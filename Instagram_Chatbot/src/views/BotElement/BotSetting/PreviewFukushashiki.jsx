@@ -2453,7 +2453,7 @@ const PreviewFukushashiki = () => {
                 }
                 else {
                   message.pull_down.customization.options_without_comment.forEach((item) => {
-                    if (item.value == textInDropdown) {
+                    if (!!textInDropdown && item.value == textInDropdown) {
                       const fukuObject = {
                         type: message.type,
                         bindingMode: message.fukushashiki_search_mode,
@@ -2471,9 +2471,23 @@ const PreviewFukushashiki = () => {
                 if (message.pull_down.lp_integration_option.value != "") {
                   const fukuObject = {
                     type: message.type,
+                    pulldownType: message.pull_down.type,
                     bindingMode: message.pull_down.lp_element_search_mode,
                     bindingAddress: message.pull_down.lp_element_search_value,
                     bindingValue: message.pull_down.lp_integration_option.value
+                  };
+                  fukuDataList.push(fukuObject);
+                }
+              }
+
+              if (message.pull_down?.type == "from_js_result") {
+                if (message.pull_down.from_js_result.value?.toString() != "") {
+                  const fukuObject = {
+                    type: message.type,
+                    pulldownType: message.pull_down.type,
+                    bindingMode: message.pull_down.from_js_result_target_search_mode,
+                    bindingAddress: message.pull_down.from_js_result_target_search_value,
+                    bindingValue: message.pull_down.from_js_result.value
                   };
                   fukuDataList.push(fukuObject);
                 }

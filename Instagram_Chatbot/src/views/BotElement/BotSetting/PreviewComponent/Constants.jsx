@@ -102,6 +102,7 @@ const SESSION_STORAGE_KEY = {
 
 const CRAWL_ELEMENT_TYPES = {
   SELECT: 'select',
+  FROM_JS: "from_js"
 };
 
 const CHATBOT_ACTIONS = {
