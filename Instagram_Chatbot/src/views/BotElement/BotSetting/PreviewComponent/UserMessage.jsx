@@ -712,7 +712,7 @@ const UserMessage = ({
                           placeholder={textInput[textInput.type]?.number1}
                           onChange={(value) => {
                             if (value.length === 3) {
-                              moveToNext("ss-user-message-phone_number_2");
+                              moveToNext(`ss-user-message-phone_number_2_${indexContent}`);
                             }
                             onChangeValue(
                               indexContent,
@@ -724,13 +724,13 @@ const UserMessage = ({
                           }}
                           onCompositionEnd={(event) => {
                             if (event.target.value.length === 3) {
-                              moveToNext("ss-user-message-phone_number_2");
+                              moveToNext(`ss-user-message-phone_number_2_${indexContent}`);
                             }
                           }}
                           value={textInput[textInput.type]?.value1}
                         ></InputCustom>
                         <InputCustom
-                          id="ss-user-message-phone_number_2"
+                          id={`ss-user-message-phone_number_2_${indexContent}`}
                           disabled={disabled}
                           className="ss-message__content--user-text-input ss-input-value"
                           style={{ marginBottom: "0px", width: "32%" }}
@@ -740,7 +740,7 @@ const UserMessage = ({
                           placeholder={textInput[textInput.type]?.number2}
                           onChange={(value) => {
                             if (value.length === 4) {
-                              moveToNext("ss-user-message-phone_number_3");
+                              moveToNext(`ss-user-message-phone_number_3_${indexContent}`);
                             }
                             onChangeValue(
                               indexContent,
@@ -752,13 +752,13 @@ const UserMessage = ({
                           }}
                           onCompositionEnd={(event) => {
                             if (event.target.value.length === 4) {
-                              moveToNext("ss-user-message-phone_number_3");
+                              moveToNext(`ss-user-message-phone_number_3_${indexContent}`);
                             }
                           }}
                           value={textInput[textInput.type]?.value2}
                         ></InputCustom>
                         <InputCustom
-                          id="ss-user-message-phone_number_3"
+                          id={`ss-user-message-phone_number_3_${indexContent}`}
                           disabled={disabled}
                           // className="ss-message__content--user-text-input ss-input-value"
                           style={{ marginBottom: "0px", width: "32%" }}
