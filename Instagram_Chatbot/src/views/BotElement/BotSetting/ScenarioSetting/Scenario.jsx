@@ -882,8 +882,8 @@ const Scenario = () => {
     });
   }
 
-  const renderDescriptionPayment = ({ itemPaymentRadio, setDataMessages, dataMessages }) => {
-    if (!itemPaymentRadio.isUsedHTMLDescription) return null;
+  const renderPaymentMethodDescriptionInput = ({ selectedItem, dataMessages }) => {
+    if (!selectedItem.isUsedHTMLDescription) return null;
     return (
       <InputCustom
         maxLength={10000}
@@ -891,9 +891,9 @@ const Scenario = () => {
         label="HTMLの説明をカスタマイズする"
         inline={false}
         placeholder="ここにHTMLを入力してください"
-        value={itemPaymentRadio.descriptionContent}
+        value={selectedItem.descriptionContent}
         onChange={(value) => {
-          itemPaymentRadio.descriptionContent = value;
+          selectedItem.descriptionContent = value;
           setDataMessages([...dataMessages]);
         }}
       />
@@ -10975,7 +10975,7 @@ const Scenario = () => {
                                                                                         onChange={() => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemPaymentRadio.value, 'card_linked_setting')}
                                                                                       />
                                                                                     </div>
-                                                                                    {renderDescriptionPayment(cardPaymentRadioButton)}
+                                                                                    {renderPaymentMethodDescriptionInput(cardPaymentRadioButton)}
                                                                                     {array.length > 1 &&
                                                                                       <div className="ss-user-setting-payment-radio-times-icons">
                                                                                         <MDBIcon fas icon="times-circle"
