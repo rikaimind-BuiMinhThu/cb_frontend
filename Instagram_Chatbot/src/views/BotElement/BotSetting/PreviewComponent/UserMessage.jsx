@@ -556,7 +556,7 @@ const UserMessage = ({
   }
 
   function RenderPulldownFromJs({ disabled, pullDown, indexContent, content }) {
-    if (pullDown?.type === MESSAGE_CONTENT_TYPES.PULLDOWN.FROM_JS) return null;
+    if (pullDown?.type !== MESSAGE_CONTENT_TYPES.PULLDOWN.FROM_JS) return null;
 
     return (
       <LPIntegrationOptionPullDown
