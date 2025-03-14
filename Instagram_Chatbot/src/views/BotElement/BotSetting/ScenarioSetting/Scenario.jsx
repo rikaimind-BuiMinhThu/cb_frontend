@@ -1936,9 +1936,10 @@ const Scenario = () => {
   }
 
   const closeAfterDone = (func) => (...props) => {
-    func(...props)
-    handleChangeOpenModalCustomCss(false)();
-  }
+    func(...props);
+    setTimeout(() => setIsOpenModalCustomCss(false), 0);
+  };
+  
 
   const handleOnCancelCustomCss = () => {
     setCustomCssContent((prevState) => ({
@@ -13493,7 +13494,7 @@ const Scenario = () => {
           <span style={{ fontSize: '16px' }}>{messageNoti}</span>
         </div>
       </ModalNoti>
-      {renderModalCustomCssForm(isOpenModalCustomCss)}
+      {isOpenModalCustomCss && renderModalCustomCssForm(isOpenModalCustomCss)}
       <ModalShort open={isOpenAddVariable} onClose={() => setIsOpenAddVariable(false)}>
         <div className="sl-popup-create-scenario-wrapper">
           <h4>変数追加</h4>
