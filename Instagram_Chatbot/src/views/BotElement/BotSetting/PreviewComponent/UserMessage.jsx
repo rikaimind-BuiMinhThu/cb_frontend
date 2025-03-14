@@ -3169,10 +3169,10 @@ const UserMessage = ({
                                     ""
                                   );
                                   document
-                                    .getElementById("ss-user-input-address")
+                                  .getElementById(`ss-user-input-address${indexContent}`)
                                     .focus();
                                   document
-                                    .getElementById("ss-user-input-address")
+                                  .getElementById(`ss-user-input-address${indexContent}`)
                                     .select();
                                 } else {
                                   onChangeErrors(
@@ -3224,10 +3224,10 @@ const UserMessage = ({
                           onChange={async (value) => {
                             if ((value + "").length === 3) {
                               document
-                                .getElementById("ss-user-post-code-right-input")
+                                .getElementById(`ss-user-post-code-right-input${indexContent}`)
                                 .focus();
                               document
-                                .getElementById("ss-user-post-code-right-input")
+                              .getElementById(`ss-user-post-code-right-input${indexContent}`)
                                 .select();
                             }
                             onChangeValue(
@@ -3265,10 +3265,10 @@ const UserMessage = ({
                                       ""
                                     );
                                     document
-                                      .getElementById("ss-user-input-address")
+                                      .getElementById(`ss-user-input-address${indexContent}`)
                                       .focus();
                                     document
-                                      .getElementById("ss-user-input-address")
+                                      .getElementById(`ss-user-input-address${indexContent}`)
                                       .select();
                                   } else {
                                     onChangeErrors(
@@ -3309,7 +3309,7 @@ const UserMessage = ({
                           inputMode="numeric"
                           placeholder={zipCodeAddress.post_code_right}
                           disabled={disabled}
-                          id="ss-user-post-code-right-input"
+                          id={`ss-user-post-code-right-input${indexContent}`}
                           style={{ width: "49%" }}
                           onKeyPress={(e) => {
                             if (e.target.value.length >= 4) e.preventDefault();
@@ -3350,10 +3350,10 @@ const UserMessage = ({
                                       ""
                                     );
                                     document
-                                      .getElementById("ss-user-input-address")
+                                    .getElementById(`ss-user-input-address${indexContent}`)
                                       .focus();
                                     document
-                                      .getElementById("ss-user-input-address")
+                                    .getElementById(`ss-user-input-address${indexContent}`)
                                       .select();
                                   } else {
                                     onChangeErrors(
@@ -3494,7 +3494,7 @@ const UserMessage = ({
                     </div>
                     <InputCustom
                       placeholder={zipCodeAddress.address}
-                      id="ss-user-input-address"
+                      id={`ss-user-input-address${indexContent}`}
                       disabled={disabled}
                       style={{ width: "100%" }}
                       onChange={(value) =>
