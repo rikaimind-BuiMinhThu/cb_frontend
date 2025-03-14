@@ -752,10 +752,7 @@ const installmentOptions = Array.from({ length: 23 }, (_, i) => ({
   value: `${i + 2}`,
 }));
 
-// const saveCustomCss = () => {
-//   localStorage.setItem('customCss', customCssContent);
-//   setIsUseCustomCss(false);
-// };
+
 
 const Scenario = () => {
   // states
@@ -847,11 +844,6 @@ const Scenario = () => {
   useEffect(() => {
     getListVariable();
   }, [])
-  // useEffect(() => {
-  //   if (isUseCustomCss) {
-  //     getCustomCss();
-  //   }
-  // }, [isUseCustomCss]);
     
 
   useEffect(() => {
@@ -884,12 +876,6 @@ const Scenario = () => {
     handleOpenPreview(isOpenPreview);
   }, [])
 
-  // useEffect(() => {
-  //   if (isUseCustomCss) {
-  //     const savedCss = localStorage.getItem('customCss') || ''; 
-  //     setCustomCssContent(savedCss);
-  //   }
-  // }, [isUseCustomCss]);
   const handleGetMessage = () => {
     api.get(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`).then((res) => {
       setDataMessages(res.data.data?.conversation?.messages || []);
@@ -1897,13 +1883,13 @@ const Scenario = () => {
       if (res.data.code === 1) {
         setDataCondition([
           ...dataConditionFixed,
-          ...res.data.data
+          ...res.data.data,
         ]);
         setDataInputVar(res.data.data);
       }
     }).catch((error) => {
       if (error.response?.data.code === 0) {
-        tokenExpired()
+        tokenExpired();
       }
     });
   }
@@ -1916,7 +1902,7 @@ const Scenario = () => {
     let data = {
       variable: {
         variable_name: variableName,
-        default_value: defaultValue
+        default_value: defaultValue,
       }
     }
     api.post(`/api/v1/managements/chatbots/${botId}/variables`, data).then(res => {
@@ -1934,13 +1920,13 @@ const Scenario = () => {
       }, 2000);
     }).catch((error) => {
       if (error.response?.data.code === 0) {
-        tokenExpired()
+        tokenExpired();
       }
     });
   }
 
   const handleChangeOpenModalCustomCss = (value) => () => {
-    setIsOpenModalCustomCss(value)
+    setIsOpenModalCustomCss(value);
   }
 
   const handleOnChangeValueCustomCss = (e) =>{
@@ -1949,12 +1935,11 @@ const Scenario = () => {
       ...prevState,
       temp: e.target.value,
     }));
-
   }
 
-  const closeAfterDone = (func) => () => {
-    func()
-    handleChangeOpenModalCustomCss(false)()
+  const closeAfterDone = (func) => (...props) => {
+    func(...props)
+    handleChangeOpenModalCustomCss(false)();
   }
 
   const handleOnCancelCustomCss = () => {
@@ -1969,9 +1954,7 @@ const Scenario = () => {
       ...prevState,
       final: prevState.temp,
     }));
-    
   }
-
 
   const onClickSavePreview = () => {
     if (!scenarioName) {
@@ -1985,14 +1968,14 @@ const Scenario = () => {
       conversation: {
         messages: [...dataMessages],
         urlThanksPage: urlThanks,
-        coupon: coupon
+        coupon: coupon,
       },
       scenario_name: scenarioName,
       landing_page_product_url: lpProductUrl,
       is_use_only_regular_order: isUseOnlyRegularOrder,
       is_used_fukushashiki: isUseFukushashiki,
       is_used_custom_css: isUseCustomCss,
-      custom_css_content: customCssContent.final
+      custom_css_content: customCssContent.final,
     }
     api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data).then(res => {
       setIsOpenNoti(true);
@@ -2013,11 +1996,10 @@ const Scenario = () => {
       }, 2000);
     }).catch((error) => {
       if (error?.response?.data?.code === 0) {
-        tokenExpired()
+        tokenExpired();
       }
     })
   }
-
   
   const onClickSaveScenario = async () => {
     if (!scenarioName) {
@@ -2037,7 +2019,7 @@ const Scenario = () => {
       is_use_only_regular_order: isUseOnlyRegularOrder,
       is_used_fukushashiki: isUseFukushashiki,
       is_used_custom_css : isUseCustomCss,
-      custom_css_content: customCssContent.final
+      custom_css_content: customCssContent.final,
     }
     try {
       const res = await api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data);
@@ -2054,7 +2036,7 @@ const Scenario = () => {
       }, 2000);
     } catch (error) {
       if (error.response?.data.code === 0) {
-        tokenExpired()
+        tokenExpired();
       }
     }
   }
@@ -2150,7 +2132,7 @@ const Scenario = () => {
           belong_to: belongTo,
           conditions: [],
           is_display_button_next: true,
-          message_content: []
+          message_content: [],
         }
       )
     }
@@ -2180,7 +2162,7 @@ const Scenario = () => {
 
   const onChangeValueCondition = (index, value, name) => {
     dataMessages[indexMessageSelect].conditions[index][name] = value;
-    setConditions([...conditions])
+    setConditions([...conditions]);
   }
 
   const onClickAddCondition = () => {
@@ -2188,7 +2170,7 @@ const Scenario = () => {
       linkCondition: 'and',
       condition: 'is',
       nameCondition: 'current_url',
-      inputCondition: ''
+      inputCondition: '',
     });
     setDataMessages([...dataMessages]);
   }
@@ -2427,20 +2409,30 @@ const Scenario = () => {
                     />
                     <label>定期注文のみ</label>
                   </div>
-                  <div>
-                    <input
-                      type="checkbox"
-                      className="ss-user-setting-checkbox-custom"
-                      onChange={(value) => setIsUseCustomCss(!isUseCustomCss)}
-                      checked={isUseCustomCss}
-                    />
-                    <label>Css Custom</label>
-                  </div>
-                  {isUseCustomCss && (
-                    <div>
-                      <button class="ss-user-setting__select-btn-add btn btn-secondary" onClick={handleChangeOpenModalCustomCss(true)}>Open Modal</button>
+                  <div style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "16px",
+                    justifyContent: "start",
+                    width: "100%",
+                  }}>
+                    <div className='ss-user-setting-checkbox-custom_css'> 
+                      <input
+                        type="checkbox"
+                        className="ss-user-setting-checkbox-custom"
+                        onChange={(value) => setIsUseCustomCss(!isUseCustomCss)}
+                        checked={isUseCustomCss}
+                      />
+                      <label style={{whiteSpace: "nowrap", wordBreak: "normal"}}>CSSカスタムを使用</label>
                     </div>
-                  )}
+                    {isUseCustomCss && (
+                      <div>
+                        <button class="ss-user-setting-checkbox-custom-css_toggle" onClick={handleChangeOpenModalCustomCss(true)}>
+                          {`( CSSカスタムを使用 )`}
+                        </button>
+                      </div>
+                    )}
+                  </div>
                   <div>
                     <input
                       type="checkbox"

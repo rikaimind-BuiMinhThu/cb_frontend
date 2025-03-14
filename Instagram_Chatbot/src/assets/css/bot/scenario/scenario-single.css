@@ -1311,8 +1311,26 @@ input#ss-message__content--user-checkbox--checkbox_img {
 }
 
 .ss-user-setting-checkbox-custom {
-  margin-left: 1%;
-  margin-right: 9%;
+  margin-left: 5px;
+  margin-right: 20px;
+}
+
+.ss-user-setting-checkbox-custom_css { 
+  box-sizing: border-box;
+} 
+
+.ss-user-setting-checkbox-custom-css_toggle {
+  border: none;
+  background: transparent;
+  color: #327aed;
+  font-weight: bold;
+  font-size: 12px;
+  margin: 0 0 5px 0;
+}
+
+.ss-user-setting-checkbox-custom-css_toggle:hover {
+  text-decoration: underline;
+  color: black;
 }
 
 .ss-user-setting__item-bottom-flex-start .react-datepicker-wrapper {
