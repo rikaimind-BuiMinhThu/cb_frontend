@@ -122,6 +122,26 @@ const SEARCH_MODES = {
   XPATH: 3,
 };
 
+const MESSAGE_CONTENT_TYPES = {
+  PULLDOWN: {
+    LP_INTEGRATION_OPTION: 'lp_integration_option',
+    FROM_JS: 'from_js_result',
+    CUSTOMIZATION: 'customization',
+    TIME_HM: 'time_hm',
+    DATE_YMD: 'date_ymd',
+    DATE_MD: 'date_md',
+    DATE_YM: 'date_ym',
+    DATE_YMD_HM: 'date_ymd_hm',
+    DOB_YMD: 'dob_ymd',
+    DOB_YM: 'dob_ym',
+    TIMEZONE_FROM_TO: 'timezone_from_to',
+    PERIOD_FROM_TO: 'period_from_to',
+    PREFECTURES: 'prefectures',
+    UP_TO_MUNICIPALITY: 'up_to_municipality',
+    CONSUME_API_RESPONSE: 'comsume_api_response',
+  },
+};
+
 export {
   dataHourFixed,
   dataMinutes,
@@ -137,4 +157,5 @@ export {
   CHATBOT_ACTIONS,
   CRAWL_ELEMENT_TYPES,
   SEARCH_MODES,
+  MESSAGE_CONTENT_TYPES
 };

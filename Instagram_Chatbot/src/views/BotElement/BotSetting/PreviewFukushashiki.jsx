@@ -23,7 +23,7 @@ import iconMessagePink from "../../../assets/img/icon-mess/icon-message-chat-pin
 import iconMessagePurple from "../../../assets/img/icon-mess/icon-message-chat-purple.png";
 import iconMessageBlack from "../../../assets/img/icon-mess/icon-message-chat-black.png";
 import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-white.png";
-import { CHATBOT_ACTIONS, SESSION_STORAGE_KEY } from "./PreviewComponent/Constants";
+import { CHATBOT_ACTIONS, MESSAGE_CONTENT_TYPES, SESSION_STORAGE_KEY } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
   lightenColor,
@@ -2480,7 +2480,7 @@ const PreviewFukushashiki = () => {
                 }
               }
 
-              if (message.pull_down?.type == "from_js_result") {
+              if (message.pull_down?.type == MESSAGE_CONTENT_TYPES.PULLDOWN.FROM_JS) {
                 if (message.pull_down.from_js_result.value?.toString() != "") {
                   const fukuObject = {
                     type: message.type,

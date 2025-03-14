@@ -41,6 +41,7 @@ import locale from 'antd/es/date-picker/locale/ja_JP';
 import 'moment/locale/zh-cn';
 import ShopifyReferenceSelect from "./ShopifyReferenceSelect";
 import { Tooltip } from '@mui/material';
+import { MESSAGE_CONTENT_TYPES } from '../PreviewComponent/Constants';
 
 const _ = require('lodash');
 
@@ -537,7 +538,7 @@ let dataTypePullDown = [
     value: 'LP一体型フォームの選択肢を利用する'
   },
   {
-    key: 'from_js_result',
+    key: MESSAGE_CONTENT_TYPES.PULLDOWN.FROM_JS,
     value: 'JSコードを利用する'
   }
 ];
@@ -1815,8 +1816,19 @@ const Scenario = () => {
    
   }
 
+  const RenderPulldownFromJs = ({ pullDown }) => {
+    if (pullDown.type !== MESSAGE_CONTENT_TYPES.PULLDOWN.FROM_JS) return null;
 
-
+    return (
+      <React.Fragment>
+        <SelectCustom
+          data={[]}
+          placeholder="選択してください。"
+          style={{ width: '100%' }}
+        />
+      </React.Fragment>
+    )
+  };
   
   const onChangeFixedDate = (indexMessage, indexContent, type, value, name) => {
     if (value) {
@@ -3685,15 +3697,7 @@ const Scenario = () => {
                                                                     />
                                                                   </React.Fragment>
                                                                 )}
-                                                                {pullDown.type === 'from_js_result' && (
-                                                                  <React.Fragment>
-                                                                    <SelectCustom
-                                                                      data={[]}
-                                                                      placeholder="選択してください。"
-                                                                      style={{ width: '100%' }}
-                                                                    />
-                                                                  </React.Fragment>
-                                                                )}
+                                                                <RenderPulldownFromJs pullDown={pullDown} />
                                                                 {pullDown.type === 'up_to_municipality' && (
                                                                   <div>
                                                                     <div style={{ fontWeight: '400', fontSize: '12px' }}>{pullDown[pullDown.type].prefecture_comment}</div>
@@ -9352,7 +9356,7 @@ const Scenario = () => {
                                                       }
 
                                                       {/* pull_down: type = from_js_result */}
-                                                      {pullDown.type === 'from_js_result' && 
+                                                      {pullDown.type === MESSAGE_CONTENT_TYPES.PULLDOWN.FROM_JS && 
                                                         <React.Fragment>
                                                           <div>
                                                             <div className='ss-user-setting__item-bottom' style={{ width: '18%', fontSize: '14px', fontWeight: '400', marginBottom: '5px' }}>
