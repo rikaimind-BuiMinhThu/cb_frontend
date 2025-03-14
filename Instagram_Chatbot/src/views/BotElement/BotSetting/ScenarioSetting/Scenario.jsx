@@ -41,6 +41,7 @@ import locale from 'antd/es/date-picker/locale/ja_JP';
 import 'moment/locale/zh-cn';
 import ShopifyReferenceSelect from "./ShopifyReferenceSelect";
 import { Tooltip } from '@mui/material';
+import { MESSAGE_CONTENT_TYPES } from '../PreviewComponent/Constants';
 
 const _ = require('lodash');
 
@@ -535,6 +536,10 @@ let dataTypePullDown = [
   {
     key: 'lp_integration_option',
     value: 'LP一体型フォームの選択肢を利用する'
+  },
+  {
+    key: MESSAGE_CONTENT_TYPES.PULLDOWN.FROM_JS,
+    value: 'JSコードを利用する'
   }
 ];
 
@@ -1273,6 +1278,7 @@ const Scenario = () => {
             up_to_municipality: {},
             prefectures: {},
             lp_integration_option: {},
+            from_js_result: {}
           }
         }
       );
@@ -1811,8 +1817,118 @@ const Scenario = () => {
    
   }
 
+  const renderPreviewPulldownfromJs = (pullDown) => {
+    if (pullDown.type !== MESSAGE_CONTENT_TYPES.PULLDOWN.FROM_JS) return null;
 
+    return (
+      <React.Fragment>
+        <SelectCustom
+          data={[]}
+          placeholder="選択してください。"
+          style={{ width: '100%' }}
+        />
+      </React.Fragment>
+    )
+  };
 
+  const renderDetailSettingPulldownFromJs = ({ indexMessageSelect, indexContent, content, pullDown }) => {
+    if (pullDown.type !== MESSAGE_CONTENT_TYPES.PULLDOWN.FROM_JS) return null;
+
+    return (
+      <React.Fragment>
+        <div>
+          <div
+            className='ss-user-setting__item-bottom'
+            style={{ width: '18%', fontSize: '14px', fontWeight: '400', marginBottom: '5px' }}
+          >
+            jscode
+          </div>
+          <div className='ss-user-setting__item-bottom'>
+            <textarea
+              style={{ width: '90%' }}
+              className='ss-user-setting-item-textarea-label ss-input-value'
+              placeholder='テキスト'
+              rows='10'
+              value={pullDown.from_js_result_code}
+              onChange={(e) =>
+                onChangeValueMessageContent(
+                  indexMessageSelect,
+                  indexContent,
+                  content.type,
+                  e.target.value,
+                  'from_js_result_code'
+                )
+              }
+            />
+          </div>
+        </div>
+        <div
+          className='ss-user-setting__item-row'
+          style={{ display: 'flex', gap: '10px', marginLeft: '35px', width: '90%' }}
+        >
+          <Tooltip title='複写先要素の取得方法をお選びください' placement='top'>
+            <div style={{ width: '25%' }}>
+              <SelectCustom
+                id='title'
+                style={{ width: '100%' }}
+                value={pullDown.from_js_result_target_search_mode}
+                onChange={(value) =>
+                  onChangeValueMessageContent(
+                    indexMessageSelect,
+                    indexContent,
+                    content.type,
+                    value,
+                    'from_js_result_target_search_mode'
+                  )
+                }
+                data={[
+                  { key: 1, value: 'id' },
+                  { key: 2, value: 'css_selector' },
+                  { key: 3, value: 'xpath' },
+                ]}
+                keyValue='key'
+                placeholder='複写先要素の取得方法をお選びください'
+              />
+            </div>
+          </Tooltip>
+          <Tooltip
+            title={
+              {
+                1: '複写先要素のIDを入力ください',
+                2: '複写先要素のcss_selectorを入力ください',
+                3: '複写先要素のxPathを入力ください',
+              }[pullDown[pullDown.type]?.from_js_result_target_search_mode] || ''
+            }
+            placement='top'
+          >
+            <div style={{ flex: '75%' }}>
+              <InputCustom
+                styleLabel={{ width: '100%' }}
+                style={{ width: '100%' }}
+                onChange={(value) =>
+                  onChangeValueMessageContent(
+                    indexMessageSelect,
+                    indexContent,
+                    content.type,
+                    value,
+                    'from_js_result_target_search_value'
+                  )
+                }
+                value={pullDown.from_js_result_target_search_value}
+                placeholder={
+                  {
+                    1: '複写先要素のIDを入力ください',
+                    2: '複写先要素のcss_selectorを入力ください',
+                    3: '複写先要素のxPathを入力ください',
+                  }[pullDown[pullDown.type]?.from_js_result_target_search_mode] || ''
+                }
+              />
+            </div>
+          </Tooltip>
+        </div>
+      </React.Fragment>
+    );
+  };
   
   const onChangeFixedDate = (indexMessage, indexContent, type, value, name) => {
     if (value) {
@@ -3681,6 +3797,7 @@ const Scenario = () => {
                                                                     />
                                                                   </React.Fragment>
                                                                 )}
+                                                                {renderPreviewPulldownfromJs(pullDown)}
                                                                 {pullDown.type === 'up_to_municipality' && (
                                                                   <div>
                                                                     <div style={{ fontWeight: '400', fontSize: '12px' }}>{pullDown[pullDown.type].prefecture_comment}</div>
@@ -9348,6 +9465,14 @@ const Scenario = () => {
                                                           </div>}
                                                         </React.Fragment>
                                                       }
+
+                                                      {/* pull_down: type = from_js_result */}
+                                                      {renderDetailSettingPulldownFromJs({
+                                                        indexContent: indexContent,
+                                                        content: content,
+                                                        indexMessageSelect: indexMessageSelect,
+                                                        pullDown: pullDown
+                                                      })}
                                                       
                                                     </React.Fragment>
                                                   )}
