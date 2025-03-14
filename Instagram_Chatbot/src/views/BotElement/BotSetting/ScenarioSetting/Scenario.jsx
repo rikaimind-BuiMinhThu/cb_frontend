@@ -765,6 +765,13 @@ const Scenario = () => {
   const [coupon, setCoupon] = useState('');
   const [isUseOnlyRegularOrder, setIsUseOnlyRegularOrder] = useState(false);
   const [isUseFukushashiki, setIsUseFukushashiki] = useState(false);
+  const [isUseCustomCss, setIsUseCustomCss] = useState(false);
+  const [customCssContent, setCustomCssContent] = useState({
+    temp: "",
+    final: ""
+  });
+  const [isOpenModalCustomCss, setIsOpenModalCustomCss] = useState(false);
+
   const [errorScenarioName, setErrorScenarioName] = useState('');
 
   const [belongTo, setBelongTo] = useState('bot');
@@ -840,6 +847,7 @@ const Scenario = () => {
   useEffect(() => {
     getListVariable();
   }, [])
+    
 
   useEffect(() => {
     api.get(`/api/v1/managements/emails?page=all&chatbot_id=${botId}`).then(res => {
@@ -880,6 +888,11 @@ const Scenario = () => {
       setLpProductUrl(res.data.data?.tamagoLandingPageUrl || '');
       setIsUseOnlyRegularOrder(res.data.data?.isUseOnlyRegularOrder || false);
       setIsUseFukushashiki(res.data.data?.isUseFukushashiki || false);
+      setIsUseCustomCss(res.data.data?.isUseCustomCss || false);
+      setCustomCssContent({
+        temp: res.data.data?.custom_css_content || '',
+        final: res.data.data?.custom_css_content || '',
+      });
     }).catch((error) => {
       if (error.response?.data.code === 0) {
         tokenExpired()
@@ -2003,13 +2016,13 @@ const Scenario = () => {
       if (res.data.code === 1) {
         setDataCondition([
           ...dataConditionFixed,
-          ...res.data.data
+          ...res.data.data,
         ]);
         setDataInputVar(res.data.data);
       }
     }).catch((error) => {
       if (error.response?.data.code === 0) {
-        tokenExpired()
+        tokenExpired();
       }
     });
   }
@@ -2022,7 +2035,7 @@ const Scenario = () => {
     let data = {
       variable: {
         variable_name: variableName,
-        default_value: defaultValue
+        default_value: defaultValue,
       }
     }
     api.post(`/api/v1/managements/chatbots/${botId}/variables`, data).then(res => {
@@ -2040,10 +2053,78 @@ const Scenario = () => {
       }, 2000);
     }).catch((error) => {
       if (error.response?.data.code === 0) {
-        tokenExpired()
+        tokenExpired();
       }
     });
   }
+
+  const handleChangeOpenModalCustomCss = (value) => () => {
+    setIsOpenModalCustomCss(value);
+  }
+
+  const handleOnChangeValueCustomCss = (e) =>{
+    e.preventDefault();
+    setCustomCssContent((prevState) => ({
+      ...prevState,
+      temp: e.target.value,
+    }));
+  }
+
+  const closeAfterDone = (func) => (...props) => {
+    func(...props);
+    setTimeout(() => setIsOpenModalCustomCss(false), 0);
+  };
+  
+
+  const handleOnCancelCustomCss = () => {
+    setCustomCssContent((prevState) => ({
+      ...prevState,
+      temp: prevState.final,
+    }));
+  }
+
+  const handleOnConfirmCustomCss = () => {
+    setCustomCssContent((prevState) => ({
+      ...prevState,
+      final: prevState.temp,
+    }));
+  }
+
+  const renderModalCustomCssForm = (isOpen) => {
+    return (
+      <ModalShort open={isOpen} onClose={closeAfterDone(handleOnCancelCustomCss)}>
+        <div className="sl-popup-create-scenario-wrapper" style={{width: "750px"}}>
+          <h4>カスタム CSS を入力</h4>
+          <div style={{ marginBottom: '10px' }}>
+            <div className="sl-popup-create-scenario-input-wrapper" style={{ marginBottom: '0px' }}>
+              <span style={{ width: '100px', whiteSpace: "nowrap", wordBreak: "normal" }}>CSSコンテンツ</span>
+              <textarea
+                style={{ width: '100%', height: '150px', padding: '10px', fontSize: '14px', flexGrow: "1" }}
+                placeholder="ここにカスタムCSSコンテンツを入力してください"
+                value={customCssContent.temp}
+                onChange={handleOnChangeValueCustomCss}
+              />
+            </div>
+          </div>
+          <div className="sl-popup-create-scenario-btn-wrapper">
+            <Button
+              className="ss-popup-add-variable-input-close-button"
+              onClick={closeAfterDone(handleOnCancelCustomCss)}
+            >
+              閉じる
+            </Button>
+            <Button
+              style={{ backgroundColor: '#024BB9' }}
+              className="ss-popup-add-variable-input-keep-button"
+              onClick={closeAfterDone(handleOnConfirmCustomCss)}
+            >
+              保存
+            </Button>
+          </div>
+        </div>
+      </ModalShort>
+    );
+  };
 
   const onClickSavePreview = () => {
     if (!scenarioName) {
@@ -2057,12 +2138,14 @@ const Scenario = () => {
       conversation: {
         messages: [...dataMessages],
         urlThanksPage: urlThanks,
-        coupon: coupon
+        coupon: coupon,
       },
       scenario_name: scenarioName,
       landing_page_product_url: lpProductUrl,
       is_use_only_regular_order: isUseOnlyRegularOrder,
       is_used_fukushashiki: isUseFukushashiki,
+      is_used_custom_css: isUseCustomCss,
+      custom_css_content: customCssContent.final,
     }
     api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data).then(res => {
       setIsOpenNoti(true);
@@ -2083,11 +2166,11 @@ const Scenario = () => {
       }, 2000);
     }).catch((error) => {
       if (error?.response?.data?.code === 0) {
-        tokenExpired()
+        tokenExpired();
       }
     })
   }
-
+  
   const onClickSaveScenario = async () => {
     if (!scenarioName) {
       setErrorScenarioName("入力してください。");
@@ -2105,6 +2188,8 @@ const Scenario = () => {
       landing_page_product_url: lpProductUrl,
       is_use_only_regular_order: isUseOnlyRegularOrder,
       is_used_fukushashiki: isUseFukushashiki,
+      is_used_custom_css : isUseCustomCss,
+      custom_css_content: customCssContent.final,
     }
     try {
       const res = await api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data);
@@ -2121,7 +2206,7 @@ const Scenario = () => {
       }, 2000);
     } catch (error) {
       if (error.response?.data.code === 0) {
-        tokenExpired()
+        tokenExpired();
       }
     }
   }
@@ -2217,7 +2302,7 @@ const Scenario = () => {
           belong_to: belongTo,
           conditions: [],
           is_display_button_next: true,
-          message_content: []
+          message_content: [],
         }
       )
     }
@@ -2247,7 +2332,7 @@ const Scenario = () => {
 
   const onChangeValueCondition = (index, value, name) => {
     dataMessages[indexMessageSelect].conditions[index][name] = value;
-    setConditions([...conditions])
+    setConditions([...conditions]);
   }
 
   const onClickAddCondition = () => {
@@ -2255,7 +2340,7 @@ const Scenario = () => {
       linkCondition: 'and',
       condition: 'is',
       nameCondition: 'current_url',
-      inputCondition: ''
+      inputCondition: '',
     });
     setDataMessages([...dataMessages]);
   }
@@ -2493,6 +2578,30 @@ const Scenario = () => {
                       checked={isUseOnlyRegularOrder}
                     />
                     <label>定期注文のみ</label>
+                  </div>
+                  <div style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "16px",
+                    justifyContent: "start",
+                    width: "100%",
+                  }}>
+                    <div className='ss-user-setting-checkbox-custom_css'> 
+                      <input
+                        type="checkbox"
+                        className="ss-user-setting-checkbox-custom"
+                        onChange={(value) => setIsUseCustomCss(!isUseCustomCss)}
+                        checked={isUseCustomCss}
+                      />
+                      <label style={{whiteSpace: "nowrap", wordBreak: "normal"}}>CSSカスタムを使用</label>
+                    </div>
+                    {isUseCustomCss && (
+                      <div>
+                        <button class="ss-user-setting-checkbox-custom-css_toggle" onClick={handleChangeOpenModalCustomCss(true)}>
+                          {`( CSSコンテンツ設定モダルを開く )`}
+                        </button>
+                      </div>
+                    )}
                   </div>
                   <div>
                     <input
@@ -13548,6 +13657,7 @@ const Scenario = () => {
           <span style={{ fontSize: '16px' }}>{messageNoti}</span>
         </div>
       </ModalNoti>
+      {renderModalCustomCssForm(isOpenModalCustomCss)}
       <ModalShort open={isOpenAddVariable} onClose={() => setIsOpenAddVariable(false)}>
         <div className="sl-popup-create-scenario-wrapper">
           <h4>変数追加</h4>

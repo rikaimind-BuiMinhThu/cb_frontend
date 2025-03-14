@@ -111,7 +111,8 @@ const waitForElement = (mode, address, options = {type: "WAIT_FOR_LOADING"}, cal
         callback();
         break;
       case WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE:
-        if (element.value != options.value && element.value != removeLeadingZero(options.value)) {
+        const yearsValue = `20${options.value}`;
+        if (element.value != options.value && element.value != removeLeadingZero(options.value) && element.value != yearsValue) {
           setValueToElement(element, options.value);
           break;
         }
@@ -123,6 +124,15 @@ const waitForElement = (mode, address, options = {type: "WAIT_FOR_LOADING"}, cal
         throw new Error(`Invalid wait option type ${options.type}`);
     }
   }, 500);
+}
+
+const movePaymentMethodToTop = (data) => {
+  const index = data.findIndex(item => item.type === "payment_method_id");
+  if (index !== -1) {
+      const [paymentMethod] = data.splice(index, 1);
+      data.unshift(paymentMethod);
+  }
+  return data;
 }
 
 const getEcChatBotApiServerBaseUrl = () => {
@@ -233,6 +243,7 @@ const displayPopup = async () => {
 
       switch (e.data.action) {
         case CHATBOT_ACTIONS.FUKUSHASHIKI:
+          e.data.actionData = movePaymentMethodToTop(e.data.actionData);
           await fillDataFromMessage(e.data.actionData);
           break;
         case CHATBOT_ACTIONS.GET_ERROR_MESSAGE:
@@ -413,11 +424,15 @@ const fillDataFromMessage = async (data) => {
       case "card_payment_radio_button":
       case "text_input":
       case "textarea":
-      case "payment_method_id":
       case "slider": {
         waitForElement(
           item.bindingMode, item.bindingAddress,
           {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
+        break;
+      }
+
+      case "payment_method_id": {
+        setValuePaymentMethodToElement(element, item.bindingValue);
         break;
       }
 
@@ -506,7 +521,7 @@ const setValueToElement = (element, value) => {
   let newElementValue = value;
 
   if (element.tagName === ELEMENT_TAGS.SELECT) {
-    const acceptableValues = [value.toString(), removeLeadingZero(value).toString()];
+    const acceptableValues = [value.toString(), removeLeadingZero(value).toString(), `20${value}`];
     newElementValue = acceptableValues.find(v => {
       return Array.from(element.options).some(option => option.value === v);
     });;
@@ -519,6 +534,16 @@ const setValueToElement = (element, value) => {
   element.value = newElementValue;
   element.dispatchEvent(new Event('change', { bubbles: true }));
 }
+
+const setValuePaymentMethodToElement = (element, value) => {
+  const radioButtons = [...element.querySelectorAll('input[type="radio"]')];
+  
+  if (radioButtons.length > 0) {
+    setRadioValue(element, value);
+  } else {
+    setValueToElement(element, value);
+  }
+};
 
 const setRadioValue = (element, value) => {
   const radioButtons = [...element.querySelectorAll('input[type="radio"]')];
