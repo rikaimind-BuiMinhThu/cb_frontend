@@ -1278,7 +1278,7 @@ const Scenario = () => {
             title_require: false,
             type: 'customization',
             customization: {
-              initial_selection: 1,
+              initial_selection,
               display_unselected: '選択してください',
               is_comment: false,
               options_with_comment: [{ id: 1 }],

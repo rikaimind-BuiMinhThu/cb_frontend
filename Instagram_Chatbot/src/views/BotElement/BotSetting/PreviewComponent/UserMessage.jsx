@@ -2236,7 +2236,7 @@ const UserMessage = ({
                                     "value"
                                   )
                                 }
-                                value={pullDown[pullDown.type].value}
+                                value={pullDown[pullDown.type].value || pullDown.initial_selection}
                               />
                             </div>
                           ) : (
