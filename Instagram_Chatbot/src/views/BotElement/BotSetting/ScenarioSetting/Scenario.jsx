@@ -1954,6 +1954,42 @@ const Scenario = () => {
     }));
   }
 
+  const renderModalCustomCssForm = (isOpen) => {
+    return (
+      <ModalShort open={isOpen} onClose={closeAfterDone(handleOnCancelCustomCss)}>
+        <div className="sl-popup-create-scenario-wrapper">
+          <h4>カスタム CSS を入力</h4>
+          <div style={{ marginBottom: '10px' }}>
+            <div className="sl-popup-create-scenario-input-wrapper" style={{ marginBottom: '0px' }}>
+              <span style={{ width: '100px' }}>CSSコンテンツ</span>
+              <textarea
+                style={{ width: '100%', height: '150px', padding: '10px', fontSize: '14px' }}
+                placeholder="ここにカスタムCSSコンテンツを入力してください"
+                value={customCssContent.temp}
+                onChange={handleOnChangeValueCustomCss}
+              />
+            </div>
+          </div>
+          <div className="sl-popup-create-scenario-btn-wrapper">
+            <Button
+              className="ss-popup-add-variable-input-close-button"
+              onClick={closeAfterDone(handleOnCancelCustomCss)}
+            >
+              閉じる
+            </Button>
+            <Button
+              style={{ backgroundColor: '#024BB9' }}
+              className="ss-popup-add-variable-input-keep-button"
+              onClick={closeAfterDone(handleOnConfirmCustomCss)}
+            >
+              保存
+            </Button>
+          </div>
+        </div>
+      </ModalShort>
+    );
+  };
+
   const onClickSavePreview = () => {
     if (!scenarioName) {
       setErrorScenarioName("入力してください。");
@@ -2426,7 +2462,7 @@ const Scenario = () => {
                     {isUseCustomCss && (
                       <div>
                         <button class="ss-user-setting-checkbox-custom-css_toggle" onClick={handleChangeOpenModalCustomCss(true)}>
-                          {`( CSSカスタムを使用 )`}
+                          {`( CSSコンテンツ設定モダルを開く )`}
                         </button>
                       </div>
                     )}
@@ -13457,38 +13493,7 @@ const Scenario = () => {
           <span style={{ fontSize: '16px' }}>{messageNoti}</span>
         </div>
       </ModalNoti>
-      <ModalShort open={isOpenModalCustomCss} onClose={() => setIsUseCustomCss(false)}>
-        <div className="sl-popup-create-scenario-wrapper">
-          <h4>カスタム CSS を入力</h4>
-          <div style={{ marginBottom: '10px' }}>
-            <div className="sl-popup-create-scenario-input-wrapper" style={{ marginBottom: '0px' }}>
-              <span style={{ width: '100px' }}>変数名</span>
-              <textarea
-                style={{ width: '100%', height: '150px', padding: '10px', fontSize: '14px' }}
-                placeholder="ここにカスタムCSSを入力してください..."
-                value={customCssContent.temp}
-                onChange={handleOnChangeValueCustomCss}
-              />
-            </div>
-          </div>
-          <div className="sl-popup-create-scenario-btn-wrapper">
-            <Button
-              className="ss-popup-add-variable-input-close-button"
-              onClick={closeAfterDone(handleOnCancelCustomCss)}
-            >
-              閉じる
-            </Button>
-            <Button
-              style={{ backgroundColor: '#024BB9' }}
-              className="ss-popup-add-variable-input-keep-button"
-              
-              onClick={closeAfterDone(handleOnConfirmCustomCss)}
-            >
-              保存
-            </Button>
-          </div>
-        </div>
-      </ModalShort>
+      {renderModalCustomCssForm(isOpenModalCustomCss)}
       <ModalShort open={isOpenAddVariable} onClose={() => setIsOpenAddVariable(false)}>
         <div className="sl-popup-create-scenario-wrapper">
           <h4>変数追加</h4>
