@@ -5754,6 +5754,22 @@ const UserMessage = ({
                           );
                         }
                       )}
+                    {cardPaymentRadioButton.radio_contents.map((itemPayment, indexPayment) => {
+                      if (
+                        cardPaymentRadioButton.initial_selection === itemPayment.value &&
+                        itemPayment.isDescriptionHTML === true &&
+                        itemPayment.descriptionContent.length > 0
+                      ) {
+                        return (
+                          <div
+                            key={indexPayment}
+                            dangerouslySetInnerHTML={{ __html: itemPayment.descriptionContent }}
+                          />
+                        );
+                      }
+                      return null;
+                    })}
+
                   </Radio.Group>
                 )}
                 {cardPaymentRadioButton.type === "customized_style" && (
@@ -5817,7 +5833,9 @@ const UserMessage = ({
                               }}
                             >
                               {itemPayment.text}
+                             
                             </Radio.Button>
+                         
                           );
                         }
                       )}

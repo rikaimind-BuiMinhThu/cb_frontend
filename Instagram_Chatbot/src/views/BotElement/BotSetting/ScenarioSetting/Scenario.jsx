@@ -10944,12 +10944,34 @@ const Scenario = () => {
                                                                                         }}
                                                                                       />
                                                                                       <CheckboxCustom
+                                                                                        label="説明HTML"
+                                                                                        onChange={(value) => {
+                                                                                          itemPaymentRadio.isDescriptionHTML = value;
+                                                                                          setDataMessages([...dataMessages]);
+                                                                                        }}
+                                                                                        value={itemPaymentRadio.isDescriptionHTML}
+                                                                                      />
+                                                                                      <CheckboxCustom
                                                                                         label="カード決済連動設定"
                                                                                         value={cardPaymentRadioButton.card_linked_setting.includes(itemPaymentRadio.value)}
                                                                                         onChange={() => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemPaymentRadio.value, 'card_linked_setting')}
                                                                                       />
-                                                                                      
                                                                                     </div>
+                                                                                    {
+                                                                                      itemPaymentRadio.isDescriptionHTML == true &&
+                                                                                      <InputCustom
+                                                                                        maxLength={5000}
+                                                                                        styleLabel={{ width: '100% !important', marginBottom: '10px' }}
+                                                                                        label="HTMLの説明をカスタマイズする"
+                                                                                        inline={false}
+                                                                                        placeholder="ここにHTMLを入力してください"
+                                                                                        value={itemPaymentRadio.descriptionContent}
+                                                                                        onChange={(value) => {
+                                                                                          itemPaymentRadio.descriptionContent = value;
+                                                                                          setDataMessages([...dataMessages]);
+                                                                                        }}
+                                                                                      />
+                                                                                    }
                                                                                     {array.length > 1 &&
                                                                                       <div className="ss-user-setting-payment-radio-times-icons">
                                                                                         <MDBIcon fas icon="times-circle"
