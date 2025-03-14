@@ -16,7 +16,7 @@ const SEARCH_MODES = {
 
 const CRAWL_ELEMENT_TYPES = {
   SELECT: 'select',
-  FROM_JS: "from_js"
+  FROM_JS: 'from_js'
 };
 
 const ELEMENT_TAGS = {
@@ -291,7 +291,7 @@ const crawl = async (options) => {
     case CRAWL_ELEMENT_TYPES.FROM_JS:
       return transformJsResultArray({
         data: await extractFromJs(options),
-        fields: ["id", "value", "text"],
+        fields: ['id', 'value', 'text'],
       });
     default:
       throw new Error(`Not support target element type ${options.targetElementType}`);
@@ -326,42 +326,31 @@ const extractSelectOptions = (selectElement) => {
     }));
 }
 
-const extractFromJs =  async (options) => {
-  const { searchJsCode: jsCode } = options; 
-  if(!jsCode) return;
+const extractFromJs = async (options) => {
+  const { searchJsCode: jsCode } = options;
+  if (!jsCode) return;
 
   try {
     const func = new Function(jsCode);
     const result = await func();
-  
+
     return result;
-  } 
-  catch(error) {
+  } catch (error) {
     console.error("[EXTRACT_FROM_JS]", error);
 
     return null;
   }
-}
+};
 
 const transformJsResultArray = ({ data, fields, skipOnError = true }) => {
-  if (!fields || !Array.isArray(fields) || !Array.isArray(data)) return [];
+  if (!Array.isArray(fields) || !Array.isArray(data)) return [];
 
-  const result = [];
+  const result = data.filter(item => {
+    const isValid = fields.every(field => item[field]);
+    return isValid || !skipOnError;
+  });
 
-  for (const item of data) {
-    let take = true;
-    for (const field of fields) {
-      if (!item[field]) {
-        take = false;
-        break;
-      }
-    }
-    if (take) {
-      result.push(item);
-    } else if (!skipOnError) return [];
-  }
-
-  return result;
+  return skipOnError ? result : result.length === data.length ? result : [];
 };
 
 const processGetErrorMessage = (data) => {
@@ -430,8 +419,8 @@ const fillDataFromMessage = async (data) => {
         break;
       }
 
-      case "pull_down": {
-        if (item.pulldownType === "lp_integration_option") {
+      case 'pull_down': {
+        if (item.pulldownType === 'lp_integration_option') {
           const hasOption = Array.from(element.options).some(option => option.value === item.bindingValue);
           if (!hasOption) item.bindingValue = '';
         }

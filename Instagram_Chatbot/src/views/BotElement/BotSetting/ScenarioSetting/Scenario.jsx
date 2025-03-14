@@ -538,7 +538,7 @@ let dataTypePullDown = [
   },
   {
     key: 'from_js_result',
-    value: 'Get result from js code'
+    value: 'JSコードを利用する'
   }
 ];
 
