@@ -47,7 +47,8 @@ const UserMessage = ({
   variables,
   lpOptionData = {},
   submitErrorMessage = '',
-  postMessageToParent
+  postMessageToParent,
+  botId
 }) => {
   const [dataHour, setDataHour] = useState(dataHourFixed);
   const [dataYear, setDataYear] = useState(dataYearFixed);
@@ -57,9 +58,12 @@ const UserMessage = ({
   const [messageContent, setMessageContent] = useState(messageContentProps);
   const [errors, setErrors] = useState(errorsProps);
   const [checked, setChecked] = useState([]);
-  const [bot_id, setBotId] = useState(Cookies.get("bot_id"));
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [messageNoti, setMessageNoti] = useState("");
+
+  const getPrefectureIdCodeFromName = (name) => {
+    return prefecturesList.find((prefecture) => prefecture.name === name)?.id;
+  }
   
   const cardExpiredYearOptions =  Array.from({ length: 10 }, (_, i) => {
     return {
@@ -499,13 +503,15 @@ const UserMessage = ({
   };
 
   const handleClickCarousel = (urls, use_shortened_urls) => {
+    if (!urls.trim().length) return;
+
     let data = {
       history_click_url: {
         origin_url: urls,
       },
     };
     api
-      .post(`/api/v1/managements/history_click_urls?chatbot_id=${bot_id}`, data)
+      .post(`/api/v1/managements/history_click_urls?chatbot_id=${botId}`, data)
       .then((response) => {
         if (response.data.code === 1) {
           let message = response.data.message;
@@ -706,7 +712,7 @@ const UserMessage = ({
                           placeholder={textInput[textInput.type]?.number1}
                           onChange={(value) => {
                             if (value.length === 3) {
-                              moveToNext("ss-user-message-phone_number_2");
+                              moveToNext(`ss-user-message-phone_number_2_${indexContent}`);
                             }
                             onChangeValue(
                               indexContent,
@@ -718,13 +724,13 @@ const UserMessage = ({
                           }}
                           onCompositionEnd={(event) => {
                             if (event.target.value.length === 3) {
-                              moveToNext("ss-user-message-phone_number_2");
+                              moveToNext(`ss-user-message-phone_number_2_${indexContent}`);
                             }
                           }}
                           value={textInput[textInput.type]?.value1}
                         ></InputCustom>
                         <InputCustom
-                          id="ss-user-message-phone_number_2"
+                          id={`ss-user-message-phone_number_2_${indexContent}`}
                           disabled={disabled}
                           className="ss-message__content--user-text-input ss-input-value"
                           style={{ marginBottom: "0px", width: "32%" }}
@@ -734,7 +740,7 @@ const UserMessage = ({
                           placeholder={textInput[textInput.type]?.number2}
                           onChange={(value) => {
                             if (value.length === 4) {
-                              moveToNext("ss-user-message-phone_number_3");
+                              moveToNext(`ss-user-message-phone_number_3_${indexContent}`);
                             }
                             onChangeValue(
                               indexContent,
@@ -746,13 +752,13 @@ const UserMessage = ({
                           }}
                           onCompositionEnd={(event) => {
                             if (event.target.value.length === 4) {
-                              moveToNext("ss-user-message-phone_number_3");
+                              moveToNext(`ss-user-message-phone_number_3_${indexContent}`);
                             }
                           }}
                           value={textInput[textInput.type]?.value2}
                         ></InputCustom>
                         <InputCustom
-                          id="ss-user-message-phone_number_3"
+                          id={`ss-user-message-phone_number_3_${indexContent}`}
                           disabled={disabled}
                           // className="ss-message__content--user-text-input ss-input-value"
                           style={{ marginBottom: "0px", width: "32%" }}
@@ -3105,7 +3111,7 @@ const UserMessage = ({
                                   onChangeValue(
                                     indexContent,
                                     content.type,
-                                    res.data.data.prefecture_name,
+                                    getPrefectureIdCodeFromName(res.data.data.prefecture_name),
                                     "value_prefecture"
                                   );
                                   onChangeValue(
@@ -3962,11 +3968,13 @@ const UserMessage = ({
                                     style={{ width: "100%" }}
                                   />
                                 </div>
-                                <div className="sp-carousel-preview-title">
-                                  {itemCarousel.title}
-                                </div>
-                                <div className="sp-carousel-preview-sub-title">
-                                  {itemCarousel.subtitle}
+                                <div className="sp-carousel-preview-title_holder">
+                                  <div className="sp-carousel-preview-title">
+                                    {itemCarousel.title}
+                                  </div>
+                                  <div className="sp-carousel-preview-sub-title">
+                                    {itemCarousel.subtitle}
+                                  </div>
                                 </div>
                               </div>
                               <div

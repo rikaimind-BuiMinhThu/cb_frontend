@@ -289,9 +289,17 @@ const PreviewFukushashiki = () => {
   // post message to parent window
   useEffect(() => {
     if (!state.urlReceive) return;
-
     postMessageToParent();
-  }, [state.urlReceive]);
+  }, [
+    state.urlReceive,
+    state.isOpen,
+    state.widthPc,
+    state.heightPc,
+    state.widthSp,
+    state.heightSp,
+    state.rightMarginPc,
+    state.bottomMarginPc
+  ]);
 
   // Get prefectures
   useEffect(() => {
@@ -623,6 +631,7 @@ const PreviewFukushashiki = () => {
       icon_mess,
       main_color: res.data.chatbot.main_color || res.data.chatbot.main_color_other,
       main_color_other: res.data.chatbot.main_color_other,
+      titleBubble:res.data.design_settings.title_bubble
     };
   }
 
@@ -795,12 +804,32 @@ const PreviewFukushashiki = () => {
 
   const extractStateFromPreviewResponse = async (res) => {
     if (!res || !res.data || res.data.code !== 1) return;
+    
+    const designSetting = res.data.design_settings;
     let newState = {
       ...state,
       botInfor: getBotInforFromPreviewResponse(res),
       objParam: {},
       loadedStateFromSession: true,
       messagesList: res.data.data?.conversation?.messages || [],
+      isOpen: Number(designSetting.display_type) === 1,
+      activePopupCloseBot: Boolean(designSetting?.popup_close_bot),
+      titleBubble: designSetting?.title_bubble || "簡単90秒で注文完了",
+      displayType: designSetting?.display_type,
+      widthPc: designSetting?.width_pc || 450,
+      heightPc: designSetting?.height_pc || 700,
+      widthSp: designSetting?.width_sp || 100,
+      heightSp: designSetting?.height_sp || 100,
+      positionPc: designSetting?.position_pc || "1",
+      rightPcTitle: designSetting?.right_position_pc_title,
+      buttonTypePc: designSetting?.button_type_pc || "1",
+      rightMarginPc: designSetting?.right_margin_pc || 10,
+      bottomMarginPc: designSetting?.bottom_margin_pc || 0,
+      positionSp: designSetting?.position_sp || "1",
+      buttonTypeSp: designSetting?.button_type_sp || "1",
+      rightSpTitle: designSetting?.right_position_sp_title,
+      rightMarginSp: designSetting?.right_margin_sp,
+      bottomMarginSp: designSetting?.bottom_margin_sp,
     };
     const prevOpenStatus = sessionStorage.getItem("prevOpenStatus");
 
@@ -1005,7 +1034,7 @@ const PreviewFukushashiki = () => {
     if (!state.isOpen) return;
     await sleep(1000);
     scrollToBottom(false);
-  }, [state.isOpen, state.renderMessagesList]);
+  }, [state.isOpen, state.renderMessagesList.length]);
 
   const scrollToBottom = (forceScroll = false) => {
     if (document.getElementById("sp-body")) {
@@ -3268,6 +3297,7 @@ const PreviewFukushashiki = () => {
             variables={state.variables}
             lpOptionData={state.lpOptionData}
             submitErrorMessage={state.submitErrorMessage}
+            botId={state.botId}
           />
           {renderSubmitButton(message, indexMessage)}
         </div>
@@ -3373,7 +3403,7 @@ const PreviewFukushashiki = () => {
               <div className="sp-header-left-label-sub-title">
                 {state.botInfor?.subtitle}
               </div>
-              <div className="sp-header-left-label-title">{state.botInfor?.title}</div>
+              <div className="sp-header-left-label-title">{state.botInfor?.titleBubble}</div>
             </div>
           </div>
           <div
