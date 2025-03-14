@@ -3169,10 +3169,10 @@ const UserMessage = ({
                                     ""
                                   );
                                   document
-                                  .getElementById(`ss-user-input-address${indexContent}`)
+                                    .getElementById(`ss-user-input-address${indexContent}`)
                                     .focus();
                                   document
-                                  .getElementById(`ss-user-input-address${indexContent}`)
+                                    .getElementById(`ss-user-input-address${indexContent}`)
                                     .select();
                                 } else {
                                   onChangeErrors(
@@ -3350,10 +3350,10 @@ const UserMessage = ({
                                       ""
                                     );
                                     document
-                                    .getElementById(`ss-user-input-address${indexContent}`)
+                                      .getElementById(`ss-user-input-address${indexContent}`)
                                       .focus();
                                     document
-                                    .getElementById(`ss-user-input-address${indexContent}`)
+                                      .getElementById(`ss-user-input-address${indexContent}`)
                                       .select();
                                   } else {
                                     onChangeErrors(
