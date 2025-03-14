@@ -1255,6 +1255,7 @@ const Scenario = () => {
             title_require: false,
             type: 'customization',
             customization: {
+              initial_selection: 1,
               display_unselected: '選択してください',
               is_comment: false,
               options_with_comment: [{ id: 1 }],
@@ -8067,7 +8068,7 @@ const Scenario = () => {
                                                                                     {...providedChild.dragHandleProps}
                                                                                     ref={providedChild.innerRef}
                                                                                   >
-                                                                                    <div style={{ marginBottom: '10px', width: '100%', backgroundColor: '#F8F9FA', padding: '5px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                                                    <div style={{ width: '100%', backgroundColor: '#F8F9FA', padding: '5px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                                                                       <MDBIcon fas icon="grip-horizontal" />
                                                                                       <InputDouble
                                                                                         style={array.length === 1 && !pullDown[pullDown.type]?.is_comment ? { width: '95%' } : {}}
@@ -8098,6 +8099,17 @@ const Scenario = () => {
                                                                                         />
                                                                                       }
                                                                                     </div>
+                                                                                    <CheckboxCustom
+                                                                                      label="初期選択設定"
+                                                                                      onChange={() => {
+                                                                                        if (pullDown.initial_selection !== itemPullDown.value) {
+                                                                                          onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemPullDown.value, 'initial_selection');
+                                                                                        } else { 
+                                                                                          onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, "", 'initial_selection'); }
+                                                                                      }}
+                                                                                      value={pullDown.initial_selection === itemPullDown.value}
+                                                                                      isOnChange={false}
+                                                                                    />
                                                                                   </div>
                                                                                 )}
                                                                               </Draggable>
