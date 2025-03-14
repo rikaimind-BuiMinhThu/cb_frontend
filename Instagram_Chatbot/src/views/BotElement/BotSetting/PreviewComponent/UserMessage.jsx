@@ -100,20 +100,21 @@ const UserMessage = ({
         )?.[0]?.data || "";
   }
 
-  function renderDescriptionPayment(cardPaymentRadioButton) {
+  const renderDescriptionPayment = (cardPaymentRadioButton) => {
     const foundItem = cardPaymentRadioButton.radio_contents.find(
       (item) =>
         cardPaymentRadioButton.initial_selection === item.value &&
-        item.isUsedHTMLDescription === true &&
+        item.isUsedHTMLDescription &&
         item.descriptionContent.length > 0
     );
-    return foundItem ? (
+    if (!foundItem) return null;
+    return (
       <div
         key={foundItem.value}
         dangerouslySetInnerHTML={{ __html: foundItem.descriptionContent }}
       />
-    ) : null;
-  }
+    )
+  };
 
   useEffect(() => {
     if (messageContent.length === 1) {
