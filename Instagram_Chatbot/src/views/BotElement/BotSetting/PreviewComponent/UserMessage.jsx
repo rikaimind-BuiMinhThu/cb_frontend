@@ -555,7 +555,7 @@ const UserMessage = ({
     return content;
   }
 
-  function RenderPulldownFromJs({ disabled, pullDown, indexContent, content }) {
+  function renderPulldownFromJs({ disabled, pullDown, indexContent, content }) {
     if (pullDown?.type !== MESSAGE_CONTENT_TYPES.PULLDOWN.FROM_JS) return null;
 
     return (
@@ -576,7 +576,7 @@ const UserMessage = ({
       />
     );
   }
-
+  
   return (
     <div className="ss-user-message__content-wrapper">
       {messageContent?.map((content, indexContent) => {
@@ -2951,12 +2951,12 @@ const UserMessage = ({
                       }
                     />
                   )}
-                  <RenderPulldownFromJs 
-                    disabled={disabled} 
-                    pullDown={pullDown} 
-                    indexContent={indexContent} 
-                    content={content}
-                  />
+                  {renderPulldownFromJs({
+                    disabled: disabled,
+                    pullDown: pullDown,
+                    indexContent: indexContent,
+                    content: content
+                  })}
                   {pullDown.type === "up_to_municipality" && (
                     <div>
                       <div style={{ fontWeight: "400", fontSize: "12px" }}>
