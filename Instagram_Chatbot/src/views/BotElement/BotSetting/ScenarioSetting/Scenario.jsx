@@ -1957,13 +1957,13 @@ const Scenario = () => {
   const renderModalCustomCssForm = (isOpen) => {
     return (
       <ModalShort open={isOpen} onClose={closeAfterDone(handleOnCancelCustomCss)}>
-        <div className="sl-popup-create-scenario-wrapper">
+        <div className="sl-popup-create-scenario-wrapper" style={{width: "750px"}}>
           <h4>カスタム CSS を入力</h4>
           <div style={{ marginBottom: '10px' }}>
             <div className="sl-popup-create-scenario-input-wrapper" style={{ marginBottom: '0px' }}>
-              <span style={{ width: '100px' }}>CSSコンテンツ</span>
+              <span style={{ width: '100px', whiteSpace: "nowrap", wordBreak: "normal" }}>CSSコンテンツ</span>
               <textarea
-                style={{ width: '100%', height: '150px', padding: '10px', fontSize: '14px' }}
+                style={{ width: '100%', height: '150px', padding: '10px', fontSize: '14px', flexGrow: "1" }}
                 placeholder="ここにカスタムCSSコンテンツを入力してください"
                 value={customCssContent.temp}
                 onChange={handleOnChangeValueCustomCss}
