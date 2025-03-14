@@ -555,7 +555,7 @@ const UserMessage = ({
     return content;
   }
 
-  function renderPulldownFromJs({ disabled, pullDown, indexContent, content }) {
+  function renderPulldownfromJs({ disabled, pullDown, indexContent, content }) {
     if (pullDown?.type !== MESSAGE_CONTENT_TYPES.PULLDOWN.FROM_JS) return null;
 
     return (
@@ -2951,7 +2951,7 @@ const UserMessage = ({
                       }
                     />
                   )}
-                  {renderPulldownFromJs({
+                  {renderPulldownfromJs({
                     disabled: disabled,
                     pullDown: pullDown,
                     indexContent: indexContent,
