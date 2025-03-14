@@ -100,6 +100,22 @@ const UserMessage = ({
         )?.[0]?.data || "";
   }
 
+  const renderDescriptionPayment = (cardPaymentRadioButton) => {
+    const foundItem = cardPaymentRadioButton.radio_contents.find(
+      (item) =>
+        cardPaymentRadioButton.initial_selection === item.value &&
+        item.isUsedHTMLDescription &&
+        item.descriptionContent.length > 0
+    );
+    if (!foundItem) return null;
+    return (
+      <div
+        key={foundItem.value}
+        dangerouslySetInnerHTML={{ __html: foundItem.descriptionContent }}
+      />
+    )
+  };
+
   useEffect(() => {
     if (messageContent.length === 1) {
       let message = messageContent[0];
@@ -5782,6 +5798,7 @@ const UserMessage = ({
                           );
                         }
                       )}
+                    {renderDescriptionPayment(cardPaymentRadioButton)}
                   </Radio.Group>
                 )}
                 {cardPaymentRadioButton.type === "customized_style" && (
@@ -5844,8 +5861,8 @@ const UserMessage = ({
                                 }
                               }}
                             >
-                              {itemPayment.text}
-                            </Radio.Button>
+                              {itemPayment.text}                             
+                            </Radio.Button>                         
                           );
                         }
                       )}
