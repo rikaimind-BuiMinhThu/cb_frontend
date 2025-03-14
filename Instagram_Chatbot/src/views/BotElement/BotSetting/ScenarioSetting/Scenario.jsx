@@ -752,8 +752,6 @@ const installmentOptions = Array.from({ length: 23 }, (_, i) => ({
   value: `${i + 2}`,
 }));
 
-
-
 const Scenario = () => {
   // states
   const [scenarioName, setScenarioName] = useState('');
