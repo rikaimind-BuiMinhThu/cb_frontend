@@ -100,6 +100,21 @@ const UserMessage = ({
         )?.[0]?.data || "";
   }
 
+  function renderDescriptionPayment(cardPaymentRadioButton) {
+    const foundItem = cardPaymentRadioButton.radio_contents.find(
+      (item) =>
+        cardPaymentRadioButton.initial_selection === item.value &&
+        item.isUsedHTMLDescription === true &&
+        item.descriptionContent.length > 0
+    );
+    return foundItem ? (
+      <div
+        key={foundItem.value}
+        dangerouslySetInnerHTML={{ __html: foundItem.descriptionContent }}
+      />
+    ) : null;
+  }
+
   useEffect(() => {
     if (messageContent.length === 1) {
       let message = messageContent[0];
@@ -5754,22 +5769,7 @@ const UserMessage = ({
                           );
                         }
                       )}
-                    {cardPaymentRadioButton.radio_contents.map((itemPayment, indexPayment) => {
-                      if (
-                        cardPaymentRadioButton.initial_selection === itemPayment.value &&
-                        itemPayment.isDescriptionHTML === true &&
-                        itemPayment.descriptionContent.length > 0
-                      ) {
-                        return (
-                          <div
-                            key={indexPayment}
-                            dangerouslySetInnerHTML={{ __html: itemPayment.descriptionContent }}
-                          />
-                        );
-                      }
-                      return null;
-                    })}
-
+                    {renderDescriptionPayment(cardPaymentRadioButton)}
                   </Radio.Group>
                 )}
                 {cardPaymentRadioButton.type === "customized_style" && (
@@ -5832,10 +5832,8 @@ const UserMessage = ({
                                 }
                               }}
                             >
-                              {itemPayment.text}
-                             
-                            </Radio.Button>
-                         
+                              {itemPayment.text}                             
+                            </Radio.Button>                         
                           );
                         }
                       )}

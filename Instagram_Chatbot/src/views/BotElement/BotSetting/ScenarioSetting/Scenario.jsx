@@ -10946,10 +10946,10 @@ const Scenario = () => {
                                                                                       <CheckboxCustom
                                                                                         label="説明HTML"
                                                                                         onChange={(value) => {
-                                                                                          itemPaymentRadio.isDescriptionHTML = value;
+                                                                                          itemPaymentRadio.isUsedHTMLDescription = value;
                                                                                           setDataMessages([...dataMessages]);
                                                                                         }}
-                                                                                        value={itemPaymentRadio.isDescriptionHTML}
+                                                                                        value={itemPaymentRadio.isUsedHTMLDescription}
                                                                                       />
                                                                                       <CheckboxCustom
                                                                                         label="カード決済連動設定"
@@ -10958,7 +10958,7 @@ const Scenario = () => {
                                                                                       />
                                                                                     </div>
                                                                                     {
-                                                                                      itemPaymentRadio.isDescriptionHTML == true &&
+                                                                                      itemPaymentRadio.isUsedHTMLDescription == true &&
                                                                                       <InputCustom
                                                                                         maxLength={5000}
                                                                                         styleLabel={{ width: '100% !important', marginBottom: '10px' }}
