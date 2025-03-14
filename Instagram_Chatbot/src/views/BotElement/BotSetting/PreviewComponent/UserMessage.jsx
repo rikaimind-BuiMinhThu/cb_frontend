@@ -3227,7 +3227,7 @@ const UserMessage = ({
                                 .getElementById(`ss-user-post-code-right-input${indexContent}`)
                                 .focus();
                               document
-                              .getElementById(`ss-user-post-code-right-input${indexContent}`)
+                                .getElementById(`ss-user-post-code-right-input${indexContent}`)
                                 .select();
                             }
                             onChangeValue(
