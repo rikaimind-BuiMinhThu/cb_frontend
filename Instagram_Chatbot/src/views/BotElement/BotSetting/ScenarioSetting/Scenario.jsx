@@ -13494,7 +13494,7 @@ const Scenario = () => {
           <span style={{ fontSize: '16px' }}>{messageNoti}</span>
         </div>
       </ModalNoti>
-      {isOpenModalCustomCss && renderModalCustomCssForm(isOpenModalCustomCss)}
+      {renderModalCustomCssForm(isOpenModalCustomCss)}
       <ModalShort open={isOpenAddVariable} onClose={() => setIsOpenAddVariable(false)}>
         <div className="sl-popup-create-scenario-wrapper">
           <h4>変数追加</h4>
