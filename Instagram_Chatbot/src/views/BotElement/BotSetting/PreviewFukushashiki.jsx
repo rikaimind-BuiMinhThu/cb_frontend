@@ -831,6 +831,12 @@ const PreviewFukushashiki = () => {
       rightMarginSp: designSetting?.right_margin_sp,
       bottomMarginSp: designSetting?.bottom_margin_sp,
     };
+    if (res.data?.chatbot?.is_used_custom_css && res.data?.chatbot?.custom_css_content.length > 0) {
+      const style = document.createElement('style');
+      style.innerHTML = res.data.chatbot.custom_css_content;
+      document.head.appendChild(style);
+    }
+
     const prevOpenStatus = sessionStorage.getItem("prevOpenStatus");
 
     if (res.data.design_settings.display_type == 1 && prevOpenStatus == "0") {

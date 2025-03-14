@@ -888,7 +888,7 @@ const Scenario = () => {
       setLpProductUrl(res.data.data?.tamagoLandingPageUrl || '');
       setIsUseOnlyRegularOrder(res.data.data?.isUseOnlyRegularOrder || false);
       setIsUseFukushashiki(res.data.data?.isUseFukushashiki || false);
-      setIsUseCustomCss(res.data.data?.isUseCustomCss || false);
+      setIsUseCustomCss(res.data.data?.is_used_custom_css || false);
       setCustomCssContent({
         temp: res.data.data?.custom_css_content || '',
         final: res.data.data?.custom_css_content || '',
