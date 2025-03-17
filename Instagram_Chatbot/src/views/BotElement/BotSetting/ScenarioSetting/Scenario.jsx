@@ -905,7 +905,7 @@ const Scenario = () => {
     return (
       <InputCustom
         maxLength={10000}
-        styleLabel={{ width: '100% !important', marginBottom: '10px' }}
+        style={{ width: '100%', marginBottom: '5px' }}
         label="HTMLの説明をカスタマイズする"
         inline={false}
         placeholder="ここにHTMLを入力してください"
@@ -11221,7 +11221,7 @@ const Scenario = () => {
                                                                                         onChange={() => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemPaymentRadio.value, 'card_linked_setting')}
                                                                                       />
                                                                                     </div>
-                                                                                    {renderPaymentMethodDescriptionInput(cardPaymentRadioButton)}
+                                                                                    {renderPaymentMethodDescriptionInput({ selectedItem: itemPaymentRadio, dataMessages })}
                                                                                     {array.length > 1 &&
                                                                                       <div className="ss-user-setting-payment-radio-times-icons">
                                                                                         <MDBIcon fas icon="times-circle"
