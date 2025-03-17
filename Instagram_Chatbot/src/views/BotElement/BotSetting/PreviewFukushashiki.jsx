@@ -812,7 +812,7 @@ const PreviewFukushashiki = () => {
       objParam: {},
       loadedStateFromSession: true,
       messagesList: res.data.data?.conversation?.messages || [],
-      isOpen: Number(designSetting.display_type) === 1,
+      isOpen: state.isOpen || Number(designSetting.display_type) === 1,
       activePopupCloseBot: Boolean(designSetting?.popup_close_bot),
       titleBubble: designSetting?.title_bubble || "簡単90秒で注文完了",
       displayType: designSetting?.display_type,
