@@ -900,24 +900,6 @@ const Scenario = () => {
     });
   }
 
-  const renderPaymentMethodDescriptionInput = ({ selectedItem, dataMessages }) => {
-    if (!selectedItem.isUsedHTMLDescription) return null;
-    return (
-      <InputCustom
-        maxLength={10000}
-        styleLabel={{ width: '100% !important', marginBottom: '10px' }}
-        label="HTMLの説明をカスタマイズする"
-        inline={false}
-        placeholder="ここにHTMLを入力してください"
-        value={selectedItem.descriptionContent}
-        onChange={(value) => {
-          selectedItem.descriptionContent = value;
-          setDataMessages([...dataMessages]);
-        }}
-      />
-    );
-  };
-
   const getListProductVariants = (cursor) => {
     const query = cursor ? `cursor=${cursor}` : ""
     api.get(`/api/v1/shopify/product_variants?${query}`).then(res => {
@@ -11221,7 +11203,20 @@ const Scenario = () => {
                                                                                         onChange={() => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemPaymentRadio.value, 'card_linked_setting')}
                                                                                       />
                                                                                     </div>
-                                                                                    {renderPaymentMethodDescriptionInput(cardPaymentRadioButton)}
+                                                                                    {
+                                                                                      itemPaymentRadio.isUsedHTMLDescription == true &&
+                                                                                      <InputCustom
+                                                                                        maxLength={5000}
+                                                                                        style={{ width: '100%', marginBottom: '5px' }}
+                                                                                        label="HTMLの説明をカスタマイズする"
+                                                                                        placeholder="ここにHTMLを入力してください"
+                                                                                        value={itemPaymentRadio.descriptionContent}
+                                                                                        onChange={(value) => {
+                                                                                          itemPaymentRadio.descriptionContent = value;
+                                                                                          setDataMessages([...dataMessages]);
+                                                                                        }}
+                                                                                      />
+                                                                                    }
                                                                                     {array.length > 1 &&
                                                                                       <div className="ss-user-setting-payment-radio-times-icons">
                                                                                         <MDBIcon fas icon="times-circle"
