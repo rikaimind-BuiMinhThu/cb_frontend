@@ -2457,7 +2457,7 @@ const PreviewFukushashiki = () => {
           case "pull_down":
             {
               if (message.pull_down?.customization.length != 0) {
-                const textInDropdown = message.pull_down.customization.value
+                const textInDropdown = message.pull_down.customization.value || message.pull_down.initial_selection;
                 if (message.pull_down.customization.is_comment == true) {
 
                 }
