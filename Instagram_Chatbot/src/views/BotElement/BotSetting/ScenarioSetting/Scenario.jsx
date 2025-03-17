@@ -11203,8 +11203,7 @@ const Scenario = () => {
                                                                                         onChange={() => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemPaymentRadio.value, 'card_linked_setting')}
                                                                                       />
                                                                                     </div>
-                                                                                    {
-                                                                                      itemPaymentRadio.isUsedHTMLDescription == true &&
+                                                                                    {itemPaymentRadio.isUsedHTMLDescription == true &&
                                                                                       <InputCustom
                                                                                         maxLength={5000}
                                                                                         style={{ width: '100%', marginBottom: '5px' }}
@@ -11215,8 +11214,7 @@ const Scenario = () => {
                                                                                           itemPaymentRadio.descriptionContent = value;
                                                                                           setDataMessages([...dataMessages]);
                                                                                         }}
-                                                                                      />
-                                                                                    }
+                                                                                      />}
                                                                                     {array.length > 1 &&
                                                                                       <div className="ss-user-setting-payment-radio-times-icons">
                                                                                         <MDBIcon fas icon="times-circle"
