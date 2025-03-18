@@ -16,11 +16,32 @@ const SEARCH_MODES = {
 
 const CRAWL_ELEMENT_TYPES = {
   SELECT: 'select',
+  FROM_JS: 'from_js'
 };
 
 const ELEMENT_TAGS = {
   SELECT: "SELECT",
   INPUT: "INPUT",
+};
+
+const MESSAGE_CONTENT_TYPES = {
+  PULLDOWN: {
+    LP_INTEGRATION_OPTION: 'lp_integration_option',
+    FROM_JS: 'from_js_result',
+    CUSTOMIZATION: 'customization',
+    TIME_HM: 'time_hm',
+    DATE_YMD: 'date_ymd',
+    DATE_MD: 'date_md',
+    DATE_YM: 'date_ym',
+    DATE_YMD_HM: 'date_ymd_hm',
+    DOB_YMD: 'dob_ymd',
+    DOB_YM: 'dob_ym',
+    TIMEZONE_FROM_TO: 'timezone_from_to',
+    PERIOD_FROM_TO: 'period_from_to',
+    PREFECTURES: 'prefectures',
+    UP_TO_MUNICIPALITY: 'up_to_municipality',
+    CONSUME_API_RESPONSE: 'comsume_api_response',
+  },
 };
 
 const botId = sessionStorage.getItem("bot_id");
@@ -90,7 +111,8 @@ const waitForElement = (mode, address, options = {type: "WAIT_FOR_LOADING"}, cal
         callback();
         break;
       case WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE:
-        if (element.value != options.value && element.value != removeLeadingZero(options.value)) {
+        const yearsValue = `20${options.value}`;
+        if (element.value != options.value && element.value != removeLeadingZero(options.value) && element.value != yearsValue) {
           setValueToElement(element, options.value);
           break;
         }
@@ -102,6 +124,15 @@ const waitForElement = (mode, address, options = {type: "WAIT_FOR_LOADING"}, cal
         throw new Error(`Invalid wait option type ${options.type}`);
     }
   }, 500);
+}
+
+const movePaymentMethodToTop = (data) => {
+  const index = data.findIndex(item => item.type === "payment_method_id");
+  if (index !== -1) {
+      const [paymentMethod] = data.splice(index, 1);
+      data.unshift(paymentMethod);
+  }
+  return data;
 }
 
 const getEcChatBotApiServerBaseUrl = () => {
@@ -212,6 +243,7 @@ const displayPopup = async () => {
 
       switch (e.data.action) {
         case CHATBOT_ACTIONS.FUKUSHASHIKI:
+          e.data.actionData = movePaymentMethodToTop(e.data.actionData);
           await fillDataFromMessage(e.data.actionData);
           break;
         case CHATBOT_ACTIONS.GET_ERROR_MESSAGE:
@@ -222,7 +254,7 @@ const displayPopup = async () => {
           break;
         case CHATBOT_ACTIONS.CRAWL_DATA:
           await sleep(500);
-          crawlDataAndSendMessage(e.data.actionData);
+          await crawlDataAndSendMessage(e.data.actionData);
           break;
         case CHATBOT_ACTIONS.CLICK_BUTTON:
           const button = document.getElementById(e.data.id_value);
@@ -278,7 +310,7 @@ const displayPopup = async () => {
   }, 5000);
 }
 
-const crawl = (options) => {
+const crawl = async (options) => {
   const targetElement = getElementByAddress(options.searchMode, options.searchAddress);
   if (!targetElement) {
     throw new Error('Element not found');
@@ -287,17 +319,22 @@ const crawl = (options) => {
   switch (options.targetElementType) {
     case CRAWL_ELEMENT_TYPES.SELECT:
       return extractSelectOptions(targetElement, options);
+    case CRAWL_ELEMENT_TYPES.FROM_JS:
+      return transformJsResultArray({
+        data: await extractFromJs(options),
+        fields: ['id', 'value', 'text'],
+      });
     default:
       throw new Error(`Not support target element type ${options.targetElementType}`);
   }
 }
 
-const crawlDataAndSendMessage = (options) => {
+const crawlDataAndSendMessage = async (options) => {
   if (!options.searchAddress || !options.searchMode) return;
 
   const message = {
     ...options,
-    result: crawl(options),
+    result: await crawl(options),
   };
   
   sendMessageToChatbot(message, CHATBOT_ACTIONS.CRAWL_DATA);
@@ -319,6 +356,33 @@ const extractSelectOptions = (selectElement) => {
       value: option.innerText
     }));
 }
+
+const extractFromJs = async (options) => {
+  const { searchJsCode: jsCode } = options;
+  if (!jsCode) return;
+
+  try {
+    const func = new Function(jsCode);
+    const result = await func();
+
+    return result;
+  } catch (error) {
+    console.error("[EXTRACT_FROM_JS]", error);
+
+    return null;
+  }
+};
+
+const transformJsResultArray = ({ data, fields, skipOnError = true }) => {
+  if (!Array.isArray(fields) || !Array.isArray(data)) return [];
+
+  const result = data.filter(item => {
+    const isValid = fields.every(field => item[field]);
+    return isValid || !skipOnError;
+  });
+
+  return skipOnError ? result : result.length === data.length ? result : [];
+};
 
 const processGetErrorMessage = (data) => {
   if (!data.isDisplay) return;
@@ -360,11 +424,15 @@ const fillDataFromMessage = async (data) => {
       case "card_payment_radio_button":
       case "text_input":
       case "textarea":
-      case "payment_method_id":
       case "slider": {
         waitForElement(
           item.bindingMode, item.bindingAddress,
           {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
+        break;
+      }
+
+      case "payment_method_id": {
+        setValuePaymentMethodToElement(element, item.bindingValue);
         break;
       }
 
@@ -386,9 +454,12 @@ const fillDataFromMessage = async (data) => {
         break;
       }
 
-      case "pull_down": {
-        const hasOption = Array.from(element.options).some(option => option.value === item.bindingValue);
-        if (!hasOption) item.bindingValue = '';
+      case 'pull_down': {
+        if (item.pulldownType === 'lp_integration_option') {
+          const hasOption = Array.from(element.options).some(option => option.value === item.bindingValue);
+          if (!hasOption) item.bindingValue = '';
+        }
+        
         waitForElement(
           item.bindingMode, item.bindingAddress,
           {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
@@ -450,7 +521,7 @@ const setValueToElement = (element, value) => {
   let newElementValue = value;
 
   if (element.tagName === ELEMENT_TAGS.SELECT) {
-    const acceptableValues = [value.toString(), removeLeadingZero(value).toString()];
+    const acceptableValues = [value.toString(), removeLeadingZero(value).toString(), `20${value}`];
     newElementValue = acceptableValues.find(v => {
       return Array.from(element.options).some(option => option.value === v);
     });;
@@ -463,6 +534,16 @@ const setValueToElement = (element, value) => {
   element.value = newElementValue;
   element.dispatchEvent(new Event('change', { bubbles: true }));
 }
+
+const setValuePaymentMethodToElement = (element, value) => {
+  const radioButtons = [...element.querySelectorAll('input[type="radio"]')];
+  
+  if (radioButtons.length > 0) {
+    setRadioValue(element, value);
+  } else {
+    setValueToElement(element, value);
+  }
+};
 
 const setRadioValue = (element, value) => {
   const radioButtons = [...element.querySelectorAll('input[type="radio"]')];

@@ -23,7 +23,7 @@ import iconMessagePink from "../../../assets/img/icon-mess/icon-message-chat-pin
 import iconMessagePurple from "../../../assets/img/icon-mess/icon-message-chat-purple.png";
 import iconMessageBlack from "../../../assets/img/icon-mess/icon-message-chat-black.png";
 import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-white.png";
-import { CHATBOT_ACTIONS, SESSION_STORAGE_KEY } from "./PreviewComponent/Constants";
+import { CHATBOT_ACTIONS, MESSAGE_CONTENT_TYPES, SESSION_STORAGE_KEY } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
   lightenColor,
@@ -422,6 +422,10 @@ const PreviewFukushashiki = () => {
     return `${dataContentType[field]?.valueLeft} ${dataContentType[field]?.valueRight}`;
   }
 
+  const setRadioButtonDefaultValue = (dataContentType, value) => {
+    return dataContentType[dataContentType.type].find(item => item.value === value)?.text;
+  }
+  
   const setCheckboxDefaultValue = (dataContentType, field) => {
     let dataTextChecked = [];
     switch (field) {
@@ -808,7 +812,7 @@ const PreviewFukushashiki = () => {
       objParam: {},
       loadedStateFromSession: true,
       messagesList: res.data.data?.conversation?.messages || [],
-      isOpen: Number(designSetting.display_type) === 1,
+      isOpen: state.isOpen || Number(designSetting.display_type) === 1,
       activePopupCloseBot: Boolean(designSetting?.popup_close_bot),
       titleBubble: designSetting?.title_bubble || "簡単90秒で注文完了",
       displayType: designSetting?.display_type,
@@ -827,6 +831,12 @@ const PreviewFukushashiki = () => {
       rightMarginSp: designSetting?.right_margin_sp,
       bottomMarginSp: designSetting?.bottom_margin_sp,
     };
+    if (res.data?.chatbot?.is_used_custom_css && res.data?.chatbot?.custom_css_content.length > 0) {
+      const style = document.createElement('style');
+      style.innerHTML = res.data.chatbot.custom_css_content;
+      document.head.appendChild(style);
+    }
+
     const prevOpenStatus = sessionStorage.getItem("prevOpenStatus");
 
     if (res.data.design_settings.display_type == 1 && prevOpenStatus == "0") {
@@ -2447,13 +2457,13 @@ const PreviewFukushashiki = () => {
           case "pull_down":
             {
               if (message.pull_down?.customization.length != 0) {
-                const textInDropdown = message.pull_down.customization.value
+                const textInDropdown = message.pull_down.customization.value || message.pull_down.initial_selection;
                 if (message.pull_down.customization.is_comment == true) {
 
                 }
                 else {
                   message.pull_down.customization.options_without_comment.forEach((item) => {
-                    if (item.value == textInDropdown) {
+                    if (!!textInDropdown && item.value == textInDropdown) {
                       const fukuObject = {
                         type: message.type,
                         bindingMode: message.fukushashiki_search_mode,
@@ -2471,9 +2481,23 @@ const PreviewFukushashiki = () => {
                 if (message.pull_down.lp_integration_option.value != "") {
                   const fukuObject = {
                     type: message.type,
+                    pulldownType: message.pull_down.type,
                     bindingMode: message.pull_down.lp_element_search_mode,
                     bindingAddress: message.pull_down.lp_element_search_value,
                     bindingValue: message.pull_down.lp_integration_option.value
+                  };
+                  fukuDataList.push(fukuObject);
+                }
+              }
+
+              if (message.pull_down?.type == MESSAGE_CONTENT_TYPES.PULLDOWN.FROM_JS) {
+                if (message.pull_down.from_js_result.value?.toString() != "") {
+                  const fukuObject = {
+                    type: message.type,
+                    pulldownType: message.pull_down.type,
+                    bindingMode: message.pull_down.from_js_result_target_search_mode,
+                    bindingAddress: message.pull_down.from_js_result_target_search_value,
+                    bindingValue: message.pull_down.from_js_result.value
                   };
                   fukuDataList.push(fukuObject);
                 }

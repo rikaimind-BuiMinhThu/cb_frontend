@@ -9,7 +9,7 @@ import CheckboxCustom from "../ScenarioSetting/scenarioComon/CheckboxCustom";
 import InputCustom from "../ScenarioSetting/scenarioComon/InputCustom";
 import { Button } from "reactstrap";
 import ModalNoti from "../../../Popup/ModalNoti";
-import { CHATBOT_ACTIONS } from "../PreviewComponent/Constants";
+import { CHATBOT_ACTIONS, CRAWL_ELEMENT_TYPES, MESSAGE_CONTENT_TYPES } from "../PreviewComponent/Constants";
 import {
   Checkbox,
   Radio,
@@ -99,6 +99,22 @@ const UserMessage = ({
             item.index === indexMessage && item.indexContent === indexContent
         )?.[0]?.data || "";
   }
+
+  const renderDescriptionPayment = (cardPaymentRadioButton) => {
+    const foundItem = cardPaymentRadioButton.radio_contents.find(
+      (item) =>
+        cardPaymentRadioButton.initial_selection === item.value &&
+        item.isUsedHTMLDescription &&
+        item.descriptionContent.length > 0
+    );
+    if (!foundItem) return null;
+    return (
+      <div
+        key={foundItem.value}
+        dangerouslySetInnerHTML={{ __html: foundItem.descriptionContent }}
+      />
+    )
+  };
 
   useEffect(() => {
     if (messageContent.length === 1) {
@@ -555,6 +571,28 @@ const UserMessage = ({
     return content;
   }
 
+  function renderPulldownfromJs({ disabled, pullDown, indexContent, content }) {
+    if (pullDown?.type !== MESSAGE_CONTENT_TYPES.PULLDOWN.FROM_JS) return null;
+
+    return (
+      <LPIntegrationOptionPullDown
+        targetElementType={CRAWL_ELEMENT_TYPES.FROM_JS}
+        search_element_type={pullDown.from_js_result_target_search_mode}
+        search_element_value={pullDown.from_js_result_target_search_value}
+        jsCode={pullDown.from_js_result_code}
+        disabled={disabled}
+        pullDown={pullDown}
+        data={getLPOptionData(pullDown.from_js_result_target_search_value)}
+        postMessageToParent={postMessageToParent}
+        onChange={(value) =>
+          onChangeValue(indexContent, content.type, value, pullDown.type, 'value')
+        }
+        nameValue='text'
+        keyValue='value'
+      />
+    );
+  }
+  
   return (
     <div className="ss-user-message__content-wrapper">
       {messageContent?.map((content, indexContent) => {
@@ -2198,7 +2236,7 @@ const UserMessage = ({
                                     "value"
                                   )
                                 }
-                                value={pullDown[pullDown.type].value}
+                                value={pullDown[pullDown.type].value || pullDown.initial_selection}
                               />
                             </div>
                           ) : (
@@ -2929,6 +2967,12 @@ const UserMessage = ({
                       }
                     />
                   )}
+                  {renderPulldownfromJs({
+                    disabled: disabled,
+                    pullDown: pullDown,
+                    indexContent: indexContent,
+                    content: content
+                  })}
                   {pullDown.type === "up_to_municipality" && (
                     <div>
                       <div style={{ fontWeight: "400", fontSize: "12px" }}>
@@ -3125,10 +3169,10 @@ const UserMessage = ({
                                     ""
                                   );
                                   document
-                                    .getElementById("ss-user-input-address")
+                                    .getElementById(`ss-user-input-address${indexContent}`)
                                     .focus();
                                   document
-                                    .getElementById("ss-user-input-address")
+                                    .getElementById(`ss-user-input-address${indexContent}`)
                                     .select();
                                 } else {
                                   onChangeErrors(
@@ -3180,10 +3224,10 @@ const UserMessage = ({
                           onChange={async (value) => {
                             if ((value + "").length === 3) {
                               document
-                                .getElementById("ss-user-post-code-right-input")
+                                .getElementById(`ss-user-post-code-right-input${indexContent}`)
                                 .focus();
                               document
-                                .getElementById("ss-user-post-code-right-input")
+                                .getElementById(`ss-user-post-code-right-input${indexContent}`)
                                 .select();
                             }
                             onChangeValue(
@@ -3221,10 +3265,10 @@ const UserMessage = ({
                                       ""
                                     );
                                     document
-                                      .getElementById("ss-user-input-address")
+                                      .getElementById(`ss-user-input-address${indexContent}`)
                                       .focus();
                                     document
-                                      .getElementById("ss-user-input-address")
+                                      .getElementById(`ss-user-input-address${indexContent}`)
                                       .select();
                                   } else {
                                     onChangeErrors(
@@ -3265,7 +3309,7 @@ const UserMessage = ({
                           inputMode="numeric"
                           placeholder={zipCodeAddress.post_code_right}
                           disabled={disabled}
-                          id="ss-user-post-code-right-input"
+                          id={`ss-user-post-code-right-input${indexContent}`}
                           style={{ width: "49%" }}
                           onKeyPress={(e) => {
                             if (e.target.value.length >= 4) e.preventDefault();
@@ -3306,10 +3350,10 @@ const UserMessage = ({
                                       ""
                                     );
                                     document
-                                      .getElementById("ss-user-input-address")
+                                      .getElementById(`ss-user-input-address${indexContent}`)
                                       .focus();
                                     document
-                                      .getElementById("ss-user-input-address")
+                                      .getElementById(`ss-user-input-address${indexContent}`)
                                       .select();
                                   } else {
                                     onChangeErrors(
@@ -3450,7 +3494,7 @@ const UserMessage = ({
                     </div>
                     <InputCustom
                       placeholder={zipCodeAddress.address}
-                      id="ss-user-input-address"
+                      id={`ss-user-input-address${indexContent}`}
                       disabled={disabled}
                       style={{ width: "100%" }}
                       onChange={(value) =>
@@ -5754,6 +5798,7 @@ const UserMessage = ({
                           );
                         }
                       )}
+                    {renderDescriptionPayment(cardPaymentRadioButton)}
                   </Radio.Group>
                 )}
                 {cardPaymentRadioButton.type === "customized_style" && (
@@ -5816,8 +5861,8 @@ const UserMessage = ({
                                 }
                               }}
                             >
-                              {itemPayment.text}
-                            </Radio.Button>
+                              {itemPayment.text}                             
+                            </Radio.Button>                         
                           );
                         }
                       )}
