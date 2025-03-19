@@ -924,14 +924,13 @@ const PreviewFukushashiki = () => {
   // Get Preview Scenario Data
   useEffect(() => {
     if (!state.loadedStateFromSession) {
-      let savedState = getStateFromSessionStorage();    
+      let savedState = getStateFromSessionStorage();
       if (savedState) {
-        if(!isLoadedCssContent && savedState?.botInfor?.is_used_custom_css && savedState?.botInfor?.custom_css_content.length > 0) 
-          {       
-              const style = document.createElement('style');
-              style.innerHTML = savedState?.botInfor?.custom_css_content;
-              document.head.appendChild(style);        
-          }
+        if (!isLoadedCssContent && savedState?.botInfor?.is_used_custom_css && savedState?.botInfor?.custom_css_content.length > 0) {
+          const style = document.createElement('style');
+          style.innerHTML = savedState?.botInfor?.custom_css_content;
+          document.head.appendChild(style);
+        }
         if (isLoggedIn) {
           savedState.messagesList.forEach((x) => x.hidden = !!x?.not_display_when_logged_in);
           savedState.currentMsgIndex = savedState.messagesList.findIndex((item) => isUserMessage(item) && item.hidden == false);
