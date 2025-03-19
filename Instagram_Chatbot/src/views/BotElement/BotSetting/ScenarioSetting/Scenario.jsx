@@ -1291,7 +1291,7 @@ const Scenario = () => {
             title_require: false,
             type: 'customization',
             customization: {
-              initial_selection,
+              initial_selection: "",
               display_unselected: '選択してください',
               is_comment: false,
               options_with_comment: [{ id: 1 }],
@@ -8351,8 +8351,7 @@ const Scenario = () => {
                                                                                         } else { 
                                                                                           onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, "", 'initial_selection'); }
                                                                                       }}
-                                                                                      value={pullDown.initial_selection === itemPullDown.value}
-                                                                                      isOnChange={false}
+                                                                                      value={pullDown.initial_selection ? pullDown.initial_selection === itemPullDown.value : false}
                                                                                     />
                                                                                   </div>
                                                                                 )}
