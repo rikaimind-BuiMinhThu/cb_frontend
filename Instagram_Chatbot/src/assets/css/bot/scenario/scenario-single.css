@@ -378,9 +378,10 @@ textarea.ss-message__content--bot-delay {
   margin-bottom: 0;
 }
 
-input#ss-message__content--user-radio_button {
-  width: 19px;
-  height: 19px;
+input#ss-message__content--user-radio_button,
+.ss-message__content--user-radio_button-wrapper input[type="radio"]{
+  width: 19px !important;
+  height: 19px !important;
 }
 
 .ss-message__content--user-radio_button>label {
