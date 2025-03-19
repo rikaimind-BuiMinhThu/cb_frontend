@@ -1839,7 +1839,7 @@ const UserMessage = ({
                           <input
                             disabled={disabled}
                             type="radio"
-                            id="ss-message__content--user-radio_button"
+                            id={`ss-message__content--user-radio_button_${item.value}`}
                             checked={radioButton.initial_selection === item.value}
                             onChange={() => {
                               onChangeValue(
@@ -1852,7 +1852,7 @@ const UserMessage = ({
                             }}
                           />
                           {item.text && (
-                            <label htmlFor="ss-message__content--user-radio_button">
+                            <label htmlFor={`ss-message__content--user-radio_button_${item.value}`}>
                               {item.text}
                             </label>
                           )}
