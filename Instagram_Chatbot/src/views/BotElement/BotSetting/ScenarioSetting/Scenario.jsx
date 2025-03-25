@@ -1193,7 +1193,22 @@ const Scenario = () => {
           }
         }
       );
-    } else if (messageType === 'radio_button') {
+    }
+    else if (messageType === 'image') {
+      dataMessages[indexMessageSelect].message_content.push(
+        {
+          id: idMax,
+          type: messageType,
+          [messageType]: {
+            imageURL: '',
+            displayButtonNext: true,
+            image_width: "100%",
+            image_height: "100%"
+          }
+        }
+      );
+    }
+    else if (messageType === 'radio_button') {
       dataMessages[indexMessageSelect].message_content.push(
         {
           id: idMax,
@@ -1831,10 +1846,10 @@ const Scenario = () => {
           dataMessages[indexMessage].message_content[indexContent][type][name] = []
           dataMessages[indexMessage].message_content[indexContent][type][name].push(check_box_value)
         }
-        if(dataMessages[indexMessage].message_content[indexContent][type][name].includes(value))
+        if (dataMessages[indexMessage].message_content[indexContent][type][name].includes(value))
           dataMessages[indexMessage].message_content[indexContent][type][name] = dataMessages[indexMessage].message_content[indexContent][type][name].filter((el) => el !== value);
         else
-        dataMessages[indexMessage].message_content[indexContent][type][name].push(value);
+          dataMessages[indexMessage].message_content[indexContent][type][name].push(value);
       } else {
         if (dataMessages[indexMessage].message_content[indexContent][type] === undefined) {
           dataMessages[indexMessage].message_content[indexContent][type] = {};
@@ -1845,7 +1860,7 @@ const Scenario = () => {
       dataMessages[indexMessage].message_content[indexContent][type] = value;
     }
     setDataMessages([...dataMessages]);
-   
+
   }
 
   const renderPreviewPulldownfromJs = (pullDown) => {
@@ -2959,34 +2974,35 @@ const Scenario = () => {
                                           >
                                             <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
                                               {message.message_name && <div className="ss-sub-title-message ss-truncation-text" style={{ backgroundColor: '#fff', maxWidth: '60%', marginRight: '10px' }}>{message.message_name}</div>}
-                                              <div className={`ss-user-chat-detail-content ss-user-chat-detail-content-${index} ${message.hidden === true ? "ss-message-hidden-style" : ""}`}
-                                                style={message.message_name ? {} : { borderColor: 'red' }}>
-                                                <div className="ss-user-message__content-wrapper">
-                                                  {message?.message_content.map((content, indexContent) => {
-                                                    let textInput = content.text_input;
-                                                    let label = content.label;
-                                                    let textarea = content.textarea;
-                                                    let radioButton = content.radio_button;
-                                                    let checkbox = content.checkbox;
-                                                    let pullDown = content.pull_down;
-                                                    let zipCodeAddress = content.zip_code_address;
-                                                    let attachingFile = content.attaching_file;
-                                                    let calendar = content.calendar;
-                                                    let agreeTerm = content.agree_term;
-                                                    let carousel = content.carousel;
-                                                    let creditCardPayment = content.credit_card_payment;
-                                                    let capture = content.capture;
-                                                    let productPurchase = content.product_purchase;
-                                                    let productPurchaseRadioButton = content.product_purchase_radio_button;
-                                                    let productPurchaseSelectOption = content.product_purchase_select_option;
-                                                    let smsVerify = content.sms_verify;
-                                                    let afteePaymentModule = content.AFTEE_payment_module;
-                                                    let slider = content.slider;
-                                                    let cardPaymentRadioButton = content.card_payment_radio_button;
-                                                    let shippingAddress = content.shipping_address;
-                                                    let variableSet = content.variable_set;
-                                                    let buttonSubmit = content.button_submit;
-                                                    let labelNoTransition = content.label_no_transition;
+                                                <div className={`ss-user-chat-detail-content ss-user-chat-detail-content-${index} ${message.hidden === true ? "ss-message-hidden-style" : ""}`}
+                                                  style={message.message_name ? {} : { borderColor: 'red' }}>
+                                                  <div className="ss-user-message__content-wrapper">
+                                                    {message?.message_content.map((content, indexContent) => {
+                                                      let textInput = content.text_input;
+                                                      let label = content.label;
+                                                      let textarea = content.textarea;
+                                                      let image = content.image;
+                                                      let radioButton = content.radio_button;
+                                                      let checkbox = content.checkbox;
+                                                      let pullDown = content.pull_down;
+                                                      let zipCodeAddress = content.zip_code_address;
+                                                      let attachingFile = content.attaching_file;
+                                                      let calendar = content.calendar;
+                                                      let agreeTerm = content.agree_term;
+                                                      let carousel = content.carousel;
+                                                      let creditCardPayment = content.credit_card_payment;
+                                                      let capture = content.capture;
+                                                      let productPurchase = content.product_purchase;
+                                                      let productPurchaseRadioButton = content.product_purchase_radio_button;
+                                                      let productPurchaseSelectOption = content.product_purchase_select_option;
+                                                      let smsVerify = content.sms_verify;
+                                                      let afteePaymentModule = content.AFTEE_payment_module;
+                                                      let slider = content.slider;
+                                                      let cardPaymentRadioButton = content.card_payment_radio_button;
+                                                      let shippingAddress = content.shipping_address;
+                                                      let variableSet = content.variable_set;
+                                                      let buttonSubmit = content.button_submit;
+                                                      let labelNoTransition = content.label_no_transition;
                                                     return (
                                                       <React.Fragment key={indexContent}>
                                                         {/* type == 'text_input' */}
@@ -4312,6 +4328,13 @@ const Scenario = () => {
                                                             </div>
                                                           )
                                                         }
+                                                        {
+                                                          content.type === 'image' && (
+                                                            <div className="ss-message__content--user-text-input-top" style={{ marginBottom: '0px' }}>
+                                                              <img src={image.imageURL} style={{ width: image.image_width, height: image.image_height }} />
+                                                            </div>
+                                                          )
+                                                        }
                                                         {/* type == 'credit_card_payment' */}
                                                         {
                                                           content.type === 'credit_card_payment' && (
@@ -5294,7 +5317,7 @@ const Scenario = () => {
                                     </div>
                                   </div>
                                 </div>
-                              )}
+                              )}     
 
                               {/* type: email */}
                               {messageType === 'email' && (
@@ -5592,6 +5615,7 @@ const Scenario = () => {
                                         let textarea = content.textarea;
                                         let radioButton = content.radio_button;
                                         let checkbox = content.checkbox;
+                                        let image = content.image;
                                         let pullDown = content.pull_down;
                                         let zipCodeAddress = content.zip_code_address;
                                         let attachingFile = content.attaching_file;
@@ -9599,10 +9623,121 @@ const Scenario = () => {
                                                         indexMessageSelect: indexMessageSelect,
                                                         pullDown: pullDown
                                                       })}
-                                                      
+
                                                     </React.Fragment>
                                                   )}
                                                   {/* user: type = 'carousel' ADD_FUKU */}
+                                                  {
+                                                    content.type === 'image' && (
+                                                      <React.Fragment>
+                                                        <div className="ss-user-setting__item-text_input-top">
+                                                          <CheckboxCustom
+                                                            label="ログイン済み時に表示しない"
+                                                            onChange={(value) => {
+                                                              dataMessages[indexMessageSelect].not_display_when_logged_in = value;
+                                                              setDataMessages([...dataMessages]);
+                                                            }}
+                                                            value={dataMessages[indexMessageSelect].not_display_when_logged_in}
+                                                          />
+                                                          <CheckboxCustom
+                                                            label="入力された内容を変数に保存する。"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
+                                                            value={image.is_save_input_content}
+                                                          />
+                                                          {image.is_save_input_content &&
+                                                            <div className="ss-user-setting__item-bottom">
+                                                              <div className="ss-user-setting__item-select-bottom-wrapper-flex">
+                                                                <SelectCustom
+                                                                  style={{ width: '100%', marginRight: '10px' }}
+                                                                  id="title"
+                                                                  value={image?.save_input_content}
+                                                                  data={dataInputVar}
+                                                                  keyValue="variable_name"
+                                                                  nameValue="variable_name"
+                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
+                                                                />
+                                                                <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>追加</Button>
+                                                              </div>
+                                                            </div>
+                                                          }
+                                                          <div className="ss-user-setting__item-text_input-use-api-wrapper">
+                                                            <CheckboxCustom
+                                                              label="入力値の検証にAPIを利用する"
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'use_api_input_value')}
+                                                              value={image.use_api_input_value}
+                                                            />
+                                                          </div>
+                                                          {image.use_api_input_value &&
+                                                            <div className="ss-user-setting__item-bottom">
+                                                              <SelectCustom
+                                                                style={{ width: '90%' }}
+                                                                id="title"
+                                                                value={image?.use_api_input_value}
+                                                                data={dataInputVar}
+                                                                keyValue="variable_name"
+                                                                nameValue="variable_name"
+                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'use_api_input_value')}
+                                                              />
+                                                            </div>
+                                                          }
+                                                          <CheckboxCustom
+                                                            label="「続行」ボタンを表示する"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'displayButtonNext')}
+                                                            value={image.displayButtonNext}
+                                                          />
+                                                          {/*
+                                                          Edit Width, Height
+                                                           <div className='d-flex mt-2 mb-2'>
+                                                            <div>
+                                                              <label>幅</label>
+                                                              <div>
+                                                              <InputCustom
+                                                              placeholder="プレースホルダ"
+                                                              value={image.image_width}
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'image_width')}
+                                                            />
+                                                              </div>
+                                                            </div>
+                                                            <div>
+                                                              <label>標高ン</label>
+                                                              <div>
+                                                              <InputCustom
+                                                              placeholder="プレースホルダ"
+                                                              value={image.image_height}
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'image_height')}
+                                                            />
+                                                              </div>
+                                                            </div>
+                                                          </div> */}
+                                                          <div className="ss-user-setting__item-bottom">
+                                                            <img src={image.imageURL} style={{ width: image.image_width, height: image.image_height }}></img>
+                                                          </div>
+
+                                                          <div className="ss-file-upload-wrapper" style={{ width: '90%' }}>
+                                                            <Button style={{ margin: '0px', marginRight: '15px' }} className="ss-bot-file-reference-btn" onClick={() => {
+                                                              setIsOpenFileReference(true);
+                                                              setVarFileReference({ indexContent, contentType: 'image', subContentType: 'imageURL', childSubContentType: undefined, indexSubContent: undefined, img: undefined })
+                                                            }}>
+                                                              ファイル参照
+                                                            </Button>
+                                                            <input
+                                                              type="file"
+                                                              id="ss-carouse-file-upload"
+                                                              name="carouse-file-upload"
+                                                              hidden
+                                                              onChange={(e) => getBaseUrl(e, indexContent)}
+                                                            />
+                                                            <Button style={{ margin: '0px' }} className="ss-bot-file-upload-btn" onClick={carouselUploadFile}>
+                                                              追加
+                                                            </Button>
+
+
+                                                          </div>
+                                                        </div>
+                                                      </React.Fragment>
+
+                                                    )
+                                                  }
                                                   {content.type === 'carousel' && (
                                                     <>
                                                       <div className="ss-user-setting__item-text_input-top">
@@ -13489,6 +13624,7 @@ const Scenario = () => {
                                   value={messageType}
                                 >
                                   <option value="text_input">テキスト入力</option>
+                                  <option value="image">画像</option>
                                   <option value="label">ラベル</option>
                                   <option value="textarea">テキストエリア</option>
                                   <option value="radio_button">ラジオボタン</option>

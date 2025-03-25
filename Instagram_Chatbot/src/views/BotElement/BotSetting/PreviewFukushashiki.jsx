@@ -3233,6 +3233,7 @@ const PreviewFukushashiki = () => {
   };
 
   const renderSubmitButton = (message, indexMessage) => {
+    let isAutoClick = message?.message_content[0]?.type == "image" && message?.message_content[0]?.image?.displayButtonNext == false;
     if (!message || message.belong_to !== "user") return null;
     if (message.message_content[0]?.type === "button_submit") return null;
 
@@ -3240,9 +3241,8 @@ const PreviewFukushashiki = () => {
     if (!btnText) {
       btnText = indexMessage >= state.renderMessagesList.length - 1 ? "次へ" : "更新";
     }
-
     return (
-      <div className="sp-user-message-button-action">
+      <div className="sp-user-message-button-action" style={{ display: isAutoClick ? "none" : "flex" }}>
         <CustomButton
           disabled={state.submitErrorMessage.length > 0 ? false : message.disabled}
           style={{
@@ -3253,7 +3253,7 @@ const PreviewFukushashiki = () => {
           onClick={() => {
             onClickNext(indexMessage, message)
           }}
-          autoClick={false}
+          autoClick={isAutoClick}
           messsagetype={message.message_content[0]?.type}
         >
           {btnText}

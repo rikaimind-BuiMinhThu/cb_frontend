@@ -5,18 +5,17 @@ const CustomButton = ({
   disabled, 
   style, 
   className, 
-  onClick, 
-  children, 
+  onClick,
+  children,
   autoClick,
   messsagetype
 }) => {
   useEffect(() => {
     if (autoClick && typeof onClick === "function") {
-        if(messsagetype=='pull_down' || messsagetype=='agree_term'||messsagetype=='card_payment_radio_button')
-        {
-            onClick();
-        }
-        return
+      if (messsagetype == 'pull_down' || messsagetype == 'agree_term' || messsagetype == 'card_payment_radio_button' || messsagetype == 'image') {
+        onClick();
+      }
+      return
     }
   }, []);
 
