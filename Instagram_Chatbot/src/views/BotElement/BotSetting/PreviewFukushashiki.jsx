@@ -1774,25 +1774,25 @@ const PreviewFukushashiki = () => {
             }
             if (
               contentType.prefecture !== undefined &&
-              stringNullOrEmpty(contentType.value_prefecture)
+              stringNullOrEmpty(contentType.value_prefecture) && contentType.hasOwnProperty('prefecture')
             ) {
               isValidZipCode = false;
             }
             if (
               contentType.municipality !== undefined &&
-              stringNullOrEmpty(contentType.value_municipality)
+              stringNullOrEmpty(contentType.value_municipality) && contentType.hasOwnProperty('municipality')
             ) {
               isValidZipCode = false;
             }
             if (
               contentType.address !== undefined &&
-              stringNullOrEmpty(contentType.value_address)
+              stringNullOrEmpty(contentType.value_address) && contentType.hasOwnProperty('address')
             ) {
               isValidZipCode = false;
             }
             if (
               contentType.address !== undefined &&
-              stringNullOrEmpty(contentType.value_building_name)
+              stringNullOrEmpty(contentType.value_building_name) && contentType.hasOwnProperty('building_name')
             ) {
               isValidZipCode = false;
             }
