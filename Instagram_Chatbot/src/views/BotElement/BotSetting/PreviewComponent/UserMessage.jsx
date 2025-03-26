@@ -599,6 +599,7 @@ const UserMessage = ({
         let textInput = content.text_input;
         let label = content.label;
         let textarea = content.textarea;
+        const image = content.image;
         let radioButton = content.radio_button;
         let checkbox = content.checkbox;
         let pullDown = content.pull_down;
@@ -624,6 +625,13 @@ const UserMessage = ({
 
         return (
           <React.Fragment key={indexContent}>
+            {
+              content.type === 'image' && (
+                <div className="ss-message__content--user-text-input-top" style={{ marginBottom: '0px' }}>
+                  <img src={image.imageURL} style={{ width: image.image_width, height: image.image_height }} />
+                </div>
+              )
+            }
             {/* type == 'text_input' */}
             {content.type === "text_input" && (
               <div style={{ marginBottom: "10px" }}>
