@@ -12,9 +12,9 @@ const CustomButton = ({
 }) => {
   useEffect(() => {
     if (autoClick && typeof onClick === "function") {
-      if (messsagetype == 'pull_down' || messsagetype == 'agree_term' || messsagetype == 'card_payment_radio_button' || messsagetype == 'image') {
+      const acceptableTypes = ['pull_down', 'agree_term', 'card_payment_radio_button', 'image'];
+      if (acceptableTypes.includes(messageType))
         onClick();
-      }
       return
     }
   }, []);

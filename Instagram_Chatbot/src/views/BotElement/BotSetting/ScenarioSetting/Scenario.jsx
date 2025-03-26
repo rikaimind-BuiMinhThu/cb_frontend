@@ -1193,8 +1193,7 @@ const Scenario = () => {
           }
         }
       );
-    }
-    else if (messageType === 'image') {
+    } else if (messageType === 'image') {
       dataMessages[indexMessageSelect].message_content.push(
         {
           id: idMax,
@@ -1207,8 +1206,7 @@ const Scenario = () => {
           }
         }
       );
-    }
-    else if (messageType === 'radio_button') {
+    } else if (messageType === 'radio_button') {
       dataMessages[indexMessageSelect].message_content.push(
         {
           id: idMax,

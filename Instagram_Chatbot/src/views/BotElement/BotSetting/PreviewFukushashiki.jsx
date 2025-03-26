@@ -3233,7 +3233,7 @@ const PreviewFukushashiki = () => {
   };
 
   const renderSubmitButton = (message, indexMessage) => {
-    let isAutoClick = message?.message_content[0]?.type == "image" && message?.message_content[0]?.image?.displayButtonNext == false;
+    const isAutoClick = message?.message_content[0]?.type == "image" && message?.message_content[0]?.image?.displayButtonNext == false;
     if (!message || message.belong_to !== "user") return null;
     if (message.message_content[0]?.type === "button_submit") return null;
 
