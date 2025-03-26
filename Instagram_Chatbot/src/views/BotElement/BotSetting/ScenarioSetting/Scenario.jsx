@@ -2972,35 +2972,35 @@ const Scenario = () => {
                                           >
                                             <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
                                               {message.message_name && <div className="ss-sub-title-message ss-truncation-text" style={{ backgroundColor: '#fff', maxWidth: '60%', marginRight: '10px' }}>{message.message_name}</div>}
-                                                <div className={`ss-user-chat-detail-content ss-user-chat-detail-content-${index} ${message.hidden === true ? "ss-message-hidden-style" : ""}`}
-                                                  style={message.message_name ? {} : { borderColor: 'red' }}>
-                                                  <div className="ss-user-message__content-wrapper">
-                                                    {message?.message_content.map((content, indexContent) => {
-                                                      let textInput = content.text_input;
-                                                      let label = content.label;
-                                                      let textarea = content.textarea;
-                                                      let image = content.image;
-                                                      let radioButton = content.radio_button;
-                                                      let checkbox = content.checkbox;
-                                                      let pullDown = content.pull_down;
-                                                      let zipCodeAddress = content.zip_code_address;
-                                                      let attachingFile = content.attaching_file;
-                                                      let calendar = content.calendar;
-                                                      let agreeTerm = content.agree_term;
-                                                      let carousel = content.carousel;
-                                                      let creditCardPayment = content.credit_card_payment;
-                                                      let capture = content.capture;
-                                                      let productPurchase = content.product_purchase;
-                                                      let productPurchaseRadioButton = content.product_purchase_radio_button;
-                                                      let productPurchaseSelectOption = content.product_purchase_select_option;
-                                                      let smsVerify = content.sms_verify;
-                                                      let afteePaymentModule = content.AFTEE_payment_module;
-                                                      let slider = content.slider;
-                                                      let cardPaymentRadioButton = content.card_payment_radio_button;
-                                                      let shippingAddress = content.shipping_address;
-                                                      let variableSet = content.variable_set;
-                                                      let buttonSubmit = content.button_submit;
-                                                      let labelNoTransition = content.label_no_transition;
+                                              <div className={`ss-user-chat-detail-content ss-user-chat-detail-content-${index} ${message.hidden === true ? "ss-message-hidden-style" : ""}`}
+                                                style={message.message_name ? {} : { borderColor: 'red' }}>
+                                                <div className="ss-user-message__content-wrapper">
+                                                  {message?.message_content.map((content, indexContent) => {
+                                                    let textInput = content.text_input;
+                                                    let label = content.label;
+                                                    let textarea = content.textarea;
+                                                    const image = content.image;
+                                                    let radioButton = content.radio_button;
+                                                    let checkbox = content.checkbox;
+                                                    let pullDown = content.pull_down;
+                                                    let zipCodeAddress = content.zip_code_address;
+                                                    let attachingFile = content.attaching_file;
+                                                    let calendar = content.calendar;
+                                                    let agreeTerm = content.agree_term;
+                                                    let carousel = content.carousel;
+                                                    let creditCardPayment = content.credit_card_payment;
+                                                    let capture = content.capture;
+                                                    let productPurchase = content.product_purchase;
+                                                    let productPurchaseRadioButton = content.product_purchase_radio_button;
+                                                    let productPurchaseSelectOption = content.product_purchase_select_option;
+                                                    let smsVerify = content.sms_verify;
+                                                    let afteePaymentModule = content.AFTEE_payment_module;
+                                                    let slider = content.slider;
+                                                    let cardPaymentRadioButton = content.card_payment_radio_button;
+                                                    let shippingAddress = content.shipping_address;
+                                                    let variableSet = content.variable_set;
+                                                    let buttonSubmit = content.button_submit;
+                                                    let labelNoTransition = content.label_no_transition;
                                                     return (
                                                       <React.Fragment key={indexContent}>
                                                         {/* type == 'text_input' */}
