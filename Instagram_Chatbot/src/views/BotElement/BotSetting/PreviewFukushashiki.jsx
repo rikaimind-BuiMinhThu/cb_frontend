@@ -42,6 +42,7 @@ import {
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
 import ZipCodePopUp from "./PreviewComponent/ZipCodePopUp";
+import * as wanakana from "wanakana";
 
 sessionStorage.setItem("prevOpenStatus", "0");
 var url = new URL(window.location.href);
@@ -2958,6 +2959,19 @@ const PreviewFukushashiki = () => {
     return loginMessageNames.includes(message.message_name);
   }
 
+  function convertTextJapanese(text, targetType) {
+    switch (targetType.toLowerCase()) {
+        case "hiragana":
+            return wanakana.toHiragana(text);
+        case "katakana":
+            return wanakana.toKatakana(text);
+        case "romaji":
+            return wanakana.toRomaji(text);
+        default:
+            throw new Error("Loại chuyển đổi không hợp lệ! Chọn 'hiragana', 'katakana' hoặc 'romaji'.");
+    }
+}
+
   const onChangeValue = (
     indexContent,
     contentType,
@@ -2971,7 +2985,35 @@ const PreviewFukushashiki = () => {
     const msgIndex = state.messagesList.findIndex((msg) => msg.id === message.id);
     if (newState.messagesList.length == 0) return;
     let messageContentTypeData = newState.messagesList[msgIndex].message_content[indexContent][contentType];
-    
+    if (messageContentTypeData?.isUseConvertText && contentType === "text_input") {
+      const convertType = newState.messagesList[msgIndex].message_content[indexContent][contentType].convertTextTypeValue;
+      switch (subFiled) {
+        case "valueLeft":
+          {
+            const element = document.getElementById(newState.messagesList[msgIndex].message_content[indexContent]?.convertTextDestination1);
+            if (element) {
+              element.value = convertTextJapanese(value, convertType);
+            }
+            break;
+          }
+        case "valueRight":
+          {
+            const element = document.getElementById(newState.messagesList[msgIndex].message_content[indexContent]?.convertTextDestination2);
+            if (element) {
+              element.value = convertTextJapanese(value, convertType);
+            }
+            break;
+          }
+        case "value":
+          {
+            const element = document.getElementById(newState.messagesList[msgIndex].message_content[indexContent]?.convertTextDestination);
+            if (element) {
+              element.value = convertTextJapanese(value, convertType);
+            }
+            break;
+          }
+      }
+    }
     if (name) {
       messageContentTypeData[field] = messageContentTypeData[field] || {};
       messageContentTypeData[field][subFiled] = messageContentTypeData[field][subFiled] || {};
