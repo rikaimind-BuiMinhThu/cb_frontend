@@ -23,10 +23,10 @@ const ProcessBar = ({
 
   const getText = () => {
     if (currentIndex) {
-      if (maxIndex > currentIndex) return `あと${maxIndex - currentIndex}間`;
+      if (maxIndex > currentIndex) return `あと${maxIndex - currentIndex}問`;
       return "完了しました。";
     }
-    return `あと${maxIndex}間`;
+    return `あと${maxIndex}問`;
   }
 
   return (
