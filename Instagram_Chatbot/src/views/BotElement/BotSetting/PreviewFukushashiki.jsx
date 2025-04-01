@@ -2162,15 +2162,15 @@ const PreviewFukushashiki = () => {
         }
       }
     }
-
     if (isValid) {
       errorsMess = {};
     }
+    
+    state.errors = errorsMess;
+    
     dispatch({
       type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-      payload: {
-        errors: errorsMess,
-      },
+      payload: state,                                                          
     });
     return isValid;
   };
@@ -2827,14 +2827,16 @@ const PreviewFukushashiki = () => {
     if (!handleValidateField(indexMessage)) {
       return;
     }
-
+    
+    newState ={...state};
+    
     const submitData = {
       scenario_id: state.scenarioId,
       message: clickedMsg,
       user_id: state.uuid,
       bot_type: "web"
     };
-
+    
     const isClickedCreateOrder = state.messagesList[clickedMsgIndex]?.message_content?.[0]?.text_input?.save_input_content === "create_order";
     const isClickedLastMessage = state.messagesList.length - 1 === clickedMsgIndex;
 
