@@ -4594,11 +4594,13 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                                         <div className="sp-carousel-preview-img">
                                                             <img src={itemCarousel.fileUrl} style={{ width: '100%' }} />
                                                         </div>
-                                                        <div className="sp-carousel-preview-title">
-                                                            {itemCarousel.title}
-                                                        </div>
-                                                        <div className="sp-carousel-preview-sub-title">
-                                                            {itemCarousel.subtitle}
+                                                        <div style={{ width: '95%', justifyContent: 'center', margin: 'auto' }}>
+                                                            <div className="sp-carousel-preview-title">
+                                                                {itemCarousel.title}
+                                                            </div>
+                                                            <div className="sp-carousel-preview-sub-title">
+                                                                {itemCarousel.subtitle}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div className="sp-carousel-preview-button" style={carousel.initial_selection === itemCarousel.id ? { backgroundColor: 'white' } : (disabled ? { backgroundColor: '#B2B0AE' } : {})} onClick={() => {

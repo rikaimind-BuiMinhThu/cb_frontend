@@ -9,13 +9,18 @@ const LPIntegrationOptionPullDown = ({
   pullDown,
   onChange,
   data,
-  postMessageToParent
+  postMessageToParent,
+  targetElementType = CRAWL_ELEMENT_TYPES.SELECT,
+  jsCode = "",
+  keyValue="text",
+  nameValue="text"
 }) => {
   useEffect(() => {
     const crawlOption = {
-      targetElementType: CRAWL_ELEMENT_TYPES.SELECT,
+      targetElementType,
       searchMode: search_element_type,
       searchAddress: search_element_value,
+      searchJsCode: jsCode
     };
     postMessageToParent({
       actionData: crawlOption,
@@ -30,8 +35,8 @@ const LPIntegrationOptionPullDown = ({
       <SelectCustom
         disabled={disabled}
         data={data}
-        keyValue="text"
-        nameValue="text"
+        keyValue={keyValue}
+        nameValue={nameValue}
         style={{ width: "100%" }}
         placeholder={pullDown?.customization?.display_unselected}
         value={pullDown?.[pullDown?.type]?.value || undefined}
