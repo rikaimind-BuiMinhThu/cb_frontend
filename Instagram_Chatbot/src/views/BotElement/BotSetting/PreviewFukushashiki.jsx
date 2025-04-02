@@ -914,9 +914,11 @@ const PreviewFukushashiki = () => {
 
   const fukushashikiSavedStateToLp = (savedState) => {
     return new Promise((resolve) => {
+      let fukuDataList = [];
       savedState.userMessagesList.forEach((message) => {
-        fukushashikiToLP(convertToFukushashikiObject({message: message}));
+        fukuDataList.push(...convertToFukushashikiObject({message: message}));
       });
+      fukushashikiToLP(fukuDataList);
       resolve();
     });
   }
