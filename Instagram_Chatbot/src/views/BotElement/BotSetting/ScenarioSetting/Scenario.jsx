@@ -303,6 +303,21 @@ let dropDownTitle = [
   }
 ];
 
+let convertTextType = [
+  {
+    key: "katakana",
+    value: "Katakana",
+  },
+  {
+    key: "hiragana",
+    value: "Hiragana",
+  },
+  {
+    key: "romaji",
+    value: "Romaji",
+  },
+];
+
 let typeTextarea = [
   {
     key: 'text_input',
@@ -1228,6 +1243,10 @@ const Scenario = () => {
           type: messageType,
           [messageType]: {
             title_require: false,
+            isUseConvertText: false,
+            isCustomID: false,
+            convertTextTypeValue: 'katakana',
+            idRefector: '',
             type: 'text',
             text: {
               range: 'no_input',
@@ -5756,6 +5775,119 @@ const Scenario = () => {
                                                       {/* text_input: type = text  ADD_FUKU*/}
                                                       {textInput.type === 'text' && (
                                                         <React.Fragment>
+                                                          <div className='d-flex justify-content-start align-item-center'>
+                                                            <div>
+                                                              <CheckboxCustom
+                                                                label="文字を自動変換する"
+                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'isUseConvertText')}
+                                                                value={textInput.isUseConvertText}
+                                                              />
+                                                            </div>
+                                                            <div className='ml-3'>
+                                                              {textInput.isUseConvertText && (
+                                                                <SelectCustom
+                                                                  id="convertTextTypeSelect"
+                                                                  allowClear={false}
+                                                                  style={{ width: '100%' }}
+                                                                  value={textInput.convertTextTypeValue}
+                                                                  data={convertTextType}
+                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'convertTextTypeValue')}
+                                                                  keyValue="key"
+                                                                  placeholder={'Select Convert Text Type'}
+                                                                />
+                                                              )}
+
+                                                            </div>
+                                                          </div>
+                                                          {textInput.isUseConvertText && (
+                                                            textInput.text.isSplitInput
+                                                              ?
+                                                              <div className='mt-2 mb-2 d-flex justify-content-start align-item-center'>
+                                                                <div>
+                                                                  <InputCustom
+                                                                    placeholder={'セル1受信点ID'}
+                                                                    style={{ width: '98%' }}
+                                                                    styleLabel={{ width: '100%' }}
+                                                                    maxLength={250}
+                                                                    useFukushashiki={true}
+                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'convertTextDestination1', value)}
+                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['convertTextDestination1']}
+                                                                  />
+                                                                </div>
+
+                                                                <div>
+                                                                  <InputCustom
+                                                                    placeholder={'セル2受信点ID'}
+                                                                    style={{ width: '98%' }}
+                                                                    styleLabel={{ width: '100%' }}
+                                                                    maxLength={250}
+                                                                    useFukushashiki={true}
+                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'convertTextDestination2', value)}
+                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['convertTextDestination2']}
+                                                                  />
+                                                                </div>
+                                                              </div>
+                                                              :
+                                                              <div className='mt-2 mb-2'>
+                                                                <InputCustom
+                                                                  placeholder={'受信反射ポイントIDを入力してください'}
+                                                                  styleLabel={{ width: '100%' }}
+                                                                  maxLength={250}
+                                                                  useFukushashiki={true}
+                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'convertTextDestination', value)}
+                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['convertTextDestination']}
+                                                                />
+                                                              </div>
+
+                                                          )}
+                                                          <div>
+                                                            <CheckboxCustom
+                                                              label="IDのカスタマイズ"
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'isCustomID')}
+                                                              value={textInput.isCustomID}
+                                                            />
+                                                          </div>
+                                                          {textInput.isCustomID && (
+                                                            textInput.text.isSplitInput
+                                                              ?
+                                                              <div className='mt-2 mb-2 d-flex justify-content-start align-item-center'>
+                                                                <div>
+
+                                                                  <InputCustom
+                                                                    placeholder={'セル 1 のオプション ID'}
+                                                                    styleLabel={{ width: '100%' }}
+                                                                    style={{ width: '98%' }}
+                                                                    maxLength={250}
+                                                                    useFukushashiki={true}
+                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'customId1', value)}
+                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['customId1']}
+                                                                  />
+                                                                </div>
+
+                                                                <div>
+
+                                                                  <InputCustom
+                                                                    placeholder={'セル 2 のオプション ID'}
+                                                                    style={{ width: '98%' }}
+                                                                    maxLength={250}
+                                                                    useFukushashiki={true}
+                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'customId2', value)}
+                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['customId2']}
+                                                                  />
+                                                                </div>
+                                                              </div>
+                                                              :
+                                                              <div className='m-2'>
+                                                                <InputCustom
+                                                                  placeholder={'オプションIDを入力してください'}
+                                                                  style={{ width: '100%' }}
+                                                                  maxLength={250}
+                                                                  useFukushashiki={true}
+                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'customId', value)}
+                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['customId']}
+                                                                />
+                                                              </div>
+                                                          )}
                                                           <div className="ss-user-setting__item-bottom">
                                                             <SelectCustom
                                                               id="range"
