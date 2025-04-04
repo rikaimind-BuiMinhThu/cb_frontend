@@ -761,6 +761,7 @@ const Scenario = () => {
   // states
   const [scenarioName, setScenarioName] = useState('');
   const [urlThanks, setUrlThanks] = useState('');
+  const [urlConfirm, setUrlConfirm] = useState(''); 
   const [lpProductUrl, setLpProductUrl] = useState('');
   const [coupon, setCoupon] = useState('');
   const [isUseOnlyRegularOrder, setIsUseOnlyRegularOrder] = useState(false);
@@ -884,6 +885,7 @@ const Scenario = () => {
       setDataMessages(res.data.data?.conversation?.messages || []);
       setScenarioName(res.data.data?.scenario_name || '');
       setUrlThanks(res.data.data?.conversation?.urlThanksPage || '');
+      setUrlConfirm(res.data.data?.conversation?.urlConfirmPage || '');
       setCoupon(res.data.data?.conversation?.coupon || '');
       setLpProductUrl(res.data.data?.tamagoLandingPageUrl || '');
       setIsUseOnlyRegularOrder(res.data.data?.isUseOnlyRegularOrder || false);
@@ -1571,6 +1573,7 @@ const Scenario = () => {
             require: false,
             is_display_error_message: false,
             is_use_js: false,
+            is_used_cart_confirm_page: false,
             use_for_confirm_order: false, 
           },
           button_submit_name:''
@@ -2151,6 +2154,7 @@ const Scenario = () => {
       conversation: {
         messages: [...dataMessages],
         urlThanksPage: urlThanks,
+        urlConfirmPage: urlConfirm,
         coupon: coupon,
       },
       scenario_name: scenarioName,
@@ -2195,6 +2199,7 @@ const Scenario = () => {
       conversation: {
         messages: [...dataMessages],
         urlThanksPage: urlThanks,
+        urlConfirmPage: urlConfirm,
         coupon: coupon
       },
       scenario_name: scenarioName,
@@ -13502,6 +13507,15 @@ const Scenario = () => {
                                                           />
                                                         </div>
                                                       </div>
+                                                      <div className="ss-user-setting__item-bottom" style={{ marginBottom: '0px', display: 'flex' }}>
+                                                      <div style={{ width: '90%' }}>
+                                                          <CheckboxCustom
+                                                            label="カートシステムの注文確認ページを利用"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_used_cart_confirm_page')}
+                                                            value={buttonSubmit.is_used_cart_confirm_page}
+                                                          />
+                                                        </div>
+                                                      </div>
                                                       {buttonSubmit.is_display_error_message &&
                                                         <>
                                                           <div className='ss-user-setting__item-bottom' style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -13582,6 +13596,22 @@ const Scenario = () => {
                                                           value={content.button_submit_name}
                                                         />
                                                       </div>
+                                                      {buttonSubmit.is_used_cart_confirm_page &&
+                                                        <>
+                                                        <div className="ss-user-setting__item-text_input-top" style={{ margin: '10px 0', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                                          <InputCustom
+                                                            className="ss-user-setting-input-overview"
+                                                            styleLabel={{width: '90%' }}
+                                                            style={{ width: '90%' }}
+                                                            label="注文確認ページURL"
+                                                            inline={false}
+                                                            placeholder={'注文確認ページURL'}
+                                                            value={urlConfirm}
+                                                            onChange={value => setUrlConfirm(value)}
+                                                          />
+                                                        </div>
+                                                        </>
+                                                      }
                                                     </>}
                                                   {/* user: type = 'label_no_transition' */}
                                                   {content.type === 'label_no_transition' && (
