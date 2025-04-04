@@ -378,9 +378,10 @@ textarea.ss-message__content--bot-delay {
   margin-bottom: 0;
 }
 
-input#ss-message__content--user-radio_button {
-  width: 19px;
-  height: 19px;
+input#ss-message__content--user-radio_button,
+.ss-message__content--user-radio_button-wrapper input[type="radio"]{
+  width: 19px !important;
+  height: 19px !important;
 }
 
 .ss-message__content--user-radio_button>label {
@@ -1311,8 +1312,26 @@ input#ss-message__content--user-checkbox--checkbox_img {
 }
 
 .ss-user-setting-checkbox-custom {
-  margin-left: 1%;
-  margin-right: 9%;
+  margin-left: 5px;
+  margin-right: 20px;
+}
+
+.ss-user-setting-checkbox-custom_css { 
+  box-sizing: border-box;
+} 
+
+.ss-user-setting-checkbox-custom-css_toggle {
+  border: none;
+  background: transparent;
+  color: #327aed;
+  font-weight: bold;
+  font-size: 12px;
+  margin: 0 0 5px 0;
+}
+
+.ss-user-setting-checkbox-custom-css_toggle:hover {
+  text-decoration: underline;
+  color: black;
 }
 
 .ss-user-setting__item-bottom-flex-start .react-datepicker-wrapper {

@@ -9,7 +9,7 @@ import CheckboxCustom from "../ScenarioSetting/scenarioComon/CheckboxCustom";
 import InputCustom from "../ScenarioSetting/scenarioComon/InputCustom";
 import { Button } from "reactstrap";
 import ModalNoti from "../../../Popup/ModalNoti";
-import { CHATBOT_ACTIONS } from "../PreviewComponent/Constants";
+import { CHATBOT_ACTIONS, CRAWL_ELEMENT_TYPES, MESSAGE_CONTENT_TYPES } from "../PreviewComponent/Constants";
 import {
   Checkbox,
   Radio,
@@ -47,7 +47,8 @@ const UserMessage = ({
   variables,
   lpOptionData = {},
   submitErrorMessage = '',
-  postMessageToParent
+  postMessageToParent,
+  botId
 }) => {
   const [dataHour, setDataHour] = useState(dataHourFixed);
   const [dataYear, setDataYear] = useState(dataYearFixed);
@@ -57,9 +58,12 @@ const UserMessage = ({
   const [messageContent, setMessageContent] = useState(messageContentProps);
   const [errors, setErrors] = useState(errorsProps);
   const [checked, setChecked] = useState([]);
-  const [bot_id, setBotId] = useState(Cookies.get("bot_id"));
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [messageNoti, setMessageNoti] = useState("");
+
+  const getPrefectureIdCodeFromName = (name) => {
+    return prefecturesList.find((prefecture) => prefecture.name === name)?.id;
+  }
   
   const cardExpiredYearOptions =  Array.from({ length: 10 }, (_, i) => {
     return {
@@ -95,6 +99,22 @@ const UserMessage = ({
             item.index === indexMessage && item.indexContent === indexContent
         )?.[0]?.data || "";
   }
+
+  const renderDescriptionPayment = (cardPaymentRadioButton) => {
+    const foundItem = cardPaymentRadioButton.radio_contents.find(
+      (item) =>
+        cardPaymentRadioButton.initial_selection === item.value &&
+        item.isUsedHTMLDescription &&
+        item.descriptionContent.length > 0
+    );
+    if (!foundItem) return null;
+    return (
+      <div
+        key={foundItem.value}
+        dangerouslySetInnerHTML={{ __html: foundItem.descriptionContent }}
+      />
+    )
+  };
 
   useEffect(() => {
     if (messageContent.length === 1) {
@@ -499,13 +519,15 @@ const UserMessage = ({
   };
 
   const handleClickCarousel = (urls, use_shortened_urls) => {
+    if (!urls.trim().length) return;
+
     let data = {
       history_click_url: {
         origin_url: urls,
       },
     };
     api
-      .post(`/api/v1/managements/history_click_urls?chatbot_id=${bot_id}`, data)
+      .post(`/api/v1/managements/history_click_urls?chatbot_id=${botId}`, data)
       .then((response) => {
         if (response.data.code === 1) {
           let message = response.data.message;
@@ -549,12 +571,35 @@ const UserMessage = ({
     return content;
   }
 
+  function renderPulldownfromJs({ disabled, pullDown, indexContent, content }) {
+    if (pullDown?.type !== MESSAGE_CONTENT_TYPES.PULLDOWN.FROM_JS) return null;
+
+    return (
+      <LPIntegrationOptionPullDown
+        targetElementType={CRAWL_ELEMENT_TYPES.FROM_JS}
+        search_element_type={pullDown.from_js_result_target_search_mode}
+        search_element_value={pullDown.from_js_result_target_search_value}
+        jsCode={pullDown.from_js_result_code}
+        disabled={disabled}
+        pullDown={pullDown}
+        data={getLPOptionData(pullDown.from_js_result_target_search_value)}
+        postMessageToParent={postMessageToParent}
+        onChange={(value) =>
+          onChangeValue(indexContent, content.type, value, pullDown.type, 'value')
+        }
+        nameValue='text'
+        keyValue='value'
+      />
+    );
+  }
+  
   return (
     <div className="ss-user-message__content-wrapper">
       {messageContent?.map((content, indexContent) => {
         let textInput = content.text_input;
         let label = content.label;
         let textarea = content.textarea;
+        const image = content.image;
         let radioButton = content.radio_button;
         let checkbox = content.checkbox;
         let pullDown = content.pull_down;
@@ -580,6 +625,13 @@ const UserMessage = ({
 
         return (
           <React.Fragment key={indexContent}>
+            {
+              content.type === 'image' && (
+                <div className="ss-message__content--user-text-input-top" style={{ marginBottom: '0px' }}>
+                  <img src={image.imageURL} style={{ width: image.image_width, height: image.image_height }} />
+                </div>
+              )
+            }
             {/* type == 'text_input' */}
             {content.type === "text_input" && (
               <div style={{ marginBottom: "10px" }}>
@@ -706,7 +758,7 @@ const UserMessage = ({
                           placeholder={textInput[textInput.type]?.number1}
                           onChange={(value) => {
                             if (value.length === 3) {
-                              moveToNext("ss-user-message-phone_number_2");
+                              moveToNext(`ss-user-message-phone_number_2_${indexContent}`);
                             }
                             onChangeValue(
                               indexContent,
@@ -718,13 +770,13 @@ const UserMessage = ({
                           }}
                           onCompositionEnd={(event) => {
                             if (event.target.value.length === 3) {
-                              moveToNext("ss-user-message-phone_number_2");
+                              moveToNext(`ss-user-message-phone_number_2_${indexContent}`);
                             }
                           }}
                           value={textInput[textInput.type]?.value1}
                         ></InputCustom>
                         <InputCustom
-                          id="ss-user-message-phone_number_2"
+                          id={`ss-user-message-phone_number_2_${indexContent}`}
                           disabled={disabled}
                           className="ss-message__content--user-text-input ss-input-value"
                           style={{ marginBottom: "0px", width: "32%" }}
@@ -734,7 +786,7 @@ const UserMessage = ({
                           placeholder={textInput[textInput.type]?.number2}
                           onChange={(value) => {
                             if (value.length === 4) {
-                              moveToNext("ss-user-message-phone_number_3");
+                              moveToNext(`ss-user-message-phone_number_3_${indexContent}`);
                             }
                             onChangeValue(
                               indexContent,
@@ -746,13 +798,13 @@ const UserMessage = ({
                           }}
                           onCompositionEnd={(event) => {
                             if (event.target.value.length === 4) {
-                              moveToNext("ss-user-message-phone_number_3");
+                              moveToNext(`ss-user-message-phone_number_3_${indexContent}`);
                             }
                           }}
                           value={textInput[textInput.type]?.value2}
                         ></InputCustom>
                         <InputCustom
-                          id="ss-user-message-phone_number_3"
+                          id={`ss-user-message-phone_number_3_${indexContent}`}
                           disabled={disabled}
                           // className="ss-message__content--user-text-input ss-input-value"
                           style={{ marginBottom: "0px", width: "32%" }}
@@ -1795,7 +1847,7 @@ const UserMessage = ({
                           <input
                             disabled={disabled}
                             type="radio"
-                            id="ss-message__content--user-radio_button"
+                            id={`ss-message__content--user-radio_button_${item.value}`}
                             checked={radioButton.initial_selection === item.value}
                             onChange={() => {
                               onChangeValue(
@@ -1808,7 +1860,7 @@ const UserMessage = ({
                             }}
                           />
                           {item.text && (
-                            <label htmlFor="ss-message__content--user-radio_button">
+                            <label htmlFor={`ss-message__content--user-radio_button_${item.value}`}>
                               {item.text}
                             </label>
                           )}
@@ -2192,7 +2244,7 @@ const UserMessage = ({
                                     "value"
                                   )
                                 }
-                                value={pullDown[pullDown.type].value}
+                                value={pullDown[pullDown.type].value || pullDown.initial_selection}
                               />
                             </div>
                           ) : (
@@ -2923,6 +2975,12 @@ const UserMessage = ({
                       }
                     />
                   )}
+                  {renderPulldownfromJs({
+                    disabled: disabled,
+                    pullDown: pullDown,
+                    indexContent: indexContent,
+                    content: content
+                  })}
                   {pullDown.type === "up_to_municipality" && (
                     <div>
                       <div style={{ fontWeight: "400", fontSize: "12px" }}>
@@ -3105,7 +3163,7 @@ const UserMessage = ({
                                   onChangeValue(
                                     indexContent,
                                     content.type,
-                                    res.data.data.prefecture_name,
+                                    getPrefectureIdCodeFromName(res.data.data.prefecture_name),
                                     "value_prefecture"
                                   );
                                   onChangeValue(
@@ -3119,10 +3177,10 @@ const UserMessage = ({
                                     ""
                                   );
                                   document
-                                    .getElementById("ss-user-input-address")
+                                    .getElementById(`ss-user-input-address${indexContent}`)
                                     .focus();
                                   document
-                                    .getElementById("ss-user-input-address")
+                                    .getElementById(`ss-user-input-address${indexContent}`)
                                     .select();
                                 } else {
                                   onChangeErrors(
@@ -3174,10 +3232,10 @@ const UserMessage = ({
                           onChange={async (value) => {
                             if ((value + "").length === 3) {
                               document
-                                .getElementById("ss-user-post-code-right-input")
+                                .getElementById(`ss-user-post-code-right-input${indexContent}`)
                                 .focus();
                               document
-                                .getElementById("ss-user-post-code-right-input")
+                                .getElementById(`ss-user-post-code-right-input${indexContent}`)
                                 .select();
                             }
                             onChangeValue(
@@ -3215,10 +3273,10 @@ const UserMessage = ({
                                       ""
                                     );
                                     document
-                                      .getElementById("ss-user-input-address")
+                                      .getElementById(`ss-user-input-address${indexContent}`)
                                       .focus();
                                     document
-                                      .getElementById("ss-user-input-address")
+                                      .getElementById(`ss-user-input-address${indexContent}`)
                                       .select();
                                   } else {
                                     onChangeErrors(
@@ -3259,7 +3317,7 @@ const UserMessage = ({
                           inputMode="numeric"
                           placeholder={zipCodeAddress.post_code_right}
                           disabled={disabled}
-                          id="ss-user-post-code-right-input"
+                          id={`ss-user-post-code-right-input${indexContent}`}
                           style={{ width: "49%" }}
                           onKeyPress={(e) => {
                             if (e.target.value.length >= 4) e.preventDefault();
@@ -3300,10 +3358,10 @@ const UserMessage = ({
                                       ""
                                     );
                                     document
-                                      .getElementById("ss-user-input-address")
+                                      .getElementById(`ss-user-input-address${indexContent}`)
                                       .focus();
                                     document
-                                      .getElementById("ss-user-input-address")
+                                      .getElementById(`ss-user-input-address${indexContent}`)
                                       .select();
                                   } else {
                                     onChangeErrors(
@@ -3444,7 +3502,7 @@ const UserMessage = ({
                     </div>
                     <InputCustom
                       placeholder={zipCodeAddress.address}
-                      id="ss-user-input-address"
+                      id={`ss-user-input-address${indexContent}`}
                       disabled={disabled}
                       style={{ width: "100%" }}
                       onChange={(value) =>
@@ -3962,11 +4020,13 @@ const UserMessage = ({
                                     style={{ width: "100%" }}
                                   />
                                 </div>
-                                <div className="sp-carousel-preview-title">
-                                  {itemCarousel.title}
-                                </div>
-                                <div className="sp-carousel-preview-sub-title">
-                                  {itemCarousel.subtitle}
+                                <div className="sp-carousel-preview-title_holder">
+                                  <div className="sp-carousel-preview-title">
+                                    {itemCarousel.title}
+                                  </div>
+                                  <div className="sp-carousel-preview-sub-title">
+                                    {itemCarousel.subtitle}
+                                  </div>
                                 </div>
                               </div>
                               <div
@@ -5746,6 +5806,7 @@ const UserMessage = ({
                           );
                         }
                       )}
+                    {renderDescriptionPayment(cardPaymentRadioButton)}
                   </Radio.Group>
                 )}
                 {cardPaymentRadioButton.type === "customized_style" && (
@@ -5808,8 +5869,8 @@ const UserMessage = ({
                                 }
                               }}
                             >
-                              {itemPayment.text}
-                            </Radio.Button>
+                              {itemPayment.text}                             
+                            </Radio.Button>                         
                           );
                         }
                       )}

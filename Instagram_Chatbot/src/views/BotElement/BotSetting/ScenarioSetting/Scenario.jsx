@@ -41,6 +41,7 @@ import locale from 'antd/es/date-picker/locale/ja_JP';
 import 'moment/locale/zh-cn';
 import ShopifyReferenceSelect from "./ShopifyReferenceSelect";
 import { Tooltip } from '@mui/material';
+import { MESSAGE_CONTENT_TYPES } from '../PreviewComponent/Constants';
 
 const _ = require('lodash');
 
@@ -535,6 +536,10 @@ let dataTypePullDown = [
   {
     key: 'lp_integration_option',
     value: 'LP一体型フォームの選択肢を利用する'
+  },
+  {
+    key: MESSAGE_CONTENT_TYPES.PULLDOWN.FROM_JS,
+    value: 'JSコードを利用する'
   }
 ];
 
@@ -760,6 +765,13 @@ const Scenario = () => {
   const [coupon, setCoupon] = useState('');
   const [isUseOnlyRegularOrder, setIsUseOnlyRegularOrder] = useState(false);
   const [isUseFukushashiki, setIsUseFukushashiki] = useState(false);
+  const [isUseCustomCss, setIsUseCustomCss] = useState(false);
+  const [customCssContent, setCustomCssContent] = useState({
+    temp: "",
+    final: ""
+  });
+  const [isOpenModalCustomCss, setIsOpenModalCustomCss] = useState(false);
+
   const [errorScenarioName, setErrorScenarioName] = useState('');
 
   const [belongTo, setBelongTo] = useState('bot');
@@ -835,6 +847,7 @@ const Scenario = () => {
   useEffect(() => {
     getListVariable();
   }, [])
+    
 
   useEffect(() => {
     api.get(`/api/v1/managements/emails?page=all&chatbot_id=${botId}`).then(res => {
@@ -875,6 +888,11 @@ const Scenario = () => {
       setLpProductUrl(res.data.data?.tamagoLandingPageUrl || '');
       setIsUseOnlyRegularOrder(res.data.data?.isUseOnlyRegularOrder || false);
       setIsUseFukushashiki(res.data.data?.isUseFukushashiki || false);
+      setIsUseCustomCss(res.data.data?.is_used_custom_css || false);
+      setCustomCssContent({
+        temp: res.data.data?.custom_css_content || '',
+        final: res.data.data?.custom_css_content || '',
+      });
     }).catch((error) => {
       if (error.response?.data.code === 0) {
         tokenExpired()
@@ -882,8 +900,26 @@ const Scenario = () => {
     });
   }
 
+  const renderPaymentMethodDescriptionInput = ({ selectedItem, dataMessages }) => {
+    if (!selectedItem.isUsedHTMLDescription) return null;
+    return (
+      <InputCustom
+        maxLength={10000}
+        style={{ width: '100%', marginBottom: '5px' }}
+        label="HTMLの説明をカスタマイズする"
+        inline={false}
+        placeholder="ここにHTMLを入力してください"
+        value={selectedItem.descriptionContent}
+        onChange={(value) => {
+          selectedItem.descriptionContent = value;
+          setDataMessages([...dataMessages]);
+        }}
+      />
+    );
+  };
+
   const getListProductVariants = (cursor) => {
-    const query = cursor? `cursor=${cursor}` : ""
+    const query = cursor ? `cursor=${cursor}` : ""
     api.get(`/api/v1/shopify/product_variants?${query}`).then(res => {
       setListProductVariants(prev => prev.concat(
           res?.data?.data?.productVariants?.edges.map(x => {
@@ -1157,6 +1193,19 @@ const Scenario = () => {
           }
         }
       );
+    } else if (messageType === 'image') {
+      dataMessages[indexMessageSelect].message_content.push(
+        {
+          id: idMax,
+          type: messageType,
+          [messageType]: {
+            imageURL: '',
+            displayButtonNext: true,
+            image_width: "100%",
+            image_height: "100%"
+          }
+        }
+      );
     } else if (messageType === 'radio_button') {
       dataMessages[indexMessageSelect].message_content.push(
         {
@@ -1255,6 +1304,7 @@ const Scenario = () => {
             title_require: false,
             type: 'customization',
             customization: {
+              initial_selection: "",
               display_unselected: '選択してください',
               is_comment: false,
               options_with_comment: [{ id: 1 }],
@@ -1272,6 +1322,7 @@ const Scenario = () => {
             up_to_municipality: {},
             prefectures: {},
             lp_integration_option: {},
+            from_js_result: {}
           }
         }
       );
@@ -1793,10 +1844,10 @@ const Scenario = () => {
           dataMessages[indexMessage].message_content[indexContent][type][name] = []
           dataMessages[indexMessage].message_content[indexContent][type][name].push(check_box_value)
         }
-        if(dataMessages[indexMessage].message_content[indexContent][type][name].includes(value))
+        if (dataMessages[indexMessage].message_content[indexContent][type][name].includes(value))
           dataMessages[indexMessage].message_content[indexContent][type][name] = dataMessages[indexMessage].message_content[indexContent][type][name].filter((el) => el !== value);
         else
-        dataMessages[indexMessage].message_content[indexContent][type][name].push(value);
+          dataMessages[indexMessage].message_content[indexContent][type][name].push(value);
       } else {
         if (dataMessages[indexMessage].message_content[indexContent][type] === undefined) {
           dataMessages[indexMessage].message_content[indexContent][type] = {};
@@ -1807,11 +1858,121 @@ const Scenario = () => {
       dataMessages[indexMessage].message_content[indexContent][type] = value;
     }
     setDataMessages([...dataMessages]);
-   
+
   }
 
+  const renderPreviewPulldownfromJs = (pullDown) => {
+    if (pullDown.type !== MESSAGE_CONTENT_TYPES.PULLDOWN.FROM_JS) return null;
 
+    return (
+      <React.Fragment>
+        <SelectCustom
+          data={[]}
+          placeholder="選択してください。"
+          style={{ width: '100%' }}
+        />
+      </React.Fragment>
+    )
+  };
 
+  const renderDetailSettingPulldownFromJs = ({ indexMessageSelect, indexContent, content, pullDown }) => {
+    if (pullDown.type !== MESSAGE_CONTENT_TYPES.PULLDOWN.FROM_JS) return null;
+
+    return (
+      <React.Fragment>
+        <div>
+          <div
+            className='ss-user-setting__item-bottom'
+            style={{ width: '18%', fontSize: '14px', fontWeight: '400', marginBottom: '5px' }}
+          >
+            jscode
+          </div>
+          <div className='ss-user-setting__item-bottom'>
+            <textarea
+              style={{ width: '90%' }}
+              className='ss-user-setting-item-textarea-label ss-input-value'
+              placeholder='テキスト'
+              rows='10'
+              value={pullDown.from_js_result_code}
+              onChange={(e) =>
+                onChangeValueMessageContent(
+                  indexMessageSelect,
+                  indexContent,
+                  content.type,
+                  e.target.value,
+                  'from_js_result_code'
+                )
+              }
+            />
+          </div>
+        </div>
+        <div
+          className='ss-user-setting__item-row'
+          style={{ display: 'flex', gap: '10px', marginLeft: '35px', width: '90%' }}
+        >
+          <Tooltip title='複写先要素の取得方法をお選びください' placement='top'>
+            <div style={{ width: '25%' }}>
+              <SelectCustom
+                id='title'
+                style={{ width: '100%' }}
+                value={pullDown.from_js_result_target_search_mode}
+                onChange={(value) =>
+                  onChangeValueMessageContent(
+                    indexMessageSelect,
+                    indexContent,
+                    content.type,
+                    value,
+                    'from_js_result_target_search_mode'
+                  )
+                }
+                data={[
+                  { key: 1, value: 'id' },
+                  { key: 2, value: 'css_selector' },
+                  { key: 3, value: 'xpath' },
+                ]}
+                keyValue='key'
+                placeholder='複写先要素の取得方法をお選びください'
+              />
+            </div>
+          </Tooltip>
+          <Tooltip
+            title={
+              {
+                1: '複写先要素のIDを入力ください',
+                2: '複写先要素のcss_selectorを入力ください',
+                3: '複写先要素のxPathを入力ください',
+              }[pullDown[pullDown.type]?.from_js_result_target_search_mode] || ''
+            }
+            placement='top'
+          >
+            <div style={{ flex: '75%' }}>
+              <InputCustom
+                styleLabel={{ width: '100%' }}
+                style={{ width: '100%' }}
+                onChange={(value) =>
+                  onChangeValueMessageContent(
+                    indexMessageSelect,
+                    indexContent,
+                    content.type,
+                    value,
+                    'from_js_result_target_search_value'
+                  )
+                }
+                value={pullDown.from_js_result_target_search_value}
+                placeholder={
+                  {
+                    1: '複写先要素のIDを入力ください',
+                    2: '複写先要素のcss_selectorを入力ください',
+                    3: '複写先要素のxPathを入力ください',
+                  }[pullDown[pullDown.type]?.from_js_result_target_search_mode] || ''
+                }
+              />
+            </div>
+          </Tooltip>
+        </div>
+      </React.Fragment>
+    );
+  };
   
   const onChangeFixedDate = (indexMessage, indexContent, type, value, name) => {
     if (value) {
@@ -1868,13 +2029,13 @@ const Scenario = () => {
       if (res.data.code === 1) {
         setDataCondition([
           ...dataConditionFixed,
-          ...res.data.data
+          ...res.data.data,
         ]);
         setDataInputVar(res.data.data);
       }
     }).catch((error) => {
       if (error.response?.data.code === 0) {
-        tokenExpired()
+        tokenExpired();
       }
     });
   }
@@ -1887,7 +2048,7 @@ const Scenario = () => {
     let data = {
       variable: {
         variable_name: variableName,
-        default_value: defaultValue
+        default_value: defaultValue,
       }
     }
     api.post(`/api/v1/managements/chatbots/${botId}/variables`, data).then(res => {
@@ -1905,10 +2066,78 @@ const Scenario = () => {
       }, 2000);
     }).catch((error) => {
       if (error.response?.data.code === 0) {
-        tokenExpired()
+        tokenExpired();
       }
     });
   }
+
+  const handleChangeOpenModalCustomCss = (value) => () => {
+    setIsOpenModalCustomCss(value);
+  }
+
+  const handleOnChangeValueCustomCss = (e) =>{
+    e.preventDefault();
+    setCustomCssContent((prevState) => ({
+      ...prevState,
+      temp: e.target.value,
+    }));
+  }
+
+  const closeAfterDone = (func) => (...props) => {
+    func(...props);
+    setTimeout(() => setIsOpenModalCustomCss(false), 0);
+  };
+  
+
+  const handleOnCancelCustomCss = () => {
+    setCustomCssContent((prevState) => ({
+      ...prevState,
+      temp: prevState.final,
+    }));
+  }
+
+  const handleOnConfirmCustomCss = () => {
+    setCustomCssContent((prevState) => ({
+      ...prevState,
+      final: prevState.temp,
+    }));
+  }
+
+  const renderModalCustomCssForm = (isOpen) => {
+    return (
+      <ModalShort open={isOpen} onClose={closeAfterDone(handleOnCancelCustomCss)}>
+        <div className="sl-popup-create-scenario-wrapper" style={{width: "750px"}}>
+          <h4>カスタム CSS を入力</h4>
+          <div style={{ marginBottom: '10px' }}>
+            <div className="sl-popup-create-scenario-input-wrapper" style={{ marginBottom: '0px' }}>
+              <span style={{ width: '100px', whiteSpace: "nowrap", wordBreak: "normal" }}>CSSコンテンツ</span>
+              <textarea
+                style={{ width: '100%', height: '150px', padding: '10px', fontSize: '14px', flexGrow: "1" }}
+                placeholder="ここにカスタムCSSコンテンツを入力してください"
+                value={customCssContent.temp}
+                onChange={handleOnChangeValueCustomCss}
+              />
+            </div>
+          </div>
+          <div className="sl-popup-create-scenario-btn-wrapper">
+            <Button
+              className="ss-popup-add-variable-input-close-button"
+              onClick={closeAfterDone(handleOnCancelCustomCss)}
+            >
+              閉じる
+            </Button>
+            <Button
+              style={{ backgroundColor: '#024BB9' }}
+              className="ss-popup-add-variable-input-keep-button"
+              onClick={closeAfterDone(handleOnConfirmCustomCss)}
+            >
+              保存
+            </Button>
+          </div>
+        </div>
+      </ModalShort>
+    );
+  };
 
   const onClickSavePreview = () => {
     if (!scenarioName) {
@@ -1922,12 +2151,14 @@ const Scenario = () => {
       conversation: {
         messages: [...dataMessages],
         urlThanksPage: urlThanks,
-        coupon: coupon
+        coupon: coupon,
       },
       scenario_name: scenarioName,
       landing_page_product_url: lpProductUrl,
       is_use_only_regular_order: isUseOnlyRegularOrder,
       is_used_fukushashiki: isUseFukushashiki,
+      is_used_custom_css: isUseCustomCss,
+      custom_css_content: customCssContent.final,
     }
     api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data).then(res => {
       setIsOpenNoti(true);
@@ -1948,11 +2179,11 @@ const Scenario = () => {
       }, 2000);
     }).catch((error) => {
       if (error?.response?.data?.code === 0) {
-        tokenExpired()
+        tokenExpired();
       }
     })
   }
-
+  
   const onClickSaveScenario = async () => {
     if (!scenarioName) {
       setErrorScenarioName("入力してください。");
@@ -1970,6 +2201,8 @@ const Scenario = () => {
       landing_page_product_url: lpProductUrl,
       is_use_only_regular_order: isUseOnlyRegularOrder,
       is_used_fukushashiki: isUseFukushashiki,
+      is_used_custom_css : isUseCustomCss,
+      custom_css_content: customCssContent.final,
     }
     try {
       const res = await api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data);
@@ -1986,7 +2219,7 @@ const Scenario = () => {
       }, 2000);
     } catch (error) {
       if (error.response?.data.code === 0) {
-        tokenExpired()
+        tokenExpired();
       }
     }
   }
@@ -2082,7 +2315,7 @@ const Scenario = () => {
           belong_to: belongTo,
           conditions: [],
           is_display_button_next: true,
-          message_content: []
+          message_content: [],
         }
       )
     }
@@ -2112,7 +2345,7 @@ const Scenario = () => {
 
   const onChangeValueCondition = (index, value, name) => {
     dataMessages[indexMessageSelect].conditions[index][name] = value;
-    setConditions([...conditions])
+    setConditions([...conditions]);
   }
 
   const onClickAddCondition = () => {
@@ -2120,7 +2353,7 @@ const Scenario = () => {
       linkCondition: 'and',
       condition: 'is',
       nameCondition: 'current_url',
-      inputCondition: ''
+      inputCondition: '',
     });
     setDataMessages([...dataMessages]);
   }
@@ -2358,6 +2591,30 @@ const Scenario = () => {
                       checked={isUseOnlyRegularOrder}
                     />
                     <label>定期注文のみ</label>
+                  </div>
+                  <div style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "16px",
+                    justifyContent: "start",
+                    width: "100%",
+                  }}>
+                    <div className='ss-user-setting-checkbox-custom_css'> 
+                      <input
+                        type="checkbox"
+                        className="ss-user-setting-checkbox-custom"
+                        onChange={(value) => setIsUseCustomCss(!isUseCustomCss)}
+                        checked={isUseCustomCss}
+                      />
+                      <label style={{whiteSpace: "nowrap", wordBreak: "normal"}}>CSSカスタムを使用</label>
+                    </div>
+                    {isUseCustomCss && (
+                      <div>
+                        <button class="ss-user-setting-checkbox-custom-css_toggle" onClick={handleChangeOpenModalCustomCss(true)}>
+                          {`( CSSコンテンツ設定モダルを開く )`}
+                        </button>
+                      </div>
+                    )}
                   </div>
                   <div>
                     <input
@@ -2722,6 +2979,7 @@ const Scenario = () => {
                                                     let textInput = content.text_input;
                                                     let label = content.label;
                                                     let textarea = content.textarea;
+                                                    const image = content.image;
                                                     let radioButton = content.radio_button;
                                                     let checkbox = content.checkbox;
                                                     let pullDown = content.pull_down;
@@ -3680,6 +3938,7 @@ const Scenario = () => {
                                                                     />
                                                                   </React.Fragment>
                                                                 )}
+                                                                {renderPreviewPulldownfromJs(pullDown)}
                                                                 {pullDown.type === 'up_to_municipality' && (
                                                                   <div>
                                                                     <div style={{ fontWeight: '400', fontSize: '12px' }}>{pullDown[pullDown.type].prefecture_comment}</div>
@@ -4064,6 +4323,13 @@ const Scenario = () => {
                                                                   </>
                                                                 )}
                                                               </div>
+                                                            </div>
+                                                          )
+                                                        }
+                                                        {
+                                                          content.type === 'image' && (
+                                                            <div className="ss-message__content--user-text-input-top" style={{ marginBottom: '0px' }}>
+                                                              <img src={image.imageURL} style={{ width: image.image_width, height: image.image_height }} />
                                                             </div>
                                                           )
                                                         }
@@ -5049,7 +5315,7 @@ const Scenario = () => {
                                     </div>
                                   </div>
                                 </div>
-                              )}
+                              )}     
 
                               {/* type: email */}
                               {messageType === 'email' && (
@@ -5347,6 +5613,7 @@ const Scenario = () => {
                                         let textarea = content.textarea;
                                         let radioButton = content.radio_button;
                                         let checkbox = content.checkbox;
+                                        let image = content.image;
                                         let pullDown = content.pull_down;
                                         let zipCodeAddress = content.zip_code_address;
                                         let attachingFile = content.attaching_file;
@@ -8067,7 +8334,7 @@ const Scenario = () => {
                                                                                     {...providedChild.dragHandleProps}
                                                                                     ref={providedChild.innerRef}
                                                                                   >
-                                                                                    <div style={{ marginBottom: '10px', width: '100%', backgroundColor: '#F8F9FA', padding: '5px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                                                    <div style={{ width: '100%', backgroundColor: '#F8F9FA', padding: '5px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                                                                       <MDBIcon fas icon="grip-horizontal" />
                                                                                       <InputDouble
                                                                                         style={array.length === 1 && !pullDown[pullDown.type]?.is_comment ? { width: '95%' } : {}}
@@ -8098,6 +8365,16 @@ const Scenario = () => {
                                                                                         />
                                                                                       }
                                                                                     </div>
+                                                                                    <CheckboxCustom
+                                                                                      label="初期選択設定"
+                                                                                      onChange={() => {
+                                                                                        if (pullDown.initial_selection !== itemPullDown.value) {
+                                                                                          onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemPullDown.value, 'initial_selection');
+                                                                                        } else { 
+                                                                                          onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, "", 'initial_selection'); }
+                                                                                      }}
+                                                                                      value={pullDown.initial_selection ? pullDown.initial_selection === itemPullDown.value : false}
+                                                                                    />
                                                                                   </div>
                                                                                 )}
                                                                               </Draggable>
@@ -9336,10 +9613,129 @@ const Scenario = () => {
                                                           </div>}
                                                         </React.Fragment>
                                                       }
-                                                      
+
+                                                      {/* pull_down: type = from_js_result */}
+                                                      {renderDetailSettingPulldownFromJs({
+                                                        indexContent: indexContent,
+                                                        content: content,
+                                                        indexMessageSelect: indexMessageSelect,
+                                                        pullDown: pullDown
+                                                      })}
+
                                                     </React.Fragment>
                                                   )}
                                                   {/* user: type = 'carousel' ADD_FUKU */}
+                                                  {
+                                                    content.type === 'image' && (
+                                                      <React.Fragment>
+                                                        <div className="ss-user-setting__item-text_input-top">
+                                                          <CheckboxCustom
+                                                            label="ログイン済み時に表示しない"
+                                                            onChange={(value) => {
+                                                              dataMessages[indexMessageSelect].not_display_when_logged_in = value;
+                                                              setDataMessages([...dataMessages]);
+                                                            }}
+                                                            value={dataMessages[indexMessageSelect].not_display_when_logged_in}
+                                                          />
+                                                          <CheckboxCustom
+                                                            label="入力された内容を変数に保存する。"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
+                                                            value={image.is_save_input_content}
+                                                          />
+                                                          {image.is_save_input_content &&
+                                                            <div className="ss-user-setting__item-bottom">
+                                                              <div className="ss-user-setting__item-select-bottom-wrapper-flex">
+                                                                <SelectCustom
+                                                                  style={{ width: '100%', marginRight: '10px' }}
+                                                                  id="title"
+                                                                  value={image?.save_input_content}
+                                                                  data={dataInputVar}
+                                                                  keyValue="variable_name"
+                                                                  nameValue="variable_name"
+                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
+                                                                />
+                                                                <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>追加</Button>
+                                                              </div>
+                                                            </div>
+                                                          }
+                                                          <div className="ss-user-setting__item-text_input-use-api-wrapper">
+                                                            <CheckboxCustom
+                                                              label="入力値の検証にAPIを利用する"
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'use_api_input_value')}
+                                                              value={image.use_api_input_value}
+                                                            />
+                                                          </div>
+                                                          {image.use_api_input_value &&
+                                                            <div className="ss-user-setting__item-bottom">
+                                                              <SelectCustom
+                                                                style={{ width: '90%' }}
+                                                                id="title"
+                                                                value={image?.use_api_input_value}
+                                                                data={dataInputVar}
+                                                                keyValue="variable_name"
+                                                                nameValue="variable_name"
+                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'use_api_input_value')}
+                                                              />
+                                                            </div>
+                                                          }
+                                                          <CheckboxCustom
+                                                            label="「続行」ボタンを表示する"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'displayButtonNext')}
+                                                            value={image.displayButtonNext}
+                                                          />
+                                                          {/*
+                                                          Edit Width, Height
+                                                           <div className='d-flex mt-2 mb-2'>
+                                                            <div>
+                                                              <label>幅</label>
+                                                              <div>
+                                                              <InputCustom
+                                                              placeholder="プレースホルダ"
+                                                              value={image.image_width}
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'image_width')}
+                                                            />
+                                                              </div>
+                                                            </div>
+                                                            <div>
+                                                              <label>標高ン</label>
+                                                              <div>
+                                                              <InputCustom
+                                                              placeholder="プレースホルダ"
+                                                              value={image.image_height}
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'image_height')}
+                                                            />
+                                                              </div>
+                                                            </div>
+                                                          </div> */}
+                                                          <div className="ss-user-setting__item-bottom">
+                                                            <img src={image.imageURL} style={{ width: image.image_width, height: image.image_height }}></img>
+                                                          </div>
+
+                                                          <div className="ss-file-upload-wrapper" style={{ width: '90%' }}>
+                                                            <Button style={{ margin: '0px', marginRight: '15px' }} className="ss-bot-file-reference-btn" onClick={() => {
+                                                              setIsOpenFileReference(true);
+                                                              setVarFileReference({ indexContent, contentType: 'image', subContentType: 'imageURL', childSubContentType: undefined, indexSubContent: undefined, img: undefined })
+                                                            }}>
+                                                              ファイル参照
+                                                            </Button>
+                                                            <input
+                                                              type="file"
+                                                              id="ss-carouse-file-upload"
+                                                              name="carouse-file-upload"
+                                                              hidden
+                                                              onChange={(e) => getBaseUrl(e, indexContent)}
+                                                            />
+                                                            <Button style={{ margin: '0px' }} className="ss-bot-file-upload-btn" onClick={carouselUploadFile}>
+                                                              追加
+                                                            </Button>
+
+
+                                                          </div>
+                                                        </div>
+                                                      </React.Fragment>
+
+                                                    )
+                                                  }
                                                   {content.type === 'carousel' && (
                                                     <>
                                                       <div className="ss-user-setting__item-text_input-top">
@@ -10944,12 +11340,20 @@ const Scenario = () => {
                                                                                         }}
                                                                                       />
                                                                                       <CheckboxCustom
+                                                                                        label="説明HTML"
+                                                                                        onChange={(value) => {
+                                                                                          itemPaymentRadio.isUsedHTMLDescription = value;
+                                                                                          setDataMessages([...dataMessages]);
+                                                                                        }}
+                                                                                        value={itemPaymentRadio.isUsedHTMLDescription}
+                                                                                      />
+                                                                                      <CheckboxCustom
                                                                                         label="カード決済連動設定"
                                                                                         value={cardPaymentRadioButton.card_linked_setting.includes(itemPaymentRadio.value)}
                                                                                         onChange={() => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemPaymentRadio.value, 'card_linked_setting')}
                                                                                       />
-                                                                                      
                                                                                     </div>
+                                                                                    {renderPaymentMethodDescriptionInput({ selectedItem: itemPaymentRadio, dataMessages })}
                                                                                     {array.length > 1 &&
                                                                                       <div className="ss-user-setting-payment-radio-times-icons">
                                                                                         <MDBIcon fas icon="times-circle"
@@ -13218,6 +13622,7 @@ const Scenario = () => {
                                   value={messageType}
                                 >
                                   <option value="text_input">テキスト入力</option>
+                                  <option value="image">画像</option>
                                   <option value="label">ラベル</option>
                                   <option value="textarea">テキストエリア</option>
                                   <option value="radio_button">ラジオボタン</option>
@@ -13385,6 +13790,7 @@ const Scenario = () => {
           <span style={{ fontSize: '16px' }}>{messageNoti}</span>
         </div>
       </ModalNoti>
+      {renderModalCustomCssForm(isOpenModalCustomCss)}
       <ModalShort open={isOpenAddVariable} onClose={() => setIsOpenAddVariable(false)}>
         <div className="sl-popup-create-scenario-wrapper">
           <h4>変数追加</h4>

@@ -23,7 +23,7 @@ import iconMessagePink from "../../../assets/img/icon-mess/icon-message-chat-pin
 import iconMessagePurple from "../../../assets/img/icon-mess/icon-message-chat-purple.png";
 import iconMessageBlack from "../../../assets/img/icon-mess/icon-message-chat-black.png";
 import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-white.png";
-import { CHATBOT_ACTIONS, SESSION_STORAGE_KEY } from "./PreviewComponent/Constants";
+import { CHATBOT_ACTIONS, MESSAGE_CONTENT_TYPES, SESSION_STORAGE_KEY } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
   lightenColor,
@@ -47,7 +47,7 @@ sessionStorage.setItem("prevOpenStatus", "0");
 var url = new URL(window.location.href);
 let params = new URLSearchParams(url.search);
 let isLoggedIn = params.get('isLoggedIn') === "true";
-
+let isLoadedCssContent = false;
 const previewInitialState = {
   isOpen: false,
   urlSend: "",
@@ -289,9 +289,17 @@ const PreviewFukushashiki = () => {
   // post message to parent window
   useEffect(() => {
     if (!state.urlReceive) return;
-
     postMessageToParent();
-  }, [state.urlReceive]);
+  }, [
+    state.urlReceive,
+    state.isOpen,
+    state.widthPc,
+    state.heightPc,
+    state.widthSp,
+    state.heightSp,
+    state.rightMarginPc,
+    state.bottomMarginPc
+  ]);
 
   // Get prefectures
   useEffect(() => {
@@ -414,6 +422,10 @@ const PreviewFukushashiki = () => {
     return `${dataContentType[field]?.valueLeft} ${dataContentType[field]?.valueRight}`;
   }
 
+  const setRadioButtonDefaultValue = (dataContentType, value) => {
+    return dataContentType[dataContentType.type].find(item => item.value === value)?.text;
+  }
+  
   const setCheckboxDefaultValue = (dataContentType, field) => {
     let dataTextChecked = [];
     switch (field) {
@@ -619,6 +631,7 @@ const PreviewFukushashiki = () => {
       icon_mess,
       main_color: res.data.chatbot.main_color || res.data.chatbot.main_color_other,
       main_color_other: res.data.chatbot.main_color_other,
+      titleBubble:res.data.design_settings.title_bubble
     };
   }
 
@@ -791,13 +804,39 @@ const PreviewFukushashiki = () => {
 
   const extractStateFromPreviewResponse = async (res) => {
     if (!res || !res.data || res.data.code !== 1) return;
+    
+    const designSetting = res.data.design_settings;
     let newState = {
       ...state,
       botInfor: getBotInforFromPreviewResponse(res),
       objParam: {},
       loadedStateFromSession: true,
       messagesList: res.data.data?.conversation?.messages || [],
+      isOpen: state.isOpen || Number(designSetting.display_type) === 1,
+      activePopupCloseBot: Boolean(designSetting?.popup_close_bot),
+      titleBubble: designSetting?.title_bubble || "簡単90秒で注文完了",
+      displayType: designSetting?.display_type,
+      widthPc: designSetting?.width_pc || 450,
+      heightPc: designSetting?.height_pc || 700,
+      widthSp: designSetting?.width_sp || 100,
+      heightSp: designSetting?.height_sp || 100,
+      positionPc: designSetting?.position_pc || "1",
+      rightPcTitle: designSetting?.right_position_pc_title,
+      buttonTypePc: designSetting?.button_type_pc || "1",
+      rightMarginPc: designSetting?.right_margin_pc || 10,
+      bottomMarginPc: designSetting?.bottom_margin_pc || 0,
+      positionSp: designSetting?.position_sp || "1",
+      buttonTypeSp: designSetting?.button_type_sp || "1",
+      rightSpTitle: designSetting?.right_position_sp_title,
+      rightMarginSp: designSetting?.right_margin_sp,
+      bottomMarginSp: designSetting?.bottom_margin_sp,
     };
+    if (res.data?.chatbot?.is_used_custom_css && res.data?.chatbot?.custom_css_content.length > 0) {
+      const style = document.createElement('style');
+      style.innerHTML = res.data.chatbot.custom_css_content;
+      document.head.appendChild(style);
+    }
+
     const prevOpenStatus = sessionStorage.getItem("prevOpenStatus");
 
     if (res.data.design_settings.display_type == 1 && prevOpenStatus == "0") {
@@ -875,9 +914,11 @@ const PreviewFukushashiki = () => {
 
   const fukushashikiSavedStateToLp = (savedState) => {
     return new Promise((resolve) => {
+      let fukuDataList = [];
       savedState.userMessagesList.forEach((message) => {
-        fukushashikiToLP(convertToFukushashikiObject({message: message}));
+        fukuDataList.push(...convertToFukushashikiObject({message: message}));
       });
+      fukushashikiToLP(fukuDataList);
       resolve();
     });
   }
@@ -887,6 +928,11 @@ const PreviewFukushashiki = () => {
     if (!state.loadedStateFromSession) {
       let savedState = getStateFromSessionStorage();
       if (savedState) {
+        if (!isLoadedCssContent && savedState?.botInfor?.is_used_custom_css && savedState?.botInfor?.custom_css_content.length > 0) {
+          const style = document.createElement('style');
+          style.innerHTML = savedState?.botInfor?.custom_css_content;
+          document.head.appendChild(style);
+        }
         if (isLoggedIn) {
           savedState.messagesList.forEach((x) => x.hidden = !!x?.not_display_when_logged_in);
           savedState.currentMsgIndex = savedState.messagesList.findIndex((item) => isUserMessage(item) && item.hidden == false);
@@ -1001,7 +1047,7 @@ const PreviewFukushashiki = () => {
     if (!state.isOpen) return;
     await sleep(1000);
     scrollToBottom(false);
-  }, [state.isOpen, state.renderMessagesList]);
+  }, [state.isOpen, state.renderMessagesList.length]);
 
   const scrollToBottom = (forceScroll = false) => {
     if (document.getElementById("sp-body")) {
@@ -1730,25 +1776,25 @@ const PreviewFukushashiki = () => {
             }
             if (
               contentType.prefecture !== undefined &&
-              stringNullOrEmpty(contentType.value_prefecture)
+              stringNullOrEmpty(contentType.value_prefecture) && contentType.hasOwnProperty('prefecture')
             ) {
               isValidZipCode = false;
             }
             if (
               contentType.municipality !== undefined &&
-              stringNullOrEmpty(contentType.value_municipality)
+              stringNullOrEmpty(contentType.value_municipality) && contentType.hasOwnProperty('municipality')
             ) {
               isValidZipCode = false;
             }
             if (
               contentType.address !== undefined &&
-              stringNullOrEmpty(contentType.value_address)
+              stringNullOrEmpty(contentType.value_address) && contentType.hasOwnProperty('address')
             ) {
               isValidZipCode = false;
             }
             if (
               contentType.address !== undefined &&
-              stringNullOrEmpty(contentType.value_building_name)
+              stringNullOrEmpty(contentType.value_building_name) && contentType.hasOwnProperty('building_name')
             ) {
               isValidZipCode = false;
             }
@@ -2118,15 +2164,15 @@ const PreviewFukushashiki = () => {
         }
       }
     }
-
     if (isValid) {
       errorsMess = {};
     }
+    
+    state.errors = errorsMess;
+    
     dispatch({
       type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-      payload: {
-        errors: errorsMess,
-      },
+      payload: state,                                                          
     });
     return isValid;
   };
@@ -2418,13 +2464,13 @@ const PreviewFukushashiki = () => {
           case "pull_down":
             {
               if (message.pull_down?.customization.length != 0) {
-                const textInDropdown = message.pull_down.customization.value
+                const textInDropdown = message.pull_down.customization.value || message.pull_down.initial_selection;
                 if (message.pull_down.customization.is_comment == true) {
 
                 }
                 else {
                   message.pull_down.customization.options_without_comment.forEach((item) => {
-                    if (item.value == textInDropdown) {
+                    if (!!textInDropdown && item.value == textInDropdown) {
                       const fukuObject = {
                         type: message.type,
                         bindingMode: message.fukushashiki_search_mode,
@@ -2442,9 +2488,23 @@ const PreviewFukushashiki = () => {
                 if (message.pull_down.lp_integration_option.value != "") {
                   const fukuObject = {
                     type: message.type,
+                    pulldownType: message.pull_down.type,
                     bindingMode: message.pull_down.lp_element_search_mode,
                     bindingAddress: message.pull_down.lp_element_search_value,
                     bindingValue: message.pull_down.lp_integration_option.value
+                  };
+                  fukuDataList.push(fukuObject);
+                }
+              }
+
+              if (message.pull_down?.type == MESSAGE_CONTENT_TYPES.PULLDOWN.FROM_JS) {
+                if (message.pull_down.from_js_result.value?.toString() != "") {
+                  const fukuObject = {
+                    type: message.type,
+                    pulldownType: message.pull_down.type,
+                    bindingMode: message.pull_down.from_js_result_target_search_mode,
+                    bindingAddress: message.pull_down.from_js_result_target_search_value,
+                    bindingValue: message.pull_down.from_js_result.value
                   };
                   fukuDataList.push(fukuObject);
                 }
@@ -2769,14 +2829,16 @@ const PreviewFukushashiki = () => {
     if (!handleValidateField(indexMessage)) {
       return;
     }
-
+    
+    newState ={...state};
+    
     const submitData = {
       scenario_id: state.scenarioId,
       message: clickedMsg,
       user_id: state.uuid,
       bot_type: "web"
     };
-
+    
     const isClickedCreateOrder = state.messagesList[clickedMsgIndex]?.message_content?.[0]?.text_input?.save_input_content === "create_order";
     const isClickedLastMessage = state.messagesList.length - 1 === clickedMsgIndex;
 
@@ -3175,6 +3237,7 @@ const PreviewFukushashiki = () => {
   };
 
   const renderSubmitButton = (message, indexMessage) => {
+    const isAutoClick = message?.message_content[0]?.type == "image" && message?.message_content[0]?.image?.displayButtonNext == false;
     if (!message || message.belong_to !== "user") return null;
     if (message.message_content[0]?.type === "button_submit") return null;
 
@@ -3182,9 +3245,8 @@ const PreviewFukushashiki = () => {
     if (!btnText) {
       btnText = indexMessage >= state.renderMessagesList.length - 1 ? "次へ" : "更新";
     }
-
     return (
-      <div className="sp-user-message-button-action">
+      <div className="sp-user-message-button-action" style={{ display: isAutoClick ? "none" : "flex" }}>
         <CustomButton
           disabled={state.submitErrorMessage.length > 0 ? false : message.disabled}
           style={{
@@ -3195,7 +3257,7 @@ const PreviewFukushashiki = () => {
           onClick={() => {
             onClickNext(indexMessage, message)
           }}
-          autoClick={false}
+          autoClick={isAutoClick}
           messsagetype={message.message_content[0]?.type}
         >
           {btnText}
@@ -3264,6 +3326,7 @@ const PreviewFukushashiki = () => {
             variables={state.variables}
             lpOptionData={state.lpOptionData}
             submitErrorMessage={state.submitErrorMessage}
+            botId={state.botId}
           />
           {renderSubmitButton(message, indexMessage)}
         </div>
@@ -3369,7 +3432,7 @@ const PreviewFukushashiki = () => {
               <div className="sp-header-left-label-sub-title">
                 {state.botInfor?.subtitle}
               </div>
-              <div className="sp-header-left-label-title">{state.botInfor?.title}</div>
+              <div className="sp-header-left-label-title">{state.botInfor?.titleBubble}</div>
             </div>
           </div>
           <div
