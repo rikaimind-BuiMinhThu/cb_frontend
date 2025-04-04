@@ -661,6 +661,7 @@ const UserMessage = ({
                       }}
                     >
                       <InputCustom
+                        id={content.customId1 || undefined}
                         disabled={disabled}
                         placeholder={textInput.text?.placeholderLeft}
                         style={{ width: "49%", marginBottom: "0px" }}
@@ -676,6 +677,7 @@ const UserMessage = ({
                         value={textInput[textInput.type]?.valueLeft}
                       ></InputCustom>
                       <InputCustom
+                        id={content.customId2 || undefined}
                         disabled={disabled}
                         placeholder={textInput.text?.placeholderRight}
                         style={{ width: "49%" }}
@@ -694,6 +696,7 @@ const UserMessage = ({
                   ) : (
                     <React.Fragment>
                       <InputCustom
+                        id={content.customId || undefined}
                         disabled={disabled}
                         style={{ marginBottom: "0px" }}
                         placeholder={textInput[textInput.type]?.placeholderLeft}
