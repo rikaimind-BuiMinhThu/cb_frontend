@@ -2961,16 +2961,20 @@ const PreviewFukushashiki = () => {
 
   function convertTextJapanese(text, targetType) {
     switch (targetType.toLowerCase()) {
-        case "hiragana":
-            return wanakana.toHiragana(text);
-        case "katakana":
-            return wanakana.toKatakana(text);
-        case "romaji":
-            return wanakana.toRomaji(text);
-        default:
-            throw new Error("Loại chuyển đổi không hợp lệ! Chọn 'hiragana', 'katakana' hoặc 'romaji'.");
+      case "hiragana":
+        return wanakana.toHiragana(text);
+      case "katakana":
+        return wanakana.toKatakana(text);
+      case "romaji":
+        return wanakana.toRomaji(text);
+      default:
+        throw new Error("Loại chuyển đổi không hợp lệ! Chọn 'hiragana', 'katakana' hoặc 'romaji'.");
     }
-}
+  }
+
+  function containsKanji(input) {
+    return [...input].some(char => wanakana.isKanji(char));
+  }
 
   const onChangeValue = (
     indexContent,
@@ -2991,7 +2995,7 @@ const PreviewFukushashiki = () => {
         case "valueLeft":
           {
             const element = document.getElementById(newState.messagesList[msgIndex].message_content[indexContent]?.convertTextDestination1);
-            if (element) {
+            if (element && containsKanji(value) == false) {
               element.value = convertTextJapanese(value, convertType);
             }
             break;
@@ -2999,7 +3003,7 @@ const PreviewFukushashiki = () => {
         case "valueRight":
           {
             const element = document.getElementById(newState.messagesList[msgIndex].message_content[indexContent]?.convertTextDestination2);
-            if (element) {
+            if (element && containsKanji(value) == false) {
               element.value = convertTextJapanese(value, convertType);
             }
             break;
@@ -3007,7 +3011,7 @@ const PreviewFukushashiki = () => {
         case "value":
           {
             const element = document.getElementById(newState.messagesList[msgIndex].message_content[indexContent]?.convertTextDestination);
-            if (element) {
+            if (element && containsKanji(value) == false) {
               element.value = convertTextJapanese(value, convertType);
             }
             break;
