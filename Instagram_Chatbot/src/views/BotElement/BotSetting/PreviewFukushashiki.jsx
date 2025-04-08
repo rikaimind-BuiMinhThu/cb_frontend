@@ -2996,7 +2996,7 @@ const PreviewFukushashiki = () => {
           {
             const element = document.getElementById(newState.messagesList[msgIndex].message_content[indexContent]?.convertTextDestination1);
             if (element && containsKanji(value) == false) {
-              element.value = convertTextJapanese(value, convertType);
+              newState.messagesList[msgIndex].message_content[indexContent + 1][contentType].text.valueLeft = convertTextJapanese(value, convertType);
             }
             break;
           }
@@ -3004,7 +3004,7 @@ const PreviewFukushashiki = () => {
           {
             const element = document.getElementById(newState.messagesList[msgIndex].message_content[indexContent]?.convertTextDestination2);
             if (element && containsKanji(value) == false) {
-              element.value = convertTextJapanese(value, convertType);
+              newState.messagesList[msgIndex].message_content[indexContent + 1][contentType].text.valueRight = convertTextJapanese(value, convertType);
             }
             break;
           }
@@ -3012,7 +3012,7 @@ const PreviewFukushashiki = () => {
           {
             const element = document.getElementById(newState.messagesList[msgIndex].message_content[indexContent]?.convertTextDestination);
             if (element && containsKanji(value) == false) {
-              element.value = convertTextJapanese(value, convertType);
+              newState.messagesList[msgIndex].message_content[indexContent + 1][contentType].text.value = convertTextJapanese(value, convertType);
             }
             break;
           }
