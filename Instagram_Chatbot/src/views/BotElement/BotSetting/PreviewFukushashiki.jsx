@@ -37,7 +37,8 @@ import {
   getChatBotSetting,
   sendEmailRequest,
   sleep,
-  stringNullOrEmpty
+  stringNullOrEmpty,
+  appendParamsToUrl,
 } from "./PreviewComponent/Utils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
@@ -59,6 +60,8 @@ const previewInitialState = {
   botInfor: {},
   messagesList: [],
   urlThanksPage: "",
+  cartConfirmUrl: "",
+  isUsedCartConfirmPage: false,
   currentMsgIndex: 0,
   renderMessagesList: [],
   currentUserMsgIndex: 0,
@@ -562,12 +565,30 @@ const PreviewFukushashiki = () => {
     return { arrayCode, arrayName, arrayPrice, arrayOrderQuantity };
   }
 
-  const redirectToThanksPage = () => {
-    if (!state.urlThanksPage) return;
+  const redirectToCartPage = () => {
+    const params = {
+      scenario_id: state.scenarioId,
+      client_id: state.clientId,
+      bot_type: state.botType,
+      user_input_id: state.userInputId
+    };
+    let redirectRurl = null;
+  
+    if (state.isUsedCartConfirmPage && state.cartConfirmUrl) {
+      // Redirect to cart confirm page với parameters
+      redirectRurl = appendParamsToUrl(state.cartConfirmUrl, params);
+      
+    } else if (state.urlThanksPage) {
+      // Redirect to thanks page với parameters
+      redirectRurl = appendParamsToUrl(state.urlThanksPage, params);
+    }
+
+    if (!redirectRurl) return;
+
     setTimeout(() => {
-      window.parent.location.href = state.urlThanksPage;
+      window.parent.location.href = redirectRurl;
     }, 2000);
-  }
+  }; 
 
   const getBotInforFromPreviewResponse = (res) => {
     if (!res || !res.data || !res.data.chatbot) return {};
@@ -664,8 +685,8 @@ const PreviewFukushashiki = () => {
     if (state.renderMessagesList.length - 1 === i) {
       await sleep(messagesList[i].message_content[0].delay.content * 1000);
     }
-    if (isLastMessageInCreateOrderFlow() && state.urlThanksPage)
-      return redirectToThanksPage();
+    if (isLastMessageInCreateOrderFlow())
+      return redirectToCartPage();
     newState.currentMsgIndex = i;
     newState.messagesList[i].hidden = true;
     return newState;
@@ -735,8 +756,8 @@ const PreviewFukushashiki = () => {
     newState.currentMsgIndex = i;
     scrollToBottom();
 
-    if (isLastMessageInCreateOrderFlow() && state.urlThanksPage)
-      return redirectToThanksPage();
+    if (isLastMessageInCreateOrderFlow())
+      return redirectToCartPage();
 
     return newState;
   }
@@ -864,6 +885,8 @@ const PreviewFukushashiki = () => {
     
     newState.variablesList = res.data?.all_variables || [];
     newState.urlThanksPage = res.data.data?.conversation?.urlThanksPage || "";
+    newState.cartConfirmUrl = res.data.data?.conversation?.urlCartConfirm || "";
+    newState.isUsedCartConfirmPage = res.data.data?.conversation?.isUsedCartConfirmPage || false;
 
     checkUpdateMessagesSessionStorage(res.data.data.updated_at)
     
@@ -2801,7 +2824,7 @@ const PreviewFukushashiki = () => {
         sendCountRequest(conversion)
           .then(res => {
             console.log(res);
-            redirectToThanksPage();
+            redirectToCartPage();
           });
       });
     });
