@@ -575,11 +575,8 @@ const PreviewFukushashiki = () => {
     let redirectRurl = null;
   
     if (state.isUsedCartConfirmPage && state.cartConfirmUrl) {
-      // Redirect to cart confirm page với parameters
       redirectRurl = appendParamsToUrl(state.cartConfirmUrl, params);
-      
     } else if (state.urlThanksPage) {
-      // Redirect to thanks page với parameters
       redirectRurl = appendParamsToUrl(state.urlThanksPage, params);
     }
 
