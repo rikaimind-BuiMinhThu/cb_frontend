@@ -6450,21 +6450,7 @@ const UserMessage = ({
                       e.target.style.transform = "translateY(-2px)";
                       e.target.style.boxShadow = "0 6px 12px rgba(0, 0, 0, 0.15)";
                     }}
-                    onClick={() => {
-                      window.parent.postMessage({
-                        isOpen: true,
-                        widthPc: 450,
-                        heightPc: 700,
-                        widthSp: 100,
-                        heightSp: 100,
-                        chatbotRight: 10,
-                        chatbotBottom: 10,
-                        action: 'clickButton',
-                        id_value: content.button_submit_id
-                      }, '*');
-
-                    }
-                    }
+                    onClick={onClickNext}
                   >
                     {content.button_submit_name}
                   </button>

@@ -568,9 +568,8 @@ const PreviewFukushashiki = () => {
   const redirectToCartPage = () => {
     const params = {
       scenario_id: state.scenarioId,
-      client_id: state.clientId,
-      bot_type: state.botType,
-      user_input_id: state.userInputId
+      bot_type: "web",
+      user_input_id: state.uuid,
     };
     let redirectRurl = null;
   
@@ -2809,6 +2808,12 @@ const PreviewFukushashiki = () => {
     ).then(async (res) => {
       fukushashikiToLP(convertToFukushashikiObject(data));
       setStateToSessionStorage(state);
+      // Process for non-Shopify
+      if (params.get('cartSystem') !== 'shopify') {
+        redirectToCartPage();
+        return;
+      }
+      // Process for Shopify
       await createOrAddLinesCart(res);
       sendCreateOrderData(
         data,
@@ -2859,7 +2864,7 @@ const PreviewFukushashiki = () => {
       bot_type: "web"
     };
     
-    const isClickedCreateOrder = state.messagesList[clickedMsgIndex]?.message_content?.[0]?.text_input?.save_input_content === "create_order";
+    const isClickedCreateOrder = state.messagesList[clickedMsgIndex]?.message_content?.[0]?.type === "button_submit";
     const isClickedLastMessage = state.messagesList.length - 1 === clickedMsgIndex;
 
     if (isClickedCreateOrder) {
