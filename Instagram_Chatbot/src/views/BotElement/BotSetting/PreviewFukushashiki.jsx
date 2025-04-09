@@ -2806,9 +2806,9 @@ const PreviewFukushashiki = () => {
     sendUserInteractionData(
       data,
     ).then(async (res) => {
-      fukushashikiToLP(convertToFukushashikiObject(data));
-      setStateToSessionStorage(state);
       // Process for non-Shopify
+      setStateToSessionStorage(state);
+      const content = data?.message?.message_content?[0];
       if (params.get('cartSystem') !== 'shopify') {
         postMessageToParent({
           action: CHATBOT_ACTIONS.CLICK_BUTTON,
@@ -2817,7 +2817,9 @@ const PreviewFukushashiki = () => {
         redirectToCartPage();
         return;
       }
+
       // Process for Shopify
+      fukushashikiToLP(convertToFukushashikiObject(data));
       await createOrAddLinesCart(res);
       sendCreateOrderData(
         data,
