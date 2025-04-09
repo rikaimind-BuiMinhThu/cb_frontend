@@ -2810,6 +2810,10 @@ const PreviewFukushashiki = () => {
       setStateToSessionStorage(state);
       // Process for non-Shopify
       if (params.get('cartSystem') !== 'shopify') {
+        postMessageToParent({
+          action: CHATBOT_ACTIONS.CLICK_BUTTON,
+          id_value: content.button_submit_id
+        });
         redirectToCartPage();
         return;
       }
