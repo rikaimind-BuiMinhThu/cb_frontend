@@ -2808,7 +2808,7 @@ const PreviewFukushashiki = () => {
     ).then(async (res) => {
       // Process for non-Shopify
       setStateToSessionStorage(state);
-      const content = data?.message?.message_content?[0];
+      const content = data?.message?.message_content?.[0];
       if (params.get('cartSystem') !== 'shopify') {
         postMessageToParent({
           action: CHATBOT_ACTIONS.CLICK_BUTTON,
