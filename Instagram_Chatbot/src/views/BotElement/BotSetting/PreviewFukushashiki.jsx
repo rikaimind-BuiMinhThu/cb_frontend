@@ -60,7 +60,7 @@ const previewInitialState = {
   botInfor: {},
   messagesList: [],
   urlThanksPage: "",
-  cartConfirmUrl: "",
+  urlCartConfirmPage: "",
   isUsedCartConfirmPage: false,
   currentMsgIndex: 0,
   renderMessagesList: [],
@@ -574,8 +574,8 @@ const PreviewFukushashiki = () => {
     };
     let redirectRurl = null;
   
-    if (state.isUsedCartConfirmPage && state.cartConfirmUrl) {
-      redirectRurl = appendParamsToUrl(state.cartConfirmUrl, params);
+    if (state.isUsedCartConfirmPage && state.urlCartConfirmPage) {
+      redirectRurl = appendParamsToUrl(state.urlCartConfirmPage, params);
     } else if (state.urlThanksPage) {
       redirectRurl = appendParamsToUrl(state.urlThanksPage, params);
     }
@@ -882,7 +882,7 @@ const PreviewFukushashiki = () => {
     
     newState.variablesList = res.data?.all_variables || [];
     newState.urlThanksPage = res.data.data?.conversation?.urlThanksPage || "";
-    newState.cartConfirmUrl = res.data.data?.conversation?.urlCartConfirm || "";
+    newState.urlCartConfirmPage = res.data.data?.conversation?.urlCartConfirmPage || "";
     newState.isUsedCartConfirmPage = res.data.data?.conversation?.isUsedCartConfirmPage || false;
 
     checkUpdateMessagesSessionStorage(res.data.data.updated_at)
