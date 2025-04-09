@@ -198,11 +198,32 @@ const sleep = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+/**
+ * Append query parameters to URL
+ * @param {string} url - Base URL to append parameters to
+ * @param {Object} params - Object containing parameters to append
+ * @returns {string} URL with appended parameters
+ */
+const appendParamsToUrl = (url, params) => {
+  if (!url) return '';
+
+  const queryString = Object.entries(params)
+    .filter(([_, value]) => value != null && value !== '')
+    .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+    .join('&');
+
+  if (!queryString) return url;
+
+  return url.includes('?')
+    ? `${url}&${queryString}`
+    : `${url}?${queryString}`;
+};
+
 export {
   stringNullOrEmpty, getAllUrlParams, lightenColor,
   mobileCheck, removeLeadingZero, sendUserInteractionData,
   sendCreateOrderData, sendCountRequest,
   getCitiesByPrefecture, getTownsByCity, getPrefectures,
   getScenarioPreviewData, getChatBotSetting, sendEmailRequest,
-  sleep, getCaptcha,
+  sleep, getCaptcha, appendParamsToUrl
 };
