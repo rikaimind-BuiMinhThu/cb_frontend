@@ -3,7 +3,6 @@
   // Define constant keys
   const STORAGE_KEYS = {
     SCENARIO_ID: 'ecChatbotScenarioId',
-    CLIENT_ID: 'ecChatbotClientId',
     BOT_TYPE: 'ecChatbotBotType',
     USER_INPUT_ID: 'ecChatbotUserInputId'
   };
@@ -11,7 +10,6 @@
   // Define URL parameter names
   const URL_PARAMS = {
     SCENARIO_ID: 'scenario_id',
-    CLIENT_ID: 'client_id',
     BOT_TYPE: 'bot_type',
     USER_INPUT_ID: 'user_input_id'
   };
@@ -27,7 +25,6 @@
   // Mapping giữa URL parameters và localStorage keys
   const paramsMapping = {
     [URL_PARAMS.SCENARIO_ID]: STORAGE_KEYS.SCENARIO_ID,
-    [URL_PARAMS.CLIENT_ID]: STORAGE_KEYS.CLIENT_ID,
     [URL_PARAMS.BOT_TYPE]: STORAGE_KEYS.BOT_TYPE,
     [URL_PARAMS.USER_INPUT_ID]: STORAGE_KEYS.USER_INPUT_ID
   };
