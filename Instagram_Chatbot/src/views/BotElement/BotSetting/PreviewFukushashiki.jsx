@@ -37,7 +37,8 @@ import {
   getChatBotSetting,
   sendEmailRequest,
   sleep,
-  stringNullOrEmpty
+  stringNullOrEmpty,
+  appendParamsToUrl,
 } from "./PreviewComponent/Utils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
@@ -59,6 +60,8 @@ const previewInitialState = {
   botInfor: {},
   messagesList: [],
   urlThanksPage: "",
+  urlCartConfirmPage: "",
+  isUsedCartConfirmPage: false,
   currentMsgIndex: 0,
   renderMessagesList: [],
   currentUserMsgIndex: 0,
@@ -562,12 +565,26 @@ const PreviewFukushashiki = () => {
     return { arrayCode, arrayName, arrayPrice, arrayOrderQuantity };
   }
 
-  const redirectToThanksPage = () => {
-    if (!state.urlThanksPage) return;
+  const redirectToCartPage = () => {
+    const params = {
+      scenario_id: state.scenarioId,
+      bot_type: "web",
+      user_input_id: state.uuid,
+    };
+    let redirectRurl = null;
+  
+    if (state.isUsedCartConfirmPage && state.urlCartConfirmPage) {
+      redirectRurl = appendParamsToUrl(state.urlCartConfirmPage, params);
+    } else if (state.urlThanksPage) {
+      redirectRurl = appendParamsToUrl(state.urlThanksPage, params);
+    }
+
+    if (!redirectRurl) return;
+
     setTimeout(() => {
-      window.parent.location.href = state.urlThanksPage;
+      window.parent.location.href = redirectRurl;
     }, 2000);
-  }
+  }; 
 
   const getBotInforFromPreviewResponse = (res) => {
     if (!res || !res.data || !res.data.chatbot) return {};
@@ -664,8 +681,8 @@ const PreviewFukushashiki = () => {
     if (state.renderMessagesList.length - 1 === i) {
       await sleep(messagesList[i].message_content[0].delay.content * 1000);
     }
-    if (isLastMessageInCreateOrderFlow() && state.urlThanksPage)
-      return redirectToThanksPage();
+    if (isLastMessageInCreateOrderFlow())
+      return redirectToCartPage();
     newState.currentMsgIndex = i;
     newState.messagesList[i].hidden = true;
     return newState;
@@ -735,8 +752,8 @@ const PreviewFukushashiki = () => {
     newState.currentMsgIndex = i;
     scrollToBottom();
 
-    if (isLastMessageInCreateOrderFlow() && state.urlThanksPage)
-      return redirectToThanksPage();
+    if (isLastMessageInCreateOrderFlow())
+      return redirectToCartPage();
 
     return newState;
   }
@@ -864,6 +881,8 @@ const PreviewFukushashiki = () => {
     
     newState.variablesList = res.data?.all_variables || [];
     newState.urlThanksPage = res.data.data?.conversation?.urlThanksPage || "";
+    newState.urlCartConfirmPage = res.data.data?.conversation?.urlCartConfirmPage || "";
+    newState.isUsedCartConfirmPage = res.data.data?.conversation?.isUsedCartConfirmPage || false;
 
     checkUpdateMessagesSessionStorage(res.data.data.updated_at)
     
@@ -914,9 +933,11 @@ const PreviewFukushashiki = () => {
 
   const fukushashikiSavedStateToLp = (savedState) => {
     return new Promise((resolve) => {
+      let fukuDataList = [];
       savedState.userMessagesList.forEach((message) => {
-        fukushashikiToLP(convertToFukushashikiObject({message: message}));
+        fukuDataList.push(...convertToFukushashikiObject({message: message}));
       });
+      fukushashikiToLP(fukuDataList);
       resolve();
     });
   }
@@ -2785,8 +2806,20 @@ const PreviewFukushashiki = () => {
     sendUserInteractionData(
       data,
     ).then(async (res) => {
-      fukushashikiToLP(convertToFukushashikiObject(data));
+      // Process for non-Shopify
       setStateToSessionStorage(state);
+      const content = data?.message?.message_content?.[0];
+      if (params.get('cartSystem') !== 'shopify') {
+        postMessageToParent({
+          action: CHATBOT_ACTIONS.CLICK_BUTTON,
+          id_value: content.button_submit_id
+        });
+        redirectToCartPage();
+        return;
+      }
+
+      // Process for Shopify
+      fukushashikiToLP(convertToFukushashikiObject(data));
       await createOrAddLinesCart(res);
       sendCreateOrderData(
         data,
@@ -2799,7 +2832,7 @@ const PreviewFukushashiki = () => {
         sendCountRequest(conversion)
           .then(res => {
             console.log(res);
-            redirectToThanksPage();
+            redirectToCartPage();
           });
       });
     });
@@ -2837,7 +2870,7 @@ const PreviewFukushashiki = () => {
       bot_type: "web"
     };
     
-    const isClickedCreateOrder = state.messagesList[clickedMsgIndex]?.message_content?.[0]?.text_input?.save_input_content === "create_order";
+    const isClickedCreateOrder = state.messagesList[clickedMsgIndex]?.message_content?.[0]?.type === "button_submit";
     const isClickedLastMessage = state.messagesList.length - 1 === clickedMsgIndex;
 
     if (isClickedCreateOrder) {
