@@ -5775,12 +5775,6 @@ const UserMessage = ({
                                 } else {
                                   dataValue = "";
                                 }
-                                onChangeValue(
-                                  indexContent,
-                                  content.type,
-                                  dataValue,
-                                  "initial_selection"
-                                );
 
                                 if (
                                   cardPaymentRadioButton.card_linked_setting.includes(dataValue)
@@ -5802,6 +5796,12 @@ const UserMessage = ({
                                   );
                                   // if (messageContent.length === 1) onClickNext();
                                 }
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  dataValue,
+                                  "initial_selection"
+                                );
                               }}
                             >
                               {itemPayment.text}
@@ -5843,12 +5843,6 @@ const UserMessage = ({
                                 } else {
                                   dataValue = "";
                                 }
-                                onChangeValue(
-                                  indexContent,
-                                  content.type,
-                                  dataValue,
-                                  "initial_selection"
-                                );
 
                                 if (
                                   cardPaymentRadioButton.card_linked_setting.includes(dataValue)
@@ -5870,6 +5864,12 @@ const UserMessage = ({
                                   );
                                   // if (messageContent.length === 1) onClickNext();
                                 }
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  dataValue,
+                                  "initial_selection"
+                                );
                               }}
                             >
                               {itemPayment.text}                             
@@ -5915,12 +5915,6 @@ const UserMessage = ({
                                         } else {
                                           dataValue = "";
                                         }
-                                        onChangeValue(
-                                          indexContent,
-                                          content.type,
-                                          dataValue,
-                                          "initial_selection_picture"
-                                        );
                                         if (
                                           cardPaymentRadioButton.card_linked_setting_picture ===
                                           dataValue
@@ -5942,6 +5936,12 @@ const UserMessage = ({
                                           );
                                           // if (messageContent.length === 1) onClickNext();
                                         }
+                                        onChangeValue(
+                                          indexContent,
+                                          content.type,
+                                          dataValue,
+                                          "initial_selection_picture"
+                                        );
                                       }}
                                     >
                                       <img
