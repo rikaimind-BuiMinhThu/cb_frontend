@@ -3150,23 +3150,8 @@ const PreviewFukushashiki = () => {
         };
       
         if (state.messagesList[msgIndex].message_content[indexContent][contentType].save_input_content === item.variable_name) {
-
+          setDefaultValue(item, dataContentType, contentType, value, field);
           isSaveParam = true;
-
-          // TODO: need refactor (card_payment_radio_button use only)
-          // Reason: Contents render inside of each types of radio button will change saveParams like "is_display_card_payment"
-          // if onChange event handler us onChangeValue
-          if(contentType === "card_payment_radio_button") {
-            const allowFields = ["initial_selection", "initial_selection_picture"];
-            isSaveParam = allowFields.includes(field);
-            
-            if(isSaveParam) {
-              setDefaultValue(item, dataContentType, contentType, value, field);
-            }
-          }
-          else {
-            setDefaultValue(item, dataContentType, contentType, value, field);
-          }
         }
       
         return item;
