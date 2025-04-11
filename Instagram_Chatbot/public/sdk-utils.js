@@ -101,15 +101,26 @@ if (window.mobileCheck === undefined) {
 if (window.patchToChatBotServer === undefined) {
   window.patchToChatBotServer = (url, data) => {
     return new Promise((resolve, reject) => {
-      api
-        .patch(url, data)
-        .then((res) => {
-          if (resolve) resolve(res);
-        })
-        .catch((error) => {
-          if (reject) reject(error);
-          console.error(error);
-        });
+      fetch(url, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(res => {
+        if (resolve) resolve(res);
+      })
+      .catch(error => {
+        if (reject) reject(error);
+        console.error('Error in patchToChatBotServer:', error);
+      });
     });
-  }
+  };
 }
