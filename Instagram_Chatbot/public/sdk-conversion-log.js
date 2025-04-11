@@ -27,4 +27,12 @@
   };
 
   sendConversionData();
+
+  const device = tabletCheck() ? "tablet" : (mobileCheck() ? "smartphone" : "pc");
+
+  const conversion = {
+    scenario_data: `${device}_conversion`,
+  };
+
+  sendCountRequest(conversion).then(res => console.log(res));
 })();
