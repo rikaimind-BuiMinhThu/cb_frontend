@@ -821,9 +821,13 @@ const PreviewFukushashiki = () => {
   }
 
   const setConversionParamToLocalStorage = (scenarioId, botType, userInputId) => {
-    localStorage.setItem(CONVERSION_PARAMS_STORAGE_KEYS.SCENARIO_ID, scenarioId);
-    localStorage.setItem(CONVERSION_PARAMS_STORAGE_KEYS.BOT_TYPE, botType);
-    localStorage.setItem(CONVERSION_PARAMS_STORAGE_KEYS.USER_INPUT_ID, userInputId);
+    postMessageToParent({
+      isOpen: true,
+      action: CHATBOT_ACTIONS.SET_CHATBOT_CONVERSION_PARAMS_TO_LOCAL_STORAGE,
+      actionData: {
+        scenarioId, botType, userInputId
+      }
+    });
   }
 
   const extractStateFromPreviewResponse = async (res) => {
