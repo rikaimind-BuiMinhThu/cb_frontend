@@ -114,6 +114,7 @@ const CHATBOT_ACTIONS = {
   OPEN_PREVIEW: 'openPreview',
   GET_PREVIEW_ORDER_CONTENT: 'getPreviewOrderContent',
   PREVIEW_OBJECT: 'previewObject',
+  SET_CHATBOT_CONVERSION_PARAMS_TO_LOCAL_STORAGE: 'setChatbotConversionParamsToLocalStorage',
 };
 
 const SEARCH_MODES = {
@@ -157,5 +158,5 @@ export {
   CHATBOT_ACTIONS,
   CRAWL_ELEMENT_TYPES,
   SEARCH_MODES,
-  MESSAGE_CONTENT_TYPES
+  MESSAGE_CONTENT_TYPES,
 };

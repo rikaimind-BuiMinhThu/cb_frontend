@@ -5775,12 +5775,6 @@ const UserMessage = ({
                                 } else {
                                   dataValue = "";
                                 }
-                                onChangeValue(
-                                  indexContent,
-                                  content.type,
-                                  dataValue,
-                                  "initial_selection"
-                                );
 
                                 if (
                                   cardPaymentRadioButton.card_linked_setting.includes(dataValue)
@@ -5802,6 +5796,12 @@ const UserMessage = ({
                                   );
                                   // if (messageContent.length === 1) onClickNext();
                                 }
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  dataValue,
+                                  "initial_selection"
+                                );
                               }}
                             >
                               {itemPayment.text}
@@ -5843,12 +5843,6 @@ const UserMessage = ({
                                 } else {
                                   dataValue = "";
                                 }
-                                onChangeValue(
-                                  indexContent,
-                                  content.type,
-                                  dataValue,
-                                  "initial_selection"
-                                );
 
                                 if (
                                   cardPaymentRadioButton.card_linked_setting.includes(dataValue)
@@ -5870,6 +5864,12 @@ const UserMessage = ({
                                   );
                                   // if (messageContent.length === 1) onClickNext();
                                 }
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  dataValue,
+                                  "initial_selection"
+                                );
                               }}
                             >
                               {itemPayment.text}                             
@@ -5915,12 +5915,6 @@ const UserMessage = ({
                                         } else {
                                           dataValue = "";
                                         }
-                                        onChangeValue(
-                                          indexContent,
-                                          content.type,
-                                          dataValue,
-                                          "initial_selection_picture"
-                                        );
                                         if (
                                           cardPaymentRadioButton.card_linked_setting_picture ===
                                           dataValue
@@ -5942,6 +5936,12 @@ const UserMessage = ({
                                           );
                                           // if (messageContent.length === 1) onClickNext();
                                         }
+                                        onChangeValue(
+                                          indexContent,
+                                          content.type,
+                                          dataValue,
+                                          "initial_selection_picture"
+                                        );
                                       }}
                                     >
                                       <img
@@ -6453,21 +6453,7 @@ const UserMessage = ({
                       e.target.style.transform = "translateY(-2px)";
                       e.target.style.boxShadow = "0 6px 12px rgba(0, 0, 0, 0.15)";
                     }}
-                    onClick={() => {
-                      window.parent.postMessage({
-                        isOpen: true,
-                        widthPc: 450,
-                        heightPc: 700,
-                        widthSp: 100,
-                        heightSp: 100,
-                        chatbotRight: 10,
-                        chatbotBottom: 10,
-                        action: 'clickButton',
-                        id_value: content.button_submit_id
-                      }, '*');
-
-                    }
-                    }
+                    onClick={onClickNext}
                   >
                     {content.button_submit_name}
                   </button>

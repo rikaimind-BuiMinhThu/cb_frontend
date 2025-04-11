@@ -6,6 +6,14 @@ const CHATBOT_ACTIONS = {
   CRAWL_DATA: 'crawlData',
   OPEN_PREVIEW: 'openPreview',
   GET_PREVIEW_ORDER_CONTENT: 'getPreviewOrderContent',
+  SET_CHATBOT_CONVERSION_PARAMS_TO_LOCAL_STORAGE: 'setChatbotConversionParamsToLocalStorage',
+};
+
+const CONVERSION_PARAMS_STORAGE_KEYS = {
+  SCENARIO_ID: 'ecChatbotScenarioId',
+  BOT_TYPE: 'ecChatbotBotType',
+  USER_INPUT_ID: 'ecChatbotUserInputId',
+  ENV: 'ecChatbotEnv',
 };
 
 const SEARCH_MODES = {
@@ -170,6 +178,13 @@ const getEcChatBotFrontEndBaseUrl = () => {
   }
 }
 
+const setChatbotConversionParamsToLocalStorage = (data) => {
+  localStorage.setItem(CONVERSION_PARAMS_STORAGE_KEYS.SCENARIO_ID, data.scenarioId);
+  localStorage.setItem(CONVERSION_PARAMS_STORAGE_KEYS.BOT_TYPE, data.botType);
+  localStorage.setItem(CONVERSION_PARAMS_STORAGE_KEYS.USER_INPUT_ID, data.userInputId);
+  localStorage.setItem(CONVERSION_PARAMS_STORAGE_KEYS.ENV, data.env);
+}
+
 let globalIframe;
 
 const sendMessageToChatbot = (contentMessage, action) => {
@@ -264,6 +279,9 @@ const displayPopup = async () => {
         case CHATBOT_ACTIONS.GET_PREVIEW_ORDER_CONTENT:
           await sleep(2000);
           excuteJSCode(e.data.actionData);
+          break;
+        case CHATBOT_ACTIONS.SET_CHATBOT_CONVERSION_PARAMS_TO_LOCAL_STORAGE:
+          setChatbotConversionParamsToLocalStorage(e.data.actionData);
           break;
       };
       

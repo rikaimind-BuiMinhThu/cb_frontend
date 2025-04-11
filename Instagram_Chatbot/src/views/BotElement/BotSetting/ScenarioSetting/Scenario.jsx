@@ -785,6 +785,8 @@ const Scenario = () => {
     temp: "",
     final: ""
   });
+  const [isUsedCartConfirmPage, setIsUsedCartConfirmPage] = useState(false);
+  const [urlCartConfirmPage, setUrlCartConfirmPage] = useState('');
   const [isOpenModalCustomCss, setIsOpenModalCustomCss] = useState(false);
 
   const [errorScenarioName, setErrorScenarioName] = useState('');
@@ -899,6 +901,8 @@ const Scenario = () => {
       setDataMessages(res.data.data?.conversation?.messages || []);
       setScenarioName(res.data.data?.scenario_name || '');
       setUrlThanks(res.data.data?.conversation?.urlThanksPage || '');
+      setIsUsedCartConfirmPage(res.data.data?.conversation?.isUsedCartConfirmPage || false);
+      setUrlCartConfirmPage(res.data.data?.conversation?.urlCartConfirmPage || '');
       setCoupon(res.data.data?.conversation?.coupon || '');
       setLpProductUrl(res.data.data?.tamagoLandingPageUrl || '');
       setIsUseOnlyRegularOrder(res.data.data?.isUseOnlyRegularOrder || false);
@@ -1590,6 +1594,7 @@ const Scenario = () => {
             require: false,
             is_display_error_message: false,
             is_use_js: false,
+            is_used_cart_confirm_page: false,
             use_for_confirm_order: false, 
           },
           button_submit_name:''
@@ -2171,6 +2176,8 @@ const Scenario = () => {
         messages: [...dataMessages],
         urlThanksPage: urlThanks,
         coupon: coupon,
+        urlCartConfirmPage: urlCartConfirmPage,
+        isUsedCartConfirmPage: isUsedCartConfirmPage,
       },
       scenario_name: scenarioName,
       landing_page_product_url: lpProductUrl,
@@ -2214,6 +2221,8 @@ const Scenario = () => {
       conversation: {
         messages: [...dataMessages],
         urlThanksPage: urlThanks,
+        urlCartConfirmPage: urlCartConfirmPage,
+        isUsedCartConfirmPage: isUsedCartConfirmPage,
         coupon: coupon
       },
       scenario_name: scenarioName,
@@ -2581,19 +2590,31 @@ const Scenario = () => {
                   <div>
                     <InputCustom
                       style={{ width: '100%', marginTop: '5px' }}
-                      value={urlThanks}
-                      onChange={value => setUrlThanks(value)}
-                      placeholder="サンクスページのURL"
-                    />
-                  </div>
-                  <div>
-                    <InputCustom
-                      style={{ width: '100%', marginTop: '5px' }}
                       value={lpProductUrl}
                       onChange={value => setLpProductUrl(value)}
                       placeholder="商品購入のURL"
                     />
                   </div>
+                  <div>
+                    <InputCustom
+                      style={{ width: '100%', marginTop: '5px' }}
+                      value={urlThanks}
+                      onChange={value => setUrlThanks(value)}
+                      placeholder="サンクスページのURL"
+                    />
+                  </div>
+                  {
+                    isUsedCartConfirmPage && (
+                      <div>
+                        <InputCustom
+                          style={{ width: '100%', marginTop: '5px' }}
+                          value={urlCartConfirmPage}
+                          onChange={value => setUrlCartConfirmPage(value)}
+                          placeholder="カートの注文確認ページのURL"
+                        />
+                      </div>
+                    )
+                  }
                   {client?.cart_system === "ec_force" && <div>
                     <InputCustom
                       style={{ width: '100%', marginTop: '5px' }}
@@ -2643,6 +2664,15 @@ const Scenario = () => {
                       checked={isUseFukushashiki}
                     />
                     <label>複写式利用フラグ</label>
+                  </div>
+                  <div>
+                    <input
+                      type="checkbox"
+                      className="ss-user-setting-checkbox-custom"
+                      onChange={(value) => setIsUsedCartConfirmPage(!isUsedCartConfirmPage)}
+                      checked={isUsedCartConfirmPage}
+                    />
+                    <label>カートシステムの注文確認ページを利用</label>
                   </div>
                   {/* Overview scenario */}
                   <div style={{ height:`calc(80% - ${errorScenarioName ? '30':'10'}px)`, backgroundColor: '#f6fbff' }}>
@@ -13634,6 +13664,7 @@ const Scenario = () => {
                                                           />
                                                         </div>
                                                       </div>
+                                                      
                                                       {buttonSubmit.is_display_error_message &&
                                                         <>
                                                           <div className='ss-user-setting__item-bottom' style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px' }}>
