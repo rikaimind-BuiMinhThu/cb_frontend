@@ -76,7 +76,6 @@ if (window.tabletCheck === undefined) {
     /(ipad|tablet|(android(?!.*mobile))|(windows(?!.*phone)(.*touch))|kindle|playbook|silk|(puffin(?!.*(IP|AP|WP))))/.test(
       userAgent
     );
-    log("isTablet: " + isTablet);
     return isTablet;
   }
 }
