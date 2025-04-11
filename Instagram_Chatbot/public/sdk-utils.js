@@ -12,7 +12,8 @@ if (typeof EC_CHATBOT_CONVERSION_PARAMS === 'undefined') {
   window.EC_CHATBOT_CONVERSION_PARAMS = {
     SCENARIO_ID: 'scenario_id',
     BOT_TYPE: 'bot_type',
-    USER_INPUT_ID: 'user_input_id'
+    USER_INPUT_ID: 'user_input_id',
+    ENV: 'env'
   };
 }
 

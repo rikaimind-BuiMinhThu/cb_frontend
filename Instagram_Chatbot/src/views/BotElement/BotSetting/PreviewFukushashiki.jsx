@@ -23,7 +23,7 @@ import iconMessagePink from "../../../assets/img/icon-mess/icon-message-chat-pin
 import iconMessagePurple from "../../../assets/img/icon-mess/icon-message-chat-purple.png";
 import iconMessageBlack from "../../../assets/img/icon-mess/icon-message-chat-black.png";
 import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-white.png";
-import { CHATBOT_ACTIONS, MESSAGE_CONTENT_TYPES, SESSION_STORAGE_KEY, CONVERSION_PARAMS_STORAGE_KEYS } from "./PreviewComponent/Constants";
+import { CHATBOT_ACTIONS, MESSAGE_CONTENT_TYPES, SESSION_STORAGE_KEY } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
   lightenColor,
@@ -820,12 +820,12 @@ const PreviewFukushashiki = () => {
     return newState;
   }
 
-  const setConversionParamToLocalStorage = (scenarioId, botType, userInputId) => {
+  const setConversionParamToLocalStorage = (scenarioId, botType, userInputId, env) => {
     postMessageToParent({
       isOpen: true,
       action: CHATBOT_ACTIONS.SET_CHATBOT_CONVERSION_PARAMS_TO_LOCAL_STORAGE,
       actionData: {
-        scenarioId, botType, userInputId
+        scenarioId, botType, userInputId, env
       }
     });
   }
@@ -895,7 +895,12 @@ const PreviewFukushashiki = () => {
     newState.urlCartConfirmPage = res.data.data?.conversation?.urlCartConfirmPage || "";
     newState.isUsedCartConfirmPage = res.data.data?.conversation?.isUsedCartConfirmPage || false;
 
-    setConversionParamToLocalStorage(newState.scenarioId, 'web', newState.userInputId || params.get("uuid"));
+    setConversionParamToLocalStorage(
+      newState.scenarioId,
+      'web',
+      newState.userInputId || params.get("uuid"),
+      params.get("env") || "production"
+    );
 
     checkUpdateMessagesSessionStorage(res.data.data.updated_at)
     
