@@ -965,6 +965,12 @@ const PreviewFukushashiki = () => {
     if (!state.loadedStateFromSession) {
       let savedState = getStateFromSessionStorage();
       if (savedState) {
+        setConversionParamToLocalStorage(
+          savedState.scenarioId,
+          'web',
+          savedState.userInputId || params.get("uuid"),
+          params.get("env") || "production"
+        );
         if (!isLoadedCssContent && savedState?.botInfor?.is_used_custom_css && savedState?.botInfor?.custom_css_content.length > 0) {
           const style = document.createElement('style');
           style.innerHTML = savedState?.botInfor?.custom_css_content;
@@ -982,7 +988,7 @@ const PreviewFukushashiki = () => {
               };
             }
             return msg;
-          }); 
+          });
           return dispatch({
             type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
             payload: {
