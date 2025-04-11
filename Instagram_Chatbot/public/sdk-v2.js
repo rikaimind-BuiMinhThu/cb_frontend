@@ -12,7 +12,8 @@ const CHATBOT_ACTIONS = {
 const CONVERSION_PARAMS_STORAGE_KEYS = {
   SCENARIO_ID: 'ecChatbotScenarioId',
   BOT_TYPE: 'ecChatbotBotType',
-  USER_INPUT_ID: 'ecChatbotUserInputId'
+  USER_INPUT_ID: 'ecChatbotUserInputId',
+  ENV: 'ecChatbotEnv',
 };
 
 const SEARCH_MODES = {
@@ -181,6 +182,7 @@ const setChatbotConversionParamsToLocalStorage = (data) => {
   localStorage.setItem(CONVERSION_PARAMS_STORAGE_KEYS.SCENARIO_ID, data.scenarioId);
   localStorage.setItem(CONVERSION_PARAMS_STORAGE_KEYS.BOT_TYPE, data.botType);
   localStorage.setItem(CONVERSION_PARAMS_STORAGE_KEYS.USER_INPUT_ID, data.userInputId);
+  localStorage.setItem(CONVERSION_PARAMS_STORAGE_KEYS.ENV, data.env);
 }
 
 let globalIframe;
