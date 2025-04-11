@@ -895,9 +895,7 @@ const PreviewFukushashiki = () => {
     newState.urlCartConfirmPage = res.data.data?.conversation?.urlCartConfirmPage || "";
     newState.isUsedCartConfirmPage = res.data.data?.conversation?.isUsedCartConfirmPage || false;
 
-    if ((newState.isUsedCartConfirmPage && newState.urlCartConfirmPage) || newState.urlThanksPage) {
-      setConversionParamToLocalStorage(newState.scenarioId, 'web', newState.userInputId);
-    }
+    setConversionParamToLocalStorage(newState.scenarioId, 'web', newState.userInputId);
 
     checkUpdateMessagesSessionStorage(res.data.data.updated_at)
     
