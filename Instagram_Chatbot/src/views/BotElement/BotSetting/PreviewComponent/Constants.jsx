@@ -142,6 +142,12 @@ const MESSAGE_CONTENT_TYPES = {
   },
 };
 
+const CONVERSION_PARAMS_STORAGE_KEYS = {
+  SCENARIO_ID: 'ecChatbotScenarioId',
+  BOT_TYPE: 'ecChatbotBotType',
+  USER_INPUT_ID: 'ecChatbotUserInputId'
+};
+
 export {
   dataHourFixed,
   dataMinutes,
@@ -157,5 +163,6 @@ export {
   CHATBOT_ACTIONS,
   CRAWL_ELEMENT_TYPES,
   SEARCH_MODES,
-  MESSAGE_CONTENT_TYPES
+  MESSAGE_CONTENT_TYPES,
+  CONVERSION_PARAMS_STORAGE_KEYS
 };

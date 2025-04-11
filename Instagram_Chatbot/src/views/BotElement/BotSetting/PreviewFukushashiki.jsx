@@ -23,7 +23,7 @@ import iconMessagePink from "../../../assets/img/icon-mess/icon-message-chat-pin
 import iconMessagePurple from "../../../assets/img/icon-mess/icon-message-chat-purple.png";
 import iconMessageBlack from "../../../assets/img/icon-mess/icon-message-chat-black.png";
 import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-white.png";
-import { CHATBOT_ACTIONS, MESSAGE_CONTENT_TYPES, SESSION_STORAGE_KEY } from "./PreviewComponent/Constants";
+import { CHATBOT_ACTIONS, MESSAGE_CONTENT_TYPES, SESSION_STORAGE_KEY, CONVERSION_PARAMS_STORAGE_KEYS } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
   lightenColor,
@@ -820,6 +820,12 @@ const PreviewFukushashiki = () => {
     return newState;
   }
 
+  const setConversionParamToLocalStorage = (scenarioId, botType, userInputId) => {
+    localStorage.setItem(CONVERSION_PARAMS_STORAGE_KEYS.SCENARIO_ID, scenarioId);
+    localStorage.setItem(CONVERSION_PARAMS_STORAGE_KEYS.BOT_TYPE, botType);
+    localStorage.setItem(CONVERSION_PARAMS_STORAGE_KEYS.USER_INPUT_ID, userInputId);
+  }
+
   const extractStateFromPreviewResponse = async (res) => {
     if (!res || !res.data || res.data.code !== 1) return;
     
@@ -884,6 +890,10 @@ const PreviewFukushashiki = () => {
     newState.urlThanksPage = res.data.data?.conversation?.urlThanksPage || "";
     newState.urlCartConfirmPage = res.data.data?.conversation?.urlCartConfirmPage || "";
     newState.isUsedCartConfirmPage = res.data.data?.conversation?.isUsedCartConfirmPage || false;
+
+    if ((newState.isUsedCartConfirmPage && newState.urlCartConfirmPage) || newState.urlThanksPage) {
+      setConversionParamToLocalStorage(newState.scenarioId, 'web', newState.userInputId);
+    }
 
     checkUpdateMessagesSessionStorage(res.data.data.updated_at)
     
