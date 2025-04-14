@@ -1,6 +1,7 @@
 (() => {
+  const scenarioId = getUrlParameter(EC_CHATBOT_CONVERSION_PARAMS.SCENARIO_ID) || localStorage.getItem(EC_CHATBOT_STORAGE_KEYS.SCENARIO_ID);
   const params = {
-    scenario_id: getUrlParameter(EC_CHATBOT_CONVERSION_PARAMS.SCENARIO_ID) || localStorage.getItem(EC_CHATBOT_STORAGE_KEYS.SCENARIO_ID),
+    scenario_id: scenarioId,
     bot_type: getUrlParameter(EC_CHATBOT_CONVERSION_PARAMS.BOT_TYPE) || localStorage.getItem(EC_CHATBOT_STORAGE_KEYS.BOT_TYPE),
     user_input_id: getUrlParameter(EC_CHATBOT_CONVERSION_PARAMS.USER_INPUT_ID) || localStorage.getItem(EC_CHATBOT_STORAGE_KEYS.USER_INPUT_ID)
   };
@@ -27,4 +28,12 @@
   };
 
   sendConversionData();
+
+  const device = tabletCheck() ? "tablet" : (mobileCheck() ? "smartphone" : "pc");
+
+  const conversion = {
+    scenario_data: `${device}_conversion`,
+  };
+
+  sendCountRequest(scenarioId, conversion).then(res => console.log(res));
 })();
