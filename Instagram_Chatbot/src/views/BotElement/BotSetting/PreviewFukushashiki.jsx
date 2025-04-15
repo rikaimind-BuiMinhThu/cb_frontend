@@ -198,10 +198,13 @@ const PreviewFukushashiki = () => {
 
   // Get chat bot setting
   useEffect(() => {
+    if (!state.loadedStateFromSession) return;
+    if (state.titleBubble) return;
     if (!state.botId && params.get("bot_id")) {
       dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { botId: params.get("bot_id") } });
       return;
     }
+
     getChatBotSetting(state.botId)
       .then((response) => {
         if (!response.data.data) return;
@@ -234,7 +237,7 @@ const PreviewFukushashiki = () => {
         sessionStorage.setItem("chatbotRight", result?.right_margin_pc ? result?.right_margin_pc : 30);
         dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
       });
-  }, [state.botId]);
+  }, [state.botId, state.loadedStateFromSession, state.titleBubble]);
 
   const eventHandler = async (event) => {
     if (!event.data || !event.data.actionData) return;
@@ -2810,6 +2813,7 @@ const PreviewFukushashiki = () => {
 
   const postMessageToParent = (options) => {
     if (!window || !window.parent) return;
+    
     const defaultOptions = {
       isOpen: state.isOpen,
       widthPc: state.widthPc,
@@ -2884,9 +2888,7 @@ const PreviewFukushashiki = () => {
     if (!handleValidateField(indexMessage)) {
       return;
     }
-    
-    newState ={...state};
-    
+
     const submitData = {
       scenario_id: state.scenarioId,
       message: clickedMsg,
@@ -2898,6 +2900,7 @@ const PreviewFukushashiki = () => {
     const isClickedLastMessage = state.messagesList.length - 1 === clickedMsgIndex;
 
     if (isClickedCreateOrder) {
+      setStateToSessionStorage(newState);
       return processClickCreateOrder(submitData);
     }
 
@@ -2917,6 +2920,7 @@ const PreviewFukushashiki = () => {
 
     if (isDislayingLoginForm(clickedMsg)) {
       // For GINZA AIRA,
+      setStateToSessionStorage(newState);
       return;
     }
 
@@ -3348,8 +3352,11 @@ const PreviewFukushashiki = () => {
     ));
   };
 
-  const renderSubmitButton = (message, indexMessage) => {
-    const isAutoClick = message?.message_content[0]?.type == "image" && message?.message_content[0]?.image?.displayButtonNext == false;
+  const renderNextButton = (message, indexMessage) => {
+    const firstMsgContent = message?.message_content?.[0];
+    const isDisplayBtnNext = firstMsgContent?.type != "image" || firstMsgContent?.image?.displayButtonNext != false;
+    const isAutoClick = !isDisplayBtnNext && indexMessage >= state.renderMessagesList.length - 1;
+
     if (!message || message.belong_to !== "user") return null;
     if (message.message_content[0]?.type === "button_submit") return null;
 
@@ -3358,7 +3365,7 @@ const PreviewFukushashiki = () => {
       btnText = indexMessage >= state.renderMessagesList.length - 1 ? "次へ" : "更新";
     }
     return (
-      <div className="sp-user-message-button-action" style={{ display: isAutoClick ? "none" : "flex" }}>
+      <div className="sp-user-message-button-action" style={{ display: isDisplayBtnNext ? "flex" : "none" }}>
         <CustomButton
           disabled={state.submitErrorMessage.length > 0 ? false : message.disabled}
           style={{
@@ -3440,7 +3447,7 @@ const PreviewFukushashiki = () => {
             submitErrorMessage={state.submitErrorMessage}
             botId={state.botId}
           />
-          {renderSubmitButton(message, indexMessage)}
+          {renderNextButton(message, indexMessage)}
         </div>
       </div>
     );
