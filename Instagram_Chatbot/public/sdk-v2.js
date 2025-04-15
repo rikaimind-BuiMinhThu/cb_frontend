@@ -550,6 +550,7 @@ const setValueToElement = (element, value) => {
   }
 
   element.value = newElementValue;
+  element.dispatchEvent(new Event('input', { bubbles: true }));
   element.dispatchEvent(new Event('change', { bubbles: true }));
 }
 
