@@ -3060,33 +3060,25 @@ const PreviewFukushashiki = () => {
     let messageContentTypeData = newState.messagesList[msgIndex].message_content[indexContent][contentType];
     if (messageContentTypeData?.isUseConvertText && contentType === "text_input") {
       const convertType = newState.messagesList[msgIndex].message_content[indexContent][contentType].convertTextTypeValue;
-      switch (subFiled) {
-        case "valueLeft":
-          {
-            const element = document.getElementById(newState.messagesList[msgIndex].message_content[indexContent]?.convertTextDestination1);
-            if (element && containsKanji(value) == false) {
-              newState.messagesList[msgIndex].message_content[indexContent + 1][contentType].text.valueLeft = convertTextJapanese(value, convertType);
-            }
+      const textConvertedValue = convertTextJapanese(value, convertType);
+      if (textConvertedValue && !containsKanji(textConvertedValue)) {
+        switch (subFiled) {
+          case "valueLeft": {
+            newState.messagesList[msgIndex].message_content[indexContent + 1][contentType].text.valueLeft = textConvertedValue;
             break;
           }
-        case "valueRight":
-          {
-            const element = document.getElementById(newState.messagesList[msgIndex].message_content[indexContent]?.convertTextDestination2);
-            if (element && containsKanji(value) == false) {
-              newState.messagesList[msgIndex].message_content[indexContent + 1][contentType].text.valueRight = convertTextJapanese(value, convertType);
-            }
+          case "valueRight": {
+            newState.messagesList[msgIndex].message_content[indexContent + 1][contentType].text.valueRight = textConvertedValue;
             break;
           }
-        case "value":
-          {
-            const element = document.getElementById(newState.messagesList[msgIndex].message_content[indexContent]?.convertTextDestination);
-            if (element && containsKanji(value) == false) {
-              newState.messagesList[msgIndex].message_content[indexContent + 1][contentType].text.value = convertTextJapanese(value, convertType);
-            }
+          case "value": {
+            newState.messagesList[msgIndex].message_content[indexContent + 1][contentType].text.value = textConvertedValue;
             break;
           }
+        }
       }
     }
+
     if (name) {
       messageContentTypeData[field] = messageContentTypeData[field] || {};
       messageContentTypeData[field][subFiled] = messageContentTypeData[field][subFiled] || {};
