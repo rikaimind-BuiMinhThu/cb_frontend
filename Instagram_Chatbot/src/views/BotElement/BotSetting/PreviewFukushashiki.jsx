@@ -123,6 +123,7 @@ const PREVIEW_ACTIONS = {
   UPDATE_MULTI_STATE: "UPDATE_MULTI_STATE",
   ADD_LP_OPTION_DATA: "ADD_LP_OPTION_DATA",
   UPDATE_PREVIEW_ORDER_CONTENT: "UPDATE_PREVIEW_ORDER_CONTENT",
+  UPDATE_OPEN_PREVIEW: "UPDATE_OPEN_PREVIEW",
 };
 
 const PreviewFukushashikiReducer = (state, action) => {
@@ -133,6 +134,8 @@ const PreviewFukushashikiReducer = (state, action) => {
       return { ...state, lpOptionData: { ...state.lpOptionData, ...action.payload } };
     case PREVIEW_ACTIONS.UPDATE_PREVIEW_ORDER_CONTENT:
       return { ...state, previewOrderContent: action.payload };
+    case PREVIEW_ACTIONS.UPDATE_OPEN_PREVIEW:
+      return { ...state, isOpen: action.payload.isOpen, showPopupCloseBot: action.payload.showPopupCloseBot };
     case PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES:
       return { ...state, renderMessagesList: action.payload };
   }
@@ -385,20 +388,24 @@ const PreviewFukushashiki = () => {
     // post message to parent window
     postMessageToParent({isOpen: opening});
 
-    let newState = {...state};
-    
     if (!opening) {
       if (state.activePopupCloseBot) {
-        newState.isOpen = false;
-        newState.showPopupCloseBot = true;
+        return dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_OPEN_PREVIEW,
+          payload: {
+            isOpen: false,
+            showPopupCloseBot: true,
+          }
+        });
       }
-
-      return dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
     }
-    newState.isOpen = true;
-    newState.showPopupCloseBot = false;
-
-    return dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
+    return dispatch({
+      type: PREVIEW_ACTIONS.UPDATE_OPEN_PREVIEW,
+      payload: {
+        isOpen: true,
+        showPopupCloseBot: false,
+      }
+    });
   }
 
   const setPulldownValue = (dataContentType, field, value) => {
