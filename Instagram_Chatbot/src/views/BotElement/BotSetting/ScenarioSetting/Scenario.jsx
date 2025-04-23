@@ -789,6 +789,10 @@ const Scenario = () => {
   const [urlCartConfirmPage, setUrlCartConfirmPage] = useState('');
   const [isOpenModalCustomCss, setIsOpenModalCustomCss] = useState(false);
 
+  const [errMsgJsCode, setErrMsgJsCode] = useState('');
+  const [isOpenErrMsgByJsSettingModal, setIsOpenErrMsgByJsSettingModal] = useState(false);
+  const [isUseErrMsgByJs, setIsUseErrMsgByJs] = useState(false);
+
   const [errorScenarioName, setErrorScenarioName] = useState('');
 
   const [belongTo, setBelongTo] = useState('bot');
@@ -912,6 +916,8 @@ const Scenario = () => {
         temp: res.data.data?.custom_css_content || '',
         final: res.data.data?.custom_css_content || '',
       });
+      setIsUseErrMsgByJs(res.data.data?.is_used_err_msg_by_js || false);
+      setErrMsgJsCode(res.data.data?.err_msg_js_code || '');
     }).catch((error) => {
       if (error.response?.data.code === 0) {
         tokenExpired()
@@ -2163,6 +2169,42 @@ const Scenario = () => {
     );
   };
 
+  const renderErrMsgByJsSettingModal = (isOpen) => {
+    return (
+      <ModalShort open={isOpen} onClose={() => setIsOpenErrMsgByJsSettingModal(false)}>
+        <div className="sl-popup-error-message-wrapper" style={{ width: "750px" }}>
+          <h4>エラーメッセンジ取得JSコードを入力</h4>
+          <div style={{ marginBottom: "10px" }}>
+            <div className="sl-popup-error-message-input-wrapper" style={{ marginBottom: "0px" }}>
+              <span style={{ width: "100px", whiteSpace: "nowrap", wordBreak: "normal" }}>JSコード</span>
+              <textarea
+                style={{ width: "100%", height: "150px", padding: "10px", fontSize: "14px", flexGrow: "1" }}
+                placeholder="ここにJSコードを入力してください"
+                value={errMsgJsCode}
+                onChange={(e) => setErrMsgJsCode(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="sl-popup-error-message-btn-wrapper">
+            <Button
+              className="ss-popup-error-message-input-close-button"
+              onClick={() => setIsOpenErrMsgByJsSettingModal(false)}
+            >
+              閉じる
+            </Button>
+            <Button
+              style={{ backgroundColor: "#024BB9" }}
+              className="ss-popup-error-message-input-keep-button"
+              onClick={() => setIsOpenErrMsgByJsSettingModal(false)}
+            >
+              保存
+            </Button>
+          </div>
+        </div>
+      </ModalShort>
+    );
+  };
+
   const onClickSavePreview = () => {
     if (!scenarioName) {
       setErrorScenarioName("入力してください。");
@@ -2185,6 +2227,8 @@ const Scenario = () => {
       is_used_fukushashiki: isUseFukushashiki,
       is_used_custom_css: isUseCustomCss,
       custom_css_content: customCssContent.final,
+      is_used_err_msg_by_js: isUseErrMsgByJs,
+      err_msg_js_code: errMsgJsCode,
     }
     api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data).then(res => {
       setIsOpenNoti(true);
@@ -2231,6 +2275,8 @@ const Scenario = () => {
       is_used_fukushashiki: isUseFukushashiki,
       is_used_custom_css : isUseCustomCss,
       custom_css_content: customCssContent.final,
+      is_used_err_msg_by_js: isUseErrMsgByJs,
+      err_msg_js_code: errMsgJsCode,
     }
     try {
       const res = await api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data);
@@ -2652,6 +2698,30 @@ const Scenario = () => {
                       <div>
                         <button class="ss-user-setting-checkbox-custom-css_toggle" onClick={handleChangeOpenModalCustomCss(true)}>
                           {`( CSSコンテンツ設定モダルを開く )`}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <div style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "16px",
+                    justifyContent: "start",
+                    width: "100%",
+                  }}>
+                    <div className='ss-user-setting-checkbox-custom_css'> 
+                      <input
+                        type="checkbox"
+                        className="ss-user-setting-checkbox-custom"
+                        onChange={() => setIsUseErrMsgByJs(!isUseErrMsgByJs)}
+                        checked={isUseErrMsgByJs}
+                      />
+                      <label style={{whiteSpace: "nowrap", wordBreak: "normal"}}>エラーメッセンジ取得をJSコード使用</label>
+                    </div>
+                    {isUseErrMsgByJs && (
+                      <div>
+                        <button class="ss-user-setting-checkbox-custom-css_toggle" onClick={() => setIsOpenErrMsgByJsSettingModal(true)}>
+                          {`( JSコード設定モダルを開く )`}
                         </button>
                       </div>
                     )}
@@ -13954,6 +14024,7 @@ const Scenario = () => {
         </div>
       </ModalNoti>
       {renderModalCustomCssForm(isOpenModalCustomCss)}
+      {renderErrMsgByJsSettingModal(isOpenErrMsgByJsSettingModal)}
       <ModalShort open={isOpenAddVariable} onClose={() => setIsOpenAddVariable(false)}>
         <div className="sl-popup-create-scenario-wrapper">
           <h4>変数追加</h4>
