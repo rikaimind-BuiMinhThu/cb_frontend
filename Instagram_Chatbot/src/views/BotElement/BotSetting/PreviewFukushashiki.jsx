@@ -123,6 +123,7 @@ const PREVIEW_ACTIONS = {
   UPDATE_MULTI_STATE: "UPDATE_MULTI_STATE",
   ADD_LP_OPTION_DATA: "ADD_LP_OPTION_DATA",
   UPDATE_PREVIEW_ORDER_CONTENT: "UPDATE_PREVIEW_ORDER_CONTENT",
+  UPDATE_OPEN_PREVIEW: "UPDATE_OPEN_PREVIEW",
 };
 
 const PreviewFukushashikiReducer = (state, action) => {
@@ -133,6 +134,8 @@ const PreviewFukushashikiReducer = (state, action) => {
       return { ...state, lpOptionData: { ...state.lpOptionData, ...action.payload } };
     case PREVIEW_ACTIONS.UPDATE_PREVIEW_ORDER_CONTENT:
       return { ...state, previewOrderContent: action.payload };
+    case PREVIEW_ACTIONS.UPDATE_OPEN_PREVIEW:
+      return { ...state, isOpen: action.payload.isOpen, showPopupCloseBot: action.payload.showPopupCloseBot };
     case PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES:
       return { ...state, renderMessagesList: action.payload };
   }
@@ -198,10 +201,13 @@ const PreviewFukushashiki = () => {
 
   // Get chat bot setting
   useEffect(() => {
+    if (!state.loadedStateFromSession) return;
+    if (state.titleBubble) return;
     if (!state.botId && params.get("bot_id")) {
       dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { botId: params.get("bot_id") } });
       return;
     }
+
     getChatBotSetting(state.botId)
       .then((response) => {
         if (!response.data.data) return;
@@ -234,7 +240,7 @@ const PreviewFukushashiki = () => {
         sessionStorage.setItem("chatbotRight", result?.right_margin_pc ? result?.right_margin_pc : 30);
         dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
       });
-  }, [state.botId]);
+  }, [state.botId, state.loadedStateFromSession, state.titleBubble]);
 
   const eventHandler = async (event) => {
     if (!event.data || !event.data.actionData) return;
@@ -382,20 +388,24 @@ const PreviewFukushashiki = () => {
     // post message to parent window
     postMessageToParent({isOpen: opening});
 
-    let newState = {...state};
-    
     if (!opening) {
       if (state.activePopupCloseBot) {
-        newState.isOpen = false;
-        newState.showPopupCloseBot = true;
+        return dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_OPEN_PREVIEW,
+          payload: {
+            isOpen: false,
+            showPopupCloseBot: true,
+          }
+        });
       }
-
-      return dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
     }
-    newState.isOpen = true;
-    newState.showPopupCloseBot = false;
-
-    return dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
+    return dispatch({
+      type: PREVIEW_ACTIONS.UPDATE_OPEN_PREVIEW,
+      payload: {
+        isOpen: true,
+        showPopupCloseBot: false,
+      }
+    });
   }
 
   const setPulldownValue = (dataContentType, field, value) => {
@@ -965,6 +975,12 @@ const PreviewFukushashiki = () => {
     if (!state.loadedStateFromSession) {
       let savedState = getStateFromSessionStorage();
       if (savedState) {
+        setConversionParamToLocalStorage(
+          savedState.scenarioId,
+          'web',
+          savedState.userInputId || params.get("uuid"),
+          params.get("env") || "production"
+        );
         if (!isLoadedCssContent && savedState?.botInfor?.is_used_custom_css && savedState?.botInfor?.custom_css_content.length > 0) {
           const style = document.createElement('style');
           style.innerHTML = savedState?.botInfor?.custom_css_content;
@@ -982,7 +998,7 @@ const PreviewFukushashiki = () => {
               };
             }
             return msg;
-          }); 
+          });
           return dispatch({
             type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
             payload: {
@@ -2804,6 +2820,7 @@ const PreviewFukushashiki = () => {
 
   const postMessageToParent = (options) => {
     if (!window || !window.parent) return;
+    
     const defaultOptions = {
       isOpen: state.isOpen,
       widthPc: state.widthPc,
@@ -2878,9 +2895,7 @@ const PreviewFukushashiki = () => {
     if (!handleValidateField(indexMessage)) {
       return;
     }
-    
-    newState ={...state};
-    
+
     const submitData = {
       scenario_id: state.scenarioId,
       message: clickedMsg,
@@ -2892,6 +2907,7 @@ const PreviewFukushashiki = () => {
     const isClickedLastMessage = state.messagesList.length - 1 === clickedMsgIndex;
 
     if (isClickedCreateOrder) {
+      setStateToSessionStorage(newState);
       return processClickCreateOrder(submitData);
     }
 
@@ -2911,6 +2927,7 @@ const PreviewFukushashiki = () => {
 
     if (isDislayingLoginForm(clickedMsg)) {
       // For GINZA AIRA,
+      setStateToSessionStorage(newState);
       return;
     }
 
@@ -3043,33 +3060,25 @@ const PreviewFukushashiki = () => {
     let messageContentTypeData = newState.messagesList[msgIndex].message_content[indexContent][contentType];
     if (messageContentTypeData?.isUseConvertText && contentType === "text_input") {
       const convertType = newState.messagesList[msgIndex].message_content[indexContent][contentType].convertTextTypeValue;
-      switch (subFiled) {
-        case "valueLeft":
-          {
-            const element = document.getElementById(newState.messagesList[msgIndex].message_content[indexContent]?.convertTextDestination1);
-            if (element && containsKanji(value) == false) {
-              newState.messagesList[msgIndex].message_content[indexContent + 1][contentType].text.valueLeft = convertTextJapanese(value, convertType);
-            }
+      const textConvertedValue = convertTextJapanese(value, convertType);
+      if (textConvertedValue && !containsKanji(textConvertedValue)) {
+        switch (subFiled) {
+          case "valueLeft": {
+            newState.messagesList[msgIndex].message_content[indexContent + 1][contentType].text.valueLeft = textConvertedValue;
             break;
           }
-        case "valueRight":
-          {
-            const element = document.getElementById(newState.messagesList[msgIndex].message_content[indexContent]?.convertTextDestination2);
-            if (element && containsKanji(value) == false) {
-              newState.messagesList[msgIndex].message_content[indexContent + 1][contentType].text.valueRight = convertTextJapanese(value, convertType);
-            }
+          case "valueRight": {
+            newState.messagesList[msgIndex].message_content[indexContent + 1][contentType].text.valueRight = textConvertedValue;
             break;
           }
-        case "value":
-          {
-            const element = document.getElementById(newState.messagesList[msgIndex].message_content[indexContent]?.convertTextDestination);
-            if (element && containsKanji(value) == false) {
-              newState.messagesList[msgIndex].message_content[indexContent + 1][contentType].text.value = convertTextJapanese(value, convertType);
-            }
+          case "value": {
+            newState.messagesList[msgIndex].message_content[indexContent + 1][contentType].text.value = textConvertedValue;
             break;
           }
+        }
       }
     }
+
     if (name) {
       messageContentTypeData[field] = messageContentTypeData[field] || {};
       messageContentTypeData[field][subFiled] = messageContentTypeData[field][subFiled] || {};
@@ -3167,22 +3176,20 @@ const PreviewFukushashiki = () => {
         };
       
         if (state.messagesList[msgIndex].message_content[indexContent][contentType].save_input_content === item.variable_name) {
-          setDefaultValue(item, dataContentType, contentType, value, field);
           isSaveParam = true;
 
-          // // TODO: need refactor (card_payment_radio_button use only)
-          // // Reason: Contents render inside of each types of radio button will change saveParams like "is_display_card_payment"
-          // // if onChange event handler us onChangeValue
-          // if (contentType === 'card_payment_radio_button') {
-          //   const allowFields = ['initial_selection', 'initial_selection_picture'];
-          //   isSaveParam = allowFields.includes(field);
+          // TODO: need refactor (card_payment_radio_button use only)
+          // Reason: Contents render inside of each types of radio button will change saveParams like "is_display_card_payment"
+          if (contentType === 'card_payment_radio_button') {
+            const allowFields = ['initial_selection', 'initial_selection_picture'];
+            isSaveParam = allowFields.includes(field);
 
-          //   if (isSaveParam) {
-          //     setDefaultValue(item, dataContentType, contentType, value, field);
-          //   }
-          // } else {
-          //   setDefaultValue(item, dataContentType, contentType, value, field);
-          // }
+            if (isSaveParam) {
+              setDefaultValue(item, dataContentType, contentType, value, field);
+            }
+          } else {
+            setDefaultValue(item, dataContentType, contentType, value, field);
+          }
         }
       
         return item;
@@ -3344,8 +3351,11 @@ const PreviewFukushashiki = () => {
     ));
   };
 
-  const renderSubmitButton = (message, indexMessage) => {
-    const isAutoClick = message?.message_content[0]?.type == "image" && message?.message_content[0]?.image?.displayButtonNext == false;
+  const renderNextButton = (message, indexMessage) => {
+    const firstMsgContent = message?.message_content?.[0];
+    const isDisplayBtnNext = firstMsgContent?.type != "image" || firstMsgContent?.image?.displayButtonNext != false;
+    const isAutoClick = !isDisplayBtnNext && indexMessage >= state.renderMessagesList.length - 1;
+
     if (!message || message.belong_to !== "user") return null;
     if (message.message_content[0]?.type === "button_submit") return null;
 
@@ -3354,7 +3364,7 @@ const PreviewFukushashiki = () => {
       btnText = indexMessage >= state.renderMessagesList.length - 1 ? "次へ" : "更新";
     }
     return (
-      <div className="sp-user-message-button-action" style={{ display: isAutoClick ? "none" : "flex" }}>
+      <div className="sp-user-message-button-action" style={{ display: isDisplayBtnNext ? "flex" : "none" }}>
         <CustomButton
           disabled={state.submitErrorMessage.length > 0 ? false : message.disabled}
           style={{
@@ -3436,7 +3446,7 @@ const PreviewFukushashiki = () => {
             submitErrorMessage={state.submitErrorMessage}
             botId={state.botId}
           />
-          {renderSubmitButton(message, indexMessage)}
+          {renderNextButton(message, indexMessage)}
         </div>
       </div>
     );

@@ -491,6 +491,8 @@ const fillDataFromMessage = async (data) => {
 
       case "password": {
         element.setRangeText(item.bindingValue, 0, element.value.length);
+        element.dispatchEvent(new Event('input', { bubbles: true }));
+        element.dispatchEvent(new Event('change', { bubbles: true }));
         break;
       }
       default:
@@ -531,8 +533,8 @@ const removeFirstTwoChars = (input) => {
 const setCheckToCheckboxElement = (element, value) => {
   if (!element.type === 'checkbox') return;
   element.checked = value;
-  const changeEvent = new Event('change', { bubbles: true });
-  element.dispatchEvent(changeEvent);
+  element.dispatchEvent(new Event('input', { bubbles: true }));
+  element.dispatchEvent(new Event('change', { bubbles: true }));
 }
 
 const setValueToElement = (element, value) => {
@@ -550,6 +552,7 @@ const setValueToElement = (element, value) => {
   }
 
   element.value = newElementValue;
+  element.dispatchEvent(new Event('input', { bubbles: true }));
   element.dispatchEvent(new Event('change', { bubbles: true }));
 }
 
@@ -568,8 +571,8 @@ const setRadioValue = (element, value) => {
   const selectedRadio = radioButtons.find(radio => radio.value === value);
   if (!selectedRadio) return;
   selectedRadio.checked = true;
-  const changeEvent = new Event('change', { bubbles: true });
-  selectedRadio.dispatchEvent(changeEvent);
+  selectedRadio.dispatchEvent(new Event('input', { bubbles: true }));
+  selectedRadio.dispatchEvent(new Event('change', { bubbles: true }));
 };
 
 const getUser = async (url, datacount) => {
