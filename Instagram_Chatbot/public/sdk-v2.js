@@ -440,6 +440,7 @@ const fillDataFromMessage = async (data) => {
       case "zip_code_address":
       case "card_number":
       case "card_payment_radio_button":
+      case "credit_card_payment":
       case "text_input":
       case "textarea":
       case "slider": {
