@@ -116,6 +116,8 @@ const previewInitialState = {
   previewOrderContent: null,
   // loadedStateFromSession has 2 values: "wait", "loaded"
   loadedStateFromSession: false,
+  isUsedErrMsgByJs: false,
+  errMsgJsCode: ''
 };
 
 const PREVIEW_ACTIONS = {
@@ -868,6 +870,8 @@ const PreviewFukushashiki = () => {
       rightSpTitle: designSetting?.right_position_sp_title,
       rightMarginSp: designSetting?.right_margin_sp,
       bottomMarginSp: designSetting?.bottom_margin_sp,
+      isUsedErrMsgByJs: res.data?.chatbot?.is_used_err_msg_by_js,
+      errMsgJsCode: res.data?.chatbot?.err_msg_js_code,
     };
     if (res.data?.chatbot?.is_used_custom_css && res.data?.chatbot?.custom_css_content.length > 0) {
       const style = document.createElement('style');
@@ -3009,13 +3013,17 @@ const PreviewFukushashiki = () => {
         ?.text_input?.jscode;
       const nextUserMessage = newState.messagesList[newState.currentUserMsgIndex];
       const isNextUserMessageButtonSubmit = nextUserMessage?.message_content?.[0]?.type === "button_submit";
-      
+
+      if (state.isUsedErrMsgByJs && state.errMsgJsCode) {
+        postMessageForExecuteJs(state.errMsgJsCode);
+      }
+
       if (botConfirmJsCode && botConfirmJsCode.length > 0 && isNextUserMessageButtonSubmit) {
         postMessageForGetPreviewOrderContent(botConfirmJsCode);
       }
   
       setStateToSessionStorage(newState);
-  
+
       return dispatch({
         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
         payload: newState
