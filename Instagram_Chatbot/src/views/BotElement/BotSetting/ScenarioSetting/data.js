@@ -369,6 +369,7 @@ let dataClone = {
             require: 'yes', //yes-no
             all_items_require: 'yes', //yes-no
             split_postal_code: 'yes', //yes-no
+            compact_municipality_and_address: 'yes', //yes-no
             post_code: '', //string
             use_drop_down: 'yes', //yes-no
             prefecture: '', //string
@@ -691,6 +692,7 @@ let dataClone2 = {
             require: true, //yes-no
             all_items_require: true, //yes-no
             split_postal_code: true, //yes-no
+            compact_municipality_and_address: true, //yes-no
             post_code: '', //string
             use_drop_down: true, //yes-no
             prefecture: '', //string
@@ -975,6 +977,7 @@ let dataClone2 = {
             require: true, //yes-no
             all_item_checked: true, //yes-no
             split_postal_code: true, //yes-no
+            compact_municipality_and_address: true, //yes-no
             post_code: '', //string
             use_drop_down: true, //yes-no
             prefecture: '', //string
