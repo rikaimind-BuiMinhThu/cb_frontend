@@ -3464,6 +3464,30 @@ const PreviewFukushashiki = () => {
     })
   };
 
+  const renderErrorMessages = () => {
+    if (!state.submitErrorMessage) return null;
+
+    return (
+      <div className="ss-user-setting__item-text_input-top">
+        <div
+          style={{
+            width: "95%",
+            padding: "5px",
+            border: "1px solid #f44336",
+            backgroundColor: "#ffebee",
+            color: "#d32f2f",
+            borderRadius: "5px",
+            fontFamily: "Arial, sans-serif",
+            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
+            margin: "10px",
+          }}
+          id="error-message"
+          dangerouslySetInnerHTML={{ __html: state.submitErrorMessage }}
+        />
+      </div>
+    );   
+  }
+
   const getOpeningBotStyle = () => {
     let containerStyle = {
       position: 'fixed',
@@ -3604,6 +3628,7 @@ const PreviewFukushashiki = () => {
         <div id="sp-body" className="sp-body" style={bodyStyle}
         >
           {renderMessages()}
+          {renderErrorMessages()}
         </div>
       </div>
     )
