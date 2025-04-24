@@ -23,7 +23,7 @@ import iconMessagePink from "../../../assets/img/icon-mess/icon-message-chat-pin
 import iconMessagePurple from "../../../assets/img/icon-mess/icon-message-chat-purple.png";
 import iconMessageBlack from "../../../assets/img/icon-mess/icon-message-chat-black.png";
 import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-white.png";
-import { CHATBOT_ACTIONS, MESSAGE_CONTENT_TYPES, SESSION_STORAGE_KEY } from "./PreviewComponent/Constants";
+import { CHATBOT_ACTIONS, MESSAGE_CONTENT_TYPES, SESSION_STORAGE_KEY, NO_ERROR } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
   lightenColor,
@@ -260,9 +260,10 @@ const PreviewFukushashiki = () => {
 
       case CHATBOT_ACTIONS.GET_ERROR_MESSAGE:
         await sleep(1000);
+        const error = actionData === NO_ERROR ? "" : actionData;
         return dispatch({
           type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-          payload: { submitErrorMessage: actionData }
+          payload: { submitErrorMessage: error }
         });
 
       case CHATBOT_ACTIONS.OPEN_PREVIEW:
@@ -1104,7 +1105,7 @@ const PreviewFukushashiki = () => {
     if (!state.isOpen) return;
     await sleep(1000);
     scrollToBottom(false);
-  }, [state.isOpen, state.renderMessagesList.length]);
+  }, [state.isOpen, state.renderMessagesList.length, state.submitErrorMessage]);
 
   const scrollToBottom = (forceScroll = false) => {
     if (document.getElementById("sp-body")) {
