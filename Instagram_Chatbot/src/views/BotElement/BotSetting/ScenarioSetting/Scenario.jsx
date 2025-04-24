@@ -10228,6 +10228,13 @@ const Scenario = () => {
                                                               value={creditCardPayment.is_hide_card_name}
                                                             />
                                                           </div>
+                                                          <div className="ss-user-setting__item-text_input-use-api-required">
+                                                            <CheckboxCustom
+                                                              label="分割払い"
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_use_installment')}
+                                                              value={creditCardPayment.is_use_installment}
+                                                            />
+                                                          </div>
                                                         </div>
                                                         <div className="ss-user-setting__item-text_input-use-api-wrapper">
                                                           <div>
@@ -10586,6 +10593,67 @@ const Scenario = () => {
                                                           </>
                                                         }
                                                       </div>
+                                                      {
+                                                        creditCardPayment.is_use_installment && (
+                                                          <div className="ss-user-setting__item-bottom">
+                                                            <SelectCustom
+                                                              styleLabel={{ width: '90%' }}
+                                                              label="お支払い回数"
+                                                              inline={false}
+                                                              placeholder="プレースホルダ"
+                                                              data={installmentOptions}
+                                                              value={creditCardPayment.installment_placeholder}
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'installment_placeholder')}
+                                                            />
+                                                            {isUseFukushashiki &&
+                                                              <>
+                                                                <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px', width: '90%', marginTop: '10px' }}>
+                                                                  <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
+                                                                    <div style={{ width: '20%' }}>
+                                                                      <SelectCustom
+                                                                        id="title"
+                                                                        style={{ width: '100%' }}
+                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['installment_fukushashiki_search_mode']}
+                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'installment_fukushashiki_search_mode', value)}
+                                                                        data={[
+                                                                          { key: 1, value: 'id' },
+                                                                          { key: 2, value: 'css_selector' },
+                                                                          { key: 3, value: 'xpath' }
+                                                                        ]}
+                                                                        keyValue="key"
+                                                                        placeholder="複写先要素の取得方法をお選びください"
+                                                                      />
+                                                                    </div>
+                                                                  </Tooltip>
+                                                                  <Tooltip title={{
+                                                                    1: '複写先要素のIDを入力ください',
+                                                                    2: '複写先要素のcss_selectorを入力ください',
+                                                                    3: '複写先要素のxPathを入力ください',
+                                                                  }[
+                                                                    dataMessages[indexMessageSelect]?.message_content[indexContent]?.['installment_fukushashiki_search_mode']
+                                                                  ] || ''} placement="top">
+                                                                    <div style={{ flex: '80%' }}>
+                                                                      <InputCustom
+                                                                        styleLabel={{ width: '100%' }}
+                                                                        style={{ width: '100%' }}
+                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'installment_fukushashiki_search_value', value)}
+                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['installment_fukushashiki_search_value']}
+                                                                        placeholder={{
+                                                                          1: '複写先要素のIDを入力ください',
+                                                                          2: '複写先要素のcss_selectorを入力ください',
+                                                                          3: '複写先要素のxPathを入力ください',
+                                                                        }[
+                                                                          dataMessages[indexMessageSelect]?.message_content[indexContent]?.['installment_fukushashiki_search_value']
+                                                                        ] || ''}
+                                                                      />
+                                                                    </div>
+                                                                  </Tooltip>
+                                                                </div>
+                                                              </>
+                                                            }
+                                                          </div>
+                                                        )
+                                                      }
                                                     </>
                                                   )}
                                                   {/* user: type = 'capture' */}
@@ -12364,7 +12432,7 @@ const Scenario = () => {
                                                                                           <div className="ss-user-setting__item-bottom">
                                                                                             <SelectCustom
                                                                                               styleLabel={{ width: '90%' }}
-                                                                                              label=" お支払い回数"
+                                                                                              label="お支払い回数"
                                                                                               inline={false}
                                                                                               placeholder="プレースホルダ"
                                                                                               data={installmentOptions}
