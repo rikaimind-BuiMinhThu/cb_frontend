@@ -2454,7 +2454,7 @@ const UserMessage = ({
                                   "valueYear"
                                 )
                               }
-                              value={pullDown[pullDown.type].valueYear}
+                              value={pullDown[pullDown.type].valueYear || pullDown[pullDown.type].year}
                             />
                             <SelectCustom
                               disabled={disabled}
@@ -2470,7 +2470,7 @@ const UserMessage = ({
                                   "valueMonth"
                                 )
                               }
-                              value={pullDown[pullDown.type].valueMonth}
+                              value={pullDown[pullDown.type].valueMonth || pullDown[pullDown.type].month}
                             />
                             <SelectCustom
                               disabled={disabled}
@@ -2486,7 +2486,7 @@ const UserMessage = ({
                                   "valueDay"
                                 )
                               }
-                              value={pullDown[pullDown.type].valueDay}
+                              value={pullDown[pullDown.type].valueDay || pullDown[pullDown.type].day}
                             />
                             <div
                               className="ss-message__content--user-pull_down-comment"
@@ -3322,7 +3322,7 @@ const UserMessage = ({
                                     onChangeValue(
                                       indexContent,
                                       content.type,
-                                      res.data.data.prefecture_name,
+                                      getPrefectureIdCodeFromName(res.data.data.prefecture_name),
                                       "value_prefecture"
                                     );
                                     if (zipCodeAddress.compact_municipality_and_address) {
@@ -3422,7 +3422,7 @@ const UserMessage = ({
                                     onChangeValue(
                                       indexContent,
                                       content.type,
-                                      res.data.data.prefecture_name,
+                                      getPrefectureIdCodeFromName(res.data.data.prefecture_name),
                                       "value_prefecture"
                                     );
                                     if (zipCodeAddress.compact_municipality_and_address) {

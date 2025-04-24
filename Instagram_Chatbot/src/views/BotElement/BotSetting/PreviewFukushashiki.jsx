@@ -2746,7 +2746,8 @@ const PreviewFukushashiki = () => {
               break;
             }
 
-          case 'card_payment_radio_button', 'credit_card_payment': {
+          case 'card_payment_radio_button':
+          case 'credit_card_payment': {
             const keysToExtract = [
               "initial_selection", "card_holder1", "card_holder2",
               "card_number1", "card_number2", "card_number3", "card_number4",
