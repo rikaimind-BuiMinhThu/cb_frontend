@@ -1210,6 +1210,7 @@ const Scenario = () => {
             address: '',
             building_name: '',
             split_postal_code: false,
+            compact_municipality_and_address: false,
             post_code_label: '郵便番号',
             prefecture_label: '都道府県',
             municipality_label: '市区町村',
@@ -1299,6 +1300,7 @@ const Scenario = () => {
             address: '',
             building_name: '',
             split_postal_code: false,
+            compact_municipality_and_address: false,
             withHyphen: false,
             
           }
