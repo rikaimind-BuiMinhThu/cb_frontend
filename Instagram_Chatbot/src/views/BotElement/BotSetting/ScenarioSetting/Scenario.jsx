@@ -7424,6 +7424,13 @@ const Scenario = () => {
                                                             value={zipCodeAddress.split_postal_code}
                                                           />
                                                         </div>
+                                                        <div className="ss-user-setting__item-text_input-use-api-wrapper">
+                                                          <CheckboxCustom
+                                                            label="市区町村と番地を１フィールドで利用"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'compact_municipality_and_address')}
+                                                            value={zipCodeAddress.compact_municipality_and_address}
+                                                          />
+                                                        </div>
                                                       </div>
                                                       {zipCodeAddress.post_code !== undefined && (
                                                         zipCodeAddress.split_postal_code === false ?
@@ -7779,7 +7786,7 @@ const Scenario = () => {
                                                           )}
                                                         </div>
                                                       }
-                                                      {zipCodeAddress.address !== undefined &&
+                                                      {zipCodeAddress.address !== undefined && !zipCodeAddress.compact_municipality_and_address &&
                                                         <>
                                                           <div className="ss-user-setting__item-bottom" style={{gap: '1%'}}>
                                                             <InputCustom
@@ -13011,6 +13018,13 @@ const Scenario = () => {
                                                                                                                 label="郵便番号を3桁+4桁に分割する"
                                                                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'split_postal_code')}
                                                                                                                 value={shippingAddress.split_postal_code}
+                                                                                                              />
+                                                                                                            </div>
+                                                                                                            <div className="ss-user-setting__item-text_input-use-api-wrapper">
+                                                                                                              <CheckboxCustom
+                                                                                                                label="市区町村と番地を１フィールドで利用"
+                                                                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'compact_municipality_and_address')}
+                                                                                                                value={shippingAddress.compact_municipality_and_address}
                                                                                                               />
                                                                                                             </div>
                                                                                                           </div>
