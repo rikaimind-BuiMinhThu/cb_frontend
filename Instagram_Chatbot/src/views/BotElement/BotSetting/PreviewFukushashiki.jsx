@@ -2741,7 +2741,7 @@ const PreviewFukushashiki = () => {
               break;
             }
 
-          case 'card_payment_radio_button': {
+          case 'card_payment_radio_button', 'credit_card_payment': {
             const keysToExtract = [
               "initial_selection", "card_holder1", "card_holder2",
               "card_number1", "card_number2", "card_number3", "card_number4",
@@ -2749,8 +2749,8 @@ const PreviewFukushashiki = () => {
               "year", "month", "cvc", "installment"
             ];
             const userInputData = keysToExtract.reduce((result, key) => {
-              if (message.card_payment_radio_button[key] !== undefined) {
-                result[key] = message.card_payment_radio_button[key];
+              if (message[message.type]?.[key] !== undefined) {
+                result[key] = message[message.type][key];
               }
               return result;
             }, {});
@@ -2778,9 +2778,9 @@ const PreviewFukushashiki = () => {
                 if (type == "card_number") {
                   return { type: "card_number", ...fukuData };
                 }
-                return { type: "card_payment_radio_button", ...fukuData };
+                return { type: message.type, ...fukuData };
               })
-              .filter(item => item !== null);
+              .filter(item => item);
             fukuDataList.push(...result);
           }
           default: 
