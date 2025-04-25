@@ -251,6 +251,7 @@ const displayPopup = async () => {
   window.addEventListener(
     "message",
     async (e) => {
+      if (typeof e.data !== 'object') return;
       chatbotW = e.data.widthPc;
       chatbotH = e.data.heightPc;
       chatbotRight = e.data.chatbotRight;
@@ -284,7 +285,7 @@ const displayPopup = async () => {
           setChatbotConversionParamsToLocalStorage(e.data.actionData);
           break;
       };
-      
+
       if (e.data.isOpen && mobileCheck()) {
         iframe.width = "100%";
         // iframe.height = "620px";
