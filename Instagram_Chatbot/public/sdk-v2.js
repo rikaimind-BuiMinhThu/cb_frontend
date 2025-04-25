@@ -278,7 +278,7 @@ const displayPopup = async () => {
           button.click();
           break;
         case CHATBOT_ACTIONS.GET_PREVIEW_ORDER_CONTENT:
-          await sleep(2000);
+          await sleep(5000);
           excuteJSCode(e.data.actionData);
           break;
         case CHATBOT_ACTIONS.SET_CHATBOT_CONVERSION_PARAMS_TO_LOCAL_STORAGE:
