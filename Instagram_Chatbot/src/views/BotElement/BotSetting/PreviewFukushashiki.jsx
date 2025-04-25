@@ -126,6 +126,7 @@ const PREVIEW_ACTIONS = {
   ADD_LP_OPTION_DATA: "ADD_LP_OPTION_DATA",
   UPDATE_PREVIEW_ORDER_CONTENT: "UPDATE_PREVIEW_ORDER_CONTENT",
   UPDATE_OPEN_PREVIEW: "UPDATE_OPEN_PREVIEW",
+  UPDATE_SUBMIT_ERROR_MESSAGE: "UPDATE_SUBMIT_ERROR_MESSAGE"
 };
 
 const PreviewFukushashikiReducer = (state, action) => {
@@ -140,6 +141,8 @@ const PreviewFukushashikiReducer = (state, action) => {
       return { ...state, isOpen: action.payload.isOpen, showPopupCloseBot: action.payload.showPopupCloseBot };
     case PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES:
       return { ...state, renderMessagesList: action.payload };
+    case PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE:
+      return { ...state, submitErrorMessage: action.payload };
   }
 
   return state;
@@ -262,8 +265,8 @@ const PreviewFukushashiki = () => {
         await sleep(1000);
         const error = actionData === NO_ERROR ? "" : actionData;
         return dispatch({
-          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-          payload: { submitErrorMessage: error }
+          type: PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE,
+          payload: error
         });
 
       case CHATBOT_ACTIONS.OPEN_PREVIEW:
@@ -302,7 +305,16 @@ const PreviewFukushashiki = () => {
   // post message to parent window
   useEffect(() => {
     if (!state.urlReceive) return;
-    postMessageToParent();
+    const options = {
+      isOpen: state.isOpen,
+      widthPc: state.widthPc,
+      heightPc: state.heightPc,
+      widthSp: state.widthSp,
+      heightSp: state.heightSp,
+      chatbotRight: state.rightMarginPc,
+      chatbotBottom: state.bottomMarginPc,
+    };
+    postMessageToParent(options);
   }, [
     state.urlReceive,
     state.isOpen,
@@ -405,7 +417,7 @@ const PreviewFukushashiki = () => {
     return dispatch({
       type: PREVIEW_ACTIONS.UPDATE_OPEN_PREVIEW,
       payload: {
-        isOpen: true,
+        isOpen: opening,
         showPopupCloseBot: false,
       }
     });
@@ -2829,12 +2841,12 @@ const PreviewFukushashiki = () => {
     
     const defaultOptions = {
       isOpen: state.isOpen,
-      widthPc: state.widthPc,
-      heightPc: state.heightPc,
-      widthSp: state.widthSp,
-      heightSp: state.heightSp,
-      chatbotRight: state.rightMarginPc,
-      chatbotBottom: state.bottomMarginPc,
+      // widthPc: state.widthPc,
+      // heightPc: state.heightPc,
+      // widthSp: state.widthSp,
+      // heightSp: state.heightSp,
+      // chatbotRight: state.rightMarginPc,
+      // chatbotBottom: state.bottomMarginPc,
     };
     
     window.parent.postMessage({
