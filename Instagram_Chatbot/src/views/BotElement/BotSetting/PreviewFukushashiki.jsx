@@ -3501,7 +3501,9 @@ const PreviewFukushashiki = () => {
             borderRadius: "5px",
             fontFamily: "Arial, sans-serif",
             boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
-            margin: "10px",
+            position: "fixed",
+            top: "12.5%",
+            left: "1%"
           }}
           id="error-message"
           dangerouslySetInnerHTML={{ __html: state.submitErrorMessage }}
