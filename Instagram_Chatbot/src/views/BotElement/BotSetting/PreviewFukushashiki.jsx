@@ -2914,6 +2914,10 @@ const PreviewFukushashiki = () => {
       return;
     }
 
+    if (state.isUsedErrMsgByJs && state.errMsgJsCode) {
+      postMessageForExecuteJs(state.errMsgJsCode);
+    }
+
     const submitData = {
       scenario_id: state.scenarioId,
       message: clickedMsg,
@@ -3027,10 +3031,6 @@ const PreviewFukushashiki = () => {
         ?.text_input?.jscode;
       const nextUserMessage = newState.messagesList[newState.currentUserMsgIndex];
       const isNextUserMessageButtonSubmit = nextUserMessage?.message_content?.[0]?.type === "button_submit";
-
-      if (state.isUsedErrMsgByJs && state.errMsgJsCode) {
-        postMessageForExecuteJs(state.errMsgJsCode);
-      }
 
       if (botConfirmJsCode && botConfirmJsCode.length > 0 && isNextUserMessageButtonSubmit) {
         postMessageForGetPreviewOrderContent(botConfirmJsCode);
