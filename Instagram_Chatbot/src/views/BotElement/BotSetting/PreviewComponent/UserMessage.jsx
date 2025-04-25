@@ -2584,7 +2584,7 @@ const UserMessage = ({
                                   "valueYear"
                                 )
                               }
-                              value={pullDown[pullDown.type].valueYear}
+                              value={pullDown[pullDown.type].valueYear || pullDown[pullDown.type].year}
                             />
                             <SelectCustom
                               disabled={disabled}
@@ -2646,7 +2646,7 @@ const UserMessage = ({
                                 "valueYear"
                               )
                             }
-                            value={pullDown[pullDown.type].valueYear}
+                            value={pullDown[pullDown.type].valueYear || pullDown[pullDown.type].year}
                           />
                           <SelectCustom
                             disabled={disabled}
