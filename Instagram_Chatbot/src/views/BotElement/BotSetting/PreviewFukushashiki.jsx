@@ -886,6 +886,11 @@ const PreviewFukushashiki = () => {
       isUsedErrMsgByJs: res.data?.chatbot?.is_used_err_msg_by_js,
       errMsgJsCode: res.data?.chatbot?.err_msg_js_code,
     };
+
+    if (newState.isUsedErrMsgByJs && newState.errMsgJsCode) {
+      postMessageForExecuteJs(newState.errMsgJsCode);
+    }
+
     if (res.data?.chatbot?.is_used_custom_css && res.data?.chatbot?.custom_css_content.length > 0) {
       const style = document.createElement('style');
       style.innerHTML = res.data.chatbot.custom_css_content;
