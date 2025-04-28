@@ -888,6 +888,7 @@ const PreviewFukushashiki = () => {
     };
 
     if (newState.isUsedErrMsgByJs && newState.errMsgJsCode) {
+      console.log("Run js code: ", newState.errMsgJsCode);
       postMessageForExecuteJs(newState.errMsgJsCode);
     }
 
@@ -1007,6 +1008,10 @@ const PreviewFukushashiki = () => {
           const style = document.createElement('style');
           style.innerHTML = savedState?.botInfor?.custom_css_content;
           document.head.appendChild(style);
+        }
+        if (savedState.isUsedErrMsgByJs && savedState.errMsgJsCode) {
+          console.log("Run js code: ", savedState.errMsgJsCode);
+          postMessageForExecuteJs(savedState.errMsgJsCode);
         }
         if (isLoggedIn) {
           savedState.messagesList.forEach((x) => x.hidden = !!x?.not_display_when_logged_in);
@@ -2919,9 +2924,9 @@ const PreviewFukushashiki = () => {
       return;
     }
 
-    if (state.isUsedErrMsgByJs && state.errMsgJsCode) {
-      postMessageForExecuteJs(state.errMsgJsCode);
-    }
+    // if (state.isUsedErrMsgByJs && state.errMsgJsCode) {
+    //   postMessageForExecuteJs(state.errMsgJsCode);
+    // }
 
     const submitData = {
       scenario_id: state.scenarioId,
