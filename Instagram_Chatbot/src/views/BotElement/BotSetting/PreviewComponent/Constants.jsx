@@ -105,6 +105,8 @@ const CRAWL_ELEMENT_TYPES = {
   FROM_JS: 'from_js'
 };
 
+const NO_ERROR = 'NO_ERROR';
+
 const CHATBOT_ACTIONS = {
   CLICK_BUTTON: 'clickButton',
   EXCUTE_JS: 'excuteJS',
@@ -159,4 +161,5 @@ export {
   CRAWL_ELEMENT_TYPES,
   SEARCH_MODES,
   MESSAGE_CONTENT_TYPES,
+  NO_ERROR,
 };

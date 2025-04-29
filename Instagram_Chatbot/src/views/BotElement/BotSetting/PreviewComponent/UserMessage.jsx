@@ -1239,12 +1239,27 @@ const UserMessage = ({
                                             res.data.data.prefecture_name,
                                             "value_prefecture"
                                           );
-                                          onChangeValue(
-                                            indexContent,
-                                            content.type,
-                                            `${res.data.data.city_name}${res.data.data.town_name}`,
-                                            "value_municipality"
-                                          );
+                                          if (shippingAddress.compact_municipality_and_address) {
+                                            onChangeValue(
+                                              indexContent,
+                                              content.type,
+                                              `${res.data.data.city_name}${res.data.data.town_name}`,
+                                              "value_municipality"
+                                            );
+                                          } else {
+                                            onChangeValue(
+                                              indexContent,
+                                              content.type,
+                                              res.data.data.city_name,
+                                              "value_municipality"
+                                            );
+                                            onChangeValue(
+                                              indexContent,
+                                              content.type,
+                                              res.data.data.town_name,
+                                              "value_address"
+                                            );
+                                          }
                                           onChangeErrors(
                                             `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
                                             ""
@@ -1329,12 +1344,27 @@ const UserMessage = ({
                                               res.data.data.prefecture_name,
                                               "value_prefecture"
                                             );
-                                            onChangeValue(
-                                              indexContent,
-                                              content.type,
-                                              `${res.data.data.city_name}${res.data.data.town_name}`,
-                                              "value_municipality"
-                                            );
+                                            if (shippingAddress.compact_municipality_and_address) {
+                                              onChangeValue(
+                                                indexContent,
+                                                content.type,
+                                                `${res.data.data.city_name}${res.data.data.town_name}`,
+                                                "value_municipality"
+                                              );
+                                            } else {
+                                              onChangeValue(
+                                                indexContent,
+                                                content.type,
+                                                res.data.data.city_name,
+                                                "value_municipality"
+                                              );
+                                              onChangeValue(
+                                                indexContent,
+                                                content.type,
+                                                res.data.data.town_name,
+                                                "value_address"
+                                              );
+                                            }
                                             onChangeErrors(
                                               `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
                                               ""
@@ -1413,12 +1443,27 @@ const UserMessage = ({
                                               res.data.data.prefecture_name,
                                               "value_prefecture"
                                             );
-                                            onChangeValue(
-                                              indexContent,
-                                              content.type,
-                                              `${res.data.data.city_name}${res.data.data.town_name}`,
-                                              "value_municipality"
-                                            );
+                                            if (shippingAddress.compact_municipality_and_address) {
+                                              onChangeValue(
+                                                indexContent,
+                                                content.type,
+                                                `${res.data.data.city_name}${res.data.data.town_name}`,
+                                                "value_municipality"
+                                              );
+                                            } else {
+                                              onChangeValue(
+                                                indexContent,
+                                                content.type,
+                                                res.data.data.city_name,
+                                                "value_municipality"
+                                              );
+                                              onChangeValue(
+                                                indexContent,
+                                                content.type,
+                                                res.data.data.town_name,
+                                                "value_address"
+                                              );
+                                            }
                                             onChangeErrors(
                                               `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
                                               ""
@@ -2409,7 +2454,7 @@ const UserMessage = ({
                                   "valueYear"
                                 )
                               }
-                              value={pullDown[pullDown.type].valueYear}
+                              value={pullDown[pullDown.type].valueYear || pullDown[pullDown.type].year}
                             />
                             <SelectCustom
                               disabled={disabled}
@@ -2425,7 +2470,7 @@ const UserMessage = ({
                                   "valueMonth"
                                 )
                               }
-                              value={pullDown[pullDown.type].valueMonth}
+                              value={pullDown[pullDown.type].valueMonth || pullDown[pullDown.type].month}
                             />
                             <SelectCustom
                               disabled={disabled}
@@ -2441,7 +2486,7 @@ const UserMessage = ({
                                   "valueDay"
                                 )
                               }
-                              value={pullDown[pullDown.type].valueDay}
+                              value={pullDown[pullDown.type].valueDay || pullDown[pullDown.type].day}
                             />
                             <div
                               className="ss-message__content--user-pull_down-comment"
@@ -2539,7 +2584,7 @@ const UserMessage = ({
                                   "valueYear"
                                 )
                               }
-                              value={pullDown[pullDown.type].valueYear}
+                              value={pullDown[pullDown.type].valueYear || pullDown[pullDown.type].year}
                             />
                             <SelectCustom
                               disabled={disabled}
@@ -2601,7 +2646,7 @@ const UserMessage = ({
                                 "valueYear"
                               )
                             }
-                            value={pullDown[pullDown.type].valueYear}
+                            value={pullDown[pullDown.type].valueYear || pullDown[pullDown.type].year}
                           />
                           <SelectCustom
                             disabled={disabled}
@@ -3169,12 +3214,27 @@ const UserMessage = ({
                                     getPrefectureIdCodeFromName(res.data.data.prefecture_name),
                                     "value_prefecture"
                                   );
-                                  onChangeValue(
-                                    indexContent,
-                                    content.type,
-                                    `${res.data.data.city_name}${res.data.data.town_name}`,
-                                    "value_municipality"
-                                  );
+                                  if (zipCodeAddress.compact_municipality_and_address) {
+                                    onChangeValue(
+                                      indexContent,
+                                      content.type,
+                                      `${res.data.data.city_name}${res.data.data.town_name}`,
+                                      "value_municipality"
+                                    );
+                                  } else {
+                                    onChangeValue(
+                                      indexContent,
+                                      content.type,
+                                      res.data.data.city_name,
+                                      "value_municipality"
+                                    );
+                                    onChangeValue(
+                                      indexContent,
+                                      content.type,
+                                      res.data.data.town_name,
+                                      "value_address"
+                                    );
+                                  }
                                   onChangeErrors(
                                     `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
                                     ""
@@ -3262,15 +3322,30 @@ const UserMessage = ({
                                     onChangeValue(
                                       indexContent,
                                       content.type,
-                                      res.data.data.prefecture_name,
+                                      getPrefectureIdCodeFromName(res.data.data.prefecture_name),
                                       "value_prefecture"
                                     );
-                                    onChangeValue(
-                                      indexContent,
-                                      content.type,
-                                      `${res.data.data.city_name}${res.data.data.town_name}`,
-                                      "value_municipality"
-                                    );
+                                    if (zipCodeAddress.compact_municipality_and_address) {
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        `${res.data.data.city_name}${res.data.data.town_name}`,
+                                        "value_municipality"
+                                      );
+                                    } else {
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        res.data.data.city_name,
+                                        "value_municipality"
+                                      );
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        res.data.data.town_name,
+                                        "value_address"
+                                      );
+                                    }
                                     onChangeErrors(
                                       `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
                                       ""
@@ -3347,15 +3422,30 @@ const UserMessage = ({
                                     onChangeValue(
                                       indexContent,
                                       content.type,
-                                      res.data.data.prefecture_name,
+                                      getPrefectureIdCodeFromName(res.data.data.prefecture_name),
                                       "value_prefecture"
                                     );
-                                    onChangeValue(
-                                      indexContent,
-                                      content.type,
-                                      `${res.data.data.city_name}${res.data.data.town_name}`,
-                                      "value_municipality"
-                                    );
+                                    if (zipCodeAddress.compact_municipality_and_address) {
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        `${res.data.data.city_name}${res.data.data.town_name}`,
+                                        "value_municipality"
+                                      );
+                                    } else {
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        res.data.data.city_name,
+                                        "value_municipality"
+                                      );
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        res.data.data.town_name,
+                                        "value_address"
+                                      );
+                                    }
                                     onChangeErrors(
                                       `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
                                       ""

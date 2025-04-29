@@ -23,7 +23,7 @@ import iconMessagePink from "../../../assets/img/icon-mess/icon-message-chat-pin
 import iconMessagePurple from "../../../assets/img/icon-mess/icon-message-chat-purple.png";
 import iconMessageBlack from "../../../assets/img/icon-mess/icon-message-chat-black.png";
 import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-white.png";
-import { CHATBOT_ACTIONS, MESSAGE_CONTENT_TYPES, SESSION_STORAGE_KEY } from "./PreviewComponent/Constants";
+import { CHATBOT_ACTIONS, MESSAGE_CONTENT_TYPES, SESSION_STORAGE_KEY, NO_ERROR } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
   lightenColor,
@@ -116,6 +116,8 @@ const previewInitialState = {
   previewOrderContent: null,
   // loadedStateFromSession has 2 values: "wait", "loaded"
   loadedStateFromSession: false,
+  isUsedErrMsgByJs: false,
+  errMsgJsCode: ''
 };
 
 const PREVIEW_ACTIONS = {
@@ -124,6 +126,7 @@ const PREVIEW_ACTIONS = {
   ADD_LP_OPTION_DATA: "ADD_LP_OPTION_DATA",
   UPDATE_PREVIEW_ORDER_CONTENT: "UPDATE_PREVIEW_ORDER_CONTENT",
   UPDATE_OPEN_PREVIEW: "UPDATE_OPEN_PREVIEW",
+  UPDATE_SUBMIT_ERROR_MESSAGE: "UPDATE_SUBMIT_ERROR_MESSAGE"
 };
 
 const PreviewFukushashikiReducer = (state, action) => {
@@ -138,6 +141,8 @@ const PreviewFukushashikiReducer = (state, action) => {
       return { ...state, isOpen: action.payload.isOpen, showPopupCloseBot: action.payload.showPopupCloseBot };
     case PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES:
       return { ...state, renderMessagesList: action.payload };
+    case PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE:
+      return { ...state, submitErrorMessage: action.payload };
   }
 
   return state;
@@ -258,9 +263,10 @@ const PreviewFukushashiki = () => {
 
       case CHATBOT_ACTIONS.GET_ERROR_MESSAGE:
         await sleep(1000);
+        const error = actionData === NO_ERROR ? "" : actionData;
         return dispatch({
-          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-          payload: { submitErrorMessage: actionData }
+          type: PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE,
+          payload: error
         });
 
       case CHATBOT_ACTIONS.OPEN_PREVIEW:
@@ -299,7 +305,16 @@ const PreviewFukushashiki = () => {
   // post message to parent window
   useEffect(() => {
     if (!state.urlReceive) return;
-    postMessageToParent();
+    const options = {
+      isOpen: state.isOpen,
+      widthPc: state.widthPc,
+      heightPc: state.heightPc,
+      widthSp: state.widthSp,
+      heightSp: state.heightSp,
+      chatbotRight: state.rightMarginPc,
+      chatbotBottom: state.bottomMarginPc,
+    };
+    postMessageToParent(options);
   }, [
     state.urlReceive,
     state.isOpen,
@@ -402,7 +417,7 @@ const PreviewFukushashiki = () => {
     return dispatch({
       type: PREVIEW_ACTIONS.UPDATE_OPEN_PREVIEW,
       payload: {
-        isOpen: true,
+        isOpen: opening,
         showPopupCloseBot: false,
       }
     });
@@ -868,7 +883,15 @@ const PreviewFukushashiki = () => {
       rightSpTitle: designSetting?.right_position_sp_title,
       rightMarginSp: designSetting?.right_margin_sp,
       bottomMarginSp: designSetting?.bottom_margin_sp,
+      isUsedErrMsgByJs: res.data?.chatbot?.is_used_err_msg_by_js,
+      errMsgJsCode: res.data?.chatbot?.err_msg_js_code,
     };
+
+    if (newState.isUsedErrMsgByJs && newState.errMsgJsCode) {
+      console.log("Run js code: ", newState.errMsgJsCode);
+      postMessageForExecuteJs(newState.errMsgJsCode);
+    }
+
     if (res.data?.chatbot?.is_used_custom_css && res.data?.chatbot?.custom_css_content.length > 0) {
       const style = document.createElement('style');
       style.innerHTML = res.data.chatbot.custom_css_content;
@@ -986,6 +1009,10 @@ const PreviewFukushashiki = () => {
           style.innerHTML = savedState?.botInfor?.custom_css_content;
           document.head.appendChild(style);
         }
+        if (savedState.isUsedErrMsgByJs && savedState.errMsgJsCode) {
+          console.log("Run js code: ", savedState.errMsgJsCode);
+          postMessageForExecuteJs(savedState.errMsgJsCode);
+        }
         if (isLoggedIn) {
           savedState.messagesList.forEach((x) => x.hidden = !!x?.not_display_when_logged_in);
           savedState.currentMsgIndex = savedState.messagesList.findIndex((item) => isUserMessage(item) && item.hidden == false);
@@ -1100,7 +1127,7 @@ const PreviewFukushashiki = () => {
     if (!state.isOpen) return;
     await sleep(1000);
     scrollToBottom(false);
-  }, [state.isOpen, state.renderMessagesList.length]);
+  }, [state.isOpen, state.renderMessagesList.length, state.submitErrorMessage]);
 
   const scrollToBottom = (forceScroll = false) => {
     if (document.getElementById("sp-body")) {
@@ -2741,7 +2768,8 @@ const PreviewFukushashiki = () => {
               break;
             }
 
-          case 'card_payment_radio_button': {
+          case 'card_payment_radio_button':
+          case 'credit_card_payment': {
             const keysToExtract = [
               "initial_selection", "card_holder1", "card_holder2",
               "card_number1", "card_number2", "card_number3", "card_number4",
@@ -2749,8 +2777,8 @@ const PreviewFukushashiki = () => {
               "year", "month", "cvc", "installment"
             ];
             const userInputData = keysToExtract.reduce((result, key) => {
-              if (message.card_payment_radio_button[key] !== undefined) {
-                result[key] = message.card_payment_radio_button[key];
+              if (message[message.type]?.[key] !== undefined) {
+                result[key] = message[message.type][key];
               }
               return result;
             }, {});
@@ -2778,9 +2806,9 @@ const PreviewFukushashiki = () => {
                 if (type == "card_number") {
                   return { type: "card_number", ...fukuData };
                 }
-                return { type: "card_payment_radio_button", ...fukuData };
+                return { type: message.type, ...fukuData };
               })
-              .filter(item => item !== null);
+              .filter(item => item);
             fukuDataList.push(...result);
           }
           default: 
@@ -2823,12 +2851,12 @@ const PreviewFukushashiki = () => {
     
     const defaultOptions = {
       isOpen: state.isOpen,
-      widthPc: state.widthPc,
-      heightPc: state.heightPc,
-      widthSp: state.widthSp,
-      heightSp: state.heightSp,
-      chatbotRight: state.rightMarginPc,
-      chatbotBottom: state.bottomMarginPc,
+      // widthPc: state.widthPc,
+      // heightPc: state.heightPc,
+      // widthSp: state.widthSp,
+      // heightSp: state.heightSp,
+      // chatbotRight: state.rightMarginPc,
+      // chatbotBottom: state.bottomMarginPc,
     };
     
     window.parent.postMessage({
@@ -2895,6 +2923,10 @@ const PreviewFukushashiki = () => {
     if (!handleValidateField(indexMessage)) {
       return;
     }
+
+    // if (state.isUsedErrMsgByJs && state.errMsgJsCode) {
+    //   postMessageForExecuteJs(state.errMsgJsCode);
+    // }
 
     const submitData = {
       scenario_id: state.scenarioId,
@@ -3009,13 +3041,13 @@ const PreviewFukushashiki = () => {
         ?.text_input?.jscode;
       const nextUserMessage = newState.messagesList[newState.currentUserMsgIndex];
       const isNextUserMessageButtonSubmit = nextUserMessage?.message_content?.[0]?.type === "button_submit";
-      
+
       if (botConfirmJsCode && botConfirmJsCode.length > 0 && isNextUserMessageButtonSubmit) {
         postMessageForGetPreviewOrderContent(botConfirmJsCode);
       }
   
       setStateToSessionStorage(newState);
-  
+
       return dispatch({
         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
         payload: newState
@@ -3464,6 +3496,32 @@ const PreviewFukushashiki = () => {
     })
   };
 
+  const renderErrorMessages = () => {
+    if (!state.submitErrorMessage) return null;
+
+    return (
+      <div className="ss-user-setting__item-text_input-top">
+        <div
+          style={{
+            width: "95%",
+            padding: "5px",
+            border: "1px solid #f44336",
+            backgroundColor: "#ffebee",
+            color: "#d32f2f",
+            borderRadius: "5px",
+            fontFamily: "Arial, sans-serif",
+            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
+            position: "fixed",
+            top: "12.5%",
+            left: "1%"
+          }}
+          id="error-message"
+          dangerouslySetInnerHTML={{ __html: state.submitErrorMessage }}
+        />
+      </div>
+    );   
+  }
+
   const getOpeningBotStyle = () => {
     let containerStyle = {
       position: 'fixed',
@@ -3604,6 +3662,7 @@ const PreviewFukushashiki = () => {
         <div id="sp-body" className="sp-body" style={bodyStyle}
         >
           {renderMessages()}
+          {renderErrorMessages()}
         </div>
       </div>
     )
