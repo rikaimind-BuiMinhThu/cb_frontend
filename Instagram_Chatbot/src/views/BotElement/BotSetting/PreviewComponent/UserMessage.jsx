@@ -273,6 +273,24 @@ const UserMessage = ({
           productPurchase.initial_selection,
           "initial_selection"
         );
+      } else if (content.type === "pull_down") {
+        let pullDown = content.pull_down;
+        let attrs = {};
+        if (pullDown.type === "date_ym" || pullDown.type === "dob_ym") {
+          attrs = {year: "valueYear", month: "valueMonth"};
+        } else if (pullDown.type === "date_ymd" || pullDown.type === "dob_ymd" || pullDown.type === "fixed_date"
+        ) {
+          attrs = {year: "valueYear", month: "valueMonth", day: "valueDay"};
+        } else if (pullDown.type === "date_md") {
+          attrs = {month: "valueMonth", day: "valueDay"};
+        }
+        Object.keys(attrs).forEach((key) => {
+          const initValue = pullDown[pullDown.type][key];
+          const currentValue = pullDown[pullDown.type][attrs[key]];
+          if (!currentValue && initValue) {
+            onChangeValue(indexContent, content.type, initValue, pullDown.type, attrs[key]);
+          }
+        });
       }
     });
   }, []);
