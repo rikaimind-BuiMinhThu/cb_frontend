@@ -82,7 +82,7 @@ const postToChatBotServer = (url, data) => {
         if (resolve) resolve(res);
       })
       .catch((error) => {
-        if (error.response?.data.code === 0) tokenExpired();
+        if (error.response?.data?.code === 0) tokenExpired();
         if (reject) reject(error);
         console.error(error);
       });
@@ -111,7 +111,7 @@ const getToChatBotServer = (url) => {
         if (resolve) resolve(res);
       })
       .catch((error) => {
-        if (error.response?.data.code === 0) tokenExpired();
+        if (error.response?.data?.code === 0) tokenExpired();
         if (reject) reject(error);
         console.error(error);
       });
