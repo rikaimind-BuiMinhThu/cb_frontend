@@ -3497,7 +3497,7 @@ const PreviewFukushashiki = () => {
   };
 
   const renderErrorMessages = () => {
-    if (!state.submitErrorMessage) return null;
+    if (!state.isUsedErrMsgByJs || !state.submitErrorMessage) return null;
 
     return (
       <div className="ss-user-setting__item-text_input-top">
