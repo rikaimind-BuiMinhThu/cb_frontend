@@ -2924,6 +2924,8 @@ const PreviewFukushashiki = () => {
       return;
     }
 
+    newState.errors = {};
+
     // if (state.isUsedErrMsgByJs && state.errMsgJsCode) {
     //   postMessageForExecuteJs(state.errMsgJsCode);
     // }
