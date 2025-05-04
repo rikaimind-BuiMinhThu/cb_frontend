@@ -7973,8 +7973,11 @@ const Scenario = () => {
                                                       <div className="ss-user-setting__item-text_input-top">
                                                         <CheckboxCustom
                                                           label="エラー発生の時に表示しない"
-                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'not_display_when_have_error')}
-                                                          value={attachingFile.not_display_when_have_error}
+                                                          onChange={(value) => {
+                                                            dataMessages[indexMessageSelect].not_display_when_have_error = value;
+                                                            setDataMessages([...dataMessages]);
+                                                          }}
+                                                          value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                                         />
                                                         <CheckboxCustom
                                                           label="入力された内容を変数に保存する。"
@@ -8034,8 +8037,11 @@ const Scenario = () => {
                                                       <div className="ss-user-setting__item-text_input-top">
                                                         <CheckboxCustom
                                                           label="エラー発生の時に表示しない"
-                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'not_display_when_have_error')}
-                                                          value={calendar.not_display_when_have_error}
+                                                          onChange={(value) => {
+                                                            dataMessages[indexMessageSelect].not_display_when_have_error = value;
+                                                            setDataMessages([...dataMessages]);
+                                                          }}
+                                                          value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                                         />
                                                         <CheckboxCustom
                                                           label="入力された内容を変数に保存する。"
@@ -10066,9 +10072,11 @@ const Scenario = () => {
                                                       <div className="ss-user-setting__item-text_input-top">
                                                         <CheckboxCustom
                                                           label="エラー発生の時に表示しない"
-                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'not_display_when_have_error')}
-                                                          value={carousel.not_display_when_have_error}
-                                                          isOnChange={false}
+                                                          onChange={(value) => {
+                                                            dataMessages[indexMessageSelect].not_display_when_have_error = value;
+                                                            setDataMessages([...dataMessages]);
+                                                          }}
+                                                          value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                                         />
                                                         <CheckboxCustom
                                                           label="入力された内容を変数に保存する。"
@@ -10288,8 +10296,11 @@ const Scenario = () => {
                                                       <div className="ss-user-setting__item-text_input-top">
                                                         <CheckboxCustom
                                                           label="エラー発生の時に表示しない"
-                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'not_display_when_have_error')}
-                                                          value={creditCardPayment.not_display_when_have_error}
+                                                          onChange={(value) => {
+                                                            dataMessages[indexMessageSelect].not_display_when_have_error = value;
+                                                            setDataMessages([...dataMessages]);
+                                                          }}
+                                                          value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                                         />
                                                         <CheckboxCustom
                                                           label="入力された内容を変数に保存する。"
