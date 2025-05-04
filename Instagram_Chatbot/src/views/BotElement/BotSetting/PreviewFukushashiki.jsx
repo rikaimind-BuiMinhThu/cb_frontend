@@ -142,22 +142,16 @@ const PreviewFukushashikiReducer = (state, action) => {
     case PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES:
       return { ...state, renderMessagesList: action.payload };
     case PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE:
-      const messagesList = _.cloneDeep(state.messagesList);
-
       if (action.payload === NO_ERROR) {
-        for (let i = state.currentMsgIndex + 1; i > 0; i--) {
-          const message = messagesList[i];
-          if (message.message_content?.find(content => content.type === 'getting_error_notification')) {
-            message.hidden = true;
-          }
-        }
-      } else {
-        messagesList.forEach(message => {
-          if (message.hidden === false) {
-            message.hidden = action.payload && message.not_display_when_have_error;
-          }
-        });
+        return { ...state, submitErrorMessage: action.payload };
       }
+
+      const messagesList = _.cloneDeep(state.messagesList);
+      messagesList.forEach(message => {
+        if (!message.hidden) {
+          message.hidden = action.payload && message.not_display_when_have_error;
+        }
+      });
 
       const renderMessagesList = messagesList.slice(0, state.currentMsgIndex + 1)
       const userMessagesList = messagesList.filter(message => message.belong_to === 'user' && message.message_content.length > 0);
@@ -912,7 +906,6 @@ const PreviewFukushashiki = () => {
     };
 
     if (newState.isUsedErrMsgByJs && newState.errMsgJsCode) {
-      console.log("Run js code: ", newState.errMsgJsCode);
       postMessageForExecuteJs(newState.errMsgJsCode);
     }
 
@@ -1027,7 +1020,6 @@ const PreviewFukushashiki = () => {
           document.head.appendChild(style);
         }
         if (savedState.isUsedErrMsgByJs && savedState.errMsgJsCode) {
-          console.log("Run js code: ", savedState.errMsgJsCode);
           postMessageForExecuteJs(savedState.errMsgJsCode);
         }
         if (isLoggedIn) {
@@ -2924,7 +2916,7 @@ const PreviewFukushashiki = () => {
   }
 
   const onClickNext = async (indexMessage, message) => {
-    let newState = { ...state };
+    let newState = _.omit(state, ['submitErrorMessage']);
     let clickedMsgIndex = newState.messagesList.findIndex((msg) => msg?.id === message?.id);
     if (clickedMsgIndex < 0) clickedMsgIndex = newState.currentMsgIndex;
     newState.userMessagesList = newState.messagesList.filter((item) => isUserMessage(item));
