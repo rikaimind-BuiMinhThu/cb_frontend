@@ -152,7 +152,7 @@ const PreviewFukushashikiReducer = (state, action) => {
           message.hidden = action.payload && message.not_display_when_have_error;
         }
       });
-      const renderMessagesList = messagesList.slice(0, newState.currentMsgIndex + 1)
+      const renderMessagesList = messagesList.slice(0, state.currentMsgIndex + 1)
       return { ...state,
         messagesList: messagesList,
         renderMessagesList: renderMessagesList,
