@@ -148,7 +148,7 @@ const PreviewFukushashikiReducer = (state, action) => {
 
       const messagesList = _.cloneDeep(state.messagesList);
       messagesList.forEach(message => {
-        if (!message.hidden) {
+        if (message.hidden === false) {
           message.hidden = action.payload && message.not_display_when_have_error;
         }
       });
