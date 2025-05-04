@@ -153,9 +153,11 @@ const PreviewFukushashikiReducer = (state, action) => {
         }
       });
       const renderMessagesList = messagesList.slice(0, state.currentMsgIndex + 1)
+      const userMessagesList = messagesList.filter(message => message.belong_to === 'user' && message.message_content.length > 0);
       return { ...state,
         messagesList: messagesList,
         renderMessagesList: renderMessagesList,
+        userMessagesList: userMessagesList,
         submitErrorMessage: action.payload
       };
   }
@@ -2932,7 +2934,7 @@ const PreviewFukushashiki = () => {
     let newState = { ...state };
     let clickedMsgIndex = newState.messagesList.findIndex((msg) => msg?.id === message?.id);
     if (clickedMsgIndex < 0) clickedMsgIndex = newState.currentMsgIndex;
-    newState.userMessagesList = newState.messagesList.filter((item) => isUserMessage(item));   
+    newState.userMessagesList = newState.messagesList.filter((item) => isUserMessage(item));
     const clickedMsg = newState.messagesList[clickedMsgIndex];
 
     if (!handleValidateField(indexMessage)) {
