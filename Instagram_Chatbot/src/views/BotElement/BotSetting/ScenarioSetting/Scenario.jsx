@@ -2315,6 +2315,9 @@ const Scenario = () => {
               text_input: {
                 use_for_confirm_message: false,
               },
+              getting_error_notification: {
+                use_for_confirm_message: false,
+              },
               email: {},
               file: {},
               script: {},
@@ -2795,6 +2798,7 @@ const Scenario = () => {
                                   else if (content.type === 'clear_variable') { titleMessage = "変数クリア" }
                                   else if (content.type === 'variable_set') { titleMessage = "変数セット" }
                                   else if (content.type === 'pause') { titleMessage = "一時停止" }
+                                  else if (content.type === 'getting_error_notification') { titleMessage = "エラー取得の通知" }
                                 }
 
                                 return message.belong_to === 'bot' ? (
@@ -2821,7 +2825,8 @@ const Scenario = () => {
                                                     {message.message_name && <div className="ss-sub-title-message ss-truncation-text" style={{ backgroundColor: '#fff', maxWidth: '60%' }}>{message.message_name}</div>}
                                                   </div>
                                                   {/* bot: type == 'text_input' */}
-                                                  {content.type === 'text_input' && (
+                                                  {/* bot: type == 'getting_error_notification' */}
+                                                  {(content.type === 'text_input' || content.type === 'getting_error_notification') && (
                                                     // <textarea
                                                     //   className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
                                                     //   value={content[content.type]?.content || ''}
@@ -5320,6 +5325,7 @@ const Scenario = () => {
                                 onChange={e => handleChangeBotStatementType(e.target.value)}
                               >
                                 <option value="text_input">テキスト</option>
+                                <option value="getting_error_notification">エラー取得の通知</option>
                                 <option value="file">ファイル</option>
                                 <option value="email">メール</option>
                                 <option value="api_linkage">API連携</option>
@@ -5332,7 +5338,8 @@ const Scenario = () => {
                               </select>
 
                               {/* type: text_input */}
-                              {messageType === 'text_input' && (
+                              {/* type == 'getting_error_notification' */}
+                              {(messageType === 'text_input' || messageType === 'getting_error_notification') && (
                                 <div className="ss-bot-statement-wrapper">
                                   <div
                                     id="ss-bot-statement-type-text"
