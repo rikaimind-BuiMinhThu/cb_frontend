@@ -141,7 +141,7 @@ const PreviewFukushashikiReducer = (state, action) => {
       return { ...state, isOpen: action.payload.isOpen, showPopupCloseBot: action.payload.showPopupCloseBot };
     case PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES:
       return { ...state, renderMessagesList: action.payload };
-    case PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE:
+    case PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE: {
       let messagesList = _.cloneDeep(state.messagesList);
 
       if (action.payload === NO_ERROR) {
@@ -168,6 +168,7 @@ const PreviewFukushashikiReducer = (state, action) => {
         userMessagesList: userMessagesList,
         submitErrorMessage: action.payload
       };
+    }
   }
 
   return state;
@@ -3452,15 +3453,22 @@ const PreviewFukushashiki = () => {
             indexMessage={indexMessage}
             errorsProps={state.errors}
             displayButtonNext={(value) => {
-              if (!state.messagesList[state.currentMsgIndex]) return;
-              let newMessagesList = [...state.messagesList];
-              newMessagesList[state.currentMsgIndex].is_display_button_next = value;
-              dispatch({
-                type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-                payload: {
-                  messagesList: [...newMessagesList],
-                }
-              });
+              // dispatch({
+              //   type: PREVIEW_ACTIONS.UPDATE_DISPLAY_BUTTON_NEXT,
+              //   payload: {
+              //     nextButtonStatus: value,
+              //     msgIndex: indexMessage
+              //   }
+              // });
+              // // if (!state.messagesList[state.currentMsgIndex]) return;
+              // // let newMessagesList = [...state.messagesList];
+              // // newMessagesList[state.currentMsgIndex].is_display_button_next = value;
+              // // dispatch({
+              // //   type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+              // //   payload: {
+              // //     messagesList: [...newMessagesList],
+              // //   }
+              // // });
             }}
             prefecturesList={[...state.prefecturesList]}
             isPopUpZipCode={(isOpen, indexContent) =>

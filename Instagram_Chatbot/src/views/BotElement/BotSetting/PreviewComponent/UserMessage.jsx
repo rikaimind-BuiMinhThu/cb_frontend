@@ -116,7 +116,7 @@ const UserMessage = ({
     )
   };
 
-  useEffect(() => {
+  const buttonNextStatus = (indexMessage) => {
     if (messageContent.length === 1) {
       let message = messageContent[0];
       if (
@@ -146,7 +146,7 @@ const UserMessage = ({
     } else {
       displayButtonNext(true);
     }
-  }, []);
+  }
 
   useEffect(() => {
     setErrors(errorsProps);
