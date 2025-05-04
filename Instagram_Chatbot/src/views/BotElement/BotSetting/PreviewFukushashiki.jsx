@@ -2999,7 +2999,7 @@ const PreviewFukushashiki = () => {
           const result = checkMessageCondition(newState.messagesList[i], newState.objParam);
           newState.messagesList[i].hidden = !result;
         }
-        if (newState.messagesList[i].hidden && newState.messagesList[i].hidden !== undefined) continue;
+        if (newState.messagesList[i].hidden && !stringNullOrEmpty(newState.messagesList[i].hidden)) continue;
 
         if (isBotMessage(newState.messagesList[i])) {
           newState = {
@@ -3507,7 +3507,7 @@ const PreviewFukushashiki = () => {
 
   const renderMessages = () => {
     return state.renderMessagesList.map((message, indexMessage) => {
-      if (message.hidden && message.hidden !== undefined) return null;
+      if (message.hidden && !stringNullOrEmpty(message.hidden)) return null;
       return (
         <React.Fragment key={indexMessage}>
           {renderBotMessageContent(message, indexMessage)}
