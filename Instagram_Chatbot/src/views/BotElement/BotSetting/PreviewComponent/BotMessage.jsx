@@ -110,7 +110,8 @@ const BotMessage = ({
         {content && (
           <React.Fragment>
             {/* bot: type == 'text_input' */}
-            {content.type === "text_input" && (
+            {/* bot: type == 'getting_error_notification' */}
+            {(content.type === "text_input" || content.type === "getting_error_notification") && (
               <div className="position-relative">
                 <div
                   className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value position-relative`}
