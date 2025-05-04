@@ -142,16 +142,23 @@ const PreviewFukushashikiReducer = (state, action) => {
     case PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES:
       return { ...state, renderMessagesList: action.payload };
     case PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE:
-      if (action.payload === NO_ERROR) {
-        return { ...state, submitErrorMessage: action.payload };
-      }
+      let messagesList = _.cloneDeep(state.messagesList);
 
-      const messagesList = _.cloneDeep(state.messagesList);
-      messagesList.forEach(message => {
-        if (!message.hidden) {
-          message.hidden = action.payload && message.not_display_when_have_error;
-        }
-      });
+      if (action.payload === NO_ERROR) {
+        messagesList = messagesList.map((message, index) => {
+          if (message.message_content.find(content => content.type === 'getting_error_notification') && index < state.currentMsgIndex) {
+            message.hidden = true;
+          }
+          return message;
+        });
+      } else {
+        messagesList = messagesList.map((message, index) => {
+          if (!message.hidden) {
+            message.hidden = action.payload && message.not_display_when_have_error;
+          }
+          return message;
+        });
+      }
 
       const renderMessagesList = messagesList.slice(0, state.currentMsgIndex + 1)
       const userMessagesList = messagesList.filter(message => message.belong_to === 'user' && message.message_content.length > 0);
