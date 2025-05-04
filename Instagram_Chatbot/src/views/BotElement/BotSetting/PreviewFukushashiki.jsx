@@ -132,7 +132,11 @@ const PREVIEW_ACTIONS = {
 const PreviewFukushashikiReducer = (state, action) => {
   switch (action.type) {
     case PREVIEW_ACTIONS.UPDATE_MULTI_STATE:
-      return { ...state, ...(action.payload) };
+      const startIndex = action.payload.startIndex || 0;
+      const endIndex = action.payload.endIndex || state.currentMsgIndex + 1;
+      const newRenderMessagesList = state.messagesList.slice(startIndex, endIndex);
+      return { ...state, ...(action.payload), renderMessagesList: newRenderMessagesList };
+
     case PREVIEW_ACTIONS.ADD_LP_OPTION_DATA:
       return { ...state, lpOptionData: { ...state.lpOptionData, ...action.payload } };
     case PREVIEW_ACTIONS.UPDATE_PREVIEW_ORDER_CONTENT:
@@ -140,7 +144,10 @@ const PreviewFukushashikiReducer = (state, action) => {
     case PREVIEW_ACTIONS.UPDATE_OPEN_PREVIEW:
       return { ...state, isOpen: action.payload.isOpen, showPopupCloseBot: action.payload.showPopupCloseBot };
     case PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES:
-      return { ...state, renderMessagesList: action.payload };
+      return {
+        ...state,
+        renderMessagesList: state.messagesList.slice(action.payload.startIndex, action.payload.endIndex)
+      };
     case PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE: {
       let messagesList = _.cloneDeep(state.messagesList);
 
@@ -3023,7 +3030,10 @@ const PreviewFukushashiki = () => {
         
         dispatch({
           type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
-          payload: newState.renderMessagesList
+          payload: {
+            startIndex: 0,
+            endIndex: i + 1
+          }
         });
         await sleep(500);
       }
@@ -3056,7 +3066,11 @@ const PreviewFukushashiki = () => {
       setStateToSessionStorage(newState);
       return dispatch({
         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-        payload: newState
+        payload: {
+          ..._.pick(newState, ['passedUserMsgCount', 'currentUserMsgIndex', 'currentMsgIndex']),
+          startIndex: 0,
+          endIndex: newState.currentMsgIndex + 1
+        }
       });
     });
   };
