@@ -151,14 +151,14 @@ const PreviewFukushashikiReducer = (state, action) => {
             message.hidden = true;
           }
         }
-        return { ...state, submitErrorMessage: action.payload, messagesList: messagesList };
+      } else {
+        messagesList.forEach(message => {
+          if (message.hidden === false) {
+            message.hidden = action.payload && message.not_display_when_have_error;
+          }
+        });
       }
 
-      messagesList.forEach(message => {
-        if (message.hidden === false) {
-          message.hidden = action.payload && message.not_display_when_have_error;
-        }
-      });
       const renderMessagesList = messagesList.slice(0, state.currentMsgIndex + 1)
       const userMessagesList = messagesList.filter(message => message.belong_to === 'user' && message.message_content.length > 0);
       return { ...state,
