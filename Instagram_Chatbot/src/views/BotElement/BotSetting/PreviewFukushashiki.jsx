@@ -920,7 +920,7 @@ const PreviewFukushashiki = () => {
     }
 
     if (isLoggedIn) {
-      newState.messagesList.forEach((x) => x.hidden = x.not_display_when_logged_in);
+      newState.messagesList.forEach((x) => x.hidden = x.not_display_when_logged_in || (newState.submitErrorMessage && x.not_display_when_have_error));
     }
     
     newState.variablesList = res.data?.all_variables || [];
@@ -1014,7 +1014,7 @@ const PreviewFukushashiki = () => {
           postMessageForExecuteJs(savedState.errMsgJsCode);
         }
         if (isLoggedIn) {
-          savedState.messagesList.forEach((x) => x.hidden = !!x?.not_display_when_logged_in);
+          savedState.messagesList.forEach((x) => x.hidden = !!x?.not_display_when_logged_in || (savedState.submitErrorMessage && !!x?.not_display_when_have_error));
           savedState.currentMsgIndex = savedState.messagesList.findIndex((item) => isUserMessage(item) && item.hidden == false);
           savedState.renderMessagesList = savedState.messagesList.slice(0, savedState.currentMsgIndex + 1);
           savedState.renderMessagesList = savedState.renderMessagesList.map((msg) => {
@@ -2966,7 +2966,7 @@ const PreviewFukushashiki = () => {
     }
 
     if (isLoggedIn) {
-      newState.messagesList.forEach(x => x.hidden = x.not_display_when_logged_in);
+      newState.messagesList.forEach(x => x.hidden = x.not_display_when_logged_in || (newState.submitErrorMessage && x.not_display_when_have_error));
     }
 
     // Update next messages list after clicked next
