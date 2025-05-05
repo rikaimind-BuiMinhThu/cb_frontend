@@ -113,6 +113,7 @@ const CHATBOT_ACTIONS = {
   EXCUTE_JS: 'excuteJS',
   FUKUSHASHIKI: 'fukushashiki',
   GET_ERROR_MESSAGE: 'getErrorMessage',
+  GET_ERROR_MESSAGE_WITH_DISPLAY_MSG: 'getErrorMessageWithDisplayMsg',
   CRAWL_DATA: 'crawlData',
   OPEN_PREVIEW: 'openPreview',
   GET_PREVIEW_ORDER_CONTENT: 'getPreviewOrderContent',
