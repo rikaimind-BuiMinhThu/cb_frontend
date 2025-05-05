@@ -132,7 +132,8 @@ const PREVIEW_ACTIONS = {
   ADD_LP_OPTION_DATA: "ADD_LP_OPTION_DATA",
   UPDATE_PREVIEW_ORDER_CONTENT: "UPDATE_PREVIEW_ORDER_CONTENT",
   UPDATE_OPEN_PREVIEW: "UPDATE_OPEN_PREVIEW",
-  UPDATE_SUBMIT_ERROR_MESSAGE: "UPDATE_SUBMIT_ERROR_MESSAGE"
+  UPDATE_SUBMIT_ERROR_MESSAGE: "UPDATE_SUBMIT_ERROR_MESSAGE",
+  UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG: "UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG"
 };
 
 const PreviewFukushashikiReducer = (state, action) => {
@@ -178,6 +179,27 @@ const PreviewFukushashikiReducer = (state, action) => {
         renderMessagesList: renderMessagesList,
         userMessagesList: userMessagesList,
         submitErrorMessage: action.payload
+      };
+    }
+
+    case PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG: {
+      let messagesList = _.cloneDeep(state.messagesList);
+
+      if ((action.payload.displayMsg || []).length > 0) {
+        messagesList = messagesList.map((message, index) => {
+          if (action.payload.displayMsg.includes(message.name?.trim())) {
+            message.hidden = false;
+          }
+          return message;
+        });
+      }
+      const renderMessagesList = messagesList.slice(0, state.currentMsgIndex + 1)
+      const userMessagesList = messagesList.filter(message => message.belong_to === 'user' && message.message_content.length > 0);
+      return { ...state,
+        messagesList: messagesList,
+        renderMessagesList: renderMessagesList,
+        userMessagesList: userMessagesList,
+        submitErrorMessage: action.payload.error
       };
     }
   }
@@ -297,6 +319,17 @@ const PreviewFukushashiki = () => {
           type: PREVIEW_ACTIONS.ADD_LP_OPTION_DATA,
           payload: receiveOptionData
         });
+
+      case CHATBOT_ACTIONS.GET_ERROR_MESSAGE_WITH_DISPLAY_MSG: {
+        const error = actionData.error === NO_ERROR ? "" : actionData.error;
+        return dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG,
+          payload: {
+            error: error,
+            displayMsg: actionData.displayMsg
+          }
+        });
+      }
 
       case CHATBOT_ACTIONS.GET_ERROR_MESSAGE:
         await sleep(1000);
