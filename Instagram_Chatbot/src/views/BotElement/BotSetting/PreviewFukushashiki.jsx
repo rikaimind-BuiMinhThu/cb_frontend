@@ -3570,7 +3570,7 @@ const PreviewFukushashiki = () => {
     }
 
     if (!state.activePopupCloseBot) {
-      containerStyle.height = `${state.heightPc || 600}px`;
+      containerStyle.height = mobileCheck() ? `${state.heightSp || 100}%` : `${state.heightPc || 600}px`;
       headerStyle = {
         ...headerStyle,
         position: "static",
