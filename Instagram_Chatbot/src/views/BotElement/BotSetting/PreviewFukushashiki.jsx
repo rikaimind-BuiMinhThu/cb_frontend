@@ -153,6 +153,7 @@ const PreviewFukushashikiReducer = (state, action) => {
           if (message.message_content.find(content => content.type === 'getting_error_notification') && index < state.currentMsgIndex) {
             message.hidden = true;
           }
+          if (message.hidden_when_has_error) message.hidden = false;
           return message;
         });
       } else {
