@@ -2988,6 +2988,10 @@ const PreviewFukushashiki = () => {
           newState.messagesList[i].hidden = true;
           continue;
         }
+
+        if (newState.messagesList[i].hidden_when_has_error) {
+          newState.messagesList[i].hidden = newState.submitErrorMessage.length > 0;
+        }
       }
     }
     if (isUserMessage(nextMessage) || isBotMessage(nextMessage)) {
