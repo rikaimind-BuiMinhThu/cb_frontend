@@ -150,10 +150,10 @@ const PreviewFukushashikiReducer = (state, action) => {
 
       if (stringNullOrEmpty(action.payload)) {
         messagesList = messagesList.map((message, index) => {
-          if (message.message_content.find(content => content.type === 'getting_error_notification') && index < state.currentMsgIndex) {
+          if (message.message_content.find(content => content.type === 'getting_error_notification' || content.type === 'delay') && index < state.currentMsgIndex) {
             message.hidden = true;
-          }
-          if (message.not_display_when_have_error) message.hidden = false;
+          } else if (message.not_display_when_have_error)
+            message.hidden = false;
           return message;
         });
       } else {
