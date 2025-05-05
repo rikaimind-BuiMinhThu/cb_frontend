@@ -3530,10 +3530,12 @@ const PreviewFukushashiki = () => {
     let backgroundColor = "#ffebee";
     let color = "#d32f2f";
     let text = state.submitErrorMessage;
+    let borderColor = "#f44336";
     if (state.submitErrorMessage === GETTING_ERROR_NOTIFICATION) {
       backgroundColor = "#0000FF";
       color = "#FFFFFF";
-      text = "処理中";
+      text = "処理中...";
+      borderColor = "#8bc34a";
     }
     return (
       <div className="ss-user-setting__item-text_input-top">
@@ -3541,7 +3543,7 @@ const PreviewFukushashiki = () => {
           style={{
             width: "95%",
             padding: "5px",
-            border: "1px solid #f44336",
+            border: `1px solid ${borderColor}`,
             backgroundColor: backgroundColor,
             color: color,
             borderRadius: "5px",
