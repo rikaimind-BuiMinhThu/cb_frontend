@@ -23,7 +23,13 @@ import iconMessagePink from "../../../assets/img/icon-mess/icon-message-chat-pin
 import iconMessagePurple from "../../../assets/img/icon-mess/icon-message-chat-purple.png";
 import iconMessageBlack from "../../../assets/img/icon-mess/icon-message-chat-black.png";
 import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-white.png";
-import { CHATBOT_ACTIONS, MESSAGE_CONTENT_TYPES, SESSION_STORAGE_KEY, NO_ERROR } from "./PreviewComponent/Constants";
+import {
+  CHATBOT_ACTIONS,
+  MESSAGE_CONTENT_TYPES,
+  SESSION_STORAGE_KEY,
+  NO_ERROR,
+  GETTING_ERROR_NOTIFICATION
+} from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
   lightenColor,
@@ -156,7 +162,7 @@ const PreviewFukushashikiReducer = (state, action) => {
             message.hidden = false;
           return message;
         });
-      } else {
+      } else if (action.payload !== GETTING_ERROR_NOTIFICATION) {
         messagesList = messagesList.map((message, index) => {
           if (!message.hidden) {
             message.hidden = action.payload && message.not_display_when_have_error;
@@ -3442,7 +3448,7 @@ const PreviewFukushashiki = () => {
             postMessageToParent={postMessageToParent}
             captcha={state.captcha}
             messageContentProps={message.message_content}
-            disabled={state.submitErrorMessage.length > 0 ? false : message.disabled}
+            disabled={(state.submitErrorMessage.length > 0 && state.submitErrorMessage !== GETTING_ERROR_NOTIFICATION) ? false : message.disabled}
             onChangeValue={(
               indexContent,
               contentType,
@@ -3497,7 +3503,7 @@ const PreviewFukushashiki = () => {
             }
             variables={state.variables}
             lpOptionData={state.lpOptionData}
-            submitErrorMessage={state.submitErrorMessage}
+            submitErrorMessage={state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "" : state.submitErrorMessage}
             botId={state.botId}
           />
           {renderNextButton(message, indexMessage)}
@@ -3521,6 +3527,14 @@ const PreviewFukushashiki = () => {
   const renderErrorMessages = () => {
     if (!state.isUsedErrMsgByJs || !state.submitErrorMessage) return null;
 
+    let backgroundColor = "#ffebee";
+    let color = "#d32f2f";
+    let text = state.submitErrorMessage;
+    if (state.submitErrorMessage === GETTING_ERROR_NOTIFICATION) {
+      backgroundColor = "#0000FF";
+      color = "#FFFFFF";
+      text = "処理中";
+    }
     return (
       <div className="ss-user-setting__item-text_input-top">
         <div
@@ -3528,8 +3542,8 @@ const PreviewFukushashiki = () => {
             width: "95%",
             padding: "5px",
             border: "1px solid #f44336",
-            backgroundColor: "#ffebee",
-            color: "#d32f2f",
+            backgroundColor: backgroundColor,
+            color: color,
             borderRadius: "5px",
             fontFamily: "Arial, sans-serif",
             boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
@@ -3538,7 +3552,7 @@ const PreviewFukushashiki = () => {
             left: "1%"
           }}
           id="error-message"
-          dangerouslySetInnerHTML={{ __html: state.submitErrorMessage }}
+          dangerouslySetInnerHTML={{ __html: text }}
         />
       </div>
     );   

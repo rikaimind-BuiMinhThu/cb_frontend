@@ -106,6 +106,7 @@ const CRAWL_ELEMENT_TYPES = {
 };
 
 const NO_ERROR = 'NO_ERROR';
+const GETTING_ERROR_NOTIFICATION = 'getting_error_notification';
 
 const CHATBOT_ACTIONS = {
   CLICK_BUTTON: 'clickButton',
@@ -162,4 +163,5 @@ export {
   SEARCH_MODES,
   MESSAGE_CONTENT_TYPES,
   NO_ERROR,
+  GETTING_ERROR_NOTIFICATION
 };
