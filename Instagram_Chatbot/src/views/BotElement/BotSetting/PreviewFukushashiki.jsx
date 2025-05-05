@@ -3017,7 +3017,10 @@ const PreviewFukushashiki = () => {
     }
 
     newState.currentUserMsgIndex = newState.messagesList.findIndex((item, index) => !item.hidden && isUserMessage(item) && index > clickedMsgIndex);
-    newState.currentMsgIndex = newState.currentUserMsgIndex;
+    if (newState.currentUserMsgIndex === -1)
+      newState.currentUserMsgIndex = newState.messagesList.length - 1;
+    else
+      newState.currentMsgIndex = newState.currentUserMsgIndex;
     
     const isBtnUpdateClick = indexMessage < newState.renderMessagesList.length - 1;
 
