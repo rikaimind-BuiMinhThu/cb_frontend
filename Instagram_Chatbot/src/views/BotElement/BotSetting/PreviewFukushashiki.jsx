@@ -153,7 +153,7 @@ const PreviewFukushashikiReducer = (state, action) => {
           if (message.message_content.find(content => content.type === 'getting_error_notification') && index < state.currentMsgIndex) {
             message.hidden = true;
           }
-          if (message.hidden_when_has_error) message.hidden = false;
+          if (message.not_display_when_have_error) message.hidden = false;
           return message;
         });
       } else {
@@ -2990,7 +2990,7 @@ const PreviewFukushashiki = () => {
           continue;
         }
 
-        if (newState.messagesList[i].hidden_when_has_error) {
+        if (newState.messagesList[i].not_display_when_have_error) {
           newState.messagesList[i].hidden = newState.submitErrorMessage.length > 0;
         }
       }
