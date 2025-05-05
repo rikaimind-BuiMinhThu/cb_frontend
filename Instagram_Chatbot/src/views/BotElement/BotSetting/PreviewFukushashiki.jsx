@@ -148,7 +148,7 @@ const PreviewFukushashikiReducer = (state, action) => {
     case PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE: {
       let messagesList = _.cloneDeep(state.messagesList);
 
-      if (action.payload === NO_ERROR) {
+      if (stringNullOrEmpty(action.payload)) {
         messagesList = messagesList.map((message, index) => {
           if (message.message_content.find(content => content.type === 'getting_error_notification') && index < state.currentMsgIndex) {
             message.hidden = true;
@@ -293,9 +293,10 @@ const PreviewFukushashiki = () => {
 
       case CHATBOT_ACTIONS.GET_ERROR_MESSAGE:
         await sleep(1000);
+        const error = actionData === NO_ERROR ? "" : actionData;
         return dispatch({
           type: PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE,
-          payload: actionData
+          payload: error
         });
 
       case CHATBOT_ACTIONS.OPEN_PREVIEW:
