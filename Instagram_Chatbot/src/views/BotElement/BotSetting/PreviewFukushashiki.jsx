@@ -132,10 +132,7 @@ const PREVIEW_ACTIONS = {
 const PreviewFukushashikiReducer = (state, action) => {
   switch (action.type) {
     case PREVIEW_ACTIONS.UPDATE_MULTI_STATE:
-      const startIndex = action.payload.startIndex || 0;
-      const endIndex = action.payload.endIndex || state.currentMsgIndex + 1;
-      const newRenderMessagesList = state.messagesList.slice(startIndex, endIndex);
-      return { ...state, ...(action.payload), renderMessagesList: newRenderMessagesList };
+      return { ...state, ...(action.payload) };
 
     case PREVIEW_ACTIONS.ADD_LP_OPTION_DATA:
       return { ...state, lpOptionData: { ...state.lpOptionData, ...action.payload } };
@@ -3066,11 +3063,7 @@ const PreviewFukushashiki = () => {
       setStateToSessionStorage(newState);
       return dispatch({
         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-        payload: {
-          ..._.pick(newState, ['passedUserMsgCount', 'currentUserMsgIndex', 'currentMsgIndex']),
-          startIndex: 0,
-          endIndex: newState.currentMsgIndex + 1
-        }
+        payload: newState
       });
     });
   };
