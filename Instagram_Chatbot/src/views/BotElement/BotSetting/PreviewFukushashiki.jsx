@@ -2990,9 +2990,9 @@ const PreviewFukushashiki = () => {
           continue;
         }
 
-        if (newState.messagesList[i].not_display_when_have_error) {
-          newState.messagesList[i].hidden = newState.submitErrorMessage.length > 0;
-        }
+        // if (newState.messagesList[i].not_display_when_have_error) {
+        //   newState.messagesList[i].hidden = newState.submitErrorMessage.length > 0;
+        // }
       }
     }
     if (isUserMessage(nextMessage) || isBotMessage(nextMessage)) {
