@@ -270,11 +270,12 @@ const PreviewFukushashiki = () => {
   // Get chat bot setting
   useEffect(() => {
     if (!state.loadedStateFromSession) return;
-    if (state.titleBubble) return;
     if (!state.botId && params.get("bot_id")) {
       dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { botId: params.get("bot_id") } });
       return;
     }
+
+    if (state.displayType !== undefined && state.displayType !== null) return;
 
     getChatBotSetting(state.botId)
       .then((response) => {
@@ -308,7 +309,7 @@ const PreviewFukushashiki = () => {
         sessionStorage.setItem("chatbotRight", result?.right_margin_pc ? result?.right_margin_pc : 30);
         dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
       });
-  }, [state.botId, state.loadedStateFromSession, state.titleBubble]);
+  }, [state.botId, state.loadedStateFromSession, state.displayType]);
 
   const eventHandler = async (event) => {
     if (!event.data || !event.data.actionData) return;
