@@ -155,6 +155,10 @@ const PreviewFukushashikiReducer = (state, action) => {
     case PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE: {
       let messagesList = _.cloneDeep(state.messagesList);
 
+      if (action.payload === GETTING_ERROR_NOTIFICATION) {
+        return state;
+      }
+
       if (stringNullOrEmpty(action.payload)) {
         messagesList = messagesList.map((message, index) => {
           if (message.message_content.find(content => content.type === 'getting_error_notification' || content.type === 'delay') && index < state.currentMsgIndex) {
@@ -163,7 +167,7 @@ const PreviewFukushashikiReducer = (state, action) => {
             message.hidden = false;
           return message;
         });
-      } else if (action.payload !== GETTING_ERROR_NOTIFICATION) {
+      } else {
         messagesList = messagesList.map((message, index) => {
           if (!message.hidden) {
             message.hidden = action.payload && message.not_display_when_have_error;
