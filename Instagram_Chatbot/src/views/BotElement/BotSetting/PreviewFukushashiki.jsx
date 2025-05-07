@@ -45,6 +45,7 @@ import {
   sleep,
   stringNullOrEmpty,
   appendParamsToUrl,
+  checkMessageCondition
 } from "./PreviewComponent/Utils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
@@ -163,8 +164,10 @@ const PreviewFukushashikiReducer = (state, action) => {
         messagesList = messagesList.map((message, index) => {
           if (message.message_content.find(content => content.type === 'getting_error_notification' || content.type === 'delay') && index < state.currentMsgIndex) {
             message.hidden = true;
-          } else if (message.not_display_when_have_error)
-            message.hidden = false;
+          } else if (message.not_display_when_have_error) {
+            const result = checkMessageCondition(message, state.objParam);
+            message.hidden = !result;;
+          }
           return message;
         });
       } else {
@@ -422,43 +425,6 @@ const PreviewFukushashiki = () => {
         dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { showPopupCloseBot: false, isOpen: false } });
       }, 680)
     }
-  }
-
-  const checkMessageCondition = (message, buildParam) => {
-    if (message.conditions.length === 0) return false;
-
-    let checked = false;
-    for (let j = 0; j < message.conditions.length; j++) {
-      const conditionItem = message.conditions[j];
-      const buildParamValue = buildParam[conditionItem.nameCondition];
-      let subCheck = false;
-
-      switch (conditionItem.condition) {
-        case "include":
-          subCheck = buildParamValue.includes(conditionItem.inputCondition);
-          break;
-        case "is":
-          subCheck = buildParamValue == conditionItem.inputCondition;
-          break;
-        case "not_include":
-          subCheck = !buildParamValue.includes(conditionItem.inputCondition);
-          break;
-        case "is_not":
-          subCheck = buildParamValue != conditionItem.inputCondition;
-          break;
-        default:
-          break;
-      }
-      if (j === 0) {
-        checked = subCheck;
-      } else if (conditionItem?.linkCondition === "and") {
-        checked = checked && subCheck;
-      } else if (conditionItem?.linkCondition === "or") {
-        checked = checked || subCheck;
-      }
-    }
-
-    return checked;
   }
 
   const onOpenPreview = (opening) => {
