@@ -220,7 +220,7 @@ const appendParamsToUrl = (url, params) => {
 };
 
 const checkMessageCondition = (message, buildParam) => {
-  if (message.conditions.length === 0) return false;
+  if (message.conditions.length === 0) return true;
 
   let checked = false;
   for (let j = 0; j < message.conditions.length; j++) {
