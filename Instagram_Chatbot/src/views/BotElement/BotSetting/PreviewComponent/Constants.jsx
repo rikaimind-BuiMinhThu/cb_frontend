@@ -106,12 +106,14 @@ const CRAWL_ELEMENT_TYPES = {
 };
 
 const NO_ERROR = 'NO_ERROR';
+const GETTING_ERROR_NOTIFICATION = 'getting_error_notification';
 
 const CHATBOT_ACTIONS = {
   CLICK_BUTTON: 'clickButton',
   EXCUTE_JS: 'excuteJS',
   FUKUSHASHIKI: 'fukushashiki',
   GET_ERROR_MESSAGE: 'getErrorMessage',
+  GET_ERROR_MESSAGE_WITH_DISPLAY_MSG: 'getErrorMessageWithDisplayMsg',
   CRAWL_DATA: 'crawlData',
   OPEN_PREVIEW: 'openPreview',
   GET_PREVIEW_ORDER_CONTENT: 'getPreviewOrderContent',
@@ -162,4 +164,5 @@ export {
   SEARCH_MODES,
   MESSAGE_CONTENT_TYPES,
   NO_ERROR,
+  GETTING_ERROR_NOTIFICATION
 };
