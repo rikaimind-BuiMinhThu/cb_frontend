@@ -817,7 +817,7 @@ const PreviewFukushashiki = () => {
 
     newState.renderMessagesList.push(messagesList[i]);
     newState.currentMsgIndex = i;
-    // scrollToBottom();
+    scrollToBottom();
 
     if (isLastMessageInCreateOrderFlow())
       return redirectToCartPage();
@@ -881,7 +881,7 @@ const PreviewFukushashiki = () => {
     newState.currentMsgIndex = i;
     newState.currentUserMsgIndex++;
 
-    // scrollToBottom();
+    scrollToBottom();
 
     return newState;
   }
@@ -1000,19 +1000,43 @@ const PreviewFukushashiki = () => {
       }
     }
 
-    newState.currentUserMsgIndex = newState.messagesList.findIndex((item) => !item.hidden && isUserMessage(item));
+    newState.currentUserMsgIndex = newState.messagesList.findIndex((item) => {
+      const firstMsgContent = item?.message_content?.[0];
+      const isDisplayBtnNext = firstMsgContent?.type != "image" || firstMsgContent?.image?.displayButtonNext != false;
+
+      return !item.hidden && isUserMessage(item) && isDisplayBtnNext;
+    });
 
     // For the first time, we need to render to the first user message
     if (newState.currentUserMsgIndex >= 0) {
       newState.currentMsgIndex = newState.currentUserMsgIndex;
     }
 
-    newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
     newState.renderMessagesList = newState.renderMessagesList.map((msg) => {
       return isDelayBotMessage(msg) ? {...msg, hidden: true} : msg;
-    }); 
-    newState.passedUserMsgCount = newState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
-    dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
+    });
+
+    new Promise(async (resolve) => {
+      for (let i = 0; i <= newState.currentMsgIndex; i++) {
+        newState.renderMessagesList = newState.messagesList.slice(0, i + 1);
+        if (isDelayBotMessage(newState.messagesList[i])) {
+          await sleep(newState.messagesList[i].message_content[0].delay.content * 1000);
+          newState.messagesList[i].hidden = true;
+          continue;
+        }
+        
+        dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+          payload: newState
+        });
+        await sleep(1000);
+      }
+      resolve();
+    }).then(() => {
+      newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+      newState.passedUserMsgCount = newState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
+      dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
+    });
   }
 
   const fukushashikiSavedStateToLp = (savedState) => {
@@ -1152,9 +1176,7 @@ const PreviewFukushashiki = () => {
       return isUserMessage(message) && isDisplayBtnNext && !message.hidden;
     });
 
-    console.log("renderUserMessagesList.length", renderUserMessagesList.length);
     if (renderUserMessagesList.length > 1) {
-      // await sleep(1000);
       scrollToBottom(false);
     } else {
       scrollToTop();
