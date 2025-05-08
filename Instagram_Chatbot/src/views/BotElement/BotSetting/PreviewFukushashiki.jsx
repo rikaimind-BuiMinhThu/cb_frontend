@@ -1154,6 +1154,8 @@ const PreviewFukushashiki = () => {
     if (renderUserMessagesList.length > 1) {
       await sleep(1000);
       scrollToBottom(false);
+    } else {
+      scrollToTop();
     }
   }, [state.isOpen, state.renderMessagesList.length, state.submitErrorMessage]);
 
@@ -1165,6 +1167,15 @@ const PreviewFukushashiki = () => {
       });
     }
   };
+
+  const scrollToTop = () => {
+    if (document.getElementById("sp-body")) {
+      document.getElementById("sp-body").scrollTo({
+        top: 0,
+        behavior: "auto"
+      });
+    }
+  }
 
   const handleValidateField = (index) => {
     let contentArr = [...state.renderMessagesList[index].message_content];
