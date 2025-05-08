@@ -1874,6 +1874,7 @@ const PreviewFukushashiki = () => {
                 isValidZipCode = false;
               }
               if (
+                !contentType.compact_municipality_and_address_and_building_name &&
                 contentType.address !== undefined &&
                 stringNullOrEmpty(contentType.value_address) && contentType.hasOwnProperty('address')
               ) {
@@ -1906,13 +1907,15 @@ const PreviewFukushashiki = () => {
               isValidZipCode = false;
             }
             if (
+              !contentType.compact_municipality_and_address_and_building_name &&
               contentType.address !== undefined &&
               stringNullOrEmpty(contentType.value_address) && contentType.hasOwnProperty('address')
             ) {
               isValidZipCode = false;
             }
             if (
-              contentType.address !== undefined &&
+              !contentType.compact_municipality_and_address_and_building_name &&
+              contentType.building_name !== undefined &&
               stringNullOrEmpty(contentType.value_building_name) && contentType.hasOwnProperty('building_name')
             ) {
               isValidZipCode = false;
@@ -1983,13 +1986,15 @@ const PreviewFukushashiki = () => {
               isValidShippingAddress = false;
             }
             if (
+              !contentType.compact_municipality_and_address_and_building_name &&
               contentType.address !== undefined &&
               stringNullOrEmpty(contentType.value_address)
             ) {
               isValidShippingAddress = false;
             }
             if (
-              contentType.address !== undefined &&
+              !contentType.compact_municipality_and_address_and_building_name &&
+              contentType.building_name !== undefined &&
               stringNullOrEmpty(contentType.value_building_name)
             ) {
               isValidShippingAddress = false;
