@@ -817,7 +817,7 @@ const PreviewFukushashiki = () => {
 
     newState.renderMessagesList.push(messagesList[i]);
     newState.currentMsgIndex = i;
-    scrollToBottom();
+    // scrollToBottom();
 
     if (isLastMessageInCreateOrderFlow())
       return redirectToCartPage();
@@ -881,7 +881,7 @@ const PreviewFukushashiki = () => {
     newState.currentMsgIndex = i;
     newState.currentUserMsgIndex++;
 
-    scrollToBottom();
+    // scrollToBottom();
 
     return newState;
   }
@@ -1149,10 +1149,12 @@ const PreviewFukushashiki = () => {
     const renderUserMessagesList = state.renderMessagesList.filter(message => {
       const firstMsgContent = message?.message_content?.[0];
       const isDisplayBtnNext = firstMsgContent?.type != "image" || firstMsgContent?.image?.displayButtonNext != false;
-      return isUserMessage(message) && isDisplayBtnNext;
+      return isUserMessage(message) && isDisplayBtnNext && !message.hidden;
     });
+
+    console.log("renderUserMessagesList.length", renderUserMessagesList.length);
     if (renderUserMessagesList.length > 1) {
-      await sleep(1000);
+      // await sleep(1000);
       scrollToBottom(false);
     } else {
       scrollToTop();
