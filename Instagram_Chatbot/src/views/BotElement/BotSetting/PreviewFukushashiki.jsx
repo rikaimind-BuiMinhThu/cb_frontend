@@ -23,7 +23,13 @@ import iconMessagePink from "../../../assets/img/icon-mess/icon-message-chat-pin
 import iconMessagePurple from "../../../assets/img/icon-mess/icon-message-chat-purple.png";
 import iconMessageBlack from "../../../assets/img/icon-mess/icon-message-chat-black.png";
 import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-white.png";
-import { CHATBOT_ACTIONS, MESSAGE_CONTENT_TYPES, SESSION_STORAGE_KEY, NO_ERROR } from "./PreviewComponent/Constants";
+import {
+  CHATBOT_ACTIONS,
+  MESSAGE_CONTENT_TYPES,
+  SESSION_STORAGE_KEY,
+  NO_ERROR,
+  GETTING_ERROR_NOTIFICATION
+} from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
   lightenColor,
@@ -39,6 +45,7 @@ import {
   sleep,
   stringNullOrEmpty,
   appendParamsToUrl,
+  checkMessageCondition
 } from "./PreviewComponent/Utils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
@@ -126,13 +133,15 @@ const PREVIEW_ACTIONS = {
   ADD_LP_OPTION_DATA: "ADD_LP_OPTION_DATA",
   UPDATE_PREVIEW_ORDER_CONTENT: "UPDATE_PREVIEW_ORDER_CONTENT",
   UPDATE_OPEN_PREVIEW: "UPDATE_OPEN_PREVIEW",
-  UPDATE_SUBMIT_ERROR_MESSAGE: "UPDATE_SUBMIT_ERROR_MESSAGE"
+  UPDATE_SUBMIT_ERROR_MESSAGE: "UPDATE_SUBMIT_ERROR_MESSAGE",
+  UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG: "UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG"
 };
 
 const PreviewFukushashikiReducer = (state, action) => {
   switch (action.type) {
     case PREVIEW_ACTIONS.UPDATE_MULTI_STATE:
       return { ...state, ...(action.payload) };
+
     case PREVIEW_ACTIONS.ADD_LP_OPTION_DATA:
       return { ...state, lpOptionData: { ...state.lpOptionData, ...action.payload } };
     case PREVIEW_ACTIONS.UPDATE_PREVIEW_ORDER_CONTENT:
@@ -140,9 +149,66 @@ const PreviewFukushashikiReducer = (state, action) => {
     case PREVIEW_ACTIONS.UPDATE_OPEN_PREVIEW:
       return { ...state, isOpen: action.payload.isOpen, showPopupCloseBot: action.payload.showPopupCloseBot };
     case PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES:
-      return { ...state, renderMessagesList: action.payload };
-    case PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE:
-      return { ...state, submitErrorMessage: action.payload };
+      return {
+        ...state,
+        renderMessagesList: state.messagesList.slice(action.payload.startIndex, action.payload.endIndex)
+      };
+    case PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE: {
+      let messagesList = _.cloneDeep(state.messagesList);
+
+      if (action.payload === GETTING_ERROR_NOTIFICATION) {
+        return state;
+      }
+
+      if (stringNullOrEmpty(action.payload)) {
+        messagesList = messagesList.map((message, index) => {
+          if (message.message_content.find(content => content.type === 'getting_error_notification' || content.type === 'delay') && index < state.currentMsgIndex) {
+            message.hidden = true;
+          } else if (message.not_display_when_have_error) {
+            const result = checkMessageCondition(message, state.objParam);
+            message.hidden = !result;;
+          }
+          return message;
+        });
+      } else {
+        messagesList = messagesList.map((message, index) => {
+          if (!message.hidden) {
+            message.hidden = action.payload && message.not_display_when_have_error;
+          }
+          return message;
+        });
+      }
+
+      const renderMessagesList = messagesList.slice(0, state.currentMsgIndex + 1)
+      const userMessagesList = messagesList.filter(message => message.belong_to === 'user' && message.message_content.length > 0);
+      return { ...state,
+        messagesList: messagesList,
+        renderMessagesList: renderMessagesList,
+        userMessagesList: userMessagesList,
+        submitErrorMessage: action.payload
+      };
+    }
+
+    case PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG: {
+      let messagesList = _.cloneDeep(state.messagesList);
+
+      if ((action.payload.displayMsg || []).length > 0) {
+        messagesList = messagesList.map((message, index) => {
+          if (action.payload.displayMsg.includes(message.name?.trim())) {
+            message.hidden = false;
+          }
+          return message;
+        });
+      }
+      const renderMessagesList = messagesList.slice(0, state.currentMsgIndex + 1)
+      const userMessagesList = messagesList.filter(message => message.belong_to === 'user' && message.message_content.length > 0);
+      return { ...state,
+        messagesList: messagesList,
+        renderMessagesList: renderMessagesList,
+        userMessagesList: userMessagesList,
+        submitErrorMessage: action.payload.error
+      };
+    }
   }
 
   return state;
@@ -207,11 +273,12 @@ const PreviewFukushashiki = () => {
   // Get chat bot setting
   useEffect(() => {
     if (!state.loadedStateFromSession) return;
-    if (state.titleBubble) return;
     if (!state.botId && params.get("bot_id")) {
       dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { botId: params.get("bot_id") } });
       return;
     }
+
+    if (state.displayType !== undefined && state.displayType !== null) return;
 
     getChatBotSetting(state.botId)
       .then((response) => {
@@ -245,7 +312,7 @@ const PreviewFukushashiki = () => {
         sessionStorage.setItem("chatbotRight", result?.right_margin_pc ? result?.right_margin_pc : 30);
         dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
       });
-  }, [state.botId, state.loadedStateFromSession, state.titleBubble]);
+  }, [state.botId, state.loadedStateFromSession, state.displayType]);
 
   const eventHandler = async (event) => {
     if (!event.data || !event.data.actionData) return;
@@ -260,6 +327,17 @@ const PreviewFukushashiki = () => {
           type: PREVIEW_ACTIONS.ADD_LP_OPTION_DATA,
           payload: receiveOptionData
         });
+
+      case CHATBOT_ACTIONS.GET_ERROR_MESSAGE_WITH_DISPLAY_MSG: {
+        const error = actionData.error === NO_ERROR ? "" : actionData.error;
+        return dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG,
+          payload: {
+            error: error,
+            displayMsg: actionData.displayMsg
+          }
+        });
+      }
 
       case CHATBOT_ACTIONS.GET_ERROR_MESSAGE:
         await sleep(1000);
@@ -347,43 +425,6 @@ const PreviewFukushashiki = () => {
         dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { showPopupCloseBot: false, isOpen: false } });
       }, 680)
     }
-  }
-
-  const checkMessageCondition = (message, buildParam) => {
-    if (message.conditions.length === 0) return false;
-
-    let checked = false;
-    for (let j = 0; j < message.conditions.length; j++) {
-      const conditionItem = message.conditions[j];
-      const buildParamValue = buildParam[conditionItem.nameCondition];
-      let subCheck = false;
-
-      switch (conditionItem.condition) {
-        case "include":
-          subCheck = buildParamValue.includes(conditionItem.inputCondition);
-          break;
-        case "is":
-          subCheck = buildParamValue == conditionItem.inputCondition;
-          break;
-        case "not_include":
-          subCheck = !buildParamValue.includes(conditionItem.inputCondition);
-          break;
-        case "is_not":
-          subCheck = buildParamValue != conditionItem.inputCondition;
-          break;
-        default:
-          break;
-      }
-      if (j === 0) {
-        checked = subCheck;
-      } else if (conditionItem?.linkCondition === "and") {
-        checked = checked && subCheck;
-      } else if (conditionItem?.linkCondition === "or") {
-        checked = checked || subCheck;
-      }
-    }
-
-    return checked;
   }
 
   const onOpenPreview = (opening) => {
@@ -888,7 +929,6 @@ const PreviewFukushashiki = () => {
     };
 
     if (newState.isUsedErrMsgByJs && newState.errMsgJsCode) {
-      console.log("Run js code: ", newState.errMsgJsCode);
       postMessageForExecuteJs(newState.errMsgJsCode);
     }
 
@@ -969,16 +1009,9 @@ const PreviewFukushashiki = () => {
 
     newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
     newState.renderMessagesList = newState.renderMessagesList.map((msg) => {
-      if (isBotMessage(msg) && msg.message_content[0]?.type === "delay") {
-        return {
-          ...msg,
-          hidden: true,
-        };
-      }
-      return msg;
+      return isDelayBotMessage(msg) ? {...msg, hidden: true} : msg;
     }); 
     newState.passedUserMsgCount = newState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
-
     dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
   }
 
@@ -1010,7 +1043,6 @@ const PreviewFukushashiki = () => {
           document.head.appendChild(style);
         }
         if (savedState.isUsedErrMsgByJs && savedState.errMsgJsCode) {
-          console.log("Run js code: ", savedState.errMsgJsCode);
           postMessageForExecuteJs(savedState.errMsgJsCode);
         }
         if (isLoggedIn) {
@@ -1018,13 +1050,7 @@ const PreviewFukushashiki = () => {
           savedState.currentMsgIndex = savedState.messagesList.findIndex((item) => isUserMessage(item) && item.hidden == false);
           savedState.renderMessagesList = savedState.messagesList.slice(0, savedState.currentMsgIndex + 1);
           savedState.renderMessagesList = savedState.renderMessagesList.map((msg) => {
-            if (isBotMessage(msg) && msg.message_content[0]?.type === "delay") {
-              return {
-                ...msg,
-                hidden: true,
-              };
-            }
-            return msg;
+            return isDelayBotMessage(msg) ? {...msg, hidden: true} : msg;
           });
           return dispatch({
             type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
@@ -1035,13 +1061,7 @@ const PreviewFukushashiki = () => {
           });
         }        
         const renderMessagesList = savedState.renderMessagesList.map((msg) => {
-          if (isBotMessage(msg) && msg.message_content[0]?.type === "delay") {
-            return {
-              ...msg,
-              hidden: true,
-            };
-          }
-          return msg;
+          return isDelayBotMessage(msg) ? {...msg, hidden: true} : msg;
         });
 
         const btnSubmitItem = renderMessagesList.find(x => x.message_content.find(y => y.type == "button_submit"));
@@ -1840,6 +1860,25 @@ const PreviewFukushashiki = () => {
               } else if (stringNullOrEmpty(contentType.value_post_code)) {
                 isValidZipCode = false;
               }
+
+              if (
+                contentType.prefecture !== undefined &&
+                stringNullOrEmpty(contentType.value_prefecture) && contentType.hasOwnProperty('prefecture')
+              ) {
+                isValidZipCode = false;
+              }
+              if (
+                contentType.municipality !== undefined &&
+                stringNullOrEmpty(contentType.value_municipality) && contentType.hasOwnProperty('municipality')
+              ) {
+                isValidZipCode = false;
+              }
+              if (
+                contentType.address !== undefined &&
+                stringNullOrEmpty(contentType.value_address) && contentType.hasOwnProperty('address')
+              ) {
+                isValidZipCode = false;
+              }
             }
           } else if (contentType.isCheckRequire === "all_items_require") {
             if (contentType.post_code !== undefined) {
@@ -2249,11 +2288,12 @@ const PreviewFukushashiki = () => {
     }
     
     state.errors = errorsMess;
-    
-    dispatch({
-      type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-      payload: state,                                                          
-    });
+    if (!isValid) {
+      dispatch({
+        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+        payload: state,                                                          
+      });
+    }
     return isValid;
   };
 
@@ -2909,15 +2949,19 @@ const PreviewFukushashiki = () => {
     return message.belong_to === 'bot' && message.message_content.length > 0;
   }
 
+  const isDelayBotMessage = (message) => {
+    return message.belong_to === 'bot' && message.message_content[0]?.type === "delay";
+  }
+
   const isUserMessage = (message) => {
     return message.belong_to === 'user' && message.message_content.length > 0;
   }
 
   const onClickNext = async (indexMessage, message) => {
-    let newState = { ...state };
+    let newState = _.omit(state, ['submitErrorMessage']);
     let clickedMsgIndex = newState.messagesList.findIndex((msg) => msg?.id === message?.id);
     if (clickedMsgIndex < 0) clickedMsgIndex = newState.currentMsgIndex;
-    newState.userMessagesList = newState.messagesList.filter((item) => isUserMessage(item));   
+    newState.userMessagesList = newState.messagesList.filter((item) => isUserMessage(item));
     const clickedMsg = newState.messagesList[clickedMsgIndex];
 
     if (!handleValidateField(indexMessage)) {
@@ -2925,10 +2969,6 @@ const PreviewFukushashiki = () => {
     }
 
     newState.errors = {};
-
-    // if (state.isUsedErrMsgByJs && state.errMsgJsCode) {
-    //   postMessageForExecuteJs(state.errMsgJsCode);
-    // }
 
     const submitData = {
       scenario_id: state.scenarioId,
@@ -2978,6 +3018,10 @@ const PreviewFukushashiki = () => {
           newState.messagesList[i].hidden = true;
           continue;
         }
+
+        // if (newState.messagesList[i].not_display_when_have_error) {
+        //   newState.messagesList[i].hidden = newState.submitErrorMessage.length > 0;
+        // }
       }
     }
     if (isUserMessage(nextMessage) || isBotMessage(nextMessage)) {
@@ -2986,7 +3030,7 @@ const PreviewFukushashiki = () => {
           const result = checkMessageCondition(newState.messagesList[i], newState.objParam);
           newState.messagesList[i].hidden = !result;
         }
-        if (newState.messagesList[i].hidden) continue;
+        if (newState.messagesList[i].hidden && !stringNullOrEmpty(newState.messagesList[i].hidden)) continue;
 
         if (isBotMessage(newState.messagesList[i])) {
           newState = {
@@ -3003,29 +3047,34 @@ const PreviewFukushashiki = () => {
     }
 
     newState.currentUserMsgIndex = newState.messagesList.findIndex((item, index) => !item.hidden && isUserMessage(item) && index > clickedMsgIndex);
-    newState.currentMsgIndex = newState.currentUserMsgIndex;
+    if (newState.currentUserMsgIndex === -1)
+      newState.currentMsgIndex = newState.messagesList.length - 1;
+    else
+      newState.currentMsgIndex = newState.currentUserMsgIndex;
     
     const isBtnUpdateClick = indexMessage < newState.renderMessagesList.length - 1;
 
     new Promise(async (resolve) => {
       for (let i = clickedMsgIndex + 1; i <= newState.currentMsgIndex; i++) {
         newState.renderMessagesList = newState.messagesList.slice(0, i + 1);
+        if (isDelayBotMessage(newState.messagesList[i])) {
+          await sleep(newState.messagesList[i].message_content[0].delay.content * 1000);
+          continue;
+        }
+        
         dispatch({
           type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
-          payload: newState.renderMessagesList
+          payload: {
+            startIndex: 0,
+            endIndex: i + 1
+          }
         });
-        await sleep(500);
+        await sleep(100);
       }
       resolve();
     }).then(() => {
       newState.renderMessagesList = newState.renderMessagesList.map((msg) => {
-        if (isBotMessage(msg) && msg.message_content[0]?.type === "delay") {
-          return {
-            ...msg,
-            hidden: true,
-          };
-        }
-        return msg;
+        return isDelayBotMessage(msg) ? {...msg, hidden: true} : msg;
       }); 
   
       if (!isBtnUpdateClick) {
@@ -3049,7 +3098,6 @@ const PreviewFukushashiki = () => {
       }
   
       setStateToSessionStorage(newState);
-
       return dispatch({
         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
         payload: newState
@@ -3237,13 +3285,7 @@ const PreviewFukushashiki = () => {
     newState.messagesList = state.messagesList;
     newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
     newState.renderMessagesList = newState.renderMessagesList.map((msg) => {
-      if (isBotMessage(msg) && msg.message_content[0]?.type === "delay") {
-        return {
-          ...msg,
-          hidden: true,
-        };
-      }
-      return msg;
+      return isDelayBotMessage(msg) ? {...msg, hidden: true} : msg;
     });
     setStateToSessionStorage(newState);
 
@@ -3429,7 +3471,7 @@ const PreviewFukushashiki = () => {
             postMessageToParent={postMessageToParent}
             captcha={state.captcha}
             messageContentProps={message.message_content}
-            disabled={state.submitErrorMessage.length > 0 ? false : message.disabled}
+            disabled={(state.submitErrorMessage.length > 0 && state.submitErrorMessage !== GETTING_ERROR_NOTIFICATION) ? false : message.disabled}
             onChangeValue={(
               indexContent,
               contentType,
@@ -3455,15 +3497,22 @@ const PreviewFukushashiki = () => {
             indexMessage={indexMessage}
             errorsProps={state.errors}
             displayButtonNext={(value) => {
-              if (!state.messagesList[state.currentMsgIndex]) return;
-              let newMessagesList = [...state.messagesList];
-              newMessagesList[state.currentMsgIndex].is_display_button_next = value;
-              dispatch({
-                type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-                payload: {
-                  messagesList: [...newMessagesList],
-                }
-              });
+              // dispatch({
+              //   type: PREVIEW_ACTIONS.UPDATE_DISPLAY_BUTTON_NEXT,
+              //   payload: {
+              //     nextButtonStatus: value,
+              //     msgIndex: indexMessage
+              //   }
+              // });
+              // // if (!state.messagesList[state.currentMsgIndex]) return;
+              // // let newMessagesList = [...state.messagesList];
+              // // newMessagesList[state.currentMsgIndex].is_display_button_next = value;
+              // // dispatch({
+              // //   type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+              // //   payload: {
+              // //     messagesList: [...newMessagesList],
+              // //   }
+              // // });
             }}
             prefecturesList={[...state.prefecturesList]}
             isPopUpZipCode={(isOpen, indexContent) =>
@@ -3477,7 +3526,7 @@ const PreviewFukushashiki = () => {
             }
             variables={state.variables}
             lpOptionData={state.lpOptionData}
-            submitErrorMessage={state.submitErrorMessage}
+            submitErrorMessage={state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "" : state.submitErrorMessage}
             botId={state.botId}
           />
           {renderNextButton(message, indexMessage)}
@@ -3488,7 +3537,7 @@ const PreviewFukushashiki = () => {
 
   const renderMessages = () => {
     return state.renderMessagesList.map((message, indexMessage) => {
-      if (message.hidden) return null;
+      if (message.hidden && !stringNullOrEmpty(message.hidden)) return null;
       return (
         <React.Fragment key={indexMessage}>
           {renderBotMessageContent(message, indexMessage)}
@@ -3501,15 +3550,25 @@ const PreviewFukushashiki = () => {
   const renderErrorMessages = () => {
     if (!state.isUsedErrMsgByJs || !state.submitErrorMessage) return null;
 
+    let backgroundColor = "#ffebee";
+    let color = "#d32f2f";
+    let text = state.submitErrorMessage;
+    let borderColor = "#f44336";
+    if (state.submitErrorMessage === GETTING_ERROR_NOTIFICATION) {
+      backgroundColor = "#0000FF";
+      color = "#FFFFFF";
+      text = "処理中...";
+      borderColor = "#8bc34a";
+    }
     return (
       <div className="ss-user-setting__item-text_input-top">
         <div
           style={{
             width: "95%",
             padding: "5px",
-            border: "1px solid #f44336",
-            backgroundColor: "#ffebee",
-            color: "#d32f2f",
+            border: `1px solid ${borderColor}`,
+            backgroundColor: backgroundColor,
+            color: color,
             borderRadius: "5px",
             fontFamily: "Arial, sans-serif",
             boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
@@ -3518,7 +3577,7 @@ const PreviewFukushashiki = () => {
             left: "1%"
           }}
           id="error-message"
-          dangerouslySetInnerHTML={{ __html: state.submitErrorMessage }}
+          dangerouslySetInnerHTML={{ __html: text }}
         />
       </div>
     );   
@@ -3550,7 +3609,7 @@ const PreviewFukushashiki = () => {
     }
 
     if (!state.activePopupCloseBot) {
-      containerStyle.height = `${state.heightPc || 600}px`;
+      containerStyle.height = mobileCheck() ? `${state.heightSp || 100}%` : `${state.heightPc || 600}px`;
       headerStyle = {
         ...headerStyle,
         position: "static",

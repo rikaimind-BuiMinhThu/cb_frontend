@@ -219,11 +219,48 @@ const appendParamsToUrl = (url, params) => {
     : `${url}?${queryString}`;
 };
 
+const checkMessageCondition = (message, buildParam) => {
+  if (message.conditions.length === 0) return true;
+
+  let checked = false;
+  for (let j = 0; j < message.conditions.length; j++) {
+    const conditionItem = message.conditions[j];
+    const buildParamValue = buildParam[conditionItem.nameCondition];
+    let subCheck = false;
+
+    switch (conditionItem.condition) {
+      case "include":
+        subCheck = buildParamValue.includes(conditionItem.inputCondition);
+        break;
+      case "is":
+        subCheck = buildParamValue == conditionItem.inputCondition;
+        break;
+      case "not_include":
+        subCheck = !buildParamValue.includes(conditionItem.inputCondition);
+        break;
+      case "is_not":
+        subCheck = buildParamValue != conditionItem.inputCondition;
+        break;
+      default:
+        break;
+    }
+    if (j === 0) {
+      checked = subCheck;
+    } else if (conditionItem?.linkCondition === "and") {
+      checked = checked && subCheck;
+    } else if (conditionItem?.linkCondition === "or") {
+      checked = checked || subCheck;
+    }
+  }
+
+  return checked;
+}
+
 export {
   stringNullOrEmpty, getAllUrlParams, lightenColor,
   mobileCheck, removeLeadingZero, sendUserInteractionData,
   sendCreateOrderData, sendCountRequest,
   getCitiesByPrefecture, getTownsByCity, getPrefectures,
   getScenarioPreviewData, getChatBotSetting, sendEmailRequest,
-  sleep, getCaptcha, appendParamsToUrl
+  sleep, getCaptcha, appendParamsToUrl, checkMessageCondition
 };
