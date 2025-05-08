@@ -81,7 +81,7 @@ const UserMessage = ({
       const nextInput = document.getElementById(nextId);
       if (nextInput) {
         nextInput.focus();
-        nextInput.select();
+        // nextInput.select();
       }
     }, 50);
   };
@@ -1282,12 +1282,7 @@ const UserMessage = ({
                                             `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
                                             ""
                                           );
-                                          document
-                                            .getElementById("ss-user-input-address2")
-                                            .focus();
-                                          document
-                                            .getElementById("ss-user-input-address2")
-                                            .select();
+                                          moveToNext("ss-user-input-address2");
                                         } else {
                                           onChangeErrors(
                                             `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
@@ -1335,15 +1330,15 @@ const UserMessage = ({
                                     if (e.target.value.length >= 3) e.preventDefault();
                                   }}
                                   onChange={async (value) => {
-                                    if ((value + "").length === 3) {
-                                      moveToNext("ss-user-post-code-right-input2");
-                                    }
                                     onChangeValue(
                                       indexContent,
                                       content.type,
                                       value,
                                       "value_post_code_left"
                                     );
+                                    if ((value + "").length === 3) {
+                                      moveToNext("ss-user-post-code-right-input2");
+                                    }
                                     if (
                                       (value + "").length === 3 &&
                                       shippingAddress.value_post_code_right &&
@@ -1387,12 +1382,7 @@ const UserMessage = ({
                                               `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
                                               ""
                                             );
-                                            document
-                                              .getElementById("ss-user-input-address2")
-                                              .focus();
-                                            document
-                                              .getElementById("ss-user-input-address2")
-                                              .select();
+                                            moveToNext("ss-user-input-address2");
                                           } else {
                                             onChangeErrors(
                                               `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
@@ -1486,12 +1476,7 @@ const UserMessage = ({
                                               `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
                                               ""
                                             );
-                                            document
-                                              .getElementById("ss-user-input-address2")
-                                              .focus();
-                                            document
-                                              .getElementById("ss-user-input-address2")
-                                              .select();
+                                            moveToNext("ss-user-input-address2");
                                           } else {
                                             onChangeErrors(
                                               `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
@@ -1721,24 +1706,15 @@ const UserMessage = ({
                                     style={{ marginBottom: "0px", width: "32%" }}
                                     placeholder={shippingAddress.text?.number1_placeholder}
                                     onChange={(value) => {
-                                      if (value.length === 3) {
-                                        document
-                                          .getElementById(
-                                            "ss-user-message-phone_number_22"
-                                          )
-                                          .focus();
-                                        document
-                                          .getElementById(
-                                            "ss-user-message-phone_number_22"
-                                          )
-                                          .select();
-                                      }
                                       onChangeValue(
                                         indexContent,
                                         content.type,
                                         value,
                                         "value_number1"
                                       );
+                                      if (value.length === 3) {
+                                        moveToNext("ss-user-message-phone_number_22");
+                                      }
                                     }}
                                     value={shippingAddress.value_number1}
                                   ></InputCustom>
@@ -1750,24 +1726,15 @@ const UserMessage = ({
                                     maxLength={4}
                                     placeholder={shippingAddress.text?.number2_placeholder}
                                     onChange={(value) => {
-                                      if (value.length === 4) {
-                                        document
-                                          .getElementById(
-                                            "ss-user-message-phone_number_33"
-                                          )
-                                          .focus();
-                                        document
-                                          .getElementById(
-                                            "ss-user-message-phone_number_33"
-                                          )
-                                          .select();
-                                      }
                                       onChangeValue(
                                         indexContent,
                                         content.type,
                                         value,
                                         "value_number2"
                                       );
+                                      if (value.length === 4) {
+                                        moveToNext("ss-user-message-phone_number_33");
+                                      }
                                     }}
                                     value={shippingAddress.value_number2}
                                   ></InputCustom>
@@ -3257,12 +3224,7 @@ const UserMessage = ({
                                     `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
                                     ""
                                   );
-                                  document
-                                    .getElementById(`ss-user-input-address${indexContent}`)
-                                    .focus();
-                                  document
-                                    .getElementById(`ss-user-input-address${indexContent}`)
-                                    .select();
+                                  moveToNext(`ss-user-input-address${indexContent}`);
                                 } else {
                                   onChangeErrors(
                                     `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
@@ -3311,20 +3273,16 @@ const UserMessage = ({
                             if (e.target.value.length >= 3) e.preventDefault();
                           }}
                           onChange={async (value) => {
-                            if ((value + "").length === 3) {
-                              document
-                                .getElementById(`ss-user-post-code-right-input${indexContent}`)
-                                .focus();
-                              document
-                                .getElementById(`ss-user-post-code-right-input${indexContent}`)
-                                .select();
-                            }
                             onChangeValue(
                               indexContent,
                               content.type,
                               value,
                               "value_post_code_left"
                             );
+                            if ((value + "").length === 3) {
+                              moveToNext(`ss-user-post-code-right-input${indexContent}`);
+                            }
+                            
                             if (
                               (value + "").length === 3 &&
                               zipCodeAddress.value_post_code_right &&
@@ -3368,12 +3326,7 @@ const UserMessage = ({
                                       `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
                                       ""
                                     );
-                                    document
-                                      .getElementById(`ss-user-input-address${indexContent}`)
-                                      .focus();
-                                    document
-                                      .getElementById(`ss-user-input-address${indexContent}`)
-                                      .select();
+                                    moveToNext(`ss-user-input-address${indexContent}`);
                                   } else {
                                     onChangeErrors(
                                       `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
@@ -3468,12 +3421,7 @@ const UserMessage = ({
                                       `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
                                       ""
                                     );
-                                    document
-                                      .getElementById(`ss-user-input-address${indexContent}`)
-                                      .focus();
-                                    document
-                                      .getElementById(`ss-user-input-address${indexContent}`)
-                                      .select();
+                                    moveToNext(`ss-user-input-address${indexContent}`);
                                   } else {
                                     onChangeErrors(
                                       `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
@@ -4307,24 +4255,15 @@ const UserMessage = ({
                         value={creditCardPayment.card_number1}
                         placeholder={creditCardPayment.card_number_placeholder1}
                         onChange={(value) => {
-                          if ((value + "").length === 4) {
-                            document
-                              .getElementById(
-                                "ss-user-card-number-radio-input2"
-                              )
-                              .focus();
-                            document
-                              .getElementById(
-                                "ss-user-card-number-radio-input2"
-                              )
-                              .select();
-                          }
                           onChangeValue(
                             indexContent,
                             content.type,
                             value,
                             "card_number1"
                           );
+                          if ((value + "").length === 4) {
+                            moveToNext("ss-user-card-number-radio-input2");
+                          }
                         }}
                       />
                       <InputNum
@@ -4338,24 +4277,15 @@ const UserMessage = ({
                         value={creditCardPayment.card_number2}
                         placeholder={creditCardPayment.card_number_placeholder2}
                         onChange={(value) => {
-                          if ((value + "").length === 4) {
-                            document
-                              .getElementById(
-                                "ss-user-card-number-radio-input3"
-                              )
-                              .focus();
-                            document
-                              .getElementById(
-                                "ss-user-card-number-radio-input3"
-                              )
-                              .select();
-                          }
                           onChangeValue(
                             indexContent,
                             content.type,
                             value,
                             "card_number2"
                           );
+                          if ((value + "").length === 4) {
+                            moveToNext("ss-user-card-number-radio-input3");
+                          }
                         }}
                       />
                       <InputNum
@@ -4369,24 +4299,15 @@ const UserMessage = ({
                         value={creditCardPayment.card_number3}
                         placeholder={creditCardPayment.card_number_placeholder3}
                         onChange={(value) => {
-                          if ((value + "").length === 4) {
-                            document
-                              .getElementById(
-                                "ss-user-card-number-radio-input4"
-                              )
-                              .focus();
-                            document
-                              .getElementById(
-                                "ss-user-card-number-radio-input4"
-                              )
-                              .select();
-                          }
                           onChangeValue(
                             indexContent,
                             content.type,
                             value,
                             "card_number3"
                           );
+                          if ((value + "").length === 4) {
+                            moveToNext("ss-user-card-number-radio-input4");
+                          }
                         }}
                       />
                       <InputNum
@@ -4651,7 +4572,6 @@ const UserMessage = ({
                                         selectArr,
                                         "initial_selection"
                                       );
-                                      // onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexProduct, 'price_display_custom')
                                     }}
                                   >
                                     <div className="ss-user-overview-product-purchase-container">
@@ -6199,24 +6119,15 @@ const UserMessage = ({
                                 cardPaymentRadioButton.card_number_placeholder1
                               }
                               onChange={(value) => {
-                                if ((value + "").length === 4) {
-                                  document
-                                    .getElementById(
-                                      "ss-user-card-number-radio-input2"
-                                    )
-                                    .focus();
-                                  document
-                                    .getElementById(
-                                      "ss-user-card-number-radio-input2"
-                                    )
-                                    .select();
-                                }
                                 onChangeValue(
                                   indexContent,
                                   content.type,
                                   value,
                                   "card_number1"
                                 );
+                                if ((value + "").length === 4) {
+                                  moveToNext("ss-user-card-number-radio-input2");
+                                }
                               }}
                             />
                             <InputNum
@@ -6232,24 +6143,15 @@ const UserMessage = ({
                                 cardPaymentRadioButton.card_number_placeholder2
                               }
                               onChange={(value) => {
-                                if ((value + "").length === 4) {
-                                  document
-                                    .getElementById(
-                                      "ss-user-card-number-radio-input3"
-                                    )
-                                    .focus();
-                                  document
-                                    .getElementById(
-                                      "ss-user-card-number-radio-input3"
-                                    )
-                                    .select();
-                                }
                                 onChangeValue(
                                   indexContent,
                                   content.type,
                                   value,
                                   "card_number2"
                                 );
+                                if ((value + "").length === 4) {
+                                  moveToNext("ss-user-card-number-radio-input3");
+                                }
                               }}
                             />
                             <InputNum
@@ -6265,24 +6167,15 @@ const UserMessage = ({
                                 cardPaymentRadioButton.card_number_placeholder3
                               }
                               onChange={(value) => {
-                                if ((value + "").length === 4) {
-                                  document
-                                    .getElementById(
-                                      "ss-user-card-number-radio-input4"
-                                    )
-                                    .focus();
-                                  document
-                                    .getElementById(
-                                      "ss-user-card-number-radio-input4"
-                                    )
-                                    .select();
-                                }
                                 onChangeValue(
                                   indexContent,
                                   content.type,
                                   value,
                                   "card_number3"
                                 );
+                                if ((value + "").length === 4) {
+                                  moveToNext("ss-user-card-number-radio-input4");
+                                }
                               }}
                             />
                             <InputNum
