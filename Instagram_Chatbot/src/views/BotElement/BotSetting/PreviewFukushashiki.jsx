@@ -1145,8 +1145,16 @@ const PreviewFukushashiki = () => {
 
   useEffect(async () => {
     if (!state.isOpen) return;
-    await sleep(1000);
-    scrollToBottom(false);
+
+    const renderUserMessagesList = state.renderMessagesList.filter(message => {
+      const firstMsgContent = message?.message_content?.[0];
+      const isDisplayBtnNext = firstMsgContent?.type != "image" || firstMsgContent?.image?.displayButtonNext != false;
+      return isUserMessage(message) && isDisplayBtnNext;
+    });
+    if (renderUserMessagesList.length > 1) {
+      await sleep(1000);
+      scrollToBottom(false);
+    }
   }, [state.isOpen, state.renderMessagesList.length, state.submitErrorMessage]);
 
   const scrollToBottom = (forceScroll = false) => {
