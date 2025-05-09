@@ -896,6 +896,27 @@ const PreviewFukushashiki = () => {
     });
   }
 
+  const renderMessagesWithDelay = (theState, startMsgIndex, endMsgIndex) => {
+    return new Promise(async (resolve) => {
+      for (let i = startMsgIndex; i <= endMsgIndex; i++) {
+        theState.renderMessagesList = theState.messagesList.slice(0, i + 1);
+        if (isDelayBotMessage(theState.messagesList[i])) {
+          await sleep(theState.messagesList[i].message_content[0].delay.content * 1000);
+          theState.messagesList[i].hidden = true;
+          continue;
+        }
+        
+        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: theState });
+        await sleep(1000);
+      }
+      resolve();
+    }).then(() => {
+      theState.renderMessagesList = theState.messagesList.slice(0, theState.currentMsgIndex + 1);
+      theState.passedUserMsgCount = theState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
+      dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: theState });
+    });
+  }
+
   const extractStateFromPreviewResponse = async (res) => {
     if (!res || !res.data || res.data.code !== 1) return;
     
@@ -1016,27 +1037,13 @@ const PreviewFukushashiki = () => {
       return isDelayBotMessage(msg) ? {...msg, hidden: true} : msg;
     });
 
-    new Promise(async (resolve) => {
-      for (let i = 0; i <= newState.currentMsgIndex; i++) {
-        newState.renderMessagesList = newState.messagesList.slice(0, i + 1);
-        if (isDelayBotMessage(newState.messagesList[i])) {
-          await sleep(newState.messagesList[i].message_content[0].delay.content * 1000);
-          newState.messagesList[i].hidden = true;
-          continue;
-        }
-        
-        dispatch({
-          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-          payload: newState
-        });
-        await sleep(1000);
-      }
-      resolve();
-    }).then(() => {
+    if (newState.isOpen) {
+      return renderMessagesWithDelay(newState, 0, newState.currentMsgIndex);
+    } else {
       newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
       newState.passedUserMsgCount = newState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
       dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
-    });
+    }
   }
 
   const fukushashikiSavedStateToLp = (savedState) => {
