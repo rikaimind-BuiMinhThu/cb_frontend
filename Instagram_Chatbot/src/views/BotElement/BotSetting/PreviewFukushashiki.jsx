@@ -801,6 +801,7 @@ const PreviewFukushashiki = () => {
     const msgContent = messagesList[i]?.message_content?.[0];
     if (!msgContent) return newState;
 
+    // await sleep(1000);
     if (msgContent.type === "text_input" && msgContent.text_input.content) {
       if (isUpdateSourceContent) {
         msgContent.text_input.sourceContent = msgContent.text_input.content;
@@ -3118,7 +3119,7 @@ const PreviewFukushashiki = () => {
             endIndex: i + 1
           }
         });
-        await sleep(1000);
+        await sleep(100);
       }
       resolve();
     }).then(() => {
