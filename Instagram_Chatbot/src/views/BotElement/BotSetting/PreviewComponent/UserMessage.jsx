@@ -4440,6 +4440,9 @@ const UserMessage = ({
                           CVC <img style={{ width: "8%" }} src={cvcIcon} />
                         </span>
                       }
+                      formatter={(value) => {
+                        return value.toString().padStart(3, '0');
+                      }}
                       value={creditCardPayment.cvc}
                       placeholder={creditCardPayment.cvc_placeholder}
                       onChange={(value) =>
@@ -6371,6 +6374,9 @@ const UserMessage = ({
                               </span>
                             }
                             value={cardPaymentRadioButton.cvc}
+                            formatter={(value) => {
+                              return value.toString().padStart(3, '0');
+                            }}
                             placeholder={cardPaymentRadioButton.cvc_placeholder}
                             onChange={(value) =>
                               onChangeValue(
