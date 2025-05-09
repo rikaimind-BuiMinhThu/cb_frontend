@@ -4446,7 +4446,7 @@ const UserMessage = ({
                       value={creditCardPayment.cvc}
                       placeholder={creditCardPayment.cvc_placeholder}
                       onChange={(value) =>
-                        onChangeValue(indexContent, content.type, value, "cvc")
+                        onChangeValue(indexContent, content.type, value.toString().padStart(3, '0'), "cvc")
                       }
                     />
                   </div>
@@ -6382,7 +6382,7 @@ const UserMessage = ({
                               onChangeValue(
                                 indexContent,
                                 content.type,
-                                value,
+                                value.toString().padStart(3, '0'),
                                 "cvc"
                               )
                             }
