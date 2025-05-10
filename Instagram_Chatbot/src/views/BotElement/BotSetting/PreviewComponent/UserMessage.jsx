@@ -4428,26 +4428,22 @@ const UserMessage = ({
                     className="ss-user-setting__item-bottom"
                     style={{ display: "block" }}
                   >
-                    <InputNum
-                      style={{ marginLeft: "0px", width: "33%" }}
+                    <InputCustom
                       className="ss-user-setting-input-limit-character"
-                      max={9999}
-                      maxLength={4}
                       disabled={disabled}
-                      controls={false}
+                      style={{ marginLeft: "0px", width: "33%" }}
+                      value={creditCardPayment.cvc}
+                      onChange={(value) => {
+                        if (/^[0-9]{0,4}$/.test(value)) {
+                          onChangeValue(indexContent, content.type, value, "cvc")
+                        }
+                      }}
                       label={
                         <span style={{ fontWeight: "400" }}>
                           CVC <img style={{ width: "8%" }} src={cvcIcon} />
                         </span>
                       }
-                      formatter={(value) => {
-                        return value.toString().padStart(3, '0');
-                      }}
-                      value={creditCardPayment.cvc}
                       placeholder={creditCardPayment.cvc_placeholder}
-                      onChange={(value) =>
-                        onChangeValue(indexContent, content.type, value.toString().padStart(3, '0'), "cvc")
-                      }
                     />
                   </div>
                 )}
@@ -6361,31 +6357,22 @@ const UserMessage = ({
                           className="ss-user-setting__item-bottom"
                           style={{ display: "block" }}
                         >
-                          <InputNum
-                            style={{ marginLeft: "0px", width: "33%" }}
+                          <InputCustom
                             className="ss-user-setting-input-limit-character"
-                            max={9999}
-                            maxLength={4}
                             disabled={disabled}
-                            controls={false}
+                            style={{ marginLeft: "0px", width: "33%" }}
+                            value={cardPaymentRadioButton.cvc}
+                            onChange={(value) => {
+                              if (/^[0-9]{0,4}$/.test(value)) {
+                                onChangeValue(indexContent, content.type, value, "cvc")
+                              }
+                            }}
                             label={
                               <span style={{ fontWeight: "400" }}>
                                 CVC <img style={{ width: "8%" }} src={cvcIcon} />
                               </span>
                             }
-                            value={cardPaymentRadioButton.cvc}
-                            formatter={(value) => {
-                              return value.toString().padStart(3, '0');
-                            }}
                             placeholder={cardPaymentRadioButton.cvc_placeholder}
-                            onChange={(value) =>
-                              onChangeValue(
-                                indexContent,
-                                content.type,
-                                value.toString().padStart(3, '0'),
-                                "cvc"
-                              )
-                            }
                           />
                         </div>
                       )}
