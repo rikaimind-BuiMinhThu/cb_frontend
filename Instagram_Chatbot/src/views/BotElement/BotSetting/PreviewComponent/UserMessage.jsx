@@ -1264,6 +1264,13 @@ const UserMessage = ({
                                               `${res.data.data.city_name}${res.data.data.town_name}`,
                                               "value_municipality"
                                             );
+                                          } else if (shippingAddress.compact_municipality_and_address_and_building_name) {
+                                            onChangeValue(
+                                              indexContent,
+                                              content.type,
+                                              `${res.data.data.city_name}${res.data.data.town_name}${res.data.data.building_name}`,
+                                              "value_municipality"
+                                            );
                                           } else {
                                             onChangeValue(
                                               indexContent,
@@ -1369,6 +1376,13 @@ const UserMessage = ({
                                                 `${res.data.data.city_name}${res.data.data.town_name}`,
                                                 "value_municipality"
                                               );
+                                            } else if (shippingAddress.compact_municipality_and_address_and_building_name) {
+                                              onChangeValue(
+                                                indexContent,
+                                                content.type,
+                                                `${res.data.data.city_name}${res.data.data.town_name}${res.data.data.building_name}`,
+                                                "value_municipality"
+                                              );
                                             } else {
                                               onChangeValue(
                                                 indexContent,
@@ -1466,6 +1480,13 @@ const UserMessage = ({
                                                 indexContent,
                                                 content.type,
                                                 `${res.data.data.city_name}${res.data.data.town_name}`,
+                                                "value_municipality"
+                                              );
+                                            } else if (shippingAddress.compact_municipality_and_address_and_building_name) {
+                                              onChangeValue(
+                                                indexContent,
+                                                content.type,
+                                                `${res.data.data.city_name}${res.data.data.town_name}${res.data.data.building_name}`,
                                                 "value_municipality"
                                               );
                                             } else {
@@ -3239,6 +3260,13 @@ const UserMessage = ({
                                       `${res.data.data.city_name}${res.data.data.town_name}`,
                                       "value_municipality"
                                     );
+                                  } else if (zipCodeAddress.compact_municipality_and_address_and_building_name) {
+                                    onChangeValue(
+                                      indexContent,
+                                      content.type,
+                                      `${res.data.data.city_name}${res.data.data.town_name}${res.data.data.building_name}`,
+                                      "value_municipality"
+                                    );
                                   } else {
                                     onChangeValue(
                                       indexContent,
@@ -3350,6 +3378,13 @@ const UserMessage = ({
                                         `${res.data.data.city_name}${res.data.data.town_name}`,
                                         "value_municipality"
                                       );
+                                    } else if (zipCodeAddress.compact_municipality_and_address_and_building_name) {
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        `${res.data.data.city_name}${res.data.data.town_name}${res.data.data.building_name}`,
+                                        "value_municipality"
+                                      );
                                     } else {
                                       onChangeValue(
                                         indexContent,
@@ -3448,6 +3483,13 @@ const UserMessage = ({
                                         indexContent,
                                         content.type,
                                         `${res.data.data.city_name}${res.data.data.town_name}`,
+                                        "value_municipality"
+                                      );
+                                    } else if (zipCodeAddress.compact_municipality_and_address_and_building_name) {
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        `${res.data.data.city_name}${res.data.data.town_name}${res.data.data.building_name}`,
                                         "value_municipality"
                                       );
                                     } else {
