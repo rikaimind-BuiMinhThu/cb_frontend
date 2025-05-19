@@ -2550,6 +2550,7 @@ const PreviewFukushashiki = () => {
           case 'agree_term':
             {
               let searchValue = message.fukushashiki_search_value;
+              if (!searchValue) break;
               if (searchValue.includes(',')) {
                 let values = searchValue.split(',');
                 values.forEach(value => {
