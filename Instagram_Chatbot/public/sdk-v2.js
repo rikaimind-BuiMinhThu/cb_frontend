@@ -487,11 +487,12 @@ const fillDataFromMessage = async (data) => {
       }
 
       case "radio_button": {
-        if (element.tagName === ELEMENT_TAGS.RADIO) {
-          setRadioValue(element, item.bindingValue);
-        } else {
+        if (element.tagName === ELEMENT_TAGS.SELECT) {
           setValueToElement(element, item.bindingValue);
+          break;
         }
+
+        setRadioValue(element, item.bindingValue);
         break;
       }
 
