@@ -1268,7 +1268,7 @@ const UserMessage = ({
                                             onChangeValue(
                                               indexContent,
                                               content.type,
-                                              `${res.data.data.city_name}${res.data.data.town_name}${res.data.data.building_name}`,
+                                              `${res.data.data.city_name}${res.data.data.town_name}${res.data.data.building_name}`.replace,
                                               "value_municipality"
                                             );
                                           } else {
@@ -1380,7 +1380,7 @@ const UserMessage = ({
                                               onChangeValue(
                                                 indexContent,
                                                 content.type,
-                                                `${res.data.data.city_name}${res.data.data.town_name}${res.data.data.building_name}`,
+                                                `${res.data.data.city_name}${res.data.data.town_name}${res.data.data.building_name}`.replace,
                                                 "value_municipality"
                                               );
                                             } else {
@@ -1486,7 +1486,7 @@ const UserMessage = ({
                                               onChangeValue(
                                                 indexContent,
                                                 content.type,
-                                                `${res.data.data.city_name}${res.data.data.town_name}${res.data.data.building_name}`,
+                                                `${res.data.data.city_name}${res.data.data.town_name}${res.data.data.building_name}`.replace,
                                                 "value_municipality"
                                               );
                                             } else {
@@ -3264,7 +3264,7 @@ const UserMessage = ({
                                     onChangeValue(
                                       indexContent,
                                       content.type,
-                                      `${res.data.data.city_name}${res.data.data.town_name}${res.data.data.building_name}`,
+                                      `${res.data.data.city_name}${res.data.data.town_name}${res.data.data.building_name}`.replace,
                                       "value_municipality"
                                     );
                                   } else {
@@ -3382,7 +3382,7 @@ const UserMessage = ({
                                       onChangeValue(
                                         indexContent,
                                         content.type,
-                                        `${res.data.data.city_name}${res.data.data.town_name}${res.data.data.building_name}`,
+                                        `${res.data.data.city_name}${res.data.data.town_name}${res.data.data.building_name}`.replace,
                                         "value_municipality"
                                       );
                                     } else {
@@ -3489,7 +3489,7 @@ const UserMessage = ({
                                       onChangeValue(
                                         indexContent,
                                         content.type,
-                                        `${res.data.data.city_name}${res.data.data.town_name}${res.data.data.building_name}`,
+                                        `${res.data.data.city_name}${res.data.data.town_name}${res.data.data.building_name}`.replace('undefined', ''),
                                         "value_municipality"
                                       );
                                     } else {
