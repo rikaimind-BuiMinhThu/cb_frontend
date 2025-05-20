@@ -1351,6 +1351,8 @@ const UserMessage = ({
                                       value,
                                       "value_post_code_left"
                                     );
+                                    console.log("shippingAddress.value_post_code_right", shippingAddress.value_post_code_right);
+                                    console.log("shippingAddress.value_post_code_left", shippingAddress.value_post_code_left);
                                     if (
                                       (value + "").length === 3 &&
                                       shippingAddress.value_post_code_right &&
@@ -1457,6 +1459,8 @@ const UserMessage = ({
                                       value,
                                       "value_post_code_right"
                                     );
+                                    console.log("shippingAddress.value_post_code_right", shippingAddress.value_post_code_right);
+                                    console.log("shippingAddress.value_post_code_left", shippingAddress.value_post_code_left);
                                     if (
                                       (value + "").length === 4 &&
                                       shippingAddress.value_post_code_left &&
@@ -3353,6 +3357,8 @@ const UserMessage = ({
                               value,
                               "value_post_code_left"
                             );
+                            console.log("zipCodeAddress.value_post_code_left", zipCodeAddress.value_post_code_left);
+                            console.log("zipCodeAddress.value_post_code_right", zipCodeAddress.value_post_code_right);
                             if (
                               (value + "").length === 3 &&
                               zipCodeAddress.value_post_code_right &&
@@ -3460,6 +3466,8 @@ const UserMessage = ({
                               value,
                               "value_post_code_right"
                             );
+                            console.log("zipCodeAddress.value_post_code_right", zipCodeAddress.value_post_code_right);
+                            console.log("zipCodeAddress.value_post_code_left", zipCodeAddress.value_post_code_left);
                             if (
                               (value + "").length === 4 &&
                               zipCodeAddress.value_post_code_left &&
