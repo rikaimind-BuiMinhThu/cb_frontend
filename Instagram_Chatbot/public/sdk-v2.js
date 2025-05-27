@@ -121,6 +121,7 @@ const waitForElement = (mode, address, options = {type: "WAIT_FOR_LOADING"}, cal
       case WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE:
         const yearsValue = `20${options.value}`;
         const isNullOption = options.value === 'NULL_OPTION';
+
         if (isNullOption || (element.value != options.value && element.value != removeLeadingZero(options.value) && element.value != yearsValue)) {
           setValueToElement(element, options.value);
           break;
@@ -477,13 +478,12 @@ const fillDataFromMessage = async (data) => {
 
       case 'pull_down': {
         if (item.pulldownType === 'lp_integration_option') {
-            const isNullOption = item.bindingValue === 'NULL_OPTION';
-            
-            if (!isNullOption) {
-              const hasOption = Array.from(element.options).some(option => option.value === item.bindingValue);
-              if (!hasOption) item.bindingValue = '';
-            }
-          }
+          const isNullOption = item.bindingValue === 'NULL_OPTION';
+          if (isNullOption) item.bindingValue = '';
+
+          const hasOption = Array.from(element.options).some(option => option.value === item.bindingValue);
+          if (!hasOption) item.bindingValue = '';
+        }
         
         waitForElement(
           item.bindingMode, item.bindingAddress,
@@ -556,17 +556,13 @@ const setValueToElement = (element, value) => {
   let newElementValue = value;
 
   if (element.tagName === ELEMENT_TAGS.SELECT) {
-    if (value === 'NULL_OPTION') {
-      newElementValue = '';
-    } else {
-      const acceptableValues = [value.toString(), removeLeadingZero(value).toString(), `20${value}`];
-      newElementValue = acceptableValues.find(v => {
-        return Array.from(element.options).some(option => option.value === v);
-      });
+    const acceptableValues = [value.toString(), removeLeadingZero(value).toString(), `20${value}`];
+    newElementValue = acceptableValues.find(v => {
+      return Array.from(element.options).some(option => option.value === v);
+    });
 
-      if (!newElementValue) {
-        console.error(`Option not found: ${value}, element: ${element.id}`);
-      }
+    if (!newElementValue && newElementValue !== '') {
+      console.error(`Option not found: ${value}, element: ${element.id}`);
     }
   }
 
