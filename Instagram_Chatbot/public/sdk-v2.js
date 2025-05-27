@@ -476,10 +476,13 @@ const fillDataFromMessage = async (data) => {
 
       case 'pull_down': {
         if (item.pulldownType === 'lp_integration_option') {
-          const isNullOption = item.bindingValue === 'NULL_OPTION';
-          const hasOption = Array.from(element.options).some(option => (isNullOption ? option.value === '' : option.value === item.bindingValue));
-          if (!hasOption) item.bindingValue = '';
-        }
+            const isNullOption = item.bindingValue === 'NULL_OPTION';
+            
+            if (!isNullOption) {
+              const hasOption = Array.from(element.options).some(option => option.value === item.bindingValue);
+              if (!hasOption) item.bindingValue = '';
+            }
+          }
         
         waitForElement(
           item.bindingMode, item.bindingAddress,
@@ -552,13 +555,17 @@ const setValueToElement = (element, value) => {
   let newElementValue = value;
 
   if (element.tagName === ELEMENT_TAGS.SELECT) {
-    const acceptableValues = [value.toString(), removeLeadingZero(value).toString(), `20${value}`];
-    newElementValue = acceptableValues.find(v => {
-      return Array.from(element.options).some(option => option.value === v);
-    });;
+    if (value === 'NULL_OPTION') {
+      newElementValue = '';
+    } else {
+      const acceptableValues = [value.toString(), removeLeadingZero(value).toString(), `20${value}`];
+      newElementValue = acceptableValues.find(v => {
+        return Array.from(element.options).some(option => option.value === v);
+      });
 
-    if (!newElementValue) {
-      console.error(`Option not found: ${value}, element: ${element.id}`);
+      if (!newElementValue) {
+        console.error(`Option not found: ${value}, element: ${element.id}`);
+      }
     }
   }
 
