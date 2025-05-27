@@ -3022,8 +3022,8 @@ const UserMessage = ({
                       pullDown={pullDown}
                       data={getLPOptionData(pullDown.lp_element_search_value)}
                       postMessageToParent={postMessageToParent}
-                      keyValue="text"
-                      nameValue="value"
+                      keyValue="value"
+                      nameValue="text"
                       onChange={(value) =>
                         onChangeValue(
                           indexContent,
