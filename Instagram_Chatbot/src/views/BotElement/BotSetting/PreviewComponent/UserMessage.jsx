@@ -6275,8 +6275,8 @@ const UserMessage = ({
                             />
                           </div> :
                           <>
-                            <div style={{ width: "100%" }}>カード名義</div>
                             <div className="ss-user-setting__item-bottom">
+                              <div style={{ width: "100%" }}>カード名義</div>
                               <div style={{ display: 'flex', width: '100%', gap: '10px' }}>
                                 <InputCustom
                                   className="ss-user-setting-input-overview"
