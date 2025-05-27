@@ -372,7 +372,7 @@ const extractSelectOptions = (selectElement) => {
     .map((option, index) => ({
       id: index + 1,
       text: option.innerText,
-      value: option.innerText
+      value: option.value || 'NULL_OPTION'
     }));
 }
 
@@ -476,7 +476,8 @@ const fillDataFromMessage = async (data) => {
 
       case 'pull_down': {
         if (item.pulldownType === 'lp_integration_option') {
-          const hasOption = Array.from(element.options).some(option => option.value === item.bindingValue);
+          const isNullOption = item.bindingValue === 'NULL_OPTION';
+          const hasOption = Array.from(element.options).some(option => (isNullOption ? option.value === '' : option.value === item.bindingValue));
           if (!hasOption) item.bindingValue = '';
         }
         
