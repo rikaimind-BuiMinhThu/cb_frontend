@@ -1211,6 +1211,7 @@ const Scenario = () => {
             building_name: '',
             split_postal_code: false,
             compact_municipality_and_address: false,
+            compact_municipality_and_address_and_building_name: false,
             post_code_label: '郵便番号',
             prefecture_label: '都道府県',
             municipality_label: '市区町村',
@@ -1301,6 +1302,7 @@ const Scenario = () => {
             building_name: '',
             split_postal_code: false,
             compact_municipality_and_address: false,
+            compact_municipality_and_address_and_building_name: false,
             withHyphen: false,
             
           }
@@ -7486,8 +7488,25 @@ const Scenario = () => {
                                                         <div className="ss-user-setting__item-text_input-use-api-wrapper">
                                                           <CheckboxCustom
                                                             label="市区町村と番地を１フィールドで利用"
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'compact_municipality_and_address')}
+                                                            onChange={value => {
+                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'compact_municipality_and_address')
+                                                              if (value) {
+                                                                onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, false, 'compact_municipality_and_address_and_building_name');
+                                                              }
+                                                            }}
                                                             value={zipCodeAddress.compact_municipality_and_address}
+                                                          />
+                                                        </div>
+                                                        <div className="ss-user-setting__item-text_input-use-api-wrapper">
+                                                          <CheckboxCustom
+                                                            label="市区町村・番地・建物名を１フィールドで利用"
+                                                            onChange={value => {
+                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'compact_municipality_and_address_and_building_name')
+                                                              if (value) {
+                                                                onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, false, 'compact_municipality_and_address');
+                                                              }
+                                                            }}
+                                                            value={zipCodeAddress.compact_municipality_and_address_and_building_name}
                                                           />
                                                         </div>
                                                       </div>
@@ -7845,7 +7864,7 @@ const Scenario = () => {
                                                           )}
                                                         </div>
                                                       }
-                                                      {zipCodeAddress.address !== undefined && !zipCodeAddress.compact_municipality_and_address &&
+                                                      {zipCodeAddress.address !== undefined && !zipCodeAddress.compact_municipality_and_address_and_building_name && !zipCodeAddress.compact_municipality_and_address &&
                                                         <>
                                                           <div className="ss-user-setting__item-bottom" style={{gap: '1%'}}>
                                                             <InputCustom
@@ -7908,7 +7927,7 @@ const Scenario = () => {
                                                           )}
                                                         </>
                                                       }
-                                                      {zipCodeAddress.building_name !== undefined &&
+                                                      {zipCodeAddress.building_name !== undefined && !zipCodeAddress.compact_municipality_and_address_and_building_name &&
                                                         <>
                                                           <div className="ss-user-setting__item-bottom" style ={{gap: '1%'}}>
                                                             <InputCustom
@@ -13162,8 +13181,25 @@ const Scenario = () => {
                                                                                                             <div className="ss-user-setting__item-text_input-use-api-wrapper">
                                                                                                               <CheckboxCustom
                                                                                                                 label="市区町村と番地を１フィールドで利用"
-                                                                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'compact_municipality_and_address')}
+                                                                                                                onChange={value => {
+                                                                                                                  onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'compact_municipality_and_address')
+                                                                                                                  if (value) {
+                                                                                                                    onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, false, 'compact_municipality_and_address_and_building_name')
+                                                                                                                  }
+                                                                                                                }}
                                                                                                                 value={shippingAddress.compact_municipality_and_address}
+                                                                                                              />
+                                                                                                            </div>
+                                                                                                            <div className="ss-user-setting__item-text_input-use-api-wrapper">
+                                                                                                              <CheckboxCustom
+                                                                                                                label="市区町村・番地・建物名を１フィールドで利用"
+                                                                                                                onChange={value => {
+                                                                                                                  onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'compact_municipality_and_address_and_building_name')
+                                                                                                                  if (value) {
+                                                                                                                    onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, false, 'compact_municipality_and_address')
+                                                                                                                  }
+                                                                                                                }}
+                                                                                                                value={shippingAddress.compact_municipality_and_address_and_building_name}
                                                                                                               />
                                                                                                             </div>
                                                                                                           </div>

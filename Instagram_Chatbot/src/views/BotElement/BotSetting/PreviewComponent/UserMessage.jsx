@@ -1264,6 +1264,13 @@ const UserMessage = ({
                                               `${res.data.data.city_name}${res.data.data.town_name}`,
                                               "value_municipality"
                                             );
+                                          } else if (shippingAddress.compact_municipality_and_address_and_building_name) {
+                                            onChangeValue(
+                                              indexContent,
+                                              content.type,
+                                              `${res.data.data.city_name}${res.data.data.town_name}${res.data.data.building_name}`.replace('undefined', ''),
+                                              "value_municipality"
+                                            );
                                           } else {
                                             onChangeValue(
                                               indexContent,
@@ -1336,6 +1343,8 @@ const UserMessage = ({
                                       value,
                                       "value_post_code_left"
                                     );
+                                    console.log("shippingAddress.value_post_code_right", shippingAddress.value_post_code_right);
+                                    console.log("shippingAddress.value_post_code_left", shippingAddress.value_post_code_left);
                                     if ((value + "").length === 3) {
                                       moveToNext("ss-user-post-code-right-input2");
                                     }
@@ -1362,6 +1371,13 @@ const UserMessage = ({
                                                 indexContent,
                                                 content.type,
                                                 `${res.data.data.city_name}${res.data.data.town_name}`,
+                                                "value_municipality"
+                                              );
+                                            } else if (shippingAddress.compact_municipality_and_address_and_building_name) {
+                                              onChangeValue(
+                                                indexContent,
+                                                content.type,
+                                                `${res.data.data.city_name}${res.data.data.town_name}${res.data.data.building_name}`.replace('undefined', ''),
                                                 "value_municipality"
                                               );
                                             } else {
@@ -1433,6 +1449,8 @@ const UserMessage = ({
                                       value,
                                       "value_post_code_right"
                                     );
+                                    console.log("shippingAddress.value_post_code_right", shippingAddress.value_post_code_right);
+                                    console.log("shippingAddress.value_post_code_left", shippingAddress.value_post_code_left);
                                     if (
                                       (value + "").length === 4 &&
                                       shippingAddress.value_post_code_left &&
@@ -1456,6 +1474,13 @@ const UserMessage = ({
                                                 indexContent,
                                                 content.type,
                                                 `${res.data.data.city_name}${res.data.data.town_name}`,
+                                                "value_municipality"
+                                              );
+                                            } else if (shippingAddress.compact_municipality_and_address_and_building_name) {
+                                              onChangeValue(
+                                                indexContent,
+                                                content.type,
+                                                `${res.data.data.city_name}${res.data.data.town_name}${res.data.data.building_name}`.replace('undefined', ''),
                                                 "value_municipality"
                                               );
                                             } else {
@@ -2997,6 +3022,8 @@ const UserMessage = ({
                       pullDown={pullDown}
                       data={getLPOptionData(pullDown.lp_element_search_value)}
                       postMessageToParent={postMessageToParent}
+                      keyValue="value"
+                      nameValue="text"
                       onChange={(value) =>
                         onChangeValue(
                           indexContent,
@@ -3206,6 +3233,13 @@ const UserMessage = ({
                                       `${res.data.data.city_name}${res.data.data.town_name}`,
                                       "value_municipality"
                                     );
+                                  } else if (zipCodeAddress.compact_municipality_and_address_and_building_name) {
+                                    onChangeValue(
+                                      indexContent,
+                                      content.type,
+                                      `${res.data.data.city_name}${res.data.data.town_name}${res.data.data.building_name}`.replace('undefined', ''),
+                                      "value_municipality"
+                                    );
                                   } else {
                                     onChangeValue(
                                       indexContent,
@@ -3279,6 +3313,8 @@ const UserMessage = ({
                               value,
                               "value_post_code_left"
                             );
+                            console.log("zipCodeAddress.value_post_code_left", zipCodeAddress.value_post_code_left);
+                            console.log("zipCodeAddress.value_post_code_right", zipCodeAddress.value_post_code_right);
                             if ((value + "").length === 3) {
                               moveToNext(`ss-user-post-code-right-input${indexContent}`);
                             }
@@ -3306,6 +3342,13 @@ const UserMessage = ({
                                         indexContent,
                                         content.type,
                                         `${res.data.data.city_name}${res.data.data.town_name}`,
+                                        "value_municipality"
+                                      );
+                                    } else if (zipCodeAddress.compact_municipality_and_address_and_building_name) {
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        `${res.data.data.city_name}${res.data.data.town_name}${res.data.data.building_name}`.replace('undefined', ''),
                                         "value_municipality"
                                       );
                                     } else {
@@ -3378,6 +3421,8 @@ const UserMessage = ({
                               value,
                               "value_post_code_right"
                             );
+                            console.log("zipCodeAddress.value_post_code_right", zipCodeAddress.value_post_code_right);
+                            console.log("zipCodeAddress.value_post_code_left", zipCodeAddress.value_post_code_left);
                             if (
                               (value + "").length === 4 &&
                               zipCodeAddress.value_post_code_left &&
@@ -3401,6 +3446,13 @@ const UserMessage = ({
                                         indexContent,
                                         content.type,
                                         `${res.data.data.city_name}${res.data.data.town_name}`,
+                                        "value_municipality"
+                                      );
+                                    } else if (zipCodeAddress.compact_municipality_and_address_and_building_name) {
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        `${res.data.data.city_name}${res.data.data.town_name}${res.data.data.building_name}`.replace('undefined', ''),
                                         "value_municipality"
                                       );
                                     } else {
@@ -6225,8 +6277,8 @@ const UserMessage = ({
                             />
                           </div> :
                           <>
-                            <div style={{ width: "100%" }}>カード名義</div>
                             <div className="ss-user-setting__item-bottom">
+                              <div style={{ width: "100%" }}>カード名義</div>
                               <div style={{ display: 'flex', width: '100%', gap: '10px' }}>
                                 <InputCustom
                                   className="ss-user-setting-input-overview"

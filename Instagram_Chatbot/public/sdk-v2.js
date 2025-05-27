@@ -120,7 +120,9 @@ const waitForElement = (mode, address, options = {type: "WAIT_FOR_LOADING"}, cal
         break;
       case WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE:
         const yearsValue = `20${options.value}`;
-        if (element.value != options.value && element.value != removeLeadingZero(options.value) && element.value != yearsValue) {
+        const isNullOption = options.value === 'NULL_OPTION';
+
+        if (isNullOption || (element.value != options.value && element.value != removeLeadingZero(options.value) && element.value != yearsValue)) {
           setValueToElement(element, options.value);
           break;
         }
@@ -372,7 +374,7 @@ const extractSelectOptions = (selectElement) => {
     .map((option, index) => ({
       id: index + 1,
       text: option.innerText,
-      value: option.innerText
+      value: option.value || 'NULL_OPTION'
     }));
 }
 
@@ -476,6 +478,9 @@ const fillDataFromMessage = async (data) => {
 
       case 'pull_down': {
         if (item.pulldownType === 'lp_integration_option') {
+          const isNullOption = item.bindingValue === 'NULL_OPTION';
+          if (isNullOption) item.bindingValue = '';
+
           const hasOption = Array.from(element.options).some(option => option.value === item.bindingValue);
           if (!hasOption) item.bindingValue = '';
         }
@@ -487,6 +492,11 @@ const fillDataFromMessage = async (data) => {
       }
 
       case "radio_button": {
+        if (element.tagName === ELEMENT_TAGS.SELECT) {
+          setValueToElement(element, item.bindingValue);
+          break;
+        }
+
         setRadioValue(element, item.bindingValue);
         break;
       }
@@ -549,9 +559,9 @@ const setValueToElement = (element, value) => {
     const acceptableValues = [value.toString(), removeLeadingZero(value).toString(), `20${value}`];
     newElementValue = acceptableValues.find(v => {
       return Array.from(element.options).some(option => option.value === v);
-    });;
+    });
 
-    if (!newElementValue) {
+    if (!newElementValue && newElementValue !== '') {
       console.error(`Option not found: ${value}, element: ${element.id}`);
     }
   }

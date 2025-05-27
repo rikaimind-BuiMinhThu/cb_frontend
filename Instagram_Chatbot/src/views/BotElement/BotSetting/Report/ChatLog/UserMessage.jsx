@@ -2279,6 +2279,8 @@ export default function UserMessage({
                               value,
                               "value_post_code_left"
                             );
+                            console.log("zipCodeAddress.value_post_code_right", zipCodeAddress.value_post_code_right);
+                            console.log("zipCodeAddress.value_post_code_left", zipCodeAddress.value_post_code_left);
                             if (
                               (value + "").length === 3 &&
                               zipCodeAddress.value_post_code_right &&
@@ -2346,6 +2348,8 @@ export default function UserMessage({
                               (zipCodeAddress.value_post_code_left + "")
                                 .length === 3
                             ) {
+                              console.log("zipCodeAddress.value_post_code_left", zipCodeAddress.value_post_code_left);
+                              console.log("zipCodeAddress.value_post_code_right", zipCodeAddress.value_post_code_right);
                               api
                                 .get(
                                   `/api/v1/get_address_from_zip_code?zip_code=${zipCodeAddress.value_post_code_left}${value}`

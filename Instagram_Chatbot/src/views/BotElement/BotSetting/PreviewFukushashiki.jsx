@@ -1924,6 +1924,7 @@ const PreviewFukushashiki = () => {
                 isValidZipCode = false;
               }
               if (
+                !contentType.compact_municipality_and_address_and_building_name &&
                 contentType.address !== undefined &&
                 stringNullOrEmpty(contentType.value_address) && contentType.hasOwnProperty('address')
               ) {
@@ -1956,13 +1957,15 @@ const PreviewFukushashiki = () => {
               isValidZipCode = false;
             }
             if (
+              !contentType.compact_municipality_and_address_and_building_name &&
               contentType.address !== undefined &&
               stringNullOrEmpty(contentType.value_address) && contentType.hasOwnProperty('address')
             ) {
               isValidZipCode = false;
             }
             if (
-              contentType.address !== undefined &&
+              !contentType.compact_municipality_and_address_and_building_name &&
+              contentType.building_name !== undefined &&
               stringNullOrEmpty(contentType.value_building_name) && contentType.hasOwnProperty('building_name')
             ) {
               isValidZipCode = false;
@@ -2033,13 +2036,15 @@ const PreviewFukushashiki = () => {
               isValidShippingAddress = false;
             }
             if (
+              !contentType.compact_municipality_and_address_and_building_name &&
               contentType.address !== undefined &&
               stringNullOrEmpty(contentType.value_address)
             ) {
               isValidShippingAddress = false;
             }
             if (
-              contentType.address !== undefined &&
+              !contentType.compact_municipality_and_address_and_building_name &&
+              contentType.building_name !== undefined &&
               stringNullOrEmpty(contentType.value_building_name)
             ) {
               isValidShippingAddress = false;
@@ -2266,6 +2271,11 @@ const PreviewFukushashiki = () => {
           errorsMess[
             `message${index}_content${i}_${contentArr[i].type}`
           ] = "有効期限に誤りがあるために、決済を完了できませんでした。";
+          isValid = false;
+        } else if (contentType.cvc && (contentType.cvc.toString().length < 3 || contentType.cvc.toString().length > 4)) {
+          errorsMess[
+            `message${index}_content${i}_${contentArr[i].type}`
+          ] = "CVCは3桁か4桁で入力してください。";
           isValid = false;
         }
       }
@@ -2595,6 +2605,7 @@ const PreviewFukushashiki = () => {
           case 'agree_term':
             {
               let searchValue = message.fukushashiki_search_value;
+              if (!searchValue) break;
               if (searchValue.includes(',')) {
                 let values = searchValue.split(',');
                 values.forEach(value => {
@@ -2821,7 +2832,10 @@ const PreviewFukushashiki = () => {
           case 'radio_button':
             {
               const initialSelection = message.radio_button.initial_selection;
-              const selectedElement = message.radio_button.default.find(item => item.value === initialSelection);
+              let selectedElement = message.radio_button.default.find(item => item.value === initialSelection);
+              if (!selectedElement) {
+                selectedElement = message.radio_button.radio_button_img.find(item => item.value === initialSelection);
+              }
               if (selectedElement) {
                 const value = selectedElement.value;
                 const fukuObject = {
