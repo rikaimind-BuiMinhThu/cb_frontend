@@ -896,6 +896,27 @@ const PreviewFukushashiki = () => {
     });
   }
 
+  const renderMessagesWithDelay = (theState, startMsgIndex, endMsgIndex) => {
+    return new Promise(async (resolve) => {
+      for (let i = startMsgIndex; i <= endMsgIndex; i++) {
+        theState.renderMessagesList = theState.messagesList.slice(0, i + 1);
+        if (isDelayBotMessage(theState.messagesList[i])) {
+          await sleep(theState.messagesList[i].message_content[0].delay.content * 1000);
+          theState.messagesList[i].hidden = true;
+          continue;
+        }
+        
+        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: theState });
+        await sleep(1000);
+      }
+      resolve();
+    }).then(() => {
+      theState.renderMessagesList = theState.messagesList.slice(0, theState.currentMsgIndex + 1);
+      theState.passedUserMsgCount = theState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
+      dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: theState });
+    });
+  }
+
   const extractStateFromPreviewResponse = async (res) => {
     if (!res || !res.data || res.data.code !== 1) return;
     
@@ -1000,19 +1021,29 @@ const PreviewFukushashiki = () => {
       }
     }
 
-    newState.currentUserMsgIndex = newState.messagesList.findIndex((item) => !item.hidden && isUserMessage(item));
+    newState.currentUserMsgIndex = newState.messagesList.findIndex((item) => {
+      const firstMsgContent = item?.message_content?.[0];
+      const isDisplayBtnNext = firstMsgContent?.type != "image" || firstMsgContent?.image?.displayButtonNext != false;
+
+      return !item.hidden && isUserMessage(item) && isDisplayBtnNext;
+    });
 
     // For the first time, we need to render to the first user message
     if (newState.currentUserMsgIndex >= 0) {
       newState.currentMsgIndex = newState.currentUserMsgIndex;
     }
 
-    newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
     newState.renderMessagesList = newState.renderMessagesList.map((msg) => {
       return isDelayBotMessage(msg) ? {...msg, hidden: true} : msg;
-    }); 
-    newState.passedUserMsgCount = newState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
-    dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
+    });
+
+    if (newState.isOpen) {
+      return renderMessagesWithDelay(newState, 0, newState.currentMsgIndex);
+    } else {
+      newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+      newState.passedUserMsgCount = newState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
+      dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
+    }
   }
 
   const fukushashikiSavedStateToLp = (savedState) => {
@@ -1145,8 +1176,18 @@ const PreviewFukushashiki = () => {
 
   useEffect(async () => {
     if (!state.isOpen) return;
-    await sleep(1000);
-    scrollToBottom(false);
+
+    const renderUserMessagesList = state.renderMessagesList.filter(message => {
+      const firstMsgContent = message?.message_content?.[0];
+      const isDisplayBtnNext = firstMsgContent?.type != "image" || firstMsgContent?.image?.displayButtonNext != false;
+      return isUserMessage(message) && isDisplayBtnNext && !message.hidden;
+    });
+
+    if (renderUserMessagesList.length > 1) {
+      scrollToBottom(false);
+    } else {
+      scrollToTop();
+    }
   }, [state.isOpen, state.renderMessagesList.length, state.submitErrorMessage]);
 
   const scrollToBottom = (forceScroll = false) => {
@@ -1157,6 +1198,15 @@ const PreviewFukushashiki = () => {
       });
     }
   };
+
+  const scrollToTop = () => {
+    if (document.getElementById("sp-body")) {
+      document.getElementById("sp-body").scrollTo({
+        top: 0,
+        behavior: "auto"
+      });
+    }
+  }
 
   const handleValidateField = (index) => {
     let contentArr = [...state.renderMessagesList[index].message_content];

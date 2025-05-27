@@ -539,6 +539,9 @@ const removeFirstTwoChars = (input) => {
 
 const setCheckToCheckboxElement = (element, value) => {
   if (!element.type === 'checkbox') return;
+  const currentValue = element.checked;
+  if (currentValue === value) return;
+
   element.checked = value;
   element.dispatchEvent(new Event('input', { bubbles: true }));
   element.dispatchEvent(new Event('change', { bubbles: true }));
