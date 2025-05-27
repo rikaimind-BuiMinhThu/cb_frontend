@@ -20,6 +20,7 @@ import jcb from "assets/img/payment-method/jcb.png";
 import master_card from "assets/img/payment-method/master_card.png";
 import visa from "assets/img/payment-method/visa.png";
 import InputNum from "../../ScenarioSetting/scenarioComon/InputNum";
+import { REGEXP } from "../../PreviewComponent/Constants";
 
 import cvcIcon from "assets/img/cvc-icon.png";
 import ModalNoti from "views/Popup/ModalNoti";
@@ -2265,6 +2266,7 @@ export default function UserMessage({
                             if (e.target.value.length >= 3) e.preventDefault();
                           }}
                           onChange={async (value) => {
+                            if (!REGEXP.NUMBER.test(value)) return;
                             if ((value + "").length === 3) {
                               document
                                 .getElementById("ss-user-post-code-right-input")
@@ -2336,6 +2338,7 @@ export default function UserMessage({
                             if (e.target.value.length >= 4) e.preventDefault();
                           }}
                           onChange={async (value) => {
+                            if (!REGEXP.NUMBER.test(value)) return;
                             onChangeValue(
                               indexContent,
                               content.type,
