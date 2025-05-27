@@ -2222,6 +2222,11 @@ const PreviewFukushashiki = () => {
             `message${index}_content${i}_${contentArr[i].type}`
           ] = "有効期限に誤りがあるために、決済を完了できませんでした。";
           isValid = false;
+        } else if (contentType.cvc && (contentType.cvc.length < 3 || contentType.cvc.length > 4)) {
+          errorsMess[
+            `message${index}_content${i}_${contentArr[i].type}`
+          ] = "CVCは3桁か4桁で入力してください。";
+          isValid = false;
         }
       }
       if (
