@@ -120,7 +120,8 @@ const waitForElement = (mode, address, options = {type: "WAIT_FOR_LOADING"}, cal
         break;
       case WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE:
         const yearsValue = `20${options.value}`;
-        if (element.value != options.value && element.value != removeLeadingZero(options.value) && element.value != yearsValue) {
+        const isNullOption = options.value === 'NULL_OPTION';
+        if (isNullOption || (element.value != options.value && element.value != removeLeadingZero(options.value) && element.value != yearsValue)) {
           setValueToElement(element, options.value);
           break;
         }
