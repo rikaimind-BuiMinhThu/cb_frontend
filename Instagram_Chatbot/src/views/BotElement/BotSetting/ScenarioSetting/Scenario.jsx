@@ -1895,6 +1895,23 @@ const Scenario = () => {
 
   }
 
+  const renderAddressField = (address) => {
+    if (address.compact_municipality_and_address || address.compact_municipality_and_address_and_building_name) return;
+    if (address.address === undefined) return;
+    return (
+      <div className="ss-user-setting__item-bottom">
+        <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
+          {address.address_label || '番地'}
+        </div>
+        <InputCustom
+          placeholder={address.address}
+          disabled={true}
+          style={{ width: '100%' }}
+        />
+      </div>
+    );
+  }
+
   const renderPreviewPulldownfromJs = (pullDown) => {
     if (pullDown.type !== MESSAGE_CONTENT_TYPES.PULLDOWN.FROM_JS) return null;
 
@@ -4163,18 +4180,7 @@ const Scenario = () => {
                                                                   />
                                                                 </div>
                                                               }
-                                                              {zipCodeAddress.address !== undefined &&
-                                                                <div className="ss-user-setting__item-bottom">
-                                                                  <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
-                                                                    {zipCodeAddress.address_label || '番地'}
-                                                                  </div>
-                                                                  <InputCustom
-                                                                    placeholder={zipCodeAddress.address}
-                                                                    disabled={true}
-                                                                    style={{ width: '100%' }}
-                                                                  />
-                                                                </div>
-                                                              }
+                                                              {renderAddressField(zipCodeAddress)}
                                                               {zipCodeAddress.building_name !== undefined &&
                                                                 <div className="ss-user-setting__item-bottom">
                                                                   <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
