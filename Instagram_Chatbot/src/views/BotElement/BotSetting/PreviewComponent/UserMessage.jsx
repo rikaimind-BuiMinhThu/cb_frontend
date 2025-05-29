@@ -610,6 +610,44 @@ const UserMessage = ({
       />
     );
   }
+
+  const renderAddressField = (address, indexContent) => {
+    if (address.compact_municipality_and_address || address.compact_municipality_and_address_and_building_name) return;
+    if (address.address === undefined) return;
+    return (
+      <div className="ss-user-setting__item-bottom">
+        <div
+          style={{
+            fontWeight: "400",
+            fontSize: "12px",
+            width: "100%",
+            marginBottom: "3px",
+          }}
+        >
+          {
+            address.address_label && address.address_label.trim() !== ""
+              ? address.address_label
+              : '番地'
+          }
+        </div>
+        <InputCustom
+          placeholder={address.address}
+          id={`ss-user-input-address${indexContent}`}
+          disabled={disabled}
+          style={{ width: "100%" }}
+          onChange={(value) =>
+            onChangeValue(
+              indexContent,
+              content.type,
+              value,
+              "value_address"
+            )
+          }
+          value={address.value_address}
+        />
+      </div>
+    )
+  }
   
   return (
     <div className="ss-user-message__content-wrapper">
@@ -3597,39 +3635,7 @@ const UserMessage = ({
                     />
                   </div>
                 )}
-                {zipCodeAddress.address !== undefined && (
-                  <div className="ss-user-setting__item-bottom">
-                    <div
-                      style={{
-                        fontWeight: "400",
-                        fontSize: "12px",
-                        width: "100%",
-                        marginBottom: "3px",
-                      }}
-                    >
-                      {
-                        zipCodeAddress.address_label && zipCodeAddress.address_label.trim() !== ""
-                          ? zipCodeAddress.address_label
-                          : '番地'
-                      }
-                    </div>
-                    <InputCustom
-                      placeholder={zipCodeAddress.address}
-                      id={`ss-user-input-address${indexContent}`}
-                      disabled={disabled}
-                      style={{ width: "100%" }}
-                      onChange={(value) =>
-                        onChangeValue(
-                          indexContent,
-                          content.type,
-                          value,
-                          "value_address"
-                        )
-                      }
-                      value={zipCodeAddress.value_address}
-                    />
-                  </div>
-                )}
+                {renderAddressField(zipCodeAddress, indexContent)}
                 {zipCodeAddress.building_name !== undefined && (
                   <div className="ss-user-setting__item-bottom">
                     <div
