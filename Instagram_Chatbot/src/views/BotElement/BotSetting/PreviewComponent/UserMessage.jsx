@@ -611,7 +611,7 @@ const UserMessage = ({
     );
   }
 
-  const renderAddressField = (address, indexContent) => {
+  const renderAddressField = (address, indexContent, content) => {
     if (address.compact_municipality_and_address || address.compact_municipality_and_address_and_building_name) return;
     if (address.address === undefined) return;
     return (
@@ -3633,7 +3633,7 @@ const UserMessage = ({
                     />
                   </div>
                 )}
-                {renderAddressField(zipCodeAddress, indexContent)}
+                {renderAddressField(zipCodeAddress, indexContent, content)}
                 {zipCodeAddress.building_name !== undefined && (
                   <div className="ss-user-setting__item-bottom">
                     <div
