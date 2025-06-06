@@ -1375,7 +1375,7 @@ const UserMessage = ({
                                     if (e.target.value.length >= 3) e.preventDefault();
                                   }}
                                   onChange={async (value) => {
-                                    if (!NUMBER_REGEX.test(value)) return;
+                                    if (value && !NUMBER_REGEX.test(value)) return;
                                     onChangeValue(
                                       indexContent,
                                       content.type,
@@ -1482,7 +1482,7 @@ const UserMessage = ({
                                     if (e.target.value.length >= 4) e.preventDefault();
                                   }}
                                   onChange={async (value) => {
-                                    if (!NUMBER_REGEX.test(value)) return;
+                                    if (value && !NUMBER_REGEX.test(value)) return;
                                     onChangeValue(
                                       indexContent,
                                       content.type,
@@ -3347,7 +3347,7 @@ const UserMessage = ({
                             if (e.target.value.length >= 3) e.preventDefault();
                           }}
                           onChange={async (value) => {
-                            if (!NUMBER_REGEX.test(value)) return;
+                            if (value && !NUMBER_REGEX.test(value)) return;
                             onChangeValue(
                               indexContent,
                               content.type,
@@ -3456,7 +3456,7 @@ const UserMessage = ({
                             if (e.target.value.length >= 4) e.preventDefault();
                           }}
                           onChange={async (value) => {
-                            if (!NUMBER_REGEX.test(value)) return;
+                            if (value && !NUMBER_REGEX.test(value)) return;
                             onChangeValue(
                               indexContent,
                               content.type,
