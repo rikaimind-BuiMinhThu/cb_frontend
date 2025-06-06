@@ -27,7 +27,7 @@ import { tokenExpired } from "api/tokenExpired";
 import { SHORTEN_URL } from "../../../../variables/constants";
 import locale from "antd/es/date-picker/locale/ja_JP";
 import "moment/locale/zh-cn";
-import { dataHourFixed, dataMinutes, dataYearFixed, dataMonth, dataDay, dataPaymentMethod, installmentOptions } from "./Constants";
+import { dataHourFixed, dataMinutes, dataYearFixed, dataMonth, dataDay, dataPaymentMethod, installmentOptions, NUMBER_REGEX } from "./Constants";
 import { stringNullOrEmpty } from "./Utils";
 
 const UserMessage = ({
@@ -1375,6 +1375,7 @@ const UserMessage = ({
                                     if (e.target.value.length >= 3) e.preventDefault();
                                   }}
                                   onChange={async (value) => {
+                                    if (!NUMBER_REGEX.test(value)) return;
                                     onChangeValue(
                                       indexContent,
                                       content.type,
@@ -1481,6 +1482,7 @@ const UserMessage = ({
                                     if (e.target.value.length >= 4) e.preventDefault();
                                   }}
                                   onChange={async (value) => {
+                                    if (!NUMBER_REGEX.test(value)) return;
                                     onChangeValue(
                                       indexContent,
                                       content.type,
@@ -3345,6 +3347,7 @@ const UserMessage = ({
                             if (e.target.value.length >= 3) e.preventDefault();
                           }}
                           onChange={async (value) => {
+                            if (!NUMBER_REGEX.test(value)) return;
                             onChangeValue(
                               indexContent,
                               content.type,
@@ -3453,6 +3456,7 @@ const UserMessage = ({
                             if (e.target.value.length >= 4) e.preventDefault();
                           }}
                           onChange={async (value) => {
+                            if (!NUMBER_REGEX.test(value)) return;
                             onChangeValue(
                               indexContent,
                               content.type,

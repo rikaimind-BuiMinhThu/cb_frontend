@@ -82,6 +82,7 @@ const installmentOptions = Array.from({ length: 23 }, (_, i) => ({
 }));
 
 const SCAN_REGEX = /\{\{(.*?)\}\}/g;
+const NUMBER_REGEX = /^\d+$/;
 const CHATBOT_SERVER = {
   SCENARIO_USER_RESPONSE_PATH: '/api/v1/scenario_users/scenario_user_responses',
   SCENARIO_CREATE_ORDER_PATH: '/api/v1/scenario_users/scenario_user_responses/create_order',
@@ -156,6 +157,7 @@ export {
   dataPaymentMethod,
   installmentOptions,
   SCAN_REGEX,
+  NUMBER_REGEX,
   CHATBOT_SERVER,
   GET_CAPTCHA_PATH,
   SESSION_STORAGE_KEY,
