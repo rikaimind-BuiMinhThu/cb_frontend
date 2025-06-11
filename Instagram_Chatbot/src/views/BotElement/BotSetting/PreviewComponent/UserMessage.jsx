@@ -786,6 +786,7 @@ const UserMessage = ({
                     {textInput.phone_number.withHyphen === false ? (
                       <InputCustom
                         disabled={disabled}
+                        inputMode="numeric"
                         // className="ss-message__content--user-text-input ss-input-value"
                         style={{ marginBottom: "0px" }}
                         placeholder={textInput[textInput.type]?.number}
@@ -1368,6 +1369,7 @@ const UserMessage = ({
                               >
                                 <InputCustom
                                   type="number"
+                                  inputMode="numeric"
                                   placeholder={shippingAddress.post_code_left}
                                   disabled={disabled}
                                   style={{ width: "49%" }}
@@ -1474,6 +1476,7 @@ const UserMessage = ({
                                 />
                                 <InputCustom
                                   type="number"
+                                  inputMode="numeric"
                                   placeholder={shippingAddress.post_code_right}
                                   disabled={disabled}
                                   id="ss-user-post-code-right-input2"
@@ -1732,6 +1735,7 @@ const UserMessage = ({
                                 </div>
                                 <InputCustom
                                   disabled={disabled}
+                                  inputMode="numeric"
                                   // className="ss-message__content--user-text-input ss-input-value"
                                   style={{ marginBottom: "0px" }}
                                   placeholder={shippingAddress.text?.number_placeholder}
@@ -1765,6 +1769,7 @@ const UserMessage = ({
                                   }}
                                 >
                                   <InputCustom
+                                    inputMode="numeric"
                                     disabled={disabled}
                                     className="ss-message__content--user-text-input ss-input-value"
                                     maxLength={3}
@@ -1784,6 +1789,7 @@ const UserMessage = ({
                                     value={shippingAddress.value_number1}
                                   ></InputCustom>
                                   <InputCustom
+                                    inputMode="numeric"
                                     id="ss-user-message-phone_number_22"
                                     disabled={disabled}
                                     className="ss-message__content--user-text-input ss-input-value"
@@ -1804,6 +1810,7 @@ const UserMessage = ({
                                     value={shippingAddress.value_number2}
                                   ></InputCustom>
                                   <InputCustom
+                                    inputMode="numeric"
                                     id="ss-user-message-phone_number_33"
                                     disabled={disabled}
                                     // className="ss-message__content--user-text-input ss-input-value"

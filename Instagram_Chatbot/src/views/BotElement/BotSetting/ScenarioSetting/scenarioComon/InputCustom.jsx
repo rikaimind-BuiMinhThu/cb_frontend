@@ -4,13 +4,16 @@ import CheckboxCustom from './CheckboxCustom';
 
 const InputCustom = ({ id, type = "text", value, maxLength = 200, onChange, placeholder, className, label, icon, onClickIcon, classIcon, handleCheckBox, valueCheckbox = false, style, classLabel, disabled = false, styleLabel, inline = true, onKeyPress, pattern, onPaste, readOnly = false, useFukushashiki = false, editableLabel = false, 
     onLabelChange, 
-    labelValue  }) => {
+    labelValue,
+    inputMode = "text"
+ }) => {
 
     return (
         <React.Fragment>
             {editableLabel ? (
                 <input
                     type="text"
+                    inputmode={inputMode}
                     value={labelValue}
                     onChange={e => onLabelChange(e.target.value)}
                     className={`ss-editable-label ${classLabel || ''}`}
@@ -30,6 +33,7 @@ const InputCustom = ({ id, type = "text", value, maxLength = 200, onChange, plac
                 id={id}
                 maxLength={maxLength}
                 type={type}
+                inputmode={inputMode}
                 onPaste={onPaste}
                 pattern={pattern}
                 onKeyPress={onKeyPress}
