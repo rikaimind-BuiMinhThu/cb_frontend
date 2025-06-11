@@ -5,8 +5,68 @@ import CheckboxCustom from './CheckboxCustom';
 const InputCustom = ({ id, type = "text", value, maxLength = 200, onChange, placeholder, className, label, icon, onClickIcon, classIcon, handleCheckBox, valueCheckbox = false, style, classLabel, disabled = false, styleLabel, inline = true, onKeyPress, pattern, onPaste, readOnly = false, useFukushashiki = false, editableLabel = false, 
     onLabelChange, 
     labelValue,
-    inputMode = "text"
+    inputMode = "text",
+    clearable = false,
  }) => {
+
+    const renderWithClearIcon = () => {
+        return (
+            <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', width: inline ? '100%' : 'fit-content' }}>
+                <input
+                    id={id}
+                    maxLength={maxLength}
+                    type={type}
+                    inputMode={inputMode}
+                    onPaste={onPaste}
+                    pattern={pattern}
+                    onKeyPress={onKeyPress}
+                    name="ss-user-setting__item-text_input-use-api"
+                    className={`ss-input-value ${!useFukushashiki ? 'ss-user-setting-item' : ''} ${className || ''}`}
+                    placeholder={placeholder}
+                    disabled={disabled}
+                    value={value}
+                    style={{ ...style, paddingRight: '30px' }} // Add padding to avoid overlap with the clear icon
+                    onChange={e => onChange(e.target.value)}
+                    readOnly={readOnly}
+                />
+                <MDBIcon
+                    fas
+                    icon="times"
+                    onClick={e => onChange("")}
+                    style={{
+                    position: 'absolute',
+                    right: '10px',
+                    cursor: 'pointer',
+                    color: '#666',
+                    fontSize: '14px'
+                    }}
+                    className="ss-clear-input-icon"
+                />
+            </div>
+        )
+    }
+
+    const renderWithoutClearIcon = () => {
+        return (
+            <input
+                id={id}
+                maxLength={maxLength}
+                type={type}
+                inputMode={inputMode}
+                onPaste={onPaste}
+                pattern={pattern}
+                onKeyPress={onKeyPress}
+                name="ss-user-setting__item-text_input-use-api"
+                className={`ss-input-value ${!useFukushashiki ? 'ss-user-setting-item' : ''} ${className || ''}`}
+                placeholder={placeholder}
+                disabled={disabled}
+                value={value}
+                style={{ ...style, paddingRight: '30px' }} // Add padding to avoid overlap with the clear icon
+                onChange={e => onChange(e.target.value)}
+                readOnly={readOnly}
+            />
+        );
+    }
 
     return (
         <React.Fragment>
@@ -29,23 +89,7 @@ const InputCustom = ({ id, type = "text", value, maxLength = 200, onChange, plac
                     </div>
                 )
             )}
-            <input
-                id={id}
-                maxLength={maxLength}
-                type={type}
-                inputmode={inputMode}
-                onPaste={onPaste}
-                pattern={pattern}
-                onKeyPress={onKeyPress}
-                name="ss-user-setting__item-text_input-use-api"
-                className={`ss-input-value ${!useFukushashiki ? 'ss-user-setting-item' : ''} ${className || ''}`}
-                placeholder={placeholder}
-                disabled={disabled}
-                value={value}
-                style={{...style}}
-                onChange={e => onChange(e.target.value)}
-                readOnly={readOnly}
-            />
+            {clearable ? renderWithClearIcon() : renderWithoutClearIcon()}
             {handleCheckBox &&
                 <CheckboxCustom
                     label="Use the dropdown"
