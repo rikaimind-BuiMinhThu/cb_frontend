@@ -27,7 +27,7 @@ import { tokenExpired } from "api/tokenExpired";
 import { SHORTEN_URL } from "../../../../variables/constants";
 import locale from "antd/es/date-picker/locale/ja_JP";
 import "moment/locale/zh-cn";
-import { dataHourFixed, dataMinutes, dataYearFixed, dataMonth, dataDay, dataPaymentMethod, installmentOptions } from "./Constants";
+import { dataHourFixed, dataMinutes, dataYearFixed, dataMonth, dataDay, dataPaymentMethod, installmentOptions, NUMBER_REGEX } from "./Constants";
 import { stringNullOrEmpty } from "./Utils";
 
 const UserMessage = ({
@@ -611,7 +611,7 @@ const UserMessage = ({
     );
   }
 
-  const renderAddressField = (address, indexContent) => {
+  const renderAddressField = (address, indexContent, content) => {
     if (address.compact_municipality_and_address || address.compact_municipality_and_address_and_building_name) return;
     if (address.address === undefined) return;
     return (
@@ -1375,7 +1375,7 @@ const UserMessage = ({
                                     if (e.target.value.length >= 3) e.preventDefault();
                                   }}
                                   onChange={async (value) => {
-                                    if (!REGEXP.NUMBER.test(value)) return;
+                                    if (value && !NUMBER_REGEX.test(value)) return;
                                     onChangeValue(
                                       indexContent,
                                       content.type,
@@ -1482,6 +1482,7 @@ const UserMessage = ({
                                     if (e.target.value.length >= 4) e.preventDefault();
                                   }}
                                   onChange={async (value) => {
+                                    if (value && !NUMBER_REGEX.test(value)) return;
                                     onChangeValue(
                                       indexContent,
                                       content.type,
@@ -3346,7 +3347,7 @@ const UserMessage = ({
                             if (e.target.value.length >= 3) e.preventDefault();
                           }}
                           onChange={async (value) => {
-                            if (!REGEXP.NUMBER.test(value)) return;
+                            if (value && !NUMBER_REGEX.test(value)) return;
                             onChangeValue(
                               indexContent,
                               content.type,
@@ -3455,6 +3456,7 @@ const UserMessage = ({
                             if (e.target.value.length >= 4) e.preventDefault();
                           }}
                           onChange={async (value) => {
+                            if (value && !NUMBER_REGEX.test(value)) return;
                             onChangeValue(
                               indexContent,
                               content.type,
@@ -3635,7 +3637,7 @@ const UserMessage = ({
                     />
                   </div>
                 )}
-                {renderAddressField(zipCodeAddress, indexContent)}
+                {renderAddressField(zipCodeAddress, indexContent, content)}
                 {zipCodeAddress.building_name !== undefined && (
                   <div className="ss-user-setting__item-bottom">
                     <div
