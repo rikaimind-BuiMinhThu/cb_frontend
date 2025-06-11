@@ -148,6 +148,10 @@ const MESSAGE_CONTENT_TYPES = {
   },
 };
 
+const REGEXP = {
+  NUMBER: /^[0-9]+$/,
+}
+
 export {
   dataHourFixed,
   dataMinutes,
@@ -166,5 +170,6 @@ export {
   SEARCH_MODES,
   MESSAGE_CONTENT_TYPES,
   NO_ERROR,
-  GETTING_ERROR_NOTIFICATION
+  GETTING_ERROR_NOTIFICATION,
+  REGEXP,
 };

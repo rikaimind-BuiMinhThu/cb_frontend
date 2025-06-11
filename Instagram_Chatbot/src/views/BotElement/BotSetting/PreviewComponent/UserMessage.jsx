@@ -9,7 +9,7 @@ import CheckboxCustom from "../ScenarioSetting/scenarioComon/CheckboxCustom";
 import InputCustom from "../ScenarioSetting/scenarioComon/InputCustom";
 import { Button } from "reactstrap";
 import ModalNoti from "../../../Popup/ModalNoti";
-import { CHATBOT_ACTIONS, CRAWL_ELEMENT_TYPES, MESSAGE_CONTENT_TYPES } from "../PreviewComponent/Constants";
+import { CHATBOT_ACTIONS, CRAWL_ELEMENT_TYPES, MESSAGE_CONTENT_TYPES, REGEXP } from "../PreviewComponent/Constants";
 import {
   Checkbox,
   Radio,

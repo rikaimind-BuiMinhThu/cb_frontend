@@ -254,6 +254,7 @@ const displayPopup = async () => {
     "message",
     async (e) => {
       if (typeof e.data !== 'object') return;
+      if (e.data.source !== 'ec-chatbot') return;
       chatbotW = e.data.widthPc;
       chatbotH = e.data.heightPc;
       chatbotRight = e.data.chatbotRight;
