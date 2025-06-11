@@ -2955,6 +2955,7 @@ const PreviewFukushashiki = () => {
     
     const defaultOptions = {
       isOpen: state.isOpen,
+      source: 'ec-chatbot',
       // widthPc: state.widthPc,
       // heightPc: state.heightPc,
       // widthSp: state.widthSp,
