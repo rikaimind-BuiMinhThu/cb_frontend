@@ -49,7 +49,8 @@ const UserMessage = ({
   lpOptionData = {},
   submitErrorMessage = '',
   postMessageToParent,
-  botId
+  botId,
+  isProcessing
 }) => {
   const [dataHour, setDataHour] = useState(dataHourFixed);
   const [dataYear, setDataYear] = useState(dataYearFixed);
@@ -674,7 +675,6 @@ const UserMessage = ({
         let slider = content.slider;
         let cardPaymentRadioButton = content.card_payment_radio_button;
         let shippingAddress = content.shipping_address;
-        let buttonSubmit = content.button_submit;
         let labelNoTransition = content.label_no_transition;
 
         if (content.type == 'textarea' && content.textarea && content.textarea.invalid_input && content.textarea.invalid_input.content) {
@@ -6478,6 +6478,7 @@ const UserMessage = ({
                 content={content}
                 submitErrorMessage={submitErrorMessage}
                 onClickNext={onClickNext}
+                isProcessing={isProcessing}
               />
             }
             {/* type == 'label_no_transition' */}

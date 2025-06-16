@@ -124,7 +124,8 @@ const previewInitialState = {
   // loadedStateFromSession has 2 values: "wait", "loaded"
   loadedStateFromSession: false,
   isUsedErrMsgByJs: false,
-  errMsgJsCode: ''
+  errMsgJsCode: '',
+  isProcessing: false
 };
 
 const PREVIEW_ACTIONS = {
@@ -134,7 +135,8 @@ const PREVIEW_ACTIONS = {
   UPDATE_PREVIEW_ORDER_CONTENT: "UPDATE_PREVIEW_ORDER_CONTENT",
   UPDATE_OPEN_PREVIEW: "UPDATE_OPEN_PREVIEW",
   UPDATE_SUBMIT_ERROR_MESSAGE: "UPDATE_SUBMIT_ERROR_MESSAGE",
-  UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG: "UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG"
+  UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG: "UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG",
+  SET_PROCESSING: "SET_PROCESSING"
 };
 
 const PreviewFukushashikiReducer = (state, action) => {
@@ -143,11 +145,13 @@ const PreviewFukushashikiReducer = (state, action) => {
       return { ...state, ...(action.payload) };
 
     case PREVIEW_ACTIONS.ADD_LP_OPTION_DATA:
-      return { ...state, lpOptionData: { ...state.lpOptionData, ...action.payload } };
+      return { ...state, lpOptionData: { ...state.lpOptionData, ...action.payload, isProcessing: false } };
     case PREVIEW_ACTIONS.UPDATE_PREVIEW_ORDER_CONTENT:
-      return { ...state, previewOrderContent: action.payload };
+      return { ...state, previewOrderContent: action.payload, isProcessing: false };
     case PREVIEW_ACTIONS.UPDATE_OPEN_PREVIEW:
       return { ...state, isOpen: action.payload.isOpen, showPopupCloseBot: action.payload.showPopupCloseBot };
+    case PREVIEW_ACTIONS.SET_PROCESSING:
+      return { ...state, isProcessing: action.payload };
     case PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES:
       return {
         ...state,
@@ -185,7 +189,8 @@ const PreviewFukushashikiReducer = (state, action) => {
         messagesList: messagesList,
         renderMessagesList: renderMessagesList,
         userMessagesList: userMessagesList,
-        submitErrorMessage: action.payload
+        submitErrorMessage: action.payload,
+        isProcessing: false
       };
     }
 
@@ -206,7 +211,8 @@ const PreviewFukushashikiReducer = (state, action) => {
         messagesList: messagesList,
         renderMessagesList: renderMessagesList,
         userMessagesList: userMessagesList,
-        submitErrorMessage: action.payload.error
+        submitErrorMessage: action.payload.error,
+        isProcessing: false
       };
     }
   }
@@ -3023,6 +3029,7 @@ const PreviewFukushashiki = () => {
   }
 
   const onClickNext = async (indexMessage, message) => {
+    dispatch({type: PREVIEW_ACTIONS.SET_PROCESSING, payload: true});
     let newState = _.omit(state, ['submitErrorMessage']);
     let clickedMsgIndex = newState.messagesList.findIndex((msg) => msg?.id === message?.id);
     if (clickedMsgIndex < 0) clickedMsgIndex = newState.currentMsgIndex;
@@ -3167,6 +3174,8 @@ const PreviewFukushashiki = () => {
         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
         payload: newState
       });
+    }).finally(() => {
+      dispatch({type: PREVIEW_ACTIONS.SET_PROCESSING, payload: false});
     });
   };
 
@@ -3593,6 +3602,7 @@ const PreviewFukushashiki = () => {
             lpOptionData={state.lpOptionData}
             submitErrorMessage={state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "" : state.submitErrorMessage}
             botId={state.botId}
+            isProcessing={state.isProcessing}
           />
           {renderNextButton(message, indexMessage)}
         </div>
