@@ -29,6 +29,7 @@ import locale from "antd/es/date-picker/locale/ja_JP";
 import "moment/locale/zh-cn";
 import { dataHourFixed, dataMinutes, dataYearFixed, dataMonth, dataDay, dataPaymentMethod, installmentOptions, NUMBER_REGEX } from "./Constants";
 import { stringNullOrEmpty } from "./Utils";
+import SubmitButton from "./UserMessageComponent/SubmitButton";
 
 const UserMessage = ({
   messageContentProps,
@@ -6473,66 +6474,11 @@ const UserMessage = ({
             )}
             {/* user: type = 'button_submit' */}
             {content.type === 'button_submit' &&
-              <>
-                {buttonSubmit.is_display_error_message && submitErrorMessage.length > 0 && (
-                  <div className="ss-user-setting__item-text_input-top">
-                    <div
-                      style={{
-                        width: "95%",
-                        padding: "5px",
-                        border: "1px solid #f44336",
-                        backgroundColor: "#ffebee",
-                        color: "#d32f2f",
-                        borderRadius: "5px",
-                        fontFamily: "Arial, sans-serif",
-                        boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
-                        margin: "10px",
-                      }}
-                      id="error-message"
-                      dangerouslySetInnerHTML={{ __html: submitErrorMessage }}
-                    />
-                  </div>
-                )}
-                <div className="ss-user-setting__item-text_input-top">
-                  <button
-                    style={{
-                      background: "linear-gradient(135deg, #4caf50, #43a047)",
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: "25px",
-                      padding: "15px 30px",
-                      fontSize: "20px",
-                      fontWeight: "bold",
-                      cursor: "pointer",
-                      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-                      transition: "all 0.3s ease",
-                      width: "85%",
-                      alignContent: 'center',
-                    }}
-                    onMouseOver={(e) => {
-                      e.target.style.background = "linear-gradient(135deg, #43a047, #4caf50)";
-                      e.target.style.boxShadow = "0 6px 12px rgba(0, 0, 0, 0.15)";
-                      e.target.style.transform = "translateY(-2px)";
-                    }}
-                    onMouseOut={(e) => {
-                      e.target.style.background = "linear-gradient(135deg, #4caf50, #43a047)";
-                      e.target.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
-                      e.target.style.transform = "translateY(0)";
-                    }}
-                    onMouseDown={(e) => {
-                      e.target.style.transform = "translateY(1px)";
-                      e.target.style.boxShadow = "0 3px 8px rgba(0, 0, 0, 0.1)";
-                    }}
-                    onMouseUp={(e) => {
-                      e.target.style.transform = "translateY(-2px)";
-                      e.target.style.boxShadow = "0 6px 12px rgba(0, 0, 0, 0.15)";
-                    }}
-                    onClick={onClickNext}
-                  >
-                    {content.button_submit_name}
-                  </button>
-                </div>
-              </>
+              <SubmitButton
+                content={content}
+                submitErrorMessage={submitErrorMessage}
+                onClickNext={onClickNext}
+              />
             }
             {/* type == 'label_no_transition' */}
             {content.type === "label_no_transition" && (

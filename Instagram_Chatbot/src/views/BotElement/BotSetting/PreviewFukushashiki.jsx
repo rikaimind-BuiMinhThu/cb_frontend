@@ -2552,7 +2552,7 @@ const PreviewFukushashiki = () => {
                   const fukuObject = {
                     type: message.type,
                     bindingMode: message.fukushashiki_search_mode,
-                    bindingAddress: value.trim(),
+                    bindingAddress: value?.trim() || "",
                     bindingValue: message.text_input.email_address.value,
                   };
                   fukuDataList.push(fukuObject);
