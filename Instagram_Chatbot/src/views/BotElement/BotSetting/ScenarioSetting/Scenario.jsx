@@ -41,7 +41,7 @@ import locale from 'antd/es/date-picker/locale/ja_JP';
 import 'moment/locale/zh-cn';
 import ShopifyReferenceSelect from "./ShopifyReferenceSelect";
 import { Tooltip } from '@mui/material';
-import { MESSAGE_CONTENT_TYPES } from '../PreviewComponent/Constants';
+import { dataDay, MESSAGE_CONTENT_TYPES } from '../PreviewComponent/Constants';
 
 const _ = require('lodash');
 
@@ -119,13 +119,7 @@ for (let i = 2; i <= 10; i++) {
   })
 }
 
-let dataDayFixed = [];
-for (let i = 1; i <= 31; i++) {
-  dataDayFixed.push({
-    key: i + '',
-    value: i + ''
-  });
-}
+let dataDayFixed = dataDay;
 
 let dataEveryMinuteFixed = [
   {
