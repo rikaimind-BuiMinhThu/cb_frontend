@@ -450,24 +450,42 @@ const PreviewFukushashiki = () => {
     // post message to parent window
     postMessageToParent({isOpen: opening});
 
-    if (!opening) {
-      if (state.activePopupCloseBot) {
-        return dispatch({
-          type: PREVIEW_ACTIONS.UPDATE_OPEN_PREVIEW,
-          payload: {
-            isOpen: false,
-            showPopupCloseBot: true,
-          }
-        });
+    if (state.alreadyOpenFirstTime) {
+      if (!opening) {
+        if (state.activePopupCloseBot) {
+          return dispatch({
+            type: PREVIEW_ACTIONS.UPDATE_OPEN_PREVIEW,
+            payload: {
+              isOpen: false,
+              showPopupCloseBot: true,
+            }
+          });
+        }
       }
+      return dispatch({
+        type: PREVIEW_ACTIONS.UPDATE_OPEN_PREVIEW,
+        payload: {
+          isOpen: opening,
+          showPopupCloseBot: false,
+        }
+      });
     }
-    return dispatch({
-      type: PREVIEW_ACTIONS.UPDATE_OPEN_PREVIEW,
-      payload: {
-        isOpen: opening,
-        showPopupCloseBot: false,
-      }
+    
+    state.alreadyOpenFirstTime = true;
+    state.isOpen = true;
+    state.currentUserMsgIndex = state.messagesList.findIndex((item) => {
+      const firstMsgContent = item?.message_content?.[0];
+      const isDisplayBtnNext = firstMsgContent?.type != "image" || firstMsgContent?.image?.displayButtonNext != false;
+
+      return !item.hidden && isUserMessage(item) && isDisplayBtnNext;
     });
+
+    // For the first time, we need to render to the first user message
+    if (state.currentUserMsgIndex >= 0) {
+      state.currentMsgIndex = state.currentUserMsgIndex;
+    }
+
+    return renderMessagesWithDelay(state, 0, state.currentMsgIndex);
   }
 
   const setPulldownValue = (dataContentType, field, value) => {
@@ -1044,10 +1062,11 @@ const PreviewFukushashiki = () => {
     });
 
     if (newState.isOpen) {
+      newState.alreadyOpenFirstTime = true;
       return renderMessagesWithDelay(newState, 0, newState.currentMsgIndex);
     } else {
-      newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
-      newState.passedUserMsgCount = newState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
+      newState.renderMessagesList = [];
+      newState.passedUserMsgCount = 0;
       dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
     }
   }
