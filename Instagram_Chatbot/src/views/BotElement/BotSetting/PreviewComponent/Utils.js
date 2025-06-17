@@ -256,11 +256,18 @@ const checkMessageCondition = (message, buildParam) => {
   return checked;
 }
 
+const getAddressFromZipCode = (zipCode) => {
+  return getToChatBotServer(
+    CHATBOT_SERVER.GET_ADDRESS_FROM_ZIP_CODE_PATH.replace(":zip_code", zipCode)
+  );
+}
+
 export {
   stringNullOrEmpty, getAllUrlParams, lightenColor,
   mobileCheck, removeLeadingZero, sendUserInteractionData,
   sendCreateOrderData, sendCountRequest,
   getCitiesByPrefecture, getTownsByCity, getPrefectures,
   getScenarioPreviewData, getChatBotSetting, sendEmailRequest,
-  sleep, getCaptcha, appendParamsToUrl, checkMessageCondition
+  sleep, getCaptcha, appendParamsToUrl, checkMessageCondition,
+  getAddressFromZipCode
 };

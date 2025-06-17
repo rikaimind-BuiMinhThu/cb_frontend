@@ -36,6 +36,39 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+.zip-code-address-container {
+    margin-bottom: 10px;
+}
+
+.zip-code-address-search-link {
+    margin-bottom: 5px;
+    text-decoration: underline;
+    text-align: right;
+}
+
+.zip-code-address-title-required {
+    margin-bottom: 0px;
+}
+
+.zip-code-address-post-code-label {
+    font-weight: 400;
+    font-size: 12px;
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+.zip-code-address-error-message {
+    color: #FF7E00;
+    font-size: 12px;
+}
+
+.zip-code-address-field-label {
+    font-weight: 400;
+    font-size: 12px;
+    width: 100%;
+    margin-bottom: 5px;
+}
+
 .sp-container {
     position: fixed;
     bottom: 0;

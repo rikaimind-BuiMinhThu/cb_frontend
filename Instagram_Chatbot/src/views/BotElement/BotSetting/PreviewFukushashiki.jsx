@@ -3443,12 +3443,8 @@ const PreviewFukushashiki = () => {
     }
   };
 
-  const isPopUpZipCode = (isOpen, indexContent) => {
+  const toggleZipCodePopup = (isOpen, indexContent, messageIndex) => {
     let newState = {};
-
-    if (indexContent !== undefined) {
-      newState.zipcodeContentIndex = indexContent;
-    }
 
     if (isOpen) {
       document.getElementById("sp-withdrawal-container").style.display = "block";
@@ -3461,6 +3457,10 @@ const PreviewFukushashiki = () => {
         towns: null,
         zipcode: null,
       };
+
+      if (indexContent !== undefined) newState.zipcodeContentIndex = indexContent;
+      if (messageIndex !== undefined) newState.zipcodeMessageIndex = messageIndex;
+
       dispatch({
         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
         payload: { ...newState }
@@ -3470,27 +3470,6 @@ const PreviewFukushashiki = () => {
 
     document.getElementById("sp-withdrawal-container").style.display = "none";
     document.getElementById("sp-popup-zip-code-address").style.display = "none";
-  };
-
-  const isPopUpZipCodeShippingAddress = (isOpen, indexContent) => {
-    // TODO: Check to remove
-    // if (isOpen === true) {
-    //   setPrefectures(null);
-    //   setCities(null);
-    //   setTowns(null);
-    //   setZipcode(null);
-    //   document.getElementById("sp-withdrawal-container").style.display =
-    //     "block";
-    //   document.getElementById("sp-popup-zip-code-address2").style.display =
-    //     "block";
-    // } else {
-    //   document.getElementById("sp-withdrawal-container").style.display = "none";
-    //   document.getElementById("sp-popup-zip-code-address2").style.display =
-    //     "none";
-    // }
-    // if (indexContent !== undefined) {
-    //   setContentZipcode(indexContent);
-    // }
   };
 
   const onChangeErrors = (field, value) => {
@@ -3608,12 +3587,7 @@ const PreviewFukushashiki = () => {
               // // });
             }}
             prefecturesList={[...state.prefecturesList]}
-            isPopUpZipCode={(isOpen, indexContent) =>
-              isPopUpZipCode(isOpen, indexContent)
-            }
-            isPopUpZipCodeShippingAddress={(isOpen, indexContent) =>
-              isPopUpZipCodeShippingAddress(isOpen, indexContent)
-            }
+            toggleZipCodePopup={toggleZipCodePopup}
             onChangeErrors={(field, value) =>
               onChangeErrors(field, value)
             }
@@ -3720,7 +3694,7 @@ const PreviewFukushashiki = () => {
     };
   };
 
-  ///body container
+  // body container
   if (state.scenarioId && state.botInfor && state.isOpen) {
     const { containerStyle, headerStyle, bodyStyle } = getOpeningBotStyle();
     return (
@@ -3736,10 +3710,10 @@ const PreviewFukushashiki = () => {
           onOpenPreview={onOpenPreview}
         />
         <ZipCodePopUp
-          isPopUpZipCode={isPopUpZipCode}
+          toggleZipCodePopup={toggleZipCodePopup}
           prefecturesList={state.prefecturesList}
-          message={state.messagesList[state.currentMsgIndex]}
-          messageIndex={state.currentMsgIndex}
+          message={state.messagesList[state.zipcodeMessageIndex]}
+          messageIndex={state.zipcodeMessageIndex}
           zipcodeContentIndex={state.zipcodeContentIndex}
           onChangeValue={onChangeValue}
           onChangeErrors={onChangeErrors}

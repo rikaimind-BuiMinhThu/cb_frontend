@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../../../../assets/css/bot/preview-chat-bot.css";
 import api from "../../../../api/api-management";
-import Cookies from "js-cookie";
 import { MDBIcon } from "mdbreact";
 import SelectCustom from "../ScenarioSetting/scenarioComon/SelectCustom";
 import LPIntegrationOptionPullDown from "../ScenarioSetting/scenarioComon/LPIntegrationOptionPullDown";
@@ -9,7 +8,7 @@ import CheckboxCustom from "../ScenarioSetting/scenarioComon/CheckboxCustom";
 import InputCustom from "../ScenarioSetting/scenarioComon/InputCustom";
 import { Button } from "reactstrap";
 import ModalNoti from "../../../Popup/ModalNoti";
-import { CHATBOT_ACTIONS, CRAWL_ELEMENT_TYPES, MESSAGE_CONTENT_TYPES, REGEXP } from "../PreviewComponent/Constants";
+import { CHATBOT_ACTIONS, CRAWL_ELEMENT_TYPES, MESSAGE_CONTENT_TYPES } from "../PreviewComponent/Constants";
 import {
   Checkbox,
   Radio,
@@ -29,7 +28,7 @@ import locale from "antd/es/date-picker/locale/ja_JP";
 import "moment/locale/zh-cn";
 import { dataHourFixed, dataMinutes, dataYearFixed, dataMonth, dataDay, dataPaymentMethod, installmentOptions, NUMBER_REGEX } from "./Constants";
 import { stringNullOrEmpty } from "./Utils";
-import SubmitButton from "./UserMessageComponent/SubmitButton";
+import { SubmitButton, ZipCodeAddress } from "./UserMessageComponent";
 
 const UserMessage = ({
   messageContentProps,
@@ -41,8 +40,7 @@ const UserMessage = ({
   captcha,
   onClickNext,
   displayButtonNext,
-  isPopUpZipCode,
-  isPopUpZipCodeShippingAddress,
+  toggleZipCodePopup,
   onChangeErrors,
   prefecturesList,
   variables,
@@ -63,10 +61,6 @@ const UserMessage = ({
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [messageNoti, setMessageNoti] = useState("");
 
-  const getPrefectureIdCodeFromName = (name) => {
-    return prefecturesList.find((prefecture) => prefecture.name === name)?.id;
-  }
-  
   const cardExpiredYearOptions =  Array.from({ length: 10 }, (_, i) => {
     return {
       key: moment().add(i, "years").format("YY"),
@@ -613,44 +607,6 @@ const UserMessage = ({
     );
   }
 
-  const renderAddressField = (address, indexContent, content) => {
-    if (address.compact_municipality_and_address || address.compact_municipality_and_address_and_building_name) return;
-    if (address.address === undefined) return;
-    return (
-      <div className="ss-user-setting__item-bottom">
-        <div
-          style={{
-            fontWeight: "400",
-            fontSize: "12px",
-            width: "100%",
-            marginBottom: "3px",
-          }}
-        >
-          {
-            address.address_label && address.address_label.trim() !== ""
-              ? address.address_label
-              : '番地'
-          }
-        </div>
-        <InputCustom
-          placeholder={address.address}
-          id={`ss-user-input-address${indexContent}`}
-          disabled={disabled}
-          style={{ width: "100%" }}
-          onChange={(value) =>
-            onChangeValue(
-              indexContent,
-              content.type,
-              value,
-              "value_address"
-            )
-          }
-          value={address.value_address}
-          clearable={true}
-        />
-      </div>
-    )
-  }
   
   return (
     <div className="ss-user-message__content-wrapper">
@@ -1228,7 +1184,7 @@ const UserMessage = ({
                           <span
                             style={!disabled ? { cursor: "pointer" } : {}}
                             onClick={() => {
-                              if (disabled !== true) isPopUpZipCode(true, indexContent);
+                              if (disabled !== true) toggleZipCodePopup(true, indexContent);
                             }}
                           >
                             〒検索はこちら
@@ -3196,515 +3152,21 @@ const UserMessage = ({
             )}
             {/* type == 'zip_code_address' */}
             {content.type === "zip_code_address" && (
-              <div style={{ marginBottom: "10px" }}>
-                <div
-                  style={{
-                    marginBottom: "5px",
-                    textDecoration: "underline",
-                    ...(!disabled ? { color: "#2c76f0" } : { color: "gray" }),
-                    textAlign: "right",
-                  }}
-                >
-                  <span
-                    style={!disabled ? { cursor: "pointer" } : {}}
-                    onClick={() => {
-                      if (disabled !== true) isPopUpZipCode(true, indexContent);
-                    }}
-                  >
-                    〒検索はこちら
-                  </span>
-                </div>
-                {(zipCodeAddress.title_require ||
-                  zipCodeAddress.isCheckRequire) && (
-                    <div
-                      className="ss-message__content--user-pull_down-top"
-                      style={{ marginBottom: "0px" }}
-                    >
-                      {zipCodeAddress.title_require && (
-                        <span className="ss-message__content--user-pull_down-title">
-                          {zipCodeAddress.title}
-                        </span>
-                      )}
-                      {(zipCodeAddress.isCheckRequire === "all_items_require" ||
-                        zipCodeAddress.isCheckRequire === "require") && (
-                          <span className="ss-message__content--user-text-input-required">
-                            ※必須
-                          </span>
-                        )}
-                    </div>
-                  )}
-                {zipCodeAddress.post_code !== undefined && (
-                  <div className="ss-user-setting__item-bottom">
-                    <div
-                      style={{
-                        fontWeight: "400",
-                        fontSize: "12px",
-                        width: "100%",
-                        marginBottom: "5px",
-                      }}
-                    >
-                      {
-                        zipCodeAddress.post_code_label && zipCodeAddress.post_code_label.trim() !== ""
-                          ? zipCodeAddress.post_code_label
-                          : '郵便番号'
-                      }
-                    </div>
-                    {zipCodeAddress.split_postal_code !== true ? (
-                      <InputCustom
-                        type="tel"
-                        inputMode="numeric"
-                        placeholder={zipCodeAddress.post_code}
-                        disabled={disabled}
-                        // controls={false}
-                        // className="ss-user-setting-input-limit-character"
-                        // maxLength={7}
-                        onKeyPress={(e) => {
-                          if (e.target.value.length >= 7) e.preventDefault();
-                        }}
-                        style={{ width: "100%", marginLeft: "0px" }}
-                        onChange={async (value) => {
-                          onChangeValue(
-                            indexContent,
-                            content.type,
-                            value,
-                            "value_post_code"
-                          );
-                          if ((value + "").length === 7) {
-                            api
-                              .get(
-                                `/api/v1/get_address_from_zip_code?zip_code=${value}`
-                              )
-                              .then((res) => {
-                                if (res.data && res.data.code === 1) {
-                                  onChangeValue(
-                                    indexContent,
-                                    content.type,
-                                    getPrefectureIdCodeFromName(res.data.data.prefecture_name),
-                                    "value_prefecture"
-                                  );
-                                  if (zipCodeAddress.compact_municipality_and_address) {
-                                    onChangeValue(
-                                      indexContent,
-                                      content.type,
-                                      `${res.data.data.city_name}${res.data.data.town_name}`,
-                                      "value_municipality"
-                                    );
-                                  } else if (zipCodeAddress.compact_municipality_and_address_and_building_name) {
-                                    onChangeValue(
-                                      indexContent,
-                                      content.type,
-                                      `${res.data.data.city_name}${res.data.data.town_name}${res.data.data.building_name}`.replace('undefined', ''),
-                                      "value_municipality"
-                                    );
-                                  } else {
-                                    onChangeValue(
-                                      indexContent,
-                                      content.type,
-                                      res.data.data.city_name,
-                                      "value_municipality"
-                                    );
-                                    onChangeValue(
-                                      indexContent,
-                                      content.type,
-                                      res.data.data.town_name,
-                                      "value_address"
-                                    );
-                                  }
-                                  onChangeErrors(
-                                    `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
-                                    ""
-                                  );
-                                  moveToNext(`ss-user-input-address${indexContent}`);
-                                } else {
-                                  onChangeErrors(
-                                    `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
-                                    "無効な郵便番号です。"
-                                  );
-                                }
-                              })
-                              .catch((error) => {
-                                onChangeErrors(
-                                  `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
-                                  "無効な郵便番号です。"
-                                );
-                                if (error.response?.data.code === 0) {
-                                  tokenExpired();
-                                }
-                              });
-                          } else if ((value + "").length !== 0) {
-                            onChangeErrors(
-                              `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
-                              "無効な郵便番号です。"
-                            );
-                          } else {
-                            onChangeErrors(
-                              `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
-                              ""
-                            );
-                          }
-                        }}
-                        value={zipCodeAddress.value_post_code}
-                        clearable={true}
-                      />
-                    ) : (
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          width: "100%",
-                        }}
-                      >
-                        <InputCustom
-                          type="tel"
-                          inputMode="numeric"
-                          placeholder={zipCodeAddress.post_code_left}
-                          disabled={disabled}
-                          style={{ width: "49%" }}
-                          onKeyPress={(e) => {
-                            if (e.target.value.length >= 3) e.preventDefault();
-                          }}
-                          onChange={async (value) => {
-                            if (value && !NUMBER_REGEX.test(value)) return;
-                            onChangeValue(
-                              indexContent,
-                              content.type,
-                              value,
-                              "value_post_code_left"
-                            );
-                            console.log("zipCodeAddress.value_post_code_left", zipCodeAddress.value_post_code_left);
-                            console.log("zipCodeAddress.value_post_code_right", zipCodeAddress.value_post_code_right);
-                            if ((value + "").length === 3) {
-                              moveToNext(`ss-user-post-code-right-input${indexContent}`);
-                            }
-                            
-                            if (
-                              (value + "").length === 3 &&
-                              zipCodeAddress.value_post_code_right &&
-                              (zipCodeAddress.value_post_code_right + "")
-                                .length === 4
-                            ) {
-                              api
-                                .get(
-                                  `/api/v1/get_address_from_zip_code?zip_code=${value}${zipCodeAddress.value_post_code_right}`
-                                )
-                                .then((res) => {
-                                  if (res.data && res.data.code === 1) {
-                                    onChangeValue(
-                                      indexContent,
-                                      content.type,
-                                      getPrefectureIdCodeFromName(res.data.data.prefecture_name),
-                                      "value_prefecture"
-                                    );
-                                    if (zipCodeAddress.compact_municipality_and_address) {
-                                      onChangeValue(
-                                        indexContent,
-                                        content.type,
-                                        `${res.data.data.city_name}${res.data.data.town_name}`,
-                                        "value_municipality"
-                                      );
-                                    } else if (zipCodeAddress.compact_municipality_and_address_and_building_name) {
-                                      onChangeValue(
-                                        indexContent,
-                                        content.type,
-                                        `${res.data.data.city_name}${res.data.data.town_name}${res.data.data.building_name}`.replace('undefined', ''),
-                                        "value_municipality"
-                                      );
-                                    } else {
-                                      onChangeValue(
-                                        indexContent,
-                                        content.type,
-                                        res.data.data.city_name,
-                                        "value_municipality"
-                                      );
-                                      onChangeValue(
-                                        indexContent,
-                                        content.type,
-                                        res.data.data.town_name,
-                                        "value_address"
-                                      );
-                                    }
-                                    onChangeErrors(
-                                      `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
-                                      ""
-                                    );
-                                    moveToNext(`ss-user-input-address${indexContent}`);
-                                  } else {
-                                    onChangeErrors(
-                                      `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
-                                      "無効な郵便番号です。"
-                                    );
-                                  }
-                                })
-                                .catch((error) => {
-                                  onChangeErrors(
-                                    `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
-                                    "無効な郵便番号です。"
-                                  );
-                                  if (error.response?.data.code === 0) {
-                                    tokenExpired();
-                                  }
-                                });
-                            } else if (
-                              (value + "").length !== 0 ||
-                              (zipCodeAddress.value_post_code_right + "")
-                                .length !== 0
-                            ) {
-                              onChangeErrors(
-                                `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
-                                "無効な郵便番号です。"
-                              );
-                            } else {
-                              onChangeErrors(
-                                `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
-                                ""
-                              );
-                            }
-                          }}
-                          value={zipCodeAddress.value_post_code_left}
-                          clearable={true}
-                        />
-                        <InputCustom
-                          type="tel"
-                          inputMode="numeric"
-                          placeholder={zipCodeAddress.post_code_right}
-                          disabled={disabled}
-                          id={`ss-user-post-code-right-input${indexContent}`}
-                          style={{ width: "49%" }}
-                          onKeyPress={(e) => {
-                            if (e.target.value.length >= 4) e.preventDefault();
-                          }}
-                          onChange={async (value) => {
-                            if (value && !NUMBER_REGEX.test(value)) return;
-                            onChangeValue(
-                              indexContent,
-                              content.type,
-                              value,
-                              "value_post_code_right"
-                            );
-                            console.log("zipCodeAddress.value_post_code_right", zipCodeAddress.value_post_code_right);
-                            console.log("zipCodeAddress.value_post_code_left", zipCodeAddress.value_post_code_left);
-                            if (
-                              (value + "").length === 4 &&
-                              zipCodeAddress.value_post_code_left &&
-                              (zipCodeAddress.value_post_code_left + "")
-                                .length === 3
-                            ) {
-                              api
-                                .get(
-                                  `/api/v1/get_address_from_zip_code?zip_code=${zipCodeAddress.value_post_code_left}${value}`
-                                )
-                                .then((res) => {
-                                  if (res.data && res.data.code === 1) {
-                                    onChangeValue(
-                                      indexContent,
-                                      content.type,
-                                      getPrefectureIdCodeFromName(res.data.data.prefecture_name),
-                                      "value_prefecture"
-                                    );
-                                    if (zipCodeAddress.compact_municipality_and_address) {
-                                      onChangeValue(
-                                        indexContent,
-                                        content.type,
-                                        `${res.data.data.city_name}${res.data.data.town_name}`,
-                                        "value_municipality"
-                                      );
-                                    } else if (zipCodeAddress.compact_municipality_and_address_and_building_name) {
-                                      onChangeValue(
-                                        indexContent,
-                                        content.type,
-                                        `${res.data.data.city_name}${res.data.data.town_name}${res.data.data.building_name}`.replace('undefined', ''),
-                                        "value_municipality"
-                                      );
-                                    } else {
-                                      onChangeValue(
-                                        indexContent,
-                                        content.type,
-                                        res.data.data.city_name,
-                                        "value_municipality"
-                                      );
-                                      onChangeValue(
-                                        indexContent,
-                                        content.type,
-                                        res.data.data.town_name,
-                                        "value_address"
-                                      );
-                                    }
-                                    onChangeErrors(
-                                      `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
-                                      ""
-                                    );
-                                    moveToNext(`ss-user-input-address${indexContent}`);
-                                  } else {
-                                    onChangeErrors(
-                                      `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
-                                      "無効な郵便番号です。"
-                                    );
-                                  }
-                                })
-                                .catch((error) => {
-                                  onChangeErrors(
-                                    `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
-                                    "無効な郵便番号です。"
-                                  );
-                                  if (error.response?.data.code === 0) {
-                                    tokenExpired();
-                                  }
-                                });
-                            } else if (
-                              (value + "").length !== 0 ||
-                              (zipCodeAddress.value_post_code_left + "")
-                                .length !== 0
-                            ) {
-                              onChangeErrors(
-                                `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
-                                "無効な郵便番号です。"
-                              );
-                            } else {
-                              onChangeErrors(
-                                `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
-                                ""
-                              );
-                            }
-                          }}
-                          value={zipCodeAddress.value_post_code_right}
-                          clearable={true}
-                        />
-                      </div>
-                    )}
-                  </div>
-                )}
-                {zipCodeAddress.prefecture !== undefined && (
-                  <div className="ss-user-setting__item-bottom">
-                    <div
-                      style={{
-                        fontWeight: "400",
-                        fontSize: "12px",
-                        width: "100%",
-                        marginBottom: "3px",
-                      }}
-                    >
-                      {
-                        zipCodeAddress.prefecture_label && zipCodeAddress.prefecture_label.trim() !== ""
-                          ? zipCodeAddress.prefecture_label
-                          : '都道府県'
-                      }
-                    </div>
-                    {zipCodeAddress.is_use_dropdown ? (
-                      <SelectCustom
-                        style={{ width: "100%" }}
-                        value={zipCodeAddress?.value_prefecture}
-                        data={prefecturesList}
-                        keyValue="id"
-                        nameValue="name"
-                        placeholder={zipCodeAddress.prefecture}
-                        onChange={(value) =>
-                          onChangeValue(
-                            indexContent,
-                            content.type,
-                            value,
-                            "value_prefecture"
-                          )
-                        }
-                      />
-                    ) : (
-                      <InputCustom
-                        placeholder={zipCodeAddress.prefecture}
-                        disabled={disabled}
-                        style={{ width: "100%" }}
-                        onChange={(value) =>
-                          onChangeValue(
-                            indexContent,
-                            content.type,
-                            value,
-                            "value_prefecture"
-                          )
-                        }
-                        value={zipCodeAddress.value_prefecture}
-                        clearable={true}
-                      />
-                    )}
-                  </div>
-                )}
-                {zipCodeAddress.municipality !== undefined && (
-                  <div className="ss-user-setting__item-bottom">
-                    <div
-                      style={{
-                        fontWeight: "400",
-                        fontSize: "12px",
-                        width: "100%",
-                        marginBottom: "3px",
-                      }}
-                    >
-                      {
-                        zipCodeAddress.municipality_label && zipCodeAddress.municipality_label.trim() !== ""
-                          ? zipCodeAddress.municipality_label
-                          : '市区町村'
-                      }
-                    </div>
-                    <InputCustom
-                      placeholder={zipCodeAddress.municipality}
-                      disabled={disabled}
-                      style={{ width: "100%" }}
-                      onChange={(value) =>
-                        onChangeValue(
-                          indexContent,
-                          content.type,
-                          value,
-                          "value_municipality"
-                        )
-                      }
-                      value={zipCodeAddress.value_municipality}
-                      clearable={true}
-                    />
-                  </div>
-                )}
-                {renderAddressField(zipCodeAddress, indexContent, content)}
-                {zipCodeAddress.building_name !== undefined && (
-                  <div className="ss-user-setting__item-bottom">
-                    <div
-                      style={{
-                        fontWeight: "400",
-                        fontSize: "12px",
-                        width: "100%",
-                        marginBottom: "3px",
-                      }}
-                    >
-                      {
-                        zipCodeAddress.building_name_label && zipCodeAddress.building_name_label.trim() !== ""
-                          ? zipCodeAddress.building_name_label
-                          : '建物名'
-                      }
-                    </div>
-                    <InputCustom
-                      placeholder={zipCodeAddress.building_name}
-                      id="ss-user-input-building"
-                      disabled={disabled}
-                      style={{ width: "100%" }}
-                      onChange={(value) => {
-                        onChangeValue(
-                          indexContent,
-                          content.type,
-                          value,
-                          "value_building_name"
-                        );
-                      }}
-                      value={zipCodeAddress.value_building_name}
-                      clearable={true}
-                    />
-                  </div>
-                )}
-                {errors?.[
-                  `message${indexMessage}_content${indexContent}_${content.type}`
-                ] && (
-                    <div style={{ color: "#FF7E00", fontSize: "12px" }}>
-                      {
-                        errors?.[
-                        `message${indexMessage}_content${indexContent}_${content.type}`
-                        ]
-                      }
-                    </div>
-                  )}
-              </div>
+              <ZipCodeAddress
+                content={content}
+                zipCodeAddress={zipCodeAddress}
+                disabled={disabled}
+                indexContent={indexContent}
+                messageIndex={indexMessage}
+                messageContent={messageContent}
+                errors={errors}
+                prefecturesList={prefecturesList}
+                onChangeValue={onChangeValue}
+                onChangeErrors={onChangeErrors}
+                moveToNext={moveToNext}
+                tokenExpired={tokenExpired}
+                toggleZipCodePopup={toggleZipCodePopup}
+              />
             )}
             {/* type == 'attaching_file' */}
             {content.type === "attaching_file" && (

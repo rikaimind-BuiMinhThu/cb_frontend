@@ -6,7 +6,7 @@ import { MDBIcon } from "mdbreact";
 import SelectCustom from "../ScenarioSetting/scenarioComon/SelectCustom";
 
 const ZipCodePopUp = ({
-  isPopUpZipCode,
+  toggleZipCodePopup,
   prefecturesList,
   message,
   messageIndex,
@@ -95,6 +95,10 @@ const ZipCodePopUp = ({
     setState(newState);
   };
 
+  const getPrefectureNameById = (id) => {
+    return prefecturesList.find((item) => item.id === id)?.name;
+  };
+
   const onSelectZipcode = () => {
     let index = zipcodeContentIndex; 
     if (!zipcodeContentIndex) {
@@ -108,14 +112,23 @@ const ZipCodePopUp = ({
 
       let newErrors = { ...errors };
       newErrors[`message${messageIndex}_content${index}_zip_code_address`] = "";
+      const zipCodeAddress = message.message_content[index]?.zip_code_address;
 
       const newZipCodeAddress = {
         value_post_code: state.selectedZipcode,
         value_post_code_left: state.selectedZipcode.slice(0, 3),
         value_post_code_right: state.selectedZipcode.slice(3),
-        value_prefecture: state.selectedPrefecture,
-        value_municipality: `${state.selectedCity}${state.selectedTown}`,
+        value_prefecture: getPrefectureNameById(state.selectedPrefecture),
       };
+
+      if (zipCodeAddress?.compact_municipality_and_address) {
+        newZipCodeAddress.value_municipality = `${state.selectedCity}${state.selectedTown}`;
+      } else if (zipCodeAddress?.compact_municipality_and_address_and_building_name) {
+        newZipCodeAddress.value_municipality = `${state.selectedCity}${state.selectedTown}${zipCodeAddress.building_name}`;
+      } else {
+        newZipCodeAddress.value_municipality = state.selectedCity;
+        newZipCodeAddress.value_address = state.selectedTown;
+      }
 
       onChangeValue(index, "zip_code_address", newZipCodeAddress, null, null, null, message);
       // TODO: Need refactor for this part to render only 1 time instead of 2 times
@@ -135,7 +148,7 @@ const ZipCodePopUp = ({
           <MDBIcon
             style={{ width: "5%", marginLeft: "3px", cursor: "pointer" }}
             fas
-            onClick={() => isPopUpZipCode(false)}
+            onClick={() => toggleZipCodePopup(false, zipcodeContentIndex, messageIndex)}
             icon="times"
             className={"sp-plus-circle-option-icon-times-custom"}
           />
@@ -179,7 +192,7 @@ const ZipCodePopUp = ({
         <div className="sp-popup-zip-code-address-body-button">
           <div
             className="sp-popup-zip-code-address-body-button-cancel"
-            onClick={() => isPopUpZipCode(false)}
+            onClick={() => toggleZipCodePopup(false, zipcodeContentIndex, messageIndex)}
           >
             キャンセル
           </div>
