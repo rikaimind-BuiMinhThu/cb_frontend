@@ -13,16 +13,16 @@ import {
 } from "antd";
 import moment from "moment";
 import $ from "jquery";
-import { EC_CHATBOT_URL } from "../../../variables/constants";
+import { EC_CHATBOT_URL } from "variables/constants";
 import "moment/locale/zh-cn";
-import iconMessageBlue from "../../../assets/img/icon-mess/icon-message-chat-blue.png";
-import iconMessageGreen from "../../../assets/img/icon-mess/icon-message-chat-green.png";
-import iconMessageOrange from "../../../assets/img/icon-mess/icon-message-chat-orange.png";
-import iconMessageYellow from "../../../assets/img/icon-mess/icon-message-chat-yellow.png";
-import iconMessagePink from "../../../assets/img/icon-mess/icon-message-chat-pink.png";
-import iconMessagePurple from "../../../assets/img/icon-mess/icon-message-chat-purple.png";
-import iconMessageBlack from "../../../assets/img/icon-mess/icon-message-chat-black.png";
-import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-white.png";
+import iconMessageBlue from "assets/img/icon-mess/icon-message-chat-blue.png";
+import iconMessageGreen from "assets/img/icon-mess/icon-message-chat-green.png";
+import iconMessageOrange from "assets/img/icon-mess/icon-message-chat-orange.png";
+import iconMessageYellow from "assets/img/icon-mess/icon-message-chat-yellow.png";
+import iconMessagePink from "assets/img/icon-mess/icon-message-chat-pink.png";
+import iconMessagePurple from "assets/img/icon-mess/icon-message-chat-purple.png";
+import iconMessageBlack from "assets/img/icon-mess/icon-message-chat-black.png";
+import iconMessageWhite from "assets/img/icon-mess/icon-message-chat-white.png";
 import {
   CHATBOT_ACTIONS,
   MESSAGE_CONTENT_TYPES,
@@ -3811,7 +3811,8 @@ const PreviewFukushashiki = () => {
         className={`sp-container1 ${mobileCheck() ? 'slideUpSp' : 'slideUp'}`}
         style={containerStyle}
       >
-        <Withdrawal botInfor={state.botInfor}
+        <Withdrawal
+          // botInfor={state.botInfor}
           deviceReceive={state.deviceReceive}
           scenarioId={state.scenarioId}
           onOpenPreview={onOpenPreview}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import "../../../../assets/css/bot/preview-chat-bot.css";
-import messageTypingGif from "../../../../assets/img/icons8-dots-loading.gif";
-import { EC_CHATBOT_URL } from "../../../../variables/constants";
+import "assets/css/bot/preview-chat-bot.css";
+import messageTypingGif from "assets/img/icons8-dots-loading.gif";
+import { EC_CHATBOT_URL } from "variables/constants";
 import "moment/locale/zh-cn";
 import { BOT_MESSAGE_TYPES } from "./Constants";
 import HtmlCodeMessagePreview from "components/BotMessages/HtmlCodeMessagePreview";
