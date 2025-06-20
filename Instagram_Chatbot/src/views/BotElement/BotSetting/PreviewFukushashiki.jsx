@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useReducer } from "react";
-import "../../../assets/css/bot/preview-chat-bot.css";
-import api from "../../../api/api-management";
+import "assets/css/bot/preview-chat-bot.css";
+import api from "api/api-management";
 import Cookies from "js-cookie";
 import { MDBIcon } from "mdbreact";
 import { Button } from "reactstrap";
@@ -13,16 +13,16 @@ import {
 } from "antd";
 import moment from "moment";
 import $ from "jquery";
-import { EC_CHATBOT_URL } from "../../../variables/constants";
+import { EC_CHATBOT_URL } from "variables/constants";
 import "moment/locale/zh-cn";
-import iconMessageBlue from "../../../assets/img/icon-mess/icon-message-chat-blue.png";
-import iconMessageGreen from "../../../assets/img/icon-mess/icon-message-chat-green.png";
-import iconMessageOrange from "../../../assets/img/icon-mess/icon-message-chat-orange.png";
-import iconMessageYellow from "../../../assets/img/icon-mess/icon-message-chat-yellow.png";
-import iconMessagePink from "../../../assets/img/icon-mess/icon-message-chat-pink.png";
-import iconMessagePurple from "../../../assets/img/icon-mess/icon-message-chat-purple.png";
-import iconMessageBlack from "../../../assets/img/icon-mess/icon-message-chat-black.png";
-import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-white.png";
+import iconMessageBlue from "assets/img/icon-mess/icon-message-chat-blue.png";
+import iconMessageGreen from "assets/img/icon-mess/icon-message-chat-green.png";
+import iconMessageOrange from "assets/img/icon-mess/icon-message-chat-orange.png";
+import iconMessageYellow from "assets/img/icon-mess/icon-message-chat-yellow.png";
+import iconMessagePink from "assets/img/icon-mess/icon-message-chat-pink.png";
+import iconMessagePurple from "assets/img/icon-mess/icon-message-chat-purple.png";
+import iconMessageBlack from "assets/img/icon-mess/icon-message-chat-black.png";
+import iconMessageWhite from "assets/img/icon-mess/icon-message-chat-white.png";
 import {
   CHATBOT_ACTIONS,
   MESSAGE_CONTENT_TYPES,
@@ -3695,6 +3695,7 @@ const PreviewFukushashiki = () => {
   };
 
   // body container
+  console.log('state.botInfor', state.botInfor);
   if (state.scenarioId && state.botInfor && state.isOpen) {
     const { containerStyle, headerStyle, bodyStyle } = getOpeningBotStyle();
     return (
@@ -3704,7 +3705,8 @@ const PreviewFukushashiki = () => {
         className={`sp-container1 ${mobileCheck() ? 'slideUpSp' : 'slideUp'}`}
         style={containerStyle}
       >
-        <Withdrawal botInfor={state.botInfor}
+        <Withdrawal
+          // botInfor={state.botInfor}
           deviceReceive={state.deviceReceive}
           scenarioId={state.scenarioId}
           onOpenPreview={onOpenPreview}

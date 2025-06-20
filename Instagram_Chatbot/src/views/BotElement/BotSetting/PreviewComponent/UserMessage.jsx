@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import "../../../../assets/css/bot/preview-chat-bot.css";
-import api from "../../../../api/api-management";
+import "assets/css/bot/preview-chat-bot.css";
+import api from "api/api-management";
 import { MDBIcon } from "mdbreact";
 import SelectCustom from "../ScenarioSetting/scenarioComon/SelectCustom";
 import LPIntegrationOptionPullDown from "../ScenarioSetting/scenarioComon/LPIntegrationOptionPullDown";
@@ -19,11 +19,11 @@ import {
   Col
 } from "antd";
 import moment from "moment";
-import cvcIcon from "../../../../assets/img/cvc-icon.png";
+import cvcIcon from "assets/img/cvc-icon.png";
 import DatePickerCustom from "../ScenarioSetting/scenarioComon/DatePickerCustom";
 import InputNum from "../ScenarioSetting/scenarioComon/InputNum";
 import { tokenExpired } from "api/tokenExpired";
-import { SHORTEN_URL } from "../../../../variables/constants";
+import { SHORTEN_URL } from "variables/constants";
 import locale from "antd/es/date-picker/locale/ja_JP";
 import "moment/locale/zh-cn";
 import { dataHourFixed, dataMinutes, dataYearFixed, dataMonth, dataDay, dataPaymentMethod, installmentOptions, NUMBER_REGEX } from "./Constants";
