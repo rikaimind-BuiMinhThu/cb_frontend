@@ -435,7 +435,10 @@ const fillDataFromMessage = async (data) => {
       continue;
     }
 
-    let element = getElementByAddress(item.bindingMode, item.bindingAddress);
+    let element = null;
+    waitForElement(item.bindingMode, item.bindingAddress, {type: WAIT_OPTION_TYPES.WAIT_FOR_LOADING}, () => {
+      element = getElementByAddress(item.bindingMode, item.bindingAddress);
+    });
     if (!element) continue;
 
     if (isDisabledElement(element)) continue;
