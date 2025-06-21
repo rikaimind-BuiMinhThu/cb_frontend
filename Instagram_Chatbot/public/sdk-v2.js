@@ -435,85 +435,83 @@ const fillDataFromMessage = async (data) => {
       continue;
     }
 
-    let element = null;
     waitForElement(item.bindingMode, item.bindingAddress, {type: WAIT_OPTION_TYPES.WAIT_FOR_LOADING}, () => {
-      element = getElementByAddress(item.bindingMode, item.bindingAddress);
-    });
-    if (!element) continue;
+      let element = getElementByAddress(item.bindingMode, item.bindingAddress);
+      if (!element) return;
+      if (isDisabledElement(element)) return;
 
-    if (isDisabledElement(element)) continue;
-
-    switch (item.type) {
-      case "zip_code_address":
-      case "card_number":
-      case "card_payment_radio_button":
-      case "credit_card_payment":
-      case "text_input":
-      case "textarea":
-      case "slider": {
-        waitForElement(
-          item.bindingMode, item.bindingAddress,
-          {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
-        break;
-      }
-
-      case "payment_method_id": {
-        setValuePaymentMethodToElement(element, item.bindingValue);
-        break;
-      }
-
-      case 'dropdown_prefecture': {
-        if (element.tagName === ELEMENT_TAGS.SELECT) {
-          const acceptableValues = [item.bindingValue.toString(), removeLeadingZero(item.bindingValue).toString()];
-          const selectedOption = Array.from(element.options).find(option => acceptableValues.includes(option.value.toString()));
-          if (!selectedOption) item.bindingValue = '';
-        };
-        waitForElement(
-          item.bindingMode, item.bindingAddress,
-          {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
-        break;
-      }
-
-      case "agree_term":
-      case 'checkbox': {
-        setCheckToCheckboxElement(element, item.bindingValue);
-        break;
-      }
-
-      case 'pull_down': {
-        if (item.pulldownType === 'lp_integration_option') {
-          const isNullOption = item.bindingValue === 'NULL_OPTION';
-          if (isNullOption) item.bindingValue = '';
-
-          const hasOption = Array.from(element.options).some(option => option.value === item.bindingValue);
-          if (!hasOption) item.bindingValue = '';
-        }
-        
-        waitForElement(
-          item.bindingMode, item.bindingAddress,
-          {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
-        break;
-      }
-
-      case "radio_button": {
-        if (element.tagName === ELEMENT_TAGS.SELECT) {
-          setValueToElement(element, item.bindingValue);
+      switch (item.type) {
+        case "zip_code_address":
+        case "card_number":
+        case "card_payment_radio_button":
+        case "credit_card_payment":
+        case "text_input":
+        case "textarea":
+        case "slider": {
+          waitForElement(
+            item.bindingMode, item.bindingAddress,
+            {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
           break;
         }
 
-        setRadioValue(element, item.bindingValue);
-        break;
-      }
+        case "payment_method_id": {
+          setValuePaymentMethodToElement(element, item.bindingValue);
+          break;
+        }
 
-      case "password": {
-        element.setRangeText(item.bindingValue, 0, element.value.length);
-        element.dispatchEvent(new Event('input', { bubbles: true }));
-        element.dispatchEvent(new Event('change', { bubbles: true }));
-        break;
+        case 'dropdown_prefecture': {
+          if (element.tagName === ELEMENT_TAGS.SELECT) {
+            const acceptableValues = [item.bindingValue.toString(), removeLeadingZero(item.bindingValue).toString()];
+            const selectedOption = Array.from(element.options).find(option => acceptableValues.includes(option.value.toString()));
+            if (!selectedOption) item.bindingValue = '';
+          };
+          waitForElement(
+            item.bindingMode, item.bindingAddress,
+            {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
+          break;
+        }
+
+        case "agree_term":
+        case 'checkbox': {
+          setCheckToCheckboxElement(element, item.bindingValue);
+          break;
+        }
+
+        case 'pull_down': {
+          if (item.pulldownType === 'lp_integration_option') {
+            const isNullOption = item.bindingValue === 'NULL_OPTION';
+            if (isNullOption) item.bindingValue = '';
+  
+            const hasOption = Array.from(element.options).some(option => option.value === item.bindingValue);
+            if (!hasOption) item.bindingValue = '';
+          }
+
+          waitForElement(
+            item.bindingMode, item.bindingAddress,
+            {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
+          break;
+        }
+
+        case "radio_button": {
+          if (element.tagName === ELEMENT_TAGS.SELECT) {
+            setValueToElement(element, item.bindingValue);
+            break;
+          }
+  
+          setRadioValue(element, item.bindingValue);
+          break;
+        }
+
+        case "password": {
+          element.setRangeText(item.bindingValue, 0, element.value.length);
+          element.dispatchEvent(new Event('input', { bubbles: true }));
+          element.dispatchEvent(new Event('change', { bubbles: true }));
+          break;
+        }
+        default:
+          break;
       }
-      default:
-        break;
-    }
+    });
   }
 }
 
