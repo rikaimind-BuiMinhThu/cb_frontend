@@ -28,7 +28,8 @@ import {
   MESSAGE_CONTENT_TYPES,
   SESSION_STORAGE_KEY,
   NO_ERROR,
-  GETTING_ERROR_NOTIFICATION
+  GETTING_ERROR_NOTIFICATION,
+  CUSTOM_JS_CODE_POSITION
 } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
@@ -983,6 +984,14 @@ const PreviewFukushashiki = () => {
       document.head.appendChild(style);
     }
 
+    if (res.data?.chatbot?.is_used_custom_js_code) {
+      sendCustomJsToParent({
+        head: { jsCode: res.data?.chatbot?.head_custom_js_code, position: CUSTOM_JS_CODE_POSITION.HEAD },
+        top_body: { jsCode: res.data?.chatbot?.top_body_custom_js_code, position: CUSTOM_JS_CODE_POSITION.TOP_BODY },
+        bottom_body: { jsCode: res.data?.chatbot?.bottom_body_custom_js_code, position: CUSTOM_JS_CODE_POSITION.BOTTOM_BODY },
+      });
+    }
+
     const prevOpenStatus = sessionStorage.getItem("prevOpenStatus");
 
     if (res.data.design_settings.display_type == 1 && prevOpenStatus == "0") {
@@ -1098,6 +1107,15 @@ const PreviewFukushashiki = () => {
           style.innerHTML = savedState?.botInfor?.custom_css_content;
           document.head.appendChild(style);
         }
+
+        if (savedState?.botInfor?.is_used_custom_js_code) {
+          sendCustomJsToParent({
+            head: { jsCode: savedState?.botInfor?.head_custom_js_code, position: CUSTOM_JS_CODE_POSITION.HEAD },
+            top_body: { jsCode: savedState?.botInfor?.top_body_custom_js_code, position: CUSTOM_JS_CODE_POSITION.TOP_BODY },
+            bottom_body: { jsCode: savedState?.botInfor?.bottom_body_custom_js_code, position: CUSTOM_JS_CODE_POSITION.BOTTOM_BODY }
+          });
+        }
+
         if (savedState.isUsedErrMsgByJs && savedState.errMsgJsCode) {
           postMessageForExecuteJs(savedState.errMsgJsCode);
         }
@@ -2967,12 +2985,21 @@ const PreviewFukushashiki = () => {
     await sleep(2000);
   }
 
-  const fukushashikiToLP = (fukushashikiData) => {  
+  const fukushashikiToLP = (fukushashikiData) => {
     postMessageToParent({
       action: 'fukushashiki',
       actionData: fukushashikiData,
       isOpen: true
     });
+  }
+
+  const sendCustomJsToParent = ({ head, top_body, bottom_body } = {}) => {
+    const items = [ head, top_body, bottom_body ].filter(item => !!item?.jsCode?.trim() && !!item?.position?.trim() )
+      postMessageToParent({
+        action: CHATBOT_ACTIONS.INJECT_CUSTOM_JS,
+        actionData: items,
+        isOpen: true
+      });
   }
 
   const postMessageToParent = (options) => {
