@@ -789,6 +789,22 @@ const Scenario = () => {
   const [urlCartConfirmPage, setUrlCartConfirmPage] = useState('');
   const [isOpenModalCustomCss, setIsOpenModalCustomCss] = useState(false);
 
+  // New state for custom JS code (separated into 3 fields)
+  const [isUseCustomJsCode, setIsUseCustomJsCode] = useState(false);
+  const [headCustomJsCode, setHeadCustomJsCode] = useState({
+    temp: "",
+    final: ""
+  });
+  const [topBodyCustomJsCode, setTopBodyCustomJsCode] = useState({
+    temp: "",
+    final: ""
+  });
+  const [bottomBodyCustomJsCode, setBottomBodyCustomJsCode] = useState({
+    temp: "",
+    final: ""
+  });
+  const [isOpenModalCustomJsCode, setIsOpenModalCustomJsCode] = useState(false);
+
   const [errMsgJsCode, setErrMsgJsCode] = useState('');
   const [isOpenErrMsgByJsSettingModal, setIsOpenErrMsgByJsSettingModal] = useState(false);
   const [isUseErrMsgByJs, setIsUseErrMsgByJs] = useState(false);
@@ -915,6 +931,19 @@ const Scenario = () => {
       setCustomCssContent({
         temp: res.data.data?.custom_css_content || '',
         final: res.data.data?.custom_css_content || '',
+      });
+      setIsUseCustomJsCode(res.data.data?.is_used_custom_js_code || false);
+      setHeadCustomJsCode({
+        temp: res.data.data?.head_custom_js_code || '',
+        final: res.data.data?.head_custom_js_code || ''
+      });
+      setTopBodyCustomJsCode({
+        temp: res.data.data?.top_body_custom_js_code || '',
+        final: res.data.data?.top_body_custom_js_code || ''
+      });
+      setBottomBodyCustomJsCode({
+        temp: res.data.data?.bottom_body_custom_js_code || '',
+        final: res.data.data?.bottom_body_custom_js_code || ''
       });
       setIsUseErrMsgByJs(res.data.data?.is_used_err_msg_by_js || false);
       setErrMsgJsCode(res.data.data?.err_msg_js_code || '');
@@ -2138,7 +2167,7 @@ const Scenario = () => {
     func(...props);
     setTimeout(() => setIsOpenModalCustomCss(false), 0);
   };
-  
+
 
   const handleOnCancelCustomCss = () => {
     setCustomCssContent((prevState) => ({
@@ -2151,6 +2180,68 @@ const Scenario = () => {
     setCustomCssContent((prevState) => ({
       ...prevState,
       final: prevState.temp,
+    }));
+  }
+
+  // Custom JS code handlers
+  const handleChangeOpenModalCustomJsCode = (value) => () => {
+    setIsOpenModalCustomJsCode(value);
+  }
+
+  const handleOnChangeValueCustomJsCode = (fieldType) => (e) => {
+    e.preventDefault();
+    const value = e.target.value;
+
+    if (fieldType === 'head') {
+      setHeadCustomJsCode((prevState) => ({
+        ...prevState,
+        temp: value
+      }));
+    } else if (fieldType === 'top_body') {
+      setTopBodyCustomJsCode((prevState) => ({
+        ...prevState,
+        temp: value
+      }));
+    } else if (fieldType === 'bottom_body') {
+      setBottomBodyCustomJsCode((prevState) => ({
+        ...prevState,
+        temp: value
+      }));
+    }
+  }
+
+  const closeAfterDoneCustomJsCode = (func) => (...props) => {
+    func(...props);
+    setTimeout(() => setIsOpenModalCustomJsCode(false), 0);
+  };
+
+  const handleOnCancelCustomJsCode = () => {
+    setHeadCustomJsCode((prevState) => ({
+      ...prevState,
+      temp: prevState.final
+    }));
+    setTopBodyCustomJsCode((prevState) => ({
+      ...prevState,
+      temp: prevState.final
+    }));
+    setBottomBodyCustomJsCode((prevState) => ({
+      ...prevState,
+      temp: prevState.final
+    }));
+  }
+
+  const handleOnConfirmCustomJsCode = () => {
+    setHeadCustomJsCode((prevState) => ({
+      ...prevState,
+      final: prevState.temp
+    }));
+    setTopBodyCustomJsCode((prevState) => ({
+      ...prevState,
+      final: prevState.temp
+    }));
+    setBottomBodyCustomJsCode((prevState) => ({
+      ...prevState,
+      final: prevState.temp
     }));
   }
 
@@ -2181,6 +2272,62 @@ const Scenario = () => {
               style={{ backgroundColor: '#024BB9' }}
               className="ss-popup-add-variable-input-keep-button"
               onClick={closeAfterDone(handleOnConfirmCustomCss)}
+            >
+              保存
+            </Button>
+          </div>
+        </div>
+      </ModalShort>
+    );
+  };
+
+  const renderModalCustomJsCodeForm = (isOpen) => {
+    return (
+      <ModalShort open={isOpen} onClose={closeAfterDoneCustomJsCode(handleOnCancelCustomJsCode)}>
+        <div className="sl-popup-create-scenario-wrapper" style={{width: "750px"}}>
+          <h4>カスタムJSコードを入力</h4>
+          <div style={{ marginBottom: '10px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              <div className="sl-popup-create-scenario-input-wrapper" style={{ marginBottom: '0px' }}>
+                <span style={{ width: '100px'}}>ヘッド内のJSコンテンツ</span>
+                <textarea
+                  style={{ width: '100%', height: '120px', padding: '10px', fontSize: '14px', flexGrow: "1" }}
+                  placeholder="ここにヘッド内のJSコードを入力してください"
+                  value={headCustomJsCode.temp}
+                  onChange={handleOnChangeValueCustomJsCode('head')}
+                />
+              </div>
+              <div className="sl-popup-create-scenario-input-wrapper" style={{ marginBottom: '0px' }}>
+                <span style={{ width: '100px'}}>上部の本文にJSコンテンツ</span>
+                <textarea
+                  style={{ width: '100%', height: '120px', padding: '10px', fontSize: '14px', flexGrow: "1" }}
+                  placeholder="ここに上部の本文のJSコードを入力してください"
+                  value={topBodyCustomJsCode.temp}
+                  onChange={handleOnChangeValueCustomJsCode('top_body')}
+                />
+              </div>
+              <div className="sl-popup-create-scenario-input-wrapper" style={{ marginBottom: '0px' }}>
+                <span style={{ width: '100px'}}>下部の本文のJSコンテンツ</span>
+                <textarea
+                  style={{ width: '100%', height: '120px', padding: '10px', fontSize: '14px', flexGrow: "1" }}
+                  placeholder="ここに下部の本文のJSコードを入力してください"
+                  value={bottomBodyCustomJsCode.temp}
+                  onChange={handleOnChangeValueCustomJsCode('bottom_body')}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="sl-popup-create-scenario-btn-wrapper">
+            <Button
+              className="ss-popup-add-variable-input-close-button"
+              onClick={closeAfterDoneCustomJsCode(handleOnCancelCustomJsCode)}
+            >
+              閉じる
+            </Button>
+            <Button
+              style={{ backgroundColor: '#024BB9' }}
+              className="ss-popup-add-variable-input-keep-button"
+              onClick={closeAfterDoneCustomJsCode(handleOnConfirmCustomJsCode)}
             >
               保存
             </Button>
@@ -2248,6 +2395,10 @@ const Scenario = () => {
       is_used_fukushashiki: isUseFukushashiki,
       is_used_custom_css: isUseCustomCss,
       custom_css_content: customCssContent.final,
+      is_used_custom_js_code: isUseCustomJsCode,
+      head_custom_js_code: headCustomJsCode.final,
+      top_body_custom_js_code: topBodyCustomJsCode.final,
+      bottom_body_custom_js_code: bottomBodyCustomJsCode.final,
       is_used_err_msg_by_js: isUseErrMsgByJs,
       err_msg_js_code: errMsgJsCode,
     }
@@ -2296,6 +2447,10 @@ const Scenario = () => {
       is_used_fukushashiki: isUseFukushashiki,
       is_used_custom_css : isUseCustomCss,
       custom_css_content: customCssContent.final,
+      is_used_custom_js_code: isUseCustomJsCode,
+      head_custom_js_code: headCustomJsCode.final,
+      top_body_custom_js_code: topBodyCustomJsCode.final,
+      bottom_body_custom_js_code: bottomBodyCustomJsCode.final,
       is_used_err_msg_by_js: isUseErrMsgByJs,
       err_msg_js_code: errMsgJsCode,
     }
@@ -2733,7 +2888,31 @@ const Scenario = () => {
                     justifyContent: "start",
                     width: "100%",
                   }}>
-                    <div className='ss-user-setting-checkbox-custom_css'> 
+                    <div className='ss-user-setting-checkbox-custom_css'>
+                      <input
+                        type="checkbox"
+                        className="ss-user-setting-checkbox-custom"
+                        onChange={(value) => setIsUseCustomJsCode(!isUseCustomJsCode)}
+                        checked={isUseCustomJsCode}
+                      />
+                      <label style={{whiteSpace: "nowrap", wordBreak: "normal"}}>JSカスタムを使用</label>
+                    </div>
+                    {isUseCustomJsCode && (
+                      <div>
+                        <button class="ss-user-setting-checkbox-custom-css_toggle" onClick={handleChangeOpenModalCustomJsCode(true)}>
+                          {`( JSコンテンツ設定モダルを開く )`}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <div style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "16px",
+                    justifyContent: "start",
+                    width: "100%",
+                  }}>
+                    <div className='ss-user-setting-checkbox-custom_css'>
                       <input
                         type="checkbox"
                         className="ss-user-setting-checkbox-custom"
@@ -14525,6 +14704,7 @@ const Scenario = () => {
         </div>
       </ModalNoti>
       {renderModalCustomCssForm(isOpenModalCustomCss)}
+      {renderModalCustomJsCodeForm(isOpenModalCustomJsCode)}
       {renderErrMsgByJsSettingModal(isOpenErrMsgByJsSettingModal)}
       <ModalShort open={isOpenAddVariable} onClose={() => setIsOpenAddVariable(false)}>
         <div className="sl-popup-create-scenario-wrapper">
