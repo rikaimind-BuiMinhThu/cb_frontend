@@ -2,6 +2,7 @@ const CHATBOT_ACTIONS = {
   CLICK_BUTTON: 'clickButton',
   EXCUTE_JS: 'excuteJS',
   FUKUSHASHIKI: 'fukushashiki',
+  INJECT_CUSTOM_JS: 'injectCustomJS',
   GET_ERROR_MESSAGE: 'getErrorMessage',
   CRAWL_DATA: 'crawlData',
   OPEN_PREVIEW: 'openPreview',
@@ -288,6 +289,9 @@ const displayPopup = async () => {
           break;
         case CHATBOT_ACTIONS.SET_CHATBOT_CONVERSION_PARAMS_TO_LOCAL_STORAGE:
           setChatbotConversionParamsToLocalStorage(e.data.actionData);
+          break;
+        case CHATBOT_ACTIONS.INJECT_CUSTOM_JS:
+          injectCustomJS(e.data.actionData);
           break;
       };
 
@@ -631,6 +635,29 @@ const mobileCheck = () => {
       check = true;
   })(navigator.userAgent || navigator.vendor || window.opera);
   return check;
+}
+
+const injectCustomJS = (injectCustomJsCodes) => {
+  for(const { jsCode, position } of injectCustomJsCodes)
+  {
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.innerHTML = jsCode;
+
+    switch (position) {
+      case 'head':
+        document.head.appendChild(script);
+        break;
+      case 'top_body':
+        document.body.insertBefore(script, document.body.firstChild);
+        break;
+      case 'bottom_body':
+        document.body.appendChild(script);
+        break;
+      default:
+        document.head.appendChild(script);
+    }
+  }
 }
 
 displayPopup();
