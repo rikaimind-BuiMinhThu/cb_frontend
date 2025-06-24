@@ -28,7 +28,8 @@ import {
   MESSAGE_CONTENT_TYPES,
   SESSION_STORAGE_KEY,
   NO_ERROR,
-  GETTING_ERROR_NOTIFICATION
+  GETTING_ERROR_NOTIFICATION,
+  CUSTOM_JS_CODE_POSITION
 } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
@@ -985,9 +986,9 @@ const PreviewFukushashiki = () => {
 
     if (res.data?.chatbot?.is_used_custom_js_code) {
       sendCustomJsToParent({
-        head: { jsCode: res.data?.chatbot?.head_custom_js_code, position: 'head' },
-        top_body: { jsCode: res.data?.chatbot?.top_body_custom_js_code, position: 'top_body' },
-        bottom_body: { jsCode: res.data?.chatbot?.bottom_body_custom_js_code, position: 'bottom_body' },
+        head: { jsCode: res.data?.chatbot?.head_custom_js_code, position: CUSTOM_JS_CODE_POSITION.HEAD },
+        top_body: { jsCode: res.data?.chatbot?.top_body_custom_js_code, position: CUSTOM_JS_CODE_POSITION.TOP_BODY },
+        bottom_body: { jsCode: res.data?.chatbot?.bottom_body_custom_js_code, position: CUSTOM_JS_CODE_POSITION.BOTTOM_BODY },
       });
     }
 
@@ -1109,9 +1110,9 @@ const PreviewFukushashiki = () => {
 
         if (savedState?.botInfor?.is_used_custom_js_code) {
           sendCustomJsToParent({
-            head: { jsCode: savedState?.botInfor?.head_custom_js_code, position: 'head' },
-            top_body: { jsCode: savedState?.botInfor?.top_body_custom_js_code, position: 'top_body' },
-            bottom_body: { jsCode: savedState?.botInfor?.bottom_body_custom_js_code, position: 'bottom_body' }
+            head: { jsCode: savedState?.botInfor?.head_custom_js_code, position: CUSTOM_JS_CODE_POSITION.HEAD },
+            top_body: { jsCode: savedState?.botInfor?.top_body_custom_js_code, position: CUSTOM_JS_CODE_POSITION.TOP_BODY },
+            bottom_body: { jsCode: savedState?.botInfor?.bottom_body_custom_js_code, position: CUSTOM_JS_CODE_POSITION.BOTTOM_BODY }
           });
         }
 
@@ -2995,7 +2996,7 @@ const PreviewFukushashiki = () => {
   const sendCustomJsToParent = ({ head, top_body, bottom_body } = {}) => {
     const items = [ head, top_body, bottom_body ].filter(item => !!item?.jsCode?.trim() && !!item?.position?.trim() )
       postMessageToParent({
-        action: 'injectCustomJS',
+        action: CHATBOT_ACTIONS.INJECT_CUSTOM_JS,
         actionData: items,
         isOpen: true
       });

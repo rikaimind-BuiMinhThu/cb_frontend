@@ -10,6 +10,12 @@ const CHATBOT_ACTIONS = {
   SET_CHATBOT_CONVERSION_PARAMS_TO_LOCAL_STORAGE: 'setChatbotConversionParamsToLocalStorage',
 };
 
+const CUSTOM_JS_CODE_POSITION = {
+  HEAD: 'head',
+  TOP_BODY: 'top_body',
+  BOTTOM_BODY: 'bottom_body',
+};
+
 const CONVERSION_PARAMS_STORAGE_KEYS = {
   SCENARIO_ID: 'ecChatbotScenarioId',
   BOT_TYPE: 'ecChatbotBotType',
@@ -645,17 +651,17 @@ const injectCustomJS = (injectCustomJsCodes) => {
     script.innerHTML = jsCode;
 
     switch (position) {
-      case 'head':
+      case CUSTOM_JS_CODE_POSITION.HEAD:
         document.head.appendChild(script);
         break;
-      case 'top_body':
+      case CUSTOM_JS_CODE_POSITION.TOP_BODY:
         document.body.insertBefore(script, document.body.firstChild);
         break;
-      case 'bottom_body':
+      case CUSTOM_JS_CODE_POSITION.BOTTOM_BODY:
         document.body.appendChild(script);
         break;
       default:
-        document.head.appendChild(script);
+        console.error("Invalid position: " + position);
     }
   }
 }
