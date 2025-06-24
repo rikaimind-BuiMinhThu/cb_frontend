@@ -120,6 +120,7 @@ const CHATBOT_ACTIONS = {
   GET_PREVIEW_ORDER_CONTENT: 'getPreviewOrderContent',
   PREVIEW_OBJECT: 'previewObject',
   SET_CHATBOT_CONVERSION_PARAMS_TO_LOCAL_STORAGE: 'setChatbotConversionParamsToLocalStorage',
+  INJECT_CUSTOM_JS: 'injectCustomJS',
 };
 
 const SEARCH_MODES = {
@@ -152,6 +153,12 @@ const REGEXP = {
   NUMBER: /^[0-9]+$/,
 }
 
+const CUSTOM_JS_CODE_POSITION = {
+  HEAD: 'head',
+  TOP_BODY: 'top_body',
+  BOTTOM_BODY: 'bottom_body',
+}
+
 export {
   dataHourFixed,
   dataMinutes,
@@ -172,4 +179,5 @@ export {
   NO_ERROR,
   GETTING_ERROR_NOTIFICATION,
   REGEXP,
+  CUSTOM_JS_CODE_POSITION,
 };
