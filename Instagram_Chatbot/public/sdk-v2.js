@@ -140,6 +140,8 @@ const movePaymentMethodToTop = (data) => {
   const index = data.findIndex(item => item.type === "payment_method_id");
   if (index !== -1) {
       const [paymentMethod] = data.splice(index, 1);
+      paymentMethod.additionalType = "await"
+
       data.unshift(paymentMethod);
   }
   return data;
