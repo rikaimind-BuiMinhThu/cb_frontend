@@ -3145,6 +3145,7 @@ const PreviewFukushashiki = () => {
     for (let i = 0; i < newState.messagesList.length; i++) {
       if (newState.messagesList[i].conditions?.length > 0) {
         const result = checkMessageCondition(newState.messagesList[i], newState.objParam);
+        console.log(result, newState.messagesList[i], newState.objParam)
         if (!result && isUserMessage(newState.messagesList[i])) {
           newState.messagesList[i].hidden = true;
           continue;
@@ -3178,10 +3179,12 @@ const PreviewFukushashiki = () => {
     }
 
     newState.currentUserMsgIndex = newState.messagesList.findIndex((item, index) => !item.hidden && isUserMessage(item) && index > clickedMsgIndex);
+    newState.lastMsgIndex = Math.max(newState.lastMsgIndex || 0 ,newState.currentUserMsgIndex)
+
     if (newState.currentUserMsgIndex === -1)
       newState.currentMsgIndex = newState.messagesList.length - 1;
     else
-      newState.currentMsgIndex = newState.currentUserMsgIndex;
+      newState.currentMsgIndex = newState.lastMsgIndex;
     
     const isBtnUpdateClick = indexMessage < newState.renderMessagesList.length - 1;
 
