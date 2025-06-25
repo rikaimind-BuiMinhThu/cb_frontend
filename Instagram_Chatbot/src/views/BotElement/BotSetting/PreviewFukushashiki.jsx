@@ -3145,7 +3145,6 @@ const PreviewFukushashiki = () => {
     for (let i = 0; i < newState.messagesList.length; i++) {
       if (newState.messagesList[i].conditions?.length > 0) {
         const result = checkMessageCondition(newState.messagesList[i], newState.objParam);
-        console.log(result, newState.messagesList[i], newState.objParam)
         if (!result && isUserMessage(newState.messagesList[i])) {
           newState.messagesList[i].hidden = true;
           continue;
