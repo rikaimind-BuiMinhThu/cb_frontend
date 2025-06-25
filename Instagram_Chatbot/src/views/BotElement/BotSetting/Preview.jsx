@@ -29,7 +29,7 @@ import {
 } from '../../../variables/constants';
 import locale from 'antd/es/date-picker/locale/ja_JP';
 import 'moment/locale/zh-cn';
-import HtmlCodeMessagePreview from '../../../components/BotMessages/HtmlCodeMessagePreview';
+import { HtmlCodeMessagePreview } from '../../../components/BotMessages';
 import ModalPreviewBot from '../../../views/Popup/ModalPreviewBot';
 import iconMessageBlue from "../../../assets/img/icon-mess/icon-message-chat-blue.png";
 import iconMessageGreen from "../../../assets/img/icon-mess/icon-message-chat-green.png";
