@@ -42,7 +42,7 @@ import locale from 'antd/es/date-picker/locale/ja_JP';
 import 'moment/locale/zh-cn';
 import ShopifyReferenceSelect from "./ShopifyReferenceSelect";
 import { Tooltip } from '@mui/material';
-import { dataDay, MESSAGE_CONTENT_TYPES } from '../PreviewComponent/Constants';
+import { dataDay, MESSAGE_CONTENT_TYPES, BOT_MESSAGE_TYPES } from '../PreviewComponent/Constants';
 
 const _ = require('lodash');
 
@@ -2995,7 +2995,7 @@ const Scenario = () => {
                                   else if (content.type === 'variable_set') { titleMessage = "変数セット" }
                                   else if (content.type === 'pause') { titleMessage = "一時停止" }
                                   else if (content.type === 'getting_error_notification') { titleMessage = "エラー取得の通知" }
-                                  else if (content.type === 'html_code') { titleMessage = "HTMLコード" }
+                                  else if (content.type === BOT_MESSAGE_TYPES.HTML_CODE) { titleMessage = "HTMLコード" }
                                 }
 
                                 return message.belong_to === 'bot' ? (
@@ -3103,7 +3103,7 @@ const Scenario = () => {
                                                     ></textarea>
                                                   )}
                                                   {/* bot: type == 'script' */}
-                                                  {(content.type === 'script' || content.type === 'html_code') && (
+                                                  {(content.type === 'script' || content.type === BOT_MESSAGE_TYPES.HTML_CODE) && (
                                                     <textarea
                                                       className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
                                                       style={message.hidden === true ? { opacity: '0.4' } : {}}
@@ -5831,7 +5831,7 @@ const Scenario = () => {
                               )}
 
                               {/* type: html_code */}
-                              {messageType === 'html_code' && (
+                              {messageType === BOT_MESSAGE_TYPES.HTML_CODE && (
                                 <HtmlCodeMessage
                                   value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['content'] || ''}
                                   onChange={(value) => {
