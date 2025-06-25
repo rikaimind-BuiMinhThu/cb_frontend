@@ -52,6 +52,7 @@ import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
 import ZipCodePopUp from "./PreviewComponent/ZipCodePopUp";
 import * as wanakana from "wanakana";
+import _ from "lodash";
 
 sessionStorage.setItem("prevOpenStatus", "0");
 var url = new URL(window.location.href);
@@ -790,7 +791,7 @@ const PreviewFukushashiki = () => {
     });
 
     sendEmailRequest(emailId, {variables: variablesData})
-      then((res) => {console.log(res)});
+      .then((res) => {console.log(res)});
 
     newState.renderMessagesList.push({});
     newState.currentMsgIndex = i;
@@ -881,7 +882,7 @@ const PreviewFukushashiki = () => {
     getCaptcha(size, color, charPreset)
       .then((res) => {
         let newCaptcha = [...state.captcha];
-        newCaptcha.push({index: i, indexContent: j, ...res.data});
+        newCaptcha.push({index: i, indexContent: msgContentIndex, ...res.data});
         dispatch({
           type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
           payload: {
@@ -2470,6 +2471,18 @@ const PreviewFukushashiki = () => {
         })
     }
   }
+
+  const setPhoneNumberDefaultValue = (dataContentType, field) => {
+    // TODO: Implement later
+  }
+
+  const setDateSelectDefaultValue = (dataContentType) => {
+    // TODO: Implement later
+  }
+
+  const getCaptcha = async () => {
+    // TODO: Implement later
+  } 
 
   const convertToFukushashikiObject = (obj) => {
     if (
