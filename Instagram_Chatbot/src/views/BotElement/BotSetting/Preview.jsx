@@ -29,6 +29,7 @@ import {
 } from '../../../variables/constants';
 import locale from 'antd/es/date-picker/locale/ja_JP';
 import 'moment/locale/zh-cn';
+import ChatbotMessageTypeHtmlPreview from '../../../components/ChatbotMessageTypeHtmlPreview/ChatbotMessageTypeHtmlPreview';
 import ModalPreviewBot from '../../../views/Popup/ModalPreviewBot';
 import iconMessageBlue from "../../../assets/img/icon-mess/icon-message-chat-blue.png";
 import iconMessageGreen from "../../../assets/img/icon-mess/icon-message-chat-green.png";
@@ -611,6 +612,21 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                         return delayRender = setTimeout(() => {
                                             if (messageArr[i].message_content[0]?.type === 'text_input' && messageArr[i].message_content[0].text_input.content) {
                                                 messageArr[i].message_content[0].text_input.content = messageArr[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
+                                                    if (variables.length !== 0) {
+                                                        let valueVar = "";
+                                                        for (let j = 0; j < variables.length; j++) {
+                                                            if (variables[j].variable_name === variable) {
+                                                                valueVar = variables[j].default_value;
+                                                            }
+                                                        }
+                                                        return valueVar;
+                                                    } else {
+                                                        return "";
+                                                    }
+                                                });
+                                            }
+                                            if (messageArr[i].message_content[0]?.type === 'html_code' && messageArr[i].message_content[0].html_code.content) {
+                                                messageArr[i].message_content[0].html_code.content = messageArr[i].message_content[0].html_code.content.replaceAll(SCAN_REGEX, (text, variable) => {
                                                     if (variables.length !== 0) {
                                                         let valueVar = "";
                                                         for (let j = 0; j < variables.length; j++) {
@@ -1634,6 +1650,21 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                             }
                                         })
                                     }
+                                    if (dataMessages[i].message_content[0].type === 'html_code' && dataMessages[i].message_content[0].html_code.content) {
+                                        dataMessages[i].message_content[0].html_code.content = dataMessages[i].message_content[0].html_code.content.replaceAll(SCAN_REGEX, (text, variable) => {
+                                            if (variables.length !== 0) {
+                                                let valueVar = "";
+                                                for (let j = 0; j < variables.length; j++) {
+                                                    if (variables[j].variable_name === variable) {
+                                                        valueVar = variables[j].default_value;
+                                                    }
+                                                }
+                                                return valueVar;
+                                            } else {
+                                                return "";
+                                            }
+                                        })
+                                    }
                                     resolve({ ...dataMessages[i] });
                                 }, 1000);
                             }).then(data => {
@@ -1984,6 +2015,21 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                     return setTimeout(() => {
                                         if (dataMessages[i].message_content[0].type === 'text_input' && dataMessages[i].message_content[0].text_input.content) {
                                             dataMessages[i].message_content[0].text_input.content = dataMessages[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
+                                                if (variables.length !== 0) {
+                                                    let valueVar = "";
+                                                    for (let j = 0; j < variables.length; j++) {
+                                                        if (variables[j].variable_name === variable) {
+                                                            valueVar = variables[j].default_value;
+                                                        }
+                                                    }
+                                                    return valueVar;
+                                                } else {
+                                                    return "";
+                                                }
+                                            })
+                                        }
+                                        if (dataMessages[i].message_content[0].type === 'html_code' && dataMessages[i].message_content[0].html_code.content) {
+                                            dataMessages[i].message_content[0].html_code.content = dataMessages[i].message_content[0].html_code.content.replaceAll(SCAN_REGEX, (text, variable) => {
                                                 if (variables.length !== 0) {
                                                     let valueVar = "";
                                                     for (let j = 0; j < variables.length; j++) {
@@ -2651,7 +2697,7 @@ const BotMessage = ({ content, index, botInfor }) => {
 
     return (
         <div key={index} className="sp-body-bot-side slideRight">
-            {(content.type === 'text_input' || content.type === 'file' || content.type === 'delay') && (
+            {(content.type === 'text_input' || content.type === 'file' || content.type === 'delay' || content.type === 'html_code') && (
                 <div className="sp-body-bot-side-avatar sp-avatar">
                     <img src={EC_CHATBOT_URL + "/" + botInfor?.icon?.url} alt="sp-avarta" />
                 </div>
@@ -2742,6 +2788,14 @@ const BotMessage = ({ content, index, botInfor }) => {
                         )}
                         {content.type === 'delay' && (
                             <img src={messageTypingGif} style={{ backgroundColor: '#EBF7FF', height: '40px', borderRadius: '10px' }} />
+                        )}
+                        {/* bot: type == 'html_code' */}
+                        {content.type === 'html_code' && (
+                            <ChatbotMessageTypeHtmlPreview
+                                content={content}
+                                index={index}
+                                botInfor={botInfor}
+                            />
                         )}
                     </React.Fragment>}
             </div>
