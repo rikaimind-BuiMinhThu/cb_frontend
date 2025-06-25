@@ -28,7 +28,7 @@ import {
 import { tokenExpired } from 'api/tokenExpired';
 import DatePickerCustom from './scenarioComon/DatePickerCustom';
 import { Carousel, Checkbox, Radio, Slider, Calendar, Select } from 'antd';
-import HtmlCodeMessage from '../../../../components/BotMessages/HtmlCodeMessage';
+import { HtmlCodeMessage } from '../../../../components/BotMessages';
 import CheckboxGroupCustom from './scenarioComon/CheckboxGroupCustom';
 import american_express from '../../../../assets/img/payment-method/american_express.png';
 import diner_club from '../../../../assets/img/payment-method/diner_club.png';
