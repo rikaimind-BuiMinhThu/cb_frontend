@@ -25,7 +25,7 @@ import jcb from '../../../assets/img/payment-method/jcb.png';
 import master_card from '../../../assets/img/payment-method/master_card.png';
 import visa from '../../../assets/img/payment-method/visa.png';
 import {
-    SHORTEN_URL, EC_CHATBOT_URL
+    SHORTEN_URL, EC_CHATBOT_URL 
 } from '../../../variables/constants';
 import locale from 'antd/es/date-picker/locale/ja_JP';
 import 'moment/locale/zh-cn';
@@ -39,6 +39,7 @@ import iconMessagePink from "../../../assets/img/icon-mess/icon-message-chat-pin
 import iconMessagePurple from "../../../assets/img/icon-mess/icon-message-chat-purple.png";
 import iconMessageBlack from "../../../assets/img/icon-mess/icon-message-chat-black.png";
 import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-white.png";
+import { BOT_MESSAGE_TYPES } from './PreviewComponent/Constants';
 // import { Input, rgbToHex } from '@material-ui/core';
 
 const _ = require('lodash');
@@ -621,7 +622,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                                     return getVariableValue(variables, variable);
                                                 });
                                             }
-                                            if (messageArr[i].message_content[0]?.type === 'html_code' && messageArr[i].message_content[0].html_code.content) {
+                                            if (messageArr[i].message_content[0]?.type === BOT_MESSAGE_TYPES.HTML_CODE && messageArr[i].message_content[0].html_code.content) {
                                                 messageArr[i].message_content[0].html_code.content = messageArr[i].message_content[0].html_code.content.replaceAll(SCAN_REGEX, (text, variable) => {
                                                     return getVariableValue(variables, variable);
                                                 });
@@ -1626,7 +1627,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                             return getVariableValue(variables, variable);
                                         })
                                     }
-                                    if (dataMessages[i].message_content[0].type === 'html_code' && dataMessages[i].message_content[0].html_code.content) {
+                                    if (dataMessages[i].message_content[0].type === BOT_MESSAGE_TYPES.HTML_CODE && dataMessages[i].message_content[0].html_code.content) {
                                         dataMessages[i].message_content[0].html_code.content = dataMessages[i].message_content[0].html_code.content.replaceAll(SCAN_REGEX, (text, variable) => {
                                             return getVariableValue(variables, variable);
                                         })
@@ -1974,7 +1975,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                                 return getVariableValue(variables, variable);
                                             })
                                         }
-                                        if (dataMessages[i].message_content[0].type === 'html_code' && dataMessages[i].message_content[0].html_code.content) {
+                                        if (dataMessages[i].message_content[0].type === BOT_MESSAGE_TYPES.HTML_CODE && dataMessages[i].message_content[0].html_code.content) {
                                             dataMessages[i].message_content[0].html_code.content = dataMessages[i].message_content[0].html_code.content.replaceAll(SCAN_REGEX, (text, variable) => {
                                                 return getVariableValue(variables, variable);
                                             })
@@ -2633,7 +2634,7 @@ const BotMessage = ({ content, index, botInfor }) => {
 
     return (
         <div key={index} className="sp-body-bot-side slideRight">
-            {(content.type === 'text_input' || content.type === 'file' || content.type === 'delay' || content.type === 'html_code') && (
+            {(content.type === 'text_input' || content.type === 'file' || content.type === 'delay' || content.type === BOT_MESSAGE_TYPES.HTML_CODE) && (
                 <div className="sp-body-bot-side-avatar sp-avatar">
                     <img src={EC_CHATBOT_URL + "/" + botInfor?.icon?.url} alt="sp-avarta" />
                 </div>
@@ -2726,7 +2727,7 @@ const BotMessage = ({ content, index, botInfor }) => {
                             <img src={messageTypingGif} style={{ backgroundColor: '#EBF7FF', height: '40px', borderRadius: '10px' }} />
                         )}
                         {/* bot: type == 'html_code' */}
-                        {content.type === 'html_code' && (
+                        {content.type === BOT_MESSAGE_TYPES.HTML_CODE && (
                             <HtmlCodeMessagePreview
                                 content={content}
                                 index={index}

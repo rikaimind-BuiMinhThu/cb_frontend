@@ -159,6 +159,10 @@ const CUSTOM_JS_CODE_POSITION = {
   BOTTOM_BODY: 'bottom_body',
 }
 
+const BOT_MESSAGE_TYPES = {
+  HTML_CODE: 'html_code'
+}
+
 export {
   dataHourFixed,
   dataMinutes,
@@ -180,4 +184,5 @@ export {
   GETTING_ERROR_NOTIFICATION,
   REGEXP,
   CUSTOM_JS_CODE_POSITION,
+  BOT_MESSAGE_TYPES,
 };
