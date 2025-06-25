@@ -3094,6 +3094,7 @@ const PreviewFukushashiki = () => {
     if (clickedMsgIndex < 0) clickedMsgIndex = newState.currentMsgIndex;
     newState.userMessagesList = newState.messagesList.filter((item) => isUserMessage(item));
     const clickedMsg = newState.messagesList[clickedMsgIndex];
+    clickedMsg.isSubmitted = true
 
     if (!handleValidateField(indexMessage)) {
       return;
@@ -3124,6 +3125,7 @@ const PreviewFukushashiki = () => {
       });
     }
 
+    newState.messagesList[clickedMsgIndex].isSubmitted = true
     fukushashikiToLP(convertToFukushashikiObject(submitData));
 
     if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
@@ -3177,8 +3179,37 @@ const PreviewFukushashiki = () => {
       }
     }
 
-    newState.currentUserMsgIndex = newState.messagesList.findIndex((item, index) => !item.hidden && isUserMessage(item) && index > clickedMsgIndex);
-    newState.lastMsgIndex = Math.max(newState.lastMsgIndex || 0 ,newState.currentUserMsgIndex)
+    const { currentUserMsg, nextRenderMsg } = { 
+      currentUserMsg: { index: -1, take: true }, 
+      nextRenderMsg: { index: -1, take: true }
+    }
+
+    for (let index = clickedMsgIndex + 1; index < newState.messagesList.length; index++) {
+      const item = newState.messagesList[index];
+      if (!item.hidden && isUserMessage(item)) {
+        if (currentUserMsg.take) {
+          currentUserMsg.index = index; 
+          currentUserMsg.take = false;
+        }
+
+        if (!item.isSubmitted && nextRenderMsg.take) {
+          nextRenderMsg.index = index;
+          nextRenderMsg.take = false;
+        }
+      }
+
+      if (!currentUserMsg.take && !nextRenderMsg.take) {
+        break;
+      }
+    }
+    
+    newState.currentUserMsgIndex = currentUserMsg.index;
+    newState.lastMsgIndex = Math.max(
+      nextRenderMsg.index < 0 
+        ? newState.lastMsgIndex || -1 
+        : nextRenderMsg.index, 
+      newState.currentUserMsgIndex
+    )
 
     if (newState.currentUserMsgIndex === -1)
       newState.currentMsgIndex = newState.messagesList.length - 1;
