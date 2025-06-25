@@ -29,7 +29,7 @@ import {
 } from '../../../variables/constants';
 import locale from 'antd/es/date-picker/locale/ja_JP';
 import 'moment/locale/zh-cn';
-import ChatbotMessageTypeHtmlPreview from '../../../components/ChatbotMessageTypeHtmlPreview/ChatbotMessageTypeHtmlPreview';
+import HtmlCodeMessagePreview from '../../../components/BotMessages/HtmlCodeMessagePreview';
 import ModalPreviewBot from '../../../views/Popup/ModalPreviewBot';
 import iconMessageBlue from "../../../assets/img/icon-mess/icon-message-chat-blue.png";
 import iconMessageGreen from "../../../assets/img/icon-mess/icon-message-chat-green.png";
@@ -162,6 +162,12 @@ let dataPaymentMethod = [
 ]
 
 let SCAN_REGEX = /\{\{(.*?)\}\}/g;
+
+// Helper function để thay thế variables
+const getVariableValue = (variables, variableName) => {
+    const foundVariable = variables.find(v => v.variable_name === variableName);
+    return foundVariable?.default_value || "";
+};
 
 const installmentOptions = Array.from({ length: 23 }, (_, i) => ({
     key: i + 2,
@@ -612,32 +618,12 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                         return delayRender = setTimeout(() => {
                                             if (messageArr[i].message_content[0]?.type === 'text_input' && messageArr[i].message_content[0].text_input.content) {
                                                 messageArr[i].message_content[0].text_input.content = messageArr[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
-                                                    if (variables.length !== 0) {
-                                                        let valueVar = "";
-                                                        for (let j = 0; j < variables.length; j++) {
-                                                            if (variables[j].variable_name === variable) {
-                                                                valueVar = variables[j].default_value;
-                                                            }
-                                                        }
-                                                        return valueVar;
-                                                    } else {
-                                                        return "";
-                                                    }
+                                                    return getVariableValue(variables, variable);
                                                 });
                                             }
                                             if (messageArr[i].message_content[0]?.type === 'html_code' && messageArr[i].message_content[0].html_code.content) {
                                                 messageArr[i].message_content[0].html_code.content = messageArr[i].message_content[0].html_code.content.replaceAll(SCAN_REGEX, (text, variable) => {
-                                                    if (variables.length !== 0) {
-                                                        let valueVar = "";
-                                                        for (let j = 0; j < variables.length; j++) {
-                                                            if (variables[j].variable_name === variable) {
-                                                                valueVar = variables[j].default_value;
-                                                            }
-                                                        }
-                                                        return valueVar;
-                                                    } else {
-                                                        return "";
-                                                    }
+                                                    return getVariableValue(variables, variable);
                                                 });
                                             }
                                             resolve({ ...messageArr[i] });
@@ -1637,32 +1623,12 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                 return delayRender = setTimeout(() => {
                                     if (dataMessages[i].message_content[0].type === 'text_input' && dataMessages[i].message_content[0].text_input.content) {
                                         dataMessages[i].message_content[0].text_input.content = dataMessages[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
-                                            if (variables.length !== 0) {
-                                                let valueVar = "";
-                                                for (let j = 0; j < variables.length; j++) {
-                                                    if (variables[j].variable_name === variable) {
-                                                        valueVar = variables[j].default_value;
-                                                    }
-                                                }
-                                                return valueVar;
-                                            } else {
-                                                return "";
-                                            }
+                                            return getVariableValue(variables, variable);
                                         })
                                     }
                                     if (dataMessages[i].message_content[0].type === 'html_code' && dataMessages[i].message_content[0].html_code.content) {
                                         dataMessages[i].message_content[0].html_code.content = dataMessages[i].message_content[0].html_code.content.replaceAll(SCAN_REGEX, (text, variable) => {
-                                            if (variables.length !== 0) {
-                                                let valueVar = "";
-                                                for (let j = 0; j < variables.length; j++) {
-                                                    if (variables[j].variable_name === variable) {
-                                                        valueVar = variables[j].default_value;
-                                                    }
-                                                }
-                                                return valueVar;
-                                            } else {
-                                                return "";
-                                            }
+                                            return getVariableValue(variables, variable);
                                         })
                                     }
                                     resolve({ ...dataMessages[i] });
@@ -1776,17 +1742,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                         }
                         function replaceVariable(content) {
                             content = content.replaceAll(SCAN_REGEX, (text, variable) => {
-                                if (variables.length !== 0) {
-                                    let valueVar = "";
-                                    for (let j = 0; j < variables.length; j++) {
-                                        if (variables[j].variable_name === variable) {
-                                            valueVar = variables[j].default_value;
-                                        }
-                                    }
-                                    return valueVar;
-                                } else {
-                                    return "";
-                                }
+                                return getVariableValue(variables, variable);
                             })
                             return content;
                         }
@@ -2015,32 +1971,12 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                     return setTimeout(() => {
                                         if (dataMessages[i].message_content[0].type === 'text_input' && dataMessages[i].message_content[0].text_input.content) {
                                             dataMessages[i].message_content[0].text_input.content = dataMessages[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
-                                                if (variables.length !== 0) {
-                                                    let valueVar = "";
-                                                    for (let j = 0; j < variables.length; j++) {
-                                                        if (variables[j].variable_name === variable) {
-                                                            valueVar = variables[j].default_value;
-                                                        }
-                                                    }
-                                                    return valueVar;
-                                                } else {
-                                                    return "";
-                                                }
+                                                return getVariableValue(variables, variable);
                                             })
                                         }
                                         if (dataMessages[i].message_content[0].type === 'html_code' && dataMessages[i].message_content[0].html_code.content) {
                                             dataMessages[i].message_content[0].html_code.content = dataMessages[i].message_content[0].html_code.content.replaceAll(SCAN_REGEX, (text, variable) => {
-                                                if (variables.length !== 0) {
-                                                    let valueVar = "";
-                                                    for (let j = 0; j < variables.length; j++) {
-                                                        if (variables[j].variable_name === variable) {
-                                                            valueVar = variables[j].default_value;
-                                                        }
-                                                    }
-                                                    return valueVar;
-                                                } else {
-                                                    return "";
-                                                }
+                                                return getVariableValue(variables, variable);
                                             })
                                         }
                                         resolve({ ...dataMessages[i] });
@@ -2791,7 +2727,7 @@ const BotMessage = ({ content, index, botInfor }) => {
                         )}
                         {/* bot: type == 'html_code' */}
                         {content.type === 'html_code' && (
-                            <ChatbotMessageTypeHtmlPreview
+                            <HtmlCodeMessagePreview
                                 content={content}
                                 index={index}
                                 botInfor={botInfor}
@@ -3103,17 +3039,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
 
     function replaceVariable(content) {
         content = content.replaceAll(SCAN_REGEX, (text, variable) => {
-            if (variables.length !== 0) {
-                let valueVar = "";
-                for (let j = 0; j < variables.length; j++) {
-                    if (variables[j].variable_name === variable) {
-                        valueVar = variables[j].default_value;
-                    }
-                }
-                return valueVar;
-            } else {
-                return "";
-            }
+            return getVariableValue(variables, variable);
         })
         return content;
     }

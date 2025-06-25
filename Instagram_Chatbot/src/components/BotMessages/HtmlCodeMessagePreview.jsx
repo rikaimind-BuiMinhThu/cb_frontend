@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ChatbotMessageTypeHtmlPreview = ({
+const HtmlCodeMessagePreview = ({
   content,
   index,
   botInfor
@@ -11,33 +11,20 @@ const ChatbotMessageTypeHtmlPreview = ({
   return (
     <div className="position-relative">
       <div
-        className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value position-relative`}
+        className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value position-relative html-code-message-preview`}
         style={{
-          overflowWrap: 'break-word',
           backgroundColor: botInfor?.message_color,
-          color: botInfor?.font_color,
-          height: 'auto',
-          border: 'none',
-          borderRadius: '20px',
-          padding: '10px'
+          color: botInfor?.font_color
         }}
         dangerouslySetInnerHTML={{
           __html: htmlContent
         }}
       />
       <div
+        className="html-code-message-icon"
         style={{
-          content: " ",
-          display: "flex",
-          position: "absolute",
-          bottom: 1,
-          left: "-3px",
-          width: "12px",
-          height: "18px",
           backgroundColor: botInfor?.message_color,
-          background: `url(${botInfor?.icon_mess})`,
-          backgroundSize: "contain",
-          backgroundRepeat: "no-repeat",
+          background: `url(${botInfor?.icon_mess})`
         }}
       >
         {!botInfor?.icon_mess && (
@@ -54,4 +41,4 @@ const ChatbotMessageTypeHtmlPreview = ({
   );
 };
 
-export default ChatbotMessageTypeHtmlPreview;
+export default HtmlCodeMessagePreview;

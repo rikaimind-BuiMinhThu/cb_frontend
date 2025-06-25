@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ChatbotMessageTypeHtml = ({
+const HtmlCodeMessage = ({
   value = '',
   onChange,
   validationError = '',
@@ -31,7 +31,7 @@ const ChatbotMessageTypeHtml = ({
           onChange={handleChange}
         />
         {validationError && (
-          <div style={{ color: '#FF7E00', fontSize: '12px', marginTop: '5px' }}>
+          <div className="validation-error">
             {validationError}
           </div>
         )}
@@ -40,4 +40,4 @@ const ChatbotMessageTypeHtml = ({
   );
 };
 
-export default ChatbotMessageTypeHtml;
+export default HtmlCodeMessage;
