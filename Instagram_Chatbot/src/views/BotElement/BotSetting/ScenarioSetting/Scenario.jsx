@@ -28,7 +28,7 @@ import {
 import { tokenExpired } from 'api/tokenExpired';
 import DatePickerCustom from './scenarioComon/DatePickerCustom';
 import { Carousel, Checkbox, Radio, Slider, Calendar, Select } from 'antd';
-import ChatbotMessageTypeHtml from '../../../../components/ChatbotMessageTypeHtml/ChatbotMessageTypeHtml';
+import HtmlCodeMessage from '../../../../components/BotMessages/HtmlCodeMessage';
 import CheckboxGroupCustom from './scenarioComon/CheckboxGroupCustom';
 import american_express from '../../../../assets/img/payment-method/american_express.png';
 import diner_club from '../../../../assets/img/payment-method/diner_club.png';
@@ -5838,7 +5838,7 @@ const Scenario = () => {
 
                               {/* type: html_code */}
                               {messageType === 'html_code' && (
-                                <ChatbotMessageTypeHtml
+                                <HtmlCodeMessage
                                   value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['content'] || ''}
                                   onChange={(value) => {
                                     onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'content');
