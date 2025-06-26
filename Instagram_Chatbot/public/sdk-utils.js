@@ -26,7 +26,7 @@ if (window.getChatbotEnvironment === undefined) {
     });
 
     if (params.env) return params.env;
-    const localStorageEnv = localStorage.getItem(EC_CHATBOT_STORAGE_KEYS.ENV);
+    const localStorageEnv = localStorage.getItem(window.EC_CHATBOT_STORAGE_KEYS.ENV);
     return localStorageEnv || "production";
   };
 }
@@ -54,7 +54,7 @@ if (window.getUrlParameter === undefined) {
   window.getUrlParameter = (name) => {
     name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
     const regex = new RegExp(`[\\?&]${name}=([^&#]*)`);
-    const results = regex.exec(location.search);
+    const results = regex.exec(window.location.search);
     return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
   };
 }
@@ -62,7 +62,7 @@ if (window.getUrlParameter === undefined) {
 if (window.sendCountRequest === undefined) {
   window.sendCountRequest = (scenarioId, data) => {
     const url = `${window.getEcChatBotApiServerBaseUrl()}/api/v1/analytics/scenario_counts/${scenarioId}`;
-    return patchToChatBotServer(
+    return window.patchToChatBotServer(
       url,
       data
     );
