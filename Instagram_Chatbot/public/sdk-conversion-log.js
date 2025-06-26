@@ -1,4 +1,41 @@
 (() => {
+  const MAX_RETRIES = 50;
+  const REQUIRED_GLOBALS = [
+    'getUrlParameter',
+    'EC_CHATBOT_CONVERSION_PARAMS',
+    'EC_CHATBOT_STORAGE_KEYS',
+    'getEcChatBotApiServerBaseUrl',
+    'tabletCheck',
+    'mobileCheck',
+    'sendCountRequest'
+  ];
+
+  const validatedGlobals = {};
+  let isValidGlobal = false
+
+  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+    if (REQUIRED_GLOBALS.every(globalName => globalName in window)) {
+      REQUIRED_GLOBALS.forEach(globalName => validatedGlobals[globalName] = window[globalName]);
+      isValidGlobal = true
+      break;
+    }
+  }
+
+  if (!isValidGlobal) {
+    console.error(`Failed to validate required globals after ${MAX_RETRIES} attempts`);
+    return;
+  }
+
+  const {
+    getUrlParameter,
+    EC_CHATBOT_CONVERSION_PARAMS,
+    EC_CHATBOT_STORAGE_KEYS,
+    getEcChatBotApiServerBaseUrl,
+    tabletCheck,
+    mobileCheck,
+    sendCountRequest,
+  } = validatedGlobals;
+
   const scenarioId = getUrlParameter(EC_CHATBOT_CONVERSION_PARAMS.SCENARIO_ID) || localStorage.getItem(EC_CHATBOT_STORAGE_KEYS.SCENARIO_ID);
   const params = {
     scenario_id: scenarioId,
