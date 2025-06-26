@@ -52,6 +52,7 @@ import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
 import ZipCodePopUp from "./PreviewComponent/ZipCodePopUp";
 import * as wanakana from "wanakana";
+import _ from "lodash";
 
 sessionStorage.setItem("prevOpenStatus", "0");
 var url = new URL(window.location.href);
@@ -790,7 +791,7 @@ const PreviewFukushashiki = () => {
     });
 
     sendEmailRequest(emailId, {variables: variablesData})
-      then((res) => {console.log(res)});
+      .then((res) => {console.log(res)});
 
     newState.renderMessagesList.push({});
     newState.currentMsgIndex = i;
@@ -881,7 +882,7 @@ const PreviewFukushashiki = () => {
     getCaptcha(size, color, charPreset)
       .then((res) => {
         let newCaptcha = [...state.captcha];
-        newCaptcha.push({index: i, indexContent: j, ...res.data});
+        newCaptcha.push({index: i, indexContent: msgContentIndex, ...res.data});
         dispatch({
           type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
           payload: {
@@ -2471,6 +2472,18 @@ const PreviewFukushashiki = () => {
     }
   }
 
+  const setPhoneNumberDefaultValue = (dataContentType, field) => {
+    // TODO: Implement later
+  }
+
+  const setDateSelectDefaultValue = (dataContentType) => {
+    // TODO: Implement later
+  }
+
+  const getCaptcha = async () => {
+    // TODO: Implement later
+  } 
+
   const convertToFukushashikiObject = (obj) => {
     if (
       obj &&
@@ -3081,6 +3094,7 @@ const PreviewFukushashiki = () => {
     if (clickedMsgIndex < 0) clickedMsgIndex = newState.currentMsgIndex;
     newState.userMessagesList = newState.messagesList.filter((item) => isUserMessage(item));
     const clickedMsg = newState.messagesList[clickedMsgIndex];
+    clickedMsg.isSubmitted = true
 
     if (!handleValidateField(indexMessage)) {
       return;
@@ -3111,6 +3125,7 @@ const PreviewFukushashiki = () => {
       });
     }
 
+    newState.messagesList[clickedMsgIndex].isSubmitted = true
     fukushashikiToLP(convertToFukushashikiObject(submitData));
 
     if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
@@ -3164,11 +3179,42 @@ const PreviewFukushashiki = () => {
       }
     }
 
-    newState.currentUserMsgIndex = newState.messagesList.findIndex((item, index) => !item.hidden && isUserMessage(item) && index > clickedMsgIndex);
+    const { currentUserMsg, nextRenderMsg } = { 
+      currentUserMsg: { index: -1, take: true }, 
+      nextRenderMsg: { index: -1, take: true }
+    }
+
+    for (let index = clickedMsgIndex + 1; index < newState.messagesList.length; index++) {
+      const item = newState.messagesList[index];
+      if (!item.hidden && isUserMessage(item)) {
+        if (currentUserMsg.take) {
+          currentUserMsg.index = index; 
+          currentUserMsg.take = false;
+        }
+
+        if (!item.isSubmitted && nextRenderMsg.take) {
+          nextRenderMsg.index = index;
+          nextRenderMsg.take = false;
+        }
+      }
+
+      if (!currentUserMsg.take && !nextRenderMsg.take) {
+        break;
+      }
+    }
+    
+    newState.currentUserMsgIndex = currentUserMsg.index;
+    newState.lastMsgIndex = Math.max(
+      nextRenderMsg.index < 0 
+        ? newState.lastMsgIndex || -1 
+        : nextRenderMsg.index, 
+      newState.currentUserMsgIndex
+    )
+
     if (newState.currentUserMsgIndex === -1)
       newState.currentMsgIndex = newState.messagesList.length - 1;
     else
-      newState.currentMsgIndex = newState.currentUserMsgIndex;
+      newState.currentMsgIndex = newState.lastMsgIndex;
     
     const isBtnUpdateClick = indexMessage < newState.renderMessagesList.length - 1;
 
