@@ -829,32 +829,26 @@ const PreviewFukushashiki = () => {
     if (!msgContent) return newState;
 
     // await sleep(1000);
-    const textInput = msgContent.text_input;
-    if (msgContent.type === "text_input" && textInput?.content) {
-      if (isUpdateSourceContent) textInput.sourceContent = textInput.content;
+    const applyVariables = (section) => {
+      if (!section?.content || newState.variables.length === 0) return false;
 
-      if (newState.variables.length === 0) return;
+      if (isUpdateSourceContent) section.sourceContent = section.content;
 
-      textInput.content = newState.variables.reduce(
-        (s, v) => s.replaceAll(`{{${v.variable_name}}}`, v.default_value),
-        textInput.sourceContent
+      section.content = newState.variables.reduce(
+        (s, { variable_name, default_value }) =>
+          s.replaceAll(`{{${variable_name}}}`, default_value),
+        section.sourceContent ?? section.content
       );
-      messagesList[i].message_content[0] = msgContent;
-    }
+      return true;
+    };
 
-    const html = msgContent.html_code;
-    if (msgContent.type === BOT_MESSAGE_TYPES.HTML_CODE && html?.content) {
-      if (isUpdateSourceContent) html.sourceContent = html.content;
+    const updated =
+      (msgContent.type === "text_input" &&
+        applyVariables(msgContent.text_input)) ||
+      (msgContent.type === BOT_MESSAGE_TYPES.HTML_CODE &&
+        applyVariables(msgContent.html_code));
 
-      if (newState.variables.length) {
-        const base = html.sourceContent ?? html.content;
-        html.content = newState.variables.reduce(
-          (s, v) => s.replaceAll(`{{${v.variable_name}}}`, v.default_value),
-          base
-        );
-        messagesList[i].message_content[0] = msgContent;
-      }
-    }
+    if (updated) messagesList[i].message_content[0] = msgContent;
 
     newState.renderMessagesList.push(messagesList[i]);
     newState.currentMsgIndex = i;
