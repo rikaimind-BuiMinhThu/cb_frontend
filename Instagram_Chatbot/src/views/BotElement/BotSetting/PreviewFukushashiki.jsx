@@ -29,7 +29,8 @@ import {
   SESSION_STORAGE_KEY,
   NO_ERROR,
   GETTING_ERROR_NOTIFICATION,
-  CUSTOM_JS_CODE_POSITION
+  CUSTOM_JS_CODE_POSITION,
+  BOT_MESSAGE_TYPES
 } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
@@ -807,13 +808,27 @@ const PreviewFukushashiki = () => {
       if (isUpdateSourceContent) {
         msgContent.text_input.sourceContent = msgContent.text_input.content;
       }
-      if (newState.variables.length === 0) return; 
+      if (newState.variables.length === 0) return;
       let newContent = msgContent.text_input.sourceContent;
       newState.variables.forEach((variable) => {
         newContent = newContent.replaceAll(`{{${variable.variable_name}}}`, variable.default_value);
       });
       msgContent.text_input.content = newContent;
       messagesList[i].message_content[0] = msgContent;
+    }
+
+    if (msgContent.type === BOT_MESSAGE_TYPES.HTML_CODE && msgContent.html_code.content) {
+      if (isUpdateSourceContent) {
+        msgContent.html_code.sourceContent = msgContent.html_code.content;
+      }
+      if (newState.variables.length > 0) {
+        let newContent = msgContent.html_code.sourceContent || msgContent.html_code.content;
+        newState.variables.forEach((variable) => {
+          newContent = newContent.replaceAll(`{{${variable.variable_name}}}`, variable.default_value);
+        });
+        msgContent.html_code.content = newContent;
+        messagesList[i].message_content[0] = msgContent;
+      }
     }
 
     newState.renderMessagesList.push(messagesList[i]);
