@@ -69,7 +69,7 @@ const checkRequiredGlobals = async (callback) => {
 
         if (response.ok) {
           Object.values(EC_CHATBOT_STORAGE_KEYS).forEach(key => {
-            // localStorage.removeItem(key);
+            localStorage.removeItem(key);
           });
         }
       } catch (error) {
