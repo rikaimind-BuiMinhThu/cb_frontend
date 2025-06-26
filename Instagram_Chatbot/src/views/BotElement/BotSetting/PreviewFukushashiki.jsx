@@ -829,29 +829,29 @@ const PreviewFukushashiki = () => {
     if (!msgContent) return newState;
 
     // await sleep(1000);
-    if (msgContent.type === "text_input" && msgContent.text_input.content) {
-      if (isUpdateSourceContent) {
-        msgContent.text_input.sourceContent = msgContent.text_input.content;
-      }
+    const textInput = msgContent.text_input;
+    if (msgContent.type === "text_input" && textInput?.content) {
+      if (isUpdateSourceContent) textInput.sourceContent = textInput.content;
+
       if (newState.variables.length === 0) return;
-      let newContent = msgContent.text_input.sourceContent;
-      newState.variables.forEach((variable) => {
-        newContent = newContent.replaceAll(`{{${variable.variable_name}}}`, variable.default_value);
-      });
-      msgContent.text_input.content = newContent;
+
+      textInput.content = newState.variables.reduce(
+        (s, v) => s.replaceAll(`{{${v.variable_name}}}`, v.default_value),
+        textInput.sourceContent
+      );
       messagesList[i].message_content[0] = msgContent;
     }
 
-    if (msgContent.type === BOT_MESSAGE_TYPES.HTML_CODE && msgContent.html_code.content) {
-      if (isUpdateSourceContent) {
-        msgContent.html_code.sourceContent = msgContent.html_code.content;
-      }
-      if (newState.variables.length > 0) {
-        let newContent = msgContent.html_code.sourceContent || msgContent.html_code.content;
-        newState.variables.forEach((variable) => {
-          newContent = newContent.replaceAll(`{{${variable.variable_name}}}`, variable.default_value);
-        });
-        msgContent.html_code.content = newContent;
+    const html = msgContent.html_code;
+    if (msgContent.type === BOT_MESSAGE_TYPES.HTML_CODE && html?.content) {
+      if (isUpdateSourceContent) html.sourceContent = html.content;
+
+      if (newState.variables.length) {
+        const base = html.sourceContent ?? html.content;
+        html.content = newState.variables.reduce(
+          (s, v) => s.replaceAll(`{{${v.variable_name}}}`, v.default_value),
+          base
+        );
         messagesList[i].message_content[0] = msgContent;
       }
     }
