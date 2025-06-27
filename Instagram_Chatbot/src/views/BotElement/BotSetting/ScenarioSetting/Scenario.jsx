@@ -971,12 +971,13 @@ const Scenario = () => {
         vairables: timerVariables,
       };
 
-      if(res.data.data?.timer_config) {
+      if (res.data.data?.timer_config) {
         const scenarioTimerConfig = {
           duration: res.data.data.timer_config.duration || 0,
           messages: res.data.data.timer_config.messages || { counting: "", finish: "" },
           isShowMessageFinish: res.data.data.timer_config.isShowMessageFinish || false,
         };
+        
         timerConfig.temp = scenarioTimerConfig;
         timerConfig.final = scenarioTimerConfig;
         timerConfig.enable = !!res.data.data.timer_config.enable;
@@ -2375,7 +2376,7 @@ const Scenario = () => {
 
   // Timer config handlers
   const handleChangeTimerConfig = ({ keyPath = [], instanceValue = null, useEventValue = false, transform = (v) => v, defaultValue = null }) => (e) => {
-    if(!keyPath.length) return;
+    if (!keyPath.length) return;
 
     let value = instanceValue;
 
