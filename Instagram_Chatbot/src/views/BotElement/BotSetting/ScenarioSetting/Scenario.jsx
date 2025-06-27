@@ -767,6 +767,20 @@ const installmentOptions = Array.from({ length: 23 }, (_, i) => ({
   value: `${i + 2}`,
 }));
 
+const initialTimeConfig = {
+  duration: 0,
+  messages: {
+    counting: "",
+    finish: "",
+  },
+  isShowMessageFinish: false
+}
+
+const timerVariables = {
+  timeCounting: "timer",
+  duration: "duration",
+}
+
 const Scenario = () => {
   // states
   const [scenarioName, setScenarioName] = useState('');
@@ -799,6 +813,13 @@ const Scenario = () => {
     final: ""
   });
   const [isOpenModalCustomJsCode, setIsOpenModalCustomJsCode] = useState(false);
+  const [timerConfig, setTimerConfig] = useState({
+    isOpen: false,
+    enable: false,
+    temp: initialTimeConfig,
+    final: initialTimeConfig,
+    variables: timerVariables,
+  })
 
   const [errMsgJsCode, setErrMsgJsCode] = useState('');
   const [isOpenErrMsgByJsSettingModal, setIsOpenErrMsgByJsSettingModal] = useState(false);
@@ -943,6 +964,27 @@ const Scenario = () => {
       });
       setIsUseErrMsgByJs(res.data.data?.is_used_err_msg_by_js || false);
       setErrMsgJsCode(res.data.data?.err_msg_js_code || '');
+
+      let timerConfig = {
+        isOpen: false,
+        enable: false,
+        temp: initialTimeConfig,
+        final: initialTimeConfig,
+        variables: timerVariables,
+      };
+
+      if (res.data.data?.timer_config) {
+        const scenarioTimerConfig = {
+          duration: res.data.data.timer_config.duration || 0,
+          messages: res.data.data.timer_config.messages || { counting: "", finish: "" },
+          isShowMessageFinish: res.data.data.timer_config.isShowMessageFinish || false,
+        };
+        
+        timerConfig.temp = scenarioTimerConfig;
+        timerConfig.final = scenarioTimerConfig;
+        timerConfig.enable = !!res.data.data.timer_config.enable;
+      }
+      setTimerConfig(timerConfig)
     }).catch((error) => {
       if (error.response?.data.code === 0) {
         tokenExpired()
@@ -2333,6 +2375,132 @@ const Scenario = () => {
     );
   };
 
+
+  // Timer config handlers
+  const handleChangeTimerConfig = ({ keyPath = [], instanceValue = null, useEventValue = false, transform = (v) => v, defaultValue = null }) => (e) => {
+    if (!keyPath.length) return;
+
+    let value = instanceValue;
+
+    if (!!e && useEventValue) {
+      e.preventDefault?.();
+      value = e.target?.value ?? e;
+    }
+
+    setTimerConfig((prevConfig) => {
+      const newConfig = { ...prevConfig };
+      let current = newConfig;
+
+      for (let i = 0; i < keyPath.length - 1; i++) {
+        const key = keyPath[i];
+        current[key] = { ...(current[key] || {}) }
+        current = current[key];
+      }
+
+      current[keyPath[keyPath.length - 1]] = transform(value || defaultValue);
+
+      return newConfig;
+    })
+  }
+
+  const closeAfterDoneTimerConfig = (func) => (...props) => {
+    new Promise((res) => {
+      func(...props)
+      res()
+    }).then(() => setTimerConfig((config) => ({ ...config, isOpen: false })));
+  };
+
+  // Timer config
+  const handleOnCancelTimerConfig= () => {
+    setTimerConfig((prevState) => ({
+      ...prevState,
+      temp: prevState.final
+    }));
+  }
+
+  const handleOnConfirmTimerConfig = () => {
+    setTimerConfig((prevState) => ({
+      ...prevState,
+      final: prevState.temp
+    }));
+  }
+
+  const renderModalTimer = (isOpen) => {
+    return (
+      <ModalShort open={isOpen} onClose={closeAfterDoneTimerConfig(handleOnCancelTimerConfig)}>
+        <div className="sl-popup-create-scenario-wrapper modal_timer_config-holder">
+          <h4>タイマーを使用する</h4>
+          <div className="modal_timer_config-content">
+            <div className="modal_timer_config-input_holder">
+              <div className="sl-popup-create-scenario-input-wrapper margin-b-none">
+                <span className="modal_timer_config-input-label">{"タイマー時間（秒）"}</span>
+                <InputCustom
+                  className="full-width"
+                  value={timerConfig.temp.duration}
+                  onChange={handleChangeTimerConfig({ keyPath: ["temp", "duration"], useEventValue: true, defaultValue: 0, transform: (v) => v ? Number(v) : 0 })}
+                  placeholder="0 (秒)"
+                  type='number'
+                />
+              </div>
+
+              <div className="sl-popup-create-scenario-input-wrapper margin-b-none">
+                <span className="modal_timer_config-input-label">カウント中メッセージ</span>
+                <InputCustom
+                  className="full-width"
+                  value={timerConfig.temp.messages.counting}
+                  onChange={handleChangeTimerConfig({ keyPath: ["temp", "messages", "counting"], useEventValue: true, transform: (v) => v ? String(v) : "" })}
+                  placeholder="カウント中メッセージ"
+                />
+              </div>
+
+              <div className="modal_timer_config-finish_message">
+                <div className="finish_message_label">
+                  <input
+                    type="checkbox"
+                    className="ss-user-setting-checkbox-custom"
+                    onChange={handleChangeTimerConfig({ keyPath: ["temp", "isShowMessageFinish"], instanceValue: !timerConfig.temp.isShowMessageFinish })}
+                    checked={timerConfig.temp.isShowMessageFinish}
+                  />
+                  <label>終了メッセージを表示</label>
+                </div>
+                <div className="sl-popup-create-scenario-input-wrapper" style={!timerConfig.temp.isShowMessageFinish ? { display: "none" } : {}}>
+                  <span className="modal_timer_config-input-label">終了時メッセージ</span>
+                  <InputCustom
+                    className="full-width"
+                    value={timerConfig.temp.messages.finish}
+                    onChange={handleChangeTimerConfig({ keyPath: ["temp", "messages", "finish"], useEventValue: true, transform: (v) => v ? String(v) : "" })}
+                    disabled={!timerConfig.temp.isShowMessageFinish}
+                    placeholder="終了時メッセージ"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="modal_timer_config-variable_holder">
+              <div><span><b>{`{{${timerConfig.variables.duration}}}`}</b></span> - 設定されたタイマー時間</div>
+              <div><span><b>{`{{${timerConfig.variables.timeCounting}}}`}</b></span> - 	のこりじかん</div>
+            </div>
+          </div>
+
+          <div className="sl-popup-create-scenario-btn-wrapper">
+            <Button
+              className="ss-popup-add-variable-input-close-button"
+              onClick={closeAfterDoneTimerConfig(handleOnCancelTimerConfig)}
+            >
+              閉じる
+            </Button>
+            <Button
+              className="ss-popup-add-variable-input-keep-button modal_confirm-button"
+              onClick={closeAfterDoneTimerConfig(handleOnConfirmTimerConfig)}
+            >
+              保存
+            </Button>
+          </div>
+        </div>
+      </ModalShort>
+    );
+  };
+
   const renderErrMsgByJsSettingModal = (isOpen) => {
     return (
       <ModalShort open={isOpen} onClose={() => setIsOpenErrMsgByJsSettingModal(false)}>
@@ -2394,6 +2562,13 @@ const Scenario = () => {
       is_used_custom_js_code: isUseCustomJsCode,
       head_custom_js_code: headCustomJsCode.final,
       top_body_custom_js_code: topBodyCustomJsCode.final,
+      timer_config: {
+        enable: timerConfig.enable,
+        variables: timerConfig.variables,
+        duration: timerConfig.final.duration,
+        messages: timerConfig.final.messages,
+        isShowMessageFinish: timerConfig.final.isShowMessageFinish,
+      },
       bottom_body_custom_js_code: bottomBodyCustomJsCode.final,
       is_used_err_msg_by_js: isUseErrMsgByJs,
       err_msg_js_code: errMsgJsCode,
@@ -2447,6 +2622,13 @@ const Scenario = () => {
       head_custom_js_code: headCustomJsCode.final,
       top_body_custom_js_code: topBodyCustomJsCode.final,
       bottom_body_custom_js_code: bottomBodyCustomJsCode.final,
+      timer_config: {
+        enable: timerConfig.enable,
+        variables: timerConfig.variables,
+        duration: timerConfig.final.duration,
+        messages: timerConfig.final.messages,
+        isShowMessageFinish: timerConfig.final.isShowMessageFinish,
+      },
       is_used_err_msg_by_js: isUseErrMsgByJs,
       err_msg_js_code: errMsgJsCode,
     }
@@ -2899,6 +3081,24 @@ const Scenario = () => {
                       <div>
                         <button class="ss-user-setting-checkbox-custom-css_toggle" onClick={handleChangeOpenModalCustomJsCode(true)}>
                           {`( JSコンテンツ設定モダルを開く )`}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <div className="timer_config-checkbox">
+                    <div className='ss-user-setting-checkbox-custom_css'>
+                      <input
+                        type="checkbox"
+                        className="ss-user-setting-checkbox-custom"
+                        onChange={handleChangeTimerConfig({ keyPath: ["enable"], instanceValue: !timerConfig.enable })}
+                        checked={timerConfig.enable}
+                      />
+                      <label className="timer_config-label">タイマー</label>
+                    </div>
+                    {timerConfig.enable && (
+                      <div>
+                        <button className="ss-user-setting-checkbox-custom-css_toggle" onClick={handleChangeTimerConfig({ keyPath: ["isOpen"], instanceValue: true })}>
+                          {`( タイマーを設定する )`}
                         </button>
                       </div>
                     )}
@@ -14727,6 +14927,7 @@ const Scenario = () => {
       </ModalNoti>
       {renderModalCustomCssForm(isOpenModalCustomCss)}
       {renderModalCustomJsCodeForm(isOpenModalCustomJsCode)}
+      {renderModalTimer(timerConfig.isOpen)}
       {renderErrMsgByJsSettingModal(isOpenErrMsgByJsSettingModal)}
       <ModalShort open={isOpenAddVariable} onClose={() => setIsOpenAddVariable(false)}>
         <div className="sl-popup-create-scenario-wrapper">

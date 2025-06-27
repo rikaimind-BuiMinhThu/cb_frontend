@@ -2011,3 +2011,74 @@ input#ss-message__content--user-checkbox--checkbox_img {
 .sp-container input {
   background-color: #eff4fd;
 }
+
+.timer_config-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.timer_config-label {
+  white-space: nowrap;
+  word-break: normal;
+}
+
+.modal_timer_config-content {
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.modal_timer_config-input_holder {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.modal_timer_config-input-label{
+  width: 200px;
+  text-align: left;
+}
+
+.modal_timer_config-finish_message {
+  display: block;
+  width: 100%;
+}
+
+.modal_timer_config-finish_message > .finish_message_label {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+}
+
+.modal_timer_config-finish_message > .finish_message_label > label {
+  white-space: nowrap;
+  word-break: normal;
+  margin: 0;
+}
+
+.modal_timer_config-variable_holder {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.modal_timer_config-holder {
+  width: 750px;
+}
+
+.modal_confirm-button {
+  backgroundColor: '#024BB9'
+}
+
+.margin-b-none {
+  margin-bottom: 0px;
+} 
+
+.full-width {
+  width: 100%;
+}
