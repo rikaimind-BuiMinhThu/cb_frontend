@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useReducer } from "react";
-import "../../../assets/css/bot/preview-chat-bot.css";
-import api from "../../../api/api-management";
+import React, { useEffect, useRef, useReducer, useState } from "react";
+import "assets/css/bot/preview-chat-bot.css";
+import api from "api/api-management";
 import Cookies from "js-cookie";
 import { MDBIcon } from "mdbreact";
 import { Button } from "reactstrap";
@@ -216,6 +216,8 @@ const PreviewFukushashikiReducer = (state, action) => {
 
 const PreviewFukushashiki = () => {
   const [state, dispatch] = useReducer(PreviewFukushashikiReducer, previewInitialState);
+  const [timer, setTimer] = useState(-1);
+  const [runTimer, setRunTimer] = useState(false);
   const containerRef = useRef(null);
   const isFromScenario = false;
 
@@ -1056,6 +1058,61 @@ const PreviewFukushashiki = () => {
       resolve();
     });
   }
+
+  const replaceStringVariables = (str, variables) => {
+    return Object.entries(variables).reduce(
+      (result, [key, value]) => result.replace(new RegExp(`{{${key}}}`, "g"), value),
+      str
+    );
+  }
+  const checkTimerMessage = (rawHtml) => {
+    const temp = document.createElement("div");
+    try {
+      temp.innerHTML = rawHtml;
+      return rawHtml;
+    } catch (err) {
+      return "Invalid HTML";
+    } finally {
+      temp.remove();
+    }
+  }
+  
+  const botTimer = (timerConfig) => {
+    if (!timerConfig) return "";
+
+    const mappingValues = {
+      [timerConfig.variables.timeCounting]: timer,
+      [timerConfig.variables.duration]: timerConfig.duration,
+    };
+
+    let timerMessage = replaceStringVariables(timerConfig.messages.counting, mappingValues);
+
+    if (timer === 0 && timerConfig.isShowMessageFinish) {
+      timerMessage = replaceStringVariables(timerConfig.messages.finish, mappingValues);
+    }
+
+    return checkTimerMessage(timerMessage);
+  }
+
+  useEffect(() => {
+    const config = state.botInfor?.timer_config;
+    const shouldStartTimer = config?.enable && state.isOpen;
+
+    if (!shouldStartTimer) return;
+
+    if (timer === -1 && !runTimer) {
+      setTimer(config.duration);
+      setRunTimer(true);
+    }
+  }, [state.botInfor, state.isOpen]);
+
+  useEffect(() => {
+    if (!state.isOpen || timer <= 0) return;
+
+    const timeout = setTimeout(() => setTimer((t) => t - 1), 1000);
+    return () => clearTimeout(timeout);
+  }, [timer, state.isOpen]);
+
 
   // Get Preview Scenario Data
   useEffect(() => {
@@ -3734,7 +3791,11 @@ const PreviewFukushashiki = () => {
               <div className="sp-header-left-label-sub-title">
                 {state.botInfor?.subtitle}
               </div>
-              <div className="sp-header-left-label-title">{state.botInfor?.titleBubble}</div>
+              {
+                !!state.botInfor?.timer_config?.enable
+                  ? (<div className="sp-header-left-label-title" dangerouslySetInnerHTML={{ __html: botTimer(state.botInfor.timer_config) }}/>)
+                  : (<div className="sp-header-left-label-title">{state.botInfor?.titleBubble}</div>)
+              }
             </div>
           </div>
           <div
