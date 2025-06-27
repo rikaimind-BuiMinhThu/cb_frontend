@@ -2443,12 +2443,12 @@ const Scenario = () => {
 
               <div className="sl-popup-create-scenario-input-wrapper margin-b-none">
                 <span className="modal_timer_config-input-label">カウント中メッセージ</span>
-                <InputCustom
-                  className="full-width"
-                  value={timerConfig.temp.messages.counting}
-                  onChange={handleChangeTimerConfig({ keyPath: ["temp", "messages", "counting"], useEventValue: true, transform: (v) => v ? String(v) : "" })}
-                  placeholder="カウント中メッセージ"
-                />
+                  <textarea
+                    className="modal_timer_config-html_holder"
+                    value={timerConfig.temp.messages.counting}
+                    onChange={handleChangeTimerConfig({ keyPath: ["temp", "messages", "counting"], useEventValue: true, transform: (v) => v ? String(v) : "" })}
+                    placeholder="カウント中メッセージ"
+                  />
               </div>
 
               <div className="modal_timer_config-finish_message">
@@ -2463,11 +2463,10 @@ const Scenario = () => {
                 </div>
                 <div className="sl-popup-create-scenario-input-wrapper" style={!timerConfig.temp.isShowMessageFinish ? { display: "none" } : {}}>
                   <span className="modal_timer_config-input-label">終了時メッセージ</span>
-                  <InputCustom
-                    className="full-width"
+                  <textarea
+                    className="modal_timer_config-html_holder"
                     value={timerConfig.temp.messages.finish}
                     onChange={handleChangeTimerConfig({ keyPath: ["temp", "messages", "finish"], useEventValue: true, transform: (v) => v ? String(v) : "" })}
-                    disabled={!timerConfig.temp.isShowMessageFinish}
                     placeholder="終了時メッセージ"
                   />
                 </div>
