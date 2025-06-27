@@ -1984,12 +1984,17 @@ input#ss-message__content--user-checkbox--checkbox_img {
   background-color: #eff4fd;
 }
 
-.config_checkbox {
+.timer_config-checkbox {
   display: flex;
   align-items: center;
   gap: 16px;
   justify-content: flex-start;
   width: 100%;
+}
+
+.timer_config-label {
+  white-space: nowrap;
+  word-break: normal;
 }
 
 .modal_timer_config-content {
@@ -2028,8 +2033,24 @@ input#ss-message__content--user-checkbox--checkbox_img {
   margin: 0;
 }
 
-.model_timer_config-variable_holder {
+.modal_timer_config-variable_holder {
   display: flex;
   flex-direction: column;
   text-align: left;
+}
+
+.modal_timer_config-holder {
+  width: 750px;
+}
+
+.modal_confirm-button {
+  backgroundColor: '#024BB9'
+}
+
+.margin-b-none {
+  margin-bottom: 0px;
+} 
+
+.full-width {
+  width: 100%;
 }

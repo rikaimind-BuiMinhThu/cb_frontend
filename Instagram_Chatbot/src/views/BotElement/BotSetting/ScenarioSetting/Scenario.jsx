@@ -2356,14 +2356,14 @@ const Scenario = () => {
   const renderModalTimer = (isOpen) => {
     return (
       <ModalShort open={isOpen} onClose={closeAfterDoneTimerConfig(handleOnCancelTimerConfig)}>
-        <div className="sl-popup-create-scenario-wrapper" style={{width: "750px"}}>
+        <div className="sl-popup-create-scenario-wrapper modal_timer_config-holder">
           <h4>タイマーを使用する</h4>
           <div className="modal_timer_config-content">
             <div className="modal_timer_config-input_holder">
-              <div className="sl-popup-create-scenario-input-wrapper" style={{ marginBottom: '0px' }}>
+              <div className="sl-popup-create-scenario-input-wrapper margin-b-none">
                 <span className="modal_timer_config-input-label">{"タイマー時間（秒）"}</span>
                 <InputCustom
-                  style={{ width: '100%' }}
+                  className="full-width"
                   value={timerConfig.temp.duration}
                   onChange={handleChangeTimerConfig({ keyPath: ["temp", "duration"], useEventValue: true, defaultValue: 0, transform: (v) => v ? Number(v) : 0 })}
                   placeholder="0 (秒)"
@@ -2371,10 +2371,10 @@ const Scenario = () => {
                 />
               </div>
 
-              <div className="sl-popup-create-scenario-input-wrapper" style={{ marginBottom: '0px' }}>
+              <div className="sl-popup-create-scenario-input-wrapper margin-b-none">
                 <span className="modal_timer_config-input-label">カウント中メッセージ</span>
                 <InputCustom
-                  style={{ width: '100%' }}
+                  className="full-width"
                   value={timerConfig.temp.messages.counting}
                   onChange={handleChangeTimerConfig({ keyPath: ["temp", "messages", "counting"], useEventValue: true, transform: (v) => v ? String(v) : "" })}
                   placeholder="カウント中メッセージ"
@@ -2391,10 +2391,10 @@ const Scenario = () => {
                   />
                   <label>終了メッセージを表示</label>
                 </div>
-                <div className="sl-popup-create-scenario-input-wrapper" style={{ marginBottom: '0px', ...(!timerConfig.temp.isShowMessageFinish ? { display: "none" } : {})   }}>
+                <div className="sl-popup-create-scenario-input-wrapper" style={!timerConfig.temp.isShowMessageFinish ? { display: "none" } : {}}>
                   <span className="modal_timer_config-input-label">終了時メッセージ</span>
                   <InputCustom
-                    style={{ width: '100%' }}
+                    className="full-width"
                     value={timerConfig.temp.messages.finish}
                     onChange={handleChangeTimerConfig({ keyPath: ["temp", "messages", "finish"], useEventValue: true, transform: (v) => v ? String(v) : "" })}
                     disabled={!timerConfig.temp.isShowMessageFinish}
@@ -2404,7 +2404,7 @@ const Scenario = () => {
               </div>
             </div>
 
-            <div className="model_timer_config-variable_holder">
+            <div className="modal_timer_config-variable_holder">
               <div><span><b>{`{{${timerConfig.vairables.duration}}}`}</b></span> - 設定されたタイマー時間</div>
               <div><span><b>{`{{${timerConfig.vairables.timeCounting}}}`}</b></span> - 	のこりじかん</div>
             </div>
@@ -2418,8 +2418,7 @@ const Scenario = () => {
               閉じる
             </Button>
             <Button
-              style={{ backgroundColor: '#024BB9' }}
-              className="ss-popup-add-variable-input-keep-button"
+              className="ss-popup-add-variable-input-keep-button modal_confirm-button"
               onClick={closeAfterDoneTimerConfig(handleOnConfirmTimerConfig)}
             >
               保存
@@ -3012,7 +3011,7 @@ const Scenario = () => {
                       </div>
                     )}
                   </div>
-                  <div className="config_checkbox">
+                  <div className="timer_config-checkbox">
                     <div className='ss-user-setting-checkbox-custom_css'>
                       <input
                         type="checkbox"
@@ -3020,7 +3019,7 @@ const Scenario = () => {
                         onChange={handleChangeTimerConfig({ keyPath: ["enable"], instanceValue: !timerConfig.enable })}
                         checked={timerConfig.enable}
                       />
-                      <label style={{whiteSpace: "nowrap", wordBreak: "normal"}}>タイマー</label>
+                      <label className="timer_config-label">タイマー</label>
                     </div>
                     {timerConfig.enable && (
                       <div>
