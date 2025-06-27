@@ -817,7 +817,7 @@ const Scenario = () => {
     enable: false,
     temp: initialTimeConfig,
     final: initialTimeConfig,
-    vairables: timerVariables,
+    variables: timerVariables,
   })
 
   const [errMsgJsCode, setErrMsgJsCode] = useState('');
@@ -968,7 +968,7 @@ const Scenario = () => {
         enable: false,
         temp: initialTimeConfig,
         final: initialTimeConfig,
-        vairables: timerVariables,
+        variables: timerVariables,
       };
 
       if (res.data.data?.timer_config) {
@@ -2475,8 +2475,8 @@ const Scenario = () => {
             </div>
 
             <div className="modal_timer_config-variable_holder">
-              <div><span><b>{`{{${timerConfig.vairables.duration}}}`}</b></span> - 設定されたタイマー時間</div>
-              <div><span><b>{`{{${timerConfig.vairables.timeCounting}}}`}</b></span> - 	のこりじかん</div>
+              <div><span><b>{`{{${timerConfig.variables.duration}}}`}</b></span> - 設定されたタイマー時間</div>
+              <div><span><b>{`{{${timerConfig.variables.timeCounting}}}`}</b></span> - 	のこりじかん</div>
             </div>
           </div>
 
@@ -2562,7 +2562,7 @@ const Scenario = () => {
       top_body_custom_js_code: topBodyCustomJsCode.final,
       timer_config: {
         enable: timerConfig.enable,
-        variables: timerConfig.vairables,
+        variables: timerConfig.variables,
         duration: timerConfig.final.duration,
         messages: timerConfig.final.messages,
         isShowMessageFinish: timerConfig.final.isShowMessageFinish,
@@ -2622,7 +2622,7 @@ const Scenario = () => {
       bottom_body_custom_js_code: bottomBodyCustomJsCode.final,
       timer_config: {
         enable: timerConfig.enable,
-        variables: timerConfig.vairables,
+        variables: timerConfig.variables,
         duration: timerConfig.final.duration,
         messages: timerConfig.final.messages,
         isShowMessageFinish: timerConfig.final.isShowMessageFinish,
