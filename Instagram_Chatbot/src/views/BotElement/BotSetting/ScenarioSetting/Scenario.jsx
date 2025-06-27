@@ -2427,10 +2427,10 @@ const Scenario = () => {
       <ModalShort open={isOpen} onClose={closeAfterDoneTimerConfig(handleOnCancelTimerConfig)}>
         <div className="sl-popup-create-scenario-wrapper" style={{width: "750px"}}>
           <h4>タイマーを使用する</h4>
-          <div style={{ marginBottom: '10px', display: "flex", flexDirection: "column", gap: "20px" }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+          <div className="modal_timer_config-content">
+            <div className="modal_timer_config-input_holder">
               <div className="sl-popup-create-scenario-input-wrapper" style={{ marginBottom: '0px' }}>
-                <span style={{ width: '200px', textAlign: "left" }}>{"タイマー時間（秒）"}</span>
+                <span className="modal_timer_config-input-label">{"タイマー時間（秒）"}</span>
                 <InputCustom
                   style={{ width: '100%' }}
                   value={timerConfig.temp.duration}
@@ -2441,7 +2441,7 @@ const Scenario = () => {
               </div>
 
               <div className="sl-popup-create-scenario-input-wrapper" style={{ marginBottom: '0px' }}>
-                <span style={{ width: '200px', textAlign: "left" }}>カウント中メッセージ</span>
+                <span className="modal_timer_config-input-label">カウント中メッセージ</span>
                 <InputCustom
                   style={{ width: '100%' }}
                   value={timerConfig.temp.messages.counting}
@@ -2450,18 +2450,18 @@ const Scenario = () => {
                 />
               </div>
 
-              <div style={{ display: "block", width: "100%" }}>
-                <div style={{ display: "flex", alignItems: "center" }}>
+              <div className="modal_timer_config-finish_message">
+                <div className="finish_message_label">
                   <input
                     type="checkbox"
                     className="ss-user-setting-checkbox-custom"
                     onChange={handleChangeTimerConfig({ keyPath: ["temp", "isShowMessageFinish"], instanceValue: !timerConfig.temp.isShowMessageFinish })}
                     checked={timerConfig.temp.isShowMessageFinish}
                   />
-                  <label style={{ whiteSpace: "nowrap", wordBreak: "normal", margin: "0"}}>終了メッセージを表示</label>
+                  <label>終了メッセージを表示</label>
                 </div>
                 <div className="sl-popup-create-scenario-input-wrapper" style={{ marginBottom: '0px', ...(!timerConfig.temp.isShowMessageFinish ? { display: "none" } : {})   }}>
-                  <span style={{ width: '200px', textAlign: "left" }}>終了時メッセージ</span>
+                  <span className="modal_timer_config-input-label">終了時メッセージ</span>
                   <InputCustom
                     style={{ width: '100%' }}
                     value={timerConfig.temp.messages.finish}
@@ -2473,7 +2473,7 @@ const Scenario = () => {
               </div>
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", textAlign: "left" }}>
+            <div className="model_timer_config-variable_holder">
               <div><span><b>{`{{${timerConfig.vairables.duration}}}`}</b></span> - 設定されたタイマー時間</div>
               <div><span><b>{`{{${timerConfig.vairables.timeCounting}}}`}</b></span> - 	のこりじかん</div>
             </div>
@@ -3081,13 +3081,7 @@ const Scenario = () => {
                       </div>
                     )}
                   </div>
-                  <div style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "16px",
-                    justifyContent: "start",
-                    width: "100%",
-                  }}>
+                  <div className="config_checkbox">
                     <div className='ss-user-setting-checkbox-custom_css'>
                       <input
                         type="checkbox"
