@@ -769,10 +769,17 @@ const installmentOptions = Array.from({ length: 23 }, (_, i) => ({
 const initialTimeConfig = {
   duration: 0,
   messages: {
-    counting: "",
-    finish: "",
+    counting: {
+      content: "",
+      useHtml: true,
+      isShow: true,
+    },
+    finish: {
+      content: "",
+      useHtml: true,
+      isShow: false,
+    },
   },
-  isShowMessageFinish: false
 }
 
 const timerVariables = {
@@ -963,24 +970,25 @@ const Scenario = () => {
       setIsUseErrMsgByJs(res.data.data?.is_used_err_msg_by_js || false);
       setErrMsgJsCode(res.data.data?.err_msg_js_code || '');
 
-      let timerConfig = {
+      const timerConfig = {
         isOpen: false,
         enable: false,
-        temp: initialTimeConfig,
-        final: initialTimeConfig,
-        variables: timerVariables,
       };
+      const resTimerConfig = res.data.data.timer_config;
 
-      if (res.data.data?.timer_config) {
+      if (resTimerConfig) {
         const scenarioTimerConfig = {
-          duration: res.data.data.timer_config.duration || 0,
-          messages: res.data.data.timer_config.messages || { counting: "", finish: "" },
-          isShowMessageFinish: res.data.data.timer_config.isShowMessageFinish || false,
+          duration: resTimerConfig.duration || initialTimeConfig.duration,
+          messages: {
+            ...initialTimeConfig.messages,
+            ...resTimerConfig.messages,
+          },
         };
         
         timerConfig.temp = scenarioTimerConfig;
         timerConfig.final = scenarioTimerConfig;
-        timerConfig.enable = !!res.data.data.timer_config.enable;
+        timerConfig.enable = !!resTimerConfig.enable;
+        timerConfig.variables = resTimerConfig.variables;
       }
       setTimerConfig(timerConfig)
     }).catch((error) => {
@@ -2396,7 +2404,7 @@ const Scenario = () => {
       }
 
       current[keyPath[keyPath.length - 1]] = transform(value || defaultValue);
-
+      console.log(newConfig);
       return newConfig;
     })
   }
@@ -2407,6 +2415,35 @@ const Scenario = () => {
       res()
     }).then(() => setTimerConfig((config) => ({ ...config, isOpen: false })));
   };
+
+  const cleanMessageTimerConfig = (config) => {
+    const cleanedConfig = { ...config };
+    const takenField = {
+      isShow: true,
+      useHtml: true,
+      content: true,
+    };
+
+    const messages = {
+      finish: {},
+      counting: {},
+    };
+
+    Object.keys(cleanedConfig.messages.finish).forEach((key) => {
+      if (!!takenField[key]) {
+        messages.finish[key] = cleanedConfig.messages.finish[key];
+      }
+    });
+
+    Object.keys(cleanedConfig.messages.counting).forEach((key) => {
+      if (!!takenField[key]) {
+        messages.counting[key] = cleanedConfig.messages.counting[key];
+      }
+    });
+
+    cleanedConfig.messages = messages;
+    return cleanedConfig;
+  }
 
   // Timer config
   const handleOnCancelTimerConfig= () => {
@@ -2424,6 +2461,7 @@ const Scenario = () => {
   }
 
   const renderModalTimer = (isOpen) => {
+    const modalData = timerConfig.temp;
     return (
       <ModalShort open={isOpen} onClose={closeAfterDoneTimerConfig(handleOnCancelTimerConfig)}>
         <div className="sl-popup-create-scenario-wrapper modal_timer_config-holder">
@@ -2434,7 +2472,7 @@ const Scenario = () => {
                 <span className="modal_timer_config-input-label">{"タイマー時間（秒）"}</span>
                 <InputCustom
                   className="full-width"
-                  value={timerConfig.temp.duration}
+                  value={modalData.duration}
                   onChange={handleChangeTimerConfig({ keyPath: ["temp", "duration"], useEventValue: true, defaultValue: 0, transform: (v) => v ? Number(v) : 0 })}
                   placeholder="0 (秒)"
                   type='number'
@@ -2445,8 +2483,8 @@ const Scenario = () => {
                 <span className="modal_timer_config-input-label">カウント中メッセージ</span>
                   <textarea
                     className="modal_timer_config-html_holder"
-                    value={timerConfig.temp.messages.counting}
-                    onChange={handleChangeTimerConfig({ keyPath: ["temp", "messages", "counting"], useEventValue: true, transform: (v) => v ? String(v) : "" })}
+                    value={modalData.messages.counting.content}
+                    onChange={handleChangeTimerConfig({ keyPath: ["temp", "messages", "counting", "content"], useEventValue: true, transform: (v) => v ? String(v) : "" })}
                     placeholder="カウント中メッセージ"
                   />
               </div>
@@ -2456,17 +2494,17 @@ const Scenario = () => {
                   <input
                     type="checkbox"
                     className="ss-user-setting-checkbox-custom"
-                    onChange={handleChangeTimerConfig({ keyPath: ["temp", "isShowMessageFinish"], instanceValue: !timerConfig.temp.isShowMessageFinish })}
-                    checked={timerConfig.temp.isShowMessageFinish}
+                    onChange={handleChangeTimerConfig({ keyPath: ["temp", "messages", "finish", "isShow"], instanceValue: !modalData.messages.finish.isShow })}
+                    checked={modalData.messages.finish.isShow}
                   />
                   <label>終了メッセージを表示</label>
                 </div>
-                <div className="sl-popup-create-scenario-input-wrapper" style={!timerConfig.temp.isShowMessageFinish ? { display: "none" } : {}}>
+                <div className="sl-popup-create-scenario-input-wrapper" style={!modalData.messages.finish.isShow ? { display: "none" } : {}}>
                   <span className="modal_timer_config-input-label">終了時メッセージ</span>
                   <textarea
                     className="modal_timer_config-html_holder"
-                    value={timerConfig.temp.messages.finish}
-                    onChange={handleChangeTimerConfig({ keyPath: ["temp", "messages", "finish"], useEventValue: true, transform: (v) => v ? String(v) : "" })}
+                    value={modalData.messages.finish.content}
+                    onChange={handleChangeTimerConfig({ keyPath: ["temp", "messages", "finish", "content"], useEventValue: true, transform: (v) => v ? String(v) : "" })}
                     placeholder="終了時メッセージ"
                   />
                 </div>
@@ -2559,13 +2597,12 @@ const Scenario = () => {
       is_used_custom_js_code: isUseCustomJsCode,
       head_custom_js_code: headCustomJsCode.final,
       top_body_custom_js_code: topBodyCustomJsCode.final,
-      timer_config: {
+      timer_config: cleanMessageTimerConfig({
         enable: timerConfig.enable,
         variables: timerConfig.variables,
         duration: timerConfig.final.duration,
         messages: timerConfig.final.messages,
-        isShowMessageFinish: timerConfig.final.isShowMessageFinish,
-      },
+      }),
       bottom_body_custom_js_code: bottomBodyCustomJsCode.final,
       is_used_err_msg_by_js: isUseErrMsgByJs,
       err_msg_js_code: errMsgJsCode,
@@ -2619,13 +2656,12 @@ const Scenario = () => {
       head_custom_js_code: headCustomJsCode.final,
       top_body_custom_js_code: topBodyCustomJsCode.final,
       bottom_body_custom_js_code: bottomBodyCustomJsCode.final,
-      timer_config: {
+      timer_config: cleanMessageTimerConfig({
         enable: timerConfig.enable,
         variables: timerConfig.variables,
         duration: timerConfig.final.duration,
         messages: timerConfig.final.messages,
-        isShowMessageFinish: timerConfig.final.isShowMessageFinish,
-      },
+      }),
       is_used_err_msg_by_js: isUseErrMsgByJs,
       err_msg_js_code: errMsgJsCode,
     }
