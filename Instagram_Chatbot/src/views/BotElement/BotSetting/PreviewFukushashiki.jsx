@@ -51,6 +51,8 @@ import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
 import ZipCodePopUp from "./PreviewComponent/ZipCodePopUp";
 import * as wanakana from "wanakana";
+import _ from "lodash";
+import Timer, { MAP_VARIABLE_METHOD } from "./Timer";
 
 sessionStorage.setItem("prevOpenStatus", "0");
 var url = new URL(window.location.href);
@@ -216,8 +218,7 @@ const PreviewFukushashikiReducer = (state, action) => {
 
 const PreviewFukushashiki = () => {
   const [state, dispatch] = useReducer(PreviewFukushashikiReducer, previewInitialState);
-  const [timer, setTimer] = useState(-1);
-  const [runTimer, setRunTimer] = useState(false);
+  const [timerChanges, setTimerChanges] = useState({ timer: null, status: -1 })
   const containerRef = useRef(null);
   const isFromScenario = false;
 
@@ -446,24 +447,45 @@ const PreviewFukushashiki = () => {
     // post message to parent window
     postMessageToParent({isOpen: opening});
 
-    if (!opening) {
-      if (state.activePopupCloseBot) {
-        return dispatch({
-          type: PREVIEW_ACTIONS.UPDATE_OPEN_PREVIEW,
-          payload: {
-            isOpen: false,
-            showPopupCloseBot: true,
-          }
-        });
+    if (state.alreadyOpenFirstTime) {
+      if (!opening) {
+        if (state.activePopupCloseBot) {
+          return dispatch({
+            type: PREVIEW_ACTIONS.UPDATE_OPEN_PREVIEW,
+            payload: {
+              isOpen: false,
+              showPopupCloseBot: true,
+            }
+          });
+        }
       }
+      return dispatch({
+        type: PREVIEW_ACTIONS.UPDATE_OPEN_PREVIEW,
+        payload: {
+          isOpen: opening,
+          showPopupCloseBot: false,
+        }
+      });
     }
-    return dispatch({
-      type: PREVIEW_ACTIONS.UPDATE_OPEN_PREVIEW,
-      payload: {
-        isOpen: opening,
-        showPopupCloseBot: false,
-      }
+    
+    state.alreadyOpenFirstTime = true;
+    state.isOpen = true;
+    state.currentUserMsgIndex = state.messagesList.findIndex((item) => {
+      const firstMsgContent = item?.message_content?.[0];
+      const isDisplayBtnNext = firstMsgContent?.type != "image" || firstMsgContent?.image?.displayButtonNext != false;
+
+      return !item.hidden && isUserMessage(item) && isDisplayBtnNext;
     });
+    
+    const timerChatbotStorage = sessionStorage.getItem(SESSION_STORAGE_KEY.TIMER_CHATBOT);
+    setTimerChanges((timerChanges) => !!timerChatbotStorage ? JSON.parse(timerChatbotStorage) : timerChanges);
+
+    // For the first time, we need to render to the first user message
+    if (state.currentUserMsgIndex >= 0) {
+      state.currentMsgIndex = state.currentUserMsgIndex;
+    }
+
+    return renderMessagesWithDelay(state, 0, state.currentMsgIndex);
   }
 
   const setPulldownValue = (dataContentType, field, value) => {
@@ -1059,60 +1081,10 @@ const PreviewFukushashiki = () => {
     });
   }
 
-  const replaceStringVariables = (str, variables) => {
-    return Object.entries(variables).reduce(
-      (result, [key, value]) => result.replace(new RegExp(`{{${key}}}`, "g"), value),
-      str
-    );
+  const handleOnCounting = (timerChanges) => {
+    sessionStorage.setItem(SESSION_STORAGE_KEY.TIMER_CHATBOT, JSON.stringify({ timerChanges }));
+    setTimerChanges(timerChanges)
   }
-  const checkTimerMessage = (rawHtml) => {
-    const temp = document.createElement("div");
-    try {
-      temp.innerHTML = rawHtml;
-      return rawHtml;
-    } catch (err) {
-      return "Invalid HTML";
-    } finally {
-      temp.remove();
-    }
-  }
-  
-  const botTimer = (timerConfig) => {
-    if (!timerConfig) return "";
-
-    const mappingValues = {
-      [timerConfig.variables.timeCounting]: timer,
-      [timerConfig.variables.duration]: timerConfig.duration,
-    };
-
-    let timerMessage = replaceStringVariables(timerConfig.messages.counting, mappingValues);
-
-    if (timer === 0 && timerConfig.isShowMessageFinish) {
-      timerMessage = replaceStringVariables(timerConfig.messages.finish, mappingValues);
-    }
-
-    return checkTimerMessage(timerMessage);
-  }
-
-  useEffect(() => {
-    const config = state.botInfor?.timer_config;
-    const shouldStartTimer = config?.enable && state.isOpen;
-
-    if (!shouldStartTimer) return;
-
-    if (timer === -1 && !runTimer) {
-      setTimer(config.duration);
-      setRunTimer(true);
-    }
-  }, [state.botInfor, state.isOpen]);
-
-  useEffect(() => {
-    if (!state.isOpen || timer <= 0) return;
-
-    const timeout = setTimeout(() => setTimer((t) => t - 1), 1000);
-    return () => clearTimeout(timeout);
-  }, [timer, state.isOpen]);
-
 
   // Get Preview Scenario Data
   useEffect(() => {
@@ -3791,11 +3763,22 @@ const PreviewFukushashiki = () => {
               <div className="sp-header-left-label-sub-title">
                 {state.botInfor?.subtitle}
               </div>
-              {
-                !!state.botInfor?.timer_config?.enable
-                  ? (<div className="sp-header-left-label-title" dangerouslySetInnerHTML={{ __html: botTimer(state.botInfor.timer_config) }}/>)
-                  : (<div className="sp-header-left-label-title">{state.botInfor?.titleBubble}</div>)
-              }
+              <div className="sp-header-left-label-title">
+                {!!state.botInfor?.timer_config?.enable
+                  ? <Timer
+                    duration={timerChanges.timer === null ? state.botInfor.timer_config.duration : timerChanges.timer }
+                    countMsg={state.botInfor.timer_config.messages.counting}
+                    finishMsg={state.botInfor.timer_config.messages.finish}
+                    variables={[
+                      { name: state.botInfor.timer_config.variables?.timeCounting || "timer", field: "timer", method: MAP_VARIABLE_METHOD.COMP_STATE },
+                      { name: state.botInfor.timer_config.variables?.duration || "duration", field: "duration", method: MAP_VARIABLE_METHOD.CONFIG },
+                    ]}
+                    startCount={state.isOpen}
+                    onCounting={handleOnCounting}
+                    />
+                  : state.botInfor?.titleBubble
+                }
+              </div>
             </div>
           </div>
           <div

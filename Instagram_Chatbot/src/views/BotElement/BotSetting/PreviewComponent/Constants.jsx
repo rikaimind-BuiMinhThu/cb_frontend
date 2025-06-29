@@ -99,6 +99,7 @@ const GET_CAPTCHA_PATH = `https://svg-captcha-nodejs.vercel.app/captcha?size=:si
 
 const SESSION_STORAGE_KEY = {
   CHAT_BOT_STATE: 'CHAT_BOT_STATE',
+  TIMER_CHATBOT: 'TIMER_CHATBOT',
 };
 
 const CRAWL_ELEMENT_TYPES = {
