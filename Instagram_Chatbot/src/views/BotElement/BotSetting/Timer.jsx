@@ -154,14 +154,19 @@ export default function Timer({
     const timeout = setTimeout(() => {
       const newTimer = timer - 1;
       setTimer(newTimer);
-      onCounting({
-        timer: newTimer,
-        status,
-      })
+
+      let newStatus = status;
 
       if (newTimer === 0) {
-        setStatus(COMPONENT_STATUS.FINISH);
+        newStatus = COMPONENT_STATUS.FINISH;
+        setStatus(newStatus);
       }
+
+      onCounting({
+        timer: newTimer,
+        status: newStatus,
+      })
+
     }, 1000);
 
     return () => clearTimeout(timeout);
