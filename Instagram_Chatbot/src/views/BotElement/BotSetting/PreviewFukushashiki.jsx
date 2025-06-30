@@ -225,7 +225,7 @@ const PreviewFukushashikiReducer = (state, action) => {
 
 const PreviewFukushashiki = () => {
   const [state, dispatch] = useReducer(PreviewFukushashikiReducer, previewInitialState);
-  const [timerChanges, setTimerChanges] = useState({ timer: null, status: -1 })
+  const [timerChanges, setTimerChanges] = useState({ timeLeft: -1, config: null });
   const containerRef = useRef(null);
   const isFromScenario = false;
 
@@ -484,8 +484,8 @@ const PreviewFukushashiki = () => {
       return !item.hidden && isUserMessage(item) && isDisplayBtnNext;
     });
     
-    const timerChatbotStorage = sessionStorage.getItem(SESSION_STORAGE_KEY.TIMER_CHATBOT);
-    setTimerChanges((timerChanges) => !!timerChatbotStorage ? JSON.parse(timerChatbotStorage) : timerChanges);
+    const timerChatbotStorage = getTimerSessionStorage();
+    setTimerChanges((timerChanges) => timerChatbotStorage || timerChanges);
 
     // For the first time, we need to render to the first user message
     if (state.currentUserMsgIndex >= 0) {
@@ -998,6 +998,11 @@ const PreviewFukushashiki = () => {
       });
     }
 
+    if (res.data?.chatbot?.timer_config?.enable) {
+      const timerConfig = res.data.chatbot.timer_config;
+      setTimerChanges({ timeLeft: timerConfig.duration ?? 0, config: timerConfig });
+    }
+
     const prevOpenStatus = sessionStorage.getItem("prevOpenStatus");
 
     if (res.data.design_settings.display_type == 1 && prevOpenStatus == "0") {
@@ -1097,9 +1102,20 @@ const PreviewFukushashiki = () => {
     });
   }
 
-  const handleOnCounting = (timerChanges) => {
-    sessionStorage.setItem(SESSION_STORAGE_KEY.TIMER_CHATBOT, JSON.stringify({ timerChanges }));
-    setTimerChanges(timerChanges)
+  const getTimerSessionStorage = () => {
+    const timerChatbotStorage = sessionStorage.getItem(SESSION_STORAGE_KEY.TIMER_CHATBOT);
+    
+    if (!timerChatbotStorage?.trim().length) {
+      return null;
+    }
+    
+    return JSON.parse(timerChatbotStorage);
+  }
+
+  const handleOnCounting = (config) => (timer) => {
+    const timerChanges = { timeLeft: timer, config };
+    sessionStorage.setItem(SESSION_STORAGE_KEY.TIMER_CHATBOT, JSON.stringify(timerChanges));
+    setTimerChanges(timerChanges);
   }
 
   // Get Preview Scenario Data
@@ -3821,22 +3837,7 @@ const PreviewFukushashiki = () => {
               <div className="sp-header-left-label-sub-title">
                 {state.botInfor?.subtitle}
               </div>
-              <div className="sp-header-left-label-title">
-                {!!state.botInfor?.timer_config?.enable
-                  ? <Timer
-                    duration={timerChanges.timer === null ? state.botInfor.timer_config.duration : timerChanges.timer }
-                    countMsg={state.botInfor.timer_config.messages.counting}
-                    finishMsg={state.botInfor.timer_config.messages.finish}
-                    variables={[
-                      { name: state.botInfor.timer_config.variables?.timeCounting || "timer", field: "timer", method: MAP_VARIABLE_METHOD.COMP_STATE },
-                      { name: state.botInfor.timer_config.variables?.duration || "duration", field: "duration", method: MAP_VARIABLE_METHOD.CONFIG },
-                    ]}
-                    startCount={state.isOpen}
-                    onCounting={handleOnCounting}
-                    />
-                  : state.botInfor?.titleBubble
-                }
-              </div>
+              <div className="sp-header-left-label-title">{state.botInfor?.titleBubble}</div>
             </div>
           </div>
           <div
@@ -3883,6 +3884,26 @@ const PreviewFukushashiki = () => {
             </Row>
           </ModalPreviewBot>
           : ""}
+        
+        {!!state.botInfor?.timer_config?.enable
+          && 
+          <div className="chatbot_timer_holder" style={{
+            backgroundColor: bodyStyle.backgroundColor,
+          }}>
+            <Timer
+              duration={timerChanges.timeLeft}
+              countMsg={state.botInfor.timer_config.messages.counting}
+              finishMsg={state.botInfor.timer_config.messages.finish}
+              variables={[
+                { name: state.botInfor.timer_config.variables?.timeCounting || "timer", field: "timer", method: MAP_VARIABLE_METHOD.COMP_STATE },
+                { name: state.botInfor.timer_config.variables?.duration || "duration", field: "duration", method: MAP_VARIABLE_METHOD.CONFIG },
+              ]}
+              startCount={state.isOpen}
+              onCounting={handleOnCounting(state.botInfor.timer_config)}
+            />
+          </div>
+        }
+
         <ProcessBar botInfor={state.botInfor}
           currentIndex={state.passedUserMsgCount}
           maxIndex={state.userMessagesList.length}

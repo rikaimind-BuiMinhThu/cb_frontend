@@ -2404,7 +2404,6 @@ const Scenario = () => {
       }
 
       current[keyPath[keyPath.length - 1]] = transform(value || defaultValue);
-      console.log(newConfig);
       return newConfig;
     })
   }
@@ -2473,7 +2472,7 @@ const Scenario = () => {
                 <InputCustom
                   className="full-width"
                   value={modalData.duration}
-                  onChange={handleChangeTimerConfig({ keyPath: ["temp", "duration"], useEventValue: true, defaultValue: 0, transform: (v) => v ? Number(v) : 0 })}
+                  onChange={handleChangeTimerConfig({ keyPath: ["temp", "duration"], useEventValue: true, defaultValue: 0, transform: (v) => (v || Number(v) < 0) ? Number(v) : 0 })}
                   placeholder="0 (秒)"
                   type='number'
                 />
@@ -2494,7 +2493,7 @@ const Scenario = () => {
                   <input
                     type="checkbox"
                     className="ss-user-setting-checkbox-custom"
-                    onChange={handleChangeTimerConfig({ keyPath: ["temp", "messages", "finish", "isShow"], instanceValue: !modalData.messages.finish.isShow })}
+                    onChange={handleChangeTimerConfig({ keyPath: ["temp", "messages", "finish", "isShow"], instanceValue: !modalData.messages.finish.isShow, transform: (v) => !!v })}
                     checked={modalData.messages.finish.isShow}
                   />
                   <label>終了メッセージを表示</label>
