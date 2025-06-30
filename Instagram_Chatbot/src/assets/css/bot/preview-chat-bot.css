@@ -875,3 +875,8 @@ slideUp
 
 
   }
+
+.chatbot_timer_holder {
+  width: 100%;
+  height: fit-content;
+}

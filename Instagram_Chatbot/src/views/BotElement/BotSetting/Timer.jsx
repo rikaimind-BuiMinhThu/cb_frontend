@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import "assets/css/bot/timer.css";
 
 const initialState = {
   duration: 0,
@@ -35,7 +36,7 @@ export default function Timer({
   finishMsg = initialState.messages.finish,
   variables = initialState.variables,
   startCount = false,
-  onCounting = ({ timer, status }) => {}
+  onCounting = (timer) => {}
 }) {
   const [config, setConfig] = useState(null);
   const [status, setStatus] = useState(COMPONENT_STATUS.PAUSE);
@@ -162,10 +163,7 @@ export default function Timer({
         setStatus(newStatus);
       }
 
-      onCounting({
-        timer: newTimer,
-        status: newStatus,
-      })
+      onCounting(newTimer)
 
     }, 1000);
 
@@ -185,12 +183,20 @@ export default function Timer({
     if (JSON.stringify(newConfig) === JSON.stringify(config)) return;
 
     setConfig(newConfig);
-    setTimer(duration);
-  }, [duration, finishMsg, countMsg, variables, config]);
+
+    const timer = newConfig.duration;
+    setTimer(timer);
+
+    if (timer <= 0) {
+      setStatus(COMPONENT_STATUS.FINISH);
+    }
+  }, [duration, finishMsg, countMsg, variables]);
 
   if (!config) return null;
 
+  if (status === COMPONENT_STATUS.FINISH && !finishMsg.isShow) return null;
+
   return (
-    <div dangerouslySetInnerHTML={{ __html: botTimerMessage(config) }}></div>
+    <div className="timer" dangerouslySetInnerHTML={{ __html: botTimerMessage(config) }}></div>
   );
 }
