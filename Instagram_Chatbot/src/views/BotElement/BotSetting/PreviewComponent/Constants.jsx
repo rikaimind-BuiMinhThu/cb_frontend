@@ -190,7 +190,7 @@ export const TIMER_VARIABLES = {
 
 export const TIMER_VARIABLES_DESCRIPTION = {
   [TIMER_TYPES.COUNTING_DOWN]: {
-    timeCounting: "のこりじかん dd日 hh時 mm分 ss秒",
+    timeCounting: "残り時間 dd日 hh時 mm分 ss秒",
     duration: "設定されたタイマー時間 dd日 hh時 mm分 ss秒"
   }
 };
