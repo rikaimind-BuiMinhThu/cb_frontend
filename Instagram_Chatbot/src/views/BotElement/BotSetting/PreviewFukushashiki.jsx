@@ -29,7 +29,8 @@ import {
   SESSION_STORAGE_KEY,
   NO_ERROR,
   GETTING_ERROR_NOTIFICATION,
-  CUSTOM_JS_CODE_POSITION
+  CUSTOM_JS_CODE_POSITION,
+  BOT_MESSAGE_TYPES
 } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
@@ -833,18 +834,26 @@ const PreviewFukushashiki = () => {
     if (!msgContent) return newState;
 
     // await sleep(1000);
-    if (msgContent.type === "text_input" && msgContent.text_input.content) {
-      if (isUpdateSourceContent) {
-        msgContent.text_input.sourceContent = msgContent.text_input.content;
-      }
-      if (newState.variables.length === 0) return; 
-      let newContent = msgContent.text_input.sourceContent;
-      newState.variables.forEach((variable) => {
-        newContent = newContent.replaceAll(`{{${variable.variable_name}}}`, variable.default_value);
-      });
-      msgContent.text_input.content = newContent;
-      messagesList[i].message_content[0] = msgContent;
-    }
+    const applyVariables = (section) => {
+      if (!section?.content || newState.variables.length === 0) return false;
+
+      if (isUpdateSourceContent) section.sourceContent = section.content;
+
+      section.content = newState.variables.reduce(
+        (s, { variable_name, default_value }) =>
+          s.replaceAll(`{{${variable_name}}}`, default_value),
+        section.sourceContent ?? section.content
+      );
+      return true;
+    };
+
+    const updated =
+      (msgContent.type === "text_input" &&
+        applyVariables(msgContent.text_input)) ||
+      (msgContent.type === BOT_MESSAGE_TYPES.HTML_CODE &&
+        applyVariables(msgContent.html_code));
+
+    if (updated) messagesList[i].message_content[0] = msgContent;
 
     newState.renderMessagesList.push(messagesList[i]);
     newState.currentMsgIndex = i;

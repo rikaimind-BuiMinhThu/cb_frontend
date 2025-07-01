@@ -161,6 +161,10 @@ const CUSTOM_JS_CODE_POSITION = {
   BOTTOM_BODY: 'bottom_body',
 }
 
+const BOT_MESSAGE_TYPES = {
+  HTML_CODE: 'html_code'
+}
+
 export {
   dataHourFixed,
   dataMinutes,
@@ -182,4 +186,23 @@ export {
   GETTING_ERROR_NOTIFICATION,
   REGEXP,
   CUSTOM_JS_CODE_POSITION,
+  BOT_MESSAGE_TYPES,
+};
+
+export const TIMER_TYPES = {
+  COUNTING_DOWN: "counting_down",
+};
+
+export const TIMER_VARIABLES = {
+  [TIMER_TYPES.COUNTING_DOWN]: {
+    timeCounting: "timer",
+    duration: "duration"
+  }
+};
+
+export const TIMER_VARIABLES_DESCRIPTION = {
+  [TIMER_TYPES.COUNTING_DOWN]: {
+    timeCounting: "のこりじかん hh:mm:ss",
+    duration: "設定されたタイマー時間"
+  }
 };
