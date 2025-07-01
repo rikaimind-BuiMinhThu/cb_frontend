@@ -2080,5 +2080,35 @@ input#ss-message__content--user-checkbox--checkbox_img {
 } 
 
 .full-width {
+  width: 100% !important;
+}
+
+.modal_timer_config-html_holder {
+  width: 98%;
+  height: 120px;
+  padding: 10px;
+  font-size: 14px;
+  flex-grow: 1;
+}
+
+.counting_down_input_holder {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   width: 100%;
+  column-gap: 20px;
+}
+
+.counting_down_input_wrapper {
+  display: flex;
+  gap: 5px;
+}
+
+.counting_down_input_label {
+  aspect-ratio: 1/1;
+  height: 100%;
+  border: 1px solid grey;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

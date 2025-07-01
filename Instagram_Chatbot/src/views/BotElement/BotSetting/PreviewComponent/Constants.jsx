@@ -187,3 +187,21 @@ export {
   CUSTOM_JS_CODE_POSITION,
   BOT_MESSAGE_TYPES,
 };
+
+export const TIMER_TYPES = {
+  COUNTING_DOWN: "counting_down",
+};
+
+export const TIMER_VARIABLES = {
+  [TIMER_TYPES.COUNTING_DOWN]: {
+    timeCounting: "timer",
+    duration: "duration"
+  }
+};
+
+export const TIMER_VARIABLES_DESCRIPTION = {
+  [TIMER_TYPES.COUNTING_DOWN]: {
+    timeCounting: "のこりじかん hh:mm:ss",
+    duration: "設定されたタイマー時間"
+  }
+};
