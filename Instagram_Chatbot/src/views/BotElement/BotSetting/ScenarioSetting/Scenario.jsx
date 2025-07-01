@@ -2557,7 +2557,7 @@ const Scenario = () => {
       top_body_custom_js_code: topBodyCustomJsCode.final,
       timer_config: cleanMessageTimerConfig({
         enable: timerConfig.enable,
-        type: timerConfig.type,
+        type: timerConfig.final.type,
         variables: timerConfig.variables,
         duration: timerConfig.final.duration,
         messages: timerConfig.final.messages,
@@ -2617,7 +2617,7 @@ const Scenario = () => {
       bottom_body_custom_js_code: bottomBodyCustomJsCode.final,
       timer_config: cleanMessageTimerConfig({
         enable: timerConfig.enable,
-        type: timerConfig.type,
+        type: timerConfig.final.type,
         variables: timerConfig.variables,
         duration: timerConfig.final.duration,
         messages: timerConfig.final.messages,
