@@ -28,6 +28,7 @@ import {
 import { tokenExpired } from 'api/tokenExpired';
 import DatePickerCustom from './scenarioComon/DatePickerCustom';
 import { Carousel, Checkbox, Radio, Slider, Calendar, Select } from 'antd';
+import { HtmlCodeMessage } from '../../../../components/BotMessages';
 import CheckboxGroupCustom from './scenarioComon/CheckboxGroupCustom';
 import american_express from '../../../../assets/img/payment-method/american_express.png';
 import diner_club from '../../../../assets/img/payment-method/diner_club.png';
@@ -41,7 +42,7 @@ import locale from 'antd/es/date-picker/locale/ja_JP';
 import 'moment/locale/zh-cn';
 import ShopifyReferenceSelect from "./ShopifyReferenceSelect";
 import { Tooltip } from '@mui/material';
-import { dataDay, MESSAGE_CONTENT_TYPES, TIMER_TYPES, TIMER_VARIABLES, TIMER_VARIABLES_DESCRIPTION } from '../PreviewComponent/Constants';
+import { dataDay, MESSAGE_CONTENT_TYPES, BOT_MESSAGE_TYPES, TIMER_TYPES, TIMER_VARIABLES, TIMER_VARIABLES_DESCRIPTION } from '../PreviewComponent/Constants';
 
 const _ = require('lodash');
 
@@ -878,6 +879,7 @@ const Scenario = () => {
   const [dataDay, setDataDay] = useState(dataDayFixed);
 
   const [errorVariable, setErrorVariable] = useState('');
+  const [htmlValidationError, setHtmlValidationError] = useState('');
 
   const [dataCondition, setDataCondition] = useState([]);
 
@@ -2709,6 +2711,7 @@ const Scenario = () => {
               email: {},
               file: {},
               script: {},
+              html_code: {},
               delay: {
                 typing_on: false,
               },
@@ -2756,6 +2759,7 @@ const Scenario = () => {
               email: {},
               file: {},
               script: {},
+              html_code: {},
               delay: {},
               api_link_age: {},
               clear_variable: {
@@ -3229,6 +3233,7 @@ const Scenario = () => {
                                   else if (content.type === 'variable_set') { titleMessage = "変数セット" }
                                   else if (content.type === 'pause') { titleMessage = "一時停止" }
                                   else if (content.type === 'getting_error_notification') { titleMessage = "エラー取得の通知" }
+                                  else if (content.type === BOT_MESSAGE_TYPES.HTML_CODE) { titleMessage = "HTMLコード" }
                                 }
 
                                 return message.belong_to === 'bot' ? (
@@ -3336,7 +3341,7 @@ const Scenario = () => {
                                                     ></textarea>
                                                   )}
                                                   {/* bot: type == 'script' */}
-                                                  {content.type === 'script' && (
+                                                  {(content.type === 'script' || content.type === BOT_MESSAGE_TYPES.HTML_CODE) && (
                                                     <textarea
                                                       className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
                                                       style={message.hidden === true ? { opacity: '0.4' } : {}}
@@ -5753,6 +5758,7 @@ const Scenario = () => {
                                 <option value="clear_variable">変数クリア</option>
                                 <option value="variable_set">変数セット</option>
                                 <option value="pause">一時停止</option>
+                                <option value="html_code">HTMLコード</option>
                                 {/* <option value="api_link_age">テキスト</option> Pending */}
                               </select>
 
@@ -6060,6 +6066,17 @@ const Scenario = () => {
                               {/* type: pause */}
                               {messageType === 'pause' && (
                                 <div style={{ marginTop: '15px', fontWeight: '700' }}>一時停止</div>
+                              )}
+
+                              {/* type: html_code */}
+                              {messageType === BOT_MESSAGE_TYPES.HTML_CODE && (
+                                <HtmlCodeMessage
+                                  value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['content'] || ''}
+                                  onChange={(value) => {
+                                    onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'content');
+                                  }}
+                                  validationError={htmlValidationError}
+                                />
                               )}
                             </div>
                           </div>
