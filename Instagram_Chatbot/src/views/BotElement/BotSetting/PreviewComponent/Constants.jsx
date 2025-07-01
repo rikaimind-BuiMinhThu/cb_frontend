@@ -173,4 +173,23 @@ export {
   NO_ERROR,
   GETTING_ERROR_NOTIFICATION,
   REGEXP,
+  CUSTOM_JS_CODE_POSITION,
+};
+
+export const TIMER_TYPES = {
+  COUNTING_DOWN: "counting_down",
+};
+
+export const TIMER_VARIABLES = {
+  [TIMER_TYPES.COUNTING_DOWN]: {
+    timeCounting: "timer",
+    duration: "duration"
+  }
+};
+
+export const TIMER_VARIABLES_DESCRIPTION = {
+  [TIMER_TYPES.COUNTING_DOWN]: {
+    timeCounting: "のこりじかん hh:mm:ss",
+    duration: "設定されたタイマー時間"
+  }
 };

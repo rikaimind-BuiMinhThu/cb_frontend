@@ -23,7 +23,7 @@ import ShopifyReferencePopup from './ShopifyReferencePopup';
 import axios from 'axios';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import {
-  S3_UPLOAD_URL
+  S3_UPLOAD_URL,
 } from '../../../../variables/constants';
 import { tokenExpired } from 'api/tokenExpired';
 import DatePickerCustom from './scenarioComon/DatePickerCustom';
@@ -41,7 +41,7 @@ import locale from 'antd/es/date-picker/locale/ja_JP';
 import 'moment/locale/zh-cn';
 import ShopifyReferenceSelect from "./ShopifyReferenceSelect";
 import { Tooltip } from '@mui/material';
-import { MESSAGE_CONTENT_TYPES } from '../PreviewComponent/Constants';
+import { dataDay, MESSAGE_CONTENT_TYPES, TIMER_TYPES, TIMER_VARIABLES, TIMER_VARIABLES_DESCRIPTION } from '../PreviewComponent/Constants';
 
 const _ = require('lodash');
 
@@ -773,7 +773,8 @@ const installmentOptions = Array.from({ length: 23 }, (_, i) => ({
 }));
 
 const initialTimeConfig = {
-  duration: 0,
+  type: TIMER_TYPES.COUNTING_DOWN,
+  duration: {},
   messages: {
     counting: {
       content: "",
@@ -786,11 +787,7 @@ const initialTimeConfig = {
       isShow: false,
     },
   },
-}
-
-const timerVariables = {
-  timeCounting: "timer",
-  duration: "duration",
+  isShowMessageFinish: false
 }
 
 const Scenario = () => {
@@ -830,7 +827,7 @@ const Scenario = () => {
     enable: false,
     temp: initialTimeConfig,
     final: initialTimeConfig,
-    variables: timerVariables,
+    variables: TIMER_VARIABLES[initialTimeConfig.type],
   })
 
   const [errMsgJsCode, setErrMsgJsCode] = useState('');
@@ -967,7 +964,8 @@ const Scenario = () => {
         isOpen: false,
         enable: false,
       };
-      const resTimerConfig = res.data.data.timer_config;
+
+      const resTimerConfig = res.data.data?.timer_config;
 
       if (resTimerConfig) {
         const scenarioTimerConfig = {
@@ -976,12 +974,13 @@ const Scenario = () => {
             ...initialTimeConfig.messages,
             ...resTimerConfig.messages,
           },
+          type: resTimerConfig.type || TIMER_TYPES.COUNTING_DOWN,
         };
         
         timerConfig.temp = scenarioTimerConfig;
         timerConfig.final = scenarioTimerConfig;
-        timerConfig.enable = !!resTimerConfig.enable;
-        timerConfig.variables = resTimerConfig.variables;
+        timerConfig.enable = !!res.data.data.timer_config.enable;
+        timerConfig.variables = TIMER_VARIABLES[scenarioTimerConfig.type];
       }
       setTimerConfig(timerConfig)
     }).catch((error) => {
@@ -2398,38 +2397,66 @@ const Scenario = () => {
           <h4>タイマーを使用する</h4>
           <div className="modal_timer_config-content">
             <div className="modal_timer_config-input_holder">
-              <div className="sl-popup-create-scenario-input-wrapper margin-b-none">
+              <div className="sl-popup-create-scenario-input-wrapper full-width margin-b-none">
                 <span className="modal_timer_config-input-label">{"タイマー時間（秒）"}</span>
-                <InputCustom
-                  className="full-width"
-                  value={modalData.duration}
-                  onChange={handleChangeTimerConfig({ keyPath: ["temp", "duration"], useEventValue: true, defaultValue: 0, transform: (v) => (v || Number(v) < 0) ? Number(v) : 0 })}
-                  placeholder="0 (秒)"
-                  type='number'
+                {modalData.type === TIMER_TYPES.COUNTING_DOWN && (
+                  <div className="counting_down_input_holder">
+                    <div className="counting_down_input_wrapper">
+                      <InputCustom
+                        className="full-width"
+                        value={modalData.duration[modalData.type]?.hour ?? 0}
+                        onChange={handleChangeTimerConfig({ keyPath: ["temp", "duration", modalData.type, "hour"], useEventValue: true, defaultValue: 0, transform: (v) => (v || Number(v) > 0) ? Number(v) : 0 })}
+                        placeholder="0 (秒)"
+                        type='number'
+                      />
+                      <label className="counting_down_input_label">時</label>
+                    </div>
+                    <div className="counting_down_input_wrapper">
+                      <InputCustom
+                        className="full-width"
+                        value={modalData.duration[modalData.type]?.minute ?? 0}
+                        onChange={handleChangeTimerConfig({ keyPath: ["temp", "duration", modalData.type, "minute"], useEventValue: true, defaultValue: 0, transform: (v) => (v || Number(v) > 0) ? Number(v) : 0 })}
+                        placeholder="0 (秒)"
+                        type='number'
+                      />
+                      <label className="counting_down_input_label">分</label>
+                    </div>
+                    <div className="counting_down_input_wrapper">
+                      <InputCustom
+                        className="full-width"
+                        value={modalData.duration[modalData.type]?.second ?? 0}
+                        onChange={handleChangeTimerConfig({ keyPath: ["temp", "duration", modalData.type, "second"], useEventValue: true, defaultValue: 0, transform: (v) => (v || Number(v) > 0) ? Number(v) : 0 })}
+                        placeholder="0 (秒)"
+                        type='number'
+                      />
+                      <label className="counting_down_input_label">秒</label>
+                    </div>
+
+                  </div>
+                )}
+              </div>
+
+              <div className="sl-popup-create-scenario-input-wrapper full-width margin-b-none">
+                <span className="modal_timer_config-input-label">カウント中メッセージ</span>
+                <textarea
+                  className="modal_timer_config-html_holder"
+                  value={modalData.messages.counting.content}
+                  onChange={handleChangeTimerConfig({ keyPath: ["temp", "messages", "counting", "content"], useEventValue: true, transform: (v) => v ? String(v) : "" })}
+                  placeholder="カウント中メッセージ"
                 />
               </div>
 
-              <div className="sl-popup-create-scenario-input-wrapper margin-b-none">
-                <span className="modal_timer_config-input-label">カウント中メッセージ</span>
-                  <textarea
-                    className="modal_timer_config-html_holder"
-                    value={modalData.messages.counting.content}
-                    onChange={handleChangeTimerConfig({ keyPath: ["temp", "messages", "counting", "content"], useEventValue: true, transform: (v) => v ? String(v) : "" })}
-                    placeholder="カウント中メッセージ"
-                  />
-              </div>
-
-              <div className="modal_timer_config-finish_message">
+              <div className="modal_timer_config-finish_message full-width">
                 <div className="finish_message_label">
                   <input
                     type="checkbox"
                     className="ss-user-setting-checkbox-custom"
-                    onChange={handleChangeTimerConfig({ keyPath: ["temp", "messages", "finish", "isShow"], instanceValue: !modalData.messages.finish.isShow, transform: (v) => !!v })}
+                    onChange={handleChangeTimerConfig({ keyPath: ["temp", "messages", "finish", "isShow"], instanceValue: !modalData.messages.finish.isShow, tranform: (v) => !!v })}
                     checked={modalData.messages.finish.isShow}
                   />
                   <label>終了メッセージを表示</label>
                 </div>
-                <div className="sl-popup-create-scenario-input-wrapper" style={!modalData.messages.finish.isShow ? { display: "none" } : {}}>
+                <div className="sl-popup-create-scenario-input-wrapper full-width" style={!modalData.messages.finish.isShow ? { display: "none" } : {}}>
                   <span className="modal_timer_config-input-label">終了時メッセージ</span>
                   <textarea
                     className="modal_timer_config-html_holder"
@@ -2442,8 +2469,9 @@ const Scenario = () => {
             </div>
 
             <div className="modal_timer_config-variable_holder">
-              <div><span><b>{`{{${timerConfig.variables.duration}}}`}</b></span> - 設定されたタイマー時間</div>
-              <div><span><b>{`{{${timerConfig.variables.timeCounting}}}`}</b></span> - 	のこりじかん</div>
+              {Object.keys(timerConfig.variables).map((key) => (
+                <div key={key + "v_des"}><span><b>{`{{${timerConfig.variables[key]}}}`}</b></span> - {TIMER_VARIABLES_DESCRIPTION[modalData.type][key]}</div>
+              ))}
             </div>
           </div>
 
@@ -2529,6 +2557,7 @@ const Scenario = () => {
       top_body_custom_js_code: topBodyCustomJsCode.final,
       timer_config: cleanMessageTimerConfig({
         enable: timerConfig.enable,
+        type: timerConfig.type,
         variables: timerConfig.variables,
         duration: timerConfig.final.duration,
         messages: timerConfig.final.messages,
@@ -2588,6 +2617,7 @@ const Scenario = () => {
       bottom_body_custom_js_code: bottomBodyCustomJsCode.final,
       timer_config: cleanMessageTimerConfig({
         enable: timerConfig.enable,
+        type: timerConfig.type,
         variables: timerConfig.variables,
         duration: timerConfig.final.duration,
         messages: timerConfig.final.messages,
