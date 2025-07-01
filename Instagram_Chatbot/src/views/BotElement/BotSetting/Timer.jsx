@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "assets/css/bot/timer.css";
+import { TIMER_MAP_VARIABLE_METHOD } from "./PreviewComponent/Constants";
 
 const initialState = {
   duration: 0,
@@ -18,13 +19,7 @@ const initialState = {
   variables: [],
 };
 
-export const MAP_VARIABLE_METHOD = {
-  CONFIG: 1,
-  PARAMS: 2,
-  COMP_STATE: 3,
-};
-
-const COMPONENT_STATUS = {
+export const TIMER_COMPONENT_STATUS = {
   PAUSE: 0,
   COUNTING: 1,
   FINISH: 2,
@@ -32,6 +27,7 @@ const COMPONENT_STATUS = {
 
 export default function Timer({
   duration = initialState.duration,
+  timeLeft = 0,
   countMsg = initialState.messages.counting,
   finishMsg = initialState.messages.finish,
   variables = initialState.variables,
@@ -39,7 +35,7 @@ export default function Timer({
   onCounting = (timer) => {}
 }) {
   const [config, setConfig] = useState(null);
-  const [status, setStatus] = useState(COMPONENT_STATUS.PAUSE);
+  const [status, setStatus] = useState(TIMER_COMPONENT_STATUS.PAUSE);
   const [timer, setTimer] = useState(-1);
 
   const checkHtmlMessage = (rawHtml) => {
@@ -75,15 +71,15 @@ export default function Timer({
 
   const mapVariableByMethod = (variable, config, state) => {
     switch (variable.method) {
-      case MAP_VARIABLE_METHOD.CONFIG: {
+      case TIMER_MAP_VARIABLE_METHOD.CONFIG: {
         return variable.field ? config[variable.field] : undefined;
       }
 
-      case MAP_VARIABLE_METHOD.PARAMS: {
+      case TIMER_MAP_VARIABLE_METHOD.PARAMS: {
         return variable.value || undefined;
       }
 
-      case MAP_VARIABLE_METHOD.COMP_STATE: {
+      case TIMER_MAP_VARIABLE_METHOD.COMP_STATE: {
         return variable.field ? state[variable.field] : undefined;
       }
 
@@ -105,7 +101,11 @@ export default function Timer({
         continue;
       }
 
-      const value = mapVariableByMethod(variable, config, { status, timer });
+      let value = mapVariableByMethod(variable, config, { status, timer });
+
+      if (variable.transform && typeof variable.transform === "function") {
+        value = variable.transform(value);
+      }
 
       if (value !== undefined) {
         mappingVariables.push({ key: variable.name, value });
@@ -132,7 +132,7 @@ export default function Timer({
       timerMessage = config.messages.counting;
     }
 
-    if (config.duration === 0 && !!config.messages.finish.isShow) {
+    if (timer <= 0 && !!config.messages.finish.isShow) {
       timerMessage = config.messages.finish;
     }
 
@@ -140,17 +140,17 @@ export default function Timer({
   };
 
   useEffect(() => {
-    if (status === COMPONENT_STATUS.FINISH) return;
+    if (status === TIMER_COMPONENT_STATUS.FINISH) return;
 
     setStatus(
       startCount
-        ? COMPONENT_STATUS.COUNTING
-        : COMPONENT_STATUS.PAUSE
+        ? TIMER_COMPONENT_STATUS.COUNTING
+        : TIMER_COMPONENT_STATUS.PAUSE
     );
   }, [startCount]);
 
   useEffect(() => {
-    if (status !== COMPONENT_STATUS.COUNTING || timer <= 0) return;
+    if (status !== TIMER_COMPONENT_STATUS.COUNTING || timer <= 0) return;
 
     const timeout = setTimeout(() => {
       const newTimer = timer - 1;
@@ -159,12 +159,11 @@ export default function Timer({
       let newStatus = status;
 
       if (newTimer === 0) {
-        newStatus = COMPONENT_STATUS.FINISH;
+        newStatus = TIMER_COMPONENT_STATUS.FINISH;
         setStatus(newStatus);
       }
 
       onCounting(newTimer)
-
     }, 1000);
 
     return () => clearTimeout(timeout);
@@ -184,17 +183,17 @@ export default function Timer({
 
     setConfig(newConfig);
 
-    const timer = newConfig.duration;
+    const timer = timeLeft;
     setTimer(timer);
 
     if (timer <= 0) {
-      setStatus(COMPONENT_STATUS.FINISH);
+      setStatus(TIMER_COMPONENT_STATUS.FINISH);
     }
-  }, [duration, finishMsg, countMsg, variables]);
+  }, [timeLeft, duration, finishMsg, countMsg, variables]);
 
   if (!config) return null;
 
-  if (status === COMPONENT_STATUS.FINISH && !finishMsg.isShow) return null;
+  if (status === TIMER_COMPONENT_STATUS.FINISH && !finishMsg.isShow) return null;
 
   return (
     <div className="timer" dangerouslySetInnerHTML={{ __html: botTimerMessage(config) }}></div>
