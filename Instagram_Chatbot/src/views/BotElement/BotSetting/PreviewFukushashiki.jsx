@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useReducer } from "react";
+import React, { useEffect, useRef, useReducer, useState } from "react";
 import "assets/css/bot/preview-chat-bot.css";
 import api from "api/api-management";
 import Cookies from "js-cookie";
@@ -30,7 +30,9 @@ import {
   NO_ERROR,
   GETTING_ERROR_NOTIFICATION,
   CUSTOM_JS_CODE_POSITION,
-  BOT_MESSAGE_TYPES
+  BOT_MESSAGE_TYPES,
+  TIMER_MAP_VARIABLES_FIELD,
+  TIMER_TYPES
 } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
@@ -47,13 +49,14 @@ import {
   sleep,
   stringNullOrEmpty,
   appendParamsToUrl,
-  checkMessageCondition
+  checkMessageCondition,
 } from "./PreviewComponent/Utils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
 import ZipCodePopUp from "./PreviewComponent/ZipCodePopUp";
 import * as wanakana from "wanakana";
 import _ from "lodash";
+import Timer from "./Timer";
 
 sessionStorage.setItem("prevOpenStatus", "0");
 var url = new URL(window.location.href);
@@ -225,6 +228,7 @@ const PreviewFukushashikiReducer = (state, action) => {
 
 const PreviewFukushashiki = () => {
   const [state, dispatch] = useReducer(PreviewFukushashikiReducer, previewInitialState);
+  const [timerChanges, setTimerChanges] = useState({ timeLeft: -1, config: null });
   const containerRef = useRef(null);
   const isFromScenario = false;
 
@@ -482,6 +486,9 @@ const PreviewFukushashiki = () => {
 
       return !item.hidden && isUserMessage(item) && isDisplayBtnNext;
     });
+    
+    const timerChatbotStorage = getTimerSessionStorage();
+    setTimerChanges((timerChanges) => timerChatbotStorage || timerChanges);
 
     // For the first time, we need to render to the first user message
     if (state.currentUserMsgIndex >= 0) {
@@ -1002,6 +1009,11 @@ const PreviewFukushashiki = () => {
       });
     }
 
+    if (res.data?.chatbot?.timer_config?.enable) {
+      const timerConfig = res.data.chatbot.timer_config;
+      setTimerChanges({ timeLeft: calculateTimerConfigDuration(timerConfig.type, timerConfig.duration), config: timerConfig });
+    }
+
     const prevOpenStatus = sessionStorage.getItem("prevOpenStatus");
 
     if (res.data.design_settings.display_type == 1 && prevOpenStatus == "0") {
@@ -1099,6 +1111,49 @@ const PreviewFukushashiki = () => {
       fukushashikiToLP(fukuDataList);
       resolve();
     });
+  }
+
+  const getTimerSessionStorage = () => {
+    const timerChatbotStorage = sessionStorage.getItem(SESSION_STORAGE_KEY.TIMER_CHATBOT);
+    
+    if (!timerChatbotStorage?.trim().length) {
+      return null;
+    }
+    
+    return JSON.parse(timerChatbotStorage);
+  }
+
+  const handleOnCounting = (config) => (timer) => {
+    const timerChanges = { timeLeft: timer, config };
+    sessionStorage.setItem(SESSION_STORAGE_KEY.TIMER_CHATBOT, JSON.stringify(timerChanges));
+    setTimerChanges(timerChanges);
+  }
+
+  const getTimerConfigVariable = (configVariables) => {
+    const variables = Object.values(configVariables)
+      .reduce((acc, key) => !TIMER_MAP_VARIABLES_FIELD[key] ? acc : [...acc, { ...TIMER_MAP_VARIABLES_FIELD[key], name: key }], []);
+
+    return variables;
+  }
+
+  const calculateTimerConfigDuration = (type, duration) => {
+    if (!duration || !type) return 0;
+
+    const durationConfig = duration[type];
+    if (!durationConfig) {
+      return 0;
+    }
+
+    switch(type) {
+      case TIMER_TYPES.COUNTING_DOWN: {
+        const { hour = 0, minute = 0, second = 0 } = duration[type];
+        return (hour * 60 + minute) * 60 + second;
+      }
+
+      default: {
+        return 0;
+      }
+    }
   }
 
   // Get Preview Scenario Data
@@ -3867,6 +3922,24 @@ const PreviewFukushashiki = () => {
             </Row>
           </ModalPreviewBot>
           : ""}
+        
+        {!!state.botInfor?.timer_config?.enable
+          && 
+          <div className="chatbot_timer_holder" style={{
+            backgroundColor: bodyStyle.backgroundColor,
+          }}>
+            <Timer
+              duration={calculateTimerConfigDuration(state.botInfor.timer_config.type, state.botInfor.timer_config.duration)}
+              timeLeft={timerChanges.timeLeft}
+              countMsg={state.botInfor.timer_config.messages.counting}
+              finishMsg={state.botInfor.timer_config.messages.finish}
+              variables={getTimerConfigVariable(state.botInfor.timer_config.variables)}
+              startCount={state.isOpen}
+              onCounting={handleOnCounting(state.botInfor.timer_config)}
+            />
+          </div>
+        }
+
         <ProcessBar botInfor={state.botInfor}
           currentIndex={state.passedUserMsgCount}
           maxIndex={state.userMessagesList.length}

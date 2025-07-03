@@ -969,14 +969,14 @@ const Scenario = () => {
       setIsUseErrMsgByJs(res.data.data?.is_used_err_msg_by_js || false);
       setErrMsgJsCode(res.data.data?.err_msg_js_code || '');
 
-      let timerConfig = {
+      const timerConfig = {
         isOpen: false,
         enable: false,
       };
 
       const resTimerConfig = res.data.data?.timer_config;
 
-      if (res.data.data?.timer_config) {
+      if (resTimerConfig) {
         const scenarioTimerConfig = {
           duration: resTimerConfig.duration || initialTimeConfig.duration,
           messages: {
@@ -2405,7 +2405,6 @@ const Scenario = () => {
       }
 
       current[keyPath[keyPath.length - 1]] = transform(value || defaultValue);
-
       return newConfig;
     })
   }
@@ -2416,6 +2415,35 @@ const Scenario = () => {
       res()
     }).then(() => setTimerConfig((config) => ({ ...config, isOpen: false })));
   };
+
+  const cleanMessageTimerConfig = (config) => {
+    const cleanedConfig = { ...config };
+    const takenField = {
+      isShow: true,
+      useHtml: true,
+      content: true,
+    };
+
+    const messages = {
+      finish: {},
+      counting: {},
+    };
+
+    Object.keys(cleanedConfig.messages.finish).forEach((key) => {
+      if (!!takenField[key]) {
+        messages.finish[key] = cleanedConfig.messages.finish[key];
+      }
+    });
+
+    Object.keys(cleanedConfig.messages.counting).forEach((key) => {
+      if (!!takenField[key]) {
+        messages.counting[key] = cleanedConfig.messages.counting[key];
+      }
+    });
+
+    cleanedConfig.messages = messages;
+    return cleanedConfig;
+  }
 
   // Timer config
   const handleOnCancelTimerConfig= () => {
@@ -2598,14 +2626,13 @@ const Scenario = () => {
       is_used_custom_js_code: isUseCustomJsCode,
       head_custom_js_code: headCustomJsCode.final,
       top_body_custom_js_code: topBodyCustomJsCode.final,
-      timer_config: {
+      timer_config: cleanMessageTimerConfig({
         enable: timerConfig.enable,
         type: timerConfig.final.type,
         variables: timerConfig.variables,
         duration: timerConfig.final.duration,
         messages: timerConfig.final.messages,
-        isShowMessageFinish: timerConfig.final.isShowMessageFinish,
-      },
+      }),
       bottom_body_custom_js_code: bottomBodyCustomJsCode.final,
       is_used_err_msg_by_js: isUseErrMsgByJs,
       err_msg_js_code: errMsgJsCode,
@@ -2659,14 +2686,13 @@ const Scenario = () => {
       head_custom_js_code: headCustomJsCode.final,
       top_body_custom_js_code: topBodyCustomJsCode.final,
       bottom_body_custom_js_code: bottomBodyCustomJsCode.final,
-      timer_config: {
+      timer_config: cleanMessageTimerConfig({
         enable: timerConfig.enable,
         type: timerConfig.final.type,
         variables: timerConfig.variables,
         duration: timerConfig.final.duration,
         messages: timerConfig.final.messages,
-        isShowMessageFinish: timerConfig.final.isShowMessageFinish,
-      },
+      }),
       is_used_err_msg_by_js: isUseErrMsgByJs,
       err_msg_js_code: errMsgJsCode,
     }

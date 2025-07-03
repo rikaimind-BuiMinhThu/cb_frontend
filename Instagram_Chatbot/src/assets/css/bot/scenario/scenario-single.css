@@ -2112,3 +2112,11 @@ input#ss-message__content--user-checkbox--checkbox_img {
   align-items: center;
   justify-content: center;
 }
+
+.modal_timer_config-html_holder {
+  width: 100%;
+  height: 120px;
+  padding: 10px;
+  font-size: 14px;
+  flex-grow: 1;
+}

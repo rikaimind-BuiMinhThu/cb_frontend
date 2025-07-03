@@ -4,6 +4,7 @@ import discover from "../../../../assets/img/payment-method/discover.png";
 import jcb from "../../../../assets/img/payment-method/jcb.png";
 import master_card from "../../../../assets/img/payment-method/master_card.png";
 import visa from "../../../../assets/img/payment-method/visa.png";
+import { secondToDatetime } from "./Utils";
 
 let dataHourFixed = [];
 for (let i = 0; i <= 23; i++) {
@@ -100,6 +101,7 @@ const GET_CAPTCHA_PATH = `https://svg-captcha-nodejs.vercel.app/captcha?size=:si
 
 const SESSION_STORAGE_KEY = {
   CHAT_BOT_STATE: 'CHAT_BOT_STATE',
+  TIMER_CHATBOT: 'TIMER_CHATBOT',
 };
 
 const CRAWL_ELEMENT_TYPES = {
@@ -201,7 +203,26 @@ export const TIMER_VARIABLES = {
 
 export const TIMER_VARIABLES_DESCRIPTION = {
   [TIMER_TYPES.COUNTING_DOWN]: {
-    timeCounting: "のこりじかん hh:mm:ss",
-    duration: "設定されたタイマー時間"
+    timeCounting: "残り時間 dd日 hh時 mm分 ss秒",
+    duration: "設定されたタイマー時間 dd日 hh時 mm分 ss秒"
   }
+};
+
+export const TIMER_MAP_VARIABLE_METHOD = {
+  CONFIG: 1,
+  PARAMS: 2,
+  COMP_STATE: 3,
+};
+
+export const TIMER_MAP_VARIABLES_FIELD = {
+  [TIMER_VARIABLES[TIMER_TYPES.COUNTING_DOWN].timeCounting]: {
+    field: "timer",
+    method: TIMER_MAP_VARIABLE_METHOD.COMP_STATE,
+    transform: (timer) => secondToDatetime(timer, "{{dd}}日 {{hh}}時 {{mm}}分 {{ss}}秒"),
+  },
+  [TIMER_VARIABLES[TIMER_TYPES.COUNTING_DOWN].duration]: {
+    field: "duration",
+    method: TIMER_MAP_VARIABLE_METHOD.CONFIG,
+    transform: (duration) => secondToDatetime(duration, "{{dd}}日 {{hh}}時 {{mm}}分 {{ss}}秒"),
+  },
 };

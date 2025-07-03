@@ -262,6 +262,53 @@ const getAddressFromZipCode = (zipCode) => {
   );
 }
 
+/**
+ * 
+ * @param {*} format using dd || hh || mm || ss
+ */
+const secondToDatetime =(
+  sec, 
+  format = "{{dd}}:{{hh}}:{{mm}}:{{ss}}",
+  omitLeadingZero = true,
+) => {
+  let paramsSec = sec < 0 ? 0 : (sec || 0);
+
+  const SECONDS_IN_MINUTE = 60;
+  const SECONDS_IN_HOUR = 60 * SECONDS_IN_MINUTE;     
+  const SECONDS_IN_DAY = 24 * SECONDS_IN_HOUR;    
+
+  const timeParts = {
+    dd: Math.floor(paramsSec / SECONDS_IN_DAY) || 0,
+    hh: Math.floor((paramsSec % SECONDS_IN_DAY) / SECONDS_IN_HOUR) || 0,
+    mm: Math.floor((paramsSec % SECONDS_IN_HOUR) / SECONDS_IN_MINUTE) || 0,
+    ss: (paramsSec % SECONDS_IN_MINUTE) || 0,
+  };
+
+  const pad = (n) => String(n).padStart(2, '0');
+
+  const regex = /{{(dd|hh|mm|ss)}}[^{{}]*/g;
+  const matches = [...format.matchAll(regex)];
+
+  let formatted = "";
+
+  let firstNonZeroIndex = 0;
+  
+  if (omitLeadingZero) {
+    firstNonZeroIndex = matches.findIndex(([match, key]) => timeParts[key] > 0);
+
+    if (firstNonZeroIndex === -1) firstNonZeroIndex = matches.length - 1;
+  }
+
+  for (let i = firstNonZeroIndex; i < matches.length; i++) {
+    const [match, key] = matches[i];
+    const value = pad(timeParts[key]);
+
+    formatted += match.replace(`{{${key}}}`, value);
+  }
+
+  return formatted;
+}
+
 export {
   stringNullOrEmpty, getAllUrlParams, lightenColor,
   mobileCheck, removeLeadingZero, sendUserInteractionData,
@@ -269,5 +316,5 @@ export {
   getCitiesByPrefecture, getTownsByCity, getPrefectures,
   getScenarioPreviewData, getChatBotSetting, sendEmailRequest,
   sleep, getCaptcha, appendParamsToUrl, checkMessageCondition,
-  getAddressFromZipCode
+  getAddressFromZipCode, secondToDatetime
 };
