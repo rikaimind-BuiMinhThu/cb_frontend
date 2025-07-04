@@ -990,8 +990,6 @@ const Scenario = () => {
       timerConfig.enable = !!resTimerConfig?.enable;
       timerConfig.variables = TIMER_VARIABLES[scenarioTimerConfig.type];
 
-      console.log(timerConfig);
-
       setTimerConfig(timerConfig)
     }).catch((error) => {
       if (error.response?.data.code === 0) {
