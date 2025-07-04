@@ -976,21 +976,22 @@ const Scenario = () => {
 
       const resTimerConfig = res.data.data?.timer_config;
 
-      if (resTimerConfig) {
-        const scenarioTimerConfig = {
-          duration: resTimerConfig.duration || initialTimeConfig.duration,
-          messages: {
-            ...initialTimeConfig.messages,
-            ...resTimerConfig.messages,
-          },
-          type: resTimerConfig.type || TIMER_TYPES.COUNTING_DOWN,
-        };
-        
-        timerConfig.temp = scenarioTimerConfig;
-        timerConfig.final = scenarioTimerConfig;
-        timerConfig.enable = !!res.data.data.timer_config.enable;
-        timerConfig.variables = TIMER_VARIABLES[scenarioTimerConfig.type];
-      }
+      const scenarioTimerConfig = {
+        duration: resTimerConfig?.duration || initialTimeConfig.duration,
+        messages: {
+          ...initialTimeConfig.messages,
+          ...(resTimerConfig?.messages || {}),
+        },
+        type: resTimerConfig?.type || TIMER_TYPES.COUNTING_DOWN,
+      };
+      
+      timerConfig.temp = scenarioTimerConfig;
+      timerConfig.final = scenarioTimerConfig;
+      timerConfig.enable = !!resTimerConfig?.enable;
+      timerConfig.variables = TIMER_VARIABLES[scenarioTimerConfig.type];
+
+      console.log(timerConfig);
+
       setTimerConfig(timerConfig)
     }).catch((error) => {
       if (error.response?.data.code === 0) {
