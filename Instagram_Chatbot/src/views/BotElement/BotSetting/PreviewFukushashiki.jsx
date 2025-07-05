@@ -2680,7 +2680,7 @@ const PreviewFukushashiki = () => {
               }
 
               if (Object.keys(message.text_input.password).length != 0 && message.text_input.password != undefined) {
-                if (message.fukushashiki_search_value.includes(',')) {
+                if (message?.fukushashiki_search_value?.includes(',')) {
                   let address = message.fukushashiki_search_value.split(',');
                   address.forEach(value => {
                     const fukuObject = {
@@ -3189,8 +3189,11 @@ const PreviewFukushashiki = () => {
       });
     }
 
-    newState.messagesList[clickedMsgIndex].isSubmitted = true
+    newState.messagesList[clickedMsgIndex].isSubmitted = true;
     fukushashikiToLP(convertToFukushashikiObject(submitData));
+    
+    await api.post(`/api/v1/scenario_users/scenario_user_responses`, submitData)
+
 
     if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
       postMessageForExecuteJs(clickedMsg.jscode);

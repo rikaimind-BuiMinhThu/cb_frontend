@@ -9,7 +9,7 @@ import "assets/css/bot/bot-chat-log.css";
 import $ from "jquery";
 import BotMessage from "./BotMessage";
 import UserMessage from "./UserMessage";
-import { isBoolean } from "lodash";
+import { findLastIndex, isBoolean } from "lodash";
 import moment from "moment";
 import jwt_decode from 'jwt-decode'
 registerLocale("ja", ja);
@@ -132,6 +132,8 @@ function BotChatLog() {
       (a, b) => a.id - b.id
     );
     setSelectScenario(sc);
+    setRenderMessageArr([]);
+    
     api
       .get(
         `/api/v1/managements/chat_log/${item.scenario_id}/${item.user_input_id}`
@@ -163,13 +165,14 @@ function BotChatLog() {
           }
           setConversions(conversations);
 
+          let messageArr = [];
+
           api
             .get(
               `/api/v1/managements/chatbots/${botId}/scenarios/${item.scenario_id}/preview`
             )
             .then(async (res) => {
               if (res.data.code === 1) {
-                let messageArr = [];
                 if (res.data.data?.conversation?.messages?.length > 0) {
                   messageArr = [...res.data.data?.conversation?.messages];
                 }
@@ -503,17 +506,24 @@ function BotChatLog() {
                       let chats = conversations.filter(
                         (c) => c?.message_id === messageArr[i].id
                       );
-                      let chat = chats.find(
-                        (c) =>
-                          c?.data_input_name ===
-                          element[element.type]?.save_input_content
-                      );
-                      if (!chat) {
-                        chat = chats.find((c) => c?.ui_type === element.type);
+
+                      let lastIndexChat = findLastIndex(chats, (c) =>
+                        c?.data_input_name ===
+                        element[element.type]?.save_input_content && element[element.type]?.save_input_content);
+
+                      if (lastIndexChat < 0) {
+                        lastIndexChat = findLastIndex(chats, (c) => c?.ui_type === element.type);
                       }
+
+                      const chat = chats[lastIndexChat];
+                      if (!chat) {
+                        continue;
+                      }
+
                       conversations = conversations.filter(
-                        (el) => el.id !== chat?.id
+                        (el) => el?.message_id !== chat.message_id
                       );
+
                       const subElement = element[element.type];
                       if (element.type === "text_input") {
                         if (subElement.type === "text") {
@@ -530,10 +540,31 @@ function BotChatLog() {
                             element[element.type][subElement.type].value = data?.value;
                         }
                         if (subElement.type === "phone_number") {
-                          if (subElement?.withHyphen) {
-                          } else
+                          if (subElement[subElement.type]?.withHyphen) {
+                            let parsedValues = {
+                              value1: "",
+                              value2: "",
+                              value3: "",
+                            };
+
+                            try {
+                              parsedValues = { ...parsedValues, ...JSON.parse(chat.value) };
+                            } catch {
+                              parsedValues = {
+                                value1: "",
+                                value2: "",
+                                value3: "",
+                              }
+                            }
+
+                            element[element.type][subElement.type] = {
+                              ...element[element.type][subElement.type],
+                              ...parsedValues,
+                            };
+                          } else {
                             element[element.type][subElement.type].value =
                               chat.value;
+                          }
                         }
                         if (subElement.type === "password") {
                           element[element.type][subElement.type].password =
@@ -728,13 +759,15 @@ function BotChatLog() {
                       }
                       element.updated_at = chat?.updated_at;
                     }
-                    setRenderMessageArr(messageArr);
                   }
                 }
               }
             })
             .catch((error) => {
               console.log(error);
+            })
+            .finally(() => {
+              setRenderMessageArr(messageArr);
             });
         }
       });
@@ -897,7 +930,7 @@ function BotChatLog() {
                 </div>
 
                 <div className="right-column">
-                  {selectScenario ? (
+                  {selectScenario && (
                     <>
                       <div
                         id="csp-body"
@@ -994,10 +1027,7 @@ function BotChatLog() {
                           );
                         })}
                       </div>
-                    </>
-                  ) : (
-                    <></>
-                  )}
+                    </>)}
                 </div>
               </CardBody>
             </Card>
