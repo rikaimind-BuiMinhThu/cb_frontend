@@ -76,3 +76,62 @@ button:hover .info {
     margin-right: 0;
   }
 }
+
+.tab_holder {
+  width: 100%;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  padding: 0 15px;
+  box-sizing: border-box;
+} 
+
+.tab_button {
+  height: fit-content;
+  background-color: white;
+  flex-grow: 1;
+  padding: 10px 15px;
+  border: none;
+  border-bottom: 1px solid white;
+  cursor: pointer;
+  transition-duration: .25s;
+  border-radius: 5px;
+  color: #919191;
+}
+
+.tab_button:hover {
+  background-color: #f1f2f7;
+}
+
+.t_selected {
+  font-weight: bold;
+  background-color: #f1f2f7;
+  border-bottom-color: white;
+  cursor: default;
+  color: black;
+}
+
+.chat-log_item {
+  position: relative;
+}
+
+.chat_log-is_done_holder {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+}
+
+.is-done_label {
+  border-radius: 5px;
+  padding: 3px 5px;
+  font-size: .8rem;
+  font-weight: bold;
+  background-color: #FEE2E2;
+  color: #DC2626;
+}
+
+.finished {
+  background-color: #D1FAE5;
+  color: #059669;
+}

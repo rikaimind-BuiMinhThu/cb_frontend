@@ -32,7 +32,8 @@ import {
   CUSTOM_JS_CODE_POSITION,
   BOT_MESSAGE_TYPES,
   TIMER_MAP_VARIABLES_FIELD,
-  TIMER_TYPES
+  TIMER_TYPES,
+  CONVERSATION_RESPONSE_STATUS
 } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
@@ -50,6 +51,7 @@ import {
   stringNullOrEmpty,
   appendParamsToUrl,
   checkMessageCondition,
+  saveStatusConversion,
 } from "./PreviewComponent/Utils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
@@ -131,7 +133,8 @@ const previewInitialState = {
   loadedStateFromSession: false,
   isUsedErrMsgByJs: false,
   errMsgJsCode: '',
-  isProcessing: false
+  isProcessing: false,
+  conversionStatus: null,
 };
 
 const PREVIEW_ACTIONS = {
@@ -421,6 +424,9 @@ const PreviewFukushashiki = () => {
   useEffect(() => {
     if (!state.loadedStateFromSession) return;
     if (state.prefecturesList.length !== 0) return;
+    
+    return;
+
     getPrefectures()
       .then((res) => {
         dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { prefecturesList: res.data.data } });
@@ -3111,7 +3117,11 @@ const PreviewFukushashiki = () => {
           action: CHATBOT_ACTIONS.CLICK_BUTTON,
           id_value: content.button_submit_id
         });
-        redirectToCartPage();
+
+        saveStatusConversion({ scenario_id: data.scenario_id, user_input_id: data.user_id, status: CONVERSATION_RESPONSE_STATUS.FINISH })
+          .then(() => {
+            redirectToCartPage();
+          });
         return;
       }
 
@@ -3129,7 +3139,11 @@ const PreviewFukushashiki = () => {
         sendCountRequest(conversion)
           .then(res => {
             console.log(res);
-            redirectToCartPage();
+
+            saveStatusConversion({ scenario_id: data.scenario_id, user_input_id: data.user_id, status: CONVERSATION_RESPONSE_STATUS.FINISH })
+              .then(() => {
+                redirectToCartPage();
+              });
           });
       });
     });
@@ -3176,6 +3190,8 @@ const PreviewFukushashiki = () => {
     const isClickedCreateOrder = state.messagesList[clickedMsgIndex]?.message_content?.[0]?.type === "button_submit";
     const isClickedLastMessage = state.messagesList.length - 1 === clickedMsgIndex;
 
+    await api.post(`/api/v1/scenario_users/scenario_user_responses`, submitData)
+
     if (isClickedCreateOrder) {
       setStateToSessionStorage(newState);
       return processClickCreateOrder(submitData);
@@ -3183,6 +3199,7 @@ const PreviewFukushashiki = () => {
 
     if (isClickedLastMessage) {
       newState.messagesList[clickedMsgIndex].disabled = false;
+      await saveStatusConversion({ scenario_id: submitData.scenario_id, user_input_id: submitData.user_id, status: CONVERSATION_RESPONSE_STATUS.FINISH })
       return dispatch({
         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
         payload: newState
@@ -3191,8 +3208,6 @@ const PreviewFukushashiki = () => {
 
     newState.messagesList[clickedMsgIndex].isSubmitted = true;
     fukushashikiToLP(convertToFukushashikiObject(submitData));
-    
-    await api.post(`/api/v1/scenario_users/scenario_user_responses`, submitData)
 
 
     if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
@@ -3833,6 +3848,22 @@ const PreviewFukushashiki = () => {
       bodyStyle,
     };
   };
+
+  useEffect(() => {
+    if (state.conversionStatus === null && !!state.uuid && !!state.scenarioId && state.isOpen) {
+      saveStatusConversion({
+        scenario_id: state.scenarioId, 
+        user_input_id: state.uuid, 
+        status: CONVERSATION_RESPONSE_STATUS.UN_FINISH,
+      })
+      .then(() => {
+        dispatch({ 
+          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, 
+          payload: { conversionStatus: CONVERSATION_RESPONSE_STATUS.UN_FINISH } 
+        });
+      });
+    }
+  }, [state.uuid, state.scenarioId, state.conversionStatus, state.isOpen])
 
   // body container
   if (state.scenarioId && state.botInfor && state.isOpen) {

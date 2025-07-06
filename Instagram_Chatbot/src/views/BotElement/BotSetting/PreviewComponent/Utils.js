@@ -194,6 +194,13 @@ const getCaptcha = (size, color, charPreset) => {
   });
 };
 
+const saveStatusConversion = (data) => {
+  return postToChatBotServer(
+    CHATBOT_SERVER.SAVE_STATUS_CONVERSION_USER_RESPONSE,
+    data
+  );
+}
+
 const sleep = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -316,5 +323,5 @@ export {
   getCitiesByPrefecture, getTownsByCity, getPrefectures,
   getScenarioPreviewData, getChatBotSetting, sendEmailRequest,
   sleep, getCaptcha, appendParamsToUrl, checkMessageCondition,
-  getAddressFromZipCode, secondToDatetime
+  getAddressFromZipCode, secondToDatetime, saveStatusConversion
 };
