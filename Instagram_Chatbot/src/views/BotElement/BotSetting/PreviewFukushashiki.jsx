@@ -3144,6 +3144,7 @@ const PreviewFukushashiki = () => {
   }
 
   const isDelayBotMessage = (message) => {
+    if (!message) return false;
     return message.belong_to === 'bot' && message.message_content[0]?.type === "delay";
   }
 
