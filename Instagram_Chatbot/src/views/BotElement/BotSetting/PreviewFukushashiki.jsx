@@ -50,6 +50,7 @@ import {
   stringNullOrEmpty,
   appendParamsToUrl,
   checkMessageCondition,
+  changeElementAttributeById,
 } from "./PreviewComponent/Utils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
@@ -3177,6 +3178,8 @@ const PreviewFukushashiki = () => {
     const isClickedCreateOrder = state.messagesList[clickedMsgIndex]?.message_content?.[0]?.type === "button_submit";
     const isClickedLastMessage = state.messagesList.length - 1 === clickedMsgIndex;
 
+    api.post(`/api/v1/scenario_users/scenario_user_responses`, submitData)
+
     if (isClickedCreateOrder) {
       setStateToSessionStorage(newState);
       return processClickCreateOrder(submitData);
@@ -3575,9 +3578,10 @@ const PreviewFukushashiki = () => {
       state.botInfor?.withdrawal_prevention_status === "standard_exit_popup" ||
       state.botInfor?.withdrawal_prevention_status === "image_popup"
     ) {
-      document.getElementById("sp-withdrawal-container").style.display =
-        "block";
-      document.getElementById("sp-withdrawal-content").style.display = "block";
+      changeElementAttributeById([
+        { id: "sp-withdrawal-container", style: { display: "block" } },
+        { id: "sp-withdrawal-content", style: { display: "block" } },
+      ]);
     }
   };
 
@@ -3585,8 +3589,10 @@ const PreviewFukushashiki = () => {
     let newState = {};
 
     if (isOpen) {
-      document.getElementById("sp-withdrawal-container").style.display = "block";
-      document.getElementById("sp-popup-zip-code-address").style.display = "block";
+      changeElementAttributeById([
+        { id: "sp-withdrawal-container", style: { display: "block" } },
+        { id: "sp-popup-zip-code-address", style: { display: "block" } },
+      ]);
 
       newState = {
         ...state,
@@ -3606,8 +3612,10 @@ const PreviewFukushashiki = () => {
       return;
     }
 
-    document.getElementById("sp-withdrawal-container").style.display = "none";
-    document.getElementById("sp-popup-zip-code-address").style.display = "none";
+    changeElementAttributeById([
+      { id: "sp-withdrawal-container", style: { display: "none" } },
+      { id: "sp-popup-zip-code-address", style: { display: "none" } },
+    ]);
   };
 
   const onChangeErrors = (field, value) => {
