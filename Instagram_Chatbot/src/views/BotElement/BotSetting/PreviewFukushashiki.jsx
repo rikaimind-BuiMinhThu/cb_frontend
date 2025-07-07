@@ -425,9 +425,6 @@ const PreviewFukushashiki = () => {
   useEffect(() => {
     if (!state.loadedStateFromSession) return;
     if (state.prefecturesList.length !== 0) return;
-    
-    return;
-
     getPrefectures()
       .then((res) => {
         dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { prefecturesList: res.data.data } });
