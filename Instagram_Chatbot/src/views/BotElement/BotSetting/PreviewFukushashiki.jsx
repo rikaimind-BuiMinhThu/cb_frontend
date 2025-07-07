@@ -50,6 +50,7 @@ import {
   stringNullOrEmpty,
   appendParamsToUrl,
   checkMessageCondition,
+  sendScenarioUserResponse,
 } from "./PreviewComponent/Utils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
@@ -3163,7 +3164,7 @@ const PreviewFukushashiki = () => {
     if (!handleValidateField(indexMessage)) {
       return;
     }
-
+    
     newState.errors = {};
 
     const submitData = {
@@ -3175,6 +3176,8 @@ const PreviewFukushashiki = () => {
     
     const isClickedCreateOrder = state.messagesList[clickedMsgIndex]?.message_content?.[0]?.type === "button_submit";
     const isClickedLastMessage = state.messagesList.length - 1 === clickedMsgIndex;
+
+    sendScenarioUserResponse(submitData);
 
     if (isClickedCreateOrder) {
       setStateToSessionStorage(newState);
@@ -3191,9 +3194,6 @@ const PreviewFukushashiki = () => {
 
     newState.messagesList[clickedMsgIndex].isSubmitted = true;
     fukushashikiToLP(convertToFukushashikiObject(submitData));
-    
-    await api.post(`/api/v1/scenario_users/scenario_user_responses`, submitData)
-
 
     if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
       postMessageForExecuteJs(clickedMsg.jscode);
