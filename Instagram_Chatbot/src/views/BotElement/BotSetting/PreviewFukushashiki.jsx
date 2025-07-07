@@ -50,6 +50,7 @@ import {
   stringNullOrEmpty,
   appendParamsToUrl,
   checkMessageCondition,
+  changeElementAttributeById,
 } from "./PreviewComponent/Utils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
@@ -3582,30 +3583,6 @@ const PreviewFukushashiki = () => {
       ]);
     }
   };
-
-  const toCamelCase = (str = "") => str.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
-
-  const changeElementAttributeById = (ids = []) => {
-    for (const { id, ...attributes } of ids) {
-      const element = document.getElementById(id);
-
-      if (!element) continue;
-      
-      for (const [key, value] of Object.entries(attributes)) {
-        try {
-        if (key === "style" && typeof value === "object") {
-          Object.entries(value).forEach(([styleKey, styleValue]) => {
-            element.style[toCamelCase(styleKey)] = styleValue;
-          });
-        } else {
-          element.setAttribute(key, value);
-        }
-        } catch {
-          continue;
-        }
-      }
-    }
-  }
 
   const toggleZipCodePopup = (isOpen, indexContent, messageIndex) => {
     let newState = {};
