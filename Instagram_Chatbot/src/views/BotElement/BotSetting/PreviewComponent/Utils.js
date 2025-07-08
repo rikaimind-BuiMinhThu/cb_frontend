@@ -194,6 +194,20 @@ const getCaptcha = (size, color, charPreset) => {
   });
 };
 
+const createStatusConversion = (data) => {
+  return postToChatBotServer(
+    CHATBOT_SERVER.CREATE_STATUS_CONVERSION_USER_RESPONSE,
+    data
+  );
+}
+
+const updateStatusConversion = (data) => {
+  return patchToChatBotServer(
+    CHATBOT_SERVER.UPDATE_STATUS_CONVERSION_USER_RESPONSE,
+    data
+  );
+}
+
 const sendScenarioUserResponse = (data) => {
   return postToChatBotServer(
     CHATBOT_SERVER.SEND_SCENARIO_USER_RESPONSE,
@@ -347,6 +361,6 @@ export {
   getCitiesByPrefecture, getTownsByCity, getPrefectures,
   getScenarioPreviewData, getChatBotSetting, sendEmailRequest,
   sleep, getCaptcha, appendParamsToUrl, checkMessageCondition,
-  getAddressFromZipCode, secondToDatetime, toCamelCase, changeElementAttributeById,
-  sendScenarioUserResponse,
+  getAddressFromZipCode, secondToDatetime, toCamelCase, changeElementAttributeById, 
+  createStatusConversion, updateStatusConversion, sendScenarioUserResponse,
 };

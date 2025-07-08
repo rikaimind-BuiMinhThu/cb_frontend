@@ -95,6 +95,8 @@ const CHATBOT_SERVER = {
   GET_CHATBOT_SETTING_PATH: '/api/v1/managements/chatbots/:bot_id',
   SEND_EMAIL_PATH: '/api/v1/managements/emails/:email_id/send_email',
   GET_ADDRESS_FROM_ZIP_CODE_PATH: '/api/v1/get_address_from_zip_code?zip_code=:zip_code',
+  CREATE_STATUS_CONVERSION_USER_RESPONSE: '/api/v1/scenario_users/scenario_user_responses_status',
+  UPDATE_STATUS_CONVERSION_USER_RESPONSE: '/api/v1/scenario_users/scenario_user_responses_status',
   SEND_SCENARIO_USER_RESPONSE: '/api/v1/scenario_users/scenario_user_responses',
 };
 
@@ -227,3 +229,8 @@ export const TIMER_MAP_VARIABLES_FIELD = {
     transform: (duration) => secondToDatetime(duration, "{{dd}}日 {{hh}}時 {{mm}}分 {{ss}}秒"),
   },
 };
+
+export const CONVERSATION_RESPONSE_STATUS = {
+  FINISH: "finished",
+  UN_FINISH: "un_finished",
+}

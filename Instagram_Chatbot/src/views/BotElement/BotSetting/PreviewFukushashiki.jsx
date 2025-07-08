@@ -32,7 +32,8 @@ import {
   CUSTOM_JS_CODE_POSITION,
   BOT_MESSAGE_TYPES,
   TIMER_MAP_VARIABLES_FIELD,
-  TIMER_TYPES
+  TIMER_TYPES,
+  CONVERSATION_RESPONSE_STATUS
 } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
@@ -51,6 +52,8 @@ import {
   appendParamsToUrl,
   checkMessageCondition,
   changeElementAttributeById,
+  updateStatusConversion,
+  createStatusConversion,
   sendScenarioUserResponse,
 } from "./PreviewComponent/Utils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
@@ -133,7 +136,8 @@ const previewInitialState = {
   loadedStateFromSession: false,
   isUsedErrMsgByJs: false,
   errMsgJsCode: '',
-  isProcessing: false
+  isProcessing: false,
+  conversionStatus: null,
 };
 
 const PREVIEW_ACTIONS = {
@@ -3101,6 +3105,20 @@ const PreviewFukushashiki = () => {
     }, state.urlReceive || '*');
   }
 
+  const finishConversion = async ({ scenario_id, user_input_id }, callback) => {
+    return updateStatusConversion({ scenario_id, user_input_id, status: CONVERSATION_RESPONSE_STATUS.FINISH })
+      .then(() => {
+        dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+          payload: { conversionStatus: CONVERSATION_RESPONSE_STATUS.FINISH },
+        });
+
+        if (!!callback) {
+          callback();
+        }
+      });
+  }
+
   const processClickCreateOrder = (data) => {
     sendUserInteractionData(
       data,
@@ -3113,7 +3131,8 @@ const PreviewFukushashiki = () => {
           action: CHATBOT_ACTIONS.CLICK_BUTTON,
           id_value: content.button_submit_id
         });
-        redirectToCartPage();
+
+        finishConversion({ scenario_id: data.scenario_id, user_input_id: data.user_id }, redirectToCartPage)
         return;
       }
 
@@ -3131,7 +3150,7 @@ const PreviewFukushashiki = () => {
         sendCountRequest(conversion)
           .then(res => {
             console.log(res);
-            redirectToCartPage();
+            finishConversion({ scenario_id: data.scenario_id, user_input_id: data.user_id }, redirectToCartPage);
           });
       });
     });
@@ -3188,14 +3207,16 @@ const PreviewFukushashiki = () => {
 
     if (isClickedLastMessage) {
       newState.messagesList[clickedMsgIndex].disabled = false;
+      await finishConversion({ scenario_id: submitData.scenario_id, user_input_id: submitData.user_id })
       return dispatch({
         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-        payload: newState
+        payload: { ...newState, conversionStatus: CONVERSATION_RESPONSE_STATUS.FINISH }
       });
     }
 
     newState.messagesList[clickedMsgIndex].isSubmitted = true;
     fukushashikiToLP(convertToFukushashikiObject(submitData));
+
 
     if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
       postMessageForExecuteJs(clickedMsg.jscode);
@@ -3840,6 +3861,26 @@ const PreviewFukushashiki = () => {
       bodyStyle,
     };
   };
+
+  useEffect(() => {
+    if (state.conversionStatus === null && !!state.uuid && !!state.scenarioId && state.isOpen) {
+      createStatusConversion({
+        scenario_id: state.scenarioId, 
+        user_input_id: state.uuid, 
+        status: CONVERSATION_RESPONSE_STATUS.UN_FINISH,
+      })
+      .then((res) => {
+        const status = res?.data?.data?.status;
+
+        if (status) {
+          dispatch({ 
+            type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, 
+            payload: { conversionStatus: status },
+          });
+        }
+      });
+    }
+  }, [state.uuid, state.scenarioId, state.conversionStatus, state.isOpen])
 
   // body container
   if (state.scenarioId && state.botInfor && state.isOpen) {
