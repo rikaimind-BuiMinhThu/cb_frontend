@@ -97,6 +97,7 @@ const CHATBOT_SERVER = {
   GET_ADDRESS_FROM_ZIP_CODE_PATH: '/api/v1/get_address_from_zip_code?zip_code=:zip_code',
   CREATE_STATUS_CONVERSION_USER_RESPONSE: '/api/v1/scenario_users/scenario_user_responses_status',
   UPDATE_STATUS_CONVERSION_USER_RESPONSE: '/api/v1/scenario_users/scenario_user_responses_status',
+  SEND_SCENARIO_USER_RESPONSE: '/api/v1/scenario_users/scenario_user_responses',
 };
 
 const GET_CAPTCHA_PATH = `https://svg-captcha-nodejs.vercel.app/captcha?size=:size&color=:color&charPreset=:char_preset`;

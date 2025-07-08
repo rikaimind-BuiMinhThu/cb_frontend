@@ -208,6 +208,13 @@ const updateStatusConversion = (data) => {
   );
 }
 
+const sendScenarioUserResponse = (data) => {
+  return postToChatBotServer(
+    CHATBOT_SERVER.SEND_SCENARIO_USER_RESPONSE,
+    data
+  );
+}
+
 const sleep = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -355,5 +362,5 @@ export {
   getScenarioPreviewData, getChatBotSetting, sendEmailRequest,
   sleep, getCaptcha, appendParamsToUrl, checkMessageCondition,
   getAddressFromZipCode, secondToDatetime, toCamelCase, changeElementAttributeById, 
-  createStatusConversion, updateStatusConversion,
+  createStatusConversion, updateStatusConversion, sendScenarioUserResponse,
 };
