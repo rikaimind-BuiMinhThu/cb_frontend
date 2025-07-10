@@ -953,12 +953,13 @@ input#ss-message__content--user-checkbox--checkbox_img {
 }
 
 /* html code message preview */
-.html-code-message-preview {
+.sp-body-bot-side-messages .html-code-message-preview {
   overflow-wrap: break-word;
   height: auto;
   border: none;
   border-radius: 20px;
   padding: 10px;
+  white-space: normal !important;
 }
 
 .html-code-message-icon {
