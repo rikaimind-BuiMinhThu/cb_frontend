@@ -623,6 +623,8 @@ const PreviewFukushashiki = () => {
       case "text_input":
         if (field === 'text' && dataContentType[field].isSplitInput) {
           item.default_value = setTextInputValue(dataContentType, field);
+        } else if (!dataContentType[field].isSplitInput) {
+          item.default_value = dataContentType[field].value;
         }
         break;
       default:
