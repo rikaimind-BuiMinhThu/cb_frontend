@@ -3194,7 +3194,7 @@ const PreviewFukushashiki = () => {
       user_id: state.uuid,
       bot_type: "web"
     };
-    
+
     const isClickedCreateOrder = state.messagesList[clickedMsgIndex]?.message_content?.[0]?.type === "button_submit";
     const isClickedLastMessage = state.messagesList.length - 1 === clickedMsgIndex;
 
@@ -3429,8 +3429,16 @@ const PreviewFukushashiki = () => {
     }
 
     if (contentType === "zip_code_address") {
+      const transformKey = {
+        value_prefecture: (name) => state.prefecturesList.find((item) => item.name === name)?.id || name,
+      }
+
+      if (transformKey[field]) {
+        messageContentTypeData[field] = transformKey[field](value);
+      }
+
       Object.keys(value).forEach((key) => {
-        messageContentTypeData[key] = value[key];
+        messageContentTypeData[key] = transformKey[key] ? transformKey[key](value[key]) : value[key];
       });
     }
 

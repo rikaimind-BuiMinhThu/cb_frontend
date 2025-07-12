@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "assets/css/bot/preview-chat-bot.css";
 import "moment/locale/zh-cn";
-import { getTownsByCity, getCitiesByPrefecture } from "./Utils";
+import { getTownsByCity, getCitiesByPrefecture, changeElementAttributeById } from "./Utils";
 import { MDBIcon } from "mdbreact";
 import SelectCustom from "../ScenarioSetting/scenarioComon/SelectCustom";
 
@@ -107,8 +107,10 @@ const ZipCodePopUp = ({
     }
 
     if (state.selectedZipcode) {
-      document.getElementById("sp-withdrawal-container").style.display = "none";
-      document.getElementById("sp-popup-zip-code-address").style.display = "none";
+      changeElementAttributeById([
+        { id: "sp-withdrawal-container", style: { display: "none" } },
+        { id: "sp-popup-zip-code-address", style: { display: "none" } },
+      ]);
 
       let newErrors = { ...errors };
       newErrors[`message${messageIndex}_content${index}_zip_code_address`] = "";
