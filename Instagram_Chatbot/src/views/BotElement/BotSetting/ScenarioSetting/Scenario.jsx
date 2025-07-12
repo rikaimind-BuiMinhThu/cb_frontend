@@ -3091,122 +3091,112 @@ const Scenario = () => {
                       placeholder="Coupon"
                     />
                   </div>}
-                  <div>
-                    <input
-                      type="checkbox"
-                      className="ss-user-setting-checkbox-custom"
-                      onChange={(value) => setIsUseOnlyRegularOrder(!isUseOnlyRegularOrder)}
-                      checked={isUseOnlyRegularOrder}
-                    />
-                    <label>定期注文のみ</label>
-                  </div>
-                  <div style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "16px",
-                    justifyContent: "start",
-                    width: "100%",
-                  }}>
-                    <div className='ss-user-setting-checkbox-custom_css'> 
-                      <input
-                        type="checkbox"
-                        className="ss-user-setting-checkbox-custom"
-                        onChange={(value) => setIsUseCustomCss(!isUseCustomCss)}
-                        checked={isUseCustomCss}
-                      />
-                      <label style={{whiteSpace: "nowrap", wordBreak: "normal"}}>CSSカスタムを使用</label>
-                    </div>
-                    {isUseCustomCss && (
-                      <div>
-                        <button class="ss-user-setting-checkbox-custom-css_toggle" onClick={handleChangeOpenModalCustomCss(true)}>
-                          {`( CSSコンテンツ設定モダルを開く )`}
-                        </button>
+                  <div className="config_holder">
+                    <div>
+                      <div className="ss-user-setting-checkbox-custom_css">
+                        <input
+                          type="checkbox"
+                          className="ss-user-setting-checkbox-custom"
+                          onChange={(value) => setIsUseOnlyRegularOrder(!isUseOnlyRegularOrder)}
+                          checked={isUseOnlyRegularOrder}
+                        />
+                        <label>定期注文のみ</label>
                       </div>
-                    )}
-                  </div>
-                  <div style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "16px",
-                    justifyContent: "start",
-                    width: "100%",
-                  }}>
-                    <div className='ss-user-setting-checkbox-custom_css'>
-                      <input
-                        type="checkbox"
-                        className="ss-user-setting-checkbox-custom"
-                        onChange={(value) => setIsUseCustomJsCode(!isUseCustomJsCode)}
-                        checked={isUseCustomJsCode}
-                      />
-                      <label style={{whiteSpace: "nowrap", wordBreak: "normal"}}>JSカスタムを使用</label>
                     </div>
-                    {isUseCustomJsCode && (
-                      <div>
-                        <button class="ss-user-setting-checkbox-custom-css_toggle" onClick={handleChangeOpenModalCustomJsCode(true)}>
-                          {`( JSコンテンツ設定モダルを開く )`}
-                        </button>
+                    <div>
+                      <div className="ss-user-setting-checkbox-custom_css"> 
+                        <input
+                          type="checkbox"
+                          className="ss-user-setting-checkbox-custom"
+                          onChange={(value) => setIsUseCustomCss(!isUseCustomCss)}
+                          checked={isUseCustomCss}
+                        />
+                        <label style={{whiteSpace: "nowrap", wordBreak: "normal"}}>CSSカスタムを使用</label>
                       </div>
-                    )}
-                  </div>
-                  <div className="timer_config-checkbox">
-                    <div className='ss-user-setting-checkbox-custom_css'>
-                      <input
-                        type="checkbox"
-                        className="ss-user-setting-checkbox-custom"
-                        onChange={handleChangeTimerConfig({ keyPath: ["enable"], instanceValue: !timerConfig.enable })}
-                        checked={timerConfig.enable}
-                      />
-                      <label className="timer_config-label">タイマー</label>
+                      {isUseCustomCss && (
+                        <div>
+                          <button class="ss-user-setting-checkbox-custom-css_toggle" onClick={handleChangeOpenModalCustomCss(true)}>
+                            {`( CSSコンテンツ設定モダルを開く )`}
+                          </button>
+                        </div>
+                      )}
                     </div>
-                    {timerConfig.enable && (
-                      <div>
-                        <button className="ss-user-setting-checkbox-custom-css_toggle" onClick={handleChangeTimerConfig({ keyPath: ["isOpen"], instanceValue: true })}>
-                          {`( タイマーを設定する )`}
-                        </button>
+                    <div>
+                      <div className='ss-user-setting-checkbox-custom_css'>
+                        <input
+                          type="checkbox"
+                          className="ss-user-setting-checkbox-custom"
+                          onChange={(value) => setIsUseCustomJsCode(!isUseCustomJsCode)}
+                          checked={isUseCustomJsCode}
+                        />
+                        <label style={{whiteSpace: "nowrap", wordBreak: "normal"}}>JSカスタムを使用</label>
                       </div>
-                    )}
-                  </div>
-                  <div style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "16px",
-                    justifyContent: "start",
-                    width: "100%",
-                  }}>
-                    <div className='ss-user-setting-checkbox-custom_css'>
-                      <input
-                        type="checkbox"
-                        className="ss-user-setting-checkbox-custom"
-                        onChange={() => setIsUseErrMsgByJs(!isUseErrMsgByJs)}
-                        checked={isUseErrMsgByJs}
-                      />
-                      <label style={{whiteSpace: "nowrap", wordBreak: "normal"}}>エラーメッセンジ取得をJSコード使用</label>
+                      {isUseCustomJsCode && (
+                        <div>
+                          <button class="ss-user-setting-checkbox-custom-css_toggle" onClick={handleChangeOpenModalCustomJsCode(true)}>
+                            {`( JSコンテンツ設定モダルを開く )`}
+                          </button>
+                        </div>
+                      )}
                     </div>
-                    {isUseErrMsgByJs && (
-                      <div>
-                        <button class="ss-user-setting-checkbox-custom-css_toggle" onClick={() => setIsOpenErrMsgByJsSettingModal(true)}>
-                          {`( JSコード設定モダルを開く )`}
-                        </button>
+                    <div className="timer_config-checkbox">
+                      <div className='ss-user-setting-checkbox-custom_css'>
+                        <input
+                          type="checkbox"
+                          className="ss-user-setting-checkbox-custom"
+                          onChange={handleChangeTimerConfig({ keyPath: ["enable"], instanceValue: !timerConfig.enable })}
+                          checked={timerConfig.enable}
+                        />
+                        <label className="timer_config-label">タイマー</label>
                       </div>
-                    )}
-                  </div>
-                  <div>
-                    <input
-                      type="checkbox"
-                      className="ss-user-setting-checkbox-custom"
-                      onChange={(value) => setIsUseFukushashiki(!isUseFukushashiki)}
-                      checked={isUseFukushashiki}
-                    />
-                    <label>複写式利用フラグ</label>
-                  </div>
-                  <div>
-                    <input
-                      type="checkbox"
-                      className="ss-user-setting-checkbox-custom"
-                      onChange={(value) => setIsUsedCartConfirmPage(!isUsedCartConfirmPage)}
-                      checked={isUsedCartConfirmPage}
-                    />
-                    <label>カートシステムの注文確認ページを利用</label>
+                      {timerConfig.enable && (
+                        <div>
+                          <button className="ss-user-setting-checkbox-custom-css_toggle" onClick={handleChangeTimerConfig({ keyPath: ["isOpen"], instanceValue: true })}>
+                            {`( タイマーを設定する )`}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <div className='ss-user-setting-checkbox-custom_css'>
+                        <input
+                          type="checkbox"
+                          className="ss-user-setting-checkbox-custom"
+                          onChange={() => setIsUseErrMsgByJs(!isUseErrMsgByJs)}
+                          checked={isUseErrMsgByJs}
+                        />
+                        <label style={{whiteSpace: "nowrap", wordBreak: "normal"}}>エラーメッセンジ取得をJSコード使用</label>
+                      </div>
+                      {isUseErrMsgByJs && (
+                        <div>
+                          <button class="ss-user-setting-checkbox-custom-css_toggle" onClick={() => setIsOpenErrMsgByJsSettingModal(true)}>
+                            {`( JSコード設定モダルを開く )`}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <div className="ss-user-setting-checkbox-custom_css">
+                        <input
+                          type="checkbox"
+                          className="ss-user-setting-checkbox-custom"
+                          onChange={(value) => setIsUseFukushashiki(!isUseFukushashiki)}
+                          checked={isUseFukushashiki}
+                        />
+                        <label>複写式利用フラグ</label>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="ss-user-setting-checkbox-custom_css">
+                        <input
+                          type="checkbox"
+                          className="ss-user-setting-checkbox-custom"
+                          onChange={(value) => setIsUsedCartConfirmPage(!isUsedCartConfirmPage)}
+                          checked={isUsedCartConfirmPage}
+                        />
+                        <label>カートシステムの注文確認ページを利用</label>
+                      </div>
+                    </div>
                   </div>
                   {/* Overview scenario */}
                   <div style={{ height:`calc(80% - ${errorScenarioName ? '30':'10'}px)`, backgroundColor: '#f6fbff' }}>
