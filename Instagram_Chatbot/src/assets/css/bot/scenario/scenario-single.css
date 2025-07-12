@@ -2121,3 +2121,25 @@ input#ss-message__content--user-checkbox--checkbox_img {
   font-size: 14px;
   flex-grow: 1;
 }
+
+.config_holder {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 5px;
+  row-gap: 2px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 10px 0;
+}
+
+.config_holder > div {
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 5px;
+  row-gap: 0px;
+  justify-content: flex-start;
+}
