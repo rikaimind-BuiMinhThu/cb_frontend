@@ -2039,10 +2039,17 @@ const PreviewFukushashiki = () => {
               }
               if (
                 !contentType.compact_municipality_and_address_and_building_name &&
-                contentType.address !== undefined &&
-                stringNullOrEmpty(contentType.value_address) && contentType.hasOwnProperty('address')
+                contentType.address !== undefined && contentType.hasOwnProperty('address')
               ) {
-                isValidZipCode = false;
+                if (
+                  contentType.compact_municipality_and_address &&
+                  (stringNullOrEmpty(contentType.value_building_name) || stringNullOrEmpty(contentType.value_municipality))
+                ) {
+                  isValidZipCode = false;
+                }
+                else if (!contentType.compact_municipality_and_address && stringNullOrEmpty(contentType.address)) {
+                  isValidZipCode = false;
+                }
               }
             }
           } else if (contentType.isCheckRequire === "all_items_require") {
