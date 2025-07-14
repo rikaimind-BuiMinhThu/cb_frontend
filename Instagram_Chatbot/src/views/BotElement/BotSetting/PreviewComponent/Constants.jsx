@@ -157,6 +157,7 @@ const MESSAGE_CONTENT_TYPES = {
 
 const REGEXP = {
   NUMBER: /^[0-9]+$/,
+  PASSWORD: "^[A-Za-z0-9]+$",
 }
 
 const CUSTOM_JS_CODE_POSITION = {

@@ -2143,3 +2143,29 @@ input#ss-message__content--user-checkbox--checkbox_img {
   row-gap: 0px;
   justify-content: flex-start;
 }
+
+.password_configuration_label {
+  width: 100%;
+  text-align: left;
+  font-weight: bold;
+  margin: 0;
+  padding: 0 20px;
+}
+
+.password_configuration_main {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.password_input {
+  flex-grow: 1;
+}
+
+.password_input > .note {
+  margin: 0;
+  font-size: .7rem;
+  color: grey;
+  font-style: italic;
+}

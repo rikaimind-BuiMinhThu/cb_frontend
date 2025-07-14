@@ -33,7 +33,8 @@ import {
   BOT_MESSAGE_TYPES,
   TIMER_MAP_VARIABLES_FIELD,
   TIMER_TYPES,
-  CONVERSATION_RESPONSE_STATUS
+  CONVERSATION_RESPONSE_STATUS,
+  REGEXP
 } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
@@ -1862,7 +1863,7 @@ const PreviewFukushashiki = () => {
         }
       }
       let REGEX_EMAIL = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-      let REGEX_PASSWORD = /^[A-Za-z0-9 ]+$/;
+      let REGEX_PASSWORD = new RegExp( contentType[contentType.type].password_reg?.trim() || REGEXP.PASSWORD);
 
       if (contentType.type === "text" || contentType.type === "password") {
         if (contentType[contentType.type].isSplitInput) {
@@ -1910,7 +1911,7 @@ const PreviewFukushashiki = () => {
         ) {
           errorsMess[
             `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-          ] = `英数字('A-Z','a-z','0-9')が使用できます。`;
+          ] = contentType[contentType.type].password_reg_error || `英数字('A-Z','a-z','0-9')が使用できます。`;
           isValid = false;
         }
       } else if (
@@ -1954,7 +1955,7 @@ const PreviewFukushashiki = () => {
         ) {
           errorsMess[
             `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-          ] = `英数字('A-Z','a-z','0-9')が使用できます。`;
+          ] = contentType[contentType.type].password_reg_error || `英数字('A-Z','a-z','0-9')が使用できます。`;
           isValid = false;
         } else if (
           !stringNullOrEmpty(contentType[contentType.type].valueConfirm) &&
@@ -1962,7 +1963,7 @@ const PreviewFukushashiki = () => {
         ) {
           errorsMess[
             `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-          ] = `英数字('A-Z','a-z','0-9')が使用できます。`;
+          ] = contentType[contentType.type].password_reg_error || `英数字('A-Z','a-z','0-9')が使用できます。`;
           isValid = false;
         } else if (
           !stringNullOrEmpty(contentType[contentType.type].value) &&

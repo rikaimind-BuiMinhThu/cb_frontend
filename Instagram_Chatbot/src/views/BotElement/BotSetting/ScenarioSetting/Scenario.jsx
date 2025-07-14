@@ -7053,6 +7053,29 @@ const Scenario = () => {
                                                               </div>
                                                             </div>
                                                           )}
+                                                          <div className="ss-user-setting__item-bottom">
+                                                            <p className="password_configuration_label">パスワード検証の構成</p>
+                                                            <div className="ss-user-setting__item-select-bottom-wrapper ss-input-text-comment password_configuration_main">
+                                                              <div className="password_input">
+                                                                <InputCustom
+                                                                  style={{ width: '100%' }}
+                                                                  placeholder="Password expression"
+                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'password_reg')}
+                                                                  value={textInput[textInput.type]?.password_reg || ""}
+                                                                />
+                                                                <p className="note">{`未入力の場合: ^[A-Za-z0-9]+$`}</p>
+                                                              </div>
+                                                              <div className="password_input">
+                                                                <InputCustom
+                                                                  style={{ width: '100%' }}
+                                                                  placeholder="Password error "
+                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'password_reg_error')}
+                                                                  value={textInput[textInput.type]?.password_reg_error || ""}
+                                                                />
+                                                                <p className="note">{`未入力の場合: 英数字（'A-Z'、'a-z'、'0-9'）が使用できます。`}</p>
+                                                              </div>
+                                                            </div>
+                                                          </div>
                                                           {isUseFukushashiki && (
                                                             <div className='ss-user-setting__item-bottom' style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                               <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
