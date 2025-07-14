@@ -1863,7 +1863,7 @@ const PreviewFukushashiki = () => {
         }
       }
       let REGEX_EMAIL = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-      let REGEX_PASSWORD = new RegExp( contentType[contentType.type].password_reg?.trim() || REGEXP.PASSWORD);
+      let REGEX_PASSWORD = new RegExp( contentType[contentType.type]?.password_reg?.trim() || REGEXP.PASSWORD);
 
       if (contentType.type === "text" || contentType.type === "password") {
         if (contentType[contentType.type].isSplitInput) {
