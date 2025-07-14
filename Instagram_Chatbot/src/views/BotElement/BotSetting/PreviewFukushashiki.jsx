@@ -958,7 +958,7 @@ const PreviewFukushashiki = () => {
         }
         
         dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: theState });
-        await sleep(2000);
+        await sleep(1000);
       }
       resolve();
     }).then(() => {
