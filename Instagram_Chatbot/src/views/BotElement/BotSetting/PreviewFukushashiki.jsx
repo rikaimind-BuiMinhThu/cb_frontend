@@ -962,7 +962,7 @@ const PreviewFukushashiki = () => {
       }
       resolve();
     }).then(() => {
-      if(options.setNewState) {
+      if (options.setNewState) {
         theState.renderMessagesList = theState.messagesList.slice(0, theState.currentMsgIndex + 1);
         theState.passedUserMsgCount = theState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
         dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: theState });
