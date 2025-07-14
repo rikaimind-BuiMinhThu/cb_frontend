@@ -237,6 +237,7 @@ const PreviewFukushashiki = () => {
   const [timerChanges, setTimerChanges] = useState({ timeLeft: -1, config: null });
   const containerRef = useRef(null);
   const isFromScenario = false;
+  const hasSentCustomJs = useRef(false);
 
   const setShowPopupCloseBot = (value) => {
     dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { showPopupCloseBot: value } });
@@ -390,7 +391,7 @@ const PreviewFukushashiki = () => {
     return () => {
       window.removeEventListener("message", eventHandler);
     };
-  }, [])
+  }, [state.isOpen]) // Thêm state.isOpen vào dependencies
 
   // Add style to body tag if it's mobile
   useEffect(() => {
@@ -474,7 +475,7 @@ const PreviewFukushashiki = () => {
             }
           });
         }
-      }
+              }
       return dispatch({
         type: PREVIEW_ACTIONS.UPDATE_OPEN_PREVIEW,
         payload: {
@@ -501,7 +502,7 @@ const PreviewFukushashiki = () => {
       state.currentMsgIndex = state.currentUserMsgIndex;
     }
 
-    return renderMessagesWithDelay(state, 0, state.currentMsgIndex);
+    return renderMessagesWithDelay(state, 0, state.currentMsgIndex, { setNewState: false });
   }
 
   const setPulldownValue = (dataContentType, field, value) => {
@@ -946,7 +947,7 @@ const PreviewFukushashiki = () => {
     });
   }
 
-  const renderMessagesWithDelay = (theState, startMsgIndex, endMsgIndex) => {
+  const renderMessagesWithDelay = (theState, startMsgIndex, endMsgIndex, options = { setNewState: true }) => {
     return new Promise(async (resolve) => {
       for (let i = startMsgIndex; i <= endMsgIndex; i++) {
         theState.renderMessagesList = theState.messagesList.slice(0, i + 1);
@@ -957,13 +958,15 @@ const PreviewFukushashiki = () => {
         }
         
         dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: theState });
-        await sleep(1000);
+        await sleep(2000);
       }
       resolve();
     }).then(() => {
-      theState.renderMessagesList = theState.messagesList.slice(0, theState.currentMsgIndex + 1);
-      theState.passedUserMsgCount = theState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
-      dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: theState });
+      if(options.setNewState) {
+        theState.renderMessagesList = theState.messagesList.slice(0, theState.currentMsgIndex + 1);
+        theState.passedUserMsgCount = theState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
+        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: theState });
+      }
     });
   }
 
@@ -3079,12 +3082,16 @@ const PreviewFukushashiki = () => {
   }
 
   const sendCustomJsToParent = ({ head, top_body, bottom_body } = {}) => {
+    if (hasSentCustomJs.current) return;
+    
     const items = [ head, top_body, bottom_body ].filter(item => !!item?.jsCode?.trim() && !!item?.position?.trim() )
-      postMessageToParent({
-        action: CHATBOT_ACTIONS.INJECT_CUSTOM_JS,
-        actionData: items,
-        isOpen: true
-      });
+    postMessageToParent({
+      action: CHATBOT_ACTIONS.INJECT_CUSTOM_JS,
+      actionData: items,
+      isOpen: true
+    });
+    
+    hasSentCustomJs.current = true;
   }
 
   const postMessageToParent = (options) => {
