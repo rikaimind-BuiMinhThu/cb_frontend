@@ -465,6 +465,7 @@ function Preview() {
   }
 
   function checkMessageCondition (message,buildParam) {
+    debugger;
     var checked = false;
    if(message.conditions.length > 0){
     for (let j = 0; j < message.conditions.length; j++) {
