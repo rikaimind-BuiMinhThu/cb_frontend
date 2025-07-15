@@ -277,7 +277,7 @@ const ZipCodeAddress = ({
     )
   }
 
-  const findNamePrefecture = (prefectureId) => {
+  const findPrefectureNameById = (prefectureId) => {
     if (!prefectureId) return "";
     
     return prefecturesList.find((item) => item.id === prefectureId)?.name || prefectureId;
@@ -332,7 +332,7 @@ const ZipCodeAddress = ({
                   "value_prefecture"
                 )
               }
-              value={findNamePrefecture(zipCodeAddress.value_prefecture)}
+              value={findPrefectureNameById(zipCodeAddress.value_prefecture)}
               clearable={true}
             />
           )}
