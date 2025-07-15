@@ -2053,11 +2053,7 @@ const PreviewFukushashiki = () => {
                 ) {
                   isValidZipCode = false;
                 }
-                else if (
-                  contentType.compact_municipality_and_address !== undefined &&
-                  !contentType.compact_municipality_and_address && 
-                  stringNullOrEmpty(contentType.address)
-                ) {
+                else if (!contentType.compact_municipality_and_address && stringNullOrEmpty(contentType.address)) {
                   isValidZipCode = false;
                 }
               }
