@@ -2,11 +2,18 @@ const CHATBOT_ACTIONS = {
   CLICK_BUTTON: 'clickButton',
   EXCUTE_JS: 'excuteJS',
   FUKUSHASHIKI: 'fukushashiki',
+  INJECT_CUSTOM_JS: 'injectCustomJS',
   GET_ERROR_MESSAGE: 'getErrorMessage',
   CRAWL_DATA: 'crawlData',
   OPEN_PREVIEW: 'openPreview',
   GET_PREVIEW_ORDER_CONTENT: 'getPreviewOrderContent',
   SET_CHATBOT_CONVERSION_PARAMS_TO_LOCAL_STORAGE: 'setChatbotConversionParamsToLocalStorage',
+};
+
+const CUSTOM_JS_CODE_POSITION = {
+  HEAD: 'head',
+  TOP_BODY: 'top_body',
+  BOTTOM_BODY: 'bottom_body',
 };
 
 const CONVERSION_PARAMS_STORAGE_KEYS = {
@@ -140,7 +147,9 @@ const movePaymentMethodToTop = (data) => {
   const index = data.findIndex(item => item.type === "payment_method_id");
   if (index !== -1) {
       const [paymentMethod] = data.splice(index, 1);
-      data.unshift(paymentMethod);
+
+      // await component in LP to set value after payment method setted
+      data.unshift(paymentMethod, { additionalType: "await" });
   }
   return data;
 }
@@ -286,6 +295,9 @@ const displayPopup = async () => {
           break;
         case CHATBOT_ACTIONS.SET_CHATBOT_CONVERSION_PARAMS_TO_LOCAL_STORAGE:
           setChatbotConversionParamsToLocalStorage(e.data.actionData);
+          break;
+        case CHATBOT_ACTIONS.INJECT_CUSTOM_JS:
+          injectCustomJS(e.data.actionData);
           break;
       };
 
@@ -435,82 +447,83 @@ const fillDataFromMessage = async (data) => {
       continue;
     }
 
-    let element = getElementByAddress(item.bindingMode, item.bindingAddress);
-    if (!element) continue;
+    waitForElement(item.bindingMode, item.bindingAddress, {type: WAIT_OPTION_TYPES.WAIT_FOR_LOADING}, () => {
+      let element = getElementByAddress(item.bindingMode, item.bindingAddress);
+      if (!element) return;
+      if (isDisabledElement(element)) return;
 
-    if (isDisabledElement(element)) continue;
-
-    switch (item.type) {
-      case "zip_code_address":
-      case "card_number":
-      case "card_payment_radio_button":
-      case "credit_card_payment":
-      case "text_input":
-      case "textarea":
-      case "slider": {
-        waitForElement(
-          item.bindingMode, item.bindingAddress,
-          {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
-        break;
-      }
-
-      case "payment_method_id": {
-        setValuePaymentMethodToElement(element, item.bindingValue);
-        break;
-      }
-
-      case 'dropdown_prefecture': {
-        if (element.tagName === ELEMENT_TAGS.SELECT) {
-          const acceptableValues = [item.bindingValue.toString(), removeLeadingZero(item.bindingValue).toString()];
-          const selectedOption = Array.from(element.options).find(option => acceptableValues.includes(option.value.toString()));
-          if (!selectedOption) item.bindingValue = '';
-        };
-        waitForElement(
-          item.bindingMode, item.bindingAddress,
-          {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
-        break;
-      }
-
-      case "agree_term":
-      case 'checkbox': {
-        setCheckToCheckboxElement(element, item.bindingValue);
-        break;
-      }
-
-      case 'pull_down': {
-        if (item.pulldownType === 'lp_integration_option') {
-          const isNullOption = item.bindingValue === 'NULL_OPTION';
-          if (isNullOption) item.bindingValue = '';
-
-          const hasOption = Array.from(element.options).some(option => option.value === item.bindingValue);
-          if (!hasOption) item.bindingValue = '';
-        }
-        
-        waitForElement(
-          item.bindingMode, item.bindingAddress,
-          {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
-        break;
-      }
-
-      case "radio_button": {
-        if (element.tagName === ELEMENT_TAGS.SELECT) {
-          setValueToElement(element, item.bindingValue);
+      switch (item.type) {
+        case "zip_code_address":
+        case "card_number":
+        case "card_payment_radio_button":
+        case "credit_card_payment":
+        case "text_input":
+        case "textarea":
+        case "slider": {
+          waitForElement(
+            item.bindingMode, item.bindingAddress,
+            {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
           break;
         }
 
-        setRadioValue(element, item.bindingValue);
-        break;
-      }
+        case "payment_method_id": {
+          setValuePaymentMethodToElement(element, item.bindingValue);
+          break;
+        }
 
-      case "password": {
-        element.setRangeText(item.bindingValue, 0, element.value.length);
-        element.dispatchEvent(new Event('input', { bubbles: true }));
-        element.dispatchEvent(new Event('change', { bubbles: true }));
-        break;
+        case 'dropdown_prefecture': {
+          if (element.tagName === ELEMENT_TAGS.SELECT) {
+            const acceptableValues = [item.bindingValue.toString(), removeLeadingZero(item.bindingValue).toString()];
+            const selectedOption = Array.from(element.options).find(option => acceptableValues.includes(option.value.toString()));
+            if (!selectedOption) item.bindingValue = '';
+          };
+          waitForElement(
+            item.bindingMode, item.bindingAddress,
+            {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
+          break;
+        }
+
+        case "agree_term":
+        case 'checkbox': {
+          setCheckToCheckboxElement(element, item.bindingValue);
+          break;
+        }
+
+        case 'pull_down': {
+          if (item.pulldownType === 'lp_integration_option') {
+            const isNullOption = item.bindingValue === 'NULL_OPTION';
+            if (isNullOption) item.bindingValue = '';
+  
+            const hasOption = Array.from(element.options).some(option => option.value === item.bindingValue);
+            if (!hasOption) item.bindingValue = '';
+          }
+
+          waitForElement(
+            item.bindingMode, item.bindingAddress,
+            {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
+          break;
+        }
+
+        case "radio_button": {
+          if (element.tagName === ELEMENT_TAGS.SELECT) {
+            setValueToElement(element, item.bindingValue);
+            break;
+          }
+  
+          setRadioValue(element, item.bindingValue);
+          break;
+        }
+
+        case "password": {
+          element.setRangeText(item.bindingValue, 0, element.value.length);
+          element.dispatchEvent(new Event('input', { bubbles: true }));
+          element.dispatchEvent(new Event('change', { bubbles: true }));
+          break;
+        }
+        default:
+          break;
       }
-      default:
-        break;
-    }
+    });
   }
 }
 
@@ -628,6 +641,29 @@ const mobileCheck = () => {
       check = true;
   })(navigator.userAgent || navigator.vendor || window.opera);
   return check;
+}
+
+const injectCustomJS = (injectCustomJsCodes) => {
+  for(const { jsCode, position } of injectCustomJsCodes)
+  {
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.innerHTML = jsCode;
+
+    switch (position) {
+      case CUSTOM_JS_CODE_POSITION.HEAD:
+        document.head.appendChild(script);
+        break;
+      case CUSTOM_JS_CODE_POSITION.TOP_BODY:
+        document.body.insertBefore(script, document.body.firstChild);
+        break;
+      case CUSTOM_JS_CODE_POSITION.BOTTOM_BODY:
+        document.body.appendChild(script);
+        break;
+      default:
+        console.error("Invalid position: " + position);
+    }
+  }
 }
 
 displayPopup();

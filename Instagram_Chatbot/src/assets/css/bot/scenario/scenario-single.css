@@ -945,6 +945,35 @@ input#ss-message__content--user-checkbox--checkbox_img {
   align-items: center;
 }
 
+/* validation error */
+.validation-error {
+  color: #FF7E00;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+/* html code message preview */
+.sp-body-bot-side-messages .html-code-message-preview {
+  overflow-wrap: break-word;
+  height: auto;
+  border: none;
+  border-radius: 20px;
+  padding: 10px;
+  white-space: normal !important;
+}
+
+.html-code-message-icon {
+  content: " ";
+  display: flex;
+  position: absolute;
+  bottom: 1px;
+  left: -3px;
+  width: 12px;
+  height: 18px;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
 #ss-bot-statement-type-delay__checkbox {
   cursor: pointer;
 }
@@ -1982,4 +2011,161 @@ input#ss-message__content--user-checkbox--checkbox_img {
 
 .sp-container input {
   background-color: #eff4fd;
+}
+
+.timer_config-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.timer_config-label {
+  white-space: nowrap;
+  word-break: normal;
+}
+
+.modal_timer_config-content {
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.modal_timer_config-input_holder {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.modal_timer_config-input-label{
+  width: 200px;
+  text-align: left;
+}
+
+.modal_timer_config-finish_message {
+  display: block;
+  width: 100%;
+}
+
+.modal_timer_config-finish_message > .finish_message_label {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+}
+
+.modal_timer_config-finish_message > .finish_message_label > label {
+  white-space: nowrap;
+  word-break: normal;
+  margin: 0;
+}
+
+.modal_timer_config-variable_holder {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.modal_timer_config-holder {
+  width: 750px;
+}
+
+.modal_confirm-button {
+  backgroundColor: '#024BB9'
+}
+
+.margin-b-none {
+  margin-bottom: 0px;
+} 
+
+.full-width {
+  width: 100% !important;
+}
+
+.modal_timer_config-html_holder {
+  width: 98%;
+  height: 120px;
+  padding: 10px;
+  font-size: 14px;
+  flex-grow: 1;
+}
+
+.counting_down_input_holder {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: 100%;
+  column-gap: 20px;
+}
+
+.counting_down_input_wrapper {
+  display: flex;
+  gap: 5px;
+}
+
+.counting_down_input_label {
+  aspect-ratio: 1/1;
+  height: 100%;
+  border: 1px solid grey;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal_timer_config-html_holder {
+  width: 100%;
+  height: 120px;
+  padding: 10px;
+  font-size: 14px;
+  flex-grow: 1;
+}
+
+.config_holder {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 5px;
+  row-gap: 2px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 10px 0;
+}
+
+.config_holder > div {
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 5px;
+  row-gap: 0px;
+  justify-content: flex-start;
+}
+
+.password_configuration_label {
+  width: 100%;
+  text-align: left;
+  font-weight: bold;
+  margin: 0;
+  padding: 0 20px;
+}
+
+.password_configuration_main {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.password_input {
+  flex-grow: 1;
+}
+
+.password_input > .note {
+  margin: 0;
+  font-size: .7rem;
+  color: grey;
+  font-style: italic;
 }
