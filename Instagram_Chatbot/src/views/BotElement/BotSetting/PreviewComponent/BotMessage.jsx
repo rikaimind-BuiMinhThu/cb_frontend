@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
-import "assets/css/bot/preview-chat-bot.css";
-import messageTypingGif from "assets/img/icons8-dots-loading.gif";
-import { EC_CHATBOT_URL } from "variables/constants";
+import "../../../../assets/css/bot/preview-chat-bot.css";
+import messageTypingGif from "../../../../assets/img/icons8-dots-loading.gif";
+import { EC_CHATBOT_URL } from "../../../../variables/constants";
 import "moment/locale/zh-cn";
-import { BOT_MESSAGE_TYPES } from "./Constants";
-import HtmlCodeMessagePreview from "components/BotMessages/HtmlCodeMessagePreview";
 
 const BotMessage = ({
   content,
@@ -102,8 +100,7 @@ const BotMessage = ({
     <div key={index} className="sp-body-bot-side slideRight">
       {(content.type === "text_input" ||
         content.type === "file" ||
-        content.type === "delay" ||
-        content.type === BOT_MESSAGE_TYPES.HTML_CODE) && (
+        content.type === "delay") && (
           <div className="sp-body-bot-side-avatar sp-avatar">
             <img src={EC_CHATBOT_URL + "/" + botInfor?.icon?.url} />
           </div>
@@ -221,14 +218,6 @@ const BotMessage = ({
                   height: "40px",
                   borderRadius: "10px",
                 }}
-              />
-            )}
-            {/* bot: type == 'html_code' */}
-            {content.type === BOT_MESSAGE_TYPES.HTML_CODE && (
-              <HtmlCodeMessagePreview
-                content={content}
-                index={index}
-                botInfor={botInfor}
               />
             )}
           </React.Fragment>

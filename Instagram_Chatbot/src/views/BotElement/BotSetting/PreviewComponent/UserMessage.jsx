@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import "assets/css/bot/preview-chat-bot.css";
-import api from "api/api-management";
+import "../../../../assets/css/bot/preview-chat-bot.css";
+import api from "../../../../api/api-management";
+import Cookies from "js-cookie";
 import { MDBIcon } from "mdbreact";
 import SelectCustom from "../ScenarioSetting/scenarioComon/SelectCustom";
 import LPIntegrationOptionPullDown from "../ScenarioSetting/scenarioComon/LPIntegrationOptionPullDown";
@@ -8,7 +9,7 @@ import CheckboxCustom from "../ScenarioSetting/scenarioComon/CheckboxCustom";
 import InputCustom from "../ScenarioSetting/scenarioComon/InputCustom";
 import { Button } from "reactstrap";
 import ModalNoti from "../../../Popup/ModalNoti";
-import { CHATBOT_ACTIONS, CRAWL_ELEMENT_TYPES, MESSAGE_CONTENT_TYPES, SCAN_REGEX } from "../PreviewComponent/Constants";
+import { CHATBOT_ACTIONS, CRAWL_ELEMENT_TYPES, MESSAGE_CONTENT_TYPES, REGEXP } from "../PreviewComponent/Constants";
 import {
   Checkbox,
   Radio,
@@ -19,16 +20,15 @@ import {
   Col
 } from "antd";
 import moment from "moment";
-import cvcIcon from "assets/img/cvc-icon.png";
+import cvcIcon from "../../../../assets/img/cvc-icon.png";
 import DatePickerCustom from "../ScenarioSetting/scenarioComon/DatePickerCustom";
 import InputNum from "../ScenarioSetting/scenarioComon/InputNum";
 import { tokenExpired } from "api/tokenExpired";
-import { SHORTEN_URL } from "variables/constants";
+import { SHORTEN_URL } from "../../../../variables/constants";
 import locale from "antd/es/date-picker/locale/ja_JP";
 import "moment/locale/zh-cn";
 import { dataHourFixed, dataMinutes, dataYearFixed, dataMonth, dataDay, dataPaymentMethod, installmentOptions, NUMBER_REGEX } from "./Constants";
 import { stringNullOrEmpty } from "./Utils";
-import { SubmitButton, ZipCodeAddress } from "./UserMessageComponent";
 
 const UserMessage = ({
   messageContentProps,
@@ -40,15 +40,15 @@ const UserMessage = ({
   captcha,
   onClickNext,
   displayButtonNext,
-  toggleZipCodePopup,
+  isPopUpZipCode,
+  isPopUpZipCodeShippingAddress,
   onChangeErrors,
   prefecturesList,
   variables,
   lpOptionData = {},
   submitErrorMessage = '',
   postMessageToParent,
-  botId,
-  isProcessing
+  botId
 }) => {
   const [dataHour, setDataHour] = useState(dataHourFixed);
   const [dataYear, setDataYear] = useState(dataYearFixed);
@@ -61,6 +61,10 @@ const UserMessage = ({
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [messageNoti, setMessageNoti] = useState("");
 
+  const getPrefectureIdCodeFromName = (name) => {
+    return prefecturesList.find((prefecture) => prefecture.name === name)?.id;
+  }
+  
   const cardExpiredYearOptions =  Array.from({ length: 10 }, (_, i) => {
     return {
       key: moment().add(i, "years").format("YY"),
@@ -607,6 +611,43 @@ const UserMessage = ({
     );
   }
 
+  const renderAddressField = (address, indexContent, content) => {
+    if (address.compact_municipality_and_address || address.compact_municipality_and_address_and_building_name) return;
+    if (address.address === undefined) return;
+    return (
+      <div className="ss-user-setting__item-bottom">
+        <div
+          style={{
+            fontWeight: "400",
+            fontSize: "12px",
+            width: "100%",
+            marginBottom: "3px",
+          }}
+        >
+          {
+            address.address_label && address.address_label.trim() !== ""
+              ? address.address_label
+              : '番地'
+          }
+        </div>
+        <InputCustom
+          placeholder={address.address}
+          id={`ss-user-input-address${indexContent}`}
+          disabled={disabled}
+          style={{ width: "100%" }}
+          onChange={(value) =>
+            onChangeValue(
+              indexContent,
+              content.type,
+              value,
+              "value_address"
+            )
+          }
+          value={address.value_address}
+        />
+      </div>
+    )
+  }
   
   return (
     <div className="ss-user-message__content-wrapper">
@@ -631,6 +672,7 @@ const UserMessage = ({
         let slider = content.slider;
         let cardPaymentRadioButton = content.card_payment_radio_button;
         let shippingAddress = content.shipping_address;
+        let buttonSubmit = content.button_submit;
         let labelNoTransition = content.label_no_transition;
 
         if (content.type == 'textarea' && content.textarea && content.textarea.invalid_input && content.textarea.invalid_input.content) {
@@ -744,7 +786,6 @@ const UserMessage = ({
                     {textInput.phone_number.withHyphen === false ? (
                       <InputCustom
                         disabled={disabled}
-                        inputMode="numeric"
                         // className="ss-message__content--user-text-input ss-input-value"
                         style={{ marginBottom: "0px" }}
                         placeholder={textInput[textInput.type]?.number}
@@ -1184,7 +1225,7 @@ const UserMessage = ({
                           <span
                             style={!disabled ? { cursor: "pointer" } : {}}
                             onClick={() => {
-                              if (disabled !== true) toggleZipCodePopup(true, indexContent);
+                              if (disabled !== true) isPopUpZipCode(true, indexContent);
                             }}
                           >
                             〒検索はこちら
@@ -1316,7 +1357,6 @@ const UserMessage = ({
                                   }
                                 }}
                                 value={shippingAddress.value_post_code}
-                                clearable={true}
                               />
                             ) : (
                               <div
@@ -1328,14 +1368,12 @@ const UserMessage = ({
                               >
                                 <InputCustom
                                   type="number"
-                                  inputMode="numeric"
                                   placeholder={shippingAddress.post_code_left}
                                   disabled={disabled}
                                   style={{ width: "49%" }}
                                   onKeyPress={(e) => {
                                     if (e.target.value.length >= 3) e.preventDefault();
                                   }}
-                                  clearable={true}
                                   onChange={async (value) => {
                                     if (value && !NUMBER_REGEX.test(value)) return;
                                     onChangeValue(
@@ -1344,6 +1382,8 @@ const UserMessage = ({
                                       value,
                                       "value_post_code_left"
                                     );
+                                    console.log("shippingAddress.value_post_code_right", shippingAddress.value_post_code_right);
+                                    console.log("shippingAddress.value_post_code_left", shippingAddress.value_post_code_left);
                                     if ((value + "").length === 3) {
                                       moveToNext("ss-user-post-code-right-input2");
                                     }
@@ -1434,7 +1474,6 @@ const UserMessage = ({
                                 />
                                 <InputCustom
                                   type="number"
-                                  inputMode="numeric"
                                   placeholder={shippingAddress.post_code_right}
                                   disabled={disabled}
                                   id="ss-user-post-code-right-input2"
@@ -1442,7 +1481,6 @@ const UserMessage = ({
                                   onKeyPress={(e) => {
                                     if (e.target.value.length >= 4) e.preventDefault();
                                   }}
-                                  clearable={true}
                                   onChange={async (value) => {
                                     if (value && !NUMBER_REGEX.test(value)) return;
                                     onChangeValue(
@@ -1451,6 +1489,8 @@ const UserMessage = ({
                                       value,
                                       "value_post_code_right"
                                     );
+                                    console.log("shippingAddress.value_post_code_right", shippingAddress.value_post_code_right);
+                                    console.log("shippingAddress.value_post_code_left", shippingAddress.value_post_code_left);
                                     if (
                                       (value + "").length === 4 &&
                                       shippingAddress.value_post_code_left &&
@@ -1583,7 +1623,6 @@ const UserMessage = ({
                                   )
                                 }
                                 value={shippingAddress.value_prefecture}
-                                clearable={true}
                               />
                             )}
                           </div>
@@ -1613,7 +1652,6 @@ const UserMessage = ({
                                 )
                               }
                               value={shippingAddress.value_municipality}
-                              clearable={true}
                             />
                           </div>
                         )}
@@ -1643,7 +1681,6 @@ const UserMessage = ({
                                 )
                               }
                               value={shippingAddress.value_address}
-                              clearable={true}
                             />
                           </div>
                         )}
@@ -1664,7 +1701,6 @@ const UserMessage = ({
                               id="ss-user-input-building"
                               disabled={disabled}
                               style={{ width: "100%" }}
-                              clearable={true}
                               onChange={(value) => {
                                 onChangeValue(
                                   indexContent,
@@ -1696,7 +1732,6 @@ const UserMessage = ({
                                 </div>
                                 <InputCustom
                                   disabled={disabled}
-                                  inputMode="numeric"
                                   // className="ss-message__content--user-text-input ss-input-value"
                                   style={{ marginBottom: "0px" }}
                                   placeholder={shippingAddress.text?.number_placeholder}
@@ -1709,7 +1744,6 @@ const UserMessage = ({
                                     )
                                   }
                                   value={shippingAddress.value_number}
-                                  clearable={true}
                                 ></InputCustom>
                               </>
                             ) : (
@@ -1731,7 +1765,6 @@ const UserMessage = ({
                                   }}
                                 >
                                   <InputCustom
-                                    inputMode="numeric"
                                     disabled={disabled}
                                     className="ss-message__content--user-text-input ss-input-value"
                                     maxLength={3}
@@ -1749,10 +1782,8 @@ const UserMessage = ({
                                       }
                                     }}
                                     value={shippingAddress.value_number1}
-                                    clearable={true}
                                   ></InputCustom>
                                   <InputCustom
-                                    inputMode="numeric"
                                     id="ss-user-message-phone_number_22"
                                     disabled={disabled}
                                     className="ss-message__content--user-text-input ss-input-value"
@@ -1771,10 +1802,8 @@ const UserMessage = ({
                                       }
                                     }}
                                     value={shippingAddress.value_number2}
-                                    clearable={true}
                                   ></InputCustom>
                                   <InputCustom
-                                    inputMode="numeric"
                                     id="ss-user-message-phone_number_33"
                                     disabled={disabled}
                                     // className="ss-message__content--user-text-input ss-input-value"
@@ -1790,7 +1819,6 @@ const UserMessage = ({
                                       )
                                     }
                                     value={shippingAddress.value_number3}
-                                    clearable={true}
                                   ></InputCustom>
                                 </div>
                               </>
@@ -3152,21 +3180,512 @@ const UserMessage = ({
             )}
             {/* type == 'zip_code_address' */}
             {content.type === "zip_code_address" && (
-              <ZipCodeAddress
-                content={content}
-                zipCodeAddress={zipCodeAddress}
-                disabled={disabled}
-                indexContent={indexContent}
-                messageIndex={indexMessage}
-                messageContent={messageContent}
-                errors={errors}
-                prefecturesList={prefecturesList}
-                onChangeValue={onChangeValue}
-                onChangeErrors={onChangeErrors}
-                moveToNext={moveToNext}
-                tokenExpired={tokenExpired}
-                toggleZipCodePopup={toggleZipCodePopup}
-              />
+              <div style={{ marginBottom: "10px" }}>
+                <div
+                  style={{
+                    marginBottom: "5px",
+                    textDecoration: "underline",
+                    ...(!disabled ? { color: "#2c76f0" } : { color: "gray" }),
+                    textAlign: "right",
+                  }}
+                >
+                  <span
+                    style={!disabled ? { cursor: "pointer" } : {}}
+                    onClick={() => {
+                      if (disabled !== true) isPopUpZipCode(true, indexContent);
+                    }}
+                  >
+                    〒検索はこちら
+                  </span>
+                </div>
+                {(zipCodeAddress.title_require ||
+                  zipCodeAddress.isCheckRequire) && (
+                    <div
+                      className="ss-message__content--user-pull_down-top"
+                      style={{ marginBottom: "0px" }}
+                    >
+                      {zipCodeAddress.title_require && (
+                        <span className="ss-message__content--user-pull_down-title">
+                          {zipCodeAddress.title}
+                        </span>
+                      )}
+                      {(zipCodeAddress.isCheckRequire === "all_items_require" ||
+                        zipCodeAddress.isCheckRequire === "require") && (
+                          <span className="ss-message__content--user-text-input-required">
+                            ※必須
+                          </span>
+                        )}
+                    </div>
+                  )}
+                {zipCodeAddress.post_code !== undefined && (
+                  <div className="ss-user-setting__item-bottom">
+                    <div
+                      style={{
+                        fontWeight: "400",
+                        fontSize: "12px",
+                        width: "100%",
+                        marginBottom: "5px",
+                      }}
+                    >
+                      {
+                        zipCodeAddress.post_code_label && zipCodeAddress.post_code_label.trim() !== ""
+                          ? zipCodeAddress.post_code_label
+                          : '郵便番号'
+                      }
+                    </div>
+                    {zipCodeAddress.split_postal_code !== true ? (
+                      <InputCustom
+                        type="tel"
+                        inputMode="numeric"
+                        placeholder={zipCodeAddress.post_code}
+                        disabled={disabled}
+                        // controls={false}
+                        // className="ss-user-setting-input-limit-character"
+                        // maxLength={7}
+                        onKeyPress={(e) => {
+                          if (e.target.value.length >= 7) e.preventDefault();
+                        }}
+                        style={{ width: "100%", marginLeft: "0px" }}
+                        onChange={async (value) => {
+                          onChangeValue(
+                            indexContent,
+                            content.type,
+                            value,
+                            "value_post_code"
+                          );
+                          if ((value + "").length === 7) {
+                            api
+                              .get(
+                                `/api/v1/get_address_from_zip_code?zip_code=${value}`
+                              )
+                              .then((res) => {
+                                if (res.data && res.data.code === 1) {
+                                  onChangeValue(
+                                    indexContent,
+                                    content.type,
+                                    getPrefectureIdCodeFromName(res.data.data.prefecture_name),
+                                    "value_prefecture"
+                                  );
+                                  if (zipCodeAddress.compact_municipality_and_address) {
+                                    onChangeValue(
+                                      indexContent,
+                                      content.type,
+                                      `${res.data.data.city_name}${res.data.data.town_name}`,
+                                      "value_municipality"
+                                    );
+                                  } else if (zipCodeAddress.compact_municipality_and_address_and_building_name) {
+                                    onChangeValue(
+                                      indexContent,
+                                      content.type,
+                                      `${res.data.data.city_name}${res.data.data.town_name}${res.data.data.building_name}`.replace('undefined', ''),
+                                      "value_municipality"
+                                    );
+                                  } else {
+                                    onChangeValue(
+                                      indexContent,
+                                      content.type,
+                                      res.data.data.city_name,
+                                      "value_municipality"
+                                    );
+                                    onChangeValue(
+                                      indexContent,
+                                      content.type,
+                                      res.data.data.town_name,
+                                      "value_address"
+                                    );
+                                  }
+                                  onChangeErrors(
+                                    `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                    ""
+                                  );
+                                  moveToNext(`ss-user-input-address${indexContent}`);
+                                } else {
+                                  onChangeErrors(
+                                    `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                    "無効な郵便番号です。"
+                                  );
+                                }
+                              })
+                              .catch((error) => {
+                                onChangeErrors(
+                                  `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                  "無効な郵便番号です。"
+                                );
+                                if (error.response?.data.code === 0) {
+                                  tokenExpired();
+                                }
+                              });
+                          } else if ((value + "").length !== 0) {
+                            onChangeErrors(
+                              `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                              "無効な郵便番号です。"
+                            );
+                          } else {
+                            onChangeErrors(
+                              `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                              ""
+                            );
+                          }
+                        }}
+                        value={zipCodeAddress.value_post_code}
+                      />
+                    ) : (
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          width: "100%",
+                        }}
+                      >
+                        <InputCustom
+                          type="tel"
+                          inputMode="numeric"
+                          placeholder={zipCodeAddress.post_code_left}
+                          disabled={disabled}
+                          style={{ width: "49%" }}
+                          onKeyPress={(e) => {
+                            if (e.target.value.length >= 3) e.preventDefault();
+                          }}
+                          onChange={async (value) => {
+                            if (value && !NUMBER_REGEX.test(value)) return;
+                            onChangeValue(
+                              indexContent,
+                              content.type,
+                              value,
+                              "value_post_code_left"
+                            );
+                            console.log("zipCodeAddress.value_post_code_left", zipCodeAddress.value_post_code_left);
+                            console.log("zipCodeAddress.value_post_code_right", zipCodeAddress.value_post_code_right);
+                            if ((value + "").length === 3) {
+                              moveToNext(`ss-user-post-code-right-input${indexContent}`);
+                            }
+                            
+                            if (
+                              (value + "").length === 3 &&
+                              zipCodeAddress.value_post_code_right &&
+                              (zipCodeAddress.value_post_code_right + "")
+                                .length === 4
+                            ) {
+                              api
+                                .get(
+                                  `/api/v1/get_address_from_zip_code?zip_code=${value}${zipCodeAddress.value_post_code_right}`
+                                )
+                                .then((res) => {
+                                  if (res.data && res.data.code === 1) {
+                                    onChangeValue(
+                                      indexContent,
+                                      content.type,
+                                      getPrefectureIdCodeFromName(res.data.data.prefecture_name),
+                                      "value_prefecture"
+                                    );
+                                    if (zipCodeAddress.compact_municipality_and_address) {
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        `${res.data.data.city_name}${res.data.data.town_name}`,
+                                        "value_municipality"
+                                      );
+                                    } else if (zipCodeAddress.compact_municipality_and_address_and_building_name) {
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        `${res.data.data.city_name}${res.data.data.town_name}${res.data.data.building_name}`.replace('undefined', ''),
+                                        "value_municipality"
+                                      );
+                                    } else {
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        res.data.data.city_name,
+                                        "value_municipality"
+                                      );
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        res.data.data.town_name,
+                                        "value_address"
+                                      );
+                                    }
+                                    onChangeErrors(
+                                      `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                      ""
+                                    );
+                                    moveToNext(`ss-user-input-address${indexContent}`);
+                                  } else {
+                                    onChangeErrors(
+                                      `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                      "無効な郵便番号です。"
+                                    );
+                                  }
+                                })
+                                .catch((error) => {
+                                  onChangeErrors(
+                                    `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                    "無効な郵便番号です。"
+                                  );
+                                  if (error.response?.data.code === 0) {
+                                    tokenExpired();
+                                  }
+                                });
+                            } else if (
+                              (value + "").length !== 0 ||
+                              (zipCodeAddress.value_post_code_right + "")
+                                .length !== 0
+                            ) {
+                              onChangeErrors(
+                                `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                "無効な郵便番号です。"
+                              );
+                            } else {
+                              onChangeErrors(
+                                `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                ""
+                              );
+                            }
+                          }}
+                          value={zipCodeAddress.value_post_code_left}
+                        />
+                        <InputCustom
+                          type="tel"
+                          inputMode="numeric"
+                          placeholder={zipCodeAddress.post_code_right}
+                          disabled={disabled}
+                          id={`ss-user-post-code-right-input${indexContent}`}
+                          style={{ width: "49%" }}
+                          onKeyPress={(e) => {
+                            if (e.target.value.length >= 4) e.preventDefault();
+                          }}
+                          onChange={async (value) => {
+                            if (value && !NUMBER_REGEX.test(value)) return;
+                            onChangeValue(
+                              indexContent,
+                              content.type,
+                              value,
+                              "value_post_code_right"
+                            );
+                            console.log("zipCodeAddress.value_post_code_right", zipCodeAddress.value_post_code_right);
+                            console.log("zipCodeAddress.value_post_code_left", zipCodeAddress.value_post_code_left);
+                            if (
+                              (value + "").length === 4 &&
+                              zipCodeAddress.value_post_code_left &&
+                              (zipCodeAddress.value_post_code_left + "")
+                                .length === 3
+                            ) {
+                              api
+                                .get(
+                                  `/api/v1/get_address_from_zip_code?zip_code=${zipCodeAddress.value_post_code_left}${value}`
+                                )
+                                .then((res) => {
+                                  if (res.data && res.data.code === 1) {
+                                    onChangeValue(
+                                      indexContent,
+                                      content.type,
+                                      getPrefectureIdCodeFromName(res.data.data.prefecture_name),
+                                      "value_prefecture"
+                                    );
+                                    if (zipCodeAddress.compact_municipality_and_address) {
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        `${res.data.data.city_name}${res.data.data.town_name}`,
+                                        "value_municipality"
+                                      );
+                                    } else if (zipCodeAddress.compact_municipality_and_address_and_building_name) {
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        `${res.data.data.city_name}${res.data.data.town_name}${res.data.data.building_name}`.replace('undefined', ''),
+                                        "value_municipality"
+                                      );
+                                    } else {
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        res.data.data.city_name,
+                                        "value_municipality"
+                                      );
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        res.data.data.town_name,
+                                        "value_address"
+                                      );
+                                    }
+                                    onChangeErrors(
+                                      `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                      ""
+                                    );
+                                    moveToNext(`ss-user-input-address${indexContent}`);
+                                  } else {
+                                    onChangeErrors(
+                                      `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                      "無効な郵便番号です。"
+                                    );
+                                  }
+                                })
+                                .catch((error) => {
+                                  onChangeErrors(
+                                    `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                    "無効な郵便番号です。"
+                                  );
+                                  if (error.response?.data.code === 0) {
+                                    tokenExpired();
+                                  }
+                                });
+                            } else if (
+                              (value + "").length !== 0 ||
+                              (zipCodeAddress.value_post_code_left + "")
+                                .length !== 0
+                            ) {
+                              onChangeErrors(
+                                `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                "無効な郵便番号です。"
+                              );
+                            } else {
+                              onChangeErrors(
+                                `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                ""
+                              );
+                            }
+                          }}
+                          value={zipCodeAddress.value_post_code_right}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+                {zipCodeAddress.prefecture !== undefined && (
+                  <div className="ss-user-setting__item-bottom">
+                    <div
+                      style={{
+                        fontWeight: "400",
+                        fontSize: "12px",
+                        width: "100%",
+                        marginBottom: "3px",
+                      }}
+                    >
+                      {
+                        zipCodeAddress.prefecture_label && zipCodeAddress.prefecture_label.trim() !== ""
+                          ? zipCodeAddress.prefecture_label
+                          : '都道府県'
+                      }
+                    </div>
+                    {zipCodeAddress.is_use_dropdown ? (
+                      <SelectCustom
+                        style={{ width: "100%" }}
+                        value={zipCodeAddress?.value_prefecture}
+                        data={prefecturesList}
+                        keyValue="id"
+                        nameValue="name"
+                        placeholder={zipCodeAddress.prefecture}
+                        onChange={(value) =>
+                          onChangeValue(
+                            indexContent,
+                            content.type,
+                            value,
+                            "value_prefecture"
+                          )
+                        }
+                      />
+                    ) : (
+                      <InputCustom
+                        placeholder={zipCodeAddress.prefecture}
+                        disabled={disabled}
+                        style={{ width: "100%" }}
+                        onChange={(value) =>
+                          onChangeValue(
+                            indexContent,
+                            content.type,
+                            value,
+                            "value_prefecture"
+                          )
+                        }
+                        value={zipCodeAddress.value_prefecture}
+                      />
+                    )}
+                  </div>
+                )}
+                {zipCodeAddress.municipality !== undefined && (
+                  <div className="ss-user-setting__item-bottom">
+                    <div
+                      style={{
+                        fontWeight: "400",
+                        fontSize: "12px",
+                        width: "100%",
+                        marginBottom: "3px",
+                      }}
+                    >
+                      {
+                        zipCodeAddress.municipality_label && zipCodeAddress.municipality_label.trim() !== ""
+                          ? zipCodeAddress.municipality_label
+                          : '市区町村'
+                      }
+                    </div>
+                    <InputCustom
+                      placeholder={zipCodeAddress.municipality}
+                      disabled={disabled}
+                      style={{ width: "100%" }}
+                      onChange={(value) =>
+                        onChangeValue(
+                          indexContent,
+                          content.type,
+                          value,
+                          "value_municipality"
+                        )
+                      }
+                      value={zipCodeAddress.value_municipality}
+                    />
+                  </div>
+                )}
+                {renderAddressField(zipCodeAddress, indexContent, content)}
+                {zipCodeAddress.building_name !== undefined && (
+                  <div className="ss-user-setting__item-bottom">
+                    <div
+                      style={{
+                        fontWeight: "400",
+                        fontSize: "12px",
+                        width: "100%",
+                        marginBottom: "3px",
+                      }}
+                    >
+                      {
+                        zipCodeAddress.building_name_label && zipCodeAddress.building_name_label.trim() !== ""
+                          ? zipCodeAddress.building_name_label
+                          : '建物名'
+                      }
+                    </div>
+                    <InputCustom
+                      placeholder={zipCodeAddress.building_name}
+                      id="ss-user-input-building"
+                      disabled={disabled}
+                      style={{ width: "100%" }}
+                      onChange={(value) => {
+                        onChangeValue(
+                          indexContent,
+                          content.type,
+                          value,
+                          "value_building_name"
+                        );
+
+                      }
+                      }
+
+                      value={zipCodeAddress.value_building_name}
+                    />
+                  </div>
+                )}
+                {errors?.[
+                  `message${indexMessage}_content${indexContent}_${content.type}`
+                ] && (
+                    <div style={{ color: "#FF7E00", fontSize: "12px" }}>
+                      {
+                        errors?.[
+                        `message${indexMessage}_content${indexContent}_${content.type}`
+                        ]
+                      }
+                    </div>
+                  )}
+              </div>
             )}
             {/* type == 'attaching_file' */}
             {content.type === "attaching_file" && (
@@ -5936,12 +6455,66 @@ const UserMessage = ({
             )}
             {/* user: type = 'button_submit' */}
             {content.type === 'button_submit' &&
-              <SubmitButton
-                content={content}
-                submitErrorMessage={submitErrorMessage}
-                onClickNext={onClickNext}
-                isProcessing={isProcessing}
-              />
+              <>
+                {buttonSubmit.is_display_error_message && submitErrorMessage.length > 0 && (
+                  <div className="ss-user-setting__item-text_input-top">
+                    <div
+                      style={{
+                        width: "95%",
+                        padding: "5px",
+                        border: "1px solid #f44336",
+                        backgroundColor: "#ffebee",
+                        color: "#d32f2f",
+                        borderRadius: "5px",
+                        fontFamily: "Arial, sans-serif",
+                        boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
+                        margin: "10px",
+                      }}
+                      id="error-message"
+                      dangerouslySetInnerHTML={{ __html: submitErrorMessage }}
+                    />
+                  </div>
+                )}
+                <div className="ss-user-setting__item-text_input-top">
+                  <button
+                    style={{
+                      background: "linear-gradient(135deg, #4caf50, #43a047)",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: "25px",
+                      padding: "15px 30px",
+                      fontSize: "20px",
+                      fontWeight: "bold",
+                      cursor: "pointer",
+                      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                      transition: "all 0.3s ease",
+                      width: "85%",
+                      alignContent: 'center',
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.background = "linear-gradient(135deg, #43a047, #4caf50)";
+                      e.target.style.boxShadow = "0 6px 12px rgba(0, 0, 0, 0.15)";
+                      e.target.style.transform = "translateY(-2px)";
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.background = "linear-gradient(135deg, #4caf50, #43a047)";
+                      e.target.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
+                      e.target.style.transform = "translateY(0)";
+                    }}
+                    onMouseDown={(e) => {
+                      e.target.style.transform = "translateY(1px)";
+                      e.target.style.boxShadow = "0 3px 8px rgba(0, 0, 0, 0.1)";
+                    }}
+                    onMouseUp={(e) => {
+                      e.target.style.transform = "translateY(-2px)";
+                      e.target.style.boxShadow = "0 6px 12px rgba(0, 0, 0, 0.15)";
+                    }}
+                    onClick={onClickNext}
+                  >
+                    {content.button_submit_name}
+                  </button>
+                </div>
+              </>
             }
             {/* type == 'label_no_transition' */}
             {content.type === "label_no_transition" && (

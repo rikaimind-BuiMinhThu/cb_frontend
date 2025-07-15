@@ -23,12 +23,11 @@ import ShopifyReferencePopup from './ShopifyReferencePopup';
 import axios from 'axios';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import {
-  S3_UPLOAD_URL,
+  S3_UPLOAD_URL
 } from '../../../../variables/constants';
 import { tokenExpired } from 'api/tokenExpired';
 import DatePickerCustom from './scenarioComon/DatePickerCustom';
 import { Carousel, Checkbox, Radio, Slider, Calendar, Select } from 'antd';
-import { HtmlCodeMessage } from '../../../../components/BotMessages';
 import CheckboxGroupCustom from './scenarioComon/CheckboxGroupCustom';
 import american_express from '../../../../assets/img/payment-method/american_express.png';
 import diner_club from '../../../../assets/img/payment-method/diner_club.png';
@@ -42,7 +41,7 @@ import locale from 'antd/es/date-picker/locale/ja_JP';
 import 'moment/locale/zh-cn';
 import ShopifyReferenceSelect from "./ShopifyReferenceSelect";
 import { Tooltip } from '@mui/material';
-import { dataDay, MESSAGE_CONTENT_TYPES, BOT_MESSAGE_TYPES, TIMER_TYPES, TIMER_VARIABLES, TIMER_VARIABLES_DESCRIPTION } from '../PreviewComponent/Constants';
+import { MESSAGE_CONTENT_TYPES } from '../PreviewComponent/Constants';
 
 const _ = require('lodash');
 
@@ -120,7 +119,13 @@ for (let i = 2; i <= 10; i++) {
   })
 }
 
-let dataDayFixed = dataDay;
+let dataDayFixed = [];
+for (let i = 1; i <= 31; i++) {
+  dataDayFixed.push({
+    key: i + '',
+    value: i + ''
+  });
+}
 
 let dataEveryMinuteFixed = [
   {
@@ -767,24 +772,6 @@ const installmentOptions = Array.from({ length: 23 }, (_, i) => ({
   value: `${i + 2}`,
 }));
 
-const initialTimeConfig = {
-  type: TIMER_TYPES.COUNTING_DOWN,
-  duration: {},
-  messages: {
-    counting: {
-      content: "",
-      useHtml: true,
-      isShow: true,
-    },
-    finish: {
-      content: "",
-      useHtml: true,
-      isShow: false,
-    },
-  },
-  isShowMessageFinish: false
-}
-
 const Scenario = () => {
   // states
   const [scenarioName, setScenarioName] = useState('');
@@ -801,29 +788,6 @@ const Scenario = () => {
   const [isUsedCartConfirmPage, setIsUsedCartConfirmPage] = useState(false);
   const [urlCartConfirmPage, setUrlCartConfirmPage] = useState('');
   const [isOpenModalCustomCss, setIsOpenModalCustomCss] = useState(false);
-
-  // New state for custom JS code (separated into 3 fields)
-  const [isUseCustomJsCode, setIsUseCustomJsCode] = useState(false);
-  const [headCustomJsCode, setHeadCustomJsCode] = useState({
-    temp: "",
-    final: ""
-  });
-  const [topBodyCustomJsCode, setTopBodyCustomJsCode] = useState({
-    temp: "",
-    final: ""
-  });
-  const [bottomBodyCustomJsCode, setBottomBodyCustomJsCode] = useState({
-    temp: "",
-    final: ""
-  });
-  const [isOpenModalCustomJsCode, setIsOpenModalCustomJsCode] = useState(false);
-  const [timerConfig, setTimerConfig] = useState({
-    isOpen: false,
-    enable: false,
-    temp: initialTimeConfig,
-    final: initialTimeConfig,
-    variables: TIMER_VARIABLES[initialTimeConfig.type],
-  })
 
   const [errMsgJsCode, setErrMsgJsCode] = useState('');
   const [isOpenErrMsgByJsSettingModal, setIsOpenErrMsgByJsSettingModal] = useState(false);
@@ -879,7 +843,6 @@ const Scenario = () => {
   const [dataDay, setDataDay] = useState(dataDayFixed);
 
   const [errorVariable, setErrorVariable] = useState('');
-  const [htmlValidationError, setHtmlValidationError] = useState('');
 
   const [dataCondition, setDataCondition] = useState([]);
 
@@ -953,44 +916,8 @@ const Scenario = () => {
         temp: res.data.data?.custom_css_content || '',
         final: res.data.data?.custom_css_content || '',
       });
-      setIsUseCustomJsCode(res.data.data?.is_used_custom_js_code || false);
-      setHeadCustomJsCode({
-        temp: res.data.data?.head_custom_js_code || '',
-        final: res.data.data?.head_custom_js_code || ''
-      });
-      setTopBodyCustomJsCode({
-        temp: res.data.data?.top_body_custom_js_code || '',
-        final: res.data.data?.top_body_custom_js_code || ''
-      });
-      setBottomBodyCustomJsCode({
-        temp: res.data.data?.bottom_body_custom_js_code || '',
-        final: res.data.data?.bottom_body_custom_js_code || ''
-      });
       setIsUseErrMsgByJs(res.data.data?.is_used_err_msg_by_js || false);
       setErrMsgJsCode(res.data.data?.err_msg_js_code || '');
-
-      const timerConfig = {
-        isOpen: false,
-        enable: false,
-      };
-
-      const resTimerConfig = res.data.data?.timer_config;
-
-      const scenarioTimerConfig = {
-        duration: resTimerConfig?.duration || initialTimeConfig.duration,
-        messages: {
-          ...initialTimeConfig.messages,
-          ...(resTimerConfig?.messages || {}),
-        },
-        type: resTimerConfig?.type || TIMER_TYPES.COUNTING_DOWN,
-      };
-      
-      timerConfig.temp = scenarioTimerConfig;
-      timerConfig.final = scenarioTimerConfig;
-      timerConfig.enable = !!resTimerConfig?.enable;
-      timerConfig.variables = TIMER_VARIABLES[scenarioTimerConfig.type];
-
-      setTimerConfig(timerConfig)
     }).catch((error) => {
       if (error.response?.data.code === 0) {
         tokenExpired()
@@ -2211,7 +2138,7 @@ const Scenario = () => {
     func(...props);
     setTimeout(() => setIsOpenModalCustomCss(false), 0);
   };
-
+  
 
   const handleOnCancelCustomCss = () => {
     setCustomCssContent((prevState) => ({
@@ -2224,68 +2151,6 @@ const Scenario = () => {
     setCustomCssContent((prevState) => ({
       ...prevState,
       final: prevState.temp,
-    }));
-  }
-
-  // Custom JS code handlers
-  const handleChangeOpenModalCustomJsCode = (value) => () => {
-    setIsOpenModalCustomJsCode(value);
-  }
-
-  const handleOnChangeValueCustomJsCode = (fieldType) => (e) => {
-    e.preventDefault();
-    const value = e.target.value;
-
-    if (fieldType === 'head') {
-      setHeadCustomJsCode((prevState) => ({
-        ...prevState,
-        temp: value
-      }));
-    } else if (fieldType === 'top_body') {
-      setTopBodyCustomJsCode((prevState) => ({
-        ...prevState,
-        temp: value
-      }));
-    } else if (fieldType === 'bottom_body') {
-      setBottomBodyCustomJsCode((prevState) => ({
-        ...prevState,
-        temp: value
-      }));
-    }
-  }
-
-  const closeAfterDoneCustomJsCode = (func) => (...props) => {
-    func(...props);
-    setTimeout(() => setIsOpenModalCustomJsCode(false), 0);
-  };
-
-  const handleOnCancelCustomJsCode = () => {
-    setHeadCustomJsCode((prevState) => ({
-      ...prevState,
-      temp: prevState.final
-    }));
-    setTopBodyCustomJsCode((prevState) => ({
-      ...prevState,
-      temp: prevState.final
-    }));
-    setBottomBodyCustomJsCode((prevState) => ({
-      ...prevState,
-      temp: prevState.final
-    }));
-  }
-
-  const handleOnConfirmCustomJsCode = () => {
-    setHeadCustomJsCode((prevState) => ({
-      ...prevState,
-      final: prevState.temp
-    }));
-    setTopBodyCustomJsCode((prevState) => ({
-      ...prevState,
-      final: prevState.temp
-    }));
-    setBottomBodyCustomJsCode((prevState) => ({
-      ...prevState,
-      final: prevState.temp
     }));
   }
 
@@ -2316,245 +2181,6 @@ const Scenario = () => {
               style={{ backgroundColor: '#024BB9' }}
               className="ss-popup-add-variable-input-keep-button"
               onClick={closeAfterDone(handleOnConfirmCustomCss)}
-            >
-              保存
-            </Button>
-          </div>
-        </div>
-      </ModalShort>
-    );
-  };
-
-  const renderModalCustomJsCodeForm = (isOpen) => {
-    return (
-      <ModalShort open={isOpen} onClose={closeAfterDoneCustomJsCode(handleOnCancelCustomJsCode)}>
-        <div className="sl-popup-create-scenario-wrapper" style={{width: "750px"}}>
-          <h4>カスタムJSコードを入力</h4>
-          <div style={{ marginBottom: '10px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-              <div className="sl-popup-create-scenario-input-wrapper" style={{ marginBottom: '0px' }}>
-                <span style={{ width: '100px'}}>ヘッド内のJSコンテンツ</span>
-                <textarea
-                  style={{ width: '100%', height: '120px', padding: '10px', fontSize: '14px', flexGrow: "1" }}
-                  placeholder="ここにヘッド内のJSコードを入力してください"
-                  value={headCustomJsCode.temp}
-                  onChange={handleOnChangeValueCustomJsCode('head')}
-                />
-              </div>
-              <div className="sl-popup-create-scenario-input-wrapper" style={{ marginBottom: '0px' }}>
-                <span style={{ width: '100px'}}>上部の本文にJSコンテンツ</span>
-                <textarea
-                  style={{ width: '100%', height: '120px', padding: '10px', fontSize: '14px', flexGrow: "1" }}
-                  placeholder="ここに上部の本文のJSコードを入力してください"
-                  value={topBodyCustomJsCode.temp}
-                  onChange={handleOnChangeValueCustomJsCode('top_body')}
-                />
-              </div>
-              <div className="sl-popup-create-scenario-input-wrapper" style={{ marginBottom: '0px' }}>
-                <span style={{ width: '100px'}}>下部の本文のJSコンテンツ</span>
-                <textarea
-                  style={{ width: '100%', height: '120px', padding: '10px', fontSize: '14px', flexGrow: "1" }}
-                  placeholder="ここに下部の本文のJSコードを入力してください"
-                  value={bottomBodyCustomJsCode.temp}
-                  onChange={handleOnChangeValueCustomJsCode('bottom_body')}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="sl-popup-create-scenario-btn-wrapper">
-            <Button
-              className="ss-popup-add-variable-input-close-button"
-              onClick={closeAfterDoneCustomJsCode(handleOnCancelCustomJsCode)}
-            >
-              閉じる
-            </Button>
-            <Button
-              style={{ backgroundColor: '#024BB9' }}
-              className="ss-popup-add-variable-input-keep-button"
-              onClick={closeAfterDoneCustomJsCode(handleOnConfirmCustomJsCode)}
-            >
-              保存
-            </Button>
-          </div>
-        </div>
-      </ModalShort>
-    );
-  };
-
-
-  // Timer config handlers
-  const handleChangeTimerConfig = ({ keyPath = [], instanceValue = null, useEventValue = false, transform = (v) => v, defaultValue = null }) => (e) => {
-    if (!keyPath.length) return;
-
-    let value = instanceValue;
-
-    if (!!e && useEventValue) {
-      e.preventDefault?.();
-      value = e.target?.value ?? e;
-    }
-
-    setTimerConfig((prevConfig) => {
-      const newConfig = { ...prevConfig };
-      let current = newConfig;
-
-      for (let i = 0; i < keyPath.length - 1; i++) {
-        const key = keyPath[i];
-        current[key] = { ...(current[key] || {}) }
-        current = current[key];
-      }
-
-      current[keyPath[keyPath.length - 1]] = transform(value || defaultValue);
-      return newConfig;
-    })
-  }
-
-  const closeAfterDoneTimerConfig = (func) => (...props) => {
-    new Promise((res) => {
-      func(...props)
-      res()
-    }).then(() => setTimerConfig((config) => ({ ...config, isOpen: false })));
-  };
-
-  const cleanMessageTimerConfig = (config) => {
-    const cleanedConfig = { ...config };
-    const takenField = {
-      isShow: true,
-      useHtml: true,
-      content: true,
-    };
-
-    const messages = {
-      finish: {},
-      counting: {},
-    };
-
-    Object.keys(cleanedConfig.messages.finish).forEach((key) => {
-      if (!!takenField[key]) {
-        messages.finish[key] = cleanedConfig.messages.finish[key];
-      }
-    });
-
-    Object.keys(cleanedConfig.messages.counting).forEach((key) => {
-      if (!!takenField[key]) {
-        messages.counting[key] = cleanedConfig.messages.counting[key];
-      }
-    });
-
-    cleanedConfig.messages = messages;
-    return cleanedConfig;
-  }
-
-  // Timer config
-  const handleOnCancelTimerConfig= () => {
-    setTimerConfig((prevState) => ({
-      ...prevState,
-      temp: prevState.final
-    }));
-  }
-
-  const handleOnConfirmTimerConfig = () => {
-    setTimerConfig((prevState) => ({
-      ...prevState,
-      final: prevState.temp
-    }));
-  }
-
-  const renderModalTimer = (isOpen) => {
-    const modalData = timerConfig.temp;
-    return (
-      <ModalShort open={isOpen} onClose={closeAfterDoneTimerConfig(handleOnCancelTimerConfig)}>
-        <div className="sl-popup-create-scenario-wrapper modal_timer_config-holder">
-          <h4>タイマーを使用する</h4>
-          <div className="modal_timer_config-content">
-            <div className="modal_timer_config-input_holder">
-              <div className="sl-popup-create-scenario-input-wrapper full-width margin-b-none">
-                <span className="modal_timer_config-input-label">{"タイマー時間（秒）"}</span>
-                {modalData.type === TIMER_TYPES.COUNTING_DOWN && (
-                  <div className="counting_down_input_holder">
-                    <div className="counting_down_input_wrapper">
-                      <InputCustom
-                        className="full-width"
-                        value={modalData.duration[modalData.type]?.hour ?? 0}
-                        onChange={handleChangeTimerConfig({ keyPath: ["temp", "duration", modalData.type, "hour"], useEventValue: true, defaultValue: 0, transform: (v) => (v || Number(v) > 0) ? Number(v) : 0 })}
-                        placeholder="0 (秒)"
-                        type='number'
-                      />
-                      <label className="counting_down_input_label">時</label>
-                    </div>
-                    <div className="counting_down_input_wrapper">
-                      <InputCustom
-                        className="full-width"
-                        value={modalData.duration[modalData.type]?.minute ?? 0}
-                        onChange={handleChangeTimerConfig({ keyPath: ["temp", "duration", modalData.type, "minute"], useEventValue: true, defaultValue: 0, transform: (v) => (v || Number(v) > 0) ? Number(v) : 0 })}
-                        placeholder="0 (秒)"
-                        type='number'
-                      />
-                      <label className="counting_down_input_label">分</label>
-                    </div>
-                    <div className="counting_down_input_wrapper">
-                      <InputCustom
-                        className="full-width"
-                        value={modalData.duration[modalData.type]?.second ?? 0}
-                        onChange={handleChangeTimerConfig({ keyPath: ["temp", "duration", modalData.type, "second"], useEventValue: true, defaultValue: 0, transform: (v) => (v || Number(v) > 0) ? Number(v) : 0 })}
-                        placeholder="0 (秒)"
-                        type='number'
-                      />
-                      <label className="counting_down_input_label">秒</label>
-                    </div>
-
-                  </div>
-                )}
-              </div>
-
-              <div className="sl-popup-create-scenario-input-wrapper full-width margin-b-none">
-                <span className="modal_timer_config-input-label">カウント中メッセージ</span>
-                <textarea
-                  className="modal_timer_config-html_holder"
-                  value={modalData.messages.counting.content}
-                  onChange={handleChangeTimerConfig({ keyPath: ["temp", "messages", "counting", "content"], useEventValue: true, transform: (v) => v ? String(v) : "" })}
-                  placeholder="カウント中メッセージ"
-                />
-              </div>
-
-              <div className="modal_timer_config-finish_message full-width">
-                <div className="finish_message_label">
-                  <input
-                    type="checkbox"
-                    className="ss-user-setting-checkbox-custom"
-                    onChange={handleChangeTimerConfig({ keyPath: ["temp", "messages", "finish", "isShow"], instanceValue: !modalData.messages.finish.isShow, tranform: (v) => !!v })}
-                    checked={modalData.messages.finish.isShow}
-                  />
-                  <label>終了メッセージを表示</label>
-                </div>
-                <div className="sl-popup-create-scenario-input-wrapper full-width" style={!modalData.messages.finish.isShow ? { display: "none" } : {}}>
-                  <span className="modal_timer_config-input-label">終了時メッセージ</span>
-                  <textarea
-                    className="modal_timer_config-html_holder"
-                    value={modalData.messages.finish.content}
-                    onChange={handleChangeTimerConfig({ keyPath: ["temp", "messages", "finish", "content"], useEventValue: true, transform: (v) => v ? String(v) : "" })}
-                    placeholder="終了時メッセージ"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="modal_timer_config-variable_holder">
-              {Object.keys(timerConfig.variables).map((key) => (
-                <div key={key + "v_des"}><span><b>{`{{${timerConfig.variables[key]}}}`}</b></span> - {TIMER_VARIABLES_DESCRIPTION[modalData.type][key]}</div>
-              ))}
-            </div>
-          </div>
-
-          <div className="sl-popup-create-scenario-btn-wrapper">
-            <Button
-              className="ss-popup-add-variable-input-close-button"
-              onClick={closeAfterDoneTimerConfig(handleOnCancelTimerConfig)}
-            >
-              閉じる
-            </Button>
-            <Button
-              className="ss-popup-add-variable-input-keep-button modal_confirm-button"
-              onClick={closeAfterDoneTimerConfig(handleOnConfirmTimerConfig)}
             >
               保存
             </Button>
@@ -2622,17 +2248,6 @@ const Scenario = () => {
       is_used_fukushashiki: isUseFukushashiki,
       is_used_custom_css: isUseCustomCss,
       custom_css_content: customCssContent.final,
-      is_used_custom_js_code: isUseCustomJsCode,
-      head_custom_js_code: headCustomJsCode.final,
-      top_body_custom_js_code: topBodyCustomJsCode.final,
-      timer_config: cleanMessageTimerConfig({
-        enable: timerConfig.enable,
-        type: timerConfig.final.type,
-        variables: timerConfig.variables,
-        duration: timerConfig.final.duration,
-        messages: timerConfig.final.messages,
-      }),
-      bottom_body_custom_js_code: bottomBodyCustomJsCode.final,
       is_used_err_msg_by_js: isUseErrMsgByJs,
       err_msg_js_code: errMsgJsCode,
     }
@@ -2681,17 +2296,6 @@ const Scenario = () => {
       is_used_fukushashiki: isUseFukushashiki,
       is_used_custom_css : isUseCustomCss,
       custom_css_content: customCssContent.final,
-      is_used_custom_js_code: isUseCustomJsCode,
-      head_custom_js_code: headCustomJsCode.final,
-      top_body_custom_js_code: topBodyCustomJsCode.final,
-      bottom_body_custom_js_code: bottomBodyCustomJsCode.final,
-      timer_config: cleanMessageTimerConfig({
-        enable: timerConfig.enable,
-        type: timerConfig.final.type,
-        variables: timerConfig.variables,
-        duration: timerConfig.final.duration,
-        messages: timerConfig.final.messages,
-      }),
       is_used_err_msg_by_js: isUseErrMsgByJs,
       err_msg_js_code: errMsgJsCode,
     }
@@ -2736,7 +2340,6 @@ const Scenario = () => {
               email: {},
               file: {},
               script: {},
-              html_code: {},
               delay: {
                 typing_on: false,
               },
@@ -2784,7 +2387,6 @@ const Scenario = () => {
               email: {},
               file: {},
               script: {},
-              html_code: {},
               delay: {},
               api_link_age: {},
               clear_variable: {
@@ -3091,112 +2693,80 @@ const Scenario = () => {
                       placeholder="Coupon"
                     />
                   </div>}
-                  <div className="config_holder">
-                    <div>
-                      <div className="ss-user-setting-checkbox-custom_css">
-                        <input
-                          type="checkbox"
-                          className="ss-user-setting-checkbox-custom"
-                          onChange={(value) => setIsUseOnlyRegularOrder(!isUseOnlyRegularOrder)}
-                          checked={isUseOnlyRegularOrder}
-                        />
-                        <label>定期注文のみ</label>
-                      </div>
+                  <div>
+                    <input
+                      type="checkbox"
+                      className="ss-user-setting-checkbox-custom"
+                      onChange={(value) => setIsUseOnlyRegularOrder(!isUseOnlyRegularOrder)}
+                      checked={isUseOnlyRegularOrder}
+                    />
+                    <label>定期注文のみ</label>
+                  </div>
+                  <div style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "16px",
+                    justifyContent: "start",
+                    width: "100%",
+                  }}>
+                    <div className='ss-user-setting-checkbox-custom_css'> 
+                      <input
+                        type="checkbox"
+                        className="ss-user-setting-checkbox-custom"
+                        onChange={(value) => setIsUseCustomCss(!isUseCustomCss)}
+                        checked={isUseCustomCss}
+                      />
+                      <label style={{whiteSpace: "nowrap", wordBreak: "normal"}}>CSSカスタムを使用</label>
                     </div>
-                    <div>
-                      <div className="ss-user-setting-checkbox-custom_css"> 
-                        <input
-                          type="checkbox"
-                          className="ss-user-setting-checkbox-custom"
-                          onChange={(value) => setIsUseCustomCss(!isUseCustomCss)}
-                          checked={isUseCustomCss}
-                        />
-                        <label style={{whiteSpace: "nowrap", wordBreak: "normal"}}>CSSカスタムを使用</label>
+                    {isUseCustomCss && (
+                      <div>
+                        <button class="ss-user-setting-checkbox-custom-css_toggle" onClick={handleChangeOpenModalCustomCss(true)}>
+                          {`( CSSコンテンツ設定モダルを開く )`}
+                        </button>
                       </div>
-                      {isUseCustomCss && (
-                        <div>
-                          <button class="ss-user-setting-checkbox-custom-css_toggle" onClick={handleChangeOpenModalCustomCss(true)}>
-                            {`( CSSコンテンツ設定モダルを開く )`}
-                          </button>
-                        </div>
-                      )}
+                    )}
+                  </div>
+                  <div style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "16px",
+                    justifyContent: "start",
+                    width: "100%",
+                  }}>
+                    <div className='ss-user-setting-checkbox-custom_css'> 
+                      <input
+                        type="checkbox"
+                        className="ss-user-setting-checkbox-custom"
+                        onChange={() => setIsUseErrMsgByJs(!isUseErrMsgByJs)}
+                        checked={isUseErrMsgByJs}
+                      />
+                      <label style={{whiteSpace: "nowrap", wordBreak: "normal"}}>エラーメッセンジ取得をJSコード使用</label>
                     </div>
-                    <div>
-                      <div className='ss-user-setting-checkbox-custom_css'>
-                        <input
-                          type="checkbox"
-                          className="ss-user-setting-checkbox-custom"
-                          onChange={(value) => setIsUseCustomJsCode(!isUseCustomJsCode)}
-                          checked={isUseCustomJsCode}
-                        />
-                        <label style={{whiteSpace: "nowrap", wordBreak: "normal"}}>JSカスタムを使用</label>
+                    {isUseErrMsgByJs && (
+                      <div>
+                        <button class="ss-user-setting-checkbox-custom-css_toggle" onClick={() => setIsOpenErrMsgByJsSettingModal(true)}>
+                          {`( JSコード設定モダルを開く )`}
+                        </button>
                       </div>
-                      {isUseCustomJsCode && (
-                        <div>
-                          <button class="ss-user-setting-checkbox-custom-css_toggle" onClick={handleChangeOpenModalCustomJsCode(true)}>
-                            {`( JSコンテンツ設定モダルを開く )`}
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                    <div className="timer_config-checkbox">
-                      <div className='ss-user-setting-checkbox-custom_css'>
-                        <input
-                          type="checkbox"
-                          className="ss-user-setting-checkbox-custom"
-                          onChange={handleChangeTimerConfig({ keyPath: ["enable"], instanceValue: !timerConfig.enable })}
-                          checked={timerConfig.enable}
-                        />
-                        <label className="timer_config-label">タイマー</label>
-                      </div>
-                      {timerConfig.enable && (
-                        <div>
-                          <button className="ss-user-setting-checkbox-custom-css_toggle" onClick={handleChangeTimerConfig({ keyPath: ["isOpen"], instanceValue: true })}>
-                            {`( タイマーを設定する )`}
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                    <div>
-                      <div className='ss-user-setting-checkbox-custom_css'>
-                        <input
-                          type="checkbox"
-                          className="ss-user-setting-checkbox-custom"
-                          onChange={() => setIsUseErrMsgByJs(!isUseErrMsgByJs)}
-                          checked={isUseErrMsgByJs}
-                        />
-                        <label style={{whiteSpace: "nowrap", wordBreak: "normal"}}>エラーメッセンジ取得をJSコード使用</label>
-                      </div>
-                      {isUseErrMsgByJs && (
-                        <div>
-                          <button class="ss-user-setting-checkbox-custom-css_toggle" onClick={() => setIsOpenErrMsgByJsSettingModal(true)}>
-                            {`( JSコード設定モダルを開く )`}
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                    <div>
-                      <div className="ss-user-setting-checkbox-custom_css">
-                        <input
-                          type="checkbox"
-                          className="ss-user-setting-checkbox-custom"
-                          onChange={(value) => setIsUseFukushashiki(!isUseFukushashiki)}
-                          checked={isUseFukushashiki}
-                        />
-                        <label>複写式利用フラグ</label>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="ss-user-setting-checkbox-custom_css">
-                        <input
-                          type="checkbox"
-                          className="ss-user-setting-checkbox-custom"
-                          onChange={(value) => setIsUsedCartConfirmPage(!isUsedCartConfirmPage)}
-                          checked={isUsedCartConfirmPage}
-                        />
-                        <label>カートシステムの注文確認ページを利用</label>
-                      </div>
-                    </div>
+                    )}
+                  </div>
+                  <div>
+                    <input
+                      type="checkbox"
+                      className="ss-user-setting-checkbox-custom"
+                      onChange={(value) => setIsUseFukushashiki(!isUseFukushashiki)}
+                      checked={isUseFukushashiki}
+                    />
+                    <label>複写式利用フラグ</label>
+                  </div>
+                  <div>
+                    <input
+                      type="checkbox"
+                      className="ss-user-setting-checkbox-custom"
+                      onChange={(value) => setIsUsedCartConfirmPage(!isUsedCartConfirmPage)}
+                      checked={isUsedCartConfirmPage}
+                    />
+                    <label>カートシステムの注文確認ページを利用</label>
                   </div>
                   {/* Overview scenario */}
                   <div style={{ height:`calc(80% - ${errorScenarioName ? '30':'10'}px)`, backgroundColor: '#f6fbff' }}>
@@ -3248,7 +2818,6 @@ const Scenario = () => {
                                   else if (content.type === 'variable_set') { titleMessage = "変数セット" }
                                   else if (content.type === 'pause') { titleMessage = "一時停止" }
                                   else if (content.type === 'getting_error_notification') { titleMessage = "エラー取得の通知" }
-                                  else if (content.type === BOT_MESSAGE_TYPES.HTML_CODE) { titleMessage = "HTMLコード" }
                                 }
 
                                 return message.belong_to === 'bot' ? (
@@ -3356,7 +2925,7 @@ const Scenario = () => {
                                                     ></textarea>
                                                   )}
                                                   {/* bot: type == 'script' */}
-                                                  {(content.type === 'script' || content.type === BOT_MESSAGE_TYPES.HTML_CODE) && (
+                                                  {content.type === 'script' && (
                                                     <textarea
                                                       className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
                                                       style={message.hidden === true ? { opacity: '0.4' } : {}}
@@ -5773,7 +5342,6 @@ const Scenario = () => {
                                 <option value="clear_variable">変数クリア</option>
                                 <option value="variable_set">変数セット</option>
                                 <option value="pause">一時停止</option>
-                                <option value="html_code">HTMLコード</option>
                                 {/* <option value="api_link_age">テキスト</option> Pending */}
                               </select>
 
@@ -6081,17 +5649,6 @@ const Scenario = () => {
                               {/* type: pause */}
                               {messageType === 'pause' && (
                                 <div style={{ marginTop: '15px', fontWeight: '700' }}>一時停止</div>
-                              )}
-
-                              {/* type: html_code */}
-                              {messageType === BOT_MESSAGE_TYPES.HTML_CODE && (
-                                <HtmlCodeMessage
-                                  value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['content'] || ''}
-                                  onChange={(value) => {
-                                    onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'content');
-                                  }}
-                                  validationError={htmlValidationError}
-                                />
                               )}
                             </div>
                           </div>
@@ -7053,29 +6610,6 @@ const Scenario = () => {
                                                               </div>
                                                             </div>
                                                           )}
-                                                          <div className="ss-user-setting__item-bottom">
-                                                            <p className="password_configuration_label">パスワード検証の構成</p>
-                                                            <div className="ss-user-setting__item-select-bottom-wrapper ss-input-text-comment password_configuration_main">
-                                                              <div className="password_input">
-                                                                <InputCustom
-                                                                  style={{ width: '100%' }}
-                                                                  placeholder="Password expression"
-                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'password_reg')}
-                                                                  value={textInput[textInput.type]?.password_reg || ""}
-                                                                />
-                                                                <p className="note">{`未入力の場合: ^[A-Za-z0-9]+$`}</p>
-                                                              </div>
-                                                              <div className="password_input">
-                                                                <InputCustom
-                                                                  style={{ width: '100%' }}
-                                                                  placeholder="Password error "
-                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'password_reg_error')}
-                                                                  value={textInput[textInput.type]?.password_reg_error || ""}
-                                                                />
-                                                                <p className="note">{`未入力の場合: 英数字（'A-Z'、'a-z'、'0-9'）が使用できます。`}</p>
-                                                              </div>
-                                                            </div>
-                                                          </div>
                                                           {isUseFukushashiki && (
                                                             <div className='ss-user-setting__item-bottom' style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                               <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
@@ -14774,23 +14308,12 @@ const Scenario = () => {
                                                           className="ss-user-setting-input-overview"
                                                           styleLabel={{ width: '90%', marginTop: '10px' }}
                                                           style={{ width: '90%' }}
-                                                          label="ボタン名称"
+                                                          label="名前ボタン"
                                                           inline={false}
-                                                          placeholder={'ボタン名称'}
+                                                          placeholder={'名前ボタン'}
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'button_submit_name', value)}
 
                                                           value={content.button_submit_name}
-                                                        />
-                                                        <InputCustom
-                                                          className="ss-user-setting-input-overview"
-                                                          styleLabel={{ width: '90%', marginTop: '10px' }}
-                                                          style={{ width: '90%' }}
-                                                          label="ローディングテキスト"
-                                                          inline={false}
-                                                          placeholder={'ローディングテキスト'}
-                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'button_submit_loading_text', value)}
-
-                                                          value={content.button_submit_loading_text}
                                                         />
                                                       </div>
                                                     </>}
@@ -15002,8 +14525,6 @@ const Scenario = () => {
         </div>
       </ModalNoti>
       {renderModalCustomCssForm(isOpenModalCustomCss)}
-      {renderModalCustomJsCodeForm(isOpenModalCustomJsCode)}
-      {renderModalTimer(timerConfig.isOpen)}
       {renderErrMsgByJsSettingModal(isOpenErrMsgByJsSettingModal)}
       <ModalShort open={isOpenAddVariable} onClose={() => setIsOpenAddVariable(false)}>
         <div className="sl-popup-create-scenario-wrapper">
