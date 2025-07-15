@@ -277,6 +277,12 @@ const ZipCodeAddress = ({
     )
   }
 
+  const findNamePrefecture = (prefectureId) => {
+    if (!prefectureId) return "";
+    
+    return prefecturesList.find((item) => item.id === prefectureId)?.name || prefectureId;
+  }
+
   return (
     <div className="zip-code-address-container">
       {renderSearchLink()}
@@ -326,7 +332,7 @@ const ZipCodeAddress = ({
                   "value_prefecture"
                 )
               }
-              value={zipCodeAddress.value_prefecture}
+              value={findNamePrefecture(zipCodeAddress.value_prefecture)}
               clearable={true}
             />
           )}
