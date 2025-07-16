@@ -2,11 +2,18 @@ const CHATBOT_ACTIONS = {
   CLICK_BUTTON: 'clickButton',
   EXCUTE_JS: 'excuteJS',
   FUKUSHASHIKI: 'fukushashiki',
+  INJECT_CUSTOM_JS: 'injectCustomJS',
   GET_ERROR_MESSAGE: 'getErrorMessage',
   CRAWL_DATA: 'crawlData',
   OPEN_PREVIEW: 'openPreview',
   GET_PREVIEW_ORDER_CONTENT: 'getPreviewOrderContent',
   SET_CHATBOT_CONVERSION_PARAMS_TO_LOCAL_STORAGE: 'setChatbotConversionParamsToLocalStorage',
+};
+
+const CUSTOM_JS_CODE_POSITION = {
+  HEAD: 'head',
+  TOP_BODY: 'top_body',
+  BOTTOM_BODY: 'bottom_body',
 };
 
 const CONVERSION_PARAMS_STORAGE_KEYS = {
@@ -286,6 +293,9 @@ const displayPopup = async () => {
           break;
         case CHATBOT_ACTIONS.SET_CHATBOT_CONVERSION_PARAMS_TO_LOCAL_STORAGE:
           setChatbotConversionParamsToLocalStorage(e.data.actionData);
+          break;
+        case CHATBOT_ACTIONS.INJECT_CUSTOM_JS:
+          injectCustomJS(e.data.actionData);
           break;
       };
 
@@ -628,6 +638,29 @@ const mobileCheck = () => {
       check = true;
   })(navigator.userAgent || navigator.vendor || window.opera);
   return check;
+}
+
+const injectCustomJS = (injectCustomJsCodes) => {
+  for(const { jsCode, position } of injectCustomJsCodes)
+  {
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.innerHTML = jsCode;
+
+    switch (position) {
+      case CUSTOM_JS_CODE_POSITION.HEAD:
+        document.head.appendChild(script);
+        break;
+      case CUSTOM_JS_CODE_POSITION.TOP_BODY:
+        document.body.insertBefore(script, document.body.firstChild);
+        break;
+      case CUSTOM_JS_CODE_POSITION.BOTTOM_BODY:
+        document.body.appendChild(script);
+        break;
+      default:
+        console.error("Invalid position: " + position);
+    }
+  }
 }
 
 displayPopup();
