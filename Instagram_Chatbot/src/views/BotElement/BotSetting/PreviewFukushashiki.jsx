@@ -830,18 +830,26 @@ const PreviewFukushashiki = () => {
     if (!msgContent) return newState;
 
     // await sleep(1000);
-    if (msgContent.type === "text_input" && msgContent.text_input.content) {
-      if (isUpdateSourceContent) {
-        msgContent.text_input.sourceContent = msgContent.text_input.content;
-      }
-      if (newState.variables.length === 0) return; 
-      let newContent = msgContent.text_input.sourceContent;
-      newState.variables.forEach((variable) => {
-        newContent = newContent.replaceAll(`{{${variable.variable_name}}}`, variable.default_value);
-      });
-      msgContent.text_input.content = newContent;
-      messagesList[i].message_content[0] = msgContent;
-    }
+    const applyVariables = (section) => {
+      if (!section?.content || newState.variables.length === 0) return false;
+
+      if (isUpdateSourceContent) section.sourceContent = section.content;
+
+      section.content = newState.variables.reduce(
+        (s, { variable_name, default_value }) =>
+          s.replaceAll(`{{${variable_name}}}`, default_value),
+        section.sourceContent ?? section.content
+      );
+      return true;
+    };
+
+    const updated =
+      (msgContent.type === "text_input" &&
+        applyVariables(msgContent.text_input)) ||
+      (msgContent.type === BOT_MESSAGE_TYPES.HTML_CODE &&
+        applyVariables(msgContent.html_code));
+
+    if (updated) messagesList[i].message_content[0] = msgContent;
 
     newState.renderMessagesList.push(messagesList[i]);
     newState.currentMsgIndex = i;
@@ -1157,6 +1165,15 @@ const PreviewFukushashiki = () => {
           style.innerHTML = savedState?.botInfor?.custom_css_content;
           document.head.appendChild(style);
         }
+
+        if (savedState?.botInfor?.is_used_custom_js_code) {
+          sendCustomJsToParent({
+            head: { jsCode: savedState?.botInfor?.head_custom_js_code, position: CUSTOM_JS_CODE_POSITION.HEAD },
+            top_body: { jsCode: savedState?.botInfor?.top_body_custom_js_code, position: CUSTOM_JS_CODE_POSITION.TOP_BODY },
+            bottom_body: { jsCode: savedState?.botInfor?.bottom_body_custom_js_code, position: CUSTOM_JS_CODE_POSITION.BOTTOM_BODY }
+          });
+        }
+
         if (savedState.isUsedErrMsgByJs && savedState.errMsgJsCode) {
           postMessageForExecuteJs(savedState.errMsgJsCode);
         }
@@ -3026,12 +3043,21 @@ const PreviewFukushashiki = () => {
     await sleep(2000);
   }
 
-  const fukushashikiToLP = (fukushashikiData) => {  
+  const fukushashikiToLP = (fukushashikiData) => {
     postMessageToParent({
       action: 'fukushashiki',
       actionData: fukushashikiData,
       isOpen: true
     });
+  }
+
+  const sendCustomJsToParent = ({ head, top_body, bottom_body } = {}) => {
+    const items = [ head, top_body, bottom_body ].filter(item => !!item?.jsCode?.trim() && !!item?.position?.trim() )
+      postMessageToParent({
+        action: CHATBOT_ACTIONS.INJECT_CUSTOM_JS,
+        actionData: items,
+        isOpen: true
+      });
   }
 
   const postMessageToParent = (options) => {
