@@ -1,14 +1,14 @@
 import React, {  } from "react";
-import "assets/css/bot/preview-chat-bot.css";
+import "../../../../assets/css/bot/preview-chat-bot.css";
 import "moment/locale/zh-cn";
 import { sendCountRequest } from "./Utils";
 
-const Withdrawal = ({
+const Withdrawal = (
   botInfor,
   deviceReceive,
   scenarioId,
   onOpenPreview,
-}) => {
+) => {
   if (!botInfor) return <></>;
 
   const renderMessagePopup = () => {

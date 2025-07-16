@@ -1,9 +1,0 @@
-.timer {
-  width: 100%;
-  padding: 10px;
-  max-height: 50px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}

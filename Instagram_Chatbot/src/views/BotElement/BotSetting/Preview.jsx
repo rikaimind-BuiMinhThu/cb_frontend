@@ -25,11 +25,10 @@ import jcb from '../../../assets/img/payment-method/jcb.png';
 import master_card from '../../../assets/img/payment-method/master_card.png';
 import visa from '../../../assets/img/payment-method/visa.png';
 import {
-    SHORTEN_URL, EC_CHATBOT_URL 
+    SHORTEN_URL, EC_CHATBOT_URL
 } from '../../../variables/constants';
 import locale from 'antd/es/date-picker/locale/ja_JP';
 import 'moment/locale/zh-cn';
-import { HtmlCodeMessagePreview } from '../../../components/BotMessages';
 import ModalPreviewBot from '../../../views/Popup/ModalPreviewBot';
 import iconMessageBlue from "../../../assets/img/icon-mess/icon-message-chat-blue.png";
 import iconMessageGreen from "../../../assets/img/icon-mess/icon-message-chat-green.png";
@@ -39,7 +38,6 @@ import iconMessagePink from "../../../assets/img/icon-mess/icon-message-chat-pin
 import iconMessagePurple from "../../../assets/img/icon-mess/icon-message-chat-purple.png";
 import iconMessageBlack from "../../../assets/img/icon-mess/icon-message-chat-black.png";
 import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-white.png";
-import { BOT_MESSAGE_TYPES } from './PreviewComponent/Constants';
 // import { Input, rgbToHex } from '@material-ui/core';
 
 const _ = require('lodash');
@@ -163,12 +161,6 @@ let dataPaymentMethod = [
 ]
 
 let SCAN_REGEX = /\{\{(.*?)\}\}/g;
-
-// Helper function để thay thế variables
-const getVariableValue = (variables, variableName) => {
-    const foundVariable = variables.find(v => v.variable_name === variableName);
-    return foundVariable?.default_value || "";
-};
 
 const installmentOptions = Array.from({ length: 23 }, (_, i) => ({
     key: i + 2,
@@ -619,12 +611,17 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                         return delayRender = setTimeout(() => {
                                             if (messageArr[i].message_content[0]?.type === 'text_input' && messageArr[i].message_content[0].text_input.content) {
                                                 messageArr[i].message_content[0].text_input.content = messageArr[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
-                                                    return getVariableValue(variables, variable);
-                                                });
-                                            }
-                                            if (messageArr[i].message_content[0]?.type === BOT_MESSAGE_TYPES.HTML_CODE && messageArr[i].message_content[0].html_code.content) {
-                                                messageArr[i].message_content[0].html_code.content = messageArr[i].message_content[0].html_code.content.replaceAll(SCAN_REGEX, (text, variable) => {
-                                                    return getVariableValue(variables, variable);
+                                                    if (variables.length !== 0) {
+                                                        let valueVar = "";
+                                                        for (let j = 0; j < variables.length; j++) {
+                                                            if (variables[j].variable_name === variable) {
+                                                                valueVar = variables[j].default_value;
+                                                            }
+                                                        }
+                                                        return valueVar;
+                                                    } else {
+                                                        return "";
+                                                    }
                                                 });
                                             }
                                             resolve({ ...messageArr[i] });
@@ -1624,12 +1621,17 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                 return delayRender = setTimeout(() => {
                                     if (dataMessages[i].message_content[0].type === 'text_input' && dataMessages[i].message_content[0].text_input.content) {
                                         dataMessages[i].message_content[0].text_input.content = dataMessages[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
-                                            return getVariableValue(variables, variable);
-                                        })
-                                    }
-                                    if (dataMessages[i].message_content[0].type === BOT_MESSAGE_TYPES.HTML_CODE && dataMessages[i].message_content[0].html_code.content) {
-                                        dataMessages[i].message_content[0].html_code.content = dataMessages[i].message_content[0].html_code.content.replaceAll(SCAN_REGEX, (text, variable) => {
-                                            return getVariableValue(variables, variable);
+                                            if (variables.length !== 0) {
+                                                let valueVar = "";
+                                                for (let j = 0; j < variables.length; j++) {
+                                                    if (variables[j].variable_name === variable) {
+                                                        valueVar = variables[j].default_value;
+                                                    }
+                                                }
+                                                return valueVar;
+                                            } else {
+                                                return "";
+                                            }
                                         })
                                     }
                                     resolve({ ...dataMessages[i] });
@@ -1743,7 +1745,17 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                         }
                         function replaceVariable(content) {
                             content = content.replaceAll(SCAN_REGEX, (text, variable) => {
-                                return getVariableValue(variables, variable);
+                                if (variables.length !== 0) {
+                                    let valueVar = "";
+                                    for (let j = 0; j < variables.length; j++) {
+                                        if (variables[j].variable_name === variable) {
+                                            valueVar = variables[j].default_value;
+                                        }
+                                    }
+                                    return valueVar;
+                                } else {
+                                    return "";
+                                }
                             })
                             return content;
                         }
@@ -1972,12 +1984,17 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                     return setTimeout(() => {
                                         if (dataMessages[i].message_content[0].type === 'text_input' && dataMessages[i].message_content[0].text_input.content) {
                                             dataMessages[i].message_content[0].text_input.content = dataMessages[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
-                                                return getVariableValue(variables, variable);
-                                            })
-                                        }
-                                        if (dataMessages[i].message_content[0].type === BOT_MESSAGE_TYPES.HTML_CODE && dataMessages[i].message_content[0].html_code.content) {
-                                            dataMessages[i].message_content[0].html_code.content = dataMessages[i].message_content[0].html_code.content.replaceAll(SCAN_REGEX, (text, variable) => {
-                                                return getVariableValue(variables, variable);
+                                                if (variables.length !== 0) {
+                                                    let valueVar = "";
+                                                    for (let j = 0; j < variables.length; j++) {
+                                                        if (variables[j].variable_name === variable) {
+                                                            valueVar = variables[j].default_value;
+                                                        }
+                                                    }
+                                                    return valueVar;
+                                                } else {
+                                                    return "";
+                                                }
                                             })
                                         }
                                         resolve({ ...dataMessages[i] });
@@ -2634,7 +2651,7 @@ const BotMessage = ({ content, index, botInfor }) => {
 
     return (
         <div key={index} className="sp-body-bot-side slideRight">
-            {(content.type === 'text_input' || content.type === 'file' || content.type === 'delay' || content.type === BOT_MESSAGE_TYPES.HTML_CODE) && (
+            {(content.type === 'text_input' || content.type === 'file' || content.type === 'delay') && (
                 <div className="sp-body-bot-side-avatar sp-avatar">
                     <img src={EC_CHATBOT_URL + "/" + botInfor?.icon?.url} alt="sp-avarta" />
                 </div>
@@ -2725,14 +2742,6 @@ const BotMessage = ({ content, index, botInfor }) => {
                         )}
                         {content.type === 'delay' && (
                             <img src={messageTypingGif} style={{ backgroundColor: '#EBF7FF', height: '40px', borderRadius: '10px' }} />
-                        )}
-                        {/* bot: type == 'html_code' */}
-                        {content.type === BOT_MESSAGE_TYPES.HTML_CODE && (
-                            <HtmlCodeMessagePreview
-                                content={content}
-                                index={index}
-                                botInfor={botInfor}
-                            />
                         )}
                     </React.Fragment>}
             </div>
@@ -3040,7 +3049,17 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
 
     function replaceVariable(content) {
         content = content.replaceAll(SCAN_REGEX, (text, variable) => {
-            return getVariableValue(variables, variable);
+            if (variables.length !== 0) {
+                let valueVar = "";
+                for (let j = 0; j < variables.length; j++) {
+                    if (variables[j].variable_name === variable) {
+                        valueVar = variables[j].default_value;
+                    }
+                }
+                return valueVar;
+            } else {
+                return "";
+            }
         })
         return content;
     }

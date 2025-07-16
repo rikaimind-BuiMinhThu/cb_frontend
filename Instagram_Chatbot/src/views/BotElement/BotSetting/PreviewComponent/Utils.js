@@ -194,27 +194,6 @@ const getCaptcha = (size, color, charPreset) => {
   });
 };
 
-const createStatusConversion = (data) => {
-  return postToChatBotServer(
-    CHATBOT_SERVER.CREATE_STATUS_CONVERSION_USER_RESPONSE,
-    data
-  );
-}
-
-const updateStatusConversion = (data) => {
-  return patchToChatBotServer(
-    CHATBOT_SERVER.UPDATE_STATUS_CONVERSION_USER_RESPONSE,
-    data
-  );
-}
-
-const sendScenarioUserResponse = (data) => {
-  return postToChatBotServer(
-    CHATBOT_SERVER.SEND_SCENARIO_USER_RESPONSE,
-    data
-  );
-}
-
 const sleep = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -277,90 +256,11 @@ const checkMessageCondition = (message, buildParam) => {
   return checked;
 }
 
-const getAddressFromZipCode = (zipCode) => {
-  return getToChatBotServer(
-    CHATBOT_SERVER.GET_ADDRESS_FROM_ZIP_CODE_PATH.replace(":zip_code", zipCode)
-  );
-}
-
-/**
- * 
- * @param {*} format using dd || hh || mm || ss
- */
-const secondToDatetime =(
-  sec, 
-  format = "{{dd}}:{{hh}}:{{mm}}:{{ss}}",
-  omitLeadingZero = true,
-) => {
-  let paramsSec = sec < 0 ? 0 : (sec || 0);
-
-  const SECONDS_IN_MINUTE = 60;
-  const SECONDS_IN_HOUR = 60 * SECONDS_IN_MINUTE;     
-  const SECONDS_IN_DAY = 24 * SECONDS_IN_HOUR;    
-
-  const timeParts = {
-    dd: Math.floor(paramsSec / SECONDS_IN_DAY) || 0,
-    hh: Math.floor((paramsSec % SECONDS_IN_DAY) / SECONDS_IN_HOUR) || 0,
-    mm: Math.floor((paramsSec % SECONDS_IN_HOUR) / SECONDS_IN_MINUTE) || 0,
-    ss: (paramsSec % SECONDS_IN_MINUTE) || 0,
-  };
-
-  const pad = (n) => String(n).padStart(2, '0');
-
-  const regex = /{{(dd|hh|mm|ss)}}[^{{}]*/g;
-  const matches = [...format.matchAll(regex)];
-
-  let formatted = "";
-
-  let firstNonZeroIndex = 0;
-  
-  if (omitLeadingZero) {
-    firstNonZeroIndex = matches.findIndex(([match, key]) => timeParts[key] > 0);
-
-    if (firstNonZeroIndex === -1) firstNonZeroIndex = matches.length - 1;
-  }
-
-  for (let i = firstNonZeroIndex; i < matches.length; i++) {
-    const [match, key] = matches[i];
-    const value = pad(timeParts[key]);
-
-    formatted += match.replace(`{{${key}}}`, value);
-  }
-
-  return formatted;
-}
-
-const toCamelCase = (str = "") => str.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
-
-const changeElementAttributeById = (ids = []) => {
-  for (const { id, ...attributes } of ids) {
-    const element = document.getElementById(id);
-
-    if (!element) continue;
-    
-    for (const [key, value] of Object.entries(attributes)) {
-      try {
-      if (key === "style" && typeof value === "object") {
-        Object.entries(value).forEach(([styleKey, styleValue]) => {
-          element.style[toCamelCase(styleKey)] = styleValue;
-        });
-      } else {
-        element.setAttribute(key, value);
-      }
-      } catch {
-        continue;
-      }
-    }
-  }
-}
-
 export {
   stringNullOrEmpty, getAllUrlParams, lightenColor,
   mobileCheck, removeLeadingZero, sendUserInteractionData,
   sendCreateOrderData, sendCountRequest,
   getCitiesByPrefecture, getTownsByCity, getPrefectures,
   getScenarioPreviewData, getChatBotSetting, sendEmailRequest,
-  sleep, getCaptcha, appendParamsToUrl, checkMessageCondition,
-  getAddressFromZipCode, secondToDatetime, toCamelCase, changeElementAttributeById, 
-  createStatusConversion, updateStatusConversion, sendScenarioUserResponse,
+  sleep, getCaptcha, appendParamsToUrl, checkMessageCondition
 };
