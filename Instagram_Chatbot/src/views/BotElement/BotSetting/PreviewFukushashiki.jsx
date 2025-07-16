@@ -50,6 +50,7 @@ import {
   stringNullOrEmpty,
   appendParamsToUrl,
   checkMessageCondition,
+  getCaptcha,
 } from "./PreviewComponent/Utils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
@@ -627,6 +628,14 @@ const PreviewFukushashiki = () => {
     }
   }
 
+  const setPhoneNumberDefaultValue = (dataContentType, field) => {
+    // TODO: Implement this function
+  }
+
+  const setDateSelectDefaultValue = (dataContentType, field) => {
+    // TODO: Implement this function
+  }
+
   const getProductDetailsForProductPurchaseRadioButton = (dataContentType, value) => {
     let valueCode, valueName, valuePrice;
   
@@ -793,7 +802,7 @@ const PreviewFukushashiki = () => {
     });
 
     sendEmailRequest(emailId, {variables: variablesData})
-      then((res) => {console.log(res)});
+      .then((res) => {console.log(res)});
 
     newState.renderMessagesList.push({});
     newState.currentMsgIndex = i;
@@ -892,7 +901,7 @@ const PreviewFukushashiki = () => {
     getCaptcha(size, color, charPreset)
       .then((res) => {
         let newCaptcha = [...state.captcha];
-        newCaptcha.push({index: i, indexContent: j, ...res.data});
+        newCaptcha.push({index: i, indexContent: msgContentIndex, ...res.data});
         dispatch({
           type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
           payload: {
