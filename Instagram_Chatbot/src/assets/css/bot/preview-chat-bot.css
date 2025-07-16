@@ -880,3 +880,12 @@ slideUp
   width: 100%;
   height: fit-content;
 }
+
+/* Custom width for post code inputs */
+.ss-user-setting__item-bottom > div > div:first-child {
+  width: 39% !important;
+}
+
+.ss-user-setting__item-bottom > div > div:last-child {
+  width: 59% !important;
+}
