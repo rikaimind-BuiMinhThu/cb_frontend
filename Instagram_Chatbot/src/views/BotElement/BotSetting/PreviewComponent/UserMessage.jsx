@@ -20,11 +20,11 @@ import {
   Col
 } from "antd";
 import moment from "moment";
-import cvcIcon from "../../../../assets/img/cvc-icon.png";
+import cvcIcon from "assets/img/cvc-icon.png";
 import DatePickerCustom from "../ScenarioSetting/scenarioComon/DatePickerCustom";
 import InputNum from "../ScenarioSetting/scenarioComon/InputNum";
 import { tokenExpired } from "api/tokenExpired";
-import { SHORTEN_URL } from "../../../../variables/constants";
+import { SHORTEN_URL } from "variables/constants";
 import locale from "antd/es/date-picker/locale/ja_JP";
 import "moment/locale/zh-cn";
 import { dataHourFixed, dataMinutes, dataYearFixed, dataMonth, dataDay, dataPaymentMethod, installmentOptions, NUMBER_REGEX } from "./Constants";
@@ -644,6 +644,7 @@ const UserMessage = ({
             )
           }
           value={address.value_address}
+          clearable={true}
         />
       </div>
     )
@@ -1357,6 +1358,7 @@ const UserMessage = ({
                                   }
                                 }}
                                 value={shippingAddress.value_post_code}
+                                clearable={true}
                               />
                             ) : (
                               <div
@@ -1374,6 +1376,7 @@ const UserMessage = ({
                                   onKeyPress={(e) => {
                                     if (e.target.value.length >= 3) e.preventDefault();
                                   }}
+                                  clearable={true}
                                   onChange={async (value) => {
                                     if (value && !NUMBER_REGEX.test(value)) return;
                                     onChangeValue(
@@ -1382,8 +1385,6 @@ const UserMessage = ({
                                       value,
                                       "value_post_code_left"
                                     );
-                                    console.log("shippingAddress.value_post_code_right", shippingAddress.value_post_code_right);
-                                    console.log("shippingAddress.value_post_code_left", shippingAddress.value_post_code_left);
                                     if ((value + "").length === 3) {
                                       moveToNext("ss-user-post-code-right-input2");
                                     }
@@ -1481,6 +1482,7 @@ const UserMessage = ({
                                   onKeyPress={(e) => {
                                     if (e.target.value.length >= 4) e.preventDefault();
                                   }}
+                                  clearable={true}
                                   onChange={async (value) => {
                                     if (value && !NUMBER_REGEX.test(value)) return;
                                     onChangeValue(
@@ -1489,8 +1491,6 @@ const UserMessage = ({
                                       value,
                                       "value_post_code_right"
                                     );
-                                    console.log("shippingAddress.value_post_code_right", shippingAddress.value_post_code_right);
-                                    console.log("shippingAddress.value_post_code_left", shippingAddress.value_post_code_left);
                                     if (
                                       (value + "").length === 4 &&
                                       shippingAddress.value_post_code_left &&
@@ -1623,6 +1623,7 @@ const UserMessage = ({
                                   )
                                 }
                                 value={shippingAddress.value_prefecture}
+                                clearable={true}
                               />
                             )}
                           </div>
@@ -1652,6 +1653,7 @@ const UserMessage = ({
                                 )
                               }
                               value={shippingAddress.value_municipality}
+                              clearable={true}
                             />
                           </div>
                         )}
@@ -1681,6 +1683,7 @@ const UserMessage = ({
                                 )
                               }
                               value={shippingAddress.value_address}
+                              clearable={true}
                             />
                           </div>
                         )}
@@ -1701,6 +1704,7 @@ const UserMessage = ({
                               id="ss-user-input-building"
                               disabled={disabled}
                               style={{ width: "100%" }}
+                              clearable={true}
                               onChange={(value) => {
                                 onChangeValue(
                                   indexContent,
@@ -1744,6 +1748,7 @@ const UserMessage = ({
                                     )
                                   }
                                   value={shippingAddress.value_number}
+                                  clearable={true}
                                 ></InputCustom>
                               </>
                             ) : (
@@ -1782,6 +1787,7 @@ const UserMessage = ({
                                       }
                                     }}
                                     value={shippingAddress.value_number1}
+                                    clearable={true}
                                   ></InputCustom>
                                   <InputCustom
                                     id="ss-user-message-phone_number_22"
@@ -1802,6 +1808,7 @@ const UserMessage = ({
                                       }
                                     }}
                                     value={shippingAddress.value_number2}
+                                    clearable={true}
                                   ></InputCustom>
                                   <InputCustom
                                     id="ss-user-message-phone_number_33"
@@ -1819,6 +1826,7 @@ const UserMessage = ({
                                       )
                                     }
                                     value={shippingAddress.value_number3}
+                                    clearable={true}
                                   ></InputCustom>
                                 </div>
                               </>
@@ -3328,6 +3336,7 @@ const UserMessage = ({
                           }
                         }}
                         value={zipCodeAddress.value_post_code}
+                        clearable={true}
                       />
                     ) : (
                       <div
@@ -3444,6 +3453,7 @@ const UserMessage = ({
                             }
                           }}
                           value={zipCodeAddress.value_post_code_left}
+                          clearable={true}
                         />
                         <InputCustom
                           type="tel"
@@ -3549,6 +3559,7 @@ const UserMessage = ({
                             }
                           }}
                           value={zipCodeAddress.value_post_code_right}
+                          clearable={true}
                         />
                       </div>
                     )}
@@ -3601,6 +3612,7 @@ const UserMessage = ({
                           )
                         }
                         value={zipCodeAddress.value_prefecture}
+                        clearable={true}
                       />
                     )}
                   </div>
@@ -3634,6 +3646,7 @@ const UserMessage = ({
                         )
                       }
                       value={zipCodeAddress.value_municipality}
+                      clearable={true}
                     />
                   </div>
                 )}
@@ -3666,11 +3679,9 @@ const UserMessage = ({
                           value,
                           "value_building_name"
                         );
-
-                      }
-                      }
-
+                      }}
                       value={zipCodeAddress.value_building_name}
+                      clearable={true}
                     />
                   </div>
                 )}

@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useReducer } from "react";
-import "../../../assets/css/bot/preview-chat-bot.css";
-import api from "../../../api/api-management";
+import React, { useEffect, useRef, useReducer, useState } from "react";
+import "assets/css/bot/preview-chat-bot.css";
+import api from "api/api-management";
 import Cookies from "js-cookie";
 import { MDBIcon } from "mdbreact";
 import { Button } from "reactstrap";
@@ -13,22 +13,26 @@ import {
 } from "antd";
 import moment from "moment";
 import $ from "jquery";
-import { EC_CHATBOT_URL } from "../../../variables/constants";
+import { EC_CHATBOT_URL } from "variables/constants";
 import "moment/locale/zh-cn";
-import iconMessageBlue from "../../../assets/img/icon-mess/icon-message-chat-blue.png";
-import iconMessageGreen from "../../../assets/img/icon-mess/icon-message-chat-green.png";
-import iconMessageOrange from "../../../assets/img/icon-mess/icon-message-chat-orange.png";
-import iconMessageYellow from "../../../assets/img/icon-mess/icon-message-chat-yellow.png";
-import iconMessagePink from "../../../assets/img/icon-mess/icon-message-chat-pink.png";
-import iconMessagePurple from "../../../assets/img/icon-mess/icon-message-chat-purple.png";
-import iconMessageBlack from "../../../assets/img/icon-mess/icon-message-chat-black.png";
-import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-white.png";
+import iconMessageBlue from "assets/img/icon-mess/icon-message-chat-blue.png";
+import iconMessageGreen from "assets/img/icon-mess/icon-message-chat-green.png";
+import iconMessageOrange from "assets/img/icon-mess/icon-message-chat-orange.png";
+import iconMessageYellow from "assets/img/icon-mess/icon-message-chat-yellow.png";
+import iconMessagePink from "assets/img/icon-mess/icon-message-chat-pink.png";
+import iconMessagePurple from "assets/img/icon-mess/icon-message-chat-purple.png";
+import iconMessageBlack from "assets/img/icon-mess/icon-message-chat-black.png";
+import iconMessageWhite from "assets/img/icon-mess/icon-message-chat-white.png";
 import {
   CHATBOT_ACTIONS,
   MESSAGE_CONTENT_TYPES,
   SESSION_STORAGE_KEY,
   NO_ERROR,
-  GETTING_ERROR_NOTIFICATION
+  GETTING_ERROR_NOTIFICATION,
+  CUSTOM_JS_CODE_POSITION,
+  BOT_MESSAGE_TYPES,
+  TIMER_MAP_VARIABLES_FIELD,
+  TIMER_TYPES
 } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
@@ -45,12 +49,15 @@ import {
   sleep,
   stringNullOrEmpty,
   appendParamsToUrl,
-  checkMessageCondition
+  checkMessageCondition,
+  getCaptcha,
 } from "./PreviewComponent/Utils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
 import ZipCodePopUp from "./PreviewComponent/ZipCodePopUp";
 import * as wanakana from "wanakana";
+import _ from "lodash";
+import Timer from "./Timer";
 
 sessionStorage.setItem("prevOpenStatus", "0");
 var url = new URL(window.location.href);
@@ -216,8 +223,10 @@ const PreviewFukushashikiReducer = (state, action) => {
 
 const PreviewFukushashiki = () => {
   const [state, dispatch] = useReducer(PreviewFukushashikiReducer, previewInitialState);
+  const [timerChanges, setTimerChanges] = useState({ timeLeft: -1, config: null });
   const containerRef = useRef(null);
   const isFromScenario = false;
+  const hasSentCustomJs = useRef(false);
 
   const setShowPopupCloseBot = (value) => {
     dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { showPopupCloseBot: value } });
@@ -371,7 +380,7 @@ const PreviewFukushashiki = () => {
     return () => {
       window.removeEventListener("message", eventHandler);
     };
-  }, [])
+  }, [state.isOpen])
 
   // Add style to body tag if it's mobile
   useEffect(() => {
@@ -444,24 +453,45 @@ const PreviewFukushashiki = () => {
     // post message to parent window
     postMessageToParent({isOpen: opening});
 
-    if (!opening) {
-      if (state.activePopupCloseBot) {
-        return dispatch({
-          type: PREVIEW_ACTIONS.UPDATE_OPEN_PREVIEW,
-          payload: {
-            isOpen: false,
-            showPopupCloseBot: true,
-          }
-        });
+    if (state.alreadyOpenFirstTime) {
+      if (!opening) {
+        if (state.activePopupCloseBot) {
+          return dispatch({
+            type: PREVIEW_ACTIONS.UPDATE_OPEN_PREVIEW,
+            payload: {
+              isOpen: false,
+              showPopupCloseBot: true,
+            }
+          });
+        }
       }
+      return dispatch({
+        type: PREVIEW_ACTIONS.UPDATE_OPEN_PREVIEW,
+        payload: {
+          isOpen: opening,
+          showPopupCloseBot: false,
+        }
+      });
     }
-    return dispatch({
-      type: PREVIEW_ACTIONS.UPDATE_OPEN_PREVIEW,
-      payload: {
-        isOpen: opening,
-        showPopupCloseBot: false,
-      }
+    
+    state.alreadyOpenFirstTime = true;
+    state.isOpen = true;
+    state.currentUserMsgIndex = state.messagesList.findIndex((item) => {
+      const firstMsgContent = item?.message_content?.[0];
+      const isDisplayBtnNext = firstMsgContent?.type != "image" || firstMsgContent?.image?.displayButtonNext != false;
+
+      return !item.hidden && isUserMessage(item) && isDisplayBtnNext;
     });
+    
+    const timerChatbotStorage = getTimerSessionStorage();
+    setTimerChanges((timerChanges) => timerChatbotStorage || timerChanges);
+
+    // For the first time, we need to render to the first user message
+    if (state.currentUserMsgIndex >= 0) {
+      state.currentMsgIndex = state.currentUserMsgIndex;
+    }
+
+    return renderMessagesWithDelay(state, 0, state.currentMsgIndex, { setNewState: false });
   }
 
   const setPulldownValue = (dataContentType, field, value) => {
@@ -597,6 +627,14 @@ const PreviewFukushashiki = () => {
         }
         break;
     }
+  }
+
+  const setPhoneNumberDefaultValue = (dataContentType, field) => {
+    // TODO: Implement this function
+  }
+
+  const setDateSelectDefaultValue = (dataContentType, field) => {
+    // TODO: Implement this function
   }
 
   const getProductDetailsForProductPurchaseRadioButton = (dataContentType, value) => {
@@ -765,7 +803,7 @@ const PreviewFukushashiki = () => {
     });
 
     sendEmailRequest(emailId, {variables: variablesData})
-      then((res) => {console.log(res)});
+      .then((res) => {console.log(res)});
 
     newState.renderMessagesList.push({});
     newState.currentMsgIndex = i;
@@ -802,18 +840,26 @@ const PreviewFukushashiki = () => {
     if (!msgContent) return newState;
 
     // await sleep(1000);
-    if (msgContent.type === "text_input" && msgContent.text_input.content) {
-      if (isUpdateSourceContent) {
-        msgContent.text_input.sourceContent = msgContent.text_input.content;
-      }
-      if (newState.variables.length === 0) return; 
-      let newContent = msgContent.text_input.sourceContent;
-      newState.variables.forEach((variable) => {
-        newContent = newContent.replaceAll(`{{${variable.variable_name}}}`, variable.default_value);
-      });
-      msgContent.text_input.content = newContent;
-      messagesList[i].message_content[0] = msgContent;
-    }
+    const applyVariables = (section) => {
+      if (!section?.content || newState.variables.length === 0) return false;
+
+      if (isUpdateSourceContent) section.sourceContent = section.content;
+
+      section.content = newState.variables.reduce(
+        (s, { variable_name, default_value }) =>
+          s.replaceAll(`{{${variable_name}}}`, default_value),
+        section.sourceContent ?? section.content
+      );
+      return true;
+    };
+
+    const updated =
+      (msgContent.type === "text_input" &&
+        applyVariables(msgContent.text_input)) ||
+      (msgContent.type === BOT_MESSAGE_TYPES.HTML_CODE &&
+        applyVariables(msgContent.html_code));
+
+    if (updated) messagesList[i].message_content[0] = msgContent;
 
     newState.renderMessagesList.push(messagesList[i]);
     newState.currentMsgIndex = i;
@@ -856,7 +902,7 @@ const PreviewFukushashiki = () => {
     getCaptcha(size, color, charPreset)
       .then((res) => {
         let newCaptcha = [...state.captcha];
-        newCaptcha.push({index: i, indexContent: j, ...res.data});
+        newCaptcha.push({index: i, indexContent: msgContentIndex, ...res.data});
         dispatch({
           type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
           payload: {
@@ -896,7 +942,7 @@ const PreviewFukushashiki = () => {
     });
   }
 
-  const renderMessagesWithDelay = (theState, startMsgIndex, endMsgIndex) => {
+  const renderMessagesWithDelay = (theState, startMsgIndex, endMsgIndex, options = { setNewState: true }) => {
     return new Promise(async (resolve) => {
       for (let i = startMsgIndex; i <= endMsgIndex; i++) {
         theState.renderMessagesList = theState.messagesList.slice(0, i + 1);
@@ -911,9 +957,11 @@ const PreviewFukushashiki = () => {
       }
       resolve();
     }).then(() => {
-      theState.renderMessagesList = theState.messagesList.slice(0, theState.currentMsgIndex + 1);
-      theState.passedUserMsgCount = theState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
-      dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: theState });
+      if(options.setNewState) {
+        theState.renderMessagesList = theState.messagesList.slice(0, theState.currentMsgIndex + 1);
+        theState.passedUserMsgCount = theState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
+        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: theState });
+      }
     });
   }
 
@@ -957,6 +1005,19 @@ const PreviewFukushashiki = () => {
       const style = document.createElement('style');
       style.innerHTML = res.data.chatbot.custom_css_content;
       document.head.appendChild(style);
+    }
+
+    if (res.data?.chatbot?.is_used_custom_js_code) {
+      sendCustomJsToParent({
+        head: { jsCode: res.data?.chatbot?.head_custom_js_code, position: CUSTOM_JS_CODE_POSITION.HEAD },
+        top_body: { jsCode: res.data?.chatbot?.top_body_custom_js_code, position: CUSTOM_JS_CODE_POSITION.TOP_BODY },
+        bottom_body: { jsCode: res.data?.chatbot?.bottom_body_custom_js_code, position: CUSTOM_JS_CODE_POSITION.BOTTOM_BODY },
+      });
+    }
+
+    if (res.data?.chatbot?.timer_config?.enable) {
+      const timerConfig = res.data.chatbot.timer_config;
+      setTimerChanges({ timeLeft: calculateTimerConfigDuration(timerConfig.type, timerConfig.duration), config: timerConfig });
     }
 
     const prevOpenStatus = sessionStorage.getItem("prevOpenStatus");
@@ -1057,6 +1118,49 @@ const PreviewFukushashiki = () => {
     });
   }
 
+  const getTimerSessionStorage = () => {
+    const timerChatbotStorage = sessionStorage.getItem(SESSION_STORAGE_KEY.TIMER_CHATBOT);
+    
+    if (!timerChatbotStorage?.trim().length) {
+      return null;
+    }
+    
+    return JSON.parse(timerChatbotStorage);
+  }
+
+  const handleOnCounting = (config) => (timer) => {
+    const timerChanges = { timeLeft: timer, config };
+    sessionStorage.setItem(SESSION_STORAGE_KEY.TIMER_CHATBOT, JSON.stringify(timerChanges));
+    setTimerChanges(timerChanges);
+  }
+
+  const getTimerConfigVariable = (configVariables) => {
+    const variables = Object.values(configVariables)
+      .reduce((acc, key) => !TIMER_MAP_VARIABLES_FIELD[key] ? acc : [...acc, { ...TIMER_MAP_VARIABLES_FIELD[key], name: key }], []);
+
+    return variables;
+  }
+
+  const calculateTimerConfigDuration = (type, duration) => {
+    if (!duration || !type) return 0;
+
+    const durationConfig = duration[type];
+    if (!durationConfig) {
+      return 0;
+    }
+
+    switch(type) {
+      case TIMER_TYPES.COUNTING_DOWN: {
+        const { hour = 0, minute = 0, second = 0 } = duration[type];
+        return (hour * 60 + minute) * 60 + second;
+      }
+
+      default: {
+        return 0;
+      }
+    }
+  }
+
   // Get Preview Scenario Data
   useEffect(() => {
     if (!state.loadedStateFromSession) {
@@ -1073,6 +1177,15 @@ const PreviewFukushashiki = () => {
           style.innerHTML = savedState?.botInfor?.custom_css_content;
           document.head.appendChild(style);
         }
+
+        if (savedState?.botInfor?.is_used_custom_js_code) {
+          sendCustomJsToParent({
+            head: { jsCode: savedState?.botInfor?.head_custom_js_code, position: CUSTOM_JS_CODE_POSITION.HEAD },
+            top_body: { jsCode: savedState?.botInfor?.top_body_custom_js_code, position: CUSTOM_JS_CODE_POSITION.TOP_BODY },
+            bottom_body: { jsCode: savedState?.botInfor?.bottom_body_custom_js_code, position: CUSTOM_JS_CODE_POSITION.BOTTOM_BODY }
+          });
+        }
+
         if (savedState.isUsedErrMsgByJs && savedState.errMsgJsCode) {
           postMessageForExecuteJs(savedState.errMsgJsCode);
         }
@@ -2942,12 +3055,25 @@ const PreviewFukushashiki = () => {
     await sleep(2000);
   }
 
-  const fukushashikiToLP = (fukushashikiData) => {  
+  const fukushashikiToLP = (fukushashikiData) => {
     postMessageToParent({
       action: 'fukushashiki',
       actionData: fukushashikiData,
       isOpen: true
     });
+  }
+
+  const sendCustomJsToParent = ({ head, top_body, bottom_body } = {}) => {
+    if (hasSentCustomJs.current) return;
+
+    const items = [ head, top_body, bottom_body ].filter(item => !!item?.jsCode?.trim() && !!item?.position?.trim() )
+      postMessageToParent({
+        action: CHATBOT_ACTIONS.INJECT_CUSTOM_JS,
+        actionData: items,
+        isOpen: true
+      });
+
+      hasSentCustomJs.current = true;
   }
 
   const postMessageToParent = (options) => {
@@ -3015,6 +3141,7 @@ const PreviewFukushashiki = () => {
   }
 
   const isDelayBotMessage = (message) => {
+    if (!message) return false;
     return message.belong_to === 'bot' && message.message_content[0]?.type === "delay";
   }
 
@@ -3701,7 +3828,8 @@ const PreviewFukushashiki = () => {
         className={`sp-container1 ${mobileCheck() ? 'slideUpSp' : 'slideUp'}`}
         style={containerStyle}
       >
-        <Withdrawal botInfor={state.botInfor}
+        <Withdrawal
+          // botInfor={state.botInfor}
           deviceReceive={state.deviceReceive}
           scenarioId={state.scenarioId}
           onOpenPreview={onOpenPreview}
@@ -3781,6 +3909,24 @@ const PreviewFukushashiki = () => {
             </Row>
           </ModalPreviewBot>
           : ""}
+        
+        {!!state.botInfor?.timer_config?.enable
+          && 
+          <div className="chatbot_timer_holder" style={{
+            backgroundColor: bodyStyle.backgroundColor,
+          }}>
+            <Timer
+              duration={calculateTimerConfigDuration(state.botInfor.timer_config.type, state.botInfor.timer_config.duration)}
+              timeLeft={timerChanges.timeLeft}
+              countMsg={state.botInfor.timer_config.messages.counting}
+              finishMsg={state.botInfor.timer_config.messages.finish}
+              variables={getTimerConfigVariable(state.botInfor.timer_config.variables)}
+              startCount={state.isOpen}
+              onCounting={handleOnCounting(state.botInfor.timer_config)}
+            />
+          </div>
+        }
+
         <ProcessBar botInfor={state.botInfor}
           currentIndex={state.passedUserMsgCount}
           maxIndex={state.userMessagesList.length}

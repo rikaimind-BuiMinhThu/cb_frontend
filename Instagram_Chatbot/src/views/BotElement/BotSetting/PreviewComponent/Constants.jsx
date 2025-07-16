@@ -4,6 +4,7 @@ import discover from "../../../../assets/img/payment-method/discover.png";
 import jcb from "../../../../assets/img/payment-method/jcb.png";
 import master_card from "../../../../assets/img/payment-method/master_card.png";
 import visa from "../../../../assets/img/payment-method/visa.png";
+import { secondToDatetime } from "./Utils";
 
 let dataHourFixed = [];
 for (let i = 0; i <= 23; i++) {
@@ -99,6 +100,7 @@ const GET_CAPTCHA_PATH = `https://svg-captcha-nodejs.vercel.app/captcha?size=:si
 
 const SESSION_STORAGE_KEY = {
   CHAT_BOT_STATE: 'CHAT_BOT_STATE',
+  TIMER_CHATBOT: 'TIMER_CHATBOT',
 };
 
 const CRAWL_ELEMENT_TYPES = {
@@ -120,6 +122,7 @@ const CHATBOT_ACTIONS = {
   GET_PREVIEW_ORDER_CONTENT: 'getPreviewOrderContent',
   PREVIEW_OBJECT: 'previewObject',
   SET_CHATBOT_CONVERSION_PARAMS_TO_LOCAL_STORAGE: 'setChatbotConversionParamsToLocalStorage',
+  INJECT_CUSTOM_JS: 'injectCustomJS',
 };
 
 const SEARCH_MODES = {
@@ -152,6 +155,16 @@ const REGEXP = {
   NUMBER: /^[0-9]+$/,
 }
 
+const CUSTOM_JS_CODE_POSITION = {
+  HEAD: 'head',
+  TOP_BODY: 'top_body',
+  BOTTOM_BODY: 'bottom_body',
+}
+
+const BOT_MESSAGE_TYPES = {
+  HTML_CODE: 'html_code'
+}
+
 export {
   dataHourFixed,
   dataMinutes,
@@ -172,4 +185,43 @@ export {
   NO_ERROR,
   GETTING_ERROR_NOTIFICATION,
   REGEXP,
+  CUSTOM_JS_CODE_POSITION,
+  BOT_MESSAGE_TYPES,
+};
+
+export const TIMER_TYPES = {
+  COUNTING_DOWN: "counting_down",
+};
+
+export const TIMER_VARIABLES = {
+  [TIMER_TYPES.COUNTING_DOWN]: {
+    timeCounting: "timer",
+    duration: "duration"
+  }
+};
+
+export const TIMER_VARIABLES_DESCRIPTION = {
+  [TIMER_TYPES.COUNTING_DOWN]: {
+    timeCounting: "残り時間 dd日 hh時 mm分 ss秒",
+    duration: "設定されたタイマー時間 dd日 hh時 mm分 ss秒"
+  }
+};
+
+export const TIMER_MAP_VARIABLE_METHOD = {
+  CONFIG: 1,
+  PARAMS: 2,
+  COMP_STATE: 3,
+};
+
+export const TIMER_MAP_VARIABLES_FIELD = {
+  [TIMER_VARIABLES[TIMER_TYPES.COUNTING_DOWN].timeCounting]: {
+    field: "timer",
+    method: TIMER_MAP_VARIABLE_METHOD.COMP_STATE,
+    transform: (timer) => secondToDatetime(timer, "{{dd}}日 {{hh}}時 {{mm}}分 {{ss}}秒"),
+  },
+  [TIMER_VARIABLES[TIMER_TYPES.COUNTING_DOWN].duration]: {
+    field: "duration",
+    method: TIMER_MAP_VARIABLE_METHOD.CONFIG,
+    transform: (duration) => secondToDatetime(duration, "{{dd}}日 {{hh}}時 {{mm}}分 {{ss}}秒"),
+  },
 };

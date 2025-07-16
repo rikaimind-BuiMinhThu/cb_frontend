@@ -875,3 +875,17 @@ slideUp
 
 
   }
+
+.chatbot_timer_holder {
+  width: 100%;
+  height: fit-content;
+}
+
+/* Custom width for post code inputs */
+.ss-user-setting__item-bottom div[style*="display: flex"] > div:first-child {
+  width: 39% !important;
+}
+
+.ss-user-setting__item-bottom div[style*="display: flex"] > div:last-child {
+  width: 59% !important;
+}
