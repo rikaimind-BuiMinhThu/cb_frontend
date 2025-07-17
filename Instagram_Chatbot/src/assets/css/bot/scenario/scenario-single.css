@@ -2112,3 +2112,13 @@ input#ss-message__content--user-checkbox--checkbox_img {
   align-items: center;
   justify-content: center;
 }
+
+.loading-submit-button_holder {
+  margin-top: 10px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 10px;
+}

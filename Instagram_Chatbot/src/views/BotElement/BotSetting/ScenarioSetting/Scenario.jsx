@@ -14767,13 +14767,32 @@ const Scenario = () => {
                                                           className="ss-user-setting-input-overview"
                                                           styleLabel={{ width: '90%', marginTop: '10px' }}
                                                           style={{ width: '90%' }}
-                                                          label="名前ボタン"
+                                                          label="ボタン名称"
                                                           inline={false}
-                                                          placeholder={'名前ボタン'}
+                                                          placeholder={'ボタン名称'}
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'button_submit_name', value)}
-
                                                           value={content.button_submit_name}
                                                         />
+                                                        
+                                                        <div className="loading-submit-button_holder">
+                                                          <CheckboxCustom
+                                                            label="ローディングテキストを表示する"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'button_submit_use_loading_text', value)}
+                                                            value={!!content.button_submit_use_loading_text}
+                                                          />
+                                                          {!!content.button_submit_use_loading_text && (
+                                                            <InputCustom
+                                                              className="ss-user-setting-input-overview"
+                                                              styleLabel={{ width: '100%' }}
+                                                              style={{ width: '90%' }}
+                                                              label="ローディングテキスト"
+                                                              inline={false}
+                                                              placeholder={'ローディングテキスト'}
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'button_submit_loading_text', value)}
+                                                              value={content.button_submit_loading_text || ""}
+                                                            />
+                                                          )}
+                                                        </div>
                                                       </div>
                                                     </>}
                                                   {/* user: type = 'label_no_transition' */}
