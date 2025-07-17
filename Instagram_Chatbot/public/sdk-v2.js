@@ -146,8 +146,9 @@ const waitForElement = (mode, address, options = {type: "WAIT_FOR_LOADING"}, cal
 const movePaymentMethodToTop = (data) => {
   const index = data.findIndex(item => item.type === "payment_method_id");
   if (index !== -1) {
-      const [paymentMethod] = data.splice(index, 1);
-      data.unshift(paymentMethod);
+      const [paymentMethod] = data.splice(index, 1);      
+      // await component in LP to set value after payment method setted
+      data.unshift(paymentMethod, { additionalType: "await" });
   }
   return data;
 }
