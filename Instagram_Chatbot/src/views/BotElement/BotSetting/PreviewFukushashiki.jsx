@@ -131,7 +131,8 @@ const previewInitialState = {
   // loadedStateFromSession has 2 values: "wait", "loaded"
   loadedStateFromSession: false,
   isUsedErrMsgByJs: false,
-  errMsgJsCode: ''
+  errMsgJsCode: '',
+  isProcessing: false,
 };
 
 const PREVIEW_ACTIONS = {
@@ -141,7 +142,8 @@ const PREVIEW_ACTIONS = {
   UPDATE_PREVIEW_ORDER_CONTENT: "UPDATE_PREVIEW_ORDER_CONTENT",
   UPDATE_OPEN_PREVIEW: "UPDATE_OPEN_PREVIEW",
   UPDATE_SUBMIT_ERROR_MESSAGE: "UPDATE_SUBMIT_ERROR_MESSAGE",
-  UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG: "UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG"
+  UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG: "UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG",
+  SET_PROCESSING: "SET_PROCESSING",
 };
 
 const PreviewFukushashikiReducer = (state, action) => {
@@ -150,11 +152,13 @@ const PreviewFukushashikiReducer = (state, action) => {
       return { ...state, ...(action.payload) };
 
     case PREVIEW_ACTIONS.ADD_LP_OPTION_DATA:
-      return { ...state, lpOptionData: { ...state.lpOptionData, ...action.payload } };
+      return { ...state, lpOptionData: { ...state.lpOptionData, ...action.payload, isProcessing: false } };
     case PREVIEW_ACTIONS.UPDATE_PREVIEW_ORDER_CONTENT:
-      return { ...state, previewOrderContent: action.payload };
+      return { ...state, previewOrderContent: action.payload, isProcessing: false };
     case PREVIEW_ACTIONS.UPDATE_OPEN_PREVIEW:
       return { ...state, isOpen: action.payload.isOpen, showPopupCloseBot: action.payload.showPopupCloseBot };
+    case PREVIEW_ACTIONS.SET_PROCESSING: 
+      return { ...state, isProcessing: action.payload };
     case PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES:
       return {
         ...state,
@@ -192,7 +196,8 @@ const PreviewFukushashikiReducer = (state, action) => {
         messagesList: messagesList,
         renderMessagesList: renderMessagesList,
         userMessagesList: userMessagesList,
-        submitErrorMessage: action.payload
+        submitErrorMessage: action.payload,
+        isProcessing: false,
       };
     }
 
@@ -213,7 +218,8 @@ const PreviewFukushashikiReducer = (state, action) => {
         messagesList: messagesList,
         renderMessagesList: renderMessagesList,
         userMessagesList: userMessagesList,
-        submitErrorMessage: action.payload.error
+        submitErrorMessage: action.payload.error,
+        isProcessing: false,
       };
     }
   }
@@ -613,6 +619,8 @@ const PreviewFukushashiki = () => {
       case "text_input":
         if (field === 'text' && dataContentType[field].isSplitInput) {
           item.default_value = setTextInputValue(dataContentType, field);
+        } else if (!dataContentType[field].isSplitInput) {
+          item.default_value = dataContentType[field].value;
         }
         break;
       default:
@@ -2011,36 +2019,91 @@ const PreviewFukushashiki = () => {
           isValid = false;
         } else {
           let isValidZipCode = true;
-          if (contentType.isCheckRequire === "require") {
-            if (contentType.post_code !== undefined) {
+          const validateFields = {
+            postCode: (contentType) => {
               if (contentType.split_postal_code) {
                 if (
                   stringNullOrEmpty(contentType.value_post_code_left) ||
                   stringNullOrEmpty(contentType.value_post_code_right)
                 ) {
-                  isValidZipCode = false;
+                  return false;
                 }
               } else if (stringNullOrEmpty(contentType.value_post_code)) {
+                return false;
+              }
+
+              return true;
+            },
+            prefecture: (contentType) => {
+              if (stringNullOrEmpty(contentType.value_prefecture) && contentType.hasOwnProperty('prefecture')) {
+                return false;
+              }
+
+              return true;
+            },
+            municipality: (contentType) => {
+              if (stringNullOrEmpty(contentType.value_municipality) && contentType.hasOwnProperty('municipality')) {
+                return false;
+              }
+
+              return true;
+            },
+            address: (contentType) => {
+              if (stringNullOrEmpty(contentType.value_address) && contentType.hasOwnProperty('address')) {
+                return false;
+              }
+
+              return true;
+            },
+            building_name: (contentType) => {
+              if (stringNullOrEmpty(contentType.value_building_name) && contentType.hasOwnProperty('building_name')) {
+                return false;
+              }
+
+              return true;
+            },
+            compact_municipality_and_address: (contentType, requireBuildingName = true) => { 
+              if (
+                (contentType.municipality !== undefined && !validateFields.municipality(contentType)) || 
+                (requireBuildingName && contentType.building_name !== undefined && !validateFields.building_name(contentType))
+              ) {
+                return false;
+              }
+              return true
+            },
+            compact_municipality_and_address_and_building_name: (contentType) => {
+              if (contentType.municipality !== undefined && !validateFields.municipality(contentType)) {
+                return false;
+              }
+              return true;
+            }
+          };
+          
+          if (contentType.isCheckRequire === "require") {
+            if (contentType.post_code !== undefined) {
+              if (!validateFields.postCode(contentType)) {
+                isValidZipCode = false;
+              }
+              
+              if (contentType.prefecture !== undefined && !validateFields.prefecture(contentType)) {
                 isValidZipCode = false;
               }
 
-              if (
-                contentType.prefecture !== undefined &&
-                stringNullOrEmpty(contentType.value_prefecture) && contentType.hasOwnProperty('prefecture')
-              ) {
+              if (contentType.municipality !== undefined && !validateFields.municipality(contentType)) {
                 isValidZipCode = false;
               }
-              if (
-                contentType.municipality !== undefined &&
-                stringNullOrEmpty(contentType.value_municipality) && contentType.hasOwnProperty('municipality')
-              ) {
-                isValidZipCode = false;
+              
+              if (contentType.compact_municipality_and_address) {
+                if (!validateFields.compact_municipality_and_address(contentType)) {
+                  isValidZipCode = false;
+                }
               }
-              if (
-                !contentType.compact_municipality_and_address_and_building_name &&
-                contentType.address !== undefined &&
-                stringNullOrEmpty(contentType.value_address) && contentType.hasOwnProperty('address')
-              ) {
+              else if (contentType.compact_municipality_and_address_and_building_name) {
+                if (!validateFields.compact_municipality_and_address_and_building_name(contentType)) {
+                  isValidZipCode = false;
+                }
+              }
+              else if (contentType.address !== undefined && !validateFields.address(contentType)) {
                 isValidZipCode = false;
               }
             }
@@ -2069,18 +2132,18 @@ const PreviewFukushashiki = () => {
             ) {
               isValidZipCode = false;
             }
-            if (
-              !contentType.compact_municipality_and_address_and_building_name &&
-              contentType.address !== undefined &&
-              stringNullOrEmpty(contentType.value_address) && contentType.hasOwnProperty('address')
-            ) {
-              isValidZipCode = false;
+              
+            if (contentType.compact_municipality_and_address) {
+              if (!validateFields.compact_municipality_and_address(contentType)) {
+                isValidZipCode = false;
+              }
             }
-            if (
-              !contentType.compact_municipality_and_address_and_building_name &&
-              contentType.building_name !== undefined &&
-              stringNullOrEmpty(contentType.value_building_name) && contentType.hasOwnProperty('building_name')
-            ) {
+            else if (contentType.compact_municipality_and_address_and_building_name) {
+              if (!validateFields.compact_municipality_and_address_and_building_name(contentType)) {
+                isValidZipCode = false;
+              }
+            }
+            else if (contentType.address !== undefined && !validateFields.address(contentType)) {
               isValidZipCode = false;
             }
           }
@@ -2665,7 +2728,7 @@ const PreviewFukushashiki = () => {
                   const fukuObject = {
                     type: message.type,
                     bindingMode: message.fukushashiki_search_mode,
-                    bindingAddress: value.trim(),
+                    bindingAddress: value?.trim() || "",
                     bindingValue: message.text_input.email_address.value,
                   };
                   fukuDataList.push(fukuObject);
@@ -3150,6 +3213,7 @@ const PreviewFukushashiki = () => {
   }
 
   const onClickNext = async (indexMessage, message) => {
+    dispatch({ type: PREVIEW_ACTIONS.SET_PROCESSING, payload: true });
     let newState = _.omit(state, ['submitErrorMessage']);
     let clickedMsgIndex = newState.messagesList.findIndex((msg) => msg?.id === message?.id);
     if (clickedMsgIndex < 0) clickedMsgIndex = newState.currentMsgIndex;
@@ -3294,6 +3358,8 @@ const PreviewFukushashiki = () => {
         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
         payload: newState
       });
+    }).finally(() => {
+      dispatch({ type: PREVIEW_ACTIONS.SET_PROCESSING, payload: false });
     });
   };
 
@@ -3720,6 +3786,7 @@ const PreviewFukushashiki = () => {
             lpOptionData={state.lpOptionData}
             submitErrorMessage={state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "" : state.submitErrorMessage}
             botId={state.botId}
+            isProcessing={!!state.isProcessing}
           />
           {renderNextButton(message, indexMessage)}
         </div>
