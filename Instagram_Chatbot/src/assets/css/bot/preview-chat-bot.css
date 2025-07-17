@@ -1,3 +1,38 @@
+#error-message {
+    width: "95%";
+    padding: "5px";
+    border: "1px solid #f44336";
+    background-color: #ffebee;
+    color: #d32f2f;
+    border-radius: 5px;
+    font-family: "Arial, sans-serif";
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    margin: 10px;
+}
+#chatbot-submit-button {
+    background: linear-gradient(135deg, #4caf50, #43a047);
+    color: #fff;
+    border: none;
+    border-radius: 25px;
+    padding: 15px 30px;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    width: 85%;
+    align-content: center;
+}
+#chatbot-submit-button:hover {
+    background: linear-gradient(135deg, #43a047, #4caf50);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+#chatbot-submit-button:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
 .sp-container {
     position: fixed;
     bottom: 0;
