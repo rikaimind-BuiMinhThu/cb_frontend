@@ -2011,38 +2011,67 @@ const PreviewFukushashiki = () => {
           isValid = false;
         } else {
           let isValidZipCode = true;
+          const validateFields = {
+            postCode: (contentType) => {
+              if (contentType.split_postal_code) {
+                if (
+                  stringNullOrEmpty(contentType.value_post_code_left) ||
+                  stringNullOrEmpty(contentType.value_post_code_right)
+                ) {
+                  return false;
+                }
+              } else if (stringNullOrEmpty(contentType.value_post_code)) {
+                return false;
+              }
+
+              return true;
+            },
+            prefecture: (contentType) => {
+              if (stringNullOrEmpty(contentType.value_prefecture) && contentType.hasOwnProperty('prefecture')) {
+                return false;
+              }
+
+              return true;
+            },
+            municipality: (contentType) => {
+              if (stringNullOrEmpty(contentType.value_municipality) && contentType.hasOwnProperty('municipality')) {
+                return false;
+              }
+
+              return true;
+            },
+            address: (contentType) => {
+              if (stringNullOrEmpty(contentType.value_address) && contentType.hasOwnProperty('address')) {
+                return false;
+              }
+
+              return true;
+            },
+            building_name: (contentType) => {
+              if (stringNullOrEmpty(contentType.value_building_name) && contentType.hasOwnProperty('building_name')) {
+                return false;
+              }
+
+              return true;
+            },
+            compact_municipality_and_address: (contentType, requireBuildingName = true) => { 
+              if (
+                (contentType.municipality !== undefined && !validateFields.municipality(contentType)) || 
+                (requireBuildingName && contentType.building_name !== undefined && !validateFields.building_name(contentType))
+              ) {
+                return false;
+              }
+              return true
+            },
+            compact_municipality_and_address_and_building_name: (contentType) => {
+              if (contentType.municipality !== undefined && !validateFields.municipality(contentType)) {
+                return false;
+              }
+              return true;
+            }
+          };
+          
           if (contentType.isCheckRequire === "require") {
-            const validateFields = {
-              postCode: (contentType) => {
-                if (contentType.split_postal_code) {
-                  if (
-                    stringNullOrEmpty(contentType.value_post_code_left) ||
-                    stringNullOrEmpty(contentType.value_post_code_right)
-                  ) {
-                    return false;
-                  }
-                } else if (stringNullOrEmpty(contentType.value_post_code)) {
-                  return false;
-                }
-
-                return true;
-              },
-              prefecture: (contentType) => {
-                if (stringNullOrEmpty(contentType.value_prefecture) && contentType.hasOwnProperty('prefecture')) {
-                  return false;
-                }
-
-                return true;
-              },
-              municipality: (contentType) => {
-                if (stringNullOrEmpty(contentType.value_municipality) && contentType.hasOwnProperty('municipality')) {
-                  return false;
-                }
-
-                return true;
-              },
-            };
-
             if (contentType.post_code !== undefined) {
               if (!validateFields.postCode(contentType)) {
                 isValidZipCode = false;
@@ -2056,17 +2085,18 @@ const PreviewFukushashiki = () => {
                 isValidZipCode = false;
               }
               
-              if (contentType.address !== undefined && contentType.hasOwnProperty('address')) {
-                if (
-                  (contentType.compact_municipality_and_address || contentType.compact_municipality_and_address_and_building_name)
-                ) {
-                  if (contentType.municipality !== undefined && !validateFields.municipality(contentType)) {
-                    isValidZipCode = false;
-                  }
-                }
-                else if (stringNullOrEmpty(contentType.value_address)) {
+              if (contentType.compact_municipality_and_address) {
+                if (!validateFields.compact_municipality_and_address(contentType)) {
                   isValidZipCode = false;
                 }
+              }
+              else if (contentType.compact_municipality_and_address_and_building_name) {
+                if (!validateFields.compact_municipality_and_address_and_building_name(contentType)) {
+                  isValidZipCode = false;
+                }
+              }
+              else if (contentType.address !== undefined && !validateFields.address(contentType)) {
+                isValidZipCode = false;
               }
             }
           } else if (contentType.isCheckRequire === "all_items_require") {
@@ -2094,18 +2124,18 @@ const PreviewFukushashiki = () => {
             ) {
               isValidZipCode = false;
             }
-            if (
-              !contentType.compact_municipality_and_address_and_building_name &&
-              contentType.address !== undefined &&
-              stringNullOrEmpty(contentType.value_address) && contentType.hasOwnProperty('address')
-            ) {
-              isValidZipCode = false;
+              
+            if (contentType.compact_municipality_and_address) {
+              if (!validateFields.compact_municipality_and_address(contentType)) {
+                isValidZipCode = false;
+              }
             }
-            if (
-              !contentType.compact_municipality_and_address_and_building_name &&
-              contentType.building_name !== undefined &&
-              stringNullOrEmpty(contentType.value_building_name) && contentType.hasOwnProperty('building_name')
-            ) {
+            else if (contentType.compact_municipality_and_address_and_building_name) {
+              if (!validateFields.compact_municipality_and_address_and_building_name(contentType)) {
+                isValidZipCode = false;
+              }
+            }
+            else if (contentType.address !== undefined && !validateFields.address(contentType)) {
               isValidZipCode = false;
             }
           }
