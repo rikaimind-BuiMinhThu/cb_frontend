@@ -13,7 +13,11 @@ const CheckboxCustom = ({ id, label, value = false, onChange, className, styleSp
                     checked={value}
                     onChange={e => onChange(e.target.checked)}
                     name="ss-user-setting__item-text_input-save-variable">
-                    {label && <div style={{ ...styleSpan }} >{label}</div>}
+                    {label && typeof label === 'string' ? (
+                      <div style={{ ...styleSpan }} dangerouslySetInnerHTML={{ __html: label }} />
+                    ) : (
+                      <div style={{ ...styleSpan }}>{label}</div>
+                    )}
                 </Checkbox>
             </div>
         </React.Fragment>
