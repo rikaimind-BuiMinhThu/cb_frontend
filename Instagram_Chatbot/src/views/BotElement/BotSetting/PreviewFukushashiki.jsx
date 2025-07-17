@@ -2020,41 +2020,59 @@ const PreviewFukushashiki = () => {
         } else {
           let isValidZipCode = true;
           if (contentType.isCheckRequire === "require") {
-            if (contentType.post_code !== undefined) {
-              if (contentType.split_postal_code) {
-                if (
-                  stringNullOrEmpty(contentType.value_post_code_left) ||
-                  stringNullOrEmpty(contentType.value_post_code_right)
-                ) {
-                  isValidZipCode = false;
+            const validateFields = {
+              postCode: (contentType) => {
+                if (contentType.split_postal_code) {
+                  if (
+                    stringNullOrEmpty(contentType.value_post_code_left) ||
+                    stringNullOrEmpty(contentType.value_post_code_right)
+                  ) {
+                    return false;
+                  }
+                } else if (stringNullOrEmpty(contentType.value_post_code)) {
+                  return false;
                 }
-              } else if (stringNullOrEmpty(contentType.value_post_code)) {
+
+                return true;
+              },
+              prefecture: (contentType) => {
+                if (stringNullOrEmpty(contentType.value_prefecture) && contentType.hasOwnProperty('prefecture')) {
+                  return false;
+                }
+
+                return true;
+              },
+              municipality: (contentType) => {
+                if (stringNullOrEmpty(contentType.value_municipality) && contentType.hasOwnProperty('municipality')) {
+                  return false;
+                }
+
+                return true;
+              },
+            };
+
+            if (contentType.post_code !== undefined) {
+              if (!validateFields.postCode(contentType)) {
+                isValidZipCode = false;
+              }
+              
+              if (contentType.prefecture !== undefined && !validateFields.prefecture(contentType)) {
                 isValidZipCode = false;
               }
 
-              if (
-                contentType.prefecture !== undefined &&
-                stringNullOrEmpty(contentType.value_prefecture) && contentType.hasOwnProperty('prefecture')
-              ) {
+              if (contentType.municipality !== undefined && !validateFields.municipality(contentType)) {
                 isValidZipCode = false;
               }
-              if (
-                contentType.municipality !== undefined &&
-                stringNullOrEmpty(contentType.value_municipality) && contentType.hasOwnProperty('municipality')
-              ) {
-                isValidZipCode = false;
-              }
-              if (
-                !contentType.compact_municipality_and_address_and_building_name &&
-                contentType.address !== undefined && contentType.hasOwnProperty('address')
-              ) {
+              
+              if (contentType.address !== undefined && contentType.hasOwnProperty('address')) {
                 if (
-                  contentType.compact_municipality_and_address &&
-                  (stringNullOrEmpty(contentType.value_building_name) || stringNullOrEmpty(contentType.value_municipality))
+                  (contentType.compact_municipality_and_address || contentType.compact_municipality_and_address_and_building_name)
                 ) {
-                  isValidZipCode = false;
+                  if (contentType.municipality !== undefined && !validateFields.municipality(contentType)) {
+                    isValidZipCode = false;
+                  }
                 }
-                else if (!contentType.compact_municipality_and_address && stringNullOrEmpty(contentType.address)) {
+                else if (stringNullOrEmpty(contentType.value_address)) {
                   isValidZipCode = false;
                 }
               }
