@@ -308,7 +308,6 @@ const secondToDatetime =(
 
   return formatted;
 }
-
 const isUndefined = (value) => {
   return value === undefined;
 }
@@ -350,6 +349,28 @@ const findItem = (array, { keys, value, onSuccess = (v) => v, callbackValue = nu
 
   return returnValue || callbackValue;
 } 
+const toCamelCase = (str = "") => str.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+
+const changeElementAttributeById = (ids = []) => {
+  for (const { id, ...attributes } of ids) {
+    const element = document.getElementById(id);
+    if (!element) continue;
+    
+    for (const [key, value] of Object.entries(attributes)) {
+      try {
+      if (key === "style" && typeof value === "object") {
+        Object.entries(value).forEach(([styleKey, styleValue]) => {
+          element.style[toCamelCase(styleKey)] = styleValue;
+        });
+      } else {
+        element.setAttribute(key, value);
+      }
+      } catch {
+        continue;
+      }
+    }
+  }
+}
 
 export {
   stringNullOrEmpty, getAllUrlParams, lightenColor,
@@ -359,4 +380,5 @@ export {
   getScenarioPreviewData, getChatBotSetting, sendEmailRequest,
   sleep, getCaptcha, appendParamsToUrl, checkMessageCondition,
   getAddressFromZipCode, secondToDatetime, findItem, isUndefined,
+  changeElementAttributeById, toCamelCase,
 };
