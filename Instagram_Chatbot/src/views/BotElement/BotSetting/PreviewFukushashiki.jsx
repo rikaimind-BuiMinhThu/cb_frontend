@@ -51,6 +51,7 @@ import {
   appendParamsToUrl,
   checkMessageCondition,
   getCaptcha,
+  findItem,
 } from "./PreviewComponent/Utils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
@@ -574,7 +575,15 @@ const PreviewFukushashiki = () => {
     const municipality = dataContentType?.value_municipality || "";
     const address = dataContentType?.value_address || "";
     const buildingName = dataContentType?.value_building_name || "";
-    return `〒${dataPostCode} ${prefecture}${municipality} ${address}${buildingName}`;
+
+    // Safe parse prefecture name in case of using dropdown
+    let fixedPrefecture = findItem(state.prefecturesList, { 
+      keys: 'id', 
+      value: prefecture, 
+      callbackValue: prefecture,
+      onSuccess: (item) => item.name,
+    });
+    return `〒${dataPostCode} ${fixedPrefecture}${municipality} ${address}${buildingName}`;
   }
 
   const setCardPaymentRadioButtonDefaultValue = (dataContentType, field, value) => {
@@ -3441,9 +3450,35 @@ const PreviewFukushashiki = () => {
     }
 
     if (contentType === "zip_code_address") {
-      Object.keys(value).forEach((key) => {
-        messageContentTypeData[key] = value[key];
-      });
+      if (messageContentTypeData.is_use_dropdown) {
+        messageContentTypeData.value_prefecture_type = "id";
+      }
+      else {
+        messageContentTypeData.value_prefecture_type = "name";
+      }
+
+      if (typeof value === "object") {
+        const transformField = {
+          value_prefecture: (value) => {
+            if (messageContentTypeData.value_prefecture_type === "id") {
+              return value;
+            } else {
+              return findItem(state.prefecturesList, { 
+                keys: 'id', 
+                value: value, 
+                callbackValue: value,
+                onSuccess: (item) => item.name,
+              });
+            }
+          }
+        }
+        
+        Object.keys(value).forEach((key) => {
+          messageContentTypeData[key] = transformField[key] ? transformField[key](value[key]) : value[key];
+        });
+      } else {
+        messageContentTypeData[field] = value;
+      }
     }
 
     if (
