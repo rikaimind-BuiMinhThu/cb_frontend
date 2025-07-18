@@ -22,12 +22,22 @@ export default function SubmitButton({ display = false, content, submitErrorMess
     );
   }
 
+  const getButtonSubmitName = (isProcessing) => {
+    if (!content.button_submit_use_loading_text) return content.button_submit_name;
+
+    if (isProcessing) {
+      return content.button_submit_loading_text;
+    }
+
+    return content.button_submit_name;
+  }
+
   return (
     <>
       {renderSubmitErrorMessage()}
       <div className="ss-user-setting__item-text_input-top">
         <button id="chatbot-submit-button" onClick={onClickNext}>
-          { isProcessing ? content.button_submit_loading_text : content.button_submit_name }
+          {getButtonSubmitName(isProcessing)}
         </button>
       </div>
     </>
