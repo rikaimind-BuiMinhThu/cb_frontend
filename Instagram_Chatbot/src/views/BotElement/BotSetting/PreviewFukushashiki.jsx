@@ -3214,7 +3214,7 @@ const PreviewFukushashiki = () => {
 
   const onClickNext = async (indexMessage, message) => {
     dispatch({ type: PREVIEW_ACTIONS.SET_PROCESSING, payload: true });
-    let newState = _.omit(state, ['submitErrorMessage']);
+    let newState = _.cloneDeep(state);
     let clickedMsgIndex = newState.messagesList.findIndex((msg) => msg?.id === message?.id);
     if (clickedMsgIndex < 0) clickedMsgIndex = newState.currentMsgIndex;
     newState.userMessagesList = newState.messagesList.filter((item) => isUserMessage(item));
@@ -3360,6 +3360,14 @@ const PreviewFukushashiki = () => {
       });
     }).finally(() => {
       dispatch({ type: PREVIEW_ACTIONS.SET_PROCESSING, payload: false });
+
+      if (!!newState.submitErrorMessage) {
+        dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE,
+          payload: "",
+        });
+        newState.submitErrorMessage = "";
+      };
     });
   };
 
