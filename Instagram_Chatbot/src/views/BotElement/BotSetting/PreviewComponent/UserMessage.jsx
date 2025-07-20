@@ -3272,7 +3272,7 @@ const UserMessage = ({
                                   onChangeValue(
                                     indexContent,
                                     content.type,
-                                    getPrefectureIdCodeFromName(res.data.data.prefecture_name),
+                                    zipCodeAddress.is_use_dropdown ? getPrefectureIdCodeFromName(res.data.data.prefecture_name) : res.data.data.prefecture_name,
                                     "value_prefecture"
                                   );
                                   if (zipCodeAddress.compact_municipality_and_address) {
@@ -3385,7 +3385,7 @@ const UserMessage = ({
                                     onChangeValue(
                                       indexContent,
                                       content.type,
-                                      getPrefectureIdCodeFromName(res.data.data.prefecture_name),
+                                      zipCodeAddress.is_use_dropdown ? getPrefectureIdCodeFromName(res.data.data.prefecture_name) : res.data.data.prefecture_name,
                                       "value_prefecture"
                                     );
                                     if (zipCodeAddress.compact_municipality_and_address) {
@@ -3491,7 +3491,7 @@ const UserMessage = ({
                                     onChangeValue(
                                       indexContent,
                                       content.type,
-                                      getPrefectureIdCodeFromName(res.data.data.prefecture_name),
+                                      zipCodeAddress.is_use_dropdown ? getPrefectureIdCodeFromName(res.data.data.prefecture_name) : res.data.data.prefecture_name,
                                       "value_prefecture"
                                     );
                                     if (zipCodeAddress.compact_municipality_and_address) {
