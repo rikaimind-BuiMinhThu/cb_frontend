@@ -3380,14 +3380,6 @@ const PreviewFukushashiki = () => {
       });
     }).finally(() => {
       dispatch({ type: PREVIEW_ACTIONS.SET_PROCESSING, payload: false });
-
-      // if (!!newState.submitErrorMessage) {
-      //   dispatch({
-      //     type: PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE,
-      //     payload: "",
-      //   });
-      //   newState.submitErrorMessage = "";
-      // };
     });
   };
 
