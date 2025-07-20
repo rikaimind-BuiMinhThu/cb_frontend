@@ -309,6 +309,70 @@ const secondToDatetime =(
   return formatted;
 }
 
+const isUndefined = (value) => {
+  return value === undefined;
+}
+
+/**
+ * keys can use . to access nested object
+ */
+const findItem = (array, { keys, value, onSuccess = (v) => v, callbackValue = null }) => {
+  if (!array || !keys) return callbackValue;
+  let keysArray = [];
+
+  if (typeof keys === 'string') {
+    keysArray = keys.split('.');
+  } else if (Array.isArray(keys)) {
+    keysArray = keys;
+  } else {
+    return callbackValue;
+  }
+
+
+  if (keysArray.length === 0) return callbackValue;
+
+  if (typeof array !== 'object' || !Array.isArray(array)) return callbackValue;
+
+  const foundItem = array.find(item => {
+    const itemValue = keysArray.reduce((acc, key) => isUndefined(acc) ? acc : acc[key], item);
+    return itemValue === value;
+  });
+
+  let returnValue = foundItem;
+
+  if (onSuccess && foundItem) {
+    try {
+      returnValue = onSuccess(foundItem);
+    } catch {
+      return callbackValue;
+    }
+  }
+
+  return returnValue || callbackValue;
+} 
+const toCamelCase = (str = "") => str.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+
+const changeElementAttributeById = (ids = []) => {
+  for (const { id, ...attributes } of ids) {
+    const element = document.getElementById(id);
+    if (!element) continue;
+    
+    for (const [key, value] of Object.entries(attributes)) {
+      try {
+      if (key === "style" && typeof value === "object") {
+        Object.entries(value).forEach(([styleKey, styleValue]) => {
+          element.style[toCamelCase(styleKey)] = styleValue;
+        });
+      } else {
+        element.setAttribute(key, value);
+      }
+      } catch {
+        continue;
+      }
+    }
+  }
+}
+
 export {
   stringNullOrEmpty, getAllUrlParams, lightenColor,
   mobileCheck, removeLeadingZero, sendUserInteractionData,
@@ -316,5 +380,6 @@ export {
   getCitiesByPrefecture, getTownsByCity, getPrefectures,
   getScenarioPreviewData, getChatBotSetting, sendEmailRequest,
   sleep, getCaptcha, appendParamsToUrl, checkMessageCondition,
-  getAddressFromZipCode, secondToDatetime
+  getAddressFromZipCode, secondToDatetime, findItem, isUndefined,
+  changeElementAttributeById, toCamelCase,
 };
