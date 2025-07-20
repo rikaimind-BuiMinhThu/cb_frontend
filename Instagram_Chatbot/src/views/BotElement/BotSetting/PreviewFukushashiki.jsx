@@ -964,7 +964,7 @@ const PreviewFukushashiki = () => {
     });
   }
 
-  const renderMessagesWithDelay = (theState, startMsgIndex, endMsgIndex, options = { setNewState: true, delay: 500 }) => {
+  const renderMessagesWithDelay = (theState, startMsgIndex, endMsgIndex, options = { setNewState: true }) => {
     return new Promise(async (resolve) => {
       for (let i = startMsgIndex; i <= endMsgIndex; i++) {
         theState.renderMessagesList = theState.messagesList.slice(0, i + 1);
@@ -978,11 +978,11 @@ const PreviewFukushashiki = () => {
         const { prefecturesList, ...rest } = theState;
         dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: rest });
 
-        await sleep(options.delay);
+        await sleep(1000);
       }
       resolve();
     }).then(() => {
-      if (options.setNewState) {
+      if(options.setNewState) {
         theState.renderMessagesList = theState.messagesList.slice(0, theState.currentMsgIndex + 1);
         theState.passedUserMsgCount = theState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
   
@@ -1127,11 +1127,10 @@ const PreviewFukushashiki = () => {
     });
 
     if (newState.isOpen) {
-      newState.alreadyOpenFirstTime = true;
       return renderMessagesWithDelay(newState, 0, newState.currentMsgIndex);
     } else {
-      newState.renderMessagesList = [];
-      newState.passedUserMsgCount = 0;
+      newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+      newState.passedUserMsgCount = newState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
       dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
     }
   }
@@ -1255,7 +1254,6 @@ const PreviewFukushashiki = () => {
         }
 
         return fukushashikiSavedStateToLp(savedState).then(async () => {
-          savedState.renderMessagesList = [];
           dispatch({
             type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
             payload: {
@@ -1264,24 +1262,19 @@ const PreviewFukushashiki = () => {
               loadedStateFromSession: true,
             }
           });
-
+          await sleep(2000);
           // GetPreviewOrderContent
           const botConfirmMessage = savedState.messagesList.find(msg => {
             return !!msg.message_content.find(x => x.text_input?.use_for_confirm_message)
           });
           if (botConfirmMessage) {
-            sleep(2000)
-            .then(() => {
-              const botConfirmJsCode = botConfirmMessage.message_content
-                .find(x => x.text_input?.use_for_confirm_message)
-                ?.text_input?.jscode;
-              if (botConfirmJsCode && botConfirmJsCode.length > 0) {
-                postMessageForGetPreviewOrderContent(botConfirmJsCode);
-              }
-            });
-          };
-
-          renderMessagesWithDelay(savedState, 0, savedState.currentMsgIndex);
+            const botConfirmJsCode = botConfirmMessage.message_content
+              .find(x => x.text_input?.use_for_confirm_message)
+              ?.text_input?.jscode;
+            if (botConfirmJsCode && botConfirmJsCode.length > 0) {
+              postMessageForGetPreviewOrderContent(botConfirmJsCode);
+            }
+          }
         });
       }
     }

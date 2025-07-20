@@ -308,7 +308,6 @@ const secondToDatetime =(
 
   return formatted;
 }
-
 const isUndefined = (value) => {
   return value === undefined;
 }
