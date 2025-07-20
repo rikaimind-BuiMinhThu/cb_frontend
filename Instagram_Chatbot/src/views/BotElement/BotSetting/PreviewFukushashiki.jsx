@@ -51,8 +51,6 @@ import {
   appendParamsToUrl,
   checkMessageCondition,
   getCaptcha,
-  findItem,
-  changeElementAttributeById,
 } from "./PreviewComponent/Utils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
@@ -485,7 +483,7 @@ const PreviewFukushashiki = () => {
         }
       });
     }
-
+    
     state.alreadyOpenFirstTime = true;
     state.isOpen = true;
     state.currentUserMsgIndex = state.messagesList.findIndex((item) => {
@@ -576,15 +574,7 @@ const PreviewFukushashiki = () => {
     const municipality = dataContentType?.value_municipality || "";
     const address = dataContentType?.value_address || "";
     const buildingName = dataContentType?.value_building_name || "";
-
-    // Safe parse prefecture name in case of using dropdown
-    let fixedPrefecture = findItem(state.prefecturesList, { 
-      keys: 'id', 
-      value: prefecture, 
-      callbackValue: prefecture,
-      onSuccess: (item) => item.name,
-    });
-    return `〒${dataPostCode} ${fixedPrefecture}${municipality} ${address}${buildingName}`;
+    return `〒${dataPostCode} ${prefecture}${municipality} ${address}${buildingName}`;
   }
 
   const setCardPaymentRadioButtonDefaultValue = (dataContentType, field, value) => {
@@ -964,7 +954,7 @@ const PreviewFukushashiki = () => {
     });
   }
 
-  const renderMessagesWithDelay = (theState, startMsgIndex, endMsgIndex, options = { setNewState: true, delay: 500 }) => {
+  const renderMessagesWithDelay = (theState, startMsgIndex, endMsgIndex, options = { setNewState: true }) => {
     return new Promise(async (resolve) => {
       for (let i = startMsgIndex; i <= endMsgIndex; i++) {
         theState.renderMessagesList = theState.messagesList.slice(0, i + 1);
@@ -978,11 +968,11 @@ const PreviewFukushashiki = () => {
         const { prefecturesList, ...rest } = theState;
         dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: rest });
 
-        await sleep(options.delay);
+        await sleep(1000);
       }
       resolve();
     }).then(() => {
-      if (options.setNewState) {
+      if(options.setNewState) {
         theState.renderMessagesList = theState.messagesList.slice(0, theState.currentMsgIndex + 1);
         theState.passedUserMsgCount = theState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
   
@@ -1127,11 +1117,10 @@ const PreviewFukushashiki = () => {
     });
 
     if (newState.isOpen) {
-      newState.alreadyOpenFirstTime = true;
       return renderMessagesWithDelay(newState, 0, newState.currentMsgIndex);
     } else {
-      newState.renderMessagesList = [];
-      newState.passedUserMsgCount = 0;
+      newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+      newState.passedUserMsgCount = newState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
       dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
     }
   }
@@ -1255,7 +1244,6 @@ const PreviewFukushashiki = () => {
         }
 
         return fukushashikiSavedStateToLp(savedState).then(async () => {
-          savedState.renderMessagesList = [];
           dispatch({
             type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
             payload: {
@@ -1264,24 +1252,19 @@ const PreviewFukushashiki = () => {
               loadedStateFromSession: true,
             }
           });
-
+          await sleep(2000);
           // GetPreviewOrderContent
           const botConfirmMessage = savedState.messagesList.find(msg => {
             return !!msg.message_content.find(x => x.text_input?.use_for_confirm_message)
           });
           if (botConfirmMessage) {
-            sleep(2000)
-            .then(() => {
-              const botConfirmJsCode = botConfirmMessage.message_content
-                .find(x => x.text_input?.use_for_confirm_message)
-                ?.text_input?.jscode;
-              if (botConfirmJsCode && botConfirmJsCode.length > 0) {
-                postMessageForGetPreviewOrderContent(botConfirmJsCode);
-              }
-            });
-          };
-
-          renderMessagesWithDelay(savedState, 0, savedState.currentMsgIndex);
+            const botConfirmJsCode = botConfirmMessage.message_content
+              .find(x => x.text_input?.use_for_confirm_message)
+              ?.text_input?.jscode;
+            if (botConfirmJsCode && botConfirmJsCode.length > 0) {
+              postMessageForGetPreviewOrderContent(botConfirmJsCode);
+            }
+          }
         });
       }
     }
@@ -3458,35 +3441,9 @@ const PreviewFukushashiki = () => {
     }
 
     if (contentType === "zip_code_address") {
-      if (messageContentTypeData.is_use_dropdown) {
-        messageContentTypeData.value_prefecture_type = "id";
-      }
-      else {
-        messageContentTypeData.value_prefecture_type = "name";
-      }
-
-      if (typeof value === "object") {
-        const transformField = {
-          value_prefecture: (value) => {
-            if (messageContentTypeData.value_prefecture_type === "id") {
-              return value;
-            } else {
-              return findItem(state.prefecturesList, { 
-                keys: 'id', 
-                value: value, 
-                callbackValue: value,
-                onSuccess: (item) => item.name,
-              });
-            }
-          }
-        }
-        
-        Object.keys(value).forEach((key) => {
-          messageContentTypeData[key] = transformField[key] ? transformField[key](value[key]) : value[key];
-        });
-      } else {
-        messageContentTypeData[field] = value;
-      }
+      Object.keys(value).forEach((key) => {
+        messageContentTypeData[key] = value[key];
+      });
     }
 
     if (
@@ -3655,10 +3612,9 @@ const PreviewFukushashiki = () => {
       state.botInfor?.withdrawal_prevention_status === "standard_exit_popup" ||
       state.botInfor?.withdrawal_prevention_status === "image_popup"
     ) {
-      changeElementAttributeById([
-        { id: "sp-withdrawal-container", style: { display: "block" }},
-        { id: "sp-withdrawal-content", style: { display: "block" }}
-      ]);
+      document.getElementById("sp-withdrawal-container").style.display =
+        "block";
+      document.getElementById("sp-withdrawal-content").style.display = "block";
     }
   };
 
@@ -3670,10 +3626,8 @@ const PreviewFukushashiki = () => {
     }
 
     if (isOpen) {
-      changeElementAttributeById([
-        { id: "sp-withdrawal-container", style: { display: "block" }},
-        { id: "sp-popup-zip-code-address", style: { display: "block" }}
-      ]);
+      document.getElementById("sp-withdrawal-container").style.display = "block";
+      document.getElementById("sp-popup-zip-code-address").style.display = "block";
 
       newState = {
         ...state,
@@ -3689,10 +3643,8 @@ const PreviewFukushashiki = () => {
       return;
     }
 
-    changeElementAttributeById([
-      { id: "sp-withdrawal-container", style: { display: "none" }},
-      { id: "sp-popup-zip-code-address", style: { display: "none" }}
-    ]);
+    document.getElementById("sp-withdrawal-container").style.display = "none";
+    document.getElementById("sp-popup-zip-code-address").style.display = "none";
   };
 
   const isPopUpZipCodeShippingAddress = (isOpen, indexContent) => {
