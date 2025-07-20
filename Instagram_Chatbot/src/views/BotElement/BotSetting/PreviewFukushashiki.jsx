@@ -146,6 +146,7 @@ const PREVIEW_ACTIONS = {
   UPDATE_SUBMIT_ERROR_MESSAGE: "UPDATE_SUBMIT_ERROR_MESSAGE",
   UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG: "UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG",
   SET_PROCESSING: "SET_PROCESSING",
+  UPDATE_PREFECTURES_LIST: "UPDATE_PREFECTURES_LIST",
 };
 
 const PreviewFukushashikiReducer = (state, action) => {
@@ -224,6 +225,8 @@ const PreviewFukushashikiReducer = (state, action) => {
         isProcessing: false,
       };
     }
+    case PREVIEW_ACTIONS.UPDATE_PREFECTURES_LIST:
+      return { ...state, prefecturesList: action.payload.prefecturesList };
   }
 
   return state;
@@ -425,9 +428,10 @@ const PreviewFukushashiki = () => {
   useEffect(() => {
     if (!state.loadedStateFromSession) return;
     if (state.prefecturesList.length !== 0) return;
+
     getPrefectures()
       .then((res) => {
-        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { prefecturesList: res.data.data } });
+        dispatch({ type: PREVIEW_ACTIONS.UPDATE_PREFECTURES_LIST, payload: { prefecturesList: res.data.data } });
       })
   }, [state.prefecturesList, state.loadedStateFromSession]);
 
@@ -969,8 +973,11 @@ const PreviewFukushashiki = () => {
           theState.messagesList[i].hidden = true;
           continue;
         }
-        
-        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: theState });
+
+        // update state with theState except prefecturesList
+        const { prefecturesList, ...rest } = theState;
+        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: rest });
+
         await sleep(options.delay);
       }
       resolve();
@@ -978,7 +985,10 @@ const PreviewFukushashiki = () => {
       if (options.setNewState) {
         theState.renderMessagesList = theState.messagesList.slice(0, theState.currentMsgIndex + 1);
         theState.passedUserMsgCount = theState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
-        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: theState });
+  
+        // update state with theState except prefecturesList
+        const { prefecturesList, ...rest } = theState;
+        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: rest });
       }
     });
   }
