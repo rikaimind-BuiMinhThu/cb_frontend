@@ -28,7 +28,7 @@ const LPIntegrationOptionPullDown = ({
     });
   }, []);
 
-  if (data === null) return null;
+  if (data === null || data === undefined) return null;
 
   return (
     <React.Fragment>
