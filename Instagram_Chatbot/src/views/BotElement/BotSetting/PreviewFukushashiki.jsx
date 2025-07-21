@@ -32,7 +32,8 @@ import {
   CUSTOM_JS_CODE_POSITION,
   BOT_MESSAGE_TYPES,
   TIMER_MAP_VARIABLES_FIELD,
-  TIMER_TYPES
+  TIMER_TYPES,
+  RENDER_CHATBOT_CONFIG
 } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
@@ -3345,7 +3346,8 @@ const PreviewFukushashiki = () => {
             endIndex: i + 1
           }
         });
-        await sleep(100);
+
+        await sleep(RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE);
       }
       resolve();
     }).then(() => {

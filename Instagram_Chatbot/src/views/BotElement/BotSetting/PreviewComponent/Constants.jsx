@@ -165,6 +165,10 @@ const BOT_MESSAGE_TYPES = {
   HTML_CODE: 'html_code'
 }
 
+const RENDER_CHATBOT_CONFIG = {
+  DELAY_EACH_MESSAGE: 1000,
+};
+
 export {
   dataHourFixed,
   dataMinutes,
@@ -187,6 +191,7 @@ export {
   REGEXP,
   CUSTOM_JS_CODE_POSITION,
   BOT_MESSAGE_TYPES,
+  RENDER_CHATBOT_CONFIG,
 };
 
 export const TIMER_TYPES = {
