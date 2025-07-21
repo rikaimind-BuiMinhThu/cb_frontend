@@ -17,7 +17,7 @@ const CustomButton = ({
         onClick();
       return
     }
-  }, []);
+  }, [autoClick]);
 
   return (
     <Button
