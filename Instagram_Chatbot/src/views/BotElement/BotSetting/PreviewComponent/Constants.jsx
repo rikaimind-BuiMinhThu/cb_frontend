@@ -169,6 +169,12 @@ const RENDER_CHATBOT_CONFIG = {
   DELAY_EACH_MESSAGE: 1000,
 };
 
+const CONVERT_TEXT_TYPES = {
+  HIRAGANA: 'hiragana',
+  KATAKANA: 'katakana',
+  ROMAJI: 'romaji',
+}
+
 export {
   dataHourFixed,
   dataMinutes,
@@ -192,6 +198,7 @@ export {
   CUSTOM_JS_CODE_POSITION,
   BOT_MESSAGE_TYPES,
   RENDER_CHATBOT_CONFIG,
+  CONVERT_TEXT_TYPES,
 };
 
 export const TIMER_TYPES = {

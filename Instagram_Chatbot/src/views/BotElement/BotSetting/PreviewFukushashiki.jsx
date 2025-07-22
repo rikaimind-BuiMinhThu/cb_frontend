@@ -61,6 +61,7 @@ import ZipCodePopUp from "./PreviewComponent/ZipCodePopUp";
 import * as wanakana from "wanakana";
 import _ from "lodash";
 import Timer from "./Timer";
+import { convertTextJapanese } from "utils/japaneseConverter";
 
 sessionStorage.setItem("prevOpenStatus", "0");
 var url = new URL(window.location.href);
@@ -3390,23 +3391,6 @@ const PreviewFukushashiki = () => {
     return loginMessageNames.includes(message.message_name);
   }
 
-  function convertTextJapanese(text, targetType) {
-    switch (targetType.toLowerCase()) {
-      case "hiragana":
-        return wanakana.toHiragana(text);
-      case "katakana":
-        return wanakana.toKatakana(text);
-      case "romaji":
-        return wanakana.toRomaji(text);
-      default:
-        throw new Error("Loại chuyển đổi không hợp lệ! Chọn 'hiragana', 'katakana' hoặc 'romaji'.");
-    }
-  }
-
-  function containsKanji(input) {
-    return [...input].some(char => wanakana.isKanji(char));
-  }
-
   const onChangeValue = (
     indexContent,
     contentType,
@@ -3423,20 +3407,18 @@ const PreviewFukushashiki = () => {
     if (messageContentTypeData?.isUseConvertText && contentType === "text_input") {
       const convertType = newState.messagesList[msgIndex].message_content[indexContent][contentType].convertTextTypeValue;
       const textConvertedValue = convertTextJapanese(value, convertType);
-      if (textConvertedValue && !containsKanji(textConvertedValue)) {
-        switch (subFiled) {
-          case "valueLeft": {
-            newState.messagesList[msgIndex].message_content[indexContent + 1][contentType].text.valueLeft = textConvertedValue;
-            break;
-          }
-          case "valueRight": {
-            newState.messagesList[msgIndex].message_content[indexContent + 1][contentType].text.valueRight = textConvertedValue;
-            break;
-          }
-          case "value": {
-            newState.messagesList[msgIndex].message_content[indexContent + 1][contentType].text.value = textConvertedValue;
-            break;
-          }
+      switch (subFiled) {
+        case "valueLeft": {
+          newState.messagesList[msgIndex].message_content[indexContent + 1][contentType].text.valueLeft = textConvertedValue;
+          break;
+        }
+        case "valueRight": {
+          newState.messagesList[msgIndex].message_content[indexContent + 1][contentType].text.valueRight = textConvertedValue;
+          break;
+        }
+        case "value": {
+          newState.messagesList[msgIndex].message_content[indexContent + 1][contentType].text.value = textConvertedValue;
+          break;
         }
       }
     }
