@@ -463,6 +463,9 @@ const PreviewFukushashiki = () => {
       };
       sendCountRequest(state.scenarioId, openChatbotCountApiParams);
     }
+    
+    const timerChatbotStorage = getTimerSessionStorage();
+    setTimerChanges((timerChanges) => timerChatbotStorage || timerChanges);
 
     // post message to parent window
     postMessageToParent({isOpen: opening});
@@ -497,9 +500,6 @@ const PreviewFukushashiki = () => {
       return !item.hidden && isUserMessage(item) && isDisplayBtnNext;
     });
     
-    const timerChatbotStorage = getTimerSessionStorage();
-    setTimerChanges((timerChanges) => timerChatbotStorage || timerChanges);
-
     // For the first time, we need to render to the first user message
     if (state.currentUserMsgIndex >= 0) {
       state.currentMsgIndex = state.currentUserMsgIndex;
@@ -1171,7 +1171,9 @@ const PreviewFukushashiki = () => {
     return variables;
   }
 
-  const calculateTimerConfigDuration = (type, duration) => {
+  const calculateTimerConfigDuration = (type, duration, options = {}) => {  
+    const { timerLeft = 0, useTimerLeft = false } = options;
+
     if (!duration || !type) return 0;
 
     const durationConfig = duration[type];
@@ -1181,6 +1183,10 @@ const PreviewFukushashiki = () => {
 
     switch(type) {
       case TIMER_TYPES.COUNTING_DOWN: {
+        if (useTimerLeft) {
+          return timerLeft;
+        }
+
         const { hour = 0, minute = 0, second = 0 } = duration[type];
         return (hour * 60 + minute) * 60 + second;
       }
@@ -1253,6 +1259,11 @@ const PreviewFukushashiki = () => {
             action: CHATBOT_ACTIONS.GET_ERROR_MESSAGE,
             actionData: actionData
           });
+        }
+
+        const timerConfig = getTimerSessionStorage();
+        if (timerConfig) {
+          setTimerChanges({ timeLeft: calculateTimerConfigDuration(timerConfig?.config?.type, timerConfig?.config?.duration, { timerLeft: timerConfig.timeLeft, useTimerLeft: true }), config: timerConfig });
         }
 
         return fukushashikiSavedStateToLp(savedState).then(async () => {
