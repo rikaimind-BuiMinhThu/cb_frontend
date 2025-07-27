@@ -1,9 +1,25 @@
 import * as wanakana from 'wanakana';
 import { CONVERT_TEXT_TYPES } from '../views/BotElement/BotSetting/PreviewComponent/Constants';
+import { sendConvertTextJapaneseRequest } from '../views/BotElement/BotSetting/PreviewComponent/Utils';
 
 export function containsKanji(text) {
   if (!text || typeof text !== 'string') return false;
   return [...text].some(char => wanakana.isKanji(char));
+}
+
+export async function convertTextJapaneseByApi(text, targetType) {
+  if (!text) return "";
+  
+  try {
+    const resApi = await sendConvertTextJapaneseRequest(text);
+
+    const { hiragana = "" } = resApi?.data?.data;
+
+    return convertTextJapanese(hiragana, targetType);
+  } catch (error) {
+    console.error(error);
+    return text;
+  }
 }
 
 export function convertTextJapanese(text, targetType) {

@@ -176,6 +176,13 @@ const sendEmailRequest = (emailId, data) => {
   );
 }
 
+const sendConvertTextJapaneseRequest = (text) => {
+  return postToChatBotServer(
+    CHATBOT_SERVER.CONVERT_TEXT_JAPANESE_PATH,
+    { text }
+  );
+}
+
 const getCaptcha = (size, color, charPreset) => {
   const url = GET_CAPTCHA_PATH.replace(":size", size)
     .replace(":color", color)
@@ -380,5 +387,5 @@ export {
   getScenarioPreviewData, getChatBotSetting, sendEmailRequest,
   sleep, getCaptcha, appendParamsToUrl, checkMessageCondition,
   getAddressFromZipCode, secondToDatetime, findItem, isUndefined,
-  changeElementAttributeById, toCamelCase,
+  changeElementAttributeById, toCamelCase, sendConvertTextJapaneseRequest,
 };
