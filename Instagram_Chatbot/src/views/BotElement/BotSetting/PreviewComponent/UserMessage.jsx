@@ -30,6 +30,7 @@ import "moment/locale/zh-cn";
 import { dataHourFixed, dataMinutes, dataYearFixed, dataMonth, dataDay, dataPaymentMethod, installmentOptions, NUMBER_REGEX } from "./Constants";
 import { stringNullOrEmpty } from "./Utils";
 import SubmitButton from "./UserMessageComponent/SubmitButton";
+import InputDebounce from "../ScenarioSetting/scenarioComon/InputDebounce";
 
 const UserMessage = ({
   messageContentProps,
@@ -718,57 +719,114 @@ const UserMessage = ({
                         justifyContent: "space-between",
                       }}
                     >
-                      <InputCustom
-                        id={content.customId1 || undefined}
-                        disabled={disabled}
-                        placeholder={textInput.text?.placeholderLeft}
-                        style={{ width: "49%", marginBottom: "0px" }}
-                        onChange={(value) =>
-                          onChangeValue(
-                            indexContent,
-                            content.type,
-                            value,
-                            textInput.type,
-                            "valueLeft",
-                          )
-                        }
-                        value={textInput[textInput.type]?.valueLeft}
-                      ></InputCustom>
-                      <InputCustom
-                        id={content.customId2 || undefined}
-                        disabled={disabled}
-                        placeholder={textInput.text?.placeholderRight}
-                        style={{ width: "49%" }}
-                        onChange={(value) =>
-                          onChangeValue(
-                            indexContent,
-                            content.type,
-                            value,
-                            textInput.type,
-                            "valueRight"
-                          )
-                        }
-                        value={textInput[textInput.type]?.valueRight}
-                      ></InputCustom>
+                      {textInput.isUseConvertText 
+                      ? (<>
+                          <InputDebounce
+                            id={content.customId1 || undefined}
+                            disabled={disabled}
+                            placeholder={textInput.text?.placeholderLeft}
+                            style={{ width: "49%", marginBottom: "0px" }}
+                            onChange={(value) =>
+                              onChangeValue(
+                                indexContent,
+                                content.type,
+                                value,
+                                textInput.type,
+                                "valueLeft",
+                              )
+                            }
+                            value={textInput[textInput.type]?.valueLeft}
+                            debounceTime={1000}
+                          />
+                          <InputDebounce
+                            id={content.customId2 || undefined}
+                            disabled={disabled}
+                            placeholder={textInput.text?.placeholderRight}
+                            style={{ width: "49%" }}
+                            onChange={(value) =>
+                              onChangeValue(
+                                indexContent,
+                                content.type,
+                                value,
+                                textInput.type,
+                                "valueRight"
+                              )
+                            }
+                            value={textInput[textInput.type]?.valueRight}
+                            debounceTime={1000}
+                          />
+                        </>) 
+                      : (<>
+                          <InputCustom
+                            id={content.customId1 || undefined}
+                            disabled={disabled}
+                            placeholder={textInput.text?.placeholderLeft}
+                            style={{ width: "49%", marginBottom: "0px" }}
+                            onChange={(value) =>
+                              onChangeValue(
+                                indexContent,
+                                content.type,
+                                value,
+                                textInput.type,
+                                "valueLeft",
+                              )
+                            }
+                            value={textInput[textInput.type]?.valueLeft}
+                          />
+                          <InputCustom
+                            id={content.customId2 || undefined}
+                            disabled={disabled}
+                            placeholder={textInput.text?.placeholderRight}
+                            style={{ width: "49%" }}
+                            onChange={(value) =>
+                              onChangeValue(
+                                indexContent,
+                                content.type,
+                                value,
+                                textInput.type,
+                                "valueRight"
+                              )
+                            }
+                            value={textInput[textInput.type]?.valueRight}
+                          />
+                        </>)}
                     </div>
                   ) : (
                     <React.Fragment>
-                      <InputCustom
-                        id={content.customId || undefined}
-                        disabled={disabled}
-                        style={{ marginBottom: "0px" }}
-                        placeholder={textInput[textInput.type]?.placeholderLeft}
-                        onChange={(value) =>
-                          onChangeValue(
-                            indexContent,
-                            content.type,
-                            value,
-                            textInput.type,
-                            "value"
-                          )
-                        }
-                        value={textInput[textInput.type]?.value}
-                      ></InputCustom>
+                      {textInput.isUseConvertText 
+                      ? (<InputDebounce
+                          id={content.customId || undefined}
+                          disabled={disabled}
+                          style={{ marginBottom: "0px" }}
+                          placeholder={textInput[textInput.type]?.placeholderLeft}
+                          onChange={(value) =>
+                            onChangeValue(
+                              indexContent,
+                              content.type,
+                              value,
+                              textInput.type,
+                              "value"
+                            )
+                          }
+                          value={textInput[textInput.type]?.value}
+                          debounceTime={1000}
+                        />) 
+                      : (<InputCustom
+                          id={content.customId || undefined}
+                          disabled={disabled}
+                          style={{ marginBottom: "0px" }}
+                          placeholder={textInput[textInput.type]?.placeholderLeft}
+                          onChange={(value) =>
+                            onChangeValue(
+                              indexContent,
+                              content.type,
+                              value,
+                              textInput.type,
+                              "value"
+                            )
+                          }
+                          value={textInput[textInput.type]?.value}
+                        />)}
                       {textInput.text?.placeholderRight && (
                         <span
                           style={{
