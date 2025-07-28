@@ -215,10 +215,12 @@ export const TIMER_VARIABLES = {
 
 export const TIMER_VARIABLES_DESCRIPTION = {
   [TIMER_TYPES.COUNTING_DOWN]: {
-    timeCounting: "残り時間 dd日 hh時 mm分 ss秒",
+    timeCounting: "残り時間 dd日 hh時 mm分 ss秒 ms",
     duration: "設定されたタイマー時間 dd日 hh時 mm分 ss秒"
   }
 };
+
+export const TIMER_COUNTING_DELAY = 20;
 
 export const TIMER_MAP_VARIABLE_METHOD = {
   CONFIG: 1,
@@ -230,7 +232,7 @@ export const TIMER_MAP_VARIABLES_FIELD = {
   [TIMER_VARIABLES[TIMER_TYPES.COUNTING_DOWN].timeCounting]: {
     field: "timer",
     method: TIMER_MAP_VARIABLE_METHOD.COMP_STATE,
-    transform: (timer) => secondToDatetime(timer, "{{dd}}日 {{hh}}時 {{mm}}分 {{ss}}秒"),
+    transform: (timer) => secondToDatetime(timer, "{{dd}}日 {{hh}}時 {{mm}}分 {{ss}}秒 {{ms}}"),
   },
   [TIMER_VARIABLES[TIMER_TYPES.COUNTING_DOWN].duration]: {
     field: "duration",
