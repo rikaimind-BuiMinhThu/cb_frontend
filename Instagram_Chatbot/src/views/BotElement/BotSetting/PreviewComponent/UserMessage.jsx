@@ -9,7 +9,7 @@ import CheckboxCustom from "../ScenarioSetting/scenarioComon/CheckboxCustom";
 import InputCustom from "../ScenarioSetting/scenarioComon/InputCustom";
 import { Button } from "reactstrap";
 import ModalNoti from "../../../Popup/ModalNoti";
-import { CHATBOT_ACTIONS, CRAWL_ELEMENT_TYPES, MESSAGE_CONTENT_TYPES, REGEXP, SCAN_REGEX } from "../PreviewComponent/Constants";
+import { CHATBOT_ACTIONS, CRAWL_ELEMENT_TYPES, MESSAGE_CONTENT_TYPES, REGEXP, RENDER_CHATBOT_CONFIG, SCAN_REGEX } from "../PreviewComponent/Constants";
 import {
   Checkbox,
   Radio,
@@ -736,7 +736,7 @@ const UserMessage = ({
                               )
                             }
                             value={textInput[textInput.type]?.valueLeft}
-                            debounceTime={1000}
+                            debounceTime={RENDER_CHATBOT_CONFIG.DEBOUNCE_INPUT_TEXT_JP_CONVERT}
                           />
                           <InputDebounce
                             id={content.customId2 || undefined}
@@ -753,7 +753,7 @@ const UserMessage = ({
                               )
                             }
                             value={textInput[textInput.type]?.valueRight}
-                            debounceTime={1000}
+                            debounceTime={RENDER_CHATBOT_CONFIG.DEBOUNCE_INPUT_TEXT_JP_CONVERT}
                           />
                         </>) 
                       : (<>
@@ -809,7 +809,7 @@ const UserMessage = ({
                             )
                           }
                           value={textInput[textInput.type]?.value}
-                          debounceTime={1000}
+                          debounceTime={RENDER_CHATBOT_CONFIG.DEBOUNCE_INPUT_TEXT_JP_CONVERT}
                         />) 
                       : (<InputCustom
                           id={content.customId || undefined}
