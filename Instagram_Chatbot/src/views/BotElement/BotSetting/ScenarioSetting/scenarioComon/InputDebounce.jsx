@@ -9,6 +9,10 @@ export default function InputDebounce({ value, onChange, debounceTime = 500, ...
     setInputValue(value);
   };
 
+  const handleKeyDown = (e) => {
+    setInputValue(e.target.value);
+  };
+
   useEffect(() => {
     onChange(debouncedValue);
   }, [debouncedValue]);
@@ -18,6 +22,7 @@ export default function InputDebounce({ value, onChange, debounceTime = 500, ...
       {...props}
       value={inputValue}
       onChange={handleChange}
+      onKeyDown={handleKeyDown}
     />
   );  
 }

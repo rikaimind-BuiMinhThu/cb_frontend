@@ -31,6 +31,7 @@ const InputCustom = ({
   labelValue,
   inputMode = "text",
   clearable = false,
+  ...props
 }) => {
   // State to manage password visibility
   const [showPassword, setShowPassword] = useState(false);
@@ -44,6 +45,7 @@ const InputCustom = ({
     return (
       <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', width: '100%' }}>
         <input
+          {...props}
           id={id}
           maxLength={maxLength}
           type={type === 'password' && showPassword ? 'text' : type} // Toggle type for password
@@ -98,6 +100,7 @@ const InputCustom = ({
     return (
       <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', width: '100%' }}>
         <input
+          {...props}
           id={id}
           maxLength={maxLength}
           type={type === 'password' && showPassword ? 'text' : type} // Toggle type for password
@@ -137,6 +140,7 @@ const InputCustom = ({
     <React.Fragment>
       {editableLabel ? (
         <input
+          {...props}
           type="text"
           inputMode={inputMode}
           value={labelValue}
