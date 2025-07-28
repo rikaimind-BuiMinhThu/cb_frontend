@@ -264,29 +264,31 @@ const getAddressFromZipCode = (zipCode) => {
 
 /**
  * 
- * @param {*} format using dd || hh || mm || ss
+ * @param {*} format using dd || hh || mm || ss || ms
  */
 const secondToDatetime =(
   sec, 
-  format = "{{dd}}:{{hh}}:{{mm}}:{{ss}}",
+  format = "{{dd}}:{{hh}}:{{mm}}:{{ss}}:{{ms}}",
   omitLeadingZero = true,
 ) => {
   let paramsSec = sec < 0 ? 0 : (sec || 0);
 
   const SECONDS_IN_MINUTE = 60;
   const SECONDS_IN_HOUR = 60 * SECONDS_IN_MINUTE;     
-  const SECONDS_IN_DAY = 24 * SECONDS_IN_HOUR;    
+  const SECONDS_IN_DAY = 24 * SECONDS_IN_HOUR;   
+  const MILISECONDS_IN_SECOND = 1000; 
 
   const timeParts = {
     dd: Math.floor(paramsSec / SECONDS_IN_DAY) || 0,
     hh: Math.floor((paramsSec % SECONDS_IN_DAY) / SECONDS_IN_HOUR) || 0,
     mm: Math.floor((paramsSec % SECONDS_IN_HOUR) / SECONDS_IN_MINUTE) || 0,
-    ss: (paramsSec % SECONDS_IN_MINUTE) || 0,
+    ss: Math.floor((paramsSec % SECONDS_IN_MINUTE)) || 0,
+    ms: Math.floor((paramsSec % 1) * MILISECONDS_IN_SECOND).toString().slice(-2) || 0, 
   };
 
   const pad = (n) => String(n).padStart(2, '0');
 
-  const regex = /{{(dd|hh|mm|ss)}}[^{{}]*/g;
+  const regex = /{{(dd|hh|mm|ss||ms)}}[^{{}]*/g;
   const matches = [...format.matchAll(regex)];
 
   let formatted = "";
