@@ -60,7 +60,6 @@ import ProcessBar from "./PreviewComponent/ProcessBar";
 import ZipCodePopUp from "./PreviewComponent/ZipCodePopUp";
 import _ from "lodash";
 import Timer from "./Timer";
-import { convertTextJapaneseByApi } from "utils/japaneseConverter";
 
 sessionStorage.setItem("prevOpenStatus", "0");
 var url = new URL(window.location.href);
@@ -3414,31 +3413,6 @@ const PreviewFukushashiki = () => {
     const msgIndex = state.messagesList.findIndex((msg) => msg.id === message.id);
     if (newState.messagesList.length == 0) return;
     let messageContentTypeData = newState.messagesList[msgIndex].message_content[indexContent][contentType];
-    if (messageContentTypeData?.isUseConvertText && contentType === "text_input") {
-      const isExistConvertedTextInput = newState.messagesList[msgIndex].message_content[indexContent + 1];
-
-      if (isExistConvertedTextInput) {
-        const convertType = newState.messagesList[msgIndex].message_content[indexContent][contentType].convertTextTypeValue;
-
-        convertTextJapaneseByApi(value, convertType)
-        .then((textConvertedValue) => {
-          switch (subFiled) {
-            case "valueLeft": {
-              newState.messagesList[msgIndex].message_content[indexContent + 1][contentType].text.valueLeft = textConvertedValue;
-              break;
-            }
-            case "valueRight": {
-              newState.messagesList[msgIndex].message_content[indexContent + 1][contentType].text.valueRight = textConvertedValue;
-              break;
-            }
-            case "value": {
-              newState.messagesList[msgIndex].message_content[indexContent + 1][contentType].text.value = textConvertedValue;
-              break;
-            }   
-          }
-        });
-      }
-    }
 
     if (name) {
       messageContentTypeData[field] = messageContentTypeData[field] || {};
