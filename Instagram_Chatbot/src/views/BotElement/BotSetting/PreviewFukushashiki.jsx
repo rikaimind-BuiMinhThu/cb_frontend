@@ -450,6 +450,32 @@ const PreviewFukushashiki = () => {
     }
   }
 
+  const startRenderWithDelay = (renderMessagesList = [], options = {}) => {
+    const { 
+      delayTime = RENDER_CHATBOT_CONFIG.DELAY_START_RENDER,
+      scrollToBottom = true,
+    } = options;
+
+    new Promise((resolve) => {
+      dispatch({
+        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+        payload: { renderMessagesList: [] },
+      });
+
+      sleep(delayTime).then(resolve);
+    }).then(async () => {
+      dispatch({
+        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+        payload: { renderMessagesList },
+      });
+
+      if (scrollToBottom) {
+        await sleep(RENDER_CHATBOT_CONFIG.DELAY_BEFORE_SCROLL_TO_BOTTOM);
+        scrollToPosition({ position: "b", selector: "#sp-body" });
+      }
+    });
+  }
+
   const onOpenPreview = (opening) => {
     const deviceReceive = state.deviceReceive || params.get("deviceReceive");
     if (!deviceReceive) return;
@@ -482,13 +508,19 @@ const PreviewFukushashiki = () => {
           });
         }
       }
-      return dispatch({
+      dispatch({
         type: PREVIEW_ACTIONS.UPDATE_OPEN_PREVIEW,
         payload: {
           isOpen: opening,
           showPopupCloseBot: false,
         }
       });
+
+      if (opening) {
+        return startRenderWithDelay(state.renderMessagesList, { delayTime: RENDER_CHATBOT_CONFIG.DELAY_START_RENDER });
+      }
+
+      return
     }
 
     state.alreadyOpenFirstTime = true;
@@ -1202,6 +1234,8 @@ const PreviewFukushashiki = () => {
     if (!state.loadedStateFromSession) {
       let savedState = getStateFromSessionStorage();
       if (savedState) {
+        savedState.isExtractFromSession = true;
+
         setConversionParamToLocalStorage(
           savedState.scenarioId,
           'web',
@@ -1267,14 +1301,19 @@ const PreviewFukushashiki = () => {
         }
 
         return fukushashikiSavedStateToLp(savedState).then(async () => {
+          const { renderMessagesList = [], ...savedStateWithoutRenderMessagesList } = savedState;
           dispatch({
             type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
             payload: {
-              ...savedState,
+              ...savedStateWithoutRenderMessagesList,
               isOpen: true,
               loadedStateFromSession: true,
+              isExtractFromSession: false,
             }
           });
+
+          startRenderWithDelay(renderMessagesList, { delayTime: RENDER_CHATBOT_CONFIG.DELAY_START_RENDER });
+
           await sleep(2000);
           // GetPreviewOrderContent
           const botConfirmMessage = savedState.messagesList.find(msg => {
@@ -1330,18 +1369,8 @@ const PreviewFukushashiki = () => {
 
   useEffect(async () => {
     if (!state.isOpen) return;
-
-    const renderUserMessagesList = state.renderMessagesList.filter(message => {
-      const firstMsgContent = message?.message_content?.[0];
-      const isDisplayBtnNext = firstMsgContent?.type != "image" || firstMsgContent?.image?.displayButtonNext != false;
-      return isUserMessage(message) && isDisplayBtnNext && !message.hidden;
-    });
-
-    if (renderUserMessagesList.length > 1) {
-      scrollToPosition({ position: "b", selector: "#sp-body" });
-    } else {
-      scrollToPosition({ position: "t", selector: "#sp-body", forceScroll: true });
-    }
+    
+    scrollToPosition({ position: "b", selector: "#sp-body" });
   }, [state.isOpen, state.renderMessagesList.length, state.submitErrorMessage]);
 
   const handleValidateField = (index) => {
@@ -3744,7 +3773,7 @@ const PreviewFukushashiki = () => {
           onClick={() => {
             onClickNext(indexMessage, message)
           }}
-          autoClick={isAutoClick}
+          autoClick={isAutoClick && !state.isExtractFromSession}
           messsagetype={message.message_content[0]?.type}
         >
           {btnText}
