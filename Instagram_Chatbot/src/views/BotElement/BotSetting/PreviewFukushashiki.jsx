@@ -54,6 +54,7 @@ import {
   getCaptcha,
   findItem,
   changeElementAttributeById,
+  scrollToPosition,
 } from "./PreviewComponent/Utils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
@@ -886,7 +887,7 @@ const PreviewFukushashiki = () => {
 
     newState.renderMessagesList.push(messagesList[i]);
     newState.currentMsgIndex = i;
-    scrollToBottom();
+    scrollToPosition({ position: "b", selector: "#sp-body" });
 
     if (isLastMessageInCreateOrderFlow())
       return redirectToCartPage();
@@ -950,7 +951,7 @@ const PreviewFukushashiki = () => {
     newState.currentMsgIndex = i;
     newState.currentUserMsgIndex++;
 
-    scrollToBottom();
+    scrollToPosition({ position: "b", selector: "#sp-body" });
 
     return newState;
   }
@@ -1337,29 +1338,11 @@ const PreviewFukushashiki = () => {
     });
 
     if (renderUserMessagesList.length > 1) {
-      scrollToBottom(false);
+      scrollToPosition({ position: "b", selector: "#sp-body" });
     } else {
-      scrollToTop();
+      scrollToPosition({ position: "t", selector: "#sp-body", forceScroll: true });
     }
   }, [state.isOpen, state.renderMessagesList.length, state.submitErrorMessage]);
-
-  const scrollToBottom = (forceScroll = false) => {
-    if (document.getElementById("sp-body")) {
-      document.getElementById("sp-body").scrollTo({
-        top: document.getElementById("sp-body").scrollHeight,
-        behavior: forceScroll ? "auto" : "smooth"
-      });
-    }
-  };
-
-  const scrollToTop = () => {
-    if (document.getElementById("sp-body")) {
-      document.getElementById("sp-body").scrollTo({
-        top: 0,
-        behavior: "auto"
-      });
-    }
-  }
 
   const handleValidateField = (index) => {
     let contentArr = [...state.renderMessagesList[index].message_content];

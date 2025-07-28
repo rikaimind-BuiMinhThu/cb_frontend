@@ -381,6 +381,36 @@ const changeElementAttributeById = (ids = []) => {
   }
 }
 
+const scrollToPosition = (options = {}) => {
+  const {
+    selector = null,
+    forceScroll = false,
+    position = "b",
+  } = options;
+
+  if (!selector) return;
+
+  const element = document.querySelector(selector);
+  if (!element) return;
+
+  let top = 0;
+
+  switch (position) {
+    case "b":
+      top = element.scrollHeight;
+      break;
+    case "t":
+      top = 0;
+  }
+
+  if (element) {
+    element.scrollTo({
+      top,
+      behavior: forceScroll ? "auto" : "smooth",
+    });
+  }
+}
+
 export {
   stringNullOrEmpty, getAllUrlParams, lightenColor,
   mobileCheck, removeLeadingZero, sendUserInteractionData,
@@ -390,4 +420,5 @@ export {
   sleep, getCaptcha, appendParamsToUrl, checkMessageCondition,
   getAddressFromZipCode, secondToDatetime, findItem, isUndefined,
   changeElementAttributeById, toCamelCase, sendConvertTextJapaneseRequest,
+  scrollToPosition,
 };
