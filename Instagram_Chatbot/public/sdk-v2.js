@@ -146,7 +146,7 @@ const waitForElement = (mode, address, options = {type: "WAIT_FOR_LOADING"}, cal
 const movePaymentMethodToTop = (data) => {
   const index = data.findIndex(item => item.type === "payment_method_id");
   if (index !== -1) {
-      const [paymentMethod] = data.splice(index, 1);      
+      const paymentMethod = data[index];
       // await component in LP to set value after payment method setted
       data.unshift(paymentMethod, { additionalType: "await" });
   }
@@ -270,14 +270,8 @@ const displayPopup = async () => {
 
       switch (e.data.action) {
         case CHATBOT_ACTIONS.FUKUSHASHIKI:
-          const { data, options } = e.data.actionData;
-          let fukushashikiData = [...data];
-
-          if (options.movePaymentMethodToTop) {
-            fukushashikiData = movePaymentMethodToTop(fukushashikiData);
-          }
-
-          await fillDataFromMessage(fukushashikiData);
+          e.data.actionData = movePaymentMethodToTop(e.data.actionData);
+          await fillDataFromMessage(e.data.actionData);
           break;
         case CHATBOT_ACTIONS.GET_ERROR_MESSAGE:
           processGetErrorMessage(e.data.actionData);

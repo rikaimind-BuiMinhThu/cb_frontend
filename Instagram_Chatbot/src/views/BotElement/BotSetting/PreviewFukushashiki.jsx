@@ -3166,11 +3166,10 @@ const PreviewFukushashiki = () => {
     await sleep(2000);
   }
 
-  const fukushashikiToLP = (fukushashikiData, options = {}) => {
-    const { movePaymentMethodToTop = false } = options;
+  const fukushashikiToLP = (fukushashikiData) => {
     postMessageToParent({
       action: 'fukushashiki',
-      actionData: { data: fukushashikiData, options: { movePaymentMethodToTop } },
+      actionData: fukushashikiData,
       isOpen: true
     });
   }
@@ -3298,8 +3297,7 @@ const PreviewFukushashiki = () => {
       });
     }
 
-    const isContainPaymentMethod = clickedMsg.message_content.some(x => ['card_payment_radio_button', 'credit_card_payment'].includes(x.type));
-    fukushashikiToLP(convertToFukushashikiObject(submitData), { movePaymentMethodToTop: isContainPaymentMethod });
+    fukushashikiToLP(convertToFukushashikiObject(submitData));
 
     if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
       postMessageForExecuteJs(clickedMsg.jscode);
