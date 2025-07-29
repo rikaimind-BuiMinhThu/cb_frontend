@@ -33,7 +33,8 @@ import {
   BOT_MESSAGE_TYPES,
   TIMER_MAP_VARIABLES_FIELD,
   TIMER_TYPES,
-  RENDER_CHATBOT_CONFIG
+  RENDER_CHATBOT_CONFIG,
+  RANGE_TEXT_VALIDATE
 } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
@@ -2526,6 +2527,10 @@ const PreviewFukushashiki = () => {
             // REGEX_CHECK = /[^ァ-ンぁ-んｧ-ﾝﾞﾟ]+$/;
             REGEX_CHECK = /[^ァ-ンぁ-ん一-龥]+$/;
             messageLog = "全角文字を入力してください。";
+            break;
+          case RANGE_TEXT_VALIDATE.ONLY_KATAKANA.KEY:
+            REGEX_CHECK = RANGE_TEXT_VALIDATE.ONLY_KATAKANA.REGEX;
+            messageLog = RANGE_TEXT_VALIDATE.ONLY_KATAKANA.LOG;
             break;
           default:
             REGEX_CHECK = "";
