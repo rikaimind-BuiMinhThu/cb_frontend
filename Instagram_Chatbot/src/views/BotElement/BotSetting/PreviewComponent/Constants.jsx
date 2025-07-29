@@ -179,6 +179,15 @@ const CONVERT_TEXT_TYPES = {
   ROMAJI: 'romaji',
 }
 
+const RANGE_TEXT_VALIDATE = {
+  ONLY_KATAKANA: {
+    KEY: 'only_katakana',
+    REGEX: /[^\u30A0-\u30FF\uFF66-\uFF9Fー]+/,
+    MESSAGE: 'カタカナのみ（全角・半角）',
+    LOG: 'カタカナ（全角・半角）を入力してください。',
+  },
+}
+
 export {
   dataHourFixed,
   dataMinutes,
@@ -203,6 +212,7 @@ export {
   BOT_MESSAGE_TYPES,
   RENDER_CHATBOT_CONFIG,
   CONVERT_TEXT_TYPES,
+  RANGE_TEXT_VALIDATE,
 };
 
 export const TIMER_TYPES = {
