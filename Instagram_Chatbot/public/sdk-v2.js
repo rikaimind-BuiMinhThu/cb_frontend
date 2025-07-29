@@ -270,8 +270,14 @@ const displayPopup = async () => {
 
       switch (e.data.action) {
         case CHATBOT_ACTIONS.FUKUSHASHIKI:
-          e.data.actionData = movePaymentMethodToTop(e.data.actionData);
-          await fillDataFromMessage(e.data.actionData);
+          const { data, options } = e.data.actionData;
+          let fukushashikiData = [...data];
+
+          if (options.movePaymentMethodToTop) {
+            fukushashikiData = movePaymentMethodToTop(fukushashikiData);
+          }
+
+          await fillDataFromMessage(fukushashikiData);
           break;
         case CHATBOT_ACTIONS.GET_ERROR_MESSAGE:
           processGetErrorMessage(e.data.actionData);
