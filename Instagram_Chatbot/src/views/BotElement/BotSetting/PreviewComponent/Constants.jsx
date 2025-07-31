@@ -169,12 +169,23 @@ const BOT_MESSAGE_TYPES = {
 const RENDER_CHATBOT_CONFIG = {
   DELAY_EACH_MESSAGE: 1000,
   DEBOUNCE_INPUT_TEXT_JP_CONVERT: 300,
+  DELAY_START_RENDER: 500,
+  DELAY_BEFORE_SCROLL_TO_BOTTOM: 500,
 };
 
 const CONVERT_TEXT_TYPES = {
   HIRAGANA: 'hiragana',
   KATAKANA: 'katakana',
   ROMAJI: 'romaji',
+}
+
+const RANGE_TEXT_VALIDATE = {
+  ONLY_KATAKANA: {
+    KEY: 'only_katakana',
+    REGEX: /[^\u30A0-\u30FF\uFF66-\uFF9Fー]+/,
+    MESSAGE: 'カタカナのみ（全角・半角）',
+    LOG: 'カタカナ（全角・半角）を入力してください。',
+  },
 }
 
 export {
@@ -201,6 +212,7 @@ export {
   BOT_MESSAGE_TYPES,
   RENDER_CHATBOT_CONFIG,
   CONVERT_TEXT_TYPES,
+  RANGE_TEXT_VALIDATE,
 };
 
 export const TIMER_TYPES = {
