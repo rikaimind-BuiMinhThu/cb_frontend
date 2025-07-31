@@ -381,6 +381,11 @@ const changeElementAttributeById = (ids = []) => {
   }
 }
 
+const removeSpace = (text, trim = true) => {
+  const replacedText = text.replace(/ /g, "");
+  return trim ? replacedText.trim() : replacedText;
+}
+
 export {
   stringNullOrEmpty, getAllUrlParams, lightenColor,
   mobileCheck, removeLeadingZero, sendUserInteractionData,
@@ -390,4 +395,5 @@ export {
   sleep, getCaptcha, appendParamsToUrl, checkMessageCondition,
   getAddressFromZipCode, secondToDatetime, findItem, isUndefined,
   changeElementAttributeById, toCamelCase, sendConvertTextJapaneseRequest,
+  removeSpace,
 };

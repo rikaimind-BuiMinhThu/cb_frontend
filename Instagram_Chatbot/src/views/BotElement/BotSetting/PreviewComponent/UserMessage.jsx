@@ -28,7 +28,7 @@ import { SHORTEN_URL } from "variables/constants";
 import locale from "antd/es/date-picker/locale/ja_JP";
 import "moment/locale/zh-cn";
 import { dataHourFixed, dataMinutes, dataYearFixed, dataMonth, dataDay, dataPaymentMethod, installmentOptions, NUMBER_REGEX } from "./Constants";
-import { stringNullOrEmpty } from "./Utils";
+import { removeSpace, stringNullOrEmpty } from "./Utils";
 import SubmitButton from "./UserMessageComponent/SubmitButton";
 import InputDebounce from "../ScenarioSetting/scenarioComon/InputDebounce";
 import { convertTextJapaneseByApi } from "utils/japaneseConverter";
@@ -160,7 +160,7 @@ const UserMessage = ({
       const convertType = messageContent[indexContent][contentType].convertTextTypeValue;
 
       convertTextJapaneseByApi(value, convertType).then((textConvertedValue) => {
-        onChangeValue(indexContent + 1, contentType, textConvertedValue, type, subFiled);
+        onChangeValue(indexContent + 1, contentType, removeSpace(textConvertedValue), type, subFiled);
       });
     }
   }
