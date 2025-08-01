@@ -476,6 +476,19 @@ const PreviewFukushashiki = () => {
     });
   }
 
+  const getNextUserMsg = (ext = null) => (item, index) => {
+    const firstMsgContent = item?.message_content?.at(0);
+    const isDisplayBtnNext = (item?.message_content?.length === 1 && firstMsgContent?.type != "image") || firstMsgContent?.image?.displayButtonNext != false;
+
+    const conds = !item.hidden && isUserMessage(item) && isDisplayBtnNext;
+
+    if (ext && typeof ext === "function") {
+      return conds && ext(item, index);
+    }
+
+    return conds;
+  }
+
   const onOpenPreview = (opening) => {
     const deviceReceive = state.deviceReceive || params.get("deviceReceive");
     if (!deviceReceive) return;
@@ -525,12 +538,7 @@ const PreviewFukushashiki = () => {
 
     state.alreadyOpenFirstTime = true;
     state.isOpen = true;
-    state.currentUserMsgIndex = state.messagesList.findIndex((item) => {
-      const firstMsgContent = item?.message_content?.[0];
-      const isDisplayBtnNext = firstMsgContent?.type != "image" || firstMsgContent?.image?.displayButtonNext != false;
-
-      return !item.hidden && isUserMessage(item) && isDisplayBtnNext;
-    });
+    state.currentUserMsgIndex = state.messagesList.findIndex(getNextUserMsg());
     
     // For the first time, we need to render to the first user message
     if (state.currentUserMsgIndex >= 0) {
@@ -891,7 +899,7 @@ const PreviewFukushashiki = () => {
     return newState;
   }
 
-  const processForBotDefaultMessage = async (messagesList, i, newState, isUpdateSourceContent) => {
+  const processForBotDefaultMessage = async (messagesList, i, newState, isUpdateSourceContent, assignToState = true) => {
     const msgContent = messagesList[i]?.message_content?.[0];
     if (!msgContent) return newState;
 
@@ -916,9 +924,12 @@ const PreviewFukushashiki = () => {
         applyVariables(msgContent.html_code));
 
     if (updated) messagesList[i].message_content[0] = msgContent;
-
-    newState.renderMessagesList.push(messagesList[i]);
-    newState.currentMsgIndex = i;
+    
+    if (assignToState) {
+      newState.renderMessagesList.push(messagesList[i]);
+      newState.currentMsgIndex = i;
+    }
+    
     scrollToPosition({ position: "b", selector: "#sp-body" });
 
     if (isLastMessageInCreateOrderFlow())
@@ -927,7 +938,7 @@ const PreviewFukushashiki = () => {
     return newState;
   }
 
-  const processForBotMessage = async (messagesList, i, newState, isUpdateSourceContent =+ false) => {
+  const processForBotMessage = async (messagesList, i, newState, isUpdateSourceContent =+ false, assignToState = true) => {
     const firstMsgType = messagesList[i]?.message_content[0]?.type;
 
     switch (firstMsgType) {
@@ -942,7 +953,7 @@ const PreviewFukushashiki = () => {
       case "pause":
         return processBotPauseMessage(messagesList, i, newState);
       default:
-        return processForBotDefaultMessage(messagesList, i, newState, isUpdateSourceContent);
+        return processForBotDefaultMessage(messagesList, i, newState, isUpdateSourceContent, assignToState);
     }
   }
 
@@ -968,7 +979,7 @@ const PreviewFukushashiki = () => {
       });
   }
 
-  const processForUserMessage = (messagesList, i, newState) => {
+  const processForUserMessage = (messagesList, i, newState, assignToState = true) => {
     for (
       let j = 0;
       j < messagesList[i].message_content.length;
@@ -979,9 +990,11 @@ const PreviewFukushashiki = () => {
       }
     }
 
-    newState.renderMessagesList.push(messagesList[i]);
-    newState.currentMsgIndex = i;
-    newState.currentUserMsgIndex++;
+    if (assignToState) {
+      newState.renderMessagesList.push(messagesList[i]);
+      newState.currentMsgIndex = i;
+      newState.currentUserMsgIndex++;
+    }
 
     scrollToPosition({ position: "b", selector: "#sp-body" });
 
@@ -1007,12 +1020,19 @@ const PreviewFukushashiki = () => {
           theState.messagesList[i].hidden = true;
           continue;
         }
-
+        
         // update state with theState except prefecturesList
         const { prefecturesList, ...rest } = theState;
-        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: rest });
+        dispatch({ 
+          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, 
+          payload: {
+            renderMessagesList: theState.renderMessagesList,
+            messagesList: theState.messagesList,
+          },
+        });
 
-        await sleep(1000);
+        scrollToPosition({ position: "b", selector: "#sp-body" });
+        await sleep(RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE);
       }
       resolve();
     }).then(() => {
@@ -1144,12 +1164,7 @@ const PreviewFukushashiki = () => {
       }
     }
 
-    newState.currentUserMsgIndex = newState.messagesList.findIndex((item) => {
-      const firstMsgContent = item?.message_content?.[0];
-      const isDisplayBtnNext = firstMsgContent?.type != "image" || firstMsgContent?.image?.displayButtonNext != false;
-
-      return !item.hidden && isUserMessage(item) && isDisplayBtnNext;
-    });
+    newState.currentUserMsgIndex = newState.messagesList.findIndex(getNextUserMsg());
 
     // For the first time, we need to render to the first user message
     if (newState.currentUserMsgIndex >= 0) {
@@ -3339,18 +3354,18 @@ const PreviewFukushashiki = () => {
         if (isBotMessage(newState.messagesList[i])) {
           newState = {
             ...newState,
-            ...processForBotMessage(newState.messagesList, i, newState)
+            ...processForBotMessage(newState.messagesList, i, newState, false, false)
           };
         } else if (isUserMessage(newState.messagesList[i])) {
           newState = {
             ...newState,
-            ...processForUserMessage(newState.messagesList, i, newState)
+            ...processForUserMessage(newState.messagesList, i, newState, false)
           };
         }
       }
     }
 
-    newState.currentUserMsgIndex = newState.messagesList.findIndex((item, index) => !item.hidden && isUserMessage(item) && index > clickedMsgIndex);
+    newState.currentUserMsgIndex = newState.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex));
     if (newState.currentUserMsgIndex === -1)
       newState.currentMsgIndex = newState.messagesList.length - 1;
     else
