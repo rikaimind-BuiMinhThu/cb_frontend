@@ -2532,7 +2532,7 @@ const PreviewFukushashiki = () => {
             messageLog = "全角ひらがなを入力してください。";
             break;
           case "full_width_katakana":
-            REGEX_CHECK = /[^ァ-ン]+/;
+            REGEX_CHECK = /[^ァ-ン\s]+/;
             messageLog = "全角カタカナを入力してください。";
             break;
           case "double_byte":
