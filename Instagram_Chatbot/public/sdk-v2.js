@@ -82,8 +82,8 @@ const getEnvFromScriptSrc  = () => {
     window.getSdkEnv = true;
   
     const SRC_PARSER = {
-      "ec-chatbot-test1.com": "staging",
-      "ec-chatbot-test.com": "production",
+      "ec-chatbot1.com": "staging",
+      "ec-chatbot.com": "production",
       "localhost:3001": "local",
     }
   
