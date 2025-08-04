@@ -1,0 +1,54 @@
+.option-gender-config {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.option-gender-config input {
+  width: 100% !important;
+}
+
+.icon-config-holder {
+  display: flex;
+  gap: 5px;
+}
+
+.events-config-holder {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.events-config-holder > .preset {
+  display: flex;
+  gap: 5px;
+  width: 100%;
+}
+
+.preset > div {
+  flex: 1;
+}
+
+.input-with-preview {
+  display: flex;
+  flex-direction: row;
+  gap: 1px;
+}
+
+.preview {
+  height: 100%;
+  aspect-ratio: 1/1;
+  border-radius: 5px;
+  border: 1px solid gray;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.preview-text {
+  margin: 0 !important;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-align: center;
+}
