@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { LABELS } from "../Constants";
 
-export default function OptionGender({
+const OptionGender = ({
   indexContent,
   radioButton,
   onChangeValue,
   options,
-}) {
+}) => {
   const mapDisplayType = {
     horizontal: 'row',
     vertical: 'column',
@@ -48,6 +47,8 @@ function OptionGenderItem({ indexContent, item, onChangeValue, isSelected }) {
   };
 
   const getButtonStyle = () => {
+    if (!item.preset_config) return {};
+    
     const { button } = item.preset_config.preset;
     let backgroundColor = button.default;
 
@@ -60,6 +61,8 @@ function OptionGenderItem({ indexContent, item, onChangeValue, isSelected }) {
   };
 
   const getIconStyle = (url) => {
+    if (!item.preset_config) return {};
+
     const { icon } = item.preset_config.preset;
     let colorFill = icon.default;
 
@@ -107,7 +110,7 @@ function OptionGenderItem({ indexContent, item, onChangeValue, isSelected }) {
         );
       }}
     >
-      {item.preset_config.preset.icon.url ? (
+      {item.preset_config?.preset?.icon?.url ? (
         <div
           className="ico"
           alt={item.text}
@@ -119,3 +122,5 @@ function OptionGenderItem({ indexContent, item, onChangeValue, isSelected }) {
     </div>
   );
 }
+
+export default OptionGender;

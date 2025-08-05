@@ -22,7 +22,7 @@ const defaultGenderConfig = {
   },
 };
 
-export default function OptionGenderConfig({ value, onChange }) {
+const OptionGenderConfig = ({ value, onChange })  => {
   const [genderConfig, setGenderConfig] = useState({
     ...defaultGenderConfig,
     ...value,
@@ -138,7 +138,7 @@ export default function OptionGenderConfig({ value, onChange }) {
   );
 }
 
-function InputWithPreview({ preview, ...props }) {
+const InputWithPreview = ({ preview, ...props }) => {
   return (
     <div className="input-with-preview">
       <InputCustom {...props} />
@@ -158,3 +158,5 @@ function InputWithPreview({ preview, ...props }) {
     </div>
   );
 }
+
+export default OptionGenderConfig;
