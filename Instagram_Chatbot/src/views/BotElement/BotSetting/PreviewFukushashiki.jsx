@@ -1274,21 +1274,36 @@ const PreviewFukushashiki = () => {
         if (savedState.isUsedErrMsgByJs && savedState.errMsgJsCode) {
           postMessageForExecuteJs(savedState.errMsgJsCode);
         }
-        if (isLoggedIn) {
-          savedState.messagesList.forEach((x) => x.hidden = !!x?.not_display_when_logged_in);
-          savedState.currentMsgIndex = savedState.messagesList.findIndex((item) => isUserMessage(item) && item.hidden == false);
-          savedState.renderMessagesList = savedState.messagesList.slice(0, savedState.currentMsgIndex + 1);
-          savedState.renderMessagesList = savedState.renderMessagesList.map((msg) => {
-            return isDelayBotMessage(msg) ? {...msg, hidden: true} : msg;
-          });
-          return dispatch({
-            type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-            payload: {
-              ...savedState,
-              isOpen: true
+        
+        if (Boolean(isLoggedIn) !== Boolean(savedState.isLoggedIn)) {
+          savedState.currentMsgIndex = 0;
+        }
+
+        for (let i = 0; i < savedState.messagesList.length; i++) {
+          const item = savedState.messagesList[i];
+          if (!item) continue;
+
+          let isHidden = false;
+          if (isLoggedIn) {
+            savedState.messagesList[i].hidden = !!item?.not_display_when_logged_in;
+            isHidden = !!item?.not_display_when_logged_in;
+          }
+
+          if (isHidden) continue;
+
+          if (savedState.messagesList[i].conditions?.length > 0) {
+            const result = checkMessageCondition(savedState.messagesList[i], savedState.objParam);
+            if (!result) {
+              savedState.messagesList[i].hidden = true;
             }
-          });
-        }        
+          }
+        }
+
+        const newMsgIndex = savedState.messagesList.findIndex((item) => isUserMessage(item) && (item.hidden !== undefined && !item.hidden));
+
+        savedState.currentMsgIndex = Math.max(savedState.currentMsgIndex, newMsgIndex);
+        savedState.renderMessagesList = savedState.messagesList.slice(0, savedState.currentMsgIndex + 1);
+        
         const renderMessagesList = savedState.renderMessagesList.map((msg) => {
           return isDelayBotMessage(msg) ? {...msg, hidden: true} : msg;
         });
@@ -2597,7 +2612,7 @@ const PreviewFukushashiki = () => {
   };
 
   const setStateToSessionStorage = (data) => {
-    sessionStorage.setItem(SESSION_STORAGE_KEY.CHAT_BOT_STATE, JSON.stringify(data));
+    sessionStorage.setItem(SESSION_STORAGE_KEY.CHAT_BOT_STATE, JSON.stringify({ ...data, isLoggedIn }));
   };
 
   const getStateFromSessionStorage = () => {
