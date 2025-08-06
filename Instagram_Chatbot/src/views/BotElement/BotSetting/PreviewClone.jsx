@@ -5345,14 +5345,14 @@ function Preview() {
         onClick={() => onOpenPreview(!isOpen)}
         style={{
           backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
-          width: '240px',
+          width: 'calc(100vw - 20px)',
           height: "48px",
           borderRadius: '35px',
           display: "flex",
           justifyContent: "left",
           position: 'fixed',
           bottom: bottomMarginSp ? `${bottomMarginSp}px` : '10px',
-          right: rightMarginSp ? `${rightMarginSp}px` : '10px'
+          left: '10px'
         }}
       >
         <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)} style={{ width: '100%', padding: '4px' }}>
@@ -5364,7 +5364,7 @@ function Preview() {
               alt="bot-avatar"
             />
           </div>
-          <div>
+          <div style={{ marginLeft: '10px' }}>
             <div id="comment_bubble" className="sp-bubble">
               <span style={{ fontSize: '14px', fontWeight: 700 }}>{titleBubble}</span>
             </div>
