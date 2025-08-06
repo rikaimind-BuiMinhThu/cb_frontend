@@ -44,6 +44,8 @@ import ShopifyReferenceSelect from "./ShopifyReferenceSelect";
 import { Tooltip } from '@mui/material';
 import { MESSAGE_CONTENT_TYPES, TIMER_TYPES, TIMER_VARIABLES, TIMER_VARIABLES_DESCRIPTION, BOT_MESSAGE_TYPES, RANGE_TEXT_VALIDATE, LABELS, GENDER_DISPLAY_TYPES } from '../PreviewComponent/Constants';
 import OptionGenderConfig from './OptionGenderConfig';
+import SubmitButtonLoadingConfig from './SubmitButtonLoadingConfig';
+import SubmitButtonConfig from './SubmitButtonConfig';
 
 const _ = require('lodash');
 
@@ -14804,26 +14806,13 @@ const Scenario = () => {
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'button_submit_name', value)}
                                                           value={content.button_submit_name}
                                                         />
-                                                        
-                                                        <div className="loading-submit-button_holder">
-                                                          <CheckboxCustom
-                                                            label="ローディングテキストを表示する"
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'button_submit_use_loading_text', value)}
-                                                            value={!!content.button_submit_use_loading_text}
-                                                          />
-                                                          {!!content.button_submit_use_loading_text && (
-                                                            <InputCustom
-                                                              className="ss-user-setting-input-overview"
-                                                              styleLabel={{ width: '100%' }}
-                                                              style={{ width: '90%' }}
-                                                              label="ローディングテキスト"
-                                                              inline={false}
-                                                              placeholder={'ローディングテキスト'}
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'button_submit_loading_text', value)}
-                                                              value={content.button_submit_loading_text || ""}
-                                                            />
-                                                          )}
-                                                        </div>
+                                                        <SubmitButtonConfig
+                                                          content={content}
+                                                          onChange={onChangeValueMessageContent}
+                                                          indexMessageSelect={indexMessageSelect}
+                                                          indexContent={indexContent}
+                                                          buttonSubmit={buttonSubmit}
+                                                        />
                                                       </div>
                                                     </>}
                                                   {/* user: type = 'label_no_transition' */}
