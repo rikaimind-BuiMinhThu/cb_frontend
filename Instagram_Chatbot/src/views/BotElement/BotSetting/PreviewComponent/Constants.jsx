@@ -94,7 +94,6 @@ const CHATBOT_SERVER = {
   GET_SCENARIO_PREVIEW_DATA_PATH: '/api/v1/managements/chatbots/:bot_id/scenarios/:scenario_id/preview',
   GET_CHATBOT_SETTING_PATH: '/api/v1/managements/chatbots/:bot_id',
   SEND_EMAIL_PATH: '/api/v1/managements/emails/:email_id/send_email',
-  CONVERT_TEXT_JAPANESE_PATH: '/api/v1/jp_convert',
 };
 
 const GET_CAPTCHA_PATH = `https://svg-captcha-nodejs.vercel.app/captcha?size=:size&color=:color&charPreset=:char_preset`;
@@ -168,25 +167,7 @@ const BOT_MESSAGE_TYPES = {
 
 const RENDER_CHATBOT_CONFIG = {
   DELAY_EACH_MESSAGE: 1000,
-  DEBOUNCE_INPUT_TEXT_JP_CONVERT: 300,
-  DELAY_START_RENDER: 500,
-  DELAY_BEFORE_SCROLL_TO_BOTTOM: 500,
 };
-
-const CONVERT_TEXT_TYPES = {
-  HIRAGANA: 'hiragana',
-  KATAKANA: 'katakana',
-  ROMAJI: 'romaji',
-}
-
-const RANGE_TEXT_VALIDATE = {
-  ONLY_KATAKANA: {
-    KEY: 'only_katakana',
-    REGEX: /[^\u30A0-\u30FF\uFF66-\uFF9Fー]+/,
-    MESSAGE: 'カタカナのみ（全角・半角）',
-    LOG: 'カタカナ（全角・半角）を入力してください。',
-  },
-}
 
 export {
   dataHourFixed,
@@ -211,8 +192,6 @@ export {
   CUSTOM_JS_CODE_POSITION,
   BOT_MESSAGE_TYPES,
   RENDER_CHATBOT_CONFIG,
-  CONVERT_TEXT_TYPES,
-  RANGE_TEXT_VALIDATE,
 };
 
 export const TIMER_TYPES = {
@@ -228,12 +207,10 @@ export const TIMER_VARIABLES = {
 
 export const TIMER_VARIABLES_DESCRIPTION = {
   [TIMER_TYPES.COUNTING_DOWN]: {
-    timeCounting: "残り時間 dd日 hh時 mm分 ss秒 ms",
+    timeCounting: "残り時間 dd日 hh時 mm分 ss秒",
     duration: "設定されたタイマー時間 dd日 hh時 mm分 ss秒"
   }
 };
-
-export const TIMER_COUNTING_DELAY = 20;
 
 export const TIMER_MAP_VARIABLE_METHOD = {
   CONFIG: 1,
@@ -245,7 +222,7 @@ export const TIMER_MAP_VARIABLES_FIELD = {
   [TIMER_VARIABLES[TIMER_TYPES.COUNTING_DOWN].timeCounting]: {
     field: "timer",
     method: TIMER_MAP_VARIABLE_METHOD.COMP_STATE,
-    transform: (timer) => secondToDatetime(timer, "{{dd}}日 {{hh}}時 {{mm}}分 {{ss}}秒 {{ms}}"),
+    transform: (timer) => secondToDatetime(timer, "{{dd}}日 {{hh}}時 {{mm}}分 {{ss}}秒"),
   },
   [TIMER_VARIABLES[TIMER_TYPES.COUNTING_DOWN].duration]: {
     field: "duration",

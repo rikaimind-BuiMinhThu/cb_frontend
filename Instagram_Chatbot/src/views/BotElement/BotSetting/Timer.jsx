@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "assets/css/bot/timer.css";
-import { TIMER_MAP_VARIABLE_METHOD, TIMER_COUNTING_DELAY } from "./PreviewComponent/Constants";
+import { TIMER_MAP_VARIABLE_METHOD } from "./PreviewComponent/Constants";
 
 const initialState = {
   duration: 0,
@@ -153,17 +153,18 @@ export default function Timer({
     if (status !== TIMER_COMPONENT_STATUS.COUNTING || timer <= 0) return;
 
     const timeout = setTimeout(() => {
-      const newTimer = Math.round((timer - (TIMER_COUNTING_DELAY/1000)) * 1000) / 1000;
+      const newTimer = timer - 1;
       setTimer(newTimer);
 
       let newStatus = status;
-      if (newTimer <= 0) {
+
+      if (newTimer === 0) {
         newStatus = TIMER_COMPONENT_STATUS.FINISH;
         setStatus(newStatus);
       }
 
       onCounting(newTimer)
-    }, TIMER_COUNTING_DELAY);
+    }, 1000);
 
     return () => clearTimeout(timeout);
   }, [timer, status]);

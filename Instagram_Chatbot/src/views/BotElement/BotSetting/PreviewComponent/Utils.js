@@ -176,13 +176,6 @@ const sendEmailRequest = (emailId, data) => {
   );
 }
 
-const sendConvertTextJapaneseRequest = (text) => {
-  return postToChatBotServer(
-    CHATBOT_SERVER.CONVERT_TEXT_JAPANESE_PATH,
-    { text }
-  );
-}
-
 const getCaptcha = (size, color, charPreset) => {
   const url = GET_CAPTCHA_PATH.replace(":size", size)
     .replace(":color", color)
@@ -271,31 +264,29 @@ const getAddressFromZipCode = (zipCode) => {
 
 /**
  * 
- * @param {*} format using dd || hh || mm || ss || ms
+ * @param {*} format using dd || hh || mm || ss
  */
 const secondToDatetime =(
   sec, 
-  format = "{{dd}}:{{hh}}:{{mm}}:{{ss}}:{{ms}}",
+  format = "{{dd}}:{{hh}}:{{mm}}:{{ss}}",
   omitLeadingZero = true,
 ) => {
   let paramsSec = sec < 0 ? 0 : (sec || 0);
 
   const SECONDS_IN_MINUTE = 60;
   const SECONDS_IN_HOUR = 60 * SECONDS_IN_MINUTE;     
-  const SECONDS_IN_DAY = 24 * SECONDS_IN_HOUR;   
-  const MILISECONDS_IN_SECOND = 1000; 
+  const SECONDS_IN_DAY = 24 * SECONDS_IN_HOUR;    
 
   const timeParts = {
     dd: Math.floor(paramsSec / SECONDS_IN_DAY) || 0,
     hh: Math.floor((paramsSec % SECONDS_IN_DAY) / SECONDS_IN_HOUR) || 0,
     mm: Math.floor((paramsSec % SECONDS_IN_HOUR) / SECONDS_IN_MINUTE) || 0,
-    ss: Math.floor((paramsSec % SECONDS_IN_MINUTE)) || 0,
-    ms: Math.floor((paramsSec % 1) * MILISECONDS_IN_SECOND).toString().slice(-2) || 0, 
+    ss: (paramsSec % SECONDS_IN_MINUTE) || 0,
   };
 
   const pad = (n) => String(n).padStart(2, '0');
 
-  const regex = /{{(dd|hh|mm|ss||ms)}}[^{{}]*/g;
+  const regex = /{{(dd|hh|mm|ss)}}[^{{}]*/g;
   const matches = [...format.matchAll(regex)];
 
   let formatted = "";
@@ -381,41 +372,6 @@ const changeElementAttributeById = (ids = []) => {
   }
 }
 
-const scrollToPosition = (options = {}) => {
-  const {
-    selector = null,
-    forceScroll = false,
-    position = "b",
-  } = options;
-
-  if (!selector) return;
-
-  const element = document.querySelector(selector);
-  if (!element) return;
-
-  let top = 0;
-
-  switch (position) {
-    case "b":
-      top = element.scrollHeight;
-      break;
-    case "t":
-      top = 0;
-  }
-
-  if (element) {
-    element.scrollTo({
-      top,
-      behavior: forceScroll ? "auto" : "smooth",
-    });
-  }
-}
-
-const removeSpace = (text, trim = true) => {
-  const replacedText = text.replace(/ /g, "");
-  return trim ? replacedText.trim() : replacedText;
-}
-
 export {
   stringNullOrEmpty, getAllUrlParams, lightenColor,
   mobileCheck, removeLeadingZero, sendUserInteractionData,
@@ -424,6 +380,5 @@ export {
   getScenarioPreviewData, getChatBotSetting, sendEmailRequest,
   sleep, getCaptcha, appendParamsToUrl, checkMessageCondition,
   getAddressFromZipCode, secondToDatetime, findItem, isUndefined,
-  changeElementAttributeById, toCamelCase, sendConvertTextJapaneseRequest,
-  scrollToPosition, removeSpace,
+  changeElementAttributeById, toCamelCase,
 };
