@@ -75,43 +75,11 @@ if (typeof window.jQuery === 'undefined') {
   head.appendChild(script);
 }
 
-const getEnvFromScriptSrc  = () => {
-  try {
-    if (window.getSdkEnv) return window.sdkEnv;
-  
-    window.getSdkEnv = true;
-  
-    const SRC_PARSER = {
-      "ec-chatbot1.com": "staging",
-      "ec-chatbot.com": "production",
-      "localhost:3001": "local",
-    }
-  
-    const src = document.currentScript?.src || "";
-  
-    if (!src) return null;
-  
-    const host = new URL(src).host;
-  
-  
-    const sdkEnv = SRC_PARSER[host];
-  
-    if (sdkEnv) {
-      window.sdkEnv = sdkEnv;
-      return sdkEnv;
-    }
-  
-    return null;
-  } catch {
-    return null;
-  }
-}
-
 const getEnvironment = () => {
   const params = new Proxy(new URLSearchParams(window.location.search), {
     get: (searchParams, prop) => searchParams.get(prop),
   });
-  return params.env || getEnvFromScriptSrc() || "production";
+  return params.env || "production";
 }
 
 const getDebugFlag = () => {

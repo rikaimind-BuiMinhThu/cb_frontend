@@ -9,7 +9,7 @@ import CheckboxCustom from "../ScenarioSetting/scenarioComon/CheckboxCustom";
 import InputCustom from "../ScenarioSetting/scenarioComon/InputCustom";
 import { Button } from "reactstrap";
 import ModalNoti from "../../../Popup/ModalNoti";
-import { CHATBOT_ACTIONS, CRAWL_ELEMENT_TYPES, MESSAGE_CONTENT_TYPES, REGEXP, RENDER_CHATBOT_CONFIG, SCAN_REGEX } from "../PreviewComponent/Constants";
+import { CHATBOT_ACTIONS, CRAWL_ELEMENT_TYPES, MESSAGE_CONTENT_TYPES, REGEXP, SCAN_REGEX } from "../PreviewComponent/Constants";
 import {
   Checkbox,
   Radio,
@@ -30,8 +30,6 @@ import "moment/locale/zh-cn";
 import { dataHourFixed, dataMinutes, dataYearFixed, dataMonth, dataDay, dataPaymentMethod, installmentOptions, NUMBER_REGEX } from "./Constants";
 import { stringNullOrEmpty } from "./Utils";
 import SubmitButton from "./UserMessageComponent/SubmitButton";
-import InputDebounce from "../ScenarioSetting/scenarioComon/InputDebounce";
-import { convertTextJapaneseByApi } from "utils/japaneseConverter";
 
 const UserMessage = ({
   messageContentProps,
@@ -149,19 +147,6 @@ const UserMessage = ({
       }
     } else {
       displayButtonNext(true);
-    }
-  }
-
-  const handleOnChangeJpConvertText = (indexContent, contentType, type, subFiled) => (value) => {
-    onChangeValue(indexContent, contentType, value, type, subFiled);
-
-    const nextContent = messageContent[indexContent + 1];
-    if (nextContent) {
-      const convertType = messageContent[indexContent][contentType].convertTextTypeValue;
-
-      convertTextJapaneseByApi(value, convertType).then((textConvertedValue) => {
-        onChangeValue(indexContent + 1, contentType, textConvertedValue, type, subFiled);
-      });
     }
   }
 
@@ -733,90 +718,57 @@ const UserMessage = ({
                         justifyContent: "space-between",
                       }}
                     >
-                      {textInput.isUseConvertText 
-                      ? (<>
-                          <InputDebounce
-                            id={content.customId1 || undefined}
-                            disabled={disabled}
-                            placeholder={textInput.text?.placeholderLeft}
-                            style={{ width: "49%", marginBottom: "0px" }}
-                            onChange={handleOnChangeJpConvertText(indexContent, content.type, textInput.type, "valueLeft")}
-                            value={textInput[textInput.type]?.valueLeft}
-                            debounceTime={RENDER_CHATBOT_CONFIG.DEBOUNCE_INPUT_TEXT_JP_CONVERT}
-                          />
-                          <InputDebounce
-                            id={content.customId2 || undefined}
-                            disabled={disabled}
-                            placeholder={textInput.text?.placeholderRight}
-                            style={{ width: "49%" }}
-                            onChange={handleOnChangeJpConvertText(indexContent, content.type, textInput.type, "valueRight")}
-                            value={textInput[textInput.type]?.valueRight}
-                            debounceTime={RENDER_CHATBOT_CONFIG.DEBOUNCE_INPUT_TEXT_JP_CONVERT}
-                          />
-                        </>) 
-                      : (<>
-                          <InputCustom
-                            id={content.customId1 || undefined}
-                            disabled={disabled}
-                            placeholder={textInput.text?.placeholderLeft}
-                            style={{ width: "49%", marginBottom: "0px" }}
-                            onChange={(value) =>
-                              onChangeValue(
-                                indexContent,
-                                content.type,
-                                value,
-                                textInput.type,
-                                "valueLeft",
-                              )
-                            }
-                            value={textInput[textInput.type]?.valueLeft}
-                          />
-                          <InputCustom
-                            id={content.customId2 || undefined}
-                            disabled={disabled}
-                            placeholder={textInput.text?.placeholderRight}
-                            style={{ width: "49%" }}
-                            onChange={(value) =>
-                              onChangeValue(
-                                indexContent,
-                                content.type,
-                                value,
-                                textInput.type,
-                                "valueRight"
-                              )
-                            }
-                            value={textInput[textInput.type]?.valueRight}
-                          />
-                        </>)}
+                      <InputCustom
+                        id={content.customId1 || undefined}
+                        disabled={disabled}
+                        placeholder={textInput.text?.placeholderLeft}
+                        style={{ width: "49%", marginBottom: "0px" }}
+                        onChange={(value) =>
+                          onChangeValue(
+                            indexContent,
+                            content.type,
+                            value,
+                            textInput.type,
+                            "valueLeft",
+                          )
+                        }
+                        value={textInput[textInput.type]?.valueLeft}
+                      ></InputCustom>
+                      <InputCustom
+                        id={content.customId2 || undefined}
+                        disabled={disabled}
+                        placeholder={textInput.text?.placeholderRight}
+                        style={{ width: "49%" }}
+                        onChange={(value) =>
+                          onChangeValue(
+                            indexContent,
+                            content.type,
+                            value,
+                            textInput.type,
+                            "valueRight"
+                          )
+                        }
+                        value={textInput[textInput.type]?.valueRight}
+                      ></InputCustom>
                     </div>
                   ) : (
                     <React.Fragment>
-                      {textInput.isUseConvertText 
-                      ? (<InputDebounce
-                          id={content.customId || undefined}
-                          disabled={disabled}
-                          style={{ marginBottom: "0px" }}
-                          placeholder={textInput[textInput.type]?.placeholderLeft}
-                          onChange={handleOnChangeJpConvertText(indexContent, content.type, textInput.type, "value")}
-                          value={textInput[textInput.type]?.value}
-                          debounceTime={RENDER_CHATBOT_CONFIG.DEBOUNCE_INPUT_TEXT_JP_CONVERT}
-                        />) 
-                      : (<InputCustom
-                          id={content.customId || undefined}
-                          disabled={disabled}
-                          style={{ marginBottom: "0px" }}
-                          placeholder={textInput[textInput.type]?.placeholderLeft}
-                          onChange={(value) =>
-                            onChangeValue(
-                              indexContent,
-                              content.type,
-                              value,
-                              textInput.type,
-                              "value"
-                            )
-                          }
-                          value={textInput[textInput.type]?.value}
-                        />)}
+                      <InputCustom
+                        id={content.customId || undefined}
+                        disabled={disabled}
+                        style={{ marginBottom: "0px" }}
+                        placeholder={textInput[textInput.type]?.placeholderLeft}
+                        onChange={(value) =>
+                          onChangeValue(
+                            indexContent,
+                            content.type,
+                            value,
+                            textInput.type,
+                            "value"
+                          )
+                        }
+                        value={textInput[textInput.type]?.value}
+                      ></InputCustom>
                       {textInput.text?.placeholderRight && (
                         <span
                           style={{
