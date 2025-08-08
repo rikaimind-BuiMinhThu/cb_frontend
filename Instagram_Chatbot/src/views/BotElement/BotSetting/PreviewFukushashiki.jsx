@@ -1026,6 +1026,7 @@ const PreviewFukushashiki = () => {
         dispatch({ 
           type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, 
           payload: {
+            ...rest,
             renderMessagesList: theState.renderMessagesList,
             messagesList: theState.messagesList,
           },
