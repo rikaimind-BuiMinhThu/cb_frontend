@@ -56,6 +56,7 @@ import {
   findItem,
   changeElementAttributeById,
   scrollToPosition,
+  processMessagesForErrorState,
 } from "./PreviewComponent/Utils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
@@ -154,7 +155,7 @@ const PREVIEW_ACTIONS = {
 const PreviewFukushashikiReducer = (state, action) => {
   switch (action.type) {
     case PREVIEW_ACTIONS.UPDATE_MULTI_STATE:
-      return { ...state, ...(action.payload) };
+      return { ...state, ...(!!state.submitErrorMessage ? processMessagesForErrorState(action.payload): action.payload) };
 
     case PREVIEW_ACTIONS.ADD_LP_OPTION_DATA:
       return { ...state, lpOptionData: { ...state.lpOptionData, ...action.payload, isProcessing: false } };
