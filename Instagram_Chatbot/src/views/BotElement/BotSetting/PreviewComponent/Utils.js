@@ -416,6 +416,28 @@ const removeSpace = (text, trim = true) => {
   return trim ? replacedText.trim() : replacedText;
 }
 
+const getColor = (color, options = {}) => {
+  const { toUpperCase = false, trim = true, addHash = true, ignoreEmpty } = options;
+  
+  let baseColor = color;
+
+  if (toUpperCase) {
+    baseColor = baseColor.toUpperCase();
+  }
+
+  if (trim) {
+    baseColor = baseColor.trim();
+  }
+
+  if (addHash && !baseColor.startsWith("#")) {
+    if (!ignoreEmpty || baseColor !== "") {
+      baseColor = `#${baseColor}`;
+    }
+  }
+
+  return baseColor;
+};
+
 const hideMessageOnError = (message) => {
   if (!message.hidden && message.not_display_when_have_error) {
     return { ...message, hidden: true };
@@ -446,5 +468,5 @@ export {
   sleep, getCaptcha, appendParamsToUrl, checkMessageCondition,
   getAddressFromZipCode, secondToDatetime, findItem, isUndefined,
   changeElementAttributeById, toCamelCase, sendConvertTextJapaneseRequest,
-  scrollToPosition, removeSpace, processMessagesForErrorState, hideMessageOnError,
+  scrollToPosition, removeSpace, getColor, processMessagesForErrorState, hideMessageOnError,
 };
