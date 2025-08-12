@@ -33,7 +33,7 @@ const SelectCustom = ({ id, allowClear = true, data, value, onChange, keyValue =
         onChange={onChange}
         value={value || undefined}
         disabled={disabled}
-        virual={false}
+        virtual={false}
         filterOption={(input, option) =>
           option.children ?
             option.children?.toLowerCase().includes(input.toLowerCase())
