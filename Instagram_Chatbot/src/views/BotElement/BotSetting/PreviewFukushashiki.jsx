@@ -34,7 +34,8 @@ import {
   TIMER_MAP_VARIABLES_FIELD,
   TIMER_TYPES,
   RENDER_CHATBOT_CONFIG,
-  RANGE_TEXT_VALIDATE
+  RANGE_TEXT_VALIDATE,
+  CART_SYSTEM
 } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
@@ -241,6 +242,7 @@ const PreviewFukushashiki = () => {
   const containerRef = useRef(null);
   const isFromScenario = false;
   const hasSentCustomJs = useRef(false);
+  const timeoutConfrmMsgRef = useRef(null);
 
   const setShowPopupCloseBot = (value) => {
     dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { showPopupCloseBot: value } });
@@ -451,7 +453,7 @@ const PreviewFukushashiki = () => {
     }
   }
 
-  const startRenderWithDelay = (renderMessagesList = [], options = {}) => {
+  const startRenderWithDelay = (newState, options = {}) => {
     const { 
       delayTime = RENDER_CHATBOT_CONFIG.DELAY_START_RENDER,
       scrollToBottom = true,
@@ -460,15 +462,25 @@ const PreviewFukushashiki = () => {
     new Promise((resolve) => {
       dispatch({
         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-        payload: { renderMessagesList: [] },
+        payload: { renderMessagesList: [], isDelaying: true },
       });
 
       sleep(delayTime).then(resolve);
     }).then(async () => {
-      dispatch({
-        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-        payload: { renderMessagesList },
-      });
+      if (state.useNewProcess) {
+        renderMessageInRange(0, newState.currentMsgIndex, newState, newState.currentUserMsgIndex, { isPassDelay: true })
+        .then(() => {
+          dispatch({
+            type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+            payload: { isDelaying: false },
+          });
+        });
+      } else {
+        dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+          payload: { renderMessagesList: newState.renderMessagesList, isDelaying: false },
+        });
+      }
 
       if (scrollToBottom) {
         await sleep(RENDER_CHATBOT_CONFIG.DELAY_BEFORE_SCROLL_TO_BOTTOM);
@@ -531,7 +543,7 @@ const PreviewFukushashiki = () => {
       });
 
       if (opening) {
-        return startRenderWithDelay(state.renderMessagesList, { delayTime: RENDER_CHATBOT_CONFIG.DELAY_START_RENDER });
+        return startRenderWithDelay(state, { delayTime: RENDER_CHATBOT_CONFIG.DELAY_START_RENDER });
       }
 
       return
@@ -1079,6 +1091,7 @@ const PreviewFukushashiki = () => {
       bottomMarginSp: designSetting?.bottom_margin_sp,
       isUsedErrMsgByJs: res.data?.chatbot?.is_used_err_msg_by_js,
       errMsgJsCode: res.data?.chatbot?.err_msg_js_code,
+      useNewProcess: res.data?.chatbot?.client_cart_system === CART_SYSTEM.EC_FORCE,
     };
 
     if (newState.isUsedErrMsgByJs && newState.errMsgJsCode) {
@@ -1252,6 +1265,7 @@ const PreviewFukushashiki = () => {
       let savedState = getStateFromSessionStorage();
       if (savedState) {
         savedState.isExtractFromSession = true;
+        savedState.isDelaying = false;
 
         setConversionParamToLocalStorage(
           savedState.scenarioId,
@@ -1319,18 +1333,21 @@ const PreviewFukushashiki = () => {
 
         return fukushashikiSavedStateToLp(savedState).then(async () => {
           const { renderMessagesList = [], ...savedStateWithoutRenderMessagesList } = savedState;
+          savedStateWithoutRenderMessagesList.isOpen = true;
+          savedStateWithoutRenderMessagesList.loadedStateFromSession = true;
+          savedStateWithoutRenderMessagesList.isExtractFromSession = false;
+
           dispatch({
             type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
             payload: {
               ...savedStateWithoutRenderMessagesList,
-              isOpen: true,
-              loadedStateFromSession: true,
-              isExtractFromSession: false,
             }
           });
 
-          startRenderWithDelay(renderMessagesList, { delayTime: RENDER_CHATBOT_CONFIG.DELAY_START_RENDER });
+          startRenderWithDelay(savedStateWithoutRenderMessagesList, { delayTime: RENDER_CHATBOT_CONFIG.DELAY_START_RENDER });
 
+          if (savedStateWithoutRenderMessagesList.useNewProcess) return;
+          
           await sleep(2000);
           // GetPreviewOrderContent
           const botConfirmMessage = savedState.messagesList.find(msg => {
@@ -3172,14 +3189,28 @@ const PreviewFukushashiki = () => {
     });
   }
 
-  const postMessageForGetPreviewOrderContent = async (jsCode) => {
+  const postMessageForGetPreviewOrderContent = async (jsCode, options = {}) => {
+    const { isNewProcess = false, stopRender } = options;
+
+    if (isNewProcess && stopRender) {
+      dispatch({
+        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+        payload: {
+          stopRender,
+          previewOrderContent: null,
+        },
+      });
+    }
+
     postMessageToParent({
       action: CHATBOT_ACTIONS.GET_PREVIEW_ORDER_CONTENT,
       actionData: jsCode,
       is_use_js: true,
-      isOpen: true
+      isOpen: true,
+      isNewProcess,
     });
 
+    if (isNewProcess) return;
     await sleep(2000);
   }
 
@@ -3275,6 +3306,136 @@ const PreviewFukushashiki = () => {
 
   const isUserMessage = (message) => {
     return message.belong_to === 'user' && message.message_content.length > 0;
+  }
+
+  const renderMessageInRange = async (startIndex, endIndex, newState, nextUserMsgIndex, options = {}) => { 
+    const { 
+      isUpdateClick = false, 
+      isPassDelay = false,
+      lastConfirmMessageIdx = -1,
+    } = options;
+
+    for (let i = startIndex; i <= endIndex; i++) {
+      const confirmMessage = newState.messagesList[i].message_content?.find(x => x.text_input?.use_for_confirm_message);
+      if (confirmMessage?.text_input?.jscode && !newState.stopRender?.isActive && lastConfirmMessageIdx !== i) {
+        const nextUserMessage = newState.messagesList[nextUserMsgIndex];
+        const isNextUserMessageButtonSubmit = nextUserMessage?.message_content?.[0]?.type === "button_submit";
+
+        if (!isNextUserMessageButtonSubmit) {
+          continue;
+        }
+
+        newState.stopRender = {
+          index: i,
+          finalIndex: newState.currentMsgIndex,
+          timeout: 30,
+          start: new Date(),
+          isActive: true,
+        };
+
+        newState.previewOrderContent = null;
+
+        postMessageForGetPreviewOrderContent(
+          confirmMessage.text_input.jscode,
+          { isNewProcess: newState.useNewProcess, stopRender: newState.stopRender },
+        );
+        break;
+      }
+
+      newState.renderMessagesList = newState.messagesList.slice(0, i + 1);
+      if (isDelayBotMessage(newState.messagesList[i])) {
+        newState.renderMessagesList[i].hidden = true;
+        if (!isPassDelay) {
+          await sleep(newState.messagesList[i].message_content[0].delay.content * 1000);
+        }
+        continue;
+      }
+      
+      dispatch({
+        type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
+        payload: {
+          startIndex: 0,
+          endIndex: i + 1
+        }
+      });
+
+      if (!isPassDelay) {
+        await sleep(RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE);
+      }
+    }
+    if (!isUpdateClick) {
+      newState.passedUserMsgCount++;
+    } else {
+      newState.passedUserMsgCount = newState.renderMessagesList.filter((item) => isUserMessage(item) && !item.hidden).length - 1 ;
+    }
+
+    return newState;
+  }
+
+  const handleRenderMessageAfterClickNext = async (newState, clickedMsgIndex, isBtnUpdateClick) => {
+    if (newState.useNewProcess) {
+      return renderMessageInRange(clickedMsgIndex + 1, newState.currentMsgIndex, newState, newState.currentUserMsgIndex, { isUpdateClick: isBtnUpdateClick })
+      .then((newState) => {
+        setStateToSessionStorage(newState);
+        return dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+          payload: newState
+        });
+      }).finally(() => {
+        dispatch({ type: PREVIEW_ACTIONS.SET_PROCESSING, payload: false });
+      });
+    }
+
+    return new Promise(async (resolve) => {
+      for (let i = clickedMsgIndex + 1; i <= newState.currentMsgIndex; i++) {
+        newState.renderMessagesList = newState.messagesList.slice(0, i + 1);
+        if (isDelayBotMessage(newState.messagesList[i])) {
+          await sleep(newState.messagesList[i].message_content[0].delay.content * 1000);
+          continue;
+        }
+        
+        dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
+          payload: {
+            startIndex: 0,
+            endIndex: i + 1
+          }
+        });
+
+        await sleep(RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE);
+      }
+      resolve();
+    }).then(() => {
+      newState.renderMessagesList = newState.renderMessagesList.map((msg) => {
+        return isDelayBotMessage(msg) ? {...msg, hidden: true} : msg;
+      }); 
+  
+      if (!isBtnUpdateClick) {
+        newState.passedUserMsgCount++;
+      } else {
+        newState.passedUserMsgCount = newState.renderMessagesList.filter((item) => isUserMessage(item)).length - 1 ;
+      }
+  
+      const botConfirmMessage = newState.messagesList.find(msg => {
+        return !!msg.message_content?.find(x => x.text_input?.use_for_confirm_message)
+      });
+  
+      const botConfirmJsCode = botConfirmMessage?.message_content
+        ?.find(x => x.text_input?.use_for_confirm_message)
+        ?.text_input?.jscode;
+      const nextUserMessage = newState.messagesList[newState.currentUserMsgIndex];
+      const isNextUserMessageButtonSubmit = nextUserMessage?.message_content?.[0]?.type === "button_submit";
+
+      if (botConfirmJsCode && botConfirmJsCode.length > 0 && isNextUserMessageButtonSubmit) {
+        postMessageForGetPreviewOrderContent(botConfirmJsCode);
+      }
+
+      setStateToSessionStorage(newState);
+      return dispatch({
+        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+        payload: newState
+      });
+    });
   }
 
   const onClickNext = async (indexMessage, message) => {
@@ -3375,58 +3536,7 @@ const PreviewFukushashiki = () => {
     
     const isBtnUpdateClick = indexMessage < newState.renderMessagesList.length - 1;
 
-    new Promise(async (resolve) => {
-      for (let i = clickedMsgIndex + 1; i <= newState.currentMsgIndex; i++) {
-        newState.renderMessagesList = newState.messagesList.slice(0, i + 1);
-        if (isDelayBotMessage(newState.messagesList[i])) {
-          await sleep(newState.messagesList[i].message_content[0].delay.content * 1000);
-          continue;
-        }
-        
-        dispatch({
-          type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
-          payload: {
-            startIndex: 0,
-            endIndex: i + 1
-          }
-        });
-
-        await sleep(RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE);
-      }
-      resolve();
-    }).then(() => {
-      newState.renderMessagesList = newState.renderMessagesList.map((msg) => {
-        return isDelayBotMessage(msg) ? {...msg, hidden: true} : msg;
-      }); 
-  
-      if (!isBtnUpdateClick) {
-        newState.passedUserMsgCount++;
-      } else {
-        newState.passedUserMsgCount = newState.renderMessagesList.filter((item) => isUserMessage(item)).length - 1 ;
-      }
-  
-      const botConfirmMessage = newState.messagesList.find(msg => {
-        return !!msg.message_content?.find(x => x.text_input?.use_for_confirm_message)
-      });
-  
-      const botConfirmJsCode = botConfirmMessage?.message_content
-        ?.find(x => x.text_input?.use_for_confirm_message)
-        ?.text_input?.jscode;
-      const nextUserMessage = newState.messagesList[newState.currentUserMsgIndex];
-      const isNextUserMessageButtonSubmit = nextUserMessage?.message_content?.[0]?.type === "button_submit";
-
-      if (botConfirmJsCode && botConfirmJsCode.length > 0 && isNextUserMessageButtonSubmit) {
-        postMessageForGetPreviewOrderContent(botConfirmJsCode);
-      }
-  
-      setStateToSessionStorage(newState);
-      return dispatch({
-        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-        payload: newState
-      });
-    }).finally(() => {
-      dispatch({ type: PREVIEW_ACTIONS.SET_PROCESSING, payload: false });
-    });
+    await handleRenderMessageAfterClickNext(newState, clickedMsgIndex, isBtnUpdateClick);
   };
 
   const isDislayingLoginForm = (message) => {
@@ -3944,6 +4054,62 @@ const PreviewFukushashiki = () => {
       bodyStyle,
     };
   };
+
+  useEffect(() => {
+    if (!state.stopRender || state.isDelaying || !state.useNewProcess) return;
+    
+    const renderContinueMessages = async () => {
+      const { isActive, index, finalIndex, timeout } = state.stopRender;
+
+      if (isActive) {
+        if (!state.previewOrderContent) {
+          timeoutConfrmMsgRef.current = setTimeout(async () => {
+            renderMessageInRange(index, finalIndex, state, { lastConfirmMessageIdx: index }).then(() => {
+              dispatch({
+                type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+                payload: {
+                  stopRender: {
+                    ...state.stopRender,
+                    isActive: false,
+                  },
+                },
+              });
+            });
+          }, timeout * 1000);
+
+          return;
+        }
+
+        clearTimeout(timeoutConfrmMsgRef.current);
+
+        renderMessageInRange(index, finalIndex, state, { lastConfirmMessageIdx: index });
+        dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+          payload: {
+            stopRender: {
+              ...state.stopRender,
+              isActive: false,
+            },
+          },
+        });
+
+        return;
+      }
+
+      clearTimeout(timeoutConfrmMsgRef.current);
+
+      renderMessageInRange(index, finalIndex, state, { lastConfirmMessageIdx: index });
+    } 
+
+    renderContinueMessages();
+
+    return () => clearTimeout(timeoutConfrmMsgRef.current);
+  }, [
+    state.stopRender, 
+    state.previewOrderContent, 
+    state.isDelaying,
+    state.useNewProcess,
+  ]);
 
   ///body container
   if (state.scenarioId && state.botInfor && state.isOpen) {

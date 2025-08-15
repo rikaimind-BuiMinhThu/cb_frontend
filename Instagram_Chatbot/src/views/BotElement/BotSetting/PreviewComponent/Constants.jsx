@@ -188,6 +188,10 @@ const RANGE_TEXT_VALIDATE = {
   },
 }
 
+const CART_SYSTEM = {
+  EC_FORCE: 'ec_force',
+}
+
 export {
   dataHourFixed,
   dataMinutes,
@@ -213,6 +217,7 @@ export {
   RENDER_CHATBOT_CONFIG,
   CONVERT_TEXT_TYPES,
   RANGE_TEXT_VALIDATE,
+  CART_SYSTEM,
 };
 
 export const TIMER_TYPES = {
