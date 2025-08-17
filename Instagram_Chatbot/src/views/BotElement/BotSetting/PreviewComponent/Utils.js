@@ -416,6 +416,27 @@ const removeSpace = (text, trim = true) => {
   return trim ? replacedText.trim() : replacedText;
 }
 
+const hideMessageOnError = (message) => {
+  if (!message.hidden && message.not_display_when_have_error) {
+    return { ...message, hidden: true };
+  }
+  return message;
+};
+
+const processMessagesForErrorState = (payload) => {
+  const processedPayload = { ...(payload || {}) };
+  
+  if (processedPayload.messagesList) {
+    processedPayload.messagesList = processedPayload.messagesList.map(hideMessageOnError);
+  }
+
+  if (processedPayload.renderMessagesList) {
+    processedPayload.renderMessagesList = processedPayload.renderMessagesList.map(hideMessageOnError);
+  }
+
+  return processedPayload;
+};
+
 export {
   stringNullOrEmpty, getAllUrlParams, lightenColor,
   mobileCheck, removeLeadingZero, sendUserInteractionData,
@@ -425,5 +446,5 @@ export {
   sleep, getCaptcha, appendParamsToUrl, checkMessageCondition,
   getAddressFromZipCode, secondToDatetime, findItem, isUndefined,
   changeElementAttributeById, toCamelCase, sendConvertTextJapaneseRequest,
-  scrollToPosition, removeSpace,
+  scrollToPosition, removeSpace, processMessagesForErrorState, hideMessageOnError,
 };
