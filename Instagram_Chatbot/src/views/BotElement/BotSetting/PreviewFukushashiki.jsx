@@ -1332,10 +1332,11 @@ const PreviewFukushashiki = () => {
         }
 
         return fukushashikiSavedStateToLp(savedState).then(async () => {
+          savedState.isOpen = true;
+          savedState.loadedStateFromSession = true;
+          savedState.isExtractFromSession = false;
+
           const { renderMessagesList = [], ...savedStateWithoutRenderMessagesList } = savedState;
-          savedStateWithoutRenderMessagesList.isOpen = true;
-          savedStateWithoutRenderMessagesList.loadedStateFromSession = true;
-          savedStateWithoutRenderMessagesList.isExtractFromSession = false;
 
           dispatch({
             type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
@@ -1344,7 +1345,7 @@ const PreviewFukushashiki = () => {
             }
           });
 
-          startRenderWithDelay(savedStateWithoutRenderMessagesList, { delayTime: RENDER_CHATBOT_CONFIG.DELAY_START_RENDER });
+          startRenderWithDelay(savedState, { delayTime: RENDER_CHATBOT_CONFIG.DELAY_START_RENDER });
 
           if (savedStateWithoutRenderMessagesList.useNewProcess) return;
           
