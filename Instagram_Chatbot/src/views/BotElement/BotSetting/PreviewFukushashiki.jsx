@@ -3956,7 +3956,7 @@ const PreviewFukushashiki = () => {
         style={containerStyle}
       >
         <Withdrawal
-          // botInfor={state.botInfor}
+          botInfor={state.botInfor}
           deviceReceive={state.deviceReceive}
           scenarioId={state.scenarioId}
           onOpenPreview={onOpenPreview}
@@ -3977,7 +3977,7 @@ const PreviewFukushashiki = () => {
           style={headerStyle}
           className="sp-header"
         >
-          <div className="sp-header-left" onClick={() => onOpenPreview(!state.isOpen)}>
+          <div className="sp-header-left" onClick={() => state.isOpen ? handleOpenWithDrawal() : onOpenPreview(true)}>
             <div className="sp-header-left-avatar sp-avatar">
               <img
                 src={

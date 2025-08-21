@@ -100,13 +100,45 @@ function WithdrawalPrevention() {
       };
     } else {
       if (utils.checkRequired('image_URL', 'errImageURL', 'image URL')) {
-        resWith = {
-          withdrawal_prevention: {
-            withdrawal_prevention_status: image.value,
-            withdrawal_prevention_image_url: image_URL.value,
-            withdrawal_prevention_link_url: link_URL.value,
-          },
-        };
+        // Validate định dạng và kích thước ảnh
+        utils.validateImageURLWithDimension(image_URL.value).then(result => {
+          if (result.valid) {
+            resWith = {
+              withdrawal_prevention: {
+                withdrawal_prevention_status: image.value,
+                withdrawal_prevention_image_url: image_URL.value,
+                withdrawal_prevention_link_url: link_URL.value,
+              },
+            };
+            
+            // Gửi request nếu dữ liệu hợp lệ
+            if (resWith) {
+              api
+                .patch(`/api/v1/chatbot_settings/withdrawal_preventions/${botId}`, resWith)
+                .then((res) => {
+                  console.log(res);
+                  if (res.data.code == 1) {
+                    setMsgNoti(`更新しました。`);
+                    setIsOpenNoti(true);
+                    reload();
+                    setTimeout(() => {
+                      setIsOpenNoti(false);
+                      setMsgNoti(``);
+                    }, 2000);
+                  }
+                })
+                .catch((err) => {
+                  if (err.response?.data.code === 0) {
+                    tokenExpired();
+                  }
+                });
+            }
+          } else {
+            // Hiển thị lỗi nếu ảnh không hợp lệ
+            document.getElementById('errImageURL').style.display = 'block';
+            document.getElementById('errImageURL').innerHTML = result.message;
+          }
+        });
       } else {
         utils.checkRequired('image_URL', 'errImageURL', 'image URL');
       }
