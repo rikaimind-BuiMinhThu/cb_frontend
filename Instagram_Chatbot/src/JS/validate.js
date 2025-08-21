@@ -82,12 +82,17 @@ export function checkTel(inputId, errId, label) {
     return true;
   }
 }
-export const validateImageURLWithDimension = (url, maxWidth = 800, maxHeight = 200) => {
-  return new Promise((resolve) => {
-    // Check file extension
-    const pattern = /\.(jpg|jpeg|png)$/i;
-    if (!pattern.test(url)) {
-      resolve({ valid: false, message: '画像URLはjpg、jpeg、png形式のみ対応しています' }); // "URL chỉ hỗ trợ jpg, jpeg, png"
+export const validateImageURLWithDimension = (url, options = {}) => {
+  const {
+     maxWidth = 800,
+     maxHeight = 200,
+     callback = () => {}
+  } = options;
+
+  const pattern = /\.(jpg|jpeg|png)$/i;
+
+  if (!pattern.test(url)) {
+      callback({ valid: false, message: '画像URLはjpg、jpeg、png形式のみ対応しています' }); // "URL only support jpg, jpeg, png"
       return;
     }
     // Check image dimensions
@@ -98,19 +103,18 @@ export const validateImageURLWithDimension = (url, maxWidth = 800, maxHeight = 2
       const height = img.naturalHeight;
       
       if (width > maxWidth || height > maxHeight) {
-        resolve({ 
+        callback({ 
           valid: false, 
-          message: `画像サイズが${maxWidth}x${maxHeight}ピクセルを超えています。現在のサイズ：${width}x${height}ピクセル` // "Kích thước ảnh vượt quá"
+          message: `画像サイズが${maxWidth}x${maxHeight}ピクセルを超えています。現在のサイズ：${width}x${height}ピクセル` // "Message wwhen Size of image over"
         });
       } else {
-        resolve({ valid: true });
+        callback({ valid: true });
       }
     };
     
     img.onerror = function() {
-      resolve({ valid: false, message: '画像URLが無効です' }); // "URL ảnh không hợp lệ"
+      callback({ valid: false, message: '画像URLが無効です' }); // "URL image not acepted"
     };
     
     img.src = url;
-  });
 };

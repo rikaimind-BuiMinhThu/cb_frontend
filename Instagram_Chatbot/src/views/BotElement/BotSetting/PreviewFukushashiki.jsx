@@ -549,6 +549,19 @@ const PreviewFukushashiki = () => {
     return renderMessagesWithDelay(state, 0, state.currentMsgIndex, { setNewState: false });
   }
 
+
+  const handleCloseChatbotWhenUseWithDrawal = () => {
+    const enabledStatus = new Set(["standard_exit_popup", "image_popup"])
+    const isWithDrawalEnabled = state.botInfor && enabledStatus.has(state.botInfor.withdrawal_prevention_status)
+    if (isWithDrawalEnabled) {
+      handleOpenWithDrawal();
+      return ;
+    }
+
+    if (!state.isOpen) return;
+    onOpenPreview(false)  
+  }
+
   const setPulldownValue = (dataContentType, field, value) => {
     switch (field) {
       case "customization":
@@ -3977,7 +3990,7 @@ const PreviewFukushashiki = () => {
           style={headerStyle}
           className="sp-header"
         >
-          <div className="sp-header-left" onClick={() => state.isOpen ? handleOpenWithDrawal() : onOpenPreview(true)}>
+          <div className="sp-header-left" onClick={handleCloseChatbotWhenUseWithDrawal}>
             <div className="sp-header-left-avatar sp-avatar">
               <img
                 src={

@@ -8,6 +8,7 @@ import api from './../../../../api/api-management';
 import { tokenExpired } from 'api/tokenExpired';
 import ModalNoti from 'views/Popup/ModalNoti';
 import * as utils from './../../../../JS/validate.js';
+import {patchWithDrawalPreview} from "../../BotSetting/PreviewComponent/Utils"
 
 function WithdrawalPrevention() {
   const [valueWP, setValueWP] = useState('');
@@ -100,9 +101,12 @@ function WithdrawalPrevention() {
       };
     } else {
       if (utils.checkRequired('image_URL', 'errImageURL', 'image URL')) {
-        // Validate định dạng và kích thước ảnh
-        utils.validateImageURLWithDimension(image_URL.value).then(result => {
-          if (result.valid) {
+        // Verify image format and size
+        utils.validateImageURLWithDimension(image_URL.value, {
+          maxWidth: 800,
+          maxHeight: 200,
+          callback: (result) => {
+            if (result.valid) {
             resWith = {
               withdrawal_prevention: {
                 withdrawal_prevention_status: image.value,
@@ -111,32 +115,31 @@ function WithdrawalPrevention() {
               },
             };
             
-            // Gửi request nếu dữ liệu hợp lệ
-            if (resWith) {
-              api
-                .patch(`/api/v1/chatbot_settings/withdrawal_preventions/${botId}`, resWith)
-                .then((res) => {
-                  console.log(res);
-                  if (res.data.code == 1) {
-                    setMsgNoti(`更新しました。`);
-                    setIsOpenNoti(true);
-                    reload();
-                    setTimeout(() => {
-                      setIsOpenNoti(false);
-                      setMsgNoti(``);
-                    }, 2000);
-                  }
-                })
-                .catch((err) => {
-                  if (err.response?.data.code === 0) {
-                    tokenExpired();
-                  }
-                });
+            // Send request if data is valid
+              if (resWith) {
+                patchWithDrawalPreview(botId, resWith)
+                  .then((res) => {
+                    console.log(res);
+                    if (res.data.code == 1) {
+                      setMsgNoti(`更新しました。`);
+                      setIsOpenNoti(true);
+                      reload();
+                      setTimeout(() => {
+                        setIsOpenNoti(false);
+                        setMsgNoti(``);
+                      }, 2000);
+                    }
+                  })
+                  .catch((err) => {
+                    if (err.response?.data.code === 0) {
+                      tokenExpired();
+                    }
+                  });
+                }
+            } else {
+                document.getElementById('errImageURL').style.display = 'block';
+                document.getElementById('errImageURL').innerHTML = result.message;
             }
-          } else {
-            // Hiển thị lỗi nếu ảnh không hợp lệ
-            document.getElementById('errImageURL').style.display = 'block';
-            document.getElementById('errImageURL').innerHTML = result.message;
           }
         });
       } else {
@@ -144,8 +147,7 @@ function WithdrawalPrevention() {
       }
     }
     if (resWith) {
-      api
-        .patch(`/api/v1/chatbot_settings/withdrawal_preventions/${botId}`, resWith)
+      patchWithDrawalPreview(botId, resWith)
         .then((res) => {
           console.log(res);
           if (res.data.code == 1) {
