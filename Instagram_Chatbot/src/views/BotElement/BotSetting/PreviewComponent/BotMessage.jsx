@@ -16,6 +16,25 @@ const BotMessage = ({
 }) => {
   const [textInputContent, setTextInputContent] = useState(""); 
 
+  const isShowAvatar = (content) => {
+    if (!content) return false;
+
+    switch(content.type) {
+      case 'text_input':
+      case 'file':
+      case 'delay': 
+        return true;
+      case BOT_MESSAGE_TYPES.HTML_CODE: 
+        return !isUGCUsage(content);
+    }
+  }
+
+  const isUGCUsage = (content) => {
+    if (content.type !== BOT_MESSAGE_TYPES.HTML_CODE) return false;
+
+    return content[content.type]?.use_for_ugc;
+  }
+
   const handleDownloadFile = (file) => {
     let link = document.createElement("a");
     link.href = file;
@@ -99,7 +118,7 @@ const BotMessage = ({
   }
 
   return (
-    <div key={index} className="sp-body-bot-side slideRight">
+    <div key={index} className={`sp-body-bot-side slideRight ${!isShowAvatar(content) ? "hide_avatar" : ""} ${isUGCUsage(content) ? "ugc_usage" : ""}`}>
       {(content.type === "text_input" ||
         content.type === "file" ||
         content.type === "delay" ||
