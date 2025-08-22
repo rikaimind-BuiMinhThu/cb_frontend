@@ -107,8 +107,8 @@ function WithdrawalPrevention() {
           maxHeight: 200,
           callback: (result) => {
             if (result.valid) {
-            resWith = {
-              withdrawal_prevention: {
+              resWith = {
+                withdrawal_prevention: {
                 withdrawal_prevention_status: image.value,
                 withdrawal_prevention_image_url: image_URL.value,
                 withdrawal_prevention_link_url: link_URL.value,

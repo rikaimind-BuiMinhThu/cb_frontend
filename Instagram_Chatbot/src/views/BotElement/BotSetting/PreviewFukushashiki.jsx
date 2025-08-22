@@ -550,17 +550,16 @@ const PreviewFukushashiki = () => {
   }
 
 
-  const handleCloseChatbotWhenUseWithDrawal = () => {
-    const enabledStatus = new Set(["standard_exit_popup", "image_popup"])
-    const isWithDrawalEnabled = state.botInfor && enabledStatus.has(state.botInfor.withdrawal_prevention_status)
-    if (isWithDrawalEnabled) {
-      handleOpenWithDrawal();
-      return ;
+    const handleCloseChatbotWhenUseWithDrawal = () => {
+      if (!state.isOpen) return; 
+      onOpenPreview(false) 
+      const enabledStatus = new Set(["standard_exit_popup", "image_popup"])
+      const isWithDrawalEnabled = state.botInfor && enabledStatus.has(state.botInfor.withdrawal_prevention_status)
+      if (isWithDrawalEnabled) {
+        handleOpenWithDrawal();
+        return ;
+      }
     }
-
-    if (!state.isOpen) return;
-    onOpenPreview(false)  
-  }
 
   const setPulldownValue = (dataContentType, field, value) => {
     switch (field) {
