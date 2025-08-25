@@ -951,10 +951,26 @@ const PreviewFukushashiki = () => {
     return newState;
   }
 
+  const processBotScriptMessage = (messagesList, i, newState) => {
+    const script = messagesList[i]?.message_content[0]?.script?.content;
+    if (!script) return newState;
+
+    try {
+      const func = new Function(script);
+      func();
+    } catch {
+      console.error('Script run failed!')
+    } finally {
+      return newState;
+    }
+  }
+
   const processForBotMessage = async (messagesList, i, newState, isUpdateSourceContent =+ false, assignToState = true) => {
     const firstMsgType = messagesList[i]?.message_content[0]?.type;
 
     switch (firstMsgType) {
+      case 'script':
+        return processBotScriptMessage(messagesList, i, newState);
       case "delay":
         return await processBotDelayMessage(messagesList, i, newState);
       case "email":
