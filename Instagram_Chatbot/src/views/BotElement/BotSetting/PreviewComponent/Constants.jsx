@@ -153,6 +153,24 @@ const MESSAGE_CONTENT_TYPES = {
   },
 };
 
+const LABELS = {
+  GENDER_OPTIONS: {
+    CHECKBOX_USE_AS_GENDER: '性別として使用',
+    LABEL_GENDER_DISPLAY_TYPE: '性別表示タイプ',
+    ICON_HEIGHT: 'アイコン高さ',
+    ICON_WIDTH: 'アイコン幅',
+    ICON_URL: 'アイコン画像',
+    ICON_DEFAULT: "アイコンデフォルト",
+    ICON_HOVER: "アイコンホバー",
+    ICON_SELECTED: "アイコン選択時",
+    BUTTON_DEFAULT: "ボタンデフォルト",
+    BUTTON_HOVER: "ボタンホバー",
+    BUTTON_SELECTED: "ボタン選択時",  
+    HORIZONTAL: '横並び',
+    VERTICAL: '縦並び',
+  },
+}
+
 const REGEXP = {
   NUMBER: /^[0-9]+$/,
 }
@@ -219,6 +237,7 @@ export {
   CONVERT_TEXT_TYPES,
   RANGE_TEXT_VALIDATE,
   CART_SYSTEM,
+  LABELS,
 };
 
 export const TIMER_TYPES = {
