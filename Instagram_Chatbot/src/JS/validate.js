@@ -82,3 +82,39 @@ export function checkTel(inputId, errId, label) {
     return true;
   }
 }
+export const validateImageURLWithDimension = (url, options = {}) => {
+  const {
+     maxWidth = 800,
+     maxHeight = 200,
+     callback = () => {}
+  } = options;
+
+  const pattern = /\.(jpg|jpeg|png)$/i;
+
+  if (!pattern.test(url)) {
+      callback({ valid: false, message: '画像URLはjpg、jpeg、png形式のみ対応しています' }); // "URL only support jpg, jpeg, png"
+      return;
+    }
+    // Check image dimensions
+    const img = new Image();
+    
+    img.onload = function() {
+      const width = img.naturalWidth;
+      const height = img.naturalHeight;
+      
+      if (width > maxWidth || height > maxHeight) {
+        callback({ 
+          valid: false, 
+          message: `画像サイズが${maxWidth}x${maxHeight}ピクセルを超えています。現在のサイズ：${width}x${height}ピクセル` // "Message wwhen Size of image over"
+        });
+      } else {
+        callback({ valid: true });
+      }
+    };
+    
+    img.onerror = function() {
+      callback({ valid: false, message: '画像URLが無効です' }); // "URL image not acepted"
+    };
+    
+    img.src = url;
+};

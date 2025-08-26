@@ -169,6 +169,12 @@ const getChatBotSetting = (botId) => {
   );
 }
 
+const patchWithDrawalPreview = (botId, data) => {
+  return patchToChatBotServer(
+    CHATBOT_SERVER.WITHDRAWAL_RESPONSE.replace(":bot_id", botId), data
+  )
+} 
+
 const sendEmailRequest = (emailId, data) => {
   return postToChatBotServer(
     CHATBOT_SERVER.SEND_EMAIL_PATH.replace(":email_id", emailId),
@@ -469,4 +475,5 @@ export {
   getAddressFromZipCode, secondToDatetime, findItem, isUndefined,
   changeElementAttributeById, toCamelCase, sendConvertTextJapaneseRequest,
   scrollToPosition, removeSpace, getColor, processMessagesForErrorState, hideMessageOnError,
+  patchWithDrawalPreview
 };

@@ -95,6 +95,7 @@ const CHATBOT_SERVER = {
   GET_CHATBOT_SETTING_PATH: '/api/v1/managements/chatbots/:bot_id',
   SEND_EMAIL_PATH: '/api/v1/managements/emails/:email_id/send_email',
   CONVERT_TEXT_JAPANESE_PATH: '/api/v1/jp_convert',
+  WITHDRAWAL_RESPONSE: '/api/v1/chatbot_settings/withdrawal_preventions/:bot_id'
 };
 
 const GET_CAPTCHA_PATH = `https://svg-captcha-nodejs.vercel.app/captcha?size=:size&color=:color&charPreset=:char_preset`;
@@ -206,6 +207,10 @@ const RANGE_TEXT_VALIDATE = {
   },
 }
 
+const CART_SYSTEM = {
+  EC_FORCE: 'ec_force',
+}
+
 export {
   dataHourFixed,
   dataMinutes,
@@ -231,6 +236,7 @@ export {
   RENDER_CHATBOT_CONFIG,
   CONVERT_TEXT_TYPES,
   RANGE_TEXT_VALIDATE,
+  CART_SYSTEM,
   LABELS,
 };
 

@@ -43,6 +43,7 @@ import 'moment/locale/zh-cn';
 import ShopifyReferenceSelect from "./ShopifyReferenceSelect";
 import { Tooltip } from '@mui/material';
 import { MESSAGE_CONTENT_TYPES, TIMER_TYPES, TIMER_VARIABLES, TIMER_VARIABLES_DESCRIPTION, BOT_MESSAGE_TYPES, RANGE_TEXT_VALIDATE, LABELS, GENDER_DISPLAY_TYPES } from '../PreviewComponent/Constants';
+import HtmlCodeConfig from './scenarioComon/HtmlCodeConfig';
 import OptionGenderConfig from './OptionGenderConfig';
 
 const _ = require('lodash');
@@ -890,7 +891,6 @@ const Scenario = () => {
   const [dataDay, setDataDay] = useState(dataDayFixed);
 
   const [errorVariable, setErrorVariable] = useState('');
-  const [htmlValidationError, setHtmlValidationError] = useState('');
 
   const [dataCondition, setDataCondition] = useState([]);
 
@@ -6106,12 +6106,10 @@ const Scenario = () => {
 
                               {/* type: html_code */}
                               {messageType === BOT_MESSAGE_TYPES.HTML_CODE && (
-                                <HtmlCodeMessage
-                                  value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['content'] || ''}
-                                  onChange={(value) => {
-                                    onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'content');
-                                  }}
-                                  validationError={htmlValidationError}
+                                <HtmlCodeConfig 
+                                  config={dataMessages[indexMessageSelect].message_content[0][messageType]}
+                                  onChangeValue={onChangeValueMessageContent}
+                                  indexMessageSelect={indexMessageSelect}
                                 />
                               )}
                             </div>

@@ -197,6 +197,23 @@
     justify-content: space-between;
 }
 
+.sp-body-bot-side.hide_avatar > .sp-avatar {
+    display: none;
+}
+
+.sp-body-bot-side.ugc_usage > .sp-body-bot-side-messages {
+    width: 100%;
+    padding: 0 30px;
+}
+
+.sp-body-bot-side.ugc_usage > .sp-body-bot-side-messages .ss-bot-chat-detail-content.display_ugc {
+  white-space: nowrap;
+  width: 100% !important;
+  background-color: transparent !important;
+  color: auto;
+  padding: 0;
+}
+
 /* .sp-body-bot-side::before {
     width: 89%;
     animation: reveal 1s reverse forwards;
