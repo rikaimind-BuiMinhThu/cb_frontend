@@ -4022,17 +4022,9 @@ const PreviewFukushashiki = () => {
       <div className="ss-user-setting__item-text_input-top">
         <div
           style={{
-            width: "95%",
-            padding: "5px",
             border: `1px solid ${borderColor}`,
             backgroundColor: backgroundColor,
             color: color,
-            borderRadius: "5px",
-            fontFamily: "Arial, sans-serif",
-            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
-            position: "fixed",
-            top: "12.5%",
-            left: "1%"
           }}
           id="error-message"
           dangerouslySetInnerHTML={{ __html: text }}
