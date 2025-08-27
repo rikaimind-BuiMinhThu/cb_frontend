@@ -95,6 +95,7 @@ const CHATBOT_SERVER = {
   GET_CHATBOT_SETTING_PATH: '/api/v1/managements/chatbots/:bot_id',
   SEND_EMAIL_PATH: '/api/v1/managements/emails/:email_id/send_email',
   CONVERT_TEXT_JAPANESE_PATH: '/api/v1/jp_convert',
+  WITHDRAWAL_RESPONSE: '/api/v1/chatbot_settings/withdrawal_preventions/:bot_id'
 };
 
 const GET_CAPTCHA_PATH = `https://svg-captcha-nodejs.vercel.app/captcha?size=:size&color=:color&charPreset=:char_preset`;
@@ -151,6 +152,24 @@ const MESSAGE_CONTENT_TYPES = {
     CONSUME_API_RESPONSE: 'comsume_api_response',
   },
 };
+
+const LABELS = {
+  GENDER_OPTIONS: {
+    CHECKBOX_USE_AS_GENDER: '性別として使用',
+    LABEL_GENDER_DISPLAY_TYPE: '性別表示タイプ',
+    ICON_HEIGHT: 'アイコン高さ',
+    ICON_WIDTH: 'アイコン幅',
+    ICON_URL: 'アイコン画像',
+    ICON_DEFAULT: "アイコンデフォルト",
+    ICON_HOVER: "アイコンホバー",
+    ICON_SELECTED: "アイコン選択時",
+    BUTTON_DEFAULT: "ボタンデフォルト",
+    BUTTON_HOVER: "ボタンホバー",
+    BUTTON_SELECTED: "ボタン選択時",  
+    HORIZONTAL: '横並び',
+    VERTICAL: '縦並び',
+  },
+}
 
 const REGEXP = {
   NUMBER: /^[0-9]+$/,
@@ -218,6 +237,7 @@ export {
   CONVERT_TEXT_TYPES,
   RANGE_TEXT_VALIDATE,
   CART_SYSTEM,
+  LABELS,
 };
 
 export const TIMER_TYPES = {

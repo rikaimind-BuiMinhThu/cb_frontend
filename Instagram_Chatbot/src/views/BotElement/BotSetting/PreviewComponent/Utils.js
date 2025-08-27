@@ -169,6 +169,12 @@ const getChatBotSetting = (botId) => {
   );
 }
 
+const patchWithDrawalPreview = (botId, data) => {
+  return patchToChatBotServer(
+    CHATBOT_SERVER.WITHDRAWAL_RESPONSE.replace(":bot_id", botId), data
+  )
+} 
+
 const sendEmailRequest = (emailId, data) => {
   return postToChatBotServer(
     CHATBOT_SERVER.SEND_EMAIL_PATH.replace(":email_id", emailId),
@@ -416,6 +422,28 @@ const removeSpace = (text, trim = true) => {
   return trim ? replacedText.trim() : replacedText;
 }
 
+const getColor = (color, options = {}) => {
+  const { toUpperCase = false, trim = true, addHash = true, ignoreEmpty } = options;
+  
+  let baseColor = color;
+
+  if (toUpperCase) {
+    baseColor = baseColor.toUpperCase();
+  }
+
+  if (trim) {
+    baseColor = baseColor.trim();
+  }
+
+  if (addHash && !baseColor.startsWith("#")) {
+    if (!ignoreEmpty || baseColor !== "") {
+      baseColor = `#${baseColor}`;
+    }
+  }
+
+  return baseColor;
+};
+
 const hideMessageOnError = (message) => {
   if (!message.hidden && message.not_display_when_have_error) {
     return { ...message, hidden: true };
@@ -446,5 +474,6 @@ export {
   sleep, getCaptcha, appendParamsToUrl, checkMessageCondition,
   getAddressFromZipCode, secondToDatetime, findItem, isUndefined,
   changeElementAttributeById, toCamelCase, sendConvertTextJapaneseRequest,
-  scrollToPosition, removeSpace, processMessagesForErrorState, hideMessageOnError,
+  scrollToPosition, removeSpace, getColor, processMessagesForErrorState, hideMessageOnError,
+  patchWithDrawalPreview
 };

@@ -197,6 +197,23 @@
     justify-content: space-between;
 }
 
+.sp-body-bot-side.hide_avatar > .sp-avatar {
+    display: none;
+}
+
+.sp-body-bot-side.ugc_usage > .sp-body-bot-side-messages {
+    width: 100%;
+    padding: 0 30px;
+}
+
+.sp-body-bot-side.ugc_usage > .sp-body-bot-side-messages .ss-bot-chat-detail-content.display_ugc {
+  white-space: nowrap;
+  width: 100% !important;
+  background-color: transparent !important;
+  color: auto;
+  padding: 0;
+}
+
 /* .sp-body-bot-side::before {
     width: 89%;
     animation: reveal 1s reverse forwards;
@@ -929,4 +946,41 @@ slideUp
 
 .ss-user-setting__item-bottom div[style*="display: flex"] > div:last-child {
   width: 59% !important;
+}
+
+.options-gender_wrapper {
+    padding: 0px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.options-gender_wrapper-item {
+    display: flex;
+    width: 100%;
+    gap: 5px;
+}
+
+.option-gender-item {
+    flex-grow: 1;
+    border-radius: 10px;
+    box-sizing: border-box;
+    padding: 15px 10px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    transition-duration: 0.2s;
+}
+
+.option-gender-item:active {
+    transform: scale(0.95);
+}
+
+.option-gender-item .ico {
+    width: 50px;
+    height: 50px;
 }

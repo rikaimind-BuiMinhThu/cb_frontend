@@ -7,6 +7,7 @@ const HtmlCodeMessagePreview = ({
 }) => {
   const defaultHtmlContent = '<p style="color: #999; font-style: italic;">HTMLコードを入力してください</p>';
   const htmlContent = content[content.type]?.content || defaultHtmlContent;
+  const isUseForUgc = !!content[content.type]?.use_for_ugc;
 
   const messageColor = botInfor?.message_color || '#3CACEF';
   const fontColor = botInfor?.font_color || '#fff';
@@ -15,7 +16,7 @@ const HtmlCodeMessagePreview = ({
   return (
     <div className="position-relative">
       <div
-        className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value position-relative html-code-message-preview`}
+        className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value position-relative html-code-message-preview ${isUseForUgc ? 'display_ugc' : ""}`}
         style={{
           backgroundColor: messageColor,
           color: fontColor

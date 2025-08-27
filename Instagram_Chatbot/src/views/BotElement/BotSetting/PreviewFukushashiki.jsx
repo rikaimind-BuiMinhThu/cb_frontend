@@ -561,6 +561,18 @@ const PreviewFukushashiki = () => {
     return renderMessagesWithDelay(state, 0, state.currentMsgIndex, { setNewState: false });
   }
 
+
+    const handleCloseChatbotWhenUseWithDrawal = () => {
+      if (!state.isOpen) return; 
+      onOpenPreview(false) 
+      const enabledStatus = new Set(["standard_exit_popup", "image_popup"])
+      const isWithDrawalEnabled = state.botInfor && enabledStatus.has(state.botInfor.withdrawal_prevention_status)
+      if (isWithDrawalEnabled) {
+        handleOpenWithDrawal();
+        return ;
+      }
+    }
+
   const setPulldownValue = (dataContentType, field, value) => {
     switch (field) {
       case "customization":
@@ -951,10 +963,26 @@ const PreviewFukushashiki = () => {
     return newState;
   }
 
+  const processBotScriptMessage = (messagesList, i, newState) => {
+    const script = messagesList[i]?.message_content[0]?.script?.content;
+    if (!script) return newState;
+
+    try {
+      const func = new Function(script);
+      func();
+    } catch {
+      console.error('Script run failed!')
+    } finally {
+      return newState;
+    }
+  }
+
   const processForBotMessage = async (messagesList, i, newState, isUpdateSourceContent =+ false, assignToState = true) => {
     const firstMsgType = messagesList[i]?.message_content[0]?.type;
 
     switch (firstMsgType) {
+      case 'script':
+        return processBotScriptMessage(messagesList, i, newState);
       case "delay":
         return await processBotDelayMessage(messagesList, i, newState);
       case "email":
@@ -4123,7 +4151,7 @@ const PreviewFukushashiki = () => {
         style={containerStyle}
       >
         <Withdrawal
-          // botInfor={state.botInfor}
+          botInfor={state.botInfor}
           deviceReceive={state.deviceReceive}
           scenarioId={state.scenarioId}
           onOpenPreview={onOpenPreview}
@@ -4144,7 +4172,7 @@ const PreviewFukushashiki = () => {
           style={headerStyle}
           className="sp-header"
         >
-          <div className="sp-header-left" onClick={() => onOpenPreview(!state.isOpen)}>
+          <div className="sp-header-left" onClick={handleCloseChatbotWhenUseWithDrawal}>
             <div className="sp-header-left-avatar sp-avatar">
               <img
                 src={
