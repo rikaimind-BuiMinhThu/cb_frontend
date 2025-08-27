@@ -42,8 +42,9 @@ import locale from 'antd/es/date-picker/locale/ja_JP';
 import 'moment/locale/zh-cn';
 import ShopifyReferenceSelect from "./ShopifyReferenceSelect";
 import { Tooltip } from '@mui/material';
-import { MESSAGE_CONTENT_TYPES, TIMER_TYPES, TIMER_VARIABLES, TIMER_VARIABLES_DESCRIPTION, BOT_MESSAGE_TYPES, RANGE_TEXT_VALIDATE } from '../PreviewComponent/Constants';
+import { MESSAGE_CONTENT_TYPES, TIMER_TYPES, TIMER_VARIABLES, TIMER_VARIABLES_DESCRIPTION, BOT_MESSAGE_TYPES, RANGE_TEXT_VALIDATE, LABELS, GENDER_DISPLAY_TYPES } from '../PreviewComponent/Constants';
 import HtmlCodeConfig from './scenarioComon/HtmlCodeConfig';
+import OptionGenderConfig from './OptionGenderConfig';
 
 const _ = require('lodash');
 
@@ -7336,6 +7337,11 @@ const Scenario = () => {
                                                           </div>
                                                         }
                                                         <CheckboxCustom
+                                                          label={LABELS.GENDER_OPTIONS.CHECKBOX_USE_AS_GENDER}
+                                                          onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'use_as_gender')}
+                                                          value={!!radioButton.use_as_gender}
+                                                        />
+                                                        <CheckboxCustom
                                                           label="必須"
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'require')}
                                                           value={radioButton.require}
@@ -7383,6 +7389,7 @@ const Scenario = () => {
                                                         </div>
                                                       )}
                                                       {isUseFukushashiki && (
+                                                        <React.Fragment>
                                                               <div className="ss-user-setting__item-bottom">
                                                                 <div style={{ width: '5%' }}>
 
@@ -7425,6 +7432,18 @@ const Scenario = () => {
                                                                 <div style={{ width: '5%' }}>
                                                                 </div>
                                                               </div>
+                                                              {!!radioButton.use_as_gender && <div style={{ width: '100%', padding: "0 5% 10px" }}>
+                                                                <SelectCustom 
+                                                                  data={[{ key: LABELS.GENDER_OPTIONS.VERTICAL, value: 'vertical' }, { key: LABELS.GENDER_OPTIONS.HORIZONTAL, value: 'horizontal' }]}
+                                                                  value={radioButton?.gender_display_type}
+                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'gender_display_type')}
+                                                                  keyValue="value"
+                                                                  nameValue="key"
+                                                                  label={LABELS.GENDER_OPTIONS.LABEL_GENDER_DISPLAY_TYPE}
+                                                                  style={{ width: '100%' }}
+                                                                />
+                                                              </div>}
+                                                        </React.Fragment>
                                                             )}
                                                       {/* radioButton: type != consume_api_response */}
                                                       {radioButton.type !== 'consume_api_response' &&
@@ -7513,6 +7532,14 @@ const Scenario = () => {
                                                                                           value={radioButton.initial_selection === itemRadio.value}
                                                                                           isOnChange={false}
                                                                                         />
+                                                                                        {
+                                                                                          radioButton.use_as_gender && (
+                                                                                            <OptionGenderConfig
+                                                                                              value={itemRadio.preset_config}
+                                                                                              onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, radioButton.type, indexRadio, 'preset_config')}
+                                                                                            />
+                                                                                          )
+                                                                                        }
                                                                                       </React.Fragment>
                                                                                     }
                                                                                     {(radioButton.type === 'block_style') &&

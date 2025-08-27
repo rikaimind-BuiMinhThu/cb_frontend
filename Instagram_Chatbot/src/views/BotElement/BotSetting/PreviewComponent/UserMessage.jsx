@@ -32,6 +32,7 @@ import { stringNullOrEmpty } from "./Utils";
 import SubmitButton from "./UserMessageComponent/SubmitButton";
 import InputDebounce from "../ScenarioSetting/scenarioComon/InputDebounce";
 import { convertTextJapaneseByApi } from "utils/japaneseConverter";
+import OptionGender from "./UserMessageComponent/OptionGender";
 
 const UserMessage = ({
   messageContentProps,
@@ -1993,7 +1994,14 @@ const UserMessage = ({
                 )}
                 <div className="ss-message__content--user-radio_button-wrapper">
                   {radioButton.type === "default" &&
-                    radioButton[radioButton.type].map((item, index) => {
+                    radioButton.use_as_gender
+                    ? <OptionGender 
+                        indexContent={indexContent} 
+                        radioButton={radioButton} 
+                        onChangeValue={onChangeValue} 
+                        options={radioButton[radioButton.type]}
+                      />
+                    : radioButton[radioButton.type].map((item, index) => {
                       return (
                         <div
                           key={index}
