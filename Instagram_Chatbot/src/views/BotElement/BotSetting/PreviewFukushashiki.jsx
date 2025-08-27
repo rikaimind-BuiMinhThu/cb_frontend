@@ -35,7 +35,8 @@ import {
   TIMER_TYPES,
   RENDER_CHATBOT_CONFIG,
   RANGE_TEXT_VALIDATE,
-  CART_SYSTEM
+  CART_SYSTEM,
+  TIMER_DELAY_RENDER
 } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
@@ -58,6 +59,7 @@ import {
   changeElementAttributeById,
   scrollToPosition,
   processMessagesForErrorState,
+  createTempDelay
 } from "./PreviewComponent/Utils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
@@ -3373,10 +3375,36 @@ const PreviewFukushashiki = () => {
 
       newState.renderMessagesList = newState.messagesList.slice(0, i + 1);
       if (isDelayBotMessage(newState.messagesList[i])) {
-        newState.renderMessagesList[i].hidden = true;
+        // render delay item so typing GIF appears, then wait
+        dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
+          payload: {
+            startIndex: 0,
+            endIndex: i + 1
+          }
+        });
         if (!isPassDelay) {
-          await sleep(newState.messagesList[i].message_content[0].delay.content * 1000);
+          await sleep(newState.messagesList[i].message_content[0].delay?.content * 1000 || TIMER_DELAY_RENDER);
         }
+        const newRender = newState.renderMessagesList.slice(0, i + 1).map(msg => isDelayBotMessage(msg) ? {...msg, hidden: true} : msg);
+        newState.renderMessagesList[i].hidden = true;
+        dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+          payload: {
+            messagesList: newState.messagesList,
+            renderMessagesList: newRender,
+          }
+        })
+
+        newState.messagesList[i].hidden = true;
+        dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+          payload: {
+            messagesList: newState.messagesList,
+            renderMessagesList: newRender,
+          }
+        })
+
         continue;
       }
       
@@ -3416,10 +3444,31 @@ const PreviewFukushashiki = () => {
     }
 
     return new Promise(async (resolve) => {
+      // Insert a temporary delay item to show typing GIF for 0.5s when advancing
+      const tempDelay = createTempDelay(0.5);
+
+      // Place tempDelay right after clicked index so user sees typing before next messages
+      newState.messagesList.splice(clickedMsgIndex + 1, 0, tempDelay);
+      // adjust indices
+      if (newState.currentMsgIndex >= clickedMsgIndex + 1) newState.currentMsgIndex++;
+
       for (let i = clickedMsgIndex + 1; i <= newState.currentMsgIndex; i++) {
         newState.renderMessagesList = newState.messagesList.slice(0, i + 1);
         if (isDelayBotMessage(newState.messagesList[i])) {
-          await sleep(newState.messagesList[i].message_content[0].delay.content * 1000);
+          // ensure the delay item is rendered so typing GIF visible
+          dispatch({
+            type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
+            payload: { startIndex: 0, endIndex: i + 1 }
+          });
+          await sleep(newState.messagesList[i].message_content[0].delay?.content * 1000 || TIMER_DELAY_RENDER);
+          newState.renderMessagesList[i].hidden = true;
+          dispatch({
+            type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+            payload: {
+              messagesList: newState.messagesList,
+              renderMessagesList: newState.renderMessagesList.slice(0, i + 1).map(msg => isDelayBotMessage(msg) ? {...msg, hidden: true} : msg),
+            }
+          })
           continue;
         }
         
@@ -3432,6 +3481,13 @@ const PreviewFukushashiki = () => {
         });
 
         await sleep(RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE);
+      }
+
+      // remove temp delay if still present
+      const tempIdx = newState.messagesList.findIndex(m => m.id && `${m.id}`.startsWith('__temp_delay_'));
+      if (tempIdx >= 0) {
+        newState.messagesList.splice(tempIdx, 1);
+        if (newState.currentMsgIndex > tempIdx) newState.currentMsgIndex--;
       }
       resolve();
     }).then(() => {
