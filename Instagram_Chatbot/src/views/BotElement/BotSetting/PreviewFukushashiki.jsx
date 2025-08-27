@@ -35,7 +35,8 @@ import {
   TIMER_TYPES,
   RENDER_CHATBOT_CONFIG,
   RANGE_TEXT_VALIDATE,
-  CART_SYSTEM
+  CART_SYSTEM,
+  TIMER_DELAY_RENDER
 } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
@@ -58,6 +59,7 @@ import {
   changeElementAttributeById,
   scrollToPosition,
   processMessagesForErrorState,
+  createTempDelay
 } from "./PreviewComponent/Utils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
@@ -3382,20 +3384,19 @@ const PreviewFukushashiki = () => {
           }
         });
         if (!isPassDelay) {
-          await sleep(newState.messagesList[i].message_content[0].delay?.content * 1000 || 500);
+          await sleep(newState.messagesList[i].message_content[0].delay?.content * 1000 || TIMER_DELAY_RENDER);
         }
-
+        const newRender = newState.renderMessagesList.slice(0, i + 1).map(msg => isDelayBotMessage(msg) ? {...msg, hidden: true} : msg);
         newState.renderMessagesList[i].hidden = true;
         dispatch({
           type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
           payload: {
             messagesList: newState.messagesList,
-            renderMessagesList: newState.renderMessagesList.slice(0, i + 1).map(msg => isDelayBotMessage(msg) ? {...msg, hidden: true} : msg),
+            renderMessagesList: newRender,
           }
         })
 
         newState.messagesList[i].hidden = true;
-        const newRender = newState.renderMessagesList.slice(0, i + 1).map(msg => isDelayBotMessage(msg) ? {...msg, hidden: true} : msg);
         dispatch({
           type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
           payload: {
@@ -3444,12 +3445,7 @@ const PreviewFukushashiki = () => {
 
     return new Promise(async (resolve) => {
       // Insert a temporary delay item to show typing GIF for 0.5s when advancing
-      const tempDelay = {
-        id: `__temp_delay_${Date.now()}`,
-        belong_to: 'bot',
-        message_name: 'delay',
-        message_content: [{ type: 'delay', delay: { content: 0.5 } }],
-      };
+      const tempDelay = createTempDelay(0.5);
 
       // Place tempDelay right after clicked index so user sees typing before next messages
       newState.messagesList.splice(clickedMsgIndex + 1, 0, tempDelay);
@@ -3464,7 +3460,7 @@ const PreviewFukushashiki = () => {
             type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
             payload: { startIndex: 0, endIndex: i + 1 }
           });
-          await sleep(newState.messagesList[i].message_content[0].delay?.content * 1000 || 500);
+          await sleep(newState.messagesList[i].message_content[0].delay?.content * 1000 || TIMER_DELAY_RENDER);
           newState.renderMessagesList[i].hidden = true;
           dispatch({
             type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,

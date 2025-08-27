@@ -260,6 +260,8 @@ export const TIMER_VARIABLES_DESCRIPTION = {
 
 export const TIMER_COUNTING_DELAY = 20;
 
+export const TIMER_DELAY_RENDER = 500;
+
 export const TIMER_MAP_VARIABLE_METHOD = {
   CONFIG: 1,
   PARAMS: 2,

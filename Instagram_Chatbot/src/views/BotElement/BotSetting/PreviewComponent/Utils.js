@@ -465,6 +465,16 @@ const processMessagesForErrorState = (payload) => {
   return processedPayload;
 };
 
+const createTempDelay = (seconds = 0.5) => {
+  return {
+    id: `__temp_delay_${Date.now()}`,
+    belong_to: 'bot',
+    message_name: 'delay',
+    message_content: [{ type: 'delay', delay: { content: Number(seconds)}}],
+  }
+}
+
+
 export {
   stringNullOrEmpty, getAllUrlParams, lightenColor,
   mobileCheck, removeLeadingZero, sendUserInteractionData,
@@ -474,6 +484,6 @@ export {
   sleep, getCaptcha, appendParamsToUrl, checkMessageCondition,
   getAddressFromZipCode, secondToDatetime, findItem, isUndefined,
   changeElementAttributeById, toCamelCase, sendConvertTextJapaneseRequest,
-  scrollToPosition, removeSpace, getColor, processMessagesForErrorState, hideMessageOnError,
-  patchWithDrawalPreview
+  scrollToPosition, removeSpace, getColor, processMessagesForErrorState, hideMessageOnError, createTempDelay,
+  patchWithDrawalPreview,
 };
