@@ -189,6 +189,27 @@ const sendConvertTextJapaneseRequest = (text) => {
   );
 }
 
+const sendScenarioUserResponse = (data) => {
+  return postToChatBotServer(
+    CHATBOT_SERVER.SEND_SCENARIO_USER_RESPONSE,
+    data
+  );
+}
+
+const createStatusConversion = (data) => {
+  return postToChatBotServer(
+    CHATBOT_SERVER.CREATE_STATUS_CONVERSION_USER_RESPONSE,
+    data
+  );
+}
+
+const updateStatusConversion = (data) => {
+  return patchToChatBotServer(
+    CHATBOT_SERVER.UPDATE_STATUS_CONVERSION_USER_RESPONSE,
+    data
+  );
+}
+
 const getCaptcha = (size, color, charPreset) => {
   const url = GET_CAPTCHA_PATH.replace(":size", size)
     .replace(":color", color)
@@ -485,5 +506,5 @@ export {
   getAddressFromZipCode, secondToDatetime, findItem, isUndefined,
   changeElementAttributeById, toCamelCase, sendConvertTextJapaneseRequest,
   scrollToPosition, removeSpace, getColor, processMessagesForErrorState, hideMessageOnError, createTempDelay,
-  patchWithDrawalPreview,
+  patchWithDrawalPreview, sendScenarioUserResponse, createStatusConversion, updateStatusConversion,
 };

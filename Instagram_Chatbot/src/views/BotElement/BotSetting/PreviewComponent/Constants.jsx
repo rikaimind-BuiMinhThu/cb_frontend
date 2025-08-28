@@ -95,7 +95,10 @@ const CHATBOT_SERVER = {
   GET_CHATBOT_SETTING_PATH: '/api/v1/managements/chatbots/:bot_id',
   SEND_EMAIL_PATH: '/api/v1/managements/emails/:email_id/send_email',
   CONVERT_TEXT_JAPANESE_PATH: '/api/v1/jp_convert',
-  WITHDRAWAL_RESPONSE: '/api/v1/chatbot_settings/withdrawal_preventions/:bot_id'
+  WITHDRAWAL_RESPONSE: '/api/v1/chatbot_settings/withdrawal_preventions/:bot_id',
+  SEND_SCENARIO_USER_RESPONSE: '/api/v1/scenario_users/scenario_user_responses',
+  CREATE_STATUS_CONVERSION_USER_RESPONSE: '/api/v1/scenario_users/scenario_user_responses_status',
+  UPDATE_STATUS_CONVERSION_USER_RESPONSE: '/api/v1/scenario_users/scenario_user_responses_status',
 };
 
 const GET_CAPTCHA_PATH = `https://svg-captcha-nodejs.vercel.app/captcha?size=:size&color=:color&charPreset=:char_preset`;
@@ -239,6 +242,11 @@ export {
   CART_SYSTEM,
   LABELS,
 };
+
+export const CONVERSATION_RESPONSE_STATUS = {
+  FINISH: "finished",
+  UN_FINISH: "un_finished",
+}
 
 export const TIMER_TYPES = {
   COUNTING_DOWN: "counting_down",

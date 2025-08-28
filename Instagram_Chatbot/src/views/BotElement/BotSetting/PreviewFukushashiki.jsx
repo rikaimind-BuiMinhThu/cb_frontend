@@ -36,7 +36,8 @@ import {
   RENDER_CHATBOT_CONFIG,
   RANGE_TEXT_VALIDATE,
   CART_SYSTEM,
-  TIMER_DELAY_RENDER
+  TIMER_DELAY_RENDER,
+  CONVERSATION_RESPONSE_STATUS
 } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
@@ -59,7 +60,10 @@ import {
   changeElementAttributeById,
   scrollToPosition,
   processMessagesForErrorState,
-  createTempDelay
+  createTempDelay,
+  sendScenarioUserResponse,
+  createStatusConversion,
+  updateStatusConversion
 } from "./PreviewComponent/Utils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
@@ -141,6 +145,7 @@ const previewInitialState = {
   isUsedErrMsgByJs: false,
   errMsgJsCode: '',
   isProcessing: false,
+  conversionStatus: null,
 };
 
 const PREVIEW_ACTIONS = {
@@ -2849,7 +2854,7 @@ const PreviewFukushashiki = () => {
               }
 
               if (Object.keys(message.text_input.password).length != 0 && message.text_input.password != undefined) {
-                if (message.fukushashiki_search_value.includes(',')) {
+                if (message?.fukushashiki_search_value.includes(',')) {
                   let address = message.fukushashiki_search_value.split(',');
                   address.forEach(value => {
                     const fukuObject = {
@@ -3212,6 +3217,20 @@ const PreviewFukushashiki = () => {
     }
   }
 
+  const finishConversion = async ({ scenario_id, user_input_id }, callback) => {
+    return updateStatusConversion({ scenario_id, user_input_id, status: CONVERSATION_RESPONSE_STATUS.FINISH })
+      .then(() => {
+        dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+          payload: { conversionStatus: CONVERSATION_RESPONSE_STATUS.FINISH },
+        });
+
+        if (!!callback) {
+          callback();
+        }
+      });
+  }
+
   const postMessageForExecuteJs = (jsCode) => {
     postMessageToParent({
       action: CHATBOT_ACTIONS.EXCUTE_JS,
@@ -3298,7 +3317,8 @@ const PreviewFukushashiki = () => {
           action: CHATBOT_ACTIONS.CLICK_BUTTON,
           id_value: content.button_submit_id
         });
-        redirectToCartPage();
+
+        finishConversion({ scenario_id: data.scenario_id, user_input_id: data.user_id }, redirectToCartPage)
         return;
       }
 
@@ -3316,7 +3336,7 @@ const PreviewFukushashiki = () => {
         sendCountRequest(conversion)
           .then(res => {
             console.log(res);
-            redirectToCartPage();
+            finishConversion({ scenario_id: data.scenario_id, user_input_id: data.user_id }, redirectToCartPage);
           });
       });
     });
@@ -3531,10 +3551,6 @@ const PreviewFukushashiki = () => {
     newState.userMessagesList = newState.messagesList.filter((item) => isUserMessage(item));
     const clickedMsg = newState.messagesList[clickedMsgIndex];
 
-    if (!handleValidateField(indexMessage)) {
-      return;
-    }
-
     newState.errors = {};
 
     const submitData = {
@@ -3543,9 +3559,23 @@ const PreviewFukushashiki = () => {
       user_id: state.uuid,
       bot_type: "web"
     };
+
+    if (!handleValidateField(indexMessage)) {
+      // sendScenarioUserResponse({
+      //   ...submitData,
+      //   is_error: true,
+      // });
+      return;
+    }
     
     const isClickedCreateOrder = state.messagesList[clickedMsgIndex]?.message_content?.[0]?.type === "button_submit";
     const isClickedLastMessage = state.messagesList.length - 1 === clickedMsgIndex;
+    const isBtnUpdateClick = indexMessage < newState.renderMessagesList.length - 1;
+
+    sendScenarioUserResponse({
+      ...submitData,
+      is_update: isBtnUpdateClick,
+    });
 
     if (isClickedCreateOrder) {
       setStateToSessionStorage(newState);
@@ -3554,12 +3584,16 @@ const PreviewFukushashiki = () => {
 
     if (isClickedLastMessage) {
       newState.messagesList[clickedMsgIndex].disabled = false;
+
+      await finishConversion({ scenario_id: submitData.scenario_id, user_input_id: submitData.user_id });
+      newState.conversionStatus = CONVERSATION_RESPONSE_STATUS.FINISH;      
       return dispatch({
         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
         payload: newState
       });
     }
 
+    newState.messagesList[clickedMsgIndex].isSubmitted = true;
     fukushashikiToLP(convertToFukushashikiObject(submitData));
 
     if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
@@ -3614,12 +3648,19 @@ const PreviewFukushashiki = () => {
     }
 
     newState.currentUserMsgIndex = newState.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex));
+
+    if (
+      newState.currentUserMsgIndex === -1 &&
+      newState.conversionStatus === CONVERSATION_RESPONSE_STATUS.UN_FINISH
+    ) {
+      await finishConversion({ scenario_id: submitData.scenario_id, user_input_id: submitData.user_id });
+      newState.conversionStatus = CONVERSATION_RESPONSE_STATUS.FINISH;
+    }
+
     if (newState.currentUserMsgIndex === -1)
       newState.currentMsgIndex = newState.messagesList.length - 1;
     else
       newState.currentMsgIndex = newState.currentUserMsgIndex;
-    
-    const isBtnUpdateClick = indexMessage < newState.renderMessagesList.length - 1;
 
     await handleRenderMessageAfterClickNext(newState, clickedMsgIndex, isBtnUpdateClick);
   };
@@ -3941,16 +3982,17 @@ const PreviewFukushashiki = () => {
   };
 
   const renderNextButton = (message, indexMessage) => {
+    const isUpdate = indexMessage >= state.renderMessagesList.length - 1;
     const firstMsgContent = message?.message_content?.[0];
     const isDisplayBtnNext = firstMsgContent?.type != "image" || firstMsgContent?.image?.displayButtonNext != false;
-    const isAutoClick = !isDisplayBtnNext && indexMessage >= state.renderMessagesList.length - 1;
+    const isAutoClick = !isDisplayBtnNext && isUpdate;
 
     if (!message || message.belong_to !== "user") return null;
     if (message.message_content[0]?.type === "button_submit") return null;
 
     let btnText = message.buttonName;
     if (!btnText) {
-      btnText = indexMessage >= state.renderMessagesList.length - 1 ? "次へ" : "更新";
+      btnText = isUpdate ? "次へ" : "更新";
     }
     return (
       <div className="sp-user-message-button-action" style={{ display: isDisplayBtnNext ? "flex" : "none" }}>
@@ -4131,6 +4173,26 @@ const PreviewFukushashiki = () => {
       bodyStyle,
     };
   };
+
+  useEffect(() => {
+    if (state.conversionStatus === null && !!state.uuid && !!state.scenarioId && state.isOpen) {
+      createStatusConversion({
+        scenario_id: state.scenarioId, 
+        user_input_id: state.uuid, 
+        status: CONVERSATION_RESPONSE_STATUS.UN_FINISH,
+      })
+      .then((res) => {
+        const status = res?.data?.data?.status;
+
+        if (status) {
+          dispatch({ 
+            type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, 
+            payload: { conversionStatus: status },
+          });
+        }
+      });
+    }
+  }, [state.uuid, state.scenarioId, state.conversionStatus, state.isOpen])
 
   useEffect(() => {
     if (!state.stopRender || state.isDelaying || !state.useNewProcess) return;
