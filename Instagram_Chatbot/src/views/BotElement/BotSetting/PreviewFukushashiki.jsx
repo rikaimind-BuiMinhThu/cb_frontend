@@ -979,12 +979,45 @@ const PreviewFukushashiki = () => {
     }
   }
 
+  const processBotUgcMessage = async (messagesList, i, newState) => {
+    const content = messagesList[i]?.message_content[0]?.test_ugc?.content;
+    if (!content) return newState;
+    if(/^\s*<\w+|<\w+[^>]*>/i.test(content)){
+      try {
+        const doc = new DOMParser().parseFromString(content, "text/html");
+        [...doc.querySelectorAll("link")].forEach(el => 
+          document.head.appendChild(el.cloneNode(true)));
+        [...doc.body.children].filter(el => !["script", "link"]
+          .includes(el.tagName.toLowerCase())).forEach(el => document.body.appendChild(el.cloneNode(true)));
+        for (const script of doc.querySelectorAll("script")) {
+          const s = document.createElement("script");
+          [...script.attributes].forEach(attr => s.setAttribute(attr.name, attr.value));
+          s.text = script.textContent || '';
+          if (s.src) await new Promise(r => { s.onload = s.onerror = r; document.body.appendChild(s); });
+          else document.body.appendChild(s);
+        }
+      } catch (error) {
+        console.error("Hello !, you have one bug",error)
+      }
+    } else {
+      try {
+        const func = new Function(content);
+        func();
+      } catch (error) {
+        console.error("Ồ là lá Fail rồi", error);
+      }
+    }
+    return newState;
+  }
+  
   const processForBotMessage = async (messagesList, i, newState, isUpdateSourceContent =+ false, assignToState = true) => {
     const firstMsgType = messagesList[i]?.message_content[0]?.type;
 
     switch (firstMsgType) {
       case 'script':
         return processBotScriptMessage(messagesList, i, newState);
+      case BOT_MESSAGE_TYPES.UGC:
+        return await processBotUgcMessage(messagesList, i, newState);
       case "delay":
         return await processBotDelayMessage(messagesList, i, newState);
       case "email":
