@@ -980,7 +980,7 @@ const PreviewFukushashiki = () => {
   }
 
   const processBotUgcMessage = async (messagesList, i, newState) => {
-    const content = messagesList[i]?.message_content[0]?.test_ugc?.content;
+    const content = messagesList[i]?.message_content[0]?.use_html_ugc_config?.content;
     if (!content) return newState;
     if(/^\s*<\w+|<\w+[^>]*>/i.test(content)){
       try {
