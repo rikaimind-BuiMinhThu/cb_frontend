@@ -36,7 +36,10 @@ import {
   RENDER_CHATBOT_CONFIG,
   RANGE_TEXT_VALIDATE,
   CART_SYSTEM,
-  TIMER_DELAY_RENDER
+  TIMER_DELAY_RENDER,
+  CONVERSTION_RESPONSE_STATUS,
+  CONVERSION_RESPONSE_SUBMIT_TYPE,
+  CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE
 } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
@@ -59,7 +62,12 @@ import {
   changeElementAttributeById,
   scrollToPosition,
   processMessagesForErrorState,
-  createTempDelay
+  createTempDelay,
+  sendScenarioUserResponse,
+  createStatusConversion,
+  updateStatusConversion,
+  createScenarioUserResponseMessageHistory,
+  userEntryScenario
 } from "./PreviewComponent/Utils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
@@ -141,6 +149,7 @@ const previewInitialState = {
   isUsedErrMsgByJs: false,
   errMsgJsCode: '',
   isProcessing: false,
+  conversionStatus: null,
 };
 
 const PREVIEW_ACTIONS = {
@@ -436,10 +445,10 @@ const PreviewFukushashiki = () => {
     if (!state.loadedStateFromSession) return;
     if (state.prefecturesList.length !== 0) return;
 
-    getPrefectures()
-      .then((res) => {
-        dispatch({ type: PREVIEW_ACTIONS.UPDATE_PREFECTURES_LIST, payload: { prefecturesList: res.data.data } });
-      })
+    // getPrefectures()
+    //   .then((res) => {
+    //     dispatch({ type: PREVIEW_ACTIONS.UPDATE_PREFECTURES_LIST, payload: { prefecturesList: res.data.data } });
+    //   })
   }, [state.prefecturesList, state.loadedStateFromSession]);
 
   const handleCloseBot = () => {
@@ -461,6 +470,11 @@ const PreviewFukushashiki = () => {
       scrollToBottom = true,
     } = options;
 
+    userEntryScenario({
+      scenario_id: newState.scenarioId,
+      user_id: newState.uuid,
+    });
+
     new Promise((resolve) => {
       dispatch({
         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
@@ -469,8 +483,8 @@ const PreviewFukushashiki = () => {
 
       sleep(delayTime).then(resolve);
     }).then(async () => {
-      if (state.useNewProcess) {
-        renderMessageInRange(0, newState.currentMsgIndex, newState, newState.currentUserMsgIndex, { isPassDelay: true })
+      if (newState.useNewProcess) {
+        renderMessageInRange(0, newState.currentMsgIndex, newState, newState.currentUserMsgIndex, { isPassDelay: true, appearFromStart: true })
         .then(() => {
           dispatch({
             type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
@@ -478,6 +492,15 @@ const PreviewFukushashiki = () => {
           });
         });
       } else {
+        const listMsgAppear = newState.renderMessagesList.filter(i => isUserMessage(i) && !i.hidden).map(i => ({ id: i.id, type: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.APPEAR }));
+
+        if (listMsgAppear.length) {
+          createScenarioUserResponseMessageHistory({
+            scenario_id: newState.scenarioId,
+            user_id: newState.uuid,
+            msgs: listMsgAppear,
+          });
+        }
         dispatch({
           type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
           payload: { renderMessagesList: newState.renderMessagesList, isDelaying: false },
@@ -1088,7 +1111,13 @@ const PreviewFukushashiki = () => {
   }
 
   const renderMessagesWithDelay = (theState, startMsgIndex, endMsgIndex, options = { setNewState: true }) => {
+    userEntryScenario({
+      scenario_id: theState.scenarioId,
+      user_id: theState.uuid,
+    });
+
     return new Promise(async (resolve) => {
+      const listMsgAppear = [];
       for (let i = startMsgIndex; i <= endMsgIndex; i++) {
         theState.renderMessagesList = theState.messagesList.slice(0, i + 1);
         if (isDelayBotMessage(theState.messagesList[i])) {
@@ -1108,11 +1137,15 @@ const PreviewFukushashiki = () => {
           },
         });
 
+        if (isUserMessage(theState.messagesList[i])) {
+          listMsgAppear.push({ id: theState.messagesList[i].id, type: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.APPEAR });
+        }
+
         scrollToPosition({ position: "b", selector: "#sp-body" });
         await sleep(RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE);
       }
-      resolve();
-    }).then(() => {
+      resolve({ listMsgAppear });
+    }).then(({ listMsgAppear }) => {
       if(options.setNewState) {
         theState.renderMessagesList = theState.messagesList.slice(0, theState.currentMsgIndex + 1);
         theState.passedUserMsgCount = theState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
@@ -1120,6 +1153,14 @@ const PreviewFukushashiki = () => {
         // update state with theState except prefecturesList
         const { prefecturesList, ...rest } = theState;
         dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: rest });
+      }
+
+      if (listMsgAppear.length) {
+        createScenarioUserResponseMessageHistory({
+          scenario_id: theState.scenarioId,
+          user_id: theState.uuid,
+          msgs: listMsgAppear,
+        });
       }
     });
   }
@@ -2882,7 +2923,7 @@ const PreviewFukushashiki = () => {
               }
 
               if (Object.keys(message.text_input.password).length != 0 && message.text_input.password != undefined) {
-                if (message.fukushashiki_search_value.includes(',')) {
+                if (message?.fukushashiki_search_value.includes(',')) {
                   let address = message.fukushashiki_search_value.split(',');
                   address.forEach(value => {
                     const fukuObject = {
@@ -3245,6 +3286,20 @@ const PreviewFukushashiki = () => {
     }
   }
 
+  const finishConversion = async ({ scenario_id, user_input_id }, callback) => {
+    return updateStatusConversion({ scenario_id, user_input_id, status: CONVERSTION_RESPONSE_STATUS.FINISH })
+      .then(() => {
+        dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+          payload: { conversionStatus: CONVERSTION_RESPONSE_STATUS.FINISH },
+        });
+
+        if (!!callback) {
+          callback();
+        }
+      });
+  }
+
   const postMessageForExecuteJs = (jsCode) => {
     postMessageToParent({
       action: CHATBOT_ACTIONS.EXCUTE_JS,
@@ -3331,7 +3386,8 @@ const PreviewFukushashiki = () => {
           action: CHATBOT_ACTIONS.CLICK_BUTTON,
           id_value: content.button_submit_id
         });
-        redirectToCartPage();
+
+        finishConversion({ scenario_id: data.scenario_id, user_input_id: data.user_id }, redirectToCartPage)
         return;
       }
 
@@ -3349,7 +3405,7 @@ const PreviewFukushashiki = () => {
         sendCountRequest(conversion)
           .then(res => {
             console.log(res);
-            redirectToCartPage();
+            finishConversion({ scenario_id: data.scenario_id, user_input_id: data.user_id }, redirectToCartPage);
           });
       });
     });
@@ -3377,7 +3433,9 @@ const PreviewFukushashiki = () => {
       isUpdateClick = false, 
       isPassDelay = false,
       lastConfirmMessageIdx = -1,
+      appearFromStart = false,
     } = options;
+    const listMsgAppear = [];
 
     for (let i = startIndex; i <= endIndex; i++) {
       const confirmMessage = newState.messagesList[i].message_content?.find(x => x.text_input?.use_for_confirm_message);
@@ -3440,6 +3498,10 @@ const PreviewFukushashiki = () => {
 
         continue;
       }
+
+      if ((appearFromStart ? true : i !== startIndex ) && isUserMessage(newState.messagesList[i])) {
+        listMsgAppear.push({ id: newState.messagesList[i].id, type: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.APPEAR });
+      }
       
       dispatch({
         type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
@@ -3459,12 +3521,20 @@ const PreviewFukushashiki = () => {
       newState.passedUserMsgCount = newState.renderMessagesList.filter((item) => isUserMessage(item) && !item.hidden).length - 1 ;
     }
 
+    if (listMsgAppear.length) {
+      createScenarioUserResponseMessageHistory({
+        scenario_id: state.scenarioId,
+        user_id: state.uuid,
+        msgs: listMsgAppear,
+      });
+    }
+
     return newState;
   }
 
   const handleRenderMessageAfterClickNext = async (newState, clickedMsgIndex, isBtnUpdateClick) => {
     if (newState.useNewProcess) {
-      return renderMessageInRange(clickedMsgIndex + 1, newState.currentMsgIndex, newState, newState.currentUserMsgIndex, { isUpdateClick: isBtnUpdateClick })
+      return renderMessageInRange(clickedMsgIndex + 1, newState.currentMsgIndex, newState, newState.currentUserMsgIndex, { isUpdateClick: isBtnUpdateClick, appearFromStart: true })
       .then((newState) => {
         setStateToSessionStorage(newState);
         return dispatch({
@@ -3556,6 +3626,26 @@ const PreviewFukushashiki = () => {
     });
   }
 
+  const sendLogMessageToServer = (submitData) => {
+    const { submit_type, message, ...data } = submitData;
+    sendScenarioUserResponse(submitData);
+
+    const convertType = {
+      [CONVERSION_RESPONSE_SUBMIT_TYPE.ADD]: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.ADD,
+      [CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE]: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.RETRY,
+      [CONVERSION_RESPONSE_SUBMIT_TYPE.ERROR]: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.ERROR,
+    }
+
+    const messageSubmitType = convertType[submit_type];
+    
+    if (!messageSubmitType) return;
+
+    createScenarioUserResponseMessageHistory({
+      ...data,
+      msgs: [{ id: message.id, type: messageSubmitType }],
+    });
+  }
+
   const onClickNext = async (indexMessage, message) => {
     dispatch({ type: PREVIEW_ACTIONS.SET_PROCESSING, payload: true });
     let newState = _.omit(state, ['submitErrorMessage', 'lpOptionData']);
@@ -3563,10 +3653,6 @@ const PreviewFukushashiki = () => {
     if (clickedMsgIndex < 0) clickedMsgIndex = newState.currentMsgIndex;
     newState.userMessagesList = newState.messagesList.filter((item) => isUserMessage(item));
     const clickedMsg = newState.messagesList[clickedMsgIndex];
-
-    if (!handleValidateField(indexMessage)) {
-      return;
-    }
 
     newState.errors = {};
 
@@ -3576,9 +3662,24 @@ const PreviewFukushashiki = () => {
       user_id: state.uuid,
       bot_type: "web"
     };
+
+    if (!handleValidateField(indexMessage)) {
+      sendLogMessageToServer({
+        ...submitData,
+        submit_type: CONVERSION_RESPONSE_SUBMIT_TYPE.ERROR,
+      });
+      return;
+    }
     
-    const isClickedCreateOrder = state.messagesList[clickedMsgIndex]?.message_content?.[0]?.type === "button_submit";
-    const isClickedLastMessage = state.messagesList.length - 1 === clickedMsgIndex;
+    const isClickedCreateOrder = newState.messagesList[clickedMsgIndex]?.message_content?.[0]?.type === "button_submit";
+    const isClickedLastMessage = newState.messagesList.length - 1 === clickedMsgIndex;
+    const nextOrCurrentUserMessage = newState.messagesList.findIndex(getNextUserMsg((_, index) => index >= clickedMsgIndex));
+    const isBtnUpdateClick = indexMessage < newState.currentUserMsgIndex || (newState.currentUserMsgIndex === -1 && indexMessage === nextOrCurrentUserMessage);
+
+    sendLogMessageToServer({
+      ...submitData,
+      submit_type: isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD,
+    });
 
     if (isClickedCreateOrder) {
       setStateToSessionStorage(newState);
@@ -3587,12 +3688,16 @@ const PreviewFukushashiki = () => {
 
     if (isClickedLastMessage) {
       newState.messagesList[clickedMsgIndex].disabled = false;
+
+      await finishConversion({ scenario_id: submitData.scenario_id, user_input_id: submitData.user_id });
+      newState.conversionStatus = CONVERSTION_RESPONSE_STATUS.FINISH;      
       return dispatch({
         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
         payload: newState
       });
     }
 
+    newState.messagesList[clickedMsgIndex].isSubmitted = true;
     fukushashikiToLP(convertToFukushashikiObject(submitData));
 
     if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
@@ -3647,12 +3752,19 @@ const PreviewFukushashiki = () => {
     }
 
     newState.currentUserMsgIndex = newState.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex));
+
+    if (
+      newState.currentUserMsgIndex === -1 &&
+      newState.conversionStatus === CONVERSTION_RESPONSE_STATUS.UN_FINISH
+    ) {
+      await finishConversion({ scenario_id: submitData.scenario_id, user_input_id: submitData.user_id });
+      newState.conversionStatus = CONVERSTION_RESPONSE_STATUS.FINISH;
+    }
+
     if (newState.currentUserMsgIndex === -1)
       newState.currentMsgIndex = newState.messagesList.length - 1;
     else
       newState.currentMsgIndex = newState.currentUserMsgIndex;
-    
-    const isBtnUpdateClick = indexMessage < newState.renderMessagesList.length - 1;
 
     await handleRenderMessageAfterClickNext(newState, clickedMsgIndex, isBtnUpdateClick);
   };
@@ -3974,16 +4086,17 @@ const PreviewFukushashiki = () => {
   };
 
   const renderNextButton = (message, indexMessage) => {
+    const isUpdate = indexMessage >= state.renderMessagesList.length - 1;
     const firstMsgContent = message?.message_content?.[0];
     const isDisplayBtnNext = firstMsgContent?.type != "image" || firstMsgContent?.image?.displayButtonNext != false;
-    const isAutoClick = !isDisplayBtnNext && indexMessage >= state.renderMessagesList.length - 1;
+    const isAutoClick = !isDisplayBtnNext && isUpdate;
 
     if (!message || message.belong_to !== "user") return null;
     if (message.message_content[0]?.type === "button_submit") return null;
 
     let btnText = message.buttonName;
     if (!btnText) {
-      btnText = indexMessage >= state.renderMessagesList.length - 1 ? "次へ" : "更新";
+      btnText = isUpdate ? "次へ" : "更新";
     }
     return (
       <div className="sp-user-message-button-action" style={{ display: isDisplayBtnNext ? "flex" : "none" }}>
@@ -4164,6 +4277,26 @@ const PreviewFukushashiki = () => {
       bodyStyle,
     };
   };
+
+  useEffect(() => {
+    if (state.conversionStatus === null && !!state.uuid && !!state.scenarioId && state.isOpen) {
+      createStatusConversion({
+        scenario_id: state.scenarioId, 
+        user_input_id: state.uuid, 
+        status: CONVERSTION_RESPONSE_STATUS.UN_FINISH,
+      })
+      .then((res) => {
+        const status = res?.data?.data?.status;
+
+        if (status) {
+          dispatch({ 
+            type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, 
+            payload: { conversionStatus: status },
+          });
+        }
+      });
+    }
+  }, [state.uuid, state.scenarioId, state.conversionStatus, state.isOpen])
 
   useEffect(() => {
     if (!state.stopRender || state.isDelaying || !state.useNewProcess) return;
