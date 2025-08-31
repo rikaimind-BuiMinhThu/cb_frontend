@@ -38,11 +38,11 @@ export default function BotChatStatistic({
       return {
         ...msg,
         stats: {
-          appear_count: msgStats.appear_count,
-          error_count: msgStats.error_count,
-          complete_count: msgStats.complete_count,
-          retry_count: msgStats.retry_count,
-          completion_rate: msgStats.completion_rate,
+          appear_count: msgStats?.appear_count || 0,
+          error_count: msgStats?.error_count || 0,
+          complete_count: msgStats?.complete_count || 0,
+          retry_count: msgStats?.retry_count || 0,
+          completion_rate: msgStats?.completion_rate || 0,
         },
       };
     });
