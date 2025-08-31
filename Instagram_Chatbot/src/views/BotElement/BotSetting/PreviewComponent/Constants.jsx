@@ -182,7 +182,8 @@ const CUSTOM_JS_CODE_POSITION = {
 }
 
 const BOT_MESSAGE_TYPES = {
-  HTML_CODE: 'html_code'
+  HTML_CODE: 'html_code',
+  UGC: 'use_html_ugc_config',
 }
 
 const RENDER_CHATBOT_CONFIG = {
