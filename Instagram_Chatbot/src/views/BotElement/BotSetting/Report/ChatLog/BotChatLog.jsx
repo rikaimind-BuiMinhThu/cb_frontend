@@ -127,6 +127,7 @@ function BotChatLog() {
   const [captcha, setCaptcha] = useState([]);
   const [dataPrefectures, setDataPrefectures] = useState([]);
   const [statistic, setStatistic] = useState([]);
+  const [overall, setOverall] = useState({});
 
   let SCAN_REGEX = /\{\{(.*?)\}\}/g;
 
@@ -168,9 +169,11 @@ function BotChatLog() {
     getMessageData(item)
   }
 
-  function getScenarioMessages(botId, scenario_id, conversion = [], options = { saveMsgRender: true, saveMsgStatistic: true }) {
+  function getScenarioMessages(botId, scenario_id, conversion = [], options = {}) {
     let messageArr = [];
-    let conversations = conversion
+    let conversations = conversion;
+
+    const { saveMsgRender = true, saveMsgStatistic = true } = options;
 
     api
       .get(
@@ -514,6 +517,7 @@ function BotChatLog() {
                 //TODO: find message type
                 let chats = conversations.filter(
                   (c) => c?.message_id === messageArr[i].id
+                  && (c?.message_child_id >= 0 ? c.message_child_id === element.id : true)
                 );
 
                 let lastIndexChat = findLastIndex(chats, (c) =>
@@ -529,9 +533,10 @@ function BotChatLog() {
                   continue;
                 }
 
-                conversations = conversations.filter(
-                  (el) => el?.message_id !== chat.message_id
-                );
+                conversations = conversations.filter((c) => !(
+                  c?.message_id === chat.message_id 
+                  && (c?.message_child_id >= 0 ? c.message_child_id === chat.message_child_id : true)
+                ));
 
                 const subElement = element[element.type];
                 if (element.type === "text_input") {
@@ -776,10 +781,10 @@ function BotChatLog() {
         console.log(error);
       })
       .finally(() => {
-        if (options.saveMsgStatistic) {
+        if (saveMsgStatistic) {
           setRenderMessageStatisticArr(messageArr)
         } 
-        if (options.saveMsgRender) {
+        if (saveMsgRender) {
           setRenderMessageArr(messageArr);
         }
       });
@@ -826,7 +831,8 @@ function BotChatLog() {
     api.get(`/api/v1/managements/chat_log/statistic`, { params })
       .then((response) => {
         if (response.data.code === 1) {
-          setStatistic(response.data.statistic)
+          setStatistic(response.data.statistic);
+          setOverall(response.data.overall);
           getScenarioMessages(botId, params.sc_id, [], { saveMsgStatistic: true });
         }
       }
@@ -1105,6 +1111,7 @@ function BotChatLog() {
 
               <BotChatStatistic
                 display={selectTab === TABS.STATICTIC}
+                overall={overall}
                 botInfor={botInfor}
                 messages={renderMessageStatisticArr}
                 dataMessages={dataMessages}

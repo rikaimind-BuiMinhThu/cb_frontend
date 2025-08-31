@@ -3,46 +3,63 @@ import UserMessage from "./UserMessage";
 import { Fragment, useEffect, useState } from "react";
 import BotMessage from "./BotMessage";
 import { Button } from "reactstrap";
+import { parseQuantity } from "../../PreviewComponent/Utils";
+import ChatbotOverall, { CONVERTERS_OVERALL } from "./ChatbotOverall";
+import MessageStatisticDetail from "./MessageStatisticDetail";
 
 export default function BotChatStatistic({
   botInfor = null,
   messages = [],
   dataMessages = [],
   statistic = [],
+  overall = {},
   display = false,
 }) {
   const [msgs, setMsgs] = useState([]);
+  const [chatbotOverall, setChatbotOverall] = useState([]);
 
-  function bindStatistic(messages, statistic) {
+  const bindStatistic = (messages, statistic, overall) => {
+    setMsgs(parseMessageDetail(messages, statistic));
+    setChatbotOverall(parseOverall(overall));
+  };
+
+  const parseMessageDetail = (messages, statistic) => {    
     const mapMsgId = new Map();
 
     statistic.forEach((s) => {
       mapMsgId.set(s.msg_id, s);
     });
 
-    setMsgs(
-      messages.map((msg) => {
-        const msgStats = mapMsgId.get(msg.id);
+    return messages.map((msg) => {
+      if (msg.belong_to === "bot") return msg;
 
-        return {
-          ...msg,
-          stats: {
-            pass_count: 0,
-            access_count: 0,
-            pass_percent: msgStats
-              ? Math.round((msgStats.pass_count / msgStats.access_count) * 100)
-              : 0,
-            msg_id: msg.id,
-            ...(msgStats || {}),
-          },
-        };
-      })
-    );
+      const msgStats = mapMsgId.get(msg.id);
+
+      return {
+        ...msg,
+        stats: {
+          appear_count: msgStats.appear_count,
+          error_count: msgStats.error_count,
+          complete_count: msgStats.complete_count,
+          retry_count: msgStats.retry_count,
+          completion_rate: msgStats.completion_rate,
+        },
+      };
+    });
   }
 
+  const parseOverall = (overall) => {
+    return Object.entries(overall).map(([key, value]) => ({
+      key,
+      value:
+        typeof value === "number" ? parseQuantity(value) : String(value || 0),
+      ...(CONVERTERS_OVERALL[key] || { label: ["No label"], icon: null }),
+    }));
+  };
+
   useEffect(() => {
-    bindStatistic(messages, statistic);
-  }, [messages, statistic]);
+    bindStatistic(messages, statistic, overall);
+  }, [messages, statistic, overall]);
 
   if (!display) return null;
 
@@ -59,6 +76,7 @@ export default function BotChatStatistic({
 
   return (
     <div className="statistic_holder">
+      <ChatbotOverall overall={chatbotOverall}/>
       <div className="statistic_content">
         {msgs.map((message, indexMessage) => {
           return (
@@ -76,28 +94,7 @@ export default function BotChatStatistic({
                 })}
               {message.belong_to === "user" && (
                 <div className="sp-body-user-side csp-body-user-side slideLeft msg_with_stats">
-                  <div className="msg_stats">
-                    <span className="stat">
-                      <span className="stat_hover_none">
-                        {(message.stats.pass_count || 0)
-                          .toString()
-                          .padStart(2, "0")}
-                      </span>
-                      <span className="stat_addition">
-                        {message.stats.pass_percent || 0}%
-                      </span>
-                      <span>通過</span>
-                    </span>
-
-                    <div className="seperator_v" />
-
-                    <span className="stat">
-                      {(message.stats.access_count || 0)
-                        .toString()
-                        .padStart(2, "0")}{" "}
-                      対応済
-                    </span>
-                  </div>
+                  <MessageStatisticDetail stats={message.stats}/>
                   <div className="sp-body-user-side-messages csp-body-user-side-messages">
                     <UserMessage
                       captcha={[]}

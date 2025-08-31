@@ -99,6 +99,8 @@ const CHATBOT_SERVER = {
   SEND_SCENARIO_USER_RESPONSE: '/api/v1/scenario_users/scenario_user_responses',
   CREATE_STATUS_CONVERSION_USER_RESPONSE: '/api/v1/scenario_users/scenario_user_responses_status',
   UPDATE_STATUS_CONVERSION_USER_RESPONSE: '/api/v1/scenario_users/scenario_user_responses_status',
+  CREATE_USER_SCENARIO_RESPONSE_MESSAGE_HISTORY: '/api/v1/scenario_users/scenario_user_responses_message',
+  USER_ENTRY_SCENARIO: '/api/v1/scenario_users/entry',
 };
 
 const GET_CAPTCHA_PATH = `https://svg-captcha-nodejs.vercel.app/captcha?size=:size&color=:color&charPreset=:char_preset`;
@@ -243,9 +245,22 @@ export {
   LABELS,
 };
 
-export const CONVERSATION_RESPONSE_STATUS = {
+export const CONVERSTION_RESPONSE_STATUS = {
   FINISH: "finished",
   UN_FINISH: "un_finished",
+}
+
+export const CONVERSION_RESPONSE_SUBMIT_TYPE = {
+  ERROR: 'error',
+  ADD: 'add',
+  UPDATE: 'upd',
+}
+
+export const CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE = {
+  APPEAR: 'appear',
+  ERROR: 'errpr',
+  ADD: 'add',
+  RETRY: 'retry'
 }
 
 export const TIMER_TYPES = {
@@ -288,3 +303,9 @@ export const TIMER_MAP_VARIABLES_FIELD = {
     transform: (duration) => secondToDatetime(duration, "{{dd}}日 {{hh}}時 {{mm}}分 {{ss}}秒"),
   },
 };
+
+export const CURRENCY_UNITS = [
+  { value: 1_0000_0000_0000, symbol: "兆" }, // 1兆 = 10^12
+  { value: 1_0000_0000, symbol: "億" },      // 1億 = 10^8
+  { value: 1_0000, symbol: "万" },           // 1万 = 10^4
+];

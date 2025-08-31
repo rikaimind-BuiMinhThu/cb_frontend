@@ -1,6 +1,6 @@
 import api from "api/api-management";
 import { tokenExpired } from "api/tokenExpired";
-import { CHATBOT_SERVER, GET_CAPTCHA_PATH } from "./Constants";
+import { CHATBOT_SERVER, CURRENCY_UNITS, GET_CAPTCHA_PATH } from "./Constants";
 
 const stringNullOrEmpty = (string) => {
   return !string || (string + "").trim() === "";
@@ -207,6 +207,20 @@ const updateStatusConversion = (data) => {
   return patchToChatBotServer(
     CHATBOT_SERVER.UPDATE_STATUS_CONVERSION_USER_RESPONSE,
     data
+  );
+}
+
+const createScenarioUserResponseMessageHistory = (data) => {
+  return postToChatBotServer(
+    CHATBOT_SERVER.CREATE_USER_SCENARIO_RESPONSE_MESSAGE_HISTORY,
+    data,
+  );
+}
+
+const userEntryScenario = (data) => {
+  return postToChatBotServer(
+    CHATBOT_SERVER.USER_ENTRY_SCENARIO,
+    data,
   );
 }
 
@@ -494,8 +508,16 @@ const createTempDelay = (seconds = 0.5) => {
     message_content: [{ type: 'delay', delay: { content: Number(seconds)}}],
   }
 }
-
-
+const parseQuantity = (quantity = 0) => {
+  for (const { value, symbol } of CURRENCY_UNITS) {
+    if (quantity >= value) {
+      return (
+        (quantity / value).toFixed(1).replace(/\.0$/, "") + symbol
+      );
+    }
+  }
+  return (quantity || 0).toLocaleString("ja-JP"); 
+};
 export {
   stringNullOrEmpty, getAllUrlParams, lightenColor,
   mobileCheck, removeLeadingZero, sendUserInteractionData,
@@ -506,5 +528,6 @@ export {
   getAddressFromZipCode, secondToDatetime, findItem, isUndefined,
   changeElementAttributeById, toCamelCase, sendConvertTextJapaneseRequest,
   scrollToPosition, removeSpace, getColor, processMessagesForErrorState, hideMessageOnError, createTempDelay,
-  patchWithDrawalPreview, sendScenarioUserResponse, createStatusConversion, updateStatusConversion,
+  patchWithDrawalPreview, sendScenarioUserResponse, createStatusConversion, updateStatusConversion, parseQuantity,
+  createScenarioUserResponseMessageHistory, userEntryScenario,
 };
