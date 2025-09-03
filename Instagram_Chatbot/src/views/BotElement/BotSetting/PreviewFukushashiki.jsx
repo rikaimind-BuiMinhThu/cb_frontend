@@ -445,10 +445,10 @@ const PreviewFukushashiki = () => {
     if (!state.loadedStateFromSession) return;
     if (state.prefecturesList.length !== 0) return;
 
-    // getPrefectures()
-    //   .then((res) => {
-    //     dispatch({ type: PREVIEW_ACTIONS.UPDATE_PREFECTURES_LIST, payload: { prefecturesList: res.data.data } });
-    //   })
+    getPrefectures()
+      .then((res) => {
+        dispatch({ type: PREVIEW_ACTIONS.UPDATE_PREFECTURES_LIST, payload: { prefecturesList: res.data.data } });
+      })
   }, [state.prefecturesList, state.loadedStateFromSession]);
 
   const handleCloseBot = () => {
