@@ -797,12 +797,16 @@ slideUp
     0% {
         transform: translateY(100%);
         opacity: 0;
-        width: 250px;
+        left: 50% !important;
+        right: auto !important;
+        transform-origin: center bottom;
     }
 
     100% {
         transform: translateY(0%);
         opacity: 1;
+        left: 0 !important;
+        right: 0 !important;
     }
 }
 
@@ -810,22 +814,25 @@ slideUp
     0% {
         -webkit-transform: translateY(100%);
         opacity: 0;
-        width: 250px;
+        left: 50% !important;
+        right: auto !important;
+        -webkit-transform-origin: center bottom;
     }
 
     100% {
         -webkit-transform: translateY(0%);
         opacity: 1;
+        left: 0 !important;
+        right: 0 !important;
     }
 }
 
-/* CSS cho màn hình mobile */
 @media (max-width: 767px) {
     .sp-container {
       position: fixed;
       bottom: 0;
       right: 0px;
-      width: 100%; /* full-width cho màn hình mobile */
+      width: 100%;
       max-width: 100%;
       height: 620px;
       background-color: transparent;
@@ -877,16 +884,18 @@ slideUp
         display: flex;
         align-items: center;
         padding: 0 10px;
-        width: 160px;
         height: 30px;
-        margin-left: 10px;
+        flex: 1 1 auto;
+        min-width: 0;
+        width: clamp(240px, calc(100vw - 116px), 310px);
+        margin-left: 0;
     }
     
     #comment_bubble:before {
         content: "";
         width: 0;
         height: 0;
-        right: 92%;
+        left: -8px;
         top: 13px;
         position: absolute;
         border-top: 9px solid transparent;
@@ -895,7 +904,8 @@ slideUp
     }
 
     #comment_bubble.sp-bubble::before {
-        right: 95%;
+        left: -8px;
+        right: auto;
         top: 6px;
         border-right: 14px solid #fff;
     }
@@ -903,6 +913,7 @@ slideUp
     #comment_bubble > span {
         display:-webkit-box;
         -webkit-line-clamp:1;
+        line-clamp: 1;
         -webkit-box-orient: vertical;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -930,8 +941,6 @@ slideUp
         border-radius: 50%;
         width: 58px;
     }
-
-
   }
 
 .chatbot_timer_holder {
@@ -983,4 +992,33 @@ slideUp
 .option-gender-item .ico {
     width: 50px;
     height: 50px;
+}
+
+@media (max-width: 767px) {
+  body #comment_bubble.sp-bubble {
+    max-width: none !important;
+    margin-left: 15px !important;
+    padding-left: 15px !important;
+  }
+
+  body .sp-header-left {
+    width: 100% !important;
+  }
+}
+
+@media only screen and (max-device-width: 480px) {
+  body.is_mobile #comment_bubble.sp-bubble {
+    width: calc(100% - 60px) !important;
+  }
+
+  body.is_mobile #comment_bubble {
+    width: calc(100% - 60px) !important;
+  }
+
+  body.is_mobile .sp-container1.slideUpSp {
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 auto !important;
+    transform-origin: center bottom !important;
+  }
 }
