@@ -354,7 +354,7 @@ const displayPopup = async () => {
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
       } else if (!e.data.isOpen && mobileCheck()) {
-        iframe.width = "250px";
+        iframe.width = "100%";
         iframe.height = "58px";
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
