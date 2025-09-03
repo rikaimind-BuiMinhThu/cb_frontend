@@ -178,7 +178,7 @@ const waitForElement = (mode, address, options = {type: "WAIT_FOR_LOADING"}, cal
 const movePaymentMethodToTop = (data) => {
   const index = data.findIndex(item => item.type === "payment_method_id");
   if (index !== -1) {
-      const paymentMethod = data[index];
+      const [paymentMethod] = data.splice(index, 1);      
       // await component in LP to set value after payment method setted
       data.unshift(paymentMethod, { additionalType: "await" });
   }
@@ -321,7 +321,11 @@ const displayPopup = async () => {
           button.click();
           break;
         case CHATBOT_ACTIONS.GET_PREVIEW_ORDER_CONTENT:
-          await sleep(2000);
+          const { isNewProcess = false } = e.data;
+
+          if (!isNewProcess) {
+            await sleep(2000);
+          }
           excuteJSCode(e.data.actionData);
           break;
         case CHATBOT_ACTIONS.SET_CHATBOT_CONVERSION_PARAMS_TO_LOCAL_STORAGE:

@@ -34,7 +34,12 @@ import {
   TIMER_MAP_VARIABLES_FIELD,
   TIMER_TYPES,
   RENDER_CHATBOT_CONFIG,
-  RANGE_TEXT_VALIDATE
+  RANGE_TEXT_VALIDATE,
+  CART_SYSTEM,
+  TIMER_DELAY_RENDER,
+  CONVERSTION_RESPONSE_STATUS,
+  CONVERSION_RESPONSE_SUBMIT_TYPE,
+  CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE
 } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
@@ -56,6 +61,13 @@ import {
   findItem,
   changeElementAttributeById,
   scrollToPosition,
+  processMessagesForErrorState,
+  createTempDelay,
+  sendScenarioUserResponse,
+  createStatusConversion,
+  updateStatusConversion,
+  createScenarioUserResponseMessageHistory,
+  userEntryScenario
 } from "./PreviewComponent/Utils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
@@ -137,6 +149,7 @@ const previewInitialState = {
   isUsedErrMsgByJs: false,
   errMsgJsCode: '',
   isProcessing: false,
+  conversionStatus: null,
 };
 
 const PREVIEW_ACTIONS = {
@@ -154,7 +167,7 @@ const PREVIEW_ACTIONS = {
 const PreviewFukushashikiReducer = (state, action) => {
   switch (action.type) {
     case PREVIEW_ACTIONS.UPDATE_MULTI_STATE:
-      return { ...state, ...(action.payload) };
+      return { ...state, ...(!!state.submitErrorMessage ? processMessagesForErrorState(action.payload): action.payload) };
 
     case PREVIEW_ACTIONS.ADD_LP_OPTION_DATA:
       return { ...state, lpOptionData: { ...state.lpOptionData, ...action.payload, isProcessing: false } };
@@ -240,6 +253,7 @@ const PreviewFukushashiki = () => {
   const containerRef = useRef(null);
   const isFromScenario = false;
   const hasSentCustomJs = useRef(false);
+  const timeoutConfrmMsgRef = useRef(null);
 
   const setShowPopupCloseBot = (value) => {
     dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { showPopupCloseBot: value } });
@@ -431,10 +445,10 @@ const PreviewFukushashiki = () => {
     if (!state.loadedStateFromSession) return;
     if (state.prefecturesList.length !== 0) return;
 
-    getPrefectures()
-      .then((res) => {
-        dispatch({ type: PREVIEW_ACTIONS.UPDATE_PREFECTURES_LIST, payload: { prefecturesList: res.data.data } });
-      })
+    // getPrefectures()
+    //   .then((res) => {
+    //     dispatch({ type: PREVIEW_ACTIONS.UPDATE_PREFECTURES_LIST, payload: { prefecturesList: res.data.data } });
+    //   })
   }, [state.prefecturesList, state.loadedStateFromSession]);
 
   const handleCloseBot = () => {
@@ -450,24 +464,48 @@ const PreviewFukushashiki = () => {
     }
   }
 
-  const startRenderWithDelay = (renderMessagesList = [], options = {}) => {
+  const startRenderWithDelay = (newState, options = {}) => {
     const { 
       delayTime = RENDER_CHATBOT_CONFIG.DELAY_START_RENDER,
       scrollToBottom = true,
     } = options;
 
+    userEntryScenario({
+      scenario_id: newState.scenarioId,
+      user_id: newState.uuid,
+    });
+
     new Promise((resolve) => {
       dispatch({
         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-        payload: { renderMessagesList: [] },
+        payload: { renderMessagesList: [], isDelaying: true },
       });
 
       sleep(delayTime).then(resolve);
     }).then(async () => {
-      dispatch({
-        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-        payload: { renderMessagesList },
-      });
+      if (newState.useNewProcess) {
+        renderMessageInRange(0, newState.currentMsgIndex, newState, newState.currentUserMsgIndex, { isPassDelay: true, appearFromStart: true })
+        .then(() => {
+          dispatch({
+            type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+            payload: { isDelaying: false },
+          });
+        });
+      } else {
+        const listMsgAppear = newState.renderMessagesList.filter(i => isUserMessage(i) && !i.hidden).map(i => ({ id: i.id, type: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.APPEAR }));
+
+        if (listMsgAppear.length) {
+          createScenarioUserResponseMessageHistory({
+            scenario_id: newState.scenarioId,
+            user_id: newState.uuid,
+            msgs: listMsgAppear,
+          });
+        }
+        dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+          payload: { renderMessagesList: newState.renderMessagesList, isDelaying: false },
+        });
+      }
 
       if (scrollToBottom) {
         await sleep(RENDER_CHATBOT_CONFIG.DELAY_BEFORE_SCROLL_TO_BOTTOM);
@@ -530,7 +568,7 @@ const PreviewFukushashiki = () => {
       });
 
       if (opening) {
-        return startRenderWithDelay(state.renderMessagesList, { delayTime: RENDER_CHATBOT_CONFIG.DELAY_START_RENDER });
+        return startRenderWithDelay(state, { delayTime: RENDER_CHATBOT_CONFIG.DELAY_START_RENDER });
       }
 
       return
@@ -547,6 +585,18 @@ const PreviewFukushashiki = () => {
 
     return renderMessagesWithDelay(state, 0, state.currentMsgIndex, { setNewState: false });
   }
+
+
+    const handleCloseChatbotWhenUseWithDrawal = () => {
+      if (!state.isOpen) return; 
+      onOpenPreview(false) 
+      const enabledStatus = new Set(["standard_exit_popup", "image_popup"])
+      const isWithDrawalEnabled = state.botInfor && enabledStatus.has(state.botInfor.withdrawal_prevention_status)
+      if (isWithDrawalEnabled) {
+        handleOpenWithDrawal();
+        return ;
+      }
+    }
 
   const setPulldownValue = (dataContentType, field, value) => {
     switch (field) {
@@ -938,10 +988,59 @@ const PreviewFukushashiki = () => {
     return newState;
   }
 
+  const processBotScriptMessage = (messagesList, i, newState) => {
+    const script = messagesList[i]?.message_content[0]?.script?.content;
+    if (!script) return newState;
+
+    try {
+      const func = new Function(script);
+      func();
+    } catch {
+      console.error('Script run failed!')
+    } finally {
+      return newState;
+    }
+  }
+
+  const processBotUgcMessage = async (messagesList, i, newState) => {
+    const content = messagesList[i]?.message_content[0]?.use_html_ugc_config?.content;
+    if (!content) return newState;
+    if(/^\s*<\w+|<\w+[^>]*>/i.test(content)){
+      try {
+        const doc = new DOMParser().parseFromString(content, "text/html");
+        [...doc.querySelectorAll("link")].forEach(el => 
+          document.head.appendChild(el.cloneNode(true)));
+        [...doc.body.children].filter(el => !["script", "link"]
+          .includes(el.tagName.toLowerCase())).forEach(el => document.body.appendChild(el.cloneNode(true)));
+        for (const script of doc.querySelectorAll("script")) {
+          const s = document.createElement("script");
+          [...script.attributes].forEach(attr => s.setAttribute(attr.name, attr.value));
+          s.text = script.textContent || '';
+          if (s.src) await new Promise(r => { s.onload = s.onerror = r; document.body.appendChild(s); });
+          else document.body.appendChild(s);
+        }
+      } catch (error) {
+        console.error("Hello !, you have one bug",error)
+      }
+    } else {
+      try {
+        const func = new Function(content);
+        func();
+      } catch (error) {
+        console.error("Ồ là lá Fail rồi", error);
+      }
+    }
+    return newState;
+  }
+  
   const processForBotMessage = async (messagesList, i, newState, isUpdateSourceContent =+ false, assignToState = true) => {
     const firstMsgType = messagesList[i]?.message_content[0]?.type;
 
     switch (firstMsgType) {
+      case 'script':
+        return processBotScriptMessage(messagesList, i, newState);
+      case BOT_MESSAGE_TYPES.UGC:
+        return await processBotUgcMessage(messagesList, i, newState);
       case "delay":
         return await processBotDelayMessage(messagesList, i, newState);
       case "email":
@@ -1012,7 +1111,13 @@ const PreviewFukushashiki = () => {
   }
 
   const renderMessagesWithDelay = (theState, startMsgIndex, endMsgIndex, options = { setNewState: true }) => {
+    userEntryScenario({
+      scenario_id: theState.scenarioId,
+      user_id: theState.uuid,
+    });
+
     return new Promise(async (resolve) => {
+      const listMsgAppear = [];
       for (let i = startMsgIndex; i <= endMsgIndex; i++) {
         theState.renderMessagesList = theState.messagesList.slice(0, i + 1);
         if (isDelayBotMessage(theState.messagesList[i])) {
@@ -1026,16 +1131,21 @@ const PreviewFukushashiki = () => {
         dispatch({ 
           type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, 
           payload: {
+            ...rest,
             renderMessagesList: theState.renderMessagesList,
             messagesList: theState.messagesList,
           },
         });
 
+        if (isUserMessage(theState.messagesList[i])) {
+          listMsgAppear.push({ id: theState.messagesList[i].id, type: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.APPEAR });
+        }
+
         scrollToPosition({ position: "b", selector: "#sp-body" });
         await sleep(RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE);
       }
-      resolve();
-    }).then(() => {
+      resolve({ listMsgAppear });
+    }).then(({ listMsgAppear }) => {
       if(options.setNewState) {
         theState.renderMessagesList = theState.messagesList.slice(0, theState.currentMsgIndex + 1);
         theState.passedUserMsgCount = theState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
@@ -1043,6 +1153,14 @@ const PreviewFukushashiki = () => {
         // update state with theState except prefecturesList
         const { prefecturesList, ...rest } = theState;
         dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: rest });
+      }
+
+      if (listMsgAppear.length) {
+        createScenarioUserResponseMessageHistory({
+          scenario_id: theState.scenarioId,
+          user_id: theState.uuid,
+          msgs: listMsgAppear,
+        });
       }
     });
   }
@@ -1077,6 +1195,7 @@ const PreviewFukushashiki = () => {
       bottomMarginSp: designSetting?.bottom_margin_sp,
       isUsedErrMsgByJs: res.data?.chatbot?.is_used_err_msg_by_js,
       errMsgJsCode: res.data?.chatbot?.err_msg_js_code,
+      useNewProcess: res.data?.chatbot?.client_cart_system === CART_SYSTEM.EC_FORCE,
     };
 
     if (newState.isUsedErrMsgByJs && newState.errMsgJsCode) {
@@ -1250,6 +1369,7 @@ const PreviewFukushashiki = () => {
       let savedState = getStateFromSessionStorage();
       if (savedState) {
         savedState.isExtractFromSession = true;
+        savedState.isDelaying = false;
 
         setConversionParamToLocalStorage(
           savedState.scenarioId,
@@ -1274,36 +1394,21 @@ const PreviewFukushashiki = () => {
         if (savedState.isUsedErrMsgByJs && savedState.errMsgJsCode) {
           postMessageForExecuteJs(savedState.errMsgJsCode);
         }
-        
-        if (Boolean(isLoggedIn) !== Boolean(savedState.isLoggedIn)) {
-          savedState.currentMsgIndex = 0;
-        }
-
-        for (let i = 0; i < savedState.messagesList.length; i++) {
-          const item = savedState.messagesList[i];
-          if (!item) continue;
-
-          let isHidden = false;
-          if (isLoggedIn) {
-            savedState.messagesList[i].hidden = !!item?.not_display_when_logged_in;
-            isHidden = !!item?.not_display_when_logged_in;
-          }
-
-          if (isHidden) continue;
-
-          if (savedState.messagesList[i].conditions?.length > 0) {
-            const result = checkMessageCondition(savedState.messagesList[i], savedState.objParam);
-            if (!result) {
-              savedState.messagesList[i].hidden = true;
+        if (isLoggedIn) {
+          savedState.messagesList.forEach((x) => x.hidden = !!x?.not_display_when_logged_in);
+          savedState.currentMsgIndex = savedState.messagesList.findIndex((item) => isUserMessage(item) && item.hidden == false);
+          savedState.renderMessagesList = savedState.messagesList.slice(0, savedState.currentMsgIndex + 1);
+          savedState.renderMessagesList = savedState.renderMessagesList.map((msg) => {
+            return isDelayBotMessage(msg) ? {...msg, hidden: true} : msg;
+          });
+          return dispatch({
+            type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+            payload: {
+              ...savedState,
+              isOpen: true
             }
-          }
-        }
-
-        const newMsgIndex = savedState.messagesList.findIndex((item) => isUserMessage(item) && (item.hidden !== undefined && !item.hidden));
-
-        savedState.currentMsgIndex = Math.max(savedState.currentMsgIndex, newMsgIndex);
-        savedState.renderMessagesList = savedState.messagesList.slice(0, savedState.currentMsgIndex + 1);
-        
+          });
+        }        
         const renderMessagesList = savedState.renderMessagesList.map((msg) => {
           return isDelayBotMessage(msg) ? {...msg, hidden: true} : msg;
         });
@@ -1331,19 +1436,23 @@ const PreviewFukushashiki = () => {
         }
 
         return fukushashikiSavedStateToLp(savedState).then(async () => {
+          savedState.isOpen = true;
+          savedState.loadedStateFromSession = true;
+          savedState.isExtractFromSession = false;
+
           const { renderMessagesList = [], ...savedStateWithoutRenderMessagesList } = savedState;
+
           dispatch({
             type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
             payload: {
               ...savedStateWithoutRenderMessagesList,
-              isOpen: true,
-              loadedStateFromSession: true,
-              isExtractFromSession: false,
             }
           });
 
-          startRenderWithDelay(renderMessagesList, { delayTime: RENDER_CHATBOT_CONFIG.DELAY_START_RENDER });
+          startRenderWithDelay(savedState, { delayTime: RENDER_CHATBOT_CONFIG.DELAY_START_RENDER });
 
+          if (savedStateWithoutRenderMessagesList.useNewProcess) return;
+          
           await sleep(2000);
           // GetPreviewOrderContent
           const botConfirmMessage = savedState.messagesList.find(msg => {
@@ -2612,7 +2721,7 @@ const PreviewFukushashiki = () => {
   };
 
   const setStateToSessionStorage = (data) => {
-    sessionStorage.setItem(SESSION_STORAGE_KEY.CHAT_BOT_STATE, JSON.stringify({ ...data, isLoggedIn }));
+    sessionStorage.setItem(SESSION_STORAGE_KEY.CHAT_BOT_STATE, JSON.stringify(data));
   };
 
   const getStateFromSessionStorage = () => {
@@ -2814,7 +2923,7 @@ const PreviewFukushashiki = () => {
               }
 
               if (Object.keys(message.text_input.password).length != 0 && message.text_input.password != undefined) {
-                if (message.fukushashiki_search_value.includes(',')) {
+                if (message?.fukushashiki_search_value.includes(',')) {
                   let address = message.fukushashiki_search_value.split(',');
                   address.forEach(value => {
                     const fukuObject = {
@@ -3177,6 +3286,20 @@ const PreviewFukushashiki = () => {
     }
   }
 
+  const finishConversion = async ({ scenario_id, user_input_id }, callback) => {
+    return updateStatusConversion({ scenario_id, user_input_id, status: CONVERSTION_RESPONSE_STATUS.FINISH })
+      .then(() => {
+        dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+          payload: { conversionStatus: CONVERSTION_RESPONSE_STATUS.FINISH },
+        });
+
+        if (!!callback) {
+          callback();
+        }
+      });
+  }
+
   const postMessageForExecuteJs = (jsCode) => {
     postMessageToParent({
       action: CHATBOT_ACTIONS.EXCUTE_JS,
@@ -3185,14 +3308,28 @@ const PreviewFukushashiki = () => {
     });
   }
 
-  const postMessageForGetPreviewOrderContent = async (jsCode) => {
+  const postMessageForGetPreviewOrderContent = async (jsCode, options = {}) => {
+    const { isNewProcess = false, stopRender } = options;
+
+    if (isNewProcess && stopRender) {
+      dispatch({
+        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+        payload: {
+          stopRender,
+          previewOrderContent: null,
+        },
+      });
+    }
+
     postMessageToParent({
       action: CHATBOT_ACTIONS.GET_PREVIEW_ORDER_CONTENT,
       actionData: jsCode,
       is_use_js: true,
-      isOpen: true
+      isOpen: true,
+      isNewProcess,
     });
 
+    if (isNewProcess) return;
     await sleep(2000);
   }
 
@@ -3249,7 +3386,8 @@ const PreviewFukushashiki = () => {
           action: CHATBOT_ACTIONS.CLICK_BUTTON,
           id_value: content.button_submit_id
         });
-        redirectToCartPage();
+
+        finishConversion({ scenario_id: data.scenario_id, user_input_id: data.user_id }, redirectToCartPage)
         return;
       }
 
@@ -3267,7 +3405,7 @@ const PreviewFukushashiki = () => {
         sendCountRequest(conversion)
           .then(res => {
             console.log(res);
-            redirectToCartPage();
+            finishConversion({ scenario_id: data.scenario_id, user_input_id: data.user_id }, redirectToCartPage);
           });
       });
     });
@@ -3290,6 +3428,224 @@ const PreviewFukushashiki = () => {
     return message.belong_to === 'user' && message.message_content.length > 0;
   }
 
+  const renderMessageInRange = async (startIndex, endIndex, newState, nextUserMsgIndex, options = {}) => { 
+    const { 
+      isUpdateClick = false, 
+      isPassDelay = false,
+      lastConfirmMessageIdx = -1,
+      appearFromStart = false,
+    } = options;
+    const listMsgAppear = [];
+
+    for (let i = startIndex; i <= endIndex; i++) {
+      const confirmMessage = newState.messagesList[i].message_content?.find(x => x.text_input?.use_for_confirm_message);
+      if (confirmMessage?.text_input?.jscode && !newState.stopRender?.isActive && lastConfirmMessageIdx !== i) {
+        const nextUserMessage = newState.messagesList[nextUserMsgIndex];
+        const isNextUserMessageButtonSubmit = nextUserMessage?.message_content?.[0]?.type === "button_submit";
+
+        if (!isNextUserMessageButtonSubmit) {
+          continue;
+        }
+
+        newState.stopRender = {
+          index: i,
+          finalIndex: newState.currentMsgIndex,
+          timeout: 30,
+          start: new Date(),
+          isActive: true,
+        };
+
+        newState.previewOrderContent = null;
+
+        postMessageForGetPreviewOrderContent(
+          confirmMessage.text_input.jscode,
+          { isNewProcess: newState.useNewProcess, stopRender: newState.stopRender },
+        );
+        break;
+      }
+
+      newState.renderMessagesList = newState.messagesList.slice(0, i + 1);
+      if (isDelayBotMessage(newState.messagesList[i])) {
+        // render delay item so typing GIF appears, then wait
+        dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
+          payload: {
+            startIndex: 0,
+            endIndex: i + 1
+          }
+        });
+        if (!isPassDelay) {
+          await sleep(newState.messagesList[i].message_content[0].delay?.content * 1000 || TIMER_DELAY_RENDER);
+        }
+        const newRender = newState.renderMessagesList.slice(0, i + 1).map(msg => isDelayBotMessage(msg) ? {...msg, hidden: true} : msg);
+        newState.renderMessagesList[i].hidden = true;
+        dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+          payload: {
+            messagesList: newState.messagesList,
+            renderMessagesList: newRender,
+          }
+        })
+
+        newState.messagesList[i].hidden = true;
+        dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+          payload: {
+            messagesList: newState.messagesList,
+            renderMessagesList: newRender,
+          }
+        })
+
+        continue;
+      }
+
+      if ((appearFromStart ? true : i !== startIndex ) && isUserMessage(newState.messagesList[i])) {
+        listMsgAppear.push({ id: newState.messagesList[i].id, type: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.APPEAR });
+      }
+      
+      dispatch({
+        type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
+        payload: {
+          startIndex: 0,
+          endIndex: i + 1
+        }
+      });
+
+      if (!isPassDelay) {
+        await sleep(RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE);
+      }
+    }
+    if (!isUpdateClick) {
+      newState.passedUserMsgCount++;
+    } else {
+      newState.passedUserMsgCount = newState.renderMessagesList.filter((item) => isUserMessage(item) && !item.hidden).length - 1 ;
+    }
+
+    if (listMsgAppear.length) {
+      createScenarioUserResponseMessageHistory({
+        scenario_id: state.scenarioId,
+        user_id: state.uuid,
+        msgs: listMsgAppear,
+      });
+    }
+
+    return newState;
+  }
+
+  const handleRenderMessageAfterClickNext = async (newState, clickedMsgIndex, isBtnUpdateClick) => {
+    if (newState.useNewProcess) {
+      return renderMessageInRange(clickedMsgIndex + 1, newState.currentMsgIndex, newState, newState.currentUserMsgIndex, { isUpdateClick: isBtnUpdateClick, appearFromStart: true })
+      .then((newState) => {
+        setStateToSessionStorage(newState);
+        return dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+          payload: newState
+        });
+      }).finally(() => {
+        dispatch({ type: PREVIEW_ACTIONS.SET_PROCESSING, payload: false });
+      });
+    }
+
+    return new Promise(async (resolve) => {
+      // Insert a temporary delay item to show typing GIF for 0.5s when advancing
+      const tempDelay = createTempDelay(0.5);
+
+      // Place tempDelay right after clicked index so user sees typing before next messages
+      newState.messagesList.splice(clickedMsgIndex + 1, 0, tempDelay);
+      // adjust indices
+      if (newState.currentMsgIndex >= clickedMsgIndex + 1) newState.currentMsgIndex++;
+
+      for (let i = clickedMsgIndex + 1; i <= newState.currentMsgIndex; i++) {
+        newState.renderMessagesList = newState.messagesList.slice(0, i + 1);
+        if (isDelayBotMessage(newState.messagesList[i])) {
+          // ensure the delay item is rendered so typing GIF visible
+          dispatch({
+            type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
+            payload: { startIndex: 0, endIndex: i + 1 }
+          });
+          await sleep(newState.messagesList[i].message_content[0].delay?.content * 1000 || TIMER_DELAY_RENDER);
+          newState.renderMessagesList[i].hidden = true;
+          dispatch({
+            type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+            payload: {
+              messagesList: newState.messagesList,
+              renderMessagesList: newState.renderMessagesList.slice(0, i + 1).map(msg => isDelayBotMessage(msg) ? {...msg, hidden: true} : msg),
+            }
+          })
+          continue;
+        }
+        
+        dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
+          payload: {
+            startIndex: 0,
+            endIndex: i + 1
+          }
+        });
+
+        await sleep(RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE);
+      }
+
+      // remove temp delay if still present
+      const tempIdx = newState.messagesList.findIndex(m => m.id && `${m.id}`.startsWith('__temp_delay_'));
+      if (tempIdx >= 0) {
+        newState.messagesList.splice(tempIdx, 1);
+        if (newState.currentMsgIndex > tempIdx) newState.currentMsgIndex--;
+      }
+      resolve();
+    }).then(() => {
+      newState.renderMessagesList = newState.renderMessagesList.map((msg) => {
+        return isDelayBotMessage(msg) ? {...msg, hidden: true} : msg;
+      }); 
+  
+      if (!isBtnUpdateClick) {
+        newState.passedUserMsgCount++;
+      } else {
+        newState.passedUserMsgCount = newState.renderMessagesList.filter((item) => isUserMessage(item)).length - 1 ;
+      }
+  
+      const botConfirmMessage = newState.messagesList.find(msg => {
+        return !!msg.message_content?.find(x => x.text_input?.use_for_confirm_message)
+      });
+  
+      const botConfirmJsCode = botConfirmMessage?.message_content
+        ?.find(x => x.text_input?.use_for_confirm_message)
+        ?.text_input?.jscode;
+      const nextUserMessage = newState.messagesList[newState.currentUserMsgIndex];
+      const isNextUserMessageButtonSubmit = nextUserMessage?.message_content?.[0]?.type === "button_submit";
+
+      if (botConfirmJsCode && botConfirmJsCode.length > 0 && isNextUserMessageButtonSubmit) {
+        postMessageForGetPreviewOrderContent(botConfirmJsCode);
+      }
+
+      setStateToSessionStorage(newState);
+      return dispatch({
+        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+        payload: newState
+      });
+    });
+  }
+
+  const sendLogMessageToServer = (submitData) => {
+    const { submit_type, message, ...data } = submitData;
+    sendScenarioUserResponse(submitData);
+
+    const convertType = {
+      [CONVERSION_RESPONSE_SUBMIT_TYPE.ADD]: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.ADD,
+      [CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE]: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.RETRY,
+      [CONVERSION_RESPONSE_SUBMIT_TYPE.ERROR]: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.ERROR,
+    }
+
+    const messageSubmitType = convertType[submit_type];
+    
+    if (!messageSubmitType) return;
+
+    createScenarioUserResponseMessageHistory({
+      ...data,
+      msgs: [{ id: message.id, type: messageSubmitType }],
+    });
+  }
+
   const onClickNext = async (indexMessage, message) => {
     dispatch({ type: PREVIEW_ACTIONS.SET_PROCESSING, payload: true });
     let newState = _.omit(state, ['submitErrorMessage', 'lpOptionData']);
@@ -3297,10 +3653,6 @@ const PreviewFukushashiki = () => {
     if (clickedMsgIndex < 0) clickedMsgIndex = newState.currentMsgIndex;
     newState.userMessagesList = newState.messagesList.filter((item) => isUserMessage(item));
     const clickedMsg = newState.messagesList[clickedMsgIndex];
-
-    if (!handleValidateField(indexMessage)) {
-      return;
-    }
 
     newState.errors = {};
 
@@ -3310,9 +3662,24 @@ const PreviewFukushashiki = () => {
       user_id: state.uuid,
       bot_type: "web"
     };
+
+    if (!handleValidateField(indexMessage)) {
+      sendLogMessageToServer({
+        ...submitData,
+        submit_type: CONVERSION_RESPONSE_SUBMIT_TYPE.ERROR,
+      });
+      return;
+    }
     
-    const isClickedCreateOrder = state.messagesList[clickedMsgIndex]?.message_content?.[0]?.type === "button_submit";
-    const isClickedLastMessage = state.messagesList.length - 1 === clickedMsgIndex;
+    const isClickedCreateOrder = newState.messagesList[clickedMsgIndex]?.message_content?.[0]?.type === "button_submit";
+    const isClickedLastMessage = newState.messagesList.length - 1 === clickedMsgIndex;
+    const nextOrCurrentUserMessage = newState.messagesList.findIndex(getNextUserMsg((_, index) => index >= clickedMsgIndex));
+    const isBtnUpdateClick = indexMessage < newState.currentUserMsgIndex || (newState.currentUserMsgIndex === -1 && indexMessage === nextOrCurrentUserMessage);
+
+    sendLogMessageToServer({
+      ...submitData,
+      submit_type: isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD,
+    });
 
     if (isClickedCreateOrder) {
       setStateToSessionStorage(newState);
@@ -3321,12 +3688,16 @@ const PreviewFukushashiki = () => {
 
     if (isClickedLastMessage) {
       newState.messagesList[clickedMsgIndex].disabled = false;
+
+      await finishConversion({ scenario_id: submitData.scenario_id, user_input_id: submitData.user_id });
+      newState.conversionStatus = CONVERSTION_RESPONSE_STATUS.FINISH;      
       return dispatch({
         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
         payload: newState
       });
     }
 
+    newState.messagesList[clickedMsgIndex].isSubmitted = true;
     fukushashikiToLP(convertToFukushashikiObject(submitData));
 
     if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
@@ -3381,65 +3752,21 @@ const PreviewFukushashiki = () => {
     }
 
     newState.currentUserMsgIndex = newState.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex));
+
+    if (
+      newState.currentUserMsgIndex === -1 &&
+      newState.conversionStatus === CONVERSTION_RESPONSE_STATUS.UN_FINISH
+    ) {
+      await finishConversion({ scenario_id: submitData.scenario_id, user_input_id: submitData.user_id });
+      newState.conversionStatus = CONVERSTION_RESPONSE_STATUS.FINISH;
+    }
+
     if (newState.currentUserMsgIndex === -1)
       newState.currentMsgIndex = newState.messagesList.length - 1;
     else
       newState.currentMsgIndex = newState.currentUserMsgIndex;
-    
-    const isBtnUpdateClick = indexMessage < newState.renderMessagesList.length - 1;
 
-    new Promise(async (resolve) => {
-      for (let i = clickedMsgIndex + 1; i <= newState.currentMsgIndex; i++) {
-        newState.renderMessagesList = newState.messagesList.slice(0, i + 1);
-        if (isDelayBotMessage(newState.messagesList[i])) {
-          await sleep(newState.messagesList[i].message_content[0].delay.content * 1000);
-          continue;
-        }
-        
-        dispatch({
-          type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
-          payload: {
-            startIndex: 0,
-            endIndex: i + 1
-          }
-        });
-
-        await sleep(RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE);
-      }
-      resolve();
-    }).then(() => {
-      newState.renderMessagesList = newState.renderMessagesList.map((msg) => {
-        return isDelayBotMessage(msg) ? {...msg, hidden: true} : msg;
-      }); 
-  
-      if (!isBtnUpdateClick) {
-        newState.passedUserMsgCount++;
-      } else {
-        newState.passedUserMsgCount = newState.renderMessagesList.filter((item) => isUserMessage(item)).length - 1 ;
-      }
-  
-      const botConfirmMessage = newState.messagesList.find(msg => {
-        return !!msg.message_content?.find(x => x.text_input?.use_for_confirm_message)
-      });
-  
-      const botConfirmJsCode = botConfirmMessage?.message_content
-        ?.find(x => x.text_input?.use_for_confirm_message)
-        ?.text_input?.jscode;
-      const nextUserMessage = newState.messagesList[newState.currentUserMsgIndex];
-      const isNextUserMessageButtonSubmit = nextUserMessage?.message_content?.[0]?.type === "button_submit";
-
-      if (botConfirmJsCode && botConfirmJsCode.length > 0 && isNextUserMessageButtonSubmit) {
-        postMessageForGetPreviewOrderContent(botConfirmJsCode);
-      }
-  
-      setStateToSessionStorage(newState);
-      return dispatch({
-        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-        payload: newState
-      });
-    }).finally(() => {
-      dispatch({ type: PREVIEW_ACTIONS.SET_PROCESSING, payload: false });
-    });
+    await handleRenderMessageAfterClickNext(newState, clickedMsgIndex, isBtnUpdateClick);
   };
 
   const isDislayingLoginForm = (message) => {
@@ -3759,16 +4086,17 @@ const PreviewFukushashiki = () => {
   };
 
   const renderNextButton = (message, indexMessage) => {
+    const isUpdate = indexMessage >= state.renderMessagesList.length - 1;
     const firstMsgContent = message?.message_content?.[0];
     const isDisplayBtnNext = firstMsgContent?.type != "image" || firstMsgContent?.image?.displayButtonNext != false;
-    const isAutoClick = !isDisplayBtnNext && indexMessage >= state.renderMessagesList.length - 1;
+    const isAutoClick = !isDisplayBtnNext && isUpdate;
 
     if (!message || message.belong_to !== "user") return null;
     if (message.message_content[0]?.type === "button_submit") return null;
 
     let btnText = message.buttonName;
     if (!btnText) {
-      btnText = indexMessage >= state.renderMessagesList.length - 1 ? "次へ" : "更新";
+      btnText = isUpdate ? "次へ" : "更新";
     }
     return (
       <div className="sp-user-message-button-action" style={{ display: isDisplayBtnNext ? "flex" : "none" }}>
@@ -3896,17 +4224,9 @@ const PreviewFukushashiki = () => {
       <div className="ss-user-setting__item-text_input-top">
         <div
           style={{
-            width: "95%",
-            padding: "5px",
             border: `1px solid ${borderColor}`,
             backgroundColor: backgroundColor,
             color: color,
-            borderRadius: "5px",
-            fontFamily: "Arial, sans-serif",
-            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
-            position: "fixed",
-            top: "12.5%",
-            left: "1%"
           }}
           id="error-message"
           dangerouslySetInnerHTML={{ __html: text }}
@@ -3958,6 +4278,82 @@ const PreviewFukushashiki = () => {
     };
   };
 
+  useEffect(() => {
+    if (state.conversionStatus === null && !!state.uuid && !!state.scenarioId && state.isOpen) {
+      createStatusConversion({
+        scenario_id: state.scenarioId, 
+        user_input_id: state.uuid, 
+        status: CONVERSTION_RESPONSE_STATUS.UN_FINISH,
+      })
+      .then((res) => {
+        const status = res?.data?.data?.status;
+
+        if (status) {
+          dispatch({ 
+            type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, 
+            payload: { conversionStatus: status },
+          });
+        }
+      });
+    }
+  }, [state.uuid, state.scenarioId, state.conversionStatus, state.isOpen])
+
+  useEffect(() => {
+    if (!state.stopRender || state.isDelaying || !state.useNewProcess) return;
+    
+    const renderContinueMessages = async () => {
+      const { isActive, index, finalIndex, timeout } = state.stopRender;
+
+      if (isActive) {
+        if (!state.previewOrderContent) {
+          timeoutConfrmMsgRef.current = setTimeout(async () => {
+            renderMessageInRange(index, finalIndex, state, { lastConfirmMessageIdx: index }).then(() => {
+              dispatch({
+                type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+                payload: {
+                  stopRender: {
+                    ...state.stopRender,
+                    isActive: false,
+                  },
+                },
+              });
+            });
+          }, timeout * 1000);
+
+          return;
+        }
+
+        clearTimeout(timeoutConfrmMsgRef.current);
+
+        renderMessageInRange(index, finalIndex, state, { lastConfirmMessageIdx: index });
+        dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+          payload: {
+            stopRender: {
+              ...state.stopRender,
+              isActive: false,
+            },
+          },
+        });
+
+        return;
+      }
+
+      clearTimeout(timeoutConfrmMsgRef.current);
+
+      renderMessageInRange(index, finalIndex, state, { lastConfirmMessageIdx: index });
+    } 
+
+    renderContinueMessages();
+
+    return () => clearTimeout(timeoutConfrmMsgRef.current);
+  }, [
+    state.stopRender, 
+    state.previewOrderContent, 
+    state.isDelaying,
+    state.useNewProcess,
+  ]);
+
   ///body container
   if (state.scenarioId && state.botInfor && state.isOpen) {
     const { containerStyle, headerStyle, bodyStyle } = getOpeningBotStyle();
@@ -3969,7 +4365,7 @@ const PreviewFukushashiki = () => {
         style={containerStyle}
       >
         <Withdrawal
-          // botInfor={state.botInfor}
+          botInfor={state.botInfor}
           deviceReceive={state.deviceReceive}
           scenarioId={state.scenarioId}
           onOpenPreview={onOpenPreview}
@@ -3990,7 +4386,7 @@ const PreviewFukushashiki = () => {
           style={headerStyle}
           className="sp-header"
         >
-          <div className="sp-header-left" onClick={() => onOpenPreview(!state.isOpen)}>
+          <div className="sp-header-left" onClick={handleCloseChatbotWhenUseWithDrawal}>
             <div className="sp-header-left-avatar sp-avatar">
               <img
                 src={

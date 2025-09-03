@@ -95,6 +95,12 @@ const CHATBOT_SERVER = {
   GET_CHATBOT_SETTING_PATH: '/api/v1/managements/chatbots/:bot_id',
   SEND_EMAIL_PATH: '/api/v1/managements/emails/:email_id/send_email',
   CONVERT_TEXT_JAPANESE_PATH: '/api/v1/jp_convert',
+  WITHDRAWAL_RESPONSE: '/api/v1/chatbot_settings/withdrawal_preventions/:bot_id',
+  SEND_SCENARIO_USER_RESPONSE: '/api/v1/scenario_users/scenario_user_responses',
+  CREATE_STATUS_CONVERSION_USER_RESPONSE: '/api/v1/scenario_users/scenario_user_responses_status',
+  UPDATE_STATUS_CONVERSION_USER_RESPONSE: '/api/v1/scenario_users/scenario_user_responses_status',
+  CREATE_USER_SCENARIO_RESPONSE_MESSAGE_HISTORY: '/api/v1/scenario_users/scenario_user_responses_message',
+  USER_ENTRY_SCENARIO: '/api/v1/scenario_users/entry',
 };
 
 const GET_CAPTCHA_PATH = `https://svg-captcha-nodejs.vercel.app/captcha?size=:size&color=:color&charPreset=:char_preset`;
@@ -190,7 +196,8 @@ const CUSTOM_JS_CODE_POSITION = {
 }
 
 const BOT_MESSAGE_TYPES = {
-  HTML_CODE: 'html_code'
+  HTML_CODE: 'html_code',
+  UGC: 'use_html_ugc_config',
 }
 
 const RENDER_CHATBOT_CONFIG = {
@@ -213,6 +220,10 @@ const RANGE_TEXT_VALIDATE = {
     MESSAGE: 'カタカナのみ（全角・半角）',
     LOG: 'カタカナ（全角・半角）を入力してください。',
   },
+}
+
+const CART_SYSTEM = {
+  EC_FORCE: 'ec_force',
 }
 
 export {
@@ -240,8 +251,27 @@ export {
   RENDER_CHATBOT_CONFIG,
   CONVERT_TEXT_TYPES,
   RANGE_TEXT_VALIDATE,
+  CART_SYSTEM,
   LABELS,
 };
+
+export const CONVERSTION_RESPONSE_STATUS = {
+  FINISH: "finished",
+  UN_FINISH: "un_finished",
+}
+
+export const CONVERSION_RESPONSE_SUBMIT_TYPE = {
+  ERROR: 'error',
+  ADD: 'add',
+  UPDATE: 'upd',
+}
+
+export const CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE = {
+  APPEAR: 'appear',
+  ERROR: 'errpr',
+  ADD: 'add',
+  RETRY: 'retry'
+}
 
 export const TIMER_TYPES = {
   COUNTING_DOWN: "counting_down",
@@ -263,6 +293,8 @@ export const TIMER_VARIABLES_DESCRIPTION = {
 
 export const TIMER_COUNTING_DELAY = 20;
 
+export const TIMER_DELAY_RENDER = 500;
+
 export const TIMER_MAP_VARIABLE_METHOD = {
   CONFIG: 1,
   PARAMS: 2,
@@ -281,3 +313,9 @@ export const TIMER_MAP_VARIABLES_FIELD = {
     transform: (duration) => secondToDatetime(duration, "{{dd}}日 {{hh}}時 {{mm}}分 {{ss}}秒"),
   },
 };
+
+export const CURRENCY_UNITS = [
+  { value: 1_0000_0000_0000, symbol: "兆" }, // 1兆 = 10^12
+  { value: 1_0000_0000, symbol: "億" },      // 1億 = 10^8
+  { value: 1_0000, symbol: "万" },           // 1万 = 10^4
+];

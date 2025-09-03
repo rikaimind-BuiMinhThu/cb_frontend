@@ -43,6 +43,7 @@ import 'moment/locale/zh-cn';
 import ShopifyReferenceSelect from "./ShopifyReferenceSelect";
 import { Tooltip } from '@mui/material';
 import { MESSAGE_CONTENT_TYPES, TIMER_TYPES, TIMER_VARIABLES, TIMER_VARIABLES_DESCRIPTION, BOT_MESSAGE_TYPES, RANGE_TEXT_VALIDATE, LABELS, GENDER_DISPLAY_TYPES } from '../PreviewComponent/Constants';
+import HtmlCodeConfig from './scenarioComon/HtmlCodeConfig';
 import OptionGenderConfig from './OptionGenderConfig';
 import SubmitButtonLoadingConfig from './SubmitButtonLoadingConfig';
 import SubmitButtonConfig from './SubmitButtonConfig';
@@ -892,7 +893,6 @@ const Scenario = () => {
   const [dataDay, setDataDay] = useState(dataDayFixed);
 
   const [errorVariable, setErrorVariable] = useState('');
-  const [htmlValidationError, setHtmlValidationError] = useState('');
 
   const [dataCondition, setDataCondition] = useState([]);
 
@@ -3272,6 +3272,7 @@ const Scenario = () => {
                                   else if (content.type === 'pause') { titleMessage = "一時停止" }
                                   else if (content.type === 'getting_error_notification') { titleMessage = "エラー取得の通知" }
                                   else if (content.type === BOT_MESSAGE_TYPES.HTML_CODE) { titleMessage = "HTMLコード" }
+                                  else if (content.type === BOT_MESSAGE_TYPES.UGC) { titleMessage = "HTML_UGC_CONFIG" }
                                 }
 
                                 return message.belong_to === 'bot' ? (
@@ -3379,7 +3380,7 @@ const Scenario = () => {
                                                     ></textarea>
                                                   )}
                                                   {/* bot: type == 'script' */}
-                                                  {(content.type === 'script' || content.type === BOT_MESSAGE_TYPES.HTML_CODE) && (
+                                                  {(content.type === 'script' || content.type === BOT_MESSAGE_TYPES.HTML_CODE || content.type === BOT_MESSAGE_TYPES.UGC ) && (
                                                     <textarea
                                                       className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
                                                       style={message.hidden === true ? { opacity: '0.4' } : {}}
@@ -5797,6 +5798,7 @@ const Scenario = () => {
                                 <option value="variable_set">変数セット</option>
                                 <option value="pause">一時停止</option>
                                 <option value="html_code">HTMLコード</option>
+                                <option value="use_html_ugc_config">HTML_UGC_CONFIG</option>
                                 {/* <option value="api_link_age">テキスト</option> Pending */}
                               </select>
 
@@ -5975,7 +5977,7 @@ const Scenario = () => {
                               )}
 
                               {/* type: script */}
-                              {messageType === 'script' && (
+                              {(messageType === 'script'|| messageType === BOT_MESSAGE_TYPES.UGC)&& (
                                 <div className="ss-bot-statement-wrapper">
                                   <div
                                     id="ss-bot-statement-type-script"
@@ -6108,12 +6110,10 @@ const Scenario = () => {
 
                               {/* type: html_code */}
                               {messageType === BOT_MESSAGE_TYPES.HTML_CODE && (
-                                <HtmlCodeMessage
-                                  value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['content'] || ''}
-                                  onChange={(value) => {
-                                    onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'content');
-                                  }}
-                                  validationError={htmlValidationError}
+                                <HtmlCodeConfig 
+                                  config={dataMessages[indexMessageSelect].message_content[0][messageType]}
+                                  onChangeValue={onChangeValueMessageContent}
+                                  indexMessageSelect={indexMessageSelect}
                                 />
                               )}
                             </div>

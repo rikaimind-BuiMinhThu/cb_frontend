@@ -1,6 +1,6 @@
 import api from "api/api-management";
 import { tokenExpired } from "api/tokenExpired";
-import { CHATBOT_SERVER, GET_CAPTCHA_PATH } from "./Constants";
+import { CHATBOT_SERVER, CURRENCY_UNITS, GET_CAPTCHA_PATH } from "./Constants";
 
 const stringNullOrEmpty = (string) => {
   return !string || (string + "").trim() === "";
@@ -169,6 +169,12 @@ const getChatBotSetting = (botId) => {
   );
 }
 
+const patchWithDrawalPreview = (botId, data) => {
+  return patchToChatBotServer(
+    CHATBOT_SERVER.WITHDRAWAL_RESPONSE.replace(":bot_id", botId), data
+  )
+} 
+
 const sendEmailRequest = (emailId, data) => {
   return postToChatBotServer(
     CHATBOT_SERVER.SEND_EMAIL_PATH.replace(":email_id", emailId),
@@ -180,6 +186,41 @@ const sendConvertTextJapaneseRequest = (text) => {
   return postToChatBotServer(
     CHATBOT_SERVER.CONVERT_TEXT_JAPANESE_PATH,
     { text }
+  );
+}
+
+const sendScenarioUserResponse = (data) => {
+  return postToChatBotServer(
+    CHATBOT_SERVER.SEND_SCENARIO_USER_RESPONSE,
+    data
+  );
+}
+
+const createStatusConversion = (data) => {
+  return postToChatBotServer(
+    CHATBOT_SERVER.CREATE_STATUS_CONVERSION_USER_RESPONSE,
+    data
+  );
+}
+
+const updateStatusConversion = (data) => {
+  return patchToChatBotServer(
+    CHATBOT_SERVER.UPDATE_STATUS_CONVERSION_USER_RESPONSE,
+    data
+  );
+}
+
+const createScenarioUserResponseMessageHistory = (data) => {
+  return postToChatBotServer(
+    CHATBOT_SERVER.CREATE_USER_SCENARIO_RESPONSE_MESSAGE_HISTORY,
+    data,
+  );
+}
+
+const userEntryScenario = (data) => {
+  return postToChatBotServer(
+    CHATBOT_SERVER.USER_ENTRY_SCENARIO,
+    data,
   );
 }
 
@@ -438,6 +479,45 @@ const getColor = (color, options = {}) => {
   return baseColor;
 };
 
+const hideMessageOnError = (message) => {
+  if (!message.hidden && message.not_display_when_have_error) {
+    return { ...message, hidden: true };
+  }
+  return message;
+};
+
+const processMessagesForErrorState = (payload) => {
+  const processedPayload = { ...(payload || {}) };
+  
+  if (processedPayload.messagesList) {
+    processedPayload.messagesList = processedPayload.messagesList.map(hideMessageOnError);
+  }
+
+  if (processedPayload.renderMessagesList) {
+    processedPayload.renderMessagesList = processedPayload.renderMessagesList.map(hideMessageOnError);
+  }
+
+  return processedPayload;
+};
+
+const createTempDelay = (seconds = 0.5) => {
+  return {
+    id: `__temp_delay_${Date.now()}`,
+    belong_to: 'bot',
+    message_name: 'delay',
+    message_content: [{ type: 'delay', delay: { content: Number(seconds)}}],
+  }
+}
+const parseQuantity = (quantity = 0) => {
+  for (const { value, symbol } of CURRENCY_UNITS) {
+    if (quantity >= value) {
+      return (
+        (quantity / value).toFixed(1).replace(/\.0$/, "") + symbol
+      );
+    }
+  }
+  return (quantity || 0).toLocaleString("ja-JP"); 
+};
 export {
   stringNullOrEmpty, getAllUrlParams, lightenColor,
   mobileCheck, removeLeadingZero, sendUserInteractionData,
@@ -447,5 +527,7 @@ export {
   sleep, getCaptcha, appendParamsToUrl, checkMessageCondition,
   getAddressFromZipCode, secondToDatetime, findItem, isUndefined,
   changeElementAttributeById, toCamelCase, sendConvertTextJapaneseRequest,
-  scrollToPosition, removeSpace, getColor,
+  scrollToPosition, removeSpace, getColor, processMessagesForErrorState, hideMessageOnError, createTempDelay,
+  patchWithDrawalPreview, sendScenarioUserResponse, createStatusConversion, updateStatusConversion, parseQuantity,
+  createScenarioUserResponseMessageHistory, userEntryScenario,
 };

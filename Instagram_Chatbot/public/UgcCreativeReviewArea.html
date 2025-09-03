@@ -1,0 +1,939 @@
+<div id="UgcCreativeReview-ratingStarWriteReview" class="UgcCreativeReview-show" style="display: none;">
+	<div id="UgcCreativeReview-stararea-header_image" class="UgcCreativeReview-headerImageWrapper">
+			<img alt="ヘッダー" class="UgcCreativeReview-headerImage" />
+	</div>
+	<div style="margin: 15px 15px 15px 0">
+		<div style="text-align: left;">
+			<span id="UgcCreativeReview-customerstr"></span>
+			<div id="UgcCreativeReview-starArea">
+				<span id="UgcCreativeReview-stararea-span" class="UgcCreativeReview-tooltip" onclick="UgcCreativeReview.engage('look_star')">
+					<span id="UgcCreativeReview-stararea-tooltip" class="UgcCreativeReview-tooltipContent">
+						<div>
+							<div class="UgcCreativeReview-stararea-star_average UgcCreativeReview-tooltipText"></div>
+							<div style="display:flex;margin:10px 0px">
+								<div class="UgcCreativeReview-gaugeText">星5つ</div>
+								<div class="UgcCreativeReview-gauge">
+									<span class="UgcCreativeReview-stararea-gauge_width UgcCreativeReview-gaugeFill" style="background: #f8b62c;"></span>
+								</div>
+								<div class="UgcCreativeReview-stararea-gauge_percent UgcCreativeReview-gaugePercent"></div>
+							</div>
+							<div style="display:flex;margin:10px 0px">
+								<div class="UgcCreativeReview-gaugeText">星4つ</div>
+								<div class="UgcCreativeReview-gauge">
+									<span class="UgcCreativeReview-stararea-gauge_width UgcCreativeReview-gaugeFill" style="background: #f8b62c;"></span>
+								</div>
+								<div class="UgcCreativeReview-stararea-gauge_percent UgcCreativeReview-gaugePercent"></div>
+							</div>
+							<div style="display:flex;margin:10px 0px">
+								<div class="UgcCreativeReview-gaugeText">星3つ</div>
+								<div class="UgcCreativeReview-gauge">
+									<span class="UgcCreativeReview-stararea-gauge_width UgcCreativeReview-gaugeFill" style="background: #f8b62c;"></span>
+								</div>
+								<div class="UgcCreativeReview-stararea-gauge_percent UgcCreativeReview-gaugePercent"></div>
+							</div>
+							<div style="display:flex;margin:10px 0px">
+								<div class="UgcCreativeReview-gaugeText">星2つ</div>
+								<div class="UgcCreativeReview-gauge">
+									<span class="UgcCreativeReview-stararea-gauge_width UgcCreativeReview-gaugeFill" style="background: #f8b62c;"></span>
+								</div>
+								<div class="UgcCreativeReview-stararea-gauge_percent UgcCreativeReview-gaugePercent"></div>
+							</div>
+							<div style="display:flex;margin:10px 0px">
+								<div class="UgcCreativeReview-gaugeText">星1つ</div>
+								<div class="UgcCreativeReview-gauge">
+									<span class="UgcCreativeReview-stararea-gauge_width UgcCreativeReview-gaugeFill" style="background: #f8b62c;"></span>
+								</div>
+								<div class="UgcCreativeReview-stararea-gauge_percent UgcCreativeReview-gaugePercent"></div>
+							</div>
+						</div>
+					</span>
+					<span id="UgcCreativeReview-reviews-star" style="letter-spacing: -2px;">
+						<span style="font-size: 18px;"></span>
+						<span style="font-size: 18px;"></span>
+						<span style="font-size: 18px;"></span>
+						<span style="font-size: 18px;"></span>
+						<span style="font-size: 18px;"></span>
+					</span>
+				</span>
+
+				<span class="UgcCreativeReview-stararea-star_average UgcCreativeReview-starRightStr1"></span>
+				<span class="UgcCreativeReview-stararea-star_total UgcCreativeReview-starRightStr2"></span>
+
+				<div class="UgcCreativeReview-reviews-display_write_comment" style="margin-top: .5em;color: #565959!important;">
+					<span id="UgcCreativeReview-reviews-count" style="font-size: 14px;"></span><span id="UgcCreativeReview-commentstr">件の評価</span>
+				</div>
+			</div>
+
+			<div id="UgcCreativeReview-stararea-ratio" class="UgcCreativeReview-customerReviewGraphArea">
+				<div style="display:flex;margin:10px 0px">
+					<div class="UgcCreativeReview-gaugeText" onclick="UgcCreativeReview.search_star(5)">星5つ</div>
+					<div class="UgcCreativeReview-gauge" onclick="UgcCreativeReview.search_star(5)">
+						<span class="UgcCreativeReview-stararea-gauge_width UgcCreativeReview-gaugeFill" style="background: #f8b62c;"></span>
+					</div>
+					<div class="UgcCreativeReview-stararea-gauge_percent UgcCreativeReview-gaugePercent"></div>
+				</div>
+				<div style="display:flex;margin:10px 0px">
+					<div class="UgcCreativeReview-gaugeText" onclick="UgcCreativeReview.search_star(4)">星4つ</div>
+					<div class="UgcCreativeReview-gauge" onclick="UgcCreativeReview.search_star(4)">
+						<span class="UgcCreativeReview-stararea-gauge_width UgcCreativeReview-gaugeFill" style="background: #f8b62c;"></span>
+					</div>
+					<div class="UgcCreativeReview-stararea-gauge_percent UgcCreativeReview-gaugePercent"></div>
+				</div>
+				<div style="display:flex;margin:10px 0px">
+					<div class="UgcCreativeReview-gaugeText" onclick="UgcCreativeReview.search_star(3)">星3つ</div>
+					<div class="UgcCreativeReview-gauge" onclick="UgcCreativeReview.search_star(3)">
+						<span class="UgcCreativeReview-stararea-gauge_width UgcCreativeReview-gaugeFill" style="background: #f8b62c;"></span>
+					</div>
+					<div class="UgcCreativeReview-stararea-gauge_percent UgcCreativeReview-gaugePercent"></div>
+				</div>
+				<div style="display:flex;margin:10px 0px">
+					<div class="UgcCreativeReview-gaugeText" onclick="UgcCreativeReview.search_star(2)">星2つ</div>
+					<div class="UgcCreativeReview-gauge" onclick="UgcCreativeReview.search_star(2)">
+						<span class="UgcCreativeReview-stararea-gauge_width UgcCreativeReview-gaugeFill" style="background: #f8b62c;"></span>
+					</div>
+					<div class="UgcCreativeReview-stararea-gauge_percent UgcCreativeReview-gaugePercent"></div>
+				</div>
+				<div style="display:flex;margin:10px 0px">
+					<div class="UgcCreativeReview-gaugeText" onclick="UgcCreativeReview.search_star(1)">星1つ</div>
+					<div class="UgcCreativeReview-gauge" onclick="UgcCreativeReview.search_star(1)">
+						<span class="UgcCreativeReview-stararea-gauge_width UgcCreativeReview-gaugeFill" style="background: #f8b62c;"></span>
+					</div>
+					<div class="UgcCreativeReview-stararea-gauge_percent UgcCreativeReview-gaugePercent"></div>
+				</div>
+			</div>
+
+			<div id="UgcCreativeReview-itemrate-title" class="UgcCreativeReview-profileTitle">項目別評価</div>
+			<table id="UgcCreativeReview-itemrate-table">
+				<tbody>
+					<tr id="UgcCreativeReview-itemrate-tr1">
+						<td id="UgcCreativeReview-itemrate-title1" class="UgcCreativeReview-profileTitle2" style="line-height: 14px;word-break: break-all;"></td>
+						<td class="UgcCreativeReview-evaluation">
+							<span id="UgcCreativeReview-itemrate-star1" style="width:120px;padding-left:10px;letter-spacing: -1.5px;">
+								<span class="UgcCreativeReview-profileSize"></span>
+								<span class="UgcCreativeReview-profileSize"></span>
+								<span class="UgcCreativeReview-profileSize"></span>
+								<span class="UgcCreativeReview-profileSize"></span>
+								<span class="UgcCreativeReview-profileSize"></span>
+								<span class="UgcCreativeReview-profileItemScore UgcCreativeReview-profileSize"></span>
+							</span>
+						</td>
+					</tr>
+					<tr id="UgcCreativeReview-itemrate-tr2">
+						<td id="UgcCreativeReview-itemrate-title2" class="UgcCreativeReview-profileTitle2" style="line-height: 14px;word-break: break-all;"></td>
+						<td class="UgcCreativeReview-evaluation">
+							<span id="UgcCreativeReview-itemrate-star2" style="width:120px;padding-left:10px;letter-spacing: -1.5px;">
+								<span class="UgcCreativeReview-profileSize"></span>
+								<span class="UgcCreativeReview-profileSize"></span>
+								<span class="UgcCreativeReview-profileSize"></span>
+								<span class="UgcCreativeReview-profileSize"></span>
+								<span class="UgcCreativeReview-profileSize"></span>
+								<span class="UgcCreativeReview-profileItemScore UgcCreativeReview-profileSize"></span>
+							</span>
+						</td>
+					</tr>
+					<tr id="UgcCreativeReview-itemrate-tr3">
+						<td id="UgcCreativeReview-itemrate-title3" class="UgcCreativeReview-profileTitle2" style="line-height: 14px;word-break: break-all;"></td>
+						<td class="UgcCreativeReview-evaluation">
+							<span id="UgcCreativeReview-itemrate-star3" style="width:120px;padding-left:10px;letter-spacing: -1.5px;">
+								<span class="UgcCreativeReview-profileSize"></span>
+								<span class="UgcCreativeReview-profileSize"></span>
+								<span class="UgcCreativeReview-profileSize"></span>
+								<span class="UgcCreativeReview-profileSize"></span>
+								<span class="UgcCreativeReview-profileSize"></span>
+								<span class="UgcCreativeReview-profileItemScore UgcCreativeReview-profileSize"></span>
+							</span>
+						</td>
+					</tr>
+					<tr id="UgcCreativeReview-itemrate-tr4">
+						<td id="UgcCreativeReview-itemrate-title4" class="UgcCreativeReview-profileTitle2" style="line-height: 14px;word-break: break-all;"></td>
+						<td class="UgcCreativeReview-evaluation">
+							<span id="UgcCreativeReview-itemrate-star4" style="width:120px;padding-left:10px;letter-spacing: -1.5px;">
+								<span class="UgcCreativeReview-profileSize"></span>
+								<span class="UgcCreativeReview-profileSize"></span>
+								<span class="UgcCreativeReview-profileSize"></span>
+								<span class="UgcCreativeReview-profileSize"></span>
+								<span class="UgcCreativeReview-profileSize"></span>
+								<span class="UgcCreativeReview-profileItemScore UgcCreativeReview-profileSize"></span>
+							</span>
+						</td>
+					</tr>
+					<tr id="UgcCreativeReview-itemrate-tr5">
+						<td id="UgcCreativeReview-itemrate-title5" class="UgcCreativeReview-profileTitle2" style="line-height: 14px;word-break: break-all;"></td>
+						<td class="UgcCreativeReview-evaluation">
+							<span id="UgcCreativeReview-itemrate-star5" style="width:120px;padding-left:10px;letter-spacing: -1.5px;">
+								<span class="UgcCreativeReview-profileSize"></span>
+								<span class="UgcCreativeReview-profileSize"></span>
+								<span class="UgcCreativeReview-profileSize"></span>
+								<span class="UgcCreativeReview-profileSize"></span>
+								<span class="UgcCreativeReview-profileSize"></span>
+								<span class="UgcCreativeReview-profileItemScore UgcCreativeReview-profileSize"></span>
+							</span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div id="UgcCreativeReview-tag" class="UgcCreativeReview-TagArea" style="display: none">
+			</div>
+
+		</div>
+	</div>
+
+	<div style="text-align: left">
+		<div id="UgcCreativeReview-comment-write">
+			<div>
+				<label class="UgcCreativeReview-popupOpen UgcCreativeReviewAreaBtn UgcCreativeReviewAreaBtn--white UgcCreativeReview-btnColor" for="UgcCreativeReview-popupReviewForm">
+					<i class="fas fa-pen UgcCreativeReviewAreaBtn-iconleft"></i>レビューを書く
+				</label>
+			</div>
+
+			<!-- レビューフォーム -->
+			<input type="checkbox" id="UgcCreativeReview-popupReviewForm" class="UgcCreativeReview-popup" />
+			<div class="UgcCreativeReview-overlay">
+				<div class="UgcCreativeReview-windowScroll">
+
+					<label class="UgcCreativeReview-formClose" for="UgcCreativeReview-popupReviewForm">
+						<i class="fas fa-times UgcCreativeReview-popupImageCloseInner"></i>
+					</label>
+
+					<div class="UgcCreativeReview-popupContent UgcCreativeRevie-form">
+						<div id="UgcCreativeReviewAreaForm">
+							<div id="UgcCreativeReviewAreaFormW">
+								<div id="UgcCreativeReview-comment-post_page"></div>
+								<div style="margin-bottom:.5em"><span class="UgcCreativeReview-require">*</span>のついた項目は必須項目です</div>
+
+								<div class="UgcCreativeReview-formItem">評価<span class="UgcCreativeReview-require">*</span></div>
+								<div class="UgcCreativeReview-evaluation">
+									<input id="UgcCreativeReview-star1" type="radio" name="star" value="5" required />
+									<label for="UgcCreativeReview-star1" class="evaluation-star"></label>
+									<input id="UgcCreativeReview-star2" type="radio" name="star" value="4" />
+									<label for="UgcCreativeReview-star2" class="evaluation-star"></label>
+									<input id="UgcCreativeReview-star3" type="radio" name="star" value="3" />
+									<label for="UgcCreativeReview-star3" class="evaluation-star"></label>
+									<input id="UgcCreativeReview-star4" type="radio" name="star" value="2" />
+									<label for="UgcCreativeReview-star4" class="evaluation-star"></label>
+									<input id="UgcCreativeReview-star5" type="radio" name="star" value="1" />
+									<label for="UgcCreativeReview-star5" class="evaluation-star"></label>
+								</div>
+
+			 					<div id="UgcCreativeReview-comment-item_rating">
+									<div id="UgcCreativeReview-comment-item_rating1_title" class="UgcCreativeReview-comment-item_rating1 UgcCreativeReview-formItem2"></div>
+									<div id="UgcCreativeReview-comment-item_rating1_star" class="UgcCreativeReview-comment-item_rating1 UgcCreativeReview-evaluation">
+										<input id="UgcCreativeReview-star1item_rating1" type="radio" name="item_rating1" value="5" required" />
+										<label for="UgcCreativeReview-star1item_rating1" class="evaluation-star"></label>
+										<input id="UgcCreativeReview-star2item_rating1" type="radio" name="item_rating1" value="4" />
+										<label for="UgcCreativeReview-star2item_rating1" class="evaluation-star"></label>
+										<input id="UgcCreativeReview-star3item_rating1" type="radio" name="item_rating1" value="3" />
+										<label for="UgcCreativeReview-star3item_rating1" class="evaluation-star"></label>
+										<input id="UgcCreativeReview-star4item_rating1" type="radio" name="item_rating1" value="2" />
+										<label for="UgcCreativeReview-star4item_rating1" class="evaluation-star"></label>
+										<input id="UgcCreativeReview-star5item_rating1" type="radio" name="item_rating1" value="1" />
+										<label for="UgcCreativeReview-star5item_rating1" class="evaluation-star"></label>
+									</div>
+									<div id="UgcCreativeReview-comment-item_rating2_title" class="UgcCreativeReview-comment-item_rating2 UgcCreativeReview-formItem2"></div>
+									<div id="UgcCreativeReview-comment-item_rating2_star" class="UgcCreativeReview-comment-item_rating2 UgcCreativeReview-evaluation">
+										<input id="UgcCreativeReview-star1item_rating2" type="radio" name="item_rating2" value="5" required" />
+										<label for="UgcCreativeReview-star1item_rating2" class="evaluation-star"></label>
+										<input id="UgcCreativeReview-star2item_rating2" type="radio" name="item_rating2" value="4" />
+										<label for="UgcCreativeReview-star2item_rating2" class="evaluation-star"></label>
+										<input id="UgcCreativeReview-star3item_rating2" type="radio" name="item_rating2" value="3" />
+										<label for="UgcCreativeReview-star3item_rating2" class="evaluation-star"></label>
+										<input id="UgcCreativeReview-star4item_rating2" type="radio" name="item_rating2" value="2" />
+										<label for="UgcCreativeReview-star4item_rating2" class="evaluation-star"></label>
+										<input id="UgcCreativeReview-star5item_rating2" type="radio" name="item_rating2" value="1" />
+										<label for="UgcCreativeReview-star5item_rating2" class="evaluation-star"></label>
+									</div>
+									<div id="UgcCreativeReview-comment-item_rating3_title" class="UgcCreativeReview-comment-item_rating3 UgcCreativeReview-formItem2"></div>
+									<div id="UgcCreativeReview-comment-item_rating3_star" class="UgcCreativeReview-comment-item_rating3 UgcCreativeReview-evaluation">
+										<input id="UgcCreativeReview-star1item_rating3" type="radio" name="item_rating3" value="5" required" />
+										<label for="UgcCreativeReview-star1item_rating3" class="evaluation-star"></label>
+										<input id="UgcCreativeReview-star2item_rating3" type="radio" name="item_rating3" value="4" />
+										<label for="UgcCreativeReview-star2item_rating3" class="evaluation-star"></label>
+										<input id="UgcCreativeReview-star3item_rating3" type="radio" name="item_rating3" value="3" />
+										<label for="UgcCreativeReview-star3item_rating3" class="evaluation-star"></label>
+										<input id="UgcCreativeReview-star4item_rating3" type="radio" name="item_rating3" value="2" />
+										<label for="UgcCreativeReview-star4item_rating3" class="evaluation-star"></label>
+										<input id="UgcCreativeReview-star5item_rating3" type="radio" name="item_rating3" value="1" />
+										<label for="UgcCreativeReview-star5item_rating3" class="evaluation-star"></label>
+									</div>
+									<div id="UgcCreativeReview-comment-item_rating4_title" class="UgcCreativeReview-comment-item_rating4 UgcCreativeReview-formItem2"></div>
+									<div id="UgcCreativeReview-comment-item_rating4_star" class="UgcCreativeReview-comment-item_rating4 UgcCreativeReview-evaluation">
+										<input id="UgcCreativeReview-star1item_rating4" type="radio" name="item_rating4" value="5" required" />
+										<label for="UgcCreativeReview-star1item_rating4" class="evaluation-star"></label>
+										<input id="UgcCreativeReview-star2item_rating4" type="radio" name="item_rating4" value="4" />
+										<label for="UgcCreativeReview-star2item_rating4" class="evaluation-star"></label>
+										<input id="UgcCreativeReview-star3item_rating4" type="radio" name="item_rating4" value="3" />
+										<label for="UgcCreativeReview-star3item_rating4" class="evaluation-star"></label>
+										<input id="UgcCreativeReview-star4item_rating4" type="radio" name="item_rating4" value="2" />
+										<label for="UgcCreativeReview-star4item_rating4" class="evaluation-star"></label>
+										<input id="UgcCreativeReview-star5item_rating4" type="radio" name="item_rating4" value="1" />
+										<label for="UgcCreativeReview-star5item_rating4" class="evaluation-star"></label>
+									</div>
+									<div id="UgcCreativeReview-comment-item_rating5_title" class="UgcCreativeReview-comment-item_rating5 UgcCreativeReview-formItem2"></div>
+									<div id="UgcCreativeReview-comment-item_rating5_star" class="UgcCreativeReview-comment-item_rating5 UgcCreativeReview-evaluation">
+										<input id="UgcCreativeReview-star1item_rating5" type="radio" name="item_rating5" value="5" required" />
+										<label for="UgcCreativeReview-star1item_rating5" class="evaluation-star"></label>
+										<input id="UgcCreativeReview-star2item_rating5" type="radio" name="item_rating5" value="4" />
+										<label for="UgcCreativeReview-star2item_rating5" class="evaluation-star"></label>
+										<input id="UgcCreativeReview-star3item_rating5" type="radio" name="item_rating5" value="3" />
+										<label for="UgcCreativeReview-star3item_rating5" class="evaluation-star"></label>
+										<input id="UgcCreativeReview-star4item_rating5" type="radio" name="item_rating5" value="2" />
+										<label for="UgcCreativeReview-star4item_rating5" class="evaluation-star"></label>
+										<input id="UgcCreativeReview-star5item_rating5" type="radio" name="item_rating5" value="1" />
+										<label for="UgcCreativeReview-star5item_rating5" class="evaluation-star"></label>
+									</div>
+				 				</div>
+				 				<input id="UgcCreativeReview-comment-item_rating_name" type="hidden" name="item_rating_name" />
+
+								<div class="UgcCreativeReview-formItem2">レビュータイトル
+			 						<span id="UgcCreativeReview-comment-require_title" class="UgcCreativeReview-require">*</span>
+								</div>
+								<div>
+									<input id="UgcCreativeReview-title" type="text" name="title" class="UgcCreativeReview-formTitle" required />
+								</div>
+
+								<div class="UgcCreativeReview-formItem2">レビュー<span class="UgcCreativeReview-require">*</span></div>
+								<div>
+									<textarea id="UgcCreativeReview-review" name="review" class="UgcCreativeReview-formReview" rows="4" required onKeyUp="UgcCreativeReview.reviewLengthCount()"></textarea>
+								</div>
+								<div class="UgcCreativeReview-reviewLengthCountWrapper">
+									<i class="fas fa-check" id="UgcCreativeReview-reviewLengthCountCheck" style="display:none"></i>
+									<span id="UgcCreativeReview-reviewLengthCount">0</span> / <span id="UgcCreativeReview-comment-maxlength" ></span>
+								</div>
+
+			 					<div id="UgcCreativeReview-comment-image">
+									<div class="UgcCreativeReview-formItem2">画像</div>
+									<div id="UgcCreativeReview-comment-post_image" style="font-size:14px;"></div>
+									<div style="position:relative;display:inline-block;">
+										<label id="UgcCreativeReview-image_box">
+											<input id="UgcCreativeReview-image_file" style="display:none" type="file" onchange="UgcCreativeReview.chooseImage(this)" accept="image/*" />
+											<div id="UgcCreativeReview-image_add" style="text-align:center;margin-top:8px;">
+												<i class="fas fa-plus" style="font-size:25px"></i>
+												<div>追加</div>
+											</div>
+										</label>
+
+										<div id="UgcCreativeReview-image_delete" style="display:block;">
+											<i class="fas fa-times-circle" style="font-size:25px;color:#fff;" onclick="UgcCreativeReview.deleteImage(this)"></i>
+										</div>
+									</div>
+								</div>
+
+								<div class="UgcCreativeReview-formItem2">名前<span class="UgcCreativeReview-require">*</span></div>
+								<div>
+									<input id="UgcCreativeReview-name" type="text" name="name" class="UgcCreativeReview-formTitle" required />
+								</div>
+
+								<div class="UgcCreativeReview-formItem2">Eメールアドレス<span class="UgcCreativeReview-require">*</span></div>
+								<div>
+									<input id="UgcCreativeReview-email" type="text" name="email" class="UgcCreativeReview-formTitle" required />
+								</div>
+
+			 					<div id="UgcCreativeReview-comment-nickname">
+									<div class="UgcCreativeReview-formItem2">ニックネーム</div>
+									<div id="UgcCreativeReview-comment-nickname_page" style="font-size:14px;"></div>
+									<div>
+										<input id="UgcCreativeReview-nickname" type="text" name="nickname" class="UgcCreativeReview-formTitle" required />
+									</div>
+								</div>
+
+								<div id="UgcCreativeReview-comment-profile">
+									<div id="UgcCreativeReview-comment-profile_div1" class="UgcCreativeReview-formItem2"></div>
+									<select id="UgcCreativeReview-comment-profile_select1" class="UgcCreativeReview-formSelect">
+										<option value="">選択してください</option>
+									</select>
+									<div id="UgcCreativeReview-comment-profile_div2" class="UgcCreativeReview-formItem2"></div>
+									<select id="UgcCreativeReview-comment-profile_select2" class="UgcCreativeReview-formSelect">
+										<option value="">選択してください</option>
+									</select>
+									<div id="UgcCreativeReview-comment-profile_div3" class="UgcCreativeReview-formItem2"></div>
+									<select id="UgcCreativeReview-comment-profile_select3" class="UgcCreativeReview-formSelect">
+										<option value="">選択してください</option>
+									</select>
+									<div id="UgcCreativeReview-comment-profile_div4" class="UgcCreativeReview-formItem2"></div>
+									<select id="UgcCreativeReview-comment-profile_select4" class="UgcCreativeReview-formSelect">
+										<option value="">選択してください</option>
+									</select>
+									<div id="UgcCreativeReview-comment-profile_div5" class="UgcCreativeReview-formItem2"></div>
+									<select id="UgcCreativeReview-comment-profile_select5" class="UgcCreativeReview-formSelect">
+										<option value="">選択してください</option>
+									</select>
+								</div>
+
+								<div class="UgcCreativeReview-formItem2">年齢<span class="UgcCreativeReview-require">*</span></div>
+								<select id="UgcCreativeReview-comment-age_select" class="UgcCreativeReview-formSelect" name="age" data-item="年齢">
+									<option value="">選択してください</option>
+								</select>
+
+								<div class="UgcCreativeReview-formItem2">性別<span class="UgcCreativeReview-require">*</span></div>
+								<select id="UgcCreativeReview-comment-gender_select" class="UgcCreativeReview-formSelect" name="gender" data-item="性別">
+									<option value="">選択してください</option>
+								</select>
+
+								<div id="UgcCreativeReview-errorMsg" style="margin: 1em 0;display: none"></div>
+								<div style="margin-top: 2em;height: 80px;text-align:center">
+									<button class="UgcCreativeReviewAreaBtn UgcCreativeReviewAreaBtn--blue UgcCreativeReview-bgColor" onclick="UgcCreativeReview.submitForm()" type="button">投稿する</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="UgcCreativeReview-filter" class="UgcCreativeReview-FilterArea">
+			<div class="UgcCreativeReview-FilterAreaInner">
+				<button class="UgcCreativeReviewAreaBtn UgcCreativeReviewAreaBtn--white UgcCreativeReview-btnColor" onclick="UgcCreativeReview.pushDetailFilterBtn()">
+				<i class="fas fa-search UgcCreativeReviewAreaBtn-iconleft"></i>詳細フィルター</button>
+			</div>
+			<div id="UgcCreativeReview-FilterAreaDetail" style="display:none">
+				<select class="UgcCreativeReview-select UgcCreativeReview-btnColor" id="UgcCreativeReview-FilterStarSelect" onChange="UgcCreativeReview.changeStarSelect(this)">
+					<option value="all">星による評価</option>
+				</select>
+				<select class="UgcCreativeReview-select UgcCreativeReview-btnColor" id="UgcCreativeReview-FilterOtherSelect" onChange="UgcCreativeReview.changeFilterOtherSelect(this)">
+					<option value="all">全てのレビュー</option>
+					<option value="with_image">写真付きのレビュー</option>
+				</select>
+			</div>
+			<div id="UgcCreativeReview-SortAreaDetail" style="display:none">
+				<button class="UgcCreativeReviewAreaBtnSmall UgcCreativeReviewAreaBtn--white" id="UgcCreativeReview-sort_date" onClick="UgcCreativeReview.sort(this)">日付順<span></span></button>
+				<button class="UgcCreativeReviewAreaBtnSmall UgcCreativeReviewAreaBtn--white" id="UgcCreativeReview-sort_rate" onClick="UgcCreativeReview.sort(this)">評価順<span></span></button>
+				<button class="UgcCreativeReviewAreaBtnSmall UgcCreativeReviewAreaBtn--white" id="UgcCreativeReview-sort_like" onClick="UgcCreativeReview.sort(this)">いいね数順<span></span></button>
+				<button class="UgcCreativeReviewAreaBtnSmall UgcCreativeReviewAreaBtn--white" id="UgcCreativeReview-sort_confirm" onClick="UgcCreativeReview.sort(this)">購入確認順<span></span></button>
+				<button class="UgcCreativeReviewAreaBtnSmall UgcCreativeReviewAreaBtn--white" id="UgcCreativeReview-sort_replay" onClick="UgcCreativeReview.sort(this)">返信順<span></span></button>
+				<button class="UgcCreativeReviewAreaBtnSmall UgcCreativeReviewAreaBtn--white" id="UgcCreativeReview-sort_image" onClick="UgcCreativeReview.sort(this)">写真付き順<span></span></button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div id="UgcCreativeReviewArea-comment" class="UgcCreativeReview-show" style="display: none;">
+
+	<!-- 横１以外の時 -->
+	<div id="UgcCreativeReviewArea-commentSwiper1" class="UgcCreativeReviewArea-swiper swiper" style="display:none">
+		<div class="UgcCreativeReview-review_parent UgcCreativeReview-swiper-wrapper swiper-wrapper">
+			<div id="UgcCreativeReview-review-base" class="UgcCreativeReview-commentBackground UgcCreativeReview-swiper-slide swiper-slide">
+				<div class="UgcCreativeReview-swiper-overflow">
+					<div class="UgcCreativeReviewArea-commentArea">
+						<div class="UgcCreativeReview-review-id" style="display:none;"></div>
+						<!-- レビュー者名 -->
+						<div style="display:flex; align-items:center">
+							<div class="UgcCreativeReviewArea-userIcon">
+								<svg class="UgcCreativeReview-reviews-main_color_fill" version="1.1"x="0px" y="0px" width="32px" height="32px" viewBox="0 0 514.252 514.166" enable-background="new 0 0 514.252 514.166" xml:space="preserve">
+									<path d="M257.6,104c-53,0-96,43-96,96s43,96,96,96s96-43,96-96S310.6,104,257.6,104z M257.6,248c-26.5,0-48-21.5-48-48
+										s21.5-48,48-48s48,21.5,48,48S284.1,248,257.6,248z M257.6,8c-137,0-248,111-248,248s111,248,248,248s248-111,248-248
+										S394.6,8,257.6,8z M257.6,456c-49.701,0-95.1-18.301-130.1-48.4c14.899-23,40.399-38.6,69.6-39.5c20.799,6.4,40.6,9.6,60.5,9.6
+										s39.699-3.1,60.5-9.6c29.199,1,54.699,16.5,69.6,39.5C352.7,437.699,307.299,456,257.6,456z M420.299,371.9
+										c-24.4-31.4-62.1-51.9-105.1-51.9c-10.199,0-26,9.6-57.6,9.6c-31.5,0-47.4-9.6-57.6-9.6c-42.9,0-80.601,20.5-105.101,51.9
+										C71.5,339.199,57.6,299.199,57.6,256c0-110.3,89.699-200,200-200c110.299,0,200,89.7,200,200
+										C457.6,299.199,443.7,339.199,420.299,371.9z"/>
+								</svg>
+							</div>
+
+							<span class="UgcCreativeReview-textColor" style="vertical-align: 6px;font-size:13px;">
+								<div class="UgcCreativeReview-name-box">
+									<span class="UgcCreativeReview-review-name"></span>
+									<span class="UgcCreativeReview-review-is_confirm UgcCreativeReview-badgeWrapper UgcCreativeReview-borderColor">
+										<i class="UgcCreativeReview-reviews-main_color fas fa-check-circle" style="margin-right: 5px;"></i>購入確認済み
+									</span>
+								</div>
+								<span class="UgcCreativeReview-reviews-display_profile_select" style="font-size: 12px;border-radius: 5px;display: inline-block;">
+									<span class="UgcCreativeReview-review-gender_age"></span>
+									<span class="UgcCreativeReview-review-profile1"></span>
+									<span class="UgcCreativeReview-review-profile2"></span>
+									<span class="UgcCreativeReview-review-profile3"></span>
+									<span class="UgcCreativeReview-review-profile4"></span>
+									<span class="UgcCreativeReview-review-profile5"></span>
+								</span>
+							</span>
+						</div>
+
+						<!-- ★★★★★ -->
+						<div class="UgcCreativeReview-reviews-display_star_rate UgcCreativeReview-reviewStar">
+							<span></span><span></span><span></span><span></span><span></span>
+						</div>
+
+						<!-- 項目別評価 -->
+						<table class="UgcCreativeReview-reviews-display_item_rating">
+							<tbody>
+								<tr class="UgcCreativeReview-reviews-rating_item_1 UgcCreativeReview-review-rating_item_1">
+									<td class="UgcCreativeReview-reviews-rating_item_1_name UgcCreativeReview-textColor UgcCreativeReview-defaultFontSize" style="font-weight:bold;line-height: 14px;word-break: break-all;"></td>
+									<td class="UgcCreativeReview-review-rating_item_1_star UgcCreativeReview-evaluation" style="flex-direction: initial;vertical-align: middle;padding-left:10px;">
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+									</td>
+								</tr>
+								<tr class="UgcCreativeReview-reviews-rating_item_2 UgcCreativeReview-review-rating_item_2">
+									<td class="UgcCreativeReview-reviews-rating_item_2_name UgcCreativeReview-textColor UgcCreativeReview-defaultFontSize" style="font-weight:bold;line-height: 14px;word-break: break-all;"></td>
+									<td class="UgcCreativeReview-review-rating_item_2_star UgcCreativeReview-evaluation" style="flex-direction: initial;vertical-align: middle;padding-left:10px;">
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+									</td>
+								</tr>
+								<tr class="UgcCreativeReview-reviews-rating_item_3 UgcCreativeReview-review-rating_item_3">
+									<td class="UgcCreativeReview-reviews-rating_item_3_name UgcCreativeReview-textColor UgcCreativeReview-defaultFontSize" style="font-weight:bold;line-height: 14px;word-break: break-all;"></td>
+									<td class="UgcCreativeReview-review-rating_item_3_star UgcCreativeReview-evaluation" style="flex-direction: initial;vertical-align: middle;padding-left:10px;">
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+									</td>
+								</tr>
+								<tr class="UgcCreativeReview-reviews-rating_item_4 UgcCreativeReview-review-rating_item_4" style="display:none">
+									<td class="UgcCreativeReview-reviews-rating_item_4_name UgcCreativeReview-textColor UgcCreativeReview-defaultFontSize" style="font-weight:bold;line-height: 14px;word-break: break-all;"></td>
+									<td class="UgcCreativeReview-review-rating_item_4_star UgcCreativeReview-evaluation" style="flex-direction: initial;vertical-align: middle;padding-left:10px;">
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+									</td>
+								</tr>
+								<tr class="UgcCreativeReview-reviews-rating_item_5 UgcCreativeReview-review-rating_item_5" style="display:none">
+									<td class="UgcCreativeReview-reviews-rating_item_5_name UgcCreativeReview-textColor UgcCreativeReview-defaultFontSize" style="font-weight:bold;line-height: 14px;word-break: break-all;"></td>
+									<td class="UgcCreativeReview-review-rating_item_5_star UgcCreativeReview-evaluation" style="flex-direction: initial;vertical-align: middle;padding-left:10px;">
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+									</td>
+								</tr>
+
+								<tr>
+									<td></td>
+									<td class="UgcCreativeReview-reviews-rating_item_4">
+										<span class="UgcCreativeReview-review-show_all_rating_item UgcCreativeReview-textColor" style="cursor:pointer;font-size:10px;padding-left:10px;" onclick="UgcCreativeReview.show_all_rating_item(this)">続きを見る</span>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+						<!-- レビュー本文 -->
+						<div class="UgcCreativeReview-review-title UgcCreativeReview-textColor UgcCreativeReview-defaultFontSize" style="font-size:13px;font-weight: bold;margin-top: 13px;"></div>
+						<input class="UgcCreativeReview-review-trigger_id UgcCreativeReview-gradTrigger" type="checkbox" />
+						<div class="UgcCreativeReview-reviews-description_background UgcCreativeReview-gradItem UgcCreativeReview-defaultFontSize">
+							<div class="UgcCreativeReview-review-review UgcCreativeReview-gradItemInner UgcCreativeReview-defaultFontSize UgcCreativeReview-textColor"></div>
+						</div>
+						<div class="UgcCreativeReview-gradBtnWrap UgcCreativeReview-defaultFontSize UgcCreativeReview-textColor" style="text-align:left;">
+							<label class="UgcCreativeReview-review-trigger_for UgcCreativeReview-comBtn1" style="cursor:pointer;">続きを読む
+								<div class="UgcCreativeReview-arrow UgcCreativeReview-arrow-bottom"></div>
+							</label>
+							<label class="UgcCreativeReview-review-trigger_for UgcCreativeReview-comBtn2" style="cursor:pointer;">コメントを隠す
+								<div class="UgcCreativeReview-arrow UgcCreativeReview-arrow-top"></div>
+							</label>
+						</div>
+
+						<!-- 画像 -->
+						<div class="UgcCreativeReview-review-image_div UgcCreativeReview-review_imageBox">
+							<div>
+								<label class="UgcCreativeReview-review-popup UgcCreativeReview-review_image_link UgcCreativeReview-popupOpen" onclick="UgcCreativeReview.engage('look_image')">
+									<img class="UgcCreativeReview-review-image UgcCreativeReview-review_image" />
+								</label>
+							</div>
+						</div>
+
+						<!-- 参考になった -->
+		 				<div class="UgcCreativeReview-reviews-display_like_counts">
+							<button class="UgcCreativeReview-review-likeBtn UgcCreativeReview-btnColor UgcCreativeReview-likeBtn" type="button">
+								<span class="UgcCreativeReview-like-label UgcCreativeReview-defaultFontSize">参考になった</span>
+								<i class="UgcCreativeReview-review-likeI fas fa-thumbs-up"></i>
+								<span class="UgcCreativeReview-review-like_count UgcCreativeReview-like-count"></span>
+							</button>
+
+							<button class="UgcCreativeReview-review-badBtn UgcCreativeReview-reviews-can_bad UgcCreativeReview-btnColor UgcCreativeReview-badBtn" type="button">
+								<span class="UgcCreativeReview-like-label UgcCreativeReview-defaultFontSize">参考にならなかった</span>
+								<i class="UgcCreativeReview-review-badI fas fa-thumbs-up"></i>
+								<span class="UgcCreativeReview-review-bad_count UgcCreativeReview-bad-count"></span>
+							</button>
+						</div>
+
+						<!-- サイトからの返信 -->
+						<div style="text-align:left;" class="UgcCreativeReview-review-has_reply">
+							<div class="UgcCreativeReview-replyBtn UgcCreativeReview-defaultFontSize UgcCreativeReview-textColor">サイトからの返信</div>
+							<div class="UgcCreativeReview-reply_balloon UgcCreativeReview-replyBalloon UgcCreativeReview-defaultFontSize">
+								<div class="UgcCreativeReview-replyBalloonInner">
+									<svg class="UgcCreativeReview-reviews-main_color_fill" style="display: inline;margin-right: 10px;" version="1.1"x="0px" y="0px" width="30px" height="30px" viewBox="0 0 514.252 514.166" enable-background="new 0 0 514.252 514.166" xml:space="preserve">
+										<path d="M257.6,104c-53,0-96,43-96,96s43,96,96,96s96-43,96-96S310.6,104,257.6,104z M257.6,248c-26.5,0-48-21.5-48-48
+											s21.5-48,48-48s48,21.5,48,48S284.1,248,257.6,248z M257.6,8c-137,0-248,111-248,248s111,248,248,248s248-111,248-248
+											S394.6,8,257.6,8z M257.6,456c-49.701,0-95.1-18.301-130.1-48.4c14.899-23,40.399-38.6,69.6-39.5c20.799,6.4,40.6,9.6,60.5,9.6
+											s39.699-3.1,60.5-9.6c29.199,1,54.699,16.5,69.6,39.5C352.7,437.699,307.299,456,257.6,456z M420.299,371.9
+											c-24.4-31.4-62.1-51.9-105.1-51.9c-10.199,0-26,9.6-57.6,9.6c-31.5,0-47.4-9.6-57.6-9.6c-42.9,0-80.601,20.5-105.101,51.9
+											C71.5,339.199,57.6,299.199,57.6,256c0-110.3,89.699-200,200-200c110.299,0,200,89.7,200,200
+											C457.6,299.199,443.7,339.199,420.299,371.9z"/>
+									</svg>
+									<span class="UgcCreativeReview-review-reply_company UgcCreativeReview-defaultFontSize" style="vertical-align: 3px;"></span>
+								</div>
+							</div>
+						</div>
+
+						<!-- 時間 -->
+						<div class="UgcCreativeReview-review-date" style="color: #aaa;font-size: 12px;margin-top:.5em;"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="UgcCreativeReview-swiper-scrollbar swiper-scrollbar"></div>
+	</div>
+
+	<!-- 横１のとき -->
+	<div id="UgcCreativeReviewArea-commentSwiper2" class="UgcCreativeReviewArea-swiper swiper" style="display:none">
+		<div class="UgcCreativeReview-review_parent UgcCreativeReview-swiper-wrapper swiper-wrapper">
+			<div id="UgcCreativeReview-review-base" class="UgcCreativeReview-commentBackground UgcCreativeReview-swiper-slide swiper-slide">
+				<div class="UgcCreativeReview-swiper-overflow">
+					<div class="UgcCreativeReviewArea-commentArea">
+						<div class="UgcCreativeReview-review-id" style="display:none"></div>
+						<!-- レビュー者名 -->
+						<div class="UgcCreativeReviewArea-singleUser">
+							<div style="display:flex; align-items:center">
+								<div class="UgcCreativeReviewArea-userIcon">
+									<svg class="UgcCreativeReview-reviews-main_color_fill" version="1.1"x="0px" y="0px" width="32px" height="32px" viewBox="0 0 514.252 514.166" enable-background="new 0 0 514.252 514.166" xml:space="preserve">
+										<path d="M257.6,104c-53,0-96,43-96,96s43,96,96,96s96-43,96-96S310.6,104,257.6,104z M257.6,248c-26.5,0-48-21.5-48-48
+											s21.5-48,48-48s48,21.5,48,48S284.1,248,257.6,248z M257.6,8c-137,0-248,111-248,248s111,248,248,248s248-111,248-248
+											S394.6,8,257.6,8z M257.6,456c-49.701,0-95.1-18.301-130.1-48.4c14.899-23,40.399-38.6,69.6-39.5c20.799,6.4,40.6,9.6,60.5,9.6
+											s39.699-3.1,60.5-9.6c29.199,1,54.699,16.5,69.6,39.5C352.7,437.699,307.299,456,257.6,456z M420.299,371.9
+											c-24.4-31.4-62.1-51.9-105.1-51.9c-10.199,0-26,9.6-57.6,9.6c-31.5,0-47.4-9.6-57.6-9.6c-42.9,0-80.601,20.5-105.101,51.9
+											C71.5,339.199,57.6,299.199,57.6,256c0-110.3,89.699-200,200-200c110.299,0,200,89.7,200,200
+											C457.6,299.199,443.7,339.199,420.299,371.9z"/>
+									</svg>
+								</div>
+								<span class="UgcCreativeReview-textColor" style="vertical-align: 6px;font-size:13px;">
+									<div class="UgcCreativeReview-name-box">
+										<span class="UgcCreativeReview-review-name"></span>
+										<span class="UgcCreativeReview-review-is_confirm UgcCreativeReview-badgeWrapper UgcCreativeReview-borderColor UgcCreativeReview-is_confirm">
+											<i class="UgcCreativeReview-reviews-main_color fas fa-check-circle" style="margin-right: 5px;color:red"></i>購入確認済み
+										</span>
+									</div>
+									<span class="UgcCreativeReviewArea-display_profile_select" style="font-size: 12px;border-radius: 5px;display: inline-block;">
+										<span class="UgcCreativeReview-review-gender_age"></span>
+										<span class="UgcCreativeReview-review-profile1"></span>
+										<span class="UgcCreativeReview-review-profile2"></span>
+										<span class="UgcCreativeReview-review-profile3"></span>
+										<span class="UgcCreativeReview-review-profile4"></span>
+										<span class="UgcCreativeReview-review-profile5"></span>
+									</span>
+								</span>
+							</div>
+
+							<div class="UgcCreativeReview-review-date UgcCreativeReview-reviewDate UgcCreativeReview-textColor" style="font-size: 12px;"></div>
+						</div>
+
+						<!-- ★★★★★ -->
+						<div class="UgcCreativeReview-reviews-display_star_rate UgcCreativeReview-reviewStar">
+							<span></span><span></span><span></span><span></span><span></span>
+						</div>
+
+						<!-- 項目別評価 -->
+						<table class="UgcCreativeReview-reviews-display_item_rating">
+							<tbody>
+								<tr class="UgcCreativeReview-reviews-rating_item_1 UgcCreativeReview-review-rating_item_1">
+									<td class="UgcCreativeReview-reviews-rating_item_1_name UgcCreativeReview-textColor UgcCreativeReview-defaultFontSize" style="font-weight:bold;line-height: 14px;word-break: break-all;"></td>
+									<td class="UgcCreativeReview-review-rating_item_1_star UgcCreativeReview-evaluation" style="flex-direction: initial;vertical-align: middle;padding-left:10px;">
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+									</td>
+								</tr>
+								<tr class="UgcCreativeReview-reviews-rating_item_2 UgcCreativeReview-review-rating_item_2">
+									<td class="UgcCreativeReview-reviews-rating_item_2_name UgcCreativeReview-textColor UgcCreativeReview-defaultFontSize" style="font-weight:bold;line-height: 14px;word-break: break-all;"></td>
+									<td class="UgcCreativeReview-review-rating_item_2_star UgcCreativeReview-evaluation" style="flex-direction: initial;vertical-align: middle;padding-left:10px;">
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+									</td>
+								</tr>
+								<tr class="UgcCreativeReview-reviews-rating_item_3 UgcCreativeReview-review-rating_item_3">
+									<td class="UgcCreativeReview-reviews-rating_item_3_name UgcCreativeReview-textColor UgcCreativeReview-defaultFontSize" style="font-weight:bold;line-height: 14px;word-break: break-all;"></td>
+									<td class="UgcCreativeReview-review-rating_item_3_star UgcCreativeReview-evaluation" style="flex-direction: initial;vertical-align: middle;padding-left:10px;">
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+									</td>
+								</tr>
+								<tr class="UgcCreativeReview-reviews-rating_item_4 UgcCreativeReview-review-rating_item_4" style="display:none">
+									<td class="UgcCreativeReview-reviews-rating_item_4_name UgcCreativeReview-textColor UgcCreativeReview-defaultFontSize" style="font-weight:bold;line-height: 14px;word-break: break-all;"></td>
+									<td class="UgcCreativeReview-review-rating_item_4_star UgcCreativeReview-evaluation" style="flex-direction: initial;vertical-align: middle;padding-left:10px;">
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+									</td>
+								</tr>
+								<tr class="UgcCreativeReview-reviews-rating_item_5 UgcCreativeReview-review-rating_item_5" style="display:none">
+									<td class="UgcCreativeReview-reviews-rating_item_5_name UgcCreativeReview-textColor UgcCreativeReview-defaultFontSize" style="font-weight:bold;line-height: 14px;word-break: break-all;"></td>
+									<td class="UgcCreativeReview-review-rating_item_5_star UgcCreativeReview-evaluation" style="flex-direction: initial;vertical-align: middle;padding-left:10px;">
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+										<span style="height:20px;"></span>
+									</td>
+								</tr>
+								<tr>
+									<td></td>
+									<td class="UgcCreativeReview-reviews-rating_item_4">
+										<span class="UgcCreativeReview-review-show_all_rating_item UgcCreativeReview-textColor" style="cursor:pointer;font-size:10px;padding-left:10px;" onclick="UgcCreativeReview.show_all_rating_item(this)">続きを見る</span>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+						<div style="display:flex">
+							<!-- 画像 -->
+							<div class="UgcCreativeReview-review-image_div UgcCreativeReview-ImageWrapperOnly">
+								<label class="UgcCreativeReview-review-popup UgcCreativeReview-review_image_link UgcCreativeReview-popupOpen" for="UgcCreativeReview-popUp" onclick="UgcCreativeReview.engage('look_image')">
+									<img class="UgcCreativeReview-review-image UgcCreativeReview-review_image" style="width:100px !important;height:100px !important;"/>
+								</label>
+							</div>
+
+							<!-- レビュー本文 -->
+							<div style="flex:1;text-align: right;margin-top: 8px;">
+								<div class="UgcCreativeReview-review-title UgcCreativeReview-textColor UgcCreativeReview-defaultFontSize" style="font-size:13px;font-weight: bold;text-align:left;"></div>
+								<input class="UgcCreativeReview-review-trigger_id UgcCreativeReview-gradTrigger" type="checkbox" />
+								<div class="UgcCreativeReview-reviews-description_background UgcCreativeReview-gradItem UgcCreativeReview-defaultFontSize">
+									<div class="UgcCreativeReview-review-review UgcCreativeReview-gradItemInner UgcCreativeReview-defaultFontSize" style="text-align:left;"></div>
+								</div>
+								<div class="UgcCreativeReview-gradBtnWrap UgcCreativeReview-defaultFontSize UgcCreativeReview-textColor" style="text-align:left;">
+									<label class="UgcCreativeReview-review-trigger_for UgcCreativeReview-comBtn1" style="cursor:pointer;">続きを読む
+										<div class="UgcCreativeReview-arrow UgcCreativeReview-arrow-bottom"></div>
+									</label>
+									<label class="UgcCreativeReview-review-trigger_for UgcCreativeReview-comBtn2" style="cursor:pointer;">コメントを隠す
+										<div class="UgcCreativeReview-arrow UgcCreativeReview-arrow-top"></div>
+									</label>
+								</div>
+
+								<!-- 参考になった -->
+								<div style="margin-top: 10px;text-align: left;" class="UgcCreativeReview-reviews-display_like_counts">
+									<button class="UgcCreativeReview-review-likeBtn UgcCreativeReview-btnColor UgcCreativeReview-likeBtn" type="button">
+										<span class="UgcCreativeReview-like-label UgcCreativeReview-defaultFontSize">参考になった</span>
+										<i class="UgcCreativeReview-review-likeI fas fa-thumbs-up"></i>
+										<span class="UgcCreativeReview-review-like_count UgcCreativeReview-like-count"></span>
+									</button>
+
+									<button class="UgcCreativeReview-review-badBtn UgcCreativeReview-btnColor UgcCreativeReview-badBtn UgcCreativeReview-can_bad" type="button">
+										<span class="UgcCreativeReview-like-label UgcCreativeReview-defaultFontSize">参考にならなかった</span>
+										<i class="UgcCreativeReview-review-badI fas fa-thumbs-down"></i>
+										<span class="UgcCreativeReview-review-bad_count UgcCreativeReview-bad-count"></span>
+									</button>
+								</div>
+
+								<!-- サイトからの返信 -->
+								<div style="text-align:left;" class="UgcCreativeReview-review-has_reply">
+									<div class="UgcCreativeReview-replyBtn UgcCreativeReview-defaultFontSize UgcCreativeReview-textColor">サイトからの返信</div>
+									<div class="UgcCreativeReview-reply_balloon UgcCreativeReview-reply UgcCreativeReview-replyBalloon UgcCreativeReview-defaultFontSize">
+										<div class="UgcCreativeReview-replyBalloonInner">
+											<svg class="UgcCreativeReview-reviews-main_color_fill" style="display: inline;margin-right: 10px;" version="1.1"x="0px" y="0px" width="30px" height="30px" viewBox="0 0 514.252 514.166" enable-background="new 0 0 514.252 514.166">
+												<path d="M257.6,104c-53,0-96,43-96,96s43,96,96,96s96-43,96-96S310.6,104,257.6,104z M257.6,248c-26.5,0-48-21.5-48-48
+													s21.5-48,48-48s48,21.5,48,48S284.1,248,257.6,248z M257.6,8c-137,0-248,111-248,248s111,248,248,248s248-111,248-248
+													S394.6,8,257.6,8z M257.6,456c-49.701,0-95.1-18.301-130.1-48.4c14.899-23,40.399-38.6,69.6-39.5c20.799,6.4,40.6,9.6,60.5,9.6
+													s39.699-3.1,60.5-9.6c29.199,1,54.699,16.5,69.6,39.5C352.7,437.699,307.299,456,257.6,456z M420.299,371.9
+													c-24.4-31.4-62.1-51.9-105.1-51.9c-10.199,0-26,9.6-57.6,9.6c-31.5,0-47.4-9.6-57.6-9.6c-42.9,0-80.601,20.5-105.101,51.9
+													C71.5,339.199,57.6,299.199,57.6,256c0-110.3,89.699-200,200-200c110.299,0,200,89.7,200,200
+													C457.6,299.199,443.7,339.199,420.299,371.9z"/>
+											</svg>
+											<span class="UgcCreativeReview-review-reply_company  UgcCreativeReview-defaultFontSize" style="vertical-align: 3px;"></span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="UgcCreativeReview-reviews-display_more" style="text-align: center">
+		<div id="UgcCreativeReview-moreReviewBtn" class="UgcCreativeReviewAreaBtn UgcCreativeReview-buttonWidth" onclick="UgcCreativeReview.push_more_button()"></div>
+	</div>
+	<div id="UgcCreativeReview-popup_parent">
+		<div>
+			<input type="checkbox" class="UgcCreativeReview-popup-checkbox UgcCreativeReview-popup" />
+			<div class="UgcCreativeReview-overlay">
+				<div class="UgcCreativeReview-window">
+					<p class="UgcCreativeReview-popupContent">
+						<label class="UgcCreativeReview-popup-close UgcCreativeReview-popupImageClose">
+							<i class="fas fa-times UgcCreativeReview-popupImageCloseInner"></i>
+						</label>
+						<img class="UgcCreativeReview-popup-image UgcCreativeReview-popupImage" />
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="UgcCreativeReview-reviews-swiper_btn UgcCreativeReview-swiper-button-common UgcCreativeReview-swiper-button-prev" style="display:none"></div>
+	<div class="UgcCreativeReview-reviews-swiper_btn UgcCreativeReview-swiper-button-common UgcCreativeReview-swiper-button-next" style="display:none"></div>
+	<div class="UgcCreativeReview-reviews-amazon_btn UgcCreativeReview-swiper-button-common-amazon UgcCreativeReview-swiper-button-prev-amazon" onclick="UgcCreativeReview.click_slider_arrow()" style="display:none">前へ</div>
+	<div class="UgcCreativeReview-reviews-amazon_btn UgcCreativeReview-swiper-button-common-amazon UgcCreativeReview-swiper-button-next-amazon" onclick="UgcCreativeReview.click_slider_arrow()" style="display:none">次へ</div>
+
+	<div id="UgcCreativeReview-reviews-nothing" style="margin-top: .5em"></div>
+
+</div>
+<!-- コメント表示エリア -->
+<div id="UgcCreativeReview-bottom-comment" class="UgcCreativeReview-bottom-comment" style="margin-top: 30px; font-size: 12px; display: none;"></div>
+<div class="UgcCreativeReview-show" style="text-align:right;font-size: 10px;margin-top: 10px;display: none;"><span css="transform: scale(0.8);">Powered by</span>
+	<a id="UgcCreativeReview-app_url" href="" target="_blank" rel="nofollow">
+		<img id="UgcCreativeReview-logo_img" src="" alt="ロゴ" style="height: 10px;width:auto;" />
+	</a>
+</div>
+
+
+<!-- レビュー全体の幅 -->
+<style>
+	div#UgcCreativeReviewArea {
+		width: 90%;
+		max-width: 899px;
+		margin: 0 auto;
+	}
+	@media (max-width: 480px){
+		div#UgcCreativeReviewArea {
+			width: 78%;
+		}
+	}
+</style>
+
+
+<style id="UgcCreativeReview-custom_css">
+</style>
+
+<!-- 共通CSS -->
+<style id="UgcCreativeReview-css-common">
+	.UgcCreativeReview-commentBackground{
+		background: %background_color%;
+		border-radius: 10px;
+		overflow: hidden;
+	}
+	.UgcCreativeReview-mainColor{
+		color: %main_color% !important;
+	}
+	.UgcCreativeReview-borderColor{
+		border-color: %main_color% !important;
+	}
+	.UgcCreativeReview-btnColor, #UgcCreativeReview-moreReviewBtn{
+		color: %main_color% !important;
+		border-color: %main_color% !important;
+	}
+	.UgcCreativeReview-btnSelectColor{
+		color: #fff !important;
+		background: %main_color% !important;
+	}
+	.UgcCreativeReview-textColor{
+		color: %text_color% !important;
+	}
+	.UgcCreativeReview-bgColor{
+		background: %main_color% !important;
+		border: 1px solid %main_color% !important;
+	}
+	.UgcCreativeReview-select:focus {
+		outline-color: %main_color%;
+	}
+	.UgcCreativeReview-arrow{
+		border-bottom: 1px solid %text_color%;
+		border-right: 1px solid %text_color%;
+	}
+	.UgcCreativeReview-TagSelect{
+		background: %main_color% !important;
+		border-color: %main_color% !important;
+	}
+	.UgcCreativeReview-swiper-slide{
+		max-height: 460px;
+		position: relative;
+		box-sizing: border-box;
+	}
+	.UgcCreativeReview-swiper-overflow{
+		overflow-y: auto;
+		height: 100%;
+		padding: 10px 8px 10px 14px;
+		box-sizing: inherit;
+	}
+	@media (max-width:480px) {
+		.UgcCreativeReview-swiper-overflow{
+			padding: 10px 14px 10px 14px;
+		}
+	}
+</style>
+
+<!-- スライダーCSS -->
+<link id="UgcCreativeReview-css-slider_link" rel="stylesheet" href="https://r2.ugc-creative.work/pkg/swiper-bundle.min.css"/>
+<style id="UgcCreativeReview-css-slider">
+	.UgcCreativeReviewArea-swiper{
+		height: fit-content;
+		padding-bottom: 60px;
+	}
+	.UgcCreativeReview-swiper-slide{
+		height: initial !important;
+	}
+	.UgcCreativeReview-swiper-button-common:after {
+		color: %main_color%;
+	}
+	.swiper-scrollbar-drag{
+		background: %main_color%;
+	}
+	.swiper-pagination-bullet {
+		--swiper-pagination-bullet-width: 40px;
+		--swiper-pagination-bullet-height: 30px;
+		color: white;
+		border-radius: 0%;
+	}
+	.swiper-pagination-bullet-active {
+		background: %main_color%;
+	}
+	.UgcCreativeReview-swiper-scrollbar{
+		bottom: 40px !important;
+	}
+	.UgcCreativeReview-swiper-pagination{
+		bottom: 0px !important;
+	}
+	@media (min-width:480px) {
+		.UgcCreativeReview-swiper-button-next{
+			right: -50px !important;
+		}
+		.UgcCreativeReview-swiper-button-prev{
+			left: -50px !important;
+		}
+	}
+	@media (max-width:480px) {
+		.UgcCreativeReview-swiper-button-next{
+			right: -20px !important;
+		}
+		.UgcCreativeReview-swiper-button-prev{
+			left: -20px !important;
+		}
+	}
+</style>
+
+
+<!-- 一覧表示CSS -->
+<style id="UgcCreativeReview-css-link">
+	.UgcCreativeReview-swiper-wrapper{
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+		margin-bottom: 15px;
+	}
+
+	@media (max-width:480px) {
+		.UgcCreativeReview-swiper-slide{
+			width: %swiper_width_sd%;
+		}
+	}
+	@media (min-width:480px) {
+		.UgcCreativeReview-swiper-slide{
+			width: %swiper_width_pc%;
+		}
+	}
+</style>
