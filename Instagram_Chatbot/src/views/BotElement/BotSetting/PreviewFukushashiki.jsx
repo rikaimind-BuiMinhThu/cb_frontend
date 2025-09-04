@@ -4401,7 +4401,7 @@ const PreviewFukushashiki = () => {
             <div className="sp-header-left-avatar sp-avatar">
               <img
                 src={
-                  state.botInfor?.icon?.url && EC_CHATBOT_URL + "" + state.botInfor?.icon?.url
+                  `${EC_CHATBOT_URL}${state.botInfor?.message_icon?.url || state.botInfor?.icon?.url }`
                 }
               />
             </div>
