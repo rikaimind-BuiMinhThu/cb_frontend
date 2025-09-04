@@ -2122,3 +2122,62 @@ input#ss-message__content--user-checkbox--checkbox_img {
   justify-content: flex-start;
   gap: 10px;
 }
+
+.submit-button-config_holder {
+  width: 100%;
+}
+
+.style-submit-button_holder {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  padding: 15px 0;
+}
+
+#label-submit-button-style {
+  color: #000;
+  padding-left: 35px;
+}
+
+#submit-button-style {
+  width: 100%;
+  height: 150px;
+  border-radius: 5px;
+  border: 1px solid grey;
+  padding: 10px;
+}
+
+.loading-submit-button-config_holder {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.with-preview {
+  width: 100%;
+}
+
+.with-preview textarea {
+  border-radius: 5px;
+  min-height: 150px;
+  padding: 10px;
+  width: 100%;
+}
+
+.subtitle {
+  display: flex;
+  gap: 5px;
+  width: 100%;
+}
+
+.subtitle p {
+  margin: 0;
+  font-size: .7rem;
+  font-style: italic;
+  color: gray;
+}
