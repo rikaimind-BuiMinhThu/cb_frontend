@@ -850,6 +850,7 @@ const UserMessage = ({
                           )
                         }
                         value={textInput[textInput.type]?.value}
+                        inputMode="numeric"
                       ></InputCustom>
                     ) : (
                       <div
