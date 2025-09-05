@@ -115,6 +115,7 @@ const previewInitialState = {
   towns: "",
   zipcode: "",
   zipcodeContentIndex: "",
+  zipcodeIndex: -1,
   buttonTypePc: "1",
   positionPc: "1",
   widthPc: 450,
@@ -3798,6 +3799,7 @@ const PreviewFukushashiki = () => {
     const msgIndex = state.messagesList.findIndex((msg) => msg.id === message.id);
     if (newState.messagesList.length == 0) return;
     let messageContentTypeData = newState.messagesList[msgIndex].message_content[indexContent][contentType];
+    if (!messageContentTypeData) return;
 
     if (name) {
       messageContentTypeData[field] = messageContentTypeData[field] || {};
@@ -4015,12 +4017,13 @@ const PreviewFukushashiki = () => {
     }
   };
 
-  const isPopUpZipCode = (isOpen, indexContent) => {
+  const isPopUpZipCode = (isOpen, indexContent, indexMessage) => {
     let newState = {};
 
     if (indexContent !== undefined) {
       newState.zipcodeContentIndex = indexContent;
     }
+    newState.zipcodeIndex = indexMessage;
 
     if (isOpen) {
       changeElementAttributeById([
@@ -4029,7 +4032,7 @@ const PreviewFukushashiki = () => {
       ]);
 
       newState = {
-        ...state,
+        ...newState,
         prefectures: null,
         cities: null,
         towns: null,
@@ -4186,7 +4189,7 @@ const PreviewFukushashiki = () => {
             }}
             prefecturesList={[...state.prefecturesList]}
             isPopUpZipCode={(isOpen, indexContent) =>
-              isPopUpZipCode(isOpen, indexContent)
+              isPopUpZipCode(isOpen, indexContent, indexMessage)
             }
             isPopUpZipCodeShippingAddress={(isOpen, indexContent) =>
               isPopUpZipCodeShippingAddress(isOpen, indexContent)
@@ -4384,7 +4387,7 @@ const PreviewFukushashiki = () => {
         <ZipCodePopUp
           isPopUpZipCode={isPopUpZipCode}
           prefecturesList={state.prefecturesList}
-          message={state.messagesList[state.currentMsgIndex]}
+          message={state.messagesList[state.zipcodeIndex]}
           messageIndex={state.currentMsgIndex}
           zipcodeContentIndex={state.zipcodeContentIndex}
           onChangeValue={onChangeValue}
