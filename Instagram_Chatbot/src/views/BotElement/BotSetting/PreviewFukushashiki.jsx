@@ -354,6 +354,45 @@ const PreviewFukushashiki = () => {
       });
   }, [state.botId, state.loadedStateFromSession, state.displayType]);
 
+  const computeMessageIndices = (newState, clickedMsgIndex) => {
+    const { currentUserMsg, nextRenderMsg} = {
+      currentUserMsg: { index: -1, take: true }, 
+      nextRenderMsg: { index: -1, take: true }
+    };
+
+    if (!newState.isUsedPastMessageLoaded) {
+      newState.currentUserMsgIndex = newState.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex));
+      return newState;
+    }
+
+    for (let index = clickedMsgIndex + 1; index < newState.messagesList.length; index++) {
+      const item = newState.messagesList[index];
+      if (!item.hidden && isUserMessage(item)) {
+        if (currentUserMsg.take) {
+          currentUserMsg.index = index; 
+          currentUserMsg.take = false;
+        }
+
+        if (!item.isSubmitted && nextRenderMsg.take) {
+          nextRenderMsg.index = index;
+          nextRenderMsg.take = false;
+        }
+      }
+
+      if (!currentUserMsg.take && !nextRenderMsg.take) {
+        break;
+      }
+    }
+    newState.currentUserMsgIndex = currentUserMsg.index;
+    newState.lastMsgIndex = Math.max(
+      nextRenderMsg.index < 0 
+        ? newState.lastMsgIndex || -1 
+        : nextRenderMsg.index, 
+      newState.currentUserMsgIndex
+    )
+    return newState;
+  } 
+
   const eventHandler = async (event) => {
     if (!event.data || !event.data.actionData) return;
     const actionData = event.data.actionData;
@@ -1200,6 +1239,7 @@ const PreviewFukushashiki = () => {
       isUsedErrMsgByJs: res.data?.chatbot?.is_used_err_msg_by_js,
       errMsgJsCode: res.data?.chatbot?.err_msg_js_code,
       useNewProcess: res.data?.chatbot?.client_cart_system === CART_SYSTEM.EC_FORCE,
+      isUsedPastMessageLoaded: !!res.data?.chatbot?.is_used_message_loaded_past,
       isProcessing: false,
     };
 
@@ -3671,6 +3711,7 @@ const PreviewFukushashiki = () => {
     if (clickedMsgIndex < 0) clickedMsgIndex = newState.currentMsgIndex;
     newState.userMessagesList = newState.messagesList.filter((item) => isUserMessage(item));
     const clickedMsg = newState.messagesList[clickedMsgIndex];
+    clickedMsg.isSubmitted = true;
 
     newState.errors = {};
 
@@ -3769,7 +3810,7 @@ const PreviewFukushashiki = () => {
       }
     }
 
-    newState.currentUserMsgIndex = newState.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex));
+    computeMessageIndices(newState, clickedMsgIndex)
 
     if (
       newState.currentUserMsgIndex === -1 &&
@@ -3781,7 +3822,7 @@ const PreviewFukushashiki = () => {
     if (newState.currentUserMsgIndex === -1)
       newState.currentMsgIndex = newState.messagesList.length - 1;
     else
-      newState.currentMsgIndex = newState.currentUserMsgIndex;
+      newState.currentMsgIndex = newState.isUsedPastMessageLoaded ? newState.lastMsgIndex : newState.currentUserMsgIndex;
 
     await handleRenderMessageAfterClickNext(newState, clickedMsgIndex, isBtnUpdateClick);
   };
