@@ -97,16 +97,16 @@ const ZipCodePopUp = ({
 
   const onSelectZipcode = () => {
     let index = zipcodeContentIndex; 
-    if (!zipcodeContentIndex) {
+    if (!zipcodeContentIndex && zipcodeContentIndex !== 0) {
       index = message.message_content
         .findIndex((item) => item.type === "zip_code_address");
     }
 
-      if (state.selectedZipcode) {
-        changeElementAttributeById([
-          { id: "sp-withdrawal-container", style: { display: "none" }},
-          { id: "sp-popup-zip-code-address", style: { display: "none" }}
-        ]);
+    if (state.selectedZipcode) {
+      changeElementAttributeById([
+        { id: "sp-withdrawal-container", style: { display: "none" }},
+        { id: "sp-popup-zip-code-address", style: { display: "none" }}
+      ]);
 
       let newErrors = { ...errors };
       newErrors[`message${messageIndex}_content${index}_zip_code_address`] = "";
