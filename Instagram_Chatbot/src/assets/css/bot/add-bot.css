@@ -169,6 +169,36 @@
   cursor: pointer;
 }
 
+.remove-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background-color: #ffa1a1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+}
+
+.remove-icon:hover {
+  background-color: #fc9393;
+}
+
+.remove-icon > span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-color: white;
+  font-size: 44px;
+  color: #ff5b5b;
+  cursor: pointer;
+  transform: rotate(45deg);
+}
+
 /* image show */
 .image-show {
   display: flex;
@@ -190,7 +220,19 @@
 }
 
 /* bot image */
-#bot_image {
+#bot_image, .input_select_file {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.input_remove_file {
   position: absolute;
   top: 0;
   left: 0;
