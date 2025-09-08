@@ -11,8 +11,7 @@ const DesignBotIcons = ({
   onOpeningBotIconRemove,
   onClosingBotIconRemove,
   images = [],
-  onIconClick,
-  onAddIcon
+  onIconClick
 }) => {
   return (
     <div className="icon_holder">
@@ -48,7 +47,7 @@ const DesignBotIcons = ({
                 </div>
               ))}
             </div>
-            <div className="add-icon" onClick={() => onAddIcon && onAddIcon('bot')}>
+            <div className="add-icon">
               <span>+</span>
               <input
                 type="file"
@@ -95,7 +94,7 @@ const DesignBotIcons = ({
                 </div>
               ))}
             </div>
-            <div className="add-icon" onClick={() => onAddIcon && onAddIcon('opening')}>
+            <div className="add-icon">
               <span>+</span>
               <input
                 type="file"
@@ -142,7 +141,7 @@ const DesignBotIcons = ({
                 </div>
               ))}
             </div>
-            <div className="add-icon" onClick={() => onAddIcon && onAddIcon('closing')}>
+            <div className="add-icon">
               <span>+</span>
               <input
                 type="file"

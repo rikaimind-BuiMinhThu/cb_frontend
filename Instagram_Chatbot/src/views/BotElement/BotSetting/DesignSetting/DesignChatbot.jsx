@@ -140,11 +140,6 @@ function DesignChatbot() {
     }
   };
 
-  const handleAddIconForType = (type) => {
-    const inputId = type === 'bot' ? 'bot_icon' : 
-                   type === 'opening' ? 'opening_bot_icon' : 'closing_bot_icon';
-    document.getElementById(inputId).click();
-  };
 
   const setBotIcon = (type, url) => {
     const methodMap = {
@@ -775,7 +770,6 @@ function DesignChatbot() {
                                 onClosingBotIconRemove={handleRemoveImage("closing_bot_icon")}
                                 images={images}
                                 onIconClick={handleIconClickForType}
-                                onAddIcon={handleAddIconForType}
                               /> 
                             </div>
                             <div className="field-add-bot">
