@@ -354,7 +354,10 @@ const displayPopup = async () => {
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
       } else if (!e.data.isOpen && mobileCheck()) {
-        iframe.width = "250px";
+        const useMoblieFullwidth = (typeof e.data.useMoblieFullwidth === 'boolean')
+          ? e.data.useMoblieFullwidth
+          : (sessionStorage.getItem("useFullwidthChatbotMobile") === "true");
+        iframe.width = useMoblieFullwidth ? "100%" : "250px";
         iframe.height = "58px";
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
