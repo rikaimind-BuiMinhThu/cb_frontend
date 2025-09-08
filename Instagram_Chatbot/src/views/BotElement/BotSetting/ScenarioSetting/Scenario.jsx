@@ -896,6 +896,7 @@ const Scenario = () => {
 
   const [dataCondition, setDataCondition] = useState([]);
   const [isUsedMessageLoadedPast, setIsUsedMessageLoadedPast] = useState(false);
+  const [useFullwidthChatbotMobile, setUseFullwidthChatbotMobile] = useState(false);
 
   // const client = JSON.parse(sessionStorage.getItem('client'));
   const client = JSON.parse(sessionStorage.getItem('client'));
@@ -983,6 +984,7 @@ const Scenario = () => {
       setIsUseErrMsgByJs(res.data.data?.is_used_err_msg_by_js || false);
       setErrMsgJsCode(res.data.data?.err_msg_js_code || '');
       setIsUsedMessageLoadedPast(res.data.data?.is_used_message_loaded_past || false);
+      setUseFullwidthChatbotMobile(res.data.data?.use_fullwidth_chatbot_mobile || false);
       const timerConfig = {
         isOpen: false,
         enable: false,
@@ -2650,6 +2652,7 @@ const Scenario = () => {
       is_used_err_msg_by_js: isUseErrMsgByJs,
       err_msg_js_code: errMsgJsCode,
       is_used_message_loaded_past: isUsedMessageLoadedPast,
+      use_fullwidth_chatbot_mobile: useFullwidthChatbotMobile,
     }
     api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data).then(res => {
       setIsOpenNoti(true);
@@ -2710,6 +2713,7 @@ const Scenario = () => {
       is_used_err_msg_by_js: isUseErrMsgByJs,
       err_msg_js_code: errMsgJsCode,
       is_used_message_loaded_past: isUsedMessageLoadedPast,
+      use_fullwidth_chatbot_mobile: useFullwidthChatbotMobile,
     }
     try {
       const res = await api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data);
@@ -3233,6 +3237,15 @@ const Scenario = () => {
                       checked={isUsedMessageLoadedPast}
                     />
                     <label>過去メッセージを読み込む</label>
+                  </div>
+                  <div>
+                    <input
+                      type="checkbox"
+                      className="ss-user-setting-checkbox-custom"
+                      onChange={() => setUseFullwidthChatbotMobile(!useFullwidthChatbotMobile)}
+                      checked={useFullwidthChatbotMobile}
+                    />
+                    <label>モバイル全画面チャット</label>
                   </div>
                   {/* Overview scenario */}
                   <div style={{ height:`calc(80% - ${errorScenarioName ? '30':'10'}px)`, backgroundColor: '#f6fbff' }}>

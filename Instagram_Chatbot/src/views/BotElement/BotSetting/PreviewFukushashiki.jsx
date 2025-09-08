@@ -1241,6 +1241,7 @@ const PreviewFukushashiki = () => {
       useNewProcess: res.data?.chatbot?.client_cart_system === CART_SYSTEM.EC_FORCE,
       isUsedPastMessageLoaded: !!res.data?.chatbot?.is_used_message_loaded_past,
       isProcessing: false,
+      useFullWidthChatbotMobile: !!res.data?.chatbot?.use_fullwidth_chatbot_mobile,
     };
 
     if (newState.isUsedErrMsgByJs && newState.errMsgJsCode) {
@@ -3406,6 +3407,7 @@ const PreviewFukushashiki = () => {
     const defaultOptions = {
       isOpen: state.isOpen,
       source: 'ec-chatbot',
+      useMoblieFullwidth: !!state.useFullWidthChatbotMobile,
       // widthPc: state.widthPc,
       // heightPc: state.heightPc,
       // widthSp: state.widthSp,
@@ -4653,9 +4655,10 @@ const PreviewFukushashiki = () => {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
+        className={state.useFullWidthChatbotMobile ? "fullwidth_mobile_chatbot" : ""}
         style={{
           backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
-          width: 'calc(100vw - 20px)',
+          width: state.useFullWidthChatbotMobile ? "calc(100vw - 20px)" : "240px",
           height: "48px",
           borderRadius: '35px',
           display: "flex",
