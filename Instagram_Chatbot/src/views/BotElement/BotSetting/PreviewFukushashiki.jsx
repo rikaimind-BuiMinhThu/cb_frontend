@@ -4659,7 +4659,7 @@ const PreviewFukushashiki = () => {
         style={{
           backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
           width: state.useFullWidthChatbotMobile ? "calc(100vw - 20px)" : "240px",
-          height: "48px",
+          height: state.useFullWidthChatbotMobile ? "70px" : "48px",
           borderRadius: '35px',
           display: "flex",
           justifyContent: "left",
@@ -4669,7 +4669,7 @@ const PreviewFukushashiki = () => {
         }}
       >
         <div className="sp-header-left" onClick={() => onOpenPreview(!state.isOpen)} style={{ width: '100%', padding: '4px' }}>
-          <div className="sp-header-left-avatar sp-avatar" style={{ width: '38px' }}>
+          <div className={state.useFullWidthChatbotMobile ? "fullwidth_mobile_chatbot sp-header-left-avatar sp-avatar" :"sp-header-left-avatar sp-avatar"} style={{ width: state.useFullWidthChatbotMobile ? "50px"  :'38px' }}>
             <img
               src={
                 state.botInfor?.icon?.url && EC_CHATBOT_URL + "" + state.botInfor?.icon?.url
@@ -4679,7 +4679,7 @@ const PreviewFukushashiki = () => {
           </div>
           <div>
             <div id="comment_bubble" className="sp-bubble">
-              <span style={{ fontSize: '14px', fontWeight: 700 }}>{state.botInfor.title}</span>
+              <span style={{ fontSize: state.useFullWidthChatbotMobile ? "17px" :'14px', fontWeight: 700 }}>{state.botInfor.title}</span>
             </div>
           </div>
           <div className="sp-header-right-arrow" style={{ marginLeft: 'auto' }}>
