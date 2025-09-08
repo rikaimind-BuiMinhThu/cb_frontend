@@ -93,22 +93,3 @@
   width: 100%;
   z-index: 0;
 }
-
-.icon_holder_section:hover > .message_icon_select_config {
-  display: flex;
-}
-
-.message_icon_select_config {
-  display: none;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  background-color: rgba(255, 255, 255, .4);
-  backdrop-filter: blur(10px); 
-}

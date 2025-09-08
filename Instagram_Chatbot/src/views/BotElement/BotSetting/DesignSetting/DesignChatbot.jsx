@@ -173,18 +173,21 @@ function DesignChatbot() {
         baseString = reader.result;
         setBotIcon(iconType, baseString);
         if (baseString !== undefined || baseString !== "") {
-          document.querySelector(".error-message.bot-image").style.display =
-            "none";
+          const errorElement = document.querySelector(".error-message.bot-image");
+          if (errorElement) {
+            errorElement.style.display = "none";
+          }
         }
       };
       reader.readAsDataURL(file);
       return true;
     } else {
       setBotIcon(iconType, "");
-      document.querySelector(".error-message.bot-image").innerHTML =
-        "画像を選択してください。";
-      document.querySelector(".error-message.bot-image").style.display =
-        "block";
+      const errorElement = document.querySelector(".error-message.bot-image");
+      if (errorElement) {
+        errorElement.innerHTML = "画像を選択してください。";
+        errorElement.style.display = "block";
+      }
       return false;
     }
   };
