@@ -727,37 +727,6 @@ function DesignChatbot() {
                         <div className="bot-right">
                           <div>
                             <div className="field-add-bot">
-                              <div className="add-bot_field-container">
-                                <span className={"label-field"}>アイコン</span>
-                                <div className="icons">
-                                  {images.map((icon, index) => (
-                                    <div
-                                      key={index}
-                                      className={`icon icon-${index}`}
-                                      onClick={() => {
-                                        toDataURL(icon).then((dataUrl) => {
-                                        });
-                                        handleIconClick(index, icon);
-                                      }}
-                                    >
-                                      <img src={icon} alt="" />
-                                    </div>
-                                  ))}
-                                </div>
-                                <div className="add-icon">
-                                  <span>+</span>
-                                  <input
-                                    type="file"
-                                    id="bot_image"
-                                    onChange={getBaseUrlAdd("icon")}
-                                    name="bot_image"
-                                    accept="image/png, image/jpeg"
-                                  />
-                                </div>
-                              </div>
-                              <span className="error-message bot-image"></span>
-                            </div>
-                            <div className="field-add-bot">
                               <DesignBotIcons 
                                 botIcon={botImage}
                                 openingBotIcon={openingBotIcon}
