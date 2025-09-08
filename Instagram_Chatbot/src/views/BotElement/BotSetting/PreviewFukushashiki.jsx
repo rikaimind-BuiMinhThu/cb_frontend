@@ -4411,6 +4411,13 @@ const PreviewFukushashiki = () => {
     state.useNewProcess,
   ]);
 
+  const getBotHeaderIcon = () => {
+    if (state.isOpen) {
+      return state.botInfor?.opening_bot_icon?.url || state.botInfor?.icon?.url;
+    }
+    return state.botInfor?.closing_bot_icon?.url || state.botInfor?.icon?.url;
+  }
+
   ///body container
   if (state.scenarioId && state.botInfor && state.isOpen) {
     const { containerStyle, headerStyle, bodyStyle } = getOpeningBotStyle();
@@ -4445,11 +4452,7 @@ const PreviewFukushashiki = () => {
         >
           <div className="sp-header-left" onClick={handleCloseChatbotWhenUseWithDrawal}>
             <div className="sp-header-left-avatar sp-avatar">
-              <img
-                src={
-                  `${EC_CHATBOT_URL}${state.botInfor?.icon?.url }`
-                }
-              />
+              <img src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`} alt="bot-header-icon"/>
             </div>
             <div className="sp-header-left-label">
               <div className="sp-header-left-label-sub-title">
@@ -4550,9 +4553,8 @@ const PreviewFukushashiki = () => {
       >
         <img
           style={{ width: "96%", height: "96%", borderRadius: "30px" }}
-          src={
-            state.botInfor?.icon?.url && EC_CHATBOT_URL + "" + state.botInfor?.icon?.url
-          }
+          src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
+          alt="bot-header-icon"
         />
       </div>
     )
@@ -4579,11 +4581,7 @@ const PreviewFukushashiki = () => {
       >
         <div className="sp-header-left-bt" onClick={() => onOpenPreview(!state.isOpen)}>
           <div className="sp-header-left-avatar sp-avatar-bt">
-            <img
-              src={
-                state.botInfor?.icon?.url && EC_CHATBOT_URL + "" + state.botInfor?.icon?.url
-              }
-            />
+            <img src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`} alt="bot-header-icon" />
           </div>
         </div>
         <div style={{ alignItems: 'center', justifyContent: "center", padding: 'auto' }}>
@@ -4615,11 +4613,7 @@ const PreviewFukushashiki = () => {
       >
         <div className="sp-header-left" onClick={() => onOpenPreview(!state.isOpen)}>
           <div className="sp-header-left-avatar sp-avatar">
-            <img
-              src={
-                state.botInfor?.icon?.url && EC_CHATBOT_URL + "" + state.botInfor?.icon?.url
-              }
-            />PreviewComp
+            <img src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`} alt="bot-header-icon" />
           </div>
           <div className="sp-header-left-label">
             <div className="sp-header-left-label-title">{state.rightPcTitle}</div>
@@ -4645,9 +4639,8 @@ const PreviewFukushashiki = () => {
       >
         <img
           style={{ width: "96%", height: "96%", borderRadius: "30px" }}
-          src={
-            state.botInfor?.icon?.url && EC_CHATBOT_URL + "" + state.botInfor?.icon?.url
-          }
+          src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
+          alt="bot-header-icon"
         />
       </div>
     )
@@ -4671,9 +4664,8 @@ const PreviewFukushashiki = () => {
         <div className="sp-header-left" onClick={() => onOpenPreview(!state.isOpen)} style={{ width: '100%', padding: '4px' }}>
           <div className="sp-header-left-avatar sp-avatar" style={{ width: '38px' }}>
             <img
-              src={
-                state.botInfor?.icon?.url && EC_CHATBOT_URL + "" + state.botInfor?.icon?.url
-              }
+              src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
+              alt="bot-header-icon"
               alt="bot-avatar"
             />
           </div>
@@ -4708,9 +4700,8 @@ const PreviewFukushashiki = () => {
         <div className="sp-header-left" onClick={() => onOpenPreview(!state.isOpen)}>
           <div className="sp-header-left-avatar sp-avatar">
             <img
-              src={
-                state.botInfor?.icon?.url && EC_CHATBOT_URL + "" + state.botInfor?.icon?.url
-              }
+              src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
+              alt="bot-header-icon"
             />
           </div>
           <div className="sp-header-left-label">
