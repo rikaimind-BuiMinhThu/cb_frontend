@@ -174,6 +174,15 @@ const LABELS = {
     HORIZONTAL: '横並び',
     VERTICAL: '縦並び',
   },
+  SUBMIT_BUTTON: {
+    STYLE: '送信ボタンのカスタムCSSを入力してください',
+  },
+  SUBMIT_BUTTON_LOADING: {
+    LOADING_BUTTON_HTML: 'ローディングボタンHTML',
+    LOADING_BUTTON_CSS: 'ローディングボタンCSS',
+    LOADING_HTML: 'ローディングHTML',
+    LOADING_CSS: 'ローディングCSS',
+  },
 }
 
 const REGEXP = {
