@@ -518,6 +518,25 @@ const parseQuantity = (quantity = 0) => {
   }
   return (quantity || 0).toLocaleString("ja-JP"); 
 };
+
+export const isDislayingLoginForm = (message) => {
+  const loginMessageNames = ["ログイン", "Login", "login", "LOGIN"];
+  return loginMessageNames.includes(message.message_name);
+}
+
+export const isBotMessage = (message) => {
+  return message.belong_to === 'bot' && message.message_content.length > 0;
+}
+
+export const isDelayBotMessage = (message) => {
+  if (!message) return false;
+  return message.belong_to === 'bot' && message.message_content[0]?.type === "delay";
+}
+
+export const isUserMessage = (message) => {
+  return message.belong_to === 'user' && message.message_content.length > 0;
+}
+
 export {
   stringNullOrEmpty, getAllUrlParams, lightenColor,
   mobileCheck, removeLeadingZero, sendUserInteractionData,

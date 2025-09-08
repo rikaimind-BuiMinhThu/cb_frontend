@@ -1,39 +1,90 @@
-(() => {
-  const scenarioId = getUrlParameter(EC_CHATBOT_CONVERSION_PARAMS.SCENARIO_ID) || localStorage.getItem(EC_CHATBOT_STORAGE_KEYS.SCENARIO_ID);
-  const params = {
-    scenario_id: scenarioId,
-    bot_type: getUrlParameter(EC_CHATBOT_CONVERSION_PARAMS.BOT_TYPE) || localStorage.getItem(EC_CHATBOT_STORAGE_KEYS.BOT_TYPE),
-    user_input_id: getUrlParameter(EC_CHATBOT_CONVERSION_PARAMS.USER_INPUT_ID) || localStorage.getItem(EC_CHATBOT_STORAGE_KEYS.USER_INPUT_ID)
-  };
+const checkRequiredGlobals = async (callback) => {
+  const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 
-  // Gửi request lên chatbot server
-  const sendConversionData = async () => {
-    try {
-      const response = await fetch(`${getEcChatBotApiServerBaseUrl()}/api/v1/scenario_users/conversions`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(params)
+  const MAX_RETRIES = 50;
+  const REQUIRED_GLOBALS = [
+    'getUrlParameter',
+    'EC_CHATBOT_CONVERSION_PARAMS',
+    'EC_CHATBOT_STORAGE_KEYS',
+    'getEcChatBotApiServerBaseUrl',
+    'tabletCheck',
+    'mobileCheck',
+    'sendCountRequest'
+  ];
+
+  const validatedGlobals = {};
+  let isValidGlobal = false;
+
+  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+    if (REQUIRED_GLOBALS.every(globalName => globalName in window)) {
+      REQUIRED_GLOBALS.forEach(globalName => {
+        validatedGlobals[globalName] = window[globalName];
       });
-
-      if (response.ok) {
-        Object.values(EC_CHATBOT_STORAGE_KEYS).forEach(key => {
-          localStorage.removeItem(key);
-        });
-      }
-    } catch (error) {
-      console.error('Error sending conversion data:', error);
+      isValidGlobal = true;
+      break;
     }
-  };
+    await sleep(500);
+  }
 
-  sendConversionData();
+  if (!isValidGlobal) {
+    console.error(`Failed to validate required globals after ${MAX_RETRIES} attempts`);
+    return callback(true, null);
+  }
 
-  const device = tabletCheck() ? "tablet" : (mobileCheck() ? "smartphone" : "pc");
+  return callback(false, validatedGlobals);
+};
 
-  const conversion = {
-    scenario_data: `${device}_conversion`,
-  };
+(() => {
+  checkRequiredGlobals((error, validatedGlobals) => {
+    if(error) {
+      return 
+    }
+    const {
+      getUrlParameter,
+      EC_CHATBOT_CONVERSION_PARAMS,
+      EC_CHATBOT_STORAGE_KEYS,
+      getEcChatBotApiServerBaseUrl,
+      tabletCheck,
+      mobileCheck,
+      sendCountRequest,
+    } = validatedGlobals;
 
-  sendCountRequest(scenarioId, conversion).then(res => console.log(res));
+    const scenarioId = getUrlParameter(EC_CHATBOT_CONVERSION_PARAMS.SCENARIO_ID) || localStorage.getItem(EC_CHATBOT_STORAGE_KEYS.SCENARIO_ID);
+    const params = {
+      scenario_id: scenarioId,
+      bot_type: getUrlParameter(EC_CHATBOT_CONVERSION_PARAMS.BOT_TYPE) || localStorage.getItem(EC_CHATBOT_STORAGE_KEYS.BOT_TYPE),
+      user_input_id: getUrlParameter(EC_CHATBOT_CONVERSION_PARAMS.USER_INPUT_ID) || localStorage.getItem(EC_CHATBOT_STORAGE_KEYS.USER_INPUT_ID)
+    };
+
+    // Gửi request lên chatbot server
+    const sendConversionData = async () => {
+      try {
+        const response = await fetch(`${getEcChatBotApiServerBaseUrl()}/api/v1/scenario_users/conversions`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(params)
+        });
+
+        if (response.ok) {
+          Object.values(EC_CHATBOT_STORAGE_KEYS).forEach(key => {
+            localStorage.removeItem(key);
+          });
+        }
+      } catch (error) {
+        console.error('Error sending conversion data:', error);
+      }
+    };
+
+    sendConversionData();
+
+    const device = tabletCheck() ? "tablet" : (mobileCheck() ? "smartphone" : "pc");
+
+    const conversion = {
+      scenario_data: `${device}_conversion`,
+    };
+
+    sendCountRequest(scenarioId, conversion).then(res => console.log(res));
+  })
 })();

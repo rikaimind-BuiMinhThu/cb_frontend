@@ -1,7 +1,7 @@
 import { Card, CardHeader, CardBody, Table, Row, Col } from "reactstrap";
 import "./../../../../assets/css/bot/bot-setting.css";
 // icons
-import InputNum from '../../BotSetting/ScenarioSetting/scenarioComon/InputNum';
+import InputNum from '../ScenarioSetting/scenarioComon/InputNum';
 import IconManDefault from "./../../../../assets/img/bot-icon/man1_new.png";
 import IconWomenDefault from "./../../../../assets/img/bot-icon/women1_new.png";
 import IconWomen4 from "./../../../../assets/img/bot-icon/women4_new.png";
@@ -14,13 +14,14 @@ import IconWomen10 from "./../../../../assets/img/bot-icon/women10_new.png";
 import IconWomen11 from "./../../../../assets/img/bot-icon/women11_new.png";
 import React, { useEffect, useState } from "react";
 import "./../../../../assets/css/bot/add-bot.css";
-import api from "./../../../../api/api-management";
-import ModalNoti from "./../../../../views/Popup/ModalNoti";
+import api from "../../../../api/api-management";
+import ModalNoti from "../../../Popup/ModalNoti";
 import { Link } from "react-router-dom";
 import { tokenExpired } from "api/tokenExpired";
 import Cookies from "js-cookie";
 import { MDBIcon } from "mdbreact";
 import { any } from "prop-types";
+import DesignMessageIcon from "./DesignSettingComponents/DesignMessageIcon";
 
 const colors = [
   "#327AED",
@@ -76,6 +77,7 @@ function DesignChatbot() {
   const [popupCloseBot, setPopupCloseBot] = useState(false);
   const [titleBubble, setTitleBubble] = useState("");
   const [isOpenPreviewBot, setIsOpenPreviewBot] = useState(true);
+  const [messageIcon, setMessageIcon] = useState("");
 
   // design type: handle click
   const designTypeClick = (e) => {
@@ -121,15 +123,35 @@ function DesignChatbot() {
     if (!imageDefault.includes("image/png;base64")) {
       toDataURL(imageDefault).then((dataUrl) => {
         setBotImage(dataUrl);
+        if (!messageIcon) setMessageIcon(dataUrl);
       });
     } else {
       setBotImage(imageDefault);
+      if (!messageIcon) setMessageIcon(dataUrl);
     }
   };
 
+  const setBotIcon = (type, url) => {
+    const methodMap = {
+      icon: (url) => setBotImage(url),
+      message_icon: (url) => setMessageIcon(url),
+    }
+    methodMap[type]?.(url);
+
+    if (type === "icon" && !messageIcon) {
+      methodMap.message_icon(url);
+    }
+  }
+
+  const handleRemoveImage = (type) => () => {
+    setBotIcon(type, null);
+  }
+
   // get base url image add
-  const getBaseUrlAdd = () => {
-    const file = document.getElementById("bot_image")?.files[0];
+  const getBaseUrlAdd = (icontType) => (e) => {
+    const file = e.target.files[0];
+    e.target.value = null;
+
     if (
       file?.type === "image/png" ||
       file?.type === "image/jpeg" ||
@@ -137,10 +159,10 @@ function DesignChatbot() {
     ) {
       let reader = new FileReader();
       let baseString;
-      setBotImage(process.env.REACT_APP_API_CHATBOT_URL / `${cbImage}`);
+      setBotIcon(icontType, process.env.REACT_APP_API_CHATBOT_URL / `${cbImage}`);
       reader.onloadend = function () {
         baseString = reader.result;
-        setBotImage(baseString);
+        setBotIcon(icontType, baseString);
         if (baseString !== undefined || baseString !== "") {
           document.querySelector(".error-message.bot-image").style.display =
             "none";
@@ -149,7 +171,7 @@ function DesignChatbot() {
       reader.readAsDataURL(file);
       return true;
     } else {
-      setBotImage("");
+      setBotIcon(icontType, "");
       document.querySelector(".error-message.bot-image").innerHTML =
         "画像を選択してください。";
       document.querySelector(".error-message.bot-image").style.display =
@@ -245,6 +267,9 @@ function DesignChatbot() {
         setBotImage(
           `${process.env.REACT_APP_API_CHATBOT_URL}${response.data.data?.icon?.url}`
         );
+        if (!!response.data.data?.message_icon?.url) {
+          setMessageIcon(`${process.env.REACT_APP_API_CHATBOT_URL}${response.data.data.message_icon.url}`);
+        }
         const mainColor = response?.data?.data?.main_color || response?.data?.data?.main_color_other;
         if (mainColor && colorMap[mainColor]) {
           setMainColor(colorMap[mainColor]);
@@ -269,6 +294,11 @@ function DesignChatbot() {
     // document.querySelector(".icons .icon.icon-0").classList.add("active");
     setBotId(Cookies.get("bot_id"));
   }, []);
+
+  const isTempImage = (image) => {
+    return !!image && (image.includes("image/png;base64")||image.includes("image/jpeg;base64")||image.includes("image/jpg;base64"))
+  }
+
   // update bot chat
   const addUpdateBotChat = () => {
     let iconBot = "";
@@ -294,7 +324,7 @@ function DesignChatbot() {
           color = key;
         }
       });
-      if (iconBot.includes("image/png;base64")||iconBot.includes("image/jpeg;base64")||iconBot.includes("image/jpg;base64")){
+      if (isTempImage(botImage)){
         var bot = {
           chatbot: {
             title: title,
@@ -303,6 +333,24 @@ function DesignChatbot() {
             // main_color: color,
             // icon: !iconBot.includes('image/png;base64') ? defaultIcon : iconBot,
             icon: iconBot,
+            bot_name: botName,
+          },
+        };
+
+        if (color) bot.chatbot.main_color = color
+        else {
+          bot.chatbot.main_color_other = mainColor
+          bot.chatbot.main_color = ""
+        }
+      } else if (isTempImage(messageIcon)){
+        var bot = {
+          chatbot: {
+            title: title,
+            subtitle: subtitle,
+            design_type: designType,
+            // main_color: color,
+            // icon: !iconBot.includes('image/png;base64') ? defaultIcon : iconBot,
+            message_icon: messageIcon,
             bot_name: botName,
           },
         };
@@ -330,6 +378,11 @@ function DesignChatbot() {
           bot.chatbot.main_color = ""
         }
       }
+
+      if (!messageIcon) {
+        bot.chatbot.remove_message_icon = true;
+      }
+
       api
         .put(`api/v1/managements/chatbots/${botId}`, bot)
         .then((res) => {
@@ -680,7 +733,7 @@ function DesignChatbot() {
                                   <input
                                     type="file"
                                     id="bot_image"
-                                    onChange={getBaseUrlAdd}
+                                    onChange={getBaseUrlAdd("icon")}
                                     name="bot_image"
                                     accept="image/png, image/jpeg"
                                   />
@@ -688,13 +741,14 @@ function DesignChatbot() {
                               </div>
                               <span className="error-message bot-image"></span>
                             </div>
-                            {botImage && (
-                              <div className="field-add-bot">
-                                <div className="image-show">
-                                  <img src={botImage} alt="" />
-                                </div>
-                              </div>
-                            )}
+                            <div className="field-add-bot">
+                              <DesignMessageIcon 
+                                onChange={getBaseUrlAdd("message_icon")}
+                                onRemove={handleRemoveImage("message_icon")}
+                                botIcon={botImage}
+                                messageIcon={messageIcon}
+                              /> 
+                            </div>
                             <div className="field-add-bot">
                               <div className="add-bot_field-container">
                                 <span className="label-field">

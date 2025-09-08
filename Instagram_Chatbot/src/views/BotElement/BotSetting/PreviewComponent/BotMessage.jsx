@@ -117,6 +117,10 @@ const BotMessage = ({
     return result;
   }
 
+  const getBotImage = (botInfor) => {
+    return botInfor?.message_icon?.url ? botInfor?.message_icon?.url : botInfor?.icon?.url;
+  }
+
   return (
     <div key={index} className={`sp-body-bot-side slideRight ${!isShowAvatar(content) ? "hide_avatar" : ""} ${isUGCUsage(content) ? "ugc_usage" : ""}`}>
       {(content.type === "text_input" ||
@@ -124,7 +128,7 @@ const BotMessage = ({
         content.type === "delay" ||
         content.type === BOT_MESSAGE_TYPES.HTML_CODE) && (
           <div className="sp-body-bot-side-avatar sp-avatar">
-            <img src={EC_CHATBOT_URL + "/" + botInfor?.icon?.url} />
+            <img src={EC_CHATBOT_URL + "/" + getBotImage(botInfor)} />
           </div>
         )}
       <div className="sp-body-bot-side-messages">
