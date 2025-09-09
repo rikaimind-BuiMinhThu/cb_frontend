@@ -4,12 +4,18 @@ export const mapAmazonPayDataToMessagesList = (amazonPayData, messagesList) => {
 
   const newMessagesList = _.cloneDeep(messagesList);
 
-  const { profileFamilyName, profileFirstName, profileZipCode, profileStateId, profileCity, profileStreetAddress, profileTel, profileEmail } = amazonPayData;
+  const {
+    profileFamilyName, profileFirstName, profileFamilyNameKana, profileFirstNameKana,
+    profileZipCode, profileStateId, profileCity, profileStreetAddress,
+    profileTel, profileEmail
+  } = amazonPayData;
   const userMessages = newMessagesList.filter(message => message.belong_to === "user");
   if (!userMessages) return newMessagesList;
 
   // set profileFamilyName vào message có left_fukushashiki_search_value là "jsUkProfileFamilyName". Set vào　message_content.text_input.valueLeft
   // set profileFirstName vào message có right_fukushashiki_search_value là "jsUkProfileFirstName". Set vào　message_content.text_input.valueRight
+  // set profileFamilyNameKana vào message có left_fukushashiki_search_value là "jsUkProfileFamilyNameKana". Set vào　message_content.text_input.valueLeft
+  // set profileFirstNameKana vào message có right_fukushashiki_search_value là "jsUkProfileFirstNameKana". Set vào　message_content.text_input.valueRight
   // set profileZipCode vào message có post_code_fukushashiki_search_value là "jsUkProfileZipCode". Set vào　message_content.zip_code_address.value_post_code
   // set profileStateId vào message có prefecture_fukushashiki_search_value là "jsUkProfileZipCode". Set vào　message_content.zip_code_address.value_prefecture
   // set profileCity vào message có municipality_fukushashiki_search_value là "jsUkProfileZipCode". Set vào　message_content.zip_code_address.value_municipality
@@ -25,6 +31,16 @@ export const mapAmazonPayDataToMessagesList = (amazonPayData, messagesList) => {
   const messageProfileFirstName = userMessages?.find(message => message.message_content.find(content => content.right_fukushashiki_search_value === "jsUkProfileFirstName"));
   if (messageProfileFirstName) {
     messageProfileFirstName.message_content.find(content => content.right_fukushashiki_search_value === "jsUkProfileFirstName").text_input.text.valueRight = profileFirstName;
+  }
+
+  const messageProfileFamilyNameKana = userMessages?.find(message => message.message_content.find(content => content.left_fukushashiki_search_value === "jsUkProfileFamilyNameKana"));
+  if (messageProfileFamilyNameKana) {
+    messageProfileFamilyNameKana.message_content.find(content => content.left_fukushashiki_search_value === "jsUkProfileFamilyNameKana").text_input.text.valueLeft = profileFamilyNameKana;
+  }
+
+  const messageProfileFirstNameKana = userMessages?.find(message => message.message_content.find(content => content.right_fukushashiki_search_value === "jsUkProfileFirstNameKana"));
+  if (messageProfileFirstNameKana) {
+    messageProfileFirstNameKana.message_content.find(content => content.right_fukushashiki_search_value === "jsUkProfileFirstNameKana").text_input.text.valueRight = profileFirstNameKana;
   }
 
   const messageProfileZipCode = userMessages?.find(message => message.message_content.find(content => content.post_code_fukushashiki_search_value === "jsUkProfileZipCode"));
@@ -69,5 +85,7 @@ export const isTorizenLpAmazonData = (message) => {
   const isStreetAddressData = message.message_content.find(content => content.address_fukushashiki_search_value === "jsUkProfileStreetAddress");
   const isFamilyNameData = message.message_content.find(content => content.left_fukushashiki_search_value === "jsUkProfileFamilyName");
   const isFirstNameData = message.message_content.find(content => content.right_fukushashiki_search_value === "jsUkProfileFirstName");
-  return isEmailData || isTelData || isZipCodeData || isStateIdData || isCityData || isStreetAddressData || isFamilyNameData || isFirstNameData;
+  const isFamilyNameKanaData = message.message_content.find(content => content.left_fukushashiki_search_value === "jsUkProfileFamilyNameKana");
+  const isFirstNameKanaData = message.message_content.find(content => content.right_fukushashiki_search_value === "jsUkProfileFirstNameKana");
+  return isEmailData || isTelData || isZipCodeData || isStateIdData || isCityData || isStreetAddressData || isFamilyNameData || isFirstNameData || isFamilyNameKanaData || isFirstNameKanaData;
 }
