@@ -72,7 +72,7 @@ import {
   isUserMessage,
   isDelayBotMessage,
 } from "./PreviewComponent/Utils";
-import { mapAmazonPayDataToMessagesList } from "./PreviewComponent/TorizenUtils";
+import { mapAmazonPayDataToMessagesList, isTorizenLpAmazonData } from "./PreviewComponent/TorizenUtils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
 import ZipCodePopUp from "./PreviewComponent/ZipCodePopUp";
@@ -200,7 +200,7 @@ const PreviewFukushashikiReducer = (state, action) => {
           if (message.message_content.find(content => content.type === 'getting_error_notification' || content.type === 'delay') && index < state.currentMsgIndex) {
             message.hidden = true;
           } else if (message.not_display_when_have_error) {
-            const result = checkMessageCondition(message, state.objParam);
+            const result = checkMessageCondition(message, buildConditionParams(state));
             message.hidden = !result;;
           }
           return message;
@@ -360,6 +360,12 @@ const PreviewFukushashiki = () => {
         dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
       });
   }, [state.botId, state.loadedStateFromSession, state.displayType]);
+
+  const buildConditionParams = (theState) => {
+    const result = _.cloneDeep(theState.objParam);
+    const currentUrlParams = getAllUrlParams(window.location.search);
+    return { ...result, current_url_param: Object.keys(currentUrlParams) };
+  }
 
   const computeMessageIndices = (newState, clickedMsgIndex) => {
     const { currentUserMsg, nextRenderMsg} = {
@@ -1323,7 +1329,7 @@ const PreviewFukushashiki = () => {
     newState.userMessagesList = newState.messagesList.filter((item) => isUserMessage(item));
     for (let i = 0; i < newState.messagesList.length; i++) {
       if (newState.messagesList[i].conditions?.length > 0) {
-        const result = checkMessageCondition(newState.messagesList[i], newState.objParam);
+        const result = checkMessageCondition(newState.messagesList[i], buildConditionParams(newState));
 
         if (!result && isUserMessage(newState.messagesList[i])) {
           newState.currentUserMsgIndex++;
@@ -1367,6 +1373,9 @@ const PreviewFukushashiki = () => {
     return new Promise((resolve) => {
       let fukuDataList = [];
       savedState.userMessagesList.forEach((message) => {
+        // Except some data when fukushashiki torizen san
+        if (params.get('is_using_amazon_pay') && isTorizenLpAmazonData(message)) return;
+
         fukuDataList.push(...convertToFukushashikiObject({message: message}));
       });
       fukushashikiToLP(fukuDataList);
@@ -1440,17 +1449,10 @@ const PreviewFukushashiki = () => {
         );
 
         // Support only for amazon pay and subscstore cart system (torizen san)
-        if (params.get('isUsingAmazonPay')) {
+        if (params.get('is_using_amazon_pay')) {
           for (let i = 0; i < savedState.messagesList.length; i++) {
-            savedState.messagesList.forEach(message => {
-              if (message.conditions && message.conditions.length > 0) {
-                const hasAmazonPayCondition = message.conditions.some(condition => 
-                  condition.inputCondition === "isUsingAmazonPay"
-                );
-
-                if (hasAmazonPayCondition) message.hidden = true;
-              }
-            });
+            const result = checkMessageCondition(savedState.messagesList[i], buildConditionParams(savedState));
+            savedState.messagesList[i].hidden = !result;
           }
         }
 
@@ -3809,7 +3811,7 @@ const PreviewFukushashiki = () => {
     const nextMessage = newState.messagesList[clickedMsgIndex + 1];
     for (let i = 0; i < newState.messagesList.length; i++) {
       if (newState.messagesList[i].conditions?.length > 0) {
-        const result = checkMessageCondition(newState.messagesList[i], newState.objParam);
+        const result = checkMessageCondition(newState.messagesList[i], buildConditionParams(newState));
         if (!result && isUserMessage(newState.messagesList[i])) {
           newState.messagesList[i].hidden = true;
           continue;
@@ -3823,7 +3825,7 @@ const PreviewFukushashiki = () => {
     if (isUserMessage(nextMessage) || isBotMessage(nextMessage)) {
       for (let i = clickedMsgIndex + 1; i < newState.messagesList.length; i++) {
         if (newState.messagesList[i].conditions.length !== 0) {
-          const result = checkMessageCondition(newState.messagesList[i], newState.objParam);
+          const result = checkMessageCondition(newState.messagesList[i], buildConditionParams(newState));
           newState.messagesList[i].hidden = !result;
         }
         if (newState.messagesList[i].hidden && !stringNullOrEmpty(newState.messagesList[i].hidden)) continue;
