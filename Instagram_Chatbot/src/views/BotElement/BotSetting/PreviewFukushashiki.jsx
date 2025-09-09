@@ -72,6 +72,7 @@ import {
   isUserMessage,
   isDelayBotMessage,
 } from "./PreviewComponent/Utils";
+import { mapAmazonPayDataToMessagesList } from "./PreviewComponent/TorizenUtils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
 import ZipCodePopUp from "./PreviewComponent/ZipCodePopUp";
@@ -166,6 +167,7 @@ const PREVIEW_ACTIONS = {
   UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG: "UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG",
   SET_PROCESSING: "SET_PROCESSING",
   UPDATE_PREFECTURES_LIST: "UPDATE_PREFECTURES_LIST",
+  UPDATE_AMAZON_PAY_DATA: "UPDATE_AMAZON_PAY_DATA",
 };
 
 const PreviewFukushashikiReducer = (state, action) => {
@@ -246,6 +248,10 @@ const PreviewFukushashikiReducer = (state, action) => {
     }
     case PREVIEW_ACTIONS.UPDATE_PREFECTURES_LIST:
       return { ...state, prefecturesList: action.payload.prefecturesList };
+    case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA:
+      const newMessagesList = mapAmazonPayDataToMessagesList(action.payload, state.messagesList);
+      const renderMessagesList = newMessagesList.slice(0, state.currentMsgIndex + 1);
+      return { ...state, messagesList: newMessagesList, renderMessagesList: renderMessagesList };
   }
 
   return state;
@@ -437,6 +443,13 @@ const PreviewFukushashiki = () => {
           type: PREVIEW_ACTIONS.UPDATE_PREVIEW_ORDER_CONTENT,
           payload: actionData
         });
+
+      case CHATBOT_ACTIONS.UPDATE_AMAZON_PAY_DATA:
+        return dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA,
+          payload: actionData,
+        });
+
       default:
         // TODO
         break;
@@ -4182,8 +4195,6 @@ const PreviewFukushashiki = () => {
     if (!message || message.belong_to !== "user") return null;
     if (!Array.isArray(message?.message_content) || message.message_content.length === 0) return null;
 
-    console.log('message: ', message, 'indexMessage: ', indexMessage);
-
     return (
       <div className="sp-body-user-side slideLeft">
         <div className="sp-body-user-side-messages">
@@ -4236,7 +4247,6 @@ const PreviewFukushashiki = () => {
             }}
             prefecturesList={[...state.prefecturesList]}
             onOpen={(isOpen, indexContent) => {
-              debugger;
               onOpenZipCodePopup(isOpen, indexContent, Math.min(state.currentMsgIndex, indexMessage));
             }}
             onOpenShippingAddress={(isOpen, indexContent) =>
@@ -4423,7 +4433,7 @@ const PreviewFukushashiki = () => {
     return state.botInfor?.closing_bot_icon?.url || state.botInfor?.icon?.url;
   }
 
-  ///body container
+  // body container
   if (state.scenarioId && state.botInfor && state.isOpen) {
     const { containerStyle, headerStyle, bodyStyle } = getOpeningBotStyle();
     return (
