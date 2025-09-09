@@ -1241,6 +1241,7 @@ const PreviewFukushashiki = () => {
       useNewProcess: res.data?.chatbot?.client_cart_system === CART_SYSTEM.EC_FORCE,
       isUsedPastMessageLoaded: !!res.data?.chatbot?.is_used_message_loaded_past,
       isProcessing: false,
+      useFullWidthChatbotMobile: !!res.data?.chatbot?.use_fullwidth_chatbot_mobile,
     };
 
     if (newState.isUsedErrMsgByJs && newState.errMsgJsCode) {
@@ -3406,6 +3407,7 @@ const PreviewFukushashiki = () => {
     const defaultOptions = {
       isOpen: state.isOpen,
       source: 'ec-chatbot',
+      useMoblieFullwidth: !!state.useFullWidthChatbotMobile,
       // widthPc: state.widthPc,
       // heightPc: state.heightPc,
       // widthSp: state.widthSp,
@@ -4409,6 +4411,13 @@ const PreviewFukushashiki = () => {
     state.useNewProcess,
   ]);
 
+  const getBotHeaderIcon = () => {
+    if (state.isOpen) {
+      return state.botInfor?.opening_bot_icon?.url || state.botInfor?.icon?.url;
+    }
+    return state.botInfor?.closing_bot_icon?.url || state.botInfor?.icon?.url;
+  }
+
   ///body container
   if (state.scenarioId && state.botInfor && state.isOpen) {
     const { containerStyle, headerStyle, bodyStyle } = getOpeningBotStyle();
@@ -4429,7 +4438,7 @@ const PreviewFukushashiki = () => {
           isPopUpZipCode={isPopUpZipCode}
           prefecturesList={state.prefecturesList}
           message={state.messagesList[state.zipcodeIndex]}
-          messageIndex={state.currentMsgIndex}
+          messageIndex={state.zipcodeIndex}
           zipcodeContentIndex={state.zipcodeContentIndex}
           onChangeValue={onChangeValue}
           onChangeErrors={onChangeErrors}
@@ -4443,11 +4452,7 @@ const PreviewFukushashiki = () => {
         >
           <div className="sp-header-left" onClick={handleCloseChatbotWhenUseWithDrawal}>
             <div className="sp-header-left-avatar sp-avatar">
-              <img
-                src={
-                  `${EC_CHATBOT_URL}${state.botInfor?.icon?.url }`
-                }
-              />
+              <img src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`} alt="bot-header-icon"/>
             </div>
             <div className="sp-header-left-label">
               <div className="sp-header-left-label-sub-title">
@@ -4548,9 +4553,8 @@ const PreviewFukushashiki = () => {
       >
         <img
           style={{ width: "96%", height: "96%", borderRadius: "30px" }}
-          src={
-            state.botInfor?.icon?.url && EC_CHATBOT_URL + "" + state.botInfor?.icon?.url
-          }
+          src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
+          alt="bot-header-icon"
         />
       </div>
     )
@@ -4577,11 +4581,7 @@ const PreviewFukushashiki = () => {
       >
         <div className="sp-header-left-bt" onClick={() => onOpenPreview(!state.isOpen)}>
           <div className="sp-header-left-avatar sp-avatar-bt">
-            <img
-              src={
-                state.botInfor?.icon?.url && EC_CHATBOT_URL + "" + state.botInfor?.icon?.url
-              }
-            />
+            <img src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`} alt="bot-header-icon" />
           </div>
         </div>
         <div style={{ alignItems: 'center', justifyContent: "center", padding: 'auto' }}>
@@ -4613,11 +4613,7 @@ const PreviewFukushashiki = () => {
       >
         <div className="sp-header-left" onClick={() => onOpenPreview(!state.isOpen)}>
           <div className="sp-header-left-avatar sp-avatar">
-            <img
-              src={
-                state.botInfor?.icon?.url && EC_CHATBOT_URL + "" + state.botInfor?.icon?.url
-              }
-            />PreviewComp
+            <img src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`} alt="bot-header-icon" />
           </div>
           <div className="sp-header-left-label">
             <div className="sp-header-left-label-title">{state.rightPcTitle}</div>
@@ -4643,9 +4639,8 @@ const PreviewFukushashiki = () => {
       >
         <img
           style={{ width: "96%", height: "96%", borderRadius: "30px" }}
-          src={
-            state.botInfor?.icon?.url && EC_CHATBOT_URL + "" + state.botInfor?.icon?.url
-          }
+          src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
+          alt="bot-header-icon"
         />
       </div>
     )
@@ -4653,10 +4648,11 @@ const PreviewFukushashiki = () => {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
+        className={state.useFullWidthChatbotMobile ? "fullwidth_mobile_chatbot" : ""}
         style={{
           backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
-          width: 'calc(100vw - 20px)',
-          height: "48px",
+          width: state.useFullWidthChatbotMobile ? "calc(100vw - 20px)" : "240px",
+          height: state.useFullWidthChatbotMobile ? "70px" : "48px",
           borderRadius: '35px',
           display: "flex",
           justifyContent: "left",
@@ -4666,17 +4662,16 @@ const PreviewFukushashiki = () => {
         }}
       >
         <div className="sp-header-left" onClick={() => onOpenPreview(!state.isOpen)} style={{ width: '100%', padding: '4px' }}>
-          <div className="sp-header-left-avatar sp-avatar" style={{ width: '38px' }}>
+          <div className={state.useFullWidthChatbotMobile ? "fullwidth_mobile_chatbot sp-header-left-avatar sp-avatar" :"sp-header-left-avatar sp-avatar"} style={{ width: state.useFullWidthChatbotMobile ? "50px"  :'38px' }}>
             <img
-              src={
-                state.botInfor?.icon?.url && EC_CHATBOT_URL + "" + state.botInfor?.icon?.url
-              }
+              src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
+              alt="bot-header-icon"
               alt="bot-avatar"
             />
           </div>
           <div>
             <div id="comment_bubble" className="sp-bubble">
-              <span style={{ fontSize: '14px', fontWeight: 700 }}>{state.botInfor.title}</span>
+              <span style={{ fontSize: state.useFullWidthChatbotMobile ? "17px" :'14px', fontWeight: 700 }}>{state.botInfor.title}</span>
             </div>
           </div>
           <div className="sp-header-right-arrow" style={{ marginLeft: 'auto' }}>
@@ -4705,9 +4700,8 @@ const PreviewFukushashiki = () => {
         <div className="sp-header-left" onClick={() => onOpenPreview(!state.isOpen)}>
           <div className="sp-header-left-avatar sp-avatar">
             <img
-              src={
-                state.botInfor?.icon?.url && EC_CHATBOT_URL + "" + state.botInfor?.icon?.url
-              }
+              src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
+              alt="bot-header-icon"
             />
           </div>
           <div className="sp-header-left-label">
