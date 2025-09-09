@@ -200,7 +200,8 @@ const PreviewFukushashikiReducer = (state, action) => {
           if (message.message_content.find(content => content.type === 'getting_error_notification' || content.type === 'delay') && index < state.currentMsgIndex) {
             message.hidden = true;
           } else if (message.not_display_when_have_error) {
-            const result = checkMessageCondition(message, buildConditionParams(state));
+            const conditionParams = buildConditionParams(state);
+            const result = checkMessageCondition(message, conditionParams);
             message.hidden = !result;;
           }
           return message;
@@ -1461,8 +1462,9 @@ const PreviewFukushashiki = () => {
 
         // Support only for amazon pay and subscstore cart system (torizen san)
         if (params.get('is_using_amazon_pay')) {
+          const conditionParams = buildConditionParams(savedState);
           for (let i = 0; i < savedState.messagesList.length; i++) {
-            const result = checkMessageCondition(savedState.messagesList[i], buildConditionParams(savedState));
+            const result = checkMessageCondition(savedState.messagesList[i], conditionParams);
             savedState.messagesList[i].hidden = !result;
           }
         }
@@ -3854,9 +3856,10 @@ const PreviewFukushashiki = () => {
 
     // Update next messages list after clicked next
     const nextMessage = newState.messagesList[clickedMsgIndex + 1];
+    const conditionParams = buildConditionParams(newState);
     for (let i = 0; i < newState.messagesList.length; i++) {
       if (newState.messagesList[i].conditions?.length > 0) {
-        const result = checkMessageCondition(newState.messagesList[i], buildConditionParams(newState));
+        const result = checkMessageCondition(newState.messagesList[i], conditionParams);
         if (!result && isUserMessage(newState.messagesList[i])) {
           newState.messagesList[i].hidden = true;
           continue;
@@ -3868,9 +3871,10 @@ const PreviewFukushashiki = () => {
       }
     }
     if (isUserMessage(nextMessage) || isBotMessage(nextMessage)) {
+      const conditionParams = buildConditionParams(newState);
       for (let i = clickedMsgIndex + 1; i < newState.messagesList.length; i++) {
         if (newState.messagesList[i].conditions.length !== 0) {
-          const result = checkMessageCondition(newState.messagesList[i], buildConditionParams(newState));
+          const result = checkMessageCondition(newState.messagesList[i], conditionParams);
           newState.messagesList[i].hidden = !result;
         }
         if (newState.messagesList[i].hidden && !stringNullOrEmpty(newState.messagesList[i].hidden)) continue;
