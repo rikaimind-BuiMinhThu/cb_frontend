@@ -2293,7 +2293,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
         }
     }
 
-    const isPopUpZipCode = (isOpen, indexContent) => {
+    const onOpen = (isOpen, indexContent) => {
         if (isOpen === true) {
             setPrefectures(null);
             setCities(null);
@@ -2420,7 +2420,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                             <MDBIcon
                                 style={{ width: '5%', marginLeft: '3px', cursor: 'pointer' }}
                                 fas
-                                onClick={() => isPopUpZipCode(false)}
+                                onClick={() => onOpen(false)}
                                 icon="times"
                                 className={"sp-plus-circle-option-icon-times-custom"}
                             />
@@ -2506,7 +2506,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                         </div>
                         <div className="sp-popup-zip-code-address-body-button">
                             <div className="sp-popup-zip-code-address-body-button-cancel"
-                                onClick={() => isPopUpZipCode(false)}>
+                                onClick={() => onOpen(false)}>
                                 キャンセル
                             </div>
                             <div className="sp-popup-zip-code-address-body-button-selection"
@@ -2594,7 +2594,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                                         setDataMessages([...dataMessages]);
                                                     }}
                                                     dataPrefectures={[...dataPrefectures]}
-                                                    isPopUpZipCode={(isOpen, indexContent) => isPopUpZipCode(isOpen, indexContent)}
+                                                    onOpen={(isOpen, indexContent) => onOpen(isOpen, indexContent)}
                                                     onChangeErrors={(field, value) => onChangeErrors(field, value)}
                                                     variables={variables}
                                                 />
@@ -2740,7 +2740,7 @@ const BotMessage = ({ content, index, botInfor }) => {
     )
 }
 
-const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, indexMessageRender, errorsProps, indexMessage, captcha, onClickNext, displayButtonNext, isPopUpZipCode, onChangeErrors, dataPrefectures, variables }) => {
+const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, indexMessageRender, errorsProps, indexMessage, captcha, onClickNext, displayButtonNext, onOpen, onChangeErrors, dataPrefectures, variables }) => {
     const [dataHour, setDataHour] = useState(dataHourFixed);
     const [dataYear, setDataYear] = useState(dataYearFixed);
     const [dataCity, setDataCity] = useState([]);
@@ -4055,7 +4055,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                 <div style={{ marginBottom: '10px' }}>
                                     <div style={{ marginBottom: '10px', textDecoration: 'underline', ...!disabled ? { color: '#2c76f0' } : { color: 'gray' }, textAlign: 'right' }}>
                                         <span style={!disabled ? { cursor: 'pointer' } : {}} onClick={() => {
-                                            if (disabled !== true) isPopUpZipCode(true, indexContent)
+                                            if (disabled !== true) onOpen(true, indexContent)
                                         }}>〒検索はこちら</span>
                                     </div>
                                     {(zipCodeAddress.title_require || zipCodeAddress.isCheckRequire) &&
@@ -6076,7 +6076,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           <span
                             style={!disabled ? { cursor: "pointer" } : {}}
                             onClick={() => {
-                              if (disabled !== true) isPopUpZipCodeShippingAddress(true, indexContent);
+                              if (disabled !== true) onOpenShippingAddress(true, indexContent);
                             }}
                           >
                             〒検索はこちら

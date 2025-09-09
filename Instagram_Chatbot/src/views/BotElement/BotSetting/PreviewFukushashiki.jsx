@@ -4060,13 +4060,15 @@ const PreviewFukushashiki = () => {
     }
   };
 
-  const isPopUpZipCode = (isOpen, indexContent, indexMessage) => {
+  const onOpenZipCodePopup = (isOpen, indexContent, indexMessage) => {
     let newState = {};
 
     if (indexContent !== undefined) {
       newState.zipcodeContentIndex = indexContent;
     }
-    newState.zipcodeIndex = indexMessage;
+    if (indexMessage !== undefined) {
+      newState.zipcodeIndex = indexMessage;
+    }
 
     if (isOpen) {
       changeElementAttributeById([
@@ -4094,7 +4096,7 @@ const PreviewFukushashiki = () => {
     ]);
   };
 
-  const isPopUpZipCodeShippingAddress = (isOpen, indexContent) => {
+  const onOpenShippingAddress = (isOpen, indexContent) => {
     // TODO: Check to remove
     // if (isOpen === true) {
     //   setPrefectures(null);
@@ -4180,6 +4182,8 @@ const PreviewFukushashiki = () => {
     if (!message || message.belong_to !== "user") return null;
     if (!Array.isArray(message?.message_content) || message.message_content.length === 0) return null;
 
+    console.log('message: ', message, 'indexMessage: ', indexMessage);
+
     return (
       <div className="sp-body-user-side slideLeft">
         <div className="sp-body-user-side-messages">
@@ -4231,11 +4235,12 @@ const PreviewFukushashiki = () => {
               // // });
             }}
             prefecturesList={[...state.prefecturesList]}
-            isPopUpZipCode={(isOpen, indexContent) =>
-              isPopUpZipCode(isOpen, indexContent, indexMessage)
-            }
-            isPopUpZipCodeShippingAddress={(isOpen, indexContent) =>
-              isPopUpZipCodeShippingAddress(isOpen, indexContent)
+            onOpen={(isOpen, indexContent) => {
+              debugger;
+              onOpenZipCodePopup(isOpen, indexContent, Math.min(state.currentMsgIndex, indexMessage));
+            }}
+            onOpenShippingAddress={(isOpen, indexContent) =>
+              onOpenShippingAddress(isOpen, indexContent)
             }
             onChangeErrors={(field, value) =>
               onChangeErrors(field, value)
@@ -4435,10 +4440,10 @@ const PreviewFukushashiki = () => {
           onOpenPreview={onOpenPreview}
         />
         <ZipCodePopUp
-          isPopUpZipCode={isPopUpZipCode}
+          onOpen={onOpenZipCodePopup}
           prefecturesList={state.prefecturesList}
           message={state.messagesList[state.zipcodeIndex]}
-          messageIndex={state.zipcodeIndex}
+          messageIndex={state.currentMsgIndex}
           zipcodeContentIndex={state.zipcodeContentIndex}
           onChangeValue={onChangeValue}
           onChangeErrors={onChangeErrors}

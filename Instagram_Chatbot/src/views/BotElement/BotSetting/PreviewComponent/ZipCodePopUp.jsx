@@ -6,11 +6,11 @@ import { MDBIcon } from "mdbreact";
 import SelectCustom from "../ScenarioSetting/scenarioComon/SelectCustom";
 
 const ZipCodePopUp = ({
-  isPopUpZipCode,
   prefecturesList,
   message,
   messageIndex,
   zipcodeContentIndex,
+  onOpen,
   onChangeValue,
   onChangeErrors,
   errors = {},
@@ -137,7 +137,7 @@ const ZipCodePopUp = ({
           <MDBIcon
             style={{ width: "5%", marginLeft: "3px", cursor: "pointer" }}
             fas
-            onClick={() => isPopUpZipCode(false)}
+            onClick={() => onOpen(false)}
             icon="times"
             className={"sp-plus-circle-option-icon-times-custom"}
           />
@@ -181,7 +181,7 @@ const ZipCodePopUp = ({
         <div className="sp-popup-zip-code-address-body-button">
           <div
             className="sp-popup-zip-code-address-body-button-cancel"
-            onClick={() => isPopUpZipCode(false)}
+            onClick={() => onOpen(false)}
           >
             キャンセル
           </div>
