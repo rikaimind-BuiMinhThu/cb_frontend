@@ -297,7 +297,7 @@ const displayPopup = async () => {
   // only for amazon
   // add param amazonCheckoutSessionId to iframe src
   if (getParam('amazonCheckoutSessionId')) {
-    iframe.src += `&isUsingAmazonPay=true`;
+    iframe.src += `&is_using_amazon_pay=true`;
     // only for subscstore cart system, torizen san
     // loop for waiting data is filled to lp form
     // wait 20 times
