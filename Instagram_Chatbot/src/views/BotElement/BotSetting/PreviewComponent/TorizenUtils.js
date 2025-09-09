@@ -59,3 +59,15 @@ export const mapAmazonPayDataToMessagesList = (amazonPayData, messagesList) => {
 
   return newMessagesList;
 }
+
+export const isTorizenLpAmazonData = (message) => {
+  const isEmailData = message.message_content.find(content => content.fukushashiki_search_value === "jsUkEmail");
+  const isTelData = message.message_content.find(content => content.fukushashiki_search_value === "jsUkProfileTel");
+  const isZipCodeData = message.message_content.find(content => content.post_code_fukushashiki_search_value === "jsUkProfileZipCode");
+  const isStateIdData = message.message_content.find(content => content.prefecture_fukushashiki_search_value === "jsUkProfileStateId");
+  const isCityData = message.message_content.find(content => content.municipality_fukushashiki_search_value === "jsUkProfileCity");
+  const isStreetAddressData = message.message_content.find(content => content.address_fukushashiki_search_value === "jsUkProfileStreetAddress");
+  const isFamilyNameData = message.message_content.find(content => content.left_fukushashiki_search_value === "jsUkProfileFamilyName");
+  const isFirstNameData = message.message_content.find(content => content.right_fukushashiki_search_value === "jsUkProfileFirstName");
+  return isEmailData || isTelData || isZipCodeData || isStateIdData || isCityData || isStreetAddressData || isFamilyNameData || isFirstNameData;
+}
