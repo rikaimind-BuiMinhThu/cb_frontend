@@ -316,12 +316,6 @@ function DesignChatbot() {
 
   // update bot chat
   const addUpdateBotChat = () => {
-    let iconBot = "";
-      if (botImage === "") {
-        iconBot = IconManDefault;
-      } else {
-        iconBot = botImage;
-      }
     if (title && subtitle && botName ) {
       let main_color = {
         blue: "#327AED",
@@ -339,60 +333,30 @@ function DesignChatbot() {
           color = key;
         }
       });
-      if (isTempImage(botImage)){
-        var bot = {
-          chatbot: {
-            title: title,
-            subtitle: subtitle,
-            design_type: designType,
-            // main_color: color,
-            // icon: !iconBot.includes('image/png;base64') ? defaultIcon : iconBot,
-            icon: iconBot,
-            bot_name: botName,
-          },
-        };
+      var bot = {
+        chatbot: {
+          title: title,
+          subtitle: subtitle,
+          design_type: designType,
+          bot_name: botName,
+        },
+      };
 
-        if (color) bot.chatbot.main_color = color
-        else {
-          bot.chatbot.main_color_other = mainColor
-          bot.chatbot.main_color = ""
-        }
-      } else if (isTempImage(openingBotIcon) || isTempImage(closingBotIcon)){
-        var bot = {
-          chatbot: {
-            title: title,
-            subtitle: subtitle,
-            design_type: designType,
-            // main_color: color,
-            // icon: !iconBot.includes('image/png;base64') ? defaultIcon : iconBot,
-            opening_bot_icon: openingBotIcon,
-            closing_bot_icon: closingBotIcon,
-            bot_name: botName,
-          },
-        };
+      // Add icon fields if they are temp images
+      if (isTempImage(botImage)) {
+        bot.chatbot.icon = botImage || IconManDefault;
+      }
+      if (isTempImage(openingBotIcon)) {
+        bot.chatbot.opening_bot_icon = openingBotIcon;
+      }
+      if (isTempImage(closingBotIcon)) {
+        bot.chatbot.closing_bot_icon = closingBotIcon;
+      }
 
-        if (color) bot.chatbot.main_color = color
-        else {
-          bot.chatbot.main_color_other = mainColor
-          bot.chatbot.main_color = ""
-        }
-      } else {
-        var bot = {
-          chatbot: {
-            title: title,
-            subtitle: subtitle,
-            design_type: designType,
-            // main_color: color,
-            // icon: !iconBot.includes('image/png;base64') ? defaultIcon : iconBot,
-            bot_name: botName,
-          },
-        };
-
-        if (color) bot.chatbot.main_color = color
-        else {
-          bot.chatbot.main_color_other = mainColor
-          bot.chatbot.main_color = ""
-        }
+      if (color) bot.chatbot.main_color = color
+      else {
+        bot.chatbot.main_color_other = mainColor
+        bot.chatbot.main_color = ""
       }
 
       if (!openingBotIcon) {
