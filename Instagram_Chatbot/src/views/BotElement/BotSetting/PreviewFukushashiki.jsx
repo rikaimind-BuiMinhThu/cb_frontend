@@ -914,7 +914,11 @@ const PreviewFukushashiki = () => {
     };
   }
 
-  const processBotDelayMessage = async (messagesList, i, newState) => {
+  const processBotDelayMessage = async (messagesList, i, newState, options = { isPassDelay: false }) => {
+    if (isPassDelay) {
+      newState.currentMsgIndex = i;
+      return newState;
+    }
     if (messagesList[i]?.message_content[0]?.delay?.typing_on) {
       // TODO: Need display typing on
       // return new Promise(async (resolve) => {
@@ -1153,7 +1157,12 @@ const PreviewFukushashiki = () => {
     });
   }
 
-  const renderMessagesWithDelay = (theState, startMsgIndex, endMsgIndex, options = { setNewState: true }) => {
+  const renderMessagesWithDelay = (theState, startMsgIndex, endMsgIndex, options = {}) => {
+    const {
+      setNewState = true,
+      isPassDelay = false,
+    } = options;
+    
     userEntryScenario({
       scenario_id: theState.scenarioId,
       user_id: theState.uuid,
@@ -1164,9 +1173,11 @@ const PreviewFukushashiki = () => {
       for (let i = startMsgIndex; i <= endMsgIndex; i++) {
         theState.renderMessagesList = theState.messagesList.slice(0, i + 1);
         if (isDelayBotMessage(theState.messagesList[i])) {
-          await sleep(theState.messagesList[i].message_content[0].delay.content * 1000);
-          theState.messagesList[i].hidden = true;
-          continue;
+          if (!isPassDelay) {
+            await sleep(theState.messagesList[i].message_content[0].delay.content * 1000);
+            theState.messagesList[i].hidden = true;
+            continue;
+          }
         }
         
         // update state with theState except prefecturesList
@@ -1189,7 +1200,7 @@ const PreviewFukushashiki = () => {
       }
       resolve({ listMsgAppear });
     }).then(({ listMsgAppear }) => {
-      if(options.setNewState) {
+      if(setNewState) {
         theState.renderMessagesList = theState.messagesList.slice(0, theState.currentMsgIndex + 1);
         theState.passedUserMsgCount = theState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
   
@@ -3562,6 +3573,24 @@ const PreviewFukushashiki = () => {
   }
 
   const handleRenderMessageAfterClickNext = async (newState, clickedMsgIndex, isBtnUpdateClick) => {
+    if (newState.isUsedPastMessageLoaded) {
+      const existingRender = state.renderMessagesList || [];
+      const startAppendIndex = existingRender.length;
+      const endAppendIndex = newState.currentMsgIndex;
+      let appended = [];
+      if (endAppendIndex >= startAppendIndex) {
+        appended = newState.messagesList
+          .slice(startAppendIndex, endAppendIndex + 1)
+          .map((msg) => (isDelayBotMessage(msg) ? { ...msg, hidden: true } : msg));
+      }
+      newState.renderMessagesList = [...existingRender, ...appended];
+      newState.passedUserMsgCount = newState.renderMessagesList.filter((m) => isUserMessage(m) && !m.hidden).length;
+      setStateToSessionStorage(newState);
+      dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { renderMessagesList: newState.renderMessagesList, messagesList: newState.messagesList, passedUserMsgCount: newState.passedUserMsgCount, currentMsgIndex: newState.currentMsgIndex } });
+      scrollToPosition({ position: "b", selector: "#sp-body" });
+      dispatch({ type: PREVIEW_ACTIONS.SET_PROCESSING, payload: false });
+      return;
+    }
     if (newState.useNewProcess) {
       return renderMessageInRange(clickedMsgIndex + 1, newState.currentMsgIndex, newState, newState.currentUserMsgIndex, { isUpdateClick: isBtnUpdateClick, appearFromStart: true })
       .then((newState) => {
@@ -3622,6 +3651,7 @@ const PreviewFukushashiki = () => {
         if (newState.currentMsgIndex > tempIdx) newState.currentMsgIndex--;
       }
       resolve();
+      newState.renderMessagesList = newState.renderMessagesList.filter(m => !(m.id && `${m.id}`.startsWith('__temp_delay_')));
     }).then(() => {
       newState.renderMessagesList = newState.renderMessagesList.map((msg) => {
         return isDelayBotMessage(msg) ? {...msg, hidden: true} : msg;
@@ -3824,6 +3854,24 @@ const PreviewFukushashiki = () => {
     else
       newState.currentMsgIndex = newState.isUsedPastMessageLoaded ? newState.lastMsgIndex : newState.currentUserMsgIndex;
 
+    if (isBtnUpdateClick) {
+      dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
+      scrollToPosition({ position: "b", selector: "#sp-body" });
+      try {
+        const el = document.querySelector('#sp-body');
+        if (el) el.scrollTop = el.scrollHeight;
+      } catch (e) {}
+      return;
+    }
+
+    if (newState.isUsedPastMessageLoaded) {
+      scrollToPosition({ position: "b", selector: "#sp-body" });
+      try {
+        const el = document.querySelector('#sp-body');
+        if (el) el.scrollTop = el.scrollHeight;
+      } catch (e) {}
+    }
+
     await handleRenderMessageAfterClickNext(newState, clickedMsgIndex, isBtnUpdateClick);
   };
 
@@ -3990,10 +4038,28 @@ const PreviewFukushashiki = () => {
     }
 
     newState.messagesList = state.messagesList;
-    newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
-    newState.renderMessagesList = newState.renderMessagesList.map((msg) => {
-      return isDelayBotMessage(msg) ? {...msg, hidden: true} : msg;
-    });
+    if (state.isUsedPastMessageLoaded) {
+      setStateToSessionStorage({
+        ...state,
+        messagesList: newState.messagesList,
+        variables: newState.variables,
+        objParam: newState.objParam,
+      });
+      dispatch({
+        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+        payload: {
+          messagesList: newState.messagesList,
+          variables: newState.variables,
+          objParam: newState.objParam,
+        }
+      });
+      return;
+    } else {
+      newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+      newState.renderMessagesList = newState.renderMessagesList.map((msg) => {
+        return isDelayBotMessage(msg) ? { ...msg, hidden: true } : msg;
+      });
+    }
     setStateToSessionStorage(newState);
 
     dispatch({
