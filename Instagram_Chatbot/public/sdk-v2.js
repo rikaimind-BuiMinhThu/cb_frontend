@@ -122,6 +122,13 @@ const getDebugFlag = () => {
   return params.debug || true;
 }
 
+const getParam = (paramName) => {
+  const params = new Proxy(new URLSearchParams(window.location.search), {
+    get: (searchParams, prop) => searchParams.get(prop),
+  });
+  return params[paramName];
+}
+
 const log = (message) =>{
   let debugFlag = getDebugFlag();
 
@@ -256,7 +263,6 @@ const displayPopup = async () => {
   const data = await response.json();
   scenarioId = data.data.id;
   
-  let body = document.getElementsByTagName("BODY")[0];
   let iframe = document.createElement("iframe");
 
   if (mobileCheck()) {
@@ -287,8 +293,25 @@ const displayPopup = async () => {
   iframe.style.zIndex = "999999";
   iframe.src = `${getEcChatBotFrontEndBaseUrl()}/preview-customer-fukushashiki?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin
     }&deviceReceive=${device}&uuid=${uuid}&env=${getEnvironment()}&debug=${getDebugFlag()}&cartSystem=${data.cart_system}&isLoggedIn=${window.logged_in}`;
-  globalIframe = iframe
-  body.appendChild(iframe);
+
+  // only for amazon
+  // add param amazonCheckoutSessionId to iframe src
+  if (getParam('amazonCheckoutSessionId')) {
+    iframe.src += `&isUsingAmazonPay=true`;
+    // only for subscstore cart system, torizen san
+    // loop for waiting data is filled to lp form
+    // wait 20 times
+    let count = 0;
+    const interval = setInterval(() => {
+      if (document.querySelector("input#jsUkProfileFamilyName").value && count < 20) {
+        appendIframeToBody(iframe);
+        clearInterval(interval);
+      }
+      count++;
+    }, 200);
+  } else {
+    appendIframeToBody(iframe);
+  }
 
   window.addEventListener(
     "message",
@@ -701,6 +724,11 @@ const injectCustomJS = (injectCustomJsCodes) => {
         console.error("Invalid position: " + position);
     }
   }
+}
+
+const appendIframeToBody = (iframe) => {
+  globalIframe = iframe;
+  document.body.appendChild(iframe);
 }
 
 displayPopup();
