@@ -118,7 +118,7 @@ const BotMessage = ({
   }
 
   const getBotImage = (botInfor) => {
-    return botInfor?.message_icon?.url ? botInfor?.message_icon?.url : botInfor?.icon?.url;
+    return botInfor?.icon?.url || botInfor?.opening_bot_icon?.url || botInfor?.closing_bot_icon?.url;
   }
 
   return (
