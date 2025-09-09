@@ -1438,6 +1438,22 @@ const PreviewFukushashiki = () => {
           savedState.userInputId || params.get("uuid"),
           params.get("env") || "production"
         );
+
+        // Support only for amazon pay and subscstore cart system (torizen san)
+        if (params.get('isUsingAmazonPay')) {
+          for (let i = 0; i < savedState.messagesList.length; i++) {
+            savedState.messagesList.forEach(message => {
+              if (message.conditions && message.conditions.length > 0) {
+                const hasAmazonPayCondition = message.conditions.some(condition => 
+                  condition.inputCondition === "isUsingAmazonPay"
+                );
+
+                if (hasAmazonPayCondition) message.hidden = true;
+              }
+            });
+          }
+        }
+
         if (!isLoadedCssContent && savedState?.botInfor?.is_used_custom_css && savedState?.botInfor?.custom_css_content.length > 0) {
           const style = document.createElement('style');
           style.innerHTML = savedState?.botInfor?.custom_css_content;
