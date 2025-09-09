@@ -935,7 +935,11 @@ const PreviewFukushashiki = () => {
     };
   }
 
-  const processBotDelayMessage = async (messagesList, i, newState, options = { isPassDelay: false }) => {
+  const processBotDelayMessage = async (messagesList, i, newState, options = {}) => {
+    const {
+      isPassDelay = false,
+    } = options;
+    
     if (isPassDelay) {
       newState.currentMsgIndex = i;
       return newState;
