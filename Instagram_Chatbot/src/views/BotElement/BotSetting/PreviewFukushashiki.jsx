@@ -3656,7 +3656,7 @@ const PreviewFukushashiki = () => {
 
   const handleRenderMessageAfterClickNext = async (newState, clickedMsgIndex, isBtnUpdateClick) => {
     if (newState.isUsedPastMessageLoaded && isBtnUpdateClick) {
-      newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex).filter(m => !m.hidden);
+      newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1).filter(m => !m.hidden);
       newState.passedUserMsgCount = newState.renderMessagesList.filter((m) => isUserMessage(m) && !m.hidden).length;
       return handleAfterRenderMessage(
         newState,
@@ -3726,7 +3726,7 @@ const PreviewFukushashiki = () => {
         newState.messagesList.splice(tempIdx, 1);
         if (newState.currentMsgIndex > tempIdx) newState.currentMsgIndex--;
       }
-      newState.renderMessagesList = newState.renderMessagesList.filter(m => !(m.id && !`${m.id}`.startsWith('__temp_delay_')));
+      newState.renderMessagesList = newState.renderMessagesList.filter(m => !(m.id && `${m.id}`.startsWith('__temp_delay_')));
       resolve();
     }).then(() => {
       handleAfterRenderMessage(
@@ -3814,7 +3814,7 @@ const PreviewFukushashiki = () => {
     const isClickedCreateOrder = newState.messagesList[clickedMsgIndex]?.message_content?.[0]?.type === "button_submit";
     const isClickedLastMessage = newState.messagesList.length - 1 === clickedMsgIndex;
     const nextOrCurrentUserMessage = newState.messagesList.findIndex(getNextUserMsg((_, index) => index >= clickedMsgIndex));
-    const isBtnUpdateClick = indexMessage < newState.currentUserMsgIndex || indexMessage < newState.lastMsgIndex || (newState.currentUserMsgIndex === -1 && indexMessage === nextOrCurrentUserMessage);
+    const isBtnUpdateClick = indexMessage < newState.currentUserMsgIndex || (newState.currentUserMsgIndex === -1 && indexMessage === nextOrCurrentUserMessage);
 
     const dataLog = sendLogMessageToServer({
       ...submitData,
@@ -4748,7 +4748,6 @@ const PreviewFukushashiki = () => {
             <img
               src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
               alt="bot-header-icon"
-              alt="bot-avatar"
             />
           </div>
           <div>
