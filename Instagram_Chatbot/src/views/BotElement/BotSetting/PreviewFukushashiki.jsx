@@ -4431,7 +4431,7 @@ const PreviewFukushashiki = () => {
           isPopUpZipCode={isPopUpZipCode}
           prefecturesList={state.prefecturesList}
           message={state.messagesList[state.zipcodeIndex]}
-          messageIndex={state.currentMsgIndex}
+          messageIndex={state.zipcodeIndex}
           zipcodeContentIndex={state.zipcodeContentIndex}
           onChangeValue={onChangeValue}
           onChangeErrors={onChangeErrors}
