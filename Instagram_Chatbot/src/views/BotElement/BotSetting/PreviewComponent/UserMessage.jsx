@@ -667,7 +667,7 @@ const UserMessage = ({
       </div>
     )
   }
-  
+
   return (
     <div className="ss-user-message__content-wrapper">
       {messageContent?.map((content, indexContent) => {
@@ -3421,8 +3421,6 @@ const UserMessage = ({
                               value,
                               "value_post_code_left"
                             );
-                            console.log("zipCodeAddress.value_post_code_left", zipCodeAddress.value_post_code_left);
-                            console.log("zipCodeAddress.value_post_code_right", zipCodeAddress.value_post_code_right);
                             if ((value + "").length === 3) {
                               moveToNext(`ss-user-post-code-right-input${indexContent}`);
                             }
@@ -3531,8 +3529,6 @@ const UserMessage = ({
                               value,
                               "value_post_code_right"
                             );
-                            console.log("zipCodeAddress.value_post_code_right", zipCodeAddress.value_post_code_right);
-                            console.log("zipCodeAddress.value_post_code_left", zipCodeAddress.value_post_code_left);
                             if (
                               (value + "").length === 4 &&
                               zipCodeAddress.value_post_code_left &&
