@@ -495,6 +495,9 @@ const isDisabledElement = (element) => {
   // For check GINZA AIRA
   if (element.classList.contains('disabled-input-ec')) return true;
 
+  // For check torizen san with amazon pay
+  if (getParam('amazonCheckoutSessionId') && element.getAttribute('disabled')) return true;
+
   // For other customer
   return element.disabled;
 }
