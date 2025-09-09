@@ -44,8 +44,8 @@ const UserMessage = ({
   captcha,
   onClickNext,
   displayButtonNext,
-  isPopUpZipCode,
-  isPopUpZipCodeShippingAddress,
+  onOpen,
+  onOpenShippingAddress,
   onChangeErrors,
   prefecturesList,
   variables,
@@ -1277,7 +1277,7 @@ const UserMessage = ({
                           <span
                             style={!disabled ? { cursor: "pointer" } : {}}
                             onClick={() => {
-                              if (disabled !== true) isPopUpZipCode(true, indexContent);
+                              if (disabled !== true) onOpen(true, indexContent);
                             }}
                           >
                             〒検索はこちら
@@ -3258,7 +3258,7 @@ const UserMessage = ({
                   <span
                     style={!disabled ? { cursor: "pointer" } : {}}
                     onClick={() => {
-                      if (disabled !== true) isPopUpZipCode(true, indexContent);
+                      if (disabled !== true) onOpen(true, indexContent);
                     }}
                   >
                     〒検索はこちら

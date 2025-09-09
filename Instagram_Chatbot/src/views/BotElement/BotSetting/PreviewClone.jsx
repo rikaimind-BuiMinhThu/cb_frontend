@@ -4457,7 +4457,7 @@ function Preview() {
     }
   };
 
-  const isPopUpZipCode = (isOpen, indexContent) => {
+  const onOpen = (isOpen, indexContent) => {
     if (isOpen === true) {
       setPrefectures(null);
       setCities(null);
@@ -4477,7 +4477,7 @@ function Preview() {
     }
   };
 
-  const isPopUpZipCodeShippingAddress = (isOpen, indexContent) => {
+  const onOpenShippingAddress = (isOpen, indexContent) => {
     if (isOpen === true) {
       setPrefectures(null);
       setCities(null);
@@ -4615,7 +4615,7 @@ function Preview() {
               <MDBIcon
                 style={{ width: "5%", marginLeft: "3px", cursor: "pointer" }}
                 fas
-                onClick={() => isPopUpZipCode(false)}
+                onClick={() => onOpen(false)}
                 icon="times"
                 className={"sp-plus-circle-option-icon-times-custom"}
               />
@@ -4717,7 +4717,7 @@ function Preview() {
             <div className="sp-popup-zip-code-address-body-button">
               <div
                 className="sp-popup-zip-code-address-body-button-cancel"
-                onClick={() => isPopUpZipCode(false)}
+                onClick={() => onOpen(false)}
               >
                 キャンセル
               </div>
@@ -4821,7 +4821,7 @@ function Preview() {
               <MDBIcon
                 style={{ width: "5%", marginLeft: "3px", cursor: "pointer" }}
                 fas
-                onClick={() => isPopUpZipCodeShippingAddress(false)}
+                onClick={() => onOpenShippingAddress(false)}
                 icon="times"
                 className={"sp-plus-circle-option-icon-times-custom"}
               />
@@ -4923,7 +4923,7 @@ function Preview() {
             <div className="sp-popup-zip-code-address-body-button">
               <div
                 className="sp-popup-zip-code-address-body-button-cancel"
-                onClick={() => isPopUpZipCodeShippingAddress(false)}
+                onClick={() => onOpenShippingAddress(false)}
               >
                 キャンセル
               </div>
@@ -5171,11 +5171,11 @@ function Preview() {
                             setDataMessages([...dataMessages]);
                           }}
                           dataPrefectures={[...dataPrefectures]}
-                          isPopUpZipCode={(isOpen, indexContent) =>
-                            isPopUpZipCode(isOpen, indexContent)
+                          onOpen={(isOpen, indexContent) =>
+                            onOpen(isOpen, indexContent)
                           }
-                          isPopUpZipCodeShippingAddress={(isOpen, indexContent) =>
-                            isPopUpZipCodeShippingAddress(isOpen, indexContent)
+                          onOpenShippingAddress={(isOpen, indexContent) =>
+                            onOpenShippingAddress(isOpen, indexContent)
                           }
                           onChangeErrors={(field, value) =>
                             onChangeErrors(field, value)
@@ -5642,8 +5642,8 @@ const UserMessage = ({
   captcha,
   onClickNext,
   displayButtonNext,
-  isPopUpZipCode,
-  isPopUpZipCodeShippingAddress,
+  onOpen,
+  onOpenShippingAddress,
   onChangeErrors,
   dataPrefectures,
   variables,
@@ -6735,7 +6735,7 @@ const UserMessage = ({
                           <span
                             style={!disabled ? { cursor: "pointer" } : {}}
                             onClick={() => {
-                              if (disabled !== true) isPopUpZipCodeShippingAddress(true, indexContent);
+                              if (disabled !== true) onOpenShippingAddress(true, indexContent);
                             }}
                           >
                             〒検索はこちら
@@ -8653,7 +8653,7 @@ const UserMessage = ({
                   <span
                     style={!disabled ? { cursor: "pointer" } : {}}
                     onClick={() => {
-                      if (disabled !== true) isPopUpZipCode(true, indexContent);
+                      if (disabled !== true) onOpen(true, indexContent);
                     }}
                   >
                     〒検索はこちら
