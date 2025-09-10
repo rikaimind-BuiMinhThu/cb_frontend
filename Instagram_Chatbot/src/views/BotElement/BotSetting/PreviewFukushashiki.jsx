@@ -71,6 +71,7 @@ import {
   isBotMessage,
   isUserMessage,
   isDelayBotMessage,
+  getElementMessageById,
 } from "./PreviewComponent/Utils";
 import { mapAmazonPayDataToMessagesList, isTorizenLpAmazonData } from "./PreviewComponent/TorizenUtils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
@@ -4217,6 +4218,7 @@ const PreviewFukushashiki = () => {
 
     return message.message_content.map((content, index) => (
       <BotMessage
+        messageId={message.id}
         key={indexMessage}
         content={content}
         index={index}
@@ -4267,7 +4269,7 @@ const PreviewFukushashiki = () => {
     if (!Array.isArray(message?.message_content) || message.message_content.length === 0) return null;
 
     return (
-      <div className="sp-body-user-side slideLeft">
+      <div className="sp-body-user-side slideLeft" id={getElementMessageById(message.id)}>
         <div className="sp-body-user-side-messages">
           <UserMessage
             postMessageToParent={postMessageToParent}

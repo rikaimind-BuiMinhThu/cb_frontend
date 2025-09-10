@@ -538,6 +538,12 @@ export const isUserMessage = (message) => {
   return message.belong_to === 'user' && message.message_content.length > 0;
 }
 
+export const getElementMessageById = (id) => {
+  if (!id) return;
+  
+  return `msg_id_${id}`;
+};
+
 export {
   stringNullOrEmpty, getAllUrlParams, lightenColor,
   mobileCheck, removeLeadingZero, sendUserInteractionData,
