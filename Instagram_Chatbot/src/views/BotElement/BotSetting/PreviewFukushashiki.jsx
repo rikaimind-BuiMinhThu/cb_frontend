@@ -71,6 +71,7 @@ import {
   isBotMessage,
   isUserMessage,
   isDelayBotMessage,
+  getElementMessageById,
 } from "./PreviewComponent/Utils";
 import { mapAmazonPayDataToMessagesList, isTorizenLpAmazonData } from "./PreviewComponent/TorizenUtils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
@@ -4266,12 +4267,6 @@ const PreviewFukushashiki = () => {
   const renderUserMessageContent = (message, indexMessage) => {
     if (!message || message.belong_to !== "user") return null;
     if (!Array.isArray(message?.message_content) || message.message_content.length === 0) return null;
-
-    const getElementMessageById = (id) => {
-      if (!id) return;
-      const format = `msg_id_${id}`
-      return format
-    }
 
     return (
       <div className="sp-body-user-side slideLeft" id={getElementMessageById(message.id)}>

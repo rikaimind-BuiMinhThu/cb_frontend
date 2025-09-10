@@ -5,6 +5,7 @@ import { EC_CHATBOT_URL } from "variables/constants";
 import "moment/locale/zh-cn";
 import { BOT_MESSAGE_TYPES } from "./Constants";
 import HtmlCodeMessagePreview from "components/BotMessages/HtmlCodeMessagePreview";
+import { getElementMessageById } from "./Utils";
 
 const BotMessage = ({
   content,
@@ -124,7 +125,7 @@ const BotMessage = ({
 
   return (
     <div key={index} 
-      id={`msg_id_${messageId}`}
+      id={getElementMessageById(messageId)}
       className={`sp-body-bot-side slideRight ${!isShowAvatar(content) ? "hide_avatar" : ""} ${isUGCUsage(content) ? "ugc_usage" : ""}`}>
       {(content.type === "text_input" ||
         content.type === "file" ||
