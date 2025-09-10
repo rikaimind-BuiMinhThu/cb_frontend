@@ -16,7 +16,7 @@ export default function InputDebounce({ value, onChange, debounceTime = 500, ...
   return (
     <InputCustom
       {...props}
-      value={inputValue}
+      value={value || inputValue}
       onChange={handleChange}
     />
   );  

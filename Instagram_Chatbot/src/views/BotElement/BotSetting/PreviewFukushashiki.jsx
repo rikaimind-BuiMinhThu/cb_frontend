@@ -72,6 +72,7 @@ import {
   isUserMessage,
   isDelayBotMessage,
 } from "./PreviewComponent/Utils";
+import { mapAmazonPayDataToMessagesList, isTorizenLpAmazonData } from "./PreviewComponent/TorizenUtils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
 import ZipCodePopUp from "./PreviewComponent/ZipCodePopUp";
@@ -166,6 +167,7 @@ const PREVIEW_ACTIONS = {
   UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG: "UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG",
   SET_PROCESSING: "SET_PROCESSING",
   UPDATE_PREFECTURES_LIST: "UPDATE_PREFECTURES_LIST",
+  UPDATE_AMAZON_PAY_DATA: "UPDATE_AMAZON_PAY_DATA",
 };
 
 const PreviewFukushashikiReducer = (state, action) => {
@@ -198,7 +200,8 @@ const PreviewFukushashikiReducer = (state, action) => {
           if (message.message_content.find(content => content.type === 'getting_error_notification' || content.type === 'delay') && index < state.currentMsgIndex) {
             message.hidden = true;
           } else if (message.not_display_when_have_error) {
-            const result = checkMessageCondition(message, state.objParam);
+            const conditionParams = buildConditionParams(state);
+            const result = checkMessageCondition(message, conditionParams);
             message.hidden = !result;;
           }
           return message;
@@ -246,6 +249,11 @@ const PreviewFukushashikiReducer = (state, action) => {
     }
     case PREVIEW_ACTIONS.UPDATE_PREFECTURES_LIST:
       return { ...state, prefecturesList: action.payload.prefecturesList };
+    case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA:
+      // Support only for amazon pay and subscstore cart system
+      const newMessagesList = mapAmazonPayDataToMessagesList(action.payload, state.messagesList);
+      const renderMessagesList = newMessagesList.slice(0, state.currentMsgIndex + 1);
+      return { ...state, messagesList: newMessagesList, renderMessagesList: renderMessagesList };
   }
 
   return state;
@@ -354,6 +362,12 @@ const PreviewFukushashiki = () => {
       });
   }, [state.botId, state.loadedStateFromSession, state.displayType]);
 
+  const buildConditionParams = (theState) => {
+    const result = _.cloneDeep(theState.objParam);
+    const currentUrlParams = getAllUrlParams(window.location.search);
+    return { ...result, current_url_param: Object.keys(currentUrlParams) };
+  }
+
   const computeMessageIndices = (newState, clickedMsgIndex) => {
     const { currentUserMsg, nextRenderMsg} = {
       currentUserMsg: { index: -1, take: true }, 
@@ -437,6 +451,13 @@ const PreviewFukushashiki = () => {
           type: PREVIEW_ACTIONS.UPDATE_PREVIEW_ORDER_CONTENT,
           payload: actionData
         });
+
+      case CHATBOT_ACTIONS.UPDATE_AMAZON_PAY_DATA:
+        return dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA,
+          payload: actionData,
+        });
+
       default:
         // TODO
         break;
@@ -914,7 +935,15 @@ const PreviewFukushashiki = () => {
     };
   }
 
-  const processBotDelayMessage = async (messagesList, i, newState) => {
+  const processBotDelayMessage = async (messagesList, i, newState, options = {}) => {
+    const {
+      isPassDelay = false,
+    } = options;
+    
+    if (isPassDelay) {
+      newState.currentMsgIndex = i;
+      return newState;
+    }
     if (messagesList[i]?.message_content[0]?.delay?.typing_on) {
       // TODO: Need display typing on
       // return new Promise(async (resolve) => {
@@ -1153,7 +1182,12 @@ const PreviewFukushashiki = () => {
     });
   }
 
-  const renderMessagesWithDelay = (theState, startMsgIndex, endMsgIndex, options = { setNewState: true }) => {
+  const renderMessagesWithDelay = (theState, startMsgIndex, endMsgIndex, options = {}) => {
+    const {
+      setNewState = true,
+      isPassDelay = false,
+    } = options;
+    
     userEntryScenario({
       scenario_id: theState.scenarioId,
       user_id: theState.uuid,
@@ -1164,9 +1198,11 @@ const PreviewFukushashiki = () => {
       for (let i = startMsgIndex; i <= endMsgIndex; i++) {
         theState.renderMessagesList = theState.messagesList.slice(0, i + 1);
         if (isDelayBotMessage(theState.messagesList[i])) {
-          await sleep(theState.messagesList[i].message_content[0].delay.content * 1000);
-          theState.messagesList[i].hidden = true;
-          continue;
+          if (!isPassDelay) {
+            await sleep(theState.messagesList[i].message_content[0].delay.content * 1000);
+            theState.messagesList[i].hidden = true;
+            continue;
+          }
         }
         
         // update state with theState except prefecturesList
@@ -1189,7 +1225,7 @@ const PreviewFukushashiki = () => {
       }
       resolve({ listMsgAppear });
     }).then(({ listMsgAppear }) => {
-      if(options.setNewState) {
+      if(setNewState) {
         theState.renderMessagesList = theState.messagesList.slice(0, theState.currentMsgIndex + 1);
         theState.passedUserMsgCount = theState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
   
@@ -1309,7 +1345,7 @@ const PreviewFukushashiki = () => {
     newState.userMessagesList = newState.messagesList.filter((item) => isUserMessage(item));
     for (let i = 0; i < newState.messagesList.length; i++) {
       if (newState.messagesList[i].conditions?.length > 0) {
-        const result = checkMessageCondition(newState.messagesList[i], newState.objParam);
+        const result = checkMessageCondition(newState.messagesList[i], buildConditionParams(newState));
 
         if (!result && isUserMessage(newState.messagesList[i])) {
           newState.currentUserMsgIndex++;
@@ -1353,6 +1389,9 @@ const PreviewFukushashiki = () => {
     return new Promise((resolve) => {
       let fukuDataList = [];
       savedState.userMessagesList.forEach((message) => {
+        // Except some data when fukushashiki torizen san
+        if (params.get('is_using_amazon_pay') && isTorizenLpAmazonData(message)) return;
+
         fukuDataList.push(...convertToFukushashikiObject({message: message}));
       });
       fukushashikiToLP(fukuDataList);
@@ -1424,6 +1463,16 @@ const PreviewFukushashiki = () => {
           savedState.userInputId || params.get("uuid"),
           params.get("env") || "production"
         );
+
+        // Support only for amazon pay and subscstore cart system (torizen san)
+        if (params.get('is_using_amazon_pay')) {
+          const conditionParams = buildConditionParams(savedState);
+          for (let i = 0; i < savedState.messagesList.length; i++) {
+            const result = checkMessageCondition(savedState.messagesList[i], conditionParams);
+            savedState.messagesList[i].hidden = !result;
+          }
+        }
+
         if (!isLoadedCssContent && savedState?.botInfor?.is_used_custom_css && savedState?.botInfor?.custom_css_content.length > 0) {
           const style = document.createElement('style');
           style.innerHTML = savedState?.botInfor?.custom_css_content;
@@ -3563,7 +3612,65 @@ const PreviewFukushashiki = () => {
     return newState;
   }
 
+  const handleAfterRenderMessage = (newState, options = {}) => {
+    const {
+      isBtnUpdateClick = false,
+      isUsedPastMessageLoaded = false,
+      clickedMsgIndex = 0,
+    } = options;
+
+    newState.renderMessagesList = newState.renderMessagesList.map((msg) => {
+      return isDelayBotMessage(msg) ? {...msg, hidden: true} : msg;
+    }); 
+
+    if (!isBtnUpdateClick) {
+      newState.passedUserMsgCount++;
+    } else {
+      newState.passedUserMsgCount = newState.renderMessagesList.filter((item) => isUserMessage(item)).length - 1 ;
+    }
+
+    const botConfirmMessage = newState.messagesList.find(msg => {
+      return !!msg.message_content?.find(x => x.text_input?.use_for_confirm_message)
+    });
+
+    const botConfirmJsCode = botConfirmMessage?.message_content
+      ?.find(x => x.text_input?.use_for_confirm_message)
+      ?.text_input?.jscode;
+    const nextUserMessage = newState.messagesList[newState.currentUserMsgIndex];
+    let isNextUserMessageButtonSubmit = nextUserMessage?.message_content?.[0]?.type === "button_submit";
+
+    if (isBtnUpdateClick && isUsedPastMessageLoaded) {
+      isNextUserMessageButtonSubmit = !!newState.messagesList.find((m, i) => m.message_content?.[0]?.type === "button_submit" && i <= newState.currentMsgIndex && i > clickedMsgIndex);
+    }
+
+    if (botConfirmJsCode && botConfirmJsCode.length > 0 && isNextUserMessageButtonSubmit) {
+      postMessageForGetPreviewOrderContent(botConfirmJsCode);
+    }
+
+    if (newState.isProcessing) {
+      newState.isProcessing = false;
+    }
+
+    setStateToSessionStorage(newState);
+    return dispatch({
+      type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+      payload: newState
+    });
+  }
+
   const handleRenderMessageAfterClickNext = async (newState, clickedMsgIndex, isBtnUpdateClick) => {
+    if (newState.isUsedPastMessageLoaded && isBtnUpdateClick) {
+      newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1).filter(m => !m.hidden);
+      newState.passedUserMsgCount = newState.renderMessagesList.filter((m) => isUserMessage(m) && !m.hidden).length;
+      return handleAfterRenderMessage(
+        newState,
+        { 
+          isBtnUpdateClick, 
+          isUsedPastMessageLoaded: newState.isUsedPastMessageLoaded,
+          clickedMsgIndex,
+        }
+      );
+    }
     if (newState.useNewProcess) {
       return renderMessageInRange(clickedMsgIndex + 1, newState.currentMsgIndex, newState, newState.currentUserMsgIndex, { isUpdateClick: isBtnUpdateClick, appearFromStart: true })
       .then((newState) => {
@@ -3623,41 +3730,17 @@ const PreviewFukushashiki = () => {
         newState.messagesList.splice(tempIdx, 1);
         if (newState.currentMsgIndex > tempIdx) newState.currentMsgIndex--;
       }
+      newState.renderMessagesList = newState.renderMessagesList.filter(m => !(m.id && `${m.id}`.startsWith('__temp_delay_')));
       resolve();
     }).then(() => {
-      newState.renderMessagesList = newState.renderMessagesList.map((msg) => {
-        return isDelayBotMessage(msg) ? {...msg, hidden: true} : msg;
-      }); 
-  
-      if (!isBtnUpdateClick) {
-        newState.passedUserMsgCount++;
-      } else {
-        newState.passedUserMsgCount = newState.renderMessagesList.filter((item) => isUserMessage(item)).length - 1 ;
-      }
-  
-      const botConfirmMessage = newState.messagesList.find(msg => {
-        return !!msg.message_content?.find(x => x.text_input?.use_for_confirm_message)
-      });
-  
-      const botConfirmJsCode = botConfirmMessage?.message_content
-        ?.find(x => x.text_input?.use_for_confirm_message)
-        ?.text_input?.jscode;
-      const nextUserMessage = newState.messagesList[newState.currentUserMsgIndex];
-      const isNextUserMessageButtonSubmit = nextUserMessage?.message_content?.[0]?.type === "button_submit";
-
-      if (botConfirmJsCode && botConfirmJsCode.length > 0 && isNextUserMessageButtonSubmit) {
-        postMessageForGetPreviewOrderContent(botConfirmJsCode);
-      }
-
-      if (newState.isProcessing) {
-        newState.isProcessing = false;
-      }
-
-      setStateToSessionStorage(newState);
-      return dispatch({
-        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-        payload: newState
-      });
+      handleAfterRenderMessage(
+        newState,
+        { 
+          isBtnUpdateClick, 
+          isUsedPastMessageLoaded: newState.isUsedPastMessageLoaded,
+          clickedMsgIndex,
+        }
+      );
     });
   }
 
@@ -3777,9 +3860,10 @@ const PreviewFukushashiki = () => {
 
     // Update next messages list after clicked next
     const nextMessage = newState.messagesList[clickedMsgIndex + 1];
+    const conditionParams = buildConditionParams(newState);
     for (let i = 0; i < newState.messagesList.length; i++) {
       if (newState.messagesList[i].conditions?.length > 0) {
-        const result = checkMessageCondition(newState.messagesList[i], newState.objParam);
+        const result = checkMessageCondition(newState.messagesList[i], conditionParams);
         if (!result && isUserMessage(newState.messagesList[i])) {
           newState.messagesList[i].hidden = true;
           continue;
@@ -3791,9 +3875,10 @@ const PreviewFukushashiki = () => {
       }
     }
     if (isUserMessage(nextMessage) || isBotMessage(nextMessage)) {
+      const conditionParams = buildConditionParams(newState);
       for (let i = clickedMsgIndex + 1; i < newState.messagesList.length; i++) {
         if (newState.messagesList[i].conditions.length !== 0) {
-          const result = checkMessageCondition(newState.messagesList[i], newState.objParam);
+          const result = checkMessageCondition(newState.messagesList[i], conditionParams);
           newState.messagesList[i].hidden = !result;
         }
         if (newState.messagesList[i].hidden && !stringNullOrEmpty(newState.messagesList[i].hidden)) continue;
@@ -3991,10 +4076,9 @@ const PreviewFukushashiki = () => {
       }
     }
 
-    newState.messagesList = state.messagesList;
     newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
     newState.renderMessagesList = newState.renderMessagesList.map((msg) => {
-      return isDelayBotMessage(msg) ? {...msg, hidden: true} : msg;
+      return isDelayBotMessage(msg) ? { ...msg, hidden: true } : msg;
     });
     setStateToSessionStorage(newState);
 
@@ -4060,13 +4144,15 @@ const PreviewFukushashiki = () => {
     }
   };
 
-  const isPopUpZipCode = (isOpen, indexContent, indexMessage) => {
+  const onOpenZipCodePopup = (isOpen, indexContent, indexMessage) => {
     let newState = {};
 
     if (indexContent !== undefined) {
       newState.zipcodeContentIndex = indexContent;
     }
-    newState.zipcodeIndex = indexMessage;
+    if (indexMessage !== undefined) {
+      newState.zipcodeIndex = indexMessage;
+    }
 
     if (isOpen) {
       changeElementAttributeById([
@@ -4094,7 +4180,7 @@ const PreviewFukushashiki = () => {
     ]);
   };
 
-  const isPopUpZipCodeShippingAddress = (isOpen, indexContent) => {
+  const onOpenShippingAddress = (isOpen, indexContent) => {
     // TODO: Check to remove
     // if (isOpen === true) {
     //   setPrefectures(null);
@@ -4231,11 +4317,11 @@ const PreviewFukushashiki = () => {
               // // });
             }}
             prefecturesList={[...state.prefecturesList]}
-            isPopUpZipCode={(isOpen, indexContent) =>
-              isPopUpZipCode(isOpen, indexContent, indexMessage)
-            }
-            isPopUpZipCodeShippingAddress={(isOpen, indexContent) =>
-              isPopUpZipCodeShippingAddress(isOpen, indexContent)
+            onOpen={(isOpen, indexContent) => {
+              onOpenZipCodePopup(isOpen, indexContent, Math.min(state.currentMsgIndex, indexMessage));
+            }}
+            onOpenShippingAddress={(isOpen, indexContent) =>
+              onOpenShippingAddress(isOpen, indexContent)
             }
             onChangeErrors={(field, value) =>
               onChangeErrors(field, value)
@@ -4418,7 +4504,7 @@ const PreviewFukushashiki = () => {
     return state.botInfor?.closing_bot_icon?.url || state.botInfor?.icon?.url;
   }
 
-  ///body container
+  // body container
   if (state.scenarioId && state.botInfor && state.isOpen) {
     const { containerStyle, headerStyle, bodyStyle } = getOpeningBotStyle();
     return (
@@ -4435,10 +4521,10 @@ const PreviewFukushashiki = () => {
           onOpenPreview={onOpenPreview}
         />
         <ZipCodePopUp
-          isPopUpZipCode={isPopUpZipCode}
+          onOpen={onOpenZipCodePopup}
           prefecturesList={state.prefecturesList}
           message={state.messagesList[state.zipcodeIndex]}
-          messageIndex={state.zipcodeIndex}
+          messageIndex={state.currentMsgIndex}
           zipcodeContentIndex={state.zipcodeContentIndex}
           onChangeValue={onChangeValue}
           onChangeErrors={onChangeErrors}
@@ -4666,7 +4752,6 @@ const PreviewFukushashiki = () => {
             <img
               src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
               alt="bot-header-icon"
-              alt="bot-avatar"
             />
           </div>
           <div>

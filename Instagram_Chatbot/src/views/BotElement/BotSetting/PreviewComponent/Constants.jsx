@@ -130,6 +130,7 @@ const CHATBOT_ACTIONS = {
   PREVIEW_OBJECT: 'previewObject',
   SET_CHATBOT_CONVERSION_PARAMS_TO_LOCAL_STORAGE: 'setChatbotConversionParamsToLocalStorage',
   INJECT_CUSTOM_JS: 'injectCustomJS',
+  UPDATE_AMAZON_PAY_DATA: 'updateAmazonPayData',
 };
 
 const SEARCH_MODES = {

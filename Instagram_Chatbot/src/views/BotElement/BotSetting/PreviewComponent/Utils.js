@@ -274,20 +274,21 @@ const checkMessageCondition = (message, buildParam) => {
   for (let j = 0; j < message.conditions.length; j++) {
     const conditionItem = message.conditions[j];
     const buildParamValue = buildParam[conditionItem.nameCondition];
+
     let subCheck = false;
 
     switch (conditionItem.condition) {
       case "include":
-        subCheck = buildParamValue.includes(conditionItem.inputCondition);
+        subCheck = buildParamValue && buildParamValue.includes(conditionItem.inputCondition);
         break;
       case "is":
-        subCheck = buildParamValue == conditionItem.inputCondition;
+        subCheck = buildParamValue && buildParamValue == conditionItem.inputCondition;
         break;
       case "not_include":
-        subCheck = !buildParamValue.includes(conditionItem.inputCondition);
+        subCheck = !buildParamValue || !buildParamValue.includes(conditionItem.inputCondition);
         break;
       case "is_not":
-        subCheck = buildParamValue != conditionItem.inputCondition;
+        subCheck = !buildParamValue || buildParamValue != conditionItem.inputCondition;
         break;
       default:
         break;

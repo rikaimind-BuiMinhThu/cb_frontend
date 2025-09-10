@@ -128,7 +128,7 @@ export default function UserMessage({
   captcha,
   onClickNext,
   displayButtonNext,
-  isPopUpZipCode,
+  onOpen,
   dataPrefectures,
   variables,
 }) {
@@ -2159,7 +2159,7 @@ export default function UserMessage({
                   <span
                     style={!disabled ? { cursor: "pointer" } : {}}
                     onClick={() => {
-                      if (disabled !== true) isPopUpZipCode(true, indexContent);
+                      if (disabled !== true) onOpen(true, indexContent);
                     }}
                   >
                     〒検索はこちら
