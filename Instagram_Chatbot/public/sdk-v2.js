@@ -122,6 +122,13 @@ const getDebugFlag = () => {
   return params.debug || true;
 }
 
+const getParam = (paramName) => {
+  const params = new Proxy(new URLSearchParams(window.location.search), {
+    get: (searchParams, prop) => searchParams.get(prop),
+  });
+  return params[paramName];
+}
+
 const log = (message) =>{
   let debugFlag = getDebugFlag();
 
@@ -256,7 +263,6 @@ const displayPopup = async () => {
   const data = await response.json();
   scenarioId = data.data.id;
   
-  let body = document.getElementsByTagName("BODY")[0];
   let iframe = document.createElement("iframe");
 
   if (mobileCheck()) {
@@ -287,8 +293,25 @@ const displayPopup = async () => {
   iframe.style.zIndex = "999999";
   iframe.src = `${getEcChatBotFrontEndBaseUrl()}/preview-customer-fukushashiki?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin
     }&deviceReceive=${device}&uuid=${uuid}&env=${getEnvironment()}&debug=${getDebugFlag()}&cartSystem=${data.cart_system}&isLoggedIn=${window.logged_in}`;
-  globalIframe = iframe
-  body.appendChild(iframe);
+
+  // only for amazon
+  // add param amazonCheckoutSessionId to iframe src
+  if (getParam('amazonCheckoutSessionId')) {
+    iframe.src += `&is_using_amazon_pay=true`;
+    // only for subscstore cart system, torizen san
+    // loop for waiting data is filled to lp form
+    // wait 20 times
+    let count = 0;
+    const interval = setInterval(() => {
+      if (document.querySelector("input#jsUkProfileFamilyName").value && count < 20) {
+        appendIframeToBody(iframe);
+        clearInterval(interval);
+      }
+      count++;
+    }, 200);
+  } else {
+    appendIframeToBody(iframe);
+  }
 
   window.addEventListener(
     "message",
@@ -354,8 +377,11 @@ const displayPopup = async () => {
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
       } else if (!e.data.isOpen && mobileCheck()) {
-        iframe.width = "250px";
-        iframe.height = "58px";
+        const useMoblieFullwidth = (typeof e.data.useMoblieFullwidth === 'boolean')
+          ? e.data.useMoblieFullwidth
+          : (sessionStorage.getItem("useFullwidthChatbotMobile") === "true");
+        iframe.width = useMoblieFullwidth ? "100%" : "250px";
+        iframe.height = useMoblieFullwidth ? "85px" : "58px";
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
       } else if (!e.data.isOpen) {
@@ -468,6 +494,9 @@ const processGetErrorMessage = (data) => {
 const isDisabledElement = (element) => {
   // For check GINZA AIRA
   if (element.classList.contains('disabled-input-ec')) return true;
+
+  // For check torizen san with amazon pay
+  if (getParam('amazonCheckoutSessionId') && element.getAttribute('disabled')) return true;
 
   // For other customer
   return element.disabled;
@@ -698,6 +727,11 @@ const injectCustomJS = (injectCustomJsCodes) => {
         console.error("Invalid position: " + position);
     }
   }
+}
+
+const appendIframeToBody = (iframe) => {
+  globalIframe = iframe;
+  document.body.appendChild(iframe);
 }
 
 displayPopup();

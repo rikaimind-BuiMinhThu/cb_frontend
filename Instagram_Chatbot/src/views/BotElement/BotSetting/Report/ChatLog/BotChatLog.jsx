@@ -9,10 +9,16 @@ import "assets/css/bot/bot-chat-log.css";
 import $ from "jquery";
 import BotMessage from "./BotMessage";
 import UserMessage from "./UserMessage";
-import { isBoolean } from "lodash";
+import { findLastIndex, isBoolean } from "lodash";
 import moment from "moment";
 import jwt_decode from 'jwt-decode'
+import BotChatStatistic from "./BotChatStatistic";
 registerLocale("ja", ja);
+
+const TABS = {
+  LOGS: "LOGS",
+  STATICTIC: "STATICTIC",
+}
 
 function BotChatLog() {
   const botId = Cookies.get("bot_id");
@@ -20,7 +26,9 @@ function BotChatLog() {
   const [chats, setChats] = useState([]);
   const [conversions, setConversions] = useState([]);
   const [selectScenario, setSelectScenario] = useState(null);
+  const [selectStatisticScenarioId, setSelectStatisticScenarioId] = useState(null);
   const [selectUserId, setSelectUserId] = useState(null);
+  const [selectTab, setSelectTab] = useState(TABS.LOGS);
 
   const [searchScenarioId, setSearchScenarioId] = useState(null);
   const [searchDate, setSearchDate] = useState(null);
@@ -69,13 +77,7 @@ function BotChatLog() {
     return moment(date).format("YYYY-MM-DD");
   }
 
-  function pressSearchButton() {
-    const params = {
-      sc_id: searchScenarioId ? parseInt(searchScenarioId) : null,
-      date: searchDate ? formatDate(searchDate) : null,
-      start_date: searchStartDate ? formatDate(searchStartDate) : null,
-      end_date: searchEndDate ? formatDate(searchEndDate) : null
-    };
+  function searchLog(params) {
     api
       .get(`/api/v1/managements/chat_log/${botId}/list`, {params})
       .then((res) => {
@@ -88,8 +90,28 @@ function BotChatLog() {
           setChats(res.data.chats);
         }
       });
+  }
+
+  function searchStatistic(params) {
+    if (!params.sc_id) return;
+
+    getScenarioStatictic(params);
+  }
+ 
+  function pressSearchButton() {
+    const params = {
+      sc_id: searchScenarioId ? parseInt(searchScenarioId) : null,
+      date: searchDate ? formatDate(searchDate) : null,
+      start_date: searchStartDate ? formatDate(searchStartDate) : null,
+      end_date: searchEndDate ? formatDate(searchEndDate) : null
+    };
+
     setRenderMessageArr([]);
+    setRenderMessageStatisticArr([]);
     setSelectUserId(null);
+
+    searchLog(params)
+    searchStatistic(params)
   }
 
   const [botInfor, setBotInfor] = useState();
@@ -100,9 +122,12 @@ function BotChatLog() {
   const [messageUser, setMessageUser] = useState([]);
   const [indexMessageRender, setIndexMessageRender] = useState(0);
   const [renderMessageArr, setRenderMessageArr] = useState([]);
+  const [renderMessageStatisticArr, setRenderMessageStatisticArr] = useState([]);
   const [indexUser, setIndexUser] = useState(0);
   const [captcha, setCaptcha] = useState([]);
   const [dataPrefectures, setDataPrefectures] = useState([]);
+  const [statistic, setStatistic] = useState([]);
+  const [overall, setOverall] = useState({});
 
   let SCAN_REGEX = /\{\{(.*?)\}\}/g;
 
@@ -125,6 +150,13 @@ function BotChatLog() {
     return dataObj;
   });
 
+  function onSelectTab(tab) {
+    return function () {
+      if (tab === selectTab) return;
+      setSelectTab(tab);
+    }
+  }
+
   function onSelectChat(item) {
     setSelectUserId(item.user_input_id);
     var sc = scenarios.find((s) => s.id === item.scenario_id);
@@ -132,6 +164,633 @@ function BotChatLog() {
       (a, b) => a.id - b.id
     );
     setSelectScenario(sc);
+    setRenderMessageArr([]);
+
+    getMessageData(item)
+  }
+
+  function getScenarioMessages(botId, scenario_id, conversion = [], options = {}) {
+    let messageArr = [];
+    let conversations = conversion;
+
+    const { saveMsgRender = true, saveMsgStatistic = true } = options;
+
+    api
+      .get(
+        `/api/v1/managements/chatbots/${botId}/scenarios/${scenario_id}/preview`
+      )
+      .then(async (res) => {
+        if (res.data.code === 1) {
+          if (res.data.data?.conversation?.messages?.length > 0) {
+            messageArr = [...res.data.data?.conversation?.messages];
+          }
+          let variablesAll = res.data?.all_variables || [];
+          setDataVariables(variablesAll);
+          setDataMessages(messageArr);
+          if (res.data.chatbot) {
+            let opacity_color, message_color, font_color;
+            if (res.data.chatbot.main_color === "blue") {
+              opacity_color = "#D6E0EF";
+              message_color = "#3CACEF";
+              font_color = "#fff";
+            } else if (res.data.chatbot.main_color === "green") {
+              opacity_color = "#DEEADB";
+              message_color = "#9DDB7C";
+              font_color = "#fff";
+            } else if (res.data.chatbot.main_color === "orange") {
+              opacity_color = "#F4E5DA";
+              message_color = "#EF8D2F";
+              font_color = "#fff";
+            } else if (res.data.chatbot.main_color === "yellow") {
+              opacity_color = "#F0EFEB";
+              message_color = "#F3AA2D";
+              res.data.chatbot.main_color = "#F6CA21";
+              font_color = "#fff";
+            } else if (res.data.chatbot.main_color === "pink") {
+              opacity_color = "#EBDDE3";
+              message_color = "#E65B83";
+              res.data.chatbot.main_color = "#F170AA";
+              font_color = "#fff";
+            } else if (res.data.chatbot.main_color === "purple") {
+              opacity_color = "#E9E8F1";
+              message_color = "#AF82D5";
+              res.data.chatbot.main_color = "#8C66D9";
+              font_color = "#fff";
+            } else if (res.data.chatbot.main_color === "black") {
+              opacity_color = "#ECEDE8";
+              message_color = "#fff";
+              font_color = "#333333";
+            } else if (res.data.chatbot.main_color === "white") {
+              opacity_color = "#fff";
+              message_color = "#F5F5F5";
+              font_color = "#000";
+            }
+            res.data.chatbot.opacity_color = opacity_color;
+            res.data.chatbot.message_color = message_color;
+            res.data.chatbot.font_color = font_color;
+          }
+
+          setBotInfor(res.data.chatbot);
+          if (res.data.variables) {
+            setVariables([...res.data.variables, ...variablesAll]);
+            res.data.variables.forEach((item) => {
+              objParam[item.variable_name] = item.default_value;
+            });
+          }
+          setObjParam({ ...objParam });
+          let variables = [...res.data.variables];
+          let messageUserVar = messageArr.filter(
+            (item) =>
+              item.belong_to === "user" && item.message_content.length > 0
+          );
+          setMessageUser([...messageUserVar]);
+          let renderMessage = [];
+          let index;
+          const userMessageLength = messageArr.filter(
+            (e) => e.belong_to === "user"
+          ).length;
+
+          if (!conversion.length) {
+            return;
+          }
+
+          for (let i = 0; i < messageArr.length; i++) {
+            if (messageArr[i].conditions?.length > 0) {
+              var checked = true;
+              for (let j = 0; j < messageArr[i].conditions.length; j++) {
+                let conditionItem = messageArr[i].conditions[j];
+                if (j === 0) {
+                  if (conditionItem.condition === "include") {
+                    checked = objParam[
+                      conditionItem.nameCondition
+                    ].includes(conditionItem.inputCondition);
+                  } else if (conditionItem.condition === "is") {
+                    checked =
+                      objParam[conditionItem.nameCondition] ===
+                      conditionItem.inputCondition;
+                  } else if (conditionItem.condition === "not_include") {
+                    checked = !objParam[
+                      conditionItem.nameCondition
+                    ].includes(conditionItem.inputCondition);
+                  } else if (conditionItem.condition === "is_not") {
+                    checked =
+                      objParam[conditionItem.nameCondition] !==
+                      conditionItem.inputCondition;
+                  }
+                } else if (conditionItem?.linkCondition === "and") {
+                  if (conditionItem.condition === "include") {
+                    checked =
+                      checked &&
+                      objParam[conditionItem.nameCondition].includes(
+                        conditionItem.inputCondition
+                      );
+                  } else if (conditionItem.condition === "is") {
+                    checked =
+                      checked &&
+                      objParam[conditionItem.nameCondition] ===
+                        conditionItem.inputCondition;
+                  } else if (conditionItem.condition === "not_include") {
+                    checked =
+                      checked &&
+                      !objParam[conditionItem.nameCondition].includes(
+                        conditionItem.inputCondition
+                      );
+                  } else if (conditionItem.condition === "is_not") {
+                    checked =
+                      checked &&
+                      objParam[conditionItem.nameCondition] !==
+                        conditionItem.inputCondition;
+                  }
+                } else if (conditionItem?.linkCondition === "or") {
+                  if (conditionItem.condition === "include") {
+                    checked =
+                      checked ||
+                      objParam[conditionItem.nameCondition].includes(
+                        conditionItem.inputCondition
+                      );
+                  } else if (conditionItem.condition === "is") {
+                    checked =
+                      checked ||
+                      objParam[conditionItem.nameCondition] ===
+                        conditionItem.inputCondition;
+                  } else if (conditionItem.condition === "not_include") {
+                    checked =
+                      checked ||
+                      !objParam[conditionItem.nameCondition].includes(
+                        conditionItem.inputCondition
+                      );
+                  } else if (conditionItem.condition === "is_not") {
+                    checked =
+                      checked ||
+                      objParam[conditionItem.nameCondition] !==
+                        conditionItem.inputCondition;
+                  }
+                }
+              }
+              if (checked === false) {
+                if (messageArr[i].belong_to === "user")
+                  setIndexUser((prev) => prev + 1);
+                // continue;
+              }
+            }
+            if (
+              messageArr[0].belong_to === "bot" &&
+              messageArr[i].message_content.length > 0
+            ) {
+              if (messageArr[i]?.message_content[0]?.type === "delay") {
+                if (messageArr[i]?.message_content[0]?.delay.typing_on) {
+                  await new Promise((resolve) => {
+                    renderMessage.push({ ...messageArr[i] });
+                    setRenderMessageArr([...renderMessage]);
+                    resolve();
+                  }).then(() => {
+                    setIndexMessageRender(i);
+                    renderMessage.pop();
+                    renderMessage.push({});
+                    setRenderMessageArr([...renderMessage]);
+                  });
+                } else {
+                  setIndexMessageRender(i);
+                }
+                index = i;
+              } else if (
+                messageArr[i]?.message_content[0]?.type === "email"
+              ) {
+                let emailId =
+                  messageArr[i]?.message_content[0][
+                    messageArr[i]?.message_content[0].type
+                  ].contentId;
+                let variablesData = {};
+                variablesAll.forEach((item) => {
+                  variablesData[item.variable_name] = item.default_value;
+                });
+
+                variables.forEach((item) => {
+                  variablesData[item.variable_name] = item.default_value;
+                });
+                renderMessage.push({});
+                setRenderMessageArr([...renderMessage]);
+                setIndexMessageRender(i);
+                setVariables([...variables]);
+                index = i;
+              } else if (
+                messageArr[i]?.message_content[0]?.type === "variable_set"
+              ) {
+                if (variables.length !== 0) {
+                  let dataVarExist =
+                    messageArr[i]?.message_content[0][
+                      messageArr[i]?.message_content[0].type
+                    ].variables;
+                  variables.forEach((item) => {
+                    for (let z = 0; z < dataVarExist.length; z++) {
+                      if (item.variable_name === dataVarExist[z].key) {
+                        item.default_value = dataVarExist[z].value;
+                      }
+                    }
+                  });
+                  setVariables([...variables]);
+                }
+                renderMessage.push({});
+                setRenderMessageArr([...renderMessage]);
+                setIndexMessageRender(i);
+                index = i;
+              } else if (
+                messageArr[i]?.message_content[0]?.type ===
+                "clear_variable"
+              ) {
+                if (variables.length !== 0) {
+                  let dataVarExist =
+                    messageArr[i]?.message_content[0][
+                      messageArr[i]?.message_content[0].type
+                    ].variables;
+                  variables.forEach((item) => {
+                    for (let z = 0; z < dataVarExist.length; z++) {
+                      if (item.variable_name === dataVarExist[z]) {
+                        item.default_value = "";
+                      }
+                    }
+                  });
+                  setVariables([...variables]);
+                }
+                renderMessage.push({});
+                setRenderMessageArr([...renderMessage]);
+                setIndexMessageRender(i);
+                index = i;
+              } else if (
+                messageArr[i]?.message_content[0]?.type === "pause"
+              ) {
+                renderMessage.push({});
+                setRenderMessageArr([...renderMessage]);
+                setIndexMessageRender(i);
+                index = i;
+                break;
+              } else if (messageArr[i].belong_to !== "bot") {
+                for (
+                  let j = 0;
+                  j < messageArr[i].message_content.length;
+                  j++
+                ) {
+                  if (
+                    messageArr[i].message_content[j].type === "capture"
+                  ) {
+                    api
+                      .get(
+                        `https://svg-captcha-nodejs.vercel.app/captcha?size=${
+                          messageArr[i].message_content[j][
+                            messageArr[i].message_content[j].type
+                          ].length
+                        }${
+                          messageArr[i].message_content[j][
+                            messageArr[i].message_content[j].type
+                          ].colour
+                            ? "&color=true"
+                            : ""
+                        }&charPreset=${
+                          messageArr[i].message_content[j][
+                            messageArr[i].message_content[j].type
+                          ].type
+                        }`
+                      )
+                      .then((res) => {
+                        captcha.push({
+                          index: i,
+                          indexContent: j,
+                          ...res.data,
+                        });
+                        setCaptcha([...captcha]);
+                      })
+                      .catch((error) => {
+                        console.log(error);
+                      });
+                    // break;
+                  }
+                }
+
+                renderMessage.push(messageArr[i]);
+                setIndexMessageRender(i);
+                setRenderMessageArr([...renderMessage]);
+                setIndexUser((prev) => prev + 1);
+                index = i;
+                // break;
+              } else {
+                if (
+                  messageArr[i].message_content[0]?.type ===
+                    "text_input" &&
+                  messageArr[i].message_content[0].text_input.content
+                ) {
+                  messageArr[i].message_content[0].text_input.content =
+                    messageArr[
+                      i
+                    ].message_content[0].text_input.content.replaceAll(
+                      SCAN_REGEX,
+                      (text, variable) => {
+                        if (variables.length !== 0) {
+                          let valueVar = "";
+                          for (let j = 0; j < variables.length; j++) {
+                            if (variables[j].variable_name === variable) {
+                              valueVar = variables[j].default_value;
+                            }
+                          }
+                          return valueVar;
+                        } else {
+                          return "";
+                        }
+                      }
+                    );
+                }
+
+                setIndexMessageRender(i);
+                renderMessage.push(messageArr[i]);
+                setRenderMessageArr([...renderMessage]);
+              }
+            }
+            if (messageArr[i]?.belong_to === "user") {
+              if (conversations.length === 0) {
+                break;
+              }
+              for (
+                let msIndex = 0;
+                msIndex < messageArr[i].message_content.length;
+                msIndex++
+              ) {
+                const element = messageArr[i].message_content[msIndex];
+                //TODO: find message type
+                let chats = conversations.filter(
+                  (c) => c?.message_id === messageArr[i].id
+                  && (c?.message_child_id >= 0 ? c.message_child_id === element.id : true)
+                );
+
+                let lastIndexChat = findLastIndex(chats, (c) =>
+                  c?.data_input_name ===
+                  element[element.type]?.save_input_content && element[element.type]?.save_input_content);
+
+                if (lastIndexChat < 0) {
+                  lastIndexChat = findLastIndex(chats, (c) => c?.ui_type === element.type);
+                }
+
+                const chat = chats[lastIndexChat];
+                if (!chat) {
+                  continue;
+                }
+
+                conversations = conversations.filter((c) => !(
+                  c?.message_id === chat.message_id 
+                  && (c?.message_child_id >= 0 ? c.message_child_id === chat.message_child_id : true)
+                ));
+
+                const subElement = element[element.type];
+                if (element.type === "text_input") {
+                  if (subElement.type === "text") {
+                    let data;
+                    try {
+                      data = JSON.parse(chat.value);
+                    } catch (error) {
+                      data = chat;
+                    }
+                    if (element[element.type][subElement.type].isSplitInput) {
+                      element[element.type][subElement.type].valueLeft = data.valueLeft;
+                      element[element.type][subElement.type].valueRight = data.valueRight;
+                    } else
+                      element[element.type][subElement.type].value = data?.value;
+                  }
+                  if (subElement.type === "phone_number") {
+                    if (subElement[subElement.type]?.withHyphen) {
+                      let parsedValues = {
+                        value1: "",
+                        value2: "",
+                        value3: "",
+                      };
+
+                      try {
+                        parsedValues = { ...parsedValues, ...JSON.parse(chat.value) };
+                      } catch {
+                        parsedValues = {
+                          value1: "",
+                          value2: "",
+                          value3: "",
+                        }
+                      }
+
+                      element[element.type][subElement.type] = {
+                        ...element[element.type][subElement.type],
+                        ...parsedValues,
+                      };
+                    } else {
+                      element[element.type][subElement.type].value =
+                        chat.value;
+                    }
+                  }
+                  if (subElement.type === "password") {
+                    element[element.type][subElement.type].password =
+                      "********";
+                  }
+                  if (
+                    ["urls", "email_address"].includes(subElement.type)
+                  ) {
+                    element[element.type][subElement.type].value =
+                      chat.value;
+                  }
+                  if (subElement.type === "email_confirmation") {
+                    element[element.type][subElement.type].value =
+                      chat.value;
+                    element[element.type][subElement.type].valueConfirm =
+                      chat.value;
+                  }
+                  if (subElement.type === "password_confirmation") {
+                    element[element.type][subElement.type].password =
+                      "********";
+                    element[element.type][
+                      subElement.type
+                    ].confirm_password = "********";
+                  }
+                }
+                if (element.type === "radio_button") {
+                  element[element.type].initial_selection = chat.value;
+                  // if(subElement.type==="default"){
+                  //   element[element.type].initial_selection = chat.value;
+                  // }
+                }
+                if (element.type === "checkbox") {
+                  element[element.type][subElement.type].checkedValue =
+                    chat.value;
+                  element[element.type][
+                    subElement.type
+                  ].initial_selection_picture = chat.value;
+                }
+                if (element.type === "pull_down") {
+                  element[element.type][subElement.type].value =
+                  chat?.value?.toString();
+
+                  element[element.type][subElement.type].valueLeft =
+                    chat?.valueLeft ? chat.valueLeft : chat?.content?.valueLeft;
+                  element[element.type][subElement.type].valueRight =
+                    chat?.valueRight ? chat.valueRight : chat?.content?.valueRight;
+
+                  if (subElement.type === "time_hm") {
+                    element[element.type][subElement.type].valueHour =
+                      chat.valueHour ? chat.valueHour : chat?.content?.valueHour;;
+                    element[element.type][subElement.type].valueMinute =
+                      chat.valueMinute ? chat.valueMinute : chat?.content?.valueMinute;;
+                  }
+                  if (
+                    [
+                      "date_ym",
+                      "date_ymd_hm",
+                      "dob_ym",
+                      "date_md",
+                      "date_ymd",
+                      "dob_ymd",
+                    ].includes(subElement.type)
+                  ) {
+                    element[element.type][subElement.type].valueYear =
+                      chat?.valueYear ? chat.valueYear : chat?.content?.valueYear;
+                    element[element.type][subElement.type].valueMonth =
+                      chat?.valueMonth ? chat.valueMonth : chat?.content?.valueMonth;
+                    element[element.type][subElement.type].valueDay =
+                      chat?.valueDay ? chat.valueDay : chat?.content?.valueDay;
+                  }
+                  if (subElement.type === "timezone_from_to") {
+                    element[element.type][subElement.type].valueHour1 =
+                      chat?.valueHour1 ? chat.valueHour1 : chat?.content?.valueHour1;
+                    element[element.type][subElement.type].valueMinute1 =
+                      chat?.valueMinute1 ? chat.valueMinute1 : chat?.content?.valueMinute1;
+                    element[element.type][subElement.type].valueHour2 =
+                      chat?.valueHour2 ? chat.valueHour2 : chat?.content?.valueHour2;
+                    element[element.type][subElement.type].valueMinute2 =
+                      chat?.valueMinute2 ? chat.valueMinute2 : chat?.content?.valueMinute2;
+                  }
+                  if (subElement.type === "period_from_to") {
+                    element[element.type][subElement.type].valueYear1 =
+                      chat?.valueYear1 ? chat.valueYear1 : chat?.content?.valueYear1;
+                    element[element.type][subElement.type].valueMonth1 =
+                      chat?.valueMonth1 ? chat.valueMonth1 : chat?.content?.valueMonth1;
+                    element[element.type][subElement.type].valueDay1 =
+                      chat?.valueDay1 ? chat.valueDay1 : chat?.content?.valueDay1;
+                    element[element.type][subElement.type].valueYear2 =
+                      chat?.valueYear2 ? chat.valueYear2 : chat?.content?.valueYear2;
+                    element[element.type][subElement.type].valueMonth2 =
+                      chat?.valueMonth2 ? chat.valueMonth2 : chat?.content?.valueMonth2;
+                    element[element.type][subElement.type].valueDay2 =
+                      chat?.valueDay2 ? chat.valueDay2 : chat?.content?.valueDay2;
+                  }
+                  if (subElement.type === "up_to_municipality") {
+                    element[element.type][subElement.type].prefecture =
+                      chat?.prefecture ? chat.prefecture : chat?.content?.prefecture;
+                    element[element.type][subElement.type].city =
+                      chat?.city ? chat.city : chat?.content?.prefecture;
+                  }
+                }
+                if (element.type === "zip_code_address") {
+                  element[element.type].value_address =
+                    chat.content?.value_address;
+                  element[element.type].value_building_name =
+                    chat.content?.value_building_name;
+                  element[element.type].value_municipality =
+                    chat.content?.value_municipality;
+                  element[element.type].value_post_code =
+                    chat.content?.value_post_code;
+                  element[element.type].value_post_code_left =
+                    chat.content?.value_post_code_left;
+                  element[element.type].value_post_code_right =
+                    chat.content?.value_post_code_right;
+                  element[element.type].value_prefecture =
+                    chat.content?.value_prefecture;
+                }
+
+                if (element.type === "calendar") {
+                  if (
+                    ["date_selection", "embedded"].includes(
+                      subElement.type
+                    )
+                  ) {
+                    element[element.type][subElement.type].date_select =
+                      chat?.date_select ? chat.date_select : chat?.content?.date_select;
+                  }
+                  if (subElement.type === "start_end_date") {
+                    element[element.type][
+                      subElement.type
+                    ].start_date_select = chat?.start_date_select ? chat.start_date_select : chat?.content?.start_date_select;
+                    element[element.type][
+                      subElement.type
+                    ].end_date_select = chat?.end_date_select ? chat.end_date_select : chat?.content?.end_date_select;
+                  }
+                }
+
+                if (element.type === "card_payment_radio_button") {
+                  if (subElement.type === "default") {
+                    // Regex valueChat matches JWT format
+                    const jwtRegex = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]*$/;
+                    if (jwtRegex.test(chat?.value)) {
+                      const decoded = jwt_decode(chat?.value);
+                      try {
+                        const data = JSON.parse(decoded?.data);
+                        element[element.type].initial_selection = data?.initial_selection;
+                        element[element.type].card_number = data?.card_number;
+                        element[element.type].card_holder = data?.card_holder;
+                        element[element.type].year = data?.year;
+                        element[element.type].month = data?.month;
+                        element[element.type].cvc = data?.cvc;
+                      } catch (error) {
+                        element[element.type].initial_selection = decoded?.data;
+                      }
+                    } else {
+                      element[element.type].initial_selection = chat?.value;
+                    }
+                    
+                  }
+                }
+                if (element.type === "capture") {
+                  element[element.type][subElement.type].value =
+                    chat.value;
+                }
+                if (element.type === "product_purchase_radio_button") {
+                  try {
+                    const resultPurchase = JSON.parse(chat?.value);
+                    element[element.type].value = resultPurchase;
+                    element[element.type].initial_selection = resultPurchase.initial_selection;
+                  } catch (error) {
+                    element[element.type].initial_selection = chat?.value;
+                  }
+                }
+                if (
+                  [
+                    "product_purchase"
+                  ].includes(element.type)
+                ) {
+                  if (subElement.multiple_item_purchase) {
+                    subElement.initial_selection = chat.value;
+                  } else {
+                    subElement.initial_selection = [chat.value];
+                  }
+                }
+                
+                if (element.type === "slider") {
+                  element[element.type][subElement.type].value =
+                    chat.value;
+                }
+                if (element.type === "agree_term") {
+                  element[element.type].isAgree = true;
+                }
+                element.updated_at = chat?.updated_at;
+              }
+            }
+          }
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        if (saveMsgStatistic) {
+          setRenderMessageStatisticArr(messageArr)
+        } 
+        if (saveMsgRender) {
+          setRenderMessageArr(messageArr);
+        }
+      });
+  }
+
+  function getMessageData(item) {
     api
       .get(
         `/api/v1/managements/chat_log/${item.scenario_id}/${item.user_input_id}`
@@ -163,581 +822,21 @@ function BotChatLog() {
           }
           setConversions(conversations);
 
-          api
-            .get(
-              `/api/v1/managements/chatbots/${botId}/scenarios/${item.scenario_id}/preview`
-            )
-            .then(async (res) => {
-              if (res.data.code === 1) {
-                let messageArr = [];
-                if (res.data.data?.conversation?.messages?.length > 0) {
-                  messageArr = [...res.data.data?.conversation?.messages];
-                }
-                let variablesAll = res.data?.all_variables || [];
-                setDataVariables(variablesAll);
-                setDataMessages(messageArr);
-                if (res.data.chatbot) {
-                  let opacity_color, message_color, font_color;
-                  if (res.data.chatbot.main_color === "blue") {
-                    opacity_color = "#D6E0EF";
-                    message_color = "#3CACEF";
-                    font_color = "#fff";
-                  } else if (res.data.chatbot.main_color === "green") {
-                    opacity_color = "#DEEADB";
-                    message_color = "#9DDB7C";
-                    font_color = "#fff";
-                  } else if (res.data.chatbot.main_color === "orange") {
-                    opacity_color = "#F4E5DA";
-                    message_color = "#EF8D2F";
-                    font_color = "#fff";
-                  } else if (res.data.chatbot.main_color === "yellow") {
-                    opacity_color = "#F0EFEB";
-                    message_color = "#F3AA2D";
-                    res.data.chatbot.main_color = "#F6CA21";
-                    font_color = "#fff";
-                  } else if (res.data.chatbot.main_color === "pink") {
-                    opacity_color = "#EBDDE3";
-                    message_color = "#E65B83";
-                    res.data.chatbot.main_color = "#F170AA";
-                    font_color = "#fff";
-                  } else if (res.data.chatbot.main_color === "purple") {
-                    opacity_color = "#E9E8F1";
-                    message_color = "#AF82D5";
-                    res.data.chatbot.main_color = "#8C66D9";
-                    font_color = "#fff";
-                  } else if (res.data.chatbot.main_color === "black") {
-                    opacity_color = "#ECEDE8";
-                    message_color = "#fff";
-                    font_color = "#333333";
-                  } else if (res.data.chatbot.main_color === "white") {
-                    opacity_color = "#fff";
-                    message_color = "#F5F5F5";
-                    font_color = "#000";
-                  }
-                  res.data.chatbot.opacity_color = opacity_color;
-                  res.data.chatbot.message_color = message_color;
-                  res.data.chatbot.font_color = font_color;
-                }
-
-                setBotInfor(res.data.chatbot);
-                if (res.data.variables) {
-                  setVariables([...res.data.variables, ...variablesAll]);
-                  res.data.variables.forEach((item) => {
-                    objParam[item.variable_name] = item.default_value;
-                  });
-                }
-                setObjParam({ ...objParam });
-                let variables = [...res.data.variables];
-                let messageUserVar = messageArr.filter(
-                  (item) =>
-                    item.belong_to === "user" && item.message_content.length > 0
-                );
-                setMessageUser([...messageUserVar]);
-                let renderMessage = [];
-                let index;
-                const userMessageLength = messageArr.filter(
-                  (e) => e.belong_to === "user"
-                ).length;
-
-                for (let i = 0; i < messageArr.length; i++) {
-                  if (messageArr[i].conditions?.length > 0) {
-                    var checked = true;
-                    for (let j = 0; j < messageArr[i].conditions.length; j++) {
-                      let conditionItem = messageArr[i].conditions[j];
-                      if (j === 0) {
-                        if (conditionItem.condition === "include") {
-                          checked = objParam[
-                            conditionItem.nameCondition
-                          ].includes(conditionItem.inputCondition);
-                        } else if (conditionItem.condition === "is") {
-                          checked =
-                            objParam[conditionItem.nameCondition] ===
-                            conditionItem.inputCondition;
-                        } else if (conditionItem.condition === "not_include") {
-                          checked = !objParam[
-                            conditionItem.nameCondition
-                          ].includes(conditionItem.inputCondition);
-                        } else if (conditionItem.condition === "is_not") {
-                          checked =
-                            objParam[conditionItem.nameCondition] !==
-                            conditionItem.inputCondition;
-                        }
-                      } else if (conditionItem?.linkCondition === "and") {
-                        if (conditionItem.condition === "include") {
-                          checked =
-                            checked &&
-                            objParam[conditionItem.nameCondition].includes(
-                              conditionItem.inputCondition
-                            );
-                        } else if (conditionItem.condition === "is") {
-                          checked =
-                            checked &&
-                            objParam[conditionItem.nameCondition] ===
-                              conditionItem.inputCondition;
-                        } else if (conditionItem.condition === "not_include") {
-                          checked =
-                            checked &&
-                            !objParam[conditionItem.nameCondition].includes(
-                              conditionItem.inputCondition
-                            );
-                        } else if (conditionItem.condition === "is_not") {
-                          checked =
-                            checked &&
-                            objParam[conditionItem.nameCondition] !==
-                              conditionItem.inputCondition;
-                        }
-                      } else if (conditionItem?.linkCondition === "or") {
-                        if (conditionItem.condition === "include") {
-                          checked =
-                            checked ||
-                            objParam[conditionItem.nameCondition].includes(
-                              conditionItem.inputCondition
-                            );
-                        } else if (conditionItem.condition === "is") {
-                          checked =
-                            checked ||
-                            objParam[conditionItem.nameCondition] ===
-                              conditionItem.inputCondition;
-                        } else if (conditionItem.condition === "not_include") {
-                          checked =
-                            checked ||
-                            !objParam[conditionItem.nameCondition].includes(
-                              conditionItem.inputCondition
-                            );
-                        } else if (conditionItem.condition === "is_not") {
-                          checked =
-                            checked ||
-                            objParam[conditionItem.nameCondition] !==
-                              conditionItem.inputCondition;
-                        }
-                      }
-                    }
-                    if (checked === false) {
-                      if (messageArr[i].belong_to === "user")
-                        setIndexUser((prev) => prev + 1);
-                      // continue;
-                    }
-                  }
-                  if (
-                    messageArr[0].belong_to === "bot" &&
-                    messageArr[i].message_content.length > 0
-                  ) {
-                    if (messageArr[i]?.message_content[0]?.type === "delay") {
-                      if (messageArr[i]?.message_content[0]?.delay.typing_on) {
-                        await new Promise((resolve) => {
-                          renderMessage.push({ ...messageArr[i] });
-                          setRenderMessageArr([...renderMessage]);
-                          resolve();
-                        }).then(() => {
-                          setIndexMessageRender(i);
-                          renderMessage.pop();
-                          renderMessage.push({});
-                          setRenderMessageArr([...renderMessage]);
-                        });
-                      } else {
-                        setIndexMessageRender(i);
-                      }
-                      index = i;
-                    } else if (
-                      messageArr[i]?.message_content[0]?.type === "email"
-                    ) {
-                      let emailId =
-                        messageArr[i]?.message_content[0][
-                          messageArr[i]?.message_content[0].type
-                        ].contentId;
-                      let variablesData = {};
-                      variablesAll.forEach((item) => {
-                        variablesData[item.variable_name] = item.default_value;
-                      });
-
-                      variables.forEach((item) => {
-                        variablesData[item.variable_name] = item.default_value;
-                      });
-                      renderMessage.push({});
-                      setRenderMessageArr([...renderMessage]);
-                      setIndexMessageRender(i);
-                      setVariables([...variables]);
-                      index = i;
-                    } else if (
-                      messageArr[i]?.message_content[0]?.type === "variable_set"
-                    ) {
-                      if (variables.length !== 0) {
-                        let dataVarExist =
-                          messageArr[i]?.message_content[0][
-                            messageArr[i]?.message_content[0].type
-                          ].variables;
-                        variables.forEach((item) => {
-                          for (let z = 0; z < dataVarExist.length; z++) {
-                            if (item.variable_name === dataVarExist[z].key) {
-                              item.default_value = dataVarExist[z].value;
-                            }
-                          }
-                        });
-                        setVariables([...variables]);
-                      }
-                      renderMessage.push({});
-                      setRenderMessageArr([...renderMessage]);
-                      setIndexMessageRender(i);
-                      index = i;
-                    } else if (
-                      messageArr[i]?.message_content[0]?.type ===
-                      "clear_variable"
-                    ) {
-                      if (variables.length !== 0) {
-                        let dataVarExist =
-                          messageArr[i]?.message_content[0][
-                            messageArr[i]?.message_content[0].type
-                          ].variables;
-                        variables.forEach((item) => {
-                          for (let z = 0; z < dataVarExist.length; z++) {
-                            if (item.variable_name === dataVarExist[z]) {
-                              item.default_value = "";
-                            }
-                          }
-                        });
-                        setVariables([...variables]);
-                      }
-                      renderMessage.push({});
-                      setRenderMessageArr([...renderMessage]);
-                      setIndexMessageRender(i);
-                      index = i;
-                    } else if (
-                      messageArr[i]?.message_content[0]?.type === "pause"
-                    ) {
-                      renderMessage.push({});
-                      setRenderMessageArr([...renderMessage]);
-                      setIndexMessageRender(i);
-                      index = i;
-                      break;
-                    } else if (messageArr[i].belong_to !== "bot") {
-                      for (
-                        let j = 0;
-                        j < messageArr[i].message_content.length;
-                        j++
-                      ) {
-                        if (
-                          messageArr[i].message_content[j].type === "capture"
-                        ) {
-                          api
-                            .get(
-                              `https://svg-captcha-nodejs.vercel.app/captcha?size=${
-                                messageArr[i].message_content[j][
-                                  messageArr[i].message_content[j].type
-                                ].length
-                              }${
-                                messageArr[i].message_content[j][
-                                  messageArr[i].message_content[j].type
-                                ].colour
-                                  ? "&color=true"
-                                  : ""
-                              }&charPreset=${
-                                messageArr[i].message_content[j][
-                                  messageArr[i].message_content[j].type
-                                ].type
-                              }`
-                            )
-                            .then((res) => {
-                              captcha.push({
-                                index: i,
-                                indexContent: j,
-                                ...res.data,
-                              });
-                              setCaptcha([...captcha]);
-                            })
-                            .catch((error) => {
-                              console.log(error);
-                            });
-                          // break;
-                        }
-                      }
-
-                      renderMessage.push(messageArr[i]);
-                      setIndexMessageRender(i);
-                      setRenderMessageArr([...renderMessage]);
-                      setIndexUser((prev) => prev + 1);
-                      index = i;
-                      // break;
-                    } else {
-                      if (
-                        messageArr[i].message_content[0]?.type ===
-                          "text_input" &&
-                        messageArr[i].message_content[0].text_input.content
-                      ) {
-                        messageArr[i].message_content[0].text_input.content =
-                          messageArr[
-                            i
-                          ].message_content[0].text_input.content.replaceAll(
-                            SCAN_REGEX,
-                            (text, variable) => {
-                              if (variables.length !== 0) {
-                                let valueVar = "";
-                                for (let j = 0; j < variables.length; j++) {
-                                  if (variables[j].variable_name === variable) {
-                                    valueVar = variables[j].default_value;
-                                  }
-                                }
-                                return valueVar;
-                              } else {
-                                return "";
-                              }
-                            }
-                          );
-                      }
-
-                      setIndexMessageRender(i);
-                      renderMessage.push(messageArr[i]);
-                      setRenderMessageArr([...renderMessage]);
-                    }
-                  }
-                  if (messageArr[i]?.belong_to === "user") {
-                    if (conversations.length === 0) {
-                      break;
-                    }
-                    for (
-                      let msIndex = 0;
-                      msIndex < messageArr[i].message_content.length;
-                      msIndex++
-                    ) {
-                      const element = messageArr[i].message_content[msIndex];
-                      //TODO: find message type
-                      let chats = conversations.filter(
-                        (c) => c?.message_id === messageArr[i].id
-                      );
-                      let chat = chats.find(
-                        (c) =>
-                          c?.data_input_name ===
-                          element[element.type]?.save_input_content
-                      );
-                      if (!chat) {
-                        chat = chats.find((c) => c?.ui_type === element.type);
-                      }
-                      conversations = conversations.filter(
-                        (el) => el.id !== chat?.id
-                      );
-                      const subElement = element[element.type];
-                      if (element.type === "text_input") {
-                        if (subElement.type === "text") {
-                          let data;
-                          try {
-                            data = JSON.parse(chat.value);
-                          } catch (error) {
-                            data = chat;
-                          }
-                          if (element[element.type][subElement.type].isSplitInput) {
-                            element[element.type][subElement.type].valueLeft = data.valueLeft;
-                            element[element.type][subElement.type].valueRight = data.valueRight;
-                          } else
-                            element[element.type][subElement.type].value = data?.value;
-                        }
-                        if (subElement.type === "phone_number") {
-                          if (subElement?.withHyphen) {
-                          } else
-                            element[element.type][subElement.type].value =
-                              chat.value;
-                        }
-                        if (subElement.type === "password") {
-                          element[element.type][subElement.type].password =
-                            "********";
-                        }
-                        if (
-                          ["urls", "email_address"].includes(subElement.type)
-                        ) {
-                          element[element.type][subElement.type].value =
-                            chat.value;
-                        }
-                        if (subElement.type === "email_confirmation") {
-                          element[element.type][subElement.type].value =
-                            chat.value;
-                          element[element.type][subElement.type].valueConfirm =
-                            chat.value;
-                        }
-                        if (subElement.type === "password_confirmation") {
-                          element[element.type][subElement.type].password =
-                            "********";
-                          element[element.type][
-                            subElement.type
-                          ].confirm_password = "********";
-                        }
-                      }
-                      if (element.type === "radio_button") {
-                        element[element.type].initial_selection = chat.value;
-                        // if(subElement.type==="default"){
-                        //   element[element.type].initial_selection = chat.value;
-                        // }
-                      }
-                      if (element.type === "checkbox") {
-                        element[element.type][subElement.type].checkedValue =
-                          chat.value;
-                        element[element.type][
-                          subElement.type
-                        ].initial_selection_picture = chat.value;
-                      }
-                      if (element.type === "pull_down") {
-                        element[element.type][subElement.type].value =
-                        chat?.value?.toString();
-
-                        element[element.type][subElement.type].valueLeft =
-                          chat?.valueLeft ? chat.valueLeft : chat?.content?.valueLeft;
-                        element[element.type][subElement.type].valueRight =
-                          chat?.valueRight ? chat.valueRight : chat?.content?.valueRight;
-
-                        if (subElement.type === "time_hm") {
-                          element[element.type][subElement.type].valueHour =
-                            chat.valueHour ? chat.valueHour : chat?.content?.valueHour;;
-                          element[element.type][subElement.type].valueMinute =
-                            chat.valueMinute ? chat.valueMinute : chat?.content?.valueMinute;;
-                        }
-                        if (
-                          [
-                            "date_ym",
-                            "date_ymd_hm",
-                            "dob_ym",
-                            "date_md",
-                            "date_ymd",
-                            "dob_ymd",
-                          ].includes(subElement.type)
-                        ) {
-                          element[element.type][subElement.type].valueYear =
-                            chat?.valueYear ? chat.valueYear : chat?.content?.valueYear;
-                          element[element.type][subElement.type].valueMonth =
-                            chat?.valueMonth ? chat.valueMonth : chat?.content?.valueMonth;
-                          element[element.type][subElement.type].valueDay =
-                            chat?.valueDay ? chat.valueDay : chat?.content?.valueDay;
-                        }
-                        if (subElement.type === "timezone_from_to") {
-                          element[element.type][subElement.type].valueHour1 =
-                            chat?.valueHour1 ? chat.valueHour1 : chat?.content?.valueHour1;
-                          element[element.type][subElement.type].valueMinute1 =
-                            chat?.valueMinute1 ? chat.valueMinute1 : chat?.content?.valueMinute1;
-                          element[element.type][subElement.type].valueHour2 =
-                            chat?.valueHour2 ? chat.valueHour2 : chat?.content?.valueHour2;
-                          element[element.type][subElement.type].valueMinute2 =
-                            chat?.valueMinute2 ? chat.valueMinute2 : chat?.content?.valueMinute2;
-                        }
-                        if (subElement.type === "period_from_to") {
-                          element[element.type][subElement.type].valueYear1 =
-                            chat?.valueYear1 ? chat.valueYear1 : chat?.content?.valueYear1;
-                          element[element.type][subElement.type].valueMonth1 =
-                            chat?.valueMonth1 ? chat.valueMonth1 : chat?.content?.valueMonth1;
-                          element[element.type][subElement.type].valueDay1 =
-                            chat?.valueDay1 ? chat.valueDay1 : chat?.content?.valueDay1;
-                          element[element.type][subElement.type].valueYear2 =
-                            chat?.valueYear2 ? chat.valueYear2 : chat?.content?.valueYear2;
-                          element[element.type][subElement.type].valueMonth2 =
-                            chat?.valueMonth2 ? chat.valueMonth2 : chat?.content?.valueMonth2;
-                          element[element.type][subElement.type].valueDay2 =
-                            chat?.valueDay2 ? chat.valueDay2 : chat?.content?.valueDay2;
-                        }
-                        if (subElement.type === "up_to_municipality") {
-                          element[element.type][subElement.type].prefecture =
-                            chat?.prefecture ? chat.prefecture : chat?.content?.prefecture;
-                          element[element.type][subElement.type].city =
-                            chat?.city ? chat.city : chat?.content?.prefecture;
-                        }
-                      }
-                      if (element.type === "zip_code_address") {
-                        element[element.type].value_address =
-                          chat.content?.value_address;
-                        element[element.type].value_building_name =
-                          chat.content?.value_building_name;
-                        element[element.type].value_municipality =
-                          chat.content?.value_municipality;
-                        element[element.type].value_post_code =
-                          chat.content?.value_post_code;
-                        element[element.type].value_post_code_left =
-                          chat.content?.value_post_code_left;
-                        element[element.type].value_post_code_right =
-                          chat.content?.value_post_code_right;
-                        element[element.type].value_prefecture =
-                          chat.content?.value_prefecture;
-                      }
-
-                      if (element.type === "calendar") {
-                        if (
-                          ["date_selection", "embedded"].includes(
-                            subElement.type
-                          )
-                        ) {
-                          element[element.type][subElement.type].date_select =
-                            chat?.date_select ? chat.date_select : chat?.content?.date_select;
-                        }
-                        if (subElement.type === "start_end_date") {
-                          element[element.type][
-                            subElement.type
-                          ].start_date_select = chat?.start_date_select ? chat.start_date_select : chat?.content?.start_date_select;
-                          element[element.type][
-                            subElement.type
-                          ].end_date_select = chat?.end_date_select ? chat.end_date_select : chat?.content?.end_date_select;
-                        }
-                      }
-
-                      if (element.type === "card_payment_radio_button") {
-                        if (subElement.type === "default") {
-                          // Regex valueChat matches JWT format
-                          const jwtRegex = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]*$/;
-                          if (jwtRegex.test(chat?.value)) {
-                            const decoded = jwt_decode(chat?.value);
-                            try {
-                              const data = JSON.parse(decoded?.data);
-                              element[element.type].initial_selection = data?.initial_selection;
-                              element[element.type].card_number = data?.card_number;
-                              element[element.type].card_holder = data?.card_holder;
-                              element[element.type].year = data?.year;
-                              element[element.type].month = data?.month;
-                              element[element.type].cvc = data?.cvc;
-                            } catch (error) {
-                              element[element.type].initial_selection = decoded?.data;
-                            }
-                          } else {
-                            element[element.type].initial_selection = chat?.value;
-                          }
-                          
-                        }
-                      }
-                      if (element.type === "capture") {
-                        element[element.type][subElement.type].value =
-                          chat.value;
-                      }
-                      if (element.type === "product_purchase_radio_button") {
-                        try {
-                          const resultPurchase = JSON.parse(chat?.value);
-                          element[element.type].value = resultPurchase;
-                          element[element.type].initial_selection = resultPurchase.initial_selection;
-                        } catch (error) {
-                          element[element.type].initial_selection = chat?.value;
-                        }
-                      }
-                      if (
-                        [
-                          "product_purchase"
-                        ].includes(element.type)
-                      ) {
-                        if (subElement.multiple_item_purchase) {
-                          subElement.initial_selection = chat.value;
-                        } else {
-                          subElement.initial_selection = [chat.value];
-                        }
-                      }
-                      
-                      if (element.type === "slider") {
-                        element[element.type][subElement.type].value =
-                          chat.value;
-                      }
-                      if (element.type === "agree_term") {
-                        element[element.type].isAgree = true;
-                      }
-                      element.updated_at = chat?.updated_at;
-                    }
-                    setRenderMessageArr(messageArr);
-                  }
-                }
-              }
-            })
-            .catch((error) => {
-              console.log(error);
-            });
+          getScenarioMessages(botId, item.scenario_id, conversations, { saveMsgRender: true });
         }
       });
+  }
+
+  async function getScenarioStatictic(params) {
+    api.get(`/api/v1/managements/chat_log/statistic`, { params })
+      .then((response) => {
+        if (response.data.code === 1) {
+          setStatistic(response.data.statistic);
+          setOverall(response.data.overall);
+          getScenarioMessages(botId, params.sc_id, [], { saveMsgStatistic: true });
+        }
+      }
+    )
   }
 
   return (
@@ -819,6 +918,12 @@ function BotChatLog() {
               </Row>
               <hr />
               </CardHeader>
+
+              <div className="tab_holder">
+                <button className={`tab_button ${selectTab === TABS.LOGS ? "t_selected" : ""}`} onClick={onSelectTab(TABS.LOGS)}>会話ログ</button>
+                <button className={`tab_button ${selectTab === TABS.STATICTIC ? "t_selected" : ""}`} onClick={onSelectTab(TABS.STATICTIC)}>統計 (とうけい)</button>
+              </div>
+
               <CardBody
                 style={{
                   display: "flex",
@@ -829,6 +934,8 @@ function BotChatLog() {
                   padding: "10px 15px",
                 }}
               >
+              {selectTab === TABS.LOGS && 
+              <>
                 <div className="left-column">
                   <div
                     style={{
@@ -859,7 +966,7 @@ function BotChatLog() {
                           }}
                         >
                           <button
-                            className="button"
+                            className="button chat-log_item"
                             onClick={(e) => onSelectChat(item)}
                             style={
                               item.scenario_id === selectScenario?.id &&
@@ -889,6 +996,10 @@ function BotChatLog() {
                                 }}
                               ></i>
                             </div>
+
+                            <div className="chat_log-is_done_holder">
+                              <span className={`is-done_label ${item.is_done ? "finished" : ""}`}>{item.is_done ? "完了" : "未完了"}</span>
+                            </div>
                           </button>
                         </li>
                       ))}
@@ -897,7 +1008,7 @@ function BotChatLog() {
                 </div>
 
                 <div className="right-column">
-                  {selectScenario ? (
+                  {selectScenario && (
                     <>
                       <div
                         id="csp-body"
@@ -994,11 +1105,18 @@ function BotChatLog() {
                           );
                         })}
                       </div>
-                    </>
-                  ) : (
-                    <></>
-                  )}
+                    </>)}
                 </div>
+              </>}
+
+              <BotChatStatistic
+                display={selectTab === TABS.STATICTIC}
+                overall={overall}
+                botInfor={botInfor}
+                messages={renderMessageStatisticArr}
+                dataMessages={dataMessages}
+                statistic={statistic}
+              />
               </CardBody>
             </Card>
           </Col>

@@ -25,21 +25,43 @@ export default function SubmitButton({ display = false, content, submitErrorMess
   const getButtonSubmitName = (isProcessing) => {
     if (!content.button_submit_use_loading_text) return content.button_submit_name;
 
-    if (isProcessing) {
-      return content.button_submit_loading_text;
+    if (isProcessing && content[content.type]?.loading_config) {
+      const { buttonHtml = "", buttonStyle = "" } = content[content.type].loading_config;
+
+      return (
+        <>
+          <style dangerouslySetInnerHTML={{ __html: buttonStyle }} />
+          <div dangerouslySetInnerHTML={{ __html: buttonHtml.trim() || content.button_submit_name}} />
+        </>
+      );
     }
 
     return content.button_submit_name;
+  }
+
+  const renderLoadingUnderButton = (isProcessing) => {
+    if (!isProcessing || !content[content.type]?.loading_config) return null;
+
+    const { loadingHtml, loadingStyle } = content[content.type].loading_config;
+
+    return (
+      <>
+        <style dangerouslySetInnerHTML={{ __html: loadingStyle }} />
+        <div dangerouslySetInnerHTML={{ __html: loadingHtml }}/>
+      </>
+    )
   }
 
   return (
     <>
       {renderSubmitErrorMessage()}
       <div className="ss-user-setting__item-text_input-top">
+        {buttonSubmit?.style && <style dangerouslySetInnerHTML={{ __html: buttonSubmit.style }} />}
         <button id="chatbot-submit-button" onClick={onClickNext}>
           {getButtonSubmitName(isProcessing)}
         </button>
       </div>
+      {renderLoadingUnderButton(isProcessing)}
     </>
   );
 };

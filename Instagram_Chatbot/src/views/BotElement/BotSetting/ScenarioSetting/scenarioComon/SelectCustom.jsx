@@ -33,6 +33,7 @@ const SelectCustom = ({ id, allowClear = true, data, value, onChange, keyValue =
         onChange={onChange}
         value={value || undefined}
         disabled={disabled}
+        virtual={false}
         filterOption={(input, option) =>
           option.children ?
             option.children?.toLowerCase().includes(input.toLowerCase())
@@ -40,6 +41,7 @@ const SelectCustom = ({ id, allowClear = true, data, value, onChange, keyValue =
             option.value.toLowerCase().includes(input.toLowerCase())
         }
         optionFilterProp="children"
+        getPopupContainer={trigger => trigger.parentNode}
       >
         {
           data && data.map((item, index) => {            

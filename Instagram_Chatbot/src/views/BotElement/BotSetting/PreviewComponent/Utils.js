@@ -1,6 +1,6 @@
 import api from "api/api-management";
 import { tokenExpired } from "api/tokenExpired";
-import { CHATBOT_SERVER, GET_CAPTCHA_PATH } from "./Constants";
+import { CHATBOT_SERVER, CURRENCY_UNITS, GET_CAPTCHA_PATH } from "./Constants";
 
 const stringNullOrEmpty = (string) => {
   return !string || (string + "").trim() === "";
@@ -169,6 +169,12 @@ const getChatBotSetting = (botId) => {
   );
 }
 
+const patchWithDrawalPreview = (botId, data) => {
+  return patchToChatBotServer(
+    CHATBOT_SERVER.WITHDRAWAL_RESPONSE.replace(":bot_id", botId), data
+  )
+} 
+
 const sendEmailRequest = (emailId, data) => {
   return postToChatBotServer(
     CHATBOT_SERVER.SEND_EMAIL_PATH.replace(":email_id", emailId),
@@ -180,6 +186,41 @@ const sendConvertTextJapaneseRequest = (text) => {
   return postToChatBotServer(
     CHATBOT_SERVER.CONVERT_TEXT_JAPANESE_PATH,
     { text }
+  );
+}
+
+const sendScenarioUserResponse = (data) => {
+  return postToChatBotServer(
+    CHATBOT_SERVER.SEND_SCENARIO_USER_RESPONSE,
+    data
+  );
+}
+
+const createStatusConversion = (data) => {
+  return postToChatBotServer(
+    CHATBOT_SERVER.CREATE_STATUS_CONVERSION_USER_RESPONSE,
+    data
+  );
+}
+
+const updateStatusConversion = (data) => {
+  return patchToChatBotServer(
+    CHATBOT_SERVER.UPDATE_STATUS_CONVERSION_USER_RESPONSE,
+    data
+  );
+}
+
+const createScenarioUserResponseMessageHistory = (data) => {
+  return postToChatBotServer(
+    CHATBOT_SERVER.CREATE_USER_SCENARIO_RESPONSE_MESSAGE_HISTORY,
+    data,
+  );
+}
+
+const userEntryScenario = (data) => {
+  return postToChatBotServer(
+    CHATBOT_SERVER.USER_ENTRY_SCENARIO,
+    data,
   );
 }
 
@@ -233,20 +274,21 @@ const checkMessageCondition = (message, buildParam) => {
   for (let j = 0; j < message.conditions.length; j++) {
     const conditionItem = message.conditions[j];
     const buildParamValue = buildParam[conditionItem.nameCondition];
+
     let subCheck = false;
 
     switch (conditionItem.condition) {
       case "include":
-        subCheck = buildParamValue.includes(conditionItem.inputCondition);
+        subCheck = buildParamValue && buildParamValue.includes(conditionItem.inputCondition);
         break;
       case "is":
-        subCheck = buildParamValue == conditionItem.inputCondition;
+        subCheck = buildParamValue && buildParamValue == conditionItem.inputCondition;
         break;
       case "not_include":
-        subCheck = !buildParamValue.includes(conditionItem.inputCondition);
+        subCheck = !buildParamValue || !buildParamValue.includes(conditionItem.inputCondition);
         break;
       case "is_not":
-        subCheck = buildParamValue != conditionItem.inputCondition;
+        subCheck = !buildParamValue || buildParamValue != conditionItem.inputCondition;
         break;
       default:
         break;
@@ -267,6 +309,12 @@ const getAddressFromZipCode = (zipCode) => {
   return getToChatBotServer(
     CHATBOT_SERVER.GET_ADDRESS_FROM_ZIP_CODE_PATH.replace(":zip_code", zipCode)
   );
+}
+
+export const buildConditionParams = (theState) => {
+  const result = _.cloneDeep(theState.objParam);
+  const currentUrlParams = getAllUrlParams(window.location.search);
+  return { ...result, current_url_param: Object.keys(currentUrlParams) };
 }
 
 /**
@@ -416,6 +464,28 @@ const removeSpace = (text, trim = true) => {
   return trim ? replacedText.trim() : replacedText;
 }
 
+const getColor = (color, options = {}) => {
+  const { toUpperCase = false, trim = true, addHash = true, ignoreEmpty } = options;
+  
+  let baseColor = color;
+
+  if (toUpperCase) {
+    baseColor = baseColor.toUpperCase();
+  }
+
+  if (trim) {
+    baseColor = baseColor.trim();
+  }
+
+  if (addHash && !baseColor.startsWith("#")) {
+    if (!ignoreEmpty || baseColor !== "") {
+      baseColor = `#${baseColor}`;
+    }
+  }
+
+  return baseColor;
+};
+
 const hideMessageOnError = (message) => {
   if (!message.hidden && message.not_display_when_have_error) {
     return { ...message, hidden: true };
@@ -437,6 +507,49 @@ const processMessagesForErrorState = (payload) => {
   return processedPayload;
 };
 
+const createTempDelay = (seconds = 0.5) => {
+  return {
+    id: `__temp_delay_${Date.now()}`,
+    belong_to: 'bot',
+    message_name: 'delay',
+    message_content: [{ type: 'delay', delay: { content: Number(seconds)}}],
+  }
+}
+const parseQuantity = (quantity = 0) => {
+  for (const { value, symbol } of CURRENCY_UNITS) {
+    if (quantity >= value) {
+      return (
+        (quantity / value).toFixed(1).replace(/\.0$/, "") + symbol
+      );
+    }
+  }
+  return (quantity || 0).toLocaleString("ja-JP"); 
+};
+
+export const isDislayingLoginForm = (message) => {
+  const loginMessageNames = ["ログイン", "Login", "login", "LOGIN"];
+  return loginMessageNames.includes(message.message_name);
+}
+
+export const isBotMessage = (message) => {
+  return message.belong_to === 'bot' && message.message_content.length > 0;
+}
+
+export const isDelayBotMessage = (message) => {
+  if (!message) return false;
+  return message.belong_to === 'bot' && message.message_content[0]?.type === "delay";
+}
+
+export const isUserMessage = (message) => {
+  return message.belong_to === 'user' && message.message_content.length > 0;
+}
+
+export const getElementMessageById = (id) => {
+  if (!id) return;
+  
+  return `msg_id_${id}`;
+};
+
 export {
   stringNullOrEmpty, getAllUrlParams, lightenColor,
   mobileCheck, removeLeadingZero, sendUserInteractionData,
@@ -446,5 +559,7 @@ export {
   sleep, getCaptcha, appendParamsToUrl, checkMessageCondition,
   getAddressFromZipCode, secondToDatetime, findItem, isUndefined,
   changeElementAttributeById, toCamelCase, sendConvertTextJapaneseRequest,
-  scrollToPosition, removeSpace, processMessagesForErrorState, hideMessageOnError,
+  scrollToPosition, removeSpace, getColor, processMessagesForErrorState, hideMessageOnError, createTempDelay,
+  patchWithDrawalPreview, sendScenarioUserResponse, createStatusConversion, updateStatusConversion, parseQuantity,
+  createScenarioUserResponseMessageHistory, userEntryScenario,
 };

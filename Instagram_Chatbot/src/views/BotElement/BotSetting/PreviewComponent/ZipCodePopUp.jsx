@@ -6,11 +6,11 @@ import { MDBIcon } from "mdbreact";
 import SelectCustom from "../ScenarioSetting/scenarioComon/SelectCustom";
 
 const ZipCodePopUp = ({
-  isPopUpZipCode,
   prefecturesList,
   message,
   messageIndex,
   zipcodeContentIndex,
+  onOpen,
   onChangeValue,
   onChangeErrors,
   errors = {},
@@ -97,16 +97,16 @@ const ZipCodePopUp = ({
 
   const onSelectZipcode = () => {
     let index = zipcodeContentIndex; 
-    if (!zipcodeContentIndex) {
+    if (!zipcodeContentIndex && zipcodeContentIndex !== 0) {
       index = message.message_content
         .findIndex((item) => item.type === "zip_code_address");
     }
 
-      if (state.selectedZipcode) {
-        changeElementAttributeById([
-          { id: "sp-withdrawal-container", style: { display: "none" }},
-          { id: "sp-popup-zip-code-address", style: { display: "none" }}
-        ]);
+    if (state.selectedZipcode) {
+      changeElementAttributeById([
+        { id: "sp-withdrawal-container", style: { display: "none" }},
+        { id: "sp-popup-zip-code-address", style: { display: "none" }}
+      ]);
 
       let newErrors = { ...errors };
       newErrors[`message${messageIndex}_content${index}_zip_code_address`] = "";
@@ -137,7 +137,7 @@ const ZipCodePopUp = ({
           <MDBIcon
             style={{ width: "5%", marginLeft: "3px", cursor: "pointer" }}
             fas
-            onClick={() => isPopUpZipCode(false)}
+            onClick={() => onOpen(false)}
             icon="times"
             className={"sp-plus-circle-option-icon-times-custom"}
           />
@@ -181,7 +181,7 @@ const ZipCodePopUp = ({
         <div className="sp-popup-zip-code-address-body-button">
           <div
             className="sp-popup-zip-code-address-body-button-cancel"
-            onClick={() => isPopUpZipCode(false)}
+            onClick={() => onOpen(false)}
           >
             キャンセル
           </div>

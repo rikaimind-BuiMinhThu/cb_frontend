@@ -32,6 +32,7 @@ import { stringNullOrEmpty } from "./Utils";
 import SubmitButton from "./UserMessageComponent/SubmitButton";
 import InputDebounce from "../ScenarioSetting/scenarioComon/InputDebounce";
 import { convertTextJapaneseByApi } from "utils/japaneseConverter";
+import OptionGender from "./UserMessageComponent/OptionGender";
 
 const UserMessage = ({
   messageContentProps,
@@ -43,8 +44,8 @@ const UserMessage = ({
   captcha,
   onClickNext,
   displayButtonNext,
-  isPopUpZipCode,
-  isPopUpZipCodeShippingAddress,
+  onOpen,
+  onOpenShippingAddress,
   onChangeErrors,
   prefecturesList,
   variables,
@@ -666,7 +667,7 @@ const UserMessage = ({
       </div>
     )
   }
-  
+
   return (
     <div className="ss-user-message__content-wrapper">
       {messageContent?.map((content, indexContent) => {
@@ -849,6 +850,7 @@ const UserMessage = ({
                           )
                         }
                         value={textInput[textInput.type]?.value}
+                        inputMode="numeric"
                       ></InputCustom>
                     ) : (
                       <div
@@ -1275,7 +1277,7 @@ const UserMessage = ({
                           <span
                             style={!disabled ? { cursor: "pointer" } : {}}
                             onClick={() => {
-                              if (disabled !== true) isPopUpZipCode(true, indexContent);
+                              if (disabled !== true) onOpen(true, indexContent);
                             }}
                           >
                             〒検索はこちら
@@ -1993,7 +1995,14 @@ const UserMessage = ({
                 )}
                 <div className="ss-message__content--user-radio_button-wrapper">
                   {radioButton.type === "default" &&
-                    radioButton[radioButton.type].map((item, index) => {
+                    radioButton.use_as_gender
+                    ? <OptionGender 
+                        indexContent={indexContent} 
+                        radioButton={radioButton} 
+                        onChangeValue={onChangeValue} 
+                        options={radioButton[radioButton.type]}
+                      />
+                    : radioButton[radioButton.type].map((item, index) => {
                       return (
                         <div
                           key={index}
@@ -3249,7 +3258,7 @@ const UserMessage = ({
                   <span
                     style={!disabled ? { cursor: "pointer" } : {}}
                     onClick={() => {
-                      if (disabled !== true) isPopUpZipCode(true, indexContent);
+                      if (disabled !== true) onOpen(true, indexContent);
                     }}
                   >
                     〒検索はこちら
@@ -3412,8 +3421,6 @@ const UserMessage = ({
                               value,
                               "value_post_code_left"
                             );
-                            console.log("zipCodeAddress.value_post_code_left", zipCodeAddress.value_post_code_left);
-                            console.log("zipCodeAddress.value_post_code_right", zipCodeAddress.value_post_code_right);
                             if ((value + "").length === 3) {
                               moveToNext(`ss-user-post-code-right-input${indexContent}`);
                             }
@@ -3522,8 +3529,6 @@ const UserMessage = ({
                               value,
                               "value_post_code_right"
                             );
-                            console.log("zipCodeAddress.value_post_code_right", zipCodeAddress.value_post_code_right);
-                            console.log("zipCodeAddress.value_post_code_left", zipCodeAddress.value_post_code_left);
                             if (
                               (value + "").length === 4 &&
                               zipCodeAddress.value_post_code_left &&

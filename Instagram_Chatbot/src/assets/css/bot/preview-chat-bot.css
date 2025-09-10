@@ -5,15 +5,15 @@
 }
 
 #error-message {
-    width: "95%";
-    padding: "5px";
-    border: "1px solid #f44336";
-    background-color: #ffebee;
-    color: #d32f2f;
+    width: 95%;
+    padding: 5px;
     border-radius: 5px;
-    font-family: "Arial, sans-serif";
+    font-family: Arial, sans-serif;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    margin: 10px;
+    position: fixed;
+    top: 12.5%;
+    left: 0;
+    margin: 5px;
 }
 #chatbot-submit-button {
     background: linear-gradient(135deg, #4caf50, #43a047);
@@ -132,6 +132,7 @@
 .sp-avatar img {
     border-radius: 50%;
     width: 60px;
+    object-fit: cover;
 }
 
 .sp-header-left-label {
@@ -195,6 +196,23 @@
     display: flex;
     width: 100%;
     justify-content: space-between;
+}
+
+.sp-body-bot-side.hide_avatar > .sp-avatar {
+    display: none;
+}
+
+.sp-body-bot-side.ugc_usage > .sp-body-bot-side-messages {
+    width: 100%;
+    padding: 0 30px;
+}
+
+.sp-body-bot-side.ugc_usage > .sp-body-bot-side-messages .ss-bot-chat-detail-content.display_ugc {
+  white-space: nowrap;
+  width: 100% !important;
+  background-color: transparent !important;
+  color: auto;
+  padding: 0;
 }
 
 /* .sp-body-bot-side::before {
@@ -568,6 +586,7 @@
 }
 
 .slideRight {
+    gap: 15px;
     animation-name: slideRight;
     -webkit-animation-name: slideRight;
 
@@ -802,13 +821,12 @@ slideUp
     }
 }
 
-/* CSS cho màn hình mobile */
 @media (max-width: 767px) {
     .sp-container {
       position: fixed;
       bottom: 0;
       right: 0px;
-      width: 100%; /* full-width cho màn hình mobile */
+      width: 100%;
       max-width: 100%;
       height: 620px;
       background-color: transparent;
@@ -906,15 +924,20 @@ slideUp
         -webkit-transform: rotate(-135deg);
       }
     .sp-avatar img {
+        max-width: none;
         border-radius: 50%;
-        width: 50px;
+        width: 40px;
+        height: 40px;
+        object-fit: cover;
+        display: block;
     }
     .sp-avatar-bt img {
         border-radius: 50%;
         width: 58px;
+        height: 58px;
+        object-fit: cover;
+        display: block;
     }
-
-
   }
 
 .chatbot_timer_holder {
@@ -929,4 +952,96 @@ slideUp
 
 .ss-user-setting__item-bottom div[style*="display: flex"] > div:last-child {
   width: 59% !important;
+}
+
+.options-gender_wrapper {
+    padding: 0px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.options-gender_wrapper-item {
+    display: flex;
+    width: 100%;
+    gap: 5px;
+}
+
+.option-gender-item {
+    flex-grow: 1;
+    border-radius: 10px;
+    box-sizing: border-box;
+    padding: 15px 10px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    transition-duration: 0.2s;
+}
+
+.option-gender-item:active {
+    transform: scale(0.95);
+}
+
+.option-gender-item .ico {
+    width: 50px;
+    height: 50px;
+}
+
+.fullwidth_mobile_chatbot .sp-avatar img {
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    display: block;
+}
+
+.fullwidth_mobile_chatbot #comment_bubble {
+  width: calc(100% - 60px) !important;
+  height: 46px;
+  background: #fff;
+  border-radius: 28px;
+  flex: 1 1 auto !important;
+    min-width: 0 !important;
+    width: clamp(240px, calc(100vw - 150px), 310px) !important;
+    margin-left: 0 !important;
+}
+
+.fullwidth_mobile_chatbot #comment_bubble.sp-bubble {
+  max-width: none !important;
+  padding-left: 15px !important;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  width: 160px;
+  height: 55px;
+}
+
+.fullwidth_mobile_chatbot #comment_bubble:before {
+  content: "";
+  width: 0;
+  height: 0;
+  left: -5px !important;
+  top: 13px;
+  position: absolute;
+  border-top: 9px solid transparent;
+  border-right: 14px solid #fff;
+  border-bottom: 9px solid transparent;
+}
+
+@media only screen and (max-device-width: 480px) {
+  .fullwidth_mobile_chatbot body.is_mobile #comment_bubble.sp-bubble,
+  .fullwidth_mobile_chatbot body.is_mobile #comment_bubble {
+    width: calc(100% - 60px) !important;
+  }
+
+  .fullwidth_mobile_chatbot .sp-container1.slideUpSp {
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 auto !important;
+    transform-origin: center bottom !important;
+  }
 }

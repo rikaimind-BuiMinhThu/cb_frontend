@@ -5,6 +5,7 @@ import { EC_CHATBOT_URL } from "variables/constants";
 import "moment/locale/zh-cn";
 import { BOT_MESSAGE_TYPES } from "./Constants";
 import HtmlCodeMessagePreview from "components/BotMessages/HtmlCodeMessagePreview";
+import { getElementMessageById } from "./Utils";
 
 const BotMessage = ({
   content,
@@ -12,9 +13,29 @@ const BotMessage = ({
   botInfor,
   checkoutUrl,
   previewOrderContent,
-  postMessageForExecuteJs
+  postMessageForExecuteJs,
+  messageId
 }) => {
   const [textInputContent, setTextInputContent] = useState(""); 
+
+  const isShowAvatar = (content) => {
+    if (!content) return false;
+
+    switch(content.type) {
+      case 'text_input':
+      case 'file':
+      case 'delay': 
+        return true;
+      case BOT_MESSAGE_TYPES.HTML_CODE: 
+        return !isUGCUsage(content);
+    }
+  }
+
+  const isUGCUsage = (content) => {
+    if (content.type !== BOT_MESSAGE_TYPES.HTML_CODE) return false;
+
+    return content[content.type]?.use_for_ugc;
+  }
 
   const handleDownloadFile = (file) => {
     let link = document.createElement("a");
@@ -98,14 +119,20 @@ const BotMessage = ({
     return result;
   }
 
+  const getBotImage = (botInfor) => {
+    return botInfor?.icon?.url || botInfor?.opening_bot_icon?.url || botInfor?.closing_bot_icon?.url;
+  }
+
   return (
-    <div key={index} className="sp-body-bot-side slideRight">
+    <div key={index} 
+      id={getElementMessageById(messageId)}
+      className={`sp-body-bot-side slideRight ${!isShowAvatar(content) ? "hide_avatar" : ""} ${isUGCUsage(content) ? "ugc_usage" : ""}`}>
       {(content.type === "text_input" ||
         content.type === "file" ||
         content.type === "delay" ||
         content.type === BOT_MESSAGE_TYPES.HTML_CODE) && (
           <div className="sp-body-bot-side-avatar sp-avatar">
-            <img src={EC_CHATBOT_URL + "/" + botInfor?.icon?.url} />
+            <img src={EC_CHATBOT_URL + "/" + getBotImage(botInfor)} />
           </div>
         )}
       <div className="sp-body-bot-side-messages">
