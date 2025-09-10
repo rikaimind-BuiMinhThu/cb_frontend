@@ -1275,6 +1275,7 @@ const PreviewFukushashiki = () => {
       bottomMarginSp: designSetting?.bottom_margin_sp,
       isUsedErrMsgByJs: res.data?.chatbot?.is_used_err_msg_by_js,
       errMsgJsCode: res.data?.chatbot?.err_msg_js_code,
+      cart_system: res.data?.chatbot?.client_cart_system || null,
       useNewProcess: res.data?.chatbot?.client_cart_system === CART_SYSTEM.EC_FORCE,
       isUsedPastMessageLoaded: !!res.data?.chatbot?.is_used_message_loaded_past,
       isProcessing: false,
@@ -2769,7 +2770,7 @@ const PreviewFukushashiki = () => {
             break;
           case "full_width_katakana":
             REGEX_CHECK = /[^ァ-ン\s]+/;
-            messageLog = "全角カタカナを入力してください。";
+            messageLog = state.cart_system === CART_SYSTEM.SUBSC_STORE ? "全角文字を入力してください。" : "全角カタカナを入力してください。";
             break;
           case "double_byte":
             // REGEX_CHECK = /[^ァ-ンぁ-んｧ-ﾝﾞﾟ]+$/;
@@ -4739,18 +4740,18 @@ const PreviewFukushashiki = () => {
         className={state.useFullWidthChatbotMobile ? "fullwidth_mobile_chatbot" : ""}
         style={{
           backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
-          width: state.useFullWidthChatbotMobile ? "calc(100vw - 20px)" : "240px",
-          height: state.useFullWidthChatbotMobile ? "70px" : "48px",
-          borderRadius: '35px',
+          width: state.useFullWidthChatbotMobile ? "calc(100vw - 30px)" : "240px",
+          height: state.useFullWidthChatbotMobile ? "75px" : "48px",
+          borderRadius: state.useFullWidthChatbotMobile ? "45px" :'35px',
           display: "flex",
           justifyContent: "left",
           position: 'fixed',
           bottom: state.bottomMarginSp ? `${state.bottomMarginSp}px` : '10px',
-          right: state.rightMarginSp ? `${state.rightMarginSp}px` : '10px'
+          right: (state.useFullWidthChatbotMobile) ? "15px" : (state.rightMarginSp ? `${state.rightMarginSp}px` : '10px')
         }}
       >
-        <div className="sp-header-left" onClick={() => onOpenPreview(!state.isOpen)} style={{ width: '100%', padding: '4px' }}>
-          <div className={state.useFullWidthChatbotMobile ? "fullwidth_mobile_chatbot sp-header-left-avatar sp-avatar" :"sp-header-left-avatar sp-avatar"} style={{ width: state.useFullWidthChatbotMobile ? "50px"  :'38px' }}>
+        <div className="sp-header-left" onClick={() => onOpenPreview(!state.isOpen)} style={{ width: '100%', padding: state.useFullWidthChatbotMobile ? "15px" : '4px' }}>
+          <div className={state.useFullWidthChatbotMobile ? "fullwidth_mobile_chatbot sp-header-left-avatar sp-avatar" :"sp-header-left-avatar sp-avatar"} style={{ width: state.useFullWidthChatbotMobile ? "58px"  :'38px' }}>
             <img
               src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
               alt="bot-header-icon"
