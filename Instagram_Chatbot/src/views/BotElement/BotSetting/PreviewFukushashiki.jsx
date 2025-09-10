@@ -252,7 +252,7 @@ const PreviewFukushashikiReducer = (state, action) => {
       return { ...state, prefecturesList: action.payload.prefecturesList };
     case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA:
       // Support only for amazon pay and subscstore cart system
-      const newMessagesList = mapAmazonPayDataToMessagesList(action.payload, state.messagesList);
+      const newMessagesList = mapAmazonPayDataToMessagesList(action.payload, state.messagesList, state.prefecturesList);
       const renderMessagesList = newMessagesList.slice(0, state.currentMsgIndex + 1);
       return { ...state, messagesList: newMessagesList, renderMessagesList: renderMessagesList };
   }
