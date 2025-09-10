@@ -1,4 +1,6 @@
-export const mapAmazonPayDataToMessagesList = (amazonPayData, messagesList) => {
+import { findItem } from "./Utils";
+
+export const mapAmazonPayDataToMessagesList = (amazonPayData, messagesList, prefectureList) => {
   // No support for other customer and other cart system
   if (!amazonPayData || amazonPayData.cartSystem !== "SUBSCSTORE") return messagesList;
 
@@ -50,7 +52,12 @@ export const mapAmazonPayDataToMessagesList = (amazonPayData, messagesList) => {
 
   const messageProfileStateId = userMessages?.find(message => message.message_content.find(content => content.prefecture_fukushashiki_search_value === "jsUkProfileStateId"));
   if (messageProfileStateId) {
-    messageProfileStateId.message_content.find(content => content.prefecture_fukushashiki_search_value === "jsUkProfileStateId").zip_code_address.value_prefecture = profileStateId;
+    messageProfileStateId.message_content.find(content => content.prefecture_fukushashiki_search_value === "jsUkProfileStateId").zip_code_address.value_prefecture = findItem(prefectureList, {
+      keys: ["name"],
+      value: profileStateId,
+      onSuccess: (item)=> item.id,
+      callbackValue: profileStateId,
+    });
   }
 
   const messageProfileCity = userMessages?.find(message => message.message_content.find(content => content.municipality_fukushashiki_search_value === "jsUkProfileCity"));
