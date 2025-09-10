@@ -926,8 +926,8 @@ slideUp
     .sp-avatar img {
         max-width: none;
         border-radius: 50%;
-        width: 55px;
-        height: 55px;
+        width: 40px;
+        height: 40px;
         object-fit: cover;
         display: block;
     }
