@@ -31,7 +31,7 @@ export default function SubmitButton({ display = false, content, submitErrorMess
       return (
         <>
           <style dangerouslySetInnerHTML={{ __html: buttonStyle }} />
-          <div dangerouslySetInnerHTML={{ __html: buttonHtml }} />
+          <div dangerouslySetInnerHTML={{ __html: buttonHtml.trim() || content.button_submit_name}} />
         </>
       );
     }
