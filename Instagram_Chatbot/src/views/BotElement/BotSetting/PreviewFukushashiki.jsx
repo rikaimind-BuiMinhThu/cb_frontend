@@ -1275,6 +1275,7 @@ const PreviewFukushashiki = () => {
       bottomMarginSp: designSetting?.bottom_margin_sp,
       isUsedErrMsgByJs: res.data?.chatbot?.is_used_err_msg_by_js,
       errMsgJsCode: res.data?.chatbot?.err_msg_js_code,
+      cart_system: res.data?.chatbot?.client_cart_system || null,
       useNewProcess: res.data?.chatbot?.client_cart_system === CART_SYSTEM.EC_FORCE,
       isUsedPastMessageLoaded: !!res.data?.chatbot?.is_used_message_loaded_past,
       isProcessing: false,
@@ -2769,7 +2770,7 @@ const PreviewFukushashiki = () => {
             break;
           case "full_width_katakana":
             REGEX_CHECK = /[^ァ-ン\s]+/;
-            messageLog = "全角カタカナを入力してください。";
+            messageLog = state.cart_system === CART_SYSTEM.SUBSC_STORE ? "全角文字を入力してください。" : "全角カタカナを入力してください。";
             break;
           case "double_byte":
             // REGEX_CHECK = /[^ァ-ンぁ-んｧ-ﾝﾞﾟ]+$/;

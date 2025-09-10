@@ -225,6 +225,7 @@ const RANGE_TEXT_VALIDATE = {
 
 const CART_SYSTEM = {
   EC_FORCE: 'ec_force',
+  SUBSC_STORE: 'subsc_store',
 }
 
 export {
