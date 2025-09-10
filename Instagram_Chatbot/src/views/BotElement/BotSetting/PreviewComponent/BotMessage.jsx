@@ -12,7 +12,8 @@ const BotMessage = ({
   botInfor,
   checkoutUrl,
   previewOrderContent,
-  postMessageForExecuteJs
+  postMessageForExecuteJs,
+  messageId
 }) => {
   const [textInputContent, setTextInputContent] = useState(""); 
 
@@ -122,7 +123,9 @@ const BotMessage = ({
   }
 
   return (
-    <div key={index} className={`sp-body-bot-side slideRight ${!isShowAvatar(content) ? "hide_avatar" : ""} ${isUGCUsage(content) ? "ugc_usage" : ""}`}>
+    <div key={index} 
+      id={`msg_id_${messageId}`}
+      className={`sp-body-bot-side slideRight ${!isShowAvatar(content) ? "hide_avatar" : ""} ${isUGCUsage(content) ? "ugc_usage" : ""}`}>
       {(content.type === "text_input" ||
         content.type === "file" ||
         content.type === "delay" ||
