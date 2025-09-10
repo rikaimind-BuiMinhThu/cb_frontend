@@ -72,6 +72,7 @@ import {
   isUserMessage,
   isDelayBotMessage,
   getElementMessageById,
+  buildConditionParams,
 } from "./PreviewComponent/Utils";
 import { mapAmazonPayDataToMessagesList, isTorizenLpAmazonData } from "./PreviewComponent/TorizenUtils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
@@ -362,12 +363,6 @@ const PreviewFukushashiki = () => {
         dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
       });
   }, [state.botId, state.loadedStateFromSession, state.displayType]);
-
-  const buildConditionParams = (theState) => {
-    const result = _.cloneDeep(theState.objParam);
-    const currentUrlParams = getAllUrlParams(window.location.search);
-    return { ...result, current_url_param: Object.keys(currentUrlParams) };
-  }
 
   const computeMessageIndices = (newState, clickedMsgIndex) => {
     const { currentUserMsg, nextRenderMsg} = {

@@ -311,6 +311,12 @@ const getAddressFromZipCode = (zipCode) => {
   );
 }
 
+export const buildConditionParams = (theState) => {
+  const result = _.cloneDeep(theState.objParam);
+  const currentUrlParams = getAllUrlParams(window.location.search);
+  return { ...result, current_url_param: Object.keys(currentUrlParams) };
+}
+
 /**
  * 
  * @param {*} format using dd || hh || mm || ss || ms
