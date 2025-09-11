@@ -72,6 +72,7 @@ import {
   isUserMessage,
   isDelayBotMessage,
   getElementMessageById,
+  isTempDelay,
 } from "./PreviewComponent/Utils";
 import { mapAmazonPayDataToMessagesList, isTorizenLpAmazonData } from "./PreviewComponent/TorizenUtils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
@@ -169,6 +170,7 @@ const PREVIEW_ACTIONS = {
   SET_PROCESSING: "SET_PROCESSING",
   UPDATE_PREFECTURES_LIST: "UPDATE_PREFECTURES_LIST",
   UPDATE_AMAZON_PAY_DATA: "UPDATE_AMAZON_PAY_DATA",
+  REMOVE_TEMP_DELAYS: "REMOVE_TEMP_DELAYS",
 };
 
 const PreviewFukushashikiReducer = (state, action) => {
@@ -255,6 +257,12 @@ const PreviewFukushashikiReducer = (state, action) => {
       const newMessagesList = mapAmazonPayDataToMessagesList(action.payload, state.messagesList, state.prefecturesList);
       const renderMessagesList = newMessagesList.slice(0, state.currentMsgIndex + 1);
       return { ...state, messagesList: newMessagesList, renderMessagesList: renderMessagesList };
+      
+    case PREVIEW_ACTIONS.REMOVE_TEMP_DELAYS:
+      return { 
+        ...state, 
+        renderMessagesList: state.renderMessagesList?.filter(m => !isTempDelay(m, RENDER_CHATBOT_CONFIG.TEMP_DELAY_PREFIX)) || [],
+      };
   }
 
   return state;
@@ -3687,7 +3695,7 @@ const PreviewFukushashiki = () => {
 
     return new Promise(async (resolve) => {
       // Insert a temporary delay item to show typing GIF for 0.5s when advancing
-      const tempDelay = createTempDelay(0.5);
+      const tempDelay = createTempDelay(0.5, RENDER_CHATBOT_CONFIG.TEMP_DELAY_PREFIX);
 
       // Place tempDelay right after clicked index so user sees typing before next messages
       newState.messagesList.splice(clickedMsgIndex + 1, 0, tempDelay);
@@ -3707,7 +3715,6 @@ const PreviewFukushashiki = () => {
           dispatch({
             type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
             payload: {
-              messagesList: newState.messagesList,
               renderMessagesList: newState.renderMessagesList.slice(0, i + 1).map(msg => isDelayBotMessage(msg) ? {...msg, hidden: true} : msg),
             }
           })
@@ -3726,12 +3733,12 @@ const PreviewFukushashiki = () => {
       }
 
       // remove temp delay if still present
-      const tempIdx = newState.messagesList.findIndex(m => m.id && `${m.id}`.startsWith('__temp_delay_'));
+      const tempIdx = newState.messagesList.findIndex(m => isTempDelay(m, RENDER_CHATBOT_CONFIG.TEMP_DELAY_PREFIX));
       if (tempIdx >= 0) {
         newState.messagesList.splice(tempIdx, 1);
         if (newState.currentMsgIndex > tempIdx) newState.currentMsgIndex--;
       }
-      newState.renderMessagesList = newState.renderMessagesList.filter(m => !(m.id && `${m.id}`.startsWith('__temp_delay_')));
+      dispatch({ type: PREVIEW_ACTIONS.REMOVE_TEMP_DELAYS });
       resolve();
     }).then(() => {
       handleAfterRenderMessage(
@@ -3878,7 +3885,7 @@ const PreviewFukushashiki = () => {
     if (isUserMessage(nextMessage) || isBotMessage(nextMessage)) {
       const conditionParams = buildConditionParams(newState);
       for (let i = clickedMsgIndex + 1; i < newState.messagesList.length; i++) {
-        if (newState.messagesList[i].conditions.length !== 0) {
+        if (newState.messagesList[i].conditions && newState.messagesList[i].conditions.length !== 0) {
           const result = checkMessageCondition(newState.messagesList[i], conditionParams);
           newState.messagesList[i].hidden = !result;
         }

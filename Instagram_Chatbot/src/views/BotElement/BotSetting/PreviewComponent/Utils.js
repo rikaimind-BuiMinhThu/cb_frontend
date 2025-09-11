@@ -1,6 +1,6 @@
 import api from "api/api-management";
 import { tokenExpired } from "api/tokenExpired";
-import { CHATBOT_SERVER, CURRENCY_UNITS, GET_CAPTCHA_PATH } from "./Constants";
+import { CHATBOT_SERVER, CURRENCY_UNITS, GET_CAPTCHA_PATH, RENDER_CHATBOT_CONFIG } from "./Constants";
 
 const stringNullOrEmpty = (string) => {
   return !string || (string + "").trim() === "";
@@ -501,9 +501,9 @@ const processMessagesForErrorState = (payload) => {
   return processedPayload;
 };
 
-const createTempDelay = (seconds = 0.5) => {
+const createTempDelay = (seconds = 0.5, prefix) => {
   return {
-    id: `__temp_delay_${Date.now()}`,
+    id: `${prefix || ''}${Date.now()}`,
     belong_to: 'bot',
     message_name: 'delay',
     message_content: [{ type: 'delay', delay: { content: Number(seconds)}}],
@@ -536,6 +536,10 @@ export const isDelayBotMessage = (message) => {
 
 export const isUserMessage = (message) => {
   return message.belong_to === 'user' && message.message_content.length > 0;
+}
+
+export const isTempDelay = (message, prefix) => {
+  return message.id && `${message.id}`.startsWith(prefix || '');
 }
 
 export const getElementMessageById = (id) => {
