@@ -4369,6 +4369,7 @@ const PreviewFukushashiki = () => {
             color: color,
           }}
           id="error-message"
+          className="error-message-modal"
           dangerouslySetInnerHTML={{ __html: text }}
         />
       </div>
