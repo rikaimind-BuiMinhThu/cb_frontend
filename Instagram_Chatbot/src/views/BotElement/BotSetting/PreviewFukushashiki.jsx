@@ -72,6 +72,7 @@ import {
   isUserMessage,
   isDelayBotMessage,
   getElementMessageById,
+  buildConditionParams,
   isTempDelay,
 } from "./PreviewComponent/Utils";
 import { mapAmazonPayDataToMessagesList, isTorizenLpAmazonData } from "./PreviewComponent/TorizenUtils";
@@ -370,12 +371,6 @@ const PreviewFukushashiki = () => {
         dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
       });
   }, [state.botId, state.loadedStateFromSession, state.displayType]);
-
-  const buildConditionParams = (theState) => {
-    const result = _.cloneDeep(theState.objParam);
-    const currentUrlParams = getAllUrlParams(window.location.search);
-    return { ...result, current_url_param: Object.keys(currentUrlParams) };
-  }
 
   const computeMessageIndices = (newState, clickedMsgIndex) => {
     const { currentUserMsg, nextRenderMsg} = {
@@ -4381,6 +4376,7 @@ const PreviewFukushashiki = () => {
             color: color,
           }}
           id="error-message"
+          className="error-message-modal"
           dangerouslySetInnerHTML={{ __html: text }}
         />
       </div>
@@ -4546,7 +4542,7 @@ const PreviewFukushashiki = () => {
           className="sp-header"
         >
           <div className="sp-header-left" onClick={handleCloseChatbotWhenUseWithDrawal}>
-            <div className="sp-header-left-avatar sp-avatar">
+            <div className="sp-header-left-avatar sp-avatar-bt">
               <img src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`} alt="bot-header-icon"/>
             </div>
             <div className="sp-header-left-label">
