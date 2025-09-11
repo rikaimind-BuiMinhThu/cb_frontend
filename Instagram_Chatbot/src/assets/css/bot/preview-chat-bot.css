@@ -10,11 +10,19 @@
     border-radius: 5px;
     font-family: Arial, sans-serif;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    margin: 10px;
+    border: "1px solid #f44336";
+    background-color: #ffebee;
+    color: #d32f2f;
+}
+
+.error-message-modal {
     position: fixed;
     top: 12.5%;
     left: 0;
-    margin: 5px;
+    margin: 5px !important;
 }
+
 #chatbot-submit-button {
     background: linear-gradient(135deg, #4caf50, #43a047);
     color: #fff;
