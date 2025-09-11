@@ -126,10 +126,17 @@ for (let i = 2; i <= 10; i++) {
 
 let dataDayFixed = [];
 for (let i = 1; i <= 31; i++) {
-  dataDayFixed.push({
-    key: i + '',
-    value: i + ''
-  });
+  if (i < 10) {
+    dataDayFixed.push({
+      key: `0${i}` + '',
+      value: `0${i}` + ''
+    });
+  } else {
+    dataDayFixed.push({
+      key: i + '',
+      value: i + ''
+    });
+  }
 }
 
 let dataEveryMinuteFixed = [
