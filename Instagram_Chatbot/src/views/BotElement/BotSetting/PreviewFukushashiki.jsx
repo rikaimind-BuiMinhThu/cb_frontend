@@ -171,7 +171,7 @@ const PREVIEW_ACTIONS = {
   SET_PROCESSING: "SET_PROCESSING",
   UPDATE_PREFECTURES_LIST: "UPDATE_PREFECTURES_LIST",
   UPDATE_AMAZON_PAY_DATA: "UPDATE_AMAZON_PAY_DATA",
-  REMOVE_TEMP_DELAYS: "REMOVE_TEMP_DELAYS",
+  REMOVE_TEMP_DELAY: "REMOVE_TEMP_DELAY",
 };
 
 const PreviewFukushashikiReducer = (state, action) => {
@@ -259,7 +259,7 @@ const PreviewFukushashikiReducer = (state, action) => {
       const renderMessagesList = newMessagesList.slice(0, state.currentMsgIndex + 1);
       return { ...state, messagesList: newMessagesList, renderMessagesList: renderMessagesList };
       
-    case PREVIEW_ACTIONS.REMOVE_TEMP_DELAYS:
+    case PREVIEW_ACTIONS.REMOVE_TEMP_DELAY:
       return { 
         ...state, 
         renderMessagesList: state.renderMessagesList?.filter(m => !isTempDelay(m, RENDER_CHATBOT_CONFIG.TEMP_DELAY_PREFIX)) || [],
@@ -3733,7 +3733,7 @@ const PreviewFukushashiki = () => {
         newState.messagesList.splice(tempIdx, 1);
         if (newState.currentMsgIndex > tempIdx) newState.currentMsgIndex--;
       }
-      dispatch({ type: PREVIEW_ACTIONS.REMOVE_TEMP_DELAYS });
+      dispatch({ type: PREVIEW_ACTIONS.REMOVE_TEMP_DELAY });
       resolve();
     }).then(() => {
       handleAfterRenderMessage(
