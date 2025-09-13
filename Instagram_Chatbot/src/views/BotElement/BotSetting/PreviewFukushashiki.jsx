@@ -171,7 +171,6 @@ const PREVIEW_ACTIONS = {
   SET_PROCESSING: "SET_PROCESSING",
   UPDATE_PREFECTURES_LIST: "UPDATE_PREFECTURES_LIST",
   UPDATE_AMAZON_PAY_DATA: "UPDATE_AMAZON_PAY_DATA",
-  REMOVE_TEMP_DELAY: "REMOVE_TEMP_DELAY",
 };
 
 const PreviewFukushashikiReducer = (state, action) => {
@@ -263,12 +262,6 @@ const PreviewFukushashikiReducer = (state, action) => {
       const newMessagesList = mapAmazonPayDataToMessagesList(action.payload, state.messagesList, state.prefecturesList);
       const renderMessagesList = newMessagesList.slice(0, state.currentMsgIndex + 1);
       return { ...state, messagesList: newMessagesList, renderMessagesList: renderMessagesList };
-      
-    case PREVIEW_ACTIONS.REMOVE_TEMP_DELAY:
-      return { 
-        ...state, 
-        renderMessagesList: state.renderMessagesList?.filter(m => !isTempDelay(m, RENDER_CHATBOT_CONFIG.TEMP_DELAY_PREFIX)) || [],
-      };
   }
 
   return state;
@@ -3740,7 +3733,6 @@ const PreviewFukushashiki = () => {
         if (newState.currentMsgIndex > tempIdx) newState.currentMsgIndex--;
       }
 
-      console.log("dispatch final message: ", newState.currentMsgIndex);
       // Single final dispatch with all state updates
       dispatch({ 
         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
@@ -4098,7 +4090,6 @@ const PreviewFukushashiki = () => {
       .map((msg) => isDelayBotMessage(msg) ? { ...msg, hidden: true } : msg);
     
     setStateToSessionStorage(newState);
-    console.log("dispatch after change value: ", newState.currentMsgIndex);
     
     dispatch({
       type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
