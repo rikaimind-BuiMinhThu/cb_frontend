@@ -4524,7 +4524,7 @@ const PreviewFukushashiki = () => {
           className="sp-header"
         >
           <div className="sp-header-left" onClick={handleCloseChatbotWhenUseWithDrawal}>
-            <div className="sp-body-bot-side-avatar sp-avatar">
+            <div className="sp-header-left-avatar sp-avatar-bt">
               <img src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`} alt="bot-header-icon"/>
             </div>
             <div className="sp-header-left-label">
@@ -4653,7 +4653,7 @@ const PreviewFukushashiki = () => {
         }}
       >
         <div className="sp-header-left-bt" onClick={() => onOpenPreview(!state.isOpen)}>
-          <div className="sp-body-bot-side-avatar sp-avatar">
+          <div className="sp-header-left-avatar sp-avatar-bt">
             <img src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`} alt="bot-header-icon" />
           </div>
         </div>
