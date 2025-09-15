@@ -1,31 +1,71 @@
 import React, { useEffect, useState } from 'react';
 import { Select } from 'antd';
-import 'antd/dist/antd.css';
 import { InboxOutlined } from "@ant-design/icons";
+import 'antd/dist/antd.css';
+import './SelectCustom.css';
 
 const { Option } = Select;
 
 const SelectCustom = ({ id, allowClear = true, data, value, onChange, keyValue = "key", style, placeholder, nameValue = "value", mode, label, disabled = false, styleLabel, showSearch = true }) => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      const userAgent = navigator.userAgent.toLowerCase();
+      const isMobileDevice = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
+      const isSmallScreen = window.innerWidth <= 768;
+      setIsMobile(isMobileDevice || isSmallScreen);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Native select for mobile devices
+  if (isMobile) {
+    return (
+      <React.Fragment>
+        {label && <span className="select-custom-label" style={styleLabel}>{label}</span>}
+        <select
+          id={id}
+          value={value || ''}
+          onChange={(e) => onChange && onChange(e.target.value)}
+          disabled={disabled}
+          className="select-custom-native"
+          style={style}
+        >
+          {placeholder && <option value="" disabled>{placeholder}</option>}
+          {data && data.map((item, index) => {
+            if (item[keyValue] || item[nameValue]) {
+              return (
+                <option key={index} value={item[keyValue]}>
+                  {item[nameValue]}
+                </option>
+              );
+            }
+            return null;
+          })}
+        </select>
+      </React.Fragment>
+    );
+  }
+
+  // Antd Select for desktop
   return (
     <React.Fragment>
-      {label && <span style={{ marginRight: '2%', fontSize: '14px', fontWeight: '400', ...styleLabel }}>{label}</span>}
+      {label && <span className="select-custom-label" style={styleLabel}>{label}</span>}
       <Select
         showSearch={showSearch}
         allowClear={allowClear}
-        style={style || { width: '90%' }}
+        className="select-custom-antd"
+        style={style}
         placeholder={placeholder}
         mode={mode ? mode : 'combobox'}
         notFoundContent={
-          <div
-            style={{
-              height: "90px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
-            <div style={{ textAlign: "center" }}>
-              <InboxOutlined style={{fontSize: "50px", fontWeight: "100"}}/>
+          <div className="select-custom-not-found">
+            <div className="select-custom-not-found-content">
+              <InboxOutlined className="select-custom-not-found-icon"/>
               <div>データーがありません</div>
             </div>
           </div>
