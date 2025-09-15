@@ -1,29 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Select } from 'antd';
 import { InboxOutlined } from "@ant-design/icons";
 import 'antd/dist/antd.css';
 import './SelectCustom.css';
+import { isAndroid } from '../../PreviewComponent/Utils';
 
 const { Option } = Select;
 
 const SelectCustom = ({ id, allowClear = true, data, value, onChange, keyValue = "key", style, placeholder, nameValue = "value", mode, label, disabled = false, styleLabel, showSearch = true }) => {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      const userAgent = navigator.userAgent.toLowerCase();
-      const isMobileDevice = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
-      const isSmallScreen = window.innerWidth <= 768;
-      setIsMobile(isMobileDevice || isSmallScreen);
-    };
-
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  // Native select for mobile devices
-  if (isMobile) {
+  // Native select for Android devices only
+  if (isAndroid()) {
     return (
       <React.Fragment>
         {label && <span className="select-custom-label" style={styleLabel}>{label}</span>}
@@ -51,7 +37,7 @@ const SelectCustom = ({ id, allowClear = true, data, value, onChange, keyValue =
     );
   }
 
-  // Antd Select for desktop
+  // Antd Select for non-Android devices (iOS, desktop, etc.)
   return (
     <React.Fragment>
       {label && <span className="select-custom-label" style={styleLabel}>{label}</span>}
