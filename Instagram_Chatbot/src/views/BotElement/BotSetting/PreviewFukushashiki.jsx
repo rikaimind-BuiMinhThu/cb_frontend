@@ -171,6 +171,18 @@ const PREVIEW_ACTIONS = {
   SET_PROCESSING: "SET_PROCESSING",
   UPDATE_PREFECTURES_LIST: "UPDATE_PREFECTURES_LIST",
   UPDATE_AMAZON_PAY_DATA: "UPDATE_AMAZON_PAY_DATA",
+  SET_SCENARIO_USER_RESPONSES: "SET_SCENARIO_USER_RESPONSES",
+  SET_SHOW_POPUP_CLOSE_BOT: "SET_SHOW_POPUP_CLOSE_BOT",
+  SET_CHECKOUT_URL: "SET_CHECKOUT_URL",
+  SET_OBJ_PARAM: "SET_OBJ_PARAM",
+  SET_BOT_ID: "SET_BOT_ID",
+  CLOSE_BOT: "CLOSE_BOT",
+  SET_CAPTCHA: "SET_CAPTCHA",
+  SET_URL_SEND: "SET_URL_SEND",
+  SET_URL_RECEIVE: "SET_URL_RECEIVE",
+  SET_DEVICE_RECEIVE: "SET_DEVICE_RECEIVE",
+  SET_SCENARIO_ID: "SET_SCENARIO_ID",
+  SET_CONVERSION_STATUS: "SET_CONVERSION_STATUS",
 };
 
 const PreviewFukushashikiReducer = (state, action) => {
@@ -262,6 +274,30 @@ const PreviewFukushashikiReducer = (state, action) => {
       const newMessagesList = mapAmazonPayDataToMessagesList(action.payload, state.messagesList, state.prefecturesList);
       const renderMessagesList = newMessagesList.slice(0, state.currentMsgIndex + 1);
       return { ...state, messagesList: newMessagesList, renderMessagesList: renderMessagesList };
+    case PREVIEW_ACTIONS.SET_CHECKOUT_URL:
+      return { ...state, checkoutUrl: action.payload };
+    case PREVIEW_ACTIONS.SET_OBJ_PARAM:
+      return { ...state, objParam: action.payload };
+    case PREVIEW_ACTIONS.SET_SHOW_POPUP_CLOSE_BOT:
+      return { ...state, showPopupCloseBot: action.payload };
+    case PREVIEW_ACTIONS.SET_SCENARIO_USER_RESPONSES:
+      return { ...state, scenarioUserResponses: action.payload };
+    case PREVIEW_ACTIONS.SET_BOT_ID:
+      return { ...state, botId: action.payload };
+    case PREVIEW_ACTIONS.CLOSE_BOT:
+      return { ...state, isOpen: false, showPopupCloseBot: false };
+    case PREVIEW_ACTIONS.SET_CAPTCHA:
+      return { ...state, captcha: action.payload };
+    case PREVIEW_ACTIONS.SET_URL_SEND:
+      return { ...state, urlSend: action.payload };
+    case PREVIEW_ACTIONS.SET_URL_RECEIVE:
+      return { ...state, urlReceive: action.payload };
+    case PREVIEW_ACTIONS.SET_DEVICE_RECEIVE:
+      return { ...state, deviceReceive: action.payload };
+    case PREVIEW_ACTIONS.SET_SCENARIO_ID:
+      return { ...state, scenarioId: action.payload };
+    case PREVIEW_ACTIONS.SET_CONVERSION_STATUS:
+      return { ...state, conversionStatus: action.payload };
   }
 
   return state;
@@ -276,15 +312,14 @@ const PreviewFukushashiki = () => {
   const timeoutConfrmMsgRef = useRef(null);
 
   const setShowPopupCloseBot = (value) => {
-    dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { showPopupCloseBot: value } });
+    dispatch({ type: PREVIEW_ACTIONS.SET_SHOW_POPUP_CLOSE_BOT, payload: value });
   };
 
   const setCheckoutUrl = (value) => {
-    dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { checkoutUrl: value } });
+    dispatch({ type: PREVIEW_ACTIONS.SET_CHECKOUT_URL, payload: value });
   };
-
-  const setScenarioUserResponses = (sursArr) => {
-    dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { scenarioUserResponses: sursArr } });
+  const setScenarioUserResponses = (scenarioUserResponses) => {
+    dispatch({ type: PREVIEW_ACTIONS.SET_SCENARIO_USER_RESPONSES, payload: scenarioUserResponses });
   };
 
   const getBotModalStyle = () => {
@@ -320,8 +355,8 @@ const PreviewFukushashiki = () => {
         start_datetime: new Date(),
       };
       dispatch({
-        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-        payload: { objParam: { ...state.objParam, ...defaultObjParam } }
+        type: PREVIEW_ACTIONS.SET_OBJ_PARAM,
+        payload: { ...state.objParam, ...defaultObjParam }
       });
     });
   }, [state.objParam.ip, state.loadedStateFromSession]);
@@ -330,7 +365,7 @@ const PreviewFukushashiki = () => {
   useEffect(() => {
     if (!state.loadedStateFromSession) return;
     if (!state.botId && params.get("bot_id")) {
-      dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { botId: params.get("bot_id") } });
+      dispatch({ type: PREVIEW_ACTIONS.SET_BOT_ID, payload: params.get("bot_id") });
       return;
     }
 
@@ -520,12 +555,12 @@ const PreviewFukushashiki = () => {
   const handleCloseBot = () => {
     const element = document.getElementById('sp-container1');
     if (mobileCheck()) {
-      dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { showPopupCloseBot: false, isOpen: false } });
+      dispatch({ type: PREVIEW_ACTIONS.CLOSE_BOT });
     } else {
       element.classList.remove('slideUp');
       element.classList.add('slideDown');
       setTimeout(() => {
-        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { showPopupCloseBot: false, isOpen: false } });
+        dispatch({ type: PREVIEW_ACTIONS.CLOSE_BOT });
       }, 680)
     }
   }
@@ -1143,12 +1178,7 @@ const PreviewFukushashiki = () => {
       .then((res) => {
         let newCaptcha = [...state.captcha];
         newCaptcha.push({index: i, indexContent: msgContentIndex, ...res.data});
-        dispatch({
-          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-          payload: {
-            captcha: [...newCaptcha]
-          }
-        });
+        dispatch({ type: PREVIEW_ACTIONS.SET_CAPTCHA, payload: [...newCaptcha] });
       });
   }
 
@@ -1572,27 +1602,27 @@ const PreviewFukushashiki = () => {
       return;
 
     if (!state.botId) {
-      dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { botId: params.get("bot_id") } });
+      dispatch({ type: PREVIEW_ACTIONS.SET_BOT_ID, payload: params.get("bot_id") });
       return;
     }
 
     if (!state.urlSend) {
-      dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { urlSend: window.location.href } });
+      dispatch({ type: PREVIEW_ACTIONS.SET_URL_SEND, payload: window.location.href });
       return;
     }
 
     if (!state.urlReceive) {
-      dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { urlReceive: params.get("urlReceive") } });
+      dispatch({ type: PREVIEW_ACTIONS.SET_URL_RECEIVE, payload: params.get("urlReceive") });
       return;
     }
 
     if (!state.deviceReceive) {
-      dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { deviceReceive: params.get("deviceReceive") } });
+      dispatch({ type: PREVIEW_ACTIONS.SET_DEVICE_RECEIVE, payload: params.get("deviceReceive") });
       return;
     }
 
     if (!state.scenarioId) {
-      dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { scenarioId: params.get("scenario_id") } });
+      dispatch({ type: PREVIEW_ACTIONS.SET_SCENARIO_ID, payload: params.get("scenario_id") });
       return;
     }
 
@@ -3388,8 +3418,8 @@ const PreviewFukushashiki = () => {
     return updateStatusConversion({ scenario_id, user_input_id, status: CONVERSTION_RESPONSE_STATUS.FINISH })
       .then(() => {
         dispatch({
-          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-          payload: { conversionStatus: CONVERSTION_RESPONSE_STATUS.FINISH },
+          type: PREVIEW_ACTIONS.SET_CONVERSION_STATUS,
+          payload: CONVERSTION_RESPONSE_STATUS.FINISH,
         });
 
         if (!!callback) {
