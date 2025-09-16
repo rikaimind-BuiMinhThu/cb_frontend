@@ -185,6 +185,7 @@ const PREVIEW_ACTIONS = {
   SET_CONVERSION_STATUS: "SET_CONVERSION_STATUS",
   SET_STOP_RENDER: "SET_STOP_RENDER",
   SET_ERRORS: "SET_ERRORS",
+  SET_CURRENT_USER_MSG_INDEX: "SET_CURRENT_USER_MSG_INDEX",
 };
 
 const PreviewFukushashikiReducer = (state, action) => {
@@ -304,6 +305,8 @@ const PreviewFukushashikiReducer = (state, action) => {
       return { ...state, stopRender: action.payload };
     case PREVIEW_ACTIONS.SET_ERRORS:
       return { ...state, errors: action.payload };
+    case PREVIEW_ACTIONS.SET_CURRENT_USER_MSG_INDEX:
+      return { ...state, currentUserMsgIndex: action.payload };
   }
 
   return state;
@@ -4141,10 +4144,7 @@ const PreviewFukushashiki = () => {
     if (state.botInfor && state.botInfor.withdrawal_prevention_status === "invalid") {
       sessionStorage.removeItem("cart")
       setScenarioUserResponses([])
-      dispatch({
-        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-        payload: { currentUserMsgIndex: 0 }
-      });
+      dispatch({ type: PREVIEW_ACTIONS.SET_CURRENT_USER_MSG_INDEX, payload: 0 });
       let indexTiming = 0;
       let i;
       for (i = state.currentMsgIndex; i < state.messagesList.length; i++) {
@@ -4319,22 +4319,7 @@ const PreviewFukushashiki = () => {
             indexMessage={indexMessage}
             errorsProps={state.errors}
             displayButtonNext={(value) => {
-              // dispatch({
-              //   type: PREVIEW_ACTIONS.UPDATE_DISPLAY_BUTTON_NEXT,
-              //   payload: {
-              //     nextButtonStatus: value,
-              //     msgIndex: indexMessage
-              //   }
-              // });
-              // // if (!state.messagesList[state.currentMsgIndex]) return;
-              // // let newMessagesList = [...state.messagesList];
-              // // newMessagesList[state.currentMsgIndex].is_display_button_next = value;
-              // // dispatch({
-              // //   type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-              // //   payload: {
-              // //     messagesList: [...newMessagesList],
-              // //   }
-              // // });
+              // TODO: Remove displayButtonNext from here
             }}
             prefecturesList={[...state.prefecturesList]}
             onOpen={(isOpen, indexContent) => {
