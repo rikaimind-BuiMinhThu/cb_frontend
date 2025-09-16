@@ -554,6 +554,12 @@ export const getElementMessageById = (id) => {
   return `msg_id_${id}`;
 };
 
+// Device detection utilities
+const isAndroid = () => {
+  const userAgent = navigator.userAgent.toLowerCase();
+  return /android/i.test(userAgent);
+};
+
 export {
   stringNullOrEmpty, getAllUrlParams, lightenColor,
   mobileCheck, removeLeadingZero, sendUserInteractionData,
@@ -565,5 +571,5 @@ export {
   changeElementAttributeById, toCamelCase, sendConvertTextJapaneseRequest,
   scrollToPosition, removeSpace, getColor, processMessagesForErrorState, hideMessageOnError, createTempDelay,
   patchWithDrawalPreview, sendScenarioUserResponse, createStatusConversion, updateStatusConversion, parseQuantity,
-  createScenarioUserResponseMessageHistory, userEntryScenario,
+  createScenarioUserResponseMessageHistory, userEntryScenario, isAndroid,
 };
