@@ -186,6 +186,7 @@ const PREVIEW_ACTIONS = {
   SET_STOP_RENDER: "SET_STOP_RENDER",
   SET_ERRORS: "SET_ERRORS",
   SET_CURRENT_USER_MSG_INDEX: "SET_CURRENT_USER_MSG_INDEX",
+  SET_DELAYING: "SET_DELAYING",
 };
 
 const PreviewFukushashikiReducer = (state, action) => {
@@ -307,6 +308,8 @@ const PreviewFukushashikiReducer = (state, action) => {
       return { ...state, errors: action.payload };
     case PREVIEW_ACTIONS.SET_CURRENT_USER_MSG_INDEX:
       return { ...state, currentUserMsgIndex: action.payload };
+    case PREVIEW_ACTIONS.SET_DELAYING:
+      return { ...state, isDelaying: action.payload };
   }
 
   return state;
@@ -596,10 +599,7 @@ const PreviewFukushashiki = () => {
       if (newState.useNewProcess) {
         renderMessageInRange(0, newState.currentMsgIndex, newState, newState.currentUserMsgIndex, { isPassDelay: true, appearFromStart: true })
         .then(() => {
-          dispatch({
-            type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-            payload: { isDelaying: false },
-          });
+          dispatch({ type: PREVIEW_ACTIONS.SET_DELAYING, payload: false });
         });
       } else {
         const listMsgAppear = newState.renderMessagesList.filter(i => isUserMessage(i) && !i.hidden).map(i => ({ id: i.id, type: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.APPEAR }));
@@ -3426,10 +3426,7 @@ const PreviewFukushashiki = () => {
   const finishConversion = async ({ scenario_id, user_input_id }, callback) => {
     return updateStatusConversion({ scenario_id, user_input_id, status: CONVERSTION_RESPONSE_STATUS.FINISH })
       .then(() => {
-        dispatch({
-          type: PREVIEW_ACTIONS.SET_CONVERSION_STATUS,
-          payload: CONVERSTION_RESPONSE_STATUS.FINISH,
-        });
+        dispatch({ type: PREVIEW_ACTIONS.SET_CONVERSION_STATUS, payload: CONVERSTION_RESPONSE_STATUS.FINISH });
 
         if (!!callback) {
           callback();
