@@ -4450,10 +4450,7 @@ const PreviewFukushashiki = () => {
         const status = res?.data?.data?.status;
 
         if (status) {
-          dispatch({ 
-            type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, 
-            payload: { conversionStatus: status },
-          });
+          dispatch({ type: PREVIEW_ACTIONS.SET_CONVERSION_STATUS, payload: status });
         }
       });
     }
