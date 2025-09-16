@@ -52,7 +52,7 @@ const lightenColor = (hex, opacity) => {
   return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 };
 
-const mobileCheck = () => {
+const isMobile = () => {
   let check = false;
   (function (a) {
     if (
@@ -562,7 +562,7 @@ const isAndroid = () => {
 
 export {
   stringNullOrEmpty, getAllUrlParams, lightenColor,
-  mobileCheck, removeLeadingZero, sendUserInteractionData,
+  isMobile, removeLeadingZero, sendUserInteractionData,
   sendCreateOrderData, sendCountRequest,
   getCitiesByPrefecture, getTownsByCity, getPrefectures,
   getScenarioPreviewData, getChatBotSetting, sendEmailRequest,

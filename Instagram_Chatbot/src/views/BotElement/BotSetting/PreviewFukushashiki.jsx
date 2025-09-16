@@ -42,7 +42,7 @@ import {
 import {
   getAllUrlParams,
   lightenColor,
-  mobileCheck,
+  isMobile,
   removeLeadingZero,
   sendCountRequest,
   sendCreateOrderData,
@@ -178,7 +178,7 @@ const PreviewFukushashiki = () => {
   };
 
   const getBotModalStyle = () => {
-    if (mobileCheck())
+    if (isMobile())
       return {
         bottom: "0px",
         right: "0px",
@@ -367,7 +367,7 @@ const PreviewFukushashiki = () => {
 
   // Add style to body tag if it's mobile
   useEffect(() => {
-    if (mobileCheck()) {
+    if (isMobile()) {
       document.body.classList.add('is_mobile');
     }
   }, [])
@@ -409,7 +409,7 @@ const PreviewFukushashiki = () => {
 
   const handleCloseBot = () => {
     const element = document.getElementById('sp-container1');
-    if (mobileCheck()) {
+    if (isMobile()) {
       dispatch({ type: PREVIEW_ACTIONS.CLOSE_BOT });
     } else {
       element.classList.remove('slideUp');
@@ -4225,17 +4225,17 @@ const PreviewFukushashiki = () => {
     let containerStyle = {
       position: 'fixed',
       bottom: "0px",
-      right: mobileCheck() ? state.isOpen ? 0 : `${state.rightMarginSp}px` : `${state.rightMarginPc}px`,
-      width: mobileCheck() ? `${state.widthSp}%` : `${state.widthPc}px`,
-      height: mobileCheck() ? `${state.heightSp}%` : `${state.heightPc}px`,
+      right: isMobile() ? state.isOpen ? 0 : `${state.rightMarginSp}px` : `${state.rightMarginPc}px`,
+      width: isMobile() ? `${state.widthSp}%` : `${state.widthPc}px`,
+      height: isMobile() ? `${state.heightSp}%` : `${state.heightPc}px`,
       zIndex: 999,
       display: "flex",
       flexDirection: "column",
       backgroundColor: "white"
     };
     let headerStyle = {
-      borderTopLeftRadius: mobileCheck() ? "0px" : "5px",
-      borderTopRightRadius: mobileCheck() ? "0px" : "5px",
+      borderTopLeftRadius: isMobile() ? "0px" : "5px",
+      borderTopRightRadius: isMobile() ? "0px" : "5px",
     };
     let bodyStyle = {
       backgroundColor: state.botInfor?.opacity_color,
@@ -4247,7 +4247,7 @@ const PreviewFukushashiki = () => {
     }
 
     if (!state.activePopupCloseBot) {
-      containerStyle.height = mobileCheck() ? `${state.heightSp || 100}%` : `${state.heightPc || 600}px`;
+      containerStyle.height = isMobile() ? `${state.heightSp || 100}%` : `${state.heightPc || 600}px`;
       headerStyle = {
         ...headerStyle,
         position: "static",
@@ -4344,7 +4344,7 @@ const PreviewFukushashiki = () => {
       <div
         ref={containerRef}
         id="sp-container1"
-        className={`sp-container1 ${mobileCheck() ? 'slideUpSp' : 'slideUp'}`}
+        className={`sp-container1 ${isMobile() ? 'slideUpSp' : 'slideUp'}`}
         style={containerStyle}
       >
         <Withdrawal
@@ -4397,7 +4397,7 @@ const PreviewFukushashiki = () => {
         </div>
         {state.activePopupCloseBot ?
           <ModalPreviewBot
-            isMobile={mobileCheck()}
+            isMobile={isMobile()}
             styleBot={getBotModalStyle()}
             open={state.showPopupCloseBot} isAdmin={false} onClose={() => setShowPopupCloseBot(false)}>
             <Row>
@@ -4453,7 +4453,7 @@ const PreviewFukushashiki = () => {
         </div>
       </div>
     )
-  } else if (!state.isOpen && mobileCheck() === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 2) {
+  } else if (!state.isOpen && isMobile() === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 2) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -4477,7 +4477,7 @@ const PreviewFukushashiki = () => {
         />
       </div>
     )
-  } else if (!state.isOpen && mobileCheck() === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 1) {
+  } else if (!state.isOpen && isMobile() === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 1) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -4513,7 +4513,7 @@ const PreviewFukushashiki = () => {
         </div>
       </div>
     )
-  } else if (!state.isOpen && mobileCheck() === false && Number(state.positionPc) === 2) {
+  } else if (!state.isOpen && isMobile() === false && Number(state.positionPc) === 2) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -4539,7 +4539,7 @@ const PreviewFukushashiki = () => {
           </div>
         </div>
       </div>)
-  } else if (!state.isOpen && mobileCheck() === true && Number(state.positionSp) === 1 && Number(state.buttonTypeSp) === 2) {
+  } else if (!state.isOpen && isMobile() === true && Number(state.positionSp) === 1 && Number(state.buttonTypeSp) === 2) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -4563,7 +4563,7 @@ const PreviewFukushashiki = () => {
         />
       </div>
     )
-  } else if (!state.isOpen && mobileCheck() === true && Number(state.positionSp) === 1 && Number(state.buttonTypeSp) === 1) {
+  } else if (!state.isOpen && isMobile() === true && Number(state.positionSp) === 1 && Number(state.buttonTypeSp) === 1) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -4598,7 +4598,7 @@ const PreviewFukushashiki = () => {
         </div>
       </div>
     )
-  } else if (!state.isOpen && mobileCheck() === true && Number(state.positionSp) === 2) {
+  } else if (!state.isOpen && isMobile() === true && Number(state.positionSp) === 2) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
