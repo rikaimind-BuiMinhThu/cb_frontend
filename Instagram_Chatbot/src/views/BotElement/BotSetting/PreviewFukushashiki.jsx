@@ -183,6 +183,8 @@ const PREVIEW_ACTIONS = {
   SET_DEVICE_RECEIVE: "SET_DEVICE_RECEIVE",
   SET_SCENARIO_ID: "SET_SCENARIO_ID",
   SET_CONVERSION_STATUS: "SET_CONVERSION_STATUS",
+  SET_STOP_RENDER: "SET_STOP_RENDER",
+  SET_ERRORS: "SET_ERRORS",
 };
 
 const PreviewFukushashikiReducer = (state, action) => {
@@ -298,6 +300,10 @@ const PreviewFukushashikiReducer = (state, action) => {
       return { ...state, scenarioId: action.payload };
     case PREVIEW_ACTIONS.SET_CONVERSION_STATUS:
       return { ...state, conversionStatus: action.payload };
+    case PREVIEW_ACTIONS.SET_STOP_RENDER:
+      return { ...state, stopRender: action.payload };
+    case PREVIEW_ACTIONS.SET_ERRORS:
+      return { ...state, errors: action.payload };
   }
 
   return state;
@@ -4222,12 +4228,7 @@ const PreviewFukushashiki = () => {
   const onChangeErrors = (field, value) => {
     let newErrors = { ...state.errors };
     newErrors[field] = value;
-    dispatch({
-      type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-      payload: {
-        errors: newErrors,
-      }
-    });
+    dispatch({ type: PREVIEW_ACTIONS.SET_ERRORS, payload: { newErrors } });
   };
 
   const renderBotMessageContent = (message, indexMessage) => {
@@ -4469,13 +4470,8 @@ const PreviewFukushashiki = () => {
           timeoutConfrmMsgRef.current = setTimeout(async () => {
             renderMessageInRange(index, finalIndex, state, { lastConfirmMessageIdx: index }).then(() => {
               dispatch({
-                type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-                payload: {
-                  stopRender: {
-                    ...state.stopRender,
-                    isActive: false,
-                  },
-                },
+                type: PREVIEW_ACTIONS.SET_STOP_RENDER,
+                payload: { ...state.stopRender, isActive: false },
               });
             });
           }, timeout * 1000);
@@ -4487,12 +4483,10 @@ const PreviewFukushashiki = () => {
 
         renderMessageInRange(index, finalIndex, state, { lastConfirmMessageIdx: index });
         dispatch({
-          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+          type: PREVIEW_ACTIONS.SET_STOP_RENDER,
           payload: {
-            stopRender: {
-              ...state.stopRender,
-              isActive: false,
-            },
+            ...state.stopRender,
+            isActive: false,
           },
         });
 
