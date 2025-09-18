@@ -10,11 +10,19 @@
     border-radius: 5px;
     font-family: Arial, sans-serif;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    margin: 10px;
+    border: "1px solid #f44336";
+    background-color: #ffebee;
+    color: #d32f2f;
+}
+
+.error-message-modal {
     position: fixed;
     top: 12.5%;
     left: 0;
-    margin: 5px;
+    margin: 5px !important;
 }
+
 #chatbot-submit-button {
     background: linear-gradient(135deg, #4caf50, #43a047);
     color: #fff;
@@ -233,7 +241,6 @@
 } */
 
 .sp-body-bot-side-avatar {
-    width: 12%;
     display: flex;
     align-items: flex-end;
 }
@@ -586,6 +593,7 @@
 }
 
 .slideRight {
+    gap: 15px;
     animation-name: slideRight;
     -webkit-animation-name: slideRight;
 
@@ -923,6 +931,7 @@ slideUp
         -webkit-transform: rotate(-135deg);
       }
     .sp-avatar img {
+        max-width: none;
         border-radius: 50%;
         width: 40px;
         height: 40px;
@@ -1004,19 +1013,18 @@ slideUp
   border-radius: 28px;
   flex: 1 1 auto !important;
     min-width: 0 !important;
-    width: clamp(240px, calc(100vw - 125px), 310px) !important;
+    width: clamp(240px, calc(100vw - 150px), 310px) !important;
     margin-left: 0 !important;
 }
 
 .fullwidth_mobile_chatbot #comment_bubble.sp-bubble {
   max-width: none !important;
-  margin-left: 15px !important;
   padding-left: 15px !important;
   display: flex;
   align-items: center;
   padding: 0 10px;
   width: 160px;
-  height: 48px;
+  height: 55px;
 }
 
 .fullwidth_mobile_chatbot #comment_bubble:before {

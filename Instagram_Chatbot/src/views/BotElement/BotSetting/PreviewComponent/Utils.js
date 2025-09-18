@@ -1,6 +1,6 @@
 import api from "api/api-management";
 import { tokenExpired } from "api/tokenExpired";
-import { CHATBOT_SERVER, CURRENCY_UNITS, GET_CAPTCHA_PATH } from "./Constants";
+import { CHATBOT_SERVER, CURRENCY_UNITS, GET_CAPTCHA_PATH, RENDER_CHATBOT_CONFIG } from "./Constants";
 
 const stringNullOrEmpty = (string) => {
   return !string || (string + "").trim() === "";
@@ -311,6 +311,12 @@ const getAddressFromZipCode = (zipCode) => {
   );
 }
 
+export const buildConditionParams = (theState) => {
+  const result = _.cloneDeep(theState.objParam);
+  const currentUrlParams = getAllUrlParams(window.location.search);
+  return { ...result, current_url_param: Object.keys(currentUrlParams) };
+}
+
 /**
  * 
  * @param {*} format using dd || hh || mm || ss || ms
@@ -501,9 +507,9 @@ const processMessagesForErrorState = (payload) => {
   return processedPayload;
 };
 
-const createTempDelay = (seconds = 0.5) => {
+const createTempDelay = (seconds = 0.5, prefix) => {
   return {
-    id: `__temp_delay_${Date.now()}`,
+    id: `${prefix || ''}${Date.now()}`,
     belong_to: 'bot',
     message_name: 'delay',
     message_content: [{ type: 'delay', delay: { content: Number(seconds)}}],
@@ -538,6 +544,22 @@ export const isUserMessage = (message) => {
   return message.belong_to === 'user' && message.message_content.length > 0;
 }
 
+export const isTempDelay = (message, prefix) => {
+  return message.id && `${message.id}`.startsWith(prefix || '');
+}
+
+export const getElementMessageById = (id) => {
+  if (!id) return;
+  
+  return `msg_id_${id}`;
+};
+
+// Device detection utilities
+const isAndroid = () => {
+  const userAgent = navigator.userAgent.toLowerCase();
+  return /android/i.test(userAgent);
+};
+
 export {
   stringNullOrEmpty, getAllUrlParams, lightenColor,
   mobileCheck, removeLeadingZero, sendUserInteractionData,
@@ -549,5 +571,5 @@ export {
   changeElementAttributeById, toCamelCase, sendConvertTextJapaneseRequest,
   scrollToPosition, removeSpace, getColor, processMessagesForErrorState, hideMessageOnError, createTempDelay,
   patchWithDrawalPreview, sendScenarioUserResponse, createStatusConversion, updateStatusConversion, parseQuantity,
-  createScenarioUserResponseMessageHistory, userEntryScenario,
+  createScenarioUserResponseMessageHistory, userEntryScenario, isAndroid,
 };

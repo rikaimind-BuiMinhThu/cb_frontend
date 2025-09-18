@@ -71,6 +71,9 @@ import {
   isBotMessage,
   isUserMessage,
   isDelayBotMessage,
+  getElementMessageById,
+  buildConditionParams,
+  isTempDelay,
 } from "./PreviewComponent/Utils";
 import { mapAmazonPayDataToMessagesList, isTorizenLpAmazonData } from "./PreviewComponent/TorizenUtils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
@@ -173,6 +176,11 @@ const PREVIEW_ACTIONS = {
 const PreviewFukushashikiReducer = (state, action) => {
   switch (action.type) {
     case PREVIEW_ACTIONS.UPDATE_MULTI_STATE:
+      if (action.payload.removeTempDelay && action.payload.renderMessagesList?.length) {
+        action.payload.renderMessagesList = action.payload.renderMessagesList?.filter(m => {
+          return !isTempDelay(m, RENDER_CHATBOT_CONFIG.TEMP_DELAY_PREFIX);
+        }) || [];
+      }
       return { ...state, ...(!!state.submitErrorMessage ? processMessagesForErrorState(action.payload): action.payload) };
 
     case PREVIEW_ACTIONS.ADD_LP_OPTION_DATA:
@@ -251,7 +259,7 @@ const PreviewFukushashikiReducer = (state, action) => {
       return { ...state, prefecturesList: action.payload.prefecturesList };
     case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA:
       // Support only for amazon pay and subscstore cart system
-      const newMessagesList = mapAmazonPayDataToMessagesList(action.payload, state.messagesList);
+      const newMessagesList = mapAmazonPayDataToMessagesList(action.payload, state.messagesList, state.prefecturesList);
       const renderMessagesList = newMessagesList.slice(0, state.currentMsgIndex + 1);
       return { ...state, messagesList: newMessagesList, renderMessagesList: renderMessagesList };
   }
@@ -361,12 +369,6 @@ const PreviewFukushashiki = () => {
         dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
       });
   }, [state.botId, state.loadedStateFromSession, state.displayType]);
-
-  const buildConditionParams = (theState) => {
-    const result = _.cloneDeep(theState.objParam);
-    const currentUrlParams = getAllUrlParams(window.location.search);
-    return { ...result, current_url_param: Object.keys(currentUrlParams) };
-  }
 
   const computeMessageIndices = (newState, clickedMsgIndex) => {
     const { currentUserMsg, nextRenderMsg} = {
@@ -3686,33 +3688,33 @@ const PreviewFukushashiki = () => {
 
     return new Promise(async (resolve) => {
       // Insert a temporary delay item to show typing GIF for 0.5s when advancing
-      const tempDelay = createTempDelay(0.5);
+      const tempDelay = createTempDelay(0.5, RENDER_CHATBOT_CONFIG.TEMP_DELAY_PREFIX);
 
       // Place tempDelay right after clicked index so user sees typing before next messages
       newState.messagesList.splice(clickedMsgIndex + 1, 0, tempDelay);
       // adjust indices
       if (newState.currentMsgIndex >= clickedMsgIndex + 1) newState.currentMsgIndex++;
 
+      // Process messages sequentially but batch state updates
       for (let i = clickedMsgIndex + 1; i <= newState.currentMsgIndex; i++) {
         newState.renderMessagesList = newState.messagesList.slice(0, i + 1);
+        
         if (isDelayBotMessage(newState.messagesList[i])) {
-          // ensure the delay item is rendered so typing GIF visible
+          // Show typing GIF for delay message
           dispatch({
             type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
             payload: { startIndex: 0, endIndex: i + 1 }
           });
+          
+          // Wait for delay duration
           await sleep(newState.messagesList[i].message_content[0].delay?.content * 1000 || TIMER_DELAY_RENDER);
+          
+          // Hide delay message and continue - no additional dispatch here
           newState.renderMessagesList[i].hidden = true;
-          dispatch({
-            type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-            payload: {
-              messagesList: newState.messagesList,
-              renderMessagesList: newState.renderMessagesList.slice(0, i + 1).map(msg => isDelayBotMessage(msg) ? {...msg, hidden: true} : msg),
-            }
-          })
           continue;
         }
-        
+
+        // For regular messages, only dispatch once per message
         dispatch({
           type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
           payload: {
@@ -3724,13 +3726,26 @@ const PreviewFukushashiki = () => {
         await sleep(RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE);
       }
 
-      // remove temp delay if still present
-      const tempIdx = newState.messagesList.findIndex(m => m.id && `${m.id}`.startsWith('__temp_delay_'));
+      // Final cleanup - single dispatch for all remaining updates
+      const tempIdx = newState.messagesList.findIndex(m => isTempDelay(m, RENDER_CHATBOT_CONFIG.TEMP_DELAY_PREFIX));
       if (tempIdx >= 0) {
         newState.messagesList.splice(tempIdx, 1);
         if (newState.currentMsgIndex > tempIdx) newState.currentMsgIndex--;
       }
-      newState.renderMessagesList = newState.renderMessagesList.filter(m => !(m.id && `${m.id}`.startsWith('__temp_delay_')));
+
+      // Single final dispatch with all state updates
+      dispatch({ 
+        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+        payload: {
+          messagesList: newState.messagesList,
+          currentMsgIndex: newState.currentMsgIndex,
+          renderMessagesList: newState.renderMessagesList.map(msg => 
+            isDelayBotMessage(msg) ? {...msg, hidden: true} : msg
+          ),
+          removeTempDelay: true
+        }
+      });
+      
       resolve();
     }).then(() => {
       handleAfterRenderMessage(
@@ -3877,7 +3892,7 @@ const PreviewFukushashiki = () => {
     if (isUserMessage(nextMessage) || isBotMessage(nextMessage)) {
       const conditionParams = buildConditionParams(newState);
       for (let i = clickedMsgIndex + 1; i < newState.messagesList.length; i++) {
-        if (newState.messagesList[i].conditions.length !== 0) {
+        if (newState.messagesList[i].conditions && newState.messagesList[i].conditions.length !== 0) {
           const result = checkMessageCondition(newState.messagesList[i], conditionParams);
           newState.messagesList[i].hidden = !result;
         }
@@ -3923,12 +3938,39 @@ const PreviewFukushashiki = () => {
     name,
     message
   ) => {
-    let newState = { ...state };
+    // Early returns for invalid states
+    if (!state.messagesList.length) return;
+    
     const msgIndex = state.messagesList.findIndex((msg) => msg.id === message.id);
-    if (newState.messagesList.length == 0) return;
-    let messageContentTypeData = newState.messagesList[msgIndex].message_content[indexContent][contentType];
+    if (msgIndex === -1) return;
+    
+    const newState = { ...state };
+    const messageContentTypeData = newState.messagesList[msgIndex].message_content[indexContent][contentType];
     if (!messageContentTypeData) return;
 
+    // Update message content data based on field hierarchy
+    updateMessageContentData(messageContentTypeData, value, field, subFiled, name);
+
+    // Handle specific content type logic
+    const contentHandlers = {
+      zip_code_address: () => handleZipCodeAddress(messageContentTypeData, value, field),
+      product_purchase: () => handleProductPurchase(newState, msgIndex, indexContent, contentType, field, value),
+      product_purchase_radio_button: () => handleProductPurchaseRadioButton(newState, msgIndex, indexContent, contentType, field, value)
+    };
+
+    if (contentHandlers[contentType]) {
+      contentHandlers[contentType]();
+    }
+
+    // Handle save input content
+    handleSaveInputContent(newState, msgIndex, indexContent, contentType, field, value);
+
+    // Update render messages and dispatch
+    updateRenderMessagesAndDispatch(newState);
+  };
+
+  // Helper functions
+  const updateMessageContentData = (messageContentTypeData, value, field, subFiled, name) => {
     if (name) {
       messageContentTypeData[field] = messageContentTypeData[field] || {};
       messageContentTypeData[field][subFiled] = messageContentTypeData[field][subFiled] || {};
@@ -3939,149 +3981,116 @@ const PreviewFukushashiki = () => {
     } else if (field) {
       messageContentTypeData[field] = value;
     }
+  };
 
-    if (contentType === "zip_code_address") {
-      if (messageContentTypeData.is_use_dropdown) {
-        messageContentTypeData.value_prefecture_type = "id";
-      }
-      else {
-        messageContentTypeData.value_prefecture_type = "name";
-      }
+  const handleZipCodeAddress = (messageContentTypeData, value, field) => {
+    // Set prefecture type based on dropdown usage
+    messageContentTypeData.value_prefecture_type = messageContentTypeData.is_use_dropdown ? "id" : "name";
 
-      if (typeof value === "object") {
-        const transformField = {
-          value_prefecture: (value) => {
-            if (messageContentTypeData.value_prefecture_type === "id") {
-              return value;
-            } else {
-              return findItem(state.prefecturesList, { 
-                keys: 'id', 
-                value: value, 
-                callbackValue: value,
-                onSuccess: (item) => item.name,
-              });
-            }
+    if (typeof value === "object") {
+      const transformField = {
+        value_prefecture: (value) => {
+          if (messageContentTypeData.value_prefecture_type === "id") {
+            return value;
           }
+          return findItem(state.prefecturesList, { 
+            keys: 'id', 
+            value: value, 
+            callbackValue: value,
+            onSuccess: (item) => item.name,
+          });
         }
-        
-        Object.keys(value).forEach((key) => {
-          messageContentTypeData[key] = transformField[key] ? transformField[key](value[key]) : value[key];
-        });
-      } else {
-        messageContentTypeData[field] = value;
-      }
-    }
-
-    if (
-      contentType === "product_purchase" &&
-      field === "initial_selection" &&
-      value.length > 0
-    ) {
-      let dataContentType = {
-        ...state.messagesList[msgIndex].message_content[indexContent][contentType],
       };
       
-      const { arrayCode, arrayName, arrayPrice, arrayOrderQuantity } = getProductDetailsForProductPurchase(dataContentType, value);
-
-      newState.variables.push(
-        {
-          variable_name: "product_code",
-          default_value: arrayCode.join(","),
-        },
-        {
-          variable_name: "product_name",
-          default_value: arrayName.join(","),
-        },
-        {
-          variable_name: "product_unit_price",
-          default_value: arrayPrice.join(","),
-        },
-        {
-          variable_name: "order_quantity",
-          default_value: arrayOrderQuantity.join(","),
-        }
-      );
-      newState.objParam = {
-        ...newState.objParam,
-        product_code: arrayCode.join(","),
-        product_name: arrayName.join(","),
-        product_unit_price: arrayPrice.join(","),
-        order_quantity: arrayOrderQuantity.join(","),
-      };
-    } else if (
-      contentType === "product_purchase_radio_button" &&
-      field === "initial_selection"
-    ) {
-      let dataContentType = {
-        ...state.messagesList[msgIndex].message_content[indexContent][
-        contentType
-        ],
-      };
-
-      const { valueCode, valueName, valuePrice } = getProductDetailsForProductPurchaseRadioButton(dataContentType, value);
-
-      newState.variables.push(
-        {
-          variable_name: "product_code",
-          default_value: valueCode,
-        },
-        {
-          variable_name: "product_name",
-          default_value: valueName,
-        },
-        {
-          variable_name: "product_unit_price",
-          default_value: valuePrice,
-        }
-      );
-      newState.objParam = {
-        ...newState.objParam,
-        product_code: valueCode,
-        product_name: valueName,
-        product_unit_price: valuePrice,
-      }
-    }
-
-    if (
-      state.messagesList[msgIndex].message_content[indexContent][contentType].is_save_input_content
-    ) {
-      let isSaveParam = false;
-      newState.variables = state.variables.map((item) => {
-        let dataContentType = {
-          ...state.messagesList[msgIndex].message_content[indexContent][contentType],
-        };
-      
-        if (state.messagesList[msgIndex].message_content[indexContent][contentType].save_input_content === item.variable_name) {
-          isSaveParam = true;
-
-          // TODO: need refactor (card_payment_radio_button use only)
-          // Reason: Contents render inside of each types of radio button will change saveParams like "is_display_card_payment"
-          if (contentType === 'card_payment_radio_button') {
-            const allowFields = ['initial_selection', 'initial_selection_picture'];
-            isSaveParam = allowFields.includes(field);
-
-            if (isSaveParam) {
-              setDefaultValue(item, dataContentType, contentType, value, field);
-            }
-          } else {
-            setDefaultValue(item, dataContentType, contentType, value, field);
-          }
-        }
-      
-        return item;
+      Object.keys(value).forEach((key) => {
+        messageContentTypeData[key] = transformField[key] ? transformField[key](value[key]) : value[key];
       });
-      
-      if (isSaveParam) {
-        newState.objParam[state.messagesList[msgIndex].message_content[indexContent][contentType].save_input_content] = value;
-      }
+    } else {
+      messageContentTypeData[field] = value;
     }
+  };
 
-    newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
-    newState.renderMessagesList = newState.renderMessagesList.map((msg) => {
-      return isDelayBotMessage(msg) ? { ...msg, hidden: true } : msg;
+  const handleProductPurchase = (newState, msgIndex, indexContent, contentType, field, value) => {
+    if (field !== "initial_selection" || !value.length) return;
+
+    const dataContentType = { ...state.messagesList[msgIndex].message_content[indexContent][contentType] };
+    const { arrayCode, arrayName, arrayPrice, arrayOrderQuantity } = getProductDetailsForProductPurchase(dataContentType, value);
+
+    const productVariables = [
+      { variable_name: "product_code", default_value: arrayCode.join(",") },
+      { variable_name: "product_name", default_value: arrayName.join(",") },
+      { variable_name: "product_unit_price", default_value: arrayPrice.join(",") },
+      { variable_name: "order_quantity", default_value: arrayOrderQuantity.join(",") }
+    ];
+
+    newState.variables.push(...productVariables);
+    newState.objParam = {
+      ...newState.objParam,
+      product_code: arrayCode.join(","),
+      product_name: arrayName.join(","),
+      product_unit_price: arrayPrice.join(","),
+      order_quantity: arrayOrderQuantity.join(","),
+    };
+  };
+
+  const handleProductPurchaseRadioButton = (newState, msgIndex, indexContent, contentType, field, value) => {
+    if (field !== "initial_selection") return;
+
+    const dataContentType = { ...state.messagesList[msgIndex].message_content[indexContent][contentType] };
+    const { valueCode, valueName, valuePrice } = getProductDetailsForProductPurchaseRadioButton(dataContentType, value);
+
+    const productVariables = [
+      { variable_name: "product_code", default_value: valueCode },
+      { variable_name: "product_name", default_value: valueName },
+      { variable_name: "product_unit_price", default_value: valuePrice }
+    ];
+
+    newState.variables.push(...productVariables);
+    newState.objParam = {
+      ...newState.objParam,
+      product_code: valueCode,
+      product_name: valueName,
+      product_unit_price: valuePrice,
+    };
+  };
+
+  const handleSaveInputContent = (newState, msgIndex, indexContent, contentType, field, value) => {
+    const messageContent = state.messagesList[msgIndex].message_content[indexContent][contentType];
+    if (!messageContent.is_save_input_content) return;
+
+    let isSaveParam = false;
+    const saveInputContentName = messageContent.save_input_content;
+
+    newState.variables = state.variables.map((item) => {
+      if (item.variable_name === saveInputContentName) {
+        isSaveParam = true;
+        const dataContentType = { ...messageContent };
+
+        // Handle special case for card_payment_radio_button
+        if (contentType === 'card_payment_radio_button') {
+          const allowFields = ['initial_selection', 'initial_selection_picture'];
+          isSaveParam = allowFields.includes(field);
+        }
+
+        if (isSaveParam) {
+          setDefaultValue(item, dataContentType, contentType, value, field);
+        }
+      }
+      return item;
     });
-    setStateToSessionStorage(newState);
+    
+    if (isSaveParam) {
+      newState.objParam[saveInputContentName] = value;
+    }
+  };
 
+  const updateRenderMessagesAndDispatch = (newState) => {
+    newState.renderMessagesList = newState.messagesList
+      .slice(0, newState.currentMsgIndex + 1)
+      .map((msg) => isDelayBotMessage(msg) ? { ...msg, hidden: true } : msg);
+    
+    setStateToSessionStorage(newState);
+    
     dispatch({
       type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
       payload: newState
@@ -4180,27 +4189,6 @@ const PreviewFukushashiki = () => {
     ]);
   };
 
-  const onOpenShippingAddress = (isOpen, indexContent) => {
-    // TODO: Check to remove
-    // if (isOpen === true) {
-    //   setPrefectures(null);
-    //   setCities(null);
-    //   setTowns(null);
-    //   setZipcode(null);
-    //   document.getElementById("sp-withdrawal-container").style.display =
-    //     "block";
-    //   document.getElementById("sp-popup-zip-code-address2").style.display =
-    //     "block";
-    // } else {
-    //   document.getElementById("sp-withdrawal-container").style.display = "none";
-    //   document.getElementById("sp-popup-zip-code-address2").style.display =
-    //     "none";
-    // }
-    // if (indexContent !== undefined) {
-    //   setContentZipcode(indexContent);
-    // }
-  };
-
   const onChangeErrors = (field, value) => {
     let newErrors = { ...state.errors };
     newErrors[field] = value;
@@ -4217,6 +4205,7 @@ const PreviewFukushashiki = () => {
 
     return message.message_content.map((content, index) => (
       <BotMessage
+        messageId={message.id}
         key={indexMessage}
         content={content}
         index={index}
@@ -4267,7 +4256,7 @@ const PreviewFukushashiki = () => {
     if (!Array.isArray(message?.message_content) || message.message_content.length === 0) return null;
 
     return (
-      <div className="sp-body-user-side slideLeft">
+      <div className="sp-body-user-side slideLeft" id={getElementMessageById(message.id)}>
         <div className="sp-body-user-side-messages">
           <UserMessage
             postMessageToParent={postMessageToParent}
@@ -4320,9 +4309,6 @@ const PreviewFukushashiki = () => {
             onOpen={(isOpen, indexContent) => {
               onOpenZipCodePopup(isOpen, indexContent, Math.min(state.currentMsgIndex, indexMessage));
             }}
-            onOpenShippingAddress={(isOpen, indexContent) =>
-              onOpenShippingAddress(isOpen, indexContent)
-            }
             onChangeErrors={(field, value) =>
               onChangeErrors(field, value)
             }
@@ -4372,6 +4358,7 @@ const PreviewFukushashiki = () => {
             color: color,
           }}
           id="error-message"
+          className="error-message-modal"
           dangerouslySetInnerHTML={{ __html: text }}
         />
       </div>
@@ -4537,7 +4524,7 @@ const PreviewFukushashiki = () => {
           className="sp-header"
         >
           <div className="sp-header-left" onClick={handleCloseChatbotWhenUseWithDrawal}>
-            <div className="sp-header-left-avatar sp-avatar">
+            <div className="sp-body-bot-side-avatar sp-avatar-bt">
               <img src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`} alt="bot-header-icon"/>
             </div>
             <div className="sp-header-left-label">
@@ -4737,18 +4724,18 @@ const PreviewFukushashiki = () => {
         className={state.useFullWidthChatbotMobile ? "fullwidth_mobile_chatbot" : ""}
         style={{
           backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
-          width: state.useFullWidthChatbotMobile ? "calc(100vw - 20px)" : "240px",
-          height: state.useFullWidthChatbotMobile ? "70px" : "48px",
-          borderRadius: '35px',
+          width: state.useFullWidthChatbotMobile ? "calc(100vw - 30px)" : "240px",
+          height: state.useFullWidthChatbotMobile ? "75px" : "48px",
+          borderRadius: state.useFullWidthChatbotMobile ? "45px" :'35px',
           display: "flex",
           justifyContent: "left",
           position: 'fixed',
           bottom: state.bottomMarginSp ? `${state.bottomMarginSp}px` : '10px',
-          right: state.rightMarginSp ? `${state.rightMarginSp}px` : '10px'
+          right: (state.useFullWidthChatbotMobile) ? "15px" : (state.rightMarginSp ? `${state.rightMarginSp}px` : '10px')
         }}
       >
-        <div className="sp-header-left" onClick={() => onOpenPreview(!state.isOpen)} style={{ width: '100%', padding: '4px' }}>
-          <div className={state.useFullWidthChatbotMobile ? "fullwidth_mobile_chatbot sp-header-left-avatar sp-avatar" :"sp-header-left-avatar sp-avatar"} style={{ width: state.useFullWidthChatbotMobile ? "50px"  :'38px' }}>
+        <div className="sp-header-left" onClick={() => onOpenPreview(!state.isOpen)} style={{ width: '100%', padding: state.useFullWidthChatbotMobile ? "15px" : '4px' }}>
+          <div className={state.useFullWidthChatbotMobile ? "fullwidth_mobile_chatbot sp-header-left-avatar sp-avatar" :"sp-header-left-avatar sp-avatar"} style={{ width: state.useFullWidthChatbotMobile ? "58px"  :'38px' }}>
             <img
               src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
               alt="bot-header-icon"

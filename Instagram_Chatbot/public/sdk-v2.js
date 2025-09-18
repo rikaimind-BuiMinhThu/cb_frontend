@@ -381,7 +381,7 @@ const displayPopup = async () => {
           ? e.data.useMoblieFullwidth
           : (sessionStorage.getItem("useFullwidthChatbotMobile") === "true");
         iframe.width = useMoblieFullwidth ? "100%" : "250px";
-        iframe.height = useMoblieFullwidth ? "80px" : "58px";
+        iframe.height = useMoblieFullwidth ? "85px" : "58px";
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
       } else if (!e.data.isOpen) {
@@ -392,6 +392,11 @@ const displayPopup = async () => {
         iframe.height = chatbotBottom ? `${parseInt(chatbotBottom) + 77}px` : "77px";
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
+      }
+      if (e.data.isOpen && mobileCheck()) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = 'scroll';
       }
       globalIframe = iframe;
     },

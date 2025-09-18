@@ -45,7 +45,6 @@ const UserMessage = ({
   onClickNext,
   displayButtonNext,
   onOpen,
-  onOpenShippingAddress,
   onChangeErrors,
   prefecturesList,
   variables,
