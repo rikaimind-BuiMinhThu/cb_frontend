@@ -3,7 +3,7 @@ import "assets/css/bot/preview-chat-bot.css";
 import { MESSAGE_CONTENT_TYPES } from "views/BotElement/BotSetting/PreviewComponent/Constants";
 import InputCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
 import Text from "./TextInputComponent/Text";
-
+import PhoneNumber from "./TextInputComponent/PhoneNumber";
 
 export default function TextInput({ content, disabled, handleOnChangeJpConvertText, indexContent, onChangeValue, errors, indexMessage }) {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.TEXT_INPUT) return null;
@@ -31,18 +31,21 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
     );
   };
 
-  const renderText = () => {
-    return (
-      <Text content={content} disabled={disabled} handleOnChangeJpConvertText={handleOnChangeJpConvertText} indexContent={indexContent} onChangeValue={onChangeValue} />
-    );
-  };
-
   const renderContent = () => {
     switch (textInput.type) {
       case "text":
-        return renderText();
+        return <Text content={content}
+          disabled={disabled}
+          handleOnChangeJpConvertText={handleOnChangeJpConvertText}
+          indexContent={indexContent}
+          onChangeValue={onChangeValue}
+        />;
       case "phone_number":
-        return renderPhoneNumber();
+        return <PhoneNumber content={content}
+          disabled={disabled}
+          indexContent={indexContent}
+          onChangeValue={onChangeValue}
+        />;
       case "password":
         return renderPassword();
       case "urls":
@@ -62,112 +65,6 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
     <div style={{ marginBottom: "10px" }}>
       {renderTitle()}
       {renderContent()}
-      {textInput.type === "phone_number" && (
-        <React.Fragment>
-          {textInput.phone_number.withHyphen === false ? (
-            <InputCustom
-              disabled={disabled}
-              // className="ss-message__content--user-text-input ss-input-value"
-              style={{ marginBottom: "0px" }}
-              placeholder={textInput[textInput.type]?.number}
-              onChange={(value) =>
-                onChangeValue(
-                  indexContent,
-                  content.type,
-                  value,
-                  textInput.type,
-                  "value"
-                )
-              }
-              value={textInput[textInput.type]?.value}
-              inputMode="numeric"
-            ></InputCustom>
-          ) : (
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
-              <InputCustom
-                disabled={disabled}
-                className="ss-message__content--user-text-input ss-input-value"
-                maxLength={3}
-                style={{ marginBottom: "0px", width: "32%" }}
-                type="tel"
-                inputMode="numeric"
-                placeholder={textInput[textInput.type]?.number1}
-                onChange={(value) => {
-                  if (value.length === 3) {
-                    moveToNext(`ss-user-message-phone_number_2_${indexContent}`);
-                  }
-                  onChangeValue(
-                    indexContent,
-                    content.type,
-                    value,
-                    textInput.type,
-                    "value1"
-                  );
-                }}
-                onCompositionEnd={(event) => {
-                  if (event.target.value.length === 3) {
-                    moveToNext(`ss-user-message-phone_number_2_${indexContent}`);
-                  }
-                }}
-                value={textInput[textInput.type]?.value1}
-              ></InputCustom>
-              <InputCustom
-                id={`ss-user-message-phone_number_2_${indexContent}`}
-                disabled={disabled}
-                className="ss-message__content--user-text-input ss-input-value"
-                style={{ marginBottom: "0px", width: "32%" }}
-                type="tel"
-                inputMode="numeric"
-                maxLength={4}
-                placeholder={textInput[textInput.type]?.number2}
-                onChange={(value) => {
-                  if (value.length === 4) {
-                    moveToNext(`ss-user-message-phone_number_3_${indexContent}`);
-                  }
-                  onChangeValue(
-                    indexContent,
-                    content.type,
-                    value,
-                    textInput.type,
-                    "value2"
-                  );
-                }}
-                onCompositionEnd={(event) => {
-                  if (event.target.value.length === 4) {
-                    moveToNext(`ss-user-message-phone_number_3_${indexContent}`);
-                  }
-                }}
-                value={textInput[textInput.type]?.value2}
-              ></InputCustom>
-              <InputCustom
-                id={`ss-user-message-phone_number_3_${indexContent}`}
-                disabled={disabled}
-                // className="ss-message__content--user-text-input ss-input-value"
-                style={{ marginBottom: "0px", width: "32%" }}
-                placeholder={textInput[textInput.type]?.number3}
-                maxLength={4}
-                type="tel"
-                inputMode="numeric"
-                onChange={(value) =>
-                  onChangeValue(
-                    indexContent,
-                    content.type,
-                    value,
-                    textInput.type,
-                    "value3"
-                  )
-                }
-                value={textInput[textInput.type]?.value3}
-              ></InputCustom>
-            </div>
-          )}
-        </React.Fragment>
-      )}
       {textInput.type === "password" && (
         <React.Fragment>
           <InputCustom

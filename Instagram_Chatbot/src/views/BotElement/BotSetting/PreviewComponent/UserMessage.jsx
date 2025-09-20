@@ -35,6 +35,7 @@ import { convertTextJapaneseByApi } from "utils/japaneseConverter";
 import OptionGender from "./UserMessageComponent/OptionGender";
 import Image from "./UserMessageComponent/Image";
 import TextInput from "./UserMessageComponent/TextInput";
+import { moveToNext } from "./Utils";
 
 const UserMessage = ({
   messageContentProps,
@@ -87,16 +88,6 @@ const UserMessage = ({
   const getLPOptionData = (search_element_value) => {
     return lpOptionData[search_element_value];
   }
-
-  const moveToNext = (nextId) => {
-    setTimeout(() => {
-      const nextInput = document.getElementById(nextId);
-      if (nextInput) {
-        nextInput.focus();
-        // nextInput.select();
-      }
-    }, 50);
-  };
 
   function loadCaptcha(indexContent) {
     if (

@@ -1,6 +1,6 @@
 import api from "api/api-management";
 import { tokenExpired } from "api/tokenExpired";
-import { CHATBOT_SERVER, CURRENCY_UNITS, GET_CAPTCHA_PATH, RENDER_CHATBOT_CONFIG } from "./Constants";
+import { CHATBOT_SERVER, CURRENCY_UNITS, GET_CAPTCHA_PATH, RENDER_CHATBOT_CONFIG, CONVERSION_RESPONSE_SUBMIT_TYPE, CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE } from "./Constants";
 
 const stringNullOrEmpty = (string) => {
   return !string || (string + "").trim() === "";
@@ -138,6 +138,32 @@ const sendCountRequest = (scenarioId, data) => {
     data
   );
 };
+
+const sendLogMessageToServer = (submitData, submitType) => {
+  const { message, ...data } = submitData;
+  const dataLog = sendScenarioUserResponse(submitData);
+
+  const convertType = {
+    [CONVERSION_RESPONSE_SUBMIT_TYPE.ADD]: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.ADD,
+    [CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE]: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.RETRY,
+    [CONVERSION_RESPONSE_SUBMIT_TYPE.ERROR]: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.ERROR,
+  }
+
+  const messageSubmitType = convertType[submitType];
+  
+  if (!messageSubmitType) return;
+
+  createScenarioUserResponseMessageHistory({
+    ...data,
+    msgs: [{ id: message.id, type: messageSubmitType }],
+  });
+
+  return dataLog;
+}
+
+const sendErrorLogToServer = (submitData) => {
+  return sendLogMessageToServer(submitData, CONVERSION_RESPONSE_SUBMIT_TYPE.ERROR);
+}
 
 const getPrefectures = () => {
   return getToChatBotServer(CHATBOT_SERVER.GET_PREFECTURES_PATH);
@@ -548,6 +574,10 @@ export const isTempDelay = (message, prefix) => {
   return message.id && `${message.id}`.startsWith(prefix || '');
 }
 
+const isButtonSubmitMessage = (message) => {
+  return message.message_content[0]?.type === "button_submit";
+}
+
 export const getElementMessageById = (id) => {
   if (!id) return;
   
@@ -558,6 +588,15 @@ export const getElementMessageById = (id) => {
 const isAndroid = () => {
   const userAgent = navigator.userAgent.toLowerCase();
   return /android/i.test(userAgent);
+};
+
+const moveToNext = (nextId) => {
+  setTimeout(() => {
+    const nextInput = document.getElementById(nextId);
+    if (nextInput) {
+      nextInput.focus();
+    }
+  }, 50);
 };
 
 export {
@@ -571,5 +610,7 @@ export {
   changeElementAttributeById, toCamelCase, sendConvertTextJapaneseRequest,
   scrollToPosition, removeSpace, getColor, processMessagesForErrorState, hideMessageOnError, createTempDelay,
   patchWithDrawalPreview, sendScenarioUserResponse, createStatusConversion, updateStatusConversion, parseQuantity,
-  createScenarioUserResponseMessageHistory, userEntryScenario, isAndroid,
+  createScenarioUserResponseMessageHistory, userEntryScenario, isAndroid, isButtonSubmitMessage,
+  sendErrorLogToServer, sendLogMessageToServer,
+  moveToNext,
 };
