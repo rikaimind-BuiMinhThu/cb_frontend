@@ -199,6 +199,10 @@ const CUSTOM_JS_CODE_POSITION = {
 const BOT_MESSAGE_TYPES = {
   HTML_CODE: 'html_code',
   UGC: 'use_html_ugc_config',
+  TEXT_INPUT: 'text_input',
+  FILE: 'file',
+  DELAY: 'delay',
+  GETTING_ERROR_NOTIFICATION: 'getting_error_notification',
 }
 
 const RENDER_CHATBOT_CONFIG = {

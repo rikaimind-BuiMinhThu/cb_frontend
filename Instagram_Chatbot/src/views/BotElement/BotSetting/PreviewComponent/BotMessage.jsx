@@ -13,12 +13,10 @@ const BotMessage = ({
   botInfor,
   checkoutUrl,
   previewOrderContent,
-  postMessageForExecuteJs,
+  executeLpJsCode,
   messageId
 }) => {
-  const [textInputContent, setTextInputContent] = useState(""); 
-
-  const isShowAvatar = (content) => {
+  const isShowAvatar = () => {
     if (!content) return false;
 
     switch(content.type) {
@@ -47,12 +45,13 @@ const BotMessage = ({
     link.remove();
   };
 
+  // Sau khi render BotMessage xong thì muốn chạy các script mà được setting trong bot message đó
   useEffect(() => {
     if (content.text_input?.use_for_confirm_message &&
       content.text_input?.jscode?.trim() && 
       !previewOrderContent
     ) {
-      postMessageForExecuteJs(content.text_input.jscode);
+      executeLpJsCode(content.text_input.jscode);
     }
   }, [
     content.text_input?.use_for_confirm_message,
@@ -119,145 +118,161 @@ const BotMessage = ({
     return result;
   }
 
-  const getBotImage = (botInfor) => {
-    return botInfor?.icon?.url || botInfor?.opening_bot_icon?.url || botInfor?.closing_bot_icon?.url;
+  const renderAvatar = () => {
+    if (!isShowAvatar()) return null;
+
+    const botAvatar = botInfor?.icon?.url || botInfor?.opening_bot_icon?.url || botInfor?.closing_bot_icon?.url;
+
+    return (
+      <div className="sp-body-bot-side-avatar sp-avatar">
+        <img src={EC_CHATBOT_URL + "/" + botAvatar} />
+      </div>
+    )
+  }
+
+  const renderTextInputContent = () => {
+    return (
+      <div className="position-relative">
+        <div
+          className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value position-relative`}
+          style={{
+            overflowWrap: "break-word",
+            backgroundColor: botInfor?.message_color,
+            color: botInfor?.font_color,
+            height: "auto",
+            border: "none",
+            borderRadius: "20px",
+          }}
+          dangerouslySetInnerHTML={{
+            __html: formatResult()
+          }}
+        >
+        </div>
+        <div
+          style={{
+            content: " ",
+            display: "flex",
+            position: "absolute",
+            bottom: 1,
+            left: "-3px",
+            width: "12px",
+            height: "18px",
+            backgroundColor: botInfor?.message_color,
+            background: `url(${botInfor?.icon_mess})`,
+            backgroundSize: "contain",
+            backgroundRepeat: "no-repeat",
+          }}
+        >
+          {!botInfor?.icon_mess && (
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="12" height="18" viewBox="0 0 37 54">
+              <path
+                d="M0 0 C7.59 0 15.18 0 23 0 C23.18 6.32 23.34 12.63 23.44 18.95 C23.48 21.1 23.53 23.25 23.6 25.4 C23.7 28.49 23.75 31.58 23.78 34.67 C23.82 35.63 23.86 36.58 23.91 37.57 C23.91 40.27 23.83 42.43 23 45 C20.61 47.35 18.05 48.68 15 50 C13.61 50.67 13.61 50.67 12.19 51.36 C3.42 54.53 -4.81 54.39 -14 54 C-14 53.34 -14 52.68 -14 52 C-13.31 51.7 -12.63 51.39 -11.92 51.08 C-11.02 50.66 -10.12 50.24 -9.19 49.81 C-8.29 49.41 -7.4 49 -6.48 48.58 C-3.39 46.61 -2.53 45.34 -1 42 C-0.54 38.78 -0.51 35.58 -0.49 32.32 C-0.47 31.4 -0.45 30.47 -0.43 29.52 C-0.38 26.58 -0.35 23.63 -0.31 20.69 C-0.28 18.69 -0.24 16.69 -0.21 14.69 C-0.12 9.79 -0.06 4.9 0 0 Z "
+                fill={botInfor?.message_color} transform="translate(14,0)" />
+            </svg>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  const isImageExtension = (fileContent) => {
+    const imgExtensions = ["jpeg", "png", "jpg"];
+    return imgExtensions.some(extension => fileContent.includes(extension));
+  }
+
+  const isPdfExtension = (fileContent) => {
+    return fileContent.includes("pdf");
+  }
+
+  const isMp4Extension = (fileContent) => {
+    return fileContent.includes("mp4");
+  }
+
+  const renderFileContentImage = () => {
+    return (
+      <img src={fileContent} alt="" className="ss-bot-chat-file-content-image" />
+    )
+  }
+
+  const renderFileContentPdf = () => {
+    return (
+      <span className="ss-bot-chat-file-content-download" onClick={() => handleDownloadFile(fileContent)}>
+        ファイルをダウンロード
+      </span>
+    )
+  }
+
+  const renderFileContentVideo = () => {
+    return (
+      <div><video src={fileContent} autoPlay controls className="ss-bot-chat-file-content-video" /></div>
+    )
+  }
+
+  const renderFileContent = () => {
+    const fileContent = content[content.type]?.content;
+
+    if (fileContent) {
+      if (isImageExtension(fileContent)) return renderFileContentImage();
+      if (isPdfExtension(fileContent)) return renderFileContentPdf();
+      if (isMp4Extension(fileContent)) return renderFileContentVideo();  
+    }
+
+    return (
+      <textarea
+        className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
+        value={""}
+        readOnly
+        style={{
+          backgroundColor: botInfor?.message_color,
+          border: "none",
+          borderRadius: "20px",
+          color: botInfor?.font_color,
+        }}
+      ></textarea>
+    );
+  }
+
+  const renderDelayContent = () => {
+    return (
+      <img src={messageTypingGif} className="ss-bot-chat-delay" />
+    )
+  }
+
+  const renderHtmlCodeContent = () => {
+    return (
+      <HtmlCodeMessagePreview
+        content={content}
+        index={index}
+        botInfor={botInfor}
+      />
+    )
+  }
+
+  const renderContent = () => {
+    if (!content) return null;
+
+    switch (content.type) {
+      case BOT_MESSAGE_TYPES.TEXT_INPUT:
+      case BOT_MESSAGE_TYPES.GETTING_ERROR_NOTIFICATION:
+        return renderTextInputContent();
+      case BOT_MESSAGE_TYPES.FILE:
+        return renderFileContent();
+      case BOT_MESSAGE_TYPES.DELAY:
+        return renderDelayContent();
+      case BOT_MESSAGE_TYPES.HTML_CODE:
+        return renderHtmlCodeContent();
+    }
   }
 
   return (
     <div key={index} 
       id={getElementMessageById(messageId)}
-      className={`sp-body-bot-side slideRight ${!isShowAvatar(content) ? "hide_avatar" : ""} ${isUGCUsage(content) ? "ugc_usage" : ""}`}>
-      {(content.type === "text_input" ||
-        content.type === "file" ||
-        content.type === "delay" ||
-        content.type === BOT_MESSAGE_TYPES.HTML_CODE) && (
-          <div className="sp-body-bot-side-avatar sp-avatar">
-            <img src={EC_CHATBOT_URL + "/" + getBotImage(botInfor)} />
-          </div>
-        )}
+      className={`sp-body-bot-side slideRight ${!isShowAvatar() ? "hide_avatar" : ""} ${isUGCUsage(content) ? "ugc_usage" : ""}`}>
+      { renderAvatar() }
       <div className="sp-body-bot-side-messages">
-        {/* <img className="ss-bot-ava" src={icon} alt="" /> */}
         {content && (
           <React.Fragment>
-            {/* bot: type == 'text_input' */}
-            {/* bot: type == 'getting_error_notification' */}
-            {(content.type === "text_input" || content.type === "getting_error_notification") && (
-              <div className="position-relative">
-                <div
-                  className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value position-relative`}
-                  style={{
-                    overflowWrap: "break-word",
-                    backgroundColor: botInfor?.message_color,
-                    color: botInfor?.font_color,
-                    height: "auto",
-                    border: "none",
-                    borderRadius: "20px",
-                  }}
-
-                  dangerouslySetInnerHTML={{
-                    __html: formatResult()
-                  }}
-                >
-                </div>
-                <div
-                  style={{
-                    content: " ",
-                    display: "flex",
-                    position: "absolute",
-                    bottom: 1,
-                    left: "-3px",
-                    width: "12px",
-                    height: "18px",
-                    backgroundColor: botInfor?.message_color,
-                    background: `url(${botInfor?.icon_mess})`,
-                    backgroundSize: "contain",
-                    backgroundRepeat: "no-repeat",
-                  }}
-                >
-                  {!botInfor?.icon_mess && (
-                    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="12" height="18" viewBox="0 0 37 54">
-                      <path
-                        d="M0 0 C7.59 0 15.18 0 23 0 C23.18 6.32 23.34 12.63 23.44 18.95 C23.48 21.1 23.53 23.25 23.6 25.4 C23.7 28.49 23.75 31.58 23.78 34.67 C23.82 35.63 23.86 36.58 23.91 37.57 C23.91 40.27 23.83 42.43 23 45 C20.61 47.35 18.05 48.68 15 50 C13.61 50.67 13.61 50.67 12.19 51.36 C3.42 54.53 -4.81 54.39 -14 54 C-14 53.34 -14 52.68 -14 52 C-13.31 51.7 -12.63 51.39 -11.92 51.08 C-11.02 50.66 -10.12 50.24 -9.19 49.81 C-8.29 49.41 -7.4 49 -6.48 48.58 C-3.39 46.61 -2.53 45.34 -1 42 C-0.54 38.78 -0.51 35.58 -0.49 32.32 C-0.47 31.4 -0.45 30.47 -0.43 29.52 C-0.38 26.58 -0.35 23.63 -0.31 20.69 C-0.28 18.69 -0.24 16.69 -0.21 14.69 C-0.12 9.79 -0.06 4.9 0 0 Z "
-                        fill={botInfor?.message_color} transform="translate(14,0)" />
-                    </svg>
-                  )}
-                </div>
-              </div>
-            )}
-            {content.type === "file" &&
-              (content[content.type]?.content ? (
-                <React.Fragment>
-                  {(content[content.type]?.content.includes("jpeg") ||
-                    content[content.type]?.content.includes("png") ||
-                    content[content.type]?.content.includes("jpg")) && (
-                      <img
-                        src={content[content.type]?.content}
-                        alt=""
-                        style={{ width: "100%" }}
-                      />
-                    )}
-                  {content[content.type]?.content.includes("pdf") && (
-                    <span
-                      style={{
-                        color: "#089BE5",
-                        fontSize: "17px",
-                        display: "block",
-                        height: "50px",
-                        cursor: "pointer",
-                      }}
-                      onClick={() =>
-                        handleDownloadFile(content[content.type]?.content)
-                      }
-                    >
-                      ファイルをダウンロード
-                    </span>
-                  )}
-                  {content[content.type]?.content.includes("mp4") && (
-                    <div>
-                      <video
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          borderRadius: "2px",
-                        }}
-                        src={content[content.type]?.content}
-                        autoPlay
-                        controls
-                      />
-                    </div>
-                  )}
-                </React.Fragment>
-              ) : (
-                <textarea
-                  className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
-                  value={""}
-                  readOnly
-                  style={{
-                    backgroundColor: botInfor?.message_color,
-                    border: "none",
-                    borderRadius: "20px",
-                    color: botInfor?.font_color,
-                  }}
-                ></textarea>
-              ))}
-            {content.type === "delay" && (
-              <img
-                src={messageTypingGif}
-                style={{
-                  backgroundColor: "#EBF7FF",
-                  height: "40px",
-                  borderRadius: "10px",
-                }}
-              />
-            )}
-            {/* bot: type == 'html_code' */}
-            {content.type === BOT_MESSAGE_TYPES.HTML_CODE && (
-              <HtmlCodeMessagePreview
-                content={content}
-                index={index}
-                botInfor={botInfor}
-              />
-            )}
+            { renderContent() }
           </React.Fragment>
         )}
       </div>

@@ -267,6 +267,7 @@ textarea.ss-message__content--bot-delay {
 .ss-user-message__action-btn {
   background-color: #327aed;
   font-weight: 500;
+  border-radius: 25px;
 }
 
 /* user: type = 'text_input' */
@@ -2180,4 +2181,28 @@ input#ss-message__content--user-checkbox--checkbox_img {
   font-size: .7rem;
   font-style: italic;
   color: gray;
+}
+
+.ss-bot-chat-file-content-download {
+  color: #089BE5;
+  font-size: 17px;
+  display: block;
+  height: 50px;
+  cursor: pointer;
+}
+
+.ss-bot-chat-file-content-video {
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
+}
+
+.ss-bot-chat-file-content-image {
+  width: 100%;
+}
+
+.ss-bot-chat-delay {
+  background-color: #EBF7FF;
+  height: 40px;
+  border-radius: 10px;
 }
