@@ -1053,3 +1053,24 @@ slideUp
     transform-origin: center bottom !important;
   }
 }
+
+.ss-message__content--user-chat-image {
+  margin-bottom: 0px;
+}
+
+.ss-message__content--user-text-input-phone_number-hyphen {
+  margin-bottom: 0px !important;
+}
+
+.ss-message__content--user-chat-container {
+  display: flex;
+  justify-content: space-between;
+}
+.validation-error-message {
+  color: #FF7E00;
+  font-size: 12px;
+}
+
+.m-b-0 { margin-bottom: 0px; }
+.m-b-5 { margin-bottom: 5px; }
+.m-b-10 { margin-bottom: 10px; }

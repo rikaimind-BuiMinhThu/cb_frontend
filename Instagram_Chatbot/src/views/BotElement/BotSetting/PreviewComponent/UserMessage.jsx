@@ -30,11 +30,12 @@ import "moment/locale/zh-cn";
 import { dataHourFixed, dataMinutes, dataYearFixed, dataMonth, dataDay, dataPaymentMethod, installmentOptions, NUMBER_REGEX } from "./Constants";
 import { stringNullOrEmpty } from "./Utils";
 import SubmitButton from "./UserMessageComponent/SubmitButton";
-import InputDebounce from "../ScenarioSetting/scenarioComon/InputDebounce";
 import { convertTextJapaneseByApi } from "utils/japaneseConverter";
 import OptionGender from "./UserMessageComponent/OptionGender";
 import Image from "./UserMessageComponent/Image";
 import TextInput from "./UserMessageComponent/TextInput";
+import Label from "./UserMessageComponent/Label";
+import TextArea from "./UserMessageComponent/TextArea";
 import { moveToNext } from "./Utils";
 
 const UserMessage = ({
@@ -669,9 +670,28 @@ const UserMessage = ({
   const renderContent = (content, indexContent) => {
     switch (content.type) {
       case MESSAGE_CONTENT_TYPES.IMAGE:
-        return <Image content={content} />
+        return <Image content={content} />;
       case MESSAGE_CONTENT_TYPES.TEXT_INPUT:
-        return <TextInput content={content} disabled={disabled} handleOnChangeJpConvertText={handleOnChangeJpConvertText} indexContent={indexContent} onChangeValue={onChangeValue} />
+        return <TextInput
+          content={content}
+          disabled={disabled}
+          handleOnChangeJpConvertText={handleOnChangeJpConvertText}
+          indexContent={indexContent}
+          onChangeValue={onChangeValue}
+          errors={errors}
+          indexMessage={indexMessage}
+        />;
+      case MESSAGE_CONTENT_TYPES.LABEL:
+        return <Label content={content} />;
+      case MESSAGE_CONTENT_TYPES.TEXT_AREA:
+        return <TextArea
+          content={content}
+          disabled={disabled}
+          onChangeValue={onChangeValue}
+          errors={errors}
+          indexContent={indexContent}
+          indexMessage={indexMessage}
+        />;
       default:
         return null;
     }
@@ -681,7 +701,6 @@ const UserMessage = ({
     <div className="ss-user-message__content-wrapper">
       {messageContent?.map((content, indexContent) => {
         let textInput = content.text_input;
-        let label = content.label;
         let textarea = content.textarea;
         let radioButton = content.radio_button;
         let checkbox = content.checkbox;
@@ -1547,78 +1566,6 @@ const UserMessage = ({
                 </div>
               )
             }
-            {/* type == 'label' */}
-            {content.type === "label" && label.lbl_content && (
-              <div style={{ marginBottom: "10px" }}>
-                <div className="ss-message__content--user-label-top">
-                  <span className="ss-message__content--user-label-title">
-                    {label.lbl_content}
-                  </span>
-                  {label?.require === true && (
-                    <span className="ss-message__content--user-required">
-                      ※必須
-                    </span>
-                  )}
-                </div>
-              </div>
-            )}
-            {/* type == 'textarea' */}
-            {content.type === "textarea" && (
-              <div style={{ marginBottom: "10px" }}>
-                {(textarea.title_require || textarea.require) && (
-                  <div
-                    className="ss-message__content--user-textarea-top"
-                    style={{ marginBottom: "0px" }}
-                  >
-                    {textarea.title_require && (
-                      <span className="ss-message__content--user-textarea-title">
-                        {textarea.title}
-                      </span>
-                    )}
-                    {textarea.require === true &&
-                      textarea?.type === "text_input" && (
-                        <span className="ss-message__content--user-text-input-required">
-                          ※必須
-                        </span>
-                      )}
-                  </div>
-                )}
-                {(textarea?.type === "text_input" ||
-                  textarea?.type === "invalid_input") && (
-                    <textarea
-                      disabled={disabled || textarea?.type === "invalid_input"}
-                      className="ss-message__content--user-textarea ss-input-value"
-                      placeholder={textarea[textarea.type]?.content}
-                      rows={3}
-                      onChange={(e) =>
-                        onChangeValue(
-                          indexContent,
-                          content.type,
-                          e.target.value,
-                          textarea?.type,
-                          "value"
-                        )
-                      }
-                      value={
-                        textarea?.type === "invalid_input"
-                          ? textarea[textarea.type]?.content
-                          : textarea[textarea.type]?.value
-                      }
-                    ></textarea>
-                  )}
-                {errors?.[
-                  `message${indexMessage}_content${indexContent}_${content.type}`
-                ] && (
-                    <div style={{ color: "#FF7E00", fontSize: "12px" }}>
-                      {
-                        errors?.[
-                        `message${indexMessage}_content${indexContent}_${content.type}`
-                        ]
-                      }
-                    </div>
-                  )}
-              </div>
-            )}
             {/* type == 'radio_button' */}
             {content.type === "radio_button" && (
               <div style={{ marginBottom: "10px" }}>

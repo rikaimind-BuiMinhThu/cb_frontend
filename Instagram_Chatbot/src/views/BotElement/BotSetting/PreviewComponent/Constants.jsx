@@ -159,6 +159,8 @@ const MESSAGE_CONTENT_TYPES = {
   },
   IMAGE: 'image',
   TEXT_INPUT: 'text_input',
+  LABEL: 'label',
+  TEXT_AREA: 'textarea',
 };
 
 const LABELS = {
