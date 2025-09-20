@@ -2206,3 +2206,19 @@ input#ss-message__content--user-checkbox--checkbox_img {
   height: 40px;
   border-radius: 10px;
 }
+
+.ss-bot-chat-text-input {
+  overflow-wrap: break-word;
+  height: auto;
+  border: none;
+  border-radius: 20px;
+}
+
+.ss-bot-chat-text-input-bot-icon {
+  content: " ";
+  display: flex;
+  bottom: 8px;
+  left: -3px;
+  width: 12px;
+  height: 18px;
+}

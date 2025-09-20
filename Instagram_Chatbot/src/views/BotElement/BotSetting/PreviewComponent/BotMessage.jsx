@@ -134,14 +134,10 @@ const BotMessage = ({
     return (
       <div className="position-relative">
         <div
-          className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value position-relative`}
+          className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value ss-bot-chat-text-input position-relative`}
           style={{
-            overflowWrap: "break-word",
             backgroundColor: botInfor?.message_color,
             color: botInfor?.font_color,
-            height: "auto",
-            border: "none",
-            borderRadius: "20px",
           }}
           dangerouslySetInnerHTML={{
             __html: formatResult()
@@ -149,18 +145,10 @@ const BotMessage = ({
         >
         </div>
         <div
+          className="ss-bot-chat-text-input-bot-icon position-absolute"
           style={{
-            content: " ",
-            display: "flex",
-            position: "absolute",
-            bottom: 1,
-            left: "-3px",
-            width: "12px",
-            height: "18px",
             backgroundColor: botInfor?.message_color,
             background: `url(${botInfor?.icon_mess})`,
-            backgroundSize: "contain",
-            backgroundRepeat: "no-repeat",
           }}
         >
           {!botInfor?.icon_mess && (
