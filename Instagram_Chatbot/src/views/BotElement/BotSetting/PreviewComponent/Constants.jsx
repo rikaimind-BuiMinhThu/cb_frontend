@@ -101,6 +101,7 @@ const CHATBOT_SERVER = {
   UPDATE_STATUS_CONVERSION_USER_RESPONSE: '/api/v1/scenario_users/scenario_user_responses_status',
   CREATE_USER_SCENARIO_RESPONSE_MESSAGE_HISTORY: '/api/v1/scenario_users/scenario_user_responses_message',
   USER_ENTRY_SCENARIO: '/api/v1/scenario_users/entry',
+  GET_ADDRESS_FROM_ZIP_CODE_PATH: '/api/v1/get_address_from_zip_code?zip_code=:zip_code',
 };
 
 const GET_CAPTCHA_PATH = `https://svg-captcha-nodejs.vercel.app/captcha?size=:size&color=:color&charPreset=:char_preset`;
@@ -164,6 +165,7 @@ const MESSAGE_CONTENT_TYPES = {
   RADIO_BUTTON: 'radio_button',
   CHECKBOX: 'checkbox',
   PULL_DOWN: 'pull_down',
+  ZIP_CODE_ADDRESS: 'zip_code_address',
 };
 
 const LABELS = {

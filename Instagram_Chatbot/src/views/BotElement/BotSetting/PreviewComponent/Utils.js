@@ -1,6 +1,6 @@
 import api from "api/api-management";
 import { tokenExpired } from "api/tokenExpired";
-import { CHATBOT_SERVER, CURRENCY_UNITS, GET_CAPTCHA_PATH, RENDER_CHATBOT_CONFIG, CONVERSION_RESPONSE_SUBMIT_TYPE, CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE } from "./Constants";
+import { CHATBOT_SERVER, CURRENCY_UNITS, GET_CAPTCHA_PATH, CONVERSION_RESPONSE_SUBMIT_TYPE, CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE } from "./Constants";
 
 const stringNullOrEmpty = (string) => {
   return !string || (string + "").trim() === "";
