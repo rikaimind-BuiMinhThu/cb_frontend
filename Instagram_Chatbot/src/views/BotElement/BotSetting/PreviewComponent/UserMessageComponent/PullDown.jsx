@@ -7,11 +7,12 @@ import {
   dataYearFixed as YEAR_DEFAULT_OPTIONS,
   CRAWL_ELEMENT_TYPES,
 } from "views/BotElement/BotSetting/PreviewComponent/Constants";
-import { getCitiesByPrefecture, getLPOptionData, postMessageToParent, tokenExpired } from "views/BotElement/BotSetting/PreviewComponent/Utils";
+import { getCitiesByPrefecture } from "views/BotElement/BotSetting/PreviewComponent/Utils";
+import { tokenExpired } from "api/tokenExpired";
 import LPIntegrationOptionPullDown from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/LPIntegrationOptionPullDown";
 import SelectCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/SelectCustom";
 
-export default function Pulldown({ content, errors, indexContent, indexMessage, disabled, onChangeValue, prefecturesList }) {
+export default function PullDown({ content, errors, indexContent, indexMessage, disabled, onChangeValue, prefecturesList, lpOptionData, postMessageToParent }) {
   const [cityOptions, setCityOptions] = useState([]);
 
   if (content.type !== MESSAGE_CONTENT_TYPES.PULL_DOWN) return null;
@@ -490,7 +491,7 @@ export default function Pulldown({ content, errors, indexContent, indexMessage, 
         search_element_value={pullDown.lp_element_search_value}
         disabled={disabled}
         pullDown={pullDown}
-        data={getLPOptionData(pullDown.lp_element_search_value)}
+        data={lpOptionData[pullDown.lp_element_search_value]}
         postMessageToParent={postMessageToParent}
         keyValue="value"
         nameValue="text"
@@ -516,7 +517,7 @@ export default function Pulldown({ content, errors, indexContent, indexMessage, 
         jsCode={pullDown.from_js_result_code}
         disabled={disabled}
         pullDown={pullDown}
-        data={getLPOptionData(pullDown.from_js_result_target_search_value)}
+        data={lpOptionData[pullDown.from_js_result_target_search_value]}
         postMessageToParent={postMessageToParent}
         onChange={(value) =>
           onChangeValue(indexContent, content.type, value, pullDown.type, 'value')

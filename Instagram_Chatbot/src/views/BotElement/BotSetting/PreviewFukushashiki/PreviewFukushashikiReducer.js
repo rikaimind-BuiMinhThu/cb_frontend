@@ -38,7 +38,6 @@ export const PREVIEW_ACTIONS = {
   SET_DELAYING: "SET_DELAYING",
 };
 
-
 const PreviewFukushashikiReducer = (state, action) => {
   switch (action.type) {
     case PREVIEW_ACTIONS.UPDATE_MULTI_STATE:

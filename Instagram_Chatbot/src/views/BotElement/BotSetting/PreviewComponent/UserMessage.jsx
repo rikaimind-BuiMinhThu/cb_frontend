@@ -38,6 +38,7 @@ import Label from "./UserMessageComponent/Label";
 import TextArea from "./UserMessageComponent/TextArea";
 import RadioButton from "./UserMessageComponent/RadioButton";
 import Checkbox from "./UserMessageComponent/Checkbox";
+import PullDown from "./UserMessageComponent/PullDown";
 import { moveToNext } from "./Utils";
 
 const UserMessage = ({
@@ -711,6 +712,18 @@ const UserMessage = ({
           errors={errors}
           indexContent={indexContent}
           indexMessage={indexMessage}
+        />;
+      case MESSAGE_CONTENT_TYPES.PULL_DOWN:
+        return <PullDown
+          content={content}
+          disabled={disabled}
+          onChangeValue={onChangeValue}
+          errors={errors}
+          indexContent={indexContent}
+          indexMessage={indexMessage}
+          prefecturesList={prefecturesList}
+          lpOptionData={lpOptionData}
+          postMessageToParent={postMessageToParent}
         />;
       default:
         return null;
@@ -1642,25 +1655,6 @@ const UserMessage = ({
                   )}
               </div>
             }
-            {/* type == 'pull_down' */}
-            {content.type === "pull_down" && (
-              <div style={{ marginBottom: "10px" }}>
-                <div className="ss-message__content--user-pull_down-wrapper">
-                  
-                </div>
-                {errors?.[
-                  `message${indexMessage}_content${indexContent}_${content.type}_${pullDown.type}`
-                ] && (
-                    <div style={{ color: "#FF7E00", fontSize: "12px" }}>
-                      {
-                        errors?.[
-                        `message${indexMessage}_content${indexContent}_${content.type}_${pullDown.type}`
-                        ]
-                      }
-                    </div>
-                  )}
-              </div>
-            )}
             {/* type == 'zip_code_address' */}
             {content.type === "zip_code_address" && (
               <div style={{ marginBottom: "10px" }}>
