@@ -47,11 +47,43 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
           onChangeValue={onChangeValue}
         />;
       case "password":
-        return renderPassword();
+        return <>
+          <InputCustom
+            disabled={disabled}
+            type="password"
+            className="m-b-0"
+            placeholder={textInput[textInput.type]?.password}
+            onChange={(value) =>
+              onChangeValue(
+                indexContent,
+                content.type,
+                value,
+                textInput.type,
+                "value"
+              )
+            }
+            value={textInput[textInput.type]?.value}
+          />
+        </>;
       case "urls":
-        return renderUrls();
       case "email_address":
-        return renderEmailAddress();
+        return <>
+          <InputCustom
+            disabled={disabled}
+            className="m-b-0"
+            placeholder={textInput[textInput.type].placeholder}
+            onChange={(value) =>
+              onChangeValue(
+                indexContent,
+                content.type,
+                value,
+                textInput.type,
+                "value"
+              )
+            }
+            value={textInput[textInput.type]?.value}
+          />
+        </>;
       case "email_confirmation":
         return renderEmailConfirmation();
       case "password_confirmation":
@@ -65,48 +97,6 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
     <div style={{ marginBottom: "10px" }}>
       {renderTitle()}
       {renderContent()}
-      {textInput.type === "password" && (
-        <React.Fragment>
-          <InputCustom
-            disabled={disabled}
-            type="password"
-            // className="ss-message__content--user-text-input ss-input-value"
-            style={{ marginBottom: "0px" }}
-            placeholder={textInput[textInput.type]?.password}
-            onChange={(value) =>
-              onChangeValue(
-                indexContent,
-                content.type,
-                value,
-                textInput.type,
-                "value"
-              )
-            }
-            value={textInput[textInput.type]?.value}
-          ></InputCustom>
-        </React.Fragment>
-      )}
-      {(textInput.type === "urls" ||
-        textInput.type === "email_address") && (
-          <React.Fragment>
-            <InputCustom
-              disabled={disabled}
-              // className="ss-message__content--user-text-input ss-input-value"
-              style={{ marginBottom: "0px" }}
-              placeholder={textInput[textInput.type].placeholder}
-              onChange={(value) =>
-                onChangeValue(
-                  indexContent,
-                  content.type,
-                  value,
-                  textInput.type,
-                  "value"
-                )
-              }
-              value={textInput[textInput.type]?.value}
-            ></InputCustom>
-          </React.Fragment>
-        )}
       {textInput.type === "email_confirmation" && (
         <>
           <InputCustom
