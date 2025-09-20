@@ -157,6 +157,7 @@ const MESSAGE_CONTENT_TYPES = {
     UP_TO_MUNICIPALITY: 'up_to_municipality',
     CONSUME_API_RESPONSE: 'comsume_api_response',
   },
+  IMAGE: 'image',
 };
 
 const LABELS = {

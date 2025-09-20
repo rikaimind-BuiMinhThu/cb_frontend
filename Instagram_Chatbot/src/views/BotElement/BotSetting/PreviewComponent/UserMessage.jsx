@@ -33,6 +33,7 @@ import SubmitButton from "./UserMessageComponent/SubmitButton";
 import InputDebounce from "../ScenarioSetting/scenarioComon/InputDebounce";
 import { convertTextJapaneseByApi } from "utils/japaneseConverter";
 import OptionGender from "./UserMessageComponent/OptionGender";
+import Image from "./UserMessageComponent/Image";
 
 const UserMessage = ({
   messageContentProps,
@@ -54,6 +55,12 @@ const UserMessage = ({
   botId,
   isProcessing = false,
 }) => {
+
+  // UserMesssage sẽ có những nhiệm vụ:
+  //   + Check xem content thuộc dạng nào và render ra component tương ứng
+  //   + Sau khi mà render xong UserMessage thì sẽ validate cho phần tương ứng như vậy
+  //   + Hiển thị errorsMessage tương ứng cho content đó nếu validate có lỗi
+
   const [dataHour, setDataHour] = useState(dataHourFixed);
   const [dataYear, setDataYear] = useState(dataYearFixed);
   const [dataCity, setDataCity] = useState([]);
@@ -667,6 +674,15 @@ const UserMessage = ({
     )
   }
 
+  const renderContent = (content, indexContent) => {
+    switch (content.type) {
+      case MESSAGE_CONTENT_TYPES.IMAGE:
+        return <Image content={content} />
+      default:
+        return null;
+    }
+  }
+
   return (
     <div className="ss-user-message__content-wrapper">
       {messageContent?.map((content, indexContent) => {
@@ -698,13 +714,8 @@ const UserMessage = ({
 
         return (
           <React.Fragment key={indexContent}>
-            {
-              content.type === 'image' && (
-                <div className="ss-message__content--user-text-input-top" style={{ marginBottom: '0px' }}>
-                  <img src={image.imageURL} style={{ width: image.image_width, height: image.image_height }} />
-                </div>
-              )
-            }
+            { renderContent(content, indexContent) }
+
             {/* type == 'text_input' */}
             {content.type === "text_input" && (
               <div style={{ marginBottom: "10px" }}>
