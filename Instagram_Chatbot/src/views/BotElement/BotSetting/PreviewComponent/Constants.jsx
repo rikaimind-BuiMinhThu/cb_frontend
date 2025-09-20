@@ -163,6 +163,7 @@ const MESSAGE_CONTENT_TYPES = {
   TEXT_AREA: 'textarea',
   RADIO_BUTTON: 'radio_button',
   CHECKBOX: 'checkbox',
+  PULL_DOWN: 'pull_down',
 };
 
 const LABELS = {
