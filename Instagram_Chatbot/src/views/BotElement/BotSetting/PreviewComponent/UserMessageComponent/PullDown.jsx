@@ -5,6 +5,8 @@ import {
   dataHourFixed as HOUR_DEFAULT_OPTIONS,
   dataMinutes as MINUTES_DEFAULT_OPTIONS,
   dataYearFixed as YEAR_DEFAULT_OPTIONS,
+  dataMonth as MONTH_DEFAULT_OPTIONS,
+  dataDay as DAY_DEFAULT_OPTIONS,
   CRAWL_ELEMENT_TYPES,
 } from "views/BotElement/BotSetting/PreviewComponent/Constants";
 import { getCitiesByPrefecture } from "views/BotElement/BotSetting/PreviewComponent/Utils";

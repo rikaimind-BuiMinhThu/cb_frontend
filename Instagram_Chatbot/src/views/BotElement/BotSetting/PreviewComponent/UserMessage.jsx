@@ -543,67 +543,6 @@ const UserMessage = ({
     return content;
   }
 
-  function renderPulldownfromJs({ disabled, pullDown, indexContent, content }) {
-    if (pullDown?.type !== MESSAGE_CONTENT_TYPES.PULLDOWN.FROM_JS) return null;
-
-    return (
-      <LPIntegrationOptionPullDown
-        targetElementType={CRAWL_ELEMENT_TYPES.FROM_JS}
-        search_element_type={pullDown.from_js_result_target_search_mode}
-        search_element_value={pullDown.from_js_result_target_search_value}
-        jsCode={pullDown.from_js_result_code}
-        disabled={disabled}
-        pullDown={pullDown}
-        data={getLPOptionData(pullDown.from_js_result_target_search_value)}
-        postMessageToParent={postMessageToParent}
-        onChange={(value) =>
-          onChangeValue(indexContent, content.type, value, pullDown.type, 'value')
-        }
-        nameValue='text'
-        keyValue='value'
-      />
-    );
-  }
-
-  const renderAddressField = (address, indexContent, content) => {
-    if (address.compact_municipality_and_address || address.compact_municipality_and_address_and_building_name) return;
-    if (address.address === undefined) return;
-    return (
-      <div className="ss-user-setting__item-bottom">
-        <div
-          style={{
-            fontWeight: "400",
-            fontSize: "12px",
-            width: "100%",
-            marginBottom: "3px",
-          }}
-        >
-          {
-            address.address_label && address.address_label.trim() !== ""
-              ? address.address_label
-              : '番地'
-          }
-        </div>
-        <InputCustom
-          placeholder={address.address}
-          id={`ss-user-input-address${indexContent}`}
-          disabled={disabled}
-          style={{ width: "100%" }}
-          onChange={(value) =>
-            onChangeValue(
-              indexContent,
-              content.type,
-              value,
-              "value_address"
-            )
-          }
-          value={address.value_address}
-          clearable={true}
-        />
-      </div>
-    )
-  }
-
   const renderContent = (content, indexContent) => {
     switch (content.type) {
       case MESSAGE_CONTENT_TYPES.IMAGE:

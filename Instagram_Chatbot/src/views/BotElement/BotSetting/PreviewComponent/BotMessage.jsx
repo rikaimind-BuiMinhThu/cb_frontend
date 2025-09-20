@@ -3,7 +3,7 @@ import "assets/css/bot/preview-chat-bot.css";
 import messageTypingGif from "assets/img/icons8-dots-loading.gif";
 import { EC_CHATBOT_URL } from "variables/constants";
 import "moment/locale/zh-cn";
-import { BOT_MESSAGE_TYPES } from "./Constants";
+import { BOT_MESSAGE_TYPES, RENDER_CHATBOT_CONFIG } from "./Constants";
 import HtmlCodeMessagePreview from "components/BotMessages/HtmlCodeMessagePreview";
 import { getElementMessageById } from "./Utils";
 
@@ -16,6 +16,8 @@ const BotMessage = ({
   executeLpJsCode,
   messageId
 }) => {
+  const [isDelaying, setIsDelaying] = useState(true);
+
   const isShowAvatar = () => {
     if (!content) return false;
 
@@ -45,7 +47,24 @@ const BotMessage = ({
     link.remove();
   };
 
-  // Sau khi render BotMessage xong thì muốn chạy các script mà được setting trong bot message đó
+  useEffect(() => {
+    if (!isDelaying) return;
+
+    if (content.type === BOT_MESSAGE_TYPES.DELAY) {
+      setIsDelaying(true);
+      setTimeout(() => {
+        setIsDelaying(false);
+      }, content.delay.content * 1000);
+      return;
+    }
+
+    if (isDelaying) {
+      setTimeout(() => {
+        setIsDelaying(false);
+      }, RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE);
+    }
+  }, [content.type, isDelaying]);
+
   useEffect(() => {
     if (content.text_input?.use_for_confirm_message &&
       content.text_input?.jscode?.trim() && 
@@ -238,6 +257,10 @@ const BotMessage = ({
 
   const renderContent = () => {
     if (!content) return null;
+
+    if (isDelaying) {
+      return renderDelayContent();
+    }
 
     switch (content.type) {
       case BOT_MESSAGE_TYPES.TEXT_INPUT:
