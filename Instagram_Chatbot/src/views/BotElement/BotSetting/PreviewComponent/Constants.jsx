@@ -158,6 +158,7 @@ const MESSAGE_CONTENT_TYPES = {
     CONSUME_API_RESPONSE: 'comsume_api_response',
   },
   IMAGE: 'image',
+  TEXT_INPUT: 'text_input',
 };
 
 const LABELS = {
