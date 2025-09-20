@@ -11,7 +11,7 @@ import { Button } from "reactstrap";
 import ModalNoti from "../../../Popup/ModalNoti";
 import { CHATBOT_ACTIONS, CRAWL_ELEMENT_TYPES, MESSAGE_CONTENT_TYPES, REGEXP, RENDER_CHATBOT_CONFIG, SCAN_REGEX } from "../PreviewComponent/Constants";
 import {
-  Checkbox,
+  Checkbox as AntdCheckbox,
   Radio,
   Slider,
   Calendar,
@@ -37,6 +37,7 @@ import TextInput from "./UserMessageComponent/TextInput";
 import Label from "./UserMessageComponent/Label";
 import TextArea from "./UserMessageComponent/TextArea";
 import RadioButton from "./UserMessageComponent/RadioButton";
+import Checkbox from "./UserMessageComponent/Checkbox";
 import { moveToNext } from "./Utils";
 
 const UserMessage = ({
@@ -695,6 +696,15 @@ const UserMessage = ({
         />;
       case MESSAGE_CONTENT_TYPES.RADIO_BUTTON:
         return <RadioButton
+          content={content}
+          disabled={disabled}
+          onChangeValue={onChangeValue}
+          errors={errors}
+          indexContent={indexContent}
+          indexMessage={indexMessage}
+        />;
+      case MESSAGE_CONTENT_TYPES.CHECKBOX:
+        return <Checkbox
           content={content}
           disabled={disabled}
           onChangeValue={onChangeValue}
@@ -1577,166 +1587,6 @@ const UserMessage = ({
               )
             }
 
-            {/* type == 'checkbox' */}
-            {content.type === "checkbox" && (
-              <div style={{ marginBottom: "10px" }}>
-                {(checkbox.title_require || checkbox.require) && (
-                  <div
-                    className="ss-message__content--user-checkbox-top"
-                    style={{ marginBottom: "0px" }}
-                  >
-                    {checkbox.title_require && (
-                      <span className="ss-message__content--user-checkbox-title">
-                        {checkbox.title}
-                      </span>
-                    )}
-                    {checkbox.require === true && (
-                      <span className="ss-message__content--user-text-input-required">
-                        ※必須
-                      </span>
-                    )}
-                  </div>
-                )}
-                <div>
-                  {checkbox.type === "default" && (
-                    <Checkbox.Group
-                      style={{ width: "100%" }}
-                      disabled={disabled}
-                      onChange={(value) =>
-                        onChangeValue(
-                          indexContent,
-                          content.type,
-                          value,
-                          "checkedValue"
-                        )
-                      }
-                      value={checkbox.checkedValue}
-                    >
-                      {checkbox[checkbox.type].map((item, index) => {
-                        return (
-                          <div
-                            key={index}
-                            className="ss-message__content--user-checkbox"
-                          >
-                            <Checkbox value={item.id}>
-                              <label htmlFor="ss-message__content--user-checkbox">
-                                {item.text}
-                              </label>
-                            </Checkbox>
-                          </div>
-                        );
-                      })}
-                    </Checkbox.Group>
-                  )}
-                  {/* {checkbox.type === 'checkbox_img' && (
-                        checkbox[checkbox.type].map((item, index) => {
-                          return <div key={index} className="ss-message__content--user-checkbox--checkbox_img" style={{ marginBottom: '10px' }}>
-                            <CheckboxCustom
-                              disabled={disabled}
-                              onChange={() => onChangeValueCheckbox(indexContent, content.type, item.id, 'checkedValue')}
-                              value={checkbox.checkedValue.includes(item.id)}
-                              isOnChange={false}
-                            />
-                            <img
-                              src={item.img}
-                              alt=""
-                            />
-                            <div style={{ textAlign: 'center' }}>{item.text}</div>
-                          </div>
-                        })
-                      )} */}
-                  {checkbox.type === "checkbox_img" && checkbox[checkbox.type] && (
-                    <Checkbox.Group
-                      disabled={disabled}
-                      style={{ width: "100%", fontSize: "14px" }}
-                      className="ss-user-preview-product-purchase-checkbox-group-type-text_image ss-user-overview-product-purchase-style-width"
-                      onChange={(value) =>
-                        onChangeValue(
-                          indexContent,
-                          content.type,
-                          value,
-                          "initial_selection_picture"
-                        )
-                      }
-                      value={checkbox.initial_selection_picture}
-                    >
-                      {checkbox[checkbox.type].map(
-                        (itemCheckboxImg, indexCheckboxImg) => {
-                          return (
-                            <div
-                              key={indexCheckboxImg}
-                              style={{ color: "#6789A6", display: "flex" }}
-                            >
-                              {itemCheckboxImg.contents &&
-                                itemCheckboxImg.contents.map(
-                                  (itemCheckContent, indexCheckboxContent) => {
-                                    return (
-                                      <Checkbox
-                                        value={`${itemCheckboxImg.id}-${itemCheckContent.id}`}
-                                        key={indexCheckboxContent}
-                                        style={{ marginRight: "0px" }}
-                                      >
-                                        <img
-                                          src={itemCheckContent.file_url}
-                                        ></img>
-                                        <div
-                                          style={{
-                                            textAlign: "center",
-                                            fontSize: "14px",
-                                            color: "#6789A6",
-                                            fontWeight: "700",
-                                          }}
-                                        >
-                                          {itemCheckContent.text}
-                                        </div>
-                                      </Checkbox>
-                                    );
-                                  }
-                                )}
-                            </div>
-                          );
-                        }
-                      )}
-                    </Checkbox.Group>
-                  )}
-                  {checkbox.type === "consume_api_response" && (
-                    <>
-                      <div className="ss-message__content--user-checkbox">
-                        <input
-                          type="checkbox"
-                          name="ss-message__content--user-checkbox"
-                          id="ss-message__content--user-checkbox"
-                        />
-                        <label htmlFor="ss-message__content--user-checkbox">
-                          ラベル
-                        </label>
-                      </div>
-                      <div className="ss-message__content--user-checkbox">
-                        <input
-                          type="checkbox"
-                          name="ss-message__content--user-checkbox"
-                          id="ss-message__content--user-checkbox"
-                        />
-                        <label htmlFor="ss-message__content--user-checkbox">
-                          ラベル
-                        </label>
-                      </div>
-                    </>
-                  )}
-                </div>
-                {errors?.[
-                  `message${indexMessage}_content${indexContent}_${content.type}`
-                ] && (
-                    <div style={{ color: "#FF7E00", fontSize: "12px" }}>
-                      {
-                        errors?.[
-                        `message${indexMessage}_content${indexContent}_${content.type}`
-                        ]
-                      }
-                    </div>
-                  )}
-              </div>
-            )}
             {/* type == 'product_purchase_select_option */}
             {
               content.type === 'product_purchase_select_option' &&
@@ -4097,7 +3947,7 @@ const UserMessage = ({
                   {productPurchase.type === "text_with_thumbnail_image" &&
                     (productPurchase.multiple_item_purchase ? (
                       <React.Fragment>
-                        <Checkbox.Group
+                        <AntdCheckbox.Group
                           className="ss-user-preivew-product-purchase-checkbox-group ss-user-preivew-product-purchase-style-width"
                           style={{ width: "100%" }}
                           disabled={disabled}
@@ -4114,7 +3964,7 @@ const UserMessage = ({
                                     marginBottom: "5px",
                                   }}
                                 >
-                                  <Checkbox
+                                  <AntdCheckbox
                                     value={itemProduct.id}
                                     style={{ border: "none", padding: "0px" }}
                                     onChange={() => {
@@ -4185,7 +4035,7 @@ const UserMessage = ({
                                           </div>
                                         )}
                                     </div>
-                                  </Checkbox>
+                                  </AntdCheckbox>
                                   {(productPurchase.quantity_designation_all ||
                                     itemProduct.is_quantity_designation) && (
                                       <div>
@@ -4348,7 +4198,7 @@ const UserMessage = ({
                               );
                             }
                           )}
-                        </Checkbox.Group>
+                        </AntdCheckbox.Group>
                       </React.Fragment>
                     ) : (
                       <React.Fragment>
@@ -4604,7 +4454,7 @@ const UserMessage = ({
                   {productPurchase.type === "text_with_image" &&
                     (productPurchase.multiple_item_purchase ? (
                       <React.Fragment>
-                        <Checkbox.Group
+                        <AntdCheckbox.Group
                           className="ss-user-preview-product-purchase-checkbox-group-type-text_image ss-user-preivew-product-purchase-style-width"
                           style={{ width: "100%" }}
                           disabled={disabled}
@@ -4621,7 +4471,7 @@ const UserMessage = ({
                                     marginBottom: "5px",
                                   }}
                                 >
-                                  <Checkbox
+                                  <AntdCheckbox
                                     key={indexProduct}
                                     value={itemProduct.id}
                                     onChange={() => {
@@ -4681,7 +4531,7 @@ const UserMessage = ({
                                         ""
                                       )}
                                     </div>
-                                  </Checkbox>
+                                  </AntdCheckbox>
                                   {(productPurchase.quantity_designation_all ||
                                     itemProduct.is_quantity_designation) && (
                                       <div>
@@ -4839,7 +4689,7 @@ const UserMessage = ({
                               );
                             }
                           )}
-                        </Checkbox.Group>
+                        </AntdCheckbox.Group>
                       </React.Fragment>
                     ) : (
                       <React.Fragment>

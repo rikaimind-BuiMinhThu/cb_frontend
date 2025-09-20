@@ -162,6 +162,7 @@ const MESSAGE_CONTENT_TYPES = {
   LABEL: 'label',
   TEXT_AREA: 'textarea',
   RADIO_BUTTON: 'radio_button',
+  CHECKBOX: 'checkbox',
 };
 
 const LABELS = {
