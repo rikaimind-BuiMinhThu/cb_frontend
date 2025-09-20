@@ -40,6 +40,7 @@ import RadioButton from "./UserMessageComponent/RadioButton";
 import Checkbox from "./UserMessageComponent/Checkbox";
 import PullDown from "./UserMessageComponent/PullDown";
 import ZipCodeAddress from "./UserMessageComponent/ZipCodeAddress";
+import Attachment from "./UserMessageComponent/Attachment";
 import { moveToNext } from "./Utils";
 
 const UserMessage = ({
@@ -316,75 +317,7 @@ const UserMessage = ({
     });
   }, []);
 
-  function botUploadFile() {
-    document.getElementById("ss-bot-file-upload-preview").click();
-  }
 
-  function getBaseUrl(event, indexContent) {
-    var file = event.target.files[0];
-    const type = file.name.slice(file.name.lastIndexOf(".") + 1);
-    if (
-      messageContent[indexContent].attaching_file.file_type.length > 0 &&
-      !messageContent[indexContent].attaching_file.file_type.includes(
-        type.toLowerCase()
-      )
-    ) {
-      onChangeErrors(
-        `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
-        `ファイルには${messageContent[
-          indexContent
-        ].attaching_file.file_type.join(
-          ", "
-        )}タイプのファイルを指定してください。`
-      );
-      return;
-    } else if (file.size / 1024 / 1024 >= 2) {
-      onChangeErrors(
-        `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
-        "ファイルサイズは2MB以下です。"
-      );
-      return;
-    } else {
-      onChangeErrors(
-        `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
-        ""
-      );
-    }
-    // if (file?.type === 'image/png' || file?.type === 'image/jpeg') {
-    // var reader = new FileReader(file);
-
-    // messageContent[indexContent].attaching_file.value = file.name;
-    let urlFile = URL.createObjectURL(file);
-    onChangeValue(indexContent, "attaching_file", file.name, "value");
-    onChangeValue(indexContent, "attaching_file", urlFile, "linkFile");
-    // var baseString;
-    // var imgUrl = URL.createObjectURL(event.target.files[0]);
-    // if (
-    //   file?.type === 'image/png' ||
-    //   file?.type === 'image/jpeg' ||
-    //   file?.type === 'image/jpg' ||
-    //   file?.type === 'image/gif' ||
-    //   file?.type === 'image/img'
-    // ) {
-    //   document.getElementById(`bot-file-upload-img`).style.display = 'block';
-    //   document.getElementById(`bot-file-upload-img`).src = imgUrl;
-    // } else {
-    //   document.getElementById(`bot-file-upload-img`).style.display = 'none';
-    //   document.getElementById(`bot-file-upload-img`).src = '';
-    // }
-
-    // reader.onloadend = function () {
-    //   baseString = reader.result;
-    //   // setInputImage(baseString);
-    //   // document.getElementById('ss-bot-file-upload-name').innerHTML = event.target.files[0].name;
-    //   if (baseString !== undefined || baseString !== '') {
-    //     // document.getElementById('newClientImgLogoErrMsg').style.display = 'none';
-
-    //   }
-
-    // };
-    // reader.readAsDataURL(file);
-  }
 
   const handleDisableDateCalendar = (current, calendar) => {
     if (
@@ -740,6 +673,16 @@ const UserMessage = ({
           disabled={disabled}
           onOpen={onOpen}
         />;
+      case MESSAGE_CONTENT_TYPES.ATTACHMENT:
+        return <Attachment
+          content={content}
+          indexMessage={indexMessage}
+          indexContent={indexContent}
+          onChangeValue={onChangeValue}
+          onChangeErrors={onChangeErrors}
+          errors={errors}
+          disabled={disabled}
+        />;
       default:
         return null;
     }
@@ -748,13 +691,6 @@ const UserMessage = ({
   return (
     <div className="ss-user-message__content-wrapper">
       {messageContent?.map((content, indexContent) => {
-        let textInput = content.text_input;
-        let textarea = content.textarea;
-        let radioButton = content.radio_button;
-        let checkbox = content.checkbox;
-        let pullDown = content.pull_down;
-        let zipCodeAddress = content.zip_code_address;
-        let attachingFile = content.attaching_file;
         let calendar = content.calendar;
         let agreeTerm = content.agree_term;
         let carousel = content.carousel;
@@ -1673,74 +1609,7 @@ const UserMessage = ({
             {/* type == 'zip_code_address' */}
             
             {/* type == 'attaching_file' */}
-            {content.type === "attaching_file" && (
-              <div style={{ marginBottom: "10px" }}>
-                {attachingFile.require && (
-                  <div className="ss-message__content--user-attaching_file-top">
-                    {attachingFile.require === true && (
-                      <span className="ss-message__content--user-text-input-required">
-                        ※必須
-                      </span>
-                    )}
-                  </div>
-                )}
-                <div className="ss-message__content--user-attaching_file">
-                  <div style={{ position: "relative" }}>
-                    <InputCustom
-                      value={attachingFile.value || "未選択"}
-                      disabled={true}
-                    />
-                    <MDBIcon
-                      fas
-                      icon="times-circle"
-                      className={`ss-message-custom-icon-times ${disabled && "ss-message-custom-icon-times-disabled"
-                        }`}
-                      onClick={() => {
-                        if (!disabled) {
-                          onChangeValue(
-                            indexContent,
-                            content.type,
-                            "",
-                            "value"
-                          );
-                        }
-                      }}
-                    />
-                  </div>
-                  <input
-                    type="file"
-                    id="ss-bot-file-upload-preview"
-                    name="bot-file-upload"
-                    hidden
-                    onChange={(e) => getBaseUrl(e, indexContent)}
-                  />
-                  <Button
-                    id={`sp-button-upload-${indexContent}`}
-                    className="ss-message__content--user-attaching_file-btn"
-                    style={{
-                      backgroundColor: "#A3B1BF",
-                      marginTop: "3px",
-                      width: "100%",
-                    }}
-                    disabled={disabled}
-                    onClick={botUploadFile}
-                  >
-                    ファイルを選択
-                  </Button>
-                </div>
-                {errors?.[
-                  `message${indexMessage}_content${indexContent}_${content.type}`
-                ] && (
-                    <div style={{ color: "#FF7E00", fontSize: "12px" }}>
-                      {
-                        errors?.[
-                        `message${indexMessage}_content${indexContent}_${content.type}`
-                        ]
-                      }
-                    </div>
-                  )}
-              </div>
-            )}
+            
             {/* type == 'calendar' */}
             {content.type === "calendar" && (
               <div style={{ marginBottom: "10px" }}>

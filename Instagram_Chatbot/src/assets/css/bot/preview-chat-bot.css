@@ -1066,6 +1066,35 @@ slideUp
   display: flex;
   justify-content: space-between;
 }
+
+.ss-message__content--user-zip-code-address-search-link {
+  margin-bottom: 5px;
+  text-decoration: underline;
+  color: #2c76f0;
+  text-align: right;
+}
+
+.ss-message__content--user-zip-code-address-post-code-label {
+  font-weight: 400;
+  font-size: 12px;
+  width: 100%;
+  margin-bottom: 5px;
+}
+
+.ss-message__content--user-zip-code-address-label {
+  font-weight: 400;
+  font-size: 12px;
+  width: 100%;
+  margin-bottom: 3px;
+}
+
+.ss-message__content--attaching_file-button-upload {
+  margin-top: 3px;
+  width: -webkit-fill-available;
+  max-width: 90%;
+  background-color: #A3B1BF;
+}
+
 .validation-error-message {
   color: #FF7E00;
   font-size: 12px;
