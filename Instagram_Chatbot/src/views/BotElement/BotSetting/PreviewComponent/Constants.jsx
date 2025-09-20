@@ -161,6 +161,7 @@ const MESSAGE_CONTENT_TYPES = {
   TEXT_INPUT: 'text_input',
   LABEL: 'label',
   TEXT_AREA: 'textarea',
+  RADIO_BUTTON: 'radio_button',
 };
 
 const LABELS = {

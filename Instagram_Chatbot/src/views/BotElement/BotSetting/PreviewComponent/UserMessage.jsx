@@ -36,6 +36,7 @@ import Image from "./UserMessageComponent/Image";
 import TextInput from "./UserMessageComponent/TextInput";
 import Label from "./UserMessageComponent/Label";
 import TextArea from "./UserMessageComponent/TextArea";
+import RadioButton from "./UserMessageComponent/RadioButton";
 import { moveToNext } from "./Utils";
 
 const UserMessage = ({
@@ -685,6 +686,15 @@ const UserMessage = ({
         return <Label content={content} />;
       case MESSAGE_CONTENT_TYPES.TEXT_AREA:
         return <TextArea
+          content={content}
+          disabled={disabled}
+          onChangeValue={onChangeValue}
+          errors={errors}
+          indexContent={indexContent}
+          indexMessage={indexMessage}
+        />;
+      case MESSAGE_CONTENT_TYPES.RADIO_BUTTON:
+        return <RadioButton
           content={content}
           disabled={disabled}
           onChangeValue={onChangeValue}
@@ -1566,172 +1576,7 @@ const UserMessage = ({
                 </div>
               )
             }
-            {/* type == 'radio_button' */}
-            {content.type === "radio_button" && (
-              <div style={{ marginBottom: "10px" }}>
-                {(radioButton.title_require || radioButton.require) && (
-                  <div
-                    className="ss-message__content--user-radio_button-top"
-                    style={{ marginBottom: "0px" }}
-                  >
-                    {radioButton.title_require && (
-                      <span className="ss-message__content--user-radio_button-title">
-                        {radioButton.title}
-                      </span>
-                    )}
-                    {radioButton.require === true && (
-                      <span className="ss-message__content--user-text-input-required">
-                        ※必須
-                      </span>
-                    )}
-                  </div>
-                )}
-                <div className="ss-message__content--user-radio_button-wrapper">
-                  {radioButton.type === "default" &&
-                    radioButton.use_as_gender
-                    ? <OptionGender 
-                        indexContent={indexContent} 
-                        radioButton={radioButton} 
-                        onChangeValue={onChangeValue} 
-                        options={radioButton[radioButton.type]}
-                      />
-                    : radioButton[radioButton.type].map((item, index) => {
-                      return (
-                        <div
-                          key={index}
-                          className="ss-message__content--user-radio_button"
-                        >
-                          <input
-                            disabled={disabled}
-                            type="radio"
-                            id={`ss-message__content--user-radio_button_${item.value}`}
-                            checked={radioButton.initial_selection === item.value}
-                            onChange={() => {
-                              onChangeValue(
-                                indexContent,
-                                content.type,
-                                item.value,
-                                "initial_selection"
-                              );
-                              // if (messageContent.length === 1) onClickNext();
-                            }}
-                          />
-                          {item.text && (
-                            <label htmlFor={`ss-message__content--user-radio_button_${item.value}`}>
-                              {item.text}
-                            </label>
-                          )}
-                        </div>
-                      );
-                    })}
-                  {radioButton.type === "radio_button_img" &&
-                    radioButton[radioButton.type].map((item, index) => {
-                      return (
-                        <div
-                          key={index}
-                          className="ss-message__content--user-radio_button--radio_button_img"
-                        >
-                          <input
-                            disabled={disabled}
-                            type="radio"
-                            name="ss-message__content--user-radio_button--radio_button_img"
-                            id="ss-message__content--user-radio_button--radio_button_img"
-                            checked={radioButton.initial_selection === item.value}
-                            onChange={() => {
-                              onChangeValue(
-                                indexContent,
-                                content.type,
-                                item.value,
-                                "initial_selection"
-                              );
-                              // if (messageContent.length === 1) onClickNext();
-                            }}
-                          />
-                          <img src={item.img} alt="" />
-                          {item.text && (
-                            <div
-                              style={{
-                                display: "flex",
-                                justifyContent: "center",
-                              }}
-                            >
-                              {item.text}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  {radioButton.type === "consume_api_response" && (
-                    <>
-                      <div className="ss-message__content--user-radio_button">
-                        <input
-                          type="radio"
-                          name="ss-message__content--user-radio_button"
-                          id="ss-message__content--user-radio_button"
-                        />
-                        <label htmlFor="ss-message__content--user-radio_button">
-                          ラベル
-                        </label>
-                      </div>
-                      <div className="ss-message__content--user-radio_button">
-                        <input
-                          type="radio"
-                          name="ss-message__content--user-radio_button"
-                          id="ss-message__content--user-radio_button"
-                        />
-                        <label htmlFor="ss-message__content--user-radio_button">
-                          ラベル
-                        </label>
-                      </div>
-                    </>
-                  )}
-                  {radioButton.type === "block_style" &&
-                    radioButton[radioButton.type].map((item, index) => {
-                      return (
-                        item.text && (
-                          <div
-                            style={{
-                              marginBottom: "10px",
-                              cursor: "pointer",
-                              backgroundColor: radioButton.value
-                                ? radioButton.value === item.value
-                                  ? "#347AED"
-                                  : ""
-                                : radioButton.initial_selection === item.value
-                                  ? "#347AED"
-                                  : "",
-                            }}
-                            key={index}
-                            className="ss-message__content--user-radio_button--block_style"
-                            onClick={() => {
-                              onChangeValue(
-                                indexContent,
-                                content.type,
-                                item.value,
-                                "initial_selection"
-                              );
-                              // if (messageContent.length === 1) onClickNext();
-                            }}
-                          >
-                            <span>{item.text}</span>
-                          </div>
-                        )
-                      );
-                    })}
-                </div>
-                {errors?.[
-                  `message${indexMessage}_content${indexContent}_${content.type}`
-                ] && (
-                    <div style={{ color: "#FF7E00", fontSize: "12px" }}>
-                      {
-                        errors?.[
-                        `message${indexMessage}_content${indexContent}_${content.type}`
-                        ]
-                      }
-                    </div>
-                  )}
-              </div>
-            )}
+
             {/* type == 'checkbox' */}
             {content.type === "checkbox" && (
               <div style={{ marginBottom: "10px" }}>
