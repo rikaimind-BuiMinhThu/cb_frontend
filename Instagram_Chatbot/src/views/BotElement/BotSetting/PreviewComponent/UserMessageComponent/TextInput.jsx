@@ -85,22 +85,9 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
           />
         </>;
       case "email_confirmation":
-        return renderEmailConfirmation();
-      case "password_confirmation":
-        return renderPasswordConfirmation();
-      default:
-        return null;
-    }
-  };
-
-  return (
-    <div style={{ marginBottom: "10px" }}>
-      {renderTitle()}
-      {renderContent()}
-      {textInput.type === "email_confirmation" && (
-        <>
+        return <>
           <InputCustom
-            style={{ marginBottom: "5px" }}
+            className="m-b-5"
             disabled={disabled}
             placeholder={textInput[textInput.type].cfEmlAdd_email}
             onChange={(value) =>
@@ -130,12 +117,11 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
             }
             value={textInput[textInput.type]?.valueConfirm}
           />
-        </>
-      )}
-      {textInput.type === "password_confirmation" && (
-        <>
+        </>;
+      case "password_confirmation":
+        return <>
           <InputCustom
-            style={{ marginBottom: "5px" }}
+            className="m-b-5"
             disabled={disabled}
             type="password"
             placeholder={textInput[textInput.type].password}
@@ -165,19 +151,26 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
             }
             value={textInput[textInput.type]?.valueConfirm}
           />
-        </>
-      )}
-      {errors?.[
-        `message${indexMessage}_content${indexContent}_${content.type}_${textInput.type}`
-      ] && (
-          <div style={{ color: "#FF7E00", fontSize: "12px" }}>
-            {
-              errors?.[
-              `message${indexMessage}_content${indexContent}_${content.type}_${textInput.type}`
-              ]
-            }
-          </div>
-        )}
+        </>;
+      default:
+        return null;
+    }
+  };
+
+  const renderErrorMessage = () => {
+    if (!errors?.[`message${indexMessage}_content${indexContent}_${content.type}_${textInput.type}`]) return null;
+    return (
+      <div className="validation-error-message">
+        {errors?.[`message${indexMessage}_content${indexContent}_${content.type}_${textInput.type}`]}
+      </div>
+    );
+  };
+
+  return (
+    <div className="m-b-10">
+      {renderTitle()}
+      {renderContent()}
+      {renderErrorMessage()}
     </div>
   )
 };
