@@ -1,12 +1,13 @@
 import React from "react";
 import "assets/css/bot/preview-chat-bot.css";
 import { MESSAGE_CONTENT_TYPES } from "views/BotElement/BotSetting/PreviewComponent/Constants";
+import { Radio } from "antd";
 import CommonAddress from "./CommonAddress";
 
 import InputCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
 
 export default function ShippingAddress({ content, prefecturesList, indexMessageRender, indexMessage, indexContent, messageContent, onChangeValue, onChangeErrors, errors, disabled, onOpen }) {
-  if (content.type !== MESSAGE_CONTENT_TYPES.SHIPPING_ADDRESS) return;
+  if (content.type !== MESSAGE_CONTENT_TYPES.SHIPPING_ADDRESS) return <></>;
 
   const shippingAddress = content.shipping_address;
   if (!shippingAddress) return;

@@ -145,7 +145,7 @@ const convertTextInputObject = (content) => {
 
   // Handle password
   if (Object.keys(content.text_input.password).length != 0 && content.text_input.password != undefined) {
-    if (content?.fukushashiki_search_value.includes(',')) {
+    if (content?.fukushashiki_search_value?.includes(',')) {
       let address = content.fukushashiki_search_value.split(',');
       address.forEach(value => {
         const fukuObject = {

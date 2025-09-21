@@ -7,10 +7,11 @@ import InputCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioCom
 import SelectCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/SelectCustom";
 
 export default function CommonAddress({ content, prefecturesList, indexMessageRender, indexMessage, indexContent, messageContent, onChangeValue, onChangeErrors, errors, disabled, onOpen }) {
+  
   if (content.type !== MESSAGE_CONTENT_TYPES.ZIP_CODE_ADDRESS && content.type !== MESSAGE_CONTENT_TYPES.SHIPPING_ADDRESS) return <></>;
   
-  const addressContent = content.type !== MESSAGE_CONTENT_TYPES.ZIP_CODE_ADDRESS ? content.zip_code_address : content.shipping_address;
-  if (!addressContent) return;
+  const addressContent = content.type === MESSAGE_CONTENT_TYPES.ZIP_CODE_ADDRESS ? content.zip_code_address : content.shipping_address;
+  if (!addressContent) return <></>;
 
   const getPrefectureIdCodeFromName = (name) => {
     return prefecturesList.find((prefecture) => prefecture.name === name)?.id;
