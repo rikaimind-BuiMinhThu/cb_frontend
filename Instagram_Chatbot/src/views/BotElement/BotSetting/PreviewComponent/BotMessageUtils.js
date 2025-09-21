@@ -94,7 +94,7 @@ const processForBotDefaultMessage = async (messagesList, i, newState, isUpdateSo
 
   // await sleep(1000);
   const applyVariables = (section) => {
-    if (!section?.content || newState.variables.length === 0) return false;
+    if (!section?.content || newState.variables?.length === 0) return false;
 
     if (isUpdateSourceContent) section.sourceContent = section.content;
 

@@ -23,12 +23,10 @@ import iconMessageBlack from "assets/img/icon-mess/icon-message-chat-black.png";
 import iconMessageWhite from "assets/img/icon-mess/icon-message-chat-white.png";
 import {
   CHATBOT_ACTIONS,
-  MESSAGE_CONTENT_TYPES,
   SESSION_STORAGE_KEY,
   NO_ERROR,
   GETTING_ERROR_NOTIFICATION,
   CUSTOM_JS_CODE_POSITION,
-  BOT_MESSAGE_TYPES,
   TIMER_MAP_VARIABLES_FIELD,
   TIMER_TYPES,
   RENDER_CHATBOT_CONFIG,
@@ -43,23 +41,18 @@ import {
   getAllUrlParams,
   lightenColor,
   isMobile,
-  removeLeadingZero,
   sendCountRequest,
   sendCreateOrderData,
   getPrefectures,
   getScenarioPreviewData,
   getChatBotSetting,
-  sendEmailRequest,
   sleep,
   stringNullOrEmpty,
   appendParamsToUrl,
   checkMessageCondition,
-  getCaptcha,
   findItem,
   changeElementAttributeById,
   scrollToPosition,
-  createTempDelay,
-  sendScenarioUserResponse,
   createStatusConversion,
   updateStatusConversion,
   createScenarioUserResponseMessageHistory,
@@ -70,8 +63,8 @@ import {
   isDelayBotMessage,
   getElementMessageById,
   buildConditionParams,
-  isTempDelay,
   getNextUserMsg,
+  sendOpenChatbotCountRequest,
 } from "./PreviewComponent/Utils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
@@ -267,45 +260,6 @@ const PreviewFukushashiki = () => {
       });
   }, [state.botId, state.loadedStateFromSession, state.displayType]);
 
-  const computeMessageIndices = (newState, clickedMsgIndex) => {
-    const { currentUserMsg, nextRenderMsg} = {
-      currentUserMsg: { index: -1, take: true }, 
-      nextRenderMsg: { index: -1, take: true }
-    };
-
-    if (!newState.isUsedPastMessageLoaded) {
-      newState.currentUserMsgIndex = newState.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex));
-      return newState;
-    }
-
-    for (let index = clickedMsgIndex + 1; index < newState.messagesList.length; index++) {
-      const item = newState.messagesList[index];
-      if (!item.hidden && isUserMessage(item)) {
-        if (currentUserMsg.take) {
-          currentUserMsg.index = index; 
-          currentUserMsg.take = false;
-        }
-
-        if (!item.isSubmitted && nextRenderMsg.take) {
-          nextRenderMsg.index = index;
-          nextRenderMsg.take = false;
-        }
-      }
-
-      if (!currentUserMsg.take && !nextRenderMsg.take) {
-        break;
-      }
-    }
-    newState.currentUserMsgIndex = currentUserMsg.index;
-    newState.lastMsgIndex = Math.max(
-      nextRenderMsg.index < 0 
-        ? newState.lastMsgIndex || -1 
-        : nextRenderMsg.index, 
-      newState.currentUserMsgIndex
-    )
-    return newState;
-  } 
-
   const eventHandler = async (event) => {
     if (!event.data || !event.data.actionData) return;
     const actionData = event.data.actionData;
@@ -414,6 +368,33 @@ const PreviewFukushashiki = () => {
       })
   }, [state.prefecturesList, state.loadedStateFromSession]);
 
+    // For run errorJsCode
+  useEffect(() => {
+    if (!state.isUsedErrMsgByJs || !state.errMsgJsCode) return;
+    executeLpJsCode(state.errMsgJsCode, state);
+  }, [state.errMsgJsCode, state.isUsedErrMsgByJs]);
+
+  // For run injectCustomJsCode
+  useEffect(() => {
+    if (!state.isUsedCustomJsCode) return;
+
+    injectCustomJsCode(hasSentCustomJs, state, {
+      head: { jsCode: state.headCustomJsCode, position: CUSTOM_JS_CODE_POSITION.HEAD },
+      top_body: { jsCode: state.topBodyCustomJsCode, position: CUSTOM_JS_CODE_POSITION.TOP_BODY },
+      bottom_body: { jsCode: state.bottomBodyCustomJsCode, position: CUSTOM_JS_CODE_POSITION.BOTTOM_BODY },
+    });
+  }, [state.isUsedCustomJsCode, state.headCustomJsCode, state.topBodyCustomJsCode, state.bottomBodyCustomJsCode]);
+
+  // For add custom css
+  useEffect(() => {
+    if (!state.isUsedCustomCss || !state.customCssContent) return;
+
+    const style = document.createElement('style');
+    style.id = "custom-css";
+    style.innerHTML = state.customCssContent;
+    document.head.appendChild(style);
+  }, [state.isUsedCustomCss, state.customCssContent]);
+
   const handleCloseBot = () => {
     const element = document.getElementById('sp-container1');
     if (isMobile()) {
@@ -482,10 +463,7 @@ const PreviewFukushashiki = () => {
     const prevOpenStatus = sessionStorage.getItem("prevOpenStatus");
     if (prevOpenStatus == "0" && opening) {
       sessionStorage.setItem("prevOpenStatus", "1");
-      const openChatbotCountApiParams = {
-        scenario_data: `${deviceReceive}_open_chatbot_window`,
-      };
-      sendCountRequest(state.scenarioId, openChatbotCountApiParams);
+      sendOpenChatbotCountRequest(state.scenarioId, deviceReceive);
     }
     
     const timerChatbotStorage = getTimerSessionStorage();
@@ -533,17 +511,16 @@ const PreviewFukushashiki = () => {
     return renderMessagesWithDelay(state, 0, state.currentMsgIndex, { setNewState: false });
   }
 
-
-    const handleCloseChatbotWhenUseWithDrawal = () => {
-      if (!state.isOpen) return; 
-      onOpenPreview(false) 
-      const enabledStatus = new Set(["standard_exit_popup", "image_popup"])
-      const isWithDrawalEnabled = state.botInfor && enabledStatus.has(state.botInfor.withdrawal_prevention_status)
-      if (isWithDrawalEnabled) {
-        handleOpenWithDrawal();
-        return ;
-      }
+  const handleCloseChatbotWhenUseWithDrawal = () => {
+    if (!state.isOpen) return; 
+    onOpenPreview(false) 
+    const enabledStatus = new Set(["standard_exit_popup", "image_popup"])
+    const isWithDrawalEnabled = state.botInfor && enabledStatus.has(state.botInfor.withdrawal_prevention_status)
+    if (isWithDrawalEnabled) {
+      handleOpenWithDrawal();
+      return ;
     }
+  }
 
   const setPulldownValue = (dataContentType, field, value) => {
     switch (field) {
@@ -884,12 +861,14 @@ const PreviewFukushashiki = () => {
     if (!res || !res.data || res.data.code !== 1) return;
 
     const designSetting = res.data.design_settings;
+    const chatbot = res.data.chatbot;
+    const conversation = res.data.data?.conversation;
     let newState = {
       ...state,
       botInfor: getBotInforFromPreviewResponse(res),
       objParam: {},
       loadedStateFromSession: true,
-      messagesList: res.data.data?.conversation?.messages || [],
+      messagesList: conversation?.messages || [],
       isOpen: state.isOpen || Number(designSetting.display_type) === 1,
       activePopupCloseBot: Boolean(designSetting?.popup_close_bot),
       titleBubble: designSetting?.title_bubble || "簡単90秒で注文完了",
@@ -908,66 +887,49 @@ const PreviewFukushashiki = () => {
       rightSpTitle: designSetting?.right_position_sp_title,
       rightMarginSp: designSetting?.right_margin_sp,
       bottomMarginSp: designSetting?.bottom_margin_sp,
-      isUsedErrMsgByJs: res.data?.chatbot?.is_used_err_msg_by_js,
-      errMsgJsCode: res.data?.chatbot?.err_msg_js_code,
-      useNewProcess: res.data?.chatbot?.client_cart_system === CART_SYSTEM.EC_FORCE,
-      isUsedPastMessageLoaded: !!res.data?.chatbot?.is_used_message_loaded_past,
+      isUsedErrMsgByJs: chatbot?.is_used_err_msg_by_js,
+      errMsgJsCode: chatbot?.err_msg_js_code,
+      useNewProcess: chatbot?.client_cart_system === CART_SYSTEM.EC_FORCE,
+      isUsedPastMessageLoaded: !!chatbot?.is_used_message_loaded_past,
       isProcessing: false,
-      useFullWidthChatbotMobile: !!res.data?.chatbot?.use_fullwidth_chatbot_mobile,
+      useFullWidthChatbotMobile: !!chatbot?.use_fullwidth_chatbot_mobile,
+      isUsedCustomJsCode: !!chatbot?.is_used_custom_js_code,
+      headCustomJsCode: chatbot?.head_custom_js_code,
+      topBodyCustomJsCode: chatbot?.top_body_custom_js_code,
+      bottomBodyCustomJsCode: chatbot?.bottom_body_custom_js_code,
+      isUsedCustomCss: !!chatbot?.is_used_custom_css,
+      customCssContent: chatbot?.custom_css_content,
     };
 
-    if (newState.isUsedErrMsgByJs && newState.errMsgJsCode) {
-      executeLpJsCode(newState.errMsgJsCode, state);
-    }
+    // if (newState.isUsedErrMsgByJs && newState.errMsgJsCode) {
+    //   executeLpJsCode(newState.errMsgJsCode, state);
+    // }
 
-    if (res.data?.chatbot?.is_used_custom_css && res.data?.chatbot?.custom_css_content.length > 0) {
-      const style = document.createElement('style');
-      style.innerHTML = res.data.chatbot.custom_css_content;
-      document.head.appendChild(style);
-    }
+    // if (res.data?.chatbot?.is_used_custom_css && res.data?.chatbot?.custom_css_content.length > 0) {
+    //   const style = document.createElement('style');
+    //   style.innerHTML = res.data.chatbot.custom_css_content;
+    //   document.head.appendChild(style);
+    // }
 
-    if (res.data?.chatbot?.is_used_custom_js_code) {
-      injectCustomJsCode(hasSentCustomJs, state, {
-        head: { jsCode: res.data?.chatbot?.head_custom_js_code, position: CUSTOM_JS_CODE_POSITION.HEAD },
-        top_body: { jsCode: res.data?.chatbot?.top_body_custom_js_code, position: CUSTOM_JS_CODE_POSITION.TOP_BODY },
-        bottom_body: { jsCode: res.data?.chatbot?.bottom_body_custom_js_code, position: CUSTOM_JS_CODE_POSITION.BOTTOM_BODY },
-      });
-    }
+    // if (res.data?.chatbot?.is_used_custom_js_code) {
+    //   injectCustomJsCode(hasSentCustomJs, state, {
+    //     head: { jsCode: res.data?.chatbot?.head_custom_js_code, position: CUSTOM_JS_CODE_POSITION.HEAD },
+    //     top_body: { jsCode: res.data?.chatbot?.top_body_custom_js_code, position: CUSTOM_JS_CODE_POSITION.TOP_BODY },
+    //     bottom_body: { jsCode: res.data?.chatbot?.bottom_body_custom_js_code, position: CUSTOM_JS_CODE_POSITION.BOTTOM_BODY },
+    //   });
+    // }
 
-    if (res.data?.chatbot?.timer_config?.enable) {
-      const timerConfig = res.data.chatbot.timer_config;
+    if (chatbot?.timer_config?.enable) {
+      const timerConfig = chatbot.timer_config;
       setTimerChanges({ timeLeft: calculateTimerConfigDuration(timerConfig.type, timerConfig.duration), config: timerConfig });
     }
 
     const prevOpenStatus = sessionStorage.getItem("prevOpenStatus");
 
-    if (res.data.design_settings.display_type == 1 && prevOpenStatus == "0") {
+    if (designSetting.display_type == 1 && prevOpenStatus == "0") {
       sessionStorage.setItem("prevOpenStatus", "1");
-      const openChatbotCountApiParams = {
-        scenario_data: `${state.deviceReceive}_open_chatbot_window`,
-      };
-      sendCountRequest(state.scenarioId, openChatbotCountApiParams);
+      sendOpenChatbotCountRequest(state.scenarioId, state.deviceReceive);
     }
-
-    if (res.data.variables) {
-      newState.variables = [
-        ...res.data.variables,
-        ...res.data.all_variables,
-      ];
-
-      newState.variables.forEach((item) => {
-        newState.objParam[item.variable_name] = item.default_value;
-      });
-    }
-
-    if (isLoggedIn) {
-      newState.messagesList.forEach((x) => x.hidden = x.not_display_when_logged_in);
-    }
-    
-    newState.variablesList = res.data?.all_variables || [];
-    newState.urlThanksPage = res.data.data?.conversation?.urlThanksPage || "";
-    newState.urlCartConfirmPage = res.data.data?.conversation?.urlCartConfirmPage || "";
-    newState.isUsedCartConfirmPage = res.data.data?.conversation?.isUsedCartConfirmPage || false;
 
     setConversionParamToLocalStorage(
       newState.scenarioId,
@@ -977,49 +939,80 @@ const PreviewFukushashiki = () => {
       state
     );
 
-    checkUpdateMessagesSessionStorage(res.data.data.updated_at)
-    
-    newState.userMessagesList = newState.messagesList.filter((item) => isUserMessage(item));
-    for (let i = 0; i < newState.messagesList.length; i++) {
-      if (newState.messagesList[i].conditions?.length > 0) {
-        const result = checkMessageCondition(newState.messagesList[i], buildConditionParams(newState));
+    checkUpdateMessagesSessionStorage(res.data.data.updated_at);
 
-        if (!result && isUserMessage(newState.messagesList[i])) {
-          newState.currentUserMsgIndex++;
-          continue;
-        }
-      }
-      if (isBotMessage(newState.messagesList[i])) {
-        newState = {
-          ...newState,
-          ...(await processForBotMessage(newState.messagesList, i, newState, true))
-        };
-      } else if (isUserMessage(newState.messagesList[i])) {
-        newState = {
-          ...newState,
-          ...processForUserMessage(newState.messagesList, i, newState)
-        };
-      }
-    }
-
-    newState.currentUserMsgIndex = newState.messagesList.findIndex(getNextUserMsg());
-
-    // For the first time, we need to render to the first user message
-    if (newState.currentUserMsgIndex >= 0) {
-      newState.currentMsgIndex = newState.currentUserMsgIndex;
-    }
-
-    newState.renderMessagesList = newState.renderMessagesList.map((msg) => {
-      return isDelayBotMessage(msg) ? {...msg, hidden: true} : msg;
+    dispatch({
+      type: PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO,
+      payload: {
+        responseData: res.data,
+        botInfor: getBotInforFromPreviewResponse(res),
+        isLoggedIn: isLoggedIn,
+      },
     });
 
-    if (newState.isOpen) {
-      return renderMessagesWithDelay(newState, 0, newState.currentMsgIndex);
-    } else {
-      newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
-      newState.passedUserMsgCount = newState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
-      dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
-    }
+    // if (res.data.variables) {
+    //   newState.variables = [
+    //     ...res.data.variables,
+    //     ...res.data.all_variables,
+    //   ];
+
+    //   newState.variables.forEach((item) => {
+    //     newState.objParam[item.variable_name] = item.default_value;
+    //   });
+    // }
+
+    // if (isLoggedIn) {
+    //   newState.messagesList.forEach((x) => x.hidden = x.not_display_when_logged_in);
+    // }
+    
+    // newState.variablesList = res.data?.all_variables || [];
+    // newState.urlThanksPage = res.data.data?.conversation?.urlThanksPage || "";
+    // newState.urlCartConfirmPage = res.data.data?.conversation?.urlCartConfirmPage || "";
+    // newState.isUsedCartConfirmPage = res.data.data?.conversation?.isUsedCartConfirmPage || false;
+
+    
+    
+    // newState.userMessagesList = newState.messagesList.filter((item) => isUserMessage(item));
+    // for (let i = 0; i < newState.messagesList.length; i++) {
+    //   if (newState.messagesList[i].conditions?.length > 0) {
+    //     const result = checkMessageCondition(newState.messagesList[i], buildConditionParams(newState));
+
+    //     if (!result && isUserMessage(newState.messagesList[i])) {
+    //       newState.currentUserMsgIndex++;
+    //       continue;
+    //     }
+    //   }
+    //   if (isBotMessage(newState.messagesList[i])) {
+    //     newState = {
+    //       ...newState,
+    //       ...(await processForBotMessage(newState.messagesList, i, newState, true))
+    //     };
+    //   } else if (isUserMessage(newState.messagesList[i])) {
+    //     newState = {
+    //       ...newState,
+    //       ...processForUserMessage(newState.messagesList, i, newState)
+    //     };
+    //   }
+    // }
+
+    // newState.currentUserMsgIndex = newState.messagesList.findIndex(getNextUserMsg());
+
+    // // For the first time, we need to render to the first user message
+    // if (newState.currentUserMsgIndex >= 0) {
+    //   newState.currentMsgIndex = newState.currentUserMsgIndex;
+    // }
+
+    // newState.renderMessagesList = newState.renderMessagesList.map((msg) => {
+    //   return isDelayBotMessage(msg) ? {...msg, hidden: true} : msg;
+    // });
+
+    // if (newState.isOpen) {
+    //   return renderMessagesWithDelay(newState, 0, newState.currentMsgIndex);
+    // } else {
+    //   newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+    //   newState.passedUserMsgCount = newState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
+    //   dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
+    // }
   }
 
   const getTimerSessionStorage = () => {
@@ -2511,7 +2504,6 @@ const PreviewFukushashiki = () => {
     }
   }
 
-
   const finishConversion = async ({ scenario_id, user_input_id }, callback) => {
     return updateStatusConversion({ scenario_id, user_input_id, status: CONVERSTION_RESPONSE_STATUS.FINISH })
       .then(() => {
@@ -2848,6 +2840,17 @@ const PreviewFukushashiki = () => {
   useEffect(() => {
     console.log("state.currentMsgIndex", state.currentMsgIndex);
     console.log("state.nextStopMsgIndex", state.nextStopMsgIndex);
+    if (state.currentMsgIndex === state.nextStopMsgIndex) return;
+
+    setTimeout(() => {
+      dispatch({
+        type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
+        payload: {
+          startIndex: 0,
+          endIndex: state.nextStopMsgIndex
+        }
+      });
+    }, 1000);
   }, [state.currentMsgIndex, state.nextStopMsgIndex]);
 
   const onClickNext = (clickedMsgIndex, clickedMsg) => {
@@ -3163,7 +3166,7 @@ const PreviewFukushashiki = () => {
         botInfor={state.botInfor}
         checkoutUrl={state.checkoutUrl}
         previewOrderContent={state.previewOrderContent}
-        executeLpJsCode={executeLpJsCode}
+        executeLpJsCode={(jsCode) => executeLpJsCode(jsCode, state)}
       />
     ));
   };
@@ -3708,7 +3711,7 @@ const PreviewFukushashiki = () => {
       </div>)
   }
 
-  return (<div>LOLOLOL</div>);
+  return (<div></div>);
 }
 
 export default PreviewFukushashiki;

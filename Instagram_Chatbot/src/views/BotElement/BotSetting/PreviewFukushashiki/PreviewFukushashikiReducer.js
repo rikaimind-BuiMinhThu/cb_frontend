@@ -10,7 +10,7 @@ import { processForBotMessage } from '../PreviewComponent/BotMessageUtils';
 import { processForUserMessage } from '../PreviewComponent/UserMessageUtils';
 import { isButtonSubmitMessage, isBotMessage, isUserMessage, getNextUserMsg, scrollToPosition } from '../PreviewComponent/Utils';
 import { mapAmazonPayDataToMessagesList } from '../PreviewComponent/TorizenUtils';
-import { RENDER_CHATBOT_CONFIG, GETTING_ERROR_NOTIFICATION, PREVIEW_ACTIONS } from '../PreviewComponent/Constants.jsx';
+import { RENDER_CHATBOT_CONFIG, GETTING_ERROR_NOTIFICATION, PREVIEW_ACTIONS, CART_SYSTEM } from '../PreviewComponent/Constants.jsx';
 
 const PreviewFukushashikiReducer = (state, action) => {
   console.log("action", action);
@@ -35,7 +35,8 @@ const PreviewFukushashikiReducer = (state, action) => {
     case PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES:
       return {
         ...state,
-        renderMessagesList: state.messagesList.slice(action.payload.startIndex, action.payload.endIndex)
+        renderMessagesList: state.messagesList.slice(action.payload.startIndex, action.payload.endIndex),
+        currentMsgIndex: action.payload.endIndex - 1
       };
     case PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE: {
       let messagesList = _.cloneDeep(state.messagesList);
@@ -100,9 +101,10 @@ const PreviewFukushashikiReducer = (state, action) => {
       // TODO: Update state after click Next in here
       // In here, default is validation ok
       const { clickedMsgIndex, clickedMsg, isLoggedIn } = action.payload;
-      const newState = {
+      let newState = {
         errors: {},
         messagesList: _.cloneDeep(state.messagesList),
+        variables: _.cloneDeep(state.variables),
       };
 
       if (isLoggedIn) {
@@ -111,8 +113,6 @@ const PreviewFukushashikiReducer = (state, action) => {
 
       const isClickedButtonSubmit = isButtonSubmitMessage(state.messagesList[clickedMsgIndex]);
       const isClickedLastMessage = state.messagesList.length - 1 === clickedMsgIndex;
-      const nextOrCurrentUserMessage = state.messagesList.findIndex(getNextUserMsg((_, index) => index >= clickedMsgIndex));
-      const isBtnUpdateClick = clickedMsgIndex < state.currentUserMsgIndex || (state.currentUserMsgIndex === -1 && clickedMsgIndex === nextOrCurrentUserMessage);
 
       if (isClickedButtonSubmit || isClickedLastMessage) {
         newState.conversionStatus = CONVERSTION_RESPONSE_STATUS.FINISH;
@@ -144,7 +144,7 @@ const PreviewFukushashikiReducer = (state, action) => {
       }
 
       newState.userMessagesList = newState.messagesList.filter((item) => isUserMessage(item));
-      newState.nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg((_, index) => index >= clickedMsgIndex));
+      newState.nextStopMsgIndex = state.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex)) + 1;
       newState.currentMsgIndex = clickedMsgIndex + 1;
       newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
 
@@ -188,6 +188,70 @@ const PreviewFukushashikiReducer = (state, action) => {
       return { ...state, currentUserMsgIndex: action.payload };
     case PREVIEW_ACTIONS.SET_DELAYING:
       return { ...state, isDelaying: action.payload };
+    case PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO: {
+      // This action is used to set the state after retrieve scenario
+      const designSetting = action.payload.responseData.design_settings;
+      const chatbot = action.payload.responseData.chatbot;
+      const botInfor = action.payload.botInfor;
+      const { conversation } = action.payload.responseData?.data;
+      const { variables, all_variables } = action.payload.responseData;
+
+      let newState = {
+        ...state,
+        botInfor: botInfor,
+        objParam: {},
+        loadedStateFromSession: true,
+        messagesList: conversation?.messages || [],
+        isOpen: state.isOpen || Number(designSetting.display_type) === 1,
+        activePopupCloseBot: Boolean(designSetting?.popup_close_bot),
+        titleBubble: designSetting?.title_bubble || "簡単90秒で注文完了",
+        displayType: designSetting?.display_type,
+        widthPc: designSetting?.width_pc || 450,
+        heightPc: designSetting?.height_pc || 700,
+        widthSp: designSetting?.width_sp || 100,
+        heightSp: designSetting?.height_sp || 100,
+        positionPc: designSetting?.position_pc || "1",
+        rightPcTitle: designSetting?.right_position_pc_title,
+        buttonTypePc: designSetting?.button_type_pc || "1",
+        rightMarginPc: designSetting?.right_margin_pc || 10,
+        bottomMarginPc: designSetting?.bottom_margin_pc || 0,
+        positionSp: designSetting?.position_sp || "1",
+        buttonTypeSp: designSetting?.button_type_sp || "1",
+        rightSpTitle: designSetting?.right_position_sp_title,
+        rightMarginSp: designSetting?.right_margin_sp,
+        bottomMarginSp: designSetting?.bottom_margin_sp,
+        isUsedErrMsgByJs: chatbot?.is_used_err_msg_by_js,
+        errMsgJsCode: chatbot?.err_msg_js_code,
+        useNewProcess: chatbot?.client_cart_system === CART_SYSTEM.EC_FORCE,
+        isUsedPastMessageLoaded: !!chatbot?.is_used_message_loaded_past,
+        isProcessing: false,
+        useFullWidthChatbotMobile: !!chatbot?.use_fullwidth_chatbot_mobile,
+        isUsedCustomJsCode: !!chatbot?.is_used_custom_js_code,
+        headCustomJsCode: chatbot?.head_custom_js_code,
+        topBodyCustomJsCode: chatbot?.top_body_custom_js_code,
+        bottomBodyCustomJsCode: chatbot?.bottom_body_custom_js_code,
+        isUsedCustomCss: !!chatbot?.is_used_custom_css,
+        customCssContent: chatbot?.custom_css_content,
+        currentMsgIndex: 0, // Start
+      };
+
+      if (variables) {
+        newState.variables = [...variables, ...all_variables];
+        newState.variables.forEach((item) => {
+          newState.objParam[item.variable_name] = item.default_value;
+        });
+      }
+
+      if (action.payload.isLoggedIn) {
+        newState.messagesList.forEach((x) => x.hidden = x.not_display_when_logged_in);
+      }
+
+      newState.nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg()) + 1;
+      newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+
+      return { ...state, ...newState };
+    }
+      
   }
 
   return state;

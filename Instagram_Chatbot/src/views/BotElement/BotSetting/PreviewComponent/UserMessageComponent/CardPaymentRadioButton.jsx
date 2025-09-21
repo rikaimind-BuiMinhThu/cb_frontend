@@ -2,7 +2,7 @@ import React from "react";
 import "assets/css/bot/preview-chat-bot.css";
 import { MESSAGE_CONTENT_TYPES } from "views/BotElement/BotSetting/PreviewComponent/Constants";
 import CommonCreditCardPayment from "./CommonCreditCardPayment";
-
+import { Radio } from "antd";
 
 export default function CardPaymentRadioButton({ content, indexMessage, indexContent, onChangeValue, errors, disabled }) {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.CARD_PAYMENT_RADIO_BUTTON) return null;
