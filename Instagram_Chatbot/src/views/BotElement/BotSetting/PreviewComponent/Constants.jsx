@@ -170,6 +170,7 @@ const MESSAGE_CONTENT_TYPES = {
   PRODUCT_PURCHASE_SELECT_OPTION: 'product_purchase_select_option',
   ATTACHMENT: 'attaching_file',
   CALENDAR: 'calendar',
+  AGREE_TERM: 'agree_term',
 };
 
 const LABELS = {

@@ -42,6 +42,7 @@ import Attachment from "./UserMessageComponent/Attachment";
 import ShippingAddress from "./UserMessageComponent/ShippingAddress";
 import ProductPurchaseSelectOption from "./UserMessageComponent/ProductPurchaseSelectOption";
 import Calendar from "./UserMessageComponent/Calendar";
+import AgreeTerm from "./UserMessageComponent/AgreeTerm";
 import { isUserMessage, moveToNext } from "./Utils";
 
 const UserMessage = ({
@@ -470,6 +471,15 @@ const UserMessage = ({
           disabled={disabled}
           locale={locale}
         />;
+      case MESSAGE_CONTENT_TYPES.AGREE_TERM:
+        return <AgreeTerm
+          content={content}
+          indexMessage={indexMessage}
+          indexContent={indexContent}
+          onChangeValue={onChangeValue}
+          errors={errors}
+          disabled={disabled}
+        />;
       default:
         return null;
     }
@@ -507,104 +517,6 @@ const UserMessage = ({
             {/* type == 'calendar' */}
             
             {/* type == 'agree_term' */}
-            {content.type === "agree_term" && (
-              <div style={{ marginBottom: "10px" }}>
-                {/* {(agreeTerm.title_require || agreeTerm.require) && */}
-                <div
-                  className="ss-message__content--user-agree_to_term-top"
-                  style={{ marginBottom: "0px" }}
-                >
-                  {agreeTerm.title_require && (
-                    <span className="ss-message__content--user-agree_to_term-title">
-                      {agreeTerm.title}
-                    </span>
-                  )}
-                  <span className="ss-message__content--user-text-input-required">
-                    ※必須
-                  </span>
-                </div>
-                {/* } */}
-                {/* agreeTerm: type = 'detail_content' */}
-                {agreeTerm.type === "detail_content" && (
-                  <React.Fragment>
-                    <div className="ss-message__content--user-agree_to_term-detail_content">
-                      <textarea
-                        name="ss-message__content--user-agree_to_term-detail_content"
-                        id=""
-                        rows={
-                          agreeTerm[agreeTerm.type].content?.length > 200
-                            ? 8
-                            : 5
-                        }
-                        value={agreeTerm[agreeTerm.type].content}
-                        className="ss-input-value"
-                        readOnly
-                      ></textarea>
-                      <CheckboxCustom
-                        disabled={disabled}
-                        label={agreeTerm.term}
-                        onChange={(value) =>
-                          onChangeValue(
-                            indexContent,
-                            content.type,
-                            value,
-                            "isAgree"
-                          )
-                        }
-                        value={agreeTerm.isAgree}
-                      />
-                    </div>
-                  </React.Fragment>
-                )}
-                {/* agreeTerm: type = 'post_link_only' */}
-                {agreeTerm.type === "post_link_only" && (
-                  <div>
-                    {agreeTerm[agreeTerm.type].map((item, index) => {
-                      return (
-                        <div
-                          key={index}
-                          className="ss-message__content--user-agree_to_term-post_link_only"
-                        >
-                          <span style={{ marginRight: "8px" }}>
-                            {item.title_comment}
-                          </span>
-                          <a href={item.urls} target="_blank" rel="noreferrer">
-                            {item.title}
-                          </a>
-                          <span style={{ marginLeft: "8px" }}>
-                            {item.url_comment}
-                          </span>
-                        </div>
-                      );
-                    })}
-                    <CheckboxCustom
-                      disabled={disabled}
-                      onChange={(value) =>
-                        onChangeValue(
-                          indexContent,
-                          content.type,
-                          value,
-                          "isAgree"
-                        )
-                      }
-                      value={agreeTerm.isAgree}
-                      label={agreeTerm.term}
-                    />
-                  </div>
-                )}
-                {errors?.[
-                  `message${indexMessage}_content${indexContent}_${content.type}`
-                ] && (
-                    <div style={{ color: "#FF7E00", fontSize: "12px" }}>
-                      {
-                        errors?.[
-                        `message${indexMessage}_content${indexContent}_${content.type}`
-                        ]
-                      }
-                    </div>
-                  )}
-              </div>
-            )}
             {/* type == 'carousel' */}
             {content.type === "carousel" && (
               <div style={{ marginBottom: "10px" }}>
