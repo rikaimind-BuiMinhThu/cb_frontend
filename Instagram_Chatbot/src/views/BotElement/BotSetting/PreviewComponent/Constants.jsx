@@ -172,6 +172,7 @@ const MESSAGE_CONTENT_TYPES = {
   CALENDAR: 'calendar',
   AGREE_TERM: 'agree_term',
   CREDIT_CARD_PAYMENT: 'credit_card_payment',
+  CARD_PAYMENT_RADIO_BUTTON: 'card_payment_radio_button',
 };
 
 const LABELS = {

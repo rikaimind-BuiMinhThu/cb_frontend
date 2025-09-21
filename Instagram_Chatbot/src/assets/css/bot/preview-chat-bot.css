@@ -1110,6 +1110,39 @@ slideUp
   width: 100%;
 }
 
+.ss-message__content--user-card-payment-radio-container {
+  width: 100%;
+  font-size: 14px;
+}
+
+.ss-message__content--user-card-payment-radio-content {
+  background-color: #ECF5FA;
+  margin-bottom: 5px;
+  padding: 5px;
+  width: 100%;
+}
+
+.ss-message__content--user-card-payment-radio-customized-style {
+  margin-bottom: 5px;
+  padding: 5px;
+  width: 100%;
+  text-align: center;
+  line-height: 22px;
+}
+
+.ss-message__content--user-card-payment-radio-group-type-text_image {
+  width: 100%;
+  font-size: 14px;
+  display: "flex";
+}
+
+.ss-message__content--user-card-payment-radio-group-type-text_image-text {
+  text-align: center;
+  font-size: 14px;
+  color: #6789A6;
+  font-weight: 700;
+}
+
 .validation-error-message {
   color: #FF7E00;
   font-size: 12px;
