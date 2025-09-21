@@ -41,9 +41,10 @@ import Checkbox from "./UserMessageComponent/Checkbox";
 import PullDown from "./UserMessageComponent/PullDown";
 import ZipCodeAddress from "./UserMessageComponent/ZipCodeAddress";
 import Attachment from "./UserMessageComponent/Attachment";
-import { moveToNext } from "./Utils";
+import { isUserMessage, moveToNext } from "./Utils";
 
 const UserMessage = ({
+  message,
   messageContentProps,
   onChangeValue,
   disabled = false,
@@ -63,37 +64,24 @@ const UserMessage = ({
   botId,
   isProcessing = false,
 }) => {
+  if (!isUserMessage(message)) return null;
 
   // UserMesssage sẽ có những nhiệm vụ:
   //   + Check xem content thuộc dạng nào và render ra component tương ứng
   //   + Sau khi mà render xong UserMessage thì sẽ validate cho phần tương ứng như vậy
   //   + Hiển thị errorsMessage tương ứng cho content đó nếu validate có lỗi
 
-  const [dataHour, setDataHour] = useState(dataHourFixed);
-  const [dataYear, setDataYear] = useState(dataYearFixed);
-  const [dataCity, setDataCity] = useState([]);
-  // const [prefecturesList, setprefecturesList] = useState([...prefecturesList]);
-  const [startDate, setStartDate] = useState(new Date());
   const [messageContent, setMessageContent] = useState(messageContentProps);
   const [errors, setErrors] = useState(errorsProps);
-  const [checked, setChecked] = useState([]);
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [messageNoti, setMessageNoti] = useState("");
 
-  const getPrefectureIdCodeFromName = (name) => {
-    return prefecturesList.find((prefecture) => prefecture.name === name)?.id;
-  }
-  
   const cardExpiredYearOptions =  Array.from({ length: 10 }, (_, i) => {
     return {
       key: moment().add(i, "years").format("YY"),
       value: moment().add(i, "years").format("YY"),
     };
   });
-
-  const getLPOptionData = (search_element_value) => {
-    return lpOptionData[search_element_value];
-  }
 
   function loadCaptcha(indexContent) {
     if (

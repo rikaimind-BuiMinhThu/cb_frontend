@@ -6,39 +6,15 @@ import {
   isTempDelay,
   buildConditionParams
 } from '../PreviewComponent/Utils';
+import { processForBotMessage } from '../PreviewComponent/BotMessageUtils';
+import { processForUserMessage } from '../PreviewComponent/UserMessageUtils';
+import { isButtonSubmitMessage, isBotMessage, isUserMessage, getNextUserMsg, scrollToPosition } from '../PreviewComponent/Utils';
 import { mapAmazonPayDataToMessagesList } from '../PreviewComponent/TorizenUtils';
-import { RENDER_CHATBOT_CONFIG, GETTING_ERROR_NOTIFICATION } from '../PreviewComponent/Constants.jsx';
-
-export const PREVIEW_ACTIONS = {
-  UPDATE_MULTI_STATE: "UPDATE_MULTI_STATE",
-  ADD_LP_OPTION_DATA: "ADD_LP_OPTION_DATA",
-  UPDATE_PREVIEW_ORDER_CONTENT: "UPDATE_PREVIEW_ORDER_CONTENT",
-  UPDATE_OPEN_PREVIEW: "UPDATE_OPEN_PREVIEW",
-  SET_PROCESSING: "SET_PROCESSING",
-  UPDATE_RENDER_MESSAGES: "UPDATE_RENDER_MESSAGES",
-  UPDATE_SUBMIT_ERROR_MESSAGE: "UPDATE_SUBMIT_ERROR_MESSAGE",
-  UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG: "UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG",
-  UPDATE_PREFECTURES_LIST: "UPDATE_PREFECTURES_LIST",
-  UPDATE_AMAZON_PAY_DATA: "UPDATE_AMAZON_PAY_DATA",
-  SET_CHECKOUT_URL: "SET_CHECKOUT_URL",
-  SET_OBJ_PARAM: "SET_OBJ_PARAM",
-  SET_SHOW_POPUP_CLOSE_BOT: "SET_SHOW_POPUP_CLOSE_BOT",
-  SET_SCENARIO_USER_RESPONSES: "SET_SCENARIO_USER_RESPONSES",
-  SET_BOT_ID: "SET_BOT_ID",
-  CLOSE_BOT: "CLOSE_BOT",
-  SET_CAPTCHA: "SET_CAPTCHA",
-  SET_URL_SEND: "SET_URL_SEND",
-  SET_URL_RECEIVE: "SET_URL_RECEIVE",
-  SET_DEVICE_RECEIVE: "SET_DEVICE_RECEIVE",
-  SET_SCENARIO_ID: "SET_SCENARIO_ID",
-  SET_CONVERSION_STATUS: "SET_CONVERSION_STATUS",
-  SET_STOP_RENDER: "SET_STOP_RENDER",
-  SET_ERRORS: "SET_ERRORS",
-  SET_CURRENT_USER_MSG_INDEX: "SET_CURRENT_USER_MSG_INDEX",
-  SET_DELAYING: "SET_DELAYING",
-};
+import { RENDER_CHATBOT_CONFIG, GETTING_ERROR_NOTIFICATION, PREVIEW_ACTIONS } from '../PreviewComponent/Constants.jsx';
 
 const PreviewFukushashikiReducer = (state, action) => {
+  console.log("action", action);
+  console.log("state.renderMessagesList inside reducer", state.renderMessagesList);
   switch (action.type) {
     case PREVIEW_ACTIONS.UPDATE_MULTI_STATE:
       if (action.payload.removeTempDelay && action.payload.renderMessagesList?.length) {
@@ -120,6 +96,59 @@ const PreviewFukushashikiReducer = (state, action) => {
         isProcessing: false,
       };
     }
+    case PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON:
+      // TODO: Update state after click Next in here
+      // In here, default is validation ok
+      const { clickedMsgIndex, clickedMsg, isLoggedIn } = action.payload;
+      const newState = {
+        errors: {},
+        messagesList: _.cloneDeep(state.messagesList),
+      };
+
+      if (isLoggedIn) {
+        newState.messagesList = newState.messagesList.map(x => ({...x, hidden: x.not_display_when_logged_in}));
+      }
+
+      const isClickedButtonSubmit = isButtonSubmitMessage(state.messagesList[clickedMsgIndex]);
+      const isClickedLastMessage = state.messagesList.length - 1 === clickedMsgIndex;
+      const nextOrCurrentUserMessage = state.messagesList.findIndex(getNextUserMsg((_, index) => index >= clickedMsgIndex));
+      const isBtnUpdateClick = clickedMsgIndex < state.currentUserMsgIndex || (state.currentUserMsgIndex === -1 && clickedMsgIndex === nextOrCurrentUserMessage);
+
+      if (isClickedButtonSubmit || isClickedLastMessage) {
+        newState.conversionStatus = CONVERSTION_RESPONSE_STATUS.FINISH;
+        newState.currentUserMsgIndex = -1;
+        newState.isProcessing = true;
+      } else {
+        const conditionParams = buildConditionParams(state); // Build with oldState objParams
+        for (let i = 0; i < newState.messagesList.length; i++) {
+          if (newState.messagesList[i].conditions && newState.messagesList[i].conditions.length !== 0) {
+            const result = checkMessageCondition(newState.messagesList[i], conditionParams);
+            newState.messagesList[i].hidden = !result;
+          }
+
+          if (i <= clickedMsgIndex) continue;
+          if (newState.messagesList[i].hidden && !stringNullOrEmpty(newState.messagesList[i].hidden)) continue;
+
+          if (isBotMessage(newState.messagesList[i])) {
+            newState = {
+              ...newState,
+              ...processForBotMessage(newState.messagesList, i, newState, false, false)
+            };
+          } else if (isUserMessage(newState.messagesList[i])) {
+            newState = {
+              ...newState,
+              ...processForUserMessage(newState.messagesList, i, newState, false)
+            };
+          }
+        }
+      }
+
+      newState.userMessagesList = newState.messagesList.filter((item) => isUserMessage(item));
+      newState.nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg((_, index) => index >= clickedMsgIndex));
+      newState.currentMsgIndex = clickedMsgIndex + 1;
+      newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+
+      return { ...state, ...newState };
     case PREVIEW_ACTIONS.UPDATE_PREFECTURES_LIST:
       return { ...state, prefecturesList: action.payload.prefecturesList };
     case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA:

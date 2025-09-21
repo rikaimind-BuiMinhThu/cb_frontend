@@ -7,7 +7,7 @@ import { Button } from "reactstrap";
 import ModalPreviewBot from '../../Popup/ModalPreviewBot';
 import CustomButton from "./CustomButton";
 import { UserMessage, BotMessage } from "./PreviewComponent";
-import PreviewFukushashikiReducer, { PREVIEW_ACTIONS } from "./PreviewFukushashiki/PreviewFukushashikiReducer";
+import PreviewFukushashikiReducer from "./PreviewFukushashiki/PreviewFukushashikiReducer";
 import { Row, Col } from "antd";
 import moment from "moment";
 import $ from "jquery";
@@ -36,8 +36,8 @@ import {
   CART_SYSTEM,
   TIMER_DELAY_RENDER,
   CONVERSTION_RESPONSE_STATUS,
-  CONVERSION_RESPONSE_SUBMIT_TYPE,
-  CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE
+  CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE,
+  PREVIEW_ACTIONS
 } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
@@ -71,13 +71,20 @@ import {
   getElementMessageById,
   buildConditionParams,
   isTempDelay,
+  getNextUserMsg,
 } from "./PreviewComponent/Utils";
-import { isTorizenLpAmazonData } from "./PreviewComponent/TorizenUtils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
 import ZipCodePopUp from "./PreviewComponent/ZipCodePopUp";
 import _ from "lodash";
 import Timer from "./Timer";
+import {
+  setConversionParamToLocalStorage, fukushashikiSavedStateToLp, fukushashikiToLP,
+  executeLpJsCode, injectCustomJsCode, postMessageToParent
+} from "./PreviewFukushashiki/LPUtils";
+import { convertToFukushashikiObject } from "./PreviewFukushashiki/FukushashikiDataConverterUtils";
+import { processForBotMessage } from "./PreviewComponent/BotMessageUtils";
+import { processForUserMessage } from "./PreviewComponent/UserMessageUtils";
 
 sessionStorage.setItem("prevOpenStatus", "0");
 var url = new URL(window.location.href);
@@ -214,7 +221,7 @@ const PreviewFukushashiki = () => {
         payload: { ...state.objParam, ...defaultObjParam }
       });
     });
-  }, [state.objParam.ip, state.loadedStateFromSession]);
+  }, [state.objParam?.ip, state.loadedStateFromSession]);
 
   // Get chat bot setting
   useEffect(() => {
@@ -384,7 +391,7 @@ const PreviewFukushashiki = () => {
       chatbotRight: state.rightMarginPc,
       chatbotBottom: state.bottomMarginPc,
     };
-    postMessageToParent(options);
+    postMessageToParent(options, state);
   }, [
     state.urlReceive,
     state.isOpen,
@@ -467,19 +474,6 @@ const PreviewFukushashiki = () => {
     });
   }
 
-  const getNextUserMsg = (ext = null) => (item, index) => {
-    const firstMsgContent = item?.message_content?.at(0);
-    const isDisplayBtnNext = (item?.message_content?.length === 1 && firstMsgContent?.type != "image") || firstMsgContent?.image?.displayButtonNext != false;
-
-    const conds = !item.hidden && isUserMessage(item) && isDisplayBtnNext;
-
-    if (ext && typeof ext === "function") {
-      return conds && ext(item, index);
-    }
-
-    return conds;
-  }
-
   const onOpenPreview = (opening) => {
     const deviceReceive = state.deviceReceive || params.get("deviceReceive");
     if (!deviceReceive) return;
@@ -498,7 +492,7 @@ const PreviewFukushashiki = () => {
     setTimerChanges((timerChanges) => timerChatbotStorage || timerChanges);
 
     // post message to parent window
-    postMessageToParent({isOpen: opening});
+    postMessageToParent({isOpen: opening}, state);
 
     if (state.alreadyOpenFirstTime) {
       if (!opening) {
@@ -824,248 +818,6 @@ const PreviewFukushashiki = () => {
     };
   }
 
-  const processBotDelayMessage = async (messagesList, i, newState, options = {}) => {
-    const {
-      isPassDelay = false,
-    } = options;
-    
-    if (isPassDelay) {
-      newState.currentMsgIndex = i;
-      return newState;
-    }
-    if (messagesList[i]?.message_content[0]?.delay?.typing_on) {
-      // TODO: Need display typing on
-      // return new Promise(async (resolve) => {
-      //   const newRenderMessagesList = [...state.renderMessagesList, messagesList[i]];
-      //   dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { renderMessagesList: newRenderMessagesList } });
-      //   await sleep(messagesList[i].message_content[0].delay.content * 1000);
-      //   resolve();
-      // }).then(() => {
-      //   let messagesList = state.messagesList;
-      //   messagesList[i].hidden = true;
-      //   let newRenderMessagesList = [...state.renderMessagesList];
-      //   newRenderMessagesList[i].hidden = true;
-        
-      //   if (isLastMessageInCreateOrderFlow() && state.urlThanksPage)
-      //     return redirectToThanksPage();
-
-      //   return dispatch({
-      //     type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: {
-      //       renderMessagesList: [...newRenderMessagesList],
-      //       messagesList: messagesList,
-      //       currentMsgIndex: i,
-      //     }
-      //   });
-      // });
-    }
-    if (state.renderMessagesList.length - 1 === i) {
-      await sleep(messagesList[i].message_content[0].delay.content * 1000);
-    }
-    if (isLastMessageInCreateOrderFlow())
-      return redirectToCartPage();
-    newState.currentMsgIndex = i;
-    newState.messagesList[i].hidden = true;
-    return newState;
-  }
-
-  const processBotEmailMessage = (messagesList, i, newState) => {
-    const msgContent = messagesList[i]?.message_content?.[0];
-    const emailId = msgContent[msgContent.type].contentId;
-    let variablesData = {};
-
-    newState.variablesList.forEach((item) => {
-      variablesData[item.variable_name] = item.default_value;
-    });
-
-    sendEmailRequest(emailId, {variables: variablesData})
-      .then((res) => {console.log(res)});
-
-    newState.renderMessagesList.push({});
-    newState.currentMsgIndex = i;
-    return newState;
-  }
-
-  const processBotPauseMessage = (messagesList, i, newState) => {
-    newState.renderMessagesList.push({});
-    newState.currentMsgIndex = i;
-  }
-
-  const processForBotVariableSetMessage = (messagesList, i, newState, options = {forceEmpty: false}) => {
-    const msgContent = messagesList[i]?.message_content?.[0];
-    if (!msgContent) return newState;
-
-    if (newState.variables.length !== 0) {
-      const msgVariables = msgContent[msgContent.type].variables;
-
-      newState.variables.forEach((item) => {
-        const matchingVariable = msgVariables.find(variable => item.variable_name === variable.key);
-        if (matchingVariable) {
-          item.default_value = options.forceEmpty ? "" : matchingVariable.value;
-        }
-      });
-    }
-
-    newState.renderMessagesList.push({});
-    newState.currentMsgIndex = i;
-    return newState;
-  }
-
-  const processForBotDefaultMessage = async (messagesList, i, newState, isUpdateSourceContent, assignToState = true) => {
-    const msgContent = messagesList[i]?.message_content?.[0];
-    if (!msgContent) return newState;
-
-    // await sleep(1000);
-    const applyVariables = (section) => {
-      if (!section?.content || newState.variables.length === 0) return false;
-
-      if (isUpdateSourceContent) section.sourceContent = section.content;
-
-      section.content = newState.variables.reduce(
-        (s, { variable_name, default_value }) =>
-          s.replaceAll(`{{${variable_name}}}`, default_value),
-        section.sourceContent ?? section.content
-      );
-      return true;
-    };
-
-    const updated =
-      (msgContent.type === "text_input" &&
-        applyVariables(msgContent.text_input)) ||
-      (msgContent.type === BOT_MESSAGE_TYPES.HTML_CODE &&
-        applyVariables(msgContent.html_code));
-
-    if (updated) messagesList[i].message_content[0] = msgContent;
-    
-    if (assignToState) {
-      newState.renderMessagesList.push(messagesList[i]);
-      newState.currentMsgIndex = i;
-    }
-    
-    scrollToPosition({ position: "b", selector: "#sp-body" });
-
-    if (isLastMessageInCreateOrderFlow())
-      return redirectToCartPage();
-
-    return newState;
-  }
-
-  const processBotScriptMessage = (messagesList, i, newState) => {
-    const script = messagesList[i]?.message_content[0]?.script?.content;
-    if (!script) return newState;
-
-    try {
-      const func = new Function(script);
-      func();
-    } catch {
-      console.error('Script run failed!')
-    } finally {
-      return newState;
-    }
-  }
-
-  const processBotUgcMessage = async (messagesList, i, newState) => {
-    const content = messagesList[i]?.message_content[0]?.use_html_ugc_config?.content;
-    if (!content) return newState;
-    if(/^\s*<\w+|<\w+[^>]*>/i.test(content)){
-      try {
-        const doc = new DOMParser().parseFromString(content, "text/html");
-        [...doc.querySelectorAll("link")].forEach(el => 
-          document.head.appendChild(el.cloneNode(true)));
-        [...doc.body.children].filter(el => !["script", "link"]
-          .includes(el.tagName.toLowerCase())).forEach(el => document.body.appendChild(el.cloneNode(true)));
-        for (const script of doc.querySelectorAll("script")) {
-          const s = document.createElement("script");
-          [...script.attributes].forEach(attr => s.setAttribute(attr.name, attr.value));
-          s.text = script.textContent || '';
-          if (s.src) await new Promise(r => { s.onload = s.onerror = r; document.body.appendChild(s); });
-          else document.body.appendChild(s);
-        }
-      } catch (error) {
-        console.error("Hello !, you have one bug",error)
-      }
-    } else {
-      try {
-        const func = new Function(content);
-        func();
-      } catch (error) {
-        console.error("Ồ là lá Fail rồi", error);
-      }
-    }
-    return newState;
-  }
-  
-  const processForBotMessage = async (messagesList, i, newState, isUpdateSourceContent =+ false, assignToState = true) => {
-    const firstMsgType = messagesList[i]?.message_content[0]?.type;
-
-    switch (firstMsgType) {
-      case 'script':
-        return processBotScriptMessage(messagesList, i, newState);
-      case BOT_MESSAGE_TYPES.UGC:
-        return await processBotUgcMessage(messagesList, i, newState);
-      case "delay":
-        return await processBotDelayMessage(messagesList, i, newState);
-      case "email":
-        return processBotEmailMessage(messagesList, i, newState);
-      case "variable_set":
-        return processForBotVariableSetMessage(messagesList, i, newState);
-      case "clear_variable":
-        return processForBotVariableSetMessage(messagesList, i, newState, {forceEmpty: ""});
-      case "pause":
-        return processBotPauseMessage(messagesList, i, newState);
-      default:
-        return processForBotDefaultMessage(messagesList, i, newState, isUpdateSourceContent, assignToState);
-    }
-  }
-
-  const processForUserCaptchaMessage = (messagesList, i, msgContentIndex, newState) => {
-    const msgContent = messagesList[i]?.message_content?.[msgContentIndex];
-    const msgContentType = msgContent.type;
-    if (!msgContent) return newState;
-
-    const size = msgContent[msgContentType].length;
-    const color = msgContent[msgContentType].colour ? "true" : "";
-    const charPreset = msgContent[msgContentType].type;
-
-    getCaptcha(size, color, charPreset)
-      .then((res) => {
-        let newCaptcha = [...state.captcha];
-        newCaptcha.push({index: i, indexContent: msgContentIndex, ...res.data});
-        dispatch({ type: PREVIEW_ACTIONS.SET_CAPTCHA, payload: [...newCaptcha] });
-      });
-  }
-
-  const processForUserMessage = (messagesList, i, newState, assignToState = true) => {
-    for (
-      let j = 0;
-      j < messagesList[i].message_content.length;
-      j++
-    ) {
-      if (messagesList[i].message_content[j].type === "capture") {
-        processForUserCaptchaMessage(messagesList, i, j, newState);
-      }
-    }
-
-    if (assignToState) {
-      newState.renderMessagesList.push(messagesList[i]);
-      newState.currentMsgIndex = i;
-      newState.currentUserMsgIndex++;
-    }
-
-    scrollToPosition({ position: "b", selector: "#sp-body" });
-
-    return newState;
-  }
-
-  const setConversionParamToLocalStorage = (scenarioId, botType, userInputId, env) => {
-    postMessageToParent({
-      isOpen: true,
-      action: CHATBOT_ACTIONS.SET_CHATBOT_CONVERSION_PARAMS_TO_LOCAL_STORAGE,
-      actionData: {
-        scenarioId, botType, userInputId, env
-      }
-    });
-  }
-
   const renderMessagesWithDelay = (theState, startMsgIndex, endMsgIndex, options = {}) => {
     const {
       setNewState = true,
@@ -1130,6 +882,8 @@ const PreviewFukushashiki = () => {
 
   const extractStateFromPreviewResponse = async (res) => {
     if (!res || !res.data || res.data.code !== 1) return;
+
+    debugger;
     
     const designSetting = res.data.design_settings;
     let newState = {
@@ -1165,7 +919,7 @@ const PreviewFukushashiki = () => {
     };
 
     if (newState.isUsedErrMsgByJs && newState.errMsgJsCode) {
-      postMessageForExecuteJs(newState.errMsgJsCode);
+      executeLpJsCode(newState.errMsgJsCode, state);
     }
 
     if (res.data?.chatbot?.is_used_custom_css && res.data?.chatbot?.custom_css_content.length > 0) {
@@ -1175,7 +929,7 @@ const PreviewFukushashiki = () => {
     }
 
     if (res.data?.chatbot?.is_used_custom_js_code) {
-      sendCustomJsToParent({
+      injectCustomJsCode(hasSentCustomJs, state, {
         head: { jsCode: res.data?.chatbot?.head_custom_js_code, position: CUSTOM_JS_CODE_POSITION.HEAD },
         top_body: { jsCode: res.data?.chatbot?.top_body_custom_js_code, position: CUSTOM_JS_CODE_POSITION.TOP_BODY },
         bottom_body: { jsCode: res.data?.chatbot?.bottom_body_custom_js_code, position: CUSTOM_JS_CODE_POSITION.BOTTOM_BODY },
@@ -1221,7 +975,8 @@ const PreviewFukushashiki = () => {
       newState.scenarioId,
       'web',
       newState.userInputId || params.get("uuid"),
-      params.get("env") || "production"
+      params.get("env") || "production",
+      state
     );
 
     checkUpdateMessagesSessionStorage(res.data.data.updated_at)
@@ -1267,20 +1022,6 @@ const PreviewFukushashiki = () => {
       newState.passedUserMsgCount = newState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
       dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
     }
-  }
-
-  const fukushashikiSavedStateToLp = (savedState) => {
-    return new Promise((resolve) => {
-      let fukuDataList = [];
-      savedState.userMessagesList.forEach((message) => {
-        // Except some data when fukushashiki torizen san
-        if (params.get('is_using_amazon_pay') && isTorizenLpAmazonData(message)) return;
-
-        fukuDataList.push(...convertToFukushashikiObject({message: message}));
-      });
-      fukushashikiToLP(fukuDataList);
-      resolve();
-    });
   }
 
   const getTimerSessionStorage = () => {
@@ -1340,12 +1081,14 @@ const PreviewFukushashiki = () => {
         savedState.isExtractFromSession = true;
         savedState.isDelaying = false;
         savedState.isProcessing = false;
+        debugger;
 
         setConversionParamToLocalStorage(
           savedState.scenarioId,
           'web',
           savedState.userInputId || params.get("uuid"),
-          params.get("env") || "production"
+          params.get("env") || "production",
+          state
         );
 
         // Support only for amazon pay and subscstore cart system (torizen san)
@@ -1364,7 +1107,7 @@ const PreviewFukushashiki = () => {
         }
 
         if (savedState?.botInfor?.is_used_custom_js_code) {
-          sendCustomJsToParent({
+          injectCustomJsCode(hasSentCustomJs, state, {
             head: { jsCode: savedState?.botInfor?.head_custom_js_code, position: CUSTOM_JS_CODE_POSITION.HEAD },
             top_body: { jsCode: savedState?.botInfor?.top_body_custom_js_code, position: CUSTOM_JS_CODE_POSITION.TOP_BODY },
             bottom_body: { jsCode: savedState?.botInfor?.bottom_body_custom_js_code, position: CUSTOM_JS_CODE_POSITION.BOTTOM_BODY }
@@ -1372,7 +1115,7 @@ const PreviewFukushashiki = () => {
         }
 
         if (savedState.isUsedErrMsgByJs && savedState.errMsgJsCode) {
-          postMessageForExecuteJs(savedState.errMsgJsCode);
+          executeLpJsCode(savedState.errMsgJsCode, state);
         }
         if (isLoggedIn) {
           savedState.messagesList.forEach((x) => x.hidden = !!x?.not_display_when_logged_in);
@@ -1415,7 +1158,7 @@ const PreviewFukushashiki = () => {
           setTimerChanges({ timeLeft: calculateTimerConfigDuration(timerConfig?.config?.type, timerConfig?.config?.duration, { timerLeft: timerConfig.timeLeft, useTimerLeft: true }), config: timerConfig });
         }
 
-        return fukushashikiSavedStateToLp(savedState).then(async () => {
+        return fukushashikiSavedStateToLp(savedState, params, state).then(async () => {
           savedState.isOpen = true;
           savedState.loadedStateFromSession = true;
           savedState.isExtractFromSession = false;
@@ -1450,6 +1193,8 @@ const PreviewFukushashiki = () => {
       }
     }
 
+    debugger;
+
     if (state.loadedStateFromSession && state.botId)
       return;
 
@@ -1457,6 +1202,8 @@ const PreviewFukushashiki = () => {
       dispatch({ type: PREVIEW_ACTIONS.SET_BOT_ID, payload: params.get("bot_id") });
       return;
     }
+
+    debugger;
 
     if (!state.urlSend) {
       dispatch({ type: PREVIEW_ACTIONS.SET_URL_SEND, payload: window.location.href });
@@ -1478,6 +1225,8 @@ const PreviewFukushashiki = () => {
       return;
     }
 
+    debugger;
+
     return getScenarioPreviewData(state.botId, state.scenarioId)
       .then(extractStateFromPreviewResponse);
   }, [
@@ -1490,7 +1239,7 @@ const PreviewFukushashiki = () => {
     if (!state.isOpen) return;
     
     scrollToPosition({ position: "b", selector: "#sp-body" });
-  }, [state.isOpen, state.renderMessagesList.length, state.submitErrorMessage]);
+  }, [state.isOpen, state.renderMessagesList?.length, state.submitErrorMessage]);
 
   const handleValidateField = (index) => {
     let contentArr = [...state.renderMessagesList[index].message_content];
@@ -2771,500 +2520,6 @@ const PreviewFukushashiki = () => {
     }
   }
 
-  const convertToFukushashikiObject = (obj) => {
-    if (
-      obj &&
-      obj.message.message_content &&
-      obj.message.message_content.length > 0
-    ) {
-      const messageArray = obj.message.message_content;
-      const fukuDataList = [];
-      messageArray.forEach((message) => {
-        switch (message.type) {
-          case 'text_input':
-            {
-              if (message.text_input?.text?.value != undefined || message.text_input?.text?.valueLeft != undefined || message.text_input?.text?.valueRight != undefined) {
-                if (message.text_input?.text?.isSplitInput == true) {
-                  const fukuObjectLeft = {
-                    type: message.type,
-                    bindingMode: message.left_fukushashiki_search_mode,
-                    bindingAddress: message.left_fukushashiki_search_value,
-                    bindingValue: message.text_input.text.valueLeft,
-                  };
-
-                  const fukuObjectRight = {
-                    type: message.type,
-                    bindingMode: message.right_fukushashiki_search_mode,
-                    bindingAddress: message.right_fukushashiki_search_value,
-                    bindingValue: message.text_input.text.valueRight,
-                  };
-                  fukuDataList.push(fukuObjectLeft);
-                  fukuDataList.push(fukuObjectRight);
-                }
-                else {
-                  if (message.fukushashiki_search_value?.includes(',')) {
-                    let address = message.fukushashiki_search_value.split(',');
-                    address.forEach(value => {
-                      const fukuObject = {
-                        type: message.type,
-                        bindingMode: message.fukushashiki_search_mode,
-                        bindingAddress: value,
-                        bindingValue: message.text_input.text.value,
-                      };
-                      fukuDataList.push(fukuObject);
-                    });
-                  }
-                  else {
-                    const fukuObject = {
-                      type: message.type,
-                      bindingMode: message.fukushashiki_search_mode,
-                      bindingAddress: message.fukushashiki_search_value,
-                      bindingValue: message.text_input.text.value,
-                    };
-                    fukuDataList.push(fukuObject);
-                  }
-                }
-              }
-
-              if (Object.keys(message.text_input.urls).length != 0 && message.text_input.urls.value != undefined) {
-                const fukuObject = {
-                  type: message.type,
-                  bindingMode: message.fukushashiki_search_mode,
-                  bindingAddress: message.fukushashiki_search_value,
-                  bindingValue: message.text_input.urls.value,
-                };
-                fukuDataList.push(fukuObject);
-              }
-
-              if (Object.keys(message.text_input.email_confirmation).length != 0 && message.text_input.email_confirmation != undefined) {
-                const userInputData = Object.fromEntries(
-                  Object.entries(message.text_input.email_confirmation).filter(([key]) => key.includes("value"))
-                );
-                const dataInforFukushashiki = Object.fromEntries(
-                  Object.entries(message).filter(([key]) => key.includes("fukushashiki"))
-                );
-                const types = ["value", "valueConfirm"];
-                const result = types
-                  .filter(type => `${type}` in userInputData)
-                  .map(type => ({
-                    type: message.type,
-                    bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
-                    bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-                    bindingValue: userInputData[`${type}`]
-                  }));
-                fukuDataList.push(...result);
-              }
-
-              if (message.text_input?.phone_number.value != undefined ||
-                message.text_input?.phone_number.value1 != undefined ||
-                message.text_input?.phone_number.value2 != undefined ||
-                message.text_input?.phone_number.value3 != undefined) {
-
-                if (message.text_input.phone_number.withHyphen == false) {
-                  const fukuObject = {
-                    type: message.type,
-                    bindingMode: message.fukushashiki_search_mode,
-                    bindingAddress: message.fukushashiki_search_value,
-                    bindingValue: message.text_input.phone_number.value,
-                  };
-                  fukuDataList.push(fukuObject);
-                }
-                else {
-                  const userInputData = Object.fromEntries(
-                    Object.entries(message.text_input.phone_number).filter(([key]) => key.includes("value"))
-                  );
-                  const dataInforFukushashiki = Object.fromEntries(
-                    Object.entries(message).filter(([key]) => key.includes("fukushashiki"))
-                  );
-                  const types = ["value1", "value2", "value3"];
-                  const result = types
-                    .filter(type => `${type}` in userInputData)
-                    .map(type => ({
-                      type: message.type,
-                      bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
-                      bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-                      bindingValue: userInputData[`${type}`]
-                    }));
-                  fukuDataList.push(...result);
-                }
-              }
-
-              if (Object.keys(message.text_input.email_address).length !== 0 && message.text_input.email_address !== undefined) {
-                const addresses = message.fukushashiki_search_value?.split(',') || [message.fukushashiki_search_value];
-                addresses.forEach(value => {
-                  const fukuObject = {
-                    type: message.type,
-                    bindingMode: message.fukushashiki_search_mode,
-                    bindingAddress: value?.trim() || "",
-                    bindingValue: message.text_input.email_address.value,
-                  };
-                  fukuDataList.push(fukuObject);
-                });
-              }
-
-              if (Object.keys(message.text_input.password).length != 0 && message.text_input.password != undefined) {
-                if (message?.fukushashiki_search_value.includes(',')) {
-                  let address = message.fukushashiki_search_value.split(',');
-                  address.forEach(value => {
-                    const fukuObject = {
-                      type: 'password',
-                      bindingMode: message.fukushashiki_search_mode,
-                      bindingAddress: value,
-                      bindingValue: message.text_input.password.value,
-                    };
-                    fukuDataList.push(fukuObject);
-                  });
-                }
-                else {
-                  const fukuObject = {
-                    type: 'password',
-                    bindingMode: message.fukushashiki_search_mode,
-                    bindingAddress: message.fukushashiki_search_value,
-                    bindingValue: message.text_input.password.value,
-                  };
-                  fukuDataList.push(fukuObject);
-                }
-              }
-
-              if (Object.keys(message.text_input.password_confirmation).length != 0 && message.text_input.password_confirmation != undefined) {
-                const fukuObject1 = {
-                  type: 'password_confirmation',
-                  bindingMode: message.fukushashiki_search_mode,
-                  bindingAddress: message.fukushashiki_search_value,
-                  bindingValue: message.text_input.password_confirmation.value,
-                };
-
-                const fukuObject2 = {
-                  type: 'password_confirmation',
-                  bindingMode: message.fukushashiki_search_mode,
-                  bindingAddress: message.fukushashiki_search_value,
-                  bindingValue: message.text_input.password_confirmation.valueConfirm,
-                };
-                fukuDataList.push(fukuObject1);
-                fukuDataList.push(fukuObject2);
-              }
-            }
-            break;
-          case 'agree_term':
-            {
-              let searchValue = message.fukushashiki_search_value;
-              if (!searchValue) break;
-              if (searchValue.includes(',')) {
-                let values = searchValue.split(',');
-                values.forEach(value => {
-                  let trimmedValue = value.trim();
-                  const fukuObject = {
-                    type: message.type,
-                    bindingMode: message.fukushashiki_search_mode,
-                    bindingAddress: trimmedValue,
-                    bindingValue: message.agree_term.isAgree,
-                  };
-                  fukuDataList.push(fukuObject);
-                });
-              } else {
-                const fukuObject = {
-                  type: message.type,
-                  bindingMode: message.fukushashiki_search_mode,
-                  bindingAddress: message.fukushashiki_search_value,
-                  bindingValue: message.agree_term.isAgree,
-                };
-                fukuDataList.push(fukuObject);
-              }
-              break;
-            }
-          case 'slider':
-            {
-              const fukuObject = {
-                type: message.type,
-                bindingMode: message.fukushashiki_search_mode,
-                bindingAddress: message.fukushashiki_search_value,
-                bindingValue: message.slider.value,
-              };
-              fukuDataList.push(fukuObject);
-
-              break;
-            }
-
-          case "pull_down":
-            {
-              if (message.pull_down?.customization.length != 0) {
-                const textInDropdown = message.pull_down.customization.value || message.pull_down.initial_selection;
-                if (message.pull_down.customization.is_comment == true) {
-
-                }
-                else {
-                  message.pull_down.customization.options_without_comment.forEach((item) => {
-                    if (!!textInDropdown && item.value == textInDropdown) {
-                      const fukuObject = {
-                        type: message.type,
-                        bindingMode: message.fukushashiki_search_mode,
-                        bindingAddress: message.fukushashiki_search_value,
-                        bindingValue: item.value
-                      };
-                      fukuDataList.push(fukuObject);
-                    }
-
-                  })
-                }
-              }
-
-              if (message.pull_down?.type == "lp_integration_option") {
-                if (message.pull_down.lp_integration_option.value != "") {
-                  const fukuObject = {
-                    type: message.type,
-                    pulldownType: message.pull_down.type,
-                    bindingMode: message.pull_down.lp_element_search_mode,
-                    bindingAddress: message.pull_down.lp_element_search_value,
-                    bindingValue: message.pull_down.lp_integration_option.value
-                  };
-                  fukuDataList.push(fukuObject);
-                }
-              }
-
-              if (message.pull_down?.type == MESSAGE_CONTENT_TYPES.PULLDOWN.FROM_JS) {
-                if (message.pull_down.from_js_result.value?.toString() != "") {
-                  const fukuObject = {
-                    type: message.type,
-                    pulldownType: message.pull_down.type,
-                    bindingMode: message.pull_down.from_js_result_target_search_mode,
-                    bindingAddress: message.pull_down.from_js_result_target_search_value,
-                    bindingValue: message.pull_down.from_js_result.value
-                  };
-                  fukuDataList.push(fukuObject);
-                }
-              }
-
-              const userInputData = Object.fromEntries(
-                Object.entries(message.pull_down?.date_md || {}).filter(([key]) => key.includes("value"))
-              );
-
-              const additionalKeys = [
-                'time_hm',
-                'date_ymd',
-                'date_ym',
-                'date_ymd_hm',
-                'dob_ymd',
-                'dob_ym',
-                'timezone_from_to',
-                'period_from_to',
-                'up_to_municipality',
-                'prefectures'
-              ];
-
-              additionalKeys.forEach(key => {
-                const entries = Object.entries(message.pull_down?.[key] || {}).filter(([k]) => k.includes("value"));
-                Object.assign(userInputData, Object.fromEntries(entries));
-              });
-
-              const dataInforFukushashiki = Object.fromEntries(
-                Object.entries(message).filter(([key]) => key.includes("fukushashiki"))
-              );
-
-              const types = ["day", "month", "year", "hour", "minute", "Day", "Month", "Year", "Hour", "Minute", "valueDay", "valueMonth", "valueYear", "valueHour", "valueMinute"];
-              const result = types
-                .filter(type => `${type}` in userInputData)
-                .map(type => ({
-                  type: "pull_down",
-                  bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
-                  bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-                  bindingValue: removeLeadingZero(userInputData[`${type}`]),
-                }));
-              fukuDataList.push(...result);
-
-              break;
-            }
-          case 'textarea':
-            {
-              if (message.textarea.text_input.value != undefined) {
-                const fukuObject = {
-                  type: message.type,
-                  bindingMode: message.fukushashiki_search_mode,
-                  bindingAddress: message.fukushashiki_search_value,
-                  bindingValue: message.textarea.text_input.value,
-                };
-                fukuDataList.push(fukuObject);
-              }
-              break;
-            }
-          case 'zip_code_address':
-            {
-              const userInputData = Object.fromEntries(
-                Object.entries(message.zip_code_address).filter(([key]) => key.includes("value_"))
-              );
-              const dataInforFukushashiki = Object.fromEntries(
-                Object.entries(message).filter(([key]) => key.includes("fukushashiki"))
-              );
-              const types = [
-                "post_code",
-                "post_code_left",
-                "post_code_right",
-                "await",
-                "prefecture",
-                "address",
-                "building_name",
-                "municipality"
-              ];              
-              const result = types
-                .filter(type => type === "await" || `value_${type}` in userInputData)
-                .map(type => {
-                  const bindingMode = dataInforFukushashiki[`${type}_fukushashiki_search_mode`];
-
-                  if (bindingMode === undefined && type !== "await") {
-                    return null;
-                  }
-
-                  return {
-                    type: message.zip_code_address.is_use_dropdown ? "dropdown_prefecture" : "zip_code_address",
-                    bindingMode: bindingMode,
-                    additionalType: type,
-                    bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-                    bindingValue: userInputData[`value_${type}`] || null
-                  };
-                })
-                .filter(item => item !== null);
-              fukuDataList.push(...result);
-              break;
-            }
-          case 'shipping_address':
-            {
-              const userInputData = Object.fromEntries(
-                Object.entries(message.shipping_address).filter(([key]) => key.includes("value_"))
-              );
-              const dataInforFukushashiki = Object.fromEntries(
-                Object.entries(message).filter(([key]) => key.includes("fukushashiki"))
-              );
-              const types = ["number1", "number2", "number3", "number", "name_left", "name_right", "kana_left", "kana_right", "building_name", "address", "municipality", "prefecture", "post_code", "post_code_left", "post_code_right", "initial_selection"];
-              const result = types
-                .filter(type => `value_${type}` in userInputData)
-                .map(type => {
-                  const bindingMode = dataInforFukushashiki[`${type}_fukushashiki_search_mode`];
-                  const bindingValue = dataInforFukushashiki[`${type}_fukushashiki_search_value`];
-                  if (bindingMode === undefined || bindingValue == undefined || bindingValue.length == 0) {
-                    return null;
-                  }
-                  if (type == "initial_selection") {
-                    const objA = {
-                      type: "initial_selection",
-                      bindingMode,
-                      bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-                      bindingValue: userInputData[`value_${type}`]
-                    };
-                    fukuDataList.push(objA)
-                  }
-                  if (type == "address") {
-                    const objA = {
-                      type: "zip_code_address",
-                      bindingMode,
-                      bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-                      bindingValue: userInputData[`value_${type}`]
-                    };
-                    fukuDataList.push(objA)
-                  }
-                  return {
-                    type: message.shipping_address.is_use_dropdown ? "dropdown_prefecture" : "shipping_address",
-                    bindingMode: bindingMode,
-                    bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-                    bindingValue: userInputData[`value_${type}`]
-                  };
-                })
-                .filter(item => item !== null);
-              fukuDataList.push(...result);
-              break;
-            }
-
-          case 'radio_button':
-            {
-              const initialSelection = message.radio_button.initial_selection;
-              let selectedElement = message.radio_button.default.find(item => item.value === initialSelection);
-              if (!selectedElement) {
-                selectedElement = message.radio_button.radio_button_img.find(item => item.value === initialSelection);
-              }
-              if (selectedElement) {
-                const value = selectedElement.value;
-                const fukuObject = {
-                  type: message.type,
-                  bindingMode: message.initial_selection_fukushashiki_search_mode,
-                  bindingAddress: message.initial_selection_fukushashiki_search_value,
-                  bindingValue: value.toString()
-                };
-                fukuDataList.push(fukuObject);
-              }
-
-              break;
-            }
-          case 'checkbox':
-            {
-              if (message.checkbox.checkedValue.length > 0) {
-                const fukuObject = {
-                  type: message.type,
-                  bindingMode: message.checkedValue_fukushashiki_search_mode,
-                  bindingAddress: message.checkedValue_fukushashiki_search_value,
-                  bindingValue: true
-                };
-                fukuDataList.push(fukuObject);
-              }
-              else {
-                const fukuObject = {
-                  type: message.type,
-                  bindingMode: message.checkedValue_fukushashiki_search_mode,
-                  bindingAddress: message.checkedValue_fukushashiki_search_value,
-                  bindingValue: false
-                };
-                fukuDataList.push(fukuObject);
-              }
-              break;
-            }
-
-          case 'card_payment_radio_button':
-          case 'credit_card_payment': {
-            const keysToExtract = [
-              "initial_selection", "card_holder1", "card_holder2",
-              "card_number1", "card_number2", "card_number3", "card_number4",
-              "card_holder", "card_number",
-              "year", "month", "cvc", "installment"
-            ];
-            const userInputData = keysToExtract.reduce((result, key) => {
-              if (message[message.type]?.[key] !== undefined) {
-                result[key] = message[message.type][key];
-              }
-              return result;
-            }, {});
-            const dataInforFukushashiki = Object.fromEntries(
-              Object.entries(message).filter(([key]) => key.includes("fukushashiki"))
-            );
-            const types = ["card_number", "card_holder1", "card_holder2",
-              "card_holder", "year", "month",
-              "cvc", "card_number1", "card_number2", "card_number3",
-              "card_number4", "installment", "initial_selection"];
-            const result = types
-              .filter(type => type in userInputData)
-              .map(type => {
-                const fukuData = {
-                  bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
-                  bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-                  bindingValue: userInputData[`${type}`]
-                }
-
-                if (!fukuData.bindingMode || !fukuData.bindingValue || !fukuData.bindingAddress) return;
-
-                if (type == "initial_selection") {
-                  return { type: "payment_method_id", ...fukuData }
-                }
-                if (type == "card_number") {
-                  return { type: "card_number", ...fukuData };
-                }
-                return { type: message.type, ...fukuData };
-              })
-              .filter(item => item);
-            fukuDataList.push(...result);
-          }
-          default: 
-            break;
-        }
-      })
-      return fukuDataList;
-    }
-  }
 
   const finishConversion = async ({ scenario_id, user_input_id }, callback) => {
     return updateStatusConversion({ scenario_id, user_input_id, status: CONVERSTION_RESPONSE_STATUS.FINISH })
@@ -3275,14 +2530,6 @@ const PreviewFukushashiki = () => {
           callback();
         }
       });
-  }
-
-  const postMessageForExecuteJs = (jsCode) => {
-    postMessageToParent({
-      action: CHATBOT_ACTIONS.EXCUTE_JS,
-      actionData: jsCode,
-      is_use_js: true
-    });
   }
 
   const postMessageForGetPreviewOrderContent = async (jsCode, options = {}) => {
@@ -3304,70 +2551,26 @@ const PreviewFukushashiki = () => {
       is_use_js: true,
       isOpen: true,
       isNewProcess,
-    });
+    }, state);
 
     if (isNewProcess) return;
     await sleep(2000);
   }
 
-  const fukushashikiToLP = (fukushashikiData) => {
-    postMessageToParent({
-      action: 'fukushashiki',
-      actionData: fukushashikiData,
-      isOpen: true
-    });
-  }
-
-  const sendCustomJsToParent = ({ head, top_body, bottom_body } = {}) => {
-    if (hasSentCustomJs.current) return;
-
-    const items = [ head, top_body, bottom_body ].filter(item => !!item?.jsCode?.trim() && !!item?.position?.trim() )
-      postMessageToParent({
-        action: CHATBOT_ACTIONS.INJECT_CUSTOM_JS,
-        actionData: items,
-        isOpen: true
-      });
-
-      hasSentCustomJs.current = true;
-  }
-
-  const postMessageToParent = (options) => {
-    if (!window || !window.parent) return;
-    
-    const defaultOptions = {
-      isOpen: state.isOpen,
-      source: 'ec-chatbot',
-      useMoblieFullwidth: !!state.useFullWidthChatbotMobile,
-      // widthPc: state.widthPc,
-      // heightPc: state.heightPc,
-      // widthSp: state.widthSp,
-      // heightSp: state.heightSp,
-      // chatbotRight: state.rightMarginPc,
-      // chatbotBottom: state.bottomMarginPc,
-    };
-    
-    window.parent.postMessage({
-      ...defaultOptions,
-      ...options,
-    }, state.urlReceive || '*');
-  }
-
   const processClickCreateOrder = async (data, res) => {
     // Process for non-Shopify
-    setStateToSessionStorage(state);
     const content = data?.message?.message_content?.[0];
     if (params.get('cartSystem') !== 'shopify') {
       postMessageToParent({
         action: CHATBOT_ACTIONS.CLICK_BUTTON,
         id_value: content.button_submit_id
-      });
+      }, state);
 
       redirectToCartPage();
       return;
     }
 
     // Process for Shopify
-    fukushashikiToLP(convertToFukushashikiObject(data));
     await createOrAddLinesCart(res);
     sendCreateOrderData(
       data,
@@ -3566,11 +2769,11 @@ const PreviewFukushashiki = () => {
     }
 
     return new Promise(async (resolve) => {
-      // Insert a temporary delay item to show typing GIF for 0.5s when advancing
-      const tempDelay = createTempDelay(0.5, RENDER_CHATBOT_CONFIG.TEMP_DELAY_PREFIX);
+      // // Insert a temporary delay item to show typing GIF for 0.5s when advancing
+      // const tempDelay = createTempDelay(0.5, RENDER_CHATBOT_CONFIG.TEMP_DELAY_PREFIX);
 
-      // Place tempDelay right after clicked index so user sees typing before next messages
-      newState.messagesList.splice(clickedMsgIndex + 1, 0, tempDelay);
+      // // Place tempDelay right after clicked index so user sees typing before next messages
+      // newState.messagesList.splice(clickedMsgIndex + 1, 0, tempDelay);
       // adjust indices
       if (newState.currentMsgIndex >= clickedMsgIndex + 1) newState.currentMsgIndex++;
 
@@ -3578,20 +2781,20 @@ const PreviewFukushashiki = () => {
       for (let i = clickedMsgIndex + 1; i <= newState.currentMsgIndex; i++) {
         newState.renderMessagesList = newState.messagesList.slice(0, i + 1);
         
-        if (isDelayBotMessage(newState.messagesList[i])) {
-          // Show typing GIF for delay message
-          dispatch({
-            type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
-            payload: { startIndex: 0, endIndex: i + 1 }
-          });
+        // if (isDelayBotMessage(newState.messagesList[i])) {
+        //   // Show typing GIF for delay message
+        //   dispatch({
+        //     type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
+        //     payload: { startIndex: 0, endIndex: i + 1 }
+        //   });
           
-          // Wait for delay duration
-          await sleep(newState.messagesList[i].message_content[0].delay?.content * 1000 || TIMER_DELAY_RENDER);
+        //   // Wait for delay duration
+        //   await sleep(newState.messagesList[i].message_content[0].delay?.content * 1000 || TIMER_DELAY_RENDER);
           
-          // Hide delay message and continue - no additional dispatch here
-          newState.renderMessagesList[i].hidden = true;
-          continue;
-        }
+        //   // Hide delay message and continue - no additional dispatch here
+        //   newState.renderMessagesList[i].hidden = true;
+        //   continue;
+        // }
 
         // For regular messages, only dispatch once per message
         dispatch({
@@ -3603,13 +2806,6 @@ const PreviewFukushashiki = () => {
         });
 
         await sleep(RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE);
-      }
-
-      // Final cleanup - single dispatch for all remaining updates
-      const tempIdx = newState.messagesList.findIndex(m => isTempDelay(m, RENDER_CHATBOT_CONFIG.TEMP_DELAY_PREFIX));
-      if (tempIdx >= 0) {
-        newState.messagesList.splice(tempIdx, 1);
-        if (newState.currentMsgIndex > tempIdx) newState.currentMsgIndex--;
       }
 
       // Single final dispatch with all state updates
@@ -3658,154 +2854,47 @@ const PreviewFukushashiki = () => {
     newState.currentUserMsgIndex = -1;
   }
 
-  const sendLogMessageToServer = (submitData) => {
-    const { submit_type, message, ...data } = submitData;
-    const dataLog = sendScenarioUserResponse(submitData);
+  useEffect(() => {
+    console.log("state.currentMsgIndex", state.currentMsgIndex);
+    console.log("state.nextStopMsgIndex", state.nextStopMsgIndex);
+  }, [state.currentMsgIndex, state.nextStopMsgIndex]);
 
-    const convertType = {
-      [CONVERSION_RESPONSE_SUBMIT_TYPE.ADD]: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.ADD,
-      [CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE]: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.RETRY,
-      [CONVERSION_RESPONSE_SUBMIT_TYPE.ERROR]: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.ERROR,
-    }
+  const onClickNext = (clickedMsgIndex, clickedMsg) => {
+    // tại onclick next này thì chỉ muốn: 
+    //   + chạy các script của message được click next thôi
+    //   + set data vào trong sessionStorage
+    //   + fukushashiki sang trang LP
+    //   + gửi log message lên server
+    //   + validate data
+    // Việc update state, update render message và các giá trị trong state thì sẽ chạy ở trong reducer
 
-    const messageSubmitType = convertType[submit_type];
-    
-    if (!messageSubmitType) return;
+    setStateToSessionStorage(state);
 
-    createScenarioUserResponseMessageHistory({
-      ...data,
-      msgs: [{ id: message.id, type: messageSubmitType }],
-    });
-
-    return dataLog;
-  }
-
-  const onClickNext = async (indexMessage, message) => {
-    if (state.isProcessing) {
-      dispatch({ type: PREVIEW_ACTIONS.SET_PROCESSING, payload: false });
-      state.isProcessing = false;
-    }
-    let newState = _.omit(state, ['submitErrorMessage', 'lpOptionData']);
-    let clickedMsgIndex = newState.messagesList.findIndex((msg) => msg?.id === message?.id);
-    if (clickedMsgIndex < 0) clickedMsgIndex = newState.currentMsgIndex;
-    newState.userMessagesList = newState.messagesList.filter((item) => isUserMessage(item));
-    const clickedMsg = newState.messagesList[clickedMsgIndex];
-    clickedMsg.isSubmitted = true;
-
-    newState.errors = {};
-
-    const submitData = {
+    const data = {
       scenario_id: state.scenarioId,
       message: clickedMsg,
       user_id: state.uuid,
       bot_type: "web"
     };
 
-    if (!handleValidateField(indexMessage)) {
-      sendLogMessageToServer({
-        ...submitData,
-        submit_type: CONVERSION_RESPONSE_SUBMIT_TYPE.ERROR,
-      });
+    if (!handleValidateField(clickedMsgIndex)) {
+      // return sendErrorLogToServer(data);
       return;
     }
     
-    const isClickedCreateOrder = newState.messagesList[clickedMsgIndex]?.message_content?.[0]?.type === "button_submit";
-    const isClickedLastMessage = newState.messagesList.length - 1 === clickedMsgIndex;
-    const nextOrCurrentUserMessage = newState.messagesList.findIndex(getNextUserMsg((_, index) => index >= clickedMsgIndex));
-    const isBtnUpdateClick = indexMessage < newState.currentUserMsgIndex || (newState.currentUserMsgIndex === -1 && indexMessage === nextOrCurrentUserMessage);
-
-    const dataLog = sendLogMessageToServer({
-      ...submitData,
-      submit_type: isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD,
-    });
-
-    if (isClickedCreateOrder) {
-      await handleLastUserMessage(newState, submitData, { isProcessing: true });
-      setStateToSessionStorage(newState);
-      return processClickCreateOrder(submitData, dataLog);
-    }
-
-    if (isClickedLastMessage) {
-      newState.messagesList[clickedMsgIndex].disabled = false;
-
-      await handleLastUserMessage(newState, submitData, { isProcessing: true });
-      return dispatch({
-        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-        payload: newState
-      });
-    }
-
-    newState.messagesList[clickedMsgIndex].isSubmitted = true;
-    fukushashikiToLP(convertToFukushashikiObject(submitData));
-
     if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
-      postMessageForExecuteJs(clickedMsg.jscode);
+      executeLpJsCode(clickedMsg.jscode, state);
     }
 
-    if (isDislayingLoginForm(clickedMsg)) {
-      // For GINZA AIRA,
-      setStateToSessionStorage(newState);
-      return;
-    }
+    // For GINZA AIRA
+    if (isDislayingLoginForm(clickedMsg)) return;
 
-    if (isLoggedIn) {
-      newState.messagesList.forEach(x => x.hidden = x.not_display_when_logged_in);
-    }
+    fukushashikiToLP(convertToFukushashikiObject(data, []), state);
 
-    // Update next messages list after clicked next
-    const nextMessage = newState.messagesList[clickedMsgIndex + 1];
-    const conditionParams = buildConditionParams(newState);
-    for (let i = 0; i < newState.messagesList.length; i++) {
-      if (newState.messagesList[i].conditions?.length > 0) {
-        const result = checkMessageCondition(newState.messagesList[i], conditionParams);
-        if (!result && isUserMessage(newState.messagesList[i])) {
-          newState.messagesList[i].hidden = true;
-          continue;
-        }
-
-        // if (newState.messagesList[i].not_display_when_have_error) {
-        //   newState.messagesList[i].hidden = newState.submitErrorMessage.length > 0;
-        // }
-      }
-    }
-    if (isUserMessage(nextMessage) || isBotMessage(nextMessage)) {
-      const conditionParams = buildConditionParams(newState);
-      for (let i = clickedMsgIndex + 1; i < newState.messagesList.length; i++) {
-        if (newState.messagesList[i].conditions && newState.messagesList[i].conditions.length !== 0) {
-          const result = checkMessageCondition(newState.messagesList[i], conditionParams);
-          newState.messagesList[i].hidden = !result;
-        }
-        if (newState.messagesList[i].hidden && !stringNullOrEmpty(newState.messagesList[i].hidden)) continue;
-
-        if (isBotMessage(newState.messagesList[i])) {
-          newState = {
-            ...newState,
-            ...processForBotMessage(newState.messagesList, i, newState, false, false)
-          };
-        } else if (isUserMessage(newState.messagesList[i])) {
-          newState = {
-            ...newState,
-            ...processForUserMessage(newState.messagesList, i, newState, false)
-          };
-        }
-      }
-    }
-
-    computeMessageIndices(newState, clickedMsgIndex)
-
-    if (
-      newState.currentUserMsgIndex === -1 &&
-      newState.conversionStatus === CONVERSTION_RESPONSE_STATUS.UN_FINISH
-    ) {
-      await handleLastUserMessage(newState, submitData);
-    }
-
-    if (newState.currentUserMsgIndex === -1)
-      newState.currentMsgIndex = newState.messagesList.length - 1;
-    else
-      newState.currentMsgIndex = newState.isUsedPastMessageLoaded ? newState.lastMsgIndex : newState.currentUserMsgIndex;
-
-    await handleRenderMessageAfterClickNext(newState, clickedMsgIndex, isBtnUpdateClick);
+    dispatch({
+      type: PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON,
+      payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn }
+    });
   };
 
   const onChangeValue = (
@@ -4083,7 +3172,7 @@ const PreviewFukushashiki = () => {
         botInfor={state.botInfor}
         checkoutUrl={state.checkoutUrl}
         previewOrderContent={state.previewOrderContent}
-        postMessageForExecuteJs={postMessageForExecuteJs}
+        executeLpJsCode={executeLpJsCode}
       />
     ));
   };
@@ -4107,7 +3196,6 @@ const PreviewFukushashiki = () => {
           disabled={state.submitErrorMessage.length > 0 ? false : message.disabled}
           style={{
             backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
-            borderRadius: "25px",
           }}
           className="ss-user-message__action-btn"
           onClick={() => {
@@ -4130,7 +3218,8 @@ const PreviewFukushashiki = () => {
       <div className="sp-body-user-side slideLeft" id={getElementMessageById(message.id)}>
         <div className="sp-body-user-side-messages">
           <UserMessage
-            postMessageToParent={postMessageToParent}
+            postMessageToParent={(options) => postMessageToParent(options, state)}
+            message={message}
             captcha={state.captcha}
             messageContentProps={message.message_content}
             disabled={(state.submitErrorMessage.length > 0 && state.submitErrorMessage !== GETTING_ERROR_NOTIFICATION) ? false : message.disabled}
@@ -4181,7 +3270,7 @@ const PreviewFukushashiki = () => {
   };
 
   const renderMessages = () => {
-    return state.renderMessagesList.map((message, indexMessage) => {
+    return (state.renderMessagesList || []).map((message, indexMessage) => {
       if (message.hidden && !stringNullOrEmpty(message.hidden)) return null;
       return (
         <React.Fragment key={indexMessage}>
@@ -4336,6 +3425,8 @@ const PreviewFukushashiki = () => {
     }
     return state.botInfor?.closing_bot_icon?.url || state.botInfor?.icon?.url;
   }
+
+  console.log("state.renderMessagesList", state.renderMessagesList);
 
   // body container
   if (state.scenarioId && state.botInfor && state.isOpen) {
@@ -4629,7 +3720,7 @@ const PreviewFukushashiki = () => {
       </div>)
   }
 
-  return (<div></div>);
+  return (<div>LOLOLOL</div>);
 }
 
 export default PreviewFukushashiki;

@@ -578,6 +578,19 @@ const isButtonSubmitMessage = (message) => {
   return message.message_content[0]?.type === "button_submit";
 }
 
+const getNextUserMsg = (ext = null) => (item, index) => {
+  const firstMsgContent = item?.message_content?.at(0);
+  const isDisplayBtnNext = (item?.message_content?.length === 1 && firstMsgContent?.type != "image") || firstMsgContent?.image?.displayButtonNext != false;
+
+  const conds = !item.hidden && isUserMessage(item) && isDisplayBtnNext;
+
+  if (ext && typeof ext === "function") {
+    return conds && ext(item, index);
+  }
+
+  return conds;
+}
+
 export const getElementMessageById = (id) => {
   if (!id) return;
   
@@ -612,5 +625,5 @@ export {
   patchWithDrawalPreview, sendScenarioUserResponse, createStatusConversion, updateStatusConversion, parseQuantity,
   createScenarioUserResponseMessageHistory, userEntryScenario, isAndroid, isButtonSubmitMessage,
   sendErrorLogToServer, sendLogMessageToServer,
-  moveToNext,
+  moveToNext, getNextUserMsg,
 };
