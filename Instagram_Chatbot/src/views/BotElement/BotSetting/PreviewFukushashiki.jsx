@@ -3238,9 +3238,6 @@ const PreviewFukushashiki = () => {
             }
             indexMessage={indexMessage}
             errorsProps={state.errors}
-            displayButtonNext={(value) => {
-              // TODO: Remove displayButtonNext from here
-            }}
             prefecturesList={[...state.prefecturesList]}
             onOpen={(isOpen, indexContent) => {
               onOpenZipCodePopup(isOpen, indexContent, Math.min(state.currentMsgIndex, indexMessage));

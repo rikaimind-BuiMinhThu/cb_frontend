@@ -57,7 +57,6 @@ const UserMessage = ({
   indexMessage,
   captcha,
   onClickNext,
-  displayButtonNext,
   onOpen,
   onChangeErrors,
   prefecturesList,
@@ -468,18 +467,10 @@ const UserMessage = ({
   return (
     <div className="ss-user-message__content-wrapper">
       {messageContent?.map((content, indexContent) => {
-        let calendar = content.calendar;
-        let agreeTerm = content.agree_term;
         let carousel = content.carousel;
-        let creditCardPayment = content.credit_card_payment;
         let capture = content.capture;
         let productPurchase = content.product_purchase;
         let productPurchaseRadioButton = content.product_purchase_radio_button;
-        let productPurchaseSelectOption = content.product_purchase_select_option;
-        let slider = content.slider;
-        let cardPaymentRadioButton = content.card_payment_radio_button;
-        let shippingAddress = content.shipping_address;
-        let labelNoTransition = content.label_no_transition;
 
         if (content.type == 'textarea' && content.textarea && content.textarea.invalid_input && content.textarea.invalid_input.content) {
           content.textarea.invalid_input.content = replaceVariable(content.textarea.invalid_input.content);
