@@ -173,6 +173,8 @@ const MESSAGE_CONTENT_TYPES = {
   AGREE_TERM: 'agree_term',
   CREDIT_CARD_PAYMENT: 'credit_card_payment',
   CARD_PAYMENT_RADIO_BUTTON: 'card_payment_radio_button',
+  SUBMIT_BUTTON: 'button_submit',
+  LABEL_NO_TRANSITION: 'label_no_transition',
 };
 
 const LABELS = {

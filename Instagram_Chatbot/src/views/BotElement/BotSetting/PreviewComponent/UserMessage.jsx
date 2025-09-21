@@ -447,6 +447,19 @@ const UserMessage = ({
           errors={errors}
           disabled={disabled}
         />;
+      case MESSAGE_CONTENT_TYPES.SUBMIT_BUTTON:
+        return <SubmitButton
+          content={content}
+          submitErrorMessage={submitErrorMessage}
+          onClickNext={onClickNext}
+          isProcessing={isProcessing}
+        />;
+      case MESSAGE_CONTENT_TYPES.LABEL_NO_TRANSITION:
+        return (
+          <div className="m-b-10">
+            {content.label_no_transition.value}
+          </div>
+        );
       default:
         return null;
     }
@@ -1879,20 +1892,6 @@ const UserMessage = ({
                       </div>
                     )}
                 </div>
-              </div>
-            )}
-            {/* user: type = 'button_submit' */}
-            <SubmitButton
-              display={content.type === 'button_submit'}
-              content={content}
-              submitErrorMessage={submitErrorMessage}
-              onClickNext={onClickNext}
-              isProcessing={isProcessing}
-            /> 
-            {/* type == 'label_no_transition' */}
-            {content.type === "label_no_transition" && (
-              <div style={{ marginBottom: "10px" }}>
-                {labelNoTransition.value}
               </div>
             )}
           </React.Fragment>
