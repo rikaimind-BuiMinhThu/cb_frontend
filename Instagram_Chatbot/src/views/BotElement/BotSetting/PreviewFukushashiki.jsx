@@ -901,24 +901,6 @@ const PreviewFukushashiki = () => {
       customCssContent: chatbot?.custom_css_content,
     };
 
-    // if (newState.isUsedErrMsgByJs && newState.errMsgJsCode) {
-    //   executeLpJsCode(newState.errMsgJsCode, state);
-    // }
-
-    // if (res.data?.chatbot?.is_used_custom_css && res.data?.chatbot?.custom_css_content.length > 0) {
-    //   const style = document.createElement('style');
-    //   style.innerHTML = res.data.chatbot.custom_css_content;
-    //   document.head.appendChild(style);
-    // }
-
-    // if (res.data?.chatbot?.is_used_custom_js_code) {
-    //   injectCustomJsCode(hasSentCustomJs, state, {
-    //     head: { jsCode: res.data?.chatbot?.head_custom_js_code, position: CUSTOM_JS_CODE_POSITION.HEAD },
-    //     top_body: { jsCode: res.data?.chatbot?.top_body_custom_js_code, position: CUSTOM_JS_CODE_POSITION.TOP_BODY },
-    //     bottom_body: { jsCode: res.data?.chatbot?.bottom_body_custom_js_code, position: CUSTOM_JS_CODE_POSITION.BOTTOM_BODY },
-    //   });
-    // }
-
     if (chatbot?.timer_config?.enable) {
       const timerConfig = chatbot.timer_config;
       setTimerChanges({ timeLeft: calculateTimerConfigDuration(timerConfig.type, timerConfig.duration), config: timerConfig });
@@ -949,70 +931,6 @@ const PreviewFukushashiki = () => {
         isLoggedIn: isLoggedIn,
       },
     });
-
-    // if (res.data.variables) {
-    //   newState.variables = [
-    //     ...res.data.variables,
-    //     ...res.data.all_variables,
-    //   ];
-
-    //   newState.variables.forEach((item) => {
-    //     newState.objParam[item.variable_name] = item.default_value;
-    //   });
-    // }
-
-    // if (isLoggedIn) {
-    //   newState.messagesList.forEach((x) => x.hidden = x.not_display_when_logged_in);
-    // }
-    
-    // newState.variablesList = res.data?.all_variables || [];
-    // newState.urlThanksPage = res.data.data?.conversation?.urlThanksPage || "";
-    // newState.urlCartConfirmPage = res.data.data?.conversation?.urlCartConfirmPage || "";
-    // newState.isUsedCartConfirmPage = res.data.data?.conversation?.isUsedCartConfirmPage || false;
-
-    
-    
-    // newState.userMessagesList = newState.messagesList.filter((item) => isUserMessage(item));
-    // for (let i = 0; i < newState.messagesList.length; i++) {
-    //   if (newState.messagesList[i].conditions?.length > 0) {
-    //     const result = checkMessageCondition(newState.messagesList[i], buildConditionParams(newState));
-
-    //     if (!result && isUserMessage(newState.messagesList[i])) {
-    //       newState.currentUserMsgIndex++;
-    //       continue;
-    //     }
-    //   }
-    //   if (isBotMessage(newState.messagesList[i])) {
-    //     newState = {
-    //       ...newState,
-    //       ...(await processForBotMessage(newState.messagesList, i, newState, true))
-    //     };
-    //   } else if (isUserMessage(newState.messagesList[i])) {
-    //     newState = {
-    //       ...newState,
-    //       ...processForUserMessage(newState.messagesList, i, newState)
-    //     };
-    //   }
-    // }
-
-    // newState.currentUserMsgIndex = newState.messagesList.findIndex(getNextUserMsg());
-
-    // // For the first time, we need to render to the first user message
-    // if (newState.currentUserMsgIndex >= 0) {
-    //   newState.currentMsgIndex = newState.currentUserMsgIndex;
-    // }
-
-    // newState.renderMessagesList = newState.renderMessagesList.map((msg) => {
-    //   return isDelayBotMessage(msg) ? {...msg, hidden: true} : msg;
-    // });
-
-    // if (newState.isOpen) {
-    //   return renderMessagesWithDelay(newState, 0, newState.currentMsgIndex);
-    // } else {
-    //   newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
-    //   newState.passedUserMsgCount = newState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
-    //   dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
-    // }
   }
 
   const getTimerSessionStorage = () => {
