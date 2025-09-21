@@ -171,6 +171,7 @@ const MESSAGE_CONTENT_TYPES = {
   ATTACHMENT: 'attaching_file',
   CALENDAR: 'calendar',
   AGREE_TERM: 'agree_term',
+  CREDIT_CARD_PAYMENT: 'credit_card_payment',
 };
 
 const LABELS = {

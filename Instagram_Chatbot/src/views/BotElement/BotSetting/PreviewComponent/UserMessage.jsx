@@ -43,6 +43,7 @@ import ShippingAddress from "./UserMessageComponent/ShippingAddress";
 import ProductPurchaseSelectOption from "./UserMessageComponent/ProductPurchaseSelectOption";
 import Calendar from "./UserMessageComponent/Calendar";
 import AgreeTerm from "./UserMessageComponent/AgreeTerm";
+import CreditCardPayment from "./UserMessageComponent/CreditCardPayment";
 import { isUserMessage, moveToNext } from "./Utils";
 
 const UserMessage = ({
@@ -78,12 +79,7 @@ const UserMessage = ({
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [messageNoti, setMessageNoti] = useState("");
 
-  const cardExpiredYearOptions =  Array.from({ length: 10 }, (_, i) => {
-    return {
-      key: moment().add(i, "years").format("YY"),
-      value: moment().add(i, "years").format("YY"),
-    };
-  });
+  
 
   function loadCaptcha(indexContent) {
     if (
@@ -480,6 +476,15 @@ const UserMessage = ({
           errors={errors}
           disabled={disabled}
         />;
+      case MESSAGE_CONTENT_TYPES.CREDIT_CARD_PAYMENT:
+        return <CreditCardPayment
+          content={content}
+          indexMessage={indexMessage}
+          indexContent={indexContent}
+          onChangeValue={onChangeValue}
+          errors={errors}
+          disabled={disabled}
+        />;
       default:
         return null;
     }
@@ -629,321 +634,7 @@ const UserMessage = ({
                   )}
               </div>
             )}
-            {/* type == 'credit_card_payment' */}
-            {content.type === "credit_card_payment" && (
-              <div style={{ marginBottom: "10px" }}>
-                {(creditCardPayment.title_require ||
-                  creditCardPayment.require) && (
-                    <div
-                      className="ss-message__content--user-pull_down-top"
-                      style={{ marginBottom: "0px" }}
-                    >
-                      {creditCardPayment.title_require && (
-                        <span className="ss-message__content--user-pull_down-title">
-                          {creditCardPayment.title}
-                        </span>
-                      )}
-                      {creditCardPayment.require && (
-                        <span className="ss-message__content--user-text-input-required">
-                          ※必須
-                        </span>
-                      )}
-                    </div>
-                  )}
-                {creditCardPayment.payment_method.length > 0 && (
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "flex-start",
-                      margin: "5px 0px",
-                    }}
-                  >
-                    {creditCardPayment.payment_method.map(
-                      (itemPayment, index) => {
-                        return (
-                          <div
-                            key={index}
-                            style={{ width: `${15.6667}%`, marginRight: "1%" }}
-                            className="ss-img-list-bank"
-                          >
-                            {
-                              dataPaymentMethod.find(
-                                (item) => item.key === itemPayment
-                              ).value
-                            }
-                          </div>
-                        );
-                      }
-                    )}
-                  </div>
-                )}
-                {creditCardPayment.separate_type === false ? (
-                  <div className="ss-user-setting__item-bottom">
-                    <InputCustom
-                      styleLabel={{ width: "100%" }}
-                      id="sp_credit_card_payment"
-                      label="カード番号"
-                      type="number"
-                      onKeyPress={(e) => {
-                        if (e.target.value.length >= 16) e.preventDefault();
-                      }}
-                      disabled={disabled}
-                      onPaste={(e) => {
-                        // Get the pasted value and remove all white space
-                        const value = e.clipboardData
-                          .getData("text")
-                          .replace(/[^0-9]/g, "")
-                          .slice(0, 16);
-                        setTimeout(() => {
-                          document.getElementById(
-                            "sp_credit_card_payment"
-                          ).value = value;
-                          onChangeValue(
-                            indexContent,
-                            content.type,
-                            value,
-                            "card_number"
-                          );
-                        }, 10);
-                        // Set the value of the input to the pasted value
-                        // return value;
-                      }}
-                      // max={9999999999999999}
-                      style={{ width: "100%", marginLeft: "0px" }}
-                      value={creditCardPayment.card_number}
-                      placeholder={creditCardPayment.card_number_placeholder}
-                      onChange={(value) =>
-                        onChangeValue(
-                          indexContent,
-                          content.type,
-                          value,
-                          "card_number"
-                        )
-                      }
-                    />
-                  </div>
-                ) : (
-                  <div className="ss-user-setting__item-bottom">
-                    <div style={{ width: "100%" }}>カード番号</div>
-                    <div
-                      className="ss-user-setting__item-select-bottom-wrapper-flex ss-user-setting-card-number-separate-type"
-                      style={{ width: "100%" }}
-                    >
-                      <InputNum
-                        max={9999}
-                        controls={false}
-                        style={{ marginLeft: "0px" }}
-                        disabled={disabled}
-                        maxLength={4}
-                        className="ss-user-setting-input-limit-character"
-                        value={creditCardPayment.card_number1}
-                        placeholder={creditCardPayment.card_number_placeholder1}
-                        onChange={(value) => {
-                          onChangeValue(
-                            indexContent,
-                            content.type,
-                            value,
-                            "card_number1"
-                          );
-                          if ((value + "").length === 4) {
-                            moveToNext("ss-user-card-number-radio-input2");
-                          }
-                        }}
-                      />
-                      <InputNum
-                        max={9999}
-                        id="ss-user-card-number-radio-input2"
-                        controls={false}
-                        style={{ marginLeft: "7px" }}
-                        disabled={disabled}
-                        maxLength={4}
-                        className="ss-user-setting-input-limit-character"
-                        value={creditCardPayment.card_number2}
-                        placeholder={creditCardPayment.card_number_placeholder2}
-                        onChange={(value) => {
-                          onChangeValue(
-                            indexContent,
-                            content.type,
-                            value,
-                            "card_number2"
-                          );
-                          if ((value + "").length === 4) {
-                            moveToNext("ss-user-card-number-radio-input3");
-                          }
-                        }}
-                      />
-                      <InputNum
-                        id="ss-user-card-number-radio-input3"
-                        max={9999}
-                        controls={false}
-                        style={{ marginLeft: "7px" }}
-                        disabled={disabled}
-                        maxLength={4}
-                        className="ss-user-setting-input-limit-character"
-                        value={creditCardPayment.card_number3}
-                        placeholder={creditCardPayment.card_number_placeholder3}
-                        onChange={(value) => {
-                          onChangeValue(
-                            indexContent,
-                            content.type,
-                            value,
-                            "card_number3"
-                          );
-                          if ((value + "").length === 4) {
-                            moveToNext("ss-user-card-number-radio-input4");
-                          }
-                        }}
-                      />
-                      <InputNum
-                        id="ss-user-card-number-radio-input4"
-                        max={9999}
-                        controls={false}
-                        style={{ marginLeft: "7px" }}
-                        disabled={disabled}
-                        maxLength={4}
-                        className="ss-user-setting-input-limit-character"
-                        value={creditCardPayment.card_number4}
-                        placeholder={creditCardPayment.card_number_placeholder4}
-                        onChange={(value) =>
-                          onChangeValue(
-                            indexContent,
-                            content.type,
-                            value,
-                            "card_number4"
-                          )
-                        }
-                      />
-                    </div>
-                  </div>
-                )}
-                {creditCardPayment.is_hide_card_name !== true && (
-                  <div className="ss-user-setting__item-bottom">
-                    <InputCustom
-                      styleLabel={{ width: "100%" }}
-                      label="カード名義"
-                      inline={false}
-                      disabled={disabled}
-                      value={creditCardPayment.card_holder}
-                      placeholder={creditCardPayment.card_holder_placeholder}
-                      onChange={(value) =>
-                        onChangeValue(
-                          indexContent,
-                          content.type,
-                          value,
-                          "card_holder"
-                        )
-                      }
-                    />
-                  </div>
-                )}
-                <div className="ss-user-setting__item-bottom">
-                  <div style={{ width: "100%" }}>有効期限</div>
-                  {creditCardPayment.type_date_of_expiry === "ym" && (
-                    <div style={{ display: "flex", width: "100%" }}>
-                      <SelectCustom
-                        style={{ width: "33%" }}
-                        value={creditCardPayment.year}
-                        disabled={disabled}
-                        placeholder={creditCardPayment.year_placeholder}
-                        data={cardExpiredYearOptions}
-                        onChange={(value) =>
-                          onChangeValue(
-                            indexContent,
-                            content.type,
-                            value,
-                            "year"
-                          )
-                        }
-                      />
-                      <SelectCustom
-                        style={{ width: "33%", marginLeft: "10px" }}
-                        value={creditCardPayment.month}
-                        placeholder={creditCardPayment.month_placeholder}
-                        data={dataMonth}
-                        disabled={disabled}
-                        onChange={(value) =>
-                          onChangeValue(
-                            indexContent,
-                            content.type,
-                            value,
-                            "month"
-                          )
-                        }
-                      />
-                    </div>
-                  )}
-                  {creditCardPayment.type_date_of_expiry === "my" && (
-                    <div style={{ display: "flex", width: "100%" }}>
-                      <SelectCustom
-                        style={{ width: "33%" }}
-                        value={creditCardPayment.month}
-                        placeholder={creditCardPayment.month_placeholder}
-                        data={dataMonth}
-                        disabled={disabled}
-                        onChange={(value) =>
-                          onChangeValue(
-                            indexContent,
-                            content.type,
-                            value,
-                            "month"
-                          )
-                        }
-                      />
-                      <SelectCustom
-                        style={{ width: "33%", marginLeft: "10px" }}
-                        value={creditCardPayment.year}
-                        disabled={disabled}
-                        placeholder={creditCardPayment.year_placeholder}
-                        data={cardExpiredYearOptions}
-                        onChange={(value) =>
-                          onChangeValue(
-                            indexContent,
-                            content.type,
-                            value,
-                            "year"
-                          )
-                        }
-                      />
-                    </div>
-                  )}
-                </div>
-                {creditCardPayment.is_hide_cvc !== true && (
-                  <div
-                    className="ss-user-setting__item-bottom"
-                    style={{ display: "block" }}
-                  >
-                    <InputCustom
-                      className="ss-user-setting-input-limit-character"
-                      disabled={disabled}
-                      style={{ marginLeft: "0px", width: "33%" }}
-                      value={creditCardPayment.cvc}
-                      onChange={(value) => {
-                        if (/^[0-9]{0,4}$/.test(value)) {
-                          onChangeValue(indexContent, content.type, value, "cvc")
-                        }
-                      }}
-                      label={
-                        <span style={{ fontWeight: "400" }}>
-                          CVC <img style={{ width: "8%" }} src={cvcIcon} />
-                        </span>
-                      }
-                      placeholder={creditCardPayment.cvc_placeholder}
-                    />
-                  </div>
-                )}
-                {errors?.[
-                  `message${indexMessage}_content${indexContent}_${content.type}`
-                ] && (
-                    <div style={{ color: "#FF7E00", fontSize: "12px" }}>
-                      {
-                        errors?.[
-                        `message${indexMessage}_content${indexContent}_${content.type}`
-                        ]
-                      }
-                    </div>
-                  )}
-              </div>
-            )}
+            
             {/* type == 'capture' */}
             {content.type === "capture" && (
               <div style={{ marginBottom: "10px" }}>
