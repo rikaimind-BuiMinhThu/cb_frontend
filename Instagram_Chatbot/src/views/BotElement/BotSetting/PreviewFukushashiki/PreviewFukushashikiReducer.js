@@ -188,7 +188,7 @@ const PreviewFukushashikiReducer = (state, action) => {
       return { ...state, currentUserMsgIndex: action.payload };
     case PREVIEW_ACTIONS.SET_DELAYING:
       return { ...state, isDelaying: action.payload };
-    case PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO: {
+    case PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SERVER: {
       // This action is used to set the state after retrieve scenario
       const designSetting = action.payload.responseData.design_settings;
       const chatbot = action.payload.responseData.chatbot;
@@ -251,7 +251,29 @@ const PreviewFukushashikiReducer = (state, action) => {
 
       return { ...state, ...newState };
     }
-      
+    case PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SESSION_STORAGE: {
+      const newState = {...action.payload.savedState};
+
+      if (action.payload.isUsingAmazonPay) {
+        // Support only for amazon pay and subscstore cart system (torizen san)
+        const conditionParams = buildConditionParams(newState);
+        for (let i = 0; i < newState.messagesList.length; i++) {
+          const result = checkMessageCondition(newState.messagesList[i], conditionParams);
+          newState.messagesList[i].hidden = !result;
+        }
+      }
+
+      if (action.payload.isLoggedIn) {
+        newState.messagesList.forEach((x) => x.hidden = x.not_display_when_logged_in);
+      }
+
+      newState.nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg()) + 1;
+      newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+      newState.loadedStateFromSession = true;
+      newState.isExtractFromSession = false;
+
+      return { ...state, ...newState };
+    }
   }
 
   return state;
