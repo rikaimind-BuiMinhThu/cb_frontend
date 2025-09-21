@@ -1157,12 +1157,14 @@ slideUp
 }
 
 .p-0 { padding: 0px; }
+.p-8 { padding: 8px; }
 
 .m-b-0 { margin-bottom: 0px; }
 .m-b-5 { margin-bottom: 5px; }
 .m-b-4 { margin-bottom: 4px; }
 .m-b-10 { margin-bottom: 10px; }
 .m-t-4 { margin-top: 4px; }
+.m-t-5 { margin-top: 5px; }
 .w-100-percent { width: 100%; }
 .w-49-percent { width: 49%; }
 .w-32-percent { width: 32%; }
