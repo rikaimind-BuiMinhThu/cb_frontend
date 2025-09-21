@@ -39,8 +39,8 @@ const processBotDelayMessage = async (messagesList, i, newState, options = {}) =
     await sleep(messagesList[i].message_content[0].delay.content * 1000);
   }
 
-  if (newState.currentMsgIndex === newState.messagesList.length - 1)
-    return redirectToCartPage();
+  // if (newState.currentMsgIndex === newState.messagesList.length - 1)
+  //   return redirectToCartPage();
   newState.currentMsgIndex = i;
   newState.messagesList[i].hidden = true;
   return newState;
@@ -121,8 +121,8 @@ const processForBotDefaultMessage = async (messagesList, i, newState, isUpdateSo
   
   scrollToPosition({ position: "b", selector: "#sp-body" });
 
-  if (newState.currentMsgIndex === newState.messagesList.length - 1)
-    return redirectToCartPage();
+  // if (newState.currentMsgIndex === newState.messagesList.length - 1)
+  //   return redirectToCartPage();
 
   return newState;
 }

@@ -883,8 +883,6 @@ const PreviewFukushashiki = () => {
   const extractStateFromPreviewResponse = async (res) => {
     if (!res || !res.data || res.data.code !== 1) return;
 
-    debugger;
-    
     const designSetting = res.data.design_settings;
     let newState = {
       ...state,
@@ -1081,7 +1079,6 @@ const PreviewFukushashiki = () => {
         savedState.isExtractFromSession = true;
         savedState.isDelaying = false;
         savedState.isProcessing = false;
-        debugger;
 
         setConversionParamToLocalStorage(
           savedState.scenarioId,
@@ -1193,8 +1190,6 @@ const PreviewFukushashiki = () => {
       }
     }
 
-    debugger;
-
     if (state.loadedStateFromSession && state.botId)
       return;
 
@@ -1202,8 +1197,6 @@ const PreviewFukushashiki = () => {
       dispatch({ type: PREVIEW_ACTIONS.SET_BOT_ID, payload: params.get("bot_id") });
       return;
     }
-
-    debugger;
 
     if (!state.urlSend) {
       dispatch({ type: PREVIEW_ACTIONS.SET_URL_SEND, payload: window.location.href });
@@ -1224,8 +1217,6 @@ const PreviewFukushashiki = () => {
       dispatch({ type: PREVIEW_ACTIONS.SET_SCENARIO_ID, payload: params.get("scenario_id") });
       return;
     }
-
-    debugger;
 
     return getScenarioPreviewData(state.botId, state.scenarioId)
       .then(extractStateFromPreviewResponse);

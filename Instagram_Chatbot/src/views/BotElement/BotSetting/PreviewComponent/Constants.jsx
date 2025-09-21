@@ -166,6 +166,7 @@ const MESSAGE_CONTENT_TYPES = {
   CHECKBOX: 'checkbox',
   PULL_DOWN: 'pull_down',
   ZIP_CODE_ADDRESS: 'zip_code_address',
+  SHIPPING_ADDRESS: 'shipping_address',
   ATTACHMENT: 'attaching_file',
 };
 
