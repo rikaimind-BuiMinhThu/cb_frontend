@@ -42,6 +42,7 @@ import PullDown from "./UserMessageComponent/PullDown";
 import ZipCodeAddress from "./UserMessageComponent/ZipCodeAddress";
 import Attachment from "./UserMessageComponent/Attachment";
 import ShippingAddress from "./UserMessageComponent/ShippingAddress";
+import ProductPurchaseSelectOption from "./UserMessageComponent/ProductPurchaseSelectOption";
 import { isUserMessage, moveToNext } from "./Utils";
 
 const UserMessage = ({
@@ -615,6 +616,14 @@ const UserMessage = ({
           disabled={disabled}
           onOpen={onOpen}
         />;
+      case MESSAGE_CONTENT_TYPES.PRODUCT_PURCHASE_SELECT_OPTION:
+        return <ProductPurchaseSelectOption
+          content={content}
+          indexMessage={indexMessage}
+          indexContent={indexContent}
+          onChangeValue={onChangeValue}
+          errors={errors}
+        />;
       case MESSAGE_CONTENT_TYPES.ATTACHMENT:
         return <Attachment
           content={content}
@@ -655,60 +664,6 @@ const UserMessage = ({
             { renderContent(content, indexContent) }
 
             {/* type == 'product_purchase_select_option */}
-            {
-              content.type === 'product_purchase_select_option' &&
-              <div style={{ marginBottom: '10px' }}>
-                {(productPurchaseSelectOption.title_require || productPurchaseSelectOption.require) &&
-                  <div className="ss-message__content--user-pull_down-top"
-                    style={{ marginBottom: '0px' }}>
-                    {productPurchaseSelectOption.title_require &&
-                      <span className="ss-message__content--user-pull_down-title">
-                        {productPurchaseSelectOption.title}
-                      </span>
-                    }
-                    {productPurchaseSelectOption.require === true &&
-                      <span className="ss-message__content--user-text-input-required">
-                        ※必須
-                      </span>
-                    }
-                  </div>
-                }
-                <div className="ss-message__content--user-pull_down-wrapper">
-                  {productPurchaseSelectOption.type === 'text_with_thumbnail_image' && (
-                    <>
-                      <div className="ss-message__content--user-pull_down--customization">
-                        <div className="">
-                          <div className="ss-message__content--user-pull_down-col col-12"
-                            style={{ padding: '0' }}>
-                            <SelectCustom
-                              showSearch={false}
-                              data={productPurchaseSelectOption.products}
-                              style={{ width: '100%' }}
-                              placeholder={productPurchaseSelectOption.display_unselected}
-                              keyValue="productVariantId"
-                              nameValue="title"
-                              onChange={(value) => onChangeValue(indexContent, content.type, value, 'value')}
-                              value={productPurchaseSelectOption.value}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
-                {errors?.[
-                  `message${indexMessage}_content${indexContent}_${content.type}`
-                ] && (
-                    <div style={{ color: "#FF7E00", fontSize: "12px" }}>
-                      {
-                        errors?.[
-                        `message${indexMessage}_content${indexContent}_${content.type}`
-                        ]
-                      }
-                    </div>
-                  )}
-              </div>
-            }
             {/* type == 'zip_code_address' */}
             
             {/* type == 'attaching_file' */}

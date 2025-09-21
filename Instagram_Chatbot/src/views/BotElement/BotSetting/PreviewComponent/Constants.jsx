@@ -167,6 +167,7 @@ const MESSAGE_CONTENT_TYPES = {
   PULL_DOWN: 'pull_down',
   ZIP_CODE_ADDRESS: 'zip_code_address',
   SHIPPING_ADDRESS: 'shipping_address',
+  PRODUCT_PURCHASE_SELECT_OPTION: 'product_purchase_select_option',
   ATTACHMENT: 'attaching_file',
 };
 
