@@ -1,12 +1,14 @@
+import { findItem } from '../PreviewComponent/Utils';
+import { MESSAGE_CONTENT_TYPES, SCAN_REGEX } from '../PreviewComponent/Constants';
+
 const getTextInputValue = (subContent, field) => {
   switch (subContent.type) {
-    case "text_input": {
-      const textInput = subContent.text_input;
-
-      if (textInput.isSplitInput) {
-        return `${textInput.valueLeft} ${textInput.valueRight}`;
+    case "text": {
+      const text = subContent.text;
+      if (text.isSplitInput) {
+        return `${text.valueLeft} ${text.valueRight}`;
       } else {
-        return textInput.value;
+        return text.value;
       }
     }
     case "phone_number": {
@@ -21,8 +23,8 @@ const getTextInputValue = (subContent, field) => {
     case "urls":
     case "email_address":
     case "password": {
-      const textInput = subContent.text_input;
-      return textInput.value;
+      const container = subContent[field];
+      return container.value;
     }
     case "email_confirmation": 
     case "password_confirmation": {
@@ -177,10 +179,12 @@ const getCardPaymentRadioButtonValue = (subContent, field, value) => {
 }
 
 const getCarouselDefaultValue = (subContent,value) => {
-  let default_value = subContent[
-    subContent.carousel
-  ].contents.find((item) => item.id === value).title;
-  return default_value;
+  // TODO: Need check to find value
+  return value;
+  // let default_value = subContent[
+  //   subContent.carousel
+  // ].contents.find((item) => item.id === value).title;
+  // return default_value;
 }
 
 const getDefaultValue = (subContent, contentType, value, field, prefecturesList) => {
@@ -212,7 +216,7 @@ const getDefaultValue = (subContent, contentType, value, field, prefecturesList)
     case MESSAGE_CONTENT_TYPES.CREDIT_CARD_PAYMENT:
       throw new Error(`getDefaultValue: ${contentType} is not supported`);
     case MESSAGE_CONTENT_TYPES.CARD_PAYMENT_RADIO_BUTTON:
-      throw new Error(`getDefaultValue: ${contentType} is not supported`);
+      return getCardPaymentRadioButtonValue(subContent, field, value);
     case MESSAGE_CONTENT_TYPES.SUBMIT_BUTTON:
       throw new Error(`getDefaultValue: ${contentType} is not supported`);
     case MESSAGE_CONTENT_TYPES.IMAGE:
@@ -223,3 +227,11 @@ const getDefaultValue = (subContent, contentType, value, field, prefecturesList)
       throw new Error(`getDefaultValue: ${contentType} is not supported`);
   }
 }
+
+const replaceVariables = (contentText, variables) => {
+  return contentText.replaceAll(SCAN_REGEX, (_, variable) => {
+    return variables.find(item => item.variable_name === variable)?.default_value || "";
+  });
+}
+
+export { getDefaultValue, replaceVariables };

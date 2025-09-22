@@ -11,6 +11,7 @@ import { processForUserMessage } from '../PreviewComponent/UserMessageUtils';
 import { isButtonSubmitMessage, isBotMessage, isUserMessage, getNextUserMsg } from '../PreviewComponent/Utils';
 import { mapAmazonPayDataToMessagesList } from '../PreviewComponent/TorizenUtils';
 import { RENDER_CHATBOT_CONFIG, GETTING_ERROR_NOTIFICATION, PREVIEW_ACTIONS, CART_SYSTEM, CONVERSTION_RESPONSE_STATUS } from '../PreviewComponent/Constants.jsx';
+import { getDefaultValue } from '../PreviewComponent/VariablesUtils';
 
 const PreviewFukushashikiReducer = (state, action) => {
   switch (action.type) {
@@ -168,7 +169,7 @@ const PreviewFukushashikiReducer = (state, action) => {
           break;
       }
 
-      handleSaveInputContent(newState, subContent, value);
+      handleSaveInputContent(newState, subContent, contentType, field, value);
 
       return { ...state, ...newState };
     }

@@ -1076,9 +1076,9 @@ const PreviewFukushashiki = () => {
         content={content}
         index={index}
         botInfor={state.botInfor}
-        checkoutUrl={state.checkoutUrl}
         previewOrderContent={state.previewOrderContent}
         executeLpJsCode={(jsCode) => executeLpJsCode(jsCode, state)}
+        variables={state.variables}
       />
     ));
   };

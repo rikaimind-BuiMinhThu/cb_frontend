@@ -6,17 +6,25 @@ import "moment/locale/zh-cn";
 import { BOT_MESSAGE_TYPES, RENDER_CHATBOT_CONFIG } from "./Constants";
 import HtmlCodeMessagePreview from "components/BotMessages/HtmlCodeMessagePreview";
 import { getElementMessageById } from "./Utils";
+import { replaceVariables } from "./VariablesUtils";
 
 const BotMessage = ({
   content,
   index,
   botInfor,
-  checkoutUrl,
   previewOrderContent,
   executeLpJsCode,
-  messageId
+  messageId,
+  variables
 }) => {
   const [isDelaying, setIsDelaying] = useState(true);
+  const [text, setText] = useState("");
+
+  useEffect(() => {
+    if (!content || !content[content.type]?.content || variables.length < 0) return;
+
+    setText(replaceVariables(content[content.type]?.content || "", variables));
+  }, [content, content[content.type]?.content, variables]);
 
   const isShowAvatar = () => {
     if (!content) return false;
@@ -78,64 +86,64 @@ const BotMessage = ({
     previewOrderContent
   ]);
 
-  const formatResult = () => {
-    const cart = JSON.parse(sessionStorage.getItem("cart") || null)
+  // const formatResult = () => {
+  //   const cart = JSON.parse(sessionStorage.getItem("cart") || null)
 
-    const url = cart?.cartCreate?.cart?.checkoutUrl || ""
+  //   const url = cart?.cartCreate?.cart?.checkoutUrl || ""
 
-    const email = cart?.cartCreate?.cart?.buyerIdentity?.email || ""
+  //   const email = cart?.cartCreate?.cart?.buyerIdentity?.email || ""
 
-    const name = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.name || ""
-    const formattedArea = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.formattedArea || ""
-    const address1 = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.address1 || ""
-    const address2 = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.address2 || ""
-    const zip = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.zip || ""
-    const province = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.province || ""
-    const city = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.city || ""
-    const phone = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.phone || ""
+  //   const name = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.name || ""
+  //   const formattedArea = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.formattedArea || ""
+  //   const address1 = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.address1 || ""
+  //   const address2 = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.address2 || ""
+  //   const zip = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.zip || ""
+  //   const province = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.province || ""
+  //   const city = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.city || ""
+  //   const phone = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.phone || ""
 
-    const product = cart?.cartCreate?.cart?.lines?.edges[0]?.node?.merchandise?.product?.title || ""
-    const variant = cart?.cartCreate?.cart?.lines?.edges[0]?.node?.merchandise?.title || ""
+  //   const product = cart?.cartCreate?.cart?.lines?.edges[0]?.node?.merchandise?.product?.title || ""
+  //   const variant = cart?.cartCreate?.cart?.lines?.edges[0]?.node?.merchandise?.title || ""
 
-    const totalQuantity = cart?.cartCreate?.cart?.totalQuantity || ""
+  //   const totalQuantity = cart?.cartCreate?.cart?.totalQuantity || ""
 
-    const totalAmount = cart?.cartCreate?.cart?.cost?.totalAmount?.amount || ""
-    const currencyCode = cart?.cartCreate?.cart?.cost?.totalAmount?.currencyCode || ""
+  //   const totalAmount = cart?.cartCreate?.cart?.cost?.totalAmount?.amount || ""
+  //   const currencyCode = cart?.cartCreate?.cart?.cost?.totalAmount?.currencyCode || ""
 
-    let result = content[content.type]?.content;
+  //   let result = content[content.type]?.content;
 
-    if (content.text_input?.use_for_confirm_message && previewOrderContent) {
-      result = previewOrderContent;
-    }
+  //   if (content.text_input?.use_for_confirm_message && previewOrderContent) {
+  //     result = previewOrderContent;
+  //   }
 
-    result = result?.replace("{checkoutUrl}",
-      `<a href="${url}" target="_blank" style="color: ${botInfor?.font_color}">${url}</a>`)
-    result = result?.replace("{checkoutUrlBtn}",
-      `<a href="${url}" target="_blank" class="sp-user-message-button-action underline-none">
-          <button
-              id="btn-checkout-url"
-              style="background-color: ${botInfor?.main_color || botInfor?.font_color}; 
-                     color: ${botInfor?.main_color ? botInfor?.font_color : botInfor?.main_color_other};
-                     border-radius: 25px;
-                     margin: 5px 0;"
-              class="ss-user-message__action-btn btn btn-secondary"
-          >決済画面へ進む</button>
-        </a>`)
-    result = result?.replace("{email}", email)
-    result = result?.replace("{phone}", phone)
-    result = result?.replace("{name}", name)
-    result = result?.replace("{totalQuantity}", totalQuantity)
-    result = result?.replace("{totalAmount}", Number(totalAmount.toString()) + currencyCode.replace('JPY', '円'))
-    result = result?.replace("{product}", product + ' - ' + variant)
-    result = result?.replace("{address}", formattedArea + address1 + address2).replace("日本：", "")
-    result = result?.replace("{address1}", address1)
-    result = result?.replace("{address2}", address2)
-    result = result?.replace("{zip}", zip)
-    result = result?.replace("{province}", province)
-    result = result?.replace("{city}", city)
-    result = result?.replace(/\n/g, "<br>");
-    return result;
-  }
+  //   result = result?.replace("{checkoutUrl}",
+  //     `<a href="${url}" target="_blank" style="color: ${botInfor?.font_color}">${url}</a>`)
+  //   result = result?.replace("{checkoutUrlBtn}",
+  //     `<a href="${url}" target="_blank" class="sp-user-message-button-action underline-none">
+  //         <button
+  //             id="btn-checkout-url"
+  //             style="background-color: ${botInfor?.main_color || botInfor?.font_color}; 
+  //                    color: ${botInfor?.main_color ? botInfor?.font_color : botInfor?.main_color_other};
+  //                    border-radius: 25px;
+  //                    margin: 5px 0;"
+  //             class="ss-user-message__action-btn btn btn-secondary"
+  //         >決済画面へ進む</button>
+  //       </a>`)
+  //   result = result?.replace("{email}", email)
+  //   result = result?.replace("{phone}", phone)
+  //   result = result?.replace("{name}", name)
+  //   result = result?.replace("{totalQuantity}", totalQuantity)
+  //   result = result?.replace("{totalAmount}", Number(totalAmount.toString()) + currencyCode.replace('JPY', '円'))
+  //   result = result?.replace("{product}", product + ' - ' + variant)
+  //   result = result?.replace("{address}", formattedArea + address1 + address2).replace("日本：", "")
+  //   result = result?.replace("{address1}", address1)
+  //   result = result?.replace("{address2}", address2)
+  //   result = result?.replace("{zip}", zip)
+  //   result = result?.replace("{province}", province)
+  //   result = result?.replace("{city}", city)
+  //   result = result?.replace(/\n/g, "<br>");
+  //   return content[content.type]?.content;
+  // }
 
   const renderAvatar = () => {
     if (!isShowAvatar()) return null;
@@ -158,9 +166,7 @@ const BotMessage = ({
             backgroundColor: botInfor?.message_color,
             color: botInfor?.font_color,
           }}
-          dangerouslySetInnerHTML={{
-            __html: formatResult()
-          }}
+          dangerouslySetInnerHTML={{__html: text}}
         >
         </div>
         <div
