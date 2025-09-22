@@ -133,7 +133,7 @@ export default function CardPaymentRadioButton({ content, indexMessage, indexCon
                     <Radio
                       value={`${itemPaymentImg.id}-${itemPaymentContent.id}`}
                       key={indexPaymentContent}
-                      style={{ marginRight: "0px" }}
+                      className="m-r-0"
                       onChange={() => {
                         const value = cardPaymentRadioButton.initial_selection_picture !== `${itemPaymentImg.id}-${itemPaymentContent.id}` ? `${itemPaymentImg.id}-${itemPaymentContent.id}` : "";
                         const isDisplayCardPayment = cardPaymentRadioButton.card_linked_setting_picture === value;
@@ -167,7 +167,7 @@ export default function CardPaymentRadioButton({ content, indexMessage, indexCon
     });
   };
 
-  const onRadioChange = () => {
+  const onRadioChange = (itemPayment) => {
     const value = cardPaymentRadioButton.initial_selection !== itemPayment.value ? itemPayment.value : "";
     const isDisplayCardPayment = cardPaymentRadioButton.card_linked_setting.includes(value);
 

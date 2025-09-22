@@ -152,3 +152,5 @@ export const handleValidateField = (message, messageIndex) => {
     errors: isValid ? {} : errorsMess
   };
 };
+
+export { stringNullOrEmpty };

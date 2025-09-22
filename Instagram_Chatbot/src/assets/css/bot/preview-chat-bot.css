@@ -555,6 +555,7 @@
     width: fit-content !important;
     max-width: 100%;
     overflow-y: unset;
+    height: auto;
 }
 
 .sp-body-bot-side-messages .ss-bot-chat-detail-content a:hover {
@@ -1198,6 +1199,7 @@ slideUp
 .m-b-10 { margin-bottom: 10px; }
 .m-t-4 { margin-top: 4px; }
 .m-t-5 { margin-top: 5px; }
+.m-r-0 { margin-right: 0px; }
 .m-r-8 { margin-right: 8px; }
 .m-l-8 { margin-left: 8px; }
 

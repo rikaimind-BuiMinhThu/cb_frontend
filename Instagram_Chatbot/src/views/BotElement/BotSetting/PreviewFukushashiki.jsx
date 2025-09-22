@@ -30,7 +30,6 @@ import {
   TIMER_MAP_VARIABLES_FIELD,
   TIMER_TYPES,
   RENDER_CHATBOT_CONFIG,
-  RANGE_TEXT_VALIDATE,
   CART_SYSTEM,
   TIMER_DELAY_RENDER,
   CONVERSTION_RESPONSE_STATUS,
@@ -49,7 +48,6 @@ import {
   sleep,
   stringNullOrEmpty,
   appendParamsToUrl,
-  checkMessageCondition,
   findItem,
   changeElementAttributeById,
   scrollToPosition,
@@ -58,11 +56,9 @@ import {
   createScenarioUserResponseMessageHistory,
   userEntryScenario,
   isDislayingLoginForm,
-  isBotMessage,
   isUserMessage,
   isDelayBotMessage,
   getElementMessageById,
-  buildConditionParams,
   getNextUserMsg,
   sendOpenChatbotCountRequest,
 } from "./PreviewComponent/Utils";
@@ -76,14 +72,12 @@ import {
   executeLpJsCode, injectCustomJsCode, postMessageToParent
 } from "./PreviewFukushashiki/LPUtils";
 import { convertToFukushashikiObject } from "./PreviewFukushashiki/FukushashikiDataConverterUtils";
-import { processForBotMessage } from "./PreviewComponent/BotMessageUtils";
-import { processForUserMessage } from "./PreviewComponent/UserMessageUtils";
+import { handleValidateField } from "./PreviewFukushashiki/ValidationUtils";
 
 sessionStorage.setItem("prevOpenStatus", "0");
 var url = new URL(window.location.href);
 let params = new URLSearchParams(url.search);
 let isLoggedIn = params.get('isLoggedIn') === "true";
-let isLoadedCssContent = false;
 const previewInitialState = {
   isOpen: false,
   urlSend: "",
@@ -667,11 +661,11 @@ const PreviewFukushashiki = () => {
     }
   }
 
-  const setPhoneNumberDefaultValue = (dataContentType, field) => {
+  const setPhoneNumberDefaultValue = () => {
     // TODO: Implement this function
   }
 
-  const setDateSelectDefaultValue = (dataContentType, field) => {
+  const setDateSelectDefaultValue = () => {
     // TODO: Implement this function
   }
 
@@ -1137,16 +1131,6 @@ const PreviewFukushashiki = () => {
     }
   }
 
-  const finishConversion = async ({ scenario_id, user_input_id }, callback) => {
-    return updateStatusConversion({ scenario_id, user_input_id, status: CONVERSTION_RESPONSE_STATUS.FINISH })
-      .then(() => {
-        dispatch({ type: PREVIEW_ACTIONS.SET_CONVERSION_STATUS, payload: CONVERSTION_RESPONSE_STATUS.FINISH });
-
-        if (!!callback) {
-          callback();
-        }
-      });
-  }
 
   const postMessageForGetPreviewOrderContent = async (jsCode, options = {}) => {
     const { isNewProcess = false, stopRender } = options;
@@ -1173,36 +1157,6 @@ const PreviewFukushashiki = () => {
     await sleep(2000);
   }
 
-  const processClickCreateOrder = async (data, res) => {
-    // Process for non-Shopify
-    const content = data?.message?.message_content?.[0];
-    if (params.get('cartSystem') !== 'shopify') {
-      postMessageToParent({
-        action: CHATBOT_ACTIONS.CLICK_BUTTON,
-        id_value: content.button_submit_id
-      }, state);
-
-      redirectToCartPage();
-      return;
-    }
-
-    // Process for Shopify
-    await createOrAddLinesCart(res);
-    sendCreateOrderData(
-      data,
-      (res) => console.log(res)
-    ).then(() => {
-      if (params.get('cartSystem') === 'shopify') return;
-      const conversion = {
-        scenario_data: `${state.deviceReceive}_conversion`,
-      };
-      sendCountRequest(conversion)
-        .then(res => {
-          console.log(res);
-          redirectToCartPage();
-        });
-    });
-  }
 
   const renderMessageInRange = async (startIndex, endIndex, newState, nextUserMsgIndex, options = {}) => { 
     const { 
@@ -1309,8 +1263,6 @@ const PreviewFukushashiki = () => {
   }
 
   useEffect(() => {
-    console.log("state.currentMsgIndex", state.currentMsgIndex);
-    console.log("state.nextStopMsgIndex", state.nextStopMsgIndex);
     if (state.currentMsgIndex === state.nextStopMsgIndex) return;
 
     setTimeout(() => {
@@ -1345,13 +1297,9 @@ const PreviewFukushashiki = () => {
     const validationResult = handleValidateField(clickedMsg, clickedMsgIndex);
     
     if (!validationResult.isValid) {
-      // Dispatch errors to state
       dispatch({
-        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-        payload: {
-          ...state,
-          errors: validationResult.errors
-        }
+        type: PREVIEW_ACTIONS.SET_ERRORS,
+        payload: validationResult.errors
       });
       // return sendErrorLogToServer(data);
       return;
