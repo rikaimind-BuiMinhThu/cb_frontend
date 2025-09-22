@@ -393,8 +393,7 @@ const displayPopup = async () => {
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
       }
-      // for prevent scroll body when open preview chatbot
-      if (e.data.isOpen) {
+      if (e.data.isOpen && mobileCheck()) {
         document.body.style.overflow = 'hidden';
       } else {
         document.body.style.overflow = 'scroll';
