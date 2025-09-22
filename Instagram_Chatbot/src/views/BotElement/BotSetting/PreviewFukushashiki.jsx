@@ -248,12 +248,12 @@ const PreviewFukushashiki = () => {
           bottomMarginPc: result?.bottom_margin_pc ? result?.bottom_margin_pc : 0,
           positionSp: result?.position_sp ? result?.position_sp : "1",
           buttonTypeSp: result?.button_type_sp ? result?.button_type_sp : "1",
-          rightSpTitle: JSON.parse(response.data.data?.design_settings)?.right_position_sp_title,
+          rightSpTitle: result?.right_position_sp_title,
           rightMarginSp: result?.right_margin_sp,
           bottomMarginSp: result?.bottom_margin_sp,
         };
 
-        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
+        dispatch({ type: PREVIEW_ACTIONS.SET_CHATBOT_SETTINGS, payload: newState });
       });
   }, [state.botId, state.loadedStateFromSession, state.displayType]);
 
