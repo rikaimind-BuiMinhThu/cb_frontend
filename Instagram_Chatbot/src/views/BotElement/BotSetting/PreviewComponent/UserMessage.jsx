@@ -1,33 +1,19 @@
 import React, { useEffect, useState } from "react";
 import "../../../../assets/css/bot/preview-chat-bot.css";
 import api from "../../../../api/api-management";
-import Cookies from "js-cookie";
-import { MDBIcon } from "mdbreact";
-import SelectCustom from "../ScenarioSetting/scenarioComon/SelectCustom";
-import LPIntegrationOptionPullDown from "../ScenarioSetting/scenarioComon/LPIntegrationOptionPullDown";
-import CheckboxCustom from "../ScenarioSetting/scenarioComon/CheckboxCustom";
 import InputCustom from "../ScenarioSetting/scenarioComon/InputCustom";
-import { Button } from "reactstrap";
 import ModalNoti from "../../../Popup/ModalNoti";
-import { CHATBOT_ACTIONS, CRAWL_ELEMENT_TYPES, MESSAGE_CONTENT_TYPES, REGEXP, RENDER_CHATBOT_CONFIG, SCAN_REGEX } from "../PreviewComponent/Constants";
+import { CHATBOT_ACTIONS, MESSAGE_CONTENT_TYPES, SCAN_REGEX } from "../PreviewComponent/Constants";
 import {
   Checkbox as AntdCheckbox,
   Radio,
-  Slider,
-  Row,
-  Select,
-  Col
-} from "antd";
+  Slider} from "antd";
 import moment from "moment";
-import cvcIcon from "assets/img/cvc-icon.png";
-import DatePickerCustom from "../ScenarioSetting/scenarioComon/DatePickerCustom";
 import InputNum from "../ScenarioSetting/scenarioComon/InputNum";
 import { tokenExpired } from "api/tokenExpired";
 import { SHORTEN_URL } from "variables/constants";
 import locale from "antd/es/date-picker/locale/ja_JP";
 import "moment/locale/zh-cn";
-import { dataHourFixed, dataMinutes, dataYearFixed, dataMonth, dataDay, dataPaymentMethod, installmentOptions, NUMBER_REGEX } from "./Constants";
-import { stringNullOrEmpty } from "./Utils";
 import SubmitButton from "./UserMessageComponent/SubmitButton";
 import { convertTextJapaneseByApi } from "utils/japaneseConverter";
 import Image from "./UserMessageComponent/Image";
@@ -45,7 +31,7 @@ import Calendar from "./UserMessageComponent/Calendar";
 import AgreeTerm from "./UserMessageComponent/AgreeTerm";
 import CreditCardPayment from "./UserMessageComponent/CreditCardPayment";
 import CardPaymentRadioButton from "./UserMessageComponent/CardPaymentRadioButton";
-import { isUserMessage, moveToNext } from "./Utils";
+import { isUserMessage } from "./Utils";
 
 const UserMessage = ({
   message,

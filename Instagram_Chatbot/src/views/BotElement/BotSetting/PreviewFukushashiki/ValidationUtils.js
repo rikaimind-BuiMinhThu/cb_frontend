@@ -3,6 +3,7 @@ import { MESSAGE_CONTENT_TYPES, PREVIEW_ACTIONS } from '../PreviewComponent/Cons
 import { validateTextInput } from './Validation/TextInputValidator';
 import { validateTextArea } from './Validation/TextAreaValidator';
 import { validateRadioButton } from './Validation/RadioButtonValidator';
+import { validatePullDown } from './Validation/PullDownValidator';
 import { validateCheckbox } from './Validation/CheckboxValidator';
 import { validateZipCodeAddress, validateShippingAddress } from './Validation/ZipCodeAddressValidator';
 import { validateProductPurchaseSelectOption } from './Validation/ProductPurchaseSelectOptionValidator';
@@ -99,8 +100,7 @@ const getValidator = (messageType) => {
     case MESSAGE_CONTENT_TYPES.CHECKBOX:
       return validateCheckbox;
     case MESSAGE_CONTENT_TYPES.PULL_DOWN:
-      // Similar to radio button
-      return validateRadioButton;
+      return validatePullDown;
     case MESSAGE_CONTENT_TYPES.ZIP_CODE_ADDRESS:
       return validateZipCodeAddress;
     case MESSAGE_CONTENT_TYPES.SHIPPING_ADDRESS:

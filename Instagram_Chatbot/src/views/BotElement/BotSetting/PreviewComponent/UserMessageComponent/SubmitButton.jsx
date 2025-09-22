@@ -1,9 +1,7 @@
 import React from "react";
 import "assets/css/bot/preview-chat-bot.css";
 
-export default function SubmitButton({ display = false, content, submitErrorMessage = "", onClickNext, isProcessing = false }) {
-  if (!display) return null;
-
+export default function SubmitButton({ content, submitErrorMessage = "", onClickNext, isProcessing = false }) {
   if (content.type !== 'button_submit') return null;
 
   const buttonSubmit = content.button_submit;
