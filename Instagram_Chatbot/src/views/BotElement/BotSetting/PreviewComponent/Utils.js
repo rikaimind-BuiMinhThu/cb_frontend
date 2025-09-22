@@ -482,12 +482,10 @@ const scrollToPosition = (options = {}) => {
       top = 0;
   }
 
-  if (element) {
-    element.scrollTo({
-      top,
-      behavior: forceScroll ? "auto" : "smooth",
-    });
-  }
+  element.scrollTo({
+    top,
+    behavior: forceScroll ? "auto" : "smooth",
+  });
 }
 
 const removeSpace = (text, trim = true) => {

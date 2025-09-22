@@ -268,6 +268,12 @@ const PreviewFukushashikiReducer = (state, action) => {
 
       return { ...state, ...newState };
     }
+    case PREVIEW_ACTIONS.OPEN_CHATBOT:
+      return { ...state, isOpen: true, showPopupCloseBot: false, isAlreadyOpenFirstTime: true };
+    case PREVIEW_ACTIONS.CLOSE_CHATBOT:
+      return { ...state, isOpen: false, showPopupCloseBot: true };
+    case PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL:
+      return { ...state, showPopupCloseBot: true };
   }
 
   return state;
