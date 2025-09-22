@@ -1203,11 +1203,11 @@ slideUp
 .m-r-8 { margin-right: 8px; }
 .m-l-8 { margin-left: 8px; }
 
-.w-100-percent { width: 100%; }
-.w-49-percent { width: 49%; }
-.w-32-percent { width: 32%; }
-.w-45-percent { width: 45%; }
-.w-8-percent { width: 8%; }
+.w-100-percent { width: 100% !important; }
+.w-49-percent { width: 49% !important; }
+.w-32-percent { width: 32% !important; }
+.w-45-percent { width: 45% !important; }
+.w-8-percent { width: 8% !important; }
 
 .f-weight-400 { font-weight: 400; }
 .f-size-12 { font-size: 12px; }

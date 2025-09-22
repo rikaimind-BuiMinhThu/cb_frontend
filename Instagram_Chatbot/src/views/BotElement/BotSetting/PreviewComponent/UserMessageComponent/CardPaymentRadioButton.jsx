@@ -167,7 +167,8 @@ export default function CardPaymentRadioButton({ content, indexMessage, indexCon
     });
   };
 
-  const onRadioChange = (itemPayment) => {
+  const onRadioChange = (e) => {
+    const itemPayment = e.target;
     const value = cardPaymentRadioButton.initial_selection !== itemPayment.value ? itemPayment.value : "";
     const isDisplayCardPayment = cardPaymentRadioButton.card_linked_setting.includes(value);
 
