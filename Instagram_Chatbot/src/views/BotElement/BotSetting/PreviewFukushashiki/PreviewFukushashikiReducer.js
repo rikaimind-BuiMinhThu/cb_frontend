@@ -8,9 +8,9 @@ import {
 } from '../PreviewComponent/Utils';
 import { processForBotMessage } from '../PreviewComponent/BotMessageUtils';
 import { processForUserMessage } from '../PreviewComponent/UserMessageUtils';
-import { isButtonSubmitMessage, isBotMessage, isUserMessage, getNextUserMsg, scrollToPosition } from '../PreviewComponent/Utils';
+import { isButtonSubmitMessage, isBotMessage, isUserMessage, getNextUserMsg } from '../PreviewComponent/Utils';
 import { mapAmazonPayDataToMessagesList } from '../PreviewComponent/TorizenUtils';
-import { RENDER_CHATBOT_CONFIG, GETTING_ERROR_NOTIFICATION, PREVIEW_ACTIONS, CART_SYSTEM } from '../PreviewComponent/Constants.jsx';
+import { RENDER_CHATBOT_CONFIG, GETTING_ERROR_NOTIFICATION, PREVIEW_ACTIONS, CART_SYSTEM, CONVERSTION_RESPONSE_STATUS } from '../PreviewComponent/Constants.jsx';
 
 const PreviewFukushashikiReducer = (state, action) => {
   console.log("action", action);
@@ -41,36 +41,25 @@ const PreviewFukushashikiReducer = (state, action) => {
     case PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE: {
       let messagesList = _.cloneDeep(state.messagesList);
 
-      if (action.payload === GETTING_ERROR_NOTIFICATION) {
-        return state;
+      if (action.payload === GETTING_ERROR_NOTIFICATION || stringNullOrEmpty(action.payload)) {
+        return {
+          ...state,
+          submitErrorMessage: action.payload,
+          isProcessing: false,
+        };
       }
 
-      if (stringNullOrEmpty(action.payload)) {
-        messagesList = messagesList.map((message, index) => {
-          if (message.message_content.find(content => content.type === 'getting_error_notification' || content.type === 'delay') && index < state.currentMsgIndex) {
-            message.hidden = true;
-          } else if (message.not_display_when_have_error) {
-            const conditionParams = buildConditionParams(state);
-            const result = checkMessageCondition(message, conditionParams);
-            message.hidden = !result;;
-          }
-          return message;
-        });
-      } else {
-        messagesList = messagesList.map((message, index) => {
-          if (!message.hidden) {
-            message.hidden = action.payload && message.not_display_when_have_error;
-          }
-          return message;
-        });
-      }
+      messagesList = messagesList.map((message) => {
+        if (!message.hidden) {
+          message.hidden = message.not_display_when_have_error;
+        }
+        return message;
+      });
 
       const renderMessagesList = messagesList.slice(0, state.currentMsgIndex + 1)
-      const userMessagesList = messagesList.filter(message => message.belong_to === 'user' && message.message_content.length > 0);
       return { ...state,
         messagesList: messagesList,
         renderMessagesList: renderMessagesList,
-        userMessagesList: userMessagesList,
         submitErrorMessage: action.payload,
         isProcessing: false,
       };
@@ -80,7 +69,7 @@ const PreviewFukushashikiReducer = (state, action) => {
       let messagesList = _.cloneDeep(state.messagesList);
 
       if ((action.payload.displayMsg || []).length > 0) {
-        messagesList = messagesList.map((message, index) => {
+        messagesList = messagesList.map((message) => {
           if (action.payload.displayMsg.includes(message.name?.trim())) {
             message.hidden = false;
           }
@@ -88,11 +77,9 @@ const PreviewFukushashikiReducer = (state, action) => {
         });
       }
       const renderMessagesList = messagesList.slice(0, state.currentMsgIndex + 1)
-      const userMessagesList = messagesList.filter(message => message.belong_to === 'user' && message.message_content.length > 0);
       return { ...state,
         messagesList: messagesList,
         renderMessagesList: renderMessagesList,
-        userMessagesList: userMessagesList,
         submitErrorMessage: action.payload.error,
         isProcessing: false,
       };
@@ -146,6 +133,9 @@ const PreviewFukushashikiReducer = (state, action) => {
       newState.userMessagesList = newState.messagesList.filter((item) => isUserMessage(item));
       newState.nextStopMsgIndex = state.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex)) + 1;
       newState.currentMsgIndex = clickedMsgIndex + 1;
+      if (newState.nextStopMsgIndex < newState.currentMsgIndex) {
+        newState.nextStopMsgIndex = newState.currentMsgIndex;
+      }
       newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
 
       return { ...state, ...newState };
@@ -267,7 +257,10 @@ const PreviewFukushashikiReducer = (state, action) => {
         newState.messagesList.forEach((x) => x.hidden = x.not_display_when_logged_in);
       }
 
-      newState.nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg()) + 1;
+      if (newState.nextStopMsgIndex < newState.currentMsgIndex) {
+        newState.nextStopMsgIndex = newState.currentMsgIndex + 1;
+      }
+
       newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
       newState.loadedStateFromSession = true;
       newState.isExtractFromSession = false;

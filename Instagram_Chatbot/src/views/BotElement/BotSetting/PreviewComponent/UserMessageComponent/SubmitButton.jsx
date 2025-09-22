@@ -20,7 +20,7 @@ export default function SubmitButton({ content, submitErrorMessage = "", onClick
     );
   }
 
-  const getButtonSubmitName = (isProcessing) => {
+  const getButtonSubmitName = () => {
     if (!content.button_submit_use_loading_text) return content.button_submit_name;
 
     if (isProcessing && content[content.type]?.loading_config) {
@@ -37,7 +37,7 @@ export default function SubmitButton({ content, submitErrorMessage = "", onClick
     return content.button_submit_name;
   }
 
-  const renderLoadingUnderButton = (isProcessing) => {
+  const renderLoadingUnderButton = () => {
     if (!isProcessing || !content[content.type]?.loading_config) return null;
 
     const { loadingHtml, loadingStyle } = content[content.type].loading_config;
@@ -56,10 +56,10 @@ export default function SubmitButton({ content, submitErrorMessage = "", onClick
       <div className="ss-user-setting__item-text_input-top">
         {buttonSubmit?.style && <style dangerouslySetInnerHTML={{ __html: buttonSubmit.style }} />}
         <button id="chatbot-submit-button" onClick={onClickNext}>
-          {getButtonSubmitName(isProcessing)}
+          {getButtonSubmitName()}
         </button>
       </div>
-      {renderLoadingUnderButton(isProcessing)}
+      {renderLoadingUnderButton()}
     </>
   );
 };

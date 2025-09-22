@@ -257,7 +257,7 @@ const PreviewFukushashiki = () => {
   const eventHandler = async (event) => {
     if (!event.data || !event.data.actionData) return;
     const actionData = event.data.actionData;
-    
+
     switch (event.data.action) {
       case CHATBOT_ACTIONS.CRAWL_DATA:
         let receiveOptionData = {};
@@ -1263,7 +1263,7 @@ const PreviewFukushashiki = () => {
   }
 
   useEffect(() => {
-    if (state.currentMsgIndex === state.nextStopMsgIndex) return;
+    if (state.currentMsgIndex <= state.nextStopMsgIndex) return;
 
     setTimeout(() => {
       dispatch({

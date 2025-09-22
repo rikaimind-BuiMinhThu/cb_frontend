@@ -6,9 +6,8 @@ import {
 
 const validatePullDown = (contentType, messageContents, i, index, errorsMess) => {
   const key = `message${index}_content${i}_${messageContents[i].type}`;
-  const subContent = contentType[contentType.type];
 
-  switch (subContent.type) {
+  switch (contentType.type) {
     case "customization":
       return validateCustomizationType(contentType, key, errorsMess);
     case "time_hm":
