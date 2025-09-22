@@ -13,8 +13,6 @@ import { mapAmazonPayDataToMessagesList } from '../PreviewComponent/TorizenUtils
 import { RENDER_CHATBOT_CONFIG, GETTING_ERROR_NOTIFICATION, PREVIEW_ACTIONS, CART_SYSTEM, CONVERSTION_RESPONSE_STATUS } from '../PreviewComponent/Constants.jsx';
 
 const PreviewFukushashikiReducer = (state, action) => {
-  console.log("action", action);
-  console.log("state.renderMessagesList inside reducer", state.renderMessagesList);
   switch (action.type) {
     case PREVIEW_ACTIONS.UPDATE_MULTI_STATE:
       if (action.payload.removeTempDelay && action.payload.renderMessagesList?.length) {
@@ -237,6 +235,9 @@ const PreviewFukushashikiReducer = (state, action) => {
       }
 
       newState.nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg()) + 1;
+      if (newState.nextStopMsgIndex < newState.currentMsgIndex) {
+        newState.nextStopMsgIndex = newState.currentMsgIndex + 1;
+      }
       newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
 
       return { ...state, ...newState };
