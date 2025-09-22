@@ -7,6 +7,7 @@ import PhoneNumber from "./TextInputComponent/PhoneNumber";
 
 export default function TextInput({ content, disabled, handleOnChangeJpConvertText, indexContent, onChangeValue, errors, indexMessage }) {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.TEXT_INPUT) return null;
+  const errorKey = `message${indexMessage}_content${indexContent}_${content.type}_${content.text_input.type}`;
   const textInput = content.text_input;
 
   const renderTitle = () => {
@@ -158,10 +159,10 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
   };
 
   const renderErrorMessage = () => {
-    if (!errors?.[`message${indexMessage}_content${indexContent}_${content.type}_${textInput.type}`]) return null;
+    if (!errors?.[errorKey]) return null;
     return (
       <div className="validation-error-message">
-        {errors?.[`message${indexMessage}_content${indexContent}_${content.type}_${textInput.type}`]}
+        {errors?.[errorKey]}
       </div>
     );
   };
