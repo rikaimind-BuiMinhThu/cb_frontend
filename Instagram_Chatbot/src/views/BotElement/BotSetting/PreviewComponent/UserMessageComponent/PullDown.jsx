@@ -606,6 +606,10 @@ export default function PullDown({ content, errors, indexContent, indexMessage, 
     );
   };
 
+  const renderConsumeApiResponse = () => {
+    throw new Error("Not implemented");
+  };
+
   const renderErrorMessage = () => {
     if (!errors?.[`message${indexMessage}_content${indexContent}_${content.type}_${pullDown.type}`]) return null;
 
