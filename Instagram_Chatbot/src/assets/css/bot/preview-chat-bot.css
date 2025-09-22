@@ -1221,6 +1221,18 @@ slideUp
   z-index: 1000;
 }
 
+.ss-bot-submit-error-message {
+  background-color: #ffebee;
+  color: #d32f2f;
+  border: 1px solid #f44336;
+}
+
+.ss-bot-getting-error-notification {
+  background-color: #0000FF;
+  color: #FFFFFF;
+  border: 1px solid #8bc34a;
+}
+
 .p-0 { padding: 0px; }
 .p-8 { padding: 8px; }
 

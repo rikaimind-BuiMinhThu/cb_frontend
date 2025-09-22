@@ -1533,26 +1533,12 @@ const PreviewFukushashiki = () => {
   const renderErrorMessages = () => {
     if (!state.isUsedErrMsgByJs || !state.submitErrorMessage) return null;
 
-    let backgroundColor = "#ffebee";
-    let color = "#d32f2f";
-    let text = state.submitErrorMessage;
-    let borderColor = "#f44336";
-    if (state.submitErrorMessage === GETTING_ERROR_NOTIFICATION) {
-      backgroundColor = "#0000FF";
-      color = "#FFFFFF";
-      text = "処理中...";
-      borderColor = "#8bc34a";
-    }
+    const className = state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "ss-bot-getting-error-notification" : "ss-bot-submit-error-message";
+    const text = state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "処理中..." : state.submitErrorMessage;
     return (
       <div className="ss-user-setting__item-text_input-top">
-        <div
-          style={{
-            border: `1px solid ${borderColor}`,
-            backgroundColor: backgroundColor,
-            color: color,
-          }}
-          id="error-message"
-          className="error-message-modal"
+        <div id="error-message"
+          className={`error-message-modal ${className}`}
           dangerouslySetInnerHTML={{ __html: text }}
         />
       </div>
