@@ -3,12 +3,9 @@ import "assets/css/bot/preview-chat-bot.css";
 import api from "api/api-management";
 import Cookies from "js-cookie";
 import { MDBIcon } from "mdbreact";
-import { Button } from "reactstrap";
-import ModalPreviewBot from '../../Popup/ModalPreviewBot';
 import CustomButton from "./CustomButton";
 import { UserMessage, BotMessage } from "./PreviewComponent";
 import PreviewFukushashikiReducer from "./PreviewFukushashiki/PreviewFukushashikiReducer";
-import { Row, Col } from "antd";
 import moment from "moment";
 import $ from "jquery";
 import { EC_CHATBOT_URL } from "variables/constants";
@@ -23,7 +20,6 @@ import iconMessageBlack from "assets/img/icon-mess/icon-message-chat-black.png";
 import iconMessageWhite from "assets/img/icon-mess/icon-message-chat-white.png";
 import {
   CHATBOT_ACTIONS,
-  SESSION_STORAGE_KEY,
   NO_ERROR,
   GETTING_ERROR_NOTIFICATION,
   CUSTOM_JS_CODE_POSITION,
@@ -40,8 +36,6 @@ import {
   getAllUrlParams,
   lightenColor,
   isMobile,
-  sendCountRequest,
-  sendCreateOrderData,
   getPrefectures,
   getScenarioPreviewData,
   getChatBotSetting,
@@ -69,7 +63,7 @@ import {
   getTimerConfig,
   setTimerConfig
 } from "./PreviewComponent/SessionStorageUtils";
-import Withdrawal from "./PreviewComponent/Withdrawal";
+import PreventExitChatbotModal from "./PreviewComponent/PreventExitChatbotModal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
 import ZipCodePopUp from "./PreviewComponent/ZipCodePopUp";
 import _ from "lodash";
@@ -178,22 +172,16 @@ const PreviewFukushashiki = () => {
     dispatch({ type: PREVIEW_ACTIONS.SET_SCENARIO_USER_RESPONSES, payload: scenarioUserResponses });
   };
 
-  const getBotModalStyle = () => {
-    if (isMobile())
-      return {
-        bottom: "0px",
-        right: "0px",
-        width: `${state.widthSp || 100}%`,
-        height: `${state.heightSp || 100}%`,
-      }
-
+  const getBotPositionConfig = () => {
     return {
-      bottom: `${state.bottomMarginPc || 0}px`,
-      right: `${state.rightMarginPc || 30}px`,
-      width: `${state.widthPc || 450}px`,
-      height: `${state.heightPc || 700}px`,
+      widthSp: state.widthSp,
+      heightSp: state.heightSp,
+      widthPc: state.widthPc,
+      heightPc: state.heightPc,
+      bottomMarginPc: state.bottomMarginPc,
+      rightMarginPc: state.rightMarginPc,
     };
-  }
+  };
 
   // get default obj params
   useEffect(() => {
@@ -392,66 +380,6 @@ const PreviewFukushashiki = () => {
     document.head.appendChild(style);
   }, [state.isUsedCustomCss, state.customCssContent]);
 
-  const handleCloseBot = () => {
-    const element = document.getElementById('sp-container1');
-    if (isMobile()) {
-      dispatch({ type: PREVIEW_ACTIONS.CLOSE_BOT });
-    } else {
-      element.classList.remove('slideUp');
-      element.classList.add('slideDown');
-      setTimeout(() => {
-        dispatch({ type: PREVIEW_ACTIONS.CLOSE_BOT });
-      }, 680)
-    }
-  }
-
-  // const startRenderWithDelay = (newState, options = {}) => {
-  //   const { 
-  //     delayTime = RENDER_CHATBOT_CONFIG.DELAY_START_RENDER,
-  //     scrollToBottom = true,
-  //   } = options;
-
-  //   userEntryScenario({
-  //     scenario_id: newState.scenarioId,
-  //     user_id: newState.uuid,
-  //   });
-
-  //   new Promise((resolve) => {
-  //     dispatch({
-  //       type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-  //       payload: { renderMessagesList: [], isDelaying: true },
-  //     });
-
-  //     sleep(delayTime).then(resolve);
-  //   }).then(async () => {
-  //     if (newState.useNewProcess) {
-  //       renderMessageInRange(0, newState.currentMsgIndex, newState, newState.currentUserMsgIndex, { isPassDelay: true, appearFromStart: true })
-  //       .then(() => {
-  //         dispatch({ type: PREVIEW_ACTIONS.SET_DELAYING, payload: false });
-  //       });
-  //     } else {
-  //       const listMsgAppear = newState.renderMessagesList.filter(i => isUserMessage(i) && !i.hidden).map(i => ({ id: i.id, type: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.APPEAR }));
-
-  //       if (listMsgAppear.length) {
-  //         createScenarioUserResponseMessageHistory({
-  //           scenario_id: newState.scenarioId,
-  //           user_id: newState.uuid,
-  //           msgs: listMsgAppear,
-  //         });
-  //       }
-  //       dispatch({
-  //         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-  //         payload: { renderMessagesList: newState.renderMessagesList, isDelaying: false },
-  //       });
-  //     }
-
-  //     if (scrollToBottom) {
-  //       await sleep(RENDER_CHATBOT_CONFIG.DELAY_BEFORE_SCROLL_TO_BOTTOM);
-  //       scrollToPosition({ position: "b", selector: "#sp-body" });
-  //     }
-  //   });
-  // }
-
   const onOpenPreview = (opening) => {
     const deviceReceive = state.deviceReceive || params.get("deviceReceive");
     if (!deviceReceive) return;
@@ -487,18 +415,27 @@ const PreviewFukushashiki = () => {
       });
     }
 
-    dispatch({ type: PREVIEW_ACTIONS.OPEN_CHATBOT });
+    if (opening) {
+      sendOpenChatbotCountRequest(state.scenarioId, deviceReceive).then(() => {
+        dispatch({ type: PREVIEW_ACTIONS.OPEN_CHATBOT });
+      });
+    } else {
+      sendCloseChatbotCountRequest(state.scenarioId, deviceReceive).then(() => {
+        dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
+      });
+    }
   }
 
-  const handleCloseChatbotWhenUseWithDrawal = () => {
-    if (!state.isOpen) return; 
-    onOpenPreview(false) 
-    const enabledStatus = new Set(["standard_exit_popup", "image_popup"])
-    const isWithDrawalEnabled = state.botInfor && enabledStatus.has(state.botInfor.withdrawal_prevention_status)
-    if (isWithDrawalEnabled) {
-      handleOpenWithDrawal();
-      return ;
-    }
+  const onChatbotHeaderClick = () => {
+    if (!state.isOpen) return dispatch({ type: PREVIEW_ACTIONS.OPEN_CHATBOT });
+
+    // When closing chatbot, show popup close bot modal if has setting
+    const openPopupSetting = ["standard_exit_popup", "image_popup"];
+    const isWithDrawalEnabled = state.botInfor && openPopupSetting.includes(state.botInfor.withdrawal_prevention_status);
+
+    if (!isWithDrawalEnabled) return dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
+
+    return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
   }
 
   const setPulldownValue = (dataContentType, field, value) => {
@@ -1748,12 +1685,6 @@ const PreviewFukushashiki = () => {
         className={`sp-container1 ${isMobile() ? 'slideUpSp' : 'slideUp'}`}
         style={containerStyle}
       >
-        <Withdrawal
-          botInfor={state.botInfor}
-          deviceReceive={state.deviceReceive}
-          scenarioId={state.scenarioId}
-          onOpenPreview={onOpenPreview}
-        />
         <ZipCodePopUp
           onOpen={onOpenZipCodePopup}
           prefecturesList={state.prefecturesList}
@@ -1765,12 +1696,8 @@ const PreviewFukushashiki = () => {
           errors={state.errors}
         />
         {/* popup for shipping address can be used instead of ZipCodePopUp -> remove */}
-        <div
-          id="sp-header"
-          style={headerStyle}
-          className="sp-header"
-        >
-          <div className="sp-header-left" onClick={handleCloseChatbotWhenUseWithDrawal}>
+        <div id="sp-header" style={headerStyle} className="sp-header">
+          <div className="sp-header-left" onClick={onChatbotHeaderClick}>
             <div className="sp-body-bot-side-avatar sp-avatar-bt">
               <img src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`} alt="bot-header-icon"/>
             </div>
@@ -1781,12 +1708,7 @@ const PreviewFukushashiki = () => {
               <div className="sp-header-left-label-title">{state.botInfor?.titleBubble}</div>
             </div>
           </div>
-          <div
-            className="sp-header-right"
-            onClick={() => {
-              state.isOpen ? handleOpenWithDrawal() : onOpenPreview(true);
-            }}
-          >
+          <div className="sp-header-right" onClick={onChatbotHeaderClick}>
             <div className="sp-header-right-arrow">
               {state.isOpen ? (
                 <MDBIcon fas icon="chevron-circle-down" />
@@ -1796,36 +1718,12 @@ const PreviewFukushashiki = () => {
             </div>
           </div>
         </div>
-        {state.activePopupCloseBot ?
-          <ModalPreviewBot
-            isMobile={isMobile()}
-            styleBot={getBotModalStyle()}
-            open={state.showPopupCloseBot} isAdmin={false} onClose={() => setShowPopupCloseBot(false)}>
-            <Row>
-              <Col md="12">
-                <span className="title-bot-modal">本当に閉じますか？</span>
-              </Col>
-            </Row>
-
-            <Row className="justify-content-around">
-              <Col md="6">
-                <Button
-                  className="btn-cancel__modal-bot"
-                  onClick={() => setShowPopupCloseBot(false)}
-                >
-                  チャットに戻る
-                </Button>
-              </Col>
-              <Col md="6">
-                <Button className="btn-close__modal-bot" onClick={() => handleCloseBot()}
-                >
-                  閉じる
-                </Button>
-              </Col>
-            </Row>
-          </ModalPreviewBot>
-          : ""}
-        
+        <PreventExitChatbotModal
+          botConfig={state}
+          isOpen={state.showPopupCloseBot}
+          onClose={() => setShowPopupCloseBot(false)}
+          onCloseBot={() => onOpenPreview(false)}
+        />
         {!!state.botInfor?.timer_config?.enable
           && 
           <div className="chatbot_timer_holder" style={{

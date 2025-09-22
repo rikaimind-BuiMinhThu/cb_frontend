@@ -150,6 +150,11 @@ const sendOpenChatbotCountRequest = (scenarioId, deviceReceive) => {
   return sendCountRequest(scenarioId, data);
 };
 
+const sendCloseChatbotCountRequest = (scenarioId, deviceReceive) => {
+  const data = { scenario_data: `${deviceReceive}_close_chatbot_window` };
+  return sendCountRequest(scenarioId, data);
+};
+
 const sendLogMessageToServer = (submitData, submitType) => {
   const { message, ...data } = submitData;
   const dataLog = sendScenarioUserResponse(submitData);
@@ -635,5 +640,5 @@ export {
   createScenarioUserResponseMessageHistory, userEntryScenario, isAndroid, isButtonSubmitMessage,
   sendErrorLogToServer, sendLogMessageToServer,
   moveToNext, getNextUserMsg,
-  sendOpenChatbotCountRequest,
+  sendOpenChatbotCountRequest, sendCloseChatbotCountRequest,
 };
