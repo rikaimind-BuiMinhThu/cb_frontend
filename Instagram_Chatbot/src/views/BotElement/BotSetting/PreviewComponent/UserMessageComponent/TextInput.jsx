@@ -5,9 +5,9 @@ import InputCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioCom
 import Text from "./TextInputComponent/Text";
 import PhoneNumber from "./TextInputComponent/PhoneNumber";
 
-export default function TextInput({ content, disabled, handleOnChangeJpConvertText, indexContent, onChangeValue, errors, indexMessage }) {
+export default function TextInput({ content, disabled, handleOnChangeJpConvertText, indexContent: contentIndex, onChangeValue, errors, indexMessage }) {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.TEXT_INPUT) return null;
-  const errorKey = `message${indexMessage}_content${indexContent}_${content.type}_${content.text_input.type}`;
+  const errorKey = `message${indexMessage}_content${contentIndex}_${content.type}_${content.text_input.type}`;
   const textInput = content.text_input;
 
   const renderTitle = () => {
@@ -38,13 +38,13 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
         return <Text content={content}
           disabled={disabled}
           handleOnChangeJpConvertText={handleOnChangeJpConvertText}
-          indexContent={indexContent}
+          indexContent={contentIndex}
           onChangeValue={onChangeValue}
         />;
       case "phone_number":
         return <PhoneNumber content={content}
           disabled={disabled}
-          indexContent={indexContent}
+          indexContent={contentIndex}
           onChangeValue={onChangeValue}
         />;
       case "password":
@@ -56,7 +56,7 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
             placeholder={textInput[textInput.type]?.password}
             onChange={(value) =>
               onChangeValue(
-                indexContent,
+                contentIndex,
                 content.type,
                 value,
                 textInput.type,
@@ -75,7 +75,7 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
             placeholder={textInput[textInput.type].placeholder}
             onChange={(value) =>
               onChangeValue(
-                indexContent,
+                contentIndex,
                 content.type,
                 value,
                 textInput.type,
@@ -93,7 +93,7 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
             placeholder={textInput[textInput.type].cfEmlAdd_email}
             onChange={(value) =>
               onChangeValue(
-                indexContent,
+                contentIndex,
                 content.type,
                 value,
                 textInput.type,
@@ -109,7 +109,7 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
             }
             onChange={(value) =>
               onChangeValue(
-                indexContent,
+                contentIndex,
                 content.type,
                 value,
                 textInput.type,
@@ -128,7 +128,7 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
             placeholder={textInput[textInput.type].password}
             onChange={(value) =>
               onChangeValue(
-                indexContent,
+                contentIndex,
                 content.type,
                 value,
                 textInput.type,
@@ -143,7 +143,7 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
             placeholder={textInput[textInput.type].confirm_password}
             onChange={(value) =>
               onChangeValue(
-                indexContent,
+                contentIndex,
                 content.type,
                 value,
                 textInput.type,

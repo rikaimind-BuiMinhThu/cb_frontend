@@ -79,8 +79,6 @@ const UserMessage = ({
         )?.[0]?.data || "";
   }
 
-
-
   const handleOnChangeJpConvertText = (indexContent, contentType, type, subFiled) => (value) => {
     onChangeValue(indexContent, contentType, value, type, subFiled);
 

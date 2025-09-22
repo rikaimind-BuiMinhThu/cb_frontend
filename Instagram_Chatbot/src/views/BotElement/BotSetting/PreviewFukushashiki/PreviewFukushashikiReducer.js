@@ -26,8 +26,6 @@ const PreviewFukushashikiReducer = (state, action) => {
       return { ...state, lpOptionData: { ...state.lpOptionData, ...action.payload, isProcessing: false } };
     case PREVIEW_ACTIONS.UPDATE_PREVIEW_ORDER_CONTENT:
       return { ...state, previewOrderContent: action.payload, isProcessing: false };
-    case PREVIEW_ACTIONS.UPDATE_OPEN_PREVIEW:
-      return { ...state, isOpen: action.payload.isOpen, showPopupCloseBot: action.payload.showPopupCloseBot };
     case PREVIEW_ACTIONS.SET_PROCESSING: 
       return { ...state, isProcessing: action.payload };
     case PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES:
@@ -144,6 +142,36 @@ const PreviewFukushashikiReducer = (state, action) => {
       const newMessagesList = mapAmazonPayDataToMessagesList(action.payload, state.messagesList, state.prefecturesList);
       const renderMessagesList = newMessagesList.slice(0, state.currentMsgIndex + 1);
       return { ...state, messagesList: newMessagesList, renderMessagesList: renderMessagesList };
+    case PREVIEW_ACTIONS.UPDATE_AFTER_CHANGE_VALUE: {
+      const { contentIndex, contentType, value, field, subField1, subField2, message } = action.payload;
+      const newState = {
+        messagesList: _.cloneDeep(state.messagesList),
+        variables: _.cloneDeep(state.variables),
+        objParam: _.cloneDeep(state.objParam),
+        prefecturesList: _.cloneDeep(state.prefecturesList),
+      };
+
+      const subContent = message.message_content[contentIndex][contentType];
+
+      switch (contentType) {
+        case 'zip_code_address':
+          changeZipCodeAddress(subContent, value, field, state.prefecturesList);
+          break;
+        case 'product_purchase':
+          changeProductPurchase(newState, subContent, value, field);
+          break;
+        case 'product_purchase_radio_button':
+          changeProductPurchaseRadioButton(newState, subContent, field, value);
+          break;
+        default:
+          changeContentValue(subContent, value, field, subField1, subField2);
+          break;
+      }
+
+      handleSaveInputContent(newState, subContent, value);
+
+      return { ...state, ...newState };
+    }
     case PREVIEW_ACTIONS.SET_CHECKOUT_URL:
       return { ...state, checkoutUrl: action.payload };
     case PREVIEW_ACTIONS.SET_OBJ_PARAM:
@@ -154,8 +182,6 @@ const PreviewFukushashikiReducer = (state, action) => {
       return { ...state, scenarioUserResponses: action.payload };
     case PREVIEW_ACTIONS.SET_BOT_ID:
       return { ...state, botId: action.payload };
-    case PREVIEW_ACTIONS.CLOSE_BOT:
-      return { ...state, isOpen: false, showPopupCloseBot: false };
     case PREVIEW_ACTIONS.SET_CAPTCHA:
       return { ...state, captcha: action.payload };
     case PREVIEW_ACTIONS.SET_URL_SEND:
@@ -280,5 +306,141 @@ const PreviewFukushashikiReducer = (state, action) => {
 
   return state;
 };
+
+const changeContentValue = (subContent, value, field, subField1 = null, subField2 = null) => {
+  if (!field) return;
+
+  if (subField2) {
+    subContent[field] = subContent[field] || {};
+    subContent[field][subField1] = subContent[field][subField1] || {};
+    subContent[field][subField1][subField2] = value;
+  } else if (subField1) {
+    subContent[field] = subContent[field] || {};
+    subContent[field][subField1] = value;
+  } else {
+    subContent[field] = value;
+  }
+};
+
+const changeZipCodeAddress = (subContent, value, field, prefecturesList) => {
+  subContent.value_prefecture_type = subContent.is_use_dropdown ? "id" : "name";
+
+  if (typeof value === "object") {
+    const transformField = {
+      value_prefecture: (value) => {
+        if (subContent.value_prefecture_type === "id") {
+          return value;
+        }
+        return findItem(prefecturesList, { 
+          keys: 'id', 
+          value: value, 
+          callbackValue: value,
+          onSuccess: (item) => item.name,
+        });
+      }
+    };
+    
+    Object.keys(value).forEach((key) => {
+      subContent[key] = transformField[key] ? transformField[key](value[key]) : value[key];
+    });
+  } else {
+    subContent[field] = value;
+  }
+}
+
+const changeProductPurchase = (newState, subContent, value, field) => {
+  if (field !== "initial_selection" || !value.length) return;
+
+  const { codesArray, namesArray, pricesArray, orderQuantitiesArray } = getProductDetailsForProductPurchase(subContent, value);
+
+  const productVariables = [
+    { variable_name: "product_code", default_value: codesArray.join(",") },
+    { variable_name: "product_name", default_value: namesArray.join(",") },
+    { variable_name: "product_unit_price", default_value: pricesArray.join(",") },
+    { variable_name: "order_quantity", default_value: orderQuantitiesArray.join(",") }
+  ];
+
+  newState.variables.push(...productVariables);
+  newState.objParam = {
+    ...newState.objParam,
+    product_code: codesArray.join(","),
+    product_name: namesArray.join(","),
+    product_unit_price: pricesArray.join(","),
+    order_quantity: orderQuantitiesArray.join(","),
+  };
+}
+
+const changeProductPurchaseRadioButton = (newState, subContent, field, value) => {
+  if (field !== "initial_selection") return;
+
+  const { valueCode, valueName, valuePrice } = getProductDetailsForProductPurchaseRadioButton(subContent, value);
+
+  const productVariables = [
+    { variable_name: "product_code", default_value: valueCode },
+    { variable_name: "product_name", default_value: valueName },
+    { variable_name: "product_unit_price", default_value: valuePrice }
+  ];
+
+  newState.variables.push(...productVariables);
+  newState.objParam = {
+    ...newState.objParam,
+    product_code: valueCode,
+    product_name: valueName,
+    product_unit_price: valuePrice,
+  };
+};
+
+const getProductDetailsForProductPurchaseRadioButton = (subContent, value) => {
+  let valueCode, valueName, valuePrice;
+
+  const product = subContent.products?.find(product => product.id === value);
+  if (product) {
+    valueCode = product.item_number;
+    valueName = product.title;
+    valuePrice = product.item_price;
+  }
+
+  return { valueCode, valueName, valuePrice };
+}
+
+const getProductDetailsForProductPurchase = (subContent, value) => {
+  let codesArray = [];
+  let namesArray = [];
+  let pricesArray = [];
+  let orderQuantitiesArray = [];
+
+  subContent.products?.forEach((product) => {
+    value.forEach((val) => {
+      if (!product.id !== val) return;
+
+      codesArray.push(product?.item_number);
+      namesArray.push(product?.title);
+      pricesArray.push(product?.item_price);
+      orderQuantitiesArray.push(product?.quantity_select);
+    });
+  });
+
+  return { codesArray, namesArray, pricesArray, orderQuantitiesArray };
+}
+
+const handleSaveInputContent = (newState, subContent, contentType, field, value) => {
+  if (!subContent.is_save_input_content) return;
+
+  const variableName = subContent.save_input_content;
+
+  newState.variables.forEach((item) => {
+    if (item.variable_name !== variableName) {
+      return item;
+    }
+
+    item.default_value = getDefaultValue(subContent, contentType, field, value, newState.prefecturesList);
+
+    newState.objParam[variableName] = value;
+  });
+
+  console.log("newState.objParam", newState.objParam);
+  console.log("newState.variables", newState.variables);
+};
+
 
 export default PreviewFukushashikiReducer;
