@@ -52,16 +52,23 @@ import {
   changeElementAttributeById,
   scrollToPosition,
   createStatusConversion,
-  updateStatusConversion,
   createScenarioUserResponseMessageHistory,
   userEntryScenario,
   isDislayingLoginForm,
   isUserMessage,
   isDelayBotMessage,
   getElementMessageById,
-  getNextUserMsg,
   sendOpenChatbotCountRequest,
 } from "./PreviewComponent/Utils";
+import {
+  getChatbotSavedState,
+  savedChatbotState,
+  saveCheckpointTime,
+  savePrevOpenStatus,
+  getPrevOpenStatus,
+  getTimerConfig,
+  setTimerConfig
+} from "./PreviewComponent/SessionStorageUtils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
 import ZipCodePopUp from "./PreviewComponent/ZipCodePopUp";
@@ -74,7 +81,7 @@ import {
 import { convertToFukushashikiObject } from "./PreviewFukushashiki/FukushashikiDataConverterUtils";
 import { handleValidateField } from "./PreviewFukushashiki/ValidationUtils";
 
-sessionStorage.setItem("prevOpenStatus", "0");
+savePrevOpenStatus("0");
 var url = new URL(window.location.href);
 let params = new URLSearchParams(url.search);
 let isLoggedIn = params.get('isLoggedIn') === "true";
@@ -246,10 +253,6 @@ const PreviewFukushashiki = () => {
           bottomMarginSp: result?.bottom_margin_sp,
         };
 
-        sessionStorage.setItem("chatbotH", result?.height_pc ? result?.height_pc : 700);
-        sessionStorage.setItem("chatbotBottom", result?.bottom_margin_pc ? result?.bottom_margin_pc : 10);
-        sessionStorage.setItem("chatbotW", result?.width_pc ? result?.width_pc : 450);
-        sessionStorage.setItem("chatbotRight", result?.right_margin_pc ? result?.right_margin_pc : 30);
         dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
       });
   }, [state.botId, state.loadedStateFromSession, state.displayType]);
@@ -454,14 +457,14 @@ const PreviewFukushashiki = () => {
     if (!deviceReceive) return;
 
     // Send data to count open chatbot window
-    const prevOpenStatus = sessionStorage.getItem("prevOpenStatus");
+    const prevOpenStatus = getPrevOpenStatus();
 
     if (prevOpenStatus == "0" && opening) {
-      sessionStorage.setItem("prevOpenStatus", "1");
+      savePrevOpenStatus("1");
       sendOpenChatbotCountRequest(state.scenarioId, deviceReceive);
     }
     
-    const timerChatbotStorage = getTimerSessionStorage();
+    const timerChatbotStorage = getTimerConfig();
     setTimerChanges((timerChanges) => timerChatbotStorage || timerChanges);
 
     // post message to parent window
@@ -820,10 +823,10 @@ const PreviewFukushashiki = () => {
       setTimerChanges({ timeLeft: calculateTimerConfigDuration(timerConfig.type, timerConfig.duration), config: timerConfig });
     }
 
-    const prevOpenStatus = sessionStorage.getItem("prevOpenStatus");
+    const prevOpenStatus = getPrevOpenStatus();
 
     if (designSetting.display_type == 1 && prevOpenStatus == "0") {
-      sessionStorage.setItem("prevOpenStatus", "1");
+      savePrevOpenStatus("1");
       sendOpenChatbotCountRequest(state.scenarioId, state.deviceReceive);
     }
 
@@ -835,7 +838,7 @@ const PreviewFukushashiki = () => {
       state
     );
 
-    checkUpdateMessagesSessionStorage(res.data.data.updated_at);
+    saveCheckpointTime(res.data.data.updated_at);
 
     dispatch({
       type: PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SERVER,
@@ -847,19 +850,9 @@ const PreviewFukushashiki = () => {
     });
   }
 
-  const getTimerSessionStorage = () => {
-    const timerChatbotStorage = sessionStorage.getItem(SESSION_STORAGE_KEY.TIMER_CHATBOT);
-    
-    if (!timerChatbotStorage?.trim().length) {
-      return null;
-    }
-    
-    return JSON.parse(timerChatbotStorage);
-  }
-
   const handleOnCounting = (config) => (timer) => {
     const timerChanges = { timeLeft: timer, config };
-    sessionStorage.setItem(SESSION_STORAGE_KEY.TIMER_CHATBOT, JSON.stringify(timerChanges));
+    setTimerConfig(timerChanges);
     setTimerChanges(timerChanges);
   }
 
@@ -899,7 +892,7 @@ const PreviewFukushashiki = () => {
   // Get Preview Scenario Data
   useEffect(() => {
     if (!state.loadedStateFromSession) {
-      let savedState = getStateFromSessionStorage();
+      let savedState = getChatbotSavedState();
       if (savedState) {
         setConversionParamToLocalStorage(
           savedState.scenarioId,
@@ -920,7 +913,7 @@ const PreviewFukushashiki = () => {
           });
         }        
 
-        const timerConfig = getTimerSessionStorage();
+        const timerConfig = getTimerConfig();
         if (timerConfig) {
           setTimerChanges({ timeLeft: calculateTimerConfigDuration(timerConfig?.config?.type, timerConfig?.config?.duration, { timerLeft: timerConfig.timeLeft, useTimerLeft: true }), config: timerConfig });
         }
@@ -977,25 +970,6 @@ const PreviewFukushashiki = () => {
   useEffect(() => {
     scrollToPosition({ position: "b", selector: "#sp-body" });
   }, [state.renderMessagesList?.length, state.submitErrorMessage]);
-
-  const setStateToSessionStorage = (data) => {
-    sessionStorage.setItem(SESSION_STORAGE_KEY.CHAT_BOT_STATE, JSON.stringify(data));
-  };
-
-  const getStateFromSessionStorage = () => {
-    const data = sessionStorage.getItem(SESSION_STORAGE_KEY.CHAT_BOT_STATE);
-    if (!data) return null;
-    return JSON.parse(data);
-  };
-
-  const checkUpdateMessagesSessionStorage = (updated_at) => {
-    const temp = sessionStorage.getItem("bot_update_at");
-
-    if (temp !== updated_at) {
-      sessionStorage.removeItem(`messages_bot_${state.botId}`);
-      sessionStorage.setItem("bot_update_at", updated_at);
-    }
-  }
 
   const createOrAddLinesCart = async (res) => {
     const newArr = state.scenarioUserResponses.concat(res.data?.data || [])
@@ -1203,7 +1177,7 @@ const PreviewFukushashiki = () => {
     //   + validate data
     // Việc update state, update render message và các giá trị trong state thì sẽ chạy ở trong reducer
 
-    setStateToSessionStorage(state);
+    savedChatbotState(state);
 
     const data = {
       scenario_id: state.scenarioId,
@@ -1398,7 +1372,7 @@ const PreviewFukushashiki = () => {
       .slice(0, newState.currentMsgIndex + 1)
       .map((msg) => isDelayBotMessage(msg) ? { ...msg, hidden: true } : msg);
     
-    setStateToSessionStorage(newState);
+    savedChatbotState(newState);
     
     dispatch({
       type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
