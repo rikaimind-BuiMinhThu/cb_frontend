@@ -229,7 +229,7 @@ const getDefaultValue = (subContent, contentType, value, field, prefecturesList)
 }
 
 const replaceVariables = (contentText, variables) => {
-  return contentText.replaceAll(SCAN_REGEX, (_, variable) => {
+  return (contentText || "").replaceAll(SCAN_REGEX, (_, variable) => {
     return variables.find(item => item.variable_name === variable)?.default_value || "";
   });
 }

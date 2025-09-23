@@ -34,7 +34,7 @@ export const log = (message) => {
 
 export const getEcChatBotApiServerBaseUrl = () => {
     // Comment out below line if you want to connect the staging backend API server
-    return "https://ec-chatbot-test1.com";
+    return "https://ec-chatbot-test.com";
     const environment = process.env.REACT_APP_CHATBOT_ENV;
     log("Environment: " + environment);
 

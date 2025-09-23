@@ -1,12 +1,10 @@
 import React, { useEffect, useRef, useReducer, useState } from "react";
 import "assets/css/bot/preview-chat-bot.css";
-import api from "api/api-management";
 import Cookies from "js-cookie";
 import { MDBIcon } from "mdbreact";
 import CustomButton from "./CustomButton";
 import { UserMessage, BotMessage } from "./PreviewComponent";
 import PreviewFukushashikiReducer from "./PreviewFukushashiki/PreviewFukushashikiReducer";
-import moment from "moment";
 import $ from "jquery";
 import { EC_CHATBOT_URL } from "variables/constants";
 import "moment/locale/zh-cn";
@@ -27,10 +25,8 @@ import {
   TIMER_TYPES,
   RENDER_CHATBOT_CONFIG,
   CART_SYSTEM,
-  TIMER_DELAY_RENDER,
   CONVERSTION_RESPONSE_STATUS,
-  CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE,
-  PREVIEW_ACTIONS
+  PREVIEW_ACTIONS,
 } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
@@ -42,15 +38,11 @@ import {
   sleep,
   stringNullOrEmpty,
   appendParamsToUrl,
-  findItem,
   changeElementAttributeById,
   scrollToPosition,
   createStatusConversion,
-  createScenarioUserResponseMessageHistory,
   userEntryScenario,
   isDislayingLoginForm,
-  isUserMessage,
-  isDelayBotMessage,
   getElementMessageById,
   sendOpenChatbotCountRequest,
 } from "./PreviewComponent/Utils";
@@ -157,11 +149,7 @@ const PreviewFukushashiki = () => {
   const [state, dispatch] = useReducer(PreviewFukushashikiReducer, previewInitialState);
   const [timerChanges, setTimerChanges] = useState({ timeLeft: -1, config: null });
   const containerRef = useRef(null);
-  const isFromScenario = false;
   const hasSentCustomJs = useRef(false);
-  const timeoutConfrmMsgRef = useRef(null);
-
-
 
   // Initialize conversion status when chatbot opens
   useEffect(() => {
@@ -478,7 +466,7 @@ const PreviewFukushashiki = () => {
           endIndex: state.nextStopMsgIndex
         }
       });
-    }, 1000);
+    }, RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE);
 
     return () => clearTimeout(timeoutId);
   }, [state.currentMsgIndex, state.nextStopMsgIndex]);
@@ -546,26 +534,6 @@ const PreviewFukushashiki = () => {
     return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
   }
 
-  const redirectToCartPage = () => {
-    const params = {
-      scenario_id: state.scenarioId,
-      bot_type: "web",
-      user_input_id: state.uuid,
-    };
-    let redirectRurl = null;
-  
-    if (state.isUsedCartConfirmPage && state.urlCartConfirmPage) {
-      redirectRurl = appendParamsToUrl(state.urlCartConfirmPage, params);
-    } else if (state.urlThanksPage) {
-      redirectRurl = appendParamsToUrl(state.urlThanksPage, params);
-    }
-
-    if (!redirectRurl) return;
-
-    setTimeout(() => {
-      window.parent.location.href = redirectRurl;
-    }, 2000);
-  };
 
   const getBotInforFromPreviewResponse = (res) => {
     if (!res || !res.data || !res.data.chatbot) return {};

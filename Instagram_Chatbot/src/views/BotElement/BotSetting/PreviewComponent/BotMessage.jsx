@@ -21,7 +21,9 @@ const BotMessage = ({
   const [text, setText] = useState("");
 
   useEffect(() => {
-    if (!content || !content[content.type]?.originalContent || variables.length < 0) return;
+    if (!content || !content[content.type]?.originalContent || variables.length === 0) return;
+
+    if (![BOT_MESSAGE_TYPES.TEXT_INPUT, BOT_MESSAGE_TYPES.GETTING_ERROR_NOTIFICATION].includes(content.type)) return;
 
     setText(replaceVariables(content[content.type]?.originalContent || "", variables));
   }, [content, content[content.type]?.originalContent, variables]);
@@ -250,6 +252,8 @@ const BotMessage = ({
   }
 
   const renderDelayContent = () => {
+    if (!isDelaying) return null;
+    
     return (
       <img src={messageTypingGif} className="ss-bot-chat-delay" />
     )
@@ -284,6 +288,9 @@ const BotMessage = ({
         return renderHtmlCodeContent();
     }
   }
+
+  if (!content) return null;
+  if (content.type === BOT_MESSAGE_TYPES.DELAY && !isDelaying) return null;
 
   return (
     <div key={contentIndex} 
