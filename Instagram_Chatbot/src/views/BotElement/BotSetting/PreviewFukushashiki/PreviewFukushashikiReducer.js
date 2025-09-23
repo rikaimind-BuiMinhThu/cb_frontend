@@ -316,11 +316,6 @@ const PreviewFukushashikiReducer = (state, action) => {
 };
 
 const changeContentValue = (subContent, value, field, subField1 = null, subField2 = null) => {
-  console.log("changeContentValue subContent", subContent);
-  console.log("changeContentValue value", value);
-  console.log("changeContentValue field", field);
-  console.log("changeContentValue subField1", subField1);
-  console.log("changeContentValue subField2", subField2);
   if (!field) return;
 
   if (subField2) {
@@ -333,7 +328,6 @@ const changeContentValue = (subContent, value, field, subField1 = null, subField
   } else {
     subContent[field] = value;
   }
-  console.log("changeContentValue after subContent", subContent);
 };
 
 const changeZipCodeAddress = (subContent, value, field, prefecturesList) => {
@@ -452,6 +446,5 @@ const handleSaveInputContent = (newState, subContent, contentType, field, value)
     newState.objParam[variableName] = value;
   });
 };
-
 
 export default PreviewFukushashikiReducer;

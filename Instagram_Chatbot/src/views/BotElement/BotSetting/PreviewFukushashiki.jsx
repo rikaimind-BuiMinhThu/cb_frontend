@@ -941,7 +941,7 @@ const PreviewFukushashiki = () => {
   useEffect(() => {
     if (state.currentMsgIndex >= state.nextStopMsgIndex) return;
 
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       dispatch({
         type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
         payload: {
@@ -950,6 +950,8 @@ const PreviewFukushashiki = () => {
         }
       });
     }, 1000);
+
+    return () => clearTimeout(timeoutId);
   }, [state.currentMsgIndex, state.nextStopMsgIndex]);
 
   const onClickNext = (clickedMsgIndex, clickedMsg) => {

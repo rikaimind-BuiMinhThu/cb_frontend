@@ -58,19 +58,23 @@ const BotMessage = ({
   useEffect(() => {
     if (!isDelaying) return;
 
+    let timeoutId;
+
     if (content.type === BOT_MESSAGE_TYPES.DELAY) {
       setIsDelaying(true);
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         setIsDelaying(false);
       }, content.delay.content * 1000);
-      return;
+      return () => clearTimeout(timeoutId);
     }
 
     if (isDelaying) {
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         setIsDelaying(false);
       }, RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE);
+      return () => clearTimeout(timeoutId);
     }
+
   }, [content.type, isDelaying]);
 
   useEffect(() => {
