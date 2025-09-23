@@ -4,7 +4,7 @@ import { MESSAGE_CONTENT_TYPES } from "views/BotElement/BotSetting/PreviewCompon
 import CommonCreditCardPayment from "./CommonCreditCardPayment";
 import { Radio } from "antd";
 
-export default function CardPaymentRadioButton({ content, indexMessage, contentIndex, onChangeValue, errors, disabled }) {
+export default function CardPaymentRadioButton({ content, messageIndex, contentIndex, onChangeValue, errors, disabled }) {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.CARD_PAYMENT_RADIO_BUTTON) return null;
 
   const cardPaymentRadioButton = content.card_payment_radio_button;
@@ -206,7 +206,7 @@ export default function CardPaymentRadioButton({ content, indexMessage, contentI
 
     return (
       <CommonCreditCardPayment content={content}
-        indexMessage={indexMessage}
+        messageIndex={messageIndex}
         contentIndex={contentIndex}
         onChangeValue={onChangeValue}
         errors={errors}
@@ -215,7 +215,7 @@ export default function CardPaymentRadioButton({ content, indexMessage, contentI
     );
   };
 
-  const errorKey = `message${indexMessage}_content${contentIndex}_${content.type}`;
+  const errorKey = `message${messageIndex}_content${contentIndex}_${content.type}`;
 
   const renderErrorMessage = () => {
     if (!errors?.[errorKey]) return null;

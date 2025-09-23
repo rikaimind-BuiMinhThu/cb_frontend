@@ -5,7 +5,7 @@ import {
 } from "../ValidationUtils";
 
 const validatePullDown = (contentType, messageContents, i, index, errorsMess) => {
-  const key = `message${index}_content${i}_${messageContents[i].type}`;
+  const key = `message${index}_content${i}_${messageContents[i].type}_${contentType.type}`;
 
   switch (contentType.type) {
     case "customization":

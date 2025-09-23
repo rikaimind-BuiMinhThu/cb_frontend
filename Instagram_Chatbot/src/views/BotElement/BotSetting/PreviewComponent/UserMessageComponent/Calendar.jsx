@@ -5,7 +5,7 @@ import DatePickerCustom from "views/BotElement/BotSetting/ScenarioSetting/scenar
 import { moment } from "moment";
 import { Select, Radio, Row, Col, Calendar as AntdCalendar } from "antd";
 
-export default function Calendar({ content, indexMessage, contentIndex, onChangeValue, errors, disabled, locale}) {
+export default function Calendar({ content, messageIndex, contentIndex, onChangeValue, errors, disabled, locale}) {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.CALENDAR) return null;
 
   const calendar = content.calendar;
@@ -561,12 +561,12 @@ export default function Calendar({ content, indexMessage, contentIndex, onChange
         </div>
       )}
       {errors?.[
-        `message${indexMessage}_content${contentIndex}_${content.type}`
+        `message${messageIndex}_content${contentIndex}_${content.type}`
       ] && (
           <div style={{ color: "#FF7E00", fontSize: "12px" }}>
             {
               errors?.[
-              `message${indexMessage}_content${contentIndex}_${content.type}`
+              `message${messageIndex}_content${contentIndex}_${content.type}`
               ]
             }
           </div>

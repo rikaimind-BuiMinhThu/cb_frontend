@@ -13,7 +13,7 @@ import { moveToNext } from "views/BotElement/BotSetting/PreviewComponent/Utils";
 
 import moment from "moment";
 
-export default function CommonCreditCardPayment({ content, indexMessage, contentIndex, onChangeValue, errors, disabled, isDisplayError = true }) {
+export default function CommonCreditCardPayment({ content, messageIndex, contentIndex, onChangeValue, errors, disabled, isDisplayError = true }) {
 
   if (content.type !== MESSAGE_CONTENT_TYPES.CREDIT_CARD_PAYMENT && content.type !== MESSAGE_CONTENT_TYPES.CARD_PAYMENT_RADIO_BUTTON) return null;
 
@@ -287,7 +287,7 @@ export default function CommonCreditCardPayment({ content, indexMessage, content
     );
   };
 
-  const errorKey = `message${indexMessage}_content${contentIndex}_${content.type}`;
+  const errorKey = `message${messageIndex}_content${contentIndex}_${content.type}`;
 
   const renderErrorMessage = () => {
     if (!isDisplayError || !errors?.[errorKey]) return null;

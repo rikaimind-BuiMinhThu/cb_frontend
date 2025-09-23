@@ -3,7 +3,7 @@ import "assets/css/bot/preview-chat-bot.css";
 import { MESSAGE_CONTENT_TYPES } from "views/BotElement/BotSetting/PreviewComponent/Constants";
 import { Checkbox as AntdCheckbox } from "antd";
 
-export default function Checkbox({ content, disabled, onChangeValue, errors, contentIndex, indexMessage }) {
+export default function Checkbox({ content, disabled, onChangeValue, errors, contentIndex, messageIndex }) {
   if (content.type !== MESSAGE_CONTENT_TYPES.CHECKBOX) return null;
 
   const checkbox = content.checkbox;
@@ -137,10 +137,10 @@ export default function Checkbox({ content, disabled, onChangeValue, errors, con
   };
 
   const renderErrorMessage = () => {
-    if (!errors?.[`message${indexMessage}_content${contentIndex}_${content.type}`]) return null;
+    if (!errors?.[`message${messageIndex}_content${contentIndex}_${content.type}`]) return null;
     return (
       <div className="validation-error-message">
-        {errors?.[`message${indexMessage}_content${contentIndex}_${content.type}`]}
+        {errors?.[`message${messageIndex}_content${contentIndex}_${content.type}`]}
       </div>
     );
   };

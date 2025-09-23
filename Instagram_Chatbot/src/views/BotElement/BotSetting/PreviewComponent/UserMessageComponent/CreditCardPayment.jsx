@@ -13,7 +13,7 @@ import { moveToNext } from "views/BotElement/BotSetting/PreviewComponent/Utils";
 
 import moment from "moment";
 
-export default function CreditCardPayment({ content, indexMessage, contentIndex, onChangeValue, errors, disabled }) {
+export default function CreditCardPayment({ content, messageIndex, contentIndex, onChangeValue, errors, disabled }) {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.CREDIT_CARD_PAYMENT) return null;
 
   const creditCardPayment = content.credit_card_payment;
@@ -286,7 +286,7 @@ export default function CreditCardPayment({ content, indexMessage, contentIndex,
     );
   };
 
-  const errorKey = `message${indexMessage}_content${contentIndex}_${content.type}`;
+  const errorKey = `message${messageIndex}_content${contentIndex}_${content.type}`;
 
   const renderErrorMessage = () => {
     if (!errors?.[errorKey]) return null;

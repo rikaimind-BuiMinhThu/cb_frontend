@@ -6,7 +6,7 @@ import CommonAddress from "./CommonAddress";
 
 import InputCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
 
-export default function ShippingAddress({ content, prefecturesList, indexMessageRender, indexMessage, contentIndex, messageContent, onChangeValue, onChangeErrors, errors, disabled, onOpen }) {
+export default function ShippingAddress({ content, prefecturesList, messageIndexRender, messageIndex, contentIndex, messageContent, onChangeValue, onChangeErrors, errors, disabled, onOpen }) {
   if (content.type !== MESSAGE_CONTENT_TYPES.SHIPPING_ADDRESS) return <></>;
 
   const shippingAddress = content.shipping_address;
@@ -170,8 +170,8 @@ export default function ShippingAddress({ content, prefecturesList, indexMessage
         <CommonAddress
           content={content}
           prefecturesList={prefecturesList}
-          indexMessageRender={indexMessageRender}
-          indexMessage={indexMessage}
+          messageIndexRender={messageIndexRender}
+          messageIndex={messageIndex}
           contentIndex={contentIndex}
           messageContent={messageContent}
           onChangeValue={onChangeValue}

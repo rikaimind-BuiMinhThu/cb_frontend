@@ -3,7 +3,7 @@ import "assets/css/bot/preview-chat-bot.css";
 import { MESSAGE_CONTENT_TYPES } from "views/BotElement/BotSetting/PreviewComponent/Constants";
 import SelectCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/SelectCustom";
 
-export default function ProductPurchaseSelectOption({ content, indexMessage, contentIndex, onChangeValue, errors }) {
+export default function ProductPurchaseSelectOption({ content, messageIndex, contentIndex, onChangeValue, errors }) {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.PRODUCT_PURCHASE_SELECT_OPTION) return null;
 
   const productPurchaseSelectOption = content.product_purchase_select_option;
@@ -55,11 +55,11 @@ export default function ProductPurchaseSelectOption({ content, indexMessage, con
   };
 
   const renderErrorMessage = () => {
-    if (!errors?.[`message${indexMessage}_content${contentIndex}_${content.type}`]) return null;
+    if (!errors?.[`message${messageIndex}_content${contentIndex}_${content.type}`]) return null;
 
     return (
       <div className="validation-error-message">
-        {errors?.[`message${indexMessage}_content${contentIndex}_${content.type}`]}
+        {errors?.[`message${messageIndex}_content${contentIndex}_${content.type}`]}
       </div>
     );
   };

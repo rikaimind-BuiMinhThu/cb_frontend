@@ -5,9 +5,9 @@ import InputCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioCom
 import Text from "./TextInputComponent/Text";
 import PhoneNumber from "./TextInputComponent/PhoneNumber";
 
-export default function TextInput({ content, disabled, handleOnChangeJpConvertText, contentIndex: contentIndex, onChangeValue, errors, indexMessage }) {
+export default function TextInput({ content, disabled, handleOnChangeJpConvertText, contentIndex: contentIndex, onChangeValue, errors, messageIndex }) {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.TEXT_INPUT) return null;
-  const errorKey = `message${indexMessage}_content${contentIndex}_${content.type}_${content.text_input.type}`;
+  const errorKey = `message${messageIndex}_content${contentIndex}_${content.type}_${content.text_input.type}`;
   const textInput = content.text_input;
 
   const renderTitle = () => {

@@ -38,9 +38,9 @@ const UserMessage = ({
   messageContentProps,
   onChangeValue,
   disabled = false,
-  indexMessageRender,
+  messageIndexRender,
   errorsProps,
-  indexMessage,
+  messageIndex,
   captcha,
   onClickNext,
   onOpen,
@@ -67,15 +67,15 @@ const UserMessage = ({
 
   function loadCaptcha(contentIndex) {
     if (
-      document.getElementById(`captcha-${indexMessage}-${contentIndex}`) &&
+      document.getElementById(`captcha-${messageIndex}-${contentIndex}`) &&
       captcha.length !== 0
     )
       document.getElementById(
-        `captcha-${indexMessage}-${contentIndex}`
+        `captcha-${messageIndex}-${contentIndex}`
       ).innerHTML =
         captcha.filter(
           (item) =>
-            item.index === indexMessage && item.contentIndex === contentIndex
+            item.index === messageIndex && item.contentIndex === contentIndex
         )?.[0]?.data || "";
   }
 
@@ -304,7 +304,7 @@ const UserMessage = ({
           contentIndex={contentIndex}
           onChangeValue={onChangeValue}
           errors={errors}
-          indexMessage={indexMessage}
+          messageIndex={messageIndex}
         />;
       case MESSAGE_CONTENT_TYPES.LABEL:
         return <Label content={content} />;
@@ -315,7 +315,7 @@ const UserMessage = ({
           onChangeValue={onChangeValue}
           errors={errors}
           contentIndex={contentIndex}
-          indexMessage={indexMessage}
+          messageIndex={messageIndex}
         />;
       case MESSAGE_CONTENT_TYPES.RADIO_BUTTON:
         return <RadioButton
@@ -324,7 +324,7 @@ const UserMessage = ({
           onChangeValue={onChangeValue}
           errors={errors}
           contentIndex={contentIndex}
-          indexMessage={indexMessage}
+          messageIndex={messageIndex}
         />;
       case MESSAGE_CONTENT_TYPES.CHECKBOX:
         return <Checkbox
@@ -333,7 +333,7 @@ const UserMessage = ({
           onChangeValue={onChangeValue}
           errors={errors}
           contentIndex={contentIndex}
-          indexMessage={indexMessage}
+          messageIndex={messageIndex}
         />;
       case MESSAGE_CONTENT_TYPES.PULL_DOWN:
         return <PullDown
@@ -342,7 +342,7 @@ const UserMessage = ({
           onChangeValue={onChangeValue}
           errors={errors}
           contentIndex={contentIndex}
-          indexMessage={indexMessage}
+          messageIndex={messageIndex}
           prefecturesList={prefecturesList}
           lpOptionData={lpOptionData}
           postMessageToParent={postMessageToParent}
@@ -351,8 +351,8 @@ const UserMessage = ({
         return <ZipCodeAddress
           content={content}
           prefecturesList={prefecturesList}
-          indexMessageRender={indexMessageRender}
-          indexMessage={indexMessage}
+          messageIndexRender={messageIndexRender}
+          messageIndex={messageIndex}
           contentIndex={contentIndex}
           messageContent={messageContent}
           onChangeValue={onChangeValue}
@@ -365,8 +365,8 @@ const UserMessage = ({
         return <ShippingAddress
           content={content}
           prefecturesList={prefecturesList}
-          indexMessageRender={indexMessageRender}
-          indexMessage={indexMessage}
+          messageIndexRender={messageIndexRender}
+          messageIndex={messageIndex}
           contentIndex={contentIndex}
           messageContent={messageContent}
           onChangeValue={onChangeValue}
@@ -378,7 +378,7 @@ const UserMessage = ({
       case MESSAGE_CONTENT_TYPES.PRODUCT_PURCHASE_SELECT_OPTION:
         return <ProductPurchaseSelectOption
           content={content}
-          indexMessage={indexMessage}
+          messageIndex={messageIndex}
           contentIndex={contentIndex}
           onChangeValue={onChangeValue}
           errors={errors}
@@ -386,7 +386,7 @@ const UserMessage = ({
       case MESSAGE_CONTENT_TYPES.ATTACHMENT:
         return <Attachment
           content={content}
-          indexMessage={indexMessage}
+          messageIndex={messageIndex}
           contentIndex={contentIndex}
           onChangeValue={onChangeValue}
           onChangeErrors={onChangeErrors}
@@ -396,7 +396,7 @@ const UserMessage = ({
       case MESSAGE_CONTENT_TYPES.CALENDAR:
         return <Calendar
           content={content}
-          indexMessage={indexMessage}
+          messageIndex={messageIndex}
           contentIndex={contentIndex}
           onChangeValue={onChangeValue}
           errors={errors}
@@ -406,7 +406,7 @@ const UserMessage = ({
       case MESSAGE_CONTENT_TYPES.AGREE_TERM:
         return <AgreeTerm
           content={content}
-          indexMessage={indexMessage}
+          messageIndex={messageIndex}
           contentIndex={contentIndex}
           onChangeValue={onChangeValue}
           errors={errors}
@@ -415,7 +415,7 @@ const UserMessage = ({
       case MESSAGE_CONTENT_TYPES.CREDIT_CARD_PAYMENT:
         return <CreditCardPayment
           content={content}
-          indexMessage={indexMessage}
+          messageIndex={messageIndex}
           contentIndex={contentIndex}
           onChangeValue={onChangeValue}
           errors={errors}
@@ -424,7 +424,7 @@ const UserMessage = ({
       case MESSAGE_CONTENT_TYPES.CARD_PAYMENT_RADIO_BUTTON:
         return <CardPaymentRadioButton
           content={content}
-          indexMessage={indexMessage}
+          messageIndex={messageIndex}
           contentIndex={contentIndex}
           onChangeValue={onChangeValue}
           errors={errors}
@@ -564,12 +564,12 @@ const UserMessage = ({
                   </div>
                 )}
                 {errors?.[
-                  `message${indexMessage}_content${contentIndex}_${content.type}`
+                  `message${messageIndex}_content${contentIndex}_${content.type}`
                 ] && (
                     <div style={{ color: "#FF7E00", fontSize: "12px" }}>
                       {
                         errors?.[
-                        `message${indexMessage}_content${contentIndex}_${content.type}`
+                        `message${messageIndex}_content${contentIndex}_${content.type}`
                         ]
                       }
                     </div>
@@ -607,18 +607,18 @@ const UserMessage = ({
                   />
                   {/* {new DOMParser().parseFromString(capture.img, "text/xml").innerHTML} */}
                   <div
-                    id={`captcha-${indexMessageRender}-${contentIndex}`}
+                    id={`captcha-${messageIndexRender}-${contentIndex}`}
                     style={{ width: "50%" }}
                     onLoad={loadCaptcha(contentIndex)}
                   ></div>
                 </div>
                 {errors?.[
-                  `message${indexMessage}_content${contentIndex}_${content.type}`
+                  `message${messageIndex}_content${contentIndex}_${content.type}`
                 ] && (
                     <div style={{ color: "#FF7E00", fontSize: "12px" }}>
                       {
                         errors?.[
-                        `message${indexMessage}_content${contentIndex}_${content.type}`
+                        `message${messageIndex}_content${contentIndex}_${content.type}`
                         ]
                       }
                     </div>
@@ -877,7 +877,7 @@ const UserMessage = ({
                                           }
                                         />
                                         {errors?.[
-                                          `message${indexMessage}_content${contentIndex}_${content.type}_${indexProduct}`
+                                          `message${messageIndex}_content${contentIndex}_${content.type}_${indexProduct}`
                                         ] && (
                                             <div
                                               style={{
@@ -889,7 +889,7 @@ const UserMessage = ({
                                             >
                                               {
                                                 errors?.[
-                                                `message${indexMessage}_content${contentIndex}_${content.type}_${indexProduct}`
+                                                `message${messageIndex}_content${contentIndex}_${content.type}_${indexProduct}`
                                                 ]
                                               }
                                             </div>
@@ -1127,7 +1127,7 @@ const UserMessage = ({
                                           }
                                         />
                                         {errors?.[
-                                          `message${indexMessage}_content${contentIndex}_${content.type}_${indexProduct}`
+                                          `message${messageIndex}_content${contentIndex}_${content.type}_${indexProduct}`
                                         ] && (
                                             <div
                                               style={{
@@ -1139,7 +1139,7 @@ const UserMessage = ({
                                             >
                                               {
                                                 errors?.[
-                                                `message${indexMessage}_content${contentIndex}_${content.type}_${indexProduct}`
+                                                `message${messageIndex}_content${contentIndex}_${content.type}_${indexProduct}`
                                                 ]
                                               }
                                             </div>
@@ -1195,7 +1195,7 @@ const UserMessage = ({
                                         selectArr,
                                         "initial_selection"
                                       );
-                                      // onChangeValueMessageContent(indexMessageSelect, contentIndex, content.type, value, 'products', indexProduct, 'price_display_custom')
+                                      // onChangeValueMessageContent(messageIndexSelect, contentIndex, content.type, value, 'products', indexProduct, 'price_display_custom')
                                     }}
                                   >
                                     <div className="ss-user-overview-product-purchase-container-type-text_image">
@@ -1370,7 +1370,7 @@ const UserMessage = ({
                                           }
                                         />
                                         {errors?.[
-                                          `message${indexMessage}_content${contentIndex}_${content.type}_${indexProduct}`
+                                          `message${messageIndex}_content${contentIndex}_${content.type}_${indexProduct}`
                                         ] && (
                                             <div
                                               style={{
@@ -1380,7 +1380,7 @@ const UserMessage = ({
                                             >
                                               {
                                                 errors?.[
-                                                `message${indexMessage}_content${contentIndex}_${content.type}_${indexProduct}`
+                                                `message${messageIndex}_content${contentIndex}_${content.type}_${indexProduct}`
                                                 ]
                                               }
                                             </div>
@@ -1598,7 +1598,7 @@ const UserMessage = ({
                                           }
                                         />
                                         {errors?.[
-                                          `message${indexMessage}_content${contentIndex}_${content.type}_${indexProduct}`
+                                          `message${messageIndex}_content${contentIndex}_${content.type}_${indexProduct}`
                                         ] && (
                                             <div
                                               style={{
@@ -1608,7 +1608,7 @@ const UserMessage = ({
                                             >
                                               {
                                                 errors?.[
-                                                `message${indexMessage}_content${contentIndex}_${content.type}_${indexProduct}`
+                                                `message${messageIndex}_content${contentIndex}_${content.type}_${indexProduct}`
                                                 ]
                                               }
                                             </div>
@@ -1624,12 +1624,12 @@ const UserMessage = ({
                     ))}
                   {productPurchase.type === "consume_api_response" && <></>}
                   {errors?.[
-                    `message${indexMessage}_content${contentIndex}_${content.type}`
+                    `message${messageIndex}_content${contentIndex}_${content.type}`
                   ] && (
                       <div style={{ color: "#FF7E00", fontSize: "12px" }}>
                         {
                           errors?.[
-                          `message${indexMessage}_content${contentIndex}_${content.type}`
+                          `message${messageIndex}_content${contentIndex}_${content.type}`
                           ]
                         }
                       </div>
@@ -1790,12 +1790,12 @@ const UserMessage = ({
                   {productPurchaseRadioButton.type ===
                     "consume_api_response" && <></>}
                   {errors?.[
-                    `message${indexMessage}_content${contentIndex}_${content.type}`
+                    `message${messageIndex}_content${contentIndex}_${content.type}`
                   ] && (
                       <div style={{ color: "#FF7E00", fontSize: "12px" }}>
                         {
                           errors?.[
-                          `message${indexMessage}_content${contentIndex}_${content.type}`
+                          `message${messageIndex}_content${contentIndex}_${content.type}`
                           ]
                         }
                       </div>
@@ -1856,12 +1856,12 @@ const UserMessage = ({
                     }
                   />
                   {errors?.[
-                    `message${indexMessage}_content${contentIndex}_${content.type}`
+                    `message${messageIndex}_content${contentIndex}_${content.type}`
                   ] && (
                       <div style={{ color: "#FF7E00", fontSize: "12px" }}>
                         {
                           errors?.[
-                          `message${indexMessage}_content${contentIndex}_${content.type}`
+                          `message${messageIndex}_content${contentIndex}_${content.type}`
                           ]
                         }
                       </div>

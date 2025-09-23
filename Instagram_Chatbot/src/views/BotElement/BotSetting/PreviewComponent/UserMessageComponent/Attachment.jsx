@@ -5,13 +5,13 @@ import { MDBIcon } from "mdbreact";
 import { MESSAGE_CONTENT_TYPES } from "../Constants";
 import InputCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
 
-export default function Attachment({ content, indexMessage, contentIndex, onChangeValue, onChangeErrors, errors, disabled }) {
+export default function Attachment({ content, messageIndex, contentIndex, onChangeValue, onChangeErrors, errors, disabled }) {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.ATTACHMENT) return null;
 
   const attachingFile = content.attaching_file;
   if (!attachingFile) return;
 
-  const errorKey = `message${indexMessage}_content${contentIndex}_${content.type}`;
+  const errorKey = `message${messageIndex}_content${contentIndex}_${content.type}`;
 
   const changeErrorMessage = (message) => {
     onChangeErrors(errorKey, message);

@@ -14,7 +14,7 @@ import { tokenExpired } from "api/tokenExpired";
 import LPIntegrationOptionPullDown from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/LPIntegrationOptionPullDown";
 import SelectCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/SelectCustom";
 
-export default function PullDown({ content, errors, contentIndex, indexMessage, disabled, onChangeValue, prefecturesList, lpOptionData, postMessageToParent }) {
+export default function PullDown({ content, errors, contentIndex, messageIndex, disabled, onChangeValue, prefecturesList, lpOptionData, postMessageToParent }) {
   const [cityOptions, setCityOptions] = useState([]);
 
   if (content.type !== MESSAGE_CONTENT_TYPES.PULL_DOWN) return null;
@@ -57,7 +57,7 @@ export default function PullDown({ content, errors, contentIndex, indexMessage, 
             valueKey
           )
         }
-        value={pullDown[pullDown.type][valueKey]}
+        value={pullDown[pullDown.type][valueKey] || ""}
       />
     );
   };
@@ -79,7 +79,7 @@ export default function PullDown({ content, errors, contentIndex, indexMessage, 
             valueKey
           )
         }
-        value={pullDown[pullDown.type][valueKey]}
+        value={pullDown[pullDown.type][valueKey] || ""}
       />
     );
   };
@@ -101,7 +101,7 @@ export default function PullDown({ content, errors, contentIndex, indexMessage, 
             valueKey
           )
         }
-        value={pullDown[pullDown.type][valueKey]}
+        value={pullDown[pullDown.type][valueKey] || ""}
       />
     );
   };
@@ -123,7 +123,7 @@ export default function PullDown({ content, errors, contentIndex, indexMessage, 
             valueKey
           )
         }
-        value={pullDown[pullDown.type][valueKey]}
+        value={pullDown[pullDown.type][valueKey] || ""}
       />
     );
   };
@@ -144,7 +144,7 @@ export default function PullDown({ content, errors, contentIndex, indexMessage, 
             valueKey
           )
         }
-        value={pullDown[pullDown.type][valueKey]}
+        value={pullDown[pullDown.type][valueKey] || ""}
       />
     );
   };
@@ -247,7 +247,7 @@ export default function PullDown({ content, errors, contentIndex, indexMessage, 
               "value"
             )
           }
-          value={pullDown[pullDown.type].value || pullDown.initial_selection}
+          value={pullDown[pullDown.type].value || pullDown.initial_selection || ""}
         />
       </div>
     );
@@ -276,7 +276,7 @@ export default function PullDown({ content, errors, contentIndex, indexMessage, 
               "valueLeft"
             )
           }
-          value={pullDown[pullDown.type].valueLeft}
+          value={pullDown[pullDown.type].valueLeft || ""}
         />
         <SelectCustom
           disabled={disabled}
@@ -298,7 +298,7 @@ export default function PullDown({ content, errors, contentIndex, indexMessage, 
               "valueRight"
             )
           }
-          value={pullDown[pullDown.type].valueRight}
+          value={pullDown[pullDown.type].valueRight || ""}
         />
       </div>
     );
@@ -333,7 +333,7 @@ export default function PullDown({ content, errors, contentIndex, indexMessage, 
                   "valueHour"
                 )
               }
-              value={pullDown[pullDown.type].valueHour}
+              value={pullDown[pullDown.type].valueHour || ""}
             />
             <SelectCustom
               disabled={disabled}
@@ -611,12 +611,13 @@ export default function PullDown({ content, errors, contentIndex, indexMessage, 
   };
 
   const renderErrorMessage = () => {
-    if (!errors?.[`message${indexMessage}_content${contentIndex}_${content.type}_${pullDown.type}`]) return null;
+    const errorKey = `message${messageIndex}_content${contentIndex}_${content.type}_${pullDown.type}`;
+    if (!errors?.[errorKey]) return null;
 
     return (
       <div className="validation-error-message">
-        {errors?.[`message${indexMessage}_content${contentIndex}_${content.type}_${pullDown.type}`]}
-      </div>
+        {errors?.[errorKey]}
+        </div>
     );
   };
 
