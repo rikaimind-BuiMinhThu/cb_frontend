@@ -141,15 +141,15 @@ const PreviewFukushashikiReducer = (state, action) => {
       
       if (!isUpdateClicked) {
         newState.nextStopMsgIndex = state.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex)) + 1;
+        if (newState.nextStopMsgIndex < newState.currentMsgIndex) {
+          newState.nextStopMsgIndex = newState.currentMsgIndex;
+        }
       }
 
       if (action.payload.renderMode === RENDER_MODES.LAST) {
         newState.currentMsgIndex = newState.nextStopMsgIndex - 1;
       } else {
-        newState.currentMsgIndex = clickedMsgIndex + 1;
-        if (newState.nextStopMsgIndex < newState.currentMsgIndex) {
-          newState.nextStopMsgIndex = newState.currentMsgIndex;
-        }
+        newState.currentMsgIndex = clickedMsgIndex + 1; 
       }
 
       newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
@@ -318,11 +318,8 @@ const PreviewFukushashikiReducer = (state, action) => {
         newState.messagesList.forEach((x) => x.hidden = x.not_display_when_logged_in);
       }
 
-      if (newState.nextStopMsgIndex < newState.currentMsgIndex) {
-        newState.nextStopMsgIndex = newState.currentMsgIndex + 1;
-      }
-
-      newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+      newState.renderMessagesList = newState.messagesList.slice(0, newState.nextStopMsgIndex);
+      newState.currentMsgIndex = newState.nextStopMsgIndex - 1;
       newState.loadedStateFromSession = true;
       newState.isExtractFromSession = false;
 

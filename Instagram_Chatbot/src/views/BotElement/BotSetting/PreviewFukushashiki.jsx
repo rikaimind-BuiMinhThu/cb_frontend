@@ -471,7 +471,7 @@ const PreviewFukushashiki = () => {
   // Auto-render messages when current message index changes
   // Delays rendering for 1 second to show smooth transition between messages
   useEffect(() => {
-    if (state.currentMsgIndex + 1 >= state.nextStopMsgIndex) return;
+    if (!state.nextStopMsgIndex || state.currentMsgIndex + 1 >= state.nextStopMsgIndex) return;
 
     setTimeout(() => {
       const endIndex = getRenderMode() === RENDER_MODES.LAST ? state.nextStopMsgIndex : state.currentMsgIndex + 1 + 1;

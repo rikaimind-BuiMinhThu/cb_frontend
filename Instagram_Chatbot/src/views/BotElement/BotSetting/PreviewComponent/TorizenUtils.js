@@ -87,7 +87,7 @@ export const mapAmazonPayDataToMessagesList = (amazonPayData, messagesList, pref
 // TODO: Cần refactor đoạn này sao cho có thể sử dụng được setting RENDER_MODES trên trang quản lý
 export const isTorizenLP = (url) => {
   const torizenDomains = [
-    "localhost:8080",
+    // "localhost:8080",
     "commerceforce.co.jp",
     "hana.inuneko-sukoyaka.jp",
     "sb.inuneko-sukoyaka.jp"
