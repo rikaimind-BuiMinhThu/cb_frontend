@@ -205,7 +205,13 @@ export default function CardPaymentRadioButton({ content, indexMessage, contentI
     if (!isSelectLinkedCard) return null;
 
     return (
-      <CommonCreditCardPayment content={content} indexMessage={indexMessage} contentIndex={contentIndex} onChangeValue={onChangeValue} errors={errors} disabled={disabled} />
+      <CommonCreditCardPayment content={content}
+        indexMessage={indexMessage}
+        contentIndex={contentIndex}
+        onChangeValue={onChangeValue}
+        errors={errors}
+        isDisplayError={false}
+        disabled={disabled} />
     );
   };
 
