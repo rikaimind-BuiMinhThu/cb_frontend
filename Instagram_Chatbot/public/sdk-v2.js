@@ -194,7 +194,7 @@ const movePaymentMethodToTop = (data) => {
 
 const getEcChatBotApiServerBaseUrl = () => {
   // Comment out below line if you want to connect the staging backend API server
-  return "https://ec-chatbot-test.com";
+  return "https://ec-chatbot-test1.com";
   const environment = getEnvironment();
   switch (environment) {
     case "staging":

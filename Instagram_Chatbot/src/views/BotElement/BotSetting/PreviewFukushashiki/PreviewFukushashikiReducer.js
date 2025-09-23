@@ -10,7 +10,14 @@ import { processForBotMessage } from '../PreviewComponent/BotMessageUtils';
 import { processForUserMessage } from '../PreviewComponent/UserMessageUtils';
 import { isButtonSubmitMessage, isBotMessage, isUserMessage, getNextUserMsg } from '../PreviewComponent/Utils';
 import { mapAmazonPayDataToMessagesList } from '../PreviewComponent/TorizenUtils';
-import { RENDER_CHATBOT_CONFIG, GETTING_ERROR_NOTIFICATION, PREVIEW_ACTIONS, CART_SYSTEM, CONVERSTION_RESPONSE_STATUS } from '../PreviewComponent/Constants.jsx';
+import {
+  RENDER_CHATBOT_CONFIG,
+  GETTING_ERROR_NOTIFICATION,
+  PREVIEW_ACTIONS,
+  CART_SYSTEM,
+  CONVERSTION_RESPONSE_STATUS,
+  BOT_MESSAGE_TYPES,
+} from '../PreviewComponent/Constants.jsx';
 import { getDefaultValue } from '../PreviewComponent/VariablesUtils';
 
 const PreviewFukushashikiReducer = (state, action) => {
@@ -258,7 +265,9 @@ const PreviewFukushashikiReducer = (state, action) => {
       // Update originalContent for replace variables when after getPreviewResponse
       newState.messagesList.filter(isBotMessage).forEach((message) => {
         message.message_content.forEach((content) => {
-          content[content.type].originalContent = content[content.type].content;
+          if (content.type === BOT_MESSAGE_TYPES.TEXT_INPUT) {
+            content[content.type].originalContent = content[content.type].content;
+          }
         });
       });
 

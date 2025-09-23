@@ -44,6 +44,7 @@ import {
   isDislayingLoginForm,
   getElementMessageById,
   sendOpenChatbotCountRequest,
+  sendCloseChatbotCountRequest,
   isUserMessage,
 } from "./PreviewComponent/Utils";
 import {
@@ -455,7 +456,6 @@ const PreviewFukushashiki = () => {
   // Auto-render messages when current message index changes
   // Delays rendering for 1 second to show smooth transition between messages
   useEffect(() => {
-    console.log("state.currentMsgIndex", state.currentMsgIndex, state.nextStopMsgIndex);
     if (state.currentMsgIndex + 1 >= state.nextStopMsgIndex) return;
 
     setTimeout(() => {

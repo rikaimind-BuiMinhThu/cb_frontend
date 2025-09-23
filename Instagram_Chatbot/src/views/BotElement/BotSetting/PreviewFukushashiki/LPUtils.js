@@ -2,7 +2,7 @@
 import { CHATBOT_ACTIONS } from "../PreviewComponent/Constants";
 import { isTorizenLpAmazonData } from "../PreviewComponent/TorizenUtils";
 import { convertToFukushashikiObject } from "./FukushashikiDataConverterUtils";
-import { isUserMessage } from "../PreviewComponent/Utils";
+import { isUserMessage, sendOpenChatbotCountRequest } from "../PreviewComponent/Utils";
 
 const postMessageToParent = (options, state) => {
   if (!window || !window.parent) return;
