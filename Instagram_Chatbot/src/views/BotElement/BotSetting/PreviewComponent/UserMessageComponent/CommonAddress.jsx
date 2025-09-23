@@ -6,7 +6,7 @@ import { getAddressFromZipCode, moveToNext } from "views/BotElement/BotSetting/P
 import InputCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
 import SelectCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/SelectCustom";
 
-export default function CommonAddress({ content, prefecturesList, indexMessageRender, indexMessage, contentIndex, messageContent, onChangeValue, onChangeErrors, errors, disabled, onOpen }) {
+export default function CommonAddress({ content, prefecturesList, indexMessageRender, indexMessage, contentIndex, messageContent, onChangeValue, onChangeErrors, errors, disabled, onOpen, isDisplayError = true }) {
   
   if (content.type !== MESSAGE_CONTENT_TYPES.ZIP_CODE_ADDRESS && content.type !== MESSAGE_CONTENT_TYPES.SHIPPING_ADDRESS) return <></>;
   
@@ -333,9 +333,12 @@ export default function CommonAddress({ content, prefecturesList, indexMessageRe
   };
 
   const renderErrorMessage = () => {
+    const errorKey = `message${indexMessage}_content${contentIndex}_${content.type}`;
+    if (!isDisplayError || !errors?.[errorKey]) return null;
+
     return (
       <div className="validation-error-message">
-        {errors?.[`message${indexMessage}_content${contentIndex}_${content.type}`]}
+        {errors?.[errorKey]}
       </div>
     );
   };

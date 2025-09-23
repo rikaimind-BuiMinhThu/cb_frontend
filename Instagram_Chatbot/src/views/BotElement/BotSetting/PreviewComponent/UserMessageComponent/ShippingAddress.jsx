@@ -157,7 +157,11 @@ export default function ShippingAddress({ content, prefecturesList, indexMessage
   };
 
   const renderCardLinkSetting = () => {
-    if (shippingAddress.card_linked_setting.length === 0 || !shippingAddress.card_linked_setting.includes(shippingAddress.value_initial_selection)) return;
+    const {
+      card_linked_setting: cardLinkedSetting,
+      value_initial_selection: valueInitialSelection
+    } = shippingAddress;
+    if (cardLinkedSetting.length === 0 || !cardLinkedSetting.includes(valueInitialSelection)) return;
     return (
       <React.Fragment>
         {renderTitle()}
@@ -175,6 +179,7 @@ export default function ShippingAddress({ content, prefecturesList, indexMessage
           errors={errors}
           disabled={disabled}
           onOpen={onOpen}
+          isDisplayError={false}
         />
       </React.Fragment>
     );
