@@ -26,6 +26,7 @@ import {
   CART_SYSTEM,
   CONVERSTION_RESPONSE_STATUS,
   PREVIEW_ACTIONS,
+  RENDER_CHATBOT_CONFIG,
 } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
@@ -454,17 +455,20 @@ const PreviewFukushashiki = () => {
   // Auto-render messages when current message index changes
   // Delays rendering for 1 second to show smooth transition between messages
   useEffect(() => {
-    if (state.currentMsgIndex >= state.nextStopMsgIndex) return;
+    console.log("state.currentMsgIndex", state.currentMsgIndex, state.nextStopMsgIndex);
+    if (state.currentMsgIndex + 1 >= state.nextStopMsgIndex) return;
 
-    dispatch({
-      type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
-      payload: {
-        startIndex: 0,
-        endIndex: state.nextStopMsgIndex,
-        renderMode: "next",
-        fromCallback: false,
-      }
-    });
+    setTimeout(() => {
+      dispatch({
+        type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
+        payload: {
+          startIndex: 0,
+          endIndex: state.currentMsgIndex + 1 + 1,
+          renderMode: "next",
+          fromCallback: false,
+        }
+      });
+    }, RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE);
   }, [state.currentMsgIndex, state.nextStopMsgIndex]);
 
   const renderNextMessage = () => {
