@@ -166,9 +166,15 @@ const PreviewFukushashikiReducer = (state, action) => {
           break;
         default:
           changeContentValue(subContent, value, field, subField1, subField2);
-          console.log("changeContentValue after subContent out", subContent);
           break;
       }
+
+      // Update value of message
+      const messageIndex = newState.messagesList.findIndex(x => x.id === message.id);
+      if (messageIndex === -1) {
+        throw new Error(`${PREVIEW_ACTIONS.UPDATE_AFTER_CHANGE_VALUE}: Message with id ${message.id} not found`);
+      }
+      newState.messagesList[messageIndex].message_content[contentIndex][contentType] = _.cloneDeep(subContent);
 
       handleSaveInputContent(newState, subContent, contentType, field, value);
 
@@ -432,8 +438,6 @@ const getProductDetailsForProductPurchase = (subContent, value) => {
 }
 
 const handleSaveInputContent = (newState, subContent, contentType, field, value) => {
-  console.log("field", field);
-  console.log("value", value);
   if (!subContent.is_save_input_content) return;
 
   const variableName = subContent.save_input_content;
@@ -447,9 +451,6 @@ const handleSaveInputContent = (newState, subContent, contentType, field, value)
 
     newState.objParam[variableName] = value;
   });
-
-  console.log("newState.objParam", newState.objParam);
-  console.log("newState.variables", newState.variables);
 };
 
 

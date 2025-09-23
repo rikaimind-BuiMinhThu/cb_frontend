@@ -37,7 +37,7 @@ const SplitInputText = ({ content, disabled, handleOnChangeJpConvertText, conten
           placeholder={textInput.text?.placeholderLeft}
           style={{ width: "49%", marginBottom: "0px" }}
           onChange={handleOnChangeJpConvertText(contentIndex, content.type, textInput.type, "valueLeft")}
-          value={textInput[textInput.type]?.valueLeft}
+          value={textInput[textInput.type]?.valueLeft || ""}
           debounceTime={RENDER_CHATBOT_CONFIG.DEBOUNCE_INPUT_TEXT_JP_CONVERT}
         />
         <InputDebounce
@@ -46,7 +46,7 @@ const SplitInputText = ({ content, disabled, handleOnChangeJpConvertText, conten
           placeholder={textInput.text?.placeholderRight}
           style={{ width: "49%" }}
           onChange={handleOnChangeJpConvertText(contentIndex, content.type, textInput.type, "valueRight")}
-          value={textInput[textInput.type]?.valueRight}
+          value={textInput[textInput.type]?.valueRight || ""}
           debounceTime={RENDER_CHATBOT_CONFIG.DEBOUNCE_INPUT_TEXT_JP_CONVERT}
         />
       </>
@@ -68,7 +68,7 @@ const SplitInputText = ({ content, disabled, handleOnChangeJpConvertText, conten
           "valueLeft",
         )
       }
-      value={textInput[textInput.type]?.valueLeft}
+      value={textInput[textInput.type]?.valueLeft || ""}
     />
     <InputCustom
       id={content.customId2 || undefined}
@@ -84,7 +84,7 @@ const SplitInputText = ({ content, disabled, handleOnChangeJpConvertText, conten
           "valueRight"
         )
       }
-      value={textInput[textInput.type]?.valueRight}
+      value={textInput[textInput.type]?.valueRight || ""}
     />
   </>
 }
@@ -102,7 +102,7 @@ const SingleInputText = ({ content, disabled, handleOnChangeJpConvertText, conte
         placeholder={textInput.text?.placeholderLeft}
         onChange={handleOnChangeJpConvertText(contentIndex, content.type, textInput.type, "value")}
         style={{ width: "49%", marginBottom: "0px" }}
-        value={textInput[textInput.type]?.value}
+        value={textInput[textInput.type]?.value || ""}
         debounceTime={RENDER_CHATBOT_CONFIG.DEBOUNCE_INPUT_TEXT_JP_CONVERT}
       />
     )
@@ -123,7 +123,7 @@ const SingleInputText = ({ content, disabled, handleOnChangeJpConvertText, conte
           "value"
         )
       }
-      value={textInput[textInput.type]?.value}
+      value={textInput[textInput.type]?.value || ""}
     />
   )
 }

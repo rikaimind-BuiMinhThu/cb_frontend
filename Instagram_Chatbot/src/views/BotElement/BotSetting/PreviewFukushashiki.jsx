@@ -1134,16 +1134,16 @@ const PreviewFukushashiki = () => {
               contentType,
               value,
               field,
-              subFiled,
-              name
+              subField1,
+              subField2
             ) =>
               onChangeValue(
                 contentIndex,
                 contentType,
                 value,
                 field,
-                subFiled,
-                name,
+                subField1,
+                subField2,
                 message
               )
             }

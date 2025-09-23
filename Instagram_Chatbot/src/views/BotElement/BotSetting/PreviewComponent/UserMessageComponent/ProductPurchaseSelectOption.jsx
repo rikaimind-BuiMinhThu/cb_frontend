@@ -45,7 +45,7 @@ export default function ProductPurchaseSelectOption({ content, indexMessage, con
                 keyValue="productVariantId"
                 nameValue="title"
                 onChange={(value) => onChangeValue(contentIndex, content.type, value, 'value')}
-                value={productPurchaseSelectOption.value}
+                value={productPurchaseSelectOption.value || ""}
               />
             </div>
           </div>

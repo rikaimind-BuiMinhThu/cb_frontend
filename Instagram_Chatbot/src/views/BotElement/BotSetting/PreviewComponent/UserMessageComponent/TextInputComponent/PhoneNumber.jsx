@@ -25,7 +25,7 @@ export default function PhoneNumber({ content, disabled, contentIndex, onChangeV
                 "value"
               )
             }
-            value={textInput[textInput.type]?.value}
+            value={textInput[textInput.type]?.value || ""}
             inputMode="numeric"
           ></InputCustom>
       </React.Fragment>
@@ -59,7 +59,7 @@ export default function PhoneNumber({ content, disabled, contentIndex, onChangeV
               moveToNext(`ss-user-message-phone_number_2_${contentIndex}`);
             }
           }}
-          value={textInput[textInput.type]?.value1}
+          value={textInput[textInput.type]?.value1 || ""}
         ></InputCustom>
         <InputCustom
           id={`ss-user-message-phone_number_2_${contentIndex}`}
@@ -86,7 +86,7 @@ export default function PhoneNumber({ content, disabled, contentIndex, onChangeV
               moveToNext(`ss-user-message-phone_number_3_${contentIndex}`);
             }
           }}
-          value={textInput[textInput.type]?.value2}
+          value={textInput[textInput.type]?.value2 || ""}
         ></InputCustom>
         <InputCustom
           id={`ss-user-message-phone_number_3_${contentIndex}`}
@@ -105,7 +105,7 @@ export default function PhoneNumber({ content, disabled, contentIndex, onChangeV
               "value3"
             )
           }
-          value={textInput[textInput.type]?.value3}
+          value={textInput[textInput.type]?.value3 || ""}
         ></InputCustom>
       </div>
     </React.Fragment>

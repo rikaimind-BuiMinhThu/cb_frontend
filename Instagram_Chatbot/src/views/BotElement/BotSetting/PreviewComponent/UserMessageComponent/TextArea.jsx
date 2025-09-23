@@ -52,7 +52,7 @@ export default function TextArea({ content, disabled, onChangeValue, errors, con
             "value"
           )
         }
-        value={textareaValue}
+        value={textareaValue || ""}
       ></textarea>
     );
   };

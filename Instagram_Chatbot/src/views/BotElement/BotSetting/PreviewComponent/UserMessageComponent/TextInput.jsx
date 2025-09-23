@@ -63,7 +63,7 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
                 "value"
               )
             }
-            value={textInput[textInput.type]?.value}
+            value={textInput[textInput.type]?.value || ""}
           />
         </>;
       case "urls":
@@ -82,7 +82,7 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
                 "value"
               )
             }
-            value={textInput[textInput.type]?.value}
+            value={textInput[textInput.type]?.value || ""}
           />
         </>;
       case "email_confirmation":
@@ -100,7 +100,7 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
                 "value"
               )
             }
-            value={textInput[textInput.type]?.value}
+            value={textInput[textInput.type]?.value || ""}
           />
           <InputCustom
             disabled={disabled}
@@ -116,7 +116,7 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
                 "valueConfirm"
               )
             }
-            value={textInput[textInput.type]?.valueConfirm}
+            value={textInput[textInput.type]?.valueConfirm || ""}
           />
         </>;
       case "password_confirmation":
@@ -135,7 +135,7 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
                 "value"
               )
             }
-            value={textInput[textInput.type]?.value}
+            value={textInput[textInput.type]?.value || ""}
           />
           <InputCustom
             disabled={disabled}
@@ -150,7 +150,7 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
                 "valueConfirm"
               )
             }
-            value={textInput[textInput.type]?.valueConfirm}
+            value={textInput[textInput.type]?.valueConfirm || ""}
           />
         </>;
       default:
