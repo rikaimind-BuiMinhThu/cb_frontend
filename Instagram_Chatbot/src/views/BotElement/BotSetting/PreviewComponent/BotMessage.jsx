@@ -10,21 +10,21 @@ import { replaceVariables } from "./VariablesUtils";
 
 const BotMessage = ({
   content,
-  index,
+  contentIndex,
   botInfor,
   previewOrderContent,
   executeLpJsCode,
   messageId,
-  variables
+  variables,
 }) => {
   const [isDelaying, setIsDelaying] = useState(true);
   const [text, setText] = useState("");
 
   useEffect(() => {
-    if (!content || !content[content.type]?.content || variables.length < 0) return;
+    if (!content || !content[content.type]?.originalContent || variables.length < 0) return;
 
-    setText(replaceVariables(content[content.type]?.content || "", variables));
-  }, [content, content[content.type]?.content, variables]);
+    setText(replaceVariables(content[content.type]?.originalContent || "", variables));
+  }, [content, content[content.type]?.originalContent, variables]);
 
   const isShowAvatar = () => {
     if (!content) return false;
@@ -165,7 +165,7 @@ const BotMessage = ({
     return (
       <div className="position-relative">
         <div
-          className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value ss-bot-chat-text-input position-relative`}
+          className={`ss-bot-chat-overview-${contentIndex} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value ss-bot-chat-text-input position-relative`}
           style={{
             backgroundColor: botInfor?.message_color,
             color: botInfor?.font_color,
@@ -236,7 +236,7 @@ const BotMessage = ({
 
     return (
       <textarea
-        className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
+        className={`ss-bot-chat-overview-${contentIndex} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
         value={""}
         readOnly
         style={{
@@ -259,7 +259,7 @@ const BotMessage = ({
     return (
       <HtmlCodeMessagePreview
         content={content}
-        index={index}
+        contentIndex={contentIndex}
         botInfor={botInfor}
       />
     )
@@ -286,7 +286,7 @@ const BotMessage = ({
   }
 
   return (
-    <div key={index} 
+    <div key={contentIndex} 
       id={getElementMessageById(messageId)}
       className={`sp-body-bot-side slideRight ${!isShowAvatar() ? "hide_avatar" : ""} ${isUGCUsage(content) ? "ugc_usage" : ""}`}>
       { renderAvatar() }

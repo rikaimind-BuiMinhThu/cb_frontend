@@ -257,6 +257,13 @@ const PreviewFukushashikiReducer = (state, action) => {
         currentMsgIndex: 0, // Start
       };
 
+      // Update originalContent for replace variables when after getPreviewResponse
+      newState.messagesList.filter(isBotMessage).forEach((message) => {
+        message.message_content.forEach((content) => {
+          content[content.type].originalContent = content[content.type].content;
+        });
+      });
+
       if (variables) {
         newState.variables = [...variables, ...all_variables];
         newState.variables.forEach((item) => {

@@ -1071,12 +1071,12 @@ const PreviewFukushashiki = () => {
   const renderBotMessageContent = (message, indexMessage) => {
     if (!message || message.belong_to !== "bot" || !Array.isArray(message?.message_content)) return null;
 
-    return message.message_content.map((content, index) => (
+    return message.message_content.map((content, contentIndex) => (
       <BotMessage
         messageId={message.id}
-        key={indexMessage}
+        key={contentIndex}
         content={content}
-        index={index}
+        contentIndex={contentIndex}
         botInfor={state.botInfor}
         previewOrderContent={state.previewOrderContent}
         executeLpJsCode={(jsCode) => executeLpJsCode(jsCode, state)}
