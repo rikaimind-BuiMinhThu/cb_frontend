@@ -161,27 +161,25 @@ const PreviewFukushashiki = () => {
   const hasSentCustomJs = useRef(false);
   const timeoutConfrmMsgRef = useRef(null);
 
-  const setShowPopupCloseBot = (value) => {
-    dispatch({ type: PREVIEW_ACTIONS.SET_SHOW_POPUP_CLOSE_BOT, payload: value });
-  };
 
-  const setCheckoutUrl = (value) => {
-    dispatch({ type: PREVIEW_ACTIONS.SET_CHECKOUT_URL, payload: value });
-  };
-  const setScenarioUserResponses = (scenarioUserResponses) => {
-    dispatch({ type: PREVIEW_ACTIONS.SET_SCENARIO_USER_RESPONSES, payload: scenarioUserResponses });
-  };
 
-  const getBotPositionConfig = () => {
-    return {
-      widthSp: state.widthSp,
-      heightSp: state.heightSp,
-      widthPc: state.widthPc,
-      heightPc: state.heightPc,
-      bottomMarginPc: state.bottomMarginPc,
-      rightMarginPc: state.rightMarginPc,
-    };
-  };
+  // Initialize conversion status when chatbot opens
+  useEffect(() => {
+    if (state.conversionStatus || !state.uuid || !state.scenarioId || !state.isOpen) return;
+    
+    createStatusConversion({
+      scenario_id: state.scenarioId, 
+      user_input_id: state.uuid, 
+      status: CONVERSTION_RESPONSE_STATUS.UN_FINISH,
+    })
+    .then((res) => {
+      const status = res?.data?.data?.status;
+
+      if (status) {
+        dispatch({ type: PREVIEW_ACTIONS.SET_CONVERSION_STATUS, payload: status });
+      }
+    });
+  }, [state.uuid, state.scenarioId, state.conversionStatus, state.isOpen]);
 
   // get default obj params
   useEffect(() => {
@@ -380,6 +378,116 @@ const PreviewFukushashiki = () => {
     document.head.appendChild(style);
   }, [state.isUsedCustomCss, state.customCssContent]);
 
+  // Get Preview Scenario Data
+  useEffect(() => {
+    if (!state.loadedStateFromSession) {
+      let savedState = getChatbotSavedState();
+      if (savedState) {
+        setConversionParamToLocalStorage(
+          savedState.scenarioId,
+          'web',
+          savedState.userInputId || params.get("uuid"),
+          params.get("env") || "production",
+          state
+        );
+
+        if (isLoggedIn) {
+          return dispatch({
+            type: PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SESSION_STORAGE,
+            payload: {
+              savedState,
+              isLoggedIn: isLoggedIn,
+              isUsingAmazonPay: params.get('is_using_amazon_pay')
+            }
+          });
+        }        
+
+        const timerConfig = getTimerConfig();
+        if (timerConfig) {
+          setTimerChanges({ timeLeft: calculateTimerConfigDuration(timerConfig?.config?.type, timerConfig?.config?.duration, { timerLeft: timerConfig.timeLeft, useTimerLeft: true }), config: timerConfig });
+        }
+
+        return fukushashikiSavedStateToLp(savedState, params, state).then(async () => {
+          return dispatch({
+            type: PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SESSION_STORAGE,
+            payload: {
+              savedState,
+              isLoggedIn: isLoggedIn,
+              isUsingAmazonPay: params.get('is_using_amazon_pay')
+            }
+          });
+        });
+      }
+    }
+
+    if (state.loadedStateFromSession && state.botId)
+      return;
+
+    if (!state.botId) {
+      dispatch({ type: PREVIEW_ACTIONS.SET_BOT_ID, payload: params.get("bot_id") });
+      return;
+    }
+
+    if (!state.urlSend) {
+      dispatch({ type: PREVIEW_ACTIONS.SET_URL_SEND, payload: window.location.href });
+      return;
+    }
+
+    if (!state.urlReceive) {
+      dispatch({ type: PREVIEW_ACTIONS.SET_URL_RECEIVE, payload: params.get("urlReceive") });
+      return;
+    }
+
+    if (!state.deviceReceive) {
+      dispatch({ type: PREVIEW_ACTIONS.SET_DEVICE_RECEIVE, payload: params.get("deviceReceive") });
+      return;
+    }
+
+    if (!state.scenarioId) {
+      dispatch({ type: PREVIEW_ACTIONS.SET_SCENARIO_ID, payload: params.get("scenario_id") });
+      return;
+    }
+
+    return getScenarioPreviewData(state.botId, state.scenarioId)
+      .then(extractStateFromPreviewResponse);
+  }, [
+    state.botId, state.urlSend, state.urlReceive,
+    state.deviceReceive, state.scenarioId,
+    state.isDisplayErrorMessage, state.loadedStateFromSession
+  ]);
+
+  // Auto-scroll to bottom of the chatbot when render messages list changes or submit error message changes
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      scrollToPosition({ position: "b", selector: "#sp-body" });
+    }, 1000);
+
+    return () => clearTimeout(timeoutId);
+  }, [state.renderMessagesList?.length, state.submitErrorMessage]);
+
+  // Auto-render messages when current message index changes
+  // Delays rendering for 1 second to show smooth transition between messages
+  useEffect(() => {
+    if (state.currentMsgIndex >= state.nextStopMsgIndex) return;
+
+    const timeoutId = setTimeout(() => {
+      dispatch({
+        type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
+        payload: {
+          startIndex: 0,
+          endIndex: state.nextStopMsgIndex
+        }
+      });
+    }, 1000);
+
+    return () => clearTimeout(timeoutId);
+  }, [state.currentMsgIndex, state.nextStopMsgIndex]);
+  
+
+  const setShowPopupCloseBot = (value) => {
+    dispatch({ type: PREVIEW_ACTIONS.SET_SHOW_POPUP_CLOSE_BOT, payload: value });
+  };
+
   const onOpenPreview = (opening) => {
     const deviceReceive = state.deviceReceive || params.get("deviceReceive");
     if (!deviceReceive) return;
@@ -436,39 +544,6 @@ const PreviewFukushashiki = () => {
     if (!isWithDrawalEnabled) return dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
 
     return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
-  }
-
-  const getProductDetailsForProductPurchaseRadioButton = (dataContentType, value) => {
-    let valueCode, valueName, valuePrice;
-  
-    const product = dataContentType.products?.find(product => product.id === value);
-    if (product) {
-      valueCode = product.item_number;
-      valueName = product.title;
-      valuePrice = product.item_price;
-    }
-  
-    return { valueCode, valueName, valuePrice };
-  }
-
-  const getProductDetailsForProductPurchase = (dataContentType, value) => {
-    let arrayCode = [];
-    let arrayName = [];
-    let arrayPrice = [];
-    let arrayOrderQuantity = [];
-  
-    dataContentType.products?.forEach((product) => {
-      value.forEach((val) => {
-        if (product.id === val) {
-          arrayCode.push(product.item_number);
-          arrayName.push(product.title);
-          arrayPrice.push(product.item_price);
-          arrayOrderQuantity.push(product?.quantity_select);
-        }
-      });
-    });
-  
-    return { arrayCode, arrayName, arrayPrice, arrayOrderQuantity };
   }
 
   const redirectToCartPage = () => {
@@ -673,291 +748,6 @@ const PreviewFukushashiki = () => {
     }
   }
 
-  // Get Preview Scenario Data
-  useEffect(() => {
-    if (!state.loadedStateFromSession) {
-      let savedState = getChatbotSavedState();
-      if (savedState) {
-        setConversionParamToLocalStorage(
-          savedState.scenarioId,
-          'web',
-          savedState.userInputId || params.get("uuid"),
-          params.get("env") || "production",
-          state
-        );
-
-        if (isLoggedIn) {
-          return dispatch({
-            type: PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SESSION_STORAGE,
-            payload: {
-              savedState,
-              isLoggedIn: isLoggedIn,
-              isUsingAmazonPay: params.get('is_using_amazon_pay')
-            }
-          });
-        }        
-
-        const timerConfig = getTimerConfig();
-        if (timerConfig) {
-          setTimerChanges({ timeLeft: calculateTimerConfigDuration(timerConfig?.config?.type, timerConfig?.config?.duration, { timerLeft: timerConfig.timeLeft, useTimerLeft: true }), config: timerConfig });
-        }
-
-        return fukushashikiSavedStateToLp(savedState, params, state).then(async () => {
-          return dispatch({
-            type: PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SESSION_STORAGE,
-            payload: {
-              savedState,
-              isLoggedIn: isLoggedIn,
-              isUsingAmazonPay: params.get('is_using_amazon_pay')
-            }
-          });
-        });
-      }
-    }
-
-    if (state.loadedStateFromSession && state.botId)
-      return;
-
-    if (!state.botId) {
-      dispatch({ type: PREVIEW_ACTIONS.SET_BOT_ID, payload: params.get("bot_id") });
-      return;
-    }
-
-    if (!state.urlSend) {
-      dispatch({ type: PREVIEW_ACTIONS.SET_URL_SEND, payload: window.location.href });
-      return;
-    }
-
-    if (!state.urlReceive) {
-      dispatch({ type: PREVIEW_ACTIONS.SET_URL_RECEIVE, payload: params.get("urlReceive") });
-      return;
-    }
-
-    if (!state.deviceReceive) {
-      dispatch({ type: PREVIEW_ACTIONS.SET_DEVICE_RECEIVE, payload: params.get("deviceReceive") });
-      return;
-    }
-
-    if (!state.scenarioId) {
-      dispatch({ type: PREVIEW_ACTIONS.SET_SCENARIO_ID, payload: params.get("scenario_id") });
-      return;
-    }
-
-    return getScenarioPreviewData(state.botId, state.scenarioId)
-      .then(extractStateFromPreviewResponse);
-  }, [
-    state.botId, state.urlSend, state.urlReceive,
-    state.deviceReceive, state.scenarioId,
-    state.isDisplayErrorMessage, state.loadedStateFromSession
-  ]);
-
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      scrollToPosition({ position: "b", selector: "#sp-body" });
-    }, 1000);
-
-    return () => clearTimeout(timeoutId);
-  }, [state.renderMessagesList?.length, state.submitErrorMessage]);
-
-  const createOrAddLinesCart = async (res) => {
-    const newArr = state.scenarioUserResponses.concat(res.data?.data || [])
-    setScenarioUserResponses([...newArr])
-
-    const products = JSON.parse(newArr.findLast(x => x.data_input_name === "text_with_thumbnail_image")?.text_value || null)
-    const quantity = newArr.findLast(x => x.data_input_name === "quantity")?.integer_value || 1
-    const product = products?.products?.findLast(x => x?.id === products?.initial_selection || x?.productVariantId === products?.value)
-
-    const email = newArr.findLast(x => x.data_input_name === "email")?.string_value || null
-    const phone = newArr.findLast(x => x.data_input_name === "phone_number")?.string_value || null
-    const user_name = newArr.findLast(x => x.data_input_name === "user_name")?.string_value || null
-    const user_name_kana = newArr.findLast(x => x.data_input_name === "user_name_kana")?.string_value || null
-
-    const zip_code_address = newArr.findLast(x => x.data_input_name === "zip_code_address")?.text_value || null
-
-    if (product && quantity && user_name && user_name_kana && email && zip_code_address) {
-      let phoneNumber;
-      try {
-        phoneNumber = `${JSON.parse(phone)?.value1 || ""}${JSON.parse(phone)?.value2 || ""}${JSON.parse(phone)?.value3 || ""}`
-      } catch (e) {
-        phoneNumber = phone || ""
-      }
-      await api
-        .post('/api/v1/shopify/cart_create', {
-          first_name: JSON.parse(user_name)?.valueRight || JSON.parse(user_name_kana)?.valueRight,
-          last_name: JSON.parse(user_name)?.valueLeft || JSON.parse(user_name_kana)?.valueLeft,
-          email: email || "example@gmail.com",
-          phone: phoneNumber,
-          zip: JSON.parse(zip_code_address)?.value_post_code || (JSON.parse(zip_code_address)?.value_post_code_left + JSON.parse(zip_code_address)?.value_post_code_right),
-          province: JSON.parse(zip_code_address)?.value_prefecture,
-          city: JSON.parse(zip_code_address)?.value_municipality,
-          address1: JSON.parse(zip_code_address)?.value_address,
-          address2: JSON.parse(zip_code_address)?.value_building_name,
-          lines: [
-            {
-              "merchandiseId": product.productVariantId,
-              "quantity": quantity
-            }
-          ],
-          scenario_id: state.scenarioId,
-          uuid: state.uuid
-        })
-        .then(async res => {
-          sessionStorage.setItem("cart", JSON.stringify(res?.data?.data))
-          setCheckoutUrl(res?.data?.data?.cartCreate?.cart?.checkoutUrl)
-        })
-        .catch(e => {
-          console.log(e)
-        })
-    }
-  }
-
-  const postMessageForGetPreviewOrderContent = async (jsCode, options = {}) => {
-    const { isNewProcess = false, stopRender } = options;
-
-    if (isNewProcess && stopRender) {
-      dispatch({
-        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-        payload: {
-          stopRender,
-          previewOrderContent: null,
-        },
-      });
-    }
-
-    postMessageToParent({
-      action: CHATBOT_ACTIONS.GET_PREVIEW_ORDER_CONTENT,
-      actionData: jsCode,
-      is_use_js: true,
-      isOpen: true,
-      isNewProcess,
-    }, state);
-
-    if (isNewProcess) return;
-    await sleep(2000);
-  }
-
-
-  // const renderMessageInRange = async (startIndex, endIndex, newState, nextUserMsgIndex, options = {}) => { 
-  //   const { 
-  //     isUpdateClick = false, 
-  //     isPassDelay = false,
-  //     lastConfirmMessageIdx = -1,
-  //     appearFromStart = false,
-  //   } = options;
-  //   const listMsgAppear = [];
-
-  //   for (let i = startIndex; i <= endIndex; i++) {
-  //     const confirmMessage = newState.messagesList[i].message_content?.find(x => x.text_input?.use_for_confirm_message);
-  //     if (confirmMessage?.text_input?.jscode && !newState.stopRender?.isActive && lastConfirmMessageIdx !== i) {
-  //       const nextUserMessage = newState.messagesList[nextUserMsgIndex];
-  //       const isNextUserMessageButtonSubmit = nextUserMessage?.message_content?.[0]?.type === "button_submit";
-
-  //       if (!isNextUserMessageButtonSubmit) {
-  //         continue;
-  //       }
-
-  //       newState.stopRender = {
-  //         index: i,
-  //         finalIndex: newState.currentMsgIndex,
-  //         timeout: 30,
-  //         start: new Date(),
-  //         isActive: true,
-  //       };
-
-  //       newState.previewOrderContent = null;
-
-  //       postMessageForGetPreviewOrderContent(
-  //         confirmMessage.text_input.jscode,
-  //         { isNewProcess: newState.useNewProcess, stopRender: newState.stopRender },
-  //       );
-  //       break;
-  //     }
-
-  //     newState.renderMessagesList = newState.messagesList.slice(0, i + 1);
-  //     if (isDelayBotMessage(newState.messagesList[i])) {
-  //       // render delay item so typing GIF appears, then wait
-  //       dispatch({
-  //         type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
-  //         payload: {
-  //           startIndex: 0,
-  //           endIndex: i + 1
-  //         }
-  //       });
-  //       if (!isPassDelay) {
-  //         await sleep(newState.messagesList[i].message_content[0].delay?.content * 1000 || TIMER_DELAY_RENDER);
-  //       }
-  //       const newRender = newState.renderMessagesList.slice(0, i + 1).map(msg => isDelayBotMessage(msg) ? {...msg, hidden: true} : msg);
-  //       newState.renderMessagesList[i].hidden = true;
-  //       dispatch({
-  //         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-  //         payload: {
-  //           messagesList: newState.messagesList,
-  //           renderMessagesList: newRender,
-  //         }
-  //       })
-
-  //       newState.messagesList[i].hidden = true;
-  //       dispatch({
-  //         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-  //         payload: {
-  //           messagesList: newState.messagesList,
-  //           renderMessagesList: newRender,
-  //         }
-  //       })
-
-  //       continue;
-  //     }
-
-  //     if ((appearFromStart ? true : i !== startIndex ) && isUserMessage(newState.messagesList[i]) && !newState.messagesList[i]?.hidden) {
-  //       listMsgAppear.push({ id: newState.messagesList[i].id, type: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.APPEAR });
-  //     }
-      
-  //     dispatch({
-  //       type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
-  //       payload: {
-  //         startIndex: 0,
-  //         endIndex: i + 1
-  //       }
-  //     });
-
-  //     if (!isPassDelay) {
-  //       await sleep(RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE);
-  //     }
-  //   }
-  //   if (!isUpdateClick) {
-  //     newState.passedUserMsgCount++;
-  //   } else {
-  //     newState.passedUserMsgCount = newState.renderMessagesList.filter((item) => isUserMessage(item) && !item.hidden).length - 1 ;
-  //   }
-
-  //   if (listMsgAppear.length) {
-  //     createScenarioUserResponseMessageHistory({
-  //       scenario_id: state.scenarioId,
-  //       user_id: state.uuid,
-  //       msgs: listMsgAppear,
-  //     });
-  //   }
-
-  //   return newState;
-  // }
-
-  // Auto-render messages when current message index changes
-  // Delays rendering for 1 second to show smooth transition between messages
-  useEffect(() => {
-    if (state.currentMsgIndex >= state.nextStopMsgIndex) return;
-
-    const timeoutId = setTimeout(() => {
-      dispatch({
-        type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
-        payload: {
-          startIndex: 0,
-          endIndex: state.nextStopMsgIndex
-        }
-      });
-    }, 1000);
-
-    return () => clearTimeout(timeoutId);
-  }, [state.currentMsgIndex, state.nextStopMsgIndex]);
 
   const onClickNext = (clickedMsgIndex, clickedMsg) => {
     savedChatbotState(state);
@@ -1183,7 +973,7 @@ const PreviewFukushashiki = () => {
     })
   };
 
-  const renderErrorMessages = () => {
+  const renderSubmitErrorMessages = () => {
     if (!state.isUsedErrMsgByJs || !state.submitErrorMessage) return null;
 
     const className = state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "ss-bot-getting-error-notification" : "ss-bot-submit-error-message";
@@ -1196,6 +986,13 @@ const PreviewFukushashiki = () => {
         />
       </div>
     );   
+  }
+
+  const getBotHeaderIcon = () => {
+    if (state.isOpen) {
+      return state.botInfor?.opening_bot_icon?.url || state.botInfor?.icon?.url;
+    }
+    return state.botInfor?.closing_bot_icon?.url || state.botInfor?.icon?.url;
   }
 
   const getOpeningBotStyle = () => {
@@ -1240,79 +1037,6 @@ const PreviewFukushashiki = () => {
       bodyStyle,
     };
   };
-
-  useEffect(() => {
-    if (state.conversionStatus === null && !!state.uuid && !!state.scenarioId && state.isOpen) {
-      createStatusConversion({
-        scenario_id: state.scenarioId, 
-        user_input_id: state.uuid, 
-        status: CONVERSTION_RESPONSE_STATUS.UN_FINISH,
-      })
-      .then((res) => {
-        const status = res?.data?.data?.status;
-
-        if (status) {
-          dispatch({ type: PREVIEW_ACTIONS.SET_CONVERSION_STATUS, payload: status });
-        }
-      });
-    }
-  }, [state.uuid, state.scenarioId, state.conversionStatus, state.isOpen])
-
-  // useEffect(() => {
-  //   if (!state.stopRender || state.isDelaying || !state.useNewProcess) return;
-    
-  //   const renderContinueMessages = async () => {
-  //     const { isActive, index, finalIndex, timeout } = state.stopRender;
-
-  //     if (isActive) {
-  //       if (!state.previewOrderContent) {
-  //         timeoutConfrmMsgRef.current = setTimeout(async () => {
-  //           renderMessageInRange(index, finalIndex, state, { lastConfirmMessageIdx: index }).then(() => {
-  //             dispatch({
-  //               type: PREVIEW_ACTIONS.SET_STOP_RENDER,
-  //               payload: { ...state.stopRender, isActive: false },
-  //             });
-  //           });
-  //         }, timeout * 1000);
-
-  //         return;
-  //       }
-
-  //       clearTimeout(timeoutConfrmMsgRef.current);
-
-  //       renderMessageInRange(index, finalIndex, state, { lastConfirmMessageIdx: index });
-  //       dispatch({
-  //         type: PREVIEW_ACTIONS.SET_STOP_RENDER,
-  //         payload: {
-  //           ...state.stopRender,
-  //           isActive: false,
-  //         },
-  //       });
-
-  //       return;
-  //     }
-
-  //     clearTimeout(timeoutConfrmMsgRef.current);
-
-  //     renderMessageInRange(index, finalIndex, state, { lastConfirmMessageIdx: index });
-  //   } 
-
-  //   renderContinueMessages();
-
-  //   return () => clearTimeout(timeoutConfrmMsgRef.current);
-  // }, [
-  //   state.stopRender, 
-  //   state.previewOrderContent, 
-  //   state.isDelaying,
-  //   state.useNewProcess,
-  // ]);
-
-  const getBotHeaderIcon = () => {
-    if (state.isOpen) {
-      return state.botInfor?.opening_bot_icon?.url || state.botInfor?.icon?.url;
-    }
-    return state.botInfor?.closing_bot_icon?.url || state.botInfor?.icon?.url;
-  }
 
   // body container
   if (state.scenarioId && state.botInfor && state.isOpen) {
@@ -1387,7 +1111,7 @@ const PreviewFukushashiki = () => {
         <div id="sp-body" className="sp-body" style={bodyStyle}
         >
           {renderMessages()}
-          {renderErrorMessages()}
+          {renderSubmitErrorMessages()}
         </div>
       </div>
     )
