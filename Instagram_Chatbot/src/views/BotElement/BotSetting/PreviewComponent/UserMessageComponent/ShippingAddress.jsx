@@ -18,13 +18,13 @@ export default function ShippingAddress({ content, prefecturesList, indexMessage
       <Radio.Group
         className="f-size-14 w-100-percent"
         disabled={disabled}
-        value={shippingAddress.value_initial_selection}
+        value={shippingAddress.value_initial_selection || ""}
       >
         {
           shippingAddress.radio_contents.map((itemPayment, indexPayment) => {
             return (
               <Radio
-                value={itemPayment.value}
+                value={itemPayment.value || ""}
                 key={indexPayment}
                 className="ss-message__content--user-shipping-address-radio-content"
                 onChange={() => {
@@ -94,7 +94,7 @@ export default function ShippingAddress({ content, prefecturesList, indexMessage
                 "value_name_left"
               )
             }
-            value={shippingAddress.text?.name_valueLeft}
+            value={shippingAddress.text?.name_valueLeft || ""}
           />
           <InputCustom
             disabled={disabled}
@@ -108,7 +108,7 @@ export default function ShippingAddress({ content, prefecturesList, indexMessage
                 "value_name_right"
               )
             }
-            value={shippingAddress.text?.name_valueRight}
+            value={shippingAddress.text?.name_valueRight || ""}
           />
         </div>
       </React.Fragment>
@@ -135,7 +135,7 @@ export default function ShippingAddress({ content, prefecturesList, indexMessage
                 "value_kana_left"
               )
             }
-            value={shippingAddress.text?.kana_name_valueLeft}
+            value={shippingAddress.text?.kana_name_valueLeft || ""}
           />
           <InputCustom
             disabled={disabled}
@@ -149,7 +149,7 @@ export default function ShippingAddress({ content, prefecturesList, indexMessage
                 "value_kana_right"
               )
             }
-            value={shippingAddress.text?.kana_name_valueRight}
+            value={shippingAddress.text?.kana_name_valueRight || ""}
           />
         </div>
       </React.Fragment>

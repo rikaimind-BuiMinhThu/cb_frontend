@@ -128,7 +128,7 @@ export default function CommonAddress({ content, prefecturesList, indexMessageRe
             clearZipCodeError();
           }
         }}
-        value={addressContent.value_post_code}
+        value={addressContent.value_post_code || ""}
         clearable={true}
       />
     );
@@ -169,7 +169,7 @@ export default function CommonAddress({ content, prefecturesList, indexMessageRe
               clearZipCodeError();
             }
           }}
-          value={addressContent.value_post_code_left}
+          value={addressContent.value_post_code_left || ""}
           clearable={true}
         />
         <InputCustom
@@ -200,7 +200,7 @@ export default function CommonAddress({ content, prefecturesList, indexMessageRe
               clearZipCodeError();
             }
           }}
-          value={addressContent.value_post_code_right}
+          value={addressContent.value_post_code_right || ""}
           clearable={true}
         />
       </div>
@@ -231,7 +231,7 @@ export default function CommonAddress({ content, prefecturesList, indexMessageRe
       prefectureInput = (
         <SelectCustom
           className="w-100-percent"
-          value={addressContent?.value_prefecture}
+          value={addressContent?.value_prefecture || ""}
           data={prefecturesList}
           keyValue="id"
           nameValue="name"
@@ -250,7 +250,7 @@ export default function CommonAddress({ content, prefecturesList, indexMessageRe
           onChange={(value) =>
             onChangeValue(contentIndex, content.type, value, "value_prefecture")
           }
-          value={addressContent.value_prefecture}
+          value={addressContent.value_prefecture || ""}
           clearable={true}
         />
       );
@@ -279,7 +279,7 @@ export default function CommonAddress({ content, prefecturesList, indexMessageRe
           onChange={(value) =>
             onChangeValue(contentIndex, content.type, value, "value_municipality")
           }
-          value={addressContent.value_municipality}
+          value={addressContent.value_municipality || ""}
           clearable={true}
         />
       </div>
@@ -303,7 +303,7 @@ export default function CommonAddress({ content, prefecturesList, indexMessageRe
           onChange={(value) =>
             onChangeValue(contentIndex, content.type, value, "value_address")
           }
-          value={addressContent.value_address}
+          value={addressContent.value_address || ""}
           clearable={true}
         />
       </div>
@@ -325,7 +325,7 @@ export default function CommonAddress({ content, prefecturesList, indexMessageRe
           onChange={(value) =>
             onChangeValue(contentIndex, content.type, value, "value_building_name")
           }
-          value={addressContent.value_building_name}
+          value={addressContent.value_building_name || ""}
           clearable={true}
         />
       </div>

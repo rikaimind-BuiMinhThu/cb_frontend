@@ -95,7 +95,7 @@ export default function CreditCardPayment({ content, indexMessage, contentIndex,
             }}
             // max={9999999999999999}
             style={{ width: "100%", marginLeft: "0px" }}
-            value={creditCardPayment.card_number}
+            value={creditCardPayment.card_number || ""}
             placeholder={creditCardPayment.card_number_placeholder}
             onChange={(value) =>
               onChangeValue(
@@ -123,7 +123,7 @@ export default function CreditCardPayment({ content, indexMessage, contentIndex,
             disabled={disabled}
             maxLength={4}
             className="ss-user-setting-input-limit-character"
-            value={creditCardPayment.card_number1}
+            value={creditCardPayment.card_number1 || ""}
             placeholder={creditCardPayment.card_number_placeholder1}
             onChange={(value) => {
               onChangeValue(
@@ -145,7 +145,7 @@ export default function CreditCardPayment({ content, indexMessage, contentIndex,
             disabled={disabled}
             maxLength={4}
             className="ss-user-setting-input-limit-character"
-            value={creditCardPayment.card_number2}
+            value={creditCardPayment.card_number2 || ""}
             placeholder={creditCardPayment.card_number_placeholder2}
             onChange={(value) => {
               onChangeValue(
@@ -167,7 +167,7 @@ export default function CreditCardPayment({ content, indexMessage, contentIndex,
             disabled={disabled}
             maxLength={4}
             className="ss-user-setting-input-limit-character"
-            value={creditCardPayment.card_number3}
+            value={creditCardPayment.card_number3 || ""}
             placeholder={creditCardPayment.card_number_placeholder3}
             onChange={(value) => {
               onChangeValue(
@@ -189,7 +189,7 @@ export default function CreditCardPayment({ content, indexMessage, contentIndex,
             disabled={disabled}
             maxLength={4}
             className="ss-user-setting-input-limit-character"
-            value={creditCardPayment.card_number4}
+            value={creditCardPayment.card_number4 || ""}
             placeholder={creditCardPayment.card_number_placeholder4}
             onChange={(value) =>
               onChangeValue(
@@ -215,7 +215,7 @@ export default function CreditCardPayment({ content, indexMessage, contentIndex,
           label="カード名義"
           inline={false}
           disabled={disabled}
-          value={creditCardPayment.card_holder}
+          value={creditCardPayment.card_holder || ""}
           placeholder={creditCardPayment.card_holder_placeholder}
           onChange={(value) =>
             onChangeValue(
@@ -273,7 +273,7 @@ export default function CreditCardPayment({ content, indexMessage, contentIndex,
           className="ss-user-setting-input-limit-character"
           disabled={disabled}
           style={{ marginLeft: "0px", width: "33%" }}
-          value={creditCardPayment.cvc}
+          value={creditCardPayment.cvc || ""}
           onChange={(value) => {
             if (/^[0-9]{0,4}$/.test(value)) {
               onChangeValue(contentIndex, content.type, value, "cvc")
