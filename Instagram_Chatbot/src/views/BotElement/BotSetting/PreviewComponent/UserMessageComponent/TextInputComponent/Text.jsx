@@ -4,26 +4,26 @@ import { MESSAGE_CONTENT_TYPES, RENDER_CHATBOT_CONFIG } from "views/BotElement/B
 import InputCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
 import InputDebounce from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputDebounce";
 
-export default function Text({ content, disabled, handleOnChangeJpConvertText, indexContent, onChangeValue }) {
+export default function Text({ content, disabled, handleOnChangeJpConvertText, contentIndex, onChangeValue }) {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.TEXT_INPUT || content.text_input.type !== "text") return null;
   const textInput = content.text_input;
 
   if (textInput.isSplitInput === true || textInput.isSplitInput === undefined) {
     return (
       <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <SplitInputText content={content} disabled={disabled} handleOnChangeJpConvertText={handleOnChangeJpConvertText} indexContent={indexContent} onChangeValue={onChangeValue} />
+        <SplitInputText content={content} disabled={disabled} handleOnChangeJpConvertText={handleOnChangeJpConvertText} contentIndex={contentIndex} onChangeValue={onChangeValue} />
       </div>
     )
   }
 
   return (
     <div style={{ display: "flex", justifyContent: "space-between" }}>
-      <SingleInputText content={content} disabled={disabled} handleOnChangeJpConvertText={handleOnChangeJpConvertText} indexContent={indexContent} onChangeValue={onChangeValue} />
+      <SingleInputText content={content} disabled={disabled} handleOnChangeJpConvertText={handleOnChangeJpConvertText} contentIndex={contentIndex} onChangeValue={onChangeValue} />
     </div>
   )
 }
 
-const SplitInputText = ({ content, disabled, handleOnChangeJpConvertText, indexContent, onChangeValue }) => {
+const SplitInputText = ({ content, disabled, handleOnChangeJpConvertText, contentIndex, onChangeValue }) => {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.TEXT_INPUT || content.text_input.type !== "text") return null;
   const textInput = content.text_input;
   if (textInput.isSplitInput !== undefined && textInput.isSplitInput !== true) return null;
@@ -36,7 +36,7 @@ const SplitInputText = ({ content, disabled, handleOnChangeJpConvertText, indexC
           disabled={disabled}
           placeholder={textInput.text?.placeholderLeft}
           style={{ width: "49%", marginBottom: "0px" }}
-          onChange={handleOnChangeJpConvertText(indexContent, content.type, textInput.type, "valueLeft")}
+          onChange={handleOnChangeJpConvertText(contentIndex, content.type, textInput.type, "valueLeft")}
           value={textInput[textInput.type]?.valueLeft}
           debounceTime={RENDER_CHATBOT_CONFIG.DEBOUNCE_INPUT_TEXT_JP_CONVERT}
         />
@@ -45,7 +45,7 @@ const SplitInputText = ({ content, disabled, handleOnChangeJpConvertText, indexC
           disabled={disabled}
           placeholder={textInput.text?.placeholderRight}
           style={{ width: "49%" }}
-          onChange={handleOnChangeJpConvertText(indexContent, content.type, textInput.type, "valueRight")}
+          onChange={handleOnChangeJpConvertText(contentIndex, content.type, textInput.type, "valueRight")}
           value={textInput[textInput.type]?.valueRight}
           debounceTime={RENDER_CHATBOT_CONFIG.DEBOUNCE_INPUT_TEXT_JP_CONVERT}
         />
@@ -61,7 +61,7 @@ const SplitInputText = ({ content, disabled, handleOnChangeJpConvertText, indexC
       style={{ width: "49%", marginBottom: "0px" }}
       onChange={(value) =>
         onChangeValue(
-          indexContent,
+          contentIndex,
           content.type,
           value,
           textInput.type,
@@ -77,7 +77,7 @@ const SplitInputText = ({ content, disabled, handleOnChangeJpConvertText, indexC
       style={{ width: "49%" }}
       onChange={(value) =>
         onChangeValue(
-          indexContent,
+          contentIndex,
           content.type,
           value,
           textInput.type,
@@ -89,7 +89,7 @@ const SplitInputText = ({ content, disabled, handleOnChangeJpConvertText, indexC
   </>
 }
 
-const SingleInputText = ({ content, disabled, handleOnChangeJpConvertText, indexContent, onChangeValue }) => {
+const SingleInputText = ({ content, disabled, handleOnChangeJpConvertText, contentIndex, onChangeValue }) => {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.TEXT_INPUT || content.text_input.type !== "text") return null;
   const textInput = content.text_input;
   if (textInput.isSplitInput) return null;
@@ -100,7 +100,7 @@ const SingleInputText = ({ content, disabled, handleOnChangeJpConvertText, index
         id={content.customId || undefined}
         disabled={disabled}
         placeholder={textInput.text?.placeholderLeft}
-        onChange={handleOnChangeJpConvertText(indexContent, content.type, textInput.type, "value")}
+        onChange={handleOnChangeJpConvertText(contentIndex, content.type, textInput.type, "value")}
         style={{ width: "49%", marginBottom: "0px" }}
         value={textInput[textInput.type]?.value}
         debounceTime={RENDER_CHATBOT_CONFIG.DEBOUNCE_INPUT_TEXT_JP_CONVERT}
@@ -116,7 +116,7 @@ const SingleInputText = ({ content, disabled, handleOnChangeJpConvertText, index
       style={{ width: "49%", marginBottom: "0px" }}
       onChange={(value) =>
         onChangeValue(
-          indexContent,
+          contentIndex,
           content.type,
           value,
           textInput.type,

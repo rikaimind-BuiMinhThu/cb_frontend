@@ -3,7 +3,7 @@ import "assets/css/bot/preview-chat-bot.css";
 import { MESSAGE_CONTENT_TYPES } from "../Constants";
 import CheckboxCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/CheckboxCustom";
 
-export default function AgreeTerm({ content, indexMessage, indexContent, onChangeValue, errors, disabled }) {
+export default function AgreeTerm({ content, indexMessage, contentIndex, onChangeValue, errors, disabled }) {
 if (!content || content.type !== MESSAGE_CONTENT_TYPES.AGREE_TERM) return null;
 
   const agreeTerm = content.agree_term;
@@ -55,7 +55,7 @@ if (!content || content.type !== MESSAGE_CONTENT_TYPES.AGREE_TERM) return null;
             label={agreeTerm.term}
             onChange={(value) =>
               onChangeValue(
-                indexContent,
+                contentIndex,
                 content.type,
                 value,
                 "isAgree"
@@ -92,7 +92,7 @@ if (!content || content.type !== MESSAGE_CONTENT_TYPES.AGREE_TERM) return null;
           disabled={disabled}
           onChange={(value) =>
             onChangeValue(
-              indexContent,
+              contentIndex,
               content.type,
               value,
               "isAgree"
@@ -106,7 +106,7 @@ if (!content || content.type !== MESSAGE_CONTENT_TYPES.AGREE_TERM) return null;
   };
   
   const renderErrorMessage = () => {
-    const errorKey = `message${indexMessage}_content${indexContent}_${content.type}`;
+    const errorKey = `message${indexMessage}_content${contentIndex}_${content.type}`;
     if (!errors?.[errorKey]) return null;
 
     return (

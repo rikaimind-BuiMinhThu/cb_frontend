@@ -5,7 +5,7 @@ import InputCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioCom
 import Text from "./TextInputComponent/Text";
 import PhoneNumber from "./TextInputComponent/PhoneNumber";
 
-export default function TextInput({ content, disabled, handleOnChangeJpConvertText, indexContent: contentIndex, onChangeValue, errors, indexMessage }) {
+export default function TextInput({ content, disabled, handleOnChangeJpConvertText, contentIndex: contentIndex, onChangeValue, errors, indexMessage }) {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.TEXT_INPUT) return null;
   const errorKey = `message${indexMessage}_content${contentIndex}_${content.type}_${content.text_input.type}`;
   const textInput = content.text_input;
@@ -38,13 +38,13 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
         return <Text content={content}
           disabled={disabled}
           handleOnChangeJpConvertText={handleOnChangeJpConvertText}
-          indexContent={contentIndex}
+          contentIndex={contentIndex}
           onChangeValue={onChangeValue}
         />;
       case "phone_number":
         return <PhoneNumber content={content}
           disabled={disabled}
-          indexContent={contentIndex}
+          contentIndex={contentIndex}
           onChangeValue={onChangeValue}
         />;
       case "password":

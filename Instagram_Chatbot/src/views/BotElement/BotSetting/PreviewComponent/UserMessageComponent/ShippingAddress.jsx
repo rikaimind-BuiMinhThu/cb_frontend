@@ -6,7 +6,7 @@ import CommonAddress from "./CommonAddress";
 
 import InputCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
 
-export default function ShippingAddress({ content, prefecturesList, indexMessageRender, indexMessage, indexContent, messageContent, onChangeValue, onChangeErrors, errors, disabled, onOpen }) {
+export default function ShippingAddress({ content, prefecturesList, indexMessageRender, indexMessage, contentIndex, messageContent, onChangeValue, onChangeErrors, errors, disabled, onOpen }) {
   if (content.type !== MESSAGE_CONTENT_TYPES.SHIPPING_ADDRESS) return <></>;
 
   const shippingAddress = content.shipping_address;
@@ -30,7 +30,7 @@ export default function ShippingAddress({ content, prefecturesList, indexMessage
                 onChange={() => {
                   const value = shippingAddress.value_initial_selection !== itemPayment.value ? itemPayment.value : "";
                   onChangeValue(
-                    indexContent,
+                    contentIndex,
                     content.type,
                     value,
                     "value_initial_selection"
@@ -38,7 +38,7 @@ export default function ShippingAddress({ content, prefecturesList, indexMessage
 
                   const isDisplayCardPayment = shippingAddress.card_linked_setting.includes(value);
                   onChangeValue(
-                    indexContent,
+                    contentIndex,
                     content.type,
                     isDisplayCardPayment,
                     "is_display_card_payment"
@@ -88,7 +88,7 @@ export default function ShippingAddress({ content, prefecturesList, indexMessage
             className="w-49-percent m-b-0"
             onChange={(value) =>
               onChangeValue(
-                indexContent,
+                contentIndex,
                 content.type,
                 value,
                 "value_name_left"
@@ -102,7 +102,7 @@ export default function ShippingAddress({ content, prefecturesList, indexMessage
             className="w-49-percent"
             onChange={(value) =>
               onChangeValue(
-                indexContent,
+                contentIndex,
                 content.type,
                 value,
                 "value_name_right"
@@ -129,7 +129,7 @@ export default function ShippingAddress({ content, prefecturesList, indexMessage
             className="w-49-percent m-b-0"
             onChange={(value) =>
               onChangeValue(
-                indexContent,
+                contentIndex,
                 content.type,
                 value,
                 "value_kana_left"
@@ -143,7 +143,7 @@ export default function ShippingAddress({ content, prefecturesList, indexMessage
             className="w-49-percent"
             onChange={(value) =>
               onChangeValue(
-                indexContent,
+                contentIndex,
                 content.type,
                 value,
                 "value_kana_right"
@@ -168,7 +168,7 @@ export default function ShippingAddress({ content, prefecturesList, indexMessage
           prefecturesList={prefecturesList}
           indexMessageRender={indexMessageRender}
           indexMessage={indexMessage}
-          indexContent={indexContent}
+          contentIndex={contentIndex}
           messageContent={messageContent}
           onChangeValue={onChangeValue}
           onChangeErrors={onChangeErrors}

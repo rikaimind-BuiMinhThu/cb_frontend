@@ -2,7 +2,7 @@ import React from "react";
 import "assets/css/bot/preview-chat-bot.css";
 import { MESSAGE_CONTENT_TYPES } from "views/BotElement/BotSetting/PreviewComponent/Constants";
 
-export default function RadioButton({ content, disabled, onChangeValue, errors, indexContent, indexMessage }) {
+export default function RadioButton({ content, disabled, onChangeValue, errors, contentIndex, indexMessage }) {
   if (content.type !== MESSAGE_CONTENT_TYPES.RADIO_BUTTON) return null;
 
   const radioButton = content.radio_button;
@@ -32,7 +32,7 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
   const renderDefaultContent = () => {
     if (radioButton.use_as_gender)
       return <OptionGender 
-        indexContent={indexContent} 
+        contentIndex={contentIndex} 
         radioButton={radioButton} 
         onChangeValue={onChangeValue} 
         options={radioButton[radioButton.type]}
@@ -51,7 +51,7 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
             checked={radioButton.initial_selection === item.value}
             onChange={() => {
               onChangeValue(
-                indexContent,
+                contentIndex,
                 content.type,
                 item.value,
                 "initial_selection"
@@ -84,7 +84,7 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
             checked={radioButton.initial_selection === item.value}
             onChange={() => {
               onChangeValue(
-                indexContent,
+                contentIndex,
                 content.type,
                 item.value,
                 "initial_selection"
@@ -138,7 +138,7 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
           className="ss-message__content--user-radio_button--block_style"
           onClick={() => {
             onChangeValue(
-              indexContent,
+              contentIndex,
               content.type,
               item.value,
               "initial_selection"
@@ -168,10 +168,10 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
   };
 
   const renderErrorMessage = () => {
-    if (!errors?.[`message${indexMessage}_content${indexContent}_${content.type}`]) return null;
+    if (!errors?.[`message${indexMessage}_content${contentIndex}_${content.type}`]) return null;
     return (
       <div className="validation-error-message">
-        {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`]}
+        {errors?.[`message${indexMessage}_content${contentIndex}_${content.type}`]}
       </div>
     );
   };

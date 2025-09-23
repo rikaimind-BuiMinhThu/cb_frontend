@@ -4,7 +4,7 @@ import { MESSAGE_CONTENT_TYPES } from "views/BotElement/BotSetting/PreviewCompon
 import CommonCreditCardPayment from "./CommonCreditCardPayment";
 import { Radio } from "antd";
 
-export default function CardPaymentRadioButton({ content, indexMessage, indexContent, onChangeValue, errors, disabled }) {
+export default function CardPaymentRadioButton({ content, indexMessage, contentIndex, onChangeValue, errors, disabled }) {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.CARD_PAYMENT_RADIO_BUTTON) return null;
 
   const cardPaymentRadioButton = content.card_payment_radio_button;
@@ -139,14 +139,14 @@ export default function CardPaymentRadioButton({ content, indexMessage, indexCon
                         const isDisplayCardPayment = cardPaymentRadioButton.card_linked_setting_picture === value;
 
                         onChangeValue(
-                          indexContent,
+                          contentIndex,
                           content.type,
                           isDisplayCardPayment,
                           "is_display_card_payment"
                         );
 
                         onChangeValue(
-                          indexContent,
+                          contentIndex,
                           content.type,
                           value,
                           "initial_selection_picture"
@@ -173,7 +173,7 @@ export default function CardPaymentRadioButton({ content, indexMessage, indexCon
     const isDisplayCardPayment = cardPaymentRadioButton.card_linked_setting.includes(value);
 
     onChangeValue(
-      indexContent,
+      contentIndex,
       content.type,
       isDisplayCardPayment,
       "is_display_card_payment"
@@ -183,7 +183,7 @@ export default function CardPaymentRadioButton({ content, indexMessage, indexCon
     // if (messageContent.length === 1) onClickNext();
 
     onChangeValue(
-      indexContent,
+      contentIndex,
       content.type,
       value,
       "initial_selection"
@@ -205,11 +205,11 @@ export default function CardPaymentRadioButton({ content, indexMessage, indexCon
     if (!isSelectLinkedCard) return null;
 
     return (
-      <CommonCreditCardPayment content={content} indexMessage={indexMessage} indexContent={indexContent} onChangeValue={onChangeValue} errors={errors} disabled={disabled} />
+      <CommonCreditCardPayment content={content} indexMessage={indexMessage} contentIndex={contentIndex} onChangeValue={onChangeValue} errors={errors} disabled={disabled} />
     );
   };
 
-  const errorKey = `message${indexMessage}_content${indexContent}_${content.type}`;
+  const errorKey = `message${indexMessage}_content${contentIndex}_${content.type}`;
 
   const renderErrorMessage = () => {
     if (!errors?.[errorKey]) return null;

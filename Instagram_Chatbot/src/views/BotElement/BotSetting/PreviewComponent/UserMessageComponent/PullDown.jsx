@@ -14,7 +14,7 @@ import { tokenExpired } from "api/tokenExpired";
 import LPIntegrationOptionPullDown from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/LPIntegrationOptionPullDown";
 import SelectCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/SelectCustom";
 
-export default function PullDown({ content, errors, indexContent, indexMessage, disabled, onChangeValue, prefecturesList, lpOptionData, postMessageToParent }) {
+export default function PullDown({ content, errors, contentIndex, indexMessage, disabled, onChangeValue, prefecturesList, lpOptionData, postMessageToParent }) {
   const [cityOptions, setCityOptions] = useState([]);
 
   if (content.type !== MESSAGE_CONTENT_TYPES.PULL_DOWN) return null;
@@ -50,7 +50,7 @@ export default function PullDown({ content, errors, indexContent, indexMessage, 
         className={`w-32-percent ${additionalProps.className}`}
         onChange={(value) =>
           onChangeValue(
-            indexContent,
+            contentIndex,
             content.type,
             value,
             pullDown.type,
@@ -72,7 +72,7 @@ export default function PullDown({ content, errors, indexContent, indexMessage, 
         className={`w-32-percent ${additionalProps.className}`}
         onChange={(value) =>
           onChangeValue(
-            indexContent,
+            contentIndex,
             content.type,
             value,
             pullDown.type,
@@ -94,7 +94,7 @@ export default function PullDown({ content, errors, indexContent, indexMessage, 
         className={`w-32-percent ${additionalProps.className}`}
         onChange={(value) =>
           onChangeValue(
-            indexContent,
+            contentIndex,
             content.type,
             value,
             pullDown.type,
@@ -116,7 +116,7 @@ export default function PullDown({ content, errors, indexContent, indexMessage, 
         className={`w-32-percent ${additionalProps.className}`}
         onChange={(value) =>
           onChangeValue(
-            indexContent,
+            contentIndex,
             content.type,
             value,
             pullDown.type,
@@ -137,7 +137,7 @@ export default function PullDown({ content, errors, indexContent, indexMessage, 
         className={`w-32-percent ${additionalProps.className}`}
         onChange={(value) =>
           onChangeValue(
-            indexContent,
+            contentIndex,
             content.type,
             value,
             pullDown.type,
@@ -240,7 +240,7 @@ export default function PullDown({ content, errors, indexContent, indexMessage, 
           nameValue="text"
           onChange={(value) =>
             onChangeValue(
-              indexContent,
+              contentIndex,
               content.type,
               value,
               pullDown.type,
@@ -269,7 +269,7 @@ export default function PullDown({ content, errors, indexContent, indexMessage, 
           nameValue="text"
           onChange={(value) =>
             onChangeValue(
-              indexContent,
+              contentIndex,
               content.type,
               value,
               pullDown.type,
@@ -291,7 +291,7 @@ export default function PullDown({ content, errors, indexContent, indexMessage, 
           nameValue="text2"
           onChange={(value) =>
             onChangeValue(
-              indexContent,
+              contentIndex,
               content.type,
               value,
               pullDown.type,
@@ -326,7 +326,7 @@ export default function PullDown({ content, errors, indexContent, indexMessage, 
               className="w-32-percent"
               onChange={(value) =>
                 onChangeValue(
-                  indexContent,
+                  contentIndex,
                   content.type,
                   value,
                   pullDown.type,
@@ -342,7 +342,7 @@ export default function PullDown({ content, errors, indexContent, indexMessage, 
               className="w-32-percent"
               onChange={(value) =>
                 onChangeValue(
-                  indexContent,
+                  contentIndex,
                   content.type,
                   value,
                   pullDown.type,
@@ -473,7 +473,7 @@ export default function PullDown({ content, errors, indexContent, indexMessage, 
           nameValue="name"
           onChange={(value) =>
             onChangeValue(
-              indexContent,
+              contentIndex,
               content.type,
               value,
               pullDown.type,
@@ -499,7 +499,7 @@ export default function PullDown({ content, errors, indexContent, indexMessage, 
         nameValue="text"
         onChange={(value) =>
           onChangeValue(
-            indexContent,
+            contentIndex,
             content.type,
             value,
             pullDown.type,
@@ -522,7 +522,7 @@ export default function PullDown({ content, errors, indexContent, indexMessage, 
         data={lpOptionData[pullDown.from_js_result_target_search_value]}
         postMessageToParent={postMessageToParent}
         onChange={(value) =>
-          onChangeValue(indexContent, content.type, value, pullDown.type, 'value')
+          onChangeValue(contentIndex, content.type, value, pullDown.type, 'value')
         }
         nameValue='text'
         keyValue='value'
@@ -546,7 +546,7 @@ export default function PullDown({ content, errors, indexContent, indexMessage, 
             nameValue="name"
             onChange={async (value) => {
               onChangeValue(
-                indexContent,
+                contentIndex,
                 content.type,
                 value,
                 pullDown.type,
@@ -568,7 +568,7 @@ export default function PullDown({ content, errors, indexContent, indexMessage, 
                 });
               } else {
                 onChangeValue(
-                  indexContent,
+                  contentIndex,
                   content.type,
                   null,
                   pullDown.type,
@@ -589,7 +589,7 @@ export default function PullDown({ content, errors, indexContent, indexMessage, 
             nameValue="city_name"
             onChange={(value) =>
               onChangeValue(
-                indexContent,
+                contentIndex,
                 content.type,
                 value,
                 pullDown.type,
@@ -611,11 +611,11 @@ export default function PullDown({ content, errors, indexContent, indexMessage, 
   };
 
   const renderErrorMessage = () => {
-    if (!errors?.[`message${indexMessage}_content${indexContent}_${content.type}_${pullDown.type}`]) return null;
+    if (!errors?.[`message${indexMessage}_content${contentIndex}_${content.type}_${pullDown.type}`]) return null;
 
     return (
       <div className="validation-error-message">
-        {errors?.[`message${indexMessage}_content${indexContent}_${content.type}_${pullDown.type}`]}
+        {errors?.[`message${indexMessage}_content${contentIndex}_${content.type}_${pullDown.type}`]}
       </div>
     );
   };

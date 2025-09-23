@@ -1024,11 +1024,11 @@ const PreviewFukushashiki = () => {
     });
   };
 
-  const onOpenZipCodePopup = (isOpen, indexContent, indexMessage) => {
+  const onOpenZipCodePopup = (isOpen, contentIndex, indexMessage) => {
     let newState = {};
 
-    if (indexContent !== undefined) {
-      newState.zipcodeContentIndex = indexContent;
+    if (contentIndex !== undefined) {
+      newState.zipcodeContentIndex = contentIndex;
     }
     if (indexMessage !== undefined) {
       newState.zipcodeIndex = indexMessage;
@@ -1130,7 +1130,7 @@ const PreviewFukushashiki = () => {
             messageContentProps={message.message_content}
             disabled={(state.submitErrorMessage.length > 0 && state.submitErrorMessage !== GETTING_ERROR_NOTIFICATION) ? false : message.disabled}
             onChangeValue={(
-              indexContent,
+              contentIndex,
               contentType,
               value,
               field,
@@ -1138,7 +1138,7 @@ const PreviewFukushashiki = () => {
               name
             ) =>
               onChangeValue(
-                indexContent,
+                contentIndex,
                 contentType,
                 value,
                 field,
@@ -1154,8 +1154,8 @@ const PreviewFukushashiki = () => {
             indexMessage={indexMessage}
             errorsProps={state.errors}
             prefecturesList={[...state.prefecturesList]}
-            onOpen={(isOpen, indexContent) => {
-              onOpenZipCodePopup(isOpen, indexContent, Math.min(state.currentMsgIndex, indexMessage));
+            onOpen={(isOpen, contentIndex) => {
+              onOpenZipCodePopup(isOpen, contentIndex, Math.min(state.currentMsgIndex, indexMessage));
             }}
             onChangeErrors={(field, value) =>
               onChangeErrors(field, value)

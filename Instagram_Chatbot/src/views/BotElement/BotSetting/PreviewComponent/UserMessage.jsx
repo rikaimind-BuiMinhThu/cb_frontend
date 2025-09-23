@@ -65,29 +65,29 @@ const UserMessage = ({
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [messageNoti, setMessageNoti] = useState("");
 
-  function loadCaptcha(indexContent) {
+  function loadCaptcha(contentIndex) {
     if (
-      document.getElementById(`captcha-${indexMessage}-${indexContent}`) &&
+      document.getElementById(`captcha-${indexMessage}-${contentIndex}`) &&
       captcha.length !== 0
     )
       document.getElementById(
-        `captcha-${indexMessage}-${indexContent}`
+        `captcha-${indexMessage}-${contentIndex}`
       ).innerHTML =
         captcha.filter(
           (item) =>
-            item.index === indexMessage && item.indexContent === indexContent
+            item.index === indexMessage && item.contentIndex === contentIndex
         )?.[0]?.data || "";
   }
 
-  const handleOnChangeJpConvertText = (indexContent, contentType, type, subFiled) => (value) => {
-    onChangeValue(indexContent, contentType, value, type, subFiled);
+  const handleOnChangeJpConvertText = (contentIndex, contentType, field, subField) => (value) => {
+    onChangeValue(contentIndex, contentType, value, field, subField);
 
-    const nextContent = messageContent[indexContent + 1];
+    const nextContent = messageContent[contentIndex + 1];
     if (nextContent) {
-      const convertType = messageContent[indexContent][contentType].convertTextTypeValue;
+      const convertType = messageContent[contentIndex][contentType].convertTextTypeValue;
 
       convertTextJapaneseByApi(value, convertType).then((textConvertedValue) => {
-        onChangeValue(indexContent + 1, contentType, textConvertedValue, type, subFiled);
+        onChangeValue(contentIndex + 1, contentType, textConvertedValue, field, subField);
       });
     }
   }
@@ -101,7 +101,7 @@ const UserMessage = ({
   }, [messageContentProps]);
 
   useEffect(() => {
-    messageContent.forEach((content, indexContent) => {
+    messageContent.forEach((content, contentIndex) => {
       if (content.type === "calendar") {
         let calendar = content.calendar;
         if (calendar.initial_selection && calendar.type !== "start_end_date") {
@@ -120,7 +120,7 @@ const UserMessage = ({
             i++;
           }
           // calendar.date_select = date_select;
-          onChangeValue(indexContent, content.type, date_select, "date_select");
+          onChangeValue(contentIndex, content.type, date_select, "date_select");
         } else if (
           calendar.initial_selection &&
           calendar.type === "start_end_date"
@@ -146,7 +146,7 @@ const UserMessage = ({
             checkbox.checkedValue.push(item.id);
           });
           onChangeValue(
-            indexContent,
+            contentIndex,
             content.type,
             checkbox.checkedValue,
             "checkedValue"
@@ -163,7 +163,7 @@ const UserMessage = ({
             });
           });
           onChangeValue(
-            indexContent,
+            contentIndex,
             content.type,
             checkbox.initial_selection_picture,
             "initial_selection_picture"
@@ -173,7 +173,7 @@ const UserMessage = ({
         let radioButton = content.radio_button;
         if (radioButton.initial_selection) {
           onChangeValue(
-            indexContent,
+            contentIndex,
             content.type,
             radioButton.initial_selection,
             "initial_selection"
@@ -186,14 +186,14 @@ const UserMessage = ({
           cardPaymentRadioButton.initial_selection
         ) {
           onChangeValue(
-            indexContent,
+            contentIndex,
             content.type,
             cardPaymentRadioButton.initial_selection,
             "initial_selection"
           );
         } else if (cardPaymentRadioButton.initial_selection_picture) {
           onChangeValue(
-            indexContent,
+            contentIndex,
             content.type,
             cardPaymentRadioButton.initial_selection_picture,
             "initial_selection_picture"
@@ -203,7 +203,7 @@ const UserMessage = ({
         let shippingAddress = content.shipping_address;
         if (shippingAddress.value_initial_selection) {
           onChangeValue(
-            indexContent,
+            contentIndex,
             content.type,
             shippingAddress.value_initial_selection,
             "value_initial_selection"
@@ -212,7 +212,7 @@ const UserMessage = ({
       } else if (content.type === "product_purchase") {
         let productPurchase = content.product_purchase;
         onChangeValue(
-          indexContent,
+          contentIndex,
           content.type,
           productPurchase.initial_selection,
           "initial_selection"
@@ -232,7 +232,7 @@ const UserMessage = ({
           const initValue = pullDown[pullDown.type][key];
           const currentValue = pullDown[pullDown.type][attrs[key]];
           if (!currentValue && initValue) {
-            onChangeValue(indexContent, content.type, initValue, pullDown.type, attrs[key]);
+            onChangeValue(contentIndex, content.type, initValue, pullDown.type, attrs[key]);
           }
         });
       }
@@ -292,7 +292,7 @@ const UserMessage = ({
     return content;
   }
 
-  const renderContent = (content, indexContent) => {
+  const renderContent = (content, contentIndex) => {
     switch (content.type) {
       case MESSAGE_CONTENT_TYPES.IMAGE:
         return <Image content={content} />;
@@ -301,7 +301,7 @@ const UserMessage = ({
           content={content}
           disabled={disabled}
           handleOnChangeJpConvertText={handleOnChangeJpConvertText}
-          indexContent={indexContent}
+          contentIndex={contentIndex}
           onChangeValue={onChangeValue}
           errors={errors}
           indexMessage={indexMessage}
@@ -314,7 +314,7 @@ const UserMessage = ({
           disabled={disabled}
           onChangeValue={onChangeValue}
           errors={errors}
-          indexContent={indexContent}
+          contentIndex={contentIndex}
           indexMessage={indexMessage}
         />;
       case MESSAGE_CONTENT_TYPES.RADIO_BUTTON:
@@ -323,7 +323,7 @@ const UserMessage = ({
           disabled={disabled}
           onChangeValue={onChangeValue}
           errors={errors}
-          indexContent={indexContent}
+          contentIndex={contentIndex}
           indexMessage={indexMessage}
         />;
       case MESSAGE_CONTENT_TYPES.CHECKBOX:
@@ -332,7 +332,7 @@ const UserMessage = ({
           disabled={disabled}
           onChangeValue={onChangeValue}
           errors={errors}
-          indexContent={indexContent}
+          contentIndex={contentIndex}
           indexMessage={indexMessage}
         />;
       case MESSAGE_CONTENT_TYPES.PULL_DOWN:
@@ -341,7 +341,7 @@ const UserMessage = ({
           disabled={disabled}
           onChangeValue={onChangeValue}
           errors={errors}
-          indexContent={indexContent}
+          contentIndex={contentIndex}
           indexMessage={indexMessage}
           prefecturesList={prefecturesList}
           lpOptionData={lpOptionData}
@@ -353,7 +353,7 @@ const UserMessage = ({
           prefecturesList={prefecturesList}
           indexMessageRender={indexMessageRender}
           indexMessage={indexMessage}
-          indexContent={indexContent}
+          contentIndex={contentIndex}
           messageContent={messageContent}
           onChangeValue={onChangeValue}
           onChangeErrors={onChangeErrors}
@@ -367,7 +367,7 @@ const UserMessage = ({
           prefecturesList={prefecturesList}
           indexMessageRender={indexMessageRender}
           indexMessage={indexMessage}
-          indexContent={indexContent}
+          contentIndex={contentIndex}
           messageContent={messageContent}
           onChangeValue={onChangeValue}
           onChangeErrors={onChangeErrors}
@@ -379,7 +379,7 @@ const UserMessage = ({
         return <ProductPurchaseSelectOption
           content={content}
           indexMessage={indexMessage}
-          indexContent={indexContent}
+          contentIndex={contentIndex}
           onChangeValue={onChangeValue}
           errors={errors}
         />;
@@ -387,7 +387,7 @@ const UserMessage = ({
         return <Attachment
           content={content}
           indexMessage={indexMessage}
-          indexContent={indexContent}
+          contentIndex={contentIndex}
           onChangeValue={onChangeValue}
           onChangeErrors={onChangeErrors}
           errors={errors}
@@ -397,7 +397,7 @@ const UserMessage = ({
         return <Calendar
           content={content}
           indexMessage={indexMessage}
-          indexContent={indexContent}
+          contentIndex={contentIndex}
           onChangeValue={onChangeValue}
           errors={errors}
           disabled={disabled}
@@ -407,7 +407,7 @@ const UserMessage = ({
         return <AgreeTerm
           content={content}
           indexMessage={indexMessage}
-          indexContent={indexContent}
+          contentIndex={contentIndex}
           onChangeValue={onChangeValue}
           errors={errors}
           disabled={disabled}
@@ -416,7 +416,7 @@ const UserMessage = ({
         return <CreditCardPayment
           content={content}
           indexMessage={indexMessage}
-          indexContent={indexContent}
+          contentIndex={contentIndex}
           onChangeValue={onChangeValue}
           errors={errors}
           disabled={disabled}
@@ -425,7 +425,7 @@ const UserMessage = ({
         return <CardPaymentRadioButton
           content={content}
           indexMessage={indexMessage}
-          indexContent={indexContent}
+          contentIndex={contentIndex}
           onChangeValue={onChangeValue}
           errors={errors}
           disabled={disabled}
@@ -450,7 +450,7 @@ const UserMessage = ({
 
   return (
     <div className="ss-user-message__content-wrapper">
-      {messageContent?.map((content, indexContent) => {
+      {messageContent?.map((content, contentIndex) => {
         let carousel = content.carousel;
         let capture = content.capture;
         let productPurchase = content.product_purchase;
@@ -461,8 +461,8 @@ const UserMessage = ({
         }
 
         return (
-          <React.Fragment key={indexContent}>
-            { renderContent(content, indexContent) }
+          <React.Fragment key={contentIndex}>
+            { renderContent(content, contentIndex) }
 
             {/* type == 'carousel' */}
             {content.type === "carousel" && (
@@ -542,7 +542,7 @@ const UserMessage = ({
                                     !disabled
                                   ) {
                                     onChangeValue(
-                                      indexContent,
+                                      contentIndex,
                                       content.type,
                                       itemCarousel.id,
                                       "initial_selection"
@@ -564,12 +564,12 @@ const UserMessage = ({
                   </div>
                 )}
                 {errors?.[
-                  `message${indexMessage}_content${indexContent}_${content.type}`
+                  `message${indexMessage}_content${contentIndex}_${content.type}`
                 ] && (
                     <div style={{ color: "#FF7E00", fontSize: "12px" }}>
                       {
                         errors?.[
-                        `message${indexMessage}_content${indexContent}_${content.type}`
+                        `message${indexMessage}_content${contentIndex}_${content.type}`
                         ]
                       }
                     </div>
@@ -602,23 +602,23 @@ const UserMessage = ({
                     style={{ width: "50%" }}
                     value={capture.value}
                     onChange={(value) =>
-                      onChangeValue(indexContent, content.type, value, "value")
+                      onChangeValue(contentIndex, content.type, value, "value")
                     }
                   />
                   {/* {new DOMParser().parseFromString(capture.img, "text/xml").innerHTML} */}
                   <div
-                    id={`captcha-${indexMessageRender}-${indexContent}`}
+                    id={`captcha-${indexMessageRender}-${contentIndex}`}
                     style={{ width: "50%" }}
-                    onLoad={loadCaptcha(indexContent)}
+                    onLoad={loadCaptcha(contentIndex)}
                   ></div>
                 </div>
                 {errors?.[
-                  `message${indexMessage}_content${indexContent}_${content.type}`
+                  `message${indexMessage}_content${contentIndex}_${content.type}`
                 ] && (
                     <div style={{ color: "#FF7E00", fontSize: "12px" }}>
                       {
                         errors?.[
-                        `message${indexMessage}_content${indexContent}_${content.type}`
+                        `message${indexMessage}_content${contentIndex}_${content.type}`
                         ]
                       }
                     </div>
@@ -683,7 +683,7 @@ const UserMessage = ({
                                         selectArr.push(itemProduct.id);
                                       }
                                       onChangeValue(
-                                        indexContent,
+                                        contentIndex,
                                         content.type,
                                         selectArr,
                                         "initial_selection"
@@ -760,14 +760,14 @@ const UserMessage = ({
                                             ) {
                                               selectArr.push(itemProduct.id);
                                               onChangeValue(
-                                                indexContent,
+                                                contentIndex,
                                                 content.type,
                                                 selectArr,
                                                 "initial_selection"
                                               );
                                             }
                                             onChangeValue(
-                                              indexContent,
+                                              contentIndex,
                                               content.type,
                                               value,
                                               "products",
@@ -796,7 +796,7 @@ const UserMessage = ({
                                                       Number.MAX_SAFE_INTEGER)
                                                   ) {
                                                     onChangeValue(
-                                                      indexContent,
+                                                      contentIndex,
                                                       content.type,
                                                       itemProduct.quantity_select +
                                                       1,
@@ -817,7 +817,7 @@ const UserMessage = ({
                                                       itemProduct.id
                                                     );
                                                     onChangeValue(
-                                                      indexContent,
+                                                      contentIndex,
                                                       content.type,
                                                       selectArr,
                                                       "initial_selection"
@@ -842,7 +842,7 @@ const UserMessage = ({
                                                     1
                                                   ) {
                                                     onChangeValue(
-                                                      indexContent,
+                                                      contentIndex,
                                                       content.type,
                                                       itemProduct.quantity_select -
                                                       1,
@@ -863,7 +863,7 @@ const UserMessage = ({
                                                       itemProduct.id
                                                     );
                                                     onChangeValue(
-                                                      indexContent,
+                                                      contentIndex,
                                                       content.type,
                                                       selectArr,
                                                       "initial_selection"
@@ -877,7 +877,7 @@ const UserMessage = ({
                                           }
                                         />
                                         {errors?.[
-                                          `message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`
+                                          `message${indexMessage}_content${contentIndex}_${content.type}_${indexProduct}`
                                         ] && (
                                             <div
                                               style={{
@@ -889,7 +889,7 @@ const UserMessage = ({
                                             >
                                               {
                                                 errors?.[
-                                                `message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`
+                                                `message${indexMessage}_content${contentIndex}_${content.type}_${indexProduct}`
                                                 ]
                                               }
                                             </div>
@@ -935,7 +935,7 @@ const UserMessage = ({
                                         dataValue = [itemProduct.id];
                                       }
                                       onChangeValue(
-                                        indexContent,
+                                        contentIndex,
                                         content.type,
                                         dataValue,
                                         "initial_selection"
@@ -1016,14 +1016,14 @@ const UserMessage = ({
                                               value
                                             ) {
                                               onChangeValue(
-                                                indexContent,
+                                                contentIndex,
                                                 content.type,
                                                 [itemProduct.id],
                                                 "initial_selection"
                                               );
                                             }
                                             onChangeValue(
-                                              indexContent,
+                                              contentIndex,
                                               content.type,
                                               value,
                                               "products",
@@ -1052,7 +1052,7 @@ const UserMessage = ({
                                                       Number.MAX_SAFE_INTEGER)
                                                   ) {
                                                     onChangeValue(
-                                                      indexContent,
+                                                      contentIndex,
                                                       content.type,
                                                       itemProduct.quantity_select +
                                                       1,
@@ -1070,7 +1070,7 @@ const UserMessage = ({
                                                     )
                                                   ) {
                                                     onChangeValue(
-                                                      indexContent,
+                                                      contentIndex,
                                                       content.type,
                                                       [itemProduct.id],
                                                       "initial_selection"
@@ -1095,7 +1095,7 @@ const UserMessage = ({
                                                     1
                                                   ) {
                                                     onChangeValue(
-                                                      indexContent,
+                                                      contentIndex,
                                                       content.type,
                                                       itemProduct.quantity_select -
                                                       1,
@@ -1113,7 +1113,7 @@ const UserMessage = ({
                                                     )
                                                   ) {
                                                     onChangeValue(
-                                                      indexContent,
+                                                      contentIndex,
                                                       content.type,
                                                       [itemProduct.id],
                                                       "initial_selection"
@@ -1127,7 +1127,7 @@ const UserMessage = ({
                                           }
                                         />
                                         {errors?.[
-                                          `message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`
+                                          `message${indexMessage}_content${contentIndex}_${content.type}_${indexProduct}`
                                         ] && (
                                             <div
                                               style={{
@@ -1139,7 +1139,7 @@ const UserMessage = ({
                                             >
                                               {
                                                 errors?.[
-                                                `message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`
+                                                `message${indexMessage}_content${contentIndex}_${content.type}_${indexProduct}`
                                                 ]
                                               }
                                             </div>
@@ -1190,12 +1190,12 @@ const UserMessage = ({
                                         selectArr.push(itemProduct.id);
                                       }
                                       onChangeValue(
-                                        indexContent,
+                                        contentIndex,
                                         content.type,
                                         selectArr,
                                         "initial_selection"
                                       );
-                                      // onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexProduct, 'price_display_custom')
+                                      // onChangeValueMessageContent(indexMessageSelect, contentIndex, content.type, value, 'products', indexProduct, 'price_display_custom')
                                     }}
                                   >
                                     <div className="ss-user-overview-product-purchase-container-type-text_image">
@@ -1252,14 +1252,14 @@ const UserMessage = ({
                                             ) {
                                               selectArr.push(itemProduct.id);
                                               onChangeValue(
-                                                indexContent,
+                                                contentIndex,
                                                 content.type,
                                                 selectArr,
                                                 "initial_selection"
                                               );
                                             }
                                             onChangeValue(
-                                              indexContent,
+                                              contentIndex,
                                               content.type,
                                               value,
                                               "products",
@@ -1289,7 +1289,7 @@ const UserMessage = ({
                                                       Number.MAX_SAFE_INTEGER)
                                                   ) {
                                                     onChangeValue(
-                                                      indexContent,
+                                                      contentIndex,
                                                       content.type,
                                                       itemProduct.quantity_select +
                                                       1,
@@ -1310,7 +1310,7 @@ const UserMessage = ({
                                                       itemProduct.id
                                                     );
                                                     onChangeValue(
-                                                      indexContent,
+                                                      contentIndex,
                                                       content.type,
                                                       selectArr,
                                                       "initial_selection"
@@ -1335,7 +1335,7 @@ const UserMessage = ({
                                                     1
                                                   ) {
                                                     onChangeValue(
-                                                      indexContent,
+                                                      contentIndex,
                                                       content.type,
                                                       itemProduct.quantity_select -
                                                       1,
@@ -1356,7 +1356,7 @@ const UserMessage = ({
                                                       itemProduct.id
                                                     );
                                                     onChangeValue(
-                                                      indexContent,
+                                                      contentIndex,
                                                       content.type,
                                                       selectArr,
                                                       "initial_selection"
@@ -1370,7 +1370,7 @@ const UserMessage = ({
                                           }
                                         />
                                         {errors?.[
-                                          `message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`
+                                          `message${indexMessage}_content${contentIndex}_${content.type}_${indexProduct}`
                                         ] && (
                                             <div
                                               style={{
@@ -1380,7 +1380,7 @@ const UserMessage = ({
                                             >
                                               {
                                                 errors?.[
-                                                `message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`
+                                                `message${indexMessage}_content${contentIndex}_${content.type}_${indexProduct}`
                                                 ]
                                               }
                                             </div>
@@ -1410,7 +1410,7 @@ const UserMessage = ({
                               dataValue = [e.target.value];
                             }
                             onChangeValue(
-                              indexContent,
+                              contentIndex,
                               content.type,
                               dataValue,
                               "initial_selection"
@@ -1488,14 +1488,14 @@ const UserMessage = ({
                                               value
                                             ) {
                                               onChangeValue(
-                                                indexContent,
+                                                contentIndex,
                                                 content.type,
                                                 [itemProduct.id],
                                                 "initial_selection"
                                               );
                                             }
                                             onChangeValue(
-                                              indexContent,
+                                              contentIndex,
                                               content.type,
                                               value,
                                               "products",
@@ -1523,7 +1523,7 @@ const UserMessage = ({
                                                       Number.MAX_SAFE_INTEGER)
                                                   ) {
                                                     onChangeValue(
-                                                      indexContent,
+                                                      contentIndex,
                                                       content.type,
                                                       itemProduct.quantity_select +
                                                       1,
@@ -1541,7 +1541,7 @@ const UserMessage = ({
                                                     )
                                                   ) {
                                                     onChangeValue(
-                                                      indexContent,
+                                                      contentIndex,
                                                       content.type,
                                                       [itemProduct.id],
                                                       "initial_selection"
@@ -1566,7 +1566,7 @@ const UserMessage = ({
                                                     1
                                                   ) {
                                                     onChangeValue(
-                                                      indexContent,
+                                                      contentIndex,
                                                       content.type,
                                                       itemProduct.quantity_select -
                                                       1,
@@ -1584,7 +1584,7 @@ const UserMessage = ({
                                                     )
                                                   ) {
                                                     onChangeValue(
-                                                      indexContent,
+                                                      contentIndex,
                                                       content.type,
                                                       [itemProduct.id],
                                                       "initial_selection"
@@ -1598,7 +1598,7 @@ const UserMessage = ({
                                           }
                                         />
                                         {errors?.[
-                                          `message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`
+                                          `message${indexMessage}_content${contentIndex}_${content.type}_${indexProduct}`
                                         ] && (
                                             <div
                                               style={{
@@ -1608,7 +1608,7 @@ const UserMessage = ({
                                             >
                                               {
                                                 errors?.[
-                                                `message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`
+                                                `message${indexMessage}_content${contentIndex}_${content.type}_${indexProduct}`
                                                 ]
                                               }
                                             </div>
@@ -1624,12 +1624,12 @@ const UserMessage = ({
                     ))}
                   {productPurchase.type === "consume_api_response" && <></>}
                   {errors?.[
-                    `message${indexMessage}_content${indexContent}_${content.type}`
+                    `message${indexMessage}_content${contentIndex}_${content.type}`
                   ] && (
                       <div style={{ color: "#FF7E00", fontSize: "12px" }}>
                         {
                           errors?.[
-                          `message${indexMessage}_content${indexContent}_${content.type}`
+                          `message${indexMessage}_content${contentIndex}_${content.type}`
                           ]
                         }
                       </div>
@@ -1668,7 +1668,7 @@ const UserMessage = ({
                           disabled={disabled}
                           onChange={(value) => {
                             onChangeValue(
-                              indexContent,
+                              contentIndex,
                               content.type,
                               value.target.value,
                               "initial_selection"
@@ -1740,7 +1740,7 @@ const UserMessage = ({
                         value={productPurchaseRadioButton.initial_selection}
                         onChange={(value) => {
                           onChangeValue(
-                            indexContent,
+                            contentIndex,
                             content.type,
                             value.target.value,
                             "initial_selection"
@@ -1790,12 +1790,12 @@ const UserMessage = ({
                   {productPurchaseRadioButton.type ===
                     "consume_api_response" && <></>}
                   {errors?.[
-                    `message${indexMessage}_content${indexContent}_${content.type}`
+                    `message${indexMessage}_content${contentIndex}_${content.type}`
                   ] && (
                       <div style={{ color: "#FF7E00", fontSize: "12px" }}>
                         {
                           errors?.[
-                          `message${indexMessage}_content${indexContent}_${content.type}`
+                          `message${indexMessage}_content${contentIndex}_${content.type}`
                           ]
                         }
                       </div>
@@ -1828,7 +1828,7 @@ const UserMessage = ({
                     disabled={disabled}
                     value={slider.value}
                     onChange={(value) =>
-                      onChangeValue(indexContent, content.type, value, "value")
+                      onChangeValue(contentIndex, content.type, value, "value")
                     }
                     trackStyle={{ backgroundColor: slider.color || "#2C75F0" }}
                     min={
@@ -1856,12 +1856,12 @@ const UserMessage = ({
                     }
                   />
                   {errors?.[
-                    `message${indexMessage}_content${indexContent}_${content.type}`
+                    `message${indexMessage}_content${contentIndex}_${content.type}`
                   ] && (
                       <div style={{ color: "#FF7E00", fontSize: "12px" }}>
                         {
                           errors?.[
-                          `message${indexMessage}_content${indexContent}_${content.type}`
+                          `message${indexMessage}_content${contentIndex}_${content.type}`
                           ]
                         }
                       </div>

@@ -13,7 +13,7 @@ const SubmitButtonLoadingConfig = ({
   content,
   config = {},
   indexMessageSelect,
-  indexContent,
+  contentIndex,
 }) => {
   const [loadingConfig, setLoadingConfig] = useState({
     ...defaultValue,
@@ -27,7 +27,7 @@ const SubmitButtonLoadingConfig = ({
     setLoadingConfig(newLoadingConfig);
     onChange(
       indexMessageSelect,
-      indexContent,
+      contentIndex,
       content.type,
       newLoadingConfig,
       "loading_config",

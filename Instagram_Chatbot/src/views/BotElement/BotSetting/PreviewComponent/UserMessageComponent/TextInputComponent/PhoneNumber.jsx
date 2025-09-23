@@ -4,7 +4,7 @@ import { MESSAGE_CONTENT_TYPES } from "views/BotElement/BotSetting/PreviewCompon
 import InputCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
 import { moveToNext } from "views/BotElement/BotSetting/PreviewComponent/Utils";
 
-export default function PhoneNumber({ content, disabled, indexContent, onChangeValue }) {
+export default function PhoneNumber({ content, disabled, contentIndex, onChangeValue }) {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.TEXT_INPUT || content.text_input.type !== "phone_number") return null;
   const textInput = content.text_input;
   const phoneNumber = textInput.phone_number;
@@ -18,7 +18,7 @@ export default function PhoneNumber({ content, disabled, indexContent, onChangeV
             placeholder={textInput[textInput.type]?.number}
             onChange={(value) =>
               onChangeValue(
-                indexContent,
+                contentIndex,
                 content.type,
                 value,
                 textInput.type,
@@ -44,10 +44,10 @@ export default function PhoneNumber({ content, disabled, indexContent, onChangeV
           placeholder={textInput[textInput.type]?.number1}
           onChange={(value) => {
             if (value.length === 3) {
-              moveToNext(`ss-user-message-phone_number_2_${indexContent}`);
+              moveToNext(`ss-user-message-phone_number_2_${contentIndex}`);
             }
             onChangeValue(
-              indexContent,
+              contentIndex,
               content.type,
               value,
               textInput.type,
@@ -56,13 +56,13 @@ export default function PhoneNumber({ content, disabled, indexContent, onChangeV
           }}
           onCompositionEnd={(event) => {
             if (event.target.value.length === 3) {
-              moveToNext(`ss-user-message-phone_number_2_${indexContent}`);
+              moveToNext(`ss-user-message-phone_number_2_${contentIndex}`);
             }
           }}
           value={textInput[textInput.type]?.value1}
         ></InputCustom>
         <InputCustom
-          id={`ss-user-message-phone_number_2_${indexContent}`}
+          id={`ss-user-message-phone_number_2_${contentIndex}`}
           disabled={disabled}
           className="ss-message__content--user-text-input ss-input-value ss-message__content--user-text-input-phone_number-hyphen"
           type="tel"
@@ -71,10 +71,10 @@ export default function PhoneNumber({ content, disabled, indexContent, onChangeV
           placeholder={textInput[textInput.type]?.number2}
           onChange={(value) => {
             if (value.length === 4) {
-              moveToNext(`ss-user-message-phone_number_3_${indexContent}`);
+              moveToNext(`ss-user-message-phone_number_3_${contentIndex}`);
             }
             onChangeValue(
-              indexContent,
+              contentIndex,
               content.type,
               value,
               textInput.type,
@@ -83,13 +83,13 @@ export default function PhoneNumber({ content, disabled, indexContent, onChangeV
           }}
           onCompositionEnd={(event) => {
             if (event.target.value.length === 4) {
-              moveToNext(`ss-user-message-phone_number_3_${indexContent}`);
+              moveToNext(`ss-user-message-phone_number_3_${contentIndex}`);
             }
           }}
           value={textInput[textInput.type]?.value2}
         ></InputCustom>
         <InputCustom
-          id={`ss-user-message-phone_number_3_${indexContent}`}
+          id={`ss-user-message-phone_number_3_${contentIndex}`}
           disabled={disabled}
           className="ss-message__content--user-text-input ss-input-value ss-message__content--user-text-input-phone_number-hyphen"
           placeholder={textInput[textInput.type]?.number3}
@@ -98,7 +98,7 @@ export default function PhoneNumber({ content, disabled, indexContent, onChangeV
           inputMode="numeric"
           onChange={(value) =>
             onChangeValue(
-              indexContent,
+              contentIndex,
               content.type,
               value,
               textInput.type,

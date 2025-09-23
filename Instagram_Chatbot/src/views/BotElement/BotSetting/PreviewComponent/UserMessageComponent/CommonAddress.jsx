@@ -6,7 +6,7 @@ import { getAddressFromZipCode, moveToNext } from "views/BotElement/BotSetting/P
 import InputCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
 import SelectCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/SelectCustom";
 
-export default function CommonAddress({ content, prefecturesList, indexMessageRender, indexMessage, indexContent, messageContent, onChangeValue, onChangeErrors, errors, disabled, onOpen }) {
+export default function CommonAddress({ content, prefecturesList, indexMessageRender, indexMessage, contentIndex, messageContent, onChangeValue, onChangeErrors, errors, disabled, onOpen }) {
   
   if (content.type !== MESSAGE_CONTENT_TYPES.ZIP_CODE_ADDRESS && content.type !== MESSAGE_CONTENT_TYPES.SHIPPING_ADDRESS) return <></>;
   
@@ -49,7 +49,7 @@ export default function CommonAddress({ content, prefecturesList, indexMessageRe
       >
         <span style={{ cursor }}
           onClick={() => {
-            if (disabled !== true) onOpen(true, indexContent);
+            if (disabled !== true) onOpen(true, contentIndex);
           }}
         >
           〒検索はこちら
@@ -59,12 +59,12 @@ export default function CommonAddress({ content, prefecturesList, indexMessageRe
   };
 
   const changeInvalidZipCodeError = () => {
-    const errorKey = `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`;
+    const errorKey = `message${indexMessageRender}_content${contentIndex}_${messageContent[contentIndex].type}`;
     onChangeErrors(errorKey, "無効な郵便番号です。");
   };
 
   const clearZipCodeError = () => {
-    const errorKey = `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`;
+    const errorKey = `message${indexMessageRender}_content${contentIndex}_${messageContent[contentIndex].type}`;
     onChangeErrors(errorKey, "");
   };
 
@@ -88,12 +88,12 @@ export default function CommonAddress({ content, prefecturesList, indexMessageRe
         newZipCodeAddress.value_address = town_name;
       }
 
-      onChangeValue(indexContent, content.type, newZipCodeAddress.value_prefecture, "value_prefecture");
-      onChangeValue(indexContent, content.type, newZipCodeAddress.value_municipality, "value_municipality");
-      onChangeValue(indexContent, content.type, newZipCodeAddress.value_address, "value_address");
-      onChangeValue(indexContent, content.type, newZipCodeAddress.value_building_name, "value_building_name");
+      onChangeValue(contentIndex, content.type, newZipCodeAddress.value_prefecture, "value_prefecture");
+      onChangeValue(contentIndex, content.type, newZipCodeAddress.value_municipality, "value_municipality");
+      onChangeValue(contentIndex, content.type, newZipCodeAddress.value_address, "value_address");
+      onChangeValue(contentIndex, content.type, newZipCodeAddress.value_building_name, "value_building_name");
 
-      moveToNext(`ss-user-input-address${indexContent}`);
+      moveToNext(`ss-user-input-address${contentIndex}`);
       clearZipCodeError();
 
     }).catch((error) => {
@@ -115,7 +115,7 @@ export default function CommonAddress({ content, prefecturesList, indexMessageRe
         style={{ width: "100%", marginLeft: "0px" }}
         onChange={async (value) => {
           onChangeValue(
-            indexContent,
+            contentIndex,
             content.type,
             value,
             "value_post_code"
@@ -150,13 +150,13 @@ export default function CommonAddress({ content, prefecturesList, indexMessageRe
             if (value && !NUMBER_REGEX.test(value)) return;
 
             onChangeValue(
-              indexContent,
+              contentIndex,
               content.type,
               value,
               "value_post_code_left"
             );
             if ((value + "").length === 3) {
-              moveToNext(`ss-user-post-code-right-input${indexContent}`);
+              moveToNext(`ss-user-post-code-right-input${contentIndex}`);
             }
 
             const zipCode = value + addressContent.value_post_code_right;
@@ -177,7 +177,7 @@ export default function CommonAddress({ content, prefecturesList, indexMessageRe
           inputMode="numeric"
           placeholder={addressContent.post_code_right}
           disabled={disabled}
-          id={`ss-user-post-code-right-input${indexContent}`}
+          id={`ss-user-post-code-right-input${contentIndex}`}
           className="w-49-percent"
           onKeyPress={(e) => {
             if (String(e.target.value).length >= 4) e.preventDefault();
@@ -185,7 +185,7 @@ export default function CommonAddress({ content, prefecturesList, indexMessageRe
           onChange={async (value) => {
             if (value && !NUMBER_REGEX.test(value)) return;
             onChangeValue(
-              indexContent,
+              contentIndex,
               content.type,
               value,
               "value_post_code_right"
@@ -237,7 +237,7 @@ export default function CommonAddress({ content, prefecturesList, indexMessageRe
           nameValue="name"
           placeholder={addressContent.prefecture}
           onChange={(value) =>
-            onChangeValue(indexContent, content.type, value, "value_prefecture")
+            onChangeValue(contentIndex, content.type, value, "value_prefecture")
           }
         />
       );
@@ -248,7 +248,7 @@ export default function CommonAddress({ content, prefecturesList, indexMessageRe
           disabled={disabled}
           className="w-100-percent"
           onChange={(value) =>
-            onChangeValue(indexContent, content.type, value, "value_prefecture")
+            onChangeValue(contentIndex, content.type, value, "value_prefecture")
           }
           value={addressContent.value_prefecture}
           clearable={true}
@@ -277,7 +277,7 @@ export default function CommonAddress({ content, prefecturesList, indexMessageRe
           disabled={disabled}
           className="w-100-percent"
           onChange={(value) =>
-            onChangeValue(indexContent, content.type, value, "value_municipality")
+            onChangeValue(contentIndex, content.type, value, "value_municipality")
           }
           value={addressContent.value_municipality}
           clearable={true}
@@ -296,12 +296,12 @@ export default function CommonAddress({ content, prefecturesList, indexMessageRe
       <div className="ss-user-setting__item-bottom">
         <div className="ss-message__content--user-zip-code-address-label">{addressLabel}</div>
         <InputCustom
-          id={`ss-user-input-address${indexContent}`}
+          id={`ss-user-input-address${contentIndex}`}
           placeholder={addressContent.address}
           disabled={disabled}
           className="w-100-percent"
           onChange={(value) =>
-            onChangeValue(indexContent, content.type, value, "value_address")
+            onChangeValue(contentIndex, content.type, value, "value_address")
           }
           value={addressContent.value_address}
           clearable={true}
@@ -318,12 +318,12 @@ export default function CommonAddress({ content, prefecturesList, indexMessageRe
       <div className="ss-user-setting__item-bottom">
         <div className="ss-message__content--user-zip-code-address-label">{buildingNameLabel}</div>
         <InputCustom
-          id={`ss-user-input-building${indexContent}`}
+          id={`ss-user-input-building${contentIndex}`}
           placeholder={addressContent.building_name}
           disabled={disabled}
           className="w-100-percent"
           onChange={(value) =>
-            onChangeValue(indexContent, content.type, value, "value_building_name")
+            onChangeValue(contentIndex, content.type, value, "value_building_name")
           }
           value={addressContent.value_building_name}
           clearable={true}
@@ -335,7 +335,7 @@ export default function CommonAddress({ content, prefecturesList, indexMessageRe
   const renderErrorMessage = () => {
     return (
       <div className="validation-error-message">
-        {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`]}
+        {errors?.[`message${indexMessage}_content${contentIndex}_${content.type}`]}
       </div>
     );
   };

@@ -166,6 +166,7 @@ const PreviewFukushashikiReducer = (state, action) => {
           break;
         default:
           changeContentValue(subContent, value, field, subField1, subField2);
+          console.log("changeContentValue after subContent out", subContent);
           break;
       }
 
@@ -309,6 +310,11 @@ const PreviewFukushashikiReducer = (state, action) => {
 };
 
 const changeContentValue = (subContent, value, field, subField1 = null, subField2 = null) => {
+  console.log("changeContentValue subContent", subContent);
+  console.log("changeContentValue value", value);
+  console.log("changeContentValue field", field);
+  console.log("changeContentValue subField1", subField1);
+  console.log("changeContentValue subField2", subField2);
   if (!field) return;
 
   if (subField2) {
@@ -321,6 +327,7 @@ const changeContentValue = (subContent, value, field, subField1 = null, subField
   } else {
     subContent[field] = value;
   }
+  console.log("changeContentValue after subContent", subContent);
 };
 
 const changeZipCodeAddress = (subContent, value, field, prefecturesList) => {
@@ -425,6 +432,8 @@ const getProductDetailsForProductPurchase = (subContent, value) => {
 }
 
 const handleSaveInputContent = (newState, subContent, contentType, field, value) => {
+  console.log("field", field);
+  console.log("value", value);
   if (!subContent.is_save_input_content) return;
 
   const variableName = subContent.save_input_content;

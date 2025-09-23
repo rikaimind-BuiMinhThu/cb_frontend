@@ -5,13 +5,13 @@ import { MDBIcon } from "mdbreact";
 import { MESSAGE_CONTENT_TYPES } from "../Constants";
 import InputCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
 
-export default function Attachment({ content, indexMessage, indexContent, onChangeValue, onChangeErrors, errors, disabled }) {
+export default function Attachment({ content, indexMessage, contentIndex, onChangeValue, onChangeErrors, errors, disabled }) {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.ATTACHMENT) return null;
 
   const attachingFile = content.attaching_file;
   if (!attachingFile) return;
 
-  const errorKey = `message${indexMessage}_content${indexContent}_${content.type}`;
+  const errorKey = `message${indexMessage}_content${contentIndex}_${content.type}`;
 
   const changeErrorMessage = (message) => {
     onChangeErrors(errorKey, message);
@@ -25,7 +25,7 @@ export default function Attachment({ content, indexMessage, indexContent, onChan
     document.getElementById("ss-bot-file-upload-preview").click();
   }
 
-  const getBaseUrl = (event, indexContent) => {
+  const getBaseUrl = (event, contentIndex) => {
     var file = event.target.files[0];
     const type = file.name.slice(file.name.lastIndexOf(".") + 1);
     if (attachingFile.file_type.length > 0 && !attachingFile.file_type.includes(type.toLowerCase())) {
@@ -36,8 +36,8 @@ export default function Attachment({ content, indexMessage, indexContent, onChan
     }
 
     clearErrorMessage();
-    onChangeValue(indexContent, "attaching_file", file.name, "value");
-    onChangeValue(indexContent, "attaching_file", URL.createObjectURL(file), "linkFile");
+    onChangeValue(contentIndex, "attaching_file", file.name, "value");
+    onChangeValue(contentIndex, "attaching_file", URL.createObjectURL(file), "linkFile");
   };
 
   const renderRequireLabel = () => {
@@ -66,7 +66,7 @@ export default function Attachment({ content, indexMessage, indexContent, onChan
             className={`ss-message-custom-icon-times ${disabled && "ss-message-custom-icon-times-disabled"}`}
             onClick={() => {
               if (!disabled) {
-                onChangeValue(indexContent, content.type, "", "value");
+                onChangeValue(contentIndex, content.type, "", "value");
               }
             }}
           />
@@ -76,10 +76,10 @@ export default function Attachment({ content, indexMessage, indexContent, onChan
           id="ss-bot-file-upload-preview"
           name="bot-file-upload"
           hidden
-          onChange={(e) => getBaseUrl(e, indexContent)}
+          onChange={(e) => getBaseUrl(e, contentIndex)}
         />
         <Button
-          id={`sp-button-upload-${indexContent}`}
+          id={`sp-button-upload-${contentIndex}`}
           className="ss-message__content--attaching_file-button-upload"
           disabled={disabled}
           onClick={onClickUploadFile}

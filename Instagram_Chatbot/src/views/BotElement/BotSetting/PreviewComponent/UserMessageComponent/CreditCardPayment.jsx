@@ -13,7 +13,7 @@ import { moveToNext } from "views/BotElement/BotSetting/PreviewComponent/Utils";
 
 import moment from "moment";
 
-export default function CreditCardPayment({ content, indexMessage, indexContent, onChangeValue, errors, disabled }) {
+export default function CreditCardPayment({ content, indexMessage, contentIndex, onChangeValue, errors, disabled }) {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.CREDIT_CARD_PAYMENT) return null;
 
   const creditCardPayment = content.credit_card_payment;
@@ -84,7 +84,7 @@ export default function CreditCardPayment({ content, indexMessage, indexContent,
                   "sp_credit_card_payment"
                 ).value = value;
                 onChangeValue(
-                  indexContent,
+                  contentIndex,
                   content.type,
                   value,
                   "card_number"
@@ -99,7 +99,7 @@ export default function CreditCardPayment({ content, indexMessage, indexContent,
             placeholder={creditCardPayment.card_number_placeholder}
             onChange={(value) =>
               onChangeValue(
-                indexContent,
+                contentIndex,
                 content.type,
                 value,
                 "card_number"
@@ -127,7 +127,7 @@ export default function CreditCardPayment({ content, indexMessage, indexContent,
             placeholder={creditCardPayment.card_number_placeholder1}
             onChange={(value) => {
               onChangeValue(
-                indexContent,
+                contentIndex,
                 content.type,
                 value,
                 "card_number1"
@@ -149,7 +149,7 @@ export default function CreditCardPayment({ content, indexMessage, indexContent,
             placeholder={creditCardPayment.card_number_placeholder2}
             onChange={(value) => {
               onChangeValue(
-                indexContent,
+                contentIndex,
                 content.type,
                 value,
                 "card_number2"
@@ -171,7 +171,7 @@ export default function CreditCardPayment({ content, indexMessage, indexContent,
             placeholder={creditCardPayment.card_number_placeholder3}
             onChange={(value) => {
               onChangeValue(
-                indexContent,
+                contentIndex,
                 content.type,
                 value,
                 "card_number3"
@@ -193,7 +193,7 @@ export default function CreditCardPayment({ content, indexMessage, indexContent,
             placeholder={creditCardPayment.card_number_placeholder4}
             onChange={(value) =>
               onChangeValue(
-                indexContent,
+                contentIndex,
                 content.type,
                 value,
                 "card_number4"
@@ -219,7 +219,7 @@ export default function CreditCardPayment({ content, indexMessage, indexContent,
           placeholder={creditCardPayment.card_holder_placeholder}
           onChange={(value) =>
             onChangeValue(
-              indexContent,
+              contentIndex,
               content.type,
               value,
               "card_holder"
@@ -233,8 +233,8 @@ export default function CreditCardPayment({ content, indexMessage, indexContent,
   const renderExpirationDateYm = () => {
     return (
       <div style={{ display: "flex", width: "100%" }}>
-        <SelectCustom style={{ width: "33%" }} value={creditCardPayment.year} disabled={disabled} placeholder={creditCardPayment.year_placeholder} data={cardExpiredYearOptions} onChange={(value) => onChangeValue(indexContent, content.type, value, "year")} />
-        <SelectCustom style={{ width: "33%", marginLeft: "10px" }} value={creditCardPayment.month} placeholder={creditCardPayment.month_placeholder} data={cardExpiredMonthOptions} disabled={disabled} onChange={(value) => onChangeValue(indexContent, content.type, value, "month")} />
+        <SelectCustom style={{ width: "33%" }} value={creditCardPayment.year} disabled={disabled} placeholder={creditCardPayment.year_placeholder} data={cardExpiredYearOptions} onChange={(value) => onChangeValue(contentIndex, content.type, value, "year")} />
+        <SelectCustom style={{ width: "33%", marginLeft: "10px" }} value={creditCardPayment.month} placeholder={creditCardPayment.month_placeholder} data={cardExpiredMonthOptions} disabled={disabled} onChange={(value) => onChangeValue(contentIndex, content.type, value, "month")} />
       </div>
     );
   };
@@ -242,8 +242,8 @@ export default function CreditCardPayment({ content, indexMessage, indexContent,
   const renderExpirationDateMy = () => {
     return (
       <div style={{ display: "flex", width: "100%" }}>
-        <SelectCustom style={{ width: "33%" }} value={creditCardPayment.month} placeholder={creditCardPayment.month_placeholder} data={cardExpiredMonthOptions} disabled={disabled} onChange={(value) => onChangeValue(indexContent, content.type, value, "month")} />
-        <SelectCustom style={{ width: "33%", marginLeft: "10px" }} value={creditCardPayment.year} disabled={disabled} placeholder={creditCardPayment.year_placeholder} data={cardExpiredYearOptions} onChange={(value) => onChangeValue(indexContent, content.type, value, "year")} />
+        <SelectCustom style={{ width: "33%" }} value={creditCardPayment.month} placeholder={creditCardPayment.month_placeholder} data={cardExpiredMonthOptions} disabled={disabled} onChange={(value) => onChangeValue(contentIndex, content.type, value, "month")} />
+        <SelectCustom style={{ width: "33%", marginLeft: "10px" }} value={creditCardPayment.year} disabled={disabled} placeholder={creditCardPayment.year_placeholder} data={cardExpiredYearOptions} onChange={(value) => onChangeValue(contentIndex, content.type, value, "year")} />
       </div>
     );
   };
@@ -276,7 +276,7 @@ export default function CreditCardPayment({ content, indexMessage, indexContent,
           value={creditCardPayment.cvc}
           onChange={(value) => {
             if (/^[0-9]{0,4}$/.test(value)) {
-              onChangeValue(indexContent, content.type, value, "cvc")
+              onChangeValue(contentIndex, content.type, value, "cvc")
             }
           }}
           label={cvcLabel}
@@ -286,7 +286,7 @@ export default function CreditCardPayment({ content, indexMessage, indexContent,
     );
   };
 
-  const errorKey = `message${indexMessage}_content${indexContent}_${content.type}`;
+  const errorKey = `message${indexMessage}_content${contentIndex}_${content.type}`;
 
   const renderErrorMessage = () => {
     if (!errors?.[errorKey]) return null;

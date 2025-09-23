@@ -13,7 +13,7 @@ const processForUserCaptchaMessage = (messagesList, i, msgContentIndex, newState
   getCaptcha(size, color, charPreset)
     .then((res) => {
       let newCaptcha = [...state.captcha];
-      newCaptcha.push({index: i, indexContent: msgContentIndex, ...res.data});
+      newCaptcha.push({index: i, contentIndex: msgContentIndex, ...res.data});
       dispatch({ type: PREVIEW_ACTIONS.SET_CAPTCHA, payload: [...newCaptcha] });
     });
 }
