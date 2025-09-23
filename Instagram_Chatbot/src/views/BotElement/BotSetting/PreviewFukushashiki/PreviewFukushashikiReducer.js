@@ -138,18 +138,26 @@ const PreviewFukushashikiReducer = (state, action) => {
           }
         }
       }
-      
-      if (!isUpdateClicked) {
-        newState.nextStopMsgIndex = state.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex)) + 1;
-        if (newState.nextStopMsgIndex < newState.currentMsgIndex) {
-          newState.nextStopMsgIndex = newState.currentMsgIndex;
-        }
-      }
 
+      // Calculate next stop message index
+      const nextStopMsgIndex = state.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex)) + 1;
+      
+      // Set nextStopMsgIndex based on render mode
       if (action.payload.renderMode === RENDER_MODES.LAST) {
+        // LAST mode: render all messages up to the next user message
+        if (!isUpdateClicked) {
+          newState.nextStopMsgIndex = nextStopMsgIndex;
+        }
         newState.currentMsgIndex = newState.nextStopMsgIndex - 1;
       } else {
+        // NEXT mode: render messages one by one
         newState.currentMsgIndex = clickedMsgIndex + 1; 
+        newState.nextStopMsgIndex = nextStopMsgIndex;
+      }
+      
+      // Ensure nextStopMsgIndex is not less than currentMsgIndex (common validation)
+      if (newState.nextStopMsgIndex < newState.currentMsgIndex) {
+        newState.nextStopMsgIndex = newState.currentMsgIndex;
       }
 
       newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
