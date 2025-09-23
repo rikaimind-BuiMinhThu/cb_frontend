@@ -811,7 +811,6 @@ const PreviewFukushashiki = () => {
     }
   }
 
-
   const postMessageForGetPreviewOrderContent = async (jsCode, options = {}) => {
     const { isNewProcess = false, stopRender } = options;
 
@@ -838,110 +837,112 @@ const PreviewFukushashiki = () => {
   }
 
 
-  const renderMessageInRange = async (startIndex, endIndex, newState, nextUserMsgIndex, options = {}) => { 
-    const { 
-      isUpdateClick = false, 
-      isPassDelay = false,
-      lastConfirmMessageIdx = -1,
-      appearFromStart = false,
-    } = options;
-    const listMsgAppear = [];
+  // const renderMessageInRange = async (startIndex, endIndex, newState, nextUserMsgIndex, options = {}) => { 
+  //   const { 
+  //     isUpdateClick = false, 
+  //     isPassDelay = false,
+  //     lastConfirmMessageIdx = -1,
+  //     appearFromStart = false,
+  //   } = options;
+  //   const listMsgAppear = [];
 
-    for (let i = startIndex; i <= endIndex; i++) {
-      const confirmMessage = newState.messagesList[i].message_content?.find(x => x.text_input?.use_for_confirm_message);
-      if (confirmMessage?.text_input?.jscode && !newState.stopRender?.isActive && lastConfirmMessageIdx !== i) {
-        const nextUserMessage = newState.messagesList[nextUserMsgIndex];
-        const isNextUserMessageButtonSubmit = nextUserMessage?.message_content?.[0]?.type === "button_submit";
+  //   for (let i = startIndex; i <= endIndex; i++) {
+  //     const confirmMessage = newState.messagesList[i].message_content?.find(x => x.text_input?.use_for_confirm_message);
+  //     if (confirmMessage?.text_input?.jscode && !newState.stopRender?.isActive && lastConfirmMessageIdx !== i) {
+  //       const nextUserMessage = newState.messagesList[nextUserMsgIndex];
+  //       const isNextUserMessageButtonSubmit = nextUserMessage?.message_content?.[0]?.type === "button_submit";
 
-        if (!isNextUserMessageButtonSubmit) {
-          continue;
-        }
+  //       if (!isNextUserMessageButtonSubmit) {
+  //         continue;
+  //       }
 
-        newState.stopRender = {
-          index: i,
-          finalIndex: newState.currentMsgIndex,
-          timeout: 30,
-          start: new Date(),
-          isActive: true,
-        };
+  //       newState.stopRender = {
+  //         index: i,
+  //         finalIndex: newState.currentMsgIndex,
+  //         timeout: 30,
+  //         start: new Date(),
+  //         isActive: true,
+  //       };
 
-        newState.previewOrderContent = null;
+  //       newState.previewOrderContent = null;
 
-        postMessageForGetPreviewOrderContent(
-          confirmMessage.text_input.jscode,
-          { isNewProcess: newState.useNewProcess, stopRender: newState.stopRender },
-        );
-        break;
-      }
+  //       postMessageForGetPreviewOrderContent(
+  //         confirmMessage.text_input.jscode,
+  //         { isNewProcess: newState.useNewProcess, stopRender: newState.stopRender },
+  //       );
+  //       break;
+  //     }
 
-      newState.renderMessagesList = newState.messagesList.slice(0, i + 1);
-      if (isDelayBotMessage(newState.messagesList[i])) {
-        // render delay item so typing GIF appears, then wait
-        dispatch({
-          type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
-          payload: {
-            startIndex: 0,
-            endIndex: i + 1
-          }
-        });
-        if (!isPassDelay) {
-          await sleep(newState.messagesList[i].message_content[0].delay?.content * 1000 || TIMER_DELAY_RENDER);
-        }
-        const newRender = newState.renderMessagesList.slice(0, i + 1).map(msg => isDelayBotMessage(msg) ? {...msg, hidden: true} : msg);
-        newState.renderMessagesList[i].hidden = true;
-        dispatch({
-          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-          payload: {
-            messagesList: newState.messagesList,
-            renderMessagesList: newRender,
-          }
-        })
+  //     newState.renderMessagesList = newState.messagesList.slice(0, i + 1);
+  //     if (isDelayBotMessage(newState.messagesList[i])) {
+  //       // render delay item so typing GIF appears, then wait
+  //       dispatch({
+  //         type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
+  //         payload: {
+  //           startIndex: 0,
+  //           endIndex: i + 1
+  //         }
+  //       });
+  //       if (!isPassDelay) {
+  //         await sleep(newState.messagesList[i].message_content[0].delay?.content * 1000 || TIMER_DELAY_RENDER);
+  //       }
+  //       const newRender = newState.renderMessagesList.slice(0, i + 1).map(msg => isDelayBotMessage(msg) ? {...msg, hidden: true} : msg);
+  //       newState.renderMessagesList[i].hidden = true;
+  //       dispatch({
+  //         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+  //         payload: {
+  //           messagesList: newState.messagesList,
+  //           renderMessagesList: newRender,
+  //         }
+  //       })
 
-        newState.messagesList[i].hidden = true;
-        dispatch({
-          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-          payload: {
-            messagesList: newState.messagesList,
-            renderMessagesList: newRender,
-          }
-        })
+  //       newState.messagesList[i].hidden = true;
+  //       dispatch({
+  //         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+  //         payload: {
+  //           messagesList: newState.messagesList,
+  //           renderMessagesList: newRender,
+  //         }
+  //       })
 
-        continue;
-      }
+  //       continue;
+  //     }
 
-      if ((appearFromStart ? true : i !== startIndex ) && isUserMessage(newState.messagesList[i]) && !newState.messagesList[i]?.hidden) {
-        listMsgAppear.push({ id: newState.messagesList[i].id, type: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.APPEAR });
-      }
+  //     if ((appearFromStart ? true : i !== startIndex ) && isUserMessage(newState.messagesList[i]) && !newState.messagesList[i]?.hidden) {
+  //       listMsgAppear.push({ id: newState.messagesList[i].id, type: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.APPEAR });
+  //     }
       
-      dispatch({
-        type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
-        payload: {
-          startIndex: 0,
-          endIndex: i + 1
-        }
-      });
+  //     dispatch({
+  //       type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
+  //       payload: {
+  //         startIndex: 0,
+  //         endIndex: i + 1
+  //       }
+  //     });
 
-      if (!isPassDelay) {
-        await sleep(RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE);
-      }
-    }
-    if (!isUpdateClick) {
-      newState.passedUserMsgCount++;
-    } else {
-      newState.passedUserMsgCount = newState.renderMessagesList.filter((item) => isUserMessage(item) && !item.hidden).length - 1 ;
-    }
+  //     if (!isPassDelay) {
+  //       await sleep(RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE);
+  //     }
+  //   }
+  //   if (!isUpdateClick) {
+  //     newState.passedUserMsgCount++;
+  //   } else {
+  //     newState.passedUserMsgCount = newState.renderMessagesList.filter((item) => isUserMessage(item) && !item.hidden).length - 1 ;
+  //   }
 
-    if (listMsgAppear.length) {
-      createScenarioUserResponseMessageHistory({
-        scenario_id: state.scenarioId,
-        user_id: state.uuid,
-        msgs: listMsgAppear,
-      });
-    }
+  //   if (listMsgAppear.length) {
+  //     createScenarioUserResponseMessageHistory({
+  //       scenario_id: state.scenarioId,
+  //       user_id: state.uuid,
+  //       msgs: listMsgAppear,
+  //     });
+  //   }
 
-    return newState;
-  }
+  //   return newState;
+  // }
 
+  // Auto-render messages when current message index changes
+  // Delays rendering for 1 second to show smooth transition between messages
   useEffect(() => {
     if (state.currentMsgIndex >= state.nextStopMsgIndex) return;
 
@@ -959,14 +960,6 @@ const PreviewFukushashiki = () => {
   }, [state.currentMsgIndex, state.nextStopMsgIndex]);
 
   const onClickNext = (clickedMsgIndex, clickedMsg) => {
-    // tại onclick next này thì chỉ muốn: 
-    //   + chạy các script của message được click next thôi
-    //   + set data vào trong sessionStorage
-    //   + fukushashiki sang trang LP
-    //   + gửi log message lên server
-    //   + validate data
-    // Việc update state, update render message và các giá trị trong state thì sẽ chạy ở trong reducer
-
     savedChatbotState(state);
 
     const data = {
@@ -1030,14 +1023,14 @@ const PreviewFukushashiki = () => {
     });
   };
 
-  const onOpenZipCodePopup = (isOpen, contentIndex, indexMessage) => {
+  const onOpenZipCodePopup = (isOpen, contentIndex, messageIndex) => {
     let newState = {};
 
     if (contentIndex !== undefined) {
       newState.zipcodeContentIndex = contentIndex;
     }
-    if (indexMessage !== undefined) {
-      newState.zipcodeIndex = indexMessage;
+    if (messageIndex !== undefined) {
+      newState.zipcodeIndex = messageIndex;
     }
 
     if (isOpen) {
@@ -1072,13 +1065,13 @@ const PreviewFukushashiki = () => {
     dispatch({ type: PREVIEW_ACTIONS.SET_ERRORS, payload: { newErrors } });
   };
 
-  const renderBotMessageContent = (message, indexMessage) => {
+  const renderBotMessageContent = (message, messageIndex) => {
     if (!message || message.belong_to !== "bot" || !Array.isArray(message?.message_content)) return null;
 
     return message.message_content.map((content, contentIndex) => (
       <BotMessage
         messageId={message.id}
-        key={contentIndex}
+        key={`${messageIndex}-${contentIndex}`}
         content={content}
         contentIndex={contentIndex}
         botInfor={state.botInfor}
@@ -1089,8 +1082,8 @@ const PreviewFukushashiki = () => {
     ));
   };
 
-  const renderNextButton = (message, indexMessage) => {
-    const isUpdate = indexMessage >= state.renderMessagesList.length - 1;
+  const renderNextButton = (message, messageIndex) => {
+    const isUpdate = messageIndex >= state.renderMessagesList.length - 1;
     const firstMsgContent = message?.message_content?.[0];
     const isDisplayBtnNext = firstMsgContent?.type != "image" || firstMsgContent?.image?.displayButtonNext != false;
     const isAutoClick = !isDisplayBtnNext && isUpdate;
@@ -1111,7 +1104,7 @@ const PreviewFukushashiki = () => {
           }}
           className="ss-user-message__action-btn"
           onClick={() => {
-            onClickNext(indexMessage, message)
+            onClickNext(messageIndex, message)
           }}
           autoClick={isAutoClick && !state.isExtractFromSession}
           messsagetype={message.message_content[0]?.type}
@@ -1122,7 +1115,7 @@ const PreviewFukushashiki = () => {
     );
   };
 
-  const renderUserMessageContent = (message, indexMessage) => {
+  const renderUserMessageContent = (message, messageIndex) => {
     if (!message || message.belong_to !== "user") return null;
     if (!Array.isArray(message?.message_content) || message.message_content.length === 0) return null;
 
@@ -1155,13 +1148,13 @@ const PreviewFukushashiki = () => {
             }
             currentMsgIndex={state.currentMsgIndex}
             onClickNext={() => {
-              onClickNext(indexMessage, message)}
+              onClickNext(messageIndex, message)}
             }
-            indexMessage={indexMessage}
+            messageIndex={messageIndex}
             errorsProps={state.errors}
             prefecturesList={[...state.prefecturesList]}
             onOpen={(isOpen, contentIndex) => {
-              onOpenZipCodePopup(isOpen, contentIndex, Math.min(state.currentMsgIndex, indexMessage));
+              onOpenZipCodePopup(isOpen, contentIndex, Math.min(state.currentMsgIndex, messageIndex));
             }}
             onChangeErrors={(field, value) =>
               onChangeErrors(field, value)
@@ -1172,19 +1165,19 @@ const PreviewFukushashiki = () => {
             botId={state.botId}
             isProcessing={!!state.isProcessing}
           />
-          {renderNextButton(message, indexMessage)}
+          {renderNextButton(message, messageIndex)}
         </div>
       </div>
     );
   };
 
   const renderMessages = () => {
-    return (state.renderMessagesList || []).map((message, indexMessage) => {
+    return (state.renderMessagesList || []).map((message, messageIndex) => {
       if (message.hidden && !stringNullOrEmpty(message.hidden)) return null;
       return (
-        <React.Fragment key={indexMessage}>
-          {renderBotMessageContent(message, indexMessage)}
-          {renderUserMessageContent(message, indexMessage)}
+        <React.Fragment key={messageIndex}>
+          {renderBotMessageContent(message, messageIndex)}
+          {renderUserMessageContent(message, messageIndex)}
         </React.Fragment>
       );
     })
@@ -1265,54 +1258,54 @@ const PreviewFukushashiki = () => {
     }
   }, [state.uuid, state.scenarioId, state.conversionStatus, state.isOpen])
 
-  useEffect(() => {
-    if (!state.stopRender || state.isDelaying || !state.useNewProcess) return;
+  // useEffect(() => {
+  //   if (!state.stopRender || state.isDelaying || !state.useNewProcess) return;
     
-    const renderContinueMessages = async () => {
-      const { isActive, index, finalIndex, timeout } = state.stopRender;
+  //   const renderContinueMessages = async () => {
+  //     const { isActive, index, finalIndex, timeout } = state.stopRender;
 
-      if (isActive) {
-        if (!state.previewOrderContent) {
-          timeoutConfrmMsgRef.current = setTimeout(async () => {
-            renderMessageInRange(index, finalIndex, state, { lastConfirmMessageIdx: index }).then(() => {
-              dispatch({
-                type: PREVIEW_ACTIONS.SET_STOP_RENDER,
-                payload: { ...state.stopRender, isActive: false },
-              });
-            });
-          }, timeout * 1000);
+  //     if (isActive) {
+  //       if (!state.previewOrderContent) {
+  //         timeoutConfrmMsgRef.current = setTimeout(async () => {
+  //           renderMessageInRange(index, finalIndex, state, { lastConfirmMessageIdx: index }).then(() => {
+  //             dispatch({
+  //               type: PREVIEW_ACTIONS.SET_STOP_RENDER,
+  //               payload: { ...state.stopRender, isActive: false },
+  //             });
+  //           });
+  //         }, timeout * 1000);
 
-          return;
-        }
+  //         return;
+  //       }
 
-        clearTimeout(timeoutConfrmMsgRef.current);
+  //       clearTimeout(timeoutConfrmMsgRef.current);
 
-        renderMessageInRange(index, finalIndex, state, { lastConfirmMessageIdx: index });
-        dispatch({
-          type: PREVIEW_ACTIONS.SET_STOP_RENDER,
-          payload: {
-            ...state.stopRender,
-            isActive: false,
-          },
-        });
+  //       renderMessageInRange(index, finalIndex, state, { lastConfirmMessageIdx: index });
+  //       dispatch({
+  //         type: PREVIEW_ACTIONS.SET_STOP_RENDER,
+  //         payload: {
+  //           ...state.stopRender,
+  //           isActive: false,
+  //         },
+  //       });
 
-        return;
-      }
+  //       return;
+  //     }
 
-      clearTimeout(timeoutConfrmMsgRef.current);
+  //     clearTimeout(timeoutConfrmMsgRef.current);
 
-      renderMessageInRange(index, finalIndex, state, { lastConfirmMessageIdx: index });
-    } 
+  //     renderMessageInRange(index, finalIndex, state, { lastConfirmMessageIdx: index });
+  //   } 
 
-    renderContinueMessages();
+  //   renderContinueMessages();
 
-    return () => clearTimeout(timeoutConfrmMsgRef.current);
-  }, [
-    state.stopRender, 
-    state.previewOrderContent, 
-    state.isDelaying,
-    state.useNewProcess,
-  ]);
+  //   return () => clearTimeout(timeoutConfrmMsgRef.current);
+  // }, [
+  //   state.stopRender, 
+  //   state.previewOrderContent, 
+  //   state.isDelaying,
+  //   state.useNewProcess,
+  // ]);
 
   const getBotHeaderIcon = () => {
     if (state.isOpen) {
