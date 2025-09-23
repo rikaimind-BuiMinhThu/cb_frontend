@@ -27,6 +27,7 @@ import {
   CONVERSTION_RESPONSE_STATUS,
   PREVIEW_ACTIONS,
   RENDER_CHATBOT_CONFIG,
+  RENDER_MODES,
 } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
@@ -56,6 +57,7 @@ import {
   getTimerConfig,
   setTimerConfig
 } from "./PreviewComponent/SessionStorageUtils";
+import { isTorizenLP } from "./PreviewComponent/TorizenUtils";
 import PreventExitChatbotModal from "./PreviewComponent/PreventExitChatbotModal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
 import ZipCodePopUp from "./PreviewComponent/ZipCodePopUp";
@@ -453,18 +455,31 @@ const PreviewFukushashiki = () => {
     return () => clearTimeout(timeoutId);
   }, [state.renderMessagesList?.length, state.submitErrorMessage]);
 
+  const getRenderMode = () => {
+    // TODO: 
+    // Hiện tại thì đang hard code check isTorizenLP từ url của LP để return RENDER_MODES.LAST
+    // Cần refactor đoạn này sao cho có thể sử dụng được setting RENDER_MODES trên trang quản lý
+    // 
+    if (isTorizenLP(state.urlReceive)) return RENDER_MODES.LAST;
+    // Cần check xem có phải trường hợp reload hay ko?
+    // Nếu là trường hợp reload thì return RENDER_MODES.LAST
+    // Nếu là trường hợp không phải reload thì return RENDER_MODES.NEXT
+    
+    return RENDER_MODES.NEXT;
+  }
+
   // Auto-render messages when current message index changes
   // Delays rendering for 1 second to show smooth transition between messages
   useEffect(() => {
     if (state.currentMsgIndex + 1 >= state.nextStopMsgIndex) return;
 
     setTimeout(() => {
+      const endIndex = getRenderMode() === RENDER_MODES.LAST ? state.nextStopMsgIndex : state.currentMsgIndex + 1 + 1;
       dispatch({
         type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
         payload: {
           startIndex: 0,
-          endIndex: state.currentMsgIndex + 1 + 1,
-          renderMode: "next",
+          endIndex: endIndex,
           fromCallback: false,
         }
       });
@@ -472,15 +487,13 @@ const PreviewFukushashiki = () => {
   }, [state.currentMsgIndex, state.nextStopMsgIndex]);
 
   const renderNextMessage = () => {
-    console.log("renderNextMessage", state.currentMsgIndex, state.nextStopMsgIndex);
-    if (state.currentMsgIndex >= state.nextStopMsgIndex) return;
+    if (state.currentMsgIndex + 1 >= state.nextStopMsgIndex) return;
 
     dispatch({
       type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
       payload: {
         startIndex: 0,
         endIndex: state.currentMsgIndex + 1 + 1,
-        renderMode: "next",
         fromCallback: true,
       }
     });
@@ -762,7 +775,7 @@ const PreviewFukushashiki = () => {
 
     dispatch({
       type: PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON,
-      payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn }
+      payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn, renderMode: getRenderMode() }
     });
   };
 

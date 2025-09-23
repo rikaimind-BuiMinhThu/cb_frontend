@@ -147,7 +147,6 @@ export const handleValidateField = (message, messageIndex) => {
   }
   
   // Return validation result and errors
-  console.log("errorsMess", errorsMess);
   return {
     isValid,
     errors: isValid ? {} : errorsMess

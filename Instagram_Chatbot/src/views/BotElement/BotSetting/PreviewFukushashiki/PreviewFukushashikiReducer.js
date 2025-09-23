@@ -17,6 +17,7 @@ import {
   CART_SYSTEM,
   CONVERSTION_RESPONSE_STATUS,
   BOT_MESSAGE_TYPES,
+  RENDER_MODES,
 } from '../PreviewComponent/Constants.jsx';
 import { getDefaultValue } from '../PreviewComponent/VariablesUtils';
 
@@ -94,10 +95,13 @@ const PreviewFukushashikiReducer = (state, action) => {
       // TODO: Update state after click Next in here
       // In here, default is validation ok
       const { clickedMsgIndex, clickedMsg, isLoggedIn } = action.payload;
+      const isUpdateClicked = clickedMsgIndex < state.renderMessagesList.length - 1;
       let newState = {
         errors: {},
         messagesList: _.cloneDeep(state.messagesList),
         variables: _.cloneDeep(state.variables),
+        nextStopMsgIndex: state.nextStopMsgIndex,
+        currentMsgIndex: state.currentMsgIndex,
       };
 
       if (isLoggedIn) {
@@ -134,12 +138,20 @@ const PreviewFukushashikiReducer = (state, action) => {
           }
         }
       }
-
-      newState.nextStopMsgIndex = state.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex)) + 1;
-      newState.currentMsgIndex = clickedMsgIndex + 1;
-      if (newState.nextStopMsgIndex < newState.currentMsgIndex) {
-        newState.nextStopMsgIndex = newState.currentMsgIndex;
+      
+      if (!isUpdateClicked) {
+        newState.nextStopMsgIndex = state.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex)) + 1;
       }
+
+      if (action.payload.renderMode === RENDER_MODES.LAST) {
+        newState.currentMsgIndex = newState.nextStopMsgIndex - 1;
+      } else {
+        newState.currentMsgIndex = clickedMsgIndex + 1;
+        if (newState.nextStopMsgIndex < newState.currentMsgIndex) {
+          newState.nextStopMsgIndex = newState.currentMsgIndex;
+        }
+      }
+
       newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
 
       return { ...state, ...newState };

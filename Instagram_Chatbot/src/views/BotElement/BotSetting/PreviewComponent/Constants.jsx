@@ -234,6 +234,11 @@ const RENDER_CHATBOT_CONFIG = {
   TEMP_DELAY_PREFIX: "__temp_delay_",
 };
 
+export const RENDER_MODES = {
+  NEXT: "next", // when click next/update -> render next message 
+  LAST: "last", // when click next/update -> render last message is displayed
+}
+
 const CONVERT_TEXT_TYPES = {
   HIRAGANA: 'hiragana',
   KATAKANA: 'katakana',
