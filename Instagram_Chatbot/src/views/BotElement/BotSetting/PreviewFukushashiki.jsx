@@ -752,7 +752,11 @@ const PreviewFukushashiki = () => {
   ]);
 
   useEffect(() => {
-    scrollToPosition({ position: "b", selector: "#sp-body" });
+    const timeoutId = setTimeout(() => {
+      scrollToPosition({ position: "b", selector: "#sp-body" });
+    }, 1000);
+
+    return () => clearTimeout(timeoutId);
   }, [state.renderMessagesList?.length, state.submitErrorMessage]);
 
   const createOrAddLinesCart = async (res) => {
