@@ -35,7 +35,7 @@ const processBotDelayMessage = async (messagesList, i, newState, options = {}) =
     //   });
     // });
   }
-  if (newState.renderMessagesList.length - 1 === i) {
+  if (newState.renderMessagesList?.length - 1 === i) {
     await sleep(messagesList[i].message_content[0].delay.content * 1000);
   }
 
@@ -181,7 +181,7 @@ export const processForBotMessage = async (messagesList, i, newState, isUpdateSo
     case BOT_MESSAGE_TYPES.UGC:
       return await processBotUgcMessage(messagesList, i, newState);
     case "delay":
-      return await processBotDelayMessage(messagesList, i, newState);
+      return newState;
     case "email":
       return processBotEmailMessage(messagesList, i, newState);
     case "variable_set":

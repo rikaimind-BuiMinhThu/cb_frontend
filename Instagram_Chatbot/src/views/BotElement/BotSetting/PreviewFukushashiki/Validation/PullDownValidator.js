@@ -108,9 +108,12 @@ const validateMultipleValueField = (contentType, key, errorsMess, fields) => {
       return addErrorMessage(errorsMess, key, ERROR_MESSAGES.REQUIRED);
     }
   } else {
-    if (!values.every(stringNullOrEmpty)) {
-      return addErrorMessage(errorsMess, key, ERROR_MESSAGES.REQUIRED);
-    }
+    const isAllFieldsEmpty = values.every(stringNullOrEmpty);
+    const isAllFieldsNotEmpty = values.every(value => !stringNullOrEmpty(value));
+
+    if (isAllFieldsEmpty || isAllFieldsNotEmpty) return true;
+    
+    return addErrorMessage(errorsMess, key, ERROR_MESSAGES.REQUIRED);
   }
 
   return true;

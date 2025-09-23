@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useReducer, useState } from "react";
+import React, { useEffect, useRef, useReducer, useState, useMemo } from "react";
 import "assets/css/bot/preview-chat-bot.css";
 import Cookies from "js-cookie";
 import { MDBIcon } from "mdbreact";
@@ -23,7 +23,6 @@ import {
   CUSTOM_JS_CODE_POSITION,
   TIMER_MAP_VARIABLES_FIELD,
   TIMER_TYPES,
-  RENDER_CHATBOT_CONFIG,
   CART_SYSTEM,
   CONVERSTION_RESPONSE_STATUS,
   PREVIEW_ACTIONS,
@@ -37,7 +36,6 @@ import {
   getChatBotSetting,
   sleep,
   stringNullOrEmpty,
-  appendParamsToUrl,
   changeElementAttributeById,
   scrollToPosition,
   createStatusConversion,
@@ -45,6 +43,7 @@ import {
   isDislayingLoginForm,
   getElementMessageById,
   sendOpenChatbotCountRequest,
+  isUserMessage,
 } from "./PreviewComponent/Utils";
 import {
   getChatbotSavedState,
@@ -86,9 +85,7 @@ const previewInitialState = {
   isUsedCartConfirmPage: false,
   currentMsgIndex: 0,
   renderMessagesList: [],
-  currentUserMsgIndex: 0,
   passedUserMsgCount: 0,
-  userMessagesList: [],
   errors: {},
   variables: [],
   isDisplayButtonNext: false,
@@ -150,6 +147,7 @@ const PreviewFukushashiki = () => {
   const [timerChanges, setTimerChanges] = useState({ timeLeft: -1, config: null });
   const containerRef = useRef(null);
   const hasSentCustomJs = useRef(false);
+  const userMessagesList = useMemo(() => state.messagesList.filter(isUserMessage), [state.messagesList]);
 
   // Initialize conversion status when chatbot opens
   useEffect(() => {
@@ -458,19 +456,31 @@ const PreviewFukushashiki = () => {
   useEffect(() => {
     if (state.currentMsgIndex >= state.nextStopMsgIndex) return;
 
-    const timeoutId = setTimeout(() => {
-      dispatch({
-        type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
-        payload: {
-          startIndex: 0,
-          endIndex: state.nextStopMsgIndex
-        }
-      });
-    }, RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE);
-
-    return () => clearTimeout(timeoutId);
+    dispatch({
+      type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
+      payload: {
+        startIndex: 0,
+        endIndex: state.nextStopMsgIndex,
+        renderMode: "next",
+        fromCallback: false,
+      }
+    });
   }, [state.currentMsgIndex, state.nextStopMsgIndex]);
-  
+
+  const renderNextMessage = () => {
+    console.log("renderNextMessage", state.currentMsgIndex, state.nextStopMsgIndex);
+    if (state.currentMsgIndex >= state.nextStopMsgIndex) return;
+
+    dispatch({
+      type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
+      payload: {
+        startIndex: 0,
+        endIndex: state.currentMsgIndex + 1 + 1,
+        renderMode: "next",
+        fromCallback: true,
+      }
+    });
+  }
 
   const setShowPopupCloseBot = (value) => {
     dispatch({ type: PREVIEW_ACTIONS.SET_SHOW_POPUP_CLOSE_BOT, payload: value });
@@ -716,7 +726,6 @@ const PreviewFukushashiki = () => {
     }
   }
 
-
   const onClickNext = (clickedMsgIndex, clickedMsg) => {
     savedChatbotState(state);
 
@@ -836,6 +845,7 @@ const PreviewFukushashiki = () => {
         previewOrderContent={state.previewOrderContent}
         executeLpJsCode={(jsCode) => executeLpJsCode(jsCode, state)}
         variables={state.variables}
+        onRenderCompleted={renderNextMessage}
       />
     ));
   };
@@ -908,6 +918,7 @@ const PreviewFukushashiki = () => {
             onClickNext={() => {
               onClickNext(messageIndex, message)}
             }
+            onRenderCompleted={renderNextMessage}
             messageIndex={messageIndex}
             errorsProps={state.errors}
             prefecturesList={[...state.prefecturesList]}
@@ -1074,7 +1085,7 @@ const PreviewFukushashiki = () => {
 
         <ProcessBar botInfor={state.botInfor}
           currentIndex={state.passedUserMsgCount}
-          maxIndex={state.userMessagesList.length}
+          maxIndex={userMessagesList.length}
         />
         <div id="sp-body" className="sp-body" style={bodyStyle}
         >

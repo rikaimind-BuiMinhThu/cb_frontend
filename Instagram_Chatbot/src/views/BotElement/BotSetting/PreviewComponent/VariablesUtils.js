@@ -164,14 +164,13 @@ const getShippingAddressValue = (subContent, prefecturesList) => {
 }
 
 const getCardPaymentRadioButtonValue = (subContent, field, value) => {
-  const cardPaymentRadioButton = subContent.card_payment_radio_button;
   switch (subContent.type) {
     case "default":
     case "customized_style": {
-      return cardPaymentRadioButton.radio_contents.find(item => item.initial_selection === value)?.text;
+      return subContent.radio_contents.find(item => item.initial_selection === value)?.text;
     }
     case "picture_radio": {
-      return cardPaymentRadioButton.radio_contents_img.find(item => item.initial_selection_picture === value)?.text;
+      return subContent.radio_contents_img.find(item => item.initial_selection_picture === value)?.text;
     }
     default:
       return "";

@@ -52,6 +52,7 @@ const UserMessage = ({
   postMessageToParent,
   botId,
   isProcessing = false,
+  onRenderCompleted,
 }) => {
   if (!isUserMessage(message)) return null;
 
@@ -237,6 +238,14 @@ const UserMessage = ({
         });
       }
     });
+  }, []);
+
+  useEffect(() => {
+    if (!messageContent) return;
+    if (messageContent.length > 1) return;
+    if (messageContent[0].type !== MESSAGE_CONTENT_TYPES.IMAGE) return;
+    
+    onRenderCompleted();
   }, []);
 
   const handleClickCarousel = (urls, use_shortened_urls) => {

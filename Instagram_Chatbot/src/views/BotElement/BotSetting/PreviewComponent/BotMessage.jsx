@@ -16,9 +16,15 @@ const BotMessage = ({
   executeLpJsCode,
   messageId,
   variables,
+  onRenderCompleted,
 }) => {
   const [isDelaying, setIsDelaying] = useState(true);
   const [text, setText] = useState("");
+
+  useEffect(() => {
+    if (isDelaying) return;
+    onRenderCompleted();
+  }, [isDelaying]);
 
   useEffect(() => {
     if (!content || !content[content.type]?.originalContent || variables.length === 0) return;

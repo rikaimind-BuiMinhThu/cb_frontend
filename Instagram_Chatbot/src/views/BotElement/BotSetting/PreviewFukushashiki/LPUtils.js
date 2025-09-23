@@ -2,6 +2,7 @@
 import { CHATBOT_ACTIONS } from "../PreviewComponent/Constants";
 import { isTorizenLpAmazonData } from "../PreviewComponent/TorizenUtils";
 import { convertToFukushashikiObject } from "./FukushashikiDataConverterUtils";
+import { isUserMessage } from "../PreviewComponent/Utils";
 
 const postMessageToParent = (options, state) => {
   if (!window || !window.parent) return;
@@ -35,7 +36,8 @@ const fukushashikiToLP = (fukushashikiData, state) => {
 const fukushashikiSavedStateToLp = (savedState, params, state) => {
   return new Promise((resolve) => {
     let fukuDataList = [];
-    savedState.userMessagesList.forEach((message) => {
+    const userMessagesList = savedState.messagesList.filter(isUserMessage);
+    userMessagesList.forEach((message) => {
       // Except some data when fukushashiki torizen san
       if (params.get('is_using_amazon_pay') && isTorizenLpAmazonData(message)) return;
 

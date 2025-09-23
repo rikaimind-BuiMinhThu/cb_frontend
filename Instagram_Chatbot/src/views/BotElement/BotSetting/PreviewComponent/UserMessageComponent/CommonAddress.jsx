@@ -142,7 +142,7 @@ export default function CommonAddress({ content, prefecturesList, messageIndexRe
           inputMode="numeric"
           placeholder={addressContent.post_code_left}
           disabled={disabled}
-          className="w-49-percent"
+          containerStyle={{ width: "39%" }}
           onKeyPress={(e) => {
             if (String(e.target.value).length >= 3) e.preventDefault();
           }}
@@ -178,7 +178,7 @@ export default function CommonAddress({ content, prefecturesList, messageIndexRe
           placeholder={addressContent.post_code_right}
           disabled={disabled}
           id={`ss-user-post-code-right-input${contentIndex}`}
-          className="w-49-percent"
+          containerStyle={{ width: "59%" }}
           onKeyPress={(e) => {
             if (String(e.target.value).length >= 4) e.preventDefault();
           }}

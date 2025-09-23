@@ -31,6 +31,7 @@ const InputCustom = ({
   labelValue,
   inputMode = "text",
   clearable = false,
+  containerStyle,
   ...props
 }) => {
   // State to manage password visibility
@@ -43,7 +44,7 @@ const InputCustom = ({
 
   const renderWithClearIcon = () => {
     return (
-      <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', width: '100%' }}>
+      <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', width: '100%', ...containerStyle }}>
         <input
           {...props}
           id={id}
@@ -98,7 +99,7 @@ const InputCustom = ({
 
   const renderWithoutClearIcon = () => {
     return (
-      <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', width: '100%' }}>
+      <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', width: '100%', ...containerStyle }}>
         <input
           {...props}
           id={id}

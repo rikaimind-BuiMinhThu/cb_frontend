@@ -30,6 +30,8 @@ const PreviewFukushashikiReducer = (state, action) => {
     case PREVIEW_ACTIONS.SET_PROCESSING: 
       return { ...state, isProcessing: action.payload };
     case PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES:
+      if (action.payload.fromCallback) return state;
+
       return {
         ...state,
         renderMessagesList: state.messagesList.slice(action.payload.startIndex, action.payload.endIndex),
@@ -100,7 +102,6 @@ const PreviewFukushashikiReducer = (state, action) => {
 
       if (isClickedButtonSubmit || isClickedLastMessage) {
         newState.conversionStatus = CONVERSTION_RESPONSE_STATUS.FINISH;
-        newState.currentUserMsgIndex = -1;
         newState.isProcessing = true;
       } else {
         const conditionParams = buildConditionParams(state); // Build with oldState objParams
@@ -127,7 +128,6 @@ const PreviewFukushashikiReducer = (state, action) => {
         }
       }
 
-      newState.userMessagesList = newState.messagesList.filter((item) => isUserMessage(item));
       newState.nextStopMsgIndex = state.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex)) + 1;
       newState.currentMsgIndex = clickedMsgIndex + 1;
       if (newState.nextStopMsgIndex < newState.currentMsgIndex) {
@@ -206,8 +206,6 @@ const PreviewFukushashikiReducer = (state, action) => {
       return { ...state, stopRender: action.payload };
     case PREVIEW_ACTIONS.SET_ERRORS:
       return { ...state, errors: action.payload };
-    case PREVIEW_ACTIONS.SET_CURRENT_USER_MSG_INDEX:
-      return { ...state, currentUserMsgIndex: action.payload };
     case PREVIEW_ACTIONS.SET_DELAYING:
       return { ...state, isDelaying: action.payload };
     case PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SERVER: {
