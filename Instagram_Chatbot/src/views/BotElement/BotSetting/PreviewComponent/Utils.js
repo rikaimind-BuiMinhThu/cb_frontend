@@ -1,6 +1,12 @@
 import api from "api/api-management";
 import { tokenExpired } from "api/tokenExpired";
-import { CHATBOT_SERVER, CURRENCY_UNITS, GET_CAPTCHA_PATH, RENDER_CHATBOT_CONFIG } from "./Constants";
+import {
+  CHATBOT_SERVER,
+  CURRENCY_UNITS,
+  GET_CAPTCHA_PATH,
+  CONVERSION_RESPONSE_SUBMIT_TYPE,
+  CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE,
+} from "./Constants";
 
 const stringNullOrEmpty = (string) => {
   return !string || (string + "").trim() === "";
@@ -52,7 +58,7 @@ const lightenColor = (hex, opacity) => {
   return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 };
 
-const mobileCheck = () => {
+const isMobile = () => {
   let check = false;
   (function (a) {
     if (
@@ -138,6 +144,42 @@ const sendCountRequest = (scenarioId, data) => {
     data
   );
 };
+
+const sendOpenChatbotCountRequest = (scenarioId, deviceReceive) => {
+  const data = { scenario_data: `${deviceReceive}_open_chatbot_window` };
+  return sendCountRequest(scenarioId, data);
+};
+
+const sendCloseChatbotCountRequest = (scenarioId, deviceReceive) => {
+  const data = { scenario_data: `${deviceReceive}_close_chatbot_window` };
+  return sendCountRequest(scenarioId, data);
+};
+
+const sendLogMessageToServer = (submitData, submitType) => {
+  const { message, ...data } = submitData;
+  const dataLog = sendScenarioUserResponse(submitData);
+
+  const convertType = {
+    [CONVERSION_RESPONSE_SUBMIT_TYPE.ADD]: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.ADD,
+    [CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE]: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.RETRY,
+    [CONVERSION_RESPONSE_SUBMIT_TYPE.ERROR]: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.ERROR,
+  }
+
+  const messageSubmitType = convertType[submitType];
+  
+  if (!messageSubmitType) return;
+
+  createScenarioUserResponseMessageHistory({
+    ...data,
+    msgs: [{ id: message.id, type: messageSubmitType }],
+  });
+
+  return dataLog;
+}
+
+const sendErrorLogToServer = (submitData) => {
+  return sendLogMessageToServer(submitData, CONVERSION_RESPONSE_SUBMIT_TYPE.ERROR);
+}
 
 const getPrefectures = () => {
   return getToChatBotServer(CHATBOT_SERVER.GET_PREFECTURES_PATH);
@@ -451,12 +493,10 @@ const scrollToPosition = (options = {}) => {
       top = 0;
   }
 
-  if (element) {
-    element.scrollTo({
-      top,
-      behavior: forceScroll ? "auto" : "smooth",
-    });
-  }
+  element.scrollTo({
+    top,
+    behavior: forceScroll ? "auto" : "smooth",
+  });
 }
 
 const removeSpace = (text, trim = true) => {
@@ -548,6 +588,23 @@ export const isTempDelay = (message, prefix) => {
   return message.id && `${message.id}`.startsWith(prefix || '');
 }
 
+const isButtonSubmitMessage = (message) => {
+  return message.message_content[0]?.type === "button_submit";
+}
+
+const getNextUserMsg = (ext = null) => (item, index) => {
+  const firstMsgContent = item?.message_content?.at(0);
+  const isDisplayBtnNext = (item?.message_content?.length === 1 && firstMsgContent?.type != "image") || firstMsgContent?.image?.displayButtonNext != false;
+
+  const conds = !item.hidden && isUserMessage(item) && isDisplayBtnNext;
+
+  if (ext && typeof ext === "function") {
+    return conds && ext(item, index);
+  }
+
+  return conds;
+}
+
 export const getElementMessageById = (id) => {
   if (!id) return;
   
@@ -560,9 +617,18 @@ const isAndroid = () => {
   return /android/i.test(userAgent);
 };
 
+const moveToNext = (nextId) => {
+  setTimeout(() => {
+    const nextInput = document.getElementById(nextId);
+    if (nextInput) {
+      nextInput.focus();
+    }
+  }, 50);
+};
+
 export {
   stringNullOrEmpty, getAllUrlParams, lightenColor,
-  mobileCheck, removeLeadingZero, sendUserInteractionData,
+  isMobile, removeLeadingZero, sendUserInteractionData,
   sendCreateOrderData, sendCountRequest,
   getCitiesByPrefecture, getTownsByCity, getPrefectures,
   getScenarioPreviewData, getChatBotSetting, sendEmailRequest,
@@ -571,5 +637,8 @@ export {
   changeElementAttributeById, toCamelCase, sendConvertTextJapaneseRequest,
   scrollToPosition, removeSpace, getColor, processMessagesForErrorState, hideMessageOnError, createTempDelay,
   patchWithDrawalPreview, sendScenarioUserResponse, createStatusConversion, updateStatusConversion, parseQuantity,
-  createScenarioUserResponseMessageHistory, userEntryScenario, isAndroid,
+  createScenarioUserResponseMessageHistory, userEntryScenario, isAndroid, isButtonSubmitMessage,
+  sendErrorLogToServer, sendLogMessageToServer,
+  moveToNext, getNextUserMsg,
+  sendOpenChatbotCountRequest, sendCloseChatbotCountRequest,
 };

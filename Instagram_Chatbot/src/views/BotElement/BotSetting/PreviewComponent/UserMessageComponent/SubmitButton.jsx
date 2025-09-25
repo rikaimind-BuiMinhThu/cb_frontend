@@ -1,9 +1,7 @@
 import React from "react";
 import "assets/css/bot/preview-chat-bot.css";
 
-export default function SubmitButton({ display = false, content, submitErrorMessage = "", onClickNext, isProcessing = false }) {
-  if (!display) return null;
-
+export default function SubmitButton({ content, submitErrorMessage = "", onClickNext, isProcessing = false }) {
   if (content.type !== 'button_submit') return null;
 
   const buttonSubmit = content.button_submit;
@@ -22,7 +20,7 @@ export default function SubmitButton({ display = false, content, submitErrorMess
     );
   }
 
-  const getButtonSubmitName = (isProcessing) => {
+  const getButtonSubmitName = () => {
     if (!content.button_submit_use_loading_text) return content.button_submit_name;
 
     if (isProcessing && content[content.type]?.loading_config) {
@@ -39,7 +37,7 @@ export default function SubmitButton({ display = false, content, submitErrorMess
     return content.button_submit_name;
   }
 
-  const renderLoadingUnderButton = (isProcessing) => {
+  const renderLoadingUnderButton = () => {
     if (!isProcessing || !content[content.type]?.loading_config) return null;
 
     const { loadingHtml, loadingStyle } = content[content.type].loading_config;
@@ -58,10 +56,10 @@ export default function SubmitButton({ display = false, content, submitErrorMess
       <div className="ss-user-setting__item-text_input-top">
         {buttonSubmit?.style && <style dangerouslySetInnerHTML={{ __html: buttonSubmit.style }} />}
         <button id="chatbot-submit-button" onClick={onClickNext}>
-          {getButtonSubmitName(isProcessing)}
+          {getButtonSubmitName()}
         </button>
       </div>
-      {renderLoadingUnderButton(isProcessing)}
+      {renderLoadingUnderButton()}
     </>
   );
 };
