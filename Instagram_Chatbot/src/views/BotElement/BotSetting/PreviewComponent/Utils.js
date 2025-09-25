@@ -1,6 +1,12 @@
 import api from "api/api-management";
 import { tokenExpired } from "api/tokenExpired";
-import { CHATBOT_SERVER, CURRENCY_UNITS, GET_CAPTCHA_PATH } from "./Constants";
+import {
+  CHATBOT_SERVER,
+  CURRENCY_UNITS,
+  GET_CAPTCHA_PATH,
+  CONVERSION_RESPONSE_SUBMIT_TYPE,
+  CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE,
+} from "./Constants";
 
 const stringNullOrEmpty = (string) => {
   return !string || (string + "").trim() === "";
@@ -52,7 +58,7 @@ const lightenColor = (hex, opacity) => {
   return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 };
 
-const mobileCheck = () => {
+const isMobile = () => {
   let check = false;
   (function (a) {
     if (
@@ -138,6 +144,42 @@ const sendCountRequest = (scenarioId, data) => {
     data
   );
 };
+
+const sendOpenChatbotCountRequest = (scenarioId, deviceReceive) => {
+  const data = { scenario_data: `${deviceReceive}_open_chatbot_window` };
+  return sendCountRequest(scenarioId, data);
+};
+
+const sendCloseChatbotCountRequest = (scenarioId, deviceReceive) => {
+  const data = { scenario_data: `${deviceReceive}_close_chatbot_window` };
+  return sendCountRequest(scenarioId, data);
+};
+
+const sendLogMessageToServer = (submitData, submitType) => {
+  const { message, ...data } = submitData;
+  const dataLog = sendScenarioUserResponse(submitData);
+
+  const convertType = {
+    [CONVERSION_RESPONSE_SUBMIT_TYPE.ADD]: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.ADD,
+    [CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE]: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.RETRY,
+    [CONVERSION_RESPONSE_SUBMIT_TYPE.ERROR]: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.ERROR,
+  }
+
+  const messageSubmitType = convertType[submitType];
+  
+  if (!messageSubmitType) return;
+
+  createScenarioUserResponseMessageHistory({
+    ...data,
+    msgs: [{ id: message.id, type: messageSubmitType }],
+  });
+
+  return dataLog;
+}
+
+const sendErrorLogToServer = (submitData) => {
+  return sendLogMessageToServer(submitData, CONVERSION_RESPONSE_SUBMIT_TYPE.ERROR);
+}
 
 const getPrefectures = () => {
   return getToChatBotServer(CHATBOT_SERVER.GET_PREFECTURES_PATH);
@@ -274,20 +316,21 @@ const checkMessageCondition = (message, buildParam) => {
   for (let j = 0; j < message.conditions.length; j++) {
     const conditionItem = message.conditions[j];
     const buildParamValue = buildParam[conditionItem.nameCondition];
+
     let subCheck = false;
 
     switch (conditionItem.condition) {
       case "include":
-        subCheck = buildParamValue.includes(conditionItem.inputCondition);
+        subCheck = buildParamValue && buildParamValue.includes(conditionItem.inputCondition);
         break;
       case "is":
-        subCheck = buildParamValue == conditionItem.inputCondition;
+        subCheck = buildParamValue && buildParamValue == conditionItem.inputCondition;
         break;
       case "not_include":
-        subCheck = !buildParamValue.includes(conditionItem.inputCondition);
+        subCheck = !buildParamValue || !buildParamValue.includes(conditionItem.inputCondition);
         break;
       case "is_not":
-        subCheck = buildParamValue != conditionItem.inputCondition;
+        subCheck = !buildParamValue || buildParamValue != conditionItem.inputCondition;
         break;
       default:
         break;
@@ -308,6 +351,12 @@ const getAddressFromZipCode = (zipCode) => {
   return getToChatBotServer(
     CHATBOT_SERVER.GET_ADDRESS_FROM_ZIP_CODE_PATH.replace(":zip_code", zipCode)
   );
+}
+
+export const buildConditionParams = (theState) => {
+  const result = _.cloneDeep(theState.objParam);
+  const currentUrlParams = getAllUrlParams(window.location.search);
+  return { ...result, current_url_param: Object.keys(currentUrlParams) };
 }
 
 /**
@@ -444,12 +493,10 @@ const scrollToPosition = (options = {}) => {
       top = 0;
   }
 
-  if (element) {
-    element.scrollTo({
-      top,
-      behavior: forceScroll ? "auto" : "smooth",
-    });
-  }
+  element.scrollTo({
+    top,
+    behavior: forceScroll ? "auto" : "smooth",
+  });
 }
 
 const removeSpace = (text, trim = true) => {
@@ -500,9 +547,9 @@ const processMessagesForErrorState = (payload) => {
   return processedPayload;
 };
 
-const createTempDelay = (seconds = 0.5) => {
+const createTempDelay = (seconds = 0.5, prefix) => {
   return {
-    id: `__temp_delay_${Date.now()}`,
+    id: `${prefix || ''}${Date.now()}`,
     belong_to: 'bot',
     message_name: 'delay',
     message_content: [{ type: 'delay', delay: { content: Number(seconds)}}],
@@ -518,9 +565,70 @@ const parseQuantity = (quantity = 0) => {
   }
   return (quantity || 0).toLocaleString("ja-JP"); 
 };
+
+export const isDislayingLoginForm = (message) => {
+  const loginMessageNames = ["ログイン", "Login", "login", "LOGIN"];
+  return loginMessageNames.includes(message.message_name);
+}
+
+export const isBotMessage = (message) => {
+  return message.belong_to === 'bot' && message.message_content.length > 0;
+}
+
+export const isDelayBotMessage = (message) => {
+  if (!message) return false;
+  return message.belong_to === 'bot' && message.message_content[0]?.type === "delay";
+}
+
+export const isUserMessage = (message) => {
+  return message.belong_to === 'user' && message.message_content.length > 0;
+}
+
+export const isTempDelay = (message, prefix) => {
+  return message.id && `${message.id}`.startsWith(prefix || '');
+}
+
+const isButtonSubmitMessage = (message) => {
+  return message.message_content[0]?.type === "button_submit";
+}
+
+const getNextUserMsg = (ext = null) => (item, index) => {
+  const firstMsgContent = item?.message_content?.at(0);
+  const isDisplayBtnNext = (item?.message_content?.length === 1 && firstMsgContent?.type != "image") || firstMsgContent?.image?.displayButtonNext != false;
+
+  const conds = !item.hidden && isUserMessage(item) && isDisplayBtnNext;
+
+  if (ext && typeof ext === "function") {
+    return conds && ext(item, index);
+  }
+
+  return conds;
+}
+
+export const getElementMessageById = (id) => {
+  if (!id) return;
+  
+  return `msg_id_${id}`;
+};
+
+// Device detection utilities
+const isAndroid = () => {
+  const userAgent = navigator.userAgent.toLowerCase();
+  return /android/i.test(userAgent);
+};
+
+const moveToNext = (nextId) => {
+  setTimeout(() => {
+    const nextInput = document.getElementById(nextId);
+    if (nextInput) {
+      nextInput.focus();
+    }
+  }, 50);
+};
+
 export {
   stringNullOrEmpty, getAllUrlParams, lightenColor,
-  mobileCheck, removeLeadingZero, sendUserInteractionData,
+  isMobile, removeLeadingZero, sendUserInteractionData,
   sendCreateOrderData, sendCountRequest,
   getCitiesByPrefecture, getTownsByCity, getPrefectures,
   getScenarioPreviewData, getChatBotSetting, sendEmailRequest,
@@ -529,5 +637,8 @@ export {
   changeElementAttributeById, toCamelCase, sendConvertTextJapaneseRequest,
   scrollToPosition, removeSpace, getColor, processMessagesForErrorState, hideMessageOnError, createTempDelay,
   patchWithDrawalPreview, sendScenarioUserResponse, createStatusConversion, updateStatusConversion, parseQuantity,
-  createScenarioUserResponseMessageHistory, userEntryScenario,
+  createScenarioUserResponseMessageHistory, userEntryScenario, isAndroid, isButtonSubmitMessage,
+  sendErrorLogToServer, sendLogMessageToServer,
+  moveToNext, getNextUserMsg,
+  sendOpenChatbotCountRequest, sendCloseChatbotCountRequest,
 };

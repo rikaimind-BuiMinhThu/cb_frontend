@@ -59,3 +59,37 @@
     width: 100%;
     border: 1px solid #333;
   }
+
+.icon_holder {
+  width: 100%;
+  height: fit-content;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.icon_holder_section {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  border-radius: 15px;
+  overflow: hidden;
+  border: 1px solid #ccc;
+}
+
+.icon_holder_section:hover{
+  border-color: gray;
+}
+
+.bot_icon_display {
+  flex-grow: 1;
+  aspect-ratio: 1/1;
+}
+
+.bot_icon_display > img {
+  object-fit: cover;
+  height: 100%;
+  width: 100%;
+  z-index: 0;
+}

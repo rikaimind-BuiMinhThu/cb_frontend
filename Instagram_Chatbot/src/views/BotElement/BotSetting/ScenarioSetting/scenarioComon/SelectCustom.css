@@ -1,0 +1,64 @@
+/* SelectCustom styles */
+.select-custom-label {
+  margin-right: 2%;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.select-custom-native {
+  width: 90%;
+  padding: 8px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: #fff;
+  color: #000000d9;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.select-custom-native:focus {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.select-custom-native:disabled {
+  background-color: #f5f5f5;
+  color: #00000040;
+  cursor: not-allowed;
+}
+
+.select-custom-antd {
+  width: 100%;
+}
+
+.select-custom-not-found {
+  height: 90px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.select-custom-not-found-content {
+  text-align: center;
+}
+
+.select-custom-not-found-icon {
+  font-size: 50px;
+  font-weight: 100;
+}
+
+/* Mobile optimization */
+@media (max-width: 768px) {
+  .select-custom-native {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  .select-custom-label {
+    display: block;
+    margin-bottom: 8px;
+    margin-right: 0;
+  }
+}

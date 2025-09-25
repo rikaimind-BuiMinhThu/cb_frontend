@@ -45,6 +45,8 @@ import { Tooltip } from '@mui/material';
 import { MESSAGE_CONTENT_TYPES, TIMER_TYPES, TIMER_VARIABLES, TIMER_VARIABLES_DESCRIPTION, BOT_MESSAGE_TYPES, RANGE_TEXT_VALIDATE, LABELS, GENDER_DISPLAY_TYPES } from '../PreviewComponent/Constants';
 import HtmlCodeConfig from './scenarioComon/HtmlCodeConfig';
 import OptionGenderConfig from './OptionGenderConfig';
+import SubmitButtonLoadingConfig from './SubmitButtonLoadingConfig';
+import SubmitButtonConfig from './SubmitButtonConfig';
 
 const _ = require('lodash');
 
@@ -124,10 +126,17 @@ for (let i = 2; i <= 10; i++) {
 
 let dataDayFixed = [];
 for (let i = 1; i <= 31; i++) {
-  dataDayFixed.push({
-    key: i + '',
-    value: i + ''
-  });
+  if (i < 10) {
+    dataDayFixed.push({
+      key: `0${i}` + '',
+      value: `0${i}` + ''
+    });
+  } else {
+    dataDayFixed.push({
+      key: i + '',
+      value: i + ''
+    });
+  }
 }
 
 let dataEveryMinuteFixed = [
@@ -893,6 +902,8 @@ const Scenario = () => {
   const [errorVariable, setErrorVariable] = useState('');
 
   const [dataCondition, setDataCondition] = useState([]);
+  const [isUsedMessageLoadedPast, setIsUsedMessageLoadedPast] = useState(false);
+  const [useFullwidthChatbotMobile, setUseFullwidthChatbotMobile] = useState(false);
 
   // const client = JSON.parse(sessionStorage.getItem('client'));
   const client = JSON.parse(sessionStorage.getItem('client'));
@@ -979,7 +990,8 @@ const Scenario = () => {
       });
       setIsUseErrMsgByJs(res.data.data?.is_used_err_msg_by_js || false);
       setErrMsgJsCode(res.data.data?.err_msg_js_code || '');
-
+      setIsUsedMessageLoadedPast(res.data.data?.is_used_message_loaded_past || false);
+      setUseFullwidthChatbotMobile(res.data.data?.use_fullwidth_chatbot_mobile || false);
       const timerConfig = {
         isOpen: false,
         enable: false,
@@ -2646,6 +2658,8 @@ const Scenario = () => {
       bottom_body_custom_js_code: bottomBodyCustomJsCode.final,
       is_used_err_msg_by_js: isUseErrMsgByJs,
       err_msg_js_code: errMsgJsCode,
+      is_used_message_loaded_past: isUsedMessageLoadedPast,
+      use_fullwidth_chatbot_mobile: useFullwidthChatbotMobile,
     }
     api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data).then(res => {
       setIsOpenNoti(true);
@@ -2705,6 +2719,8 @@ const Scenario = () => {
       }),
       is_used_err_msg_by_js: isUseErrMsgByJs,
       err_msg_js_code: errMsgJsCode,
+      is_used_message_loaded_past: isUsedMessageLoadedPast,
+      use_fullwidth_chatbot_mobile: useFullwidthChatbotMobile,
     }
     try {
       const res = await api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data);
@@ -3218,6 +3234,25 @@ const Scenario = () => {
                       checked={isUsedCartConfirmPage}
                     />
                     <label>カートシステムの注文確認ページを利用</label>
+                  </div>
+                  <div>
+                    <input
+                      type="checkbox"
+                      className="ss-user-setting-checkbox-custom"
+                      onChange={() => 
+                        setIsUsedMessageLoadedPast(!isUsedMessageLoadedPast)}
+                      checked={isUsedMessageLoadedPast}
+                    />
+                    <label>過去メッセージを読み込む</label>
+                  </div>
+                  <div>
+                    <input
+                      type="checkbox"
+                      className="ss-user-setting-checkbox-custom"
+                      onChange={() => setUseFullwidthChatbotMobile(!useFullwidthChatbotMobile)}
+                      checked={useFullwidthChatbotMobile}
+                    />
+                    <label>モバイル全画面チャット</label>
                   </div>
                   {/* Overview scenario */}
                   <div style={{ height:`calc(80% - ${errorScenarioName ? '30':'10'}px)`, backgroundColor: '#f6fbff' }}>
@@ -14804,26 +14839,13 @@ const Scenario = () => {
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'button_submit_name', value)}
                                                           value={content.button_submit_name}
                                                         />
-                                                        
-                                                        <div className="loading-submit-button_holder">
-                                                          <CheckboxCustom
-                                                            label="ローディングテキストを表示する"
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'button_submit_use_loading_text', value)}
-                                                            value={!!content.button_submit_use_loading_text}
-                                                          />
-                                                          {!!content.button_submit_use_loading_text && (
-                                                            <InputCustom
-                                                              className="ss-user-setting-input-overview"
-                                                              styleLabel={{ width: '100%' }}
-                                                              style={{ width: '90%' }}
-                                                              label="ローディングテキスト"
-                                                              inline={false}
-                                                              placeholder={'ローディングテキスト'}
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'button_submit_loading_text', value)}
-                                                              value={content.button_submit_loading_text || ""}
-                                                            />
-                                                          )}
-                                                        </div>
+                                                        <SubmitButtonConfig
+                                                          content={content}
+                                                          onChange={onChangeValueMessageContent}
+                                                          indexMessageSelect={indexMessageSelect}
+                                                          indexContent={indexContent}
+                                                          buttonSubmit={buttonSubmit}
+                                                        />
                                                       </div>
                                                     </>}
                                                   {/* user: type = 'label_no_transition' */}

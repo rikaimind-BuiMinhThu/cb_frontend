@@ -101,6 +101,7 @@ const CHATBOT_SERVER = {
   UPDATE_STATUS_CONVERSION_USER_RESPONSE: '/api/v1/scenario_users/scenario_user_responses_status',
   CREATE_USER_SCENARIO_RESPONSE_MESSAGE_HISTORY: '/api/v1/scenario_users/scenario_user_responses_message',
   USER_ENTRY_SCENARIO: '/api/v1/scenario_users/entry',
+  GET_ADDRESS_FROM_ZIP_CODE_PATH: '/api/v1/get_address_from_zip_code?zip_code=:zip_code',
 };
 
 const GET_CAPTCHA_PATH = `https://svg-captcha-nodejs.vercel.app/captcha?size=:size&color=:color&charPreset=:char_preset`;
@@ -108,6 +109,9 @@ const GET_CAPTCHA_PATH = `https://svg-captcha-nodejs.vercel.app/captcha?size=:si
 const SESSION_STORAGE_KEY = {
   CHAT_BOT_STATE: 'CHAT_BOT_STATE',
   TIMER_CHATBOT: 'TIMER_CHATBOT',
+  BOT_UPDATE_AT: 'bot_update_at',
+  BOT_ID: (botId) => `messages_bot_${botId}`,
+  PREV_OPEN_STATUS: 'prevOpenStatus',
 };
 
 const CRAWL_ELEMENT_TYPES = {
@@ -130,6 +134,7 @@ const CHATBOT_ACTIONS = {
   PREVIEW_OBJECT: 'previewObject',
   SET_CHATBOT_CONVERSION_PARAMS_TO_LOCAL_STORAGE: 'setChatbotConversionParamsToLocalStorage',
   INJECT_CUSTOM_JS: 'injectCustomJS',
+  UPDATE_AMAZON_PAY_DATA: 'updateAmazonPayData',
 };
 
 const SEARCH_MODES = {
@@ -156,6 +161,23 @@ const MESSAGE_CONTENT_TYPES = {
     UP_TO_MUNICIPALITY: 'up_to_municipality',
     CONSUME_API_RESPONSE: 'comsume_api_response',
   },
+  IMAGE: 'image',
+  TEXT_INPUT: 'text_input',
+  LABEL: 'label',
+  TEXT_AREA: 'textarea',
+  RADIO_BUTTON: 'radio_button',
+  CHECKBOX: 'checkbox',
+  PULL_DOWN: 'pull_down',
+  ZIP_CODE_ADDRESS: 'zip_code_address',
+  SHIPPING_ADDRESS: 'shipping_address',
+  PRODUCT_PURCHASE_SELECT_OPTION: 'product_purchase_select_option',
+  ATTACHMENT: 'attaching_file',
+  CALENDAR: 'calendar',
+  AGREE_TERM: 'agree_term',
+  CREDIT_CARD_PAYMENT: 'credit_card_payment',
+  CARD_PAYMENT_RADIO_BUTTON: 'card_payment_radio_button',
+  SUBMIT_BUTTON: 'button_submit',
+  LABEL_NO_TRANSITION: 'label_no_transition',
 };
 
 const LABELS = {
@@ -174,6 +196,15 @@ const LABELS = {
     HORIZONTAL: '横並び',
     VERTICAL: '縦並び',
   },
+  SUBMIT_BUTTON: {
+    STYLE: '送信ボタンのカスタムCSSを入力してください',
+  },
+  SUBMIT_BUTTON_LOADING: {
+    LOADING_BUTTON_HTML: 'ローディングボタンHTML',
+    LOADING_BUTTON_CSS: 'ローディングボタンCSS',
+    LOADING_HTML: 'ローディングHTML',
+    LOADING_CSS: 'ローディングCSS',
+  },
 }
 
 const REGEXP = {
@@ -189,6 +220,10 @@ const CUSTOM_JS_CODE_POSITION = {
 const BOT_MESSAGE_TYPES = {
   HTML_CODE: 'html_code',
   UGC: 'use_html_ugc_config',
+  TEXT_INPUT: 'text_input',
+  FILE: 'file',
+  DELAY: 'delay',
+  GETTING_ERROR_NOTIFICATION: 'getting_error_notification',
 }
 
 const RENDER_CHATBOT_CONFIG = {
@@ -196,7 +231,13 @@ const RENDER_CHATBOT_CONFIG = {
   DEBOUNCE_INPUT_TEXT_JP_CONVERT: 300,
   DELAY_START_RENDER: 500,
   DELAY_BEFORE_SCROLL_TO_BOTTOM: 500,
+  TEMP_DELAY_PREFIX: "__temp_delay_",
 };
+
+export const RENDER_MODES = {
+  NEXT: "next", // when click next/update -> render next message 
+  LAST: "last", // when click next/update -> render last message is displayed
+}
 
 const CONVERT_TEXT_TYPES = {
   HIRAGANA: 'hiragana',
@@ -310,3 +351,37 @@ export const CURRENCY_UNITS = [
   { value: 1_0000_0000, symbol: "億" },      // 1億 = 10^8
   { value: 1_0000, symbol: "万" },           // 1万 = 10^4
 ];
+
+export const PREVIEW_ACTIONS = {
+  UPDATE_MULTI_STATE: "UPDATE_MULTI_STATE",
+  ADD_LP_OPTION_DATA: "ADD_LP_OPTION_DATA",
+  UPDATE_PREVIEW_ORDER_CONTENT: "UPDATE_PREVIEW_ORDER_CONTENT",
+  SET_PROCESSING: "SET_PROCESSING",
+  UPDATE_RENDER_MESSAGES: "UPDATE_RENDER_MESSAGES",
+  UPDATE_SUBMIT_ERROR_MESSAGE: "UPDATE_SUBMIT_ERROR_MESSAGE",
+  UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG: "UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG",
+  UPDATE_PREFECTURES_LIST: "UPDATE_PREFECTURES_LIST",
+  UPDATE_AMAZON_PAY_DATA: "UPDATE_AMAZON_PAY_DATA",
+  UPDATE_AFTER_CLICK_NEXT_BUTTON: "UPDATE_AFTER_CLICK_NEXT_BUTTON",
+  UPDATE_AFTER_CHANGE_VALUE: "UPDATE_AFTER_CHANGE_VALUE",
+  SET_CHECKOUT_URL: "SET_CHECKOUT_URL",
+  SET_OBJ_PARAM: "SET_OBJ_PARAM",
+  SET_SHOW_POPUP_CLOSE_BOT: "SET_SHOW_POPUP_CLOSE_BOT",
+  SET_SCENARIO_USER_RESPONSES: "SET_SCENARIO_USER_RESPONSES",
+  SET_BOT_ID: "SET_BOT_ID",
+  SET_CAPTCHA: "SET_CAPTCHA",
+  SET_URL_SEND: "SET_URL_SEND",
+  SET_URL_RECEIVE: "SET_URL_RECEIVE",
+  SET_DEVICE_RECEIVE: "SET_DEVICE_RECEIVE",
+  SET_SCENARIO_ID: "SET_SCENARIO_ID",
+  SET_CONVERSION_STATUS: "SET_CONVERSION_STATUS",
+  SET_STOP_RENDER: "SET_STOP_RENDER",
+  SET_ERRORS: "SET_ERRORS",
+  SET_DELAYING: "SET_DELAYING",
+  SET_CHATBOT_SETTINGS: "SET_CHATBOT_SETTINGS",
+  SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SERVER: "SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SERVER",
+  SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SESSION_STORAGE: "SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SESSION_STORAGE",
+  OPEN_CHATBOT: "OPEN_CHATBOT",
+  CLOSE_CHATBOT: "CLOSE_CHATBOT",
+  OPEN_POPUP_CLOSE_BOT_MODAL: "OPEN_POPUP_CLOSE_BOT_MODAL",
+};

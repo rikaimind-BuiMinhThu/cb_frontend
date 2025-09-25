@@ -90,7 +90,7 @@ function FileManagement() {
   function handleSave() {
     console.log(newFile);
     const type = newFile.name.split('.')[1].toLowerCase();
-    const trueFile = ['jpeg', 'jpg', 'png', 'pdf', 'mp4'].includes(type);
+    const trueFile = ['jpeg', 'jpg', 'png', 'pdf', 'mp4', 'gif'].includes(type);
     let file;
     if (trueFile) {
       if (type != 'pdf' && type != 'mp4' && newFile.size / 1024 / 1024 > 2) {
@@ -180,7 +180,7 @@ function FileManagement() {
           }
         });
     } else {
-      setFileError(`jpeg/ jpg/ png/ pdf/ mp4のファイルを入力が必要です。`);
+      setFileError(`jpeg/ jpg/ png/ pdf/ mp4/ gifのファイルを入力が必要です。`);
     }
   }
 
@@ -261,7 +261,7 @@ function FileManagement() {
                   {newFile !== null ? (
                     <>
                       <div className="file-mng__preview">
-                        {['jpeg', 'jpg', 'png'].includes(newFile.name.split('.')[1]) ? (
+                        {['jpeg', 'jpg', 'png', 'gif'].includes(newFile.name.split('.')[1]) ? (
                           <img src={URL.createObjectURL(newFile)} alt={newFile.name} />
                         ) : (
                           <>

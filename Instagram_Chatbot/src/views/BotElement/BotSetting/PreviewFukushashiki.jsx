@@ -1,17 +1,10 @@
-import React, { useEffect, useRef, useReducer, useState } from "react";
+import React, { useEffect, useRef, useReducer, useState, useMemo } from "react";
 import "assets/css/bot/preview-chat-bot.css";
-import api from "api/api-management";
 import Cookies from "js-cookie";
 import { MDBIcon } from "mdbreact";
-import { Button } from "reactstrap";
-import ModalPreviewBot from '../../Popup/ModalPreviewBot';
 import CustomButton from "./CustomButton";
 import { UserMessage, BotMessage } from "./PreviewComponent";
-import {
-  Row,
-  Col
-} from "antd";
-import moment from "moment";
+import PreviewFukushashikiReducer from "./PreviewFukushashiki/PreviewFukushashikiReducer";
 import $ from "jquery";
 import { EC_CHATBOT_URL } from "variables/constants";
 import "moment/locale/zh-cn";
@@ -25,61 +18,62 @@ import iconMessageBlack from "assets/img/icon-mess/icon-message-chat-black.png";
 import iconMessageWhite from "assets/img/icon-mess/icon-message-chat-white.png";
 import {
   CHATBOT_ACTIONS,
-  MESSAGE_CONTENT_TYPES,
-  SESSION_STORAGE_KEY,
   NO_ERROR,
   GETTING_ERROR_NOTIFICATION,
   CUSTOM_JS_CODE_POSITION,
-  BOT_MESSAGE_TYPES,
   TIMER_MAP_VARIABLES_FIELD,
   TIMER_TYPES,
-  RENDER_CHATBOT_CONFIG,
-  RANGE_TEXT_VALIDATE,
   CART_SYSTEM,
-  TIMER_DELAY_RENDER,
   CONVERSTION_RESPONSE_STATUS,
-  CONVERSION_RESPONSE_SUBMIT_TYPE,
-  CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE
+  PREVIEW_ACTIONS,
+  RENDER_CHATBOT_CONFIG,
+  RENDER_MODES,
 } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
   lightenColor,
-  mobileCheck,
-  removeLeadingZero,
-  sendCountRequest,
-  sendCreateOrderData,
-  sendUserInteractionData,
+  isMobile,
   getPrefectures,
   getScenarioPreviewData,
   getChatBotSetting,
-  sendEmailRequest,
   sleep,
   stringNullOrEmpty,
-  appendParamsToUrl,
-  checkMessageCondition,
-  getCaptcha,
-  findItem,
   changeElementAttributeById,
   scrollToPosition,
-  processMessagesForErrorState,
-  createTempDelay,
-  sendScenarioUserResponse,
   createStatusConversion,
-  updateStatusConversion,
-  createScenarioUserResponseMessageHistory,
-  userEntryScenario
+  userEntryScenario,
+  isDislayingLoginForm,
+  getElementMessageById,
+  sendOpenChatbotCountRequest,
+  sendCloseChatbotCountRequest,
+  isUserMessage,
 } from "./PreviewComponent/Utils";
-import Withdrawal from "./PreviewComponent/Withdrawal";
+import {
+  getChatbotSavedState,
+  savedChatbotState,
+  saveCheckpointTime,
+  savePrevOpenStatus,
+  getPrevOpenStatus,
+  getTimerConfig,
+  setTimerConfig
+} from "./PreviewComponent/SessionStorageUtils";
+import { isTorizenLP } from "./PreviewComponent/TorizenUtils";
+import PreventExitChatbotModal from "./PreviewComponent/PreventExitChatbotModal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
 import ZipCodePopUp from "./PreviewComponent/ZipCodePopUp";
 import _ from "lodash";
 import Timer from "./Timer";
+import {
+  setConversionParamToLocalStorage, fukushashikiSavedStateToLp, fukushashikiToLP,
+  executeLpJsCode, injectCustomJsCode, postMessageToParent
+} from "./PreviewFukushashiki/LPUtils";
+import { convertToFukushashikiObject } from "./PreviewFukushashiki/FukushashikiDataConverterUtils";
+import { handleValidateField } from "./PreviewFukushashiki/ValidationUtils";
 
-sessionStorage.setItem("prevOpenStatus", "0");
+savePrevOpenStatus("0");
 var url = new URL(window.location.href);
 let params = new URLSearchParams(url.search);
 let isLoggedIn = params.get('isLoggedIn') === "true";
-let isLoadedCssContent = false;
 const previewInitialState = {
   isOpen: false,
   urlSend: "",
@@ -95,9 +89,7 @@ const previewInitialState = {
   isUsedCartConfirmPage: false,
   currentMsgIndex: 0,
   renderMessagesList: [],
-  currentUserMsgIndex: 0,
   passedUserMsgCount: 0,
-  userMessagesList: [],
   errors: {},
   variables: [],
   isDisplayButtonNext: false,
@@ -112,6 +104,7 @@ const previewInitialState = {
   towns: "",
   zipcode: "",
   zipcodeContentIndex: "",
+  zipcodeIndex: -1,
   buttonTypePc: "1",
   positionPc: "1",
   widthPc: 450,
@@ -152,137 +145,31 @@ const previewInitialState = {
   conversionStatus: null,
 };
 
-const PREVIEW_ACTIONS = {
-  UPDATE_RENDER_MESSAGES: "UPDATE_RENDER_MESSAGES",
-  UPDATE_MULTI_STATE: "UPDATE_MULTI_STATE",
-  ADD_LP_OPTION_DATA: "ADD_LP_OPTION_DATA",
-  UPDATE_PREVIEW_ORDER_CONTENT: "UPDATE_PREVIEW_ORDER_CONTENT",
-  UPDATE_OPEN_PREVIEW: "UPDATE_OPEN_PREVIEW",
-  UPDATE_SUBMIT_ERROR_MESSAGE: "UPDATE_SUBMIT_ERROR_MESSAGE",
-  UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG: "UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG",
-  SET_PROCESSING: "SET_PROCESSING",
-  UPDATE_PREFECTURES_LIST: "UPDATE_PREFECTURES_LIST",
-};
-
-const PreviewFukushashikiReducer = (state, action) => {
-  switch (action.type) {
-    case PREVIEW_ACTIONS.UPDATE_MULTI_STATE:
-      return { ...state, ...(!!state.submitErrorMessage ? processMessagesForErrorState(action.payload): action.payload) };
-
-    case PREVIEW_ACTIONS.ADD_LP_OPTION_DATA:
-      return { ...state, lpOptionData: { ...state.lpOptionData, ...action.payload, isProcessing: false } };
-    case PREVIEW_ACTIONS.UPDATE_PREVIEW_ORDER_CONTENT:
-      return { ...state, previewOrderContent: action.payload, isProcessing: false };
-    case PREVIEW_ACTIONS.UPDATE_OPEN_PREVIEW:
-      return { ...state, isOpen: action.payload.isOpen, showPopupCloseBot: action.payload.showPopupCloseBot };
-    case PREVIEW_ACTIONS.SET_PROCESSING: 
-      return { ...state, isProcessing: action.payload };
-    case PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES:
-      return {
-        ...state,
-        renderMessagesList: state.messagesList.slice(action.payload.startIndex, action.payload.endIndex)
-      };
-    case PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE: {
-      let messagesList = _.cloneDeep(state.messagesList);
-
-      if (action.payload === GETTING_ERROR_NOTIFICATION) {
-        return state;
-      }
-
-      if (stringNullOrEmpty(action.payload)) {
-        messagesList = messagesList.map((message, index) => {
-          if (message.message_content.find(content => content.type === 'getting_error_notification' || content.type === 'delay') && index < state.currentMsgIndex) {
-            message.hidden = true;
-          } else if (message.not_display_when_have_error) {
-            const result = checkMessageCondition(message, state.objParam);
-            message.hidden = !result;;
-          }
-          return message;
-        });
-      } else {
-        messagesList = messagesList.map((message, index) => {
-          if (!message.hidden) {
-            message.hidden = action.payload && message.not_display_when_have_error;
-          }
-          return message;
-        });
-      }
-
-      const renderMessagesList = messagesList.slice(0, state.currentMsgIndex + 1)
-      const userMessagesList = messagesList.filter(message => message.belong_to === 'user' && message.message_content.length > 0);
-      return { ...state,
-        messagesList: messagesList,
-        renderMessagesList: renderMessagesList,
-        userMessagesList: userMessagesList,
-        submitErrorMessage: action.payload,
-        isProcessing: false,
-      };
-    }
-
-    case PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG: {
-      let messagesList = _.cloneDeep(state.messagesList);
-
-      if ((action.payload.displayMsg || []).length > 0) {
-        messagesList = messagesList.map((message, index) => {
-          if (action.payload.displayMsg.includes(message.name?.trim())) {
-            message.hidden = false;
-          }
-          return message;
-        });
-      }
-      const renderMessagesList = messagesList.slice(0, state.currentMsgIndex + 1)
-      const userMessagesList = messagesList.filter(message => message.belong_to === 'user' && message.message_content.length > 0);
-      return { ...state,
-        messagesList: messagesList,
-        renderMessagesList: renderMessagesList,
-        userMessagesList: userMessagesList,
-        submitErrorMessage: action.payload.error,
-        isProcessing: false,
-      };
-    }
-    case PREVIEW_ACTIONS.UPDATE_PREFECTURES_LIST:
-      return { ...state, prefecturesList: action.payload.prefecturesList };
-  }
-
-  return state;
-}
 
 const PreviewFukushashiki = () => {
   const [state, dispatch] = useReducer(PreviewFukushashikiReducer, previewInitialState);
   const [timerChanges, setTimerChanges] = useState({ timeLeft: -1, config: null });
   const containerRef = useRef(null);
-  const isFromScenario = false;
   const hasSentCustomJs = useRef(false);
-  const timeoutConfrmMsgRef = useRef(null);
+  const userMessagesList = useMemo(() => state.messagesList.filter(isUserMessage), [state.messagesList]);
 
-  const setShowPopupCloseBot = (value) => {
-    dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { showPopupCloseBot: value } });
-  };
+  // Initialize conversion status when chatbot opens
+  useEffect(() => {
+    if (state.conversionStatus || !state.uuid || !state.scenarioId || !state.isOpen) return;
+    
+    createStatusConversion({
+      scenario_id: state.scenarioId, 
+      user_input_id: state.uuid, 
+      status: CONVERSTION_RESPONSE_STATUS.UN_FINISH,
+    })
+    .then((res) => {
+      const status = res?.data?.data?.status;
 
-  const setCheckoutUrl = (value) => {
-    dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { checkoutUrl: value } });
-  };
-
-  const setScenarioUserResponses = (sursArr) => {
-    dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { scenarioUserResponses: sursArr } });
-  };
-
-  const getBotModalStyle = () => {
-    if (mobileCheck())
-      return {
-        bottom: "0px",
-        right: "0px",
-        width: `${state.widthSp || 100}%`,
-        height: `${state.heightSp || 100}%`,
+      if (status) {
+        dispatch({ type: PREVIEW_ACTIONS.SET_CONVERSION_STATUS, payload: status });
       }
-
-    return {
-      bottom: `${state.bottomMarginPc || 0}px`,
-      right: `${state.rightMarginPc || 30}px`,
-      width: `${state.widthPc || 450}px`,
-      height: `${state.heightPc || 700}px`,
-    };
-  }
+    });
+  }, [state.uuid, state.scenarioId, state.conversionStatus, state.isOpen]);
 
   // get default obj params
   useEffect(() => {
@@ -300,17 +187,17 @@ const PreviewFukushashiki = () => {
         start_datetime: new Date(),
       };
       dispatch({
-        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-        payload: { objParam: { ...state.objParam, ...defaultObjParam } }
+        type: PREVIEW_ACTIONS.SET_OBJ_PARAM,
+        payload: { ...state.objParam, ...defaultObjParam }
       });
     });
-  }, [state.objParam.ip, state.loadedStateFromSession]);
+  }, [state.objParam?.ip, state.loadedStateFromSession]);
 
   // Get chat bot setting
   useEffect(() => {
     if (!state.loadedStateFromSession) return;
     if (!state.botId && params.get("bot_id")) {
-      dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { botId: params.get("bot_id") } });
+      dispatch({ type: PREVIEW_ACTIONS.SET_BOT_ID, payload: params.get("bot_id") });
       return;
     }
 
@@ -337,23 +224,19 @@ const PreviewFukushashiki = () => {
           bottomMarginPc: result?.bottom_margin_pc ? result?.bottom_margin_pc : 0,
           positionSp: result?.position_sp ? result?.position_sp : "1",
           buttonTypeSp: result?.button_type_sp ? result?.button_type_sp : "1",
-          rightSpTitle: JSON.parse(response.data.data?.design_settings)?.right_position_sp_title,
+          rightSpTitle: result?.right_position_sp_title,
           rightMarginSp: result?.right_margin_sp,
           bottomMarginSp: result?.bottom_margin_sp,
         };
 
-        sessionStorage.setItem("chatbotH", result?.height_pc ? result?.height_pc : 700);
-        sessionStorage.setItem("chatbotBottom", result?.bottom_margin_pc ? result?.bottom_margin_pc : 10);
-        sessionStorage.setItem("chatbotW", result?.width_pc ? result?.width_pc : 450);
-        sessionStorage.setItem("chatbotRight", result?.right_margin_pc ? result?.right_margin_pc : 30);
-        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
+        dispatch({ type: PREVIEW_ACTIONS.SET_CHATBOT_SETTINGS, payload: newState });
       });
   }, [state.botId, state.loadedStateFromSession, state.displayType]);
 
   const eventHandler = async (event) => {
     if (!event.data || !event.data.actionData) return;
     const actionData = event.data.actionData;
-    
+
     switch (event.data.action) {
       case CHATBOT_ACTIONS.CRAWL_DATA:
         let receiveOptionData = {};
@@ -394,6 +277,13 @@ const PreviewFukushashiki = () => {
           type: PREVIEW_ACTIONS.UPDATE_PREVIEW_ORDER_CONTENT,
           payload: actionData
         });
+
+      case CHATBOT_ACTIONS.UPDATE_AMAZON_PAY_DATA:
+        return dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA,
+          payload: actionData,
+        });
+
       default:
         // TODO
         break;
@@ -411,7 +301,7 @@ const PreviewFukushashiki = () => {
 
   // Add style to body tag if it's mobile
   useEffect(() => {
-    if (mobileCheck()) {
+    if (isMobile()) {
       document.body.classList.add('is_mobile');
     }
   }, [])
@@ -428,7 +318,7 @@ const PreviewFukushashiki = () => {
       chatbotRight: state.rightMarginPc,
       chatbotBottom: state.bottomMarginPc,
     };
-    postMessageToParent(options);
+    postMessageToParent(options, state);
   }, [
     state.urlReceive,
     state.isOpen,
@@ -445,365 +335,232 @@ const PreviewFukushashiki = () => {
     if (!state.loadedStateFromSession) return;
     if (state.prefecturesList.length !== 0) return;
 
-    // getPrefectures()
-    //   .then((res) => {
-    //     dispatch({ type: PREVIEW_ACTIONS.UPDATE_PREFECTURES_LIST, payload: { prefecturesList: res.data.data } });
-    //   })
+    getPrefectures()
+      .then((res) => {
+        dispatch({ type: PREVIEW_ACTIONS.UPDATE_PREFECTURES_LIST, payload: { prefecturesList: res.data.data } });
+      })
   }, [state.prefecturesList, state.loadedStateFromSession]);
 
-  const handleCloseBot = () => {
-    const element = document.getElementById('sp-container1');
-    if (mobileCheck()) {
-      dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { showPopupCloseBot: false, isOpen: false } });
-    } else {
-      element.classList.remove('slideUp');
-      element.classList.add('slideDown');
-      setTimeout(() => {
-        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { showPopupCloseBot: false, isOpen: false } });
-      }, 680)
-    }
-  }
+    // For run errorJsCode
+  useEffect(() => {
+    if (!state.isUsedErrMsgByJs || !state.errMsgJsCode) return;
+    executeLpJsCode(state.errMsgJsCode, state);
+  }, [state.errMsgJsCode, state.isUsedErrMsgByJs]);
 
-  const startRenderWithDelay = (newState, options = {}) => {
-    const { 
-      delayTime = RENDER_CHATBOT_CONFIG.DELAY_START_RENDER,
-      scrollToBottom = true,
-    } = options;
+  // For run injectCustomJsCode
+  useEffect(() => {
+    if (!state.isUsedCustomJsCode) return;
 
-    userEntryScenario({
-      scenario_id: newState.scenarioId,
-      user_id: newState.uuid,
+    injectCustomJsCode(hasSentCustomJs, state, {
+      head: { jsCode: state.headCustomJsCode, position: CUSTOM_JS_CODE_POSITION.HEAD },
+      top_body: { jsCode: state.topBodyCustomJsCode, position: CUSTOM_JS_CODE_POSITION.TOP_BODY },
+      bottom_body: { jsCode: state.bottomBodyCustomJsCode, position: CUSTOM_JS_CODE_POSITION.BOTTOM_BODY },
     });
+  }, [state.isUsedCustomJsCode, state.headCustomJsCode, state.topBodyCustomJsCode, state.bottomBodyCustomJsCode]);
 
-    new Promise((resolve) => {
-      dispatch({
-        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-        payload: { renderMessagesList: [], isDelaying: true },
-      });
+  // For add custom css
+  useEffect(() => {
+    if (!state.isUsedCustomCss || !state.customCssContent) return;
 
-      sleep(delayTime).then(resolve);
-    }).then(async () => {
-      if (newState.useNewProcess) {
-        renderMessageInRange(0, newState.currentMsgIndex, newState, newState.currentUserMsgIndex, { isPassDelay: true, appearFromStart: true })
-        .then(() => {
-          dispatch({
-            type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-            payload: { isDelaying: false },
+    const style = document.createElement('style');
+    style.id = "custom-css";
+    style.innerHTML = state.customCssContent;
+    document.head.appendChild(style);
+  }, [state.isUsedCustomCss, state.customCssContent]);
+
+  // Get Preview Scenario Data
+  useEffect(() => {
+    if (!state.loadedStateFromSession) {
+      let savedState = getChatbotSavedState();
+      if (savedState) {
+        setConversionParamToLocalStorage(
+          savedState.scenarioId,
+          'web',
+          savedState.userInputId || params.get("uuid"),
+          params.get("env") || "production",
+          state
+        );
+
+        if (isLoggedIn) {
+          return dispatch({
+            type: PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SESSION_STORAGE,
+            payload: {
+              savedState,
+              isLoggedIn: isLoggedIn,
+              isUsingAmazonPay: params.get('is_using_amazon_pay')
+            }
           });
-        });
-      } else {
-        const listMsgAppear = newState.renderMessagesList.filter(i => isUserMessage(i) && !i.hidden).map(i => ({ id: i.id, type: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.APPEAR }));
+        }        
 
-        if (listMsgAppear.length) {
-          createScenarioUserResponseMessageHistory({
-            scenario_id: newState.scenarioId,
-            user_id: newState.uuid,
-            msgs: listMsgAppear,
-          });
+        const timerConfig = getTimerConfig();
+        if (timerConfig) {
+          setTimerChanges({ timeLeft: calculateTimerConfigDuration(timerConfig?.config?.type, timerConfig?.config?.duration, { timerLeft: timerConfig.timeLeft, useTimerLeft: true }), config: timerConfig });
         }
-        dispatch({
-          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-          payload: { renderMessagesList: newState.renderMessagesList, isDelaying: false },
+
+        return fukushashikiSavedStateToLp(savedState, params, state).then(async () => {
+          return dispatch({
+            type: PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SESSION_STORAGE,
+            payload: {
+              savedState,
+              isLoggedIn: isLoggedIn,
+              isUsingAmazonPay: params.get('is_using_amazon_pay')
+            }
+          });
         });
       }
+    }
 
-      if (scrollToBottom) {
-        await sleep(RENDER_CHATBOT_CONFIG.DELAY_BEFORE_SCROLL_TO_BOTTOM);
-        scrollToPosition({ position: "b", selector: "#sp-body" });
+    if (state.loadedStateFromSession && state.botId)
+      return;
+
+    if (!state.botId) {
+      dispatch({ type: PREVIEW_ACTIONS.SET_BOT_ID, payload: params.get("bot_id") });
+      return;
+    }
+
+    if (!state.urlSend) {
+      dispatch({ type: PREVIEW_ACTIONS.SET_URL_SEND, payload: window.location.href });
+      return;
+    }
+
+    if (!state.urlReceive) {
+      dispatch({ type: PREVIEW_ACTIONS.SET_URL_RECEIVE, payload: params.get("urlReceive") });
+      return;
+    }
+
+    if (!state.deviceReceive) {
+      dispatch({ type: PREVIEW_ACTIONS.SET_DEVICE_RECEIVE, payload: params.get("deviceReceive") });
+      return;
+    }
+
+    if (!state.scenarioId) {
+      dispatch({ type: PREVIEW_ACTIONS.SET_SCENARIO_ID, payload: params.get("scenario_id") });
+      return;
+    }
+
+    return getScenarioPreviewData(state.botId, state.scenarioId)
+      .then(extractStateFromPreviewResponse);
+  }, [
+    state.botId, state.urlSend, state.urlReceive,
+    state.deviceReceive, state.scenarioId,
+    state.isDisplayErrorMessage, state.loadedStateFromSession
+  ]);
+
+  // Auto-scroll to bottom of the chatbot when render messages list changes or submit error message changes
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      scrollToPosition({ position: "b", selector: "#sp-body" });
+    }, 1000);
+
+    return () => clearTimeout(timeoutId);
+  }, [state.renderMessagesList?.length, state.submitErrorMessage]);
+
+  const getRenderMode = () => {
+    // TODO: 
+    // Hiện tại thì đang hard code check isTorizenLP từ url của LP để return RENDER_MODES.LAST
+    // Cần refactor đoạn này sao cho có thể sử dụng được setting RENDER_MODES trên trang quản lý
+    // 
+    if (isTorizenLP(state.urlReceive)) return RENDER_MODES.LAST;
+    // Cần check xem có phải trường hợp reload hay ko?
+    // Nếu là trường hợp reload thì return RENDER_MODES.LAST
+    // Nếu là trường hợp không phải reload thì return RENDER_MODES.NEXT
+    
+    return RENDER_MODES.NEXT;
+  }
+
+  // Auto-render messages when current message index changes
+  // Delays rendering for 1 second to show smooth transition between messages
+  useEffect(() => {
+    if (!state.nextStopMsgIndex || state.currentMsgIndex + 1 >= state.nextStopMsgIndex) return;
+
+    setTimeout(() => {
+      const endIndex = getRenderMode() === RENDER_MODES.LAST ? state.nextStopMsgIndex : state.currentMsgIndex + 1 + 1;
+      dispatch({
+        type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
+        payload: {
+          startIndex: 0,
+          endIndex: endIndex,
+          fromCallback: false,
+        }
+      });
+    }, RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE);
+  }, [state.currentMsgIndex, state.nextStopMsgIndex]);
+
+  const renderNextMessage = () => {
+    if (state.currentMsgIndex + 1 >= state.nextStopMsgIndex) return;
+
+    dispatch({
+      type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
+      payload: {
+        startIndex: 0,
+        endIndex: state.currentMsgIndex + 1 + 1,
+        fromCallback: true,
       }
     });
   }
 
-  const getNextUserMsg = (ext = null) => (item, index) => {
-    const firstMsgContent = item?.message_content?.at(0);
-    const isDisplayBtnNext = (item?.message_content?.length === 1 && firstMsgContent?.type != "image") || firstMsgContent?.image?.displayButtonNext != false;
-
-    const conds = !item.hidden && isUserMessage(item) && isDisplayBtnNext;
-
-    if (ext && typeof ext === "function") {
-      return conds && ext(item, index);
-    }
-
-    return conds;
-  }
+  const setShowPopupCloseBot = (value) => {
+    dispatch({ type: PREVIEW_ACTIONS.SET_SHOW_POPUP_CLOSE_BOT, payload: value });
+  };
 
   const onOpenPreview = (opening) => {
     const deviceReceive = state.deviceReceive || params.get("deviceReceive");
     if (!deviceReceive) return;
 
     // Send data to count open chatbot window
-    const prevOpenStatus = sessionStorage.getItem("prevOpenStatus");
+    const prevOpenStatus = getPrevOpenStatus();
+
     if (prevOpenStatus == "0" && opening) {
-      sessionStorage.setItem("prevOpenStatus", "1");
-      const openChatbotCountApiParams = {
-        scenario_data: `${deviceReceive}_open_chatbot_window`,
-      };
-      sendCountRequest(state.scenarioId, openChatbotCountApiParams);
+      savePrevOpenStatus("1");
+      sendOpenChatbotCountRequest(state.scenarioId, deviceReceive);
     }
     
-    const timerChatbotStorage = getTimerSessionStorage();
+    const timerChatbotStorage = getTimerConfig();
     setTimerChanges((timerChanges) => timerChatbotStorage || timerChanges);
 
     // post message to parent window
-    postMessageToParent({isOpen: opening});
+    postMessageToParent({isOpen: opening}, state);
 
     if (state.alreadyOpenFirstTime) {
       if (!opening) {
         if (state.activePopupCloseBot) {
-          return dispatch({
-            type: PREVIEW_ACTIONS.UPDATE_OPEN_PREVIEW,
-            payload: {
-              isOpen: false,
-              showPopupCloseBot: true,
-            }
-          });
+          return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
         }
-      }
-      dispatch({
-        type: PREVIEW_ACTIONS.UPDATE_OPEN_PREVIEW,
-        payload: {
-          isOpen: opening,
-          showPopupCloseBot: false,
-        }
-      });
 
-      if (opening) {
-        return startRenderWithDelay(state, { delayTime: RENDER_CHATBOT_CONFIG.DELAY_START_RENDER });
+        return dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
       }
 
-      return
-    }
-
-    state.alreadyOpenFirstTime = true;
-    state.isOpen = true;
-    state.currentUserMsgIndex = state.messagesList.findIndex(getNextUserMsg());
-    
-    // For the first time, we need to render to the first user message
-    if (state.currentUserMsgIndex >= 0) {
-      state.currentMsgIndex = state.currentUserMsgIndex;
-    }
-
-    return renderMessagesWithDelay(state, 0, state.currentMsgIndex, { setNewState: false });
-  }
-
-
-    const handleCloseChatbotWhenUseWithDrawal = () => {
-      if (!state.isOpen) return; 
-      onOpenPreview(false) 
-      const enabledStatus = new Set(["standard_exit_popup", "image_popup"])
-      const isWithDrawalEnabled = state.botInfor && enabledStatus.has(state.botInfor.withdrawal_prevention_status)
-      if (isWithDrawalEnabled) {
-        handleOpenWithDrawal();
-        return ;
-      }
-    }
-
-  const setPulldownValue = (dataContentType, field, value) => {
-    switch (field) {
-      case "customization":
-      case "prefectures":
-        return value;
-      case "up_to_municipality":
-        return `${dataContentType[field].prefecture}${dataContentType[field].city}`;
-      case "timezone_from_to":
-        return `${dataContentType[field]?.valueHour1}:${dataContentType[field]?.valueMinute1}-${dataContentType[field]?.valueHour2}:${dataContentType[field]?.valueMinute2}`;
-      case "date_ym":
-        return `${dataContentType[field]?.valueYear}-${dataContentType[field]?.valueMonth}`;
-      case "period_from_to":
-        return `${dataContentType[field]?.valueYear1}-${dataContentType[field]?.valueMonth1}-${dataContentType[field]?.valueDay1} ~ ${dataContentType[field]?.valueYear2}-${dataContentType[field]?.valueMonth2}-${dataContentType[field]?.valueDay2}`;
-      default:
-        return `${dataContentType[field]?.valueYear || dataContentType[field]?.valueMonth || dataContentType[field]?.valueDay
-          ? `${dataContentType[field]?.valueYear}-${dataContentType[field]?.valueMonth}-${dataContentType[field]?.valueDay}`
-          : ""
-        } ${dataContentType[field]?.valueHour || dataContentType[field]?.valueMinute
-          ? `${dataContentType[field]?.valueHour}:${dataContentType[field]?.valueMinute}`
-          : ""
-        }`;
-    }
-  }
-
-  const setTextInputValue = (dataContentType, field) => {
-    return `${dataContentType[field]?.valueLeft} ${dataContentType[field]?.valueRight}`;
-  }
-
-  const setRadioButtonDefaultValue = (dataContentType, value) => {
-    return dataContentType[dataContentType.type].find(item => item.value === value)?.text;
-  }
-  
-  const setCheckboxDefaultValue = (dataContentType, field) => {
-    let dataTextChecked = [];
-    switch (field) {
-      case "checkedValue":
-        break;
-      case "initial_selection_picture":
-        break;
-    }
-    if (field === "checkedValue") {
-      if (dataContentType.checkedValue.length > 0) {
-        dataTextChecked = dataContentType.checkedValue.map((itemChecked) => {
-          return dataContentType[dataContentType.type].find((item) => itemChecked === item.id)?.text;
-        });
-      }
-    } else if (field === "initial_selection_picture" && dataContentType.initial_selection_picture.length > 0) {
-      dataTextChecked = dataContentType.initial_selection_picture.map((itemChecked) => {
-        let dataReturn;
-        dataContentType[dataContentType.type].forEach((item) => {
-          item.contents.forEach((subItem) => {
-            if (itemChecked === `${item.id}-${subItem.id}`) {
-              dataReturn = subItem.text;
-            }
-          });
-        });
-        return dataReturn;
+      return userEntryScenario({
+        scenario_id: state.scenarioId,
+        user_id: state.uuid,
+      }).then(() => {
+        dispatch({ type: PREVIEW_ACTIONS.OPEN_CHATBOT });
       });
     }
-    return dataTextChecked.length > 0 ? dataTextChecked.join(",") : "";
-  }
 
-  const setZipCodeAddressDefaultValue = (dataContentType) => {
-    let dataPostCode = !dataContentType.split_postal_code
-      ? dataContentType?.value_post_code
-      : `${dataContentType.value_post_code_left}${dataContentType.value_post_code_right}`;
-    const prefecture = dataContentType?.value_prefecture || "";
-    const municipality = dataContentType?.value_municipality || "";
-    const address = dataContentType?.value_address || "";
-    const buildingName = dataContentType?.value_building_name || "";
-
-    // Safe parse prefecture name in case of using dropdown
-    let fixedPrefecture = findItem(state.prefecturesList, { 
-      keys: 'id', 
-      value: prefecture, 
-      callbackValue: prefecture,
-      onSuccess: (item) => item.name,
-    });
-    return `〒${dataPostCode} ${fixedPrefecture}${municipality} ${address}${buildingName}`;
-  }
-
-  const setCardPaymentRadioButtonDefaultValue = (dataContentType, field, value) => {
-    let checkedOptionText = "";
-    if (field === "initial_selection") {
-      checkedOptionText = dataContentType.radio_contents.find((item) => value === item.value)?.text;
-    } else if (field === "initial_selection_picture") {
-      dataContentType.radio_contents_img.forEach((item) => {
-        item.contents.forEach((subItem) => {
-          if (value === `${item.id}-${subItem.id}`) {
-            checkedOptionText = subItem.text;
-          }
-        });
+    if (opening) {
+      sendOpenChatbotCountRequest(state.scenarioId, deviceReceive).then(() => {
+        dispatch({ type: PREVIEW_ACTIONS.OPEN_CHATBOT });
+      });
+    } else {
+      sendCloseChatbotCountRequest(state.scenarioId, deviceReceive).then(() => {
+        dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
       });
     }
-    return checkedOptionText;
   }
 
-  const setCarouselDefaultValue=(dataContentType,value) => {
-    let default_value = dataContentType[
-      dataContentType.carousel
-    ].contents.find((item) => item.id === value).title;
-    return default_value;
+  const onChatbotHeaderClick = () => {
+    if (!state.isOpen) return dispatch({ type: PREVIEW_ACTIONS.OPEN_CHATBOT });
+
+    // When closing chatbot, show popup close bot modal if has setting
+    const openPopupSetting = ["standard_exit_popup", "image_popup"];
+    const isWithDrawalEnabled = state.botInfor && openPopupSetting.includes(state.botInfor.withdrawal_prevention_status);
+
+    if (!isWithDrawalEnabled) return dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
+
+    return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
   }
 
-  const setDefaultValue = (item, dataContentType, contentType, value, field) => {
-    switch (contentType) {
-      case "zip_code_address":
-        item.default_value = setZipCodeAddressDefaultValue(dataContentType);
-        break;
-      case "radio_button":
-        item.default_value = setRadioButtonDefaultValue(dataContentType, value);
-        break;
-      case "checkbox":
-        item.default_value = setCheckboxDefaultValue(dataContentType, field);
-        break;
-      case "card_payment_radio_button":
-        item.default_value = setCardPaymentRadioButtonDefaultValue(dataContentType, field, value);
-        break;
-      case "pull_down":
-        item.default_value = setPulldownValue(dataContentType, field, value);
-        break;
-      case "carousel":
-        item.default_value = setCarouselDefaultValue(dataContentType, value);
-        break;
-      case "text_input":
-        if (field === 'text' && dataContentType[field].isSplitInput) {
-          item.default_value = setTextInputValue(dataContentType, field);
-        } else if (!dataContentType[field].isSplitInput) {
-          item.default_value = dataContentType[field].value;
-        }
-        break;
-      default:
-        if (dataContentType.type === "embedded") {
-          item.default_value = `${moment(value).format("YYYY-MM-DD")}`;
-        } else if (field === "phone_number" && dataContentType[field].withHyphen) {
-          item.default_value = setPhoneNumberDefaultValue(dataContentType, field);
-        } else if (field === "start_date_select" || field === "end_date_select") {
-          item.default_value = setDateSelectDefaultValue(dataContentType);
-        } else if (contentType !== "credit_card_payment") {
-          item.default_value = value;
-        }
-        break;
-    }
-  }
-
-  const setPhoneNumberDefaultValue = (dataContentType, field) => {
-    // TODO: Implement this function
-  }
-
-  const setDateSelectDefaultValue = (dataContentType, field) => {
-    // TODO: Implement this function
-  }
-
-  const getProductDetailsForProductPurchaseRadioButton = (dataContentType, value) => {
-    let valueCode, valueName, valuePrice;
-  
-    const product = dataContentType.products?.find(product => product.id === value);
-    if (product) {
-      valueCode = product.item_number;
-      valueName = product.title;
-      valuePrice = product.item_price;
-    }
-  
-    return { valueCode, valueName, valuePrice };
-  }
-
-  const getProductDetailsForProductPurchase = (dataContentType, value) => {
-    let arrayCode = [];
-    let arrayName = [];
-    let arrayPrice = [];
-    let arrayOrderQuantity = [];
-  
-    dataContentType.products?.forEach((product) => {
-      value.forEach((val) => {
-        if (product.id === val) {
-          arrayCode.push(product.item_number);
-          arrayName.push(product.title);
-          arrayPrice.push(product.item_price);
-          arrayOrderQuantity.push(product?.quantity_select);
-        }
-      });
-    });
-  
-    return { arrayCode, arrayName, arrayPrice, arrayOrderQuantity };
-  }
-
-  const redirectToCartPage = () => {
-    const params = {
-      scenario_id: state.scenarioId,
-      bot_type: "web",
-      user_input_id: state.uuid,
-    };
-    let redirectRurl = null;
-  
-    if (state.isUsedCartConfirmPage && state.urlCartConfirmPage) {
-      redirectRurl = appendParamsToUrl(state.urlCartConfirmPage, params);
-    } else if (state.urlThanksPage) {
-      redirectRurl = appendParamsToUrl(state.urlThanksPage, params);
-    }
-
-    if (!redirectRurl) return;
-
-    setTimeout(() => {
-      window.parent.location.href = redirectRurl;
-    }, 2000);
-  }; 
 
   const getBotInforFromPreviewResponse = (res) => {
     if (!res || !res.data || !res.data.chatbot) return {};
@@ -871,310 +628,18 @@ const PreviewFukushashiki = () => {
     };
   }
 
-  const processBotDelayMessage = async (messagesList, i, newState) => {
-    if (messagesList[i]?.message_content[0]?.delay?.typing_on) {
-      // TODO: Need display typing on
-      // return new Promise(async (resolve) => {
-      //   const newRenderMessagesList = [...state.renderMessagesList, messagesList[i]];
-      //   dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { renderMessagesList: newRenderMessagesList } });
-      //   await sleep(messagesList[i].message_content[0].delay.content * 1000);
-      //   resolve();
-      // }).then(() => {
-      //   let messagesList = state.messagesList;
-      //   messagesList[i].hidden = true;
-      //   let newRenderMessagesList = [...state.renderMessagesList];
-      //   newRenderMessagesList[i].hidden = true;
-        
-      //   if (isLastMessageInCreateOrderFlow() && state.urlThanksPage)
-      //     return redirectToThanksPage();
-
-      //   return dispatch({
-      //     type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: {
-      //       renderMessagesList: [...newRenderMessagesList],
-      //       messagesList: messagesList,
-      //       currentMsgIndex: i,
-      //     }
-      //   });
-      // });
-    }
-    if (state.renderMessagesList.length - 1 === i) {
-      await sleep(messagesList[i].message_content[0].delay.content * 1000);
-    }
-    if (isLastMessageInCreateOrderFlow())
-      return redirectToCartPage();
-    newState.currentMsgIndex = i;
-    newState.messagesList[i].hidden = true;
-    return newState;
-  }
-
-  const processBotEmailMessage = (messagesList, i, newState) => {
-    const msgContent = messagesList[i]?.message_content?.[0];
-    const emailId = msgContent[msgContent.type].contentId;
-    let variablesData = {};
-
-    newState.variablesList.forEach((item) => {
-      variablesData[item.variable_name] = item.default_value;
-    });
-
-    sendEmailRequest(emailId, {variables: variablesData})
-      .then((res) => {console.log(res)});
-
-    newState.renderMessagesList.push({});
-    newState.currentMsgIndex = i;
-    return newState;
-  }
-
-  const processBotPauseMessage = (messagesList, i, newState) => {
-    newState.renderMessagesList.push({});
-    newState.currentMsgIndex = i;
-  }
-
-  const processForBotVariableSetMessage = (messagesList, i, newState, options = {forceEmpty: false}) => {
-    const msgContent = messagesList[i]?.message_content?.[0];
-    if (!msgContent) return newState;
-
-    if (newState.variables.length !== 0) {
-      const msgVariables = msgContent[msgContent.type].variables;
-
-      newState.variables.forEach((item) => {
-        const matchingVariable = msgVariables.find(variable => item.variable_name === variable.key);
-        if (matchingVariable) {
-          item.default_value = options.forceEmpty ? "" : matchingVariable.value;
-        }
-      });
-    }
-
-    newState.renderMessagesList.push({});
-    newState.currentMsgIndex = i;
-    return newState;
-  }
-
-  const processForBotDefaultMessage = async (messagesList, i, newState, isUpdateSourceContent, assignToState = true) => {
-    const msgContent = messagesList[i]?.message_content?.[0];
-    if (!msgContent) return newState;
-
-    // await sleep(1000);
-    const applyVariables = (section) => {
-      if (!section?.content || newState.variables.length === 0) return false;
-
-      if (isUpdateSourceContent) section.sourceContent = section.content;
-
-      section.content = newState.variables.reduce(
-        (s, { variable_name, default_value }) =>
-          s.replaceAll(`{{${variable_name}}}`, default_value),
-        section.sourceContent ?? section.content
-      );
-      return true;
-    };
-
-    const updated =
-      (msgContent.type === "text_input" &&
-        applyVariables(msgContent.text_input)) ||
-      (msgContent.type === BOT_MESSAGE_TYPES.HTML_CODE &&
-        applyVariables(msgContent.html_code));
-
-    if (updated) messagesList[i].message_content[0] = msgContent;
-    
-    if (assignToState) {
-      newState.renderMessagesList.push(messagesList[i]);
-      newState.currentMsgIndex = i;
-    }
-    
-    scrollToPosition({ position: "b", selector: "#sp-body" });
-
-    if (isLastMessageInCreateOrderFlow())
-      return redirectToCartPage();
-
-    return newState;
-  }
-
-  const processBotScriptMessage = (messagesList, i, newState) => {
-    const script = messagesList[i]?.message_content[0]?.script?.content;
-    if (!script) return newState;
-
-    try {
-      const func = new Function(script);
-      func();
-    } catch {
-      console.error('Script run failed!')
-    } finally {
-      return newState;
-    }
-  }
-
-  const processBotUgcMessage = async (messagesList, i, newState) => {
-    const content = messagesList[i]?.message_content[0]?.use_html_ugc_config?.content;
-    if (!content) return newState;
-    if(/^\s*<\w+|<\w+[^>]*>/i.test(content)){
-      try {
-        const doc = new DOMParser().parseFromString(content, "text/html");
-        [...doc.querySelectorAll("link")].forEach(el => 
-          document.head.appendChild(el.cloneNode(true)));
-        [...doc.body.children].filter(el => !["script", "link"]
-          .includes(el.tagName.toLowerCase())).forEach(el => document.body.appendChild(el.cloneNode(true)));
-        for (const script of doc.querySelectorAll("script")) {
-          const s = document.createElement("script");
-          [...script.attributes].forEach(attr => s.setAttribute(attr.name, attr.value));
-          s.text = script.textContent || '';
-          if (s.src) await new Promise(r => { s.onload = s.onerror = r; document.body.appendChild(s); });
-          else document.body.appendChild(s);
-        }
-      } catch (error) {
-        console.error("Hello !, you have one bug",error)
-      }
-    } else {
-      try {
-        const func = new Function(content);
-        func();
-      } catch (error) {
-        console.error("Ồ là lá Fail rồi", error);
-      }
-    }
-    return newState;
-  }
-  
-  const processForBotMessage = async (messagesList, i, newState, isUpdateSourceContent =+ false, assignToState = true) => {
-    const firstMsgType = messagesList[i]?.message_content[0]?.type;
-
-    switch (firstMsgType) {
-      case 'script':
-        return processBotScriptMessage(messagesList, i, newState);
-      case BOT_MESSAGE_TYPES.UGC:
-        return await processBotUgcMessage(messagesList, i, newState);
-      case "delay":
-        return await processBotDelayMessage(messagesList, i, newState);
-      case "email":
-        return processBotEmailMessage(messagesList, i, newState);
-      case "variable_set":
-        return processForBotVariableSetMessage(messagesList, i, newState);
-      case "clear_variable":
-        return processForBotVariableSetMessage(messagesList, i, newState, {forceEmpty: ""});
-      case "pause":
-        return processBotPauseMessage(messagesList, i, newState);
-      default:
-        return processForBotDefaultMessage(messagesList, i, newState, isUpdateSourceContent, assignToState);
-    }
-  }
-
-  const processForUserCaptchaMessage = (messagesList, i, msgContentIndex, newState) => {
-    const msgContent = messagesList[i]?.message_content?.[msgContentIndex];
-    const msgContentType = msgContent.type;
-    if (!msgContent) return newState;
-
-    const size = msgContent[msgContentType].length;
-    const color = msgContent[msgContentType].colour ? "true" : "";
-    const charPreset = msgContent[msgContentType].type;
-
-    getCaptcha(size, color, charPreset)
-      .then((res) => {
-        let newCaptcha = [...state.captcha];
-        newCaptcha.push({index: i, indexContent: msgContentIndex, ...res.data});
-        dispatch({
-          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-          payload: {
-            captcha: [...newCaptcha]
-          }
-        });
-      });
-  }
-
-  const processForUserMessage = (messagesList, i, newState, assignToState = true) => {
-    for (
-      let j = 0;
-      j < messagesList[i].message_content.length;
-      j++
-    ) {
-      if (messagesList[i].message_content[j].type === "capture") {
-        processForUserCaptchaMessage(messagesList, i, j, newState);
-      }
-    }
-
-    if (assignToState) {
-      newState.renderMessagesList.push(messagesList[i]);
-      newState.currentMsgIndex = i;
-      newState.currentUserMsgIndex++;
-    }
-
-    scrollToPosition({ position: "b", selector: "#sp-body" });
-
-    return newState;
-  }
-
-  const setConversionParamToLocalStorage = (scenarioId, botType, userInputId, env) => {
-    postMessageToParent({
-      isOpen: true,
-      action: CHATBOT_ACTIONS.SET_CHATBOT_CONVERSION_PARAMS_TO_LOCAL_STORAGE,
-      actionData: {
-        scenarioId, botType, userInputId, env
-      }
-    });
-  }
-
-  const renderMessagesWithDelay = (theState, startMsgIndex, endMsgIndex, options = { setNewState: true }) => {
-    userEntryScenario({
-      scenario_id: theState.scenarioId,
-      user_id: theState.uuid,
-    });
-
-    return new Promise(async (resolve) => {
-      const listMsgAppear = [];
-      for (let i = startMsgIndex; i <= endMsgIndex; i++) {
-        theState.renderMessagesList = theState.messagesList.slice(0, i + 1);
-        if (isDelayBotMessage(theState.messagesList[i])) {
-          await sleep(theState.messagesList[i].message_content[0].delay.content * 1000);
-          theState.messagesList[i].hidden = true;
-          continue;
-        }
-        
-        // update state with theState except prefecturesList
-        const { prefecturesList, ...rest } = theState;
-        dispatch({ 
-          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, 
-          payload: {
-            ...rest,
-            renderMessagesList: theState.renderMessagesList,
-            messagesList: theState.messagesList,
-          },
-        });
-
-        if (isUserMessage(theState.messagesList[i])) {
-          listMsgAppear.push({ id: theState.messagesList[i].id, type: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.APPEAR });
-        }
-
-        scrollToPosition({ position: "b", selector: "#sp-body" });
-        await sleep(RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE);
-      }
-      resolve({ listMsgAppear });
-    }).then(({ listMsgAppear }) => {
-      if(options.setNewState) {
-        theState.renderMessagesList = theState.messagesList.slice(0, theState.currentMsgIndex + 1);
-        theState.passedUserMsgCount = theState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
-  
-        // update state with theState except prefecturesList
-        const { prefecturesList, ...rest } = theState;
-        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: rest });
-      }
-
-      if (listMsgAppear.length) {
-        createScenarioUserResponseMessageHistory({
-          scenario_id: theState.scenarioId,
-          user_id: theState.uuid,
-          msgs: listMsgAppear,
-        });
-      }
-    });
-  }
-
   const extractStateFromPreviewResponse = async (res) => {
     if (!res || !res.data || res.data.code !== 1) return;
-    
+
     const designSetting = res.data.design_settings;
+    const chatbot = res.data.chatbot;
+    const conversation = res.data.data?.conversation;
     let newState = {
       ...state,
       botInfor: getBotInforFromPreviewResponse(res),
       objParam: {},
       loadedStateFromSession: true,
-      messagesList: res.data.data?.conversation?.messages || [],
+      messagesList: conversation?.messages || [],
       isOpen: state.isOpen || Number(designSetting.display_type) === 1,
       activePopupCloseBot: Boolean(designSetting?.popup_close_bot),
       titleBubble: designSetting?.title_bubble || "簡単90秒で注文完了",
@@ -1193,140 +658,55 @@ const PreviewFukushashiki = () => {
       rightSpTitle: designSetting?.right_position_sp_title,
       rightMarginSp: designSetting?.right_margin_sp,
       bottomMarginSp: designSetting?.bottom_margin_sp,
-      isUsedErrMsgByJs: res.data?.chatbot?.is_used_err_msg_by_js,
-      errMsgJsCode: res.data?.chatbot?.err_msg_js_code,
-      useNewProcess: res.data?.chatbot?.client_cart_system === CART_SYSTEM.EC_FORCE,
+      isUsedErrMsgByJs: chatbot?.is_used_err_msg_by_js,
+      errMsgJsCode: chatbot?.err_msg_js_code,
+      useNewProcess: chatbot?.client_cart_system === CART_SYSTEM.EC_FORCE,
+      isUsedPastMessageLoaded: !!chatbot?.is_used_message_loaded_past,
+      isProcessing: false,
+      useFullWidthChatbotMobile: !!chatbot?.use_fullwidth_chatbot_mobile,
+      isUsedCustomJsCode: !!chatbot?.is_used_custom_js_code,
+      headCustomJsCode: chatbot?.head_custom_js_code,
+      topBodyCustomJsCode: chatbot?.top_body_custom_js_code,
+      bottomBodyCustomJsCode: chatbot?.bottom_body_custom_js_code,
+      isUsedCustomCss: !!chatbot?.is_used_custom_css,
+      customCssContent: chatbot?.custom_css_content,
     };
 
-    if (newState.isUsedErrMsgByJs && newState.errMsgJsCode) {
-      postMessageForExecuteJs(newState.errMsgJsCode);
-    }
-
-    if (res.data?.chatbot?.is_used_custom_css && res.data?.chatbot?.custom_css_content.length > 0) {
-      const style = document.createElement('style');
-      style.innerHTML = res.data.chatbot.custom_css_content;
-      document.head.appendChild(style);
-    }
-
-    if (res.data?.chatbot?.is_used_custom_js_code) {
-      sendCustomJsToParent({
-        head: { jsCode: res.data?.chatbot?.head_custom_js_code, position: CUSTOM_JS_CODE_POSITION.HEAD },
-        top_body: { jsCode: res.data?.chatbot?.top_body_custom_js_code, position: CUSTOM_JS_CODE_POSITION.TOP_BODY },
-        bottom_body: { jsCode: res.data?.chatbot?.bottom_body_custom_js_code, position: CUSTOM_JS_CODE_POSITION.BOTTOM_BODY },
-      });
-    }
-
-    if (res.data?.chatbot?.timer_config?.enable) {
-      const timerConfig = res.data.chatbot.timer_config;
+    if (chatbot?.timer_config?.enable) {
+      const timerConfig = chatbot.timer_config;
       setTimerChanges({ timeLeft: calculateTimerConfigDuration(timerConfig.type, timerConfig.duration), config: timerConfig });
     }
 
-    const prevOpenStatus = sessionStorage.getItem("prevOpenStatus");
+    const prevOpenStatus = getPrevOpenStatus();
 
-    if (res.data.design_settings.display_type == 1 && prevOpenStatus == "0") {
-      sessionStorage.setItem("prevOpenStatus", "1");
-      const openChatbotCountApiParams = {
-        scenario_data: `${state.deviceReceive}_open_chatbot_window`,
-      };
-      sendCountRequest(state.scenarioId, openChatbotCountApiParams);
+    if (designSetting.display_type == 1 && prevOpenStatus == "0") {
+      savePrevOpenStatus("1");
+      sendOpenChatbotCountRequest(state.scenarioId, state.deviceReceive);
     }
-
-    if (res.data.variables) {
-      newState.variables = [
-        ...res.data.variables,
-        ...res.data.all_variables,
-      ];
-
-      newState.variables.forEach((item) => {
-        newState.objParam[item.variable_name] = item.default_value;
-      });
-    }
-
-    if (isLoggedIn) {
-      newState.messagesList.forEach((x) => x.hidden = x.not_display_when_logged_in);
-    }
-    
-    newState.variablesList = res.data?.all_variables || [];
-    newState.urlThanksPage = res.data.data?.conversation?.urlThanksPage || "";
-    newState.urlCartConfirmPage = res.data.data?.conversation?.urlCartConfirmPage || "";
-    newState.isUsedCartConfirmPage = res.data.data?.conversation?.isUsedCartConfirmPage || false;
 
     setConversionParamToLocalStorage(
       newState.scenarioId,
       'web',
       newState.userInputId || params.get("uuid"),
-      params.get("env") || "production"
+      params.get("env") || "production",
+      state
     );
 
-    checkUpdateMessagesSessionStorage(res.data.data.updated_at)
-    
-    newState.userMessagesList = newState.messagesList.filter((item) => isUserMessage(item));
-    for (let i = 0; i < newState.messagesList.length; i++) {
-      if (newState.messagesList[i].conditions?.length > 0) {
-        const result = checkMessageCondition(newState.messagesList[i], newState.objParam);
+    saveCheckpointTime(res.data.data.updated_at);
 
-        if (!result && isUserMessage(newState.messagesList[i])) {
-          newState.currentUserMsgIndex++;
-          continue;
-        }
-      }
-      if (isBotMessage(newState.messagesList[i])) {
-        newState = {
-          ...newState,
-          ...(await processForBotMessage(newState.messagesList, i, newState, true))
-        };
-      } else if (isUserMessage(newState.messagesList[i])) {
-        newState = {
-          ...newState,
-          ...processForUserMessage(newState.messagesList, i, newState)
-        };
-      }
-    }
-
-    newState.currentUserMsgIndex = newState.messagesList.findIndex(getNextUserMsg());
-
-    // For the first time, we need to render to the first user message
-    if (newState.currentUserMsgIndex >= 0) {
-      newState.currentMsgIndex = newState.currentUserMsgIndex;
-    }
-
-    newState.renderMessagesList = newState.renderMessagesList.map((msg) => {
-      return isDelayBotMessage(msg) ? {...msg, hidden: true} : msg;
+    dispatch({
+      type: PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SERVER,
+      payload: {
+        responseData: res.data,
+        botInfor: getBotInforFromPreviewResponse(res),
+        isLoggedIn: isLoggedIn,
+      },
     });
-
-    if (newState.isOpen) {
-      return renderMessagesWithDelay(newState, 0, newState.currentMsgIndex);
-    } else {
-      newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
-      newState.passedUserMsgCount = newState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
-      dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
-    }
-  }
-
-  const fukushashikiSavedStateToLp = (savedState) => {
-    return new Promise((resolve) => {
-      let fukuDataList = [];
-      savedState.userMessagesList.forEach((message) => {
-        fukuDataList.push(...convertToFukushashikiObject({message: message}));
-      });
-      fukushashikiToLP(fukuDataList);
-      resolve();
-    });
-  }
-
-  const getTimerSessionStorage = () => {
-    const timerChatbotStorage = sessionStorage.getItem(SESSION_STORAGE_KEY.TIMER_CHATBOT);
-    
-    if (!timerChatbotStorage?.trim().length) {
-      return null;
-    }
-    
-    return JSON.parse(timerChatbotStorage);
   }
 
   const handleOnCounting = (config) => (timer) => {
     const timerChanges = { timeLeft: timer, config };
-    sessionStorage.setItem(SESSION_STORAGE_KEY.TIMER_CHATBOT, JSON.stringify(timerChanges));
+    setTimerConfig(timerChanges);
     setTimerChanges(timerChanges);
   }
 
@@ -1363,2652 +743,78 @@ const PreviewFukushashiki = () => {
     }
   }
 
-  // Get Preview Scenario Data
-  useEffect(() => {
-    if (!state.loadedStateFromSession) {
-      let savedState = getStateFromSessionStorage();
-      if (savedState) {
-        savedState.isExtractFromSession = true;
-        savedState.isDelaying = false;
+  const onClickNext = (clickedMsgIndex, clickedMsg) => {
+    savedChatbotState(state);
 
-        setConversionParamToLocalStorage(
-          savedState.scenarioId,
-          'web',
-          savedState.userInputId || params.get("uuid"),
-          params.get("env") || "production"
-        );
-        if (!isLoadedCssContent && savedState?.botInfor?.is_used_custom_css && savedState?.botInfor?.custom_css_content.length > 0) {
-          const style = document.createElement('style');
-          style.innerHTML = savedState?.botInfor?.custom_css_content;
-          document.head.appendChild(style);
-        }
-
-        if (savedState?.botInfor?.is_used_custom_js_code) {
-          sendCustomJsToParent({
-            head: { jsCode: savedState?.botInfor?.head_custom_js_code, position: CUSTOM_JS_CODE_POSITION.HEAD },
-            top_body: { jsCode: savedState?.botInfor?.top_body_custom_js_code, position: CUSTOM_JS_CODE_POSITION.TOP_BODY },
-            bottom_body: { jsCode: savedState?.botInfor?.bottom_body_custom_js_code, position: CUSTOM_JS_CODE_POSITION.BOTTOM_BODY }
-          });
-        }
-
-        if (savedState.isUsedErrMsgByJs && savedState.errMsgJsCode) {
-          postMessageForExecuteJs(savedState.errMsgJsCode);
-        }
-        if (isLoggedIn) {
-          savedState.messagesList.forEach((x) => x.hidden = !!x?.not_display_when_logged_in);
-          savedState.currentMsgIndex = savedState.messagesList.findIndex((item) => isUserMessage(item) && item.hidden == false);
-          savedState.renderMessagesList = savedState.messagesList.slice(0, savedState.currentMsgIndex + 1);
-          savedState.renderMessagesList = savedState.renderMessagesList.map((msg) => {
-            return isDelayBotMessage(msg) ? {...msg, hidden: true} : msg;
-          });
-          return dispatch({
-            type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-            payload: {
-              ...savedState,
-              isOpen: true
-            }
-          });
-        }        
-        const renderMessagesList = savedState.renderMessagesList.map((msg) => {
-          return isDelayBotMessage(msg) ? {...msg, hidden: true} : msg;
-        });
-
-        const btnSubmitItem = renderMessagesList.find(x => x.message_content.find(y => y.type == "button_submit"));
-
-        if (btnSubmitItem) {
-          const btnSubmitItemContent = btnSubmitItem.message_content[0];
-          const actionData = {
-            isDisplay: btnSubmitItemContent.button_submit.is_display_error_message,
-            seachMode: btnSubmitItemContent.error_message_display_element_search_type,
-            searchValue: btnSubmitItemContent.error_message_display_element_search_value,
-          };
-          savedState.isDisplayErrorMessage = btnSubmitItemContent.button_submit.is_display_error_message;
-          postMessageToParent({
-            isOpen: true,
-            action: CHATBOT_ACTIONS.GET_ERROR_MESSAGE,
-            actionData: actionData
-          });
-        }
-
-        const timerConfig = getTimerSessionStorage();
-        if (timerConfig) {
-          setTimerChanges({ timeLeft: calculateTimerConfigDuration(timerConfig?.config?.type, timerConfig?.config?.duration, { timerLeft: timerConfig.timeLeft, useTimerLeft: true }), config: timerConfig });
-        }
-
-        return fukushashikiSavedStateToLp(savedState).then(async () => {
-          savedState.isOpen = true;
-          savedState.loadedStateFromSession = true;
-          savedState.isExtractFromSession = false;
-
-          const { renderMessagesList = [], ...savedStateWithoutRenderMessagesList } = savedState;
-
-          dispatch({
-            type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-            payload: {
-              ...savedStateWithoutRenderMessagesList,
-            }
-          });
-
-          startRenderWithDelay(savedState, { delayTime: RENDER_CHATBOT_CONFIG.DELAY_START_RENDER });
-
-          if (savedStateWithoutRenderMessagesList.useNewProcess) return;
-          
-          await sleep(2000);
-          // GetPreviewOrderContent
-          const botConfirmMessage = savedState.messagesList.find(msg => {
-            return !!msg.message_content.find(x => x.text_input?.use_for_confirm_message)
-          });
-          if (botConfirmMessage) {
-            const botConfirmJsCode = botConfirmMessage.message_content
-              .find(x => x.text_input?.use_for_confirm_message)
-              ?.text_input?.jscode;
-            if (botConfirmJsCode && botConfirmJsCode.length > 0) {
-              postMessageForGetPreviewOrderContent(botConfirmJsCode);
-            }
-          }
-        });
-      }
-    }
-
-    if (state.loadedStateFromSession && state.botId)
-      return;
-
-    if (!state.botId) {
-      dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { botId: params.get("bot_id") } });
-      return;
-    }
-
-    if (!state.urlSend) {
-      dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { urlSend: window.location.href } });
-      return;
-    }
-
-    if (!state.urlReceive) {
-      dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { urlReceive: params.get("urlReceive") } });
-      return;
-    }
-
-    if (!state.deviceReceive) {
-      dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { deviceReceive: params.get("deviceReceive") } });
-      return;
-    }
-
-    if (!state.scenarioId) {
-      dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { scenarioId: params.get("scenario_id") } });
-      return;
-    }
-
-    return getScenarioPreviewData(state.botId, state.scenarioId)
-      .then(extractStateFromPreviewResponse);
-  }, [
-    state.botId, state.urlSend, state.urlReceive,
-    state.deviceReceive, state.scenarioId,
-    state.isDisplayErrorMessage, state.loadedStateFromSession
-  ]);
-
-  useEffect(async () => {
-    if (!state.isOpen) return;
-    
-    scrollToPosition({ position: "b", selector: "#sp-body" });
-  }, [state.isOpen, state.renderMessagesList.length, state.submitErrorMessage]);
-
-  const handleValidateField = (index) => {
-    let contentArr = [...state.renderMessagesList[index].message_content];
-    let isValid = true;
-    let errorsMess = {};
-
-    let messageError = "この項目は必須です。";
-    for (let i = 0; i < contentArr.length; i++) {
-      let contentType = contentArr[i][contentArr[i].type];
-      let limitFrom = contentType[contentType.type]?.character_limit_from || 0;
-      let limitTo =
-        contentType[contentType.type]?.character_limit_to ||
-        Number.MAX_SAFE_INTEGER;
-      if (contentType.require) {
-        if (contentType.type === "text" || contentType.type === "password") {
-          if (contentType[contentType.type].isSplitInput) {
-            if (
-              stringNullOrEmpty(contentType[contentType.type].valueLeft) ||
-              stringNullOrEmpty(contentType[contentType.type].valueRight)
-            ) {
-              errorsMess[
-                `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-              ] = messageError;
-              isValid = false;
-            }
-          } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (contentType.type === "phone_number") {
-          if (contentType[contentType.type].withHyphen) {
-            if (
-              stringNullOrEmpty(contentType[contentType.type].value1) ||
-              stringNullOrEmpty(contentType[contentType.type].value2) ||
-              stringNullOrEmpty(contentType[contentType.type].value3)
-            ) {
-              errorsMess[
-                `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-              ] = messageError;
-              isValid = false;
-            }
-          } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (
-          contentType.type === "email_confirmation" ||
-          contentType.type === "password_confirmation"
-        ) {
-          if (
-            stringNullOrEmpty(contentType[contentType.type].value) ||
-            stringNullOrEmpty(contentType[contentType.type].valueConfirm)
-          ) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (contentType.type === "customization") {
-          if (contentType[contentType.type].is_comment) {
-            if (
-              stringNullOrEmpty(contentType[contentType.type].valueLeft) ||
-              stringNullOrEmpty(contentType[contentType.type].valueRight)
-            ) {
-              errorsMess[
-                `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-              ] = messageError;
-              isValid = false;
-            }
-          } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (contentType.type === "time_hm") {
-          if (
-            stringNullOrEmpty(contentType[contentType.type].valueHour) ||
-            stringNullOrEmpty(contentType[contentType.type].valueMinute)
-          ) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (
-          contentType.type === "date_ymd" ||
-          contentType.type === "dob_ymd"
-        ) {
-          if (
-            stringNullOrEmpty(contentType[contentType.type].valueYear) ||
-            stringNullOrEmpty(contentType[contentType.type].valueMonth) ||
-            stringNullOrEmpty(contentType[contentType.type].valueDay)
-          ) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (contentType.type === "date_md") {
-          if (
-            stringNullOrEmpty(contentType[contentType.type].valueMonth) ||
-            stringNullOrEmpty(contentType[contentType.type].valueDay)
-          ) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (
-          contentType.type === "date_ym" ||
-          contentType.type === "dob_ym"
-        ) {
-          if (
-            stringNullOrEmpty(contentType[contentType.type].valueYear) ||
-            stringNullOrEmpty(contentType[contentType.type].valueMonth)
-          ) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (contentType.type === "date_ymd_hm") {
-          if (
-            stringNullOrEmpty(contentType[contentType.type].valueYear) ||
-            stringNullOrEmpty(contentType[contentType.type].valueMonth) ||
-            stringNullOrEmpty(contentType[contentType.type].valueDay) ||
-            stringNullOrEmpty(contentType[contentType.type].valueHour) ||
-            stringNullOrEmpty(contentType[contentType.type].valueMinute)
-          ) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (contentType.type === "timezone_from_to") {
-          if (
-            stringNullOrEmpty(contentType[contentType.type].valueHour1) ||
-            stringNullOrEmpty(contentType[contentType.type].valueMinute1) ||
-            stringNullOrEmpty(contentType[contentType.type].valueHour2) ||
-            stringNullOrEmpty(contentType[contentType.type].valueMinute2)
-          ) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (contentType.type === "period_from_to") {
-          if (
-            stringNullOrEmpty(contentType[contentType.type].valueYear1) ||
-            stringNullOrEmpty(contentType[contentType.type].valueMonth1) ||
-            stringNullOrEmpty(contentType[contentType.type].valueDay1) ||
-            stringNullOrEmpty(contentType[contentType.type].valueYear2) ||
-            stringNullOrEmpty(contentType[contentType.type].valueMonth2) ||
-            stringNullOrEmpty(contentType[contentType.type].valueDay2)
-          ) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (contentType.type === "up_to_municipality") {
-          if (
-            stringNullOrEmpty(contentType[contentType.type].prefecture) ||
-            stringNullOrEmpty(contentType[contentType.type].city)
-          ) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (contentArr[i].type === "attaching_file") {
-          if (stringNullOrEmpty(contentType.value)) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (
-          contentType.type === "date_selection" ||
-          contentType.type === "embedded"
-        ) {
-          if (stringNullOrEmpty(contentType.date_select)) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (contentType.type === "start_end_date") {
-          if (
-            stringNullOrEmpty(contentType.start_date_select) ||
-            stringNullOrEmpty(contentType.end_date_select)
-          ) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (contentArr[i].type === "agree_term") {
-          if (
-            stringNullOrEmpty(contentType.isAgree) ||
-            contentType.isAgree === false
-          ) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (contentArr[i].type === "radio_button") {
-          if (stringNullOrEmpty(contentType.initial_selection)) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (contentArr[i].type === "checkbox") {
-          if (contentType.type !== "checkbox_img") {
-            if (
-              contentType.checkedValue &&
-              contentType.checkedValue.length === 0
-            ) {
-              errorsMess[
-                `message${index}_content${i}_${contentArr[i].type}`
-              ] = messageError;
-              isValid = false;
-            } else if (
-              contentType.selection_limit_from &&
-              contentType.checkedValue.length <
-              parseInt(contentType.selection_limit_from)
-            ) {
-              errorsMess[
-                `message${index}_content${i}_${contentArr[i].type}`
-              ] = `この項目は、${contentType.selection_limit_from}個以上選択してください。`;
-              isValid = false;
-            } else if (
-              contentType.selection_limit_to &&
-              contentType.checkedValue.length >
-              parseInt(contentType.selection_limit_to)
-            ) {
-              errorsMess[
-                `message${index}_content${i}_${contentArr[i].type}`
-              ] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
-              isValid = false;
-            }
-          } else {
-            if (
-              contentType.initial_selection_picture &&
-              contentType.initial_selection_picture.length === 0
-            ) {
-              errorsMess[
-                `message${index}_content${i}_${contentArr[i].type}`
-              ] = messageError;
-              isValid = false;
-            } else if (
-              contentType.selection_limit_from &&
-              contentType.initial_selection_picture.length <
-              parseInt(contentType.selection_limit_from)
-            ) {
-              errorsMess[
-                `message${index}_content${i}_${contentArr[i].type}`
-              ] = `この項目は、${contentType.selection_limit_from}個以上選択してください。`;
-              isValid = false;
-            } else if (
-              contentType.selection_limit_to &&
-              contentType.initial_selection_picture.length >
-              parseInt(contentType.selection_limit_to)
-            ) {
-              errorsMess[
-                `message${index}_content${i}_${contentArr[i].type}`
-              ] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
-              isValid = false;
-            }
-          }
-        } else if (contentArr[i].type === "carousel") {
-          if (stringNullOrEmpty(contentType.initial_selection)) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (contentArr[i].type === "capture") {
-          if (stringNullOrEmpty(contentType.value)) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}`
-            ] = messageError;
-            isValid = false;
-          } else if (
-            state.captcha.filter(
-              (item) => item.index === index && item.indexContent === i
-            )?.[0]?.text.toLowerCase() !== contentType.value.toLowerCase()
-          ) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}`
-            ] = "認証コードが間違っています。";
-            isValid = false;
-          }
-        } else if (contentArr[i].type === "product_purchase") {
-          if (contentType.initial_selection.length === 0) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (contentArr[i].type === "slider") {
-          if (stringNullOrEmpty(contentType.value)) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (contentArr[i].type === "product_purchase_radio_button") {
-          if (contentType.initial_selection.length === 0) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (contentArr[i].type === 'product_purchase_select_option') {
-          if (stringNullOrEmpty(contentType.value)) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (contentArr[i].type === "card_payment_radio_button") {
-          if (
-            contentType.type !== "picture_radio" &&
-            stringNullOrEmpty(contentType.initial_selection)
-          ) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}`
-            ] = messageError;
-            isValid = false;
-          } else if (
-            contentType.type === "picture_radio" &&
-            stringNullOrEmpty(contentType.initial_selection_picture)
-          ) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (contentArr[i].type === "textarea") {
-          if (
-            contentType.type === "text_input" &&
-            stringNullOrEmpty(contentType[contentType.type].value)
-          ) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (
-          contentArr[i].type !== "credit_card_payment" &&
-          stringNullOrEmpty(contentType[contentType.type].value)
-        ) {
-          errorsMess[
-            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-          ] = messageError;
-          isValid = false;
-        } else if (
-          (limitFrom || limitTo) &&
-          (contentType[contentType.type]?.value?.length < limitFrom ||
-            contentType[contentType.type]?.value?.length > limitTo)
-        ) {
-          errorsMess[
-            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-          ] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
-          isValid = false;
-        }
-      } else {
-        if (contentArr[i].type === "checkbox") {
-          if (
-            contentType.type !== "checkbox_img" &&
-            contentType.selection_limit_to &&
-            contentType.checkedValue.length >
-            parseInt(contentType.selection_limit_to)
-          ) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}`
-            ] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
-            isValid = false;
-          } else if (
-            contentType.type === "checkbox_img" &&
-            contentType.selection_limit_to &&
-            contentType.initial_selection_picture.length >
-            parseInt(contentType.selection_limit_to)
-          ) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}`
-            ] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
-            isValid = false;
-          }
-        } else if (
-          contentType.type === "phone_number" &&
-          contentType[contentType.type].withHyphen
-        ) {
-          if (
-            (!stringNullOrEmpty(contentType[contentType.type].value1) ||
-              !stringNullOrEmpty(contentType[contentType.type].value2) ||
-              !stringNullOrEmpty(contentType[contentType.type].value3)) &&
-            (stringNullOrEmpty(contentType[contentType.type].value1) ||
-              stringNullOrEmpty(contentType[contentType.type].value2) ||
-              stringNullOrEmpty(contentType[contentType.type].value3))
-          ) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (contentType.type === "time_hm") {
-          if (
-            (!stringNullOrEmpty(contentType[contentType.type].valueHour) ||
-              !stringNullOrEmpty(contentType[contentType.type].valueMinute)) &&
-            (stringNullOrEmpty(contentType[contentType.type].valueMinute) ||
-              stringNullOrEmpty(contentType[contentType.type].valueHour))
-          ) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (
-          contentType.type === "date_ymd" ||
-          contentType.type === "dob_ymd"
-        ) {
-          if (
-            (!stringNullOrEmpty(contentType[contentType.type].valueYear) ||
-              !stringNullOrEmpty(contentType[contentType.type].valueMonth) ||
-              !stringNullOrEmpty(contentType[contentType.type].valueDay)) &&
-            (stringNullOrEmpty(contentType[contentType.type].valueYear) ||
-              stringNullOrEmpty(contentType[contentType.type].valueMonth) ||
-              stringNullOrEmpty(contentType[contentType.type].valueDay))
-          ) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (contentType.type === "date_md") {
-          if (
-            (!stringNullOrEmpty(contentType[contentType.type].valueMonth) ||
-              !stringNullOrEmpty(contentType[contentType.type].valueDay)) &&
-            (stringNullOrEmpty(contentType[contentType.type].valueMonth) ||
-              stringNullOrEmpty(contentType[contentType.type].valueDay))
-          ) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (
-          contentType.type === "date_ym" ||
-          contentType.type === "dob_ym"
-        ) {
-          if (
-            (!stringNullOrEmpty(contentType[contentType.type].valueYear) ||
-              !stringNullOrEmpty(contentType[contentType.type].valueMonth)) &&
-            (stringNullOrEmpty(contentType[contentType.type].valueYear) ||
-              stringNullOrEmpty(contentType[contentType.type].valueMonth))
-          ) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (contentType.type === "date_ymd_hm") {
-          if (
-            (!stringNullOrEmpty(contentType[contentType.type].valueYear) ||
-              !stringNullOrEmpty(contentType[contentType.type].valueMonth) ||
-              !stringNullOrEmpty(contentType[contentType.type].valueDay) ||
-              !stringNullOrEmpty(contentType[contentType.type].valueHour) ||
-              !stringNullOrEmpty(contentType[contentType.type].valueMinute)) &&
-            (stringNullOrEmpty(contentType[contentType.type].valueYear) ||
-              stringNullOrEmpty(contentType[contentType.type].valueMonth) ||
-              stringNullOrEmpty(contentType[contentType.type].valueDay) ||
-              stringNullOrEmpty(contentType[contentType.type].valueHour) ||
-              stringNullOrEmpty(contentType[contentType.type].valueMinute))
-          ) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (contentType.type === "timezone_from_to") {
-          if (
-            (!stringNullOrEmpty(contentType[contentType.type].valueHour1) ||
-              !stringNullOrEmpty(contentType[contentType.type].valueMinute1) ||
-              !stringNullOrEmpty(contentType[contentType.type].valueHour2) ||
-              !stringNullOrEmpty(contentType[contentType.type].valueMinute2)) &&
-            (stringNullOrEmpty(contentType[contentType.type].valueHour1) ||
-              stringNullOrEmpty(contentType[contentType.type].valueMinute1) ||
-              stringNullOrEmpty(contentType[contentType.type].valueHour2) ||
-              stringNullOrEmpty(contentType[contentType.type].valueMinute2))
-          ) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (contentType.type === "period_from_to") {
-          if (
-            (!stringNullOrEmpty(contentType[contentType.type].valueYear1) ||
-              !stringNullOrEmpty(contentType[contentType.type].valueMonth1) ||
-              !stringNullOrEmpty(contentType[contentType.type].valueDay1) ||
-              !stringNullOrEmpty(contentType[contentType.type].valueYear2) ||
-              !stringNullOrEmpty(contentType[contentType.type].valueMonth2) ||
-              !stringNullOrEmpty(contentType[contentType.type].valueDay2)) &&
-            (stringNullOrEmpty(contentType[contentType.type].valueYear1) ||
-              stringNullOrEmpty(contentType[contentType.type].valueMonth1) ||
-              stringNullOrEmpty(contentType[contentType.type].valueDay1) ||
-              stringNullOrEmpty(contentType[contentType.type].valueYear2) ||
-              stringNullOrEmpty(contentType[contentType.type].valueMonth2) ||
-              stringNullOrEmpty(contentType[contentType.type].valueDay2))
-          ) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-            ] = messageError;
-            isValid = false;
-          }
-        } else if (contentType.type === "up_to_municipality") {
-          if (
-            (!stringNullOrEmpty(contentType[contentType.type].prefecture) ||
-              !stringNullOrEmpty(contentType[contentType.type].city)) &&
-            (stringNullOrEmpty(contentType[contentType.type].prefecture) ||
-              stringNullOrEmpty(contentType[contentType.type].city))
-          ) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-            ] = messageError;
-            isValid = false;
-          }
-        }
-      }
-      let REGEX_EMAIL = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-      let REGEX_PASSWORD = /^[A-Za-z0-9 ]+$/;
-
-      if (contentType.type === "text" || contentType.type === "password") {
-        if (contentType[contentType.type].isSplitInput) {
-          if (
-            (!stringNullOrEmpty(contentType[contentType.type].valueLeft) ||
-              !stringNullOrEmpty(contentType[contentType.type].valueRight)) &&
-            (contentType[contentType.type].valueLeft?.length < limitFrom ||
-              contentType[contentType.type].valueRight?.length < limitFrom)
-          ) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-            ] = `${limitFrom}文字以上入力してください。`;
-            isValid = false;
-          } else if (
-            (!stringNullOrEmpty(contentType[contentType.type].valueLeft) ||
-              !stringNullOrEmpty(contentType[contentType.type].valueRight)) &&
-            (contentType[contentType.type].valueLeft?.length > limitTo ||
-              contentType[contentType.type].valueRight?.length > limitTo)
-          ) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-            ] = `${limitTo}文字以下入力してください。`;
-            isValid = false;
-          }
-        } else if (
-          !stringNullOrEmpty(contentType[contentType.type].value) &&
-          contentType[contentType.type].value?.length < limitFrom
-        ) {
-          errorsMess[
-            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-          ] = `${limitFrom}文字以上入力してください。`;
-          isValid = false;
-        } else if (
-          !stringNullOrEmpty(contentType[contentType.type].value) &&
-          contentType[contentType.type].value?.length > limitTo
-        ) {
-          errorsMess[
-            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-          ] = `${limitTo}文字以下入力してください。`;
-          isValid = false;
-        } else if (
-          contentType.type === "password" &&
-          !stringNullOrEmpty(contentType[contentType.type].value) &&
-          !REGEX_PASSWORD.test(contentType[contentType.type].value)
-        ) {
-          errorsMess[
-            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-          ] = `英数字('A-Z','a-z','0-9')が使用できます。`;
-          isValid = false;
-        }
-      } else if (
-        contentArr[i].type === "product_purchase" &&
-        contentType.initial_selection.length !== 0
-      ) {
-        contentType.initial_selection.forEach((item, index) => {
-          contentType.products.forEach((itemProduct, indexProduct) => {
-            if (item === itemProduct.id && !itemProduct.quantity_select) {
-              errorsMess[
-                `message${index}_content${i}_${contentArr[i].type}_${indexProduct}`
-              ] = messageError;
-              isValid = false;
-            }
-          });
-        });
-      } else if (contentType.type === "password_confirmation") {
-        if (
-          (!stringNullOrEmpty(contentType[contentType.type].value) ||
-            !stringNullOrEmpty(contentType[contentType.type].valueConfirm)) &&
-          (contentType[contentType.type].value?.length < limitFrom ||
-            contentType[contentType.type].valueConfirm?.length < limitFrom)
-        ) {
-          errorsMess[
-            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-          ] = `${limitFrom}文字以上入力してください。`;
-          isValid = false;
-        } else if (
-          (!stringNullOrEmpty(contentType[contentType.type].value) ||
-            !stringNullOrEmpty(contentType[contentType.type].valueConfirm)) &&
-          (contentType[contentType.type].value?.length > limitTo ||
-            contentType[contentType.type].valueConfirm?.length > limitTo)
-        ) {
-          errorsMess[
-            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-          ] = `${limitTo}文字以下入力してください。`;
-          isValid = false;
-        } else if (
-          !stringNullOrEmpty(contentType[contentType.type].value) &&
-          !REGEX_PASSWORD.test(contentType[contentType.type].value)
-        ) {
-          errorsMess[
-            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-          ] = `英数字('A-Z','a-z','0-9')が使用できます。`;
-          isValid = false;
-        } else if (
-          !stringNullOrEmpty(contentType[contentType.type].valueConfirm) &&
-          !REGEX_PASSWORD.test(contentType[contentType.type].valueConfirm)
-        ) {
-          errorsMess[
-            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-          ] = `英数字('A-Z','a-z','0-9')が使用できます。`;
-          isValid = false;
-        } else if (
-          !stringNullOrEmpty(contentType[contentType.type].value) &&
-          !stringNullOrEmpty(contentType[contentType.type].valueConfirm) &&
-          contentType[contentType.type].value !==
-          contentType[contentType.type].valueConfirm
-        ) {
-          errorsMess[
-            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-          ] = "パスワードとパスワード確認が一致しません。";
-          isValid = false;
-        }
-      } else if (
-        contentArr[i].type === "textarea" &&
-        contentType.type === "text_input"
-      ) {
-        if (
-          !stringNullOrEmpty(contentType[contentType.type].value) &&
-          contentType[contentType.type].value.length < limitFrom
-        ) {
-          errorsMess[
-            `message${index}_content${i}_${contentArr[i].type}`
-          ] = `${limitFrom}文字以上入力してください。`;
-          isValid = false;
-        } else if (
-          !stringNullOrEmpty(contentType[contentType.type].value) &&
-          contentType[contentType.type].value.length > limitTo
-        ) {
-          errorsMess[
-            `message${index}_content${i}_${contentArr[i].type}`
-          ] = `${limitTo}文字以下入力してください。`;
-          isValid = false;
-        }
-      } else if (contentArr[i].type === "zip_code_address") {
-        if (
-          state.errors[
-          `message${index}_content${i}_${contentArr[i].type}`
-          ] &&
-          state.errors[
-          `message${index}_content${i}_${contentArr[i].type}`
-          ] !== messageError
-        ) {
-          errorsMess[
-            `message${index}_content${i}_${contentArr[i].type}`
-          ] =
-          state.errors[
-            `message${index}_content${i}_${contentArr[i].type}`
-            ];
-          isValid = false;
-        } else {
-          let isValidZipCode = true;
-          const validateFields = {
-            postCode: (contentType) => {
-              if (contentType.split_postal_code) {
-                if (
-                  stringNullOrEmpty(contentType.value_post_code_left) ||
-                  stringNullOrEmpty(contentType.value_post_code_right)
-                ) {
-                  return false;
-                }
-              } else if (stringNullOrEmpty(contentType.value_post_code)) {
-                return false;
-              }
-
-              return true;
-            },
-            prefecture: (contentType) => {
-              if (stringNullOrEmpty(contentType.value_prefecture) && contentType.hasOwnProperty('prefecture')) {
-                return false;
-              }
-
-              return true;
-            },
-            municipality: (contentType) => {
-              if (stringNullOrEmpty(contentType.value_municipality) && contentType.hasOwnProperty('municipality')) {
-                return false;
-              }
-
-              return true;
-            },
-            address: (contentType) => {
-              if (stringNullOrEmpty(contentType.value_address) && contentType.hasOwnProperty('address')) {
-                return false;
-              }
-
-              return true;
-            },
-            building_name: (contentType) => {
-              if (stringNullOrEmpty(contentType.value_building_name) && contentType.hasOwnProperty('building_name')) {
-                return false;
-              }
-
-              return true;
-            },
-            compact_municipality_and_address: (contentType, requireBuildingName = true) => { 
-              if (
-                (contentType.municipality !== undefined && !validateFields.municipality(contentType)) || 
-                (requireBuildingName && contentType.building_name !== undefined && !validateFields.building_name(contentType))
-              ) {
-                return false;
-              }
-              return true
-            },
-            compact_municipality_and_address_and_building_name: (contentType) => {
-              if (contentType.municipality !== undefined && !validateFields.municipality(contentType)) {
-                return false;
-              }
-              return true;
-            }
-          };
-          
-          if (contentType.isCheckRequire === "require") {
-            if (contentType.post_code !== undefined) {
-              if (!validateFields.postCode(contentType)) {
-                isValidZipCode = false;
-              }
-              
-              if (contentType.prefecture !== undefined && !validateFields.prefecture(contentType)) {
-                isValidZipCode = false;
-              }
-
-              if (contentType.municipality !== undefined && !validateFields.municipality(contentType)) {
-                isValidZipCode = false;
-              }
-              
-              if (contentType.compact_municipality_and_address) {
-                if (!validateFields.compact_municipality_and_address(contentType)) {
-                  isValidZipCode = false;
-                }
-              }
-              else if (contentType.compact_municipality_and_address_and_building_name) {
-                if (!validateFields.compact_municipality_and_address_and_building_name(contentType)) {
-                  isValidZipCode = false;
-                }
-              }
-              else if (contentType.address !== undefined && !validateFields.address(contentType)) {
-                isValidZipCode = false;
-              }
-            }
-          } else if (contentType.isCheckRequire === "all_items_require") {
-            if (contentType.post_code !== undefined) {
-              if (contentType.split_postal_code) {
-                if (
-                  stringNullOrEmpty(contentType.value_post_code_left) ||
-                  stringNullOrEmpty(contentType.value_post_code_right)
-                ) {
-                  isValidZipCode = false;
-                }
-              } else if (stringNullOrEmpty(contentType.value_post_code)) {
-                isValidZipCode = false;
-              }
-            }
-            if (
-              contentType.prefecture !== undefined &&
-              stringNullOrEmpty(contentType.value_prefecture) && contentType.hasOwnProperty('prefecture')
-            ) {
-              isValidZipCode = false;
-            }
-            if (
-              contentType.municipality !== undefined &&
-              stringNullOrEmpty(contentType.value_municipality) && contentType.hasOwnProperty('municipality')
-            ) {
-              isValidZipCode = false;
-            }
-              
-            if (contentType.compact_municipality_and_address) {
-              if (!validateFields.compact_municipality_and_address(contentType)) {
-                isValidZipCode = false;
-              }
-            }
-            else if (contentType.compact_municipality_and_address_and_building_name) {
-              if (!validateFields.compact_municipality_and_address_and_building_name(contentType)) {
-                isValidZipCode = false;
-              }
-            }
-            else if (contentType.address !== undefined && !validateFields.address(contentType)) {
-              isValidZipCode = false;
-            }
-          }
-          if (isValidZipCode === false) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}`
-            ] = messageError;
-            isValid = false;
-          }
-        }
-      } else if (contentArr[i].type === "shipping_address") {
-        if (
-          state.errors[
-          `message${index}_content${i}_${contentArr[i].type}`
-          ] &&
-          state.errors[
-          `message${index}_content${i}_${contentArr[i].type}`
-          ] !== messageError
-        ) {
-          errorsMess[
-            `message${index}_content${i}_${contentArr[i].type}`
-          ] =
-          state.errors[
-            `message${index}_content${i}_${contentArr[i].type}`
-            ];
-          isValid = false;
-        } else {
-          let isValidShippingAddress = true;
-          if (contentType.isCheckRequire === "all_items_require") {
-            if (
-              contentType.name !== undefined &&
-              stringNullOrEmpty(contentType.value_name_left) ||
-              stringNullOrEmpty(contentType.value_name_right)
-            ) {
-              isValidShippingAddress = false;
-            }
-            if (
-              contentType.kana_name !== undefined &&
-              stringNullOrEmpty(contentType.value_kana_left) ||
-              stringNullOrEmpty(contentType.value_kana_right)
-            ) {
-              isValidShippingAddress = false;
-            }
-            if (contentType.post_code !== undefined) {
-              if (contentType.split_postal_code) {
-                if (
-                  stringNullOrEmpty(contentType.value_post_code_left) ||
-                  stringNullOrEmpty(contentType.value_post_code_right)
-                ) {
-                  isValidShippingAddress = false;
-                }
-              } else if (stringNullOrEmpty(contentType.value_post_code)) {
-                isValidShippingAddress = false;
-              }
-            }
-            if (
-              contentType.prefecture !== undefined &&
-              stringNullOrEmpty(contentType.value_prefecture)
-            ) {
-              isValidShippingAddress = false;
-            }
-            if (
-              contentType.municipality !== undefined &&
-              stringNullOrEmpty(contentType.value_municipality)
-            ) {
-              isValidShippingAddress = false;
-            }
-            if (
-              !contentType.compact_municipality_and_address_and_building_name &&
-              contentType.address !== undefined &&
-              stringNullOrEmpty(contentType.value_address)
-            ) {
-              isValidShippingAddress = false;
-            }
-            if (
-              !contentType.compact_municipality_and_address_and_building_name &&
-              contentType.building_name !== undefined &&
-              stringNullOrEmpty(contentType.value_building_name)
-            ) {
-              isValidShippingAddress = false;
-            }
-            if (
-              contentType.number !== undefined &&
-              (stringNullOrEmpty(contentType.value_number1) ||
-                stringNullOrEmpty(contentType.value_number2) ||
-                stringNullOrEmpty(contentType.value_number3))
-            ) {
-              isValidShippingAddress = false
-            }
-          }
-          if (isValidShippingAddress === false) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}`
-            ] = messageError;
-            isValid = false;
-          }
-        }
-      } else if (
-        contentType.type === "phone_number" &&
-        !errorsMess[
-        `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-        ]
-      ) {
-        let REGEX_PHONE = /^0\d{9}$|^0\d{10}$/;
-        if (contentType[contentType.type].withHyphen) {
-          if (
-            !stringNullOrEmpty(contentType[contentType.type].value1) &&
-            !stringNullOrEmpty(contentType[contentType.type].value2) &&
-            !stringNullOrEmpty(contentType[contentType.type].value3) &&
-            !REGEX_PHONE.test(
-              `${contentType[contentType.type].value1}${contentType[contentType.type].value2
-              }${contentType[contentType.type].value3}`
-            )
-          ) {
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-            ] = "入力形式が正しくありません。";
-            isValid = false;
-          }
-        } else if (
-          !stringNullOrEmpty(contentType[contentType.type].value) &&
-          !REGEX_PHONE.test(contentType[contentType.type].value)
-        ) {
-          errorsMess[
-            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-          ] = "入力形式が正しくありません。";
-          isValid = false;
-        }
-      } else if (
-        contentType.type === "urls" &&
-        !stringNullOrEmpty(contentType[contentType.type].value)
-      ) {
-        let REGEX_URLS =
-          /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/;
-        if (!REGEX_URLS.test(contentType[contentType.type].value)) {
-          errorsMess[
-            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-          ] = `有効なURL形式で指定してください。`;
-          isValid = false;
-        }
-      } else if (
-        contentType.type === "email_address" &&
-        !stringNullOrEmpty(contentType[contentType.type].value)
-      ) {
-        if (!REGEX_EMAIL.test(contentType[contentType.type].value)) {
-          errorsMess[
-            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-          ] = `有効なメールアドレス形式で指定してください。`;
-          isValid = false;
-        }
-      } else if (contentType.type === "email_confirmation") {
-        if (
-          !stringNullOrEmpty(contentType[contentType.type].value) &&
-          !REGEX_EMAIL.test(contentType[contentType.type].value)
-        ) {
-          errorsMess[
-            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-          ] = `有効なメールアドレス形式で指定してください。`;
-          isValid = false;
-        } else if (
-          !stringNullOrEmpty(contentType[contentType.type].valueConfirm) &&
-          !REGEX_EMAIL.test(contentType[contentType.type].valueConfirm)
-        ) {
-          errorsMess[
-            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-          ] = `有効なメールアドレス形式で指定してください。`;
-          isValid = false;
-        } else if (
-          !stringNullOrEmpty(contentType[contentType.type].value) &&
-          !stringNullOrEmpty(contentType[contentType.type].valueConfirm) &&
-          contentType[contentType.type].value !==
-          contentType[contentType.type].valueConfirm
-        ) {
-          errorsMess[
-            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-          ] = `メールアドレスとメールアドレス確認が一致しません。`;
-          isValid = false;
-        }
-      } else if (
-        contentArr[i].type === "attaching_file" &&
-        state.errors[`message${index}_content${i}_${contentArr[i].type}`]
-      ) {
-        errorsMess[
-          `message${index}_content${i}_${contentArr[i].type}`
-        ] =
-          state.errors[
-            `message${index}_content${i}_${contentArr[i].type}`
-            ];
-        isValid = false;
-      } else if (contentArr[i].type === "credit_card_payment") {
-        if (
-          (contentType.is_hide_card_name !== true &&
-            stringNullOrEmpty(contentType.card_holder)) ||
-          (contentType.is_hide_cvc !== true &&
-            stringNullOrEmpty(contentType.cvc)) ||
-          (contentType.separate_type === true &&
-            (stringNullOrEmpty(contentType.card_number1) ||
-              stringNullOrEmpty(contentType.card_number2) ||
-              stringNullOrEmpty(contentType.card_number3) ||
-              stringNullOrEmpty(contentType.card_number4))) ||
-          (contentType.separate_type === false &&
-            stringNullOrEmpty(contentType.card_number)) ||
-          (contentType.is_hide_cvc !== true &&
-            stringNullOrEmpty(contentType.cvc)) ||
-          stringNullOrEmpty(contentType.year) ||
-          stringNullOrEmpty(contentType.month)
-        ) {
-          errorsMess[
-            `message${index}_content${i}_${contentArr[i].type}`
-          ] = messageError;
-          isValid = false;
-        } else if (
-          (contentType.card_number &&
-            ((contentType.card_number + "").length !== 16 ||
-              /[^0-9]+/.test(contentType.card_number))) ||
-          (!stringNullOrEmpty(contentType.card_number1) &&
-            !stringNullOrEmpty(contentType.card_number2) &&
-            !stringNullOrEmpty(contentType.card_number3) &&
-            !stringNullOrEmpty(contentType.card_number4) &&
-            ((contentType.card_number1 + "").length !== 4 ||
-              (contentType.card_number2 + "").length !== 4 ||
-              (contentType.card_number3 + "").length !== 4 ||
-              (contentType.card_number4 + "").length !== 4))
-        ) {
-          errorsMess[
-            `message${index}_content${i}_${contentArr[i].type}`
-          ] = "クレジットカード番号は無効です。";
-          isValid = false;
-        } else if (
-          moment(
-            `${contentType.year}-${contentType.month}}`,
-            "YYYY-MM"
-          ).isBefore(moment().format("YYYY-MM"))
-        ) {
-          errorsMess[
-            `message${index}_content${i}_${contentArr[i].type}`
-          ] = "有効期限に誤りがあるために、決済を完了できませんでした。";
-          isValid = false;
-        }
-      } else if (
-        contentArr[i].type === "card_payment_radio_button" &&
-        errorsMess[
-        `message${index}_content${i}_${contentArr[i].type}`
-        ] !== messageError &&
-        (((contentType?.initial_selection ||
-          contentType?.card_linked_setting.length > 0) &&
-          contentType?.card_linked_setting.includes(contentType?.initial_selection)
-        ) ||
-          ((contentType?.initial_selection_picture ||
-            contentType?.card_linked_setting_picture) &&
-            contentType?.initial_selection_picture ===
-            contentType?.card_linked_setting_picture))
-      ) {
-        if (
-          contentType.is_hide_card_name !== true &&
-          (contentType.separate_name === false
-            ? stringNullOrEmpty(contentType.card_holder)
-            : (stringNullOrEmpty(contentType.card_holder1),
-              stringNullOrEmpty(contentType.card_holder2))) ||
-          (contentType.is_hide_cvc !== true &&
-            stringNullOrEmpty(contentType.cvc)) ||
-          (contentType.separate_type === true &&
-            (stringNullOrEmpty(contentType.card_number1) ||
-              stringNullOrEmpty(contentType.card_number2) ||
-              stringNullOrEmpty(contentType.card_number3) ||
-              stringNullOrEmpty(contentType.card_number4))) ||
-          (contentType.separate_type === false &&
-            stringNullOrEmpty(contentType.card_number)) ||
-          (contentType.is_hide_cvc !== true &&
-            stringNullOrEmpty(contentType.cvc)) ||
-          stringNullOrEmpty(contentType.year) ||
-          stringNullOrEmpty(contentType.month)
-        ) {
-          errorsMess[
-            `message${index}_content${i}_${contentArr[i].type}`
-          ] = messageError;
-          isValid = false;
-        } else if (
-          (contentType.card_number &&
-            ((contentType.card_number + "").length !== 16 ||
-              /[^0-9]+/.test(contentType.card_number))) ||
-          (!stringNullOrEmpty(contentType.card_number1) &&
-            !stringNullOrEmpty(contentType.card_number2) &&
-            !stringNullOrEmpty(contentType.card_number3) &&
-            !stringNullOrEmpty(contentType.card_number4) &&
-            ((contentType.card_number1 + "").length !== 4 ||
-              (contentType.card_number2 + "").length !== 4 ||
-              (contentType.card_number3 + "").length !== 4 ||
-              (contentType.card_number4 + "").length !== 4))
-        ) {
-          errorsMess[
-            `message${index}_content${i}_${contentArr[i].type}`
-          ] = "クレジットカード番号は無効です。";
-          isValid = false;
-        } else if (
-          moment(
-            `${contentType.year}-${contentType.month}}`,
-            "YYYY-MM"
-          ).isBefore(moment().format("YYYY-MM"))
-        ) {
-          errorsMess[
-            `message${index}_content${i}_${contentArr[i].type}`
-          ] = "有効期限に誤りがあるために、決済を完了できませんでした。";
-          isValid = false;
-        } else if (contentType.cvc && (contentType.cvc.toString().length < 3 || contentType.cvc.toString().length > 4)) {
-          errorsMess[
-            `message${index}_content${i}_${contentArr[i].type}`
-          ] = "CVCは3桁か4桁で入力してください。";
-          isValid = false;
-        }
-      }
-      if (
-        contentArr[i].type === "text_input" &&
-        contentType[contentType.type].range &&
-        contentType[contentType.type].range !== "no_input" &&
-        (!stringNullOrEmpty(contentType[contentType.type].value) ||
-          !stringNullOrEmpty(contentType[contentType.type].valueLeft) ||
-          !stringNullOrEmpty(contentType[contentType.type].valueRight))
-      ) {
-        let REGEX_CHECK;
-        let messageLog = "";
-        switch (contentType[contentType.type].range) {
-          case "alphabet":
-            REGEX_CHECK = /[^A-Za-z ]+/;
-            messageLog = "アルファベッドのみ使用できます。";
-            break;
-          case "single_byte":
-            REGEX_CHECK = /[^0-9 ]+/;
-            messageLog = "半角数字で入力してください";
-            break;
-          case "alphanumeric_hyphen":
-            REGEX_CHECK = /[^A-Za-z0-9-_ ]+/;
-            messageLog =
-              "英数字('A-Z','a-z','0-9')とハイフンと下線('-','_')が使用できます。";
-            break;
-          case "alphanumeric":
-            REGEX_CHECK = /[^A-Za-z0-9 ]+/;
-            messageLog = "英数字('A-Z','a-z','0-9')が使用できます。";
-            break;
-          case "double_byte_hiragana":
-            REGEX_CHECK = /[^ぁ-ん]+/;
-            messageLog = "全角ひらがなを入力してください。";
-            break;
-          case "full_width_katakana":
-            REGEX_CHECK = /[^ァ-ン\s]+/;
-            messageLog = "全角カタカナを入力してください。";
-            break;
-          case "double_byte":
-            // REGEX_CHECK = /[^ァ-ンぁ-んｧ-ﾝﾞﾟ]+$/;
-            REGEX_CHECK = /[^ァ-ンぁ-ん一-龥]+$/;
-            messageLog = "全角文字を入力してください。";
-            break;
-          case RANGE_TEXT_VALIDATE.ONLY_KATAKANA.KEY:
-            REGEX_CHECK = RANGE_TEXT_VALIDATE.ONLY_KATAKANA.REGEX;
-            messageLog = RANGE_TEXT_VALIDATE.ONLY_KATAKANA.LOG;
-            break;
-          default:
-            REGEX_CHECK = "";
-            break;
-        }
-        if (REGEX_CHECK !== "") {
-          if (
-            contentType[contentType.type].isSplitInput &&
-            (REGEX_CHECK.test(contentType[contentType.type].valueLeft) ||
-              REGEX_CHECK.test(contentType[contentType.type].valueRight))
-          ) {
-            isValid = false;
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-            ] = messageLog;
-          } else if (!contentType[contentType.type].isSplitInput && REGEX_CHECK.test(contentType[contentType.type].value)) {
-            isValid = false;
-            errorsMess[
-              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
-            ] = messageLog;
-          }
-        }
-      }
-    }
-    if (isValid) {
-      errorsMess = {};
-    }
-    
-    state.errors = errorsMess;
-    if (!isValid) {
-      dispatch({
-        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-        payload: state,                                                          
-      });
-    }
-    return isValid;
-  };
-
-  const setStateToSessionStorage = (data) => {
-    sessionStorage.setItem(SESSION_STORAGE_KEY.CHAT_BOT_STATE, JSON.stringify(data));
-  };
-
-  const getStateFromSessionStorage = () => {
-    const data = sessionStorage.getItem(SESSION_STORAGE_KEY.CHAT_BOT_STATE);
-    if (!data) return null;
-    return JSON.parse(data);
-  };
-
-  const checkUpdateMessagesSessionStorage = (updated_at) => {
-    const temp = sessionStorage.getItem("bot_update_at");
-
-    if (temp !== updated_at) {
-      sessionStorage.removeItem(`messages_bot_${state.botId}`);
-      sessionStorage.setItem("bot_update_at", updated_at);
-    }
-  }
-
-  const createOrAddLinesCart = async (res) => {
-    const newArr = state.scenarioUserResponses.concat(res.data?.data || [])
-    setScenarioUserResponses([...newArr])
-
-    const products = JSON.parse(newArr.findLast(x => x.data_input_name === "text_with_thumbnail_image")?.text_value || null)
-    const quantity = newArr.findLast(x => x.data_input_name === "quantity")?.integer_value || 1
-    const product = products?.products?.findLast(x => x?.id === products?.initial_selection || x?.productVariantId === products?.value)
-
-    const email = newArr.findLast(x => x.data_input_name === "email")?.string_value || null
-    const phone = newArr.findLast(x => x.data_input_name === "phone_number")?.string_value || null
-    const user_name = newArr.findLast(x => x.data_input_name === "user_name")?.string_value || null
-    const user_name_kana = newArr.findLast(x => x.data_input_name === "user_name_kana")?.string_value || null
-
-    const zip_code_address = newArr.findLast(x => x.data_input_name === "zip_code_address")?.text_value || null
-
-    if (product && quantity && user_name && user_name_kana && email && zip_code_address) {
-      let phoneNumber;
-      try {
-        phoneNumber = `${JSON.parse(phone)?.value1 || ""}${JSON.parse(phone)?.value2 || ""}${JSON.parse(phone)?.value3 || ""}`
-      } catch (e) {
-        phoneNumber = phone || ""
-      }
-      await api
-        .post('/api/v1/shopify/cart_create', {
-          first_name: JSON.parse(user_name)?.valueRight || JSON.parse(user_name_kana)?.valueRight,
-          last_name: JSON.parse(user_name)?.valueLeft || JSON.parse(user_name_kana)?.valueLeft,
-          email: email || "example@gmail.com",
-          phone: phoneNumber,
-          zip: JSON.parse(zip_code_address)?.value_post_code || (JSON.parse(zip_code_address)?.value_post_code_left + JSON.parse(zip_code_address)?.value_post_code_right),
-          province: JSON.parse(zip_code_address)?.value_prefecture,
-          city: JSON.parse(zip_code_address)?.value_municipality,
-          address1: JSON.parse(zip_code_address)?.value_address,
-          address2: JSON.parse(zip_code_address)?.value_building_name,
-          lines: [
-            {
-              "merchandiseId": product.productVariantId,
-              "quantity": quantity
-            }
-          ],
-          scenario_id: state.scenarioId,
-          uuid: state.uuid
-        })
-        .then(async res => {
-          sessionStorage.setItem("cart", JSON.stringify(res?.data?.data))
-          setCheckoutUrl(res?.data?.data?.cartCreate?.cart?.checkoutUrl)
-        })
-        .catch(e => {
-          console.log(e)
-        })
-    }
-  }
-
-  const convertToFukushashikiObject = (obj) => {
-    if (
-      obj &&
-      obj.message.message_content &&
-      obj.message.message_content.length > 0
-    ) {
-      const messageArray = obj.message.message_content;
-      const fukuDataList = [];
-      messageArray.forEach((message) => {
-        switch (message.type) {
-          case 'text_input':
-            {
-              if (message.text_input?.text?.value != undefined || message.text_input?.text?.valueLeft != undefined || message.text_input?.text?.valueRight != undefined) {
-                if (message.text_input?.text?.isSplitInput == true) {
-                  const fukuObjectLeft = {
-                    type: message.type,
-                    bindingMode: message.left_fukushashiki_search_mode,
-                    bindingAddress: message.left_fukushashiki_search_value,
-                    bindingValue: message.text_input.text.valueLeft,
-                  };
-
-                  const fukuObjectRight = {
-                    type: message.type,
-                    bindingMode: message.right_fukushashiki_search_mode,
-                    bindingAddress: message.right_fukushashiki_search_value,
-                    bindingValue: message.text_input.text.valueRight,
-                  };
-                  fukuDataList.push(fukuObjectLeft);
-                  fukuDataList.push(fukuObjectRight);
-                }
-                else {
-                  if (message.fukushashiki_search_value?.includes(',')) {
-                    let address = message.fukushashiki_search_value.split(',');
-                    address.forEach(value => {
-                      const fukuObject = {
-                        type: message.type,
-                        bindingMode: message.fukushashiki_search_mode,
-                        bindingAddress: value,
-                        bindingValue: message.text_input.text.value,
-                      };
-                      fukuDataList.push(fukuObject);
-                    });
-                  }
-                  else {
-                    const fukuObject = {
-                      type: message.type,
-                      bindingMode: message.fukushashiki_search_mode,
-                      bindingAddress: message.fukushashiki_search_value,
-                      bindingValue: message.text_input.text.value,
-                    };
-                    fukuDataList.push(fukuObject);
-                  }
-                }
-              }
-
-              if (Object.keys(message.text_input.urls).length != 0 && message.text_input.urls.value != undefined) {
-                const fukuObject = {
-                  type: message.type,
-                  bindingMode: message.fukushashiki_search_mode,
-                  bindingAddress: message.fukushashiki_search_value,
-                  bindingValue: message.text_input.urls.value,
-                };
-                fukuDataList.push(fukuObject);
-              }
-
-              if (Object.keys(message.text_input.email_confirmation).length != 0 && message.text_input.email_confirmation != undefined) {
-                const userInputData = Object.fromEntries(
-                  Object.entries(message.text_input.email_confirmation).filter(([key]) => key.includes("value"))
-                );
-                const dataInforFukushashiki = Object.fromEntries(
-                  Object.entries(message).filter(([key]) => key.includes("fukushashiki"))
-                );
-                const types = ["value", "valueConfirm"];
-                const result = types
-                  .filter(type => `${type}` in userInputData)
-                  .map(type => ({
-                    type: message.type,
-                    bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
-                    bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-                    bindingValue: userInputData[`${type}`]
-                  }));
-                fukuDataList.push(...result);
-              }
-
-              if (message.text_input?.phone_number.value != undefined ||
-                message.text_input?.phone_number.value1 != undefined ||
-                message.text_input?.phone_number.value2 != undefined ||
-                message.text_input?.phone_number.value3 != undefined) {
-
-                if (message.text_input.phone_number.withHyphen == false) {
-                  const fukuObject = {
-                    type: message.type,
-                    bindingMode: message.fukushashiki_search_mode,
-                    bindingAddress: message.fukushashiki_search_value,
-                    bindingValue: message.text_input.phone_number.value,
-                  };
-                  fukuDataList.push(fukuObject);
-                }
-                else {
-                  const userInputData = Object.fromEntries(
-                    Object.entries(message.text_input.phone_number).filter(([key]) => key.includes("value"))
-                  );
-                  const dataInforFukushashiki = Object.fromEntries(
-                    Object.entries(message).filter(([key]) => key.includes("fukushashiki"))
-                  );
-                  const types = ["value1", "value2", "value3"];
-                  const result = types
-                    .filter(type => `${type}` in userInputData)
-                    .map(type => ({
-                      type: message.type,
-                      bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
-                      bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-                      bindingValue: userInputData[`${type}`]
-                    }));
-                  fukuDataList.push(...result);
-                }
-              }
-
-              if (Object.keys(message.text_input.email_address).length !== 0 && message.text_input.email_address !== undefined) {
-                const addresses = message.fukushashiki_search_value?.split(',') || [message.fukushashiki_search_value];
-                addresses.forEach(value => {
-                  const fukuObject = {
-                    type: message.type,
-                    bindingMode: message.fukushashiki_search_mode,
-                    bindingAddress: value?.trim() || "",
-                    bindingValue: message.text_input.email_address.value,
-                  };
-                  fukuDataList.push(fukuObject);
-                });
-              }
-
-              if (Object.keys(message.text_input.password).length != 0 && message.text_input.password != undefined) {
-                if (message?.fukushashiki_search_value.includes(',')) {
-                  let address = message.fukushashiki_search_value.split(',');
-                  address.forEach(value => {
-                    const fukuObject = {
-                      type: 'password',
-                      bindingMode: message.fukushashiki_search_mode,
-                      bindingAddress: value,
-                      bindingValue: message.text_input.password.value,
-                    };
-                    fukuDataList.push(fukuObject);
-                  });
-                }
-                else {
-                  const fukuObject = {
-                    type: 'password',
-                    bindingMode: message.fukushashiki_search_mode,
-                    bindingAddress: message.fukushashiki_search_value,
-                    bindingValue: message.text_input.password.value,
-                  };
-                  fukuDataList.push(fukuObject);
-                }
-              }
-
-              if (Object.keys(message.text_input.password_confirmation).length != 0 && message.text_input.password_confirmation != undefined) {
-                const fukuObject1 = {
-                  type: 'password_confirmation',
-                  bindingMode: message.fukushashiki_search_mode,
-                  bindingAddress: message.fukushashiki_search_value,
-                  bindingValue: message.text_input.password_confirmation.value,
-                };
-
-                const fukuObject2 = {
-                  type: 'password_confirmation',
-                  bindingMode: message.fukushashiki_search_mode,
-                  bindingAddress: message.fukushashiki_search_value,
-                  bindingValue: message.text_input.password_confirmation.valueConfirm,
-                };
-                fukuDataList.push(fukuObject1);
-                fukuDataList.push(fukuObject2);
-              }
-            }
-            break;
-          case 'agree_term':
-            {
-              let searchValue = message.fukushashiki_search_value;
-              if (!searchValue) break;
-              if (searchValue.includes(',')) {
-                let values = searchValue.split(',');
-                values.forEach(value => {
-                  let trimmedValue = value.trim();
-                  const fukuObject = {
-                    type: message.type,
-                    bindingMode: message.fukushashiki_search_mode,
-                    bindingAddress: trimmedValue,
-                    bindingValue: message.agree_term.isAgree,
-                  };
-                  fukuDataList.push(fukuObject);
-                });
-              } else {
-                const fukuObject = {
-                  type: message.type,
-                  bindingMode: message.fukushashiki_search_mode,
-                  bindingAddress: message.fukushashiki_search_value,
-                  bindingValue: message.agree_term.isAgree,
-                };
-                fukuDataList.push(fukuObject);
-              }
-              break;
-            }
-          case 'slider':
-            {
-              const fukuObject = {
-                type: message.type,
-                bindingMode: message.fukushashiki_search_mode,
-                bindingAddress: message.fukushashiki_search_value,
-                bindingValue: message.slider.value,
-              };
-              fukuDataList.push(fukuObject);
-
-              break;
-            }
-
-          case "pull_down":
-            {
-              if (message.pull_down?.customization.length != 0) {
-                const textInDropdown = message.pull_down.customization.value || message.pull_down.initial_selection;
-                if (message.pull_down.customization.is_comment == true) {
-
-                }
-                else {
-                  message.pull_down.customization.options_without_comment.forEach((item) => {
-                    if (!!textInDropdown && item.value == textInDropdown) {
-                      const fukuObject = {
-                        type: message.type,
-                        bindingMode: message.fukushashiki_search_mode,
-                        bindingAddress: message.fukushashiki_search_value,
-                        bindingValue: item.value
-                      };
-                      fukuDataList.push(fukuObject);
-                    }
-
-                  })
-                }
-              }
-
-              if (message.pull_down?.type == "lp_integration_option") {
-                if (message.pull_down.lp_integration_option.value != "") {
-                  const fukuObject = {
-                    type: message.type,
-                    pulldownType: message.pull_down.type,
-                    bindingMode: message.pull_down.lp_element_search_mode,
-                    bindingAddress: message.pull_down.lp_element_search_value,
-                    bindingValue: message.pull_down.lp_integration_option.value
-                  };
-                  fukuDataList.push(fukuObject);
-                }
-              }
-
-              if (message.pull_down?.type == MESSAGE_CONTENT_TYPES.PULLDOWN.FROM_JS) {
-                if (message.pull_down.from_js_result.value?.toString() != "") {
-                  const fukuObject = {
-                    type: message.type,
-                    pulldownType: message.pull_down.type,
-                    bindingMode: message.pull_down.from_js_result_target_search_mode,
-                    bindingAddress: message.pull_down.from_js_result_target_search_value,
-                    bindingValue: message.pull_down.from_js_result.value
-                  };
-                  fukuDataList.push(fukuObject);
-                }
-              }
-
-              const userInputData = Object.fromEntries(
-                Object.entries(message.pull_down?.date_md || {}).filter(([key]) => key.includes("value"))
-              );
-
-              const additionalKeys = [
-                'time_hm',
-                'date_ymd',
-                'date_ym',
-                'date_ymd_hm',
-                'dob_ymd',
-                'dob_ym',
-                'timezone_from_to',
-                'period_from_to',
-                'up_to_municipality',
-                'prefectures'
-              ];
-
-              additionalKeys.forEach(key => {
-                const entries = Object.entries(message.pull_down?.[key] || {}).filter(([k]) => k.includes("value"));
-                Object.assign(userInputData, Object.fromEntries(entries));
-              });
-
-              const dataInforFukushashiki = Object.fromEntries(
-                Object.entries(message).filter(([key]) => key.includes("fukushashiki"))
-              );
-
-              const types = ["day", "month", "year", "hour", "minute", "Day", "Month", "Year", "Hour", "Minute", "valueDay", "valueMonth", "valueYear", "valueHour", "valueMinute"];
-              const result = types
-                .filter(type => `${type}` in userInputData)
-                .map(type => ({
-                  type: "pull_down",
-                  bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
-                  bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-                  bindingValue: removeLeadingZero(userInputData[`${type}`]),
-                }));
-              fukuDataList.push(...result);
-
-              break;
-            }
-          case 'textarea':
-            {
-              if (message.textarea.text_input.value != undefined) {
-                const fukuObject = {
-                  type: message.type,
-                  bindingMode: message.fukushashiki_search_mode,
-                  bindingAddress: message.fukushashiki_search_value,
-                  bindingValue: message.textarea.text_input.value,
-                };
-                fukuDataList.push(fukuObject);
-              }
-              break;
-            }
-          case 'zip_code_address':
-            {
-              const userInputData = Object.fromEntries(
-                Object.entries(message.zip_code_address).filter(([key]) => key.includes("value_"))
-              );
-              const dataInforFukushashiki = Object.fromEntries(
-                Object.entries(message).filter(([key]) => key.includes("fukushashiki"))
-              );
-              const types = [
-                "post_code",
-                "post_code_left",
-                "post_code_right",
-                "await",
-                "prefecture",
-                "address",
-                "building_name",
-                "municipality"
-              ];              
-              const result = types
-                .filter(type => type === "await" || `value_${type}` in userInputData)
-                .map(type => {
-                  const bindingMode = dataInforFukushashiki[`${type}_fukushashiki_search_mode`];
-
-                  if (bindingMode === undefined && type !== "await") {
-                    return null;
-                  }
-
-                  return {
-                    type: message.zip_code_address.is_use_dropdown ? "dropdown_prefecture" : "zip_code_address",
-                    bindingMode: bindingMode,
-                    additionalType: type,
-                    bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-                    bindingValue: userInputData[`value_${type}`] || null
-                  };
-                })
-                .filter(item => item !== null);
-              fukuDataList.push(...result);
-              break;
-            }
-          case 'shipping_address':
-            {
-              const userInputData = Object.fromEntries(
-                Object.entries(message.shipping_address).filter(([key]) => key.includes("value_"))
-              );
-              const dataInforFukushashiki = Object.fromEntries(
-                Object.entries(message).filter(([key]) => key.includes("fukushashiki"))
-              );
-              const types = ["number1", "number2", "number3", "number", "name_left", "name_right", "kana_left", "kana_right", "building_name", "address", "municipality", "prefecture", "post_code", "post_code_left", "post_code_right", "initial_selection"];
-              const result = types
-                .filter(type => `value_${type}` in userInputData)
-                .map(type => {
-                  const bindingMode = dataInforFukushashiki[`${type}_fukushashiki_search_mode`];
-                  const bindingValue = dataInforFukushashiki[`${type}_fukushashiki_search_value`];
-                  if (bindingMode === undefined || bindingValue == undefined || bindingValue.length == 0) {
-                    return null;
-                  }
-                  if (type == "initial_selection") {
-                    const objA = {
-                      type: "initial_selection",
-                      bindingMode,
-                      bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-                      bindingValue: userInputData[`value_${type}`]
-                    };
-                    fukuDataList.push(objA)
-                  }
-                  if (type == "address") {
-                    const objA = {
-                      type: "zip_code_address",
-                      bindingMode,
-                      bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-                      bindingValue: userInputData[`value_${type}`]
-                    };
-                    fukuDataList.push(objA)
-                  }
-                  return {
-                    type: message.shipping_address.is_use_dropdown ? "dropdown_prefecture" : "shipping_address",
-                    bindingMode: bindingMode,
-                    bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-                    bindingValue: userInputData[`value_${type}`]
-                  };
-                })
-                .filter(item => item !== null);
-              fukuDataList.push(...result);
-              break;
-            }
-
-          case 'radio_button':
-            {
-              const initialSelection = message.radio_button.initial_selection;
-              let selectedElement = message.radio_button.default.find(item => item.value === initialSelection);
-              if (!selectedElement) {
-                selectedElement = message.radio_button.radio_button_img.find(item => item.value === initialSelection);
-              }
-              if (selectedElement) {
-                const value = selectedElement.value;
-                const fukuObject = {
-                  type: message.type,
-                  bindingMode: message.initial_selection_fukushashiki_search_mode,
-                  bindingAddress: message.initial_selection_fukushashiki_search_value,
-                  bindingValue: value.toString()
-                };
-                fukuDataList.push(fukuObject);
-              }
-
-              break;
-            }
-          case 'checkbox':
-            {
-              if (message.checkbox.checkedValue.length > 0) {
-                const fukuObject = {
-                  type: message.type,
-                  bindingMode: message.checkedValue_fukushashiki_search_mode,
-                  bindingAddress: message.checkedValue_fukushashiki_search_value,
-                  bindingValue: true
-                };
-                fukuDataList.push(fukuObject);
-              }
-              else {
-                const fukuObject = {
-                  type: message.type,
-                  bindingMode: message.checkedValue_fukushashiki_search_mode,
-                  bindingAddress: message.checkedValue_fukushashiki_search_value,
-                  bindingValue: false
-                };
-                fukuDataList.push(fukuObject);
-              }
-              break;
-            }
-
-          case 'card_payment_radio_button':
-          case 'credit_card_payment': {
-            const keysToExtract = [
-              "initial_selection", "card_holder1", "card_holder2",
-              "card_number1", "card_number2", "card_number3", "card_number4",
-              "card_holder", "card_number",
-              "year", "month", "cvc", "installment"
-            ];
-            const userInputData = keysToExtract.reduce((result, key) => {
-              if (message[message.type]?.[key] !== undefined) {
-                result[key] = message[message.type][key];
-              }
-              return result;
-            }, {});
-            const dataInforFukushashiki = Object.fromEntries(
-              Object.entries(message).filter(([key]) => key.includes("fukushashiki"))
-            );
-            const types = ["card_number", "card_holder1", "card_holder2",
-              "card_holder", "year", "month",
-              "cvc", "card_number1", "card_number2", "card_number3",
-              "card_number4", "installment", "initial_selection"];
-            const result = types
-              .filter(type => type in userInputData)
-              .map(type => {
-                const fukuData = {
-                  bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
-                  bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-                  bindingValue: userInputData[`${type}`]
-                }
-
-                if (!fukuData.bindingMode || !fukuData.bindingValue || !fukuData.bindingAddress) return;
-
-                if (type == "initial_selection") {
-                  return { type: "payment_method_id", ...fukuData }
-                }
-                if (type == "card_number") {
-                  return { type: "card_number", ...fukuData };
-                }
-                return { type: message.type, ...fukuData };
-              })
-              .filter(item => item);
-            fukuDataList.push(...result);
-          }
-          default: 
-            break;
-        }
-      })
-      return fukuDataList;
-    }
-  }
-
-  const finishConversion = async ({ scenario_id, user_input_id }, callback) => {
-    return updateStatusConversion({ scenario_id, user_input_id, status: CONVERSTION_RESPONSE_STATUS.FINISH })
-      .then(() => {
-        dispatch({
-          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-          payload: { conversionStatus: CONVERSTION_RESPONSE_STATUS.FINISH },
-        });
-
-        if (!!callback) {
-          callback();
-        }
-      });
-  }
-
-  const postMessageForExecuteJs = (jsCode) => {
-    postMessageToParent({
-      action: CHATBOT_ACTIONS.EXCUTE_JS,
-      actionData: jsCode,
-      is_use_js: true
-    });
-  }
-
-  const postMessageForGetPreviewOrderContent = async (jsCode, options = {}) => {
-    const { isNewProcess = false, stopRender } = options;
-
-    if (isNewProcess && stopRender) {
-      dispatch({
-        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-        payload: {
-          stopRender,
-          previewOrderContent: null,
-        },
-      });
-    }
-
-    postMessageToParent({
-      action: CHATBOT_ACTIONS.GET_PREVIEW_ORDER_CONTENT,
-      actionData: jsCode,
-      is_use_js: true,
-      isOpen: true,
-      isNewProcess,
-    });
-
-    if (isNewProcess) return;
-    await sleep(2000);
-  }
-
-  const fukushashikiToLP = (fukushashikiData) => {
-    postMessageToParent({
-      action: 'fukushashiki',
-      actionData: fukushashikiData,
-      isOpen: true
-    });
-  }
-
-  const sendCustomJsToParent = ({ head, top_body, bottom_body } = {}) => {
-    if (hasSentCustomJs.current) return;
-
-    const items = [ head, top_body, bottom_body ].filter(item => !!item?.jsCode?.trim() && !!item?.position?.trim() )
-      postMessageToParent({
-        action: CHATBOT_ACTIONS.INJECT_CUSTOM_JS,
-        actionData: items,
-        isOpen: true
-      });
-
-      hasSentCustomJs.current = true;
-  }
-
-  const postMessageToParent = (options) => {
-    if (!window || !window.parent) return;
-    
-    const defaultOptions = {
-      isOpen: state.isOpen,
-      source: 'ec-chatbot',
-      // widthPc: state.widthPc,
-      // heightPc: state.heightPc,
-      // widthSp: state.widthSp,
-      // heightSp: state.heightSp,
-      // chatbotRight: state.rightMarginPc,
-      // chatbotBottom: state.bottomMarginPc,
-    };
-    
-    window.parent.postMessage({
-      ...defaultOptions,
-      ...options,
-    }, state.urlReceive || '*');
-  }
-
-  const processClickCreateOrder = (data) => {
-    sendUserInteractionData(
-      data,
-    ).then(async (res) => {
-      // Process for non-Shopify
-      setStateToSessionStorage(state);
-      const content = data?.message?.message_content?.[0];
-      if (params.get('cartSystem') !== 'shopify') {
-        postMessageToParent({
-          action: CHATBOT_ACTIONS.CLICK_BUTTON,
-          id_value: content.button_submit_id
-        });
-
-        finishConversion({ scenario_id: data.scenario_id, user_input_id: data.user_id }, redirectToCartPage)
-        return;
-      }
-
-      // Process for Shopify
-      fukushashikiToLP(convertToFukushashikiObject(data));
-      await createOrAddLinesCart(res);
-      sendCreateOrderData(
-        data,
-        (res) => console.log(res)
-      ).then(() => {
-        if (params.get('cartSystem') === 'shopify') return;
-        const conversion = {
-          scenario_data: `${state.deviceReceive}_conversion`,
-        };
-        sendCountRequest(conversion)
-          .then(res => {
-            console.log(res);
-            finishConversion({ scenario_id: data.scenario_id, user_input_id: data.user_id }, redirectToCartPage);
-          });
-      });
-    });
-  }
-
-  const isLastMessageInCreateOrderFlow = () => {
-    return state.currentMsgIndex === state.messagesList.length - 1;
-  };
-
-  const isBotMessage = (message) => {
-    return message.belong_to === 'bot' && message.message_content.length > 0;
-  }
-
-  const isDelayBotMessage = (message) => {
-    if (!message) return false;
-    return message.belong_to === 'bot' && message.message_content[0]?.type === "delay";
-  }
-
-  const isUserMessage = (message) => {
-    return message.belong_to === 'user' && message.message_content.length > 0;
-  }
-
-  const renderMessageInRange = async (startIndex, endIndex, newState, nextUserMsgIndex, options = {}) => { 
-    const { 
-      isUpdateClick = false, 
-      isPassDelay = false,
-      lastConfirmMessageIdx = -1,
-      appearFromStart = false,
-    } = options;
-    const listMsgAppear = [];
-
-    for (let i = startIndex; i <= endIndex; i++) {
-      const confirmMessage = newState.messagesList[i].message_content?.find(x => x.text_input?.use_for_confirm_message);
-      if (confirmMessage?.text_input?.jscode && !newState.stopRender?.isActive && lastConfirmMessageIdx !== i) {
-        const nextUserMessage = newState.messagesList[nextUserMsgIndex];
-        const isNextUserMessageButtonSubmit = nextUserMessage?.message_content?.[0]?.type === "button_submit";
-
-        if (!isNextUserMessageButtonSubmit) {
-          continue;
-        }
-
-        newState.stopRender = {
-          index: i,
-          finalIndex: newState.currentMsgIndex,
-          timeout: 30,
-          start: new Date(),
-          isActive: true,
-        };
-
-        newState.previewOrderContent = null;
-
-        postMessageForGetPreviewOrderContent(
-          confirmMessage.text_input.jscode,
-          { isNewProcess: newState.useNewProcess, stopRender: newState.stopRender },
-        );
-        break;
-      }
-
-      newState.renderMessagesList = newState.messagesList.slice(0, i + 1);
-      if (isDelayBotMessage(newState.messagesList[i])) {
-        // render delay item so typing GIF appears, then wait
-        dispatch({
-          type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
-          payload: {
-            startIndex: 0,
-            endIndex: i + 1
-          }
-        });
-        if (!isPassDelay) {
-          await sleep(newState.messagesList[i].message_content[0].delay?.content * 1000 || TIMER_DELAY_RENDER);
-        }
-        const newRender = newState.renderMessagesList.slice(0, i + 1).map(msg => isDelayBotMessage(msg) ? {...msg, hidden: true} : msg);
-        newState.renderMessagesList[i].hidden = true;
-        dispatch({
-          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-          payload: {
-            messagesList: newState.messagesList,
-            renderMessagesList: newRender,
-          }
-        })
-
-        newState.messagesList[i].hidden = true;
-        dispatch({
-          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-          payload: {
-            messagesList: newState.messagesList,
-            renderMessagesList: newRender,
-          }
-        })
-
-        continue;
-      }
-
-      if ((appearFromStart ? true : i !== startIndex ) && isUserMessage(newState.messagesList[i])) {
-        listMsgAppear.push({ id: newState.messagesList[i].id, type: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.APPEAR });
-      }
-      
-      dispatch({
-        type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
-        payload: {
-          startIndex: 0,
-          endIndex: i + 1
-        }
-      });
-
-      if (!isPassDelay) {
-        await sleep(RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE);
-      }
-    }
-    if (!isUpdateClick) {
-      newState.passedUserMsgCount++;
-    } else {
-      newState.passedUserMsgCount = newState.renderMessagesList.filter((item) => isUserMessage(item) && !item.hidden).length - 1 ;
-    }
-
-    if (listMsgAppear.length) {
-      createScenarioUserResponseMessageHistory({
-        scenario_id: state.scenarioId,
-        user_id: state.uuid,
-        msgs: listMsgAppear,
-      });
-    }
-
-    return newState;
-  }
-
-  const handleRenderMessageAfterClickNext = async (newState, clickedMsgIndex, isBtnUpdateClick) => {
-    if (newState.useNewProcess) {
-      return renderMessageInRange(clickedMsgIndex + 1, newState.currentMsgIndex, newState, newState.currentUserMsgIndex, { isUpdateClick: isBtnUpdateClick, appearFromStart: true })
-      .then((newState) => {
-        setStateToSessionStorage(newState);
-        return dispatch({
-          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-          payload: newState
-        });
-      }).finally(() => {
-        dispatch({ type: PREVIEW_ACTIONS.SET_PROCESSING, payload: false });
-      });
-    }
-
-    return new Promise(async (resolve) => {
-      // Insert a temporary delay item to show typing GIF for 0.5s when advancing
-      const tempDelay = createTempDelay(0.5);
-
-      // Place tempDelay right after clicked index so user sees typing before next messages
-      newState.messagesList.splice(clickedMsgIndex + 1, 0, tempDelay);
-      // adjust indices
-      if (newState.currentMsgIndex >= clickedMsgIndex + 1) newState.currentMsgIndex++;
-
-      for (let i = clickedMsgIndex + 1; i <= newState.currentMsgIndex; i++) {
-        newState.renderMessagesList = newState.messagesList.slice(0, i + 1);
-        if (isDelayBotMessage(newState.messagesList[i])) {
-          // ensure the delay item is rendered so typing GIF visible
-          dispatch({
-            type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
-            payload: { startIndex: 0, endIndex: i + 1 }
-          });
-          await sleep(newState.messagesList[i].message_content[0].delay?.content * 1000 || TIMER_DELAY_RENDER);
-          newState.renderMessagesList[i].hidden = true;
-          dispatch({
-            type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-            payload: {
-              messagesList: newState.messagesList,
-              renderMessagesList: newState.renderMessagesList.slice(0, i + 1).map(msg => isDelayBotMessage(msg) ? {...msg, hidden: true} : msg),
-            }
-          })
-          continue;
-        }
-        
-        dispatch({
-          type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
-          payload: {
-            startIndex: 0,
-            endIndex: i + 1
-          }
-        });
-
-        await sleep(RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE);
-      }
-
-      // remove temp delay if still present
-      const tempIdx = newState.messagesList.findIndex(m => m.id && `${m.id}`.startsWith('__temp_delay_'));
-      if (tempIdx >= 0) {
-        newState.messagesList.splice(tempIdx, 1);
-        if (newState.currentMsgIndex > tempIdx) newState.currentMsgIndex--;
-      }
-      resolve();
-    }).then(() => {
-      newState.renderMessagesList = newState.renderMessagesList.map((msg) => {
-        return isDelayBotMessage(msg) ? {...msg, hidden: true} : msg;
-      }); 
-  
-      if (!isBtnUpdateClick) {
-        newState.passedUserMsgCount++;
-      } else {
-        newState.passedUserMsgCount = newState.renderMessagesList.filter((item) => isUserMessage(item)).length - 1 ;
-      }
-  
-      const botConfirmMessage = newState.messagesList.find(msg => {
-        return !!msg.message_content?.find(x => x.text_input?.use_for_confirm_message)
-      });
-  
-      const botConfirmJsCode = botConfirmMessage?.message_content
-        ?.find(x => x.text_input?.use_for_confirm_message)
-        ?.text_input?.jscode;
-      const nextUserMessage = newState.messagesList[newState.currentUserMsgIndex];
-      const isNextUserMessageButtonSubmit = nextUserMessage?.message_content?.[0]?.type === "button_submit";
-
-      if (botConfirmJsCode && botConfirmJsCode.length > 0 && isNextUserMessageButtonSubmit) {
-        postMessageForGetPreviewOrderContent(botConfirmJsCode);
-      }
-
-      setStateToSessionStorage(newState);
-      return dispatch({
-        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-        payload: newState
-      });
-    });
-  }
-
-  const sendLogMessageToServer = (submitData) => {
-    const { submit_type, message, ...data } = submitData;
-    sendScenarioUserResponse(submitData);
-
-    const convertType = {
-      [CONVERSION_RESPONSE_SUBMIT_TYPE.ADD]: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.ADD,
-      [CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE]: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.RETRY,
-      [CONVERSION_RESPONSE_SUBMIT_TYPE.ERROR]: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.ERROR,
-    }
-
-    const messageSubmitType = convertType[submit_type];
-    
-    if (!messageSubmitType) return;
-
-    createScenarioUserResponseMessageHistory({
-      ...data,
-      msgs: [{ id: message.id, type: messageSubmitType }],
-    });
-  }
-
-  const onClickNext = async (indexMessage, message) => {
-    dispatch({ type: PREVIEW_ACTIONS.SET_PROCESSING, payload: true });
-    let newState = _.omit(state, ['submitErrorMessage', 'lpOptionData']);
-    let clickedMsgIndex = newState.messagesList.findIndex((msg) => msg?.id === message?.id);
-    if (clickedMsgIndex < 0) clickedMsgIndex = newState.currentMsgIndex;
-    newState.userMessagesList = newState.messagesList.filter((item) => isUserMessage(item));
-    const clickedMsg = newState.messagesList[clickedMsgIndex];
-
-    newState.errors = {};
-
-    const submitData = {
+    const data = {
       scenario_id: state.scenarioId,
       message: clickedMsg,
       user_id: state.uuid,
       bot_type: "web"
     };
 
-    if (!handleValidateField(indexMessage)) {
-      sendLogMessageToServer({
-        ...submitData,
-        submit_type: CONVERSION_RESPONSE_SUBMIT_TYPE.ERROR,
+    const validationResult = handleValidateField(clickedMsg, clickedMsgIndex);
+    
+    if (!validationResult.isValid) {
+      dispatch({
+        type: PREVIEW_ACTIONS.SET_ERRORS,
+        payload: validationResult.errors
       });
+      // return sendErrorLogToServer(data);
       return;
     }
     
-    const isClickedCreateOrder = newState.messagesList[clickedMsgIndex]?.message_content?.[0]?.type === "button_submit";
-    const isClickedLastMessage = newState.messagesList.length - 1 === clickedMsgIndex;
-    const nextOrCurrentUserMessage = newState.messagesList.findIndex(getNextUserMsg((_, index) => index >= clickedMsgIndex));
-    const isBtnUpdateClick = indexMessage < newState.currentUserMsgIndex || (newState.currentUserMsgIndex === -1 && indexMessage === nextOrCurrentUserMessage);
-
-    sendLogMessageToServer({
-      ...submitData,
-      submit_type: isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD,
-    });
-
-    if (isClickedCreateOrder) {
-      setStateToSessionStorage(newState);
-      return processClickCreateOrder(submitData);
-    }
-
-    if (isClickedLastMessage) {
-      newState.messagesList[clickedMsgIndex].disabled = false;
-
-      await finishConversion({ scenario_id: submitData.scenario_id, user_input_id: submitData.user_id });
-      newState.conversionStatus = CONVERSTION_RESPONSE_STATUS.FINISH;      
-      return dispatch({
-        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-        payload: newState
-      });
-    }
-
-    newState.messagesList[clickedMsgIndex].isSubmitted = true;
-    fukushashikiToLP(convertToFukushashikiObject(submitData));
-
     if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
-      postMessageForExecuteJs(clickedMsg.jscode);
+      executeLpJsCode(clickedMsg.jscode, state);
     }
 
-    if (isDislayingLoginForm(clickedMsg)) {
-      // For GINZA AIRA,
-      setStateToSessionStorage(newState);
-      return;
-    }
+    // For GINZA AIRA
+    if (isDislayingLoginForm(clickedMsg)) return;
 
-    if (isLoggedIn) {
-      newState.messagesList.forEach(x => x.hidden = x.not_display_when_logged_in);
-    }
+    fukushashikiToLP(convertToFukushashikiObject(data, []), state);
 
-    // Update next messages list after clicked next
-    const nextMessage = newState.messagesList[clickedMsgIndex + 1];
-    for (let i = 0; i < newState.messagesList.length; i++) {
-      if (newState.messagesList[i].conditions?.length > 0) {
-        const result = checkMessageCondition(newState.messagesList[i], newState.objParam);
-        if (!result && isUserMessage(newState.messagesList[i])) {
-          newState.messagesList[i].hidden = true;
-          continue;
-        }
-
-        // if (newState.messagesList[i].not_display_when_have_error) {
-        //   newState.messagesList[i].hidden = newState.submitErrorMessage.length > 0;
-        // }
-      }
-    }
-    if (isUserMessage(nextMessage) || isBotMessage(nextMessage)) {
-      for (let i = clickedMsgIndex + 1; i < newState.messagesList.length; i++) {
-        if (newState.messagesList[i].conditions.length !== 0) {
-          const result = checkMessageCondition(newState.messagesList[i], newState.objParam);
-          newState.messagesList[i].hidden = !result;
-        }
-        if (newState.messagesList[i].hidden && !stringNullOrEmpty(newState.messagesList[i].hidden)) continue;
-
-        if (isBotMessage(newState.messagesList[i])) {
-          newState = {
-            ...newState,
-            ...processForBotMessage(newState.messagesList, i, newState, false, false)
-          };
-        } else if (isUserMessage(newState.messagesList[i])) {
-          newState = {
-            ...newState,
-            ...processForUserMessage(newState.messagesList, i, newState, false)
-          };
-        }
-      }
-    }
-
-    newState.currentUserMsgIndex = newState.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex));
-
-    if (
-      newState.currentUserMsgIndex === -1 &&
-      newState.conversionStatus === CONVERSTION_RESPONSE_STATUS.UN_FINISH
-    ) {
-      await finishConversion({ scenario_id: submitData.scenario_id, user_input_id: submitData.user_id });
-      newState.conversionStatus = CONVERSTION_RESPONSE_STATUS.FINISH;
-    }
-
-    if (newState.currentUserMsgIndex === -1)
-      newState.currentMsgIndex = newState.messagesList.length - 1;
-    else
-      newState.currentMsgIndex = newState.currentUserMsgIndex;
-
-    await handleRenderMessageAfterClickNext(newState, clickedMsgIndex, isBtnUpdateClick);
+    dispatch({
+      type: PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON,
+      payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn, renderMode: getRenderMode() }
+    });
   };
 
-  const isDislayingLoginForm = (message) => {
-    const loginMessageNames = ["ログイン", "Login", "login", "LOGIN"];
-    return loginMessageNames.includes(message.message_name);
-  }
-
   const onChangeValue = (
-    indexContent,
+    contentIndex,
     contentType,
     value,
     field,
-    subFiled,
-    name,
+    subField1,
+    subField2,
     message
   ) => {
-    let newState = { ...state };
-    const msgIndex = state.messagesList.findIndex((msg) => msg.id === message.id);
-    if (newState.messagesList.length == 0) return;
-    let messageContentTypeData = newState.messagesList[msgIndex].message_content[indexContent][contentType];
+    // Early returns for invalid states
+    if (!state.messagesList.length) return;
 
-    if (name) {
-      messageContentTypeData[field] = messageContentTypeData[field] || {};
-      messageContentTypeData[field][subFiled] = messageContentTypeData[field][subFiled] || {};
-      messageContentTypeData[field][subFiled][name] = value;
-    } else if (subFiled) {
-      messageContentTypeData[field] = messageContentTypeData[field] || {};
-      messageContentTypeData[field][subFiled] = value;
-    } else if (field) {
-      messageContentTypeData[field] = value;
-    }
-
-    if (contentType === "zip_code_address") {
-      if (messageContentTypeData.is_use_dropdown) {
-        messageContentTypeData.value_prefecture_type = "id";
-      }
-      else {
-        messageContentTypeData.value_prefecture_type = "name";
-      }
-
-      if (typeof value === "object") {
-        const transformField = {
-          value_prefecture: (value) => {
-            if (messageContentTypeData.value_prefecture_type === "id") {
-              return value;
-            } else {
-              return findItem(state.prefecturesList, { 
-                keys: 'id', 
-                value: value, 
-                callbackValue: value,
-                onSuccess: (item) => item.name,
-              });
-            }
-          }
-        }
-        
-        Object.keys(value).forEach((key) => {
-          messageContentTypeData[key] = transformField[key] ? transformField[key](value[key]) : value[key];
-        });
-      } else {
-        messageContentTypeData[field] = value;
-      }
-    }
-
-    if (
-      contentType === "product_purchase" &&
-      field === "initial_selection" &&
-      value.length > 0
-    ) {
-      let dataContentType = {
-        ...state.messagesList[msgIndex].message_content[indexContent][contentType],
-      };
-      
-      const { arrayCode, arrayName, arrayPrice, arrayOrderQuantity } = getProductDetailsForProductPurchase(dataContentType, value);
-
-      newState.variables.push(
-        {
-          variable_name: "product_code",
-          default_value: arrayCode.join(","),
-        },
-        {
-          variable_name: "product_name",
-          default_value: arrayName.join(","),
-        },
-        {
-          variable_name: "product_unit_price",
-          default_value: arrayPrice.join(","),
-        },
-        {
-          variable_name: "order_quantity",
-          default_value: arrayOrderQuantity.join(","),
-        }
-      );
-      newState.objParam = {
-        ...newState.objParam,
-        product_code: arrayCode.join(","),
-        product_name: arrayName.join(","),
-        product_unit_price: arrayPrice.join(","),
-        order_quantity: arrayOrderQuantity.join(","),
-      };
-    } else if (
-      contentType === "product_purchase_radio_button" &&
-      field === "initial_selection"
-    ) {
-      let dataContentType = {
-        ...state.messagesList[msgIndex].message_content[indexContent][
-        contentType
-        ],
-      };
-
-      const { valueCode, valueName, valuePrice } = getProductDetailsForProductPurchaseRadioButton(dataContentType, value);
-
-      newState.variables.push(
-        {
-          variable_name: "product_code",
-          default_value: valueCode,
-        },
-        {
-          variable_name: "product_name",
-          default_value: valueName,
-        },
-        {
-          variable_name: "product_unit_price",
-          default_value: valuePrice,
-        }
-      );
-      newState.objParam = {
-        ...newState.objParam,
-        product_code: valueCode,
-        product_name: valueName,
-        product_unit_price: valuePrice,
-      }
-    }
-
-    if (
-      state.messagesList[msgIndex].message_content[indexContent][contentType].is_save_input_content
-    ) {
-      let isSaveParam = false;
-      newState.variables = state.variables.map((item) => {
-        let dataContentType = {
-          ...state.messagesList[msgIndex].message_content[indexContent][contentType],
-        };
-      
-        if (state.messagesList[msgIndex].message_content[indexContent][contentType].save_input_content === item.variable_name) {
-          isSaveParam = true;
-
-          // TODO: need refactor (card_payment_radio_button use only)
-          // Reason: Contents render inside of each types of radio button will change saveParams like "is_display_card_payment"
-          if (contentType === 'card_payment_radio_button') {
-            const allowFields = ['initial_selection', 'initial_selection_picture'];
-            isSaveParam = allowFields.includes(field);
-
-            if (isSaveParam) {
-              setDefaultValue(item, dataContentType, contentType, value, field);
-            }
-          } else {
-            setDefaultValue(item, dataContentType, contentType, value, field);
-          }
-        }
-      
-        return item;
-      });
-      
-      if (isSaveParam) {
-        newState.objParam[state.messagesList[msgIndex].message_content[indexContent][contentType].save_input_content] = value;
-      }
-    }
-
-    newState.messagesList = state.messagesList;
-    newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
-    newState.renderMessagesList = newState.renderMessagesList.map((msg) => {
-      return isDelayBotMessage(msg) ? {...msg, hidden: true} : msg;
-    });
-    setStateToSessionStorage(newState);
+    savedChatbotState(state);
 
     dispatch({
-      type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-      payload: newState
+      type: PREVIEW_ACTIONS.UPDATE_AFTER_CHANGE_VALUE,
+      payload: {
+        contentIndex,
+        contentType,
+        value,
+        field,
+        subField1,
+        subField2,
+        message
+      }
     });
   };
 
-  const handleOpenWithDrawal = () => {
-    if (state.activePopupCloseBot) {
-      setShowPopupCloseBot(true)
-      return
-    }
-    if (state.botInfor && state.botInfor.withdrawal_prevention_status === "invalid") {
-      sessionStorage.removeItem("cart")
-      setScenarioUserResponses([])
-      dispatch({
-        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-        payload: { currentUserMsgIndex: 0 }
-      });
-      let indexTiming = 0;
-      let i;
-      for (i = state.currentMsgIndex; i < state.messagesList.length; i++) {
-        if (
-          state.messagesList[i].belong_to === "user" ||
-          i === state.messagesList.length - 1
-        )
-          break;
-        if (
-          state.messagesList[i].belong_to === "bot" &&
-          state.messagesList[i].message_content[0].type === "delay"
-        ) {
-          indexTiming += state.messagesList[i].message_content[0].delay.content;
-        }
-      }
-      if (!isFromScenario) dispatch({ type: PREVIEW_ACTIONS.SET_IS_OPEN, payload: { scenarioId: null } });
-      setTimeout(() => {
-        dispatch({ type: PREVIEW_ACTIONS.SET_IS_OPEN, payload: { renderMessagesList: [] } });
-        if (!isFromScenario)
-          dispatch({ type: PREVIEW_ACTIONS.SET_IS_OPEN, payload: { scenarioId: params.get("scenario_id") } });
-        if (document.getElementById("action-bd")) {
-          document.getElementById("action-bd").click();
-        } else {
-          onOpenPreview(false);
-        }
-        let withdrawal = {
-          scenario_data: `${state.deviceReceive}_close_chatbot_window`,
-        };
-        api.patch(`/api/v1/analytics/scenario_counts/${state.scenarioId}`, withdrawal).then(() => {
-        }).catch(err => {
-          console.log(err)
-        })
-      }, (indexTiming + i - state.currentMsgIndex - 1) * 1000);
-    } else if (
-      state.botInfor?.withdrawal_prevention_status === "standard_exit_popup" ||
-      state.botInfor?.withdrawal_prevention_status === "image_popup"
-    ) {
-      changeElementAttributeById([
-        { id: "sp-withdrawal-container", style: { display: "block" }},
-        { id: "sp-withdrawal-content", style: { display: "block" }}
-      ]);
-    }
-  };
-
-  const isPopUpZipCode = (isOpen, indexContent) => {
+  const onOpenZipCodePopup = (isOpen, contentIndex, messageIndex) => {
     let newState = {};
 
-    if (indexContent !== undefined) {
-      newState.zipcodeContentIndex = indexContent;
+    if (contentIndex !== undefined) {
+      newState.zipcodeContentIndex = contentIndex;
+    }
+    if (messageIndex !== undefined) {
+      newState.zipcodeIndex = messageIndex;
     }
 
     if (isOpen) {
@@ -4018,7 +824,7 @@ const PreviewFukushashiki = () => {
       ]);
 
       newState = {
-        ...state,
+        ...newState,
         prefectures: null,
         cities: null,
         towns: null,
@@ -4037,56 +843,32 @@ const PreviewFukushashiki = () => {
     ]);
   };
 
-  const isPopUpZipCodeShippingAddress = (isOpen, indexContent) => {
-    // TODO: Check to remove
-    // if (isOpen === true) {
-    //   setPrefectures(null);
-    //   setCities(null);
-    //   setTowns(null);
-    //   setZipcode(null);
-    //   document.getElementById("sp-withdrawal-container").style.display =
-    //     "block";
-    //   document.getElementById("sp-popup-zip-code-address2").style.display =
-    //     "block";
-    // } else {
-    //   document.getElementById("sp-withdrawal-container").style.display = "none";
-    //   document.getElementById("sp-popup-zip-code-address2").style.display =
-    //     "none";
-    // }
-    // if (indexContent !== undefined) {
-    //   setContentZipcode(indexContent);
-    // }
-  };
-
   const onChangeErrors = (field, value) => {
     let newErrors = { ...state.errors };
     newErrors[field] = value;
-    dispatch({
-      type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-      payload: {
-        errors: newErrors,
-      }
-    });
+    dispatch({ type: PREVIEW_ACTIONS.SET_ERRORS, payload: { newErrors } });
   };
 
-  const renderBotMessageContent = (message, indexMessage) => {
+  const renderBotMessageContent = (message, messageIndex) => {
     if (!message || message.belong_to !== "bot" || !Array.isArray(message?.message_content)) return null;
 
-    return message.message_content.map((content, index) => (
+    return message.message_content.map((content, contentIndex) => (
       <BotMessage
-        key={indexMessage}
+        messageId={message.id}
+        key={`${messageIndex}-${contentIndex}`}
         content={content}
-        index={index}
+        contentIndex={contentIndex}
         botInfor={state.botInfor}
-        checkoutUrl={state.checkoutUrl}
         previewOrderContent={state.previewOrderContent}
-        postMessageForExecuteJs={postMessageForExecuteJs}
+        executeLpJsCode={(jsCode) => executeLpJsCode(jsCode, state)}
+        variables={state.variables}
+        onRenderCompleted={renderNextMessage}
       />
     ));
   };
 
-  const renderNextButton = (message, indexMessage) => {
-    const isUpdate = indexMessage >= state.renderMessagesList.length - 1;
+  const renderNextButton = (message, messageIndex) => {
+    const isUpdate = messageIndex >= state.renderMessagesList.length - 1;
     const firstMsgContent = message?.message_content?.[0];
     const isDisplayBtnNext = firstMsgContent?.type != "image" || firstMsgContent?.image?.displayButtonNext != false;
     const isAutoClick = !isDisplayBtnNext && isUpdate;
@@ -4104,11 +886,10 @@ const PreviewFukushashiki = () => {
           disabled={state.submitErrorMessage.length > 0 ? false : message.disabled}
           style={{
             backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
-            borderRadius: "25px",
           }}
           className="ss-user-message__action-btn"
           onClick={() => {
-            onClickNext(indexMessage, message)
+            onClickNext(messageIndex, message)
           }}
           autoClick={isAutoClick && !state.isExtractFromSession}
           messsagetype={message.message_content[0]?.type}
@@ -4119,67 +900,48 @@ const PreviewFukushashiki = () => {
     );
   };
 
-  const renderUserMessageContent = (message, indexMessage) => {
+  const renderUserMessageContent = (message, messageIndex) => {
     if (!message || message.belong_to !== "user") return null;
     if (!Array.isArray(message?.message_content) || message.message_content.length === 0) return null;
 
     return (
-      <div className="sp-body-user-side slideLeft">
+      <div className="sp-body-user-side slideLeft" id={getElementMessageById(message.id)}>
         <div className="sp-body-user-side-messages">
           <UserMessage
-            postMessageToParent={postMessageToParent}
+            postMessageToParent={(options) => postMessageToParent(options, state)}
+            message={message}
             captcha={state.captcha}
             messageContentProps={message.message_content}
             disabled={(state.submitErrorMessage.length > 0 && state.submitErrorMessage !== GETTING_ERROR_NOTIFICATION) ? false : message.disabled}
             onChangeValue={(
-              indexContent,
+              contentIndex,
               contentType,
               value,
               field,
-              subFiled,
-              name
+              subField1,
+              subField2
             ) =>
               onChangeValue(
-                indexContent,
+                contentIndex,
                 contentType,
                 value,
                 field,
-                subFiled,
-                name,
+                subField1,
+                subField2,
                 message
               )
             }
             currentMsgIndex={state.currentMsgIndex}
             onClickNext={() => {
-              onClickNext(indexMessage, message)}
+              onClickNext(messageIndex, message)}
             }
-            indexMessage={indexMessage}
+            onRenderCompleted={renderNextMessage}
+            messageIndex={messageIndex}
             errorsProps={state.errors}
-            displayButtonNext={(value) => {
-              // dispatch({
-              //   type: PREVIEW_ACTIONS.UPDATE_DISPLAY_BUTTON_NEXT,
-              //   payload: {
-              //     nextButtonStatus: value,
-              //     msgIndex: indexMessage
-              //   }
-              // });
-              // // if (!state.messagesList[state.currentMsgIndex]) return;
-              // // let newMessagesList = [...state.messagesList];
-              // // newMessagesList[state.currentMsgIndex].is_display_button_next = value;
-              // // dispatch({
-              // //   type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-              // //   payload: {
-              // //     messagesList: [...newMessagesList],
-              // //   }
-              // // });
-            }}
             prefecturesList={[...state.prefecturesList]}
-            isPopUpZipCode={(isOpen, indexContent) =>
-              isPopUpZipCode(isOpen, indexContent)
-            }
-            isPopUpZipCodeShippingAddress={(isOpen, indexContent) =>
-              isPopUpZipCodeShippingAddress(isOpen, indexContent)
-            }
+            onOpen={(isOpen, contentIndex) => {
+              onOpenZipCodePopup(isOpen, contentIndex, Math.min(state.currentMsgIndex, messageIndex));
+            }}
             onChangeErrors={(field, value) =>
               onChangeErrors(field, value)
             }
@@ -4189,67 +951,61 @@ const PreviewFukushashiki = () => {
             botId={state.botId}
             isProcessing={!!state.isProcessing}
           />
-          {renderNextButton(message, indexMessage)}
+          {renderNextButton(message, messageIndex)}
         </div>
       </div>
     );
   };
 
   const renderMessages = () => {
-    return state.renderMessagesList.map((message, indexMessage) => {
+    return (state.renderMessagesList || []).map((message, messageIndex) => {
       if (message.hidden && !stringNullOrEmpty(message.hidden)) return null;
       return (
-        <React.Fragment key={indexMessage}>
-          {renderBotMessageContent(message, indexMessage)}
-          {renderUserMessageContent(message, indexMessage)}
+        <React.Fragment key={messageIndex}>
+          {renderBotMessageContent(message, messageIndex)}
+          {renderUserMessageContent(message, messageIndex)}
         </React.Fragment>
       );
     })
   };
 
-  const renderErrorMessages = () => {
+  const renderSubmitErrorMessages = () => {
     if (!state.isUsedErrMsgByJs || !state.submitErrorMessage) return null;
 
-    let backgroundColor = "#ffebee";
-    let color = "#d32f2f";
-    let text = state.submitErrorMessage;
-    let borderColor = "#f44336";
-    if (state.submitErrorMessage === GETTING_ERROR_NOTIFICATION) {
-      backgroundColor = "#0000FF";
-      color = "#FFFFFF";
-      text = "処理中...";
-      borderColor = "#8bc34a";
-    }
+    const className = state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "ss-bot-getting-error-notification" : "ss-bot-submit-error-message";
+    const text = state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "処理中..." : state.submitErrorMessage;
     return (
       <div className="ss-user-setting__item-text_input-top">
-        <div
-          style={{
-            border: `1px solid ${borderColor}`,
-            backgroundColor: backgroundColor,
-            color: color,
-          }}
-          id="error-message"
+        <div id="error-message"
+          className={`error-message-modal ${className}`}
           dangerouslySetInnerHTML={{ __html: text }}
         />
       </div>
     );   
   }
 
+  const getBotHeaderIcon = () => {
+    if (state.isOpen) {
+      return state.botInfor?.opening_bot_icon?.url || state.botInfor?.icon?.url;
+    }
+    return state.botInfor?.closing_bot_icon?.url || state.botInfor?.icon?.url;
+  }
+
   const getOpeningBotStyle = () => {
     let containerStyle = {
       position: 'fixed',
       bottom: "0px",
-      right: mobileCheck() ? state.isOpen ? 0 : `${state.rightMarginSp}px` : `${state.rightMarginPc}px`,
-      width: mobileCheck() ? `${state.widthSp}%` : `${state.widthPc}px`,
-      height: mobileCheck() ? `${state.heightSp}%` : `${state.heightPc}px`,
+      right: isMobile() ? state.isOpen ? 0 : `${state.rightMarginSp}px` : `${state.rightMarginPc}px`,
+      width: isMobile() ? `${state.widthSp}%` : `${state.widthPc}px`,
+      height: isMobile() ? `${state.heightSp}%` : `${state.heightPc}px`,
       zIndex: 999,
       display: "flex",
       flexDirection: "column",
       backgroundColor: "white"
     };
     let headerStyle = {
-      borderTopLeftRadius: mobileCheck() ? "0px" : "5px",
-      borderTopRightRadius: mobileCheck() ? "0px" : "5px",
+      borderTopLeftRadius: isMobile() ? "0px" : "5px",
+      borderTopRightRadius: isMobile() ? "0px" : "5px",
     };
     let bodyStyle = {
       backgroundColor: state.botInfor?.opacity_color,
@@ -4261,7 +1017,7 @@ const PreviewFukushashiki = () => {
     }
 
     if (!state.activePopupCloseBot) {
-      containerStyle.height = mobileCheck() ? `${state.heightSp || 100}%` : `${state.heightPc || 600}px`;
+      containerStyle.height = isMobile() ? `${state.heightSp || 100}%` : `${state.heightPc || 600}px`;
       headerStyle = {
         ...headerStyle,
         position: "static",
@@ -4278,102 +1034,20 @@ const PreviewFukushashiki = () => {
     };
   };
 
-  useEffect(() => {
-    if (state.conversionStatus === null && !!state.uuid && !!state.scenarioId && state.isOpen) {
-      createStatusConversion({
-        scenario_id: state.scenarioId, 
-        user_input_id: state.uuid, 
-        status: CONVERSTION_RESPONSE_STATUS.UN_FINISH,
-      })
-      .then((res) => {
-        const status = res?.data?.data?.status;
-
-        if (status) {
-          dispatch({ 
-            type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, 
-            payload: { conversionStatus: status },
-          });
-        }
-      });
-    }
-  }, [state.uuid, state.scenarioId, state.conversionStatus, state.isOpen])
-
-  useEffect(() => {
-    if (!state.stopRender || state.isDelaying || !state.useNewProcess) return;
-    
-    const renderContinueMessages = async () => {
-      const { isActive, index, finalIndex, timeout } = state.stopRender;
-
-      if (isActive) {
-        if (!state.previewOrderContent) {
-          timeoutConfrmMsgRef.current = setTimeout(async () => {
-            renderMessageInRange(index, finalIndex, state, { lastConfirmMessageIdx: index }).then(() => {
-              dispatch({
-                type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-                payload: {
-                  stopRender: {
-                    ...state.stopRender,
-                    isActive: false,
-                  },
-                },
-              });
-            });
-          }, timeout * 1000);
-
-          return;
-        }
-
-        clearTimeout(timeoutConfrmMsgRef.current);
-
-        renderMessageInRange(index, finalIndex, state, { lastConfirmMessageIdx: index });
-        dispatch({
-          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-          payload: {
-            stopRender: {
-              ...state.stopRender,
-              isActive: false,
-            },
-          },
-        });
-
-        return;
-      }
-
-      clearTimeout(timeoutConfrmMsgRef.current);
-
-      renderMessageInRange(index, finalIndex, state, { lastConfirmMessageIdx: index });
-    } 
-
-    renderContinueMessages();
-
-    return () => clearTimeout(timeoutConfrmMsgRef.current);
-  }, [
-    state.stopRender, 
-    state.previewOrderContent, 
-    state.isDelaying,
-    state.useNewProcess,
-  ]);
-
-  ///body container
+  // body container
   if (state.scenarioId && state.botInfor && state.isOpen) {
     const { containerStyle, headerStyle, bodyStyle } = getOpeningBotStyle();
     return (
       <div
         ref={containerRef}
         id="sp-container1"
-        className={`sp-container1 ${mobileCheck() ? 'slideUpSp' : 'slideUp'}`}
+        className={`sp-container1 ${isMobile() ? 'slideUpSp' : 'slideUp'}`}
         style={containerStyle}
       >
-        <Withdrawal
-          botInfor={state.botInfor}
-          deviceReceive={state.deviceReceive}
-          scenarioId={state.scenarioId}
-          onOpenPreview={onOpenPreview}
-        />
         <ZipCodePopUp
-          isPopUpZipCode={isPopUpZipCode}
+          onOpen={onOpenZipCodePopup}
           prefecturesList={state.prefecturesList}
-          message={state.messagesList[state.currentMsgIndex]}
+          message={state.messagesList[state.zipcodeIndex]}
           messageIndex={state.currentMsgIndex}
           zipcodeContentIndex={state.zipcodeContentIndex}
           onChangeValue={onChangeValue}
@@ -4381,18 +1055,10 @@ const PreviewFukushashiki = () => {
           errors={state.errors}
         />
         {/* popup for shipping address can be used instead of ZipCodePopUp -> remove */}
-        <div
-          id="sp-header"
-          style={headerStyle}
-          className="sp-header"
-        >
-          <div className="sp-header-left" onClick={handleCloseChatbotWhenUseWithDrawal}>
-            <div className="sp-header-left-avatar sp-avatar">
-              <img
-                src={
-                  state.botInfor?.icon?.url && EC_CHATBOT_URL + "" + state.botInfor?.icon?.url
-                }
-              />
+        <div id="sp-header" style={headerStyle} className="sp-header">
+          <div className="sp-header-left" onClick={onChatbotHeaderClick}>
+            <div className="sp-body-bot-side-avatar sp-avatar-bt">
+              <img src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`} alt="bot-header-icon"/>
             </div>
             <div className="sp-header-left-label">
               <div className="sp-header-left-label-sub-title">
@@ -4401,12 +1067,7 @@ const PreviewFukushashiki = () => {
               <div className="sp-header-left-label-title">{state.botInfor?.titleBubble}</div>
             </div>
           </div>
-          <div
-            className="sp-header-right"
-            onClick={() => {
-              state.isOpen ? handleOpenWithDrawal() : onOpenPreview(true);
-            }}
-          >
+          <div className="sp-header-right" onClick={onChatbotHeaderClick}>
             <div className="sp-header-right-arrow">
               {state.isOpen ? (
                 <MDBIcon fas icon="chevron-circle-down" />
@@ -4416,36 +1077,12 @@ const PreviewFukushashiki = () => {
             </div>
           </div>
         </div>
-        {state.activePopupCloseBot ?
-          <ModalPreviewBot
-            isMobile={mobileCheck()}
-            styleBot={getBotModalStyle()}
-            open={state.showPopupCloseBot} isAdmin={false} onClose={() => setShowPopupCloseBot(false)}>
-            <Row>
-              <Col md="12">
-                <span className="title-bot-modal">本当に閉じますか？</span>
-              </Col>
-            </Row>
-
-            <Row className="justify-content-around">
-              <Col md="6">
-                <Button
-                  className="btn-cancel__modal-bot"
-                  onClick={() => setShowPopupCloseBot(false)}
-                >
-                  チャットに戻る
-                </Button>
-              </Col>
-              <Col md="6">
-                <Button className="btn-close__modal-bot" onClick={() => handleCloseBot()}
-                >
-                  閉じる
-                </Button>
-              </Col>
-            </Row>
-          </ModalPreviewBot>
-          : ""}
-        
+        <PreventExitChatbotModal
+          botConfig={state}
+          isOpen={state.showPopupCloseBot}
+          onClose={() => setShowPopupCloseBot(false)}
+          onCloseBot={() => onOpenPreview(false)}
+        />
         {!!state.botInfor?.timer_config?.enable
           && 
           <div className="chatbot_timer_holder" style={{
@@ -4465,16 +1102,16 @@ const PreviewFukushashiki = () => {
 
         <ProcessBar botInfor={state.botInfor}
           currentIndex={state.passedUserMsgCount}
-          maxIndex={state.userMessagesList.length}
+          maxIndex={userMessagesList.length}
         />
         <div id="sp-body" className="sp-body" style={bodyStyle}
         >
           {renderMessages()}
-          {renderErrorMessages()}
+          {renderSubmitErrorMessages()}
         </div>
       </div>
     )
-  } else if (!state.isOpen && mobileCheck() === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 2) {
+  } else if (!state.isOpen && isMobile() === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 2) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -4493,13 +1130,12 @@ const PreviewFukushashiki = () => {
       >
         <img
           style={{ width: "96%", height: "96%", borderRadius: "30px" }}
-          src={
-            state.botInfor?.icon?.url && EC_CHATBOT_URL + "" + state.botInfor?.icon?.url
-          }
+          src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
+          alt="bot-header-icon"
         />
       </div>
     )
-  } else if (!state.isOpen && mobileCheck() === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 1) {
+  } else if (!state.isOpen && isMobile() === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 1) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -4522,11 +1158,7 @@ const PreviewFukushashiki = () => {
       >
         <div className="sp-header-left-bt" onClick={() => onOpenPreview(!state.isOpen)}>
           <div className="sp-header-left-avatar sp-avatar-bt">
-            <img
-              src={
-                state.botInfor?.icon?.url && EC_CHATBOT_URL + "" + state.botInfor?.icon?.url
-              }
-            />
+            <img src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`} alt="bot-header-icon" />
           </div>
         </div>
         <div style={{ alignItems: 'center', justifyContent: "center", padding: 'auto' }}>
@@ -4539,7 +1171,7 @@ const PreviewFukushashiki = () => {
         </div>
       </div>
     )
-  } else if (!state.isOpen && mobileCheck() === false && Number(state.positionPc) === 2) {
+  } else if (!state.isOpen && isMobile() === false && Number(state.positionPc) === 2) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -4558,18 +1190,14 @@ const PreviewFukushashiki = () => {
       >
         <div className="sp-header-left" onClick={() => onOpenPreview(!state.isOpen)}>
           <div className="sp-header-left-avatar sp-avatar">
-            <img
-              src={
-                state.botInfor?.icon?.url && EC_CHATBOT_URL + "" + state.botInfor?.icon?.url
-              }
-            />PreviewComp
+            <img src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`} alt="bot-header-icon" />
           </div>
           <div className="sp-header-left-label">
             <div className="sp-header-left-label-title">{state.rightPcTitle}</div>
           </div>
         </div>
       </div>)
-  } else if (!state.isOpen && mobileCheck() === true && Number(state.positionSp) === 1 && Number(state.buttonTypeSp) === 2) {
+  } else if (!state.isOpen && isMobile() === true && Number(state.positionSp) === 1 && Number(state.buttonTypeSp) === 2) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -4588,40 +1216,38 @@ const PreviewFukushashiki = () => {
       >
         <img
           style={{ width: "96%", height: "96%", borderRadius: "30px" }}
-          src={
-            state.botInfor?.icon?.url && EC_CHATBOT_URL + "" + state.botInfor?.icon?.url
-          }
+          src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
+          alt="bot-header-icon"
         />
       </div>
     )
-  } else if (!state.isOpen && mobileCheck() === true && Number(state.positionSp) === 1 && Number(state.buttonTypeSp) === 1) {
+  } else if (!state.isOpen && isMobile() === true && Number(state.positionSp) === 1 && Number(state.buttonTypeSp) === 1) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
+        className={state.useFullWidthChatbotMobile ? "fullwidth_mobile_chatbot" : ""}
         style={{
           backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
-          width: 'calc(100vw - 20px)',
-          height: "48px",
-          borderRadius: '35px',
+          width: state.useFullWidthChatbotMobile ? "calc(100vw - 30px)" : "240px",
+          height: state.useFullWidthChatbotMobile ? "75px" : "48px",
+          borderRadius: state.useFullWidthChatbotMobile ? "45px" :'35px',
           display: "flex",
           justifyContent: "left",
           position: 'fixed',
           bottom: state.bottomMarginSp ? `${state.bottomMarginSp}px` : '10px',
-          right: state.rightMarginSp ? `${state.rightMarginSp}px` : '10px'
+          right: (state.useFullWidthChatbotMobile) ? "15px" : (state.rightMarginSp ? `${state.rightMarginSp}px` : '10px')
         }}
       >
-        <div className="sp-header-left" onClick={() => onOpenPreview(!state.isOpen)} style={{ width: '100%', padding: '4px' }}>
-          <div className="sp-header-left-avatar sp-avatar" style={{ width: '38px' }}>
+        <div className="sp-header-left" onClick={() => onOpenPreview(!state.isOpen)} style={{ width: '100%', padding: state.useFullWidthChatbotMobile ? "15px" : '4px' }}>
+          <div className={state.useFullWidthChatbotMobile ? "fullwidth_mobile_chatbot sp-header-left-avatar sp-avatar" :"sp-header-left-avatar sp-avatar"} style={{ width: state.useFullWidthChatbotMobile ? "58px"  :'38px' }}>
             <img
-              src={
-                state.botInfor?.icon?.url && EC_CHATBOT_URL + "" + state.botInfor?.icon?.url
-              }
-              alt="bot-avatar"
+              src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
+              alt="bot-header-icon"
             />
           </div>
           <div>
             <div id="comment_bubble" className="sp-bubble">
-              <span style={{ fontSize: '14px', fontWeight: 700 }}>{state.botInfor.title}</span>
+              <span style={{ fontSize: state.useFullWidthChatbotMobile ? "17px" :'14px', fontWeight: 700 }}>{state.botInfor.title}</span>
             </div>
           </div>
           <div className="sp-header-right-arrow" style={{ marginLeft: 'auto' }}>
@@ -4630,7 +1256,7 @@ const PreviewFukushashiki = () => {
         </div>
       </div>
     )
-  } else if (!state.isOpen && mobileCheck() === true && Number(state.positionSp) === 2) {
+  } else if (!state.isOpen && isMobile() === true && Number(state.positionSp) === 2) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -4650,9 +1276,8 @@ const PreviewFukushashiki = () => {
         <div className="sp-header-left" onClick={() => onOpenPreview(!state.isOpen)}>
           <div className="sp-header-left-avatar sp-avatar">
             <img
-              src={
-                state.botInfor?.icon?.url && EC_CHATBOT_URL + "" + state.botInfor?.icon?.url
-              }
+              src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
+              alt="bot-header-icon"
             />
           </div>
           <div className="sp-header-left-label">

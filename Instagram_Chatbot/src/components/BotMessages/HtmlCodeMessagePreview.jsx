@@ -2,7 +2,7 @@ import React from 'react';
 
 const HtmlCodeMessagePreview = ({
   content,
-  index,
+  contentIndex,
   botInfor
 }) => {
   const defaultHtmlContent = '<p style="color: #999; font-style: italic;">HTMLコードを入力してください</p>';
@@ -16,7 +16,7 @@ const HtmlCodeMessagePreview = ({
   return (
     <div className="position-relative">
       <div
-        className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value position-relative html-code-message-preview ${isUseForUgc ? 'display_ugc' : ""}`}
+        className={`ss-bot-chat-overview-${contentIndex} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value position-relative html-code-message-preview ${isUseForUgc ? 'display_ugc' : ""}`}
         style={{
           backgroundColor: messageColor,
           color: fontColor
