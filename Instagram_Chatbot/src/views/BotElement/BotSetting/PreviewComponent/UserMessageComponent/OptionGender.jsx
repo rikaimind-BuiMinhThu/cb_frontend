@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 const OptionGender = ({
-  indexContent,
+  contentIndex,
   radioButton,
   onChangeValue,
   options,
@@ -22,7 +22,7 @@ const OptionGender = ({
         {options.map((item) => {
           return (
             <OptionGenderItem
-              indexContent={indexContent}
+              contentIndex={contentIndex}
               item={item}
               onChangeValue={onChangeValue}
               isSelected={radioButton.initial_selection === item.value}
@@ -35,7 +35,7 @@ const OptionGender = ({
   );
 }
 
-function OptionGenderItem({ indexContent, item, onChangeValue, isSelected }) {
+function OptionGenderItem({ contentIndex, item, onChangeValue, isSelected }) {
   const [isHovered, setIsHovered] = useState(false);
 
   const handleMouseEnter = () => {
@@ -103,7 +103,7 @@ function OptionGenderItem({ indexContent, item, onChangeValue, isSelected }) {
       onMouseLeave={handleMouseLeave}
       onClick={() => {
         onChangeValue(
-          indexContent,
+          contentIndex,
           "radio_button",
           item.value,
           "initial_selection"
