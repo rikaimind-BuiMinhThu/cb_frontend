@@ -302,11 +302,17 @@ const PreviewFukushashikiReducer = (state, action) => {
         newState.messagesList.forEach((x) => x.hidden = x.not_display_when_logged_in);
       }
 
-      newState.nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg()) + 1;
-      if (newState.nextStopMsgIndex < newState.currentMsgIndex) {
-        newState.nextStopMsgIndex = newState.currentMsgIndex + 1;
+      if (state.isOpen) {
+        newState.nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg()) + 1;
+        if (newState.nextStopMsgIndex < newState.currentMsgIndex) {
+          newState.nextStopMsgIndex = newState.currentMsgIndex + 1;
+        }
+        newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+      } else {
+        newState.currentMsgIndex = -1;
+        newState.nextStopMsgIndex = -1;
+        newState.renderMessagesList = [];
       }
-      newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
 
       return { ...state, ...newState };
     }
@@ -333,8 +339,20 @@ const PreviewFukushashikiReducer = (state, action) => {
 
       return { ...state, ...newState };
     }
-    case PREVIEW_ACTIONS.OPEN_CHATBOT:
+    case PREVIEW_ACTIONS.OPEN_CHATBOT: {
+      if (state.currentMsgIndex === -1) {
+        // First time open chatbot
+        let newState = {
+          messagesList: _.cloneDeep(state.messagesList),
+        };
+        newState.currentMsgIndex = 0;
+        newState.nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg()) + 1;
+        newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+        return { ...state, isOpen: true, showPopupCloseBot: false, isAlreadyOpenFirstTime: true, ...newState };
+      }
+
       return { ...state, isOpen: true, showPopupCloseBot: false, isAlreadyOpenFirstTime: true };
+    }
     case PREVIEW_ACTIONS.CLOSE_CHATBOT:
       return { ...state, isOpen: false, showPopupCloseBot: true };
     case PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL:

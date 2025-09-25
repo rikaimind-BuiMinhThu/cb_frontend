@@ -829,7 +829,7 @@ slideUp
     }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 981px) {
     .sp-container {
       position: fixed;
       bottom: 0;
@@ -938,6 +938,9 @@ slideUp
         height: 40px;
         object-fit: cover;
         display: block;
+    }
+    .sp-avatar-bt {
+        width: 65px;
     }
     .sp-avatar-bt img {
         border-radius: 50%;
