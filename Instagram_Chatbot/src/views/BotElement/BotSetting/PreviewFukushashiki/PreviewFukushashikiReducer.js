@@ -48,20 +48,23 @@ const PreviewFukushashikiReducer = (state, action) => {
     case PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE: {
       let messagesList = _.cloneDeep(state.messagesList);
 
+      const conditionParams = buildConditionParams(state); // Build with state objParams
       if (action.payload === GETTING_ERROR_NOTIFICATION || stringNullOrEmpty(action.payload)) {
-        return {
-          ...state,
-          submitErrorMessage: action.payload,
-          isProcessing: false,
-        };
-      }
-
-      messagesList = messagesList.map((message) => {
-        if (!message.hidden) {
-          message.hidden = message.not_display_when_have_error;
+        
+        messagesList = messagesList.map((message) => {
+          if (message.not_display_when_have_error) {
+            message.hidden = !checkMessageCondition(message, conditionParams);
+          }
+          return message;
+        });
+      } else {
+        messagesList = messagesList.map((message) => {
+        if (message.not_display_when_have_error) {
+          message.hidden = !checkMessageCondition(message, conditionParams);
         }
-        return message;
-      });
+          return message;
+        });
+      }
 
       const renderMessagesList = messagesList.slice(0, state.currentMsgIndex + 1)
       return { ...state,
