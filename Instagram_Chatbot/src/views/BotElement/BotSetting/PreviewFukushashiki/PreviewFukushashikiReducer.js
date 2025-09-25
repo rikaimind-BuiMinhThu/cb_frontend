@@ -63,7 +63,7 @@ const PreviewFukushashikiReducer = (state, action) => {
         return message;
       });
 
-      const renderMessagesList = messagesList.slice(0, state.currentMsgIndex + 1)
+      const renderMessagesList = messagesList.slice(0, state.currentMsgIndex + 1);
       return { ...state,
         messagesList: messagesList,
         renderMessagesList: renderMessagesList,
@@ -148,7 +148,13 @@ const PreviewFukushashikiReducer = (state, action) => {
         if (!isUpdateClicked) {
           newState.nextStopMsgIndex = nextStopMsgIndex;
         }
-        newState.currentMsgIndex = newState.nextStopMsgIndex - 1;
+        if (newState.nextStopMsgIndex <= 0) {
+          // If click to last message -> render message from 1 to last message
+          // currentMsgIndex is not changed
+          newState.nextStopMsgIndex = newState.messagesList.length;
+        } else {
+          newState.currentMsgIndex = newState.nextStopMsgIndex - 1;
+        }
       } else {
         // NEXT mode: render messages one by one
         newState.currentMsgIndex = clickedMsgIndex + 1; 
