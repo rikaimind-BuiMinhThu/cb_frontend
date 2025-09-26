@@ -36,14 +36,17 @@ const fukushashikiToLP = (fukushashikiData, state) => {
 const fukushashikiSavedStateToLp = (savedState, params, state) => {
   return new Promise((resolve) => {
     let fukuDataList = [];
+
     const userMessagesList = savedState.messagesList.filter(isUserMessage);
     userMessagesList.forEach((message) => {
       // Except some data when fukushashiki torizen san
       if (params.get('is_using_amazon_pay') && isTorizenLpAmazonData(message)) return;
 
-      fukuDataList = convertToFukushashikiObject({message: message}, fukuDataList);
+      const fukuData = convertToFukushashikiObject({message: message});
+      fukuDataList.push(...fukuData);
     });
-    fukushashikiToLP(fukuDataList, state);
+
+    fukushashikiToLP(fukuDataList, savedState);
     resolve();
   });
 };

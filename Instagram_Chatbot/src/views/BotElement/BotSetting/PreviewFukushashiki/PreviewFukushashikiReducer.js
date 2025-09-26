@@ -48,22 +48,25 @@ const PreviewFukushashikiReducer = (state, action) => {
     case PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE: {
       let messagesList = _.cloneDeep(state.messagesList);
 
+      const conditionParams = buildConditionParams(state); // Build with state objParams
       if (action.payload === GETTING_ERROR_NOTIFICATION || stringNullOrEmpty(action.payload)) {
-        return {
-          ...state,
-          submitErrorMessage: action.payload,
-          isProcessing: false,
-        };
+        
+        messagesList = messagesList.map((message) => {
+          if (message.not_display_when_have_error) {
+            message.hidden = !checkMessageCondition(message, conditionParams);
+          }
+          return message;
+        });
+      } else {
+        messagesList = messagesList.map((message) => {
+        if (message.not_display_when_have_error) {
+          message.hidden = !checkMessageCondition(message, conditionParams);
+        }
+          return message;
+        });
       }
 
-      messagesList = messagesList.map((message) => {
-        if (!message.hidden) {
-          message.hidden = message.not_display_when_have_error;
-        }
-        return message;
-      });
-
-      const renderMessagesList = messagesList.slice(0, state.currentMsgIndex + 1)
+      const renderMessagesList = messagesList.slice(0, state.currentMsgIndex + 1);
       return { ...state,
         messagesList: messagesList,
         renderMessagesList: renderMessagesList,
@@ -148,7 +151,13 @@ const PreviewFukushashikiReducer = (state, action) => {
         if (!isUpdateClicked) {
           newState.nextStopMsgIndex = nextStopMsgIndex;
         }
-        newState.currentMsgIndex = newState.nextStopMsgIndex - 1;
+        if (newState.nextStopMsgIndex <= 0) {
+          // If click to last message -> render message from 1 to last message
+          // currentMsgIndex is not changed
+          newState.nextStopMsgIndex = newState.messagesList.length;
+        } else {
+          newState.currentMsgIndex = newState.nextStopMsgIndex - 1;
+        }
       } else {
         // NEXT mode: render messages one by one
         newState.currentMsgIndex = clickedMsgIndex + 1; 
@@ -302,11 +311,17 @@ const PreviewFukushashikiReducer = (state, action) => {
         newState.messagesList.forEach((x) => x.hidden = x.not_display_when_logged_in);
       }
 
-      newState.nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg()) + 1;
-      if (newState.nextStopMsgIndex < newState.currentMsgIndex) {
-        newState.nextStopMsgIndex = newState.currentMsgIndex + 1;
+      if (state.isOpen) {
+        newState.nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg()) + 1;
+        if (newState.nextStopMsgIndex < newState.currentMsgIndex) {
+          newState.nextStopMsgIndex = newState.currentMsgIndex + 1;
+        }
+        newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+      } else {
+        newState.currentMsgIndex = -1;
+        newState.nextStopMsgIndex = -1;
+        newState.renderMessagesList = [];
       }
-      newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
 
       return { ...state, ...newState };
     }
@@ -333,8 +348,20 @@ const PreviewFukushashikiReducer = (state, action) => {
 
       return { ...state, ...newState };
     }
-    case PREVIEW_ACTIONS.OPEN_CHATBOT:
+    case PREVIEW_ACTIONS.OPEN_CHATBOT: {
+      if (state.currentMsgIndex === -1) {
+        // First time open chatbot
+        let newState = {
+          messagesList: _.cloneDeep(state.messagesList),
+        };
+        newState.currentMsgIndex = 0;
+        newState.nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg()) + 1;
+        newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+        return { ...state, isOpen: true, showPopupCloseBot: false, isAlreadyOpenFirstTime: true, ...newState };
+      }
+
       return { ...state, isOpen: true, showPopupCloseBot: false, isAlreadyOpenFirstTime: true };
+    }
     case PREVIEW_ACTIONS.CLOSE_CHATBOT:
       return { ...state, isOpen: false, showPopupCloseBot: true };
     case PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL:
