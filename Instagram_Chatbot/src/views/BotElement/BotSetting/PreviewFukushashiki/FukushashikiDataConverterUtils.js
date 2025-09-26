@@ -57,137 +57,103 @@ const convertTextInputTextObject = (content) => {
   return result;
 }
 
+const convertTextInputPhoneNumberObject = (content) => {
+  const { value, withHyphen } = content.text_input.phone_number;
+
+  if (withHyphen === false) {
+    return [{
+      type: content.type,
+      bindingMode: content.fukushashiki_search_mode,
+      bindingAddress: content.fukushashiki_search_value,
+      bindingValue: value,
+    }];
+  }
+
+  const dataInforFukushashiki = Object.fromEntries(
+    Object.entries(content).filter(([key]) => key.includes("fukushashiki"))
+  );
+
+  const types = ["value1", "value2", "value3"];
+  const result = types
+    .map(type => ({
+      type: content.type,
+      bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
+      bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
+      bindingValue: content.text_input.phone_number[`${type}`] || ""
+    }));
+
+  return result;
+}
+
+const convertTextInputValueObject = (content) => {
+  const type = content.text_input.type;
+  const htmlAddresses = content.fukushashiki_search_value?.split(',') || [content.fukushashiki_search_value];
+  let result = [];
+
+  htmlAddresses.forEach(htmlAddress => {
+    const fukuData = {
+      type: content.type,
+      bindingMode: content.fukushashiki_search_mode,
+      bindingAddress: htmlAddress?.trim() || "",
+      bindingValue: content.text_input[type]?.value || "",
+    };
+    result.push(fukuData);
+  });
+
+  return result;
+}
+
+const convertTextInputConfirmationObject = (content) => {
+  const type = content.text_input.type;
+
+  return [
+    {
+      type: content.type,
+      bindingMode: content.value_fukushashiki_search_mode,
+      bindingAddress: content.value_fukushashiki_search_value,
+      bindingValue: content.text_input[type]?.value || "",
+    },
+    {
+      type: content.type,
+      bindingMode: content.valueConfirm_fukushashiki_search_mode,
+      bindingAddress: content.valueConfirm_fukushashiki_search_value,
+      bindingValue: content.text_input[type]?.valueConfirm || "",
+    },
+  ];
+}
 
 // Helper functions for each message type
 const convertTextInputObject = (content) => {
   // convert for text_input text type
   const result = [];
-  result.push(...convertTextInputTextObject(content));
-  // Handle URLs
-  if (Object.keys(content.text_input.urls).length != 0 && content.text_input.urls.value != undefined) {
-    const fukuObject = {
-      type: content.type,
-      bindingMode: content.fukushashiki_search_mode,
-      bindingAddress: content.fukushashiki_search_value,
-      bindingValue: content.text_input.urls.value,
-    };
-    result.push(fukuObject);
+  let fukuData = [];
+  switch (content.text_input.type) {
+    case 'text':
+      fukuData = convertTextInputTextObject(content);
+      break;
+    case 'phone_number':
+      fukuData = convertTextInputPhoneNumberObject(content);
+      break;
+    case 'email_address':
+    case 'urls':
+    case 'password':
+      fukuData = convertTextInputValueObject(content);
+      break;
+    
+    case 'email_confirmation':
+      fukuData = convertTextInputConfirmationObject(content);
+      break;
+    case 'password_confirmation':
+      fukuData = convertTextInputConfirmationObject(content);
+      break;
+    default:
+      break;
+  }
+  if (fukuData.length > 0) {
+    result.push(fukuData);
   }
 
-  // Handle email confirmation
-  if (Object.keys(content.text_input.email_confirmation).length != 0 && content.text_input.email_confirmation != undefined) {
-    const userInputData = Object.fromEntries(
-      Object.entries(content.text_input.email_confirmation).filter(([key]) => key.includes("value"))
-    );
-    const dataInforFukushashiki = Object.fromEntries(
-      Object.entries(content).filter(([key]) => key.includes("fukushashiki"))
-    );
-    const types = ["value", "valueConfirm"];
-    const result = types
-      .filter(type => `${type}` in userInputData)
-      .map(type => ({
-        type: content.type,
-        bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
-        bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-        bindingValue: userInputData[`${type}`]
-      }));
-    result.push(...result);
-  }
-
-  // Handle phone number
-  if (content.text_input?.phone_number.value != undefined ||
-    content.text_input?.phone_number.value1 != undefined ||
-    content.text_input?.phone_number.value2 != undefined ||
-    content.text_input?.phone_number.value3 != undefined) {
-
-    if (content.text_input.phone_number.withHyphen == false) {
-      const fukuObject = {
-        type: content.type,
-        bindingMode: content.fukushashiki_search_mode,
-        bindingAddress: content.fukushashiki_search_value,
-        bindingValue: content.text_input.phone_number.value,
-      };
-      result.push(fukuObject);
-    }
-    else {
-      const userInputData = Object.fromEntries(
-        Object.entries(content.text_input.phone_number).filter(([key]) => key.includes("value"))
-      );
-      const dataInforFukushashiki = Object.fromEntries(
-        Object.entries(content).filter(([key]) => key.includes("fukushashiki"))
-      );
-      const types = ["value1", "value2", "value3"];
-      const result = types
-        .filter(type => `${type}` in userInputData)
-        .map(type => ({
-          type: content.type,
-          bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
-          bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-          bindingValue: userInputData[`${type}`]
-        }));
-      result.push(...result);
-    }
-  }
-
-  // Handle email address
-  if (Object.keys(content.text_input.email_address).length !== 0 && content.text_input.email_address !== undefined) {
-    const addresses = content.fukushashiki_search_value?.split(',') || [content.fukushashiki_search_value];
-    addresses.forEach(value => {
-      const fukuObject = {
-        type: content.type,
-        bindingMode: content.fukushashiki_search_mode,
-        bindingAddress: value?.trim() || "",
-        bindingValue: content.text_input.email_address.value,
-      };
-      result.push(fukuObject);
-    });
-  }
-
-  // Handle password
-  if (Object.keys(content.text_input.password).length != 0 && content.text_input.password != undefined) {
-    if (content?.fukushashiki_search_value?.includes(',')) {
-      let address = content.fukushashiki_search_value.split(',');
-      address.forEach(value => {
-        const fukuObject = {
-          type: 'password',
-          bindingMode: content.fukushashiki_search_mode,
-          bindingAddress: value,
-          bindingValue: content.text_input.password.value,
-        };
-        result.push(fukuObject);
-      });
-    }
-    else {
-      const fukuObject = {
-        type: 'password',
-        bindingMode: content.fukushashiki_search_mode,
-        bindingAddress: content.fukushashiki_search_value,
-        bindingValue: content.text_input.password.value,
-      };
-      result.push(fukuObject);
-    }
-  }
-
-  // Handle password confirmation
-  if (Object.keys(content.text_input.password_confirmation).length != 0 && content.text_input.password_confirmation != undefined) {
-    const fukuObject1 = {
-      type: 'password_confirmation',
-      bindingMode: content.fukushashiki_search_mode,
-      bindingAddress: content.fukushashiki_search_value,
-      bindingValue: content.text_input.password_confirmation.value,
-    };
-
-    const fukuObject2 = {
-      type: 'password_confirmation',
-      bindingMode: content.fukushashiki_search_mode,
-      bindingAddress: content.fukushashiki_search_value,
-      bindingValue: content.text_input.password_confirmation.valueConfirm,
-    };
-    result.push(fukuObject1);
-    result.push(fukuObject2);
-  }
-
-  return result;
+  return result.flat();
 };
 
 const convertAgreeTermObject = (content) => {

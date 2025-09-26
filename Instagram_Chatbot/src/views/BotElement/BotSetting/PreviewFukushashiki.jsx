@@ -771,7 +771,8 @@ const PreviewFukushashiki = () => {
     // For GINZA AIRA
     if (isDislayingLoginForm(clickedMsg)) return;
 
-    fukushashikiToLP(convertToFukushashikiObject(data, []), state);
+    const fukuData = convertToFukushashikiObject(data);
+    fukushashikiToLP(fukuData, state);
 
     dispatch({
       type: PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON,
