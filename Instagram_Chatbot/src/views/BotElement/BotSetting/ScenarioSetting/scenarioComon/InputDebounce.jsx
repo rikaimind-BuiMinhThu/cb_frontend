@@ -7,7 +7,7 @@ export default function InputDebounce({ value, onChange, debounceTime = 500, onC
 
   const handleChange = (value) => {
     setInputValue(value);
-  };
+      };
 
   const handleChangeEnd = (e) => {
     setIsComposing(false);
@@ -23,7 +23,7 @@ export default function InputDebounce({ value, onChange, debounceTime = 500, onC
   return (
     <InputCustom
       {...props}
-      value={value || inputValue}
+      value={inputValue}
       onChange={handleChange}
       onCompositionStart = {() => setIsComposing(true)}
       onCompositionEnd ={handleChangeEnd}
