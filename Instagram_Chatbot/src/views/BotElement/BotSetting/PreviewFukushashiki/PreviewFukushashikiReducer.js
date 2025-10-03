@@ -60,7 +60,7 @@ const PreviewFukushashikiReducer = (state, action) => {
         const conditionParams = buildConditionParams(state);
 
         messagesList = messagesList.map((message) => {
-          if (!message.hidden) {
+          if (message.hidden && message.not_display_when_have_error) {
             message.hidden = !checkMessageCondition(message, conditionParams);
           }
           return message;
