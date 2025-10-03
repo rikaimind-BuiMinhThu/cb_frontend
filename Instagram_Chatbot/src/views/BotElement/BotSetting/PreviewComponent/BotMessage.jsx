@@ -34,6 +34,12 @@ const BotMessage = ({
     setText(replaceVariables(content[content.type]?.originalContent || "", variables));
   }, [content, content[content.type]?.originalContent, variables]);
 
+  useEffect(()=>{
+    if (content.text_input?.use_for_confirm_message && previewOrderContent) {
+      setText(previewOrderContent);
+    }
+  }, [content, previewOrderContent]);
+
   const isShowAvatar = () => {
     if (!content) return false;
 
@@ -170,7 +176,7 @@ const BotMessage = ({
   }
 
   const renderTextInputContent = () => {
-    return (
+        return (
       <div className="position-relative">
         <div
           className={`ss-bot-chat-overview-${contentIndex} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value ss-bot-chat-text-input position-relative`}
