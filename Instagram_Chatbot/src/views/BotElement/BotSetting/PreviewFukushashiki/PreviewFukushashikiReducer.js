@@ -48,9 +48,28 @@ const PreviewFukushashikiReducer = (state, action) => {
     case PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE: {
       let messagesList = _.cloneDeep(state.messagesList);
 
-      if (action.payload === GETTING_ERROR_NOTIFICATION || stringNullOrEmpty(action.payload)) {
+      if (action.payload === GETTING_ERROR_NOTIFICATION) {
         return {
           ...state,
+          submitErrorMessage: action.payload,
+          isProcessing: false,
+        };
+      }
+
+      if (stringNullOrEmpty(action.payload)) {
+        const conditionParams = buildConditionParams(state);
+
+        messagesList = messagesList.map((message) => {
+          if (!message.hidden) {
+            message.hidden = !checkMessageCondition(message, conditionParams);
+          }
+          return message;
+        });
+
+        return {
+          ...state,
+          messagesList: messagesList,
+          renderMessagesList: messagesList.slice(0, state.currentMsgIndex + 1),
           submitErrorMessage: action.payload,
           isProcessing: false,
         };
