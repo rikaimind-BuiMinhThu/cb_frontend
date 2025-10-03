@@ -62,8 +62,8 @@ const InputCustom = ({
           style={{ ...style, width: '100%', paddingRight: type === 'password' ? '50px' : '30px' }} // Extra padding for eye icon
           onChange={e => onChange(e.target.value)}
           readOnly={readOnly}
-          onCompositionStart={(e) => props?.onCompositionStart(e)}
-          onCompositionEnd={(e) => props?.onCompositionEnd(e)}
+          onCompositionStart={(e) => props?.onCompositionStart?.(e)}
+          onCompositionEnd={(e) => props?.onCompositionEnd?.(e)}
         />
         {type === 'password' && (
           <MDBIcon

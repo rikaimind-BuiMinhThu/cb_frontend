@@ -143,6 +143,7 @@ const previewInitialState = {
   errMsgJsCode: '',
   isProcessing: false,
   conversionStatus: null,
+  manuallyClosed: false,
 };
 
 
@@ -217,7 +218,7 @@ const PreviewFukushashiki = () => {
           widthSp: result?.width_sp ? result?.width_sp : 100,
           heightSp: result?.height_sp ? result?.height_sp : 100,
           positionPc: result?.position_pc ? result?.position_pc : "1",
-          isOpen: result?.display_type && Number(result?.display_type) === 1,
+          isOpen: state.isOpen,
           rightPcTitle: result?.right_position_pc_title,
           buttonTypePc: result?.button_type_pc ? result?.button_type_pc : "1",
           rightMarginPc: result?.right_margin_pc ? result?.right_margin_pc : 10,
@@ -455,6 +456,21 @@ const PreviewFukushashiki = () => {
     return () => clearTimeout(timeoutId);
   }, [state.renderMessagesList?.length, state.submitErrorMessage]);
 
+  useEffect(() => {
+    if (
+      state.loadedStateFromSession &&
+      state.displayType === 1 &&
+      !state.isOpen &&
+      state.messagesList.length > 0 &&
+      state.botInfor &&
+      !state.manuallyClosed
+    ) {
+      setTimeout(() => {
+        dispatch({ type: PREVIEW_ACTIONS.OPEN_CHATBOT });
+      }, 500);
+    }
+  }, [state.loadedStateFromSession, state.displayType, state.isOpen, state.messagesList.length, state.botInfor, state.manuallyClosed]);
+
   const getRenderMode = () => {
     // TODO: 
     // Hiện tại thì đang hard code check isTorizenLP từ url của LP để return RENDER_MODES.LAST
@@ -640,7 +656,7 @@ const PreviewFukushashiki = () => {
       objParam: {},
       loadedStateFromSession: true,
       messagesList: conversation?.messages || [],
-      isOpen: state.isOpen || Number(designSetting.display_type) === 1,
+      isOpen: state.isOpen,
       activePopupCloseBot: Boolean(designSetting?.popup_close_bot),
       titleBubble: designSetting?.title_bubble || "簡単90秒で注文完了",
       displayType: designSetting?.display_type,
