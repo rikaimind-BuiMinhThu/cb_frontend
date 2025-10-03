@@ -34,6 +34,12 @@ const BotMessage = ({
     setText(replaceVariables(content[content.type]?.originalContent || "", variables));
   }, [content, content[content.type]?.originalContent, variables]);
 
+  useEffect(()=>{
+    if (content.text_input?.use_for_confirm_message && previewOrderContent) {
+      setText(previewOrderContent);
+    }
+  }, [content, previewOrderContent]);
+
   const isShowAvatar = () => {
     if (!content) return false;
 
