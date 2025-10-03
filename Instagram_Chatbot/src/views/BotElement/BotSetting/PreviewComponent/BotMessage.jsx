@@ -176,7 +176,7 @@ const BotMessage = ({
   }
 
   const renderTextInputContent = () => {
-        return (
+    return (
       <div className="position-relative">
         <div
           className={`ss-bot-chat-overview-${contentIndex} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value ss-bot-chat-text-input position-relative`}
