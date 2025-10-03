@@ -48,9 +48,28 @@ const PreviewFukushashikiReducer = (state, action) => {
     case PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE: {
       let messagesList = _.cloneDeep(state.messagesList);
 
-      if (action.payload === GETTING_ERROR_NOTIFICATION || stringNullOrEmpty(action.payload)) {
+      if (action.payload === GETTING_ERROR_NOTIFICATION) {
         return {
           ...state,
+          submitErrorMessage: action.payload,
+          isProcessing: false,
+        };
+      }
+
+      if (stringNullOrEmpty(action.payload)) {
+        const conditionParams = buildConditionParams(state);
+
+        messagesList = messagesList.map((message) => {
+          if (message.hidden && message.not_display_when_have_error) {
+            message.hidden = !checkMessageCondition(message, conditionParams);
+          }
+          return message;
+        });
+
+        return {
+          ...state,
+          messagesList: messagesList,
+          renderMessagesList: messagesList.slice(0, state.currentMsgIndex + 1),
           submitErrorMessage: action.payload,
           isProcessing: false,
         };
@@ -255,7 +274,7 @@ const PreviewFukushashikiReducer = (state, action) => {
         objParam: {},
         loadedStateFromSession: true,
         messagesList: conversation?.messages || [],
-        isOpen: state.isOpen || Number(designSetting.display_type) === 1,
+        isOpen: state.isOpen,
         activePopupCloseBot: Boolean(designSetting?.popup_close_bot),
         titleBubble: designSetting?.title_bubble || "簡単90秒で注文完了",
         displayType: designSetting?.display_type,
@@ -286,6 +305,8 @@ const PreviewFukushashikiReducer = (state, action) => {
         isUsedCustomCss: !!chatbot?.is_used_custom_css,
         customCssContent: chatbot?.custom_css_content,
         currentMsgIndex: 0, // Start
+        manuallyClosed: false,
+        autoOpenAttempted: false,
       };
 
       // Update originalContent for replace variables when after getPreviewResponse
@@ -342,6 +363,8 @@ const PreviewFukushashikiReducer = (state, action) => {
       newState.currentMsgIndex = newState.nextStopMsgIndex - 1;
       newState.loadedStateFromSession = true;
       newState.isExtractFromSession = false;
+      newState.manuallyClosed = false;
+      newState.autoOpenAttempted = false;
 
       return { ...state, ...newState };
     }
@@ -354,17 +377,19 @@ const PreviewFukushashikiReducer = (state, action) => {
         newState.currentMsgIndex = 0;
         newState.nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg()) + 1;
         newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
-        return { ...state, isOpen: true, showPopupCloseBot: false, isAlreadyOpenFirstTime: true, ...newState };
+        return { ...state, isOpen: true, showPopupCloseBot: false, isAlreadyOpenFirstTime: true, manuallyClosed: false, autoOpenAttempted: true, ...newState };
       }
 
-      return { ...state, isOpen: true, showPopupCloseBot: false, isAlreadyOpenFirstTime: true };
+      return { ...state, isOpen: true, showPopupCloseBot: false, isAlreadyOpenFirstTime: true, manuallyClosed: false, autoOpenAttempted: true };
     }
     case PREVIEW_ACTIONS.CLOSE_CHATBOT:
-      return { ...state, isOpen: false, showPopupCloseBot: true };
+      return { ...state, isOpen: false, showPopupCloseBot: true, autoOpenAttempted: false, manuallyClosed: true };
     case PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL:
       return { ...state, showPopupCloseBot: true };
     case PREVIEW_ACTIONS.SET_CHATBOT_SETTINGS:
       return { ...state, ...action.payload };
+    case PREVIEW_ACTIONS.SET_MANUALLY_CLOSED:
+      return { ...state, manuallyClosed: action.payload };
   }
 
   return state;
