@@ -94,7 +94,8 @@ const BotMessage = ({
   }, [content.type, isDelaying]);
 
   useEffect(() => {
-    if (hidden === false) return;
+    // When hidden === undefined, it means the message is not hidden yet
+    if (hidden === true) return;
 
     if (content.text_input?.use_for_confirm_message && content.text_input?.jscode?.trim()) {
       executeLpJsCode(content.text_input.jscode);
