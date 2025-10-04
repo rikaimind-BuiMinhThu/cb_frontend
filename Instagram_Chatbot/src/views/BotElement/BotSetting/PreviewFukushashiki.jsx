@@ -784,6 +784,17 @@ const PreviewFukushashiki = () => {
       executeLpJsCode(clickedMsg.jscode, state);
     }
 
+    if (clickedMsg.message_content[0]?.type === "button_submit" 
+      && clickedMsg.message_content[0]?.button_submit_id) {
+        const buttonId = clickedMsg.message_content[0]?.button_submit_id;
+
+        postMessageToParent({
+          action: CHATBOT_ACTIONS.CLICK_BUTTON,
+          actionData: buttonId,
+          isOpen: true,
+        }, state);
+    }
+
     // For GINZA AIRA
     if (isDislayingLoginForm(clickedMsg)) return;
 
