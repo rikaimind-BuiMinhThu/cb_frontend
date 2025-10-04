@@ -1004,11 +1004,12 @@ const PreviewFukushashiki = () => {
 
     const className = state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "ss-bot-getting-error-notification" : "ss-bot-submit-error-message";
     const text = state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "処理中..." : state.submitErrorMessage;
+    const htmlText = text.replace(/¥n/g, "<br/>");
     return (
       <div className="ss-user-setting__item-text_input-top">
         <div id="error-message"
           className={`error-message-modal ${className}`}
-          dangerouslySetInnerHTML={{ __html: text }}
+          dangerouslySetInnerHTML={{ __html: htmlText }}
         />
       </div>
     );   
