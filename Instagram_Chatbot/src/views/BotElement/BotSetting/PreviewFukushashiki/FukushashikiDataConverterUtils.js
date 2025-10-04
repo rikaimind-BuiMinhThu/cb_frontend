@@ -202,16 +202,6 @@ const convertSliderObject = (content) => {
 const convertPullDownObject = (content) => {
   const result = [];
   // Handle customization
-
-  if (content.pull_down?.prefectures?.value) {
-    result.push({
-      type: "dropdown_prefecture",
-      bindingMode: content.prefectures_fukushashiki_search_mode,
-      bindingAddress: content.prefectures_fukushashiki_search_value,
-      bindingValue: content.pull_down.prefectures.value
-    })
-  }
-
   if (content.pull_down?.customization.length != 0) {
     const textInDropdown = content.pull_down.customization.value || content.pull_down.initial_selection;
     if (content.pull_down.customization.is_comment == true) {
@@ -219,9 +209,6 @@ const convertPullDownObject = (content) => {
     }
     else {
       content.pull_down.customization.options_without_comment.forEach((item) => {
-
-        if (!fukuData.bindingMode || !fukuData.bindingAddress || fukuData.bindingValue === undefined) return null;
-
         if (!!textInDropdown && item.value == textInDropdown) {
           const fukuObject = {
             type: content.type,
