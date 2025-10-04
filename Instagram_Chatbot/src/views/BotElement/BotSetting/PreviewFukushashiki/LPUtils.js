@@ -43,10 +43,17 @@ const fukushashikiSavedStateToLp = (savedState, params, state) => {
       if (params.get('is_using_amazon_pay') && isTorizenLpAmazonData(message)) return;
 
       const fukuData = convertToFukushashikiObject({message: message});
-      fukuDataList.push(...fukuData);
+
+      if (Array.isArray(fukuData)) {
+        const validData = fukuData.filter(item => item?.bindingAddress && item?.bindingAddress !== undefined);
+        fukuDataList.push(...validData)
+      }
     });
 
-    fukushashikiToLP(fukuDataList, savedState);
+    if(fukuDataList.length > 0) {
+      fukushashikiToLP(fukuDataList, savedState);
+    }
+
     resolve();
   });
 };
