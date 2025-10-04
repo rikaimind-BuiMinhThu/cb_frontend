@@ -339,8 +339,8 @@ const displayPopup = async () => {
           await crawlDataAndSendMessage(e.data.actionData);
           break;
         case CHATBOT_ACTIONS.CLICK_BUTTON:
-          const button = document.getElementById(e.data.id_value);
-          if (!button) throw new Error(`Button not found: id ${e.data.id_value}`);
+          const button = document.getElementById(e.data.actionData);
+          if (!button) throw new Error(`Button not found: id ${e.data.actionData}`);
           button.click();
           break;
         case CHATBOT_ACTIONS.GET_PREVIEW_ORDER_CONTENT:
