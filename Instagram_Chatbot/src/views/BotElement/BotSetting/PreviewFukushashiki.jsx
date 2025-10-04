@@ -892,6 +892,7 @@ const PreviewFukushashiki = () => {
         variables={state.variables}
         onRenderCompleted={renderNextMessage}
         hidden={message.hidden}
+        currentMsgIndex={state.currentMsgIndex}
       />
     ));
   };

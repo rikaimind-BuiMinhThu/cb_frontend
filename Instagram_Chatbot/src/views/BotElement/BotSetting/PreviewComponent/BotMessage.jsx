@@ -18,6 +18,7 @@ const BotMessage = ({
   variables,
   onRenderCompleted,
   hidden,
+  currentMsgIndex,
 }) => {
   const [isDelaying, setIsDelaying] = useState(true);
   const [text, setText] = useState("");
@@ -94,7 +95,7 @@ const BotMessage = ({
 
   useEffect(() => {
     if (hidden === false) return;
-
+    
     if (content.text_input?.use_for_confirm_message &&
       content.text_input?.jscode?.trim() && 
       !previewOrderContent
@@ -102,6 +103,7 @@ const BotMessage = ({
       executeLpJsCode(content.text_input.jscode);
     }
   }, [
+    currentMsgIndex,
     hidden,
     content.text_input?.use_for_confirm_message,
     content.text_input?.jscode?.trim(),
