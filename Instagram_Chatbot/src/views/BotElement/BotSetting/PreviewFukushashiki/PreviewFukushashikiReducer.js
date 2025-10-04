@@ -65,6 +65,7 @@ const PreviewFukushashikiReducer = (state, action) => {
           }
           return message;
         });
+        const nextStopMsgIndex = messagesList.findIndex(getNextUserMsg((_, index) => index > state.currentMsgIndex)) + 1;
 
         return {
           ...state,
@@ -72,6 +73,7 @@ const PreviewFukushashikiReducer = (state, action) => {
           renderMessagesList: messagesList.slice(0, state.currentMsgIndex + 1),
           submitErrorMessage: action.payload,
           isProcessing: false,
+          nextStopMsgIndex: nextStopMsgIndex,
         };
       }
 
