@@ -95,11 +95,8 @@ const BotMessage = ({
 
   useEffect(() => {
     if (hidden === false) return;
-    
-    if (content.text_input?.use_for_confirm_message &&
-      content.text_input?.jscode?.trim() && 
-      !previewOrderContent
-    ) {
+
+    if (content.text_input?.use_for_confirm_message && content.text_input?.jscode?.trim()) {
       executeLpJsCode(content.text_input.jscode);
     }
   }, [
@@ -107,7 +104,6 @@ const BotMessage = ({
     hidden,
     content.text_input?.use_for_confirm_message,
     content.text_input?.jscode?.trim(),
-    previewOrderContent
   ]);
 
   // const formatResult = () => {
