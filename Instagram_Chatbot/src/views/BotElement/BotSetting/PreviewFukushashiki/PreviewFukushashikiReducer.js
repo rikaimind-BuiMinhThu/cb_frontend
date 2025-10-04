@@ -65,7 +65,12 @@ const PreviewFukushashikiReducer = (state, action) => {
           }
           return message;
         });
-        const nextStopMsgIndex = messagesList.findIndex(getNextUserMsg((_, index) => index > state.currentMsgIndex)) + 1;
+
+        let nextStopMsgIndex = state.nextStopMsgIndex;
+
+        if(!nextStopMsgIndex || (nextStopMsgIndex < messagesList.length && nextStopMsgIndex > 0 && messagesList[nextStopMsgIndex - 1].hidden)){
+          nextStopMsgIndex = messagesList.findIndex(getNextUserMsg((_, index) => index > state.currentMsgIndex)) + 1;
+        }
 
         return {
           ...state,
