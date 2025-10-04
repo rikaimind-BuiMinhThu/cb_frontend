@@ -891,6 +891,7 @@ const PreviewFukushashiki = () => {
         executeLpJsCode={(jsCode) => executeLpJsCode(jsCode, state)}
         variables={state.variables}
         onRenderCompleted={renderNextMessage}
+        hidden={message.hidden}
       />
     ));
   };
