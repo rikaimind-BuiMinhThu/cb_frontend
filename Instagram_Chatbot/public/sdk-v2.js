@@ -187,7 +187,7 @@ const movePaymentMethodToTop = (data) => {
   if (index !== -1) {
       const [paymentMethod] = data.splice(index, 1);      
       // await component in LP to set value after payment method setted
-      data.unshift(paymentMethod, { additionalType: "await" });
+      data.unshift({additionalType: "await"}, paymentMethod, { additionalType: "await" });
   }
   return data;
 }
