@@ -58,6 +58,7 @@ import {
   setTimerConfig
 } from "./PreviewComponent/SessionStorageUtils";
 import { isTorizenLP } from "./PreviewComponent/TorizenUtils";
+import { isTokyoDeveloLP, UPDATE_TOKYO_DEVELO_LP_PREFECTURE_JS_CODE } from "./PreviewComponent/TokyoLPUtils";
 import PreventExitChatbotModal from "./PreviewComponent/PreventExitChatbotModal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
 import ZipCodePopUp from "./PreviewComponent/ZipCodePopUp";
@@ -399,6 +400,10 @@ const PreviewFukushashiki = () => {
         }
 
         return fukushashikiSavedStateToLp(savedState, params, state).then(async () => {
+          if (isTokyoDeveloLP(savedState.urlReceive)) {
+            executeLpJsCode(UPDATE_TOKYO_DEVELO_LP_PREFECTURE_JS_CODE, savedState);
+          }
+
           return dispatch({
             type: PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SESSION_STORAGE,
             payload: {
