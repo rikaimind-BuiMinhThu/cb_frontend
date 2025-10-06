@@ -1,6 +1,6 @@
 
 import { CHATBOT_ACTIONS } from "../PreviewComponent/Constants";
-import {  isTorizenLpAmazonData } from "../PreviewComponent/TorizenUtils";
+import { isTorizenLpAmazonData } from "../PreviewComponent/TorizenUtils";
 import { convertToFukushashikiObject } from "./FukushashikiDataConverterUtils";
 import { isUserMessage, sendOpenChatbotCountRequest } from "../PreviewComponent/Utils";
 
