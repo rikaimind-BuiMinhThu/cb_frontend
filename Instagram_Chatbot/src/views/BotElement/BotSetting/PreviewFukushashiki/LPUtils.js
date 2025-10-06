@@ -1,6 +1,6 @@
 
 import { CHATBOT_ACTIONS } from "../PreviewComponent/Constants";
-import { isTorizenLpAmazonData } from "../PreviewComponent/TorizenUtils";
+import { hasAmazonPayActualData, isTorizenLpAmazonData } from "../PreviewComponent/TorizenUtils";
 import { convertToFukushashikiObject } from "./FukushashikiDataConverterUtils";
 import { isUserMessage, sendOpenChatbotCountRequest } from "../PreviewComponent/Utils";
 
@@ -59,7 +59,7 @@ const fukushashikiSavedStateToLp = (savedState, params, state) => {
             );
           }
           return false;
-        });
+        }) || hasAmazonPayActualData(message);
         if (!hasActualData) return;
       }
       const fukuData = convertToFukushashikiObject({ message });
