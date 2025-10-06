@@ -42,10 +42,10 @@ const fukushashikiSavedStateToLp = (savedState, params, state) => {
       // Except some data when fukushashiki torizen san
       if (params.get('is_using_amazon_pay') && isTorizenLpAmazonData(message)) return;
       
-      const fukuData = convertToFukushashikiObject({ message });
+      const fukuData = convertToFukushashikiObject({message: message});
       fukuDataList.push(...fukuData);
     });
-    
+
     fukushashikiToLP(fukuDataList, savedState);
     resolve();
   });
