@@ -1,6 +1,6 @@
 
 import { CHATBOT_ACTIONS } from "../PreviewComponent/Constants";
-import { hasAmazonPayActualData, isTorizenLpAmazonData } from "../PreviewComponent/TorizenUtils";
+import {  isTorizenLpAmazonData } from "../PreviewComponent/TorizenUtils";
 import { convertToFukushashikiObject } from "./FukushashikiDataConverterUtils";
 import { isUserMessage, sendOpenChatbotCountRequest } from "../PreviewComponent/Utils";
 
@@ -40,31 +40,12 @@ const fukushashikiSavedStateToLp = (savedState, params, state) => {
     const userMessagesList = savedState.messagesList.filter(isUserMessage);
     userMessagesList.forEach((message) => {
       // Except some data when fukushashiki torizen san
-      if (params.get('is_using_amazon_pay') && isTorizenLpAmazonData(message)) {
-        const hasActualData = message.message_content.some((content) => {
-          if (content.text_input) {
-            return !!(
-              content.text_input.text?.valueLeft ||
-              content.text_input.text?.valueRight ||
-              content.text_input.phone_number?.value ||
-              content.text_input.email_address?.value
-            );
-          }
-          if (content.zip_code_address) {
-            return !!(
-              content.zip_code_address.value_post_code ||
-              content.zip_code_address.value_prefecture ||
-              content.zip_code_address.value_municipality ||
-              content.zip_code_address.value_address
-            );
-          }
-          return false;
-        }) || hasAmazonPayActualData(message);
-        if (!hasActualData) return;
-      }
+      if (params.get('is_using_amazon_pay') && isTorizenLpAmazonData(message)) return;
+      
       const fukuData = convertToFukushashikiObject({ message });
       fukuDataList.push(...fukuData);
     });
+    
     fukushashikiToLP(fukuDataList, savedState);
     resolve();
   });
