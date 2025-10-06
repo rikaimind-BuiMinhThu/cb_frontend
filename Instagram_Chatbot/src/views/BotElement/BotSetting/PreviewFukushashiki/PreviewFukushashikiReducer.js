@@ -193,6 +193,7 @@ const PreviewFukushashikiReducer = (state, action) => {
       }
 
       newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+      newState.isUpdateClicked = isUpdateClicked;
 
       return { ...state, ...newState };
     case PREVIEW_ACTIONS.UPDATE_PREFECTURES_LIST:
