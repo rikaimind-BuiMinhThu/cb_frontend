@@ -110,20 +110,3 @@ export const isTorizenLpAmazonData = (message) => {
   const isFirstNameKanaData = message.message_content.find(content => content.right_fukushashiki_search_value === "jsUkProfileFirstNameKana");
   return isEmailData || isTelData || isZipCodeData || isStateIdData || isCityData || isStreetAddressData || isFamilyNameData || isFirstNameData || isFamilyNameKanaData || isFirstNameKanaData;
 }
-
-export const hasAmazonPayActualData = (message) => {
-  return message.message_content.some((content) => {
-    if (
-      content.left_fukushashiki_search_value === "jsUkProfileFamilyName" ||
-      content.right_fukushashiki_search_value === "jsUkProfileFirstName" ||
-      content.left_fukushashiki_search_value === "jsUkProfileFamilyNameKana" ||
-      content.right_fukushashiki_search_value === "jsUkProfileFirstNameKana"
-    ) {
-      return !!(
-        content.text_input?.text?.valueLeft ||
-        content.text_input?.text?.valueRight
-      );
-    }
-    return false;
-  });
-};
