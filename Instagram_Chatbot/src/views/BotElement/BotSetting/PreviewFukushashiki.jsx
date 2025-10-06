@@ -481,7 +481,7 @@ const PreviewFukushashiki = () => {
     // Hiện tại thì đang hard code check isTorizenLP từ url của LP để return RENDER_MODES.LAST
     // Cần refactor đoạn này sao cho có thể sử dụng được setting RENDER_MODES trên trang quản lý
     // 
-    if (isTorizenLP(state.urlReceive)) return RENDER_MODES.LAST;
+    if (state.isUpdateClicked && isTorizenLP(state.urlReceive)) return RENDER_MODES.LAST;
     // Cần check xem có phải trường hợp reload hay ko?
     // Nếu là trường hợp reload thì return RENDER_MODES.LAST
     // Nếu là trường hợp không phải reload thì return RENDER_MODES.NEXT
@@ -495,7 +495,10 @@ const PreviewFukushashiki = () => {
     if (!state.nextStopMsgIndex || state.currentMsgIndex + 1 >= state.nextStopMsgIndex) return;
 
     setTimeout(() => {
-      const endIndex = getRenderMode() === RENDER_MODES.LAST ? state.nextStopMsgIndex : state.currentMsgIndex + 1 + 1;
+      let endIndex = state.currentMsgIndex + 1 + 1;
+      if (state.isUpdateClicked) {
+        endIndex = getRenderMode() === RENDER_MODES.LAST ? state.nextStopMsgIndex : endIndex;
+      }
       dispatch({
         type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
         payload: {
