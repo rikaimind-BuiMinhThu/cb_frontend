@@ -36,7 +36,7 @@ const getTextInputValue = (subContent, field) => {
 }
 
 const getPulldownValue = (subContent, field, value) => {
-  const pullDown = subContent.pull_down;
+  const pullDown = subContent[subContent.type];
 
   switch (subContent.type) {
     case "customization": {
@@ -163,11 +163,11 @@ const getShippingAddressValue = (subContent, prefecturesList) => {
   return `${name} ${kana} ${fixedPrefecture}${municipality} ${address}${buildingName}`;
 }
 
-const getCardPaymentRadioButtonValue = (subContent, field, value) => {
+const getCardPaymentRadioButtonValue = (subContent, value, field) => {
   switch (subContent.type) {
     case "default":
     case "customized_style": {
-      return subContent.radio_contents.find(item => item.initial_selection === value)?.text;
+      return subContent.radio_contents.find(item => item.value === value)?.text;
     }
     case "picture_radio": {
       return subContent.radio_contents_img.find(item => item.initial_selection_picture === value)?.text;
