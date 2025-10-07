@@ -6,6 +6,21 @@ export default function SubmitButton({ content, submitErrorMessage = "", onClick
 
   const buttonSubmit = content.button_submit;
 
+  useEffect(() => {
+    if (!buttonSubmit.is_display_error_message) return;
+
+    const error_message_display_element_search_type = content.error_message_display_element_search_type;
+    const error_message_display_element_search_value = content.error_message_display_element_search_value;
+
+    if (!error_message_display_element_search_type || !error_message_display_element_search_value) return;
+
+    getErrorMessageFromParent(
+      error_message_display_element_search_type, 
+      error_message_display_element_search_value, 
+      buttonSubmit.is_display_error_message
+    );
+  }, []);
+
   const renderSubmitErrorMessage = () => {
     if (!buttonSubmit.is_display_error_message) return null;
 
