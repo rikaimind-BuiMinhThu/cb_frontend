@@ -487,7 +487,7 @@ const transformJsResultArray = ({ data, fields, skipOnError = true }) => {
 const processGetErrorMessage = (data) => {
   if (!data.isDisplay) return;
 
-  const element = getElementByAddress(data.seachMode, data.searchValue)
+  const element = getElementByAddress(data.searchMode, data.searchValue);
 
   if (!element) {
     console.log(`Element ${data.searchValue} not found`);
