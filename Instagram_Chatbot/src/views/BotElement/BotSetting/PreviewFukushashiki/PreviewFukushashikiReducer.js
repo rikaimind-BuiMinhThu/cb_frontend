@@ -9,7 +9,7 @@ import {
 import { processForBotMessage } from '../PreviewComponent/BotMessageUtils';
 import { processForUserMessage } from '../PreviewComponent/UserMessageUtils';
 import { isButtonSubmitMessage, isBotMessage, isUserMessage, getNextUserMsg } from '../PreviewComponent/Utils';
-import { mapAmazonPayDataToMessagesList } from '../PreviewComponent/TorizenUtils';
+import { isTorizenLP, mapAmazonPayDataToMessagesList } from '../PreviewComponent/TorizenUtils';
 import {
   RENDER_CHATBOT_CONFIG,
   GETTING_ERROR_NOTIFICATION,
@@ -167,9 +167,9 @@ const PreviewFukushashikiReducer = (state, action) => {
 
       // Calculate next stop message index
       const nextStopMsgIndex = state.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex)) + 1;
-      
-      // Set nextStopMsgIndex based on render mode
-      if (action.payload.renderMode === RENDER_MODES.LAST) {
+
+      newState.renderMode = (isUpdateClicked && isTorizenLP(state.urlReceive)) ? RENDER_MODES.LAST : RENDER_MODES.NEXT;
+      if (newState.renderMode === RENDER_MODES.LAST) {
         // LAST mode: render all messages up to the next user message
         if (!isUpdateClicked) {
           newState.nextStopMsgIndex = nextStopMsgIndex;
@@ -315,6 +315,7 @@ const PreviewFukushashikiReducer = (state, action) => {
         currentMsgIndex: 0, // Start
         manuallyClosed: false,
         autoOpenAttempted: false,
+        renderMode: RENDER_MODES.NEXT,
       };
 
       // Update originalContent for replace variables when after getPreviewResponse
@@ -373,6 +374,7 @@ const PreviewFukushashikiReducer = (state, action) => {
       newState.isExtractFromSession = false;
       newState.manuallyClosed = false;
       newState.autoOpenAttempted = false;
+      newState.renderMode = RENDER_MODES.LAST;
 
       return { ...state, ...newState };
     }
