@@ -183,7 +183,7 @@ const PreviewFukushashikiReducer = (state, action) => {
         }
       } else {
         // NEXT mode: render messages one by one
-        newState.currentMsgIndex = clickedMsgIndex + 1; 
+        newState.currentMsgIndex = clickedMsgIndex; 
         newState.nextStopMsgIndex = nextStopMsgIndex;
       }
       
