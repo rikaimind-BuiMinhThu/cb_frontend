@@ -82,11 +82,23 @@ const executeLpJsCode = (jsCode, state) => {
   }, state);
 }
 
+const getErrorMessageFromParent = (searchMode, searchValue, isDisplay) => {
+  postMessageToParent({
+    action: CHATBOT_ACTIONS.GET_ERROR_MESSAGE,
+    actionData: {
+      searchMode,
+      searchValue,
+      isDisplay,
+    }
+  }, {});
+}
+
 export {
   setConversionParamToLocalStorage,
   fukushashikiSavedStateToLp,
   fukushashikiToLP,
   executeLpJsCode,
   injectCustomJsCode,
-  postMessageToParent
+  postMessageToParent,
+  getErrorMessageFromParent,
 };
