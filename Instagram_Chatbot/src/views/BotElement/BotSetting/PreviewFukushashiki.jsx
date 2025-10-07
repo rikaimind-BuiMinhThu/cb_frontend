@@ -819,6 +819,7 @@ const PreviewFukushashiki = () => {
         field,
         subField1,
         subField2,
+        message,
       }
     });
   };
