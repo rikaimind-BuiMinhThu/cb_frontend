@@ -17,6 +17,8 @@ const BotMessage = ({
   messageId,
   variables,
   onRenderCompleted,
+  hidden,
+  currentMsgIndex,
 }) => {
   const [isDelaying, setIsDelaying] = useState(true);
   const [text, setText] = useState("");
@@ -92,16 +94,17 @@ const BotMessage = ({
   }, [content.type, isDelaying]);
 
   useEffect(() => {
-    if (content.text_input?.use_for_confirm_message &&
-      content.text_input?.jscode?.trim() && 
-      !previewOrderContent
-    ) {
+    // When hidden === undefined, it means the message is not hidden yet
+    if (hidden === true) return;
+
+    if (content.text_input?.use_for_confirm_message && content.text_input?.jscode?.trim()) {
       executeLpJsCode(content.text_input.jscode);
     }
   }, [
+    currentMsgIndex,
+    hidden,
     content.text_input?.use_for_confirm_message,
     content.text_input?.jscode?.trim(),
-    previewOrderContent
   ]);
 
   // const formatResult = () => {

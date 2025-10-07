@@ -57,7 +57,7 @@ import {
   getTimerConfig,
   setTimerConfig
 } from "./PreviewComponent/SessionStorageUtils";
-import { isTorizenLP } from "./PreviewComponent/TorizenUtils";
+import { isTokyoDeveloLP, UPDATE_TOKYO_DEVELO_LP_PREFECTURE_JS_CODE } from "./PreviewComponent/TokyoLPUtils";
 import PreventExitChatbotModal from "./PreviewComponent/PreventExitChatbotModal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
 import ZipCodePopUp from "./PreviewComponent/ZipCodePopUp";
@@ -144,6 +144,8 @@ const previewInitialState = {
   isProcessing: false,
   conversionStatus: null,
   manuallyClosed: false,
+  renderMode: RENDER_MODES.NEXT,
+  isAmazonPayData: false,
 };
 
 
@@ -233,6 +235,15 @@ const PreviewFukushashiki = () => {
         dispatch({ type: PREVIEW_ACTIONS.SET_CHATBOT_SETTINGS, payload: newState });
       });
   }, [state.botId, state.loadedStateFromSession, state.displayType]);
+
+  useEffect(() => {
+    if (params.get("is_using_amazon_pay")) {
+      dispatch({
+        type: PREVIEW_ACTIONS.SET_AMAZON_PAY_FLAG,
+        payload: true
+      });
+    }
+  }, []);
 
   const eventHandler = async (event) => {
     if (!event.data || !event.data.actionData) return;
@@ -399,6 +410,10 @@ const PreviewFukushashiki = () => {
         }
 
         return fukushashikiSavedStateToLp(savedState, params, state).then(async () => {
+          if (isTokyoDeveloLP(savedState.urlReceive)) {
+            executeLpJsCode(UPDATE_TOKYO_DEVELO_LP_PREFECTURE_JS_CODE, savedState);
+          }
+
           return dispatch({
             type: PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SESSION_STORAGE,
             payload: {
@@ -471,31 +486,15 @@ const PreviewFukushashiki = () => {
     }
   }, [state.loadedStateFromSession, state.displayType, state.isOpen, state.messagesList.length, state.botInfor, state.manuallyClosed]);
 
-  const getRenderMode = () => {
-    // TODO: 
-    // Hiện tại thì đang hard code check isTorizenLP từ url của LP để return RENDER_MODES.LAST
-    // Cần refactor đoạn này sao cho có thể sử dụng được setting RENDER_MODES trên trang quản lý
-    // 
-    if (isTorizenLP(state.urlReceive)) return RENDER_MODES.LAST;
-    // Cần check xem có phải trường hợp reload hay ko?
-    // Nếu là trường hợp reload thì return RENDER_MODES.LAST
-    // Nếu là trường hợp không phải reload thì return RENDER_MODES.NEXT
-    
-    return RENDER_MODES.NEXT;
-  }
-
-  // Auto-render messages when current message index changes
-  // Delays rendering for 1 second to show smooth transition between messages
   useEffect(() => {
     if (!state.nextStopMsgIndex || state.currentMsgIndex + 1 >= state.nextStopMsgIndex) return;
 
     setTimeout(() => {
-      const endIndex = getRenderMode() === RENDER_MODES.LAST ? state.nextStopMsgIndex : state.currentMsgIndex + 1 + 1;
       dispatch({
         type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
         payload: {
           startIndex: 0,
-          endIndex: endIndex,
+          endIndex: state.currentMsgIndex + 1 + 1,
           fromCallback: false,
         }
       });
@@ -784,6 +783,17 @@ const PreviewFukushashiki = () => {
       executeLpJsCode(clickedMsg.jscode, state);
     }
 
+    if (clickedMsg.message_content[0]?.type === "button_submit" 
+      && clickedMsg.message_content[0]?.button_submit_id) {
+        const buttonId = clickedMsg.message_content[0]?.button_submit_id;
+
+        postMessageToParent({
+          action: CHATBOT_ACTIONS.CLICK_BUTTON,
+          actionData: buttonId,
+          isOpen: true,
+        }, state);
+    }
+
     // For GINZA AIRA
     if (isDislayingLoginForm(clickedMsg)) return;
 
@@ -792,7 +802,7 @@ const PreviewFukushashiki = () => {
 
     dispatch({
       type: PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON,
-      payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn, renderMode: getRenderMode() }
+      payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn}
     });
   };
 
@@ -819,7 +829,8 @@ const PreviewFukushashiki = () => {
         field,
         subField1,
         subField2,
-        message
+        message,
+        skipTextConversion: state.isAmazonPayData,
       }
     });
   };
@@ -880,6 +891,8 @@ const PreviewFukushashiki = () => {
         executeLpJsCode={(jsCode) => executeLpJsCode(jsCode, state)}
         variables={state.variables}
         onRenderCompleted={renderNextMessage}
+        hidden={message.hidden}
+        currentMsgIndex={state.currentMsgIndex}
       />
     ));
   };
@@ -967,6 +980,7 @@ const PreviewFukushashiki = () => {
             submitErrorMessage={state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "" : state.submitErrorMessage}
             botId={state.botId}
             isProcessing={!!state.isProcessing}
+            isAmazonPayData={state.isAmazonPayData}
           />
           {renderNextButton(message, messageIndex)}
         </div>
@@ -991,11 +1005,12 @@ const PreviewFukushashiki = () => {
 
     const className = state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "ss-bot-getting-error-notification" : "ss-bot-submit-error-message";
     const text = state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "処理中..." : state.submitErrorMessage;
+    const htmlText = text.replace(/¥n/g, "<br/>");
     return (
       <div className="ss-user-setting__item-text_input-top">
         <div id="error-message"
           className={`error-message-modal ${className}`}
-          dangerouslySetInnerHTML={{ __html: text }}
+          dangerouslySetInnerHTML={{ __html: htmlText }}
         />
       </div>
     );   

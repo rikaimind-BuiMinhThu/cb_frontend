@@ -9,7 +9,7 @@ import {
 import { processForBotMessage } from '../PreviewComponent/BotMessageUtils';
 import { processForUserMessage } from '../PreviewComponent/UserMessageUtils';
 import { isButtonSubmitMessage, isBotMessage, isUserMessage, getNextUserMsg } from '../PreviewComponent/Utils';
-import { mapAmazonPayDataToMessagesList } from '../PreviewComponent/TorizenUtils';
+import { isTorizenLP, mapAmazonPayDataToMessagesList } from '../PreviewComponent/TorizenUtils';
 import {
   RENDER_CHATBOT_CONFIG,
   GETTING_ERROR_NOTIFICATION,
@@ -60,11 +60,17 @@ const PreviewFukushashikiReducer = (state, action) => {
         const conditionParams = buildConditionParams(state);
 
         messagesList = messagesList.map((message) => {
-          if (message.hidden && message.not_display_when_have_error) {
+          if ((message.hidden || message.hidden === undefined) && message.not_display_when_have_error) {
             message.hidden = !checkMessageCondition(message, conditionParams);
           }
           return message;
         });
+
+        let nextStopMsgIndex = state.nextStopMsgIndex;
+
+        if(!nextStopMsgIndex || (nextStopMsgIndex < messagesList.length && nextStopMsgIndex > 0 && messagesList[nextStopMsgIndex - 1].hidden)){
+          nextStopMsgIndex = messagesList.findIndex(getNextUserMsg((_, index) => index > state.currentMsgIndex)) + 1;
+        }
 
         return {
           ...state,
@@ -72,6 +78,7 @@ const PreviewFukushashikiReducer = (state, action) => {
           renderMessagesList: messagesList.slice(0, state.currentMsgIndex + 1),
           submitErrorMessage: action.payload,
           isProcessing: false,
+          nextStopMsgIndex: nextStopMsgIndex,
         };
       }
 
@@ -160,9 +167,9 @@ const PreviewFukushashikiReducer = (state, action) => {
 
       // Calculate next stop message index
       const nextStopMsgIndex = state.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex)) + 1;
-      
-      // Set nextStopMsgIndex based on render mode
-      if (action.payload.renderMode === RENDER_MODES.LAST) {
+
+      newState.renderMode = (isUpdateClicked && isTorizenLP(state.urlReceive)) ? RENDER_MODES.LAST : RENDER_MODES.NEXT;
+      if (newState.renderMode === RENDER_MODES.LAST) {
         // LAST mode: render all messages up to the next user message
         if (!isUpdateClicked) {
           newState.nextStopMsgIndex = nextStopMsgIndex;
@@ -176,7 +183,7 @@ const PreviewFukushashikiReducer = (state, action) => {
         }
       } else {
         // NEXT mode: render messages one by one
-        newState.currentMsgIndex = clickedMsgIndex + 1; 
+        newState.currentMsgIndex = clickedMsgIndex; 
         newState.nextStopMsgIndex = nextStopMsgIndex;
       }
       
@@ -186,6 +193,7 @@ const PreviewFukushashikiReducer = (state, action) => {
       }
 
       newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+      newState.isUpdateClicked = isUpdateClicked;
 
       return { ...state, ...newState };
     case PREVIEW_ACTIONS.UPDATE_PREFECTURES_LIST:
@@ -196,7 +204,7 @@ const PreviewFukushashikiReducer = (state, action) => {
       const renderMessagesList = newMessagesList.slice(0, state.currentMsgIndex + 1);
       return { ...state, messagesList: newMessagesList, renderMessagesList: renderMessagesList };
     case PREVIEW_ACTIONS.UPDATE_AFTER_CHANGE_VALUE: {
-      const { contentIndex, contentType, value, field, subField1, subField2, message } = action.payload;
+      const { contentIndex, contentType, value, field, subField1, subField2, message, skipTextConversion = false} = action.payload;
       const newState = {
         messagesList: _.cloneDeep(state.messagesList),
         variables: _.cloneDeep(state.variables),
@@ -307,6 +315,7 @@ const PreviewFukushashikiReducer = (state, action) => {
         currentMsgIndex: 0, // Start
         manuallyClosed: false,
         autoOpenAttempted: false,
+        renderMode: RENDER_MODES.NEXT,
       };
 
       // Update originalContent for replace variables when after getPreviewResponse
@@ -365,6 +374,7 @@ const PreviewFukushashikiReducer = (state, action) => {
       newState.isExtractFromSession = false;
       newState.manuallyClosed = false;
       newState.autoOpenAttempted = false;
+      newState.renderMode = RENDER_MODES.LAST;
 
       return { ...state, ...newState };
     }
@@ -390,6 +400,8 @@ const PreviewFukushashikiReducer = (state, action) => {
       return { ...state, ...action.payload };
     case PREVIEW_ACTIONS.SET_MANUALLY_CLOSED:
       return { ...state, manuallyClosed: action.payload };
+    case PREVIEW_ACTIONS.SET_AMAZON_PAY_FLAG:
+      return {...state, isAmazonPayData: action.payload};
   }
 
   return state;

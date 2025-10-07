@@ -5,6 +5,10 @@ export default function useDebounce(value, delay) {
   const [debouncedValue, setDebouncedValue] = useState(inputValue);
 
   useEffect(() => {
+    setInputValue(value)
+  }, [value]);
+
+  useEffect(() => {
     if (!inputValue) {
       setDebouncedValue(inputValue);
       return;

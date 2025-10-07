@@ -187,7 +187,7 @@ const movePaymentMethodToTop = (data) => {
   if (index !== -1) {
       const [paymentMethod] = data.splice(index, 1);      
       // await component in LP to set value after payment method setted
-      data.unshift(paymentMethod, { additionalType: "await" });
+      data.unshift({additionalType: "await"}, paymentMethod, { additionalType: "await" });
   }
   return data;
 }
@@ -339,8 +339,8 @@ const displayPopup = async () => {
           await crawlDataAndSendMessage(e.data.actionData);
           break;
         case CHATBOT_ACTIONS.CLICK_BUTTON:
-          const button = document.getElementById(e.data.id_value);
-          if (!button) throw new Error(`Button not found: id ${e.data.id_value}`);
+          const button = document.getElementById(e.data.actionData);
+          if (!button) throw new Error(`Button not found: id ${e.data.actionData}`);
           button.click();
           break;
         case CHATBOT_ACTIONS.GET_PREVIEW_ORDER_CONTENT:
@@ -393,7 +393,7 @@ const displayPopup = async () => {
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
       }
-      if (e.data.isOpen && mobileCheck()) {
+      if (e.data.isOpen && mobileCheck() && e.data.action !== undefined) {
         document.body.style.overflow = 'hidden';
       } else {
         document.body.style.overflow = 'scroll';
