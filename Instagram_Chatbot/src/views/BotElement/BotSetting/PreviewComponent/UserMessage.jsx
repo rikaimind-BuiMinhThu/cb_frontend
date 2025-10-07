@@ -53,7 +53,6 @@ const UserMessage = ({
   botId,
   isProcessing = false,
   onRenderCompleted,
-  isAmazonPayData = false,
 }) => {
   if (!isUserMessage(message)) return null;
 
@@ -82,11 +81,6 @@ const UserMessage = ({
   }
 
   const handleOnChangeJpConvertText = (contentIndex, contentType, field, subField) => (value) => {
-    if (isAmazonPayData) {
-      onChangeValue(contentIndex, contentType, value, field, subField);
-      return;
-    }
-
     onChangeValue(contentIndex, contentType, value, field, subField);
 
     const nextContent = messageContent[contentIndex + 1];
