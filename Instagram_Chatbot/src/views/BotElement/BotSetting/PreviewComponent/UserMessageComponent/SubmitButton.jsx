@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "assets/css/bot/preview-chat-bot.css";
 
 export default function SubmitButton({ content, submitErrorMessage = "", onClickNext, isProcessing = false }) {
