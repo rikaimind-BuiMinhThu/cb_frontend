@@ -204,7 +204,7 @@ const PreviewFukushashikiReducer = (state, action) => {
       const renderMessagesList = newMessagesList.slice(0, state.currentMsgIndex + 1);
       return { ...state, messagesList: newMessagesList, renderMessagesList: renderMessagesList };
     case PREVIEW_ACTIONS.UPDATE_AFTER_CHANGE_VALUE: {
-      const { contentIndex, contentType, value, field, subField1, subField2, message } = action.payload;
+      const { contentIndex, contentType, value, field, subField1, subField2, message, skipTextConversion = false} = action.payload;
       const newState = {
         messagesList: _.cloneDeep(state.messagesList),
         variables: _.cloneDeep(state.variables),
@@ -400,6 +400,8 @@ const PreviewFukushashikiReducer = (state, action) => {
       return { ...state, ...action.payload };
     case PREVIEW_ACTIONS.SET_MANUALLY_CLOSED:
       return { ...state, manuallyClosed: action.payload };
+    case PREVIEW_ACTIONS.SET_AMAZON_PAY_FLAG:
+      return {...state, isAmazonPayData: action.payload};
   }
 
   return state;
