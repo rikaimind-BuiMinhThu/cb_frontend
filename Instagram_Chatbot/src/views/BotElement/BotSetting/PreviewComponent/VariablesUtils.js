@@ -36,7 +36,7 @@ const getTextInputValue = (subContent, field) => {
 }
 
 const getPulldownValue = (subContent, field, value) => {
-  const pullDown = subContent.pull_down;
+  const pullDown = subContent[subContent.type];
 
   switch (subContent.type) {
     case "customization": {
