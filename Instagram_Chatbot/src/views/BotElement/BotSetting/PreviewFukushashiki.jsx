@@ -456,7 +456,7 @@ const PreviewFukushashiki = () => {
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       scrollToPosition({ position: "b", selector: "#sp-body" });
-    }, 1000);
+    }, 300);
 
     return () => clearTimeout(timeoutId);
   }, [state.renderMessagesList?.length, state.submitErrorMessage]);

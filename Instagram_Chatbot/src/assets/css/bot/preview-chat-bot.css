@@ -590,8 +590,8 @@
 }
 
 .animation {
-    transition: all 1.3s;
-    -webkit-transition: all 1.3s;
+    transition: all 1.5s;
+    -webkit-transition: all 1.5s;
 }
 
 .slideRight {
@@ -599,8 +599,8 @@
     animation-name: slideRight;
     -webkit-animation-name: slideRight;
 
-    animation-duration: .3s;
-    -webkit-animation-duration: .3s;
+    animation-duration: .7s;
+    -webkit-animation-duration: .7s;
 
     animation-timing-function: ease-in;
     -webkit-animation-timing-function: ease-in;
@@ -612,25 +612,25 @@
 
 @keyframes slideRight {
     0% {
-        transform: scale(0);
         opacity: 0;
+        transform: scale(0.95);
     }
 
     100% {
-        transform: scale(1);
         opacity: 1;
+        transform: scale(1);
     }
 }
 
 @-webkit-keyframes slideRight {
     0% {
-        -webkit-transform: scale(0);
         opacity: 0;
+        -webkit-transform: scale(0.95);
     }
 
     100% {
-        -webkit-transform: scale(1);
         opacity: 1;
+        -webkit-transform: scale(1);
     }
 }
 
@@ -645,8 +645,8 @@ slideLeft
     animation-name: slideLeft;
     -webkit-animation-name: slideLeft;
 
-    animation-duration: .3s;
-    -webkit-animation-duration: .3s;
+    animation-duration: .7;
+    -webkit-animation-duration: .7s;
 
     animation-timing-function: ease-in;
     -webkit-animation-timing-function: ease-in;
@@ -658,25 +658,25 @@ slideLeft
 
 @keyframes slideLeft {
     0% {
-        transform: scale(0);
         opacity: 0;
+        transform: scale(0.95);
     }
 
     100% {
-        transform: scale(1);
         opacity: 1;
+        transform: scale(1);
     }
 }
 
 @-webkit-keyframes slideLeft {
     0% {
-        -webkit-transform: scale(0);
         opacity: 0;
+        -webkit-transform: scale(0.95);
     }
 
     100% {
-        -webkit-transform: scale(1);
         opacity: 1;
+        -webkit-transform: scale(1);
     }
 }
 
