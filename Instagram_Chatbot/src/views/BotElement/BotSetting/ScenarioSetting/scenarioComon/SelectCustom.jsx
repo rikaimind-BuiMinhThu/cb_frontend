@@ -7,7 +7,7 @@ import { isAndroid } from '../../PreviewComponent/Utils';
 
 const { Option } = Select;
 
-const SelectCustom = ({ id, allowClear = true, data, value, onChange, keyValue = "key", style, placeholder, nameValue = "value", mode, label, disabled = false, styleLabel, showSearch = true }) => {
+const SelectCustom = ({ id, allowClear = true, data, value, onChange, keyValue = "key", style, placeholder, nameValue = "value", mode, label, disabled = false, styleLabel, showSearch = true, className = "" }) => {
   // Native select for Android devices only
   if (isAndroid()) {
     return (
@@ -18,7 +18,7 @@ const SelectCustom = ({ id, allowClear = true, data, value, onChange, keyValue =
           value={value || ''}
           onChange={(e) => onChange && onChange(e.target.value)}
           disabled={disabled}
-          className="select-custom-native"
+          className={`select-custom-native ${className}`}
           style={style}
         >
           {placeholder && <option value="" disabled>{placeholder}</option>}
@@ -44,7 +44,7 @@ const SelectCustom = ({ id, allowClear = true, data, value, onChange, keyValue =
       <Select
         showSearch={showSearch}
         allowClear={allowClear}
-        className="select-custom-antd"
+        className={`select-custom-antd ${className}`}
         style={style}
         placeholder={placeholder}
         mode={mode ? mode : 'combobox'}

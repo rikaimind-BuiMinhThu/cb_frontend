@@ -81,7 +81,7 @@ function Payment() {
     //     // }
     //   };
 
-    function onChangeValue(indexContent) {
+    function onChangeValue(contentIndex) {
         
     }
 
