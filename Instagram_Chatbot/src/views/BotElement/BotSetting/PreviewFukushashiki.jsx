@@ -145,7 +145,6 @@ const previewInitialState = {
   conversionStatus: null,
   manuallyClosed: false,
   renderMode: RENDER_MODES.NEXT,
-  isAmazonPayData: false,
 };
 
 
@@ -235,15 +234,6 @@ const PreviewFukushashiki = () => {
         dispatch({ type: PREVIEW_ACTIONS.SET_CHATBOT_SETTINGS, payload: newState });
       });
   }, [state.botId, state.loadedStateFromSession, state.displayType]);
-
-  useEffect(() => {
-    if (params.get("is_using_amazon_pay")) {
-      dispatch({
-        type: PREVIEW_ACTIONS.SET_AMAZON_PAY_FLAG,
-        payload: true
-      });
-    }
-  }, []);
 
   const eventHandler = async (event) => {
     if (!event.data || !event.data.actionData) return;
@@ -829,8 +819,6 @@ const PreviewFukushashiki = () => {
         field,
         subField1,
         subField2,
-        message,
-        skipTextConversion: state.isAmazonPayData,
       }
     });
   };
@@ -980,7 +968,6 @@ const PreviewFukushashiki = () => {
             submitErrorMessage={state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "" : state.submitErrorMessage}
             botId={state.botId}
             isProcessing={!!state.isProcessing}
-            isAmazonPayData={state.isAmazonPayData}
           />
           {renderNextButton(message, messageIndex)}
         </div>
