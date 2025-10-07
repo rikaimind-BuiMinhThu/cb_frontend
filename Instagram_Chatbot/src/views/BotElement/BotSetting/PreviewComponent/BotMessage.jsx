@@ -29,7 +29,7 @@ const BotMessage = ({
   }, [isDelaying]);
 
   useEffect(() => {
-    if (!content || !content[content.type]?.originalContent || variables.length === 0) return;
+    if (!content || !content[content.type]?.originalContent) return;
 
     if (![BOT_MESSAGE_TYPES.TEXT_INPUT, BOT_MESSAGE_TYPES.GETTING_ERROR_NOTIFICATION].includes(content.type)) return;
 
