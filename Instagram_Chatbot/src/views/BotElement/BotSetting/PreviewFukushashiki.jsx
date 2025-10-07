@@ -57,7 +57,6 @@ import {
   getTimerConfig,
   setTimerConfig
 } from "./PreviewComponent/SessionStorageUtils";
-import { isTorizenLP } from "./PreviewComponent/TorizenUtils";
 import { isTokyoDeveloLP, UPDATE_TOKYO_DEVELO_LP_PREFECTURE_JS_CODE } from "./PreviewComponent/TokyoLPUtils";
 import PreventExitChatbotModal from "./PreviewComponent/PreventExitChatbotModal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
@@ -145,6 +144,7 @@ const previewInitialState = {
   isProcessing: false,
   conversionStatus: null,
   manuallyClosed: false,
+  renderMode: RENDER_MODES.NEXT,
 };
 
 
@@ -476,34 +476,15 @@ const PreviewFukushashiki = () => {
     }
   }, [state.loadedStateFromSession, state.displayType, state.isOpen, state.messagesList.length, state.botInfor, state.manuallyClosed]);
 
-  const getRenderMode = () => {
-    // TODO: 
-    // Hiện tại thì đang hard code check isTorizenLP từ url của LP để return RENDER_MODES.LAST
-    // Cần refactor đoạn này sao cho có thể sử dụng được setting RENDER_MODES trên trang quản lý
-    // 
-    if (state.isUpdateClicked && isTorizenLP(state.urlReceive)) return RENDER_MODES.LAST;
-    // Cần check xem có phải trường hợp reload hay ko?
-    // Nếu là trường hợp reload thì return RENDER_MODES.LAST
-    // Nếu là trường hợp không phải reload thì return RENDER_MODES.NEXT
-    
-    return RENDER_MODES.NEXT;
-  }
-
-  // Auto-render messages when current message index changes
-  // Delays rendering for 1 second to show smooth transition between messages
   useEffect(() => {
     if (!state.nextStopMsgIndex || state.currentMsgIndex + 1 >= state.nextStopMsgIndex) return;
 
     setTimeout(() => {
-      let endIndex = state.currentMsgIndex + 1 + 1;
-      if (state.isUpdateClicked) {
-        endIndex = getRenderMode() === RENDER_MODES.LAST ? state.nextStopMsgIndex : endIndex;
-      }
       dispatch({
         type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
         payload: {
           startIndex: 0,
-          endIndex: endIndex,
+          endIndex: state.currentMsgIndex + 1 + 1,
           fromCallback: false,
         }
       });
@@ -811,7 +792,7 @@ const PreviewFukushashiki = () => {
 
     dispatch({
       type: PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON,
-      payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn, renderMode: getRenderMode() }
+      payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn}
     });
   };
 
