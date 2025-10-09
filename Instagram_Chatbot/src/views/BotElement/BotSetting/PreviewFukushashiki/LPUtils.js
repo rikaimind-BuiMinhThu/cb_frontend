@@ -90,7 +90,7 @@ const getErrorMessageFromParent = (searchMode, searchValue, isDisplay) => {
       searchValue,
       isDisplay,
     }
-  }, {});
+  }, {isOpen: true});
 }
 
 export {
