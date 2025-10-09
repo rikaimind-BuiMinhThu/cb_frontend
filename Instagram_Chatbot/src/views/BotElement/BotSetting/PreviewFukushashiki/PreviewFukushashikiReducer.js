@@ -130,6 +130,11 @@ const PreviewFukushashikiReducer = (state, action) => {
         currentMsgIndex: state.currentMsgIndex,
       };
 
+      if (state.conversionStatus === CONVERSTION_RESPONSE_STATUS.FINISH && isUpdateClicked) {
+        newState.conversionStatus = undefined;
+        newState.isProcessing = false;
+      }
+      
       if (isLoggedIn) {
         newState.messagesList = newState.messagesList.map(x => ({...x, hidden: x.not_display_when_logged_in}));
       }
