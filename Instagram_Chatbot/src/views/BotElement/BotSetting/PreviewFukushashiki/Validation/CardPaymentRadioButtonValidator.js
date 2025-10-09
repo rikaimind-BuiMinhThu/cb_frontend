@@ -85,7 +85,8 @@ const validateCardDetails = (contentType) => {
   } = contentType;
 
   // Check card holder name validation
-  const isCardHolderValid = is_hide_card_name === true || !stringNullOrEmpty(card_holder);
+  const isCardHolderValid = is_hide_card_name === true || (separate_name === true ? 
+    (!stringNullOrEmpty(card_holder1) && !stringNullOrEmpty(card_holder2)) : !stringNullOrEmpty(card_holder));
 
   // Check CVC validation
   const isCvcValid = is_hide_cvc === true || !stringNullOrEmpty(cvc);
