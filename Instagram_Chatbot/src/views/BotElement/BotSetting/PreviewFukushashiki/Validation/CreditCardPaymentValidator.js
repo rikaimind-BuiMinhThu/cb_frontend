@@ -27,12 +27,13 @@ const validateCreditCardPayment = (contentType, messageContents, i, index, error
 };
 
 const validateRequiredFields = (contentType) => {
-  const { is_hide_card_name, card_holder, is_hide_cvc, cvc, separate_type, 
+  const { is_hide_card_name, card_holder, card_hodler1, card_hodler2, is_hide_cvc, cvc, separate_type, 
           card_number1, card_number2, card_number3, card_number4, 
-          card_number, year, month } = contentType;
+          card_number, year, month, separate_name} = contentType;
 
   return !(
     (is_hide_card_name !== true && stringNullOrEmpty(card_holder)) ||
+    (is_hide_card_name!== true && separate_name === true && (stringNullOrEmpty(card_hodler1) || (stringNullOrEmpty(card_hodler2)))) ||
     (is_hide_cvc !== true && stringNullOrEmpty(cvc)) ||
     (separate_type === true && (
       stringNullOrEmpty(card_number1) || stringNullOrEmpty(card_number2) ||

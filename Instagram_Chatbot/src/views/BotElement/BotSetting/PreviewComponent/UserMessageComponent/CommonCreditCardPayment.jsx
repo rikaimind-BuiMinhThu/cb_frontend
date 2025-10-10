@@ -208,7 +208,49 @@ export default function CommonCreditCardPayment({ content, messageIndex, content
 
   const renderCardHolder = () => {
     if (creditCardPayment.is_hide_card_name === true) return null;
-
+    if (creditCardPayment.separate_name === true) {
+      return (
+        <div className="ss-user-setting__item-bottom">
+          <div className="w-100-percent">カード名義</div>
+          <div className="ss-user-setting__item-select-bottom-wrapper-flex w-100-percent">
+            <InputCustom
+              styleLabel={{ width: "100%" }}
+              label=""
+              inline={false}
+              disabled={disabled}
+              value={creditCardPayment.card_holder1 || ""}
+              placeholder={creditCardPayment.card_holder_placeholder1 || ""}
+              onChange={(value) =>
+                onChangeValue(
+                  contentIndex,
+                  content.type,
+                  value,
+                  "card_holder1"
+                )
+              }
+            />
+            <InputCustom
+              styleLabel={{ width: "100%" }}
+              style={{ marginLeft: "7px" }}
+              label=""
+              inline={false}
+              disabled={disabled}
+              value={creditCardPayment.card_holder2 || ""}
+              placeholder={creditCardPayment.card_holder_placeholder2 || ""}
+              onChange={(value) =>
+                onChangeValue(
+                  contentIndex,
+                  content.type,
+                  value,
+                  "card_holder2"
+                )
+              }
+            />
+          </div>
+        </div>
+      );
+    }
+    
     return (
       <div className="ss-user-setting__item-bottom">
         <InputCustom
