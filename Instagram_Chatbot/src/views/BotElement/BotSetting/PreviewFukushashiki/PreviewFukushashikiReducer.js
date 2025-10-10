@@ -193,6 +193,7 @@ const PreviewFukushashikiReducer = (state, action) => {
       }
 
       newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+      newState.passedUserMsgCount = state.passedUserMsgCount + 1;
       newState.isUpdateClicked = isUpdateClicked;
 
       return { ...state, ...newState };
