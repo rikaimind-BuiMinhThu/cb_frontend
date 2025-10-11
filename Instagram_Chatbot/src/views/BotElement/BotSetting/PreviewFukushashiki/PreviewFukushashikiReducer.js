@@ -200,9 +200,14 @@ const PreviewFukushashikiReducer = (state, action) => {
       }
 
       newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
-      newState.passedUserMsgCount = state.passedUserMsgCount + 1;
       newState.isUpdateClicked = isUpdateClicked;
-
+      if (isUpdateClick) {
+        if (renderMode === RENDER_MODES.NEXT) {
+          newState.passedUserMsgCount = newState.renderMessagesList.filter(m => isUserMessage(m)).length;
+        }
+      } else {
+          newState.passedUserMsgCount = state.passedUserMsgCount + 1;
+      }
       return { ...state, ...newState };
     case PREVIEW_ACTIONS.UPDATE_PREFECTURES_LIST:
       return { ...state, prefecturesList: action.payload.prefecturesList };
