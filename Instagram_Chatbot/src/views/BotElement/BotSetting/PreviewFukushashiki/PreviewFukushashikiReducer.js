@@ -176,7 +176,9 @@ const PreviewFukushashikiReducer = (state, action) => {
       newState.renderMode = (isUpdateClicked && isTorizenLP(state.urlReceive)) ? RENDER_MODES.LAST : RENDER_MODES.NEXT;
       if (newState.renderMode === RENDER_MODES.LAST) {
         // LAST mode: render all messages up to the next user message
-        if (!isUpdateClicked) {
+        if (isUpdateClicked) {
+          newState.nextStopMsgIndex = newState.messagesList.length;
+        } else {
           newState.nextStopMsgIndex = nextStopMsgIndex;
         }
         if (newState.nextStopMsgIndex <= 0) {
@@ -199,8 +201,8 @@ const PreviewFukushashikiReducer = (state, action) => {
 
       newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
       newState.isUpdateClicked = isUpdateClicked;
-      if (isUpdateClicked) {
-        if (newState.renderMode === RENDER_MODES.NEXT) {
+      if (isUpdateClick) {
+        if (renderMode === RENDER_MODES.NEXT) {
           newState.passedUserMsgCount = newState.renderMessagesList.filter(m => isUserMessage(m)).length;
         }
       } else {
