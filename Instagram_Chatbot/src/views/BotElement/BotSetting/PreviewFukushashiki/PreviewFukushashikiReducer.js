@@ -201,8 +201,8 @@ const PreviewFukushashikiReducer = (state, action) => {
 
       newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
       newState.isUpdateClicked = isUpdateClicked;
-      if (isUpdateClick) {
-        if (renderMode === RENDER_MODES.NEXT) {
+      if (isUpdateClicked) {
+        if (newState.renderMode === RENDER_MODES.NEXT) {
           newState.passedUserMsgCount = newState.renderMessagesList.filter(m => isUserMessage(m)).length;
         }
       } else {
