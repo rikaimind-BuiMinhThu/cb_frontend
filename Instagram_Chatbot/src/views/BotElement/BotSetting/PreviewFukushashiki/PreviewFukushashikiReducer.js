@@ -199,10 +199,10 @@ const PreviewFukushashikiReducer = (state, action) => {
 
       newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
       newState.isUpdateClicked = isUpdateClicked;
-      if (!isUpdateClicked) {
+      if (renderMode === 'next') {
         newState.passedUserMsgCount = state.passedUserMsgCount + 1;
       } else {
-        newState.passedUserMsgCount = state.passedcUserMsgCount;
+        newState.passedUserMsgCount = newState.renderMessagesList.filter(m => isUserMessage(m)).length;
       }
       return { ...state, ...newState };
     case PREVIEW_ACTIONS.UPDATE_PREFECTURES_LIST:
