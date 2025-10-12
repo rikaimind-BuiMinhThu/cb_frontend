@@ -393,7 +393,7 @@ const displayPopup = async () => {
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
       }
-      if (e.data.isOpen && mobileCheck() && e.data.action !== undefined) {
+      if (e.data.isOpen && mobileCheck()) {
         document.body.style.overflow = 'hidden';
       } else {
         document.body.style.overflow = 'scroll';
