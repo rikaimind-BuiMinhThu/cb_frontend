@@ -1,3 +1,14 @@
+//temporary fix tokyo develo
+
+const isTokyoDeveloLP = (url) => {
+  const tokyoDeveloDomains = [
+    // Comment out if you want to test tokyoDevelo in localhost
+    // "localhost:8000",
+    // "commerceforce.co.jp",
+    "tokyo-develo.co.jp",
+  ];
+  return tokyoDeveloDomains.some(domain => url.includes(domain));
+}
 const CHATBOT_ACTIONS = {
   CLICK_BUTTON: 'clickButton',
   EXCUTE_JS: 'excuteJS',
@@ -358,6 +369,12 @@ const displayPopup = async () => {
           injectCustomJS(e.data.actionData);
           break;
         case CHATBOT_ACTIONS.OPEN_PREVIEW: 
+          // temporary fix
+          if (isTokyoDeveloLP(window.location.host)) {
+            document.body.style.overflow = 'scroll';
+            break;
+          }
+
           if (e.data.actionData && mobileCheck()) {
             document.body.style.overflow = 'hidden';
           } else {
