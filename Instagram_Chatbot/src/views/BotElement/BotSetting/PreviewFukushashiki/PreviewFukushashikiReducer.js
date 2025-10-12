@@ -534,6 +534,9 @@ const getProductDetailsForProductPurchase = (subContent, value) => {
 
 const handleSaveInputContent = (newState, subContent, contentType, field, value) => {
   if (!subContent.is_save_input_content) return;
+  if (contentType === 'card_payment_radio_button' && !['initial_selection', 'initial_selection_picture'].includes(field)) {
+    return;
+  }
 
   const variableName = subContent.save_input_content;
 
