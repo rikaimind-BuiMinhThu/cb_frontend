@@ -1,3 +1,14 @@
+//temporary fix tokyo develo
+
+const isTokyoDeveloLP = (url) => {
+  const tokyoDeveloDomains = [
+    // Comment out if you want to test tokyoDevelo in localhost
+    // "localhost:8000",
+    // "commerceforce.co.jp",
+    "tokyo-develo.co.jp",
+  ];
+  return tokyoDeveloDomains.some(domain => url.includes(domain));
+}
 const CHATBOT_ACTIONS = {
   CLICK_BUTTON: 'clickButton',
   EXCUTE_JS: 'excuteJS',
@@ -728,7 +739,9 @@ const injectCustomJS = (injectCustomJsCodes) => {
         document.body.insertBefore(script, document.body.firstChild);
         break;
       case CUSTOM_JS_CODE_POSITION.BOTTOM_BODY:
-        document.body.appendChild(script);
+        setTimeout(() => {
+          return document.body.appendChild(script);
+        }, 3000);
         break;
       default:
         console.error("Invalid position: " + position);
