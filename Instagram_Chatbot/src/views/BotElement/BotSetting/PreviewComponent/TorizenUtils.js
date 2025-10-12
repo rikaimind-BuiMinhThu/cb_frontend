@@ -88,8 +88,8 @@ export const mapAmazonPayDataToMessagesList = (amazonPayData, messagesList, pref
 export const isTorizenLP = (url) => {
   const torizenDomains = [
     // Comment out if you want to test torizen in localhost
-    // "localhost:8080",
-    "commerceforce.co.jp",
+    // "localhost:8000",
+    // "commerceforce.co.jp",
     "hana.inuneko-sukoyaka.jp",
     "sb.inuneko-sukoyaka.jp"
   ];
