@@ -1258,7 +1258,7 @@ const PreviewFukushashiki = () => {
           right: (state.useFullWidthChatbotMobile) ? "15px" : (state.rightMarginSp ? `${state.rightMarginSp}px` : '10px')
         }}
       >
-        <div className="sp-header-left" onClick={() => onOpenPreview(!state.isOpen)} style={{ width: '100%', padding: state.useFullWidthChatbotMobile ? "15px" : '4px' }}>
+        <div className="sp-header-left" style={{ width: '100%', padding: state.useFullWidthChatbotMobile ? "15px" : '4px' }}>
           <div className={state.useFullWidthChatbotMobile ? "fullwidth_mobile_chatbot sp-header-left-avatar sp-avatar" :"sp-header-left-avatar sp-avatar"} style={{ width: state.useFullWidthChatbotMobile ? "58px"  :'38px' }}>
             <img
               src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
@@ -1293,7 +1293,7 @@ const PreviewFukushashiki = () => {
           right: `${-120}px`,
         }}
       >
-        <div className="sp-header-left" onClick={() => onOpenPreview(!state.isOpen)}>
+        <div className="sp-header-left">
           <div className="sp-header-left-avatar sp-avatar">
             <img
               src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
