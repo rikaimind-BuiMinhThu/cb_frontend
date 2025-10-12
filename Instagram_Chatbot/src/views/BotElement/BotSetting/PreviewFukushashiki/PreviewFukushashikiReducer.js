@@ -9,7 +9,7 @@ import {
 import { processForBotMessage } from '../PreviewComponent/BotMessageUtils';
 import { processForUserMessage } from '../PreviewComponent/UserMessageUtils';
 import { isButtonSubmitMessage, isBotMessage, isUserMessage, getNextUserMsg } from '../PreviewComponent/Utils';
-import { isTorizenLP, mapAmazonPayDataToMessagesList } from '../PreviewComponent/TorizenUtils';
+import { mapAmazonPayDataToMessagesList } from '../PreviewComponent/TorizenUtils';
 import {
   RENDER_CHATBOT_CONFIG,
   GETTING_ERROR_NOTIFICATION,
@@ -130,6 +130,11 @@ const PreviewFukushashikiReducer = (state, action) => {
         currentMsgIndex: state.currentMsgIndex,
       };
 
+      if (state.conversionStatus === CONVERSTION_RESPONSE_STATUS.FINISH && isUpdateClicked) {
+        newState.conversionStatus = undefined;
+        newState.isProcessing = false;
+      }
+      
       if (isLoggedIn) {
         newState.messagesList = newState.messagesList.map(x => ({...x, hidden: x.not_display_when_logged_in}));
       }
@@ -168,18 +173,18 @@ const PreviewFukushashikiReducer = (state, action) => {
       // Calculate next stop message index
       const nextStopMsgIndex = state.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex)) + 1;
 
-      newState.renderMode = (isUpdateClicked && isTorizenLP(state.urlReceive)) ? RENDER_MODES.LAST : RENDER_MODES.NEXT;
+      newState.renderMode = (isUpdateClicked && state.isUsedPastMessageLoaded) ? RENDER_MODES.LAST : RENDER_MODES.NEXT;
       if (newState.renderMode === RENDER_MODES.LAST) {
         // LAST mode: render all messages up to the next user message
         if (!isUpdateClicked) {
           newState.nextStopMsgIndex = nextStopMsgIndex;
-        }
-        if (newState.nextStopMsgIndex <= 0) {
-          // If click to last message -> render message from 1 to last message
-          // currentMsgIndex is not changed
-          newState.nextStopMsgIndex = newState.messagesList.length;
-        } else {
-          newState.currentMsgIndex = newState.nextStopMsgIndex - 1;
+          if (newState.nextStopMsgIndex <= 0) {
+            // If click to last message -> render message from 1 to last message
+            // currentMsgIndex is not changed
+            newState.nextStopMsgIndex = newState.messagesList.length;
+          } else {
+            newState.currentMsgIndex = newState.nextStopMsgIndex - 1;
+          }
         }
       } else {
         // NEXT mode: render messages one by one
@@ -194,7 +199,13 @@ const PreviewFukushashikiReducer = (state, action) => {
 
       newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
       newState.isUpdateClicked = isUpdateClicked;
-
+      if (isUpdateClicked) {
+        if (newState.renderMode === RENDER_MODES.NEXT) {
+          newState.passedUserMsgCount = newState.renderMessagesList.filter(m => isUserMessage(m)).length;
+        }
+      } else {
+          newState.passedUserMsgCount = state.passedUserMsgCount + 1;
+      }
       return { ...state, ...newState };
     case PREVIEW_ACTIONS.UPDATE_PREFECTURES_LIST:
       return { ...state, prefecturesList: action.payload.prefecturesList };
@@ -523,6 +534,9 @@ const getProductDetailsForProductPurchase = (subContent, value) => {
 
 const handleSaveInputContent = (newState, subContent, contentType, field, value) => {
   if (!subContent.is_save_input_content) return;
+  if (contentType === 'card_payment_radio_button' && !['initial_selection', 'initial_selection_picture'].includes(field)) {
+    return;
+  }
 
   const variableName = subContent.save_input_content;
 

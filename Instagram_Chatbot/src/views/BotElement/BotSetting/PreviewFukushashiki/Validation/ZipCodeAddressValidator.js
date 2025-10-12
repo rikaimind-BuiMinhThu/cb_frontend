@@ -22,6 +22,8 @@ const validateFields = {
   },
   
   address: (data) => {
+    if (data.compact_municipality_and_address || data.compact_municipality_and_address_and_building_name) return true;
+
     return !stringNullOrEmpty(data.value_address) || !data.hasOwnProperty('address');
   },
   
