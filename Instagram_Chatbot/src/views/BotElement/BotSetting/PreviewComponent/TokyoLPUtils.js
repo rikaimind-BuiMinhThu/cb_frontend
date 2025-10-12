@@ -2,7 +2,7 @@ export const isTokyoDeveloLP = (url) => {
   const tokyoDeveloDomains = [
     // Comment out if you want to test tokyoDevelo in localhost
     // "localhost:8000",
-    "commerceforce.co.jp",
+    // "commerceforce.co.jp",
     "tokyo-develo.co.jp",
   ];
   
