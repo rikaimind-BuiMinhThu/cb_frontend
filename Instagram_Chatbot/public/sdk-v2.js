@@ -369,6 +369,12 @@ const displayPopup = async () => {
           injectCustomJS(e.data.actionData);
           break;
         case CHATBOT_ACTIONS.OPEN_PREVIEW: 
+          // temporary fix
+          if (isTokyoDeveloLP(window.location.host)) {
+            document.body.style.overflow = 'scroll';
+            break;
+          }
+
           if (e.data.actionData && mobileCheck()) {
             document.body.style.overflow = 'hidden';
           } else {
@@ -739,9 +745,7 @@ const injectCustomJS = (injectCustomJsCodes) => {
         document.body.insertBefore(script, document.body.firstChild);
         break;
       case CUSTOM_JS_CODE_POSITION.BOTTOM_BODY:
-        setTimeout(() => {
-          return document.body.appendChild(script);
-        }, 3000);
+        document.body.appendChild(script);
         break;
       default:
         console.error("Invalid position: " + position);
