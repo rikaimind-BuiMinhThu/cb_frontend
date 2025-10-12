@@ -357,6 +357,13 @@ const displayPopup = async () => {
         case CHATBOT_ACTIONS.INJECT_CUSTOM_JS:
           injectCustomJS(e.data.actionData);
           break;
+        case CHATBOT_ACTIONS.OPEN_PREVIEW: 
+          if (e.data.actionData && mobileCheck()) {
+            document.body.style.overflow = 'hidden';
+          } else {
+            document.body.style.overflow = 'scroll';
+          }
+          break;
       };
 
       if (e.data.isOpen && mobileCheck()) {
@@ -392,11 +399,6 @@ const displayPopup = async () => {
         iframe.height = chatbotBottom ? `${parseInt(chatbotBottom) + 77}px` : "77px";
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
-      }
-      if (e.data.isOpen && mobileCheck()) {
-        document.body.style.overflow = 'hidden';
-      } else {
-        document.body.style.overflow = 'scroll';
       }
       globalIframe = iframe;
     },
