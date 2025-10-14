@@ -29,7 +29,7 @@ const fukushashikiToLP = (fukushashikiData, state) => {
   postMessageToParent({
     action: 'fukushashiki',
     actionData: fukushashikiData,
-    isOpen: true
+    isOpen: state.isOpen
   }, state);
 };
 
@@ -58,7 +58,7 @@ const injectCustomJsCode = (hasSentCustomJsRef, state, { head, top_body, bottom_
   postMessageToParent({
     action: CHATBOT_ACTIONS.INJECT_CUSTOM_JS,
     actionData: items,
-    isOpen: true
+    isOpen: state.isOpen,
   }, state);
 
   hasSentCustomJsRef.current = true;
@@ -66,7 +66,7 @@ const injectCustomJsCode = (hasSentCustomJsRef, state, { head, top_body, bottom_
 
 const setConversionParamToLocalStorage = (scenarioId, botType, userInputId, env, state) => {
   postMessageToParent({
-    isOpen: true,
+    isOpen: state.isOpen,
     action: CHATBOT_ACTIONS.SET_CHATBOT_CONVERSION_PARAMS_TO_LOCAL_STORAGE,
     actionData: {
       scenarioId, botType, userInputId, env
