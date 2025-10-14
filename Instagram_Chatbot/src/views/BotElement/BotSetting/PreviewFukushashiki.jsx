@@ -524,7 +524,7 @@ const PreviewFukushashiki = () => {
     setTimerChanges((timerChanges) => timerChatbotStorage || timerChanges);
 
     // post message to parent window
-    postMessageToParent({ action: CHATBOT_ACTIONS.OPEN_PREVIEW, actionData: opening}, state);
+    postMessageToParent({ isOpen: opening}, state);
 
     if (state.alreadyOpenFirstTime) {
       if (!opening) {
