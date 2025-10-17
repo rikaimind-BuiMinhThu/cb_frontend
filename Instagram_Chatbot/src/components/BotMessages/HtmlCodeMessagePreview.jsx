@@ -1,30 +1,93 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
-const HtmlCodeMessagePreview = ({
-  content,
-  contentIndex,
-  botInfor
-}) => {
+/**
+ * HtmlCodeMessagePreview Component
+ * Renders HTML messages and auto-injects <link>, <script>, <input hidden> tags
+ */
+const HtmlCodeMessagePreview = ({ content, contentIndex, botInfor }) => {
   const defaultHtmlContent = '<p style="color: #999; font-style: italic;">HTMLコードを入力してください</p>';
   const htmlContent = content[content.type]?.content || defaultHtmlContent;
-  const isUseForUgc = !!content[content.type]?.use_for_ugc;
+  const hasProcessed = useRef(false);
 
   const messageColor = botInfor?.message_color || '#3CACEF';
   const fontColor = botInfor?.font_color || '#fff';
   const iconMess = botInfor?.icon_mess;
 
+  // Auto-inject resources once when component mounts
+  useEffect(() => {
+    if (hasProcessed.current || !htmlContent || htmlContent === defaultHtmlContent) return;
+    
+    try {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlContent, 'text/html');
+      
+      // 1. Inject <link> tags (CSS)
+      doc.querySelectorAll('link').forEach(link => {
+        const href = link.getAttribute('href');
+        if (href && !document.querySelector(`link[href="${href}"]`)) {
+          const clonedLink = link.cloneNode(true);
+          document.head.appendChild(clonedLink);
+        }
+      });
+      
+      // 2. Inject <script> tags (JavaScript)
+      doc.querySelectorAll('script').forEach(script => {
+        const src = script.getAttribute('src');
+        if (src && !document.querySelector(`script[src="${src}"]`)) {
+          const newScript = document.createElement('script');
+          newScript.src = src;
+          Array.from(script.attributes).forEach(attr => {
+            if (attr.name !== 'src') newScript.setAttribute(attr.name, attr.value);
+          });
+          document.head.appendChild(newScript);
+        } else if (!src && script.textContent) {
+          const newScript = document.createElement('script');
+          newScript.textContent = script.textContent;
+          document.head.appendChild(newScript);
+        }
+      });
+      
+      // 3. Inject hidden <input> elements
+      doc.querySelectorAll('input[type="hidden"][id]').forEach(el => {
+        const id = el.getAttribute('id');
+        if (!document.getElementById(id)) {
+          document.body.appendChild(el.cloneNode(true));
+        }
+      });
+      
+      hasProcessed.current = true;
+    } catch (error) {
+      console.error('Failed to process HTML code:', error);
+    }
+  }, [htmlContent, defaultHtmlContent]);
+  
+  // Extract visible HTML (remove injected tags)
+  const getVisibleHtmlContent = () => {
+    try {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlContent, 'text/html');
+      doc.querySelectorAll('link, script, input[type="hidden"]').forEach(el => el.remove());
+      return doc.body.innerHTML || htmlContent;
+    } catch (error) {
+      return htmlContent;
+    }
+  };
+
   return (
-    <div className="position-relative">
+    <div className="position-relative ugc-html-wrapper">
+      {/* Main message bubble */}
       <div
-        className={`ss-bot-chat-overview-${contentIndex} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value position-relative html-code-message-preview ${isUseForUgc ? 'display_ugc' : ""}`}
+        className={`ss-bot-chat-overview-${contentIndex} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value position-relative html-code-message-preview ugc-html-content`}
         style={{
           backgroundColor: messageColor,
           color: fontColor
         }}
         dangerouslySetInnerHTML={{
-          __html: htmlContent
+          __html: getVisibleHtmlContent()
         }}
       />
+      
+      {/* Message tail icon */}
       <div
         className="html-code-message-icon"
         style={{
