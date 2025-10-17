@@ -285,7 +285,19 @@ const PreviewFukushashiki = () => {
           type: PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA,
           payload: actionData,
         });
+      
+      case CHATBOT_ACTIONS.UPDATE_NUMBER_ORDER_TO_UPSELL:
+        if (actionData) {
+          const variables = Object.entries(actionData).map(([k, v]) => ({
+            variable_name: k,
+            default_value: String(v),
+          }));
 
+          return dispatch({
+            type: PREVIEW_ACTIONS.UPDATE_NUMBER_ORDER_TO_UPSELL,
+            payload: {variables, objParam: actionData}
+          });
+        }
       default:
         // TODO
         break;

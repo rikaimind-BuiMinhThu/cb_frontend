@@ -1,3 +1,4 @@
+/* eslint-disable default-case */
 import _ from 'lodash';
 import { 
   stringNullOrEmpty, 
@@ -411,6 +412,28 @@ const PreviewFukushashikiReducer = (state, action) => {
       return { ...state, ...action.payload };
     case PREVIEW_ACTIONS.SET_MANUALLY_CLOSED:
       return { ...state, manuallyClosed: action.payload };
+    case PREVIEW_ACTIONS.UPDATE_NUMBER_ORDER_TO_UPSELL:
+      const {variables, objParam} = action.payload;
+      let newVariables = [...state.variables];
+      
+      if (variables) {
+        const entries = Array.isArray(variables) 
+          ? variables.filter(v => v?.variable_name).map(v => [v.variable_name, v])
+          : Object.entries(variables).map(([k, v]) => [k, {variable_name: k, default_value: String(v)}])
+
+        entries.forEach(([name, data]) => {
+          const idx = newVariables.findIndex(v => v.variable_name === name);
+          idx >= 0 
+          ? newVariables[idx] = {...newVariables[idx] = {...newVariables[idx], ...data}}
+          : newVariables.push(data);
+        })
+      }
+      return {
+        ...state,
+        variables: newVariables,
+        objParam: objParam ? {...state.objParam, ...objParam} : state.objParam
+      };
+
   }
 
   return state;
