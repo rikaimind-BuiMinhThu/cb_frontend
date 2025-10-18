@@ -1,5 +1,5 @@
 // Initialize Sentry (single clean block)
-(function initSentry() {
+(function initSentry() { 
   try {
     // Avoid double-initializing if sdk is loaded multiple times
     if (window.__SENTRY_SDK_V2_INITIALIZED__) return;
@@ -111,27 +111,7 @@
         console.error('Sentry init error (sdk-v2):', e);
       }
 
-      // Optional quick test (comment out in production)
-        // Optional quick test (trigger only when you add ?sentry_test=1 to the page URL)
-        try {
-          if (window.location && window.location.search && window.location.search.indexOf('sentry_test=1') !== -1) {
-            // Send a test error and log the returned event id
-            var testError = new Error('Manual test error from SDK-v2');
-            var eventId = window.Sentry.captureException(testError);
-            console.log('Sentry.captureException eventId:', eventId);
 
-            // Flush the SDK queue to ensure delivery (wait up to 2s)
-            if (window.Sentry.flush) {
-              window.Sentry.flush(2000).then(function(flushResult) {
-                console.log('Sentry.flush completed (sdk-v2)');
-              }).catch(function(flushErr) {
-                console.warn('Sentry.flush error (sdk-v2):', flushErr);
-              });
-            }
-          }
-        } catch (testErr) {
-          console.warn('Sentry test capture failed (sdk-v2):', testErr);
-        }
     };
 
     sentryScript.onerror = function (err) {
