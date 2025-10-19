@@ -1,3 +1,157 @@
+// Initialize Sentry (single clean block)
+(function initSentry() { 
+  try {
+    // Avoid double-initializing if sdk is loaded multiple times
+    if (window.__SENTRY_SDK_V2_INITIALIZED__) return;
+    window.__SENTRY_SDK_V2_INITIALIZED__ = true;
+
+  var sentryScript = document.createElement('script');
+  // Use the official browser CDN path (no @sentry/browser prefix) to avoid 404/CORS
+  sentryScript.src = 'https://browser.sentry-cdn.com/7.57.0/bundle.min.js';
+    sentryScript.crossOrigin = 'anonymous';
+
+    sentryScript.onload = function () {
+      try {
+        if (window.Sentry && !window.__SENTRY_INITIALIZED__) {
+          window.__SENTRY_INITIALIZED__ = true;
+          window.Sentry.init({
+            dsn: 'https://a6b801f5d481f7fdb5aef4884261e2a3@o4510208018874378.ingest.us.sentry.io/4510208274137088',
+            debug: false,
+            sendDefaultPii: true,
+            integrations: (typeof window.Sentry !== 'undefined' && typeof window.Sentry.BrowserTracing === 'function') ? [new window.Sentry.BrowserTracing()] : []
+          });
+          console.log('Sentry initialized (sdk-v2)');
+
+          // Attach global handlers so runtime errors and promise rejections are captured
+          try {
+            window.addEventListener('error', function(evt) {
+              try {
+                var err = evt && evt.error ? evt.error : new Error('window.error: ' + (evt && evt.message ? evt.message : String(evt)));
+                if (window.Sentry) {
+                  window.Sentry.captureException(err);
+                  console.log('Sentry captured window.error');
+                }
+              } catch (e) {
+                console.warn('Error forwarding window.error to Sentry', e);
+              }
+            });
+
+            window.addEventListener('unhandledrejection', function(evt) {
+              try {
+                var reason = evt && evt.reason ? evt.reason : new Error('Unhandled rejection');
+                if (window.Sentry) {
+                  window.Sentry.captureException(reason);
+                  console.log('Sentry captured unhandledrejection');
+                }
+              } catch (e) {
+                console.warn('Error forwarding unhandledrejection to Sentry', e);
+              }
+            });
+
+            // helper to manually capture exceptions from page
+            window.__sdk_v2_captureException = function(e) { if (window.Sentry) { return window.Sentry.captureException(e); } };
+
+            // Override console.error to forward to Sentry (with recursion guard)
+            (function() {
+              var origConsoleError = console.error && console.error.bind ? console.error.bind(console) : function(){return;};
+              var inProgress = false;
+              console.error = function() {
+                var args = Array.prototype.slice.call(arguments);
+                if (inProgress) {
+                  return origConsoleError.apply(console, args);
+                }
+                try {
+                  inProgress = true;
+                  if (window.Sentry) {
+                    var first = args[0];
+                    var err;
+                    if (first instanceof Error) err = first;
+                    else {
+                      try { err = new Error(args.map(function(a){ return typeof a === 'string' ? a : JSON.stringify(a); }).join(' ')); }
+                      catch (e) { err = new Error(String(first)); }
+                    }
+                    try {
+                      var eid = window.Sentry.captureException(err);
+                      origConsoleError('Sentry.captureException eventId:', eid);
+                    } catch(e) {
+                      origConsoleError('Sentry capture failed:', e);
+                    }
+                  }
+                } finally {
+                  inProgress = false;
+                  return origConsoleError.apply(console, args);
+                }
+              };
+            })();
+
+            // Axios interceptor to capture response errors automatically
+            try {
+              if (window.axios && window.Sentry) {
+                if (!window.__sdk_v2_axios_installed__) {
+                  window.__sdk_v2_axios_installed__ = true;
+                  window.axios.interceptors.response.use(function (resp) { return resp; }, function (error) {
+                    try {
+                      var ev = window.Sentry.captureException(error);
+                      console.log('Sentry.captureException eventId (axios):', ev);
+                    } catch(e) {
+                      console.warn('Failed to capture axios error in Sentry', e);
+                    }
+                    return Promise.reject(error);
+                  });
+                }
+              }
+            } catch (e) {
+              console.warn('Failed to install axios interceptor (sdk-v2):', e);
+            }
+          } catch (handlerErr) {
+            console.warn('Failed to attach global Sentry handlers (sdk-v2):', handlerErr);
+          }
+        }
+      } catch (e) {
+        console.error('Sentry init error (sdk-v2):', e);
+      }
+
+
+    };
+
+    sentryScript.onerror = function (err) {
+      console.error('Failed to load Sentry script (sdk-v2):', err);
+    };
+
+    document.head.appendChild(sentryScript);
+  } catch (outer) {
+    console.error('Failed to setup Sentry loader (sdk-v2):', outer);
+  }
+})();
+
+// Error tracking wrapper function
+function trackError(error, context = {}) {
+  if (window.Sentry) {
+    try {
+      var ev = Sentry.captureException(error, { extra: context });
+      console.log('Sentry.captureException eventId:', ev);
+    } catch (e) {
+      console.warn('Sentry.captureException failed in trackError', e);
+    }
+  }
+  console.error(error);
+}
+
+// Wrap your main functions with try-catch
+function wrapWithErrorHandling(fn, fnName) {
+  return function wrapped(...args) {
+    try {
+      return fn.apply(this, args);
+    } catch (error) {
+      trackError(error, {
+        functionName: fnName,
+        arguments: JSON.stringify(args)
+      });
+      throw error;
+    }
+  };
+}
+
 const CHATBOT_ACTIONS = {
   CLICK_BUTTON: 'clickButton',
   EXCUTE_JS: 'excuteJS',
@@ -339,9 +493,30 @@ const displayPopup = async () => {
           await crawlDataAndSendMessage(e.data.actionData);
           break;
         case CHATBOT_ACTIONS.CLICK_BUTTON:
-          const button = document.getElementById(e.data.actionData);
-          if (!button) throw new Error(`Button not found: id ${e.data.actionData}`);
-          button.click();
+          (function() {
+            const button = document.getElementById(e.data.actionData);
+            if (!button) {
+              const err = new Error(`Button not found: id ${e.data.actionData}`);
+              try {
+                if (window.Sentry) {
+                  window.Sentry.captureException(err);
+                  console.log('Sentry captured missing button error:', e.data.actionData);
+                } else {
+                  console.warn('Button not found (Sentry not available):', e.data.actionData);
+                }
+              } catch (captureErr) {
+                console.warn('Error while sending missing-button to Sentry', captureErr);
+              }
+              return; // don't throw — we've reported it
+            }
+
+            try {
+              button.click();
+            } catch (clickErr) {
+              try { if (window.Sentry) window.Sentry.captureException(clickErr); } catch (e) { /* ignore */ }
+              throw clickErr;
+            }
+          })();
           break;
         case CHATBOT_ACTIONS.GET_PREVIEW_ORDER_CONTENT:
           const { isNewProcess = false } = e.data;
@@ -467,6 +642,14 @@ const extractFromJs = async (options) => {
 
     return result;
   } catch (error) {
+    try {
+      if (window.Sentry) {
+        var ev = window.Sentry.captureException(error);
+        console.log('Sentry.captureException eventId:', ev);
+      }
+    } catch (e) {
+      console.warn('Failed sending EXTRACT_FROM_JS error to Sentry', e);
+    }
     console.error("[EXTRACT_FROM_JS]", error);
 
     return null;
@@ -644,6 +827,15 @@ const setValueToElement = (element, value) => {
     });
 
     if (!newElementValue && newElementValue !== '') {
+      try {
+        var optErr = new Error(`Option not found: ${value}, element: ${element.id}`);
+        if (window.Sentry) {
+          var ev = window.Sentry.captureException(optErr);
+          console.log('Sentry.captureException eventId:', ev);
+        }
+      } catch (e) {
+        console.warn('Failed sending option-not-found to Sentry', e);
+      }
       console.error(`Option not found: ${value}, element: ${element.id}`);
     }
   }
@@ -653,7 +845,7 @@ const setValueToElement = (element, value) => {
   element.dispatchEvent(new Event('change', { bubbles: true }));
 }
 
-const setValuePaymentMethodToElement = (element, value) => {
+const setValuePaymentMethodToElement = wrapWithErrorHandling((element, value) => {
   const radioButtons = [...element.querySelectorAll('input[type="radio"]')];
   
   if (radioButtons.length > 0) {
@@ -661,7 +853,7 @@ const setValuePaymentMethodToElement = (element, value) => {
   } else {
     setValueToElement(element, value);
   }
-};
+}, 'setValuePaymentMethodToElement');
 
 const setRadioValue = (element, value) => {
   const radioButtons = [...element.querySelectorAll('input[type="radio"]')];
@@ -672,7 +864,7 @@ const setRadioValue = (element, value) => {
   selectedRadio.dispatchEvent(new Event('change', { bubbles: true }));
 };
 
-const getUser = async (url, datacount) => {
+const getUser = wrapWithErrorHandling(async (url, datacount) => {
   const response = await fetch(url, {
     method: "PATCH",
     headers: {
@@ -683,7 +875,7 @@ const getUser = async (url, datacount) => {
   });
   const data = await response.json();
   log(data);
-}
+}, 'getUser');
 
 const tabletCheck = () => {
   const userAgent = navigator.userAgent.toLowerCase();
