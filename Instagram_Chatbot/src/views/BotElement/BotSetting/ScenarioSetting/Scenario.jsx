@@ -6146,7 +6146,7 @@ const Scenario = () => {
                                 <HtmlCodeConfig 
                                   config={dataMessages[indexMessageSelect].message_content[0][messageType]}
                                   onChangeValue={onChangeValueMessageContent}
-                                  messageIndexSelect={indexMessageSelect}
+                                  indexMessageSelect={indexMessageSelect}
                                 />
                               )}
                             </div>
