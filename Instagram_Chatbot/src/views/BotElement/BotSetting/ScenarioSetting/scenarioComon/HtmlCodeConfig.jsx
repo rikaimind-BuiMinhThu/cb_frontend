@@ -4,7 +4,7 @@ import { useState } from "react";
 import { BOT_MESSAGE_TYPES } from "../../PreviewComponent/Constants";
 
 export default function HtmlCodeConfig({
-  messageIndexSelect,
+  indexMessageSelect,
   config,
   onChangeValue,
 }) {
@@ -13,11 +13,11 @@ export default function HtmlCodeConfig({
   const [htmlValidationError, setHtmlvalidationError] = useState("");
 
   const onChangeContent = (value) => {
-    onChangeValue(messageIndexSelect, 0, messageType, value, "content");
+    onChangeValue(indexMessageSelect, 0, messageType, value, "content");
   };
 
   const onChangeUseAsUGC = (value) => {
-    onChangeValue(messageIndexSelect, 0, messageType, value, "use_for_ugc");
+    onChangeValue(indexMessageSelect, 0, messageType, value, "use_for_ugc");
   };
 
   const onChange = (type) => (e) => {
