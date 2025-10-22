@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 
 const HtmlCodeMessagePreview = ({
   content,
@@ -8,88 +8,12 @@ const HtmlCodeMessagePreview = ({
   const defaultHtmlContent = '<p style="color: #999; font-style: italic;">HTMLコードを入力してください</p>';
   const htmlContent = content[content.type]?.content || defaultHtmlContent;
   const isUseForUgc = !!content[content.type]?.use_for_ugc;
-  const hasProcessed = useRef(false);
 
   const messageColor = botInfor?.message_color || '#3CACEF';
   const fontColor = botInfor?.font_color || '#fff';
   const iconMess = botInfor?.icon_mess;
 
-  useEffect(() => {
-    if (
-      hasProcessed.current ||
-      !htmlContent ||
-      htmlContent === defaultHtmlContent
-    )
-      return;
-
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(htmlContent, 'text/html');
-
-    const addedLinks = [];
-    const addedScripts = [];
-    const addedInputs = [];
-
-    try {
-      // 1. Inject <link> tags (CSS)
-      doc.querySelectorAll('link[href]').forEach((link) => {
-        const href = link.getAttribute('href');
-        if (href && !document.querySelector(`link[href="${href}"]`)) {
-          const newLink = document.createElement('link');
-          newLink.rel = 'stylesheet';
-          newLink.href = href;
-          document.head.appendChild(newLink);
-          addedLinks.push(newLink);
-        }
-      });
-
-      // 2️. Inject <script> tags (only external JS)
-      doc.querySelectorAll('script[src]').forEach((script) => {
-        const src = script.getAttribute('src');
-        if (src && !document.querySelector(`script[src="${src}"]`)) {
-          const newScript = document.createElement('script');
-          newScript.src = src;
-          Array.from(script.attributes).forEach((attr) => {
-            if (attr.name !== 'src')
-              newScript.setAttribute(attr.name, attr.value);
-          });
-          newScript.async = false; // đảm bảo thứ tự thực thi
-          document.body.appendChild(newScript);
-          addedScripts.push(newScript);
-        }
-      });
-
-      // 3️. Inject hidden <input>
-      doc.querySelectorAll('input[type="hidden"][id]').forEach((el) => {
-        const id = el.getAttribute('id');
-        if (id && !document.getElementById(id)) {
-          const newInput = el.cloneNode(true);
-          document.body.appendChild(newInput);
-          addedInputs.push(newInput);
-        }
-      });
-
-      hasProcessed.current = true;
-    } catch (error) {
-      console.error('Failed to process HTML code:', error);
-    }
-
-    return () => {
-      addedLinks.forEach((el) => el.remove());
-      addedScripts.forEach((el) => el.remove());
-      addedInputs.forEach((el) => el.remove());
-    };
-  }, [htmlContent, defaultHtmlContent]);
-
-  const getVisibleHtmlContent = () => {
-    try {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(htmlContent, 'text/html');
-      doc.querySelectorAll('link, script, input[type="hidden"]').forEach(el => el.remove());
-      return doc.body.innerHTML || htmlContent;
-    } catch (error) {
-      return htmlContent;
-    }
-  };
+  
 
   return (
     <div className="position-relative">
@@ -100,7 +24,7 @@ const HtmlCodeMessagePreview = ({
           color: fontColor
         }}
         dangerouslySetInnerHTML={{
-          __html: getVisibleHtmlContent()
+          __html: htmlContent
         }}
       />
       <div
