@@ -8,7 +8,7 @@ export default function Text({ content, disabled, handleOnChangeJpConvertText, c
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.TEXT_INPUT || content.text_input.type !== "text") return null;
   const textInput = content.text_input;
 
-  if (textInput.isSplitInput === true || textInput.isSplitInput === undefined) {
+  if (textInput.text?.isSplitInput) {
     return (
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <SplitInputText content={content} disabled={disabled} handleOnChangeJpConvertText={handleOnChangeJpConvertText} contentIndex={contentIndex} onChangeValue={onChangeValue} />
@@ -26,7 +26,7 @@ export default function Text({ content, disabled, handleOnChangeJpConvertText, c
 const SplitInputText = ({ content, disabled, handleOnChangeJpConvertText, contentIndex, onChangeValue }) => {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.TEXT_INPUT || content.text_input.type !== "text") return null;
   const textInput = content.text_input;
-  if (textInput.isSplitInput !== undefined && textInput.isSplitInput !== true) return null;
+  if (!textInput.text?.isSplitInput) return null;
 
   if (textInput.isUseConvertText) {
     return (
@@ -92,7 +92,7 @@ const SplitInputText = ({ content, disabled, handleOnChangeJpConvertText, conten
 const SingleInputText = ({ content, disabled, handleOnChangeJpConvertText, contentIndex, onChangeValue }) => {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.TEXT_INPUT || content.text_input.type !== "text") return null;
   const textInput = content.text_input;
-  if (textInput.isSplitInput) return null;
+  if (textInput.text?.isSplitInput) return null;
 
   if (textInput.isUseConvertText) {
     return (

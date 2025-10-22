@@ -13,6 +13,8 @@ const HtmlCodeMessagePreview = ({
   const fontColor = botInfor?.font_color || '#fff';
   const iconMess = botInfor?.icon_mess;
 
+  
+
   return (
     <div className="position-relative">
       <div

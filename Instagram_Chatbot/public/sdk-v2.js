@@ -683,7 +683,7 @@ const getUser = async (url, datacount) => {
   });
   const data = await response.json();
   log(data);
-}
+};
 
 const tabletCheck = () => {
   const userAgent = navigator.userAgent.toLowerCase();
