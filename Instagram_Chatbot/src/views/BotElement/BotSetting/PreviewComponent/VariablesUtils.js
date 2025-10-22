@@ -121,6 +121,7 @@ const getCheckboxValue = (subContent, field, value) => {
 
 const getZipCodeAddressValue = (subContent, prefecturesList) => {
   const zipCodeAddress = subContent.zip_code_address; 
+  if (!zipCodeAddress) return "";
   const postCode = !zipCodeAddress.split_postal_code
     ? zipCodeAddress?.value_post_code
     : `${zipCodeAddress.value_post_code_left}${zipCodeAddress.value_post_code_right}`;
