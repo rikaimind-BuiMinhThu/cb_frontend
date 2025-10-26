@@ -15,7 +15,7 @@
         if (window.Sentry && !window.__SENTRY_INITIALIZED__) {
           window.__SENTRY_INITIALIZED__ = true;
           window.Sentry.init({
-            dsn: 'https://a6b801f5d481f7fdb5aef4884261e2a3@o4510208018874378.ingest.us.sentry.io/4510208274137088',
+            dsn: 'https://12b50bfdf6c0598e78a84630e5f7e40b@o4510197539930112.ingest.us.sentry.io/4510256042868736',
             debug: false,
             sendDefaultPii: true,
             integrations: (typeof window.Sentry !== 'undefined' && typeof window.Sentry.BrowserTracing === 'function') ? [new window.Sentry.BrowserTracing()] : []
