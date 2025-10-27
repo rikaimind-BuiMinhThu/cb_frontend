@@ -11,12 +11,12 @@ const postMessageToParent = (options, state) => {
     isOpen: state.isOpen,
     source: 'ec-chatbot',
     useMoblieFullwidth: !!state.useFullWidthChatbotMobile,
-    // widthPc: state.widthPc,
-    // heightPc: state.heightPc,
-    // widthSp: state.widthSp,
-    // heightSp: state.heightSp,
-    // chatbotRight: state.rightMarginPc,
-    // chatbotBottom: state.bottomMarginPc,
+    widthPc: state.widthPc,
+    heightPc: state.heightPc,
+    widthSp: state.widthSp,
+    heightSp: state.heightSp,
+    chatbotRight: state.rightMarginPc,
+    chatbotBottom: state.bottomMarginPc,
   };
   
   window.parent.postMessage({

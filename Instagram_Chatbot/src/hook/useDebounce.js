@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export default function useDebounce(value, delay) {
+export default function useDebounce(value, delay, isComposing = false) {
   const [inputValue, setInputValue] = useState(value);
   const [debouncedValue, setDebouncedValue] = useState(inputValue);
 
@@ -9,14 +9,14 @@ export default function useDebounce(value, delay) {
   }, [value]);
 
   useEffect(() => {
-    if (!inputValue) {
+    if (!inputValue || isComposing) {
       setDebouncedValue(inputValue);
       return;
     };
     
     const handler = setTimeout(() => setDebouncedValue(inputValue), delay);
     return () => clearTimeout(handler);
-  }, [inputValue, delay]);
+  }, [inputValue, delay, isComposing]);
 
   return {debouncedValue, setInputValue, inputValue};
 }
