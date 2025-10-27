@@ -70,6 +70,19 @@ import {
 import { convertToFukushashikiObject } from "./PreviewFukushashiki/FukushashikiDataConverterUtils";
 import { handleValidateField } from "./PreviewFukushashiki/ValidationUtils";
 
+const clearChatbotState = () => {
+  sessionStorage.removeItem('chatbotH');
+  sessionStorage.removeItem('chatbotBottom');
+  sessionStorage.removeItem('chatbotState');
+  sessionStorage.removeItem('prevOpenStatus');
+  sessionStorage.removeItem('timerConfig');
+  Object.keys(sessionStorage).forEach(key => {
+    if (key.startsWith('chatbot') || key.startsWith('messages_bot_')) {
+      sessionStorage.removeItem(key);
+    }
+  });
+};
+
 savePrevOpenStatus("0");
 var url = new URL(window.location.href);
 let params = new URLSearchParams(url.search);
@@ -387,6 +400,14 @@ const PreviewFukushashiki = () => {
     if (!state.loadedStateFromSession) {
       let savedState = getChatbotSavedState();
       if (savedState) {
+        const currentBotId = params.get("order_id") || params.get("bot_id") || Cookies.get("bot_id");
+        if (currentBotId && currentBotId !== savedState.botId) {
+          clearChatbotState();
+          dispatch ({type: PREVIEW_ACTIONS.SET_BOT_ID, payload: currentBotId});
+          return getScenarioPreviewData(currentBotId, params.get("scenario_id"))
+          .then(extractStateFromPreviewResponse);
+        };
+
         setConversionParamToLocalStorage(
           savedState.scenarioId,
           'web',
