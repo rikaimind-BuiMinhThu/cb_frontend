@@ -413,7 +413,7 @@ const PreviewFukushashiki = () => {
           'web',
           savedState.userInputId || params.get("uuid"),
           params.get("env") || "production",
-          state
+          savedState
         );
 
         if (isLoggedIn) {
@@ -505,7 +505,7 @@ const PreviewFukushashiki = () => {
     ) {
       setTimeout(() => {
         dispatch({ type: PREVIEW_ACTIONS.OPEN_CHATBOT });
-      }, 500);
+      }, 1000);
     }
   }, [state.loadedStateFromSession, state.displayType, state.isOpen, state.messagesList.length, state.botInfor, state.manuallyClosed]);
 
@@ -678,7 +678,7 @@ const PreviewFukushashiki = () => {
       objParam: {},
       loadedStateFromSession: true,
       messagesList: conversation?.messages || [],
-      isOpen: state.isOpen,
+      isOpen: designSetting?.display_type && Number(designSetting?.display_type) === 1 || state.isOpen,
       activePopupCloseBot: Boolean(designSetting?.popup_close_bot),
       titleBubble: designSetting?.title_bubble || "簡単90秒で注文完了",
       displayType: designSetting?.display_type,
@@ -727,7 +727,7 @@ const PreviewFukushashiki = () => {
       'web',
       newState.userInputId || params.get("uuid"),
       params.get("env") || "production",
-      state
+      newState
     );
 
     saveCheckpointTime(res.data.data.updated_at);
