@@ -158,6 +158,7 @@ const previewInitialState = {
   conversionStatus: null,
   manuallyClosed: false,
   renderMode: RENDER_MODES.NEXT,
+  isUpsell: false,
 };
 
 
@@ -403,7 +404,7 @@ const PreviewFukushashiki = () => {
         const currentBotId = params.get("order_id") || params.get("bot_id") || Cookies.get("bot_id");
         if (currentBotId && currentBotId !== savedState.botId) {
           clearChatbotState();
-          dispatch ({type: PREVIEW_ACTIONS.SET_BOT_ID, payload: currentBotId});
+          dispatch ({type: PREVIEW_ACTIONS.SET_UPSELL_BOT_ID, payload: currentBotId});
           return getScenarioPreviewData(currentBotId, params.get("scenario_id"))
           .then(extractStateFromPreviewResponse);
         };
@@ -487,12 +488,13 @@ const PreviewFukushashiki = () => {
 
   // Auto-scroll to bottom of the chatbot when render messages list changes or submit error message changes
   useEffect(() => {
+    if (state.isUpsell) return;
     const timeoutId = setTimeout(() => {
       scrollToPosition({ position: "b", selector: "#sp-body" });
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [state.renderMessagesList?.length, state.submitErrorMessage]);
+  }, [state.renderMessagesList?.length, state.submitErrorMessage, state.isUpsell]);
 
   useEffect(() => {
     if (
