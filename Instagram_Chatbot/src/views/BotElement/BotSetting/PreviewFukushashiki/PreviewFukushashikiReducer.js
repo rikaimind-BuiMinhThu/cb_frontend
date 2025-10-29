@@ -262,6 +262,8 @@ const PreviewFukushashikiReducer = (state, action) => {
       return { ...state, scenarioUserResponses: action.payload };
     case PREVIEW_ACTIONS.SET_BOT_ID:
       return { ...state, botId: action.payload };
+    case PREVIEW_ACTIONS.SET_UPSELL_BOT_ID:
+      return {...state, botId: action.payload, isUpsell: true};
     case PREVIEW_ACTIONS.SET_CAPTCHA:
       return { ...state, captcha: action.payload };
     case PREVIEW_ACTIONS.SET_URL_SEND:
