@@ -11,6 +11,7 @@ const postMessageToParent = (options, state) => {
     isOpen: state.isOpen,
     source: 'ec-chatbot',
     useMoblieFullwidth: !!state.useFullWidthChatbotMobile,
+    isUpsell: !!state.isUpsell,
     widthPc: state.widthPc,
     heightPc: state.heightPc,
     widthSp: state.widthSp,
