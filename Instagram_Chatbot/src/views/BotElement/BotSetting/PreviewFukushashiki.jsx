@@ -29,6 +29,7 @@ import {
   RENDER_CHATBOT_CONFIG,
   RENDER_MODES,
   MESSAGE_CONTENT_TYPES,
+  CONVERSION_RESPONSE_SUBMIT_TYPE,
 } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
@@ -48,6 +49,7 @@ import {
   sendOpenChatbotCountRequest,
   sendCloseChatbotCountRequest,
   isUserMessage,
+  sendLogMessageToServer,
 } from "./PreviewComponent/Utils";
 import {
   getChatbotSavedState,
@@ -830,6 +832,7 @@ const PreviewFukushashiki = () => {
       // return sendErrorLogToServer(data);
       return;
     }
+    sendLogMessageToServer(data, CONVERSION_RESPONSE_SUBMIT_TYPE.ADD)
     
     if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
       executeLpJsCode(clickedMsg.jscode, state);
