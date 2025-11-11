@@ -30,6 +30,7 @@ import {
   RENDER_MODES,
   MESSAGE_CONTENT_TYPES,
   CONVERSION_RESPONSE_SUBMIT_TYPE,
+  CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE,
 } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
@@ -548,6 +549,7 @@ const PreviewFukushashiki = () => {
     }
 
     setTimeout(() => {
+      const newMsgIndex = state.currentMsgIndex + 1;
       dispatch({
         type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
         payload: {
@@ -569,6 +571,7 @@ const PreviewFukushashiki = () => {
   const renderNextMessage = () => {
     if (state.currentMsgIndex + 1 >= state.nextStopMsgIndex) return;
 
+    const newMsgIndex = state.currentMsgIndex + 1;
     dispatch({
       type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
       payload: {
@@ -577,6 +580,13 @@ const PreviewFukushashiki = () => {
         fromCallback: true,
       }
     });
+    if (newMsgIndex < state.messagesList.length && isUserMessage(state.messagesList[newMsgIndex])) {
+      createScenarioUserResponseMessageHistory({
+        scenario_id: state.scenarioId,
+        user_id: state.uuid,
+        msgs: [{ id: state.messagesList[newMsgIndex].id, type: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.APPEAR }],
+      });
+    }
   }
 
   const setShowPopupCloseBot = (value) => {
@@ -841,10 +851,11 @@ const PreviewFukushashiki = () => {
         type: PREVIEW_ACTIONS.SET_ERRORS,
         payload: validationResult.errors
       });
-      // return sendErrorLogToServer(data);
-      return;
+      return sendErrorLogToServer(data);
     }
-    sendLogMessageToServer(data, CONVERSION_RESPONSE_SUBMIT_TYPE.ADD)
+    const isBtnUpdateClick = clickedMsgIndex < state.renderMessagesList.length - 1;
+
+    sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
     
     if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
       executeLpJsCode(clickedMsg.jscode, state);
@@ -866,6 +877,9 @@ const PreviewFukushashiki = () => {
 
     const fukuData = convertToFukushashikiObject(data);
     fukushashikiToLP(fukuData, state);
+
+    const isClickedButtonSubmit = isButtonSubmitMessage(state.messagesList[clickedMsgIndex]);
+    const isClickedLastMessage = state.messagesList.length - 1 === clickedMsgIndex;
 
     dispatch({
       type: PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON,
