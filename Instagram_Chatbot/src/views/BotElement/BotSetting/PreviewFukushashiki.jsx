@@ -50,6 +50,11 @@ import {
   sendCloseChatbotCountRequest,
   isUserMessage,
   sendLogMessageToServer,
+  updateStatusConversion,
+  isButtonSubmitMessage,
+  createScenarioUserResponseMessageHistory,
+  sendErrorLogToServer,
+  sendAppearLogToServer,
 } from "./PreviewComponent/Utils";
 import {
   getChatbotSavedState,
@@ -551,6 +556,13 @@ const PreviewFukushashiki = () => {
           fromCallback: false,
         }
       });
+      if (newMsgIndex < state.messagesList.length && isUserMessage(state.messagesList[newMsgIndex])) {
+        sendAppearLogToServer({
+          scenario_id: state.scenarioId,
+          user_id: state.uuid,
+          message: state.messagesList[newMsgIndex],
+        });
+      }
     }, RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE);
   }, [state.currentMsgIndex, state.nextStopMsgIndex]);
 
@@ -859,6 +871,14 @@ const PreviewFukushashiki = () => {
       type: PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON,
       payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn}
     });
+
+    if (isClickedButtonSubmit || isClickedLastMessage) {      
+      updateStatusConversion({
+        scenario_id: state.scenarioId,
+        user_input_id: state.uuid,
+        status: CONVERSTION_RESPONSE_STATUS.FINISH,
+      })
+    }
   };
 
   const onChangeValue = (
