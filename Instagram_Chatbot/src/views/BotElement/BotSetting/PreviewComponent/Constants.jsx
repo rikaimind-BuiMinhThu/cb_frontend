@@ -305,7 +305,7 @@ export const CONVERSION_RESPONSE_SUBMIT_TYPE = {
 
 export const CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE = {
   APPEAR: 'appear',
-  ERROR: 'errpr',
+  ERROR: 'error',
   ADD: 'add',
   RETRY: 'retry'
 }
