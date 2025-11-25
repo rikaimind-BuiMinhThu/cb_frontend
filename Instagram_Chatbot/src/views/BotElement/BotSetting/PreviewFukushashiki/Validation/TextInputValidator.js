@@ -19,6 +19,12 @@ const validateTextInput = (contentType, messageContents, i, index, errorsMess) =
           stringNullOrEmpty(contentType[contentType.type].valueRight)) {
         return addErrorMessage(errorsMess, key, ERROR_MESSAGES.REQUIRED);
       }
+    } else if (contentType.type === 'phone_number' && contentType[contentType.type].withHyphen) {
+      if (stringNullOrEmpty(contentType[contentType.type].value1)
+          || stringNullOrEmpty(contentType[contentType.type].value2)
+          || stringNullOrEmpty(contentType[contentType.type].value3)) {
+        return addErrorMessage(errorsMess, key, ERROR_MESSAGES.REQUIRED);
+      }
     } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
       return addErrorMessage(errorsMess, key, ERROR_MESSAGES.REQUIRED);
     }
@@ -151,22 +157,29 @@ const validatePhoneType = (contentType, key, errorsMess, limitFrom, limitTo) => 
   const data = contentType[contentType.type];
   const { value, withHyphen, value1, value2, value3 } = data;
 
-  // Character limit validation
-  if (!stringNullOrEmpty(value) && value?.length < limitFrom) {
-    return addErrorMessage(errorsMess, key, ERROR_MESSAGES.CHARACTER_LIMIT_FROM(limitFrom));
-  }
-  if (!stringNullOrEmpty(value) && value?.length > limitTo) {
-    return addErrorMessage(errorsMess, key, ERROR_MESSAGES.CHARACTER_LIMIT_TO(limitTo));
-  }
+  if (withHyphen) {
+    const fullPhone = `${value1}${value2}${value3}`;
 
-  // Phone validation
-  if (!stringNullOrEmpty(value)) {
-    if (withHyphen) {
-      const fullPhone = `${value1}${value2}${value3}`;
-      if (!REGEX_PATTERNS.PHONE.test(fullPhone)) {
-        return addErrorMessage(errorsMess, key, ERROR_MESSAGES.PHONE_INVALID);
-      }
-    } else if (!REGEX_PATTERNS.PHONE.test(value)) {
+    if (fullPhone.length < limitFrom) {
+      return addErrorMessage(errorsMess, key, ERROR_MESSAGES.CHARACTER_LIMIT_FROM(limitFrom));
+    }
+    if (fullPhone.length > limitTo) {
+      return addErrorMessage(errorsMess, key, ERROR_MESSAGES.CHARACTER_LIMIT_TO(limitTo));
+    }
+
+    if (!REGEX_PATTERNS.PHONE.test(fullPhone)) {
+      return addErrorMessage(errorsMess, key, ERROR_MESSAGES.PHONE_INVALID);
+    }
+  } else if (!stringNullOrEmpty(value)) {
+
+    if (value?.length < limitFrom) {
+      return addErrorMessage(errorsMess, key, ERROR_MESSAGES.CHARACTER_LIMIT_FROM(limitFrom));
+    }
+    if (value?.length > limitTo) {
+      return addErrorMessage(errorsMess, key, ERROR_MESSAGES.CHARACTER_LIMIT_TO(limitTo));
+    }
+
+    if (!REGEX_PATTERNS.PHONE.test(value)) {
       return addErrorMessage(errorsMess, key, ERROR_MESSAGES.PHONE_INVALID);
     }
   }
