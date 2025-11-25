@@ -1957,7 +1957,7 @@ function Preview() {
           }
         }
       }
-      let REGEX_EMAIL = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+      let REGEX_EMAIL = /^[\w-]+([\.-]?[\w-]+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
       let REGEX_PASSWORD = /^[A-Za-z0-9 ]+$/;
 
       if (contentType.type === "text" || contentType.type === "password") {
