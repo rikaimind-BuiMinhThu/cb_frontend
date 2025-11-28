@@ -1,9 +1,9 @@
 /* eslint-disable default-case */
 import _ from 'lodash';
-import {
-  stringNullOrEmpty,
-  checkMessageCondition,
-  processMessagesForErrorState,
+import { 
+  stringNullOrEmpty, 
+  checkMessageCondition, 
+  processMessagesForErrorState, 
   isTempDelay,
   buildConditionParams
 } from '../PreviewComponent/Utils';
@@ -136,7 +136,7 @@ const PreviewFukushashikiReducer = (state, action) => {
         newState.conversionStatus = undefined;
         newState.isProcessing = false;
       }
-
+      
       if (isLoggedIn) {
         newState.messagesList = newState.messagesList.map(x => ({...x, hidden: x.not_display_when_logged_in}));
       }
