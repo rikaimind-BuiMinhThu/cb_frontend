@@ -348,7 +348,7 @@ const movePaymentMethodToTop = (data) => {
 
 const getEcChatBotApiServerBaseUrl = () => {
   // Comment out below line if you want to connect the staging backend API server
-  return "https://ec-chatbot-test.com";
+  // return "https://ec-chatbot-test1.com";
   const environment = getEnvironment();
   switch (environment) {
     case "staging":
@@ -365,7 +365,7 @@ const getEcChatBotApiServerBaseUrl = () => {
 
 const getEcChatBotFrontEndBaseUrl = () => {
   // Comment out below line if you want to use the local frontend
-  return "http://localhost:3001";
+  // return "http://localhost:3001";
   const environment = getEnvironment();
 
   switch (environment) {

@@ -72,20 +72,6 @@ export const mapAmazonPayDataToMessagesListForBliss = (amazonPayData, messagesLi
   return newMessagesList;
 }
 
-// Hard code check torizen domains
-// TODO: Cần refactor đoạn này sao cho có thể sử dụng được setting RENDER_MODES trên trang quản lý
-export const isTorizenLP = (url) => {
-  const torizenDomains = [
-    // Comment out if you want to test torizen in localhost
-    // "localhost:8000",
-    // "commerceforce.co.jp",
-    "hana.inuneko-sukoyaka.jp",
-    "sb.inuneko-sukoyaka.jp"
-  ];
-
-  return torizenDomains.some(domain => url.includes(domain));
-}
-
 export const isBlissLpAmazonData = (message) => {
   const isTel1Data = message.message_content.find(content => content.value1_fukushashiki_search_value === "form-validation-field-0");
   const isTel2Data = message.message_content.find(content => content.value2_fukushashiki_search_value === "form-validation-field-1");
