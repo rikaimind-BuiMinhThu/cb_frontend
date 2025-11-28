@@ -348,7 +348,7 @@ const movePaymentMethodToTop = (data) => {
 
 const getEcChatBotApiServerBaseUrl = () => {
   // Comment out below line if you want to connect the staging backend API server
-  // return "https://ec-chatbot-test1.com";
+  return "https://ec-chatbot-test.com";
   const environment = getEnvironment();
   switch (environment) {
     case "staging":
@@ -365,7 +365,7 @@ const getEcChatBotApiServerBaseUrl = () => {
 
 const getEcChatBotFrontEndBaseUrl = () => {
   // Comment out below line if you want to use the local frontend
-  // return "http://localhost:3001";
+  return "http://localhost:3001";
   const environment = getEnvironment();
 
   switch (environment) {
@@ -450,14 +450,18 @@ const displayPopup = async () => {
 
   // only for amazon
   // add param amazonCheckoutSessionId to iframe src
-  if (getParam('amazonCheckoutSessionId')) {
+  const isTorizenLpUseAmazonPay = getParam('amazonCheckoutSessionId');
+  const isBlissUseAmazonPay = !!document.querySelector("#amazon_payment_method");
+  if (isTorizenLpUseAmazonPay || isBlissUseAmazonPay) {
     iframe.src += `&is_using_amazon_pay=true`;
     // only for subscstore cart system, torizen san
     // loop for waiting data is filled to lp form
     // wait 20 times
     let count = 0;
     const interval = setInterval(() => {
-      if (document.querySelector("input#jsUkProfileFamilyName").value && count < 20) {
+      const isTorizenLpAmazonDataFilled = document.querySelector("input#jsUkProfileFamilyName")?.value;
+      const isBlissLpAmazonDataFilled = document.querySelector("input#order_shipping_address_attributes_name1")?.value;
+      if ((isTorizenLpAmazonDataFilled || isBlissLpAmazonDataFilled)  && count < 20) {
         appendIframeToBody(iframe);
         clearInterval(interval);
       }

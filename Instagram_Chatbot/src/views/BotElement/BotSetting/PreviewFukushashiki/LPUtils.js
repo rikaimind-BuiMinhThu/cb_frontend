@@ -1,6 +1,7 @@
 
 import { CHATBOT_ACTIONS } from "../PreviewComponent/Constants";
 import { isTorizenLpAmazonData } from "../PreviewComponent/TorizenUtils";
+import { isBlissLpAmazonData } from "../PreviewComponent/BlissUtils";
 import { convertToFukushashikiObject } from "./FukushashikiDataConverterUtils";
 import { isUserMessage, sendOpenChatbotCountRequest } from "../PreviewComponent/Utils";
 
@@ -42,6 +43,8 @@ const fukushashikiSavedStateToLp = (savedState, params, state) => {
     userMessagesList.forEach((message) => {
       // Except some data when fukushashiki torizen san
       if (params.get('is_using_amazon_pay') && isTorizenLpAmazonData(message)) return;
+
+      if (params.get('is_using_amazon_pay') && isBlissLpAmazonData(message)) return;
       
       const fukuData = convertToFukushashikiObject({message: message});
       fukuDataList.push(...fukuData);
