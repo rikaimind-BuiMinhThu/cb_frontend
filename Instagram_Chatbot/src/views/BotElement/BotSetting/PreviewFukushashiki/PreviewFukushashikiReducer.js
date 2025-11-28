@@ -1,9 +1,9 @@
 /* eslint-disable default-case */
 import _ from 'lodash';
-import { 
-  stringNullOrEmpty, 
-  checkMessageCondition, 
-  processMessagesForErrorState, 
+import {
+  stringNullOrEmpty,
+  checkMessageCondition,
+  processMessagesForErrorState,
   isTempDelay,
   buildConditionParams
 } from '../PreviewComponent/Utils';
@@ -31,13 +31,13 @@ const PreviewFukushashikiReducer = (state, action) => {
           return !isTempDelay(m, RENDER_CHATBOT_CONFIG.TEMP_DELAY_PREFIX);
         }) || [];
       }
-      return { ...state, ...(!!state.submitErrorMessage ? processMessagesForErrorState(action.payload): action.payload) };
+      return { ...state, ...(!!state.submitErrorMessage ? processMessagesForErrorState(action.payload) : action.payload) };
 
     case PREVIEW_ACTIONS.ADD_LP_OPTION_DATA:
       return { ...state, lpOptionData: { ...state.lpOptionData, ...action.payload, isProcessing: false } };
     case PREVIEW_ACTIONS.UPDATE_PREVIEW_ORDER_CONTENT:
       return { ...state, previewOrderContent: action.payload, isProcessing: false };
-    case PREVIEW_ACTIONS.SET_PROCESSING: 
+    case PREVIEW_ACTIONS.SET_PROCESSING:
       return { ...state, isProcessing: action.payload };
     case PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES:
       if (action.payload.fromCallback) return state;
@@ -70,7 +70,7 @@ const PreviewFukushashikiReducer = (state, action) => {
 
         let nextStopMsgIndex = state.nextStopMsgIndex;
 
-        if(!nextStopMsgIndex || (nextStopMsgIndex < messagesList.length && nextStopMsgIndex > 0 && messagesList[nextStopMsgIndex - 1].hidden)){
+        if (!nextStopMsgIndex || (nextStopMsgIndex < messagesList.length && nextStopMsgIndex > 0 && messagesList[nextStopMsgIndex - 1].hidden)) {
           nextStopMsgIndex = messagesList.findIndex(getNextUserMsg((_, index) => index > state.currentMsgIndex)) + 1;
         }
 
@@ -92,7 +92,8 @@ const PreviewFukushashikiReducer = (state, action) => {
       });
 
       const renderMessagesList = messagesList.slice(0, state.currentMsgIndex + 1);
-      return { ...state,
+      return {
+        ...state,
         messagesList: messagesList,
         renderMessagesList: renderMessagesList,
         submitErrorMessage: action.payload,
@@ -112,7 +113,8 @@ const PreviewFukushashikiReducer = (state, action) => {
         });
       }
       const renderMessagesList = messagesList.slice(0, state.currentMsgIndex + 1)
-      return { ...state,
+      return {
+        ...state,
         messagesList: messagesList,
         renderMessagesList: renderMessagesList,
         submitErrorMessage: action.payload.error,
@@ -136,9 +138,9 @@ const PreviewFukushashikiReducer = (state, action) => {
         newState.conversionStatus = undefined;
         newState.isProcessing = false;
       }
-      
+
       if (isLoggedIn) {
-        newState.messagesList = newState.messagesList.map(x => ({...x, hidden: x.not_display_when_logged_in}));
+        newState.messagesList = newState.messagesList.map(x => ({ ...x, hidden: x.not_display_when_logged_in }));
       }
 
       const isClickedButtonSubmit = isButtonSubmitMessage(state.messagesList[clickedMsgIndex]);
@@ -190,10 +192,10 @@ const PreviewFukushashikiReducer = (state, action) => {
         }
       } else {
         // NEXT mode: render messages one by one
-        newState.currentMsgIndex = clickedMsgIndex; 
+        newState.currentMsgIndex = clickedMsgIndex;
         newState.nextStopMsgIndex = nextStopMsgIndex;
       }
-      
+
       // Ensure nextStopMsgIndex is not less than currentMsgIndex (common validation)
       if (newState.nextStopMsgIndex < newState.currentMsgIndex) {
         newState.nextStopMsgIndex = newState.currentMsgIndex;
@@ -206,7 +208,7 @@ const PreviewFukushashikiReducer = (state, action) => {
           newState.passedUserMsgCount = newState.renderMessagesList.filter(m => isUserMessage(m)).length;
         }
       } else {
-          newState.passedUserMsgCount = state.passedUserMsgCount + 1;
+        newState.passedUserMsgCount = state.passedUserMsgCount + 1;
       }
       return { ...state, ...newState };
     case PREVIEW_ACTIONS.UPDATE_PREFECTURES_LIST:
@@ -219,7 +221,7 @@ const PreviewFukushashikiReducer = (state, action) => {
     case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_BLISS:
       const newMessagesListForBliss = mapAmazonPayDataToMessagesListForBliss(action.payload, state.messagesList, state.prefecturesList);
       const renderMessagesListForBliss = newMessagesListForBliss.slice(0, state.currentMsgIndex + 1);
-      return { ...state, messagesList: newMessagesListForBliss, renderMessagesList: renderMessagesListForBliss};
+      return { ...state, messagesList: newMessagesListForBliss, renderMessagesList: renderMessagesListForBliss };
     case PREVIEW_ACTIONS.UPDATE_AFTER_CHANGE_VALUE: {
       const { contentIndex, contentType, value, field, subField1, subField2, message } = action.payload;
       const newState = {
@@ -268,7 +270,7 @@ const PreviewFukushashikiReducer = (state, action) => {
     case PREVIEW_ACTIONS.SET_BOT_ID:
       return { ...state, botId: action.payload };
     case PREVIEW_ACTIONS.SET_UPSELL_BOT_ID:
-      return {...state, botId: action.payload, isUpsell: true};
+      return { ...state, botId: action.payload, isUpsell: true };
     case PREVIEW_ACTIONS.SET_CAPTCHA:
       return { ...state, captcha: action.payload };
     case PREVIEW_ACTIONS.SET_URL_SEND:
@@ -369,19 +371,16 @@ const PreviewFukushashikiReducer = (state, action) => {
         newState.renderMessagesList = [];
       }
 
-      if (action.payload.isUsingAmazonPay) {
-        // Support only for amazon pay and subscstore cart system (torizen san)
-        const conditionParams = buildConditionParams(newState);
-        for (let i = 0; i < newState.messagesList.length; i++) {
-          const result = checkMessageCondition(newState.messagesList[i], conditionParams);
-          newState.messagesList[i].hidden = !result;
-        }
+      const conditionParams = buildConditionParams(newState);
+      for (let i = 0; i < newState.messagesList.length; i++) {
+        const result = checkMessageCondition(newState.messagesList[i], conditionParams);
+        newState.messagesList[i].hidden = !result;
       }
 
       return { ...state, ...newState };
     }
     case PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SESSION_STORAGE: {
-      const newState = {...action.payload.savedState};
+      const newState = { ...action.payload.savedState };
 
       if (action.payload.isUsingAmazonPay) {
         // Support only for amazon pay and subscstore cart system (torizen san)
@@ -429,25 +428,25 @@ const PreviewFukushashikiReducer = (state, action) => {
     case PREVIEW_ACTIONS.SET_MANUALLY_CLOSED:
       return { ...state, manuallyClosed: action.payload };
     case PREVIEW_ACTIONS.UPDATE_NUMBER_ORDER_TO_UPSELL:
-      const {variables, objParam} = action.payload;
+      const { variables, objParam } = action.payload;
       let newVariables = [...state.variables];
-      
+
       if (variables) {
-        const entries = Array.isArray(variables) 
+        const entries = Array.isArray(variables)
           ? variables.filter(v => v?.variable_name).map(v => [v.variable_name, v])
-          : Object.entries(variables).map(([k, v]) => [k, {variable_name: k, default_value: String(v)}])
+          : Object.entries(variables).map(([k, v]) => [k, { variable_name: k, default_value: String(v) }])
 
         entries.forEach(([name, data]) => {
           const idx = newVariables.findIndex(v => v.variable_name === name);
-          idx >= 0 
-          ? newVariables[idx] = {...newVariables[idx] = {...newVariables[idx], ...data}}
-          : newVariables.push(data);
+          idx >= 0
+            ? newVariables[idx] = { ...newVariables[idx] = { ...newVariables[idx], ...data } }
+            : newVariables.push(data);
         })
       }
       return {
         ...state,
         variables: newVariables,
-        objParam: objParam ? {...state.objParam, ...objParam} : state.objParam
+        objParam: objParam ? { ...state.objParam, ...objParam } : state.objParam
       };
 
   }
@@ -479,15 +478,15 @@ const changeZipCodeAddress = (subContent, value, field, prefecturesList) => {
         if (subContent.value_prefecture_type === "id") {
           return value;
         }
-        return findItem(prefecturesList, { 
-          keys: 'id', 
-          value: value, 
+        return findItem(prefecturesList, {
+          keys: 'id',
+          value: value,
           callbackValue: value,
           onSuccess: (item) => item.name,
         });
       }
     };
-    
+
     Object.keys(value).forEach((key) => {
       subContent[key] = transformField[key] ? transformField[key](value[key]) : value[key];
     });
