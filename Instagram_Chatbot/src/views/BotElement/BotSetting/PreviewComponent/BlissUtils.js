@@ -13,15 +13,16 @@ export const mapAmazonPayDataToMessagesListForBliss = (amazonPayData, messagesLi
   } = amazonPayData;
   const userMessages = newMessagesList.filter(message => message.belong_to === "user");
   if (!userMessages) return newMessagesList;
+  debugger
 
-  const messageProfileName1= userMessages?.find(message => message.message_content.find(content => content.left_fukushashiki_search_value === "order_billing_address_attributes_name1"));
+  const messageProfileName1= userMessages?.find(message => message.message_content.find(content => content.left_fukushashiki_search_value === "order_shipping_address_attributes_name1"));
   if (messageProfileName1) {
-    messageProfileName1.message_content.find(content => content.left_fukushashiki_search_value === "order_billing_address_attributes_name1").text_input.text.valueLeft = profileName1;
+    messageProfileName1.message_content.find(content => content.left_fukushashiki_search_value === "order_shipping_address_attributes_name1").text_input.text.valueLeft = profileName1;
   }
 
-  const messageProfileName2= userMessages?.find(message => message.message_content.find(content => content.right_fukushashiki_search_value === "order_billing_address_attributes_name2"));
+  const messageProfileName2= userMessages?.find(message => message.message_content.find(content => content.right_fukushashiki_search_value === "order_shipping_address_attributes_name2"));
   if (messageProfileName2) {
-    messageProfileName2.message_content.find(content => content.right_fukushashiki_search_value === "order_billing_address_attributes_name2").text_input.text.valueRight = profileName2;
+    messageProfileName2.message_content.find(content => content.right_fukushashiki_search_value === "order_shipping_address_attributes_name2").text_input.text.valueRight = profileName2;
   }
 
   const messageProfileZipCode1 = userMessages?.find(message => message.message_content.find(content => content.post_code_left_fukushashiki_search_value === "order_billing_address_attributes_zip01"));
