@@ -11,6 +11,7 @@ import { processForBotMessage } from '../PreviewComponent/BotMessageUtils';
 import { processForUserMessage } from '../PreviewComponent/UserMessageUtils';
 import { isButtonSubmitMessage, isBotMessage, isUserMessage, getNextUserMsg } from '../PreviewComponent/Utils';
 import { mapAmazonPayDataToMessagesList } from '../PreviewComponent/TorizenUtils';
+import { mapAmazonPayDataToMessagesListForBliss } from '../PreviewComponent/BlissUtils';
 import {
   RENDER_CHATBOT_CONFIG,
   GETTING_ERROR_NOTIFICATION,
@@ -215,6 +216,10 @@ const PreviewFukushashikiReducer = (state, action) => {
       const newMessagesList = mapAmazonPayDataToMessagesList(action.payload, state.messagesList, state.prefecturesList);
       const renderMessagesList = newMessagesList.slice(0, state.currentMsgIndex + 1);
       return { ...state, messagesList: newMessagesList, renderMessagesList: renderMessagesList };
+    case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_BLISS:
+      const newMessagesListForBliss = mapAmazonPayDataToMessagesListForBliss(action.payload, state.messagesList, state.prefecturesList);
+      const renderMessagesListForBliss = newMessagesListForBliss.slice(0, state.currentMsgIndex + 1);
+      return { ...state, messagesList: newMessagesListForBliss, renderMessagesList: renderMessagesListForBliss};
     case PREVIEW_ACTIONS.UPDATE_AFTER_CHANGE_VALUE: {
       const { contentIndex, contentType, value, field, subField1, subField2, message } = action.payload;
       const newState = {
@@ -362,6 +367,15 @@ const PreviewFukushashikiReducer = (state, action) => {
         newState.currentMsgIndex = -1;
         newState.nextStopMsgIndex = -1;
         newState.renderMessagesList = [];
+      }
+
+      if (action.payload.isUsingAmazonPay) {
+        // Support only for amazon pay and subscstore cart system (torizen san)
+        const conditionParams = buildConditionParams(newState);
+        for (let i = 0; i < newState.messagesList.length; i++) {
+          const result = checkMessageCondition(newState.messagesList[i], conditionParams);
+          newState.messagesList[i].hidden = !result;
+        }
       }
 
       return { ...state, ...newState };

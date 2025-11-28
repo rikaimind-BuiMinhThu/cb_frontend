@@ -299,7 +299,13 @@ const PreviewFukushashiki = () => {
           type: PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA,
           payload: actionData,
         });
-      
+
+      case CHATBOT_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_BLISS:
+        return dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_BLISS,
+          payload: actionData,
+        });
+
       case CHATBOT_ACTIONS.UPDATE_NUMBER_ORDER_TO_UPSELL:
         if (actionData) {
           const variables = Object.entries(actionData).map(([k, v]) => ({
@@ -740,6 +746,7 @@ const PreviewFukushashiki = () => {
         responseData: res.data,
         botInfor: getBotInforFromPreviewResponse(res),
         isLoggedIn: isLoggedIn,
+        isUsingAmazonPay: params.get('is_using_amazon_pay'),
       },
     });
   }

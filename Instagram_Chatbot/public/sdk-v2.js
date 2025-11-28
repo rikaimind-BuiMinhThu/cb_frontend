@@ -450,14 +450,18 @@ const displayPopup = async () => {
 
   // only for amazon
   // add param amazonCheckoutSessionId to iframe src
-  if (getParam('amazonCheckoutSessionId')) {
+  const isTorizenLpUseAmazonPay = getParam('amazonCheckoutSessionId');
+  const isBlissUseAmazonPay = !!document.querySelector("#amazon_payment_method");
+  if (isTorizenLpUseAmazonPay || isBlissUseAmazonPay) {
     iframe.src += `&is_using_amazon_pay=true`;
     // only for subscstore cart system, torizen san
     // loop for waiting data is filled to lp form
     // wait 20 times
     let count = 0;
     const interval = setInterval(() => {
-      if (document.querySelector("input#jsUkProfileFamilyName").value && count < 20) {
+      const isTorizenLpAmazonDataFilled = document.querySelector("input#jsUkProfileFamilyName")?.value;
+      const isBlissLpAmazonDataFilled = document.querySelector("input#order_shipping_address_attributes_name1")?.value;
+      if ((isTorizenLpAmazonDataFilled || isBlissLpAmazonDataFilled)  && count < 20) {
         appendIframeToBody(iframe);
         clearInterval(interval);
       }
