@@ -396,6 +396,38 @@ const sendMessageToChatbot = (contentMessage, action) => {
   globalIframe.contentWindow.postMessage(data, "*");
 }
 
+const waitToLoadBliss = (iframe) => {
+  let count = 0;
+  const interval = setInterval(() => {
+    const amazonPayMethodElement = document.querySelector("#amazon_payment_method");
+    const name1Value = document.querySelector("input#order_shipping_address_attributes_name1")?.value;
+
+    if (amazonPayMethodElement && name1Value && count < 20) {
+      iframe.src += `&is_using_amazon_pay=true`;
+      appendIframeToBody(iframe);
+      clearInterval(interval);
+    }
+    count++;
+
+    if (count >= 20) {
+      // Not Amazon Pay
+      appendIframeToBody(iframe);
+      clearInterval(interval);
+    }
+  }, 100);
+}
+
+const isBlissLp = (url) => {
+  const torizenDomains = [
+    // Comment out if you want to test bliss in localhost
+    // "localhost:8000",
+    // "commerceforce.co.jp",
+    "skull-shaver.jp",
+  ];
+
+  return torizenDomains.some(domain => url.includes(domain));
+}
+
 const displayPopup = async () => {
   const device =
     !tabletCheck() && !mobileCheck()
@@ -451,8 +483,8 @@ const displayPopup = async () => {
   // only for amazon
   // add param amazonCheckoutSessionId to iframe src
   const isTorizenLpUseAmazonPay = getParam('amazonCheckoutSessionId');
-  const isBlissUseAmazonPay = !!document.querySelector("#amazon_payment_method");
-  if (isTorizenLpUseAmazonPay || isBlissUseAmazonPay) {
+
+  if (isTorizenLpUseAmazonPay) {
     iframe.src += `&is_using_amazon_pay=true`;
     // only for subscstore cart system, torizen san
     // loop for waiting data is filled to lp form
@@ -460,13 +492,14 @@ const displayPopup = async () => {
     let count = 0;
     const interval = setInterval(() => {
       const isTorizenLpAmazonDataFilled = document.querySelector("input#jsUkProfileFamilyName")?.value;
-      const isBlissLpAmazonDataFilled = document.querySelector("input#order_shipping_address_attributes_name1")?.value;
-      if ((isTorizenLpAmazonDataFilled || isBlissLpAmazonDataFilled)  && count < 20) {
+      if (isTorizenLpAmazonDataFilled  && count < 20) {
         appendIframeToBody(iframe);
         clearInterval(interval);
       }
       count++;
     }, 200);
+  } else if (isBlissLp(window.location.href)) {
+    waitToLoadBliss(iframe);
   } else {
     appendIframeToBody(iframe);
   }
