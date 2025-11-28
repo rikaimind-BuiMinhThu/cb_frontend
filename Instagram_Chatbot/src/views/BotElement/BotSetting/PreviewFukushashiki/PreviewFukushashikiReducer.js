@@ -369,13 +369,10 @@ const PreviewFukushashikiReducer = (state, action) => {
         newState.renderMessagesList = [];
       }
 
-      if (action.payload.isUsingAmazonPay) {
-        // Support only for amazon pay and subscstore cart system (torizen san)
-        const conditionParams = buildConditionParams(newState);
-        for (let i = 0; i < newState.messagesList.length; i++) {
-          const result = checkMessageCondition(newState.messagesList[i], conditionParams);
-          newState.messagesList[i].hidden = !result;
-        }
+      const conditionParams = buildConditionParams(newState);
+      for (let i = 0; i < newState.messagesList.length; i++) {
+        const result = checkMessageCondition(newState.messagesList[i], conditionParams);
+        newState.messagesList[i].hidden = !result;
       }
 
       return { ...state, ...newState };
