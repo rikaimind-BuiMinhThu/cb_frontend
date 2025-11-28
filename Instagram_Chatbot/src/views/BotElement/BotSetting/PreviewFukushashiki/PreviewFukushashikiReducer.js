@@ -301,7 +301,7 @@ const PreviewFukushashikiReducer = (state, action) => {
         objParam: {},
         loadedStateFromSession: true,
         messagesList: conversation?.messages || [],
-        isOpen: state.isOpen,
+        isOpen: state.isOpen || action.payload.isUsingAmazonPay,
         activePopupCloseBot: Boolean(designSetting?.popup_close_bot),
         titleBubble: designSetting?.title_bubble || "簡単90秒で注文完了",
         displayType: designSetting?.display_type,
@@ -357,7 +357,7 @@ const PreviewFukushashikiReducer = (state, action) => {
         newState.messagesList.forEach((x) => x.hidden = x.not_display_when_logged_in);
       }
 
-      if (state.isOpen) {
+      if (state.isOpen || action.payload.isUsingAmazonPay) {
         newState.nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg()) + 1;
         if (newState.nextStopMsgIndex < newState.currentMsgIndex) {
           newState.nextStopMsgIndex = newState.currentMsgIndex + 1;
