@@ -404,7 +404,7 @@ const waitToLoadBliss = (iframe) => {
 
     if (amazonPayMethodElement && name1Value && count < 20) {
       iframe.src += `&is_using_amazon_pay=true`;
-      const isEnableEmailInput = !!document.querySelector("input#email")?.disabled;
+      const isEnableEmailInput = !document.querySelector("input#email")?.disabled;
       if (isEnableEmailInput) {
         iframe.src += `&is_enable_email_input=true`;
       }
