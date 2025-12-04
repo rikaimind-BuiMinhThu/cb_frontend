@@ -47,17 +47,26 @@ const validateRequiredFields = (contentType) => {
 const validateCardNumber = (contentType) => {
   const { card_number, card_number1, card_number2, card_number3, card_number4, separate_type } = contentType;
 
-  if (card_number && ((card_number + "").length !== 16 || /[^0-9]+/.test(card_number))) {
+  const len = (card_number + "").length;
+  if (card_number && (len !== 15 && len !== 16 || /[^0-9]+/.test(card_number))) {
     return false;
   }
 
   if (separate_type === true && 
       !stringNullOrEmpty(card_number1) && !stringNullOrEmpty(card_number2) &&
       !stringNullOrEmpty(card_number3) && !stringNullOrEmpty(card_number4)) {
-    return (
-      (card_number1 + "").length === 4 && (card_number2 + "").length === 4 &&
-      (card_number3 + "").length === 4 && (card_number4 + "").length === 4
-    );
+    const len1 = (card_number1 + "").length;
+    const len2 = (card_number2 + "").length;
+    const len3 = (card_number3 + "").length;
+    const len4 = (card_number4 + "").length;
+    const totalLength = len1 + len2 + len3 + len4;
+    
+    // Check for 16 digits: 4-4-4-4
+    const is16Digits = len1 === 4 && len2 === 4 && len3 === 4 && len4 === 4;
+    // Check for 15 digits: 4-4-4-3 (e.g., American Express)
+    const is15Digits = len1 === 4 && len2 === 4 && len3 === 4 && len4 === 3;
+    
+    return (totalLength === 15 || totalLength === 16) && (is15Digits || is16Digits);
   }
 
   return true;
@@ -73,4 +82,4 @@ const validateExpiryDate = (contentType) => {
   return !moment(`${year}-${month}`, "YYYY-MM").isBefore(moment().format("YYYY-MM"));
 };
 
-export { validateCreditCardPayment };
+export { validateCreditCardPayment, validateCardNumber, validateExpiryDate };

@@ -1,9 +1,9 @@
-import moment from "moment";
 import {
   ERROR_MESSAGES,
   addErrorMessage,
   stringNullOrEmpty
 } from "../ValidationUtils";
+import { validateCardNumber, validateExpiryDate } from "./CreditCardPaymentValidator";
 
 const validateCardPaymentRadioButton = (contentType, messageContents, i, index, errorsMess) => {
   const key = `message${index}_content${i}_${messageContents[i].type}`;
@@ -101,55 +101,6 @@ const validateCardDetails = (contentType) => {
   const isExpiryDateValid = !stringNullOrEmpty(year) && !stringNullOrEmpty(month);
 
   return isCardHolderValid && isCvcValid && isCardNumberValid && isExpiryDateValid;
-};
-
-const validateCardNumber = (contentType) => {
-  const { 
-    card_number, 
-    card_number1, 
-    card_number2, 
-    card_number3, 
-    card_number4, 
-    separate_type 
-  } = contentType;
-
-  // Validate single card number (16 digits, numbers only)
-  if (card_number) {
-    const cardNumberStr = card_number.toString();
-    const isValidLength = cardNumberStr.length === 16;
-    const isNumericOnly = /^[0-9]+$/.test(cardNumberStr);
-    
-    if (!isValidLength || !isNumericOnly) {
-      return false;
-    }
-  }
-
-  // Validate separate card number parts (4 digits each)
-  if (separate_type === true) {
-    const cardParts = [card_number1, card_number2, card_number3, card_number4];
-    const allPartsFilled = cardParts.every(part => !stringNullOrEmpty(part));
-    
-    if (allPartsFilled) {
-      const allPartsValid = cardParts.every(part => {
-        const partStr = part.toString();
-        return partStr.length === 4 && /^[0-9]+$/.test(partStr);
-      });
-      
-      return allPartsValid;
-    }
-  }
-
-  return true;
-};
-
-const validateExpiryDate = (contentType) => {
-  const { year, month } = contentType;
-  
-  if (stringNullOrEmpty(year) || stringNullOrEmpty(month)) {
-    return true; // Let required validation handle this
-  }
-
-  return !moment(`${year}-${month}`, "YYYY-MM").isBefore(moment().format("YYYY-MM"));
 };
 
 const validateCVC = (contentType) => {
