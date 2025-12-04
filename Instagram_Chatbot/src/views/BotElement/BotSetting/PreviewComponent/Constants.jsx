@@ -339,12 +339,12 @@ export const TIMER_MAP_VARIABLES_FIELD = {
   [TIMER_VARIABLES[TIMER_TYPES.COUNTING_DOWN].timeCounting]: {
     field: "timer",
     method: TIMER_MAP_VARIABLE_METHOD.COMP_STATE,
-    transform: (timer) => secondToDatetime(timer, "{{dd}}日 {{hh}}時 {{mm}}分 {{ss}}秒 {{ms}}"),
+    transform: (timer) => secondToDatetime(timer, "{{dd}}日 {{hh}}時間 {{mm}}分 {{ss}}秒 {{ms}}"),
   },
   [TIMER_VARIABLES[TIMER_TYPES.COUNTING_DOWN].duration]: {
     field: "duration",
     method: TIMER_MAP_VARIABLE_METHOD.CONFIG,
-    transform: (duration) => secondToDatetime(duration, "{{dd}}日 {{hh}}時 {{mm}}分 {{ss}}秒"),
+    transform: (duration) => secondToDatetime(duration, "{{dd}}日 {{hh}}時間 {{mm}}分 {{ss}}秒"),
   },
 };
 
