@@ -48,6 +48,7 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
             disabled={disabled}
             type="radio"
             id={`ss-message__content--user-radio_button_${item.value}`}
+            name={`ss-message__content--user-radio_button--radio_button_img_msg${messageIndex}_content${contentIndex}_${content.type}`}
             checked={radioButton.initial_selection === item.value}
             onChange={() => {
               onChangeValue(
@@ -79,7 +80,7 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
           <input
             disabled={disabled}
             type="radio"
-            name="ss-message__content--user-radio_button--radio_button_img"
+            name={`ss-message__content--user-radio_button--radio_button_img_msg${messageIndex}_content${contentIndex}_${content.type}`}
             id="ss-message__content--user-radio_button--radio_button_img"
             checked={radioButton.initial_selection === item.value}
             onChange={() => {
@@ -109,7 +110,7 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
         <div className="ss-message__content--user-radio_button">
           <input
             type="radio"
-            name="ss-message__content--user-radio_button"
+            name={`ss-message__content--user-radio_button_msg${messageIndex}_content${contentIndex}_${content.type}`}
             id="ss-message__content--user-radio_button"
           />
           <label htmlFor="ss-message__content--user-radio_button">
@@ -119,7 +120,7 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
         <div className="ss-message__content--user-radio_button">
           <input
             type="radio"
-            name="ss-message__content--user-radio_button"
+            name={`ss-message__content--user-radio_button_msg${messageIndex}_content${contentIndex}_${content.type}`}
             id="ss-message__content--user-radio_button"
           />
           <label htmlFor="ss-message__content--user-radio_button">
