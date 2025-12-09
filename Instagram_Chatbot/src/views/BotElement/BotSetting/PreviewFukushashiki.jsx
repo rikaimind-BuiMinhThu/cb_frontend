@@ -159,6 +159,7 @@ const previewInitialState = {
   manuallyClosed: false,
   renderMode: RENDER_MODES.NEXT,
   isUpsell: false,
+  progressBarMaxIndex: null,
 };
 
 
@@ -1164,7 +1165,7 @@ const PreviewFukushashiki = () => {
 
         <ProcessBar botInfor={state.botInfor}
           currentIndex={state.passedUserMsgCount}
-          maxIndex={userMessagesList.length}
+          maxIndex={state.progressBarMaxIndex}
         />
         <div id="sp-body" className="sp-body" style={bodyStyle}
         >

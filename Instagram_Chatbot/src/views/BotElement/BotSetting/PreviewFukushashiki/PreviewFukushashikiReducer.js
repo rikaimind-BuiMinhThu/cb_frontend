@@ -20,6 +20,7 @@ import {
   CONVERSTION_RESPONSE_STATUS,
   BOT_MESSAGE_TYPES,
   RENDER_MODES,
+  MESSAGE_CONTENT_TYPES,
 } from '../PreviewComponent/Constants.jsx';
 import { getDefaultValue } from '../PreviewComponent/VariablesUtils';
 
