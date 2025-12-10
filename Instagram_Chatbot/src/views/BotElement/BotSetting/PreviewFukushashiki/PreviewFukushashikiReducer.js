@@ -375,6 +375,20 @@ const PreviewFukushashikiReducer = (state, action) => {
         newState.messagesList[i].hidden = !result;
       }
 
+      const progressBarTargetCountMessagesList = newState.messagesList.filter(msg => {
+        if (!isUserMessage(msg)) return false;
+
+        const contentCount = msg?.message_content?.length;
+        const firstMsgContent = msg?.message_content?.[0];
+        const isDisplayBtnNext = firstMsgContent?.type !== MESSAGE_CONTENT_TYPES.IMAGE || firstMsgContent?.image?.displayButtonNext !== false;
+        if (!isDisplayBtnNext) return false;
+        if (firstMsgContent?.type === MESSAGE_CONTENT_TYPES.SUBMIT_BUTTON && contentCount === 1) return false;
+
+        return true;
+      });
+
+      newState.progressBarMaxIndex = progressBarTargetCountMessagesList.length;
+
       return { ...state, ...newState };
     }
     case PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SESSION_STORAGE: {
