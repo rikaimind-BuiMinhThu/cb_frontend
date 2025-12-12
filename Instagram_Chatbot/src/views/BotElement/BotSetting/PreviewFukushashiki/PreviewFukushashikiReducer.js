@@ -20,6 +20,7 @@ import {
   CONVERSTION_RESPONSE_STATUS,
   BOT_MESSAGE_TYPES,
   RENDER_MODES,
+  MESSAGE_CONTENT_TYPES,
 } from '../PreviewComponent/Constants.jsx';
 import { getDefaultValue } from '../PreviewComponent/VariablesUtils';
 
@@ -203,7 +204,7 @@ const PreviewFukushashikiReducer = (state, action) => {
       newState.isUpdateClicked = isUpdateClicked;
       if (isUpdateClicked) {
         if (newState.renderMode === RENDER_MODES.NEXT) {
-          newState.passedUserMsgCount = newState.renderMessagesList.filter(m => isUserMessage(m)).length;
+          newState.passedUserMsgCount = newState.renderMessagesList.filter(m => isUserMessage(m)).length - 1;
         }
       } else {
           newState.passedUserMsgCount = state.passedUserMsgCount + 1;
@@ -374,6 +375,20 @@ const PreviewFukushashikiReducer = (state, action) => {
         const result = checkMessageCondition(newState.messagesList[i], conditionParams);
         newState.messagesList[i].hidden = !result;
       }
+
+      const progressBarTargetCountMessagesList = newState.messagesList.filter(msg => {
+        if (!isUserMessage(msg)) return false;
+
+        const contentCount = msg?.message_content?.length;
+        const firstMsgContent = msg?.message_content?.[0];
+        const isDisplayBtnNext = firstMsgContent?.type !== MESSAGE_CONTENT_TYPES.IMAGE || firstMsgContent?.image?.displayButtonNext !== false;
+        if (!isDisplayBtnNext) return false;
+        if (firstMsgContent?.type === MESSAGE_CONTENT_TYPES.SUBMIT_BUTTON && contentCount === 1) return false;
+
+        return true;
+      });
+
+      newState.progressBarMaxIndex = progressBarTargetCountMessagesList.length;
 
       return { ...state, ...newState };
     }
