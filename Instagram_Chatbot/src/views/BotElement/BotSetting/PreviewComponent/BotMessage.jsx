@@ -19,6 +19,7 @@ const BotMessage = ({
   onRenderCompleted,
   hidden,
   currentMsgIndex,
+  isBotOpen,
 }) => {
   const [isDelaying, setIsDelaying] = useState(true);
   const [text, setText] = useState("");
@@ -89,13 +90,13 @@ const BotMessage = ({
       return () => clearTimeout(timeoutId);
     }
 
-  }, [content.type, isDelaying]);
+  }, [content.type, isDelaying, isBotOpen]);
 
   useEffect(() => {
     // When hidden === undefined, it means the message is not hidden yet
     if (hidden === true) return;
 
-    if (content.text_input?.use_for_confirm_message && content.text_input?.jscode?.trim()) {
+    if (content.text_input?.use_for_confirm_message && content.text_input?.jscode?.trim() && isBotOpen) {
       executeLpJsCode(content.text_input.jscode);
     }
   }, [
@@ -103,6 +104,7 @@ const BotMessage = ({
     hidden,
     content.text_input?.use_for_confirm_message,
     content.text_input?.jscode?.trim(),
+    isBotOpen,
   ]);
 
   // const formatResult = () => {

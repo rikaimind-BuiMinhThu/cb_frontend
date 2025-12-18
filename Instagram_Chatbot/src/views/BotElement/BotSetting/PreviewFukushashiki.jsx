@@ -925,6 +925,7 @@ const PreviewFukushashiki = () => {
         onRenderCompleted={renderNextMessage}
         hidden={message.hidden}
         currentMsgIndex={state.currentMsgIndex}
+        isBotOpen={state.isOpen}
       />
     ));
   };
