@@ -9,6 +9,78 @@ export const isTokyoDeveloLP = (url) => {
   return tokyoDeveloDomains.some(domain => url.includes(domain));
 }
 
+const TOKYO_DEVELO_LP_CONFIRM_MESSAGE_JS_CODE = String(`
+  setTimeout(() => {
+    const firstName = document.getElementById("txtName1")?.value || "";
+    const lastName = document.getElementById("txtName2")?.value || "";
+
+    const firstNameKana = document.getElementById("txtKana1")?.value || "";
+    const lastNameKana = document.getElementById("txtKana2")?.value || "";
+
+    const name = \`\${firstName} \${lastName} (\${firstNameKana} \${lastNameKana})\`;
+    const leftPostCode = document.getElementById("txtZip1")?.value || "";
+    const rightPostCode = document.getElementById("txtZip2")?.value || "";
+    const postCode = \`\${leftPostCode}-\${rightPostCode}\`;
+
+    const address1 = document.getElementById("txtAddress")?.value || "";
+    const address2 = document.getElementById("txtAddress1")?.value || "";
+    const address3 = document.getElementById("txtAddress2")?.value || "";
+
+    const prefecture = document.querySelector("button[data-id='drpPrefecture']")?.title || "";
+
+    const address = \`\${prefecture} \${address1} \${address2} \${address3}\`.replace(/^\s+|\s+$/g, '');
+    const mobile = document.getElementById("txtTel")?.value || "";
+    const email = document.getElementById("txtMail")?.value || "";
+
+    const paymentMethod = document.querySelector('input[name="grpPayment"]:checked')?.closest('label')?.textContent?.trim() || '';
+
+    const subTotal = document.querySelector("#lp-1step-confirm-container > div.card.cart-table > div:nth-child(2) > div > div.col-md-2.col-xs-9.col-xs-offset-3.text-md-center")?.innerText?.trim()?.replace('金額：', '');
+    const quantity = document.querySelector("#lp-1step-confirm-container > div.card.cart-table > div:nth-child(2) > div > div:nth-child(3)")?.innerText?.trim()?.replace('数量：', '');
+    const shippingFee = document.querySelector("#lp-1step-confirm-container > div:nth-child(4) > div.col-md-6 > div:nth-child(1) > table > tbody > tr:nth-child(2) > td:nth-child(4)")?.innerText?.trim();
+
+    const total = document.querySelector("#lp-1step-confirm-container > div:nth-child(4) > div.col-md-6 > div.card.card-light-inverse > div > text")?.innerText?.trim();
+
+    let message = \`
+◆入力情報の確認◆
+【名前】\${name}
+【住所】\${postCode} \${address}
+【電話番号】\${mobile}
+【メールアドレス】\${email}
+
+◆お支払い方法◆
+\${paymentMethod}
+\`;
+
+
+    if (subTotal && shippingFee && quantity && total) {
+      message += \`
+◆注文内容◆
+【単価(税込)】\${subTotal}+送料\${shippingFee}
+【数量】\${quantity}
+【合計金額】\${total}
+日本郵便でポストにお届けします。
+\`;
+    }
+    else {
+      message += '<div style="color: red;">ご入力注文情報は一部利用できません。ご修正いただくようお願い申し上げます</div>';
+    }
+
+    message = message.trim().replaceAll("\\n", "<br>");
+
+    const sendMessageToChatbot = (actionData, action) => {
+      let data = {action: action, actionData: actionData};
+
+      const iframe = document.getElementById('previewSdk');
+      if (!iframe) return;
+
+      iframe.contentWindow.postMessage(data, "*");
+    }
+
+    sendMessageToChatbot(message, 'getPreviewOrderContent');
+
+  }, 2000);
+`);
+
 export const UPDATE_TOKYO_DEVELO_LP_PREFECTURE_JS_CODE = String(`setTimeout(() => {
     const prefs = [
         {
@@ -295,14 +367,31 @@ export const UPDATE_TOKYO_DEVELO_LP_PREFECTURE_JS_CODE = String(`setTimeout(() =
         }
     ];
 
-    let prefId = document.getElementById("drpPrefecture").value;
-  
-    let prefName = prefId;
-    if (parseInt(prefId))
-        prefName = prefs.find(pref => pref.id== prefId).name;
+    let tryTimes = 20;
+    
+    const interval = setInterval(() => {
+      tryTimes--;
+      console.log("tryTimes", tryTimes);
+      if (tryTimes < 0) {
+        clearInterval(interval);
+        return;
+      }
+      
+      let prefId = document.getElementById("drpPrefecture")?.value;
+      console.log("prefId", prefId);
+      if (prefId) {
+        let prefName = prefId;
+        if (parseInt(prefId))
+          prefName = prefs.find(pref => pref.id== prefId).name;
 
-    let el = document.getElementById("lblPref");
-    el.value = prefName;
-    el.dispatchEvent(new Event('input', { bubbles: true }));
-    el.dispatchEvent(new Event('change', { bubbles: true }));
+        let el = document.getElementById("lblPref");
+        el.value = prefName;
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+
+        ${TOKYO_DEVELO_LP_CONFIRM_MESSAGE_JS_CODE}
+
+        clearInterval(interval);
+      }
+    }, 500);
   }, 5000);`);
