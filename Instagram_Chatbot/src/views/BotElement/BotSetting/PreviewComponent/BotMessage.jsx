@@ -33,14 +33,12 @@ const BotMessage = ({
 
     if (![BOT_MESSAGE_TYPES.TEXT_INPUT, BOT_MESSAGE_TYPES.GETTING_ERROR_NOTIFICATION].includes(content.type)) return;
 
-    setText(replaceVariables(content[content.type]?.originalContent || "", variables));
-  }, [content, content[content.type]?.originalContent, variables]);
-
-  useEffect(()=>{
-    if (content.text_input?.use_for_confirm_message && previewOrderContent) {
-      setText(previewOrderContent);
+    if (content.text_input?.use_for_confirm_message && previewOrderContent && isBotOpen) {
+      return setText(previewOrderContent);
     }
-  }, [content, previewOrderContent]);
+
+    setText(replaceVariables(content[content.type]?.originalContent || "", variables));
+  }, [content, content[content.type]?.originalContent, variables, previewOrderContent, isBotOpen]);
 
   const isShowAvatar = () => {
     if (!content) return false;
