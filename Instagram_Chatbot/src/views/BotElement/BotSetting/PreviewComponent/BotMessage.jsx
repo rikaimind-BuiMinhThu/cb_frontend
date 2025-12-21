@@ -19,6 +19,7 @@ const BotMessage = ({
   onRenderCompleted,
   hidden,
   currentMsgIndex,
+  isBotOpen,
 }) => {
   const [isDelaying, setIsDelaying] = useState(true);
   const [text, setText] = useState("");
@@ -33,14 +34,12 @@ const BotMessage = ({
 
     if (![BOT_MESSAGE_TYPES.TEXT_INPUT, BOT_MESSAGE_TYPES.GETTING_ERROR_NOTIFICATION].includes(content.type)) return;
 
-    setText(replaceVariables(content[content.type]?.originalContent || "", variables));
-  }, [content, content[content.type]?.originalContent, variables]);
-
-  useEffect(()=>{
-    if (content.text_input?.use_for_confirm_message && previewOrderContent) {
-      setText(previewOrderContent);
+    if (content.text_input?.use_for_confirm_message && previewOrderContent && isBotOpen) {
+      return setText(previewOrderContent);
     }
-  }, [content, previewOrderContent]);
+
+    setText(replaceVariables(content[content.type]?.originalContent || "", variables));
+  }, [content, content[content.type]?.originalContent, variables, previewOrderContent, isBotOpen]);
 
   const isShowAvatar = () => {
     if (!content) return false;
@@ -91,13 +90,13 @@ const BotMessage = ({
       return () => clearTimeout(timeoutId);
     }
 
-  }, [content.type, isDelaying]);
+  }, [content.type, isDelaying, isBotOpen]);
 
   useEffect(() => {
     // When hidden === undefined, it means the message is not hidden yet
     if (hidden === true) return;
 
-    if (content.text_input?.use_for_confirm_message && content.text_input?.jscode?.trim()) {
+    if (content.text_input?.use_for_confirm_message && content.text_input?.jscode?.trim() && isBotOpen) {
       executeLpJsCode(content.text_input.jscode);
     }
   }, [
@@ -105,6 +104,7 @@ const BotMessage = ({
     hidden,
     content.text_input?.use_for_confirm_message,
     content.text_input?.jscode?.trim(),
+    isBotOpen,
   ]);
 
   // const formatResult = () => {
