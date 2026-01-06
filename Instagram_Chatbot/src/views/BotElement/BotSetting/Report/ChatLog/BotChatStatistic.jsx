@@ -75,7 +75,7 @@ export default function BotChatStatistic({
 
   return (
     <div className="statistic_holder">
-      <ChatbotOverall overall={chatbotOverall}/>
+      <ChatbotOverall overall={chatbotOverall} />
       <div className="statistic_content">
         {msgs.map((message, indexMessage) => {
           return (
@@ -93,7 +93,7 @@ export default function BotChatStatistic({
                 })}
               {message.belong_to === "user" && (
                 <div className="sp-body-user-side csp-body-user-side slideLeft msg_with_stats">
-                  <MessageStatisticDetail stats={message.stats}/>
+                  <MessageStatisticDetail stats={message.stats} />
                   <div className="sp-body-user-side-messages csp-body-user-side-messages">
                     <UserMessage
                       captcha={[]}
@@ -106,7 +106,7 @@ export default function BotChatStatistic({
                         field,
                         subFiled,
                         name
-                      ) => {}}
+                      ) => { }}
                       indexMessageRender={indexMessage}
                       indexMessage={indexMessage}
                       displayButtonNext={(value) => {
@@ -117,7 +117,7 @@ export default function BotChatStatistic({
                       variables={[]}
                     />
                     {(dataMessages[indexMessage]?.is_display_button_next !==
-                    undefined
+                      undefined
                       ? dataMessages[indexMessage].is_display_button_next
                       : true) && (
                       <div className="sp-user-message-button-action">
