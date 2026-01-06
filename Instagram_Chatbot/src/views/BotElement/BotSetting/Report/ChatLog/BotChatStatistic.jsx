@@ -23,7 +23,7 @@ export default function BotChatStatistic({
     setChatbotOverall(parseOverall(overall));
   };
 
-  const parseMessageDetail = (messages, statistic) => {    
+  const parseMessageDetail = (messages, statistic) => {
     const mapMsgId = new Map();
 
     statistic.forEach((s) => {
@@ -66,17 +66,16 @@ export default function BotChatStatistic({
   if (!messages.length)
     return (
       <div className="statistic_holder">
-        <div className="statistic_noti">
-          <p className="staticstic_noti-detail">
-            メッセージが存在しないか、シナリオが未選択です
-          </p>
+        <ChatbotOverall overall={chatbotOverall} />
+        <div className="statistic_content" style={{display: "flex", justifyContent: "center", alignItems: "center", height: "100%"}}>
+          <p>メッセージが存在しないか、シナリオが未選択です</p>
         </div>
       </div>
     );
 
   return (
     <div className="statistic_holder">
-      <ChatbotOverall overall={chatbotOverall}/>
+      <ChatbotOverall overall={chatbotOverall} />
       <div className="statistic_content">
         {msgs.map((message, indexMessage) => {
           return (
@@ -94,7 +93,7 @@ export default function BotChatStatistic({
                 })}
               {message.belong_to === "user" && (
                 <div className="sp-body-user-side csp-body-user-side slideLeft msg_with_stats">
-                  <MessageStatisticDetail stats={message.stats}/>
+                  <MessageStatisticDetail stats={message.stats} />
                   <div className="sp-body-user-side-messages csp-body-user-side-messages">
                     <UserMessage
                       captcha={[]}
@@ -107,7 +106,7 @@ export default function BotChatStatistic({
                         field,
                         subFiled,
                         name
-                      ) => {}}
+                      ) => { }}
                       indexMessageRender={indexMessage}
                       indexMessage={indexMessage}
                       displayButtonNext={(value) => {
@@ -118,22 +117,22 @@ export default function BotChatStatistic({
                       variables={[]}
                     />
                     {(dataMessages[indexMessage]?.is_display_button_next !==
-                    undefined
+                      undefined
                       ? dataMessages[indexMessage].is_display_button_next
                       : true) && (
-                      <div className="sp-user-message-button-action">
-                        <Button
-                          disabled={true}
-                          style={{
-                            backgroundColor: botInfor?.main_color,
-                            borderRadius: "25px",
-                          }}
-                          className="ss-user-message__action-btn"
-                        >
-                          {message.buttonName || "次へ"}
-                        </Button>
-                      </div>
-                    )}
+                        <div className="sp-user-message-button-action">
+                          <Button
+                            disabled={true}
+                            style={{
+                              backgroundColor: botInfor?.main_color,
+                              borderRadius: "25px",
+                            }}
+                            className="ss-user-message__action-btn"
+                          >
+                            {message.buttonName || "次へ"}
+                          </Button>
+                        </div>
+                      )}
                   </div>
                 </div>
               )}

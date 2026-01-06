@@ -65,6 +65,7 @@ function BotChatLog() {
           setChats(res.data.chats);
         }
       });
+      getScenarioStatictic({sc_id: searchScenarioId ? parseInt(searchScenarioId) : null, bot_id: botId});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -90,12 +91,12 @@ function BotChatLog() {
           setChats(res.data.chats);
         }
       });
+
   }
 
-  function searchStatistic(params) {
-    if (!params.sc_id) return;
-
-    getScenarioStatictic(params);
+  function searchStatistic(params = {}) {
+    // if (!params.sc_id) return;
+    getScenarioStatictic({...params, bot_id: botId});
   }
  
   function pressSearchButton() {

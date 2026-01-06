@@ -37,6 +37,13 @@ export const CONVERTERS_OVERALL = {
 const ChatbotOverall = ({ overall }) => {
   if (!overall.length) return null;
 
+  const removePGSLabel = (label) => {
+    if(label.includes("PGS-")) {
+      return label.replace("PGS-", "");
+    }
+    return label;
+  };
+
   return (
     <div className="statistic_overall">
       <div className="statistic_overall_content">
@@ -51,7 +58,7 @@ const ChatbotOverall = ({ overall }) => {
             <div className="info">
               <div className="label">
                 {item.label.map((l) => (
-                  <span key={l}>{l}</span>
+                  <span key={l}>{removePGSLabel(l)}</span>
                 ))}
               </div>
               <div className="value">{item.value}{item.unit ||""}</div>
