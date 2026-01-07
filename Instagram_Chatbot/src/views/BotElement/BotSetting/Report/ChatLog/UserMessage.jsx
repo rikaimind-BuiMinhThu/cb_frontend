@@ -139,6 +139,8 @@ export default function UserMessage({
   const [messageContent, setMessageContent] = useState(messageContentProps);
   const [errors, setErrors] = useState(errorsProps);
 
+  console.log('messageContent', messageContent);
+
   function loadCaptcha(indexContent) {
     if (
       document.getElementById(`captcha-${indexMessage}-${indexContent}`) &&
@@ -577,6 +579,7 @@ export default function UserMessage({
             content.textarea.invalid_input.content
           );
         }
+        console.log('textInput', textInput);
 
         return (
           <React.Fragment key={indexContent}>
@@ -669,7 +672,7 @@ export default function UserMessage({
                         </span>
                       )}
                     </React.Fragment>
-                  ))}
+                ))}
                 {textInput.type === "phone_number" && (
                   <React.Fragment>
                     {textInput.phone_number.withHyphen === false ? (
