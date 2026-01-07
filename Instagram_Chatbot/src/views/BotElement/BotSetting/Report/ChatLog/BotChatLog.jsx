@@ -65,7 +65,7 @@ function BotChatLog() {
           setChats(res.data.chats);
         }
       });
-      getScenarioStatictic({sc_id: searchScenarioId ? parseInt(searchScenarioId) : null, bot_id: botId});
+      getScenarioStatistic({sc_id: searchScenarioId ? parseInt(searchScenarioId) : null, bot_id: botId});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -94,11 +94,6 @@ function BotChatLog() {
 
   }
 
-  function searchStatistic(params = {}) {
-    // if (!params.sc_id) return;
-    getScenarioStatictic({...params, bot_id: botId});
-  }
- 
   function pressSearchButton() {
     const params = {
       sc_id: searchScenarioId ? parseInt(searchScenarioId) : null,
@@ -112,7 +107,7 @@ function BotChatLog() {
     setSelectUserId(null);
 
     searchLog(params)
-    searchStatistic(params)
+    getScenarioStatistic({...params, bot_id: botId});
   }
 
   const [botInfor, setBotInfor] = useState();
@@ -225,7 +220,7 @@ function BotChatLog() {
               opacity_color = "#fff";
               message_color = "#F5F5F5";
               font_color = "#000";
-            }else{
+            } else {
               opacity_color = res.data.chatbot.main_color_other;
               message_color = res.data.chatbot.main_color_other;
               font_color = res.data.chatbot.font_color;
@@ -832,7 +827,7 @@ function BotChatLog() {
       });
   }
 
-  async function getScenarioStatictic(params) {
+  async function getScenarioStatistic(params) {
     api.get(`/api/v1/managements/chat_log/statistic`, { params })
       .then((response) => {
         if (response.data.code === 1) {

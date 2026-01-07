@@ -139,8 +139,6 @@ export default function UserMessage({
   const [messageContent, setMessageContent] = useState(messageContentProps);
   const [errors, setErrors] = useState(errorsProps);
 
-  console.log('messageContent', messageContent);
-
   function loadCaptcha(indexContent) {
     if (
       document.getElementById(`captcha-${indexMessage}-${indexContent}`) &&
@@ -568,7 +566,6 @@ export default function UserMessage({
         let slider = content.slider;
         let cardPaymentRadioButton = content.card_payment_radio_button;
         let labelNoTransition = content.label_no_transition;
-        console.log('content', content);
         
         if (
           content.type === "textarea" &&
