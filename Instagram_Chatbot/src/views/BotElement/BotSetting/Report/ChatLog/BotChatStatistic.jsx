@@ -120,18 +120,18 @@ export default function BotChatStatistic({
                     undefined
                       ? dataMessages[indexMessage].is_display_button_next
                       : true) && (
-                        <div className="sp-user-message-button-action">
-                          <Button
-                            disabled={true}
-                            style={{
-                              backgroundColor: botInfor?.main_color,
-                              borderRadius: "25px",
-                            }}
-                            className="ss-user-message__action-btn"
-                          >
-                            {message.buttonName || "次へ"}
-                          </Button>
-                        </div>
+                      <div className="sp-user-message-button-action">
+                        <Button
+                          disabled={true}
+                          style={{
+                            backgroundColor: botInfor?.main_color,
+                            borderRadius: "25px",
+                          }}
+                          className="ss-user-message__action-btn"
+                        >
+                          {message.buttonName || "次へ"}
+                        </Button>
+                      </div>
                       )}
                   </div>
                 </div>

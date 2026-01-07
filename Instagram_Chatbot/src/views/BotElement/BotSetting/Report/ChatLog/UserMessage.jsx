@@ -566,7 +566,6 @@ export default function UserMessage({
         let slider = content.slider;
         let cardPaymentRadioButton = content.card_payment_radio_button;
         let labelNoTransition = content.label_no_transition;
-        
         if (
           content.type === "textarea" &&
           content.textarea &&
@@ -577,7 +576,6 @@ export default function UserMessage({
             content.textarea.invalid_input.content
           );
         }
-        console.log('textInput', textInput);
 
         return (
           <React.Fragment key={indexContent}>
@@ -670,7 +668,7 @@ export default function UserMessage({
                         </span>
                       )}
                     </React.Fragment>
-                ))}
+                  ))}
                 {textInput.type === "phone_number" && (
                   <React.Fragment>
                     {textInput.phone_number.withHyphen === false ? (
