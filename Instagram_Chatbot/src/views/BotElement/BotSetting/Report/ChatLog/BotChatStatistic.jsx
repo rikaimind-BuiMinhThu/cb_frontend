@@ -66,7 +66,7 @@ export default function BotChatStatistic({
   if (!messages.length)
     return (
       <div className="statistic_holder">
-        <ChatbotOverall overall={chatbotOverall}/>
+        <ChatbotOverall overall={chatbotOverall} />
         <div className="statistic_content_empty">
           <p>メッセージが存在しないか、シナリオが未選択です</p>
         </div>
