@@ -541,7 +541,7 @@ function ClientManagement() {
       }
     }
 
-    var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,20})+$/;
+    var mailformat = /^[a-zA-Z0-9]+[a-zA-Z0-9]+([._+-])*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/;
     if (
       document.getElementById('newEmail') != null &&
       document.getElementById('newEmail').value.length > 0 &&
@@ -770,7 +770,7 @@ function ClientManagement() {
     }
 
 
-    var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,20})+$/;
+    var mailformat = /^[a-zA-Z0-9]+[a-zA-Z0-9]+([._+-])*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/;
     if (email.length > 35) {
       emailCheck = false;
     }

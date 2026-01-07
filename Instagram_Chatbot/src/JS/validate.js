@@ -1,7 +1,7 @@
 const field = document.getElementById.bind(document);
 
 export function checkEmail(inputId, errId, label) {
-  var regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,20})+$/;
+  var regex = /^[a-zA-Z0-9]+[a-zA-Z0-9]+([._+-])*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/;
   if (!regex.test(field(inputId).value) && field(inputId).value != '') {
     field(errId).style.display = 'block';
     field(errId).innerHTML = `${label}項目は正しくありません。`;
