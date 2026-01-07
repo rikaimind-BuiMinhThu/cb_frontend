@@ -67,7 +67,7 @@ export default function BotChatStatistic({
     return (
       <div className="statistic_holder">
         <ChatbotOverall overall={chatbotOverall} />
-        <div className="statistic_content" style={{display: "flex", justifyContent: "center", alignItems: "center", height: "100%"}}>
+        <div className="statistic_content_empty">
           <p>メッセージが存在しないか、シナリオが未選択です</p>
         </div>
       </div>

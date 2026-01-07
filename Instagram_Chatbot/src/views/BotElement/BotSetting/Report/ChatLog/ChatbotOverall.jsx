@@ -21,11 +21,11 @@ export const CONVERTERS_OVERALL = {
   },
   pgs_cv_count: {
     icon: IconUserCheck,
-    label: ["PGS-CV数"],
+    label: ["CV数"],
   },
   pgs_cv_entry_rate: {
     icon: IconTrendingUp,
-    label: ["PGS-CV数", "/ エントリー数"],
+    label: ["CV数", "/ エントリー数"],
     unit: "%",
   },
   impression_count: {
@@ -36,13 +36,6 @@ export const CONVERTERS_OVERALL = {
 
 const ChatbotOverall = ({ overall }) => {
   if (!overall.length) return null;
-
-  const removePGSLabel = (label) => {
-    if(label.includes("PGS-")) {
-      return label.replace("PGS-", "");
-    }
-    return label;
-  };
 
   return (
     <div className="statistic_overall">
@@ -58,7 +51,7 @@ const ChatbotOverall = ({ overall }) => {
             <div className="info">
               <div className="label">
                 {item.label.map((l) => (
-                  <span key={l}>{removePGSLabel(l)}</span>
+                  <span key={l}>{l}</span>
                 ))}
               </div>
               <div className="value">{item.value}{item.unit ||""}</div>

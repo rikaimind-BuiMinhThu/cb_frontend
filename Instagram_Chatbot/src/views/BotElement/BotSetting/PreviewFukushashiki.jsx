@@ -519,7 +519,7 @@ const PreviewFukushashiki = () => {
   }, [state.loadedStateFromSession, state.displayType, state.isOpen, state.messagesList.length, state.botInfor, state.manuallyClosed]);
 
   useEffect(() => {
-    if (!state.nextStopMsgIndex || state.currentMsgIndex + 1 >= state.nextStopMsgIndex) return;
+    if (!state.nextStopMsgIndex || state.currentMsgIndex + 1 >= state.nextStopMsgIndex || !state.isOpen) return;
 
     setTimeout(() => {
       dispatch({
