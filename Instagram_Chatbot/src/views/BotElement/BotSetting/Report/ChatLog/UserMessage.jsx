@@ -139,6 +139,8 @@ export default function UserMessage({
   const [messageContent, setMessageContent] = useState(messageContentProps);
   const [errors, setErrors] = useState(errorsProps);
 
+  console.log('messageContent', messageContent);
+
   function loadCaptcha(indexContent) {
     if (
       document.getElementById(`captcha-${indexMessage}-${indexContent}`) &&
@@ -566,6 +568,8 @@ export default function UserMessage({
         let slider = content.slider;
         let cardPaymentRadioButton = content.card_payment_radio_button;
         let labelNoTransition = content.label_no_transition;
+        console.log('content', content);
+        
         if (
           content.type === "textarea" &&
           content.textarea &&
@@ -576,6 +580,7 @@ export default function UserMessage({
             content.textarea.invalid_input.content
           );
         }
+        console.log('textInput', textInput);
 
         return (
           <React.Fragment key={indexContent}>
@@ -668,7 +673,7 @@ export default function UserMessage({
                         </span>
                       )}
                     </React.Fragment>
-                  ))}
+                ))}
                 {textInput.type === "phone_number" && (
                   <React.Fragment>
                     {textInput.phone_number.withHyphen === false ? (
@@ -900,6 +905,9 @@ export default function UserMessage({
                   </div>
                 )}
               </div>
+            )}
+            {content.type === 'image' && (
+              <img src={content?.image?.imageURL} alt="image" style={{ width: content?.image?.image_width, height: content?.image?.image_height }} />
             )}
             {/* type == 'label' */}
             {content.type === "label" && label.lbl_content && (

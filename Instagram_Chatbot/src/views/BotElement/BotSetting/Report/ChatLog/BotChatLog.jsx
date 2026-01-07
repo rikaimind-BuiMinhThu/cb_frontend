@@ -225,6 +225,10 @@ function BotChatLog() {
               opacity_color = "#fff";
               message_color = "#F5F5F5";
               font_color = "#000";
+            }else{
+              opacity_color = res.data.chatbot.main_color_other;
+              message_color = res.data.chatbot.main_color_other;
+              font_color = res.data.chatbot.font_color;
             }
             res.data.chatbot.opacity_color = opacity_color;
             res.data.chatbot.message_color = message_color;
