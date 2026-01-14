@@ -72,8 +72,8 @@ export default function SubmitButton({ content, submitErrorMessage = "", onChang
       content.type,
       content.button_submit_id,
       "button_submit",
-      undefined,
-      undefined,
+      null,
+      null,
       message
     )
 

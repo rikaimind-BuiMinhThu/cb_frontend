@@ -142,7 +142,6 @@ const PreviewFukushashikiReducer = (state, action) => {
         newState.messagesList = newState.messagesList.map(x => ({...x, hidden: x.not_display_when_logged_in}));
       }
 
-      const isClickedButtonSubmit = isButtonSubmitMessage(state.messagesList[clickedMsgIndex]);
       const isClickedLastMessage = state.messagesList.length - 1 === clickedMsgIndex;
 
       if (isClickedLastMessage) {
@@ -596,16 +595,7 @@ const handleSaveInputContent = (newState, subContent, contentType, field, value)
       return item;
     }
 
-    // Handle button_submit separately - save button_submit_id directly
-    if (contentType === 'button_submit') {
-      // Update value in variables
-      const variable = newState.variables.find(v => v.variable_name === variableName);
-      if (variable) {
-        variable.default_value = value;
-      }
-    }
-
-    item.default_value = getDefaultValue(subContent, contentType, field, value, newState.prefecturesList);
+    item.default_value = getDefaultValue(subContent, contentType, field, value, newState.prefecturesList, newState.variables, variableName);
 
     newState.objParam[variableName] = value;
   });
