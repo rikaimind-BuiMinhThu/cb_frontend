@@ -75,7 +75,7 @@ export default function SubmitButton({ content, submitErrorMessage = "", onChang
       null,
       null,
       message
-    )
+    );
 
     onClickNext(messageIndex, message);
   }

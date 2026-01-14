@@ -195,6 +195,7 @@ const getSubmitButtonDefaultValue = (value, variables, variableName) => {
   }
   return value;
 }
+
 const getDefaultValue = (subContent, contentType, value, field, prefecturesList, variables, variableName) => {
   switch (contentType) {
     case MESSAGE_CONTENT_TYPES.TEXT_INPUT:
