@@ -442,7 +442,11 @@ const UserMessage = ({
       case MESSAGE_CONTENT_TYPES.SUBMIT_BUTTON:
         return <SubmitButton
           content={content}
+          contentIndex={contentIndex}
+          messageIndex={messageIndex}
+          message={message}
           submitErrorMessage={submitErrorMessage}
+          onChangeValue={onChangeValue}
           onClickNext={onClickNext}
           isProcessing={isProcessing}
         />;

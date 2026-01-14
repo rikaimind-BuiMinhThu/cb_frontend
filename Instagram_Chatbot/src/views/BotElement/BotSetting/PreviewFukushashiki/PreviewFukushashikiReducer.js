@@ -145,7 +145,7 @@ const PreviewFukushashikiReducer = (state, action) => {
       const isClickedButtonSubmit = isButtonSubmitMessage(state.messagesList[clickedMsgIndex]);
       const isClickedLastMessage = state.messagesList.length - 1 === clickedMsgIndex;
 
-      if (isClickedButtonSubmit || isClickedLastMessage) {
+      if (isClickedLastMessage) {
         newState.conversionStatus = CONVERSTION_RESPONSE_STATUS.FINISH;
         newState.isProcessing = true;
       } else {
@@ -174,7 +174,7 @@ const PreviewFukushashikiReducer = (state, action) => {
       }
 
       // Calculate next stop message index
-      const nextStopMsgIndex = state.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex)) + 1;
+      const nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex)) + 1;
 
       newState.renderMode = (isUpdateClicked && state.isUsedPastMessageLoaded) ? RENDER_MODES.LAST : RENDER_MODES.NEXT;
       if (newState.renderMode === RENDER_MODES.LAST) {
@@ -594,6 +594,15 @@ const handleSaveInputContent = (newState, subContent, contentType, field, value)
   newState.variables.forEach((item) => {
     if (item.variable_name !== variableName) {
       return item;
+    }
+
+    // Handle button_submit separately - save button_submit_id directly
+    if (contentType === 'button_submit') {
+      // Update value in variables
+      const variable = newState.variables.find(v => v.variable_name === variableName);
+      if (variable) {
+        variable.default_value = value;
+      }
     }
 
     item.default_value = getDefaultValue(subContent, contentType, field, value, newState.prefecturesList);

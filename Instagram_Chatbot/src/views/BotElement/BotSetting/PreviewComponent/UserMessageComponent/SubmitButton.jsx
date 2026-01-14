@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import "assets/css/bot/preview-chat-bot.css";
 import { getErrorMessageFromParent } from "../../PreviewFukushashiki/LPUtils"
 
-export default function SubmitButton({ content, submitErrorMessage = "", onClickNext, isProcessing = false }) {
+export default function SubmitButton({ content, submitErrorMessage = "", onChangeValue, onClickNext, isProcessing = false, messageIndex, contentIndex, message}) {
   if (content.type !== 'button_submit') return null;
 
   const buttonSubmit = content.button_submit;
@@ -66,12 +66,26 @@ export default function SubmitButton({ content, submitErrorMessage = "", onClick
     )
   }
 
+  const onChangeAndClickNext = () => {
+    onChangeValue(
+      contentIndex,
+      content.type,
+      content.button_submit_id,
+      "button_submit",
+      undefined,
+      undefined,
+      message
+    )
+
+    onClickNext(messageIndex, message);
+  }
+
   return (
     <>
       {renderSubmitErrorMessage()}
       <div className="ss-user-setting__item-text_input-top">
         {buttonSubmit?.style && <style dangerouslySetInnerHTML={{ __html: buttonSubmit.style }} />}
-        <button id="chatbot-submit-button" onClick={onClickNext}>
+        <button id="chatbot-submit-button" onClick={onChangeAndClickNext}>
           {getButtonSubmitName()}
         </button>
       </div>

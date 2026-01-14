@@ -14730,8 +14730,22 @@ const Scenario = () => {
                                                             value={buttonSubmit.is_use_js}
                                                           />
                                                         </div>
-                                                      </div>
-                                                      <div className="ss-user-setting__item-bottom" style={{ marginBottom: '0px', display: 'flex' }}>
+                                                        <div style={{ width: '45%' }}>
+                                                          <CheckboxCustom
+                                                            label="入力された内容を変数に保存する。"
+                                                              onChange={(value) =>
+                                                                onChangeValueMessageContent(
+                                                                  indexMessageSelect,
+                                                                  indexContent,
+                                                                  content.type,
+                                                                  value,
+                                                                  "is_save_input_content"
+                                                                )
+                                                              }
+                                                            value={buttonSubmit.is_save_input_content}
+                                                            isOnChange={false}
+                                                          />
+                                                        </div>
                                                         <div style={{ width: '45%' }}>
                                                           <CheckboxCustom
                                                             label="確認メッセージ用"
@@ -14760,7 +14774,37 @@ const Scenario = () => {
                                                           />
                                                         </div>
                                                       </div>
-                                                      
+                                                      {buttonSubmit.is_save_input_content && (
+                                                          <div className="ss-user-setting__item-bottom">
+                                                            <div className="ss-user-setting__item-select-bottom-wrapper-flex">
+                                                              <SelectCustom
+                                                                style={{ width: "100%", marginRight: "10px" }}
+                                                                id="title"
+                                                                value={buttonSubmit.save_input_content}
+                                                                data={dataInputVar}
+                                                                keyValue="variable_name"
+                                                                nameValue="variable_name"
+                                                                onChange={(value) =>
+                                                                  onChangeValueMessageContent(
+                                                                    indexMessageSelect,
+                                                                    indexContent,
+                                                                    content.type,
+                                                                    value,
+                                                                    "save_input_content"
+                                                                  )
+                                                                }
+                                                              />
+                                                              <Button
+                                                                style={{ margin: "0px", lineHeight: "0px" }}
+                                                                className="ss-user-setting__select-btn-add"
+                                                                onClick={() => setIsOpenAddVariable(true)}
+                                                              >
+                                                                追加
+                                                              </Button>
+                                                            </div>
+                                                          </div>
+                                                        )
+                                                      }
                                                       {buttonSubmit.is_display_error_message &&
                                                         <>
                                                           <div className='ss-user-setting__item-bottom' style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px' }}>
