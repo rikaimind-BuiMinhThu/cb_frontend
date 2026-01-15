@@ -187,7 +187,16 @@ const getCarouselDefaultValue = (subContent,value) => {
   // return default_value;
 }
 
-const getDefaultValue = (subContent, contentType, value, field, prefecturesList) => {
+const getSubmitButtonDefaultValue = (value, variables, variableName) => {
+  // Update value in variables
+  const variable = variables.find(v => v.variable_name === variableName);
+  if (variable) {
+    variable.default_value = value;
+  }
+  return value;
+}
+
+const getDefaultValue = (subContent, contentType, value, field, prefecturesList, variables, variableName) => {
   switch (contentType) {
     case MESSAGE_CONTENT_TYPES.TEXT_INPUT:
       return getTextInputValue(subContent, field);
@@ -218,7 +227,7 @@ const getDefaultValue = (subContent, contentType, value, field, prefecturesList)
     case MESSAGE_CONTENT_TYPES.CARD_PAYMENT_RADIO_BUTTON:
       return getCardPaymentRadioButtonValue(subContent, field, value);
     case MESSAGE_CONTENT_TYPES.SUBMIT_BUTTON:
-      throw new Error(`getDefaultValue: ${contentType} is not supported`);
+      return getSubmitButtonDefaultValue(value, variables, variableName);
     case MESSAGE_CONTENT_TYPES.IMAGE:
     case MESSAGE_CONTENT_TYPES.LABEL:
     case MESSAGE_CONTENT_TYPES.LABEL_NO_TRANSITION:

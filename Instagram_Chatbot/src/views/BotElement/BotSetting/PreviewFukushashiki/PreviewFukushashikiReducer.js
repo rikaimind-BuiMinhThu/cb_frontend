@@ -142,10 +142,9 @@ const PreviewFukushashikiReducer = (state, action) => {
         newState.messagesList = newState.messagesList.map(x => ({...x, hidden: x.not_display_when_logged_in}));
       }
 
-      const isClickedButtonSubmit = isButtonSubmitMessage(state.messagesList[clickedMsgIndex]);
       const isClickedLastMessage = state.messagesList.length - 1 === clickedMsgIndex;
 
-      if (isClickedButtonSubmit || isClickedLastMessage) {
+      if (isClickedLastMessage) {
         newState.conversionStatus = CONVERSTION_RESPONSE_STATUS.FINISH;
         newState.isProcessing = true;
       } else {
@@ -174,7 +173,7 @@ const PreviewFukushashikiReducer = (state, action) => {
       }
 
       // Calculate next stop message index
-      const nextStopMsgIndex = state.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex)) + 1;
+      const nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex)) + 1;
 
       newState.renderMode = (isUpdateClicked && state.isUsedPastMessageLoaded) ? RENDER_MODES.LAST : RENDER_MODES.NEXT;
       if (newState.renderMode === RENDER_MODES.LAST) {
@@ -596,7 +595,7 @@ const handleSaveInputContent = (newState, subContent, contentType, field, value)
       return item;
     }
 
-    item.default_value = getDefaultValue(subContent, contentType, field, value, newState.prefecturesList);
+    item.default_value = getDefaultValue(subContent, contentType, field, value, newState.prefecturesList, newState.variables, variableName);
 
     newState.objParam[variableName] = value;
   });
