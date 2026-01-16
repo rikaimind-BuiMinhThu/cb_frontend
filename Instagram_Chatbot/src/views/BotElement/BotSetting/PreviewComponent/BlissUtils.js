@@ -69,6 +69,11 @@ export const mapAmazonPayDataToMessagesListForBliss = (amazonPayData, messagesLi
     messageProfileTel3.message_content.find(content => content.value3_fukushashiki_search_value === "form-validation-field-2").text_input.phone_number.value3 = profileTel3;
   }
 
+  const messageProfileEmail = userMessages?.find(message => message.message_content.find(content => content.fukushashiki_search_value === "email"));
+  if (messageProfileEmail) {
+    messageProfileEmail.message_content.find(content => content.email_address_fukushashiki_search_value === "email").text_input.email_address.value = profileEmail;
+  }
+
   return newMessagesList;
 }
 
@@ -83,5 +88,6 @@ export const isBlissLpAmazonData = (message) => {
   const isStreetAddressData = message.message_content.find(content => content.address_fukushashiki_search_value === "order_shipping_address_attributes_addr02");
   const isName1Data = message.message_content.find(content => content.left_fukushashiki_search_value === "order_shipping_address_attributes_name1");
   const isName2Data = message.message_content.find(content => content.right_fukushashiki_search_value === "order_shipping_address_attributes_name2");
-  return isTel1Data || isTel2Data || isTel3Data || isZipCode1Data || isZipCode2Data || isPrefectureData || isCityData || isStreetAddressData || isName1Data || isName2Data;
+  const isEmailData = message.message_content.find(content => content.fukushashiki_search_value === "email");
+  return isTel1Data || isTel2Data || isTel3Data || isZipCode1Data || isZipCode2Data || isPrefectureData || isCityData || isStreetAddressData || isName1Data || isName2Data || isEmailData;
 }
