@@ -90,16 +90,15 @@ const getPulldownValue = (subContent, field, value) => {
 }
 
 const getRadioButtonDefaultValue = (subContent, value) => {
-  const radioButton = subContent.radio_button;
   switch (subContent.type) {
     case "default":
-      return radioButton.default.find(item => item.value === value)?.text;
+      return subContent.default.find(item => item.value === value)?.text;
     case "radio_button_img":
-      return radioButton.radio_button_img.find(item => item.value === value)?.text;
+      return subContent.radio_button_img.find(item => item.value === value)?.text;
     case "consume_api_response":
       throw new Error("getRadioButtonDefaultValue: consume_api_response is not supported");
     case "block_style":
-      return radioButton.block_style.find(item => item.value === value)?.text;
+      return subContent.block_style.find(item => item.value === value)?.text;
     default:
       return "";
   }
