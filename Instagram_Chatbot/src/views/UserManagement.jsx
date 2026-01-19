@@ -262,7 +262,7 @@ function UserManagement() {
       document.getElementById('名称ErrMsg').innerHTML = '';
     }
 
-    let mailFormat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,20})+$/;
+    let mailFormat = /^[a-zA-Z0-9]+[a-zA-Z0-9]+([._+-])*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/;
     if (emailUpdate.length > 35) {
       emailCheck = false;
     } else if (emailUpdate.match(mailFormat)) {
@@ -380,7 +380,7 @@ function UserManagement() {
       document.getElementById('newUser名称ErrMsg').innerHTML = '';
     }
 
-    var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,20})+$/;
+    var mailformat = /^[a-zA-Z0-9]+[a-zA-Z0-9]+([._+-])*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/;
     if (email.length > 35) {
       emailCheck = false;
     } else if (email.match(mailformat)) {

@@ -901,6 +901,9 @@ export default function UserMessage({
                 )}
               </div>
             )}
+            {content.type === 'image' && (
+              <img src={content?.image?.imageURL} alt="image" style={{ width: content?.image?.image_width, height: content?.image?.image_height }} />
+            )}
             {/* type == 'label' */}
             {content.type === "label" && label.lbl_content && (
               <div style={{ marginBottom: "10px" }}>

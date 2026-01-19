@@ -124,6 +124,14 @@
   gap: 20px;
 }
 
+.statistic_content_empty {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+} 
+
 .msg_with_stats {
   display: flex;
   flex-direction: row;

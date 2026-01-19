@@ -83,7 +83,7 @@ function ReplyMailManagement() {
     }
     console.log(payload);
     if (payload['rm-mail'] && payload['rm-password']) {
-      var regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,20})+$/;
+      var regex = /^[a-zA-Z0-9]+[a-zA-Z0-9]+([._+-])*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/;
       if (!regex.test(payload['rm-mail'])) {
         document.getElementById('rm-add-email-err').style.display = 'block';
         document.getElementById(
@@ -165,7 +165,7 @@ function ReplyMailManagement() {
     const inputPassword = document.getElementById(`rm-input-password-table-${clientId}`);
     console.log(inputMail?.value);
     if (inputMail?.value && inputPassword?.value) {
-      var regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,20})+$/;
+      var regex = /^[a-zA-Z0-9]+[a-zA-Z0-9]+([._+-])*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/;
       if (!regex.test(inputMail?.value)) {
         document.getElementById(`rm-input-mail-table-err-${clientId}`).style.display = 'block';
         document.getElementById(

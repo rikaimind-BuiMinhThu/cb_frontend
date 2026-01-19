@@ -21,11 +21,11 @@ export const CONVERTERS_OVERALL = {
   },
   pgs_cv_count: {
     icon: IconUserCheck,
-    label: ["PGS-CV数"],
+    label: ["CV数"],
   },
   pgs_cv_entry_rate: {
     icon: IconTrendingUp,
-    label: ["PGS-CV数", "/ エントリー数"],
+    label: ["CV数", "/ エントリー数"],
     unit: "%",
   },
   impression_count: {

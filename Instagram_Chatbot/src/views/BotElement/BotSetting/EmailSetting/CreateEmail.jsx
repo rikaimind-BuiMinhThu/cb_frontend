@@ -103,7 +103,7 @@ function CreateEmail() {
   }, []);
 
   function checkListcc(value, listcc) {
-    var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,20})+$/;
+    var mailformat = /^[a-zA-Z0-9]+[a-zA-Z0-9]+([._+-])*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/;
     if (value.match(mailformat)) {
       let i = 0;
       listcc.forEach((cc) => {
@@ -144,7 +144,7 @@ function CreateEmail() {
   }
 
   function checkListBcc(value, listbcc) {
-    var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,20})+$/;
+    var mailformat = /^[a-zA-Z0-9]+([._+-][a-zA-Z0-9]+)*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/;
     if (value.match(mailformat)) {
       let i = 0;
       listbcc.forEach((bcc) => {
@@ -334,7 +334,7 @@ function CreateEmail() {
   }
 
   function checkEmail(emailId, errEmail, lable) {
-    var regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,20})+$/;
+    var regex = /^[a-zA-Z0-9]+([._+-][a-zA-Z0-9]+)*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/;
     let value = field(emailId).value;
     if (emailId == 'to' && value.slice(0, 2) == '{{' && value.slice(-2) == '}}') {
       console.log(value.slice(2, value.length - 2), ': nenen')

@@ -23,7 +23,7 @@ export default function BotChatStatistic({
     setChatbotOverall(parseOverall(overall));
   };
 
-  const parseMessageDetail = (messages, statistic) => {    
+  const parseMessageDetail = (messages, statistic) => {
     const mapMsgId = new Map();
 
     statistic.forEach((s) => {
@@ -66,10 +66,9 @@ export default function BotChatStatistic({
   if (!messages.length)
     return (
       <div className="statistic_holder">
-        <div className="statistic_noti">
-          <p className="staticstic_noti-detail">
-            メッセージが存在しないか、シナリオが未選択です
-          </p>
+        <ChatbotOverall overall={chatbotOverall}/>
+        <div className="statistic_content_empty">
+          <p>メッセージが存在しないか、シナリオが未選択です</p>
         </div>
       </div>
     );
@@ -133,7 +132,7 @@ export default function BotChatStatistic({
                           {message.buttonName || "次へ"}
                         </Button>
                       </div>
-                    )}
+                      )}
                   </div>
                 </div>
               )}
