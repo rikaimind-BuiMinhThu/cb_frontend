@@ -28,6 +28,7 @@ import {
   PREVIEW_ACTIONS,
   RENDER_CHATBOT_CONFIG,
   RENDER_MODES,
+  MESSAGE_CONTENT_TYPES,
 } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
@@ -160,6 +161,7 @@ const previewInitialState = {
   renderMode: RENDER_MODES.NEXT,
   isUpsell: false,
   progressBarMaxIndex: null,
+  isNotAutoScroll: false,
 };
 
 
@@ -168,7 +170,6 @@ const PreviewFukushashiki = () => {
   const [timerChanges, setTimerChanges] = useState({ timeLeft: -1, config: null });
   const containerRef = useRef(null);
   const hasSentCustomJs = useRef(false);
-  const userMessagesList = useMemo(() => state.messagesList.filter(isUserMessage), [state.messagesList]);
 
   // Initialize conversion status when chatbot opens
   useEffect(() => {
@@ -496,6 +497,16 @@ const PreviewFukushashiki = () => {
   // Auto-scroll to bottom of the chatbot when render messages list changes or submit error message changes
   useEffect(() => {
     if (state.isUpsell) return;
+
+    const curretMsg = state.messagesList[state.currentMsgIndex];
+    if (state.isNotAutoScroll) {
+      if (curretMsg?.message_content?.[0]?.type !== MESSAGE_CONTENT_TYPES.IMAGE) return;
+      setTimeout(() => {
+        document.querySelector(`#msg-${state.currentMsgIndex}-0`)?.scrollIntoView({ behavior: "smooth" });
+      }, 2000);
+      return;
+    }
+
     const timeoutId = setTimeout(() => {
       scrollToPosition({ position: "b", selector: "#sp-body" });
     }, 300);
@@ -519,7 +530,10 @@ const PreviewFukushashiki = () => {
   }, [state.loadedStateFromSession, state.displayType, state.isOpen, state.messagesList.length, state.botInfor, state.manuallyClosed]);
 
   useEffect(() => {
-    if (!state.nextStopMsgIndex || state.currentMsgIndex + 1 >= state.nextStopMsgIndex || !state.isOpen) return;
+    if (!state.nextStopMsgIndex || state.currentMsgIndex + 1 >= state.nextStopMsgIndex || !state.isOpen) {
+      dispatch({ type: PREVIEW_ACTIONS.SET_IS_NOT_AUTO_SCROLL, payload: false });
+      return;
+    }
 
     setTimeout(() => {
       dispatch({

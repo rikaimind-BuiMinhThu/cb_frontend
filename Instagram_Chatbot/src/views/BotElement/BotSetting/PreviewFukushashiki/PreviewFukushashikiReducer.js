@@ -40,13 +40,39 @@ const PreviewFukushashikiReducer = (state, action) => {
       return { ...state, previewOrderContent: action.payload, isProcessing: false };
     case PREVIEW_ACTIONS.SET_PROCESSING: 
       return { ...state, isProcessing: action.payload };
+    case PREVIEW_ACTIONS.SET_IS_NOT_AUTO_SCROLL:
+      return { ...state, isNotAutoScroll: action.payload };
     case PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES:
       if (action.payload.fromCallback) return state;
 
+      let updatedState = {
+        messagesList: _.cloneDeep(state.messagesList),
+        variables: _.cloneDeep(state.variables),
+      };
+
+      for (let i = action.payload.startIndex; i < action.payload.endIndex; i++) {
+        if (isBotMessage(updatedState.messagesList[i])) {
+          const result = processForBotMessage(updatedState.messagesList, i, updatedState, false, false);
+          updatedState = {
+            ...updatedState,
+            ...result
+          };
+        }
+      }
+
+      const currentMsg = updatedState.messagesList[action.payload.endIndex - 1];
+      let isNotAutoScroll = state.isNotAutoScroll || false;
+
+      if (currentMsg?.message_content?.[0]?.type === MESSAGE_CONTENT_TYPES.IMAGE) {
+        isNotAutoScroll = currentMsg?.message_content?.[0]?.image?.is_not_auto_scroll || false;
+      }
+
       return {
         ...state,
-        renderMessagesList: state.messagesList.slice(action.payload.startIndex, action.payload.endIndex),
-        currentMsgIndex: action.payload.endIndex - 1
+        ...updatedState,
+        renderMessagesList: updatedState.messagesList.slice(action.payload.startIndex, action.payload.endIndex),
+        currentMsgIndex: action.payload.endIndex - 1,
+        isNotAutoScroll: isNotAutoScroll,
       };
     case PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE: {
       let messagesList = _.cloneDeep(state.messagesList);

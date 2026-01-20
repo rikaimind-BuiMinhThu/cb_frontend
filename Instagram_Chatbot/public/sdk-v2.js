@@ -513,10 +513,10 @@ const displayPopup = async () => {
     async (e) => {
       if (typeof e.data !== 'object') return;
       if (e.data.source !== 'ec-chatbot') return;
-      chatbotW = e.data.widthPc;
-      chatbotH = e.data.heightPc;
-      chatbotRight = e.data.chatbotRight;
-      chatbotBottom = e.data.chatbotBottom;
+      if (e.data.widthPc) chatbotW = e.data.widthPc;
+      if (e.data.heightPc) chatbotH = e.data.heightPc;
+      if (e.data.chatbotRight) chatbotRight = e.data.chatbotRight;
+      if (e.data.chatbotBottom) chatbotBottom = e.data.chatbotBottom;
 
       switch (e.data.action) {
         case CHATBOT_ACTIONS.FUKUSHASHIKI:
@@ -574,6 +574,8 @@ const displayPopup = async () => {
           injectCustomJS(e.data.actionData);
           break;
       };
+
+      if (e.data.isOpen === undefined) return;
 
       if (e.data.isOpen && mobileCheck()) {
         iframe.width = "100%";
