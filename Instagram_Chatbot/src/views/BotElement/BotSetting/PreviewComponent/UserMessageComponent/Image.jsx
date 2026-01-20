@@ -3,7 +3,7 @@ import "assets/css/bot/preview-chat-bot.css";
 import { MESSAGE_CONTENT_TYPES } from "../Constants";
 
 export default function Image({ content }) {
-if (!content || content.type !== MESSAGE_CONTENT_TYPES.IMAGE) return null;
+  if (!content || content.type !== MESSAGE_CONTENT_TYPES.IMAGE) return null;
 
   const image = content.image;
 
