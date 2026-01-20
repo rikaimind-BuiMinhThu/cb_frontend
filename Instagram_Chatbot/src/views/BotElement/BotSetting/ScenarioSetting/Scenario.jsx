@@ -10528,7 +10528,7 @@ const Scenario = () => {
                                                           <CheckboxCustom
                                                             label="自動スクロールしない"
                                                             onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_not_auto_scroll')}
-                                                            value={checkbox.is_not_auto_scroll}
+                                                            value={image.is_not_auto_scroll || false}
                                                           />
                                                           <CheckboxCustom
                                                             label="入力された内容を変数に保存する。"
