@@ -61,13 +61,18 @@ const PreviewFukushashikiReducer = (state, action) => {
       }
 
       const currentMsg = updatedState.messagesList[action.payload.endIndex - 1];
+      let isNotAutoScroll = state.isNotAutoScroll || false;
+
+      if (currentMsg?.message_content?.[0]?.type === MESSAGE_CONTENT_TYPES.IMAGE) {
+        isNotAutoScroll = currentMsg?.message_content?.[0]?.image?.is_not_auto_scroll || false;
+      }
 
       return {
         ...state,
         ...updatedState,
         renderMessagesList: updatedState.messagesList.slice(action.payload.startIndex, action.payload.endIndex),
         currentMsgIndex: action.payload.endIndex - 1,
-        isNotAutoScroll: currentMsg?.message_content?.[0]?.is_not_auto_scroll || false,
+        isNotAutoScroll: isNotAutoScroll,
       };
     case PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE: {
       let messagesList = _.cloneDeep(state.messagesList);

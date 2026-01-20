@@ -119,7 +119,7 @@ const processForBotDefaultMessage = async (messagesList, i, newState, isUpdateSo
     newState.currentMsgIndex = i;
   }
   
-  scrollToPosition({ position: "b", selector: "#sp-body" });
+  // scrollToPosition({ position: "b", selector: "#sp-body" });
 
   // if (newState.currentMsgIndex === newState.messagesList.length - 1)
   //   return redirectToCartPage();

@@ -28,6 +28,7 @@ import {
   PREVIEW_ACTIONS,
   RENDER_CHATBOT_CONFIG,
   RENDER_MODES,
+  MESSAGE_CONTENT_TYPES,
 } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
@@ -496,7 +497,15 @@ const PreviewFukushashiki = () => {
   // Auto-scroll to bottom of the chatbot when render messages list changes or submit error message changes
   useEffect(() => {
     if (state.isUpsell) return;
-    if (state.isNotAutoScroll) return;
+
+    const curretMsg = state.messagesList[state.currentMsgIndex];
+    if (state.isNotAutoScroll) {
+      if (curretMsg?.message_content?.[0]?.type !== MESSAGE_CONTENT_TYPES.IMAGE) return;
+      setTimeout(() => {
+        document.querySelector(`#msg-${state.currentMsgIndex}-0`)?.scrollIntoView({ behavior: "smooth" });
+      }, 2000);
+      return;
+    }
 
     const timeoutId = setTimeout(() => {
       scrollToPosition({ position: "b", selector: "#sp-body" });

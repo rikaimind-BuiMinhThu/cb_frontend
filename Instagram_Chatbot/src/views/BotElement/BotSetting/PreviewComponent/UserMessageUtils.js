@@ -34,7 +34,7 @@ export const processForUserMessage = (messagesList, i, newState, assignToState =
     newState.currentMsgIndex = i;
   }
 
-  scrollToPosition({ position: "b", selector: "#sp-body" });
+  // scrollToPosition({ position: "b", selector: "#sp-body" });
 
   return newState;
 }

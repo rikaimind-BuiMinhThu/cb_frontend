@@ -304,7 +304,7 @@ const UserMessage = ({
   const renderContent = (content, contentIndex) => {
     switch (content.type) {
       case MESSAGE_CONTENT_TYPES.IMAGE:
-        return <Image content={content} />;
+        return <Image content={content} contentIndex={contentIndex} messageIndex={messageIndex} />;
       case MESSAGE_CONTENT_TYPES.TEXT_INPUT:
         return <TextInput
           content={content}
