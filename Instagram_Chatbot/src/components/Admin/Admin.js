@@ -16,6 +16,14 @@ import News from 'views/Public/News';
 import Instagram from 'views/Public/Instagram';
 
 class App extends Component {
+  componentDidMount() {
+    var meta = document.createElement('meta');
+    meta.name = 'format-detection';
+    meta.content = 'telephone=yes';
+
+    document.head.appendChild(meta);
+  }
+
   render() {
     return (
       <BrowserRouter>
