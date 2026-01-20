@@ -10526,6 +10526,11 @@ const Scenario = () => {
                                                             value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                                           />
                                                           <CheckboxCustom
+                                                            label="自動スクロールしない"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_not_auto_scroll')}
+                                                            value={checkbox.is_not_auto_scroll}
+                                                          />
+                                                          <CheckboxCustom
                                                             label="入力された内容を変数に保存する。"
                                                             onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
                                                             value={image.is_save_input_content}
