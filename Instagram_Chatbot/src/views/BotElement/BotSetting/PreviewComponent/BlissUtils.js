@@ -90,5 +90,6 @@ export const isBlissLpAmazonData = (message) => {
   const isStreetAddressData = message.message_content.find(content => content.address_fukushashiki_search_value === "order_shipping_address_attributes_addr02");
   const isName1Data = message.message_content.find(content => content.left_fukushashiki_search_value === "order_shipping_address_attributes_name1");
   const isName2Data = message.message_content.find(content => content.right_fukushashiki_search_value === "order_shipping_address_attributes_name2");
-  return isEmailData || isTel1Data || isTel2Data || isTel3Data || isZipCode1Data || isZipCode2Data || isPrefectureData || isCityData || isStreetAddressData || isName1Data || isName2Data;
+  const isEmailData = message.message_content.find(content => content.fukushashiki_search_value === "email");
+  return isEmailData || isTel1Data || isTel2Data || isTel3Data || isZipCode1Data || isZipCode2Data || isPrefectureData || isCityData || isStreetAddressData || isName1Data || isName2Data || isEmailData;
 }
