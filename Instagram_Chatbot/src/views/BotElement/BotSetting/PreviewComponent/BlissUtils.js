@@ -79,7 +79,6 @@ export const mapAmazonPayDataToMessagesListForBliss = (amazonPayData, messagesLi
 }
 
 export const isBlissLpAmazonData = (message) => {
-  const isEmailData = message.message_content.find(content => content.fukushashiki_search_value === "email");
   const isTel1Data = message.message_content.find(content => content.value1_fukushashiki_search_value === "form-validation-field-0");
   const isTel2Data = message.message_content.find(content => content.value2_fukushashiki_search_value === "form-validation-field-1");
   const isTel3Data = message.message_content.find(content => content.value3_fukushashiki_search_value === "form-validation-field-2");
@@ -91,5 +90,5 @@ export const isBlissLpAmazonData = (message) => {
   const isName1Data = message.message_content.find(content => content.left_fukushashiki_search_value === "order_shipping_address_attributes_name1");
   const isName2Data = message.message_content.find(content => content.right_fukushashiki_search_value === "order_shipping_address_attributes_name2");
   const isEmailData = message.message_content.find(content => content.fukushashiki_search_value === "email");
-  return isEmailData || isTel1Data || isTel2Data || isTel3Data || isZipCode1Data || isZipCode2Data || isPrefectureData || isCityData || isStreetAddressData || isName1Data || isName2Data || isEmailData;
+  return isTel1Data || isTel2Data || isTel3Data || isZipCode1Data || isZipCode2Data || isPrefectureData || isCityData || isStreetAddressData || isName1Data || isName2Data || isEmailData;
 }
