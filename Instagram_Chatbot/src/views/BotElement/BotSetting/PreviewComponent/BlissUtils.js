@@ -72,12 +72,7 @@ export const mapAmazonPayDataToMessagesListForBliss = (amazonPayData, messagesLi
   // Set profileEmail vào message có fukushashiki_search_value là "email". Set vào message_content.text_input.email_address.value
   if (profileEmail) {
     const messageProfileEmail = userMessages?.find(message => message.message_content.find(content => content.fukushashiki_search_value === "email"));
-    if (messageProfileEmail) {
-      const emailContent = messageProfileEmail.message_content.find(content => content.fukushashiki_search_value === "email");
-      if (emailContent?.text_input?.email_address !== undefined) {
-        emailContent.text_input.email_address.value = profileEmail;
-      }
-    }
+      messageProfileEmail.message_content.find(content => content.fukushashiki_search_value === "email").text_input.email_address.value = profileEmail;
   }
 
   return newMessagesList;
