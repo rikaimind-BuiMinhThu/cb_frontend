@@ -72,19 +72,13 @@ export const mapAmazonPayDataToMessagesListForBliss = (amazonPayData, messagesLi
   // Set profileEmail vào message có fukushashiki_search_value là "email". Set vào message_content.text_input.email_address.value
   if (profileEmail) {
     const messageProfileEmail = userMessages?.find(message => message.message_content.find(content => content.fukushashiki_search_value === "email"));
-    if (messageProfileEmail) {
-      const emailContent = messageProfileEmail.message_content.find(content => content.fukushashiki_search_value === "email");
-      if (emailContent?.text_input?.email_address !== undefined) {
-        emailContent.text_input.email_address.value = profileEmail;
-      }
-    }
+      messageProfileEmail.message_content.find(content => content.fukushashiki_search_value === "email").text_input.email_address.value = profileEmail;
   }
 
   return newMessagesList;
 }
 
 export const isBlissLpAmazonData = (message) => {
-  const isEmailData = message.message_content.find(content => content.fukushashiki_search_value === "email");
   const isTel1Data = message.message_content.find(content => content.value1_fukushashiki_search_value === "form-validation-field-0");
   const isTel2Data = message.message_content.find(content => content.value2_fukushashiki_search_value === "form-validation-field-1");
   const isTel3Data = message.message_content.find(content => content.value3_fukushashiki_search_value === "form-validation-field-2");
@@ -95,5 +89,6 @@ export const isBlissLpAmazonData = (message) => {
   const isStreetAddressData = message.message_content.find(content => content.address_fukushashiki_search_value === "order_shipping_address_attributes_addr02");
   const isName1Data = message.message_content.find(content => content.left_fukushashiki_search_value === "order_shipping_address_attributes_name1");
   const isName2Data = message.message_content.find(content => content.right_fukushashiki_search_value === "order_shipping_address_attributes_name2");
-  return isEmailData || isTel1Data || isTel2Data || isTel3Data || isZipCode1Data || isZipCode2Data || isPrefectureData || isCityData || isStreetAddressData || isName1Data || isName2Data;
+  const isEmailData = message.message_content.find(content => content.fukushashiki_search_value === "email");
+  return isTel1Data || isTel2Data || isTel3Data || isZipCode1Data || isZipCode2Data || isPrefectureData || isCityData || isStreetAddressData || isName1Data || isName2Data || isEmailData;
 }
