@@ -2,6 +2,7 @@
 import { CHATBOT_ACTIONS } from "../PreviewComponent/Constants";
 import { isTorizenLpAmazonData } from "../PreviewComponent/TorizenUtils";
 import { isBlissLpAmazonData } from "../PreviewComponent/BlissUtils";
+import { isPhystechLpAmazonData } from "../PreviewComponent/PhysTechUtils";
 import { convertToFukushashikiObject } from "./FukushashikiDataConverterUtils";
 import { isUserMessage, sendOpenChatbotCountRequest } from "../PreviewComponent/Utils";
 
@@ -46,6 +47,9 @@ const fukushashikiSavedStateToLp = (savedState, params, state) => {
 
       // Except some data when fukushashiki bliss san
       if (params.get('is_using_amazon_pay') && isBlissLpAmazonData(message)) return;
+
+      // Except some data when fukushashiki phystech san
+      if (params.get('is_using_amazon_pay') && isPhystechLpAmazonData(message)) return;
       
       const fukuData = convertToFukushashikiObject({message: message});
       fukuDataList.push(...fukuData);
