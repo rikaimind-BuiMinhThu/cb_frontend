@@ -8,11 +8,15 @@ export const mapAmazonPayDataToMessagesListForPhystech = (amazonPayData, message
 
   const {
 <<<<<<< HEAD
+<<<<<<< HEAD
     profileName, profileNameKana, profileZipCode,
     profilePrefecture, profileCity, 
     profileStreetAddress, profileTel, profileEmail
 =======
     profileName1, profileName2, profileZipCode1, profileZipCode2,
+=======
+    profileName, profileZipCode,
+>>>>>>> f2dafc08 ([DEELWEBCHATBOT2026-62] Fix amazon for Phystech)
     profilePrefecture, profileCity, profileStreetAddress, profileTel1,
     profileTel2, profileTel3, profileEmail
 >>>>>>> 547b4cd9 ([DEELWEBCHATBOT2026-62] Fix amazon for Phystech)
@@ -20,6 +24,7 @@ export const mapAmazonPayDataToMessagesListForPhystech = (amazonPayData, message
   const userMessages = newMessagesList.filter(message => message.belong_to === "user");
   if (!userMessages) return newMessagesList;
 
+<<<<<<< HEAD
 <<<<<<< HEAD
   const messageProfileName = userMessages?.find(message => message.message_content.find(content => content.fukushashiki_search_value === "order_shipping_address_attributes_name1"));
   if (messageProfileName) {
@@ -54,6 +59,16 @@ export const mapAmazonPayDataToMessagesListForPhystech = (amazonPayData, message
   if (messageProfileZipCode2) {
     messageProfileZipCode2.message_content.find(content => content.post_code_right_fukushashiki_search_value === "order_shipping_address_attributes_zip02").zip_code_address.value_post_code_right = profileZipCode2;
 >>>>>>> 547b4cd9 ([DEELWEBCHATBOT2026-62] Fix amazon for Phystech)
+=======
+  const messageProfileName= userMessages?.find(message => message.message_content.find(content => content.left_fukushashiki_search_value === "order_shipping_address_attributes_name1"));
+  if (messageProfileName) {
+    messageProfileName.message_content.find(content => content.left_fukushashiki_search_value === "order_shipping_address_attributes_name1").text_input.text.valueLeft = profileName;
+  }
+
+  const messageProfileZipCode = userMessages?.find(message => message.message_content.find(content => content.post_code_left_fukushashiki_search_value === "order_shipping_address_attributes_zip01"));
+  if (messageProfileZipCode) {
+    messageProfileZipCode.message_content.find(content => content.post_code_left_fukushashiki_search_value === "order_shipping_address_attributes_zip01").zip_code_address.value_post_code_left = profileZipCode;
+>>>>>>> f2dafc08 ([DEELWEBCHATBOT2026-62] Fix amazon for Phystech)
   }
 
   const messageProfileStateId = userMessages?.find(message => message.message_content.find(content => content.prefecture_fukushashiki_search_value === "order_shipping_address_attributes_prefecture_name"));
