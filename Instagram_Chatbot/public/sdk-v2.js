@@ -396,7 +396,7 @@ const sendMessageToChatbot = (contentMessage, action) => {
   globalIframe.contentWindow.postMessage(data, "*");
 }
 
-const waitToLoadBliss = (iframe) => {
+const waitToLoadAmazonEcForce = (iframe) => {
   let count = 0;
   const interval = setInterval(() => {
     const amazonPayMethodElement = document.querySelector("#amazon_payment_method");
@@ -512,8 +512,8 @@ const displayPopup = async () => {
       }
       count++;
     }, 200);
-  } else if (isBlissLp(window.location.href)) {
-    waitToLoadBliss(iframe);
+  } else if (isBlissLp(window.location.href) || isPhystechLp(window.location.href)) {
+    waitToLoadAmazonEcForce(iframe);
   } else {
     appendIframeToBody(iframe);
   }
