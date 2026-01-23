@@ -422,16 +422,26 @@ const waitToLoadBliss = (iframe) => {
 }
 
 const isBlissLp = (url) => {
-  const torizenDomains = [
+  const domains = [
     // Comment out if you want to test bliss in localhost
     // "localhost:8000",
     // "commerceforce.co.jp",
     "skull-shaver.jp",
   ];
 
-  return torizenDomains.some(domain => url.includes(domain));
+  return domains.some(domain => url.includes(domain));
 }
 
+const isPhystechLp = (url) => {
+  const domains = [
+    // Comment out if you want to test phystech in localhost
+    // "localhost:8000",
+    // "commerceforce.co.jp",
+    "livseed.jp",
+  ];
+
+  return domains.some(domain => url.includes(domain));
+}
 const displayPopup = async () => {
   const device =
     !tabletCheck() && !mobileCheck()
