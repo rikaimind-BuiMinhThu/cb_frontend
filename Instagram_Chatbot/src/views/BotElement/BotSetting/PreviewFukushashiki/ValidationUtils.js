@@ -16,7 +16,7 @@ import { validateCardPaymentRadioButton } from './Validation/CardPaymentRadioBut
 // Regex Patterns
 export const REGEX_PATTERNS = {
   PASSWORD: /^[A-Za-z0-9 ]+$/,
-  EMAIL: /^[a-zA-Z0-9]+([a-zA-Z0-9]+[._+-])*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/,
+  EMAIL: /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}$/,
   PHONE: /^0\d{9}$|^0\d{10}$/,
   URLS: /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/,
   ALPHABET: /[^A-Za-z ]+/,
