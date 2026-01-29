@@ -566,6 +566,7 @@ export default function UserMessage({
         let slider = content.slider;
         let cardPaymentRadioButton = content.card_payment_radio_button;
         let labelNoTransition = content.label_no_transition;
+        let buttonSubmit = content.button_submit;
         if (
           content.type === "textarea" &&
           content.textarea &&
@@ -5341,6 +5342,16 @@ export default function UserMessage({
             {content.type === "label_no_transition" && (
               <div style={{ marginBottom: "10px" }}>
                 {labelNoTransition.value}
+              </div>
+            )}
+            {/* type == 'button_submit' */}
+            {content.type === "button_submit" && (
+              <div style={{ marginBottom: "10px" }}>
+                <div className="ss-user-setting__item-text_input-top">
+                  <button style={{ borderRadius: "25px", padding: "5px 10px", fontSize: "16px", fontWeight: "bold"}} disabled id="chatbot-submit-button" className="ss-user-setting__select-btn-add btn btn-secondary">
+                    {content.button_submit_name || buttonSubmit?.button_submit_name || "送信"}
+                  </button>
+                </div>
               </div>
             )}
           </React.Fragment>
