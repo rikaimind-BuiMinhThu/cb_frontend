@@ -396,7 +396,7 @@ const sendMessageToChatbot = (contentMessage, action) => {
   globalIframe.contentWindow.postMessage(data, "*");
 }
 
-const waitToLoadBliss = (iframe) => {
+const waitToLoadAmazonEcForce = (iframe) => {
   let count = 0;
   const interval = setInterval(() => {
     const amazonPayMethodElement = document.querySelector("#amazon_payment_method");
@@ -422,16 +422,26 @@ const waitToLoadBliss = (iframe) => {
 }
 
 const isBlissLp = (url) => {
-  const torizenDomains = [
+  const domains = [
     // Comment out if you want to test bliss in localhost
     // "localhost:8000",
     // "commerceforce.co.jp",
     "skull-shaver.jp",
   ];
 
-  return torizenDomains.some(domain => url.includes(domain));
+  return domains.some(domain => url.includes(domain));
 }
 
+const isPhystechLp = (url) => {
+  const domains = [
+    // Comment out if you want to test phystech in localhost
+    // "localhost:8000",
+    // "commerceforce.co.jp",
+    "livseed.jp",
+  ];
+
+  return domains.some(domain => url.includes(domain));
+}
 const displayPopup = async () => {
   const device =
     !tabletCheck() && !mobileCheck()
@@ -502,8 +512,8 @@ const displayPopup = async () => {
       }
       count++;
     }, 200);
-  } else if (isBlissLp(window.location.href)) {
-    waitToLoadBliss(iframe);
+  } else if (isBlissLp(window.location.href) || isPhystechLp(window.location.href)) {
+    waitToLoadAmazonEcForce(iframe);
   } else {
     appendIframeToBody(iframe);
   }

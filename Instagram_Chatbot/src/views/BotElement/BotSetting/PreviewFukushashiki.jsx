@@ -307,6 +307,11 @@ const PreviewFukushashiki = () => {
           type: PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_BLISS,
           payload: actionData,
         });
+      case CHATBOT_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_PHYSTECH:
+        return dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_PHYSTECH,
+          payload: actionData,
+        });
 
       case CHATBOT_ACTIONS.UPDATE_NUMBER_ORDER_TO_UPSELL:
         if (actionData) {
