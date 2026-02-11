@@ -12,6 +12,7 @@ import { processForUserMessage } from '../PreviewComponent/UserMessageUtils';
 import { isBotMessage, isUserMessage, getNextUserMsg } from '../PreviewComponent/Utils';
 import { mapAmazonPayDataToMessagesList } from '../PreviewComponent/TorizenUtils';
 import { mapAmazonPayDataToMessagesListForBliss } from '../PreviewComponent/BlissUtils';
+import { mapAmazonPayDataToMessagesListForRoseMay } from '../PreviewComponent/RoseMayUtils';
 import { mapAmazonPayDataToMessagesListForPhystech } from '../PreviewComponent/PhysTechUtils';
 import {
   RENDER_CHATBOT_CONFIG,
@@ -247,6 +248,10 @@ const PreviewFukushashikiReducer = (state, action) => {
       const newMessagesListForBliss = mapAmazonPayDataToMessagesListForBliss(action.payload, state.messagesList, state.prefecturesList);
       const renderMessagesListForBliss = newMessagesListForBliss.slice(0, state.currentMsgIndex + 1);
       return { ...state, messagesList: newMessagesListForBliss, renderMessagesList: renderMessagesListForBliss};
+    case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_ROSEMAY:
+      const newMessagesListForRoseMay = mapAmazonPayDataToMessagesListForRoseMay(action.payload, state.messagesList, state.prefecturesList);
+      const renderMessagesListForRoseMay = newMessagesListForRoseMay.slice(0, state.currentMsgIndex + 1);
+      return { ...state, messagesList: newMessagesListForRoseMay, renderMessagesList: renderMessagesListForRoseMay};
     case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_PHYSTECH:
       const newMessagesListForPhystech = mapAmazonPayDataToMessagesListForPhystech(action.payload, state.messagesList, state.prefecturesList);
       const renderMessagesListForPhystech = newMessagesListForPhystech.slice(0, state.currentMsgIndex + 1);
