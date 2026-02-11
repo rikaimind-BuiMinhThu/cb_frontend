@@ -4,7 +4,7 @@ export const mapAmazonPayDataToMessagesListForPhystech = (amazonPayData, message
   if (!amazonPayData || amazonPayData.cartSystem !== "ECFORCE") return messagesList;
   const newMessagesList = _.cloneDeep(messagesList);
   const {
-    profileName, profileNameKana, profileZipCode,
+    profileName, profileZipCode,
     profilePrefecture, profileCity, 
     profileStreetAddress, profileTel, profileEmail
   } = amazonPayData;
@@ -13,10 +13,6 @@ export const mapAmazonPayDataToMessagesListForPhystech = (amazonPayData, message
   const messageProfileName = userMessages?.find(message => message.message_content.find(content => content.fukushashiki_search_value === "order_shipping_address_attributes_name1"));
   if (messageProfileName) {
     messageProfileName.message_content.find(content => content.fukushashiki_search_value === "order_shipping_address_attributes_name1").text_input.text.value = profileName;
-  }
-  const messageProfileNameKana = userMessages?.find(message => message.message_content.find(content => content.fukushashiki_search_value === "order_shipping_address_attributes_kana1"));
-  if (messageProfileNameKana) {
-    messageProfileNameKana.message_content.find(content => content.fukushashiki_search_value === "order_shipping_address_attributes_kana1").text_input.text.value = profileNameKana;
   }
   const messageProfileZipCode = userMessages?.find(message => message.message_content.find(content => content.post_code_fukushashiki_search_value === "order_shipping_address_attributes_zip01"));
   if (messageProfileZipCode) {
@@ -58,7 +54,17 @@ export const isPhystechLpAmazonData = (message) => {
   const isCityData = message.message_content.find(content => content.municipality_fukushashiki_search_value === "order_shipping_address_attributes_addr01");
   const isStreetAddressData = message.message_content.find(content => content.address_fukushashiki_search_value === "order_shipping_address_attributes_addr02");
   const isNameData = message.message_content.find(content => content.fukushashiki_search_value === "order_shipping_address_attributes_name1");
-  const isNameKanaData = message.message_content.find(content => content.fukushashiki_search_value === "order_shipping_address_attributes_kana1");
   const isEmailData = message.message_content.find(content => content.fukushashiki_search_value === 'input[name="order[email]"]');
-  return isTelData || isZipCodeData || isPrefectureData || isCityData || isStreetAddressData || isNameData || isNameKanaData || isEmailData;
+  return isTelData || isZipCodeData || isPrefectureData || isCityData || isStreetAddressData || isNameData || isEmailData;
+}
+
+export const isPhystechLP = (url) => {
+  const domains = [
+    // Comment out if you want to test phystech in localhost
+    // "localhost:8000",
+    // "commerceforce.co.jp",
+    "livseed.jp",
+  ];
+
+  return domains.some(domain => url.includes(domain));
 }
