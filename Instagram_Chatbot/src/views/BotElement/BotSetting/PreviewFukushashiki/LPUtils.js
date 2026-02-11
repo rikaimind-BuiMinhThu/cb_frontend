@@ -52,8 +52,10 @@ const fukushashikiSavedStateToLp = (savedState, params, state) => {
         if (isPhystechLP(state.urlReceive) && isPhystechLpAmazonData(message)) return;
       }
       
-      const fukuData = convertToFukushashikiObject({message: message});
-      fukuDataList.push(...fukuData);
+      if (!message.hidden) {
+        const fukuData = convertToFukushashikiObject({message: message});
+        fukuDataList.push(...fukuData);
+      }
     });
 
     fukushashikiToLP(fukuDataList, savedState);
