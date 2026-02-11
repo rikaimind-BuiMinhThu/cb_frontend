@@ -92,3 +92,14 @@ export const isBlissLpAmazonData = (message) => {
   const isEmailData = message.message_content.find(content => content.fukushashiki_search_value === "email");
   return isTel1Data || isTel2Data || isTel3Data || isZipCode1Data || isZipCode2Data || isPrefectureData || isCityData || isStreetAddressData || isName1Data || isName2Data || isEmailData;
 }
+
+export const isBlissLP = (url) => {
+  const domains = [
+    // Comment out if you want to test bliss in localhost
+    // "localhost:8000",
+    // "commerceforce.co.jp",
+    "skull-shaver.jp",
+  ];
+
+  return domains.some(domain => url.includes(domain));
+}
