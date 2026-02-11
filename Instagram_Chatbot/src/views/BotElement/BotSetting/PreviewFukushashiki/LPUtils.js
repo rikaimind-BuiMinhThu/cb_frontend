@@ -1,8 +1,8 @@
 
 import { CHATBOT_ACTIONS } from "../PreviewComponent/Constants";
-import { isTorizenLpAmazonData } from "../PreviewComponent/TorizenUtils";
-import { isBlissLpAmazonData } from "../PreviewComponent/BlissUtils";
-import { isPhystechLpAmazonData } from "../PreviewComponent/PhysTechUtils";
+import { isTorizenLpAmazonData, isTorizenLP } from "../PreviewComponent/TorizenUtils";
+import { isBlissLpAmazonData, isBlissLP } from "../PreviewComponent/BlissUtils";
+import { isPhystechLpAmazonData, isPhystechLP } from "../PreviewComponent/PhysTechUtils";
 import { convertToFukushashikiObject } from "./FukushashikiDataConverterUtils";
 import { isUserMessage, sendOpenChatbotCountRequest } from "../PreviewComponent/Utils";
 
@@ -42,14 +42,15 @@ const fukushashikiSavedStateToLp = (savedState, params, state) => {
 
     const userMessagesList = savedState.messagesList.filter(isUserMessage);
     userMessagesList.forEach((message) => {
-      // Except some data when fukushashiki torizen san
-      if (params.get('is_using_amazon_pay') && isTorizenLpAmazonData(message)) return;
-
-      // Except some data when fukushashiki bliss san
-      if (params.get('is_using_amazon_pay') && isBlissLpAmazonData(message)) return;
-
-      // Except some data when fukushashiki phystech san
-      if (params.get('is_using_amazon_pay') && isPhystechLpAmazonData(message)) return;
+      // Except some data when fukushashiki for case AmazonPay
+      if (params.get('is_using_amazon_pay')) {
+        // For Torizen
+        if (isTorizenLP(state.urlReceive) && isTorizenLpAmazonData(message)) return;
+        // For Bliss
+        if (isBlissLP(state.urlReceive) && isBlissLpAmazonData(message)) return;
+        // For Phystech
+        if (isPhystechLP(state.urlReceive) && isPhystechLpAmazonData(message)) return;
+      }
       
       const fukuData = convertToFukushashikiObject({message: message});
       fukuDataList.push(...fukuData);
