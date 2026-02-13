@@ -37,6 +37,7 @@ const fukushashikiToLP = (fukushashikiData, state) => {
 };
 
 const fukushashikiSavedStateToLp = (savedState, params, state) => {
+  const lpUrl = state.objParam.current_url_param.urlreceive;
   return new Promise((resolve) => {
     let fukuDataList = [];
 
@@ -45,11 +46,11 @@ const fukushashikiSavedStateToLp = (savedState, params, state) => {
       // Except some data when fukushashiki for case AmazonPay
       if (params.get('is_using_amazon_pay')) {
         // For Torizen
-        if (isTorizenLP(state.urlReceive) && isTorizenLpAmazonData(message)) return;
+        if (isTorizenLP(lpUrl) && isTorizenLpAmazonData(message)) return;
         // For Bliss
-        if (isBlissLP(state.urlReceive) && isBlissLpAmazonData(message)) return;
+        if (isBlissLP(lpUrl) && isBlissLpAmazonData(message)) return;
         // For Phystech
-        if (isPhystechLP(state.urlReceive) && isPhystechLpAmazonData(message)) return;
+        if (isPhystechLP(lpUrl) && isPhystechLpAmazonData(message)) return;
       }
       
       if (!message.hidden) {
