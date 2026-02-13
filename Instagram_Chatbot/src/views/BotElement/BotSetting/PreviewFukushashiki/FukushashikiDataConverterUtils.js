@@ -61,6 +61,7 @@ const convertTextInputPhoneNumberObject = (content) => {
   const { value, withHyphen } = content.text_input.phone_number;
 
   if (withHyphen === false) {
+    if (!value) return [];
     return [{
       type: content.type,
       bindingMode: content.fukushashiki_search_mode,
