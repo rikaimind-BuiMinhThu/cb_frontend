@@ -76,6 +76,10 @@ const convertTextInputPhoneNumberObject = (content) => {
 
   const types = ["value1", "value2", "value3"];
   const result = types
+    .filter(type => {
+      const value = content.text_input.phone_number?.[type];
+      return value !== null && value !== undefined;
+    })
     .map(type => ({
       type: content.type,
       bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
@@ -92,13 +96,15 @@ const convertTextInputValueObject = (content) => {
   let result = [];
 
   htmlAddresses.forEach(htmlAddress => {
-    const fukuData = {
-      type: content.type,
-      bindingMode: content.fukushashiki_search_mode,
-      bindingAddress: htmlAddress?.trim() || "",
-      bindingValue: content.text_input[type]?.value || "",
-    };
-    result.push(fukuData);
+    const bindingValue = content.text_input[type]?.value;
+    if (bindingValue !== null && bindingValue !== undefined) {
+      result.push({
+        type: content.type,
+        bindingMode: content.fukushashiki_search_mode,
+        bindingAddress: htmlAddress?.trim() || "",
+        bindingValue: bindingValue,
+      });
+    }
   });
 
   return result;
