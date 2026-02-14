@@ -14,12 +14,12 @@ const BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS = {
   EMAIL: 'email',
 }
 
-const findContentByFukushashikiSearchValue = (userMessages, fukushaKey, fukushaValue) => {
-  let result = null;
+const findContentsByFukushashikiSearchValue = (userMessages, fukushaKey, fukushaValue) => {
+  let result = [];
   userMessages.forEach(message => {
     message.message_content.forEach(content => {
       if (content[fukushaKey] === fukushaValue) {
-        content = content;
+        result.push(content);
       }
     });
   });
@@ -40,82 +40,83 @@ export const mapAmazonPayDataToMessagesListForBliss = (amazonPayData, messagesLi
   const userMessages = newMessagesList.filter(message => message.belong_to === "user");
   if (!userMessages) return newMessagesList;
 
-  const name1Content = findContentByFukushashikiSearchValue(userMessages, 'left_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.NAME1);
-  if (name1Content) {
-    name1Content.text_input.text.valueLeft = profileName1;
+  const name1Contents = findContentsByFukushashikiSearchValue(userMessages, 'left_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.NAME1);
+  if (name1Contents.length > 0) {
+    name1Contents.forEach(content => content.text_input.text.valueLeft = profileName1);
   }
 
-  const name2Content = findContentByFukushashikiSearchValue(userMessages, 'right_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.NAME2);
-  if (name2Content) {
-    name2Content.text_input.text.valueRight = profileName2;
+  const name2Contents = findContentsByFukushashikiSearchValue(userMessages, 'right_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.NAME2);
+  if (name2Contents.length > 0) {
+    name2Contents.forEach(content => content.text_input.text.valueRight = profileName2);
   }
 
-  const zipCode1Content = findContentByFukushashikiSearchValue(userMessages, 'post_code_left_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.ZIP_CODE1);
-  if (zipCode1Content) {
-    zipCode1Content.zip_code_address.value_post_code_left = profileZipCode1;
+  const zipCode1Contents = findContentsByFukushashikiSearchValue(userMessages, 'post_code_left_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.ZIP_CODE1);
+  if (zipCode1Contents.length > 0) {
+    zipCode1Contents.forEach(content => content.zip_code_address.value_post_code_left = profileZipCode1);
   }
 
-  const zipCode2Content = findContentByFukushashikiSearchValue(userMessages, 'post_code_right_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.ZIP_CODE2);
-  if (zipCode2Content) {
-    zipCode2Content.zip_code_address.value_post_code_right = profileZipCode2;
+  const zipCode2Contents = findContentsByFukushashikiSearchValue(userMessages, 'post_code_right_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.ZIP_CODE2);
+  if (zipCode2Contents.length > 0) {
+    zipCode2Contents.forEach(content => content.zip_code_address.value_post_code_right = profileZipCode2);
   }
 
-  const prefectureContent = findContentByFukushashikiSearchValue(userMessages, 'prefecture_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.PREFECTURE);
-  if (prefectureContent) {
-    prefectureContent.zip_code_address.value_prefecture = findItem(prefectureList, {
+  const prefectureContents = findContentsByFukushashikiSearchValue(userMessages, 'prefecture_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.PREFECTURE);
+  if (prefectureContents.length > 0) {
+    const prefectureItem = findItem(prefectureList, {
       keys: ["name"],
       value: profilePrefecture,
       onSuccess: (item)=> item.id,
       callbackValue: profilePrefecture,
     });
+    prefectureContents.forEach(content => content.zip_code_address.value_prefecture = prefectureItem);
   }
 
-  const cityContent = findContentByFukushashikiSearchValue(userMessages, 'municipality_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.CITY);
-  if (cityContent) {
-    cityContent.zip_code_address.value_municipality = profileCity;
+  const cityContents = findContentsByFukushashikiSearchValue(userMessages, 'municipality_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.CITY);
+  if (cityContents.length > 0) {
+    cityContents.forEach(content => content.zip_code_address.value_municipality = profileCity);
   }
 
-  const streetAddressContent = findContentByFukushashikiSearchValue(userMessages, 'address_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.STREET_ADDRESS);
-  if (streetAddressContent) {
-    streetAddressContent.zip_code_address.value_address = profileStreetAddress;
+  const streetAddressContents = findContentsByFukushashikiSearchValue(userMessages, 'address_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.STREET_ADDRESS);
+  if (streetAddressContents.length > 0) {
+    streetAddressContents.forEach(content => content.zip_code_address.value_address = profileStreetAddress);
   }
 
-  const tel1Content = findContentByFukushashikiSearchValue(userMessages, 'value1_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.TEL1);
-  if (tel1Content) {
-    tel1Content.text_input.phone_number.value1 = profileTel1;
+  const tel1Contents = findContentsByFukushashikiSearchValue(userMessages, 'value1_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.TEL1);
+  if (tel1Contents.length > 0) {
+    tel1Contents.forEach(content => content.text_input.phone_number.value1 = profileTel1);
   }
 
-  const tel2Content = findContentByFukushashikiSearchValue(userMessages, 'value2_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.TEL2);
-  if (tel2Content) {
-    tel2Content.text_input.phone_number.value2 = profileTel2;
+  const tel2Contents = findContentsByFukushashikiSearchValue(userMessages, 'value2_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.TEL2);
+  if (tel2Contents.length > 0) {
+    tel2Contents.forEach(content => content.text_input.phone_number.value2 = profileTel2);
   }
 
-  const tel3Content = findContentByFukushashikiSearchValue(userMessages, 'value3_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.TEL3);
-  if (tel3Content) {
-    tel3Content.text_input.phone_number.value3 = profileTel3;
+  const tel3Contents = findContentsByFukushashikiSearchValue(userMessages, 'value3_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.TEL3);
+  if (tel3Contents.length > 0) {
+    tel3Contents.forEach(content => content.text_input.phone_number.value3 = profileTel3);
   }
 
-  const emailContent = findContentByFukushashikiSearchValue(userMessages, 'fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.EMAIL);
-  if (emailContent) {
-    emailContent.text_input.email_address.value = profileEmail;
+  const emailContents = findContentsByFukushashikiSearchValue(userMessages, 'fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.EMAIL);
+  if (emailContents.length > 0) {
+    emailContents.forEach(content => content.text_input.email_address.value = profileEmail);
   }
 
   return newMessagesList;
 }
 
 export const isBlissLpAmazonData = (message) => {
-  const isTel1 = !!findContentByFukushashikiSearchValue(message, 'value1_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.TEL1);
-  const isTel2 = !!findContentByFukushashikiSearchValue(message, 'value2_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.TEL2);
-  const isTel3 = !!findContentByFukushashikiSearchValue(message, 'value3_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.TEL3);
-  const isZipCode1 = !!findContentByFukushashikiSearchValue(message, 'post_code_left_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.ZIP_CODE1);
-  const isZipCode2 = !!findContentByFukushashikiSearchValue(message, 'post_code_right_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.ZIP_CODE2);
-  const isPrefecture = !!findContentByFukushashikiSearchValue(message, 'prefecture_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.PREFECTURE);
-  const isCity = !!findContentByFukushashikiSearchValue(message, 'municipality_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.CITY);
-  const isStreetAddress = !!findContentByFukushashikiSearchValue(message, 'address_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.STREET_ADDRESS);
-  const isName1 = !!findContentByFukushashikiSearchValue(message, 'left_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.NAME1);
-  const isName2 = !!findContentByFukushashikiSearchValue(message, 'right_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.NAME2);
-  const isEmail = !!findContentByFukushashikiSearchValue(message, 'fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.EMAIL);
-  return isTel1 || isTel2 || isTel3 || isZipCode1 || isZipCode2 || isPrefecture || isCity || isStreetAddress || isName1 || isName2 || isEmail;
+  const isTel1 = findContentsByFukushashikiSearchValue(message, 'value1_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.TEL1).length > 0;
+  const isTel2 = findContentsByFukushashikiSearchValue(message, 'value2_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.TEL2).length > 0;
+  const isTel3 = findContentsByFukushashikiSearchValue(message, 'value3_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.TEL3).length > 0;
+  const isZipCode1 = findContentsByFukushashikiSearchValue(message, 'post_code_left_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.ZIP_CODE1).length > 0;
+  const isZipCode2 = findContentsByFukushashikiSearchValue(message, 'post_code_right_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.ZIP_CODE2).length > 0;
+  const isPrefecture = findContentsByFukushashikiSearchValue(message, 'prefecture_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.PREFECTURE).length > 0;
+  const isCity = findContentsByFukushashikiSearchValue(message, 'municipality_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.CITY).length > 0;
+  const isStreetAddress = findContentsByFukushashikiSearchValue(message, 'address_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.STREET_ADDRESS).length > 0;
+  const isName1 = findContentsByFukushashikiSearchValue(message, 'left_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.NAME1).length > 0;
+  const isName2 = findContentsByFukushashikiSearchValue(message, 'right_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.NAME2).length > 0;
+  const isEmail = findContentsByFukushashikiSearchValue(message, 'fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.EMAIL).length > 0;
+  return isTel1 || isTel2 || isTel3 || isZipCode1 || isZipCode2 || isPrefecture || isCity || isStreetAddress || isName1 || isName2 || isEmail.length;
 }
 
 export const isBlissLP = (url) => {
