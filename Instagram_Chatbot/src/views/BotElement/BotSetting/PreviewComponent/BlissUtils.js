@@ -107,18 +107,17 @@ export const mapAmazonPayDataToMessagesListForBliss = (amazonPayData, messagesLi
 }
 
 export const isBlissLpAmazonData = (message) => {
-  const isTel1 = findContentsByFukushashikiSearchValue(message, 'value1_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.TEL1).length > 0;
-  const isTel2 = findContentsByFukushashikiSearchValue(message, 'value2_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.TEL2).length > 0;
-  const isTel3 = findContentsByFukushashikiSearchValue(message, 'value3_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.TEL3).length > 0;
-  const isZipCode1 = findContentsByFukushashikiSearchValue(message, 'post_code_left_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.ZIP_CODE1).length > 0;
-  const isZipCode2 = findContentsByFukushashikiSearchValue(message, 'post_code_right_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.ZIP_CODE2).length > 0;
-  const isPrefecture = findContentsByFukushashikiSearchValue(message, 'prefecture_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.PREFECTURE).length > 0;
-  const isCity = findContentsByFukushashikiSearchValue(message, 'municipality_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.CITY).length > 0;
-  const isStreetAddress = findContentsByFukushashikiSearchValue(message, 'address_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.STREET_ADDRESS).length > 0;
-  const isName1 = findContentsByFukushashikiSearchValue(message, 'left_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.NAME1).length > 0;
-  const isName2 = findContentsByFukushashikiSearchValue(message, 'right_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.NAME2).length > 0;
-  const isEmail = findContentsByFukushashikiSearchValue(message, 'fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.EMAIL).length > 0;
-  return isTel1 || isTel2 || isTel3 || isZipCode1 || isZipCode2 || isPrefecture || isCity || isStreetAddress || isName1 || isName2 || isEmail.length;
+  return findContentsByFukushashikiSearchValue(message, 'value1_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.TEL1).length > 0 ||
+    findContentsByFukushashikiSearchValue(message, 'value2_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.TEL2).length > 0 ||
+    findContentsByFukushashikiSearchValue(message, 'value3_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.TEL3).length > 0 ||
+    findContentsByFukushashikiSearchValue(message, 'post_code_left_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.ZIP_CODE1).length > 0 ||
+    findContentsByFukushashikiSearchValue(message, 'post_code_right_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.ZIP_CODE2).length > 0 ||
+    findContentsByFukushashikiSearchValue(message, 'prefecture_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.PREFECTURE).length > 0 ||
+    findContentsByFukushashikiSearchValue(message, 'municipality_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.CITY).length > 0 ||
+    findContentsByFukushashikiSearchValue(message, 'address_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.STREET_ADDRESS).length > 0 ||
+    findContentsByFukushashikiSearchValue(message, 'left_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.NAME1).length > 0 ||
+    findContentsByFukushashikiSearchValue(message, 'right_fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.NAME2).length > 0 ||
+    findContentsByFukushashikiSearchValue(message, 'fukushashiki_search_value', BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS.EMAIL).length > 0;
 }
 
 export const isBlissLP = (url) => {
