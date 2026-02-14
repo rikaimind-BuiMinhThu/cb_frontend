@@ -408,6 +408,10 @@ const waitToLoadAmazonEcForce = (iframe) => {
       if (isEnableEmailInput) {
         iframe.src += `&is_enable_email_input=true`;
       }
+      const isDisplayPasswordInput = !!document.querySelector("input#password");
+      if (isDisplayPasswordInput) {
+        iframe.src += `&is_display_password_input=true`;
+      }
       appendIframeToBody(iframe);
       clearInterval(interval);
     }
