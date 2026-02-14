@@ -15,6 +15,8 @@ const BLISS_AMAZON_FUKUSHASHIKI_ELEMENTS = {
 }
 
 const findContentsByFukushashikiSearchValue = (userMessages, fukushaKey, fukushaValue) => {
+  if (!Array.isArray(userMessages)) userMessages = [userMessages];
+
   let result = [];
   userMessages.forEach(message => {
     message.message_content.forEach(content => {
