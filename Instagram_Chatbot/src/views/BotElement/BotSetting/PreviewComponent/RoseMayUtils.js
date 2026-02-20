@@ -33,7 +33,7 @@ export const mapAmazonPayDataToMessagesListForRoseMay = (amazonPayData, messages
 
   const name1Contents = findContentsByFukushashikiSearchValue(userMessages, 'fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.NAME1);
   if (name1Contents.length > 0) {
-    name1Contents.forEach(content => content.text_input.text.valueLeft = name1);
+    name1Contents.forEach(content => content.text_input.text.value = name1);
   }
 
   const kanaName1Contents = findContentsByFukushashikiSearchValue(userMessages, 'right_fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.KANA_NAME1);
@@ -92,14 +92,12 @@ export const mapAmazonPayDataToMessagesListForRoseMay = (amazonPayData, messages
     tel3Contents.forEach(content => content.text_input.phone_number.value3 = tel3);
   }
 
-  const emailContents = findContentsByFukushashikiSearchValue(userMessages, 'fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.EMAIL);
+  const emailContents = findContentsByFukushashikiSearchValue(userMessages, 'value_fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.EMAIL);
   if (emailContents.length > 0) {
-    emailContents.forEach(content => content.text_input.email_address.value = email);
-  }
-
-  const emailConfirmationContents = findContentsByFukushashikiSearchValue(userMessages, 'fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.EMAIL_CONFIRMATION);
-  if (emailConfirmationContents.length > 0) {
-    emailConfirmationContents.forEach(content => content.text_input.email_address.value = emailConfirmation);
+    emailContents.forEach(content => {
+      content.text_input.email_address.value = email;
+      content.text_input.email_address.valueConfirm = emailConfirmation;
+    });
   }
 
   return newMessagesList;
@@ -126,8 +124,8 @@ export const isRoseMayLpAmazonData = (message) => {
     findContentsByFukushashikiSearchValue(message, 'fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.NAME1).length > 0 ||
     findContentsByFukushashikiSearchValue(message, 'right_fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.KANA_NAME1).length > 0 ||
     findContentsByFukushashikiSearchValue(message, 'left_fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.KANA_NAME2).length > 0 ||
-    findContentsByFukushashikiSearchValue(message, 'fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.EMAIL).length > 0 ||
-    findContentsByFukushashikiSearchValue(message, 'fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.EMAIL_CONFIRMATION).length > 0;
+    findContentsByFukushashikiSearchValue(message, 'value_fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.EMAIL).length > 0 ||
+    findContentsByFukushashikiSearchValue(message, 'valueConfirm_fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.EMAIL_CONFIRMATION).length > 0;
 }
 
 export const isRoseMayLP = (url) => {
