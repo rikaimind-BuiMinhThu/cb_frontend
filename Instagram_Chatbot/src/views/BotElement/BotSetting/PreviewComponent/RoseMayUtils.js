@@ -1,8 +1,21 @@
 import { findItem } from "./Utils";
+import { findContentsByFukushashikiSearchValue } from "../PreviewFukushashiki/LPUtils";
 
-// NOTE:
-// Hiện tại logic của RoseMay được duplicate từ Bliss.
-// Nếu cấu trúc form của RoseMay khác Bliss, hãy chỉnh lại các *_fukushashiki_search_value bên dưới.
+const ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS = {
+  NAME1: 'input[name="order[shipping_address_attributes][name01]"]',
+  KANA_NAME1: 'input[name="order[shipping_address_attributes][kana01]"]',
+  KANA_NAME2: 'input[name="order[shipping_address_attributes][kana02]"]',
+  EMAIL: 'input[name="order[email]"]',
+  EMAIL_CONFIRMATION: 'input[name="order[email_confirmation]"]',
+  TEL1: 'input[name="order[shipping_address_attributes][tel01]"]',
+  TEL2: 'input[name="order[shipping_address_attributes][tel02]"]',
+  TEL3: 'input[name="order[shipping_address_attributes][tel03]"]',
+  ZIP_CODE1: 'input[name="order[shipping_address_attributes][zip01]"]',
+  ZIP_CODE2: 'input[name="order[shipping_address_attributes][zip02]"]',
+  PREFECTURE: 'select[name="order[shipping_address_attributes][prefecture_id]"]',
+  ADDRESS1: 'input[name="order[shipping_address_attributes][addr01]"]',
+  ADDRESS2: 'input[name="order[shipping_address_attributes][addr02]"]',
+}
 
 export const mapAmazonPayDataToMessagesListForRoseMay = (amazonPayData, messagesList, prefectureList) => {
   // No support for other customer and other cart system
@@ -11,92 +24,110 @@ export const mapAmazonPayDataToMessagesListForRoseMay = (amazonPayData, messages
   const newMessagesList = _.cloneDeep(messagesList);
 
   const {
-    profileName1, profileName2, profileZipCode1, profileZipCode2,
-    profilePrefecture, profileCity, profileStreetAddress, profileTel1,
-    profileTel2, profileTel3, profileEmail
+    name1, kanaName1, kanaName2, zipCode1, zipCode2,
+    prefecture, address1, address2, tel1, tel2, tel3,
+    email, emailConfirmation,
   } = amazonPayData;
   const userMessages = newMessagesList.filter(message => message.belong_to === "user");
   if (!userMessages) return newMessagesList;
 
-  const messageProfileName1 = userMessages?.find(message => message.message_content.find(content => content.left_fukushashiki_search_value === "order_shipping_address_attributes_name1"));
-  if (messageProfileName1) {
-    messageProfileName1.message_content.find(content => content.left_fukushashiki_search_value === "order_shipping_address_attributes_name1").text_input.text.valueLeft = profileName1;
+  const name1Contents = findContentsByFukushashikiSearchValue(userMessages, 'fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.NAME1);
+  if (name1Contents.length > 0) {
+    name1Contents.forEach(content => content.text_input.text.valueLeft = name1);
   }
 
-  const messageProfileName2 = userMessages?.find(message => message.message_content.find(content => content.right_fukushashiki_search_value === "order_shipping_address_attributes_name2"));
-  if (messageProfileName2) {
-    messageProfileName2.message_content.find(content => content.right_fukushashiki_search_value === "order_shipping_address_attributes_name2").text_input.text.valueRight = profileName2;
+  const kanaName1Contents = findContentsByFukushashikiSearchValue(userMessages, 'right_fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.KANA_NAME1);
+  if (kanaName1Contents.length > 0) {
+    kanaName1Contents.forEach(content => content.text_input.text.valueRight = kanaName1);
   }
 
-  const messageProfileZipCode1 = userMessages?.find(message => message.message_content.find(content => content.post_code_left_fukushashiki_search_value === "order_shipping_address_attributes_zip01"));
-  if (messageProfileZipCode1) {
-    messageProfileZipCode1.message_content.find(content => content.post_code_left_fukushashiki_search_value === "order_shipping_address_attributes_zip01").zip_code_address.value_post_code_left = profileZipCode1;
+  const kanaName2Contents = findContentsByFukushashikiSearchValue(userMessages, 'left_fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.KANA_NAME2);
+  if (kanaName2Contents.length > 0) {
+    kanaName2Contents.forEach(content => content.text_input.text.valueLeft = kanaName2);
   }
 
-  const messageProfileZipCode2 = userMessages?.find(message => message.message_content.find(content => content.post_code_right_fukushashiki_search_value === "order_shipping_address_attributes_zip02"));
-  if (messageProfileZipCode2) {
-    messageProfileZipCode2.message_content.find(content => content.post_code_right_fukushashiki_search_value === "order_shipping_address_attributes_zip02").zip_code_address.value_post_code_right = profileZipCode2;
+  const zipCode1Contents = findContentsByFukushashikiSearchValue(userMessages, 'post_code_left_fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.ZIP_CODE1);
+  if (zipCode1Contents.length > 0) {
+    zipCode1Contents.forEach(content => content.zip_code_address.value_post_code_left = zipCode1);
   }
 
-  const messageProfileStateId = userMessages?.find(message => message.message_content.find(content => content.prefecture_fukushashiki_search_value === "order_shipping_address_attributes_prefecture_name"));
-  if (messageProfileStateId) {
-    messageProfileStateId.message_content.find(content => content.prefecture_fukushashiki_search_value === "order_shipping_address_attributes_prefecture_name").zip_code_address.value_prefecture = findItem(prefectureList, {
+  const zipCode2Contents = findContentsByFukushashikiSearchValue(userMessages, 'post_code_right_fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.ZIP_CODE2);
+  if (zipCode2Contents.length > 0) {
+    zipCode2Contents.forEach(content => content.zip_code_address.value_post_code_right = zipCode2);
+  }
+
+  const prefectureContents = findContentsByFukushashikiSearchValue(userMessages, 'prefecture_fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.PREFECTURE);
+  if (prefectureContents.length > 0) {
+    const prefectureItem = findItem(prefectureList, {
       keys: ["name"],
-      value: profilePrefecture,
+      value: prefecture,
       onSuccess: (item)=> item.id,
-      callbackValue: profilePrefecture,
+      callbackValue: prefecture,
     });
+    prefectureContents.forEach(content => content.zip_code_address.value_prefecture = prefectureItem);
   }
 
-  const messageProfileCity = userMessages?.find(message => message.message_content.find(content => content.municipality_fukushashiki_search_value === "order_shipping_address_attributes_addr01"));
-  if (messageProfileCity) {
-    messageProfileCity.message_content.find(content => content.municipality_fukushashiki_search_value === "order_shipping_address_attributes_addr01").zip_code_address.value_municipality = profileCity;
+  const address1Contents = findContentsByFukushashikiSearchValue(userMessages, 'municipality_fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.ADDRESS1);
+  if (address1Contents.length > 0) {
+    address1Contents.forEach(content => content.zip_code_address.value_municipality = address1);
   }
 
-  const messageProfileStreetAddress = userMessages?.find(message => message.message_content.find(content => content.address_fukushashiki_search_value === "order_shipping_address_attributes_addr02"));
-  if (messageProfileStreetAddress) {
-    messageProfileStreetAddress.message_content.find(content => content.address_fukushashiki_search_value === "order_shipping_address_attributes_addr02").zip_code_address.value_address = profileStreetAddress;
+  const address2Contents = findContentsByFukushashikiSearchValue(userMessages, 'address_fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.ADDRESS2);
+  if (address2Contents.length > 0) {
+    address2Contents.forEach(content => content.zip_code_address.value_address = address2);
   }
 
-  const messageProfileTel1 = userMessages?.find(message => message.message_content.find(content => content.value1_fukushashiki_search_value === "form-validation-field-0"));
-  if (messageProfileTel1) {
-    messageProfileTel1.message_content.find(content => content.value1_fukushashiki_search_value === "form-validation-field-0").text_input.phone_number.value1 = profileTel1;
+  const tel1Contents = findContentsByFukushashikiSearchValue(userMessages, 'value1_fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.TEL1);
+  if (tel1Contents.length > 0) {
+    tel1Contents.forEach(content => content.text_input.phone_number.value1 = tel1);
   }
 
-  const messageProfileTel2 = userMessages?.find(message => message.message_content.find(content => content.value2_fukushashiki_search_value === "form-validation-field-1"));
-  if (messageProfileTel2) {
-    messageProfileTel2.message_content.find(content => content.value2_fukushashiki_search_value === "form-validation-field-1").text_input.phone_number.value2 = profileTel2;
+  const tel2Contents = findContentsByFukushashikiSearchValue(userMessages, 'value2_fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.TEL2);
+  if (tel2Contents.length > 0) {
+    tel2Contents.forEach(content => content.text_input.phone_number.value2 = tel2);
   }
 
-  const messageProfileTel3 = userMessages?.find(message => message.message_content.find(content => content.value3_fukushashiki_search_value === "form-validation-field-2"));
-  if (messageProfileTel3) {
-    messageProfileTel3.message_content.find(content => content.value3_fukushashiki_search_value === "form-validation-field-2").text_input.phone_number.value3 = profileTel3;
+  const tel3Contents = findContentsByFukushashikiSearchValue(userMessages, 'value3_fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.TEL3);
+  if (tel3Contents.length > 0) {
+    tel3Contents.forEach(content => content.text_input.phone_number.value3 = tel3);
   }
 
-  // Set profileEmail vào message có fukushashiki_search_value là "email". Set vào message_content.text_input.email_address.value
-  if (profileEmail) {
-    const messageProfileEmail = userMessages?.find(message => message.message_content.find(content => content.fukushashiki_search_value === "email"));
-    if (messageProfileEmail) {
-      messageProfileEmail.message_content.find(content => content.fukushashiki_search_value === "email").text_input.email_address.value = profileEmail;
-    }
+  const emailContents = findContentsByFukushashikiSearchValue(userMessages, 'fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.EMAIL);
+  if (emailContents.length > 0) {
+    emailContents.forEach(content => content.text_input.email_address.value = email);
+  }
+
+  const emailConfirmationContents = findContentsByFukushashikiSearchValue(userMessages, 'fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.EMAIL_CONFIRMATION);
+  if (emailConfirmationContents.length > 0) {
+    emailConfirmationContents.forEach(content => content.text_input.email_address.value = emailConfirmation);
   }
 
   return newMessagesList;
 }
 
+export const isRoseMayLP = (url) => {
+  const domains = [
+    // TODO: Update RoseMay domains nếu cần test ở môi trường khác
+    // "rosemay.jp",
+    "rosemay.net",
+  ];
+  return domains.some(domain => url.includes(domain));
+}
+
 export const isRoseMayLpAmazonData = (message) => {
-  const isTel1Data = message.message_content.find(content => content.value1_fukushashiki_search_value === "form-validation-field-0");
-  const isTel2Data = message.message_content.find(content => content.value2_fukushashiki_search_value === "form-validation-field-1");
-  const isTel3Data = message.message_content.find(content => content.value3_fukushashiki_search_value === "form-validation-field-2");
-  const isZipCode1Data = message.message_content.find(content => content.post_code_left_fukushashiki_search_value === "order_shipping_address_attributes_zip01");
-  const isZipCode2Data = message.message_content.find(content => content.post_code_right_fukushashiki_search_value === "order_shipping_address_attributes_addr02");
-  const isPrefectureData = message.message_content.find(content => content.prefecture_fukushashiki_search_value === "order_shipping_address_attributes_prefecture_name");
-  const isCityData = message.message_content.find(content => content.municipality_fukushashiki_search_value === "order_shipping_address_attributes_addr01");
-  const isStreetAddressData = message.message_content.find(content => content.address_fukushashiki_search_value === "order_shipping_address_attributes_addr02");
-  const isName1Data = message.message_content.find(content => content.left_fukushashiki_search_value === "order_shipping_address_attributes_name1");
-  const isName2Data = message.message_content.find(content => content.right_fukushashiki_search_value === "order_shipping_address_attributes_name2");
-  const isEmailData = message.message_content.find(content => content.fukushashiki_search_value === "email");
-  return isTel1Data || isTel2Data || isTel3Data || isZipCode1Data || isZipCode2Data || isPrefectureData || isCityData || isStreetAddressData || isName1Data || isName2Data || isEmailData;
+  return findContentsByFukushashikiSearchValue(message, 'value1_fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.TEL1).length > 0 ||
+    findContentsByFukushashikiSearchValue(message, 'value2_fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.TEL2).length > 0 ||
+    findContentsByFukushashikiSearchValue(message, 'value3_fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.TEL3).length > 0 ||
+    findContentsByFukushashikiSearchValue(message, 'post_code_left_fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.ZIP_CODE1).length > 0 ||
+    findContentsByFukushashikiSearchValue(message, 'post_code_right_fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.ZIP_CODE2).length > 0 ||
+    findContentsByFukushashikiSearchValue(message, 'prefecture_fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.PREFECTURE).length > 0 ||
+    findContentsByFukushashikiSearchValue(message, 'municipality_fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.ADDRESS1).length > 0 ||
+    findContentsByFukushashikiSearchValue(message, 'address_fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.ADDRESS2).length > 0 ||
+    findContentsByFukushashikiSearchValue(message, 'fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.NAME1).length > 0 ||
+    findContentsByFukushashikiSearchValue(message, 'right_fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.KANA_NAME1).length > 0 ||
+    findContentsByFukushashikiSearchValue(message, 'left_fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.KANA_NAME2).length > 0 ||
+    findContentsByFukushashikiSearchValue(message, 'fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.EMAIL).length > 0 ||
+    findContentsByFukushashikiSearchValue(message, 'fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.EMAIL_CONFIRMATION).length > 0;
 }
 
 export const isRoseMayLP = (url) => {

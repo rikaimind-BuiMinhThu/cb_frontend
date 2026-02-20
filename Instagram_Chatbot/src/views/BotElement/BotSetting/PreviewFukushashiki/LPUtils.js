@@ -109,6 +109,20 @@ const getErrorMessageFromParent = (searchMode, searchValue, isDisplay) => {
   }, {isOpen: true});
 }
 
+const findContentsByFukushashikiSearchValue = (userMessages, fukushaKey, fukushaValue) => {
+  if (!Array.isArray(userMessages)) userMessages = [userMessages];
+
+  let result = [];
+  userMessages.forEach(message => {
+    message.message_content.forEach(content => {
+      if (content[fukushaKey] === fukushaValue) {
+        result.push(content);
+      }
+    });
+  });
+  return result;
+}
+
 export {
   setConversionParamToLocalStorage,
   fukushashikiSavedStateToLp,
@@ -117,4 +131,5 @@ export {
   injectCustomJsCode,
   postMessageToParent,
   getErrorMessageFromParent,
+  findContentsByFukushashikiSearchValue,
 };
