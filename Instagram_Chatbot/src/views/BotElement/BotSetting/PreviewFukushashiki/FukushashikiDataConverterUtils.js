@@ -124,8 +124,8 @@ const convertTextInputConfirmationObject = (content) => {
   return [
     {
       type: content.type,
-      bindingMode: content.fukushashiki_search_mode,
-      bindingAddress: content.fukushashiki_search_value,
+      bindingMode: content.value_fukushashiki_search_mode,
+      bindingAddress: content.value_fukushashiki_search_value,
       bindingValue: content.text_input[type]?.value || "",
     },
     {

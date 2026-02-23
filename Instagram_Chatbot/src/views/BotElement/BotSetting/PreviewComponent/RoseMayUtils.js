@@ -95,8 +95,8 @@ export const mapAmazonPayDataToMessagesListForRoseMay = (amazonPayData, messages
   const emailContents = findContentsByFukushashikiSearchValue(userMessages, 'value_fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.EMAIL);
   if (emailContents.length > 0) {
     emailContents.forEach(content => {
-      content.text_input.email_address.value = email;
-      content.text_input.email_address.valueConfirm = emailConfirmation;
+      content.text_input.email_confirmation.value = email;
+      content.text_input.email_confirmation.valueConfirm = emailConfirmation;
     });
   }
 
