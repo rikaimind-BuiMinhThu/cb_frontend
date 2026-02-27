@@ -651,8 +651,6 @@ const PreviewFaq = () => {
     message,
     messageIndex
   ) => {
-    console.log("PreviewFaq > onChangeValue > message: ", message);
-    console.log("PreviewFaq > onChangeValue > messageIndex: ", messageIndex);
     // Early returns for invalid states
     if (!state.messagesList.length) return;
 
@@ -696,6 +694,7 @@ const PreviewFaq = () => {
         hidden={message.hidden}
         currentMsgIndex={state.currentMsgIndex}
         isBotOpen={state.isOpen}
+        delayEachMessage={RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE_FAQ}
       />
     ));
   };

@@ -327,7 +327,6 @@ const UserMessage = ({
           messageIndex={messageIndex}
         />;
       case MESSAGE_CONTENT_TYPES.RADIO_BUTTON:
-        console.log("UserMessage > renderContent > messageIndex: ", messageIndex);
         return <RadioButton
           content={content}
           disabled={disabled}
