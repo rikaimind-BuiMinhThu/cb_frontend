@@ -41,6 +41,8 @@ import {
   sendCloseChatbotCountRequest,
   sendLogMessageToServer,
   sendErrorLogToServer,
+  sendAppearLogToServer,
+  isUserMessage,
 } from "./PreviewComponent/Utils";
 import {
   getChatbotSavedState,
@@ -372,7 +374,7 @@ const PreviewFaq = () => {
     }
 
     setTimeout(() => {
-      // const newMsgIndex = state.currentMsgIndex + 1;
+      const newMsgIndex = state.currentMsgIndex + 1;
       dispatch({
         type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
         payload: {
@@ -381,13 +383,13 @@ const PreviewFaq = () => {
           fromCallback: false,
         }
       });
-      // if (newMsgIndex < state.messagesList.length && isUserMessage(state.messagesList[newMsgIndex])) {
-      //   sendAppearLogToServer({
-      //     scenario_id: state.scenarioId,
-      //     user_id: state.uuid,
-      //     message: state.messagesList[newMsgIndex],
-      //   });
-      // }
+      if (newMsgIndex < state.messagesList.length && isUserMessage(state.messagesList[newMsgIndex])) {
+        sendAppearLogToServer({
+          scenario_id: state.scenarioId,
+          user_id: state.uuid,
+          message: state.messagesList[newMsgIndex],
+        });
+      }
     }, RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE_FAQ);
   }, [state.currentMsgIndex, state.nextStopMsgIndex]);
 
