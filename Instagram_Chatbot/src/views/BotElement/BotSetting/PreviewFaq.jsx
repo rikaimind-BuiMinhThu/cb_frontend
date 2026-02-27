@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useReducer, useState, useMemo } from "react";
+import React, { useEffect, useRef, useReducer } from "react";
 import "assets/css/bot/preview-chat-bot.css";
 import Cookies from "js-cookie";
 import { MDBIcon } from "mdbreact";
@@ -18,17 +18,12 @@ import iconMessageBlack from "assets/img/icon-mess/icon-message-chat-black.png";
 import iconMessageWhite from "assets/img/icon-mess/icon-message-chat-white.png";
 import {
   CHATBOT_ACTIONS,
-  NO_ERROR,
-  GETTING_ERROR_NOTIFICATION,
-  CUSTOM_JS_CODE_POSITION,
-  CART_SYSTEM,
   CONVERSTION_RESPONSE_STATUS,
   PREVIEW_ACTIONS,
   RENDER_CHATBOT_CONFIG,
   RENDER_MODES,
   CONVERSION_RESPONSE_SUBMIT_TYPE,
   MESSAGE_CONTENT_TYPES,
-  BOT_MESSAGE_TYPES,
 } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
@@ -38,23 +33,14 @@ import {
   getChatBotSetting,
   sleep,
   stringNullOrEmpty,
-  changeElementAttributeById,
   scrollToPosition,
   createStatusConversion,
   userEntryScenario,
-  isDislayingLoginForm,
   getElementMessageById,
   sendOpenChatbotCountRequest,
   sendCloseChatbotCountRequest,
-  isUserMessage,
-  isBotMessage,
-  getNextUserMsg,
   sendLogMessageToServer,
-  updateStatusConversion,
-  isButtonSubmitMessage,
-  createScenarioUserResponseMessageHistory,
   sendErrorLogToServer,
-  sendAppearLogToServer,
 } from "./PreviewComponent/Utils";
 import {
   getChatbotSavedState,
@@ -125,7 +111,6 @@ const previewInitialState = {
   titleBubble: "",
   styleModal: {},
   scenarioUserResponses: [],
-  submitErrorMessage: '',
   isDisplayErrorMessage: false,
   objParam: {
     current_url: window.location.href,
@@ -573,7 +558,6 @@ const PreviewFaq = () => {
       rightSpTitle: designSetting?.right_position_sp_title,
       rightMarginSp: designSetting?.right_margin_sp,
       bottomMarginSp: designSetting?.bottom_margin_sp,
-      useNewProcess: chatbot?.client_cart_system === CART_SYSTEM.EC_FORCE,
       isUsedPastMessageLoaded: !!chatbot?.is_used_message_loaded_past,
       isProcessing: false,
       useFullWidthChatbotMobile: !!chatbot?.use_fullwidth_chatbot_mobile,
@@ -715,7 +699,7 @@ const PreviewFaq = () => {
     return (
       <div className="sp-user-message-button-action" style={{ display: isDisplayBtnNext ? "flex" : "none" }}>
         <CustomButton
-          disabled={state.submitErrorMessage.length > 0 ? false : message.disabled}
+          disabled={false}
           style={{
             backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
           }}
@@ -744,7 +728,7 @@ const PreviewFaq = () => {
             message={message}
             captcha={state.captcha}
             messageContentProps={message.message_content}
-            disabled={(state.submitErrorMessage.length > 0 && state.submitErrorMessage !== GETTING_ERROR_NOTIFICATION) ? false : message.disabled}
+            disabled={false}
             onChangeValue={(
               contentIndex,
               contentType,
@@ -780,7 +764,7 @@ const PreviewFaq = () => {
             }
             variables={state.variables}
             lpOptionData={state.lpOptionData}
-            submitErrorMessage={state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "" : state.submitErrorMessage}
+            submitErrorMessage={''}
             botId={state.botId}
             isProcessing={!!state.isProcessing}
           />

@@ -229,7 +229,6 @@ const PreviewFaqReducer = (state, action) => {
         bottomMarginSp: designSetting?.bottom_margin_sp,
         isUsedErrMsgByJs: chatbot?.is_used_err_msg_by_js,
         errMsgJsCode: chatbot?.err_msg_js_code,
-        useNewProcess: chatbot?.client_cart_system === CART_SYSTEM.EC_FORCE,
         isUsedPastMessageLoaded: !!chatbot?.is_used_message_loaded_past,
         isProcessing: false,
         useFullWidthChatbotMobile: !!chatbot?.use_fullwidth_chatbot_mobile,
