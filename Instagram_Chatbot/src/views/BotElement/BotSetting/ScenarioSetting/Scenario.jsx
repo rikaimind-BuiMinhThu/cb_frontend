@@ -865,9 +865,6 @@ const Scenario = () => {
 
   const [varShopifyReference, setVarShopifyReference] = useState({});
   const [isOpenShopifyReference, setIsOpenShopifyReference] = useState(false);
-  const [isOpenCommonMessagesModal, setIsOpenCommonMessagesModal] = useState(false);
-  const [commonScenariosList, setCommonScenariosList] = useState([]);
-  const [commonMessageInsertIndex, setCommonMessageInsertIndex] = useState(null);
 
   // bot setting values
   const [botTextValue, setBotTextValue] = useState('');
@@ -931,20 +928,6 @@ const Scenario = () => {
   useEffect(() => {
     getListVariable();
   }, [])
-
-  useEffect(() => {
-    if (scenarioType === 'faq' && botId) {
-      api.get(`/api/v1/managements/chatbots/${botId}/common_scenarios`).then(res => {
-        if (res.data.code === 1) {
-          setCommonScenariosList(res.data.data || []);
-        }
-      }).catch((error) => {
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
-      })
-    }
-  }, [scenarioType, botId])
     
 
   useEffect(() => {
@@ -2868,89 +2851,6 @@ const Scenario = () => {
     setDataMessages([...dataMessagesClone]);
   }
 
-  const handleAddCommonMessages = (indexMessage) => {
-    setCommonMessageInsertIndex(indexMessage);
-    setIsOpenCommonMessagesModal(true);
-  }
-
-  const handleSelectCommonScenario = async (commonScenarioId) => {
-    try {
-      // Fetch the common scenario conversation
-      const res = await api.get(`/api/v1/managements/chatbots/${botId}/scenarios/${commonScenarioId}/conversation`);
-      if (res.data.code === 1) {
-        const commonMessages = res.data.data?.conversation?.messages || [];
-        if (commonMessages.length === 0) {
-          setIsOpenNoti(true);
-          setMessageNoti('Common Messages scenario is empty.');
-          setTimeout(() => {
-            setIsOpenNoti(false);
-            setMessageNoti('');
-          }, 2000);
-          setIsOpenCommonMessagesModal(false);
-          return;
-        }
-
-        // Prefix all message IDs with common_<scenario_id>_
-        const prefix = `common_${commonScenarioId}_`;
-        const prefixedMessages = commonMessages.map(msg => {
-          const newMsg = { ...msg };
-          newMsg.id = `${prefix}${msg.id}`;
-          newMsg.common_scenario_id = commonScenarioId;
-          
-          // Update next_message_id references in message_content
-          if (newMsg.message_content && Array.isArray(newMsg.message_content)) {
-            newMsg.message_content = newMsg.message_content.map(content => {
-              const newContent = { ...content };
-              
-              // Handle radio_button options
-              if (content.radio_button && content.radio_button.default) {
-                newContent.radio_button = {
-                  ...content.radio_button,
-                  default: content.radio_button.default.map(opt => ({
-                    ...opt,
-                    next_message_id: opt.next_message_id ? `${prefix}${opt.next_message_id}` : opt.next_message_id
-                  }))
-                };
-              }
-              
-              // Handle other content types with next_message_id
-              if (content.next_message_id) {
-                newContent.next_message_id = `${prefix}${content.next_message_id}`;
-              }
-              
-              return newContent;
-            });
-          }
-          
-          return newMsg;
-        });
-
-        // Insert messages into current conversation
-        let dataMessagesClone = [...dataMessages];
-        const insertIndex = commonMessageInsertIndex !== null && commonMessageInsertIndex !== undefined 
-          ? commonMessageInsertIndex + 1 
-          : dataMessagesClone.length;
-        
-        dataMessagesClone.splice(insertIndex, 0, ...prefixedMessages);
-        setDataMessages(dataMessagesClone);
-        setIsOpenCommonMessagesModal(false);
-        setCommonMessageInsertIndex(null);
-      }
-    } catch (error) {
-      if (error.response?.data.code === 0) {
-        tokenExpired();
-      } else {
-        setIsOpenNoti(true);
-        setMessageNoti('Failed to load Common Messages scenario.');
-        setTimeout(() => {
-          setIsOpenNoti(false);
-          setMessageNoti('');
-        }, 2000);
-      }
-      setIsOpenCommonMessagesModal(false);
-    }
-  }
-
   const handlePannelCondition = (isUpCondition, role = 'bot') => {
     setIsConditionUp(isUpCondition);
     if (role === 'bot') {
@@ -3196,10 +3096,9 @@ const Scenario = () => {
                     >
                       <option value="payment">Payment</option>
                       <option value="faq">FAQ</option>
-                      <option value="common">Common Messages</option>
                     </select>
                   </div>
-                  {scenarioType !== 'faq' && scenarioType !== 'common' && (
+                  {scenarioType !== 'faq' && (
                     <>
                       <div>
                         <InputCustom
@@ -3296,7 +3195,7 @@ const Scenario = () => {
                       </div>
                     )}
                   </div>
-                  {scenarioType !== 'faq' && scenarioType !== 'common' && (
+                  {scenarioType !== 'faq' && (
                     <>
                       <div className="timer_config-checkbox">
                         <div className='ss-user-setting-checkbox-custom_css'>
@@ -3402,16 +3301,6 @@ const Scenario = () => {
                               ></MDBIcon>
                               <span>ユーザ入力</span>
                             </div>
-                            {scenarioType === 'faq' && (
-                              <div className="ss-option-wrapper" onClick={() => handleAddCommonMessages()}>
-                                <MDBIcon
-                                  fas
-                                  icon="comment"
-                                  className="ss-add-option-icon"
-                                ></MDBIcon>
-                                <span>Common Messages</span>
-                              </div>
-                            )}
                           </div>
                         </div>
                       }
@@ -15359,45 +15248,6 @@ const Scenario = () => {
                 setIsOpenShopifyReference(false)
               }}
           />
-        </div>
-      </ModalShort>
-      <ModalShort open={isOpenCommonMessagesModal} onClose={() => setIsOpenCommonMessagesModal(false)}>
-        <div className="sl-popup-create-scenario-wrapper">
-          <h4>Common Messages を選択</h4>
-          <div style={{ marginBottom: '10px', maxHeight: '400px', overflowY: 'auto' }}>
-            {commonScenariosList.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '20px' }}>
-                <span>Common Messages scenario が見つかりません。</span>
-              </div>
-            ) : (
-              commonScenariosList.map((scenario) => (
-                <div
-                  key={scenario.id}
-                  style={{
-                    padding: '10px',
-                    margin: '5px 0',
-                    border: '1px solid #ddd',
-                    borderRadius: '5px',
-                    cursor: 'pointer',
-                    backgroundColor: '#f9f9f9'
-                  }}
-                  onClick={() => handleSelectCommonScenario(scenario.id)}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e9e9e9'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'}
-                >
-                  <span style={{ fontWeight: '500' }}>{scenario.name}</span>
-                </div>
-              ))
-            )}
-          </div>
-          <div className="sl-popup-create-scenario-btn-wrapper">
-            <Button
-              className="ss-popup-add-variable-input-close-button"
-              onClick={() => setIsOpenCommonMessagesModal(false)}
-            >
-              閉じる
-            </Button>
-          </div>
         </div>
       </ModalShort>
       {isOpenPreview && (
