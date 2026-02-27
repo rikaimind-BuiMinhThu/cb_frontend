@@ -1,13 +1,13 @@
 // Initialize Sentry (single clean block)
-(function initSentry() { 
+(function initSentry() {
   try {
     // Avoid double-initializing if sdk is loaded multiple times
     if (window.__SENTRY_SDK_V2_INITIALIZED__) return;
     window.__SENTRY_SDK_V2_INITIALIZED__ = true;
 
-  var sentryScript = document.createElement('script');
-  // Use the official browser CDN path (no @sentry/browser prefix) to avoid 404/CORS
-  sentryScript.src = 'https://browser.sentry-cdn.com/7.57.0/bundle.min.js';
+    var sentryScript = document.createElement('script');
+    // Use the official browser CDN path (no @sentry/browser prefix) to avoid 404/CORS
+    sentryScript.src = 'https://browser.sentry-cdn.com/7.57.0/bundle.min.js';
     sentryScript.crossOrigin = 'anonymous';
 
     sentryScript.onload = function () {
@@ -24,7 +24,7 @@
 
           // Attach global handlers so runtime errors and promise rejections are captured
           try {
-            window.addEventListener('error', function(evt) {
+            window.addEventListener('error', function (evt) {
               try {
                 var err = evt && evt.error ? evt.error : new Error('window.error: ' + (evt && evt.message ? evt.message : String(evt)));
                 if (window.Sentry) {
@@ -36,7 +36,7 @@
               }
             });
 
-            window.addEventListener('unhandledrejection', function(evt) {
+            window.addEventListener('unhandledrejection', function (evt) {
               try {
                 var reason = evt && evt.reason ? evt.reason : new Error('Unhandled rejection');
                 if (window.Sentry) {
@@ -49,13 +49,13 @@
             });
 
             // helper to manually capture exceptions from page
-            window.__sdk_v2_captureException = function(e) { if (window.Sentry) { return window.Sentry.captureException(e); } };
+            window.__sdk_v2_captureException = function (e) { if (window.Sentry) { return window.Sentry.captureException(e); } };
 
             // Override console.error to forward to Sentry (with recursion guard)
-            (function() {
-              var origConsoleError = console.error && console.error.bind ? console.error.bind(console) : function(){return;};
+            (function () {
+              var origConsoleError = console.error && console.error.bind ? console.error.bind(console) : function () { return; };
               var inProgress = false;
-              console.error = function() {
+              console.error = function () {
                 var args = Array.prototype.slice.call(arguments);
                 if (inProgress) {
                   return origConsoleError.apply(console, args);
@@ -67,13 +67,13 @@
                     var err;
                     if (first instanceof Error) err = first;
                     else {
-                      try { err = new Error(args.map(function(a){ return typeof a === 'string' ? a : JSON.stringify(a); }).join(' ')); }
+                      try { err = new Error(args.map(function (a) { return typeof a === 'string' ? a : JSON.stringify(a); }).join(' ')); }
                       catch (e) { err = new Error(String(first)); }
                     }
                     try {
                       var eid = window.Sentry.captureException(err);
                       origConsoleError('Sentry.captureException eventId:', eid);
-                    } catch(e) {
+                    } catch (e) {
                       origConsoleError('Sentry capture failed:', e);
                     }
                   }
@@ -93,7 +93,7 @@
                     try {
                       var ev = window.Sentry.captureException(error);
                       console.log('Sentry.captureException eventId (axios):', ev);
-                    } catch(e) {
+                    } catch (e) {
                       console.warn('Failed to capture axios error in Sentry', e);
                     }
                     return Promise.reject(error);
@@ -151,64 +151,15 @@ function wrapWithErrorHandling(fn, fnName) {
 }
 
 const CHATBOT_ACTIONS = {
-  CLICK_BUTTON: 'clickButton',
   EXCUTE_JS: 'excuteJS',
-  FUKUSHASHIKI: 'fukushashiki',
   INJECT_CUSTOM_JS: 'injectCustomJS',
-  GET_ERROR_MESSAGE: 'getErrorMessage',
-  CRAWL_DATA: 'crawlData',
   OPEN_PREVIEW: 'openPreview',
-  GET_PREVIEW_ORDER_CONTENT: 'getPreviewOrderContent',
-  SET_CHATBOT_CONVERSION_PARAMS_TO_LOCAL_STORAGE: 'setChatbotConversionParamsToLocalStorage',
 };
 
 const CUSTOM_JS_CODE_POSITION = {
   HEAD: 'head',
   TOP_BODY: 'top_body',
   BOTTOM_BODY: 'bottom_body',
-};
-
-const CONVERSION_PARAMS_STORAGE_KEYS = {
-  SCENARIO_ID: 'ecChatbotScenarioId',
-  BOT_TYPE: 'ecChatbotBotType',
-  USER_INPUT_ID: 'ecChatbotUserInputId',
-  ENV: 'ecChatbotEnv',
-};
-
-const SEARCH_MODES = {
-  ID: 1,
-  CSS_SELECTOR: 2,
-  XPATH: 3,
-};
-
-const CRAWL_ELEMENT_TYPES = {
-  SELECT: 'select',
-  FROM_JS: 'from_js'
-};
-
-const ELEMENT_TAGS = {
-  SELECT: "SELECT",
-  INPUT: "INPUT",
-};
-
-const MESSAGE_CONTENT_TYPES = {
-  PULLDOWN: {
-    LP_INTEGRATION_OPTION: 'lp_integration_option',
-    FROM_JS: 'from_js_result',
-    CUSTOMIZATION: 'customization',
-    TIME_HM: 'time_hm',
-    DATE_YMD: 'date_ymd',
-    DATE_MD: 'date_md',
-    DATE_YM: 'date_ym',
-    DATE_YMD_HM: 'date_ymd_hm',
-    DOB_YMD: 'dob_ymd',
-    DOB_YM: 'dob_ym',
-    TIMEZONE_FROM_TO: 'timezone_from_to',
-    PERIOD_FROM_TO: 'period_from_to',
-    PREFECTURES: 'prefectures',
-    UP_TO_MUNICIPALITY: 'up_to_municipality',
-    CONSUME_API_RESPONSE: 'comsume_api_response',
-  },
 };
 
 const botId = sessionStorage.getItem("bot_id");
@@ -227,32 +178,32 @@ if (typeof window.jQuery === 'undefined') {
   head.appendChild(script);
 }
 
-const getEnvFromScriptSrc  = () => {
+const getEnvFromScriptSrc = () => {
   try {
     if (window.getSdkEnv) return window.sdkEnv;
-  
+
     window.getSdkEnv = true;
-  
+
     const SRC_PARSER = {
       "ec-chatbot1.com": "staging",
       "ec-chatbot.com": "production",
       "localhost:3001": "local",
     }
-  
+
     const src = document.currentScript?.src || "";
-  
+
     if (!src) return null;
-  
+
     const host = new URL(src).host;
-  
-  
+
+
     const sdkEnv = SRC_PARSER[host];
-  
+
     if (sdkEnv) {
       window.sdkEnv = sdkEnv;
       return sdkEnv;
     }
-  
+
     return null;
   } catch {
     return null;
@@ -281,67 +232,12 @@ const getParam = (paramName) => {
   return params[paramName];
 }
 
-const log = (message) =>{
+const log = (message) => {
   let debugFlag = getDebugFlag();
 
   if (debugFlag) {
     console.log(message);
   }
-}
-
-const sleep = (ms) => {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-const WAIT_OPTION_TYPES = {
-  WAIT_FOR_LOADING: "WAIT_FOR_LOADING",
-  WAIT_FOR_SETTING_VALUE: "WAIT_FOR_SETTING_VALUE",
-};
-
-const waitForElement = (mode, address, options = {type: "WAIT_FOR_LOADING"}, callback = () => {}) => {
-  let count = 0;
-  const poops = setInterval(function(){
-    count ++;
-    log(`Waiting for element address: ${address}, mode: ${mode}, options: ${JSON.stringify(options)}: ${count} times`);
-    if (count > 50) {
-      clearInterval(poops);
-      console.log(`Timeout for element address: ${address}, mode: ${mode}, options: ${JSON.stringify(options)}`);
-      return;
-    }
-
-    const element = getElementByAddress(mode, address);
-    if (!element) return;
-    switch (options.type) {
-      case WAIT_OPTION_TYPES.WAIT_FOR_LOADING:
-        clearInterval(poops);
-        callback();
-        break;
-      case WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE:
-        const yearsValue = `20${options.value}`;
-        const isNullOption = options.value === 'NULL_OPTION';
-
-        if (isNullOption || (element.value != options.value && element.value != removeLeadingZero(options.value) && element.value != yearsValue)) {
-          setValueToElement(element, options.value);
-          break;
-        }
-
-        clearInterval(poops);
-        callback();
-        break;
-      default:
-        throw new Error(`Invalid wait option type ${options.type}`);
-    }
-  }, 500);
-}
-
-const movePaymentMethodToTop = (data) => {
-  const index = data.findIndex(item => item.type === "payment_method_id");
-  if (index !== -1) {
-      const [paymentMethod] = data.splice(index, 1);      
-      // await component in LP to set value after payment method setted
-      data.unshift({additionalType: "await"}, paymentMethod, { additionalType: "await" });
-  }
-  return data;
 }
 
 const getEcChatBotApiServerBaseUrl = () => {
@@ -379,81 +275,14 @@ const getEcChatBotFrontEndBaseUrl = () => {
   }
 }
 
-const setChatbotConversionParamsToLocalStorage = (data) => {
-  localStorage.setItem(CONVERSION_PARAMS_STORAGE_KEYS.SCENARIO_ID, data.scenarioId);
-  localStorage.setItem(CONVERSION_PARAMS_STORAGE_KEYS.BOT_TYPE, data.botType);
-  localStorage.setItem(CONVERSION_PARAMS_STORAGE_KEYS.USER_INPUT_ID, data.userInputId);
-  localStorage.setItem(CONVERSION_PARAMS_STORAGE_KEYS.ENV, data.env);
-}
-
 let globalIframe;
 
 const sendMessageToChatbot = (contentMessage, action) => {
-  let data = {action: action, actionData: contentMessage};
+  let data = { action: action, actionData: contentMessage };
 
   globalIframe.contentWindow.postMessage(data, "*");
 }
 
-const waitToLoadAmazonEcForce = (iframe) => {
-  let count = 0;
-  const interval = setInterval(() => {
-    const amazonPayMethodElement = document.querySelector("#amazon_payment_method");
-    const name1Value = document.querySelector("input#order_shipping_address_attributes_name1")?.value;
-
-    if (amazonPayMethodElement && name1Value && count < 20) {
-      iframe.src += `&is_using_amazon_pay=true`;
-      const isEnableEmailInput = !document.querySelector("input#email")?.disabled;
-      if (isEnableEmailInput) {
-        iframe.src += `&is_enable_email_input=true`;
-      }
-      const isDisplayPasswordInput = !!document.querySelector("input#password");
-      if (isDisplayPasswordInput) {
-        iframe.src += `&is_display_password_input=true`;
-      }
-      appendIframeToBody(iframe);
-      clearInterval(interval);
-    }
-    count++;
-
-    if (count >= 20) {
-      // Not Amazon Pay
-      appendIframeToBody(iframe);
-      clearInterval(interval);
-    }
-  }, 100);
-}
-
-const isBlissLp = (url) => {
-  const domains = [
-    // Comment out if you want to test bliss in localhost
-    // "localhost:8000",
-    // "commerceforce.co.jp",
-    "skull-shaver.jp",
-  ];
-
-  return domains.some(domain => url.includes(domain));
-}
-
-const isRoseMayLp = (url) => {
-  const domains = [
-    // TODO: Update RoseMay domains nếu cần test ở môi trường khác
-    // "rosemay.jp",
-    "rosemay.net",
-  ];
-
-  return domains.some(domain => url.includes(domain));
-}
-
-const isPhystechLp = (url) => {
-  const domains = [
-    // Comment out if you want to test phystech in localhost
-    // "localhost:8000",
-    // "commerceforce.co.jp",
-    "livseed.jp",
-  ];
-
-  return domains.some(domain => url.includes(domain));
-}
 const displayPopup = async () => {
   const device =
     !tabletCheck() && !mobileCheck()
@@ -474,7 +303,7 @@ const displayPopup = async () => {
 
   const data = await response.json();
   scenarioId = data.data.id;
-  
+
   let iframe = document.createElement("iframe");
 
   if (mobileCheck()) {
@@ -504,31 +333,9 @@ const displayPopup = async () => {
   // iframe.style.display = "none";
   iframe.style.zIndex = "999999";
   iframe.src = `${getEcChatBotFrontEndBaseUrl()}/preview-faq?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin
-    }&deviceReceive=${device}&uuid=${uuid}&env=${getEnvironment()}&debug=${getDebugFlag()}&cartSystem=${data.cart_system}&isLoggedIn=${window.logged_in}`;
+    }&deviceReceive=${device}&uuid=${uuid}&env=${getEnvironment()}&debug=${getDebugFlag()}`;
 
-  // only for amazon
-  // add param amazonCheckoutSessionId to iframe src
-  const isTorizenLpUseAmazonPay = getParam('amazonCheckoutSessionId');
-
-  if (isTorizenLpUseAmazonPay) {
-    iframe.src += `&is_using_amazon_pay=true`;
-    // only for subscstore cart system, torizen san
-    // loop for waiting data is filled to lp form
-    // wait 20 times
-    let count = 0;
-    const interval = setInterval(() => {
-      const isTorizenLpAmazonDataFilled = document.querySelector("input#jsUkProfileFamilyName")?.value;
-      if (isTorizenLpAmazonDataFilled  && count < 20) {
-        appendIframeToBody(iframe);
-        clearInterval(interval);
-      }
-      count++;
-    }, 200);
-  } else if (isBlissLp(window.location.href) || isPhystechLp(window.location.href) || isRoseMayLp(window.location.href)) {
-    waitToLoadAmazonEcForce(iframe);
-  } else {
-    appendIframeToBody(iframe);
-  }
+  appendIframeToBody(iframe);
 
   window.addEventListener(
     "message",
@@ -541,56 +348,8 @@ const displayPopup = async () => {
       if (e.data.chatbotBottom) chatbotBottom = e.data.chatbotBottom;
 
       switch (e.data.action) {
-        case CHATBOT_ACTIONS.FUKUSHASHIKI:
-          e.data.actionData = movePaymentMethodToTop(e.data.actionData);
-          await fillDataFromMessage(e.data.actionData, e.data.actionData.ga4EventCode);
-          break;
-        case CHATBOT_ACTIONS.GET_ERROR_MESSAGE:
-          processGetErrorMessage(e.data.actionData);
-          break;
         case CHATBOT_ACTIONS.EXCUTE_JS:
           excuteJSCode(e.data.actionData);
-          break;
-        case CHATBOT_ACTIONS.CRAWL_DATA:
-          await sleep(500);
-          await crawlDataAndSendMessage(e.data.actionData);
-          break;
-        case CHATBOT_ACTIONS.CLICK_BUTTON:
-          (function() {
-            const button = document.getElementById(e.data.actionData);
-            if (!button) {
-              const err = new Error(`Button not found: id ${e.data.actionData}`);
-              try {
-                if (window.Sentry) {
-                  window.Sentry.captureException(err);
-                  console.log('Sentry captured missing button error:', e.data.actionData);
-                } else {
-                  console.warn('Button not found (Sentry not available):', e.data.actionData);
-                }
-              } catch (captureErr) {
-                console.warn('Error while sending missing-button to Sentry', captureErr);
-              }
-              return; // don't throw — we've reported it
-            }
-
-            try {
-              button.click();
-            } catch (clickErr) {
-              try { if (window.Sentry) window.Sentry.captureException(clickErr); } catch (e) { /* ignore */ }
-              throw clickErr;
-            }
-          })();
-          break;
-        case CHATBOT_ACTIONS.GET_PREVIEW_ORDER_CONTENT:
-          const { isNewProcess = false } = e.data;
-
-          if (!isNewProcess) {
-            await sleep(2000);
-          }
-          excuteJSCode(e.data.actionData);
-          break;
-        case CHATBOT_ACTIONS.SET_CHATBOT_CONVERSION_PARAMS_TO_LOCAL_STORAGE:
-          setChatbotConversionParamsToLocalStorage(e.data.actionData);
           break;
         case CHATBOT_ACTIONS.INJECT_CUSTOM_JS:
           injectCustomJS(e.data.actionData);
@@ -633,11 +392,7 @@ const displayPopup = async () => {
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
       }
-      if (e.data.isOpen && mobileCheck() && !e.data.isUpsell) {
-        document.body.style.overflow = 'hidden';
-      } else {
-        document.body.style.overflow = 'scroll';
-      }
+
       globalIframe = iframe;
     },
     false
@@ -650,51 +405,10 @@ const displayPopup = async () => {
   }, 5000);
 }
 
-const crawl = async (options) => {
-  const targetElement = getElementByAddress(options.searchMode, options.searchAddress);
-  if (!targetElement) {
-    throw new Error('Element not found');
-  };
-
-  switch (options.targetElementType) {
-    case CRAWL_ELEMENT_TYPES.SELECT:
-      return extractSelectOptions(targetElement, options);
-    case CRAWL_ELEMENT_TYPES.FROM_JS:
-      return transformJsResultArray({
-        data: await extractFromJs(options),
-        fields: ['id', 'value', 'text'],
-      });
-    default:
-      throw new Error(`Not support target element type ${options.targetElementType}`);
-  }
-}
-
-const crawlDataAndSendMessage = async (options) => {
-  if (!options.searchAddress || !options.searchMode) return;
-
-  const message = {
-    ...options,
-    result: await crawl(options),
-  };
-  
-  sendMessageToChatbot(message, CHATBOT_ACTIONS.CRAWL_DATA);
-}
-
 const excuteJSCode = (jscode) => {
   if (!jscode) return;
   const func = new Function(jscode);
   func();
-}
-
-const extractSelectOptions = (selectElement) => {
-  if (!selectElement || selectElement.tagName !== "SELECT") return null;
-
-  return Array.from(selectElement.options)
-    .map((option, index) => ({
-      id: index + 1,
-      text: option.innerText,
-      value: option.value || 'NULL_OPTION'
-    }));
 }
 
 const extractFromJs = async (options) => {
@@ -719,259 +433,6 @@ const extractFromJs = async (options) => {
 
     return null;
   }
-};
-
-const transformJsResultArray = ({ data, fields, skipOnError = true }) => {
-  if (!Array.isArray(fields) || !Array.isArray(data)) return [];
-
-  const result = data.filter(item => {
-    const isValid = fields.every(field => item[field]);
-    return isValid || !skipOnError;
-  });
-
-  return skipOnError ? result : result.length === data.length ? result : [];
-};
-
-const processGetErrorMessage = (data) => {
-  if (!data.isDisplay) return;
-
-  const element = getElementByAddress(data.searchMode, data.searchValue);
-
-  if (!element) {
-    console.log(`Element ${data.searchValue} not found`);
-    return;
-  }
-  sendMessageToChatbot(element.innerHTML, CHATBOT_ACTIONS.GET_ERROR_MESSAGE);
-}
-
-const isDisabledElement = (element) => {
-  // For check GINZA AIRA
-  if (element.classList.contains('disabled-input-ec')) return true;
-
-  // For check torizen san with amazon pay
-  if (getParam('amazonCheckoutSessionId') && element.getAttribute('disabled')) return true;
-
-  // For other customer
-  return element.disabled;
-}
-
-const fillDataFromMessage = async (data, ga4EventCode) => {
-  for (let i = 0; i < data.length; i++) {
-    const item = data[i];
-
-    if (item.additionalType === "await") {
-      await sleep(1500);
-      continue;
-    }
-
-    try {
-      let element = getElementByAddress(item.bindingMode, item.bindingAddress);
-
-      // --- element not found ---
-      if (!element) {
-        const err = new Error(`Element not found for binding`);
-        if (window.Sentry) {
-          window.Sentry.captureException(err, {
-            level: 'warning',
-            tags: { bindingMode: item.bindingMode, type: item.type },
-            extra: { item },
-          });
-        }
-        console.warn('Element not found:', item.bindingAddress);
-        continue;
-      }
-
-      // --- Element are disabled ---
-      if (isDisabledElement(element)) {
-        const err = new Error(`Element is disabled: ${item.bindingAddress}`);
-        if (window.Sentry) {
-          window.Sentry.captureException(err, {
-            level: 'info',
-            tags: { bindingMode: item.bindingMode, type: item.type },
-            extra: { item },
-          });
-        }
-        console.warn('Disabled element:', item.bindingAddress);
-        continue;
-      }
-
-    switch (item.type) {
-      case "zip_code_address":
-      case "card_number":
-      case "card_payment_radio_button":
-      case "credit_card_payment":
-      case "text_input":
-      case "textarea":
-      case "slider": {
-        waitForElement(
-          item.bindingMode, item.bindingAddress,
-          {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
-        break;
-      }
-
-      case "payment_method_id": {
-        setValuePaymentMethodToElement(element, item.bindingValue);
-        break;
-      }
-
-      case 'dropdown_prefecture': {
-        if (element.tagName === ELEMENT_TAGS.SELECT) {
-          const acceptableValues = [item.bindingValue.toString(), removeLeadingZero(item.bindingValue).toString()];
-          const selectedOption = Array.from(element.options).find(option => acceptableValues.includes(option.value.toString()));
-          if (!selectedOption) item.bindingValue = '';
-        };
-        waitForElement(
-          item.bindingMode, item.bindingAddress,
-          {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
-        break;
-      }
-
-      case "agree_term":
-      case 'checkbox': {
-        setCheckToCheckboxElement(element, item.bindingValue);
-        break;
-      }
-
-      case 'pull_down': {
-        if (item.pulldownType === 'lp_integration_option') {
-          const isNullOption = item.bindingValue === 'NULL_OPTION';
-          if (isNullOption) item.bindingValue = '';
-
-          const hasOption = Array.from(element.options).some(option => option.value === item.bindingValue);
-          if (!hasOption) item.bindingValue = '';
-        }
-        
-        waitForElement(
-          item.bindingMode, item.bindingAddress,
-          {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
-        break;
-      }
-
-      case "radio_button": {
-        if (element.tagName === ELEMENT_TAGS.SELECT) {
-          setValueToElement(element, item.bindingValue);
-          break;
-        }
-
-        setRadioValue(element, item.bindingValue);
-        break;
-      }
-
-      case "password": {
-        element.setRangeText(item.bindingValue, 0, element.value.length);
-        element.dispatchEvent(new Event('input', { bubbles: true }));
-        element.dispatchEvent(new Event('change', { bubbles: true }));
-        break;
-      }
-      default:
-        break;
-    }
-  } catch (err) {
-      // catch all unexpected errors in the loop
-      console.error('Error processing item in fillDataFromMessage:', err);
-      if (window.Sentry) {
-        window.Sentry.captureException(err, {
-          level: 'error',
-          extra: { item },
-        });
-      }
-    }
-  }
-  // execute GA4 event
-  if (ga4EventCode) {
-    try {
-      if (typeof window.gtag === 'function') {
-        eval(ga4EventCode);
-        console.log('✅ GA4 event code executed:', ga4EventCode);
-      } else {
-        console.warn('⚠️ gtag function not found in LP');
-      }
-    } catch (error) {
-      console.error('Error executing GA4 event code:', error);
-      if (window.Sentry) {
-        window.Sentry.captureException(error, {
-          extra: { ga4EventCode }
-        });
-      }
-    }
-  }
-}
-
-const getElementByAddress = (mode, address) => {
-  if (!mode || !address) return null;
-  switch (mode) {
-    case SEARCH_MODES.ID:
-      return document.getElementById(address);
-    case SEARCH_MODES.CSS_SELECTOR:
-      return document.querySelector(address);
-    case SEARCH_MODES.XPATH:
-      return document.evaluate(address, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-    default:
-      throw new Error(`Invalid search mode ${mode}, address: ${address}`);
-  }
-}
-
-const removeLeadingZero = (value) => {
-  let strValue = value?.toString() || "";
-  let result = strValue.replace(/^0+/, '');
-  return typeof value === 'number' ? Number(result) : result;
-}
-
-const removeFirstTwoChars = (input) => {
-  const str = input?.toString() || "";
-  if (str.length > 2) {
-    return str.slice(2);
-  } else {
-    return '';
-  }
-}
-
-const setCheckToCheckboxElement = (element, value) => {
-  if (!element.type === 'checkbox') return;
-  const currentValue = element.checked;
-  if (currentValue === value) return;
-
-  element.checked = value;
-  element.dispatchEvent(new Event('input', { bubbles: true }));
-  element.dispatchEvent(new Event('change', { bubbles: true }));
-}
-
-const setValueToElement = (element, value) => {
-  let newElementValue = value;
-
-  if (element.tagName === ELEMENT_TAGS.SELECT) {
-    const acceptableValues = [value.toString(), removeLeadingZero(value).toString(), `20${value}`];
-    newElementValue = acceptableValues.find(v => {
-      return Array.from(element.options).some(option => option.value === v);
-    });
-
-    if (!newElementValue && newElementValue !== '') {
-      console.error(`Option not found: ${value}, element: ${element.id}`);
-    }
-  }
-
-  element.value = newElementValue;
-  element.dispatchEvent(new Event('input', { bubbles: true }));
-  element.dispatchEvent(new Event('change', { bubbles: true }));
-}
-
-const setValuePaymentMethodToElement = (element, value) => {
-  const radioButtons = [...element.querySelectorAll('input[type="radio"]')];
-  
-  if (radioButtons.length > 0) {
-    setRadioValue(element, value);
-  } else {
-    setValueToElement(element, value);
-  }
-};
-
-const setRadioValue = (element, value) => {
-  const radioButtons = [...element.querySelectorAll('input[type="radio"]')];
-  const selectedRadio = radioButtons.find(radio => radio.value === value);
-  if (!selectedRadio) return;
-  selectedRadio.checked = true;
-  selectedRadio.dispatchEvent(new Event('input', { bubbles: true }));
-  selectedRadio.dispatchEvent(new Event('change', { bubbles: true }));
 };
 
 const getUser = async (url, datacount) => {
@@ -1014,8 +475,7 @@ const mobileCheck = () => {
 }
 
 const injectCustomJS = (injectCustomJsCodes) => {
-  for(const { jsCode, position } of injectCustomJsCodes)
-  {
+  for (const { jsCode, position } of injectCustomJsCodes) {
     const script = document.createElement('script');
     script.type = 'text/javascript';
     script.innerHTML = jsCode;

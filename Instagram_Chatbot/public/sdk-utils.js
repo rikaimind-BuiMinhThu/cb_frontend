@@ -33,8 +33,8 @@ if (window.getChatbotEnvironment === undefined) {
 
 if (window.getEcChatBotApiServerBaseUrl === undefined) {
   window.getEcChatBotApiServerBaseUrl = () => {
-      // Comment out below line if you want to connect the staging backend API server
-      // return "https://ec-chatbot-test1.com";
+    // Comment out below line if you want to connect the staging backend API server
+    // return "https://ec-chatbot-test1.com";
     const environment = window.getChatbotEnvironment();
     switch (environment) {
       case "staging":
