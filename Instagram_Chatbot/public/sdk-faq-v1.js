@@ -20,7 +20,7 @@
             sendDefaultPii: true,
             integrations: (typeof window.Sentry !== 'undefined' && typeof window.Sentry.BrowserTracing === 'function') ? [new window.Sentry.BrowserTracing()] : []
           });
-          console.log('Sentry initialized (sdk-v2)');
+          console.log('Sentry initialized (sdk-faq-v1)');
 
           // Attach global handlers so runtime errors and promise rejections are captured
           try {
@@ -101,26 +101,24 @@
                 }
               }
             } catch (e) {
-              console.warn('Failed to install axios interceptor (sdk-v2):', e);
+              console.warn('Failed to install axios interceptor (sdk-faq-v1):', e);
             }
           } catch (handlerErr) {
-            console.warn('Failed to attach global Sentry handlers (sdk-v2):', handlerErr);
+            console.warn('Failed to attach global Sentry handlers (sdk-faq-v1):', handlerErr);
           }
         }
       } catch (e) {
-        console.error('Sentry init error (sdk-v2):', e);
+        console.error('Sentry init error (sdk-faq-v1):', e);
       }
-
-
     };
 
     sentryScript.onerror = function (err) {
-      console.error('Failed to load Sentry script (sdk-v2):', err);
+      console.error('Failed to load Sentry script (sdk-faq-v1):', err);
     };
 
     document.head.appendChild(sentryScript);
   } catch (outer) {
-    console.error('Failed to setup Sentry loader (sdk-v2):', outer);
+    console.error('Failed to setup Sentry loader (sdk-faq-v1):', outer);
   }
 })();
 
@@ -348,7 +346,7 @@ const movePaymentMethodToTop = (data) => {
 
 const getEcChatBotApiServerBaseUrl = () => {
   // Comment out below line if you want to connect the staging backend API server
-  return "https://ec-chatbot-test1.com";
+  // return "https://ec-chatbot-test1.com";
   const environment = getEnvironment();
   switch (environment) {
     case "staging":
@@ -365,7 +363,7 @@ const getEcChatBotApiServerBaseUrl = () => {
 
 const getEcChatBotFrontEndBaseUrl = () => {
   // Comment out below line if you want to use the local frontend
-  return "http://localhost:3001";
+  // return "http://localhost:3001";
   const environment = getEnvironment();
 
   switch (environment) {
@@ -436,6 +434,16 @@ const isBlissLp = (url) => {
   return domains.some(domain => url.includes(domain));
 }
 
+const isRoseMayLp = (url) => {
+  const domains = [
+    // TODO: Update RoseMay domains nếu cần test ở môi trường khác
+    // "rosemay.jp",
+    "rosemay.net",
+  ];
+
+  return domains.some(domain => url.includes(domain));
+}
+
 const isPhystechLp = (url) => {
   const domains = [
     // Comment out if you want to test phystech in localhost
@@ -495,7 +503,7 @@ const displayPopup = async () => {
   iframe.style.borderRadius = "0px";
   // iframe.style.display = "none";
   iframe.style.zIndex = "999999";
-  iframe.src = `${getEcChatBotFrontEndBaseUrl()}/preview-customer-fukushashiki?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin
+  iframe.src = `${getEcChatBotFrontEndBaseUrl()}/preview-faq?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin
     }&deviceReceive=${device}&uuid=${uuid}&env=${getEnvironment()}&debug=${getDebugFlag()}&cartSystem=${data.cart_system}&isLoggedIn=${window.logged_in}`;
 
   // only for amazon
@@ -516,7 +524,7 @@ const displayPopup = async () => {
       }
       count++;
     }, 200);
-  } else if (isBlissLp(window.location.href) || isPhystechLp(window.location.href)) {
+  } else if (isBlissLp(window.location.href) || isPhystechLp(window.location.href) || isRoseMayLp(window.location.href)) {
     waitToLoadAmazonEcForce(iframe);
   } else {
     appendIframeToBody(iframe);
@@ -535,7 +543,7 @@ const displayPopup = async () => {
       switch (e.data.action) {
         case CHATBOT_ACTIONS.FUKUSHASHIKI:
           e.data.actionData = movePaymentMethodToTop(e.data.actionData);
-          await fillDataFromMessage(e.data.actionData);
+          await fillDataFromMessage(e.data.actionData, e.data.actionData.ga4EventCode);
           break;
         case CHATBOT_ACTIONS.GET_ERROR_MESSAGE:
           processGetErrorMessage(e.data.actionData);
@@ -747,7 +755,7 @@ const isDisabledElement = (element) => {
   return element.disabled;
 }
 
-const fillDataFromMessage = async (data) => {
+const fillDataFromMessage = async (data, ga4EventCode) => {
   for (let i = 0; i < data.length; i++) {
     const item = data[i];
 
@@ -865,6 +873,24 @@ const fillDataFromMessage = async (data) => {
         window.Sentry.captureException(err, {
           level: 'error',
           extra: { item },
+        });
+      }
+    }
+  }
+  // execute GA4 event
+  if (ga4EventCode) {
+    try {
+      if (typeof window.gtag === 'function') {
+        eval(ga4EventCode);
+        console.log('✅ GA4 event code executed:', ga4EventCode);
+      } else {
+        console.warn('⚠️ gtag function not found in LP');
+      }
+    } catch (error) {
+      console.error('Error executing GA4 event code:', error);
+      if (window.Sentry) {
+        window.Sentry.captureException(error, {
+          extra: { ga4EventCode }
         });
       }
     }

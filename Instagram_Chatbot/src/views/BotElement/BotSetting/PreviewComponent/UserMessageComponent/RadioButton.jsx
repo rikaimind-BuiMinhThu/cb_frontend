@@ -8,6 +8,8 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
   const radioButton = content.radio_button;
   if (!radioButton) return null;
 
+  console.log("RadioButton: messageIndex: ", messageIndex);
+
   const renderTitle = () => {
     if (!radioButton.title_require && !radioButton.require) return null;
     const title = radioButton.title_require && (
@@ -37,7 +39,7 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
         onChangeValue={onChangeValue} 
         options={radioButton[radioButton.type]}
       />;
-
+    console.log("RadioButton > renderDefaultContent > messageIndex: ", messageIndex);
     return radioButton[radioButton.type].map((item, index) => {
       return (
         <div 
@@ -47,10 +49,11 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
           <input
             disabled={disabled}
             type="radio"
-            id={`ss-message__content--user-radio_button_${item.value}`}
+            id={`ss-message__content--user-radio_button_${messageIndex}_${item.value}`}
             name={`ss-message__content--user-radio_button--radio_button_img_msg${messageIndex}_content${contentIndex}_${content.type}`}
             checked={radioButton.initial_selection === item.value}
             onChange={() => {
+              console.log("RadioButton > renderDefaultContent > onChange > messageIndex: ", messageIndex);
               onChangeValue(
                 contentIndex,
                 content.type,
@@ -61,7 +64,7 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
             }}
           />
           {item.text && (
-            <label htmlFor={`ss-message__content--user-radio_button_${item.value}`}>
+            <label htmlFor={`ss-message__content--user-radio_button_${messageIndex}_${item.value}`}>
               {item.text}
             </label>
           )}

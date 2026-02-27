@@ -347,6 +347,45 @@ const checkMessageCondition = (message, buildParam) => {
   return checked;
 }
 
+const checkFaqMessageCondition = (message, buildParam, loopCount) => {
+  if (message.conditions.length === 0) return true;
+
+  let checked = false;
+  for (let j = 0; j < message.conditions.length; j++) {
+    const conditionItem = message.conditions[j];
+    const nameCondition = loopCount > 0 ? `${loopCount}_${conditionItem.nameCondition}` : conditionItem.nameCondition;
+    const buildParamValue = buildParam[nameCondition];
+
+    let subCheck = false;
+
+    switch (conditionItem.condition) {
+      case "include":
+        subCheck = buildParamValue && buildParamValue.includes(conditionItem.inputCondition);
+        break;
+      case "is":
+        subCheck = buildParamValue && buildParamValue == conditionItem.inputCondition;
+        break;
+      case "not_include":
+        subCheck = !buildParamValue || !buildParamValue.includes(conditionItem.inputCondition);
+        break;
+      case "is_not":
+        subCheck = !buildParamValue || buildParamValue != conditionItem.inputCondition;
+        break;
+      default:
+        break;
+    }
+    if (j === 0) {
+      checked = subCheck;
+    } else if (conditionItem?.linkCondition === "and") {
+      checked = checked && subCheck;
+    } else if (conditionItem?.linkCondition === "or") {
+      checked = checked || subCheck;
+    }
+  }
+
+  return checked;
+}
+
 const getAddressFromZipCode = (zipCode) => {
   return getToChatBotServer(
     CHATBOT_SERVER.GET_ADDRESS_FROM_ZIP_CODE_PATH.replace(":zip_code", zipCode)
@@ -632,7 +671,7 @@ export {
   sendCreateOrderData, sendCountRequest,
   getCitiesByPrefecture, getTownsByCity, getPrefectures,
   getScenarioPreviewData, getChatBotSetting, sendEmailRequest,
-  sleep, getCaptcha, appendParamsToUrl, checkMessageCondition,
+  sleep, getCaptcha, appendParamsToUrl, checkMessageCondition, checkFaqMessageCondition,
   getAddressFromZipCode, secondToDatetime, findItem, isUndefined,
   changeElementAttributeById, toCamelCase, sendConvertTextJapaneseRequest,
   scrollToPosition, removeSpace, getColor, processMessagesForErrorState, hideMessageOnError, createTempDelay,
