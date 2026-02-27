@@ -37,13 +37,50 @@ function InstallationTag() {
                 <h4 style={{ color: '#767676' }}>設置ガイド</h4>
               </CardHeader>
               <CardBody>
-                <span style={{ color: '#767676' }}>サイトにボットを埋め込む</span> <br />
-                <span style={{ color: '#767676', fontWeight: "400" }}>ページの右下にウェブチャットを表示するためにウェブサイトの &lt;body&gt; タグ内に以下のコードを貼り付けてください。</span>
-                <div style={{ width: "90%", border: '1px solid grey', color: '#767676', padding: '5px', borderRadius: '5px' }}>
-                  &lt;script&gt; sessionStorage.setItem("bot_id", "{botId}");&lt;/script&gt; <br />
-                  {/* change script to production URL */}
-                  &lt;script src="{getEcChatBotFrontEndBaseUrl()}/sdk.js" defer&gt;&lt;/script&gt;
-                  {/* End here */}
+                {/* 決済チャットボット */}
+                <div style={{ marginBottom: '30px' }}>
+                  <span style={{ color: '#767676', fontWeight: "600" }}>決済チャットボット</span> <br />
+                  <span style={{ color: '#767676' }}>サイトにボットを埋め込む</span> <br />
+                  <span style={{ color: '#767676', fontWeight: "400" }}>ページの右下にウェブチャットを表示するためにウェブサイトの &lt;body&gt; タグ内に以下のコードを貼り付けてください。</span>
+                  <textarea
+                    disabled
+                    readOnly
+                    style={{
+                      width: "90%",
+                      border: '1px solid grey',
+                      color: '#767676',
+                      padding: '5px',
+                      borderRadius: '5px',
+                      resize: 'none',
+                      fontFamily: 'monospace',
+                      fontSize: '12px',
+                      minHeight: '60px'
+                    }}
+                    value={`<script>sessionStorage.setItem("bot_id", "${botId}");</script>\n<script src="${getEcChatBotFrontEndBaseUrl()}/sdk-v2.js" defer></script>`}
+                  />
+                </div>
+
+                {/* FAQ チャットボット */}
+                <div style={{ marginBottom: '30px' }}>
+                  <span style={{ color: '#767676', fontWeight: "600" }}>FAQ チャットボット</span> <br />
+                  <span style={{ color: '#767676' }}>サイトにボットを埋め込む</span> <br />
+                  <span style={{ color: '#767676', fontWeight: "400" }}>ページの右下にウェブチャットを表示するためにウェブサイトの &lt;body&gt; タグ内に以下のコードを貼り付けてください。</span>
+                  <textarea
+                    disabled
+                    readOnly
+                    style={{
+                      width: "90%",
+                      border: '1px solid grey',
+                      color: '#767676',
+                      padding: '5px',
+                      borderRadius: '5px',
+                      resize: 'none',
+                      fontFamily: 'monospace',
+                      fontSize: '12px',
+                      minHeight: '60px'
+                    }}
+                    value={`<script>sessionStorage.setItem("bot_id", "${botId}");</script>\n<script src="${getEcChatBotFrontEndBaseUrl()}/sdk-faq-v1.js" defer></script>`}
+                  />
                 </div>
                 <br />
                 <div style={{ color: '#767676', marginTop: "15px", padding: "5px", width: "100%", borderBottom: '1px solid grey' }}>
