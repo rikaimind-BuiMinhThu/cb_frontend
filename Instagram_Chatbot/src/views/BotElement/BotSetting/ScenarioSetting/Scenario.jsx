@@ -1041,6 +1041,38 @@ const Scenario = () => {
     );
   };
 
+  const renderRootFaqOption = (wrapperClassName = null) => {
+    if (scenarioType !== 'faq') return null;
+    
+    const checkbox = (
+      <CheckboxCustom
+        label="Root FAQ Message"
+        onChange={(value) => {
+          // Uncheck all other messages
+          const updatedMessages = dataMessages.map((msg, idx) => {
+            if (idx === indexMessageSelect) {
+              return { ...msg, is_root_faq_msg: value };
+            } else {
+              return { ...msg, is_root_faq_msg: false };
+            }
+          });
+          setDataMessages(updatedMessages);
+        }}
+        value={dataMessages[indexMessageSelect].is_root_faq_msg || false}
+      />
+    );
+
+    if (wrapperClassName) {
+      return (
+        <div className={wrapperClassName}>
+          {checkbox}
+        </div>
+      );
+    }
+
+    return checkbox;
+  };
+
   const getListProductVariants = (cursor) => {
     const query = cursor ? `cursor=${cursor}` : ""
     api.get(`/api/v1/shopify/product_variants?${query}`).then(res => {
@@ -5912,25 +5944,7 @@ const Scenario = () => {
                                       value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                     />
                                   </div>
-                                  {scenarioType === 'faq' && (
-                                    <div className="ss-bot-checkbox-scroll-auto">
-                                      <CheckboxCustom
-                                        label="Root FAQ Message"
-                                        onChange={(value) => {
-                                          // Uncheck all other messages
-                                          const updatedMessages = dataMessages.map((msg, idx) => {
-                                            if (idx === indexMessageSelect) {
-                                              return { ...msg, is_root_faq_msg: value };
-                                            } else {
-                                              return { ...msg, is_root_faq_msg: false };
-                                            }
-                                          });
-                                          setDataMessages(updatedMessages);
-                                        }}
-                                        value={dataMessages[indexMessageSelect].is_root_faq_msg || false}
-                                      />
-                                    </div>
-                                  )}
+                                  {renderRootFaqOption('ss-bot-checkbox-scroll-auto')}
                                   {dataMessages[indexMessageSelect].message_content[0][messageType]?.['use_for_confirm_message'] && (
                                     <div
                                     id="ss-bot-statement-type-text"
@@ -6368,6 +6382,7 @@ const Scenario = () => {
                                                           }}
                                                           value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                                         />
+                                                        {renderRootFaqOption()}
                                                         <CheckboxCustom
                                                           label="入力された内容を変数に保存する。"
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
@@ -7229,6 +7244,7 @@ const Scenario = () => {
                                                             }}
                                                             value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                                           />
+                                                          {renderRootFaqOption()}
                                                           <CheckboxCustom
                                                             label="入力された内容を変数に保存する。"
                                                             onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'textarea', value, 'is_save_input_content')}
@@ -7395,6 +7411,7 @@ const Scenario = () => {
                                                           }}
                                                           value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                                         />
+                                                        {renderRootFaqOption()}
                                                         <CheckboxCustom
                                                           label="入力された内容を変数に保存する。"
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
@@ -7696,6 +7713,7 @@ const Scenario = () => {
                                                           }}
                                                           value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                                         />
+                                                        {renderRootFaqOption()}
                                                         <CheckboxCustom
                                                           label="入力された内容を変数に保存する。"
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
@@ -7993,6 +8011,7 @@ const Scenario = () => {
                                                           }}
                                                           value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                                         />
+                                                        {renderRootFaqOption()}
                                                         <CheckboxCustom
                                                           label="入力された内容を変数に保存する。"
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
@@ -9159,6 +9178,7 @@ const Scenario = () => {
                                                           }}
                                                           value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                                         />
+                                                        {renderRootFaqOption()}
                                                         <CheckboxCustom
                                                           label="入力された内容を変数に保存する。"
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
@@ -10568,6 +10588,7 @@ const Scenario = () => {
                                                             }}
                                                             value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                                           />
+                                                          {renderRootFaqOption()}
                                                           <CheckboxCustom
                                                             label="自動スクロールしない"
                                                             onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_not_auto_scroll')}
@@ -12265,6 +12286,7 @@ const Scenario = () => {
                                                             }}
                                                             value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                                           />
+                                                          {renderRootFaqOption()}
                                                           <CheckboxCustom
                                                             label="入力された内容を変数に保存する。"
                                                             onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
@@ -12460,6 +12482,7 @@ const Scenario = () => {
                                                           }}
                                                           value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                                         />
+                                                        {renderRootFaqOption()}
                                                         <CheckboxCustom
                                                           label="入力された内容を変数に保存する。"
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
@@ -13597,6 +13620,7 @@ const Scenario = () => {
                                                           }}
                                                           value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                                         />
+                                                        {renderRootFaqOption()}
                                                         <div className="ss-user-setting__item-bottom" style={{ position: 'relative' }}>
                                                             {shippingAddress.type !== "picture_radio" &&
                                                                 <DragDropContext onDragEnd={result => handleDragEndRadioCheckbox(result, content.id, content.type, 'radio_contents')}>
@@ -14821,6 +14845,7 @@ const Scenario = () => {
                                                             value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                                           />
                                                         </div>
+                                                        {renderRootFaqOption()}
                                                       </div>
                                                       {buttonSubmit.is_save_input_content && (
                                                           <div className="ss-user-setting__item-bottom">
