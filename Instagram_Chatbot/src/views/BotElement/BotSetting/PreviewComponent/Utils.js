@@ -177,6 +177,14 @@ const sendLogMessageToServer = (submitData, submitType) => {
   return dataLog;
 }
 
+const sendAppearLogToServer = (data) => {
+  return createScenarioUserResponseMessageHistory({
+    scenario_id: data.scenario_id,
+    user_id: data.user_id,
+    msgs: [{ id: data.message.id, type: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.APPEAR }],
+  });
+};
+
 const sendErrorLogToServer = (submitData) => {
   return sendLogMessageToServer(submitData, CONVERSION_RESPONSE_SUBMIT_TYPE.ERROR);
 }
@@ -679,5 +687,5 @@ export {
   createScenarioUserResponseMessageHistory, userEntryScenario, isAndroid, isButtonSubmitMessage,
   sendErrorLogToServer, sendLogMessageToServer,
   moveToNext, getNextUserMsg,
-  sendOpenChatbotCountRequest, sendCloseChatbotCountRequest,
+  sendOpenChatbotCountRequest, sendCloseChatbotCountRequest, sendAppearLogToServer,
 };
