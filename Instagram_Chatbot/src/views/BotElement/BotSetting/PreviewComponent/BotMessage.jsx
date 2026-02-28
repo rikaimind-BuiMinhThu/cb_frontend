@@ -20,6 +20,7 @@ const BotMessage = ({
   hidden,
   currentMsgIndex,
   isBotOpen,
+  delayEachMessage = RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE,
 }) => {
   const [isDelaying, setIsDelaying] = useState(true);
   const [text, setText] = useState("");
@@ -86,7 +87,7 @@ const BotMessage = ({
     if (isDelaying) {
       timeoutId = setTimeout(() => {
         setIsDelaying(false);
-      }, RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE);
+      }, delayEachMessage);
       return () => clearTimeout(timeoutId);
     }
 

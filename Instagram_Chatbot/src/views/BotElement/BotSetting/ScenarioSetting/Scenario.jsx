@@ -809,6 +809,7 @@ const initialTimeConfig = {
 const Scenario = () => {
   // states
   const [scenarioName, setScenarioName] = useState('');
+  const [scenarioType, setScenarioType] = useState('payment');
   const [urlThanks, setUrlThanks] = useState('');
   const [lpProductUrl, setLpProductUrl] = useState('');
   const [coupon, setCoupon] = useState('');
@@ -963,6 +964,7 @@ const Scenario = () => {
     api.get(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`).then((res) => {
       setDataMessages(res.data.data?.conversation?.messages || []);
       setScenarioName(res.data.data?.scenario_name || '');
+      setScenarioType(res.data.data?.scenario_type || 'payment');
       setUrlThanks(res.data.data?.conversation?.urlThanksPage || '');
       setIsUsedCartConfirmPage(res.data.data?.conversation?.isUsedCartConfirmPage || false);
       setUrlCartConfirmPage(res.data.data?.conversation?.urlCartConfirmPage || '');
@@ -1037,6 +1039,38 @@ const Scenario = () => {
         }}
       />
     );
+  };
+
+  const renderRootFaqOption = (wrapperClassName = null) => {
+    if (scenarioType !== 'faq') return null;
+    
+    const checkbox = (
+      <CheckboxCustom
+        label="Root FAQ Message"
+        onChange={(value) => {
+          // Uncheck all other messages
+          const updatedMessages = dataMessages.map((msg, idx) => {
+            if (idx === indexMessageSelect) {
+              return { ...msg, is_root_faq_msg: value };
+            } else {
+              return { ...msg, is_root_faq_msg: false };
+            }
+          });
+          setDataMessages(updatedMessages);
+        }}
+        value={dataMessages[indexMessageSelect].is_root_faq_msg || false}
+      />
+    );
+
+    if (wrapperClassName) {
+      return (
+        <div className={wrapperClassName}>
+          {checkbox}
+        </div>
+      );
+    }
+
+    return checkbox;
   };
 
   const getListProductVariants = (cursor) => {
@@ -2640,6 +2674,7 @@ const Scenario = () => {
         isUsedCartConfirmPage: isUsedCartConfirmPage,
       },
       scenario_name: scenarioName,
+      scenario_type: scenarioType,
       landing_page_product_url: lpProductUrl,
       is_use_only_regular_order: isUseOnlyRegularOrder,
       is_used_fukushashiki: isUseFukushashiki,
@@ -2701,6 +2736,7 @@ const Scenario = () => {
         coupon: coupon
       },
       scenario_name: scenarioName,
+      scenario_type: scenarioType,
       landing_page_product_url: lpProductUrl,
       is_use_only_regular_order: isUseOnlyRegularOrder,
       is_used_fukushashiki: isUseFukushashiki,
@@ -3082,51 +3118,67 @@ const Scenario = () => {
                     />
                     {errorScenarioName && <span style={{ fontSize: '12px', color: '#FF621D' }}>{errorScenarioName}</span>}
                   </div>
-                  <div>
-                    <InputCustom
-                      style={{ width: '100%', marginTop: '5px' }}
-                      value={lpProductUrl}
-                      onChange={value => setLpProductUrl(value)}
-                      placeholder="商品購入のURL"
-                    />
+                  {/* Scenario Type Selector */}
+                  <div style={{ marginTop: '10px' }}>
+                    <label style={{ fontSize: '14px', fontWeight: '400', marginBottom: '5px', display: 'block' }}>シナリオタイプ</label>
+                    <select
+                      style={{ width: '100%', padding: '8px', borderRadius: '5px', border: '1px solid gray', fontSize: '14px' }}
+                      value={scenarioType}
+                      onChange={(e) => setScenarioType(e.target.value)}
+                    >
+                      <option value="payment">Payment</option>
+                      <option value="faq">FAQ</option>
+                    </select>
                   </div>
-                  <div>
-                    <InputCustom
-                      style={{ width: '100%', marginTop: '5px' }}
-                      value={urlThanks}
-                      onChange={value => setUrlThanks(value)}
-                      placeholder="サンクスページのURL"
-                    />
-                  </div>
-                  {
-                    isUsedCartConfirmPage && (
+                  {scenarioType !== 'faq' && (
+                    <>
                       <div>
                         <InputCustom
                           style={{ width: '100%', marginTop: '5px' }}
-                          value={urlCartConfirmPage}
-                          onChange={value => setUrlCartConfirmPage(value)}
-                          placeholder="カートの注文確認ページのURL"
+                          value={lpProductUrl}
+                          onChange={value => setLpProductUrl(value)}
+                          placeholder="商品購入のURL"
                         />
                       </div>
-                    )
-                  }
-                  {client?.cart_system === "ec_force" && <div>
-                    <InputCustom
-                      style={{ width: '100%', marginTop: '5px' }}
-                      value={coupon}
-                      onChange={value => setCoupon(value)}
-                      placeholder="Coupon"
-                    />
-                  </div>}
-                  <div>
-                    <input
-                      type="checkbox"
-                      className="ss-user-setting-checkbox-custom"
-                      onChange={(value) => setIsUseOnlyRegularOrder(!isUseOnlyRegularOrder)}
-                      checked={isUseOnlyRegularOrder}
-                    />
-                    <label>定期注文のみ</label>
-                  </div>
+                      <div>
+                        <InputCustom
+                          style={{ width: '100%', marginTop: '5px' }}
+                          value={urlThanks}
+                          onChange={value => setUrlThanks(value)}
+                          placeholder="サンクスページのURL"
+                        />
+                      </div>
+                      {
+                        isUsedCartConfirmPage && (
+                          <div>
+                            <InputCustom
+                              style={{ width: '100%', marginTop: '5px' }}
+                              value={urlCartConfirmPage}
+                              onChange={value => setUrlCartConfirmPage(value)}
+                              placeholder="カートの注文確認ページのURL"
+                            />
+                          </div>
+                        )
+                      }
+                      {client?.cart_system === "ec_force" && <div>
+                        <InputCustom
+                          style={{ width: '100%', marginTop: '5px' }}
+                          value={coupon}
+                          onChange={value => setCoupon(value)}
+                          placeholder="Coupon"
+                        />
+                      </div>}
+                      <div>
+                        <input
+                          type="checkbox"
+                          className="ss-user-setting-checkbox-custom"
+                          onChange={(value) => setIsUseOnlyRegularOrder(!isUseOnlyRegularOrder)}
+                          checked={isUseOnlyRegularOrder}
+                        />
+                        <label>定期注文のみ</label>
+                      </div>
+                    </>
+                  )}
                   <div style={{
                     display: "flex",
                     alignItems: "center",
@@ -3175,66 +3227,70 @@ const Scenario = () => {
                       </div>
                     )}
                   </div>
-                  <div className="timer_config-checkbox">
-                    <div className='ss-user-setting-checkbox-custom_css'>
-                      <input
-                        type="checkbox"
-                        className="ss-user-setting-checkbox-custom"
-                        onChange={handleChangeTimerConfig({ keyPath: ["enable"], instanceValue: !timerConfig.enable })}
-                        checked={timerConfig.enable}
-                      />
-                      <label className="timer_config-label">タイマー</label>
-                    </div>
-                    {timerConfig.enable && (
-                      <div>
-                        <button className="ss-user-setting-checkbox-custom-css_toggle" onClick={handleChangeTimerConfig({ keyPath: ["isOpen"], instanceValue: true })}>
-                          {`( タイマーを設定する )`}
-                        </button>
+                  {scenarioType !== 'faq' && (
+                    <>
+                      <div className="timer_config-checkbox">
+                        <div className='ss-user-setting-checkbox-custom_css'>
+                          <input
+                            type="checkbox"
+                            className="ss-user-setting-checkbox-custom"
+                            onChange={handleChangeTimerConfig({ keyPath: ["enable"], instanceValue: !timerConfig.enable })}
+                            checked={timerConfig.enable}
+                          />
+                          <label className="timer_config-label">タイマー</label>
+                        </div>
+                        {timerConfig.enable && (
+                          <div>
+                            <button className="ss-user-setting-checkbox-custom-css_toggle" onClick={handleChangeTimerConfig({ keyPath: ["isOpen"], instanceValue: true })}>
+                              {`( タイマーを設定する )`}
+                            </button>
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  <div style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "16px",
-                    justifyContent: "start",
-                    width: "100%",
-                  }}>
-                    <div className='ss-user-setting-checkbox-custom_css'>
-                      <input
-                        type="checkbox"
-                        className="ss-user-setting-checkbox-custom"
-                        onChange={() => setIsUseErrMsgByJs(!isUseErrMsgByJs)}
-                        checked={isUseErrMsgByJs}
-                      />
-                      <label style={{whiteSpace: "nowrap", wordBreak: "normal"}}>エラーメッセンジ取得をJSコード使用</label>
-                    </div>
-                    {isUseErrMsgByJs && (
-                      <div>
-                        <button class="ss-user-setting-checkbox-custom-css_toggle" onClick={() => setIsOpenErrMsgByJsSettingModal(true)}>
-                          {`( JSコード設定モダルを開く )`}
-                        </button>
+                      <div style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "16px",
+                        justifyContent: "start",
+                        width: "100%",
+                      }}>
+                        <div className='ss-user-setting-checkbox-custom_css'>
+                          <input
+                            type="checkbox"
+                            className="ss-user-setting-checkbox-custom"
+                            onChange={() => setIsUseErrMsgByJs(!isUseErrMsgByJs)}
+                            checked={isUseErrMsgByJs}
+                          />
+                          <label style={{whiteSpace: "nowrap", wordBreak: "normal"}}>エラーメッセンジ取得をJSコード使用</label>
+                        </div>
+                        {isUseErrMsgByJs && (
+                          <div>
+                            <button class="ss-user-setting-checkbox-custom-css_toggle" onClick={() => setIsOpenErrMsgByJsSettingModal(true)}>
+                              {`( JSコード設定モダルを開く )`}
+                            </button>
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  <div>
-                    <input
-                      type="checkbox"
-                      className="ss-user-setting-checkbox-custom"
-                      onChange={(value) => setIsUseFukushashiki(!isUseFukushashiki)}
-                      checked={isUseFukushashiki}
-                    />
-                    <label>複写式利用フラグ</label>
-                  </div>
-                  <div>
-                    <input
-                      type="checkbox"
-                      className="ss-user-setting-checkbox-custom"
-                      onChange={(value) => setIsUsedCartConfirmPage(!isUsedCartConfirmPage)}
-                      checked={isUsedCartConfirmPage}
-                    />
-                    <label>カートシステムの注文確認ページを利用</label>
-                  </div>
+                      <div>
+                        <input
+                          type="checkbox"
+                          className="ss-user-setting-checkbox-custom"
+                          onChange={(value) => setIsUseFukushashiki(!isUseFukushashiki)}
+                          checked={isUseFukushashiki}
+                        />
+                        <label>複写式利用フラグ</label>
+                      </div>
+                      <div>
+                        <input
+                          type="checkbox"
+                          className="ss-user-setting-checkbox-custom"
+                          onChange={(value) => setIsUsedCartConfirmPage(!isUsedCartConfirmPage)}
+                          checked={isUsedCartConfirmPage}
+                        />
+                        <label>カートシステムの注文確認ページを利用</label>
+                      </div>
+                    </>
+                  )}
                   <div>
                     <input
                       type="checkbox"
@@ -5888,6 +5944,7 @@ const Scenario = () => {
                                       value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                     />
                                   </div>
+                                  {renderRootFaqOption('ss-bot-checkbox-scroll-auto')}
                                   {dataMessages[indexMessageSelect].message_content[0][messageType]?.['use_for_confirm_message'] && (
                                     <div
                                     id="ss-bot-statement-type-text"
@@ -6325,6 +6382,7 @@ const Scenario = () => {
                                                           }}
                                                           value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                                         />
+                                                        {renderRootFaqOption()}
                                                         <CheckboxCustom
                                                           label="入力された内容を変数に保存する。"
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
@@ -7186,6 +7244,7 @@ const Scenario = () => {
                                                             }}
                                                             value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                                           />
+                                                          {renderRootFaqOption()}
                                                           <CheckboxCustom
                                                             label="入力された内容を変数に保存する。"
                                                             onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'textarea', value, 'is_save_input_content')}
@@ -7352,6 +7411,7 @@ const Scenario = () => {
                                                           }}
                                                           value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                                         />
+                                                        {renderRootFaqOption()}
                                                         <CheckboxCustom
                                                           label="入力された内容を変数に保存する。"
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
@@ -7653,6 +7713,7 @@ const Scenario = () => {
                                                           }}
                                                           value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                                         />
+                                                        {renderRootFaqOption()}
                                                         <CheckboxCustom
                                                           label="入力された内容を変数に保存する。"
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
@@ -7950,6 +8011,7 @@ const Scenario = () => {
                                                           }}
                                                           value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                                         />
+                                                        {renderRootFaqOption()}
                                                         <CheckboxCustom
                                                           label="入力された内容を変数に保存する。"
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
@@ -9116,6 +9178,7 @@ const Scenario = () => {
                                                           }}
                                                           value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                                         />
+                                                        {renderRootFaqOption()}
                                                         <CheckboxCustom
                                                           label="入力された内容を変数に保存する。"
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
@@ -10525,6 +10588,7 @@ const Scenario = () => {
                                                             }}
                                                             value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                                           />
+                                                          {renderRootFaqOption()}
                                                           <CheckboxCustom
                                                             label="自動スクロールしない"
                                                             onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_not_auto_scroll')}
@@ -12222,6 +12286,7 @@ const Scenario = () => {
                                                             }}
                                                             value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                                           />
+                                                          {renderRootFaqOption()}
                                                           <CheckboxCustom
                                                             label="入力された内容を変数に保存する。"
                                                             onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
@@ -12417,6 +12482,7 @@ const Scenario = () => {
                                                           }}
                                                           value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                                         />
+                                                        {renderRootFaqOption()}
                                                         <CheckboxCustom
                                                           label="入力された内容を変数に保存する。"
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
@@ -13554,6 +13620,7 @@ const Scenario = () => {
                                                           }}
                                                           value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                                         />
+                                                        {renderRootFaqOption()}
                                                         <div className="ss-user-setting__item-bottom" style={{ position: 'relative' }}>
                                                             {shippingAddress.type !== "picture_radio" &&
                                                                 <DragDropContext onDragEnd={result => handleDragEndRadioCheckbox(result, content.id, content.type, 'radio_contents')}>
@@ -14778,6 +14845,7 @@ const Scenario = () => {
                                                             value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                                           />
                                                         </div>
+                                                        {renderRootFaqOption()}
                                                       </div>
                                                       {buttonSubmit.is_save_input_content && (
                                                           <div className="ss-user-setting__item-bottom">
@@ -15207,7 +15275,13 @@ const Scenario = () => {
           />
         </div>
       </ModalShort>
-      {isOpenPreview && <Preview isOpen={isOpenPreview} onOpenPreview={(isOpen) => handleOpenPreview(isOpen)} isFromScenario={true} />}
+      {isOpenPreview && (
+        scenarioType === 'faq' ? (
+          <PreviewFaq />
+        ) : (
+          <Preview isOpen={isOpenPreview} onOpenPreview={(isOpen) => handleOpenPreview(isOpen)} isFromScenario={true} />
+        )
+      )}
     </div>
   );
 };

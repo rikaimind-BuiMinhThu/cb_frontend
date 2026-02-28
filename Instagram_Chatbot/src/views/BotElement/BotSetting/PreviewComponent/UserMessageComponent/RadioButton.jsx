@@ -47,7 +47,7 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
           <input
             disabled={disabled}
             type="radio"
-            id={`ss-message__content--user-radio_button_${item.value}`}
+            id={`ss-message__content--user-radio_button_${messageIndex}_${item.value}`}
             name={`ss-message__content--user-radio_button--radio_button_img_msg${messageIndex}_content${contentIndex}_${content.type}`}
             checked={radioButton.initial_selection === item.value}
             onChange={() => {
@@ -61,7 +61,7 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
             }}
           />
           {item.text && (
-            <label htmlFor={`ss-message__content--user-radio_button_${item.value}`}>
+            <label htmlFor={`ss-message__content--user-radio_button_${messageIndex}_${item.value}`}>
               {item.text}
             </label>
           )}
