@@ -373,6 +373,19 @@ const PreviewFaq = () => {
       return;
     }
 
+    const currentMsg = state.messagesList[state.currentMsgIndex];
+    if (currentMsg.hidden) {
+      dispatch({
+        type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
+        payload: {
+          startIndex: 0,
+          endIndex: state.currentMsgIndex + 1 + 1,
+          fromCallback: false,
+        }
+      });
+      return;
+    }
+
     setTimeout(() => {
       const newMsgIndex = state.currentMsgIndex + 1;
       dispatch({
