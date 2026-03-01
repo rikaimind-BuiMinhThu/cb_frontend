@@ -56,7 +56,7 @@ import _ from "lodash";
 import {
   setConversionParamToLocalStorage, postMessageToParent, executeLpJsCode
 } from "./PreviewFukushashiki/LPUtils";
-import { handleValidateField } from "./PreviewFukushashiki/ValidationUtils";
+import { handleValidateField, ERROR_MESSAGES } from "./PreviewFukushashiki/ValidationUtils";
 
 const clearChatbotState = () => {
   sessionStorage.removeItem('chatbotH');
@@ -114,6 +114,7 @@ const previewInitialState = {
   styleModal: {},
   scenarioUserResponses: [],
   isDisplayErrorMessage: false,
+  submitErrorMessage: '',
   objParam: {
     current_url: window.location.href,
     current_url_param: getAllUrlParams(window.location.href),
@@ -406,6 +407,14 @@ const PreviewFaq = () => {
     }, RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE_FAQ);
   }, [state.currentMsgIndex, state.nextStopMsgIndex]);
 
+  useEffect(() => {
+    if (state.submitErrorMessage) {
+      setTimeout(() => {
+        dispatch({ type: PREVIEW_ACTIONS.CLEAR_SUBMIT_ERROR_MESSAGE });
+      }, RENDER_CHATBOT_CONFIG.FAQ_DELAY_CLEAR_SUBMIT_ERROR_MESSAGE);
+    }
+  }, [state.submitErrorMessage]);
+
   const renderNextMessage = () => {
     if (state.currentMsgIndex + 1 >= state.nextStopMsgIndex) return;
 
@@ -607,6 +616,15 @@ const PreviewFaq = () => {
   }
 
   const onClickNext = (clickedMsgIndex, clickedMsg) => {
+    const isUpdate = clickedMsgIndex < state.renderMessagesList.length - 1;
+
+    if (isUpdate) {
+      return dispatch({
+        type: PREVIEW_ACTIONS.SET_SUBMIT_ERROR_MESSAGE,
+        payload: ERROR_MESSAGES.FAQ_CAN_NOT_UPDATE_USER_MESSAGE
+      });
+    }
+
     savedChatbotState(state);
 
     const data = {
@@ -650,6 +668,15 @@ const PreviewFaq = () => {
     message,
     messageIndex
   ) => {
+    const isUpdate = messageIndex < state.renderMessagesList.length - 1;
+
+    if (isUpdate) {
+      return dispatch({
+        type: PREVIEW_ACTIONS.SET_SUBMIT_ERROR_MESSAGE,
+        payload: ERROR_MESSAGES.FAQ_CAN_NOT_UPDATE_USER_MESSAGE
+      });
+    }
+
     // Early returns for invalid states
     if (!state.messagesList.length) return;
 
@@ -709,7 +736,7 @@ const PreviewFaq = () => {
 
     let btnText = message.buttonName;
     if (!btnText) {
-      btnText = isUpdate ? "次へ" : "更新";
+      btnText = isUpdate ? "次へ" : "次へ";
     }
     return (
       <div className="sp-user-message-button-action" style={{ display: isDisplayBtnNext ? "flex" : "none" }}>
@@ -800,6 +827,22 @@ const PreviewFaq = () => {
       );
     })
   };
+
+  const renderSubmitErrorMessages = () => {
+    if (!state.submitErrorMessage) return null;
+
+    const className = "ss-bot-submit-error-message";
+    const text = state.submitErrorMessage;
+    const htmlText = text.replace(/¥n/g, "<br/>");
+    return (
+      <div className="ss-user-setting__item-text_input-top">
+        <div id="error-message"
+          className={`error-message-modal ${className}`}
+          dangerouslySetInnerHTML={{ __html: htmlText }}
+        />
+      </div>
+    );
+  }
 
   const getBotHeaderIcon = () => {
     if (state.isOpen) {
@@ -892,6 +935,7 @@ const PreviewFaq = () => {
         <div id="sp-body" className="sp-body" style={bodyStyle}
         >
           {renderMessages()}
+          {renderSubmitErrorMessages()}
         </div>
       </div>
     )

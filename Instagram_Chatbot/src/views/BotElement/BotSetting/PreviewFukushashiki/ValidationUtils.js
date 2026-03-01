@@ -50,7 +50,8 @@ export const ERROR_MESSAGES = {
   ONLY_KATAKANA: "カタカナ（全角・半角）を入力してください。",
   CARD_NUMBER_INVALID: "クレジットカード番号は無効です。",
   CARD_EXPIRY_INVALID: "有効期限に誤りがあるために、決済を完了できませんでした。",
-  CVC_INVALID: "CVCは3桁か4桁で入力してください。"
+  CVC_INVALID: "CVCは3桁か4桁で入力してください。",
+  FAQ_CAN_NOT_UPDATE_USER_MESSAGE: "一度選択した内容は変更できません。",
 };
 
 // Range Validation Messages
