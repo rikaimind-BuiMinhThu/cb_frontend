@@ -311,6 +311,7 @@ export default function CommonAddress({ content, prefecturesList, messageIndexRe
   }
 
   const renderBuildingName = () => {
+    if (addressContent.compact_municipality_and_address_and_building_name) return;
     if (addressContent.building_name === undefined) return;
     const buildingNameLabel = addressContent.building_name_label?.trim() !== "" ? addressContent.building_name_label : "建物名";
 
