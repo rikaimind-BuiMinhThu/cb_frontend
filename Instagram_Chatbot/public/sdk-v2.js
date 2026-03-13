@@ -627,6 +627,8 @@ const displayPopup = async () => {
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
       }
+      iframe.style.width = `${iframe.width} !important`;
+      iframe.style.height = `${iframe.height} !important`;
       if (e.data.isOpen && mobileCheck() && !e.data.isUpsell) {
         document.body.style.overflow = 'hidden';
       } else {
