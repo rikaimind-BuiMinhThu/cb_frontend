@@ -67,6 +67,9 @@ function ClientManagement() {
   var [pageIndex, setPageIndex] = useState(1);
   var [totalPage, setTotalPage] = useState();
   var [cartSystem, setCartSystem] = useState();
+  var [shopUrl, setShopUrl] = useState('');
+  var [clientId, setClientId] = useState('');
+  var [clientSecret, setClientSecret] = useState();
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [isOpenAddUser, setIsOpenAddUser] = useState(false);
@@ -348,6 +351,9 @@ function ClientManagement() {
         setCompanyType(data.enterprise_type);
         setCompanyType2(data.enterprise_type_2);
         setCartSystem(data.cart_system);
+        setShopUrl(data.shop_url || '');
+        setClientId(data.client_id || '');
+        setClientSecret(data.client_secret || '');
         setDepartmentName(data.department_name);
         setTitle(data.title);
         setManager(data.responsible_person);
@@ -433,6 +439,9 @@ function ClientManagement() {
         setCompanyType(data.enterprise_type);
         setCompanyType2(data.enterprise_type_2);
         setCartSystem(data.cart_system);
+        setShopUrl(data.shop_url || '');
+        setClientId(data.client_id || '');
+        setClientSecret(data.client_secret || '');
         setDepartmentName(data.department_name);
         setTitle(data.title);
         setManager(data.responsible_person);
@@ -610,6 +619,7 @@ function ClientManagement() {
       checkFieldAdd(building, '建物名') === true &&
       checkNameAdd(email, 'メールアドレス') === true &&
       utils.checkPhoneNumber(phone, '電話番号') === true &&
+      (cartSystem !== "shopify" || (shopUrl && clientId && clientSecret)) &&
       nameKata == true &&
       managerKata == true &&
       emailCheck == true &&
@@ -1182,6 +1192,10 @@ function ClientManagement() {
     setContract('');
     setInputStartDate('');
     setInputEndDate('');
+    setCartSystem('cart_system_none');
+    setShopUrl('');
+    setClientId('');
+    setClientSecret('');
     setIsOpenAddUser(true);
     //detailUserClient
   }
@@ -2601,6 +2615,7 @@ function ClientManagement() {
                     onMouseDown={() => setSizeAfterSelectCartSystem()}
                     className="input-field"
                     defaultValue={cartSystem}
+                    onChange={(e) => setCartSystem(e.target.value)}
                     name="cart_system"
                     id="newCartSystem"
                   >
@@ -2629,6 +2644,79 @@ function ClientManagement() {
                     style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
+                {cartSystem === "shopify" && (
+                  <>
+                    <br />
+                    <label className="label-input">
+                      Shop URL
+                      <input
+                        className="input-field"
+                        value={shopUrl}
+                        onChange={(e) => setShopUrl(e.target.value)}
+                        type="text"
+                        name="shop_url"
+                      />
+                    </label>
+                    <br />
+                    <label className="label-input">
+                      Client ID
+                      <input
+                        className="input-field"
+                        value={clientId}
+                        onChange={(e) => setClientId(e.target.value)}
+                        type="text"
+                        name="client_id"
+                      />
+                    </label>
+                    <br />
+                    <label className="label-input">
+                      Client Secret
+                      <input
+                        className="input-field"
+                        value={clientSecret}
+                        onChange={(e) => setClientSecret(e.target.value)}
+                        type="text"
+                        name="client_secret"
+                      />
+                    </label>
+                    <br />
+                  </>
+                )}
+                <br />
+                <label className="label-input">
+                  Zettaireach Bot id
+                  <input
+                    className="input-field"
+                    onBlur={(e) => e.target.value}
+                    type="text"
+                    id="zettai_reach_bot_id"
+                    name="zettai_reach_bot_id"
+                  />
+                </label>
+                <br />
+                <br />
+                <label className="label-input">
+                  Zettaireach Client id
+                  <input
+                    className="input-field"
+                    onBlur={(e) => e.target.value}
+                    type="text"
+                    id="zettai_reach_client_id"
+                  name="zettai_reach_client_id"
+                  />
+                </label>
+                <br />
+                <br />
+                <label className="label-input">
+                  Zettaireach Token
+                  <input
+                    className="input-field"
+                    onBlur={(e) => e.target.value}
+                    type="text"
+                    id="zettai_x_token"
+                  name="zettai_x_token"
+                  />
+                </label>
                 <br />
                 <br />
                 <Button id="btnUpdate" hidden={disableInput} onClick={updateClient}>
@@ -3500,7 +3588,8 @@ function ClientManagement() {
                     onMouseLeave={() => closeSizeSelectCartSystem()}
                     onMouseDown={() => setSizeAfterSelectCartSystem()}
                     className="input-field"
-                    defaultValue={'cart_system_none'}
+                    defaultValue={cartSystem || 'cart_system_none'}
+                    onChange={(e) => setCartSystem(e.target.value)}
                     name="cart_system"
                     id="newCartSystem"
                   >
@@ -3528,6 +3617,80 @@ function ClientManagement() {
                     className="input-field"
                     style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
+                </label>{' '}
+                {cartSystem === "shopify" && (
+                  <>
+                    <br />
+                    <label className="label-input">
+                      Shop URL
+                      <input
+                        className="input-field"
+                        value={shopUrl}
+                        onChange={(e) => setShopUrl(e.target.value)}
+                        type="text"
+                        name="shop_url"
+                      />
+                    </label>
+                    <br />
+                    <label className="label-input">
+                      Client ID
+                      <input
+                        className="input-field"
+                        value={clientId}
+                        onChange={(e) => setClientId(e.target.value)}
+                        type="text"
+                        name="client_id"
+                      />
+                    </label>
+                    <br />
+                    <label className="label-input">
+                      Client Secret
+                      <input
+                        className="input-field"
+                        value={clientSecret}
+                        onChange={(e) => setClientSecret(e.target.value)}
+                        type="text"
+                        name="client_secret"
+                      />
+                    </label>
+                    <br />
+                  </>
+                )}
+                <br />
+                <br />
+                <label className="label-input">
+                 Zettaireach Bot id
+                  <input
+                    className="input-field"
+                    onBlur={(e) => e.target.value}
+                    type="text"
+                    id="zettai_reach_bot_id"
+                    name="zettai_reach_bot_id"
+                  />
+                </label>{' '}
+                <br />
+                <br />
+                <label className="label-input">
+                 Zettaireach Client id
+                  <input
+                    className="input-field"
+                    onBlur={(e) => e.target.value}
+                    type="text"
+                    id="zettai_reach_client_id"
+                    name="zettai_reach_client_id"
+                  />
+                </label>{' '}
+                <br />
+                <br />
+                <label className="label-input">
+                 Zettaireach Token
+                  <input
+                    className="input-field"
+                    onBlur={(e) => e.target.value}
+                    type="text"
+                    id="zettai_x_token"
+                    name="zettai_x_token"
+                  />
                 </label>{' '}
                 <br />
                 <br />
