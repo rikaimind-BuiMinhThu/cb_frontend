@@ -16,6 +16,7 @@ import iconMessagePink from "assets/img/icon-mess/icon-message-chat-pink.png";
 import iconMessagePurple from "assets/img/icon-mess/icon-message-chat-purple.png";
 import iconMessageBlack from "assets/img/icon-mess/icon-message-chat-black.png";
 import iconMessageWhite from "assets/img/icon-mess/icon-message-chat-white.png";
+import api from "../../../api/api-management";
 import {
   CHATBOT_ACTIONS,
   NO_ERROR,
@@ -188,13 +189,13 @@ const PreviewFukushashiki = () => {
       user_input_id: state.uuid, 
       status: CONVERSTION_RESPONSE_STATUS.UN_FINISH,
     })
-    .then((res) => {
-      const status = res?.data?.data?.status;
+      .then((res) => {
+        const status = res?.data?.data?.status;
 
-      if (status) {
-        dispatch({ type: PREVIEW_ACTIONS.SET_CONVERSION_STATUS, payload: status });
-      }
-    });
+        if (status) {
+          dispatch({ type: PREVIEW_ACTIONS.SET_CONVERSION_STATUS, payload: status });
+        }
+      });
   }, [state.uuid, state.scenarioId, state.conversionStatus, state.isOpen]);
 
   // get default obj params
@@ -330,7 +331,7 @@ const PreviewFukushashiki = () => {
 
           return dispatch({
             type: PREVIEW_ACTIONS.UPDATE_NUMBER_ORDER_TO_UPSELL,
-            payload: {variables, objParam: actionData}
+            payload: { variables, objParam: actionData }
           });
         }
       default:
@@ -390,7 +391,7 @@ const PreviewFukushashiki = () => {
       })
   }, [state.prefecturesList, state.loadedStateFromSession]);
 
-    // For run errorJsCode
+  // For run errorJsCode
   useEffect(() => {
     if (!state.isUsedErrMsgByJs || !state.errMsgJsCode) return;
     executeLpJsCode(state.errMsgJsCode, state);
@@ -425,9 +426,9 @@ const PreviewFukushashiki = () => {
         const currentBotId = params.get("order_id") || params.get("bot_id") || Cookies.get("bot_id");
         if (currentBotId && currentBotId !== savedState.botId) {
           clearChatbotState();
-          dispatch ({type: PREVIEW_ACTIONS.SET_UPSELL_BOT_ID, payload: currentBotId});
+          dispatch({ type: PREVIEW_ACTIONS.SET_UPSELL_BOT_ID, payload: currentBotId });
           return getScenarioPreviewData(currentBotId, params.get("scenario_id"))
-          .then(extractStateFromPreviewResponse);
+            .then(extractStateFromPreviewResponse);
         };
 
         setConversionParamToLocalStorage(
@@ -447,7 +448,7 @@ const PreviewFukushashiki = () => {
               isUsingAmazonPay: params.get('is_using_amazon_pay')
             }
           });
-        }        
+        }
 
         const timerConfig = getTimerConfig();
         if (timerConfig) {
@@ -604,12 +605,12 @@ const PreviewFukushashiki = () => {
       savePrevOpenStatus("1");
       sendOpenChatbotCountRequest(state.scenarioId, deviceReceive);
     }
-    
+
     const timerChatbotStorage = getTimerConfig();
     setTimerChanges((timerChanges) => timerChatbotStorage || timerChanges);
 
     // post message to parent window
-    postMessageToParent({ isOpen: opening}, state);
+    postMessageToParent({ isOpen: opening }, state);
 
     if (state.alreadyOpenFirstTime) {
       if (!opening) {
@@ -714,7 +715,7 @@ const PreviewFukushashiki = () => {
       icon_mess,
       main_color: res.data.chatbot.main_color || res.data.chatbot.main_color_other,
       main_color_other: res.data.chatbot.main_color_other,
-      titleBubble:res.data.design_settings.title_bubble
+      titleBubble: res.data.design_settings.title_bubble
     };
   }
 
@@ -808,7 +809,7 @@ const PreviewFukushashiki = () => {
     return variables;
   }
 
-  const calculateTimerConfigDuration = (type, duration, options = {}) => {  
+  const calculateTimerConfigDuration = (type, duration, options = {}) => {
     const { timerLeft = 0, useTimerLeft = false } = options;
 
     if (!duration || !type) return 0;
@@ -818,7 +819,7 @@ const PreviewFukushashiki = () => {
       return 0;
     }
 
-    switch(type) {
+    switch (type) {
       case TIMER_TYPES.COUNTING_DOWN: {
         if (useTimerLeft) {
           return timerLeft;
@@ -834,7 +835,127 @@ const PreviewFukushashiki = () => {
     }
   }
 
-  const onClickNext = (clickedMsgIndex, clickedMsg) => {
+  const createOrAddLinesCart = async (allResponses) => {
+    const { objParam } = state;
+
+    const productResponse = allResponses.findLast(x =>
+      x.data_input_name === "text_with_thumbnail_image" ||
+      x.data_input_name === "product_purchase" ||
+      x.data_input_name === "product_purchase_select_option"
+    );
+
+    let product;
+    let quantity = 1;
+
+    if (productResponse && productResponse.text_value) {
+      const productsData = JSON.parse(productResponse.text_value);
+      product = productsData.products?.find(x =>
+        x?.id === productsData?.initial_selection?.[0] ||
+        x?.productVariantId === productsData?.value ||
+        x?.id === productsData?.value ||
+        x?.item_number === productsData?.value
+      );
+    }
+
+    if (!product) {
+      const productMsg = state.messagesList.find(m =>
+        m.message_content.some(c =>
+          ["product_purchase", "product_purchase_select_option", "text_with_thumbnail_image", "product_purchase_select_option"].includes(c.type)
+        )
+      );
+      if (productMsg) {
+        const content = productMsg.message_content.find(c => ["product_purchase", "product_purchase_select_option", "text_with_thumbnail_image", "product_purchase_select_option"].includes(c.type));
+        const type = content.type;
+        const productsData = content[type];
+        const selectedId = objParam[productsData?.save_input_content] || productsData?.value || productsData?.initial_selection?.[0];
+        product = productsData?.products?.find(p => p.id === selectedId || p.productVariantId === selectedId || p.item_number === selectedId);
+      }
+    }
+
+    const quantityItem = allResponses.findLast(x => x.data_input_name === "quantity");
+    quantity = quantityItem?.integer_value || objParam.quantity || productResponse?.integer_value || 1;
+
+    const email = allResponses.findLast(x => x.data_input_name === "email")?.string_value || objParam.email;
+    const phone = allResponses.findLast(x => x.data_input_name === "phone_number")?.string_value || objParam.phone_number;
+    const first_name = allResponses.findLast(x => x.data_input_name === "first_name")?.string_value || objParam.first_name;
+    const last_name = allResponses.findLast(x => x.data_input_name === "last_name")?.string_value || objParam.last_name;
+    const user_name = allResponses.findLast(x => x.data_input_name === "user_name")?.text_value || objParam.user_name;
+    const user_name_kana = allResponses.findLast(x => x.data_input_name === "user_name_kana")?.text_value || objParam.user_name_kana;
+    const zip_code_address = allResponses.findLast(x => x.data_input_name === "zip_code_address")?.text_value || objParam.zip_code_address;
+
+    if (product && email && zip_code_address) {
+      let phoneNumber = "";
+      if (phone) {
+        try {
+          const p = typeof phone === 'string' ? JSON.parse(phone) : phone;
+          phoneNumber = p?.value || (p?.value1 + p?.value2 + p?.value3) || phone;
+        } catch (e) {
+          phoneNumber = phone;
+        }
+      }
+
+      let firstName = first_name || "";
+      let lastName = last_name || "";
+
+      if (!firstName && !lastName && (user_name || user_name_kana)) {
+        try {
+          const nameData = user_name || user_name_kana;
+          const nameObj = typeof nameData === 'string' ? JSON.parse(nameData) : nameData;
+          firstName = nameObj?.valueRight || "";
+          lastName = nameObj?.valueLeft || "";
+        } catch (e) {
+          firstName = (user_name || user_name_kana);
+        }
+      }
+
+      let zip = "";
+      let province = "";
+      let city = "";
+      let address1 = "";
+      let address2 = "";
+      if (zip_code_address) {
+        try {
+          const addrObj = typeof zip_code_address === 'string' ? JSON.parse(zip_code_address) : zip_code_address;
+          zip = addrObj?.value_post_code || (addrObj?.value_post_code_left + addrObj?.value_post_code_right) || addrObj?.post_code;
+          province = addrObj?.value_prefecture || addrObj?.prefecture;
+          city = addrObj?.value_municipality || addrObj?.municipality;
+          address1 = addrObj?.value_address || addrObj?.address;
+          address2 = addrObj?.value_building_name || addrObj?.building_name;
+        } catch (e) { }
+      }
+
+      await api
+        .post('/api/v1/shopify/cart_create', {
+          first_name: firstName,
+          last_name: lastName,
+          email: email,
+          phone: phoneNumber,
+          zip: zip,
+          province: province,
+          city: city,
+          address1: address1,
+          address2: address2,
+          lines: [
+            {
+              "merchandiseId": product.productVariantId || product.id,
+              "quantity": quantity
+            }
+          ],
+          scenario_id: state.scenarioId,
+          uuid: state.uuid
+        })
+        .then(async res => {
+          console.log("Shopify cart_create Success:", res.data);
+          sessionStorage.setItem("cart", JSON.stringify(res?.data?.data))
+          const checkoutUrl = res?.data?.data?.cartCreate?.cart?.checkoutUrl;
+          if (checkoutUrl) {
+            window.open(checkoutUrl, '_blank');
+          }
+        })
+    }
+  }
+
+  const onClickNext = async (clickedMsgIndex, clickedMsg) => {
     savedChatbotState(state);
 
     const data = {
@@ -845,7 +966,7 @@ const PreviewFukushashiki = () => {
     };
 
     const validationResult = handleValidateField(clickedMsg, clickedMsgIndex);
-    
+
     if (!validationResult.isValid) {
       dispatch({
         type: PREVIEW_ACTIONS.SET_ERRORS,
@@ -855,21 +976,46 @@ const PreviewFukushashiki = () => {
     }
     const isBtnUpdateClick = clickedMsgIndex < state.renderMessagesList.length - 1;
 
-    sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
-    
+    const response = await sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
+
+    const updatedResponses = state.scenarioUserResponses.concat(response.data?.data || []);
+    dispatch({ type: PREVIEW_ACTIONS.SET_SCENARIO_USER_RESPONSES, payload: updatedResponses });
+
+
+    if (clickedMsg.message_content[0]?.type === 'button_submit' ||
+      clickedMsg.message_content[0]?.button_submit?.save_input_content === 'button_submit') {
+      await createOrAddLinesCart(updatedResponses);
+    }
+
+    let ga4EventCode = "";
+    if (clickedMsg.message_content) {
+      clickedMsg.message_content.forEach((content) => {
+        if (
+          content.is_event_tracking_script &&
+          content.event_tracking_script
+        ) {
+          ga4EventCode = content.event_tracking_script;
+        }
+      });
+    }
+
+    const fukuGA4 = convertToFukushashikiObject(data);
+    fukuGA4.ga4EventCode = ga4EventCode;
+    fukushashikiToLP(fukuGA4, state);
+
     if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
       executeLpJsCode(clickedMsg.jscode, state);
     }
 
-    if (clickedMsg.message_content[0]?.type === "button_submit" 
+    if (clickedMsg.message_content[0]?.type === "button_submit"
       && clickedMsg.message_content[0]?.button_submit_id) {
-        const buttonId = clickedMsg.message_content[0]?.button_submit_id;
+      const buttonId = clickedMsg.message_content[0]?.button_submit_id;
 
-        postMessageToParent({
-          action: CHATBOT_ACTIONS.CLICK_BUTTON,
-          actionData: buttonId,
-          isOpen: true,
-        }, state);
+      postMessageToParent({
+        action: CHATBOT_ACTIONS.CLICK_BUTTON,
+        actionData: buttonId,
+        isOpen: true,
+      }, state);
     }
 
     // For GINZA AIRA
@@ -883,10 +1029,10 @@ const PreviewFukushashiki = () => {
 
     dispatch({
       type: PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON,
-      payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn}
+      payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn }
     });
 
-    if (isClickedButtonSubmit || isClickedLastMessage) {      
+    if (isClickedButtonSubmit || isClickedLastMessage) {
       updateStatusConversion({
         scenario_id: state.scenarioId,
         user_input_id: state.uuid,
@@ -935,8 +1081,8 @@ const PreviewFukushashiki = () => {
 
     if (isOpen) {
       changeElementAttributeById([
-        { id: "sp-withdrawal-container", style: { display: "block" }},
-        { id: "sp-popup-zip-code-address", style: { display: "block" }}
+        { id: "sp-withdrawal-container", style: { display: "block" } },
+        { id: "sp-popup-zip-code-address", style: { display: "block" } }
       ]);
 
       newState = {
@@ -954,8 +1100,8 @@ const PreviewFukushashiki = () => {
     }
 
     changeElementAttributeById([
-      { id: "sp-withdrawal-container", style: { display: "none" }},
-      { id: "sp-popup-zip-code-address", style: { display: "none" }}
+      { id: "sp-withdrawal-container", style: { display: "none" } },
+      { id: "sp-popup-zip-code-address", style: { display: "none" } }
     ]);
   };
 
@@ -1052,7 +1198,8 @@ const PreviewFukushashiki = () => {
             }
             currentMsgIndex={state.currentMsgIndex}
             onClickNext={() => {
-              onClickNext(messageIndex, message)}
+              onClickNext(messageIndex, message)
+            }
             }
             onRenderCompleted={renderNextMessage}
             messageIndex={messageIndex}
@@ -1101,7 +1248,7 @@ const PreviewFukushashiki = () => {
           dangerouslySetInnerHTML={{ __html: htmlText }}
         />
       </div>
-    );   
+    );
   }
 
   const getBotHeaderIcon = () => {
@@ -1178,7 +1325,7 @@ const PreviewFukushashiki = () => {
         <div id="sp-header" style={headerStyle} className="sp-header">
           <div className="sp-header-left" onClick={onChatbotHeaderClick}>
             <div className="sp-body-bot-side-avatar sp-avatar-bt">
-              <img src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`} alt="bot-header-icon"/>
+              <img src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`} alt="bot-header-icon" />
             </div>
             <div className="sp-header-left-label">
               <div className="sp-header-left-label-sub-title">
@@ -1204,7 +1351,7 @@ const PreviewFukushashiki = () => {
           onCloseBot={() => onOpenPreview(false)}
         />
         {!!state.botInfor?.timer_config?.enable
-          && 
+          &&
           <div className="chatbot_timer_holder" style={{
             backgroundColor: bodyStyle.backgroundColor,
           }}>
@@ -1350,7 +1497,7 @@ const PreviewFukushashiki = () => {
           backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
           width: state.useFullWidthChatbotMobile ? "calc(100vw - 30px)" : "240px",
           height: state.useFullWidthChatbotMobile ? "75px" : "48px",
-          borderRadius: state.useFullWidthChatbotMobile ? "45px" :'35px',
+          borderRadius: state.useFullWidthChatbotMobile ? "45px" : '35px',
           display: "flex",
           justifyContent: "left",
           position: 'fixed',
@@ -1359,7 +1506,7 @@ const PreviewFukushashiki = () => {
         }}
       >
         <div className="sp-header-left" style={{ width: '100%', padding: state.useFullWidthChatbotMobile ? "15px" : '4px' }}>
-          <div className={state.useFullWidthChatbotMobile ? "fullwidth_mobile_chatbot sp-header-left-avatar sp-avatar" :"sp-header-left-avatar sp-avatar"} style={{ width: state.useFullWidthChatbotMobile ? "58px"  :'38px' }}>
+          <div className={state.useFullWidthChatbotMobile ? "fullwidth_mobile_chatbot sp-header-left-avatar sp-avatar" : "sp-header-left-avatar sp-avatar"} style={{ width: state.useFullWidthChatbotMobile ? "58px" : '38px' }}>
             <img
               src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
               alt="bot-header-icon"
@@ -1367,7 +1514,7 @@ const PreviewFukushashiki = () => {
           </div>
           <div>
             <div id="comment_bubble" className="sp-bubble">
-              <span style={{ fontSize: state.useFullWidthChatbotMobile ? "17px" :'14px', fontWeight: 700 }}>{state.botInfor.title}</span>
+              <span style={{ fontSize: state.useFullWidthChatbotMobile ? "17px" : '14px', fontWeight: 700 }}>{state.botInfor.title}</span>
             </div>
           </div>
           <div className="sp-header-right-arrow" style={{ marginLeft: 'auto' }}>

@@ -1018,45 +1018,55 @@ function ClientManagement() {
   }
 
   function checkFieldAdd(value, field) {
+    const element = document.getElementById(`newClient${field}ErrMsg`);
+    if (!element) {
+      return true;
+    }
     if (value === '') {
-      document.getElementById(`newClient${field}ErrMsg`).style.display = 'block';
-      document.getElementById(`newClient${field}ErrMsg`).innerHTML = `${field} 入力してください。`;
+      element.style.display = 'block';
+      element.innerHTML = `${field} 入力してください。`;
     } else if (value && value.length > 50) {
-      document.getElementById(`newClient${field}ErrMsg`).style.display = 'block';
-      document.getElementById(`newClient${field}ErrMsg`).innerHTML = `50文字以下入力してください。`;
+      element.style.display = 'block';
+      element.innerHTML = `50文字以下入力してください。`;
     } else {
-      document.getElementById(`newClient${field}ErrMsg`).style.display = 'none';
-      document.getElementById(`newClient${field}ErrMsg`).innerHTML = '';
+      element.style.display = 'none';
+      element.innerHTML = '';
       return true;
     }
   }
 
   function checkNameAdd(value, field) {
+    const element = document.getElementById(`newClient${field}ErrMsg`);
+    if (!element) {
+      return true;
+    }
     if (value === '') {
-      document.getElementById(`newClient${field}ErrMsg`).style.display = 'block';
-      document.getElementById(`newClient${field}ErrMsg`).innerHTML = `${field} 入力してください。`;
+      element.style.display = 'block';
+      element.innerHTML = `${field} 入力してください。`;
     } else if (value && value.length > 35) {
-      document.getElementById(`newClient${field}ErrMsg`).style.display = 'block';
-      document.getElementById(`newClient${field}ErrMsg`).innerHTML = `35文字以下入力してください。`;
+      element.style.display = 'block';
+      element.innerHTML = `35文字以下入力してください。`;
     } else {
-      document.getElementById(`newClient${field}ErrMsg`).style.display = 'none';
-      document.getElementById(`newClient${field}ErrMsg`).innerHTML = '';
+      element.style.display = 'none';
+      element.innerHTML = '';
       return true;
     }
   }
 
   function checkPasswordAdd(value, field) {
+    const element = document.getElementById(`newClient${field}ErrMsg`);
+    if (!element) {
+      return true;
+    }
     if (value === '') {
-      document.getElementById(`newClient${field}ErrMsg`).style.display = 'block';
-      document.getElementById(`newClient${field}ErrMsg`).innerHTML = `${field} 入力してください。`;
+      element.style.display = 'block';
+      element.innerHTML = `${field} 入力してください。`;
     } else if (value && value.length > 24) {
-      document.getElementById(`newClient${field}ErrMsg`).style.display = 'block';
-      document.getElementById(
-        `newClient${field}ErrMsg`
-      ).innerHTML = `24文字以下入力してください。6文字以上入力してください。`;
+      element.style.display = 'block';
+      element.innerHTML = `24文字以下入力してください。6文字以上入力してください。`;
     } else {
-      document.getElementById(`newClient${field}ErrMsg`).style.display = 'none';
-      document.getElementById(`newClient${field}ErrMsg`).innerHTML = '';
+      element.style.display = 'none';
+      element.innerHTML = '';
       return true;
     }
   }
@@ -1096,20 +1106,19 @@ function ClientManagement() {
   }
 
   function checkInputNumber(value, field) {
-    // var phoneRe = /^\d+$/;
+    const element = document.getElementById(`newClient${field}ErrMsg`);
+    if (!element) {
+      return true;
+    }
     if (value === '') {
-      document.getElementById(`newClient${field}ErrMsg`).style.display = 'block';
-      document.getElementById(
-        `newClient${field}ErrMsg`
-      ).innerHTML = `${field} を入力してください。`;
+      element.style.display = 'block';
+      element.innerHTML = `${field} を入力してください。`;
     } else if (parseInt(value) == isNaN) {
-      document.getElementById(`newClient${field}ErrMsg`).style.display = 'block';
-      document.getElementById(
-        `newClient${field}ErrMsg`
-      ).innerHTML = `${field} 番号になければなりません。`;
+      element.style.display = 'block';
+      element.innerHTML = `${field} 番号になければなりません。`;
     } else {
-      document.getElementById(`newClient${field}ErrMsg`).style.display = 'none';
-      document.getElementById(`newClient${field}ErrMsg`).innerHTML = '';
+      element.style.display = 'none';
+      element.innerHTML = '';
       return true;
     }
   }
@@ -1386,17 +1395,17 @@ function ClientManagement() {
     }
   };
 
-  function onSelectPlan(el){
+  function onSelectPlan(el) {
     let plan = plans.find((o) => o.code == el.target.value);
-    if(plan){
+    if (plan) {
       document.getElementById("newPlanPrice").value = plan.price;
-      if(isOpen){
+      if (isOpen) {
         setPrice(plan.price);
       }
     }
   }
-  function gotoPaymentDetail(item){
-    window.location.href = '/admin/client-payment-detail/'+item.id;
+  function gotoPaymentDetail(item) {
+    window.location.href = '/admin/client-payment-detail/' + item.id;
   }
 
   const items = dataList.clients;
@@ -1557,7 +1566,7 @@ function ClientManagement() {
                             </td>
                             <td>{item.name}</td>
                             <td>
-                              {plans.find((el)=> el.code === item.plan) && plans.find((el)=> el.code === item.plan).name}
+                              {plans.find((el) => el.code === item.plan) && plans.find((el) => el.code === item.plan).name}
                             </td>
                             <td>
                               {item?.status === 'pause'
@@ -1610,45 +1619,45 @@ function ClientManagement() {
                             <td>{item.last_sign_in_at?.replaceAll('/', '-')}</td>
                             <td className="actionListClient">
                               <div style={{ display: 'flex' }}>
-                                <div style={{marginRight: '30px', marginTop: '5px'}}>
+                                <div style={{ marginRight: '30px', marginTop: '5px' }}>
                                   <MDBIcon fas icon="yen-sign"
-                                   style={{
+                                    style={{
                                       fontSize: '1.5em',
-                                    }}  
-                                    onClick={(e) => gotoPaymentDetail(item)}/>
+                                    }}
+                                    onClick={(e) => gotoPaymentDetail(item)} />
                                 </div>
 
-                                <div style={{marginRight: '30px', marginTop: '5px'}}>
+                                <div style={{ marginRight: '30px', marginTop: '5px' }}>
                                   <MDBIcon
-                                   onClick={(e) => getUserDetail(item)}
-                                   style={{
+                                    onClick={(e) => getUserDetail(item)}
+                                    style={{
                                       fontSize: '1.5em',
                                     }}
-                                      far
-                                      icon="eye"
-                                    />
-                                </div>
-                                
-                                <div style={{marginRight: '30px', marginTop: '5px'}}>
-                                  <MDBIcon
-                                   onClick={(e) => updateClientUser(item)}
-                                   style={{
-                                      fontSize: '1.5em',
-                                    }}
-                                      far
-                                      icon="edit"
-                                    />
+                                    far
+                                    icon="eye"
+                                  />
                                 </div>
 
-                                <div style={{marginTop: '5px'}}>
+                                <div style={{ marginRight: '30px', marginTop: '5px' }}>
                                   <MDBIcon
-                                   onClick={(e) => deleteClientPopup(item.id)}
-                                   style={{
+                                    onClick={(e) => updateClientUser(item)}
+                                    style={{
                                       fontSize: '1.5em',
                                     }}
-                                      far
-                                      icon="trash-alt"
-                                    />
+                                    far
+                                    icon="edit"
+                                  />
+                                </div>
+
+                                <div style={{ marginTop: '5px' }}>
+                                  <MDBIcon
+                                    onClick={(e) => deleteClientPopup(item.id)}
+                                    style={{
+                                      fontSize: '1.5em',
+                                    }}
+                                    far
+                                    icon="trash-alt"
+                                  />
                                 </div>
                               </div>
                             </td>
@@ -1753,7 +1762,7 @@ function ClientManagement() {
                     id="plan"
                     onChange={onSelectPlan}
                   >
-                  {plans.map(e => <option key={e.id} value={e.code}>{e.name}プラン</option>)}
+                    {plans.map(e => <option key={e.id} value={e.code}>{e.name}プラン</option>)}
                   </select>
                 </label>
                 <br />
@@ -2634,7 +2643,7 @@ function ClientManagement() {
                     <option onClick={() => setSizeAfterSelectCartSystem()} value="ec_force">
                       Ec-Force
                     </option>
-                    <option onClick={() => setSizeAfterSelectCartSystem()} value="repeat_plus"> 
+                    <option onClick={() => setSizeAfterSelectCartSystem()} value="repeat_plus">
                       リピートPLUS
                     </option>
                   </select>
@@ -2702,7 +2711,7 @@ function ClientManagement() {
                     onBlur={(e) => e.target.value}
                     type="text"
                     id="zettai_reach_client_id"
-                  name="zettai_reach_client_id"
+                    name="zettai_reach_client_id"
                   />
                 </label>
                 <br />
@@ -2714,7 +2723,7 @@ function ClientManagement() {
                     onBlur={(e) => e.target.value}
                     type="text"
                     id="zettai_x_token"
-                  name="zettai_x_token"
+                    name="zettai_x_token"
                   />
                 </label>
                 <br />
@@ -3659,7 +3668,7 @@ function ClientManagement() {
                 <br />
                 <br />
                 <label className="label-input">
-                 Zettaireach Bot id
+                  Zettaireach Bot id
                   <input
                     className="input-field"
                     onBlur={(e) => e.target.value}
@@ -3671,7 +3680,7 @@ function ClientManagement() {
                 <br />
                 <br />
                 <label className="label-input">
-                 Zettaireach Client id
+                  Zettaireach Client id
                   <input
                     className="input-field"
                     onBlur={(e) => e.target.value}
@@ -3683,7 +3692,7 @@ function ClientManagement() {
                 <br />
                 <br />
                 <label className="label-input">
-                 Zettaireach Token
+                  Zettaireach Token
                   <input
                     className="input-field"
                     onBlur={(e) => e.target.value}
