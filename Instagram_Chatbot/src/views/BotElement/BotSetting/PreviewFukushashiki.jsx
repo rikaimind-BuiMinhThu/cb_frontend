@@ -189,13 +189,13 @@ const PreviewFukushashiki = () => {
       user_input_id: state.uuid, 
       status: CONVERSTION_RESPONSE_STATUS.UN_FINISH,
     })
-      .then((res) => {
-        const status = res?.data?.data?.status;
+    .then((res) => {
+      const status = res?.data?.data?.status;
 
-        if (status) {
-          dispatch({ type: PREVIEW_ACTIONS.SET_CONVERSION_STATUS, payload: status });
-        }
-      });
+      if (status) {
+        dispatch({ type: PREVIEW_ACTIONS.SET_CONVERSION_STATUS, payload: status });
+      }
+    });
   }, [state.uuid, state.scenarioId, state.conversionStatus, state.isOpen]);
 
   // get default obj params
@@ -331,7 +331,7 @@ const PreviewFukushashiki = () => {
 
           return dispatch({
             type: PREVIEW_ACTIONS.UPDATE_NUMBER_ORDER_TO_UPSELL,
-            payload: { variables, objParam: actionData }
+            payload: {variables, objParam: actionData}
           });
         }
       default:
@@ -391,7 +391,7 @@ const PreviewFukushashiki = () => {
       })
   }, [state.prefecturesList, state.loadedStateFromSession]);
 
-  // For run errorJsCode
+    // For run errorJsCode
   useEffect(() => {
     if (!state.isUsedErrMsgByJs || !state.errMsgJsCode) return;
     executeLpJsCode(state.errMsgJsCode, state);
@@ -426,9 +426,9 @@ const PreviewFukushashiki = () => {
         const currentBotId = params.get("order_id") || params.get("bot_id") || Cookies.get("bot_id");
         if (currentBotId && currentBotId !== savedState.botId) {
           clearChatbotState();
-          dispatch({ type: PREVIEW_ACTIONS.SET_UPSELL_BOT_ID, payload: currentBotId });
+          dispatch ({type: PREVIEW_ACTIONS.SET_UPSELL_BOT_ID, payload: currentBotId});
           return getScenarioPreviewData(currentBotId, params.get("scenario_id"))
-            .then(extractStateFromPreviewResponse);
+          .then(extractStateFromPreviewResponse);
         };
 
         setConversionParamToLocalStorage(
@@ -610,7 +610,7 @@ const PreviewFukushashiki = () => {
     setTimerChanges((timerChanges) => timerChatbotStorage || timerChanges);
 
     // post message to parent window
-    postMessageToParent({ isOpen: opening }, state);
+    postMessageToParent({ isOpen: opening}, state);
 
     if (state.alreadyOpenFirstTime) {
       if (!opening) {
@@ -715,7 +715,7 @@ const PreviewFukushashiki = () => {
       icon_mess,
       main_color: res.data.chatbot.main_color || res.data.chatbot.main_color_other,
       main_color_other: res.data.chatbot.main_color_other,
-      titleBubble: res.data.design_settings.title_bubble
+      titleBubble:res.data.design_settings.title_bubble
     };
   }
 
@@ -819,7 +819,7 @@ const PreviewFukushashiki = () => {
       return 0;
     }
 
-    switch (type) {
+    switch(type) {
       case TIMER_TYPES.COUNTING_DOWN: {
         if (useTimerLeft) {
           return timerLeft;
@@ -1029,7 +1029,7 @@ const PreviewFukushashiki = () => {
 
     dispatch({
       type: PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON,
-      payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn }
+      payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn}
     });
 
     if (isClickedButtonSubmit || isClickedLastMessage) {
@@ -1081,8 +1081,8 @@ const PreviewFukushashiki = () => {
 
     if (isOpen) {
       changeElementAttributeById([
-        { id: "sp-withdrawal-container", style: { display: "block" } },
-        { id: "sp-popup-zip-code-address", style: { display: "block" } }
+        { id: "sp-withdrawal-container", style: { display: "block" }},
+        { id: "sp-popup-zip-code-address", style: { display: "block" }}
       ]);
 
       newState = {
@@ -1100,8 +1100,8 @@ const PreviewFukushashiki = () => {
     }
 
     changeElementAttributeById([
-      { id: "sp-withdrawal-container", style: { display: "none" } },
-      { id: "sp-popup-zip-code-address", style: { display: "none" } }
+      { id: "sp-withdrawal-container", style: { display: "none" }},
+      { id: "sp-popup-zip-code-address", style: { display: "none" }}
     ]);
   };
 
@@ -1198,8 +1198,7 @@ const PreviewFukushashiki = () => {
             }
             currentMsgIndex={state.currentMsgIndex}
             onClickNext={() => {
-              onClickNext(messageIndex, message)
-            }
+              onClickNext(messageIndex, message)}
             }
             onRenderCompleted={renderNextMessage}
             messageIndex={messageIndex}
@@ -1325,7 +1324,7 @@ const PreviewFukushashiki = () => {
         <div id="sp-header" style={headerStyle} className="sp-header">
           <div className="sp-header-left" onClick={onChatbotHeaderClick}>
             <div className="sp-body-bot-side-avatar sp-avatar-bt">
-              <img src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`} alt="bot-header-icon" />
+              <img src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`} alt="bot-header-icon"/>
             </div>
             <div className="sp-header-left-label">
               <div className="sp-header-left-label-sub-title">
@@ -1497,7 +1496,7 @@ const PreviewFukushashiki = () => {
           backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
           width: state.useFullWidthChatbotMobile ? "calc(100vw - 30px)" : "240px",
           height: state.useFullWidthChatbotMobile ? "75px" : "48px",
-          borderRadius: state.useFullWidthChatbotMobile ? "45px" : '35px',
+          borderRadius: state.useFullWidthChatbotMobile ? "45px" :'35px',
           display: "flex",
           justifyContent: "left",
           position: 'fixed',
@@ -1506,7 +1505,7 @@ const PreviewFukushashiki = () => {
         }}
       >
         <div className="sp-header-left" style={{ width: '100%', padding: state.useFullWidthChatbotMobile ? "15px" : '4px' }}>
-          <div className={state.useFullWidthChatbotMobile ? "fullwidth_mobile_chatbot sp-header-left-avatar sp-avatar" : "sp-header-left-avatar sp-avatar"} style={{ width: state.useFullWidthChatbotMobile ? "58px" : '38px' }}>
+          <div className={state.useFullWidthChatbotMobile ? "fullwidth_mobile_chatbot sp-header-left-avatar sp-avatar" :"sp-header-left-avatar sp-avatar"} style={{ width: state.useFullWidthChatbotMobile ? "58px" : '38px' }}>
             <img
               src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
               alt="bot-header-icon"
@@ -1514,7 +1513,7 @@ const PreviewFukushashiki = () => {
           </div>
           <div>
             <div id="comment_bubble" className="sp-bubble">
-              <span style={{ fontSize: state.useFullWidthChatbotMobile ? "17px" : '14px', fontWeight: 700 }}>{state.botInfor.title}</span>
+              <span style={{ fontSize: state.useFullWidthChatbotMobile ? "17px" :'14px', fontWeight: 700 }}>{state.botInfor.title}</span>
             </div>
           </div>
           <div className="sp-header-right-arrow" style={{ marginLeft: 'auto' }}>
