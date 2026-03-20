@@ -79,6 +79,7 @@ import {
 } from "./PreviewFukushashiki/LPUtils";
 import { convertToFukushashikiObject } from "./PreviewFukushashiki/FukushashikiDataConverterUtils";
 import { handleValidateField } from "./PreviewFukushashiki/ValidationUtils";
+import { createOrAddLinesCart } from "./ShopifyUtils";
 
 const clearChatbotState = () => {
   sessionStorage.removeItem('chatbotH');
@@ -835,125 +836,6 @@ const PreviewFukushashiki = () => {
     }
   }
 
-  const createOrAddLinesCart = async (allResponses) => {
-    const { objParam } = state;
-
-    const productResponse = allResponses.findLast(x =>
-      x.data_input_name === "text_with_thumbnail_image" ||
-      x.data_input_name === "product_purchase" ||
-      x.data_input_name === "product_purchase_select_option"
-    );
-
-    let product;
-    let quantity = 1;
-
-    if (productResponse && productResponse.text_value) {
-      const productsData = JSON.parse(productResponse.text_value);
-      product = productsData.products?.find(x =>
-        x?.id === productsData?.initial_selection?.[0] ||
-        x?.productVariantId === productsData?.value ||
-        x?.id === productsData?.value ||
-        x?.item_number === productsData?.value
-      );
-    }
-
-    if (!product) {
-      const productMsg = state.messagesList.find(m =>
-        m.message_content.some(c =>
-          ["product_purchase", "product_purchase_select_option", "text_with_thumbnail_image", "product_purchase_select_option"].includes(c.type)
-        )
-      );
-      if (productMsg) {
-        const content = productMsg.message_content.find(c => ["product_purchase", "product_purchase_select_option", "text_with_thumbnail_image", "product_purchase_select_option"].includes(c.type));
-        const type = content.type;
-        const productsData = content[type];
-        const selectedId = objParam[productsData?.save_input_content] || productsData?.value || productsData?.initial_selection?.[0];
-        product = productsData?.products?.find(p => p.id === selectedId || p.productVariantId === selectedId || p.item_number === selectedId);
-      }
-    }
-
-    const quantityItem = allResponses.findLast(x => x.data_input_name === "quantity");
-    quantity = quantityItem?.integer_value || objParam.quantity || productResponse?.integer_value || 1;
-
-    const email = allResponses.findLast(x => x.data_input_name === "email")?.string_value || objParam.email;
-    const phone = allResponses.findLast(x => x.data_input_name === "phone_number")?.string_value || objParam.phone_number;
-    const first_name = allResponses.findLast(x => x.data_input_name === "first_name")?.string_value || objParam.first_name;
-    const last_name = allResponses.findLast(x => x.data_input_name === "last_name")?.string_value || objParam.last_name;
-    const user_name = allResponses.findLast(x => x.data_input_name === "user_name")?.text_value || objParam.user_name;
-    const user_name_kana = allResponses.findLast(x => x.data_input_name === "user_name_kana")?.text_value || objParam.user_name_kana;
-    const zip_code_address = allResponses.findLast(x => x.data_input_name === "zip_code_address")?.text_value || objParam.zip_code_address;
-
-    if (product && email && zip_code_address) {
-      let phoneNumber = "";
-      if (phone) {
-        try {
-          const p = typeof phone === 'string' ? JSON.parse(phone) : phone;
-          phoneNumber = p?.value || (p?.value1 + p?.value2 + p?.value3) || phone;
-        } catch (e) {
-          phoneNumber = phone;
-        }
-      }
-
-      let firstName = first_name || "";
-      let lastName = last_name || "";
-
-      if (!firstName && !lastName && (user_name || user_name_kana)) {
-        try {
-          const nameData = user_name || user_name_kana;
-          const nameObj = typeof nameData === 'string' ? JSON.parse(nameData) : nameData;
-          firstName = nameObj?.valueRight || "";
-          lastName = nameObj?.valueLeft || "";
-        } catch (e) {
-          firstName = (user_name || user_name_kana);
-        }
-      }
-
-      let zip = "";
-      let province = "";
-      let city = "";
-      let address1 = "";
-      let address2 = "";
-      if (zip_code_address) {
-        try {
-          const addrObj = typeof zip_code_address === 'string' ? JSON.parse(zip_code_address) : zip_code_address;
-          zip = addrObj?.value_post_code || (addrObj?.value_post_code_left + addrObj?.value_post_code_right) || addrObj?.post_code;
-          province = addrObj?.value_prefecture || addrObj?.prefecture;
-          city = addrObj?.value_municipality || addrObj?.municipality;
-          address1 = addrObj?.value_address || addrObj?.address;
-          address2 = addrObj?.value_building_name || addrObj?.building_name;
-        } catch (e) { }
-      }
-
-      await api
-        .post('/api/v1/shopify/cart_create', {
-          first_name: firstName,
-          last_name: lastName,
-          email: email,
-          phone: phoneNumber,
-          zip: zip,
-          province: province,
-          city: city,
-          address1: address1,
-          address2: address2,
-          lines: [
-            {
-              "merchandiseId": product.productVariantId || product.id,
-              "quantity": quantity
-            }
-          ],
-          scenario_id: state.scenarioId,
-          uuid: state.uuid
-        })
-        .then(async res => {
-          console.log("Shopify cart_create Success:", res.data);
-          sessionStorage.setItem("cart", JSON.stringify(res?.data?.data))
-          const checkoutUrl = res?.data?.data?.cartCreate?.cart?.checkoutUrl;
-          if (checkoutUrl) {
-            window.open(checkoutUrl, '_blank');
-          }
-        })
-    }
-  }
 
   const onClickNext = async (clickedMsgIndex, clickedMsg) => {
     savedChatbotState(state);
@@ -984,7 +866,7 @@ const PreviewFukushashiki = () => {
 
     if (clickedMsg.message_content[0]?.type === 'button_submit' ||
       clickedMsg.message_content[0]?.button_submit?.save_input_content === 'button_submit') {
-      await createOrAddLinesCart(updatedResponses);
+      await createOrAddLinesCart(updatedResponses, state);
     }
 
     let ga4EventCode = "";
