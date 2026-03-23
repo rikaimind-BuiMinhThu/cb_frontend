@@ -20,9 +20,9 @@ const findShopifyProduct = (allResponses, state) => {
   return null;
 };
 
-const getResponseValue = (responses, name, param) => 
-  responses.findLast(x => x.data_input_name === name)?.string_value || 
-  responses.findLast(x => x.data_input_name === name)?.text_value || 
+const getResponseValue = (responses, name, param) =>
+  responses.findLast(x => x.data_input_name === name)?.string_value ||
+  responses.findLast(x => x.data_input_name === name)?.text_value ||
   param;
 
 const parseAddress = (zip_code_address) => {
@@ -58,10 +58,10 @@ const createOrAddLinesCart = async (allResponses, state) => {
     if (phone && typeof phone !== "string") {
       phoneNumber = phone.value || (phone.value1 + phone.value2 + phone.value3);
     } else if (typeof phone === "string" && phone.startsWith("{")) {
-       try { 
-         const p = JSON.parse(phone); 
-         phoneNumber = p.value || (p.value1 + p.value2 + p.value3) || phone; 
-       } catch(e){}
+      try {
+        const p = JSON.parse(phone);
+        phoneNumber = p.value || (p.value1 + p.value2 + p.value3) || phone;
+      } catch (e) { }
     }
 
     const { firstName, lastName } = parseName(allResponses, objParam);
@@ -76,7 +76,10 @@ const createOrAddLinesCart = async (allResponses, state) => {
     }).then(res => {
       sessionStorage.setItem("cart", JSON.stringify(res?.data?.data));
       const url = res?.data?.data?.cartCreate?.cart?.checkoutUrl;
-      if (url) window.open(url, "_blank");
+      if (url) {
+        const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
+        if (newWindow) newWindow.opener = null;
+      }
       return res;
     });
   }
