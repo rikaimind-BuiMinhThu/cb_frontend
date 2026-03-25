@@ -597,33 +597,38 @@ const displayPopup = async () => {
         iframe.width = "100%";
         // iframe.height = "620px";
         iframe.height = "100%";
+        iframe.style.setProperty("width", "100%", "important");
+        iframe.style.setProperty("height", "100%", "important");
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
       } else if (e.data.isOpen) {
-        iframe.width =
-          chatbotW && (chatbotRight !== null)
-            ? `${parseInt(chatbotW) + parseInt(chatbotRight)}px`
-            : "460px";
-        iframe.height =
-          chatbotH && (chatbotBottom !== null)
-            ? `${parseInt(chatbotH) + parseInt(chatbotBottom)}px`
-            : "700px";
+        let w = chatbotW && (chatbotRight !== null) ? `${parseInt(chatbotW) + parseInt(chatbotRight)}px` : "460px";
+        let h = chatbotH && (chatbotBottom !== null) ? `${parseInt(chatbotH) + parseInt(chatbotBottom)}px` : "700px";
+        iframe.width = w;
+        iframe.height = h;
+        iframe.style.setProperty("width", w, "important");
+        iframe.style.setProperty("height", h, "important");
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
       } else if (!e.data.isOpen && mobileCheck()) {
         const useMoblieFullwidth = (typeof e.data.useMoblieFullwidth === 'boolean')
           ? e.data.useMoblieFullwidth
           : (sessionStorage.getItem("useFullwidthChatbotMobile") === "true");
-        iframe.width = useMoblieFullwidth ? "100%" : "250px";
-        iframe.height = useMoblieFullwidth ? "85px" : "58px";
+        let w = useMoblieFullwidth ? "100%" : "250px";
+        let h = useMoblieFullwidth ? "85px" : "58px";
+        iframe.width = w;
+        iframe.height = h;
+        iframe.style.setProperty("width", w, "important");
+        iframe.style.setProperty("height", h, "important");
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
       } else if (!e.data.isOpen) {
-        iframe.width =
-          chatbotRight
-            ? `${parseInt(chatbotRight) + 360}px`
-            : "360px";
-        iframe.height = chatbotBottom ? `${parseInt(chatbotBottom) + 77}px` : "77px";
+        let w = chatbotRight ? `${parseInt(chatbotRight) + 400}px` : "400px";
+        let h = chatbotBottom ? `${parseInt(chatbotBottom) + 85}px` : "85px";
+        iframe.width = w;
+        iframe.height = h;
+        iframe.style.setProperty("width", w, "important");
+        iframe.style.setProperty("height", h, "important");
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
       }
