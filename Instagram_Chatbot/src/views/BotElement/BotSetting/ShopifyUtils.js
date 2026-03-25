@@ -40,10 +40,27 @@ const parseAddress = (zip_code_address) => {
 };
 
 const parseName = (allResponses, objParam) => {
-  const first = getResponseValue(allResponses, "first_name", objParam.first_name);
-  const last = getResponseValue(allResponses, "last_name", objParam.last_name);
-  if (first || last) return { firstName: first || "", lastName: last || "" };
-  return { firstName: "", lastName: "" };
+  let first = getResponseValue(allResponses, "first_name", '');
+  let last = getResponseValue(allResponses, "last_name", '');
+
+  if (!first || !last) {
+    const uName = getResponseValue(allResponses, "user_name", objParam.user_name);
+
+    const parse = (v) => {
+      if (typeof v === "string" && v.startsWith("{")) {
+        try { return JSON.parse(v); } catch (e) { return null; }
+      }
+      return v;
+    };
+
+    const n = parse(uName);
+    if (n) {
+      if (!first) first = n?.valueRight;
+      if (!last) last = n?.valueLeft;
+    }
+  }
+
+  return { firstName: first || "", lastName: last || "" };
 };
 
 const createOrAddLinesCart = async (allResponses, state) => {
