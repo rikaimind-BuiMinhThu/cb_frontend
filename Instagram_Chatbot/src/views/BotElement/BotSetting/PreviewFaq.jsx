@@ -905,7 +905,7 @@ const PreviewFaq = () => {
         style={containerStyle}
       >
         <div id="sp-header" style={headerStyle} className="sp-header">
-          <div className="sp-header-left" onClick={onChatbotHeaderClick}>
+          <div className="sp-header-left" onClick={() => onOpenPreview(!state.isOpen)}>
             <div className="sp-body-bot-side-avatar sp-avatar-bt">
               <img src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`} alt="bot-header-icon"/>
             </div>
@@ -916,7 +916,7 @@ const PreviewFaq = () => {
               <div className="sp-header-left-label-title">{state.botInfor?.titleBubble}</div>
             </div>
           </div>
-          <div className="sp-header-right" onClick={onChatbotHeaderClick}>
+          <div className="sp-header-right" onClick={() => onOpenPreview(!state.isOpen)}>
             <div className="sp-header-right-arrow">
               {state.isOpen ? (
                 <MDBIcon fas icon="chevron-circle-down" />
