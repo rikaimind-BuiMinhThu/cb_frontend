@@ -3,6 +3,7 @@ import { CHATBOT_ACTIONS } from "../PreviewComponent/Constants";
 import { isTorizenLpAmazonData, isTorizenLP } from "../PreviewComponent/TorizenUtils";
 import { isBlissLpAmazonData, isBlissLP } from "../PreviewComponent/BlissUtils";
 import { isPhystechLpAmazonData, isPhystechLP } from "../PreviewComponent/PhysTechUtils";
+import { isYuwaeruLpAmazonData, isYuwaeruLP } from "../PreviewComponent/YuwaeruUtils";
 import { convertToFukushashikiObject } from "./FukushashikiDataConverterUtils";
 import { isUserMessage, sendOpenChatbotCountRequest } from "../PreviewComponent/Utils";
 
@@ -51,6 +52,8 @@ const fukushashikiSavedStateToLp = (savedState, params, state) => {
         if (isBlissLP(lpUrl) && isBlissLpAmazonData(message)) return;
         // For Phystech
         if (isPhystechLP(lpUrl) && isPhystechLpAmazonData(message)) return;
+        // For Yuwaeru
+        if (isYuwaeruLP(lpUrl) && isYuwaeruLpAmazonData(message)) return;
       }
       
       if (!message.hidden) {

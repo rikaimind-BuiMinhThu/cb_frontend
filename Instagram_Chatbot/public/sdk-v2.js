@@ -446,6 +446,30 @@ const isPhystechLp = (url) => {
 
   return domains.some(domain => url.includes(domain));
 }
+
+const isTorizenLP = (url) => {
+  const torizenDomains = [
+    // Comment out if you want to test torizen in localhost
+    // "localhost:8000",
+    // "commerceforce.co.jp",
+    "hana.inuneko-sukoyaka.jp",
+    "sb.inuneko-sukoyaka.jp"
+  ];
+
+  return torizenDomains.some(domain => url.includes(domain));
+}
+
+const isYuwaeruLP = (url) => {
+  const domains = [
+    // Comment out if you want to test yuwaeru in localhost
+    // "localhost:8000",
+    // "commerceforce.co.jp",
+    "store.nekase-genmai.com/",
+  ];
+
+  return domains.some(domain => url.includes(domain));
+}
+
 const displayPopup = async () => {
   const device =
     !tabletCheck() && !mobileCheck()
@@ -502,17 +526,18 @@ const displayPopup = async () => {
 
   // only for amazon
   // add param amazonCheckoutSessionId to iframe src
-  const isTorizenLpUseAmazonPay = getParam('amazonCheckoutSessionId');
+  const amazonCheckSessionId = getParam('amazonCheckoutSessionId');
 
-  if (isTorizenLpUseAmazonPay) {
+  if (amazonCheckSessionId) {
     iframe.src += `&is_using_amazon_pay=true`;
     // only for subscstore cart system, torizen san
     // loop for waiting data is filled to lp form
     // wait 20 times
     let count = 0;
     const interval = setInterval(() => {
-      const isTorizenLpAmazonDataFilled = document.querySelector("input#jsUkProfileFamilyName")?.value;
-      if (isTorizenLpAmazonDataFilled  && count < 20) {
+      const isTorizenLpAmazonDataFilled = isTorizenLP(window.location.href) && document.querySelector("input#jsUkProfileFamilyName")?.value;
+      const isYuwaeruLpAmazonDataFilled = isYuwaeruLP(window.location.href) && document.querySelector("input#ctl00_ContentPlaceHolder1_ucInputForm_rCartList_ctl00_tbOwnerName1")?.value;
+      if ((isTorizenLpAmazonDataFilled || isYuwaeruLpAmazonDataFilled) && count < 20) {
         appendIframeToBody(iframe);
         clearInterval(interval);
       }

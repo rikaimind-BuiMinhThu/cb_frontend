@@ -13,6 +13,7 @@ import { isBotMessage, isUserMessage, getNextUserMsg } from '../PreviewComponent
 import { mapAmazonPayDataToMessagesList } from '../PreviewComponent/TorizenUtils';
 import { mapAmazonPayDataToMessagesListForBliss } from '../PreviewComponent/BlissUtils';
 import { mapAmazonPayDataToMessagesListForPhystech } from '../PreviewComponent/PhysTechUtils';
+import { mapAmazonPayDataToMessagesListForYuwaeru } from '../PreviewComponent/YuwaeruUtils';
 import {
   RENDER_CHATBOT_CONFIG,
   GETTING_ERROR_NOTIFICATION,
@@ -251,6 +252,10 @@ const PreviewFukushashikiReducer = (state, action) => {
       const newMessagesListForPhystech = mapAmazonPayDataToMessagesListForPhystech(action.payload, state.messagesList, state.prefecturesList);
       const renderMessagesListForPhystech = newMessagesListForPhystech.slice(0, state.currentMsgIndex + 1);
       return { ...state, messagesList: newMessagesListForPhystech, renderMessagesList: renderMessagesListForPhystech};
+    case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
+      const newMessagesListForYuwaeru = mapAmazonPayDataToMessagesListForYuwaeru(action.payload, state.messagesList, state.prefecturesList);
+      const renderMessagesListForYuwaeru = newMessagesListForYuwaeru.slice(0, state.currentMsgIndex + 1);
+      return { ...state, messagesList: newMessagesListForYuwaeru, renderMessagesList: renderMessagesListForYuwaeru};
     case PREVIEW_ACTIONS.UPDATE_AFTER_CHANGE_VALUE: {
       const { contentIndex, contentType, value, field, subField1, subField2, message } = action.payload;
       const newState = {
