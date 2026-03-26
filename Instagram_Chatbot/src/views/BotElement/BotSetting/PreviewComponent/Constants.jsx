@@ -261,6 +261,7 @@ const RANGE_TEXT_VALIDATE = {
 
 const CART_SYSTEM = {
   EC_FORCE: 'ec_force',
+  SHOPIFY: 'shopify',
 }
 
 export {

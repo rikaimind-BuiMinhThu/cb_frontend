@@ -172,6 +172,7 @@ const previewInitialState = {
   isUpsell: false,
   progressBarMaxIndex: null,
   isNotAutoScroll: false,
+  cartSystem: params.get("cartSystem") || "",
 };
 
 
@@ -857,33 +858,38 @@ const PreviewFukushashiki = () => {
       return sendErrorLogToServer(data);
     }
     const isBtnUpdateClick = clickedMsgIndex < state.renderMessagesList.length - 1;
+    const isShopify = state.cartSystem === CART_SYSTEM.SHOPIFY;
 
-    const response = await sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
+    let updatedResponses = state.scenarioUserResponses;
 
-    const updatedResponses = state.scenarioUserResponses.concat(response.data?.data || []);
-    dispatch({ type: PREVIEW_ACTIONS.SET_SCENARIO_USER_RESPONSES, payload: updatedResponses });
+    if (isShopify) {
+      const response = await sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
+      updatedResponses = state.scenarioUserResponses.concat(response.data?.data || []);
+      dispatch({ type: PREVIEW_ACTIONS.SET_SCENARIO_USER_RESPONSES, payload: updatedResponses });
 
-
-    if (clickedMsg.message_content[0]?.type === 'button_submit' ||
-      clickedMsg.message_content[0]?.button_submit?.save_input_content === 'button_submit') {
-      await createOrAddLinesCart(updatedResponses, state);
+      if (clickedMsg.message_content[0]?.type === 'button_submit' ||
+        clickedMsg.message_content[0]?.button_submit?.save_input_content === 'button_submit') {
+        await createOrAddLinesCart(updatedResponses, state);
+      }
+    } else {
+      sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
     }
 
-    let ga4EventCode = "";
-    if (clickedMsg.message_content) {
-      clickedMsg.message_content.forEach((content) => {
-        if (
-          content.is_event_tracking_script &&
-          content.event_tracking_script
-        ) {
-          ga4EventCode = content.event_tracking_script;
-        }
-      });
-    }
+      let ga4EventCode = "";
+      if (clickedMsg.message_content) {
+        clickedMsg.message_content.forEach((content) => {
+          if (
+            content.is_event_tracking_script &&
+            content.event_tracking_script
+          ) {
+            ga4EventCode = content.event_tracking_script;
+          }
+        });
+      }
 
-    const fukuGA4 = convertToFukushashikiObject(data);
-    fukuGA4.ga4EventCode = ga4EventCode;
-    fukushashikiToLP(fukuGA4, state);
+      const fukuGA4 = convertToFukushashikiObject(data);
+      fukuGA4.ga4EventCode = ga4EventCode;
+      fukushashikiToLP(fukuGA4, state);
 
     if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
       executeLpJsCode(clickedMsg.jscode, state);
@@ -891,13 +897,15 @@ const PreviewFukushashiki = () => {
 
     if (clickedMsg.message_content[0]?.type === "button_submit"
       && clickedMsg.message_content[0]?.button_submit_id) {
-      const buttonId = clickedMsg.message_content[0]?.button_submit_id;
+        const buttonId = clickedMsg.message_content[0]?.button_submit_id;
 
-      postMessageToParent({
-        action: CHATBOT_ACTIONS.CLICK_BUTTON,
-        actionData: buttonId,
-        isOpen: true,
-      }, state);
+      if (!isShopify) {
+        postMessageToParent({
+          action: CHATBOT_ACTIONS.CLICK_BUTTON,
+          actionData: buttonId,
+          isOpen: true,
+        }, state);
+      }
     }
 
     // For GINZA AIRA
