@@ -129,6 +129,23 @@ const convertTextInputConfirmationObject = (content) => {
   ];
 }
 
+const convertPasswordConfirmationObject = (content) => {
+  return [
+    {
+      type: content.type,
+      bindingMode: content.fukushashiki_search_mode,
+      bindingAddress: content.fukushashiki_search_value,
+      bindingValue: content.text_input.password_confirmation.value,
+    },
+    {
+      type: content.type,
+      bindingMode: content.confirm_fukushashiki_search_mode,
+      bindingAddress: content.confirm_fukushashiki_search_value,
+      bindingValue: content.text_input.password_confirmation.valueConfirm,
+    }
+  ];
+}
+
 // Helper functions for each message type
 const convertTextInputObject = (content) => {
   // convert for text_input text type
@@ -151,7 +168,7 @@ const convertTextInputObject = (content) => {
       fukuData = convertTextInputConfirmationObject(content);
       break;
     case 'password_confirmation':
-      fukuData = convertTextInputConfirmationObject(content);
+      fukuData = convertPasswordConfirmationObject(content);
       break;
     default:
       break;
