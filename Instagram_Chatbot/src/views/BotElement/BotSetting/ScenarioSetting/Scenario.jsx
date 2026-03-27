@@ -2121,7 +2121,6 @@ const Scenario = () => {
   const renderLPIntegrationOptionPreview = (pullDown) => {
     if (pullDown.type !== 'lp_integration_option') return null;
     const selectWidth = pullDown.with_suffix ? '70%' : '100%';
-    console.log(pullDown.with_suffix);
     
     return (
       <React.Fragment>
@@ -2135,6 +2134,27 @@ const Scenario = () => {
             <label style={{ width: '30%' }}>{pullDown.lp_integration_option_text}</label>
           )
         }
+      </React.Fragment>
+    );
+  }
+
+  const renderTextInputPasswordConfirmationPreview = (textInput) => {
+    if (textInput.type !== 'password_confirmation') return null;
+    
+    return (
+      <React.Fragment>
+        <input
+          className="ss-message__content--user-text-input ss-input-value"
+          readOnly
+          disabled
+          placeholder={textInput[textInput.type].password}
+        ></input>
+        <input
+          className="ss-message__content--user-text-input ss-input-value"
+          readOnly
+          placeholder={textInput[textInput.type].confirm_password}
+          disabled
+        ></input>
       </React.Fragment>
     );
   }
@@ -3914,22 +3934,7 @@ const Scenario = () => {
                                                                   ></input>
                                                                 </>
                                                                 )}
-                                                              {(textInput.type === 'password_confirmation') &&
-                                                                (<>
-                                                                  <input
-                                                                    className="ss-message__content--user-text-input ss-input-value"
-                                                                    readOnly
-                                                                    disabled
-                                                                    placeholder={textInput[textInput.type].password}
-                                                                  ></input>
-                                                                  <input
-                                                                    className="ss-message__content--user-text-input ss-input-value"
-                                                                    readOnly
-                                                                    placeholder={textInput[textInput.type].confirm_password}
-                                                                    disabled
-                                                                  ></input>
-                                                                </>
-                                                                )}
+                                                              {renderTextInputPasswordConfirmationPreview(textInput)}
                                                             </div>
                                                           )
                                                         }
@@ -7243,6 +7248,17 @@ const Scenario = () => {
                                                               />
                                                             </div>
                                                           </div>
+                                                          {isUseFukushashiki && (
+                                                              renderFukushashikiSetting({
+                                                                mode: dataMessages[indexMessageSelect]?.message_content[indexContent]?.['fukushashiki_search_mode'],
+                                                                inputValue: dataMessages[indexMessageSelect]?.message_content[indexContent]?.['fukushashiki_search_value'],
+                                                                onModeChange: value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'fukushashiki_search_mode', value),
+                                                                onInputChange: value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'fukushashiki_search_value', value),
+                                                                rowClassName: 'ss-user-setting__item-bottom',
+                                                                rowStyle: { width: '100%', alignItems: 'center', gap: '8px', marginLeft: 0, marginBottom: '10px' },
+                                                              })
+                                                            )
+                                                          }
                                                           {/* text_input: type = password_confirmation */}
                                                           {(textInput.type === 'password_confirmation') && (
                                                             <div className="ss-user-setting__item-bottom">
@@ -7256,42 +7272,14 @@ const Scenario = () => {
                                                               </div>
                                                             </div>
                                                           )}
-                                                          {isUseFukushashiki && (
-                                                            <div className='ss-user-setting__item-bottom' style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                              <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
-                                                                <div style={{ flexBasis: '22%', maxWidth: '22%' }}>
-                                                                  <SelectCustom
-                                                                    id="title"
-                                                                    style={{ width: '100%' }}
-                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['fukushashiki_search_mode']}
-                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'fukushashiki_search_mode', value)}
-                                                                    data={[
-                                                                      { key: 1, value: 'id' },
-                                                                      { key: 2, value: 'css_selector' },
-                                                                      { key: 3, value: 'xpath' }
-                                                                    ]}
-                                                                    keyValue="key"
-                                                                    placeholder="複写先要素の取得方法をお選びください"
-                                                                  />
-                                                                </div>
-                                                              </Tooltip>
-                                                              <div style={{ flexBasis: '67%', maxWidth: '67%' }}>
-                                                                <InputCustom
-                                                                  styleLabel={{ width: '100%' }}
-                                                                  maxLength={250}
-                                                                  useFukushashiki={true}
-                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'fukushashiki_search_value', value)}
-                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['fukushashiki_search_value']}
-                                                                  placeholder={{
-                                                                    1: '複写先要素のIDを入力ください',
-                                                                    2: '複写先要素のcss_selectorを入力ください',
-                                                                    3: '複写先要素のxPathを入力ください',
-                                                                  }[
-                                                                    dataMessages[indexMessageSelect]?.message_content[indexContent]?.['fukushashiki_search_mode']
-                                                                  ] || ''}
-                                                                />
-                                                              </div>
-                                                            </div>
+                                                          {isUseFukushashiki && textInput.type === 'password_confirmation' && (
+                                                            renderFukushashikiSetting({
+                                                              mode: dataMessages[indexMessageSelect]?.message_content[indexContent]?.['confirm_fukushashiki_search_mode'],
+                                                              inputValue: dataMessages[indexMessageSelect]?.message_content[indexContent]?.['confirm_fukushashiki_search_value'],
+                                                              onModeChange: value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'confirm_fukushashiki_search_mode', value),
+                                                              onInputChange: value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'confirm_fukushashiki_search_value', value),
+                                                              rowStyle: { width: '100%', alignItems: 'center', gap: '8px', marginLeft: 0 },
+                                                            })
                                                           )}
                                                         </React.Fragment>
                                                       )}
