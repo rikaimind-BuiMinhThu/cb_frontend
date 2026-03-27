@@ -896,7 +896,7 @@ const PreviewFukushashiki = () => {
 
     if (clickedMsg.message_content[0]?.type === "button_submit"
       && clickedMsg.message_content[0]?.button_submit_id) {
-        const buttonId = clickedMsg.message_content[0]?.button_submit_id;
+      const buttonId = clickedMsg.message_content[0]?.button_submit_id;
 
       if (!isShopify) {
         postMessageToParent({
