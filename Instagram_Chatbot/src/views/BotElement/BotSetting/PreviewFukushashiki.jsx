@@ -865,11 +865,12 @@ const PreviewFukushashiki = () => {
     if (isShopify) {
       const response = await sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
       updatedResponses = state.scenarioUserResponses.concat(response.data?.data || []);
-      dispatch({ type: PREVIEW_ACTIONS.SET_SCENARIO_USER_RESPONSES, payload: updatedResponses });
 
       if (isButtonSubmitMessage(clickedMsg)) {
         await createOrAddLinesCart(updatedResponses, state);
       }
+      
+      dispatch({ type: PREVIEW_ACTIONS.SET_SCENARIO_USER_RESPONSES, payload: updatedResponses });
     } else {
       sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
     }
