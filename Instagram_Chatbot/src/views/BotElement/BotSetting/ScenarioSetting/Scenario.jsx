@@ -23,7 +23,9 @@ import ShopifyReferencePopup from './ShopifyReferencePopup';
 import axios from 'axios';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import {
-  S3_UPLOAD_URL,
+  S3_UPLOAD_URL, 
+  FUKUSHASHIKI_SEARCH_MODE_OPTIONS,
+  FUKUSHASHIKI_SEARCH_VALUE_LABELS,
 } from '../../../../variables/constants';
 import { tokenExpired } from 'api/tokenExpired';
 import DatePickerCustom from './scenarioComon/DatePickerCustom';
@@ -2039,6 +2041,103 @@ const Scenario = () => {
           style={{ width: '100%' }}
         />
       </div>
+    );
+  }
+
+  
+
+  const renderFukushashikiSetting = ({
+    mode,
+    inputValue,
+    onModeChange,
+    onInputChange,
+    rowStyle = {}
+  }) => {
+    const inputGuideText = FUKUSHASHIKI_SEARCH_VALUE_LABELS[mode] || '';
+
+    return (
+      <div
+        className='ss-user-setting__item-row'
+        style={{ display: 'flex', gap: '10px', marginLeft: '35px', width: '90%', ...rowStyle }}
+      >
+        <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
+          <div style={{ width: '25%' }}>
+            <SelectCustom
+              id="title"
+              style={{ width: '100%' }}
+              value={mode}
+              onChange={onModeChange}
+              data={FUKUSHASHIKI_SEARCH_MODE_OPTIONS}
+              keyValue="key"
+              placeholder="複写先要素の取得方法をお選びください"
+            />
+          </div>
+        </Tooltip>
+        <Tooltip title={inputGuideText} placement="top">
+          <div style={{ flex: '75%' }}>
+            <InputCustom
+              styleLabel={{ width: '100%' }}
+              style={{ width: '100%' }}
+              onChange={onInputChange}
+              value={inputValue}
+              placeholder={inputGuideText}
+            />
+          </div>
+        </Tooltip>
+      </div>
+    );
+  }
+
+  const renderLPIntegrationOptionSetting = ({ indexMessageSelect, indexContent, content, pullDown }) => {
+    if (pullDown.type !== 'lp_integration_option') return null;
+    return (
+      <React.Fragment>
+        <CheckboxCustom
+          label="文言を右に表示する"
+          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'with_suffix')}
+          value={pullDown.with_suffix}
+        />
+        {
+          pullDown.with_suffix && (
+            <div className="ss-user-setting__item-bottom">
+              <InputCustom
+                placeholder="文言"
+                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'lp_integration_option_text')}
+                value={pullDown.lp_integration_option_text}
+              />
+            </div>
+          )
+        }
+        {
+          renderFukushashikiSetting({
+            mode: pullDown.lp_element_search_mode,
+            inputValue: pullDown.lp_element_search_value,
+            onModeChange: value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'lp_element_search_mode'),
+            onInputChange: value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'lp_element_search_value'),
+          })
+        }
+      </React.Fragment>
+    );
+  }
+
+  const renderLPIntegrationOptionPreview = (pullDown) => {
+    if (pullDown.type !== 'lp_integration_option') return null;
+    const selectWidth = pullDown.with_suffix ? '70%' : '100%';
+    console.log(pullDown.with_suffix);
+    
+    return (
+      <React.Fragment>
+        <SelectCustom
+          data={dataPrefectures}
+          placeholder="選択してください。"
+          style={{ width: selectWidth }}
+        />
+        {
+          pullDown.with_suffix && (
+            <label style={{ width: '30%' }}>{pullDown.lp_integration_option_text}</label>
+          )
+        }
+      </React.Fragment>
     );
   }
 
@@ -4618,15 +4717,7 @@ const Scenario = () => {
                                                                     />
                                                                   </React.Fragment>
                                                                 )}
-                                                                {pullDown.type === 'lp_integration_option' && (
-                                                                  <React.Fragment>
-                                                                    <SelectCustom
-                                                                      data={dataPrefectures}
-                                                                      placeholder="選択してください。"
-                                                                      style={{ width: '100%' }}
-                                                                    />
-                                                                  </React.Fragment>
-                                                                )}
+                                                                {renderLPIntegrationOptionPreview(pullDown)}
                                                                 {renderPreviewPulldownfromJs(pullDown)}
                                                                 {pullDown.type === 'up_to_municipality' && (
                                                                   <div>
@@ -10514,48 +10605,7 @@ const Scenario = () => {
                                                         </React.Fragment>
                                                       }
                                                       {/* pull_down: type = lp_integration_option */}
-                                                      {pullDown.type === 'lp_integration_option' &&
-                                                        <React.Fragment>
-                                                          {<div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px', marginLeft: '35px', width: '90%' }}>
-                                                            <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
-                                                              <div style={{ width: '25%' }}>
-                                                                <SelectCustom
-                                                                  id="title"
-                                                                  style={{ width: '100%' }}
-                                                                  value={pullDown.lp_element_search_mode}
-                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'lp_element_search_mode')}
-                                                                  data={[
-                                                                    { key: 1, value: 'id' },
-                                                                    { key: 2, value: 'css_selector' },
-                                                                    { key: 3, value: 'xpath' }
-                                                                   ]}
-                                                                  keyValue="key"
-                                                                  placeholder="複写先要素の取得方法をお選びください"
-                                                                />
-                                                              </div>
-                                                            </Tooltip>
-                                                            <Tooltip title={{
-                                                              1: '複写先要素のIDを入力ください',
-                                                              2: '複写先要素のcss_selectorを入力ください',
-                                                              3: '複写先要素のxPathを入力ください',
-                                                            }[pullDown[pullDown.type]?.lp_element_search_mode] || ''} placement="top">
-                                                              <div style={{ flex: '75%' }}>
-                                                                <InputCustom
-                                                                  styleLabel={{ width: '100%' }}
-                                                                  style={{ width: '100%' }}
-                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'lp_element_search_value')}
-                                                                  value={pullDown.lp_element_search_value}
-                                                                  placeholder={{
-                                                                    1: '複写先要素のIDを入力ください',
-                                                                    2: '複写先要素のcss_selectorを入力ください',
-                                                                    3: '複写先要素のxPathを入力ください',
-                                                                  }[pullDown[pullDown.type]?.lp_element_search_mode] || ''}
-                                                                />
-                                                              </div>
-                                                            </Tooltip>
-                                                          </div>}
-                                                        </React.Fragment>
-                                                      }
+                                                      {renderLPIntegrationOptionSetting({ indexMessageSelect, indexContent, content, pullDown })}
 
                                                       {/* pull_down: type = from_js_result */}
                                                       {renderDetailSettingPulldownFromJs({
