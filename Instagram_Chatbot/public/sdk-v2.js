@@ -464,7 +464,7 @@ const isYuwaeruLP = (url) => {
     // Comment out if you want to test yuwaeru in localhost
     // "localhost:8000",
     // "commerceforce.co.jp",
-    "store.nekase-genmai.com/",
+    "store.nekase-genmai.com",
   ];
 
   return domains.some(domain => url.includes(domain));
