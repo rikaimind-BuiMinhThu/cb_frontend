@@ -2044,8 +2044,6 @@ const Scenario = () => {
     );
   }
 
-  
-
   const renderFukushashikiSetting = ({
     mode,
     inputValue,
