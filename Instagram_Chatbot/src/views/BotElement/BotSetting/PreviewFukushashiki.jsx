@@ -867,29 +867,28 @@ const PreviewFukushashiki = () => {
       updatedResponses = state.scenarioUserResponses.concat(response.data?.data || []);
       dispatch({ type: PREVIEW_ACTIONS.SET_SCENARIO_USER_RESPONSES, payload: updatedResponses });
 
-      if (clickedMsg.message_content[0]?.type === 'button_submit' ||
-        clickedMsg.message_content[0]?.button_submit?.save_input_content === 'button_submit') {
+      if (isButtonSubmitMessage(clickedMsg)) {
         await createOrAddLinesCart(updatedResponses, state);
       }
     } else {
       sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
     }
 
-      let ga4EventCode = "";
-      if (clickedMsg.message_content) {
-        clickedMsg.message_content.forEach((content) => {
-          if (
-            content.is_event_tracking_script &&
-            content.event_tracking_script
-          ) {
-            ga4EventCode = content.event_tracking_script;
-          }
-        });
-      }
+    let ga4EventCode = "";
+    if (clickedMsg.message_content) {
+      clickedMsg.message_content.forEach((content) => {
+        if (
+          content.is_event_tracking_script &&
+          content.event_tracking_script
+        ) {
+          ga4EventCode = content.event_tracking_script;
+        }
+      });
+    }
 
-      const fukuGA4 = convertToFukushashikiObject(data);
-      fukuGA4.ga4EventCode = ga4EventCode;
-      fukushashikiToLP(fukuGA4, state);
+    const fukuGA4 = convertToFukushashikiObject(data);
+    fukuGA4.ga4EventCode = ga4EventCode;
+    fukushashikiToLP(fukuGA4, state);
 
     if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
       executeLpJsCode(clickedMsg.jscode, state);
