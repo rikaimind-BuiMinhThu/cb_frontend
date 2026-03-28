@@ -13,20 +13,24 @@ const LPIntegrationOptionPullDown = ({
   targetElementType = CRAWL_ELEMENT_TYPES.SELECT,
   jsCode = "",
   keyValue="text",
-  nameValue="text"
+  nameValue="text",
+  hidden = false
 }) => {
   useEffect(() => {
+    if (hidden) return;
+
     const crawlOption = {
       targetElementType,
       searchMode: search_element_type,
       searchAddress: search_element_value,
       searchJsCode: jsCode
     };
+
     postMessageToParent({
       actionData: crawlOption,
       action: CHATBOT_ACTIONS.CRAWL_DATA,
     });
-  }, []);
+  }, [hidden]);
 
   if (data === null || data === undefined) return null;
   const selectWidth = pullDown.with_suffix ? '70%' : '100%';

@@ -355,6 +355,7 @@ const UserMessage = ({
           prefecturesList={prefecturesList}
           lpOptionData={lpOptionData}
           postMessageToParent={postMessageToParent}
+          hidden={message.hidden}
         />;
       case MESSAGE_CONTENT_TYPES.ZIP_CODE_ADDRESS:
         return <ZipCodeAddress
