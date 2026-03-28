@@ -980,6 +980,7 @@ const setRadioValue = (element, value) => {
   selectedRadio.checked = true;
   selectedRadio.dispatchEvent(new Event('input', { bubbles: true }));
   selectedRadio.dispatchEvent(new Event('change', { bubbles: true }));
+  selectedRadio.click();
 };
 
 const getUser = async (url, datacount) => {
