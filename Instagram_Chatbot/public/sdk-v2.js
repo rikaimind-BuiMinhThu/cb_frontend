@@ -718,7 +718,7 @@ const extractSelectOptions = (selectElement) => {
   return Array.from(selectElement.options)
     .map((option, index) => ({
       id: index + 1,
-      text: option.innerText,
+      text: option.innerText || '指定なし',
       value: option.value || 'NULL_OPTION'
     }));
 }
