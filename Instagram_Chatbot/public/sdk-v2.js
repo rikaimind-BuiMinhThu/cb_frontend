@@ -419,7 +419,9 @@ const waitToLoadAmazonSubscstore = (iframe) => {
         clearInterval(interval);
       }
     }, 200);
+    return;
   }
+  appendIframeToBody(iframe);
 }
 
 const waitToLoadAmazonW2Repeat = (iframe) => {
@@ -445,7 +447,9 @@ const waitToLoadAmazonW2Repeat = (iframe) => {
         clearInterval(interval);
       }
     }, 200);
+    return;
   }
+  appendIframeToBody(iframe);
 }
 
 const waitToLoadAmazonEcForce = (iframe) => {
