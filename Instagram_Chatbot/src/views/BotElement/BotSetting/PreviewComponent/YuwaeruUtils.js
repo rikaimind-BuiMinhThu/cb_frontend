@@ -100,7 +100,7 @@ export const mapAmazonPayDataToMessagesListForYuwaeru = (amazonPayData, messages
     birthDayContents.forEach(content => content.pull_down.dob_ymd.valueDay = mappedBirthdayDay);
   }
 
-  const sexContents = findContentsByFukushashikiSearchValue(userMessages, 'fukushashiki_search_value', YUWAERU_AMAZON_FUKUSHASHIKI_ELEMENTS.SEX);
+  const sexContents = findContentsByFukushashikiSearchValue(userMessages, 'initial_selection_fukushashiki_search_value', YUWAERU_AMAZON_FUKUSHASHIKI_ELEMENTS.SEX);
   if (sexContents.length > 0) {
     sexContents.forEach(content => content.radio_button.initial_selection = mappedSex);
   }
