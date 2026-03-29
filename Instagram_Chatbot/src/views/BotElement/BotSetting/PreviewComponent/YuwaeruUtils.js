@@ -87,17 +87,17 @@ export const mapAmazonPayDataToMessagesListForYuwaeru = (amazonPayData, messages
 
   const birthYearContents = findContentsByFukushashikiSearchValue(userMessages, 'valueYear_fukushashiki_search_value', YUWAERU_AMAZON_FUKUSHASHIKI_ELEMENTS.BIRTHDAY_YEAR);
   if (birthYearContents.length > 0) {
-    birthYearContents.forEach(content => content.pull_down.dob_ymd.year = mappedBirthdayYear);
+    birthYearContents.forEach(content => content.pull_down.dob_ymd.valueYear = mappedBirthdayYear);
   }
 
   const birthMonthContents = findContentsByFukushashikiSearchValue(userMessages, 'valueMonth_fukushashiki_search_value', YUWAERU_AMAZON_FUKUSHASHIKI_ELEMENTS.BIRTHDAY_MONTH);
   if (birthMonthContents.length > 0) {
-    birthMonthContents.forEach(content => content.pull_down.dob_ymd.month = mappedBirthdayMonth);
+    birthMonthContents.forEach(content => content.pull_down.dob_ymd.valueMonth = mappedBirthdayMonth);
   }
 
   const birthDayContents = findContentsByFukushashikiSearchValue(userMessages, 'valueDay_fukushashiki_search_value', YUWAERU_AMAZON_FUKUSHASHIKI_ELEMENTS.BIRTHDAY_DAY);
   if (birthDayContents.length > 0) {
-    birthDayContents.forEach(content => content.pull_down.dob_ymd.day = mappedBirthdayDay);
+    birthDayContents.forEach(content => content.pull_down.dob_ymd.valueDay = mappedBirthdayDay);
   }
 
   const sexContents = findContentsByFukushashikiSearchValue(userMessages, 'fukushashiki_search_value', YUWAERU_AMAZON_FUKUSHASHIKI_ELEMENTS.SEX);
