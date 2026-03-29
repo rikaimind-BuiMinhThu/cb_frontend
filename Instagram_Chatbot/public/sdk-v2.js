@@ -425,9 +425,7 @@ const waitToLoadAmazonSubscstore = (iframe) => {
 }
 
 const waitToLoadAmazonW2Repeat = (iframe) => {
-  // Yuwaeru san, w2_repeat
-  const isUsingAmazonPay = document.querySelector("#ctl00_ContentPlaceHolder1_ucInputForm_lbCancelAmazonPay")?.value;
-  if (isUsingAmazonPay) {
+  const injectAmazon = () => {
     iframe.src += `&is_using_amazon_pay=true`;
     // only for w2_repeat cart system, yuwaeru san
     // loop for waiting data is filled to lp form
@@ -447,9 +445,33 @@ const waitToLoadAmazonW2Repeat = (iframe) => {
         clearInterval(interval);
       }
     }, 200);
+  }
+
+  // Yuwaeru san, w2_repeat
+  const amazonCheckSessionId = getParam('amazonCheckoutSessionId');
+
+  if (amazonCheckSessionId) {
+    injectAmazon();
     return;
   }
-  appendIframeToBody(iframe);
+
+  let try_times = 0;
+  const interval = setInterval(() => {
+    if (try_times >= WAIT_TO_LOAD_AMAZON_DATA_MAX_COUNT) {
+      clearInterval(interval);
+      appendIframeToBody(iframe);
+      return;
+    }
+    try_times++;
+
+    // Wait for cancel Amazon Pay button is displayed
+    const isUsingAmazonPay = !!document.querySelector("#ctl00_ContentPlaceHolder1_ucInputForm_lbCancelAmazonPay");
+    if (isUsingAmazonPay) {
+      injectAmazon();
+      clearInterval(interval);
+      return;
+    }
+  }, 200);
 }
 
 const waitToLoadAmazonEcForce = (iframe) => {
