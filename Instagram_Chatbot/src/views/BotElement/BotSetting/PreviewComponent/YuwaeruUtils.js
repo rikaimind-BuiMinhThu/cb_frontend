@@ -102,7 +102,7 @@ export const mapAmazonPayDataToMessagesListForYuwaeru = (amazonPayData, messages
 
   const sexContents = findContentsByFukushashikiSearchValue(userMessages, 'fukushashiki_search_value', YUWAERU_AMAZON_FUKUSHASHIKI_ELEMENTS.SEX);
   if (sexContents.length > 0) {
-    sexContents.forEach(content => content.text_input.text.value = mappedSex);
+    sexContents.forEach(content => content.radio_button.initial_selection = mappedSex);
   }
   
   const zipCodeContents = findContentsByFukushashikiSearchValue(userMessages, 'post_code_fukushashiki_search_value', YUWAERU_AMAZON_FUKUSHASHIKI_ELEMENTS.ZIP_CODE);
