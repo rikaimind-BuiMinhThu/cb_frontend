@@ -424,6 +424,18 @@ const waitToLoadAmazonSubscstore = (iframe) => {
   appendIframeToBody(iframe);
 }
 
+const loadIframeForW2Repeat = (iframe) => {
+  const isDisplayCoupon = !!document.querySelector("input#ctl00_ContentPlaceHolder1_ucInputForm_rCartList_ctl00_tbCouponCode");
+  if (isDisplayCoupon) {
+    iframe.src += `&is_display_coupon=true`;
+  }
+  const isDisplayPasswordInput = !!document.querySelector("input#ctl00_ContentPlaceHolder1_ucInputForm_rCartList_ctl00_tbUserPassword");
+  if (isDisplayPasswordInput) {
+    iframe.src += `&is_display_password_input=true`;
+  }
+  waitToLoadAmazonW2Repeat(iframe);
+}
+
 const waitToLoadAmazonW2Repeat = (iframe) => {
   const injectAmazon = () => {
     iframe.src += `&is_using_amazon_pay=true`;
@@ -608,7 +620,7 @@ const displayPopup = async () => {
   if (isTorizenLP(window.location.href)) {
     waitToLoadAmazonSubscstore(iframe);
   } else if (isYuwaeruLP(window.location.href)) {
-    waitToLoadAmazonW2Repeat(iframe);
+    loadIframeForW2Repeat(iframe);
   } else if (isBlissLp(window.location.href) || isPhystechLp(window.location.href) || isRoseMayLp(window.location.href)) {
     waitToLoadAmazonEcForce(iframe);
   } else {
