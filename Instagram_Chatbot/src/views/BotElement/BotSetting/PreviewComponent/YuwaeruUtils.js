@@ -115,7 +115,7 @@ export const mapAmazonPayDataToMessagesListForYuwaeru = (amazonPayData, messages
     const prefectureItem = findItem(prefectureList, {
       keys: ["name"],
       value: mappedPrefecture,
-      onSuccess: (item)=> item.id,
+      onSuccess: (item)=> item.name,
       callbackValue: mappedPrefecture,
     });
     prefectureContents.forEach(content => content.zip_code_address.value_prefecture = prefectureItem);
