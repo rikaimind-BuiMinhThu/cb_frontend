@@ -152,6 +152,8 @@ function wrapWithErrorHandling(fn, fnName) {
   };
 }
 
+const WAIT_TO_LOAD_AMAZON_DATA_MAX_COUNT = 20;
+
 const CHATBOT_ACTIONS = {
   CLICK_BUTTON: 'clickButton',
   EXCUTE_JS: 'excuteJS',
@@ -396,13 +398,63 @@ const sendMessageToChatbot = (contentMessage, action) => {
   globalIframe.contentWindow.postMessage(data, "*");
 }
 
+const waitToLoadAmazonSubscstore = (iframe) => {
+  // torizen san, subscstore
+  const amazonCheckSessionId = getParam('amazonCheckoutSessionId');
+  if (amazonCheckSessionId) {
+    iframe.src += `&is_using_amazon_pay=true`;
+    // only for subscstore cart system, torizen san
+    // loop for waiting data is filled to lp form
+    let count = 0;
+    const interval = setInterval(() => {
+      const isTorizenLpAmazonDataFilled = document.querySelector("input#jsUkProfileFamilyName")?.value;
+      if (isTorizenLpAmazonDataFilled && count < WAIT_TO_LOAD_AMAZON_DATA_MAX_COUNT) {
+        appendIframeToBody(iframe);
+        clearInterval(interval);
+      }
+      count++;
+      if (count >= WAIT_TO_LOAD_AMAZON_DATA_MAX_COUNT) {
+        // Not Amazon Pay
+        appendIframeToBody(iframe);
+        clearInterval(interval);
+      }
+    }, 200);
+  }
+}
+
+const waitToLoadAmazonW2Repeat = (iframe) => {
+  // Yuwaeru san, w2_repeat
+  const isUsingAmazonPay = document.querySelector("#ctl00_ContentPlaceHolder1_ucInputForm_lbCancelAmazonPay")?.value;
+  if (isUsingAmazonPay) {
+    iframe.src += `&is_using_amazon_pay=true`;
+    // only for w2_repeat cart system, yuwaeru san
+    // loop for waiting data is filled to lp form
+    let count = 0;
+    const interval = setInterval(() => {
+      const isYuwaeruLpAmazonDataFilled = document.querySelector("input#ctl00_ContentPlaceHolder1_ucInputForm_rCartList_ctl00_tbOwnerName1")?.value;
+      if (isYuwaeruLpAmazonDataFilled && count < WAIT_TO_LOAD_AMAZON_DATA_MAX_COUNT) {
+        appendIframeToBody(iframe);
+        clearInterval(interval);
+        clearInterval(interval);
+      }
+      count++;
+
+      if (count >= WAIT_TO_LOAD_AMAZON_DATA_MAX_COUNT) {
+        // Not Amazon Pay
+        appendIframeToBody(iframe);
+        clearInterval(interval);
+      }
+    }, 200);
+  }
+}
+
 const waitToLoadAmazonEcForce = (iframe) => {
   let count = 0;
   const interval = setInterval(() => {
     const amazonPayMethodElement = document.querySelector("#amazon_payment_method");
     const name1Value = document.querySelector("input#order_shipping_address_attributes_name1")?.value;
 
-    if (amazonPayMethodElement && name1Value && count < 20) {
+    if (amazonPayMethodElement && name1Value && count < WAIT_TO_LOAD_AMAZON_DATA_MAX_COUNT) {
       iframe.src += `&is_using_amazon_pay=true`;
       const isEnableEmailInput = !document.querySelector("input#email")?.disabled;
       if (isEnableEmailInput) {
@@ -417,7 +469,7 @@ const waitToLoadAmazonEcForce = (iframe) => {
     }
     count++;
 
-    if (count >= 20) {
+    if (count >= WAIT_TO_LOAD_AMAZON_DATA_MAX_COUNT) {
       // Not Amazon Pay
       appendIframeToBody(iframe);
       clearInterval(interval);
@@ -526,24 +578,12 @@ const displayPopup = async () => {
 
   // only for amazon
   // add param amazonCheckoutSessionId to iframe src
-  const amazonCheckSessionId = getParam('amazonCheckoutSessionId');
 
-  if (amazonCheckSessionId) {
-    iframe.src += `&is_using_amazon_pay=true`;
-    // only for subscstore cart system, torizen san
-    // loop for waiting data is filled to lp form
-    // wait 20 times
-    let count = 0;
-    const interval = setInterval(() => {
-      const isTorizenLpAmazonDataFilled = isTorizenLP(window.location.href) && document.querySelector("input#jsUkProfileFamilyName")?.value;
-      const isYuwaeruLpAmazonDataFilled = isYuwaeruLP(window.location.href) && document.querySelector("input#ctl00_ContentPlaceHolder1_ucInputForm_rCartList_ctl00_tbOwnerName1")?.value;
-      if ((isTorizenLpAmazonDataFilled || isYuwaeruLpAmazonDataFilled) && count < 20) {
-        appendIframeToBody(iframe);
-        clearInterval(interval);
-      }
-      count++;
-    }, 200);
-  } else if (isBlissLp(window.location.href) || isPhystechLp(window.location.href)) {
+  if (isTorizenLP(window.location.href)) {
+    waitToLoadAmazonSubscstore(iframe);
+  } else if (isYuwaeruLP(window.location.href)) {
+    waitToLoadAmazonW2Repeat(iframe);
+  } else if (isBlissLp(window.location.href) || isPhystechLp(window.location.href) || isRoseMayLp(window.location.href)) {
     waitToLoadAmazonEcForce(iframe);
   } else {
     appendIframeToBody(iframe);
