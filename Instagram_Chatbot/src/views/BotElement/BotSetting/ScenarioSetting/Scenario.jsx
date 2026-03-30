@@ -2212,6 +2212,11 @@ const Scenario = () => {
             </div>
           )
         }
+        <CheckboxCustom
+          label="空なオプション解除"
+          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'dont_display_empty_option')}
+          value={pullDown.dont_display_empty_option}
+        />
         {
           renderFukushashikiSetting({
             mode: pullDown.lp_element_search_mode,

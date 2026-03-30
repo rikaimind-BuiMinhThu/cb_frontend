@@ -23,7 +23,8 @@ const LPIntegrationOptionPullDown = ({
       targetElementType,
       searchMode: search_element_type,
       searchAddress: search_element_value,
-      searchJsCode: jsCode
+      searchJsCode: jsCode,
+      dontDisplayEmptyOption: pullDown.dont_display_empty_option
     };
 
     postMessageToParent({

@@ -549,6 +549,16 @@ const isTorizenLP = (url) => {
   return torizenDomains.some(domain => url.includes(domain));
 }
 
+const isRoseMayLp = (url) => {
+  const domains = [
+    // TODO: Update RoseMay domains nếu cần test ở môi trường khác
+    // "rosemay.jp",
+    "rosemay.net",
+  ];
+
+  return domains.some(domain => url.includes(domain));
+}
+
 const isYuwaeruLP = (url) => {
   const domains = [
     // Comment out if you want to test yuwaeru in localhost
@@ -793,12 +803,18 @@ const excuteJSCode = (jscode) => {
 const extractSelectOptions = (selectElement) => {
   if (!selectElement || selectElement.tagName !== "SELECT") return null;
 
-  return Array.from(selectElement.options)
+  const result = Array.from(selectElement.options)
     .map((option, index) => ({
       id: index + 1,
       text: option.innerText || '指定なし',
       value: option.value || 'NULL_OPTION'
     }));
+
+  if (options.dontDisplayEmptyOption) {
+    return result.filter(option => option.value !== 'NULL_OPTION');
+  }
+
+  return result;
 }
 
 const extractFromJs = async (options) => {
