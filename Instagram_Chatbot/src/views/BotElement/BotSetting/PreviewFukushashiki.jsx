@@ -420,6 +420,38 @@ const PreviewFukushashiki = () => {
     document.head.appendChild(style);
   }, [state.isUsedCustomCss, state.customCssContent]);
 
+  // Same custom JS as above, injected into *this* document (preview / chatbot iframe).
+  // injectCustomJsCode only notifies the parent LP via postMessage; widget DOM lives here.
+  useEffect(() => {
+    const IN_FRAME_SCRIPT_ID = "ec-chatbot-custom-js-in-frame-bottom_body";
+    const removeInFrameCustomJs = () => {
+      document.getElementById(IN_FRAME_SCRIPT_ID)?.remove();
+      ["head", "top_body"].forEach((key) => {
+        document.getElementById(`ec-chatbot-custom-js-in-frame-${key}`)?.remove();
+      });
+    };
+
+    const shouldInjectInFrame =
+      state.isUsedCustomJsCode &&
+      state.cartSystem === CART_SYSTEM.SHOPIFY &&
+      String(state.bottomBodyCustomJsCode || "").trim();
+
+    if (!shouldInjectInFrame) {
+      removeInFrameCustomJs();
+      return;
+    }
+
+    document.getElementById(IN_FRAME_SCRIPT_ID)?.remove();
+
+    const script = document.createElement("script");
+    script.id = IN_FRAME_SCRIPT_ID;
+    script.type = "text/javascript";
+    script.innerHTML = state.bottomBodyCustomJsCode;
+    document.body.appendChild(script);
+
+    return removeInFrameCustomJs;
+  }, [state.isUsedCustomJsCode, state.cartSystem, state.bottomBodyCustomJsCode]);
+
   // Get Preview Scenario Data
   useEffect(() => {
     if (!state.loadedStateFromSession) {
