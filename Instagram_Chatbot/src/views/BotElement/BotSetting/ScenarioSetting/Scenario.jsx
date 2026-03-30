@@ -2044,6 +2044,112 @@ const Scenario = () => {
     );
   }
 
+  const renderBuildingName = (address) => {
+    if (address.building_name === undefined) return;
+    return (
+      <div className="ss-user-setting__item-bottom">
+        <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
+          {address.building_name_label || '建物名'}
+        </div>
+        <InputCustom
+          placeholder={address.building_name}
+          disabled={true}
+          style={{ width: '100%' }}
+        />
+      </div>
+    );
+  }
+
+  const renderMunicipality = (address) => {
+    if (address.municipality === undefined) return;
+    return (
+      <div className="ss-user-setting__item-bottom">
+        <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
+          {address.municipality_label || '市区町村'}
+        </div>
+        <InputCustom
+          placeholder={address.municipality}
+          disabled={true}
+          style={{ width: '100%' }}
+        />
+      </div>
+    );
+  }
+
+  const renderSinglePostCode = (address) => {
+    return (
+      <InputCustom
+        placeholder={address.post_code}
+        disabled={true}
+        style={{ width: '100%' }}
+      />
+    );
+  }
+
+  const renderSplitPostCode = (address) => {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+        <InputCustom
+          placeholder={address.post_code_left}
+          disabled={true}
+          style={{ width: '49%' }}
+        />
+        <InputCustom
+          placeholder={address.post_code_right}
+          disabled={true}
+          style={{ width: '49%' }}
+        />
+      </div>
+    );
+  }
+
+  const renderPostCode = (address) => {
+    if (address.post_code === undefined) return;
+    return (
+      <div className="ss-user-setting__item-bottom">
+        <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '5px' }}>
+          {address.post_code_label || '郵便番号'}
+        </div>
+        {address.split_postal_code !== true ? renderSinglePostCode(address) : renderSplitPostCode(address)}
+      </div>
+    );
+  }
+
+  const renderZipCodeAddressTitle = (zipCodeAddress) => {
+    if (!(zipCodeAddress.title_require || zipCodeAddress.isCheckRequire)) return;
+    return (
+      <div className="ss-message__content--user-pull_down-top" style={{ marginBottom: '0px' }}>
+        {zipCodeAddress.title_require &&
+          <span className="ss-message__content--user-pull_down-title">
+            {zipCodeAddress.title}
+          </span>
+        }
+        {(zipCodeAddress.isCheckRequire === 'all_items_require' ||
+          zipCodeAddress.isCheckRequire === 'require') &&
+          <span className="ss-message__content--user-text-input-required">
+            ※必須
+          </span>
+        }
+      </div>
+    );
+  }
+
+  const renderPrefecture = (address) => {
+    if (address.prefecture === undefined) return;
+    return (
+      <div className="ss-user-setting__item-bottom">
+        <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
+          {address.prefecture_label || '都道府県'}
+        </div>
+        <InputCustom
+          placeholder={address.prefecture}
+          disabled={true}
+          style={{ width: '100%' }}
+        />
+      </div>
+    );
+  }
+
   const renderFukushashikiSetting = ({
     mode,
     inputValue,
@@ -4753,84 +4859,12 @@ const Scenario = () => {
                                                         {
                                                           content.type === 'zip_code_address' && (
                                                             <div style={{ marginBottom: '10px' }}>
-                                                              {(zipCodeAddress.title_require || zipCodeAddress.isCheckRequire) &&
-                                                                <div className="ss-message__content--user-pull_down-top" style={{ marginBottom: '0px' }}>
-                                                                  {zipCodeAddress.title_require &&
-                                                                    <span className="ss-message__content--user-pull_down-title">
-                                                                      {zipCodeAddress.title}
-                                                                    </span>
-                                                                  }
-                                                                  {(zipCodeAddress.isCheckRequire === 'all_items_require' ||
-                                                                    zipCodeAddress.isCheckRequire === 'require') &&
-                                                                    <span className="ss-message__content--user-text-input-required">
-                                                                      ※必須
-                                                                    </span>
-                                                                  }
-                                                                </div>
-                                                              }
-                                                              {zipCodeAddress.post_code !== undefined && (
-                                                                <div className="ss-user-setting__item-bottom">
-                                                                  <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '5px' }}>
-                                                                    {zipCodeAddress.post_code_label || '郵便番号'}
-                                                                  </div>
-                                                                  {zipCodeAddress.split_postal_code !== true ?
-                                                                    <InputCustom
-                                                                      placeholder={zipCodeAddress.post_code}
-                                                                      disabled={true}
-                                                                      style={{ width: '100%' }}
-                                                                    /> :
-                                                                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                                                                      <InputCustom
-                                                                        placeholder={zipCodeAddress.post_code_left}
-                                                                        disabled={true}
-                                                                        style={{ width: '49%' }}
-                                                                      />
-                                                                      <InputCustom
-                                                                        placeholder={zipCodeAddress.post_code_right}
-                                                                        disabled={true}
-                                                                        style={{ width: '49%' }}
-                                                                      />
-                                                                    </div>
-                                                                  }
-                                                                </div>
-                                                              )}
-                                                              {zipCodeAddress.prefecture !== undefined &&
-                                                                <div className="ss-user-setting__item-bottom">
-                                                                  <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
-                                                                    {zipCodeAddress.prefecture_label || '都道府県'}
-                                                                  </div>
-                                                                  <InputCustom
-                                                                    placeholder={zipCodeAddress.prefecture}
-                                                                    disabled={true}
-                                                                    style={{ width: '100%' }}
-                                                                  />
-                                                                </div>
-                                                              }
-                                                              {zipCodeAddress.municipality !== undefined &&
-                                                                <div className="ss-user-setting__item-bottom">
-                                                                  <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
-                                                                    {zipCodeAddress.municipality_label || '市区町村' }
-                                                                  </div>
-                                                                  <InputCustom
-                                                                    placeholder={zipCodeAddress.municipality}
-                                                                    disabled={true}
-                                                                    style={{ width: '100%' }}
-                                                                  />
-                                                                </div>
-                                                              }
+                                                              {renderZipCodeAddressTitle(zipCodeAddress)}
+                                                              {renderPostCode(zipCodeAddress)}
+                                                              {renderPrefecture(zipCodeAddress)}
+                                                              {renderMunicipality(zipCodeAddress)}
                                                               {renderAddressField(zipCodeAddress)}
-                                                              {zipCodeAddress.building_name !== undefined &&
-                                                                <div className="ss-user-setting__item-bottom">
-                                                                  <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
-                                                                    {zipCodeAddress.building_name_label || '建物名'}
-                                                                  </div>
-                                                                  <InputCustom
-                                                                    placeholder={zipCodeAddress.building_name}
-                                                                    disabled={true}
-                                                                    style={{ width: '100%' }}
-                                                                  />
-                                                                </div>
-                                                              }
+                                                              {renderBuildingName(zipCodeAddress)}
                                                             </div>
                                                           )
                                                         }
