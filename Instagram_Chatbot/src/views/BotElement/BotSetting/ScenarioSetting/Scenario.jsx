@@ -2028,7 +2028,7 @@ const Scenario = () => {
   }
 
   const renderAddressField = (address) => {
-    if (address.compact_municipality_and_address || address.compact_municipality_and_address_and_building_name) return;
+    if ((address.compact_municipality_and_address && !address.is_display_address_field) || address.compact_municipality_and_address_and_building_name) return;
     if (address.address === undefined) return;
     return (
       <div className="ss-user-setting__item-bottom">
@@ -8199,6 +8199,16 @@ const Scenario = () => {
                                                               }
                                                             }}
                                                             value={zipCodeAddress.compact_municipality_and_address}
+                                                          />
+                                                        </div>
+                                                        <div className="ss-user-setting__item-text_input-use-api-wrapper">
+                                                          <CheckboxCustom
+                                                            label="番地入力欄表示"
+                                                            onChange={value => {
+                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_display_address_field')
+                                                            }}
+                                                            disabled={!zipCodeAddress.compact_municipality_and_address}
+                                                            value={zipCodeAddress.compact_municipality_and_address && zipCodeAddress.is_display_address_field}
                                                           />
                                                         </div>
                                                         <div className="ss-user-setting__item-text_input-use-api-wrapper">

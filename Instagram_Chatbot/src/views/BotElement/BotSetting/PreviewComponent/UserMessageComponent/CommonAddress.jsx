@@ -287,7 +287,7 @@ export default function CommonAddress({ content, prefecturesList, messageIndexRe
   };
 
   const renderAddress = () => {
-    if (addressContent.compact_municipality_and_address || addressContent.compact_municipality_and_address_and_building_name) return;
+    if ((addressContent.compact_municipality_and_address && !addressContent.is_display_address_field) || addressContent.compact_municipality_and_address_and_building_name) return;
     if (addressContent.address === undefined) return;
 
     const addressLabel = addressContent.address_label?.trim() !== "" ? addressContent.address_label : "番地";
