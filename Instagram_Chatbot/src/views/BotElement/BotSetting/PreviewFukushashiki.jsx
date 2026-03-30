@@ -420,8 +420,7 @@ const PreviewFukushashiki = () => {
     document.head.appendChild(style);
   }, [state.isUsedCustomCss, state.customCssContent]);
 
-  // Same custom JS as above, injected into *this* document (preview / chatbot iframe).
-  // injectCustomJsCode only notifies the parent LP via postMessage; widget DOM lives here.
+  // For add JS code to iframe Chatbot widget
   useEffect(() => {
     const IN_FRAME_SCRIPT_ID = "ec-chatbot-custom-js-in-frame-bottom_body";
     const removeInFrameCustomJs = () => {
