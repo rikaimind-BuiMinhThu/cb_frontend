@@ -433,6 +433,14 @@ const loadIframeForW2Repeat = (iframe) => {
   if (isDisplayPasswordInput) {
     iframe.src += `&is_display_password_input=true`;
   }
+  const isDisplayCreditCardInput = !!document.querySelector("input#ctl00_ContentPlaceHolder1_ucInputForm_rCartList_ctl00_rPayment_ctl00_tbCreditCardNo1");
+  if (!isDisplayCreditCardInput) {
+    iframe.src += `&is_display_credit_card_input=false`;
+  }
+  const isDisplayNameInput = !!document.querySelector("input#ctl00_ContentPlaceHolder1_ucInputForm_rCartList_ctl00_tbOwnerName1");
+  if (!isDisplayNameInput) {
+    iframe.src += `&is_display_display_name_input=false`;
+  }
   waitToLoadAmazonW2Repeat(iframe);
 }
 
