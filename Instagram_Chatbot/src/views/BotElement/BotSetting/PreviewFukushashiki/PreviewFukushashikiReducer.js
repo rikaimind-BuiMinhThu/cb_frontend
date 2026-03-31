@@ -13,7 +13,7 @@ import { isBotMessage, isUserMessage, getNextUserMsg } from '../PreviewComponent
 import { mapAmazonPayDataToMessagesList } from '../PreviewComponent/TorizenUtils';
 import { mapAmazonPayDataToMessagesListForBliss } from '../PreviewComponent/BlissUtils';
 import { mapAmazonPayDataToMessagesListForPhystech } from '../PreviewComponent/PhysTechUtils';
-import { mapAmazonPayDataToMessagesListForYuwaeru } from '../PreviewComponent/YuwaeruUtils';
+import { mapAmazonPayDataToMessagesListForYuwaeru, isYuwaeruLP } from '../PreviewComponent/YuwaeruUtils';
 import {
   RENDER_CHATBOT_CONFIG,
   GETTING_ERROR_NOTIFICATION,
@@ -430,7 +430,7 @@ const PreviewFukushashikiReducer = (state, action) => {
     case PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SESSION_STORAGE: {
       const newState = {...action.payload.savedState};
 
-      if (action.payload.isUsingAmazonPay) {
+      if (action.payload.isUsingAmazonPay || isYuwaeruLP(newState.urlReceive)) {
         // Support only for amazon pay and subscstore cart system (torizen san)
         const conditionParams = buildConditionParams(newState);
         for (let i = 0; i < newState.messagesList.length; i++) {
