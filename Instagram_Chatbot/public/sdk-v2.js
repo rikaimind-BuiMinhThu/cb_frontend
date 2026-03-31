@@ -153,6 +153,7 @@ function wrapWithErrorHandling(fn, fnName) {
 }
 
 const WAIT_TO_LOAD_AMAZON_DATA_MAX_COUNT = 20;
+const JUST_CLICKED_LOGIN_STORAGE_KEY = "justClickedLogin";
 
 const CHATBOT_ACTIONS = {
   CLICK_BUTTON: 'clickButton',
@@ -425,6 +426,12 @@ const waitToLoadAmazonSubscstore = (iframe) => {
 }
 
 const loadIframeForW2Repeat = (iframe) => {
+  const justClickedLogin = sessionStorage.getItem(JUST_CLICKED_LOGIN_STORAGE_KEY);
+  sessionStorage.removeItem(JUST_CLICKED_LOGIN_STORAGE_KEY);
+
+  const isLoggedIn = !!document.querySelector("input#ctl00_ContentPlaceHolder1_ucInputForm_rCartList_ctl00_tbLoginIdInMailAddr");
+  if (isLoggedIn && justClickedLogin) return;
+
   const isDisplayCoupon = !!document.querySelector("input#ctl00_ContentPlaceHolder1_ucInputForm_rCartList_ctl00_tbCouponCode");
   if (isDisplayCoupon) {
     iframe.src += `&is_display_coupon=true`;
