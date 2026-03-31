@@ -808,7 +808,7 @@ const excuteJSCode = (jscode) => {
   func();
 }
 
-const extractSelectOptions = (selectElement) => {
+const extractSelectOptions = (selectElement, options = {}) => {
   if (!selectElement || selectElement.tagName !== "SELECT") return null;
 
   const result = Array.from(selectElement.options)
