@@ -25,13 +25,32 @@ const getResponseValue = (responses, name, param) =>
   responses.findLast(x => x.data_input_name === name)?.text_value ||
   param;
 
-const parseAddress = (zip_code_address) => {
+const resolveProvinceForShopify = (obj, prefecturesList) => {
+  const raw = obj?.value_prefecture ?? obj?.prefecture;
+  const list = Array.isArray(prefecturesList) ? prefecturesList : [];
+
+  const shouldResolveById =
+    obj?.value_prefecture_type === "id" || typeof raw === "number";
+
+  if (shouldResolveById && raw != null && raw !== "" && list.length) {
+    const id = typeof raw === "number" ? raw : Number(raw);
+    if (!Number.isNaN(id)) {
+      const found = list.find((p) => p.id === id || String(p.id) === String(raw));
+      if (found?.name) return found.name;
+    }
+  }
+
+  if (raw === null || raw === undefined) return "";
+  return String(raw);
+};
+
+const parseAddress = (zip_code_address, prefecturesList) => {
   if (!zip_code_address) return {};
   try {
     const obj = typeof zip_code_address === "string" ? JSON.parse(zip_code_address) : zip_code_address;
     return {
       zip: obj.value_post_code || (obj.value_post_code_left + obj.value_post_code_right) || obj.post_code || "",
-      province: obj.value_prefecture || obj.prefecture || "",
+      province: resolveProvinceForShopify(obj, prefecturesList),
       city: obj.value_municipality || obj.municipality || "",
       address1: obj.value_address || obj.address || "",
       address2: obj.value_building_name || obj.building_name || ""
@@ -82,7 +101,10 @@ const createOrAddLinesCart = async (allResponses, state) => {
     }
 
     const { firstName, lastName } = parseName(allResponses, objParam);
-    const { zip, province, city, address1, address2 } = parseAddress(zip_code_address);
+    const { zip, province, city, address1, address2 } = parseAddress(
+      zip_code_address,
+      state.prefecturesList
+    );
     const quantity = allResponses.findLast(x => x.data_input_name === "quantity")?.integer_value || objParam.quantity || 1;
 
     return api.post("/api/v1/shopify/cart_create", {
@@ -102,4 +124,4 @@ const createOrAddLinesCart = async (allResponses, state) => {
   }
 };
 
-export { createOrAddLinesCart };
+export { createOrAddLinesCart, resolveProvinceForShopify };

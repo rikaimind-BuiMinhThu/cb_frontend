@@ -2692,41 +2692,6 @@ function ClientManagement() {
                   </>
                 )}
                 <br />
-                <label className="label-input">
-                  Zettaireach Bot id
-                  <input
-                    className="input-field"
-                    onBlur={(e) => e.target.value}
-                    type="text"
-                    id="zettai_reach_bot_id"
-                    name="zettai_reach_bot_id"
-                  />
-                </label>
-                <br />
-                <br />
-                <label className="label-input">
-                  Zettaireach Client id
-                  <input
-                    className="input-field"
-                    onBlur={(e) => e.target.value}
-                    type="text"
-                    id="zettai_reach_client_id"
-                  name="zettai_reach_client_id"
-                  />
-                </label>
-                <br />
-                <br />
-                <label className="label-input">
-                  Zettaireach Token
-                  <input
-                    className="input-field"
-                    onBlur={(e) => e.target.value}
-                    type="text"
-                    id="zettai_x_token"
-                  name="zettai_x_token"
-                  />
-                </label>
-                <br />
                 <br />
                 <Button id="btnUpdate" hidden={disableInput} onClick={updateClient}>
                   {' '}
@@ -3665,42 +3630,6 @@ function ClientManagement() {
                     <br />
                   </>
                 )}
-                <br />
-                <br />
-                <label className="label-input">
-                 Zettaireach Bot id
-                  <input
-                    className="input-field"
-                    onBlur={(e) => e.target.value}
-                    type="text"
-                    id="zettai_reach_bot_id"
-                    name="zettai_reach_bot_id"
-                  />
-                </label>{' '}
-                <br />
-                <br />
-                <label className="label-input">
-                 Zettaireach Client id
-                  <input
-                    className="input-field"
-                    onBlur={(e) => e.target.value}
-                    type="text"
-                    id="zettai_reach_client_id"
-                    name="zettai_reach_client_id"
-                  />
-                </label>{' '}
-                <br />
-                <br />
-                <label className="label-input">
-                 Zettaireach Token
-                  <input
-                    className="input-field"
-                    onBlur={(e) => e.target.value}
-                    type="text"
-                    id="zettai_x_token"
-                    name="zettai_x_token"
-                  />
-                </label>{' '}
                 <br />
                 <br />
                 <Button id="btnSubmit" onClick={addClient}>
