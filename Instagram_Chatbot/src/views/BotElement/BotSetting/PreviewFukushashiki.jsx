@@ -31,6 +31,7 @@ import {
   MESSAGE_CONTENT_TYPES,
   CONVERSION_RESPONSE_SUBMIT_TYPE,
   CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE,
+  DISPLAY_TYPES,
 } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
@@ -138,7 +139,7 @@ const previewInitialState = {
   buttonTypeSp: "1",
   rightMarginPc: 10,
   bottomMarginPc: 10,
-  displayType: 1,
+  displayType: DISPLAY_TYPES.RELOAD,
   rightSpTitle: "",
   rightMarginSp: 10,
   bottomMarginSp: 10,
@@ -535,7 +536,7 @@ const PreviewFukushashiki = () => {
   useEffect(() => {
     if (
       state.loadedStateFromSession &&
-      state.displayType === 1 &&
+      state.displayType === DISPLAY_TYPES.RELOAD &&
       !state.isOpen &&
       state.messagesList.length > 0 &&
       state.botInfor &&
@@ -774,7 +775,7 @@ const PreviewFukushashiki = () => {
 
     const prevOpenStatus = getPrevOpenStatus();
 
-    if (designSetting.display_type == 1 && prevOpenStatus == "0") {
+    if (designSetting.display_type == DISPLAY_TYPES.RELOAD && prevOpenStatus == "0") {
       savePrevOpenStatus("1");
       sendOpenChatbotCountRequest(state.scenarioId, state.deviceReceive);
     }
@@ -1236,6 +1237,8 @@ const PreviewFukushashiki = () => {
         </div>
       </div>
     )
+  } else if (state.displayType === DISPLAY_TYPES.HIDDEN) {
+    return null;
   } else if (!state.isOpen && isMobile() === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 2) {
     return (
       <div

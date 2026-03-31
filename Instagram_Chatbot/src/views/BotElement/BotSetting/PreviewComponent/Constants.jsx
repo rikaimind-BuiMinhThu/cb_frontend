@@ -358,6 +358,12 @@ export const CURRENCY_UNITS = [
   { value: 1_0000, symbol: "万" },           // 1万 = 10^4
 ];
 
+export const DISPLAY_TYPES = {
+  RELOAD: 1,
+  HIDDEN: 2,
+  BUTTON_CLICK: 3,
+}
+
 export const PREVIEW_ACTIONS = {
   UPDATE_MULTI_STATE: "UPDATE_MULTI_STATE",
   ADD_LP_OPTION_DATA: "ADD_LP_OPTION_DATA",
