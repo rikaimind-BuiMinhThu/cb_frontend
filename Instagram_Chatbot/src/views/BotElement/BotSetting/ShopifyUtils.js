@@ -116,8 +116,15 @@ const createOrAddLinesCart = async (allResponses, state) => {
       sessionStorage.setItem("cart", JSON.stringify(res?.data?.data));
       const url = res?.data?.data?.cartCreate?.cart?.checkoutUrl;
       if (url) {
-        const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
-        if (newWindow) newWindow.opener = null;
+        try {
+          if (window.top && window.top !== window.self) {
+            window.top.location.href = url;
+          } else {
+            window.location.href = url;
+          }
+        } catch (e) {
+          window.open(url, "_top");
+        }
       }
       return res;
     });
