@@ -123,6 +123,7 @@ const NO_ERROR = 'NO_ERROR';
 const GETTING_ERROR_NOTIFICATION = 'getting_error_notification';
 
 const CHATBOT_ACTIONS = {
+  UPDATE_CREDIT_CARD_FORM: 'updateCreditCardForm',
   CLICK_BUTTON: 'clickButton',
   EXCUTE_JS: 'excuteJS',
   FUKUSHASHIKI: 'fukushashiki',
