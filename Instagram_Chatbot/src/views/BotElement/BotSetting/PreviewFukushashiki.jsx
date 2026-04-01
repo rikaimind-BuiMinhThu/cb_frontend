@@ -265,6 +265,11 @@ const PreviewFukushashiki = () => {
     const actionData = event.data.actionData;
 
     switch (event.data.action) {
+      case CHATBOT_ACTIONS.UPDATE_CREDIT_CARD_FORM:
+        return dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_CREDIT_CARD_FORM,
+          payload: actionData,
+        });
       case CHATBOT_ACTIONS.CRAWL_DATA:
         let receiveOptionData = {};
         receiveOptionData[actionData.searchAddress] = actionData.result;

@@ -28,6 +28,18 @@ import { getDefaultValue } from '../PreviewComponent/VariablesUtils';
 
 const PreviewFukushashikiReducer = (state, action) => {
   switch (action.type) {
+    case PREVIEW_ACTIONS.UPDATE_CREDIT_CARD_FORM: {
+      // For yuwaeru lp, when update payment method message, we need to check and update hidden for credit card payment message
+      if (action.payload.hidden === undefined || action.payload.hidden === null) return state;
+
+      const newMessagesList = _.cloneDeep(state.messagesList).map(message => {
+        if (isCreditCardPaymentMessage(message)) {
+          message.hidden = action.payload.hidden;
+        }
+      });
+      return { ...state, messagesList: newMessagesList };
+    }
+      
     case PREVIEW_ACTIONS.UPDATE_MULTI_STATE:
       if (action.payload.removeTempDelay && action.payload.renderMessagesList?.length) {
         action.payload.renderMessagesList = action.payload.renderMessagesList?.filter(m => {
