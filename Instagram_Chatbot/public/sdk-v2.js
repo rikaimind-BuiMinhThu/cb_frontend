@@ -425,7 +425,7 @@ const waitToLoadAmazonSubscstore = (iframe) => {
 }
 
 const loadIframeForW2Repeat = (iframe) => {
-  const isLoggedIn = !!document.querySelector("input#ctl00_ContentPlaceHolder1_ucInputForm_rCartList_ctl00_tbLoginIdInMailAddr");
+  const isLoggedIn = !!!document.querySelector("input#ctl00_ContentPlaceHolder1_ucInputForm_rCartList_ctl00_tbLoginIdInMailAddr");
   if (isLoggedIn) return;
 
   const isDisplayCoupon = !!document.querySelector("input#ctl00_ContentPlaceHolder1_ucInputForm_rCartList_ctl00_tbCouponCode");
