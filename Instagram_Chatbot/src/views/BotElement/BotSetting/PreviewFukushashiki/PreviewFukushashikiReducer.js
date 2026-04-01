@@ -5,7 +5,8 @@ import {
   checkMessageCondition, 
   processMessagesForErrorState, 
   isTempDelay,
-  buildConditionParams
+  buildConditionParams,
+  isCreditCardPaymentMessage,
 } from '../PreviewComponent/Utils';
 import { processForBotMessage } from '../PreviewComponent/BotMessageUtils';
 import { processForUserMessage } from '../PreviewComponent/UserMessageUtils';
