@@ -37,6 +37,7 @@ const PreviewFukushashikiReducer = (state, action) => {
         if (isCreditCardPaymentMessage(message)) {
           message.hidden = action.payload.hidden;
         }
+        return message;
       });
       return {
         ...state,
