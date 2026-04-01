@@ -26,6 +26,8 @@ import {
   MESSAGE_CONTENT_TYPES,
 } from '../PreviewComponent/Constants.jsx';
 import { getDefaultValue } from '../PreviewComponent/VariablesUtils';
+import { convertToFukushashikiObject } from './FukushashikiDataConverterUtils';
+import { fukushashikiToLP } from './LPUtils';
 
 const PreviewFukushashikiReducer = (state, action) => {
   switch (action.type) {
@@ -36,6 +38,16 @@ const PreviewFukushashikiReducer = (state, action) => {
       const newMessagesList = _.cloneDeep(state.messagesList).map(message => {
         if (isCreditCardPaymentMessage(message)) {
           message.hidden = action.payload.hidden;
+          if (!action.payload.hidden) {
+            const data = {
+              scenario_id: state.scenarioId,
+              message: message,
+              user_id: state.uuid,
+              bot_type: "web"
+            };
+            const fukuData = convertToFukushashikiObject(data);
+            fukushashikiToLP(fukuData, state);
+          }
         }
         return message;
       });
