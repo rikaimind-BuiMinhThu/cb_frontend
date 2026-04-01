@@ -37,7 +37,11 @@ const PreviewFukushashikiReducer = (state, action) => {
           message.hidden = action.payload.hidden;
         }
       });
-      return { ...state, messagesList: newMessagesList };
+      return {
+        ...state,
+        messagesList: newMessagesList,
+        renderMessagesList: newMessagesList.slice(0, state.currentMsgIndex + 1),
+      };
     }
       
     case PREVIEW_ACTIONS.UPDATE_MULTI_STATE:
