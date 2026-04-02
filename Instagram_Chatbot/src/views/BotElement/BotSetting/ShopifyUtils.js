@@ -65,8 +65,8 @@ const parseName = (state) => {
       if (ti.save_input_content !== "user_name") continue;
       const vl = String(ti.text.valueLeft ?? "").trim();
       const vr = String(ti.text.valueRight ?? "").trim();
-      if (vl) first = first || vl;
-      if (vr) last = last || vr;
+      if (vl) first = vl || "";
+      if (vr) last = vr || "";
     }
   }
   return { firstName: first, lastName: last };
