@@ -356,6 +356,8 @@ const PreviewFukushashikiReducer = (state, action) => {
         isUsedPastMessageLoaded: !!chatbot?.is_used_message_loaded_past,
         isProcessing: false,
         useFullWidthChatbotMobile: !!chatbot?.use_fullwidth_chatbot_mobile,
+        cartSystem: state.cartSystem || chatbot?.client_cart_system || "",
+        merchandiseId: action.payload.responseData?.data?.merchandise_id || "",
         isUsedCustomJsCode: !!chatbot?.is_used_custom_js_code,
         headCustomJsCode: chatbot?.head_custom_js_code,
         topBodyCustomJsCode: chatbot?.top_body_custom_js_code,
@@ -614,6 +616,12 @@ const getProductDetailsForProductPurchase = (subContent, value) => {
 }
 
 const handleSaveInputContent = (newState, subContent, contentType, field, value) => {
+  if (contentType === 'zip_code_address' && subContent) {
+    const serialized =
+      typeof subContent === 'string' ? subContent : JSON.stringify(subContent);
+    newState.objParam = { ...newState.objParam, zip_code_address: serialized };
+  }
+
   if (!subContent.is_save_input_content) return;
   if (contentType === 'card_payment_radio_button' && !['initial_selection', 'initial_selection_picture'].includes(field)) {
     return;

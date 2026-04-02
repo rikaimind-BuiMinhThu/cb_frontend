@@ -16,6 +16,7 @@ import iconMessagePink from "assets/img/icon-mess/icon-message-chat-pink.png";
 import iconMessagePurple from "assets/img/icon-mess/icon-message-chat-purple.png";
 import iconMessageBlack from "assets/img/icon-mess/icon-message-chat-black.png";
 import iconMessageWhite from "assets/img/icon-mess/icon-message-chat-white.png";
+import api from "../../../api/api-management";
 import {
   CHATBOT_ACTIONS,
   NO_ERROR,
@@ -78,6 +79,7 @@ import {
 } from "./PreviewFukushashiki/LPUtils";
 import { convertToFukushashikiObject } from "./PreviewFukushashiki/FukushashikiDataConverterUtils";
 import { handleValidateField } from "./PreviewFukushashiki/ValidationUtils";
+import { createOrAddLinesCart } from "./ShopifyUtils";
 
 const clearChatbotState = () => {
   sessionStorage.removeItem('chatbotH');
@@ -108,6 +110,7 @@ const previewInitialState = {
   messagesList: [],
   urlThanksPage: "",
   urlCartConfirmPage: "",
+  merchandiseId: "",
   isUsedCartConfirmPage: false,
   currentMsgIndex: 0,
   renderMessagesList: [],
@@ -170,6 +173,7 @@ const previewInitialState = {
   isUpsell: false,
   progressBarMaxIndex: null,
   isNotAutoScroll: false,
+  cartSystem: params.get("cartSystem") || "",
 };
 
 
@@ -447,7 +451,7 @@ const PreviewFukushashiki = () => {
               isUsingAmazonPay: params.get('is_using_amazon_pay')
             }
           });
-        }        
+        }
 
         const timerConfig = getTimerConfig();
         if (timerConfig) {
@@ -604,7 +608,7 @@ const PreviewFukushashiki = () => {
       savePrevOpenStatus("1");
       sendOpenChatbotCountRequest(state.scenarioId, deviceReceive);
     }
-    
+
     const timerChatbotStorage = getTimerConfig();
     setTimerChanges((timerChanges) => timerChatbotStorage || timerChanges);
 
@@ -754,6 +758,7 @@ const PreviewFukushashiki = () => {
       isUsedPastMessageLoaded: !!chatbot?.is_used_message_loaded_past,
       isProcessing: false,
       useFullWidthChatbotMobile: !!chatbot?.use_fullwidth_chatbot_mobile,
+      merchandiseId: res.data.data?.merchandise_id,
       isUsedCustomJsCode: !!chatbot?.is_used_custom_js_code,
       headCustomJsCode: chatbot?.head_custom_js_code,
       topBodyCustomJsCode: chatbot?.top_body_custom_js_code,
@@ -808,7 +813,7 @@ const PreviewFukushashiki = () => {
     return variables;
   }
 
-  const calculateTimerConfigDuration = (type, duration, options = {}) => {  
+  const calculateTimerConfigDuration = (type, duration, options = {}) => {
     const { timerLeft = 0, useTimerLeft = false } = options;
 
     if (!duration || !type) return 0;
@@ -845,7 +850,7 @@ const PreviewFukushashiki = () => {
     };
 
     const validationResult = handleValidateField(clickedMsg, clickedMsgIndex);
-    
+
     if (!validationResult.isValid) {
       dispatch({
         type: PREVIEW_ACTIONS.SET_ERRORS,
@@ -854,22 +859,33 @@ const PreviewFukushashiki = () => {
       return sendErrorLogToServer(data);
     }
     const isBtnUpdateClick = clickedMsgIndex < state.renderMessagesList.length - 1;
+    const isShopify = state.cartSystem === CART_SYSTEM.SHOPIFY;
 
-    sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
-    
+    if (isShopify) {
+      sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
+
+      if (isButtonSubmitMessage(clickedMsg)) {
+        createOrAddLinesCart(state);
+      }
+    } else {
+      sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
+    }
+
     if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
       executeLpJsCode(clickedMsg.jscode, state);
     }
 
-    if (clickedMsg.message_content[0]?.type === "button_submit" 
+    if (clickedMsg.message_content[0]?.type === "button_submit"
       && clickedMsg.message_content[0]?.button_submit_id) {
-        const buttonId = clickedMsg.message_content[0]?.button_submit_id;
+      const buttonId = clickedMsg.message_content[0]?.button_submit_id;
 
+      if (!isShopify) {
         postMessageToParent({
           action: CHATBOT_ACTIONS.CLICK_BUTTON,
           actionData: buttonId,
           isOpen: true,
         }, state);
+      }
     }
 
     // For GINZA AIRA
@@ -886,7 +902,7 @@ const PreviewFukushashiki = () => {
       payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn}
     });
 
-    if (isClickedButtonSubmit || isClickedLastMessage) {      
+    if (isClickedButtonSubmit || isClickedLastMessage) {
       updateStatusConversion({
         scenario_id: state.scenarioId,
         user_input_id: state.uuid,
@@ -1101,7 +1117,7 @@ const PreviewFukushashiki = () => {
           dangerouslySetInnerHTML={{ __html: htmlText }}
         />
       </div>
-    );   
+    );
   }
 
   const getBotHeaderIcon = () => {
@@ -1204,7 +1220,7 @@ const PreviewFukushashiki = () => {
           onCloseBot={() => onOpenPreview(false)}
         />
         {!!state.botInfor?.timer_config?.enable
-          && 
+          &&
           <div className="chatbot_timer_holder" style={{
             backgroundColor: bodyStyle.backgroundColor,
           }}>
@@ -1359,7 +1375,7 @@ const PreviewFukushashiki = () => {
         }}
       >
         <div className="sp-header-left" style={{ width: '100%', padding: state.useFullWidthChatbotMobile ? "15px" : '4px' }}>
-          <div className={state.useFullWidthChatbotMobile ? "fullwidth_mobile_chatbot sp-header-left-avatar sp-avatar" :"sp-header-left-avatar sp-avatar"} style={{ width: state.useFullWidthChatbotMobile ? "58px"  :'38px' }}>
+          <div className={state.useFullWidthChatbotMobile ? "fullwidth_mobile_chatbot sp-header-left-avatar sp-avatar" :"sp-header-left-avatar sp-avatar"} style={{ width: state.useFullWidthChatbotMobile ? "58px" : '38px' }}>
             <img
               src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
               alt="bot-header-icon"

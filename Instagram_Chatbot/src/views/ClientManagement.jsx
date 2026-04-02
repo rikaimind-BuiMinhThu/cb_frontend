@@ -67,6 +67,9 @@ function ClientManagement() {
   var [pageIndex, setPageIndex] = useState(1);
   var [totalPage, setTotalPage] = useState();
   var [cartSystem, setCartSystem] = useState();
+  var [shopUrl, setShopUrl] = useState('');
+  var [clientId, setClientId] = useState('');
+  var [clientSecret, setClientSecret] = useState();
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [isOpenAddUser, setIsOpenAddUser] = useState(false);
@@ -348,6 +351,9 @@ function ClientManagement() {
         setCompanyType(data.enterprise_type);
         setCompanyType2(data.enterprise_type_2);
         setCartSystem(data.cart_system);
+        setShopUrl(data.shop_url || '');
+        setClientId(data.client_id || '');
+        setClientSecret(data.client_secret || '');
         setDepartmentName(data.department_name);
         setTitle(data.title);
         setManager(data.responsible_person);
@@ -433,6 +439,9 @@ function ClientManagement() {
         setCompanyType(data.enterprise_type);
         setCompanyType2(data.enterprise_type_2);
         setCartSystem(data.cart_system);
+        setShopUrl(data.shop_url || '');
+        setClientId(data.client_id || '');
+        setClientSecret(data.client_secret || '');
         setDepartmentName(data.department_name);
         setTitle(data.title);
         setManager(data.responsible_person);
@@ -610,6 +619,7 @@ function ClientManagement() {
       checkFieldAdd(building, '建物名') === true &&
       checkNameAdd(email, 'メールアドレス') === true &&
       utils.checkPhoneNumber(phone, '電話番号') === true &&
+      (cartSystem !== "shopify" || (shopUrl && clientId && clientSecret)) &&
       nameKata == true &&
       managerKata == true &&
       emailCheck == true &&
@@ -1008,45 +1018,55 @@ function ClientManagement() {
   }
 
   function checkFieldAdd(value, field) {
+    const element = document.getElementById(`newClient${field}ErrMsg`);
+    if (!element) {
+      return true;
+    }
     if (value === '') {
-      document.getElementById(`newClient${field}ErrMsg`).style.display = 'block';
-      document.getElementById(`newClient${field}ErrMsg`).innerHTML = `${field} 入力してください。`;
+      element.style.display = 'block';
+      element.innerHTML = `${field} 入力してください。`;
     } else if (value && value.length > 50) {
-      document.getElementById(`newClient${field}ErrMsg`).style.display = 'block';
-      document.getElementById(`newClient${field}ErrMsg`).innerHTML = `50文字以下入力してください。`;
+      element.style.display = 'block';
+      element.innerHTML = `50文字以下入力してください。`;
     } else {
-      document.getElementById(`newClient${field}ErrMsg`).style.display = 'none';
-      document.getElementById(`newClient${field}ErrMsg`).innerHTML = '';
+      element.style.display = 'none';
+      element.innerHTML = '';
       return true;
     }
   }
 
   function checkNameAdd(value, field) {
+    const element = document.getElementById(`newClient${field}ErrMsg`);
+    if (!element) {
+      return true;
+    }
     if (value === '') {
-      document.getElementById(`newClient${field}ErrMsg`).style.display = 'block';
-      document.getElementById(`newClient${field}ErrMsg`).innerHTML = `${field} 入力してください。`;
+      element.style.display = 'block';
+      element.innerHTML = `${field} 入力してください。`;
     } else if (value && value.length > 35) {
-      document.getElementById(`newClient${field}ErrMsg`).style.display = 'block';
-      document.getElementById(`newClient${field}ErrMsg`).innerHTML = `35文字以下入力してください。`;
+      element.style.display = 'block';
+      element.innerHTML = `35文字以下入力してください。`;
     } else {
-      document.getElementById(`newClient${field}ErrMsg`).style.display = 'none';
-      document.getElementById(`newClient${field}ErrMsg`).innerHTML = '';
+      element.style.display = 'none';
+      element.innerHTML = '';
       return true;
     }
   }
 
   function checkPasswordAdd(value, field) {
+    const element = document.getElementById(`newClient${field}ErrMsg`);
+    if (!element) {
+      return true;
+    }
     if (value === '') {
-      document.getElementById(`newClient${field}ErrMsg`).style.display = 'block';
-      document.getElementById(`newClient${field}ErrMsg`).innerHTML = `${field} 入力してください。`;
+      element.style.display = 'block';
+      element.innerHTML = `${field} 入力してください。`;
     } else if (value && value.length > 24) {
-      document.getElementById(`newClient${field}ErrMsg`).style.display = 'block';
-      document.getElementById(
-        `newClient${field}ErrMsg`
-      ).innerHTML = `24文字以下入力してください。6文字以上入力してください。`;
+      element.style.display = 'block';
+      element.innerHTML = `24文字以下入力してください。6文字以上入力してください。`;
     } else {
-      document.getElementById(`newClient${field}ErrMsg`).style.display = 'none';
-      document.getElementById(`newClient${field}ErrMsg`).innerHTML = '';
+      element.style.display = 'none';
+      element.innerHTML = '';
       return true;
     }
   }
@@ -1086,20 +1106,19 @@ function ClientManagement() {
   }
 
   function checkInputNumber(value, field) {
-    // var phoneRe = /^\d+$/;
+    const element = document.getElementById(`newClient${field}ErrMsg`);
+    if (!element) {
+      return true;
+    }
     if (value === '') {
-      document.getElementById(`newClient${field}ErrMsg`).style.display = 'block';
-      document.getElementById(
-        `newClient${field}ErrMsg`
-      ).innerHTML = `${field} を入力してください。`;
+      element.style.display = 'block';
+      element.innerHTML = `${field} を入力してください。`;
     } else if (parseInt(value) == isNaN) {
-      document.getElementById(`newClient${field}ErrMsg`).style.display = 'block';
-      document.getElementById(
-        `newClient${field}ErrMsg`
-      ).innerHTML = `${field} 番号になければなりません。`;
+      element.style.display = 'block';
+      element.innerHTML = `${field} 番号になければなりません。`;
     } else {
-      document.getElementById(`newClient${field}ErrMsg`).style.display = 'none';
-      document.getElementById(`newClient${field}ErrMsg`).innerHTML = '';
+      element.style.display = 'none';
+      element.innerHTML = '';
       return true;
     }
   }
@@ -1182,6 +1201,10 @@ function ClientManagement() {
     setContract('');
     setInputStartDate('');
     setInputEndDate('');
+    setCartSystem('cart_system_none');
+    setShopUrl('');
+    setClientId('');
+    setClientSecret('');
     setIsOpenAddUser(true);
     //detailUserClient
   }
@@ -1374,9 +1397,9 @@ function ClientManagement() {
 
   function onSelectPlan(el){
     let plan = plans.find((o) => o.code == el.target.value);
-    if(plan){
+    if (plan){
       document.getElementById("newPlanPrice").value = plan.price;
-      if(isOpen){
+      if (isOpen){
         setPrice(plan.price);
       }
     }
@@ -1543,7 +1566,7 @@ function ClientManagement() {
                             </td>
                             <td>{item.name}</td>
                             <td>
-                              {plans.find((el)=> el.code === item.plan) && plans.find((el)=> el.code === item.plan).name}
+                              {plans.find((el)=> el.code === item.plan) && plans.find((el) => el.code === item.plan).name}
                             </td>
                             <td>
                               {item?.status === 'pause'
@@ -1600,7 +1623,7 @@ function ClientManagement() {
                                   <MDBIcon fas icon="yen-sign"
                                    style={{
                                       fontSize: '1.5em',
-                                    }}  
+                                    }}
                                     onClick={(e) => gotoPaymentDetail(item)}/>
                                 </div>
 
@@ -1614,7 +1637,7 @@ function ClientManagement() {
                                       icon="eye"
                                     />
                                 </div>
-                                
+
                                 <div style={{marginRight: '30px', marginTop: '5px'}}>
                                   <MDBIcon
                                    onClick={(e) => updateClientUser(item)}
@@ -2601,6 +2624,7 @@ function ClientManagement() {
                     onMouseDown={() => setSizeAfterSelectCartSystem()}
                     className="input-field"
                     defaultValue={cartSystem}
+                    onChange={(e) => setCartSystem(e.target.value)}
                     name="cart_system"
                     id="newCartSystem"
                   >
@@ -2619,7 +2643,7 @@ function ClientManagement() {
                     <option onClick={() => setSizeAfterSelectCartSystem()} value="ec_force">
                       Ec-Force
                     </option>
-                    <option onClick={() => setSizeAfterSelectCartSystem()} value="repeat_plus"> 
+                    <option onClick={() => setSizeAfterSelectCartSystem()} value="repeat_plus">
                       リピートPLUS
                     </option>
                   </select>
@@ -2629,6 +2653,44 @@ function ClientManagement() {
                     style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
+                {cartSystem === "shopify" && (
+                  <>
+                    <br />
+                    <label className="label-input">
+                      Shop URL
+                      <input
+                        className="input-field"
+                        value={shopUrl}
+                        onChange={(e) => setShopUrl(e.target.value)}
+                        type="text"
+                        name="shop_url"
+                      />
+                    </label>
+                    <br />
+                    <label className="label-input">
+                      Client ID
+                      <input
+                        className="input-field"
+                        value={clientId}
+                        onChange={(e) => setClientId(e.target.value)}
+                        type="text"
+                        name="client_id"
+                      />
+                    </label>
+                    <br />
+                    <label className="label-input">
+                      Client Secret
+                      <input
+                        className="input-field"
+                        value={clientSecret}
+                        onChange={(e) => setClientSecret(e.target.value)}
+                        type="text"
+                        name="client_secret"
+                      />
+                    </label>
+                    <br />
+                  </>
+                )}
                 <br />
                 <br />
                 <Button id="btnUpdate" hidden={disableInput} onClick={updateClient}>
@@ -3500,7 +3562,8 @@ function ClientManagement() {
                     onMouseLeave={() => closeSizeSelectCartSystem()}
                     onMouseDown={() => setSizeAfterSelectCartSystem()}
                     className="input-field"
-                    defaultValue={'cart_system_none'}
+                    defaultValue={cartSystem || 'cart_system_none'}
+                    onChange={(e) => setCartSystem(e.target.value)}
                     name="cart_system"
                     id="newCartSystem"
                   >
@@ -3529,6 +3592,44 @@ function ClientManagement() {
                     style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
+                {cartSystem === "shopify" && (
+                  <>
+                    <br />
+                    <label className="label-input">
+                      Shop URL
+                      <input
+                        className="input-field"
+                        value={shopUrl}
+                        onChange={(e) => setShopUrl(e.target.value)}
+                        type="text"
+                        name="shop_url"
+                      />
+                    </label>
+                    <br />
+                    <label className="label-input">
+                      Client ID
+                      <input
+                        className="input-field"
+                        value={clientId}
+                        onChange={(e) => setClientId(e.target.value)}
+                        type="text"
+                        name="client_id"
+                      />
+                    </label>
+                    <br />
+                    <label className="label-input">
+                      Client Secret
+                      <input
+                        className="input-field"
+                        value={clientSecret}
+                        onChange={(e) => setClientSecret(e.target.value)}
+                        type="text"
+                        name="client_secret"
+                      />
+                    </label>
+                    <br />
+                  </>
+                )}
                 <br />
                 <br />
                 <Button id="btnSubmit" onClick={addClient}>

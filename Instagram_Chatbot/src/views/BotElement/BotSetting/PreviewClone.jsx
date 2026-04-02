@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef, use } from "react";
 import "../../../assets/css/bot/preview-chat-bot.css";
 import api from "../../../api/api-management";
+import { resolveProvinceForShopify } from "./ShopifyUtils";
 import Cookies from "js-cookie";
 import { MDBIcon } from "mdbreact";
 import SelectCustom from "./ScenarioSetting/scenarioComon/SelectCustom";
@@ -2592,7 +2593,7 @@ function Preview() {
           email: email || "example@gmail.com",
           phone: phoneNumber,
           zip: JSON.parse(zip_code_address)?.value_post_code || (JSON.parse(zip_code_address)?.value_post_code_left + JSON.parse(zip_code_address)?.value_post_code_right),
-          province: JSON.parse(zip_code_address)?.value_prefecture,
+          province: resolveProvinceForShopify(JSON.parse(zip_code_address), dataPrefectures),
           city: JSON.parse(zip_code_address)?.value_municipality,
           address1: JSON.parse(zip_code_address)?.value_address,
           address2: JSON.parse(zip_code_address)?.value_building_name,
