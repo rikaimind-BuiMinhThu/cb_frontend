@@ -839,7 +839,7 @@ const PreviewFukushashiki = () => {
     }
   }
 
-  const onClickNext = async (clickedMsgIndex, clickedMsg) => {
+  const onClickNext = (clickedMsgIndex, clickedMsg) => {
     savedChatbotState(state);
 
     const data = {
@@ -865,27 +865,11 @@ const PreviewFukushashiki = () => {
       sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
 
       if (isButtonSubmitMessage(clickedMsg)) {
-        await createOrAddLinesCart(state);
+        createOrAddLinesCart(state);
       }
     } else {
       sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
     }
-
-    let ga4EventCode = "";
-    if (clickedMsg.message_content) {
-      clickedMsg.message_content.forEach((content) => {
-        if (
-          content.is_event_tracking_script &&
-          content.event_tracking_script
-        ) {
-          ga4EventCode = content.event_tracking_script;
-        }
-      });
-    }
-
-    const fukuGA4 = convertToFukushashikiObject(data);
-    fukuGA4.ga4EventCode = ga4EventCode;
-    fukushashikiToLP(fukuGA4, state);
 
     if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
       executeLpJsCode(clickedMsg.jscode, state);
