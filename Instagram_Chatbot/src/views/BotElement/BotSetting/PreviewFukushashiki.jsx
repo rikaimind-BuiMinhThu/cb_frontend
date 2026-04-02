@@ -110,6 +110,7 @@ const previewInitialState = {
   messagesList: [],
   urlThanksPage: "",
   urlCartConfirmPage: "",
+  merchanseId: "",
   isUsedCartConfirmPage: false,
   currentMsgIndex: 0,
   renderMessagesList: [],
@@ -419,37 +420,6 @@ const PreviewFukushashiki = () => {
     style.innerHTML = state.customCssContent;
     document.head.appendChild(style);
   }, [state.isUsedCustomCss, state.customCssContent]);
-
-  // For add JS code to iframe Chatbot widget
-  useEffect(() => {
-    const IN_FRAME_SCRIPT_ID = "ec-chatbot-custom-js-in-frame-bottom_body";
-    const removeInFrameCustomJs = () => {
-      document.getElementById(IN_FRAME_SCRIPT_ID)?.remove();
-      ["head", "top_body"].forEach((key) => {
-        document.getElementById(`ec-chatbot-custom-js-in-frame-${key}`)?.remove();
-      });
-    };
-
-    const shouldInjectInFrame =
-      state.isUsedCustomJsCode &&
-      state.cartSystem === CART_SYSTEM.SHOPIFY &&
-      String(state.bottomBodyCustomJsCode || "").trim();
-
-    if (!shouldInjectInFrame) {
-      removeInFrameCustomJs();
-      return;
-    }
-
-    document.getElementById(IN_FRAME_SCRIPT_ID)?.remove();
-
-    const script = document.createElement("script");
-    script.id = IN_FRAME_SCRIPT_ID;
-    script.type = "text/javascript";
-    script.innerHTML = state.bottomBodyCustomJsCode;
-    document.body.appendChild(script);
-
-    return removeInFrameCustomJs;
-  }, [state.isUsedCustomJsCode, state.cartSystem, state.bottomBodyCustomJsCode]);
 
   // Get Preview Scenario Data
   useEffect(() => {
@@ -788,6 +758,7 @@ const PreviewFukushashiki = () => {
       isUsedPastMessageLoaded: !!chatbot?.is_used_message_loaded_past,
       isProcessing: false,
       useFullWidthChatbotMobile: !!chatbot?.use_fullwidth_chatbot_mobile,
+      merchanseId: res.data.data?.merchanse_id,
       isUsedCustomJsCode: !!chatbot?.is_used_custom_js_code,
       headCustomJsCode: chatbot?.head_custom_js_code,
       topBodyCustomJsCode: chatbot?.top_body_custom_js_code,
@@ -825,6 +796,13 @@ const PreviewFukushashiki = () => {
         botInfor: getBotInforFromPreviewResponse(res),
         isLoggedIn: isLoggedIn,
         isUsingAmazonPay: params.get('is_using_amazon_pay'),
+      },
+    });
+    dispatch({
+      type: PREVIEW_ACTIONS.SET_CHATBOT_SETTINGS,
+      payload: {
+        cartSystem: state.cartSystem || chatbot?.client_cart_system || "",
+        merchanseId: res.data.data?.merchanse_id || "",
       },
     });
   }
@@ -867,7 +845,6 @@ const PreviewFukushashiki = () => {
       }
     }
   }
-
 
   const onClickNext = async (clickedMsgIndex, clickedMsg) => {
     savedChatbotState(state);

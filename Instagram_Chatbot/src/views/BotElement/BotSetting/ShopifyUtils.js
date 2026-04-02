@@ -1,25 +1,5 @@
 import api from "api/api-management";
 
-const findShopifyProduct = (allResponses, state) => {
-  const types = ["product_purchase", "product_purchase_select_option", "text_with_thumbnail_image"];
-  const match = (p, v) => [p.id, p.productVariantId, p.item_number].includes(v);
-
-  const resp = allResponses.findLast(x => types.includes(x.data_input_name));
-  if (resp?.text_value) {
-    const d = JSON.parse(resp.text_value);
-    const p = d.products?.find(x => match(x, d.value || d.initial_selection?.[0]));
-    if (p) return p;
-  }
-
-  const content = state.messagesList.find(m => m.message_content.some(c => types.includes(c.type)))
-    ?.message_content.find(c => types.includes(c.type));
-  if (content) {
-    const d = content[content.type], v = state.objParam[d?.save_input_content] || d?.value || d?.initial_selection?.[0];
-    return d.products?.find(x => match(x, v));
-  }
-  return null;
-};
-
 const getResponseValue = (responses, name, param) =>
   responses.findLast(x => x.data_input_name === name)?.string_value ||
   responses.findLast(x => x.data_input_name === name)?.text_value ||
@@ -84,11 +64,11 @@ const parseName = (allResponses, objParam) => {
 
 const createOrAddLinesCart = async (allResponses, state) => {
   const { objParam } = state;
-  const product = findShopifyProduct(allResponses, state);
+  const merchandiseId = state?.merchanseId;
   const email = getResponseValue(allResponses, "email", objParam.email);
   const zip_code_address = getResponseValue(allResponses, "zip_code_address", objParam.zip_code_address);
 
-  if (product && email && zip_code_address) {
+  if (merchandiseId && email && zip_code_address) {
     const phone = getResponseValue(allResponses, "phone_number", objParam.phone_number);
     let phoneNumber = phone;
     if (phone && typeof phone !== "string") {
@@ -110,7 +90,7 @@ const createOrAddLinesCart = async (allResponses, state) => {
     return api.post("/api/v1/shopify/cart_create", {
       first_name: firstName, last_name: lastName, email, phone: phoneNumber,
       zip, province, city, address1, address2,
-      lines: [{ merchandiseId: product.productVariantId || product.id, quantity }],
+      lines: [{ merchandiseId, quantity }],
       scenario_id: state.scenarioId, uuid: state.uuid
     }).then(res => {
       sessionStorage.setItem("cart", JSON.stringify(res?.data?.data));

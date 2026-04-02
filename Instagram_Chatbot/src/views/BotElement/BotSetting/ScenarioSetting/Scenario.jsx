@@ -47,6 +47,7 @@ import HtmlCodeConfig from './scenarioComon/HtmlCodeConfig';
 import OptionGenderConfig from './OptionGenderConfig';
 import SubmitButtonLoadingConfig from './SubmitButtonLoadingConfig';
 import SubmitButtonConfig from './SubmitButtonConfig';
+import {CART_SYSTEM} from '../PreviewComponent/Constants';
 
 const _ = require('lodash');
 
@@ -811,6 +812,7 @@ const Scenario = () => {
   const [scenarioName, setScenarioName] = useState('');
   const [scenarioType, setScenarioType] = useState('payment');
   const [urlThanks, setUrlThanks] = useState('');
+  const [merchanseId, setMerchanseId] = useState('');
   const [lpProductUrl, setLpProductUrl] = useState('');
   const [coupon, setCoupon] = useState('');
   const [isUseOnlyRegularOrder, setIsUseOnlyRegularOrder] = useState(false);
@@ -907,10 +909,15 @@ const Scenario = () => {
   const [useFullwidthChatbotMobile, setUseFullwidthChatbotMobile] = useState(false);
 
   // const client = JSON.parse(sessionStorage.getItem('client'));
-  const client = JSON.parse(sessionStorage.getItem('client'));
+  // const client = JSON.parse(sessionStorage.getItem('client'));
+  
+  // Prefer sessionStorage, fallback localStorage for environments that persist client there.
+  const clientStorage = sessionStorage.getItem('client') || localStorage.getItem('client');
+  const client = JSON.parse(clientStorage);
 
   // ProductVariant - Shopify
   const [listProductVariants, setListProductVariants] = useState([]);
+  const isShopifyPaymentScenario = client?.cart_system === CART_SYSTEM.SHOPIFY && scenarioType === "payment";
 
   useEffect(() => {
     getListProductVariants(null);
@@ -966,6 +973,7 @@ const Scenario = () => {
       setScenarioName(res.data.data?.scenario_name || '');
       setScenarioType(res.data.data?.scenario_type || 'payment');
       setUrlThanks(res.data.data?.conversation?.urlThanksPage || '');
+      setMerchanseId(res.data.data?.merchanse_id || '');
       setIsUsedCartConfirmPage(res.data.data?.conversation?.isUsedCartConfirmPage || false);
       setUrlCartConfirmPage(res.data.data?.conversation?.urlCartConfirmPage || '');
       setCoupon(res.data.data?.conversation?.coupon || '');
@@ -2675,6 +2683,7 @@ const Scenario = () => {
       },
       scenario_name: scenarioName,
       scenario_type: scenarioType,
+      merchanse_id: merchanseId,
       landing_page_product_url: lpProductUrl,
       is_use_only_regular_order: isUseOnlyRegularOrder,
       is_used_fukushashiki: isUseFukushashiki,
@@ -2737,6 +2746,7 @@ const Scenario = () => {
       },
       scenario_name: scenarioName,
       scenario_type: scenarioType,
+      merchanse_id: merchanseId,
       landing_page_product_url: lpProductUrl,
       is_use_only_regular_order: isUseOnlyRegularOrder,
       is_used_fukushashiki: isUseFukushashiki,
@@ -3160,6 +3170,16 @@ const Scenario = () => {
                           </div>
                         )
                       }
+                      {isShopifyPaymentScenario && (
+                        <div>
+                          <InputCustom
+                            style={{ width: '100%', marginTop: '5px' }}
+                            value={merchanseId}
+                            onChange={value => setMerchanseId(value)}
+                            placeholder="製品ID"
+                          />
+                        </div>
+                      )}
                       {client?.cart_system === "ec_force" && <div>
                         <InputCustom
                           style={{ width: '100%', marginTop: '5px' }}
