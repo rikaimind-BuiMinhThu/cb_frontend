@@ -62,17 +62,11 @@ const parseName = (state) => {
     for (const c of msg.message_content || []) {
       if (c.type !== "text_input" || !c.text_input?.text?.isSplitInput) continue;
       const ti = c.text_input;
-      const vl = (ti.text.valueLeft ?? "").toString().trim();
-      const vr = (ti.text.valueRight ?? "").toString().trim();
-      const { left_fukushashiki_search_value: lk, right_fukushashiki_search_value: rk } = c;
-      if (lk === "first_name" && vl) first = vl;
-      if (rk === "last_name" && vr) last = vr;
-      if (lk === "last_name" && vl) last = vl;
-      if (rk === "first_name" && vr) first = vr;
-      if (ti.save_input_content === "user_name") {
-        if (vl) first = first || vl;
-        if (vr) last = last || vr;
-      }
+      if (ti.save_input_content !== "user_name") continue;
+      const vl = String(ti.text.valueLeft ?? "").trim();
+      const vr = String(ti.text.valueRight ?? "").trim();
+      if (vl) first = first || vl;
+      if (vr) last = last || vr;
     }
   }
   return { firstName: first, lastName: last };
