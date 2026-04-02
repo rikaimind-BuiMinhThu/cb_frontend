@@ -862,7 +862,7 @@ const PreviewFukushashiki = () => {
     const isShopify = state.cartSystem === CART_SYSTEM.SHOPIFY;
 
     if (isShopify) {
-      await sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
+      sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
 
       if (isButtonSubmitMessage(clickedMsg)) {
         await createOrAddLinesCart(state);
