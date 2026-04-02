@@ -110,7 +110,7 @@ const previewInitialState = {
   messagesList: [],
   urlThanksPage: "",
   urlCartConfirmPage: "",
-  merchanseId: "",
+  merchandiseId: "",
   isUsedCartConfirmPage: false,
   currentMsgIndex: 0,
   renderMessagesList: [],
@@ -758,7 +758,7 @@ const PreviewFukushashiki = () => {
       isUsedPastMessageLoaded: !!chatbot?.is_used_message_loaded_past,
       isProcessing: false,
       useFullWidthChatbotMobile: !!chatbot?.use_fullwidth_chatbot_mobile,
-      merchanseId: res.data.data?.merchanse_id,
+      merchandiseId: res.data.data?.merchandise_id,
       isUsedCustomJsCode: !!chatbot?.is_used_custom_js_code,
       headCustomJsCode: chatbot?.head_custom_js_code,
       topBodyCustomJsCode: chatbot?.top_body_custom_js_code,
@@ -796,13 +796,6 @@ const PreviewFukushashiki = () => {
         botInfor: getBotInforFromPreviewResponse(res),
         isLoggedIn: isLoggedIn,
         isUsingAmazonPay: params.get('is_using_amazon_pay'),
-      },
-    });
-    dispatch({
-      type: PREVIEW_ACTIONS.SET_CHATBOT_SETTINGS,
-      payload: {
-        cartSystem: state.cartSystem || chatbot?.client_cart_system || "",
-        merchanseId: res.data.data?.merchanse_id || "",
       },
     });
   }

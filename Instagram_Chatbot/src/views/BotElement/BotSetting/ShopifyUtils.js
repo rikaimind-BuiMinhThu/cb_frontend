@@ -105,7 +105,7 @@ const formatPhoneForCart = (state) => {
 };
 
 const createOrAddLinesCart = async (state) => {
-  const merchandiseId = state?.merchanseId;
+  const merchandiseId = state?.merchandiseId;
   const email = getResponseValue(state, "email");
   const zip_code_address = getResponseValue(state, "zip_code_address");
 

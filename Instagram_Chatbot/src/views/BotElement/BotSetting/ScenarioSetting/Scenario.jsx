@@ -812,7 +812,7 @@ const Scenario = () => {
   const [scenarioName, setScenarioName] = useState('');
   const [scenarioType, setScenarioType] = useState('payment');
   const [urlThanks, setUrlThanks] = useState('');
-  const [merchanseId, setMerchanseId] = useState('');
+  const [merchandiseId, setMerchandiseId] = useState('');
   const [lpProductUrl, setLpProductUrl] = useState('');
   const [coupon, setCoupon] = useState('');
   const [isUseOnlyRegularOrder, setIsUseOnlyRegularOrder] = useState(false);
@@ -971,7 +971,7 @@ const Scenario = () => {
       setScenarioType(res.data.data?.scenario_type || 'payment');
       setClientCartSystem(res.data.data?.cart_system ?? null);
       setUrlThanks(res.data.data?.conversation?.urlThanksPage || '');
-      setMerchanseId(res.data.data?.merchanse_id || '');
+      setMerchandiseId(res.data.data?.merchandise_id || '');
       setIsUsedCartConfirmPage(res.data.data?.conversation?.isUsedCartConfirmPage || false);
       setUrlCartConfirmPage(res.data.data?.conversation?.urlCartConfirmPage || '');
       setCoupon(res.data.data?.conversation?.coupon || '');
@@ -2681,7 +2681,7 @@ const Scenario = () => {
       },
       scenario_name: scenarioName,
       scenario_type: scenarioType,
-      merchanse_id: merchanseId,
+      merchandise_id: merchandiseId,
       landing_page_product_url: lpProductUrl,
       is_use_only_regular_order: isUseOnlyRegularOrder,
       is_used_fukushashiki: isUseFukushashiki,
@@ -2744,7 +2744,7 @@ const Scenario = () => {
       },
       scenario_name: scenarioName,
       scenario_type: scenarioType,
-      merchanse_id: merchanseId,
+      merchandise_id: merchandiseId,
       landing_page_product_url: lpProductUrl,
       is_use_only_regular_order: isUseOnlyRegularOrder,
       is_used_fukushashiki: isUseFukushashiki,
@@ -3172,8 +3172,8 @@ const Scenario = () => {
                         <div>
                           <InputCustom
                             style={{ width: '100%', marginTop: '5px' }}
-                            value={merchanseId}
-                            onChange={value => setMerchanseId(value)}
+                            value={merchandiseId}
+                            onChange={value => setMerchandiseId(value)}
                             placeholder="商品IDもしくはバリアントID"
                           />
                         </div>
