@@ -104,7 +104,7 @@ const formatPhoneForCart = (state) => {
   return join(typeof p === "object" ? p : null) || "";
 };
 
-const createOrAddLinesCart = async (state) => {
+const createOrAddLinesCart = (state) => {
   const merchandiseId = state?.merchandiseId;
   const email = getResponseValue(state, "email");
   const zip_code_address = getResponseValue(state, "zip_code_address");
