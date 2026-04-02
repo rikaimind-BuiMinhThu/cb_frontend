@@ -614,6 +614,12 @@ const getProductDetailsForProductPurchase = (subContent, value) => {
 }
 
 const handleSaveInputContent = (newState, subContent, contentType, field, value) => {
+  if (contentType === 'zip_code_address' && subContent) {
+    const serialized =
+      typeof subContent === 'string' ? subContent : JSON.stringify(subContent);
+    newState.objParam = { ...newState.objParam, zip_code_address: serialized };
+  }
+
   if (!subContent.is_save_input_content) return;
   if (contentType === 'card_payment_radio_button' && !['initial_selection', 'initial_selection_picture'].includes(field)) {
     return;

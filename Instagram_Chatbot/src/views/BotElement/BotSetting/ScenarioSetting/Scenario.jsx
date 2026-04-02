@@ -907,17 +907,14 @@ const Scenario = () => {
   const [dataCondition, setDataCondition] = useState([]);
   const [isUsedMessageLoadedPast, setIsUsedMessageLoadedPast] = useState(false);
   const [useFullwidthChatbotMobile, setUseFullwidthChatbotMobile] = useState(false);
+  const [clientCartSystem, setClientCartSystem] = useState(null);
 
   // const client = JSON.parse(sessionStorage.getItem('client'));
-  // const client = JSON.parse(sessionStorage.getItem('client'));
-  
-  // Prefer sessionStorage, fallback localStorage for environments that persist client there.
-  const clientStorage = sessionStorage.getItem('client') || localStorage.getItem('client');
-  const client = JSON.parse(clientStorage);
+  const client = JSON.parse(sessionStorage.getItem('client'));
 
   // ProductVariant - Shopify
   const [listProductVariants, setListProductVariants] = useState([]);
-  const isShopifyPaymentScenario = client?.cart_system === CART_SYSTEM.SHOPIFY && scenarioType === "payment";
+  const isShopifyPaymentScenario = clientCartSystem === CART_SYSTEM.SHOPIFY && scenarioType === "payment";
 
   useEffect(() => {
     getListProductVariants(null);
@@ -972,6 +969,7 @@ const Scenario = () => {
       setDataMessages(res.data.data?.conversation?.messages || []);
       setScenarioName(res.data.data?.scenario_name || '');
       setScenarioType(res.data.data?.scenario_type || 'payment');
+      setClientCartSystem(res.data.data?.cart_system ?? null);
       setUrlThanks(res.data.data?.conversation?.urlThanksPage || '');
       setMerchanseId(res.data.data?.merchanse_id || '');
       setIsUsedCartConfirmPage(res.data.data?.conversation?.isUsedCartConfirmPage || false);
@@ -3176,7 +3174,7 @@ const Scenario = () => {
                             style={{ width: '100%', marginTop: '5px' }}
                             value={merchanseId}
                             onChange={value => setMerchanseId(value)}
-                            placeholder="製品ID"
+                            placeholder="商品IDもしくはバリアントID"
                           />
                         </div>
                       )}

@@ -1,9 +1,25 @@
 import api from "api/api-management";
 
-const getResponseValue = (responses, name, param) =>
-  responses.findLast(x => x.data_input_name === name)?.string_value ||
-  responses.findLast(x => x.data_input_name === name)?.text_value ||
-  param;
+const getResponseValue = (state, name) => {
+  const row = (state.scenarioUserResponses || []).findLast((x) => x.data_input_name === name);
+  const fromRow = row?.string_value || row?.text_value;
+  if (fromRow != null && fromRow !== "") return fromRow;
+  const p = state.objParam || {};
+  if (p[name] != null && p[name] !== "") return p[name];
+  if (name === "zip_code_address") {
+    for (const k of ["zipcode_address", "zip_code", "post_code"]) {
+      if (p[k] != null && p[k] !== "") return p[k];
+    }
+  }
+  return undefined;
+};
+
+const getResponseInteger = (state, name) => {
+  const row = (state.scenarioUserResponses || []).findLast((x) => x.data_input_name === name);
+  if (row?.integer_value != null) return row.integer_value;
+  const p = state.objParam?.[name];
+  return p != null ? p : 1;
+};
 
 const resolveProvinceForShopify = (obj, prefecturesList) => {
   const raw = obj?.value_prefecture ?? obj?.prefecture;
@@ -38,54 +54,76 @@ const parseAddress = (zip_code_address, prefecturesList) => {
   } catch (e) { return {}; }
 };
 
-const parseName = (allResponses, objParam) => {
-  let first = getResponseValue(allResponses, "first_name", '');
-  let last = getResponseValue(allResponses, "last_name", '');
-
-  if (!first || !last) {
-    const uName = getResponseValue(allResponses, "user_name", objParam.user_name);
-
-    const parse = (v) => {
-      if (typeof v === "string" && v.startsWith("{")) {
-        try { return JSON.parse(v); } catch (e) { return null; }
+const parseName = (state) => {
+  let first = getResponseValue(state, "first_name") || "";
+  let last = getResponseValue(state, "last_name") || "";
+  for (const msg of state.messagesList || []) {
+    if (msg.belong_to !== "user") continue;
+    for (const c of msg.message_content || []) {
+      if (c.type !== "text_input" || !c.text_input?.text?.isSplitInput) continue;
+      const ti = c.text_input;
+      const vl = (ti.text.valueLeft ?? "").toString().trim();
+      const vr = (ti.text.valueRight ?? "").toString().trim();
+      const { left_fukushashiki_search_value: lk, right_fukushashiki_search_value: rk } = c;
+      if (lk === "first_name" && vl) first = vl;
+      if (rk === "last_name" && vr) last = vr;
+      if (lk === "last_name" && vl) last = vl;
+      if (rk === "first_name" && vr) first = vr;
+      if (ti.save_input_content === "user_name") {
+        if (vl) first = first || vl;
+        if (vr) last = last || vr;
       }
-      return v;
-    };
-
-    const n = parse(uName);
-    if (n) {
-      if (!first) first = n?.valueRight;
-      if (!last) last = n?.valueLeft;
     }
   }
-
-  return { firstName: first || "", lastName: last || "" };
+  return { firstName: first, lastName: last };
 };
 
-const createOrAddLinesCart = async (allResponses, state) => {
-  const { objParam } = state;
+const formatPhoneForCart = (state) => {
+  const join = (pn) => {
+    if (!pn || typeof pn !== "object") return "";
+    const a = String(pn.value1 ?? "").trim();
+    const b = String(pn.value2 ?? "").trim();
+    const c = String(pn.value3 ?? "").trim();
+    if (!a && !b && !c) return "";
+    return pn.withHyphen ? `${a}-${b}-${c}` : `${a}${b}${c}`;
+  };
+
+  let s = "";
+  for (const msg of state.messagesList || []) {
+    if (msg.belong_to !== "user") continue;
+    for (const c of msg.message_content || []) {
+      if (c.type !== "text_input" || c.text_input?.type !== "phone_number") continue;
+      const out = join(c.text_input.phone_number);
+      if (out) s = out;
+    }
+  }
+  if (s) return s;
+
+  let p = state.objParam?.phone_number;
+  if (typeof p === "string" && p.trim().startsWith("{")) {
+    try {
+      p = JSON.parse(p);
+    } catch (e) {
+      p = null;
+    }
+  }
+  return join(typeof p === "object" ? p : null) || "";
+};
+
+const createOrAddLinesCart = async (state) => {
   const merchandiseId = state?.merchanseId;
-  const email = getResponseValue(allResponses, "email", objParam.email);
-  const zip_code_address = getResponseValue(allResponses, "zip_code_address", objParam.zip_code_address);
+  const email = getResponseValue(state, "email");
+  const zip_code_address = getResponseValue(state, "zip_code_address");
 
   if (merchandiseId && email && zip_code_address) {
-    const phone = getResponseValue(allResponses, "phone_number", objParam.phone_number);
-    let phoneNumber = phone;
-    if (phone && typeof phone !== "string") {
-      phoneNumber = phone.value || (phone.value1 + phone.value2 + phone.value3);
-    } else if (typeof phone === "string" && phone.startsWith("{")) {
-      try {
-        const p = JSON.parse(phone);
-        phoneNumber = p.value || (p.value1 + p.value2 + p.value3) || phone;
-      } catch (e) { }
-    }
+    const phoneNumber = formatPhoneForCart(state);
 
-    const { firstName, lastName } = parseName(allResponses, objParam);
+    const { firstName, lastName } = parseName(state);
     const { zip, province, city, address1, address2 } = parseAddress(
       zip_code_address,
       state.prefecturesList
     );
-    const quantity = allResponses.findLast(x => x.data_input_name === "quantity")?.integer_value || objParam.quantity || 1;
+    const quantity = getResponseInteger(state, "quantity") || 1 ;
 
     return api.post("/api/v1/shopify/cart_create", {
       first_name: firstName, last_name: lastName, email, phone: phoneNumber,
