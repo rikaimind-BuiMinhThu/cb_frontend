@@ -22,7 +22,7 @@ const validateFields = {
   },
   
   address: (data) => {
-    if (data.compact_municipality_and_address || data.compact_municipality_and_address_and_building_name) return true;
+    if ((data.compact_municipality_and_address && !data.is_display_address_field) || data.compact_municipality_and_address_and_building_name) return true;
 
     return !stringNullOrEmpty(data.value_address) || !data.hasOwnProperty('address');
   },
@@ -55,6 +55,47 @@ const validateFields = {
   }
 };
 
+// Zip code address: isCheckRequire === "set_required_for_each_item" (postCodeRequired, prefectureRequired, …)
+const validateSetRequiredForEachItemAddressFields = (data) => {
+  let isValid = true;
+
+  if (data.postCodeRequired && data.post_code !== undefined && !validateFields.postCode(data)) {
+    isValid = false;
+  }
+  if (data.prefectureRequired && data.prefecture !== undefined && !validateFields.prefecture(data)) {
+    isValid = false;
+  }
+  if (data.municipalityRequired && data.municipality !== undefined && !validateFields.municipality(data)) {
+    isValid = false;
+  }
+
+  const addressOrBuildingRequired = data.addressRequired || data.buildingNameRequired;
+  if (addressOrBuildingRequired) {
+    if (data.compact_municipality_and_address_and_building_name) {
+      if (!validateFields.compact_municipality_and_address_and_building_name(data)) {
+        isValid = false;
+      }
+    } else if (data.compact_municipality_and_address) {
+      const requireBuildingName = !!(data.buildingNameRequired && data.building_name !== undefined);
+      if (!validateFields.compact_municipality_and_address(data, requireBuildingName)) {
+        isValid = false;
+      }
+      if (data.addressRequired && data.is_display_address_field && data.address !== undefined && !validateFields.address(data)) {
+        isValid = false;
+      }
+    } else {
+      if (data.addressRequired && data.address !== undefined && !validateFields.address(data)) {
+        isValid = false;
+      }
+      if (data.buildingNameRequired && data.building_name !== undefined && !validateFields.building_name(data)) {
+        isValid = false;
+      }
+    }
+  }
+
+  return isValid;
+};
+
 // Common validation logic for address fields
 const validateAddressFields = (data, isCheckRequire) => {
   let isValid = true;
@@ -73,6 +114,8 @@ const validateAddressFields = (data, isCheckRequire) => {
     if (data.compact_municipality_and_address && !validateFields.compact_municipality_and_address(data)) isValid = false;
     else if (data.compact_municipality_and_address_and_building_name && !validateFields.compact_municipality_and_address_and_building_name(data)) isValid = false;
     else if (data.address !== undefined && !validateFields.address(data)) isValid = false;
+  } else if (isCheckRequire === "set_required_for_each_item") {
+    if (!validateSetRequiredForEachItemAddressFields(data)) isValid = false;
   }
   
   return isValid;

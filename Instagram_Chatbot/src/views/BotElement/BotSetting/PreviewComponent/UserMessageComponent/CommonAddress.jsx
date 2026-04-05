@@ -24,7 +24,12 @@ export default function CommonAddress({ content, prefecturesList, messageIndexRe
       </span>
     );
 
-    const isRequired = addressContent.isCheckRequire === "all_items_require" || addressContent.isCheckRequire === "require";
+    const hasRequiredItem = () => {
+      if (addressContent.isCheckRequire !== 'set_required_for_each_item') return false;
+      return ['postCode', 'prefecture', 'municipality', 'address', 'buildingName'].some(item => addressContent[`${item}Required`]);
+    }
+
+    const isRequired = addressContent.isCheckRequire === "all_items_require" || addressContent.isCheckRequire === "require" || hasRequiredItem();
 
     const requiredLabel = isRequired && (
       <span className="ss-message__content--user-text-input-required">
