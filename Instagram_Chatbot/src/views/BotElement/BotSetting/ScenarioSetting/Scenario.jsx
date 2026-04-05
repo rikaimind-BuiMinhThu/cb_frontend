@@ -2115,6 +2115,13 @@ const Scenario = () => {
 
   const renderZipCodeAddressTitle = (zipCodeAddress) => {
     if (!(zipCodeAddress.title_require || zipCodeAddress.isCheckRequire)) return;
+
+    const hasRequiredItem = () => {
+      if (zipCodeAddress.isCheckRequire !== 'set_required_for_each_item') return false;
+      return ['postCode', 'prefecture', 'municipality', 'address', 'buildingName'].some(item => zipCodeAddress[`${item}Required`]);
+    }
+
+    const isRequired = zipCodeAddress.isCheckRequire === 'all_items_require' || zipCodeAddress.isCheckRequire === 'require' || hasRequiredItem();
     return (
       <div className="ss-message__content--user-pull_down-top" style={{ marginBottom: '0px' }}>
         {zipCodeAddress.title_require &&
@@ -2122,8 +2129,7 @@ const Scenario = () => {
             {zipCodeAddress.title}
           </span>
         }
-        {(zipCodeAddress.isCheckRequire === 'all_items_require' ||
-          zipCodeAddress.isCheckRequire === 'require') &&
+        {isRequired &&
           <span className="ss-message__content--user-text-input-required">
             ※必須
           </span>
@@ -8077,7 +8083,6 @@ const Scenario = () => {
                                                       isUseFukushashiki={isUseFukushashiki}
                                                       setIsOpenAddVariable={setIsOpenAddVariable}
                                                       onChangeValueMessageContent={onChangeValueMessageContent}
-                                                      handleChangeValueRequireZipCode={handleChangeValueRequireZipCode}
                                                       handleRemoveItemZipCodeAddress={handleRemoveItemZipCodeAddress}
                                                       renderRootFaqOption={renderRootFaqOption}
                                                     />

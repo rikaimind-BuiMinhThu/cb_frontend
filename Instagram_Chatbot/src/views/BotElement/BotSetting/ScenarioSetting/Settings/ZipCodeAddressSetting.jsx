@@ -31,8 +31,6 @@ const ZipCodeAddressSetting = ({
       onChangeValueMessageContent(indexMessage, indexContent, type, false, 'require');
       onChangeValueMessageContent(indexMessage, indexContent, type, value, 'all_items_require');
     } else {
-      console.log('value', value);
-      console.log('name', name);
       onChangeValueMessageContent(indexMessage, indexContent, type, value, name);
     }
   }
