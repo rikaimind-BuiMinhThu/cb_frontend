@@ -18,11 +18,24 @@ const ZipCodeAddressSetting = ({
   isUseFukushashiki,
   setIsOpenAddVariable,
   onChangeValueMessageContent,
-  handleChangeValueRequireZipCode,
   handleRemoveItemZipCodeAddress,
   renderRootFaqOption,
 }) => {
   const messageContent = dataMessages[indexMessageSelect]?.message_content?.[indexContent];
+
+  const handleChangeValueRequireZipCode = (indexMessage, indexContent, type, value, name) => {
+    if (value === true && name === 'require') {
+      onChangeValueMessageContent(indexMessage, indexContent, type, false, 'all_items_require');
+      onChangeValueMessageContent(indexMessage, indexContent, type, value, 'require');
+    } else if (value === true && name === 'all_items_require') {
+      onChangeValueMessageContent(indexMessage, indexContent, type, false, 'require');
+      onChangeValueMessageContent(indexMessage, indexContent, type, value, 'all_items_require');
+    } else {
+      console.log('value', value);
+      console.log('name', name);
+      onChangeValueMessageContent(indexMessage, indexContent, type, value, name);
+    }
+  }
 
   const renderZipFukushashikiRow = (modeKey, valueKey) => renderFukushashikiSetting({
     variant: 'zipCodeAddress',
@@ -105,24 +118,52 @@ const ZipCodeAddressSetting = ({
     </>
   );
 
+  const renderRequireOptionsForEachItem = () => {
+    if (zipCodeAddress.isCheckRequire !== 'set_required_for_each_item') return null;
+
+    const fields = {
+      postCode: '郵便番号',
+      prefecture: '都道府県',
+      municipality: '市区町村',
+      address: '番地',
+      buildingName: '建物名',
+    }
+
+    return Object.entries(fields).map(([key, label]) => {
+      const attrName = `${key}Required`;
+      return (
+        <CheckboxCustom
+          key={key}
+          label={label}
+          onChange={value => handleChangeValueRequireZipCode(indexMessageSelect, indexContent, contentType, value, attrName)}
+          value={zipCodeAddress[attrName]}
+          isOnChange={true}
+        />
+      )
+    })
+  }
+
   const renderRequireOptions = () => (
-    <div className="ss-user-setting__item-text_input-use-api-wrapper">
-      <div>
-        <CheckboxCustom
-          label="必須"
-          onChange={() => handleChangeValueRequireZipCode(indexMessageSelect, indexContent, contentType, zipCodeAddress.isCheckRequire === 'require' ? '' : 'require', 'isCheckRequire')}
-          value={zipCodeAddress.isCheckRequire === 'require'}
-          isOnChange={false}
-        />
-      </div>
-      <div className="ss-user-setting__item-text_input-use-api-required">
-        <CheckboxCustom
-          label="全項目必須"
-          onChange={() => handleChangeValueRequireZipCode(indexMessageSelect, indexContent, contentType, zipCodeAddress.isCheckRequire === 'all_items_require' ? '' : 'all_items_require', 'isCheckRequire')}
-          value={zipCodeAddress.isCheckRequire === 'all_items_require'}
-          isOnChange={false}
-        />
-      </div>
+    <div style={{ width: '100%', gap: '10px' }}>
+      <CheckboxCustom
+        label="必須"
+        onChange={() => handleChangeValueRequireZipCode(indexMessageSelect, indexContent, contentType, zipCodeAddress.isCheckRequire === 'require' ? '' : 'require', 'isCheckRequire')}
+        value={zipCodeAddress.isCheckRequire === 'require'}
+        isOnChange={false}
+      />
+      <CheckboxCustom
+        label="全項目必須"
+        onChange={() => handleChangeValueRequireZipCode(indexMessageSelect, indexContent, contentType, zipCodeAddress.isCheckRequire === 'all_items_require' ? '' : 'all_items_require', 'isCheckRequire')}
+        value={zipCodeAddress.isCheckRequire === 'all_items_require'}
+        isOnChange={false}
+      />
+      <CheckboxCustom
+        label="項目ごとに必須設定"
+        onChange={() => handleChangeValueRequireZipCode(indexMessageSelect, indexContent, contentType, zipCodeAddress.isCheckRequire === 'set_required_for_each_item' ? '' : 'set_required_for_each_item', 'isCheckRequire')}
+        value={zipCodeAddress.isCheckRequire === 'set_required_for_each_item'}
+        isOnChange={false}
+      />
+      {zipCodeAddress.isCheckRequire === 'set_required_for_each_item' && renderRequireOptionsForEachItem()}
     </div>
   );
 
