@@ -104,8 +104,84 @@ const formatPhoneForCart = (state) => {
   return join(typeof p === "object" ? p : null) || "";
 };
 
+const getMerchandiseIdFromMessagesList = (state) => {
+  const c = (state.messagesList || [])
+    .flatMap((m) => m.message_content || [])
+    .findLast((x) => x.type === "product_purchase_select_option");
+  const p = c?.product_purchase_select_option;
+  if (p?.type !== "text_with_thumbnail_image") return undefined;
+  const v = p.value;
+  return v != null && String(v).trim() !== "" ? String(v).trim() : undefined;
+};
+
+const formatDeliveryDateFromPullDown = (pd) => {
+  const bucket =
+    pd?.type === "date_ymd"
+      ? pd.date_ymd
+      : pd?.dob_ymd || pd?.date_ymd || {};
+  const y = bucket?.valueYear;
+  const m = bucket?.valueMonth;
+  const d = bucket?.valueDay;
+  if (y == null || m == null || d == null) return undefined;
+  if (String(y).trim() === "" || String(m).trim() === "" || String(d).trim() === "")
+    return undefined;
+  return `${y}年${parseInt(String(m), 10)}月${parseInt(String(d), 10)}日`;
+};
+
+const formatDeliveryTimeFromPullDown = (pd) => {
+  const cust = pd?.customization;
+  if (!cust) return undefined;
+  const sel =
+    cust.value != null && String(cust.value).trim() !== ""
+      ? String(cust.value)
+      : undefined;
+  if (!sel) return undefined;
+  const opts = cust.is_comment
+    ? cust.options_with_comment || []
+    : cust.options_without_comment || [];
+  let opt = opts.find(
+    (o) => String(o.id) === sel || String(o.value) === sel
+  );
+  if (!opt) {
+    const idx = parseInt(sel, 10);
+    if (!Number.isNaN(idx)) {
+      if (idx >= 1 && opts[idx - 1]) opt = opts[idx - 1];
+      if (!opt && opts[idx]) opt = opts[idx];
+    }
+  }
+  const text = opt?.text;
+  return text != null && String(text).trim() !== "" ? String(text).trim() : undefined;
+};
+
+/** Read pull_down values by save_input_content from messagesList. */
+const collectCartAttributesFromMessages = (state) => {
+  const attrs = [];
+  let deliveryDate;
+  let deliveryTime;
+  for (const msg of state.messagesList || []) {
+    for (const c of msg.message_content || []) {
+      const pd = c.pull_down;
+      const key = pd?.save_input_content;
+      if (key === "delivery_date" && deliveryDate == null) {
+        deliveryDate = formatDeliveryDateFromPullDown(pd);
+      }
+      if (key === "delivery_time" && deliveryTime == null) {
+        deliveryTime = formatDeliveryTimeFromPullDown(pd);
+      }
+    }
+  }
+  if (deliveryDate)
+    attrs.push({ key: "配送希望日", value: deliveryDate });
+  if (deliveryTime)
+    attrs.push({ key: "配送希望時間", value: deliveryTime });
+  return attrs;
+};
+
 const createOrAddLinesCart = (state) => {
-  const merchandiseId = state?.merchandiseId;
+  let merchandiseId = state?.merchandiseId;
+  if (!merchandiseId) {
+    merchandiseId = getMerchandiseIdFromMessagesList(state);
+  }
   const email = getResponseValue(state, "email");
   const zip_code_address = getResponseValue(state, "zip_code_address");
 
@@ -119,12 +195,16 @@ const createOrAddLinesCart = (state) => {
     );
     const quantity = getResponseInteger(state, "quantity") || 1 ;
 
-    return api.post("/api/v1/shopify/cart_create", {
+    const attributes = collectCartAttributesFromMessages(state);
+    const payload = {
       first_name: firstName, last_name: lastName, email, phone: phoneNumber,
       zip, province, city, address1, address2,
       lines: [{ merchandiseId, quantity }],
       scenario_id: state.scenarioId, uuid: state.uuid
-    }).then(res => {
+    };
+    if (attributes.length) payload.attributes = attributes;
+
+    return api.post("/api/v1/shopify/cart_create", payload).then(res => {
       sessionStorage.setItem("cart", JSON.stringify(res?.data?.data));
       const url = res?.data?.data?.cartCreate?.cart?.checkoutUrl;
       if (url) {

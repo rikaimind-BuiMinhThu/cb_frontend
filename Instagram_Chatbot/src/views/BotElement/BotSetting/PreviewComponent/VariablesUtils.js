@@ -1,4 +1,4 @@
-import { findItem } from '../PreviewComponent/Utils';
+import { findItem, stringNullOrEmpty } from '../PreviewComponent/Utils';
 import { MESSAGE_CONTENT_TYPES, SCAN_REGEX } from '../PreviewComponent/Constants';
 
 const getTextInputValue = (subContent, field) => {
@@ -50,6 +50,13 @@ const getPulldownValue = (subContent, field, value) => {
       return `${pullDown.valueHour}:${pullDown.valueMinute}`;
     case "date_ymd":
     case "dob_ymd": {
+      if (
+        stringNullOrEmpty(pullDown.valueYear) ||
+        stringNullOrEmpty(pullDown.valueMonth) ||
+        stringNullOrEmpty(pullDown.valueDay)
+      ) {
+        return "";
+      }
       return `${pullDown.valueYear}-${pullDown.valueMonth}-${pullDown.valueDay}`;
     }
     case "date_md":
