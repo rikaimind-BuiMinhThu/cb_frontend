@@ -14,11 +14,11 @@ const getResponseValue = (state, name) => {
   return undefined;
 };
 
-const getResponseInteger = (state, name) => {
-  const row = (state.scenarioUserResponses || []).findLast((x) => x.data_input_name === name);
-  if (row?.integer_value != null) return row.integer_value;
-  const p = state.objParam?.[name];
-  return p != null ? p : 1;
+const parseQuantity = (ti) => {
+  if (ti?.save_input_content !== "quantity") return null;
+  const n = Number.parseInt(String(ti.text?.value ?? "").trim(), 10);
+  if (Number.isNaN(n)) return null;
+  return Math.max(1, n);
 };
 
 const resolveProvinceForShopify = (obj, prefecturesList) => {
@@ -107,10 +107,15 @@ const formatPhoneForCart = (state) => {
 const selectionTextFromPullDownCustomization = (pd) => {
   const cust = pd?.customization;
   if (!cust) return null;
-  const sel =
+  const fromValue =
     cust.value != null && String(cust.value).trim() !== ""
-      ? String(cust.value)
-      : undefined;
+      ? String(cust.value).trim()
+      : "";
+  const fromInitial =
+    pd?.initial_selection != null && String(pd.initial_selection).trim() !== ""
+      ? String(pd.initial_selection).trim()
+      : "";
+  const sel = fromValue || fromInitial;
   if (!sel) return null;
   const opts = cust.is_comment
     ? cust.options_with_comment || []
@@ -211,13 +216,36 @@ const collectShopLinePropertyAttributesFromMessages = (state) => {
 };
 
 const collectShopifyCartLinesFromMessages = (state) => {
-  const mid = String(state.merchandiseId ?? "").trim();
-  if (!mid) return [];
+  const qtyQueue = [];
+  for (const msg of state.messagesList || []) {
+    for (const c of msg.message_content || []) {
+      const ti = c.text_input;
+      if (ti?.save_input_content !== "quantity") continue;
+      const raw = parseQuantity(ti);
+      qtyQueue.push(raw != null ? raw : 1);
+    }
+  }
+  let qi = 0;
+  const nextQty = () => (qi < qtyQueue.length ? qtyQueue[qi++] : 1);
   const mainLineAttrs = collectShopLinePropertyAttributesFromMessages(state);
-  const qty = Math.max(1, getResponseInteger(state, "quantity"));
-  const line = { merchandiseId: mid, quantity: qty };
-  if (mainLineAttrs.length) line.attributes = mainLineAttrs;
-  return [line];
+  const lines = [];
+
+  const midFromState = String(state.merchandiseId ?? "").trim();
+  if (midFromState) {
+    const line = { merchandiseId: midFromState, quantity: nextQty() };
+    if (mainLineAttrs.length) line.attributes = mainLineAttrs;
+    lines.push(line);
+  }
+
+  for (const msg of state.messagesList || []) {
+    for (const c of msg.message_content || []) {
+      if (c.type !== "product_purchase_select_option") continue;
+      const mid = String(c?.product_purchase_select_option?.value ?? "").trim();
+      if (!mid) continue;
+      lines.push({ merchandiseId: mid, quantity: nextQty() });
+    }
+  }
+  return lines;
 };
 
 const toStorefrontCartLineInput = (line) => {
