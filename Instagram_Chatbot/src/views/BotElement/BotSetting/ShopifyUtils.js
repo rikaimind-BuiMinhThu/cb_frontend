@@ -104,14 +104,32 @@ const formatPhoneForCart = (state) => {
   return join(typeof p === "object" ? p : null) || "";
 };
 
-const getMerchandiseIdFromMessagesList = (state) => {
-  const c = (state.messagesList || [])
-    .flatMap((m) => m.message_content || [])
-    .findLast((x) => x.type === "product_purchase_select_option");
-  const p = c?.product_purchase_select_option;
-  if (p?.type !== "text_with_thumbnail_image") return undefined;
-  const v = p.value;
-  return v != null && String(v).trim() !== "" ? String(v).trim() : undefined;
+const selectionTextFromPullDownCustomization = (pd) => {
+  const cust = pd?.customization;
+  if (!cust) return null;
+  const sel =
+    cust.value != null && String(cust.value).trim() !== ""
+      ? String(cust.value)
+      : undefined;
+  if (!sel) return null;
+  const opts = cust.is_comment
+    ? cust.options_with_comment || []
+    : cust.options_without_comment || [];
+  let opt = opts.find(
+    (o) => String(o.id) === sel || String(o.value) === sel
+  );
+  if (!opt) {
+    const idx = parseInt(sel, 10);
+    if (!Number.isNaN(idx)) {
+      if (idx >= 1 && opts[idx - 1]) opt = opts[idx - 1];
+      if (!opt && opts[idx]) opt = opts[idx];
+    }
+  }
+  const text = opt?.text;
+  if (text != null && String(text).trim() !== "") return String(text).trim();
+  if (opt?.value != null && String(opt.value).trim() !== "")
+    return String(opt.value).trim();
+  return sel;
 };
 
 const formatDeliveryDateFromPullDown = (pd) => {
@@ -153,7 +171,6 @@ const formatDeliveryTimeFromPullDown = (pd) => {
   return text != null && String(text).trim() !== "" ? String(text).trim() : undefined;
 };
 
-/** Read pull_down values by save_input_content from messagesList. */
 const collectCartAttributesFromMessages = (state) => {
   const attrs = [];
   let deliveryDate;
@@ -177,15 +194,50 @@ const collectCartAttributesFromMessages = (state) => {
   return attrs;
 };
 
-const createOrAddLinesCart = (state) => {
-  let merchandiseId = state?.merchandiseId;
-  if (!merchandiseId) {
-    merchandiseId = getMerchandiseIdFromMessagesList(state);
+const collectShopLinePropertyAttributesFromMessages = (state) => {
+  const attrs = [];
+  for (const msg of state.messagesList || []) {
+    for (const c of msg.message_content || []) {
+      const sic = c.pull_down?.save_input_content;
+      if (String(sic ?? "").trim().toLowerCase() !== "option") continue;
+      const pd = c.pull_down;
+      if (!pd) continue;
+      const t = selectionTextFromPullDownCustomization(pd);
+      const value = t != null && String(t).trim() !== "" ? String(t).trim() : "";
+      attrs.push({ key: "着せ替えシート", value });
+    }
   }
+  return attrs;
+};
+
+const collectShopifyCartLinesFromMessages = (state) => {
+  const mid = String(state.merchandiseId ?? "").trim();
+  if (!mid) return [];
+  const mainLineAttrs = collectShopLinePropertyAttributesFromMessages(state);
+  const qty = Math.max(1, getResponseInteger(state, "quantity"));
+  const line = { merchandiseId: mid, quantity: qty };
+  if (mainLineAttrs.length) line.attributes = mainLineAttrs;
+  return [line];
+};
+
+const toStorefrontCartLineInput = (line) => {
+  const qty = Math.max(1, parseInt(line.quantity, 10) || 1);
+  const out = { merchandiseId: line.merchandiseId, quantity: qty };
+  if (Array.isArray(line.attributes) && line.attributes.length) {
+    out.attributes = line.attributes.map((a) => ({
+      key: String(a.key),
+      value: String(a.value),
+    }));
+  }
+  return out;
+};
+
+const createOrAddLinesCart = (state) => {
+  let linesWithAttrs = collectShopifyCartLinesFromMessages(state);
   const email = getResponseValue(state, "email");
   const zip_code_address = getResponseValue(state, "zip_code_address");
 
-  if (merchandiseId && email && zip_code_address) {
+  if (linesWithAttrs.length && email && zip_code_address) {
     const phoneNumber = formatPhoneForCart(state);
 
     const { firstName, lastName } = parseName(state);
@@ -193,13 +245,13 @@ const createOrAddLinesCart = (state) => {
       zip_code_address,
       state.prefecturesList
     );
-    const quantity = getResponseInteger(state, "quantity") || 1 ;
+    const linesPayload = linesWithAttrs.map(toStorefrontCartLineInput);
 
     const attributes = collectCartAttributesFromMessages(state);
     const payload = {
       first_name: firstName, last_name: lastName, email, phone: phoneNumber,
       zip, province, city, address1, address2,
-      lines: [{ merchandiseId, quantity }],
+      lines: linesPayload,
       scenario_id: state.scenarioId, uuid: state.uuid
     };
     if (attributes.length) payload.attributes = attributes;
