@@ -5834,7 +5834,7 @@ const Scenario = () => {
                                                     )
                                                   })}
                                                 </div>
-                                                {message.message_content[0]?.type !== 'button_submit'&& message?.message_content.length !== 0 &&
+                                                {!message.not_use_button && message.message_content[0]?.type !== 'button_submit'&& message?.message_content.length !== 0 &&
                                                   ((message?.message_content.length === 1 && 
                                                     !(message.message_content[0].type === 'product_purchase_radio_button'
                                                       || (message.message_content[0].type === 'carousel' && message.message_content[0]?.[message.message_content[0].type].require)
@@ -14512,7 +14512,18 @@ const Scenario = () => {
                                     setDataMessages([...dataMessages]);
                                   }}
                                 />
-                                <div style={{ width: '25%' }}>
+                                <div style={{ width: '100%' }}>
+                                  <CheckboxCustom
+                                    label="このボタンを利用しない"
+                                    onChange={(value) => {
+                                      dataMessages[indexMessageSelect].not_use_button = value;
+                                      setDataMessages([...dataMessages]);
+                                    }}
+                                    value={dataMessages[indexMessageSelect].not_use_button}
+
+                                  />
+                                </div>
+                                <div style={{ width: '100%' }}>
                                   <CheckboxCustom
                                     label="JavaScriptの利用"
                                     onChange={(value) => {

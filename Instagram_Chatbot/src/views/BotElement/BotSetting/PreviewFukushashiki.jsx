@@ -1000,7 +1000,7 @@ const PreviewFukushashiki = () => {
   const renderNextButton = (message, messageIndex) => {
     const isUpdate = messageIndex >= state.renderMessagesList.length - 1;
     const firstMsgContent = message?.message_content?.[0];
-    const isDisplayBtnNext = firstMsgContent?.type != "image" || firstMsgContent?.image?.displayButtonNext != false;
+    const isDisplayBtnNext = (firstMsgContent?.type != "image" || firstMsgContent?.image?.displayButtonNext != false) || !message.not_use_button;
     const isAutoClick = !isDisplayBtnNext && isUpdate;
 
     if (!message || message.belong_to !== "user") return null;
