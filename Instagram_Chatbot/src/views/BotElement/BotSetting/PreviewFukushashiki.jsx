@@ -1242,7 +1242,7 @@ const PreviewFukushashiki = () => {
         </div>
       </div>
     )
-  } else if (state.displayType === DISPLAY_TYPES.HIDDEN) {
+  } else if (state.scenarioId && state.botInfor && !state.isOpen && state.displayType === DISPLAY_TYPES.HIDDEN) {
     return null;
   } else if (!state.isOpen && isMobile() === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 2) {
     return (
