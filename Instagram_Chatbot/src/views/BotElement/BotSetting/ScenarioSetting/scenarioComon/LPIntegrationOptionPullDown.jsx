@@ -17,7 +17,7 @@ const LPIntegrationOptionPullDown = ({
   hidden = false
 }) => {
   useEffect(() => {
-    if (hidden || data.length > 0) return;
+    if (hidden || (data && data.length > 0)) return;
 
     const crawlOption = {
       targetElementType,
@@ -31,7 +31,7 @@ const LPIntegrationOptionPullDown = ({
       actionData: crawlOption,
       action: CHATBOT_ACTIONS.CRAWL_DATA,
     });
-  }, [hidden, data.length]);
+  }, [hidden, data && data.length > 0]);
 
   if (data === null || data === undefined) return null;
   const selectWidth = pullDown.with_suffix ? '70%' : '100%';
