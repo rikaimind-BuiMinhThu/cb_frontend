@@ -104,39 +104,6 @@ const formatPhoneForCart = (state) => {
   return join(typeof p === "object" ? p : null) || "";
 };
 
-const selectionTextFromPullDownCustomization = (pd) => {
-  const cust = pd?.customization;
-  if (!cust) return null;
-  const fromValue =
-    cust.value != null && String(cust.value).trim() !== ""
-      ? String(cust.value).trim()
-      : "";
-  const fromInitial =
-    pd?.initial_selection != null && String(pd.initial_selection).trim() !== ""
-      ? String(pd.initial_selection).trim()
-      : "";
-  const sel = fromValue || fromInitial;
-  if (!sel) return null;
-  const opts = cust.is_comment
-    ? cust.options_with_comment || []
-    : cust.options_without_comment || [];
-  let opt = opts.find(
-    (o) => String(o.id) === sel || String(o.value) === sel
-  );
-  if (!opt) {
-    const idx = parseInt(sel, 10);
-    if (!Number.isNaN(idx)) {
-      if (idx >= 1 && opts[idx - 1]) opt = opts[idx - 1];
-      if (!opt && opts[idx]) opt = opts[idx];
-    }
-  }
-  const text = opt?.text;
-  if (text != null && String(text).trim() !== "") return String(text).trim();
-  if (opt?.value != null && String(opt.value).trim() !== "")
-    return String(opt.value).trim();
-  return sel;
-};
-
 const formatDeliveryDateFromPullDown = (pd) => {
   const bucket =
     pd?.type === "date_ymd"
@@ -200,19 +167,9 @@ const collectCartAttributesFromMessages = (state) => {
 };
 
 const collectShopLinePropertyAttributesFromMessages = (state) => {
-  const attrs = [];
-  for (const msg of state.messagesList || []) {
-    for (const c of msg.message_content || []) {
-      const sic = c.pull_down?.save_input_content;
-      if (String(sic ?? "").trim().toLowerCase() !== "option") continue;
-      const pd = c.pull_down;
-      if (!pd) continue;
-      const t = selectionTextFromPullDownCustomization(pd);
-      const value = t != null && String(t).trim() !== "" ? String(t).trim() : "";
-      attrs.push({ key: "着せ替えシート", value });
-    }
-  }
-  return attrs;
+  const value = getResponseValue(state, "option_variant");
+  if (value == null || String(value).trim() === "") return [];
+  return [{ key: "着せ替えシート", value: String(value).trim() }];
 };
 
 const collectShopifyCartLinesFromMessages = (state) => {
