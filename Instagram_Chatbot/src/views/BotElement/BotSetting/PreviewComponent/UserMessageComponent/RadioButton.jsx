@@ -58,7 +58,7 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
                 item.value,
                 "initial_selection"
               );
-              if (notUseButtonNext) onClickNext();
+              if (notUseButtonNext) setTimeout(() => onClickNext(), 200);
             }}
           />
           {item.text && (
@@ -91,7 +91,7 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
                 item.value,
                 "initial_selection"
               );
-              if (notUseButtonNext) onClickNext();
+              if (notUseButtonNext) setTimeout(() => onClickNext(), 200);
             }}
           />
           <img src={item.img} alt="" />
