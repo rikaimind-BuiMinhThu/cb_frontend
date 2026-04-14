@@ -1,15 +1,76 @@
 import api from "api/api-management";
 
+const findLastScenarioUserResponseRow = (state, dataInputName) => {
+  const rows = state.scenarioUserResponses;
+  if (!Array.isArray(rows) || rows.length === 0) return undefined;
+  const want = String(dataInputName);
+  for (let i = rows.length - 1; i >= 0; i--) {
+    const r = rows[i];
+    if (r == null) continue;
+    const key = r.data_input_name ?? r.dataInputName;
+    if (String(key) === want) return r;
+  }
+  return undefined;
+};
+
+const findCrossSellRadioInMessages = (state) => {
+  for (const msg of state.messagesList || []) {
+    if (msg.belong_to !== "user") continue;
+    for (const c of msg.message_content || []) {
+      const rb = c.radio_button;
+      if (c.type !== "radio_button" || rb?.save_input_content !== "cross_sell_option") continue;
+      return rb;
+    }
+  }
+  return null;
+};
+
+const crossSellOptionItems = (rb) => {
+  if (!rb) return [];
+  return [
+    ...(rb.radio_button_img || []),
+    ...(rb.default || []),
+    ...(Array.isArray(rb[rb.type]) ? rb[rb.type] : []),
+  ];
+};
+
+const resolveCrossSellOptionFromMessages = (state) => {
+  const rb = findCrossSellRadioInMessages(state);
+  if (!rb) return undefined;
+  const items = crossSellOptionItems(rb);
+  let sel = rb.initial_selection;
+  if (sel == null || String(sel).trim() === "") {
+    sel = items[0]?.value ?? items[0]?.id;
+  }
+  if (sel == null || String(sel).trim() === "") return undefined;
+  const hit = items.find(
+    (o) => String(o?.id) === String(sel) || String(o?.value) === String(sel)
+  );
+  const raw = hit?.value ?? hit?.id ?? sel;
+  const out = raw != null ? String(raw).trim() : "";
+  return out || undefined;
+};
+
 const getResponseValue = (state, name) => {
-  const row = (state.scenarioUserResponses || []).findLast((x) => x.data_input_name === name);
-  const fromRow = row?.string_value || row?.text_value;
-  if (fromRow != null && fromRow !== "") return fromRow;
+  const row = findLastScenarioUserResponseRow(state, name);
+  if (row) {
+    const sv = row.string_value ?? row.stringValue;
+    const tv = row.text_value ?? row.textValue;
+    if (sv != null && String(sv).trim() !== "") return sv;
+    if (tv != null && String(tv).trim() !== "") return tv;
+    const iv = row.integer_value ?? row.integerValue;
+    if (iv != null) return String(iv);
+  }
   const p = state.objParam || {};
   if (p[name] != null && p[name] !== "") return p[name];
   if (name === "zip_code_address") {
     for (const k of ["zipcode_address", "zip_code", "post_code"]) {
       if (p[k] != null && p[k] !== "") return p[k];
     }
+  }
+  if (name === "cross_sell_option") {
+    const fromMessages = resolveCrossSellOptionFromMessages(state);
+    if (fromMessages != null && fromMessages !== "") return fromMessages;
   }
   return undefined;
 };
@@ -19,6 +80,25 @@ const parseQuantity = (ti) => {
   const n = Number.parseInt(String(ti.text?.value ?? "").trim(), 10);
   if (Number.isNaN(n)) return null;
   return Math.max(1, n);
+};
+
+const collectQuantityQueueFromState = (state) => {
+  const qtyQueue = [];
+  for (const msg of state.messagesList || []) {
+    for (const c of msg.message_content || []) {
+      const ti = c.text_input;
+      const saveKey = ti?.save_input_content ?? ti?.["save_input_content"];
+      if (saveKey !== "quantity") continue;
+      const raw = parseQuantity(ti);
+      qtyQueue.push(raw != null ? raw : 1);
+    }
+  }
+  if (qtyQueue.length === 0) {
+    const fromApi = getResponseValue(state, "quantity");
+    const n = Number.parseInt(String(fromApi ?? "").trim(), 10);
+    if (!Number.isNaN(n)) qtyQueue.push(Math.max(1, n));
+  }
+  return qtyQueue;
 };
 
 const resolveProvinceForShopify = (obj, prefecturesList) => {
@@ -173,15 +253,7 @@ const collectShopLinePropertyAttributesFromMessages = (state) => {
 };
 
 const collectShopifyCartLinesFromMessages = (state) => {
-  const qtyQueue = [];
-  for (const msg of state.messagesList || []) {
-    for (const c of msg.message_content || []) {
-      const ti = c.text_input;
-      if (ti?.save_input_content !== "quantity") continue;
-      const raw = parseQuantity(ti);
-      qtyQueue.push(raw != null ? raw : 1);
-    }
-  }
+  const qtyQueue = collectQuantityQueueFromState(state);
   let qi = 0;
   const nextQty = () => (qi < qtyQueue.length ? qtyQueue[qi++] : 1);
   const mainLineAttrs = collectShopLinePropertyAttributesFromMessages(state);
@@ -202,6 +274,22 @@ const collectShopifyCartLinesFromMessages = (state) => {
       lines.push({ merchandiseId: mid, quantity: nextQty() });
     }
   }
+
+  if (state.isUsedCrosssell) {
+    const configuredVariantId = String(state.productIdCrossSell || "").trim();
+    const choice = String(getResponseValue(state, "cross_sell_option") || "").trim();
+    let crossMerchandiseId = "";
+    if (choice == "1" && configuredVariantId) {
+      crossMerchandiseId = configuredVariantId;
+    }
+    if (
+      crossMerchandiseId &&
+      !lines.some((l) => l.merchandiseId === crossMerchandiseId)
+    ) {
+      lines.push({ merchandiseId: crossMerchandiseId, quantity: nextQty() });
+    }
+  }
+
   return lines;
 };
 

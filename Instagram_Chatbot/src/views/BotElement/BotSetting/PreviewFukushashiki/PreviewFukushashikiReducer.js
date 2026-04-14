@@ -358,6 +358,9 @@ const PreviewFukushashikiReducer = (state, action) => {
         useFullWidthChatbotMobile: !!chatbot?.use_fullwidth_chatbot_mobile,
         cartSystem: state.cartSystem || chatbot?.client_cart_system || "",
         merchandiseId: action.payload.responseData?.data?.merchandise_id || "",
+        isUsedCrosssell: !!action.payload.responseData?.data?.is_used_crosssell,
+        productIdCrossSell:
+          String(action.payload.responseData?.data?.product_id_cross_sell || "").trim(),
         isUsedCustomJsCode: !!chatbot?.is_used_custom_js_code,
         headCustomJsCode: chatbot?.head_custom_js_code,
         topBodyCustomJsCode: chatbot?.top_body_custom_js_code,

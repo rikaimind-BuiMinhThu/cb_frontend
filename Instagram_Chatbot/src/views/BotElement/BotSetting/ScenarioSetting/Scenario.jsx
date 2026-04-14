@@ -906,6 +906,8 @@ const Scenario = () => {
 
   const [dataCondition, setDataCondition] = useState([]);
   const [isUsedMessageLoadedPast, setIsUsedMessageLoadedPast] = useState(false);
+  const [isUsedCrosssell, setIsUsedCrosssell] = useState(false);
+  const [productIdCrossSell, setProductIdCrossSell] = useState('');
   const [isClearLandingPageSession, setIsClearLandingPageSession] = useState(false);
   const [useFullwidthChatbotMobile, setUseFullwidthChatbotMobile] = useState(false);
   const [clientCartSystem, setClientCartSystem] = useState(null);
@@ -1000,6 +1002,8 @@ const Scenario = () => {
       setIsUseErrMsgByJs(res.data.data?.is_used_err_msg_by_js || false);
       setErrMsgJsCode(res.data.data?.err_msg_js_code || '');
       setIsUsedMessageLoadedPast(res.data.data?.is_used_message_loaded_past || false);
+      setIsUsedCrosssell(!!res.data.data?.is_used_crosssell);
+      setProductIdCrossSell(res.data.data?.product_id_cross_sell || '');
       setIsClearLandingPageSession(res.data.data?.is_clear_landing_page_session || false);
       setUseFullwidthChatbotMobile(res.data.data?.use_fullwidth_chatbot_mobile || false);
       const timerConfig = {
@@ -2704,6 +2708,8 @@ const Scenario = () => {
       err_msg_js_code: errMsgJsCode,
       is_used_message_loaded_past: isUsedMessageLoadedPast,
       use_fullwidth_chatbot_mobile: useFullwidthChatbotMobile,
+      is_used_crosssell: isUsedCrosssell,
+      product_id_cross_sell: isUsedCrosssell ? productIdCrossSell : null,
       pis_clear_landing_page_session: isClearLandingPageSession,
     }
     api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data).then(res => {
@@ -2768,6 +2774,8 @@ const Scenario = () => {
       err_msg_js_code: errMsgJsCode,
       is_used_message_loaded_past: isUsedMessageLoadedPast,
       use_fullwidth_chatbot_mobile: useFullwidthChatbotMobile,
+      is_used_crosssell: isUsedCrosssell,
+      product_id_cross_sell: isUsedCrosssell ? productIdCrossSell : null,
       is_clear_landing_page_session: isClearLandingPageSession,
     }
     try {
@@ -3180,6 +3188,14 @@ const Scenario = () => {
                             onChange={value => setMerchandiseId(value)}
                             placeholder="商品IDもしくはバリアントID"
                           />
+                          {isUsedCrosssell && (
+                            <InputCustom
+                              style={{ width: '100%', marginTop: '5px' }}
+                              value={productIdCrossSell}
+                              onChange={value => setProductIdCrossSell(value)}
+                              placeholder="クロスセル用 商品IDもしくはバリアントID"
+                            />
+                          )}
                         </div>
                       )}
                       {client?.cart_system === "ec_force" && <div>
@@ -3332,15 +3348,21 @@ const Scenario = () => {
                     />
                     <label>モバイル全画面チャット</label>
                   </div>
-                  <div>
-                    <input
-                      type="checkbox"
-                      className="ss-user-setting-checkbox-custom"
-                      onChange={() => setIsClearLandingPageSession(!isClearLandingPageSession)}
-                      checked={isClearLandingPageSession}
-                    />
-                    <label>読み込み時に自動ログアウト処理を実行する</label>
-                  </div>
+                  {isShopifyPaymentScenario && (
+                    <div>
+                      <input
+                        type="checkbox"
+                        className="ss-user-setting-checkbox-custom"
+                        onChange={() => {
+                          const next = !isUsedCrosssell;
+                          setIsUsedCrosssell(next);
+                          if (!next) setProductIdCrossSell('');
+                        }}
+                        checked={isUsedCrosssell}
+                      />
+                      <label>クロスセル商品をカートに追加する</label>
+                    </div>
+                  )}
                   {/* Overview scenario */}
                   <div style={{ height:`calc(80% - ${errorScenarioName ? '30':'10'}px)`, backgroundColor: '#f6fbff' }}>
                     <div className="ss-overview-detail">
