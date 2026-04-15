@@ -82,15 +82,56 @@ const parseQuantity = (ti) => {
   return Math.max(1, n);
 };
 
+const parsePullDownQuantity = (pd) => {
+  const saveKey = pd?.save_input_content ?? pd?.["save_input_content"];
+  if (saveKey !== "quantity") return null;
+  const cust = pd?.customization;
+  if (!cust) return null;
+  const sel =
+    cust.value != null && String(cust.value).trim() !== ""
+      ? String(cust.value).trim()
+      : undefined;
+  if (!sel) return null;
+  const opts = cust.is_comment
+    ? cust.options_with_comment || []
+    : cust.options_without_comment || [];
+  let opt = opts.find(
+    (o) =>
+      String(o.id) === sel ||
+      String(o.value) === sel ||
+      String(o.text) === sel
+  );
+  if (!opt) {
+    const idx = parseInt(sel, 10);
+    if (!Number.isNaN(idx)) {
+      if (idx >= 1 && opts[idx - 1]) opt = opts[idx - 1];
+      if (!opt && opts[idx]) opt = opts[idx];
+    }
+  }
+  const val = opt?.value ?? opt?.text;
+  const n = Number.parseInt(String(val ?? "").trim(), 10);
+  if (Number.isNaN(n)) return null;
+  return Math.max(1, n);
+};
+
 const collectQuantityQueueFromState = (state) => {
   const qtyQueue = [];
   for (const msg of state.messagesList || []) {
     for (const c of msg.message_content || []) {
-      const ti = c.text_input;
-      const saveKey = ti?.save_input_content ?? ti?.["save_input_content"];
-      if (saveKey !== "quantity") continue;
-      const raw = parseQuantity(ti);
-      qtyQueue.push(raw != null ? raw : 1);
+      if (c.type === "text_input") {
+        const ti = c.text_input;
+        const saveKey = ti?.save_input_content ?? ti?.["save_input_content"];
+        if (saveKey !== "quantity") continue;
+        const raw = parseQuantity(ti);
+        qtyQueue.push(raw != null ? raw : 1);
+      }
+      if (c.type === "pull_down") {
+        const pd = c.pull_down;
+        const saveKey = pd?.save_input_content ?? pd?.["save_input_content"];
+        if (saveKey !== "quantity") continue;
+        const raw = parsePullDownQuantity(pd);
+        qtyQueue.push(raw != null ? raw : 1);
+      }
     }
   }
   if (qtyQueue.length === 0) {
