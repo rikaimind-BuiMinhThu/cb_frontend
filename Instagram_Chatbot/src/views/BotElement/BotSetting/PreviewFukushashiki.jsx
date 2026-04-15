@@ -139,7 +139,7 @@ const previewInitialState = {
   buttonTypeSp: "1",
   rightMarginPc: 10,
   bottomMarginPc: 10,
-  displayType: DISPLAY_TYPES.RELOAD,
+  displayType: null,
   rightSpTitle: "",
   rightMarginSp: 10,
   bottomMarginSp: 10,
@@ -1165,8 +1165,11 @@ const PreviewFukushashiki = () => {
     };
   };
 
+
+  if (!state.scenarioId || !state.botInfor || state.displayType === null) return null;
+
   // body container
-  if (state.scenarioId && state.botInfor && state.isOpen) {
+  if (state.isOpen) {
     const { containerStyle, headerStyle, bodyStyle } = getOpeningBotStyle();
     return (
       <div
@@ -1242,9 +1245,9 @@ const PreviewFukushashiki = () => {
         </div>
       </div>
     )
-  } else if (state.scenarioId && state.botInfor && !state.isOpen && state.displayType === DISPLAY_TYPES.HIDDEN) {
+  } else if (state.displayType === DISPLAY_TYPES.HIDDEN) {
     return null;
-  } else if (!state.isOpen && isMobile() === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 2) {
+  } else if (isMobile() === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 2) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -1268,7 +1271,7 @@ const PreviewFukushashiki = () => {
         />
       </div>
     )
-  } else if (!state.isOpen && isMobile() === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 1) {
+  } else if (isMobile() === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 1) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -1304,7 +1307,7 @@ const PreviewFukushashiki = () => {
         </div>
       </div>
     )
-  } else if (!state.isOpen && isMobile() === false && Number(state.positionPc) === 2) {
+  } else if (isMobile() === false && Number(state.positionPc) === 2) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -1354,7 +1357,7 @@ const PreviewFukushashiki = () => {
         />
       </div>
     )
-  } else if (!state.isOpen && isMobile() === true && Number(state.positionSp) === 1 && Number(state.buttonTypeSp) === 1) {
+  } else if (isMobile() === true && Number(state.positionSp) === 1 && Number(state.buttonTypeSp) === 1) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -1389,7 +1392,7 @@ const PreviewFukushashiki = () => {
         </div>
       </div>
     )
-  } else if (!state.isOpen && isMobile() === true && Number(state.positionSp) === 2) {
+  } else if (isMobile() === true && Number(state.positionSp) === 2) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
