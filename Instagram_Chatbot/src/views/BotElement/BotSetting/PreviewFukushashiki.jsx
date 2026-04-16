@@ -1095,6 +1095,7 @@ const PreviewFukushashiki = () => {
             submitErrorMessage={state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "" : state.submitErrorMessage}
             botId={state.botId}
             isProcessing={!!state.isProcessing}
+            cartSystem={state.cartSystem}
           />
           {renderNextButton(message, messageIndex)}
         </div>

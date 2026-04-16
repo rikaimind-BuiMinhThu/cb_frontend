@@ -1,4 +1,5 @@
 import api from "api/api-management";
+import { shortestDeliverableDateJpFromOrderClockJst } from "./deliveryDateRules";
 
 const findLastScenarioUserResponseRow = (state, dataInputName) => {
   const rows = state.scenarioUserResponses;
@@ -50,6 +51,34 @@ const resolveCrossSellOptionFromMessages = (state) => {
   const out = raw != null ? String(raw).trim() : "";
   return out || undefined;
 };
+
+const findSkipDeliveryRadioInMessages = (state) => {
+  for (const msg of state.messagesList || []) {
+    for (const c of msg.message_content || []) {
+      if (c?.radio_button?.save_input_content === "skip_delivery_datetime")
+        return c.radio_button;
+    }
+  }
+  return null;
+};
+
+const resolveSkipDeliveryChoiceFromMessages = (state) => {
+  const rb = findSkipDeliveryRadioInMessages(state);
+  if (!rb) return undefined;
+  const sel = String(rb.initial_selection ?? "").trim();
+  if (sel === "1" || sel === "2") return sel;
+};
+
+const skipDeliveryChoice = (state) => {
+  const row = findLastScenarioUserResponseRow(state, "skip_delivery_datetime");
+  const fromRow = String(row?.string_value ?? row?.stringValue ?? "").trim();
+  if (fromRow === "1" || fromRow === "2") return fromRow;
+  const fromMessages = resolveSkipDeliveryChoiceFromMessages(state);
+  if (fromMessages === "1" || fromMessages === "2") return fromMessages;
+  return "2";
+};
+
+const resolveSkipDeliveryDatetime = (state) => skipDeliveryChoice(state) === "1";
 
 const getResponseValue = (state, name) => {
   const row = findLastScenarioUserResponseRow(state, name);
@@ -280,6 +309,9 @@ const normalizeSavedDeliveryDate = (raw) => {
 };
 
 const formatDeliveryDateFromPullDown = (state) => {
+  if (resolveSkipDeliveryDatetime(state)) {
+    return shortestDeliverableDateJpFromOrderClockJst();
+  }
   let last;
   for (const msg of state.messagesList || []) {
     if (msg.belong_to !== "user") continue;
@@ -297,48 +329,20 @@ const formatDeliveryDateFromPullDown = (state) => {
   return last || normalizeSavedDeliveryDate(getResponseValue(state, "delivery_date"));
 };
 
-const formatDeliveryTimeFromPullDown = (pd) => {
-  const cust = pd?.customization;
-  if (!cust) return undefined;
-  const sel =
-    cust.value != null && String(cust.value).trim() !== ""
-      ? String(cust.value)
-      : undefined;
-  if (!sel) return undefined;
-  const opts = cust.is_comment
-    ? cust.options_with_comment || []
-    : cust.options_without_comment || [];
-  let opt = opts.find(
-    (o) => String(o.id) === sel || String(o.value) === sel
-  );
-  if (!opt) {
-    const idx = parseInt(sel, 10);
-    if (!Number.isNaN(idx)) {
-      if (idx >= 1 && opts[idx - 1]) opt = opts[idx - 1];
-      if (!opt && opts[idx]) opt = opts[idx];
-    }
-  }
-  const text = opt?.text;
-  return text != null && String(text).trim() !== "" ? String(text).trim() : undefined;
+const formatDeliveryTimeFromPullDown = (state) => {
+  if (resolveSkipDeliveryDatetime(state)) return "指定しない";
+  const v = getResponseValue(state, "delivery_time");
+  if (v == null || String(v).trim() === "") return "指定しない";
+  return String(v).trim();
 };
 
 const collectCartAttributesFromMessages = (state) => {
   const attrs = [];
   const deliveryDate = formatDeliveryDateFromPullDown(state);
-  let deliveryTime;
-  for (const msg of state.messagesList || []) {
-    for (const c of msg.message_content || []) {
-      const pd = c.pull_down;
-      const key = pd?.save_input_content;
-      if (key === "delivery_time" && deliveryTime == null) {
-        deliveryTime = formatDeliveryTimeFromPullDown(pd);
-      }
-    }
-  }
+  const deliveryTime = formatDeliveryTimeFromPullDown(state);
   if (deliveryDate)
     attrs.push({ key: "配送希望日", value: deliveryDate });
-  if (deliveryTime)
-    attrs.push({ key: "配送希望時間", value: deliveryTime });
+  attrs.push({ key: "配送希望時間", value: deliveryTime });
   return attrs;
 };
 

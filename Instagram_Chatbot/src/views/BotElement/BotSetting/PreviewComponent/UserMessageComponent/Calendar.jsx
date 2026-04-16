@@ -1,9 +1,10 @@
 import React from "react";
 import "assets/css/bot/preview-chat-bot.css";
-import { MESSAGE_CONTENT_TYPES } from "../Constants";
+import { MESSAGE_CONTENT_TYPES, CART_SYSTEM } from "../Constants";
 import DatePickerCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/DatePickerCustom";
 import moment from "moment-timezone";
 import { Select, Radio, Row, Col, Calendar as AntdCalendar } from "antd";
+import { firstDeliverableOnOrAfter } from "../../deliveryDateRules";
 
 function isCalendarPreviewRelativeOn(calendar) {
   const v = calendar?.preview_relative_range_enabled;
@@ -12,12 +13,10 @@ function isCalendarPreviewRelativeOn(calendar) {
 
 const JST = "Asia/Tokyo";
 
-/** 00:00 ngày hiện tại theo JST (không áp dụng cắt 14:00). Dùng làm mốc tính ngày kết thúc preview. */
 function getJstStartOfTodayPlain() {
   return moment.tz(JST).clone().startOf("day");
 }
 
-/** Mốc cho ngày bắt đầu: sau 14:00 JST thì coi như ngày làm việc bắt đầu từ ngày mai. */
 function getPreviewRelativeRefDayJst() {
   const nowJst = moment.tz(JST);
   let ref = nowJst.clone().startOf("day");
@@ -25,7 +24,49 @@ function getPreviewRelativeRefDayJst() {
   return ref;
 }
 
-export function mergeCalendarForPreviewRelativeRange(calendar) {
+function countTrailingSundayMondayInclusive(endJst, startJst) {
+  let n = 0;
+  let e = endJst.clone().startOf("day");
+  const s = startJst.clone().startOf("day");
+  while (e.isSameOrAfter(s, "day")) {
+    const dow = e.day();
+    if (dow === 0 || dow === 1) n += 1;
+    else break;
+    e.subtract(1, "day");
+  }
+  return n;
+}
+
+function extendDeliveryEndPastTrailingSunMonJst(startJst, endJst, cfgEndCap) {
+  let s = startJst.clone().startOf("day");
+  let e = endJst.clone().startOf("day");
+  for (let i = 0; i < 14; i += 1) {
+    const extra = countTrailingSundayMondayInclusive(e, s);
+    if (extra === 0) break;
+    e = e.clone().add(extra, "days");
+    if (cfgEndCap && e.isAfter(cfgEndCap, "day")) {
+      e = cfgEndCap.clone().startOf("day");
+      break;
+    }
+  }
+  return e;
+}
+
+function isDeliveryDateCalendar(cal) {
+  return String(cal?.save_input_content ?? "").trim() === "delivery_date";
+}
+
+function isSundayOrMondayJst(current) {
+  const d = moment.tz(current, JST).startOf("day");
+  const dow = d.day();
+  return dow === 0 || dow === 1;
+}
+
+function isShopifyCartSystem(cartSystem) {
+  return String(cartSystem ?? "").toLowerCase() === CART_SYSTEM.SHOPIFY;
+}
+
+export function mergeCalendarForPreviewRelativeRange(calendar, cartSystem = "") {
   if (!calendar || !isCalendarPreviewRelativeOn(calendar)) return calendar;
 
   const d0 = Number(calendar.preview_days_from_today);
@@ -54,7 +95,6 @@ export function mergeCalendarForPreviewRelativeRange(calendar) {
   if (cfgStartOk && effStart.isBefore(cfgStart)) effStart = cfgStart.clone();
   if (cfgEndOk && effStart.isAfter(cfgEnd)) effStart = cfgEnd.clone();
 
-  // Ngày kết thúc không bị +1 sau 14:00: cùng công thức nhưng neo vào refPlain (hôm nay JST).
   let endAnchor = refPlain.clone().add(daysFromToday, "days");
   if (cfgStartOk && endAnchor.isBefore(cfgStart)) endAnchor = cfgStart.clone();
   if (cfgEndOk && endAnchor.isAfter(cfgEnd)) endAnchor = cfgEnd.clone();
@@ -70,6 +110,18 @@ export function mergeCalendarForPreviewRelativeRange(calendar) {
   if (cfgStartOk && effEnd.isBefore(cfgStart)) effEnd = cfgStart.clone();
   if (cfgEndOk && effEnd.isAfter(cfgEnd)) effEnd = cfgEnd.clone();
   if (effStart.isAfter(effEnd)) effEnd = effStart.clone();
+
+  if (isDeliveryDateCalendar(calendar) && isShopifyCartSystem(cartSystem)) {
+    let effStartJ = moment.tz(effStart.format("YYYY-MM-DD"), "YYYY-MM-DD", JST).startOf("day");
+    let effEndJ = moment.tz(effEnd.format("YYYY-MM-DD"), "YYYY-MM-DD", JST).startOf("day");
+    if (effStartJ.day() === 0 || effStartJ.day() === 1) {
+      effStartJ = firstDeliverableOnOrAfter(effStartJ);
+    }
+    effEndJ = extendDeliveryEndPastTrailingSunMonJst(effStartJ, effEndJ, cfgEndOk ? cfgEnd : null);
+    if (effStartJ.isAfter(effEndJ, "day")) effEndJ = effStartJ.clone();
+    effStart = effStartJ;
+    effEnd = effEndJ;
+  }
 
   const merged = {
     ...calendar,
@@ -94,7 +146,7 @@ function isDateOutsideCalendarConfiguredRange(current, cal) {
   return d.isBefore(minD) || d.isAfter(maxD);
 }
 
-export default function Calendar({ content, messageIndex, contentIndex, onChangeValue, errors, disabled, locale}) {
+export default function Calendar({ content, messageIndex, contentIndex, onChangeValue, errors, disabled, locale, cartSystem = "",}) {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.CALENDAR) return null;
 
   const calendar = content.calendar;
@@ -271,17 +323,33 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
   };
 
   const calendarForPreviewDisable = isCalendarPreviewRelativeOn(calendar)
-    ? mergeCalendarForPreviewRelativeRange(calendar)
+    ? mergeCalendarForPreviewRelativeRange(calendar, cartSystem)
     : calendar;
 
   const previewDisableDateStart = (current) => {
     if (handleDisableDateCalendar(current, calendarForPreviewDisable)) return true;
-    return isDateOutsideCalendarConfiguredRange(current, calendarForPreviewDisable);
+    if (isDateOutsideCalendarConfiguredRange(current, calendarForPreviewDisable)) return true;
+    if (
+      isShopifyCartSystem(cartSystem) &&
+      isDeliveryDateCalendar(calendarForPreviewDisable) &&
+      isSundayOrMondayJst(current)
+    ) {
+      return true;
+    }
+    return false;
   };
 
   const previewDisableDateEnd = (current) => {
     if (handleDisableEndDateCalendar(current, calendarForPreviewDisable)) return true;
-    return isDateOutsideCalendarConfiguredRange(current, calendarForPreviewDisable);
+    if (isDateOutsideCalendarConfiguredRange(current, calendarForPreviewDisable)) return true;
+    if (
+      isShopifyCartSystem(cartSystem) &&
+      isDeliveryDateCalendar(calendarForPreviewDisable) &&
+      isSundayOrMondayJst(current)
+    ) {
+      return true;
+    }
+    return false;
   };
 
   const renderTitle = () => {

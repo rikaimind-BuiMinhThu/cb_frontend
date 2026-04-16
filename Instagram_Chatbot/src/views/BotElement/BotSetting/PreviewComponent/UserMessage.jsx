@@ -53,6 +53,7 @@ const UserMessage = ({
   botId,
   isProcessing = false,
   onRenderCompleted,
+  cartSystem = "",
 }) => {
   if (!isUserMessage(message)) return null;
 
@@ -413,6 +414,7 @@ const UserMessage = ({
           errors={errors}
           disabled={disabled}
           locale={locale}
+          cartSystem={cartSystem}
         />;
       case MESSAGE_CONTENT_TYPES.AGREE_TERM:
         return <AgreeTerm
