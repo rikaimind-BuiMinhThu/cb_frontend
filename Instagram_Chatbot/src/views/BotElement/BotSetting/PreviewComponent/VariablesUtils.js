@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { findItem, stringNullOrEmpty } from '../PreviewComponent/Utils';
 import { MESSAGE_CONTENT_TYPES, SCAN_REGEX } from '../PreviewComponent/Constants';
 
@@ -202,6 +203,22 @@ const getSubmitButtonDefaultValue = (value, variables, variableName) => {
   return value;
 }
 
+const formatCalendarDateForVariable = (d) => {
+  if (d === undefined || d === null || d === '') return '';
+  if (moment.isMoment(d)) return d.format('YYYY-MM-DD');
+  return String(d);
+};
+
+const getCalendarDefaultValue = (subContent) => {
+  if (!subContent) return '';
+  if (subContent.type === 'start_end_date') {
+    const s = formatCalendarDateForVariable(subContent.start_date_select);
+    const e = formatCalendarDateForVariable(subContent.end_date_select);
+    return `${s || 'start date'} ~ ${e || 'end date'}`;
+  }
+  return formatCalendarDateForVariable(subContent.date_select);
+};
+
 const getDefaultValue = (subContent, contentType, value, field, prefecturesList, variables, variableName) => {
   switch (contentType) {
     case MESSAGE_CONTENT_TYPES.TEXT_INPUT:
@@ -225,7 +242,7 @@ const getDefaultValue = (subContent, contentType, value, field, prefecturesList,
     case MESSAGE_CONTENT_TYPES.ATTACHMENT:
       throw new Error(`getDefaultValue: ${contentType} is not supported`);
     case MESSAGE_CONTENT_TYPES.CALENDAR:
-      throw new Error(`getDefaultValue: ${contentType} is not supported`);
+      return getCalendarDefaultValue(subContent);
     case MESSAGE_CONTENT_TYPES.AGREE_TERM:
       throw new Error(`getDefaultValue: ${contentType} is not supported`);
     case MESSAGE_CONTENT_TYPES.CREDIT_CARD_PAYMENT:

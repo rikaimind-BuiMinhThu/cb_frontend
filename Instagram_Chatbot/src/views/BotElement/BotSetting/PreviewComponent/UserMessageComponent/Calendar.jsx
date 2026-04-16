@@ -2,8 +2,97 @@ import React from "react";
 import "assets/css/bot/preview-chat-bot.css";
 import { MESSAGE_CONTENT_TYPES } from "../Constants";
 import DatePickerCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/DatePickerCustom";
-import { moment } from "moment";
+import moment from "moment-timezone";
 import { Select, Radio, Row, Col, Calendar as AntdCalendar } from "antd";
+
+function isCalendarPreviewRelativeOn(calendar) {
+  const v = calendar?.preview_relative_range_enabled;
+  return v === true || v === 1 || v === "true" || v === "1";
+}
+
+const JST = "Asia/Tokyo";
+
+/** 00:00 ngày hiện tại theo JST (không áp dụng cắt 14:00). Dùng làm mốc tính ngày kết thúc preview. */
+function getJstStartOfTodayPlain() {
+  return moment.tz(JST).clone().startOf("day");
+}
+
+/** Mốc cho ngày bắt đầu: sau 14:00 JST thì coi như ngày làm việc bắt đầu từ ngày mai. */
+function getPreviewRelativeRefDayJst() {
+  const nowJst = moment.tz(JST);
+  let ref = nowJst.clone().startOf("day");
+  if (nowJst.hour() >= 14) ref = ref.add(1, "days");
+  return ref;
+}
+
+export function mergeCalendarForPreviewRelativeRange(calendar) {
+  if (!calendar || !isCalendarPreviewRelativeOn(calendar)) return calendar;
+
+  const d0 = Number(calendar.preview_days_from_today);
+  const d1 = Number(calendar.preview_days_relative_to_end_date);
+  const daysFromToday = Number.isFinite(d0) ? d0 : 0;
+  const daysFromEnd = Number.isFinite(d1) ? d1 : 0;
+
+  const cfgStartStr = String(calendar.start_date || "").trim();
+  const cfgEndStr = String(calendar.end_date || "").trim();
+  const cfgStart = cfgStartStr
+    ? moment.tz(cfgStartStr, "YYYY-MM-DD", JST).startOf("day")
+    : null;
+  const cfgEnd = cfgEndStr
+    ? moment.tz(cfgEndStr, "YYYY-MM-DD", JST).startOf("day")
+    : null;
+  const cfgStartOk = !!(cfgStart && cfgStart.isValid());
+  const cfgEndOk = !!(cfgEnd && cfgEnd.isValid());
+
+  if (cfgStartStr && !cfgStartOk) return calendar;
+  if (cfgEndStr && !cfgEndOk) return calendar;
+
+  const refStart = getPreviewRelativeRefDayJst();
+  const refPlain = getJstStartOfTodayPlain();
+
+  let effStart = refStart.clone().add(daysFromToday, "days");
+  if (cfgStartOk && effStart.isBefore(cfgStart)) effStart = cfgStart.clone();
+  if (cfgEndOk && effStart.isAfter(cfgEnd)) effStart = cfgEnd.clone();
+
+  // Ngày kết thúc không bị +1 sau 14:00: cùng công thức nhưng neo vào refPlain (hôm nay JST).
+  let endAnchor = refPlain.clone().add(daysFromToday, "days");
+  if (cfgStartOk && endAnchor.isBefore(cfgStart)) endAnchor = cfgStart.clone();
+  if (cfgEndOk && endAnchor.isAfter(cfgEnd)) endAnchor = cfgEnd.clone();
+
+  let effEnd;
+  if (daysFromEnd > 0) {
+    effEnd = endAnchor.clone().add(daysFromEnd - 1, "days");
+  } else if (daysFromEnd < 0) {
+    effEnd = endAnchor.clone().add(daysFromEnd, "days");
+  } else {
+    effEnd = endAnchor.clone();
+  }
+  if (cfgStartOk && effEnd.isBefore(cfgStart)) effEnd = cfgStart.clone();
+  if (cfgEndOk && effEnd.isAfter(cfgEnd)) effEnd = cfgEnd.clone();
+  if (effStart.isAfter(effEnd)) effEnd = effStart.clone();
+
+  const merged = {
+    ...calendar,
+    start_date: effStart.format("YYYY-MM-DD"),
+    end_date: effEnd.format("YYYY-MM-DD"),
+  };
+  delete merged.aggregation_target_period_from;
+  delete merged.aggregation_target_period_to;
+  return merged;
+}
+
+/** True when the day is strictly before start_date or after end_date (inclusive range allowed). */
+function isDateOutsideCalendarConfiguredRange(current, cal) {
+  if (!cal) return false;
+  const startStr = String(cal.start_date ?? "").trim();
+  const endStr = String(cal.end_date ?? "").trim();
+  if (!startStr || !endStr) return false;
+  const d = moment(current).startOf("day");
+  const minD = moment(startStr, "YYYY-MM-DD").startOf("day");
+  const maxD = moment(endStr, "YYYY-MM-DD").startOf("day");
+  if (!minD.isValid() || !maxD.isValid()) return false;
+  return d.isBefore(minD) || d.isAfter(maxD);
+}
 
 export default function Calendar({ content, messageIndex, contentIndex, onChangeValue, errors, disabled, locale}) {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.CALENDAR) return null;
@@ -181,6 +270,20 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
     }
   };
 
+  const calendarForPreviewDisable = isCalendarPreviewRelativeOn(calendar)
+    ? mergeCalendarForPreviewRelativeRange(calendar)
+    : calendar;
+
+  const previewDisableDateStart = (current) => {
+    if (handleDisableDateCalendar(current, calendarForPreviewDisable)) return true;
+    return isDateOutsideCalendarConfiguredRange(current, calendarForPreviewDisable);
+  };
+
+  const previewDisableDateEnd = (current) => {
+    if (handleDisableEndDateCalendar(current, calendarForPreviewDisable)) return true;
+    return isDateOutsideCalendarConfiguredRange(current, calendarForPreviewDisable);
+  };
+
   const renderTitle = () => {
     if (!calendar.title_require && !calendar.require) return null;
 
@@ -234,9 +337,7 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
               "date_select"
             )
           }
-          disabledDate={(current) =>
-            handleDisableDateCalendar(current, calendar)
-          }
+          disabledDate={previewDisableDateStart}
         />
       </React.Fragment>
     );
@@ -366,9 +467,7 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
                 "date_select"
               )
             }
-            disabledDate={(current) =>
-              handleDisableDateCalendar(current, calendar)
-            }
+            disabledDate={previewDisableDateStart}
           />
         </div>
       </React.Fragment>
@@ -387,7 +486,7 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
             className="ss-message__content--user-calender-embedded"
             style={{ marginTop: "5px" }}
           >
-            <Calendar
+            <AntdCalendar
               // onLoad={
               //   checkLoadCalendar()
               // }
@@ -506,9 +605,7 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
                   "date_select"
                 )
               }
-              disabledDate={(current) =>
-                handleDisableDateCalendar(current, calendar)
-              }
+              disabledDate={previewDisableDateStart}
             />
           </div>
         </React.Fragment>
@@ -521,9 +618,7 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
           <DatePickerCustom
             disabled={disabled}
             style={{ width: "49%", marginTop: "5px" }}
-            disabledDate={(current) =>
-              handleDisableDateCalendar(current, calendar)
-            }
+            disabledDate={previewDisableDateStart}
             value={
               calendar.start_date_select
                 ? moment(calendar.start_date_select, "YYYY-MM-DD")
@@ -541,9 +636,7 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
           <DatePickerCustom
             disabled={disabled}
             style={{ width: "49%", marginTop: "5px" }}
-            disabledDate={(current) =>
-              handleDisableEndDateCalendar(current, calendar)
-            }
+            disabledDate={previewDisableDateEnd}
             value={
               calendar.end_date_select
                 ? moment(calendar.end_date_select, "YYYY-MM-DD")

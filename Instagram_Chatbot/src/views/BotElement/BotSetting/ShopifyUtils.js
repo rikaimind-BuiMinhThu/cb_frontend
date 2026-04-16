@@ -225,18 +225,76 @@ const formatPhoneForCart = (state) => {
   return join(typeof p === "object" ? p : null) || "";
 };
 
-const formatDeliveryDateFromPullDown = (pd) => {
-  const bucket =
-    pd?.type === "date_ymd"
-      ? pd.date_ymd
-      : pd?.dob_ymd || pd?.date_ymd || {};
-  const y = bucket?.valueYear;
-  const m = bucket?.valueMonth;
-  const d = bucket?.valueDay;
-  if (y == null || m == null || d == null) return undefined;
-  if (String(y).trim() === "" || String(m).trim() === "" || String(d).trim() === "")
-    return undefined;
-  return `${y}年${parseInt(String(m), 10)}月${parseInt(String(d), 10)}日`;
+const jpFromIso = (v) => {
+  const m = String(v ?? "").trim().match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  return m ? `${m[1]}年${+m[2]}月${+m[3]}日` : undefined;
+};
+
+const jpFromYmdBucket = (b) => {
+  if (!b || typeof b !== "object") return undefined;
+  const { valueYear: y, valueMonth: mo, valueDay: d } = b;
+  if (y == null || mo == null || d == null) return undefined;
+  if (!String(y).trim() || !String(mo).trim() || !String(d).trim()) return undefined;
+  return `${y}年${+mo}月${+d}日`;
+};
+
+const deliveryJpFromPullDown = (pd) =>
+  jpFromYmdBucket(
+    pd?.type === "date_ymd" ? pd.date_ymd : pd?.dob_ymd || pd?.date_ymd || {}
+  );
+
+const deliveryJpFromCalendar = (cal) => {
+  if (!cal || cal.save_input_content !== "delivery_date") return undefined;
+  const { type: t, date_select: ds, start_date_select: a, end_date_select: b } = cal;
+  if (t === "date_selection" || t === "embedded") {
+    if (ds != null && String(ds).trim() !== "") return jpFromIso(ds) || String(ds).trim();
+  }
+  if (t === "start_end_date") {
+    const ja = a != null && String(a).trim() ? jpFromIso(a) || String(a).trim() : "";
+    const jb = b != null && String(b).trim() ? jpFromIso(b) || String(b).trim() : "";
+    if (ja && jb) return `${ja} ～ ${jb}`;
+    return ja || jb || undefined;
+  }
+  return undefined;
+};
+
+const normalizeSavedDeliveryDate = (raw) => {
+  if (raw == null || String(raw).trim() === "") return undefined;
+  const t = String(raw).trim();
+  if (/\d+年\d+月\d+日/.test(t)) return t;
+  const iso = jpFromIso(t);
+  if (iso) return iso;
+  try {
+    const o =
+      typeof raw === "string" && t.startsWith("{")
+        ? JSON.parse(raw)
+        : typeof raw === "object"
+          ? raw
+          : null;
+    const jp = jpFromYmdBucket(o);
+    if (jp) return jp;
+  } catch (e) {
+    /* ignore */
+  }
+  return t;
+};
+
+const formatDeliveryDateFromPullDown = (state) => {
+  let last;
+  for (const msg of state.messagesList || []) {
+    if (msg.belong_to !== "user") continue;
+    for (const c of msg.message_content || []) {
+      let v;
+      if (c.type === "calendar" && c.calendar?.save_input_content === "delivery_date") {
+        v = deliveryJpFromCalendar(c.calendar);
+      }
+      if (!v && c.pull_down?.save_input_content === "delivery_date") {
+        v = deliveryJpFromPullDown(c.pull_down);
+      }
+      if (v) last = v;
+    }
+  }
+  return last || normalizeSavedDeliveryDate(getResponseValue(state, "delivery_date"));
 };
 
 const formatDeliveryTimeFromPullDown = (pd) => {
@@ -266,15 +324,12 @@ const formatDeliveryTimeFromPullDown = (pd) => {
 
 const collectCartAttributesFromMessages = (state) => {
   const attrs = [];
-  let deliveryDate;
+  const deliveryDate = formatDeliveryDateFromPullDown(state);
   let deliveryTime;
   for (const msg of state.messagesList || []) {
     for (const c of msg.message_content || []) {
       const pd = c.pull_down;
       const key = pd?.save_input_content;
-      if (key === "delivery_date" && deliveryDate == null) {
-        deliveryDate = formatDeliveryDateFromPullDown(pd);
-      }
       if (key === "delivery_time" && deliveryTime == null) {
         deliveryTime = formatDeliveryTimeFromPullDown(pd);
       }

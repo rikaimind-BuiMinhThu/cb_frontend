@@ -2054,7 +2054,12 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
             if (dataMessages[index].message_content[indexContent][contentType] === undefined) {
                 dataMessages[index].message_content[indexContent][contentType] = {}
             }
-            dataMessages[index].message_content[indexContent][contentType][field] = value;
+            dataMessages[index].message_content[indexContent][contentType][field] =
+                contentType === 'calendar' &&
+                (field === 'date_select' || field === 'start_date_select' || field === 'end_date_select') &&
+                moment.isMoment(value)
+                    ? value.format('YYYY-MM-DD')
+                    : value;
         }
 
         if (contentType === 'product_purchase' && field === 'initial_selection' && value.length > 0) {
@@ -2264,7 +2269,12 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
             });
             setVariables([...variables]);
             if (isSaveParam) {
-                objParam[dataMessages[index].message_content[indexContent][contentType].save_input_content] = value;
+                const saveKey = dataMessages[index].message_content[indexContent][contentType].save_input_content;
+                objParam[saveKey] =
+                    contentType === 'calendar' &&
+                    (field === 'date_select' || field === 'start_date_select' || field === 'end_date_select')
+                        ? dataMessages[index].message_content[indexContent][contentType][field]
+                        : value;
                 setObjParam({ ...objParam });
             }
         }

@@ -48,8 +48,26 @@ import OptionGenderConfig from './OptionGenderConfig';
 import SubmitButtonLoadingConfig from './SubmitButtonLoadingConfig';
 import SubmitButtonConfig from './SubmitButtonConfig';
 import {CART_SYSTEM} from '../PreviewComponent/Constants';
+import { mergeCalendarForPreviewRelativeRange as mergePreviewRelativeCalendar } from '../PreviewComponent/UserMessageComponent/Calendar';
 
 const _ = require('lodash');
+
+function getCalendarPreviewRelativeRangeLabel(calendar) {
+  const v = calendar?.preview_relative_range_enabled;
+  const relOn = v === true || v === 1 || v === "true" || v === "1";
+  if (!relOn) return null;
+  const merged = mergePreviewRelativeCalendar(calendar);
+  if (!merged?.start_date || !merged?.end_date) return null;
+  const s = moment(merged.start_date, "YYYY-MM-DD");
+  const e = moment(merged.end_date, "YYYY-MM-DD");
+  if (!s.isValid() || !e.isValid()) return null;
+  return { start: merged.start_date, end: merged.end_date };
+}
+
+function isCalendarPreviewRelativeRangeEnabled(calendar) {
+  const v = calendar?.preview_relative_range_enabled;
+  return v === true || v === 1 || v === "true" || v === "1";
+}
 
 let dataPaymentMethod = [
   {
@@ -1522,7 +1540,10 @@ const Scenario = () => {
             fixed_date: [],
             date_selection: {},
             embedded: {},
-            start_end_date: {}
+            start_end_date: {},
+            preview_relative_range_enabled: false,
+            preview_days_from_today: 0,
+            preview_days_relative_to_end_date: 0,
           }
         }
       );
@@ -8788,6 +8809,15 @@ const Scenario = () => {
                                                             onChange={(date, dateString) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, dateString, 'end_date')}
                                                           />
                                                         </div>
+                                                        {(() => {
+                                                          const previewRel = getCalendarPreviewRelativeRangeLabel(calendar);
+                                                          if (!previewRel) return null;
+                                                          return (
+                                                            <div className="ss-user-setting__item-bottom" style={{ fontSize: '12px', color: '#5a7a9a', marginTop: '4px' }}>
+                                                              プレビュー適用範囲（今日・終了日オフセット）: {previewRel.start} ～ {previewRel.end}
+                                                            </div>
+                                                          );
+                                                        })()}
                                                         <CheckboxCustom
                                                           label="入力値の検証にAPIを利用する"
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'use_api_input_value')}
@@ -8846,6 +8876,39 @@ const Scenario = () => {
                                                           }}
                                                           value={calendar.initial_selection}
                                                         />
+                                                        <div className="ss-user-setting__item-bottom" style={{ width: '100%', marginTop: '4px' }}>
+                                                          <CheckboxCustom
+                                                            label="今日を起点にプレビュー範囲を合わせる（設定した開始～終了の内側に収めます）"
+                                                            onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'preview_relative_range_enabled')}
+                                                            value={isCalendarPreviewRelativeRangeEnabled(calendar)}
+                                                          />
+                                                        </div>
+                                                        {isCalendarPreviewRelativeRangeEnabled(calendar) && (
+                                                          <div className="ss-user-setting__calendar-preview-offset-wrap">
+                                                            <div className="ss-user-setting__calendar-preview-offset-row">
+                                                              <span className="ss-user-setting-label" style={{ marginLeft: 0 }}>今日から（日）</span>
+                                                              <InputNum
+                                                                placeholder="0"
+                                                                style={{ width: 100, minWidth: 88 }}
+                                                                min={Number.MIN_SAFE_INTEGER}
+                                                                max={Number.MAX_SAFE_INTEGER}
+                                                                onChange={(v) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, v, 'preview_days_from_today')}
+                                                                value={calendar.preview_days_from_today ?? 0}
+                                                              />
+                                                            </div>
+                                                            <div className="ss-user-setting__calendar-preview-offset-row">
+                                                              <span className="ss-user-setting-label" style={{ marginLeft: 0 }}>連続選択日数（開始日を含む／－は前に短縮）</span>
+                                                              <InputNum
+                                                                placeholder="0"
+                                                                style={{ width: 100, minWidth: 88 }}
+                                                                min={Number.MIN_SAFE_INTEGER}
+                                                                max={Number.MAX_SAFE_INTEGER}
+                                                                onChange={(v) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, v, 'preview_days_relative_to_end_date')}
+                                                                value={calendar.preview_days_relative_to_end_date ?? 0}
+                                                              />
+                                                            </div>
+                                                          </div>
+                                                        )}
                                                         <div className="ss-user-setting__item-bottom">
                                                           <div style={{ width: '98%' }}>
                                                             <SelectCustom
