@@ -3,7 +3,7 @@ import moment from "moment-timezone";
 const JST = "Asia/Tokyo";
 
 const isDeliverableWeekday = (m) => {
-  const d = m.day();
+  const d = m.clone().startOf("day").day();
   return d >= 2 && d <= 6;
 };
 
@@ -21,8 +21,11 @@ export const shortestDeliverableDateJpFromOrderClockJst = (reference) => {
     ? moment.tz(reference, JST)
     : moment.tz(JST);
   const hour = ref.hour();
-  let anchor = ref.clone().startOf("day");
-  if (hour >= 14) anchor = anchor.add(1, "day");
+  const dayStart = ref.clone().startOf("day");
+  const anchor =
+    hour >= 14
+      ? dayStart.clone().add(2, "days")
+      : dayStart.clone().add(1, "day");
   const first = firstDeliverableOnOrAfter(anchor);
   return `${first.year()}年${first.month() + 1}月${first.date()}日`;
 };

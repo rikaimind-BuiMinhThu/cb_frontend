@@ -4,7 +4,10 @@ import { MESSAGE_CONTENT_TYPES, CART_SYSTEM } from "../Constants";
 import DatePickerCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/DatePickerCustom";
 import moment from "moment-timezone";
 import { Select, Radio, Row, Col, Calendar as AntdCalendar } from "antd";
-import { firstDeliverableOnOrAfter } from "../../deliveryDateRules";
+import {
+  firstDeliverableOnOrAfter,
+  isDeliverableWeekday,
+} from "../../deliveryDateRules";
 
 function isCalendarPreviewRelativeOn(calendar) {
   const v = calendar?.preview_relative_range_enabled;
@@ -13,43 +16,31 @@ function isCalendarPreviewRelativeOn(calendar) {
 
 const JST = "Asia/Tokyo";
 
-function getJstStartOfTodayPlain() {
-  return moment.tz(JST).clone().startOf("day");
-}
-
-function getPreviewRelativeRefDayJst() {
+function getPreviewRelativeAnchorDayJst() {
   const nowJst = moment.tz(JST);
-  let ref = nowJst.clone().startOf("day");
-  if (nowJst.hour() >= 14) ref = ref.add(1, "days");
-  return ref;
+  const dayStart = nowJst.clone().startOf("day");
+  return nowJst.hour() >= 14
+    ? dayStart.clone().add(2, "days")
+    : dayStart.clone().add(1, "day");
 }
 
-function countTrailingSundayMondayInclusive(endJst, startJst) {
-  let n = 0;
-  let e = endJst.clone().startOf("day");
-  const s = startJst.clone().startOf("day");
-  while (e.isSameOrAfter(s, "day")) {
-    const dow = e.day();
-    if (dow === 0 || dow === 1) n += 1;
-    else break;
-    e.subtract(1, "day");
-  }
-  return n;
-}
-
-function extendDeliveryEndPastTrailingSunMonJst(startJst, endJst, cfgEndCap) {
-  let s = startJst.clone().startOf("day");
-  let e = endJst.clone().startOf("day");
-  for (let i = 0; i < 14; i += 1) {
-    const extra = countTrailingSundayMondayInclusive(e, s);
-    if (extra === 0) break;
-    e = e.clone().add(extra, "days");
-    if (cfgEndCap && e.isAfter(cfgEndCap, "day")) {
-      e = cfgEndCap.clone().startOf("day");
-      break;
+function endDateInclusiveForDeliverableDayCount(startJst, deliverableCount, cfgEndCap) {
+  const n = Math.max(1, Math.floor(Number(deliverableCount)) || 1);
+  let d = startJst.clone().startOf("day");
+  let seen = 0;
+  for (let i = 0; i < 400; i += 1) {
+    if (isDeliverableWeekday(d)) {
+      seen += 1;
+      if (seen === n) {
+        if (cfgEndCap && d.isAfter(cfgEndCap, "day")) {
+          return cfgEndCap.clone().startOf("day");
+        }
+        return d;
+      }
     }
+    d = d.clone().add(1, "day");
   }
-  return e;
+  return cfgEndCap ? cfgEndCap.clone().startOf("day") : startJst.clone().startOf("day");
 }
 
 function isDeliveryDateCalendar(cal) {
@@ -88,14 +79,13 @@ export function mergeCalendarForPreviewRelativeRange(calendar, cartSystem = "") 
   if (cfgStartStr && !cfgStartOk) return calendar;
   if (cfgEndStr && !cfgEndOk) return calendar;
 
-  const refStart = getPreviewRelativeRefDayJst();
-  const refPlain = getJstStartOfTodayPlain();
+  const anchor = getPreviewRelativeAnchorDayJst();
 
-  let effStart = refStart.clone().add(daysFromToday, "days");
+  let effStart = anchor.clone().add(daysFromToday, "days");
   if (cfgStartOk && effStart.isBefore(cfgStart)) effStart = cfgStart.clone();
   if (cfgEndOk && effStart.isAfter(cfgEnd)) effStart = cfgEnd.clone();
 
-  let endAnchor = refPlain.clone().add(daysFromToday, "days");
+  let endAnchor = anchor.clone().add(daysFromToday, "days");
   if (cfgStartOk && endAnchor.isBefore(cfgStart)) endAnchor = cfgStart.clone();
   if (cfgEndOk && endAnchor.isAfter(cfgEnd)) endAnchor = cfgEnd.clone();
 
@@ -113,11 +103,16 @@ export function mergeCalendarForPreviewRelativeRange(calendar, cartSystem = "") 
 
   if (isDeliveryDateCalendar(calendar) && isShopifyCartSystem(cartSystem)) {
     let effStartJ = moment.tz(effStart.format("YYYY-MM-DD"), "YYYY-MM-DD", JST).startOf("day");
-    let effEndJ = moment.tz(effEnd.format("YYYY-MM-DD"), "YYYY-MM-DD", JST).startOf("day");
     if (effStartJ.day() === 0 || effStartJ.day() === 1) {
       effStartJ = firstDeliverableOnOrAfter(effStartJ);
     }
-    effEndJ = extendDeliveryEndPastTrailingSunMonJst(effStartJ, effEndJ, cfgEndOk ? cfgEnd : null);
+    const nowJst = moment.tz(JST);
+    const deliverableSlots = nowJst.hour() >= 14 ? 6 : 7;
+    let effEndJ = endDateInclusiveForDeliverableDayCount(
+      effStartJ,
+      deliverableSlots,
+      cfgEndOk ? cfgEnd : null
+    );
     if (effStartJ.isAfter(effEndJ, "day")) effEndJ = effStartJ.clone();
     effStart = effStartJ;
     effEnd = effEndJ;
