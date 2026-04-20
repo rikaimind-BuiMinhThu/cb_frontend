@@ -379,10 +379,12 @@ const displayPopup = async () => {
         const useMoblieFullwidth = (typeof e.data.useMoblieFullwidth === 'boolean')
           ? e.data.useMoblieFullwidth
           : (sessionStorage.getItem("useFullwidthChatbotMobile") === "true");
-          iframe.width = w;
-          iframe.height = h;
-          iframe.style.setProperty("width", w, "important");
-          iframe.style.setProperty("height", h, "important");
+        const w = useMoblieFullwidth ? "100%" : "250px";
+        const h = useMoblieFullwidth ? "85px" : "58px";
+        iframe.width = w;
+        iframe.height = h;
+        iframe.style.setProperty("width", w, "important");
+        iframe.style.setProperty("height", h, "important");
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
       } else if (!e.data.isOpen) {
