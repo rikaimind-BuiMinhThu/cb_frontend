@@ -308,6 +308,30 @@ const normalizeSavedDeliveryDate = (raw) => {
   return t;
 };
 
+const findLastDeliveryCalendarFromMessages = (state) => {
+  let cal;
+  for (const msg of state.messagesList || []) {
+    if (msg.belong_to !== "user") continue;
+    for (const c of msg.message_content || []) {
+      if (c.type === "calendar" && c.calendar?.save_input_content === "delivery_date") {
+        cal = c.calendar;
+      }
+    }
+  }
+  return cal;
+};
+
+const formatSkipDeliveryDateLikeCalendarPreview = (state) => {
+  const cal = findLastDeliveryCalendarFromMessages(state);
+  if (!cal) return shortestDeliverableDateJpFromOrderClockJst();
+  const effectiveCal = isCalendarPreviewRelativeOn(cal)
+    ? mergeCalendarForPreviewRelativeRange(cal)
+    : cal;
+  const startStr = String(effectiveCal?.start_date ?? "").trim();
+  const jp = jpFromIso(startStr);
+  return jp || shortestDeliverableDateJpFromOrderClockJst(undefined, cal);
+};
+
 const formatDeliveryDateFromPullDown = (state) => {
   if (resolveSkipDeliveryDatetime(state)) {
     return shortestDeliverableDateJpFromOrderClockJst();

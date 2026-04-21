@@ -79,15 +79,57 @@ export function mergeCalendarForPreviewRelativeRange(calendar, cartSystem = "") 
   if (cfgStartStr && !cfgStartOk) return calendar;
   if (cfgEndStr && !cfgEndOk) return calendar;
 
-  const anchor = getPreviewRelativeAnchorDayJst();
+  const dayZero = getCalendarPreviewDayZeroJst();
+  const closed = getEffectivePreviewClosedWeekdays(calendar);
 
-  let effStart = anchor.clone().add(daysFromToday, "days");
-  if (cfgStartOk && effStart.isBefore(cfgStart)) effStart = cfgStart.clone();
-  if (cfgEndOk && effStart.isAfter(cfgEnd)) effStart = cfgEnd.clone();
-
-  let endAnchor = anchor.clone().add(daysFromToday, "days");
-  if (cfgStartOk && endAnchor.isBefore(cfgStart)) endAnchor = cfgStart.clone();
-  if (cfgEndOk && endAnchor.isAfter(cfgEnd)) endAnchor = cfgEnd.clone();
+  let effStart;
+  if (isCalendarPreviewDaysSplitEnabled(calendar)) {
+    const b = Number(calendar.preview_business_days);
+    const c = Number(calendar.preview_calendar_days);
+    const biz = Number.isFinite(b) && b > 0 ? Math.floor(b) : 0;
+    const cal = Number.isFinite(c) && c > 0 ? Math.floor(c) : 0;
+    if (biz === 0 && cal === 0) {
+      let cursor = dayZero.clone();
+      if (shouldShiftPreviewMinOffsetAfterCutOffJst(calendar)) {
+        cursor = cursor.clone().add(1, "day");
+      }
+      effStart = resolvePreviewRelativeEffStartNonSplit(
+        cursor,
+        closed,
+        daysFromToday,
+        cfgStart,
+        cfgEnd,
+        cfgStartOk,
+        cfgEndOk
+      );
+    } else {
+      effStart = dayZero.clone();
+      if (shouldShiftPreviewMinOffsetAfterCutOffJst(calendar)) {
+        effStart = effStart.clone().add(1, "day");
+      }
+      if (effStart.day() !== 6) {
+        effStart = bumpPreviewAnchorPastClosedTodayOrTomorrow(effStart, closed);
+      }
+      effStart = advanceBusinessDaysJst(effStart, biz, closed);
+      effStart = addCalendarDaysJst(effStart, cal);
+      if (cfgStartOk && effStart.isBefore(cfgStart)) effStart = cfgStart.clone();
+      if (cfgEndOk && effStart.isAfter(cfgEnd)) effStart = cfgEnd.clone();
+    }
+  } else {
+    let cursor = dayZero.clone();
+    if (shouldShiftPreviewMinOffsetAfterCutOffJst(calendar)) {
+      cursor = cursor.clone().add(1, "day");
+    }
+    effStart = resolvePreviewRelativeEffStartNonSplit(
+      cursor,
+      closed,
+      daysFromToday,
+      cfgStart,
+      cfgEnd,
+      cfgStartOk,
+      cfgEndOk
+    );
+  }
 
   let effEnd;
   if (daysFromEnd > 0) {
