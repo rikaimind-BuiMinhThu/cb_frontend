@@ -7162,6 +7162,13 @@ const Scenario = () => {
                                                               value={textInput[textInput.type]?.character_limit_to}
                                                             />
                                                           </div>
+                                                          <div className="ss-user-setting-item-use-character">
+                                                            <CheckboxCustom
+                                                              label="特殊文字を許可する"
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'allow_special_chars')}
+                                                              value={textInput[textInput.type]?.allow_special_chars}
+                                                            />
+                                                          </div>
                                                           <div className="ss-user-setting__item-bottom">
                                                             <div className="ss-user-setting__item-select-bottom-wrapper ss-input-text-comment">
                                                               <InputCustom

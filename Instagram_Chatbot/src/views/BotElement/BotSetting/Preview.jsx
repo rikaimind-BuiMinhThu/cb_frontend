@@ -1086,6 +1086,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
             }
             let REGEX_EMAIL = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}$/;
             let REGEX_PASSWORD = /^[A-Za-z0-9 ]+$/;
+            let REGEX_PASSWORD_WITH_SPECIAL = /^[A-Za-z0-9 !@#$%^&*()_+\-=\[\]{};':"\\|,.<\/>?]+$/;
 
             if (contentType.type === 'text' || contentType.type === 'password') {
                 if (contentType[contentType.type].isSplitInput) {
@@ -1110,9 +1111,13 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                     && contentType[contentType.type].value?.length > limitTo) {
                     errorsMess[`message${index}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitTo}文字以下入力してください。`;
                     isValid = false;
-                } else if (contentType.type === 'password' && !stringNullOrEmpty(contentType[contentType.type].value) && !REGEX_PASSWORD.test(contentType[contentType.type].value)) {
-                    errorsMess[`message${index}_content${i}_${contentArr[i].type}_${contentType.type}`] = `英数字('A-Z','a-z','0-9')が使用できます。`;
-                    isValid = false;
+                } else if (contentType.type === 'password' && !stringNullOrEmpty(contentType[contentType.type].value)) {
+                    const passwordRegex = contentType[contentType.type]?.allow_special_chars ? REGEX_PASSWORD_WITH_SPECIAL : REGEX_PASSWORD;
+                    const passwordErrorMsg = contentType[contentType.type]?.allow_special_chars ? `英数字('A-Z','a-z','0-9')と特殊文字が使用できます。` : `英数字('A-Z','a-z','0-9')が使用できます。`;
+                    if (!passwordRegex.test(contentType[contentType.type].value)) {
+                        errorsMess[`message${index}_content${i}_${contentArr[i].type}_${contentType.type}`] = passwordErrorMsg;
+                        isValid = false;
+                    }
                 }
             } else if (contentArr[i].type === 'product_purchase' && contentType.initial_selection.length !== 0) {
                 contentType.initial_selection.forEach((item, index) => {
@@ -1136,12 +1141,20 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                         || contentType[contentType.type].valueConfirm?.length > limitTo)) {
                     errorsMess[`message${index}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitTo}文字以下入力してください。`;
                     isValid = false;
-                } else if (!stringNullOrEmpty(contentType[contentType.type].value) && !REGEX_PASSWORD.test(contentType[contentType.type].value)) {
-                    errorsMess[`message${index}_content${i}_${contentArr[i].type}_${contentType.type}`] = `英数字('A-Z','a-z','0-9')が使用できます。`;
-                    isValid = false;
-                } else if (!stringNullOrEmpty(contentType[contentType.type].valueConfirm) && !REGEX_PASSWORD.test(contentType[contentType.type].valueConfirm)) {
-                    errorsMess[`message${index}_content${i}_${contentArr[i].type}_${contentType.type}`] = `英数字('A-Z','a-z','0-9')が使用できます。`;
-                    isValid = false;
+                } else if (!stringNullOrEmpty(contentType[contentType.type].value)) {
+                    const passwordRegex = contentType[contentType.type]?.allow_special_chars ? REGEX_PASSWORD_WITH_SPECIAL : REGEX_PASSWORD;
+                    const passwordErrorMsg = contentType[contentType.type]?.allow_special_chars ? `英数字('A-Z','a-z','0-9')と特殊文字が使用できます。` : `英数字('A-Z','a-z','0-9')が使用できます。`;
+                    if (!passwordRegex.test(contentType[contentType.type].value)) {
+                        errorsMess[`message${index}_content${i}_${contentArr[i].type}_${contentType.type}`] = passwordErrorMsg;
+                        isValid = false;
+                    }
+                } else if (!stringNullOrEmpty(contentType[contentType.type].valueConfirm)) {
+                    const passwordRegex = contentType[contentType.type]?.allow_special_chars ? REGEX_PASSWORD_WITH_SPECIAL : REGEX_PASSWORD;
+                    const passwordErrorMsg = contentType[contentType.type]?.allow_special_chars ? `英数字('A-Z','a-z','0-9')と特殊文字が使用できます。` : `英数字('A-Z','a-z','0-9')が使用できます。`;
+                    if (!passwordRegex.test(contentType[contentType.type].valueConfirm)) {
+                        errorsMess[`message${index}_content${i}_${contentArr[i].type}_${contentType.type}`] = passwordErrorMsg;
+                        isValid = false;
+                    }
                 } else if (!stringNullOrEmpty(contentType[contentType.type].value) && !stringNullOrEmpty(contentType[contentType.type].valueConfirm) && contentType[contentType.type].value !== contentType[contentType.type].valueConfirm) {
                     errorsMess[`message${index}_content${i}_${contentArr[i].type}_${contentType.type}`] = "パスワードとパスワード確認が一致しません。";
                     isValid = false;

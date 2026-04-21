@@ -115,7 +115,7 @@ const validateTextType = (contentType, key, errorsMess, limitFrom, limitTo) => {
 
 const validatePasswordType = (contentType, key, errorsMess, limitFrom, limitTo) => {
   const data = contentType[contentType.type];
-  const { value } = data;
+  const { value, allow_special_chars } = data;
 
   // Character limit validation
   if (!stringNullOrEmpty(value) && value?.length < limitFrom) {
@@ -126,8 +126,13 @@ const validatePasswordType = (contentType, key, errorsMess, limitFrom, limitTo) 
   }
 
   // Password pattern validation
-  if (!stringNullOrEmpty(value) && !REGEX_PATTERNS.PASSWORD.test(value)) {
-    return addErrorMessage(errorsMess, key, ERROR_MESSAGES.PASSWORD_PATTERN);
+  if (!stringNullOrEmpty(value)) {
+    const passwordRegex = allow_special_chars ? REGEX_PATTERNS.PASSWORD_WITH_SPECIAL : REGEX_PATTERNS.PASSWORD;
+    const errorMessage = allow_special_chars ? ERROR_MESSAGES.PASSWORD_PATTERN_WITH_SPECIAL : ERROR_MESSAGES.PASSWORD_PATTERN;
+    
+    if (!passwordRegex.test(value)) {
+      return addErrorMessage(errorsMess, key, errorMessage);
+    }
   }
 
   return true;

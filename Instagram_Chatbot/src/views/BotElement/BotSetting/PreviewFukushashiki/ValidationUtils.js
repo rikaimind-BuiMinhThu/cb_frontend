@@ -16,6 +16,7 @@ import { validateCardPaymentRadioButton } from './Validation/CardPaymentRadioBut
 // Regex Patterns
 export const REGEX_PATTERNS = {
   PASSWORD: /^[A-Za-z0-9 ]+$/,
+  PASSWORD_WITH_SPECIAL: /^[A-Za-z0-9 !@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$/,
   EMAIL: /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}$/,
   PHONE: /^0\d{9}$|^0\d{10}$/,
   URLS: /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/,
@@ -35,6 +36,7 @@ export const ERROR_MESSAGES = {
   CHARACTER_LIMIT_FROM: (limit) => `${limit}文字以上入力してください。`,
   CHARACTER_LIMIT_TO: (limit) => `${limit}文字以下入力してください。`,
   PASSWORD_PATTERN: "英数字('A-Z','a-z','0-9')が使用できます。",
+  PASSWORD_PATTERN_WITH_SPECIAL: "英数字('A-Z','a-z','0-9')と特殊文字が使用できます。",
   EMAIL_INVALID: "有効なメールアドレス形式で指定してください。",
   PHONE_INVALID: "入力形式が正しくありません。",
   URL_INVALID: "有効なURL形式で指定してください。",
