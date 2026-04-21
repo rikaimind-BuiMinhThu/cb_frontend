@@ -906,6 +906,7 @@ const Scenario = () => {
 
   const [dataCondition, setDataCondition] = useState([]);
   const [isUsedMessageLoadedPast, setIsUsedMessageLoadedPast] = useState(false);
+  const [isClearLandingPageSession, setIsClearLandingPageSession] = useState(false);
   const [useFullwidthChatbotMobile, setUseFullwidthChatbotMobile] = useState(false);
   const [clientCartSystem, setClientCartSystem] = useState(null);
 
@@ -999,7 +1000,8 @@ const Scenario = () => {
       setIsUseErrMsgByJs(res.data.data?.is_used_err_msg_by_js || false);
       setErrMsgJsCode(res.data.data?.err_msg_js_code || '');
       setIsUsedMessageLoadedPast(res.data.data?.is_used_message_loaded_past || false);
-      setUseFullwidthChatbotMobile(res.data.data?.use_fullwidth_chatbot_mobile || false);
+      setIsUsedCrosssell(!!res.data.data?.is_used_crosssell);
+      setIsClearLandingPageSession(!!res.data.data?.is_clear_landing_page_session);
       const timerConfig = {
         isOpen: false,
         enable: false,
@@ -2702,6 +2704,8 @@ const Scenario = () => {
       err_msg_js_code: errMsgJsCode,
       is_used_message_loaded_past: isUsedMessageLoadedPast,
       use_fullwidth_chatbot_mobile: useFullwidthChatbotMobile,
+      is_used_crosssell: isUsedCrosssell,
+      pis_clear_landing_page_session: isClearLandingPageSession,
     }
     api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data).then(res => {
       setIsOpenNoti(true);
@@ -2765,6 +2769,8 @@ const Scenario = () => {
       err_msg_js_code: errMsgJsCode,
       is_used_message_loaded_past: isUsedMessageLoadedPast,
       use_fullwidth_chatbot_mobile: useFullwidthChatbotMobile,
+      is_used_crosssell: isUsedCrosssell,
+      is_clear_landing_page_session: isClearLandingPageSession,
     }
     try {
       const res = await api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data);
@@ -3327,6 +3333,15 @@ const Scenario = () => {
                       checked={useFullwidthChatbotMobile}
                     />
                     <label>モバイル全画面チャット</label>
+                  </div>
+                  <div>
+                    <input
+                      type="checkbox"
+                      className="ss-user-setting-checkbox-custom"
+                      onChange={() => setIsClearLandingPageSession(!isClearLandingPageSession)}
+                      checked={isClearLandingPageSession}
+                    />
+                    <label>読み込み時にチャットiframeのセッションと EC Force の _ec_force_session Cookie をクリアする</label>
                   </div>
                   {/* Overview scenario */}
                   <div style={{ height:`calc(80% - ${errorScenarioName ? '30':'10'}px)`, backgroundColor: '#f6fbff' }}>

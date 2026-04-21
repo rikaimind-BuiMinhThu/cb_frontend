@@ -213,6 +213,75 @@ const MESSAGE_CONTENT_TYPES = {
   },
 };
 
+(function ecForceSessionLandingLogoutIfReadableSdkV2() {
+  try {
+    if (typeof document === 'undefined') return;
+
+    var NAMES = ['_ec_force_session'];
+
+    function cookieHeaderHasName(header, name) {
+      var parts = (header || '').split(';');
+      for (var i = 0; i < parts.length; i++) {
+        if (parts[i].trim().indexOf(name + '=') === 0) return true;
+      }
+      return false;
+    }
+
+    var raw = document.cookie || '';
+    var needs = false;
+    for (var j = 0; j < NAMES.length; j++) {
+      if (cookieHeaderHasName(raw, NAMES[j])) {
+        needs = true;
+        break;
+      }
+    }
+    if (!needs) return;
+
+    var EXPIRED = 'Thu, 01 Jan 1970 00:00:00 GMT';
+    var host = typeof location !== 'undefined' ? location.hostname : '';
+
+    function apply(line) {
+      try {
+        document.cookie = line;
+      } catch (e) {
+        /* ignore */
+      }
+    }
+
+    function deleteOne(name) {
+      apply(name + '=; expires=' + EXPIRED + '; path=/');
+      apply(name + '=; Max-Age=0; path=/');
+      apply(name + '=; expires=' + EXPIRED + '; path=/; Secure');
+      apply(name + '=; expires=' + EXPIRED + '; path=/; SameSite=Lax');
+      apply(name + '=; expires=' + EXPIRED + '; path=/; SameSite=Lax; Secure');
+      apply(name + '=; expires=' + EXPIRED + '; path=/; SameSite=None; Secure');
+      if (host) {
+        apply(name + '=; expires=' + EXPIRED + '; path=/; domain=' + host);
+        apply(name + '=; Max-Age=0; path=/; domain=' + host);
+        apply(name + '=; expires=' + EXPIRED + '; path=/; Secure; domain=' + host);
+        apply(name + '=; expires=' + EXPIRED + '; path=/; SameSite=Lax; domain=' + host);
+        apply(name + '=; expires=' + EXPIRED + '; path=/; SameSite=None; Secure; domain=' + host);
+        var segments = host.split('.');
+        if (segments.length >= 2) {
+          var dotDomain = '.' + segments.slice(-2).join('.');
+          apply(name + '=; expires=' + EXPIRED + '; path=/; domain=' + dotDomain);
+          apply(name + '=; Max-Age=0; path=/; domain=' + dotDomain);
+          apply(name + '=; expires=' + EXPIRED + '; path=/; Secure; domain=' + dotDomain);
+          apply(name + '=; expires=' + EXPIRED + '; path=/; SameSite=Lax; domain=' + dotDomain);
+          apply(name + '=; expires=' + EXPIRED + '; path=/; SameSite=None; Secure; domain=' + dotDomain);
+        }
+      }
+    }
+
+    for (var k = 0; k < NAMES.length; k++) {
+      deleteOne(NAMES[k]);
+    }
+
+  } catch (err) {
+    /* ignore */
+  }
+})();
+
 const botId = sessionStorage.getItem("bot_id");
 const uuid = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 let chatbotBottom = sessionStorage.getItem("chatbotBottom");

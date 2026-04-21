@@ -40,6 +40,7 @@ import iconMessagePurple from "../../../assets/img/icon-mess/icon-message-chat-p
 import iconMessageBlack from "../../../assets/img/icon-mess/icon-message-chat-black.png";
 import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-white.png";
 import { BOT_MESSAGE_TYPES } from './PreviewComponent/Constants';
+import { clearLandingPageChatbotSession } from './PreviewComponent/SessionStorageUtils';
 // import { Input, rgbToHex } from '@material-ui/core';
 
 const _ = require('lodash');
@@ -322,6 +323,9 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
         if (scenarioId) {
             api.get(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/preview`).then(async res => {
                 if (res.data.code === 1) {
+                    if (res.data.data?.is_clear_landing_page_session) {
+                        clearLandingPageChatbotSession();
+                    }
                     let messageArr = [];
                     if (res.data.data?.conversation?.messages?.length > 0) {
                         messageArr = [...res.data.data?.conversation?.messages.filter(x => !x.hidden)];

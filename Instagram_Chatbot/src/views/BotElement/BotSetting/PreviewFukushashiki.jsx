@@ -65,7 +65,8 @@ import {
   savePrevOpenStatus,
   getPrevOpenStatus,
   getTimerConfig,
-  setTimerConfig
+  setTimerConfig,
+  clearLandingPageChatbotSession,
 } from "./PreviewComponent/SessionStorageUtils";
 import { isTokyoDeveloLP, UPDATE_TOKYO_DEVELO_LP_PREFECTURE_JS_CODE } from "./PreviewComponent/TokyoLPUtils";
 import PreventExitChatbotModal from "./PreviewComponent/PreventExitChatbotModal";
@@ -427,51 +428,62 @@ const PreviewFukushashiki = () => {
       let savedState = getChatbotSavedState();
       if (savedState) {
         const currentBotId = params.get("order_id") || params.get("bot_id") || Cookies.get("bot_id");
-        if (currentBotId && currentBotId !== savedState.botId) {
-          clearChatbotState();
-          dispatch ({type: PREVIEW_ACTIONS.SET_UPSELL_BOT_ID, payload: currentBotId});
-          return getScenarioPreviewData(currentBotId, params.get("scenario_id"))
-          .then(extractStateFromPreviewResponse);
-        };
-
-        setConversionParamToLocalStorage(
-          savedState.scenarioId,
-          'web',
-          savedState.userInputId || params.get("uuid"),
-          params.get("env") || "production",
-          savedState
-        );
-
-        if (isLoggedIn) {
-          return dispatch({
-            type: PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SESSION_STORAGE,
-            payload: {
-              savedState,
-              isLoggedIn: isLoggedIn,
-              isUsingAmazonPay: params.get('is_using_amazon_pay')
+        const scenarioIdForPreview = params.get("scenario_id");
+        return getScenarioPreviewData(currentBotId, scenarioIdForPreview)
+          .then((previewRes) => {
+            if (previewRes?.data?.data?.is_clear_landing_page_session) {
+              clearLandingPageChatbotSession();
+              savedState = getChatbotSavedState();
             }
-          });
-        }
-
-        const timerConfig = getTimerConfig();
-        if (timerConfig) {
-          setTimerChanges({ timeLeft: calculateTimerConfigDuration(timerConfig?.config?.type, timerConfig?.config?.duration, { timerLeft: timerConfig.timeLeft, useTimerLeft: true }), config: timerConfig });
-        }
-
-        return fukushashikiSavedStateToLp(savedState, params, state).then(async () => {
-          if (isTokyoDeveloLP(savedState.urlReceive)) {
-            executeLpJsCode(UPDATE_TOKYO_DEVELO_LP_PREFECTURE_JS_CODE, savedState);
-          }
-
-          return dispatch({
-            type: PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SESSION_STORAGE,
-            payload: {
-              savedState,
-              isLoggedIn: isLoggedIn,
-              isUsingAmazonPay: params.get('is_using_amazon_pay')
+            if (!savedState) {
+              return extractStateFromPreviewResponse(previewRes);
             }
+            if (currentBotId && currentBotId !== savedState.botId) {
+              clearChatbotState();
+              dispatch ({type: PREVIEW_ACTIONS.SET_UPSELL_BOT_ID, payload: currentBotId});
+              return getScenarioPreviewData(currentBotId, scenarioIdForPreview)
+              .then(extractStateFromPreviewResponse);
+            };
+
+            setConversionParamToLocalStorage(
+              savedState.scenarioId,
+              'web',
+              savedState.userInputId || params.get("uuid"),
+              params.get("env") || "production",
+              savedState
+            );
+
+            if (isLoggedIn) {
+              return dispatch({
+                type: PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SESSION_STORAGE,
+                payload: {
+                  savedState,
+                  isLoggedIn: isLoggedIn,
+                  isUsingAmazonPay: params.get('is_using_amazon_pay')
+                }
+              });
+            }
+
+            const timerConfig = getTimerConfig();
+            if (timerConfig) {
+              setTimerChanges({ timeLeft: calculateTimerConfigDuration(timerConfig?.config?.type, timerConfig?.config?.duration, { timerLeft: timerConfig.timeLeft, useTimerLeft: true }), config: timerConfig });
+            }
+
+            return fukushashikiSavedStateToLp(savedState, params, state).then(async () => {
+              if (isTokyoDeveloLP(savedState.urlReceive)) {
+                executeLpJsCode(UPDATE_TOKYO_DEVELO_LP_PREFECTURE_JS_CODE, savedState);
+              }
+
+              return dispatch({
+                type: PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SESSION_STORAGE,
+                payload: {
+                  savedState,
+                  isLoggedIn: isLoggedIn,
+                  isUsingAmazonPay: params.get('is_using_amazon_pay')
+                }
+              });
+            });
           });
-        });
       }
     }
 
@@ -724,6 +736,10 @@ const PreviewFukushashiki = () => {
 
   const extractStateFromPreviewResponse = async (res) => {
     if (!res || !res.data || res.data.code !== 1) return;
+
+    if (res.data.data?.is_clear_landing_page_session) {
+      clearLandingPageChatbotSession();
+    }
 
     const designSetting = res.data.design_settings;
     const chatbot = res.data.chatbot;
