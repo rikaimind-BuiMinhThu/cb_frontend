@@ -19,23 +19,66 @@ export function getEffectivePreviewClosedWeekdays(calendar) {
   return Array.isArray(arr) ? [...arr] : [];
 }
 
-function endDateInclusiveForDeliverableDayCount(startJst, deliverableCount, cfgEndCap) {
-  const n = Math.max(1, Math.floor(Number(deliverableCount)) || 1);
-  let d = startJst.clone().startOf("day");
-  let seen = 0;
-  for (let i = 0; i < 400; i += 1) {
-    if (isDeliverableWeekday(d)) {
-      seen += 1;
-      if (seen === n) {
-        if (cfgEndCap && d.isAfter(cfgEndCap, "day")) {
-          return cfgEndCap.clone().startOf("day");
-        }
-        return d;
-      }
+function isCalendarPreviewDaysSplitEnabled(calendar) {
+  const v = calendar?.preview_days_split_enabled;
+  return v === true || v === 1 || v === "true" || v === "1";
+}
+
+function advanceBusinessDaysJst(fromDay, businessDays, closed) {
+  let d = fromDay.clone().startOf("day");
+  const m = Number.isFinite(businessDays) && businessDays > 0 ? Math.floor(businessDays) : 0;
+  for (let i = 0; i < m; i += 1) {
+    d = d.clone().add(1, "day");
+    while (closed.length > 0 && closed.includes(d.day())) {
+      d = d.clone().add(1, "day");
     }
+  }
+  return d;
+}
+
+function addCalendarDaysJst(fromDay, calendarDays) {
+  const n = Number.isFinite(calendarDays) && calendarDays > 0 ? Math.floor(calendarDays) : 0;
+  return fromDay.clone().startOf("day").add(n, "days");
+}
+
+function bumpEffStartPastAnyClosedWeekday(effStart, closed) {
+  if (!closed || !closed.length) return effStart.clone().startOf("day");
+  let d = effStart.clone().startOf("day");
+  for (let i = 0; i < 366; i += 1) {
+    if (!closed.includes(d.day())) break;
     d = d.clone().add(1, "day");
   }
-  return cfgEndCap ? cfgEndCap.clone().startOf("day") : startJst.clone().startOf("day");
+  return d;
+}
+
+function bumpPreviewAnchorPastClosedTodayOrTomorrow(cursor, closed) {
+  if (!closed || !closed.length) return cursor.clone().startOf("day");
+  let d = cursor.clone().startOf("day");
+  for (let i = 0; i < 366; i += 1) {
+    const next = d.clone().add(1, "day");
+    const curClosed = closed.includes(d.day());
+    const nextClosed = closed.includes(next.day());
+    if (!curClosed && !nextClosed) break;
+    d = d.clone().add(1, "day");
+  }
+  return d;
+}
+
+function clampDayToCfgRange(d, cfgStart, cfgEnd, cfgStartOk, cfgEndOk) {
+  let x = d.clone().startOf("day");
+  if (cfgStartOk && x.isBefore(cfgStart)) x = cfgStart.clone();
+  if (cfgEndOk && x.isAfter(cfgEnd)) x = cfgEnd.clone();
+  return x;
+}
+
+function clampEffStartToCfgThenBumpClosed(effStart, closed, cfgStart, cfgEnd, cfgStartOk, cfgEndOk) {
+  let d = effStart.clone().startOf("day");
+  if (cfgStartOk && d.isBefore(cfgStart)) d = cfgStart.clone();
+  if (cfgEndOk && d.isAfter(cfgEnd)) d = cfgEnd.clone();
+  d = bumpEffStartPastAnyClosedWeekday(d, closed);
+  if (cfgStartOk && d.isBefore(cfgStart)) d = cfgStart.clone();
+  if (cfgEndOk && d.isAfter(cfgEnd)) d = cfgEnd.clone();
+  return d;
 }
 
 function resolvePreviewRelativeEffStartNonSplit(cursor, closed, daysFromToday, cfgStart, cfgEnd, cfgStartOk, cfgEndOk) {
