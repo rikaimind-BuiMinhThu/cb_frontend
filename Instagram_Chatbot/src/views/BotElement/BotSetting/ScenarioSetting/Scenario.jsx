@@ -1000,8 +1000,8 @@ const Scenario = () => {
       setIsUseErrMsgByJs(res.data.data?.is_used_err_msg_by_js || false);
       setErrMsgJsCode(res.data.data?.err_msg_js_code || '');
       setIsUsedMessageLoadedPast(res.data.data?.is_used_message_loaded_past || false);
-      setIsUsedCrosssell(!!res.data.data?.is_used_crosssell);
-      setIsClearLandingPageSession(!!res.data.data?.is_clear_landing_page_session);
+      setIsClearLandingPageSession(res.data.data?.is_clear_landing_page_session || false);
+      setUseFullwidthChatbotMobile(res.data.data?.use_fullwidth_chatbot_mobile || false);
       const timerConfig = {
         isOpen: false,
         enable: false,
@@ -2704,7 +2704,6 @@ const Scenario = () => {
       err_msg_js_code: errMsgJsCode,
       is_used_message_loaded_past: isUsedMessageLoadedPast,
       use_fullwidth_chatbot_mobile: useFullwidthChatbotMobile,
-      is_used_crosssell: isUsedCrosssell,
       pis_clear_landing_page_session: isClearLandingPageSession,
     }
     api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data).then(res => {
@@ -2769,7 +2768,6 @@ const Scenario = () => {
       err_msg_js_code: errMsgJsCode,
       is_used_message_loaded_past: isUsedMessageLoadedPast,
       use_fullwidth_chatbot_mobile: useFullwidthChatbotMobile,
-      is_used_crosssell: isUsedCrosssell,
       is_clear_landing_page_session: isClearLandingPageSession,
     }
     try {
@@ -3341,7 +3339,7 @@ const Scenario = () => {
                       onChange={() => setIsClearLandingPageSession(!isClearLandingPageSession)}
                       checked={isClearLandingPageSession}
                     />
-                    <label>読み込み時にチャットiframeのセッションと EC Force の _ec_force_session Cookie をクリアする</label>
+                    <label>読み込み時に自動ログアウト処理を実行する</label>
                   </div>
                   {/* Overview scenario */}
                   <div style={{ height:`calc(80% - ${errorScenarioName ? '30':'10'}px)`, backgroundColor: '#f6fbff' }}>

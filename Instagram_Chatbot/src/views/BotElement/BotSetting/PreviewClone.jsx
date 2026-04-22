@@ -46,7 +46,6 @@ import iconMessagePink from "../../../assets/img/icon-mess/icon-message-chat-pin
 import iconMessagePurple from "../../../assets/img/icon-mess/icon-message-chat-purple.png";
 import iconMessageBlack from "../../../assets/img/icon-mess/icon-message-chat-black.png";
 import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-white.png";
-import { clearLandingPageChatbotSession } from "./PreviewComponent/SessionStorageUtils";
 
 const _ = require("lodash");
 sessionStorage.setItem("prevOpenStatus", "0");
@@ -741,9 +740,6 @@ function Preview() {
         )
         .then(async (res) => {
           if (res.data.code == 1) {
-            if (res.data.data?.is_clear_landing_page_session) {
-              clearLandingPageChatbotSession();
-            }
             var listMessage = res.data.data.conversation.messages
             if (listMessage.length > 0) {
               for (const item of listMessage) {
