@@ -50,6 +50,7 @@ import SubmitButtonConfig from './SubmitButtonConfig';
 import {CART_SYSTEM} from '../PreviewComponent/Constants';
 import { mergeCalendarForPreviewRelativeRange as mergePreviewRelativeCalendar } from '../PreviewComponent/UserMessageComponent/Calendar';
 
+const { Option } = Select;
 const _ = require('lodash');
 
 function getCalendarPreviewRelativeRangeLabel(calendar) {
@@ -67,6 +68,26 @@ function getCalendarPreviewRelativeRangeLabel(calendar) {
 function isCalendarPreviewRelativeRangeEnabled(calendar) {
   const v = calendar?.preview_relative_range_enabled;
   return v === true || v === 1 || v === "true" || v === "1";
+}
+
+function isCalendarPreviewDaysSplitEnabled(calendar) {
+  const v = calendar?.preview_days_split_enabled;
+  return v === true || v === 1 || v === "true" || v === "1";
+}
+
+const DELIVERY_CUT_OFF_SELECT_NONE = '__delivery_cut_off_none__';
+
+function deliveryCutOffTimeSelectValue(calendar) {
+  const s = calendar?.preview_delivery_cut_off_time;
+  if (s === '') return DELIVERY_CUT_OFF_SELECT_NONE;
+  if (s === undefined || s === null) return '14:00';
+  if (typeof s !== 'string') return '14:00';
+  const m = s.trim().match(/^(\d{1,2}):(\d{2})$/);
+  if (!m) return '14:00';
+  const h = Number(m[1]);
+  const mm = Number(m[2]);
+  if (!Number.isFinite(h) || h < 0 || h > 23 || !Number.isFinite(mm)) return '14:00';
+  return `${String(h).padStart(2, '0')}:00`;
 }
 
 let dataPaymentMethod = [
@@ -8876,26 +8897,171 @@ const Scenario = () => {
                                                           }}
                                                           value={calendar.initial_selection}
                                                         />
-                                                        <div className="ss-user-setting__item-bottom" style={{ width: '100%', marginTop: '4px' }}>
-                                                          <CheckboxCustom
-                                                            label="今日を起点にプレビュー範囲を合わせる（設定した開始～終了の内側に収めます）"
-                                                            onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'preview_relative_range_enabled')}
-                                                            value={isCalendarPreviewRelativeRangeEnabled(calendar)}
-                                                          />
+                                                        <div className="ss-user-setting__item-bottom" style={{ width: '100%' , marginTop: '4px' }}>
+                                                            <CheckboxCustom label="今日を起点にプレビュー範囲を合わせる（設定した開始～終了の内側に収めます）" onChange={(value)=>
+                                                                onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value,
+                                                                'preview_relative_range_enabled')}
+                                                                value={isCalendarPreviewRelativeRangeEnabled(calendar)}
+                                                                />
                                                         </div>
                                                         {isCalendarPreviewRelativeRangeEnabled(calendar) && (
-                                                          <div className="ss-user-setting__calendar-preview-offset-wrap">
+                                                        <div className="ss-user-setting__calendar-preview-offset-wrap">
                                                             <div className="ss-user-setting__calendar-preview-offset-row">
-                                                              <span className="ss-user-setting-label" style={{ marginLeft: 0 }}>今日から（日）</span>
-                                                              <InputNum
-                                                                placeholder="0"
-                                                                style={{ width: 100, minWidth: 88 }}
-                                                                min={Number.MIN_SAFE_INTEGER}
-                                                                max={Number.MAX_SAFE_INTEGER}
-                                                                onChange={(v) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, v, 'preview_days_from_today')}
-                                                                value={calendar.preview_days_from_today ?? 0}
-                                                              />
+                                                                <span className="ss-user-setting-label" style={{ marginLeft: 0 }}>今日から（日）</span>
+                                                                <InputNum placeholder="0" style={{ width: 100, minWidth: 88 }} min={Number.MIN_SAFE_INTEGER}
+                                                                    max={Number.MAX_SAFE_INTEGER} disabled={isCalendarPreviewDaysSplitEnabled(calendar)} onChange={(v)=>
+                                                                    onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, v, 'preview_days_from_today')}
+                                                                    value={calendar.preview_days_from_today ?? 0}
+                                                                    />
                                                             </div>
+                                                            <div className="ss-user-setting__item-bottom" style={{ width: '100%' , marginTop: 6 }}>
+                                                                <CheckboxCustom label="営業日（店舗による出荷準備）とカレンダーデイ（配送業者の配送期間）の設定にする" onChange={(value)=> {
+                                                                    if (value === true || value === 1) {
+                                                                    const total = Number(calendar.preview_days_from_today) || 0;
+                                                                    onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, true,
+                                                                    'preview_days_split_enabled');
+                                                                    onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, 0, 'preview_business_days');
+                                                                    onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, total, 'preview_calendar_days');
+                                                                    } else {
+                                                                    onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, false,
+                                                                    'preview_days_split_enabled');
+                                                                    }
+                                                                    }}
+                                                                    value={isCalendarPreviewDaysSplitEnabled(calendar)}
+                                                                    />
+                                                            </div>
+                                                            {isCalendarPreviewDaysSplitEnabled(calendar) && (
+                                                            <>
+                                                                <div style={{ marginLeft: 12, marginTop: 8, marginBottom: 4, paddingLeft: 12, borderLeft: '2px solid #d9d9d9' ,
+                                                                    }}>
+                                                                    <div style={{ display: 'flex' , alignItems: 'flex-end' , flexWrap: 'wrap' , gap: '8px 10px' , }}>
+                                                                        <span style={{ paddingBottom: 10, fontSize: 16, color: '#888' }}>=</span>
+                                                                        <div style={{ display: 'flex' , flexDirection: 'column' , alignItems: 'center' , minWidth: 100 }}>
+                                                                            <span className="ss-user-setting-label" style={{ marginBottom: 4, fontSize: 12 }}>
+                                                                                営業日
+                                                                            </span>
+                                                                            <div style={{ display: 'flex' , alignItems: 'center' , flexWrap: 'wrap' , gap: 6 }}>
+                                                                                <InputNum placeholder="0" style={{ width: 100, minWidth: 88 }} min={Number.MIN_SAFE_INTEGER}
+                                                                                    max={Number.MAX_SAFE_INTEGER} onChange={(v)=> {
+                                                                                    const b = Number(v) || 0;
+                                                                                    const c = Number(calendar.preview_calendar_days) || 0;
+                                                                                    onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, b,
+                                                                                    'preview_business_days');
+                                                                                    onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, b + c,
+                                                                                    'preview_days_from_today');
+                                                                                    }}
+                                                                                    value={calendar.preview_business_days ?? 0}
+                                                                                    />
+                                                                                    <span style={{ fontSize: 12, color: '#666' , whiteSpace: 'nowrap' }}>
+                                                                                        日（店舗による出荷準備など）
+                                                                                    </span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <span style={{ paddingBottom: 10, fontSize: 16 }}>+</span>
+                                                                        <div style={{ display: 'flex' , flexDirection: 'column' , alignItems: 'center' , minWidth: 100 }}>
+                                                                            <span className="ss-user-setting-label" style={{ marginBottom: 4, fontSize: 12 }}>
+                                                                                カレンダーデイ
+                                                                            </span>
+                                                                            <div style={{ display: 'flex' , alignItems: 'center' , flexWrap: 'wrap' , gap: 6 }}>
+                                                                                <InputNum placeholder="0" style={{ width: 100, minWidth: 88 }} min={Number.MIN_SAFE_INTEGER}
+                                                                                    max={Number.MAX_SAFE_INTEGER} onChange={(v)=> {
+                                                                                    const c = Number(v) || 0;
+                                                                                    const b = Number(calendar.preview_business_days) || 0;
+                                                                                    onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, c,
+                                                                                    'preview_calendar_days');
+                                                                                    onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, b + c,
+                                                                                    'preview_days_from_today');
+                                                                                    }}
+                                                                                    value={calendar.preview_calendar_days ?? 0}
+                                                                                    />
+                                                                                    <span style={{ fontSize: 12, color: '#666' , whiteSpace: 'nowrap' }}>
+                                                                                        日（配送業者の配送期間など）
+                                                                                    </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="ss-user-setting__item-bottom" style={{ width: '100%' , marginTop: 12 }}>
+                                                                    <div className="ss-user-setting-label" style={{ marginBottom: 6, fontWeight: 700 }}>
+                                                                        カットオフの時間
+                                                                    </div>
+                                                                    <Select style={{ width: 200, minWidth: 160 }} showSearch optionFilterProp="children"
+                                                                        value={deliveryCutOffTimeSelectValue(calendar)} onChange={(val)=> {
+                                                                        const saved =
+                                                                        val === DELIVERY_CUT_OFF_SELECT_NONE ? '' : val;
+                                                                        onChangeValueMessageContent(
+                                                                        indexMessageSelect,
+                                                                        indexContent,
+                                                                        content.type,
+                                                                        saved,
+                                                                        'preview_delivery_cut_off_time'
+                                                                        );
+                                                                        }}
+                                                                        getPopupContainer={(trigger) => trigger.parentNode}
+                                                                        >
+                                                                        <Option value={DELIVERY_CUT_OFF_SELECT_NONE}>
+                                                                            適用しない
+                                                                        </Option>
+                                                                        {Array.from({ length: 24 }, (_, h) => (
+                                                                        <Option key={h} value={`${String(h).padStart(2, '0' )}:00`}>
+                                                                            {`${h}:00`}
+                                                                        </Option>
+                                                                        ))}
+                                                                    </Select>
+                                                                    <div style={{ fontSize: 12, color: '#666' , marginTop: 6 }}>
+                                                                        設定した時間以降の注文は最短日が+1日になります。
+                                                                    </div>
+                                                                </div>
+                                                                <div className="ss-user-setting__item-bottom" style={{ width: '100%' , marginTop: 14 }}>
+                                                                    <div className="ss-user-setting-label" style={{ marginBottom: 6, fontWeight: 700 }}>
+                                                                        営業休業日
+                                                                    </div>
+                                                                    <div className="ss-user-setting-label" style={{ marginBottom: 8, fontSize: 12 }}>
+                                                                        曜日の設定
+                                                                    </div>
+                                                                    <div style={{ display: 'flex' , flexWrap: 'wrap' , gap: '10px 16px' , alignItems: 'center' }}>
+                                                                        {[
+                                                                        { dow: 0, label: '日' },
+                                                                        { dow: 1, label: '月' },
+                                                                        { dow: 2, label: '火' },
+                                                                        { dow: 3, label: '水' },
+                                                                        { dow: 4, label: '木' },
+                                                                        { dow: 5, label: '金' },
+                                                                        { dow: 6, label: '土' },
+                                                                        ].map(({ dow, label }) => {
+                                                                        const closedList = Array.isArray(calendar.preview_closed_weekdays)
+                                                                          ? calendar.preview_closed_weekdays
+                                                                          : [];
+                                                                        const checked = closedList.includes(dow);
+                                                                        return (
+                                                                        <Checkbox
+                                                                          key={dow}
+                                                                          checked={checked}
+                                                                          onChange={(e) => {
+                                                                            const next = new Set(
+                                                                              Array.isArray(calendar.preview_closed_weekdays)
+                                                                                ? [...calendar.preview_closed_weekdays]
+                                                                                : []
+                                                                            );
+                                                                            if (e.target.checked) next.add(dow);
+                                                                            else next.delete(dow);
+                                                                            onChangeValueMessageContent(
+                                                                              indexMessageSelect,
+                                                                              indexContent,
+                                                                              content.type,
+                                                                              Array.from(next).sort((a, b) => a - b),
+                                                                              'preview_closed_weekdays'
+                                                                            );
+                                                                          }}
+                                                                        >
+                                                                          {label}
+                                                                        </Checkbox>
+                                                                        );
+                                                                        })}
+                                                                    </div>
+                                                                </div>
+                                                            </>
+                                                            )}
                                                             <div className="ss-user-setting__calendar-preview-offset-row">
                                                               <span className="ss-user-setting-label" style={{ marginLeft: 0 }}>連続選択日数（開始日を含む／－は前に短縮）</span>
                                                               <InputNum

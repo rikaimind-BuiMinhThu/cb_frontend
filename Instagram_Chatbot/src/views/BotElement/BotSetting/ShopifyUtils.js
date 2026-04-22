@@ -1,5 +1,9 @@
 import api from "api/api-management";
 import { shortestDeliverableDateJpFromOrderClockJst } from "./deliveryDateRules";
+import {
+  isCalendarPreviewRelativeOn,
+  mergeCalendarForPreviewRelativeRange,
+} from "./PreviewComponent/UserMessageComponent/Calendar";
 
 const findLastScenarioUserResponseRow = (state, dataInputName) => {
   const rows = state.scenarioUserResponses;
@@ -334,7 +338,7 @@ const formatSkipDeliveryDateLikeCalendarPreview = (state) => {
 
 const formatDeliveryDateFromPullDown = (state) => {
   if (resolveSkipDeliveryDatetime(state)) {
-    return shortestDeliverableDateJpFromOrderClockJst();
+    return formatSkipDeliveryDateLikeCalendarPreview(state);
   }
   let last;
   for (const msg of state.messagesList || []) {
