@@ -24,6 +24,7 @@ import {
   RENDER_MODES,
   CONVERSION_RESPONSE_SUBMIT_TYPE,
   MESSAGE_CONTENT_TYPES,
+  CUSTOM_JS_CODE_POSITION,
 } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
@@ -54,7 +55,7 @@ import {
 import PreventExitChatbotModal from "./PreviewComponent/PreventExitChatbotModal";
 import _ from "lodash";
 import {
-  setConversionParamToLocalStorage, postMessageToParent, executeLpJsCode
+  setConversionParamToLocalStorage, postMessageToParent, executeLpJsCode, injectCustomJsCode
 } from "./PreviewFukushashiki/LPUtils";
 import { handleValidateField, ERROR_MESSAGES } from "./PreviewFukushashiki/ValidationUtils";
 
@@ -140,6 +141,7 @@ const previewInitialState = {
 const PreviewFaq = () => {
   const [state, dispatch] = useReducer(PreviewFaqReducer, previewInitialState);
   const containerRef = useRef(null);
+  const hasSentCustomJs = useRef(false);
 
   useEffect(() => {
     if (state.conversionStatus || !state.uuid || !state.scenarioId || !state.isOpen) return;
@@ -258,6 +260,17 @@ const PreviewFaq = () => {
       document.body.classList.add('is_mobile');
     }
   }, [])
+
+  // For run injectCustomJsCode
+  useEffect(() => {
+    if (!state.isUsedCustomJsCode) return;
+
+    injectCustomJsCode(hasSentCustomJs, state, {
+      head: { jsCode: state.headCustomJsCode, position: CUSTOM_JS_CODE_POSITION.HEAD },
+      top_body: { jsCode: state.topBodyCustomJsCode, position: CUSTOM_JS_CODE_POSITION.TOP_BODY },
+      bottom_body: { jsCode: state.bottomBodyCustomJsCode, position: CUSTOM_JS_CODE_POSITION.BOTTOM_BODY },
+    });
+  }, [state.isUsedCustomJsCode, state.headCustomJsCode, state.topBodyCustomJsCode, state.bottomBodyCustomJsCode]);
 
   // For add custom css
   useEffect(() => {
