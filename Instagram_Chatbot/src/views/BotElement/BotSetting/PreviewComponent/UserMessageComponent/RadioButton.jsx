@@ -30,6 +30,12 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
     );
   };
 
+  const onClickRadioButton = (value) => {
+    if (value === radioButton.initial_selection && notUseButtonNext) {
+      onClickNext();
+    }
+  };
+
   const renderDefaultContent = () => {
     if (radioButton.use_as_gender)
       return <OptionGender 
@@ -51,6 +57,7 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
             id={`ss-message__content--user-radio_button_${messageIndex}_${item.value}`}
             name={`ss-message__content--user-radio_button--radio_button_img_msg${messageIndex}_content${contentIndex}_${content.type}`}
             checked={radioButton.initial_selection === item.value}
+            onClick={() => onClickRadioButton(item.value)}
             onChange={() => {
               onChangeValue(
                 contentIndex,
@@ -84,6 +91,7 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
             name={`ss-message__content--user-radio_button--radio_button_img_msg${messageIndex}_content${contentIndex}_${content.type}`}
             id="ss-message__content--user-radio_button--radio_button_img"
             checked={radioButton.initial_selection === item.value}
+            onClick={() => onClickRadioButton(item.value)}
             onChange={() => {
               onChangeValue(
                 contentIndex,
