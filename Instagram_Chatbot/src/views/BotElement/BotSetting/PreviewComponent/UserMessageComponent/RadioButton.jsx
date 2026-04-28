@@ -1,6 +1,7 @@
 import React from "react";
 import "assets/css/bot/preview-chat-bot.css";
 import { MESSAGE_CONTENT_TYPES } from "views/BotElement/BotSetting/PreviewComponent/Constants";
+import OptionGender from "./OptionGender";
 
 export default function RadioButton({ content, disabled, onChangeValue, errors, contentIndex, messageIndex }) {
   if (content.type !== MESSAGE_CONTENT_TYPES.RADIO_BUTTON) return null;
