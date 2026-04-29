@@ -14883,6 +14883,16 @@ const Scenario = () => {
                                                             value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                                           />
                                                         </div>
+                                                        <div style={{ width: '45%' }}>
+                                                          <CheckboxCustom
+                                                            label="確認するのみに表示"
+                                                            onChange={(value) => {
+                                                              dataMessages[indexMessageSelect].only_display_when_confirm = value;
+                                                              setDataMessages([...dataMessages]);
+                                                            }}
+                                                            value={dataMessages[indexMessageSelect].only_display_when_confirm}
+                                                          />
+                                                        </div>
                                                         {renderRootFaqOption()}
                                                       </div>
                                                       {buttonSubmit.is_save_input_content && (
