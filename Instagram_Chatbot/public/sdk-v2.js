@@ -213,6 +213,18 @@ const MESSAGE_CONTENT_TYPES = {
   },
 };
 
+function ecRunEcForceSessionLandingLogout() {
+  try {
+    if (typeof document === 'undefined') return;
+
+    var name = '_ec_force_session';
+
+    if ((document.cookie || '').includes(name + '=')) {
+      document.cookie = name + '=; Max-Age=0; path=/';
+    }
+  } catch (e) {}
+}
+
 const botId = sessionStorage.getItem("bot_id");
 const uuid = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 let chatbotBottom = sessionStorage.getItem("chatbotBottom");
@@ -465,6 +477,9 @@ const displayPopup = async () => {
   );
 
   const data = await response.json();
+  if (data.data && data.data.is_clear_landing_page_session) {
+    ecRunEcForceSessionLandingLogout();
+  }
   scenarioId = data.data.id;
   
   let iframe = document.createElement("iframe");

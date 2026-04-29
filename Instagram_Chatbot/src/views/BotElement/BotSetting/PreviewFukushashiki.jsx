@@ -909,6 +909,12 @@ const PreviewFukushashiki = () => {
         status: CONVERSTION_RESPONSE_STATUS.FINISH,
       })
     }
+
+    if (isClickedLastMessage && clickedMsg?.only_display_when_confirm && !state.submitErrorMessage && Object.keys(state.errors).length === 0) {
+      setTimeout(() => {
+        dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
+      }, 1000);
+    }
   };
 
   const onChangeValue = (

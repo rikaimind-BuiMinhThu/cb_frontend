@@ -906,6 +906,7 @@ const Scenario = () => {
 
   const [dataCondition, setDataCondition] = useState([]);
   const [isUsedMessageLoadedPast, setIsUsedMessageLoadedPast] = useState(false);
+  const [isClearLandingPageSession, setIsClearLandingPageSession] = useState(false);
   const [useFullwidthChatbotMobile, setUseFullwidthChatbotMobile] = useState(false);
   const [clientCartSystem, setClientCartSystem] = useState(null);
 
@@ -999,6 +1000,7 @@ const Scenario = () => {
       setIsUseErrMsgByJs(res.data.data?.is_used_err_msg_by_js || false);
       setErrMsgJsCode(res.data.data?.err_msg_js_code || '');
       setIsUsedMessageLoadedPast(res.data.data?.is_used_message_loaded_past || false);
+      setIsClearLandingPageSession(res.data.data?.is_clear_landing_page_session || false);
       setUseFullwidthChatbotMobile(res.data.data?.use_fullwidth_chatbot_mobile || false);
       const timerConfig = {
         isOpen: false,
@@ -2702,6 +2704,7 @@ const Scenario = () => {
       err_msg_js_code: errMsgJsCode,
       is_used_message_loaded_past: isUsedMessageLoadedPast,
       use_fullwidth_chatbot_mobile: useFullwidthChatbotMobile,
+      pis_clear_landing_page_session: isClearLandingPageSession,
     }
     api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data).then(res => {
       setIsOpenNoti(true);
@@ -2765,6 +2768,7 @@ const Scenario = () => {
       err_msg_js_code: errMsgJsCode,
       is_used_message_loaded_past: isUsedMessageLoadedPast,
       use_fullwidth_chatbot_mobile: useFullwidthChatbotMobile,
+      is_clear_landing_page_session: isClearLandingPageSession,
     }
     try {
       const res = await api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data);
@@ -3327,6 +3331,15 @@ const Scenario = () => {
                       checked={useFullwidthChatbotMobile}
                     />
                     <label>モバイル全画面チャット</label>
+                  </div>
+                  <div>
+                    <input
+                      type="checkbox"
+                      className="ss-user-setting-checkbox-custom"
+                      onChange={() => setIsClearLandingPageSession(!isClearLandingPageSession)}
+                      checked={isClearLandingPageSession}
+                    />
+                    <label>読み込み時に自動ログアウト処理を実行する</label>
                   </div>
                   {/* Overview scenario */}
                   <div style={{ height:`calc(80% - ${errorScenarioName ? '30':'10'}px)`, backgroundColor: '#f6fbff' }}>
@@ -7160,6 +7173,13 @@ const Scenario = () => {
                                                               min={textInput[textInput.type]?.character_limit_from || 0}
                                                               onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'character_limit_to')}
                                                               value={textInput[textInput.type]?.character_limit_to}
+                                                            />
+                                                          </div>
+                                                          <div className="ss-user-setting-item-use-character">
+                                                            <CheckboxCustom
+                                                              label="特殊文字を許可する"
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'allow_special_chars')}
+                                                              value={textInput[textInput.type]?.allow_special_chars}
                                                             />
                                                           </div>
                                                           <div className="ss-user-setting__item-bottom">
@@ -14861,6 +14881,16 @@ const Scenario = () => {
                                                               setDataMessages([...dataMessages]);
                                                             }}
                                                             value={dataMessages[indexMessageSelect].not_display_when_have_error}
+                                                          />
+                                                        </div>
+                                                        <div style={{ width: '45%' }}>
+                                                          <CheckboxCustom
+                                                            label="確認するのみに表示"
+                                                            onChange={(value) => {
+                                                              dataMessages[indexMessageSelect].only_display_when_confirm = value;
+                                                              setDataMessages([...dataMessages]);
+                                                            }}
+                                                            value={dataMessages[indexMessageSelect].only_display_when_confirm}
                                                           />
                                                         </div>
                                                         {renderRootFaqOption()}
