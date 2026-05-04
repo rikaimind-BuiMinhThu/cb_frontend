@@ -335,8 +335,6 @@ const UserMessage = ({
           errors={errors}
           contentIndex={contentIndex}
           messageIndex={messageIndex}
-          onClickNext={onClickNext}
-          notUseButtonNext={message.not_use_button}
         />;
       case MESSAGE_CONTENT_TYPES.CHECKBOX:
         return <Checkbox
