@@ -53,6 +53,7 @@ const UserMessage = ({
   botId,
   isProcessing = false,
   onRenderCompleted,
+  cartSystem = "",
 }) => {
   if (!isUserMessage(message)) return null;
 
@@ -129,7 +130,7 @@ const UserMessage = ({
           let i = 0;
           calendar.start_date_select = moment();
           calendar.end_date_select = moment().add(1, "days");
-          while (handleDisableDateCalendar(moment().add(i, "days"), calendar)) {
+          while (isCalendarDateDisabledInRange(moment().add(i, "days"), calForDisable)) {
             if (i === 100) {
               calendar.start_date_select = null;
               calendar.end_date_select = null;
@@ -411,6 +412,7 @@ const UserMessage = ({
           errors={errors}
           disabled={disabled}
           locale={locale}
+          cartSystem={cartSystem}
         />;
       case MESSAGE_CONTENT_TYPES.AGREE_TERM:
         return <AgreeTerm

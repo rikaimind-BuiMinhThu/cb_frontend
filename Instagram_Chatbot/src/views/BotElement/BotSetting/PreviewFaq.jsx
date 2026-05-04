@@ -822,6 +822,7 @@ const PreviewFaq = () => {
             submitErrorMessage={''}
             botId={state.botId}
             isProcessing={!!state.isProcessing}
+            cartSystem={params.get("cartSystem") ?? ""}
           />
           {renderNextButton(message, messageIndex)}
         </div>

@@ -111,6 +111,8 @@ const previewInitialState = {
   urlThanksPage: "",
   urlCartConfirmPage: "",
   merchandiseId: "",
+  isUsedCrosssell: false,
+  productIdCrossSell: "",
   isUsedCartConfirmPage: false,
   currentMsgIndex: 0,
   renderMessagesList: [],
@@ -759,6 +761,8 @@ const PreviewFukushashiki = () => {
       isProcessing: false,
       useFullWidthChatbotMobile: !!chatbot?.use_fullwidth_chatbot_mobile,
       merchandiseId: res.data.data?.merchandise_id,
+      isUsedCrosssell: !!res.data.data?.is_used_crosssell,
+      productIdCrossSell: res.data.data?.product_id_cross_sell || "",
       isUsedCustomJsCode: !!chatbot?.is_used_custom_js_code,
       headCustomJsCode: chatbot?.head_custom_js_code,
       topBodyCustomJsCode: chatbot?.top_body_custom_js_code,
@@ -1091,6 +1095,7 @@ const PreviewFukushashiki = () => {
             submitErrorMessage={state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "" : state.submitErrorMessage}
             botId={state.botId}
             isProcessing={!!state.isProcessing}
+            cartSystem={state.cartSystem}
           />
           {renderNextButton(message, messageIndex)}
         </div>
