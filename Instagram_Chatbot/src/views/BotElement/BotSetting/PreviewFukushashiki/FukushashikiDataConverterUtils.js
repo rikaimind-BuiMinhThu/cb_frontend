@@ -70,6 +70,8 @@ const convertTextInputPhoneNumberObject = (content) => {
     }];
   }
 
+  const disableRemoveLeadingZero = !!content.text_input?.phone_number?.disable_remove_leading_zero;
+
   const dataInforFukushashiki = Object.fromEntries(
     Object.entries(content).filter(([key]) => key.includes("fukushashiki"))
   );
@@ -80,12 +82,18 @@ const convertTextInputPhoneNumberObject = (content) => {
       const value = content.text_input.phone_number?.[type];
       return value !== null && value !== undefined;
     })
-    .map(type => ({
-      type: content.type,
-      bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
-      bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-      bindingValue: content.text_input.phone_number[`${type}`] || ""
-    }));
+    .map((type) => {
+      const row = {
+        type: content.type,
+        bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
+        bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
+        bindingValue: content.text_input.phone_number[`${type}`] || "",
+      };
+      if (disableRemoveLeadingZero) {
+        row.disableRemoveLeadingZero = true;
+      }
+      return row;
+    });
 
   return result;
 }

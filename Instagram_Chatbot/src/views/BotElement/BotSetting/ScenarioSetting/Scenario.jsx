@@ -1450,6 +1450,7 @@ const Scenario = () => {
             email_confirmation: {},
             phone_number: {
               withHyphen: false,
+              disable_remove_leading_zero: false,
             },
             password: {},
             password_confirmation: {}
@@ -7030,6 +7031,15 @@ const Scenario = () => {
                                                               keyValue="key"
                                                             />
                                                           </div>
+                                                          {textInput?.phone_number?.withHyphen === true && isUseFukushashiki && (
+                                                            <div className="ss-user-setting__item-bottom">
+                                                              <CheckboxCustom
+                                                                label="先頭の0は削除しない（「0000」などもそのままLPへ反映）"
+                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'disable_remove_leading_zero')}
+                                                                value={textInput.phone_number?.disable_remove_leading_zero || false}
+                                                              />
+                                                            </div>
+                                                          )}
                                                           {/* phone_number: isWithHyphens = true */}
                                                           {textInput?.phone_number?.withHyphen === true &&
                                                             <React.Fragment>

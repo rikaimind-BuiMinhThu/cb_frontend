@@ -334,8 +334,12 @@ const waitForElement = (mode, address, options = {type: "WAIT_FOR_LOADING"}, cal
         const yearsValue = `20${options.value}`;
         const isNullOption = options.value === 'NULL_OPTION';
 
-        if (isNullOption || (element.value != options.value && element.value != removeLeadingZero(options.value) && element.value != yearsValue)) {
-          setValueToElement(element, options.value);
+        const altBinding = options.disableRemoveLeadingZero
+          ? options.value
+          : removeLeadingZero(options.value);
+
+        if (isNullOption || (element.value != options.value && element.value != altBinding && element.value != yearsValue)) {
+          setValueToElement(element, options.value, options.disableRemoveLeadingZero);
           break;
         }
 
@@ -819,9 +823,14 @@ const fillDataFromMessage = async (data) => {
       case "text_input":
       case "textarea":
       case "slider": {
-        waitForElement(
-          item.bindingMode, item.bindingAddress,
-          {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
+        const waitOpts = {
+          type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE,
+          value: item.bindingValue,
+        };
+        if (item.disableRemoveLeadingZero) {
+          waitOpts.disableRemoveLeadingZero = true;
+        }
+        waitForElement(item.bindingMode, item.bindingAddress, waitOpts);
         break;
       }
 
@@ -865,7 +874,7 @@ const fillDataFromMessage = async (data) => {
 
       case "radio_button": {
         if (element.tagName === ELEMENT_TAGS.SELECT) {
-          setValueToElement(element, item.bindingValue);
+          setValueToElement(element, item.bindingValue, item.disableRemoveLeadingZero);
           break;
         }
 
@@ -934,11 +943,13 @@ const setCheckToCheckboxElement = (element, value) => {
   element.dispatchEvent(new Event('change', { bubbles: true }));
 }
 
-const setValueToElement = (element, value) => {
+const setValueToElement = (element, value, disableRemoveLeadingZero = false) => {
   let newElementValue = value;
 
   if (element.tagName === ELEMENT_TAGS.SELECT) {
-    const acceptableValues = [value.toString(), removeLeadingZero(value).toString(), `20${value}`];
+    const acceptableValues = disableRemoveLeadingZero
+      ? [value.toString(), `20${value}`]
+      : [value.toString(), removeLeadingZero(value).toString(), `20${value}`];
     newElementValue = acceptableValues.find(v => {
       return Array.from(element.options).some(option => option.value === v);
     });
