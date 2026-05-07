@@ -2752,7 +2752,7 @@ const Scenario = () => {
       use_fullwidth_chatbot_mobile: useFullwidthChatbotMobile,
       is_used_crosssell: isUsedCrosssell,
       product_id_cross_sell: isUsedCrosssell ? productIdCrossSell : null,
-      pis_clear_landing_page_session: isClearLandingPageSession,
+      is_clear_landing_page_session: isClearLandingPageSession,
     }
     api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data).then(res => {
       setIsOpenNoti(true);

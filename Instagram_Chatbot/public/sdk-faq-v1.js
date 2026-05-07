@@ -167,6 +167,10 @@ const uuid = Math.random().toString(36).substring(2, 15) + Math.random().toStrin
 let chatbotBottom = sessionStorage.getItem("chatbotBottom");
 let chatbotH = sessionStorage.getItem("chatbotH");
 let chatbotRight = sessionStorage.getItem("chatbotRight");
+let chatbotBottomPc = sessionStorage.getItem("chatbotBottomPc");
+let chatbotRightPc = sessionStorage.getItem("chatbotRightPc");
+let chatbotBottomSp = sessionStorage.getItem("chatbotBottomSp");
+let chatbotRightSp = sessionStorage.getItem("chatbotRightSp");
 let chatbotW = sessionStorage.getItem("chatbotW");
 let scenarioId = "";
 
@@ -277,6 +281,96 @@ const getEcChatBotFrontEndBaseUrl = () => {
 
 let globalIframe;
 
+const parseOffsetPx = (value, fallback = 0) => {
+  const parsed = parseInt(value, 10);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+const resolveOffsetPx = (primaryValue, fallbackValue, defaultValue = 0) => {
+  const primaryParsed = parseInt(primaryValue, 10);
+  if (Number.isFinite(primaryParsed)) return primaryParsed;
+
+  const fallbackParsed = parseInt(fallbackValue, 10);
+  if (Number.isFinite(fallbackParsed)) return fallbackParsed;
+
+  return defaultValue;
+}
+
+const parseHorizontalMarginRule = (value) => {
+  if (value === undefined || value === null) return null;
+
+  const raw = String(value).trim();
+  if (!raw) return null;
+
+  const widthExpr = /^(?:width|innerwidth|innerWidth|clientwidth|clientWidth)\s*\(\s*\)\s*-\s*(\d+)\s*$/i;
+  const match = raw.match(widthExpr);
+  if (match) {
+    const leftPx = parseInt(match[1], 10);
+    return Number.isFinite(leftPx)
+      ? { mode: "left", leftPx, rightPx: 0 }
+      : null;
+  }
+
+  const leadingNumber = parseInt(raw, 10);
+  if (Number.isFinite(leadingNumber)) {
+    const normalized = raw.replace(/^0+(\d)/, "$1");
+    const looksNumeric =
+      /^-?\d+$/.test(raw) ||
+      normalized.startsWith(String(leadingNumber)) ||
+      raw.startsWith(String(leadingNumber));
+
+    if (looksNumeric) {
+      if (leadingNumber < 0) {
+        return { mode: "left", leftPx: Math.abs(leadingNumber), rightPx: 0 };
+      }
+      return { mode: "right", rightPx: leadingNumber, leftPx: 0 };
+    }
+  }
+
+  return null;
+}
+
+const resolveHorizontalMarginRule = (primaryValue, fallbackValue) => {
+  return (
+    parseHorizontalMarginRule(primaryValue) ||
+    parseHorizontalMarginRule(fallbackValue) ||
+    { mode: "right", rightPx: 0, leftPx: 0 }
+  );
+}
+
+const applyIframeHorizontalAnchor = (iframe, rule) => {
+  if (!iframe || !rule) return;
+
+  if (rule.mode === "left") {
+    iframe.style.setProperty("left", `${rule.leftPx}px`, "important");
+    iframe.style.setProperty("right", "auto", "important");
+    return;
+  }
+
+  iframe.style.setProperty("right", `${rule.rightPx}px`, "important");
+  iframe.style.setProperty("left", "auto", "important");
+}
+
+const resetIframeHorizontalForFullBleed = (iframe) => {
+  if (!iframe) return;
+  iframe.style.setProperty("left", "0px", "important");
+  iframe.style.setProperty("right", "0px", "important");
+}
+
+const getMobileCloseOffsets = () => {
+  return {
+    horizontal: resolveHorizontalMarginRule(chatbotRightSp, chatbotRight),
+    bottom: resolveOffsetPx(chatbotBottomSp, chatbotBottom, 0),
+  };
+}
+
+const getDesktopOffsets = () => {
+  return {
+    horizontal: resolveHorizontalMarginRule(chatbotRightPc, chatbotRight),
+    bottom: resolveOffsetPx(chatbotBottomPc, chatbotBottom, 0),
+  };
+}
+
 const sendMessageToChatbot = (contentMessage, action) => {
   let data = { action: action, actionData: contentMessage };
 
@@ -305,25 +399,28 @@ const displayPopup = async () => {
   scenarioId = data.data.id;
 
   let iframe = document.createElement("iframe");
+  const isMobile = mobileCheck();
+  const mobileCloseOffsets = getMobileCloseOffsets();
+  const desktopOffsets = getDesktopOffsets();
 
-  if (mobileCheck()) {
+  if (isMobile) {
     iframe.width = "100%";
     iframe.style.maxWidth = "100%";
-    iframe.style.right = "0";
+    applyIframeHorizontalAnchor(iframe, mobileCloseOffsets.horizontal);
   } else {
     iframe.width =
-      chatbotW && chatbotRight
-        ? `${parseInt(chatbotW) + parseInt(chatbotRight)}px`
+      chatbotW
+        ? `${parseInt(chatbotW) + desktopOffsets.horizontal.rightPx}px`
         : "360px";
-    iframe.style.right = "10px";
+    applyIframeHorizontalAnchor(iframe, desktopOffsets.horizontal);
   }
 
   iframe.id = "previewSdk";
   iframe.style.position = "fixed";
-  iframe.style.bottom = "0";
+  iframe.style.setProperty("bottom", isMobile ? `${mobileCloseOffsets.bottom}px` : "0px", "important");
   iframe.height =
-    chatbotH && chatbotBottom
-      ? `${parseInt(chatbotH) + parseInt(chatbotBottom)}px`
+    chatbotH
+      ? `${parseInt(chatbotH) + desktopOffsets.bottom}px`
       : "0px";
 
   iframe.style.border = "none";
@@ -342,10 +439,14 @@ const displayPopup = async () => {
     async (e) => {
       if (typeof e.data !== 'object') return;
       if (e.data.source !== 'ec-chatbot') return;
-      if (e.data.widthPc) chatbotW = e.data.widthPc;
-      if (e.data.heightPc) chatbotH = e.data.heightPc;
-      if (e.data.chatbotRight) chatbotRight = e.data.chatbotRight;
-      if (e.data.chatbotBottom) chatbotBottom = e.data.chatbotBottom;
+      if (e.data.widthPc !== undefined && e.data.widthPc !== null) chatbotW = e.data.widthPc;
+      if (e.data.heightPc !== undefined && e.data.heightPc !== null) chatbotH = e.data.heightPc;
+      if (e.data.chatbotRightPc !== undefined && e.data.chatbotRightPc !== null) chatbotRightPc = e.data.chatbotRightPc;
+      if (e.data.chatbotBottomPc !== undefined && e.data.chatbotBottomPc !== null) chatbotBottomPc = e.data.chatbotBottomPc;
+      if (e.data.chatbotRightSp !== undefined && e.data.chatbotRightSp !== null) chatbotRightSp = e.data.chatbotRightSp;
+      if (e.data.chatbotBottomSp !== undefined && e.data.chatbotBottomSp !== null) chatbotBottomSp = e.data.chatbotBottomSp;
+      if (e.data.chatbotRight !== undefined && e.data.chatbotRight !== null) chatbotRight = e.data.chatbotRight;
+      if (e.data.chatbotBottom !== undefined && e.data.chatbotBottom !== null) chatbotBottom = e.data.chatbotBottom;
 
       switch (e.data.action) {
         case CHATBOT_ACTIONS.EXCUTE_JS:
@@ -365,31 +466,35 @@ const displayPopup = async () => {
         iframe.style.setProperty("width", "100%", "important");
         iframe.style.setProperty("height", "100%", "important");
         iframe.style.bottom = "0px";
-        iframe.style.right = "0px";
+        resetIframeHorizontalForFullBleed(iframe);
       } else if (e.data.isOpen) {
-        let w = chatbotW && (chatbotRight !== null) ? `${parseInt(chatbotW) + parseInt(chatbotRight)}px` : "460px";
-        let h = chatbotH && (chatbotBottom !== null) ? `${parseInt(chatbotH) + parseInt(chatbotBottom)}px` : "700px";
+        const desktopOpenOffsets = getDesktopOffsets();
+        let w = chatbotW ? `${parseInt(chatbotW) + desktopOpenOffsets.horizontal.rightPx}px` : "460px";
+        let h = chatbotH ? `${parseInt(chatbotH) + desktopOpenOffsets.bottom}px` : "700px";
         iframe.width = w;
         iframe.height = h;
         iframe.style.setProperty("width", w, "important");
         iframe.style.setProperty("height", h, "important");
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
+        iframe.style.setProperty("left", "auto", "important");
       } else if (!e.data.isOpen && mobileCheck()) {
         const useMoblieFullwidth = (typeof e.data.useMoblieFullwidth === 'boolean')
           ? e.data.useMoblieFullwidth
           : (sessionStorage.getItem("useFullwidthChatbotMobile") === "true");
         const w = useMoblieFullwidth ? "100%" : "250px";
         const h = useMoblieFullwidth ? "85px" : "58px";
+        const mobileOffsets = getMobileCloseOffsets();
         iframe.width = w;
         iframe.height = h;
         iframe.style.setProperty("width", w, "important");
         iframe.style.setProperty("height", h, "important");
-        iframe.style.bottom = "0px";
-        iframe.style.right = "0px";
+        iframe.style.setProperty("bottom", `${mobileOffsets.bottom}px`, "important");
+        applyIframeHorizontalAnchor(iframe, mobileOffsets.horizontal);
       } else if (!e.data.isOpen) {
-        let w = chatbotRight ? `${parseInt(chatbotRight) + 400}px` : "400px";
-        let h = chatbotBottom ? `${parseInt(chatbotBottom) + 85}px` : "85px";
+        const desktopCloseOffsets = getDesktopOffsets();
+        let w = `${desktopCloseOffsets.horizontal.rightPx + 400}px`;
+        let h = `${desktopCloseOffsets.bottom + 85}px`;
         iframe.width = w;
         iframe.height = h;
         iframe.style.setProperty("width", w, "important");

@@ -8,6 +8,11 @@ import {
   CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE,
 } from "./Constants";
 
+const toNumber = (value, fallback = 0) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
+
 const stringNullOrEmpty = (string) => {
   return !string || (string + "").trim() === "";
 };
@@ -674,6 +679,7 @@ const moveToNext = (nextId) => {
 };
 
 export {
+  toNumber,
   stringNullOrEmpty, getAllUrlParams, lightenColor,
   isMobile, removeLeadingZero, sendUserInteractionData,
   sendCreateOrderData, sendCountRequest,

@@ -18,6 +18,11 @@ const postMessageToParent = (options, state) => {
     heightPc: state.heightPc,
     widthSp: state.widthSp,
     heightSp: state.heightSp,
+    chatbotRightPc: state.rightMarginPc,
+    chatbotBottomPc: state.bottomMarginPc,
+    chatbotRightSp: state.rightMarginSp,
+    chatbotBottomSp: state.bottomMarginSp,
+    // Keep legacy keys for backward compatibility in old SDK versions.
     chatbotRight: state.rightMarginPc,
     chatbotBottom: state.bottomMarginPc,
   };
