@@ -44,6 +44,7 @@ import {
   sendErrorLogToServer,
   sendAppearLogToServer,
   isUserMessage,
+  toNumber,
 } from "./PreviewComponent/Utils";
 import {
   getChatbotSavedState,
@@ -142,6 +143,7 @@ const PreviewFaq = () => {
   const [state, dispatch] = useReducer(PreviewFaqReducer, previewInitialState);
   const containerRef = useRef(null);
   const hasSentCustomJs = useRef(false);
+  const hasSentInitialOpenStateToParent = useRef(false);
 
   useEffect(() => {
     if (state.conversionStatus || !state.uuid || !state.scenarioId || !state.isOpen) return;
@@ -201,21 +203,21 @@ const PreviewFaq = () => {
           activePopupCloseBot: result?.popup_close_bot ? true : false,
           titleBubble: result?.title_bubble ? result?.title_bubble : "簡単90秒で注文完了",
           displayType: result?.display_type,
-          widthPc: result?.width_pc ? result?.width_pc : 450,
-          heightPc: result?.height_pc ? result?.height_pc : 700,
-          widthSp: result?.width_sp ? result?.width_sp : 100,
-          heightSp: result?.height_sp ? result?.height_sp : 100,
+          widthPc: toNumber(result?.width_pc, 450),
+          heightPc: toNumber(result?.height_pc, 700),
+          widthSp: toNumber(result?.width_sp, 100),
+          heightSp: toNumber(result?.height_sp, 100),
           positionPc: result?.position_pc ? result?.position_pc : "1",
           isOpen: state.isOpen,
           rightPcTitle: result?.right_position_pc_title,
           buttonTypePc: result?.button_type_pc ? result?.button_type_pc : "1",
-          rightMarginPc: result?.right_margin_pc ? result?.right_margin_pc : 10,
-          bottomMarginPc: result?.bottom_margin_pc ? result?.bottom_margin_pc : 0,
+          rightMarginPc: toNumber(result?.right_margin_pc, 10),
+          bottomMarginPc: toNumber(result?.bottom_margin_pc, 0),
           positionSp: result?.position_sp ? result?.position_sp : "1",
           buttonTypeSp: result?.button_type_sp ? result?.button_type_sp : "1",
           rightSpTitle: result?.right_position_sp_title,
-          rightMarginSp: result?.right_margin_sp,
-          bottomMarginSp: result?.bottom_margin_sp,
+          rightMarginSp: toNumber(result?.right_margin_sp, 10),
+          bottomMarginSp: toNumber(result?.bottom_margin_sp, 10),
         };
 
         dispatch({ type: PREVIEW_ACTIONS.SET_CHATBOT_SETTINGS, payload: newState });
@@ -366,20 +368,19 @@ const PreviewFaq = () => {
     return () => clearTimeout(timeoutId);
   }, [state.renderMessagesList?.length]);
 
+  // Initial sync:
+  // Parent SDK currently relies on postMessage payload to set the correct mobile/desktop right/bottom.
+  // Without an initial sync, the first render can use stale sessionStorage values until user open->close.
   useEffect(() => {
-    if (
-      state.loadedStateFromSession &&
-      state.displayType === 1 &&
-      !state.isOpen &&
-      state.messagesList.length > 0 &&
-      state.botInfor &&
-      !state.manuallyClosed
-    ) {
-      setTimeout(() => {
-        dispatch({ type: PREVIEW_ACTIONS.OPEN_CHATBOT });
-      }, 1000);
-    }
-  }, [state.loadedStateFromSession, state.displayType, state.isOpen, state.messagesList.length, state.botInfor, state.manuallyClosed]);
+    if (hasSentInitialOpenStateToParent.current) return;
+    if (!state.loadedStateFromSession) return;
+    if (!state.botInfor) return;
+    if (typeof state.isOpen !== "boolean") return;
+    if (!state.deviceReceive || !state.urlReceive) return;
+
+    postMessageToParent({ isOpen: state.isOpen }, state);
+    hasSentInitialOpenStateToParent.current = true;
+  }, [state.loadedStateFromSession, state.botInfor, state.isOpen, state.deviceReceive, state.urlReceive]);
 
   useEffect(() => {
     if (!state.nextStopMsgIndex || state.currentMsgIndex + 1 >= state.nextStopMsgIndex || !state.isOpen) {
@@ -448,6 +449,9 @@ const PreviewFaq = () => {
   const onOpenPreview = (opening) => {
     const deviceReceive = state.deviceReceive || params.get("deviceReceive");
     if (!deviceReceive) return;
+    const postOpenStateToParent = (nextIsOpen) => {
+      postMessageToParent({ isOpen: nextIsOpen }, { ...state, isOpen: nextIsOpen });
+    };
 
     // Send data to count open chatbot window
     const prevOpenStatus = getPrevOpenStatus();
@@ -456,16 +460,13 @@ const PreviewFaq = () => {
       savePrevOpenStatus("1");
       sendOpenChatbotCountRequest(state.scenarioId, deviceReceive);
     }
-
-    // post message to parent window
-    postMessageToParent({ isOpen: opening}, state);
     
     if (state.alreadyOpenFirstTime) {
       if (!opening) {
         if (state.activePopupCloseBot) {
           return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
         }
-
+        postOpenStateToParent(false);
         return dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
       }
 
@@ -474,16 +475,19 @@ const PreviewFaq = () => {
         user_id: state.uuid,
       }).then(() => {
         dispatch({ type: PREVIEW_ACTIONS.OPEN_CHATBOT });
+        postOpenStateToParent(true);
       });
     }
 
     if (opening) {
       sendOpenChatbotCountRequest(state.scenarioId, deviceReceive).then(() => {
         dispatch({ type: PREVIEW_ACTIONS.OPEN_CHATBOT });
+        postOpenStateToParent(true);
       });
     } else {
       sendCloseChatbotCountRequest(state.scenarioId, deviceReceive).then(() => {
         dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
+        postOpenStateToParent(false);
       });
     }
   }
@@ -571,30 +575,32 @@ const PreviewFaq = () => {
     const designSetting = res.data.design_settings;
     const chatbot = res.data.chatbot;
     const conversation = res.data.data?.conversation;
+    const shouldAutoOpen = Number(designSetting?.display_type) === 1;
+    const resolvedDisplayType = Number(designSetting?.display_type ?? state.displayType ?? 2);
     let newState = {
       ...state,
       botInfor: getBotInforFromPreviewResponse(res),
       objParam: {},
       loadedStateFromSession: true,
       messagesList: conversation?.messages || [],
-      isOpen: designSetting?.display_type && Number(designSetting?.display_type) === 1 || state.isOpen,
+      isOpen: shouldAutoOpen ? true : Boolean(state.isOpen),
       activePopupCloseBot: Boolean(designSetting?.popup_close_bot),
       titleBubble: designSetting?.title_bubble || "簡単90秒で注文完了",
-      displayType: designSetting?.display_type,
-      widthPc: designSetting?.width_pc || 450,
-      heightPc: designSetting?.height_pc || 700,
-      widthSp: designSetting?.width_sp || 100,
-      heightSp: designSetting?.height_sp || 100,
+      displayType: resolvedDisplayType,
+      widthPc: toNumber(designSetting?.width_pc, 450),
+      heightPc: toNumber(designSetting?.height_pc, 700),
+      widthSp: toNumber(designSetting?.width_sp, 100),
+      heightSp: toNumber(designSetting?.height_sp, 100),
       positionPc: designSetting?.position_pc || "1",
       rightPcTitle: designSetting?.right_position_pc_title,
       buttonTypePc: designSetting?.button_type_pc || "1",
-      rightMarginPc: designSetting?.right_margin_pc || 10,
-      bottomMarginPc: designSetting?.bottom_margin_pc || 0,
+      rightMarginPc: toNumber(designSetting?.right_margin_pc, 10),
+      bottomMarginPc: toNumber(designSetting?.bottom_margin_pc, 0),
       positionSp: designSetting?.position_sp || "1",
       buttonTypeSp: designSetting?.button_type_sp || "1",
       rightSpTitle: designSetting?.right_position_sp_title,
-      rightMarginSp: designSetting?.right_margin_sp,
-      bottomMarginSp: designSetting?.bottom_margin_sp,
+      rightMarginSp: toNumber(designSetting?.right_margin_sp, 10),
+      bottomMarginSp: toNumber(designSetting?.bottom_margin_sp, 10),
       isUsedPastMessageLoaded: !!chatbot?.is_used_message_loaded_past,
       isProcessing: false,
       useFullWidthChatbotMobile: !!chatbot?.use_fullwidth_chatbot_mobile,
@@ -908,6 +914,11 @@ const PreviewFaq = () => {
     };
   };
 
+  const positionPc = toNumber(state.positionPc, 1);
+  const buttonTypePc = toNumber(state.buttonTypePc, 1);
+  const positionSp = toNumber(state.positionSp, 1);
+  const buttonTypeSp = toNumber(state.buttonTypeSp, 1);
+
   // body container
   if (state.scenarioId && state.botInfor && state.isOpen) {
     const { containerStyle, headerStyle, bodyStyle } = getOpeningBotStyle();
@@ -953,7 +964,7 @@ const PreviewFaq = () => {
         </div>
       </div>
     )
-  } else if (!state.isOpen && isMobile() === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 2) {
+  } else if (!state.isOpen && !isMobile() && positionPc === 1 && buttonTypePc === 2) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -977,7 +988,7 @@ const PreviewFaq = () => {
         />
       </div>
     )
-  } else if (!state.isOpen && isMobile() === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 1) {
+  } else if (!state.isOpen && !isMobile() && positionPc === 1 && buttonTypePc === 1) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -1013,7 +1024,7 @@ const PreviewFaq = () => {
         </div>
       </div>
     )
-  } else if (!state.isOpen && isMobile() === false && Number(state.positionPc) === 2) {
+  } else if (!state.isOpen && !isMobile() && positionPc === 2) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -1039,7 +1050,7 @@ const PreviewFaq = () => {
           </div>
         </div>
       </div>)
-  } else if (!state.isOpen && isMobile() === true && Number(state.positionSp) === 1 && Number(state.buttonTypeSp) === 2) {
+  } else if (!state.isOpen && isMobile() && positionSp === 1 && buttonTypeSp === 2) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -1052,8 +1063,9 @@ const PreviewFaq = () => {
           alignItems: "center",
           justifyContent: "center",
           position: 'fixed',
-          bottom: state.bottomMarginSp ? `${state.bottomMarginSp}px` : '20px',
-          right: state.rightMarginSp ? `${state.rightMarginSp}px` : '20px',
+          // Parent iframe already applies mobile right/bottom offsets.
+          bottom: '0px',
+          right: '0px',
         }}
       >
         <img
@@ -1063,7 +1075,7 @@ const PreviewFaq = () => {
         />
       </div>
     )
-  } else if (!state.isOpen && isMobile() === true && Number(state.positionSp) === 1 && Number(state.buttonTypeSp) === 1) {
+  } else if (!state.isOpen && isMobile() && positionSp === 1 && buttonTypeSp === 1) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -1076,8 +1088,9 @@ const PreviewFaq = () => {
           display: "flex",
           justifyContent: "left",
           position: 'fixed',
-          bottom: state.bottomMarginSp ? `${state.bottomMarginSp}px` : '10px',
-          right: (state.useFullWidthChatbotMobile) ? "15px" : (state.rightMarginSp ? `${state.rightMarginSp}px` : '10px')
+          // Parent iframe already applies mobile right/bottom offsets.
+          bottom: '0px',
+          right: state.useFullWidthChatbotMobile ? "0px" : "0px",
         }}
       >
         <div className="sp-header-left" style={{ width: '100%', padding: state.useFullWidthChatbotMobile ? "15px" : '4px' }}>
@@ -1098,7 +1111,7 @@ const PreviewFaq = () => {
         </div>
       </div>
     )
-  } else if (!state.isOpen && isMobile() === true && Number(state.positionSp) === 2) {
+  } else if (!state.isOpen && isMobile() && positionSp === 2) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -1111,7 +1124,8 @@ const PreviewFaq = () => {
           justifyContent: "left",
           position: 'fixed',
           transform: ' rotate(-90deg)',
-          bottom: state.bottomMarginSp ? `${parseInt(state.bottomMarginSp) + state.widthPc / 2}px` : '20px',
+          // Keep vertical mode anchored to iframe close viewport.
+          bottom: '0px',
           right: `${-120}px`,
         }}
       >
@@ -1127,6 +1141,32 @@ const PreviewFaq = () => {
           </div>
         </div>
       </div>)
+  }
+
+  if (!state.isOpen) {
+    return (
+      <div
+        onClick={() => onOpenPreview(true)}
+        style={{
+          backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other || "#327AED",
+          width: "56px",
+          height: "56px",
+          borderRadius: "30px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          position: "fixed",
+          bottom: isMobile() ? "0px" : `${toNumber(state.bottomMarginPc, 10)}px`,
+          right: isMobile() ? "0px" : `${toNumber(state.rightMarginPc, 10)}px`,
+        }}
+      >
+        <img
+          style={{ width: "96%", height: "96%", borderRadius: "30px" }}
+          src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
+          alt="bot-header-icon"
+        />
+      </div>
+    );
   }
 
   return (<div></div>);

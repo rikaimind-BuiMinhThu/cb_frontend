@@ -6,7 +6,8 @@ import {
   checkFaqMessageCondition,
   processMessagesForErrorState, 
   isTempDelay,
-  buildConditionParams
+  buildConditionParams,
+  toNumber
 } from '../PreviewComponent/Utils';
 import { processForBotMessage } from '../PreviewComponent/BotMessageUtils';
 import { processForUserMessage } from '../PreviewComponent/UserMessageUtils';
@@ -201,6 +202,9 @@ const PreviewFaqReducer = (state, action) => {
       const botInfor = action.payload.botInfor;
       const { conversation } = action.payload.responseData?.data;
       const { variables, all_variables } = action.payload.responseData;
+      const resolvedDisplayType = Number(designSetting?.display_type ?? state.displayType ?? 2);
+      const isOpenFromState = Boolean(state.isOpen);
+      const isOpenFromAmazonPay = Boolean(action.payload.isUsingAmazonPay);
 
       let newState = {
         ...state,
@@ -209,24 +213,24 @@ const PreviewFaqReducer = (state, action) => {
         loadedStateFromSession: true,
         originalMessagesList: _.cloneDeep(conversation?.messages || []),
         messagesList: conversation?.messages || [],
-        isOpen: state.isOpen || action.payload.isUsingAmazonPay,
+        isOpen: isOpenFromState || isOpenFromAmazonPay,
         activePopupCloseBot: Boolean(designSetting?.popup_close_bot),
         titleBubble: designSetting?.title_bubble || "簡単90秒で注文完了",
-        displayType: designSetting?.display_type,
-        widthPc: designSetting?.width_pc || 450,
-        heightPc: designSetting?.height_pc || 700,
-        widthSp: designSetting?.width_sp || 100,
-        heightSp: designSetting?.height_sp || 100,
+        displayType: resolvedDisplayType,
+        widthPc: toNumber(designSetting?.width_pc, 450),
+        heightPc: toNumber(designSetting?.height_pc, 700),
+        widthSp: toNumber(designSetting?.width_sp, 100),
+        heightSp: toNumber(designSetting?.height_sp, 100),
         positionPc: designSetting?.position_pc || "1",
         rightPcTitle: designSetting?.right_position_pc_title,
         buttonTypePc: designSetting?.button_type_pc || "1",
-        rightMarginPc: designSetting?.right_margin_pc || 10,
-        bottomMarginPc: designSetting?.bottom_margin_pc || 0,
+        rightMarginPc: toNumber(designSetting?.right_margin_pc, 10),
+        bottomMarginPc: toNumber(designSetting?.bottom_margin_pc, 0),
         positionSp: designSetting?.position_sp || "1",
         buttonTypeSp: designSetting?.button_type_sp || "1",
         rightSpTitle: designSetting?.right_position_sp_title,
-        rightMarginSp: designSetting?.right_margin_sp,
-        bottomMarginSp: designSetting?.bottom_margin_sp,
+        rightMarginSp: toNumber(designSetting?.right_margin_sp, 10),
+        bottomMarginSp: toNumber(designSetting?.bottom_margin_sp, 10),
         isUsedErrMsgByJs: chatbot?.is_used_err_msg_by_js,
         errMsgJsCode: chatbot?.err_msg_js_code,
         isUsedPastMessageLoaded: !!chatbot?.is_used_message_loaded_past,
