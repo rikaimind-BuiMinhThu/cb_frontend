@@ -3,6 +3,7 @@ import { CHATBOT_ACTIONS } from "../PreviewComponent/Constants";
 import { isTorizenLpAmazonData, isTorizenLP } from "../PreviewComponent/TorizenUtils";
 import { isBlissLpAmazonData, isBlissLP } from "../PreviewComponent/BlissUtils";
 import { isPhystechLpAmazonData, isPhystechLP } from "../PreviewComponent/PhysTechUtils";
+import { isRoseMayLpAmazonData, isRoseMayLP } from "../PreviewComponent/RoseMayUtils";
 import { convertToFukushashikiObject } from "./FukushashikiDataConverterUtils";
 import { isUserMessage, sendOpenChatbotCountRequest } from "../PreviewComponent/Utils";
 
@@ -18,6 +19,11 @@ const postMessageToParent = (options, state) => {
     heightPc: state.heightPc,
     widthSp: state.widthSp,
     heightSp: state.heightSp,
+    chatbotRightPc: state.rightMarginPc,
+    chatbotBottomPc: state.bottomMarginPc,
+    chatbotRightSp: state.rightMarginSp,
+    chatbotBottomSp: state.bottomMarginSp,
+    // Keep legacy keys for backward compatibility in old SDK versions.
     chatbotRight: state.rightMarginPc,
     chatbotBottom: state.bottomMarginPc,
   };
@@ -51,8 +57,10 @@ const fukushashikiSavedStateToLp = (savedState, params, state) => {
         if (isBlissLP(lpUrl) && isBlissLpAmazonData(message)) return;
         // For Phystech
         if (isPhystechLP(lpUrl) && isPhystechLpAmazonData(message)) return;
+        // For RoseMay
+        if (isRoseMayLP(lpUrl) && isRoseMayLpAmazonData(message)) return;
       }
-      
+
       if (!message.hidden) {
         const fukuData = convertToFukushashikiObject({message: message});
         fukuDataList.push(...fukuData);
@@ -106,6 +114,20 @@ const getErrorMessageFromParent = (searchMode, searchValue, isDisplay) => {
   }, {isOpen: true});
 }
 
+const findContentsByFukushashikiSearchValue = (userMessages, fukushaKey, fukushaValue) => {
+  if (!Array.isArray(userMessages)) userMessages = [userMessages];
+
+  let result = [];
+  userMessages.forEach(message => {
+    message.message_content.forEach(content => {
+      if (content[fukushaKey] === fukushaValue) {
+        result.push(content);
+      }
+    });
+  });
+  return result;
+}
+
 export {
   setConversionParamToLocalStorage,
   fukushashikiSavedStateToLp,
@@ -114,4 +136,5 @@ export {
   injectCustomJsCode,
   postMessageToParent,
   getErrorMessageFromParent,
+  findContentsByFukushashikiSearchValue,
 };

@@ -452,6 +452,16 @@ const isBlissLp = (url) => {
   return domains.some(domain => url.includes(domain));
 }
 
+const isRoseMayLp = (url) => {
+  const domains = [
+    // TODO: Update RoseMay domains nếu cần test ở môi trường khác
+    // "rosemay.jp",
+    "rosemay.net",
+  ];
+
+  return domains.some(domain => url.includes(domain));
+}
+
 const isPhystechLp = (url) => {
   const domains = [
     // Comment out if you want to test phystech in localhost
@@ -537,7 +547,7 @@ const displayPopup = async () => {
       }
       count++;
     }, 200);
-  } else if (isBlissLp(window.location.href) || isPhystechLp(window.location.href)) {
+  } else if (isBlissLp(window.location.href) || isPhystechLp(window.location.href) || isRoseMayLp(window.location.href)) {
     waitToLoadAmazonEcForce(iframe);
   } else {
     appendIframeToBody(iframe);
