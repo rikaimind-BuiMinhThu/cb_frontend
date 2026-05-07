@@ -103,15 +103,6 @@ export const mapAmazonPayDataToMessagesListForRoseMay = (amazonPayData, messages
   return newMessagesList;
 }
 
-export const isRoseMayLP = (url) => {
-  const domains = [
-    // TODO: Update RoseMay domains nếu cần test ở môi trường khác
-    // "rosemay.jp",
-    "rosemay.net",
-  ];
-  return domains.some(domain => url.includes(domain));
-}
-
 export const isRoseMayLpAmazonData = (message) => {
   return findContentsByFukushashikiSearchValue(message, 'value1_fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.TEL1).length > 0 ||
     findContentsByFukushashikiSearchValue(message, 'value2_fukushashiki_search_value', ROSEMAY_AMAZON_FUKUSHASHIKI_ELEMENTS.TEL2).length > 0 ||
