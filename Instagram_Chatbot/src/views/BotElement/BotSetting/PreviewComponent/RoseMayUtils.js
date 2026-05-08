@@ -122,6 +122,7 @@ export const isRoseMayLpAmazonData = (message) => {
 export const isRoseMayLP = (url) => {
   const domains = [
     // TODO: Update RoseMay domains nếu cần test ở môi trường khác
+    "rosemay.net",
     "rosemay.jp",
   ];
 
