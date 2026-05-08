@@ -455,8 +455,8 @@ const isBlissLp = (url) => {
 const isRoseMayLp = (url) => {
   const domains = [
     // TODO: Update RoseMay domains nếu cần test ở môi trường khác
-    // "rosemay.jp",
     "rosemay.net",
+    "rosemay.jp",
   ];
 
   return domains.some(domain => url.includes(domain));
