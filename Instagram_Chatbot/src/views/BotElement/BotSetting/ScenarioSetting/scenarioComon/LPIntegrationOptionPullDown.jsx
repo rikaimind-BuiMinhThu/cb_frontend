@@ -29,6 +29,7 @@ const LPIntegrationOptionPullDown = ({
   }, []);
 
   if (data === null || data === undefined) return null;
+  const selectWidth = pullDown.with_suffix ? '70%' : '100%';
 
   return (
     <React.Fragment>
@@ -37,11 +38,16 @@ const LPIntegrationOptionPullDown = ({
         data={data}
         keyValue={keyValue}
         nameValue={nameValue}
-        style={{ width: "100%" }}
+        style={{ width: selectWidth }}
         placeholder={pullDown?.customization?.display_unselected}
         value={pullDown?.[pullDown?.type]?.value || undefined}
         onChange={onChange}
       />
+      {
+        pullDown.with_suffix && (
+          <label style={{ width: '30%' }}>{pullDown.lp_integration_option_text}</label>
+        )
+      }
     </React.Fragment>
   );
 };
