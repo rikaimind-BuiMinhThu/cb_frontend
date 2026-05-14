@@ -50,7 +50,8 @@ import OptionGenderConfig from './OptionGenderConfig';
 import SubmitButtonLoadingConfig from './SubmitButtonLoadingConfig';
 import SubmitButtonConfig from './SubmitButtonConfig';
 import {CART_SYSTEM} from '../PreviewComponent/Constants';
-import { mergeCalendarForPreviewRelativeRange as mergePreviewRelativeCalendar } from '../PreviewComponent/UserMessageComponent/Calendar';
+import ZipCodeAddressSetting from './Settings/ZipCodeAddressSetting';
+import { renderFukushashikiSetting } from './ScenarioUtils';
 
 const { Option } = Select;
 const _ = require('lodash');
@@ -2083,7 +2084,7 @@ const Scenario = () => {
   }
 
   const renderAddressField = (address) => {
-    if (address.compact_municipality_and_address || address.compact_municipality_and_address_and_building_name) return;
+    if ((address.compact_municipality_and_address && !address.is_display_address_field) || address.compact_municipality_and_address_and_building_name) return;
     if (address.address === undefined) return;
     return (
       <div className="ss-user-setting__item-bottom">
@@ -2099,44 +2100,114 @@ const Scenario = () => {
     );
   }
 
-  const renderFukushashikiSetting = ({
-    mode,
-    inputValue,
-    onModeChange,
-    onInputChange,
-    rowStyle = {}
-  }) => {
-    const inputGuideText = FUKUSHASHIKI_SEARCH_VALUE_LABELS[mode] || '';
-
+  const renderBuildingName = (address) => {
+    if (address.building_name === undefined) return;
     return (
-      <div
-        className='ss-user-setting__item-row'
-        style={{ display: 'flex', gap: '10px', marginLeft: '35px', width: '90%', ...rowStyle }}
-      >
-        <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
-          <div style={{ width: '25%' }}>
-            <SelectCustom
-              id="title"
-              style={{ width: '100%' }}
-              value={mode}
-              onChange={onModeChange}
-              data={FUKUSHASHIKI_SEARCH_MODE_OPTIONS}
-              keyValue="key"
-              placeholder="複写先要素の取得方法をお選びください"
-            />
-          </div>
-        </Tooltip>
-        <Tooltip title={inputGuideText} placement="top">
-          <div style={{ flex: '75%' }}>
-            <InputCustom
-              styleLabel={{ width: '100%' }}
-              style={{ width: '100%' }}
-              onChange={onInputChange}
-              value={inputValue}
-              placeholder={inputGuideText}
-            />
-          </div>
-        </Tooltip>
+      <div className="ss-user-setting__item-bottom">
+        <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
+          {address.building_name_label || '建物名'}
+        </div>
+        <InputCustom
+          placeholder={address.building_name}
+          disabled={true}
+          style={{ width: '100%' }}
+        />
+      </div>
+    );
+  }
+
+  const renderMunicipality = (address) => {
+    if (address.municipality === undefined) return;
+    return (
+      <div className="ss-user-setting__item-bottom">
+        <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
+          {address.municipality_label || '市区町村'}
+        </div>
+        <InputCustom
+          placeholder={address.municipality}
+          disabled={true}
+          style={{ width: '100%' }}
+        />
+      </div>
+    );
+  }
+
+  const renderSinglePostCode = (address) => {
+    return (
+      <InputCustom
+        placeholder={address.post_code}
+        disabled={true}
+        style={{ width: '100%' }}
+      />
+    );
+  }
+
+  const renderSplitPostCode = (address) => {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+        <InputCustom
+          placeholder={address.post_code_left}
+          disabled={true}
+          style={{ width: '49%' }}
+        />
+        <InputCustom
+          placeholder={address.post_code_right}
+          disabled={true}
+          style={{ width: '49%' }}
+        />
+      </div>
+    );
+  }
+
+  const renderPostCode = (address) => {
+    if (address.post_code === undefined) return;
+    return (
+      <div className="ss-user-setting__item-bottom">
+        <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '5px' }}>
+          {address.post_code_label || '郵便番号'}
+        </div>
+        {address.split_postal_code !== true ? renderSinglePostCode(address) : renderSplitPostCode(address)}
+      </div>
+    );
+  }
+
+  const renderZipCodeAddressTitle = (zipCodeAddress) => {
+    if (!(zipCodeAddress.title_require || zipCodeAddress.isCheckRequire)) return;
+
+    const hasRequiredItem = () => {
+      if (zipCodeAddress.isCheckRequire !== 'set_required_for_each_item') return false;
+      return ['postCode', 'prefecture', 'municipality', 'address', 'buildingName'].some(item => zipCodeAddress[`${item}Required`]);
+    }
+
+    const isRequired = zipCodeAddress.isCheckRequire === 'all_items_require' || zipCodeAddress.isCheckRequire === 'require' || hasRequiredItem();
+    return (
+      <div className="ss-message__content--user-pull_down-top" style={{ marginBottom: '0px' }}>
+        {zipCodeAddress.title_require &&
+          <span className="ss-message__content--user-pull_down-title">
+            {zipCodeAddress.title}
+          </span>
+        }
+        {isRequired &&
+          <span className="ss-message__content--user-text-input-required">
+            ※必須
+          </span>
+        }
+      </div>
+    );
+  }
+
+  const renderPrefecture = (address) => {
+    if (address.prefecture === undefined) return;
+    return (
+      <div className="ss-user-setting__item-bottom">
+        <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
+          {address.prefecture_label || '都道府県'}
+        </div>
+        <InputCustom
+          placeholder={address.prefecture}
+          disabled={true}
+          style={{ width: '100%' }}
+        />
       </div>
     );
   }
@@ -2161,6 +2232,11 @@ const Scenario = () => {
             </div>
           )
         }
+        <CheckboxCustom
+          label="空なオプション解除"
+          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'dont_display_empty_option')}
+          value={pullDown.dont_display_empty_option}
+        />
         {
           renderFukushashikiSetting({
             mode: pullDown.lp_element_search_mode,
@@ -2176,7 +2252,6 @@ const Scenario = () => {
   const renderLPIntegrationOptionPreview = (pullDown) => {
     if (pullDown.type !== 'lp_integration_option') return null;
     const selectWidth = pullDown.with_suffix ? '70%' : '100%';
-    console.log(pullDown.with_suffix);
     
     return (
       <React.Fragment>
@@ -2190,6 +2265,27 @@ const Scenario = () => {
             <label style={{ width: '30%' }}>{pullDown.lp_integration_option_text}</label>
           )
         }
+      </React.Fragment>
+    );
+  }
+
+  const renderTextInputPasswordConfirmationPreview = (textInput) => {
+    if (textInput.type !== 'password_confirmation') return null;
+    
+    return (
+      <React.Fragment>
+        <input
+          className="ss-message__content--user-text-input ss-input-value"
+          readOnly
+          disabled
+          placeholder={textInput[textInput.type].password}
+        ></input>
+        <input
+          className="ss-message__content--user-text-input ss-input-value"
+          readOnly
+          placeholder={textInput[textInput.type].confirm_password}
+          disabled
+        ></input>
       </React.Fragment>
     );
   }
@@ -4010,22 +4106,7 @@ const Scenario = () => {
                                                                   ></input>
                                                                 </>
                                                                 )}
-                                                              {(textInput.type === 'password_confirmation') &&
-                                                                (<>
-                                                                  <input
-                                                                    className="ss-message__content--user-text-input ss-input-value"
-                                                                    readOnly
-                                                                    disabled
-                                                                    placeholder={textInput[textInput.type].password}
-                                                                  ></input>
-                                                                  <input
-                                                                    className="ss-message__content--user-text-input ss-input-value"
-                                                                    readOnly
-                                                                    placeholder={textInput[textInput.type].confirm_password}
-                                                                    disabled
-                                                                  ></input>
-                                                                </>
-                                                                )}
+                                                              {renderTextInputPasswordConfirmationPreview(textInput)}
                                                             </div>
                                                           )
                                                         }
@@ -4844,84 +4925,12 @@ const Scenario = () => {
                                                         {
                                                           content.type === 'zip_code_address' && (
                                                             <div style={{ marginBottom: '10px' }}>
-                                                              {(zipCodeAddress.title_require || zipCodeAddress.isCheckRequire) &&
-                                                                <div className="ss-message__content--user-pull_down-top" style={{ marginBottom: '0px' }}>
-                                                                  {zipCodeAddress.title_require &&
-                                                                    <span className="ss-message__content--user-pull_down-title">
-                                                                      {zipCodeAddress.title}
-                                                                    </span>
-                                                                  }
-                                                                  {(zipCodeAddress.isCheckRequire === 'all_items_require' ||
-                                                                    zipCodeAddress.isCheckRequire === 'require') &&
-                                                                    <span className="ss-message__content--user-text-input-required">
-                                                                      ※必須
-                                                                    </span>
-                                                                  }
-                                                                </div>
-                                                              }
-                                                              {zipCodeAddress.post_code !== undefined && (
-                                                                <div className="ss-user-setting__item-bottom">
-                                                                  <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '5px' }}>
-                                                                    {zipCodeAddress.post_code_label || '郵便番号'}
-                                                                  </div>
-                                                                  {zipCodeAddress.split_postal_code !== true ?
-                                                                    <InputCustom
-                                                                      placeholder={zipCodeAddress.post_code}
-                                                                      disabled={true}
-                                                                      style={{ width: '100%' }}
-                                                                    /> :
-                                                                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                                                                      <InputCustom
-                                                                        placeholder={zipCodeAddress.post_code_left}
-                                                                        disabled={true}
-                                                                        style={{ width: '49%' }}
-                                                                      />
-                                                                      <InputCustom
-                                                                        placeholder={zipCodeAddress.post_code_right}
-                                                                        disabled={true}
-                                                                        style={{ width: '49%' }}
-                                                                      />
-                                                                    </div>
-                                                                  }
-                                                                </div>
-                                                              )}
-                                                              {zipCodeAddress.prefecture !== undefined &&
-                                                                <div className="ss-user-setting__item-bottom">
-                                                                  <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
-                                                                    {zipCodeAddress.prefecture_label || '都道府県'}
-                                                                  </div>
-                                                                  <InputCustom
-                                                                    placeholder={zipCodeAddress.prefecture}
-                                                                    disabled={true}
-                                                                    style={{ width: '100%' }}
-                                                                  />
-                                                                </div>
-                                                              }
-                                                              {zipCodeAddress.municipality !== undefined &&
-                                                                <div className="ss-user-setting__item-bottom">
-                                                                  <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
-                                                                    {zipCodeAddress.municipality_label || '市区町村' }
-                                                                  </div>
-                                                                  <InputCustom
-                                                                    placeholder={zipCodeAddress.municipality}
-                                                                    disabled={true}
-                                                                    style={{ width: '100%' }}
-                                                                  />
-                                                                </div>
-                                                              }
+                                                              {renderZipCodeAddressTitle(zipCodeAddress)}
+                                                              {renderPostCode(zipCodeAddress)}
+                                                              {renderPrefecture(zipCodeAddress)}
+                                                              {renderMunicipality(zipCodeAddress)}
                                                               {renderAddressField(zipCodeAddress)}
-                                                              {zipCodeAddress.building_name !== undefined &&
-                                                                <div className="ss-user-setting__item-bottom">
-                                                                  <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
-                                                                    {zipCodeAddress.building_name_label || '建物名'}
-                                                                  </div>
-                                                                  <InputCustom
-                                                                    placeholder={zipCodeAddress.building_name}
-                                                                    disabled={true}
-                                                                    style={{ width: '100%' }}
-                                                                  />
-                                                                </div>
-                                                              }
+                                                              {renderBuildingName(zipCodeAddress)}
                                                             </div>
                                                           )
                                                         }
@@ -5924,7 +5933,7 @@ const Scenario = () => {
                                                     )
                                                   })}
                                                 </div>
-                                                {message.message_content[0]?.type !== 'button_submit'&& message?.message_content.length !== 0 &&
+                                                {!message.not_use_button && message.message_content[0]?.type !== 'button_submit'&& message?.message_content.length !== 0 &&
                                                   ((message?.message_content.length === 1 && 
                                                     !(message.message_content[0].type === 'product_purchase_radio_button'
                                                       || (message.message_content[0].type === 'carousel' && message.message_content[0]?.[message.message_content[0].type].require)
@@ -7355,6 +7364,17 @@ const Scenario = () => {
                                                               />
                                                             </div>
                                                           </div>
+                                                          {isUseFukushashiki && (
+                                                              renderFukushashikiSetting({
+                                                                mode: dataMessages[indexMessageSelect]?.message_content[indexContent]?.['fukushashiki_search_mode'],
+                                                                inputValue: dataMessages[indexMessageSelect]?.message_content[indexContent]?.['fukushashiki_search_value'],
+                                                                onModeChange: value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'fukushashiki_search_mode', value),
+                                                                onInputChange: value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'fukushashiki_search_value', value),
+                                                                rowClassName: 'ss-user-setting__item-bottom',
+                                                                rowStyle: { width: '100%', alignItems: 'center', gap: '8px', marginLeft: 0, marginBottom: '10px' },
+                                                              })
+                                                            )
+                                                          }
                                                           {/* text_input: type = password_confirmation */}
                                                           {(textInput.type === 'password_confirmation') && (
                                                             <div className="ss-user-setting__item-bottom">
@@ -7368,42 +7388,14 @@ const Scenario = () => {
                                                               </div>
                                                             </div>
                                                           )}
-                                                          {isUseFukushashiki && (
-                                                            <div className='ss-user-setting__item-bottom' style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                              <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
-                                                                <div style={{ flexBasis: '22%', maxWidth: '22%' }}>
-                                                                  <SelectCustom
-                                                                    id="title"
-                                                                    style={{ width: '100%' }}
-                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['fukushashiki_search_mode']}
-                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'fukushashiki_search_mode', value)}
-                                                                    data={[
-                                                                      { key: 1, value: 'id' },
-                                                                      { key: 2, value: 'css_selector' },
-                                                                      { key: 3, value: 'xpath' }
-                                                                    ]}
-                                                                    keyValue="key"
-                                                                    placeholder="複写先要素の取得方法をお選びください"
-                                                                  />
-                                                                </div>
-                                                              </Tooltip>
-                                                              <div style={{ flexBasis: '67%', maxWidth: '67%' }}>
-                                                                <InputCustom
-                                                                  styleLabel={{ width: '100%' }}
-                                                                  maxLength={250}
-                                                                  useFukushashiki={true}
-                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'fukushashiki_search_value', value)}
-                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['fukushashiki_search_value']}
-                                                                  placeholder={{
-                                                                    1: '複写先要素のIDを入力ください',
-                                                                    2: '複写先要素のcss_selectorを入力ください',
-                                                                    3: '複写先要素のxPathを入力ください',
-                                                                  }[
-                                                                    dataMessages[indexMessageSelect]?.message_content[indexContent]?.['fukushashiki_search_mode']
-                                                                  ] || ''}
-                                                                />
-                                                              </div>
-                                                            </div>
+                                                          {isUseFukushashiki && textInput.type === 'password_confirmation' && (
+                                                            renderFukushashikiSetting({
+                                                              mode: dataMessages[indexMessageSelect]?.message_content[indexContent]?.['confirm_fukushashiki_search_mode'],
+                                                              inputValue: dataMessages[indexMessageSelect]?.message_content[indexContent]?.['confirm_fukushashiki_search_value'],
+                                                              onModeChange: value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'confirm_fukushashiki_search_mode', value),
+                                                              onInputChange: value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'confirm_fukushashiki_search_value', value),
+                                                              rowStyle: { width: '100%', alignItems: 'center', gap: '8px', marginLeft: 0 },
+                                                            })
                                                           )}
                                                         </React.Fragment>
                                                       )}
@@ -8194,598 +8186,21 @@ const Scenario = () => {
                                                   )}
                                                   {/* user: type = 'zip_code_address' ADD_FUKU */}
                                                   {content.type === 'zip_code_address' && (
-                                                    <React.Fragment>
-                                                      <div className="ss-user-setting__item-text_input-top">
-                                                        <CheckboxCustom
-                                                          label="ログイン済み時に表示しない"
-                                                          onChange={(value) => {
-                                                            dataMessages[indexMessageSelect].not_display_when_logged_in = value;
-                                                            setDataMessages([...dataMessages]);
-                                                          }}
-                                                          value={dataMessages[indexMessageSelect].not_display_when_logged_in}
-                                                        />
-                                                        <CheckboxCustom
-                                                          label="エラー発生の時に表示しない"
-                                                          onChange={(value) => {
-                                                            dataMessages[indexMessageSelect].not_display_when_have_error = value;
-                                                            setDataMessages([...dataMessages]);
-                                                          }}
-                                                          value={dataMessages[indexMessageSelect].not_display_when_have_error}
-                                                        />
-                                                        {renderRootFaqOption()}
-                                                        <CheckboxCustom
-                                                          label="入力された内容を変数に保存する。"
-                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
-                                                          value={zipCodeAddress.is_save_input_content}
-                                                        />
-                                                        {zipCodeAddress.is_save_input_content &&
-                                                          <div className="ss-user-setting__item-bottom">
-                                                            <div className="ss-user-setting__item-select-bottom-wrapper-flex">
-                                                              <SelectCustom
-                                                                style={{ width: '100%', marginRight: '10px' }}
-                                                                id="title"
-                                                                value={zipCodeAddress?.save_input_content}
-                                                                data={dataInputVar}
-                                                                keyValue="variable_name"
-                                                                nameValue="variable_name"
-                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
-                                                              />
-                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>追加</Button>
-                                                            </div>
-                                                          </div>
-                                                        }
-                                                        <div className="ss-user-setting__item-text_input-use-api-wrapper">
-                                                          <CheckboxCustom
-                                                            label="入力値の検証にAPIを利用する"
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'use_api_input_value')}
-                                                            value={zipCodeAddress.use_api_input_value}
-                                                          />
-                                                        </div>
-                                                        {zipCodeAddress.use_api_input_value &&
-                                                          <div className="ss-user-setting__item-bottom">
-                                                            <SelectCustom
-                                                              style={{ width: '90%' }}
-                                                              id="title"
-                                                              value={zipCodeAddress?.use_api_input_value}
-                                                              data={dataInputVar}
-                                                              keyValue="variable_name"
-                                                              nameValue="variable_name"
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'use_api_input_value')}
-                                                            />
-                                                          </div>
-                                                        }
-                                                        <div className="ss-user-setting__item-text_input-use-api-wrapper">
-                                                          <div>
-                                                            <CheckboxCustom
-                                                              label="必須"
-                                                              onChange={() => handleChangeValueRequireZipCode(indexMessageSelect, indexContent, content.type, zipCodeAddress.isCheckRequire === 'require' ? '' : 'require', 'isCheckRequire')}
-                                                              value={zipCodeAddress.isCheckRequire === 'require'}
-                                                              isOnChange={false}
-                                                            />
-                                                          </div>
-                                                          <div className="ss-user-setting__item-text_input-use-api-required">
-                                                            <CheckboxCustom
-                                                              label="全項目必須"
-                                                              onChange={() => handleChangeValueRequireZipCode(indexMessageSelect, indexContent, content.type, zipCodeAddress.isCheckRequire === 'all_items_require' ? '' : 'all_items_require', 'isCheckRequire')}
-                                                              value={zipCodeAddress.isCheckRequire === 'all_items_require'}
-                                                              isOnChange={false}
-                                                            />
-                                                          </div>
-                                                        </div>
-                                                        <div className="ss-user-setting__item-text_input-use-api-wrapper">
-                                                          <CheckboxCustom
-                                                            label="郵便番号を3桁+4桁に分割する"
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'split_postal_code')}
-                                                            value={zipCodeAddress.split_postal_code}
-                                                          />
-                                                        </div>
-                                                        <div className="ss-user-setting__item-text_input-use-api-wrapper">
-                                                          <CheckboxCustom
-                                                            label="市区町村と番地を１フィールドで利用"
-                                                            onChange={value => {
-                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'compact_municipality_and_address')
-                                                              if (value) {
-                                                                onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, false, 'compact_municipality_and_address_and_building_name');
-                                                              }
-                                                            }}
-                                                            value={zipCodeAddress.compact_municipality_and_address}
-                                                          />
-                                                        </div>
-                                                        <div className="ss-user-setting__item-text_input-use-api-wrapper">
-                                                          <CheckboxCustom
-                                                            label="市区町村・番地・建物名を１フィールドで利用"
-                                                            onChange={value => {
-                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'compact_municipality_and_address_and_building_name')
-                                                              if (value) {
-                                                                onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, false, 'compact_municipality_and_address');
-                                                              }
-                                                            }}
-                                                            value={zipCodeAddress.compact_municipality_and_address_and_building_name}
-                                                          />
-                                                        </div>
-                                                      </div>
-                                                      {zipCodeAddress.post_code !== undefined && (
-                                                        zipCodeAddress.split_postal_code === false ?
-                                                          <>
-                                                            <div className="ss-user-setting__item-bottom" style={{gap:'1%'}}>
-                                                              <InputCustom
-                                                                classLabel="ss-custom-label-zip-code"
-                                                                labelValue={zipCodeAddress.post_code_label}
-                                                                onLabelChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'post_code_label')}
-                                                                editableLabel={true}
-                                                                className={"ss-user-setting__item-input-zip-code"}
-                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'post_code')}
-                                                                onClickIcon={() => handleRemoveItemZipCodeAddress(indexMessageSelect, indexContent, content.type, 'post_code')}
-                                                                value={zipCodeAddress.post_code}
-                                                                icon="times-circle"
-                                                                placeholder="000 000"
-                                                                classIcon={"ss-plus-circle-option-icon-times-custom"}
-                                                              />
-
-                                                            </div>
-                                                            {isUseFukushashiki && (
-                                                              <div className="ss-user-setting__item-bottom">
-                                                                <div style={{ width: '16%' }}>
-
-                                                                </div>
-                                                                <div style={{ width: '73%', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                                  <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
-                                                                    <div style={{ flexBasis: '30%', maxWidth: '30%' }}>
-                                                                      <SelectCustom
-                                                                        id="title"
-                                                                        style={{ width: '100%' }}
-                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['post_code_fukushashiki_search_mode']}
-                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'post_code_fukushashiki_search_mode', value)}
-                                                                        data={[
-                                                                          { key: 1, value: 'id' },
-                                                                          { key: 2, value: 'css_selector' },
-                                                                          { key: 3, value: 'xpath' }
-                                                                        ]}
-                                                                        keyValue="key"
-                                                                        placeholder="複写先要素の取得方法をお選びください"
-                                                                      />
-                                                                    </div>
-                                                                  </Tooltip>
-                                                                  <div style={{ flexBasis: '70%', maxWidth: '70%' }}>
-                                                                    <InputCustom
-                                                                      styleLabel={{ width: '100%' }}
-                                                                      maxLength={250}
-                                                                      useFukushashiki={true}
-                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'post_code_fukushashiki_search_value', value)}
-                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['post_code_fukushashiki_search_value']}
-                                                                      placeholder={{
-                                                                        1: '複写先要素のIDを入力ください',
-                                                                        2: '複写先要素のcss_selectorを入力ください',
-                                                                        3: '複写先要素のxPathを入力ください',
-                                                                      }[
-                                                                        dataMessages[indexMessageSelect]?.message_content[indexContent]?.['post_code_fukushashiki_search_mode']
-                                                                      ] || ''}
-                                                                    />
-                                                                  </div>
-                                                                </div>
-                                                                <div style={{ width: '5%' }}>
-                                                                </div>
-                                                              </div>
-                                                            )}
-                                                          </>
-                                                          :
-                                                          <>
-                                                            <div className="ss-user-setting__item-bottom" style={{gap:'1%'}}>
-                                                              <InputCustom
-                                                                classLabel="ss-custom-label-zip-code"
-                                                                labelValue={zipCodeAddress.post_code_label}
-                                                                onLabelChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'post_code_label')}
-                                                                editableLabel={true}
-                                                                className={"ss-user-setting__item-input-zip-code"}
-                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'post_code_left')}
-                                                                value={zipCodeAddress.post_code_left}
-                                                                placeholder="000"
-                                                                style={{ width: '17%', marginRight: '4%' }}
-                                                              />
-                                                              <InputCustom
-                                                                className={"ss-user-setting__item-input-zip-code"}
-                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'post_code_right')}
-                                                                value={zipCodeAddress.post_code_right}
-                                                                placeholder="0000"
-                                                                style={{ width: '20%', marginRight: '31%' }}
-                                                              />
-                                                              <MDBIcon
-                                                                style={{ width: '6%' }}
-                                                                // onClick={onClickIcon}
-                                                                onClick={() => handleRemoveItemZipCodeAddress(indexMessageSelect, indexContent, content.type, 'post_code')}
-                                                                fas
-                                                                icon="times-circle"
-                                                                className={"ss-plus-circle-option-icon-times-custom"}
-                                                              />
-                                                            </div>
-                                                            {isUseFukushashiki && (
-                                                              <>
-                                                                <div className="ss-user-setting__item-bottom">
-                                                                  <div style={{ width: '16%' }}>
-
-                                                                  </div>
-                                                                  <div style={{ width: '73%', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                                    <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
-                                                                      <div style={{ flexBasis: '30%', maxWidth: '30%' }}>
-                                                                        <SelectCustom
-                                                                          id="title"
-                                                                          style={{ width: '100%' }}
-                                                                          value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['post_code_left_fukushashiki_search_mode']}
-                                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'post_code_left_fukushashiki_search_mode', value)}
-                                                                          data={[
-                                                                            { key: 1, value: 'id' },
-                                                                            { key: 2, value: 'css_selector' },
-                                                                            { key: 3, value: 'xpath' }
-                                                                          ]}
-                                                                          keyValue="key"
-                                                                          placeholder="複写先要素の取得方法をお選びください"
-                                                                        />
-                                                                      </div>
-                                                                    </Tooltip>
-                                                                    <div style={{ flexBasis: '70%', maxWidth: '70%' }}>
-                                                                      <InputCustom
-                                                                        styleLabel={{ width: '100%' }}
-                                                                        maxLength={250}
-                                                                        useFukushashiki={true}
-                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'post_code_left_fukushashiki_search_value', value)}
-                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['post_code_left_fukushashiki_search_value']}
-                                                                        placeholder={{
-                                                                          1: '複写先要素のIDを入力ください',
-                                                                          2: '複写先要素のcss_selectorを入力ください',
-                                                                          3: '複写先要素のxPathを入力ください',
-                                                                        }[
-                                                                          dataMessages[indexMessageSelect]?.message_content[indexContent]?.['post_code_left_fukushashiki_search_mode']
-                                                                        ] || ''}
-                                                                      />
-                                                                    </div>
-                                                                  </div>
-                                                                  <div style={{ width: '5%' }}>
-                                                                  </div>
-                                                                </div>
-                                                                <div className="ss-user-setting__item-bottom">
-                                                                  <div style={{ width: '16%' }}>
-
-                                                                  </div>
-                                                                  <div style={{ width: '73%', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                                    <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
-                                                                      <div style={{ flexBasis: '30%', maxWidth: '30%' }}>
-                                                                        <SelectCustom
-                                                                          id="title"
-                                                                          style={{ width: '100%' }}
-                                                                          value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['post_code_right_fukushashiki_search_mode']}
-                                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'post_code_right_fukushashiki_search_mode', value)}
-                                                                          data={[
-                                                                            { key: 1, value: 'id' },
-                                                                            { key: 2, value: 'css_selector' },
-                                                                            { key: 3, value: 'xpath' }
-                                                                          ]}
-                                                                          keyValue="key"
-                                                                          placeholder="複写先要素の取得方法をお選びください"
-                                                                        />
-                                                                      </div>
-                                                                    </Tooltip>
-                                                                    <div style={{ flexBasis: '70%', maxWidth: '70%' }}>
-                                                                      <InputCustom
-                                                                        styleLabel={{ width: '100%' }}
-                                                                        maxLength={250}
-                                                                        useFukushashiki={true}
-                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'post_code_right_fukushashiki_search_value', value)}
-                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['post_code_right_fukushashiki_search_value']}
-                                                                        placeholder={{
-                                                                          1: '複写先要素のIDを入力ください',
-                                                                          2: '複写先要素のcss_selectorを入力ください',
-                                                                          3: '複写先要素のxPathを入力ください',
-                                                                        }[
-                                                                          dataMessages[indexMessageSelect]?.message_content[indexContent]?.['post_code_right_fukushashiki_search_mode']
-                                                                        ] || ''}
-                                                                      />
-                                                                    </div>
-                                                                  </div>
-                                                                  <div style={{ width: '5%' }}>
-                                                                  </div>
-                                                                </div>
-                                                              </>
-
-                                                            )}
-                                                          </>
-                                                      )}
-                                                      {zipCodeAddress.prefecture !== undefined &&
-                                                        <>
-                                                          <div className="ss-user-setting__item-bottom" style={{ flexWrap: 'nowrap', alignItems: 'center', gap: '1%' }}>
-                                                            <input
-                                                              type="text"
-                                                              value={zipCodeAddress.prefecture_label}
-                                                              onChange={(e) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, e.target.value, 'prefecture_label')}
-                                                              className={'ss-editable-label'}
-                                                              style={{ borderRadius: '5px', border: '1px solid gray', padding: '5px', fontSize: '14px', fontWeight: '400', width: '18.5%' }}
-                                                            />
-                                                            {zipCodeAddress.is_use_dropdown ?
-                                                              <SelectCustom
-                                                                style={{ width: '40%' }}
-                                                                id="title"
-                                                                value={zipCodeAddress?.prefecture}
-                                                                data={dataPrefectures}
-                                                                keyValue="name"
-                                                                nameValue="name"
-                                                                placeholder="プレースホルダ"
-                                                                onChange={value => {
-                                                                  if (value) {
-                                                                    onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'prefecture')
-                                                                  } else {
-                                                                    onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, null, 'prefecture')
-                                                                  }
-                                                                }}
-                                                              /> :
-                                                              <InputCustom
-                                                                className={"ss-user-setting__item-input-zip-code"}
-                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'prefecture')}
-                                                                value={zipCodeAddress.prefecture}
-                                                                placeholder={"プレースホルダ"}
-                                                                style={{ width: '40%' }}
-                                                              />
-                                                              // <input
-                                                              //   type="text"
-                                                              //   name="ss-user-setting__item-text_input-use-api"
-                                                              //   className={"ss-input-value ss-user-setting-item ss-user-setting__item-input-zip-code"}
-                                                              //   placeholder={"プレースホルダ"}
-                                                              //   value={zipCodeAddress.prefecture}
-                                                              //   style={{ width: '40%' }}
-                                                              //   onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'prefecture')}
-                                                              // />
-                                                            }
-                                                            <CheckboxCustom
-                                                              label="プルダウンを利用"
-                                                              className="ss-user-setting-custom-width-checkbox"
-                                                              style={{ width: '35%', paddingLeft: '7px', marginBottom: '0px' }}
-                                                              onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_use_dropdown')}
-                                                              value={zipCodeAddress.is_use_dropdown}
-                                                            />
-                                                            <MDBIcon
-                                                              style={{ width: '5%', marginLeft: '3px' }}
-                                                              // onClick={onClickIcon}
-                                                              onClick={() => handleRemoveItemZipCodeAddress(indexMessageSelect, indexContent, content.type, 'prefecture')}
-                                                              fas
-                                                              icon="times-circle"
-                                                              className={"ss-plus-circle-option-icon-times-custom"}
-                                                            />
-                                                          </div>
-                                                          {isUseFukushashiki && (
-                                                            <div className="ss-user-setting__item-bottom">
-                                                              <div style={{ width: '16%' }}>
-
-                                                              </div>
-                                                              <div style={{ width: '73%', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                                <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
-                                                                  <div style={{ flexBasis: '30%', maxWidth: '30%' }}>
-                                                                    <SelectCustom
-                                                                      id="title"
-                                                                      style={{ width: '100%' }}
-                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['prefecture_fukushashiki_search_mode']}
-                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'prefecture_fukushashiki_search_mode', value)}
-                                                                      data={[
-                                                                        { key: 1, value: 'id' },
-                                                                        { key: 2, value: 'css_selector' },
-                                                                        { key: 3, value: 'xpath' }
-                                                                      ]}
-                                                                      keyValue="key"
-                                                                      placeholder="複写先要素の取得方法をお選びください"
-                                                                    />
-                                                                  </div>
-                                                                </Tooltip>
-                                                                <div style={{ flexBasis: '70%', maxWidth: '70%' }}>
-                                                                  <InputCustom
-                                                                    styleLabel={{ width: '100%' }}
-                                                                    maxLength={250}
-                                                                    useFukushashiki={true}
-                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'prefecture_fukushashiki_search_value', value)}
-                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['prefecture_fukushashiki_search_value']}
-                                                                    placeholder={{
-                                                                      1: '複写先要素のIDを入力ください',
-                                                                      2: '複写先要素のcss_selectorを入力ください',
-                                                                      3: '複写先要素のxPathを入力ください',
-                                                                    }[
-                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['prefecture_fukushashiki_search_mode']
-                                                                    ] || ''}
-                                                                  />
-                                                                </div>
-                                                              </div>
-                                                              <div style={{ width: '5%' }}>
-                                                              </div>
-                                                            </div>
-                                                          )}
-                                                        </>
-                                                      }
-                                                      {zipCodeAddress.municipality !== undefined &&
-                                                        <div>
-                                                          <div className="ss-user-setting__item-bottom" style={{gap:'1%'}}>
-                                                            <InputCustom
-                                                              classLabel="ss-custom-label-zip-code"
-                                                              labelValue={zipCodeAddress.municipality_label}
-                                                              onLabelChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'municipality_label')}
-                                                              editableLabel={true}
-                                                              className={"ss-user-setting__item-input-zip-code"}
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'municipality')}
-                                                              onClickIcon={() => handleRemoveItemZipCodeAddress(indexMessageSelect, indexContent, content.type, 'municipality')}
-                                                              value={zipCodeAddress.municipality}
-                                                              icon="times-circle"
-                                                              placeholder="プレースホルダ"
-                                                              classIcon={"ss-plus-circle-option-icon-times-custom"}
-                                                            />
-                                                          </div>
-                                                          {isUseFukushashiki && (
-                                                            <div className="ss-user-setting__item-bottom">
-                                                              <div style={{ width: '16%' }}>
-
-                                                              </div>
-                                                              <div style={{ width: '73%', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                                <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
-                                                                  <div style={{ flexBasis: '30%', maxWidth: '30%' }}>
-                                                                    <SelectCustom
-                                                                      id="title"
-                                                                      style={{ width: '100%' }}
-                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['municipality_fukushashiki_search_mode']}
-                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'municipality_fukushashiki_search_mode', value)}
-                                                                      data={[
-                                                                        { key: 1, value: 'id' },
-                                                                        { key: 2, value: 'css_selector' },
-                                                                        { key: 3, value: 'xpath' }
-                                                                      ]}
-                                                                      keyValue="key"
-                                                                      placeholder="複写先要素の取得方法をお選びください"
-                                                                    />
-                                                                  </div>
-                                                                </Tooltip>
-                                                                <div style={{ flexBasis: '70%', maxWidth: '70%' }}>
-                                                                  <InputCustom
-                                                                    styleLabel={{ width: '100%' }}
-                                                                    maxLength={250}
-                                                                    useFukushashiki={true}
-                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'municipality_fukushashiki_search_value', value)}
-                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['municipality_fukushashiki_search_value']}
-                                                                    placeholder={{
-                                                                      1: '複写先要素のIDを入力ください',
-                                                                      2: '複写先要素のcss_selectorを入力ください',
-                                                                      3: '複写先要素のxPathを入力ください',
-                                                                    }[
-                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['municipality_fukushashiki_search_mode']
-                                                                    ] || ''}
-                                                                  />
-                                                                </div>
-                                                              </div>
-                                                              <div style={{ width: '5%' }}>
-                                                              </div>
-                                                            </div>
-                                                          )}
-                                                        </div>
-                                                      }
-                                                      {zipCodeAddress.address !== undefined && !zipCodeAddress.compact_municipality_and_address_and_building_name && !zipCodeAddress.compact_municipality_and_address &&
-                                                        <>
-                                                          <div className="ss-user-setting__item-bottom" style={{gap: '1%'}}>
-                                                            <InputCustom
-                                                              classLabel="ss-custom-label-zip-code"
-                                                              labelValue={zipCodeAddress.address_label}
-                                                              onLabelChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'address_label')}
-                                                              editableLabel={true}
-                                                              className={"ss-user-setting__item-input-zip-code"}
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'address')}
-                                                              onClickIcon={() => handleRemoveItemZipCodeAddress(indexMessageSelect, indexContent, content.type, 'address')}
-                                                              value={zipCodeAddress.address}
-                                                              icon="times-circle"
-                                                              placeholder="プレースホルダ"
-                                                              classIcon={"ss-plus-circle-option-icon-times-custom"}
-                                                            />
-                                                          </div>
-                                                          {isUseFukushashiki && (
-                                                            <div className="ss-user-setting__item-bottom">
-                                                              <div style={{ width: '16%' }}>
-
-                                                              </div>
-                                                              <div style={{ width: '73%', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                                <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
-                                                                  <div style={{ flexBasis: '30%', maxWidth: '30%' }}>
-                                                                    <SelectCustom
-                                                                      id="title"
-                                                                      style={{ width: '100%' }}
-                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['address_fukushashiki_search_mode']}
-                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'address_fukushashiki_search_mode', value)}
-                                                                      data={[
-                                                                        { key: 1, value: 'id' },
-                                                                        { key: 2, value: 'css_selector' },
-                                                                        { key: 3, value: 'xpath' }
-                                                                      ]}
-                                                                      keyValue="key"
-                                                                      placeholder="複写先要素の取得方法をお選びください"
-                                                                    />
-                                                                  </div>
-                                                                </Tooltip>
-                                                                <div style={{ flexBasis: '70%', maxWidth: '70%' }}>
-                                                                  <InputCustom
-                                                                    styleLabel={{ width: '100%' }}
-                                                                    maxLength={250}
-                                                                    useFukushashiki={true}
-                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'address_fukushashiki_search_value', value)}
-                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['address_fukushashiki_search_value']}
-                                                                    placeholder={{
-                                                                      1: '複写先要素のIDを入力ください',
-                                                                      2: '複写先要素のcss_selectorを入力ください',
-                                                                      3: '複写先要素のxPathを入力ください',
-                                                                    }[
-                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['address_fukushashiki_search_mode']
-                                                                    ] || ''}
-                                                                  />
-                                                                </div>
-                                                              </div>
-                                                              <div style={{ width: '5%' }}>
-                                                              </div>
-                                                            </div>
-                                                          )}
-                                                        </>
-                                                      }
-                                                      {zipCodeAddress.building_name !== undefined && !zipCodeAddress.compact_municipality_and_address_and_building_name &&
-                                                        <>
-                                                          <div className="ss-user-setting__item-bottom" style ={{gap: '1%'}}>
-                                                            <InputCustom
-                                                              classLabel="ss-custom-label-zip-code"
-                                                              labelValue={zipCodeAddress.building_name_label}
-                                                              onLabelChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'building_name_label')}
-                                                              editableLabel={true}
-                                                              className={"ss-user-setting__item-input-zip-code"}
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'building_name')}
-                                                              value={zipCodeAddress.building_name}
-                                                              icon="times-circle"
-                                                              onClickIcon={() => handleRemoveItemZipCodeAddress(indexMessageSelect, indexContent, content.type, 'building_name')}
-                                                              placeholder="プレースホルダ"
-                                                              classIcon={"ss-plus-circle-option-icon-times-custom"}
-                                                            />
-                                                          </div>
-                                                          {isUseFukushashiki && (
-                                                            <div className="ss-user-setting__item-bottom">
-                                                              <div style={{ width: '16%' }}>
-
-                                                              </div>
-                                                              <div style={{ width: '73%', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                                <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
-
-                                                                  <div style={{ flexBasis: '30%', maxWidth: '30%' }}>
-                                                                    <SelectCustom
-                                                                      id="title"
-                                                                      style={{ width: '100%' }}
-                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['building_name_fukushashiki_search_mode']}
-                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'building_name_fukushashiki_search_mode', value)}
-                                                                      data={[
-                                                                        { key: 1, value: 'id' },
-                                                                        { key: 2, value: 'css_selector' },
-                                                                        { key: 3, value: 'xpath' }
-                                                                      ]}
-                                                                      keyValue="key"
-                                                                      placeholder="複写先要素の取得方法をお選びください"
-                                                                    />
-                                                                  </div>
-                                                                </Tooltip>
-                                                                <div style={{ flexBasis: '70%', maxWidth: '70%' }}>
-                                                                  <InputCustom
-                                                                    styleLabel={{ width: '100%' }}
-                                                                    maxLength={250}
-                                                                    useFukushashiki={true}
-                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'building_name_fukushashiki_search_value', value)}
-                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['building_name_fukushashiki_search_value']}
-                                                                    placeholder={{
-                                                                      1: '複写先要素のIDを入力ください',
-                                                                      2: '複写先要素のcss_selectorを入力ください',
-                                                                      3: '複写先要素のxPathを入力ください',
-                                                                    }[
-                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['building_name_fukushashiki_search_mode']
-                                                                    ] || ''}
-                                                                  />
-                                                                </div>
-                                                              </div>
-                                                              <div style={{ width: '5%' }}>
-                                                              </div>
-                                                            </div>
-                                                          )}
-                                                        </>
-                                                      }
-                                                    </React.Fragment>
+                                                    <ZipCodeAddressSetting
+                                                      indexMessageSelect={indexMessageSelect}
+                                                      indexContent={indexContent}
+                                                      contentType={content.type}
+                                                      zipCodeAddress={zipCodeAddress}
+                                                      dataMessages={dataMessages}
+                                                      setDataMessages={setDataMessages}
+                                                      dataInputVar={dataInputVar}
+                                                      dataPrefectures={dataPrefectures}
+                                                      isUseFukushashiki={isUseFukushashiki}
+                                                      setIsOpenAddVariable={setIsOpenAddVariable}
+                                                      onChangeValueMessageContent={onChangeValueMessageContent}
+                                                      handleRemoveItemZipCodeAddress={handleRemoveItemZipCodeAddress}
+                                                      renderRootFaqOption={renderRootFaqOption}
+                                                    />
                                                   )}
                                                   {/* user: type = 'attaching_file' */}
                                                   {content.type === 'attaching_file' && (
@@ -15355,7 +14770,6 @@ const Scenario = () => {
                                 <select
                                   name="ss-user-setting__select-type"
                                   id="ss-user-setting__select-type"
-                                  defaultValue={'text_input'}
                                   onChange={(e) => setMessageType(e.target.value)}
                                   className="ss-input-value"
                                   value={messageType}
@@ -15410,7 +14824,18 @@ const Scenario = () => {
                                     setDataMessages([...dataMessages]);
                                   }}
                                 />
-                                <div style={{ width: '25%' }}>
+                                <div style={{ width: '100%' }}>
+                                  <CheckboxCustom
+                                    label="このボタンを利用しない"
+                                    onChange={(value) => {
+                                      dataMessages[indexMessageSelect].not_use_button = value;
+                                      setDataMessages([...dataMessages]);
+                                    }}
+                                    value={dataMessages[indexMessageSelect].not_use_button}
+
+                                  />
+                                </div>
+                                <div style={{ width: '100%' }}>
                                   <CheckboxCustom
                                     label="JavaScriptの利用"
                                     onChange={(value) => {

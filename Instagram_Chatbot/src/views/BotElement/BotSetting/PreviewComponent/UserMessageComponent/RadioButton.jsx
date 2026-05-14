@@ -3,7 +3,7 @@ import "assets/css/bot/preview-chat-bot.css";
 import { MESSAGE_CONTENT_TYPES } from "views/BotElement/BotSetting/PreviewComponent/Constants";
 import OptionGender from "./OptionGender";
 
-export default function RadioButton({ content, disabled, onChangeValue, errors, contentIndex, messageIndex }) {
+export default function RadioButton({ content, disabled, onChangeValue, errors, contentIndex, messageIndex, notUseButtonNext, onClickNext }) {
   if (content.type !== MESSAGE_CONTENT_TYPES.RADIO_BUTTON) return null;
 
   const radioButton = content.radio_button;
@@ -30,6 +30,12 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
     );
   };
 
+  const onClickRadioButton = (value) => {
+    if (value === radioButton.initial_selection && notUseButtonNext) {
+      onClickNext();
+    }
+  };
+
   const renderDefaultContent = () => {
     if (radioButton.use_as_gender)
       return <OptionGender 
@@ -51,6 +57,7 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
             id={`ss-message__content--user-radio_button_${messageIndex}_${item.value}`}
             name={`ss-message__content--user-radio_button--radio_button_img_msg${messageIndex}_content${contentIndex}_${content.type}`}
             checked={radioButton.initial_selection === item.value}
+            onClick={() => onClickRadioButton(item.value)}
             onChange={() => {
               onChangeValue(
                 contentIndex,
@@ -58,7 +65,7 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
                 item.value,
                 "initial_selection"
               );
-              // if (messageContent.length === 1) onClickNext();
+              if (notUseButtonNext) setTimeout(() => onClickNext(), 200);
             }}
           />
           {item.text && (
@@ -84,6 +91,7 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
             name={`ss-message__content--user-radio_button--radio_button_img_msg${messageIndex}_content${contentIndex}_${content.type}`}
             id="ss-message__content--user-radio_button--radio_button_img"
             checked={radioButton.initial_selection === item.value}
+            onClick={() => onClickRadioButton(item.value)}
             onChange={() => {
               onChangeValue(
                 contentIndex,
@@ -91,7 +99,7 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
                 item.value,
                 "initial_selection"
               );
-              // if (messageContent.length === 1) onClickNext();
+              if (notUseButtonNext) setTimeout(() => onClickNext(), 200);
             }}
           />
           <img src={item.img} alt="" />

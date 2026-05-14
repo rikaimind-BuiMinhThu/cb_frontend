@@ -335,6 +335,8 @@ const UserMessage = ({
           errors={errors}
           contentIndex={contentIndex}
           messageIndex={messageIndex}
+          onClickNext={onClickNext}
+          notUseButtonNext={message.not_use_button}
         />;
       case MESSAGE_CONTENT_TYPES.CHECKBOX:
         return <Checkbox
@@ -356,6 +358,7 @@ const UserMessage = ({
           prefecturesList={prefecturesList}
           lpOptionData={lpOptionData}
           postMessageToParent={postMessageToParent}
+          hidden={message.hidden}
         />;
       case MESSAGE_CONTENT_TYPES.ZIP_CODE_ADDRESS:
         return <ZipCodeAddress

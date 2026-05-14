@@ -6,6 +6,7 @@ import {
   GET_CAPTCHA_PATH,
   CONVERSION_RESPONSE_SUBMIT_TYPE,
   CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE,
+  MESSAGE_CONTENT_TYPES,
 } from "./Constants";
 
 const toNumber = (value, fallback = 0) => {
@@ -634,6 +635,10 @@ export const isDelayBotMessage = (message) => {
 
 export const isUserMessage = (message) => {
   return message.belong_to === 'user' && message.message_content.length > 0;
+}
+
+export const isCreditCardPaymentMessage = (message) => {
+  return message.message_content.some(content => content.type === MESSAGE_CONTENT_TYPES.CREDIT_CARD_PAYMENT);
 }
 
 export const isTempDelay = (message, prefix) => {
