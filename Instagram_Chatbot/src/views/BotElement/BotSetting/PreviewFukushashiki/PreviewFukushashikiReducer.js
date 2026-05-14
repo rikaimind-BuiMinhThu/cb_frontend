@@ -5,7 +5,8 @@ import {
   checkMessageCondition, 
   processMessagesForErrorState, 
   isTempDelay,
-  buildConditionParams
+  buildConditionParams,
+  isCreditCardPaymentMessage,
 } from '../PreviewComponent/Utils';
 import { processForBotMessage } from '../PreviewComponent/BotMessageUtils';
 import { processForUserMessage } from '../PreviewComponent/UserMessageUtils';
@@ -14,6 +15,7 @@ import { mapAmazonPayDataToMessagesList } from '../PreviewComponent/TorizenUtils
 import { mapAmazonPayDataToMessagesListForBliss } from '../PreviewComponent/BlissUtils';
 import { mapAmazonPayDataToMessagesListForRoseMay } from '../PreviewComponent/RoseMayUtils';
 import { mapAmazonPayDataToMessagesListForPhystech } from '../PreviewComponent/PhysTechUtils';
+import { mapAmazonPayDataToMessagesListForYuwaeru, isYuwaeruLP } from '../PreviewComponent/YuwaeruUtils';
 import {
   RENDER_CHATBOT_CONFIG,
   GETTING_ERROR_NOTIFICATION,
@@ -25,9 +27,38 @@ import {
   MESSAGE_CONTENT_TYPES,
 } from '../PreviewComponent/Constants.jsx';
 import { getDefaultValue } from '../PreviewComponent/VariablesUtils';
+import { convertToFukushashikiObject } from './FukushashikiDataConverterUtils';
+import { fukushashikiToLP } from './LPUtils';
 
 const PreviewFukushashikiReducer = (state, action) => {
   switch (action.type) {
+    case PREVIEW_ACTIONS.UPDATE_CREDIT_CARD_FORM: {
+      // For yuwaeru lp, when update payment method message, we need to check and update hidden for credit card payment message
+      if (action.payload.hidden === undefined || action.payload.hidden === null) return state;
+
+      const newMessagesList = _.cloneDeep(state.messagesList).map(message => {
+        if (isCreditCardPaymentMessage(message)) {
+          message.hidden = action.payload.hidden;
+          if (!action.payload.hidden) {
+            const data = {
+              scenario_id: state.scenarioId,
+              message: message,
+              user_id: state.uuid,
+              bot_type: "web"
+            };
+            const fukuData = convertToFukushashikiObject(data);
+            fukushashikiToLP(fukuData, state);
+          }
+        }
+        return message;
+      });
+      return {
+        ...state,
+        messagesList: newMessagesList,
+        renderMessagesList: newMessagesList.slice(0, state.currentMsgIndex + 1),
+      };
+    }
+      
     case PREVIEW_ACTIONS.UPDATE_MULTI_STATE:
       if (action.payload.removeTempDelay && action.payload.renderMessagesList?.length) {
         action.payload.renderMessagesList = action.payload.renderMessagesList?.filter(m => {
@@ -256,6 +287,10 @@ const PreviewFukushashikiReducer = (state, action) => {
       const newMessagesListForPhystech = mapAmazonPayDataToMessagesListForPhystech(action.payload, state.messagesList, state.prefecturesList);
       const renderMessagesListForPhystech = newMessagesListForPhystech.slice(0, state.currentMsgIndex + 1);
       return { ...state, messagesList: newMessagesListForPhystech, renderMessagesList: renderMessagesListForPhystech};
+    case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
+      const newMessagesListForYuwaeru = mapAmazonPayDataToMessagesListForYuwaeru(action.payload, state.messagesList, state.prefecturesList);
+      const renderMessagesListForYuwaeru = newMessagesListForYuwaeru.slice(0, state.currentMsgIndex + 1);
+      return { ...state, messagesList: newMessagesListForYuwaeru, renderMessagesList: renderMessagesListForYuwaeru};
     case PREVIEW_ACTIONS.UPDATE_AFTER_CHANGE_VALUE: {
       const { contentIndex, contentType, value, field, subField1, subField2, message } = action.payload;
       const newState = {
@@ -435,7 +470,7 @@ const PreviewFukushashikiReducer = (state, action) => {
     case PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SESSION_STORAGE: {
       const newState = {...action.payload.savedState};
 
-      if (action.payload.isUsingAmazonPay) {
+      if (action.payload.isUsingAmazonPay || isYuwaeruLP(newState.urlReceive)) {
         // Support only for amazon pay and subscstore cart system (torizen san)
         const conditionParams = buildConditionParams(newState);
         for (let i = 0; i < newState.messagesList.length; i++) {

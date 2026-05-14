@@ -43,8 +43,9 @@ const InputCustom = ({
   };
 
   const renderWithClearIcon = () => {
+    const {width, ...containerStyleWithoutWidth} = containerStyle || {};
     return (
-      <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', width: '100%', ...containerStyle }}>
+      <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', width: width || '100%', ...containerStyleWithoutWidth }}>
         <input
           {...props}
           id={id}
@@ -100,8 +101,9 @@ const InputCustom = ({
   };
 
   const renderWithoutClearIcon = () => {
+    const {width, ...containerStyleWithoutWidth} = containerStyle || {};
     return (
-      <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', width: '100%', ...containerStyle }}>
+      <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', width: width || '100%', ...containerStyleWithoutWidth }}>
         <input
           {...props}
           id={id}

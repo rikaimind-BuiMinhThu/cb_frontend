@@ -4,6 +4,7 @@ import { isTorizenLpAmazonData, isTorizenLP } from "../PreviewComponent/TorizenU
 import { isBlissLpAmazonData, isBlissLP } from "../PreviewComponent/BlissUtils";
 import { isPhystechLpAmazonData, isPhystechLP } from "../PreviewComponent/PhysTechUtils";
 import { isRoseMayLpAmazonData, isRoseMayLP } from "../PreviewComponent/RoseMayUtils";
+import { isYuwaeruLpAmazonData, isYuwaeruLP } from "../PreviewComponent/YuwaeruUtils";
 import { convertToFukushashikiObject } from "./FukushashikiDataConverterUtils";
 import { isUserMessage, sendOpenChatbotCountRequest } from "../PreviewComponent/Utils";
 
@@ -59,6 +60,8 @@ const fukushashikiSavedStateToLp = (savedState, params, state) => {
         if (isPhystechLP(lpUrl) && isPhystechLpAmazonData(message)) return;
         // For RoseMay
         if (isRoseMayLP(lpUrl) && isRoseMayLpAmazonData(message)) return;
+        // For Yuwaeru
+        if (isYuwaeruLP(lpUrl) && isYuwaeruLpAmazonData(message)) return;
       }
 
       if (!message.hidden) {

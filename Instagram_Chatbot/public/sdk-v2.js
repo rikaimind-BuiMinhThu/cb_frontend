@@ -152,6 +152,8 @@ function wrapWithErrorHandling(fn, fnName) {
   };
 }
 
+const WAIT_TO_LOAD_AMAZON_DATA_MAX_COUNT = 20;
+
 const CHATBOT_ACTIONS = {
   CLICK_BUTTON: 'clickButton',
   EXCUTE_JS: 'excuteJS',
@@ -412,13 +414,109 @@ const sendMessageToChatbot = (contentMessage, action) => {
   globalIframe.contentWindow.postMessage(data, "*");
 }
 
+const waitToLoadAmazonSubscstore = (iframe) => {
+  // torizen san, subscstore
+  const amazonCheckSessionId = getParam('amazonCheckoutSessionId');
+  if (amazonCheckSessionId) {
+    iframe.src += `&is_using_amazon_pay=true`;
+    // only for subscstore cart system, torizen san
+    // loop for waiting data is filled to lp form
+    let count = 0;
+    const interval = setInterval(() => {
+      const isTorizenLpAmazonDataFilled = document.querySelector("input#jsUkProfileFamilyName")?.value;
+      if (isTorizenLpAmazonDataFilled && count < WAIT_TO_LOAD_AMAZON_DATA_MAX_COUNT) {
+        appendIframeToBody(iframe);
+        clearInterval(interval);
+      }
+      count++;
+      if (count >= WAIT_TO_LOAD_AMAZON_DATA_MAX_COUNT) {
+        // Not Amazon Pay
+        appendIframeToBody(iframe);
+        clearInterval(interval);
+      }
+    }, 200);
+    return;
+  }
+  appendIframeToBody(iframe);
+}
+
+const loadIframeForW2Repeat = (iframe) => {
+  const isDisplayCoupon = !!document.querySelector("input#ctl00_ContentPlaceHolder1_ucInputForm_rCartList_ctl00_tbCouponCode");
+  if (isDisplayCoupon) {
+    iframe.src += `&is_display_coupon=true`;
+  }
+  const isDisplayPasswordInput = !!document.querySelector("input#ctl00_ContentPlaceHolder1_ucInputForm_rCartList_ctl00_tbUserPassword");
+  if (isDisplayPasswordInput) {
+    iframe.src += `&is_display_password_input=true`;
+  }
+  const isDisplayCreditCardInput = !!document.querySelector("input#ctl00_ContentPlaceHolder1_ucInputForm_rCartList_ctl00_rPayment_ctl00_tbCreditCardNo1");
+  if (!isDisplayCreditCardInput) {
+    iframe.src += `&is_display_credit_card_input=false`;
+  }
+  const isDisplayNameInput = !!document.querySelector("input#ctl00_ContentPlaceHolder1_ucInputForm_rCartList_ctl00_tbOwnerName1");
+  if (!isDisplayNameInput) {
+    iframe.src += `&is_display_display_name_input=false`;
+  }
+  waitToLoadAmazonW2Repeat(iframe);
+}
+
+const waitToLoadAmazonW2Repeat = (iframe) => {
+  const injectAmazon = () => {
+    iframe.src += `&is_using_amazon_pay=true`;
+    // only for w2_repeat cart system, yuwaeru san
+    // loop for waiting data is filled to lp form
+    let count = 0;
+    const interval = setInterval(() => {
+      const isYuwaeruLpAmazonDataFilled = document.querySelector("input#ctl00_ContentPlaceHolder1_ucInputForm_rCartList_ctl00_tbOwnerName1")?.value;
+      if (isYuwaeruLpAmazonDataFilled && count < WAIT_TO_LOAD_AMAZON_DATA_MAX_COUNT) {
+        appendIframeToBody(iframe);
+        clearInterval(interval);
+        clearInterval(interval);
+      }
+      count++;
+
+      if (count >= WAIT_TO_LOAD_AMAZON_DATA_MAX_COUNT) {
+        // Not Amazon Pay
+        appendIframeToBody(iframe);
+        clearInterval(interval);
+      }
+    }, 200);
+  }
+
+  // Yuwaeru san, w2_repeat
+  const amazonCheckSessionId = getParam('amazonCheckoutSessionId');
+
+  if (amazonCheckSessionId) {
+    injectAmazon();
+    return;
+  }
+
+  let try_times = 0;
+  const interval = setInterval(() => {
+    if (try_times >= WAIT_TO_LOAD_AMAZON_DATA_MAX_COUNT) {
+      clearInterval(interval);
+      appendIframeToBody(iframe);
+      return;
+    }
+    try_times++;
+
+    // Wait for cancel Amazon Pay button is displayed
+    const isUsingAmazonPay = !!document.querySelector("#ctl00_ContentPlaceHolder1_ucInputForm_lbCancelAmazonPay");
+    if (isUsingAmazonPay) {
+      injectAmazon();
+      clearInterval(interval);
+      return;
+    }
+  }, 200);
+}
+
 const waitToLoadAmazonEcForce = (iframe) => {
   let count = 0;
   const interval = setInterval(() => {
     const amazonPayMethodElement = document.querySelector("#amazon_payment_method");
     const name1Value = document.querySelector("input#order_shipping_address_attributes_name1")?.value;
 
-    if (amazonPayMethodElement && name1Value && count < 20) {
+    if (amazonPayMethodElement && name1Value && count < WAIT_TO_LOAD_AMAZON_DATA_MAX_COUNT) {
       iframe.src += `&is_using_amazon_pay=true`;
       const isEnableEmailInput = !document.querySelector("input#email")?.disabled;
       if (isEnableEmailInput) {
@@ -433,7 +531,7 @@ const waitToLoadAmazonEcForce = (iframe) => {
     }
     count++;
 
-    if (count >= 20) {
+    if (count >= WAIT_TO_LOAD_AMAZON_DATA_MAX_COUNT) {
       // Not Amazon Pay
       appendIframeToBody(iframe);
       clearInterval(interval);
@@ -472,6 +570,30 @@ const isPhystechLp = (url) => {
 
   return domains.some(domain => url.includes(domain));
 }
+
+const isTorizenLP = (url) => {
+  const torizenDomains = [
+    // Comment out if you want to test torizen in localhost
+    // "localhost:8000",
+    // "commerceforce.co.jp",
+    "hana.inuneko-sukoyaka.jp",
+    "sb.inuneko-sukoyaka.jp"
+  ];
+
+  return torizenDomains.some(domain => url.includes(domain));
+}
+
+const isYuwaeruLP = (url) => {
+  const domains = [
+    // Comment out if you want to test yuwaeru in localhost
+    // "localhost:8000",
+    // "commerceforce.co.jp",
+    "store.nekase-genmai.com",
+  ];
+
+  return domains.some(domain => url.includes(domain));
+}
+
 const displayPopup = async () => {
   const device =
     !tabletCheck() && !mobileCheck()
@@ -531,22 +653,11 @@ const displayPopup = async () => {
 
   // only for amazon
   // add param amazonCheckoutSessionId to iframe src
-  const isTorizenLpUseAmazonPay = getParam('amazonCheckoutSessionId');
 
-  if (isTorizenLpUseAmazonPay) {
-    iframe.src += `&is_using_amazon_pay=true`;
-    // only for subscstore cart system, torizen san
-    // loop for waiting data is filled to lp form
-    // wait 20 times
-    let count = 0;
-    const interval = setInterval(() => {
-      const isTorizenLpAmazonDataFilled = document.querySelector("input#jsUkProfileFamilyName")?.value;
-      if (isTorizenLpAmazonDataFilled  && count < 20) {
-        appendIframeToBody(iframe);
-        clearInterval(interval);
-      }
-      count++;
-    }, 200);
+  if (isTorizenLP(window.location.href)) {
+    waitToLoadAmazonSubscstore(iframe);
+  } else if (isYuwaeruLP(window.location.href)) {
+    loadIframeForW2Repeat(iframe);
   } else if (isBlissLp(window.location.href) || isPhystechLp(window.location.href) || isRoseMayLp(window.location.href)) {
     waitToLoadAmazonEcForce(iframe);
   } else {
@@ -716,15 +827,21 @@ const excuteJSCode = (jscode) => {
   func();
 }
 
-const extractSelectOptions = (selectElement) => {
+const extractSelectOptions = (selectElement, options = {}) => {
   if (!selectElement || selectElement.tagName !== "SELECT") return null;
 
-  return Array.from(selectElement.options)
+  const result = Array.from(selectElement.options)
     .map((option, index) => ({
       id: index + 1,
-      text: option.innerText,
+      text: option.innerText || '指定なし',
       value: option.value || 'NULL_OPTION'
     }));
+
+  if (options.dontDisplayEmptyOption) {
+    return result.filter(option => option.value !== 'NULL_OPTION');
+  }
+
+  return result;
 }
 
 const extractFromJs = async (options) => {
@@ -991,6 +1108,7 @@ const setRadioValue = (element, value) => {
   selectedRadio.checked = true;
   selectedRadio.dispatchEvent(new Event('input', { bubbles: true }));
   selectedRadio.dispatchEvent(new Event('change', { bubbles: true }));
+  selectedRadio.click();
 };
 
 const getUser = async (url, datacount) => {

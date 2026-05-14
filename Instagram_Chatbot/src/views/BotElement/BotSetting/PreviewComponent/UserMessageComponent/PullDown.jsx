@@ -14,7 +14,7 @@ import { tokenExpired } from "api/tokenExpired";
 import LPIntegrationOptionPullDown from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/LPIntegrationOptionPullDown";
 import SelectCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/SelectCustom";
 
-export default function PullDown({ content, errors, contentIndex, messageIndex, disabled, onChangeValue, prefecturesList, lpOptionData, postMessageToParent }) {
+export default function PullDown({ content, errors, contentIndex, messageIndex, disabled, onChangeValue, prefecturesList, lpOptionData, postMessageToParent, hidden }) {
   const [cityOptions, setCityOptions] = useState([]);
 
   if (content.type !== MESSAGE_CONTENT_TYPES.PULL_DOWN) return null;
@@ -497,6 +497,7 @@ export default function PullDown({ content, errors, contentIndex, messageIndex, 
         postMessageToParent={postMessageToParent}
         keyValue="value"
         nameValue="text"
+        hidden={hidden}
         onChange={(value) =>
           onChangeValue(
             contentIndex,

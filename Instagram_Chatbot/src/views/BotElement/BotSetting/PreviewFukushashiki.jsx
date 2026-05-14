@@ -32,6 +32,7 @@ import {
   MESSAGE_CONTENT_TYPES,
   CONVERSION_RESPONSE_SUBMIT_TYPE,
   CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE,
+  DISPLAY_TYPES,
 } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
@@ -143,7 +144,7 @@ const previewInitialState = {
   buttonTypeSp: "1",
   rightMarginPc: 10,
   bottomMarginPc: 10,
-  displayType: 1,
+  displayType: null,
   rightSpTitle: "",
   rightMarginSp: 10,
   bottomMarginSp: 10,
@@ -270,6 +271,11 @@ const PreviewFukushashiki = () => {
     const actionData = event.data.actionData;
 
     switch (event.data.action) {
+      case CHATBOT_ACTIONS.UPDATE_CREDIT_CARD_FORM:
+        return dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_CREDIT_CARD_FORM,
+          payload: actionData,
+        });
       case CHATBOT_ACTIONS.CRAWL_DATA:
         let receiveOptionData = {};
         receiveOptionData[actionData.searchAddress] = actionData.result;
@@ -329,6 +335,11 @@ const PreviewFukushashiki = () => {
       case CHATBOT_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_PHYSTECH:
         return dispatch({
           type: PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_PHYSTECH,
+          payload: actionData,
+        });
+      case CHATBOT_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
+        return dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU,
           payload: actionData,
         });
 
@@ -541,7 +552,7 @@ const PreviewFukushashiki = () => {
   useEffect(() => {
     if (
       state.loadedStateFromSession &&
-      state.displayType === 1 &&
+      state.displayType === DISPLAY_TYPES.RELOAD &&
       !state.isOpen &&
       state.messagesList.length > 0 &&
       state.botInfor &&
@@ -783,7 +794,7 @@ const PreviewFukushashiki = () => {
 
     const prevOpenStatus = getPrevOpenStatus();
 
-    if (designSetting.display_type == 1 && prevOpenStatus == "0") {
+    if (designSetting.display_type == DISPLAY_TYPES.RELOAD && prevOpenStatus == "0") {
       savePrevOpenStatus("1");
       sendOpenChatbotCountRequest(state.scenarioId, state.deviceReceive);
     }
@@ -1020,7 +1031,7 @@ const PreviewFukushashiki = () => {
   const renderNextButton = (message, messageIndex) => {
     const isUpdate = messageIndex >= state.renderMessagesList.length - 1;
     const firstMsgContent = message?.message_content?.[0];
-    const isDisplayBtnNext = firstMsgContent?.type != "image" || firstMsgContent?.image?.displayButtonNext != false;
+    const isDisplayBtnNext = (firstMsgContent?.type != "image" && !message.not_use_button) || (firstMsgContent?.type == "image" && firstMsgContent?.image?.displayButtonNext != false);
     const isAutoClick = !isDisplayBtnNext && isUpdate;
 
     if (!message || message.belong_to !== "user") return null;
@@ -1186,8 +1197,11 @@ const PreviewFukushashiki = () => {
     };
   };
 
+
+  if (!state.scenarioId || !state.botInfor || state.displayType === null) return null;
+
   // body container
-  if (state.scenarioId && state.botInfor && state.isOpen) {
+  if (state.isOpen) {
     const { containerStyle, headerStyle, bodyStyle } = getOpeningBotStyle();
     return (
       <div
@@ -1263,7 +1277,9 @@ const PreviewFukushashiki = () => {
         </div>
       </div>
     )
-  } else if (!state.isOpen && isMobile() === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 2) {
+  } else if (state.displayType === DISPLAY_TYPES.HIDDEN) {
+    return null;
+  } else if (isMobile() === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 2) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -1287,7 +1303,7 @@ const PreviewFukushashiki = () => {
         />
       </div>
     )
-  } else if (!state.isOpen && isMobile() === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 1) {
+  } else if (isMobile() === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 1) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -1323,7 +1339,7 @@ const PreviewFukushashiki = () => {
         </div>
       </div>
     )
-  } else if (!state.isOpen && isMobile() === false && Number(state.positionPc) === 2) {
+  } else if (isMobile() === false && Number(state.positionPc) === 2) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -1373,7 +1389,7 @@ const PreviewFukushashiki = () => {
         />
       </div>
     )
-  } else if (!state.isOpen && isMobile() === true && Number(state.positionSp) === 1 && Number(state.buttonTypeSp) === 1) {
+  } else if (isMobile() === true && Number(state.positionSp) === 1 && Number(state.buttonTypeSp) === 1) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -1408,7 +1424,7 @@ const PreviewFukushashiki = () => {
         </div>
       </div>
     )
-  } else if (!state.isOpen && isMobile() === true && Number(state.positionSp) === 2) {
+  } else if (isMobile() === true && Number(state.positionSp) === 2) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
