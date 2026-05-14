@@ -12,6 +12,11 @@ function Instagram() {
     meta2.name = "description";
     meta2.content = "ecchatbot,チャットボット,efo,cv増加,ltv最大化,web接客,ECチャットボット,ec,Entry Form Optimization,Form, Chat,フォーム入力, コンバージョン,Conversion,資料請求,会員登録,予約,お見積もり,求人,お申し込み,フォーム,lead generation,リードジェネレーション,新規顧客獲得,資料請求,予約,電子決済,カゴ落ち";
     document.getElementsByTagName('head')[0].appendChild(meta2);
+    const icon = document.querySelector("link[rel*='icon']") || document.createElement('link');
+    icon.rel = 'shortcut icon';
+    icon.href = `https://deel.co.jp/ec-chatbot/Instagram/img/faa.JPG?v=${Date.now()}`;
+    head.appendChild(icon);
+    document.title="ECチャットボット｜D2C・EC・単品通販のInstagramのチャットボットならECインスタボット（EC INSTABOT）";
     console.log(head)
   }, []);
 
