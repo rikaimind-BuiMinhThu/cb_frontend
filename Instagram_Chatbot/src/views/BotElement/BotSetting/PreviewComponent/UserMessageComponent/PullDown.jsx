@@ -42,12 +42,13 @@ export default function PullDown({ content, errors, contentIndex, messageIndex, 
 
   const renderYearSelect = (additionalProps = {}) => {
     const valueKey = additionalProps.valueKey || "valueYear";
+    const className = additionalProps.className || "w-32-percent";
     return (
       <SelectCustom
         disabled={disabled}
         data={yearOptions}
         placeholder="年"
-        className={`w-32-percent ${additionalProps.className}`}
+        className={className}
         onChange={(value) =>
           onChangeValue(
             contentIndex,
@@ -64,12 +65,13 @@ export default function PullDown({ content, errors, contentIndex, messageIndex, 
 
   const renderMonthSelect = (additionalProps = {}) => {
     const valueKey = additionalProps.valueKey || "valueMonth";
+    const className = additionalProps.className || "w-32-percent";
     return (
       <SelectCustom
         disabled={disabled}
         data={MONTH_DEFAULT_OPTIONS}
         placeholder="月"
-        className={`w-32-percent ${additionalProps.className}`}
+        className={className}
         onChange={(value) =>
           onChangeValue(
             contentIndex,
@@ -86,12 +88,13 @@ export default function PullDown({ content, errors, contentIndex, messageIndex, 
 
   const renderDaySelect = (additionalProps = {}) => {
     const valueKey = additionalProps.valueKey || "valueDay";
+    const className = additionalProps.className || "w-32-percent";
     return (
       <SelectCustom
         disabled={disabled}
         data={DAY_DEFAULT_OPTIONS}
         placeholder="日"
-        className={`w-32-percent ${additionalProps.className}`}
+        className={className}
         onChange={(value) =>
           onChangeValue(
             contentIndex,
@@ -359,6 +362,8 @@ export default function PullDown({ content, errors, contentIndex, messageIndex, 
   };
 
   const renderDateYmd = () => {
+    const isHideDay = pullDown.type === "dob_ymd" && pullDown?.[pullDown.type]?.is_hide_day;
+    const widthClass = isHideDay ? "w-49-percent" : "w-32-percent";
     return (
       <React.Fragment>
         <div className="ss-message__content--user-pull_down--time_hm">
@@ -370,16 +375,16 @@ export default function PullDown({ content, errors, contentIndex, messageIndex, 
               flexWrap: "wrap",
             }}
           >
-            {renderYearSelect()}
-            {renderMonthSelect()}
-            {renderDaySelect()}
+            {renderYearSelect({ className: widthClass })}
+            {renderMonthSelect({ className: widthClass })}
+            {!isHideDay && renderDaySelect()}
             {renderComment()}
           </div>
         </div>
       </React.Fragment>
     );
   };
-
+  
   const renderDateMd = () => {
     return (
       <React.Fragment>

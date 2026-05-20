@@ -4694,11 +4694,13 @@ const Scenario = () => {
                                                                             placeholder="月"
                                                                             style={{ width: '32%' }}
                                                                           />
+                                                                          {!(pullDown.type === 'dob_ymd' && pullDown?.[pullDown.type]?.is_hide_day) && (
                                                                           <SelectCustom
                                                                             data={dataDay}
                                                                             placeholder="日"
                                                                             style={{ width: '32%' }}
                                                                           />
+                                                                          )}
                                                                           <div
                                                                             className="ss-message__content--user-pull_down-comment"
                                                                             style={{ marginTop: '4px', width: '32%' }}
@@ -9817,6 +9819,17 @@ const Scenario = () => {
                                                           </div>
                                                           <div className="ss-user-setting__item-bottom" style={{ justifyContent: 'flex-start', padding: '0px 31px' }}>
                                                             <span style={{ marginBottom: '-10px', color: 'grey' }}>※初期選択の生年月日</span>
+                                                          </div>
+                                                          <div className="ss-user-setting__item-bottom" style={{ justifyContent: 'flex-start', padding: '0px 31px', alignItems: 'center' }}>
+                                                            <div className='ss-user-setting-checkbox-custom_css' style={{ display: 'flex', alignItems: 'center' }}>
+                                                              <input
+                                                                type="checkbox"
+                                                                className="ss-user-setting-checkbox-custom"
+                                                                onChange={(e) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, e.target.checked, pullDown.type, 'is_hide_day')}
+                                                                checked={pullDown?.[pullDown.type]?.is_hide_day || false}
+                                                              />
+                                                              <label style={{ whiteSpace: "nowrap", wordBreak: "normal", color: 'grey' }}>日を非表示にする</label>
+                                                            </div>
                                                           </div>
                                                           <div className="ss-user-setting__item-bottom">
                                                             <div className="ss-user-setting__item-select-bottom-wrapper-flex" style={{ flexWrap: 'wrap' }}>
