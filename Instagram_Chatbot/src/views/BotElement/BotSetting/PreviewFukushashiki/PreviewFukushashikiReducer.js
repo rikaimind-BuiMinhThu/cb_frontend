@@ -25,6 +25,7 @@ import {
   MESSAGE_CONTENT_TYPES,
 } from '../PreviewComponent/Constants.jsx';
 import { getDefaultValue } from '../PreviewComponent/VariablesUtils';
+import { applyLpPulldownValue } from './LpPulldownSyncUtils';
 
 const PreviewFukushashikiReducer = (state, action) => {
   switch (action.type) {
@@ -256,6 +257,16 @@ const PreviewFukushashikiReducer = (state, action) => {
       const newMessagesListForPhystech = mapAmazonPayDataToMessagesListForPhystech(action.payload, state.messagesList, state.prefecturesList);
       const renderMessagesListForPhystech = newMessagesListForPhystech.slice(0, state.currentMsgIndex + 1);
       return { ...state, messagesList: newMessagesListForPhystech, renderMessagesList: renderMessagesListForPhystech};
+    case PREVIEW_ACTIONS.UPDATE_LP_PULLDOWN_VALUE: {
+      const { messagesList, changed } = applyLpPulldownValue(state.messagesList, action.payload);
+      if (!changed) return state;
+
+      return {
+        ...state,
+        messagesList,
+        renderMessagesList: messagesList.slice(0, state.currentMsgIndex + 1),
+      };
+    }
     case PREVIEW_ACTIONS.UPDATE_AFTER_CHANGE_VALUE: {
       const { contentIndex, contentType, value, field, subField1, subField2, message } = action.payload;
       const newState = {
