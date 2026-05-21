@@ -355,6 +355,14 @@ const PreviewFukushashiki = () => {
             payload: {variables, objParam: actionData}
           });
         }
+        break;
+
+      case CHATBOT_ACTIONS.LP_PULLDOWN_CHANGED:
+        return dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_LP_PULLDOWN_VALUE,
+          payload: actionData,
+        });
+
       default:
         // TODO
         break;

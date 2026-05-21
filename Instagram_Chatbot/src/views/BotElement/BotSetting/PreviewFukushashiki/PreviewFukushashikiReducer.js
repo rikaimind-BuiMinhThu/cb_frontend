@@ -29,6 +29,7 @@ import {
 import { getDefaultValue } from '../PreviewComponent/VariablesUtils';
 import { convertToFukushashikiObject } from './FukushashikiDataConverterUtils';
 import { fukushashikiToLP } from './LPUtils';
+import { applyLpPulldownValue } from './LpPulldownSyncUtils';
 
 const PreviewFukushashikiReducer = (state, action) => {
   switch (action.type) {
@@ -287,10 +288,20 @@ const PreviewFukushashikiReducer = (state, action) => {
       const newMessagesListForPhystech = mapAmazonPayDataToMessagesListForPhystech(action.payload, state.messagesList, state.prefecturesList);
       const renderMessagesListForPhystech = newMessagesListForPhystech.slice(0, state.currentMsgIndex + 1);
       return { ...state, messagesList: newMessagesListForPhystech, renderMessagesList: renderMessagesListForPhystech};
-    case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
+case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
       const newMessagesListForYuwaeru = mapAmazonPayDataToMessagesListForYuwaeru(action.payload, state.messagesList, state.prefecturesList);
       const renderMessagesListForYuwaeru = newMessagesListForYuwaeru.slice(0, state.currentMsgIndex + 1);
       return { ...state, messagesList: newMessagesListForYuwaeru, renderMessagesList: renderMessagesListForYuwaeru};
+    case PREVIEW_ACTIONS.UPDATE_LP_PULLDOWN_VALUE: {
+      const { messagesList, changed } = applyLpPulldownValue(state.messagesList, action.payload);
+      if (!changed) return state;
+
+      return {
+        ...state,
+        messagesList,
+        renderMessagesList: messagesList.slice(0, state.currentMsgIndex + 1),
+      };
+    }
     case PREVIEW_ACTIONS.UPDATE_AFTER_CHANGE_VALUE: {
       const { contentIndex, contentType, value, field, subField1, subField2, message } = action.payload;
       const newState = {
