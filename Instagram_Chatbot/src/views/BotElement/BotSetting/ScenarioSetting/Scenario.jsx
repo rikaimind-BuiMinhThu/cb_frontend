@@ -951,6 +951,7 @@ const Scenario = () => {
   const [isUsedCrosssell, setIsUsedCrosssell] = useState(false);
   const [productIdCrossSell, setProductIdCrossSell] = useState('');
   const [isClearLandingPageSession, setIsClearLandingPageSession] = useState(false);
+  const [isUseBtnUpdateTracking, setIsUseBtnUpdateTracking] = useState(false);
   const [useFullwidthChatbotMobile, setUseFullwidthChatbotMobile] = useState(false);
   const [clientCartSystem, setClientCartSystem] = useState(null);
 
@@ -1047,6 +1048,7 @@ const Scenario = () => {
       setIsUsedCrosssell(!!res.data.data?.is_used_crosssell);
       setProductIdCrossSell(res.data.data?.product_id_cross_sell || '');
       setIsClearLandingPageSession(res.data.data?.is_clear_landing_page_session || false);
+      setIsUseBtnUpdateTracking(res.data.data?.conversation?.isUseBtnUpdateTracking || false);
       setUseFullwidthChatbotMobile(res.data.data?.use_fullwidth_chatbot_mobile || false);
       const timerConfig = {
         isOpen: false,
@@ -2920,6 +2922,7 @@ const Scenario = () => {
         coupon: coupon,
         urlCartConfirmPage: urlCartConfirmPage,
         isUsedCartConfirmPage: isUsedCartConfirmPage,
+        isUseBtnUpdateTracking: isUseBtnUpdateTracking,
       },
       scenario_name: scenarioName,
       scenario_type: scenarioType,
@@ -2985,7 +2988,8 @@ const Scenario = () => {
         urlThanksPage: urlThanks,
         urlCartConfirmPage: urlCartConfirmPage,
         isUsedCartConfirmPage: isUsedCartConfirmPage,
-        coupon: coupon
+        coupon: coupon,
+        isUseBtnUpdateTracking: isUseBtnUpdateTracking,
       },
       scenario_name: scenarioName,
       scenario_type: scenarioType,
@@ -3599,6 +3603,15 @@ const Scenario = () => {
                       <label>クロスセル商品をカートに追加する</label>
                     </div>
                   )}
+                  <div>
+                    <input
+                      type="checkbox"
+                      className="ss-user-setting-checkbox-custom"
+                      onChange={() => setIsUseBtnUpdateTracking(!isUseBtnUpdateTracking)}
+                      checked={isUseBtnUpdateTracking}
+                    />
+                    <label>「登録ボタ」ボタンの変更を有効化します。</label>
+                  </div>
                   {/* Overview scenario */}
                   <div style={{ height:`calc(80% - ${errorScenarioName ? '30':'10'}px)`, backgroundColor: '#f6fbff' }}>
                     <div className="ss-overview-detail">
