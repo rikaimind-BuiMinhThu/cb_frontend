@@ -177,6 +177,7 @@ const previewInitialState = {
   progressBarMaxIndex: null,
   isNotAutoScroll: false,
   cartSystem: params.get("cartSystem") || "",
+  isUseBtnUpdateTracking: false,
 };
 
 
@@ -185,8 +186,40 @@ const PreviewFukushashiki = () => {
   const [timerChanges, setTimerChanges] = useState({ timeLeft: -1, config: null });
   const containerRef = useRef(null);
   const hasSentCustomJs = useRef(false);
+  const [msgUpdateState, setMsgUpdateState] = useState({});
+  const msgUpdateStateRef = useRef({});
+  useEffect(() => { msgUpdateStateRef.current = msgUpdateState; }, [msgUpdateState]);
 
   // Initialize conversion status when chatbot opens
+  useUgcInjection(state.ugcData);
+
+  useEffect(() => {
+    if (!state.isUseBtnUpdateTracking) return;
+
+    const spBody = document.getElementById('sp-body');
+    if (!spBody) return;
+
+    const handleChange = (e) => {
+      const msgContainer = e.target.closest('.sp-body-user-side');
+      if (!msgContainer) return;
+
+      const btn = msgContainer.querySelector('button.btn-update');
+      if (btn) btn.classList.remove('btn-update');
+
+      const rawId = msgContainer.id?.replace('msg_id_', '');
+      const msgId = rawId ? parseInt(rawId) : NaN;
+      if (!isNaN(msgId) && msgUpdateStateRef.current[msgId] === 'clicked') {
+        setMsgUpdateState(prev => ({ ...prev, [msgId]: 'editing' }));
+      }
+    };
+
+    spBody.addEventListener('change', handleChange, true);
+
+    return () => {
+      spBody.removeEventListener('change', handleChange, true);
+    };
+  }, [state.isUseBtnUpdateTracking, state.isOpen]);
+
   useEffect(() => {
     if (state.conversionStatus || !state.uuid || !state.scenarioId || !state.isOpen) return;
     
@@ -886,6 +919,11 @@ const PreviewFukushashiki = () => {
       });
       return sendErrorLogToServer(data);
     }
+
+    if (state.isUseBtnUpdateTracking && !clickedMsg.buttonName) {
+      setMsgUpdateState(prev => ({ ...prev, [clickedMsg.id]: 'clicked' }));
+    }
+
     const isBtnUpdateClick = clickedMsgIndex < state.renderMessagesList.length - 1;
     const isShopify = state.cartSystem === CART_SYSTEM.SHOPIFY;
 
@@ -1045,10 +1083,18 @@ const PreviewFukushashiki = () => {
     if (!message || message.belong_to !== "user") return null;
     if (message.message_content[0]?.type === "button_submit") return null;
 
+    const isBtnUpdateMode = state.isUseBtnUpdateTracking && !message.buttonName && !isUpdate;
+    const msgState = msgUpdateState[message.id]; 
+
     let btnText = message.buttonName;
     if (!btnText) {
-      btnText = isUpdate ? "次へ" : "更新";
+      if (isBtnUpdateMode && msgState === 'clicked') {
+        btnText = "OK";
+      } else {
+        btnText = isUpdate ? "次へ" : "更新";
+      }
     }
+    const hasBtnUpdateClass = isBtnUpdateMode && msgState !== 'editing';
     return (
       <div className="sp-user-message-button-action" style={{ display: isDisplayBtnNext ? "flex" : "none" }}>
         <CustomButton
@@ -1056,7 +1102,7 @@ const PreviewFukushashiki = () => {
           style={{
             backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
           }}
-          className="ss-user-message__action-btn"
+          className={`ss-user-message__action-btn${hasBtnUpdateClass ? " btn-update" : ""}`}
           onClick={() => {
             onClickNext(messageIndex, message)
           }}
