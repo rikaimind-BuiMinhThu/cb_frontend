@@ -5203,7 +5203,7 @@ function Preview() {
                                 backgroundColor: botInfor?.main_color || botInfor?.main_color_other,
                                 borderRadius: "25px",
                               }}
-                              className={`ss-user-message__action-btn${(!message.buttonName && (errorMessageSubmit.length > 0 || userIndexMessage < userMessageArray.length)) ? " btn-update" : ""}`}
+                              className="ss-user-message__action-btn"
                               onClick={() => onClickNext(indexMessage, message)}
                               autoClick={errorMessageSubmit.trim().length > 0 ? true : false}
                               messsagetype={message.message_content[0]?.type}
