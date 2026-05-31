@@ -27,9 +27,10 @@ import {
   MESSAGE_CONTENT_TYPES,
 } from '../PreviewComponent/Constants.jsx';
 import { getDefaultValue } from '../PreviewComponent/VariablesUtils';
+import { savedChatbotState } from '../PreviewComponent/SessionStorageUtils';
 import { convertToFukushashikiObject } from './FukushashikiDataConverterUtils';
 import { fukushashikiToLP } from './LPUtils';
-import { applyLpPulldownValue } from './LpPulldownSyncUtils';
+import { applyLpFieldValue } from './LpFieldSyncUtils';
 
 const PreviewFukushashikiReducer = (state, action) => {
   switch (action.type) {
@@ -292,15 +293,17 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
       const newMessagesListForYuwaeru = mapAmazonPayDataToMessagesListForYuwaeru(action.payload, state.messagesList, state.prefecturesList);
       const renderMessagesListForYuwaeru = newMessagesListForYuwaeru.slice(0, state.currentMsgIndex + 1);
       return { ...state, messagesList: newMessagesListForYuwaeru, renderMessagesList: renderMessagesListForYuwaeru};
-    case PREVIEW_ACTIONS.UPDATE_LP_PULLDOWN_VALUE: {
-      const { messagesList, changed } = applyLpPulldownValue(state.messagesList, action.payload);
+    case PREVIEW_ACTIONS.UPDATE_LP_FIELD_VALUE: {
+      const { messagesList, changed } = applyLpFieldValue(state.messagesList, action.payload);
       if (!changed) return state;
 
-      return {
+      const newState = {
         ...state,
         messagesList,
         renderMessagesList: messagesList.slice(0, state.currentMsgIndex + 1),
       };
+      savedChatbotState(newState);
+      return newState;
     }
     case PREVIEW_ACTIONS.UPDATE_AFTER_CHANGE_VALUE: {
       const { contentIndex, contentType, value, field, subField1, subField2, message } = action.payload;
