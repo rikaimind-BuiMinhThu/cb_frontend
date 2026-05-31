@@ -391,9 +391,9 @@ const PreviewFukushashiki = () => {
         }
         break;
 
-      case CHATBOT_ACTIONS.LP_PULLDOWN_CHANGED:
+      case CHATBOT_ACTIONS.LP_FIELD_CHANGED:
         return dispatch({
-          type: PREVIEW_ACTIONS.UPDATE_LP_PULLDOWN_VALUE,
+          type: PREVIEW_ACTIONS.UPDATE_LP_FIELD_VALUE,
           payload: actionData,
         });
 
