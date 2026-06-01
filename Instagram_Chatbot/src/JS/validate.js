@@ -85,7 +85,7 @@ export function checkTel(inputId, errId, label) {
 export const validateImageURLWithDimension = (url, options = {}) => {
   const {
      maxWidth = 800,
-     maxHeight = 200,
+     maxHeight = 800,
      callback = () => {}
   } = options;
 

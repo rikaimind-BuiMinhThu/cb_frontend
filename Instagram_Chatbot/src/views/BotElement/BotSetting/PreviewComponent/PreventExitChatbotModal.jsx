@@ -42,7 +42,7 @@ const PreventExitChatbotModal = ({ isOpen, onClose, onCloseBot, botConfig }) => 
       >
         <img
           src={preventionImageUrl}
-          style={{ maxHeight: "217px", width: "100%" }}
+          style={{ width: "100%", height: "auto" }}
         />
       </a>
     );
