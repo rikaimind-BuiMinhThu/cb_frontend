@@ -104,7 +104,7 @@ function WithdrawalPrevention() {
         // Verify image format and size
         utils.validateImageURLWithDimension(image_URL.value, {
           maxWidth: 800,
-          maxHeight: 200,
+          maxHeight: 800,
           callback: (result) => {
             if (result.valid) {
               resWith = {
