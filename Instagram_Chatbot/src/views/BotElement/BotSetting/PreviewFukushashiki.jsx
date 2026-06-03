@@ -577,10 +577,28 @@ const PreviewFukushashiki = () => {
 
     const curretMsg = state.messagesList[state.currentMsgIndex];
     if (state.isNotAutoScroll) {
-      if (curretMsg?.message_content?.[0]?.type !== MESSAGE_CONTENT_TYPES.IMAGE) return;
-      setTimeout(() => {
-        document.querySelector(`#msg-${state.currentMsgIndex}-0`)?.scrollIntoView({ behavior: "smooth" });
-      }, 2000);
+      if (curretMsg?.message_content?.[0]?.type === MESSAGE_CONTENT_TYPES.IMAGE) {
+        setTimeout(() => {
+          document.querySelector(`#msg-${state.currentMsgIndex}-0`)?.scrollIntoView({ behavior: "smooth" });
+        }, 2000);
+        return;
+      }
+
+      const bot_statement_type = curretMsg?.message_content?.[0]?.type;
+      if (bot_statement_type && curretMsg?.message_content?.[0]?.[bot_statement_type]?.scroll_auto === true) {
+        setTimeout(() => {
+          const container = document.querySelector("#sp-body");
+          const element = document.querySelector(`#msg_id_${curretMsg.id}`);
+          if (container && element) {
+            const targetScrollTop = element.getBoundingClientRect().top - container.getBoundingClientRect().top + container.scrollTop - 200;
+            container.scrollTo({
+              top: targetScrollTop,
+              behavior: "smooth"
+            });
+          }
+        }, 1000);
+        return;
+      }
       return;
     }
 

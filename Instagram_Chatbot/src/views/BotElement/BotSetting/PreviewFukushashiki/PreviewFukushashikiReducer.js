@@ -102,6 +102,11 @@ const PreviewFukushashikiReducer = (state, action) => {
         isNotAutoScroll = currentMsg?.message_content?.[0]?.image?.is_not_auto_scroll || false;
       }
 
+      const bot_statement_type = currentMsg?.message_content?.[0]?.type;
+      if (bot_statement_type && currentMsg?.message_content?.[0]?.[bot_statement_type]?.scroll_auto === true) {
+        isNotAutoScroll = true;
+      }
+
       return {
         ...state,
         ...updatedState,
