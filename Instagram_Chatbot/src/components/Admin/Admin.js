@@ -42,7 +42,7 @@ class App extends Component {
             <Route exact path="/preview-customer-fukushashiki" component={PreviewFukushashiki} />
             <Route exact path="/preview-faq" component={PreviewFaq} />
             <Route exact path="/news" component={News} />
-            <Route exact path="/instagram" component={Instagram} />
+            {/* <Route exact path="/instagram" component={Instagram} /> */}
             <Route exact path="/" component={Login} />
             <Route path="/sign-in" component={Login} />
             <Route path="/admin" render={(props) => <Admin {...props} />} />
