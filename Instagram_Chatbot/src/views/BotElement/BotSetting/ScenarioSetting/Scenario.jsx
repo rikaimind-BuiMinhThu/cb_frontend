@@ -6162,6 +6162,39 @@ const Scenario = () => {
                                       value={dataMessages[indexMessageSelect].not_display_when_have_error}
                                     />
                                   </div>
+                                  <div className="ss-bot-checkbox-scroll-auto">
+                                    <CheckboxCustom
+                                      label="表示待ち時間を設定する"
+                                      onChange={(value) => {
+                                        if (dataMessages[indexMessageSelect].message_content[0]) {
+                                          dataMessages[indexMessageSelect].message_content[0].is_use_custom_delay = value;
+                                          if (value && !dataMessages[indexMessageSelect].message_content[0].custom_delay_time) {
+                                            dataMessages[indexMessageSelect].message_content[0].custom_delay_time = 1.0;
+                                          }
+                                        }
+                                        setDataMessages([...dataMessages]);
+                                      }}
+                                      value={dataMessages[indexMessageSelect].message_content[0]?.is_use_custom_delay || false}
+                                    />
+                                  </div>
+
+                                  {dataMessages[indexMessageSelect].message_content[0]?.is_use_custom_delay && (
+                                    <div className="ss-user-setting__item-bottom-flex-start" style={{ marginLeft: '25px', marginBottom: '10px' }}>
+                                      <span style={{ marginRight: '10px', fontSize: '12px' }}>待ち時間 (秒)</span>
+                                      <InputNum
+                                        step={0.1}
+                                        min={0}
+                                        max={10}
+                                        placeholder="1.0"
+                                        className="ss-user-setting-input-delay"
+                                        value={dataMessages[indexMessageSelect].message_content[0]?.custom_delay_time}
+                                        onChange={(value) => {
+                                          dataMessages[indexMessageSelect].message_content[0].custom_delay_time = value;
+                                          setDataMessages([...dataMessages]);
+                                        }}
+                                      />
+                                    </div>
+                                  )}
                                   {renderRootFaqOption('ss-bot-checkbox-scroll-auto')}
                                   {dataMessages[indexMessageSelect].message_content[0][messageType]?.['use_for_confirm_message'] && (
                                     <div

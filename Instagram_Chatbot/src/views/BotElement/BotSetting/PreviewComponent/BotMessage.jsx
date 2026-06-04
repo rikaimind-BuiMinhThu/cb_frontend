@@ -84,14 +84,20 @@ const BotMessage = ({
       return () => clearTimeout(timeoutId);
     }
 
+    let finalDelay = delayEachMessage;
+
+    if (content.is_use_custom_delay && content.custom_delay_time !== undefined) {
+      finalDelay = content.custom_delay_time * 1000;
+    }
+
     if (isDelaying) {
       timeoutId = setTimeout(() => {
         setIsDelaying(false);
-      }, delayEachMessage);
+      }, finalDelay);
       return () => clearTimeout(timeoutId);
     }
 
-  }, [content.type, isDelaying, isBotOpen]);
+  }, [content.type, isDelaying, isBotOpen, content.is_use_custom_delay, content.custom_delay_time, delayEachMessage]);
 
   useEffect(() => {
     // When hidden === undefined, it means the message is not hidden yet
