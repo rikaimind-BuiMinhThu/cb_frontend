@@ -952,6 +952,9 @@ const Scenario = () => {
   const [productIdCrossSell, setProductIdCrossSell] = useState('');
   const [isClearLandingPageSession, setIsClearLandingPageSession] = useState(false);
   const [isUseBtnUpdateTracking, setIsUseBtnUpdateTracking] = useState(false);
+  const [isUseGlobalDelay, setIsUseGlobalDelay] = useState(false);
+  const [globalDelayTime, setGlobalDelayTime] = useState(1.0);
+  const [isOpenGlobalDelayModal, setIsOpenGlobalDelayModal] = useState(false);
   const [useFullwidthChatbotMobile, setUseFullwidthChatbotMobile] = useState(false);
   const [clientCartSystem, setClientCartSystem] = useState(null);
 
@@ -1049,6 +1052,8 @@ const Scenario = () => {
       setProductIdCrossSell(res.data.data?.product_id_cross_sell || '');
       setIsClearLandingPageSession(res.data.data?.is_clear_landing_page_session || false);
       setIsUseBtnUpdateTracking(res.data.data?.conversation?.isUseBtnUpdateTracking || false);
+      setIsUseGlobalDelay(res.data.data?.conversation?.isUseGlobalDelay || false);
+      setGlobalDelayTime(res.data.data?.conversation?.globalDelayTime ?? 1.0);
       setUseFullwidthChatbotMobile(res.data.data?.use_fullwidth_chatbot_mobile || false);
       const timerConfig = {
         isOpen: false,
@@ -2871,6 +2876,45 @@ const Scenario = () => {
     );
   };
 
+  const renderGlobalDelayModal = (isOpen) => {
+    return (
+      <ModalShort open={isOpen} onClose={() => setIsOpenGlobalDelayModal(false)}>
+        <div className="sl-popup-error-message-wrapper" style={{ width: "450px" }}>
+          <h4>表示待ち時間を設定する</h4>
+          <div style={{ marginBottom: "15px" }}>
+            <div className="sl-popup-error-message-input-wrapper" style={{ marginBottom: "0px", display: "flex", alignItems: "center" }}>
+              <span style={{ marginRight: '10px', fontSize: '14px', whiteSpace: "nowrap" }}>待ち時間 (秒)</span>
+              <InputNum
+                step={0.1}
+                min={0}
+                max={10}
+                placeholder="1.0"
+                className="ss-user-setting-input-delay"
+                value={globalDelayTime}
+                onChange={(value) => setGlobalDelayTime(value)}
+              />
+            </div>
+          </div>
+          <div className="sl-popup-error-message-btn-wrapper">
+            <Button
+              className="ss-popup-error-message-input-close-button"
+              onClick={() => setIsOpenGlobalDelayModal(false)}
+            >
+              閉じる
+            </Button>
+            <Button
+              style={{ backgroundColor: "#024BB9" }}
+              className="ss-popup-error-message-input-keep-button"
+              onClick={() => setIsOpenGlobalDelayModal(false)}
+            >
+              保存
+            </Button>
+          </div>
+        </div>
+      </ModalShort>
+    );
+  };
+
   const renderErrMsgByJsSettingModal = (isOpen) => {
     return (
       <ModalShort open={isOpen} onClose={() => setIsOpenErrMsgByJsSettingModal(false)}>
@@ -2923,6 +2967,8 @@ const Scenario = () => {
         urlCartConfirmPage: urlCartConfirmPage,
         isUsedCartConfirmPage: isUsedCartConfirmPage,
         isUseBtnUpdateTracking: isUseBtnUpdateTracking,
+        isUseGlobalDelay: isUseGlobalDelay,
+        globalDelayTime: globalDelayTime,
       },
       scenario_name: scenarioName,
       scenario_type: scenarioType,
@@ -2990,6 +3036,8 @@ const Scenario = () => {
         isUsedCartConfirmPage: isUsedCartConfirmPage,
         coupon: coupon,
         isUseBtnUpdateTracking: isUseBtnUpdateTracking,
+        isUseGlobalDelay: isUseGlobalDelay,
+        globalDelayTime: globalDelayTime,
       },
       scenario_name: scenarioName,
       scenario_type: scenarioType,
@@ -3620,6 +3668,31 @@ const Scenario = () => {
                       checked={isUseBtnUpdateTracking}
                     />
                     <label>「登録ボタ」ボタンの変更を有効化します。</label>
+                  </div>
+                  <div style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "16px",
+                    justifyContent: "start",
+                    width: "100%",
+                  }}>
+                    <div className='ss-user-setting-checkbox-custom_css'>
+                      <input
+                        type="checkbox"
+                        id="isUseGlobalDelay"
+                        className="ss-user-setting-checkbox-custom"
+                        onChange={() => setIsUseGlobalDelay(!isUseGlobalDelay)}
+                        checked={isUseGlobalDelay}
+                      />
+                      <label htmlFor="isUseGlobalDelay" style={{whiteSpace: "nowrap", wordBreak: "normal"}}>表示待ち時間を設定する</label>
+                    </div>
+                    {isUseGlobalDelay && (
+                      <div>
+                        <button className="ss-user-setting-checkbox-custom-css_toggle" onClick={() => setIsOpenGlobalDelayModal(true)}>
+                          {`( 表示待ち時間設定モダルを開く )`}
+                        </button>
+                      </div>
+                    )}
                   </div>
                   {/* Overview scenario */}
                   <div style={{ height:`calc(80% - ${errorScenarioName ? '30':'10'}px)`, backgroundColor: '#f6fbff' }}>
@@ -15026,6 +15099,7 @@ const Scenario = () => {
       {renderModalCustomJsCodeForm(isOpenModalCustomJsCode)}
       {renderModalTimer(timerConfig.isOpen)}
       {renderErrMsgByJsSettingModal(isOpenErrMsgByJsSettingModal)}
+      {renderGlobalDelayModal(isOpenGlobalDelayModal)}
       <ModalShort open={isOpenAddVariable} onClose={() => setIsOpenAddVariable(false)}>
         <div className="sl-popup-create-scenario-wrapper">
           <h4>変数追加</h4>

@@ -109,6 +109,8 @@ const previewInitialState = {
   scenarioId: params.get("scenario_id"),
   botInfor: {},
   messagesList: [],
+  isUseGlobalDelay: false,
+  globalDelayTime: 1.0,
   urlThanksPage: "",
   urlCartConfirmPage: "",
   merchandiseId: "",
@@ -1089,6 +1091,8 @@ const PreviewFukushashiki = () => {
         hidden={message.hidden}
         currentMsgIndex={state.currentMsgIndex}
         isBotOpen={state.isOpen}
+        isUseGlobalDelay={state.isUseGlobalDelay}
+        globalDelayTime={state.globalDelayTime}
       />
     ));
   };
