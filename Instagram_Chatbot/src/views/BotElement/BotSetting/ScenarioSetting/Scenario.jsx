@@ -846,6 +846,7 @@ const initialTimeConfig = {
       isShow: false,
     },
   },
+  isRealtimeRemainingTime: false,
   isShowMessageFinish: false
 }
 
@@ -1069,6 +1070,7 @@ const Scenario = () => {
           ...(resTimerConfig?.messages || {}),
         },
         type: resTimerConfig?.type || TIMER_TYPES.COUNTING_DOWN,
+        isRealtimeRemainingTime: resTimerConfig?.isRealtimeRemainingTime ?? initialTimeConfig.isRealtimeRemainingTime,
       };
       
       timerConfig.temp = scenarioTimerConfig;
@@ -2848,6 +2850,18 @@ const Scenario = () => {
                   />
                 </div>
               </div>
+
+              <div className="modal_timer_config-finish_message full-width">
+                <div className="finish_message_label">
+                  <input
+                    type="checkbox"
+                    className="ss-user-setting-checkbox-custom"
+                    onChange={handleChangeTimerConfig({ keyPath: ["temp", "isRealtimeRemainingTime"], instanceValue: !modalData.isRealtimeRemainingTime, transform: (v) => !!v })}
+                    checked={!!modalData.isRealtimeRemainingTime}
+                  />
+                  <label>リアルタイム残り時間表示</label>
+                </div>
+              </div>
             </div>
 
             <div className="modal_timer_config-variable_holder">
@@ -2987,6 +3001,7 @@ const Scenario = () => {
         variables: timerConfig.variables,
         duration: timerConfig.final.duration,
         messages: timerConfig.final.messages,
+        isRealtimeRemainingTime: timerConfig.final.isRealtimeRemainingTime,
       }),
       bottom_body_custom_js_code: bottomBodyCustomJsCode.final,
       is_used_err_msg_by_js: isUseErrMsgByJs,
@@ -3057,6 +3072,7 @@ const Scenario = () => {
         variables: timerConfig.variables,
         duration: timerConfig.final.duration,
         messages: timerConfig.final.messages,
+        isRealtimeRemainingTime: timerConfig.final.isRealtimeRemainingTime,
       }),
       is_used_err_msg_by_js: isUseErrMsgByJs,
       err_msg_js_code: errMsgJsCode,

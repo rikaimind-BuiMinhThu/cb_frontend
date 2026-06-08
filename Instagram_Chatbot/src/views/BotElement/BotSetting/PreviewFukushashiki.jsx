@@ -1338,6 +1338,8 @@ const PreviewFukushashiki = () => {
               finishMsg={state.botInfor.timer_config.messages.finish}
               variables={getTimerConfigVariable(state.botInfor.timer_config.variables)}
               startCount={state.isOpen}
+              isRealtimeRemainingTime={state.botInfor.timer_config.isRealtimeRemainingTime}
+              scenarioId={state.scenarioId}
               onCounting={handleOnCounting(state.botInfor.timer_config)}
             />
           </div>
