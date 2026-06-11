@@ -1,25 +1,6 @@
 import React from 'react';
 import { Button } from 'reactstrap';
-import icon from '../../../../../../assets/img/bot-icon/man1_new.png';
-import { MDBIcon } from 'mdbreact';
-import SelectCustom from '../../scenarioComon/SelectCustom';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import moment from 'moment';
-import { Carousel, Checkbox, Radio, Slider, Calendar, Select } from 'antd';
-import shopifIcon from '../../../../../../assets/img/shopify-icon.png';
-import locale from 'antd/es/date-picker/locale/ja_JP';
-import { BOT_MESSAGE_TYPES } from '../../../PreviewComponent/Constants';
-import { PREVIEW_MAP } from '../../contentPreviews';
-import {
-  getCalendarPreviewRelativeRangeLabel,
-  isCalendarPreviewRelativeRangeEnabled,
-  isCalendarPreviewDaysSplitEnabled,
-  deliveryCutOffTimeSelectValue,
-  handleDisableDateCalendar,
-  handleDisableEndDateCalendar,
-  mergePreviewRelativeCalendar,
-} from '../../utils/scenarioCalendarUtils';
-import { settingsCarousel } from '../scenarioCarouselSettings';
+import { Draggable } from 'react-beautiful-dnd';
 
 import UserContentPreviewList from './UserContentPreviewList';
 import OverviewMessageActions from './OverviewMessageActions';
@@ -50,7 +31,7 @@ const OverviewUserMessageItem = ({ message, index, bindings }) => {
             <div className={`ss-user-chat-detail-content ss-user-chat-detail-content-${index} ${message.hidden === true ? "ss-message-hidden-style" : ""}`}
               style={message.message_name ? {} : { borderColor: 'red' }}>
               <div className="ss-user-message__content-wrapper">
-      <UserContentPreviewList message={message} index={index} bindings={bindings} />
+      <UserContentPreviewList message={message} index={index} />
               </div>
               {!message.not_use_button && message.message_content[0]?.type !== 'button_submit'&& message?.message_content.length !== 0 &&
                 ((message?.message_content.length === 1 && 

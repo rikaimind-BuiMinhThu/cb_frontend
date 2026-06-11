@@ -10,7 +10,10 @@ export const useScenarioContentSettingProps = (indexMessageSelect, indexContent,
     dataYear, dataMonth, dataDay, dataPrefectures, dataCity, listProductVariants,
     clientCartSystem, isShopifyPaymentScenario,
   } = state;
-  const { setDataMessages, setIsOpenAddVariable, setIsOpenFileReference, setVarFileReference, setAcceptFile } = actions;
+  const {
+    setDataMessages, setIsOpenAddVariable, setIsOpenFileReference, setVarFileReference,
+    setAcceptFile, setIndexCarouselSlide,
+  } = actions;
   const {
     onChangeValueMessageContent,
     onChangeTimePullDown,
@@ -42,6 +45,8 @@ export const useScenarioContentSettingProps = (indexMessageSelect, indexContent,
     renderZipCodeAddressTitle,
     renderPrefecture,
     renderPaymentMethodDescriptionInput,
+    renderTextInputPasswordConfirmationPreview,
+    renderPreviewPulldownfromJs,
   } = renderers;
 
   const textInput = content?.text_input;
@@ -100,6 +105,8 @@ export const useScenarioContentSettingProps = (indexMessageSelect, indexContent,
     renderZipCodeAddressTitle,
     renderPrefecture,
     renderPaymentMethodDescriptionInput,
+    renderTextInputPasswordConfirmationPreview,
+    renderPreviewPulldownfromJs,
     handleAddItemAgreeTerm,
     handleDragEndProduct,
     handleRemoveItemProductPullDown,
@@ -113,5 +120,6 @@ export const useScenarioContentSettingProps = (indexMessageSelect, indexContent,
     clientCartSystem,
     isShopifyPaymentScenario,
     client,
+    setIndexCarouselSlide,
   };
 };
