@@ -1,17 +1,17 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Button } from 'reactstrap';
+import { useScenarioEditor } from '../context/ScenarioEditorContext';
 
-const ScenarioActionsBar = ({ onSave, onSavePreview }) => (
-  <div className="ss-actions">
-    <Button onClick={() => onSave()}>保存</Button>
-    <Button onClick={() => onSavePreview()}>保存してプレビュー</Button>
-  </div>
-);
+const ScenarioActionsBar = () => {
+  const { actions } = useScenarioEditor();
+  const { onClickSaveScenario, onClickSavePreview } = actions;
 
-ScenarioActionsBar.propTypes = {
-  onSave: PropTypes.func.isRequired,
-  onSavePreview: PropTypes.func.isRequired,
+  return (
+    <div className="ss-actions">
+      <Button onClick={() => onClickSaveScenario()}>保存</Button>
+      <Button onClick={() => onClickSavePreview()}>保存してプレビュー</Button>
+    </div>
+  );
 };
 
 export default ScenarioActionsBar;

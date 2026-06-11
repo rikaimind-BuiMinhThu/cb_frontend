@@ -3,7 +3,7 @@ import InputCustom from '../scenarioComon/InputCustom';
 import { useScenarioEditor } from '../context/ScenarioEditorContext';
 
 const ScenarioOverviewPanel = () => {
-  const { state, actions } = useScenarioEditor();
+  const { state, actions, client: contextClient } = useScenarioEditor();
   const {
     scenarioName,
     scenarioType,
@@ -54,7 +54,7 @@ const ScenarioOverviewPanel = () => {
     setUseFullwidthChatbotMobile,
   } = actions;
 
-  const client = JSON.parse(sessionStorage.getItem('client'));
+  const client = contextClient || JSON.parse(sessionStorage.getItem('client') || 'null');
 
   const handleChangeOpenModalCustomCss = (value) => () => {
     setIsOpenModalCustomCss(value);
