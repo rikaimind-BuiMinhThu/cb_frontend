@@ -11,6 +11,7 @@ import {
   resolveMainColorFromApi,
   toDataURL,
 } from '../utils/designChatbotUtils';
+import { deriveThemeDefaults } from '../utils/designThemeUtils';
 
 const INITIAL_VALIDATION_ERRORS = {
   title: '',
@@ -53,6 +54,8 @@ export const useDesignChatbot = (initialBotId) => {
   const [bottomMarginSp, setBottomMarginSp] = useState(10);
   const [popupCloseBot, setPopupCloseBot] = useState(false);
   const [titleBubble, setTitleBubble] = useState('');
+  const [themeSettings, setThemeSettings] = useState(() => deriveThemeDefaults());
+  const [apiColorKey, setApiColorKey] = useState(null);
 
   const clearValidationError = useCallback((field) => {
     setValidationErrors((prev) => ({ ...prev, [field]: '' }));
@@ -128,7 +131,10 @@ export const useDesignChatbot = (initialBotId) => {
       }
 
       const data = response.data.data;
-      const designSettings = parseDesignSettings(data.design_settings);
+      const colorKey = data.main_color || null;
+      const resolvedColor = resolveMainColorFromApi(colorKey || data.main_color_other);
+      const mainColorHex = resolvedColor || '#327AED';
+      const designSettings = parseDesignSettings(data.design_settings, mainColorHex, colorKey);
 
       setDisplayType(designSettings.displayType);
       setWidthPc(designSettings.widthPc);
@@ -147,6 +153,8 @@ export const useDesignChatbot = (initialBotId) => {
       setBottomMarginSp(designSettings.bottomMarginSp);
       setPopupCloseBot(designSettings.popupCloseBot);
       setTitleBubble(designSettings.titleBubble);
+      setThemeSettings(designSettings.themeSettings);
+      setApiColorKey(colorKey);
 
       setBotName(data.bot_name || '');
       setTitle(data.title || '');
@@ -161,7 +169,6 @@ export const useDesignChatbot = (initialBotId) => {
       if (openingBotIconUrl) setOpeningBotIcon(openingBotIconUrl);
       if (closingBotIconUrl) setClosingBotIcon(closingBotIconUrl);
 
-      const resolvedColor = resolveMainColorFromApi(data.main_color || data.main_color_other);
       if (resolvedColor) {
         setMainColor(resolvedColor);
       }
@@ -264,6 +271,7 @@ export const useDesignChatbot = (initialBotId) => {
       bottomMarginSp,
       popupCloseBot,
       titleBubble,
+      themeSettings,
     });
 
     api.post(`api/v1/managements/chatbots/${botId}/design_settings`, payload)
@@ -297,9 +305,14 @@ export const useDesignChatbot = (initialBotId) => {
     rightSpTitle,
     showNotification,
     titleBubble,
+    themeSettings,
     widthPc,
     widthSp,
   ]);
+
+  const updateThemeField = useCallback((field, value) => {
+    setThemeSettings((prev) => ({ ...prev, [field]: value }));
+  }, []);
 
   const updateDesignSettingField = useCallback((field, value) => {
     const setters = {
@@ -360,6 +373,7 @@ export const useDesignChatbot = (initialBotId) => {
         bottomMarginSp,
         popupCloseBot,
         titleBubble,
+        themeSettings,
       },
     },
     actions: {
@@ -377,6 +391,7 @@ export const useDesignChatbot = (initialBotId) => {
       saveBasicInfo,
       saveDesignSettings,
       updateDesignSettingField,
+      updateThemeField,
       validateForPreview,
     },
   };

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { CardHeader } from 'reactstrap';
-import { TAB_BASIC, TAB_DESIGN } from '../constants/designChatbotConstants';
+import { TAB_BASIC, TAB_DESIGN, TAB_THEME } from '../constants/designChatbotConstants';
 
 const tabStyle = (activeTab, tabId) => ({
   color: activeTab === tabId ? '#4DBEB6' : '#9B9B9B',
@@ -9,6 +9,7 @@ const tabStyle = (activeTab, tabId) => ({
   boxShadow: activeTab !== tabId
     ? 'rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px'
     : 'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px',
+  marginRight: '4px',
 });
 
 const DesignChatbotTabs = ({ activeTab, onChange }) => (
@@ -28,6 +29,14 @@ const DesignChatbotTabs = ({ activeTab, onChange }) => (
       type="button"
     >
       デザインカスタマイズ
+    </button>
+    <button
+      onClick={() => onChange(TAB_THEME)}
+      style={tabStyle(activeTab, TAB_THEME)}
+      className="tab-menu"
+      type="button"
+    >
+      テーマカスタマイズ
     </button>
   </CardHeader>
 );

@@ -34,6 +34,8 @@ import {
   CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE,
   DISPLAY_TYPES,
 } from "./PreviewComponent/Constants";
+import { injectBotThemeCss } from "utils/chatbotThemeCss";
+import { COLOR_MAP } from "views/BotElement/BotSetting/DesignSetting/constants/designChatbotConstants";
 import {
   getAllUrlParams,
   lightenColor,
@@ -481,6 +483,19 @@ const PreviewFukushashiki = () => {
     document.head.appendChild(style);
   }, [state.isUsedCustomCss, state.customCssContent]);
 
+  useEffect(() => {
+    if (!state.botInfor) return;
+    const chatbot = state.botInfor;
+    const apiColorKey = chatbot.main_color && !String(chatbot.main_color).startsWith('#')
+      ? chatbot.main_color
+      : null;
+    const mainColorHex = chatbot.main_color_other
+      || COLOR_MAP[chatbot.main_color]
+      || chatbot.main_color
+      || '#327AED';
+    injectBotThemeCss(state.themeSettings, mainColorHex, apiColorKey);
+  }, [state.themeSettings, state.botInfor]);
+
   // Get Preview Scenario Data
   useEffect(() => {
     if (!state.loadedStateFromSession) {
@@ -845,6 +860,7 @@ const PreviewFukushashiki = () => {
       bottomBodyCustomJsCode: chatbot?.bottom_body_custom_js_code,
       isUsedCustomCss: !!chatbot?.is_used_custom_css,
       customCssContent: chatbot?.custom_css_content,
+      themeSettings: designSetting?.theme || null,
     };
 
     if (chatbot?.timer_config?.enable) {

@@ -1,6 +1,7 @@
 import IconManDefault from '../../../../../assets/img/bot-icon/man1_new.png';
 import { EC_CHATBOT_URL } from 'variables/constants';
 import { COLOR_MAP } from '../constants/designChatbotConstants';
+import { buildThemePayload, parseThemeSettings as parseThemeFromRaw } from './designThemeUtils';
 
 export const getIconPath = (iconField) => {
   if (!iconField) return '';
@@ -90,8 +91,8 @@ export const buildBasicInfoPayload = ({
   return payload;
 };
 
-export const buildDesignSettingsPayload = (designSettings) => ({
-  design_settings: {
+export const buildDesignSettingsPayload = (designSettings) => {
+  const payload = {
     display_type: designSettings.displayType,
     width_pc: designSettings.widthPc,
     height_pc: designSettings.heightPc,
@@ -109,11 +110,20 @@ export const buildDesignSettingsPayload = (designSettings) => ({
     bottom_margin_sp: designSettings.bottomMarginSp,
     popup_close_bot: designSettings.popupCloseBot,
     title_bubble: designSettings.titleBubble?.trim(),
-  },
-});
+  };
 
-export const parseDesignSettings = (rawSettings) => {
-  const result = typeof rawSettings === 'string' ? JSON.parse(rawSettings) : rawSettings;
+  if (designSettings.themeSettings) {
+    const theme = buildThemePayload(designSettings.themeSettings);
+    if (Object.keys(theme).length > 0) {
+      payload.theme = theme;
+    }
+  }
+
+  return { design_settings: payload };
+};
+
+export const parseDesignSettings = (rawSettings, mainColorHex, apiColorKey) => {
+  const result = typeof rawSettings === 'string' ? JSON.parse(rawSettings || '{}') : (rawSettings || {});
 
   return {
     displayType: result?.display_type,
@@ -133,5 +143,6 @@ export const parseDesignSettings = (rawSettings) => {
     bottomMarginSp: result?.bottom_margin_sp,
     popupCloseBot: !!result?.popup_close_bot,
     titleBubble: result?.title_bubble || '',
+    themeSettings: parseThemeFromRaw(result?.theme, mainColorHex, apiColorKey),
   };
 };

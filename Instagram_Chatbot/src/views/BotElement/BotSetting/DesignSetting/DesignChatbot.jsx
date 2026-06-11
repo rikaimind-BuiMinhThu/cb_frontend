@@ -5,7 +5,8 @@ import Cookies from 'js-cookie';
 import ModalNoti from '../../../Popup/ModalNoti';
 import './../../../../assets/css/bot/bot-setting.css';
 import './../../../../assets/css/bot/add-bot.css';
-import { TAB_BASIC, TAB_DESIGN } from './constants/designChatbotConstants';
+import { TAB_BASIC, TAB_DESIGN, TAB_THEME } from './constants/designChatbotConstants';
+import ThemeCustomizeTab from './components/ThemeCustomizeTab';
 import useDesignChatbot from './hooks/useDesignChatbot';
 import useChatbotPreview from './hooks/useChatbotPreview';
 import DesignChatbotTabs from './components/DesignChatbotTabs';
@@ -62,6 +63,16 @@ function DesignChatbot() {
                 <DesignCustomizeTab
                   designSettings={state.designSettings}
                   onFieldChange={actions.updateDesignSettingField}
+                  onSave={actions.saveDesignSettings}
+                />
+              )}
+              {state.tabmenu === TAB_THEME && (
+                <ThemeCustomizeTab
+                  themeSettings={state.designSettings.themeSettings}
+                  mainColor={state.basicInfo.mainColor}
+                  title={state.basicInfo.title}
+                  subtitle={state.basicInfo.subtitle}
+                  onFieldChange={actions.updateThemeField}
                   onSave={actions.saveDesignSettings}
                 />
               )}

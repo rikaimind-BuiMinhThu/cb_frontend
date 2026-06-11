@@ -52,6 +52,8 @@ import SubmitButtonConfig from './SubmitButtonConfig';
 import {CART_SYSTEM} from '../PreviewComponent/Constants';
 import ZipCodeAddressSetting from './Settings/ZipCodeAddressSetting';
 import { renderFukushashikiSetting } from './ScenarioUtils';
+import PaymentDisplayStyleSection from './components/PaymentDisplayStyleSection';
+import { PAYMENT_OPTION_IMAGE_FIELDS } from './constants/paymentStyleConstants';
 
 const { Option } = Select;
 const _ = require('lodash');
@@ -12336,6 +12338,10 @@ const Scenario = () => {
                                                             />
                                                           </div>
                                                         </div>
+                                                        <PaymentDisplayStyleSection
+                                                          cardPaymentRadioButton={cardPaymentRadioButton}
+                                                          onChange={(value, field) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, field)}
+                                                        />
                                                         {/* cardPaymentRadioButton: withTitle = true */}
                                                         {cardPaymentRadioButton?.title_require === true &&
                                                           <div className="ss-user-setting__item-bottom">
@@ -12410,6 +12416,30 @@ const Scenario = () => {
                                                                                         valueRight={itemPaymentRadio.value}
                                                                                         onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'radio_contents', indexPaymentRadio, name === 'left' ? 'text' : 'value')}
                                                                                       />
+                                                                                    </div>
+                                                                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginBottom: '10px', paddingLeft: '28px' }}>
+                                                                                      {PAYMENT_OPTION_IMAGE_FIELDS.map(({ key, label }) => (
+                                                                                        <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                                                                          <span style={{ fontSize: '12px' }}>{label}</span>
+                                                                                          {itemPaymentRadio[key] && (
+                                                                                            <img src={itemPaymentRadio[key]} alt={label} style={{ width: '48px', height: '48px', objectFit: 'contain', border: '1px solid #ddd' }} />
+                                                                                          )}
+                                                                                          <input
+                                                                                            type="file"
+                                                                                            accept="image/png,image/jpeg,image/jpg"
+                                                                                            onChange={(e) => {
+                                                                                              const file = e.target.files[0];
+                                                                                              e.target.value = null;
+                                                                                              if (!file) return;
+                                                                                              const reader = new FileReader();
+                                                                                              reader.onloadend = () => {
+                                                                                                onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, reader.result, 'radio_contents', indexPaymentRadio, key);
+                                                                                              };
+                                                                                              reader.readAsDataURL(file);
+                                                                                            }}
+                                                                                          />
+                                                                                        </div>
+                                                                                      ))}
                                                                                     </div>
                                                                                     <div className="ss-user-setting__item-select-bottom-wrapper-flex">
                                                                                       <CheckboxCustom

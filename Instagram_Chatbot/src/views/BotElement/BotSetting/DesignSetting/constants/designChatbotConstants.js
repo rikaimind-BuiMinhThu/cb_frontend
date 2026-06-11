@@ -12,6 +12,8 @@ import IconWomen11 from '../../../../../assets/img/bot-icon/women11_new.png';
 export const TAB_BASIC = 1;
 export const TAB_DESIGN = 2;
 
+export { TAB_THEME } from './designThemeConstants';
+
 export const MAIN_COLORS = [
   '#327AED',
   '#26B197',
