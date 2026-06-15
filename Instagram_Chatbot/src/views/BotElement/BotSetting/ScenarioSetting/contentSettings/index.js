@@ -13,6 +13,15 @@ import ProductPurchaseRadioButtonSetting from './ProductPurchaseRadioButtonSetti
 import ProductPurchaseSelectOptionSetting from './ProductPurchaseSelectOptionSetting';
 import SliderSetting from './SliderSetting';
 import ZipCodeAddressContentSetting from './ZipCodeAddressContentSetting';
+import AttachingFileSetting from './AttachingFileSetting';
+import AgreeTermSetting from './AgreeTermSetting';
+import ImageSetting from './ImageSetting';
+import CarouselSetting from './CarouselSetting';
+import CaptureSetting from './CaptureSetting';
+import SmsVerifySetting from './SmsVerifySetting';
+import AfteePaymentModuleSetting from './AfteePaymentModuleSetting';
+import ButtonSubmitSetting from './ButtonSubmitSetting';
+import LabelNoTransitionSetting from './LabelNoTransitionSetting';
 import { withContentSettingContext } from './withContentSettingContext';
 
 export const CONTENT_SETTING_MAP = {
@@ -31,6 +40,15 @@ export const CONTENT_SETTING_MAP = {
   product_purchase_select_option: ProductPurchaseSelectOptionSetting,
   slider: SliderSetting,
   zip_code_address: ZipCodeAddressContentSetting,
+  attaching_file: withContentSettingContext(AttachingFileSetting),
+  agree_term: withContentSettingContext(AgreeTermSetting),
+  image: withContentSettingContext(ImageSetting),
+  carousel: withContentSettingContext(CarouselSetting),
+  capture: withContentSettingContext(CaptureSetting),
+  sms_verify: withContentSettingContext(SmsVerifySetting),
+  AFTEE_payment_module: withContentSettingContext(AfteePaymentModuleSetting),
+  button_submit: withContentSettingContext(ButtonSubmitSetting),
+  label_no_transition: withContentSettingContext(LabelNoTransitionSetting),
 };
 
 export {
@@ -40,4 +58,13 @@ export {
   PullDownSetting,
   CheckboxSetting,
   RadioButtonSetting,
+  AttachingFileSetting,
+  AgreeTermSetting,
+  ImageSetting,
+  CarouselSetting,
+  CaptureSetting,
+  SmsVerifySetting,
+  AfteePaymentModuleSetting,
+  ButtonSubmitSetting,
+  LabelNoTransitionSetting,
 };

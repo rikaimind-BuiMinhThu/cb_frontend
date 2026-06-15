@@ -8,7 +8,7 @@ export const useScenarioContentSettingProps = (indexMessageSelect, indexContent,
   const {
     dataMessages, dataInputVar, isUseFukushashiki, dataHour, dataMinutes, dataEveryMinute,
     dataYear, dataMonth, dataDay, dataPrefectures, dataCity, listProductVariants,
-    clientCartSystem, isShopifyPaymentScenario,
+    clientCartSystem, isShopifyPaymentScenario, fileErrorCarousel, indexCarouselSlide,
   } = state;
   const {
     setDataMessages, setIsOpenAddVariable, setIsOpenFileReference, setVarFileReference,
@@ -121,5 +121,7 @@ export const useScenarioContentSettingProps = (indexMessageSelect, indexContent,
     isShopifyPaymentScenario,
     client,
     setIndexCarouselSlide,
+    fileErrorCarousel,
+    indexCarouselSlide,
   };
 };
