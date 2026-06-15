@@ -45,6 +45,7 @@ export const useScenario = () => {
   const [isUsedCartConfirmPage, setIsUsedCartConfirmPage] = useState(false);
   const [urlCartConfirmPage, setUrlCartConfirmPage] = useState('');
   const [isOpenModalCustomCss, setIsOpenModalCustomCss] = useState(false);
+  const [isOpenScenarioSettingsModal, setIsOpenScenarioSettingsModal] = useState(false);
 
   const [isUseCustomJsCode, setIsUseCustomJsCode] = useState(false);
   const [headCustomJsCode, setHeadCustomJsCode] = useState(INITIAL_CUSTOM_CODE);
@@ -429,6 +430,7 @@ export const useScenario = () => {
       isUsedCartConfirmPage,
       urlCartConfirmPage,
       isOpenModalCustomCss,
+      isOpenScenarioSettingsModal,
       isUseCustomJsCode,
       headCustomJsCode,
       topBodyCustomJsCode,
@@ -498,6 +500,7 @@ export const useScenario = () => {
       setIsUsedCartConfirmPage,
       setUrlCartConfirmPage,
       setIsOpenModalCustomCss,
+      setIsOpenScenarioSettingsModal,
       setIsUseCustomJsCode,
       setHeadCustomJsCode,
       setTopBodyCustomJsCode,

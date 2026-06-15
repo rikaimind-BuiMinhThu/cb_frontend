@@ -1,4 +1,4 @@
-import '../../../../assets/css/bot/scenario/scenario-single.css';
+import '../../../../assets/css/bot/scenario/scenario-editor-layout.css';
 import React from 'react';
 import { Col, Row, Card, CardBody } from 'reactstrap';
 import ScenarioActionsBar from './components/ScenarioActionsBar';
@@ -18,9 +18,11 @@ const ScenarioEditorContent = () => (
       <Col>
         <Card>
           <CardBody>
-            <div className="ss-sc-setting">
-              <div className="ss-sc-content ss-overview">
-                <ScenarioOverviewPanel />
+            <div className="ss-sc-setting ss-editor-layout-v2">
+              <div className="ss-sc-content ss-overview ss-layout-column ss-layout-overview-column">
+                <div className="ss-layout-overview-form">
+                  <ScenarioOverviewPanel />
+                </div>
                 <ScenarioMessageOverview>
                   <ScenarioMessageOverviewList />
                 </ScenarioMessageOverview>

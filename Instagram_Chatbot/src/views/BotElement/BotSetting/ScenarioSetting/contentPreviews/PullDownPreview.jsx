@@ -12,6 +12,7 @@ const PullDownPreview = ({
   dataPrefectures,
   dataCity,
   renderPreviewPulldownfromJs,
+  renderLPIntegrationOptionPreview,
 }) => (
                                                             <div style={{ marginBottom: '10px' }}>
                                                               {(pullDown.title_require || pullDown.require) &&

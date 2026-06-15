@@ -60,9 +60,8 @@ const AddContentSelect = ({ messageType, setMessageType, hasContent, onAdd }) =>
 
 const RegisterButtonConfig = ({ selectedMessage, dataMessages, setDataMessages }) => (
   <div className="ss-user-setting-condition-footer-button">
-    <div className="ss-user-setting-condition-bottom-button">
+    <div className="ss-layout-register-button-row">
       <InputCustom
-        style={{ height: '38.2px', margin: '10px', width: '25%' }}
         label="登録ボタン名称"
         value={selectedMessage.buttonName}
         maxLength={30}
@@ -71,47 +70,39 @@ const RegisterButtonConfig = ({ selectedMessage, dataMessages, setDataMessages }
           setDataMessages([...dataMessages]);
         }}
       />
-      <div style={{ width: '100%' }}>
-        <CheckboxCustom
-          label="このボタンを利用しない"
-          onChange={(value) => {
-            selectedMessage.not_use_button = value;
-            setDataMessages([...dataMessages]);
-          }}
-          value={selectedMessage.not_use_button}
-        />
-      </div>
-      <div style={{ width: '100%' }}>
-        <CheckboxCustom
-          label="JavaScriptの利用"
-          onChange={(value) => {
-            selectedMessage.button_jscode = value;
-            setDataMessages([...dataMessages]);
-          }}
-          value={selectedMessage.button_jscode}
-        />
-      </div>
+      <CheckboxCustom
+        label="このボタンを利用しない"
+        onChange={(value) => {
+          selectedMessage.not_use_button = value;
+          setDataMessages([...dataMessages]);
+        }}
+        value={selectedMessage.not_use_button}
+      />
+      <CheckboxCustom
+        label="JavaScriptの利用"
+        onChange={(value) => {
+          selectedMessage.button_jscode = value;
+          setDataMessages([...dataMessages]);
+        }}
+        value={selectedMessage.button_jscode}
+      />
     </div>
-    {selectedMessage.button_jscode &&
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-        <div className='ss-user-setting__item-bottom' style={{ width: '18%', fontSize: '14px', fontWeight: '400', marginBottom: '5px' }}>
-          jscode
-        </div>
-        <div className="ss-user-setting__item-bottom">
-          <textarea
-            style={{ width: '95%' }}
-            className="ss-user-setting-item-textarea-label ss-input-value"
-            placeholder="テキスト"
-            rows="5"
-            value={selectedMessage.jscode}
-            onChange={(e) => {
-              selectedMessage.jscode = e.target.value;
-              setDataMessages([...dataMessages]);
-            }}
-          />
-        </div>
+    {selectedMessage.button_jscode && (
+      <div className="ss-layout-register-button-jscode">
+        <label htmlFor="ss-register-button-jscode">jscode</label>
+        <textarea
+          id="ss-register-button-jscode"
+          className="ss-user-setting-item-textarea-label ss-input-value"
+          placeholder="テキスト"
+          rows="5"
+          value={selectedMessage.jscode}
+          onChange={(e) => {
+            selectedMessage.jscode = e.target.value;
+            setDataMessages([...dataMessages]);
+          }}
+        />
       </div>
-    }
+    )}
   </div>
 );
 
@@ -129,7 +120,7 @@ const ScenarioUserSettingsPanel = () => {
   }
 
   return (
-    <div id="user-chat" className="ss-user-chat-detail-setting ss-user-setting">
+    <div id="user-chat" className="ss-user-chat-detail-setting ss-user-setting ss-layout-user-setting">
       <div className="ss-user-setting__top">
         <div className="ss-user-setting__name-wrapper">
           <div>
@@ -164,7 +155,6 @@ const ScenarioUserSettingsPanel = () => {
                             id={indexContent === (arr.length - 1) ? 'last-element' : ''}
                             className={`ss-user-setting__item ss-user-setting__item-${indexContent} ${indexContent === (arr.length - 1) ? 'ss-user-setting__item--active' : ''}`}
                             onClick={() => handleSelectContentMessage(indexContent, content.type)}
-                            style={{ marginBottom: '10px' }}
                           >
                             <MDBIcon
                               fas

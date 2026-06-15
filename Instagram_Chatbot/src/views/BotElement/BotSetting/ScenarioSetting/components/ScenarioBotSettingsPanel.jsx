@@ -357,7 +357,7 @@ const ScenarioBotSettingsPanel = () => {
   };
 
   return (
-    <div className="ss-bot-setting-container">
+    <div className="ss-bot-setting-container ss-layout-bot-setting">
       <div id="bot-statement" className="ss-bot-statement-detail-setting">
         <div style={{ padding: '10px' }}>
           <div className="ss-user-setting__top">

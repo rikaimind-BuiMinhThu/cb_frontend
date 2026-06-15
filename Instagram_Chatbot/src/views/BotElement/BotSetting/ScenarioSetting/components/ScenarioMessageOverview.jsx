@@ -1,17 +1,16 @@
 import React from 'react';
-import { useScenarioEditor } from '../context/ScenarioEditorContext';
+import PropTypes from 'prop-types';
 
-const ScenarioMessageOverview = ({ children }) => {
-  const { state } = useScenarioEditor();
-  const { errorScenarioName } = state;
-
-  return (
-    <div style={{ height: `calc(80% - ${errorScenarioName ? '30' : '10'}px)`, backgroundColor: '#f6fbff' }}>
-      <div className="ss-overview-detail">
-        {children}
-      </div>
+const ScenarioMessageOverview = ({ children }) => (
+  <div className="ss-layout-overview-messages">
+    <div className="ss-overview-detail">
+      {children}
     </div>
-  );
+  </div>
+);
+
+ScenarioMessageOverview.propTypes = {
+  children: PropTypes.node.isRequired,
 };
 
 export default ScenarioMessageOverview;

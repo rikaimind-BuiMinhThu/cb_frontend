@@ -8,6 +8,7 @@ import ScenarioCustomCssModal from './modals/ScenarioCustomCssModal';
 import ScenarioCustomJsModal from './modals/ScenarioCustomJsModal';
 import ScenarioTimerModal from './modals/ScenarioTimerModal';
 import ScenarioErrMsgJsModal from './modals/ScenarioErrMsgJsModal';
+import ScenarioSettingsModal from './modals/ScenarioSettingsModal';
 import { useScenarioPanelDestructuring } from '../hooks/useScenarioPanelDestructuring';
 
 const ScenarioEditorModals = () => {
@@ -77,6 +78,7 @@ const ScenarioEditorModals = () => {
       <ScenarioCustomJsModal />
       <ScenarioTimerModal />
       <ScenarioErrMsgJsModal />
+      <ScenarioSettingsModal />
       <ModalShort open={isOpenAddVariable} onClose={() => setIsOpenAddVariable(false)}>
         <div className="sl-popup-create-scenario-wrapper">
           <h4>変数追加</h4>
