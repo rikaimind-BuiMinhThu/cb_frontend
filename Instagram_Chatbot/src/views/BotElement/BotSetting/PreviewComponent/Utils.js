@@ -674,6 +674,17 @@ const isAndroid = () => {
   return /android/i.test(userAgent);
 };
 
+const getBotMessageDelay = (message, isUseGlobalDelay, globalDelayTime, fallbackDelay = 1000) => {
+  if (isUseGlobalDelay) {
+    return (globalDelayTime !== undefined && globalDelayTime !== null ? globalDelayTime : 1.0) * 1000;
+  }
+  const firstContent = message?.message_content?.[0];
+  if (firstContent?.is_use_custom_delay && firstContent?.custom_delay_time !== undefined && firstContent?.custom_delay_time !== null) {
+    return firstContent.custom_delay_time * 1000;
+  }
+  return fallbackDelay;
+};
+
 const moveToNext = (nextId) => {
   setTimeout(() => {
     const nextInput = document.getElementById(nextId);
@@ -699,4 +710,5 @@ export {
   sendErrorLogToServer, sendLogMessageToServer,
   moveToNext, getNextUserMsg,
   sendOpenChatbotCountRequest, sendCloseChatbotCountRequest, sendAppearLogToServer,
+  getBotMessageDelay,
 };

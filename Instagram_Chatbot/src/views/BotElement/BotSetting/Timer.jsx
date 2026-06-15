@@ -32,6 +32,8 @@ export default function Timer({
   finishMsg = initialState.messages.finish,
   variables = initialState.variables,
   startCount = false,
+  isRealtimeRemainingTime = false,
+  scenarioId = "",
   onCounting = (timer) => {}
 }) {
   const [config, setConfig] = useState(null);
@@ -153,7 +155,15 @@ export default function Timer({
     if (status !== TIMER_COMPONENT_STATUS.COUNTING || timer <= 0) return;
 
     const timeout = setTimeout(() => {
-      const newTimer = Math.round((timer - (TIMER_COUNTING_DELAY/1000)) * 1000) / 1000;
+      let newTimer;
+      if (isRealtimeRemainingTime) {
+        const storageKey = scenarioId ? `timer_start_time_${scenarioId}` : 'timer_start_time';
+        const startTime = Number(sessionStorage.getItem(storageKey) || new Date().getTime());
+        const elapsed = (new Date().getTime() - startTime) / 1000;
+        newTimer = Math.max(0, duration - elapsed);
+      } else {
+        newTimer = Math.round((timer - (TIMER_COUNTING_DELAY/1000)) * 1000) / 1000;
+      }
       setTimer(newTimer);
 
       let newStatus = status;
@@ -166,7 +176,7 @@ export default function Timer({
     }, TIMER_COUNTING_DELAY);
 
     return () => clearTimeout(timeout);
-  }, [timer, status]);
+  }, [timer, status, isRealtimeRemainingTime, duration, scenarioId]);
 
   useEffect(() => {
     const newConfig = {
@@ -182,13 +192,31 @@ export default function Timer({
 
     setConfig(newConfig);
 
-    const timer = timeLeft;
+    let timer;
+    if (isRealtimeRemainingTime) {
+      const storageKey = scenarioId ? `timer_start_time_${scenarioId}` : 'timer_start_time';
+      let startTime = sessionStorage.getItem(storageKey);
+
+      const midnight = new Date();
+      midnight.setHours(0, 0, 0, 0);
+      const currentMidnightTime = midnight.getTime();
+
+      if (!startTime || Number(startTime) !== currentMidnightTime) {
+        startTime = currentMidnightTime.toString();
+        sessionStorage.setItem(storageKey, startTime);
+      }
+
+      const elapsed = (new Date().getTime() - Number(startTime)) / 1000;
+      timer = Math.max(0, duration - elapsed);
+    } else {
+      timer = timeLeft;
+    }
     setTimer(timer);
 
     if (timer <= 0) {
       setStatus(TIMER_COMPONENT_STATUS.FINISH);
     }
-  }, [timeLeft, duration, finishMsg, countMsg, variables]);
+  }, [timeLeft, duration, finishMsg, countMsg, variables, isRealtimeRemainingTime, scenarioId]);
 
   if (!config) return null;
 

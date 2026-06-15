@@ -391,6 +391,8 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
         objParam: {},
         loadedStateFromSession: true,
         messagesList: conversation?.messages || [],
+        isUseGlobalDelay: conversation?.isUseGlobalDelay || false,
+        globalDelayTime: conversation?.globalDelayTime ?? 1.0,
         isOpen: state.isOpen || action.payload.isUsingAmazonPay,
         activePopupCloseBot: Boolean(designSetting?.popup_close_bot),
         titleBubble: designSetting?.title_bubble || "簡単90秒で注文完了",

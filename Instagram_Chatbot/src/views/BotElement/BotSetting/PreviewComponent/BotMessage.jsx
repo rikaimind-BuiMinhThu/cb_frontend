@@ -5,7 +5,7 @@ import { EC_CHATBOT_URL } from "variables/constants";
 import "moment/locale/zh-cn";
 import { BOT_MESSAGE_TYPES, RENDER_CHATBOT_CONFIG } from "./Constants";
 import HtmlCodeMessagePreview from "components/BotMessages/HtmlCodeMessagePreview";
-import { getElementMessageById } from "./Utils";
+import { getElementMessageById, getBotMessageDelay } from "./Utils";
 import { replaceVariables } from "./VariablesUtils";
 
 const BotMessage = ({
@@ -21,6 +21,8 @@ const BotMessage = ({
   currentMsgIndex,
   isBotOpen,
   delayEachMessage = RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE,
+  isUseGlobalDelay = false,
+  globalDelayTime = 1.0,
 }) => {
   const [isDelaying, setIsDelaying] = useState(true);
   const [text, setText] = useState("");
@@ -84,14 +86,16 @@ const BotMessage = ({
       return () => clearTimeout(timeoutId);
     }
 
+    let finalDelay = getBotMessageDelay({ message_content: [content] }, isUseGlobalDelay, globalDelayTime, delayEachMessage);
+
     if (isDelaying) {
       timeoutId = setTimeout(() => {
         setIsDelaying(false);
-      }, delayEachMessage);
+      }, finalDelay);
       return () => clearTimeout(timeoutId);
     }
 
-  }, [content.type, isDelaying, isBotOpen]);
+  }, [content.type, isDelaying, isBotOpen, content.is_use_custom_delay, content.custom_delay_time, delayEachMessage, isUseGlobalDelay, globalDelayTime]);
 
   useEffect(() => {
     // When hidden === undefined, it means the message is not hidden yet
