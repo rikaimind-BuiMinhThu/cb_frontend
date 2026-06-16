@@ -8,6 +8,8 @@ const ThemePreviewShell = ({
   mainColor,
   title,
   subtitle,
+  headerIconUrl,
+  showPlaceholderLabels = true,
   processLabel,
   processPercent,
   className,
@@ -18,8 +20,8 @@ const ThemePreviewShell = ({
     return generateScopedThemeCss(themeSettings, mainColor, null, `#${scopeId}`);
   }, [themeSettings, mainColor, scopeId]);
 
-  const displayTitle = title || 'サンプルタイトル';
-  const displaySubtitle = subtitle || 'サンプルサブタイトル';
+  const displayTitle = title || (showPlaceholderLabels ? 'サンプルタイトル' : '');
+  const displaySubtitle = subtitle || (showPlaceholderLabels ? 'サンプルサブタイトル' : '');
   const barWidth = `${Math.min(Math.max(processPercent, 0), 100)}%`;
 
   return (
@@ -31,6 +33,11 @@ const ThemePreviewShell = ({
         style={{ backgroundColor: mainColor }}
       >
         <div className="sp-header-left">
+          {headerIconUrl && (
+            <div className="sp-body-bot-side-avatar sp-avatar-bt">
+              <img src={headerIconUrl} alt="bot-header-icon" />
+            </div>
+          )}
           <div className="sp-header-left-label">
             <div className="sp-header-left-label-sub-title">{displaySubtitle}</div>
             <div className="sp-header-left-label-title">{displayTitle}</div>
@@ -60,6 +67,8 @@ ThemePreviewShell.propTypes = {
   mainColor: PropTypes.string,
   title: PropTypes.string,
   subtitle: PropTypes.string,
+  headerIconUrl: PropTypes.string,
+  showPlaceholderLabels: PropTypes.bool,
   processLabel: PropTypes.string,
   processPercent: PropTypes.number,
   className: PropTypes.string,
@@ -71,6 +80,8 @@ ThemePreviewShell.defaultProps = {
   mainColor: '#327AED',
   title: '',
   subtitle: '',
+  headerIconUrl: '',
+  showPlaceholderLabels: true,
   processLabel: '1 / 3',
   processPercent: 33,
   className: '',

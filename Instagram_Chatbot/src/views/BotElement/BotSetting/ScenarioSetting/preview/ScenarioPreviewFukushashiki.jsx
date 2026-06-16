@@ -84,6 +84,11 @@ import { convertToFukushashikiObject } from "../../PreviewFukushashiki/Fukushash
 import { handleValidateField } from "../../PreviewFukushashiki/ValidationUtils";
 import { createOrAddLinesCart } from "../../ShopifyUtils";
 import { buildEditorDraftPreviewUpdate } from "./buildPreviewStateFromDraft";
+import { buildScenarioPreviewHeaderMeta } from "./buildScenarioPreviewHeaderMeta";
+import {
+  postToParent,
+  SCENARIO_PREVIEW_MESSAGES,
+} from "./scenarioPreviewBridge";
 
 const isPreviewMobile = (deviceMode) => deviceMode === 'sp';
 
@@ -213,6 +218,25 @@ const ScenarioPreviewFukushashiki = ({
       payload: buildEditorDraftPreviewUpdate(editorDraft),
     });
   }, [editorPreview, editorDraft, state.loadedStateFromSession]);
+
+  useEffect(() => {
+    if (!editorPreview || !state.botInfor) return;
+
+    const isOpen = embedded || editorPreview || state.isOpen;
+    postToParent({
+      type: SCENARIO_PREVIEW_MESSAGES.PREVIEW_BOT_META,
+      payload: buildScenarioPreviewHeaderMeta(state.botInfor, {
+        isOpen,
+        themeSettings: state.themeSettings,
+      }),
+    });
+  }, [
+    editorPreview,
+    embedded,
+    state.botInfor,
+    state.isOpen,
+    state.themeSettings,
+  ]);
 
   useEffect(() => { 
     if (!state.isUseBtnUpdateTracking) return;
@@ -1369,8 +1393,8 @@ const ScenarioPreviewFukushashiki = ({
         containerStyle: {
           position: 'relative',
           width: '100%',
-          height: 'auto',
-          minHeight: '400px',
+          height: editorPreview ? '100%' : 'auto',
+          minHeight: editorPreview ? '0' : '400px',
           display: 'flex',
           flexDirection: 'column',
           backgroundColor: 'transparent',
@@ -1379,7 +1403,10 @@ const ScenarioPreviewFukushashiki = ({
         bodyStyle: {
           backgroundColor: state.botInfor?.opacity_color,
           flex: 1,
-          display: 'block',
+          minHeight: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
         },
       };
     }

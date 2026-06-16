@@ -1,13 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Cookies from 'js-cookie';
 import { getChatBotSetting } from '../../PreviewComponent/Utils';
-import {
-  parseDesignSettings,
-  resolveMainColorFromApi,
-} from '../../DesignSetting/utils/designChatbotUtils';
 import ThemePreviewShell from '../../DesignSetting/components/ThemePreviewShell';
 import { useScenarioEditor } from '../context/ScenarioEditorContext';
 import { buildScenarioSavePayload } from '../utils/scenarioApiUtils';
+import { buildScenarioPreviewHeaderMetaFromChatbotApi } from '../preview/buildScenarioPreviewHeaderMeta';
 import {
   buildScenarioPreviewIframeSrc,
   isSameOriginMessage,
@@ -23,8 +20,9 @@ const PREVIEW_LOADING_TIMEOUT_MS = 20000;
 
 const DEFAULT_BOT_META = {
   themeSettings: null,
-  title: 'サンプルタイトル',
-  subtitle: 'サンプルサブタイトル',
+  title: '簡単90秒で注文完了',
+  subtitle: '',
+  headerIconUrl: '',
   mainColor: '#327AED',
 };
 
@@ -175,20 +173,10 @@ const ScenarioEditorPreviewPanel = () => {
     getChatBotSetting(currentBotId)
       .then((response) => {
         const data = response?.data?.data;
-        if (!data) return;
+        const meta = buildScenarioPreviewHeaderMetaFromChatbotApi(data);
+        if (!meta) return;
 
-        const mainColor = resolveMainColorFromApi(data);
-        const apiColorKey = data.main_color && !String(data.main_color).startsWith('#')
-          ? data.main_color
-          : null;
-        const design = parseDesignSettings(data.design_settings, mainColor, apiColorKey);
-
-        setBotMeta({
-          themeSettings: design.themeSettings,
-          title: design.titleBubble || data.title || DEFAULT_BOT_META.title,
-          subtitle: data.subtitle || DEFAULT_BOT_META.subtitle,
-          mainColor,
-        });
+        setBotMeta(meta);
       })
       .catch(() => {
         setBotMeta(DEFAULT_BOT_META);
@@ -218,6 +206,15 @@ const ScenarioEditorPreviewPanel = () => {
 
       if (type === SCENARIO_PREVIEW_MESSAGES.PREVIEW_CONTENT_READY) {
         setIsPreviewLoading(false);
+        return;
+      }
+
+      if (type === SCENARIO_PREVIEW_MESSAGES.PREVIEW_BOT_META) {
+        if (!payload) return;
+        setBotMeta((prev) => ({
+          ...prev,
+          ...payload,
+        }));
         return;
       }
 
@@ -291,6 +288,8 @@ const ScenarioEditorPreviewPanel = () => {
         mainColor={botMeta?.mainColor || DEFAULT_BOT_META.mainColor}
         title={botMeta?.title}
         subtitle={botMeta?.subtitle}
+        headerIconUrl={botMeta?.headerIconUrl}
+        showPlaceholderLabels={false}
         processLabel={processLabel}
         processPercent={processPercent}
         className="scenario-editor-preview is_mobile"

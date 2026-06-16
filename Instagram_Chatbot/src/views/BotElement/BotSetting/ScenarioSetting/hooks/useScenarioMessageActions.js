@@ -182,6 +182,7 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
     const messageEl = document.querySelector(`.ss-message-${index}`);
     if (messageEl) {
       messageEl.classList.add('ss-message--select');
+      messageEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
   }, [dataMessages, setBelongTo, setIndexMessageSelect, setIsConditionUp, setMessageType]);
 
