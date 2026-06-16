@@ -25,13 +25,18 @@ import { getDefaultValue } from '../PreviewComponent/VariablesUtils';
 
 const PreviewFaqReducer = (state, action) => {
   switch (action.type) {
-    case PREVIEW_ACTIONS.UPDATE_MULTI_STATE:
+    case PREVIEW_ACTIONS.UPDATE_MULTI_STATE: {
       if (action.payload.removeTempDelay && action.payload.renderMessagesList?.length) {
         action.payload.renderMessagesList = action.payload.renderMessagesList?.filter(m => {
           return !isTempDelay(m, RENDER_CHATBOT_CONFIG.TEMP_DELAY_PREFIX);
         }) || [];
       }
+      const { isEditorPreviewDraft, ...editorPreviewPayload } = action.payload || {};
+      if (isEditorPreviewDraft) {
+        return { ...state, ...editorPreviewPayload };
+      }
       return { ...state, ...(!!state.submitErrorMessage ? processMessagesForErrorState(action.payload): action.payload) };
+    }
 
     case PREVIEW_ACTIONS.SET_PROCESSING: 
       return { ...state, isProcessing: action.payload };

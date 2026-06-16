@@ -7,6 +7,8 @@ const ButtonSubmitPreview = ({
   indexContent,
 }) => {
   const buttonSubmit = content.button_submit;
+  if (content.type !== 'button_submit' || !buttonSubmit) return null;
+
   return (
     <>
       {content.type === 'button_submit' &&
@@ -32,7 +34,7 @@ const ButtonSubmitPreview = ({
           <div className="ss-user-setting__item-text_input-top">
             <Button
               data-id={message?.message_content[indexContent]?.['button_submit_id'] ?? content.button_submit_id}
-              className="ss-user-setting__select-btn-add"
+              className="ss-user-setting__select-btn-add chatbot-submit-button"
               style={{
                 background: "linear-gradient(135deg, #4caf50, #43a047)",
                 color: "#fff",

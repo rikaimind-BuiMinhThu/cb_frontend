@@ -6,6 +6,9 @@ export default function SubmitButton({ content, submitErrorMessage = "", onChang
   if (content.type !== 'button_submit') return null;
 
   const buttonSubmit = content.button_submit;
+  if (!buttonSubmit) return null;
+
+  const submitButtonId = `chatbot-submit-button-${message?.id ?? 'msg'}-${messageIndex}-${contentIndex}`;
 
   useEffect(() => {
     if (!buttonSubmit.is_display_error_message) return;
@@ -85,7 +88,11 @@ export default function SubmitButton({ content, submitErrorMessage = "", onChang
       {renderSubmitErrorMessage()}
       <div className="ss-user-setting__item-text_input-top">
         {buttonSubmit?.style && <style dangerouslySetInnerHTML={{ __html: buttonSubmit.style }} />}
-        <button id="chatbot-submit-button" onClick={onChangeAndClickNext}>
+        <button
+          id={submitButtonId}
+          className="chatbot-submit-button"
+          onClick={onChangeAndClickNext}
+        >
           {getButtonSubmitName()}
         </button>
       </div>

@@ -179,7 +179,10 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
       ele.classList.remove('ss-message--select');
       ele.classList.remove('ss-message--error');
     });
-    document.querySelector(`.ss-message-${index}`).classList.add('ss-message--select');
+    const messageEl = document.querySelector(`.ss-message-${index}`);
+    if (messageEl) {
+      messageEl.classList.add('ss-message--select');
+    }
   }, [dataMessages, setBelongTo, setIndexMessageSelect, setIsConditionUp, setMessageType]);
 
   const handleHiddenMessage = useCallback((index, role) => {

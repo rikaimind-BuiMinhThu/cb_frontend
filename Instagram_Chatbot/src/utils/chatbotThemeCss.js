@@ -93,9 +93,12 @@ const buildThemeRules = (theme, scopeSelector = '') => {
     previewFocusSelector,
   );
 
+  const submitBtnSelector = scopeSelector
+    ? `${scopeSelector} #chatbot-submit-button, ${scopeSelector} .chatbot-submit-button, ${scopeSelector} [id^="chatbot-submit-button-"]`
+    : '#chatbot-submit-button, .chatbot-submit-button, [id^="chatbot-submit-button-"]';
   const btnSelector = scopeSelector
-    ? `${scopeSelector} #chatbot-submit-button, ${scopeSelector} .btn-preview-bot, ${scopeSelector} .sp-body .btn-new-bot`
-    : '#chatbot-submit-button, .btn-preview-bot, .sp-body .btn-new-bot';
+    ? `${submitBtnSelector}, ${scopeSelector} .btn-preview-bot, ${scopeSelector} .sp-body .btn-new-bot`
+    : `${submitBtnSelector}, .btn-preview-bot, .sp-body .btn-new-bot`;
 
   const previewBtnPressedRule = scopeSelector ? `
 ${scopeSelector} .theme-preview--btn-pressed.btn-new-bot {

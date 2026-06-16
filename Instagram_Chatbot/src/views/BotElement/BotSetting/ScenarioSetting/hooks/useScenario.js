@@ -324,10 +324,6 @@ export const useScenario = () => {
         setMessageNoti(res.data.message);
       }
       handleGetMessage();
-      setIsOpenPreview(false);
-      setTimeout(() => {
-        setIsOpenPreview(true);
-      }, 200);
       setTimeout(() => {
         setIsOpenNoti(false);
         setMessageNoti('');
@@ -341,25 +337,31 @@ export const useScenario = () => {
 
   const handleOpenPreview = useCallback((isOpen) => {
     if (!isOpenPreview) return;
-    if (isOpen) {
-      document.getElementById('sp-container').style.height = '620px';
-      document.getElementById('sp-header').style.position = 'static';
-      document.getElementById('sp-header').style.borderBottomLeftRadius = '0px';
-      document.getElementById('sp-header').style.borderBottomRightRadius = '0px';
-      document.getElementById('sp-header').style.borderTopLeftRadius = '2px';
-      document.getElementById('sp-header').style.borderTopRightRadius = '2px';
-      document.getElementById('sp-process-bar').style.display = 'block';
-      document.getElementById('sp-body').style.display = 'block';
-    } else {
-      document.getElementById('sp-container').style.height = '0px';
-      document.getElementById('sp-process-bar').style.display = 'none';
-      document.getElementById('sp-body').style.display = 'none';
-      document.getElementById('sp-header').style.borderBottomLeftRadius = '25px';
-      document.getElementById('sp-header').style.borderBottomRightRadius = '25px';
-      document.getElementById('sp-header').style.borderTopLeftRadius = '25px';
-      document.getElementById('sp-header').style.borderTopRightRadius = '25px';
-      document.getElementById('sp-header').style.position = 'absolute';
-      document.getElementById('sp-header').style.bottom = '0px';
+    const spContainer = document.getElementById('sp-container');
+    const spHeader = document.getElementById('sp-header');
+    const spProcessBar = document.getElementById('sp-process-bar');
+    const spBody = document.getElementById('sp-body');
+    if (spContainer && spHeader && spProcessBar && spBody) {
+      if (isOpen) {
+        spContainer.style.height = '620px';
+        spHeader.style.position = 'static';
+        spHeader.style.borderBottomLeftRadius = '0px';
+        spHeader.style.borderBottomRightRadius = '0px';
+        spHeader.style.borderTopLeftRadius = '2px';
+        spHeader.style.borderTopRightRadius = '2px';
+        spProcessBar.style.display = 'block';
+        spBody.style.display = 'block';
+      } else {
+        spContainer.style.height = '0px';
+        spProcessBar.style.display = 'none';
+        spBody.style.display = 'none';
+        spHeader.style.borderBottomLeftRadius = '25px';
+        spHeader.style.borderBottomRightRadius = '25px';
+        spHeader.style.borderTopLeftRadius = '25px';
+        spHeader.style.borderTopRightRadius = '25px';
+        spHeader.style.position = 'absolute';
+        spHeader.style.bottom = '0px';
+      }
     }
     setIsOpenPreview(!isOpenPreview);
   }, [isOpenPreview]);

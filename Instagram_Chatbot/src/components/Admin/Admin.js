@@ -13,6 +13,7 @@ import ShortUrl from 'views/Public/ShortUrl';
 import PreviewClone from 'views/BotElement/BotSetting/PreviewClone';
 import PreviewFukushashiki from 'views/BotElement/BotSetting/PreviewFukushashiki';
 import PreviewFaq from 'views/BotElement/BotSetting/PreviewFaq';
+import ScenarioPreviewEditorPage from 'views/BotElement/BotSetting/ScenarioSetting/preview/ScenarioPreviewEditorPage';
 import News from 'views/Public/News';
 import Instagram from 'views/Public/Instagram';
 
@@ -41,6 +42,7 @@ class App extends Component {
             <Route exact path="/preview-customer" component={PreviewClone} />
             <Route exact path="/preview-customer-fukushashiki" component={PreviewFukushashiki} />
             <Route exact path="/preview-faq" component={PreviewFaq} />
+            <Route exact path="/preview-scenario-editor" component={ScenarioPreviewEditorPage} />
             <Route exact path="/news" component={News} />
             {/* <Route exact path="/instagram" component={Instagram} /> */}
             <Route exact path="/" component={Login} />

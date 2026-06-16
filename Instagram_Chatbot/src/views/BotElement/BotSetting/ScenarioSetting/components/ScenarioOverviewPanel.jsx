@@ -4,8 +4,16 @@ import { useScenarioEditor } from '../context/ScenarioEditorContext';
 
 const ScenarioOverviewPanel = () => {
   const { state, actions } = useScenarioEditor();
-  const { scenarioName, scenarioType, errorScenarioName } = state;
-  const { setScenarioName, setScenarioType, setIsOpenScenarioSettingsModal } = actions;
+  const {
+    scenarioName,
+    scenarioType,
+    errorScenarioName,
+  } = state;
+  const {
+    setScenarioName,
+    setScenarioType,
+    setIsOpenScenarioSettingsModal,
+  } = actions;
 
   return (
     <div className="ss-layout-overview-panel">
@@ -34,13 +42,15 @@ const ScenarioOverviewPanel = () => {
         {errorScenarioName && (
           <span style={{ fontSize: '12px', color: '#FF621D' }}>{errorScenarioName}</span>
         )}
-        <button
-          type="button"
-          className="ss-layout-settings-open-btn"
-          onClick={() => setIsOpenScenarioSettingsModal(true)}
-        >
-          シナリオ設定
-        </button>
+        <div className="ss-layout-basic-settings-actions">
+          <button
+            type="button"
+            className="ss-layout-settings-open-btn"
+            onClick={() => setIsOpenScenarioSettingsModal(true)}
+          >
+            シナリオ設定
+          </button>
+        </div>
       </section>
     </div>
   );

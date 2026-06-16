@@ -61,6 +61,47 @@
   border-bottom: 1px solid #e8e8e8;
 }
 
+.ss-layout-overview-preview {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: #f6fbff;
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 8px;
+}
+
+.ss-layout-preview-toolbar {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 0 4px 8px;
+}
+
+.ss-layout-preview-toolbar__btn {
+  flex: 1;
+  padding: 6px 10px;
+  font-size: 12px;
+  border: 1px solid #327aed;
+  border-radius: 4px;
+  background: #fff;
+  color: #327aed;
+  cursor: pointer;
+}
+
+.ss-layout-preview-toolbar__btn:hover {
+  background: #f0f6ff;
+}
+
+.ss-layout-overview-preview .scenario-editor-preview-wrapper,
+.ss-layout-overview-preview .theme-customize-preview {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  max-width: 100%;
+}
+
 .ss-layout-overview-messages {
   flex: 1;
   min-height: 0;
@@ -184,6 +225,30 @@
 .ss-layout-settings-open-btn:hover {
   background: #024bb9;
   color: #fff;
+}
+
+.ss-layout-basic-settings-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-top: 4px;
+}
+
+.ss-layout-preview-close-btn {
+  padding: 8px 16px;
+  font-size: 13px;
+  color: #555;
+  background: #fff;
+  border: 1px solid #d9d9d9;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.ss-layout-preview-close-btn:hover {
+  background: #f5f5f5;
+  border-color: #bbb;
 }
 
 /* Settings modal */
@@ -379,5 +444,9 @@
   .ss-layout-basic-settings-row .ss-layout-scenario-type {
     width: 100%;
     max-width: none;
+  }
+
+  .ss-editor-layout-v2.ss-editor-layout-v2--with-preview {
+    grid-template-columns: 1fr;
   }
 }

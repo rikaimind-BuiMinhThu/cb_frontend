@@ -23,7 +23,9 @@
     margin: 5px !important;
 }
 
-#chatbot-submit-button {
+#chatbot-submit-button,
+.chatbot-submit-button,
+[id^="chatbot-submit-button-"] {
     background: linear-gradient(135deg, #4caf50, #43a047);
     color: #fff;
     border: none;
@@ -37,12 +39,16 @@
     width: 85%;
     align-content: center;
 }
-#chatbot-submit-button:hover {
+#chatbot-submit-button:hover,
+.chatbot-submit-button:hover,
+[id^="chatbot-submit-button-"]:hover {
     background: linear-gradient(135deg, #43a047, #4caf50);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     transform: translateY(-2px);
 }
-#chatbot-submit-button:active {
+#chatbot-submit-button:active,
+.chatbot-submit-button:active,
+[id^="chatbot-submit-button-"]:active {
     transform: translateY(0);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
