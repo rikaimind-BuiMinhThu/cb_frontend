@@ -13,6 +13,7 @@ const ThemePreviewShell = ({
   processLabel,
   processPercent,
   className,
+  errorPreviewText,
   children,
 }) => {
   const scopedCss = useMemo(() => {
@@ -54,6 +55,18 @@ const ThemePreviewShell = ({
         </div>
       </div>
 
+      {errorPreviewText ? (
+        <div className="theme-customize-preview__error-top">
+          <div className="ss-user-setting__item-text_input-top">
+            <div
+              className={`error-message-modal ss-bot-submit-error-message theme-customize-preview__error-message`}
+            >
+              {errorPreviewText}
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       <div className="sp-body theme-customize-preview__body">
         {children}
       </div>
@@ -72,6 +85,7 @@ ThemePreviewShell.propTypes = {
   processLabel: PropTypes.string,
   processPercent: PropTypes.number,
   className: PropTypes.string,
+  errorPreviewText: PropTypes.string,
   children: PropTypes.node,
 };
 
@@ -85,6 +99,7 @@ ThemePreviewShell.defaultProps = {
   processLabel: '1 / 3',
   processPercent: 33,
   className: '',
+  errorPreviewText: '',
   children: null,
 };
 

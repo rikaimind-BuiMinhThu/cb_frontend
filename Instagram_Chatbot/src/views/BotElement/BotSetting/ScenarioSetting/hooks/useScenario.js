@@ -17,6 +17,11 @@ import {
   buildScenarioSavePayload,
   parseScenarioResponse,
 } from '../utils/scenarioApiUtils';
+import {
+  AUTO_LOGOUT_INCOMPLETE_CONFIG_ERROR,
+  createEmptyAutoLogoutConfig,
+  isAutoLogoutConfigValid,
+} from '../utils/autoLogoutUtils';
 
 const INITIAL_TIMER_CONFIG = {
   isOpen: false,
@@ -55,6 +60,10 @@ export const useScenario = () => {
   const [timerConfig, setTimerConfig] = useState(INITIAL_TIMER_CONFIG);
 
   const [errMsgJsCode, setErrMsgJsCode] = useState('');
+  const [errMsgSettingMode, setErrMsgSettingMode] = useState('js');
+  const [errMsgFieldSelectors, setErrMsgFieldSelectors] = useState('');
+  const [errMsgFormSelectors, setErrMsgFormSelectors] = useState('');
+  const [launchButtonSelectors, setLaunchButtonSelectors] = useState('');
   const [isOpenErrMsgByJsSettingModal, setIsOpenErrMsgByJsSettingModal] = useState(false);
   const [isUseErrMsgByJs, setIsUseErrMsgByJs] = useState(false);
 
@@ -112,6 +121,8 @@ export const useScenario = () => {
   const [isUsedCrosssell, setIsUsedCrosssell] = useState(false);
   const [productIdCrossSell, setProductIdCrossSell] = useState('');
   const [isClearLandingPageSession, setIsClearLandingPageSession] = useState(false);
+  const [autoLogoutConfig, setAutoLogoutConfig] = useState(createEmptyAutoLogoutConfig);
+  const [isOpenAutoLogoutModal, setIsOpenAutoLogoutModal] = useState(false);
   const [isUseBtnUpdateTracking, setIsUseBtnUpdateTracking] = useState(false);
   const [useFullwidthChatbotMobile, setUseFullwidthChatbotMobile] = useState(false);
   const [clientCartSystem, setClientCartSystem] = useState(null);
@@ -155,10 +166,15 @@ export const useScenario = () => {
     setBottomBodyCustomJsCode(parsed.bottomBodyCustomJsCode);
     setIsUseErrMsgByJs(parsed.isUseErrMsgByJs);
     setErrMsgJsCode(parsed.errMsgJsCode);
+    setErrMsgSettingMode(parsed.errMsgSettingMode || 'js');
+    setErrMsgFieldSelectors(parsed.errMsgFieldSelectors || '');
+    setErrMsgFormSelectors(parsed.errMsgFormSelectors || '');
+    setLaunchButtonSelectors(parsed.launchButtonSelectors || '');
     setIsUsedMessageLoadedPast(parsed.isUsedMessageLoadedPast);
     setIsUsedCrosssell(parsed.isUsedCrosssell);
     setProductIdCrossSell(parsed.productIdCrossSell);
     setIsClearLandingPageSession(parsed.isClearLandingPageSession);
+    setAutoLogoutConfig(parsed.autoLogoutConfig || createEmptyAutoLogoutConfig());
     setIsUseBtnUpdateTracking(parsed.isUseBtnUpdateTracking);
     setUseFullwidthChatbotMobile(parsed.useFullwidthChatbotMobile);
     setTimerConfig(parsed.timerConfig);
@@ -228,6 +244,17 @@ export const useScenario = () => {
     return true;
   }, [scenarioName]);
 
+  const validateAutoLogoutConfig = useCallback(() => {
+    if (!isClearLandingPageSession) return true;
+
+    if (!isAutoLogoutConfigValid(autoLogoutConfig?.final)) {
+      showNotification(AUTO_LOGOUT_INCOMPLETE_CONFIG_ERROR);
+      return false;
+    }
+
+    return true;
+  }, [autoLogoutConfig?.final, isClearLandingPageSession, showNotification]);
+
   const getSavePayload = useCallback(() => buildScenarioSavePayload({
     dataMessages,
     urlThanks,
@@ -250,17 +277,27 @@ export const useScenario = () => {
     timerConfig,
     isUseErrMsgByJs,
     errMsgJsCode,
+    errMsgSettingMode,
+    errMsgFieldSelectors,
+    errMsgFormSelectors,
+    launchButtonSelectors,
     isUsedMessageLoadedPast,
     useFullwidthChatbotMobile,
     isUsedCrosssell,
     productIdCrossSell,
     isClearLandingPageSession,
+    autoLogoutConfig,
   }), [
+    autoLogoutConfig,
     coupon,
     customCssContent,
     dataMessages,
     bottomBodyCustomJsCode,
     errMsgJsCode,
+    errMsgSettingMode,
+    errMsgFieldSelectors,
+    errMsgFormSelectors,
+    launchButtonSelectors,
     headCustomJsCode,
     isClearLandingPageSession,
     isUseBtnUpdateTracking,
@@ -286,6 +323,7 @@ export const useScenario = () => {
 
   const onClickSaveScenario = useCallback(async () => {
     if (!validateScenarioName()) return;
+    if (!validateAutoLogoutConfig()) return;
 
     try {
       const res = await api.post(
@@ -308,10 +346,11 @@ export const useScenario = () => {
         tokenExpired();
       }
     }
-  }, [botId, getSavePayload, handleGetMessage, scenarioId, validateScenarioName]);
+  }, [botId, getSavePayload, handleGetMessage, scenarioId, validateAutoLogoutConfig, validateScenarioName]);
 
   const onClickSavePreview = useCallback(() => {
     if (!validateScenarioName()) return;
+    if (!validateAutoLogoutConfig()) return;
 
     api.post(
       `/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`,
@@ -333,7 +372,7 @@ export const useScenario = () => {
         tokenExpired();
       }
     });
-  }, [botId, getSavePayload, handleGetMessage, scenarioId, validateScenarioName]);
+  }, [botId, getSavePayload, handleGetMessage, scenarioId, validateAutoLogoutConfig, validateScenarioName]);
 
   const handleOpenPreview = useCallback((isOpen) => {
     if (!isOpenPreview) return;
@@ -440,6 +479,10 @@ export const useScenario = () => {
       isOpenModalCustomJsCode,
       timerConfig,
       errMsgJsCode,
+      errMsgSettingMode,
+      errMsgFieldSelectors,
+      errMsgFormSelectors,
+      launchButtonSelectors,
       isOpenErrMsgByJsSettingModal,
       isUseErrMsgByJs,
       errorScenarioName,
@@ -482,6 +525,8 @@ export const useScenario = () => {
       isUsedCrosssell,
       productIdCrossSell,
       isClearLandingPageSession,
+      autoLogoutConfig,
+      isOpenAutoLogoutModal,
       isUseBtnUpdateTracking,
       useFullwidthChatbotMobile,
       clientCartSystem,
@@ -510,6 +555,10 @@ export const useScenario = () => {
       setIsOpenModalCustomJsCode,
       setTimerConfig,
       setErrMsgJsCode,
+      setErrMsgSettingMode,
+      setErrMsgFieldSelectors,
+      setErrMsgFormSelectors,
+      setLaunchButtonSelectors,
       setIsOpenErrMsgByJsSettingModal,
       setIsUseErrMsgByJs,
       setErrorScenarioName,
@@ -552,6 +601,8 @@ export const useScenario = () => {
       setIsUsedCrosssell,
       setProductIdCrossSell,
       setIsClearLandingPageSession,
+      setAutoLogoutConfig,
+      setIsOpenAutoLogoutModal,
       setIsUseBtnUpdateTracking,
       setUseFullwidthChatbotMobile,
       setClientCartSystem,

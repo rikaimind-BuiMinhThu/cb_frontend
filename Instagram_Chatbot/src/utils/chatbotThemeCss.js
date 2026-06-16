@@ -51,6 +51,9 @@ const buildThemeVariables = (theme) => `
   --c-checkbox-unchecked-border: ${theme.checkboxUncheckedBorderColor};
   --c-checkbox-checked-bg: ${theme.checkboxCheckedBgColor};
   --c-checkbox-checked-border: ${theme.checkboxCheckedBorderColor};
+  --c-error-bg: ${theme.errorMessageBgColor};
+  --c-error-text: ${theme.errorMessageTextColor};
+  --c-error-font-size: ${theme.errorMessageFontSize};
 `;
 
 const buildFieldFocusStyles = (fieldFocusSelectors, focusEffect, previewFocusSelector = '') => {
@@ -169,6 +172,18 @@ ${spBodySelector} .ant-checkbox-inner {
 ${spBodySelector} .ant-checkbox-checked .ant-checkbox-inner {
   background-color: var(--c-checkbox-checked-bg) !important;
   border-color: var(--c-checkbox-checked-border) !important;
+}
+
+${scopePrefix}.ss-bot-submit-error-message,
+${scopePrefix}.error-container .emsg_holder,
+${scopePrefix}.error-container .error_each {
+  background-color: var(--c-error-bg, #ffebee) !important;
+  color: var(--c-error-text, #d32f2f) !important;
+  font-size: var(--c-error-font-size, 14px) !important;
+}
+
+${scopePrefix}.ss-bot-submit-error-message {
+  border: 1px solid var(--c-error-text, #f44336) !important;
 }${previewBtnPressedRule}`.trim();
 };
 
@@ -213,6 +228,15 @@ export const parseThemeFromDesignSettings = (designSettings) => {
     ? JSON.parse(designSettings)
     : designSettings;
   return parsed?.theme || null;
+};
+
+export const getErrorThemeStyles = (rawTheme, mainColorHex, apiColorKey) => {
+  const theme = mergeThemeWithDefaults(rawTheme, mainColorHex, apiColorKey);
+  return {
+    bgColor: theme.errorMessageBgColor,
+    textColor: theme.errorMessageTextColor,
+    fontSize: theme.errorMessageFontSize,
+  };
 };
 
 export { CAMEL_TO_SNAKE_THEME };

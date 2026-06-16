@@ -1,5 +1,10 @@
 import { TIMER_TYPES, TIMER_VARIABLES } from '../../PreviewComponent/Constants';
 import { initialTimeConfig } from '../constants/scenarioFormConstants';
+import {
+  buildAutoLogoutApiPayload,
+  createEmptyAutoLogoutConfig,
+  parseAutoLogoutFromApi,
+} from './autoLogoutUtils';
 
 export const cleanMessageTimerConfig = (config) => {
   const cleanedConfig = { ...config };
@@ -90,10 +95,23 @@ export const parseScenarioResponse = (res) => {
     },
     isUseErrMsgByJs: data.is_used_err_msg_by_js || false,
     errMsgJsCode: data.err_msg_js_code || '',
+    errMsgSettingMode: data.err_msg_setting_mode || 'js',
+    errMsgFieldSelectors: data.err_msg_field_selectors || '',
+    errMsgFormSelectors: data.err_msg_form_selectors || '',
+    launchButtonSelectors: data.launch_button_selectors || '',
     isUsedMessageLoadedPast: data.is_used_message_loaded_past || false,
     isUsedCrosssell: !!data.is_used_crosssell,
     productIdCrossSell: data.product_id_cross_sell || '',
     isClearLandingPageSession: data.is_clear_landing_page_session || false,
+    autoLogoutConfig: (() => {
+      const parsed = parseAutoLogoutFromApi(
+        data.auto_logout || conversation.auto_logout || {},
+      );
+      return {
+        temp: { ...parsed },
+        final: { ...parsed },
+      };
+    })(),
     isUseBtnUpdateTracking: conversation.isUseBtnUpdateTracking || false,
     useFullwidthChatbotMobile: data.use_fullwidth_chatbot_mobile || false,
     timerConfig: parseTimerConfigFromApi(data.timer_config),
@@ -123,11 +141,16 @@ export const buildScenarioSavePayload = (state) => {
     timerConfig,
     isUseErrMsgByJs,
     errMsgJsCode,
+    errMsgSettingMode,
+    errMsgFieldSelectors,
+    errMsgFormSelectors,
+    launchButtonSelectors,
     isUsedMessageLoadedPast,
     useFullwidthChatbotMobile,
     isUsedCrosssell,
     productIdCrossSell,
     isClearLandingPageSession,
+    autoLogoutConfig,
   } = state;
 
   return {
@@ -160,10 +183,17 @@ export const buildScenarioSavePayload = (state) => {
     }),
     is_used_err_msg_by_js: isUseErrMsgByJs,
     err_msg_js_code: errMsgJsCode,
+    err_msg_setting_mode: errMsgSettingMode || 'js',
+    err_msg_field_selectors: errMsgFieldSelectors,
+    err_msg_form_selectors: errMsgFormSelectors,
+    launch_button_selectors: launchButtonSelectors,
     is_used_message_loaded_past: isUsedMessageLoadedPast,
     use_fullwidth_chatbot_mobile: useFullwidthChatbotMobile,
     is_used_crosssell: isUsedCrosssell,
     product_id_cross_sell: isUsedCrosssell ? productIdCrossSell : null,
     is_clear_landing_page_session: isClearLandingPageSession,
+    auto_logout: isClearLandingPageSession
+      ? buildAutoLogoutApiPayload(autoLogoutConfig?.final || createEmptyAutoLogoutConfig().final)
+      : buildAutoLogoutApiPayload(createEmptyAutoLogoutConfig().final),
   };
 };

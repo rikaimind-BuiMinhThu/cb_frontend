@@ -80,6 +80,8 @@ import {
   setConversionParamToLocalStorage, fukushashikiSavedStateToLp, fukushashikiToLP,
   executeLpJsCode, injectCustomJsCode, postMessageToParent
 } from "../../PreviewFukushashiki/LPUtils";
+import { resolveErrMsgLpScript } from "../utils/resolveErrMsgLpScript";
+import { generateLaunchButtonLpScript } from "../utils/launchButtonLpScriptUtils";
 import { convertToFukushashikiObject } from "../../PreviewFukushashiki/FukushashikiDataConverterUtils";
 import { handleValidateField } from "../../PreviewFukushashiki/ValidationUtils";
 import { createOrAddLinesCart } from "../../ShopifyUtils";
@@ -179,6 +181,10 @@ const previewInitialState = {
   loadedStateFromSession: false,
   isUsedErrMsgByJs: false,
   errMsgJsCode: '',
+  errMsgSettingMode: 'js',
+  errMsgFieldSelectors: '',
+  errMsgFormSelectors: '',
+  launchButtonSelectors: '',
   isProcessing: false,
   conversionStatus: null,
   manuallyClosed: false,
@@ -526,9 +532,28 @@ const ScenarioPreviewFukushashiki = ({
     // For run errorJsCode
   useEffect(() => {
     if (editorPreview) return undefined;
-    if (!state.isUsedErrMsgByJs || !state.errMsgJsCode) return;
-    executeLpJsCode(state.errMsgJsCode, state);
-  }, [state.errMsgJsCode, state.isUsedErrMsgByJs, editorPreview]);
+    if (!state.isUsedErrMsgByJs) return undefined;
+    const jsCode = resolveErrMsgLpScript(state);
+    if (jsCode) executeLpJsCode(jsCode, state);
+    return undefined;
+  }, [
+    editorPreview,
+    state.isUsedErrMsgByJs,
+    state.errMsgJsCode,
+    state.errMsgSettingMode,
+    state.errMsgFieldSelectors,
+    state.errMsgFormSelectors,
+    state.themeSettings,
+    state.botInfor,
+  ]);
+
+  useEffect(() => {
+    if (editorPreview) return undefined;
+    if (!state.launchButtonSelectors) return undefined;
+    const jsCode = generateLaunchButtonLpScript(state.launchButtonSelectors);
+    if (jsCode) executeLpJsCode(jsCode, state);
+    return undefined;
+  }, [editorPreview, state.launchButtonSelectors]);
 
   // For run injectCustomJsCode
   useEffect(() => {
@@ -963,6 +988,10 @@ const ScenarioPreviewFukushashiki = ({
       bottomMarginSp: designSetting?.bottom_margin_sp,
       isUsedErrMsgByJs: chatbot?.is_used_err_msg_by_js,
       errMsgJsCode: chatbot?.err_msg_js_code,
+      errMsgSettingMode: chatbot?.err_msg_setting_mode || 'js',
+      errMsgFieldSelectors: chatbot?.err_msg_field_selectors || '',
+      errMsgFormSelectors: chatbot?.err_msg_form_selectors || '',
+      launchButtonSelectors: chatbot?.launch_button_selectors || '',
       useNewProcess: chatbot?.client_cart_system === CART_SYSTEM.EC_FORCE,
       isUsedPastMessageLoaded: !!chatbot?.is_used_message_loaded_past,
       isProcessing: false,

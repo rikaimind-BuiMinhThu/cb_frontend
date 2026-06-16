@@ -129,6 +129,9 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
     checkboxUncheckedBorderColor: '#cccccc',
     checkboxCheckedBgColor: mainColorHex,
     checkboxCheckedBorderColor: mainColorHex,
+    errorMessageBgColor: '#ffebee',
+    errorMessageTextColor: '#d32f2f',
+    errorMessageFontSize: '14px',
   };
 };
 

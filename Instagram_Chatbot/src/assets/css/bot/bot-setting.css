@@ -179,6 +179,35 @@
   gap: 8px;
 }
 
+.theme-field__suffix {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: #666;
+}
+
+.theme-customize-preview__error-top {
+  flex-shrink: 0;
+  padding: 0 10px;
+  background-color: var(--c-chat-window-bg, #EBF7FF);
+}
+
+.theme-customize-preview__error-top .ss-user-setting__item-text_input-top {
+  width: 100%;
+}
+
+.theme-customize-preview__error-message {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 5px 10px;
+  border-radius: 5px;
+  margin: 8px 0 4px;
+  font-family: Arial, sans-serif;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
 .theme-field__swatch-wrap {
   position: relative;
   flex-shrink: 0;

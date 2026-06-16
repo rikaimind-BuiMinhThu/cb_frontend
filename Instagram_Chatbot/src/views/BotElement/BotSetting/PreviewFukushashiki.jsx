@@ -80,6 +80,8 @@ import {
   setConversionParamToLocalStorage, fukushashikiSavedStateToLp, fukushashikiToLP,
   executeLpJsCode, injectCustomJsCode, postMessageToParent
 } from "./PreviewFukushashiki/LPUtils";
+import { resolveErrMsgLpScript } from "./ScenarioSetting/utils/resolveErrMsgLpScript";
+import { generateLaunchButtonLpScript } from "./ScenarioSetting/utils/launchButtonLpScriptUtils";
 import { convertToFukushashikiObject } from "./PreviewFukushashiki/FukushashikiDataConverterUtils";
 import { handleValidateField } from "./PreviewFukushashiki/ValidationUtils";
 import { createOrAddLinesCart } from "./ShopifyUtils";
@@ -171,6 +173,10 @@ const previewInitialState = {
   loadedStateFromSession: false,
   isUsedErrMsgByJs: false,
   errMsgJsCode: '',
+  errMsgSettingMode: 'js',
+  errMsgFieldSelectors: '',
+  errMsgFormSelectors: '',
+  launchButtonSelectors: '',
   isProcessing: false,
   conversionStatus: null,
   manuallyClosed: false,
@@ -458,9 +464,24 @@ const PreviewFukushashiki = () => {
 
     // For run errorJsCode
   useEffect(() => {
-    if (!state.isUsedErrMsgByJs || !state.errMsgJsCode) return;
-    executeLpJsCode(state.errMsgJsCode, state);
-  }, [state.errMsgJsCode, state.isUsedErrMsgByJs]);
+    if (!state.isUsedErrMsgByJs) return;
+    const jsCode = resolveErrMsgLpScript(state);
+    if (jsCode) executeLpJsCode(jsCode, state);
+  }, [
+    state.isUsedErrMsgByJs,
+    state.errMsgJsCode,
+    state.errMsgSettingMode,
+    state.errMsgFieldSelectors,
+    state.errMsgFormSelectors,
+    state.themeSettings,
+    state.botInfor,
+  ]);
+
+  useEffect(() => {
+    if (!state.launchButtonSelectors) return;
+    const jsCode = generateLaunchButtonLpScript(state.launchButtonSelectors);
+    if (jsCode) executeLpJsCode(jsCode, state);
+  }, [state.launchButtonSelectors]);
 
   // For run injectCustomJsCode
   useEffect(() => {
@@ -847,6 +868,10 @@ const PreviewFukushashiki = () => {
       bottomMarginSp: designSetting?.bottom_margin_sp,
       isUsedErrMsgByJs: chatbot?.is_used_err_msg_by_js,
       errMsgJsCode: chatbot?.err_msg_js_code,
+      errMsgSettingMode: chatbot?.err_msg_setting_mode || 'js',
+      errMsgFieldSelectors: chatbot?.err_msg_field_selectors || '',
+      errMsgFormSelectors: chatbot?.err_msg_form_selectors || '',
+      launchButtonSelectors: chatbot?.launch_button_selectors || '',
       useNewProcess: chatbot?.client_cart_system === CART_SYSTEM.EC_FORCE,
       isUsedPastMessageLoaded: !!chatbot?.is_used_message_loaded_past,
       isProcessing: false,

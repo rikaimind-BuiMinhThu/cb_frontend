@@ -4,6 +4,7 @@ import ModalShort from '../../../../../Popup/ModalShort';
 import InputCustom from '../../scenarioComon/InputCustom';
 import { useScenarioEditor } from '../../context/ScenarioEditorContext';
 import OverviewCheckboxRow from '../OverviewCheckboxRow';
+import { createEmptyAutoLogoutConfig } from '../../utils/autoLogoutUtils';
 
 const OverviewCheckboxItem = ({ checked, onChange, label }) => (
   <div className="ss-layout-checkbox-item">
@@ -28,11 +29,10 @@ const ScenarioSettingsModal = () => {
     isUseOnlyRegularOrder,
     isUseFukushashiki,
     isUseCustomCss,
-    isUsedCartConfirmPage,
-    urlCartConfirmPage,
     isUseCustomJsCode,
     timerConfig,
     isUseErrMsgByJs,
+    launchButtonSelectors,
     isUsedMessageLoadedPast,
     isUsedCrosssell,
     productIdCrossSell,
@@ -56,12 +56,13 @@ const ScenarioSettingsModal = () => {
     setTimerConfig,
     setIsOpenErrMsgByJsSettingModal,
     setIsUseErrMsgByJs,
-    setIsUsedCartConfirmPage,
-    setUrlCartConfirmPage,
+    setLaunchButtonSelectors,
     setIsUsedMessageLoadedPast,
     setIsUsedCrosssell,
     setProductIdCrossSell,
     setIsClearLandingPageSession,
+    setAutoLogoutConfig,
+    setIsOpenAutoLogoutModal,
     setIsUseBtnUpdateTracking,
     setUseFullwidthChatbotMobile,
     setIsOpenScenarioSettingsModal,
@@ -106,6 +107,18 @@ const ScenarioSettingsModal = () => {
     setIsOpenScenarioSettingsModal(false);
   };
 
+  const handleToggleAutoLogout = () => {
+    if (isClearLandingPageSession) {
+      setIsClearLandingPageSession(false);
+      setAutoLogoutConfig(createEmptyAutoLogoutConfig());
+      setIsOpenAutoLogoutModal(false);
+      return;
+    }
+
+    setIsClearLandingPageSession(true);
+    setIsOpenAutoLogoutModal(true);
+  };
+
   return (
     <ModalShort open={isOpenScenarioSettingsModal} onClose={handleClose}>
       <div className="sl-popup-create-scenario-wrapper ss-layout-settings-modal" style={{ width: '750px' }}>
@@ -126,14 +139,6 @@ const ScenarioSettingsModal = () => {
               onChange={value => setUrlThanks(value)}
               placeholder="サンクスページのURL"
             />
-            {isUsedCartConfirmPage && (
-              <InputCustom
-                style={{ width: '100%' }}
-                value={urlCartConfirmPage}
-                onChange={value => setUrlCartConfirmPage(value)}
-                placeholder="カートの注文確認ページのURL"
-              />
-            )}
             {isShopifyPaymentScenario && (
               <>
                 <InputCustom
@@ -212,17 +217,31 @@ const ScenarioSettingsModal = () => {
               <OverviewCheckboxRow
                 checked={isUseErrMsgByJs}
                 onChange={() => setIsUseErrMsgByJs(!isUseErrMsgByJs)}
-                label="エラーメッセンジ取得をJSコード使用"
+                label="エラーメッセージ取得設定"
                 actionButton={isUseErrMsgByJs && (
                   <button
                     type="button"
                     className="ss-user-setting-checkbox-custom-css_toggle"
                     onClick={() => setIsOpenErrMsgByJsSettingModal(true)}
                   >
-                    ( JSコード設定モダルを開く )
+                    ( 設定モーダルを開く )
                   </button>
                 )}
               />
+              <div className="ss-layout-form-section__field" style={{ marginTop: '8px' }}>
+                <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px' }}>
+                  起動ボタンセレクター
+                </label>
+                <InputCustom
+                  style={{ width: '100%' }}
+                  value={launchButtonSelectors}
+                  onChange={(value) => setLaunchButtonSelectors(value)}
+                  placeholder='例: a[href="#target_cart"] img'
+                />
+                <p style={{ margin: '4px 0 0', fontSize: '12px', color: '#666' }}>
+                  ※ 複数セレクターはカンマ区切り。クリックでチャットボットを開きます。
+                </p>
+              </div>
             </>
           )}
         </section>
@@ -241,11 +260,6 @@ const ScenarioSettingsModal = () => {
                   checked={isUseFukushashiki}
                   onChange={() => setIsUseFukushashiki(!isUseFukushashiki)}
                   label="複写式利用フラグ"
-                />
-                <OverviewCheckboxItem
-                  checked={isUsedCartConfirmPage}
-                  onChange={() => setIsUsedCartConfirmPage(!isUsedCartConfirmPage)}
-                  label="カートシステムの注文確認ページを利用"
                 />
               </>
             )}
@@ -270,11 +284,22 @@ const ScenarioSettingsModal = () => {
                 label="クロスセル商品をカートに追加する"
               />
             )}
-            <OverviewCheckboxItem
-              checked={isClearLandingPageSession}
-              onChange={() => setIsClearLandingPageSession(!isClearLandingPageSession)}
-              label="読み込み時に自動ログアウト処理を実行する"
-            />
+            {!isShopifyPaymentScenario && (
+              <OverviewCheckboxRow
+                checked={isClearLandingPageSession}
+                onChange={handleToggleAutoLogout}
+                label="読み込み時に自動ログアウト処理を実行する"
+                actionButton={isClearLandingPageSession && (
+                  <button
+                    type="button"
+                    className="ss-user-setting-checkbox-custom-css_toggle"
+                    onClick={() => setIsOpenAutoLogoutModal(true)}
+                  >
+                    ( 自動ログアウト設定モダルを開く )
+                  </button>
+                )}
+              />
+            )}
             <OverviewCheckboxItem
               checked={isUseBtnUpdateTracking}
               onChange={() => setIsUseBtnUpdateTracking(!isUseBtnUpdateTracking)}

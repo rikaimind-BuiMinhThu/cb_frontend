@@ -34,6 +34,9 @@ export const THEME_FIELD_KEYS = [
   'checkboxUncheckedBorderColor',
   'checkboxCheckedBgColor',
   'checkboxCheckedBorderColor',
+  'errorMessageBgColor',
+  'errorMessageTextColor',
+  'errorMessageFontSize',
 ];
 
 export const THEME_SECTIONS = [
@@ -107,6 +110,15 @@ export const THEME_SECTIONS = [
       { key: 'checkboxCheckedBorderColor', label: 'チェックボックス（選択時）枠線色' },
     ],
   },
+  {
+    id: 'errors',
+    title: 'エラーメッセージ',
+    fields: [
+      { key: 'errorMessageBgColor', label: '背景色' },
+      { key: 'errorMessageTextColor', label: '文字色' },
+      { key: 'errorMessageFontSize', label: 'フォントサイズ', fieldType: 'fontSize', fullWidth: true },
+    ],
+  },
 ];
 
 export const CAMEL_TO_SNAKE_THEME = {
@@ -133,4 +145,7 @@ export const CAMEL_TO_SNAKE_THEME = {
   checkboxUncheckedBorderColor: 'checkbox_unchecked_border_color',
   checkboxCheckedBgColor: 'checkbox_checked_bg_color',
   checkboxCheckedBorderColor: 'checkbox_checked_border_color',
+  errorMessageBgColor: 'error_message_bg_color',
+  errorMessageTextColor: 'error_message_text_color',
+  errorMessageFontSize: 'error_message_font_size',
 };

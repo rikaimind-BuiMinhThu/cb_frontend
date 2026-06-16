@@ -4,6 +4,7 @@ import { Checkbox } from 'antd';
 import ThemePreviewShell from './ThemePreviewShell';
 
 const PREVIEW_SCOPE_ID = 'theme-customize-preview';
+const SAMPLE_ERROR_MESSAGE = '入力内容に誤りがあります。ご確認ください。';
 
 const PreviewUserMessage = ({ children }) => (
   <div className="sp-body-user-side">
@@ -33,6 +34,7 @@ const ThemeCustomizePreview = ({
     subtitle={subtitle}
     processLabel="1 / 3"
     processPercent={33}
+    errorPreviewText={SAMPLE_ERROR_MESSAGE}
   >
     <div className="sp-body-bot-side">
       <div className="sp-body-bot-side-messages">

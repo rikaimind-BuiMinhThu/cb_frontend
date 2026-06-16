@@ -1232,9 +1232,10 @@ slideUp
 }
 
 .ss-bot-submit-error-message {
-  background-color: #ffebee;
-  color: #d32f2f;
-  border: 1px solid #f44336;
+  background-color: var(--c-error-bg, #ffebee);
+  color: var(--c-error-text, #d32f2f);
+  border: 1px solid var(--c-error-text, #f44336);
+  font-size: var(--c-error-font-size, 14px);
 }
 
 .ss-bot-getting-error-notification {

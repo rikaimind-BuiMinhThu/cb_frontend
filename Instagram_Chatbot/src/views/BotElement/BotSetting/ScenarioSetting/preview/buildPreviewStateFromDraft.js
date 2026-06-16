@@ -72,6 +72,12 @@ export const buildEditorDraftPreviewUpdate = (draft) => {
     headCustomJsCode: '',
     topBodyCustomJsCode: '',
     bottomBodyCustomJsCode: '',
+    isUsedErrMsgByJs: !!draft?.is_used_err_msg_by_js,
+    errMsgJsCode: draft?.err_msg_js_code || '',
+    errMsgSettingMode: draft?.err_msg_setting_mode || 'js',
+    errMsgFieldSelectors: draft?.err_msg_field_selectors || '',
+    errMsgFormSelectors: draft?.err_msg_form_selectors || '',
+    launchButtonSelectors: draft?.launch_button_selectors || '',
     progressBarMaxIndex: progressBarTargetCountMessagesList.length,
   };
 };
