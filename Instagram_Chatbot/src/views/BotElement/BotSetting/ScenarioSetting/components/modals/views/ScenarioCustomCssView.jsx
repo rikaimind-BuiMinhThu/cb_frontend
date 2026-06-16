@@ -2,20 +2,13 @@ import React from 'react';
 import { useScenarioEditor } from '../../../context/ScenarioEditorContext';
 import ScenarioFormRow from '../shared/ScenarioFormRow';
 import ScenarioModalFooter from '../shared/ScenarioModalFooter';
+import ScenarioCodeTextarea from '../shared/ScenarioCodeTextarea';
 import { SCENARIO_MODAL_TOOLTIPS } from '../shared/scenarioModalTooltips';
 
 const ScenarioCustomCssView = ({ onBack }) => {
   const { state, actions } = useScenarioEditor();
   const { customCssContent } = state;
   const { setCustomCssContent } = actions;
-
-  const handleOnChangeValueCustomCss = (e) => {
-    e.preventDefault();
-    setCustomCssContent((prevState) => ({
-      ...prevState,
-      temp: e.target.value,
-    }));
-  };
 
   const handleOnCancelCustomCss = () => {
     setCustomCssContent((prevState) => ({
@@ -40,12 +33,14 @@ const ScenarioCustomCssView = ({ onBack }) => {
         tooltip={SCENARIO_MODAL_TOOLTIPS.cssContent}
         alignTop
       >
-        <textarea
-          className="ss-settings-textarea"
-          style={{ height: '150px' }}
+        <ScenarioCodeTextarea
           placeholder="ここにカスタムCSSコンテンツを入力してください"
           value={customCssContent.temp}
-          onChange={handleOnChangeValueCustomCss}
+          onChange={(value) => setCustomCssContent((prevState) => ({
+            ...prevState,
+            temp: value,
+          }))}
+          language="css"
         />
       </ScenarioFormRow>
       <ScenarioModalFooter

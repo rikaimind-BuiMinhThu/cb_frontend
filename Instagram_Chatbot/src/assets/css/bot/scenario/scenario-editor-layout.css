@@ -430,6 +430,41 @@
   box-sizing: border-box;
 }
 
+.ss-user-register-button-settings {
+  position: relative;
+  width: 100%;
+  margin-top: 6px;
+  padding-top: 8px;
+  border-top: 1px solid #eee;
+}
+
+.ss-user-register-button-settings__main {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ss-user-register-button-settings__code-flyout {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 10;
+  padding: 8px;
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.ss-user-register-button-settings--code-open {
+  margin-bottom: 148px;
+}
+
+.ss-user-register-button-settings .ss-settings-form-row {
+  margin-bottom: 0;
+}
+
 .ss-editor-layout-v2 .ss-user-setting-condition-container {
   margin-left: 0;
   width: 100%;

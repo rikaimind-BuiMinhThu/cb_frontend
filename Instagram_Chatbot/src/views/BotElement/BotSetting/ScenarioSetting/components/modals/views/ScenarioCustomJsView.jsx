@@ -2,25 +2,13 @@ import React from 'react';
 import { useScenarioEditor } from '../../../context/ScenarioEditorContext';
 import ScenarioFormRow from '../shared/ScenarioFormRow';
 import ScenarioModalFooter from '../shared/ScenarioModalFooter';
+import ScenarioCodeTextarea from '../shared/ScenarioCodeTextarea';
 import { SCENARIO_MODAL_TOOLTIPS } from '../shared/scenarioModalTooltips';
 
 const ScenarioCustomJsView = ({ onBack }) => {
   const { state, actions } = useScenarioEditor();
   const { headCustomJsCode, topBodyCustomJsCode, bottomBodyCustomJsCode } = state;
   const { setHeadCustomJsCode, setTopBodyCustomJsCode, setBottomBodyCustomJsCode } = actions;
-
-  const handleOnChangeValueCustomJsCode = (fieldType) => (e) => {
-    e.preventDefault();
-    const value = e.target.value;
-
-    if (fieldType === 'head') {
-      setHeadCustomJsCode((prevState) => ({ ...prevState, temp: value }));
-    } else if (fieldType === 'top_body') {
-      setTopBodyCustomJsCode((prevState) => ({ ...prevState, temp: value }));
-    } else if (fieldType === 'bottom_body') {
-      setBottomBodyCustomJsCode((prevState) => ({ ...prevState, temp: value }));
-    }
-  };
 
   const handleOnCancelCustomJsCode = () => {
     setHeadCustomJsCode((prev) => ({ ...prev, temp: prev.final }));
@@ -43,11 +31,11 @@ const ScenarioCustomJsView = ({ onBack }) => {
         tooltip={SCENARIO_MODAL_TOOLTIPS.headJsContent}
         alignTop
       >
-        <textarea
-          className="ss-settings-textarea"
+        <ScenarioCodeTextarea
           placeholder="ここにヘッド内のJSコードを入力してください"
           value={headCustomJsCode.temp}
-          onChange={handleOnChangeValueCustomJsCode('head')}
+          onChange={(value) => setHeadCustomJsCode((prevState) => ({ ...prevState, temp: value }))}
+          language="javascript"
         />
       </ScenarioFormRow>
       <ScenarioFormRow
@@ -55,11 +43,11 @@ const ScenarioCustomJsView = ({ onBack }) => {
         tooltip={SCENARIO_MODAL_TOOLTIPS.topBodyJsContent}
         alignTop
       >
-        <textarea
-          className="ss-settings-textarea"
+        <ScenarioCodeTextarea
           placeholder="ここに上部の本文のJSコードを入力してください"
           value={topBodyCustomJsCode.temp}
-          onChange={handleOnChangeValueCustomJsCode('top_body')}
+          onChange={(value) => setTopBodyCustomJsCode((prevState) => ({ ...prevState, temp: value }))}
+          language="javascript"
         />
       </ScenarioFormRow>
       <ScenarioFormRow
@@ -67,11 +55,11 @@ const ScenarioCustomJsView = ({ onBack }) => {
         tooltip={SCENARIO_MODAL_TOOLTIPS.bottomBodyJsContent}
         alignTop
       >
-        <textarea
-          className="ss-settings-textarea"
+        <ScenarioCodeTextarea
           placeholder="ここに下部の本文のJSコードを入力してください"
           value={bottomBodyCustomJsCode.temp}
-          onChange={handleOnChangeValueCustomJsCode('bottom_body')}
+          onChange={(value) => setBottomBodyCustomJsCode((prevState) => ({ ...prevState, temp: value }))}
+          language="javascript"
         />
       </ScenarioFormRow>
       <ScenarioModalFooter

@@ -1,13 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from 'reactstrap';
 import { MDBIcon } from 'mdbreact';
 import 'react-datepicker/dist/react-datepicker.css';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import InputCustom from '../scenarioComon/InputCustom';
-import CheckboxCustom from '../scenarioComon/CheckboxCustom';
 import { CONTENT_SETTING_MAP } from '../contentSettings';
 import { useScenarioPanelDestructuring } from '../hooks/useScenarioPanelDestructuring';
 import ScenarioConditionsPanel from './ScenarioConditionsPanel';
+import ScenarioModalCheckbox from './modals/shared/ScenarioModalCheckbox';
+import ScenarioFormRow from './modals/shared/ScenarioFormRow';
+import ScenarioInfoTooltip from './modals/shared/ScenarioInfoTooltip';
+import ScenarioCodeTextarea from './modals/shared/ScenarioCodeTextarea';
+import {
+  SCENARIO_MODAL_TOOLTIPS,
+  REGISTER_BUTTON_LABELS,
+} from './modals/shared/scenarioModalTooltips';
 
 const CONTENT_TYPE_OPTIONS = [
   ['text_input', 'テキスト入力'],
@@ -35,6 +42,13 @@ const CONTENT_TYPE_OPTIONS = [
   ['button_submit', '確認する'],
 ];
 
+const labelWithTooltip = (text, tooltipKey) => (
+  <>
+    {text}
+    <ScenarioInfoTooltip text={SCENARIO_MODAL_TOOLTIPS[tooltipKey]} />
+  </>
+);
+
 const AddContentSelect = ({ messageType, setMessageType, hasContent, onAdd }) => (
   <div className="ss-user-setting__select-wrapper">
     <select
@@ -58,53 +72,83 @@ const AddContentSelect = ({ messageType, setMessageType, hasContent, onAdd }) =>
   </div>
 );
 
-const RegisterButtonConfig = ({ selectedMessage, dataMessages, setDataMessages }) => (
-  <div className="ss-user-setting-condition-footer-button">
-    <div className="ss-layout-register-button-row">
-      <InputCustom
-        label="登録ボタン名称"
-        value={selectedMessage.buttonName}
-        maxLength={30}
-        onChange={(value) => {
-          selectedMessage.buttonName = value;
-          setDataMessages([...dataMessages]);
-        }}
-      />
-      <CheckboxCustom
-        label="このボタンを利用しない"
-        onChange={(value) => {
-          selectedMessage.not_use_button = value;
-          setDataMessages([...dataMessages]);
-        }}
-        value={selectedMessage.not_use_button}
-      />
-      <CheckboxCustom
-        label="JavaScriptの利用"
-        onChange={(value) => {
-          selectedMessage.button_jscode = value;
-          setDataMessages([...dataMessages]);
-        }}
-        value={selectedMessage.button_jscode}
-      />
-    </div>
-    {selectedMessage.button_jscode && (
-      <div className="ss-layout-register-button-jscode">
-        <label htmlFor="ss-register-button-jscode">jscode</label>
-        <textarea
-          id="ss-register-button-jscode"
-          className="ss-user-setting-item-textarea-label ss-input-value"
-          placeholder="テキスト"
-          rows="5"
-          value={selectedMessage.jscode}
-          onChange={(e) => {
-            selectedMessage.jscode = e.target.value;
-            setDataMessages([...dataMessages]);
-          }}
+const RegisterButtonConfig = ({ selectedMessage, dataMessages, setDataMessages }) => {
+  const [alignBeginningStop, setAlignBeginningStop] = useState(false);
+
+  const updateMessage = (updates) => {
+    Object.assign(selectedMessage, updates);
+    setDataMessages([...dataMessages]);
+  };
+
+  const showCodeEditor = !!selectedMessage.button_jscode;
+
+  return (
+    <div
+      className={`ss-user-register-button-settings${
+        showCodeEditor ? ' ss-user-register-button-settings--code-open' : ''
+      }`}
+    >
+      <div className="ss-user-register-button-settings__main">
+        <ScenarioModalCheckbox
+          checked={alignBeginningStop}
+          onChange={setAlignBeginningStop}
+          label={labelWithTooltip(
+            REGISTER_BUTTON_LABELS.alignBeginningStop,
+            'alignBeginningStop',
+          )}
+        />
+        <ScenarioModalCheckbox
+          checked={!!selectedMessage.not_use_button}
+          onChange={(checked) => updateMessage({ not_use_button: checked })}
+          label={labelWithTooltip(
+            REGISTER_BUTTON_LABELS.notUseButton,
+            'notUseButton',
+          )}
+        />
+        {!selectedMessage.not_use_button && (
+          <ScenarioFormRow
+            label={REGISTER_BUTTON_LABELS.registerButtonName}
+            tooltip={SCENARIO_MODAL_TOOLTIPS.registerButtonName}
+          >
+            <InputCustom
+              style={{ width: '100%' }}
+              placeholder="例：次へ、登録する"
+              value={selectedMessage.buttonName}
+              maxLength={30}
+              onChange={(value) => updateMessage({ buttonName: value })}
+            />
+          </ScenarioFormRow>
+        )}
+        <ScenarioModalCheckbox
+          checked={showCodeEditor}
+          onChange={(checked) => updateMessage({ button_jscode: checked })}
+          label={labelWithTooltip(
+            REGISTER_BUTTON_LABELS.useButtonJavascript,
+            'useButtonJavascript',
+          )}
         />
       </div>
-    )}
-  </div>
-);
+      {showCodeEditor && (
+        <div className="ss-user-register-button-settings__code-flyout">
+          <ScenarioFormRow
+            label={REGISTER_BUTTON_LABELS.registerButtonJscode}
+            tooltip={SCENARIO_MODAL_TOOLTIPS.registerButtonJscode}
+            alignTop
+          >
+            <ScenarioCodeTextarea
+              id="ss-register-button-jscode"
+              value={selectedMessage.jscode || ''}
+              onChange={(value) => updateMessage({ jscode: value })}
+              placeholder="JavaScriptコードを入力"
+              language="javascript"
+              height={120}
+            />
+          </ScenarioFormRow>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const ScenarioUserSettingsPanel = () => {
   const {
@@ -188,11 +232,6 @@ const ScenarioUserSettingsPanel = () => {
             onAdd={() => handleAddItemSetting(messageType || 'text_input')}
           />
         }
-        <div className="ss-user-setting__checkbox-wrapper">
-          <input style={{ width: '15px' }} type="checkbox" name="ss-user-setting__checkbox" />
-          <span>先頭に揃えて停止する</span>
-          <MDBIcon fas icon="question-circle" style={{ color: '#347AED', fontSize: '12px', marginLeft: '5px' }} />
-        </div>
         <RegisterButtonConfig
           selectedMessage={selectedMessage}
           dataMessages={dataMessages}

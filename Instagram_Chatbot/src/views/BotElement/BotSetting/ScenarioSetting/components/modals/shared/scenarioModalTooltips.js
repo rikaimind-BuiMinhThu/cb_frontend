@@ -31,6 +31,19 @@ export const SCENARIO_MODAL_TOOLTIPS = {
   variableName: 'シナリオ内で使用する変数名を入力してください。',
   variableDefault: '変数のデフォルト値を入力してください。',
   shopifyVariant: '参照するShopify商品バリアントを選択してください。',
+  alignBeginningStop: 'このメッセージを表示したとき、チャットの先頭位置でスクロールを止めます。',
+  notUseButton: '登録ボタンをチャット画面に表示しません。',
+  registerButtonName: 'ユーザーに表示するボタンの文言を入力します。（例：次へ、登録する）',
+  useButtonJavascript: 'ボタンをクリックしたときに、下記のJavaScriptを実行します。',
+  registerButtonJscode: 'ボタンクリック時に実行するコードを入力してください。',
+};
+
+export const REGISTER_BUTTON_LABELS = {
+  alignBeginningStop: '先頭でスクロールを止める',
+  notUseButton: '登録ボタンを表示しない',
+  registerButtonName: 'ボタンの表示名',
+  useButtonJavascript: 'JavaScriptを実行する',
+  registerButtonJscode: 'JavaScriptコード',
 };
 
 export const SETTINGS_MODAL_VIEWS = {

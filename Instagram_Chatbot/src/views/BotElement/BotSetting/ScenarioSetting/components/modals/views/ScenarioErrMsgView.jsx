@@ -2,6 +2,7 @@ import React from 'react';
 import { useScenarioEditor } from '../../../context/ScenarioEditorContext';
 import ScenarioFormRow from '../shared/ScenarioFormRow';
 import ScenarioModalFooter from '../shared/ScenarioModalFooter';
+import ScenarioCodeTextarea from '../shared/ScenarioCodeTextarea';
 import { SCENARIO_MODAL_TOOLTIPS } from '../shared/scenarioModalTooltips';
 
 const ERR_MSG_MODES = {
@@ -44,12 +45,11 @@ const ScenarioErrMsgView = ({ onBack }) => {
             tooltip={SCENARIO_MODAL_TOOLTIPS.errMsgJsCode}
             alignTop
           >
-            <textarea
-              className="ss-settings-textarea"
-              style={{ height: '150px' }}
+            <ScenarioCodeTextarea
               placeholder="ここにJSコードを入力してください"
               value={errMsgJsCode}
-              onChange={(e) => setErrMsgJsCode(e.target.value)}
+              onChange={(value) => setErrMsgJsCode(value)}
+              language="javascript"
             />
           </ScenarioFormRow>
         )}
