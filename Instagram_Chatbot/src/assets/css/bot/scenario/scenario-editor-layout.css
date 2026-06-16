@@ -73,6 +73,15 @@
   margin-top: 8px;
 }
 
+.ss-layout-overview-column--preview-visible .ss-layout-overview-messages {
+  display: none;
+}
+
+.ss-layout-overview-column--preview-visible .ss-layout-overview-preview {
+  flex: 1;
+  min-height: 0;
+}
+
 .ss-layout-overview-column--preview-hidden .ss-layout-overview-preview {
   flex: 0 0 auto;
   min-height: auto;

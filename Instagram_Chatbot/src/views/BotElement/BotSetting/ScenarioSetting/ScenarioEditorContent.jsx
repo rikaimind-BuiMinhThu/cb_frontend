@@ -24,7 +24,9 @@ const ScenarioEditorContent = () => {
               <div className="ss-sc-setting ss-editor-layout-v2">
                 <div
                   className={`ss-sc-content ss-overview ss-layout-column ss-layout-overview-column${
-                    isPreviewVisible ? '' : ' ss-layout-overview-column--preview-hidden'
+                    isPreviewVisible
+                      ? ' ss-layout-overview-column--preview-visible'
+                      : ' ss-layout-overview-column--preview-hidden'
                   }`}
                 >
                   <div className="ss-layout-overview-form">
