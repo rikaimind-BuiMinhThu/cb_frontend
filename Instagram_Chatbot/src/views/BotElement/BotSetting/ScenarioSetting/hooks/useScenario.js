@@ -22,6 +22,7 @@ import {
   createEmptyAutoLogoutConfig,
   isAutoLogoutConfigValid,
 } from '../utils/autoLogoutUtils';
+import { SETTINGS_MODAL_VIEWS } from '../components/modals/shared/scenarioModalTooltips';
 
 const INITIAL_TIMER_CONFIG = {
   isOpen: false,
@@ -51,6 +52,7 @@ export const useScenario = () => {
   const [urlCartConfirmPage, setUrlCartConfirmPage] = useState('');
   const [isOpenModalCustomCss, setIsOpenModalCustomCss] = useState(false);
   const [isOpenScenarioSettingsModal, setIsOpenScenarioSettingsModal] = useState(false);
+  const [settingsModalView, setSettingsModalView] = useState(SETTINGS_MODAL_VIEWS.MAIN);
 
   const [isUseCustomJsCode, setIsUseCustomJsCode] = useState(false);
   const [headCustomJsCode, setHeadCustomJsCode] = useState(INITIAL_CUSTOM_CODE);
@@ -143,6 +145,24 @@ export const useScenario = () => {
         setMessageNoti('');
       }, autoCloseMs);
     }
+  }, []);
+
+  const openScenarioSettingsModal = useCallback(() => {
+    setSettingsModalView(SETTINGS_MODAL_VIEWS.MAIN);
+    setIsOpenScenarioSettingsModal(true);
+  }, []);
+
+  const closeScenarioSettingsModal = useCallback(() => {
+    setIsOpenScenarioSettingsModal(false);
+    setSettingsModalView(SETTINGS_MODAL_VIEWS.MAIN);
+  }, []);
+
+  const navigateSettingsModalView = useCallback((view) => {
+    setSettingsModalView(view);
+  }, []);
+
+  const backToSettingsMainView = useCallback(() => {
+    setSettingsModalView(SETTINGS_MODAL_VIEWS.MAIN);
   }, []);
 
   const applyParsedScenario = useCallback((parsed) => {
@@ -472,6 +492,7 @@ export const useScenario = () => {
       urlCartConfirmPage,
       isOpenModalCustomCss,
       isOpenScenarioSettingsModal,
+      settingsModalView,
       isUseCustomJsCode,
       headCustomJsCode,
       topBodyCustomJsCode,
@@ -548,6 +569,11 @@ export const useScenario = () => {
       setUrlCartConfirmPage,
       setIsOpenModalCustomCss,
       setIsOpenScenarioSettingsModal,
+      setSettingsModalView,
+      openScenarioSettingsModal,
+      closeScenarioSettingsModal,
+      navigateSettingsModalView,
+      backToSettingsMainView,
       setIsUseCustomJsCode,
       setHeadCustomJsCode,
       setTopBodyCustomJsCode,

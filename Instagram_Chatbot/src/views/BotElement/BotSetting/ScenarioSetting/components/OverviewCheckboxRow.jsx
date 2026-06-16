@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import ScenarioModalCheckbox from './modals/shared/ScenarioModalCheckbox';
 
 const OverviewCheckboxRow = ({
   checked,
@@ -9,15 +10,11 @@ const OverviewCheckboxRow = ({
   className = '',
 }) => (
   <div className={`ss-layout-option-row ${className}`.trim()}>
-    <div className="ss-user-setting-checkbox-custom_css">
-      <input
-        type="checkbox"
-        className="ss-user-setting-checkbox-custom"
-        onChange={onChange}
-        checked={checked}
-      />
-      <label>{label}</label>
-    </div>
+    <ScenarioModalCheckbox
+      checked={checked}
+      onChange={onChange}
+      label={label}
+    />
     {actionButton}
   </div>
 );

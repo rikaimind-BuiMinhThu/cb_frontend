@@ -12,7 +12,7 @@ const ScenarioOverviewPanel = () => {
   const {
     setScenarioName,
     setScenarioType,
-    setIsOpenScenarioSettingsModal,
+    openScenarioSettingsModal,
   } = actions;
 
   return (
@@ -46,7 +46,7 @@ const ScenarioOverviewPanel = () => {
           <button
             type="button"
             className="ss-layout-settings-open-btn"
-            onClick={() => setIsOpenScenarioSettingsModal(true)}
+            onClick={openScenarioSettingsModal}
           >
             シナリオ設定
           </button>

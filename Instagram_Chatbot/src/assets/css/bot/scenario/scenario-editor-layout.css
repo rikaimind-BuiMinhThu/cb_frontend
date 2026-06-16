@@ -1,4 +1,5 @@
 @import './scenario-single.css';
+@import './scenario-settings-modal.css';
 
 /* =============================================================================
    Scenario Editor Layout v2 — grid/flex shell (scoped under .ss-editor-layout-v2)
