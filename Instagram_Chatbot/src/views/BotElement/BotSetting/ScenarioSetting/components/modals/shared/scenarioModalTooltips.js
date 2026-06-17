@@ -36,6 +36,13 @@ export const SCENARIO_MODAL_TOOLTIPS = {
   registerButtonName: 'ユーザーに表示するボタンの文言を入力します。（例：次へ、登録する）',
   useButtonJavascript: 'ボタンをクリックしたときに、下記のJavaScriptを実行します。',
   registerButtonJscode: 'ボタンクリック時に実行するコードを入力してください。',
+  hideWhenLoggedIn: 'ログイン済みユーザーにはこのメッセージを表示しません。',
+  hideWhenError: 'エラー発生時にはこのメッセージを表示しません。',
+  noAutoScroll: 'このメッセージ表示時に自動スクロールしません。',
+  saveToVariable: 'ユーザーの入力を指定した変数に保存します。',
+  apiValidation: '入力値の検証にAPIを利用します。',
+  displayContinueButton: 'チャット内に「続行」ボタンを表示します。',
+  require: 'この入力を必須にします。',
 };
 
 export const REGISTER_BUTTON_LABELS = {
@@ -44,6 +51,16 @@ export const REGISTER_BUTTON_LABELS = {
   registerButtonName: 'ボタンの表示名',
   useButtonJavascript: 'JavaScriptを実行する',
   registerButtonJscode: 'JavaScriptコード',
+};
+
+export const USER_CONTENT_OPTION_LABELS = {
+  hideWhenLoggedIn: 'ログイン済みのときは表示しない',
+  hideWhenError: 'エラー時は表示しない',
+  noAutoScroll: '自動でスクロールしない',
+  saveToVariable: '入力内容を変数に保存する',
+  apiValidation: '入力値をAPIで検証する',
+  displayContinueButton: '「続行」ボタンを表示する',
+  require: '必須',
 };
 
 export const SETTINGS_MODAL_VIEWS = {
