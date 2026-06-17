@@ -3,6 +3,7 @@ import CheckboxCustom from '../../scenarioComon/CheckboxCustom';
 import SelectCustom from '../../scenarioComon/SelectCustom';
 import InputCustom from '../../scenarioComon/InputCustom';
 import { hyphenPhoneNumber } from '../../constants/scenarioFormConstants';
+import { TEXT_INPUT_LABELS } from '../../constants/scenarioSettingLabels';
 import { buildTextInputSettingContext } from './textInputSettingContext';
 
 const PhoneNumberTypeSetting = (props) => {
@@ -23,7 +24,7 @@ const PhoneNumberTypeSetting = (props) => {
       {textInput?.phone_number?.withHyphen === true && isUseFukushashiki && (
         <div className="ss-user-setting__item-bottom">
           <CheckboxCustom
-            label="先頭の0は削除しない（「0000」などもそのままLPへ反映）"
+            label={TEXT_INPUT_LABELS.disableRemoveLeadingZero}
             onChange={changeContent(textInput.type, 'disable_remove_leading_zero')}
             value={textInput.phone_number?.disable_remove_leading_zero || false}
           />
@@ -37,13 +38,13 @@ const PhoneNumberTypeSetting = (props) => {
               onChange={changeContent(textInput.type, 'number1')}
               value={typeConfig?.number1}
             />
-            <span style={{ fontSize: '20px' }}>-</span>
+            <span className="ss-hyphen-separator">-</span>
             <InputCustom
               placeholder="プレースホルダ"
               onChange={changeContent(textInput.type, 'number2')}
               value={typeConfig?.number2}
             />
-            <span style={{ fontSize: '20px' }}>-</span>
+            <span className="ss-hyphen-separator">-</span>
             <InputCustom
               placeholder="プレースホルダ"
               onChange={changeContent(textInput.type, 'number3')}
@@ -54,7 +55,7 @@ const PhoneNumberTypeSetting = (props) => {
             <>
               {renderFukushashikiRow('value1_fukushashiki_search_mode', 'value1_fukushashiki_search_value', {
                 variant: 'compact',
-                rowStyle: { marginTop: '10px' },
+                rowClassName: 'ss-fukushashiki-row',
               })}
               {renderFukushashikiRow('value2_fukushashiki_search_mode', 'value2_fukushashiki_search_value', {
                 variant: 'compact',

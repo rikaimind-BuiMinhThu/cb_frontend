@@ -1,0 +1,16 @@
+.ss-radio-button-preview {
+  margin-bottom: 10px;
+}
+
+.ss-radio-button-preview__header {
+  margin-bottom: 0;
+}
+
+.ss-radio-button-preview__img-text {
+  display: flex;
+  justify-content: center;
+}
+
+.ss-radio-button-preview__block-item {
+  margin-bottom: 10px;
+}

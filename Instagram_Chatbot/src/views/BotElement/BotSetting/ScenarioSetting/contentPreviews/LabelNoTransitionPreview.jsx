@@ -1,3 +1,4 @@
+import '../styles/base/preview-common.css';
 import React from 'react';
 
 const LabelNoTransitionPreview = ({
@@ -9,7 +10,7 @@ const LabelNoTransitionPreview = ({
   return (
     <>
       {content.type === 'label_no_transition' && (
-        <div style={{ marginBottom: '10px' }}>
+        <div className="ss-content-preview">
           {labelNoTransition.value}
         </div>
       )}

@@ -1308,11 +1308,18 @@ input#ss-message__content--user-checkbox--checkbox_img {
   display: flex;
   align-items: center;
   width: 100%;
+  gap: 8px;
 }
 
 .ss-user-setting-double-input input:first-child {
   border-bottom-right-radius: unset;
   border-top-right-radius: unset;
+}
+
+.ss-user-setting-double-input--single input:first-child {
+  border-bottom-right-radius: 5px;
+  border-top-right-radius: 5px;
+  flex: 1;
 }
 
 .ss-user-setting-double-input input:nth-child(2) {

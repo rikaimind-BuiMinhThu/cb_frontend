@@ -7,18 +7,18 @@ import { isAndroid } from '../../PreviewComponent/Utils';
 
 const { Option } = Select;
 
-const SelectCustom = ({ id, allowClear = true, data, value, onChange, keyValue = "key", style, placeholder, nameValue = "value", mode, label, disabled = false, styleLabel, showSearch = true, className = "" }) => {
+const SelectCustom = ({ id, allowClear = true, data, value, onChange, keyValue = "key", style, placeholder, nameValue = "value", mode, label, disabled = false, styleLabel, showSearch = true, className = "", labelClassName = "" }) => {
   // Native select for Android devices only
   if (isAndroid()) {
     return (
       <React.Fragment>
-        {label && <span className="select-custom-label" style={styleLabel}>{label}</span>}
+        {label && <span className={`select-custom-label ${labelClassName}`.trim()} style={styleLabel}>{label}</span>}
         <select
           id={id}
           value={value || ''}
           onChange={(e) => onChange && onChange(e.target.value)}
           disabled={disabled}
-          className={`select-custom-native ${className}`}
+          className={`select-custom-native ${className}`.trim()}
           style={style}
         >
           {placeholder && <option value="" disabled>{placeholder}</option>}
@@ -40,11 +40,11 @@ const SelectCustom = ({ id, allowClear = true, data, value, onChange, keyValue =
   // Antd Select for non-Android devices (iOS, desktop, etc.)
   return (
     <React.Fragment>
-      {label && <span className="select-custom-label" style={styleLabel}>{label}</span>}
+      {label && <span className={`select-custom-label ${labelClassName}`.trim()} style={styleLabel}>{label}</span>}
       <Select
         showSearch={showSearch}
         allowClear={allowClear}
-        className={`select-custom-antd ${className}`}
+        className={`select-custom-antd ${className}`.trim()}
         style={style}
         placeholder={placeholder}
         mode={mode ? mode : 'combobox'}

@@ -1,20 +1,15 @@
 import React from 'react';
+import ContentPreviewShell from './shared/ContentPreviewShell';
+import '../styles/contentPreviews/capture.css';
 
-const CapturePreview = ({
-  content,
-  message,
-  indexContent,
-}) => {
-  const capture = content.capture;
-  return (
-    <>
-      {
-        content.type === 'capture' && (
-          <div style={{ color: '#6989A6', fontSize: '14px' }}>キャプチャ</div>
-        )
-      }
-    </>
+const CapturePreview = ({ content }) => {
+  if (content.type !== 'capture') return null;
+
+  const renderLabel = () => (
+    <div className="ss-capture-preview-label">キャプチャ</div>
   );
+
+  return <ContentPreviewShell>{renderLabel()}</ContentPreviewShell>;
 };
 
 export default CapturePreview;

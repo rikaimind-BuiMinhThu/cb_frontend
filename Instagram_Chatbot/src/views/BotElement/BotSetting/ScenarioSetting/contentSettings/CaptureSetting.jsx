@@ -1,8 +1,16 @@
 import React from 'react';
-import InputCustom from '../scenarioComon/InputCustom';
 import SelectCustom from '../scenarioComon/SelectCustom';
+import InputCustom from '../scenarioComon/InputCustom';
 import InputNum from '../scenarioComon/InputNum';
 import { dropDownTitle } from '../constants/scenarioFormConstants';
+import {
+  CAPTURE_COLOUR_OPTIONS,
+  CAPTURE_TYPE_OPTIONS,
+  SETTING_LABELS,
+  SETTING_PLACEHOLDERS,
+} from '../constants/scenarioSettingLabels';
+import { ContentTitleInput } from './shared/ContentTypeSelector';
+import '../styles/contentSettings/capture.css';
 
 const CaptureSetting = ({
   content,
@@ -11,72 +19,97 @@ const CaptureSetting = ({
   onChangeValueMessageContent,
 }) => {
   const capture = content.capture;
+
+  const changeField = (field) => (value) =>
+    onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, field);
+
+  const renderTitleRequire = () => (
+    <div className="ss-user-setting__item-bottom">
+      <SelectCustom
+        className="ss-select--full"
+        value={capture.title_require}
+        data={dropDownTitle}
+        onChange={changeField('title_require')}
+      />
+    </div>
+  );
+
+  const renderTitle = () => {
+    if (capture?.title_require !== true) return null;
+    return (
+      <ContentTitleInput
+        title={capture.title}
+        onChange={changeField('title')}
+      />
+    );
+  };
+
+  const renderTypeSelect = () => (
+    <div className="ss-setting-row__col-third">
+      <div className="ss-field-label--section">{SETTING_LABELS.type}</div>
+      <SelectCustom
+        placeholder={SETTING_PLACEHOLDERS.type}
+        className="ss-select--full"
+        value={capture.type}
+        data={CAPTURE_TYPE_OPTIONS}
+        onChange={changeField('type')}
+      />
+    </div>
+  );
+
+  const renderLengthInput = () => (
+    <div className="ss-setting-row__col-third">
+      <div className="ss-field-label--section">{SETTING_LABELS.length}</div>
+      <InputNum
+        className="ss-user-setting-input-limit-character ss-input-num--full"
+        min={1}
+        max={9999}
+        value={capture.length}
+        onChange={changeField('length')}
+      />
+    </div>
+  );
+
+  const renderColourSelect = () => (
+    <div className="ss-setting-row__col-third">
+      <div className="ss-field-label--section">{SETTING_LABELS.colour}</div>
+      <SelectCustom
+        placeholder={SETTING_PLACEHOLDERS.colour}
+        className="ss-select--full"
+        value={capture.colour}
+        data={CAPTURE_COLOUR_OPTIONS}
+        onChange={changeField('colour')}
+      />
+    </div>
+  );
+
+  const renderOptionsRow = () => (
+    <div className="ss-user-setting__item-bottom">
+      <div className="ss-setting-row">
+        {renderTypeSelect()}
+        {renderLengthInput()}
+        {renderColourSelect()}
+      </div>
+    </div>
+  );
+
+  const renderPreview = () => {
+    const previewUrl = `https://svg-captcha-nodejs.vercel.app/captchapreview?size=${capture.length}${capture.colour ? '&color=true' : ''}&charPreset=${capture.type}`;
+    return (
+      <div className="ss-user-setting__item-bottom">
+        <div className="ss-setting-width-90">
+          <img className="ss-captcha-preview" src={previewUrl} alt="" />
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
-      {content.type === 'capture' && (
-        <React.Fragment>
-          <div className="ss-user-setting__item-bottom">
-            <SelectCustom
-              // style={{ width: '90%' }}
-              value={capture.title_require}
-              data={dropDownTitle}
-              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'title_require')}
-            />
-          </div>
-          {/* capture: withTitle = true */}
-          {capture?.title_require === true &&
-            <div className="ss-user-setting__item-bottom">
-              <InputCustom
-                placeholder="タイトル"
-                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'title')}
-                value={capture.title}
-              />
-            </div>
-          }
-          <div className="ss-user-setting__item-bottom">
-            <div style={{ display: 'flex', width: '90%', justifyContent: 'space-between' }}>
-              <div style={{ width: '32%' }}>
-                <div>タイプ</div>
-                <SelectCustom
-                  placeholder="type"
-                  style={{ width: '100%' }}
-                  value={capture.type}
-                  data={[
-                    { key: '0123456789', value: '数字' }, { key: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890', value: '英数字' }, { key: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', value: 'アルファベットのみ' }
-                  ]}
-                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'type')}
-                />
-              </div>
-              <div style={{ width: '32%' }}>
-                <div>長さ</div>
-                <InputNum
-                  className="ss-user-setting-input-limit-character"
-                  style={{ width: '100%', marginLeft: '0px' }}
-                  min={1}
-                  max={9999}
-                  value={capture.length}
-                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'length')}
-                />
-              </div>
-              <div style={{ width: '32%' }}>
-                <div>色</div>
-                <SelectCustom
-                  placeholder="色"
-                  style={{ width: '100%' }}
-                  value={capture.colour}
-                  data={[{ key: true, value: 'あり' }, { key: false, value: '無し' }]}
-                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'colour')}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="ss-user-setting__item-bottom">
-            <div style={{ width: '90%' }}>
-              <img style={{ width: '35%' }} src={`https://svg-captcha-nodejs.vercel.app/captchapreview?size=${capture.length}${capture.colour ? "&color=true" : ""}&charPreset=${capture.type}`} />
-            </div>
-          </div>
-        </React.Fragment>
-      )}
+      {renderTitleRequire()}
+      {renderTitle()}
+      {renderOptionsRow()}
+      {renderPreview()}
     </>
   );
 };

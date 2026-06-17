@@ -20,3 +20,15 @@ export const PAYMENT_OPTION_IMAGE_FIELDS = [
   { key: 'selected_image', label: '選択時の画像' },
   { key: 'unselected_image', label: '未選択時の画像' },
 ];
+
+export const PAYMENT_DISPLAY_STYLE_SECTION_LABELS = {
+  title: '決済方法選択の表示スタイル',
+  layout: 'レイアウト',
+};
+
+export const PAYMENT_DISPLAY_STYLE_CHANGE_FIELDS = {
+  LAYOUT: 'layout',
+  DISPLAY_STYLE: 'display_style',
+};
+
+export const DEFAULT_COLOR_PICKER_VALUE = '#ffffff';

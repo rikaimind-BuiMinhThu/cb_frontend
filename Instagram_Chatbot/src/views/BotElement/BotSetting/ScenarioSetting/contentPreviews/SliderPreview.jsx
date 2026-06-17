@@ -1,3 +1,4 @@
+import '../styles/base/preview-common.css';
 import React from 'react';
 import { Slider } from 'antd';
 
@@ -11,9 +12,9 @@ const SliderPreview = ({
     <>
       {
         content.type === 'slider' && (
-          <div style={{ marginBottom: '10px' }}>
+          <div className="ss-content-preview">
             {(slider.title_require || slider.require) &&
-              <div className="ss-message__content--user-checkbox-top" style={{ marginBottom: '0px' }}>
+              <div className="ss-message__content--user-checkbox-top ss-content-preview__header--no-mb">
                 {slider.title_require &&
                   <span className="ss-message__content--user-checkbox-title">
                     {slider.title}

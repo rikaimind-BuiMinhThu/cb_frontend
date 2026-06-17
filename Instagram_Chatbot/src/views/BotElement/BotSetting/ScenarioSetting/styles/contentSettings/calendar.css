@@ -1,0 +1,180 @@
+.ss-calendar-setting__date-range-row {
+  display: flex;
+  align-items: flex-start;
+}
+
+.ss-calendar-setting__date-range-picker {
+  width: 39%;
+}
+
+.ss-calendar-setting__date-range-separator {
+  font-size: 30px;
+  margin-left: 10px;
+  opacity: 0.4;
+  margin-right: 10px;
+}
+
+.ss-calendar-setting__preview-hint {
+  font-size: 12px;
+  color: #5a7a9a;
+  margin-top: 4px;
+}
+
+.ss-calendar-setting__preview-offset-wrap {
+  width: 100%;
+}
+
+.ss-calendar-setting__preview-offset-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  margin-top: 8px;
+}
+
+.ss-calendar-setting__preview-offset-input {
+  width: 100px;
+  min-width: 88px;
+}
+
+.ss-calendar-setting__split-panel {
+  margin-left: 12px;
+  margin-top: 8px;
+  margin-bottom: 4px;
+  padding-left: 12px;
+  border-left: 2px solid #d9d9d9;
+}
+
+.ss-calendar-setting__split-equation {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+}
+
+.ss-calendar-setting__split-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 100px;
+}
+
+.ss-calendar-setting__split-label {
+  margin-bottom: 4px;
+  font-size: 12px;
+}
+
+.ss-calendar-setting__split-input-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ss-calendar-setting__split-hint {
+  font-size: 12px;
+  color: #666;
+  white-space: nowrap;
+}
+
+.ss-calendar-setting__cutoff-select {
+  width: 200px;
+  min-width: 160px;
+}
+
+.ss-calendar-setting__cutoff-hint {
+  font-size: 12px;
+  color: #666;
+  margin-top: 6px;
+}
+
+.ss-calendar-setting__weekday-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  align-items: center;
+}
+
+.ss-calendar-setting__non-select-wrap {
+  width: 98%;
+}
+
+.ss-calendar-setting__fixed-date-label {
+  margin-right: 10px;
+}
+
+.ss-calendar-setting__fixed-date-picker {
+  width: 88%;
+}
+
+.ss-calendar-setting__fixed-date-list {
+  width: 99%;
+  min-height: 20px;
+}
+
+.ss-calendar-setting__range-note {
+  display: block;
+}
+
+.ss-calendar-setting__range-note--muted {
+  margin-right: 10px;
+  color: #ccc;
+}
+
+.ss-calendar-setting__aggregation-input {
+  width: 100%;
+}
+
+.ss-calendar-setting__embedded-wrap {
+  height: 380px;
+}
+
+.ss-calendar-setting__embedded-calendar {
+  top: 20px;
+  width: 300px;
+  border: 1px solid grey;
+}
+
+.ss-calendar-setting__type-picker {
+  width: 99%;
+}
+
+.ss-calendar-setting__start-end-pickers {
+  justify-content: space-around;
+}
+
+.ss-calendar-setting__start-end-picker {
+  width: 49%;
+}
+
+.ss-calendar-setting__specified-period-input {
+  width: 16%;
+}
+
+.ss-calendar-setting__specified-period-note {
+  display: block;
+  height: 15px;
+}
+
+.ss-select--spaced-right {
+  margin-right: 10px;
+}
+
+.ss-btn--no-margin {
+  margin: 0;
+  line-height: 0;
+}
+
+.ss-field-label--bold {
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.ss-field-label--section-spaced {
+  font-weight: 700;
+  margin-right: 17px;
+}
+
+.ss-select--wide {
+  width: 81%;
+}

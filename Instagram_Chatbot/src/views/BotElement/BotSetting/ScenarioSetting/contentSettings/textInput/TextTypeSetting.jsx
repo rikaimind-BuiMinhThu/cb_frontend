@@ -20,11 +20,13 @@ const TextTypeSetting = (props) => {
   return (
   <>
     <div className="ss-user-setting-option-row">
-      <CheckboxCustom
-        label="文字を自動変換する"
-        onChange={changeContent('isUseConvertText')}
-        value={textInput.isUseConvertText}
-      />
+      <div className="ss-user-setting-option-row__checkbox">
+        <CheckboxCustom
+          label="文字を自動変換する"
+          onChange={changeContent('isUseConvertText')}
+          value={textInput.isUseConvertText}
+        />
+      </div>
       {textInput.isUseConvertText && (
         <div className="ss-user-setting-option-row__controls">
           <SelectCustom
@@ -69,11 +71,13 @@ const TextTypeSetting = (props) => {
       )}
     </div>
     <div className="ss-user-setting-option-row">
-      <CheckboxCustom
-        label="IDのカスタマイズ"
-        onChange={changeContent('isCustomID')}
-        value={textInput.isCustomID}
-      />
+      <div className="ss-user-setting-option-row__checkbox">
+        <CheckboxCustom
+          label="IDのカスタマイズ"
+          onChange={changeContent('isCustomID')}
+          value={textInput.isCustomID}
+        />
+      </div>
       {textInput.isCustomID && (
         <div className="ss-user-setting-option-row__controls">
           {textInput.text.isSplitInput ? (
@@ -124,7 +128,7 @@ const TextTypeSetting = (props) => {
     />
     <div className="ss-user-setting__item-bottom">
       <InputDouble
-        rightWidth="50%"
+        showSecondInput={!!typeConfig?.isSplitInput}
         icon={typeConfig?.isSplitInput ? 'minus-circle' : 'plus-circle'}
         valueLeft={typeConfig?.placeholderLeft}
         valueRight={typeConfig?.placeholderRight}

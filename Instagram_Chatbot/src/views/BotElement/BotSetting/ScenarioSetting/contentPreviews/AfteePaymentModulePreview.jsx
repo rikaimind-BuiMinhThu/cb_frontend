@@ -1,3 +1,4 @@
+import '../styles/base/preview-common.css';
 import React from 'react';
 
 const AfteePaymentModulePreview = ({
@@ -10,7 +11,7 @@ const AfteePaymentModulePreview = ({
     <>
       {content.type === 'AFTEE_payment_module' && (
         afteePaymentModule.content &&
-        <div className="ss-message__content--user-checkbox-top" style={{ marginBottom: '10px' }}>
+        <div className="ss-message__content--user-checkbox-top ss-content-preview">
           {afteePaymentModule.content}
         </div>
       )}

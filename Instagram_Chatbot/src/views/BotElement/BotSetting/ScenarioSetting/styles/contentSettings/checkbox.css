@@ -1,0 +1,102 @@
+.ss-checkbox-setting__fukushashiki-spacer {
+  width: 5%;
+}
+
+.ss-checkbox-setting__fukushashiki-row {
+  width: 90%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ss-checkbox-setting__fukushashiki-mode {
+  flex-basis: 30%;
+  max-width: 30%;
+}
+
+.ss-checkbox-setting__fukushashiki-value {
+  flex-basis: 70%;
+  max-width: 70%;
+}
+
+.ss-checkbox-setting__drag-container {
+  width: 100%;
+}
+
+.ss-checkbox-setting__default-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  width: 100%;
+  background-color: #f8f9fa;
+  padding: 5px;
+}
+
+.ss-checkbox-setting__img-row {
+  display: flex;
+  margin-bottom: 10px;
+  background-color: rgb(248, 249, 250);
+  position: relative;
+}
+
+.ss-checkbox-setting__img-grip {
+  margin-right: 5px;
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.ss-checkbox-setting__img-content {
+  padding: 5px;
+}
+
+.ss-checkbox-setting__img-content--multi {
+  flex: 1;
+  min-width: 0;
+}
+
+.ss-user-setting-payment-radio-container-img {
+  display: flex;
+  flex: 1;
+}
+
+.ss-checkbox-setting__img-file-row {
+  flex-wrap: nowrap;
+}
+
+.ss-checkbox-setting__img-file-input {
+  width: 92%;
+}
+
+.ss-checkbox-setting__paperclip {
+  margin-left: 10px;
+  background-color: #fff;
+  border-radius: 50%;
+  padding: 6px;
+}
+
+.ss-checkbox-setting__img-text-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.ss-checkbox-setting__plus-minus {
+  display: flex;
+  align-items: center;
+}
+
+.ss-checkbox-setting__plus {
+  color: #327aed;
+  cursor: pointer;
+}
+
+.ss-checkbox-setting__minus {
+  color: #fa8464;
+  cursor: pointer;
+}
+
+.ss-checkbox-setting__add-row {
+  display: flex;
+  justify-content: flex-end;
+}

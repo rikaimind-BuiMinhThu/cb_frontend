@@ -1,0 +1,29 @@
+.ss-checkbox-preview {
+  margin-bottom: 10px;
+}
+
+.ss-checkbox-preview__header {
+  margin-bottom: 0;
+}
+
+.ss-checkbox-preview__img-group {
+  color: #6789a6;
+  margin-bottom: 10px;
+}
+
+.ss-checkbox-preview__img-checkbox {
+  margin-right: 0;
+}
+
+.ss-checkbox-preview__img-group-inner {
+  width: 100%;
+  font-size: 14px;
+  display: flex;
+}
+
+.ss-checkbox-preview__img-text {
+  text-align: center;
+  font-size: 14px;
+  color: #6789a6;
+  font-weight: 700;
+}

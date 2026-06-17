@@ -1,0 +1,36 @@
+.ss-calendar-preview__wrapper {
+  margin-bottom: 10px;
+}
+
+.ss-calendar-preview__header {
+  margin-bottom: 0;
+}
+
+.ss-calendar-preview__picker {
+  width: 99%;
+  margin-top: 5px;
+}
+
+.ss-calendar-preview__embedded {
+  margin-top: 5px;
+}
+
+.ss-calendar-preview__embedded-calendar {
+  top: 20px;
+  width: 300px;
+  border: 1px solid grey;
+}
+
+.ss-calendar-preview__start-end-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.ss-calendar-preview__start-end-picker {
+  width: 49%;
+  margin-top: 5px;
+}
+
+.ss-calendar-preview__header-padding {
+  padding: 8px;
+}

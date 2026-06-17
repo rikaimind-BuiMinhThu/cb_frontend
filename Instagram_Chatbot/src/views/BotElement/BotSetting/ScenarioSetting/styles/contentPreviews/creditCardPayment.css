@@ -1,0 +1,21 @@
+.ss-credit-card-preview__wrapper {
+  margin-bottom: 10px;
+}
+
+.ss-credit-card-preview__header {
+  margin-bottom: 0;
+}
+
+.ss-credit-card-preview__card-number-label {
+  width: 100%;
+}
+
+.ss-credit-card-preview__expiry-row {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.ss-credit-card-preview__expiry-select {
+  width: 49%;
+}

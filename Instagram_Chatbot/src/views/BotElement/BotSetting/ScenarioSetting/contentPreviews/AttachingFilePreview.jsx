@@ -1,3 +1,4 @@
+import '../styles/base/preview-common.css';
 import React from 'react';
 import { Button } from 'reactstrap';
 
@@ -11,7 +12,7 @@ const AttachingFilePreview = ({
     <>
       {
         content.type === 'attaching_file' && (
-          <div style={{ marginBottom: '10px' }}>
+          <div className="ss-content-preview">
             {(attachingFile.require) &&
               <div className="ss-message__content--user-attaching_file-top">
                 {attachingFile.require === true &&
@@ -21,9 +22,9 @@ const AttachingFilePreview = ({
                 }
               </div>
             }
-            {!attachingFile.file_content && <span style={{ fontWeight: '400', fontSize: '12px' }}>未選択</span>}
+            {!attachingFile.file_content && <span className="ss-content-preview__unselected-text">未選択</span>}
             <div className="ss-message__content--user-attaching_file">
-              <Button className="ss-message__content--user-attaching_file-btn" style={{ backgroundColor: '#A3B1BF', marginTop: '0px' }}>
+              <Button className="ss-message__content--user-attaching_file-btn ss-content-preview__attaching-btn">
                 ファイルを選択
               </Button>
             </div>

@@ -1,131 +1,136 @@
 import React from 'react';
 import InputCustom from '../scenarioComon/InputCustom';
+import { SETTING_LABELS } from '../constants/scenarioSettingLabels';
 
-export const createRenderAddressField = () => (address) => {
-  if ((address.compact_municipality_and_address && !address.is_display_address_field) || address.compact_municipality_and_address_and_building_name) return;
-  if (address.address === undefined) return;
-  return (
-    <div className="ss-user-setting__item-bottom">
-      <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
-        {address.address_label || '番地'}
-      </div>
-      <InputCustom
-        placeholder={address.address}
-        disabled={true}
-        style={{ width: '100%' }}
-      />
-    </div>
-  );
+const renderLabeledAddressInput = (label, placeholder) => (
+  <div className="ss-user-setting__item-bottom">
+    <div className="ss-field-label">{label}</div>
+    <InputCustom
+      placeholder={placeholder}
+      disabled={true}
+      className="ss-input--full"
+    />
+  </div>
+);
+
+export const createRenderAddressField = () => {
+  const renderAddressField = (address) => {
+    if ((address.compact_municipality_and_address && !address.is_display_address_field) || address.compact_municipality_and_address_and_building_name) return;
+    if (address.address === undefined) return;
+    return renderLabeledAddressInput(
+      address.address_label || SETTING_LABELS.address,
+      address.address,
+    );
+  };
+  return renderAddressField;
 };
 
-export const createRenderBuildingName = () => (address) => {
-  if (address.building_name === undefined) return;
-  return (
-    <div className="ss-user-setting__item-bottom">
-      <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
-        {address.building_name_label || '建物名'}
-      </div>
-      <InputCustom
-        placeholder={address.building_name}
-        disabled={true}
-        style={{ width: '100%' }}
-      />
-    </div>
-  );
+export const createRenderBuildingName = () => {
+  const renderBuildingName = (address) => {
+    if (address.building_name === undefined) return;
+    return renderLabeledAddressInput(
+      address.building_name_label || SETTING_LABELS.buildingName,
+      address.building_name,
+    );
+  };
+  return renderBuildingName;
 };
 
-export const createRenderMunicipality = () => (address) => {
-  if (address.municipality === undefined) return;
-  return (
-    <div className="ss-user-setting__item-bottom">
-      <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
-        {address.municipality_label || '市区町村'}
-      </div>
-      <InputCustom
-        placeholder={address.municipality}
-        disabled={true}
-        style={{ width: '100%' }}
-      />
-    </div>
-  );
+export const createRenderMunicipality = () => {
+  const renderMunicipality = (address) => {
+    if (address.municipality === undefined) return;
+    return renderLabeledAddressInput(
+      address.municipality_label || SETTING_LABELS.municipality,
+      address.municipality,
+    );
+  };
+  return renderMunicipality;
 };
 
-export const createRenderSinglePostCode = () => (address) => {
-  return (
+export const createRenderSinglePostCode = () => {
+  const renderSinglePostCode = (address) => (
     <InputCustom
       placeholder={address.post_code}
       disabled={true}
-      style={{ width: '100%' }}
+      className="ss-input--full"
     />
   );
+  return renderSinglePostCode;
 };
 
-export const createRenderSplitPostCode = () => (address) => {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+export const createRenderSplitPostCode = () => {
+  const renderSplitPostCode = (address) => (
+    <div className="ss-address-post-code-row">
       <InputCustom
         placeholder={address.post_code_left}
         disabled={true}
-        style={{ width: '49%' }}
+        className="ss-input--half"
       />
       <InputCustom
         placeholder={address.post_code_right}
         disabled={true}
-        style={{ width: '49%' }}
+        className="ss-input--half"
       />
     </div>
   );
+  return renderSplitPostCode;
 };
 
-export const createRenderPostCode = ({ renderSinglePostCode, renderSplitPostCode }) => (address) => {
-  if (address.post_code === undefined) return;
-  return (
-    <div className="ss-user-setting__item-bottom">
-      <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '5px' }}>
-        {address.post_code_label || '郵便番号'}
+export const createRenderPostCode = ({ renderSinglePostCode, renderSplitPostCode }) => {
+  const renderPostCode = (address) => {
+    if (address.post_code === undefined) return;
+    return (
+      <div className="ss-user-setting__item-bottom">
+        <div className="ss-field-label ss-field-label--post-code">
+          {address.post_code_label || SETTING_LABELS.postCode}
+        </div>
+        {address.split_postal_code !== true ? renderSinglePostCode(address) : renderSplitPostCode(address)}
       </div>
-      {address.split_postal_code !== true ? renderSinglePostCode(address) : renderSplitPostCode(address)}
-    </div>
-  );
-};
-
-export const createRenderZipCodeAddressTitle = () => (zipCodeAddress) => {
-  if (!(zipCodeAddress.title_require || zipCodeAddress.isCheckRequire)) return;
-
-  const hasRequiredItem = () => {
-    if (zipCodeAddress.isCheckRequire !== 'set_required_for_each_item') return false;
-    return ['postCode', 'prefecture', 'municipality', 'address', 'buildingName'].some(item => zipCodeAddress[`${item}Required`]);
+    );
   };
-
-  const isRequired = zipCodeAddress.isCheckRequire === 'all_items_require' || zipCodeAddress.isCheckRequire === 'require' || hasRequiredItem();
-  return (
-    <div className="ss-message__content--user-pull_down-top" style={{ marginBottom: '0px' }}>
-      {zipCodeAddress.title_require &&
-        <span className="ss-message__content--user-pull_down-title">
-          {zipCodeAddress.title}
-        </span>
-      }
-      {isRequired &&
-        <span className="ss-message__content--user-text-input-required">
-          ※必須
-        </span>
-      }
-    </div>
-  );
+  return renderPostCode;
 };
 
-export const createRenderPrefecture = () => (address) => {
-  if (address.prefecture === undefined) return;
-  return (
-    <div className="ss-user-setting__item-bottom">
-      <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
-        {address.prefecture_label || '都道府県'}
+export const createRenderZipCodeAddressTitle = () => {
+  const renderZipCodeAddressTitle = (zipCodeAddress) => {
+    if (!(zipCodeAddress.title_require || zipCodeAddress.isCheckRequire)) return;
+
+    const hasRequiredItem = () => {
+      if (zipCodeAddress.isCheckRequire !== 'set_required_for_each_item') return false;
+      return ['postCode', 'prefecture', 'municipality', 'address', 'buildingName'].some(
+        (item) => zipCodeAddress[`${item}Required`],
+      );
+    };
+
+    const isRequired = zipCodeAddress.isCheckRequire === 'all_items_require'
+      || zipCodeAddress.isCheckRequire === 'require'
+      || hasRequiredItem();
+
+    return (
+      <div className="ss-message__content--user-pull_down-top ss-address-zip-title">
+        {zipCodeAddress.title_require && (
+          <span className="ss-message__content--user-pull_down-title">
+            {zipCodeAddress.title}
+          </span>
+        )}
+        {isRequired && (
+          <span className="ss-message__content--user-text-input-required">
+            ※必須
+          </span>
+        )}
       </div>
-      <InputCustom
-        placeholder={address.prefecture}
-        disabled={true}
-        style={{ width: '100%' }}
-      />
-    </div>
-  );
+    );
+  };
+  return renderZipCodeAddressTitle;
+};
+
+export const createRenderPrefecture = () => {
+  const renderPrefecture = (address) => {
+    if (address.prefecture === undefined) return;
+    return renderLabeledAddressInput(
+      address.prefecture_label || SETTING_LABELS.prefecture,
+      address.prefecture,
+    );
+  };
+  return renderPrefecture;
 };

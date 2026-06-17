@@ -1,0 +1,50 @@
+.ss-radio-button-setting__fukushashiki-spacer {
+  width: 5%;
+}
+
+.ss-radio-button-setting__fukushashiki-row {
+  width: 90%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ss-radio-button-setting__fukushashiki-mode {
+  flex-basis: 30%;
+  max-width: 30%;
+}
+
+.ss-radio-button-setting__fukushashiki-value {
+  flex-basis: 70%;
+  max-width: 70%;
+}
+
+.ss-radio-button-setting__gender-display {
+  width: 100%;
+  padding: 0 5% 10px;
+}
+
+.ss-radio-button-setting__drag-container {
+  width: 90%;
+}
+
+.ss-radio-button-setting__item-panel {
+  margin-bottom: 10px;
+  width: 100%;
+  background-color: #f8f9fa;
+  padding: 5px;
+}
+
+.ss-radio-button-setting__img-file-input {
+  width: 86%;
+}
+
+.ss-radio-button-setting__default-row {
+  display: flex;
+  align-items: center;
+}
+
+.ss-radio-button-setting__add-row {
+  display: flex;
+  justify-content: flex-end;
+}

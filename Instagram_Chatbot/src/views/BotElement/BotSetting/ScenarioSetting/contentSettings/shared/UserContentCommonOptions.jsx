@@ -160,6 +160,17 @@ const UserContentCommonOptions = ({
         </>
       )}
 
+      {config.requireStandalone && (
+        <ScenarioModalCheckbox
+          checked={!!contentData.require}
+          onChange={(checked) => updateContentField('require', checked)}
+          label={labelWithTooltip(
+            USER_CONTENT_OPTION_LABELS.require,
+            'require',
+          )}
+        />
+      )}
+
       {config.displayContinueButton && (
         <ScenarioModalCheckbox
           checked={!!contentData.displayButtonNext}

@@ -504,13 +504,22 @@
 .ss-user-setting-option-row__action {
   flex: 0 0 auto;
   margin: 0;
-  line-height: 0;
+  padding: 9px 19px;
+  line-height: normal;
+  white-space: nowrap;
 }
 
 .ss-text-input-setting {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-text-input-setting .ss-content-setting-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   width: 100%;
 }
 
@@ -535,10 +544,17 @@
 .ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting__item-bottom {
   justify-content: flex-start;
   margin-bottom: 0;
+  width: 100%;
 }
 
 .ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting__item-bottom-flex-start {
   margin-bottom: 0;
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting__item-bottom .select-custom-antd,
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting__item-bottom .select-custom-native {
+  width: 100%;
 }
 
 .ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting__item-select-bottom-wrapper-flex {
@@ -549,6 +565,44 @@
 .ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting__item-select-bottom-wrapper-flex > div {
   flex: 1 1 48%;
   width: auto;
+}
+
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting-option-row {
+  grid-template-columns: 1fr;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting-option-row__controls {
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting-option-row__controls .select-custom-antd,
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting-option-row__controls .select-custom-native,
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting-option-row__controls .ss-input-custom-container {
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting-option-row__action {
+  flex: 0 0 auto;
+  align-self: center;
+}
+
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting-double-input {
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting-double-input input {
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto;
+}
+
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting-double-input .ss-plus-circle-option-icon {
+  flex: 0 0 auto;
 }
 
 .ss-editor-layout-v2 .ss-user-setting-condition-container {

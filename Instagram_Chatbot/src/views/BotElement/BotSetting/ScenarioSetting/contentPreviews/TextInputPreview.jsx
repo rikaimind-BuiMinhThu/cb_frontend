@@ -1,3 +1,4 @@
+import '../styles/base/preview-common.css';
 import React from 'react';
 import { Checkbox } from 'antd';
 import SelectCustom from '../scenarioComon/SelectCustom';
@@ -6,9 +7,9 @@ const TextInputPreview = ({
   textInput,
   renderTextInputPasswordConfirmationPreview,
 }) => (
-                                                            <div style={{ marginBottom: '10px' }}>
+                                                            <div className="ss-content-preview">
                                                               {(textInput.title_require || textInput.require) &&
-                                                                <div className="ss-message__content--user-text-input-top" style={{ marginBottom: '0px' }}>
+                                                                <div className="ss-message__content--user-text-input-top ss-content-preview__header--no-mb">
                                                                   {textInput.title_require &&
                                                                     <span className="ss-message__content--user-text-input-title">
                                                                       {textInput.title}
@@ -23,32 +24,27 @@ const TextInputPreview = ({
                                                               }
                                                               {(textInput.type === 'text') &&
                                                                 (textInput.text.isSplitInput ?
-                                                                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                  <div className="ss-content-preview__row">
                                                                     <input
-                                                                      className="ss-message__content--user-text-input ss-input-value"
                                                                       readOnly
                                                                       placeholder={textInput.text?.placeholderLeft}
-                                                                      style={{ width: '49%', marginBottom: '0px' }}
                                                                       disabled
-                                                                    ></input>
+                                                                     className="ss-message__content--user-text-input ss-input-value ss-content-preview__input--half"></input>
                                                                     <input
-                                                                      className="ss-message__content--user-text-input ss-input-value"
                                                                       readOnly
                                                                       placeholder={textInput.text?.placeholderRight}
-                                                                      style={{ width: '49%' }}
                                                                       disabled
-                                                                    ></input>
+                                                                      className="ss-message__content--user-text-input ss-input-value ss-content-preview__input--half"
+                                                                    />
                                                                   </div> :
                                                                   <React.Fragment>
                                                                     <input
-                                                                      className="ss-message__content--user-text-input ss-input-value"
                                                                       readOnly
-                                                                      style={{ marginBottom: '0px' }}
                                                                       placeholder={textInput[textInput.type]?.placeholderLeft}
                                                                       disabled
-                                                                    ></input>
+                                                                     className="ss-message__content--user-text-input ss-input-value ss-content-preview__header--no-mb"></input>
                                                                     {textInput.text?.placeholderRight &&
-                                                                      <span style={{ fontWeight: '400', color: 'black', fontSize: '12px', marginLeft: '18px' }}>{textInput.text?.placeholderRight}</span>
+                                                                      <span className="ss-content-preview__suffix-label">{textInput.text?.placeholderRight}</span>
                                                                     }
                                                                   </React.Fragment>
                                                                 )
@@ -57,34 +53,26 @@ const TextInputPreview = ({
                                                                 <React.Fragment>
                                                                   {textInput.phone_number.withHyphen === false ?
                                                                     <input
-                                                                      className="ss-message__content--user-text-input ss-input-value"
                                                                       readOnly
-                                                                      style={{ marginBottom: '0px' }}
                                                                       placeholder={textInput[textInput.type]?.number}
                                                                       disabled
-                                                                    ></input> :
-                                                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                     className="ss-message__content--user-text-input ss-input-value ss-content-preview__header--no-mb"></input> :
+                                                                    <div className="ss-content-preview__row">
                                                                       <input
-                                                                        className="ss-message__content--user-text-input ss-input-value"
                                                                         readOnly
-                                                                        style={{ marginBottom: '0px', width: '32%' }}
                                                                         placeholder={textInput[textInput.type]?.number1}
                                                                         disabled
-                                                                      ></input>
+                                                                       className="ss-message__content--user-text-input ss-input-value ss-content-preview__input--third"></input>
                                                                       <input
-                                                                        className="ss-message__content--user-text-input ss-input-value"
                                                                         readOnly
-                                                                        style={{ marginBottom: '0px', width: '32%' }}
                                                                         placeholder={textInput[textInput.type]?.number2}
                                                                         disabled
-                                                                      ></input>
+                                                                       className="ss-message__content--user-text-input ss-input-value ss-content-preview__input--third"></input>
                                                                       <input
-                                                                        className="ss-message__content--user-text-input ss-input-value"
                                                                         readOnly
-                                                                        style={{ marginBottom: '0px', width: '32%' }}
                                                                         placeholder={textInput[textInput.type]?.number3}
                                                                         disabled
-                                                                      ></input>
+                                                                       className="ss-message__content--user-text-input ss-input-value ss-content-preview__input--third"></input>
                                                                     </div>
                                                                   }
                                                                 </React.Fragment>
@@ -92,24 +80,20 @@ const TextInputPreview = ({
                                                               {(textInput.type === 'password') &&
                                                                 <React.Fragment>
                                                                   <input
-                                                                    className="ss-message__content--user-text-input ss-input-value"
                                                                     readOnly
-                                                                    style={{ marginBottom: '0px' }}
                                                                     placeholder={textInput[textInput.type]?.password}
                                                                     disabled
-                                                                  ></input>
+                                                                   className="ss-message__content--user-text-input ss-input-value ss-content-preview__header--no-mb"></input>
                                                                 </React.Fragment>
                                                               }
                                                               {(textInput.type === 'urls' ||
                                                                 textInput.type === 'email_address') &&
                                                                 <React.Fragment>
                                                                   <input
-                                                                    className="ss-message__content--user-text-input ss-input-value"
                                                                     readOnly
-                                                                    style={{ marginBottom: '0px' }}
                                                                     placeholder={textInput[textInput.type].placeholder}
                                                                     disabled
-                                                                  ></input>
+                                                                   className="ss-message__content--user-text-input ss-input-value ss-content-preview__header--no-mb"></input>
                                                                 </React.Fragment>
                                                               }
                                                               {(textInput.type === 'email_confirmation') &&

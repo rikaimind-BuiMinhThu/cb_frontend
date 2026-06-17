@@ -1,25 +1,22 @@
 import React from 'react';
 import CheckboxCustom from '../scenarioComon/CheckboxCustom';
+import { SETTING_LABELS } from '../constants/scenarioSettingLabels';
 
 export const createRenderRootFaqOption = ({
   scenarioType,
   dataMessages,
   indexMessageSelect,
   setDataMessages,
-}) => (wrapperClassName = null) => {
-  if (scenarioType !== 'faq') return null;
-
-  const checkbox = (
+}) => {
+  const renderRootFaqCheckbox = () => (
     <CheckboxCustom
-      label="Root FAQ Message"
+      label={SETTING_LABELS.rootFaqMessage}
       onChange={(value) => {
-        // Uncheck all other messages
         const updatedMessages = dataMessages.map((msg, idx) => {
           if (idx === indexMessageSelect) {
             return { ...msg, is_root_faq_msg: value };
-          } else {
-            return { ...msg, is_root_faq_msg: false };
           }
+          return { ...msg, is_root_faq_msg: false };
         });
         setDataMessages(updatedMessages);
       }}
@@ -27,13 +24,19 @@ export const createRenderRootFaqOption = ({
     />
   );
 
-  if (wrapperClassName) {
-    return (
-      <div className={wrapperClassName}>
-        {checkbox}
-      </div>
-    );
-  }
+  const renderRootFaqOption = (wrapperClassName = null) => {
+    if (scenarioType !== 'faq') return null;
 
-  return checkbox;
+    if (wrapperClassName) {
+      return (
+        <div className={wrapperClassName}>
+          {renderRootFaqCheckbox()}
+        </div>
+      );
+    }
+
+    return renderRootFaqCheckbox();
+  };
+
+  return renderRootFaqOption;
 };

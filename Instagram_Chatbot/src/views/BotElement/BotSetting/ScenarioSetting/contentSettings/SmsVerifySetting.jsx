@@ -1,5 +1,6 @@
 import React from 'react';
-import InputCustom from '../scenarioComon/InputCustom';
+import ContentSettingShell from './shared/ContentSettingShell';
+import { ContentTitleInput } from './shared/ContentTypeSelector';
 import SelectCustom from '../scenarioComon/SelectCustom';
 import { dropDownTitle } from '../constants/scenarioFormConstants';
 
@@ -7,39 +8,59 @@ const SmsVerifySetting = ({
   content,
   indexMessageSelect,
   indexContent,
+  dataMessages,
+  setDataMessages,
   onChangeValueMessageContent,
+  renderRootFaqOption,
+  dataInputVar,
+  setIsOpenAddVariable,
 }) => {
   const smsVerify = content.sms_verify;
+
+  const changeField = (field) => (value) =>
+    onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, field);
+
+  const renderTitleRequire = () => (
+    <div className="ss-user-setting__item-bottom">
+      <div className="ss-user-setting__item-select-bottom-wrapper-flex">
+        <SelectCustom
+          id="title"
+          className="ss-select--half"
+          value={smsVerify.title_require}
+          data={dropDownTitle}
+          onChange={changeField('title_require')}
+          keyValue="key"
+        />
+      </div>
+    </div>
+  );
+
+  const renderTitle = () => {
+    if (smsVerify?.title_require !== true) return null;
+    return (
+      <ContentTitleInput
+        title={smsVerify.title}
+        onChange={changeField('title')}
+      />
+    );
+  };
+
   return (
-    <>
-      {content.type === 'sms_verify' && (
-          <React.Fragment>
-            <div className="ss-user-setting__item-bottom">
-              <div
-                  className="ss-user-setting__item-select-bottom-wrapper-flex">
-                <SelectCustom
-                    id="title"
-                    style={{width: '49%'}}
-                    value={smsVerify.title_require}
-                    data={dropDownTitle}
-                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'title_require')}
-                    keyValue="key"
-                />
-              </div>
-            </div>
-            {/* smsVerify: withTitle = true */}
-            {smsVerify?.title_require === true &&
-                <div className="ss-user-setting__item-bottom">
-                  <InputCustom
-                      placeholder="タイトル"
-                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'title')}
-                      value={smsVerify.title}
-                  />
-                </div>
-            }
-          </React.Fragment>
-      )}
-    </>
+    <ContentSettingShell
+      contentType="sms_verify"
+      contentData={smsVerify}
+      indexMessageSelect={indexMessageSelect}
+      indexContent={indexContent}
+      dataMessages={dataMessages}
+      setDataMessages={setDataMessages}
+      onChangeValueMessageContent={onChangeValueMessageContent}
+      renderRootFaqOption={renderRootFaqOption}
+      dataInputVar={dataInputVar}
+      setIsOpenAddVariable={setIsOpenAddVariable}
+    >
+      {renderTitleRequire()}
+      {renderTitle()}
+    </ContentSettingShell>
   );
 };
 

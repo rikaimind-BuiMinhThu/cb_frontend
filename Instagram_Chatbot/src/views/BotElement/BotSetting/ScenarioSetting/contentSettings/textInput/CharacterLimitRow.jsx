@@ -1,5 +1,6 @@
 import React from 'react';
 import InputNum from '../../scenarioComon/InputNum';
+import { PULL_DOWN_LABELS } from '../../constants/scenarioSettingLabels';
 
 const CharacterLimitRow = ({ typeConfig, onChangeFrom, onChangeTo }) => (
   <div className="ss-user-setting__item-bottom-flex-start">
@@ -12,7 +13,7 @@ const CharacterLimitRow = ({ typeConfig, onChangeFrom, onChangeTo }) => (
       onChange={onChangeFrom}
       value={typeConfig?.character_limit_from}
     />
-    <span style={{ fontSize: '30px', marginLeft: '10px', opacity: '0.4' }}>~</span>
+    <span className="ss-range-separator">{PULL_DOWN_LABELS.rangeSeparator}</span>
     <InputNum
       placeholder="0000"
       className="ss-user-setting-input-limit-character"

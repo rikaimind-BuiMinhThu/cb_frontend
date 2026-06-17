@@ -1,9 +1,9 @@
 import TextInputSetting from './TextInputSetting';
-import TextareaSetting from './TextareaSetting';
+import TextareaSetting from './textarea/TextareaSetting';
 import LabelSetting from './LabelSetting';
 import PullDownSetting from './PullDownSetting';
-import CheckboxSetting from './CheckboxSetting';
-import RadioButtonSetting from './RadioButtonSetting';
+import CheckboxSetting from './checkbox/CheckboxSetting';
+import RadioButtonSetting from './radioButton/RadioButtonSetting';
 import CalendarSetting from './CalendarSetting';
 import CardPaymentRadioButtonSetting from './CardPaymentRadioButtonSetting';
 import ShippingAddressSetting from './ShippingAddressSetting';
@@ -14,13 +14,13 @@ import ProductPurchaseSelectOptionSetting from './ProductPurchaseSelectOptionSet
 import SliderSetting from './SliderSetting';
 import ZipCodeAddressContentSetting from './ZipCodeAddressContentSetting';
 import AttachingFileSetting from './AttachingFileSetting';
-import AgreeTermSetting from './AgreeTermSetting';
+import AgreeTermSetting from './agreeTerm/AgreeTermSetting';
 import ImageSetting from './ImageSetting';
-import CarouselSetting from './CarouselSetting';
+import CarouselSetting from './carousel/CarouselSetting';
 import CaptureSetting from './CaptureSetting';
 import SmsVerifySetting from './SmsVerifySetting';
 import AfteePaymentModuleSetting from './AfteePaymentModuleSetting';
-import ButtonSubmitSetting from './ButtonSubmitSetting';
+import ButtonSubmitSetting from './buttonSubmit/ButtonSubmitSetting';
 import LabelNoTransitionSetting from './LabelNoTransitionSetting';
 import { withContentSettingContext } from './withContentSettingContext';
 
@@ -31,15 +31,15 @@ export const CONTENT_SETTING_MAP = {
   pull_down: withContentSettingContext(PullDownSetting),
   checkbox: withContentSettingContext(CheckboxSetting),
   radio_button: withContentSettingContext(RadioButtonSetting),
-  calendar: CalendarSetting,
-  card_payment_radio_button: CardPaymentRadioButtonSetting,
-  shipping_address: ShippingAddressSetting,
-  credit_card_payment: CreditCardPaymentSetting,
-  product_purchase: ProductPurchaseSetting,
-  product_purchase_radio_button: ProductPurchaseRadioButtonSetting,
-  product_purchase_select_option: ProductPurchaseSelectOptionSetting,
-  slider: SliderSetting,
-  zip_code_address: ZipCodeAddressContentSetting,
+  calendar: withContentSettingContext(CalendarSetting),
+  card_payment_radio_button: withContentSettingContext(CardPaymentRadioButtonSetting),
+  shipping_address: withContentSettingContext(ShippingAddressSetting),
+  credit_card_payment: withContentSettingContext(CreditCardPaymentSetting),
+  product_purchase: withContentSettingContext(ProductPurchaseSetting),
+  product_purchase_radio_button: withContentSettingContext(ProductPurchaseRadioButtonSetting),
+  product_purchase_select_option: withContentSettingContext(ProductPurchaseSelectOptionSetting),
+  slider: withContentSettingContext(SliderSetting),
+  zip_code_address: withContentSettingContext(ZipCodeAddressContentSetting),
   attaching_file: withContentSettingContext(AttachingFileSetting),
   agree_term: withContentSettingContext(AgreeTermSetting),
   image: withContentSettingContext(ImageSetting),

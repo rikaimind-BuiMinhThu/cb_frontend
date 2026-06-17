@@ -1,3 +1,4 @@
+import '../styles/base/preview-common.css';
 import React from 'react';
 
 const ImagePreview = ({
@@ -10,8 +11,8 @@ const ImagePreview = ({
     <>
       {
         content.type === 'image' && (
-          <div className="ss-message__content--user-text-input-top" style={{ marginBottom: '0px' }}>
-            <img src={image.imageURL} style={{ width: image.image_width, height: image.image_height }} />
+          <div className="ss-message__content--user-text-input-top ss-content-preview__header--no-mb">
+            <img src={image.imageURL} width={image.image_width} height={image.image_height} />
           </div>
         )
       }

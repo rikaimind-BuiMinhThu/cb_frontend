@@ -1,6 +1,7 @@
 import React from 'react';
 import CheckboxCustom from '../../scenarioComon/CheckboxCustom';
 import InputCustom from '../../scenarioComon/InputCustom';
+import { TEXT_INPUT_LABELS } from '../../constants/scenarioSettingLabels';
 import { buildTextInputSettingContext } from './textInputSettingContext';
 import CharacterLimitRow from './CharacterLimitRow';
 
@@ -17,7 +18,7 @@ const PasswordTypeSetting = (props) => {
       />
       <div className="ss-user-setting-item-use-character">
         <CheckboxCustom
-          label="特殊文字を許可する"
+          label={TEXT_INPUT_LABELS.allowSpecialChars}
           onChange={changeContent(textInput.type, 'allow_special_chars')}
           value={typeConfig?.allow_special_chars}
         />
@@ -25,8 +26,8 @@ const PasswordTypeSetting = (props) => {
       <div className="ss-user-setting__item-bottom">
         <div className="ss-user-setting__item-select-bottom-wrapper ss-input-text-comment">
           <InputCustom
-            style={{ width: '100%' }}
-            placeholder="プレースホルダ"
+            className="ss-input--full"
+            placeholder={TEXT_INPUT_LABELS.placeholder}
             onChange={changeContent(textInput.type, 'password')}
             value={typeConfig?.password}
           />
@@ -35,15 +36,14 @@ const PasswordTypeSetting = (props) => {
       {isUseFukushashiki &&
         renderFukushashikiRow('fukushashiki_search_mode', 'fukushashiki_search_value', {
           useFukushashiki: false,
-          rowClassName: 'ss-user-setting__item-bottom',
-          rowStyle: { width: '100%', alignItems: 'center', gap: '8px', marginLeft: 0, marginBottom: '10px' },
+          rowClassName: 'ss-user-setting__item-bottom ss-text-input-setting__fukushashiki-row--password',
         })}
       {textInput.type === 'password_confirmation' && (
         <div className="ss-user-setting__item-bottom">
           <div className="ss-user-setting__item-select-bottom-wrapper ss-input-text-comment">
             <InputCustom
-              style={{ width: '100%' }}
-              placeholder="プレースホルダ"
+              className="ss-input--full"
+              placeholder={TEXT_INPUT_LABELS.placeholder}
               onChange={changeContent(textInput.type, 'confirm_password')}
               value={typeConfig?.confirm_password}
             />
@@ -53,7 +53,7 @@ const PasswordTypeSetting = (props) => {
       {isUseFukushashiki && textInput.type === 'password_confirmation' &&
         renderFukushashikiRow('confirm_fukushashiki_search_mode', 'confirm_fukushashiki_search_value', {
           useFukushashiki: false,
-          rowStyle: { width: '100%', alignItems: 'center', gap: '8px', marginLeft: 0 },
+          rowClassName: 'ss-text-input-setting__fukushashiki-row--password-confirm',
         })}
     </>
   );

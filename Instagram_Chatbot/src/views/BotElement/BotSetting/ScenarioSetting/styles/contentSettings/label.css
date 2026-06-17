@@ -1,0 +1,11 @@
+.ss-label-setting__textarea {
+  width: 100%;
+}
+
+.ss-label-no-transition__notice {
+  margin-bottom: 10px;
+}
+
+.ss-label-no-transition__textarea {
+  width: 90%;
+}
