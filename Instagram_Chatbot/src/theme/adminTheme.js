@@ -11,6 +11,8 @@ export const adminDesignTokens = {
   siderWidth: 240,
 };
 
+export const adminChartPalette = ['#1677FF', '#6B7280', '#4096FF', '#91CAFF', '#52C41A'];
+
 export const adminConfigProviderProps = {
   componentSize: 'middle',
 };

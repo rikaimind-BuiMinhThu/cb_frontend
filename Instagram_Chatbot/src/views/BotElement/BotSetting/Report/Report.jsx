@@ -1,28 +1,41 @@
-import DatePicker from 'react-datepicker';
-import React from 'react';
-import { Card, CardHeader, CardBody, Table, Row, Col } from 'reactstrap';
-import './../../../../assets/css/bot/report.css';
-import { useState } from 'react';
-import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
-import { format } from 'date-fns';
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  Button,
+  DatePicker,
+  Empty,
+  Select,
+  Space,
+  Spin,
+  Tabs,
+  Tooltip,
+  Typography,
+} from 'antd';
+import {
+  DownloadOutlined,
+  QuestionCircleOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
+import moment from 'moment';
 import ReactApexChart from 'react-apexcharts';
-import { useEffect } from 'react';
 import api from './../../../../api/api-management';
 import Cookies from 'js-cookie';
 import { tokenExpired } from 'api/tokenExpired';
 import { utils, writeFileXLSX } from 'xlsx';
-import { AdminPage } from '../../../../components/AdminShell';
+import { AdminPage, AdminTable } from '../../../../components/AdminShell';
+import { adminChartPalette } from '../../../../theme/adminTheme';
+import './../../../../assets/css/bot/report.css';
 
 function Report() {
   // states
   const [botId, setBotId] = useState(Cookies.get('bot_id'));
-  const [startDate, setStartDate] = useState(new Date().setDate(1));
-  const [endDate, setEndDate] = useState(new Date().setDate(new Date().getDate() - 1));
-  const [dateState, setDateState] = useState(new Date());
+  const [startDate, setStartDate] = useState(() => moment().startOf('month'));
+  const [endDate, setEndDate] = useState(() => moment().subtract(1, 'day'));
   const [allScenarios, setAllScenarios] = useState([]);
+  const [scenarioId, setScenarioId] = useState(null);
   const [dataReportCount, setDataReportCount] = useState();
   const [device, setDevice] = useState('all');
+  const [loading, setLoading] = useState(false);
+  const [dateError, setDateError] = useState('');
   const [numOfBotStart, setNumofBotStart] = useState(0);
   const [numOfOpenBot, setNumOfOpenBot] = useState(0);
   const [numOfCloseBot, setNumOfCloseBot] = useState(0);
@@ -134,7 +147,7 @@ function Report() {
                       .slice(0, 10)}`,
                   ],
                 ];
-                startPageExportData.push(['開始ページ', 'CV数', 'URLs']);
+                startPageExportData.push(['開始ページ', 'CV数', 'URL']);
                 let contentPageExport = [
                   [
                     '集計期間',
@@ -145,7 +158,7 @@ function Report() {
                       .slice(0, 10)}`,
                   ],
                 ];
-                contentPageExport.push(['開始ページ', 'CV数', 'URLs']);
+                contentPageExport.push(['開始ページ', 'CV数', 'URL']);
                 pages.forEach((index) => {
                   startPageExportData.push([index.num_of_start, index.num_of_cv, index.url]);
                   if (index.num_of_cv > 0) {
@@ -390,6 +403,9 @@ function Report() {
           // });
 
           setAllScenarios(dataScenario);
+          if (dataScenario?.[0]?.id) {
+            setScenarioId(dataScenario[0].id);
+          }
         }
       })
       .catch((err) => {
@@ -434,7 +450,7 @@ function Report() {
           },
         },
       },
-      colors: ['#33b2df', '#546E7A'],
+      colors: [adminChartPalette[0], adminChartPalette[1]],
       dataLabels: {
         enabled: true,
         textAnchor: 'start',
@@ -442,7 +458,7 @@ function Report() {
           colors: ['#fff'],
         },
         formatter: function (val, opt) {
-          return 'Total:  ' + val;
+          return '合計:  ' + val;
         },
         offsetX: 0,
         dropShadow: {
@@ -515,7 +531,7 @@ function Report() {
           },
         },
       },
-      colors: ['#33b2df', '#546E7A'],
+      colors: [adminChartPalette[0], adminChartPalette[1]],
       dataLabels: {
         enabled: true,
         textAnchor: 'start',
@@ -589,7 +605,7 @@ function Report() {
           },
         },
       },
-      colors: ['#33b2df', '#546E7A'],
+      colors: [adminChartPalette[0], adminChartPalette[1]],
       dataLabels: {
         enabled: true,
         textAnchor: 'start',
@@ -650,7 +666,8 @@ function Report() {
         width: 380,
         type: 'pie',
       },
-      labels: ['PC', 'スマートフォン', 'タブレット'],
+      labels: ['パソコン', 'スマートフォン', 'タブレット'],
+      colors: adminChartPalette,
       responsive: [
         {
           breakpoint: 480,
@@ -668,56 +685,65 @@ function Report() {
   };
 
   function validDateRange(start, end) {
-    const errDate = document.getElementById('errDate');
     if (start > end) {
-      errDate.style.display = 'block';
-      errDate.innerHTML = '開始日時は終了日時より大きいです。';
+      setDateError('開始日時は終了日時より大きいです。');
       return false;
-    } else {
-      errDate.style.display = 'none';
-      errDate.innerHTML = '';
-      return true;
     }
+    setDateError('');
+    return true;
   }
 
   function selectStartDate(date) {
-    if (date) {
-      setStartDate(date);
-    } else {
-      setStartDate(null);
-    }
+    setStartDate(date ? moment(date) : null);
   }
 
   function selectEndDate(date) {
-    if (date) {
-      setEndDate(date);
-    } else {
-      setEndDate(null);
-    }
+    setEndDate(date ? moment(date) : null);
+  }
+
+  function getSearchParams() {
+    return {
+      scenarioId,
+      device,
+      startDate: moment(startDate).format('YYYY/MM/DD'),
+      endDate: moment(endDate).format('YYYY/MM/DD'),
+    };
   }
 
   function handleSearch(e) {
-    e.preventDefault();
-    const formSearch = document.getElementById('formSearch');
-    var searchVal = {};
-    for (let i = 0; i < formSearch.length; i++) {
-      searchVal[formSearch[i].name] = formSearch[i].value;
-    }
-    // console.log(searchVal);
+    e?.preventDefault?.();
 
-    if (!searchVal.startDate || !searchVal.endDate) {
-      const errDate = document.getElementById('errDate');
-      errDate.style.display = 'block';
-      errDate.innerHTML = 'Date cannot blank';
-    } else {
-      const start = parseInt(format(startDate, 'yyyy/MM/dd').replaceAll('/', ''));
-      const end = parseInt(format(endDate, 'yyyy/MM/dd').replaceAll('/', ''));
-      if (validDateRange(start, end) === true) {
-        api
-          .get(
-            `/api/v1/analytics/scenario_counts/${searchVal.scenarioId}?begin_date=${searchVal.startDate}&end_date=${searchVal.endDate}`
-          )
-          .then((res) => {
+    if (!startDate || !endDate) {
+      setDateError('日付を入力してください');
+      return;
+    }
+
+    const searchVal = getSearchParams();
+    const start = parseInt(searchVal.startDate.replaceAll('/', ''), 10);
+    const end = parseInt(searchVal.endDate.replaceAll('/', ''), 10);
+
+    if (!searchVal.scenarioId) {
+      return;
+    }
+
+    if (validDateRange(start, end) !== true) {
+      return;
+    }
+
+    setLoading(true);
+    let pendingRequests = 2;
+    const finishLoading = () => {
+      pendingRequests -= 1;
+      if (pendingRequests === 0) {
+        setLoading(false);
+      }
+    };
+
+    api
+      .get(
+        `/api/v1/analytics/scenario_counts/${searchVal.scenarioId}?begin_date=${searchVal.startDate}&end_date=${searchVal.endDate}`
+      )
+      .then((res) => {
             setStartDateEx(searchVal.startDate?.replaceAll('/', '-'));
             setEndDateEx(searchVal.endDate?.replaceAll('/', '-'));
             // console.log('search data: ', res.data);
@@ -725,9 +751,9 @@ function Report() {
             //set page export
             let pages = res.data?.scenario_pages;
             let startPageExportData = [['集計期間', `${searchVal.startDate}~${searchVal.endDate}`]];
-            startPageExportData.push(['開始ページ', 'CV数', 'URLs']);
+            startPageExportData.push(['開始ページ', 'CV数', 'URL']);
             let contentPageExport = [['集計期間', `${searchVal.startDate}~${searchVal.endDate}`]];
-            contentPageExport.push(['開始ページ', 'CV数', 'URLs']);
+            contentPageExport.push(['開始ページ', 'CV数', 'URL']);
             pages.forEach((index) => {
               startPageExportData.push([index.num_of_start, index.num_of_cv, index.url]);
               if (index.num_of_cv > 0) {
@@ -806,15 +832,17 @@ function Report() {
               setNumOfOpenBot(chatbotData.smartphone_open_chatbot_window_count);
               setNumOfCloseBot(chatbotData.smartphone_close_chatbot_window_count);
             }
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-        api
-          .get(
-            `/api/v1/analytics/scenario_counts/${searchVal.scenarioId}}/download?begin_date=${searchVal.startDate}&end_date=${searchVal.endDate}`
-          )
-          .then((res) => {
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(finishLoading);
+
+    api
+      .get(
+        `/api/v1/analytics/scenario_counts/${searchVal.scenarioId}}/download?begin_date=${searchVal.startDate}&end_date=${searchVal.endDate}`
+      )
+      .then((res) => {
             // console.log(`download: `, res.data.data)
             let exportData = res?.data.data;
             let totalConversion = 0;
@@ -1067,34 +1095,28 @@ function Report() {
             setConversionRateExport(exportCVR);
             setClickThroughRateExport(exportCTR);
             setBotLeaveRate(exportLeaveBotRate);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      }
-    }
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(finishLoading);
   }
 
   function chooseAggreation(value) {
-    // setStartDate
     setReportGroupSelect(value);
-    setEndDate(new Date().setDate(new Date().getDate() - 1));
-    if (value == 'first') {
-      console.log('date: ', new Date(new Date().setDate(new Date().getDate() - 7)));
-      setStartDate(new Date().setDate(1));
-    } else if (value == '1') {
-      setStartDate(new Date(new Date().setDate(new Date().getDate() - 1)));
-    } else if (value == '7') {
-      setStartDate(new Date(new Date().setDate(new Date().getDate() - 7)));
-    } else if (value == '30') {
-      setStartDate(new Date(new Date().setDate(new Date().getDate() - 30)));
+    setEndDate(moment().subtract(1, 'day'));
+    if (value === 'first') {
+      setStartDate(moment().startOf('month'));
+    } else if (value === '1') {
+      setStartDate(moment().subtract(1, 'day'));
+    } else if (value === '7') {
+      setStartDate(moment().subtract(7, 'day'));
+    } else if (value === '30') {
+      setStartDate(moment().subtract(30, 'day'));
     }
   }
 
   const [startPage, setStartPage] = useState(true);
-  function startPageContent() { }
-
-  function cvPageContent() { }
 
   // handle export
   const handleExport = async () => {
@@ -1132,6 +1154,7 @@ function Report() {
         .then((res) => {
           if (res.data?.code === 1) {
             setAllScenarios(res.data?.data);
+            setScenarioId(res.data?.data?.[0]?.id ?? null);
           }
         })
         .catch((error) => {
@@ -1142,10 +1165,9 @@ function Report() {
       api
         .get(`/api/v1/managements/get_list_scenario_by_client?client_id=${value}`)
         .then((res) => {
-          console.log('da: ', res.data);
-          // if (res.data?.code === 1) {
-          setAllScenarios(res.data?.data);
-          // }
+          const scenarios = res.data?.data ?? [];
+          setAllScenarios(scenarios);
+          setScenarioId(scenarios[0]?.id ?? null);
         })
         .catch((error) => {
           console.log(error);
@@ -1154,376 +1176,328 @@ function Report() {
     }
   };
 
+  const contentTableData = useMemo(() => {
+    if (!listContent?.length) {
+      return [];
+    }
+    if (startPage) {
+      return listContent;
+    }
+    return listContent.filter((item) => item.num_of_cv > 0);
+  }, [listContent, startPage]);
+
+  const contentColumns = useMemo(
+    () => [
+      {
+        title: '開始数',
+        dataIndex: 'num_of_start',
+        width: 100,
+      },
+      {
+        title: 'CV数',
+        dataIndex: 'num_of_cv',
+        width: 100,
+      },
+      {
+        title: 'URL',
+        dataIndex: 'url',
+        ellipsis: true,
+      },
+    ],
+    []
+  );
+
+  const shortenedColumns = useMemo(
+    () => [
+      {
+        title: 'No.',
+        width: 70,
+        align: 'center',
+        render: (_, __, index) => index + 1,
+      },
+      {
+        title: 'クリック数',
+        dataIndex: 'num_of_click',
+        width: 110,
+      },
+      {
+        title: '元のURL',
+        dataIndex: 'origin_url',
+        ellipsis: true,
+      },
+      {
+        title: '短縮URL',
+        dataIndex: 'shorten_code',
+        width: 220,
+        render: (code) => `https://ec-chatbot1.com/s/${code}`,
+      },
+    ],
+    []
+  );
+
+  const aggregationOptions = [
+    { value: 'first', label: '指定期間' },
+    { value: '1', label: '前日' },
+    { value: '7', label: '最近7日間' },
+    { value: '30', label: '最近30日間' },
+  ];
+
+  const deviceOptions = [
+    { value: 'all', label: 'すべて' },
+    { value: 'computer', label: 'パソコン' },
+    { value: 'tablet', label: 'タブレット' },
+    { value: 'smartphone', label: 'スマートフォン' },
+  ];
+
+  const scenarioOptions = useMemo(
+    () =>
+      allScenarios?.map((scenario) => ({
+        value: scenario.id,
+        label: scenario.name,
+      })) ?? [],
+    [allScenarios]
+  );
+
+  const clientOptions = useMemo(
+    () => [
+      { value: 'deel', label: 'Deel' },
+      ...allClient.map((client) => ({
+        value: client.id,
+        label: client.name,
+      })),
+    ],
+    [allClient]
+  );
+
+  const getContentRowKey = (record) =>
+    `${record.url ?? ''}-${record.num_of_start ?? 0}-${record.num_of_cv ?? 0}`;
+
+  const filterToolbar = (
+    <Space wrap size={12} className="report-filter-toolbar">
+      <Space size={4}>
+        <Typography.Text type="secondary">集計期間</Typography.Text>
+        <Select
+          value={reportGroupSelect}
+          onChange={chooseAggreation}
+          options={aggregationOptions}
+          style={{ minWidth: 130 }}
+        />
+      </Space>
+      <DatePicker.RangePicker
+        value={[startDate, endDate]}
+        onChange={(dates) => {
+          selectStartDate(dates?.[0] ?? null);
+          selectEndDate(dates?.[1] ?? null);
+        }}
+        format="YYYY/MM/DD"
+        disabled={reportGroupSelect !== 'first'}
+      />
+      <Space size={4}>
+        <Typography.Text type="secondary">デバイス</Typography.Text>
+        <Select value={device} onChange={setDevice} options={deviceOptions} style={{ minWidth: 140 }} />
+      </Space>
+      {isAdminDeel && (
+        <Space size={4}>
+          <Typography.Text type="secondary">クライアント</Typography.Text>
+          <Select
+            value={currentClientId}
+            onChange={handleSelectClient}
+            options={clientOptions}
+            style={{ minWidth: 140 }}
+          />
+        </Space>
+      )}
+      <Space size={4}>
+        <Typography.Text type="secondary">シナリオ</Typography.Text>
+        <Select
+          value={scenarioId}
+          onChange={setScenarioId}
+          options={scenarioOptions}
+          style={{ minWidth: 160 }}
+        />
+      </Space>
+      <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
+        検索
+      </Button>
+    </Space>
+  );
+
+  const pageToolbar = (
+    <Button type="primary" icon={<DownloadOutlined />} onClick={handleExport}>
+      ダウンロード
+    </Button>
+  );
+
+  const renderSectionTitle = (title, tooltip) => (
+    <div className="report-section-title">
+      <Typography.Text strong>{title}</Typography.Text>
+      {tooltip && (
+        <Tooltip title={tooltip}>
+          <QuestionCircleOutlined style={{ marginLeft: 8, color: '#9ca3af' }} />
+        </Tooltip>
+      )}
+    </div>
+  );
+
+  const renderDeviceStat = (label, value, modifier) => (
+    <div className={`report-stat-card report-stat-card--${modifier}`}>
+      <div className="report-stat-card__icon" />
+      <div className="report-stat-card__info">
+        <Typography.Text type="secondary">{label}</Typography.Text>
+        <Typography.Text strong className="report-stat-card__value">
+          {emptyDevice || !value ? 'なし' : value}
+        </Typography.Text>
+      </div>
+    </div>
+  );
+
   return (
-    <>
-      <AdminPage title="レポート" card={false}>
-        <Row id="screenAll">
-          <Col md="12">
-            <Card className="admin-page-card">
-              <CardHeader>
-                <div className="report">
-                  <form id="formSearch" className="report__info">
-                    <p className="report__group">集計期間:</p>
-                    <div className="report__group">
-                      <select
-                        className="report__group-select"
-                        onChange={(e) => chooseAggreation(e.target.value)}
-                        name="aggregation"
-                        id=""
-                        value={reportGroupSelect}
-                      >
-                        <option value="first">指定期間</option>
-                        <option value="1">前日</option>
-                        <option value="7">最近7日間</option>
-                        <option value="30">最近30日間</option>
-                      </select>
-                    </div>
-                    <div className="report__group report-date">
-                      <DatePicker
-                        className="report__group-input"
-                        id="startDate"
-                        name="startDate"
-                        selected={startDate}
-                        onChange={(date) => selectStartDate(date)}
-                        dateFormat="yyyy/MM/dd"
-                        disabled={reportGroupSelect !== 'first'}
-                      />
-                    </div>
-                    <div className="report__group report-date">
-                      <DatePicker
-                        className="report__group-input"
-                        id="endDate"
-                        name="endDate"
-                        selected={endDate}
-                        onChange={(date) => selectEndDate(date)}
-                        dateFormat="yyyy/MM/dd"
-                        disabled={reportGroupSelect !== 'first'}
-                      />
-                    </div>
-                    <p className="report__group">デバイス</p>
-                    <div className="report__group">
-                      <select className="report__group-select" name="device" id="">
-                        <option value="all">すべて</option>
-                        <option value="computer">PC</option>
-                        <option value="tablet">タブレット</option>
-                        <option value="smartphone">スマートフォン</option>
-                      </select>
-                    </div>
-                    {isAdminDeel && (
-                      <>
-                        <p className="report__group">Current Client</p>
-                        <div className="report__group">
-                          <select
-                            className="report__group-select"
-                            name="currentClientId"
-                            id=""
-                            value={currentClientId}
-                            onChange={(e) => handleSelectClient(e.target.value)}
-                          >
-                            <option value={'deel'}>Deel</option>
-                            {allClient.map((client, index) => (
-                              <option key={index} value={client.id}>
-                                {client.name}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                      </>
-                    )}
-                    <p className="report__group">シナリオ</p>
-                    <div className="report__group">
-                      <select className="report__group-select" name="scenarioId" id="">
-                        {allScenarios?.map((scenario, index) => (
-                          <option key={index} value={scenario.id}>
-                            {scenario.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="report__group">
-                      <button className="btn btn-primary" onClick={(e) => handleSearch(e)}>
-                        <i className="fa fa-search" aria-hidden="true"></i>
-                      </button>
-                    </div>
-                  </form>
-                  <div className="report__download">
-                    {/* <button className="btn btn-primary">Input contents download</button> */}
-                    {/* <button className="btn btn-primary">入力内容ダウンロード</button> */}
-                    <button className="btn btn-primary" onClick={handleExport}>
-                      ダウンロード
-                    </button>
-                    {/* <button className="btn btn-primary">ダウンロード</button> */}
-                  </div>
-                </div>
-                <span id="errDate" className="err-date"></span>
-              </CardHeader>
-              <CardBody>
-                <div className="report__body">
-                  <div className="report__item">
-                    <div className="report__item-head">
-                      コンバージョンレート（CVR）/クリックスルレート（CTR）
-                      <a href="">
-                        <i className="far fa-question-circle"></i>
-                      </a>
-                    </div>
-                    <div className="report__item-btn">
-                      <button
-                        className="btn btn-success"
-                        id="btn_conversion_rate"
-                        onClick={() => setCVRCTR(false)}
-                      >
-                        コンバージョンレート（CVR）
-                      </button>
-                      <button
-                        className="btn btn-success"
-                        id="btn_click_through_conversion_rate"
-                        onClick={() => setCVRCTR(true)}
-                      >
-                        クリックスルレート（CTR）
-                      </button>
-                    </div>
-                    <div id="conversion_rate" className="report__item-chart">
-                      <ReactApexChart
-                        options={optionsCVR.options}
-                        series={optionsCVR.series}
-                        type="bar"
-                        height={350}
-                      />
-                    </div>
-                    {/* <div id='click_through_rate' className="report__item-chart" style={{ display: 'none' }}>
-                      <ReactApexChart options={barChart.options} series={barChart.series} type="bar" height={350} />   
+    <AdminPage
+      title="レポート"
+      className="admin-page--report"
+      toolbar={pageToolbar}
+      card={false}
+    >
+      <div id="screenAll" className="admin-page-card report-page-card">
+        <div className="report-filter-panel">
+          {filterToolbar}
+          {dateError && (
+            <Typography.Text type="danger" className="report-date-error">
+              {dateError}
+            </Typography.Text>
+          )}
+        </div>
 
-                    </div> */}
-                  </div>
-
-                  <div className="report__item report__item-2">
-                    <div className="report__item-head report__item-2-head-main">
-                      離脱
-                      <a href="">
-                        <i className="far fa-question-circle"></i>
-                      </a>
-                      <ReactApexChart
-                        options={leaveBot.options}
-                        series={leaveBot.series}
-                        type="bar"
-                        height={350}
-                      />
-                    </div>
-                  </div>
-
-                  {/* <div className="report__item report__item-2">
-                    <div className="report__item-head report__item-2-head-main">
-                      コンバージョン数/BOT開始数推移
-                      <a href="">
-                        <i className="far fa-question-circle"></i>
-                      </a>
-                      <ReactApexChart
-                        options={numOfConversionBotStart.options}
-                        series={numOfConversionBotStart.series}
-                        type="bar"
-                        height={350}
-                      />
-                    </div>
-
-                  </div> */}
-
-                  {/* <div className="report__item">
-                    <div className="report__item-head">
-                      SCENARIO TRANSITION
-                      <a href="">
-                        <i className="far fa-question-circle"></i>
-                      </a>
-                      <div className="report__item-btn">
-                        <button className="btn btn-success">Overall Scenario Transition</button>
-                        <button className="btn btn-success">Scenario trends for each item</button>
-                      </div>
-                      <div className="report__item-content">
+        <Spin spinning={loading}>
+          <div className="report-sections">
+            <div className="report-section">
+              {renderSectionTitle(
+                'コンバージョンレート（CVR）/クリックスルレート（CTR）',
+                'コンバージョン率とクリックスルー率の推移'
+              )}
+              <Tabs
+                activeKey={CVRCTR ? 'ctr' : 'cvr'}
+                onChange={(key) => setCVRCTR(key === 'ctr')}
+                className="admin-page-tabs"
+                items={[
+                  {
+                    key: 'cvr',
+                    label: 'コンバージョンレート（CVR）',
+                    children: (
+                      <div className="report-chart-panel">
                         <ReactApexChart
-                          options={lineChartScenario.options}
-                          series={lineChart.series}
-                          type="line"
+                          options={optionsCVR.options}
+                          series={optionsCVR.series}
+                          type="bar"
                           height={350}
                         />
                       </div>
-                    </div>
-                  </div> */}
+                    ),
+                  },
+                  {
+                    key: 'ctr',
+                    label: 'クリックスルレート（CTR）',
+                    children: (
+                      <div className="report-chart-panel">
+                        <ReactApexChart
+                          options={optionsCVR.options}
+                          series={optionsCVR.series}
+                          type="bar"
+                          height={350}
+                        />
+                      </div>
+                    ),
+                  },
+                ]}
+              />
+            </div>
 
-                  <div className="report__item">
-                    <div className="report__item-head">
-                      コンテンツ
-                      <a href="">
-                        <i className="far fa-question-circle"></i>
-                      </a>
-                      <div className="report__item-btn">
-                        <button className="btn btn-success" onClick={() => setStartPage(true)}>
-                          開始ページ
-                        </button>
-                        <button className="btn btn-success" onClick={() => setStartPage(false)}>
-                          CVページ
-                        </button>
-                      </div>
-                      <div className="report__item-content">
-                        <Table>
-                          <thead className="text-primary">
-                            <tr>
-                              {/* <th style={{ width: '4%' }}>page</th> */}
-                              <th style={{ width: '4%' }}>開始数</th>
-                              <th style={{ width: '4%' }}>CV数</th>
-                              <th style={{ width: '4%' }}>URLS</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {/* <tr>sdsssd</tr> */}
-                            {startPage
-                              ? listContent?.map((item, index) => (
-                                <tr key={index}>
-                                  <td>{item.num_of_start}</td>
-                                  <td>{item.num_of_cv}</td>
-                                  <td>{item.url}</td>
-                                </tr>
-                              ))
-                              : listContent?.map((item, index) =>
-                                item.num_of_cv > 0 ? (
-                                  <tr key={index}>
-                                    <td>{item.num_of_start}</td>
-                                    <td>{item.num_of_cv}</td>
-                                    <td>{item.url}</td>
-                                  </tr>
-                                ) : (
-                                  <tr key={index}></tr>
-                                )
-                              )}
-                          </tbody>
-                        </Table>
-                      </div>
-                    </div>
-                  </div>
+            <div className="report-section">
+              {renderSectionTitle('離脱', 'BOT開始に対する離脱の割合')}
+              <div className="report-chart-panel">
+                <ReactApexChart
+                  options={leaveBot.options}
+                  series={leaveBot.series}
+                  type="bar"
+                  height={350}
+                />
+              </div>
+            </div>
 
-                  <div className="report__item report__item-2">
-                    <div className="report__item-head report__item-2-head-main">
-                      デバイス
-                      <a href="">
-                        <i className="far fa-question-circle"></i>
-                      </a>
-                      {/* <div className="report__item-btn">
-                        <button className="btn btn-success">number of bot starts</button>
-                        <button className="btn btn-success">Conversions (CV)</button>
-                      </div> */}
-                      <div className="report__item-pie">
-                        {emptyDevice == true ? (
-                          <div style={{ width: '100%', textAlign: 'center', marginTop: '50px' }}>
-                            <span>デバイスがありません。</span>
-                          </div>
-                        ) : (
-                          <ReactApexChart
-                            options={devicePieChartConfig.options}
-                            series={devicePieChartConfig.series}
-                            type="pie"
-                            height={350}
-                          />
-                        )}
-                      </div>
-                    </div>
-                    <div className="report__item-head report__item-2-head">
-                      <div className="report__item-head report__item-2-head">
-                        PC
-                        <a href="">
-                          <i className="far fa-question-circle"></i>
-                        </a>
-                        {devicePieChartSeriesCount[0] > 0 ? (
-                          emptyDevice == true ? (
-                            <div>データがありません。</div>
-                          ) : (
-                            <div>{devicePieChartSeriesCount[0]}</div>
-                          )
-                        ) : (
-                          <div>データがありません。</div>
-                        )}
-                      </div>
-                      <div className="report__item-head report__item-2-head">
-                        スマートフォン
-                        <a href="">
-                          <i className="far fa-question-circle"></i>
-                        </a>
-                        {devicePieChartSeriesCount[1] > 0 ? (
-                          emptyDevice == true ? (
-                            <div>データがありません。</div>
-                          ) : (
-                            <div>{devicePieChartSeriesCount[1]}</div>
-                          )
-                        ) : (
-                          <div>データがありません。</div>
-                        )}
-                      </div>
-                      <div className="report__item-head report__item-2-head">
-                        タブレット
-                        <a href="">
-                          <i className="far fa-question-circle"></i>
-                        </a>
-                        {devicePieChartSeriesCount[2] > 0 ? (
-                          emptyDevice == true ? (
-                            <div>データがありません。</div>
-                          ) : (
-                            <div>{devicePieChartSeriesCount[2]}</div>
-                          )
-                        ) : (
-                          <div>データがありません。</div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+            <div className="report-section">
+              {renderSectionTitle('コンテンツ', '開始ページとCVページの集計')}
+              <Tabs
+                activeKey={startPage ? 'start' : 'cv'}
+                onChange={(key) => setStartPage(key === 'start')}
+                className="admin-page-tabs"
+                items={[
+                  {
+                    key: 'start',
+                    label: '開始ページ',
+                    children: (
+                      <AdminTable
+                        columns={contentColumns}
+                        dataSource={contentTableData}
+                        rowKey={getContentRowKey}
+                        emptyDescription="データがありません"
+                        pagination={{ pageSize: 10 }}
+                      />
+                    ),
+                  },
+                  {
+                    key: 'cv',
+                    label: 'CVページ',
+                    children: (
+                      <AdminTable
+                        columns={contentColumns}
+                        dataSource={contentTableData}
+                        rowKey={getContentRowKey}
+                        emptyDescription="データがありません"
+                        pagination={{ pageSize: 10 }}
+                      />
+                    ),
+                  },
+                ]}
+              />
+            </div>
 
-                  <div className="report__item">
-                    <div style={{ textAlign: 'center' }} className="report__item-head">
-                      リンククリックの短縮
-                      <a href="">
-                        <i className="far fa-question-circle"></i>
-                      </a>
-                      {/* <div className="report__item-btn">
-                        <button className="btn btn-success">start page</button>
-                        <button className="btn btn-success">CV page</button>
-                      </div> */}
-                      <br />
-                      <br />
-                      <div className="report__item-content">
-                        <Table bordered height="200" className="report__item-content--fix-table">
-                          <thead className="text-primary">
-                            <tr>
-                              <th className="report__item-content-title" style={{ width: '5%' }}>
-                                No.
-                              </th>
-                              <th className="report__item-content-title" style={{ width: '15%' }}>
-                                クリック数
-                              </th>
-                              <th className="report__item-content-title" style={{ width: '60%' }}>
-                                元のURL
-                              </th>
-                              <th className="report__item-content-title" style={{ width: '20%' }}>
-                                短縮URL
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {shortenedList?.map((item, index) => (
-                              <tr key={index} style={{ height: '20px' }}>
-                                <td>{index + 1}</td>
-                                <td>{item.num_of_click}</td>
-                                <td>{item.origin_url}</td>
-                                <td>https://ec-chatbot1.com/s/{item.shorten_code}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </Table>
-                      </div>
-                    </div>
-                  </div>
+            <div className="report-section">
+              {renderSectionTitle('デバイス', 'デバイス別のBOT起動数')}
+              <div className="report-device-grid">
+                <div className="report-chart-panel">
+                  {emptyDevice ? (
+                    <Empty description="デバイスがありません。" />
+                  ) : (
+                    <ReactApexChart
+                      options={devicePieChartConfig.options}
+                      series={devicePieChartConfig.series}
+                      type="pie"
+                      height={350}
+                    />
+                  )}
                 </div>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
-      </AdminPage>
-    </>
+                <div className="report-stat-cards">
+                  {renderDeviceStat('パソコン', devicePieChartSeriesCount[0], 'pc')}
+                  {renderDeviceStat('スマートフォン', devicePieChartSeriesCount[1], 'sp')}
+                  {renderDeviceStat('タブレット', devicePieChartSeriesCount[2], 'tablet')}
+                </div>
+              </div>
+            </div>
+
+            <div className="report-section">
+              {renderSectionTitle('リンククリックの短縮', '短縮URLのクリック数')}
+              <AdminTable
+                columns={shortenedColumns}
+                dataSource={shortenedList ?? []}
+                rowKey="shorten_code"
+                emptyDescription="データがありません"
+                pagination={{ pageSize: 10 }}
+              />
+            </div>
+          </div>
+        </Spin>
+      </div>
+    </AdminPage>
   );
 }
 
