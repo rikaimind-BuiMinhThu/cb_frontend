@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
-import { Card, CardHeader, CardBody, CardTitle, Table, Row, Col } from 'reactstrap';
-import '../../assets/css/bot/payment-mng.css';
-import DatePicker, { registerLocale } from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import ja from 'date-fns/locale/ja';
-import { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Tabs } from 'antd';
+import moment from 'moment';
 import api from 'api/api-management';
 import Cookies from 'js-cookie';
 import { tokenExpired } from 'api/tokenExpired';
 import ModalNoti from './../Popup/ModalNoti';
 import { AdminPage } from '../../components/AdminShell';
-registerLocale('ja', ja);
+import PaymentOrderHistoryTab from './PaymentManagement/PaymentOrderHistoryTab';
+import PaymentSettingsTab from './PaymentManagement/PaymentSettingsTab';
+import '../../assets/css/bot/payment-management.css';
+import '../../assets/css/bot/report.css';
 
 function PaymentManagement() {
   const [botId, setBotId] = useState(Cookies.get('bot_id'));
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
-  const [openHisOrder, setOpenHisOrder] = useState(true);
+  const [startDate, setStartDate] = useState(() => moment().startOf('month'));
+  const [endDate, setEndDate] = useState(() => moment().subtract(1, 'day'));
+  const [tab, setTab] = useState('orders');
+  const [dateError, setDateError] = useState('');
   const [openTax, setOpenTax] = useState(true);
   const [noCan, setNoCan] = useState(true);
   const [noPaid, setNoPaid] = useState(true);
@@ -118,13 +118,6 @@ function PaymentManagement() {
     setBotId(Cookies.get('bot_id'));
   }, []);
   useEffect(() => {
-    var date = new Date();
-    if (date.getDate() != 1) {
-      setEndDate(new Date(date.setDate(date.getDate() - 1)));
-    }
-    setStartDate(new Date(date.setDate(1)));
-  }, []);
-  useEffect(() => {
     api
       .get(`/api/v1/managements/chatbots/${botId}/variables?page=all`)
       .then((res) => {
@@ -222,58 +215,27 @@ function PaymentManagement() {
       });
   }
 
-  function orderHisSelected() {
-    setOpenHisOrder(true);
-    document.getElementById('payment_management_order_his').style.color = '#43b8af';
-    document.getElementById('payment_management_setting').style.color = 'black';
-  }
-
-  function settingSelected() {
-    setOpenHisOrder(false);
-    document.getElementById('payment_management_order_his').style.color = 'black';
-    document.getElementById('payment_management_setting').style.color = '#43b8af';
-  }
-
-  function selectDateStart(date) {
-    setStartDate(date);
-    var validate = document.getElementById(`payment_management_date_err`);
-    var endMonth =
-      startDate.getMonth() + 1 < 10 ? `0${endDate.getMonth() + 1}` : `${endDate.getMonth() + 1}`;
-    var endDatee = startDate.getDate() < 10 ? `0${endDate.getDate()}` : `${endDate.getDate()}`;
-    var dateMonth = date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}` : `${date.getMonth() + 1}`;
-    var dateDate = date.getDate() < 10 ? `0${date.getDate()}` : `${date.getDate()}`;
-    if (
-      parseInt(`${date.getFullYear()}${dateMonth}${dateDate}`) >
-      parseInt(`${endDate.getFullYear()}${endMonth}${endDatee}`)
-    ) {
-      validate.style.display = 'block';
-      validate.innerHTML = '開始日の値は、終了日の値より小さいです。';
-    } else {
-      validate.style.display = 'none';
-      validate.innerHTML = '';
+  function validateDateRange(start, end) {
+    if (start && end && start.isAfter(end)) {
+      setDateError('開始日の値は、終了日の値より小さいです。');
+      return false;
     }
-    console.log(parseInt(`${date.getFullYear()}${dateMonth}${dateDate}`));
-    console.log(parseInt(`${endDate.getFullYear()}${endMonth}${endDatee}`));
+    setDateError('');
+    return true;
   }
 
-  function selectDateEnd(date) {
-    setEndDate(date);
-    var validate = document.getElementById(`payment_management_date_err`);
-    var startMonth =
-      startDate.getMonth() + 1 ? `0${startDate.getMonth() + 1}` : `${startDate.getMonth() + 1}`;
-    var startDatee = startDate.getDate() ? `0${startDate.getDate()}` : `${startDate.getDate()}`;
-    var dateMonth = date.getMonth() + 1 ? `0${date.getMonth() + 1}` : `${date.getMonth() + 1}`;
-    var dateDate = date.getDate() ? `0${date.getDate()}` : `${date.getDate()}`;
-    if (
-      parseInt(`${startDate.getFullYear()}${startMonth}${startDatee}`) >
-      parseInt(`${date.getFullYear()}${dateMonth}${dateDate}`)
-    ) {
-      validate.style.display = 'block';
-      validate.innerHTML = '開始日の値は、終了日の値より小さいです。';
+  function handleDateChange(start, end) {
+    setStartDate(start);
+    setEndDate(end);
+    if (start && end) {
+      validateDateRange(start, end);
     } else {
-      validate.style.display = 'none';
-      validate.innerHTML = '';
+      setDateError('');
     }
+  }
+
+  function handleSearch() {
+    validateDateRange(startDate, endDate);
   }
 
   function saveConsumptionTax() {
@@ -846,815 +808,76 @@ function PaymentManagement() {
   };
 
   return (
-    <AdminPage title="決済管理" card={false}>
-      <Row id="screenAll">
-        <Col md="12">
-          <Card className="admin-page-card">
-            <CardBody>
-              <div className="payment-management-option">
-                <div
-                  id="payment_management_order_his"
-                  style={{ color: '#43b8af' }}
-                  className="payment-management-option-item"
-                  onClick={() => orderHisSelected()}
-                >
-                  注文履歴
-                </div>
-                <div
-                  id="payment_management_setting"
-                  className="payment-management-option-item"
-                  onClick={() => settingSelected()}
-                >
-                  設定
-                </div>
-              </div>
-              {openHisOrder ? (
-                <>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <h4
-                        style={{
-                          margin: '0',
-                          fontWeight: '400',
-                          fontSize: '1.2em',
-                        }}
-                      >
-                        注文日時
-                      </h4>
-                      <div style={{ borderRadius: '5px', padding: '5px' }}>
-                        <DatePicker
-                          wrapperClassName="payment-management-datePicker"
-                          // style={{padding:'5px 15px', border:"1px solid #7186a0", borderRadius:'5px'}}
-                          selected={startDate}
-                          onChange={(date) => selectDateStart(date)}
-                          dateFormat="yyyy-MM-dd"
-                          locale="ja"
-                          value={startDate}
-                          // value={
-                          //   startDatePreview
-                          //     ? startDatePreview.toISOString().slice(0, 10).replaceAll('-', '/')
-                          //     : 'yyyy/mm/dd'
-                          // }
-                        />
-                      </div>
-                      <h4
-                        style={{
-                          margin: '0',
-                          fontWeight: '400',
-                          fontSize: '1.2em',
-                        }}
-                      >
-                        から
-                      </h4>
-                      <div style={{ borderRadius: '5px', padding: '5px' }}>
-                        <DatePicker
-                          wrapperClassName="payment-management-datePicker"
-                          selected={endDate}
-                          onChange={(date) => selectDateEnd(date)}
-                          dateFormat="yyyy-MM-dd"
-                          locale="ja"
-                          value={endDate}
-                          // value={
-                          //   endDatePreview
-                          //     ? endDatePreview.toISOString().slice(0, 10).replaceAll('-', '/')
-                          //     : 'yyyy/mm/dd'
-                          // }
-                        />
-                      </div>
-                      <h4
-                        style={{
-                          margin: '0',
-                          fontWeight: '400',
-                          fontSize: '1.2em',
-                        }}
-                      >
-                        まで
-                      </h4>
-                      {isAdminDeel && (
-                        <>
-                          <select
-                            className="pm-select"
-                            value={currentClientId}
-                            onChange={(e) => handleSelectClient(e.target.value)}
-                          > 
-                            <option value={'deel'}>Deel</option>
-                            {allClient.map((client, index) => (
-                              <option key={index} value={client.id}>
-                                {client.name}
-                              </option>
-                            ))}
-                          </select>
-                        </>
-                      )}
-                      {currentClientId !== 'deel' && (
-                        <>
-                          <select className="pm-select">
-                            {allBot.map((item, index) => (
-                              <option key={index} value={item.id}>
-                                {item.bot_name}
-                              </option>
-                            ))}
-                          </select>
-                        </>
-                      )}
-                      &emsp;<button className="payment-management-btn-search">Search</button>
-                    </div>
-                    <span
-                      id="payment_management_date_err"
-                      style={{ color: 'red', display: 'none' }}
-                    ></span>
-                  </div>
-                  <br /> <br />
-                  <Table style={{ textAlign: 'center', tableLayout: 'fixed', overflow: 'hidden' }}>
-                    <thead className="text-primary">
-                      <tr>
-                        <th style={{ width: '7.5%' }}>No</th>
-                        <th style={{ width: '7.5%' }}>ユーザID</th>
-                        <th style={{ width: '9%' }}>注文番号</th>
-                        <th>商品名</th>
-                        <th style={{ width: '7.5%' }}>単価</th>
-                        <th style={{ width: '7.5%' }}>数量</th>
-                        <th style={{ width: '7.5%' }}>価格</th>
-                        <th>消費税</th>
-                        <th>決済手数料（税込）</th>
-                        <th>送料（税込）</th>
-                        <th>合計（税込）</th>
-                        <th>モード</th>
-                        <th>状態</th>
-                        <th>注文日時</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td style={{ border: '1px solid #7186a1' }}>123</td>
-                        <td style={{ border: '1px solid #7186a1' }}>123</td>
-                        <td style={{ border: '1px solid #7186a1' }}>123</td>
-                        <td style={{ border: '1px solid #7186a1' }}>123</td>
-                        <td style={{ border: '1px solid #7186a1' }}>123</td>
-                        <td style={{ border: '1px solid #7186a1' }}>123</td>
-                        <td style={{ border: '1px solid #7186a1' }}>123</td>
-                        <td style={{ border: '1px solid #7186a1' }}>123</td>
-                        <td style={{ border: '1px solid #7186a1' }}>123</td>
-                        <td style={{ border: '1px solid #7186a1' }}>123</td>
-                        <td style={{ border: '1px solid #7186a1' }}>123</td>
-                        <td style={{ border: '1px solid #7186a1' }}>123</td>
-                        <td style={{ border: '1px solid #7186a1' }}>123</td>
-                        <td style={{ border: '1px solid #7186a1' }}>123</td>
-                      </tr>
-                    </tbody>
-                  </Table>
-                </>
-              ) : (
-                <div>
-                  {/* 1.CONSUMPTION TAX */}
-                  <div className="payment_management_setting__item">
-                    <h6>消費税</h6>
-                    <div className="payment_management_setting__body">
-                      <div className="payment_management_setting__check">
-                        <form id="consumption_tax">
-                          <input
-                            type="radio"
-                            name="included_outside_tax"
-                            id="included_tax"
-                            defaultChecked={openTax}
-                            value={`internal_tax`}
-                            onChange={() => setOpenTax(true)}
-                          />
-                          <label>内税</label>
-                          <input
-                            type="radio"
-                            id="outside_tax"
-                            name="included_outside_tax"
-                            value={`outside`}
-                            defaultChecked={!openTax}
-                            onChange={() => setOpenTax(false)}
-                          />
-                          <label>外税</label>
-                          <br />
-                          <div className="payment_management_setting__check-out">
-                            <div
-                              style={{
-                                width: '100%',
-                                display: `${openTax == true ? 'none' : 'block'}`,
-                              }}
-                            >
-                              <span style={{ fontWeight: '500', color: '#767676' }}>
-                                消費税率（％）&emsp;
-                                <select
-                                  id="sales_tax_rate"
-                                  name="sales_tax_rate"
-                                  defaultValue={
-                                    payment.sale_tax_rate ? payment.sale_tax_rate : 'eight_percent'
-                                  }
-                                >
-                                  <option value="eight_percent">8</option>
-                                  {/* <option value="9">9</option> */}
-                                  <option value="ten_percent">10</option>
-                                </select>
-                              </span>
-                              <br />
-                              <span style={{ fontWeight: '500', color: '#767676' }}>
-                                1円未満 &emsp;
-                                <input
-                                  type="radio"
-                                  name="truncation_rounded"
-                                  id="truncation"
-                                  defaultChecked={
-                                    payment.calculate_one_yen == 'truncation' ||
-                                    payment.calculate_one_yen == null
-                                  }
-                                  value={`truncation`}
-                                />
-                                <label>切り捨て</label>
-                                <input
-                                  type="radio"
-                                  name="truncation_rounded"
-                                  id="rounded"
-                                  defaultChecked={payment.calculate_one_yen == 'rounded_up'}
-                                  value="rounded_up"
-                                />
-                                <label>切り捨て</label>
-                              </span>
-                            </div>
-                            <br />
-                            <p>内税の場合は、商品金額小計をそのまま注文金額とします。</p>
-                            <p>外税の場合は、商品金額小計に税率を上乗せして注文金額とします。</p>
-                          </div>
-                        </form>
-                        <button className="btn btn-primary" onClick={() => saveConsumptionTax()}>
-                          保存
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 2.SPECIFY PAYMENT GATEWAY */}
-                  <div className="payment_management_setting__item">
-                    <h6>決済ゲートウェイ指定</h6>
-                    <div className="payment_management_setting__body">
-                      <div className="payment_management_setting__check">
-                        {/* <form action=""> */}
-                        <input
-                          type="radio"
-                          name="specify_payment_gateway"
-                          id="specify_pg_none"
-                          value={`no`}
-                          defaultChecked={noCan}
-                          onChange={() => setNoCan(true)}
-                        />
-                        <label>無し</label>
-                        <input
-                          type="radio"
-                          id="specify_pg_canbe"
-                          name="specify_payment_gateway"
-                          value={`yes`}
-                          defaultChecked={!noCan}
-                          onChange={() => setNoCan(false)}
-                        />
-                        <label>あり</label>
-                        <br />
-                        <div
-                          className="payment_management_setting__can"
-                          style={{ display: `${noCan == true ? 'none' : 'block'}` }}
-                        >
-                          <label style={{ width: '20%' }}>決済方法の変数名</label>
-                          <select
-                            name="specify_payment_method_variable"
-                            style={{ width: '30%' }}
-                            id="specify_payment_method_variable"
-                            defaultValue={
-                              payment?.specify_payment_variable?.id
-                                ? payment?.specify_payment_variable?.id
-                                : 1
-                            }
-                          >
-                            {listvar?.map((item, i) => (
-                              <option key={i} value={item.id}>
-                                {item.variable_name}
-                              </option>
-                            ))}
-                          </select>
-                          <br />
-                          <div>
-                            {/* <form action=""> */}
-                            <form id="customSPGW">
-                              {/* <div id={`specifyPGW`}>
-                                <label>variable value</label>
-                                <input name={`spgw_variable`} type="text" />
-                                <label>payment gateway</label>
-                                <select name={`spgw_gateway`}>
-                                {paymentGateway?.map((item, i)=>(
-                                      <option key={i} value={item.id}>{item.gateway_name}</option>
-                                    ))}
-                                </select>
-                              </div> */}
-                              {customDivSpecifyPaymentGW?.map((cdiv, i) => (
-                                <div key={i} id={`specifyPGW${i}`}>
-                                  <div style={{ display: 'flex' }}>
-                                    <label style={{ width: '10%' }}>
-                                      変数値 <span style={{ color: 'red' }}>*</span>
-                                    </label>
-                                    <input
-                                      style={{ width: '20%' }}
-                                      name={`spgw_variable_${i}`}
-                                      type="text"
-                                      defaultValue={
-                                        payment?.specify_payment_variables.length > 0
-                                          ? payment?.specify_payment_variables[i]?.variable_value
-                                          : null
-                                      }
-                                    />
-                                    <label style={{ width: '105px', textAlign: 'center' }}>
-                                      決済ゲートウェイ
-                                    </label>
-                                    <select
-                                      style={{ width: '20%' }}
-                                      name={`spgw_gateway_${i}`}
-                                      defaultValue={
-                                        payment?.specify_payment_variables.length > 0
-                                          ? payment?.specify_payment_variables[i]
-                                              ?.payment_gateway_name
-                                          : null
-                                      }
-                                    >
-                                      {paymentGateway?.map((item, i) => (
-                                        <option key={i} value={item.id}>
-                                          {item.gateway_name}
-                                        </option>
-                                      ))}
-                                    </select>
-                                    <span
-                                      style={{
-                                        color: 'red',
-                                        display: `${i == 0 ? 'none' : 'block'}`,
-                                      }}
-                                      onClick={() => deleteCdivSpecifyPGW(i)}
-                                    >
-                                      &emsp;X
-                                    </span>
-                                  </div>
-                                  <div id={`err_settlement${i}`}>
-                                    <label style={{ width: '10%' }}></label>
-                                    <label
-                                      style={{ width: '20%', color: 'red' }}
-                                      id={`err_specifypgw_variable${i}`}
-                                    ></label>
-                                    <label style={{ width: '105px' }}></label>
-                                    <label
-                                      style={{ width: '20%', color: 'red' }}
-                                      id={`err_specifypgw_gw${i}`}
-                                    ></label>
-                                  </div>
-                                </div>
-                              ))}
-                            </form>
-                            {/* <label>variable value</label>
-                              <input type="text" />
-                              <label>payment gateway</label>
-                              <select>
-                                <option value="l">l</option>
-                                <option value="l">l dddddddddddddd</option>
-                              </select>
-                              <br /> */}
-                            {/* <label>variable value</label>
-                                <input type="text" />
-                                <label>payment gateway</label>
-                                <select>
-                                  <option value="l">l</option>
-                                  <option value="l">l dddddddddddddd</option>
-                                </select> */}
-                            {/* </form> */}
-                          </div>
-                          <button
-                            className="btn btn-outline-primary"
-                            onClick={() => addNewSpecifyPaymentGW()}
-                          >
-                            <i className="fas fa-plus"></i>
-                          </button>
-                        </div>
-                        {/* </form> */}
-                        <button
-                          className="btn btn-primary"
-                          onClick={() => saveSpecifyPaymentGateway()}
-                        >
-                          保存
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 3.SETTLEMENT FEE (TAX INCLUDED) */}
-                  <div className="payment_management_setting__item">
-                    <h6>決済手数料（税込）</h6>
-                    <div className="payment_management_setting__body">
-                      <div className="payment_management_setting__check">
-                        <input
-                          type="radio"
-                          name="settlement_fee"
-                          id="settlement_fee_free"
-                          value={`free`}
-                          checked={noPaid}
-                          onChange={() => setNoPaid(true)}
-                        />
-                        <label>無料</label>
-                        <input
-                          type="radio"
-                          name="settlement_fee"
-                          id="settlement_fee_paid"
-                          checked={!noPaid}
-                          onChange={() => setNoPaid(false)}
-                        />
-                        <label>有料</label>
-                        <br />
-
-                        <div
-                          className="payment_management_setting__can"
-                          style={{ display: `${noPaid == true ? 'none' : 'block'}` }}
-                        >
-                          <label style={{ width: '20%' }}>決済方法の変数名</label>
-                          <select
-                            name="settlement_payment_method_variable"
-                            style={{ width: '30%' }}
-                            id="settlement_payment_method_variable"
-                            defaultValue={
-                              payment?.settlement_fee_variable?.id
-                                ? payment?.settlement_fee_variable?.id
-                                : 1
-                            }
-                          >
-                            {listvar?.map((item, i) => (
-                              <option key={i} value={item.id}>
-                                {item.variable_name}
-                              </option>
-                            ))}
-                          </select>
-                          <br />
-                          <form id="settlement_PMGW">
-                            {/* <div id={`settlementPGW`}>
-                              <label style={{width:"10%"}}>
-                                variable value <span style={{ color: 'red' }}>*</span>
-                              </label>
-                              <input style={{width:"20%"}} type="text" name={`settpgw_variable`} />
-                              <label style={{width:"65px"}}>commission</label>
-                              <input style={{width:"20%"}} type="number" name='settpgw_commission' placeholder="0" />
-                              <span type="text">Yen (tax included)</span>
-
-                            </div> */}
-                            {customDivSettlementPaymentGW?.map((cdiv, i) => (
-                              <div key={i} id={`settlementPGW${i}`}>
-                                <div style={{ display: 'flex' }}>
-                                  <label style={{ width: '10%' }}>
-                                    変数値<span style={{ color: 'red' }}>*</span>
-                                  </label>
-                                  <input
-                                    style={{ width: '20%' }}
-                                    type="text"
-                                    name={`settpgw_variable${i}`}
-                                    defaultValue={
-                                      payment?.settlement_fee_variables.length > 0
-                                        ? payment?.settlement_fee_variables[i]?.variable_value
-                                        : null
-                                    }
-                                  />
-                                  <label style={{ width: '105px', textAlign: 'center' }}>
-                                    手数料
-                                  </label>
-                                  <input
-                                    style={{ width: '20%' }}
-                                    type="number"
-                                    name={`settpgw_commission${i}`}
-                                    placeholder="0"
-                                    defaultValue={
-                                      payment?.settlement_fee_variables.length > 0
-                                        ? payment?.settlement_fee_variables[i]?.commission
-                                        : null
-                                    }
-                                  />
-                                  <span>円（税込）</span>
-                                  <span
-                                    style={{
-                                      color: 'red',
-                                      display: `${i == 0 ? 'none' : 'block'}`,
-                                    }}
-                                    onClick={() => deleteCdivSettlementPGW(i)}
-                                  >
-                                    &emsp;X
-                                  </span>
-                                </div>
-                                <div id={`err_settlement${i}`}>
-                                  <label style={{ width: '10%' }}></label>
-                                  <label
-                                    style={{ width: '20%', color: 'red' }}
-                                    id={`err_settpgw_variable${i}`}
-                                  ></label>
-                                  <label style={{ width: '65px' }}></label>
-                                  <label
-                                    style={{ width: '20%', color: 'red' }}
-                                    id={`err_settpgw_commission${i}`}
-                                  ></label>
-                                </div>
-                              </div>
-                            ))}
-                            {/* addNewSettlementPaymentGW */}
-                          </form>
-                          <button
-                            className="btn btn-outline-primary"
-                            onClick={() => addNewSettlementPaymentGW()}
-                          >
-                            <i className="fas fa-plus"></i>
-                          </button>
-                        </div>
-
-                        <button
-                          className="btn btn-primary"
-                          onClick={() => saveSettlementPaymentGateway()}
-                        >
-                          保存
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 4.SHIPPING FEE (TAX INCLUDED) */}
-                  <div className="payment_management_setting__item">
-                    <h6>送料（税込）</h6>
-                    <div className="payment_management_setting__body">
-                      <div className="payment_management_setting__check">
-                        <input
-                          type="radio"
-                          name="shipping_tax"
-                          id="shipping_tax_free"
-                          value={`free`}
-                          checked={noShip}
-                          onChange={() => setNoShip(true)}
-                        />
-                        <label>無料</label>
-                        <input
-                          type="radio"
-                          name="shipping_tax"
-                          id="shipping_tax_paid"
-                          checked={!noShip}
-                          onChange={() => setNoShip(false)}
-                        />
-                        <label>有料</label>
-                        <br />
-                        <div
-                          className="payment_management_setting__can"
-                          style={{ display: noShip == true ? 'none' : 'block' }}
-                        >
-                          <label style={{ width: '20%' }}>住所の変数名</label>
-                          <select
-                            name="shipping_fee_address_variable"
-                            style={{ width: '30%' }}
-                            id="shipping_fee_address_variable"
-                            defaultValue={payment?.shipping_fee_variable.id}
-                          >
-                            {listvar?.map((item, i) => (
-                              <option key={i} value={item.id}>
-                                {item.variable_name}
-                              </option>
-                            ))}
-                          </select>
-                          <br />
-                          <br />
-                          <div
-                            style={{
-                              width: '52%',
-                              display: 'flex',
-                              borderBottom: '2px solid #cccccc',
-                            }}
-                          >
-                            <span style={{ width: '35%', padding: '2%', color: '#767676' }}>
-                              都道府県
-                            </span>
-                            <span
-                              style={{ width: '65%', padding: '2% 2% 2% 0%', color: '#767676' }}
-                            >
-                              金額
-                            </span>
-                          </div>
-                          <div style={{ width: '52%', height: '300px', overflowY: 'scroll' }}>
-                            <form style={{ width: '100%' }} id="shipping_fee_tax">
-                              {prefectures.map((item, i) => (
-                                <div
-                                  style={{
-                                    width: '100%',
-                                    display: 'flex',
-                                    padding: '10px',
-                                    borderBottom: '1px solid #cccccc',
-                                  }}
-                                  key={i}
-                                >
-                                  <span style={{ width: '35%', padding: '2%', color: '#767676' }}>
-                                    {item.prefectureName}
-                                  </span>
-                                  <span style={{ width: '40%', display: 'inline-block' }}>
-                                    <input
-                                      type="number"
-                                      name={payment?.shipping_fee_variables[i]?.prefecture_id}
-                                      style={{ width: '100%', color: '#767676' }}
-                                      defaultValue={
-                                        payment?.shipping_fee_variables[i]?.value
-                                          ? payment?.shipping_fee_variables[i]?.value
-                                          : 0
-                                      }
-                                    />
-                                    <label
-                                      style={{ color: 'red' }}
-                                      id={`err_amount_of_money_${i}`}
-                                    ></label>
-                                  </span>
-                                  <span style={{ width: '25%', padding: '2%', color: '#767676' }}>
-                                    円（税込）
-                                  </span>
-                                </div>
-                              ))}
-                            </form>
-                          </div>
-                        </div>
-                        <button className="btn btn-primary" onClick={() => savePrefecturesTax()}>
-                          保存
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 5.NP DEFERRED PAYMENT */}
-                  <div className="payment_management_setting__item">
-                    <h6>NP後払い</h6>
-                    <div className="payment_management_setting__body">
-                      <div className="payment_management_setting__check">
-                        <input
-                          type="radio"
-                          name="np_deferred"
-                          id="np_deferred_no"
-                          value={`no`}
-                          checked={noNP}
-                          onChange={() => setNoNP(true)}
-                        />
-                        <label>無し</label>
-                        <input
-                          type="radio"
-                          name="np_deferred"
-                          id="np_deferred_can"
-                          checked={!noNP}
-                          onChange={() => setNoNP(false)}
-                        />
-                        <label>あり</label>
-                        <br />
-                        <div
-                          className="payment_management_setting__can"
-                          style={{ display: `${noNP == true ? 'none' : 'block'}` }}
-                        >
-                          <div>
-                            <span style={{ fontWeight: '400', color: '#767676' }}>
-                              請求書の同梱 &emsp;
-                              <input
-                                type="radio"
-                                name="invoice_included"
-                                id="not_included"
-                                value={`not_included`}
-                                defaultChecked={
-                                  payment.np_invoice_included == 'not_include' ||
-                                  payment.np_invoice_included == null
-                                }
-                              />
-                              <label>同梱しない</label>
-                              <input
-                                type="radio"
-                                name="invoice_included"
-                                id="enclosed "
-                                value={`enclosed`}
-                                defaultChecked={payment.np_invoice_included == 'enclosed'}
-                              />
-                              <label>同梱する（NP後払いwiz）</label>
-                            </span>
-                            <span style={{ fontWeight: '400', color: '#767676' }}>
-                              ※別途ヤマトクレジットファイナンスとの契約が必要になります。
-                            </span>
-                          </div>
-                          <div style={{ display: 'flex' }}>
-                            <label style={{ marginRight: '20px' }}>
-                              上限金額<span style={{ color: 'red' }}>*</span>
-                            </label>
-                            <span style={{ display: 'inline-block' }}>
-                              <input
-                                type="number"
-                                placeholder="0"
-                                id="np_maximum_amount"
-                                defaultValue={payment.np_maximum_amount}
-                              />
-                              <br />
-                              <label style={{ color: 'red' }} id={`err_np_maximum_amount`}></label>
-                            </span>
-                            円
-                          </div>
-                          <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                            <label style={{ marginRight: '20px' }}>
-                              決済手数料（税込）<span style={{ color: 'red' }}>*</span>
-                            </label>
-                            <form id="customNP">
-                              {customDivSettlementFee.map((cdiv, i) => (
-                                <div style={{ display: 'flex' }} key={i} id={`settlementFee${i}`}>
-                                  <div style={{ display: 'inline-block' }}>
-                                    <input
-                                      style={{ marginLeft: '20px' }}
-                                      type="number"
-                                      placeholder="0"
-                                      name={`np_settlement_fee_value${i}`}
-                                      defaultValue={
-                                        payment?.np_value_settlements.length > 0
-                                          ? payment?.np_value_settlements[i]
-                                              ?.np_settlement_fee_value
-                                          : null
-                                      }
-                                    />
-                                    ~<br />
-                                    <label
-                                      style={{ color: 'red', margin: '0 0 0 20px' }}
-                                      id={`err_np_settlement_fee_value_${i}`}
-                                    ></label>
-                                  </div>
-                                  <div style={{ display: 'inline-block' }}>
-                                    <input
-                                      style={{ marginLeft: '20px' }}
-                                      type="number"
-                                      placeholder="0"
-                                      name={`np_settlement_max_value${i}`}
-                                      defaultValue={
-                                        payment?.np_value_settlements.length > 0
-                                          ? payment?.np_value_settlements[i]
-                                              ?.np_settlement_max_value
-                                          : null
-                                      }
-                                    />
-                                    円
-                                    <br />
-                                    <label
-                                      style={{ color: 'red', margin: '0 0 0 20px' }}
-                                      id={`err_np_settlement_max_value_${i}`}
-                                    ></label>
-                                  </div>
-                                  <div style={{ display: 'inline-block' }}>
-                                    <input
-                                      style={{ marginLeft: '20px' }}
-                                      type="number"
-                                      placeholder="0"
-                                      name={`np_settlement_min_value${i}`}
-                                      defaultValue={
-                                        payment?.np_value_settlements.length > 0
-                                          ? payment?.np_value_settlements[i]
-                                              ?.np_settlement_min_value
-                                          : null
-                                      }
-                                    />
-                                    円
-                                    <br />
-                                    <label
-                                      style={{ color: 'red', margin: '0 0 0 20px' }}
-                                      id={`err_np_settlement_min_value_${i}`}
-                                    ></label>
-                                  </div>
-                                  <span
-                                    style={{
-                                      color: 'red',
-                                      display: `${i == 0 ? 'none' : 'inline-block'}`,
-                                      marginTop: '10px',
-                                    }}
-                                    onClick={() => deleteCdivSettlementFee(i)}
-                                  >
-                                    &emsp;X
-                                  </span>
-                                </div>
-                              ))}
-                            </form>
-                          </div>
-                          <button
-                            className="btn btn-outline-primary"
-                            onClick={() => addNewSettlementFee()}
-                          >
-                            <i className="fas fa-plus"></i>
-                          </button>
-                        </div>
-                        <button className="btn btn-primary" onClick={() => saveNPDeferredPayment()}>
-                          保存
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </CardBody>
-          </Card>
-        </Col>
-      </Row>
+    <AdminPage title="決済管理" className="admin-page--payment-management">
+      <Tabs
+        activeKey={tab}
+        onChange={setTab}
+        className="admin-page-tabs"
+        items={[
+            {
+              key: 'orders',
+              label: '注文履歴',
+              children: (
+                <PaymentOrderHistoryTab
+                  startDate={startDate}
+                  endDate={endDate}
+                  dateError={dateError}
+                  isAdminDeel={isAdminDeel}
+                  allClient={allClient}
+                  allBot={allBot}
+                  currentClientId={currentClientId}
+                  onDateChange={handleDateChange}
+                  onSearch={handleSearch}
+                  onSelectClient={handleSelectClient}
+                />
+              ),
+            },
+            {
+              key: 'settings',
+              label: '設定',
+              children: (
+                <PaymentSettingsTab
+                  openTax={openTax}
+                  setOpenTax={setOpenTax}
+                  noCan={noCan}
+                  setNoCan={setNoCan}
+                  noPaid={noPaid}
+                  setNoPaid={setNoPaid}
+                  noShip={noShip}
+                  setNoShip={setNoShip}
+                  noNP={noNP}
+                  setNoNP={setNoNP}
+                  listvar={listvar}
+                  payment={payment}
+                  paymentGateway={paymentGateway}
+                  prefectures={prefectures}
+                  customDivSpecifyPaymentGW={customDivSpecifyPaymentGW}
+                  customDivSettlementPaymentGW={customDivSettlementPaymentGW}
+                  customDivSettlementFee={customDivSettlementFee}
+                  onAddSpecifyPaymentGW={addNewSpecifyPaymentGW}
+                  onDeleteSpecifyPaymentGW={deleteCdivSpecifyPGW}
+                  onAddSettlementPaymentGW={addNewSettlementPaymentGW}
+                  onDeleteSettlementPaymentGW={deleteCdivSettlementPGW}
+                  onAddSettlementFee={addNewSettlementFee}
+                  onDeleteSettlementFee={deleteCdivSettlementFee}
+                  onSaveConsumptionTax={saveConsumptionTax}
+                  onSaveSpecifyPaymentGateway={saveSpecifyPaymentGateway}
+                  onSaveSettlementPaymentGateway={saveSettlementPaymentGateway}
+                  onSavePrefecturesTax={savePrefecturesTax}
+                  onSaveNPDeferredPayment={saveNPDeferredPayment}
+                />
+              ),
+            },
+          ]}
+      />
       <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
-        <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
+        <div style={{ width: '300px', textAlign: 'center', color: '#1677ff' }}>
           <span style={{ fontSize: '16px' }}>{msgNoti}</span>
         </div>
       </ModalNoti>
     </AdminPage>
   );
+
 }
 
 export default PaymentManagement;
