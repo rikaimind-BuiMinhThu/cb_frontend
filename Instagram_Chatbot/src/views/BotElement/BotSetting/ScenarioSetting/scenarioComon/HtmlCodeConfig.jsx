@@ -5,6 +5,7 @@ import { BOT_MESSAGE_TYPES } from "../../PreviewComponent/Constants";
 
 export default function HtmlCodeConfig({
   indexMessageSelect,
+  indexContent = 0,
   config,
   onChangeValue,
 }) {
@@ -13,11 +14,11 @@ export default function HtmlCodeConfig({
   const [htmlValidationError, setHtmlvalidationError] = useState("");
 
   const onChangeContent = (value) => {
-    onChangeValue(indexMessageSelect, 0, messageType, value, "content");
+    onChangeValue(indexMessageSelect, indexContent, messageType, value, "content");
   };
 
   const onChangeUseAsUGC = (value) => {
-    onChangeValue(indexMessageSelect, 0, messageType, value, "use_for_ugc");
+    onChangeValue(indexMessageSelect, indexContent, messageType, value, "use_for_ugc");
   };
 
   const onChange = (type) => (e) => {

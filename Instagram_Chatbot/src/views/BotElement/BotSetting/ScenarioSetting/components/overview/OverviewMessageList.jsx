@@ -3,6 +3,7 @@ import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { getBotMessageTitle, getBotFileExtension } from '../../utils/getBotMessageTitle';
 import OverviewBotMessageItem from './OverviewBotMessageItem';
 import OverviewUserMessageItem from './OverviewUserMessageItem';
+import OverviewCombineMessageItem from './OverviewCombineMessageItem';
 
 const OverviewMessageList = (bindings) => {
   const { dataMessages, handleDragEndMessageOverview } = bindings;
@@ -28,6 +29,13 @@ const OverviewMessageList = (bindings) => {
                   content={content}
                   fileType={fileType}
                   titleMessage={titleMessage}
+                  bindings={bindings}
+                />
+              ) : message.belong_to === 'combine' ? (
+                <OverviewCombineMessageItem
+                  key={message.id}
+                  message={message}
+                  index={index}
                   bindings={bindings}
                 />
               ) : (

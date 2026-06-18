@@ -3,7 +3,7 @@ import "assets/css/bot/preview-chat-bot.css";
 import Cookies from "js-cookie";
 import { MDBIcon } from "mdbreact";
 import CustomButton from "./CustomButton";
-import { UserMessage, BotMessage } from "./PreviewComponent";
+import { UserMessage, BotMessage, CombineMessage, CombineMessageNextButton } from "./PreviewComponent";
 import PreviewFukushashikiReducer from "./PreviewFukushashiki/PreviewFukushashikiReducer";
 import $ from "jquery";
 import { EC_CHATBOT_URL } from "variables/constants";
@@ -54,6 +54,7 @@ import {
   sendOpenChatbotCountRequest,
   sendCloseChatbotCountRequest,
   isUserMessage,
+  isInteractiveMessage,
   sendLogMessageToServer,
   updateStatusConversion,
   isButtonSubmitMessage,
@@ -682,7 +683,7 @@ const PreviewFukushashiki = () => {
           fromCallback: false,
         }
       });
-      if (newMsgIndex < state.messagesList.length && isUserMessage(state.messagesList[newMsgIndex])) {
+      if (newMsgIndex < state.messagesList.length && isInteractiveMessage(state.messagesList[newMsgIndex])) {
         sendAppearLogToServer({
           scenario_id: state.scenarioId,
           user_id: state.uuid,
@@ -704,7 +705,7 @@ const PreviewFukushashiki = () => {
         fromCallback: true,
       }
     });
-    if (newMsgIndex < state.messagesList.length && isUserMessage(state.messagesList[newMsgIndex])) {
+    if (newMsgIndex < state.messagesList.length && isInteractiveMessage(state.messagesList[newMsgIndex])) {
       createScenarioUserResponseMessageHistory({
         scenario_id: state.scenarioId,
         user_id: state.uuid,
@@ -1239,6 +1240,68 @@ const PreviewFukushashiki = () => {
     );
   };
 
+  const renderCombineMessageContent = (message, messageIndex) => {
+    if (!message || message.belong_to !== "combine") return null;
+    if (!Array.isArray(message?.message_content) || message.message_content.length === 0) return null;
+
+    const isUpdate = messageIndex >= state.renderMessagesList.length - 1;
+
+    return (
+      <React.Fragment>
+        <CombineMessage
+          postMessageToParent={(options) => postMessageToParent(options, state)}
+          message={message}
+          captcha={state.captcha}
+          disabled={(state.submitErrorMessage.length > 0 && state.submitErrorMessage !== GETTING_ERROR_NOTIFICATION) ? false : message.disabled}
+          onChangeValue={(
+            contentIndex,
+            contentType,
+            value,
+            field,
+            subField1,
+            subField2
+          ) =>
+            onChangeValue(
+              contentIndex,
+              contentType,
+              value,
+              field,
+              subField1,
+              subField2,
+              message
+            )
+          }
+          onClickNext={() => onClickNext(messageIndex, message)}
+          messageIndex={messageIndex}
+          errorsProps={state.errors}
+          prefecturesList={[...state.prefecturesList]}
+          onOpen={(isOpen, contentIndex) => {
+            onOpenZipCodePopup(isOpen, contentIndex, Math.min(state.currentMsgIndex, messageIndex));
+          }}
+          onChangeErrors={(field, value) => onChangeErrors(field, value)}
+          variables={state.variables}
+          lpOptionData={state.lpOptionData}
+          submitErrorMessage={state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "" : state.submitErrorMessage}
+          botId={state.botId}
+          isProcessing={!!state.isProcessing}
+          botInfor={state.botInfor}
+          previewOrderContent={state.previewOrderContent}
+          executeLpJsCode={(jsCode) => executeLpJsCode(jsCode, state)}
+          isBotOpen={state.isOpen}
+          cartSystem={state.cartSystem}
+        />
+        <CombineMessageNextButton
+          message={message}
+          messageIndex={messageIndex}
+          botInfor={state.botInfor}
+          onClickNext={onClickNext}
+          isUpdate={isUpdate}
+          isExtractFromSession={state.isExtractFromSession}
+        />
+      </React.Fragment>
+    );
+  };
+
   const renderMessages = () => {
     return (state.renderMessagesList || []).map((message, messageIndex) => {
       if (message.hidden && !stringNullOrEmpty(message.hidden)) return null;
@@ -1246,6 +1309,7 @@ const PreviewFukushashiki = () => {
         <React.Fragment key={messageIndex}>
           {renderBotMessageContent(message, messageIndex)}
           {renderUserMessageContent(message, messageIndex)}
+          {renderCombineMessageContent(message, messageIndex)}
         </React.Fragment>
       );
     })

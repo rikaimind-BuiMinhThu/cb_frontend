@@ -64,7 +64,7 @@ const InputCustom = ({
         className={`ss-input-value ${!useFukushashiki ? 'ss-user-setting-item' : ''} ${inputFieldClassName}`}
         placeholder={placeholder}
         disabled={disabled}
-        value={value}
+        value={value ?? ''}
         style={style}
         onChange={e => onChange(e.target.value)}
         readOnly={readOnly}
@@ -103,7 +103,7 @@ const InputCustom = ({
           {...props}
           type="text"
           inputMode={inputMode}
-          value={labelValue}
+          value={labelValue ?? ''}
           onChange={e => onLabelChange(e.target.value)}
           className={`ss-input-custom-editable-label ${resolvedClassLabel || ''}`}
           style={styleLabel}

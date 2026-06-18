@@ -6,6 +6,7 @@ import ScenarioOverviewPanel from './components/ScenarioOverviewPanel';
 import ScenarioMessageDetailPanel from './components/ScenarioMessageDetailPanel';
 import ScenarioBotSettingsPanel from './components/ScenarioBotSettingsPanel';
 import ScenarioUserSettingsPanel from './components/ScenarioUserSettingsPanel';
+import ScenarioCombineSettingsPanel from './components/ScenarioCombineSettingsPanel';
 import ScenarioEditorModals from './components/ScenarioEditorModals';
 import ScenarioEditorPreviewSection from './components/ScenarioEditorPreviewSection';
 import ScenarioMessageOverview from './components/ScenarioMessageOverview';
@@ -42,6 +43,7 @@ const ScenarioEditorContent = () => {
                 <ScenarioMessageDetailPanel>
                   <ScenarioBotSettingsPanel />
                   <ScenarioUserSettingsPanel />
+                  <ScenarioCombineSettingsPanel />
                 </ScenarioMessageDetailPanel>
               </div>
             </CardBody>

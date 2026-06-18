@@ -132,20 +132,26 @@ const getValidator = (messageType) => {
 };
 
 export const handleValidateField = (message, messageIndex) => {
-  const messageContents = [...message.message_content];
+  const indexedContents = message.message_content.map((content, index) => ({ content, index }))
+    .filter(({ content }) => {
+      if (message.belong_to === 'combine') {
+        return content.role === 'user';
+      }
+      return true;
+    });
 
   let isValid = true;
   let errorsMess = {};
 
-  for (let i = 0; i < messageContents.length; i++) {
-    const contentType = messageContents[i][messageContents[i].type];
-    const messageType = messageContents[i].type;
+  for (let i = 0; i < indexedContents.length; i++) {
+    const { content, index: contentIndex } = indexedContents[i];
+    const contentType = content[content.type];
+    const messageType = content.type;
 
-    // Get the appropriate validator for this message type
     const validator = getValidator(messageType);
-    
+
     if (validator) {
-      isValid = validator(contentType, messageContents, i, messageIndex, errorsMess) && isValid;
+      isValid = validator(contentType, message.message_content, contentIndex, messageIndex, errorsMess) && isValid;
     }
   }
   

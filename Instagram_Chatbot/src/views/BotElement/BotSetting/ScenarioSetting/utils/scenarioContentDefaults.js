@@ -214,7 +214,9 @@ export function createDefaultContentItem(messageType, idMax) {
         require: true,
         title_require: false,
         type: 'detail_content',
-        detail_content: {},
+        title: '',
+        term: '',
+        detail_content: { content: '' },
         post_link_only: [{}],
       },
     };

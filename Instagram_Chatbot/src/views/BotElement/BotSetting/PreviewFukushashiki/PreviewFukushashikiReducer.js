@@ -10,7 +10,8 @@ import {
 } from '../PreviewComponent/Utils';
 import { processForBotMessage } from '../PreviewComponent/BotMessageUtils';
 import { processForUserMessage } from '../PreviewComponent/UserMessageUtils';
-import { isBotMessage, isUserMessage, getNextUserMsg } from '../PreviewComponent/Utils';
+import { processForCombineMessage } from '../PreviewComponent/CombineMessageUtils';
+import { isBotMessage, isUserMessage, isCombineMessage, getNextUserMsg } from '../PreviewComponent/Utils';
 import { mapAmazonPayDataToMessagesList } from '../PreviewComponent/TorizenUtils';
 import { mapAmazonPayDataToMessagesListForBliss } from '../PreviewComponent/BlissUtils';
 import { mapAmazonPayDataToMessagesListForRoseMay } from '../PreviewComponent/RoseMayUtils';
@@ -239,6 +240,11 @@ const PreviewFukushashikiReducer = (state, action) => {
             newState = {
               ...newState,
               ...processForUserMessage(newState.messagesList, i, newState, false)
+            };
+          } else if (isCombineMessage(newState.messagesList[i])) {
+            newState = {
+              ...newState,
+              ...processForCombineMessage(newState.messagesList, i, newState, false)
             };
           }
         }

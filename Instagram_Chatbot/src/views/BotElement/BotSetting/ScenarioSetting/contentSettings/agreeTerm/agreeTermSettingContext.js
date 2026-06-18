@@ -61,7 +61,7 @@ export const renderAgreeTermCheckbox = (ctx) => (
           maxLength={Number.MAX_SAFE_INTEGER}
           placeholder={AGREE_TERM_LABELS.termText}
           className="ss-agree-term-setting__term-input"
-          value={ctx.agreeTerm.term}
+          value={ctx.agreeTerm?.term ?? ''}
           onChange={ctx.changeContent('term')}
         />
       )}

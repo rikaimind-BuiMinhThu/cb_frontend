@@ -7,6 +7,7 @@ import { FUKUSHASHIKI_VARIANTS, SETTING_BUTTON_LABELS } from '../constants/scena
 
 export default function AmazonPayButtonConfig({
   indexMessageSelect,
+  indexContent = 0,
   config,
   onChangeValue,
   isUseFukushashiki,
@@ -17,7 +18,7 @@ export default function AmazonPayButtonConfig({
   const imageUrl = config?.button_image_url || DEFAULT_AMAZON_PAY_BUTTON_IMAGE_URL;
 
   const handleFieldChange = (fieldName) => (value) => {
-    onChangeValue(indexMessageSelect, 0, messageType, value, fieldName);
+    onChangeValue(indexMessageSelect, indexContent, messageType, value, fieldName);
   };
 
   return (

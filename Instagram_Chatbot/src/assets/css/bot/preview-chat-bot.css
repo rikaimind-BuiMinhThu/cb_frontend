@@ -1272,3 +1272,39 @@ slideUp
 .text-center { text-align: center; }
 
 .d-block { display: block; }
+
+/* CombineMessage */
+.ss-combine-message__wrapper {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ss-combine-message__content {
+  width: 100%;
+}
+
+.ss-combine-message__block {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ss-combine-message__block-inner {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ss-combine-block-preview--bot {
+  width: 100%;
+  border-radius: 8px;
+  word-break: break-word;
+}
+
+.ss-combine-message__next-button {
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.ss-combine-message__wrapper .ss-user-message__content-wrapper {
+  width: 100%;
+  padding: 0;
+}

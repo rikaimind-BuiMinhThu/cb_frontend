@@ -11,7 +11,8 @@ import {
 } from '../PreviewComponent/Utils';
 import { processForBotMessage } from '../PreviewComponent/BotMessageUtils';
 import { processForUserMessage } from '../PreviewComponent/UserMessageUtils';
-import { isBotMessage, isUserMessage, getNextUserMsg } from '../PreviewComponent/Utils';
+import { processForCombineMessage, prepareCombineMessagesForPreview } from '../PreviewComponent/CombineMessageUtils';
+import { isBotMessage, isUserMessage, isCombineMessage, getNextUserMsg } from '../PreviewComponent/Utils';
 import {
   RENDER_CHATBOT_CONFIG,
   PREVIEW_ACTIONS,
@@ -283,6 +284,8 @@ const PreviewFaqReducer = (state, action) => {
         });
       });
 
+      prepareCombineMessagesForPreview(newState.messagesList);
+
       if (variables) {
         newState.variables = [...variables, ...all_variables];
         newState.variables.forEach((item) => {
@@ -454,6 +457,11 @@ const processMessagesAfterClickNext = (newState, oldState, clickedMsgIndex) => {
       newState = {
         ...newState,
         ...processForUserMessage(newState.messagesList, i, newState, false)
+      };
+    } else if (isCombineMessage(newState.messagesList[i])) {
+      newState = {
+        ...newState,
+        ...processForCombineMessage(newState.messagesList, i, newState, false)
       };
     }
   }

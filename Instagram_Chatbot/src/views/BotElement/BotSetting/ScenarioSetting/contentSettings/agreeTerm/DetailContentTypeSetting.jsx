@@ -11,7 +11,7 @@ const DetailContentTypeSetting = (props) => {
         className="ss-user-setting-item-textarea-label ss-input-value ss-agree-term-setting__textarea"
         placeholder={SETTING_PLACEHOLDERS.text}
         rows="5"
-        value={agreeTerm.detail_content.content}
+        value={agreeTerm.detail_content?.content ?? ''}
         onChange={(e) => changeContent('detail_content', 'content')(e.target.value)}
       />
     </div>

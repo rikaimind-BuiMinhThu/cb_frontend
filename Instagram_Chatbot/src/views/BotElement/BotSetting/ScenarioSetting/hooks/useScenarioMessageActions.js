@@ -6,6 +6,11 @@ import api from '../../../../../api/api-management';
 import { S3_UPLOAD_URL } from '../../../../../variables/constants';
 import { tokenExpired } from 'api/tokenExpired';
 import { createDefaultContentItem, getNextContentId } from '../utils/scenarioContentDefaults';
+import {
+  createDefaultCombineBlock,
+  createDefaultCombineMessage,
+  createDefaultCombineBotBlock,
+} from '../utils/combineContentDefaults';
 import { DEFAULT_AMAZON_PAY_BUTTON_CONFIG } from '../../../../../variables/amazonPayConstants';
 import { applyAmazonPayDisplayModeToConditions } from '../utils/amazonPayConfigUtils';
 
@@ -209,6 +214,12 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
           if (dataMessages[index].hidden) ele.style.opacity = '0.4';
         }
       });
+    } else if (role === 'combine') {
+      document.querySelectorAll('.ss-combine-chat-detail-content').forEach((ele) => {
+        if (ele.classList.contains(`ss-combine-chat-detail-content-${index}`)) {
+          ele.style.opacity = dataMessages[index].hidden ? '0.4' : '1';
+        }
+      });
     }
 
     setDataMessages([...dataMessages]);
@@ -255,6 +266,38 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
     dataMessages[indexMessageSelect].message_content.push(
       createDefaultContentItem(messageType, idMax),
     );
+    setDataMessages([...dataMessages]);
+  }, [dataMessages, indexMessageSelect, setDataMessages]);
+
+  const handleAddCombineBlock = useCallback((role, blockType) => {
+    const message = dataMessages[indexMessageSelect];
+    const newBlock = createDefaultCombineBlock(role, blockType, message.message_content);
+    message.message_content.push(newBlock);
+    setMessageType(blockType);
+    setDataMessages([...dataMessages]);
+  }, [dataMessages, indexMessageSelect, setDataMessages, setMessageType]);
+
+  const handleChangeCombineBlockType = useCallback((indexContent, blockType) => {
+    const message = dataMessages[indexMessageSelect];
+    const currentBlock = message.message_content[indexContent];
+    const newBlock = createDefaultCombineBotBlock(blockType, currentBlock.id);
+    newBlock.padding = currentBlock.padding;
+    message.message_content[indexContent] = newBlock;
+    setMessageType(blockType);
+    setDataMessages([...dataMessages]);
+  }, [dataMessages, indexMessageSelect, setDataMessages, setMessageType]);
+
+  const handleChangeCombineContentGap = useCallback((value) => {
+    const message = dataMessages[indexMessageSelect];
+    if (!message.combine_message) {
+      message.combine_message = {};
+    }
+    message.combine_message.content_gap = value;
+    setDataMessages([...dataMessages]);
+  }, [dataMessages, indexMessageSelect, setDataMessages]);
+
+  const handleChangeCombineBlockPadding = useCallback((indexContent, value) => {
+    dataMessages[indexMessageSelect].message_content[indexContent].padding = value;
     setDataMessages([...dataMessages]);
   }, [dataMessages, indexMessageSelect, setDataMessages]);
 
@@ -578,6 +621,8 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
           message_content: [],
         },
       ];
+    } else if (indexMessage === undefined && belongTo === 'combine') {
+      dataMessagesClone = [createDefaultCombineMessage(dataInputVar)];
     } else if (belongTo === 'bot') {
       const idMax = Math.max(...dataMessagesClone.map((item) => item.id)) + 1;
       dataMessagesClone.splice(indexMessage + 1, 0,
@@ -624,6 +669,11 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
           is_display_button_next: true,
           message_content: [],
         });
+    } else if (belongTo === 'combine') {
+      const idMax = Math.max(...dataMessagesClone.map((item) => item.id)) + 1;
+      const combineMessage = createDefaultCombineMessage(dataInputVar);
+      combineMessage.id = idMax;
+      dataMessagesClone.splice(indexMessage + 1, 0, combineMessage);
     }
 
     setBelongTo('');
@@ -708,6 +758,10 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
     handleEditIconClick,
     handleChangeBotStatementType,
     handleAddItemSetting,
+    handleAddCombineBlock,
+    handleChangeCombineBlockType,
+    handleChangeCombineContentGap,
+    handleChangeCombineBlockPadding,
     handleCopyMessage,
     handleDeleteMessageContent,
     handleDeleteMessage,

@@ -6,6 +6,7 @@ import { getElementMessageById } from '../../PreviewComponent/Utils';
 import { useScenarioEditor } from '../context/ScenarioEditorContext';
 import { getBotFileExtension } from '../utils/getBotMessageTitle';
 import UserContentPreviewList from './overview/UserContentPreviewList';
+import CombineOverviewBlockPreview from './overview/CombineOverviewBlockPreview';
 import ScenarioThemeBotMessageContent from './ScenarioThemeBotMessageContent';
 
 const shouldShowNextButton = (message) => {
@@ -80,6 +81,36 @@ const ScenarioThemePreviewBody = () => {
                   </div>
                 </div>
               </div>
+            </div>
+          );
+        }
+
+        if (message.belong_to === 'combine') {
+          const contentGap = message.combine_message?.content_gap ?? 10;
+
+          return (
+            <div
+              key={message.id ?? index}
+              className="ss-combine-message__wrapper ss-combine-message__wrapper--theme"
+              id={getElementMessageById(message.id)}
+            >
+              {message.message_content.map((content, indexContent) => (
+                <div
+                  key={content.id ?? indexContent}
+                  style={indexContent > 0 ? { marginTop: `${contentGap}px` } : undefined}
+                >
+                  <CombineOverviewBlockPreview
+                    content={content}
+                    message={message}
+                    indexMessage={index}
+                    indexContent={indexContent}
+                    hidden={message.hidden}
+                  />
+                </div>
+              ))}
+              {shouldShowNextButton(message) && (
+                <NextButton label={message.buttonName} />
+              )}
             </div>
           );
         }

@@ -57,7 +57,7 @@ export const ContentTitleInput = ({ title, onChange, placeholder = SETTING_PLACE
     <InputCustom
       placeholder={placeholder}
       onChange={onChange}
-      value={title}
+      value={title ?? ''}
       className="ss-input--full"
     />
   </div>

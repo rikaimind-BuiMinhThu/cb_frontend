@@ -2,13 +2,16 @@ import _ from 'lodash';
 import {
   isBotMessage,
   isUserMessage,
+  isCombineMessage,
 } from '../../PreviewComponent/Utils';
 import {
   BOT_MESSAGE_TYPES,
+  COMBINE_CONTENT_ROLES,
   DISPLAY_TYPES,
   MESSAGE_CONTENT_TYPES,
   RENDER_MODES,
 } from '../../PreviewComponent/Constants';
+import { prepareCombineMessagesForPreview } from '../../PreviewComponent/CombineMessageUtils';
 
 export const buildEditorDraftPreviewUpdate = (draft) => {
   const messagesList = _.cloneDeep(draft?.conversation?.messages || []);
@@ -25,6 +28,8 @@ export const buildEditorDraftPreviewUpdate = (draft) => {
     });
   });
 
+  prepareCombineMessagesForPreview(messagesList);
+
   messagesList.forEach((message) => {
     message.hidden = false;
   });
@@ -34,10 +39,13 @@ export const buildEditorDraftPreviewUpdate = (draft) => {
   const nextStopMsgIndex = allMessages.length;
 
   const progressBarTargetCountMessagesList = messagesList.filter((msg) => {
-    if (!isUserMessage(msg)) return false;
+    if (!isUserMessage(msg) && !isCombineMessage(msg)) return false;
 
-    const contentCount = msg?.message_content?.length;
-    const firstMsgContent = msg?.message_content?.[0];
+    const userContents = msg.belong_to === 'combine'
+      ? msg.message_content.filter((content) => content.role === COMBINE_CONTENT_ROLES.USER)
+      : msg.message_content;
+    const contentCount = userContents?.length;
+    const firstMsgContent = userContents?.[0];
     const isDisplayBtnNext = firstMsgContent?.type !== MESSAGE_CONTENT_TYPES.IMAGE
       || firstMsgContent?.image?.displayButtonNext !== false;
     if (!isDisplayBtnNext) return false;
