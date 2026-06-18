@@ -89,5 +89,6 @@ export const buildEditorDraftPreviewUpdate = (draft) => {
     errMsgFormSelectors: draft?.err_msg_form_selectors || '',
     launchButtonSelectors: draft?.launch_button_selectors || '',
     progressBarMaxIndex: progressBarTargetCountMessagesList.length,
+    timer_config: draft?.timer_config,
   };
 };

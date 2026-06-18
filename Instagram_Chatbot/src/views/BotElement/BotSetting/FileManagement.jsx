@@ -206,7 +206,7 @@ function FileManagement() {
         />
       </AdminPage>
 
-      <Modal visible={isOpenPreview} onCancel={() => setIsOpenPreview(false)} footer={<Button onClick={() => setIsOpenPreview(false)}>閉じる</Button>} width={720} title="プレビュー">
+      <Modal open={isOpenPreview} onCancel={() => setIsOpenPreview(false)} footer={<Button onClick={() => setIsOpenPreview(false)}>閉じる</Button>} width={720} title="プレビュー">
         {typeFilePreview === 'mp4' ? (
           <video style={{ width: '100%' }} controls><source src={srcPreview} type="video/mp4" /></video>
         ) : typeFilePreview === 'pdf' ? (

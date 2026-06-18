@@ -14,7 +14,8 @@ body.scenario-preview-editor-embedded {
 body.scenario-preview-editor-embedded #sp-header,
 body.scenario-preview-editor-embedded .sp-container1 > .sp-header,
 body.scenario-preview-editor-embedded #sp-process-bar,
-body.scenario-preview-editor-embedded .sp-container1 > .sp-process-bar {
+body.scenario-preview-editor-embedded .sp-container1 > .sp-process-bar,
+body.scenario-preview-editor-embedded .chatbot_timer_holder {
   display: none !important;
 }
 

@@ -200,7 +200,7 @@ function ScenarioList() {
 
       <Modal
         title="シナリオ作成"
-        visible={isOpenCreateScenario}
+        open={isOpenCreateScenario}
         onOk={createScenario}
         onCancel={() => {
           setIsOpenCreateScenario(false);

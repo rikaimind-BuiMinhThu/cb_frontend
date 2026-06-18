@@ -14,6 +14,7 @@ const ThemePreviewShell = ({
   processPercent,
   className,
   errorPreviewText,
+  timerSlot,
   children,
 }) => {
   const scopedCss = useMemo(() => {
@@ -45,6 +46,8 @@ const ThemePreviewShell = ({
           </div>
         </div>
       </div>
+
+      {timerSlot}
 
       <div className="sp-process-bar">
         <div
@@ -86,6 +89,7 @@ ThemePreviewShell.propTypes = {
   processPercent: PropTypes.number,
   className: PropTypes.string,
   errorPreviewText: PropTypes.string,
+  timerSlot: PropTypes.node,
   children: PropTypes.node,
 };
 
@@ -100,6 +104,7 @@ ThemePreviewShell.defaultProps = {
   processPercent: 33,
   className: '',
   errorPreviewText: '',
+  timerSlot: null,
   children: null,
 };
 

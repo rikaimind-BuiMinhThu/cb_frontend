@@ -53,7 +53,7 @@ export default function CreateSmsTemplateDialog({ botId, resolver }) {
       <Button type="primary" onClick={handleClickOpen}>追加</Button>
       <Modal
         title="SMS作成"
-        visible={open}
+        open={open}
         onCancel={handleClose}
         onOk={handleSubmit(onSubmit)}
         okText="保存"

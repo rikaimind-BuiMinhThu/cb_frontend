@@ -107,7 +107,7 @@ function SubUserManagement() {
 
       <Modal
         title="サブユーザ編集"
-        visible={isOpenEdit}
+        open={isOpenEdit}
         onOk={handleEdit}
         onCancel={() => setIsOpenEdit(false)}
         okText="編集"

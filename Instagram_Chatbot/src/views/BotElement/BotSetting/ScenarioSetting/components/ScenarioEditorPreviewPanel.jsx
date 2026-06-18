@@ -2,9 +2,14 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Cookies from 'js-cookie';
 import { getChatBotSetting } from '../../PreviewComponent/Utils';
 import ThemePreviewShell from '../../DesignSetting/components/ThemePreviewShell';
+import Timer from '../../Timer';
 import { useScenarioEditor } from '../context/ScenarioEditorContext';
 import { buildScenarioSavePayload } from '../utils/scenarioApiUtils';
 import { buildScenarioPreviewHeaderMetaFromChatbotApi } from '../preview/buildScenarioPreviewHeaderMeta';
+import {
+  calculateTimerConfigDuration,
+  getTimerConfigVariable,
+} from '../preview/timerPreviewUtils';
 import {
   buildScenarioPreviewIframeSrc,
   isSameOriginMessage,
@@ -74,6 +79,7 @@ const ScenarioEditorPreviewPanel = () => {
   const [isIframeReady, setIsIframeReady] = useState(false);
   const [isPreviewLoading, setIsPreviewLoading] = useState(true);
   const [botMeta, setBotMeta] = useState(DEFAULT_BOT_META);
+  const [timerChanges, setTimerChanges] = useState({ timeLeft: -1, config: null });
 
   const editorDraft = useMemo(() => buildScenarioSavePayload({
     dataMessages,
@@ -143,6 +149,24 @@ const ScenarioEditorPreviewPanel = () => {
     isUseCustomCss,
     content: customCssContent?.final,
   }), [customCssContent?.final, isUseCustomCss]);
+
+  const editorTimerConfig = editorDraft?.timer_config;
+
+  useEffect(() => {
+    if (scenarioType === 'faq' || !editorTimerConfig?.enable) {
+      setTimerChanges({ timeLeft: -1, config: null });
+      return;
+    }
+
+    setTimerChanges({
+      timeLeft: calculateTimerConfigDuration(editorTimerConfig.type, editorTimerConfig.duration),
+      config: editorTimerConfig,
+    });
+  }, [editorTimerConfig, scenarioType]);
+
+  const handleTimerCounting = useCallback((timer) => {
+    setTimerChanges((prev) => ({ ...prev, timeLeft: timer }));
+  }, []);
 
   const iframeSrc = useMemo(
     () => buildScenarioPreviewIframeSrc({
@@ -379,6 +403,31 @@ const ScenarioEditorPreviewPanel = () => {
   const processLabel = messageCount > 0 ? `1 / ${messageCount}` : 'プレビュー';
   const processPercent = messageCount > 0 ? Math.round((1 / messageCount) * 100) : 33;
 
+  const timerSlot = useMemo(() => {
+    if (scenarioType === 'faq' || !editorTimerConfig?.enable) {
+      return null;
+    }
+
+    return (
+      <div className="chatbot_timer_holder">
+        <Timer
+          duration={calculateTimerConfigDuration(editorTimerConfig.type, editorTimerConfig.duration)}
+          timeLeft={timerChanges.timeLeft}
+          countMsg={editorTimerConfig.messages.counting}
+          finishMsg={editorTimerConfig.messages.finish}
+          variables={getTimerConfigVariable(editorTimerConfig.variables)}
+          startCount
+          onCounting={handleTimerCounting}
+        />
+      </div>
+    );
+  }, [
+    editorTimerConfig,
+    handleTimerCounting,
+    scenarioType,
+    timerChanges.timeLeft,
+  ]);
+
   return (
     <div className="scenario-editor-preview-wrapper">
       <ThemePreviewShell
@@ -392,6 +441,7 @@ const ScenarioEditorPreviewPanel = () => {
         processLabel={processLabel}
         processPercent={processPercent}
         className="scenario-editor-preview is_mobile"
+        timerSlot={timerSlot}
       >
         <iframe
           ref={iframeRef}

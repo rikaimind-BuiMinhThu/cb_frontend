@@ -86,7 +86,8 @@
 }
 
 .scenario-editor-phone-frame__screen .theme-customize-preview__header,
-.scenario-editor-phone-frame__screen .sp-process-bar {
+.scenario-editor-phone-frame__screen .sp-process-bar,
+.scenario-editor-preview .chatbot_timer_holder {
   flex-shrink: 0;
 }
 

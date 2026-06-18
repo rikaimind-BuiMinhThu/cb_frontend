@@ -69,9 +69,13 @@ const PreviewFukushashikiReducer = (state, action) => {
           return !isTempDelay(m, RENDER_CHATBOT_CONFIG.TEMP_DELAY_PREFIX);
         }) || [];
       }
-      const { isEditorPreviewDraft, ...editorPreviewPayload } = action.payload || {};
+      const { isEditorPreviewDraft, timer_config, ...editorPreviewPayload } = action.payload || {};
       if (isEditorPreviewDraft) {
-        return { ...state, ...editorPreviewPayload };
+        const nextState = { ...state, ...editorPreviewPayload };
+        if (timer_config !== undefined) {
+          nextState.botInfor = { ...state.botInfor, timer_config };
+        }
+        return nextState;
       }
       return { ...state, ...(!!state.submitErrorMessage ? processMessagesForErrorState(action.payload): action.payload) };
     }

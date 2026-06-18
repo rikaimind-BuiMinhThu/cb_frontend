@@ -16,7 +16,7 @@ function AdminConfirmModal({
   return (
     <Modal
       title={title}
-      visible={visible ?? open}
+      open={open ?? visible}
       onOk={onOk}
       onCancel={onCancel}
       okText={okText}

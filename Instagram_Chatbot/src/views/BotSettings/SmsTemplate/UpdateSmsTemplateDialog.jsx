@@ -60,7 +60,7 @@ export default function UpdateSmsTemplateDialog({ botId, resolver, id, open }) {
   return (
     <Modal
       title="SMS編集"
-      visible={open}
+      open={open}
       onCancel={() => resolver()}
       onOk={handleSubmit(onSubmit)}
       okText="保存"
