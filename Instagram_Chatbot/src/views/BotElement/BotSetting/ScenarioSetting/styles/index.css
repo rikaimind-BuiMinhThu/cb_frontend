@@ -25,6 +25,8 @@
 @import './contentSettings/productPurchase.css';
 @import './contentSettings/cardPaymentRadioButton.css';
 @import './contentSettings/shippingAddress.css';
+@import './contentSettings/addressFields.css';
+@import './contentSettings/zipCodeAddress.css';
 
 /* contentPreviews */
 @import './contentPreviews/label.css';

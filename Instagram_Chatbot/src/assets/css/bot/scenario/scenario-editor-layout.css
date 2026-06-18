@@ -663,6 +663,44 @@
   width: 100%;
 }
 
+.ss-zip-code-address-setting {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-zip-code-address-setting .ss-content-setting-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-zip-code-address-setting .ss-user-setting__item-bottom {
+  justify-content: flex-start;
+  margin-bottom: 0;
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-zip-code-address-setting .ss-user-setting-option-row {
+  grid-template-columns: 1fr;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.ss-editor-layout-v2 .ss-zip-code-address-setting .ss-address-field-section__input-row .ss-input-custom-container,
+.ss-editor-layout-v2 .ss-zip-code-address-setting .ss-address-field-section__input-row .select-custom-antd,
+.ss-editor-layout-v2 .ss-zip-code-address-setting .ss-address-field-section__input-row .select-custom-native {
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-shipping-address-setting .ss-address-fields-group,
+.ss-editor-layout-v2 .ss-shipping-address-setting .ss-address-layout-options,
+.ss-editor-layout-v2 .ss-shipping-address-setting .ss-address-require-options {
+  width: 100%;
+}
+
 .ss-editor-layout-v2 .ss-user-setting-condition-container {
   margin-left: 0;
   width: 100%;

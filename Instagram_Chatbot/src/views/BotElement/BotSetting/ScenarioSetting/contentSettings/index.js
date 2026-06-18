@@ -12,7 +12,7 @@ import ProductPurchaseSetting from './ProductPurchaseSetting';
 import ProductPurchaseRadioButtonSetting from './ProductPurchaseRadioButtonSetting';
 import ProductPurchaseSelectOptionSetting from './ProductPurchaseSelectOptionSetting';
 import SliderSetting from './SliderSetting';
-import ZipCodeAddressContentSetting from './ZipCodeAddressContentSetting';
+import ZipCodeAddressSetting from './zipCodeAddress';
 import AttachingFileSetting from './AttachingFileSetting';
 import AgreeTermSetting from './agreeTerm/AgreeTermSetting';
 import ImageSetting from './ImageSetting';
@@ -39,7 +39,7 @@ export const CONTENT_SETTING_MAP = {
   product_purchase_radio_button: withContentSettingContext(ProductPurchaseRadioButtonSetting),
   product_purchase_select_option: withContentSettingContext(ProductPurchaseSelectOptionSetting),
   slider: withContentSettingContext(SliderSetting),
-  zip_code_address: withContentSettingContext(ZipCodeAddressContentSetting),
+  zip_code_address: withContentSettingContext(ZipCodeAddressSetting),
   attaching_file: withContentSettingContext(AttachingFileSetting),
   agree_term: withContentSettingContext(AgreeTermSetting),
   image: withContentSettingContext(ImageSetting),

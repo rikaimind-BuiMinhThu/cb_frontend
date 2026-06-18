@@ -19,6 +19,7 @@ const InputCustom = ({
   valueCheckbox = false,
   style,
   classLabel,
+  labelClassName,
   disabled = false,
   styleLabel,
   inline = true,
@@ -36,6 +37,7 @@ const InputCustom = ({
   ...props
 }) => {
   const [showPassword, setShowPassword] = useState(false);
+  const resolvedClassLabel = classLabel || labelClassName;
 
   const handleTogglePassword = () => {
     setShowPassword(!showPassword);
@@ -88,8 +90,8 @@ const InputCustom = ({
     </div>
   );
 
-  const labelClassName = [
-    classLabel,
+  const labelElementClassName = [
+    resolvedClassLabel,
     inline === false ? 'ss-input-custom-label--block' : 'ss-input-custom-label--inline',
     'ss-input-custom-label',
   ].filter(Boolean).join(' ');
@@ -103,12 +105,12 @@ const InputCustom = ({
           inputMode={inputMode}
           value={labelValue}
           onChange={e => onLabelChange(e.target.value)}
-          className={`ss-input-custom-editable-label ${classLabel || ''}`}
+          className={`ss-input-custom-editable-label ${resolvedClassLabel || ''}`}
           style={styleLabel}
         />
       ) : (
         label && (
-          <div className={labelClassName} style={styleLabel}>
+          <div className={labelElementClassName} style={styleLabel}>
             {label}
           </div>
         )

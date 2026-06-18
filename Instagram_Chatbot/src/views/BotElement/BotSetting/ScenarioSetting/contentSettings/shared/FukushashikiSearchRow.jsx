@@ -34,7 +34,6 @@ const FukushashikiSearchRow = ({
   const renderInput = () => (
     <InputCustom
       className="ss-input--full"
-      labelClassName="ss-input-label--full"
       onChange={onInputChange}
       value={inputValue}
       placeholder={inputGuideText}
