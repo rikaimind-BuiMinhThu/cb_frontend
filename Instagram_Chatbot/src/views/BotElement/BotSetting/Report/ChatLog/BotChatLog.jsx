@@ -13,6 +13,7 @@ import { findLastIndex, isBoolean } from "lodash";
 import moment from "moment";
 import jwt_decode from 'jwt-decode'
 import BotChatStatistic from "./BotChatStatistic";
+import { AdminPage } from "../../../../../components/AdminShell";
 registerLocale("ja", ja);
 
 const TABS = {
@@ -841,10 +842,10 @@ function BotChatLog() {
 
   return (
     <>
-      <div className="content">
+      <AdminPage title="会話" card={false}>
         <Row id="screenAll">
           <Col>
-            <Card>
+            <Card className="admin-page-card">
               <CardHeader>
               <Row className="bot-chat-log">
                 <Col md="12">
@@ -1121,7 +1122,7 @@ function BotChatLog() {
             </Card>
           </Col>
         </Row>
-      </div>
+      </AdminPage>
     </>
   );
 }

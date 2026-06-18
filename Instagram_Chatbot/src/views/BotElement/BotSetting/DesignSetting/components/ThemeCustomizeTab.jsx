@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { CardBody } from 'reactstrap';
 import { THEME_SECTIONS } from '../constants/designThemeConstants';
 import ThemeSection from './ThemeSection';
 import ThemeCustomizePreview from './ThemeCustomizePreview';
@@ -13,9 +12,8 @@ const ThemeCustomizeTab = ({
   onFieldChange,
   onSave,
 }) => (
-  <div>
-    <CardBody>
-      <div className="theme-customize-tab-layout">
+  <div className="design-setting-tab-content">
+    <div className="theme-customize-tab-layout">
         <div className="theme-customize-tab-preview">
           <ThemeCustomizePreview
             themeSettings={themeSettings}
@@ -40,10 +38,9 @@ const ThemeCustomizeTab = ({
             <button type="button" className="btn btn-preview" onClick={onSave}>
               設定保存
             </button>
-          </div>
         </div>
       </div>
-    </CardBody>
+    </div>
   </div>
 );
 

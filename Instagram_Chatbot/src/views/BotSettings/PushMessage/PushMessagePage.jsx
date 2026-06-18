@@ -1,59 +1,48 @@
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import * as React from "react";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
-import Box from "@mui/material/Box";
-import TabPanel from "./TabPanel";
-import CardHeader from "@mui/material/CardHeader";
-import { useParams } from "react-router-dom";
-import SavePushMessageDialog from "./SavePushMessageDialog";
-import PushMessageList from "./PushMessageList";
-import PushMessageHistory from "./PushMessageHistory";
+import * as React from 'react';
+import { Tabs } from 'antd';
+import { useParams } from 'react-router-dom';
+import SavePushMessageDialog from './SavePushMessageDialog';
+import PushMessageList from './PushMessageList';
+import PushMessageHistory from './PushMessageHistory';
+import { AdminPage } from '../../../components/AdminShell';
 
 const PushMessagePage = () => {
   const { botId } = useParams();
-  const [tab, setTab] = React.useState("list");
+  const [tab, setTab] = React.useState('list');
   const [tick, setTick] = React.useState(0);
 
-  const handleChangeTab = (event, newValue) => {
-    setTab(newValue);
-  };
-
   const handleCreateSuccess = () => {
-    setTick((pre) => ++pre)
+    setTick((pre) => pre + 1);
   };
 
   return (
-    <div className="content">
-      <Card>
-        <CardHeader
-          title="ブッシュメッセージ"
-          action={
-            <div hidden={tab === "history"}>
-              <SavePushMessageDialog
-                botId={botId}
-                resolver={handleCreateSuccess}
-              />
-            </div>
-          }
-        />
-        <CardContent>
-          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-            <Tabs value={tab} onChange={handleChangeTab}>
-              <Tab label="プッシュメッセージ一覧" value={"list"} />
-              <Tab label="配信履歴" value={"history"} />
-            </Tabs>
-          </Box>
-          <TabPanel value={"list"} selected={tab}>
-            <PushMessageList tick={tick}/>
-          </TabPanel>
-          <TabPanel value={"history"} selected={tab}>
-            <PushMessageHistory />
-          </TabPanel>
-        </CardContent>
-      </Card>
-    </div>
+    <AdminPage
+      title="プッシュメッセージ"
+      description="プッシュメッセージの作成・配信管理"
+      toolbar={
+        tab === 'list' ? (
+          <SavePushMessageDialog botId={botId} resolver={handleCreateSuccess} />
+        ) : null
+      }
+    >
+      <Tabs
+        activeKey={tab}
+        onChange={setTab}
+        className="admin-page-tabs"
+        items={[
+          {
+            key: 'list',
+            label: 'プッシュメッセージ一覧',
+            children: <PushMessageList tick={tick} />,
+          },
+          {
+            key: 'history',
+            label: '配信履歴',
+            children: <PushMessageHistory />,
+          },
+        ]}
+      />
+    </AdminPage>
   );
 };
 

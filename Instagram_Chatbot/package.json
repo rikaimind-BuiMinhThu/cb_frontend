@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "/",
   "dependencies": {
+    "@ant-design/icons": "^4.8.3",
     "@babel/preset-react": "^7.17.12",
     "@coreui/react": "^4.3.0",
     "@coreui/react-pro": "^4.4.0",

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { CardHeader, CardBody } from 'reactstrap';
+import { Typography } from 'antd';
 import DesignBotIcons from '../DesignSettingComponents/DesignBotIcons';
 import { DEFAULT_IMAGES } from '../constants/designChatbotConstants';
 import DesignTypePicker from './DesignTypePicker';
@@ -23,13 +23,12 @@ const BasicInfoTab = ({
   onIconRemove,
   onIconUpload,
 }) => (
-  <div style={{ height: '100%' }}>
-    <CardHeader>
-      <h4 style={{ margin: '10px 0' }}>ボット設定</h4>
-    </CardHeader>
-    <CardBody>
-      <form action="">
-        <div className="add-bot-container">
+  <div className="design-setting-tab-content">
+    <Typography.Title level={5} style={{ marginTop: 0, marginBottom: 16 }}>
+      ボット設定
+    </Typography.Title>
+    <form action="">
+      <div className="add-bot-container">
           <div className="bot-left">
             <div className="field-add-bot">
               <div className="add-bot_field-container">
@@ -148,7 +147,6 @@ const BasicInfoTab = ({
           </div>
         </div>
       </form>
-    </CardBody>
   </div>
 );
 

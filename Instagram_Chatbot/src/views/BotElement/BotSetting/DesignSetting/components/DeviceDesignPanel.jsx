@@ -1,8 +1,42 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { CardHeader, CardBody } from 'reactstrap';
+import { Input, InputNumber, Select, Space } from 'antd';
 import InputNum from '../../ScenarioSetting/scenarioComon/InputNum';
-import { SELECT_STYLE } from '../constants/designChatbotConstants';
+
+const DISPLAY_TYPE_OPTIONS = [
+  { value: 1, label: 'リロード' },
+  { value: 2, label: '非表示' },
+  { value: 3, label: 'ボタン押下' },
+];
+
+const POSITION_OPTIONS = [
+  { value: 1, label: '底辺に設置' },
+  { value: 2, label: '右辺に設置' },
+];
+
+const BUTTON_TYPE_OPTIONS = [
+  { value: 1, label: 'ボタンとタイトル' },
+  { value: 2, label: 'ボタンのみ' },
+];
+
+function DesignField({ label, fullWidth, children }) {
+  return (
+    <div className={`design-field${fullWidth ? ' design-field--full' : ''}`}>
+      <label className="design-field__label">{label}</label>
+      <div className="design-field__control">{children}</div>
+    </div>
+  );
+}
+
+DesignField.propTypes = {
+  label: PropTypes.string.isRequired,
+  fullWidth: PropTypes.bool,
+  children: PropTypes.node.isRequired,
+};
+
+DesignField.defaultProps = {
+  fullWidth: false,
+};
 
 const DeviceDesignPanel = ({
   device,
@@ -21,178 +55,113 @@ const DeviceDesignPanel = ({
   const isPc = device === 'pc';
   const fieldPrefix = isPc ? 'Pc' : 'Sp';
   const rightTitleLabel = isPc ? '右のタイトル' : 'タイトル';
+  const sizeMax = isPc ? 1000 : 100;
+  const positionValue = Number(position);
+  const buttonTypeValue = Number(buttonType);
 
   return (
-    <div style={{ width: '50%', ...(isPc ? { borderRight: '1px solid #ddd' } : {}) }}>
-      <CardHeader>
-        <h4 style={{ margin: '10px 0' }}>{title}</h4>
-      </CardHeader>
-      <CardBody>
-        <div className="add-bot-container">
-          <div className="bot-haft">
-            {isPc && (
-              <div className="field-add-bot">
-                <div className="add-bot_field-container">
-                  <span className="label-field">表示タイプ </span>
-                  <div style={{ display: 'flex', width: '100%' }}>
-                    <select
-                      style={SELECT_STYLE}
-                      value={displayType}
-                      onChange={(e) => onChange('displayType', Number(e.target.value))}
-                    >
-                      <option value={1}>リロード</option>
-                      <option value={2}>非表示</option>
-                      <option value={3}>ボタン押下</option>
-                    </select>
-                  </div>
-                </div>
-                <span className="error-message subtile" />
-              </div>
-            )}
+    <section className="design-device-card">
+      <h4 className="design-device-card__title">{title}</h4>
+      <div className="design-device-card__grid">
+        {isPc && (
+          <DesignField label="表示タイプ">
+            <Select
+              value={Number(displayType)}
+              options={DISPLAY_TYPE_OPTIONS}
+              onChange={(value) => onChange('displayType', value)}
+            />
+          </DesignField>
+        )}
 
-            <div className="field-add-bot">
-              <div className="add-bot_field-container">
-                <span className="label-field">サイズ </span>
-                <div
-                  style={{
-                    display: 'flex',
-                    width: '100%',
-                    justifyContent: 'space-between',
-                    ...(isPc ? {} : { padding: '0px' }),
-                  }}
-                >
-                  <div className="ss-user-setting__item-bottom-flex-start">
-                    <InputNum
-                      style={{ display: 'flex', flex: 1 }}
-                      name={`width_${device}`}
-                      min={1}
-                      max={isPc ? 1000 : 100}
-                      value={width}
-                      placeholder="幅"
-                      onChange={(e) => onChange(`width${fieldPrefix}`, e)}
-                    />
-                    <p style={{ textAlign: 'center', margin: 'auto 0' }}>{widthUnit}</p>
-                  </div>
-                  <div className="ss-user-setting__item-bottom-flex-start">
-                    <InputNum
-                      style={{ display: 'flex', flex: 1 }}
-                      name={`height_${device}`}
-                      min={1}
-                      max={isPc ? 1000 : 100}
-                      value={height}
-                      placeholder="高さ"
-                      onChange={(e) => onChange(`height${fieldPrefix}`, e)}
-                    />
-                    <p style={{ textAlign: 'center', margin: 'auto 0' }}>{widthUnit}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+        <DesignField label="サイズ" fullWidth>
+          <Space size={12} wrap className="design-size-row">
+            <InputNum
+              style={{ width: '100%', minWidth: 120 }}
+              name={`width_${device}`}
+              min={1}
+              max={sizeMax}
+              value={width}
+              placeholder="幅"
+              onChange={(value) => onChange(`width${fieldPrefix}`, value)}
+            />
+            <span className="design-field__suffix">{widthUnit}</span>
+            <InputNum
+              style={{ width: '100%', minWidth: 120 }}
+              name={`height_${device}`}
+              min={1}
+              max={sizeMax}
+              value={height}
+              placeholder="高さ"
+              onChange={(value) => onChange(`height${fieldPrefix}`, value)}
+            />
+            <span className="design-field__suffix">{widthUnit}</span>
+          </Space>
+        </DesignField>
 
-            <div className="field-add-bot">
-              <div className="add-bot_field-container">
-                <span className="label-field">設置場所 </span>
-                <div style={{ display: 'flex', width: '100%' }}>
-                  <select
-                    style={SELECT_STYLE}
-                    value={position}
-                    onChange={(e) => onChange(`position${fieldPrefix}`, Number(e.target.value))}
-                  >
-                    <option value={1}>底辺に設置</option>
-                    <option value={2}>右辺に設置</option>
-                  </select>
-                </div>
-              </div>
-              <span className="error-message subtile" />
-            </div>
+        <DesignField label="設置場所">
+          <Select
+            value={positionValue}
+            options={POSITION_OPTIONS}
+            onChange={(value) => onChange(`position${fieldPrefix}`, value)}
+          />
+        </DesignField>
 
-            {position === 2 && (
-              <div className="field-add-bot">
-                <div className="add-bot_field-container">
-                  <span className="label-field">{rightTitleLabel} </span>
-                  <div style={{ display: 'flex', width: '100%' }}>
-                    <input
-                      type="text"
-                      name={`right_position_${device}_title`}
-                      className="input-setting"
-                      placeholder="タイトル"
-                      value={rightTitle}
-                      onChange={(e) => onChange(`right${fieldPrefix}Title`, e.target.value)}
-                    />
-                  </div>
-                </div>
-                <span className="error-message subtile" />
-              </div>
-            )}
+        {positionValue === 2 && (
+          <DesignField label={rightTitleLabel}>
+            <Input
+              name={`right_position_${device}_title`}
+              placeholder="タイトル"
+              value={rightTitle}
+              onChange={(e) => onChange(`right${fieldPrefix}Title`, e.target.value)}
+            />
+          </DesignField>
+        )}
 
-            {position === 1 && (
-              <div className="field-add-bot">
-                <div className="add-bot_field-container">
-                  <span className="label-field">ボタン内容 </span>
-                  <div style={{ display: 'flex', width: '100%' }}>
-                    <select
-                      style={SELECT_STYLE}
-                      value={buttonType}
-                      onChange={(e) => onChange(`buttonType${fieldPrefix}`, Number(e.target.value))}
-                    >
-                      <option value={1}>ボタンとタイトル</option>
-                      <option value={2}>ボタンのみ</option>
-                    </select>
-                  </div>
-                </div>
-                <span className="error-message subtile" />
-              </div>
-            )}
+        {positionValue === 1 && (
+          <DesignField label="ボタン内容">
+            <Select
+              value={buttonTypeValue}
+              options={BUTTON_TYPE_OPTIONS}
+              onChange={(value) => onChange(`buttonType${fieldPrefix}`, value)}
+            />
+          </DesignField>
+        )}
 
-            <div className="field-add-bot">
-              <div className="add-bot_field-container">
-                <span className="label-field">右マージン </span>
-                <div style={{ display: 'flex', width: '100%' }}>
-                  <input
-                    type="number"
-                    name={`right_margin_${device}`}
-                    value={rightMargin}
-                    className="input-setting"
-                    placeholder="右マージン"
-                    onChange={(e) => onChange(`rightMargin${fieldPrefix}`, e.target.value)}
-                  />
-                </div>
-              </div>
-              <span className="error-message subtile" />
-            </div>
+        <DesignField label="右マージン">
+          <InputNumber
+            name={`right_margin_${device}`}
+            value={rightMargin}
+            placeholder="右マージン"
+            min={0}
+            style={{ width: '100%' }}
+            onChange={(value) => onChange(`rightMargin${fieldPrefix}`, value ?? '')}
+          />
+        </DesignField>
 
-            <div className="field-add-bot">
-              <div className="add-bot_field-container">
-                <span className="label-field">下マージン </span>
-                <div style={{ display: 'flex', width: '100%' }}>
-                  <input
-                    type="number"
-                    name={`bottom_margin_${device}`}
-                    value={bottomMargin}
-                    className="input-setting"
-                    placeholder="下マージン"
-                    onChange={(e) => onChange(`bottomMargin${fieldPrefix}`, e.target.value)}
-                  />
-                </div>
-              </div>
-              <span className="error-message subtile" />
-            </div>
-          </div>
-        </div>
-      </CardBody>
-    </div>
+        <DesignField label="下マージン">
+          <InputNumber
+            name={`bottom_margin_${device}`}
+            value={bottomMargin}
+            placeholder="下マージン"
+            min={0}
+            style={{ width: '100%' }}
+            onChange={(value) => onChange(`bottomMargin${fieldPrefix}`, value ?? '')}
+          />
+        </DesignField>
+      </div>
+    </section>
   );
 };
 
 DeviceDesignPanel.propTypes = {
   device: PropTypes.oneOf(['pc', 'sp']).isRequired,
   title: PropTypes.string.isRequired,
-  displayType: PropTypes.number,
+  displayType: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   height: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   widthUnit: PropTypes.oneOf(['px', '%']).isRequired,
-  position: PropTypes.number.isRequired,
-  buttonType: PropTypes.number.isRequired,
+  position: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  buttonType: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   rightTitle: PropTypes.string.isRequired,
   rightMargin: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   bottomMargin: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,

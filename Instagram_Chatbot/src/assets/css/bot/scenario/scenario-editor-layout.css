@@ -1,6 +1,19 @@
 @import './scenario-single.css';
 @import './scenario-settings-modal.css';
 
+.admin-page--scenario-editor {
+  max-width: none;
+}
+
+.scenario-editor-page-body {
+  padding: 16px 20px 20px;
+  box-sizing: border-box;
+}
+
+.admin-page--scenario-editor .ss-editor-layout-v2 {
+  height: calc(100vh - 260px);
+}
+
 /* =============================================================================
    Scenario Editor Layout v2 — grid/flex shell (scoped under .ss-editor-layout-v2)
    ============================================================================= */
@@ -50,6 +63,11 @@
   flex-direction: column;
   min-height: 0;
   min-width: 0;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px;
+  box-sizing: border-box;
 }
 
 .ss-layout-overview-form {

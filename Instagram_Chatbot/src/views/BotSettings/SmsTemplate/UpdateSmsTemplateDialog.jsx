@@ -1,210 +1,90 @@
-import React, { useEffect } from "react";
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import { Controller, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import schema from "./schema/createSmsTemplateFormSchema";
-import TextField from "@mui/material/TextField";
-import Stack from "@mui/material/Stack";
-import Snackbar from "@mui/material/Snackbar";
-import MuiAlert from "@mui/material/Alert";
-
-import api from "api/api-management";
-import { tokenExpired } from "api/tokenExpired";
+import React, { useEffect } from 'react';
+import { Form, Input, Modal, message } from 'antd';
+import { Controller, useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import schema from './schema/createSmsTemplateFormSchema';
+import api from 'api/api-management';
+import { tokenExpired } from 'api/tokenExpired';
 
 export default function UpdateSmsTemplateDialog({ botId, resolver, id, open }) {
-  const [openToast, setOpenToast] = React.useState(false);
-  const [errorMessage, setErrorMessage] = React.useState("");
-
-  const handleOpenToast = () => {
-    setOpenToast(true);
-  };
-
-  const handleCloseToast = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setOpenToast(false);
-    setErrorMessage("");
-  };
-
-  const descriptionElementRef = React.useRef(null);
-
   const {
     control,
     watch,
     handleSubmit,
     setValue,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: yupResolver(schema),
-    defaultValues: {
-      name: "",
-      content: "",
-    },
+    defaultValues: { name: '', content: '' },
   });
 
-  const watchContent = watch("content");
+  const watchContent = watch('content');
 
   const onSubmit = async (data) => {
     try {
-      const response = await api.put(
-        `/api/v1/managements/sms_templates/${id}`,
-        {
-          chatbot_id: botId,
-          sms_template: {
-            name: data.name,
-            content: data.content,
-          },
-        }
-      );
+      const response = await api.put(`/api/v1/managements/sms_templates/${id}`, {
+        chatbot_id: botId,
+        sms_template: { name: data.name, content: data.content },
+      });
       if (response?.data?.code === 2) {
-        handleOpenToast();
-        setErrorMessage(response?.data?.message);
+        message.error(response?.data?.message);
       }
       if (response?.data?.code === 1) {
-        handleOpenToast();
+        message.success('SMSを正常に保存しました。');
         resolver(response?.data?.data);
       }
     } catch (error) {
-      console.log(error);
-      if (error.response?.data.code === 0) {
-        tokenExpired();
-      }
+      if (error.response?.data.code === 0) tokenExpired();
     }
   };
 
   useEffect(() => {
-    if (open) {
-      const { current: descriptionElement } = descriptionElementRef;
-      if (descriptionElement !== null) {
-        descriptionElement.focus();
-      }
-    }
-  }, [open]);
-
-  useEffect(() => {
     if (open && id) {
       api
-        .get(`/api/v1/managements/sms_templates/${id}`, {
-          params: {
-            chatbot_id: botId,
-          },
-        })
+        .get(`/api/v1/managements/sms_templates/${id}`, { params: { chatbot_id: botId } })
         .then((res) => {
           if (res?.data.code === 1) {
-            setValue("name", res?.data?.data?.name, true);
-            setValue("content", res?.data?.data?.content, true);
+            setValue('name', res?.data?.data?.name, true);
+            setValue('content', res?.data?.data?.content, true);
           }
-          if (res?.data.code === 2) {
-            resolver();
-          }
+          if (res?.data.code === 2) resolver();
         })
         .catch((error) => {
-          if (error.response?.data.code === 0) {
-            tokenExpired();
-          }
+          if (error.response?.data.code === 0) tokenExpired();
         });
     }
-  }, [open, id]);
+    if (!open) reset();
+  }, [open, id, botId, setValue, reset, resolver]);
 
   return (
-    <div>
-      <Dialog
-        open={open}
-        onClose={() => resolver()}
-        scroll={"paper"}
-        aria-labelledby="scroll-dialog-title"
-        aria-describedby="scroll-dialog-description"
-      >
-        <DialogTitle id="scroll-dialog-title">SMS作成</DialogTitle>
-        <DialogContent dividers={"paper"}>
-          <DialogContentText
-            id="scroll-dialog-description"
-            ref={descriptionElementRef}
-            tabIndex={-1}
-          >
-            <Stack spacing={2} minWidth={{ xs: "200px", md: "500px" }}>
-              <Controller
-                name="name"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    required
-                    label="テンプレート名"
-                    error={errors?.name?.message}
-                    helperText={errors?.name?.message}
-                    {...field}
-                  />
-                )}
-              />
-              <Controller
-                name="content"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    required
-                    label="メッセージ"
-                    multiline
-                    rows={4}
-                    error={errors?.content?.message}
-                    helperText={errors?.content?.message}
-                    {...field}
-                  />
-                )}
-              />
-              {watchContent?.length || 0} 文字
-            </Stack>
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            sx={{ minWidth: "100px" }}
-            variant="outlined"
-            onClick={() => resolver()}
-          >
-            閉じる
-          </Button>
-          <Button
-            sx={{ minWidth: "100px" }}
-            variant="contained"
-            onClick={handleSubmit(onSubmit)}
-            disabled={isSubmitting}
-          >
-            保存
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Snackbar
-        open={openToast}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        autoHideDuration={2000}
-        onClose={handleCloseToast}
-      >
-        {errorMessage ? (
-          <MuiAlert
-            severity="error"
-            sx={{ width: "100%" }}
-            elevation={6}
-            variant="filled"
-          >
-            {errorMessage}
-          </MuiAlert>
-        ) : (
-          <MuiAlert
-            severity="success"
-            sx={{ width: "100%" }}
-            elevation={6}
-            variant="filled"
-          >
-            SMSを正常に保存しました。
-          </MuiAlert>
-        )}
-      </Snackbar>
-    </div>
+    <Modal
+      title="SMS編集"
+      visible={open}
+      onCancel={() => resolver()}
+      onOk={handleSubmit(onSubmit)}
+      okText="保存"
+      cancelText="閉じる"
+      confirmLoading={isSubmitting}
+      width={520}
+    >
+      <Form layout="vertical">
+        <Form.Item label="テンプレート名" validateStatus={errors?.name ? 'error' : ''} help={errors?.name?.message} required>
+          <Controller
+            name="name"
+            control={control}
+            render={({ field }) => <Input {...field} />}
+          />
+        </Form.Item>
+        <Form.Item label="メッセージ" validateStatus={errors?.content ? 'error' : ''} help={errors?.content?.message} required>
+          <Controller
+            name="content"
+            control={control}
+            render={({ field }) => <Input.TextArea rows={4} {...field} />}
+          />
+        </Form.Item>
+        <span style={{ color: '#6b7280' }}>{watchContent?.length || 0} 文字</span>
+      </Form>
+    </Modal>
   );
 }

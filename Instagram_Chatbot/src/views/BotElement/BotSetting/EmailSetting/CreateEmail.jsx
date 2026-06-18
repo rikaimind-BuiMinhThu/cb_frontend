@@ -1,11 +1,11 @@
-import { element, func } from 'prop-types';
 import React, { useEffect, useState } from 'react';
-import { Card, CardHeader, CardBody, Row, Col } from 'reactstrap';
-import './../../../../assets/css/bot/email/create-email.css';
+import { Button } from 'antd';
 import api from './../../../../api/api-management';
 import ModalNoti from 'views/Popup/ModalNoti';
 import Cookies from 'js-cookie';
 import { tokenExpired } from 'api/tokenExpired';
+import { AdminPage } from '../../../../components/AdminShell';
+import '../../../../assets/css/bot/email/create-email.css';
 
 function CreateEmail() {
   const [ccNum, setCcNum] = useState(0);
@@ -373,15 +373,9 @@ function CreateEmail() {
 
   return (
     <>
-      <div className="content">
-        <Row id="screenAll">
-          <Col md="12">
-            <Card>
-              <CardHeader>
-                <h4 style={{ margin: '10px 0' }}>{mailAction === false ? '編集' : 'メール作成'}</h4>
-              </CardHeader>
-              <CardBody>
-                <form id="create-email-form">
+      <AdminPage title={mailAction === false ? 'メール編集' : 'メール作成'}>
+        <div className="email-form-page">
+          <form id="create-email-form">
                   <div className="field-container">
                     <span className="field-lable">
                       テンプレート名 <span style={{ color: 'red' }}>*</span>
@@ -524,43 +518,30 @@ function CreateEmail() {
                       <span id="errText" className="err-email-format"></span>
                     </div>
                   </div>
-                </form>
+          </form>
 
-                <div className="field-btn">
-                  <button
-                    className="btn"
-                    onClick={() => {
-                      window.location.href = '/admin/list-email';
-                    }}
-                  >
-                    戻る
-                  </button>
-                  <button
-                    className="btn btn-primary"
-                    style={{ display: `${mailAction == false ? 'block' : 'none'}` }}
-                    onClick={(e) => saveEmail(e)}
-                  >
-                    保存
-                  </button>
-                  <button
-                    className="btn btn-primary"
-                    style={{ display: `${mailAction == false ? 'none' : 'block'}` }}
-                    onClick={(e) => addEmail(e)}
-                  >
-                    追加
-                  </button>
-                </div>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
+          <div className="field-btn">
+            <Button onClick={() => { window.location.href = '/admin/list-email'; }}>
+              戻る
+            </Button>
+            {mailAction === false ? (
+              <Button type="primary" onClick={(e) => saveEmail(e)}>
+                保存
+              </Button>
+            ) : (
+              <Button type="primary" onClick={(e) => addEmail(e)}>
+                追加
+              </Button>
+            )}
+          </div>
+        </div>
 
         <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
           <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
             <span style={{ fontSize: '16px' }}>{msgNoti}</span>
           </div>
         </ModalNoti>
-      </div>
+      </AdminPage>
     </>
   );
 }

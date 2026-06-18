@@ -12,6 +12,7 @@ import api from './../../../../api/api-management';
 import Cookies from 'js-cookie';
 import { tokenExpired } from 'api/tokenExpired';
 import { utils, writeFileXLSX } from 'xlsx';
+import { AdminPage } from '../../../../components/AdminShell';
 
 function Report() {
   // states
@@ -22,7 +23,7 @@ function Report() {
   const [allScenarios, setAllScenarios] = useState([]);
   const [dataReportCount, setDataReportCount] = useState();
   const [device, setDevice] = useState('all');
-  const [numOfBotStart, setNumofBotStart] = useState();
+  const [numOfBotStart, setNumofBotStart] = useState(0);
   const [numOfOpenBot, setNumOfOpenBot] = useState(0);
   const [numOfCloseBot, setNumOfCloseBot] = useState(0);
   const [reportGroupSelect, setReportGroupSelect] = useState('first');
@@ -402,11 +403,11 @@ function Report() {
     series: [
       {
         name: CVRCTR === false ? 'コンバージョン' : 'BOT起動',
-        data: [CVRCTR === false ? conversionCVRCTR : numOfOpenBot],
+        data: [CVRCTR === false ? conversionCVRCTR ?? 0 : numOfOpenBot ?? 0],
       },
       {
         name: CVRCTR === false ? 'BOT起動' : 'BOT開始',
-        data: [CVRCTR === false ? numOfOpenBot : numOfBotStart],
+        data: [CVRCTR === false ? numOfOpenBot ?? 0 : numOfBotStart ?? 0],
       },
     ],
     options: {
@@ -470,10 +471,9 @@ function Report() {
         },
       },
       yaxis: {
-        // labels: {
-        //   show: false,
-        // },
-        categories: ['合計'],
+        labels: {
+          show: true,
+        },
       },
       title: {
         text: CVRCTR === false ? 'コンバージョン率(CVR)' : 'CTR (BOT起動数/BOT開始数）',
@@ -497,7 +497,7 @@ function Report() {
   const leaveBot = {
     series: [
       {
-        data: [numOfCloseBot, numOfBotStart],
+        data: [numOfCloseBot ?? 0, numOfBotStart ?? 0],
       },
     ],
     options: {
@@ -571,7 +571,7 @@ function Report() {
   const numOfConversionBotStart = {
     series: [
       {
-        data: [conversionCVRCTR, numOfBotStart],
+        data: [conversionCVRCTR ?? 0, numOfBotStart ?? 0],
       },
     ],
     options: {
@@ -651,20 +651,20 @@ function Report() {
         type: 'pie',
       },
       labels: ['PC', 'スマートフォン', 'タブレット'],
-    },
-    responsive: [
-      {
-        breakpoint: 480,
-        options: {
-          chart: {
-            width: 200,
-          },
-          legend: {
-            position: 'bottom',
+      responsive: [
+        {
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200,
+            },
+            legend: {
+              position: 'bottom',
+            },
           },
         },
-      },
-    ],
+      ],
+    },
   };
 
   function validDateRange(start, end) {
@@ -1155,11 +1155,11 @@ function Report() {
   };
 
   return (
-    <> 
-      <div className="content">
+    <>
+      <AdminPage title="レポート" card={false}>
         <Row id="screenAll">
           <Col md="12">
-            <Card>
+            <Card className="admin-page-card">
               <CardHeader>
                 <div className="report">
                   <form id="formSearch" className="report__info">
@@ -1522,7 +1522,7 @@ function Report() {
             </Card>
           </Col>
         </Row>
-      </div>
+      </AdminPage>
     </>
   );
 }

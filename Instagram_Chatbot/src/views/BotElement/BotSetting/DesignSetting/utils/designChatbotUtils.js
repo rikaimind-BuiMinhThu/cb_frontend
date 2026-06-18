@@ -122,25 +122,33 @@ export const buildDesignSettingsPayload = (designSettings) => {
   return { design_settings: payload };
 };
 
+const parseNumericSetting = (value, defaultValue) => {
+  if (value == null || value === '') {
+    return defaultValue;
+  }
+  const parsed = Number(value);
+  return Number.isNaN(parsed) ? defaultValue : parsed;
+};
+
 export const parseDesignSettings = (rawSettings, mainColorHex, apiColorKey) => {
   const result = typeof rawSettings === 'string' ? JSON.parse(rawSettings || '{}') : (rawSettings || {});
 
   return {
-    displayType: result?.display_type,
-    widthPc: result?.width_pc,
-    heightPc: result?.height_pc,
-    widthSp: result?.width_sp,
-    heightSp: result?.height_sp,
-    positionPc: result?.position_pc ? Number(result.position_pc) : 1,
-    buttonTypePc: result?.button_type_pc ? Number(result.button_type_pc) : 1,
+    displayType: parseNumericSetting(result?.display_type, 1),
+    widthPc: parseNumericSetting(result?.width_pc, 380),
+    heightPc: parseNumericSetting(result?.height_pc, 620),
+    widthSp: parseNumericSetting(result?.width_sp, 100),
+    heightSp: parseNumericSetting(result?.height_sp, 100),
+    positionPc: parseNumericSetting(result?.position_pc, 1),
+    buttonTypePc: parseNumericSetting(result?.button_type_pc, 1),
     rightPcTitle: result?.right_position_pc_title || '',
-    rightMarginPc: result?.right_margin_pc,
-    bottomMarginPc: result?.bottom_margin_pc,
-    positionSp: result?.position_sp ? Number(result.position_sp) : 1,
-    buttonTypeSp: result?.button_type_sp ? Number(result.button_type_sp) : 1,
+    rightMarginPc: parseNumericSetting(result?.right_margin_pc, 10),
+    bottomMarginPc: parseNumericSetting(result?.bottom_margin_pc, 10),
+    positionSp: parseNumericSetting(result?.position_sp, 1),
+    buttonTypeSp: parseNumericSetting(result?.button_type_sp, 1),
     rightSpTitle: result?.right_position_sp_title || '',
-    rightMarginSp: result?.right_margin_sp,
-    bottomMarginSp: result?.bottom_margin_sp,
+    rightMarginSp: parseNumericSetting(result?.right_margin_sp, 10),
+    bottomMarginSp: parseNumericSetting(result?.bottom_margin_sp, 10),
     popupCloseBot: !!result?.popup_close_bot,
     titleBubble: result?.title_bubble || '',
     themeSettings: parseThemeFromRaw(result?.theme, mainColorHex, apiColorKey),

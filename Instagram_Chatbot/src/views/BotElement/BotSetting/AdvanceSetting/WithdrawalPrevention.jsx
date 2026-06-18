@@ -1,14 +1,14 @@
 import React, { useEffect } from 'react';
-import './../../../../assets/css/bot/withdrawal-prevention.css';
 import { Card, CardHeader, CardBody, Row, Col } from 'reactstrap';
 import { useState } from 'react';
-import { Button } from 'react-bootstrap';
+import { Button } from 'antd';
 import Cookies from 'js-cookie';
 import api from './../../../../api/api-management';
 import { tokenExpired } from 'api/tokenExpired';
 import ModalNoti from 'views/Popup/ModalNoti';
 import * as utils from './../../../../JS/validate.js';
-import {patchWithDrawalPreview} from "../../BotSetting/PreviewComponent/Utils"
+import { patchWithDrawalPreview } from '../../BotSetting/PreviewComponent/Utils';
+import { AdminPage } from '../../../../components/AdminShell';
 
 function WithdrawalPrevention() {
   const [valueWP, setValueWP] = useState('');
@@ -198,11 +198,10 @@ function WithdrawalPrevention() {
   }
   return (
     <>
-      <div className="content">
+      <AdminPage title="離脱防止" card={false}>
         <Row id="screenAll">
           <Col md="12">
-            <Card>
-              <CardHeader>離脱防止</CardHeader>
+            <Card className="admin-page-card">
               <CardBody>
                 <div onLoad={checkRadioChecked()}>
                   <input
@@ -286,7 +285,7 @@ function WithdrawalPrevention() {
             <span style={{ fontSize: '16px' }}>{msgNoti}</span>
           </div>
         </ModalNoti>
-      </div>
+      </AdminPage>
     </>
   );
 }

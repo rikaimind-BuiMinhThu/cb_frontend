@@ -1,13 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Button } from 'antd';
 import DeviceDesignPanel from './DeviceDesignPanel';
 import BubbleSettingsSection from './BubbleSettingsSection';
 
 const DesignCustomizeTab = ({ designSettings, onFieldChange, onSave }) => (
-  <div>
+  <div className="design-setting-tab-content">
     <form action="POST">
-      <div style={{ width: '100%' }}>
-        <div style={{ width: '100%', display: 'flex', padding: '0 40px' }}>
+      <div className="design-customize-sections">
+        <div className="design-customize-panels">
           <DeviceDesignPanel
             device="pc"
             title="PC"
@@ -36,18 +37,17 @@ const DesignCustomizeTab = ({ designSettings, onFieldChange, onSave }) => (
             onChange={onFieldChange}
           />
         </div>
-        <hr />
+
         <BubbleSettingsSection
           titleBubble={designSettings.titleBubble}
           popupCloseBot={designSettings.popupCloseBot}
           onChange={onFieldChange}
         />
-        <div style={{ width: '100%', marginTop: '40px', padding: '0 20px' }}>
-          <div className="btn-wrapper">
-            <button type="button" className="btn btn-preview" onClick={onSave}>
-              設定保存
-            </button>
-          </div>
+
+        <div className="design-customize-footer">
+          <Button type="primary" onClick={onSave}>
+            設定保存
+          </Button>
         </div>
       </div>
     </form>
@@ -56,18 +56,18 @@ const DesignCustomizeTab = ({ designSettings, onFieldChange, onSave }) => (
 
 DesignCustomizeTab.propTypes = {
   designSettings: PropTypes.shape({
-    displayType: PropTypes.number,
+    displayType: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     widthPc: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     heightPc: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     widthSp: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     heightSp: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    positionPc: PropTypes.number,
-    buttonTypePc: PropTypes.number,
+    positionPc: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    buttonTypePc: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     rightPcTitle: PropTypes.string,
     rightMarginPc: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     bottomMarginPc: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    positionSp: PropTypes.number,
-    buttonTypeSp: PropTypes.number,
+    positionSp: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    buttonTypeSp: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     rightSpTitle: PropTypes.string,
     rightMarginSp: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     bottomMarginSp: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),

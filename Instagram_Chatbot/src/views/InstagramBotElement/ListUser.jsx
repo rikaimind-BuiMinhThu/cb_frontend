@@ -268,11 +268,13 @@ function ListUser() {
     datePickerInputs[1].style.borderRadius = '5px';
   }, []);
 
-  var percentNew = (userChatwithCB / userChatwithCBAll) * 100;
-  var percentold = ((userChatwithCBAll - userChatwithCB) / userChatwithCBAll) * 100;
+  var percentNew = userChatwithCBAll ? (userChatwithCB / userChatwithCBAll) * 100 : 0;
+  var percentold = userChatwithCBAll
+    ? ((userChatwithCBAll - userChatwithCB) / userChatwithCBAll) * 100
+    : 0;
 
-  var percentECnew = (Math.abs(userCB - userCBAll) / userCBAll) * 100;
-  var percentECold = (userCB / userCBAll) * 100;
+  var percentECnew = userCBAll ? (Math.abs(userCB - userCBAll) / userCBAll) * 100 : 0;
+  var percentECold = userCBAll ? (userCB / userCBAll) * 100 : 0;
 
   // console.log('percentECnew: ', percentECnew);
 
@@ -312,13 +314,10 @@ function ListUser() {
       labels: ['リピーター', '新規ユーザー'],
       responsive: [
         {
-          breakpoint: undefined,
+          breakpoint: 480,
           options: {
             chart: {
               width: 500,
-            },
-            labels: {
-              position: 'bottom',
             },
             legend: {
               position: 'bottom',
@@ -464,13 +463,10 @@ function ListUser() {
       labels: ['ECユーザー', '新規ユーザー'],
       responsive: [
         {
-          breakpoint: undefined,
+          breakpoint: 480,
           options: {
             chart: {
               width: 450,
-            },
-            labels: {
-              position: 'bottom',
             },
             legend: {
               position: 'bottom',
@@ -503,10 +499,12 @@ function ListUser() {
         curve: 'smooth',
       },
       fill: {
-        type: 'solid',
+        type: ['solid', 'solid'],
         opacity: [0.35, 1],
       },
-      labels: dateECU,
+      xaxis: {
+        categories: dateECU,
+      },
       markers: {
         size: 0,
       },

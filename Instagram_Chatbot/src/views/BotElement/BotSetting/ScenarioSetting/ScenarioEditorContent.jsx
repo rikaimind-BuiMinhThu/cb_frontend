@@ -1,7 +1,9 @@
 import '../../../../assets/css/bot/scenario/scenario-editor-layout.css';
+import './styles/index.css';
 import React, { useState } from 'react';
-import { Col, Row, Card, CardBody } from 'reactstrap';
-import ScenarioActionsBar from './components/ScenarioActionsBar';
+import { Button } from 'antd';
+import { AdminPage } from '../../../../components/AdminShell';
+import { useScenarioEditor } from './context/ScenarioEditorContext';
 import ScenarioOverviewPanel from './components/ScenarioOverviewPanel';
 import ScenarioMessageDetailPanel from './components/ScenarioMessageDetailPanel';
 import ScenarioBotSettingsPanel from './components/ScenarioBotSettingsPanel';
@@ -14,44 +16,49 @@ import ScenarioMessageOverviewList from './components/ScenarioMessageOverviewLis
 
 const ScenarioEditorContent = () => {
   const [isPreviewVisible, setIsPreviewVisible] = useState(true);
+  const { actions } = useScenarioEditor();
+  const { onClickSaveScenario } = actions;
 
   return (
-    <div className="content">
-      <ScenarioActionsBar />
-      <Row>
-        <Col>
-          <Card>
-            <CardBody>
-              <div className="ss-sc-setting ss-editor-layout-v2">
-                <div
-                  className={`ss-sc-content ss-overview ss-layout-column ss-layout-overview-column${
-                    isPreviewVisible
-                      ? ' ss-layout-overview-column--preview-visible'
-                      : ' ss-layout-overview-column--preview-hidden'
-                  }`}
-                >
-                  <div className="ss-layout-overview-form">
-                    <ScenarioOverviewPanel />
-                  </div>
-                  <ScenarioMessageOverview>
-                    <ScenarioMessageOverviewList />
-                  </ScenarioMessageOverview>
-                  <div className="ss-layout-overview-preview">
-                    <ScenarioEditorPreviewSection onPreviewVisibleChange={setIsPreviewVisible} />
-                  </div>
-                </div>
-                <ScenarioMessageDetailPanel>
-                  <ScenarioBotSettingsPanel />
-                  <ScenarioUserSettingsPanel />
-                  <ScenarioCombineSettingsPanel />
-                </ScenarioMessageDetailPanel>
+    <>
+      <AdminPage
+        className="admin-page--scenario-editor"
+        title="シナリオ設定"
+        toolbar={
+          <Button type="primary" onClick={() => onClickSaveScenario()}>
+            保存
+          </Button>
+        }
+      >
+        <div className="scenario-editor-page-body">
+          <div className="ss-sc-setting ss-editor-layout-v2">
+            <div
+              className={`ss-sc-content ss-overview ss-layout-column ss-layout-overview-column${
+                isPreviewVisible
+                  ? ' ss-layout-overview-column--preview-visible'
+                  : ' ss-layout-overview-column--preview-hidden'
+              }`}
+            >
+              <div className="ss-layout-overview-form">
+                <ScenarioOverviewPanel />
               </div>
-            </CardBody>
-          </Card>
-        </Col>
-      </Row>
+              <ScenarioMessageOverview>
+                <ScenarioMessageOverviewList />
+              </ScenarioMessageOverview>
+              <div className="ss-layout-overview-preview">
+                <ScenarioEditorPreviewSection onPreviewVisibleChange={setIsPreviewVisible} />
+              </div>
+            </div>
+            <ScenarioMessageDetailPanel>
+              <ScenarioBotSettingsPanel />
+              <ScenarioUserSettingsPanel />
+              <ScenarioCombineSettingsPanel />
+            </ScenarioMessageDetailPanel>
+          </div>
+        </div>
+      </AdminPage>
       <ScenarioEditorModals />
-    </div>
+    </>
   );
 };
 

@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import UserContentCommonOptions from './UserContentCommonOptions';
-import '../../styles/index.css';
 
 const ContentSettingShell = ({
   contentType,

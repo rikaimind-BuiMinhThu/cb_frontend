@@ -9,6 +9,7 @@ import api from 'api/api-management';
 import Cookies from 'js-cookie';
 import { tokenExpired } from 'api/tokenExpired';
 import ModalNoti from './../Popup/ModalNoti';
+import { AdminPage } from '../../components/AdminShell';
 registerLocale('ja', ja);
 
 function PaymentManagement() {
@@ -845,12 +846,10 @@ function PaymentManagement() {
   };
 
   return (
-    // <div>
-    <div className="content">
+    <AdminPage title="決済管理" card={false}>
       <Row id="screenAll">
         <Col md="12">
-          <Card>
-            <CardHeader>決済管理</CardHeader>
+          <Card className="admin-page-card">
             <CardBody>
               <div className="payment-management-option">
                 <div
@@ -1654,9 +1653,7 @@ function PaymentManagement() {
           <span style={{ fontSize: '16px' }}>{msgNoti}</span>
         </div>
       </ModalNoti>
-    </div>
-
-    // </div>
+    </AdminPage>
   );
 }
 

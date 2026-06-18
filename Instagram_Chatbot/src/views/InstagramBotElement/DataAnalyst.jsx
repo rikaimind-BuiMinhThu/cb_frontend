@@ -438,8 +438,10 @@ function DataAnalyst() {
       });
   }, []);
 
-  var percentNew = (userChatwithCB / userChatwithCBAll) * 100;
-  var percentold = ((userChatwithCBAll - userChatwithCB) / userChatwithCBAll) * 100;
+  var percentNew = userChatwithCBAll ? (userChatwithCB / userChatwithCBAll) * 100 : 0;
+  var percentold = userChatwithCBAll
+    ? ((userChatwithCBAll - userChatwithCB) / userChatwithCBAll) * 100
+    : 0;
 
   const options = {
     data: [
@@ -477,13 +479,10 @@ function DataAnalyst() {
       labels: ['リピーター', '新規ユーザー'],
       responsive: [
         {
-          breakpoint: undefined,
+          breakpoint: 480,
           options: {
             chart: {
               width: 500,
-            },
-            labels: {
-              position: 'bottom',
             },
             legend: {
               position: 'bottom',
@@ -548,10 +547,12 @@ function DataAnalyst() {
         curve: 'smooth',
       },
       fill: {
-        type: 'solid',
+        type: ['solid', 'solid'],
         opacity: [0.35, 1],
       },
-      labels: dateECU,
+      xaxis: {
+        categories: dateECU,
+      },
       markers: {
         size: 0,
       },
