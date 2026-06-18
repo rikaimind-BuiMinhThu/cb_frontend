@@ -210,15 +210,21 @@ const PreviewFaqReducer = (state, action) => {
       const resolvedDisplayType = Number(designSetting?.display_type ?? state.displayType ?? 2);
       const isOpenFromState = Boolean(state.isOpen);
       const isOpenFromAmazonPay = Boolean(action.payload.isUsingAmazonPay);
+      const isEditorPreview = Boolean(action.payload.isEditorPreview);
+      const hasEditorDraftMessages = isEditorPreview && state.renderMessagesList?.length > 0;
 
       let newState = {
         ...state,
         botInfor: botInfor,
         objParam: {},
         loadedStateFromSession: true,
-        originalMessagesList: _.cloneDeep(conversation?.messages || []),
-        messagesList: conversation?.messages || [],
-        isOpen: isOpenFromState || isOpenFromAmazonPay,
+        originalMessagesList: _.cloneDeep(
+          hasEditorDraftMessages ? state.messagesList : (conversation?.messages || []),
+        ),
+        messagesList: hasEditorDraftMessages
+          ? state.messagesList
+          : (conversation?.messages || []),
+        isOpen: isEditorPreview ? true : (isOpenFromState || isOpenFromAmazonPay),
         activePopupCloseBot: Boolean(designSetting?.popup_close_bot),
         titleBubble: designSetting?.title_bubble || "簡単90秒で注文完了",
         displayType: resolvedDisplayType,
@@ -276,7 +282,12 @@ const PreviewFaqReducer = (state, action) => {
         newState.originalVariables = newState.variables;
       }
 
-      if (state.isOpen) {
+      if (isEditorPreview && state.renderMessagesList?.length > 0) {
+        newState.renderMessagesList = state.renderMessagesList;
+        newState.currentMsgIndex = state.currentMsgIndex;
+        newState.nextStopMsgIndex = state.nextStopMsgIndex;
+        newState.renderMode = state.renderMode;
+      } else if (newState.isOpen) {
         newState.nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg()) + 1;
         if (newState.nextStopMsgIndex < newState.currentMsgIndex) {
           newState.nextStopMsgIndex = newState.currentMsgIndex + 1;
@@ -289,9 +300,11 @@ const PreviewFaqReducer = (state, action) => {
       }
 
       const conditionParams = buildConditionParams(newState);
-      for (let i = 0; i < newState.messagesList.length; i++) {
-        const result = checkMessageCondition(newState.messagesList[i], conditionParams);
-        newState.messagesList[i].hidden = !result;
+      if (!isEditorPreview) {
+        for (let i = 0; i < newState.messagesList.length; i++) {
+          const result = checkMessageCondition(newState.messagesList[i], conditionParams);
+          newState.messagesList[i].hidden = !result;
+        }
       }
 
       return { ...state, ...newState };

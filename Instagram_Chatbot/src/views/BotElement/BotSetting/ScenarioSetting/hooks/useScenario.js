@@ -426,8 +426,12 @@ export const useScenario = () => {
   }, [isOpenPreview]);
 
   useEffect(() => {
+    if (!isShopifyPaymentScenario) {
+      setListProductVariants([]);
+      return;
+    }
     getListProductVariants(null);
-  }, [getListProductVariants]);
+  }, [isShopifyPaymentScenario, getListProductVariants]);
 
   useEffect(() => {
     setBotId(Cookies.get('bot_id'));

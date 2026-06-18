@@ -1308,6 +1308,10 @@ input#ss-message__content--user-checkbox--checkbox_img {
   display: flex;
   align-items: center;
   width: 100%;
+}
+
+.ss-user-setting-double-input--single,
+.ss-user-setting-double-input--split {
   gap: 8px;
 }
 
@@ -1322,10 +1326,21 @@ input#ss-message__content--user-checkbox--checkbox_img {
   flex: 1;
 }
 
+.ss-user-setting-double-input--split input:first-child {
+  border-bottom-right-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
 .ss-user-setting-double-input input:nth-child(2) {
   border-left: 0px;
   border-bottom-left-radius: unset;
   border-top-left-radius: unset;
+}
+
+.ss-user-setting-double-input--split input:nth-child(2) {
+  border-left: 1px solid gray;
+  border-bottom-left-radius: 5px;
+  border-top-left-radius: 5px;
 }
 
 .ss-user-setting-item {

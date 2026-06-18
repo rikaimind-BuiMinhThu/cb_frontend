@@ -6,7 +6,6 @@ import CustomButton from "../../CustomButton";
 import { UserMessage, BotMessage } from "../../PreviewComponent";
 import PreviewFukushashikiReducer from "../../PreviewFukushashiki/PreviewFukushashikiReducer";
 import $ from "jquery";
-import { EC_CHATBOT_URL } from "variables/constants";
 import "moment/locale/zh-cn";
 import iconMessageBlue from "assets/img/icon-mess/icon-message-chat-blue.png";
 import iconMessageGreen from "assets/img/icon-mess/icon-message-chat-green.png";
@@ -87,6 +86,7 @@ import { handleValidateField } from "../../PreviewFukushashiki/ValidationUtils";
 import { createOrAddLinesCart } from "../../ShopifyUtils";
 import { buildEditorDraftPreviewUpdate } from "./buildPreviewStateFromDraft";
 import { buildScenarioPreviewHeaderMeta } from "./buildScenarioPreviewHeaderMeta";
+import { resolveIconUrl } from "../../DesignSetting/utils/designChatbotUtils";
 import {
   postToParent,
   SCENARIO_PREVIEW_MESSAGES,
@@ -217,13 +217,13 @@ const ScenarioPreviewFukushashiki = ({
   }, [editorPreview]);
 
   useEffect(() => {
-    if (!editorPreview || !editorDraft || !state.loadedStateFromSession) return;
+    if (!editorPreview || !editorDraft) return;
 
     dispatch({
       type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
       payload: buildEditorDraftPreviewUpdate(editorDraft),
     });
-  }, [editorPreview, editorDraft, state.loadedStateFromSession]);
+  }, [editorPreview, editorDraft]);
 
   useEffect(() => {
     if (!editorPreview || !state.botInfor) return;
@@ -1039,6 +1039,7 @@ const ScenarioPreviewFukushashiki = ({
         botInfor: getBotInforFromPreviewResponse(res),
         isLoggedIn: isLoggedIn,
         isUsingAmazonPay: params.get('is_using_amazon_pay'),
+        isEditorPreview: editorPreview,
       },
     });
   }
@@ -1409,12 +1410,16 @@ const ScenarioPreviewFukushashiki = ({
     );
   }
 
-  const getBotHeaderIcon = () => {
+  const getBotHeaderIconUrl = () => {
     if (state.isOpen) {
-      return state.botInfor?.opening_bot_icon?.url || state.botInfor?.icon?.url;
+      return resolveIconUrl(state.botInfor?.opening_bot_icon)
+        || resolveIconUrl(state.botInfor?.icon);
     }
-    return state.botInfor?.closing_bot_icon?.url || state.botInfor?.icon?.url;
+    return resolveIconUrl(state.botInfor?.closing_bot_icon)
+      || resolveIconUrl(state.botInfor?.icon);
   }
+
+  const headerIconUrl = getBotHeaderIconUrl();
 
   const getOpeningBotStyle = () => {
     if (embedded) {
@@ -1483,7 +1488,9 @@ const ScenarioPreviewFukushashiki = ({
   };
 
 
-  if (!state.scenarioId || !state.botInfor || state.displayType === null) return null;
+  if (!editorPreview && (!state.scenarioId || !state.botInfor || state.displayType === null)) {
+    return null;
+  }
 
   const effectiveIsOpen = embedded || editorPreview || state.isOpen;
 
@@ -1511,7 +1518,7 @@ const ScenarioPreviewFukushashiki = ({
         <div id="sp-header" style={headerStyle} className="sp-header">
           <div className="sp-header-left" onClick={onChatbotHeaderClick}>
             <div className="sp-body-bot-side-avatar sp-avatar-bt">
-              <img src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`} alt="bot-header-icon"/>
+              {headerIconUrl && <img src={headerIconUrl} alt="bot-header-icon"/>}
             </div>
             <div className="sp-header-left-label">
               <div className="sp-header-left-label-sub-title">
@@ -1583,11 +1590,13 @@ const ScenarioPreviewFukushashiki = ({
           right: state.rightMarginPc ? `${state.rightMarginPc}px` : '0px',
         }}
       >
+        {headerIconUrl && (
         <img
           style={{ width: "96%", height: "96%", borderRadius: "30px" }}
-          src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
+          src={headerIconUrl}
           alt="bot-header-icon"
         />
+        )}
       </div>
     )
   } else if (isPreviewMobile(previewDeviceMode) === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 1) {
@@ -1613,7 +1622,7 @@ const ScenarioPreviewFukushashiki = ({
       >
         <div className="sp-header-left-bt" onClick={() => onOpenPreview(!state.isOpen)}>
           <div className="sp-header-left-avatar sp-avatar-bt">
-            <img src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`} alt="bot-header-icon" />
+            {headerIconUrl && <img src={headerIconUrl} alt="bot-header-icon" />}
           </div>
         </div>
         <div style={{ alignItems: 'center', justifyContent: "center", padding: 'auto' }}>
@@ -1645,7 +1654,7 @@ const ScenarioPreviewFukushashiki = ({
       >
         <div className="sp-header-left" onClick={() => onOpenPreview(!state.isOpen)}>
           <div className="sp-header-left-avatar sp-avatar">
-            <img src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`} alt="bot-header-icon" />
+            {headerIconUrl && <img src={headerIconUrl} alt="bot-header-icon" />}
           </div>
           <div className="sp-header-left-label">
             <div className="sp-header-left-label-title">{state.rightPcTitle}</div>
@@ -1669,11 +1678,13 @@ const ScenarioPreviewFukushashiki = ({
           right: state.rightMarginSp ? `${state.rightMarginSp}px` : '20px',
         }}
       >
+        {headerIconUrl && (
         <img
           style={{ width: "96%", height: "96%", borderRadius: "30px" }}
-          src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
+          src={headerIconUrl}
           alt="bot-header-icon"
         />
+        )}
       </div>
     )
   } else if (isPreviewMobile(previewDeviceMode) === true && Number(state.positionSp) === 1 && Number(state.buttonTypeSp) === 1) {
@@ -1695,10 +1706,12 @@ const ScenarioPreviewFukushashiki = ({
       >
         <div className="sp-header-left" style={{ width: '100%', padding: state.useFullWidthChatbotMobile ? "15px" : '4px' }}>
           <div className={state.useFullWidthChatbotMobile ? "fullwidth_mobile_chatbot sp-header-left-avatar sp-avatar" :"sp-header-left-avatar sp-avatar"} style={{ width: state.useFullWidthChatbotMobile ? "58px" : '38px' }}>
+            {headerIconUrl && (
             <img
-              src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
+              src={headerIconUrl}
               alt="bot-header-icon"
             />
+            )}
           </div>
           <div>
             <div id="comment_bubble" className="sp-bubble">
@@ -1730,10 +1743,12 @@ const ScenarioPreviewFukushashiki = ({
       >
         <div className="sp-header-left">
           <div className="sp-header-left-avatar sp-avatar">
+            {headerIconUrl && (
             <img
-              src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
+              src={headerIconUrl}
               alt="bot-header-icon"
             />
+            )}
           </div>
           <div className="sp-header-left-label">
             <div className="sp-header-left-label-title">{state.rightSpTitle}</div>

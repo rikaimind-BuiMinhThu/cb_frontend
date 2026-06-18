@@ -6,7 +6,6 @@ import CustomButton from "../../CustomButton";
 import { UserMessage, BotMessage } from "../../PreviewComponent";
 import PreviewFaqReducer from "../../PreviewFaq/PreviewFaqReducer";
 import $ from "jquery";
-import { EC_CHATBOT_URL } from "variables/constants";
 import "moment/locale/zh-cn";
 import iconMessageBlue from "assets/img/icon-mess/icon-message-chat-blue.png";
 import iconMessageGreen from "assets/img/icon-mess/icon-message-chat-green.png";
@@ -63,6 +62,7 @@ import {
 import { handleValidateField, ERROR_MESSAGES } from "../../PreviewFukushashiki/ValidationUtils";
 import { buildEditorDraftPreviewUpdate } from "./buildPreviewStateFromDraft";
 import { buildScenarioPreviewHeaderMeta } from "./buildScenarioPreviewHeaderMeta";
+import { resolveIconUrl } from "../../DesignSetting/utils/designChatbotUtils";
 import {
   postToParent,
   SCENARIO_PREVIEW_MESSAGES,
@@ -167,13 +167,13 @@ const ScenarioPreviewFaq = ({
   }, [editorPreview]);
 
   useEffect(() => {
-    if (!editorPreview || !editorDraft || !state.loadedStateFromSession) return;
+    if (!editorPreview || !editorDraft) return;
 
     dispatch({
       type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
       payload: buildEditorDraftPreviewUpdate(editorDraft),
     });
-  }, [editorPreview, editorDraft, state.loadedStateFromSession]);
+  }, [editorPreview, editorDraft]);
 
   useEffect(() => {
     if (!editorPreview || !state.botInfor) return;
@@ -752,6 +752,7 @@ const ScenarioPreviewFaq = ({
       payload: {
         responseData: res.data,
         botInfor: getBotInforFromPreviewResponse(res),
+        isEditorPreview: editorPreview,
       },
     });
   }
@@ -1010,12 +1011,16 @@ const ScenarioPreviewFaq = ({
     );
   }
 
-  const getBotHeaderIcon = () => {
+  const getBotHeaderIconUrl = () => {
     if (state.isOpen) {
-      return state.botInfor?.opening_bot_icon?.url || state.botInfor?.icon?.url;
+      return resolveIconUrl(state.botInfor?.opening_bot_icon)
+        || resolveIconUrl(state.botInfor?.icon);
     }
-    return state.botInfor?.closing_bot_icon?.url || state.botInfor?.icon?.url;
+    return resolveIconUrl(state.botInfor?.closing_bot_icon)
+      || resolveIconUrl(state.botInfor?.icon);
   }
+
+  const headerIconUrl = getBotHeaderIconUrl();
 
   const getOpeningBotStyle = () => {
     if (embedded) {
@@ -1090,7 +1095,7 @@ const ScenarioPreviewFaq = ({
   const effectiveIsOpen = embedded || editorPreview || state.isOpen;
 
   // body container
-  if (state.scenarioId && state.botInfor && effectiveIsOpen) {
+  if ((editorPreview || state.scenarioId) && state.botInfor && effectiveIsOpen) {
     const { containerStyle, headerStyle, bodyStyle } = getOpeningBotStyle();
     return (
       <div
@@ -1102,7 +1107,7 @@ const ScenarioPreviewFaq = ({
         <div id="sp-header" style={headerStyle} className="sp-header">
           <div className="sp-header-left" onClick={() => onOpenPreview(!state.isOpen)}>
             <div className="sp-body-bot-side-avatar sp-avatar-bt">
-              <img src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`} alt="bot-header-icon"/>
+              {headerIconUrl && <img src={headerIconUrl} alt="bot-header-icon"/>}
             </div>
             <div className="sp-header-left-label">
               <div className="sp-header-left-label-sub-title">
@@ -1151,11 +1156,13 @@ const ScenarioPreviewFaq = ({
           right: state.rightMarginPc ? `${state.rightMarginPc}px` : '0px',
         }}
       >
+        {headerIconUrl && (
         <img
           style={{ width: "96%", height: "96%", borderRadius: "30px" }}
-          src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
+          src={headerIconUrl}
           alt="bot-header-icon"
         />
+        )}
       </div>
     )
   } else if (!state.isOpen && !isPreviewMobile(previewDeviceMode) && positionPc === 1 && buttonTypePc === 1) {
@@ -1181,7 +1188,7 @@ const ScenarioPreviewFaq = ({
       >
         <div className="sp-header-left-bt" onClick={() => onOpenPreview(!state.isOpen)}>
           <div className="sp-header-left-avatar sp-avatar-bt">
-            <img src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`} alt="bot-header-icon" />
+            {headerIconUrl && <img src={headerIconUrl} alt="bot-header-icon" />}
           </div>
         </div>
         <div style={{ alignItems: 'center', justifyContent: "center", padding: 'auto' }}>
@@ -1213,7 +1220,7 @@ const ScenarioPreviewFaq = ({
       >
         <div className="sp-header-left" onClick={() => onOpenPreview(!state.isOpen)}>
           <div className="sp-header-left-avatar sp-avatar">
-            <img src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`} alt="bot-header-icon" />
+            {headerIconUrl && <img src={headerIconUrl} alt="bot-header-icon" />}
           </div>
           <div className="sp-header-left-label">
             <div className="sp-header-left-label-title">{state.rightPcTitle}</div>
@@ -1238,11 +1245,13 @@ const ScenarioPreviewFaq = ({
           right: '0px',
         }}
       >
+        {headerIconUrl && (
         <img
           style={{ width: "96%", height: "96%", borderRadius: "30px" }}
-          src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
+          src={headerIconUrl}
           alt="bot-header-icon"
         />
+        )}
       </div>
     )
   } else if (!state.isOpen && isPreviewMobile(previewDeviceMode) && positionSp === 1 && buttonTypeSp === 1) {
@@ -1265,10 +1274,12 @@ const ScenarioPreviewFaq = ({
       >
         <div className="sp-header-left" style={{ width: '100%', padding: state.useFullWidthChatbotMobile ? "15px" : '4px' }}>
           <div className={state.useFullWidthChatbotMobile ? "fullwidth_mobile_chatbot sp-header-left-avatar sp-avatar" :"sp-header-left-avatar sp-avatar"} style={{ width: state.useFullWidthChatbotMobile ? "58px"  :'38px' }}>
+            {headerIconUrl && (
             <img
-              src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
+              src={headerIconUrl}
               alt="bot-header-icon"
             />
+            )}
           </div>
           <div>
             <div id="comment_bubble" className="sp-bubble">
@@ -1301,10 +1312,12 @@ const ScenarioPreviewFaq = ({
       >
         <div className="sp-header-left">
           <div className="sp-header-left-avatar sp-avatar">
+            {headerIconUrl && (
             <img
-              src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
+              src={headerIconUrl}
               alt="bot-header-icon"
             />
+            )}
           </div>
           <div className="sp-header-left-label">
             <div className="sp-header-left-label-title">{state.rightSpTitle}</div>
@@ -1330,11 +1343,13 @@ const ScenarioPreviewFaq = ({
           right: isPreviewMobile(previewDeviceMode) ? "0px" : `${toNumber(state.rightMarginPc, 10)}px`,
         }}
       >
+        {headerIconUrl && (
         <img
           style={{ width: "96%", height: "96%", borderRadius: "30px" }}
-          src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
+          src={headerIconUrl}
           alt="bot-header-icon"
         />
+        )}
       </div>
     );
   }

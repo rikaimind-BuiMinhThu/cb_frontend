@@ -390,16 +390,21 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
       const { conversation } = action.payload.responseData?.data;
       const { variables, all_variables } = action.payload.responseData;
 
+      const isEditorPreview = Boolean(action.payload.isEditorPreview);
+      const hasEditorDraftMessages = isEditorPreview && state.renderMessagesList?.length > 0;
+
       let newState = {
         ...state,
         botInfor: botInfor,
         objParam: {},
         loadedStateFromSession: true,
-        messagesList: conversation?.messages || [],
-        isOpen: state.isOpen || action.payload.isUsingAmazonPay,
+        messagesList: hasEditorDraftMessages
+          ? state.messagesList
+          : (conversation?.messages || []),
+        isOpen: isEditorPreview ? true : (state.isOpen || action.payload.isUsingAmazonPay),
         activePopupCloseBot: Boolean(designSetting?.popup_close_bot),
         titleBubble: designSetting?.title_bubble || "簡単90秒で注文完了",
-        displayType: designSetting?.display_type,
+        displayType: designSetting?.display_type ?? (isEditorPreview ? (state.displayType ?? 1) : designSetting?.display_type),
         widthPc: designSetting?.width_pc || 450,
         heightPc: designSetting?.height_pc || 700,
         widthSp: designSetting?.width_sp || 100,
@@ -462,7 +467,12 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
         newState.messagesList.forEach((x) => x.hidden = x.not_display_when_logged_in);
       }
 
-      if (state.isOpen || action.payload.isUsingAmazonPay) {
+      if (isEditorPreview && state.renderMessagesList?.length > 0) {
+        newState.renderMessagesList = state.renderMessagesList;
+        newState.currentMsgIndex = state.currentMsgIndex;
+        newState.nextStopMsgIndex = state.nextStopMsgIndex;
+        newState.renderMode = state.renderMode;
+      } else if (newState.isOpen || action.payload.isUsingAmazonPay) {
         newState.nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg()) + 1;
         if (newState.nextStopMsgIndex < newState.currentMsgIndex) {
           newState.nextStopMsgIndex = newState.currentMsgIndex + 1;
@@ -475,9 +485,11 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
       }
 
       const conditionParams = buildConditionParams(newState);
-      for (let i = 0; i < newState.messagesList.length; i++) {
-        const result = checkMessageCondition(newState.messagesList[i], conditionParams);
-        newState.messagesList[i].hidden = !result;
+      if (!isEditorPreview) {
+        for (let i = 0; i < newState.messagesList.length; i++) {
+          const result = checkMessageCondition(newState.messagesList[i], conditionParams);
+          newState.messagesList[i].hidden = !result;
+        }
       }
 
       const progressBarTargetCountMessagesList = newState.messagesList.filter(msg => {

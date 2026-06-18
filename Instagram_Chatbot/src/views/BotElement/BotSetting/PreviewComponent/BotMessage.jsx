@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "assets/css/bot/preview-chat-bot.css";
 import messageTypingGif from "assets/img/icons8-dots-loading.gif";
-import { EC_CHATBOT_URL } from "variables/constants";
+import { resolveIconUrl } from "../DesignSetting/utils/designChatbotUtils";
 import "moment/locale/zh-cn";
 import { BOT_MESSAGE_TYPES, RENDER_CHATBOT_CONFIG } from "./Constants";
 import HtmlCodeMessagePreview from "components/BotMessages/HtmlCodeMessagePreview";
@@ -170,11 +170,15 @@ const BotMessage = ({
   const renderAvatar = () => {
     if (!isShowAvatar()) return null;
 
-    const botAvatar = botInfor?.icon?.url || botInfor?.opening_bot_icon?.url || botInfor?.closing_bot_icon?.url;
+    const botAvatarUrl = resolveIconUrl(botInfor?.icon)
+      || resolveIconUrl(botInfor?.opening_bot_icon)
+      || resolveIconUrl(botInfor?.closing_bot_icon);
+
+    if (!botAvatarUrl) return null;
 
     return (
       <div className="sp-body-bot-side-avatar sp-avatar">
-        <img src={EC_CHATBOT_URL + "/" + botAvatar} />
+        <img src={botAvatarUrl} alt="" />
       </div>
     )
   }
@@ -223,13 +227,13 @@ const BotMessage = ({
     return fileContent.includes("mp4");
   }
 
-  const renderFileContentImage = () => {
+  const renderFileContentImage = (fileContent) => {
     return (
       <img src={fileContent} alt="" className="ss-bot-chat-file-content-image" />
     )
   }
 
-  const renderFileContentPdf = () => {
+  const renderFileContentPdf = (fileContent) => {
     return (
       <span className="ss-bot-chat-file-content-download" onClick={() => handleDownloadFile(fileContent)}>
         ファイルをダウンロード
@@ -237,7 +241,7 @@ const BotMessage = ({
     )
   }
 
-  const renderFileContentVideo = () => {
+  const renderFileContentVideo = (fileContent) => {
     return (
       <div><video src={fileContent} autoPlay controls className="ss-bot-chat-file-content-video" /></div>
     )
@@ -247,9 +251,9 @@ const BotMessage = ({
     const fileContent = content[content.type]?.content;
 
     if (fileContent) {
-      if (isImageExtension(fileContent)) return renderFileContentImage();
-      if (isPdfExtension(fileContent)) return renderFileContentPdf();
-      if (isMp4Extension(fileContent)) return renderFileContentVideo();  
+      if (isImageExtension(fileContent)) return renderFileContentImage(fileContent);
+      if (isPdfExtension(fileContent)) return renderFileContentPdf(fileContent);
+      if (isMp4Extension(fileContent)) return renderFileContentVideo(fileContent);
     }
 
     return (

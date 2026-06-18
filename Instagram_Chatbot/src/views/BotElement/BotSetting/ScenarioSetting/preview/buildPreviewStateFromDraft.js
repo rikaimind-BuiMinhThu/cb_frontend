@@ -5,6 +5,7 @@ import {
 } from '../../PreviewComponent/Utils';
 import {
   BOT_MESSAGE_TYPES,
+  DISPLAY_TYPES,
   MESSAGE_CONTENT_TYPES,
   RENDER_MODES,
 } from '../../PreviewComponent/Constants';
@@ -54,6 +55,7 @@ export const buildEditorDraftPreviewUpdate = (draft) => {
     currentMsgIndex,
     nextStopMsgIndex,
     isOpen: true,
+    displayType: DISPLAY_TYPES.RELOAD,
     isProcessing: false,
     errors: {},
     submitErrorMessage: '',

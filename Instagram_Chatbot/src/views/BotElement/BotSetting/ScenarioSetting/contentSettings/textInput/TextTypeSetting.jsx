@@ -129,6 +129,7 @@ const TextTypeSetting = (props) => {
     <div className="ss-user-setting__item-bottom">
       <InputDouble
         showSecondInput={!!typeConfig?.isSplitInput}
+        classCustom={typeConfig?.isSplitInput ? 'ss-user-setting-double-input--split' : ''}
         icon={typeConfig?.isSplitInput ? 'minus-circle' : 'plus-circle'}
         valueLeft={typeConfig?.placeholderLeft}
         valueRight={typeConfig?.placeholderRight}
