@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { Button, Card, CardBody, CardHeader, Col, Row } from "reactstrap";
-import DatePicker, { registerLocale } from "react-datepicker";
+import React, { useState, useEffect, useMemo } from "react";
+import { Button, DatePicker, Empty, Select, Space, Tabs, Typography } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
 import api from "api/api-management";
-import ja from "date-fns/locale/ja";
 import Cookies from "js-cookie";
 import { format } from "date-fns";
 import "assets/css/bot/bot-chat-log.css";
+import "assets/css/bot/report.css";
+import "assets/css/bot/chat-log.css";
 import $ from "jquery";
 import BotMessage from "./BotMessage";
 import UserMessage from "./UserMessage";
@@ -14,7 +15,6 @@ import moment from "moment";
 import jwt_decode from 'jwt-decode'
 import BotChatStatistic from "./BotChatStatistic";
 import { AdminPage } from "../../../../../components/AdminShell";
-registerLocale("ja", ja);
 
 const TABS = {
   LOGS: "LOGS",
@@ -70,10 +70,14 @@ function BotChatLog() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function onScenarioSearch(event) {
-    if (event.target.value === "all") setSearchScenarioId(null);
-    else setSearchScenarioId(event.target.value);
-  }
+  const scenarioOptions = useMemo(
+    () =>
+      scenarios.map((scenario) => ({
+        value: scenario.id,
+        label: scenario.name,
+      })),
+    [scenarios]
+  );
 
   function formatDate(date) {
     return moment(date).format("YYYY-MM-DD");
@@ -146,13 +150,6 @@ function BotChatLog() {
     });
     return dataObj;
   });
-
-  function onSelectTab(tab) {
-    return function () {
-      if (tab === selectTab) return;
-      setSelectTab(tab);
-    }
-  }
 
   function onSelectChat(item) {
     setSelectUserId(item.user_input_id);
@@ -840,290 +837,182 @@ function BotChatLog() {
     )
   }
 
-  return (
-    <>
-      <AdminPage title="会話" card={false}>
-        <Row id="screenAll">
-          <Col>
-            <Card className="admin-page-card">
-              <CardHeader>
-              <Row className="bot-chat-log">
-                <Col md="12">
-                  <div className="d-flex justify-content-between align-items-center" style={{ padding: '10px 0px' }}>
-                    <div className="div-add-bot--search">
-                      <div className="wrap-bot-search">
-                        <div className="bm_status-filter" style={{ width: '357px', minWidth: '358px', marginRight: "30px" }}>
-                          <label style={{ margin: '0px 5px 0px 0px', color: '#2c2c2c', fontSize: '14px', width: '70px' }}>シナリオ</label>
-                          <select
+  const filterToolbar = (
+    <Space wrap size={12} className="report-filter-toolbar">
+      <Space size={4}>
+        <Typography.Text type="secondary">シナリオ</Typography.Text>
+        <Select
+          allowClear
+          placeholder="すべて"
+          value={searchScenarioId ?? undefined}
+          onChange={(value) => setSearchScenarioId(value ?? null)}
+          options={scenarioOptions}
+          style={{ minWidth: 200 }}
+        />
+      </Space>
+      <DatePicker.RangePicker
+        value={[
+          searchStartDate ? moment(searchStartDate) : null,
+          searchEndDate ? moment(searchEndDate) : null,
+        ]}
+        onChange={(dates) => {
+          setSearchStartDate(dates?.[0]?.toDate() ?? null);
+          setSearchEndDate(dates?.[1]?.toDate() ?? null);
+        }}
+        format="YYYY/MM/DD"
+      />
+      <Button type="primary" icon={<SearchOutlined />} onClick={pressSearchButton}>
+        検索
+      </Button>
+    </Space>
+  );
+
+  const logsTabContent = (
+    <div className="chat-log-content">
+      <div className="chat-log-user-list">
+        <div className="chat-log-user-list-header">
+          会話（{chats.length}人）
+        </div>
+        <div className="chat-log-user-list-body">
+          <ul className="chat-log-user-list-items">
+            {chats.map((item) => {
+              const isActive =
+                item.scenario_id === selectScenario?.id &&
+                item.user_input_id === selectUserId;
+
+              return (
+                <li
+                  key={item.scenario_id + "_" + item.user_input_id}
+                  className="chat-log-user-item"
+                >
+                  <button
+                    type="button"
+                    className={`chat-log-user-button${
+                      isActive ? " chat-log-user-button--active" : ""
+                    }`}
+                    onClick={() => onSelectChat(item)}
+                  >
+                    <div className="chat-log-user-meta">
+                      <p className="chat-log-user-name">{item.name}</p>
+                      <p className="chat-log-user-date">
+                        {format(new Date(item.newest), "yyyy-MM-dd HH:mm")}
+                      </p>
+                    </div>
+                    <span
+                      className={`is-done_label ${item.is_done ? "finished" : ""}`}
+                    >
+                      {item.is_done ? "完了" : "未完了"}
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </div>
+
+      <div className="chat-log-preview">
+        {selectScenario ? (
+          <div id="csp-body" className="sp-body csp-body chat-area">
+            {renderMessageArr.map((message, indexMessage) => (
+              <React.Fragment key={indexMessage}>
+                {message.belong_to === "bot" &&
+                  message?.message_content.map((content, index) => (
+                    <BotMessage
+                      key={index}
+                      content={content}
+                      index={index}
+                      botInfor={botInfor}
+                    />
+                  ))}
+                {message.belong_to === "user" && (
+                  <div className="sp-body-user-side csp-body-user-side slideLeft chat-log-user-side">
+                    <p className="chat-log-user-message-time">
+                      {message.message_content[0].updated_at
+                        ? format(
+                            new Date(message.message_content[0].updated_at),
+                            "yyyy-MM-dd HH:mm"
+                          )
+                        : ""}
+                    </p>
+                    <div className="sp-body-user-side-messages csp-body-user-side-messages">
+                      <UserMessage
+                        captcha={captcha}
+                        messageContentProps={message.message_content}
+                        disabled={message.disabled}
+                        onChangeValue={() => {}}
+                        indexMessageRender={indexMessageRender}
+                        indexMessage={indexMessage}
+                        displayButtonNext={(value) => {
+                          dataMessages[indexMessage].is_display_button_next = value;
+                          setDataMessages([...dataMessages]);
+                        }}
+                        dataPrefectures={[...dataPrefectures]}
+                        variables={variables}
+                      />
+                      {(dataMessages[indexMessage]?.is_display_button_next !==
+                      undefined
+                        ? dataMessages[indexMessage].is_display_button_next
+                        : true) && (
+                        <div className="sp-user-message-button-action">
+                          <button
+                            type="button"
+                            disabled
+                            className="chat-log-action-btn"
                             style={{
-                              borderRadius: "5px",
-                              border: "1px solid #7186a0",
-                              padding: "5px 10px",
-                              width: "283px",
-                              height: "34px"
+                              backgroundColor: botInfor?.main_color,
                             }}
-                            className="input-field"
-                            defaultValue="all"
-                            name="scenarioSearch"
-                            id="scenarioSearch"
-                            onChange={onScenarioSearch}
                           >
-                            <option value="all">すべて</option>
-                            {scenarios.map((s) => (
-                              <option key={s.id} value={s.id}>
-                                {s.name}
-                              </option>
-                            ))}
-                          </select>
+                            {message.buttonName || "次へ"}
+                          </button>
                         </div>
-                        <div className="wapper-search-date">
-                          <div className="bm_status-filter search-date-from">
-                            <label className="label-search-date">から</label>
-                            <div style={{ width: '283px' }}>
-                              <DatePicker
-                                selected={searchStartDate && searchStartDate}
-                                onChange={(date) => setSearchStartDate(date)}
-                                dateFormat="yyyy/MM/dd"
-                                locale="ja"
-                                placeholderText="yyyy/mm/dd"
-                                maxDate={searchEndDate}
-                              />
-                            </div>
-                          </div>
-                          <div className="bm_status-filter">
-                            <label className="label-search-date">まで</label>
-                            <div style={{ width: '283px' }}>
-                              <DatePicker
-                                selected={searchEndDate}
-                                onChange={(date) => setSearchEndDate(date)}
-                                dateFormat="yyyy/MM/dd"
-                                locale="ja"
-                                placeholderText="yyyy/mm/dd"
-                                minDate={searchStartDate}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                      )}
                     </div>
                   </div>
-                </Col>
-                <Col md="12">
-                  <Button
-                    style={{ backgroundColor: "#66615b", margin: "0px" }}
-                    onClick={(e) => pressSearchButton()}
-                  >
-                    検索
-                  </Button>
-                </Col>
-              </Row>
-              <hr />
-              </CardHeader>
+                )}
+              </React.Fragment>
+            ))}
+          </div>
+        ) : (
+          <div className="chat-log-preview-empty">
+            <Empty description="会話を選択してください" />
+          </div>
+        )}
+      </div>
+    </div>
+  );
 
-              <div className="tab_holder">
-                <button className={`tab_button ${selectTab === TABS.LOGS ? "t_selected" : ""}`} onClick={onSelectTab(TABS.LOGS)}>会話ログ</button>
-                <button className={`tab_button ${selectTab === TABS.STATICTIC ? "t_selected" : ""}`} onClick={onSelectTab(TABS.STATICTIC)}>統計 (とうけい)</button>
-              </div>
-
-              <CardBody
-                style={{
-                  display: "flex",
-                  justifyContent: "start",
-                  alignItems: "stretch",
-                  width: "100%",
-                  height: "700px",
-                  padding: "10px 15px",
-                }}
-              >
-              {selectTab === TABS.LOGS && 
-              <>
-                <div className="left-column">
-                  <div
-                    style={{
-                      backgroundColor: "#f2f2f6",
-                      padding: "5px 0px",
-                      borderBottom: ".5px solid #dbdbdb",
-                    }}
-                  >
-                    <span
-                      id="user_header_title"
-                      style={{ marginLeft: "10px", border: "" }}
-                    >
-                      会話（{chats.length}人）
-                    </span>
-                  </div>
-                  <div style={{ overflowY: "scroll", maxHeight: "647px" }}>
-                    <ul
-                      style={{ listStyle: "none", paddingInlineStart: "5px" }}
-                    >
-                      {chats.map((item) => (
-                        <li
-                          key={item.scenario_id + "_" + item.user_input_id}
-                          style={{
-                            paddingTop: "10px",
-                            paddingBottom: "10px",
-                            paddingLeft: "2px",
-                            minWidth: "180px",
-                          }}
-                        >
-                          <button
-                            className="button chat-log_item"
-                            onClick={(e) => onSelectChat(item)}
-                            style={
-                              item.scenario_id === selectScenario?.id &&
-                              item.user_input_id === selectUserId
-                                ? {
-                                    borderLeft: "2px solid #57c8f1",
-                                    backgroundColor: "#fafafa",
-                                  }
-                                : { paddingLeft: "2px" }
-                            }
-                          >
-                            <div style={{ display: "grid" }}>
-                              <p style={{ marginBottom: "1px" }}>{item.name}</p>
-                              <p style={{ marginBottom: "1px" }}>
-                                {" "}
-                                {format(
-                                  new Date(item.newest),
-                                  "yyyy-MM-dd HH:mm"
-                                )}{" "}
-                              </p>
-                            </div>
-                            <div className="info">
-                              <i
-                                className="fa fa-info-circle fa-2"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                }}
-                              ></i>
-                            </div>
-
-                            <div className="chat_log-is_done_holder">
-                              <span className={`is-done_label ${item.is_done ? "finished" : ""}`}>{item.is_done ? "完了" : "未完了"}</span>
-                            </div>
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-
-                <div className="right-column">
-                  {selectScenario && (
-                    <>
-                      <div
-                        id="csp-body"
-                        className="sp-body csp-body chat-area"
-                        // style={{ backgroundColor: botInfor?.opacity_color }}
-                      >
-                        {renderMessageArr.map((message, indexMessage) => {
-                          return (
-                            <React.Fragment key={indexMessage}>
-                              {message.belong_to === "bot" &&
-                                message?.message_content.map(
-                                  (content, index) => {
-                                    return (
-                                      <BotMessage
-                                        key={index}
-                                        content={content}
-                                        index={index}
-                                        botInfor={botInfor}
-                                      />
-                                    );
-                                  }
-                                )}
-                              {message.belong_to === "user" && (
-                                <div
-                                  className="sp-body-user-side csp-body-user-side slideLeft"
-                                  style={{
-                                    flexDirection: "column",
-                                    justifyContent: "flex-end",
-                                    alignItems: "flex-end",
-                                  }}
-                                >
-                                  <p
-                                    style={{
-                                      marginTop: "1em",
-                                      marginBottom: "0px",
-                                      marginRight: "20px",
-                                    }}
-                                  >
-                                    {message.message_content[0].updated_at ? format(
-                                      new Date(message.message_content[0].updated_at),
-                                      "yyyy-MM-dd HH:mm",
-                                      
-                                    ): ''}
-                                  </p>
-                                  <div className="sp-body-user-side-messages csp-body-user-side-messages">
-                                    <UserMessage
-                                      captcha={captcha}
-                                      messageContentProps={
-                                        message.message_content
-                                      }
-                                      disabled={message.disabled}
-                                      onChangeValue={(
-                                        indexContent,
-                                        contentType,
-                                        value,
-                                        field,
-                                        subFiled,
-                                        name
-                                      ) => {}}
-                                      indexMessageRender={indexMessageRender}
-                                      indexMessage={indexMessage}
-                                      displayButtonNext={(value) => {
-                                        dataMessages[
-                                          indexMessage
-                                        ].is_display_button_next = value;
-                                        setDataMessages([...dataMessages]);
-                                      }}
-                                      dataPrefectures={[...dataPrefectures]}
-                                      variables={variables}
-                                    />
-                                    {(dataMessages[indexMessage]
-                                      ?.is_display_button_next !== undefined
-                                      ? dataMessages[indexMessage]
-                                          .is_display_button_next
-                                      : true) && (
-                                      <div className="sp-user-message-button-action">
-                                        <Button
-                                          disabled={true}
-                                          style={{
-                                            backgroundColor:
-                                              botInfor?.main_color,
-                                            borderRadius: "25px",
-                                          }}
-                                          className="ss-user-message__action-btn"
-                                        >
-                                          {message.buttonName || "次へ"}
-                                        </Button>
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              )}
-                            </React.Fragment>
-                          );
-                        })}
-                      </div>
-                    </>)}
-                </div>
-              </>}
-
-              <BotChatStatistic
-                display={selectTab === TABS.STATICTIC}
-                overall={overall}
-                botInfor={botInfor}
-                messages={renderMessageStatisticArr}
-                dataMessages={dataMessages}
-                statistic={statistic}
-              />
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
-      </AdminPage>
-    </>
+  return (
+    <AdminPage title="会話" className="admin-page--chat-log" card={false}>
+      <div id="screenAll" className="admin-page-card chat-log-page-card">
+        <div className="report-filter-panel">{filterToolbar}</div>
+        <Tabs
+          activeKey={selectTab}
+          onChange={setSelectTab}
+          className="admin-page-tabs"
+          items={[
+            {
+              key: TABS.LOGS,
+              label: "会話ログ",
+              children: logsTabContent,
+            },
+            {
+              key: TABS.STATICTIC,
+              label: "統計",
+              children: (
+                <BotChatStatistic
+                  overall={overall}
+                  botInfor={botInfor}
+                  messages={renderMessageStatisticArr}
+                  dataMessages={dataMessages}
+                  statistic={statistic}
+                />
+              ),
+            },
+          ]}
+        />
+      </div>
+    </AdminPage>
   );
 }
 
