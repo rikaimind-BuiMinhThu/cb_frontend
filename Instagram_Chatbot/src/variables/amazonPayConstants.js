@@ -1,5 +1,19 @@
 export const FUKUSHIASHIKI_SELECTOR_VALUE_SUFFIX = '_fukushashiki_search_value';
 
+export const AMAZON_PAY_URL_FLAG = 'is_using_amazon_pay';
+
+export const AMAZON_PAY_DISPLAY_MODES = {
+  ALWAYS: 'always',
+  DISPLAY_WHEN: 'display_when_amazon_pay',
+  UNDISPLAY_WHEN: 'undisplay_when_amazon_pay',
+};
+
+export const dataAmazonPayDisplayMode = [
+  { key: AMAZON_PAY_DISPLAY_MODES.ALWAYS, value: '常に表示' },
+  { key: AMAZON_PAY_DISPLAY_MODES.DISPLAY_WHEN, value: 'Amazon Pay利用時に表示' },
+  { key: AMAZON_PAY_DISPLAY_MODES.UNDISPLAY_WHEN, value: 'Amazon Pay利用時に非表示' },
+];
+
 export const DEFAULT_AMAZON_PAY_BUTTON_IMAGE_URL =
   'https://ec-chatbot.s3.ap-northeast-1.amazonaws.com/uploads/213/86ddda57-14ba-4159-8e75-971a574caec6.png';
 

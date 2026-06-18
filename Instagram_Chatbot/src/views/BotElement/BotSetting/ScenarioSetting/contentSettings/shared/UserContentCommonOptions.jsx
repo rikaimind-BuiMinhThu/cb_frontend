@@ -22,8 +22,6 @@ const UserContentCommonOptions = ({
   contentData,
   indexMessageSelect,
   indexContent,
-  dataMessages,
-  setDataMessages,
   onChangeValueMessageContent,
   renderRootFaqOption,
   dataInputVar,
@@ -35,13 +33,6 @@ const UserContentCommonOptions = ({
     return null;
   }
 
-  const selectedMessage = dataMessages[indexMessageSelect];
-
-  const updateMessageField = (field, value) => {
-    Object.assign(selectedMessage, { [field]: value });
-    setDataMessages([...dataMessages]);
-  };
-
   const updateContentField = (field, value) => {
     onChangeValueMessageContent(indexMessageSelect, indexContent, contentType, value, field);
   };
@@ -51,28 +42,6 @@ const UserContentCommonOptions = ({
 
   return (
     <div className="ss-user-content-common-options">
-      {config.hideWhenLoggedIn && (
-        <ScenarioModalCheckbox
-          checked={!!selectedMessage.not_display_when_logged_in}
-          onChange={(checked) => updateMessageField('not_display_when_logged_in', checked)}
-          label={labelWithTooltip(
-            USER_CONTENT_OPTION_LABELS.hideWhenLoggedIn,
-            'hideWhenLoggedIn',
-          )}
-        />
-      )}
-
-      {config.hideWhenError && (
-        <ScenarioModalCheckbox
-          checked={!!selectedMessage.not_display_when_have_error}
-          onChange={(checked) => updateMessageField('not_display_when_have_error', checked)}
-          label={labelWithTooltip(
-            USER_CONTENT_OPTION_LABELS.hideWhenError,
-            'hideWhenError',
-          )}
-        />
-      )}
-
       {config.faq && renderRootFaqOption?.()}
 
       {config.noAutoScroll && (
@@ -190,8 +159,6 @@ UserContentCommonOptions.propTypes = {
   contentData: PropTypes.object,
   indexMessageSelect: PropTypes.number.isRequired,
   indexContent: PropTypes.number.isRequired,
-  dataMessages: PropTypes.array.isRequired,
-  setDataMessages: PropTypes.func.isRequired,
   onChangeValueMessageContent: PropTypes.func.isRequired,
   renderRootFaqOption: PropTypes.func,
   dataInputVar: PropTypes.array,

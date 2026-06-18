@@ -7,8 +7,6 @@ import InputCustom from '../scenarioComon/InputCustom';
 import { CONTENT_SETTING_MAP } from '../contentSettings';
 import { useScenarioPanelDestructuring } from '../hooks/useScenarioPanelDestructuring';
 import ScenarioConditionsPanel from './ScenarioConditionsPanel';
-import CheckboxCustom from '../scenarioComon/CheckboxCustom';
-import { hasValidAmazonPaySelectors } from '../utils/amazonPayConfigUtils';
 import ScenarioModalCheckbox from './modals/shared/ScenarioModalCheckbox';
 import ScenarioFormRow from './modals/shared/ScenarioFormRow';
 import ScenarioInfoTooltip from './modals/shared/ScenarioInfoTooltip';
@@ -155,14 +153,11 @@ const RegisterButtonConfig = ({ selectedMessage, dataMessages, setDataMessages }
 const ScenarioUserSettingsPanel = () => {
   const {
     belongTo, messageType, setMessageType, indexMessageSelect, dataMessages, setDataMessages,
-    isUseFukushashiki,
     onChangeValueNameMessage, handleDragEnd, handleSelectContentMessage,
     handleDeleteMessageContent, handleAddItemSetting,
   } = useScenarioPanelDestructuring();
 
   const selectedMessage = dataMessages?.[indexMessageSelect];
-  const showAmazonPaySelectorWarning = selectedMessage?.is_used_when_amazon_pay
-    && !hasValidAmazonPaySelectors(selectedMessage);
 
   if (!selectedMessage || belongTo !== 'user') {
     return null;
@@ -242,23 +237,6 @@ const ScenarioUserSettingsPanel = () => {
           dataMessages={dataMessages}
           setDataMessages={setDataMessages}
         />
-        {isUseFukushashiki && (
-          <div style={{ marginTop: '12px' }}>
-            <CheckboxCustom
-              label="Amazon Pay利用時に使用"
-              onChange={(value) => {
-                selectedMessage.is_used_when_amazon_pay = value;
-                setDataMessages([...dataMessages]);
-              }}
-              value={!!selectedMessage.is_used_when_amazon_pay}
-            />
-            {showAmazonPaySelectorWarning && (
-              <div style={{ color: 'rgb(185, 74, 72)', fontSize: '13px', marginTop: '6px' }}>
-                複写先セレクターが未設定のメッセージです。Amazon Pay連携時に自動入力されません。
-              </div>
-            )}
-          </div>
-        )}
         <ScenarioConditionsPanel variant="user" />
       </div>
     </div>

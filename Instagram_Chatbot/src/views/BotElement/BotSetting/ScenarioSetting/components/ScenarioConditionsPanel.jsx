@@ -1,30 +1,62 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from 'reactstrap';
 import { MDBIcon } from 'mdbreact';
 import SelectCustom from '../scenarioComon/SelectCustom';
 import InputCustom from '../scenarioComon/InputCustom';
 import { dataSubCondition } from '../constants/scenarioFormConstants';
+import { hasActiveSpecialDisplayConditions } from '../utils/amazonPayConfigUtils';
 import { useScenarioPanelDestructuring } from '../hooks/useScenarioPanelDestructuring';
+import SpecialDisplayConditionsModal from './modals/SpecialDisplayConditionsModal';
 
 const ScenarioConditionsPanel = ({ variant = 'bot' }) => {
   const {
     indexMessageSelect,
     dataMessages,
+    setDataMessages,
     isConditionUp,
+    isUseFukushashiki,
     dataCondition,
     handlePannelCondition,
     onChangeValueCondition,
     handleDeleteCondition,
     onClickAddCondition,
+    onChangeAmazonPayDisplayMode,
   } = useScenarioPanelDestructuring();
+
+  const [isSpecialDisplayModalOpen, setIsSpecialDisplayModalOpen] = useState(false);
 
   const role = variant === 'user' ? 'user' : 'bot';
   const containerClass = variant === 'bot'
     ? 'ss-bot-setting-condition-container'
     : 'ss-user-setting-condition-container';
+  const selectedMessage = dataMessages[indexMessageSelect];
+  const hasActiveSpecialDisplay = hasActiveSpecialDisplayConditions(selectedMessage, isUseFukushashiki);
 
   return (
     <div className={containerClass}>
+      {selectedMessage && (
+        <div className="ss-bot-setting-condition-special-display" style={{ marginBottom: '12px' }}>
+          <Button
+            onClick={() => setIsSpecialDisplayModalOpen(true)}
+            className="ss-bot-setting-add-condition-button"
+            style={{ backgroundColor: hasActiveSpecialDisplay ? '#5A8F3E' : '#347AED' }}
+          >
+            特別表示条件設定
+            {hasActiveSpecialDisplay && (
+              <span style={{ marginLeft: '8px', fontSize: '12px' }}>（設定済み）</span>
+            )}
+          </Button>
+          <SpecialDisplayConditionsModal
+            open={isSpecialDisplayModalOpen}
+            onClose={() => setIsSpecialDisplayModalOpen(false)}
+            selectedMessage={selectedMessage}
+            dataMessages={dataMessages}
+            setDataMessages={setDataMessages}
+            isUseFukushashiki={isUseFukushashiki}
+            onChangeAmazonPayDisplayMode={onChangeAmazonPayDisplayMode}
+          />
+        </div>
+      )}
       <div className="ss-bot-setting-condition-header">
         <div className="ss-bot-setting-condition-header-left">
           <span style={{ fontWeight: '400' }}>表示対象者の条件設定</span>

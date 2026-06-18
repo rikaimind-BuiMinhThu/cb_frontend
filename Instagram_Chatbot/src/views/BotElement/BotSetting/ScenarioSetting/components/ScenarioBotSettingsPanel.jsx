@@ -38,8 +38,7 @@ const removeVariableAt = (message, messageType, index) => {
 
 // type: text_input / getting_error_notification
 const TextStatementSection = ({
-  messageType, typeContent, indexMessageSelect, selectedMessage,
-  dataMessages, setDataMessages, onChangeValueMessageContent, renderRootFaqOption,
+  messageType, typeContent, indexMessageSelect, onChangeValueMessageContent, renderRootFaqOption,
 }) => (
   <div className="ss-bot-statement-wrapper">
     <div
@@ -69,26 +68,6 @@ const TextStatementSection = ({
         label="確認メッセージに使用"
         onChange={value => onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'use_for_confirm_message')}
         value={typeContent?.['use_for_confirm_message'] || ''}
-      />
-    </div>
-    <div className="ss-bot-checkbox-scroll-auto">
-      <CheckboxCustom
-        label="ログイン済み時に表示しない"
-        onChange={(value) => {
-          selectedMessage.not_display_when_logged_in = value;
-          setDataMessages([...dataMessages]);
-        }}
-        value={selectedMessage.not_display_when_logged_in}
-      />
-    </div>
-    <div className="ss-bot-checkbox-scroll-auto">
-      <CheckboxCustom
-        label="エラー発生の時に表示しない"
-        onChange={(value) => {
-          selectedMessage.not_display_when_have_error = value;
-          setDataMessages([...dataMessages]);
-        }}
-        value={selectedMessage.not_display_when_have_error}
       />
     </div>
     {renderRootFaqOption('ss-bot-checkbox-scroll-auto')}

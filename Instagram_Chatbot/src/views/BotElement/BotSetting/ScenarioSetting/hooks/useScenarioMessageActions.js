@@ -7,6 +7,7 @@ import { S3_UPLOAD_URL } from '../../../../../variables/constants';
 import { tokenExpired } from 'api/tokenExpired';
 import { createDefaultContentItem, getNextContentId } from '../utils/scenarioContentDefaults';
 import { DEFAULT_AMAZON_PAY_BUTTON_CONFIG } from '../../../../../variables/amazonPayConstants';
+import { applyAmazonPayDisplayModeToConditions } from '../utils/amazonPayConfigUtils';
 
 const _ = require('lodash');
 
@@ -670,6 +671,12 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
     setDataMessages([...dataMessages]);
   }, [dataMessages, indexMessageSelect, setDataMessages]);
 
+  const onChangeAmazonPayDisplayMode = useCallback((mode) => {
+    const message = dataMessages[indexMessageSelect];
+    message.conditions = applyAmazonPayDisplayModeToConditions(message.conditions || [], mode);
+    setDataMessages([...dataMessages]);
+  }, [dataMessages, indexMessageSelect, setDataMessages]);
+
   const handleDownloadFile = useCallback((file) => {
     const link = document.createElement('a');
     link.href = file;
@@ -725,6 +732,7 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
     onChangeValueCondition,
     onClickAddCondition,
     handleDeleteCondition,
+    onChangeAmazonPayDisplayMode,
     handleDownloadFile,
     isColor,
   };

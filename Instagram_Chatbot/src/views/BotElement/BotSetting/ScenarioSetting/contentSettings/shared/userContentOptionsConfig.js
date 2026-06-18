@@ -3,8 +3,6 @@
  */
 export const USER_CONTENT_OPTIONS_CONFIG = {
   text_input: {
-    hideWhenLoggedIn: true,
-    hideWhenError: true,
     faq: true,
     noAutoScroll: false,
     saveToVariable: true,
@@ -19,8 +17,6 @@ export const USER_CONTENT_OPTIONS_CONFIG = {
     },
   },
   image: {
-    hideWhenLoggedIn: true,
-    hideWhenError: true,
     faq: true,
     noAutoScroll: true,
     saveToVariable: true,
@@ -36,8 +32,6 @@ export const USER_CONTENT_OPTIONS_CONFIG = {
     },
   },
   textarea: {
-    hideWhenLoggedIn: true,
-    hideWhenError: true,
     faq: true,
     noAutoScroll: false,
     saveToVariable: true,
@@ -46,8 +40,6 @@ export const USER_CONTENT_OPTIONS_CONFIG = {
     displayContinueButton: false,
   },
   pull_down: {
-    hideWhenLoggedIn: true,
-    hideWhenError: true,
     faq: true,
     noAutoScroll: false,
     saveToVariable: true,
@@ -57,8 +49,6 @@ export const USER_CONTENT_OPTIONS_CONFIG = {
     requireStandalone: true,
   },
   checkbox: {
-    hideWhenLoggedIn: true,
-    hideWhenError: true,
     faq: true,
     noAutoScroll: false,
     saveToVariable: true,
@@ -68,8 +58,6 @@ export const USER_CONTENT_OPTIONS_CONFIG = {
     requireStandalone: true,
   },
   radio_button: {
-    hideWhenLoggedIn: true,
-    hideWhenError: true,
     faq: true,
     noAutoScroll: false,
     saveToVariable: true,
@@ -79,8 +67,6 @@ export const USER_CONTENT_OPTIONS_CONFIG = {
     requireStandalone: true,
   },
   calendar: {
-    hideWhenLoggedIn: true,
-    hideWhenError: true,
     faq: true,
     noAutoScroll: false,
     saveToVariable: false,
@@ -89,8 +75,6 @@ export const USER_CONTENT_OPTIONS_CONFIG = {
     displayContinueButton: false,
   },
   card_payment_radio_button: {
-    hideWhenLoggedIn: true,
-    hideWhenError: true,
     faq: true,
     noAutoScroll: false,
     saveToVariable: false,
@@ -99,8 +83,6 @@ export const USER_CONTENT_OPTIONS_CONFIG = {
     displayContinueButton: false,
   },
   shipping_address: {
-    hideWhenLoggedIn: true,
-    hideWhenError: true,
     faq: true,
     noAutoScroll: false,
     saveToVariable: false,
@@ -109,8 +91,6 @@ export const USER_CONTENT_OPTIONS_CONFIG = {
     displayContinueButton: false,
   },
   credit_card_payment: {
-    hideWhenLoggedIn: true,
-    hideWhenError: true,
     faq: true,
     noAutoScroll: false,
     saveToVariable: false,
@@ -119,8 +99,6 @@ export const USER_CONTENT_OPTIONS_CONFIG = {
     displayContinueButton: false,
   },
   product_purchase: {
-    hideWhenLoggedIn: true,
-    hideWhenError: true,
     faq: true,
     noAutoScroll: false,
     saveToVariable: false,
@@ -129,8 +107,6 @@ export const USER_CONTENT_OPTIONS_CONFIG = {
     displayContinueButton: false,
   },
   product_purchase_radio_button: {
-    hideWhenLoggedIn: true,
-    hideWhenError: true,
     faq: true,
     noAutoScroll: false,
     saveToVariable: false,
@@ -139,8 +115,6 @@ export const USER_CONTENT_OPTIONS_CONFIG = {
     displayContinueButton: false,
   },
   product_purchase_select_option: {
-    hideWhenLoggedIn: true,
-    hideWhenError: true,
     faq: true,
     noAutoScroll: false,
     saveToVariable: false,
@@ -149,8 +123,6 @@ export const USER_CONTENT_OPTIONS_CONFIG = {
     displayContinueButton: false,
   },
   slider: {
-    hideWhenLoggedIn: true,
-    hideWhenError: true,
     faq: true,
     noAutoScroll: false,
     saveToVariable: true,
@@ -159,8 +131,6 @@ export const USER_CONTENT_OPTIONS_CONFIG = {
     displayContinueButton: false,
   },
   zip_code_address: {
-    hideWhenLoggedIn: true,
-    hideWhenError: true,
     faq: true,
     noAutoScroll: false,
     saveToVariable: true,
@@ -176,8 +146,6 @@ export const USER_CONTENT_OPTIONS_CONFIG = {
     },
   },
   attaching_file: {
-    hideWhenLoggedIn: true,
-    hideWhenError: true,
     faq: true,
     noAutoScroll: false,
     saveToVariable: false,
@@ -186,8 +154,6 @@ export const USER_CONTENT_OPTIONS_CONFIG = {
     displayContinueButton: false,
   },
   agree_term: {
-    hideWhenLoggedIn: true,
-    hideWhenError: true,
     faq: true,
     noAutoScroll: false,
     saveToVariable: false,
@@ -196,8 +162,6 @@ export const USER_CONTENT_OPTIONS_CONFIG = {
     displayContinueButton: false,
   },
   carousel: {
-    hideWhenLoggedIn: true,
-    hideWhenError: true,
     faq: true,
     noAutoScroll: false,
     saveToVariable: false,
@@ -206,8 +170,6 @@ export const USER_CONTENT_OPTIONS_CONFIG = {
     displayContinueButton: false,
   },
   capture: {
-    hideWhenLoggedIn: false,
-    hideWhenError: false,
     faq: false,
     noAutoScroll: false,
     saveToVariable: false,
@@ -216,8 +178,6 @@ export const USER_CONTENT_OPTIONS_CONFIG = {
     displayContinueButton: false,
   },
   sms_verify: {
-    hideWhenLoggedIn: true,
-    hideWhenError: true,
     faq: true,
     noAutoScroll: false,
     saveToVariable: false,
@@ -226,8 +186,6 @@ export const USER_CONTENT_OPTIONS_CONFIG = {
     displayContinueButton: false,
   },
   AFTEE_payment_module: {
-    hideWhenLoggedIn: false,
-    hideWhenError: false,
     faq: false,
     noAutoScroll: false,
     saveToVariable: false,
@@ -236,8 +194,6 @@ export const USER_CONTENT_OPTIONS_CONFIG = {
     displayContinueButton: false,
   },
   button_submit: {
-    hideWhenLoggedIn: true,
-    hideWhenError: true,
     faq: true,
     noAutoScroll: false,
     saveToVariable: false,
@@ -246,8 +202,6 @@ export const USER_CONTENT_OPTIONS_CONFIG = {
     displayContinueButton: false,
   },
   label: {
-    hideWhenLoggedIn: false,
-    hideWhenError: false,
     faq: false,
     noAutoScroll: false,
     saveToVariable: false,
@@ -256,8 +210,6 @@ export const USER_CONTENT_OPTIONS_CONFIG = {
     displayContinueButton: false,
   },
   label_no_transition: {
-    hideWhenLoggedIn: false,
-    hideWhenError: false,
     faq: false,
     noAutoScroll: false,
     saveToVariable: false,

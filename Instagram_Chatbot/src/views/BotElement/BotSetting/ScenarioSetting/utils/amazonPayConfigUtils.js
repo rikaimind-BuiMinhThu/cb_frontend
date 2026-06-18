@@ -1,9 +1,54 @@
 import {
+  AMAZON_PAY_DISPLAY_MODES,
+  AMAZON_PAY_URL_FLAG,
   DEFAULT_AMAZON_DETECTION,
   DEFAULT_AMAZON_PAY_CONFIG,
   FUKUSHIASHIKI_SELECTOR_VALUE_SUFFIX,
   normalizeAmazonPayConfig,
 } from '../../../../../variables/amazonPayConstants';
+
+const isManagedAmazonPayDisplayCondition = (condition) => (
+  condition?.nameCondition === 'current_url'
+  && condition?.inputCondition === AMAZON_PAY_URL_FLAG
+  && (condition?.condition === 'include' || condition?.condition === 'not_include')
+);
+
+export const getAmazonPayDisplayModeFromConditions = (conditions = []) => {
+  const amazonCondition = conditions.find(isManagedAmazonPayDisplayCondition);
+  if (!amazonCondition) return AMAZON_PAY_DISPLAY_MODES.ALWAYS;
+  return amazonCondition.condition === 'include'
+    ? AMAZON_PAY_DISPLAY_MODES.DISPLAY_WHEN
+    : AMAZON_PAY_DISPLAY_MODES.UNDISPLAY_WHEN;
+};
+
+export const hasActiveSpecialDisplayConditions = (message, isUseFukushashiki = false) => {
+  if (!message) return false;
+  if (message.not_display_when_logged_in || message.not_display_when_have_error) return true;
+  if (!isUseFukushashiki) return false;
+  return getAmazonPayDisplayModeFromConditions(message.conditions) !== AMAZON_PAY_DISPLAY_MODES.ALWAYS;
+};
+
+export const applyAmazonPayDisplayModeToConditions = (conditions = [], mode) => {
+  const filtered = conditions.filter((condition) => !isManagedAmazonPayDisplayCondition(condition));
+
+  if (mode === AMAZON_PAY_DISPLAY_MODES.DISPLAY_WHEN) {
+    filtered.push({
+      linkCondition: 'and',
+      condition: 'include',
+      nameCondition: 'current_url',
+      inputCondition: AMAZON_PAY_URL_FLAG,
+    });
+  } else if (mode === AMAZON_PAY_DISPLAY_MODES.UNDISPLAY_WHEN) {
+    filtered.push({
+      linkCondition: 'and',
+      condition: 'not_include',
+      nameCondition: 'current_url',
+      inputCondition: AMAZON_PAY_URL_FLAG,
+    });
+  }
+
+  return filtered;
+};
 
 export const normalizeLpDomain = (input) => {
   if (!input || typeof input !== 'string') return '';

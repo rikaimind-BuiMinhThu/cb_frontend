@@ -60,7 +60,7 @@ export const useScenarioPanelDestructuring = () => {
     handleRemoveItemCustomizePullDown, handleRemoveItemProductPullDown,
     handleRemoveItemZipCodeAddress, createVariable, onClickCreateStatement,
     handlePannelCondition, onChangeValueCondition, onClickAddCondition,
-    handleDeleteCondition, handleDownloadFile, isColor,
+    handleDeleteCondition, onChangeAmazonPayDisplayMode, handleDownloadFile, isColor,
   } = messages;
 
   const {
@@ -119,7 +119,7 @@ export const useScenarioPanelDestructuring = () => {
     handleRemoveItemCustomizePullDown, handleRemoveItemProductPullDown,
     handleRemoveItemZipCodeAddress, createVariable, onClickCreateStatement,
     handlePannelCondition, onChangeValueCondition, onClickAddCondition,
-    handleDeleteCondition, handleDownloadFile, isColor,
+    handleDeleteCondition, onChangeAmazonPayDisplayMode, handleDownloadFile, isColor,
     renderPaymentMethodDescriptionInput, renderRootFaqOption, renderAddressField,
     renderBuildingName, renderMunicipality, renderPostCode, renderZipCodeAddressTitle,
     renderPrefecture, renderLPIntegrationOptionSetting, renderLPIntegrationOptionPreview,
