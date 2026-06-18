@@ -331,6 +331,10 @@
   cursor: pointer;
 }
 
+.ss-layout-option-grid + .ss-layout-option-row {
+  margin-top: 8px;
+}
+
 .ss-layout-checkbox-item {
   display: flex;
   align-items: flex-start;

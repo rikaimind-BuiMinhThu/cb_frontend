@@ -127,6 +127,7 @@ export const parseScenarioResponse = (res) => {
     allowedLpDomains: normalizeAllowedLpDomains(data.allowed_lp_domains || []),
     lpIntegrationMode: data.lp_integration_mode || LP_INTEGRATION_MODES.AUTO,
     amazonPayConfig: parseAmazonPayConfigFromApi(data.amazon_pay_config),
+    isUseAmazonPay: data.is_use_amazon_pay ?? (normalizeAllowedLpDomains(data.allowed_lp_domains || []).length > 0),
   };
 };
 
@@ -166,6 +167,7 @@ export const buildScenarioSavePayload = (state) => {
     allowedLpDomains,
     lpIntegrationMode,
     amazonPayConfig,
+    isUseAmazonPay,
   } = state;
 
   return {
@@ -183,9 +185,12 @@ export const buildScenarioSavePayload = (state) => {
     landing_page_product_url: lpProductUrl,
     is_use_only_regular_order: isUseOnlyRegularOrder,
     is_used_fukushashiki: isUseFukushashiki,
-    allowed_lp_domains: allowedLpDomains,
-    lp_integration_mode: lpIntegrationMode,
-    amazon_pay_config: normalizeAmazonPayConfig(amazonPayConfig),
+    is_use_amazon_pay: isUseAmazonPay,
+    allowed_lp_domains: isUseAmazonPay ? allowedLpDomains : [],
+    lp_integration_mode: isUseAmazonPay ? lpIntegrationMode : LP_INTEGRATION_MODES.AUTO,
+    amazon_pay_config: isUseAmazonPay
+      ? normalizeAmazonPayConfig(amazonPayConfig)
+      : normalizeAmazonPayConfig({}),
     is_used_custom_css: isUseCustomCss,
     custom_css_content: customCssContent.final,
     is_used_custom_js_code: isUseCustomJsCode,

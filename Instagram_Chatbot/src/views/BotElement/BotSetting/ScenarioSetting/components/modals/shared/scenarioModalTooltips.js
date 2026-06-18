@@ -11,6 +11,11 @@ export const SCENARIO_MODAL_TOOLTIPS = {
   isUseErrMsgByJs: 'フォームのエラーメッセージをJSまたはセレクターで取得します。',
   isUseOnlyRegularOrder: '定期注文のみを対象とします。',
   isUseFukushashiki: '複写式チャットボット機能を有効にします。',
+  isUseAmazonPay: 'Amazon Pay連携を有効にします。LP連携モードや許可ドメインを設定できます。',
+  amazonPayLpIntegrationMode: 'Amazon Pay連携時のLP判定方式を選択します。Genericは許可ドメイン設定に基づき、Legacyは既存のドメイン判定ロジックを使用します。AutoはGenericを優先し、利用できない場合はLegacyに切り替えます。',
+  amazonPayAllowedLpDomains: 'Amazon Pay連携を許可するLPのドメインを1行に1件ずつ入力してください。プロトコル（https://）やパスは不要です。',
+  amazonPayPollInterval: 'LPページでAmazon Payの読み込み完了を確認する際の、ポーリング間隔（ミリ秒）です。',
+  amazonPayMaxPollCount: 'Amazon Payの読み込み完了を確認する最大ポーリング回数です。この回数に達しても完了しない場合は処理を中断します。',
   isUsedMessageLoadedPast: '過去のメッセージ履歴を読み込みます。',
   useFullwidthChatbotMobile: 'モバイル端末でチャットボットを全画面表示します。',
   isUsedCrosssell: 'クロスセル商品をカートに自動追加します。',
@@ -70,6 +75,7 @@ export const SETTINGS_MODAL_VIEWS = {
   TIMER: 'timer',
   ERR_MSG: 'errMsg',
   AUTO_LOGOUT: 'autoLogout',
+  AMAZON_PAY: 'amazonPay',
 };
 
 export const SETTINGS_VIEW_TITLES = {
@@ -79,4 +85,5 @@ export const SETTINGS_VIEW_TITLES = {
   [SETTINGS_MODAL_VIEWS.TIMER]: 'タイマーを使用する',
   [SETTINGS_MODAL_VIEWS.ERR_MSG]: 'エラーメッセージ取得設定',
   [SETTINGS_MODAL_VIEWS.AUTO_LOGOUT]: '自動ログアウト設定',
+  [SETTINGS_MODAL_VIEWS.AMAZON_PAY]: 'Amazon Pay 連携設定',
 };

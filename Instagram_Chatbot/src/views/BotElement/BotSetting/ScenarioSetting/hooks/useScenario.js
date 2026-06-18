@@ -139,6 +139,7 @@ export const useScenario = () => {
   const [allowedLpDomainsInput, setAllowedLpDomainsInput] = useState('');
   const [lpIntegrationMode, setLpIntegrationMode] = useState(LP_INTEGRATION_MODES.AUTO);
   const [amazonPayConfig, setAmazonPayConfig] = useState(DEFAULT_AMAZON_PAY_CONFIG);
+  const [isUseAmazonPay, setIsUseAmazonPay] = useState(false);
 
   const [listProductVariants, setListProductVariants] = useState([]);
 
@@ -213,6 +214,7 @@ export const useScenario = () => {
     setAllowedLpDomainsInput((parsed.allowedLpDomains || []).join('\n'));
     setLpIntegrationMode(parsed.lpIntegrationMode || LP_INTEGRATION_MODES.AUTO);
     setAmazonPayConfig(parsed.amazonPayConfig || DEFAULT_AMAZON_PAY_CONFIG);
+    setIsUseAmazonPay(parsed.isUseAmazonPay || false);
   }, []);
 
   const handleGetMessage = useCallback(() => {
@@ -325,11 +327,13 @@ export const useScenario = () => {
     allowedLpDomains: normalizeAllowedLpDomains(allowedLpDomainsInput.split(/[\n,]+/)),
     lpIntegrationMode,
     amazonPayConfig,
+    isUseAmazonPay,
   }), [
     autoLogoutConfig,
     allowedLpDomainsInput,
     lpIntegrationMode,
     amazonPayConfig,
+    isUseAmazonPay,
     coupon,
     customCssContent,
     dataMessages,
@@ -582,6 +586,7 @@ export const useScenario = () => {
       allowedLpDomainsInput,
       lpIntegrationMode,
       amazonPayConfig,
+      isUseAmazonPay,
       listProductVariants,
       isShopifyPaymentScenario,
     },
@@ -669,6 +674,7 @@ export const useScenario = () => {
       setAllowedLpDomainsInput,
       setLpIntegrationMode,
       setAmazonPayConfig,
+      setIsUseAmazonPay,
       setListProductVariants,
       handleGetMessage,
       onClickSaveScenario,
