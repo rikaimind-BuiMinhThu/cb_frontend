@@ -11,6 +11,10 @@ import {
   SETTINGS_MODAL_VIEWS,
 } from '../shared/scenarioModalTooltips';
 import { createEmptyAutoLogoutConfig } from '../../../utils/autoLogoutUtils';
+import SelectCustom from '../../../scenarioComon/SelectCustom';
+import InputNum from '../../../scenarioComon/InputNum';
+import { LP_INTEGRATION_MODES } from '../../../../../../../variables/amazonPayConstants';
+import { validateLpDomain } from '../../../utils/amazonPayConfigUtils';
 
 const labelWithTooltip = (text, tooltipKey) => (
   <>
@@ -41,6 +45,9 @@ const ScenarioSettingsMainView = ({ onClose }) => {
     isUseBtnUpdateTracking,
     useFullwidthChatbotMobile,
     isShopifyPaymentScenario,
+    allowedLpDomainsInput,
+    lpIntegrationMode,
+    amazonPayConfig,
   } = state;
   const {
     setUrlThanks,
@@ -61,10 +68,19 @@ const ScenarioSettingsMainView = ({ onClose }) => {
     setAutoLogoutConfig,
     setIsUseBtnUpdateTracking,
     setUseFullwidthChatbotMobile,
+    setAllowedLpDomainsInput,
+    setLpIntegrationMode,
+    setAmazonPayConfig,
     navigateSettingsModalView,
   } = actions;
 
   const client = contextClient || JSON.parse(sessionStorage.getItem('client') || 'null');
+
+  const invalidLpDomains = (allowedLpDomainsInput || '')
+    .split(/[\n,]+/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .filter((item) => !validateLpDomain(item).valid);
 
   const handleToggleAutoLogout = (checked) => {
     if (!checked) {
@@ -243,6 +259,47 @@ const ScenarioSettingsMainView = ({ onClose }) => {
                 />
               </div>
             </>
+          )}
+          {scenarioType !== 'faq' && isUseFukushashiki && (
+            <div className="ss-layout-form-section" style={{ marginTop: '16px' }}>
+              <h3 className="ss-layout-form-section__title">Amazon Pay 連携設定</h3>
+              <ScenarioFormRow label="LP連携モード">
+                <SelectCustom
+                  value={lpIntegrationMode}
+                  onChange={(value) => setLpIntegrationMode(value)}
+                  data={[
+                    { key: LP_INTEGRATION_MODES.GENERIC, value: 'Generic（設定ベース）' },
+                    { key: LP_INTEGRATION_MODES.LEGACY, value: 'Legacy（既存ドメイン判定）' },
+                    { key: LP_INTEGRATION_MODES.AUTO, value: 'Auto（Generic優先、なければLegacy）' },
+                  ]}
+                />
+              </ScenarioFormRow>
+              <ScenarioFormRow label="許可LPドメイン">
+                <textarea
+                  style={{ width: '100%', minHeight: '90px', padding: '10px', fontSize: '14px' }}
+                  placeholder={'example.jp\nshop.example.jp'}
+                  value={allowedLpDomainsInput}
+                  onChange={(e) => setAllowedLpDomainsInput(e.target.value)}
+                />
+                {invalidLpDomains.length > 0 && (
+                  <div style={{ color: 'rgb(185, 74, 72)', fontSize: '13px', marginTop: '6px' }}>
+                    無効なドメイン: {invalidLpDomains.join(', ')}
+                  </div>
+                )}
+              </ScenarioFormRow>
+              <ScenarioFormRow label="Poll interval (ms)">
+                <InputNum
+                  value={amazonPayConfig?.poll_interval_ms}
+                  onChange={(value) => setAmazonPayConfig((prev) => ({ ...prev, poll_interval_ms: value }))}
+                />
+              </ScenarioFormRow>
+              <ScenarioFormRow label="Max poll count">
+                <InputNum
+                  value={amazonPayConfig?.max_count}
+                  onChange={(value) => setAmazonPayConfig((prev) => ({ ...prev, max_count: value }))}
+                />
+              </ScenarioFormRow>
+            </div>
           )}
           <div className="ss-layout-checkbox-item">
             <ScenarioModalCheckbox

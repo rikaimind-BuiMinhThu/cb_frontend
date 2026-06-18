@@ -5,6 +5,7 @@ import { resolveIconUrl } from "../DesignSetting/utils/designChatbotUtils";
 import "moment/locale/zh-cn";
 import { BOT_MESSAGE_TYPES, RENDER_CHATBOT_CONFIG } from "./Constants";
 import HtmlCodeMessagePreview from "components/BotMessages/HtmlCodeMessagePreview";
+import AmazonPayButtonMessagePreview from "components/BotMessages/AmazonPayButtonMessagePreview";
 import { getElementMessageById } from "./Utils";
 import { replaceVariables } from "./VariablesUtils";
 
@@ -52,6 +53,8 @@ const BotMessage = ({
         return true;
       case BOT_MESSAGE_TYPES.HTML_CODE: 
         return !isUGCUsage(content);
+      case BOT_MESSAGE_TYPES.AMAZON_PAY_BUTTON:
+        return true;
     }
   }
 
@@ -279,6 +282,14 @@ const BotMessage = ({
     )
   }
 
+  const renderAmazonPayButtonContent = () => (
+    <AmazonPayButtonMessagePreview
+      content={content}
+      contentIndex={contentIndex}
+      botInfor={botInfor}
+    />
+  );
+
   const renderHtmlCodeContent = () => {
     return (
       <HtmlCodeMessagePreview
@@ -306,6 +317,8 @@ const BotMessage = ({
         return renderDelayContent();
       case BOT_MESSAGE_TYPES.HTML_CODE:
         return renderHtmlCodeContent();
+      case BOT_MESSAGE_TYPES.AMAZON_PAY_BUTTON:
+        return renderAmazonPayButtonContent();
     }
   }
 

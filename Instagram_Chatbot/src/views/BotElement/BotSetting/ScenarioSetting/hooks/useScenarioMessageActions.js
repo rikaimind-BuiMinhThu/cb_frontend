@@ -6,6 +6,7 @@ import api from '../../../../../api/api-management';
 import { S3_UPLOAD_URL } from '../../../../../variables/constants';
 import { tokenExpired } from 'api/tokenExpired';
 import { createDefaultContentItem, getNextContentId } from '../utils/scenarioContentDefaults';
+import { DEFAULT_AMAZON_PAY_BUTTON_CONFIG } from '../../../../../variables/amazonPayConstants';
 
 const _ = require('lodash');
 
@@ -545,6 +546,7 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
               file: {},
               script: {},
               html_code: {},
+              amazon_pay_button: { ...DEFAULT_AMAZON_PAY_BUTTON_CONFIG },
               delay: {
                 typing_on: false,
               },
@@ -593,6 +595,7 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
               file: {},
               script: {},
               html_code: {},
+              amazon_pay_button: { ...DEFAULT_AMAZON_PAY_BUTTON_CONFIG },
               delay: {},
               api_link_age: {},
               clear_variable: {

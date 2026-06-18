@@ -16,6 +16,7 @@ import { mapAmazonPayDataToMessagesListForBliss } from '../PreviewComponent/Blis
 import { mapAmazonPayDataToMessagesListForRoseMay } from '../PreviewComponent/RoseMayUtils';
 import { mapAmazonPayDataToMessagesListForPhystech } from '../PreviewComponent/PhysTechUtils';
 import { mapAmazonPayDataToMessagesListForYuwaeru, isYuwaeruLP } from '../PreviewComponent/YuwaeruUtils';
+import { mapAmazonPayDataBySelector } from '../PreviewComponent/AmazonPayGenericUtils';
 import {
   RENDER_CHATBOT_CONFIG,
   GETTING_ERROR_NOTIFICATION,
@@ -303,6 +304,13 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
       const newMessagesListForYuwaeru = mapAmazonPayDataToMessagesListForYuwaeru(action.payload, state.messagesList, state.prefecturesList);
       const renderMessagesListForYuwaeru = newMessagesListForYuwaeru.slice(0, state.currentMsgIndex + 1);
       return { ...state, messagesList: newMessagesListForYuwaeru, renderMessagesList: renderMessagesListForYuwaeru};
+    case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_BY_SELECTOR: {
+      const { messagesList, changed } = mapAmazonPayDataBySelector(action.payload, state.messagesList);
+      if (!changed) return state;
+
+      const updatedRenderMessagesList = messagesList.slice(0, state.currentMsgIndex + 1);
+      return { ...state, messagesList, renderMessagesList: updatedRenderMessagesList };
+    }
     case PREVIEW_ACTIONS.UPDATE_LP_FIELD_VALUE: {
       const { messagesList, changed } = applyLpFieldValue(state.messagesList, action.payload);
       if (!changed) return state;

@@ -164,6 +164,494 @@ const CHATBOT_ACTIONS = {
   OPEN_PREVIEW: 'openPreview',
   GET_PREVIEW_ORDER_CONTENT: 'getPreviewOrderContent',
   SET_CHATBOT_CONVERSION_PARAMS_TO_LOCAL_STORAGE: 'setChatbotConversionParamsToLocalStorage',
+  UPDATE_AMAZON_PAY_DATA_BY_SELECTOR: 'updateAmazonPayDataBySelector',
+};
+
+const LP_INTEGRATION_MODES = {
+  GENERIC: 'generic',
+  LEGACY: 'legacy',
+  AUTO: 'auto',
+};
+
+const FUKUSHIASHIKI_SELECTOR_VALUE_SUFFIX = '_fukushashiki_search_value';
+
+const AMAZON_SELECTOR_TO_VALUE_PATH = {
+  left_fukushashiki_search_value: 'text_input.text.valueLeft',
+  right_fukushashiki_search_value: 'text_input.text.valueRight',
+  fukushashiki_search_value: 'text_input.text.value',
+  value_fukushashiki_search_value: 'text_input.text.value',
+  valueConfirm_fukushashiki_search_value: 'text_input.text.valueConfirm',
+  confirm_fukushashiki_search_value: 'text_input.password_confirmation.value',
+  value1_fukushashiki_search_value: 'text_input.phone_number.value1',
+  value2_fukushashiki_search_value: 'text_input.phone_number.value2',
+  value3_fukushashiki_search_value: 'text_input.phone_number.value3',
+  post_code_fukushashiki_search_value: 'zip_code_address.value_post_code',
+  post_code_left_fukushashiki_search_value: 'zip_code_address.value_post_code_left',
+  post_code_right_fukushashiki_search_value: 'zip_code_address.value_post_code_right',
+  prefecture_fukushashiki_search_value: 'zip_code_address.value_prefecture',
+  municipality_fukushashiki_search_value: 'zip_code_address.value_municipality',
+  address_fukushashiki_search_value: 'zip_code_address.value_address',
+  building_name_fukushashiki_search_value: 'zip_code_address.building_name',
+  initial_selection_fukushashiki_search_value: 'radio_button.initial_selection',
+  checkedValue_fukushashiki_search_value: 'checkbox.checkedValue',
+};
+
+const DEFAULT_AMAZON_DETECTION = {
+  match: 'any',
+  strategies: [
+    { type: 'url_param', param: 'amazonCheckoutSessionId' },
+    { type: 'dom_selector', selector: '#amazon_payment_method' },
+  ],
+  ready_when: [],
+};
+
+const DEFAULT_AMAZON_PAY_CONFIG = {
+  poll_interval_ms: 200,
+  max_count: 20,
+  amazon_detection: DEFAULT_AMAZON_DETECTION,
+};
+
+const evaluateAmazonStrategy = (strategy) => {
+  if (!strategy?.type) return false;
+  if (strategy.type === 'url_param') {
+    const param = strategy.param;
+    if (!param) return false;
+    const value = getParam(param);
+    return value != null && String(value).trim() !== '';
+  }
+  if (strategy.type === 'dom_selector') {
+    const selector = strategy.selector;
+    if (!selector) return false;
+    return !!document.querySelector(selector);
+  }
+  return false;
+};
+
+const evaluateAmazonReadyCondition = (condition) => {
+  if (condition?.type !== 'dom_value') return false;
+  const selector = condition.selector;
+  if (!selector) return false;
+  const el = document.querySelector(selector);
+  if (!el) return false;
+  return String(el.value || '').trim() !== '';
+};
+
+const isAmazonPayActive = (detection) => {
+  const strategies = detection?.strategies || [];
+  if (!strategies.length) return false;
+  const match = detection?.match || 'any';
+  if (match === 'all') {
+    return strategies.every((strategy) => evaluateAmazonStrategy(strategy));
+  }
+  return strategies.some((strategy) => evaluateAmazonStrategy(strategy));
+};
+
+const isAmazonPayReady = (detection) => {
+  const readyWhen = detection?.ready_when || [];
+  if (!readyWhen.length) return true;
+  return readyWhen.every((condition) => evaluateAmazonReadyCondition(condition));
+};
+
+const normalizeLpDomain = (input) => {
+  if (!input || typeof input !== 'string') return '';
+  let domain = input.trim().toLowerCase();
+  domain = domain.replace(/^https?:\/\//, '');
+  domain = domain.split('/')[0].split('?')[0].split('#')[0];
+  domain = domain.replace(/^www\./, '');
+  return domain;
+};
+
+const isHostnameAllowedForLp = (hostname, allowedDomains) => {
+  const host = normalizeLpDomain(hostname);
+  if (!host) return false;
+  return (allowedDomains || []).some((domain) => host === domain || host.endsWith(`.${domain}`));
+};
+
+const splitSourceSelectors = (rawValue) => {
+  if (typeof rawValue !== 'string') return [];
+  return rawValue.split(',').map((selector) => selector.trim()).filter(Boolean);
+};
+
+const buildBindingsFromSelectorKey = ({ selectorKeyType, rawValue, valuePath }) => {
+  if (!selectorKeyType || !valuePath) return [];
+  return splitSourceSelectors(rawValue).map((sourceSelector) => ({
+    selectorKeyType,
+    sourceSelector,
+    valuePath,
+  }));
+};
+
+const bindingsFromFieldTypes = ({
+  content,
+  fieldTypes,
+  getSelectorKeyType,
+  getValuePath,
+  shouldIncludeField = () => true,
+}) => {
+  const bindings = [];
+  fieldTypes.forEach((fieldType) => {
+    if (!shouldIncludeField(fieldType, content)) return;
+    const selectorKeyType = getSelectorKeyType(fieldType);
+    const valuePath = getValuePath(fieldType);
+    const rawValue = content[selectorKeyType];
+    bindings.push(...buildBindingsFromSelectorKey({ selectorKeyType, rawValue, valuePath }));
+  });
+  return bindings;
+};
+
+const appendBinding = (bindings, seen, binding) => {
+  if (!binding?.selectorKeyType || !binding?.sourceSelector || !binding?.valuePath) return;
+  const dedupeKey = `${binding.selectorKeyType}::${binding.sourceSelector}`;
+  if (seen.has(dedupeKey)) return;
+  seen.add(dedupeKey);
+  bindings.push(binding);
+};
+
+const appendBindings = (bindings, seen, newBindings) => {
+  (newBindings || []).forEach((binding) => appendBinding(bindings, seen, binding));
+};
+
+const ZIP_FIELD_TYPES = [
+  'post_code', 'post_code_left', 'post_code_right', 'prefecture', 'municipality', 'address', 'building_name',
+];
+
+const SHIPPING_FIELD_TYPES = [
+  'number1', 'number2', 'number3', 'number', 'name_left', 'name_right', 'kana_left', 'kana_right',
+  'building_name', 'address', 'municipality', 'prefecture', 'post_code', 'post_code_left', 'post_code_right',
+  'initial_selection',
+];
+
+const CARD_PAYMENT_FIELD_TYPES = [
+  'card_number', 'card_holder1', 'card_holder2', 'card_holder', 'year', 'month', 'cvc',
+  'card_number1', 'card_number2', 'card_number3', 'card_number4', 'installment', 'initial_selection',
+];
+
+const extractTextInputBindings = (content) => {
+  const bindings = [];
+  const inputType = content.text_input?.type;
+  switch (inputType) {
+    case 'text':
+      if (content.text_input?.text?.isSplitInput) {
+        bindings.push(
+          ...buildBindingsFromSelectorKey({
+            selectorKeyType: 'left_fukushashiki_search_value',
+            rawValue: content.left_fukushashiki_search_value,
+            valuePath: 'text_input.text.valueLeft',
+          }),
+          ...buildBindingsFromSelectorKey({
+            selectorKeyType: 'right_fukushashiki_search_value',
+            rawValue: content.right_fukushashiki_search_value,
+            valuePath: 'text_input.text.valueRight',
+          }),
+        );
+      }
+      bindings.push(...buildBindingsFromSelectorKey({
+        selectorKeyType: 'fukushashiki_search_value',
+        rawValue: content.fukushashiki_search_value,
+        valuePath: 'text_input.text.value',
+      }));
+      break;
+    case 'phone_number':
+      if (content.text_input?.phone_number?.withHyphen === false) {
+        bindings.push(...buildBindingsFromSelectorKey({
+          selectorKeyType: 'fukushashiki_search_value',
+          rawValue: content.fukushashiki_search_value,
+          valuePath: 'text_input.phone_number.value',
+        }));
+        break;
+      }
+      bindings.push(...bindingsFromFieldTypes({
+        content,
+        fieldTypes: ['value1', 'value2', 'value3'],
+        getSelectorKeyType: (fieldType) => `${fieldType}_fukushashiki_search_value`,
+        getValuePath: (fieldType) => `text_input.phone_number.${fieldType}`,
+      }));
+      break;
+    case 'email_confirmation':
+      bindings.push(
+        ...buildBindingsFromSelectorKey({
+          selectorKeyType: 'value_fukushashiki_search_value',
+          rawValue: content.value_fukushashiki_search_value,
+          valuePath: `text_input.${inputType}.value`,
+        }),
+        ...buildBindingsFromSelectorKey({
+          selectorKeyType: 'valueConfirm_fukushashiki_search_value',
+          rawValue: content.valueConfirm_fukushashiki_search_value,
+          valuePath: `text_input.${inputType}.valueConfirm`,
+        }),
+      );
+      break;
+    case 'password_confirmation':
+      bindings.push(
+        ...buildBindingsFromSelectorKey({
+          selectorKeyType: 'fukushashiki_search_value',
+          rawValue: content.fukushashiki_search_value,
+          valuePath: 'text_input.password_confirmation.value',
+        }),
+        ...buildBindingsFromSelectorKey({
+          selectorKeyType: 'confirm_fukushashiki_search_value',
+          rawValue: content.confirm_fukushashiki_search_value,
+          valuePath: 'text_input.password_confirmation.valueConfirm',
+        }),
+      );
+      break;
+    case 'email_address':
+    case 'urls':
+    case 'password':
+      bindings.push(...buildBindingsFromSelectorKey({
+        selectorKeyType: 'fukushashiki_search_value',
+        rawValue: content.fukushashiki_search_value,
+        valuePath: `text_input.${inputType}.value`,
+      }));
+      break;
+    default:
+      break;
+  }
+  return bindings;
+};
+
+const extractZipCodeAddressBindings = (content) => bindingsFromFieldTypes({
+  content,
+  fieldTypes: ZIP_FIELD_TYPES,
+  getSelectorKeyType: (fieldType) => `${fieldType}_fukushashiki_search_value`,
+  getValuePath: (fieldType) => (fieldType === 'building_name'
+    ? 'zip_code_address.building_name'
+    : `zip_code_address.value_${fieldType}`),
+  shouldIncludeField: (fieldType) => fieldType !== 'await',
+});
+
+const extractShippingAddressBindings = (content) => bindingsFromFieldTypes({
+  content,
+  fieldTypes: SHIPPING_FIELD_TYPES,
+  getSelectorKeyType: (fieldType) => `${fieldType}_fukushashiki_search_value`,
+  getValuePath: (fieldType) => `shipping_address.value_${fieldType}`,
+  shouldIncludeField: (fieldType, item) => {
+    const bindingMode = item[`${fieldType}_fukushashiki_search_mode`];
+    const bindingValue = item[`${fieldType}_fukushashiki_search_value`];
+    return bindingMode !== undefined && bindingValue !== undefined && bindingValue !== '';
+  },
+});
+
+const extractCardPaymentBindings = (content) => bindingsFromFieldTypes({
+  content,
+  fieldTypes: CARD_PAYMENT_FIELD_TYPES,
+  getSelectorKeyType: (fieldType) => `${fieldType}_fukushashiki_search_value`,
+  getValuePath: (fieldType) => `${content.type}.${fieldType}`,
+});
+
+const extractCheckboxBindings = (content) => buildBindingsFromSelectorKey({
+  selectorKeyType: 'checkedValue_fukushashiki_search_value',
+  rawValue: content.checkedValue_fukushashiki_search_value,
+  valuePath: 'checkbox.checkedValue',
+});
+
+const extractRadioButtonBindings = (content) => buildBindingsFromSelectorKey({
+  selectorKeyType: 'initial_selection_fukushashiki_search_value',
+  rawValue: content.initial_selection_fukushashiki_search_value,
+  valuePath: 'radio_button.initial_selection',
+});
+
+const extractTextareaBindings = (content) => buildBindingsFromSelectorKey({
+  selectorKeyType: 'fukushashiki_search_value',
+  rawValue: content.fukushashiki_search_value,
+  valuePath: 'textarea.text_input.value',
+});
+
+const extractBindingsFromContent = (content) => {
+  if (!content?.type) return [];
+  switch (content.type) {
+    case 'text_input': return extractTextInputBindings(content);
+    case 'zip_code_address': return extractZipCodeAddressBindings(content);
+    case 'shipping_address': return extractShippingAddressBindings(content);
+    case 'card_payment_radio_button':
+    case 'credit_card_payment': return extractCardPaymentBindings(content);
+    case 'checkbox': return extractCheckboxBindings(content);
+    case 'radio_button': return extractRadioButtonBindings(content);
+    case 'textarea': return extractTextareaBindings(content);
+    default: return [];
+  }
+};
+
+const resolveValuePath = (selectorKeyType, content) => {
+  if (AMAZON_SELECTOR_TO_VALUE_PATH[selectorKeyType]) {
+    return AMAZON_SELECTOR_TO_VALUE_PATH[selectorKeyType];
+  }
+  const inputType = content?.text_input?.type || 'text';
+  if (selectorKeyType === 'value_fukushashiki_search_value') {
+    return `text_input.${inputType}.value`;
+  }
+  if (selectorKeyType === 'valueConfirm_fukushashiki_search_value') {
+    return `text_input.${inputType}.valueConfirm`;
+  }
+  const phoneMatch = selectorKeyType.match(/^value([123])_fukushashiki_search_value$/);
+  if (phoneMatch) {
+    return `text_input.phone_number.value${phoneMatch[1]}`;
+  }
+  console.warn('[AmazonPay] unresolved valuePath for selector key:', selectorKeyType);
+  return null;
+};
+
+const extractGenericFallbackBindings = (content) => {
+  const bindings = [];
+  Object.entries(content || {}).forEach(([selectorKeyType, rawValue]) => {
+    if (!selectorKeyType.endsWith(FUKUSHIASHIKI_SELECTOR_VALUE_SUFFIX)) return;
+    const valuePath = resolveValuePath(selectorKeyType, content);
+    if (!valuePath) return;
+    bindings.push(...buildBindingsFromSelectorKey({ selectorKeyType, rawValue, valuePath }));
+  });
+  return bindings;
+};
+
+const extractSelectorBindingsFromMessages = (messages) => {
+  const bindings = [];
+  const seen = new Set();
+  (messages || [])
+    .filter((msg) => msg.belong_to === 'user' && msg.is_used_when_amazon_pay)
+    .forEach((msg) => {
+      (msg.message_content || []).forEach((content, contentIndex) => {
+        const meta = { messageId: msg.id, contentIndex };
+        appendBindings(bindings, seen, extractBindingsFromContent(content).map((binding) => ({ ...binding, ...meta })));
+        appendBindings(bindings, seen, extractGenericFallbackBindings(content).map((binding) => ({ ...binding, ...meta })));
+      });
+    });
+  return bindings;
+};
+
+const collectSelectorValuesFromBindings = (bindings) => {
+  const selectorValues = [];
+  (bindings || []).forEach(({ selectorKeyType, sourceSelector, valuePath }) => {
+    if (!sourceSelector || !valuePath) return;
+    const el = document.querySelector(sourceSelector);
+    if (!el) return;
+    const value = (el.value || '').trim();
+    if (!value) return;
+    selectorValues.push({ selectorKeyType, sourceSelector, valuePath, value });
+  });
+  return selectorValues;
+};
+
+const buildAmazonSelectorPayload = ({ scenarioMessages, selectorBindings, cartSystem, domain }) => {
+  const bindings = (selectorBindings && selectorBindings.length)
+    ? selectorBindings
+    : extractSelectorBindingsFromMessages(scenarioMessages);
+  const selectorValues = collectSelectorValuesFromBindings(bindings);
+  return {
+    meta: { cartSystem, domain, configVersion: 1, source: 'sdk-v2' },
+    selectorValues,
+  };
+};
+
+const normalizeEcchAmazonSelectorValues = (selectorValues) => {
+  const normalized = [];
+  (selectorValues || []).forEach((item) => {
+    const { selectorKeyType, sourceSelector, valuePath, value } = item || {};
+    if (!selectorKeyType || !sourceSelector || !valuePath) {
+      console.warn('[ecchAmazon] skip item missing selectorKeyType/sourceSelector/valuePath:', item);
+      return;
+    }
+    normalized.push({ selectorKeyType, sourceSelector, valuePath, value });
+  });
+  return normalized;
+};
+
+const safeGetAmazonPayload = async () => {
+  if (typeof window.ecchAmazon !== 'function') return null;
+  try {
+    const payload = await window.ecchAmazon();
+    if (!payload || !Array.isArray(payload.selectorValues)) return null;
+    const selectorValues = normalizeEcchAmazonSelectorValues(payload.selectorValues);
+    if (!selectorValues.length) return null;
+    return { ...payload, selectorValues };
+  } catch (err) {
+    console.warn('[ecchAmazon] invalid contract:', err);
+    return null;
+  }
+};
+
+const sendAmazonPayDataBySelector = (payload) => {
+  if (!payload?.selectorValues?.length) return;
+  sendMessageToChatbot(payload, CHATBOT_ACTIONS.UPDATE_AMAZON_PAY_DATA_BY_SELECTOR);
+};
+
+const waitToLoadAmazonGeneric = (iframe, amazonConfig) => {
+  const config = { ...DEFAULT_AMAZON_PAY_CONFIG, ...(amazonConfig?.amazon_pay_config || {}) };
+  const detection = config.amazon_detection || DEFAULT_AMAZON_DETECTION;
+  const cartSystem = amazonConfig?.cart_system;
+  const selectorBindings = amazonConfig?.selector_bindings || [];
+  const targetMessages = amazonConfig?.target_messages || amazonConfig?.messages || [];
+  let count = 0;
+  let sent = false;
+  let amazonPayFlagSet = false;
+
+  const interval = setInterval(async () => {
+    count++;
+    if (!amazonPayFlagSet && isAmazonPayActive(detection)) {
+      iframe.src += '&is_using_amazon_pay=true';
+      amazonPayFlagSet = true;
+    }
+    if (!isAmazonPayReady(detection)) {
+      if (count >= config.max_count) {
+        appendIframeToBody(iframe);
+        clearInterval(interval);
+      }
+      return;
+    }
+    let payload = await safeGetAmazonPayload();
+    if (!payload) {
+      payload = buildAmazonSelectorPayload({
+        selectorBindings,
+        scenarioMessages: targetMessages,
+        cartSystem,
+        domain: window.location.hostname,
+      });
+    }
+    if (payload?.selectorValues?.length) {
+      if (!sent) {
+        appendIframeToBody(iframe);
+        setTimeout(() => sendAmazonPayDataBySelector(payload), 500);
+        sent = true;
+      }
+      clearInterval(interval);
+      return;
+    }
+    if (count >= config.max_count) {
+      appendIframeToBody(iframe);
+      clearInterval(interval);
+    }
+  }, config.poll_interval_ms);
+};
+
+const hasAmazonPayTargets = (messages) => (
+  (messages || []).some((msg) => msg.belong_to === 'user' && msg.is_used_when_amazon_pay)
+);
+
+const canRunGenericAmazon = (hostname, scenarioConfig) => (
+  isHostnameAllowedForLp(hostname, scenarioConfig?.allowed_lp_domains)
+  && hasAmazonPayTargets(scenarioConfig?.messages)
+  && extractSelectorBindingsFromMessages(scenarioConfig?.messages).length > 0
+);
+
+const resolveLegacyLpMode = (href) => {
+  if (isTorizenLP(href)) return 'LEGACY_TORIZEN';
+  if (isYuwaeruLP(href)) return 'LEGACY_YUWAERU';
+  if (isBlissLp(href) || isPhystechLp(href) || isRoseMayLp(href)) return 'LEGACY_ECFORCE';
+  return 'DEFAULT';
+};
+
+const resolveLpMode = ({ hostname, scenarioConfig }) => {
+  const mode = scenarioConfig?.lp_integration_mode || LP_INTEGRATION_MODES.AUTO;
+  const genericReady = canRunGenericAmazon(hostname, scenarioConfig);
+  if (mode === LP_INTEGRATION_MODES.GENERIC) {
+    return genericReady ? 'GENERIC' : 'DEFAULT';
+  }
+  if (mode === LP_INTEGRATION_MODES.LEGACY) {
+    return resolveLegacyLpMode(window.location.href);
+  }
+  if (mode === LP_INTEGRATION_MODES.AUTO) {
+    if (genericReady) return 'GENERIC';
+    return resolveLegacyLpMode(window.location.href);
+  }
+  return 'DEFAULT';
 };
 
 const CUSTOM_JS_CODE_POSITION = {
@@ -617,7 +1105,19 @@ const displayPopup = async () => {
     ecRunEcForceSessionLandingLogout();
   }
   scenarioId = data.data.id;
-  
+
+  const scenarioMessages = data.data?.messages || [];
+  const selectorBindings = extractSelectorBindingsFromMessages(scenarioMessages);
+  const amazonRuntimeConfig = {
+    allowed_lp_domains: data.data?.allowed_lp_domains || [],
+    lp_integration_mode: data.data?.lp_integration_mode || LP_INTEGRATION_MODES.AUTO,
+    amazon_pay_config: data.data?.amazon_pay_config || {},
+    messages: scenarioMessages,
+    target_messages: scenarioMessages,
+    selector_bindings: selectorBindings,
+    cart_system: data.cart_system,
+  };
+
   let iframe = document.createElement("iframe");
 
   if (mobileCheck()) {
@@ -654,14 +1154,27 @@ const displayPopup = async () => {
   // only for amazon
   // add param amazonCheckoutSessionId to iframe src
 
-  if (isTorizenLP(window.location.href)) {
-    waitToLoadAmazonSubscstore(iframe);
-  } else if (isYuwaeruLP(window.location.href)) {
-    loadIframeForW2Repeat(iframe);
-  } else if (isBlissLp(window.location.href) || isPhystechLp(window.location.href) || isRoseMayLp(window.location.href)) {
-    waitToLoadAmazonEcForce(iframe);
-  } else {
-    appendIframeToBody(iframe);
+  const lpMode = resolveLpMode({
+    hostname: window.location.hostname,
+    scenarioConfig: amazonRuntimeConfig,
+  });
+
+  switch (lpMode) {
+    case 'GENERIC':
+      waitToLoadAmazonGeneric(iframe, amazonRuntimeConfig);
+      break;
+    case 'LEGACY_TORIZEN':
+      waitToLoadAmazonSubscstore(iframe);
+      break;
+    case 'LEGACY_YUWAERU':
+      loadIframeForW2Repeat(iframe);
+      break;
+    case 'LEGACY_ECFORCE':
+      waitToLoadAmazonEcForce(iframe);
+      break;
+    default:
+      appendIframeToBody(iframe);
+      break;
   }
 
   window.addEventListener(
@@ -691,28 +1204,44 @@ const displayPopup = async () => {
           break;
         case CHATBOT_ACTIONS.CLICK_BUTTON:
           (function() {
-            const button = document.getElementById(e.data.actionData);
-            if (!button) {
-              const err = new Error(`Button not found: id ${e.data.actionData}`);
-              try {
-                if (window.Sentry) {
-                  window.Sentry.captureException(err);
-                  console.log('Sentry captured missing button error:', e.data.actionData);
-                } else {
-                  console.warn('Button not found (Sentry not available):', e.data.actionData);
+            const data = e.data.actionData;
+
+            const clickElement = (button) => {
+              if (!button) {
+                const target = typeof data === 'string' ? data : data?.searchValue;
+                const err = new Error(`Button not found: ${target}`);
+                try {
+                  if (window.Sentry) {
+                    window.Sentry.captureException(err);
+                    console.log('Sentry captured missing button error:', target);
+                  } else {
+                    console.warn('Button not found (Sentry not available):', target);
+                  }
+                } catch (captureErr) {
+                  console.warn('Error while sending missing-button to Sentry', captureErr);
                 }
-              } catch (captureErr) {
-                console.warn('Error while sending missing-button to Sentry', captureErr);
+                return;
               }
-              return; // don't throw — we've reported it
+
+              try {
+                button.click();
+              } catch (clickErr) {
+                try { if (window.Sentry) window.Sentry.captureException(clickErr); } catch (err) { /* ignore */ }
+                throw clickErr;
+              }
+            };
+
+            if (typeof data === 'string') {
+              clickElement(document.getElementById(data));
+              return;
             }
 
-            try {
-              button.click();
-            } catch (clickErr) {
-              try { if (window.Sentry) window.Sentry.captureException(clickErr); } catch (e) { /* ignore */ }
-              throw clickErr;
+            if (data && data.searchMode && data.searchValue) {
+              clickElement(getElementByAddress(data.searchMode, data.searchValue));
+              return;
             }
+
+            console.warn('[CLICK_BUTTON] Invalid actionData:', data);
           })();
           break;
         case CHATBOT_ACTIONS.GET_PREVIEW_ORDER_CONTENT:

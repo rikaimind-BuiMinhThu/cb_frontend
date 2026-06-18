@@ -77,7 +77,8 @@ const ScenarioEditorModals = () => {
                 onChangeValueMessageContent(indexMessageSelect, varFileReference.indexContent, varFileReference.contentType, file_url, varFileReference.subContentType, varFileReference.indexSubContent, varFileReference.img);
               }
             } else {
-              onChangeValueMessageContent(indexMessageSelect, 0, messageType, file_url, 'content');
+              const field = varFileReference.fieldName || 'content';
+              onChangeValueMessageContent(indexMessageSelect, 0, messageType, file_url, field);
             }
             setIsOpenFileReference(false);
           }}

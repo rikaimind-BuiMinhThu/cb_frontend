@@ -6,6 +6,14 @@ import {
   createEmptyAutoLogoutConfig,
   parseAutoLogoutFromApi,
 } from './autoLogoutUtils';
+import {
+  LP_INTEGRATION_MODES,
+  normalizeAmazonPayConfig,
+} from '../../../../../variables/amazonPayConstants';
+import {
+  normalizeAllowedLpDomains,
+  parseAmazonPayConfigFromApi,
+} from './amazonPayConfigUtils';
 
 export const cleanMessageTimerConfig = (config) => {
   const cleanedConfig = { ...config };
@@ -116,6 +124,9 @@ export const parseScenarioResponse = (res) => {
     isUseBtnUpdateTracking: conversation.isUseBtnUpdateTracking || false,
     useFullwidthChatbotMobile: data.use_fullwidth_chatbot_mobile || false,
     timerConfig: parseTimerConfigFromApi(data.timer_config),
+    allowedLpDomains: normalizeAllowedLpDomains(data.allowed_lp_domains || []),
+    lpIntegrationMode: data.lp_integration_mode || LP_INTEGRATION_MODES.AUTO,
+    amazonPayConfig: parseAmazonPayConfigFromApi(data.amazon_pay_config),
   };
 };
 
@@ -152,6 +163,9 @@ export const buildScenarioSavePayload = (state) => {
     productIdCrossSell,
     isClearLandingPageSession,
     autoLogoutConfig,
+    allowedLpDomains,
+    lpIntegrationMode,
+    amazonPayConfig,
   } = state;
 
   return {
@@ -169,6 +183,9 @@ export const buildScenarioSavePayload = (state) => {
     landing_page_product_url: lpProductUrl,
     is_use_only_regular_order: isUseOnlyRegularOrder,
     is_used_fukushashiki: isUseFukushashiki,
+    allowed_lp_domains: allowedLpDomains,
+    lp_integration_mode: lpIntegrationMode,
+    amazon_pay_config: normalizeAmazonPayConfig(amazonPayConfig),
     is_used_custom_css: isUseCustomCss,
     custom_css_content: customCssContent.final,
     is_used_custom_js_code: isUseCustomJsCode,

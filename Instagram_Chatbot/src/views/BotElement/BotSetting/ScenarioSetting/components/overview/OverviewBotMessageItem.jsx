@@ -9,6 +9,7 @@ import { Carousel, Checkbox, Radio, Slider, Calendar, Select } from 'antd';
 import shopifIcon from '../../../../../../assets/img/shopify-icon.png';
 import locale from 'antd/es/date-picker/locale/ja_JP';
 import { BOT_MESSAGE_TYPES } from '../../../PreviewComponent/Constants';
+import { DEFAULT_AMAZON_PAY_BUTTON_IMAGE_URL } from '../../../../../../variables/amazonPayConstants';
 import { PREVIEW_MAP } from '../../contentPreviews';
 import {
   getCalendarPreviewRelativeRangeLabel,
@@ -136,6 +137,32 @@ const OverviewBotMessageItem = ({
                     value={''}
                     readOnly
                   ></textarea>
+                )}
+                {/* bot: type == 'amazon_pay_button' */}
+                {content.type === BOT_MESSAGE_TYPES.AMAZON_PAY_BUTTON && (
+                  <div
+                    className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
+                    style={message.hidden === true ? { opacity: '0.4' } : {}}
+                  >
+                    {content.amazon_pay_button?.text_above && (
+                      <div style={{ whiteSpace: 'pre-line', marginBottom: '6px' }}>
+                        {content.amazon_pay_button.text_above}
+                      </div>
+                    )}
+                    <img
+                      src={content.amazon_pay_button?.button_image_url || DEFAULT_AMAZON_PAY_BUTTON_IMAGE_URL}
+                      alt="Amazon Pay"
+                      style={{
+                        width: content.amazon_pay_button?.button_image_width || '80%',
+                        maxWidth: '100%',
+                      }}
+                    />
+                    {content.amazon_pay_button?.text_below && (
+                      <div style={{ whiteSpace: 'pre-line', marginTop: '6px' }}>
+                        {content.amazon_pay_button.text_below}
+                      </div>
+                    )}
+                  </div>
                 )}
                 {/* bot: type == 'script' */}
                 {(content.type === 'script' || content.type === BOT_MESSAGE_TYPES.HTML_CODE || content.type === BOT_MESSAGE_TYPES.UGC ) && (

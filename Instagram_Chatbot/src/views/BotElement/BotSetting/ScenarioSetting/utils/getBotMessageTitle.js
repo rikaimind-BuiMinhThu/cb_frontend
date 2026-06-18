@@ -13,6 +13,7 @@ export const getBotMessageTitle = (content) => {
   if (content.type === 'getting_error_notification') return 'エラー取得の通知';
   if (content.type === BOT_MESSAGE_TYPES.HTML_CODE) return 'HTMLコード';
   if (content.type === BOT_MESSAGE_TYPES.UGC) return 'HTML_UGC_CONFIG';
+  if (content.type === BOT_MESSAGE_TYPES.AMAZON_PAY_BUTTON) return 'Amazon Payボタン';
   return '';
 };
 

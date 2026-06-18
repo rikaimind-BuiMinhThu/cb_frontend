@@ -23,6 +23,11 @@ import {
   isAutoLogoutConfigValid,
 } from '../utils/autoLogoutUtils';
 import { SETTINGS_MODAL_VIEWS } from '../components/modals/shared/scenarioModalTooltips';
+import {
+  DEFAULT_AMAZON_PAY_CONFIG,
+  LP_INTEGRATION_MODES,
+} from '../../../../../variables/amazonPayConstants';
+import { normalizeAllowedLpDomains } from '../utils/amazonPayConfigUtils';
 
 const INITIAL_TIMER_CONFIG = {
   isOpen: false,
@@ -130,6 +135,10 @@ export const useScenario = () => {
   const [isUseBtnUpdateTracking, setIsUseBtnUpdateTracking] = useState(false);
   const [useFullwidthChatbotMobile, setUseFullwidthChatbotMobile] = useState(false);
   const [clientCartSystem, setClientCartSystem] = useState(null);
+  const [allowedLpDomains, setAllowedLpDomains] = useState([]);
+  const [allowedLpDomainsInput, setAllowedLpDomainsInput] = useState('');
+  const [lpIntegrationMode, setLpIntegrationMode] = useState(LP_INTEGRATION_MODES.AUTO);
+  const [amazonPayConfig, setAmazonPayConfig] = useState(DEFAULT_AMAZON_PAY_CONFIG);
 
   const [listProductVariants, setListProductVariants] = useState([]);
 
@@ -200,6 +209,10 @@ export const useScenario = () => {
     setIsUseBtnUpdateTracking(parsed.isUseBtnUpdateTracking);
     setUseFullwidthChatbotMobile(parsed.useFullwidthChatbotMobile);
     setTimerConfig(parsed.timerConfig);
+    setAllowedLpDomains(parsed.allowedLpDomains || []);
+    setAllowedLpDomainsInput((parsed.allowedLpDomains || []).join('\n'));
+    setLpIntegrationMode(parsed.lpIntegrationMode || LP_INTEGRATION_MODES.AUTO);
+    setAmazonPayConfig(parsed.amazonPayConfig || DEFAULT_AMAZON_PAY_CONFIG);
   }, []);
 
   const handleGetMessage = useCallback(() => {
@@ -309,8 +322,14 @@ export const useScenario = () => {
     productIdCrossSell,
     isClearLandingPageSession,
     autoLogoutConfig,
+    allowedLpDomains: normalizeAllowedLpDomains(allowedLpDomainsInput.split(/[\n,]+/)),
+    lpIntegrationMode,
+    amazonPayConfig,
   }), [
     autoLogoutConfig,
+    allowedLpDomainsInput,
+    lpIntegrationMode,
+    amazonPayConfig,
     coupon,
     customCssContent,
     dataMessages,
@@ -559,6 +578,10 @@ export const useScenario = () => {
       isUseBtnUpdateTracking,
       useFullwidthChatbotMobile,
       clientCartSystem,
+      allowedLpDomains,
+      allowedLpDomainsInput,
+      lpIntegrationMode,
+      amazonPayConfig,
       listProductVariants,
       isShopifyPaymentScenario,
     },
@@ -642,6 +665,10 @@ export const useScenario = () => {
       setIsUseBtnUpdateTracking,
       setUseFullwidthChatbotMobile,
       setClientCartSystem,
+      setAllowedLpDomains,
+      setAllowedLpDomainsInput,
+      setLpIntegrationMode,
+      setAmazonPayConfig,
       setListProductVariants,
       handleGetMessage,
       onClickSaveScenario,

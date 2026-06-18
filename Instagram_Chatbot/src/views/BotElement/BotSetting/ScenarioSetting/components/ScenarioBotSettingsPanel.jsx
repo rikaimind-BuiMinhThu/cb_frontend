@@ -6,6 +6,7 @@ import CheckboxCustom from '../scenarioComon/CheckboxCustom';
 import InputNum from '../scenarioComon/InputNum';
 import InputCustom from '../scenarioComon/InputCustom';
 import HtmlCodeConfig from '../scenarioComon/HtmlCodeConfig';
+import AmazonPayButtonConfig from '../scenarioComon/AmazonPayButtonConfig';
 import { BOT_MESSAGE_TYPES } from '../../PreviewComponent/Constants';
 import { dataApiLinkage } from '../constants/scenarioFormConstants';
 import { useScenarioPanelDestructuring } from '../hooks/useScenarioPanelDestructuring';
@@ -23,6 +24,7 @@ const STATEMENT_TYPE_OPTIONS = [
   ['variable_set', '変数セット'],
   ['pause', '一時停止'],
   ['html_code', 'HTMLコード'],
+  ['amazon_pay_button', 'Amazon Payボタン'],
   ['use_html_ugc_config', 'HTML_UGC_CONFIG'],
 ];
 
@@ -339,9 +341,9 @@ const VariableSetSection = ({
 const ScenarioBotSettingsPanel = () => {
   const {
     belongTo, messageType, indexMessageSelect, dataMessages, setDataMessages,
-    dataEmail, dataInputVar, fileError, setIsOpenFileReference, botUploadFile,
-    getBaseUrl, onChangeValueMessageContent, onChangeValueNameMessage,
-    handleChangeBotStatementType, renderRootFaqOption,
+    dataEmail, dataInputVar, fileError, setIsOpenFileReference, setVarFileReference,
+    botUploadFile, getBaseUrl, onChangeValueMessageContent, onChangeValueNameMessage,
+    handleChangeBotStatementType, renderRootFaqOption, isUseFukushashiki,
   } = useScenarioPanelDestructuring();
 
   const selectedMessage = dataMessages?.[indexMessageSelect];
@@ -414,6 +416,16 @@ const ScenarioBotSettingsPanel = () => {
               config={typeContent}
               onChangeValue={onChangeValueMessageContent}
               indexMessageSelect={indexMessageSelect}
+            />
+          )}
+          {messageType === BOT_MESSAGE_TYPES.AMAZON_PAY_BUTTON && (
+            <AmazonPayButtonConfig
+              config={typeContent}
+              onChangeValue={onChangeValueMessageContent}
+              indexMessageSelect={indexMessageSelect}
+              isUseFukushashiki={isUseFukushashiki}
+              setIsOpenFileReference={setIsOpenFileReference}
+              setVarFileReference={setVarFileReference}
             />
           )}
         </div>

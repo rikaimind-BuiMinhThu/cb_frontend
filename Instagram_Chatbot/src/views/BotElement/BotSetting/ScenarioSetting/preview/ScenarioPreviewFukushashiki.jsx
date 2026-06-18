@@ -447,6 +447,12 @@ const ScenarioPreviewFukushashiki = ({
           payload: actionData,
         });
 
+      case CHATBOT_ACTIONS.UPDATE_AMAZON_PAY_DATA_BY_SELECTOR:
+        return dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_BY_SELECTOR,
+          payload: actionData,
+        });
+
       case CHATBOT_ACTIONS.UPDATE_NUMBER_ORDER_TO_UPSELL:
         if (actionData) {
           const variables = Object.entries(actionData).map(([k, v]) => ({
