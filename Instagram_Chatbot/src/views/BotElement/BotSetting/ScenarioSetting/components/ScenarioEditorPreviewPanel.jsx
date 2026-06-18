@@ -15,7 +15,6 @@ import '../../../../../assets/css/bot/bot-setting.css';
 import '../../../../../assets/css/bot/scenario/scenario-editor-preview.css';
 
 const PREVIEW_SCOPE_ID = 'scenario-editor-preview';
-const DRAFT_SYNC_DEBOUNCE_MS = 300;
 const PREVIEW_LOADING_TIMEOUT_MS = 20000;
 
 const DEFAULT_BOT_META = {
@@ -62,12 +61,15 @@ const ScenarioEditorPreviewPanel = () => {
     isClearLandingPageSession,
     scenarioId,
     botId,
+    editorSelectedRadioOption,
   } = state;
   const { handleSelectMessage } = messages;
 
   const iframeRef = useRef(null);
-  const debounceRef = useRef(null);
+  const draftSyncRafRef = useRef(null);
   const initialSyncDoneRef = useRef(false);
+  const dataMessagesRef = useRef(dataMessages);
+  const handleSelectMessageRef = useRef(handleSelectMessage);
   const [isIframeReady, setIsIframeReady] = useState(false);
   const [isPreviewLoading, setIsPreviewLoading] = useState(true);
   const [botMeta, setBotMeta] = useState(DEFAULT_BOT_META);
@@ -172,6 +174,37 @@ const ScenarioEditorPreviewPanel = () => {
     });
   }, [isIframeReady]);
 
+  const syncRadioOptionHighlight = useCallback((selection) => {
+    if (!isIframeReady || !iframeRef.current) return;
+
+    postToIframe(iframeRef.current, {
+      type: SCENARIO_PREVIEW_MESSAGES.HIGHLIGHT_RADIO_OPTION,
+      payload: selection,
+    });
+  }, [isIframeReady]);
+
+  const getRadioOptionHighlightPayload = useCallback(() => {
+    const shouldHighlight = editorSelectedRadioOption?.indexMessageSelect === indexMessageSelect;
+    if (!shouldHighlight) return null;
+
+    return {
+      indexContent: editorSelectedRadioOption.indexContent,
+      optionId: editorSelectedRadioOption.optionId,
+    };
+  }, [editorSelectedRadioOption, indexMessageSelect]);
+
+  const syncPreviewWithHighlights = useCallback(() => {
+    syncPreview();
+    syncRadioOptionHighlight(getRadioOptionHighlightPayload());
+  }, [getRadioOptionHighlightPayload, syncPreview, syncRadioOptionHighlight]);
+
+  dataMessagesRef.current = dataMessages;
+  handleSelectMessageRef.current = handleSelectMessage;
+
+  const handleIframeLoad = useCallback(() => {
+    setIsIframeReady(true);
+  }, []);
+
   useEffect(() => {
     initialSyncDoneRef.current = false;
     setIsPreviewLoading(true);
@@ -232,50 +265,53 @@ const ScenarioEditorPreviewPanel = () => {
 
       if (type === SCENARIO_PREVIEW_MESSAGES.SELECT_MESSAGE) {
         const messageId = payload?.messageId;
-        if (messageId == null || !dataMessages?.length) return;
+        const currentDataMessages = dataMessagesRef.current;
+        const selectMessage = handleSelectMessageRef.current;
+        if (messageId == null || !currentDataMessages?.length) return;
 
-        const index = dataMessages.findIndex(
+        const index = currentDataMessages.findIndex(
           (message) => Number(message.id) === Number(messageId),
         );
         if (index < 0) return;
-        if (typeof handleSelectMessage !== 'function') return;
+        if (typeof selectMessage !== 'function') return;
 
-        const message = dataMessages[index];
+        const message = currentDataMessages[index];
         const lastContent = message.message_content?.[message.message_content.length - 1];
-        handleSelectMessage(index, message.belong_to, lastContent?.type);
+        selectMessage(index, message.belong_to, lastContent?.type);
       }
     };
 
     window.addEventListener('message', handleMessage);
     return () => {
       window.removeEventListener('message', handleMessage);
-      setIsIframeReady(false);
     };
-  }, [dataMessages, handleSelectMessage, iframeSrc]);
+  }, [iframeSrc]);
 
   useEffect(() => {
     if (!isIframeReady) return undefined;
 
     if (!initialSyncDoneRef.current) {
-      syncPreview();
+      syncPreviewWithHighlights();
       initialSyncDoneRef.current = true;
       return undefined;
     }
 
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current);
+    if (draftSyncRafRef.current) {
+      cancelAnimationFrame(draftSyncRafRef.current);
     }
 
-    debounceRef.current = setTimeout(() => {
-      syncPreview();
-    }, DRAFT_SYNC_DEBOUNCE_MS);
+    draftSyncRafRef.current = requestAnimationFrame(() => {
+      syncPreviewWithHighlights();
+      draftSyncRafRef.current = null;
+    });
 
     return () => {
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current);
+      if (draftSyncRafRef.current) {
+        cancelAnimationFrame(draftSyncRafRef.current);
+        draftSyncRafRef.current = null;
       }
     };
-  }, [editorDraft, editorCustomCss, isIframeReady, syncPreview]);
+  }, [editorDraft, editorCustomCss, isIframeReady, syncPreviewWithHighlights]);
 
   useEffect(() => {
     if (!isIframeReady) return;
@@ -283,6 +319,18 @@ const ScenarioEditorPreviewPanel = () => {
     const selectedMessage = dataMessages?.[indexMessageSelect];
     syncHighlight(selectedMessage?.id ?? null);
   }, [dataMessages, indexMessageSelect, isIframeReady, syncHighlight]);
+
+  useEffect(() => {
+    if (!isIframeReady) return;
+
+    syncRadioOptionHighlight(getRadioOptionHighlightPayload());
+  }, [
+    editorSelectedRadioOption,
+    indexMessageSelect,
+    isIframeReady,
+    getRadioOptionHighlightPayload,
+    syncRadioOptionHighlight,
+  ]);
 
   const messageCount = useMemo(
     () => (dataMessages || []).length,
@@ -311,6 +359,7 @@ const ScenarioEditorPreviewPanel = () => {
           title="Scenario preview"
           className="scenario-editor-preview__iframe"
           src={iframeSrc}
+          onLoad={handleIframeLoad}
         />
       </ThemePreviewShell>
       {isPreviewLoading && (

@@ -619,6 +619,50 @@
   flex: 0 0 auto;
 }
 
+.ss-radio-button-setting {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-radio-button-setting .ss-content-setting-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-radio-button-setting .ss-user-setting__item-bottom {
+  justify-content: flex-start;
+  margin-bottom: 0;
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-radio-button-setting .ss-radio-button-setting__drag-container,
+.ss-editor-layout-v2 .ss-radio-button-setting .ss-radio-button-img-layout-section {
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-radio-button-setting .ss-user-setting-double-input {
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-radio-button-setting .ss-user-setting-double-input input {
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto;
+}
+
+.ss-editor-layout-v2 .ss-radio-button-setting .ss-user-setting-double-input .ss-plus-circle-option-icon-times {
+  flex: 0 0 auto;
+}
+
+.ss-editor-layout-v2 .ss-radio-button-setting .ss-radio-button-setting__add-row {
+  justify-content: flex-end;
+  width: 100%;
+}
+
 .ss-editor-layout-v2 .ss-user-setting-condition-container {
   margin-left: 0;
   width: 100%;

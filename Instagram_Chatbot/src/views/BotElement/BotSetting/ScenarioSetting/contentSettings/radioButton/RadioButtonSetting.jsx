@@ -1,11 +1,8 @@
 import React from 'react';
-import CheckboxCustom from '../../scenarioComon/CheckboxCustom';
-import { LABELS } from '../../../PreviewComponent/Constants';
 import ContentSettingShell from '../shared/ContentSettingShell';
-import ContentTypeSelector, { ContentTitleInput } from '../shared/ContentTypeSelector';
 import { RADIO_BUTTON_TYPES } from '../../constants/contentTypeConstants';
-import { typeRadio } from '../../constants/scenarioFormConstants';
-import { buildRadioButtonSettingContext } from './radioButtonSettingContext';
+import RadioButtonCommonHeader from './RadioButtonCommonHeader';
+import RadioButtonFukushashikiSection from './RadioButtonFukushashikiSection';
 import DefaultTypeSetting from './DefaultTypeSetting';
 import RadioButtonImgTypeSetting from './RadioButtonImgTypeSetting';
 import BlockStyleTypeSetting from './BlockStyleTypeSetting';
@@ -25,96 +22,16 @@ const RadioButtonSetting = (props) => {
     dataInputVar,
     setIsOpenAddVariable,
     isUseFukushashiki,
-    handleDragEndRadioCheckbox,
-    handleRemoveItemContent,
-    handleAddItemRadioCheckbox,
-    setIsOpenFileReference,
-    setVarFileReference,
-    setAcceptFile,
   } = props;
 
-  const {
-    changeContent,
-    renderInitialSelectionFukushashiki,
-    renderGenderDisplayType,
-  } = buildRadioButtonSettingContext(props);
-
-  const renderGenderOption = () => (
-    <CheckboxCustom
-      label={LABELS.GENDER_OPTIONS.CHECKBOX_USE_AS_GENDER}
-      onChange={changeContent('use_as_gender')}
-      value={!!radioButton.use_as_gender}
-    />
-  );
-
-  const renderTypeSelector = () => (
-    <ContentTypeSelector
-      titleRequire={radioButton?.title_require}
-      typeValue={radioButton?.type}
-      typeOptions={typeRadio}
-      onTitleRequireChange={changeContent('title_require')}
-      onTypeChange={changeContent('type')}
-    />
-  );
-
-  const renderTitle = () => {
-    if (radioButton.title_require !== true) return null;
-    return (
-      <ContentTitleInput
-        title={radioButton?.title}
-        onChange={changeContent('title')}
-      />
-    );
-  };
-
-  const renderFukushashikiSection = () => {
-    if (!isUseFukushashiki) return null;
-    return (
-      <>
-        {renderInitialSelectionFukushashiki()}
-        {renderGenderDisplayType()}
-      </>
-    );
-  };
-
-  const renderApiTypeBody = () => {
-    if (radioButton.type !== RADIO_BUTTON_TYPES.CONSUME_API_RESPONSE) return null;
-    return <ConsumeApiResponseTypeSetting {...props} />;
-  };
-
-  const renderItemsTypeBody = () => {
-    if (radioButton.type === RADIO_BUTTON_TYPES.CONSUME_API_RESPONSE) return null;
+  const renderTypeBody = () => {
     switch (radioButton.type) {
       case RADIO_BUTTON_TYPES.DEFAULT:
-        return (
-          <DefaultTypeSetting
-            {...props}
-            handleDragEndRadioCheckbox={handleDragEndRadioCheckbox}
-            handleRemoveItemContent={handleRemoveItemContent}
-            handleAddItemRadioCheckbox={handleAddItemRadioCheckbox}
-          />
-        );
+        return <DefaultTypeSetting {...props} />;
       case RADIO_BUTTON_TYPES.RADIO_BUTTON_IMG:
-        return (
-          <RadioButtonImgTypeSetting
-            {...props}
-            handleDragEndRadioCheckbox={handleDragEndRadioCheckbox}
-            handleRemoveItemContent={handleRemoveItemContent}
-            handleAddItemRadioCheckbox={handleAddItemRadioCheckbox}
-            setIsOpenFileReference={setIsOpenFileReference}
-            setVarFileReference={setVarFileReference}
-            setAcceptFile={setAcceptFile}
-          />
-        );
+        return <RadioButtonImgTypeSetting {...props} />;
       case RADIO_BUTTON_TYPES.BLOCK_STYLE:
-        return (
-          <BlockStyleTypeSetting
-            {...props}
-            handleDragEndRadioCheckbox={handleDragEndRadioCheckbox}
-            handleRemoveItemContent={handleRemoveItemContent}
-            handleAddItemRadioCheckbox={handleAddItemRadioCheckbox}
-          />
-        );
+        return <BlockStyleTypeSetting {...props} />;
       default:
         return null;
     }
@@ -134,12 +51,12 @@ const RadioButtonSetting = (props) => {
       setIsOpenAddVariable={setIsOpenAddVariable}
       className="ss-radio-button-setting"
     >
-      {renderGenderOption()}
-      {renderTypeSelector()}
-      {renderTitle()}
-      {renderApiTypeBody()}
-      {renderFukushashikiSection()}
-      {renderItemsTypeBody()}
+      <RadioButtonCommonHeader {...props} />
+      {radioButton.type === RADIO_BUTTON_TYPES.CONSUME_API_RESPONSE && (
+        <ConsumeApiResponseTypeSetting {...props} />
+      )}
+      {isUseFukushashiki && <RadioButtonFukushashikiSection {...props} />}
+      {renderTypeBody()}
     </ContentSettingShell>
   );
 };

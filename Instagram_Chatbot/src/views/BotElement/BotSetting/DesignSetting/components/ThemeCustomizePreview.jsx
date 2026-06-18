@@ -90,6 +90,40 @@ const ThemeCustomizePreview = ({
     </PreviewUserMessage>
 
     <PreviewUserMessage>
+      <div className="theme-customize-preview__radio-group ss-message__content--user-radio_button-wrapper">
+        <div className="ss-message__content--user-radio_button theme-customize-preview__radio-default">
+          <input type="radio" name="theme-preview-radio-default" id="theme-preview-radio-default-1" readOnly />
+          <label htmlFor="theme-preview-radio-default-1">未選択</label>
+        </div>
+        <div className="ss-message__content--user-radio_button theme-customize-preview__radio-default theme-customize-preview__radio-default--selected ss-message__content--user-radio_button--selected">
+          <input type="radio" name="theme-preview-radio-default" id="theme-preview-radio-default-2" defaultChecked readOnly />
+          <label htmlFor="theme-preview-radio-default-2">選択済み</label>
+        </div>
+      </div>
+    </PreviewUserMessage>
+
+    <PreviewUserMessage>
+      <div className="theme-customize-preview__radio-group ss-message__content--user-radio_button-wrapper">
+        <div className="ss-message__content--user-radio_button-img-grid" style={{ gap: '5px', width: '100%' }}>
+          <div
+            className="ss-message__content--user-radio_button--radio_button_img theme-customize-preview__radio-img"
+            style={{ flexBasis: '48%', maxWidth: '48%', width: '48%', padding: 0 }}
+          >
+            <input type="radio" className="ss-radio-button-img-input--hidden" name="theme-preview-radio-img" id="theme-preview-radio-img-1" readOnly tabIndex={-1} aria-hidden="true" />
+            <div className="theme-customize-preview__radio-img-placeholder" />
+          </div>
+          <div
+            className="ss-message__content--user-radio_button--radio_button_img theme-customize-preview__radio-img theme-customize-preview__radio-img--selected ss-message__content--user-radio_button--selected"
+            style={{ flexBasis: '48%', maxWidth: '48%', width: '48%', padding: 0 }}
+          >
+            <input type="radio" className="ss-radio-button-img-input--hidden" name="theme-preview-radio-img" id="theme-preview-radio-img-2" defaultChecked readOnly tabIndex={-1} aria-hidden="true" />
+            <div className="theme-customize-preview__radio-img-placeholder" />
+          </div>
+        </div>
+      </div>
+    </PreviewUserMessage>
+
+    <PreviewUserMessage>
       <div className="theme-customize-preview__button-group">
         <button type="button" className="btn btn-new-bot">通常</button>
         <button type="button" className="btn btn-new-bot theme-preview--btn-pressed">押下</button>

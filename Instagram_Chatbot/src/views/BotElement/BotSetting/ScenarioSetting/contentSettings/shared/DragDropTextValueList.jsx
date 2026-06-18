@@ -6,6 +6,8 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import InputDouble from '../../scenarioComon/InputDouble';
 import { SETTING_BUTTON_LABELS, SETTING_PLACEHOLDERS } from '../../constants/scenarioSettingLabels';
 
+const INTERACTIVE_ITEM_SELECTOR = 'input, textarea, select, button, .ant-checkbox, .ant-checkbox-wrapper, .ss-plus-circle-option-icon-times, .ss-radio-button-setting__paperclip, .ss-radio-button-setting__initial-selection';
+
 const DragDropTextValueList = ({
   items,
   droppableId,
@@ -15,10 +17,70 @@ const DragDropTextValueList = ({
   onAddItem,
   containerClassName = 'ss-user-setting-item-payment-radio-drag',
   itemClassName = 'ss-user-setting-payment-radio-container ss-user-setting-payment-radio-container-no-img',
+  dragRowClassName = 'ss-drag-option-row',
   textValuePlaceholder = SETTING_PLACEHOLDERS.textValue,
+  inputDoubleClassCustom = '',
+  inputDoubleClassIcon = '',
   showAddButton = true,
+  addButtonPlacement = 'inside',
+  showGripOnInputRow = true,
+  inputDoubleWrapperClassName = '',
+  showTextInput = true,
+  selectedOptionId,
+  onSelectOption,
+  renderItemGrip,
+  itemBodyClassName = '',
+  renderItemPrefix,
   renderItemExtra,
 }) => {
+  const getItemPanelClassName = (item) => [
+    itemClassName,
+    selectedOptionId != null && item.id === selectedOptionId ? `${itemClassName}--selected` : '',
+  ].filter(Boolean).join(' ');
+
+  const handleItemPanelClick = (event, item, index) => {
+    if (!onSelectOption) return;
+    if (event.target.closest(INTERACTIVE_ITEM_SELECTOR)) return;
+    onSelectOption(item, index);
+  };
+
+  const renderInputDouble = (item, index) => {
+    const inputDouble = (
+      <InputDouble
+        classCustom={inputDoubleClassCustom}
+        placeholder={textValuePlaceholder}
+        valueLeft={item.text}
+        valueRight={item.value}
+        icon={items.length >= 2 && onRemoveItem ? 'times-circle' : ''}
+        classIcon={inputDoubleClassIcon}
+        onClickIcon={onRemoveItem ? () => onRemoveItem(index) : undefined}
+        onChange={(value, name) => onChangeItem(index, name === 'left' ? 'text' : 'value', value)}
+        valueOnly={!showTextInput}
+      />
+    );
+
+    if (!showGripOnInputRow && inputDoubleWrapperClassName) {
+      return <div className={inputDoubleWrapperClassName}>{inputDouble}</div>;
+    }
+
+    return inputDouble;
+  };
+
+  const renderItemContent = (item, index) => (
+    <>
+      {renderItemPrefix?.(item, index)}
+      {showGripOnInputRow ? (
+        <div className={dragRowClassName}>
+          <MDBIcon fas icon="grip-horizontal" className="ss-drag-handle-icon" />
+          {renderInputDouble(item, index)}
+        </div>
+      ) : (
+        renderInputDouble(item, index)
+      )}
+      {renderItemExtra?.(item, index)}
+    </>
+  );
+
   const renderDragItem = (item, index) => (
     <Draggable draggable key={item.id} draggableId={String(item.id)} index={index}>
       {(provided) => (
@@ -28,17 +90,22 @@ const DragDropTextValueList = ({
           {...provided.dragHandleProps}
           ref={provided.innerRef}
         >
-          <div className={itemClassName}>
-            <div className="ss-drag-option-row">
-              <MDBIcon fas icon="grip-horizontal" className="ss-drag-handle-icon" />
-              <InputDouble
-                placeholder={textValuePlaceholder}
-                valueLeft={item.text}
-                valueRight={item.value}
-                onChange={(value, name) => onChangeItem(index, name === 'left' ? 'text' : 'value', value)}
-              />
-            </div>
-            {renderItemExtra?.(item, index)}
+          <div
+            className={getItemPanelClassName(item)}
+            onClick={(event) => handleItemPanelClick(event, item, index)}
+            onKeyDown={() => {}}
+            role="presentation"
+          >
+            {renderItemGrip ? (
+              <>
+                {renderItemGrip(item, index)}
+                <div className={itemBodyClassName}>
+                  {renderItemContent(item, index)}
+                </div>
+              </>
+            ) : (
+              renderItemContent(item, index)
+            )}
           </div>
         </div>
       )}
@@ -46,7 +113,7 @@ const DragDropTextValueList = ({
   );
 
   const renderAddButton = () => {
-    if (!showAddButton) return null;
+    if (!showAddButton || addButtonPlacement !== 'inside') return null;
     return (
       <Button className="ss-user-setting__select-btn-add ss-drag-add-btn" onClick={onAddItem}>
         {SETTING_BUTTON_LABELS.add}
@@ -78,8 +145,20 @@ DragDropTextValueList.propTypes = {
   onAddItem: PropTypes.func,
   containerClassName: PropTypes.string,
   itemClassName: PropTypes.string,
+  dragRowClassName: PropTypes.string,
   textValuePlaceholder: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
+  inputDoubleClassCustom: PropTypes.string,
+  inputDoubleClassIcon: PropTypes.string,
   showAddButton: PropTypes.bool,
+  addButtonPlacement: PropTypes.oneOf(['inside', 'outside']),
+  showGripOnInputRow: PropTypes.bool,
+  inputDoubleWrapperClassName: PropTypes.string,
+  showTextInput: PropTypes.bool,
+  selectedOptionId: PropTypes.number,
+  onSelectOption: PropTypes.func,
+  renderItemGrip: PropTypes.func,
+  itemBodyClassName: PropTypes.string,
+  renderItemPrefix: PropTypes.func,
   renderItemExtra: PropTypes.func,
 };
 

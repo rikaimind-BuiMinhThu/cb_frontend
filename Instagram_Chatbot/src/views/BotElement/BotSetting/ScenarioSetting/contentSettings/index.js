@@ -3,7 +3,7 @@ import TextareaSetting from './textarea/TextareaSetting';
 import LabelSetting from './LabelSetting';
 import PullDownSetting from './PullDownSetting';
 import CheckboxSetting from './checkbox/CheckboxSetting';
-import RadioButtonSetting from './radioButton/RadioButtonSetting';
+import RadioButtonSetting from './radioButton';
 import CalendarSetting from './CalendarSetting';
 import CardPaymentRadioButtonSetting from './CardPaymentRadioButtonSetting';
 import ShippingAddressSetting from './ShippingAddressSetting';

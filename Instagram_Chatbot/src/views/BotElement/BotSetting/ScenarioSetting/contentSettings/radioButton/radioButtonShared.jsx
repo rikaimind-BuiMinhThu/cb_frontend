@@ -1,18 +1,20 @@
 import React from 'react';
 import CheckboxCustom from '../../scenarioComon/CheckboxCustom';
 import { RADIO_BUTTON_LABELS } from '../../constants/scenarioSettingLabels';
-import { buildRadioButtonSettingContext } from './radioButtonSettingContext';
+import { isRadioOptionInitiallySelected } from '../../utils/radioButtonSelectionUtils';
 
-export const InitialSelectionCheckbox = ({ itemValue, radioButton, toggleInitialSelection }) => (
-  <CheckboxCustom
-    label={RADIO_BUTTON_LABELS.initialSelection}
-    onChange={() => toggleInitialSelection(itemValue)}
-    value={radioButton.initial_selection === itemValue}
-    isOnChange={false}
-  />
+export const InitialSelectionCheckbox = ({ item, radioButton, toggleInitialSelection }) => (
+  <div
+    className="ss-radio-button-setting__initial-selection"
+    onClick={(e) => e.stopPropagation()}
+    onKeyDown={(e) => e.stopPropagation()}
+    role="presentation"
+  >
+    <CheckboxCustom
+      label={RADIO_BUTTON_LABELS.initialSelection}
+      onChange={() => toggleInitialSelection(item)}
+      value={isRadioOptionInitiallySelected(radioButton, item)}
+      isOnChange={false}
+    />
+  </div>
 );
-
-export const useRadioItemContext = (props) => {
-  const ctx = buildRadioButtonSettingContext(props);
-  return ctx;
-};

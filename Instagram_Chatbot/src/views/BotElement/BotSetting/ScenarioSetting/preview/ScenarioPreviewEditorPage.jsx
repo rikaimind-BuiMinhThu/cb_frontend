@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Cookies from 'js-cookie';
 import ScenarioPreviewFaq from './ScenarioPreviewFaq';
 import ScenarioPreviewFukushashiki from './ScenarioPreviewFukushashiki';
@@ -9,6 +9,7 @@ import {
 } from './scenarioPreviewBridge';
 import {
   applyEditorMessageHighlight,
+  applyEditorRadioOptionHighlight,
   setupEditorMessageClickListener,
 } from './scenarioEditorPreviewInteraction';
 import '../../../../../assets/css/bot/scenario/scenario-preview-editor-page.css';
@@ -21,6 +22,7 @@ const ScenarioPreviewEditorPage = () => {
 
   const [editorDraft, setEditorDraft] = useState(null);
   const [editorCustomCss, setEditorCustomCss] = useState(null);
+  const pendingRadioOptionHighlightRef = useRef(null);
 
   useEffect(() => {
     if (botId) {
@@ -57,6 +59,11 @@ const ScenarioPreviewEditorPage = () => {
       if (type === SCENARIO_PREVIEW_MESSAGES.HIGHLIGHT_MESSAGE) {
         applyEditorMessageHighlight(payload?.messageId ?? null);
       }
+
+      if (type === SCENARIO_PREVIEW_MESSAGES.HIGHLIGHT_RADIO_OPTION) {
+        pendingRadioOptionHighlightRef.current = payload ?? null;
+        applyEditorRadioOptionHighlight(payload ?? null);
+      }
     };
 
     window.addEventListener('message', handleMessage);
@@ -83,6 +90,7 @@ const ScenarioPreviewEditorPage = () => {
 
     const frameId = requestAnimationFrame(() => {
       requestAnimationFrame(() => {
+        applyEditorRadioOptionHighlight(pendingRadioOptionHighlightRef.current);
         postToParent({ type: SCENARIO_PREVIEW_MESSAGES.PREVIEW_CONTENT_READY });
       });
     });

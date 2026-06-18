@@ -80,6 +80,7 @@ export const useScenario = () => {
   const [varFileReference, setVarFileReference] = useState({});
   const [isOpenFileReference, setIsOpenFileReference] = useState(false);
   const [indexCarouselSlide, setIndexCarouselSlide] = useState(0);
+  const [editorSelectedRadioOption, setEditorSelectedRadioOption] = useState(null);
 
   const [varShopifyReference, setVarShopifyReference] = useState({});
   const [isOpenShopifyReference, setIsOpenShopifyReference] = useState(false);
@@ -519,6 +520,7 @@ export const useScenario = () => {
       varFileReference,
       isOpenFileReference,
       indexCarouselSlide,
+      editorSelectedRadioOption,
       varShopifyReference,
       isOpenShopifyReference,
       botTextValue,
@@ -600,6 +602,7 @@ export const useScenario = () => {
       setVarFileReference,
       setIsOpenFileReference,
       setIndexCarouselSlide,
+      setEditorSelectedRadioOption,
       setVarShopifyReference,
       setIsOpenShopifyReference,
       setBotTextValue,

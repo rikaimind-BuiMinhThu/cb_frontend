@@ -335,10 +335,51 @@
 
 .theme-customize-preview__field-group,
 .theme-customize-preview__checkbox-group,
-.theme-customize-preview__button-group {
+.theme-customize-preview__button-group,
+.theme-customize-preview__radio-group {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.theme-customize-preview__radio-default {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.theme-customize-preview__radio-default label {
+  margin: 0 0 0 8px;
+}
+
+.theme-customize-preview__radio-default input[type="radio"] {
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+}
+
+.theme-customize-preview__radio-img {
+  position: relative;
+  border-radius: 5px;
+  overflow: hidden;
+  cursor: default;
+}
+
+.theme-customize-preview__radio-img .ss-radio-button-img-input--hidden,
+.theme-customize-preview__radio-img input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+  pointer-events: none;
+}
+
+.theme-customize-preview__radio-img-placeholder {
+  width: 100%;
+  height: 56px;
+  background: linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%);
 }
 
 .theme-customize-preview__field {

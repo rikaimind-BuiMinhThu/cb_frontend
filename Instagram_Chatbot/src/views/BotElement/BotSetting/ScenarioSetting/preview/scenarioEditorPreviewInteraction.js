@@ -23,6 +23,22 @@ export const applyEditorMessageHighlight = (messageId) => {
   }
 };
 
+export const applyEditorRadioOptionHighlight = (selection) => {
+  document.querySelectorAll('.scenario-editor-radio-option--selected').forEach((el) => {
+    el.classList.remove('scenario-editor-radio-option--selected');
+  });
+
+  if (!selection) return;
+
+  const { indexContent, optionId } = selection;
+  if (indexContent == null || optionId == null) return;
+
+  const selector = `[data-editor-radio-option="${indexContent}-${optionId}"]`;
+  document.querySelectorAll(selector).forEach((el) => {
+    el.classList.add('scenario-editor-radio-option--selected');
+  });
+};
+
 export const setupEditorMessageClickListener = (onSelectMessage) => {
   const handleClick = (event) => {
     const spBody = document.getElementById('sp-body');

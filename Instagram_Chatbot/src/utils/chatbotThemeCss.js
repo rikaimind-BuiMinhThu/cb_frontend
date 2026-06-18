@@ -51,6 +51,12 @@ const buildThemeVariables = (theme) => `
   --c-checkbox-unchecked-border: ${theme.checkboxUncheckedBorderColor};
   --c-checkbox-checked-bg: ${theme.checkboxCheckedBgColor};
   --c-checkbox-checked-border: ${theme.checkboxCheckedBorderColor};
+  --c-radio-unselected-bg: ${theme.radioUnselectedBgColor};
+  --c-radio-selected-bg: ${theme.radioSelectedBgColor};
+  --c-radio-unselected-border: ${theme.radioUnselectedBorderColor};
+  --c-radio-selected-border: ${theme.radioSelectedBorderColor};
+  --c-radio-input-unselected: ${theme.radioInputUnselectedColor};
+  --c-radio-input-selected: ${theme.radioInputSelectedColor};
   --c-error-bg: ${theme.errorMessageBgColor};
   --c-error-text: ${theme.errorMessageTextColor};
   --c-error-font-size: ${theme.errorMessageFontSize};
@@ -172,6 +178,41 @@ ${spBodySelector} .ant-checkbox-inner {
 ${spBodySelector} .ant-checkbox-checked .ant-checkbox-inner {
   background-color: var(--c-checkbox-checked-bg) !important;
   border-color: var(--c-checkbox-checked-border) !important;
+}
+
+${spBodySelector} .ss-message__content--user-radio_button,
+${scopePrefix}.theme-customize-preview__radio-default {
+  background-color: var(--c-radio-unselected-bg, #ebf7ff) !important;
+  border: 1px solid var(--c-radio-unselected-border, transparent) !important;
+}
+
+${spBodySelector} .ss-message__content--user-radio_button--selected,
+${spBodySelector} .ss-message__content--user-radio_button:has(input[type="radio"]:checked),
+${scopePrefix}.theme-customize-preview__radio-default--selected {
+  background-color: var(--c-radio-selected-bg, #ebf7ff) !important;
+  border-color: var(--c-radio-selected-border, transparent) !important;
+}
+
+${spBodySelector} .ss-message__content--user-radio_button--radio_button_img {
+  background-color: var(--c-radio-unselected-bg, transparent) !important;
+  border: 1px solid var(--c-radio-unselected-border, transparent) !important;
+}
+
+${spBodySelector} .ss-message__content--user-radio_button--radio_button_img.ss-message__content--user-radio_button--selected,
+${spBodySelector} .ss-message__content--user-radio_button--radio_button_img:has(input[type="radio"]:checked),
+${scopePrefix}.theme-customize-preview__radio-img--selected {
+  background-color: var(--c-radio-selected-bg, transparent) !important;
+  border-color: var(--c-radio-selected-border, transparent) !important;
+}
+
+${spBodySelector} .ss-message__content--user-radio_button:not(.ss-message__content--user-radio_button--radio_button_img) input[type="radio"],
+${scopePrefix}.theme-customize-preview__radio-default input[type="radio"] {
+  accent-color: var(--c-radio-input-selected, #327AED) !important;
+}
+
+${spBodySelector} .ss-message__content--user-radio_button:not(.ss-message__content--user-radio_button--radio_button_img) input[type="radio"]:not(:checked),
+${scopePrefix}.theme-customize-preview__radio-default input[type="radio"]:not(:checked) {
+  accent-color: var(--c-radio-input-unselected, #ccc) !important;
 }
 
 ${scopePrefix}.ss-bot-submit-error-message,

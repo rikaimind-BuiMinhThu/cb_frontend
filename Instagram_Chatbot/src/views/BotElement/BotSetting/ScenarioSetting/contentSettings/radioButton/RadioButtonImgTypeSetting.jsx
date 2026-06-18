@@ -1,149 +1,79 @@
 import React from 'react';
 import { MDBIcon } from 'mdbreact';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import InputCustom from '../../scenarioComon/InputCustom';
-import InputDouble from '../../scenarioComon/InputDouble';
-import { RADIO_BUTTON_LABELS, SETTING_LABELS } from '../../constants/scenarioSettingLabels';
+import { RADIO_BUTTON_LABELS } from '../../constants/scenarioSettingLabels';
 import { buildRadioButtonSettingContext } from './radioButtonSettingContext';
 import { InitialSelectionCheckbox } from './radioButtonShared';
+import RadioButtonItemsList from './RadioButtonItemsList';
+import RadioButtonImgLayoutSection from './RadioButtonImgLayoutSection';
 
 const RadioButtonImgTypeSetting = (props) => {
   const {
     radioButton,
-    handleDragEndRadioCheckbox,
-    handleRemoveItemContent,
-    handleAddItemRadioCheckbox,
+    indexContent,
     setIsOpenFileReference,
     setVarFileReference,
     setAcceptFile,
   } = props;
-  const {
-    indexMessageSelect,
-    indexContent,
-    content,
-    changeContent,
-    toggleInitialSelection,
-  } = buildRadioButtonSettingContext(props);
+  const { content, changeContent, toggleInitialSelection } = buildRadioButtonSettingContext(props);
 
-  const renderImgItem = (itemRadio, indexRadio, array) => (
-    <>
-      <div className="ss-user-setting__item-bottom">
-        <MDBIcon fas icon="grip-horizontal" className="ss-drag-handle-icon" />
-        <InputCustom
-          className="ss-radio-button-setting__img-file-input"
-          placeholder={RADIO_BUTTON_LABELS.fileUrl}
-          onChange={changeContent(radioButton.type, indexRadio, 'img')}
-          value={itemRadio.img}
-        />
-        <MDBIcon
-          onClick={() => {
-            setIsOpenFileReference(true);
-            setVarFileReference({
-              indexContent,
-              contentType: content.type,
-              subContentType: radioButton.type,
-              indexSubContent: indexRadio,
-              img: 'img',
-            });
-            setAcceptFile(['image']);
-          }}
-          fas
-          icon="paperclip"
-          className="ss-checkbox-setting__paperclip"
-        />
-      </div>
-      <InputDouble
-        classCustom="ss-user-radio-custom-class"
-        onChange={(value, name) => changeContent(
-          radioButton.type,
-          indexRadio,
-          name === 'left' ? 'text' : 'value',
-        )(value)}
-        onClickIcon={() => handleRemoveItemContent(
-          indexMessageSelect,
-          indexContent,
-          content.type,
-          radioButton.type,
-          indexRadio,
-        )}
-        icon={array.length >= 2 ? 'times-circle' : ''}
-        placeholder={SETTING_LABELS.textValue}
-        classIcon="ss-plus-circle-option-icon-times"
-        valueLeft={itemRadio.text}
-        valueRight={itemRadio.value}
-      />
-      <InitialSelectionCheckbox
-        itemValue={itemRadio.value}
-        radioButton={radioButton}
-        toggleInitialSelection={toggleInitialSelection}
-      />
-    </>
+  const renderItemGrip = () => (
+    <MDBIcon fas icon="grip-horizontal" className="ss-radio-button-setting__img-grip" />
   );
 
-  const renderDragList = () => (
-    <div className="ss-user-setting__item-bottom">
-      <DragDropContext onDragEnd={(result) => handleDragEndRadioCheckbox(
-        result,
-        content.id,
-        content.type,
-        radioButton.type,
-      )}
-      >
-        <Droppable droppableId="radio-items">
-          {(providedChild) => (
-            <div
-              className="ss-user-setting-item-radio-button-drag ss-radio-button-setting__drag-container"
-              {...providedChild.droppableProps}
-              ref={providedChild.innerRef}
-            >
-              {Array.isArray(radioButton?.[radioButton.type]) && radioButton[radioButton.type].map((itemRadio, indexRadio, array) => (
-                <Draggable
-                  draggable
-                  key={itemRadio.id}
-                  draggableId={`${itemRadio.id}`}
-                  index={indexRadio}
-                >
-                  {(dragProvided) => (
-                    <div
-                      {...dragProvided.draggableProps}
-                      {...dragProvided.dragHandleProps}
-                      ref={dragProvided.innerRef}
-                    >
-                      <div className="ss-radio-button-setting__item-panel">
-                        {renderImgItem(itemRadio, indexRadio, array)}
-                      </div>
-                    </div>
-                  )}
-                </Draggable>
-              ))}
-              {providedChild.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
+  const renderItemPrefix = (itemRadio, indexRadio) => (
+    <div className="ss-radio-button-setting__img-file-row">
+      <InputCustom
+        className="ss-radio-button-setting__img-file-input"
+        placeholder={RADIO_BUTTON_LABELS.fileUrl}
+        onChange={changeContent(radioButton.type, indexRadio, 'img')}
+        value={itemRadio.img}
+      />
+      <MDBIcon
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsOpenFileReference(true);
+          setVarFileReference({
+            indexContent,
+            contentType: content.type,
+            subContentType: radioButton.type,
+            indexSubContent: indexRadio,
+            img: 'img',
+          });
+          setAcceptFile(['image']);
+        }}
+        fas
+        icon="paperclip"
+        className="ss-radio-button-setting__paperclip"
+      />
     </div>
   );
 
-  const renderAddButton = () => (
-    <div className="ss-user-setting__item-bottom ss-radio-button-setting__add-row">
-      <MDBIcon
-        fas
-        icon="plus-circle"
-        className="ss-plus-circle-option-icon"
-        onClick={() => handleAddItemRadioCheckbox(
-          indexMessageSelect,
-          indexContent,
-          content.type,
-          radioButton.type,
-        )}
+  const renderItemExtra = (itemRadio) => (
+    <div className="ss-radio-button-setting__img-item-footer">
+      <InitialSelectionCheckbox
+        item={itemRadio}
+        radioButton={radioButton}
+        toggleInitialSelection={toggleInitialSelection}
       />
     </div>
   );
 
   return (
     <>
-      {renderDragList()}
-      {renderAddButton()}
+      <RadioButtonImgLayoutSection
+        radioButton={radioButton}
+        changeContent={changeContent}
+      />
+      <RadioButtonItemsList
+        {...props}
+        showGripOnInputRow={false}
+        showTextInput={false}
+        renderItemGrip={renderItemGrip}
+        itemBodyClassName="ss-radio-button-setting__img-item-body"
+        renderItemPrefix={renderItemPrefix}
+        renderItemExtra={renderItemExtra}
+      />
     </>
   );
 };

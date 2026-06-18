@@ -9,10 +9,11 @@ export const useScenarioContentSettingProps = (indexMessageSelect, indexContent,
     dataMessages, dataInputVar, isUseFukushashiki, dataHour, dataMinutes, dataEveryMinute,
     dataYear, dataMonth, dataDay, dataPrefectures, dataCity, listProductVariants,
     clientCartSystem, isShopifyPaymentScenario, fileErrorCarousel, indexCarouselSlide,
+    editorSelectedRadioOption,
   } = state;
   const {
     setDataMessages, setIsOpenAddVariable, setIsOpenFileReference, setVarFileReference,
-    setAcceptFile, setIndexCarouselSlide,
+    setAcceptFile, setIndexCarouselSlide, setEditorSelectedRadioOption,
   } = actions;
   const {
     onChangeValueMessageContent,
@@ -129,5 +130,7 @@ export const useScenarioContentSettingProps = (indexMessageSelect, indexContent,
     setIndexCarouselSlide,
     fileErrorCarousel,
     indexCarouselSlide,
+    editorSelectedRadioOption,
+    setEditorSelectedRadioOption,
   };
 };

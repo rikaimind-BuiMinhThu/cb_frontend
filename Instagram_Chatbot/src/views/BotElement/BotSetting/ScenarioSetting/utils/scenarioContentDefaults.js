@@ -52,6 +52,12 @@ export function createDefaultContentItem(messageType, idMax) {
         title_require: false,
         type: 'default',
         initial_selection: 1,
+        img_layout: {
+          type: 'horizontal_equal_2',
+          custom_widths: ['50', '50'],
+        },
+        option_padding: '0px',
+        option_margin: '5px',
         default: [{ id: 1 }],
         radio_button_img: [{ id: 1 }],
         block_style: [{ id: 1 }],

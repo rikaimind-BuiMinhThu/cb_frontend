@@ -211,19 +211,12 @@ const PreviewFaqReducer = (state, action) => {
       const isOpenFromState = Boolean(state.isOpen);
       const isOpenFromAmazonPay = Boolean(action.payload.isUsingAmazonPay);
       const isEditorPreview = Boolean(action.payload.isEditorPreview);
-      const hasEditorDraftMessages = isEditorPreview && state.renderMessagesList?.length > 0;
 
       let newState = {
         ...state,
         botInfor: botInfor,
-        objParam: {},
+        objParam: isEditorPreview ? state.objParam : {},
         loadedStateFromSession: true,
-        originalMessagesList: _.cloneDeep(
-          hasEditorDraftMessages ? state.messagesList : (conversation?.messages || []),
-        ),
-        messagesList: hasEditorDraftMessages
-          ? state.messagesList
-          : (conversation?.messages || []),
         isOpen: isEditorPreview ? true : (isOpenFromState || isOpenFromAmazonPay),
         activePopupCloseBot: Boolean(designSetting?.popup_close_bot),
         titleBubble: designSetting?.title_bubble || "簡単90秒で注文完了",
@@ -257,12 +250,29 @@ const PreviewFaqReducer = (state, action) => {
         bottomBodyCustomJsCode: chatbot?.bottom_body_custom_js_code,
         isUsedCustomCss: !!chatbot?.is_used_custom_css,
         customCssContent: chatbot?.custom_css_content,
-        currentMsgIndex: 0, // Start
+        themeSettings: designSetting?.theme || null,
         manuallyClosed: false,
         autoOpenAttempted: false,
-        renderMode: RENDER_MODES.NEXT,
-        loopCount: 0,
       };
+
+      if (isEditorPreview) {
+        newState.originalMessagesList = state.originalMessagesList?.length
+          ? state.originalMessagesList
+          : state.messagesList;
+        newState.messagesList = state.messagesList;
+        newState.renderMessagesList = state.renderMessagesList;
+        newState.currentMsgIndex = state.currentMsgIndex;
+        newState.nextStopMsgIndex = state.nextStopMsgIndex;
+        newState.renderMode = state.renderMode;
+        newState.loopCount = state.loopCount;
+        newState.progressBarMaxIndex = state.progressBarMaxIndex;
+      } else {
+        newState.originalMessagesList = _.cloneDeep(conversation?.messages || []);
+        newState.messagesList = conversation?.messages || [];
+        newState.currentMsgIndex = 0;
+        newState.renderMode = RENDER_MODES.NEXT;
+        newState.loopCount = 0;
+      }
 
       // Update originalContent for replace variables when after getPreviewResponse
       newState.messagesList.filter(isBotMessage).forEach((message) => {
@@ -287,13 +297,13 @@ const PreviewFaqReducer = (state, action) => {
         newState.currentMsgIndex = state.currentMsgIndex;
         newState.nextStopMsgIndex = state.nextStopMsgIndex;
         newState.renderMode = state.renderMode;
-      } else if (newState.isOpen) {
+      } else if (!isEditorPreview && newState.isOpen) {
         newState.nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg()) + 1;
         if (newState.nextStopMsgIndex < newState.currentMsgIndex) {
           newState.nextStopMsgIndex = newState.currentMsgIndex + 1;
         }
         newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
-      } else {
+      } else if (!isEditorPreview) {
         newState.currentMsgIndex = -1;
         newState.nextStopMsgIndex = -1;
         newState.renderMessagesList = [];

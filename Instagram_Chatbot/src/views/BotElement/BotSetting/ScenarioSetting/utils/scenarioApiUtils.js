@@ -1,4 +1,5 @@
 import { TIMER_TYPES, TIMER_VARIABLES } from '../../PreviewComponent/Constants';
+import _ from 'lodash';
 import { initialTimeConfig } from '../constants/scenarioFormConstants';
 import {
   buildAutoLogoutApiPayload,
@@ -155,7 +156,7 @@ export const buildScenarioSavePayload = (state) => {
 
   return {
     conversation: {
-      messages: [...dataMessages],
+      messages: _.cloneDeep(dataMessages),
       urlThanksPage: urlThanks,
       urlCartConfirmPage,
       isUsedCartConfirmPage,
