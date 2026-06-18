@@ -67,6 +67,12 @@ body.scenario-preview-editor-embedded .scenario-editor-radio-option--selected {
   border-radius: 4px;
 }
 
+body.scenario-preview-editor-embedded .scenario-editor-checkbox-option--selected {
+  outline: 2px solid #327aed;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 body.scenario-preview-editor-embedded .sp-user-message-button-action,
 body.scenario-preview-editor-embedded .sp-user-message-button-action button {
   pointer-events: none;

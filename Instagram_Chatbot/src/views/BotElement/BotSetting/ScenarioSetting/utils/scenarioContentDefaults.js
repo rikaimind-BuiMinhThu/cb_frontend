@@ -130,6 +130,12 @@ export function createDefaultContentItem(messageType, idMax) {
       [messageType]: {
         title_require: false,
         type: 'default',
+        img_layout: {
+          type: 'horizontal_equal_2',
+          custom_widths: ['50', '50'],
+        },
+        option_padding: '0px',
+        option_margin: '5px',
         default: [{ id: 1 }],
         checkbox_img: [{
           id: 1,

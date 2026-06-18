@@ -4,7 +4,13 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import InputCustom from '../../scenarioComon/InputCustom';
 import InputDouble from '../../scenarioComon/InputDouble';
 import { CHECKBOX_LABELS, SETTING_LABELS } from '../../constants/scenarioSettingLabels';
+import { getCheckboxImgSelectionKey } from '../../utils/checkboxSelectionUtils';
 import { buildCheckboxSettingContext } from './checkboxSettingContext';
+import { InitialCheckedCheckbox } from './checkboxShared';
+import CheckboxImgLayoutSection from './CheckboxImgLayoutSection';
+import CheckboxAddButton from './CheckboxAddButton';
+
+const INTERACTIVE_SELECTOR = 'input, textarea, select, button, .ant-checkbox, .ant-checkbox-wrapper, .ss-plus-circle-option-icon-times, .ss-checkbox-setting__paperclip, .ss-checkbox-setting__initial-selection, .ss-checkbox-setting__plus, .ss-checkbox-setting__minus';
 
 const CheckboxImgTypeSetting = (props) => {
   const {
@@ -17,8 +23,41 @@ const CheckboxImgTypeSetting = (props) => {
     setIsOpenFileReference,
     setVarFileReference,
     setAcceptFile,
+    editorSelectedCheckboxOption,
+    setEditorSelectedCheckboxOption,
   } = props;
-  const { indexMessageSelect, indexContent, content, changeContent } = buildCheckboxSettingContext(props);
+  const {
+    indexMessageSelect,
+    indexContent,
+    content,
+    changeContent,
+    toggleInitialSelectionPicture,
+  } = buildCheckboxSettingContext(props);
+
+  const selectedOptionId = (
+    editorSelectedCheckboxOption?.indexMessageSelect === indexMessageSelect
+    && editorSelectedCheckboxOption?.indexContent === indexContent
+    && editorSelectedCheckboxOption?.subContentType === checkbox.type
+  ) ? editorSelectedCheckboxOption.optionId : null;
+
+  const handleSelectOption = (optionId) => {
+    setEditorSelectedCheckboxOption?.({
+      indexMessageSelect,
+      indexContent,
+      subContentType: checkbox.type,
+      optionId,
+    });
+  };
+
+  const handleGroupClick = (event, group) => {
+    if (event.target.closest(INTERACTIVE_SELECTOR)) return;
+    handleSelectOption(group.id);
+  };
+
+  const handleContentClick = (event, group, contentItem) => {
+    if (event.target.closest(INTERACTIVE_SELECTOR)) return;
+    handleSelectOption(getCheckboxImgSelectionKey(group, contentItem));
+  };
 
   const addImgContent = (indexCheckbox) => {
     const arrMess = [...dataMessages[indexMessageSelect].message_content[indexContent][content.type].checkbox_img[indexCheckbox].contents];
@@ -34,14 +73,52 @@ const CheckboxImgTypeSetting = (props) => {
     setDataMessages([...dataMessages]);
   };
 
+  const getGroupClassName = (group) => [
+    'ss-checkbox-setting__img-row',
+    selectedOptionId != null && String(selectedOptionId) === String(group.id)
+      ? 'ss-checkbox-setting__img-row--selected'
+      : '',
+  ].filter(Boolean).join(' ');
+
+  const getContentClassName = (group, contentItem) => {
+    const compositeKey = getCheckboxImgSelectionKey(group, contentItem);
+    return [
+      'ss-checkbox-setting__img-content',
+      group.contents.length > 1 ? 'ss-checkbox-setting__img-content--multi' : '',
+      selectedOptionId != null && String(selectedOptionId) === String(compositeKey)
+        ? 'ss-checkbox-setting__img-content--selected'
+        : '',
+    ].filter(Boolean).join(' ');
+  };
+
   const renderImgContent = (itemCheckbox, indexCheckbox, array) => (
-    <div className="ss-checkbox-setting__img-row">
+    <div
+      className={getGroupClassName(itemCheckbox)}
+      onClick={(event) => handleGroupClick(event, itemCheckbox)}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          handleSelectOption(itemCheckbox.id);
+        }
+      }}
+      role="button"
+      tabIndex={0}
+    >
       <MDBIcon fas icon="grip-horizontal" className="ss-checkbox-setting__img-grip" />
       <div className="ss-user-setting-payment-radio-container ss-user-setting-payment-radio-container-img">
         {itemCheckbox.contents.map((itemContentCheckbox, indexContentCheckbox, arrContent) => (
           <div
             key={indexContentCheckbox}
-            className={`ss-checkbox-setting__img-content ${arrContent.length > 1 ? 'ss-checkbox-setting__img-content--multi' : ''}`}
+            className={getContentClassName(itemCheckbox, itemContentCheckbox)}
+            onClick={(event) => handleContentClick(event, itemCheckbox, itemContentCheckbox)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                handleSelectOption(getCheckboxImgSelectionKey(itemCheckbox, itemContentCheckbox));
+              }
+            }}
+            role="button"
+            tabIndex={0}
           >
             <div className="ss-user-setting__item-bottom ss-checkbox-setting__img-file-row">
               <InputCustom
@@ -89,6 +166,13 @@ const CheckboxImgTypeSetting = (props) => {
                 )(value)}
               />
             </div>
+            <InitialCheckedCheckbox
+              item={itemContentCheckbox}
+              group={itemCheckbox}
+              checkbox={checkbox}
+              toggleInitialSelectionPicture={toggleInitialSelectionPicture}
+              isImgType
+            />
           </div>
         ))}
       </div>
@@ -129,7 +213,7 @@ const CheckboxImgTypeSetting = (props) => {
         checkbox.type,
       )}
       >
-        <Droppable droppableId="checkbox-items">
+        <Droppable droppableId="checkbox-img-items">
           {(providedChild) => (
             <div
               className="ss-user-setting-item-checkbox-button-drag ss-checkbox-setting__drag-container"
@@ -162,26 +246,20 @@ const CheckboxImgTypeSetting = (props) => {
     </div>
   );
 
-  const renderAddButton = () => (
-    <div className="ss-user-setting__item-bottom ss-checkbox-setting__add-row">
-      <MDBIcon
-        fas
-        icon="plus-circle"
-        className="ss-plus-circle-option-icon"
-        onClick={() => handleAddItemRadioCheckbox(
-          indexMessageSelect,
-          indexContent,
-          content.type,
-          checkbox.type,
-        )}
-      />
-    </div>
-  );
-
   return (
     <>
+      <CheckboxImgLayoutSection
+        checkbox={checkbox}
+        changeContent={changeContent}
+      />
       {renderDragList()}
-      {renderAddButton()}
+      <CheckboxAddButton
+        indexMessageSelect={indexMessageSelect}
+        indexContent={indexContent}
+        content={content}
+        checkbox={checkbox}
+        handleAddItemRadioCheckbox={handleAddItemRadioCheckbox}
+      />
     </>
   );
 };

@@ -6,7 +6,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import InputDouble from '../../scenarioComon/InputDouble';
 import { SETTING_BUTTON_LABELS, SETTING_PLACEHOLDERS } from '../../constants/scenarioSettingLabels';
 
-const INTERACTIVE_ITEM_SELECTOR = 'input, textarea, select, button, .ant-checkbox, .ant-checkbox-wrapper, .ss-plus-circle-option-icon-times, .ss-radio-button-setting__paperclip, .ss-radio-button-setting__initial-selection';
+const INTERACTIVE_ITEM_SELECTOR = 'input, textarea, select, button, .ant-checkbox, .ant-checkbox-wrapper, .ss-plus-circle-option-icon-times, .ss-radio-button-setting__paperclip, .ss-radio-button-setting__initial-selection, .ss-checkbox-setting__paperclip, .ss-checkbox-setting__initial-selection';
 
 const DragDropTextValueList = ({
   items,

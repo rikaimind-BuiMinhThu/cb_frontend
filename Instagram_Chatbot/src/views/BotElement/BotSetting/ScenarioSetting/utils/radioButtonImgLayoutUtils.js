@@ -99,21 +99,27 @@ export const normalizePxValue = (value, fallback) => {
   return trimmed;
 };
 
-export const normalizeRadioButtonImgLayout = (radioButton = {}) => {
-  const layoutType = radioButton?.img_layout?.type || DEFAULT_RADIO_IMG_LAYOUT_TYPE;
+export const normalizeOptionImgLayout = (contentData = {}) => {
+  const layoutType = contentData?.img_layout?.type || DEFAULT_RADIO_IMG_LAYOUT_TYPE;
   const customWidths = resizeCustomWidths(
     layoutType,
-    radioButton?.img_layout?.custom_widths,
+    contentData?.img_layout?.custom_widths,
     false,
   );
 
   return {
     type: layoutType,
     custom_widths: customWidths,
-    option_padding: normalizePxValue(radioButton?.option_padding, DEFAULT_RADIO_IMG_OPTION_PADDING),
-    option_margin: normalizePxValue(radioButton?.option_margin, DEFAULT_RADIO_IMG_OPTION_MARGIN),
+    option_padding: normalizePxValue(contentData?.option_padding, DEFAULT_RADIO_IMG_OPTION_PADDING),
+    option_margin: normalizePxValue(contentData?.option_margin, DEFAULT_RADIO_IMG_OPTION_MARGIN),
   };
 };
+
+export const normalizeRadioButtonImgLayout = (radioButton = {}) =>
+  normalizeOptionImgLayout(radioButton);
+
+export const normalizeCheckboxImgLayout = (checkbox = {}) =>
+  normalizeOptionImgLayout(checkbox);
 
 export const getColumnWidths = (layout) => {
   if (layout.type === RADIO_IMG_LAYOUT_VERTICAL) {
@@ -149,6 +155,35 @@ export const getRadioImgGridStyle = (radioButton) => {
 
 export const getRadioImgOptionStyle = (radioButton) => {
   const layout = normalizeRadioButtonImgLayout(radioButton);
+  return {
+    padding: layout.option_padding,
+    boxSizing: 'border-box',
+  };
+};
+
+export const getCheckboxImgGridStyle = (checkbox) => {
+  const layout = normalizeCheckboxImgLayout(checkbox);
+  const style = {
+    '--checkbox-option-margin': layout.option_margin,
+    '--checkbox-option-padding': layout.option_padding,
+  };
+
+  if (layout.type === RADIO_IMG_LAYOUT_VERTICAL) {
+    return {
+      ...style,
+      gridTemplateColumns: '1fr',
+    };
+  }
+
+  const widths = getColumnWidths(layout);
+  return {
+    ...style,
+    gridTemplateColumns: widths.map((width) => `${parseFloat(width) || 1}fr`).join(' '),
+  };
+};
+
+export const getCheckboxImgOptionStyle = (checkbox) => {
+  const layout = normalizeCheckboxImgLayout(checkbox);
   return {
     padding: layout.option_padding,
     boxSizing: 'border-box',

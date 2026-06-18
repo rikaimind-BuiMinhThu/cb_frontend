@@ -32,6 +32,7 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
     setIndexMessageSelect,
     setIsConditionUp,
     setEditorSelectedRadioOption,
+    setEditorSelectedCheckboxOption,
     setIsOpenAddVariable,
     setErrorVariable,
     setConditions,
@@ -164,6 +165,7 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
     setIndexMessageSelect(index);
     setIsConditionUp(false);
     setEditorSelectedRadioOption(null);
+    setEditorSelectedCheckboxOption(null);
     if (belongTo === 'bot' && document.querySelector('.ss-bot-setting-condition-container')) {
       document.querySelector('.ss-bot-setting-condition-container').style.height = '20%';
     } else if (belongTo === 'user' && document.querySelector('.ss-user-setting__main')) {
@@ -186,7 +188,7 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
       messageEl.classList.add('ss-message--select');
       messageEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
-  }, [dataMessages, setBelongTo, setEditorSelectedRadioOption, setIndexMessageSelect, setIsConditionUp, setMessageType]);
+  }, [dataMessages, setBelongTo, setEditorSelectedRadioOption, setEditorSelectedCheckboxOption, setIndexMessageSelect, setIsConditionUp, setMessageType]);
 
   const handleHiddenMessage = useCallback((index, role) => {
     dataMessages[index].hidden = !dataMessages[index].hidden;
@@ -213,13 +215,14 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
   const handleSelectContentMessage = useCallback((indexContent, contentType) => {
     setMessageType(contentType);
     setEditorSelectedRadioOption(null);
+    setEditorSelectedCheckboxOption(null);
     document.querySelectorAll('.ss-user-setting__item').forEach((ele) => {
       if (!ele.classList.contains(`ss-user-setting__item-${indexContent}`)) {
         ele.classList.remove('ss-user-setting__item--active');
       }
     });
     document.querySelector(`.ss-user-setting__item-${indexContent}`).classList.add('ss-user-setting__item--active');
-  }, [setEditorSelectedRadioOption, setMessageType]);
+  }, [setEditorSelectedRadioOption, setEditorSelectedCheckboxOption, setMessageType]);
 
   const handleEditIconClick = useCallback((index) => {
     document.querySelectorAll('.ss-edit-option-wrapper').forEach((ele) => {

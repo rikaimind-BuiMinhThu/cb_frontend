@@ -10,6 +10,7 @@ import {
 import {
   applyEditorMessageHighlight,
   applyEditorRadioOptionHighlight,
+  applyEditorCheckboxOptionHighlight,
   setupEditorMessageClickListener,
 } from './scenarioEditorPreviewInteraction';
 import '../../../../../assets/css/bot/scenario/scenario-preview-editor-page.css';
@@ -23,6 +24,7 @@ const ScenarioPreviewEditorPage = () => {
   const [editorDraft, setEditorDraft] = useState(null);
   const [editorCustomCss, setEditorCustomCss] = useState(null);
   const pendingRadioOptionHighlightRef = useRef(null);
+  const pendingCheckboxOptionHighlightRef = useRef(null);
 
   useEffect(() => {
     if (botId) {
@@ -64,6 +66,11 @@ const ScenarioPreviewEditorPage = () => {
         pendingRadioOptionHighlightRef.current = payload ?? null;
         applyEditorRadioOptionHighlight(payload ?? null);
       }
+
+      if (type === SCENARIO_PREVIEW_MESSAGES.HIGHLIGHT_CHECKBOX_OPTION) {
+        pendingCheckboxOptionHighlightRef.current = payload ?? null;
+        applyEditorCheckboxOptionHighlight(payload ?? null);
+      }
     };
 
     window.addEventListener('message', handleMessage);
@@ -91,6 +98,7 @@ const ScenarioPreviewEditorPage = () => {
     const frameId = requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         applyEditorRadioOptionHighlight(pendingRadioOptionHighlightRef.current);
+        applyEditorCheckboxOptionHighlight(pendingCheckboxOptionHighlightRef.current);
         postToParent({ type: SCENARIO_PREVIEW_MESSAGES.PREVIEW_CONTENT_READY });
       });
     });

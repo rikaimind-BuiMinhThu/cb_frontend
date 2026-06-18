@@ -1,11 +1,37 @@
 import React from 'react';
-import { Checkbox } from 'antd';
 import ContentPreviewShell from '../shared/ContentPreviewShell';
 import { CHECKBOX_TYPES } from '../../constants/contentTypeConstants';
 import { PREVIEW_LABELS } from '../../constants/scenarioSettingLabels';
+import {
+  getCheckboxImgGridStyle,
+  getCheckboxImgOptionStyle,
+} from '../../utils/radioButtonImgLayoutUtils';
+import {
+  buildEditorCheckboxOptionDataAttr,
+  getCheckboxImgSelectionKey,
+  getCheckboxOptionSelectionKey,
+  isCheckboxImgContentChecked,
+  isCheckboxOptionChecked,
+  isEditorCheckboxOptionHighlighted,
+} from '../../utils/checkboxSelectionUtils';
 import '../../styles/contentPreviews/checkbox.css';
 
-const CheckboxPreview = ({ checkbox }) => {
+const CheckboxPreview = ({
+  checkbox,
+  indexMessageSelect,
+  indexContent,
+  editorSelectedCheckboxOption,
+}) => {
+  const getEditorHighlightClassName = (optionId) => (
+    isEditorCheckboxOptionHighlighted(
+      editorSelectedCheckboxOption,
+      indexMessageSelect,
+      indexContent,
+      checkbox.type,
+      optionId,
+    ) ? 'ss-checkbox-preview__option--selected' : ''
+  );
+
   const renderHeader = () => {
     if (!checkbox.title_require && !checkbox.require) return null;
     return (
@@ -25,58 +51,105 @@ const CheckboxPreview = ({ checkbox }) => {
   };
 
   const renderDefaultType = () => (
-    checkbox[checkbox.type].map((item, index) => (
-      <div key={index} className="ss-message__content--user-checkbox">
-        <input
-          type="checkbox"
-          name="ss-message__content--user-checkbox"
-          id="ss-message__content--user-checkbox"
-          disabled
-          checked={checkbox.all_item_checked}
-        />
-        <label htmlFor="ss-message__content--user-checkbox">{item.text}</label>
-      </div>
-    ))
-  );
-
-  const renderCheckboxImgType = () => (
-    checkbox.checkbox_img && checkbox[checkbox.type].map((itemCheckboxImg, indexCheckboxImg) => (
-      <div key={indexCheckboxImg} className="ss-message__content--user-checkbox--checkbox_img ss-checkbox-preview__img-group">
-        <Checkbox.Group
-          className="ss-user-overview-product-purchase-checkbox-group-type-text_image ss-user-overview-product-purchase-style-width ss-checkbox-preview__img-group-inner"
-          onChange={(value) => console.log(value)}
-          value={checkbox.initial_selection_picture}
+    checkbox[checkbox.type].map((item, index) => {
+      const selectionKey = getCheckboxOptionSelectionKey(item);
+      const inputId = `ss-checkbox-preview-default-${index}`;
+      const isChecked = isCheckboxOptionChecked(checkbox, item);
+      return (
+        <div
+          key={index}
+          data-editor-checkbox-option={buildEditorCheckboxOptionDataAttr(indexContent, item.id)}
+          className={[
+            'ss-message__content--user-checkbox',
+            isChecked ? 'ss-message__content--user-checkbox--selected' : '',
+            getEditorHighlightClassName(item.id),
+          ].filter(Boolean).join(' ')}
         >
-          {itemCheckboxImg.contents && itemCheckboxImg.contents.map((itemCheckboxContent, indexContent) => (
-            <Checkbox
-              value={`${itemCheckboxImg.id}-${itemCheckboxContent.id}`}
-              key={indexContent}
-              className="ss-checkbox-preview__img-checkbox"
-            >
-              <img src={itemCheckboxContent.file_url} alt="" />
-              <div className="ss-checkbox-preview__img-text">{itemCheckboxContent.text}</div>
-            </Checkbox>
-          ))}
-        </Checkbox.Group>
-      </div>
-    ))
-  );
-
-  const renderConsumeApiType = () => (
-    <>
-      {[0, 1].map((index) => (
-        <div key={index} className="ss-message__content--user-checkbox">
           <input
             type="checkbox"
             name="ss-message__content--user-checkbox"
-            id="ss-message__content--user-checkbox"
+            id={inputId}
             disabled
+            checked={isChecked}
           />
-          <label htmlFor="ss-message__content--user-checkbox">
-            {PREVIEW_LABELS.placeholderLabel}
-          </label>
+          {item.text && (
+            <label htmlFor={inputId}>{item.text}</label>
+          )}
         </div>
-      ))}
+      );
+    })
+  );
+
+  const renderCheckboxImgType = () => {
+    const gridStyle = getCheckboxImgGridStyle(checkbox);
+    const optionStyle = getCheckboxImgOptionStyle(checkbox);
+
+    return checkbox[checkbox.type]?.map((group, groupIndex) => (
+      <div
+        key={groupIndex}
+        data-editor-checkbox-option={buildEditorCheckboxOptionDataAttr(indexContent, group.id)}
+        className="ss-message__content--user-checkbox--checkbox_img ss-checkbox-preview__img-group"
+      >
+        <div
+          className="ss-message__content--user-checkbox-img-grid"
+          style={gridStyle}
+        >
+          {group.contents?.map((contentItem, contentIndex) => {
+            const compositeKey = getCheckboxImgSelectionKey(group, contentItem);
+            const inputId = `ss-checkbox-preview-img-${groupIndex}_${contentIndex}`;
+            const isChecked = isCheckboxImgContentChecked(checkbox, group, contentItem);
+            return (
+              <div
+                key={contentIndex}
+                data-editor-checkbox-option={buildEditorCheckboxOptionDataAttr(indexContent, compositeKey)}
+                className={[
+                  'ss-message__content--user-checkbox--checkbox_img-item',
+                  isChecked ? 'ss-message__content--user-checkbox--selected' : '',
+                  getEditorHighlightClassName(compositeKey),
+                ].filter(Boolean).join(' ')}
+                style={optionStyle}
+              >
+                <input
+                  type="checkbox"
+                  className="ss-checkbox-img-input--hidden"
+                  name={`ss-checkbox-preview-img-${groupIndex}`}
+                  id={inputId}
+                  disabled
+                  checked={isChecked}
+                  readOnly
+                  tabIndex={-1}
+                  aria-hidden="true"
+                />
+                <img src={contentItem.file_url} alt="" />
+                {contentItem.text && (
+                  <div className="ss-checkbox-preview__img-text">{contentItem.text}</div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    ));
+  };
+
+  const renderConsumeApiType = () => (
+    <>
+      {[0, 1].map((index) => {
+        const inputId = `ss-checkbox-preview-api-${index}`;
+        return (
+          <div key={index} className="ss-message__content--user-checkbox">
+            <input
+              type="checkbox"
+              name="ss-message__content--user-checkbox"
+              id={inputId}
+              disabled
+            />
+            <label htmlFor={inputId}>
+              {PREVIEW_LABELS.placeholderLabel}
+            </label>
+          </div>
+        );
+      })}
     </>
   );
 
@@ -96,7 +169,9 @@ const CheckboxPreview = ({ checkbox }) => {
   return (
     <ContentPreviewShell className="ss-checkbox-preview">
       {renderHeader()}
-      {renderTypeBody()}
+      <div className="ss-message__content--user-checkbox-wrapper">
+        {renderTypeBody()}
+      </div>
     </ContentPreviewShell>
   );
 };

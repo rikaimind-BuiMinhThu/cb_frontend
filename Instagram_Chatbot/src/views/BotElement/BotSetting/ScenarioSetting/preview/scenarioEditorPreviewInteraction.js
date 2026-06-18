@@ -39,6 +39,22 @@ export const applyEditorRadioOptionHighlight = (selection) => {
   });
 };
 
+export const applyEditorCheckboxOptionHighlight = (selection) => {
+  document.querySelectorAll('.scenario-editor-checkbox-option--selected').forEach((el) => {
+    el.classList.remove('scenario-editor-checkbox-option--selected');
+  });
+
+  if (!selection) return;
+
+  const { indexContent, optionId } = selection;
+  if (indexContent == null || optionId == null) return;
+
+  const selector = `[data-editor-checkbox-option="${indexContent}-${optionId}"]`;
+  document.querySelectorAll(selector).forEach((el) => {
+    el.classList.add('scenario-editor-checkbox-option--selected');
+  });
+};
+
 export const setupEditorMessageClickListener = (onSelectMessage) => {
   const handleClick = (event) => {
     const spBody = document.getElementById('sp-body');

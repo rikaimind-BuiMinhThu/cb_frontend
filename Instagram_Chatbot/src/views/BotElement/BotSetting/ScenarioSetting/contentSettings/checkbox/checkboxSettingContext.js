@@ -1,5 +1,9 @@
 import FukushashikiSearchRow from '../shared/FukushashikiSearchRow';
 import { FUKUSHASHIKI_VARIANTS } from '../../constants/scenarioSettingLabels';
+import {
+  getCheckboxImgSelectionKey,
+  getCheckboxOptionSelectionKey,
+} from '../../utils/checkboxSelectionUtils';
 
 export const buildCheckboxSettingContext = (props) => {
   const {
@@ -35,6 +39,30 @@ export const buildCheckboxSettingContext = (props) => {
     </div>
   );
 
+  const toggleCheckedValue = (item) => {
+    const selectionKey = getCheckboxOptionSelectionKey(item);
+    const current = [...(checkbox.checkedValue ?? [])];
+    const index = current.findIndex((value) => String(value) === String(selectionKey));
+    if (index >= 0) {
+      current.splice(index, 1);
+    } else {
+      current.push(selectionKey);
+    }
+    changeContent('checkedValue')(current);
+  };
+
+  const toggleInitialSelectionPicture = (group, content) => {
+    const selectionKey = getCheckboxImgSelectionKey(group, content);
+    const current = [...(checkbox.initial_selection_picture ?? [])];
+    const index = current.findIndex((value) => String(value) === String(selectionKey));
+    if (index >= 0) {
+      current.splice(index, 1);
+    } else {
+      current.push(selectionKey);
+    }
+    changeContent('initial_selection_picture')(current);
+  };
+
   return {
     indexMessageSelect,
     indexContent,
@@ -44,5 +72,7 @@ export const buildCheckboxSettingContext = (props) => {
     changeContent,
     changeMessageField,
     renderCheckedValueFukushashiki,
+    toggleCheckedValue,
+    toggleInitialSelectionPicture,
   };
 };

@@ -81,6 +81,7 @@ export const useScenario = () => {
   const [isOpenFileReference, setIsOpenFileReference] = useState(false);
   const [indexCarouselSlide, setIndexCarouselSlide] = useState(0);
   const [editorSelectedRadioOption, setEditorSelectedRadioOption] = useState(null);
+  const [editorSelectedCheckboxOption, setEditorSelectedCheckboxOption] = useState(null);
 
   const [varShopifyReference, setVarShopifyReference] = useState({});
   const [isOpenShopifyReference, setIsOpenShopifyReference] = useState(false);
@@ -521,6 +522,7 @@ export const useScenario = () => {
       isOpenFileReference,
       indexCarouselSlide,
       editorSelectedRadioOption,
+      editorSelectedCheckboxOption,
       varShopifyReference,
       isOpenShopifyReference,
       botTextValue,
@@ -603,6 +605,7 @@ export const useScenario = () => {
       setIsOpenFileReference,
       setIndexCarouselSlide,
       setEditorSelectedRadioOption,
+      setEditorSelectedCheckboxOption,
       setVarShopifyReference,
       setIsOpenShopifyReference,
       setBotTextValue,

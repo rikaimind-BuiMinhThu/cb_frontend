@@ -62,6 +62,7 @@ const ScenarioEditorPreviewPanel = () => {
     scenarioId,
     botId,
     editorSelectedRadioOption,
+    editorSelectedCheckboxOption,
   } = state;
   const { handleSelectMessage } = messages;
 
@@ -183,6 +184,15 @@ const ScenarioEditorPreviewPanel = () => {
     });
   }, [isIframeReady]);
 
+  const syncCheckboxOptionHighlight = useCallback((selection) => {
+    if (!isIframeReady || !iframeRef.current) return;
+
+    postToIframe(iframeRef.current, {
+      type: SCENARIO_PREVIEW_MESSAGES.HIGHLIGHT_CHECKBOX_OPTION,
+      payload: selection,
+    });
+  }, [isIframeReady]);
+
   const getRadioOptionHighlightPayload = useCallback(() => {
     const shouldHighlight = editorSelectedRadioOption?.indexMessageSelect === indexMessageSelect;
     if (!shouldHighlight) return null;
@@ -193,10 +203,27 @@ const ScenarioEditorPreviewPanel = () => {
     };
   }, [editorSelectedRadioOption, indexMessageSelect]);
 
+  const getCheckboxOptionHighlightPayload = useCallback(() => {
+    const shouldHighlight = editorSelectedCheckboxOption?.indexMessageSelect === indexMessageSelect;
+    if (!shouldHighlight) return null;
+
+    return {
+      indexContent: editorSelectedCheckboxOption.indexContent,
+      optionId: editorSelectedCheckboxOption.optionId,
+    };
+  }, [editorSelectedCheckboxOption, indexMessageSelect]);
+
   const syncPreviewWithHighlights = useCallback(() => {
     syncPreview();
     syncRadioOptionHighlight(getRadioOptionHighlightPayload());
-  }, [getRadioOptionHighlightPayload, syncPreview, syncRadioOptionHighlight]);
+    syncCheckboxOptionHighlight(getCheckboxOptionHighlightPayload());
+  }, [
+    getCheckboxOptionHighlightPayload,
+    getRadioOptionHighlightPayload,
+    syncCheckboxOptionHighlight,
+    syncPreview,
+    syncRadioOptionHighlight,
+  ]);
 
   dataMessagesRef.current = dataMessages;
   handleSelectMessageRef.current = handleSelectMessage;
@@ -330,6 +357,18 @@ const ScenarioEditorPreviewPanel = () => {
     isIframeReady,
     getRadioOptionHighlightPayload,
     syncRadioOptionHighlight,
+  ]);
+
+  useEffect(() => {
+    if (!isIframeReady) return;
+
+    syncCheckboxOptionHighlight(getCheckboxOptionHighlightPayload());
+  }, [
+    editorSelectedCheckboxOption,
+    indexMessageSelect,
+    isIframeReady,
+    getCheckboxOptionHighlightPayload,
+    syncCheckboxOptionHighlight,
   ]);
 
   const messageCount = useMemo(
