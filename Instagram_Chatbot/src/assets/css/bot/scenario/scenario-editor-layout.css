@@ -509,14 +509,16 @@
   white-space: nowrap;
 }
 
-.ss-text-input-setting {
+.ss-text-input-setting,
+.ss-textarea-setting {
   display: flex;
   flex-direction: column;
   gap: 12px;
   width: 100%;
 }
 
-.ss-editor-layout-v2 .ss-text-input-setting .ss-content-setting-body {
+.ss-editor-layout-v2 .ss-text-input-setting .ss-content-setting-body,
+.ss-editor-layout-v2 .ss-textarea-setting .ss-content-setting-body {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -541,39 +543,47 @@
   min-width: 0;
 }
 
-.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting__item-bottom {
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting__item-bottom,
+.ss-editor-layout-v2 .ss-textarea-setting .ss-user-setting__item-bottom {
   justify-content: flex-start;
   margin-bottom: 0;
   width: 100%;
 }
 
-.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting__item-bottom-flex-start {
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting__item-bottom-flex-start,
+.ss-editor-layout-v2 .ss-textarea-setting .ss-user-setting__item-bottom-flex-start {
   margin-bottom: 0;
   width: 100%;
 }
 
 .ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting__item-bottom .select-custom-antd,
-.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting__item-bottom .select-custom-native {
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting__item-bottom .select-custom-native,
+.ss-editor-layout-v2 .ss-textarea-setting .ss-user-setting__item-bottom .select-custom-antd,
+.ss-editor-layout-v2 .ss-textarea-setting .ss-user-setting__item-bottom .select-custom-native {
   width: 100%;
 }
 
-.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting__item-select-bottom-wrapper-flex {
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting__item-select-bottom-wrapper-flex,
+.ss-editor-layout-v2 .ss-textarea-setting .ss-user-setting__item-select-bottom-wrapper-flex {
   width: 100%;
   gap: 8px;
 }
 
-.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting__item-select-bottom-wrapper-flex > div {
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting__item-select-bottom-wrapper-flex > div,
+.ss-editor-layout-v2 .ss-textarea-setting .ss-user-setting__item-select-bottom-wrapper-flex > div {
   flex: 1 1 48%;
   width: auto;
 }
 
-.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting-option-row {
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting-option-row,
+.ss-editor-layout-v2 .ss-textarea-setting .ss-user-setting-option-row {
   grid-template-columns: 1fr;
   align-items: stretch;
   gap: 8px;
 }
 
-.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting-option-row__controls {
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting-option-row__controls,
+.ss-editor-layout-v2 .ss-textarea-setting .ss-user-setting-option-row__controls {
   flex-wrap: wrap;
   gap: 8px 12px;
   width: 100%;
@@ -581,12 +591,16 @@
 
 .ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting-option-row__controls .select-custom-antd,
 .ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting-option-row__controls .select-custom-native,
-.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting-option-row__controls .ss-input-custom-container {
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting-option-row__controls .ss-input-custom-container,
+.ss-editor-layout-v2 .ss-textarea-setting .ss-user-setting-option-row__controls .select-custom-antd,
+.ss-editor-layout-v2 .ss-textarea-setting .ss-user-setting-option-row__controls .select-custom-native,
+.ss-editor-layout-v2 .ss-textarea-setting .ss-user-setting-option-row__controls .ss-input-custom-container {
   flex: 1 1 180px;
   min-width: 0;
 }
 
-.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting-option-row__action {
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting-option-row__action,
+.ss-editor-layout-v2 .ss-textarea-setting .ss-user-setting-option-row__action {
   flex: 0 0 auto;
   align-self: center;
 }

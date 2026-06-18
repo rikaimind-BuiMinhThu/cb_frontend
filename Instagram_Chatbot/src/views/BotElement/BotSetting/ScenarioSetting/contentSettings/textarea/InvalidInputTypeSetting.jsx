@@ -7,9 +7,9 @@ const InvalidInputTypeSetting = (props) => {
   const { typeConfig, changeContent } = buildTextareaSettingContext(props);
 
   const renderContentTextarea = () => (
-    <div className="ss-user-setting__item-bottom">
+    <div className="ss-textarea-setting__content">
       <textarea
-        className="ss-user-setting-item-textarea-label ss-input-value ss-textarea-setting__textarea"
+        className="ss-textarea-setting__textarea ss-input-value"
         placeholder={TEXTAREA_LABELS.placeholder}
         rows="5"
         value={typeConfig?.content}

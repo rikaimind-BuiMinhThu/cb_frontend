@@ -1,7 +1,52 @@
-.ss-textarea-setting__textarea {
-  width: 90%;
-}
-
 .ss-textarea-setting__require {
   margin-top: 0;
+  margin-bottom: 0;
+}
+
+.ss-textarea-setting__content {
+  width: 100%;
+}
+
+.ss-textarea-setting__textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  resize: vertical;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.ss-textarea-setting__textarea:focus {
+  outline: none;
+  border-color: #024bb9;
+  box-shadow: 0 0 0 2px rgba(2, 75, 185, 0.12);
+}
+
+.ss-textarea-setting .ss-user-setting__item-bottom-flex-start {
+  align-items: center;
+  gap: 8px;
+}
+
+.ss-textarea-setting .ss-user-setting-input-limit-character {
+  width: 90px;
+  flex: 0 0 90px;
+  margin-left: 0;
+}
+
+.ss-textarea-setting .ss-range-separator {
+  font-size: 16px;
+  margin-left: 0;
+  opacity: 0.5;
+  line-height: 1;
+}
+
+.ss-textarea-setting .ss-user-setting-label {
+  margin-left: 0;
+  flex: 0 0 auto;
+  white-space: nowrap;
 }

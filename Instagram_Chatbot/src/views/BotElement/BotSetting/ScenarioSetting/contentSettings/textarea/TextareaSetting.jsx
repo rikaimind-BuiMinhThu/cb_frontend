@@ -69,6 +69,7 @@ const TextareaSetting = (props) => {
       renderRootFaqOption={renderRootFaqOption}
       dataInputVar={dataInputVar}
       setIsOpenAddVariable={setIsOpenAddVariable}
+      className="ss-textarea-setting"
     >
       {renderTypeSelector()}
       {renderTitle()}
