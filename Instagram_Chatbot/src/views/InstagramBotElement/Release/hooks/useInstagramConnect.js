@@ -55,14 +55,28 @@ export default function useInstagramConnect({ onNotify }) {
     loadConnection();
   }, [loadConnection]);
 
-  const handleFbLogin = useCallback((response) => {
-    if (!response?.accessToken) return;
-
-    window.FB.api(`${response.userID}/accounts?fields=id,name,picture`, (resPage) => {
+  const fetchFbPages = useCallback((userID) => {
+    window.FB.api(`${userID}/accounts?fields=id,name,picture`, (resPage) => {
       setPages(resPage?.data || []);
       setShowPageList(true);
     });
   }, []);
+
+  const statusChangeCallback = useCallback((response) => {
+    if (response.status === 'connected' && response.authResponse?.userID) {
+      fetchFbPages(response.authResponse.userID);
+    }
+  }, [fetchFbPages]);
+
+  const checkFbLoginStatus = useCallback(() => {
+    if (!window.FB) return;
+    window.FB.getLoginStatus(statusChangeCallback);
+  }, [statusChangeCallback]);
+
+  const handleFbLogin = useCallback((response) => {
+    if (!response?.accessToken) return;
+    fetchFbPages(response.userID);
+  }, [fetchFbPages]);
 
   const selectPage = useCallback(async (pageId) => {
     setConnecting(true);
@@ -138,6 +152,7 @@ export default function useInstagramConnect({ onNotify }) {
     account,
     loadConnection,
     handleFbLogin,
+    checkFbLoginStatus,
     selectPage,
     disconnect,
   };

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import FacebookLogin from 'react-facebook-login';
 import { Avatar, Button, Card, List, Spin, Typography } from 'antd';
 import { FACEBOOK_APP_ID, META_GRAPH_API_VERSION } from '../../../../variables/constants';
@@ -18,8 +18,12 @@ const FB_SCOPES = [
 
 let fbSdkInitialized = false;
 
-function initFacebookSdk() {
-  if (fbSdkInitialized || !window.FB) return;
+function initFacebookSdk(onReady) {
+  if (fbSdkInitialized) {
+    onReady?.();
+    return;
+  }
+  if (!window.FB) return;
   window.FB.init({
     appId: FACEBOOK_APP_ID,
     cookie: true,
@@ -27,15 +31,32 @@ function initFacebookSdk() {
     version: META_GRAPH_API_VERSION,
   });
   fbSdkInitialized = true;
+  onReady?.();
 }
 
 export default function InstagramConnectCard() {
   const { connect } = useReleaseEditor();
+  const checkFbLoginStatusRef = useRef(connect.checkFbLoginStatus);
+  const loadingRef = useRef(connect.loading);
+  const isConnectedRef = useRef(connect.isConnected);
 
   useEffect(() => {
-    window.fbAsyncInit = initFacebookSdk;
+    checkFbLoginStatusRef.current = connect.checkFbLoginStatus;
+    loadingRef.current = connect.loading;
+    isConnectedRef.current = connect.isConnected;
+  });
+
+  useEffect(() => {
+    const tryCheckLogin = () => {
+      if (!loadingRef.current && !isConnectedRef.current) {
+        checkFbLoginStatusRef.current();
+      }
+    };
+
+    window.fbAsyncInit = () => initFacebookSdk(tryCheckLogin);
+
     if (document.getElementById('facebook-jssdk')) {
-      initFacebookSdk();
+      initFacebookSdk(tryCheckLogin);
       return undefined;
     }
 
@@ -48,6 +69,12 @@ export default function InstagramConnectCard() {
       script.remove();
     };
   }, []);
+
+  useEffect(() => {
+    if (connect.loading || connect.isConnected) return;
+    if (!window.FB || !fbSdkInitialized) return;
+    connect.checkFbLoginStatus();
+  }, [connect.loading, connect.isConnected, connect.checkFbLoginStatus]);
 
   if (connect.loading) {
     return (
