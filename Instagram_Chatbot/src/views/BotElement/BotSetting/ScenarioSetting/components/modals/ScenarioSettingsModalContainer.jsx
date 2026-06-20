@@ -12,6 +12,7 @@ import ScenarioTimerView from './views/ScenarioTimerView';
 import ScenarioErrMsgView from './views/ScenarioErrMsgView';
 import ScenarioAutoLogoutView from './views/ScenarioAutoLogoutView';
 import ScenarioSettingsAmazonPayView from './views/ScenarioSettingsAmazonPayView';
+import ScenarioGlobalDelayView from './views/ScenarioGlobalDelayView';
 
 const ScenarioSettingsModalContainer = () => {
   const { state, actions } = useScenarioEditor();
@@ -55,6 +56,8 @@ const ScenarioSettingsModalContainer = () => {
         return <ScenarioAutoLogoutView onBack={backToSettingsMainView} />;
       case SETTINGS_MODAL_VIEWS.AMAZON_PAY:
         return <ScenarioSettingsAmazonPayView onBack={backToSettingsMainView} />;
+      case SETTINGS_MODAL_VIEWS.GLOBAL_DELAY:
+        return <ScenarioGlobalDelayView onBack={backToSettingsMainView} />;
       case SETTINGS_MODAL_VIEWS.MAIN:
       default:
         return <ScenarioSettingsMainView onClose={closeScenarioSettingsModal} />;

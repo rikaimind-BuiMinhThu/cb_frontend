@@ -172,6 +172,17 @@ const ScenarioTimerView = ({ onBack }) => {
           )}
         </div>
 
+        <div className="modal_timer_config-finish_message full-width">
+          <ScenarioModalCheckbox
+            checked={!!modalData.isRealtimeRemainingTime}
+            onChange={(checked) => handleChangeTimerConfig({
+              keyPath: ['temp', 'isRealtimeRemainingTime'],
+              instanceValue: checked,
+            })()}
+            label="リアルタイム残り時間表示"
+          />
+        </div>
+
         <div className="modal_timer_config-variable_holder">
           {Object.keys(timerConfig.variables).map((key) => (
             <div key={`${key}v_des`}>

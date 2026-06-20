@@ -455,6 +455,8 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
         isUsedCustomCss: !!chatbot?.is_used_custom_css,
         customCssContent: chatbot?.custom_css_content,
         isUseBtnUpdateTracking: !!conversation?.isUseBtnUpdateTracking,
+        isUseGlobalDelay: conversation?.isUseGlobalDelay || false,
+        globalDelayTime: conversation?.globalDelayTime ?? 1.0,
         themeSettings: designSetting?.theme || null,
         manuallyClosed: false,
         autoOpenAttempted: false,

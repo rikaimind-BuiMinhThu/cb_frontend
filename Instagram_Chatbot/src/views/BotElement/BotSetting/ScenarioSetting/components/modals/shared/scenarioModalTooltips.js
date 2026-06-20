@@ -28,6 +28,8 @@ export const SCENARIO_MODAL_TOOLTIPS = {
   timerDuration: 'タイマーのカウントダウン時間を設定します。',
   timerCountingMessage: 'カウント中に表示するメッセージを入力してください。',
   timerFinishMessage: 'タイマー終了時に表示するメッセージを入力してください。',
+  isUseGlobalDelay: 'すべてのボットメッセージ表示前に待ち時間を設けます。',
+  globalDelayTime: 'ボットメッセージが表示されるまでの待ち時間（秒）を設定します。',
   errMsgJsCode: 'エラーメッセージを取得するJSコードを入力してください。',
   errMsgFieldSelectors: 'フィールドエラーを取得するCSSセレクター（カンマ区切り）。',
   errMsgFormSelectors: 'フォームエラーを取得するCSSセレクター（カンマ区切り）。',
@@ -76,6 +78,7 @@ export const SETTINGS_MODAL_VIEWS = {
   ERR_MSG: 'errMsg',
   AUTO_LOGOUT: 'autoLogout',
   AMAZON_PAY: 'amazonPay',
+  GLOBAL_DELAY: 'globalDelay',
 };
 
 export const SETTINGS_VIEW_TITLES = {
@@ -86,4 +89,5 @@ export const SETTINGS_VIEW_TITLES = {
   [SETTINGS_MODAL_VIEWS.ERR_MSG]: 'エラーメッセージ取得設定',
   [SETTINGS_MODAL_VIEWS.AUTO_LOGOUT]: '自動ログアウト設定',
   [SETTINGS_MODAL_VIEWS.AMAZON_PAY]: 'Amazon Pay 連携設定',
+  [SETTINGS_MODAL_VIEWS.GLOBAL_DELAY]: '表示待ち時間を設定する',
 };

@@ -40,6 +40,8 @@ const ScenarioEditorPreviewPanel = () => {
     isUsedCartConfirmPage,
     coupon,
     isUseBtnUpdateTracking,
+    isUseGlobalDelay,
+    globalDelayTime,
     scenarioName,
     scenarioType,
     merchandiseId,
@@ -88,6 +90,8 @@ const ScenarioEditorPreviewPanel = () => {
     isUsedCartConfirmPage,
     coupon,
     isUseBtnUpdateTracking,
+    isUseGlobalDelay,
+    globalDelayTime,
     scenarioName,
     scenarioType,
     merchandiseId,
@@ -124,6 +128,8 @@ const ScenarioEditorPreviewPanel = () => {
     headCustomJsCode,
     isClearLandingPageSession,
     isUseBtnUpdateTracking,
+    isUseGlobalDelay,
+    globalDelayTime,
     isUseCustomCss,
     isUseCustomJsCode,
     isUseErrMsgByJs,
@@ -417,6 +423,8 @@ const ScenarioEditorPreviewPanel = () => {
           finishMsg={editorTimerConfig.messages.finish}
           variables={getTimerConfigVariable(editorTimerConfig.variables)}
           startCount
+          isRealtimeRemainingTime={editorTimerConfig.isRealtimeRemainingTime}
+          scenarioId={scenarioId}
           onCounting={handleTimerCounting}
         />
       </div>
@@ -424,6 +432,7 @@ const ScenarioEditorPreviewPanel = () => {
   }, [
     editorTimerConfig,
     handleTimerCounting,
+    scenarioId,
     scenarioType,
     timerChanges.timeLeft,
   ]);

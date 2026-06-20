@@ -57,6 +57,7 @@ export const parseTimerConfigFromApi = (resTimerConfig) => {
       ...(resTimerConfig?.messages || {}),
     },
     type: resTimerConfig?.type || TIMER_TYPES.COUNTING_DOWN,
+    isRealtimeRemainingTime: resTimerConfig?.isRealtimeRemainingTime ?? initialTimeConfig.isRealtimeRemainingTime,
   };
 
   timerConfig.temp = scenarioTimerConfig;
@@ -122,6 +123,8 @@ export const parseScenarioResponse = (res) => {
       };
     })(),
     isUseBtnUpdateTracking: conversation.isUseBtnUpdateTracking || false,
+    isUseGlobalDelay: conversation.isUseGlobalDelay || false,
+    globalDelayTime: conversation.globalDelayTime ?? 1.0,
     useFullwidthChatbotMobile: data.use_fullwidth_chatbot_mobile || false,
     timerConfig: parseTimerConfigFromApi(data.timer_config),
     allowedLpDomains: normalizeAllowedLpDomains(data.allowed_lp_domains || []),
@@ -139,6 +142,8 @@ export const buildScenarioSavePayload = (state) => {
     isUsedCartConfirmPage,
     coupon,
     isUseBtnUpdateTracking,
+    isUseGlobalDelay,
+    globalDelayTime,
     scenarioName,
     scenarioType,
     merchandiseId,
@@ -178,6 +183,8 @@ export const buildScenarioSavePayload = (state) => {
       isUsedCartConfirmPage,
       coupon,
       isUseBtnUpdateTracking,
+      isUseGlobalDelay,
+      globalDelayTime,
     },
     scenario_name: scenarioName,
     scenario_type: scenarioType,
@@ -203,6 +210,7 @@ export const buildScenarioSavePayload = (state) => {
       variables: timerConfig.variables,
       duration: timerConfig.final.duration,
       messages: timerConfig.final.messages,
+      isRealtimeRemainingTime: timerConfig.final.isRealtimeRemainingTime,
     }),
     is_used_err_msg_by_js: isUseErrMsgByJs,
     err_msg_js_code: errMsgJsCode,

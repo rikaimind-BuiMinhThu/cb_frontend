@@ -133,6 +133,8 @@ export const useScenario = () => {
   const [autoLogoutConfig, setAutoLogoutConfig] = useState(createEmptyAutoLogoutConfig);
   const [isOpenAutoLogoutModal, setIsOpenAutoLogoutModal] = useState(false);
   const [isUseBtnUpdateTracking, setIsUseBtnUpdateTracking] = useState(false);
+  const [isUseGlobalDelay, setIsUseGlobalDelay] = useState(false);
+  const [globalDelayTime, setGlobalDelayTime] = useState(1.0);
   const [useFullwidthChatbotMobile, setUseFullwidthChatbotMobile] = useState(false);
   const [clientCartSystem, setClientCartSystem] = useState(null);
   const [allowedLpDomains, setAllowedLpDomains] = useState([]);
@@ -208,6 +210,8 @@ export const useScenario = () => {
     setIsClearLandingPageSession(parsed.isClearLandingPageSession);
     setAutoLogoutConfig(parsed.autoLogoutConfig || createEmptyAutoLogoutConfig());
     setIsUseBtnUpdateTracking(parsed.isUseBtnUpdateTracking);
+    setIsUseGlobalDelay(parsed.isUseGlobalDelay);
+    setGlobalDelayTime(parsed.globalDelayTime);
     setUseFullwidthChatbotMobile(parsed.useFullwidthChatbotMobile);
     setTimerConfig(parsed.timerConfig);
     setAllowedLpDomains(parsed.allowedLpDomains || []);
@@ -299,6 +303,8 @@ export const useScenario = () => {
     isUsedCartConfirmPage,
     coupon,
     isUseBtnUpdateTracking,
+    isUseGlobalDelay,
+    globalDelayTime,
     scenarioName,
     scenarioType,
     merchandiseId,
@@ -346,6 +352,8 @@ export const useScenario = () => {
     headCustomJsCode,
     isClearLandingPageSession,
     isUseBtnUpdateTracking,
+    isUseGlobalDelay,
+    globalDelayTime,
     isUseCustomCss,
     isUseCustomJsCode,
     isUseErrMsgByJs,
@@ -580,6 +588,8 @@ export const useScenario = () => {
       autoLogoutConfig,
       isOpenAutoLogoutModal,
       isUseBtnUpdateTracking,
+      isUseGlobalDelay,
+      globalDelayTime,
       useFullwidthChatbotMobile,
       clientCartSystem,
       allowedLpDomains,
@@ -668,6 +678,8 @@ export const useScenario = () => {
       setAutoLogoutConfig,
       setIsOpenAutoLogoutModal,
       setIsUseBtnUpdateTracking,
+      setIsUseGlobalDelay,
+      setGlobalDelayTime,
       setUseFullwidthChatbotMobile,
       setClientCartSystem,
       setAllowedLpDomains,

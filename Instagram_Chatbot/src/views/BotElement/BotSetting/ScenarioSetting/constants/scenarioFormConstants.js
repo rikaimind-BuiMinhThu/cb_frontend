@@ -308,4 +308,5 @@ export const initialTimeConfig = {
     },
   },
   isShowMessageFinish: false,
+  isRealtimeRemainingTime: false,
 };

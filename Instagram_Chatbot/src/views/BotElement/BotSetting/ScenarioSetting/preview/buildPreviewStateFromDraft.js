@@ -69,6 +69,8 @@ export const buildEditorDraftPreviewUpdate = (draft) => {
     submitErrorMessage: '',
     renderMode: RENDER_MODES.LAST,
     isUseBtnUpdateTracking: !!draft?.conversation?.isUseBtnUpdateTracking,
+    isUseGlobalDelay: !!draft?.conversation?.isUseGlobalDelay,
+    globalDelayTime: draft?.conversation?.globalDelayTime ?? 1.0,
     urlThanksPage: draft?.conversation?.urlThanksPage || '',
     urlCartConfirmPage: draft?.conversation?.urlCartConfirmPage || '',
     isUsedCartConfirmPage: !!draft?.conversation?.isUsedCartConfirmPage,

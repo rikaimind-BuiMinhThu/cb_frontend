@@ -40,6 +40,7 @@ const ScenarioSettingsMainView = ({ onClose }) => {
     productIdCrossSell,
     isClearLandingPageSession,
     isUseBtnUpdateTracking,
+    isUseGlobalDelay,
     useFullwidthChatbotMobile,
     isShopifyPaymentScenario,
   } = state;
@@ -62,6 +63,7 @@ const ScenarioSettingsMainView = ({ onClose }) => {
     setIsClearLandingPageSession,
     setAutoLogoutConfig,
     setIsUseBtnUpdateTracking,
+    setIsUseGlobalDelay,
     setUseFullwidthChatbotMobile,
     navigateSettingsModalView,
   } = actions;
@@ -302,6 +304,20 @@ const ScenarioSettingsMainView = ({ onClose }) => {
               label={labelWithTooltip('「登録」ボタンの変更を有効化する', 'isUseBtnUpdateTracking')}
             />
           </div>
+          <OverviewCheckboxRow
+            checked={isUseGlobalDelay}
+            onChange={(checked) => setIsUseGlobalDelay(checked)}
+            label={labelWithTooltip('表示待ち時間を設定する', 'isUseGlobalDelay')}
+            actionButton={isUseGlobalDelay && (
+              <button
+                type="button"
+                className="ss-settings-modal-action-link"
+                onClick={() => navigateSettingsModalView(SETTINGS_MODAL_VIEWS.GLOBAL_DELAY)}
+              >
+                設定する →
+              </button>
+            )}
+          />
         </div>
         {scenarioType !== 'faq' && isUseFukushashiki && (
           <OverviewCheckboxRow

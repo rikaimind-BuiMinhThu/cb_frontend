@@ -39,7 +39,11 @@ const removeVariableAt = (message, messageType, index) => {
 // type: text_input / getting_error_notification
 const TextStatementSection = ({
   messageType, typeContent, indexMessageSelect, onChangeValueMessageContent, renderRootFaqOption,
-}) => (
+  dataMessages, setDataMessages,
+}) => {
+  const messageContent = dataMessages[indexMessageSelect]?.message_content?.[0];
+
+  return (
   <div className="ss-bot-statement-wrapper">
     <div
       id="ss-bot-statement-type-text"
@@ -71,6 +75,38 @@ const TextStatementSection = ({
       />
     </div>
     {renderRootFaqOption('ss-bot-checkbox-scroll-auto')}
+    <div className="ss-bot-checkbox-scroll-auto">
+      <CheckboxCustom
+        label="表示待ち時間を設定する"
+        onChange={(value) => {
+          if (messageContent) {
+            messageContent.is_use_custom_delay = value;
+            if (value && !messageContent.custom_delay_time) {
+              messageContent.custom_delay_time = 1.0;
+            }
+          }
+          setDataMessages([...dataMessages]);
+        }}
+        value={messageContent?.is_use_custom_delay || false}
+      />
+    </div>
+    {messageContent?.is_use_custom_delay && (
+      <div className="ss-user-setting__item-bottom-flex-start" style={{ marginLeft: '25px', marginBottom: '10px' }}>
+        <span style={{ marginRight: '10px', fontSize: '12px' }}>待ち時間 (秒)</span>
+        <InputNum
+          step={0.1}
+          min={0}
+          max={10}
+          placeholder="1.0"
+          className="ss-user-setting-input-delay"
+          value={messageContent?.custom_delay_time}
+          onChange={(value) => {
+            messageContent.custom_delay_time = value;
+            setDataMessages([...dataMessages]);
+          }}
+        />
+      </div>
+    )}
     {typeContent?.['use_for_confirm_message'] && (
       <div
         id="ss-bot-statement-type-text"
@@ -89,7 +125,8 @@ const TextStatementSection = ({
       </div>
     )}
   </div>
-);
+  );
+};
 
 // type: file
 const FileStatementSection = ({

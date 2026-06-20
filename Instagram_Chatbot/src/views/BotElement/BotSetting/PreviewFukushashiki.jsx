@@ -187,6 +187,8 @@ const previewInitialState = {
   isNotAutoScroll: false,
   cartSystem: params.get("cartSystem") || "",
   isUseBtnUpdateTracking: false,
+  isUseGlobalDelay: false,
+  globalDelayTime: 1.0,
 };
 
 
@@ -1137,6 +1139,8 @@ const PreviewFukushashiki = () => {
         hidden={message.hidden}
         currentMsgIndex={state.currentMsgIndex}
         isBotOpen={state.isOpen}
+        isUseGlobalDelay={state.isUseGlobalDelay}
+        globalDelayTime={state.globalDelayTime}
       />
     ));
   };
@@ -1445,6 +1449,8 @@ const PreviewFukushashiki = () => {
               finishMsg={state.botInfor.timer_config.messages.finish}
               variables={getTimerConfigVariable(state.botInfor.timer_config.variables)}
               startCount={state.isOpen}
+              isRealtimeRemainingTime={state.botInfor.timer_config.isRealtimeRemainingTime}
+              scenarioId={state.scenarioId}
               onCounting={handleOnCounting(state.botInfor.timer_config)}
             />
           </div>
