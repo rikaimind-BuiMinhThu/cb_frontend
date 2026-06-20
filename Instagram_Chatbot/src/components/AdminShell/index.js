@@ -6,3 +6,4 @@ export { default as AdminFormRow } from './AdminFormRow';
 export { default as AdminConfirmModal } from './AdminConfirmModal';
 export { default as AdminSidebar } from './AdminSidebar';
 export { default as AdminHeader } from './AdminHeader';
+export { default as AdminActionButton } from './AdminActionButton';

@@ -1,6 +1,5 @@
 import React from 'react';
-import { Button } from 'antd';
-import { AdminFormRow } from '../../../../components/AdminShell';
+import { AdminFormRow, AdminActionButton } from '../../../../components/AdminShell';
 
 function ShippingFeeSection({
   noShip,
@@ -90,10 +89,8 @@ function ShippingFeeSection({
             </div>
           </div>
         )}
-        <div className="payment-setting-actions">
-          <Button type="primary" onClick={onSave}>
-            保存
-          </Button>
+        <div className="payment-setting-actions admin-form-actions">
+          <AdminActionButton action="save" onClick={onSave} />
         </div>
       </div>
     </div>

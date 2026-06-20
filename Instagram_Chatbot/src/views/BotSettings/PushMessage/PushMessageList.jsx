@@ -1,15 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Space, Tag, message } from 'antd';
 import {
-  DeleteOutlined,
-  EditOutlined,
   PauseCircleOutlined,
   PlayCircleOutlined,
 } from '@ant-design/icons';
 import { useParams } from 'react-router-dom';
 import api from 'api/api-management';
 import { tokenExpired } from 'api/tokenExpired';
-import { AdminConfirmModal, AdminTable } from '../../../components/AdminShell';
+import { AdminConfirmModal, AdminTable, AdminActionButton } from '../../../components/AdminShell';
 import SavePushMessageDialog from './SavePushMessageDialog';
 
 const PushMessageList = ({ tick }) => {
@@ -170,21 +168,8 @@ const PushMessageList = ({ tick }) => {
                 配信する
               </Button>
             )}
-            <Button
-              size="small"
-              icon={<EditOutlined />}
-              onClick={() => setUpdateItem(row)}
-            >
-              編集
-            </Button>
-            <Button
-              size="small"
-              danger
-              icon={<DeleteOutlined />}
-              onClick={() => setDeleteId(row.id)}
-            >
-              削除
-            </Button>
+            <AdminActionButton action="edit" onClick={() => setUpdateItem(row)} />
+            <AdminActionButton action="delete" onClick={() => setDeleteId(row.id)} />
           </Space>
         ),
       },

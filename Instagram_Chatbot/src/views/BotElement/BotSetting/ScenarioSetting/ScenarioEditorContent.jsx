@@ -1,8 +1,7 @@
 import '../../../../assets/css/bot/scenario/scenario-editor-layout.css';
 import './styles/index.css';
 import React, { useState } from 'react';
-import { Button } from 'antd';
-import { AdminPage } from '../../../../components/AdminShell';
+import { AdminPage, AdminActionButton } from '../../../../components/AdminShell';
 import { useScenarioEditor } from './context/ScenarioEditorContext';
 import ScenarioOverviewPanel from './components/ScenarioOverviewPanel';
 import ScenarioMessageDetailPanel from './components/ScenarioMessageDetailPanel';
@@ -25,9 +24,7 @@ const ScenarioEditorContent = () => {
         className="admin-page--scenario-editor"
         title="シナリオ設定"
         toolbar={
-          <Button type="primary" onClick={() => onClickSaveScenario()}>
-            保存
-          </Button>
+          <AdminActionButton action="save" onClick={() => onClickSaveScenario()} />
         }
       >
         <div className="scenario-editor-page-body">

@@ -9,6 +9,7 @@ import {
   AdminTable,
   AdminSearchBar,
   AdminConfirmModal,
+  AdminActionButton,
 } from '../../components/AdminShell';
 
 function BotManagement() {
@@ -194,12 +195,8 @@ function BotManagement() {
       width: 320,
       render: (_, record) => (
         <Space wrap className="admin-table-actions">
-          <Button type="link" size="small" onClick={() => openBotSetting(record.id)}>
-            編集
-          </Button>
-          <Button type="link" size="small" onClick={() => duplicateBot(record.id)}>
-            複製
-          </Button>
+          <AdminActionButton action="edit" onClick={() => openBotSetting(record.id)} />
+          <AdminActionButton action="duplicate" onClick={() => duplicateBot(record.id)} />
           <Link
             to={`/admin/demo-bot/${record.id}`}
             onClick={() => Cookies.set('bot_id', `${record.id}`)}
@@ -209,9 +206,7 @@ function BotManagement() {
           <Button type="link" size="small" onClick={() => handleStopBot(record.id, record.status)}>
             {record.status === 'off' ? 'ON' : 'OFF'}
           </Button>
-          <Button type="link" size="small" danger onClick={() => handleDeleteBot(record.id)}>
-            削除
-          </Button>
+          <AdminActionButton action="delete" onClick={() => handleDeleteBot(record.id)} />
         </Space>
       ),
     },
@@ -247,7 +242,7 @@ function BotManagement() {
                 ]}
               />
               <Link to="/admin/add-bot-management">
-                <Button type="primary">ボット追加</Button>
+                <AdminActionButton action="create" label="ボット追加" />
               </Link>
             </>
           }

@@ -1,15 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Input, Space, Tabs, Typography, message } from 'antd';
-import {
-  DeleteOutlined,
-  PlusOutlined,
-  SaveOutlined,
-  SearchOutlined,
-} from '@ant-design/icons';
+import { SearchOutlined } from '@ant-design/icons';
 import Cookies from 'js-cookie';
 import api from '../../../api/api-management';
 import { tokenExpired } from 'api/tokenExpired';
-import { AdminConfirmModal, AdminPage, AdminTable } from '../../../components/AdminShell';
+import { AdminConfirmModal, AdminPage, AdminTable, AdminActionButton } from '../../../components/AdminShell';
 
 const PAGE_SIZE = 25;
 
@@ -254,21 +249,8 @@ function VariableManagement() {
         width: 180,
         render: (_, row) => (
           <Space size={4} wrap={false} className="admin-table-actions">
-            <Button
-              size="small"
-              icon={<SaveOutlined />}
-              onClick={() => handleSave(row)}
-            >
-              保存
-            </Button>
-            <Button
-              size="small"
-              danger
-              icon={<DeleteOutlined />}
-              onClick={() => setDeleteId(row.id)}
-            >
-              削除
-            </Button>
+            <AdminActionButton action="save" size="small" onClick={() => handleSave(row)} />
+            <AdminActionButton action="delete" onClick={() => setDeleteId(row.id)} />
           </Space>
         ),
       },
@@ -319,13 +301,12 @@ function VariableManagement() {
       <Button type="primary" onClick={handleSearch}>
         検索
       </Button>
-      <Button
-        icon={<PlusOutlined />}
+      <AdminActionButton
+        action="create"
+        label="追加"
         onClick={() => setAddingNew(true)}
         disabled={addingNew}
-      >
-        追加
-      </Button>
+      />
     </Space>
   );
 
@@ -390,18 +371,15 @@ function VariableManagement() {
               style={{ flex: 1, minWidth: 220 }}
             />
             <Space>
-              <Button type="primary" icon={<SaveOutlined />} onClick={handleCreate}>
-                保存
-              </Button>
-              <Button
+              <AdminActionButton action="save" onClick={handleCreate} />
+              <AdminActionButton
+                action="cancel"
                 onClick={() => {
                   setAddingNew(false);
                   setNewVariable({ variable_name: '', default_value: '' });
                   setFieldErrors({});
                 }}
-              >
-                キャンセル
-              </Button>
+              />
             </Space>
           </Space>
         </div>

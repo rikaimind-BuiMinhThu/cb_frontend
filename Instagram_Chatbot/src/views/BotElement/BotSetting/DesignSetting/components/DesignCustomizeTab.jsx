@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button } from 'antd';
+import { AdminActionButton } from '../../../../../components/AdminShell';
 import DeviceDesignPanel from './DeviceDesignPanel';
 import BubbleSettingsSection from './BubbleSettingsSection';
 
@@ -44,10 +44,8 @@ const DesignCustomizeTab = ({ designSettings, onFieldChange, onSave }) => (
           onChange={onFieldChange}
         />
 
-        <div className="design-customize-footer">
-          <Button type="primary" onClick={onSave}>
-            設定保存
-          </Button>
+        <div className="design-customize-footer admin-form-actions">
+          <AdminActionButton action="save" label="設定保存" onClick={onSave} />
         </div>
       </div>
     </form>

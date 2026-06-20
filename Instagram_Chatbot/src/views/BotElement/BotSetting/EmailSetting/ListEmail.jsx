@@ -3,7 +3,7 @@ import { Button, Collapse, message, Space } from 'antd';
 import api from './../../../../api/api-management';
 import Cookies from 'js-cookie';
 import { tokenExpired } from 'api/tokenExpired';
-import { AdminPage, AdminConfirmModal } from '../../../../components/AdminShell';
+import { AdminPage, AdminConfirmModal, AdminActionButton } from '../../../../components/AdminShell';
 import '../../../../assets/css/bot/email/list-email.css';
 
 const { Panel } = Collapse;
@@ -78,9 +78,11 @@ function ListEmail() {
       <AdminPage
         title="メール一覧"
         toolbar={
-          <Button type="primary" onClick={() => { window.location.href = '/admin/create-email'; }}>
-            新メール追加
-          </Button>
+          <AdminActionButton
+            action="create"
+            label="新メール追加"
+            onClick={() => { window.location.href = '/admin/create-email'; }}
+          />
         }
       >
         <div className="email-list-page">
@@ -139,16 +141,19 @@ function ListEmail() {
                   <pre className="email-content-preview__body">{item?.content || '—'}</pre>
                 </div>
 
-                <Space className="email-list-actions">
-                  <Button onClick={() => { window.location.href = `/admin/edit-email/${item?.id}`; }}>
-                    編集
-                  </Button>
-                  <Button onClick={() => { setIsOpenDuplicate(true); setIdEmail(item.id); }}>
-                    複製
-                  </Button>
-                  <Button danger onClick={() => { setIsOpenDelete(true); setIdEmail(item.id); }}>
-                    削除
-                  </Button>
+                <Space className="email-list-actions admin-table-actions">
+                  <AdminActionButton
+                    action="edit"
+                    onClick={() => { window.location.href = `/admin/edit-email/${item?.id}`; }}
+                  />
+                  <AdminActionButton
+                    action="duplicate"
+                    onClick={() => { setIsOpenDuplicate(true); setIdEmail(item.id); }}
+                  />
+                  <AdminActionButton
+                    action="delete"
+                    onClick={() => { setIsOpenDelete(true); setIdEmail(item.id); }}
+                  />
                 </Space>
               </Panel>
             ))}

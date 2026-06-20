@@ -1,10 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button } from 'antd';
-import api from './../../../../api/api-management';
-import ModalNoti from 'views/Popup/ModalNoti';
-import Cookies from 'js-cookie';
-import { tokenExpired } from 'api/tokenExpired';
-import { AdminPage } from '../../../../components/AdminShell';
+import { AdminPage, AdminActionButton } from '../../../../components/AdminShell';
 import '../../../../assets/css/bot/email/create-email.css';
 
 function CreateEmail() {
@@ -520,18 +515,16 @@ function CreateEmail() {
                   </div>
           </form>
 
-          <div className="field-btn">
-            <Button onClick={() => { window.location.href = '/admin/list-email'; }}>
-              戻る
-            </Button>
+          <div className="field-btn admin-form-actions">
+            <AdminActionButton
+              action="cancel"
+              label="戻る"
+              onClick={() => { window.location.href = '/admin/list-email'; }}
+            />
             {mailAction === false ? (
-              <Button type="primary" onClick={(e) => saveEmail(e)}>
-                保存
-              </Button>
+              <AdminActionButton action="save" onClick={(e) => saveEmail(e)} />
             ) : (
-              <Button type="primary" onClick={(e) => addEmail(e)}>
-                追加
-              </Button>
+              <AdminActionButton action="create" label="追加" onClick={(e) => addEmail(e)} />
             )}
           </div>
         </div>

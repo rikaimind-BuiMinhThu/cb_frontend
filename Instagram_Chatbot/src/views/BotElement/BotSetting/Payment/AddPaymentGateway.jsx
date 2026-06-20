@@ -1,9 +1,9 @@
 import { tokenExpired } from 'api/tokenExpired';
 import React, { useEffect, useState } from 'react';
-import { Button, Form, Input, message, Select, Spin } from 'antd';
+import { Form, Input, message, Select, Spin } from 'antd';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import api from '../../../../api/api-management';
-import { AdminFormRow, AdminPage } from '../../../../components/AdminShell';
+import { AdminFormRow, AdminPage, AdminActionButton } from '../../../../components/AdminShell';
 import '../../../../assets/css/bot/payment-gateway-form.css';
 
 function buildPayload(values) {
@@ -230,13 +230,11 @@ function AddPaymentGateway() {
               </>
             )}
 
-            <div className="payment-gateway-form-actions">
+            <div className="payment-gateway-form-actions admin-form-actions">
               <Link to="/admin/payment-gateway">
-                <Button>戻る</Button>
+                <AdminActionButton action="cancel" label="戻る" />
               </Link>
-              <Button type="primary" loading={saving} onClick={handleSave}>
-                保存
-              </Button>
+              <AdminActionButton action="save" loading={saving} onClick={handleSave} />
             </div>
           </Form>
         </div>

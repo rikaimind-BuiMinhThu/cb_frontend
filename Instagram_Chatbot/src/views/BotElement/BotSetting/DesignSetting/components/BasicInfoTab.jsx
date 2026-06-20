@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Typography } from 'antd';
+import { AdminActionButton } from '../../../../../components/AdminShell';
 import DesignBotIcons from '../DesignSettingComponents/DesignBotIcons';
 import { DEFAULT_IMAGES } from '../constants/designChatbotConstants';
 import DesignTypePicker from './DesignTypePicker';
@@ -91,10 +92,8 @@ const BasicInfoTab = ({
               </div>
               <span className="error-message main-colors" />
             </div>
-            <div className="btn-wrapper">
-              <button type="button" className="btn btn-preview" onClick={onPreview}>
-                プレビュー
-              </button>
+            <div className="btn-wrapper admin-form-actions">
+              <AdminActionButton action="preview" onClick={onPreview} />
             </div>
           </div>
           <div className="bot-right">
@@ -139,10 +138,8 @@ const BasicInfoTab = ({
                 </span>
               </div>
             </div>
-            <div className="btn-wrapper">
-              <button type="button" className="btn btn-new-bot" onClick={onSave}>
-                保存
-              </button>
+            <div className="btn-wrapper admin-form-actions">
+              <AdminActionButton action="save" onClick={onSave} />
             </div>
           </div>
         </div>

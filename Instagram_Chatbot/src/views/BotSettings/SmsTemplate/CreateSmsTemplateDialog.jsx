@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
-import { Button, Form, Input, Modal, message } from 'antd';
+import { Form, Input, Modal, message } from 'antd';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import schema from './schema/createSmsTemplateFormSchema';
 import api from 'api/api-management';
 import { tokenExpired } from 'api/tokenExpired';
+import { AdminActionButton } from '../../../components/AdminShell';
 
 export default function CreateSmsTemplateDialog({ botId, resolver }) {
   const [open, setOpen] = React.useState(false);
@@ -50,7 +51,7 @@ export default function CreateSmsTemplateDialog({ botId, resolver }) {
 
   return (
     <>
-      <Button type="primary" onClick={handleClickOpen}>追加</Button>
+      <AdminActionButton action="create" label="追加" onClick={handleClickOpen} />
       <Modal
         title="SMS作成"
         open={open}

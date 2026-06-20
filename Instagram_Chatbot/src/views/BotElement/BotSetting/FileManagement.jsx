@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, message, Modal, Space } from 'antd';
-import { CopyOutlined, DeleteOutlined, EyeOutlined, UploadOutlined } from '@ant-design/icons';
+import { CopyOutlined, UploadOutlined } from '@ant-design/icons';
 import noImage from './../../../assets/img/no-image.jpg';
 import api from '../../../api/api-management';
 import axios from 'axios';
 import { tokenExpired } from 'api/tokenExpired';
-import { AdminPage, AdminTable, AdminConfirmModal } from '../../../components/AdminShell';
+import { AdminPage, AdminTable, AdminConfirmModal, AdminActionButton } from '../../../components/AdminShell';
 
 function FileManagement() {
   const [files, setFiles] = useState([]);
@@ -146,10 +146,10 @@ function FileManagement() {
       render: (_, file) => {
         const fullUrl = `https://ec-chatbot.s3.ap-northeast-1.amazonaws.com/${file.file_url}`;
         return (
-          <Space wrap>
-            <Button type="link" size="small" icon={<EyeOutlined />} onClick={() => handlePreview(file)}>プレビュー</Button>
+          <Space wrap className="admin-table-actions">
+            <AdminActionButton action="preview" onClick={() => handlePreview(file)} />
             <Button type="link" size="small" icon={<CopyOutlined />} onClick={() => handleCopy(fullUrl)}>コピー</Button>
-            <Button type="link" size="small" danger icon={<DeleteOutlined />} onClick={() => { setIsOpenDelete(true); setIdFile(file.id); }}>削除</Button>
+            <AdminActionButton action="delete" onClick={() => { setIsOpenDelete(true); setIdFile(file.id); }} />
           </Space>
         );
       },
@@ -167,9 +167,7 @@ function FileManagement() {
           toolbar={
             <Space direction="vertical" style={{ width: '100%' }}>
               <Space>
-                <Button type="primary" icon={<UploadOutlined />} disabled={newFile !== null} onClick={() => inputRef.current?.click()}>
-                  ファイル追加
-                </Button>
+                <AdminActionButton action="create" label="ファイル追加" icon={<UploadOutlined />} disabled={newFile !== null} onClick={() => inputRef.current?.click()} />
                 <input hidden ref={inputRef} type="file" onChange={handleChangeFile} />
               </Space>
               {newFile && (
@@ -184,9 +182,9 @@ function FileManagement() {
                     <img src={noImage} alt="" style={{ maxHeight: 120 }} />
                   )}
                   <p>{newFile.name}</p>
-                  <Space>
-                    <Button onClick={() => setNewFile(null)}>キャンセル</Button>
-                    <Button type="primary" onClick={handleSave}>保存</Button>
+                  <Space className="admin-form-actions">
+                    <AdminActionButton action="cancel" onClick={() => setNewFile(null)} />
+                    <AdminActionButton action="save" onClick={handleSave} />
                   </Space>
                   {fileError && <div style={{ color: '#ff4d4f', marginTop: 8 }}>{fileError}</div>}
                 </div>

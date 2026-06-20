@@ -1,14 +1,7 @@
 import React, { useEffect } from 'react';
 import { Card, CardHeader, CardBody, Row, Col } from 'reactstrap';
 import { useState } from 'react';
-import { Button } from 'antd';
-import Cookies from 'js-cookie';
-import api from './../../../../api/api-management';
-import { tokenExpired } from 'api/tokenExpired';
-import ModalNoti from 'views/Popup/ModalNoti';
-import * as utils from './../../../../JS/validate.js';
-import { patchWithDrawalPreview } from '../../BotSetting/PreviewComponent/Utils';
-import { AdminPage } from '../../../../components/AdminShell';
+import { AdminPage, AdminActionButton } from '../../../../components/AdminShell';
 
 function WithdrawalPrevention() {
   const [valueWP, setValueWP] = useState('');
@@ -274,7 +267,7 @@ function WithdrawalPrevention() {
                     />
                   </div>
                 </div>
-                <Button onClick={() => handleKeep()}>保存</Button>
+                <AdminActionButton action="save" onClick={() => handleKeep()} />
               </CardBody>
             </Card>
           </Col>

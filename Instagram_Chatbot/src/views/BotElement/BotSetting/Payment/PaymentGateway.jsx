@@ -3,7 +3,7 @@ import { Button, message, Space, Tag } from 'antd';
 import { Link } from 'react-router-dom';
 import api from '../../../../api/api-management';
 import { tokenExpired } from 'api/tokenExpired';
-import { AdminConfirmModal, AdminPage, AdminTable } from '../../../../components/AdminShell';
+import { AdminConfirmModal, AdminPage, AdminTable, AdminActionButton } from '../../../../components/AdminShell';
 
 const PAGE_SIZE = 25;
 
@@ -140,20 +140,16 @@ function PaymentGateway() {
         title: 'アクション',
         width: 200,
         render: (_, item) => (
-          <Space size="small">
+          <Space size="small" className="admin-table-actions">
             {item?.is_default !== 'yes' && (
               <Button type="link" size="small" onClick={() => handleSetDefault(item.id)}>
                 デフォルト
               </Button>
             )}
             <Link to={`/admin/edit-payment-gateway/${item.id}`}>
-              <Button type="link" size="small">
-                編集
-              </Button>
+              <AdminActionButton action="edit" />
             </Link>
-            <Button type="link" size="small" danger onClick={() => setDeleteId(item.id)}>
-              削除
-            </Button>
+            <AdminActionButton action="delete" onClick={() => setDeleteId(item.id)} />
           </Space>
         ),
       },
@@ -167,7 +163,7 @@ function PaymentGateway() {
         title="決済ゲートウェイ一覧"
         toolbar={
           <Link to="/admin/add-payment-gateway">
-            <Button type="primary">追加</Button>
+            <AdminActionButton action="create" label="追加" />
           </Link>
         }
       >

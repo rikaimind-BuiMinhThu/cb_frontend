@@ -1,12 +1,11 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Button, Input, List, Modal, Radio, Space, Tag, message } from 'antd';
-import { EditOutlined, CopyOutlined, EyeOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Input, List, Modal, Radio, Space, Tag, message } from 'antd';
 import api from '../../../../api/api-management';
 import Cookies from 'js-cookie';
 import moment from 'moment';
 import Preview from '../Preview';
-import { AdminPage, AdminConfirmModal } from '../../../../components/AdminShell';
+import { AdminPage, AdminConfirmModal, AdminActionButton } from '../../../../components/AdminShell';
 
 function ScenarioList() {
   const [isOpenCreateScenario, setIsOpenCreateScenario] = useState(false);
@@ -131,10 +130,8 @@ function ScenarioList() {
         title="シナリオ一覧"
         toolbar={
           <Space>
-            <Button type="primary" onClick={() => setIsOpenCreateScenario(true)}>
-              シナリオ作成
-            </Button>
-            <Button onClick={handleSaveSelectScenario}>保存</Button>
+            <AdminActionButton action="create" label="シナリオ作成" onClick={() => setIsOpenCreateScenario(true)} />
+            <AdminActionButton action="save" onClick={handleSaveSelectScenario} />
           </Space>
         }
       >
@@ -159,20 +156,12 @@ function ScenarioList() {
               }}
               actions={[
                 <Link to="/admin/scenario-setting" key="edit">
-                  <Button type="link" icon={<EditOutlined />} onClick={() => onclickEditScenario(scenario.id)}>
-                    編集
-                  </Button>
+                  <AdminActionButton action="edit" onClick={() => onclickEditScenario(scenario.id)} />
                 </Link>,
-                <Button key="preview" type="link" icon={<EyeOutlined />} onClick={() => onClickPreview(scenario.id)}>
-                  プレビュー
-                </Button>,
-                <Button key="dup" type="link" icon={<CopyOutlined />} onClick={() => handleDuplicationScenario(scenario.id)}>
-                  複製
-                </Button>,
+                <AdminActionButton key="preview" action="preview" onClick={() => onClickPreview(scenario.id)} />,
+                <AdminActionButton key="dup" action="duplicate" onClick={() => handleDuplicationScenario(scenario.id)} />,
                 scenarioSelectedClone !== scenario.id ? (
-                  <Button key="del" type="link" danger icon={<DeleteOutlined />} onClick={() => handleDeleteScenario(scenario.id)}>
-                    削除
-                  </Button>
+                  <AdminActionButton key="del" action="delete" onClick={() => handleDeleteScenario(scenario.id)} />
                 ) : null,
               ]}
             >

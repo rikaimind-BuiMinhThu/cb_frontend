@@ -5,7 +5,7 @@ import { tokenExpired } from 'api/tokenExpired';
 import api from 'api/api-management';
 import CreateSmsTemplateDialog from './CreateSmsTemplateDialog';
 import UpdateSmsTemplateDialog from './UpdateSmsTemplateDialog';
-import { AdminPage, AdminTable, AdminConfirmModal } from '../../../components/AdminShell';
+import { AdminPage, AdminTable, AdminConfirmModal, AdminActionButton } from '../../../components/AdminShell';
 
 const ListSmsTemplate = () => {
   const { botId } = useParams();
@@ -94,9 +94,9 @@ const ListSmsTemplate = () => {
       align: 'right',
       width: 200,
       render: (_, row) => (
-        <Space>
-          <Button size="small" onClick={() => handleOpenUpdateDialog(row.id)}>編集</Button>
-          <Button size="small" danger onClick={() => handleOpenDeleteDialog(row.id)}>削除</Button>
+        <Space className="admin-table-actions">
+          <AdminActionButton action="edit" onClick={() => handleOpenUpdateDialog(row.id)} />
+          <AdminActionButton action="delete" onClick={() => handleOpenDeleteDialog(row.id)} />
         </Space>
       ),
     },
