@@ -491,3 +491,31 @@
     padding: 16px;
   }
 }
+
+.admin-scenario-list-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-scenario-list-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-scenario-list-name {
+  font-weight: 500;
+}
+
+.admin-scenario-list-meta {
+  color: #6b7280;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.admin-scenario-list-row .ant-radio-wrapper {
+  margin-right: 0;
+  flex-shrink: 0;
+}

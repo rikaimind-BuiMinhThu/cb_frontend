@@ -152,6 +152,7 @@ function ScenarioList() {
         }
       >
         <List
+          className="admin-scenario-list"
           dataSource={listScenario}
           pagination={{
             current: page,
@@ -181,23 +182,23 @@ function ScenarioList() {
                 ) : null,
               ]}
             >
-              <List.Item.Meta
-                avatar={
-                  <Radio
-                    checked={scenarioSelected === scenario.id}
-                    onChange={() => setScenarioSelected(scenario.id)}
-                  />
-                }
-                title={
+              <div className="admin-scenario-list-row">
+                <Radio
+                  checked={scenarioSelected === scenario.id}
+                  onChange={() => setScenarioSelected(scenario.id)}
+                />
+                <div className="admin-scenario-list-content">
                   <Space>
                     <Tag color={scenarioSelectedClone === scenario.id ? 'green' : 'default'}>
                       {scenarioSelectedClone === scenario.id ? '有効' : '無効'}
                     </Tag>
-                    <span style={{ fontWeight: 500 }}>{scenario.name}</span>
+                    <span className="admin-scenario-list-name">{scenario.name}</span>
                   </Space>
-                }
-                description={`最後の更新日時 ${moment(scenario.updated_at).format('YYYY/MM/DD')}`}
-              />
+                  <div className="admin-scenario-list-meta">
+                    {`最後の更新日時 ${moment(scenario.updated_at).format('YYYY/MM/DD')}`}
+                  </div>
+                </div>
+              </div>
             </List.Item>
           )}
         />
