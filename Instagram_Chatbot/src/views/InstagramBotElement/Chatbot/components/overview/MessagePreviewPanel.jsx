@@ -6,25 +6,44 @@ import {
 } from '../../constants';
 import { useChatbotEditor } from '../../context/ChatbotEditorContext';
 
-function PreviewBubble({ item }) {
-  if (item.kind === 'image') {
-    return (
-      <div className="cb-preview-bubble">
-        {item.content && <img src={item.content} alt="preview" />}
-      </div>
-    );
-  }
+function PreviewTextRow({ content }) {
+  return (
+    <div className="cb-preview-message-row">
+      <div className="cb-preview-bubble">{content}</div>
+    </div>
+  );
+}
 
-  if (item.kind === 'image-text') {
-    return (
-      <div className="cb-preview-bubble">
-        {item.image && <img src={item.image} alt="preview" />}
-        {item.text && <div>{item.text}</div>}
-      </div>
-    );
-  }
+function PreviewImageRow({ content }) {
+  return (
+    <div className="cb-preview-message-row">
+      <img src={content} alt="preview" className="cb-preview-image" />
+    </div>
+  );
+}
 
-  return <div className="cb-preview-bubble">{item.content}</div>;
+function PreviewButtonsRow({ buttons }) {
+  return (
+    <div className="cb-preview-message-row cb-preview-message-row--buttons">
+      <div className="cb-preview-buttons">
+        {buttons.map((button, index) => (
+          <span key={`${button.title}-${index}`} className="cb-preview-button-chip">
+            {button.title}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function PreviewRow({ row }) {
+  if (row.kind === 'image') {
+    return <PreviewImageRow content={row.content} />;
+  }
+  if (row.kind === 'buttons') {
+    return <PreviewButtonsRow buttons={row.buttons} />;
+  }
+  return <PreviewTextRow content={row.content} />;
 }
 
 export default function MessagePreviewPanel({ onPreviewVisibleChange }) {
@@ -58,8 +77,11 @@ export default function MessagePreviewPanel({ onPreviewVisibleChange }) {
                 {previewItems.length === 0 && (
                   <div className="cb-empty-state">{PREVIEW_LABELS.EMPTY}</div>
                 )}
-                {previewItems.map((item, index) => (
-                  <PreviewBubble key={`${item.kind}-${index}`} item={item} />
+                {previewItems.map((row, index) => (
+                  <PreviewRow
+                    key={`${row.messageId}-${row.kind}-${index}`}
+                    row={row}
+                  />
                 ))}
               </div>
             </div>

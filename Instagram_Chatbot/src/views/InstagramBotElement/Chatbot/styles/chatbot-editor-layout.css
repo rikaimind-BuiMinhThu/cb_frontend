@@ -186,24 +186,6 @@
   margin-bottom: 4px;
 }
 
-.cb-preview-bubble {
-  display: inline-block;
-  max-width: 85%;
-  background: #51cbce;
-  color: #fff;
-  padding: 10px 12px;
-  border-radius: 10px;
-  margin: 5px 0;
-  text-align: right;
-  word-break: break-word;
-}
-
-.cb-preview-bubble img {
-  max-width: 100%;
-  max-height: 200px;
-  border-radius: 8px;
-}
-
 .cb-field,
 .cb-editor-form .ant-select {
   width: 100%;

@@ -3,6 +3,7 @@ import { Input, Upload } from 'antd';
 import { ACTION_LABELS, FORM_PLACEHOLDERS } from '../../constants';
 import { useChatbotEditor } from '../../context/ChatbotEditorContext';
 import { readFileAsDataUrl, validateImageFile } from '../../utils/chatbotValidation';
+import { resolveMessageImageUrl } from '../../utils/resolveMessageImageUrl';
 
 export default function ImageTextMessageForm() {
   const { drafts } = useChatbotEditor();
@@ -10,6 +11,8 @@ export default function ImageTextMessageForm() {
   const [error, setError] = useState('');
 
   if (!draft) return null;
+
+  const imageSrc = draft.previewUrl || draft.imgValue || resolveMessageImageUrl(draft);
 
   const handleFile = async (file) => {
     const validationError = validateImageFile(file);
@@ -35,10 +38,10 @@ export default function ImageTextMessageForm() {
         </button>
       </Upload>
       {error && <div className="cb-error-text">{error}</div>}
-      {(draft.previewUrl || draft.imgValue) && (
+      {imageSrc && (
         <div className="cb-image-preview-wrap">
           <img
-            src={draft.previewUrl || draft.imgValue}
+            src={imageSrc}
             alt="preview"
             className="cb-image-preview"
           />

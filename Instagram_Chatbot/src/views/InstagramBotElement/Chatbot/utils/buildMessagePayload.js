@@ -1,5 +1,6 @@
 import { MESSAGE_TYPES } from '../constants/messageTypes';
 import { BUTTON_TYPES, CHOICE_MODES } from '../constants/buttonTypes';
+import { isNewImageUpload } from './resolveMessageImageUrl';
 
 function labelsToPayload(labels) {
   return (labels || [])
@@ -142,5 +143,11 @@ export function buildCreatePayload(messageBagId, draft) {
 
 export function buildUpdatePayload(message, draft) {
   const payload = buildCreatePayload(message.message_bag_id, draft);
+  const isImageMessage =
+    draft.messageType === MESSAGE_TYPES.IMG ||
+    draft.messageType === MESSAGE_TYPES.IMG_MSG;
+  if (isImageMessage && !isNewImageUpload(draft.imgValue)) {
+    delete payload.message.img_value;
+  }
   return payload;
 }

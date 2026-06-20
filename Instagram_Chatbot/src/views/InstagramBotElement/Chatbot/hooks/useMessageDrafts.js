@@ -7,10 +7,10 @@ function isDraftValid(draft) {
   if (!draft) return true;
 
   if (draft.messageType === MESSAGE_TYPES.IMG) {
-    return Boolean(draft.imgValue);
+    return Boolean(draft.imgValue || draft.previewUrl);
   }
   if (draft.messageType === MESSAGE_TYPES.IMG_MSG) {
-    return Boolean(draft.imgValue) && Boolean(draft.messageValue?.trim());
+    return Boolean(draft.imgValue || draft.previewUrl) && Boolean(draft.messageValue?.trim());
   }
   if (draft.messageType === MESSAGE_TYPES.PAST_POST) {
     return Boolean(draft.previewPastPostUrl);
