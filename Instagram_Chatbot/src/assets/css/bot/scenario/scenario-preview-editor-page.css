@@ -52,7 +52,8 @@ body.scenario-preview-editor-embedded .sp-header {
 }
 
 body.scenario-preview-editor-embedded .sp-body-user-side,
-body.scenario-preview-editor-embedded .sp-body-bot-side {
+body.scenario-preview-editor-embedded .sp-body-bot-side,
+body.scenario-preview-editor-embedded .ss-combine-message__wrapper {
   cursor: pointer;
 }
 

@@ -1,4 +1,5 @@
-const MESSAGE_CONTAINER_SELECTORS = '.sp-body-user-side, .sp-body-bot-side';
+const MESSAGE_CONTAINER_SELECTORS =
+  '.sp-body-user-side, .sp-body-bot-side, .ss-combine-message__wrapper';
 const INTERACTIVE_SELECTOR = 'button, input, textarea, select, a, label, .ant-picker, .ant-checkbox, .ant-radio, .ant-select';
 
 export const parseMessageIdFromElement = (element) => {
