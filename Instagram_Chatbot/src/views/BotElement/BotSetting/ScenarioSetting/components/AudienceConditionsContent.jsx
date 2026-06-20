@@ -37,15 +37,6 @@ const AudienceConditionsContent = ({
         onChangeAmazonPayDisplayMode={onChangeAmazonPayDisplayMode}
       />
       <div className="ss-audience-conditions-content__section-divider" />
-      <div className="ss-bot-setting-condition-header ss-audience-conditions-content__header">
-        <div className="ss-bot-setting-condition-header-left">
-          <span className="ss-bot-setting-condition-icon-label">Standard</span>
-          <span className="ss-bot-setting-condition-icon-label" style={{ width: '50px', backgroundColor: '#7A52A3' }}>Pro</span>
-        </div>
-      </div>
-      <div className="ss-bot-setting-condition-sub-header">
-        <span style={{ fontWeight: '400' }}>※設定すると、条件に当てはまるユーザーに対してのみ表示されます。</span>
-      </div>
       <div className="ss-bot-setting-condition-contents">
         {conditions.map((condition, indexCondition) => (
           <div key={indexCondition} className="ss-bot-setting-condition-content-container">

@@ -13,6 +13,18 @@ const PANEL = {
   OTHER: 'other',
 };
 
+const clearAccordionPanelLayout = (role) => {
+  if (role === 'user') {
+    const main = document.querySelector('.ss-user-setting__main');
+    const bottom = document.querySelector('.ss-user-setting__bottom');
+    if (main) main.style.height = '';
+    if (bottom) bottom.style.maxHeight = '';
+  } else {
+    const container = document.querySelector('.ss-bot-setting-condition-container');
+    if (container) container.style.height = '';
+  }
+};
+
 const renderTriggerHelp = (tooltipKey) => (
   <span
     className="ss-message-settings-accordion__trigger-help"
@@ -33,7 +45,6 @@ const ScenarioMessageSettingsAccordion = ({
 }) => {
   const {
     isUseFukushashiki,
-    handlePannelCondition,
     resetConditionPanelLayout,
     onChangeAmazonPayDisplayMode,
   } = useScenarioPanelDestructuring();
@@ -49,6 +60,7 @@ const ScenarioMessageSettingsAccordion = ({
   useEffect(() => {
     setActivePanel(null);
     resetConditionPanelLayout(role);
+    clearAccordionPanelLayout(role);
   }, [indexMessageSelect, resetConditionPanelLayout, role]);
 
   const hasActiveSpecialDisplay = hasActiveSpecialDisplayConditions(selectedMessage, isUseFukushashiki);
@@ -73,11 +85,8 @@ const ScenarioMessageSettingsAccordion = ({
   const selectPanel = (panel) => {
     const next = activePanel === panel ? null : panel;
     setActivePanel(next);
-    if (next === PANEL.AUDIENCE) {
-      handlePannelCondition(true, role);
-    } else {
-      resetConditionPanelLayout(role);
-    }
+    resetConditionPanelLayout(role);
+    clearAccordionPanelLayout(role);
   };
 
   const renderTriggerBadge = (label) => (
