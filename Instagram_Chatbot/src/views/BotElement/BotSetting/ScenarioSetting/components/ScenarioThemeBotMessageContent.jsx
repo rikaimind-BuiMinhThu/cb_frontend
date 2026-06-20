@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { BOT_MESSAGE_TYPES } from '../../PreviewComponent/Constants';
+import { buildOrderConfirmPreviewHtml } from '../utils/OrderConfirmLpScriptGenerator';
 
 const ScenarioThemeBotMessageContent = ({ content, fileType, hidden }) => {
   const type = fileType;
@@ -106,6 +107,18 @@ const ScenarioThemeBotMessageContent = ({ content, fileType, hidden }) => {
           ))}
         </ul>
       </div>
+    );
+  }
+
+  if (content.type === BOT_MESSAGE_TYPES.ORDER_CONFIRM) {
+    return (
+      <div
+        className="ss-message__content--bot-text"
+        style={hiddenStyle}
+        dangerouslySetInnerHTML={{
+          __html: buildOrderConfirmPreviewHtml(content.order_confirm),
+        }}
+      />
     );
   }
 

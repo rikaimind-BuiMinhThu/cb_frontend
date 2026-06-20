@@ -14,6 +14,7 @@ export const getBotMessageTitle = (content) => {
   if (content.type === BOT_MESSAGE_TYPES.HTML_CODE) return 'HTMLコード';
   if (content.type === BOT_MESSAGE_TYPES.UGC) return 'HTML_UGC_CONFIG';
   if (content.type === BOT_MESSAGE_TYPES.AMAZON_PAY_BUTTON) return 'Amazon Payボタン';
+  if (content.type === BOT_MESSAGE_TYPES.ORDER_CONFIRM) return '注文確認';
   return '';
 };
 

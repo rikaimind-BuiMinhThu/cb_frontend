@@ -233,6 +233,7 @@ const BOT_MESSAGE_TYPES = {
   FILE: 'file',
   DELAY: 'delay',
   GETTING_ERROR_NOTIFICATION: 'getting_error_notification',
+  ORDER_CONFIRM: 'order_confirm',
 }
 
 const COMBINE_MESSAGE_DEFAULTS = {

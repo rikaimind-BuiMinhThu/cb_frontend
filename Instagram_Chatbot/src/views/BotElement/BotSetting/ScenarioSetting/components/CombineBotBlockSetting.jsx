@@ -4,6 +4,7 @@ import CheckboxCustom from '../scenarioComon/CheckboxCustom';
 import HtmlCodeConfig from '../scenarioComon/HtmlCodeConfig';
 import AmazonPayButtonConfig from '../scenarioComon/AmazonPayButtonConfig';
 import { BOT_MESSAGE_TYPES } from '../../PreviewComponent/Constants';
+import OrderConfirmConfig from '../scenarioComon/OrderConfirmConfig';
 
 const CombineBotBlockSetting = ({
   content,
@@ -15,6 +16,8 @@ const CombineBotBlockSetting = ({
   fileError,
   setIsOpenFileReference,
   botUploadFile,
+  dataMessages,
+  setDataMessages,
 }) => {
   const messageType = content.type;
   const typeContent = content[messageType];
@@ -91,6 +94,18 @@ const CombineBotBlockSetting = ({
           onChangeValue={onChangeValueMessageContent}
           indexMessageSelect={indexMessageSelect}
           indexContent={indexContent}
+        />
+      )}
+
+      {messageType === BOT_MESSAGE_TYPES.ORDER_CONFIRM && (
+        <OrderConfirmConfig
+          indexMessageSelect={indexMessageSelect}
+          indexContent={indexContent}
+          typeContent={typeContent}
+          onChangeValueMessageContent={onChangeValueMessageContent}
+          dataMessages={dataMessages}
+          setDataMessages={setDataMessages}
+          messageContent={content}
         />
       )}
     </div>

@@ -10,6 +10,7 @@ import shopifIcon from '../../../../../../assets/img/shopify-icon.png';
 import locale from 'antd/es/date-picker/locale/ja_JP';
 import { BOT_MESSAGE_TYPES } from '../../../PreviewComponent/Constants';
 import { DEFAULT_AMAZON_PAY_BUTTON_IMAGE_URL } from '../../../../../../variables/amazonPayConstants';
+import { buildOrderConfirmPreviewHtml } from '../../utils/OrderConfirmLpScriptGenerator';
 import { PREVIEW_MAP } from '../../contentPreviews';
 import {
   getCalendarPreviewRelativeRangeLabel,
@@ -127,6 +128,17 @@ const OverviewBotMessageItem = ({
                     value={content[content.type]?.content || ''}
                     readOnly
                   ></textarea>
+                )}
+
+                {/* bot: type == 'order_confirm' */}
+                {content.type === BOT_MESSAGE_TYPES.ORDER_CONFIRM && (
+                  <div
+                    className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
+                    style={message.hidden === true ? { opacity: '0.4' } : {}}
+                    dangerouslySetInnerHTML={{
+                      __html: buildOrderConfirmPreviewHtml(content.order_confirm),
+                    }}
+                  />
                 )}
 
                 {/* bot: type == 'api_linkage' || 'pause' */}

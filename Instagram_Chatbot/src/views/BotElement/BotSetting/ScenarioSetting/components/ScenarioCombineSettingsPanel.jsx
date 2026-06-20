@@ -133,6 +133,8 @@ const ScenarioCombineSettingsPanel = () => {
                               fileError={fileError}
                               setIsOpenFileReference={setIsOpenFileReference}
                               botUploadFile={botUploadFile}
+                              dataMessages={dataMessages}
+                              setDataMessages={setDataMessages}
                             />
                           ) : (
                             CONTENT_SETTING_MAP[content.type] ? React.createElement(CONTENT_SETTING_MAP[content.type], {

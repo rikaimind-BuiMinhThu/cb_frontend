@@ -3,6 +3,7 @@ import { BOT_MESSAGE_TYPES } from './Constants';
 import HtmlCodeMessagePreview from 'components/BotMessages/HtmlCodeMessagePreview';
 import AmazonPayButtonMessagePreview from 'components/BotMessages/AmazonPayButtonMessagePreview';
 import { replaceVariables } from './VariablesUtils';
+import { buildOrderConfirmJs, buildOrderConfirmPreviewHtml } from '../ScenarioSetting/utils/OrderConfirmLpScriptGenerator';
 
 const CombineBotBlock = ({
   content,
@@ -16,7 +17,18 @@ const CombineBotBlock = ({
   const [text, setText] = useState('');
 
   useEffect(() => {
-    if (!content || !content[content.type]?.originalContent) return;
+    if (!content) return;
+
+    if (content.type === BOT_MESSAGE_TYPES.ORDER_CONFIRM) {
+      if (previewOrderContent && isBotOpen) {
+        setText(previewOrderContent);
+      } else {
+        setText(buildOrderConfirmPreviewHtml(content.order_confirm));
+      }
+      return;
+    }
+
+    if (!content[content.type]?.originalContent) return;
     if (![BOT_MESSAGE_TYPES.TEXT_INPUT, BOT_MESSAGE_TYPES.GETTING_ERROR_NOTIFICATION].includes(content.type)) return;
 
     if (content.text_input?.use_for_confirm_message && previewOrderContent && isBotOpen) {
@@ -28,10 +40,17 @@ const CombineBotBlock = ({
   }, [content, content?.[content?.type]?.originalContent, variables, previewOrderContent, isBotOpen]);
 
   useEffect(() => {
+    if (content.type === BOT_MESSAGE_TYPES.ORDER_CONFIRM && content.order_confirm && isBotOpen) {
+      executeLpJsCode?.(buildOrderConfirmJs(content.order_confirm));
+      return;
+    }
+
     if (content.text_input?.use_for_confirm_message && content.text_input?.jscode?.trim() && isBotOpen) {
       executeLpJsCode?.(content.text_input.jscode);
     }
   }, [
+    content.type,
+    content.order_confirm,
     content.text_input?.use_for_confirm_message,
     content.text_input?.jscode,
     isBotOpen,
@@ -55,6 +74,7 @@ const CombineBotBlock = ({
   switch (content.type) {
     case BOT_MESSAGE_TYPES.TEXT_INPUT:
     case BOT_MESSAGE_TYPES.GETTING_ERROR_NOTIFICATION:
+    case BOT_MESSAGE_TYPES.ORDER_CONFIRM:
       return (
         <div
           className={`ss-combine-block-preview ss-combine-block-preview--bot ss-bot-chat-overview-${contentIndex}`}

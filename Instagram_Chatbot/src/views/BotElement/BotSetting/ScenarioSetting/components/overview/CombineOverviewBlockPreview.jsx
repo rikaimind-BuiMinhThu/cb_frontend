@@ -4,6 +4,7 @@ import { DEFAULT_AMAZON_PAY_BUTTON_IMAGE_URL } from '../../../../../../variables
 import { PREVIEW_MAP } from '../../contentPreviews';
 import { getBotFileExtension } from '../../utils/getBotMessageTitle';
 import { getCombineContentTypeLabel } from '../../utils/combineContentDefaults';
+import { buildOrderConfirmPreviewHtml } from '../../utils/OrderConfirmLpScriptGenerator';
 
 const renderBotBlockPreview = (content, index, hidden) => {
   const fileType = getBotFileExtension(content);
@@ -90,6 +91,18 @@ const renderBotBlockPreview = (content, index, hidden) => {
           style={{ width: content.amazon_pay_button?.button_image_width || '80%', maxWidth: '100%' }}
         />
       </div>
+    );
+  }
+
+  if (content.type === BOT_MESSAGE_TYPES.ORDER_CONFIRM) {
+    return (
+      <div
+        className="ss-combine-block-preview ss-combine-block-preview--bot"
+        style={opacityStyle}
+        dangerouslySetInnerHTML={{
+          __html: buildOrderConfirmPreviewHtml(content.order_confirm),
+        }}
+      />
     );
   }
 

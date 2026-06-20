@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Button, Card, message } from 'antd';
-import Preview from './BotSetting/Preview';
+import PreviewFukushashiki from './BotSetting/PreviewFukushashiki';
 import Cookies from 'js-cookie';
 import api from '../../api/api-management';
 import { AdminPage } from '../../components/AdminShell';
@@ -52,7 +52,7 @@ const BotDemo = () => {
             open-close
           </Button>
           {scenarioId && (
-            <Preview isOpen={isChatBoxClick} onOpenPreview={(isOpen) => handleOpenPreview(isOpen)} />
+            <PreviewFukushashiki isOpen={isChatBoxClick} onOpenPreview={(isOpen) => handleOpenPreview(isOpen)} />
           )}
         </div>
       </Card>

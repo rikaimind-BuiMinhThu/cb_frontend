@@ -11,6 +11,7 @@ import { BOT_MESSAGE_TYPES } from '../../PreviewComponent/Constants';
 import { dataApiLinkage } from '../constants/scenarioFormConstants';
 import { useScenarioPanelDestructuring } from '../hooks/useScenarioPanelDestructuring';
 import ScenarioMessageSettingsAccordion from './ScenarioMessageSettingsAccordion';
+import OrderConfirmConfig from '../scenarioComon/OrderConfirmConfig';
 
 const STATEMENT_TYPE_OPTIONS = [
   ['text_input', 'テキスト'],
@@ -26,6 +27,7 @@ const STATEMENT_TYPE_OPTIONS = [
   ['html_code', 'HTMLコード'],
   ['amazon_pay_button', 'Amazon Payボタン'],
   ['use_html_ugc_config', 'HTML_UGC_CONFIG'],
+  [BOT_MESSAGE_TYPES.ORDER_CONFIRM, '注文確認'],
 ];
 
 const removeVariableAt = (message, messageType, index) => {
@@ -363,7 +365,8 @@ const ScenarioBotSettingsPanel = () => {
   } = useScenarioPanelDestructuring();
 
   const selectedMessage = dataMessages?.[indexMessageSelect];
-  const typeContent = selectedMessage?.message_content?.[0]?.[messageType];
+  const messageContent = selectedMessage?.message_content?.[0];
+  const typeContent = messageContent?.[messageType];
 
   if (!selectedMessage || belongTo !== 'bot' || selectedMessage.message_content?.length === 0) {
     return null;
@@ -442,6 +445,16 @@ const ScenarioBotSettingsPanel = () => {
               isUseFukushashiki={isUseFukushashiki}
               setIsOpenFileReference={setIsOpenFileReference}
               setVarFileReference={setVarFileReference}
+            />
+          )}
+          {messageType === BOT_MESSAGE_TYPES.ORDER_CONFIRM && (
+            <OrderConfirmConfig
+              indexMessageSelect={indexMessageSelect}
+              typeContent={typeContent}
+              onChangeValueMessageContent={onChangeValueMessageContent}
+              dataMessages={dataMessages}
+              setDataMessages={setDataMessages}
+              messageContent={messageContent}
             />
           )}
         </div>

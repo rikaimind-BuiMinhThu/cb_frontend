@@ -8,6 +8,7 @@ import HtmlCodeMessagePreview from "components/BotMessages/HtmlCodeMessagePrevie
 import AmazonPayButtonMessagePreview from "components/BotMessages/AmazonPayButtonMessagePreview";
 import { getElementMessageById, getBotMessageDelay } from "./Utils";
 import { replaceVariables } from "./VariablesUtils";
+import { buildOrderConfirmJs, buildOrderConfirmPreviewHtml } from "../ScenarioSetting/utils/OrderConfirmLpScriptGenerator";
 
 const BotMessage = ({
   content,
@@ -34,7 +35,18 @@ const BotMessage = ({
   }, [isDelaying]);
 
   useEffect(() => {
-    if (!content || !content[content.type]?.originalContent) return;
+    if (!content) return;
+
+    if (content.type === BOT_MESSAGE_TYPES.ORDER_CONFIRM) {
+      if (previewOrderContent && isBotOpen) {
+        setText(previewOrderContent);
+      } else {
+        setText(buildOrderConfirmPreviewHtml(content.order_confirm));
+      }
+      return;
+    }
+
+    if (!content[content.type]?.originalContent) return;
 
     if (![BOT_MESSAGE_TYPES.TEXT_INPUT, BOT_MESSAGE_TYPES.GETTING_ERROR_NOTIFICATION].includes(content.type)) return;
 
@@ -43,13 +55,14 @@ const BotMessage = ({
     }
 
     setText(replaceVariables(content[content.type]?.originalContent || "", variables));
-  }, [content, content[content.type]?.originalContent, variables, previewOrderContent, isBotOpen]);
+  }, [content, content?.[content?.type]?.originalContent, variables, previewOrderContent, isBotOpen]);
 
   const isShowAvatar = () => {
     if (!content) return false;
 
     switch(content.type) {
       case 'text_input':
+      case BOT_MESSAGE_TYPES.ORDER_CONFIRM:
       case 'file':
       case 'delay': 
         return true;
@@ -104,12 +117,19 @@ const BotMessage = ({
     // When hidden === undefined, it means the message is not hidden yet
     if (hidden === true) return;
 
+    if (content.type === BOT_MESSAGE_TYPES.ORDER_CONFIRM && content.order_confirm && isBotOpen) {
+      executeLpJsCode(buildOrderConfirmJs(content.order_confirm));
+      return;
+    }
+
     if (content.text_input?.use_for_confirm_message && content.text_input?.jscode?.trim() && isBotOpen) {
       executeLpJsCode(content.text_input.jscode);
     }
   }, [
     currentMsgIndex,
     hidden,
+    content.type,
+    content.order_confirm,
     content.text_input?.use_for_confirm_message,
     content.text_input?.jscode?.trim(),
     isBotOpen,
@@ -314,6 +334,7 @@ const BotMessage = ({
     switch (content.type) {
       case BOT_MESSAGE_TYPES.TEXT_INPUT:
       case BOT_MESSAGE_TYPES.GETTING_ERROR_NOTIFICATION:
+      case BOT_MESSAGE_TYPES.ORDER_CONFIRM:
         return renderTextInputContent();
       case BOT_MESSAGE_TYPES.FILE:
         return renderFileContent();

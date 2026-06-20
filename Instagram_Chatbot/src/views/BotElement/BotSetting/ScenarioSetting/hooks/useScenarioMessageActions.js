@@ -13,6 +13,7 @@ import {
 } from '../utils/combineContentDefaults';
 import { DEFAULT_AMAZON_PAY_BUTTON_CONFIG } from '../../../../../variables/amazonPayConstants';
 import { applyAmazonPayDisplayModeToConditions } from '../utils/amazonPayConfigUtils';
+import { getDefaultOrderConfirmConfig } from '../utils/OrderConfirmLpScriptGenerator';
 
 const _ = require('lodash');
 
@@ -259,10 +260,14 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
       for (let i = 0; i < data.length; i++) {
         if (indexMessageSelect !== undefined && i === indexMessageSelect) {
           data[i].message_content[0].type = value;
+          if (value === 'order_confirm' && !data[i].message_content[0].order_confirm) {
+            data[i].message_content[0].order_confirm = getDefaultOrderConfirmConfig();
+          }
         }
       }
+      setDataMessages(data);
     }
-  }, [dataMessages, indexMessageSelect, setMessageType]);
+  }, [dataMessages, indexMessageSelect, setMessageType, setDataMessages]);
 
   const handleAddItemSetting = useCallback((messageType) => {
     const arrMess = [...dataMessages[indexMessageSelect].message_content];
@@ -610,6 +615,7 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
                   },
                 ],
               },
+              order_confirm: getDefaultOrderConfirmConfig(),
             },
           ],
         },
@@ -659,6 +665,7 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
                   },
                 ],
               },
+              order_confirm: getDefaultOrderConfirmConfig(),
             },
           ],
         });

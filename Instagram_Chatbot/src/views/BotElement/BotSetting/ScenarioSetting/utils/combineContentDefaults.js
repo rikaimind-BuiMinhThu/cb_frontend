@@ -1,6 +1,7 @@
 import { DEFAULT_AMAZON_PAY_BUTTON_CONFIG } from '../../../../../variables/amazonPayConstants';
 import { COMBINE_MESSAGE_DEFAULTS } from '../../PreviewComponent/Constants';
 import { createDefaultContentItem, getNextContentId } from './scenarioContentDefaults';
+import { getDefaultOrderConfirmConfig } from './OrderConfirmLpScriptGenerator';
 
 export const COMBINE_BOT_TYPE_OPTIONS = [
   ['text_input', 'テキスト'],
@@ -8,6 +9,7 @@ export const COMBINE_BOT_TYPE_OPTIONS = [
   ['file', 'ファイル'],
   ['html_code', 'HTMLコード'],
   ['amazon_pay_button', 'Amazon Payボタン'],
+  ['order_confirm', '注文確認'],
 ];
 
 export const COMBINE_USER_TYPE_OPTIONS = [
@@ -69,6 +71,7 @@ const createBotContentStub = (type) => ({
   variable_set: {
     variables: [],
   },
+  order_confirm: getDefaultOrderConfirmConfig(),
 });
 
 export function createDefaultCombineMessage(dataInputVar = []) {
