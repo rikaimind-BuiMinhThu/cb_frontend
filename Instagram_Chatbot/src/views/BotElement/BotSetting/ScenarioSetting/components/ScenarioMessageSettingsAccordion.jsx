@@ -58,10 +58,13 @@ const ScenarioMessageSettingsAccordion = ({
     : 'ss-user-setting-condition-container ss-message-settings-accordion';
 
   useEffect(() => {
-    setActivePanel(null);
+    const hasConditions = (selectedMessage?.conditions?.length ?? 0) > 0;
+    const hasSpecial = hasActiveSpecialDisplayConditions(selectedMessage, isUseFukushashiki);
+
+    setActivePanel(hasConditions || hasSpecial ? PANEL.AUDIENCE : null);
     resetConditionPanelLayout(role);
     clearAccordionPanelLayout(role);
-  }, [indexMessageSelect, resetConditionPanelLayout, role]);
+  }, [indexMessageSelect, selectedMessage, isUseFukushashiki, resetConditionPanelLayout, role]);
 
   const hasActiveSpecialDisplay = hasActiveSpecialDisplayConditions(selectedMessage, isUseFukushashiki);
   const hasAudienceConditions = (selectedMessage?.conditions?.length ?? 0) > 0;

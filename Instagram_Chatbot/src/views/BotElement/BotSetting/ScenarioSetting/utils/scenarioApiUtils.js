@@ -73,7 +73,10 @@ export const parseScenarioResponse = (res) => {
   const conversation = data.conversation || {};
 
   return {
-    dataMessages: conversation.messages || [],
+    dataMessages: (conversation.messages || []).map((message) => ({
+      ...message,
+      conditions: message.conditions || [],
+    })),
     scenarioName: data.scenario_name || '',
     scenarioType: data.scenario_type || 'payment',
     clientCartSystem: data.cart_system ?? null,

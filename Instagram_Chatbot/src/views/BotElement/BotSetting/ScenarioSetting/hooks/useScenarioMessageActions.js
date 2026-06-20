@@ -714,8 +714,8 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
 
   const onChangeValueCondition = useCallback((index, value, name) => {
     dataMessages[indexMessageSelect].conditions[index][name] = value;
-    setConditions([...conditions]);
-  }, [conditions, dataMessages, indexMessageSelect, setConditions]);
+    setDataMessages([...dataMessages]);
+  }, [dataMessages, indexMessageSelect, setDataMessages]);
 
   const onClickAddCondition = useCallback(() => {
     dataMessages[indexMessageSelect].conditions.push({
@@ -731,7 +731,7 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
     const dataMessageClone = [...dataMessages];
     const dataConditionFilter = dataMessageClone[indexMessageSelect].conditions.filter((item, index) => index !== indexCondition);
     dataMessageClone[indexMessageSelect].conditions = dataConditionFilter;
-    setDataMessages([...dataMessages]);
+    setDataMessages([...dataMessageClone]);
   }, [dataMessages, indexMessageSelect, setDataMessages]);
 
   const onChangeAmazonPayDisplayMode = useCallback((mode) => {
