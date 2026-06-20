@@ -177,6 +177,10 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
       document.querySelector('.ss-bot-setting-condition-container').style.height = '20%';
     } else if (belongTo === 'user' && document.querySelector('.ss-user-setting__main')) {
       document.querySelector('.ss-user-setting__main').style.height = '57%';
+      const bottom = document.querySelector('.ss-user-setting__bottom');
+      if (bottom) {
+        bottom.style.maxHeight = '220px';
+      }
     }
 
     document.querySelector(`.ss-user-setting__item-${indexLastEle}`) && document.querySelector(`.ss-user-setting__item-${indexLastEle}`).classList.add('ss-user-setting__item--active');
@@ -680,23 +684,32 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
     setDataMessages([...dataMessagesClone]);
   }, [dataInputVar, dataMessages, setBelongTo, setDataMessages]);
 
-  const handlePannelCondition = useCallback((isUpCondition, role = 'bot') => {
-    setIsConditionUp(isUpCondition);
+  const applyConditionPanelLayout = (isUpCondition, role = 'bot') => {
     if (role === 'bot') {
-      if (isUpCondition) {
-        document.querySelector('.ss-bot-setting-condition-container').style.height = '52%';
-      } else {
-        document.querySelector('.ss-bot-setting-condition-container').style.height = '20%';
+      const container = document.querySelector('.ss-bot-setting-condition-container');
+      if (container) {
+        container.style.height = isUpCondition ? '52%' : '20%';
       }
     } else if (role === 'user') {
-      if (isUpCondition) {
-        document.querySelector('.ss-user-setting__main').style.height = '25%';
-        document.querySelector('.ss-user-setting__bottom').style.maxHeight = '460px';
-      } else {
-        document.querySelector('.ss-user-setting__main').style.height = '57%';
-        document.querySelector('.ss-user-setting__bottom').style.maxHeight = '220px';
+      const main = document.querySelector('.ss-user-setting__main');
+      const bottom = document.querySelector('.ss-user-setting__bottom');
+      if (main) {
+        main.style.height = isUpCondition ? '25%' : '57%';
+      }
+      if (bottom) {
+        bottom.style.maxHeight = isUpCondition ? '460px' : '220px';
       }
     }
+  };
+
+  const handlePannelCondition = useCallback((isUpCondition, role = 'bot') => {
+    setIsConditionUp(isUpCondition);
+    applyConditionPanelLayout(isUpCondition, role);
+  }, [setIsConditionUp]);
+
+  const resetConditionPanelLayout = useCallback((role = 'bot') => {
+    setIsConditionUp(false);
+    applyConditionPanelLayout(false, role);
   }, [setIsConditionUp]);
 
   const onChangeValueCondition = useCallback((index, value, name) => {
@@ -783,6 +796,7 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
     createVariable,
     onClickCreateStatement,
     handlePannelCondition,
+    resetConditionPanelLayout,
     onChangeValueCondition,
     onClickAddCondition,
     handleDeleteCondition,

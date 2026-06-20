@@ -45,6 +45,8 @@ export const SCENARIO_MODAL_TOOLTIPS = {
   registerButtonJscode: 'ボタンクリック時に実行するコードを入力してください。',
   hideWhenLoggedIn: 'ログイン済みユーザーにはこのメッセージを表示しません。',
   hideWhenError: 'エラー発生時にはこのメッセージを表示しません。',
+  audienceConditionsSettings: '※設定すると、条件に当てはまるユーザーに対してのみ表示されます。',
+  otherSettings: '登録ボタンの表示、ボタン名、JavaScript実行などを設定します。',
   noAutoScroll: 'このメッセージ表示時に自動スクロールしません。',
   saveToVariable: 'ユーザーの入力を指定した変数に保存します。',
   apiValidation: '入力値の検証にAPIを利用します。',

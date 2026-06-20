@@ -1,0 +1,116 @@
+.ss-conditions-more-settings__summary-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: #eef4ff;
+  color: #327aed;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.ss-message-settings-accordion {
+  margin-top: 12px;
+}
+
+.ss-message-settings-accordion__triggers {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+}
+
+.ss-message-settings-accordion__trigger-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-width: 0;
+  gap: 6px;
+}
+
+.ss-message-settings-accordion__trigger {
+  width: 100%;
+  margin: 0;
+  padding: 8px 12px;
+  background-color: #fff;
+  border: 1px solid #347aed;
+  color: #347aed;
+  font-size: 13px;
+  white-space: normal;
+}
+
+.ss-message-settings-accordion__trigger-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.ss-message-settings-accordion__trigger-help {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.ss-message-settings-accordion__trigger--active .ss-settings-info-tooltip {
+  color: #fff;
+}
+
+.ss-audience-conditions-content__section-divider {
+  margin: 16px 0;
+  border-top: 1px solid #e5e7eb;
+}
+
+.ss-message-settings-accordion__trigger:hover,
+.ss-message-settings-accordion__trigger:focus {
+  background-color: #eef4ff;
+  color: #347aed;
+}
+
+.ss-message-settings-accordion__trigger--active {
+  background-color: #347aed;
+  border-color: #347aed;
+  color: #fff;
+}
+
+.ss-message-settings-accordion__trigger--active:hover,
+.ss-message-settings-accordion__trigger--active:focus {
+  background-color: #2a6ad4;
+  border-color: #2a6ad4;
+  color: #fff;
+}
+
+.ss-message-settings-accordion__trigger--configured:not(.ss-message-settings-accordion__trigger--active) {
+  border-color: #5a8f3e;
+  color: #5a8f3e;
+}
+
+.ss-message-settings-accordion__trigger-badge {
+  margin-left: 8px;
+  font-size: 12px;
+}
+
+.ss-message-settings-accordion__content {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.ss-special-display-conditions-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ss-audience-conditions-content__header {
+  margin-bottom: 0;
+}
+
+.ss-conditions-more-settings__summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+

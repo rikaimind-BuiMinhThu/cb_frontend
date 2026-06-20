@@ -61,7 +61,7 @@ export const useScenarioPanelDestructuring = () => {
     onChangeFixedDate, handleChangeValueRequireZipCode, handleRemoveItemContent,
     handleRemoveItemCustomizePullDown, handleRemoveItemProductPullDown,
     handleRemoveItemZipCodeAddress, createVariable, onClickCreateStatement,
-    handlePannelCondition, onChangeValueCondition, onClickAddCondition,
+    handlePannelCondition, resetConditionPanelLayout, onChangeValueCondition, onClickAddCondition,
     handleDeleteCondition, onChangeAmazonPayDisplayMode, handleDownloadFile, isColor,
   } = messages;
 
@@ -122,7 +122,7 @@ export const useScenarioPanelDestructuring = () => {
     onChangeFixedDate, handleChangeValueRequireZipCode, handleRemoveItemContent,
     handleRemoveItemCustomizePullDown, handleRemoveItemProductPullDown,
     handleRemoveItemZipCodeAddress, createVariable, onClickCreateStatement,
-    handlePannelCondition, onChangeValueCondition, onClickAddCondition,
+    handlePannelCondition, resetConditionPanelLayout, onChangeValueCondition, onClickAddCondition,
     handleDeleteCondition, onChangeAmazonPayDisplayMode, handleDownloadFile, isColor,
     renderPaymentMethodDescriptionInput, renderRootFaqOption, renderAddressField,
     renderBuildingName, renderMunicipality, renderPostCode, renderZipCodeAddressTitle,

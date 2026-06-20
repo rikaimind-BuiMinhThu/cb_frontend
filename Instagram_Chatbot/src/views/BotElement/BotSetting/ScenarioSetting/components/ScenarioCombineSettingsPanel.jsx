@@ -6,7 +6,7 @@ import InputCustom from '../scenarioComon/InputCustom';
 import InputNum from '../scenarioComon/InputNum';
 import { CONTENT_SETTING_MAP } from '../contentSettings';
 import { useScenarioPanelDestructuring } from '../hooks/useScenarioPanelDestructuring';
-import ScenarioConditionsPanel from './ScenarioConditionsPanel';
+import ScenarioMessageSettingsAccordion from './ScenarioMessageSettingsAccordion';
 import CombineBotBlockSetting from './CombineBotBlockSetting';
 import CombineBlockHeader from './CombineBlockHeader';
 import { COMBINE_CONTENT_ROLES } from '../../PreviewComponent/Constants';
@@ -33,40 +33,6 @@ const AddBlockSelect = ({ options, defaultType, onAdd, label }) => {
       <Button className="ss-user-setting__select-btn-add" style={{ padding: '9px 23px' }} onClick={() => onAdd(blockType)}>
         追加
       </Button>
-    </div>
-  );
-};
-
-const RegisterButtonConfig = ({ selectedMessage, dataMessages, setDataMessages }) => {
-  const updateMessage = (updates) => {
-    Object.assign(selectedMessage, updates);
-    setDataMessages([...dataMessages]);
-  };
-
-  return (
-    <div className="ss-user-register-button-settings">
-      <div className="ss-user-register-button-settings__main">
-        <label>
-          <input
-            type="checkbox"
-            checked={!!selectedMessage.not_use_button}
-            onChange={(e) => updateMessage({ not_use_button: e.target.checked })}
-          />
-          <span style={{ marginLeft: '8px' }}>次へボタンを使用しない</span>
-        </label>
-        {!selectedMessage.not_use_button && (
-          <div style={{ marginTop: '10px' }}>
-            <span>ボタン名称</span>
-            <InputCustom
-              style={{ width: '100%' }}
-              placeholder="例：次へ"
-              value={selectedMessage.buttonName || ''}
-              maxLength={30}
-              onChange={(value) => updateMessage({ buttonName: value })}
-            />
-          </div>
-        )}
-      </div>
     </div>
   );
 };
@@ -200,12 +166,13 @@ const ScenarioCombineSettingsPanel = () => {
           defaultType={messageType || 'text_input'}
           onAdd={(type) => handleAddCombineBlock(COMBINE_CONTENT_ROLES.USER, type)}
         />
-        <RegisterButtonConfig
+        <ScenarioMessageSettingsAccordion
+          variant="combine"
           selectedMessage={selectedMessage}
           dataMessages={dataMessages}
           setDataMessages={setDataMessages}
+          indexMessageSelect={indexMessageSelect}
         />
-        <ScenarioConditionsPanel variant="user" />
       </div>
     </div>
   );

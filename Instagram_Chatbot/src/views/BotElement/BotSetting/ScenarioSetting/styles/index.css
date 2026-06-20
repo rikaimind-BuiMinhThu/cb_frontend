@@ -43,3 +43,6 @@
 @import './contentPreviews/productPurchase.css';
 @import './contentPreviews/cardPaymentRadioButton.css';
 @import './contentPreviews/shippingAddress.css';
+
+/* components */
+@import './components/conditionsPanel.css';

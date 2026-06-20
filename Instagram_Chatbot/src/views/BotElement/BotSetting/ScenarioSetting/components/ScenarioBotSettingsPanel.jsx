@@ -10,7 +10,7 @@ import AmazonPayButtonConfig from '../scenarioComon/AmazonPayButtonConfig';
 import { BOT_MESSAGE_TYPES } from '../../PreviewComponent/Constants';
 import { dataApiLinkage } from '../constants/scenarioFormConstants';
 import { useScenarioPanelDestructuring } from '../hooks/useScenarioPanelDestructuring';
-import ScenarioConditionsPanel from './ScenarioConditionsPanel';
+import ScenarioMessageSettingsAccordion from './ScenarioMessageSettingsAccordion';
 
 const STATEMENT_TYPE_OPTIONS = [
   ['text_input', 'テキスト'],
@@ -446,7 +446,13 @@ const ScenarioBotSettingsPanel = () => {
           )}
         </div>
       </div>
-      <ScenarioConditionsPanel variant="bot" />
+      <ScenarioMessageSettingsAccordion
+        variant="bot"
+        selectedMessage={dataMessages[indexMessageSelect]}
+        dataMessages={dataMessages}
+        setDataMessages={setDataMessages}
+        indexMessageSelect={indexMessageSelect}
+      />
     </div>
   );
 };

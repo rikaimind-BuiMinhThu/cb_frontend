@@ -6,15 +6,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import InputCustom from '../scenarioComon/InputCustom';
 import { CONTENT_SETTING_MAP } from '../contentSettings';
 import { useScenarioPanelDestructuring } from '../hooks/useScenarioPanelDestructuring';
-import ScenarioConditionsPanel from './ScenarioConditionsPanel';
-import ScenarioModalCheckbox from './modals/shared/ScenarioModalCheckbox';
-import ScenarioFormRow from './modals/shared/ScenarioFormRow';
-import ScenarioInfoTooltip from './modals/shared/ScenarioInfoTooltip';
-import ScenarioCodeTextarea from './modals/shared/ScenarioCodeTextarea';
-import {
-  SCENARIO_MODAL_TOOLTIPS,
-  REGISTER_BUTTON_LABELS,
-} from './modals/shared/scenarioModalTooltips';
+import ScenarioMessageSettingsAccordion from './ScenarioMessageSettingsAccordion';
 
 const CONTENT_TYPE_OPTIONS = [
   ['text_input', 'テキスト入力'],
@@ -42,13 +34,6 @@ const CONTENT_TYPE_OPTIONS = [
   ['button_submit', '確認する'],
 ];
 
-const labelWithTooltip = (text, tooltipKey) => (
-  <>
-    {text}
-    <ScenarioInfoTooltip text={SCENARIO_MODAL_TOOLTIPS[tooltipKey]} />
-  </>
-);
-
 const AddContentSelect = ({ messageType, setMessageType, hasContent, onAdd }) => (
   <div className="ss-user-setting__select-wrapper">
     <select
@@ -71,84 +56,6 @@ const AddContentSelect = ({ messageType, setMessageType, hasContent, onAdd }) =>
     <Button className="ss-user-setting__select-btn-add" style={{ padding: '9px 23px' }} onClick={onAdd}>追加</Button>
   </div>
 );
-
-const RegisterButtonConfig = ({ selectedMessage, dataMessages, setDataMessages }) => {
-  const [alignBeginningStop, setAlignBeginningStop] = useState(false);
-
-  const updateMessage = (updates) => {
-    Object.assign(selectedMessage, updates);
-    setDataMessages([...dataMessages]);
-  };
-
-  const showCodeEditor = !!selectedMessage.button_jscode;
-
-  return (
-    <div
-      className={`ss-user-register-button-settings${
-        showCodeEditor ? ' ss-user-register-button-settings--code-open' : ''
-      }`}
-    >
-      <div className="ss-user-register-button-settings__main">
-        <ScenarioModalCheckbox
-          checked={alignBeginningStop}
-          onChange={setAlignBeginningStop}
-          label={labelWithTooltip(
-            REGISTER_BUTTON_LABELS.alignBeginningStop,
-            'alignBeginningStop',
-          )}
-        />
-        <ScenarioModalCheckbox
-          checked={!!selectedMessage.not_use_button}
-          onChange={(checked) => updateMessage({ not_use_button: checked })}
-          label={labelWithTooltip(
-            REGISTER_BUTTON_LABELS.notUseButton,
-            'notUseButton',
-          )}
-        />
-        {!selectedMessage.not_use_button && (
-          <ScenarioFormRow
-            label={REGISTER_BUTTON_LABELS.registerButtonName}
-            tooltip={SCENARIO_MODAL_TOOLTIPS.registerButtonName}
-          >
-            <InputCustom
-              style={{ width: '100%' }}
-              placeholder="例：次へ、登録する"
-              value={selectedMessage.buttonName}
-              maxLength={30}
-              onChange={(value) => updateMessage({ buttonName: value })}
-            />
-          </ScenarioFormRow>
-        )}
-        <ScenarioModalCheckbox
-          checked={showCodeEditor}
-          onChange={(checked) => updateMessage({ button_jscode: checked })}
-          label={labelWithTooltip(
-            REGISTER_BUTTON_LABELS.useButtonJavascript,
-            'useButtonJavascript',
-          )}
-        />
-      </div>
-      {showCodeEditor && (
-        <div className="ss-user-register-button-settings__code-flyout">
-          <ScenarioFormRow
-            label={REGISTER_BUTTON_LABELS.registerButtonJscode}
-            tooltip={SCENARIO_MODAL_TOOLTIPS.registerButtonJscode}
-            alignTop
-          >
-            <ScenarioCodeTextarea
-              id="ss-register-button-jscode"
-              value={selectedMessage.jscode || ''}
-              onChange={(value) => updateMessage({ jscode: value })}
-              placeholder="JavaScriptコードを入力"
-              language="javascript"
-              height={120}
-            />
-          </ScenarioFormRow>
-        </div>
-      )}
-    </div>
-  );
-};
 
 const ScenarioUserSettingsPanel = () => {
   const {
@@ -232,12 +139,13 @@ const ScenarioUserSettingsPanel = () => {
             onAdd={() => handleAddItemSetting(messageType || 'text_input')}
           />
         }
-        <RegisterButtonConfig
+        <ScenarioMessageSettingsAccordion
+          variant="user"
           selectedMessage={selectedMessage}
           dataMessages={dataMessages}
           setDataMessages={setDataMessages}
+          indexMessageSelect={indexMessageSelect}
         />
-        <ScenarioConditionsPanel variant="user" />
       </div>
     </div>
   );
