@@ -9,7 +9,7 @@ import UserManagement from 'views/UserManagement';
 import Keyword from 'views/InstagramBotElement/Keyword';
 import DataAnalyst from 'views/InstagramBotElement/DataAnalyst';
 import ListUser from 'views/InstagramBotElement/ListUser';
-import AttractedCustomer from 'views/InstagramBotElement/AttractedCusomer';
+import AttractedCustomer from 'views/InstagramBotElement/AttractedCustomer';
 import CRM from 'views/InstagramBotElement/CRM';
 import Template from 'views/InstagramBotElement/Template';
 import BotManagement from 'views/BotElement/BotManagement';
