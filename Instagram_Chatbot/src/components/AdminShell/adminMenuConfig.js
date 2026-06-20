@@ -171,6 +171,7 @@ export function filterMenuByRole(items, userRole) {
 
 export const ROUTE_TITLES = {
   '/admin/client-management': 'クライアント管理',
+  '/admin/chatbot': 'チャットボット作成',
   '/admin/bot': 'ボット管理',
   '/admin/scenario-list': 'シナリオ一覧',
   '/admin/scenario-setting': 'シナリオ設定',
