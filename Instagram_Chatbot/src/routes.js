@@ -121,13 +121,6 @@ var routes = [
     layout: '/admin',
   },
   {
-    path: '/data',
-    name: 'データ分析',
-    // icon: "nc-icon nc-bell-55",
-    component: DataAnalyst,
-    layout: '/admin',
-  },
-  {
     path: '/data-analyst',
     name: 'データ分析',
     // icon: "nc-icon nc-bell-55",

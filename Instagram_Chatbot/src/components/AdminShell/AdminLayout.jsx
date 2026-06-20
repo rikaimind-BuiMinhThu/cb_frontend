@@ -36,7 +36,6 @@ function AdminLayout(props) {
       '/admin/chatbot',
       '/admin/keyword',
       '/admin/release',
-      '/admin/data',
       '/admin/data-analyst',
       '/admin/list-user',
       '/admin/attracted-customer',

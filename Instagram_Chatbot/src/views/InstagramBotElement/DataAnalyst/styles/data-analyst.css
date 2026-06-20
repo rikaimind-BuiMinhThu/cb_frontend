@@ -1,0 +1,54 @@
+.data-analyst-page .data-analyst-section {
+  margin-bottom: 20px;
+}
+
+.data-analyst-page .data-analyst-section:last-child {
+  margin-bottom: 0;
+}
+
+.data-analyst-page .data-analyst-section-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.data-analyst-page .data-analyst-section-header h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  text-align: center;
+}
+
+.data-analyst-page .data-analyst-section-body {
+  padding: 20px;
+}
+
+.data-analyst-page .data-analyst-overview-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 3fr);
+  gap: 24px;
+  align-items: center;
+}
+
+.data-analyst-page .data-analyst-chart-wrap {
+  min-width: 0;
+}
+
+.data-analyst-page .data-analyst-pie-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 320px;
+}
+
+.data-analyst-page .data-analyst-date-error {
+  color: #ff4d4f;
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+@media (max-width: 992px) {
+  .data-analyst-page .data-analyst-overview-grid {
+    grid-template-columns: 1fr;
+  }
+}
