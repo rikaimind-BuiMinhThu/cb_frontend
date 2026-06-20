@@ -34,7 +34,7 @@ export const log = (message) => {
 
 export const getEcChatBotApiServerBaseUrl = () => {
     // Comment out below line if you want to connect the staging backend API server
-    return "https://ec-chatbot-test1.com";
+    // return "https://ec-chatbot-test1.com";
     const environment = process.env.REACT_APP_CHATBOT_ENV;
     log("Environment: " + environment);
 
@@ -61,6 +61,7 @@ export const S3_UPLOAD_URL= "https://ec-chatbot.s3.ap-northeast-1.amazonaws.com/
 export const SHORTEN_URL = `${getEcChatBotApiServerBaseUrl()}/s/`;
 export const EC_CHATBOT_URL = `${getEcChatBotApiServerBaseUrl()}`;
 export const FACEBOOK_APP_ID = `${process.env.REACT_APP_FACEBOOK_APP_ID}`;
+export const META_GRAPH_API_VERSION = 'v25.0';
 export const FUKUSHASHIKI_SEARCH_MODE_OPTIONS = [
     { key: 1, value: 'id' },
     { key: 2, value: 'css_selector' },

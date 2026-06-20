@@ -4,7 +4,7 @@ import Chatbot from 'views/InstagramBotElement/Chatbot';
 import ClientManagement from 'views/ClientManagement';
 import PlanManagement from 'views/PlanManagement';
 import Policy from 'views/InstagramBotElement/Policy';
-import Release from 'views/InstagramBotElement/Release';
+import ReleasePage from 'views/InstagramBotElement/Release/ReleasePage';
 import UserManagement from 'views/UserManagement';
 import Keyword from 'views/InstagramBotElement/Keyword';
 import DataAnalyst from 'views/InstagramBotElement/DataAnalyst';
@@ -110,7 +110,7 @@ var routes = [
     path: '/release',
     name: 'リリース',
     icon: 'nc-icon nc-air-baloon',
-    component: Release,
+    component: ReleasePage,
     layout: '/admin',
   },
   {

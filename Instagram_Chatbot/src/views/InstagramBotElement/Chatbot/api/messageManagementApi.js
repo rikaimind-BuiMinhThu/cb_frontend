@@ -2,6 +2,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import api from '../../../../api/api-management';
 import { tokenExpired } from '../../../../api/tokenExpired';
+import { META_GRAPH_API_VERSION } from '../../../../variables/constants';
 
 function handleError(error) {
   if (error.response?.data?.code === 0) {
@@ -181,7 +182,7 @@ export async function fetchInstagramPastPosts() {
   if (!pageAccessToken || !igId) return [];
 
   const mediaRes = await axios
-    .get(`https://graph.facebook.com/v14.0/${igId}/media`, {
+    .get(`https://graph.facebook.com/${META_GRAPH_API_VERSION}/${igId}/media`, {
       params: { access_token: pageAccessToken },
     })
     .catch(() => ({ data: { data: [] } }));
@@ -191,7 +192,7 @@ export async function fetchInstagramPastPosts() {
     mediaItems.map(async (item) => {
       try {
         const detail = await axios.get(
-          `https://graph.facebook.com/v14.0/${item.id}`,
+          `https://graph.facebook.com/${META_GRAPH_API_VERSION}/${item.id}`,
           {
             params: {
               fields: 'id,media_type,media_url,username,timestamp',
