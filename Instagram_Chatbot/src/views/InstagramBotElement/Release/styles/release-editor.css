@@ -30,6 +30,47 @@
   padding: 16px;
 }
 
+.release-connect-login--page-list {
+  align-items: stretch;
+  width: 100%;
+}
+
+.release-connect-page-list {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.release-connect-page-list__title {
+  margin: 0 0 8px !important;
+  text-align: center;
+}
+
+.release-connect-page-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.release-connect-page-item:last-of-type {
+  border-bottom: none;
+}
+
+.release-connect-page-item__name {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.release-connect-page-list__logout {
+  margin-top: 16px;
+  align-self: center;
+}
+
 .release-section-card {
   height: 100%;
 }

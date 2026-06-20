@@ -113,27 +113,35 @@ export default function useInstagramConnect({ onNotify }) {
   }, [loadConnection, onNotify, syncCookies]);
 
   const disconnect = useCallback(async () => {
-    if (!account?.ig_id) return;
     setConnecting(true);
     try {
-      await logoutInstagram(account.ig_id);
+      if (account?.ig_id) {
+        await logoutInstagram(account.ig_id);
+      }
+
       Cookies.remove('ig_id');
       Cookies.remove('page_access_token');
-      window.FB.getLoginStatus((response) => {
-        if (response.authResponse) {
-          window.FB.logout(() => {
-            setIsConnected(false);
-            setAccount(null);
-            setProfile(null);
-            setPages([]);
-            setShowPageList(false);
-          });
-        } else {
-          setIsConnected(false);
-          setAccount(null);
-          setProfile(null);
+
+      await new Promise((resolve) => {
+        if (!window.FB) {
+          resolve();
+          return;
         }
+        window.FB.getLoginStatus((response) => {
+          if (response.authResponse) {
+            window.FB.logout(resolve);
+          } else {
+            resolve();
+          }
+        });
       });
+
+      setIsConnected(false);
+      setAccount(null);
+      setProfile(null);
+      setPages([]);
+      setShowPageList(false);
+
       onNotify?.(TOAST_MESSAGES.LOGOUT_SUCCESS, 'success');
     } catch (error) {
       onNotify?.(error.message || 'ログアウトに失敗しました。', 'error');

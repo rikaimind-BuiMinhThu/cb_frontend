@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import FacebookLogin from 'react-facebook-login';
-import { Avatar, Button, Card, List, Spin, Typography } from 'antd';
+import { Avatar, Button, Card, Spin, Typography } from 'antd';
 import { FACEBOOK_APP_ID, META_GRAPH_API_VERSION } from '../../../../variables/constants';
 import { useReleaseEditor } from '../context/ReleaseEditorContext';
 
@@ -99,7 +99,7 @@ export default function InstagramConnectCard() {
 
   return (
     <Card className="release-connect-card">
-      <div className="release-connect-login">
+      <div className={`release-connect-login${connect.showPageList ? ' release-connect-login--page-list' : ''}`}>
         {!connect.showPageList ? (
           <FacebookLogin
             appId={FACEBOOK_APP_ID}
@@ -111,24 +111,32 @@ export default function InstagramConnectCard() {
             cssClass="release-fb-login-button"
           />
         ) : (
-          <List
-            header="Instagramページを選択"
-            dataSource={connect.pages}
-            renderItem={(page) => (
-              <List.Item
-                actions={[
-                  <Button key="select" type="primary" loading={connect.connecting} onClick={() => connect.selectPage(page.id)}>
-                    選択
-                  </Button>,
-                ]}
-              >
-                <List.Item.Meta
-                  avatar={<Avatar src={page.picture?.data?.url} />}
-                  title={page.name}
-                />
-              </List.Item>
-            )}
-          />
+          <div className="release-connect-page-list">
+            <Typography.Title level={5} className="release-connect-page-list__title">
+              Instagramページを選択
+            </Typography.Title>
+            {connect.pages.map((page) => (
+              <div key={page.id} className="release-connect-page-item">
+                <Avatar src={page.picture?.data?.url} size={48} />
+                <span className="release-connect-page-item__name">{page.name}</span>
+                <Button
+                  type="primary"
+                  loading={connect.connecting}
+                  onClick={() => connect.selectPage(page.id)}
+                >
+                  選択
+                </Button>
+              </div>
+            ))}
+            <Button
+              danger
+              loading={connect.connecting}
+              onClick={connect.disconnect}
+              className="release-connect-page-list__logout"
+            >
+              インスタグラムログアウト
+            </Button>
+          </div>
         )}
       </div>
     </Card>
