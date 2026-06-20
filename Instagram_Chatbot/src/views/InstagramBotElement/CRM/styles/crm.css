@@ -112,64 +112,126 @@
 }
 
 .crm-status-pipeline {
-  margin-top: 24px;
+  margin-top: 20px;
+  padding: 16px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  text-align: left;
 }
 
-.crm-status-pipeline__track {
-  position: relative;
-  margin: 12px 0 20px;
-}
-
-.crm-status-pipeline__line {
-  position: absolute;
-  top: 18px;
-  left: 12%;
-  right: 12%;
-  height: 3px;
-  background: #d1d5db;
-  z-index: 0;
-}
-
-.crm-status-pipeline__steps {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  position: relative;
-  z-index: 1;
-}
-
-.crm-status-pipeline__step {
-  text-align: center;
-  cursor: pointer;
-}
-
-.crm-status-pipeline__step-label {
-  display: block;
-  font-size: 12px;
-  color: #6b7280;
-  margin-bottom: 8px;
-}
-
-.crm-status-pipeline__step-circle {
-  width: 36px;
-  height: 36px;
-  margin: 0 auto;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.crm-status-pipeline__title {
+  margin: 0 0 12px;
   font-size: 13px;
   font-weight: 600;
-  color: #fff;
-  background: #9ca3af;
-  transition: background-color 0.2s;
+  color: #374151;
 }
 
-.crm-status-pipeline__step-circle--active {
+.crm-status-pipeline__list {
+  display: flex;
+  flex-direction: column;
+}
+
+.crm-status-pipeline__item {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.crm-status-pipeline__item-track {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 32px;
+  flex-shrink: 0;
+}
+
+.crm-status-pipeline__connector {
+  width: 2px;
+  flex: 1;
+  min-height: 20px;
+  margin: 4px 0;
+  background: #e5e7eb;
+  border-radius: 1px;
+}
+
+.crm-status-pipeline__connector--filled {
   background: #1677ff;
 }
 
-.crm-status-pipeline__step:hover .crm-status-pipeline__step-circle {
-  background: #4096ff;
+.crm-status-pipeline__dot {
+  width: 32px;
+  height: 32px;
+  border: 2px solid #d1d5db;
+  border-radius: 50%;
+  background: #fff;
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: border-color 0.2s, background-color 0.2s, color 0.2s;
+}
+
+.crm-status-pipeline__dot--passed {
+  border-color: #1677ff;
+  background: #e6f4ff;
+  color: #1677ff;
+}
+
+.crm-status-pipeline__dot--active {
+  border-color: #1677ff;
+  background: #1677ff;
+  color: #fff;
+  box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.15);
+}
+
+.crm-status-pipeline__dot:hover:not(:disabled):not(.crm-status-pipeline__dot--active) {
+  border-color: #4096ff;
+  color: #4096ff;
+}
+
+.crm-status-pipeline__dot:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.crm-status-pipeline__label-btn {
+  flex: 1;
+  border: none;
+  background: none;
+  padding: 6px 0 16px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #374151;
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.2s;
+}
+
+.crm-status-pipeline__item:last-child .crm-status-pipeline__label-btn {
+  padding-bottom: 0;
+}
+
+.crm-status-pipeline__item--passed .crm-status-pipeline__label-btn {
+  color: #1677ff;
+}
+
+.crm-status-pipeline__item--active .crm-status-pipeline__label-btn {
+  color: #1677ff;
+  font-weight: 600;
+}
+
+.crm-status-pipeline__label-btn:hover:not(:disabled) {
+  color: #4096ff;
+}
+
+.crm-status-pipeline__label-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
 }
 
 .crm-labels-section__header,
