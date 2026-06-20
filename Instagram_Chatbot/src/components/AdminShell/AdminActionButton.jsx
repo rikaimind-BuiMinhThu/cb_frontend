@@ -4,6 +4,7 @@ import { Button } from 'antd';
 import {
   CopyOutlined,
   DeleteOutlined,
+  DollarOutlined,
   EditOutlined,
   EyeOutlined,
   PlusOutlined,
@@ -50,6 +51,12 @@ const ACTION_CONFIG = {
     size: 'small',
     danger: true,
     icon: <DeleteOutlined />,
+  },
+  payment: {
+    label: 'Payment',
+    type: 'link',
+    size: 'small',
+    icon: <DollarOutlined />,
   },
 };
 
