@@ -11,6 +11,8 @@ export default function OrderConfirmSettingsModal({
   indexContent,
   messageType,
   onChangeValueMessageContent,
+  dataMessages,
+  setDataMessages,
   buttonLabel = '詳細設定',
   title = '注文確認設定',
 }) {
@@ -48,6 +50,8 @@ export default function OrderConfirmSettingsModal({
           indexContent={indexContent}
           messageType={messageType}
           onChangeValueMessageContent={onChangeValueMessageContent}
+          dataMessages={dataMessages}
+          setDataMessages={setDataMessages}
         />
       </ScenarioModalShell>
     </>
@@ -60,6 +64,8 @@ OrderConfirmSettingsModal.propTypes = {
   indexContent: PropTypes.number,
   messageType: PropTypes.string,
   onChangeValueMessageContent: PropTypes.func.isRequired,
+  dataMessages: PropTypes.array.isRequired,
+  setDataMessages: PropTypes.func.isRequired,
   buttonLabel: PropTypes.string,
   title: PropTypes.string,
 };

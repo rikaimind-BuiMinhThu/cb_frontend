@@ -5,7 +5,10 @@ import { BOT_MESSAGE_TYPES } from '../../PreviewComponent/Constants';
 import {
   ORDER_CONFIRM_LP_PRESET,
   ORDER_CONFIRM_LP_PRESETS,
+  applyEcforcePresetToFields,
   getDefaultOrderConfirmConfig,
+  normalizeOrderConfirmConfig,
+  syncLegacySelectorsLabelsFromFields,
 } from '../utils/OrderConfirmLpScriptGenerator';
 import OrderConfirmSettingsModal from './OrderConfirmSettingsModal';
 
@@ -26,7 +29,7 @@ export default function OrderConfirmConfig({
   setDataMessages,
   messageContent,
 }) {
-  const config = typeContent || getDefaultOrderConfirmConfig();
+  const config = normalizeOrderConfirmConfig(typeContent || getDefaultOrderConfirmConfig());
 
   const handlePresetChange = (preset) => {
     const ecforcePreset = ORDER_CONFIRM_LP_PRESETS[ORDER_CONFIRM_LP_PRESET.ECFORCE];
@@ -34,17 +37,26 @@ export default function OrderConfirmConfig({
     const content = nextMessages[indexMessageSelect]?.message_content?.[indexContent];
     if (!content) return;
 
-    content[messageType] = {
-      ...getDefaultOrderConfirmConfig(),
-      ...(content[messageType] || {}),
+    const current = normalizeOrderConfirmConfig(content[messageType] || {});
+    let nextFieldsByGroup = current.fields_by_group;
+
+    if (preset === ORDER_CONFIRM_LP_PRESET.ECFORCE) {
+      nextFieldsByGroup = applyEcforcePresetToFields(current.fields_by_group);
+    }
+
+    const legacy = syncLegacySelectorsLabelsFromFields(nextFieldsByGroup);
+
+    content[messageType] = normalizeOrderConfirmConfig({
+      ...current,
       lp_preset: preset,
       preview_root_selector: ecforcePreset.preview_root_selector,
-      selectors: JSON.parse(JSON.stringify(
-        preset === ORDER_CONFIRM_LP_PRESET.ECFORCE
-          ? ecforcePreset.selectors
-          : (content[messageType]?.selectors || getDefaultOrderConfirmConfig().selectors),
-      )),
-    };
+      fields_by_group: nextFieldsByGroup,
+      selectors: preset === ORDER_CONFIRM_LP_PRESET.ECFORCE
+        ? JSON.parse(JSON.stringify(ecforcePreset.selectors))
+        : legacy.selectors,
+      labels: { ...current.labels, ...legacy.labels },
+    });
+
     setDataMessages(nextMessages);
   };
 
@@ -68,6 +80,8 @@ export default function OrderConfirmConfig({
           indexContent={indexContent}
           messageType={messageType}
           onChangeValueMessageContent={onChangeValueMessageContent}
+          dataMessages={dataMessages}
+          setDataMessages={setDataMessages}
         />
       </div>
 

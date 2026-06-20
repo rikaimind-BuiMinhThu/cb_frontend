@@ -1,65 +1,24 @@
 import React from 'react';
+import { MDBIcon } from 'mdbreact';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import InputCustom from './InputCustom';
 import InputNum from './InputNum';
 import { BOT_MESSAGE_TYPES } from '../../PreviewComponent/Constants';
-import { ORDER_CONFIRM_LP_PRESET } from '../utils/OrderConfirmLpScriptGenerator';
+import {
+  ORDER_CONFIRM_GROUP_KEYS,
+  ORDER_CONFIRM_GROUP_META,
+  ORDER_CONFIRM_LP_PRESET,
+  addOrderConfirmField,
+  normalizeOrderConfirmConfig,
+  removeOrderConfirmField,
+  reorderOrderConfirmFields,
+  syncLegacySelectorsLabelsFromFields,
+  updateOrderConfirmField,
+} from '../utils/OrderConfirmLpScriptGenerator';
+import '../styles/contentSettings/orderConfirmSettings.css';
 
-const ORDER_CONFIRM_FIELD_GROUPS = [
-  {
-    title: 'お客様',
-    items: [
-      { type: 'label_only', labelKey: 'customerSection', rowLabel: 'お客様情報（セクション）' },
-      { type: 'paired', group: 'customer', selectorKey: 'name', labelKey: 'name', rowLabel: 'お名前' },
-      { type: 'paired', group: 'customer', selectorKey: 'address', labelKey: 'address', rowLabel: 'ご住所' },
-    ],
-  },
-  {
-    title: '商品',
-    items: [
-      { type: 'label_only', labelKey: 'orderSection', rowLabel: 'ご注文内容（セクション）' },
-      { type: 'paired', group: 'product', selectorKey: 'name', labelKey: 'productName', rowLabel: '商品名' },
-      { type: 'paired', group: 'product', selectorKey: 'price', labelKey: 'unitPrice', rowLabel: '単価' },
-      { type: 'paired', group: 'product', selectorKey: 'quantity', labelKey: 'quantity', rowLabel: '個数' },
-      { type: 'paired', group: 'product', selectorKey: 'subtotal', labelKey: 'productSubtotal', rowLabel: '商品小計' },
-    ],
-  },
-  {
-    title: '合計',
-    items: [
-      { type: 'paired', group: 'summary', selectorKey: 'subtotal', labelKey: 'subtotal', rowLabel: '小計' },
-      { type: 'paired', group: 'summary', selectorKey: 'deliveryFee', labelKey: 'deliveryFee', rowLabel: '送料' },
-      { type: 'paired', group: 'summary', selectorKey: 'charge', labelKey: 'charge', rowLabel: '手数料' },
-      { type: 'paired', group: 'summary', selectorKey: 'tax', labelKey: 'tax', rowLabel: '消費税' },
-      { type: 'paired', group: 'summary', selectorKey: 'total', labelKey: 'total', rowLabel: '合計' },
-    ],
-  },
-  {
-    title: '割引',
-    items: [
-      { type: 'selector_only', group: 'discount', selectorKey: 'subtotal10', rowLabel: '10%対象商品小計' },
-      { type: 'selector_only', group: 'discount', selectorKey: 'tax10', rowLabel: '消費税(10%)' },
-      { type: 'label_only', labelKey: 'taxNote', rowLabel: '税注記（{subtotal10}、{tax10}）' },
-    ],
-  },
-];
-
-const sectionLabelStyle = { fontWeight: 600, marginTop: '12px', marginBottom: '6px', display: 'block', fontSize: '12px' };
-const groupTitleStyle = { fontSize: '12px', fontWeight: 600, marginBottom: '6px', display: 'block' };
 const fieldLabelStyle = { fontSize: '12px', marginBottom: '4px', display: 'block' };
-const combinedRowStyle = { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' };
-const rowNameStyle = { flex: '0 0 100px', fontSize: '12px' };
-const selectorColStyle = { flex: 1 };
-const labelColStyle = { flex: 1 };
-const columnHeaderStyle = { ...combinedRowStyle, fontWeight: 600, fontSize: '12px', marginBottom: '6px' };
-const emptySelectorStyle = { fontSize: '12px', color: '#999' };
-
-const renderCombinedRow = ({ rowLabel, selectorInput, labelInput }) => (
-  <div style={combinedRowStyle}>
-    <span style={rowNameStyle}>{rowLabel}</span>
-    <div style={selectorColStyle}>{selectorInput ?? <span style={emptySelectorStyle}>—</span>}</div>
-    <div style={labelColStyle}>{labelInput ?? <span style={emptySelectorStyle}>—</span>}</div>
-  </div>
-);
+const sectionLabelStyle = { fontWeight: 600, marginTop: '12px', marginBottom: '6px', display: 'block', fontSize: '12px' };
 
 export default function OrderConfirmSettingsModalContent({
   config,
@@ -67,84 +26,166 @@ export default function OrderConfirmSettingsModalContent({
   indexContent = 0,
   messageType = BOT_MESSAGE_TYPES.ORDER_CONFIRM,
   onChangeValueMessageContent,
+  dataMessages,
+  setDataMessages,
 }) {
-  const isCustomPreset = config.lp_preset === ORDER_CONFIRM_LP_PRESET.CUSTOM;
+  const normalizedConfig = normalizeOrderConfirmConfig(config);
+  const fieldsByGroup = normalizedConfig.fields_by_group;
+  const isCustomPreset = normalizedConfig.lp_preset === ORDER_CONFIRM_LP_PRESET.CUSTOM;
 
-  const renderSelectorInput = (group, selectorKey) => (
-    <InputCustom
-      style={{ width: '100%' }}
-      placeholder=".qa-example"
-      value={config.selectors?.[group]?.[selectorKey] || ''}
-      readOnly={!isCustomPreset}
-      onChange={(value) => onChangeValueMessageContent(
-        indexMessageSelect,
-        indexContent,
-        messageType,
-        value,
-        'selectors',
-        group,
-        selectorKey,
-      )}
-    />
-  );
+  const persistFieldsByGroup = (nextFieldsByGroup) => {
+    const nextMessages = [...dataMessages];
+    const content = nextMessages[indexMessageSelect]?.message_content?.[indexContent];
+    if (!content) return;
 
-  const renderLabelInput = (labelKey) => (
-    <InputCustom
-      style={{ width: '100%' }}
-      value={config.labels?.[labelKey] || ''}
-      onChange={(value) => onChangeValueMessageContent(
-        indexMessageSelect,
-        indexContent,
-        messageType,
-        value,
-        'labels',
-        labelKey,
-      )}
-    />
-  );
+    const current = content[messageType] || {};
+    const legacy = syncLegacySelectorsLabelsFromFields(nextFieldsByGroup);
+    const isCustom = (current.lp_preset || ORDER_CONFIRM_LP_PRESET.ECFORCE) === ORDER_CONFIRM_LP_PRESET.CUSTOM;
 
-  const renderFieldItem = (item) => {
-    if (item.type === 'label_only') {
-      return renderCombinedRow({
-        rowLabel: item.rowLabel,
-        selectorInput: null,
-        labelInput: renderLabelInput(item.labelKey),
-      });
-    }
-
-    if (item.type === 'selector_only') {
-      return renderCombinedRow({
-        rowLabel: item.rowLabel,
-        selectorInput: renderSelectorInput(item.group, item.selectorKey),
-        labelInput: null,
-      });
-    }
-
-    return renderCombinedRow({
-      rowLabel: item.rowLabel,
-      selectorInput: renderSelectorInput(item.group, item.selectorKey),
-      labelInput: renderLabelInput(item.labelKey),
+    content[messageType] = normalizeOrderConfirmConfig({
+      ...current,
+      fields_by_group: nextFieldsByGroup,
+      labels: { ...current.labels, ...legacy.labels },
+      selectors: isCustom ? legacy.selectors : current.selectors,
     });
+
+    setDataMessages(nextMessages);
+  };
+
+  const handleDragEnd = (result) => {
+    if (!result.destination) return;
+    if (result.source.droppableId !== result.destination.droppableId) return;
+    if (result.source.index === result.destination.index) return;
+
+    const groupKey = result.source.droppableId.replace('order-confirm-', '');
+
+    persistFieldsByGroup(
+      reorderOrderConfirmFields(
+        fieldsByGroup,
+        groupKey,
+        result.source.index,
+        result.destination.index,
+      ),
+    );
+  };
+
+  const handleAddField = (groupKey) => {
+    persistFieldsByGroup(addOrderConfirmField(fieldsByGroup, groupKey));
+  };
+
+  const handleRemoveField = (groupKey, fieldId) => {
+    persistFieldsByGroup(removeOrderConfirmField(fieldsByGroup, groupKey, fieldId));
+  };
+
+  const handleUpdateField = (groupKey, fieldId, patch) => {
+    persistFieldsByGroup(updateOrderConfirmField(fieldsByGroup, groupKey, fieldId, patch));
+  };
+
+  const handleLabelChange = (groupKey, field, value) => {
+    const patch = { label: value };
+    if (!field.preset_key) {
+      patch.rowLabel = value;
+    }
+    handleUpdateField(groupKey, field.id, patch);
+  };
+
+  const isSelectorReadOnly = (field) => !isCustomPreset && Boolean(field.preset_key);
+
+  const renderFieldRow = (field, groupKey) => {
+    const selectorInput = (field.type === 'paired' || field.type === 'selector_only') ? (
+      <InputCustom
+        placeholder=".qa-example"
+        value={field.selector || ''}
+        readOnly={isSelectorReadOnly(field)}
+        onChange={(value) => handleUpdateField(groupKey, field.id, { selector: value })}
+      />
+    ) : null;
+
+    const labelInput = (field.type === 'label_only' || field.type === 'paired') ? (
+      <InputCustom
+        value={field.label || ''}
+        onChange={(value) => handleLabelChange(groupKey, field, value)}
+      />
+    ) : null;
+
+    return (
+      <>
+        <span className="ss-order-confirm-field-row__grip">
+          <MDBIcon fas icon="grip-vertical" />
+        </span>
+        <span className="ss-order-confirm-field-row__name">{field.rowLabel || ''}</span>
+        <div className="ss-order-confirm-field-row__cell">
+          {selectorInput ?? <span className="ss-order-confirm-field-row__empty">—</span>}
+        </div>
+        <div className="ss-order-confirm-field-row__cell">
+          {labelInput ?? <span className="ss-order-confirm-field-row__empty">—</span>}
+        </div>
+        <span
+          className="ss-order-confirm-field-row__remove"
+          role="button"
+          tabIndex={0}
+          onClick={() => handleRemoveField(groupKey, field.id)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') handleRemoveField(groupKey, field.id);
+          }}
+        >
+          <MDBIcon fas icon="times-circle" />
+        </span>
+      </>
+    );
   };
 
   return (
     <div className="ss-order-confirm-settings-modal__body">
-      <span style={sectionLabelStyle}>項目設定</span>
-      <div style={columnHeaderStyle}>
-        <span style={rowNameStyle}>項目</span>
-        <span style={selectorColStyle}>セレクター</span>
-        <span style={labelColStyle}>ラベル</span>
+      <div className="ss-order-confirm-fields-grid ss-order-confirm-fields-grid--header">
+        <span />
+        <span>項目</span>
+        <span>セレクター</span>
+        <span>ラベル</span>
+        <span />
       </div>
-      {ORDER_CONFIRM_FIELD_GROUPS.map(({ title, items }) => (
-        <div key={title} style={{ marginBottom: '10px' }}>
-          <span style={groupTitleStyle}>{title}</span>
-          {items.map((item) => (
-            <React.Fragment key={item.labelKey || `${item.group}.${item.selectorKey}`}>
-              {renderFieldItem(item)}
-            </React.Fragment>
-          ))}
-        </div>
-      ))}
+
+      <DragDropContext onDragEnd={handleDragEnd}>
+        {ORDER_CONFIRM_GROUP_KEYS.map((groupKey) => (
+          <div key={groupKey} className="ss-order-confirm-field-group">
+            <span className="ss-order-confirm-field-group__title">
+              {ORDER_CONFIRM_GROUP_META[groupKey].title}
+            </span>
+            <Droppable droppableId={`order-confirm-${groupKey}`}>
+              {(provided) => (
+                <div ref={provided.innerRef} {...provided.droppableProps}>
+                  {(fieldsByGroup[groupKey] || []).map((field, index) => (
+                    <Draggable key={field.id} draggableId={field.id} index={index}>
+                      {(draggableProvided) => (
+                        <div
+                          className="ss-order-confirm-field-row"
+                          ref={draggableProvided.innerRef}
+                          {...draggableProvided.draggableProps}
+                          {...draggableProvided.dragHandleProps}
+                        >
+                          {renderFieldRow(field, groupKey)}
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+            <span
+              role="button"
+              tabIndex={0}
+              className="ss-order-confirm-field-group__add"
+              onClick={() => handleAddField(groupKey)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') handleAddField(groupKey);
+              }}
+            >
+              + 項目を追加
+            </span>
+          </div>
+        ))}
+      </DragDropContext>
 
       <span style={sectionLabelStyle}>リトライ</span>
       <div style={{ display: 'flex', gap: '12px', marginBottom: '8px' }}>
@@ -153,7 +194,7 @@ export default function OrderConfirmSettingsModalContent({
           <InputNum
             min={1}
             max={50}
-            value={config.retry?.maxRetry ?? 20}
+            value={normalizedConfig.retry?.maxRetry ?? 20}
             onChange={(value) => onChangeValueMessageContent(
               indexMessageSelect,
               indexContent,
@@ -170,7 +211,7 @@ export default function OrderConfirmSettingsModalContent({
             min={100}
             max={5000}
             step={100}
-            value={config.retry?.delay ?? 500}
+            value={normalizedConfig.retry?.delay ?? 500}
             onChange={(value) => onChangeValueMessageContent(
               indexMessageSelect,
               indexContent,
@@ -187,7 +228,7 @@ export default function OrderConfirmSettingsModalContent({
       <textarea
         className="ss-bot-statement-type-text-content ss-input-value"
         rows={3}
-        value={config.error_message || ''}
+        value={normalizedConfig.error_message || ''}
         onChange={(e) => onChangeValueMessageContent(
           indexMessageSelect,
           indexContent,
