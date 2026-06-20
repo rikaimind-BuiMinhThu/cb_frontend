@@ -42,7 +42,8 @@ const INITIAL_CUSTOM_CODE = {
   final: '',
 };
 
-export const useScenario = () => {
+export const useScenario = (mode = 'scenario') => {
+  const isTemplateMode = mode === 'template';
   const [scenarioName, setScenarioName] = useState('');
   const [scenarioType, setScenarioType] = useState('payment');
   const [urlThanks, setUrlThanks] = useState('');
@@ -221,8 +222,16 @@ export const useScenario = () => {
     setIsUseAmazonPay(parsed.isUseAmazonPay || false);
   }, []);
 
+  const getConversationUrl = useCallback(() => {
+    if (isTemplateMode) {
+      return `/api/v1/managements/scenario_templates/${scenarioId}/conversation`;
+    }
+    return `/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`;
+  }, [botId, isTemplateMode, scenarioId]);
+
   const handleGetMessage = useCallback(() => {
-    api.get(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`)
+    if (!scenarioId) return;
+    api.get(getConversationUrl())
       .then((res) => {
         applyParsedScenario(parseScenarioResponse(res));
       })
@@ -231,7 +240,7 @@ export const useScenario = () => {
           tokenExpired();
         }
       });
-  }, [applyParsedScenario, botId, scenarioId]);
+  }, [applyParsedScenario, getConversationUrl, scenarioId]);
 
   const getListProductVariants = useCallback((cursor) => {
     const query = cursor ? `cursor=${cursor}` : '';
@@ -380,12 +389,12 @@ export const useScenario = () => {
 
     try {
       const res = await api.post(
-        `/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`,
+        getConversationUrl(),
         getSavePayload(),
       );
       setIsOpenNoti(true);
       if (res.data.code === 1) {
-        setMessageNoti('シナリオを保存しました。');
+        setMessageNoti(isTemplateMode ? 'テンプレートを保存しました。' : 'シナリオを保存しました。');
       } else if (res.data.code === 2) {
         setMessageNoti(res.data.message);
       }
@@ -399,19 +408,19 @@ export const useScenario = () => {
         tokenExpired();
       }
     }
-  }, [botId, getSavePayload, handleGetMessage, scenarioId, validateAutoLogoutConfig, validateScenarioName]);
+  }, [getConversationUrl, getSavePayload, handleGetMessage, isTemplateMode, validateAutoLogoutConfig, validateScenarioName]);
 
   const onClickSavePreview = useCallback(() => {
     if (!validateScenarioName()) return;
     if (!validateAutoLogoutConfig()) return;
 
     api.post(
-      `/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`,
+      getConversationUrl(),
       getSavePayload(),
     ).then((res) => {
       setIsOpenNoti(true);
       if (res.data.code === 1) {
-        setMessageNoti('シナリオを保存しました。');
+        setMessageNoti(isTemplateMode ? 'テンプレートを保存しました。' : 'シナリオを保存しました。');
       } else if (res.data.code === 2) {
         setMessageNoti(res.data.message);
       }
@@ -425,7 +434,7 @@ export const useScenario = () => {
         tokenExpired();
       }
     });
-  }, [botId, getSavePayload, handleGetMessage, scenarioId, validateAutoLogoutConfig, validateScenarioName]);
+  }, [getConversationUrl, getSavePayload, handleGetMessage, isTemplateMode, validateAutoLogoutConfig, validateScenarioName]);
 
   const handleOpenPreview = useCallback((isOpen) => {
     if (!isOpenPreview) return;
@@ -459,27 +468,33 @@ export const useScenario = () => {
   }, [isOpenPreview]);
 
   useEffect(() => {
-    if (!isShopifyPaymentScenario) {
+    if (isTemplateMode || !isShopifyPaymentScenario) {
       setListProductVariants([]);
       return;
     }
     getListProductVariants(null);
-  }, [isShopifyPaymentScenario, getListProductVariants]);
+  }, [getListProductVariants, isShopifyPaymentScenario, isTemplateMode]);
 
   useEffect(() => {
+    if (isTemplateMode) {
+      setScenarioId(Cookies.get('scenario_template_id'));
+      return;
+    }
     setBotId(Cookies.get('bot_id'));
     setScenarioId(Cookies.get('scenario_id'));
-  }, []);
+  }, [isTemplateMode]);
 
   useEffect(() => {
     handleGetMessage();
   }, [handleGetMessage]);
 
   useEffect(() => {
+    if (isTemplateMode) return;
     getListVariable();
-  }, [getListVariable]);
+  }, [getListVariable, isTemplateMode]);
 
   useEffect(() => {
+    if (isTemplateMode || !botId) return;
     api.get(`/api/v1/managements/emails?page=all&chatbot_id=${botId}`)
       .then((res) => {
         setDataEmail(res.data.data);
@@ -504,9 +519,9 @@ export const useScenario = () => {
   }, []);
 
   useEffect(() => {
-    document.title = 'Edit Scenario';
+    document.title = isTemplateMode ? 'Edit Scenario Template' : 'Edit Scenario';
     window.scrollTo(0, 0);
-  }, []);
+  }, [isTemplateMode]);
 
   useEffect(() => {
     handleOpenPreview(isOpenPreview);
@@ -599,6 +614,7 @@ export const useScenario = () => {
       isUseAmazonPay,
       listProductVariants,
       isShopifyPaymentScenario,
+      editorMode: mode,
     },
     actions: {
       setScenarioName,

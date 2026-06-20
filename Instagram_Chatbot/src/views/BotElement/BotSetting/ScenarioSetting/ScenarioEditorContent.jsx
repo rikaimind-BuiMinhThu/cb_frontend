@@ -15,14 +15,15 @@ import ScenarioMessageOverviewList from './components/ScenarioMessageOverviewLis
 
 const ScenarioEditorContent = () => {
   const [isPreviewVisible, setIsPreviewVisible] = useState(true);
-  const { actions } = useScenarioEditor();
+  const { actions, state } = useScenarioEditor();
   const { onClickSaveScenario } = actions;
+  const pageTitle = state.editorMode === 'template' ? 'シナリオテンプレート設定' : 'シナリオ設定';
 
   return (
     <>
       <AdminPage
         className="admin-page--scenario-editor"
-        title="シナリオ設定"
+        title={pageTitle}
         toolbar={
           <AdminActionButton action="save" onClick={() => onClickSaveScenario()} />
         }

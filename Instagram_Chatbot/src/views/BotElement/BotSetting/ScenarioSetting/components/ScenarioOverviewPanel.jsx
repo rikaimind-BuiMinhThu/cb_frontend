@@ -8,7 +8,9 @@ const ScenarioOverviewPanel = () => {
     scenarioName,
     scenarioType,
     errorScenarioName,
+    editorMode,
   } = state;
+  const isTemplateMode = editorMode === 'template';
   const {
     setScenarioName,
     setScenarioType,
@@ -24,7 +26,7 @@ const ScenarioOverviewPanel = () => {
             <InputCustom
               value={scenarioName}
               onChange={value => setScenarioName(value)}
-              placeholder="シナリオ名入力"
+              placeholder={isTemplateMode ? 'テンプレート名入力' : 'シナリオ名入力'}
             />
           </div>
           <div className="ss-layout-basic-settings-type">
@@ -48,7 +50,7 @@ const ScenarioOverviewPanel = () => {
             className="ss-layout-settings-open-btn"
             onClick={openScenarioSettingsModal}
           >
-            シナリオ設定
+            {isTemplateMode ? 'テンプレート設定' : 'シナリオ設定'}
           </button>
         </div>
       </section>

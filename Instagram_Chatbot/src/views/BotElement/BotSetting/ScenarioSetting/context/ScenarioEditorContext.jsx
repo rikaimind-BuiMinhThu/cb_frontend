@@ -6,8 +6,8 @@ import { useScenarioRenderers } from '../hooks/useScenarioRenderers';
 
 const ScenarioEditorContext = createContext(null);
 
-export const ScenarioEditorProvider = ({ children }) => {
-  const { state, actions } = useScenario();
+export const ScenarioEditorProvider = ({ children, mode = 'scenario' }) => {
+  const { state, actions } = useScenario(mode);
   const { dataMessages } = state;
   const { setDataMessages, setDataHour, setDataYear } = actions;
 

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Input, List, Modal, Radio, Space, Tag, message } from 'antd';
+import { Input, List, Modal, Radio, Select, Space, Tag, message } from 'antd';
 import api from '../../../../api/api-management';
 import Cookies from 'js-cookie';
 import moment from 'moment';
@@ -21,6 +21,8 @@ function ScenarioList() {
   const [scenarioId, setScenarioId] = useState('');
   const [newScenarioName, setNewScenarioName] = useState('');
   const [nameError, setNameError] = useState('');
+  const [listTemplate, setListTemplate] = useState([]);
+  const [selectedTemplateId, setSelectedTemplateId] = useState(undefined);
 
   useEffect(() => {
     setBotId(Cookies.get('bot_id'));
@@ -30,7 +32,17 @@ function ScenarioList() {
 
   useEffect(() => {
     getListScenario(1);
+    getListTemplate();
   }, []);
+
+  const getListTemplate = () => {
+    api
+      .get('/api/v1/managements/scenario_templates')
+      .then((res) => {
+        setListTemplate(res?.data?.data || []);
+      })
+      .catch((error) => console.error(error));
+  };
 
   const getListScenario = (pgIndex) => {
     api
@@ -60,7 +72,10 @@ function ScenarioList() {
   const createScenario = () => {
     if (!checkInputScenarioName(newScenarioName)) return;
     api
-      .post(`/api/v1/managements/chatbots/${botId}/scenarios`, { scenario: { name: newScenarioName } })
+      .post(`/api/v1/managements/chatbots/${botId}/scenarios`, {
+        scenario: { name: newScenarioName },
+        template_id: selectedTemplateId || undefined,
+      })
       .then((res) => {
         if (res.data.code === 1) {
           message.success('正常に追加されました！');
@@ -72,6 +87,7 @@ function ScenarioList() {
         getListScenario(page);
         setIsOpenCreateScenario(false);
         setNewScenarioName('');
+        setSelectedTemplateId(undefined);
       })
       .catch((err) => console.log(err));
   };
@@ -195,6 +211,7 @@ function ScenarioList() {
           setIsOpenCreateScenario(false);
           setNewScenarioName('');
           setNameError('');
+          setSelectedTemplateId(undefined);
         }}
         okText="作成"
         cancelText="キャンセル"
@@ -210,6 +227,20 @@ function ScenarioList() {
             style={{ marginTop: 8 }}
           />
           {nameError && <div style={{ color: '#ff4d4f', marginTop: 4 }}>{nameError}</div>}
+        </div>
+        <div style={{ marginBottom: 8 }}>
+          <label>テンプレート（任意）</label>
+          <Select
+            allowClear
+            placeholder="テンプレートなし"
+            value={selectedTemplateId}
+            onChange={(value) => setSelectedTemplateId(value)}
+            style={{ width: '100%', marginTop: 8 }}
+            options={listTemplate.map((template) => ({
+              value: template.id,
+              label: template.name,
+            }))}
+          />
         </div>
         <p style={{ color: '#6b7280', fontSize: 13 }}>※シナリオに任意の名称をつけることができます。</p>
       </Modal>

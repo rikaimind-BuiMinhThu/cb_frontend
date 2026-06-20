@@ -47,6 +47,8 @@ function AdminLayout(props) {
       '/admin/account-information',
       '/admin/basic-setting',
       '/admin/reply-mail-management',
+      '/admin/scenario-template-list',
+      '/admin/scenario-template-setting',
     ];
     if (
       (!isInstagram && instagramRolesUrl.includes(pathname)) ||

@@ -110,6 +110,13 @@ export function getGlobalMenuItems(client) {
         { key: '/admin/basic-setting', label: '基本設定', path: '/admin/basic-setting', icon: <BookOutlined /> },
         { key: '/admin/reply-mail-management', label: '送信メール管理', path: '/admin/reply-mail-management', icon: <MailOutlined /> },
         { key: '/admin/bot', label: 'ボット一覧', path: '/admin/bot', icon: <UnorderedListOutlined /> },
+        {
+          key: '/admin/scenario-template-list',
+          label: 'シナリオテンプレート',
+          path: '/admin/scenario-template-list',
+          icon: <BookOutlined />,
+          id: 'scenarioTemplateManagement',
+        },
       ],
     });
   }
@@ -125,6 +132,22 @@ export function getGlobalMenuItems(client) {
   return items;
 }
 
+function filterMenuItemsByRole(items, hiddenIds, userRole) {
+  return items
+    .filter((item) => {
+      if (item.id && hiddenIds.has(item.id)) return false;
+      if (item.hiddenByDefault && userRole === 'admin_deel') return false;
+      if (item.hiddenByDefault && userRole !== 'admin_deel') return true;
+      if (item.hiddenByDefault) return false;
+      return true;
+    })
+    .map((item) => (
+      item.children
+        ? { ...item, children: filterMenuItemsByRole(item.children, hiddenIds, userRole) }
+        : item
+    ));
+}
+
 export function filterMenuByRole(items, userRole) {
   const hiddenIds = new Set();
 
@@ -134,26 +157,24 @@ export function filterMenuByRole(items, userRole) {
     hiddenIds.add('sidebarClient');
     hiddenIds.add('sidebarUser');
     hiddenIds.add('planManagement');
+    hiddenIds.add('scenarioTemplateManagement');
   } else if (userRole === 'client') {
     hiddenIds.add('sidebarClient');
     hiddenIds.add('sidebarUser');
     hiddenIds.add('planManagement');
+    hiddenIds.add('scenarioTemplateManagement');
     hiddenIds.add('clientPaymentDetail');
   }
 
-  return items.filter((item) => {
-    if (item.id && hiddenIds.has(item.id)) return false;
-    if (item.hiddenByDefault && userRole === 'admin_deel') return false;
-    if (item.hiddenByDefault && userRole !== 'admin_deel') return true;
-    if (item.hiddenByDefault) return false;
-    return true;
-  });
+  return filterMenuItemsByRole(items, hiddenIds, userRole);
 }
 
 export const ROUTE_TITLES = {
   '/admin/bot': 'ボット管理',
   '/admin/scenario-list': 'シナリオ一覧',
   '/admin/scenario-setting': 'シナリオ設定',
+  '/admin/scenario-template-list': 'シナリオテンプレート一覧',
+  '/admin/scenario-template-setting': 'シナリオテンプレート設定',
   '/admin/list-email': 'メール一覧',
   '/admin/create-email': 'メール作成',
   '/admin/file-management': 'メディアファイル管理',
@@ -169,6 +190,7 @@ export const ROUTE_TITLES = {
 /** Routes not listed in the sidebar map to a related menu path for selection/open state. */
 export const MENU_ROUTE_ALIASES = [
   { match: '/admin/scenario-setting', menuPath: '/admin/scenario-list' },
+  { match: '/admin/scenario-template-setting', menuPath: '/admin/scenario-template-list' },
   { match: '/admin/edit-email', menuPath: '/admin/create-email', prefix: true },
   { match: '/admin/demo-bot', menuPath: '/admin/installation-tag-demo', prefix: true },
   { match: '/admin/add-payment-gateway', menuPath: '/admin/payment-gateway', prefix: true },
@@ -191,7 +213,8 @@ export function resolveMenuPath(pathname) {
 }
 
 const BOT_MENU_PATH_PREFIXES = [
-  '/admin/scenario-',
+  '/admin/scenario-list',
+  '/admin/scenario-setting',
   '/admin/create-email',
   '/admin/edit-email',
   '/admin/list-email',
