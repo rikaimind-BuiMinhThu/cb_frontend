@@ -11,6 +11,7 @@ const FB_SCOPES = [
   'instagram_basic',
   'pages_show_list',
   'pages_read_engagement',
+  'business_management',
   'instagram_manage_messages',
   'instagram_manage_comments',
 ].join(',');

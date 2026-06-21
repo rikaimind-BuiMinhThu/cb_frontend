@@ -7,6 +7,11 @@ import {
   logoutInstagram,
 } from '../api/releaseApi';
 import { TOAST_MESSAGES } from '../constants';
+import {
+  fetchAllInstagramPages,
+  fetchInstagramMedia,
+  parseGraphError,
+} from '../utils/metaGraphApi';
 
 export function isFbOAuthReturn() {
   const params = new URLSearchParams(window.location.search);
@@ -62,36 +67,45 @@ export default function useInstagramConnect({ onNotify }) {
     loadConnection();
   }, [loadConnection]);
 
-  const fetchFbPages = useCallback(() => {
+  const fetchInstagramPages = useCallback(async () => {
     setPagesLoading(true);
     setPagesError(null);
 
-    return new Promise((resolve) => {
-      if (!window.FB) {
-        setPagesLoading(false);
-        setPagesError('Facebook SDKが読み込まれていません。');
+    if (!window.FB) {
+      setPagesLoading(false);
+      setPagesError('Facebook SDKが読み込まれていません。');
+      setShowPageList(true);
+      return [];
+    }
+
+    try {
+      const { pages: pageList, error } = await fetchAllInstagramPages();
+
+      if (error && pageList.length === 0) {
+        setPages([]);
+        setPagesError(parseGraphError(error));
         setShowPageList(true);
-        resolve([]);
-        return;
+        return [];
       }
 
-      window.FB.api('/me/accounts?fields=id,name,picture,instagram_business_account&limit=100', (resPage) => {
-        setPagesLoading(false);
+      setPages(pageList);
+      setShowPageList(true);
 
-        if (resPage?.error) {
-          setPages([]);
-          setPagesError(resPage.error.message);
-          setShowPageList(true);
-          resolve([]);
-          return;
-        }
+      if (pageList.length === 0) {
+        setPagesError(
+          'Facebookページが見つかりません。Business Portfolio（ECCH）へのアクセス権限をMeta Business Suiteで確認してください。',
+        );
+      }
 
-        const pageList = resPage?.data || [];
-        setPages(pageList);
-        setShowPageList(true);
-        resolve(pageList);
-      });
-    });
+      return pageList;
+    } catch (err) {
+      setPages([]);
+      setPagesError(err.message || 'ページ一覧の取得に失敗しました。');
+      setShowPageList(true);
+      return [];
+    } finally {
+      setPagesLoading(false);
+    }
   }, []);
 
   const clearOAuthParams = useCallback(() => {
@@ -102,10 +116,10 @@ export default function useInstagramConnect({ onNotify }) {
 
   const statusChangeCallback = useCallback(async (response) => {
     if (response.status === 'connected' && response.authResponse?.userID) {
-      await fetchFbPages();
+      await fetchInstagramPages();
       clearOAuthParams();
     }
-  }, [clearOAuthParams, fetchFbPages]);
+  }, [clearOAuthParams, fetchInstagramPages]);
 
   const checkFbLoginStatus = useCallback((force = false) => {
     if (!window.FB) return;
@@ -115,47 +129,67 @@ export default function useInstagramConnect({ onNotify }) {
 
   const handleFbLogin = useCallback(async (response) => {
     if (!response?.accessToken) return;
-    await fetchFbPages();
+    await fetchInstagramPages();
     clearOAuthParams();
-  }, [clearOAuthParams, fetchFbPages]);
+  }, [clearOAuthParams, fetchInstagramPages]);
 
   const handleFbLoginFailure = useCallback((error) => {
-    onNotify?.(error?.status || 'Facebookログインに失敗しました。', 'error');
+    const message = error?.status
+      ? `Facebookログインに失敗しました (${error.status})。`
+      : 'Facebookログインに失敗しました。';
+    onNotify?.(message, 'error');
   }, [onNotify]);
 
   const selectPage = useCallback(async (pageId) => {
     setConnecting(true);
     try {
-      const fbAuthResponse = window.FB.getAuthResponse();
-      const pageResponse = await new Promise((resolve) => {
-        window.FB.api(`/${pageId}?fields=instagram_business_account`, resolve);
-      });
-
-      if (!pageResponse?.instagram_business_account?.id) {
-        onNotify?.('このアカウントはInstagramページにリンクされていません。', 'error');
+      const selectedPage = pages.find((p) => p.id === pageId);
+      if (!selectedPage) {
+        onNotify?.('選択したページが見つかりません。ページ一覧を再読み込みしてください。', 'error');
         return;
       }
 
-      const igResponse = await new Promise((resolve) => {
-        window.FB.api(`/${pageResponse.instagram_business_account.id}`, resolve);
-      });
+      const igUserId = selectedPage.instagram_business_account?.id;
+      const pageAccessToken = selectedPage.access_token;
+
+      if (!igUserId) {
+        onNotify?.('このFacebookページにはInstagramビジネスアカウントが連携されていません。', 'error');
+        return;
+      }
+
+      if (!pageAccessToken) {
+        onNotify?.(
+          'ページアクセストークンを取得できませんでした。business_management権限を許可して再度ログインしてください。',
+          'error',
+        );
+        return;
+      }
+
+      // Smoke test: confirm Page token works for Instagram media API
+      await fetchInstagramMedia(igUserId, pageAccessToken);
+
+      const fbAuthResponse = window.FB.getAuthResponse();
 
       await connectInstagram({
         fb_AuthResponse: fbAuthResponse,
         page_id: pageId,
-        ig_id: igResponse.id,
+        ig_id: igUserId,
+        page_access_token: pageAccessToken,
       });
 
-      syncCookies({ ig_id: igResponse.id, page_access_token: fbAuthResponse.accessToken });
+      syncCookies({ ig_id: igUserId, page_access_token: pageAccessToken });
       setShowPageList(false);
       await loadConnection();
       onNotify?.(TOAST_MESSAGES.CONNECT_SUCCESS, 'success');
     } catch (error) {
-      onNotify?.(error.message || 'Instagram接続に失敗しました。', 'error');
+      const message = error.metaError
+        ? parseGraphError(error.metaError)
+        : (error.message || 'Instagram接続に失敗しました。');
+      onNotify?.(message, 'error');
     } finally {
       setConnecting(false);
     }
-  }, [loadConnection, onNotify, syncCookies]);
+  }, [loadConnection, onNotify, pages, syncCookies]);
 
   const disconnect = useCallback(async () => {
     setConnecting(true);
