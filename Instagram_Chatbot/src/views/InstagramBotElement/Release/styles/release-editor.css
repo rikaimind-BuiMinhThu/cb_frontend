@@ -71,6 +71,28 @@
   align-self: center;
 }
 
+.release-connect-page-list__loading,
+.release-connect-page-list__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 0;
+  text-align: center;
+}
+
+.release-connect-page-item__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.release-connect-page-item__hint {
+  font-size: 12px;
+}
+
 .release-section-card {
   height: 100%;
 }

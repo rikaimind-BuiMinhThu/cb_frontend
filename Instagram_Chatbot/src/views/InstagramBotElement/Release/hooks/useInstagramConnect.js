@@ -8,12 +8,19 @@ import {
 } from '../api/releaseApi';
 import { TOAST_MESSAGES } from '../constants';
 
+export function isFbOAuthReturn() {
+  const params = new URLSearchParams(window.location.search);
+  return params.has('code') || params.has('granted_scopes');
+}
+
 export default function useInstagramConnect({ onNotify }) {
   const [isConnected, setIsConnected] = useState(false);
   const [loading, setLoading] = useState(true);
   const [connecting, setConnecting] = useState(false);
   const [profile, setProfile] = useState(null);
   const [pages, setPages] = useState([]);
+  const [pagesLoading, setPagesLoading] = useState(false);
+  const [pagesError, setPagesError] = useState(null);
   const [showPageList, setShowPageList] = useState(false);
   const [account, setAccount] = useState(null);
 
@@ -55,28 +62,66 @@ export default function useInstagramConnect({ onNotify }) {
     loadConnection();
   }, [loadConnection]);
 
-  const fetchFbPages = useCallback((userID) => {
-    window.FB.api(`${userID}/accounts?fields=id,name,picture`, (resPage) => {
-      setPages(resPage?.data || []);
-      setShowPageList(true);
+  const fetchFbPages = useCallback(() => {
+    setPagesLoading(true);
+    setPagesError(null);
+
+    return new Promise((resolve) => {
+      if (!window.FB) {
+        setPagesLoading(false);
+        setPagesError('Facebook SDKが読み込まれていません。');
+        setShowPageList(true);
+        resolve([]);
+        return;
+      }
+
+      window.FB.api('/me/accounts?fields=id,name,picture,instagram_business_account&limit=100', (resPage) => {
+        setPagesLoading(false);
+
+        if (resPage?.error) {
+          setPages([]);
+          setPagesError(resPage.error.message);
+          setShowPageList(true);
+          resolve([]);
+          return;
+        }
+
+        const pageList = resPage?.data || [];
+        setPages(pageList);
+        setShowPageList(true);
+        resolve(pageList);
+      });
     });
   }, []);
 
-  const statusChangeCallback = useCallback((response) => {
-    if (response.status === 'connected' && response.authResponse?.userID) {
-      fetchFbPages(response.authResponse.userID);
+  const clearOAuthParams = useCallback(() => {
+    if (isFbOAuthReturn()) {
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
-  }, [fetchFbPages]);
+  }, []);
 
-  const checkFbLoginStatus = useCallback(() => {
+  const statusChangeCallback = useCallback(async (response) => {
+    if (response.status === 'connected' && response.authResponse?.userID) {
+      await fetchFbPages();
+      clearOAuthParams();
+    }
+  }, [clearOAuthParams, fetchFbPages]);
+
+  const checkFbLoginStatus = useCallback((force = false) => {
     if (!window.FB) return;
-    window.FB.getLoginStatus(statusChangeCallback);
+    const shouldForce = force || isFbOAuthReturn();
+    window.FB.getLoginStatus(statusChangeCallback, shouldForce);
   }, [statusChangeCallback]);
 
-  const handleFbLogin = useCallback((response) => {
+  const handleFbLogin = useCallback(async (response) => {
     if (!response?.accessToken) return;
-    fetchFbPages(response.userID);
-  }, [fetchFbPages]);
+    await fetchFbPages();
+    clearOAuthParams();
+  }, [clearOAuthParams, fetchFbPages]);
+
+  const handleFbLoginFailure = useCallback((error) => {
+    onNotify?.(error?.status || 'Facebookログインに失敗しました。', 'error');
+  }, [onNotify]);
 
   const selectPage = useCallback(async (pageId) => {
     setConnecting(true);
@@ -140,6 +185,7 @@ export default function useInstagramConnect({ onNotify }) {
       setAccount(null);
       setProfile(null);
       setPages([]);
+      setPagesError(null);
       setShowPageList(false);
 
       onNotify?.(TOAST_MESSAGES.LOGOUT_SUCCESS, 'success');
@@ -156,10 +202,13 @@ export default function useInstagramConnect({ onNotify }) {
     connecting,
     profile,
     pages,
+    pagesLoading,
+    pagesError,
     showPageList,
     account,
     loadConnection,
     handleFbLogin,
+    handleFbLoginFailure,
     checkFbLoginStatus,
     selectPage,
     disconnect,
