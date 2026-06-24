@@ -182,9 +182,12 @@ export default function useInstagramConnect({ onNotify }) {
       await loadConnection();
       onNotify?.(TOAST_MESSAGES.CONNECT_SUCCESS, 'success');
     } catch (error) {
-      const message = error.metaError
+      let message = error.metaError
         ? parseGraphError(error.metaError)
         : (error.message || 'Instagram接続に失敗しました。');
+      if (error.grantedScopes) {
+        message += ` (grantedScopes: ${error.grantedScopes})`;
+      }
       onNotify?.(message, 'error');
     } finally {
       setConnecting(false);

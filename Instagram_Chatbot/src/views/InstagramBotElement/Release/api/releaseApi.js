@@ -12,6 +12,7 @@ function unwrap(response) {
   if (response.data?.code === 2) {
     const err = new Error(response.data.message || 'Request failed');
     err.metaError = response.data.meta_error;
+    err.grantedScopes = response.data.granted_scopes;
     throw err;
   }
   return response.data;
