@@ -3,7 +3,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { Nav, NavbarToggler } from 'reactstrap';
 // javascript plugin used to create scrollbars on windows
 import PerfectScrollbar from 'perfect-scrollbar';
-import logo from './logoEC.jpg';
+import logo from './ecchatbot-logo.png';
 import Cookies from 'js-cookie';
 import { MDBIcon } from 'mdbreact';
 
@@ -192,7 +192,7 @@ function Sidebar(props) {
           <img
             src={logo}
             alt='react-logo'
-            style={{ height: '60px', paddingLeft: '10px' }}
+            style={{ height: '40px', width: '90%', paddingLeft: '10px' }}
           />
         </a>
       </div>

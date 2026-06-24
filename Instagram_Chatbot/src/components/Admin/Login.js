@@ -7,7 +7,7 @@ import "../../assets/demo/demo.css";
 import ModalNotiFail from "views/Popup/ModalNotiFail";
 import Cookies from 'js-cookie';
 import { setToken } from "api/auth";
-import logo from '../../assets/img/logoEC.jpg'
+import logo from '../../assets/img/ecchatbot-logo.png'
 import LoginFacebook from "./LoginFacebook";
 import {EC_CHATBOT_URL} from '../../variables/constants'
 class Login extends React.Component {
@@ -155,7 +155,7 @@ class Login extends React.Component {
     return (
       <div className="App" style={{ marginTop: "1%" }}>
         <div>
-          <img src={logo} alt="react-logo" style={{ height: "60px", paddingLeft: "2%" }} />
+          <img src={logo} alt="react-logo" style={{ height: "45px", paddingLeft: "2%" }} />
         </div>
         <div className="auth-wrapper" >
           <div className="auth-inner">
