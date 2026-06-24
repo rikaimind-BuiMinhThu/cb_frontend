@@ -41,6 +41,7 @@ export const ERROR_MESSAGES = {
   PHONE_INVALID: "入力形式が正しくありません。",
   URL_INVALID: "有効なURL形式で指定してください。",
   EMAIL_MISMATCH: "メールアドレスとメールアドレス確認が一致しません。",
+  EMAIL_DOMAIN_RESTRICT: "指定されたドメインのみ入力できます。",
   PASSWORD_MISMATCH: "パスワードとパスワード確認が一致しません。",
   ALPHABET_ONLY: "アルファベッドのみ使用できます。",
   SINGLE_BYTE_NUMBER: "半角数字で入力してください",

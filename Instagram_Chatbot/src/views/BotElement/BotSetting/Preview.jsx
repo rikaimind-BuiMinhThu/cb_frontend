@@ -6,6 +6,7 @@ import { MDBIcon } from 'mdbreact';
 import SelectCustom from './ScenarioSetting/scenarioComon/SelectCustom';
 import CheckboxCustom from './ScenarioSetting/scenarioComon/CheckboxCustom';
 import InputCustom from './ScenarioSetting/scenarioComon/InputCustom';
+import EmailInput from './PreviewComponent/UserMessageComponent/TextInputComponent/EmailInput';
 import {
     Button
 } from 'reactstrap';
@@ -40,6 +41,10 @@ import iconMessagePurple from "../../../assets/img/icon-mess/icon-message-chat-p
 import iconMessageBlack from "../../../assets/img/icon-mess/icon-message-chat-black.png";
 import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-white.png";
 import { BOT_MESSAGE_TYPES } from './PreviewComponent/Constants';
+import {
+  EMAIL_DOMAIN_SUGGESTION_MODES,
+  isEmailDomainAllowed,
+} from './PreviewComponent/emailDomainDefaults';
 // import { Input, rgbToHex } from '@material-ui/core';
 
 const _ = require('lodash');
@@ -1234,6 +1239,13 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                 if (!REGEX_EMAIL.test(contentType[contentType.type].value)) {
                     errorsMess[`message${index}_content${i}_${contentArr[i].type}_${contentType.type}`] = `有効なメールアドレス形式で指定してください。`;
                     isValid = false;
+                } else if (
+                    contentType[contentType.type].domain_suggestion?.enabled &&
+                    contentType[contentType.type].domain_suggestion?.mode === EMAIL_DOMAIN_SUGGESTION_MODES.RESTRICT &&
+                    !isEmailDomainAllowed(contentType[contentType.type].value, contentType[contentType.type].domain_suggestion)
+                ) {
+                    errorsMess[`message${index}_content${i}_${contentArr[i].type}_${contentType.type}`] = `指定されたドメインのみ入力できます。`;
+                    isValid = false;
                 }
             } else if (contentType.type === 'email_confirmation') {
                 if (!stringNullOrEmpty(contentType[contentType.type].value) && !REGEX_EMAIL.test(contentType[contentType.type].value)) {
@@ -1241,6 +1253,22 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                     isValid = false;
                 } else if (!stringNullOrEmpty(contentType[contentType.type].valueConfirm) && !REGEX_EMAIL.test(contentType[contentType.type].valueConfirm)) {
                     errorsMess[`message${index}_content${i}_${contentArr[i].type}_${contentType.type}`] = `有効なメールアドレス形式で指定してください。`;
+                    isValid = false;
+                } else if (
+                    contentType[contentType.type].domain_suggestion?.enabled &&
+                    contentType[contentType.type].domain_suggestion?.mode === EMAIL_DOMAIN_SUGGESTION_MODES.RESTRICT &&
+                    !stringNullOrEmpty(contentType[contentType.type].value) &&
+                    !isEmailDomainAllowed(contentType[contentType.type].value, contentType[contentType.type].domain_suggestion)
+                ) {
+                    errorsMess[`message${index}_content${i}_${contentArr[i].type}_${contentType.type}`] = `指定されたドメインのみ入力できます。`;
+                    isValid = false;
+                } else if (
+                    contentType[contentType.type].domain_suggestion?.enabled &&
+                    contentType[contentType.type].domain_suggestion?.mode === EMAIL_DOMAIN_SUGGESTION_MODES.RESTRICT &&
+                    !stringNullOrEmpty(contentType[contentType.type].valueConfirm) &&
+                    !isEmailDomainAllowed(contentType[contentType.type].valueConfirm, contentType[contentType.type].domain_suggestion)
+                ) {
+                    errorsMess[`message${index}_content${i}_${contentArr[i].type}_${contentType.type}`] = `指定されたドメインのみ入力できます。`;
                     isValid = false;
                 } else if (!stringNullOrEmpty(contentType[contentType.type].value) && !stringNullOrEmpty(contentType[contentType.type].valueConfirm) && contentType[contentType.type].value !== contentType[contentType.type].valueConfirm) {
                     errorsMess[`message${index}_content${i}_${contentArr[i].type}_${contentType.type}`] = `メールアドレスとメールアドレス確認が一致しません。`;
@@ -3222,8 +3250,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                             ></InputCustom>
                                         </React.Fragment>
                                     }
-                                    {(textInput.type === 'urls' ||
-                                        textInput.type === 'email_address') &&
+                                    {(textInput.type === 'urls') &&
                                         <React.Fragment>
                                             <InputCustom
                                                 disabled={disabled}
@@ -3235,18 +3262,32 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                             ></InputCustom>
                                         </React.Fragment>
                                     }
-                                    {(textInput.type === 'email_confirmation') &&
-                                        (<>
-                                            <InputCustom
-                                                style={{ marginBottom: '5px' }}
+                                    {(textInput.type === 'email_address') &&
+                                        <React.Fragment>
+                                            <EmailInput
                                                 disabled={disabled}
-                                                placeholder={textInput[textInput.type].cfEmlAdd_email}
+                                                style={{ marginBottom: '0px' }}
+                                                placeholder={textInput[textInput.type].placeholder}
+                                                domainSuggestion={textInput[textInput.type]?.domain_suggestion}
                                                 onChange={value => onChangeValue(indexContent, content.type, value, textInput.type, 'value')}
                                                 value={textInput[textInput.type]?.value}
                                             />
-                                            <InputCustom
+                                        </React.Fragment>
+                                    }
+                                    {(textInput.type === 'email_confirmation') &&
+                                        (<>
+                                            <EmailInput
+                                                style={{ marginBottom: '5px' }}
+                                                disabled={disabled}
+                                                placeholder={textInput[textInput.type].cfEmlAdd_email}
+                                                domainSuggestion={textInput[textInput.type]?.domain_suggestion}
+                                                onChange={value => onChangeValue(indexContent, content.type, value, textInput.type, 'value')}
+                                                value={textInput[textInput.type]?.value}
+                                            />
+                                            <EmailInput
                                                 disabled={disabled}
                                                 placeholder={textInput[textInput.type].cfEmlAdd_confirm_email}
+                                                domainSuggestion={textInput[textInput.type]?.domain_suggestion}
                                                 onChange={value => onChangeValue(indexContent, content.type, value, textInput.type, 'valueConfirm')}
                                                 value={textInput[textInput.type]?.valueConfirm}
                                             />
