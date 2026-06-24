@@ -12,6 +12,7 @@ const FB_SCOPES = [
   'pages_show_list',
   'pages_read_engagement',
   'pages_manage_metadata',
+  'pages_messaging',
   'business_management',
   'instagram_manage_messages',
   'instagram_manage_comments',
