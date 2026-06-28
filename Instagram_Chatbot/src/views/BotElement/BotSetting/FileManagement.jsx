@@ -158,7 +158,7 @@ function FileManagement() {
 
   return (
     <>
-      <AdminPage title="メディアファイル管理">
+      <AdminPage>
         <AdminTable
           loading={loading}
           columns={columns}

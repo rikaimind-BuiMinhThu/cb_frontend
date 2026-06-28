@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import SavePushMessageDialog from './SavePushMessageDialog';
 import PushMessageList from './PushMessageList';
 import PushMessageHistory from './PushMessageHistory';
-import { AdminPage } from '../../../components/AdminShell';
+import { AdminPage, useAdminHeaderActions } from '../../../components/AdminShell';
 
 const PushMessagePage = () => {
   const { botId } = useParams();
@@ -15,16 +15,15 @@ const PushMessagePage = () => {
     setTick((pre) => pre + 1);
   };
 
+  const headerActions = React.useMemo(
+    () => (tab === 'list' ? <SavePushMessageDialog botId={botId} resolver={handleCreateSuccess} /> : null),
+    [tab, botId]
+  );
+
+  useAdminHeaderActions(headerActions);
+
   return (
-    <AdminPage
-      title="プッシュメッセージ"
-      description="プッシュメッセージの作成・配信管理"
-      toolbar={
-        tab === 'list' ? (
-          <SavePushMessageDialog botId={botId} resolver={handleCreateSuccess} />
-        ) : null
-      }
-    >
+    <AdminPage description="プッシュメッセージの作成・配信管理">
       <Tabs
         activeKey={tab}
         onChange={setTab}

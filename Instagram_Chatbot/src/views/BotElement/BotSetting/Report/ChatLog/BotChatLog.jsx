@@ -983,7 +983,7 @@ function BotChatLog() {
   );
 
   return (
-    <AdminPage title="会話" className="admin-page--chat-log" card={false}>
+    <AdminPage className="admin-page--chat-log" card={false}>
       <div id="screenAll" className="admin-page-card chat-log-page-card">
         <div className="report-filter-panel">{filterToolbar}</div>
         <Tabs

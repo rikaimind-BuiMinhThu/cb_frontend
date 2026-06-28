@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import api from '../../../api/api-management';
 import { tokenExpired } from 'api/tokenExpired';
 import { getEcChatBotFrontEndBaseUrl } from 'variables/constants';
-import { AdminPage, AdminFormRow } from '../../../components/AdminShell';
+import { AdminPage, AdminFormRow, AdminActionButton, useAdminHeaderActions } from '../../../components/AdminShell';
 
 function InstallationTag() {
   const [urlDemo, setUrlDemo] = useState('');
@@ -29,8 +29,14 @@ function InstallationTag() {
     message.success('コピーしました');
   };
 
+  useAdminHeaderActions(
+    <Link to={urlDemo}>
+      <AdminActionButton action="preview" label="デモページを開く" />
+    </Link>
+  );
+
   return (
-    <AdminPage title="設置ガイド">
+    <AdminPage>
       <div style={{ padding: '20px 24px' }}>
         <AdminFormRow label="決済チャットボット — サイトにボットを埋め込む" hint="ページの右下にウェブチャットを表示するためにウェブサイトの <body> タグ内に以下のコードを貼り付けてください。">
           <Input.TextArea value={paymentScript} readOnly rows={4} style={{ fontFamily: 'monospace', fontSize: 12 }} />
@@ -40,12 +46,6 @@ function InstallationTag() {
         <AdminFormRow label="FAQ チャットボット — サイトにボットを埋め込む" hint="ページの右下にウェブチャットを表示するためにウェブサイトの <body> タグ内に以下のコードを貼り付けてください。">
           <Input.TextArea value={faqScript} readOnly rows={4} style={{ fontFamily: 'monospace', fontSize: 12 }} />
           <Button icon={<CopyOutlined />} style={{ marginTop: 8 }} onClick={() => copyText(faqScript)}>コピー</Button>
-        </AdminFormRow>
-
-        <AdminFormRow label="デモ">
-          <Link to={urlDemo}>
-            <Button type="primary">デモページを開く</Button>
-          </Link>
         </AdminFormRow>
       </div>
     </AdminPage>

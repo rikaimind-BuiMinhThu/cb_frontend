@@ -3,7 +3,7 @@ import { Button, Collapse, message, Space } from 'antd';
 import api from './../../../../api/api-management';
 import Cookies from 'js-cookie';
 import { tokenExpired } from 'api/tokenExpired';
-import { AdminPage, AdminConfirmModal, AdminActionButton } from '../../../../components/AdminShell';
+import { AdminPage, AdminConfirmModal, AdminActionButton, useAdminHeaderActions } from '../../../../components/AdminShell';
 import '../../../../assets/css/bot/email/list-email.css';
 
 const { Panel } = Collapse;
@@ -73,18 +73,17 @@ function ListEmail() {
       });
   }
 
+  useAdminHeaderActions(
+    <AdminActionButton
+      action="create"
+      label="新メール追加"
+      onClick={() => { window.location.href = '/admin/create-email'; }}
+    />
+  );
+
   return (
     <>
-      <AdminPage
-        title="メール一覧"
-        toolbar={
-          <AdminActionButton
-            action="create"
-            label="新メール追加"
-            onClick={() => { window.location.href = '/admin/create-email'; }}
-          />
-        }
-      >
+      <AdminPage>
         <div className="email-list-page">
           <Collapse accordion className="email-list-collapse">
             {emailList?.map((item) => (

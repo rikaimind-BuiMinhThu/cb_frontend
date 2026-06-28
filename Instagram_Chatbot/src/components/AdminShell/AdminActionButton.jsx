@@ -5,10 +5,12 @@ import {
   CopyOutlined,
   DeleteOutlined,
   DollarOutlined,
+  DownloadOutlined,
   EditOutlined,
   EyeOutlined,
   PlusOutlined,
   SaveOutlined,
+  SearchOutlined,
 } from '@ant-design/icons';
 
 const ACTION_CONFIG = {
@@ -57,6 +59,16 @@ const ACTION_CONFIG = {
     type: 'link',
     size: 'small',
     icon: <DollarOutlined />,
+  },
+  search: {
+    label: '検索',
+    type: 'primary',
+    icon: <SearchOutlined />,
+  },
+  download: {
+    label: 'ダウンロード',
+    type: 'primary',
+    icon: <DownloadOutlined />,
   },
 };
 

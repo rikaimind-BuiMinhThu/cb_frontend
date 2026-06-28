@@ -390,7 +390,6 @@ function VariableManagement() {
   return (
     <>
       <AdminPage
-        title="変数管理"
         description="※ユーザの入力内容などを保管する変数です。シナリオの中で代入や参照ができます。"
       >
         <Tabs

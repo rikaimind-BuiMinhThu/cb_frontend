@@ -808,7 +808,7 @@ function PaymentManagement() {
   };
 
   return (
-    <AdminPage title="決済管理" className="admin-page--payment-management">
+    <AdminPage className="admin-page--payment-management">
       <Tabs
         activeKey={tab}
         onChange={setTab}

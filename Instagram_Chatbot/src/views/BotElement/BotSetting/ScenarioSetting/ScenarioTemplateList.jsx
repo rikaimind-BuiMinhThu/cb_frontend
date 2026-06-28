@@ -4,7 +4,7 @@ import { Input, List, Modal, Space, message } from 'antd';
 import Cookies from 'js-cookie';
 import moment from 'moment';
 import api from '../../../../api/api-management';
-import { AdminPage, AdminConfirmModal, AdminActionButton } from '../../../../components/AdminShell';
+import { AdminPage, AdminConfirmModal, AdminActionButton, useAdminHeaderActions } from '../../../../components/AdminShell';
 
 function ScenarioTemplateList() {
   const [isOpenCreateTemplate, setIsOpenCreateTemplate] = useState(false);
@@ -20,10 +20,13 @@ function ScenarioTemplateList() {
       window.location.href = '/';
       return;
     }
-    document.title = 'シナリオテンプレート一覧';
     window.scrollTo(0, 0);
     getListTemplate();
   }, []);
+
+  useAdminHeaderActions(
+    <AdminActionButton action="create" label="テンプレート作成" onClick={() => setIsOpenCreateTemplate(true)} />
+  );
 
   const getListTemplate = () => {
     api
@@ -90,12 +93,7 @@ function ScenarioTemplateList() {
 
   return (
     <>
-      <AdminPage
-        title="シナリオテンプレート一覧"
-        toolbar={
-          <AdminActionButton action="create" label="テンプレート作成" onClick={() => setIsOpenCreateTemplate(true)} />
-        }
-      >
+      <AdminPage>
         <List
           dataSource={listTemplate}
           renderItem={(template) => (

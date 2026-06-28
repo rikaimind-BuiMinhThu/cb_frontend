@@ -170,7 +170,11 @@ export function filterMenuByRole(items, userRole) {
 }
 
 export const ROUTE_TITLES = {
+  '/admin/dashboard': 'ホーム',
   '/admin/client-management': 'クライアント管理',
+  '/admin/user-management': 'ユーザー管理',
+  '/admin/plan-management': 'プラン管理',
+  '/admin/client-payment-detail': 'Payment History',
   '/admin/bot': 'ボット管理',
   '/admin/scenario-list': 'シナリオ一覧',
   '/admin/scenario-setting': 'シナリオ設定',
@@ -182,10 +186,15 @@ export const ROUTE_TITLES = {
   '/admin/sub-user': 'サブユーザ管理',
   '/admin/variable-management': '変数管理',
   '/admin/installation-tag-demo': '設定ガイドとデモ',
+  '/admin/design-setting': 'デザイン設定',
   '/admin/report': 'レポート',
   '/admin/bot-chat-log': '会話',
   '/admin/payment-management': '決済管理',
+  '/admin/payment-gateway': '決済ゲートウェイ一覧',
+  '/admin/add-payment-gateway': '決済ゲートウェイ追加',
+  '/admin/edit-payment-gateway': '決済ゲートウェイ編集',
   '/admin/withdrawal-prevention': '離脱防止',
+  '/admin/crm': 'CRM',
 };
 
 /** Routes not listed in the sidebar map to a related menu path for selection/open state. */

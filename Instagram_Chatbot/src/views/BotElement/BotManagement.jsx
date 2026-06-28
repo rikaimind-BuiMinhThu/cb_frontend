@@ -214,7 +214,7 @@ function BotManagement() {
 
   return (
     <>
-      <AdminPage title="ボット管理">
+      <AdminPage>
         <AdminTable
           loading={loading}
           columns={columns}

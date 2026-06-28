@@ -3,11 +3,13 @@ import { Button, Layout } from 'antd';
 import { MenuFoldOutlined, MenuUnfoldOutlined, LogoutOutlined } from '@ant-design/icons';
 import Cookies from 'js-cookie';
 import { useAdminHeaderTitleContext } from './AdminHeaderTitleContext';
+import { useAdminHeaderActionsContext } from './AdminHeaderActionsContext';
 
 const { Header } = Layout;
 
 function AdminHeader({ collapsed, onToggleCollapse }) {
   const { title } = useAdminHeaderTitleContext();
+  const { actions } = useAdminHeaderActionsContext();
 
   const logout = () => {
     Cookies.set('is_auth', 'false');
@@ -33,9 +35,12 @@ function AdminHeader({ collapsed, onToggleCollapse }) {
         />
         {title && <h1 className="admin-header-title">{title}</h1>}
       </div>
-      <Button type="default" icon={<LogoutOutlined />} onClick={logout}>
-        ログアウト
-      </Button>
+      <div className="admin-header-right">
+        {actions && <div className="admin-header-actions">{actions}</div>}
+        <Button type="default" icon={<LogoutOutlined />} onClick={logout}>
+          ログアウト
+        </Button>
+      </div>
     </Header>
   );
 }

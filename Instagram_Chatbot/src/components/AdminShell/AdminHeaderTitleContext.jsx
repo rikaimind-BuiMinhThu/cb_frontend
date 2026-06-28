@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
+import { useLocation } from 'react-router-dom';
+import { getPageTitle } from './adminMenuConfig';
 
 const AdminHeaderTitleContext = createContext(null);
 
@@ -29,9 +31,10 @@ export function useAdminHeaderTitleContext() {
 
 export function useAdminHeaderTitle(title) {
   const { setTitle } = useAdminHeaderTitleContext();
+  const location = useLocation();
 
   useEffect(() => {
     setTitle(title || '');
-    return () => setTitle('');
-  }, [title, setTitle]);
+    return () => setTitle(getPageTitle(location.pathname));
+  }, [title, setTitle, location.pathname]);
 }

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import api from '../../../../api/api-management';
 import { tokenExpired } from 'api/tokenExpired';
-import { AdminPage, AdminActionButton } from '../../../../components/AdminShell';
+import { AdminPage, AdminActionButton, useAdminHeaderTitle, useAdminHeaderActions } from '../../../../components/AdminShell';
 import ModalNoti from '../../../Popup/ModalNoti';
 import '../../../../assets/css/bot/email/create-email.css';
 
@@ -370,9 +370,26 @@ function CreateEmail() {
       return true;
   }
 
+  useAdminHeaderTitle(mailAction === false ? 'メール編集' : 'メール作成');
+
+  useAdminHeaderActions(
+    <>
+      <AdminActionButton
+        action="cancel"
+        label="戻る"
+        onClick={() => { window.location.href = '/admin/list-email'; }}
+      />
+      {mailAction === false ? (
+        <AdminActionButton action="save" onClick={(e) => saveEmail(e)} />
+      ) : (
+        <AdminActionButton action="create" label="追加" onClick={(e) => addEmail(e)} />
+      )}
+    </>
+  );
+
   return (
     <>
-      <AdminPage title={mailAction === false ? 'メール編集' : 'メール作成'}>
+      <AdminPage>
         <div className="email-form-page">
           <form id="create-email-form">
                   <div className="field-container">
@@ -518,19 +535,6 @@ function CreateEmail() {
                     </div>
                   </div>
           </form>
-
-          <div className="field-btn admin-form-actions">
-            <AdminActionButton
-              action="cancel"
-              label="戻る"
-              onClick={() => { window.location.href = '/admin/list-email'; }}
-            />
-            {mailAction === false ? (
-              <AdminActionButton action="save" onClick={(e) => saveEmail(e)} />
-            ) : (
-              <AdminActionButton action="create" label="追加" onClick={(e) => addEmail(e)} />
-            )}
-          </div>
         </div>
 
         <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>

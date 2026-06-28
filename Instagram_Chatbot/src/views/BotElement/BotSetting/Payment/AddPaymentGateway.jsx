@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Form, Input, message, Select, Spin } from 'antd';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import api from '../../../../api/api-management';
-import { AdminFormRow, AdminPage, AdminActionButton } from '../../../../components/AdminShell';
+import { AdminFormRow, AdminPage, AdminActionButton, useAdminHeaderTitle, useAdminHeaderActions } from '../../../../components/AdminShell';
 import '../../../../assets/css/bot/payment-gateway-form.css';
 
 function buildPayload(values) {
@@ -116,11 +116,19 @@ function AddPaymentGateway() {
     });
   };
 
+  useAdminHeaderTitle(isEdit ? '決済ゲートウェイ編集' : '決済ゲートウェイ追加');
+
+  useAdminHeaderActions(
+    <>
+      <Link to="/admin/payment-gateway">
+        <AdminActionButton action="cancel" label="戻る" />
+      </Link>
+      <AdminActionButton action="save" loading={saving} onClick={handleSave} />
+    </>
+  );
+
   return (
-    <AdminPage
-      title={isEdit ? '決済ゲートウェイ編集' : '決済ゲートウェイ追加'}
-      description="決済代行会社への接続情報を設定します。"
-    >
+    <AdminPage description="決済代行会社への接続情報を設定します。">
       <Spin spinning={loading}>
         <div className="payment-gateway-form">
           <Form form={form} layout="vertical" disabled={loading}>
@@ -230,12 +238,6 @@ function AddPaymentGateway() {
               </>
             )}
 
-            <div className="payment-gateway-form-actions admin-form-actions">
-              <Link to="/admin/payment-gateway">
-                <AdminActionButton action="cancel" label="戻る" />
-              </Link>
-              <AdminActionButton action="save" loading={saving} onClick={handleSave} />
-            </div>
           </Form>
         </div>
       </Spin>

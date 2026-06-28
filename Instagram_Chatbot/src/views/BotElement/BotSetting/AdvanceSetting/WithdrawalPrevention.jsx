@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Card, CardHeader, CardBody, Row, Col } from 'reactstrap';
 import { useState } from 'react';
-import { AdminPage, AdminActionButton } from '../../../../components/AdminShell';
+import { AdminPage, AdminActionButton, useAdminHeaderActions } from '../../../../components/AdminShell';
 
 function WithdrawalPrevention() {
   const [valueWP, setValueWP] = useState('');
@@ -189,9 +189,14 @@ function WithdrawalPrevention() {
     document.getElementById('display_img_url').style.display = 'block'
     document.getElementById('image_popup').checked = true
   }
+
+  useAdminHeaderActions(
+    <AdminActionButton action="save" onClick={() => handleKeep()} />
+  );
+
   return (
     <>
-      <AdminPage title="離脱防止" card={false}>
+      <AdminPage card={false}>
         <Row id="screenAll">
           <Col md="12">
             <Card className="admin-page-card">
@@ -267,7 +272,6 @@ function WithdrawalPrevention() {
                     />
                   </div>
                 </div>
-                <AdminActionButton action="save" onClick={() => handleKeep()} />
               </CardBody>
             </Card>
           </Col>

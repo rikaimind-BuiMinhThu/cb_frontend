@@ -6,6 +6,8 @@ import Cookies from 'js-cookie';
 import AdminSidebar from './AdminSidebar';
 import AdminHeader from './AdminHeader';
 import { AdminHeaderTitleProvider } from './AdminHeaderTitleContext';
+import { AdminHeaderActionsProvider } from './AdminHeaderActionsContext';
+import AdminRouteTitleSync from './AdminRouteTitleSync';
 import routes from '../../routes';
 import PushMessage from '../../views/BotSettings/PushMessage/PushMessagePage';
 import ListSmsTemplate from '../../views/BotSettings/SmsTemplate/ListSmsTemplate';
@@ -62,11 +64,13 @@ function AdminLayout(props) {
   return (
     <ConfigProvider locale={jaJP} {...adminConfigProviderProps}>
       <AdminHeaderTitleProvider>
-        <Layout className="admin-layout">
-          <AdminSidebar collapsed={collapsed} onCollapse={setCollapsed} />
-          <Layout>
-            <AdminHeader collapsed={collapsed} onToggleCollapse={() => setCollapsed(!collapsed)} />
-            <Content className="admin-content main-panel" ref={mainPanelRef}>
+        <AdminHeaderActionsProvider>
+          <AdminRouteTitleSync />
+          <Layout className="admin-layout">
+            <AdminSidebar collapsed={collapsed} onCollapse={setCollapsed} />
+            <Layout>
+              <AdminHeader collapsed={collapsed} onToggleCollapse={() => setCollapsed(!collapsed)} />
+              <Content className="admin-content main-panel" ref={mainPanelRef}>
               <Switch>
                 {routes.map((route, key) => (
                   <Route
@@ -84,9 +88,10 @@ function AdminLayout(props) {
                   component={PushMessage}
                 />
               </Switch>
-            </Content>
+              </Content>
+            </Layout>
           </Layout>
-        </Layout>
+        </AdminHeaderActionsProvider>
       </AdminHeaderTitleProvider>
     </ConfigProvider>
   );

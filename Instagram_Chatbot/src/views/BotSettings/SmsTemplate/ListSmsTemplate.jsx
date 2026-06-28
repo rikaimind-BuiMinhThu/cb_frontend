@@ -5,7 +5,7 @@ import { tokenExpired } from 'api/tokenExpired';
 import api from 'api/api-management';
 import CreateSmsTemplateDialog from './CreateSmsTemplateDialog';
 import UpdateSmsTemplateDialog from './UpdateSmsTemplateDialog';
-import { AdminPage, AdminTable, AdminConfirmModal, AdminActionButton } from '../../../components/AdminShell';
+import { AdminPage, AdminTable, AdminConfirmModal, AdminActionButton, useAdminHeaderActions } from '../../../components/AdminShell';
 
 const ListSmsTemplate = () => {
   const { botId } = useParams();
@@ -102,12 +102,13 @@ const ListSmsTemplate = () => {
     },
   ];
 
+  useAdminHeaderActions(
+    <CreateSmsTemplateDialog botId={botId} resolver={handleCreateSuccess} />
+  );
+
   return (
     <>
-      <AdminPage
-        title="SMS一覧"
-        toolbar={<CreateSmsTemplateDialog botId={botId} resolver={handleCreateSuccess} />}
-      >
+      <AdminPage>
         <AdminTable
           loading={loading}
           columns={columns}

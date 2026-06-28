@@ -6,6 +6,7 @@ import {
   AdminTable,
   AdminSearchBar,
   AdminActionButton,
+  useAdminHeaderActions,
 } from '../../components/AdminShell';
 import { PAGE_SIZE } from './constants';
 import { createClientColumns } from './clientManagementColumns';
@@ -41,11 +42,12 @@ function ClientManagementList({
     [plans, onView, onEdit, onDelete]
   );
 
+  useAdminHeaderActions(
+    <AdminActionButton action="create" label="クライアント追加" onClick={onAdd} />
+  );
+
   return (
-    <AdminPage
-      title="クライアント管理"
-      toolbar={<AdminActionButton action="create" label="クライアント追加" onClick={onAdd} />}
-    >
+    <AdminPage>
       <AdminTable
         loading={loading}
         columns={columns}

@@ -11,7 +11,6 @@ import {
   Typography,
 } from 'antd';
 import {
-  DownloadOutlined,
   QuestionCircleOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
@@ -21,7 +20,7 @@ import api from './../../../../api/api-management';
 import Cookies from 'js-cookie';
 import { tokenExpired } from 'api/tokenExpired';
 import { utils, writeFileXLSX } from 'xlsx';
-import { AdminPage, AdminTable } from '../../../../components/AdminShell';
+import { AdminPage, AdminTable, AdminActionButton, useAdminHeaderActions } from '../../../../components/AdminShell';
 import { adminChartPalette } from '../../../../theme/adminTheme';
 import './../../../../assets/css/bot/report.css';
 
@@ -1322,10 +1321,8 @@ function Report() {
     </Space>
   );
 
-  const pageToolbar = (
-    <Button type="primary" icon={<DownloadOutlined />} onClick={handleExport}>
-      ダウンロード
-    </Button>
+  useAdminHeaderActions(
+    <AdminActionButton action="download" onClick={handleExport} />
   );
 
   const renderSectionTitle = (title, tooltip) => (
@@ -1353,9 +1350,7 @@ function Report() {
 
   return (
     <AdminPage
-      title="レポート"
       className="admin-page--report"
-      toolbar={pageToolbar}
       card={false}
     >
       <div id="screenAll" className="admin-page-card report-page-card">

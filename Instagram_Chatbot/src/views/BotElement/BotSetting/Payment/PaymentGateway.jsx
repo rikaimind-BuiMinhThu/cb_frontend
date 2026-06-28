@@ -3,7 +3,7 @@ import { Button, message, Space, Tag } from 'antd';
 import { Link } from 'react-router-dom';
 import api from '../../../../api/api-management';
 import { tokenExpired } from 'api/tokenExpired';
-import { AdminConfirmModal, AdminPage, AdminTable, AdminActionButton } from '../../../../components/AdminShell';
+import { AdminConfirmModal, AdminPage, AdminTable, AdminActionButton, useAdminHeaderActions } from '../../../../components/AdminShell';
 
 const PAGE_SIZE = 25;
 
@@ -157,16 +157,15 @@ function PaymentGateway() {
     [page]
   );
 
+  useAdminHeaderActions(
+    <Link to="/admin/add-payment-gateway">
+      <AdminActionButton action="create" label="追加" />
+    </Link>
+  );
+
   return (
     <>
-      <AdminPage
-        title="決済ゲートウェイ一覧"
-        toolbar={
-          <Link to="/admin/add-payment-gateway">
-            <AdminActionButton action="create" label="追加" />
-          </Link>
-        }
-      >
+      <AdminPage>
         <AdminTable
           columns={columns}
           dataSource={gateway}

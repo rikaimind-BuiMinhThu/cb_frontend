@@ -29,7 +29,7 @@ function DesignChatbot() {
 
   return (
     <>
-      <AdminPage title="デザイン設定" className="admin-page--design-setting">
+      <AdminPage className="admin-page--design-setting">
         <Tabs
           activeKey={String(state.tabmenu)}
           onChange={(key) => actions.setTabmenu(Number(key))}

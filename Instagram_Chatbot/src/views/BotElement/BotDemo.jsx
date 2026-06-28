@@ -44,7 +44,7 @@ const BotDemo = () => {
   };
 
   return (
-    <AdminPage title="ボットデモ" card={false}>
+    <AdminPage card={false}>
       <Card bordered={false} style={{ borderRadius: 8, border: '1px solid #e5e7eb' }}>
         <div style={{ padding: 24 }}>
           <h3 style={{ marginBottom: 16 }}>アクションクリック</h3>

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import api from '../../api/api-management';
 import { tokenExpired } from 'api/tokenExpired';
-import { AdminPage, AdminTable, AdminConfirmModal, AdminActionButton } from '../../components/AdminShell';
+import { AdminPage, AdminTable, AdminConfirmModal, AdminActionButton, useAdminHeaderActions } from '../../components/AdminShell';
 
 function SubUserManagement() {
   const [subUsers, setSubUsers] = useState([]);
@@ -91,16 +91,16 @@ function SubUserManagement() {
     },
   ];
 
+  useAdminHeaderActions(
+    <Link to="/admin/add-sub-user">
+      <AdminActionButton action="create" label="ユーザー招待" />
+    </Link>
+  );
+
   return (
     <>
       <AdminPage
-        title="サブユーザー管理"
         description="利用中のプランのボットの管理者として追加されているユーザーを表示します。EC-CHATBOTのアカウントを持たないユーザーを管理者に追加したい場合は、招待ボタンからユーザーを招待してからボットの管理者を追加してください。"
-        toolbar={
-          <Link to="/admin/add-sub-user">
-            <AdminActionButton action="create" label="ユーザー招待" />
-          </Link>
-        }
       >
         <AdminTable columns={columns} dataSource={subUsers} rowKey="id" pagination={false} />
       </AdminPage>

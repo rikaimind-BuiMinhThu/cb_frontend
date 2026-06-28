@@ -5,7 +5,7 @@ import api from '../../../../api/api-management';
 import Cookies from 'js-cookie';
 import moment from 'moment';
 import Preview from '../Preview';
-import { AdminPage, AdminConfirmModal, AdminActionButton } from '../../../../components/AdminShell';
+import { AdminPage, AdminConfirmModal, AdminActionButton, useAdminHeaderActions } from '../../../../components/AdminShell';
 
 function ScenarioList() {
   const [isOpenCreateScenario, setIsOpenCreateScenario] = useState(false);
@@ -26,7 +26,6 @@ function ScenarioList() {
 
   useEffect(() => {
     setBotId(Cookies.get('bot_id'));
-    document.title = 'シナリオ一覧';
     window.scrollTo(0, 0);
   }, []);
 
@@ -140,17 +139,16 @@ function ScenarioList() {
     Cookies.set('scenario_id', id);
   };
 
+  useAdminHeaderActions(
+    <Space>
+      <AdminActionButton action="create" label="シナリオ作成" onClick={() => setIsOpenCreateScenario(true)} />
+      <AdminActionButton action="save" onClick={handleSaveSelectScenario} />
+    </Space>
+  );
+
   return (
     <>
-      <AdminPage
-        title="シナリオ一覧"
-        toolbar={
-          <Space>
-            <AdminActionButton action="create" label="シナリオ作成" onClick={() => setIsOpenCreateScenario(true)} />
-            <AdminActionButton action="save" onClick={handleSaveSelectScenario} />
-          </Space>
-        }
-      >
+      <AdminPage>
         <List
           className="admin-scenario-list"
           dataSource={listScenario}
