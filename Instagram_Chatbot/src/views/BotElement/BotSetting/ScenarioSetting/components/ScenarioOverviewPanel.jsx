@@ -54,19 +54,19 @@ const ScenarioOverviewPanel = ({ onOpenPreview }) => {
               <option value="faq">FAQ</option>
             </select>
           </div>
+          <div className="ss-layout-basic-settings-action">
+            <button
+              type="button"
+              className="ss-layout-settings-open-btn"
+              onClick={openScenarioSettingsModal}
+            >
+              {isTemplateMode ? 'テンプレート設定' : 'シナリオ設定'}
+            </button>
+          </div>
         </div>
         {errorScenarioName && (
           <span style={{ fontSize: '12px', color: '#FF621D' }}>{errorScenarioName}</span>
         )}
-        <div className="ss-layout-basic-settings-actions">
-          <button
-            type="button"
-            className="ss-layout-settings-open-btn"
-            onClick={openScenarioSettingsModal}
-          >
-            {isTemplateMode ? 'テンプレート設定' : 'シナリオ設定'}
-          </button>
-        </div>
       </section>
     </div>
   );

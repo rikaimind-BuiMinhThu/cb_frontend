@@ -274,7 +274,7 @@
 
 .ss-layout-basic-settings-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 140px;
+  grid-template-columns: minmax(0, 1fr) 140px auto;
   gap: 10px;
   align-items: center;
   width: 100%;
@@ -311,8 +311,14 @@
   box-sizing: border-box;
 }
 
+.ss-layout-basic-settings-action {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
 .ss-layout-settings-open-btn {
-  align-self: flex-start;
+  white-space: nowrap;
   padding: 8px 16px;
   font-size: 13px;
   color: #024bb9;
@@ -326,14 +332,6 @@
 .ss-layout-settings-open-btn:hover {
   background: #024bb9;
   color: #fff;
-}
-
-.ss-layout-basic-settings-actions {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px 12px;
-  margin-top: 4px;
 }
 
 .ss-layout-preview-close-btn {
