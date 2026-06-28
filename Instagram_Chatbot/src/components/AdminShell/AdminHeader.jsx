@@ -2,10 +2,12 @@ import React from 'react';
 import { Button, Layout } from 'antd';
 import { MenuFoldOutlined, MenuUnfoldOutlined, LogoutOutlined } from '@ant-design/icons';
 import Cookies from 'js-cookie';
+import { useAdminHeaderTitleContext } from './AdminHeaderTitleContext';
 
 const { Header } = Layout;
 
 function AdminHeader({ collapsed, onToggleCollapse }) {
+  const { title } = useAdminHeaderTitleContext();
 
   const logout = () => {
     Cookies.set('is_auth', 'false');
@@ -29,6 +31,7 @@ function AdminHeader({ collapsed, onToggleCollapse }) {
           onClick={onToggleCollapse}
           aria-label="Toggle sidebar"
         />
+        {title && <h1 className="admin-header-title">{title}</h1>}
       </div>
       <Button type="default" icon={<LogoutOutlined />} onClick={logout}>
         ログアウト

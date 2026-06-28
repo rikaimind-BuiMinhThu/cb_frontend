@@ -17,6 +17,7 @@
   max-width: 100%;
   flex: 1;
   min-width: 0;
+  padding: 0;
 }
 
 .admin-layout .ant-layout-sider {
@@ -72,6 +73,7 @@
   font-weight: 600;
   color: #1f2937;
   margin: 0;
+  line-height: 1.2;
 }
 
 .admin-layout .ant-layout-content.admin-content {

@@ -1,8 +1,9 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import InputCustom from '../scenarioComon/InputCustom';
 import { useScenarioEditor } from '../context/ScenarioEditorContext';
 
-const ScenarioOverviewPanel = () => {
+const ScenarioOverviewPanel = ({ onOpenPreview }) => {
   const { state, actions } = useScenarioEditor();
   const {
     scenarioName,
@@ -20,7 +21,20 @@ const ScenarioOverviewPanel = () => {
   return (
     <div className="ss-layout-overview-panel">
       <section className="ss-layout-form-section ss-layout-basic-settings">
-        <h3 className="ss-layout-form-section__title">基本設定</h3>
+        <div className="ss-layout-preview-toggle-bar ss-layout-basic-settings-header">
+          <h3 className="ss-layout-form-section__title ss-layout-basic-settings-header__title">
+            基本設定
+          </h3>
+          {onOpenPreview && (
+            <button
+              type="button"
+              className="ss-layout-preview-toggle-bar__btn"
+              onClick={onOpenPreview}
+            >
+              プレビューを開く
+            </button>
+          )}
+        </div>
         <div className="ss-layout-basic-settings-row">
           <div className="ss-layout-basic-settings-name">
             <InputCustom
@@ -56,6 +70,14 @@ const ScenarioOverviewPanel = () => {
       </section>
     </div>
   );
+};
+
+ScenarioOverviewPanel.propTypes = {
+  onOpenPreview: PropTypes.func,
+};
+
+ScenarioOverviewPanel.defaultProps = {
+  onOpenPreview: undefined,
 };
 
 export default ScenarioOverviewPanel;

@@ -5,6 +5,7 @@ import { Route, Switch, useLocation } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import AdminSidebar from './AdminSidebar';
 import AdminHeader from './AdminHeader';
+import { AdminHeaderTitleProvider } from './AdminHeaderTitleContext';
 import routes from '../../routes';
 import PushMessage from '../../views/BotSettings/PushMessage/PushMessagePage';
 import ListSmsTemplate from '../../views/BotSettings/SmsTemplate/ListSmsTemplate';
@@ -60,31 +61,33 @@ function AdminLayout(props) {
 
   return (
     <ConfigProvider locale={jaJP} {...adminConfigProviderProps}>
-      <Layout className="admin-layout">
-        <AdminSidebar collapsed={collapsed} onCollapse={setCollapsed} />
-        <Layout>
-          <AdminHeader collapsed={collapsed} onToggleCollapse={() => setCollapsed(!collapsed)} />
-          <Content className="admin-content main-panel" ref={mainPanelRef}>
-            <Switch>
-              {routes.map((route, key) => (
+      <AdminHeaderTitleProvider>
+        <Layout className="admin-layout">
+          <AdminSidebar collapsed={collapsed} onCollapse={setCollapsed} />
+          <Layout>
+            <AdminHeader collapsed={collapsed} onToggleCollapse={() => setCollapsed(!collapsed)} />
+            <Content className="admin-content main-panel" ref={mainPanelRef}>
+              <Switch>
+                {routes.map((route, key) => (
+                  <Route
+                    path={route.layout + route.path}
+                    component={route.component}
+                    key={key}
+                  />
+                ))}
                 <Route
-                  path={route.layout + route.path}
-                  component={route.component}
-                  key={key}
+                  path="/admin/bot-settings/:botId/sms-template"
+                  component={ListSmsTemplate}
                 />
-              ))}
-              <Route
-                path="/admin/bot-settings/:botId/sms-template"
-                component={ListSmsTemplate}
-              />
-              <Route
-                path="/admin/bot-settings/:botId/push-message"
-                component={PushMessage}
-              />
-            </Switch>
-          </Content>
+                <Route
+                  path="/admin/bot-settings/:botId/push-message"
+                  component={PushMessage}
+                />
+              </Switch>
+            </Content>
+          </Layout>
         </Layout>
-      </Layout>
+      </AdminHeaderTitleProvider>
     </ConfigProvider>
   );
 }
