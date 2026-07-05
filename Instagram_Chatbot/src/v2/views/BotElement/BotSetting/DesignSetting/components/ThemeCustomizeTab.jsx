@@ -1,12 +1,18 @@
-import React from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
+import { Collapse } from 'antd';
 import { AdminActionButton } from '../../../../../components/AdminShell';
-import { THEME_SECTIONS } from '../constants/designThemeConstants';
+import { THEME_MAIN_COLOR_SECTION, THEME_SECTIONS } from '../constants/designThemeConstants';
 import { getDesignSettingTooltip } from '../constants/designSettingTooltips';
 import MainColorPicker from './MainColorPicker';
-import ThemeSection from './ThemeSection';
+import ThemeAccordionSection from './ThemeAccordionSection';
 import ThemeCustomizePreview from './ThemeCustomizePreview';
+import ThemeSectionNav from './ThemeSectionNav';
 import DesignSettingInfoTooltip from './shared/DesignSettingInfoTooltip';
+
+const DEFAULT_EXPANDED_SECTIONS = ['mainColor', 'messages'];
+
+const { Panel } = Collapse;
 
 const ThemeCustomizeTab = ({
   themeSettings,
@@ -15,44 +21,132 @@ const ThemeCustomizeTab = ({
   subtitle,
   onFieldChange,
   onMainColorChange,
+  onApplyDerivedTheme,
+  onResetSection,
   onSave,
-}) => (
-  <div className="design-setting-tab-content">
-    <div className="theme-customize-tab-layout">
-      <div className="theme-customize-tab-preview">
-        <ThemeCustomizePreview
-          themeSettings={themeSettings}
-          mainColor={mainColor}
-          title={title}
-          subtitle={subtitle}
-        />
-      </div>
-      <div className="theme-customize-tab-settings">
-        <div className="theme-customize-tab-settings__scroll">
-          <section className="theme-section theme-section--main-color">
-            <h5 className="theme-section__title">
-              メインカラー
-              <DesignSettingInfoTooltip text={getDesignSettingTooltip('mainColor')} />
-            </h5>
-            <MainColorPicker mainColor={mainColor} onChange={onMainColorChange} />
-          </section>
-          {THEME_SECTIONS.map((section) => (
-            <ThemeSection
-              key={section.id}
-              title={section.title}
-              fields={section.fields}
-              themeSettings={themeSettings}
-              onFieldChange={onFieldChange}
-            />
-          ))}
+}) => {
+  const [activeSectionId, setActiveSectionId] = useState('mainColor');
+  const [expandedSections, setExpandedSections] = useState(DEFAULT_EXPANDED_SECTIONS);
+  const sectionRefs = useRef({});
+
+  const setSectionRef = useCallback((sectionId, node) => {
+    if (node) {
+      sectionRefs.current[sectionId] = node;
+    }
+  }, []);
+
+  const handleSectionSelect = useCallback((sectionId) => {
+    setActiveSectionId(sectionId);
+    setExpandedSections([sectionId]);
+    requestAnimationFrame(() => {
+      sectionRefs.current[sectionId]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }, []);
+
+  const handleSectionExpand = useCallback((sectionId, expanded) => {
+    if (expanded) {
+      setActiveSectionId(sectionId);
+      setExpandedSections([sectionId]);
+      return;
+    }
+    setExpandedSections((prev) => prev.filter((id) => id !== sectionId));
+  }, []);
+
+  const handleMainColorChange = useCallback((color) => {
+    if (color === mainColor) return;
+    const shouldApplyDerived = window.confirm('メインカラーに合わせて各項目を再計算しますか？');
+    if (shouldApplyDerived) {
+      onApplyDerivedTheme(color);
+      return;
+    }
+    onMainColorChange(color);
+  }, [mainColor, onApplyDerivedTheme, onMainColorChange]);
+
+  const mainColorHeader = (
+    <div className="theme-accordion-section__header">
+      <span>
+        {THEME_MAIN_COLOR_SECTION.title}
+        <DesignSettingInfoTooltip text={getDesignSettingTooltip('mainColor')} />
+      </span>
+    </div>
+  );
+
+  return (
+    <div className="design-setting-tab-content">
+      <div className="theme-customize-tab-layout">
+        <div className="theme-customize-tab-preview">
+          <p className="theme-customize-tab-preview__hint">
+            プレビューをクリックして設定箇所へ移動
+          </p>
+          <ThemeCustomizePreview
+            themeSettings={themeSettings}
+            mainColor={mainColor}
+            title={title}
+            subtitle={subtitle}
+            activeSectionId={activeSectionId}
+            onSectionSelect={handleSectionSelect}
+          />
         </div>
-        <div className="theme-customize-tab-settings__footer admin-form-actions">
-          <AdminActionButton action="save" label="設定保存" onClick={onSave} />
+        <div className="theme-customize-tab-settings">
+          <ThemeSectionNav
+            activeSectionId={activeSectionId}
+            onSectionSelect={handleSectionSelect}
+          />
+          <div className="theme-customize-tab-settings__scroll">
+            <div
+              ref={(node) => setSectionRef(THEME_MAIN_COLOR_SECTION.id, node)}
+              className={`theme-accordion-section theme-accordion-section--main-color${activeSectionId === THEME_MAIN_COLOR_SECTION.id ? ' theme-accordion-section--active' : ''}`}
+              id={`theme-section-${THEME_MAIN_COLOR_SECTION.id}`}
+            >
+              <Collapse
+                bordered={false}
+                activeKey={expandedSections.includes(THEME_MAIN_COLOR_SECTION.id)
+                  ? THEME_MAIN_COLOR_SECTION.id
+                  : []}
+                onChange={(keys) => {
+                  const expanded = Array.isArray(keys)
+                    ? keys.includes(THEME_MAIN_COLOR_SECTION.id)
+                    : keys === THEME_MAIN_COLOR_SECTION.id;
+                  handleSectionExpand(THEME_MAIN_COLOR_SECTION.id, expanded);
+                }}
+              >
+                <Panel header={mainColorHeader} key={THEME_MAIN_COLOR_SECTION.id}>
+                  <div className="theme-section theme-section--main-color">
+                    <MainColorPicker mainColor={mainColor} onChange={handleMainColorChange} />
+                    <p className="theme-section__main-color-helper">
+                      メインカラーを変更しても個別設定は自動では上書きされません。セクションごとに「デフォルトに戻す」で再計算できます。
+                    </p>
+                  </div>
+                </Panel>
+              </Collapse>
+            </div>
+            {THEME_SECTIONS.map((section) => (
+              <div
+                key={section.id}
+                ref={(node) => setSectionRef(section.id, node)}
+              >
+                <ThemeAccordionSection
+                  sectionId={section.id}
+                  title={section.title}
+                  fields={section.fields}
+                  themeSettings={themeSettings}
+                  isActive={activeSectionId === section.id}
+                  isExpanded={expandedSections.includes(section.id)}
+                  onExpand={handleSectionExpand}
+                  onFieldChange={onFieldChange}
+                  onResetSection={onResetSection}
+                />
+              </div>
+            ))}
+          </div>
+          <div className="theme-customize-tab-settings__footer admin-form-actions">
+            <AdminActionButton action="save" label="設定保存" onClick={onSave} />
+          </div>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 ThemeCustomizeTab.propTypes = {
   themeSettings: PropTypes.object.isRequired,
@@ -61,6 +155,8 @@ ThemeCustomizeTab.propTypes = {
   subtitle: PropTypes.string,
   onFieldChange: PropTypes.func.isRequired,
   onMainColorChange: PropTypes.func.isRequired,
+  onApplyDerivedTheme: PropTypes.func.isRequired,
+  onResetSection: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
 };
 

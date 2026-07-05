@@ -13,6 +13,7 @@ import {
   resolveMainColorFromApi,
 } from '../utils/designChatbotUtils';
 import { deriveThemeDefaults } from '../utils/designThemeUtils';
+import { THEME_SECTIONS } from '../constants/designThemeConstants';
 
 const INITIAL_VALIDATION_ERRORS = {
   title: '',
@@ -439,6 +440,25 @@ export const useDesignChatbot = (initialBotId) => {
     setThemeSettings((prev) => ({ ...prev, [field]: value }));
   }, []);
 
+  const resetThemeSection = useCallback((sectionId) => {
+    const section = THEME_SECTIONS.find(({ id }) => id === sectionId);
+    if (!section) return;
+
+    const defaults = deriveThemeDefaults(mainColor, apiColorKey);
+    setThemeSettings((prev) => {
+      const next = { ...prev };
+      section.fields.forEach(({ key }) => {
+        next[key] = defaults[key];
+      });
+      return next;
+    });
+  }, [apiColorKey, mainColor]);
+
+  const applyDerivedTheme = useCallback((newMainColor) => {
+    setMainColor(newMainColor);
+    setThemeSettings(deriveThemeDefaults(newMainColor, apiColorKey));
+  }, [apiColorKey]);
+
   const updateDesignSettingField = useCallback((field, value) => {
     const setters = {
       displayType: setDisplayType,
@@ -519,6 +539,8 @@ export const useDesignChatbot = (initialBotId) => {
       saveThemeCustomize,
       updateDesignSettingField,
       updateThemeField,
+      resetThemeSection,
+      applyDerivedTheme,
     },
   };
 };

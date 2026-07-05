@@ -57,7 +57,7 @@ ThemeColorField.propTypes = {
 ThemeColorField.defaultProps = {
   value: '',
   isText: false,
-  fullWidth: true,
+  fullWidth: false,
   tooltipKey: '',
 };
 

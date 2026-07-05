@@ -45,6 +45,24 @@ export const THEME_FIELD_KEYS = [
   'errorMessageFontSize',
 ];
 
+export const THEME_MAIN_COLOR_SECTION = {
+  id: 'mainColor',
+  title: 'メインカラー',
+};
+
+export const THEME_PREVIEW_REGIONS = [
+  { sectionId: 'mainColor', label: 'メインカラー', targets: ['header', 'progressFill'] },
+  { sectionId: 'header', label: 'ヘッダー', targets: ['headerText'] },
+  { sectionId: 'progress', label: 'プログレスバー', targets: ['progressBar'] },
+  { sectionId: 'window', label: 'チャットウィンドウ', targets: ['chatBody'] },
+  { sectionId: 'messages', label: 'メッセージ', targets: ['botBubble', 'userBubble'] },
+  { sectionId: 'fields', label: '入力・プルダウン', targets: ['inputs'] },
+  { sectionId: 'buttons', label: 'ボタン', targets: ['buttons'] },
+  { sectionId: 'checkbox', label: 'チェックボックス', targets: ['checkboxes'] },
+  { sectionId: 'radio', label: 'ラジオボタン', targets: ['radios'] },
+  { sectionId: 'errors', label: 'エラーメッセージ', targets: ['errorBanner'] },
+];
+
 export const THEME_SECTIONS = [
   {
     id: 'header',
@@ -137,6 +155,11 @@ export const THEME_SECTIONS = [
       { key: 'errorMessageFontSize', label: 'フォントサイズ', fieldType: 'fontSize', fullWidth: true },
     ],
   },
+];
+
+export const THEME_SECTION_NAV_ITEMS = [
+  THEME_MAIN_COLOR_SECTION,
+  ...THEME_SECTIONS.map(({ id, title }) => ({ id, title })),
 ];
 
 export const CAMEL_TO_SNAKE_THEME = {
