@@ -380,6 +380,170 @@ const getDesktopOffsets = () => {
   };
 }
 
+const getUseMobileFullwidth = (messageData) => {
+  if (typeof messageData.useMoblieFullwidth === 'boolean') {
+    return messageData.useMoblieFullwidth;
+  }
+  return sessionStorage.getItem("useFullwidthChatbotMobile") === "true";
+}
+
+const getClosedContentDimensions = (messageData, useMoblieFullwidth) => {
+  const width = messageData?.closedContentWidth;
+  const height = messageData?.closedContentHeight;
+
+  if (width !== undefined && width !== null && width !== ''
+    && height !== undefined && height !== null && height !== '') {
+    return { width, height };
+  }
+
+  if (mobileCheck()) {
+    if (useMoblieFullwidth) {
+      return { width: '100%', height: 85 };
+    }
+    return { width: 250, height: 58 };
+  }
+
+  return { width: 400, height: 85 };
+}
+
+const getHorizontalOffsetPx = (rule) => {
+  if (!rule) return 0;
+  if (rule.mode === 'left') return rule.leftPx || 0;
+  return rule.rightPx || 0;
+}
+
+const formatClosedIframeSize = (contentDimensions, horizontalRule, bottomPx) => {
+  if (typeof contentDimensions.width === 'string') {
+    return {
+      width: contentDimensions.width,
+      height: typeof contentDimensions.height === 'number'
+        ? `${contentDimensions.height}px`
+        : contentDimensions.height,
+    };
+  }
+
+  const horizontalOffset = getHorizontalOffsetPx(horizontalRule);
+  return {
+    width: `${horizontalOffset + contentDimensions.width}px`,
+    height: `${bottomPx + contentDimensions.height}px`,
+  };
+}
+
+const getOpenDimensions = (messageData, isMobileDevice) => {
+  if (isMobileDevice) {
+    const widthSp = parseInt(messageData?.widthSp ?? chatbotW, 10);
+    const heightSp = parseInt(messageData?.heightSp ?? chatbotH, 10);
+    const widthValue = Number.isFinite(widthSp) ? widthSp : 100;
+    const heightValue = Number.isFinite(heightSp) ? heightSp : 100;
+    return {
+      width: widthValue >= 100 ? '100%' : `${widthValue}%`,
+      height: heightValue >= 100 ? '100%' : `${heightValue}%`,
+    };
+  }
+
+  const widthPc = parseInt(messageData?.widthPc ?? chatbotW, 10);
+  const heightPc = parseInt(messageData?.heightPc ?? chatbotH, 10);
+  return {
+    width: Number.isFinite(widthPc) ? widthPc : 450,
+    height: Number.isFinite(heightPc) ? heightPc : 700,
+  };
+}
+
+const formatOpenIframeSize = (openDimensions, horizontalRule, bottomPx, isMobileDevice) => {
+  if (isMobileDevice) {
+    return {
+      width: openDimensions.width,
+      height: openDimensions.height,
+    };
+  }
+
+  const horizontalOffset = getHorizontalOffsetPx(horizontalRule);
+  return {
+    width: `${horizontalOffset + openDimensions.width}px`,
+    height: `${bottomPx + openDimensions.height}px`,
+  };
+}
+
+const applyIframeLayout = (iframe, width, height, options = {}) => {
+  iframe.width = width;
+  iframe.height = height;
+  iframe.style.setProperty("width", width, "important");
+  iframe.style.setProperty("height", height, "important");
+
+  if (options.bottom !== undefined) {
+    iframe.style.setProperty("bottom", options.bottom, "important");
+  }
+
+  if (options.resetHorizontal) {
+    resetIframeHorizontalForFullBleed(iframe);
+    return;
+  }
+
+  if (options.horizontalRule) {
+    applyIframeHorizontalAnchor(iframe, options.horizontalRule);
+  }
+}
+
+const resizeIframeFromMessage = (iframe, messageData) => {
+  if (messageData.isOpen === undefined) return;
+
+  const useMoblieFullwidth = getUseMobileFullwidth(messageData);
+
+  if (messageData.isOpen && mobileCheck()) {
+    const openDimensions = getOpenDimensions(messageData, true);
+    applyIframeLayout(iframe, openDimensions.width, openDimensions.height, {
+      bottom: '0px',
+      resetHorizontal: true,
+    });
+    return;
+  }
+
+  if (messageData.isOpen) {
+    const desktopOpenOffsets = getDesktopOffsets();
+    const openDimensions = getOpenDimensions(messageData, false);
+    const formatted = formatOpenIframeSize(
+      openDimensions,
+      desktopOpenOffsets.horizontal,
+      desktopOpenOffsets.bottom,
+      false,
+    );
+    applyIframeLayout(iframe, formatted.width, formatted.height, {
+      bottom: '0px',
+      horizontalRule: desktopOpenOffsets.horizontal,
+    });
+    return;
+  }
+
+  if (!messageData.isOpen && mobileCheck()) {
+    const mobileOffsets = getMobileCloseOffsets();
+    const contentDimensions = getClosedContentDimensions(messageData, useMoblieFullwidth);
+    const formatted = formatClosedIframeSize(
+      contentDimensions,
+      mobileOffsets.horizontal,
+      mobileOffsets.bottom,
+    );
+    applyIframeLayout(iframe, formatted.width, formatted.height, {
+      bottom: `${mobileOffsets.bottom}px`,
+      horizontalRule: mobileOffsets.horizontal,
+    });
+    return;
+  }
+
+  if (!messageData.isOpen) {
+    const desktopCloseOffsets = getDesktopOffsets();
+    const contentDimensions = getClosedContentDimensions(messageData, useMoblieFullwidth);
+    const formatted = formatClosedIframeSize(
+      contentDimensions,
+      desktopCloseOffsets.horizontal,
+      desktopCloseOffsets.bottom,
+    );
+    applyIframeLayout(iframe, formatted.width, formatted.height, {
+      bottom: '0px',
+      horizontalRule: desktopCloseOffsets.horizontal,
+    });
+  }
+}
+
 const sendMessageToChatbot = (contentMessage, action) => {
   let data = { action: action, actionData: contentMessage };
 
@@ -417,20 +581,25 @@ const displayPopup = async () => {
     iframe.style.maxWidth = "100%";
     applyIframeHorizontalAnchor(iframe, mobileCloseOffsets.horizontal);
   } else {
-    iframe.width =
-      chatbotW
-        ? `${parseInt(chatbotW) + desktopOffsets.horizontal.rightPx}px`
-        : "360px";
+    const initialClosedSize = formatClosedIframeSize(
+      getClosedContentDimensions({}, false),
+      desktopOffsets.horizontal,
+      desktopOffsets.bottom,
+    );
+    iframe.width = initialClosedSize.width;
     applyIframeHorizontalAnchor(iframe, desktopOffsets.horizontal);
   }
 
   iframe.id = "previewSdk";
   iframe.style.position = "fixed";
   iframe.style.setProperty("bottom", isMobile ? `${mobileCloseOffsets.bottom}px` : "0px", "important");
-  iframe.height =
-    chatbotH
-      ? `${parseInt(chatbotH) + desktopOffsets.bottom}px`
-      : "0px";
+  iframe.height = isMobile
+    ? `${mobileCloseOffsets.bottom + getClosedContentDimensions({}, getUseMobileFullwidth({})).height}px`
+    : formatClosedIframeSize(
+      getClosedContentDimensions({}, false),
+      desktopOffsets.horizontal,
+      desktopOffsets.bottom,
+    ).height;
 
   iframe.style.border = "none";
   iframe.style.padding = "0";
@@ -466,51 +635,7 @@ const displayPopup = async () => {
           break;
       };
 
-      if (e.data.isOpen === undefined) return;
-
-      if (e.data.isOpen && mobileCheck()) {
-        iframe.width = "100%";
-        // iframe.height = "620px";
-        iframe.height = "100%";
-        iframe.style.setProperty("width", "100%", "important");
-        iframe.style.setProperty("height", "100%", "important");
-        iframe.style.bottom = "0px";
-        resetIframeHorizontalForFullBleed(iframe);
-      } else if (e.data.isOpen) {
-        const desktopOpenOffsets = getDesktopOffsets();
-        let w = chatbotW ? `${parseInt(chatbotW) + desktopOpenOffsets.horizontal.rightPx}px` : "460px";
-        let h = chatbotH ? `${parseInt(chatbotH) + desktopOpenOffsets.bottom}px` : "700px";
-        iframe.width = w;
-        iframe.height = h;
-        iframe.style.setProperty("width", w, "important");
-        iframe.style.setProperty("height", h, "important");
-        iframe.style.bottom = "0px";
-        iframe.style.right = "0px";
-        iframe.style.setProperty("left", "auto", "important");
-      } else if (!e.data.isOpen && mobileCheck()) {
-        const useMoblieFullwidth = (typeof e.data.useMoblieFullwidth === 'boolean')
-          ? e.data.useMoblieFullwidth
-          : (sessionStorage.getItem("useFullwidthChatbotMobile") === "true");
-        const w = useMoblieFullwidth ? "100%" : "250px";
-        const h = useMoblieFullwidth ? "85px" : "58px";
-        const mobileOffsets = getMobileCloseOffsets();
-        iframe.width = w;
-        iframe.height = h;
-        iframe.style.setProperty("width", w, "important");
-        iframe.style.setProperty("height", h, "important");
-        iframe.style.setProperty("bottom", `${mobileOffsets.bottom}px`, "important");
-        applyIframeHorizontalAnchor(iframe, mobileOffsets.horizontal);
-      } else if (!e.data.isOpen) {
-        const desktopCloseOffsets = getDesktopOffsets();
-        let w = `${desktopCloseOffsets.horizontal.rightPx + 400}px`;
-        let h = `${desktopCloseOffsets.bottom + 85}px`;
-        iframe.width = w;
-        iframe.height = h;
-        iframe.style.setProperty("width", w, "important");
-        iframe.style.setProperty("height", h, "important");
-        iframe.style.bottom = "0px";
-        iframe.style.right = "0px";
-      }
+      resizeIframeFromMessage(iframe, e.data);
 
       iframe.style.width = `${iframe.width} !important`;
       iframe.style.height = `${iframe.height} !important`;

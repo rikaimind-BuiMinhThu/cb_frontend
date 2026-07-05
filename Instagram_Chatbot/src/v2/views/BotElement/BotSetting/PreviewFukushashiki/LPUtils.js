@@ -1,5 +1,6 @@
-
 import { CHATBOT_ACTIONS } from "../PreviewComponent/Constants";
+import { buildSdkPostMessageLayout } from "v2/utils/sdkLayoutUtils";
+import { isMobile } from "../PreviewComponent/Utils";
 import { isTorizenLpAmazonData, isTorizenLP } from "../PreviewComponent/TorizenUtils";
 import { isBlissLpAmazonData, isBlissLP } from "../PreviewComponent/BlissUtils";
 import { isPhystechLpAmazonData, isPhystechLP } from "../PreviewComponent/PhysTechUtils";
@@ -27,6 +28,7 @@ const postMessageToParent = (options, state) => {
     // Keep legacy keys for backward compatibility in old SDK versions.
     chatbotRight: state.rightMarginPc,
     chatbotBottom: state.bottomMarginPc,
+    ...buildSdkPostMessageLayout(state, isMobile()),
   };
   
   window.parent.postMessage({

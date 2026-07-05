@@ -141,6 +141,18 @@ export const resolveMainColorFromApi = (apiColor) => {
   return apiColor;
 };
 
+export const resolveMainColorContext = (chatbot) => {
+  const apiColorKey = chatbot?.main_color && !String(chatbot.main_color).startsWith('#')
+    ? chatbot.main_color
+    : null;
+  const mainColorHex = chatbot?.main_color_other
+    || resolveMainColorFromApi(chatbot?.main_color)
+    || chatbot?.main_color
+    || '#327AED';
+
+  return { apiColorKey, mainColorHex };
+};
+
 export const buildBasicInfoPayload = ({
   title,
   subtitle,

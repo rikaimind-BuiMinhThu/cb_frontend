@@ -27,7 +27,11 @@ import {
   CUSTOM_JS_CODE_POSITION,
 } from "./PreviewComponent/Constants";
 import { injectBotThemeCss } from "utils/chatbotThemeCss";
-import { COLOR_MAP } from "views/BotElement/BotSetting/DesignSetting/constants/designChatbotConstants";
+import { COLOR_MAP } from "v2/views/BotElement/BotSetting/DesignSetting/constants/designChatbotConstants";
+import {
+  parseDesignSettings,
+  resolveMainColorContext,
+} from "v2/views/BotElement/BotSetting/DesignSetting/utils/designChatbotUtils";
 import {
   getAllUrlParams,
   lightenColor,
@@ -60,6 +64,7 @@ import _ from "lodash";
 import {
   setConversionParamToLocalStorage, postMessageToParent, executeLpJsCode, injectCustomJsCode
 } from "./PreviewFukushashiki/LPUtils";
+import { getClosedLauncherPosition } from "v2/utils/sdkLayoutUtils";
 import { handleValidateField, ERROR_MESSAGES } from "./PreviewFukushashiki/ValidationUtils";
 
 const clearChatbotState = () => {
@@ -200,26 +205,32 @@ const PreviewFaq = () => {
       .then((response) => {
         if (!response.data.data) return;
 
-        const result = JSON.parse(response.data.data?.design_settings);
+        const { mainColorHex, apiColorKey } = resolveMainColorContext(response.data.data);
+        const parsedDesign = parseDesignSettings(
+          response.data.data?.design_settings,
+          mainColorHex,
+          apiColorKey,
+        );
         const newState = {
-          activePopupCloseBot: result?.popup_close_bot ? true : false,
-          titleBubble: result?.title_bubble ? result?.title_bubble : "簡単90秒で注文完了",
-          displayType: result?.display_type,
-          widthPc: toNumber(result?.width_pc, 450),
-          heightPc: toNumber(result?.height_pc, 700),
-          widthSp: toNumber(result?.width_sp, 100),
-          heightSp: toNumber(result?.height_sp, 100),
-          positionPc: result?.position_pc ? result?.position_pc : "1",
+          activePopupCloseBot: parsedDesign.popupCloseBot,
+          titleBubble: parsedDesign.titleBubble || "簡単90秒で注文完了",
+          displayType: parsedDesign.displayType,
+          widthPc: parsedDesign.widthPc,
+          heightPc: parsedDesign.heightPc,
+          widthSp: parsedDesign.widthSp,
+          heightSp: parsedDesign.heightSp,
+          positionPc: String(parsedDesign.positionPc),
           isOpen: state.isOpen,
-          rightPcTitle: result?.right_position_pc_title,
-          buttonTypePc: result?.button_type_pc ? result?.button_type_pc : "1",
-          rightMarginPc: toNumber(result?.right_margin_pc, 10),
-          bottomMarginPc: toNumber(result?.bottom_margin_pc, 0),
-          positionSp: result?.position_sp ? result?.position_sp : "1",
-          buttonTypeSp: result?.button_type_sp ? result?.button_type_sp : "1",
-          rightSpTitle: result?.right_position_sp_title,
-          rightMarginSp: toNumber(result?.right_margin_sp, 10),
-          bottomMarginSp: toNumber(result?.bottom_margin_sp, 10),
+          rightPcTitle: parsedDesign.rightPcTitle,
+          buttonTypePc: String(parsedDesign.buttonTypePc),
+          rightMarginPc: parsedDesign.rightMarginPc,
+          bottomMarginPc: parsedDesign.bottomMarginPc,
+          positionSp: String(parsedDesign.positionSp),
+          buttonTypeSp: String(parsedDesign.buttonTypeSp),
+          rightSpTitle: parsedDesign.rightSpTitle,
+          rightMarginSp: parsedDesign.rightMarginSp,
+          bottomMarginSp: parsedDesign.bottomMarginSp,
+          themeSettings: parsedDesign.themeSettings,
         };
 
         dispatch({ type: PREVIEW_ACTIONS.SET_CHATBOT_SETTINGS, payload: newState });
@@ -288,14 +299,7 @@ const PreviewFaq = () => {
 
   useEffect(() => {
     if (!state.botInfor) return;
-    const chatbot = state.botInfor;
-    const apiColorKey = chatbot.main_color && !String(chatbot.main_color).startsWith('#')
-      ? chatbot.main_color
-      : null;
-    const mainColorHex = chatbot.main_color_other
-      || COLOR_MAP[chatbot.main_color]
-      || chatbot.main_color
-      || '#327AED';
+    const { apiColorKey, mainColorHex } = resolveMainColorContext(state.botInfor);
     injectBotThemeCss(state.themeSettings, mainColorHex, apiColorKey);
   }, [state.themeSettings, state.botInfor]);
 
@@ -587,11 +591,15 @@ const PreviewFaq = () => {
 
   const extractStateFromPreviewResponse = async (res) => {
     if (!res || !res.data || res.data.code !== 1) return;
-    const designSetting = res.data.design_settings;
     const chatbot = res.data.chatbot;
     const conversation = res.data.data?.conversation;
-    const shouldAutoOpen = Number(designSetting?.display_type) === 1;
-    const resolvedDisplayType = Number(designSetting?.display_type ?? state.displayType ?? 2);
+    const { apiColorKey, mainColorHex } = resolveMainColorContext(chatbot);
+    const parsedDesign = parseDesignSettings(
+      res.data.design_settings,
+      mainColorHex,
+      apiColorKey,
+    );
+    const shouldAutoOpen = Number(parsedDesign.displayType) === 1;
     let newState = {
       ...state,
       botInfor: getBotInforFromPreviewResponse(res),
@@ -599,34 +607,34 @@ const PreviewFaq = () => {
       loadedStateFromSession: true,
       messagesList: conversation?.messages || [],
       isOpen: shouldAutoOpen ? true : Boolean(state.isOpen),
-      activePopupCloseBot: Boolean(designSetting?.popup_close_bot),
-      titleBubble: designSetting?.title_bubble || "簡単90秒で注文完了",
-      displayType: resolvedDisplayType,
-      widthPc: toNumber(designSetting?.width_pc, 450),
-      heightPc: toNumber(designSetting?.height_pc, 700),
-      widthSp: toNumber(designSetting?.width_sp, 100),
-      heightSp: toNumber(designSetting?.height_sp, 100),
-      positionPc: designSetting?.position_pc || "1",
-      rightPcTitle: designSetting?.right_position_pc_title,
-      buttonTypePc: designSetting?.button_type_pc || "1",
-      rightMarginPc: toNumber(designSetting?.right_margin_pc, 10),
-      bottomMarginPc: toNumber(designSetting?.bottom_margin_pc, 0),
-      positionSp: designSetting?.position_sp || "1",
-      buttonTypeSp: designSetting?.button_type_sp || "1",
-      rightSpTitle: designSetting?.right_position_sp_title,
-      rightMarginSp: toNumber(designSetting?.right_margin_sp, 10),
-      bottomMarginSp: toNumber(designSetting?.bottom_margin_sp, 10),
+      activePopupCloseBot: parsedDesign.popupCloseBot,
+      titleBubble: parsedDesign.titleBubble || "簡単90秒で注文完了",
+      displayType: parsedDesign.displayType,
+      widthPc: parsedDesign.widthPc,
+      heightPc: parsedDesign.heightPc,
+      widthSp: parsedDesign.widthSp,
+      heightSp: parsedDesign.heightSp,
+      positionPc: String(parsedDesign.positionPc),
+      rightPcTitle: parsedDesign.rightPcTitle,
+      buttonTypePc: String(parsedDesign.buttonTypePc),
+      rightMarginPc: parsedDesign.rightMarginPc,
+      bottomMarginPc: parsedDesign.bottomMarginPc,
+      positionSp: String(parsedDesign.positionSp),
+      buttonTypeSp: String(parsedDesign.buttonTypeSp),
+      rightSpTitle: parsedDesign.rightSpTitle,
+      rightMarginSp: parsedDesign.rightMarginSp,
+      bottomMarginSp: parsedDesign.bottomMarginSp,
       isUsedPastMessageLoaded: !!chatbot?.is_used_message_loaded_past,
       isProcessing: false,
       useFullWidthChatbotMobile: !!chatbot?.use_fullwidth_chatbot_mobile,
       isUsedCustomCss: !!chatbot?.is_used_custom_css,
       customCssContent: chatbot?.custom_css_content,
-      themeSettings: designSetting?.theme || null,
+      themeSettings: parsedDesign.themeSettings,
     };
 
     const prevOpenStatus = getPrevOpenStatus();
 
-    if (designSetting.display_type == 1 && prevOpenStatus == "0") {
+    if (parsedDesign.displayType == 1 && prevOpenStatus == "0") {
       savePrevOpenStatus("1");
       sendOpenChatbotCountRequest(state.scenarioId, state.deviceReceive);
     }
@@ -1055,8 +1063,7 @@ const PreviewFaq = () => {
           alignItems: "center",
           justifyContent: "center",
           position: 'fixed',
-          bottom: state.bottomMarginPc ? `${state.bottomMarginPc}px` : '10px',
-          right: state.rightMarginPc ? `${state.rightMarginPc}px` : '0px',
+          ...getClosedLauncherPosition(state),
         }}
       >
         <img
@@ -1072,7 +1079,6 @@ const PreviewFaq = () => {
         onClick={() => onOpenPreview(!state.isOpen)}
         style={{
           backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
-          // width: `${widthPc}px`,
           width: `360px`,
           height: "66px",
           borderRadius: '35px',
@@ -1082,9 +1088,7 @@ const PreviewFaq = () => {
           paddingLeft: '3px',
           paddingRight: '3px',
           position: 'fixed',
-          padding: 'auto',
-          bottom: state.bottomMarginPc ? `${state.bottomMarginPc}px` : '10px',
-          right: state.rightMarginPc ? `${state.rightMarginPc}px` : '0px',
+          ...getClosedLauncherPosition(state),
         }}
       >
         <div className="sp-header-left-bt" onClick={() => onOpenPreview(!state.isOpen)}>
@@ -1092,8 +1096,8 @@ const PreviewFaq = () => {
             <img src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`} alt="bot-header-icon" />
           </div>
         </div>
-        <div style={{ alignItems: 'center', justifyContent: "center", padding: 'auto' }}>
-          <div id="comment_bubble" style={{ display: 'flex', alignItems: 'center', paddingLeft: '20px', paddingTop: '3px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, minWidth: 0 }}>
+          <div id="comment_bubble" style={{ paddingLeft: '20px' }}>
             <span style={{ fontSize: '18px', fontWeight: 900 }}>{state.botInfor.title}</span>
           </div>
         </div>
@@ -1115,8 +1119,7 @@ const PreviewFaq = () => {
           justifyContent: "left",
           position: 'fixed',
           transform: ' rotate(-90deg)',
-          bottom: state.bottomMarginPc ? `${parseInt(state.bottomMarginPc) + state.widthPc / 2}px` : '20px',
-          right: `${-120}px`,
+          ...getClosedLauncherPosition(state, { variant: 'vertical' }),
         }}
       >
         <div className="sp-header-left" onClick={() => onOpenPreview(!state.isOpen)}>

@@ -720,6 +720,10 @@ const uuid = Math.random().toString(36).substring(2, 15) + Math.random().toStrin
 let chatbotBottom = sessionStorage.getItem("chatbotBottom");
 let chatbotH = sessionStorage.getItem("chatbotH");
 let chatbotRight = sessionStorage.getItem("chatbotRight");
+let chatbotBottomPc = sessionStorage.getItem("chatbotBottomPc");
+let chatbotRightPc = sessionStorage.getItem("chatbotRightPc");
+let chatbotBottomSp = sessionStorage.getItem("chatbotBottomSp");
+let chatbotRightSp = sessionStorage.getItem("chatbotRightSp");
 let chatbotW = sessionStorage.getItem("chatbotW");
 let scenarioId = "";
 
@@ -904,6 +908,255 @@ const setChatbotConversionParamsToLocalStorage = (data) => {
 }
 
 let globalIframe;
+
+const resolveOffsetPx = (primaryValue, fallbackValue, defaultValue = 0) => {
+  const primaryParsed = parseInt(primaryValue, 10);
+  if (Number.isFinite(primaryParsed)) return primaryParsed;
+
+  const fallbackParsed = parseInt(fallbackValue, 10);
+  if (Number.isFinite(fallbackParsed)) return fallbackParsed;
+
+  return defaultValue;
+}
+
+const parseHorizontalMarginRule = (value) => {
+  if (value === undefined || value === null) return null;
+
+  const raw = String(value).trim();
+  if (!raw) return null;
+
+  const widthExpr = /^(?:width|innerwidth|innerWidth|clientwidth|clientWidth)\s*\(\s*\)\s*-\s*(\d+)\s*$/i;
+  const match = raw.match(widthExpr);
+  if (match) {
+    const leftPx = parseInt(match[1], 10);
+    return Number.isFinite(leftPx)
+      ? { mode: "left", leftPx, rightPx: 0 }
+      : null;
+  }
+
+  const leadingNumber = parseInt(raw, 10);
+  if (Number.isFinite(leadingNumber)) {
+    const normalized = raw.replace(/^0+(\d)/, "$1");
+    const looksNumeric =
+      /^-?\d+$/.test(raw) ||
+      normalized.startsWith(String(leadingNumber)) ||
+      raw.startsWith(String(leadingNumber));
+
+    if (looksNumeric) {
+      if (leadingNumber < 0) {
+        return { mode: "left", leftPx: Math.abs(leadingNumber), rightPx: 0 };
+      }
+      return { mode: "right", rightPx: leadingNumber, leftPx: 0 };
+    }
+  }
+
+  return null;
+}
+
+const resolveHorizontalMarginRule = (primaryValue, fallbackValue) => {
+  return (
+    parseHorizontalMarginRule(primaryValue) ||
+    parseHorizontalMarginRule(fallbackValue) ||
+    { mode: "right", rightPx: 0, leftPx: 0 }
+  );
+}
+
+const applyIframeHorizontalAnchor = (iframe, rule) => {
+  if (!iframe || !rule) return;
+
+  if (rule.mode === "left") {
+    iframe.style.setProperty("left", `${rule.leftPx}px`, "important");
+    iframe.style.setProperty("right", "auto", "important");
+    return;
+  }
+
+  iframe.style.setProperty("right", `${rule.rightPx}px`, "important");
+  iframe.style.setProperty("left", "auto", "important");
+}
+
+const resetIframeHorizontalForFullBleed = (iframe) => {
+  if (!iframe) return;
+  iframe.style.setProperty("left", "0px", "important");
+  iframe.style.setProperty("right", "0px", "important");
+}
+
+const getMobileCloseOffsets = () => {
+  return {
+    horizontal: resolveHorizontalMarginRule(chatbotRightSp, chatbotRight),
+    bottom: resolveOffsetPx(chatbotBottomSp, chatbotBottom, 0),
+  };
+}
+
+const getDesktopOffsets = () => {
+  return {
+    horizontal: resolveHorizontalMarginRule(chatbotRightPc, chatbotRight),
+    bottom: resolveOffsetPx(chatbotBottomPc, chatbotBottom, 0),
+  };
+}
+
+const getUseMobileFullwidth = (messageData) => {
+  if (typeof messageData.useMoblieFullwidth === 'boolean') {
+    return messageData.useMoblieFullwidth;
+  }
+  return sessionStorage.getItem("useFullwidthChatbotMobile") === "true";
+}
+
+const getClosedContentDimensions = (messageData, useMoblieFullwidth) => {
+  const width = messageData?.closedContentWidth;
+  const height = messageData?.closedContentHeight;
+
+  if (width !== undefined && width !== null && width !== ''
+    && height !== undefined && height !== null && height !== '') {
+    return { width, height };
+  }
+
+  if (mobileCheck()) {
+    if (useMoblieFullwidth) {
+      return { width: '100%', height: 85 };
+    }
+    return { width: 250, height: 58 };
+  }
+
+  return { width: 400, height: 85 };
+}
+
+const getHorizontalOffsetPx = (rule) => {
+  if (!rule) return 0;
+  if (rule.mode === 'left') return rule.leftPx || 0;
+  return rule.rightPx || 0;
+}
+
+const formatClosedIframeSize = (contentDimensions, horizontalRule, bottomPx) => {
+  if (typeof contentDimensions.width === 'string') {
+    return {
+      width: contentDimensions.width,
+      height: typeof contentDimensions.height === 'number'
+        ? `${contentDimensions.height}px`
+        : contentDimensions.height,
+    };
+  }
+
+  const horizontalOffset = getHorizontalOffsetPx(horizontalRule);
+  return {
+    width: `${horizontalOffset + contentDimensions.width}px`,
+    height: `${bottomPx + contentDimensions.height}px`,
+  };
+}
+
+const getOpenDimensions = (messageData, isMobileDevice) => {
+  if (isMobileDevice) {
+    const widthSp = parseInt(messageData?.widthSp ?? chatbotW, 10);
+    const heightSp = parseInt(messageData?.heightSp ?? chatbotH, 10);
+    const widthValue = Number.isFinite(widthSp) ? widthSp : 100;
+    const heightValue = Number.isFinite(heightSp) ? heightSp : 100;
+    return {
+      width: widthValue >= 100 ? '100%' : `${widthValue}%`,
+      height: heightValue >= 100 ? '100%' : `${heightValue}%`,
+    };
+  }
+
+  const widthPc = parseInt(messageData?.widthPc ?? chatbotW, 10);
+  const heightPc = parseInt(messageData?.heightPc ?? chatbotH, 10);
+  return {
+    width: Number.isFinite(widthPc) ? widthPc : 450,
+    height: Number.isFinite(heightPc) ? heightPc : 700,
+  };
+}
+
+const formatOpenIframeSize = (openDimensions, horizontalRule, bottomPx, isMobileDevice) => {
+  if (isMobileDevice) {
+    return {
+      width: openDimensions.width,
+      height: openDimensions.height,
+    };
+  }
+
+  const horizontalOffset = getHorizontalOffsetPx(horizontalRule);
+  return {
+    width: `${horizontalOffset + openDimensions.width}px`,
+    height: `${bottomPx + openDimensions.height}px`,
+  };
+}
+
+const applyIframeLayout = (iframe, width, height, options = {}) => {
+  iframe.width = width;
+  iframe.height = height;
+  iframe.style.setProperty("width", width, "important");
+  iframe.style.setProperty("height", height, "important");
+
+  if (options.bottom !== undefined) {
+    iframe.style.setProperty("bottom", options.bottom, "important");
+  }
+
+  if (options.resetHorizontal) {
+    resetIframeHorizontalForFullBleed(iframe);
+    return;
+  }
+
+  if (options.horizontalRule) {
+    applyIframeHorizontalAnchor(iframe, options.horizontalRule);
+  }
+}
+
+const resizeIframeFromMessage = (iframe, messageData) => {
+  if (messageData.isOpen === undefined) return;
+
+  const useMoblieFullwidth = getUseMobileFullwidth(messageData);
+
+  if (messageData.isOpen && mobileCheck()) {
+    const openDimensions = getOpenDimensions(messageData, true);
+    applyIframeLayout(iframe, openDimensions.width, openDimensions.height, {
+      bottom: '0px',
+      resetHorizontal: true,
+    });
+    return;
+  }
+
+  if (messageData.isOpen) {
+    const desktopOpenOffsets = getDesktopOffsets();
+    const openDimensions = getOpenDimensions(messageData, false);
+    const formatted = formatOpenIframeSize(
+      openDimensions,
+      desktopOpenOffsets.horizontal,
+      desktopOpenOffsets.bottom,
+      false,
+    );
+    applyIframeLayout(iframe, formatted.width, formatted.height, {
+      bottom: '0px',
+      horizontalRule: desktopOpenOffsets.horizontal,
+    });
+    return;
+  }
+
+  if (!messageData.isOpen && mobileCheck()) {
+    const mobileOffsets = getMobileCloseOffsets();
+    const contentDimensions = getClosedContentDimensions(messageData, useMoblieFullwidth);
+    const formatted = formatClosedIframeSize(
+      contentDimensions,
+      mobileOffsets.horizontal,
+      mobileOffsets.bottom,
+    );
+    applyIframeLayout(iframe, formatted.width, formatted.height, {
+      bottom: `${mobileOffsets.bottom}px`,
+      horizontalRule: mobileOffsets.horizontal,
+    });
+    return;
+  }
+
+  if (!messageData.isOpen) {
+    const desktopCloseOffsets = getDesktopOffsets();
+    const contentDimensions = getClosedContentDimensions(messageData, useMoblieFullwidth);
+    const formatted = formatClosedIframeSize(
+      contentDimensions,
+      desktopCloseOffsets.horizontal,
+      desktopCloseOffsets.bottom,
+    );
+    applyIframeLayout(iframe, formatted.width, formatted.height, {
+      bottom: '0px',
+      horizontalRule: desktopCloseOffsets.horizontal,
+    });
+  }
+}
 
 const sendMessageToChatbot = (contentMessage, action) => {
   let data = {action: action, actionData: contentMessage};
@@ -1128,26 +1381,34 @@ const displayPopup = async () => {
   };
 
   let iframe = document.createElement("iframe");
+  const isMobile = mobileCheck();
+  const mobileCloseOffsets = getMobileCloseOffsets();
+  const desktopOffsets = getDesktopOffsets();
 
-  if (mobileCheck()) {
+  if (isMobile) {
     iframe.width = "100%";
     iframe.style.maxWidth = "100%";
-    iframe.style.right = "0";
+    applyIframeHorizontalAnchor(iframe, mobileCloseOffsets.horizontal);
   } else {
-    iframe.width =
-      chatbotW && chatbotRight
-        ? `${parseInt(chatbotW) + parseInt(chatbotRight)}px`
-        : "360px";
-    iframe.style.right = "10px";
+    const initialClosedSize = formatClosedIframeSize(
+      getClosedContentDimensions({}, false),
+      desktopOffsets.horizontal,
+      desktopOffsets.bottom,
+    );
+    iframe.width = initialClosedSize.width;
+    applyIframeHorizontalAnchor(iframe, desktopOffsets.horizontal);
   }
 
   iframe.id = "previewSdk";
   iframe.style.position = "fixed";
-  iframe.style.bottom = "0";
-  iframe.height =
-    chatbotH && chatbotBottom
-      ? `${parseInt(chatbotH) + parseInt(chatbotBottom)}px`
-      : "0px";
+  iframe.style.setProperty("bottom", isMobile ? `${mobileCloseOffsets.bottom}px` : "0px", "important");
+  iframe.height = isMobile
+    ? `${mobileCloseOffsets.bottom + getClosedContentDimensions({}, getUseMobileFullwidth({})).height}px`
+    : formatClosedIframeSize(
+      getClosedContentDimensions({}, false),
+      desktopOffsets.horizontal,
+      desktopOffsets.bottom,
+    ).height;
 
   iframe.style.border = "none";
   iframe.style.padding = "0";
@@ -1191,10 +1452,14 @@ const displayPopup = async () => {
     async (e) => {
       if (typeof e.data !== 'object') return;
       if (e.data.source !== 'ec-chatbot') return;
-      if (e.data.widthPc) chatbotW = e.data.widthPc;
-      if (e.data.heightPc) chatbotH = e.data.heightPc;
-      if (e.data.chatbotRight) chatbotRight = e.data.chatbotRight;
-      if (e.data.chatbotBottom) chatbotBottom = e.data.chatbotBottom;
+      if (e.data.widthPc !== undefined && e.data.widthPc !== null) chatbotW = e.data.widthPc;
+      if (e.data.heightPc !== undefined && e.data.heightPc !== null) chatbotH = e.data.heightPc;
+      if (e.data.chatbotRightPc !== undefined && e.data.chatbotRightPc !== null) chatbotRightPc = e.data.chatbotRightPc;
+      if (e.data.chatbotBottomPc !== undefined && e.data.chatbotBottomPc !== null) chatbotBottomPc = e.data.chatbotBottomPc;
+      if (e.data.chatbotRightSp !== undefined && e.data.chatbotRightSp !== null) chatbotRightSp = e.data.chatbotRightSp;
+      if (e.data.chatbotBottomSp !== undefined && e.data.chatbotBottomSp !== null) chatbotBottomSp = e.data.chatbotBottomSp;
+      if (e.data.chatbotRight !== undefined && e.data.chatbotRight !== null) chatbotRight = e.data.chatbotRight;
+      if (e.data.chatbotBottom !== undefined && e.data.chatbotBottom !== null) chatbotBottom = e.data.chatbotBottom;
 
       switch (e.data.action) {
         case CHATBOT_ACTIONS.FUKUSHASHIKI:
@@ -1271,45 +1536,8 @@ const displayPopup = async () => {
 
       if (e.data.isOpen === undefined) return;
 
-      if (e.data.isOpen && mobileCheck()) {
-        iframe.width = "100%";
-        // iframe.height = "620px";
-        iframe.height = "100%";
-        iframe.style.setProperty("width", "100%", "important");
-        iframe.style.setProperty("height", "100%", "important");
-        iframe.style.bottom = "0px";
-        iframe.style.right = "0px";
-      } else if (e.data.isOpen) {
-        let w = chatbotW && (chatbotRight !== null) ? `${parseInt(chatbotW) + parseInt(chatbotRight)}px` : "460px";
-        let h = chatbotH && (chatbotBottom !== null) ? `${parseInt(chatbotH) + parseInt(chatbotBottom)}px` : "700px";
-        iframe.width = w;
-        iframe.height = h;
-        iframe.style.setProperty("width", w, "important");
-        iframe.style.setProperty("height", h, "important");
-        iframe.style.bottom = "0px";
-        iframe.style.right = "0px";
-      } else if (!e.data.isOpen && mobileCheck()) {
-        const useMoblieFullwidth = (typeof e.data.useMoblieFullwidth === 'boolean')
-          ? e.data.useMoblieFullwidth
-          : (sessionStorage.getItem("useFullwidthChatbotMobile") === "true");
-        let w = useMoblieFullwidth ? "100%" : "250px";
-        let h = useMoblieFullwidth ? "85px" : "58px";
-        iframe.width = w;
-        iframe.height = h;
-        iframe.style.setProperty("width", w, "important");
-        iframe.style.setProperty("height", h, "important");
-        iframe.style.bottom = "0px";
-        iframe.style.right = "0px";
-      } else if (!e.data.isOpen) {
-        let w = chatbotRight ? `${parseInt(chatbotRight) + 400}px` : "400px";
-        let h = chatbotBottom ? `${parseInt(chatbotBottom) + 85}px` : "85px";
-        iframe.width = w;
-        iframe.height = h;
-        iframe.style.setProperty("width", w, "important");
-        iframe.style.setProperty("height", h, "important");
-        iframe.style.bottom = "0px";
-        iframe.style.right = "0px";
-      }
+      resizeIframeFromMessage(iframe, e.data);
+
       iframe.style.width = `${iframe.width} !important`;
       iframe.style.height = `${iframe.height} !important`;
       if (e.data.isOpen && mobileCheck() && !e.data.isUpsell) {

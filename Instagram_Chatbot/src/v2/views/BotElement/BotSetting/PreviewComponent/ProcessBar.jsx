@@ -33,7 +33,6 @@ const ProcessBar = ({
     <div
       id="sp-process-bar"
       className="sp-process-bar"
-      style={{ backgroundColor: botInfor?.opacity_color }}
     >
       <div
         className="sp-process-bar-color animation"

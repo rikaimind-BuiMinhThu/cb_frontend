@@ -171,6 +171,10 @@
 .sp-header-right-arrow {
     color: #fff;
     font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
 
 .sp-process-bar {
@@ -873,17 +877,20 @@ slideUp
         padding: 15px;
     }
     .sp-header-left-bt {
-        width: 60px;
-        height: 60px;
+        width: 58px;
+        height: 58px;
         display: flex;
         align-items: center;
         justify-content: center;
+        flex-shrink: 0;
     }
     #comment_bubble {
         width: 240px;
         height: 46px;
         background: #fff;
         position: relative;
+        display: flex;
+        align-items: center;
         -moz-border-radius: 12px;
         -webkit-border-radius: 12px;
         border-radius: 23px;
@@ -903,7 +910,8 @@ slideUp
         width: 0;
         height: 0;
         right: 92%;
-        top: 13px;
+        top: 50%;
+        transform: translateY(-50%);
         position: absolute;
         border-top: 9px solid transparent;
         border-right: 26px solid #fff;
@@ -947,7 +955,7 @@ slideUp
         display: block;
     }
     .sp-avatar-bt {
-        width: 65px;
+        width: 58px;
     }
     .sp-avatar-bt img {
         border-radius: 50%;

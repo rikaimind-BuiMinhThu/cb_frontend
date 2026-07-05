@@ -35,7 +35,11 @@ import {
   DISPLAY_TYPES,
 } from "./PreviewComponent/Constants";
 import { injectBotThemeCss } from "utils/chatbotThemeCss";
-import { COLOR_MAP } from "views/BotElement/BotSetting/DesignSetting/constants/designChatbotConstants";
+import { COLOR_MAP } from "v2/views/BotElement/BotSetting/DesignSetting/constants/designChatbotConstants";
+import {
+  parseDesignSettings,
+  resolveMainColorContext,
+} from "v2/views/BotElement/BotSetting/DesignSetting/utils/designChatbotUtils";
 import {
   getAllUrlParams,
   lightenColor,
@@ -85,6 +89,7 @@ import { resolveErrMsgLpScript } from "./ScenarioSetting/utils/resolveErrMsgLpSc
 import { generateLaunchButtonLpScript } from "./ScenarioSetting/utils/launchButtonLpScriptUtils";
 import { convertToFukushashikiObject } from "./PreviewFukushashiki/FukushashikiDataConverterUtils";
 import { handleValidateField } from "./PreviewFukushashiki/ValidationUtils";
+import { getClosedLauncherPosition } from "v2/utils/sdkLayoutUtils";
 import { createOrAddLinesCart } from "./ShopifyUtils";
 
 const clearChatbotState = () => {
@@ -199,6 +204,7 @@ const PreviewFukushashiki = () => {
   const [timerChanges, setTimerChanges] = useState({ timeLeft: -1, config: null });
   const containerRef = useRef(null);
   const hasSentCustomJs = useRef(false);
+  const hasSentInitialOpenStateToParent = useRef(false);
   const [msgUpdateState, setMsgUpdateState] = useState({});
   const msgUpdateStateRef = useRef({});
   useEffect(() => { 
@@ -287,26 +293,32 @@ const PreviewFukushashiki = () => {
       .then((response) => {
         if (!response.data.data) return;
 
-        const result = JSON.parse(response.data.data?.design_settings);
+        const { mainColorHex, apiColorKey } = resolveMainColorContext(response.data.data);
+        const parsedDesign = parseDesignSettings(
+          response.data.data?.design_settings,
+          mainColorHex,
+          apiColorKey,
+        );
         const newState = {
-          activePopupCloseBot: result?.popup_close_bot ? true : false,
-          titleBubble: result?.title_bubble ? result?.title_bubble : "簡単90秒で注文完了",
-          displayType: result?.display_type,
-          widthPc: result?.width_pc ? result?.width_pc : 450,
-          heightPc: result?.height_pc ? result?.height_pc : 700,
-          widthSp: result?.width_sp ? result?.width_sp : 100,
-          heightSp: result?.height_sp ? result?.height_sp : 100,
-          positionPc: result?.position_pc ? result?.position_pc : "1",
+          activePopupCloseBot: parsedDesign.popupCloseBot,
+          titleBubble: parsedDesign.titleBubble || "簡単90秒で注文完了",
+          displayType: parsedDesign.displayType,
+          widthPc: parsedDesign.widthPc,
+          heightPc: parsedDesign.heightPc,
+          widthSp: parsedDesign.widthSp,
+          heightSp: parsedDesign.heightSp,
+          positionPc: String(parsedDesign.positionPc),
           isOpen: state.isOpen,
-          rightPcTitle: result?.right_position_pc_title,
-          buttonTypePc: result?.button_type_pc ? result?.button_type_pc : "1",
-          rightMarginPc: result?.right_margin_pc ? result?.right_margin_pc : 10,
-          bottomMarginPc: result?.bottom_margin_pc ? result?.bottom_margin_pc : 0,
-          positionSp: result?.position_sp ? result?.position_sp : "1",
-          buttonTypeSp: result?.button_type_sp ? result?.button_type_sp : "1",
-          rightSpTitle: result?.right_position_sp_title,
-          rightMarginSp: result?.right_margin_sp,
-          bottomMarginSp: result?.bottom_margin_sp,
+          rightPcTitle: parsedDesign.rightPcTitle,
+          buttonTypePc: String(parsedDesign.buttonTypePc),
+          rightMarginPc: parsedDesign.rightMarginPc,
+          bottomMarginPc: parsedDesign.bottomMarginPc,
+          positionSp: String(parsedDesign.positionSp),
+          buttonTypeSp: String(parsedDesign.buttonTypeSp),
+          rightSpTitle: parsedDesign.rightSpTitle,
+          rightMarginSp: parsedDesign.rightMarginSp,
+          bottomMarginSp: parsedDesign.bottomMarginSp,
+          themeSettings: parsedDesign.themeSettings,
         };
 
         dispatch({ type: PREVIEW_ACTIONS.SET_CHATBOT_SETTINGS, payload: newState });
@@ -438,19 +450,23 @@ const PreviewFukushashiki = () => {
     }
   }, [])
 
-  // post message to parent window
+  // Initial sync: parent SDK needs layout payload before first user interaction.
   useEffect(() => {
+    if (hasSentInitialOpenStateToParent.current) return;
+    if (!state.loadedStateFromSession) return;
+    if (!state.botInfor) return;
+    if (typeof state.isOpen !== "boolean") return;
+    if (!state.deviceReceive || !state.urlReceive) return;
+
+    postMessageToParent({ isOpen: state.isOpen }, state);
+    hasSentInitialOpenStateToParent.current = true;
+  }, [state.loadedStateFromSession, state.botInfor, state.isOpen, state.deviceReceive, state.urlReceive]);
+
+  // post message to parent window when layout changes after initial sync
+  useEffect(() => {
+    if (!hasSentInitialOpenStateToParent.current) return;
     if (!state.urlReceive) return;
-    const options = {
-      isOpen: state.isOpen,
-      widthPc: state.widthPc,
-      heightPc: state.heightPc,
-      widthSp: state.widthSp,
-      heightSp: state.heightSp,
-      chatbotRight: state.rightMarginPc,
-      chatbotBottom: state.bottomMarginPc,
-    };
-    postMessageToParent(options, state);
+    postMessageToParent({ isOpen: state.isOpen }, state);
   }, [
     state.urlReceive,
     state.isOpen,
@@ -459,7 +475,14 @@ const PreviewFukushashiki = () => {
     state.widthSp,
     state.heightSp,
     state.rightMarginPc,
-    state.bottomMarginPc
+    state.bottomMarginPc,
+    state.rightMarginSp,
+    state.bottomMarginSp,
+    state.positionPc,
+    state.positionSp,
+    state.buttonTypePc,
+    state.buttonTypeSp,
+    state.useFullWidthChatbotMobile,
   ]);
 
   // Get prefectures
@@ -517,14 +540,7 @@ const PreviewFukushashiki = () => {
 
   useEffect(() => {
     if (!state.botInfor) return;
-    const chatbot = state.botInfor;
-    const apiColorKey = chatbot.main_color && !String(chatbot.main_color).startsWith('#')
-      ? chatbot.main_color
-      : null;
-    const mainColorHex = chatbot.main_color_other
-      || COLOR_MAP[chatbot.main_color]
-      || chatbot.main_color
-      || '#327AED';
+    const { apiColorKey, mainColorHex } = resolveMainColorContext(state.botInfor);
     injectBotThemeCss(state.themeSettings, mainColorHex, apiColorKey);
   }, [state.themeSettings, state.botInfor]);
 
@@ -850,33 +866,39 @@ const PreviewFukushashiki = () => {
   const extractStateFromPreviewResponse = async (res) => {
     if (!res || !res.data || res.data.code !== 1) return;
 
-    const designSetting = res.data.design_settings;
     const chatbot = res.data.chatbot;
     const conversation = res.data.data?.conversation;
+    const { apiColorKey, mainColorHex } = resolveMainColorContext(chatbot);
+    const parsedDesign = parseDesignSettings(
+      res.data.design_settings,
+      mainColorHex,
+      apiColorKey,
+    );
+    const shouldAutoOpen = Number(parsedDesign.displayType) === DISPLAY_TYPES.RELOAD;
     let newState = {
       ...state,
       botInfor: getBotInforFromPreviewResponse(res),
       objParam: {},
       loadedStateFromSession: true,
       messagesList: _.cloneDeep(conversation?.messages || []),
-      isOpen: designSetting?.display_type && Number(designSetting?.display_type) === 1 || state.isOpen,
-      activePopupCloseBot: Boolean(designSetting?.popup_close_bot),
-      titleBubble: designSetting?.title_bubble || "簡単90秒で注文完了",
-      displayType: designSetting?.display_type,
-      widthPc: designSetting?.width_pc || 450,
-      heightPc: designSetting?.height_pc || 700,
-      widthSp: designSetting?.width_sp || 100,
-      heightSp: designSetting?.height_sp || 100,
-      positionPc: designSetting?.position_pc || "1",
-      rightPcTitle: designSetting?.right_position_pc_title,
-      buttonTypePc: designSetting?.button_type_pc || "1",
-      rightMarginPc: designSetting?.right_margin_pc || 10,
-      bottomMarginPc: designSetting?.bottom_margin_pc || 0,
-      positionSp: designSetting?.position_sp || "1",
-      buttonTypeSp: designSetting?.button_type_sp || "1",
-      rightSpTitle: designSetting?.right_position_sp_title,
-      rightMarginSp: designSetting?.right_margin_sp,
-      bottomMarginSp: designSetting?.bottom_margin_sp,
+      isOpen: shouldAutoOpen ? true : Boolean(state.isOpen),
+      activePopupCloseBot: parsedDesign.popupCloseBot,
+      titleBubble: parsedDesign.titleBubble || "簡単90秒で注文完了",
+      displayType: parsedDesign.displayType,
+      widthPc: parsedDesign.widthPc,
+      heightPc: parsedDesign.heightPc,
+      widthSp: parsedDesign.widthSp,
+      heightSp: parsedDesign.heightSp,
+      positionPc: String(parsedDesign.positionPc),
+      rightPcTitle: parsedDesign.rightPcTitle,
+      buttonTypePc: String(parsedDesign.buttonTypePc),
+      rightMarginPc: parsedDesign.rightMarginPc,
+      bottomMarginPc: parsedDesign.bottomMarginPc,
+      positionSp: String(parsedDesign.positionSp),
+      buttonTypeSp: String(parsedDesign.buttonTypeSp),
+      rightSpTitle: parsedDesign.rightSpTitle,
+      rightMarginSp: parsedDesign.rightMarginSp,
+      bottomMarginSp: parsedDesign.bottomMarginSp,
       isUsedErrMsgByJs: chatbot?.is_used_err_msg_by_js,
       errMsgJsCode: chatbot?.err_msg_js_code,
       errMsgSettingMode: chatbot?.err_msg_setting_mode || 'js',
@@ -896,7 +918,7 @@ const PreviewFukushashiki = () => {
       bottomBodyCustomJsCode: chatbot?.bottom_body_custom_js_code,
       isUsedCustomCss: !!chatbot?.is_used_custom_css,
       customCssContent: chatbot?.custom_css_content,
-      themeSettings: designSetting?.theme || null,
+      themeSettings: parsedDesign.themeSettings,
     };
 
     if (chatbot?.timer_config?.enable) {
@@ -906,7 +928,7 @@ const PreviewFukushashiki = () => {
 
     const prevOpenStatus = getPrevOpenStatus();
 
-    if (designSetting.display_type == DISPLAY_TYPES.RELOAD && prevOpenStatus == "0") {
+    if (parsedDesign.displayType == DISPLAY_TYPES.RELOAD && prevOpenStatus == "0") {
       savePrevOpenStatus("1");
       sendOpenChatbotCountRequest(state.scenarioId, state.deviceReceive);
     }
@@ -1484,8 +1506,7 @@ const PreviewFukushashiki = () => {
           alignItems: "center",
           justifyContent: "center",
           position: 'fixed',
-          bottom: state.bottomMarginPc ? `${state.bottomMarginPc}px` : '10px',
-          right: state.rightMarginPc ? `${state.rightMarginPc}px` : '0px',
+          ...getClosedLauncherPosition(state),
         }}
       >
         <img
@@ -1501,7 +1522,6 @@ const PreviewFukushashiki = () => {
         onClick={() => onOpenPreview(!state.isOpen)}
         style={{
           backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
-          // width: `${widthPc}px`,
           width: `360px`,
           height: "66px",
           borderRadius: '35px',
@@ -1511,9 +1531,7 @@ const PreviewFukushashiki = () => {
           paddingLeft: '3px',
           paddingRight: '3px',
           position: 'fixed',
-          padding: 'auto',
-          bottom: state.bottomMarginPc ? `${state.bottomMarginPc}px` : '10px',
-          right: state.rightMarginPc ? `${state.rightMarginPc}px` : '0px',
+          ...getClosedLauncherPosition(state),
         }}
       >
         <div className="sp-header-left-bt" onClick={() => onOpenPreview(!state.isOpen)}>
@@ -1521,8 +1539,8 @@ const PreviewFukushashiki = () => {
             <img src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`} alt="bot-header-icon" />
           </div>
         </div>
-        <div style={{ alignItems: 'center', justifyContent: "center", padding: 'auto' }}>
-          <div id="comment_bubble" style={{ display: 'flex', alignItems: 'center', paddingLeft: '20px', paddingTop: '3px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, minWidth: 0 }}>
+          <div id="comment_bubble" style={{ paddingLeft: '20px' }}>
             <span style={{ fontSize: '18px', fontWeight: 900 }}>{state.botInfor.title}</span>
           </div>
         </div>
@@ -1544,8 +1562,7 @@ const PreviewFukushashiki = () => {
           justifyContent: "left",
           position: 'fixed',
           transform: ' rotate(-90deg)',
-          bottom: state.bottomMarginPc ? `${parseInt(state.bottomMarginPc) + state.widthPc / 2}px` : '20px',
-          right: `${-120}px`,
+          ...getClosedLauncherPosition(state, { variant: 'vertical' }),
         }}
       >
         <div className="sp-header-left" onClick={() => onOpenPreview(!state.isOpen)}>
