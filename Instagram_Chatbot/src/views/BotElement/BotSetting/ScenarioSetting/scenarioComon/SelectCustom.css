@@ -32,27 +32,6 @@
   width: 100%;
 }
 
-.select-custom-antd.ss-select--half {
-  width: 49%;
-}
-
-.select-custom-antd.ss-select--full-mr {
-  width: 100%;
-  margin-right: 10px;
-}
-
-.select-custom-native.ss-select--half {
-  width: 49%;
-}
-
-.select-custom-native.ss-select--full {
-  width: 100%;
-}
-
-.select-custom-label--full {
-  width: 100%;
-}
-
 .select-custom-not-found {
   height: 90px;
   display: flex;

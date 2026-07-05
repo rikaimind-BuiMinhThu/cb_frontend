@@ -1,117 +1,1476 @@
-import React from 'react';
-import { Tabs } from 'antd';
-import { Link } from 'react-router-dom';
-import Cookies from 'js-cookie';
-import ModalNoti from '../../../Popup/ModalNoti';
-import './../../../../assets/css/bot/bot-setting.css';
-import './../../../../assets/css/bot/add-bot.css';
-import { TAB_BASIC, TAB_DESIGN, TAB_THEME } from './constants/designChatbotConstants';
-import ThemeCustomizeTab from './components/ThemeCustomizeTab';
-import useDesignChatbot from './hooks/useDesignChatbot';
-import useChatbotPreview from './hooks/useChatbotPreview';
-import BasicInfoTab from './components/BasicInfoTab';
-import DesignCustomizeTab from './components/DesignCustomizeTab';
-import ChatbotPreview from './components/ChatbotPreview';
-import { AdminPage } from '../../../../components/AdminShell';
+import { Card, CardHeader, CardBody, Table, Row, Col } from "reactstrap";
+import "./../../../../assets/css/bot/bot-setting.css";
+// icons
+import InputNum from '../ScenarioSetting/scenarioComon/InputNum';
+import IconManDefault from "./../../../../assets/img/bot-icon/man1_new.png";
+import IconWomenDefault from "./../../../../assets/img/bot-icon/women1_new.png";
+import IconWomen4 from "./../../../../assets/img/bot-icon/women4_new.png";
+import IconWomen5 from "./../../../../assets/img/bot-icon/women5_new.png";
+import IconWomen6 from "./../../../../assets/img/bot-icon/women6_new.png";
+import IconWomen7 from "./../../../../assets/img/bot-icon/women7_new.png";
+import IconWomen8 from "./../../../../assets/img/bot-icon/women8_new.png";
+import IconWomen9 from "./../../../../assets/img/bot-icon/women9_new.png";
+import IconWomen10 from "./../../../../assets/img/bot-icon/women10_new.png";
+import IconWomen11 from "./../../../../assets/img/bot-icon/women11_new.png";
+import React, { useEffect, useState } from "react";
+import "./../../../../assets/css/bot/add-bot.css";
+import api from "../../../../api/api-management";
+import ModalNoti from "../../../Popup/ModalNoti";
+import { Link } from "react-router-dom";
+import { tokenExpired } from "api/tokenExpired";
+import Cookies from "js-cookie";
+import { MDBIcon } from "mdbreact";
+import { any } from "prop-types";
+import DesignBotIcons from "./DesignSettingComponents/DesignBotIcons";
 
+const colors = [
+  "#327AED",
+  "#26B197",
+  "#fC7E02",
+  "#F6CA21",
+  "#F16FAA",
+  "#8C66D9",
+  "#7C8290",
+  "#D8E2EF",
+];
+
+const images = [
+  IconManDefault,
+  IconWomenDefault,
+  IconWomen4,
+  IconWomen5,
+  IconWomen6,
+  IconWomen7,
+  IconWomen8,
+  IconWomen9,
+  IconWomen10,
+  IconWomen11,
+];
 function DesignChatbot() {
-  const botId = Cookies.get('bot_id');
-  const { state, actions } = useDesignChatbot(botId);
-  const preview = useChatbotPreview(state.designSettings);
+  const [tabmenu, setTabmenu] = useState(1);
+  const [title, setTitle] = useState("");
+  const [subtitle, setSubtitle] = useState("");
+  const [designType, setDesignType] = useState("flat");
+  const [botImage, setBotImage] = useState(""); // Message icon
+  const [openingBotIcon, setOpeningBotIcon] = useState(""); // Icon of bot in header when opening
+  const [closingBotIcon, setClosingBotIcon] = useState(""); // Icon of bot in header when closing
+  const [botName, setBotName] = useState("");
+  const [isOpenNoti, setIsOpenNoti] = useState(false);
+  const [msgNoti, setMsgNoti] = useState("");
+  const [isOpenPreview, setIsOpenPreview] = useState(false);
+  const [mainColor, setMainColor] = useState("#327AED");
+  const [botId, setBotId] = useState(Cookies.get("bot_id"));
+  const [buttonTypePc, setButtonTypePc] = useState(1);
+  const [positionPc, setPositionPc] = useState(1);
+  const [widthPc, setWidthPc] = useState(380);
+  const [heightPc, setHeightPc] = useState(620);
+  const [widthSp, setWidthSp] = useState(100);
+  const [heightSp, setHeightSp] = useState(100);
+  const [rightPcTitle, setRightPcTitle] = useState("");
+  const [positionSp, setPositionSp] = useState(1);
+  const [buttonTypeSp, setButtonTypeSp] = useState(1);
+  const [rightMarginPc, setRightMarginPc] = useState(10);
+  const [bottomMarginPc, setBottomMarginPc] = useState(10);
+  const [displayType, setDisplayType] = useState(1);
+  const [rightSpTitle, setRightSpTitle] = useState("");
+  const [rightMarginSp, setRightMarginSp] = useState(10);
+  const [bottomMarginSp, setBottomMarginSp] = useState(10);
+  const [cbImage, setCbImage] = useState("");
+  const [popupCloseBot, setPopupCloseBot] = useState(false);
+  const [titleBubble, setTitleBubble] = useState("");
+  const [isOpenPreviewBot, setIsOpenPreviewBot] = useState(true);
 
-  const handlePreview = () => {
-    preview.handlePreview(actions.validateForPreview);
+  // design type: handle click
+  const designTypeClick = (e) => {
+    let value = "";
+    if (e.target.innerText === "ポップ") {
+      value = "pop";
+    } else if (e.target.innerText === "フラット") {
+      value = "flat";
+    } else if (e.target.innerText === "マテリアル") {
+      value = "material";
+    }
+    setDesignType(value);
+    const typeActive = document.querySelector(".design-types .type.active");
+    typeActive.classList.remove("active");
+    if (e.target.localName !== "div") {
+      e.target.offsetParent.classList.add("active");
+    } else {
+      e.target.classList.add("active");
+    }
+  };
+  // color: handle click
+  const handleColorClick = (index, color) => {
+    if (color) {
+      setMainColor(color);
+    } else {
+      const customColor = document.querySelector('#custom-color')
+      customColor.click()
+    }
+    document
+      .querySelector(".main-colors .color.active")
+      ?.classList?.remove("active");
+    document
+      .querySelector(`.main-colors .color.color-${index}`)
+      .classList.add("active");
   };
 
-  if (!state.isLoaded) {
-    return null;
+  // icon: handle click
+  const handleIconClick = (index, imageDefault) => {
+    document.querySelector(".icons .icon.active")?.classList?.remove("active");
+    document
+      .querySelector(`.icons .icon.icon-${index}`)
+      .classList.add("active");
+    if (!imageDefault.includes("image/png;base64")) {
+      toDataURL(imageDefault).then((dataUrl) => {
+        setBotImage(dataUrl);
+      });
+    } else {
+      setBotImage(imageDefault);
+    }
+  };
+
+  const handleIconClickForType = (index, imageDefault, type) => {
+    if (!imageDefault.includes("image/png;base64")) {
+      toDataURL(imageDefault).then((dataUrl) => {
+        setBotIcon(type, dataUrl);
+      });
+    } else {
+      setBotIcon(type, imageDefault);
+    }
+  };
+
+
+  const setBotIcon = (type, url) => {
+    const methodMap = {
+      bot: (url) => setBotImage(url),
+      opening: (url) => setOpeningBotIcon(url),
+      closing: (url) => setClosingBotIcon(url),
+      bot_image: (url) => setBotImage(url),
+      opening_bot_icon: (url) => setOpeningBotIcon(url),
+      closing_bot_icon: (url) => setClosingBotIcon(url),
+    }
+    methodMap[type]?.(url);
   }
 
+  const handleRemoveImage = (type) => () => {
+    setBotIcon(type, null);
+  }
+
+  // get base url image add
+  const getBaseUrlAdd = (iconType) => (e) => {
+    const file = e.target.files[0];
+    e.target.value = null;
+
+    if (
+      file?.type === "image/png" ||
+      file?.type === "image/jpeg" ||
+      file?.type === "image/jpg"
+    ) {
+      let reader = new FileReader();
+      let baseString;
+      reader.onloadend = function () {
+        baseString = reader.result;
+        setBotIcon(iconType, baseString);
+        if (baseString !== undefined || baseString !== "") {
+          const errorElement = document.querySelector(".error-message.bot-image");
+          if (errorElement) {
+            errorElement.style.display = "none";
+          }
+        }
+      };
+      reader.readAsDataURL(file);
+      return true;
+    } else {
+      setBotIcon(iconType, "");
+      const errorElement = document.querySelector(".error-message.bot-image");
+      if (errorElement) {
+        errorElement.innerHTML = "画像を選択してください。";
+        errorElement.style.display = "block";
+      }
+      return false;
+    }
+  };
+
+  const [defaultIcon, setDefaultIcon] = useState("");
+  const toDataURL = (url) =>
+    fetch(url)
+      .then((response) => response.blob())
+      .then(
+        (blob) =>
+          new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          })
+      );
+  // set defal icon
+
+  //set main color
+  useEffect(() => {
+    const mainColorsList = [
+      "#327AED",
+      "#26B197",
+      "#fC7E02",
+      "#F6CA21",
+      "#F16FAA",
+      "#8C66D9",
+      "#7C8290",
+      "D8E2EF",
+    ];
+    const index = mainColorsList.indexOf(mainColor);
+    if (index !== -1 && tabmenu) {
+      document
+        .querySelector(".main-colors .color.active")
+        ?.classList?.remove("active");
+      document
+        .querySelector(`.main-colors .color.color-${index}`)
+        ?.classList?.add("active");
+    } else if (index === -1 && tabmenu) {
+      document
+          .querySelector(".main-colors .color.active")
+          ?.classList?.remove("active");
+      document
+          .querySelector(`.main-colors .color.color-999`)
+          ?.classList?.add("active");
+    }
+  }, [mainColor, tabmenu]);
+  //get chat bot information
+  useEffect(() => {
+    // document.querySelector(".icons .icon.active")?.classList?.remove("active");
+    api.get(`/api/v1/managements/chatbots/${botId}`).then((response) => {
+      if (response.data.data) {
+        const result = JSON.parse(response.data.data?.design_settings);
+        setDisplayType(result?.display_type);
+        setWidthPc(result?.width_pc);
+        setHeightPc(result?.height_pc);
+        setWidthSp(result?.width_sp);
+        setHeightSp(result?.height_sp);
+        setPositionPc(result?.position_pc ? Number(result?.position_sp) : 1);
+        setRightPcTitle(result?.right_position_pc_title);
+        setButtonTypePc(result?.button_type_pc ? Number(result?.position_sp) : 1);
+        setRightMarginPc(result?.right_margin_pc);
+        setBottomMarginPc(result?.bottom_margin_pc);
+        setPositionSp(result?.position_sp ? Number(result?.position_sp) : 1);
+        setButtonTypeSp(result?.button_type_sp ? Number(result?.position_sp) : 1);
+        setRightSpTitle(
+          JSON.parse(response.data.data?.design_settings)
+            ?.right_position_sp_title
+        );
+        setRightMarginSp(result?.right_margin_sp);
+        setBottomMarginSp(result?.bottom_margin_sp);
+        setBotName(response.data.data?.bot_name);
+        setTitle(response.data.data?.title);
+        setSubtitle(response.data.data?.subtitle);
+        setDesignType(response.data.data?.design_type);
+        setTitleBubble(result?.title_bubble);
+        setPopupCloseBot(result?.popup_close_bot ? true : false);
+        const colorMap = {
+          blue: "#327AED",
+          green: "#26B197",
+          orange: "#fC7E02",
+          yellow: "#F6CA21",
+          pink: "#F16FAA",
+          purple: "#8C66D9",
+          black: "#7C8290",
+          white: "#D8E2EF",
+        };
+        setBotImage(
+          `${process.env.REACT_APP_API_CHATBOT_URL}${response.data.data?.icon?.url}`
+        );
+        if (!!response.data.data?.opening_bot_icon?.url) {
+          setOpeningBotIcon(`${process.env.REACT_APP_API_CHATBOT_URL}${response.data.data.opening_bot_icon.url}`);
+        }
+        if (!!response.data.data?.closing_bot_icon?.url) {
+          setClosingBotIcon(`${process.env.REACT_APP_API_CHATBOT_URL}${response.data.data.closing_bot_icon.url}`);
+        }
+        const mainColor = response?.data?.data?.main_color || response?.data?.data?.main_color_other;
+        if (mainColor && colorMap[mainColor]) {
+          setMainColor(colorMap[mainColor]);
+        } else if (mainColor) {
+          setMainColor(mainColor);
+        }
+        // setMainColor(response.data.data?.main_color);
+        setDefaultIcon(response.data.data?.icon?.url);
+        setCbImage(response.data.data?.icon?.url);
+      } else {
+        setIsOpenNoti(true);
+        // setMessageNoti('シナリオがありません。');
+        setTimeout(() => {
+          setIsOpenNoti(false);
+          // setMessageNoti('');
+        }, 2000);
+      }
+    });
+    document
+      .querySelector(".main-colors .color.color-0")
+      .classList.add("active");
+    // document.querySelector(".icons .icon.icon-0").classList.add("active");
+    setBotId(Cookies.get("bot_id"));
+  }, []);
+
+  const isTempImage = (image) => {
+    return !!image && (image.includes("image/png;base64")||image.includes("image/jpeg;base64")||image.includes("image/jpg;base64"))
+  }
+
+  // update bot chat
+  const addUpdateBotChat = () => {
+    if (title && subtitle && botName ) {
+      let main_color = {
+        blue: "#327AED",
+        green: "#26B197",
+        orange: "#fC7E02",
+        yellow: "#F6CA21",
+        pink: "#F16FAA",
+        purple: "#8C66D9",
+        black: "#7C8290",
+        white: "#D8E2EF",
+      };
+      var color;
+      Object.entries(main_color).forEach(([key, val]) => {
+        if (mainColor === val) {
+          color = key;
+        }
+      });
+      var bot = {
+        chatbot: {
+          title: title,
+          subtitle: subtitle,
+          design_type: designType,
+          bot_name: botName,
+        },
+      };
+
+      // Add icon fields if they are temp images
+      if (isTempImage(botImage)) {
+        bot.chatbot.icon = botImage || IconManDefault;
+      }
+      if (isTempImage(openingBotIcon)) {
+        bot.chatbot.opening_bot_icon = openingBotIcon;
+      }
+      if (isTempImage(closingBotIcon)) {
+        bot.chatbot.closing_bot_icon = closingBotIcon;
+      }
+
+      if (color) bot.chatbot.main_color = color
+      else {
+        bot.chatbot.main_color_other = mainColor
+        bot.chatbot.main_color = ""
+      }
+
+      if (!openingBotIcon) {
+        bot.chatbot.remove_opening_bot_icon = true;
+      }
+      if (!closingBotIcon) {
+        bot.chatbot.remove_closing_bot_icon = true;
+      }
+
+      api
+        .put(`api/v1/managements/chatbots/${botId}`, bot)
+        .then((res) => {
+          if (res.data.code === 1 || res.data.code === "1") {
+            Cookies.set("bot_id", res.data.data.id);
+            Cookies.set("bot_type", "bot");
+            setMsgNoti("ボットを正常に保存されました！");
+            setIsOpenNoti(true);
+            setTimeout(() => {
+              setMsgNoti("");
+              setIsOpenNoti(false);
+            }, 1500);
+          } else if (res.data?.code === 2 || res.data?.code === "2") {
+            setMsgNoti(res.data.message);
+            setIsOpenNoti(true);
+          }
+        })
+        .catch((error) => {
+          if (error.response?.data.code === 0) {
+            tokenExpired();
+          }
+        });
+    } else {
+
+      if (!title) {
+        document.querySelector(".error-message.title").innerHTML =
+          "タイトルは、必ず指定してください。";
+        document.querySelector(".error-message.title").style.display = "block";
+      }
+      if (!subtitle) {
+        document.querySelector(".error-message.subtile").innerHTML =
+          "サブタイトルは、必ず指定ください。";
+        document.querySelector(".error-message.subtile").style.display =
+          "block";
+      }
+      if (!botName) {
+        document.querySelector(".error-message.bot-name").innerHTML =
+          "ボット名は、必ず指定してください。";
+        document.querySelector(".error-message.bot-name").style.display =
+          "block";
+      }
+    }
+  };
+  //update design setting
+  const updateDesignSetting = () => {
+    var settings = {
+      design_settings: {
+        display_type: displayType,
+        width_pc: widthPc,
+        height_pc: heightPc,
+        width_sp: widthSp,
+        height_sp: heightSp,
+        position_pc: positionPc.toString(),
+        button_type_pc: buttonTypePc.toString(),
+        right_position_pc_title: rightPcTitle,
+        right_margin_pc: rightMarginPc,
+        bottom_margin_pc: bottomMarginPc,
+        position_sp: positionSp.toString(),
+        button_type_sp: buttonTypeSp.toString(),
+        right_position_sp_title: rightSpTitle,
+        right_margin_sp: rightMarginSp,
+        bottom_margin_sp: bottomMarginSp,
+        popup_close_bot: popupCloseBot,
+        title_bubble: titleBubble?.trim()
+      },
+    };
+    console.log(settings)
+
+    api
+      .post(`api/v1/managements/chatbots/${botId}/design_settings`, settings)
+      .then((res) => {
+        if (res.data.code === 1 || res.data.code === "1") {
+          setMsgNoti("ボット設定を正常に保存されました！");
+          setIsOpenNoti(true);
+          setTimeout(() => {
+            setMsgNoti("");
+            setIsOpenNoti(false);
+
+            // window.location.href = "/admin/design-setting";
+          }, 1500);
+        } else if (res.data?.code === 2 || res.data?.code === "2") {
+          setMsgNoti(res.data.message);
+          setIsOpenNoti(true);
+        }
+      })
+      .catch((error) => {
+        if (error.response?.data.code === 0) {
+          tokenExpired();
+        }
+      });
+  };
+  // handle preview
+  const handlePreview = () => {
+    if (title && subtitle) {
+      document.getElementById("sp-container").style.height = heightPc
+        ? `${heightPc}px`
+        : "620px";
+      document.getElementById("sp-header").style.position = "static";
+      document.getElementById("sp-container").style.marginBottom =
+        bottomMarginPc ? `${bottomMarginPc}px` : "0px";
+      document.getElementById("sp-container").style.marginRight = rightMarginPc
+        ? `${rightMarginPc}px`
+        : "10px";
+
+      document.getElementById("sp-header").style.borderBottomLeftRadius = "0px";
+      document.getElementById("sp-header").style.borderBottomRightRadius =
+        "0px";
+      document.getElementById("sp-body").style.display = "block";
+      setIsOpenPreview(true);
+    } else {
+      if (!title) {
+        document.querySelector(".error-message.title").innerHTML =
+          "タイトルは、必ず指定してください。";
+        document.querySelector(".error-message.title").style.display = "block";
+      }
+      if (!subtitle) {
+        document.querySelector(".error-message.subtile").innerHTML =
+          "サブタイトルは、必ず指定ください。";
+        document.querySelector(".error-message.subtile").style.display =
+          "block";
+      }
+    }
+  };
+
+  // handle toggle preview
+  const handleTogglePreview = () => {
+    if (document.getElementById("sp-body").style.display === "none") {
+      document.getElementById("sp-container").style.height = heightPc
+        ? `${heightPc}px`
+        : "620px";
+      document.getElementById("sp-container").style.marginBottom =
+        bottomMarginPc ? `${bottomMarginPc}px` : "0px";
+      document.getElementById("sp-container").style.marginRight = rightMarginPc
+        ? `${rightMarginPc}px`
+        : "10px";
+      document.getElementById("sp-header").style.position = "static";
+      document.getElementById("sp-header").style.borderBottomLeftRadius = "0px";
+      document.getElementById("sp-header").style.borderBottomRightRadius =
+        "0px";
+      document.getElementById("sp-body").style.display = "block";
+    } else {
+      document.getElementById("sp-container").style.height = "0px";
+      document.getElementById("sp-body").style.display = "none";
+      document.getElementById("sp-header").style.borderBottomLeftRadius =
+        "25px";
+      document.getElementById("sp-header").style.borderBottomRightRadius =
+        "25px";
+      document.getElementById("sp-header").style.position = "absolute";
+      document.getElementById("sp-header").style.bottom = "13px";
+    }
+    setIsOpenPreviewBot(!isOpenPreviewBot);
+  };
   return (
-    <>
-      <AdminPage className="admin-page--design-setting">
-        <Tabs
-          activeKey={String(state.tabmenu)}
-          onChange={(key) => actions.setTabmenu(Number(key))}
-          className="admin-page-tabs"
-          items={[
-            {
-              key: String(TAB_BASIC),
-              label: '基本情報',
-              children: (
-                <BasicInfoTab
-                  basicInfo={state.basicInfo}
-                  validationErrors={state.validationErrors}
-                  onFieldChange={(field, value) => {
-                    const setters = {
-                      title: actions.setTitle,
-                      subtitle: actions.setSubtitle,
-                      botName: actions.setBotName,
-                    };
-                    setters[field]?.(value);
+    <div className="content">
+      <div>
+        <Row id="screenAll">
+          <Col md="12">
+            <Card>
+              <CardHeader>
+                <button
+                  onClick={() => setTabmenu(1)}
+                  style={{
+                    color: tabmenu === 1 ? "#4DBEB6" : "#9B9B9B",
+                    backgroundColor: tabmenu === 1 ? "#fff" : "#F4F3EF",
+                    boxShadow:
+                      tabmenu === 2
+                        ? "rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px"
+                        : "rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px",
                   }}
-                  onClearError={actions.clearValidationError}
-                  onDesignTypeChange={actions.setDesignType}
-                  onMainColorChange={actions.setMainColor}
-                  onPreview={handlePreview}
-                  onSave={actions.saveBasicInfo}
-                  onIconClick={actions.handleIconClickForType}
-                  onIconRemove={actions.handleRemoveImage}
-                  onIconUpload={actions.getBaseUrlAdd}
-                />
-              ),
-            },
-            {
-              key: String(TAB_DESIGN),
-              label: 'デザインカスタマイズ',
-              children: (
-                <DesignCustomizeTab
-                  designSettings={state.designSettings}
-                  onFieldChange={actions.updateDesignSettingField}
-                  onSave={actions.saveDesignSettings}
-                />
-              ),
-            },
-            {
-              key: String(TAB_THEME),
-              label: 'テーマカスタマイズ',
-              children: (
-                <ThemeCustomizeTab
-                  themeSettings={state.designSettings.themeSettings}
-                  mainColor={state.basicInfo.mainColor}
-                  title={state.basicInfo.title}
-                  subtitle={state.basicInfo.subtitle}
-                  onFieldChange={actions.updateThemeField}
-                  onSave={actions.saveDesignSettings}
-                />
-              ),
-            },
-          ]}
-        />
-      </AdminPage>
+                  className="tab-menu"
+                >
+                  基本情報
+                </button>
+                <button
+                  onClick={() => setTabmenu(2)}
+                  style={{
+                    color: tabmenu === 2 ? "#4DBEB6" : "#9B9B9B",
+                    backgroundColor: tabmenu === 2 ? "#fff" : "#F4F3EF",
+                    boxShadow:
+                      tabmenu === 1
+                        ? "rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px"
+                        : "rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px",
+                  }}
+                  className="tab-menu"
+                >
+                  デザインカスタマイズ
+                </button>
+              </CardHeader>
+              {tabmenu === 1 && (
+                <div style={{ height: "100%" }}>
+                  <CardHeader>
+                    <h4 style={{ margin: "10px 0" }}>ボット設定</h4>
+                  </CardHeader>
+                  <CardBody>
+                    <form action="">
+                      <div className="add-bot-container">
+                        <div className="bot-left">
+                          <div className="field-add-bot">
+                            <div className="add-bot_field-container">
+                              <span className="label-field">
+                                タイトル <span style={{ color: "red" }}>*</span>
+                              </span>
+                              <input
+                                type="text"
+                                name="title"
+                                className="input-field"
+                                defaultValue={title}
+                                placeholder="Service name, etc. (e.g. BOTCHAN)"
+                                onChange={(e) => {
+                                  setTitle(e.target.value);
+                                  document.querySelector(
+                                    ".error-message.title"
+                                  ).style.display = "none";
+                                }}
+                              />
+                            </div>
+                            <span className="error-message title"></span>
+                          </div>
+                          <div className="field-add-bot">
+                            <div className="add-bot_field-container">
+                              <span className="label-field">
+                                サブタイトル{" "}
+                                <span style={{ color: "red" }}>*</span>
+                              </span>
+                              <input
+                                type="text"
+                                className="input-field"
+                                defaultValue={subtitle}
+                                placeholder="Purpose of the form (e.g. information request form)"
+                                onChange={(e) => {
+                                  setSubtitle(e.target.value);
+                                  document.querySelector(
+                                    ".error-message.subtile"
+                                  ).style.display = "none";
+                                }}
+                              />
+                            </div>
+                            <span className="error-message subtile"></span>
+                          </div>
+                          <div className="field-add-bot">
+                            <div className="add-bot_field-container">
+                              <span className="label-field">
+                                デザインタイプ
+                              </span>
+                              <div className="design-types">
+                                <div
+                                  className={
+                                    designType === "pop"
+                                      ? "type active"
+                                      : "type"
+                                  }
+                                  onClick={(e) => designTypeClick(e)}
+                                >
+                                  <span>ポップ</span>
+                                </div>
+                                <div
+                                  className={
+                                    designType === "flat"
+                                      ? "type active"
+                                      : "type"
+                                  }
+                                  onClick={(e) => designTypeClick(e)}
+                                >
+                                  <span>フラット</span>
+                                </div>
+                                <div
+                                  className={
+                                    designType === "material"
+                                      ? "type active"
+                                      : "type"
+                                  }
+                                  onClick={(e) => designTypeClick(e)}
+                                >
+                                  <span>マテリアル</span>
+                                </div>
+                              </div>
+                            </div>
+                            <span className="error-message design-types"></span>
+                          </div>
+                          <div className="field-add-bot">
+                            <div className="add-bot_field-container">
+                              <span className="label-field">メインカラー</span>
+                              <div className="main-colors">
+                                {colors.map((color, index) => (
+                                    <div
+                                        key={index}
+                                        className={`color color-${index}`}
+                                        onClick={() =>
+                                            handleColorClick(index, color)
+                                        }
+                                    >
+                                    <span
+                                        style={{backgroundColor: color}}
+                                    ></span>
+                                    </div>
+                                ))}
 
-      <ChatbotPreview
-        isOpen={preview.isOpenPreview}
-        isOpenBot={preview.isOpenPreviewBot}
-        mainColor={state.basicInfo.mainColor}
-        title={state.basicInfo.title}
-        subtitle={state.basicInfo.subtitle}
-        botImage={state.basicInfo.botImage}
-        onToggle={preview.handleTogglePreview}
-      />
+                                <div
+                                    className={`color color-999`}
+                                    style={{position: "relative"}}
+                                    onClick={() => handleColorClick(999)}
+                                >
+                                  <span style={{backgroundColor: mainColor}}></span>
+                                  <span style={{position: "absolute", bottom: "-35px", width: "60px"}}>カスタム</span>
+                                </div>
+                                <input id="custom-color" type="color"
+                                       value={mainColor}
+                                       onChange={(e) => {
+                                         setMainColor(e.target.value)
+                                       }}
+                                       style={{visibility: "hidden", width: "0px", height: "0px"}}/>
+                              </div>
+                            </div>
+                            <span className="error-message main-colors"></span>
+                          </div>
+                          <div className="btn-wrapper">
+                            <button
+                                type="button"
+                                className="btn btn-preview"
+                                onClick={handlePreview}
+                            >
+                              プレビュー
+                            </button>
+                          </div>
+                        </div>
+                        <div className="bot-right">
+                          <div>
+                            <div className="field-add-bot">
+                              <DesignBotIcons 
+                                botIcon={botImage}
+                                openingBotIcon={openingBotIcon}
+                                closingBotIcon={closingBotIcon}
+                                onBotIconChange={getBaseUrlAdd("bot_image")}
+                                onOpeningBotIconChange={getBaseUrlAdd("opening_bot_icon")}
+                                onClosingBotIconChange={getBaseUrlAdd("closing_bot_icon")}
+                                onBotIconRemove={handleRemoveImage("bot_image")}
+                                onOpeningBotIconRemove={handleRemoveImage("opening_bot_icon")}
+                                onClosingBotIconRemove={handleRemoveImage("closing_bot_icon")}
+                                images={images}
+                                onIconClick={handleIconClickForType}
+                              /> 
+                            </div>
+                            <div className="field-add-bot">
+                              <div className="add-bot_field-container">
+                                <span className="label-field">
+                                  ボット名称{" "}
+                                  <span style={{ color: "red" }}>*</span>
+                                </span>
+                                <input
+                                  type="text"
+                                  name="title"
+                                  defaultValue={botName}
+                                  className="input-field"
+                                  placeholder="サンプルボット..."
+                                  onChange={(e) => {
+                                    setBotName(e.target.value);
+                                    document.querySelector(
+                                      ".error-message.bot-name"
+                                    ).style.display = "none";
+                                  }}
+                                />
+                              </div>
+                              <span className="subtitle-field">
+                                ※EC-CHAT管理用の名称です。ボット内で表示されることはありません。
+                              </span>
+                              <span className="error-message bot-name"></span>
+                            </div>
+                          </div>
+                          <div className="btn-wrapper">
+                            <button
+                              type="button"
+                              className="btn btn-new-bot"
+                              onClick={addUpdateBotChat}
+                            >
+                              保存
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                  </CardBody>
+                </div>
+              )}
+              {tabmenu === 2 && (
+                <div>
+                  <form action="POST">
+                    <div style={{ width: "100%" }}>
+                      <div
+                        style={{
+                          width: "100%",
+                          display: "flex",
+                          padding: "0 40px",
+                        }}
+                      >
+                        {/* Pc */}
+                        <div
+                          style={{
+                            width: "50%",
+                            borderRight: "1px solid #ddd",
+                          }}
+                        >
+                          <CardHeader>
+                            <h4 style={{ margin: "10px 0" }}>PC</h4>
+                          </CardHeader>
+                          <CardBody style={{}}>
+                            <div className="add-bot-container">
+                              <div className="bot-haft">
+                                <div className="field-add-bot">
+                                  <div className="add-bot_field-container">
+                                    <span className="label-field">
+                                      表示タイプ{" "}
+                                    </span>
+                                    <div
+                                      style={{ display: "flex", width: "100%" }}
+                                    >
+                                      <select
+                                        style={{
+                                          height: "40px",
+                                          width: "100%",
+                                          border: "1px solid #333",
+                                          borderRadius: "5px",
+                                          padding: "0 15px",
+                                        }}
+                                        value={displayType}
+                                        onChange={(e) =>
+                                          setDisplayType(Number(e.target.value))
+                                        }
+                                      >
+                                        <option value={1}>リロード</option>
+                                        <option value={2}>非表示</option>
+                                        <option value={3}>ボタン押下</option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                  <span className="error-message subtile"></span>
+                                </div>
+                                <div className="field-add-bot">
+                                  <div className="add-bot_field-container">
+                                    <span className="label-field">サイズ </span>
+                                    <div
+                                      style={{
+                                        display: "flex",
+                                        width: "100%",
+                                        justifyContent: "space-between",
+                                      }}
+                                    >
+                                      <div className="ss-user-setting__item-bottom-flex-start">
+                                          <InputNum
+                                                              style={{display:'flex', flex:1}}
+                                                              name="width_pc"
+                                                              min={1}
+                                                              max={1000}
+                                                              value={widthPc}
+                                                              placeholder={"幅"}
+                                                              onChange={e => {setWidthPc(e);
+                                                              // document.querySelector(
+                                          //   ".error-message.widthPc"
+                                          // ).style.display = "none";
+                                                              }}
+                                                            />
+                                                            <p style={{textAlign:'center', margin:'auto 0'}}>px</p>
+                                                            </div>
+                                      {/* <input
+                                        type="number"
+                                        name="width_pc"
+                                        className="input-setting2"
+                                        defaultValue={widthPc}
+                                        placeholder="幅"
+                                        onChange={(e) => {
+                                          setWidthPc(e.target.value);
+                                          // document.querySelector(
+                                          //   ".error-message.widthPc"
+                                          // ).style.display = "none";
+                                        }}
+                                      /> */}
+                                       <div className="ss-user-setting__item-bottom-flex-start">
+                                          <InputNum
+                                                              style={{display:'flex', flex:1}}
+                                                              name="height_pc"
+                                                              min={1}
+                                                              max={1000}
+                                                              value={heightPc}
+                                                              placeholder="高さ"
+                                                              onChange={e => {setHeightPc(e);
+                                                              // document.querySelector(
+                                          //   ".error-message.title"
+                                          // ).style.display = "none";
+                                                              }}
+                                                            />
+                                                            <p style={{textAlign:'center', margin:'auto 0'}}>px</p>
+                                                            </div>
+                                      {/* <input
+                                        type="number"
+                                        name="height_pc"
+                                        className="input-setting2"
+                                        placeholder="高さ"
+                                        defaultValue={heightPc}
+                                        onChange={(e) => {
+                                          setHeightPc(e.target.value);
+                                          // document.querySelector(
+                                          //   ".error-message.title"
+                                          // ).style.display = "none";
+                                        }}
+                                      /> */}
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="field-add-bot">
+                                  <div className="add-bot_field-container">
+                                    <span className="label-field">
+                                      設置場所{" "}
+                                    </span>
+                                    <div
+                                      style={{ display: "flex", width: "100%" }}
+                                    >
+                                      <select
+                                        style={{
+                                          height: "40px",
+                                          width: "100%",
+                                          border: "1px solid #333",
+                                          borderRadius: "5px",
+                                          padding: "0 15px",
+                                        }}
+                                        value={positionPc}
+                                        onChange={(e) =>
+                                          setPositionPc(Number(e.target.value))
+                                        }
+                                      >
+                                        <option value={1}>底辺に設置</option>
+                                        <option value={2}>右辺に設置</option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                  <span className="error-message subtile"></span>
+                                </div>
 
-      <ModalNoti open={state.isOpenNoti} onClose={() => actions.setIsOpenNoti(false)}>
-        <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
-          <span style={{ fontSize: '16px' }}>{state.msgNoti}</span>
+                                {positionPc === 2 && (
+                                  <div className="field-add-bot">
+                                    <div className="add-bot_field-container">
+                                      <span className="label-field">
+                                        右のタイトル{" "}
+                                      </span>
+                                      <div
+                                        style={{
+                                          display: "flex",
+                                          width: "100%",
+                                        }}
+                                      >
+                                        <input
+                                          type="text"
+                                          name="right_position_pc_title"
+                                          className="input-setting"
+                                          placeholder="タイトル"
+                                          defaultValue={rightPcTitle}
+                                          onChange={(e) => {
+                                            setRightPcTitle(e.target.value);
+                                            // document.querySelector(
+                                            //   ".error-message.title"
+                                            // ).style.display = "none";
+                                          }}
+                                        />
+                                      </div>
+                                    </div>
+                                    <span className="error-message subtile"></span>
+                                  </div>
+                                )}
+{
+  positionPc === 1 && (
+<div className="field-add-bot">
+                                  <div className="add-bot_field-container">
+                                    <span className="label-field">
+                                      ボタン内容{" "}
+                                    </span>
+                                    <div
+                                      style={{ display: "flex", width: "100%" }}
+                                    >
+                                      <select
+                                        style={{
+                                          height: "40px",
+                                          width: "100%",
+                                          border: "1px solid #333",
+                                          borderRadius: "5px",
+                                          padding: "0 15px",
+                                        }}
+                                        value={buttonTypePc}
+                                        onChange={(e) =>
+                                          setButtonTypePc(Number(e.target.value))
+                                        }
+                                      >
+                                        <option value={1}>
+                                          ボタンとタイトル
+                                        </option>
+                                        <option value={2}>ボタンのみ</option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                  <span className="error-message subtile"></span>
+                                </div>
+  )
+}
+                                
+                                <div className="field-add-bot">
+                                  <div className="add-bot_field-container">
+                                    <span className="label-field">
+                                      右マージン{" "}
+                                    </span>
+                                    <div
+                                      style={{ display: "flex", width: "100%" }}
+                                    >
+                                      <input
+                                        type="number"
+                                        name="right_margin_pc"
+                                        defaultValue={rightMarginPc}
+                                        className="input-setting"
+                                        placeholder="右マージン"
+                                        onChange={(e) => {
+                                          setRightMarginPc(e.target.value);
+                                          // document.querySelector(
+                                          //   ".error-message.title"
+                                          // ).style.display = "none";
+                                        }}
+                                      />
+                                    </div>
+                                  </div>
+                                  <span className="error-message subtile"></span>
+                                </div>
+                                <div className="field-add-bot">
+                                  <div className="add-bot_field-container">
+                                    <span className="label-field">
+                                      下マージン{" "}
+                                    </span>
+                                    <div
+                                      style={{ display: "flex", width: "100%" }}
+                                    >
+                                      <input
+                                        type="number"
+                                        name="bottom_margin_pc"
+                                        defaultValue={bottomMarginPc}
+                                        className="input-setting"
+                                        placeholder="下マージン"
+                                        onChange={(e) => {
+                                          setBottomMarginPc(e.target.value);
+                                          // document.querySelector(
+                                          //   ".error-message.title"
+                                          // ).style.display = "none";
+                                        }}
+                                      />
+                                    </div>
+                                  </div>
+                                  <span className="error-message subtile"></span>
+                                </div>
+                              </div>
+                            </div>
+                          </CardBody>
+                        </div>
+
+                        {/* SmartPhone */}
+                        <div style={{ width: "50%" }}>
+                          <CardHeader>
+                            <h4 style={{ margin: "10px 0" }}>スマートフォン</h4>
+                          </CardHeader>
+                          <CardBody>
+                            <div className="add-bot-container">
+                              <div className="bot-haft">
+                                {/* <div className="field-add-bot">
+                                <div className="add-bot_field-container">
+                                  <span className="label-field">表示タイプ </span>
+                                  <div 
+                                    style={{ display: "flex", width: "100%" }}
+                                  > 
+                                    <select
+                                      style={{
+                                        height: "40px",
+                                        width: "100%",
+                                        border: "1px solid #333",
+                                        borderRadius: "5px",
+                                        padding: "0 15px",
+                                      }}
+                                      value={positionPc}
+                                      onChange={(e) =>
+                                        setDisplayTypeSp(e.target.value)
+                                      }
+                                    >
+                                      <option value={1}>リロード</option>
+                                      <option value={2}>非表示</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <span className="error-message subtile"></span>
+                              </div>  */}
+
+                                  <div className="field-add-bot">
+                                    <div className="add-bot_field-container">
+                                      <span className="label-field">
+                                        サイズ{" "}
+                                      </span>
+                                      <div
+                                        style={{
+                                          display: "flex",
+                                          width: "100%",
+                                          padding:'0px',
+                                          justifyContent: "space-between",
+                                        }}
+                                      >
+                                        <div className="ss-user-setting__item-bottom-flex-start">
+                                          <InputNum
+                                                              style={{display:'flex', flex:1}}
+                                                              name="width_sp"
+                                                              min={1}
+                                                              max={100}
+                                                              value={widthSp}
+                                                              placeholder={"幅"}
+                                                              onChange={e => setWidthSp(e)}
+                                                            />
+                                                            <p style={{textAlign:'center', margin:'auto 0'}}>%</p>
+                                                            </div>
+                                                            <div className="ss-user-setting__item-bottom-flex-start">
+                                          <InputNum
+                                                             style={{display:'flex', flex:1}}
+                                                              name="height_sp"
+                                                              max={100}
+                                                              min={1}
+                                                              value={heightSp}
+                                                              placeholder="高さ"
+                                                              onChange={e => setHeightSp(e)}
+                                                            />
+                                                            <p style={{textAlign:'center', margin:'auto 0'}}>%</p>
+                                                            </div>
+                                        
+                                        {/* <input
+                                          type="number"
+                                          name="width_sp"
+                                          className="input-setting2"
+                                          placeholder="幅"
+                                          defaultValue={widthSp}
+                                          onChange={(e) => {
+
+                                              setWidthSp(e.target.value);
+
+                                            // document.querySelector(
+                                            //   ".error-message.widthPc"
+                                            // ).style.display = "none";
+                                          }}
+                                        /> */}
+
+                                        {/* <input
+                                          type="number"
+                                          name="ss-user-setting-input-delay ss-user-setting-input-limit-character"
+                                          className="input-setting2"
+                                          defaultValue={heightSp}
+                                          placeholder="高さ"
+                                          onChange={(e) => {
+                                            setHeightSp(e.target.value);
+                                            // document.querySelector(
+                                            //   ".error-message.title"
+                                            // ).style.display = "none";
+                                          }}
+                                        /> */}
+                                      
+                                        
+
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                <div className="field-add-bot">
+                                  <div className="add-bot_field-container">
+                                    <span className="label-field">
+                                      設置場所{" "}
+                                    </span>
+                                    <div
+                                      style={{ display: "flex", width: "100%" }}
+                                    >
+                                      <select
+                                        style={{
+                                          height: "40px",
+                                          width: "100%",
+                                          border: "1px solid #333",
+                                          borderRadius: "5px",
+                                          padding: "0 15px",
+                                        }}
+                                        value={positionSp}
+                                        onChange={(e) =>
+                                          setPositionSp(Number(e.target.value))
+                                        }
+                                      >
+                                        <option value={1}>底辺に設置</option>
+                                        <option value={2}>右辺に設置</option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                  <span className="error-message subtile"></span>
+                                </div>
+
+                                {positionSp === 2 && (
+                                  <div className="field-add-bot">
+                                    <div className="add-bot_field-container">
+                                      <span className="label-field">
+                                        タイトル{" "}
+                                      </span>
+                                      <div
+                                        style={{
+                                          display: "flex",
+                                          width: "100%",
+                                        }}
+                                      >
+                                        <input
+                                          type="text"
+                                          name="right_position_sp_title"
+                                          className="input-setting"
+                                          defaultValue={rightSpTitle}
+                                          placeholder="タイトル"
+                                          onChange={(e) => {
+                                            setRightSpTitle(e.target.value);
+                                            // document.querySelector(
+                                            //   ".error-message.title"
+                                            // ).style.display = "none";
+                                          }}
+                                        />
+                                      </div>
+                                    </div>
+                                    <span className="error-message subtile"></span>
+                                  </div>
+                                )}
+{
+  positionSp === 1 && (
+    <div className="field-add-bot">
+    <div className="add-bot_field-container">
+      <span className="label-field">
+        ボタン内容{" "}
+      </span>
+      <div
+        style={{ display: "flex", width: "100%" }}
+      >
+        <select
+          style={{
+            height: "40px",
+            width: "100%",
+            border: "1px solid #333",
+            borderRadius: "5px",
+            padding: "0 15px",
+          }}
+          value={buttonTypeSp}
+          onChange={(e) =>
+            setButtonTypeSp(Number(e.target.value))
+          }
+        >
+          <option value={1}>
+            ボタンとタイトル
+          </option>
+          <option value={2}>ボタンのみ</option>
+        </select>
+      </div>
+    </div>
+    <span className="error-message subtile"></span>
+  </div>
+  )
+}
+                               
+                                <div className="field-add-bot">
+                                  <div className="add-bot_field-container">
+                                    <span className="label-field">
+                                      右マージン{" "}
+                                    </span>
+                                    <div
+                                      style={{ display: "flex", width: "100%" }}
+                                    >
+                                      <input
+                                        type="number"
+                                        name="right_margin_sp"
+                                        defaultValue={rightMarginSp}
+                                        className="input-setting"
+                                        placeholder="右マージン"
+                                        onChange={(e) => {
+                                          setRightMarginSp(e.target.value);
+                                          // document.querySelector(
+                                          //   ".error-message.title"
+                                          // ).style.display = "none";
+                                        }}
+                                      />
+                                    </div>
+                                  </div>
+                                  <span className="error-message subtile"></span>
+                                </div>
+                                <div className="field-add-bot">
+                                  <div className="add-bot_field-container">
+                                    <span className="label-field">
+                                      下マージン{" "}
+                                    </span>
+                                    <div
+                                      style={{ display: "flex", width: "100%" }}
+                                    >
+                                      <input
+                                        type="number"
+                                        name="bottom_margin_sp"
+                                        defaultValue={bottomMarginSp}
+                                        className="input-setting"
+                                        placeholder="下マージン"
+                                        onChange={(e) => {
+                                          setBottomMarginSp(e.target.value);
+                                          // document.querySelector(
+                                          //   ".error-message.title"
+                                          // ).style.display = "none";
+                                        }}
+                                      />
+                                    </div>
+                                  </div>
+                                  <span className="error-message subtile"></span>
+                                </div>
+                              </div>
+                            </div>
+                          </CardBody>
+                        </div>
+                      </div>
+                      <hr/>
+                      <div
+                        style={{
+                          width: "50%",
+                          paddingLeft: "40px",
+                        }}
+                      >
+                        <CardBody>
+                          <div className="add-bot-container">
+                            <div className="bot-haft">
+                              <div className="field-add-bot">
+                                <div className="add-bot_field-container">
+                                  <span className="label-field">
+                                    タイトル
+                                  </span>
+                                  <div
+                                    style={{ display: "flex", width: "100%" }}
+                                  >
+                                    <input
+                                      type="text"
+                                      name="bottom_margin_sp"
+                                      defaultValue={titleBubble}
+                                      className="input-setting"
+                                      placeholder="簡単90秒で注文完了"
+                                      onChange={(e) => {
+                                        setTitleBubble(e.target.value);
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="field-add-bot">
+                                <div className="add-bot_field-container">
+                                  <span className="label-field">
+                                    離脱防止
+                                  </span>
+                                  <span className="d-flex" style={{width: "100%" }}>
+                                    <input
+                                      name="popup_close_bot"
+                                      type="radio"
+                                      id="in_active"
+                                      className="in_active_popup"
+                                      value={false}
+                                      checked={!popupCloseBot}
+                                      onClick={() => setPopupCloseBot(false)}
+                                    />
+                                    <label htmlFor="in_active" className="radio-btn-action">
+                                      無効
+                                    </label>
+                                    <input
+                                      name="popup_close_bot"
+                                      className="active_popup"
+                                      type="radio"
+                                      id="active"
+                                      value={true}
+                                      checked={popupCloseBot}
+                                      onClick={() => setPopupCloseBot(true)}
+                                    />
+                                    <label htmlFor="active" className="radio-btn-action">
+                                      有効
+                                    </label>
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </CardBody>
+                      </div>
+
+                      <div
+                        style={{
+                          width: "100%",
+                          marginTop: "40px",
+                          padding: "0 20px",
+                        }}
+                      >
+                        <div className="btn-wrapper">
+                          <button
+                            type="button"
+                            className="btn btn-preview"
+                            onClick={updateDesignSetting}
+                          >
+                            設定保存
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              )}
+            </Card>
+          </Col>
+        </Row>
+        {/* preview */}
+        <div
+          id="sp-container"
+          className="sp-container"
+          style={{ display: !isOpenPreview && "none" }}
+        >
+          <div
+            id="sp-header"
+            style={{
+              backgroundColor: mainColor,
+            }}
+            className="sp-header"
+            onClick={handleTogglePreview}
+          >
+            <div className="sp-header-left">
+              <div className="sp-header-left-avatar sp-avatar">
+                <img src={botImage} alt="" />
+              </div>
+              <div className="sp-header-left-label">
+                <div className="sp-header-left-label-sub-title">{subtitle}</div>
+                <div className="sp-header-left-label-title">{title}</div>
+              </div>
+            </div>
+            <div className="sp-header-right">
+              <div className="sp-header-right-arrow">
+                {isOpenPreviewBot ? (
+                  <MDBIcon fas icon="chevron-down" />
+                ) : (
+                  <MDBIcon fas icon="chevron-up" />
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div id="sp-body" className="sp-body"></div>
         </div>
-      </ModalNoti>
-      <Link to="/admin/scenario-list">
-        <button style={{ display: 'none' }} type="button">
-          SCL
-        </button>
-      </Link>
-    </>
+
+        {/* end preview */}
+        <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
+          <div
+            style={{ width: "300px", textAlign: "center", color: "#51cbce" }}
+          >
+            <span style={{ fontSize: "16px" }}>{msgNoti}</span>
+          </div>
+        </ModalNoti>
+        <Link to={"/admin/scenario-list"}>
+          <button style={{ display: "none" }}>SCL</button>
+        </Link>
+      </div>
+    </div>
   );
 }
 
 export default DesignChatbot;
+{
+  /* <div
+                      style={{
+                        width: "100%",
+                        padding: "0 50px",
+                      }}
+                    >
+                      <div className="field-add-bot">
+                                <div className="add-bot_field-container">
+                                  <span className="label-field">サイズ </span>
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      width: "100%",
+                                      justifyContent: "space-between",
+                                    }}
+                                  >
+                                    
+                                    <input
+                                      type="number"
+                                      name="width_pc"
+                                      className="input-setting2"
+                                      placeholder="幅"
+                                      onChange={(e) => {
+                                        setWidthPc(e.target.value);
+                                        // document.querySelector(
+                                        //   ".error-message.widthPc"
+                                        // ).style.display = "none";
+                                      }}
+                                    />
+                                    <input
+                                      type="number"
+                                      name="height_pc"
+                                      className="input-setting2"
+                                      placeholder="高さ"
+                                      onChange={(e) => {
+                                        setHeightPc(e.target.value);
+                                        // document.querySelector(
+                                        //   ".error-message.title"
+                                        // ).style.display = "none";
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                    </div> */
+}

@@ -1,182 +1,309 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Collapse, message, Space } from 'antd';
+import React from 'react';
+import { useEffect } from 'react';
+import { Card, CardHeader, CardBody, Row, Col } from 'reactstrap';
+import './../../../../assets/css/bot/email/list-email.css';
 import api from './../../../../api/api-management';
+import { useState } from 'react';
+import ModalShort from 'views/Popup/ModalShort';
+import { Button } from 'react-bootstrap';
+import ModalNoti from 'views/Popup/ModalNoti';
 import Cookies from 'js-cookie';
+import { Pagination } from '@material-ui/lab';
 import { tokenExpired } from 'api/tokenExpired';
-import { AdminPage, AdminConfirmModal, AdminActionButton, useAdminHeaderActions } from '../../../../components/AdminShell';
-import '../../../../assets/css/bot/email/list-email.css';
-
-const { Panel } = Collapse;
 
 function ListEmail() {
   const [emailList, setEmailList] = useState([]);
   const [clientEmail, setClientEmail] = useState(null);
   const [isOpenDuplicate, setIsOpenDuplicate] = useState(false);
   const [idEmail, setIdEmail] = useState();
+  const [isOpenNoti, setIsOpenNoti] = useState(false);
+  const [msgNoti, setMsgNoti] = useState();
   const [isOpenDelete, setIsOpenDelete] = useState(false);
-  const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
+  var [pageIndex, setPageIndex] = useState(1);
+  var [totalPage, setTotalPage] = useState();
+  var [page, setPage] = useState(1);
 
-  const fetchEmails = (pgIndex) => {
-    const bot_id = Cookies.get('bot_id');
-    if (!bot_id) return;
+  useEffect(() => {
+    var bot_id = Cookies.get('bot_id');
+    if (bot_id) {
+      api
+        .get(`/api/v1/managements/emails?page=1&chatbot_id=${bot_id}`)
+        .then((res) => {
+          console.log(res.data);
+          if (res.data?.code === 1) {
+            if (res.data.data !== [] && res.data.total !== 0) {
+              setEmailList(res.data?.data);
+              var totalPage = Math.ceil(res.data.total / 25);
+              setTotalPage(totalPage);
+              setClientEmail(res?.data?.client_email);
+            }
+
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          if (err.response?.data.code === 0) {
+            tokenExpired();
+          }
+        });
+    }
+
+    return () => {
+      setEmailList([]);
+      setTotalPage(1);
+      setClientEmail([]);
+    };
+  }, []);
+
+  function reLoad(pgIndex) {
+    var bot_id = Cookies.get('bot_id');
     api
       .get(`/api/v1/managements/emails?page=${pgIndex}&chatbot_id=${bot_id}`)
       .then((res) => {
-        if (res.data?.code === 1) {
-          setEmailList(res.data?.data || []);
-          setTotal(res.data.total || 0);
-          setClientEmail(res?.data?.client_email);
+        var totalPage = Math.ceil(res.data?.total / 25);
+        if (pgIndex > totalPage) {
+          api
+            .get(`/api/v1/managements/emails?page=${totalPage}&chatbot_id=${bot_id}`)
+            .then((res) => {
+              setEmailList(res.data.data);
+            })
+            .catch((err) => {
+              console.log(err);
+              if (err.response?.data.code === 0) {
+                tokenExpired();
+              }
+            });
+        } else {
+          setEmailList(res.data.data);
         }
+        setTotalPage(totalPage);
       })
       .catch((err) => {
-        if (err.response?.data.code === 0) tokenExpired();
+        console.log(err);
+        if (err.response?.data.code === 0) {
+          tokenExpired();
+        }
       });
-  };
+  }
 
-  useEffect(() => {
-    fetchEmails(1);
-    return () => setEmailList([]);
-  }, []);
+  function openDuplicate(id) {
+    setIsOpenDuplicate(true);
+    setIdEmail(id);
+  }
 
   function duplicateEmail() {
     api
       .post(`/api/v1/managements/emails/${idEmail}/duplicate`)
       .then((res) => {
-        setIsOpenDuplicate(false);
         if (res.data.code == 1) {
-          message.success('正常に複製されました！');
-          fetchEmails(page);
+          setIsOpenDuplicate(false);
+          setIsOpenNoti(true);
+          setMsgNoti(`正常に複製されました！`);
+          reLoad(pageIndex);
+          setTimeout(() => {
+            setIsOpenNoti(false);
+            setMsgNoti(``);
+          }, 2000);
         } else if (res.data.code == 2) {
-          message.warning(res.data.message);
+          setIsOpenDuplicate(false);
+          setIsOpenNoti(true);
+          setMsgNoti(res.data.message);
+          setTimeout(() => {
+            setIsOpenNoti(false);
+            setMsgNoti(``);
+          }, 2000);
         }
       })
       .catch((err) => {
-        if (err.response?.data.code === 0) tokenExpired();
+        console.log(err);
+        if (err.response?.data.code === 0) {
+          tokenExpired();
+        }
       });
+  }
+
+  function openDelete(id) {
+    setIsOpenDelete(true);
+    setIdEmail(id);
   }
 
   function deleteEmail() {
     api
       .delete(`/api/v1/managements/emails/${idEmail}`)
       .then((res) => {
-        setIsOpenDelete(false);
         if (res.data.code == 1) {
-          message.success('正常に削除されました！');
-          fetchEmails(page);
+          setIsOpenDelete(false);
+          setIsOpenNoti(true);
+          setMsgNoti(`正常に削除されました！`);
+          reLoad(pageIndex);
+          setTimeout(() => {
+            setIsOpenNoti(false);
+            setMsgNoti(``);
+          }, 2000);
         } else if (res.data.code == 2) {
-          message.warning(res.data.message);
+          setIsOpenDelete(false);
+          setIsOpenNoti(true);
+          setMsgNoti(res.data.message);
+          setTimeout(() => {
+            setIsOpenNoti(false);
+            setMsgNoti(``);
+          }, 2000);
         }
       })
       .catch((err) => {
-        if (err.response?.data.code === 0) tokenExpired();
+        console.log(err);
+        if (err.response?.data.code === 0) {
+          tokenExpired();
+        }
       });
   }
-
-  useAdminHeaderActions(
-    <AdminActionButton
-      action="create"
-      label="新メール追加"
-      onClick={() => { window.location.href = '/admin/create-email'; }}
-    />
-  );
+  function handleChange(event, value) {
+    console.log(value);
+    if (totalPage > 1) {
+      setPage(parseInt(value));
+      setPageIndex(value);
+      reLoad(value);
+      document.querySelector('.main-panel').scrollTop = 0;
+    }
+  }
 
   return (
+    // <div>ListEmail</div>
     <>
-      <AdminPage>
-        <div className="email-list-page">
-          <Collapse accordion className="email-list-collapse">
-            {emailList?.map((item) => (
-              <Panel
-                header={item?.email_template_name || item?.subject || 'メール'}
-                key={item.id}
-              >
-                <table className="email-list-detail-table">
-                  <tbody>
-                    <tr>
-                      <th>差出人</th>
-                      <td>{item?.sender_name || '—'}</td>
-                    </tr>
-                    <tr>
-                      <th>宛先</th>
-                      <td>
-                        {item?.to || '—'}
-                        {clientEmail != null ? ` (${clientEmail})` : ''}
-                      </td>
-                    </tr>
-                    <tr>
-                      <th>CC</th>
-                      <td>
-                        {item?.cc?.length
-                          ? item.cc.map((cc, ic) => <div key={ic}>{cc?.to}</div>)
-                          : '—'}
-                      </td>
-                    </tr>
-                    <tr>
-                      <th>BCC</th>
-                      <td>
-                        {item?.bcc?.length
-                          ? item.bcc.map((bcc, ib) => <div key={ib}>{bcc?.to}</div>)
-                          : '—'}
-                      </td>
-                    </tr>
-                    <tr>
-                      <th>Reply-To</th>
-                      <td>{item?.reply_to || '—'}</td>
-                    </tr>
-                    <tr>
-                      <th>件名</th>
-                      <td>{item?.subject || '—'}</td>
-                    </tr>
-                    <tr>
-                      <th>テンプレート名</th>
-                      <td>{item?.email_template_name || '—'}</td>
-                    </tr>
-                  </tbody>
-                </table>
+      <div className="content">
+        <Row id="screenAll">
+          <Col md="12">
+            <Card>
+              <CardHeader>
+                <h4 style={{ margin: '10px 0' }}>メール一覧</h4>
+                <button
+                  className="btn btn-primary"
+                  onClick={() => (window.location.href = '/admin/create-email')}
+                >
+                  新メール追加
+                </button>
+              </CardHeader>
+              <CardBody>
+                <div className="mail__list">
+                  {emailList?.map((item, i) => (
+                    <div className="mail__list-item" key={i}>
+                      <p>テスト</p>
+                      <div className="mail-block">
+                        <table className="mail-table">
+                          <tbody>
+                            <tr>
+                              <th>差出人</th>
+                              <td>{item?.sender_name}</td>
+                            </tr>
+                            <tr>
+                              <th>宛先</th>
+                              <td>
+                                {item?.to} {clientEmail != null ? `(${clientEmail})` : ''}
+                              </td>
+                            </tr>
+                            <tr>
+                              <th>CC</th>
+                              <td>
+                                {item?.cc?.map((cc, ic) => (
+                                  <span key={ic} style={{ fontWeight: '400' }}>
+                                    {cc?.to} <br />
+                                  </span>
+                                ))}
+                              </td>
+                              {/* <td>aaa@gmail.com <br />aaab@gmail.com</td> */}
+                            </tr>
+                            <tr>
+                              <th>BCC</th>
+                              <td>
+                                {item?.bcc?.map((bcc, ib) => (
+                                  <span key={ib} style={{ fontWeight: '400' }}>
+                                    {bcc?.to} <br />
+                                  </span>
+                                ))}
+                              </td>
+                            </tr>
+                            <tr>
+                              <th>Reply-To</th>
+                              <td>{item?.reply_to}</td>
+                            </tr>
+                          </tbody>
+                        </table>
 
-                <div className="email-content-preview">
-                  <div className="email-content-preview__header">メール内容</div>
-                  <pre className="email-content-preview__body">{item?.content || '—'}</pre>
+                        <div className="mail-detail">
+                          <div className="email-detail--subject" type="text">
+                            <span>件名 </span>
+                            {item?.email_template_name}
+                            <br />
+                            <span>テンプレート名 </span>
+                            {item?.subject}
+                          </div>
+
+                          <div className="mail-detail--text">
+                            <span>メール内容 </span>
+                            <p>{item?.content}</p>
+                          </div>
+                        </div>
+
+                        <div className="mail-actions">
+                          <button
+                            className="mail-actions--btn btn btn-default"
+                            onClick={() => {
+                              window.location.href = `/admin/edit-email/${item?.id}`;
+                            }}
+                          >
+                            編集
+                          </button>
+                          <button
+                            className="mail-actions--btn btn btn-success"
+                            onClick={() => openDuplicate(item.id)}
+                          >
+                            複製
+                          </button>
+                          <button
+                            className="mail-actions--btn btn btn-danger"
+                            onClick={() => openDelete(item.id)}
+                          >
+                            削除
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
 
-                <Space className="email-list-actions admin-table-actions">
-                  <AdminActionButton
-                    action="edit"
-                    onClick={() => { window.location.href = `/admin/edit-email/${item?.id}`; }}
-                  />
-                  <AdminActionButton
-                    action="duplicate"
-                    onClick={() => { setIsOpenDuplicate(true); setIdEmail(item.id); }}
-                  />
-                  <AdminActionButton
-                    action="delete"
-                    onClick={() => { setIsOpenDelete(true); setIdEmail(item.id); }}
-                  />
-                </Space>
-              </Panel>
-            ))}
-          </Collapse>
+                <Pagination
+                  count={totalPage}
+                  variant="outlined"
+                  page={page}
+                  onChange={handleChange}
+                />
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
 
-          {total > 25 && (
-            <div className="email-list-pagination">
-              <Button disabled={page <= 1} onClick={() => { setPage(page - 1); fetchEmails(page - 1); }}>
-                前へ
-              </Button>
-              <span style={{ margin: '0 16px' }}>{page} / {Math.ceil(total / 25)}</span>
-              <Button
-                disabled={page >= Math.ceil(total / 25)}
-                onClick={() => { setPage(page + 1); fetchEmails(page + 1); }}
-              >
-                次へ
-              </Button>
-            </div>
-          )}
-        </div>
-      </AdminPage>
+        <ModalShort open={isOpenDuplicate} onClose={() => setIsOpenDuplicate(false)}>
+          <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
+            <h4>本当に複製しますか。</h4>
+            <Button onClick={() => duplicateEmail()}>はい</Button>
+            <Button onClick={() => setIsOpenDuplicate(false)}>いいえ</Button>
+          </div>
+        </ModalShort>
 
-      <AdminConfirmModal open={isOpenDuplicate} message="本当に複製しますか。" onOk={duplicateEmail} onCancel={() => setIsOpenDuplicate(false)} />
-      <AdminConfirmModal open={isOpenDelete} message="本当に削除しますか。" onOk={deleteEmail} onCancel={() => setIsOpenDelete(false)} danger />
+        <ModalShort open={isOpenDelete} onClose={() => setIsOpenDelete(false)}>
+          <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
+            <h4>本当に削除しますか。</h4>
+            <Button onClick={() => deleteEmail()}>はい</Button>
+            <Button onClick={() => setIsOpenDelete(false)}>いいえ</Button>
+          </div>
+        </ModalShort>
+
+        <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
+          <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
+            <span style={{ fontSize: '16px' }}>{msgNoti}</span>
+          </div>
+        </ModalNoti>
+      </div>
     </>
   );
 }

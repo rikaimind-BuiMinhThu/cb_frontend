@@ -176,10 +176,13 @@ function AttractedCustomer() {
       labels: ['DM', 'ストーリー', 'ライブ'],
       responsive: [
         {
-          breakpoint: 480,
+          breakpoint: undefined,
           options: {
             chart: {
               width: 500,
+            },
+            labels: {
+              position: 'bottom',
             },
             legend: {
               position: 'bottom',
@@ -211,9 +214,7 @@ function AttractedCustomer() {
         type: 'solid',
         opacity: 0,
       },
-      xaxis: {
-        categories: dataECU,
-      },
+      labels: dataECU,
       markers: {
         size: 0,
       },

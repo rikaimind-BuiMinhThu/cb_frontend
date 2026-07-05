@@ -1,3 +1,4 @@
+import v2Routes from './v2/routes';
 import Dashboard from 'views/Dashboard.jsx';
 import Chatbot from 'views/InstagramBotElement/Chatbot';
 
@@ -31,8 +32,6 @@ import APIManagement from 'views/BotElement/BotSetting/APISetting/APIManagement'
 import CreateABTest from 'views/BotElement/BotSetting/ABTest/CreateABTest';
 import ListABTest from 'views/BotElement/BotSetting/ABTest/ListABTest';
 import Scenario from 'views/BotElement/BotSetting/ScenarioSetting/Scenario';
-import ScenarioTemplateList from 'views/BotElement/BotSetting/ScenarioSetting/ScenarioTemplateList';
-import ScenarioTemplateEditor from 'views/BotElement/BotSetting/ScenarioSetting/ScenarioTemplateEditor';
 import VariableManagement from 'views/BotElement/BotSetting/VariableManagement';
 import InstallationTag from 'views/BotElement/BotSetting/InstallationTag';
 import Conversion from 'views/BotElement/BotSetting/Conversion';
@@ -260,18 +259,6 @@ var routes = [
     layout: '/admin',
   },
   {
-    path: '/scenario-template-list',
-    name: 'シナリオテンプレート一覧',
-    component: ScenarioTemplateList,
-    layout: '/admin',
-  },
-  {
-    path: '/scenario-template-setting',
-    name: 'シナリオテンプレート設定',
-    component: ScenarioTemplateEditor,
-    layout: '/admin',
-  },
-  {
     path: '/design-setting',
     name: 'デザイン設定',
     // icon: "nc-icon nc-single-02",
@@ -476,4 +463,4 @@ var routes = [
 // if(Cookies.get('token') !== ""){
 //   routes.splice('2','1')
 // }
-export default routes;
+export default [...routes, ...v2Routes];

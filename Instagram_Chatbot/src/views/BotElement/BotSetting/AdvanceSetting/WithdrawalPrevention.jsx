@@ -1,7 +1,14 @@
 import React, { useEffect } from 'react';
+import './../../../../assets/css/bot/withdrawal-prevention.css';
 import { Card, CardHeader, CardBody, Row, Col } from 'reactstrap';
 import { useState } from 'react';
-import { AdminPage, AdminActionButton, useAdminHeaderActions } from '../../../../components/AdminShell';
+import { Button } from 'react-bootstrap';
+import Cookies from 'js-cookie';
+import api from './../../../../api/api-management';
+import { tokenExpired } from 'api/tokenExpired';
+import ModalNoti from 'views/Popup/ModalNoti';
+import * as utils from './../../../../JS/validate.js';
+import {patchWithDrawalPreview} from "../../BotSetting/PreviewComponent/Utils"
 
 function WithdrawalPrevention() {
   const [valueWP, setValueWP] = useState('');
@@ -189,17 +196,13 @@ function WithdrawalPrevention() {
     document.getElementById('display_img_url').style.display = 'block'
     document.getElementById('image_popup').checked = true
   }
-
-  useAdminHeaderActions(
-    <AdminActionButton action="save" onClick={() => handleKeep()} />
-  );
-
   return (
     <>
-      <AdminPage card={false}>
+      <div className="content">
         <Row id="screenAll">
           <Col md="12">
-            <Card className="admin-page-card">
+            <Card>
+              <CardHeader>離脱防止</CardHeader>
               <CardBody>
                 <div onLoad={checkRadioChecked()}>
                   <input
@@ -272,6 +275,7 @@ function WithdrawalPrevention() {
                     />
                   </div>
                 </div>
+                <Button onClick={() => handleKeep()}>保存</Button>
               </CardBody>
             </Card>
           </Col>
@@ -282,7 +286,7 @@ function WithdrawalPrevention() {
             <span style={{ fontSize: '16px' }}>{msgNoti}</span>
           </div>
         </ModalNoti>
-      </AdminPage>
+      </div>
     </>
   );
 }

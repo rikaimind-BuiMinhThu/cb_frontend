@@ -1,432 +1,624 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Input, Space, Tabs, Typography, message } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
+import React, { useState } from 'react';
+import { Card, CardHeader, CardBody, Row, Col } from 'reactstrap';
+import './../../../assets/css/bot/variable.css';
+import { MDBIcon } from 'mdbreact';
 import Cookies from 'js-cookie';
-import api from '../../../api/api-management';
+import { useEffect } from 'react';
+import api from './../../../api/api-management'; 
+import ModalNoti from 'views/Popup/ModalNoti';
+import ModalShort from 'views/Popup/ModalShort';
+import { Button } from 'react-bootstrap';
 import { tokenExpired } from 'api/tokenExpired';
-import { AdminConfirmModal, AdminPage, AdminTable, AdminActionButton } from '../../../components/AdminShell';
-
-const PAGE_SIZE = 25;
-
-const SYSTEM_VARIABLES = [
-  { name: 'current_url', description: 'ボットを開いたページのURL' },
-  {
-    name: 'current_url_param',
-    description: 'ボットを開いたページのURLについてるパラメータ（「?」以降の文字列）',
-  },
-  { name: 'current_url_title', description: 'ボットを開いたwebページのタイトルZ' },
-  {
-    name: 'user_id',
-    description: 'ボットを使用するユーザーごとに自動的に付与されるユニークなID',
-  },
-  { name: 'bot_id', description: 'ボットのID' },
-  {
-    name: 'preview_flg',
-    description: 'プレビュー機能の使用ユーザーのフラグ（通常ユーザーは空）',
-  },
-  { name: 'user_ip_address', description: 'アクセスしたユーザーのIPアドレス' },
-  { name: 'user_country', description: 'IPアドレスから割り出した国名' },
-  { name: 'user_city', description: 'IPアドレスから割り出した市区町村' },
-  {
-    name: 'user_device',
-    description: 'ユーザーが使用しているデバイスの種類（PC、スマホ、タブレット）',
-  },
-  { name: 'user_browser', description: 'ユーザーが使用しているブラウザの種類' },
-  {
-    name: 'user_agent',
-    description: 'ユーザーが使用しているブラウザ情報とOS情報（各種類、バージョンなど）',
-  },
-  { name: 'cv_datetime', description: 'ユーザーがシナリオの終端まできた時の日時' },
-  {
-    name: 'cv_flg',
-    description:
-      'ユーザーがシナリオの終端まできた時にフラグ（終端まできたユーザーは「1」の値、途中のユーザーは「0」の値を返す）',
-  },
-  { name: 'start_datetime', description: 'チャットボットを開き最初に会話をした日時' },
-  {
-    name: 'user_referer_firstopen',
-    description: '最初に開いた時のユーザーのリファラル（サイトに訪れる前に滞在していたページのURL）',
-  },
-  {
-    name: 'user_referer_current',
-    description: '最後に開いた時のユーザーのリファラル（サイトに訪れる前に滞在していたページのURL）',
-  },
-];
-
-function validateVariableName(name) {
-  if (!name?.trim()) {
-    return '変数名は、必ず指定してください。';
-  }
-  if (name.length > 30) {
-    return '変数名は30文字以内で入力してください。';
-  }
-  return null;
-}
+import Pagination from '@material-ui/lab/Pagination';
 
 function VariableManagement() {
-  const botId = Cookies.get('bot_id');
-  const [tab, setTab] = useState('user');
-  const [variables, setVariables] = useState([]);
-  const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
+  const [customVariable, setCustomVariable] = useState([]);
+  const [numVar, setNumVar] = useState(1);
+  const [botId, setBotId] = useState();
+  const [isOpenNoti, setIsOpenNoti] = useState(false);
+  const [msgNoti, setMsgNoti] = useState();
+  const [listVariable, setListVariable] = useState([]);
+  const [openVariable, setOpenVariable] = useState(true);
+  const [isOpenDelete, setIsOpenDelete] = useState(false);
+  const [idVariable, setIdVariable] = useState();
+
+  let [totalPage, setTotalPage] = useState();
+  var [pageIndex, setPageIndex] = useState(1);
+  var [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [addingNew, setAddingNew] = useState(false);
-  const [newVariable, setNewVariable] = useState({ variable_name: '', default_value: '' });
-  const [fieldErrors, setFieldErrors] = useState({});
-  const [deleteId, setDeleteId] = useState(null);
 
-  const fetchVariables = useCallback(
-    (pageIndex, name = searchQuery) => {
-      if (!botId) {
-        return;
-      }
+  useEffect(() => {
+    var bot_id = Cookies.get('bot_id');
+    console.log(bot_id);
+    setBotId(bot_id);
+  }, []);
 
-      setLoading(true);
+  useEffect(() => {
+    var bot_id = Cookies.get('bot_id');
+    api
+      .get(`/api/v1/managements/chatbots/${bot_id}/variables?page=1`)
+      .then((res) => {
+        if (res.data.data !== [] && res.data.total !== 0) {
+          console.log(res?.data);
+          setListVariable(res?.data?.data);
+          setTotalPage(Math.ceil(res?.data?.total / 25));
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        if (err.response?.data.code === 0) {
+          tokenExpired();
+        }
+      });
+  }, []);
+
+  function reloadListVariable(pgIndex) {
+    console.log(pgIndex);
+    api
+      .get(`/api/v1/managements/chatbots/${botId}/variables?page=${pgIndex}&name=${search}`)
+      .then((res) => {
+        console.log(res);
+        setListVariable(res.data.data);
+        for (var i = 0; i < res.data.data.length; i++) {
+          document.getElementById(`up_variable_name_${i}`).value = res?.data?.data[i].variable_name;
+          document.getElementById(`up_variable_value_${i}`).value =
+            res?.data?.data[i].default_value;
+        }
+        setTotalPage(Math.ceil(res.data.total / 25));
+      })
+      .catch((err) => {
+        console.log(err);
+        if (err.response?.data.code === 0) {
+          tokenExpired();
+        }
+      });
+  }
+
+  function handleChange(event, value) {
+    if (totalPage > 1) {
+      setPage(parseInt(value));
+      setPageIndex(value);
+      reloadListVariable(value);
+      document.querySelector('.main-panel').scrollTop = 0;
+    }
+  }
+
+  function handleSearch() {
+    reloadListVariable(pageIndex);
+  }
+
+  //add field to add new variable
+  function addNewVar() {
+    let cDivs = customVariable;
+    cDivs.push(`newDiv${numVar}`);
+    setCustomVariable(cDivs);
+    setNumVar(numVar + 1);
+    console.log(customVariable);
+    document.getElementById('add_new_var').setAttribute('disabled', '');
+  }
+
+  //save new variable
+  function saveNewVar(index) {
+    checkInput(`variable_name_${index}`, `errVarName_${index}`, '変数名');
+    if (checkInput(`variable_name_${index}`, `errVarName_${index}`, '変数名')) {
+      let name = document.getElementById(`variable_name_${index}`).value;
+      let dfvalue = document.getElementById(`variable_value_${index}`).value;
+      let add = { variable: { variable_name: name, default_value: dfvalue } };
+
       api
-        .get(`/api/v1/managements/chatbots/${botId}/variables`, {
-          params: { page: pageIndex, name },
-        })
+        .post(`/api/v1/managements/chatbots/${botId}/variables`, add)
         .then((res) => {
-          setVariables(res.data.data || []);
-          setTotal(res.data.total || 0);
+          if (res.data.code == 1) {
+            console.log(res);
+            reloadListVariable(pageIndex);
+            setIsOpenNoti(true);
+            setMsgNoti(`保存しました。`);
+            setTimeout(() => {
+              setIsOpenNoti(false);
+              setMsgNoti(``);
+            }, 2000);
+            const list = document.getElementById(`new_var_add_${index}`);
+            while (list.hasChildNodes()) {
+              list.removeChild(list.firstChild);
+            }
+            document.getElementById('add_new_var').removeAttribute('disabled');
+          }
         })
         .catch((err) => {
+          console.log(err);
           if (err.response?.data.code === 0) {
             tokenExpired();
           }
-        })
-        .finally(() => setLoading(false));
-    },
-    [botId, searchQuery]
-  );
-
-  useEffect(() => {
-    fetchVariables(page);
-  }, [fetchVariables, page]);
-
-  const handleSearch = () => {
-    setSearchQuery(search);
-    setPage(1);
-  };
-
-  const updateField = (id, field, value) => {
-    setVariables((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
-    );
-    setFieldErrors((prev) => {
-      const next = { ...prev };
-      delete next[`${id}-${field}`];
-      return next;
-    });
-  };
-
-  const handleSave = (item) => {
-    const nameError = validateVariableName(item.variable_name);
-    if (nameError) {
-      setFieldErrors((prev) => ({
-        ...prev,
-        [`${item.id}-variable_name`]: nameError,
-      }));
-      return;
+        });
     }
+  }
 
-    api
-      .patch(`/api/v1/managements/chatbots/${botId}/variables/${item.id}`, {
-        variable: {
-          variable_name: item.variable_name,
-          default_value: item.default_value || '',
-        },
-      })
-      .then((res) => {
-        if (res.data.code === 1) {
-          message.success('更新しました。');
-          fetchVariables(page);
-        }
-      })
-      .catch((err) => {
-        if (err.response?.data.code === 0) {
-          tokenExpired();
-        }
-      });
-  };
-
-  const handleCreate = () => {
-    const nameError = validateVariableName(newVariable.variable_name);
-    if (nameError) {
-      setFieldErrors({ new_variable_name: nameError });
-      return;
+  function cancelSaveNewVakr(index) {
+    const list = document.getElementById(`new_var_add_${index}`);
+    // console.log(list)
+    while (list.hasChildNodes()) {
+      list.removeChild(list.firstChild);
     }
+    document.getElementById('add_new_var').removeAttribute('disabled');
+  }
 
+  //function delete variable
+  function openDelete(id) {
+    setIsOpenDelete(true);
+    setIdVariable(id);
+  }
+  function deleteVariable() {
+    console.log(idVariable);
     api
-      .post(`/api/v1/managements/chatbots/${botId}/variables`, {
-        variable: {
-          variable_name: newVariable.variable_name,
-          default_value: newVariable.default_value || '',
-        },
-      })
+      .delete(`/api/v1/managements/chatbots/${botId}/variables/${idVariable}`)
       .then((res) => {
-        if (res.data.code === 1) {
-          message.success('保存しました。');
-          setAddingNew(false);
-          setNewVariable({ variable_name: '', default_value: '' });
-          setFieldErrors({});
-          fetchVariables(page);
-        }
-      })
-      .catch((err) => {
-        if (err.response?.data.code === 0) {
-          tokenExpired();
-        }
-      });
-  };
-
-  const handleDelete = () => {
-    api
-      .delete(`/api/v1/managements/chatbots/${botId}/variables/${deleteId}`)
-      .then((res) => {
-        if (res.data.code === 1) {
-          message.success('削除しました。');
-          setDeleteId(null);
-          fetchVariables(page);
+        if (res.data.code == 1) {
+          setIsOpenDelete(false);
+          reloadListVariable(pageIndex);
+          setMsgNoti(`削除しました。`);
+          setIsOpenNoti(true);
+          setTimeout(() => {
+            setIsOpenNoti(false);
+            setMsgNoti(``);
+          }, 2000);
         } else {
-          message.error('削除できませんでした。');
-          setDeleteId(null);
+          setIsOpenDelete(false);
+          setMsgNoti(`削除できませんでした。`);
+          setIsOpenNoti(true);
+          setTimeout(() => {
+            setIsOpenNoti(false);
+            setMsgNoti(``);
+          }, 2000);
         }
       })
       .catch((err) => {
+        console.log(err);
         if (err.response?.data.code === 0) {
           tokenExpired();
         }
       });
-  };
+  }
 
-  const userColumns = useMemo(
-    () => [
-      {
-        title: 'No.',
-        width: 70,
-        align: 'center',
-        render: (_, __, index) => (page - 1) * PAGE_SIZE + index + 1,
-      },
-      {
-        title: '変数名',
-        dataIndex: 'variable_name',
-        width: '28%',
-        render: (value, row) => (
-          <div>
-            <Input
-              className="admin-variable-input"
-              value={value || ''}
-              placeholder="変数名をご入力ください"
-              status={fieldErrors[`${row.id}-variable_name`] ? 'error' : undefined}
-              onChange={(e) => updateField(row.id, 'variable_name', e.target.value)}
-            />
-            {fieldErrors[`${row.id}-variable_name`] && (
-              <Typography.Text type="danger" style={{ fontSize: 12 }}>
-                {fieldErrors[`${row.id}-variable_name`]}
-              </Typography.Text>
-            )}
-          </div>
-        ),
-      },
-      {
-        title: 'デフォルト値',
-        dataIndex: 'default_value',
-        render: (value, row) => (
-          <Input
-            className="admin-variable-input"
-            value={value || ''}
-            placeholder="変数値をご入力ください"
-            onChange={(e) => updateField(row.id, 'default_value', e.target.value)}
-          />
-        ),
-      },
-      {
-        title: 'アクション',
-        align: 'right',
-        width: 180,
-        render: (_, row) => (
-          <Space size={4} wrap={false} className="admin-table-actions">
-            <AdminActionButton action="save" size="small" onClick={() => handleSave(row)} />
-            <AdminActionButton action="delete" onClick={() => setDeleteId(row.id)} />
-          </Space>
-        ),
-      },
-    ],
-    [fieldErrors, page]
-  );
+  //funtion update variable
+  function updateVariable(id, index) {
+    checkInput(`up_variable_name_${index}`, `errUpVarName_${index}`, '変数名');
+    if (checkInput(`up_variable_name_${index}`, `errUpVarName_${index}`, '変数名')) {
+      let name = document.getElementById(`up_variable_name_${index}`).value;
+      let dfvalue = document.getElementById(`up_variable_value_${index}`).value;
+      let editVariable = {
+        variable: {
+          variable_name: name,
+          default_value: dfvalue,
+        },
+      };
+      api
+        .patch(`/api/v1/managements/chatbots/${botId}/variables/${id}`, editVariable)
+        .then((res) => {
+          console.log(res);
+          if (res.data.code == 1) {
+            reloadListVariable(pageIndex);
+            setIsOpenNoti(true);
+            setMsgNoti(`更新しました。`);
+            setTimeout(() => {
+              setIsOpenNoti(false);
+              setMsgNoti(``);
+            }, 2000);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          if (err.response?.data.code === 0) {
+            tokenExpired();
+          }
+        });
+    }
+  }
 
-  const systemColumns = useMemo(
-    () => [
-      {
-        title: 'No.',
-        width: 70,
-        align: 'center',
-        render: (_, __, index) => index + 1,
-      },
-      {
-        title: '変数名',
-        dataIndex: 'name',
-        width: 220,
-        render: (name) => (
-          <Typography.Text code style={{ fontSize: 13 }}>
-            {name}
-          </Typography.Text>
-        ),
-      },
-      {
-        title: '変数備考',
-        dataIndex: 'description',
-        render: (description) => (
-          <Typography.Text type="secondary">{description}</Typography.Text>
-        ),
-      },
-    ],
-    []
-  );
-
-  const userToolbar = (
-    <Space wrap size={12}>
-      <Input
-        placeholder="変数検索..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        onPressEnter={handleSearch}
-        prefix={<SearchOutlined style={{ color: '#9ca3af' }} />}
-        allowClear
-        style={{ width: 240 }}
-      />
-      <Button type="primary" onClick={handleSearch}>
-        検索
-      </Button>
-      <AdminActionButton
-        action="create"
-        label="追加"
-        onClick={() => setAddingNew(true)}
-        disabled={addingNew}
-      />
-    </Space>
-  );
-
-  const userTabContent = (
-    <>
-      <AdminTable
-        loading={loading}
-        toolbar={userToolbar}
-        columns={userColumns}
-        dataSource={variables}
-        rowKey="id"
-        emptyDescription="変数がありません"
-        pagination={{
-          current: page,
-          total,
-          pageSize: PAGE_SIZE,
-          onChange: (nextPage) => {
-            setPage(nextPage);
-            window.scrollTo(0, 0);
-          },
-        }}
-      />
-
-      {addingNew && (
-        <div className="admin-variable-new-row">
-          <Typography.Text strong style={{ display: 'block', marginBottom: 12 }}>
-            新しい変数を追加
-          </Typography.Text>
-          <Space wrap align="start" size={12} style={{ width: '100%' }}>
-            <div style={{ flex: 1, minWidth: 220 }}>
-              <Input
-                placeholder="変数名をご入力ください"
-                value={newVariable.variable_name}
-                status={fieldErrors.new_variable_name ? 'error' : undefined}
-                onChange={(e) => {
-                  setNewVariable((prev) => ({
-                    ...prev,
-                    variable_name: e.target.value,
-                  }));
-                  setFieldErrors((prev) => {
-                    const next = { ...prev };
-                    delete next.new_variable_name;
-                    return next;
-                  });
-                }}
-              />
-              {fieldErrors.new_variable_name && (
-                <Typography.Text type="danger" style={{ fontSize: 12 }}>
-                  {fieldErrors.new_variable_name}
-                </Typography.Text>
-              )}
-            </div>
-            <Input
-              placeholder="変数値をご入力ください"
-              value={newVariable.default_value}
-              onChange={(e) =>
-                setNewVariable((prev) => ({
-                  ...prev,
-                  default_value: e.target.value,
-                }))
-              }
-              style={{ flex: 1, minWidth: 220 }}
-            />
-            <Space>
-              <AdminActionButton action="save" onClick={handleCreate} />
-              <AdminActionButton
-                action="cancel"
-                onClick={() => {
-                  setAddingNew(false);
-                  setNewVariable({ variable_name: '', default_value: '' });
-                  setFieldErrors({});
-                }}
-              />
-            </Space>
-          </Space>
-        </div>
-      )}
-    </>
-  );
+  //validate
+  const field = document.getElementById.bind(document);
+  function checkInput(idInput, errInput, lable) {
+    if (field(idInput).value === '') {
+      field(errInput).style.display = 'block';
+      field(errInput).innerHTML = `${lable}は、必ず指定してください。`;
+      return false;
+    } else if (field(idInput).value.length > 30) {
+      field(errInput).style.display = 'block';
+      field(errInput).innerHTML = `${lable} 30 文字以上。`;
+      return false;
+    } else {
+      field(errInput).style.display = 'none';
+      field(errInput).innerHTML = ``;
+      return true;
+    }
+  }
 
   return (
     <>
-      <AdminPage
-        description="※ユーザの入力内容などを保管する変数です。シナリオの中で代入や参照ができます。"
-      >
-        <Tabs
-          activeKey={tab}
-          onChange={setTab}
-          className="admin-page-tabs"
-          items={[
-            {
-              key: 'user',
-              label: 'ユーザー定義関数',
-              children: userTabContent,
-            },
-            {
-              key: 'system',
-              label: 'システム変数',
-              children: (
-                <AdminTable
-                  columns={systemColumns}
-                  dataSource={SYSTEM_VARIABLES}
-                  rowKey="name"
-                  pagination={false}
-                  emptyDescription="システム変数がありません"
-                />
-              ),
-            },
-          ]}
-        />
-      </AdminPage>
+      <div className="content">
+        <Row id="screenAll">
+          <Col md="12">
+            <Card>
+              <CardHeader>
+                <button className="btn btn-primary" onClick={() => setOpenVariable(true)}>
+                  ユーザー定義関数
+                </button>
+                <button className="btn btn-primary" onClick={() => setOpenVariable(false)}>
+                  システム変数
+                </button>
+                {openVariable ? (
+                  <div className="var-variable-search">
+                    <input
+                      className="var-form-input"
+                      type="text"
+                      placeholder="変数検索..."
+                      onChange={(e) => setSearch(e.target.value)}
+                    />
+                    <Button style={{ width: "100px" }} onClick={() => handleSearch()}>検索</Button>
+                  </div>
+                ) : (
+                  ''
+                )}
+                <p className="var-variable-note">
+                  ※ユーザの入力内容などを保管する変数です。シナリオの中で代入や参照ができます。
+                </p>
+              </CardHeader>
+              <CardBody>
+                {openVariable ? (
+                  <div className="var_defined-variable">
+                    <div className="var-form__head">
+                      <label>変数名</label>
+                      <label>デフォルト値</label>
+                    </div>
+                    <div className="var-form__variable">
+                      {listVariable?.map((item, i) => (
+                        <div className="var-form__variable-group" id={`up_var_add_${i}`} key={i}>
+                          <div className="var-form__variable-name">
+                            <input
+                              className="var-form-input"
+                              id={`up_variable_name_${i}`}
+                              defaultValue={
+                                item.variable_name == undefined ? '' : item.variable_name
+                              }
+                              placeholder="変数名をご入力ください"
+                              onChange={() =>
+                                checkInput(
+                                  `up_variable_name_${i}`,
+                                  `errUpVarName_${i}`,
+                                  '変数名'
+                                )
+                              }
+                              onBlur={() =>
+                                checkInput(
+                                  `up_variable_name_${i}`,
+                                  `errUpVarName_${i}`,
+                                  '変数名'
+                                )
+                              }
+                            />
+                            <span id={`errUpVarName_${i}`} className="err-varriable"></span>
+                          </div>
 
-      <AdminConfirmModal
-        open={Boolean(deleteId)}
-        message="変数を削除しますか。"
-        okText="削除"
-        danger
-        onOk={handleDelete}
-        onCancel={() => setDeleteId(null)}
-      />
+                          <div className="var-form__variable-name">
+                            <input
+                              className="var-form-input"
+                              id={`up_variable_value_${i}`}
+                              defaultValue={
+                                item.default_value == undefined ? '' : item.default_value
+                              }
+                              placeholder="変数値をご入力ください"
+                            />
+                          </div>
+
+                          <div className="var-form__variable-delete">
+                            <MDBIcon
+                              id="save_new_var"
+                              fas
+                              icon="edit"
+                              style={{ fontSize: '20px' }}
+                              onClick={() => updateVariable(item.id, i)}
+                            ></MDBIcon>
+                            <MDBIcon
+                              id="save_new_var"
+                              fas
+                              icon="trash"
+                              style={{ fontSize: '20px', marginLeft: '10px' }}
+                              onClick={() => openDelete(item.id)}
+                            ></MDBIcon>
+                          </div>
+                        </div>
+                      ))}
+                      {customVariable.map((cdiv, i) => (
+                        <div className="var-form__variable-group" id={`new_var_add_${i}`} key={i}>
+                          <div className="var-form__variable-name">
+                            <input
+                              className="var-form-input"
+                              id={`variable_name_${i}`}
+                              placeholder="変数名をご入力ください"
+                              onChange={() =>
+                                checkInput(`variable_name_${i}`, `errVarName_${i}`, '変数名')
+                              }
+                              onBlur={() =>
+                                checkInput(`variable_name_${i}`, `errVarName_${i}`, '変数名')
+                              }
+                            />
+                            <span id={`errVarName_${i}`} className="err-varriable"></span>
+                          </div>
+                          <div className="var-form__variable-name">
+                            <input
+                              className="var-form-input"
+                              id={`variable_value_${i}`}
+                              placeholder="変数値をご入力ください"
+                            />
+                          </div>
+                          <div className="var-form__variable-delete">
+                            <MDBIcon
+                              id="save_new_var"
+                              fas
+                              icon="save"
+                              style={{ fontSize: '20px' }}
+                              onClick={() => saveNewVar(i)}
+                            ></MDBIcon>
+                            <MDBIcon
+                              id="cancel_new_var"
+                              fas
+                              icon="minus-circle"
+                              style={{ fontSize: '20px', marginLeft: '10px' }}
+                              onClick={() => cancelSaveNewVakr(i)}
+                            ></MDBIcon>
+                          </div>
+                        </div>
+                      ))}
+
+                      <div className="var-div-add-new">
+                        <button
+                          id="add_new_var"
+                          onClick={() => addNewVar()}
+                          className="var-btn-add-new"
+                        >
+                          追加
+                        </button>
+                      </div>
+                    </div>
+                    <Pagination
+                      count={totalPage}
+                      variant="outlined"
+                      page={page}
+                      onChange={handleChange}
+                    />
+                  </div>
+                ) : (
+                  <div className="var_system-variable">
+                    <div className="var-form__head">
+                      <label>変数名</label>
+                      <label>変数備考</label>
+                    </div>
+                    <div className="var-form__variable">
+                      <div className="var-form__variable-group">
+                        <div className="var-form__variable-name">
+                          <input
+                            className="var-form-input"
+                            type="text"
+                            disabled
+                            value="current_url"
+                          />
+                        </div>
+                        <div className="var-form__variable-value var-none-border">
+                          ボットを開いたページのURL
+                        </div>
+                      </div>
+                      <div className="var-form__variable-group">
+                        <div className="var-form__variable-name">
+                          <input
+                            className="var-form-input"
+                            type="text"
+                            disabled
+                            value="current_url_param"
+                          />
+                        </div>
+                        <div className="var-form__variable-value var-none-border">
+                          ボットを開いたページのURLについてるパラメータ（「?」以降の文字列）
+                        </div>
+                      </div>
+                      <div className="var-form__variable-group">
+                        <div className="var-form__variable-name">
+                          <input
+                            className="var-form-input"
+                            type="text"
+                            disabled
+                            value="current_url_title"
+                          />
+                        </div>
+                        <div className="var-form__variable-value var-none-border">
+                          ボットを開いたwebページのタイトルZ
+                        </div>
+                      </div>
+                      <div className="var-form__variable-group">
+                        <div className="var-form__variable-name">
+                          <input className="var-form-input" type="text" disabled value="user_id" />
+                        </div>
+                        <div className="var-form__variable-value var-none-border">
+                          ボットを使用するユーザーごとに自動的に付与されるユニークなID
+                        </div>
+                      </div>
+                      <div className="var-form__variable-group">
+                        <div className="var-form__variable-name">
+                          <input className="var-form-input" type="text" disabled value="bot_id" />
+                        </div>
+                        <div className="var-form__variable-value var-none-border">ボットのID</div>
+                      </div>
+                      <div className="var-form__variable-group">
+                        <div className="var-form__variable-name">
+                          <input
+                            className="var-form-input"
+                            type="text"
+                            disabled
+                            value="preview_flg"
+                          />
+                        </div>
+                        <div className="var-form__variable-value var-none-border">
+                          プレビュー機能の使用ユーザーのフラグ（通常ユーザーは空）
+                        </div>
+                      </div>
+                      <div className="var-form__variable-group">
+                        <div className="var-form__variable-name">
+                          <input
+                            className="var-form-input"
+                            type="text"
+                            disabled
+                            value="user_ip_address"
+                          />
+                        </div>
+                        <div className="var-form__variable-value var-none-border">
+                          アクセスしたユーザーのIPアドレス
+                        </div>
+                      </div>
+                      <div className="var-form__variable-group">
+                        <div className="var-form__variable-name">
+                          <input
+                            className="var-form-input"
+                            type="text"
+                            disabled
+                            value="user_country"
+                          />
+                        </div>
+                        <div className="var-form__variable-value var-none-border">
+                          IPアドレスから割り出した国名
+                        </div>
+                      </div>
+                      <div className="var-form__variable-group">
+                        <div className="var-form__variable-name">
+                          <input
+                            className="var-form-input"
+                            type="text"
+                            disabled
+                            value="user_city"
+                          />
+                        </div>
+                        <div className="var-form__variable-value var-none-border">
+                          IPアドレスから割り出した市区町村
+                        </div>
+                      </div>
+                      <div className="var-form__variable-group">
+                        <div className="var-form__variable-name">
+                          <input
+                            className="var-form-input"
+                            type="text"
+                            disabled
+                            value="user_device"
+                          />
+                        </div>
+                        <div className="var-form__variable-value var-none-border">
+                          ユーザーが使用しているデバイスの種類（PC、スマホ、タブレット）
+                        </div>
+                      </div>
+                      <div className="var-form__variable-group">
+                        <div className="var-form__variable-name">
+                          <input
+                            className="var-form-input"
+                            type="text"
+                            disabled
+                            value="user_browser"
+                          />
+                        </div>
+                        <div className="var-form__variable-value var-none-border">
+                          ユーザーが使用しているブラウザの種類
+                        </div>
+                      </div>
+                      <div className="var-form__variable-group">
+                        <div className="var-form__variable-name">
+                          <input
+                            className="var-form-input"
+                            type="text"
+                            disabled
+                            value="user_agent"
+                          />
+                        </div>
+                        <div className="var-form__variable-value var-none-border">
+                          ユーザーが使用しているブラウザ情報とOS情報（各種類、バージョンなど）
+                        </div>
+                      </div>
+                      <div className="var-form__variable-group">
+                        <div className="var-form__variable-name">
+                          <input
+                            className="var-form-input"
+                            type="text"
+                            disabled
+                            value="cv_datetime"
+                          />
+                        </div>
+                        <div className="var-form__variable-value var-none-border">
+                          ユーザーがシナリオの終端まできた時の日時
+                        </div>
+                      </div>
+                      <div className="var-form__variable-group">
+                        <div className="var-form__variable-name">
+                          <input className="var-form-input" type="text" disabled value="cv_flg" />
+                        </div>
+                        <div className="var-form__variable-value var-none-border">
+                          ユーザーがシナリオの終端まできた時にフラグ（終端まできたユーザーは「1」の値、途中のユーザーは「0」の値を返す）
+                        </div>
+                      </div>
+                      <div className="var-form__variable-group">
+                        <div className="var-form__variable-name">
+                          <input
+                            className="var-form-input"
+                            type="text"
+                            disabled
+                            value="start_datetime"
+                          />
+                        </div>
+                        <div className="var-form__variable-value var-none-border">
+                          チャットボットを開き最初に会話をした日時
+                        </div>
+                      </div>
+                      <div className="var-form__variable-group">
+                        <div className="var-form__variable-name">
+                          <input
+                            className="var-form-input"
+                            type="text"
+                            disabled
+                            value="user_referer_firstopen"
+                          />
+                        </div>
+                        <div className="var-form__variable-value var-none-border">
+                          最初に開いた時のユーザーのリファラル（サイトに訪れる前に滞在していたページのURL）
+                        </div>
+                      </div>
+                      <div className="var-form__variable-group">
+                        <div className="var-form__variable-name">
+                          <input
+                            className="var-form-input"
+                            type="text"
+                            disabled
+                            value="user_referer_current"
+                          />
+                        </div>
+                        <div className="var-form__variable-value var-none-border">
+                          最後に開いた時のユーザーのリファラル（サイトに訪れる前に滞在していたページのURL）
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
+
+        <ModalShort open={isOpenDelete} onClose={() => setIsOpenDelete(false)}>
+          <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
+            <h4>変数を削除しますか。</h4>
+            <Button onClick={() => deleteVariable()}>はい</Button>
+            <Button onClick={() => setIsOpenDelete(false)}>いいえ</Button>
+          </div>
+        </ModalShort>
+
+        <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
+          <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
+            <span style={{ fontSize: '16px' }}>{msgNoti}</span>
+          </div>
+        </ModalNoti>
+      </div>
     </>
   );
 }

@@ -1,0 +1,84 @@
+.email-list-page {
+  padding: 20px;
+}
+
+.email-list-collapse .ant-collapse-item {
+  margin-bottom: 12px;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+  background: #fff;
+}
+
+.email-list-collapse .ant-collapse-header {
+  font-weight: 600 !important;
+  color: #1f2937 !important;
+  padding: 14px 16px !important;
+}
+
+.email-list-collapse .ant-collapse-content-box {
+  padding: 16px !important;
+}
+
+.email-list-detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+}
+
+.email-list-detail-table th {
+  width: 140px;
+  text-align: left;
+  padding: 10px 14px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  font-weight: 500;
+  color: #374151;
+  vertical-align: top;
+}
+
+.email-list-detail-table td {
+  padding: 10px 14px;
+  border: 1px solid #e5e7eb;
+  color: #1f2937;
+  vertical-align: top;
+  word-break: break-word;
+}
+
+.email-content-preview {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.email-content-preview__header {
+  padding: 10px 14px;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  font-weight: 600;
+  color: #374151;
+}
+
+.email-content-preview__body {
+  margin: 0;
+  padding: 14px;
+  max-height: 320px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #374151;
+  background: #fff;
+}
+
+.email-list-actions {
+  padding-top: 4px;
+}
+
+.email-list-pagination {
+  margin-top: 16px;
+  text-align: center;
+}

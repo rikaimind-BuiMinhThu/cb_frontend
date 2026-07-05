@@ -20,13 +20,6 @@ let dataClone = {
           type: 'card_payment_radio_button',
           card_payment_radio_button: {
             type: '', //default, customized_style, picture_radio
-            layout: 'vertical',
-            display_style: {
-              selected_bg_color: '',
-              selected_border_color: '',
-              unselected_bg_color: '',
-              unselected_border_color: '',
-            },
             save_input_content: 'yes', // yes-no
             require: 'yes', //yes-no
             title_require: 'yes', //yes-no
@@ -48,9 +41,7 @@ let dataClone = {
             radio_contents: [
               {
                 text: '',
-                value: '',
-                selected_image: '',
-                unselected_image: '',
+                value: ''
               }
             ],
             radio_contents_img: [

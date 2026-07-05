@@ -23,23 +23,12 @@ export const CONVERTERS_DETAIL = {
 
 const MessageStatisticDetail = ({ stats }) => {
   return (
-    <div className="chat-log-step-stats">
+    <div className="msg_stats">
       {Object.keys(stats).map((key) => (
-        <div
-          key={key}
-          className={`chat-log-stat-row${
-            key === "error_count" && stats.error_count > 0
-              ? " chat-log-stat-row--error"
-              : ""
-          }`}
-        >
-          <span className="chat-log-stat-label">
-            {CONVERTERS_DETAIL[key]?.label}
-          </span>
-          <span className="chat-log-stat-value">
-            {CONVERTERS_DETAIL[key]?.value(stats)}
-          </span>
-        </div>
+        <span className="stat">
+          <span className="l">{CONVERTERS_DETAIL[key]?.label}</span>
+          <span className="v">{CONVERTERS_DETAIL[key]?.value(stats)}</span>
+        </span>
       ))}
     </div>
   );

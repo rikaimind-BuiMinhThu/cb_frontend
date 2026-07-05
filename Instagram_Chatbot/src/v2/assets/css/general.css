@@ -1,0 +1,165 @@
+.btnActionStyle {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+.table .btn {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+.editBtn {
+  background-color: green;
+  /* color: black; */
+}
+.deleteBtn {
+  background-color: red;
+  /* color: black; */
+}
+.div_left {
+  width: 50%;
+  float: left;
+}
+.div_right {
+  width: 50%;
+  float: right;
+  text-align: right;
+}
+.cardBody {
+  overflow: hidden;
+}
+.actionList {
+  width: 300px;
+  min-width: 300px;
+}
+.actionListUser{
+  width: 105px;
+  min-width:105px;
+}
+.actionListClient {
+  width: 170px;
+  min-width:170px;
+}
+.label-input {
+  width: 100%;
+  float: left;
+}
+
+.input-field {
+  width: 70%;
+  float: right;
+}
+.input-field-con {
+  /* width: 70%;   */
+  /* float: right; */
+}
+:-ms-input-placeholder {
+  /* Internet Explorer 10-11 */
+  color: black;
+}
+::placeholder {
+  color: black;
+  opacity: 1; /* Firefox */
+}
+.radioButtonAddClient {
+  white-space: nowrap;
+  padding-right: 15px;
+  padding-top: 10px;
+  margin-left: 5px;
+}
+.long-label {
+  width: 27%;
+  overflow-wrap: break-word;
+}
+.span-require {
+  background-color: red;
+  color: white;
+  border-radius: 5px;
+  font-weight: bold;
+  padding: 0px 3px 0px 3px;
+}
+#dropdown-basic-button {
+  padding: 0;
+  margin-top: 0;
+  color: black;
+  font-weight: bold;
+  background-color: white;
+}
+#a_tag {
+  width: 70%;
+  color: black;
+}
+#a_tag:hover {
+  color: #51cbce;
+}
+.mgsChatbot {
+  width: 75%;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  padding: 10px;
+}
+.grid-item {
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 20px;
+  font-size: 30px;
+  text-align: center;
+}
+.ag-chart-wrapper {
+  height: 50%;
+}
+
+/* input {
+    position: relative;
+} */
+
+input[type='date']::-webkit-calendar-picker-indicator {
+  background-position: right;
+  background-size: auto;
+  cursor: pointer;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  width: auto;
+}
+.grid-container-crm {
+  display: grid;
+  grid-template-columns: 50% 50%;
+  padding: 10px;
+  width: 100%;
+}
+.grid-item-crm {
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid #e4e4e4;
+  /* padding: 0px; */
+  padding-top: 5px;
+  padding-bottom: 5px;
+  font-size: 13px;
+  margin-left: 10px;
+  margin-bottom: -1px;
+  margin-right: 10px;
+  text-align: center;
+}
+.radio-btn-action {
+  white-space: nowrap;
+  margin-right: 16px;
+  padding-top: 5px;
+  padding-left: 5px;
+  font-size: 14px !important;
+  font-family: 'Fira Sans', sans-serif;
+  color: #252422 !important;
+  font-weight: 500;
+  cursor: pointer;
+}
+.in_active_popup, 
+.active_popup {
+  cursor: pointer;
+}
+.fas, 
+.far {
+  cursor: pointer;
+ }

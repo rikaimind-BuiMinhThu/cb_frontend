@@ -370,16 +370,9 @@ textarea.ss-message__content--bot-delay {
   display: flex;
   align-items: center;
   margin-bottom: 2px;
-  background: var(--c-radio-unselected-bg, #ebf7ff);
-  border: 1px solid var(--c-radio-unselected-border, transparent);
+  background: #ebf7ff;
   padding: 10px;
   border-radius: 5px;
-}
-
-.ss-message__content--user-radio_button--selected,
-.ss-message__content--user-radio_button:has(input[type="radio"]:checked) {
-  background: var(--c-radio-selected-bg, #ebf7ff);
-  border-color: var(--c-radio-selected-border, transparent);
 }
 
 .ss-message__content--user-radio_button:last-child {
@@ -390,11 +383,6 @@ input#ss-message__content--user-radio_button,
 .ss-message__content--user-radio_button-wrapper input[type="radio"]{
   width: 19px !important;
   height: 19px !important;
-  accent-color: var(--c-radio-input-selected, #327AED);
-}
-
-.ss-message__content--user-radio_button-wrapper input[type="radio"]:not(:checked) {
-  accent-color: var(--c-radio-input-unselected, #ccc);
 }
 
 .ss-message__content--user-radio_button>label {
@@ -422,51 +410,21 @@ input#ss-message__content--user-radio_button,
 }
 
 /* radio_button: type = 'radio_button_img' */
-.ss-message__content--user-radio_button-img-grid {
-  display: grid;
-  gap: var(--radio-option-margin, 5px);
-  width: 100%;
-}
-
 .ss-message__content--user-radio_button--radio_button_img {
   position: relative;
-  margin-bottom: 0;
-  background: var(--c-radio-unselected-bg, transparent);
-  border: 1px solid var(--c-radio-unselected-border, transparent);
-  border-radius: 5px;
-  overflow: hidden;
-  cursor: pointer;
-}
-
-.ss-message__content--user-radio_button--radio_button_img--disabled {
-  cursor: default;
-}
-
-.ss-message__content--user-radio_button--radio_button_img.ss-message__content--user-radio_button--selected,
-.ss-message__content--user-radio_button--radio_button_img:has(input[type="radio"]:checked) {
-  background: var(--c-radio-selected-bg, transparent);
-  border-color: var(--c-radio-selected-border, transparent);
-}
-
-.ss-message__content--user-radio_button--radio_button_img img {
-  width: 100%;
-  height: auto;
-  display: block;
-  pointer-events: none;
+  margin-bottom: 2px;
 }
 
 .ss-message__content--user-radio_button--radio_button_img:last-child {
   margin-bottom: 0;
 }
 
-.ss-message__content--user-radio_button--radio_button_img .ss-radio-button-img-input--hidden,
-.ss-message__content--user-radio_button--radio_button_img input[type="radio"] {
+input#ss-message__content--user-radio_button--radio_button_img {
   position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-  margin: 0;
-  pointer-events: none;
+  width: 19px;
+  height: 19px;
+  top: 8px;
+  left: 8px;
 }
 
 /* user: type = 'checkbox' */
@@ -496,30 +454,18 @@ input#ss-message__content--user-radio_button,
   display: flex;
   align-items: center;
   margin-bottom: 2px;
-  background: var(--c-radio-unselected-bg, #ebf7ff);
-  border: 1px solid var(--c-radio-unselected-border, transparent);
+  background: #ebf7ff;
   padding: 10px;
   border-radius: 5px;
-}
-
-.ss-message__content--user-checkbox--selected,
-.ss-message__content--user-checkbox:has(input[type="checkbox"]:checked) {
-  background: var(--c-radio-selected-bg, #ebf7ff);
-  border-color: var(--c-radio-selected-border, transparent);
 }
 
 .ss-message__content--user-checkbox:last-child {
   margin-bottom: 0;
 }
 
-.ss-message__content--user-checkbox-wrapper input[type="checkbox"] {
-  width: 19px !important;
-  height: 19px !important;
-  accent-color: var(--c-radio-input-selected, #327AED);
-}
-
-.ss-message__content--user-checkbox-wrapper input[type="checkbox"]:not(:checked) {
-  accent-color: var(--c-radio-input-unselected, #ccc);
+input#ss-message__content--user-checkbox {
+  width: 19px;
+  height: 19px;
 }
 
 .ss-message__content--user-checkbox>label {
@@ -548,62 +494,20 @@ input#ss-message__content--user-radio_button,
 
 /* checkbox: type = 'checkbox_img' */
 .ss-message__content--user-checkbox--checkbox_img {
-  margin-bottom: 10px;
+  position: relative;
+  margin-bottom: 2px;
 }
 
 .ss-message__content--user-checkbox--checkbox_img:last-child {
   margin-bottom: 0;
 }
 
-.ss-message__content--user-checkbox-img-grid {
-  display: grid;
-  gap: var(--checkbox-option-margin, 5px);
-  width: 100%;
-}
-
-.ss-message__content--user-checkbox--checkbox_img-item {
-  position: relative;
-  margin-bottom: 0;
-  background: var(--c-radio-unselected-bg, transparent);
-  border: 1px solid var(--c-radio-unselected-border, transparent);
-  border-radius: 5px;
-  overflow: hidden;
-  cursor: pointer;
-}
-
-.ss-message__content--user-checkbox--checkbox_img-item--disabled {
-  cursor: default;
-}
-
-.ss-message__content--user-checkbox--checkbox_img-item.ss-message__content--user-checkbox--selected,
-.ss-message__content--user-checkbox--checkbox_img-item:has(input[type="checkbox"]:checked) {
-  background: var(--c-radio-selected-bg, transparent);
-  border-color: var(--c-radio-selected-border, transparent);
-}
-
-.ss-message__content--user-checkbox--checkbox_img-item img {
-  width: 100%;
-  height: auto;
-  display: block;
-  pointer-events: none;
-}
-
-.ss-message__content--user-checkbox-img-text {
-  text-align: center;
-  font-size: 14px;
-  color: #6789a6;
-  font-weight: 700;
-  padding: 4px 0;
-}
-
-.ss-message__content--user-checkbox-img-grid .ss-checkbox-img-input--hidden,
-.ss-message__content--user-checkbox-img-grid input[type="checkbox"] {
+input#ss-message__content--user-checkbox--checkbox_img {
   position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-  margin: 0;
-  pointer-events: none;
+  width: 19px;
+  height: 19px;
+  top: 8px;
+  left: 8px;
 }
 
 /* user: type = 'pull_down' */
@@ -1406,37 +1310,15 @@ input#ss-message__content--user-radio_button,
   width: 100%;
 }
 
-.ss-user-setting-double-input--single,
-.ss-user-setting-double-input--split {
-  gap: 8px;
-}
-
 .ss-user-setting-double-input input:first-child {
   border-bottom-right-radius: unset;
   border-top-right-radius: unset;
-}
-
-.ss-user-setting-double-input--single input:first-child {
-  border-bottom-right-radius: 5px;
-  border-top-right-radius: 5px;
-  flex: 1;
-}
-
-.ss-user-setting-double-input--split input:first-child {
-  border-bottom-right-radius: 5px;
-  border-top-right-radius: 5px;
 }
 
 .ss-user-setting-double-input input:nth-child(2) {
   border-left: 0px;
   border-bottom-left-radius: unset;
   border-top-left-radius: unset;
-}
-
-.ss-user-setting-double-input--split input:nth-child(2) {
-  border-left: 1px solid gray;
-  border-bottom-left-radius: 5px;
-  border-top-left-radius: 5px;
 }
 
 .ss-user-setting-item {
@@ -2303,186 +2185,4 @@ input#ss-message__content--user-radio_button,
   font-size: .7rem;
   font-style: italic;
   color: gray;
-}
-
-/* CombineMessage editor/overview */
-.ss-combine-chat-wrapper {
-  width: 100%;
-}
-
-.ss-combine-chat {
-  width: 100%;
-}
-
-.ss-combine-chat-detail {
-  width: 100%;
-  display: flex;
-}
-
-.ss-combine-chat-detail-content {
-  width: 100%;
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #8bc5ff;
-  box-sizing: border-box;
-  background-color: #fff;
-}
-
-.ss-message.ss-message--select > .ss-message__detail > .ss-combine-chat-detail-content {
-  border-color: #327aed;
-  box-shadow: 0 0 3px #327aed;
-}
-
-.ss-message.ss-message--error > .ss-message__detail > .ss-combine-chat-detail-content {
-  border-color: red;
-  box-shadow: 0 0 3px red;
-}
-
-.ss-combine-setting__top {
-  padding: 0 0 10px;
-}
-
-.ss-combine-setting__bottom {
-  padding: 0;
-}
-
-.ss-combine-setting__main {
-  overflow-y: auto;
-}
-
-.ss-combine-setting__gap-wrapper,
-.ss-combine-setting__add-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.ss-combine-setting__gap-label {
-  flex-shrink: 0;
-  white-space: nowrap;
-  overflow-wrap: normal;
-  word-break: keep-all;
-  font-size: 14px;
-}
-
-.ss-combine-setting__gap-input {
-  width: 72px !important;
-  max-width: 72px;
-  flex-shrink: 0;
-}
-
-.ss-combine-setting__add-label {
-  min-width: 120px;
-  flex-shrink: 0;
-  font-weight: 600;
-  font-size: 13px;
-}
-
-.ss-combine-block-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding-right: 28px;
-  flex-wrap: wrap;
-}
-
-.ss-combine-block-setting__role-badge {
-  display: inline-block;
-  min-width: 44px;
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 700;
-  color: #fff;
-  text-align: center;
-  white-space: nowrap;
-  flex-shrink: 0;
-  box-sizing: border-box;
-}
-
-.ss-combine-block-setting__role-badge--bot {
-  background-color: #347aed;
-}
-
-.ss-combine-block-setting__role-badge--user {
-  background-color: #ff7e00;
-}
-
-.ss-combine-block-header__type-select {
-  flex: 1;
-  min-width: 120px;
-}
-
-.ss-combine-block-header__type-label {
-  flex: 1;
-  min-width: 0;
-  font-size: 13px;
-  color: #555;
-  font-weight: 500;
-}
-
-.ss-combine-block-header__padding {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-  margin-left: auto;
-}
-
-.ss-combine-block-header__padding-label {
-  font-size: 12px;
-  color: #666;
-  white-space: nowrap;
-}
-
-.ss-combine-block-header__padding-input {
-  width: 72px !important;
-  max-width: 72px;
-}
-
-.ss-combine-setting__item-body {
-  border-top: 1px solid #eee;
-  margin-top: 10px;
-  padding-top: 10px;
-}
-
-.ss-combine-overview-block {
-  background: #fff;
-  border: 1px solid #d9d9d9;
-  border-radius: 5px;
-  overflow: hidden;
-}
-
-.ss-combine-overview-block__header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
-  background-color: #f5f7fa;
-  border-bottom: 1px solid #e8e8e8;
-}
-
-.ss-combine-overview-block__body {
-  padding: 8px;
-}
-
-.ss-combine-block-preview--bot {
-  width: 100%;
-  word-break: break-word;
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-.ss-combine-block-preview--bot-empty {
-  color: #999;
-  font-size: 12px;
-  font-style: italic;
-  min-height: 32px;
-  display: flex;
-  align-items: center;
-}
-
-.ss-combine-message__wrapper--theme {
-  padding: 10px;
 }

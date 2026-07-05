@@ -3,7 +3,7 @@ import "assets/css/bot/preview-chat-bot.css";
 import Cookies from "js-cookie";
 import { MDBIcon } from "mdbreact";
 import CustomButton from "./CustomButton";
-import { UserMessage, BotMessage, CombineMessage, CombineMessageNextButton } from "./PreviewComponent";
+import { UserMessage, BotMessage } from "./PreviewComponent";
 import PreviewFukushashikiReducer from "./PreviewFukushashiki/PreviewFukushashikiReducer";
 import $ from "jquery";
 import { EC_CHATBOT_URL } from "variables/constants";
@@ -34,8 +34,6 @@ import {
   CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE,
   DISPLAY_TYPES,
 } from "./PreviewComponent/Constants";
-import { injectBotThemeCss } from "utils/chatbotThemeCss";
-import { COLOR_MAP } from "views/BotElement/BotSetting/DesignSetting/constants/designChatbotConstants";
 import {
   getAllUrlParams,
   lightenColor,
@@ -54,7 +52,6 @@ import {
   sendOpenChatbotCountRequest,
   sendCloseChatbotCountRequest,
   isUserMessage,
-  isInteractiveMessage,
   sendLogMessageToServer,
   updateStatusConversion,
   isButtonSubmitMessage,
@@ -81,8 +78,6 @@ import {
   setConversionParamToLocalStorage, fukushashikiSavedStateToLp, fukushashikiToLP,
   executeLpJsCode, injectCustomJsCode, postMessageToParent
 } from "./PreviewFukushashiki/LPUtils";
-import { resolveErrMsgLpScript } from "./ScenarioSetting/utils/resolveErrMsgLpScript";
-import { generateLaunchButtonLpScript } from "./ScenarioSetting/utils/launchButtonLpScriptUtils";
 import { convertToFukushashikiObject } from "./PreviewFukushashiki/FukushashikiDataConverterUtils";
 import { handleValidateField } from "./PreviewFukushashiki/ValidationUtils";
 import { createOrAddLinesCart } from "./ShopifyUtils";
@@ -176,10 +171,6 @@ const previewInitialState = {
   loadedStateFromSession: false,
   isUsedErrMsgByJs: false,
   errMsgJsCode: '',
-  errMsgSettingMode: 'js',
-  errMsgFieldSelectors: '',
-  errMsgFormSelectors: '',
-  launchButtonSelectors: '',
   isProcessing: false,
   conversionStatus: null,
   manuallyClosed: false,
@@ -189,8 +180,6 @@ const previewInitialState = {
   isNotAutoScroll: false,
   cartSystem: params.get("cartSystem") || "",
   isUseBtnUpdateTracking: false,
-  isUseGlobalDelay: false,
-  globalDelayTime: 1.0,
 };
 
 
@@ -390,12 +379,6 @@ const PreviewFukushashiki = () => {
           payload: actionData,
         });
 
-      case CHATBOT_ACTIONS.UPDATE_AMAZON_PAY_DATA_BY_SELECTOR:
-        return dispatch({
-          type: PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_BY_SELECTOR,
-          payload: actionData,
-        });
-
       case CHATBOT_ACTIONS.UPDATE_NUMBER_ORDER_TO_UPSELL:
         if (actionData) {
           const variables = Object.entries(actionData).map(([k, v]) => ({
@@ -475,24 +458,9 @@ const PreviewFukushashiki = () => {
 
     // For run errorJsCode
   useEffect(() => {
-    if (!state.isUsedErrMsgByJs) return;
-    const jsCode = resolveErrMsgLpScript(state);
-    if (jsCode) executeLpJsCode(jsCode, state);
-  }, [
-    state.isUsedErrMsgByJs,
-    state.errMsgJsCode,
-    state.errMsgSettingMode,
-    state.errMsgFieldSelectors,
-    state.errMsgFormSelectors,
-    state.themeSettings,
-    state.botInfor,
-  ]);
-
-  useEffect(() => {
-    if (!state.launchButtonSelectors) return;
-    const jsCode = generateLaunchButtonLpScript(state.launchButtonSelectors);
-    if (jsCode) executeLpJsCode(jsCode, state);
-  }, [state.launchButtonSelectors]);
+    if (!state.isUsedErrMsgByJs || !state.errMsgJsCode) return;
+    executeLpJsCode(state.errMsgJsCode, state);
+  }, [state.errMsgJsCode, state.isUsedErrMsgByJs]);
 
   // For run injectCustomJsCode
   useEffect(() => {
@@ -514,19 +482,6 @@ const PreviewFukushashiki = () => {
     style.innerHTML = state.customCssContent;
     document.head.appendChild(style);
   }, [state.isUsedCustomCss, state.customCssContent]);
-
-  useEffect(() => {
-    if (!state.botInfor) return;
-    const chatbot = state.botInfor;
-    const apiColorKey = chatbot.main_color && !String(chatbot.main_color).startsWith('#')
-      ? chatbot.main_color
-      : null;
-    const mainColorHex = chatbot.main_color_other
-      || COLOR_MAP[chatbot.main_color]
-      || chatbot.main_color
-      || '#327AED';
-    injectBotThemeCss(state.themeSettings, mainColorHex, apiColorKey);
-  }, [state.themeSettings, state.botInfor]);
 
   // Get Preview Scenario Data
   useEffect(() => {
@@ -687,7 +642,7 @@ const PreviewFukushashiki = () => {
           fromCallback: false,
         }
       });
-      if (newMsgIndex < state.messagesList.length && isInteractiveMessage(state.messagesList[newMsgIndex])) {
+      if (newMsgIndex < state.messagesList.length && isUserMessage(state.messagesList[newMsgIndex])) {
         sendAppearLogToServer({
           scenario_id: state.scenarioId,
           user_id: state.uuid,
@@ -709,7 +664,7 @@ const PreviewFukushashiki = () => {
         fromCallback: true,
       }
     });
-    if (newMsgIndex < state.messagesList.length && isInteractiveMessage(state.messagesList[newMsgIndex])) {
+    if (newMsgIndex < state.messagesList.length && isUserMessage(state.messagesList[newMsgIndex])) {
       createScenarioUserResponseMessageHistory({
         scenario_id: state.scenarioId,
         user_id: state.uuid,
@@ -879,10 +834,6 @@ const PreviewFukushashiki = () => {
       bottomMarginSp: designSetting?.bottom_margin_sp,
       isUsedErrMsgByJs: chatbot?.is_used_err_msg_by_js,
       errMsgJsCode: chatbot?.err_msg_js_code,
-      errMsgSettingMode: chatbot?.err_msg_setting_mode || 'js',
-      errMsgFieldSelectors: chatbot?.err_msg_field_selectors || '',
-      errMsgFormSelectors: chatbot?.err_msg_form_selectors || '',
-      launchButtonSelectors: chatbot?.launch_button_selectors || '',
       useNewProcess: chatbot?.client_cart_system === CART_SYSTEM.EC_FORCE,
       isUsedPastMessageLoaded: !!chatbot?.is_used_message_loaded_past,
       isProcessing: false,
@@ -896,7 +847,6 @@ const PreviewFukushashiki = () => {
       bottomBodyCustomJsCode: chatbot?.bottom_body_custom_js_code,
       isUsedCustomCss: !!chatbot?.is_used_custom_css,
       customCssContent: chatbot?.custom_css_content,
-      themeSettings: designSetting?.theme || null,
     };
 
     if (chatbot?.timer_config?.enable) {
@@ -1246,68 +1196,6 @@ const PreviewFukushashiki = () => {
     );
   };
 
-  const renderCombineMessageContent = (message, messageIndex) => {
-    if (!message || message.belong_to !== "combine") return null;
-    if (!Array.isArray(message?.message_content) || message.message_content.length === 0) return null;
-
-    const isUpdate = messageIndex >= state.renderMessagesList.length - 1;
-
-    return (
-      <React.Fragment>
-        <CombineMessage
-          postMessageToParent={(options) => postMessageToParent(options, state)}
-          message={message}
-          captcha={state.captcha}
-          disabled={(state.submitErrorMessage.length > 0 && state.submitErrorMessage !== GETTING_ERROR_NOTIFICATION) ? false : message.disabled}
-          onChangeValue={(
-            contentIndex,
-            contentType,
-            value,
-            field,
-            subField1,
-            subField2
-          ) =>
-            onChangeValue(
-              contentIndex,
-              contentType,
-              value,
-              field,
-              subField1,
-              subField2,
-              message
-            )
-          }
-          onClickNext={() => onClickNext(messageIndex, message)}
-          messageIndex={messageIndex}
-          errorsProps={state.errors}
-          prefecturesList={[...state.prefecturesList]}
-          onOpen={(isOpen, contentIndex) => {
-            onOpenZipCodePopup(isOpen, contentIndex, Math.min(state.currentMsgIndex, messageIndex));
-          }}
-          onChangeErrors={(field, value) => onChangeErrors(field, value)}
-          variables={state.variables}
-          lpOptionData={state.lpOptionData}
-          submitErrorMessage={state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "" : state.submitErrorMessage}
-          botId={state.botId}
-          isProcessing={!!state.isProcessing}
-          botInfor={state.botInfor}
-          previewOrderContent={state.previewOrderContent}
-          executeLpJsCode={(jsCode) => executeLpJsCode(jsCode, state)}
-          isBotOpen={state.isOpen}
-          cartSystem={state.cartSystem}
-        />
-        <CombineMessageNextButton
-          message={message}
-          messageIndex={messageIndex}
-          botInfor={state.botInfor}
-          onClickNext={onClickNext}
-          isUpdate={isUpdate}
-          isExtractFromSession={state.isExtractFromSession}
-        />
-      </React.Fragment>
-    );
-  };
-
   const renderMessages = () => {
     return (state.renderMessagesList || []).map((message, messageIndex) => {
       if (message.hidden && !stringNullOrEmpty(message.hidden)) return null;
@@ -1315,7 +1203,6 @@ const PreviewFukushashiki = () => {
         <React.Fragment key={messageIndex}>
           {renderBotMessageContent(message, messageIndex)}
           {renderUserMessageContent(message, messageIndex)}
-          {renderCombineMessageContent(message, messageIndex)}
         </React.Fragment>
       );
     })

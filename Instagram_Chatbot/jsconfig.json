@@ -3,7 +3,8 @@
     "baseUrl": "src",
     "paths": {
       "*": ["src/*"],
-      "assets": ["src/assets"]
+      "assets": ["src/assets"],
+      "v2/*": ["src/v2/*"]
     }
   }
 }

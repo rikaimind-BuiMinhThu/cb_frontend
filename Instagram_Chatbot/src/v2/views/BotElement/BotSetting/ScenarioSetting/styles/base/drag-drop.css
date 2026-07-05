@@ -1,0 +1,20 @@
+/* ScenarioSetting drag-and-drop option lists */
+
+.ss-drag-option-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.ss-drag-payment-radio-container {
+  margin-bottom: 10px;
+}
+
+.ss-drag-handle-icon {
+  margin-right: 10px;
+}
+
+.ss-drag-add-btn {
+  margin: 0;
+  line-height: 0;
+}

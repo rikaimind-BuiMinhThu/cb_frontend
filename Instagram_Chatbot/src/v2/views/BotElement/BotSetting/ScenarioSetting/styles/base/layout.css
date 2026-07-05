@@ -1,0 +1,88 @@
+/* ScenarioSetting shared layout */
+
+.ss-setting-row {
+  display: flex;
+  width: 90%;
+  justify-content: space-between;
+}
+
+.ss-setting-row--full {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.ss-setting-row__col-third {
+  width: 32%;
+}
+
+.ss-setting-row__col-half {
+  width: 49%;
+}
+
+.ss-setting-row__col-full {
+  width: 100%;
+}
+
+.ss-setting-relative {
+  position: relative;
+}
+
+.ss-setting-flex-center {
+  display: flex;
+  align-items: center;
+}
+
+.ss-setting-flex-center-gap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ss-setting-flex-center-mb {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.ss-setting-file-upload-wrapper {
+  width: 90%;
+}
+
+.ss-setting-file-upload-btn {
+  margin: 0;
+}
+
+.ss-setting-file-upload-btn--spaced {
+  margin: 0;
+  margin-right: 15px;
+}
+
+.ss-setting-panel-muted {
+  background-color: #f8f9fa;
+  width: 90%;
+  padding: 5px;
+}
+
+.ss-setting-width-90 {
+  width: 90%;
+}
+
+.ss-setting-width-84 {
+  width: 84%;
+  margin-bottom: 10px;
+}
+
+.ss-setting-width-60 {
+  width: 60%;
+  margin-bottom: 10px;
+  margin-left: 10px;
+}
+
+.ss-content-setting-shell {
+  width: 100%;
+}
+
+.ss-content-setting-body {
+  width: 100%;
+}

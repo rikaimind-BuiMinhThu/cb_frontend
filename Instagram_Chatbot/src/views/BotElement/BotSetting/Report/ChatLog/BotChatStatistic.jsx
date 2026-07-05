@@ -1,8 +1,8 @@
-import "assets/css/bot/bot-chat-log.css";
+import "assets/css/bot/bot-chat-statistic.css";
 import UserMessage from "./UserMessage";
 import { Fragment, useEffect, useState } from "react";
 import BotMessage from "./BotMessage";
-import { Empty } from "antd";
+import { Button } from "reactstrap";
 import { parseQuantity } from "../../PreviewComponent/Utils";
 import ChatbotOverall, { CONVERTERS_OVERALL } from "./ChatbotOverall";
 import MessageStatisticDetail from "./MessageStatisticDetail";
@@ -13,6 +13,7 @@ export default function BotChatStatistic({
   dataMessages = [],
   statistic = [],
   overall = {},
+  display = false,
 }) {
   const [msgs, setMsgs] = useState([]);
   const [chatbotOverall, setChatbotOverall] = useState([]);
@@ -45,7 +46,7 @@ export default function BotChatStatistic({
         },
       };
     });
-  };
+  }
 
   const parseOverall = (overall) => {
     return Object.entries(overall).map(([key, value]) => ({
@@ -60,73 +61,78 @@ export default function BotChatStatistic({
     bindStatistic(messages, statistic, overall);
   }, [messages, statistic, overall]);
 
-  if (!messages.length) {
+  if (!display) return null;
+
+  if (!messages.length)
     return (
-      <div className="chat-log-stats-panel">
+      <div className="statistic_holder">
         <ChatbotOverall overall={chatbotOverall} />
-        <div className="chat-log-stats-empty">
-          <Empty description="メッセージが存在しないか、シナリオが未選択です" />
+        <div className="statistic_content_empty">
+          <p>メッセージが存在しないか、シナリオが未選択です</p>
         </div>
       </div>
     );
-  }
 
   return (
-    <div className="chat-log-stats-panel">
+    <div className="statistic_holder">
       <ChatbotOverall overall={chatbotOverall} />
-      <div className="chat-log-steps">
+      <div className="statistic_content">
         {msgs.map((message, indexMessage) => {
           return (
             <Fragment key={indexMessage}>
-              {message.belong_to === "bot" && (
-                <div className="chat-log-bot-messages">
-                  {message?.message_content.map((content, index) => (
+              {message.belong_to === "bot" &&
+                message?.message_content.map((content, index) => {
+                  return (
                     <BotMessage
                       key={index}
                       content={content}
                       index={index}
                       botInfor={botInfor}
                     />
-                  ))}
-                </div>
-              )}
+                  );
+                })}
               {message.belong_to === "user" && (
-                <div className="chat-log-step-card">
+                <div className="sp-body-user-side csp-body-user-side slideLeft msg_with_stats">
                   <MessageStatisticDetail stats={message.stats} />
-                  <div className="chat-log-step-preview">
-                    <div className="sp-body-user-side-messages csp-body-user-side-messages">
-                      <UserMessage
-                        captcha={[]}
-                        messageContentProps={message.message_content}
-                        disabled={message.disabled}
-                        onChangeValue={() => {}}
-                        indexMessageRender={indexMessage}
-                        indexMessage={indexMessage}
-                        displayButtonNext={(value) => {
-                          dataMessages[indexMessage].is_display_button_next =
-                            value;
-                        }}
-                        dataPrefectures={[]}
-                        variables={[]}
-                      />
-                      {(dataMessages[indexMessage]?.is_display_button_next !==
+                  <div className="sp-body-user-side-messages csp-body-user-side-messages">
+                    <UserMessage
+                      captcha={[]}
+                      messageContentProps={message.message_content}
+                      disabled={message.disabled}
+                      onChangeValue={(
+                        indexContent,
+                        contentType,
+                        value,
+                        field,
+                        subFiled,
+                        name
+                      ) => { }}
+                      indexMessageRender={indexMessage}
+                      indexMessage={indexMessage}
+                      displayButtonNext={(value) => {
+                        dataMessages[indexMessage].is_display_button_next =
+                          value;
+                      }}
+                      dataPrefectures={[]}
+                      variables={[]}
+                    />
+                    {(dataMessages[indexMessage]?.is_display_button_next !==
                       undefined
-                        ? dataMessages[indexMessage].is_display_button_next
-                        : true) && (
-                        <div className="sp-user-message-button-action">
-                          <button
-                            type="button"
-                            disabled
-                            className="chat-log-action-btn"
-                            style={{
-                              backgroundColor: botInfor?.main_color,
-                            }}
-                          >
-                            {message.buttonName || "次へ"}
-                          </button>
-                        </div>
+                      ? dataMessages[indexMessage].is_display_button_next
+                      : true) && (
+                      <div className="sp-user-message-button-action">
+                        <Button
+                          disabled={true}
+                          style={{
+                            backgroundColor: botInfor?.main_color,
+                            borderRadius: "25px",
+                          }}
+                          className="ss-user-message__action-btn"
+                        >
+                          {message.buttonName || "次へ"}
+                        </Button>
+                      </div>
                       )}
-                    </div>
                   </div>
                 </div>
               )}

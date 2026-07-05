@@ -1,0 +1,877 @@
+@import './scenario-single.css';
+@import './scenario-settings-modal.css';
+
+.admin-layout .ant-layout-content.admin-content:has(.admin-page--scenario-editor) {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 64px);
+  max-height: calc(100vh - 64px);
+  min-height: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.admin-page--scenario-editor {
+  max-width: none;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.scenario-editor-page-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 20px 20px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.admin-page--scenario-editor .ss-editor-layout-v2.ss-sc-setting {
+  display: grid;
+  align-items: stretch;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  grid-template-rows: minmax(0, 1fr);
+}
+
+/* =============================================================================
+   Scenario Editor Layout v2 — grid/flex shell (scoped under .ss-editor-layout-v2)
+   ============================================================================= */
+
+.ss-editor-layout-v2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: minmax(0, 1fr);
+  gap: 16px;
+  min-height: 600px;
+  align-items: stretch;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.ss-editor-layout-v2 .ss-layout-overview-column,
+.ss-editor-layout-v2 .ss-layout-detail-column {
+  min-height: 0;
+  height: 100%;
+  max-height: 100%;
+  align-self: stretch;
+}
+
+/* Reset legacy absolute positioning inside v2 shell */
+.ss-editor-layout-v2 .ss-sc-content {
+  width: auto;
+  flex: none;
+  position: static;
+  min-height: 0;
+  height: 100%;
+  max-height: 100%;
+}
+
+.ss-editor-layout-v2 .ss-overview {
+  margin-right: 0;
+  position: static;
+  width: auto;
+}
+
+.ss-editor-layout-v2 .ss-setting-wrapper {
+  position: static;
+  left: auto;
+}
+
+/* Left column */
+.ss-layout-overview-column {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.ss-layout-overview-column:not(.ss-layout-overview-column--full-preview) {
+  overflow: hidden;
+}
+
+.ss-layout-overview-form {
+  flex-shrink: 0;
+  max-height: 20vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.ss-layout-overview-preview {
+  flex: 0 0 auto;
+  max-height: none;
+  display: flex;
+  flex-direction: column;
+  background-color: #f6fbff;
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 8px;
+  margin-top: 8px;
+}
+
+.ss-layout-overview-column--full-preview {
+  padding: 12px;
+}
+
+.ss-layout-overview-column--full-preview .ss-layout-overview-preview--full {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+  margin-top: 0;
+}
+
+.ss-layout-preview-toggle-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  padding: 0 4px 8px;
+  gap: 8px;
+}
+
+.ss-layout-preview-toggle-bar__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+.ss-layout-preview-toggle-bar__btn {
+  padding: 4px 12px;
+  font-size: 12px;
+  border: 1px solid #327aed;
+  border-radius: 4px;
+  background: #fff;
+  color: #327aed;
+  cursor: pointer;
+}
+
+.ss-layout-preview-toggle-bar__btn:hover {
+  background: #f0f6ff;
+}
+
+.ss-layout-basic-settings-header {
+  margin-bottom: 8px;
+}
+
+.ss-layout-basic-settings-header__title {
+  margin: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.ss-layout-overview-preview .scenario-editor-preview-section {
+  flex: 1;
+  min-height: 0;
+}
+
+.ss-layout-overview-messages {
+  flex: 1 1 auto;
+  max-height: none;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  background-color: #f6fbff;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e0e8f0;
+}
+
+.ss-layout-overview-column:not(.ss-layout-overview-column--full-preview) .ss-layout-overview-messages {
+  flex: 1 1 0%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.ss-editor-layout-v2 .ss-layout-overview-messages .ss-overview-detail {
+  flex: none;
+  height: auto;
+  margin-top: 0;
+  padding: 8px 56px 8px 8px;
+  border-radius: 8px;
+  overflow: visible;
+}
+
+/* Right column */
+.ss-layout-detail-column {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.ss-layout-detail-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 12px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.ss-layout-detail-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Overview panel sections */
+.ss-layout-overview-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ss-layout-form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ss-layout-form-section__title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #eee;
+}
+
+.ss-layout-form-section .ss-input-value,
+.ss-layout-form-section select {
+  width: 100%;
+}
+
+/* Basic settings (overview panel) */
+.ss-layout-basic-settings {
+  gap: 10px;
+}
+
+.ss-layout-basic-settings-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 140px auto;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+}
+
+.ss-layout-basic-settings-name {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.ss-layout-basic-settings-name > div {
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.ss-layout-basic-settings-name .ss-user-setting-item,
+.ss-layout-basic-settings-name .ss-input-value {
+  width: 100% !important;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.ss-layout-basic-settings-type {
+  width: 140px;
+  flex-shrink: 0;
+}
+
+.ss-layout-basic-settings-row .ss-layout-scenario-type {
+  width: 100%;
+  min-width: 0;
+  max-width: 140px;
+  box-sizing: border-box;
+}
+
+.ss-layout-basic-settings-action {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.ss-layout-settings-open-btn {
+  white-space: nowrap;
+  padding: 8px 16px;
+  font-size: 13px;
+  color: #024bb9;
+  background: #fff;
+  border: 1px solid #024bb9;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.ss-layout-settings-open-btn:hover {
+  background: #024bb9;
+  color: #fff;
+}
+
+.ss-layout-preview-close-btn {
+  padding: 8px 16px;
+  font-size: 13px;
+  color: #555;
+  background: #fff;
+  border: 1px solid #d9d9d9;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.ss-layout-preview-close-btn:hover {
+  background: #f5f5f5;
+  border-color: #bbb;
+}
+
+/* Settings modal */
+.ss-layout-settings-modal {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.ss-layout-settings-modal .ss-layout-form-section {
+  margin-bottom: 16px;
+}
+
+.ss-layout-settings-modal .sl-popup-create-scenario-btn-wrapper {
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+}
+
+.ss-layout-option-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  width: 100%;
+}
+
+.ss-layout-option-row .ss-user-setting-checkbox-custom_css {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ss-layout-option-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 16px;
+}
+
+.ss-layout-option-grid > div,
+.ss-layout-option-grid .ss-layout-checkbox-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.ss-layout-option-grid label {
+  margin: 0;
+  cursor: pointer;
+}
+
+.ss-layout-option-grid + .ss-layout-option-row {
+  margin-top: 8px;
+}
+
+.ss-layout-checkbox-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.ss-layout-checkbox-item label {
+  margin: 0;
+  cursor: pointer;
+}
+
+/* User / bot settings flex column */
+.ss-editor-layout-v2 .ss-layout-user-setting,
+.ss-editor-layout-v2 .ss-layout-bot-setting {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.ss-editor-layout-v2 .ss-layout-bot-setting .ss-bot-setting-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ss-editor-layout-v2 .ss-layout-bot-setting #bot-statement {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: 8px;
+}
+
+.ss-editor-layout-v2 .ss-bot-setting-condition-container {
+  position: static;
+  bottom: auto;
+  height: auto;
+  flex-shrink: 0;
+  overflow-y: auto;
+  max-height: min(40vh, 280px);
+}
+
+.ss-editor-layout-v2 .ss-user-setting__main {
+  flex: 1;
+  height: auto;
+  min-height: 120px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ss-editor-layout-v2 .ss-user-setting__bottom {
+  flex-shrink: 0;
+  max-height: none;
+  overflow-y: visible;
+  gap: 12px;
+  padding-top: 8px;
+}
+
+.ss-editor-layout-v2 .ss-user-setting__select-wrapper {
+  max-width: 100%;
+  margin: 0;
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+.ss-editor-layout-v2 .ss-user-setting__select-wrapper select {
+  flex: 1;
+  min-width: 0;
+}
+
+.ss-editor-layout-v2 .ss-layout-combine-setting {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.ss-editor-layout-v2 .ss-combine-setting__top {
+  flex-shrink: 0;
+}
+
+.ss-editor-layout-v2 .ss-combine-setting__main {
+  flex: 1;
+  min-height: 120px;
+  overflow-y: auto;
+  max-height: none;
+}
+
+.ss-editor-layout-v2 .ss-combine-setting__bottom {
+  flex-shrink: 0;
+  overflow-y: auto;
+  max-height: min(40vh, 320px);
+  border-top: 1px solid #e8e8e8;
+  padding-top: 8px;
+  gap: 12px;
+}
+
+.ss-editor-layout-v2 .ss-combine-setting__add-wrapper {
+  max-width: 100%;
+  margin: 0;
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+.ss-editor-layout-v2 .ss-combine-setting__add-wrapper select {
+  flex: 1;
+  min-width: 0;
+}
+
+.ss-layout-register-button-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: start;
+  width: 100%;
+}
+
+.ss-layout-register-button-row > .ss-user-setting__item-checkbox,
+.ss-layout-register-button-row > div {
+  min-width: 0;
+}
+
+.ss-layout-register-button-jscode {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.ss-layout-register-button-jscode label {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.ss-layout-register-button-jscode textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ss-user-register-button-settings {
+  position: relative;
+  width: 100%;
+  margin-top: 6px;
+  padding-top: 8px;
+  border-top: 1px solid #eee;
+}
+
+.ss-user-register-button-settings__main {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ss-user-register-button-settings__code-flyout {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 10;
+  padding: 8px;
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.ss-user-register-button-settings--code-open {
+  margin-bottom: 148px;
+}
+
+.ss-user-register-button-settings .ss-settings-form-row {
+  margin-bottom: 0;
+}
+
+.ss-user-content-common-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.ss-user-setting-option-row {
+  display: grid;
+  grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
+  gap: 8px 12px;
+  align-items: center;
+  width: 100%;
+}
+
+.ss-user-setting-option-row__checkbox {
+  min-width: 0;
+}
+
+.ss-user-setting-option-row__controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.ss-user-setting-option-row__select {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ss-user-setting-option-row__controls .select-custom-antd,
+.ss-user-setting-option-row__controls .select-custom-native {
+  width: 100%;
+}
+
+.ss-user-setting-option-row__action {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 9px 19px;
+  line-height: normal;
+  white-space: nowrap;
+}
+
+.ss-text-input-setting,
+.ss-textarea-setting {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-text-input-setting .ss-content-setting-body,
+.ss-editor-layout-v2 .ss-textarea-setting .ss-content-setting-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.ss-text-input-setting__fukushashiki-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.ss-text-input-setting__fukushashiki-row__mode {
+  flex: 0 0 22%;
+  max-width: 22%;
+  min-width: 80px;
+}
+
+.ss-text-input-setting__fukushashiki-row__value {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting__item-bottom,
+.ss-editor-layout-v2 .ss-textarea-setting .ss-user-setting__item-bottom {
+  justify-content: flex-start;
+  margin-bottom: 0;
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting__item-bottom-flex-start,
+.ss-editor-layout-v2 .ss-textarea-setting .ss-user-setting__item-bottom-flex-start {
+  margin-bottom: 0;
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting__item-bottom .select-custom-antd,
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting__item-bottom .select-custom-native,
+.ss-editor-layout-v2 .ss-textarea-setting .ss-user-setting__item-bottom .select-custom-antd,
+.ss-editor-layout-v2 .ss-textarea-setting .ss-user-setting__item-bottom .select-custom-native {
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting__item-select-bottom-wrapper-flex,
+.ss-editor-layout-v2 .ss-textarea-setting .ss-user-setting__item-select-bottom-wrapper-flex {
+  width: 100%;
+  gap: 8px;
+}
+
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting__item-select-bottom-wrapper-flex > div,
+.ss-editor-layout-v2 .ss-textarea-setting .ss-user-setting__item-select-bottom-wrapper-flex > div {
+  flex: 1 1 48%;
+  width: auto;
+}
+
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting-option-row,
+.ss-editor-layout-v2 .ss-textarea-setting .ss-user-setting-option-row {
+  grid-template-columns: 1fr;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting-option-row__controls,
+.ss-editor-layout-v2 .ss-textarea-setting .ss-user-setting-option-row__controls {
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting-option-row__controls .select-custom-antd,
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting-option-row__controls .select-custom-native,
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting-option-row__controls .ss-input-custom-container,
+.ss-editor-layout-v2 .ss-textarea-setting .ss-user-setting-option-row__controls .select-custom-antd,
+.ss-editor-layout-v2 .ss-textarea-setting .ss-user-setting-option-row__controls .select-custom-native,
+.ss-editor-layout-v2 .ss-textarea-setting .ss-user-setting-option-row__controls .ss-input-custom-container {
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting-option-row__action,
+.ss-editor-layout-v2 .ss-textarea-setting .ss-user-setting-option-row__action {
+  flex: 0 0 auto;
+  align-self: center;
+}
+
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting-double-input {
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting-double-input input {
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto;
+}
+
+.ss-editor-layout-v2 .ss-text-input-setting .ss-user-setting-double-input .ss-plus-circle-option-icon {
+  flex: 0 0 auto;
+}
+
+.ss-radio-button-setting {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-radio-button-setting .ss-content-setting-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-radio-button-setting .ss-user-setting__item-bottom {
+  justify-content: flex-start;
+  margin-bottom: 0;
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-radio-button-setting .ss-radio-button-setting__drag-container,
+.ss-editor-layout-v2 .ss-radio-button-setting .ss-radio-button-img-layout-section {
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-radio-button-setting .ss-user-setting-double-input {
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-radio-button-setting .ss-user-setting-double-input input {
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto;
+}
+
+.ss-editor-layout-v2 .ss-radio-button-setting .ss-user-setting-double-input .ss-plus-circle-option-icon-times {
+  flex: 0 0 auto;
+}
+
+.ss-editor-layout-v2 .ss-radio-button-setting .ss-radio-button-setting__add-row {
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.ss-zip-code-address-setting {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-zip-code-address-setting .ss-content-setting-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-zip-code-address-setting .ss-user-setting__item-bottom {
+  justify-content: flex-start;
+  margin-bottom: 0;
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-zip-code-address-setting .ss-user-setting-option-row {
+  grid-template-columns: 1fr;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.ss-editor-layout-v2 .ss-zip-code-address-setting .ss-address-field-section__input-row .ss-input-custom-container,
+.ss-editor-layout-v2 .ss-zip-code-address-setting .ss-address-field-section__input-row .select-custom-antd,
+.ss-editor-layout-v2 .ss-zip-code-address-setting .ss-address-field-section__input-row .select-custom-native {
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-shipping-address-setting .ss-address-fields-group,
+.ss-editor-layout-v2 .ss-shipping-address-setting .ss-address-layout-options,
+.ss-editor-layout-v2 .ss-shipping-address-setting .ss-address-require-options {
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-user-setting-condition-container {
+  margin-left: 0;
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-user-setting__item {
+  margin-bottom: 0;
+}
+
+/* Timer config row in overview */
+.ss-editor-layout-v2 .timer_config-checkbox {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .ss-editor-layout-v2 {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .ss-layout-overview-form {
+    max-height: none;
+  }
+
+  .ss-layout-option-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ss-layout-register-button-row {
+    grid-template-columns: 1fr;
+  }
+
+  .ss-layout-basic-settings-row {
+    grid-template-columns: 1fr;
+  }
+
+  .ss-layout-basic-settings-type,
+  .ss-layout-basic-settings-row .ss-layout-scenario-type {
+    width: 100%;
+    max-width: none;
+  }
+
+  .ss-editor-layout-v2.ss-editor-layout-v2--with-preview {
+    grid-template-columns: 1fr;
+  }
+}

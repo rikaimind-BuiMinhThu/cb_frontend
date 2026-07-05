@@ -1,0 +1,92 @@
+/* ScenarioSetting field labels and input width variants */
+
+.ss-field-label {
+  font-weight: 400;
+  font-size: 12px;
+  width: 100%;
+  margin-bottom: 3px;
+  color: #000;
+}
+
+.ss-content-preview .ss-field-label {
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.ss-field-label--section {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.ss-input--full {
+  width: 100%;
+}
+
+.ss-input--half {
+  width: 49%;
+}
+
+.ss-input--84 {
+  width: 84%;
+  margin-bottom: 10px;
+}
+
+.ss-input-label--full {
+  width: 100%;
+}
+
+.ss-select--full {
+  width: 100%;
+}
+
+.ss-select--half {
+  width: 49%;
+}
+
+.ss-select--full-mr {
+  width: 100%;
+  margin-right: 10px;
+}
+
+.ss-textarea--full {
+  width: 90%;
+}
+
+.ss-textarea--setting {
+  width: 100%;
+}
+
+.ss-input-num--full {
+  width: 100%;
+  margin-left: 0;
+}
+
+.ss-captcha-preview {
+  width: 35%;
+}
+
+.ss-preview-image {
+  max-width: 100%;
+}
+
+.ss-grip-icon {
+  margin-right: 10px;
+}
+
+.ss-icon-action {
+  width: 5%;
+}
+
+.ss-field-label--post-code {
+  margin-bottom: 5px;
+}
+
+.ss-input--full-mb {
+  width: 100%;
+  margin-bottom: 5px;
+}
+
+.ss-select--70 {
+  width: 70%;
+}

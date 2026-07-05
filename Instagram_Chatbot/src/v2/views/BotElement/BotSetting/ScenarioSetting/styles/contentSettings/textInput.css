@@ -1,0 +1,24 @@
+.ss-range-separator {
+  font-size: 30px;
+  margin-left: 10px;
+  opacity: 0.4;
+}
+
+.ss-hyphen-separator {
+  font-size: 20px;
+}
+
+.ss-text-input-setting__fukushashiki-row--password {
+  width: 100%;
+  align-items: center;
+  gap: 8px;
+  margin-left: 0;
+  margin-bottom: 10px;
+}
+
+.ss-text-input-setting__fukushashiki-row--password-confirm {
+  width: 100%;
+  align-items: center;
+  gap: 8px;
+  margin-left: 0;
+}

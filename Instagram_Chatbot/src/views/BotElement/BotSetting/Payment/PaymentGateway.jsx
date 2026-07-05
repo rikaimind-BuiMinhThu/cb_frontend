@@ -1,86 +1,99 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, message, Space, Tag } from 'antd';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Card, CardHeader, CardBody, CardTitle, Table, Row, Col } from 'reactstrap';
+import '../../../../assets/css/bot/payment-mng.css';
 import api from '../../../../api/api-management';
 import { tokenExpired } from 'api/tokenExpired';
-import { AdminConfirmModal, AdminPage, AdminTable, AdminActionButton, useAdminHeaderActions } from '../../../../components/AdminShell';
-
-const PAGE_SIZE = 25;
-
-const AGENCY_LABELS = {
-  gmo: 'GMO',
-  np_payment: 'NP後払い',
-};
-
-function formatAgency(agency) {
-  return AGENCY_LABELS[agency] || agency || '—';
-}
-
-function formatMode(mode) {
-  if (mode === 'test') return 'テスト';
-  if (mode === 'production') return '本番';
-  return mode || '—';
-}
-
-function formatConfigInfo(item) {
-  if (item.payment_agency === 'gmo') {
-    return item.shop_id ? `ショップID: ${item.shop_id}` : '—';
-  }
-  if (item.payment_agency === 'np_payment') {
-    return item.merchant_code ? `加盟店コード: ${item.merchant_code}` : '—';
-  }
-  return '—';
-}
+import { Link } from 'react-router-dom';
+import ModalNoti from 'views/Popup/ModalNoti';
+import ModalShort from 'views/Popup/ModalShort';
+import { Pagination } from '@material-ui/lab';
 
 function PaymentGateway() {
   const [gateway, setGateway] = useState([]);
-  const [deleteId, setDeleteId] = useState(null);
-  const [total, setTotal] = useState(0);
+  const [msgNoti, setMsgNoti] = useState('');
+  const [idDelete, setIdDelete] = useState('');
+  const [isOpenNoti, setIsOpenNoti] = useState(false);
+  const [isOpenDeletePW, setIsOpenDeletePW] = useState(false);
+  const [totalPage, setTotalPage] = useState(1);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
-
-  const fetchGateways = useCallback((pageIndex) => {
-    setLoading(true);
-    api
-      .get(`/api/v1/payment_managements/payment_gateways?page=${pageIndex}`)
-      .then((res) => {
-        if (res?.data?.code === 1) {
-          setGateway(res.data.data || []);
-          setTotal(res.data.total || 0);
-        }
-      })
-      .catch((error) => {
-        if (error.response?.data?.code === 0) {
-          tokenExpired();
-        }
-      })
-      .finally(() => setLoading(false));
-  }, []);
+  const [pageIndex, setPageIndex] = useState(1);
 
   useEffect(() => {
-    fetchGateways(page);
-  }, [fetchGateways, page]);
-
-  const handleDelete = () => {
     api
-      .delete(`/api/v1/payment_managements/payment_gateways/${deleteId}`)
+      .get(`/api/v1/payment_managements/payment_gateways?page=all`)
       .then((res) => {
-        if (res.data.code === 1) {
-          message.success('決済ゲートウェイを削除しました。');
-          setDeleteId(null);
-          fetchGateways(page);
-        } else if (res.data.code === 2) {
-          message.warning(res.data.message);
-          setDeleteId(null);
-        }
+        console.log(res.data.data);
+        setGateway(res.data.data);
       })
       .catch((error) => {
-        if (error.response?.data?.code === 0) {
+        console.log(error);
+        if (error.response?.data.code === 0) {
           tokenExpired();
         }
       });
+  }, []);
+
+  function reloadListPMGW(pgIndex) {
+    console.log(pgIndex);
+    api
+      .get(`/api/v1/payment_managements/payment_gateways?page=${pgIndex}`)
+      .then((res) => {
+        console.log(res.data.data);
+        if (res?.data?.code == 1) {
+          if (res.data.data !== [] && res.data.total !== 0) {
+            setGateway(res.data.data);
+            setTotalPage(Math.ceil(res.data?.total / 25));
+          }
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired();
+        }
+      });
+  }
+
+  const handleChangePage = (event, value) => {
+    if (totalPage > 1) {
+      setPage(parseInt(value));
+      setPageIndex(value);
+      reloadListPMGW(value);
+      document.querySelector('.main-panel').scrollTop = 0;
+    }
   };
 
+  function cnfDeleteGW(id) {
+    setIdDelete(id);
+    setIsOpenDeletePW(true);
+  }
+
+  function deleteGW() {
+    setIsOpenDeletePW(false);
+    api
+      .delete(`/api/v1/payment_managements/payment_gateways/${idDelete}`)
+      .then((res) => {
+        if (res.data.code === 1) {
+          setIsOpenNoti(true);
+          setMsgNoti('決済ゲートウェイを削除しました。');
+          setTimeout(() => {
+            setIsOpenNoti(false);
+            setMsgNoti('');
+          }, 1500);
+          reloadListPMGW(pageIndex);
+        } else if (res.data.code === 2) {
+          console.log(res.data.message);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired();
+        }
+      });
+  }
+
+  // handle set payment gateway default
   const handleSetDefault = (id) => {
     api
       .patch(`/api/v1/payment_managements/payment_gateways/${id}`, {
@@ -90,10 +103,15 @@ function PaymentGateway() {
       })
       .then((res) => {
         if (res.data?.code === 1) {
-          message.success('デフォルト決済ゲートウェイを更新しました。');
-          fetchGateways(page);
+          setIsOpenNoti(true);
+          setMsgNoti('デフォルト決済ゲートウェイを更新しました。');
+          setTimeout(() => {
+            setIsOpenNoti(false);
+            setMsgNoti('');
+          }, 1500);
+          reloadListPMGW(pageIndex);
         } else if (res.data?.code !== 1) {
-          message.warning(res.data?.message || '更新に失敗しました。');
+          console.log(res.data);
         }
       })
       .catch((error) => {
@@ -101,94 +119,134 @@ function PaymentGateway() {
       });
   };
 
-  const columns = useMemo(
-    () => [
-      {
-        title: 'No.',
-        width: 64,
-        render: (_, __, index) => (page - 1) * PAGE_SIZE + index + 1,
-      },
-      {
-        title: '決済ゲートウェイ名',
-        dataIndex: 'gateway_name',
-        render: (name, item) => (
-          <Space size={8} wrap>
-            <span>{name}</span>
-            {item?.is_default === 'yes' && <Tag color="blue">デフォルト</Tag>}
-          </Space>
-        ),
-      },
-      {
-        title: '決済代行会社',
-        dataIndex: 'payment_agency',
-        width: 140,
-        render: (agency) => formatAgency(agency),
-      },
-      {
-        title: 'モード',
-        dataIndex: 'mode',
-        width: 100,
-        render: (mode) => (
-          <Tag color={mode === 'production' ? 'green' : 'default'}>{formatMode(mode)}</Tag>
-        ),
-      },
-      {
-        title: '設定情報',
-        render: (_, item) => formatConfigInfo(item),
-      },
-      {
-        title: 'アクション',
-        width: 200,
-        render: (_, item) => (
-          <Space size="small" className="admin-table-actions">
-            {item?.is_default !== 'yes' && (
-              <Button type="link" size="small" onClick={() => handleSetDefault(item.id)}>
-                デフォルト
-              </Button>
-            )}
-            <Link to={`/admin/edit-payment-gateway/${item.id}`}>
-              <AdminActionButton action="edit" />
-            </Link>
-            <AdminActionButton action="delete" onClick={() => setDeleteId(item.id)} />
-          </Space>
-        ),
-      },
-    ],
-    [page]
-  );
-
-  useAdminHeaderActions(
-    <Link to="/admin/add-payment-gateway">
-      <AdminActionButton action="create" label="追加" />
-    </Link>
-  );
-
   return (
     <>
-      <AdminPage>
-        <AdminTable
-          columns={columns}
-          dataSource={gateway}
-          rowKey="id"
-          loading={loading}
-          emptyDescription="決済ゲートウェイがありません"
-          pagination={{
-            current: page,
-            pageSize: PAGE_SIZE,
-            total,
-            onChange: (nextPage) => setPage(nextPage),
-          }}
-        />
-      </AdminPage>
-
-      <AdminConfirmModal
-        open={Boolean(deleteId)}
-        message="本当に削除しますか。"
-        okText="削除"
-        danger
-        onOk={handleDelete}
-        onCancel={() => setDeleteId(null)}
-      />
+      <div className="content">
+        <Row id="screenAll">
+          <Col md="12">
+            <Card>
+              <CardHeader>決済ゲートウェイ名</CardHeader>
+              <CardBody>
+                <h6>決済ゲートウェイ一覧</h6>
+                <Table className="payment-gateway__table">
+                  <thead className="text-primary">
+                    <tr>
+                      <th style={{ width: '5%' }}>No.</th>
+                      <th style={{ width: '12.5%' }}>決済ゲートウェイ名</th>
+                      <th style={{ width: '12.5%' }}>決済代行会社</th>
+                      <th style={{ width: '7.5%' }}>モード</th>
+                      <th style={{ width: '12.5%' }}>ショップID/店舗公開可能鍵</th>
+                      <th style={{ width: '12.5%' }}>加盟店コード/加盟店コード</th>
+                      <th style={{ width: '7.5%' }}>クライアントIP（IPコード）</th>
+                      <th style={{ width: '7.5%' }}>店舗ID</th>
+                      <th style={{ width: '100px' }}>アクション</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {gateway?.map((item, i) => (
+                      <tr key={i}>
+                        <td style={{ width: '5%', border: '1px solid #7186a1' }}>
+                          {i + 1 + 25 * (pageIndex - 1)}
+                        </td>
+                        <td style={{ width: '12.5%', border: '1px solid #7186a1' }}>
+                          {item.gateway_name}
+                          {item?.is_default === 'yes' && (
+                            <span
+                              style={{
+                                display: 'block',
+                                padding: '4px 8px',
+                                color: 'white',
+                                backgroundColor: '#1890ff',
+                                border: 'none',
+                                borderRadius: '5px',
+                                maxWidth: '100px',
+                                position: 'relative',
+                                left: '50%',
+                                transform: 'translateX(-50%)',
+                                fontWeight: '400',
+                              }}
+                            >
+                              デフォルト
+                            </span>
+                          )}
+                        </td>
+                        <td style={{ width: '12.5%', border: '1px solid #7186a1' }}>
+                          {item.payment_agency}
+                        </td>
+                        <td style={{ width: '7.5%', border: '1px solid #7186a1' }}>{item.mode}</td>
+                        <td style={{ width: '12.5%', border: '1px solid #7186a1' }}>
+                          {item.shop_id}
+                        </td>
+                        <td style={{ width: '12.5%', border: '1px solid #7186a1' }}>
+                          {item.merchant_code}
+                        </td>
+                        <td style={{ width: '7.5%', border: '1px solid #7186a1' }}>
+                          {item.client_ip}
+                        </td>
+                        <td style={{ width: '7.5%', border: '1px solid #7186a1' }}>
+                          {item.store_id}
+                        </td>
+                        <td style={{ width: '100px', border: '1px solid #7186a1' }}>
+                          {item?.is_default !== 'yes' && (
+                            <button
+                              type="button"
+                              className="payment-gateway-btn-default"
+                              onClick={() => handleSetDefault(item?.id)}
+                            >
+                              デフォルト
+                            </button>
+                          )}
+                          <Link to={`/admin/edit-payment-gateway/${item?.id}`}>
+                            <button className="payment-gateway-btn-edit">編集</button>
+                          </Link>
+                          <button
+                            className="payment-gateway-btn-delete"
+                            onClick={() => cnfDeleteGW(item?.id)}
+                          >
+                            削除
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+                <Pagination
+                  count={totalPage}
+                  variant="outlined"
+                  page={page}
+                  onChange={handleChangePage}
+                />
+                <div style={{ width: '100%', textAlign: 'center' }}>
+                  <Link to={'/admin/add-payment-gateway'}>
+                    <button className="payment-gatway-btn-add-gateway">追加</button>
+                  </Link>
+                </div>
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
+        <ModalShort open={isOpenDeletePW} onClose={() => setIsOpenDeletePW(false)}>
+          <div>
+            <h4>本当に削除しますか。</h4>
+            <div className="payment-gateway-cnf-btn">
+              <button className="payment-gateway-cnf-btn-detail-yes" onClick={() => deleteGW()}>
+                はい
+              </button>
+              <button
+                className="payment-gateway-cnf-btn-detail-no"
+                onClick={() => setIsOpenDeletePW(false)}
+              >
+                いいえ
+              </button>
+            </div>
+          </div>
+        </ModalShort>
+        <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
+          <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
+            <span style={{ fontSize: '16px' }}>{msgNoti}</span>
+          </div>
+        </ModalNoti>
+      </div>
     </>
   );
 }

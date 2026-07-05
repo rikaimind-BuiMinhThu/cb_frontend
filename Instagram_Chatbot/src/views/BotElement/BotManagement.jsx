@@ -1,32 +1,36 @@
-import React, { useEffect, useState } from 'react';
-import { Button, message, Space, Tag } from 'antd';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { Button } from 'react-bootstrap';
+import { Card, CardHeader, CardBody, CardTitle, Table, Row, Col } from 'reactstrap';
+import './../../assets/css/bot/bot-list.css';
 import Cookies from 'js-cookie';
+import { Link } from 'react-router-dom';
 import api from '../../api/api-management';
+import { Pagination } from '@material-ui/lab';
+import ModalShort from '../../views/Popup/ModalShort';
+import ModalNoti from '../../views/Popup/ModalNoti';
 import { tokenExpired } from 'api/tokenExpired';
-import {
-  AdminPage,
-  AdminTable,
-  AdminSearchBar,
-  AdminConfirmModal,
-  AdminActionButton,
-} from '../../components/AdminShell';
 
 function BotManagement() {
+  // states
   const [botList, setBotList] = useState([]);
   const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [pageIndex, setPageIndex] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
   const [isOpenPopupConfirm, setIsOpenPopupConfirm] = useState(false);
   const [msgConfirm, setMsgConfirm] = useState('');
   const [isStop, setIsStop] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
   const [idSelected, setIdSelected] = useState('');
+  const [isOpenNoti, setIsOpenNoti] = useState(false);
+  const [msgNoti, setMsgNoti] = useState('');
   const [statusSelected, setStatusSelected] = useState('');
   const [search, setSearch] = useState('');
   const [isActiveSearch, setIsActiveSearch] = useState('all');
 
+  // side effects
   useEffect(() => {
+    // console.log('token in dashboard', Cookies.get('token'));
+    // console.log('is_auth', Cookies.get('is_auth'));
     if (
       Cookies.get('token') == undefined ||
       Cookies.get('token') == null ||
@@ -39,32 +43,45 @@ function BotManagement() {
     }
   }, []);
 
-  const fetchList = (pgIndex, status = isActiveSearch, name = search) => {
-    setLoading(true);
+  useEffect(() => {
+    // reloadList(1);
     api
-      .get(`/api/v1/managements/chatbots?page=${pgIndex}&name=${name}&status=${status}`)
+      .get(`/api/v1/managements/chatbots?page=1&status=all`)
       .then((res) => {
-        setBotList(res.data?.data || []);
-        setTotal(res.data?.total || 0);
+        // console.log('bot list get data: ', res.data);
+        setBotList(res.data?.data);
+        setTotalPage(Math.ceil(res.data?.total / 10));
       })
       .catch((error) => {
         console.log(error);
         if (error.response?.data.code === 0) {
           tokenExpired();
         }
-      })
-      .finally(() => setLoading(false));
-  };
-
-  useEffect(() => {
-    fetchList(1);
+      });
   }, []);
 
-  function handleSearch() {
-    setPage(1);
-    fetchList(1);
+  function reloadList(pgIndex) {
+    console.log(pgIndex);
+    api
+      .get(`/api/v1/managements/chatbots?page=${pgIndex}&name=${search}&status=${isActiveSearch}`)
+      .then((res) => {
+        // console.log('bot list get data: ', res.data);
+        setBotList(res.data?.data);
+        setTotalPage(Math.ceil(res.data?.total / 10));
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired();
+        }
+      });
   }
 
+  function handleSearch() {
+    reloadList(pageIndex);
+  }
+
+  // open bot settings
   function openBotSetting(id) {
     Cookies.remove('bot_id');
     Cookies.set('bot_type', 'bot');
@@ -76,11 +93,34 @@ function BotManagement() {
     api
       .post(`/api/v1/managements/chatbots/${id}/duplicate`)
       .then((res) => {
+        // console.log('duplicate: ', res.data);
         if (res.data.code == 1) {
-          message.success('正常に複製されました！');
-          fetchList(page);
+          setIsOpenNoti(true);
+          setMsgNoti('正常に複製されました！');
+          setTimeout(() => {
+            setIsOpenNoti(false);
+            setMsgNoti('');
+          }, 2000);
+          api
+            .get(`/api/v1/managements/chatbots?page=1&status=${isActiveSearch}`)
+            .then((res) => {
+              // console.log('bot list get data: ', res.data);
+              setBotList(res.data?.data);
+              setTotalPage(Math.ceil(res.data?.total / 10));
+            })
+            .catch((error) => {
+              console.log(error);
+              if (error.response?.data.code === 0) {
+                tokenExpired();
+              }
+            });
         } else if (res.data.code == 2) {
-          message.warning(res.data?.message);
+          setIsOpenNoti(true);
+          setMsgNoti(res.data?.message);
+          setTimeout(() => {
+            setIsOpenNoti(false);
+            setMsgNoti('');
+          }, 2000);
         }
       })
       .catch((error) => {
@@ -91,6 +131,17 @@ function BotManagement() {
       });
   }
 
+  // handle change page
+  const handleChangePage = (event, value) => {
+    if (totalPage > 1) {
+      setPage(parseInt(value));
+      setPageIndex(value);
+      reloadList(value);
+      document.querySelector('.main-panel').scrollTop = 0;
+    }
+  };
+
+  // handle confirm action
   const confirmAction = () => {
     if (isStop) {
       api
@@ -98,15 +149,44 @@ function BotManagement() {
           chatbot: { status: statusSelected === 'off' ? 'on' : 'off' },
         })
         .then((res) => {
+          console.log(res);
           if (res.data?.code === 1) {
-            message.success('正常に変更されました！');
             setIsStop(false);
             setIsOpenPopupConfirm(false);
-            fetchList(page);
+            setMsgConfirm('');
+            setIdSelected('');
+            setStatusSelected('');
+            setIsOpenNoti(true);
+            setMsgNoti('正常に変更されました！');
+            setTimeout(() => {
+              setIsOpenNoti(false);
+              setMsgNoti('');
+            }, 2000);
+            api
+              .get(`/api/v1/managements/chatbots?page=${page}&status=${isActiveSearch}`)
+              .then((res) => {
+                // console.log('bot list get data: ', res.data);
+                setBotList(res.data?.data);
+                setTotalPage(Math.ceil(res.data?.total / 10));
+              })
+              .catch((error) => {
+                console.log(error);
+                if (error.response?.data.code === 0) {
+                  tokenExpired();
+                }
+              });
           } else if (res.data?.code === 2) {
-            message.warning(res.data?.message);
             setIsStop(false);
             setIsOpenPopupConfirm(false);
+            setMsgConfirm('');
+            setIdSelected('');
+            setStatusSelected('');
+            setIsOpenNoti(true);
+            setMsgNoti(res.data?.message);
+            setTimeout(() => {
+              setIsOpenNoti(false);
+              setMsgNoti('');
+            }, 2000);
           }
         })
         .catch((error) => {
@@ -120,16 +200,42 @@ function BotManagement() {
       api
         .delete(`/api/v1/managements/chatbots/${idSelected}`)
         .then((res) => {
+          console.log(res);
           if (res.data?.code === 1) {
-            message.success('正常に削除されました！');
             setIsDelete(false);
             setIsOpenPopupConfirm(false);
-            fetchList(1);
-            setPage(1);
+            setMsgConfirm('');
+            setIdSelected('');
+            setIsOpenNoti(true);
+            setMsgNoti('正常に削除されました！');
+            setTimeout(() => {
+              setIsOpenNoti(false);
+              setMsgNoti('');
+            }, 2000);
+            api
+              .get(`/api/v1/managements/chatbots?page=1&status=${isActiveSearch}`)
+              .then((res) => {
+                // console.log('bot list get data: ', res.data);
+                setBotList(res.data?.data);
+                setTotalPage(Math.ceil(res.data?.total / 10));
+              })
+              .catch((error) => {
+                console.log(error);
+                if (error.response?.data.code === 0) {
+                  tokenExpired();
+                }
+              });
           } else if (res.data?.code === 2) {
-            message.warning(res.data?.message);
             setIsDelete(false);
             setIsOpenPopupConfirm(false);
+            setMsgConfirm('');
+            setIdSelected('');
+            setIsOpenNoti(true);
+            setMsgNoti(res.data?.message);
+            setTimeout(() => {
+              setIsOpenNoti(false);
+              setMsgNoti('');
+            }, 2000);
           }
         })
         .catch((error) => {
@@ -141,135 +247,169 @@ function BotManagement() {
     }
   };
 
+  // handle stop bot button click
   const handleStopBot = (id, status) => {
     setIsStop(true);
-    setIsDelete(false);
     setIsOpenPopupConfirm(true);
-    setMsgConfirm(status === 'on' ? '本当にボットをOFFにしますか。' : '本当にボットをONにしますか。');
+    // alert(status)
+    if (status == 'on') {
+      setMsgConfirm('本当にボットをOFFにしますか。');
+    } else if (status == 'off') {
+      setMsgConfirm('本当にボットをONにしますか。');
+    }
+
     setIdSelected(id);
     setStatusSelected(status);
   };
 
+  // handle delete bot button click
   const handleDeleteBot = (id) => {
     setIsDelete(true);
-    setIsStop(false);
     setIsOpenPopupConfirm(true);
     setMsgConfirm('本当にボットを削除しますか。');
     setIdSelected(id);
   };
+  const loading = document.getElementById("loading");
 
-  const columns = [
-    {
-      title: 'No.',
-      width: 70,
-      render: (_, __, index) => index + 1 + 10 * (page - 1),
-    },
-    {
-      title: 'ボット名',
-      dataIndex: 'bot_name',
-      render: (name, record) => (
-        <Button type="link" onClick={() => openBotSetting(record.id)} style={{ padding: 0 }}>
-          {name}
-        </Button>
-      ),
-    },
-    {
-      title: 'ステータス',
-      dataIndex: 'status',
-      width: 120,
-      render: (status) => (
-        <Tag color={status === 'on' ? 'green' : 'default'}>{status?.toUpperCase()}</Tag>
-      ),
-    },
-    {
-      title: '所有者名',
-      dataIndex: 'owner_name',
-    },
-    {
-      title: '自分の権限',
-      width: 120,
-      render: () => '所有者',
-    },
-    {
-      title: 'アクション',
-      width: 320,
-      render: (_, record) => (
-        <Space wrap className="admin-table-actions">
-          <AdminActionButton action="edit" onClick={() => openBotSetting(record.id)} />
-          <AdminActionButton action="duplicate" onClick={() => duplicateBot(record.id)} />
-          <Link
-            to={`/admin/demo-bot/${record.id}`}
-            onClick={() => Cookies.set('bot_id', `${record.id}`)}
-          >
-            <Button type="link" size="small">デモ</Button>
-          </Link>
-          <Button type="link" size="small" onClick={() => handleStopBot(record.id, record.status)}>
-            {record.status === 'off' ? 'ON' : 'OFF'}
-          </Button>
-          <AdminActionButton action="delete" onClick={() => handleDeleteBot(record.id)} />
-        </Space>
-      ),
-    },
-  ];
 
+function hideLoading() {
+  loading.style.display = "none";
+}
   return (
     <>
-      <AdminPage>
-        <AdminTable
-          loading={loading}
-          columns={columns}
-          dataSource={botList}
-          rowKey="id"
-          toolbar={
-            <>
-              <AdminSearchBar
-                searchValue={search}
-                onSearchChange={setSearch}
-                onSearch={handleSearch}
-                searchPlaceholder="ボット名 ..."
-                filters={[
-                  {
-                    key: 'status',
-                    label: 'ボットステータス',
-                    value: isActiveSearch,
-                    onChange: setIsActiveSearch,
-                    options: [
-                      { value: 'all', label: 'すべて' },
-                      { value: 'on', label: 'ON' },
-                      { value: 'off', label: 'OFF' },
-                    ],
-                  },
-                ]}
-              />
-              <Link to="/admin/add-bot-management">
-                <AdminActionButton action="create" label="ボット追加" />
-              </Link>
-            </>
-          }
-          pagination={{
-            current: page,
-            total,
-            pageSize: 10,
-            onChange: (p) => {
-              setPage(p);
-              fetchList(p);
-              window.scrollTo(0, 0);
-            },
-          }}
-        />
-      </AdminPage>
-
-      <AdminConfirmModal
-        open={isOpenPopupConfirm}
-        message={msgConfirm}
-        onOk={confirmAction}
-        onCancel={() => {
-          setIsOpenPopupConfirm(false);
-          setIsStop(false);
-          setIsDelete(false);
-        }}
-        danger={isDelete}
-      />
+      <div className="content">
+      
+        <Row id="screenAll">
+          <Col md="12">
+            <Card>
+              <CardHeader>
+                <div className="div-add-bot">
+                  <div className="div-add-bot--search">
+                    <input
+                      type="text"
+                      placeholder="ボット名 ..."
+                      onChange={(e) => setSearch(e.target.value)}
+                    />
+                    <div className="bm_status-filter">
+                      <h6>ボットステータス</h6>&ensp;
+                      <select
+                        style={{ borderRadius: '5px', border: '1px solid #7186a0' }}
+                        name="bot-status"
+                        id="bm_bot-status"
+                        onChange={(e) => setIsActiveSearch(e.target.value)}
+                        value={isActiveSearch}
+                      >
+                        <option value="all">すべて</option>
+                        <option value="on">ON</option>
+                        <option value="off">OFF</option>
+                      </select>
+                    </div>
+                    <button
+                      className="btn-add-bot btn-bl-search"
+                      style={{ width: '100px' }}
+                      onClick={() => handleSearch()}
+                    >
+                      検索
+                    </button>
+                  </div>
+                  <Link to={'/admin/add-bot-management'}>
+                    <button className="btn-add-bot">ボット追加</button>
+                  </Link>
+                </div>
+              </CardHeader>
+              <CardBody>
+                <Table className="bl-table">
+                  <thead className="text-primary">
+                    <tr>
+                      <th style={{ width: '10%' }}>No.</th>
+                      <th style={{ width: '20%' }}>ボット名</th>
+                      <th style={{ width: '15%' }}>ステータス</th>
+                      <th style={{ width: '20%' }}>所有者名</th>
+                      <th style={{ width: '15%' }}>自分の権限</th>
+                      <th style={{ width: '300px', minWidth: '300px' }}>アクション</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {botList != []
+                      ? botList.map((bot, i) => (
+                          <tr key={bot?.id}>
+                            <td className="border-table-bot">{i + 1 + 10 * (pageIndex - 1)}</td>
+                            <td
+                              className="border-table-bot bm__bot-name"
+                              style={{ cursor: 'pointer' }}
+                              onClick={() => openBotSetting(bot?.id)}
+                            >
+                              {bot?.bot_name}
+                            </td>
+                            <td className="border-table-bot" style={{ textTransform: 'uppercase' }}>
+                              {bot?.status}
+                            </td>
+                            <td className="border-table-bot">{bot?.owner_name}</td>
+                            <td className="border-table-bot">所有者</td>
+                            <td className="border-table-bot action-table-bot">
+                              <div className="action-wrapper">
+                                <button
+                                  className="btn-edit-bot"
+                                  onClick={() => openBotSetting(bot?.id)}
+                                >
+                                  編集
+                                </button>
+                                <button
+                                  className="btn-duplicate-bot"
+                                  onClick={() => duplicateBot(bot?.id)}
+                                >
+                                  複製
+                                </button>
+                                <Link
+                                  to={`/admin/demo-bot/${bot?.id}`}
+                                  onClick={() => {
+                                    Cookies.set('bot_id', `${bot?.id}`);
+                                  }}
+                                >
+                                  <button className="btn-demo-bot">デモ</button>
+                                </Link>
+                                <button
+                                  className="btn-stop-bot"
+                                  onClick={() => handleStopBot(bot?.id, bot?.status)}
+                                >
+                                  {bot?.status === 'off' ? 'ON' : 'OFF'}
+                                </button>
+                                <button
+                                  className="btn-delete-bot"
+                                  onClick={() => handleDeleteBot(bot?.id)}
+                                >
+                                  削除
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      : ''}
+                  </tbody>
+                </Table>
+                <Pagination
+                  count={totalPage}
+                  variant="outlined"
+                  page={page}
+                  onChange={handleChangePage}
+                />
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
+        <ModalShort open={isOpenPopupConfirm} onClose={() => setIsOpenPopupConfirm(false)}>
+          <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
+            <h4>{msgConfirm}</h4>
+            <Button onClick={() => confirmAction()}>はい</Button>
+            <Button onClick={() => setIsOpenPopupConfirm(false)}>いいえ</Button>
+          </div>
+        </ModalShort>
+        <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
+          <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
+            <span style={{ fontSize: '16px' }}>{msgNoti}</span>
+          </div>
+        </ModalNoti>
+      </div>
     </>
   );
 }

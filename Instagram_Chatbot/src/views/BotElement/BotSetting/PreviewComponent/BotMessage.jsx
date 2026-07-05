@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from "react";
 import "assets/css/bot/preview-chat-bot.css";
 import messageTypingGif from "assets/img/icons8-dots-loading.gif";
-import { resolveIconUrl } from "../DesignSetting/utils/designChatbotUtils";
+import { EC_CHATBOT_URL } from "variables/constants";
 import "moment/locale/zh-cn";
 import { BOT_MESSAGE_TYPES, RENDER_CHATBOT_CONFIG } from "./Constants";
 import HtmlCodeMessagePreview from "components/BotMessages/HtmlCodeMessagePreview";
-import AmazonPayButtonMessagePreview from "components/BotMessages/AmazonPayButtonMessagePreview";
 import { getElementMessageById, getBotMessageDelay } from "./Utils";
 import { replaceVariables } from "./VariablesUtils";
-import { buildOrderConfirmJs, buildOrderConfirmPreviewHtml } from "../ScenarioSetting/utils/OrderConfirmLpScriptGenerator";
 
 const BotMessage = ({
   content,
@@ -35,18 +33,7 @@ const BotMessage = ({
   }, [isDelaying]);
 
   useEffect(() => {
-    if (!content) return;
-
-    if (content.type === BOT_MESSAGE_TYPES.ORDER_CONFIRM) {
-      if (previewOrderContent && isBotOpen) {
-        setText(previewOrderContent);
-      } else {
-        setText(buildOrderConfirmPreviewHtml(content.order_confirm));
-      }
-      return;
-    }
-
-    if (!content[content.type]?.originalContent) return;
+    if (!content || !content[content.type]?.originalContent) return;
 
     if (![BOT_MESSAGE_TYPES.TEXT_INPUT, BOT_MESSAGE_TYPES.GETTING_ERROR_NOTIFICATION].includes(content.type)) return;
 
@@ -55,21 +42,18 @@ const BotMessage = ({
     }
 
     setText(replaceVariables(content[content.type]?.originalContent || "", variables));
-  }, [content, content?.[content?.type]?.originalContent, variables, previewOrderContent, isBotOpen]);
+  }, [content, content[content.type]?.originalContent, variables, previewOrderContent, isBotOpen]);
 
   const isShowAvatar = () => {
     if (!content) return false;
 
     switch(content.type) {
       case 'text_input':
-      case BOT_MESSAGE_TYPES.ORDER_CONFIRM:
       case 'file':
       case 'delay': 
         return true;
       case BOT_MESSAGE_TYPES.HTML_CODE: 
         return !isUGCUsage(content);
-      case BOT_MESSAGE_TYPES.AMAZON_PAY_BUTTON:
-        return true;
     }
   }
 
@@ -117,19 +101,12 @@ const BotMessage = ({
     // When hidden === undefined, it means the message is not hidden yet
     if (hidden === true) return;
 
-    if (content.type === BOT_MESSAGE_TYPES.ORDER_CONFIRM && content.order_confirm && isBotOpen) {
-      executeLpJsCode(buildOrderConfirmJs(content.order_confirm));
-      return;
-    }
-
     if (content.text_input?.use_for_confirm_message && content.text_input?.jscode?.trim() && isBotOpen) {
       executeLpJsCode(content.text_input.jscode);
     }
   }, [
     currentMsgIndex,
     hidden,
-    content.type,
-    content.order_confirm,
     content.text_input?.use_for_confirm_message,
     content.text_input?.jscode?.trim(),
     isBotOpen,
@@ -197,15 +174,11 @@ const BotMessage = ({
   const renderAvatar = () => {
     if (!isShowAvatar()) return null;
 
-    const botAvatarUrl = resolveIconUrl(botInfor?.icon)
-      || resolveIconUrl(botInfor?.opening_bot_icon)
-      || resolveIconUrl(botInfor?.closing_bot_icon);
-
-    if (!botAvatarUrl) return null;
+    const botAvatar = botInfor?.icon?.url || botInfor?.opening_bot_icon?.url || botInfor?.closing_bot_icon?.url;
 
     return (
       <div className="sp-body-bot-side-avatar sp-avatar">
-        <img src={botAvatarUrl} alt="" />
+        <img src={EC_CHATBOT_URL + "/" + botAvatar} />
       </div>
     )
   }
@@ -254,13 +227,13 @@ const BotMessage = ({
     return fileContent.includes("mp4");
   }
 
-  const renderFileContentImage = (fileContent) => {
+  const renderFileContentImage = () => {
     return (
       <img src={fileContent} alt="" className="ss-bot-chat-file-content-image" />
     )
   }
 
-  const renderFileContentPdf = (fileContent) => {
+  const renderFileContentPdf = () => {
     return (
       <span className="ss-bot-chat-file-content-download" onClick={() => handleDownloadFile(fileContent)}>
         ファイルをダウンロード
@@ -268,7 +241,7 @@ const BotMessage = ({
     )
   }
 
-  const renderFileContentVideo = (fileContent) => {
+  const renderFileContentVideo = () => {
     return (
       <div><video src={fileContent} autoPlay controls className="ss-bot-chat-file-content-video" /></div>
     )
@@ -278,9 +251,9 @@ const BotMessage = ({
     const fileContent = content[content.type]?.content;
 
     if (fileContent) {
-      if (isImageExtension(fileContent)) return renderFileContentImage(fileContent);
-      if (isPdfExtension(fileContent)) return renderFileContentPdf(fileContent);
-      if (isMp4Extension(fileContent)) return renderFileContentVideo(fileContent);
+      if (isImageExtension(fileContent)) return renderFileContentImage();
+      if (isPdfExtension(fileContent)) return renderFileContentPdf();
+      if (isMp4Extension(fileContent)) return renderFileContentVideo();  
     }
 
     return (
@@ -306,14 +279,6 @@ const BotMessage = ({
     )
   }
 
-  const renderAmazonPayButtonContent = () => (
-    <AmazonPayButtonMessagePreview
-      content={content}
-      contentIndex={contentIndex}
-      botInfor={botInfor}
-    />
-  );
-
   const renderHtmlCodeContent = () => {
     return (
       <HtmlCodeMessagePreview
@@ -334,7 +299,6 @@ const BotMessage = ({
     switch (content.type) {
       case BOT_MESSAGE_TYPES.TEXT_INPUT:
       case BOT_MESSAGE_TYPES.GETTING_ERROR_NOTIFICATION:
-      case BOT_MESSAGE_TYPES.ORDER_CONFIRM:
         return renderTextInputContent();
       case BOT_MESSAGE_TYPES.FILE:
         return renderFileContent();
@@ -342,8 +306,6 @@ const BotMessage = ({
         return renderDelayContent();
       case BOT_MESSAGE_TYPES.HTML_CODE:
         return renderHtmlCodeContent();
-      case BOT_MESSAGE_TYPES.AMAZON_PAY_BUTTON:
-        return renderAmazonPayButtonContent();
     }
   }
 

@@ -16,7 +16,6 @@ import { tokenExpired } from "api/tokenExpired";
 import { MinusCircleOutlined } from "@ant-design/icons";
 import { sinceMinutesOptions, hoursOptions, sinceOptions } from "./utils";
 import moment from "moment";
-import { AdminActionButton } from "../../../components/AdminShell";
 
 export default function SavePushMessageDialog({
   botId,
@@ -256,12 +255,13 @@ export default function SavePushMessageDialog({
   return (
     <div>
       {!item && (
-        <AdminActionButton
-          action="create"
-          label="追加"
+        <Button
           style={{ minWidth: "100px" }}
+          type="primary"
           onClick={handleClickOpen}
-        />
+        >
+          追加
+        </Button>
       )}
       <Modal
         style={{ top: 20 }}

@@ -10,14 +10,12 @@ import {
 } from '../PreviewComponent/Utils';
 import { processForBotMessage } from '../PreviewComponent/BotMessageUtils';
 import { processForUserMessage } from '../PreviewComponent/UserMessageUtils';
-import { processForCombineMessage } from '../PreviewComponent/CombineMessageUtils';
-import { isBotMessage, isUserMessage, isCombineMessage, getNextUserMsg } from '../PreviewComponent/Utils';
+import { isBotMessage, isUserMessage, getNextUserMsg } from '../PreviewComponent/Utils';
 import { mapAmazonPayDataToMessagesList } from '../PreviewComponent/TorizenUtils';
 import { mapAmazonPayDataToMessagesListForBliss } from '../PreviewComponent/BlissUtils';
 import { mapAmazonPayDataToMessagesListForRoseMay } from '../PreviewComponent/RoseMayUtils';
 import { mapAmazonPayDataToMessagesListForPhystech } from '../PreviewComponent/PhysTechUtils';
 import { mapAmazonPayDataToMessagesListForYuwaeru, isYuwaeruLP } from '../PreviewComponent/YuwaeruUtils';
-import { mapAmazonPayDataBySelector } from '../PreviewComponent/AmazonPayGenericUtils';
 import {
   RENDER_CHATBOT_CONFIG,
   GETTING_ERROR_NOTIFICATION,
@@ -63,22 +61,13 @@ const PreviewFukushashikiReducer = (state, action) => {
       };
     }
       
-    case PREVIEW_ACTIONS.UPDATE_MULTI_STATE: {
+    case PREVIEW_ACTIONS.UPDATE_MULTI_STATE:
       if (action.payload.removeTempDelay && action.payload.renderMessagesList?.length) {
         action.payload.renderMessagesList = action.payload.renderMessagesList?.filter(m => {
           return !isTempDelay(m, RENDER_CHATBOT_CONFIG.TEMP_DELAY_PREFIX);
         }) || [];
       }
-      const { isEditorPreviewDraft, timer_config, ...editorPreviewPayload } = action.payload || {};
-      if (isEditorPreviewDraft) {
-        const nextState = { ...state, ...editorPreviewPayload };
-        if (timer_config !== undefined) {
-          nextState.botInfor = { ...state.botInfor, timer_config };
-        }
-        return nextState;
-      }
       return { ...state, ...(!!state.submitErrorMessage ? processMessagesForErrorState(action.payload): action.payload) };
-    }
 
     case PREVIEW_ACTIONS.ADD_LP_OPTION_DATA:
       return { ...state, lpOptionData: { ...state.lpOptionData, ...action.payload, isProcessing: false } };
@@ -245,11 +234,6 @@ const PreviewFukushashikiReducer = (state, action) => {
               ...newState,
               ...processForUserMessage(newState.messagesList, i, newState, false)
             };
-          } else if (isCombineMessage(newState.messagesList[i])) {
-            newState = {
-              ...newState,
-              ...processForCombineMessage(newState.messagesList, i, newState, false)
-            };
           }
         }
       }
@@ -314,13 +298,6 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
       const newMessagesListForYuwaeru = mapAmazonPayDataToMessagesListForYuwaeru(action.payload, state.messagesList, state.prefecturesList);
       const renderMessagesListForYuwaeru = newMessagesListForYuwaeru.slice(0, state.currentMsgIndex + 1);
       return { ...state, messagesList: newMessagesListForYuwaeru, renderMessagesList: renderMessagesListForYuwaeru};
-    case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_BY_SELECTOR: {
-      const { messagesList, changed } = mapAmazonPayDataBySelector(action.payload, state.messagesList);
-      if (!changed) return state;
-
-      const updatedRenderMessagesList = messagesList.slice(0, state.currentMsgIndex + 1);
-      return { ...state, messagesList, renderMessagesList: updatedRenderMessagesList };
-    }
     case PREVIEW_ACTIONS.UPDATE_LP_FIELD_VALUE: {
       const { messagesList, changed } = applyLpFieldValue(state.messagesList, action.payload);
       if (!changed) return state;
@@ -408,20 +385,18 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
       const { conversation } = action.payload.responseData?.data;
       const { variables, all_variables } = action.payload.responseData;
 
-      const isEditorPreview = Boolean(action.payload.isEditorPreview);
-
       let newState = {
         ...state,
         botInfor: botInfor,
-        objParam: isEditorPreview ? state.objParam : {},
+        objParam: {},
         loadedStateFromSession: true,
         messagesList: conversation?.messages || [],
         isUseGlobalDelay: conversation?.isUseGlobalDelay || false,
         globalDelayTime: conversation?.globalDelayTime ?? 1.0,
-        isOpen: isEditorPreview ? true : (state.isOpen || action.payload.isUsingAmazonPay),
+        isOpen: state.isOpen || action.payload.isUsingAmazonPay,
         activePopupCloseBot: Boolean(designSetting?.popup_close_bot),
         titleBubble: designSetting?.title_bubble || "簡単90秒で注文完了",
-        displayType: designSetting?.display_type ?? (isEditorPreview ? (state.displayType ?? 1) : designSetting?.display_type),
+        displayType: designSetting?.display_type,
         widthPc: designSetting?.width_pc || 450,
         heightPc: designSetting?.height_pc || 700,
         widthSp: designSetting?.width_sp || 100,
@@ -438,10 +413,6 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
         bottomMarginSp: designSetting?.bottom_margin_sp,
         isUsedErrMsgByJs: chatbot?.is_used_err_msg_by_js,
         errMsgJsCode: chatbot?.err_msg_js_code,
-        errMsgSettingMode: chatbot?.err_msg_setting_mode || 'js',
-        errMsgFieldSelectors: chatbot?.err_msg_field_selectors || '',
-        errMsgFormSelectors: chatbot?.err_msg_form_selectors || '',
-        launchButtonSelectors: chatbot?.launch_button_selectors || '',
         useNewProcess: chatbot?.client_cart_system === CART_SYSTEM.EC_FORCE,
         isUsedPastMessageLoaded: !!chatbot?.is_used_message_loaded_past,
         isProcessing: false,
@@ -458,25 +429,11 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
         isUsedCustomCss: !!chatbot?.is_used_custom_css,
         customCssContent: chatbot?.custom_css_content,
         isUseBtnUpdateTracking: !!conversation?.isUseBtnUpdateTracking,
-        isUseGlobalDelay: conversation?.isUseGlobalDelay || false,
-        globalDelayTime: conversation?.globalDelayTime ?? 1.0,
-        themeSettings: designSetting?.theme || null,
+        currentMsgIndex: 0, // Start
         manuallyClosed: false,
         autoOpenAttempted: false,
+        renderMode: RENDER_MODES.NEXT,
       };
-
-      if (isEditorPreview) {
-        newState.messagesList = state.messagesList;
-        newState.renderMessagesList = state.renderMessagesList;
-        newState.currentMsgIndex = state.currentMsgIndex;
-        newState.nextStopMsgIndex = state.nextStopMsgIndex;
-        newState.renderMode = state.renderMode;
-        newState.progressBarMaxIndex = state.progressBarMaxIndex;
-      } else {
-        newState.messagesList = conversation?.messages || [];
-        newState.currentMsgIndex = 0;
-        newState.renderMode = RENDER_MODES.NEXT;
-      }
 
       // Update originalContent for replace variables when after getPreviewResponse
       newState.messagesList.filter(isBotMessage).forEach((message) => {
@@ -498,29 +455,22 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
         newState.messagesList.forEach((x) => x.hidden = x.not_display_when_logged_in);
       }
 
-      if (isEditorPreview && state.renderMessagesList?.length > 0) {
-        newState.renderMessagesList = state.renderMessagesList;
-        newState.currentMsgIndex = state.currentMsgIndex;
-        newState.nextStopMsgIndex = state.nextStopMsgIndex;
-        newState.renderMode = state.renderMode;
-      } else if (!isEditorPreview && (newState.isOpen || action.payload.isUsingAmazonPay)) {
+      if (state.isOpen || action.payload.isUsingAmazonPay) {
         newState.nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg()) + 1;
         if (newState.nextStopMsgIndex < newState.currentMsgIndex) {
           newState.nextStopMsgIndex = newState.currentMsgIndex + 1;
         }
         newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
-      } else if (!isEditorPreview) {
+      } else {
         newState.currentMsgIndex = -1;
         newState.nextStopMsgIndex = -1;
         newState.renderMessagesList = [];
       }
 
       const conditionParams = buildConditionParams(newState);
-      if (!isEditorPreview) {
-        for (let i = 0; i < newState.messagesList.length; i++) {
-          const result = checkMessageCondition(newState.messagesList[i], conditionParams);
-          newState.messagesList[i].hidden = !result;
-        }
+      for (let i = 0; i < newState.messagesList.length; i++) {
+        const result = checkMessageCondition(newState.messagesList[i], conditionParams);
+        newState.messagesList[i].hidden = !result;
       }
 
       const progressBarTargetCountMessagesList = newState.messagesList.filter(msg => {

@@ -178,12 +178,10 @@ function Dashboard() {
         curve: 'smooth',
       },
       fill: {
-        type: ['solid', 'solid'],
+        type: 'solid',
         opacity: [0.35, 1],
       },
-      xaxis: {
-        categories: dateECU,
-      },
+      labels: dateECU,
       markers: {
         size: 0,
       },

@@ -3,7 +3,7 @@ import "assets/css/bot/preview-chat-bot.css";
 import Cookies from "js-cookie";
 import { MDBIcon } from "mdbreact";
 import CustomButton from "./CustomButton";
-import { UserMessage, BotMessage, CombineMessage, CombineMessageNextButton } from "./PreviewComponent";
+import { UserMessage, BotMessage } from "./PreviewComponent";
 import PreviewFaqReducer from "./PreviewFaq/PreviewFaqReducer";
 import $ from "jquery";
 import { EC_CHATBOT_URL } from "variables/constants";
@@ -26,8 +26,6 @@ import {
   MESSAGE_CONTENT_TYPES,
   CUSTOM_JS_CODE_POSITION,
 } from "./PreviewComponent/Constants";
-import { injectBotThemeCss } from "utils/chatbotThemeCss";
-import { COLOR_MAP } from "views/BotElement/BotSetting/DesignSetting/constants/designChatbotConstants";
 import {
   getAllUrlParams,
   lightenColor,
@@ -285,20 +283,7 @@ const PreviewFaq = () => {
     style.innerHTML = state.customCssContent;
     document.head.appendChild(style);
   }, [state.isUsedCustomCss, state.customCssContent]);
-
-  useEffect(() => {
-    if (!state.botInfor) return;
-    const chatbot = state.botInfor;
-    const apiColorKey = chatbot.main_color && !String(chatbot.main_color).startsWith('#')
-      ? chatbot.main_color
-      : null;
-    const mainColorHex = chatbot.main_color_other
-      || COLOR_MAP[chatbot.main_color]
-      || chatbot.main_color
-      || '#327AED';
-    injectBotThemeCss(state.themeSettings, mainColorHex, apiColorKey);
-  }, [state.themeSettings, state.botInfor]);
-
+  
   // Get Preview Scenario Data
   useEffect(() => {
     if (!state.loadedStateFromSession) {
@@ -621,7 +606,6 @@ const PreviewFaq = () => {
       useFullWidthChatbotMobile: !!chatbot?.use_fullwidth_chatbot_mobile,
       isUsedCustomCss: !!chatbot?.is_used_custom_css,
       customCssContent: chatbot?.custom_css_content,
-      themeSettings: designSetting?.theme || null,
     };
 
     const prevOpenStatus = getPrevOpenStatus();
@@ -852,67 +836,6 @@ const PreviewFaq = () => {
     );
   };
 
-  const renderCombineMessageContent = (message, messageIndex) => {
-    if (!message || message.belong_to !== "combine") return null;
-    if (!Array.isArray(message?.message_content) || message.message_content.length === 0) return null;
-
-    const isUpdate = messageIndex >= state.renderMessagesList.length - 1;
-
-    return (
-      <React.Fragment>
-        <CombineMessage
-          postMessageToParent={(options) => postMessageToParent(options, state)}
-          message={message}
-          captcha={state.captcha}
-          disabled={false}
-          onChangeValue={(
-            contentIndex,
-            contentType,
-            value,
-            field,
-            subField1,
-            subField2
-          ) =>
-            onChangeValue(
-              contentIndex,
-              contentType,
-              value,
-              field,
-              subField1,
-              subField2,
-              message,
-              messageIndex
-            )
-          }
-          onClickNext={() => onClickNext(messageIndex, message)}
-          messageIndex={messageIndex}
-          errorsProps={state.errors}
-          prefecturesList={[]}
-          onOpen={() => {}}
-          onChangeErrors={(field, value) => onChangeErrors(field, value)}
-          variables={state.variables}
-          lpOptionData={state.lpOptionData}
-          submitErrorMessage=""
-          botId={state.botId}
-          isProcessing={!!state.isProcessing}
-          botInfor={state.botInfor}
-          previewOrderContent={state.previewOrderContent}
-          executeLpJsCode={(jsCode) => executeLpJsCode(jsCode, state)}
-          isBotOpen={state.isOpen}
-          cartSystem={params.get("cartSystem") ?? ""}
-        />
-        <CombineMessageNextButton
-          message={message}
-          messageIndex={messageIndex}
-          botInfor={state.botInfor}
-          onClickNext={onClickNext}
-          isUpdate={isUpdate}
-          isExtractFromSession={state.isExtractFromSession}
-        />
-      </React.Fragment>
-    );
-  };
-
   const renderMessages = () => {
     return (state.renderMessagesList || []).map((message, messageIndex) => {
       if (message.hidden && !stringNullOrEmpty(message.hidden)) return null;
@@ -920,7 +843,6 @@ const PreviewFaq = () => {
         <React.Fragment key={messageIndex}>
           {renderBotMessageContent(message, messageIndex)}
           {renderUserMessageContent(message, messageIndex)}
-          {renderCombineMessageContent(message, messageIndex)}
         </React.Fragment>
       );
     })

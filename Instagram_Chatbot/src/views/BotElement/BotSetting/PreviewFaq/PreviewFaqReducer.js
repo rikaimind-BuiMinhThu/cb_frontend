@@ -11,8 +11,7 @@ import {
 } from '../PreviewComponent/Utils';
 import { processForBotMessage } from '../PreviewComponent/BotMessageUtils';
 import { processForUserMessage } from '../PreviewComponent/UserMessageUtils';
-import { processForCombineMessage, prepareCombineMessagesForPreview } from '../PreviewComponent/CombineMessageUtils';
-import { isBotMessage, isUserMessage, isCombineMessage, getNextUserMsg } from '../PreviewComponent/Utils';
+import { isBotMessage, isUserMessage, getNextUserMsg } from '../PreviewComponent/Utils';
 import {
   RENDER_CHATBOT_CONFIG,
   PREVIEW_ACTIONS,
@@ -26,18 +25,13 @@ import { getDefaultValue } from '../PreviewComponent/VariablesUtils';
 
 const PreviewFaqReducer = (state, action) => {
   switch (action.type) {
-    case PREVIEW_ACTIONS.UPDATE_MULTI_STATE: {
+    case PREVIEW_ACTIONS.UPDATE_MULTI_STATE:
       if (action.payload.removeTempDelay && action.payload.renderMessagesList?.length) {
         action.payload.renderMessagesList = action.payload.renderMessagesList?.filter(m => {
           return !isTempDelay(m, RENDER_CHATBOT_CONFIG.TEMP_DELAY_PREFIX);
         }) || [];
       }
-      const { isEditorPreviewDraft, ...editorPreviewPayload } = action.payload || {};
-      if (isEditorPreviewDraft) {
-        return { ...state, ...editorPreviewPayload };
-      }
       return { ...state, ...(!!state.submitErrorMessage ? processMessagesForErrorState(action.payload): action.payload) };
-    }
 
     case PREVIEW_ACTIONS.SET_PROCESSING: 
       return { ...state, isProcessing: action.payload };
@@ -211,14 +205,15 @@ const PreviewFaqReducer = (state, action) => {
       const resolvedDisplayType = Number(designSetting?.display_type ?? state.displayType ?? 2);
       const isOpenFromState = Boolean(state.isOpen);
       const isOpenFromAmazonPay = Boolean(action.payload.isUsingAmazonPay);
-      const isEditorPreview = Boolean(action.payload.isEditorPreview);
 
       let newState = {
         ...state,
         botInfor: botInfor,
-        objParam: isEditorPreview ? state.objParam : {},
+        objParam: {},
         loadedStateFromSession: true,
-        isOpen: isEditorPreview ? true : (isOpenFromState || isOpenFromAmazonPay),
+        originalMessagesList: _.cloneDeep(conversation?.messages || []),
+        messagesList: conversation?.messages || [],
+        isOpen: isOpenFromState || isOpenFromAmazonPay,
         activePopupCloseBot: Boolean(designSetting?.popup_close_bot),
         titleBubble: designSetting?.title_bubble || "簡単90秒で注文完了",
         displayType: resolvedDisplayType,
@@ -238,10 +233,6 @@ const PreviewFaqReducer = (state, action) => {
         bottomMarginSp: toNumber(designSetting?.bottom_margin_sp, 10),
         isUsedErrMsgByJs: chatbot?.is_used_err_msg_by_js,
         errMsgJsCode: chatbot?.err_msg_js_code,
-        errMsgSettingMode: chatbot?.err_msg_setting_mode || 'js',
-        errMsgFieldSelectors: chatbot?.err_msg_field_selectors || '',
-        errMsgFormSelectors: chatbot?.err_msg_form_selectors || '',
-        launchButtonSelectors: chatbot?.launch_button_selectors || '',
         isUsedPastMessageLoaded: !!chatbot?.is_used_message_loaded_past,
         isProcessing: false,
         useFullWidthChatbotMobile: !!chatbot?.use_fullwidth_chatbot_mobile,
@@ -251,29 +242,12 @@ const PreviewFaqReducer = (state, action) => {
         bottomBodyCustomJsCode: chatbot?.bottom_body_custom_js_code,
         isUsedCustomCss: !!chatbot?.is_used_custom_css,
         customCssContent: chatbot?.custom_css_content,
-        themeSettings: designSetting?.theme || null,
+        currentMsgIndex: 0, // Start
         manuallyClosed: false,
         autoOpenAttempted: false,
+        renderMode: RENDER_MODES.NEXT,
+        loopCount: 0,
       };
-
-      if (isEditorPreview) {
-        newState.originalMessagesList = state.originalMessagesList?.length
-          ? state.originalMessagesList
-          : state.messagesList;
-        newState.messagesList = state.messagesList;
-        newState.renderMessagesList = state.renderMessagesList;
-        newState.currentMsgIndex = state.currentMsgIndex;
-        newState.nextStopMsgIndex = state.nextStopMsgIndex;
-        newState.renderMode = state.renderMode;
-        newState.loopCount = state.loopCount;
-        newState.progressBarMaxIndex = state.progressBarMaxIndex;
-      } else {
-        newState.originalMessagesList = _.cloneDeep(conversation?.messages || []);
-        newState.messagesList = conversation?.messages || [];
-        newState.currentMsgIndex = 0;
-        newState.renderMode = RENDER_MODES.NEXT;
-        newState.loopCount = 0;
-      }
 
       // Update originalContent for replace variables when after getPreviewResponse
       newState.messagesList.filter(isBotMessage).forEach((message) => {
@@ -284,8 +258,6 @@ const PreviewFaqReducer = (state, action) => {
         });
       });
 
-      prepareCombineMessagesForPreview(newState.messagesList);
-
       if (variables) {
         newState.variables = [...variables, ...all_variables];
         newState.variables.forEach((item) => {
@@ -295,29 +267,22 @@ const PreviewFaqReducer = (state, action) => {
         newState.originalVariables = newState.variables;
       }
 
-      if (isEditorPreview && state.renderMessagesList?.length > 0) {
-        newState.renderMessagesList = state.renderMessagesList;
-        newState.currentMsgIndex = state.currentMsgIndex;
-        newState.nextStopMsgIndex = state.nextStopMsgIndex;
-        newState.renderMode = state.renderMode;
-      } else if (!isEditorPreview && newState.isOpen) {
+      if (state.isOpen) {
         newState.nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg()) + 1;
         if (newState.nextStopMsgIndex < newState.currentMsgIndex) {
           newState.nextStopMsgIndex = newState.currentMsgIndex + 1;
         }
         newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
-      } else if (!isEditorPreview) {
+      } else {
         newState.currentMsgIndex = -1;
         newState.nextStopMsgIndex = -1;
         newState.renderMessagesList = [];
       }
 
       const conditionParams = buildConditionParams(newState);
-      if (!isEditorPreview) {
-        for (let i = 0; i < newState.messagesList.length; i++) {
-          const result = checkMessageCondition(newState.messagesList[i], conditionParams);
-          newState.messagesList[i].hidden = !result;
-        }
+      for (let i = 0; i < newState.messagesList.length; i++) {
+        const result = checkMessageCondition(newState.messagesList[i], conditionParams);
+        newState.messagesList[i].hidden = !result;
       }
 
       return { ...state, ...newState };
@@ -457,11 +422,6 @@ const processMessagesAfterClickNext = (newState, oldState, clickedMsgIndex) => {
       newState = {
         ...newState,
         ...processForUserMessage(newState.messagesList, i, newState, false)
-      };
-    } else if (isCombineMessage(newState.messagesList[i])) {
-      newState = {
-        ...newState,
-        ...processForCombineMessage(newState.messagesList, i, newState, false)
       };
     }
   }

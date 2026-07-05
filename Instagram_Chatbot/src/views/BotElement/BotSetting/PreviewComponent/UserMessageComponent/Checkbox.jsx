@@ -1,17 +1,7 @@
 import React from "react";
 import "assets/css/bot/preview-chat-bot.css";
 import { MESSAGE_CONTENT_TYPES } from "views/BotElement/BotSetting/PreviewComponent/Constants";
-import {
-  getCheckboxImgGridStyle,
-  getCheckboxImgOptionStyle,
-} from "views/BotElement/BotSetting/ScenarioSetting/utils/radioButtonImgLayoutUtils";
-import {
-  buildEditorCheckboxOptionDataAttr,
-  getCheckboxImgSelectionKey,
-  getCheckboxOptionSelectionKey,
-  isCheckboxImgContentChecked,
-  isCheckboxOptionChecked,
-} from "views/BotElement/BotSetting/ScenarioSetting/utils/checkboxSelectionUtils";
+import { Checkbox as AntdCheckbox } from "antd";
 
 export default function Checkbox({ content, disabled, onChangeValue, errors, contentIndex, messageIndex }) {
   if (content.type !== MESSAGE_CONTENT_TYPES.CHECKBOX) return null;
@@ -42,154 +32,6 @@ export default function Checkbox({ content, disabled, onChangeValue, errors, con
     );
   };
 
-  const handleDefaultChange = (item) => {
-    const selectionKey = getCheckboxOptionSelectionKey(item);
-    const current = [...(checkbox.checkedValue ?? [])];
-    const index = current.findIndex((value) => String(value) === String(selectionKey));
-    if (index >= 0) {
-      current.splice(index, 1);
-    } else {
-      current.push(selectionKey);
-    }
-    onChangeValue(contentIndex, content.type, current, "checkedValue");
-  };
-
-  const handleCheckboxImgChange = (group, contentItem) => {
-    const selectionKey = getCheckboxImgSelectionKey(group, contentItem);
-    const current = [...(checkbox.initial_selection_picture ?? [])];
-    const index = current.findIndex((value) => String(value) === String(selectionKey));
-    if (index >= 0) {
-      current.splice(index, 1);
-    } else {
-      current.push(selectionKey);
-    }
-    onChangeValue(contentIndex, content.type, current, "initial_selection_picture");
-  };
-
-  const getDefaultOptionClassName = (item) => {
-    const isSelected = isCheckboxOptionChecked(checkbox, item);
-    return [
-      "ss-message__content--user-checkbox",
-      isSelected ? "ss-message__content--user-checkbox--selected" : "",
-    ].filter(Boolean).join(" ");
-  };
-
-  const renderDefaultContent = () => {
-    return checkbox[checkbox.type].map((item, index) => {
-      const selectionKey = getCheckboxOptionSelectionKey(item);
-      const inputId = `ss-message__content--user-checkbox_${messageIndex}_${contentIndex}_${selectionKey}_${index}`;
-      const isSelected = isCheckboxOptionChecked(checkbox, item);
-      return (
-        <div
-          key={index}
-          data-editor-checkbox-option={buildEditorCheckboxOptionDataAttr(contentIndex, item.id)}
-          className={getDefaultOptionClassName(item)}
-        >
-          <input
-            disabled={disabled}
-            type="checkbox"
-            id={inputId}
-            name={`ss-message__content--user-checkbox_msg${messageIndex}_content${contentIndex}_${content.type}`}
-            checked={isSelected}
-            onChange={() => handleDefaultChange(item)}
-          />
-          {item.text && (
-            <label htmlFor={inputId}>
-              {item.text}
-            </label>
-          )}
-        </div>
-      );
-    });
-  };
-
-  const renderCheckboxImgContent = () => {
-    const gridStyle = getCheckboxImgGridStyle(checkbox);
-    const optionStyle = getCheckboxImgOptionStyle(checkbox);
-
-    return checkbox[checkbox.type]?.map((group, groupIndex) => (
-      <div
-        key={groupIndex}
-        data-editor-checkbox-option={buildEditorCheckboxOptionDataAttr(contentIndex, group.id)}
-        className="ss-message__content--user-checkbox--checkbox_img"
-      >
-        <div
-          className="ss-message__content--user-checkbox-img-grid"
-          style={gridStyle}
-        >
-          {group.contents?.map((contentItem, contentItemIndex) => {
-            const compositeKey = getCheckboxImgSelectionKey(group, contentItem);
-            const inputId = `ss-message__content--user-checkbox_img_${messageIndex}_${contentIndex}_${compositeKey}_${contentItemIndex}`;
-            const isSelected = isCheckboxImgContentChecked(checkbox, group, contentItem);
-            return (
-              <div
-                key={contentItemIndex}
-                data-editor-checkbox-option={buildEditorCheckboxOptionDataAttr(contentIndex, compositeKey)}
-                className={[
-                  "ss-message__content--user-checkbox--checkbox_img-item",
-                  isSelected ? "ss-message__content--user-checkbox--selected" : "",
-                  disabled ? "ss-message__content--user-checkbox--checkbox_img-item--disabled" : "",
-                ].filter(Boolean).join(" ")}
-                style={optionStyle}
-                onClick={() => {
-                  if (disabled) return;
-                  handleCheckboxImgChange(group, contentItem);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    if (!disabled) handleCheckboxImgChange(group, contentItem);
-                  }
-                }}
-                role="button"
-                tabIndex={disabled ? -1 : 0}
-              >
-                <input
-                  disabled={disabled}
-                  type="checkbox"
-                  className="ss-checkbox-img-input--hidden"
-                  name={`ss-message__content--user-checkbox--checkbox_img_msg${messageIndex}_content${contentIndex}_${content.type}`}
-                  id={inputId}
-                  checked={isSelected}
-                  readOnly
-                  tabIndex={-1}
-                  aria-hidden="true"
-                />
-                <img src={contentItem.file_url} alt="" />
-                {contentItem.text && (
-                  <div className="ss-message__content--user-checkbox-img-text">{contentItem.text}</div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    ));
-  };
-
-  const renderConsumeApiResponseContent = () => {
-    return (
-      <>
-        {[0, 1].map((index) => {
-          const inputId = `ss-message__content--user-checkbox_api_${messageIndex}_${contentIndex}_${index}`;
-          return (
-            <div key={index} className="ss-message__content--user-checkbox">
-              <input
-                type="checkbox"
-                name={`ss-message__content--user-checkbox_msg${messageIndex}_content${contentIndex}_${content.type}`}
-                id={inputId}
-                disabled={disabled}
-              />
-              <label htmlFor={inputId}>
-                ラベル
-              </label>
-            </div>
-          );
-        })}
-      </>
-    );
-  };
-
   const renderContent = () => {
     switch (checkbox.type) {
       case "default":
@@ -201,6 +43,97 @@ export default function Checkbox({ content, disabled, onChangeValue, errors, con
       default:
         return null;
     }
+  };
+
+  const renderDefaultContent = () => {
+    return (
+      <AntdCheckbox.Group
+        className="w-100-percent"
+        disabled={disabled}
+        onChange={(value) =>
+          onChangeValue(
+            contentIndex,
+            content.type,
+            value,
+            "checkedValue"
+          )
+        }
+        value={checkbox.checkedValue}
+      >
+        {checkbox[checkbox.type].map((item, index) => {
+          return (
+            <div key={index} className="ss-message__content--user-checkbox">
+              <AntdCheckbox value={item.id}>
+                <label htmlFor="ss-message__content--user-checkbox">
+                  {item.text}
+                </label>
+              </AntdCheckbox>
+            </div>
+          );
+        })}
+      </AntdCheckbox.Group>
+    );
+  };
+
+  const renderCheckboxImgContent = () => {
+    return (
+      <AntdCheckbox.Group
+        className="w-100-percent"
+        disabled={disabled}
+        onChange={(value) =>
+          onChangeValue(
+            contentIndex,
+            content.type,
+            value,
+            "initial_selection_picture"
+            )
+          }
+          value={checkbox.initial_selection_picture}
+        >
+          {checkbox[checkbox.type].map((item, index) => {
+            return (
+              <div
+                key={index}
+                className="ss-message__content--user-checkbox"
+              >
+                <AntdCheckbox value={item.id}>
+                  <label htmlFor="ss-message__content--user-checkbox">
+                    {item.text}
+                  </label>
+                </AntdCheckbox>
+              </div>
+            );
+          })}
+      </AntdCheckbox.Group>
+    );
+  };
+
+  const renderConsumeApiResponseContent = () => {
+    return (
+      <>
+        <div className="ss-message__content--user-checkbox">
+          <input
+            type="checkbox"
+            name="ss-message__content--user-checkbox"
+            id="ss-message__content--user-checkbox"
+          />
+          <label htmlFor="ss-message__content--user-checkbox">
+            ラベル
+          </label>
+        </div>
+        <div className="ss-message__content--user-checkbox">
+          <input
+            type="checkbox"
+            name="ss-message__content--user-checkbox"
+            id="ss-message__content--user-checkbox"
+            disabled={disabled}
+          />
+          <label htmlFor="ss-message__content--user-checkbox">
+            ラベル
+          </label>
+        </div>
+      </>
+    );
   };
 
   const renderErrorMessage = () => {

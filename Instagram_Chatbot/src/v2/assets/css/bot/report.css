@@ -1,0 +1,111 @@
+.admin-page--report .report-page-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.admin-page--report .report-section {
+  background: #fafafa;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.admin-page--report .report-section-title {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.admin-page--report .report-section-title .ant-typography {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.admin-page--report .report-chart-panel {
+  min-height: 350px;
+}
+
+.admin-page--report .report-device-grid {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 992px) {
+  .admin-page--report .report-device-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.admin-page--report .report-stat-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-page--report .report-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+.admin-page--report .report-stat-card__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.admin-page--report .report-stat-card--pc .report-stat-card__icon {
+  background-color: #1677ff;
+}
+
+.admin-page--report .report-stat-card--sp .report-stat-card__icon {
+  background-color: #52c41a;
+}
+
+.admin-page--report .report-stat-card--tablet .report-stat-card__icon {
+  background-color: #4096ff;
+}
+
+.admin-page--report .report-stat-card__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.admin-page--report .report-stat-card__value {
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.admin-page--report .report-filter-panel {
+  padding-bottom: 20px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.admin-page--report .report-filter-toolbar {
+  margin-bottom: 0;
+}
+
+.admin-page--report .report-date-error {
+  display: block;
+  margin-top: 4px;
+}
+
+.admin-page--report .report-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}

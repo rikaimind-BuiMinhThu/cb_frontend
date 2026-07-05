@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { MDBIcon } from 'mdbreact';
 import CheckboxCustom from './CheckboxCustom';
-import './InputCustom.css';
 
 const InputCustom = ({
   id,
@@ -19,7 +18,6 @@ const InputCustom = ({
   valueCheckbox = false,
   style,
   classLabel,
-  labelClassName,
   disabled = false,
   styleLabel,
   inline = true,
@@ -33,68 +31,117 @@ const InputCustom = ({
   labelValue,
   inputMode = "text",
   clearable = false,
-  containerClassName = '',
+  containerStyle,
   ...props
 }) => {
+  // State to manage password visibility
   const [showPassword, setShowPassword] = useState(false);
-  const resolvedClassLabel = classLabel || labelClassName;
 
+  // Toggle password visibility
   const handleTogglePassword = () => {
     setShowPassword(!showPassword);
   };
 
-  const inputFieldClassName = [
-    'ss-input-custom-field',
-    type === 'password' ? 'ss-input-custom-field--password' : clearable ? 'ss-input-custom-field--with-clear' : '',
-    className,
-  ].filter(Boolean).join(' ');
-
-  const renderInputField = (withClear) => (
-    <div className={`ss-input-custom-container ${containerClassName}`.trim()}>
-      <input
-        {...props}
-        id={id}
-        maxLength={maxLength}
-        type={type === 'password' && showPassword ? 'text' : type}
-        inputMode={inputMode}
-        onPaste={onPaste}
-        pattern={pattern}
-        onKeyPress={onKeyPress}
-        name="ss-user-setting__item-text_input-use-api"
-        className={`ss-input-value ${!useFukushashiki ? 'ss-user-setting-item' : ''} ${inputFieldClassName}`}
-        placeholder={placeholder}
-        disabled={disabled}
-        value={value ?? ''}
-        style={style}
-        onChange={e => onChange(e.target.value)}
-        readOnly={readOnly}
-        onCompositionStart={(e) => props?.onCompositionStart?.(e)}
-        onCompositionEnd={(e) => props?.onCompositionEnd?.(e)}
-      />
-      {type === 'password' && (
-        <MDBIcon
-          fas
-          icon={showPassword ? 'eye-slash' : 'eye'}
-          onClick={handleTogglePassword}
-          className={`ss-password-toggle-icon ${withClear ? 'ss-password-toggle-icon--with-clear' : withClear === false ? 'ss-password-toggle-icon--no-clear' : 'ss-password-toggle-icon--default'}`}
+  const renderWithClearIcon = () => {
+    const {width, ...containerStyleWithoutWidth} = containerStyle || {};
+    return (
+      <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', width: width || '100%', ...containerStyleWithoutWidth }}>
+        <input
+          {...props}
+          id={id}
+          maxLength={maxLength}
+          type={type === 'password' && showPassword ? 'text' : type} // Toggle type for password
+          inputMode={inputMode}
+          onPaste={onPaste}
+          pattern={pattern}
+          onKeyPress={onKeyPress}
+          name="ss-user-setting__item-text_input-use-api"
+          className={`ss-input-value ${!useFukushashiki ? 'ss-user-setting-item' : ''} ${className || ''}`}
+          placeholder={placeholder}
+          disabled={disabled}
+          value={value}
+          style={{ ...style, width: '100%', paddingRight: type === 'password' ? '50px' : '30px' }} // Extra padding for eye icon
+          onChange={e => onChange(e.target.value)}
+          readOnly={readOnly}
+          onCompositionStart={(e) => props?.onCompositionStart?.(e)}
+          onCompositionEnd={(e) => props?.onCompositionEnd?.(e)}
         />
-      )}
-      {withClear && (
-        <MDBIcon
-          fas
-          icon="times"
-          onClick={() => onChange('')}
-          className="ss-clear-input-icon"
-        />
-      )}
-    </div>
-  );
+        {type === 'password' && (
+          <MDBIcon
+            fas
+            icon={showPassword ? 'eye-slash' : 'eye'} // Toggle eye icon
+            onClick={handleTogglePassword}
+            style={{
+              position: 'absolute',
+              right: clearable ? '30px' : '10px', // Adjust position if clear icon is present
+              cursor: 'pointer',
+              color: '#666',
+              fontSize: '14px',
+            }}
+            className="ss-password-toggle-icon"
+          />
+        )}
+        {clearable && (
+          <MDBIcon
+            fas
+            icon="times"
+            onClick={() => onChange('')}
+            style={{
+              position: 'absolute',
+              right: '10px',
+              cursor: 'pointer',
+              color: '#666',
+              fontSize: '14px',
+            }}
+            className="ss-clear-input-icon"
+          />
+        )}
+      </div>
+    );
+  };
 
-  const labelElementClassName = [
-    resolvedClassLabel,
-    inline === false ? 'ss-input-custom-label--block' : 'ss-input-custom-label--inline',
-    'ss-input-custom-label',
-  ].filter(Boolean).join(' ');
+  const renderWithoutClearIcon = () => {
+    const {width, ...containerStyleWithoutWidth} = containerStyle || {};
+    return (
+      <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', width: width || '100%', ...containerStyleWithoutWidth }}>
+        <input
+          {...props}
+          id={id}
+          maxLength={maxLength}
+          type={type === 'password' && showPassword ? 'text' : type} // Toggle type for password
+          inputMode={inputMode}
+          onPaste={onPaste}
+          pattern={pattern}
+          onKeyPress={onKeyPress}
+          name="ss-user-setting__item-text_input-use-api"
+          className={`ss-input-value ${!useFukushashiki ? 'ss-user-setting-item' : ''} ${className || ''}`}
+          placeholder={placeholder}
+          disabled={disabled}
+          value={value}
+          style={{ ...style, width: '98%', paddingRight: type === 'password' ? '50px' : '30px' }} // Padding for eye icon
+          onChange={e => onChange(e.target.value)}
+          readOnly={readOnly}
+          onCompositionStart={(e) => props?.onCompositionStart?.(e)}
+          onCompositionEnd={(e) => props?.onCompositionEnd?.(e)}
+        />
+        {type === 'password' && (
+          <MDBIcon
+            fas
+            icon={showPassword ? 'eye-slash' : 'eye'} // Toggle eye icon
+            onClick={handleTogglePassword}
+            style={{
+              position: 'absolute',
+              right: '20px',
+              cursor: 'pointer',
+              color: '#666',
+              fontSize: '14px',
+            }}
+            className="ss-password-toggle-icon"
+          />
+        )}
+      </div>
+    );
+  };
 
   return (
     <React.Fragment>
@@ -103,19 +150,22 @@ const InputCustom = ({
           {...props}
           type="text"
           inputMode={inputMode}
-          value={labelValue ?? ''}
+          value={labelValue}
           onChange={e => onLabelChange(e.target.value)}
-          className={`ss-input-custom-editable-label ${resolvedClassLabel || ''}`}
-          style={styleLabel}
+          className={`ss-editable-label ${classLabel || ''}`}
+          style={{ borderRadius: '5px', border: '1px solid gray', padding: '5px', fontSize: '14px', fontWeight: '400', width: '1%', ...styleLabel }}
         />
       ) : (
         label && (
-          <div className={labelElementClassName} style={styleLabel}>
+          <div
+            className={classLabel}
+            style={{ fontSize: '14px', fontWeight: '400', ...inline === false ? { width: '90%' } : { width: 'fit-content' }, ...styleLabel }}
+          >
             {label}
           </div>
         )
       )}
-      {clearable ? renderInputField(true) : renderInputField(false)}
+      {clearable ? renderWithClearIcon() : renderWithoutClearIcon()}
       {handleCheckBox && (
         <CheckboxCustom
           label="Use the dropdown"
@@ -126,10 +176,11 @@ const InputCustom = ({
       )}
       {icon && (
         <MDBIcon
-          className={`ss-input-custom-icon ${classIcon ? classIcon : 'ss-plus-circle-option-icon'}`}
+          style={{ width: '5%' }}
           onClick={onClickIcon}
           fas
           icon={icon}
+          className={classIcon ? classIcon : 'ss-plus-circle-option-icon'}
         />
       )}
     </React.Fragment>

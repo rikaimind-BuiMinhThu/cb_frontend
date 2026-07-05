@@ -3,35 +3,11 @@ import "assets/css/bot/preview-chat-bot.css";
 import { MESSAGE_CONTENT_TYPES } from "views/BotElement/BotSetting/PreviewComponent/Constants";
 import CommonCreditCardPayment from "./CommonCreditCardPayment";
 import { Radio } from "antd";
-import {
-  getPaymentGroupStyle,
-  getPaymentOptionImage,
-  getPaymentOptionStyle,
-  normalizePaymentConfig,
-} from "views/BotElement/BotSetting/ScenarioSetting/utils/paymentStyleUtils";
-
-const renderOptionLabel = (itemPayment, isSelected, displayStyle) => {
-  const image = getPaymentOptionImage(itemPayment, isSelected);
-  return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-      {image && (
-        <img
-          src={image}
-          alt=""
-          style={{ width: '24px', height: '24px', objectFit: 'contain' }}
-        />
-      )}
-      <span>{itemPayment.text}</span>
-    </span>
-  );
-};
 
 export default function CardPaymentRadioButton({ content, messageIndex, contentIndex, onChangeValue, errors, disabled }) {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.CARD_PAYMENT_RADIO_BUTTON) return null;
 
   const cardPaymentRadioButton = content.card_payment_radio_button;
-  const { layout, display_style: displayStyle } = normalizePaymentConfig(cardPaymentRadioButton);
-  const groupStyle = getPaymentGroupStyle(layout);
 
   const renderTitle = () => {
     if (!cardPaymentRadioButton.title_require && !cardPaymentRadioButton.require) return null;
@@ -86,23 +62,21 @@ export default function CardPaymentRadioButton({ content, messageIndex, contentI
 
     return (
       <Radio.Group
-        style={{ ...groupStyle, fontSize: "14px" }}
+        style={{ width: "100%", fontSize: "14px" }}
         disabled={disabled}
         value={cardPaymentRadioButton.initial_selection}
       >
         {
           cardPaymentRadioButton.radio_contents.map(
             (itemPayment, indexPayment) => {
-              const isSelected = cardPaymentRadioButton.initial_selection === itemPayment.value;
               return (
                 <Radio
                   value={itemPayment.value}
                   key={indexPayment}
                   className="ss-message__content--user-card-payment-radio-content"
-                  style={getPaymentOptionStyle(isSelected, displayStyle)}
                   onChange={onRadioChange}
                 >
-                  {renderOptionLabel(itemPayment, isSelected, displayStyle)}
+                  {itemPayment.text}
                 </Radio>
               );
             }
@@ -118,7 +92,6 @@ export default function CardPaymentRadioButton({ content, messageIndex, contentI
     return (
       <Radio.Group
         className="ss-message__content--user-card-payment-radio-container"
-        style={groupStyle}
         disabled={disabled}
         value={cardPaymentRadioButton.initial_selection}
         buttonStyle="solid"
@@ -126,17 +99,15 @@ export default function CardPaymentRadioButton({ content, messageIndex, contentI
         {
           cardPaymentRadioButton.radio_contents.map(
             (itemPayment, indexPayment) => {
-              const isSelected = cardPaymentRadioButton.initial_selection === itemPayment.value;
               return (
                 <Radio.Button
                   value={itemPayment.value}
                   key={indexPayment}
                   className="ss-message__content--user-card-payment-radio-customized-style"
-                  style={getPaymentOptionStyle(isSelected, displayStyle)}
                   onChange={onRadioChange}
                 >
-                  {renderOptionLabel(itemPayment, isSelected, displayStyle)}
-                </Radio.Button>
+                  {itemPayment.text}                             
+                </Radio.Button>                         
               );
             }
           )}
@@ -153,30 +124,18 @@ export default function CardPaymentRadioButton({ content, messageIndex, contentI
           <Radio.Group
             disabled={disabled}
             className="ss-message__content--user-card-payment-radio-group-type-text_image"
-            style={groupStyle}
             value={cardPaymentRadioButton.initial_selection_picture}
           >
             {itemPaymentImg.contents &&
               itemPaymentImg.contents.map(
                 (itemPaymentContent, indexPaymentContent) => {
-                  const optionValue = `${itemPaymentImg.id}-${itemPaymentContent.id}`;
-                  const isSelected = cardPaymentRadioButton.initial_selection_picture === optionValue;
-                  const matchedRadio = cardPaymentRadioButton.radio_contents?.find(
-                    (item) => item.value === itemPaymentContent.value
-                      || item.text === itemPaymentContent.text,
-                  );
-                  const stateImage = matchedRadio
-                    ? getPaymentOptionImage(matchedRadio, isSelected)
-                    : null;
-
                   return (
                     <Radio
-                      value={optionValue}
+                      value={`${itemPaymentImg.id}-${itemPaymentContent.id}`}
                       key={indexPaymentContent}
                       className="m-r-0"
-                      style={getPaymentOptionStyle(isSelected, displayStyle)}
                       onChange={() => {
-                        const value = cardPaymentRadioButton.initial_selection_picture !== optionValue ? optionValue : "";
+                        const value = cardPaymentRadioButton.initial_selection_picture !== `${itemPaymentImg.id}-${itemPaymentContent.id}` ? `${itemPaymentImg.id}-${itemPaymentContent.id}` : "";
                         const isDisplayCardPayment = cardPaymentRadioButton.card_linked_setting_picture === value;
 
                         onChangeValue(
@@ -194,7 +153,7 @@ export default function CardPaymentRadioButton({ content, messageIndex, contentI
                         );
                       }}
                     >
-                      <img src={stateImage || itemPaymentContent.file_url} alt="" />
+                      <img src={itemPaymentContent.file_url} />
                       <div className="ss-message__content--user-card-payment-radio-group-type-text_image-text">
                         {itemPaymentContent.text}
                       </div>
@@ -219,6 +178,9 @@ export default function CardPaymentRadioButton({ content, messageIndex, contentI
       isDisplayCardPayment,
       "is_display_card_payment"
     );
+
+    // displayButtonNext(true);
+    // if (messageContent.length === 1) onClickNext();
 
     onChangeValue(
       contentIndex,

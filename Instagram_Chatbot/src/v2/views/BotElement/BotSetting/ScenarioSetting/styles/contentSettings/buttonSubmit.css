@@ -1,0 +1,58 @@
+.ss-button-submit-setting__options-row {
+  margin-bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.ss-button-submit-setting__option-col {
+  width: 45%;
+}
+
+.ss-button-submit-setting__error-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ss-button-submit-setting__error-mode {
+  flex-basis: 26%;
+  max-width: 26%;
+}
+
+.ss-button-submit-setting__error-value {
+  flex-basis: 63%;
+  max-width: 63%;
+  margin-top: 22px;
+}
+
+.ss-button-submit-setting__js-label {
+  width: 18%;
+  font-size: 14px;
+  font-weight: 400;
+  margin-bottom: 5px;
+}
+
+.ss-button-submit-setting__js-textarea {
+  width: 90%;
+}
+
+.ss-button-submit-setting__fields {
+  margin: 10px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ss-button-submit-setting__field-label {
+  width: 90%;
+}
+
+.ss-button-submit-setting__field-input {
+  width: 90%;
+}
+
+.ss-button-submit-setting__field-label--spaced {
+  width: 90%;
+  margin-top: 10px;
+}

@@ -1,3 +1,5 @@
+import { getAppPath } from 'variables/constants';
+
 export const SCENARIO_PREVIEW_MESSAGES = {
   EDITOR_DRAFT: 'SCENARIO_EDITOR_DRAFT',
   EDITOR_CUSTOM_CSS: 'SCENARIO_EDITOR_CUSTOM_CSS',
@@ -34,5 +36,5 @@ export const buildScenarioPreviewIframeSrc = ({ scenarioId, scenarioType, botId 
   if (botId) {
     params.set('bot_id', botId);
   }
-  return `/preview-scenario-editor?${params.toString()}`;
+  return getAppPath(`/preview-scenario-editor?${params.toString()}`);
 };

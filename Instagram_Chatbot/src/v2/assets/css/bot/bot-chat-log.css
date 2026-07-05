@@ -1,0 +1,55 @@
+/* Chat message preview styles — shared by conversation log and statistics tabs */
+
+.csp-body {
+  padding: 10px;
+  height: 100%;
+  min-width: 0;
+}
+
+.csp-body-bot-side {
+  display: flex;
+  width: calc(700px * 0.7);
+  justify-content: flex-start;
+}
+
+.csp-body-user-side-messages {
+  width: calc(700px * 0.7);
+  max-width: 100%;
+  background-color: #fff;
+  padding: 10px;
+  border-radius: 20px;
+  justify-self: flex-end;
+  margin-right: calc(100% - 700px);
+}
+
+@media screen and (max-width: 750px) {
+  .csp-body-user-side-messages {
+    margin-right: 0;
+    width: 100%;
+  }
+}
+
+.is-done_label {
+  border-radius: 5px;
+  padding: 3px 5px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  background-color: #fee2e2;
+  color: #dc2626;
+  flex-shrink: 0;
+}
+
+.is-done_label.finished {
+  background-color: #d1fae5;
+  color: #059669;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #919191;
+  border-radius: 5px;
+}

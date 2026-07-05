@@ -1,15 +1,6 @@
 import React from "react";
 import "assets/css/bot/preview-chat-bot.css";
 import { MESSAGE_CONTENT_TYPES } from "views/BotElement/BotSetting/PreviewComponent/Constants";
-import {
-  getRadioImgGridStyle,
-  getRadioImgOptionStyle,
-} from "views/BotElement/BotSetting/ScenarioSetting/utils/radioButtonImgLayoutUtils";
-import {
-  buildEditorRadioOptionDataAttr,
-  getRadioOptionSelectionKey,
-  isRadioOptionInitiallySelected,
-} from "views/BotElement/BotSetting/ScenarioSetting/utils/radioButtonSelectionUtils";
 import OptionGender from "./OptionGender";
 
 export default function RadioButton({ content, disabled, onChangeValue, errors, contentIndex, messageIndex, notUseButtonNext, onClickNext }) {
@@ -39,19 +30,10 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
     );
   };
 
-  const onClickRadioButton = (item) => {
-    const selectionKey = getRadioOptionSelectionKey(item);
-    if (selectionKey === radioButton.initial_selection && notUseButtonNext) {
+  const onClickRadioButton = (value) => {
+    if (value === radioButton.initial_selection && notUseButtonNext) {
       onClickNext();
     }
-  };
-
-  const getDefaultOptionClassName = (item) => {
-    const isSelected = isRadioOptionInitiallySelected(radioButton, item);
-    return [
-      "ss-message__content--user-radio_button",
-      isSelected ? "ss-message__content--user-radio_button--selected" : "",
-    ].filter(Boolean).join(" ");
   };
 
   const renderDefaultContent = () => {
@@ -64,34 +46,30 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
       />;
 
     return radioButton[radioButton.type].map((item, index) => {
-      const selectionKey = getRadioOptionSelectionKey(item);
-      const inputId = `ss-message__content--user-radio_button_${messageIndex}_${contentIndex}_${selectionKey}_${index}`;
-      const isSelected = isRadioOptionInitiallySelected(radioButton, item);
       return (
         <div 
-          key={index}
-          data-editor-radio-option={buildEditorRadioOptionDataAttr(contentIndex, item)}
-          className={getDefaultOptionClassName(item)}
+          key={index} 
+          className="ss-message__content--user-radio_button"
         >
           <input
             disabled={disabled}
             type="radio"
-            id={inputId}
-            name={`ss-message__content--user-radio_button_msg${messageIndex}_content${contentIndex}_${content.type}`}
-            checked={isSelected}
-            onClick={() => onClickRadioButton(item)}
+            id={`ss-message__content--user-radio_button_${messageIndex}_${item.value}`}
+            name={`ss-message__content--user-radio_button--radio_button_img_msg${messageIndex}_content${contentIndex}_${content.type}`}
+            checked={radioButton.initial_selection === item.value}
+            onClick={() => onClickRadioButton(item.value)}
             onChange={() => {
               onChangeValue(
                 contentIndex,
                 content.type,
-                selectionKey,
+                item.value,
                 "initial_selection"
               );
               if (notUseButtonNext) setTimeout(() => onClickNext(), 200);
             }}
           />
           {item.text && (
-            <label htmlFor={inputId}>
+            <label htmlFor={`ss-message__content--user-radio_button_${messageIndex}_${item.value}`}>
               {item.text}
             </label>
           )}
@@ -100,109 +78,82 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
     });
   };
 
-  const handleImageOptionSelect = (item) => {
-    if (disabled) return;
-    const selectionKey = getRadioOptionSelectionKey(item);
-    onChangeValue(
-      contentIndex,
-      content.type,
-      selectionKey,
-      "initial_selection"
-    );
-    onClickRadioButton(item);
-    if (notUseButtonNext) setTimeout(() => onClickNext(), 200);
-  };
-
   const renderRadioButtonImgContent = () => {
-    const items = radioButton[radioButton.type] || [];
-    const gridStyle = getRadioImgGridStyle(radioButton);
-
-    return (
-      <div
-        className="ss-message__content--user-radio_button-img-grid"
-        style={gridStyle}
-      >
-        {items.map((item, index) => {
-          const selectionKey = getRadioOptionSelectionKey(item);
-          const inputId = `ss-message__content--user-radio_button_img_${messageIndex}_${contentIndex}_${selectionKey}_${index}`;
-          const isSelected = isRadioOptionInitiallySelected(radioButton, item);
-          return (
-            <div
-              key={index}
-              data-editor-radio-option={buildEditorRadioOptionDataAttr(contentIndex, item)}
-              className={[
-                "ss-message__content--user-radio_button--radio_button_img",
-                isSelected ? "ss-message__content--user-radio_button--selected" : "",
-                disabled ? "ss-message__content--user-radio_button--radio_button_img--disabled" : "",
-              ].filter(Boolean).join(" ")}
-              style={getRadioImgOptionStyle(radioButton)}
-              onClick={() => handleImageOptionSelect(item)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  handleImageOptionSelect(item);
-                }
-              }}
-              role="button"
-              tabIndex={disabled ? -1 : 0}
-            >
-              <input
-                disabled={disabled}
-                type="radio"
-                className="ss-radio-button-img-input--hidden"
-                name={`ss-message__content--user-radio_button--radio_button_img_msg${messageIndex}_content${contentIndex}_${content.type}`}
-                id={inputId}
-                checked={isSelected}
-                readOnly
-                tabIndex={-1}
-                aria-hidden="true"
-              />
-              <img src={item.img} alt="" />
-            </div>
-          );
-        })}
-      </div>
-    );
+    return radioButton[radioButton.type].map((item, index) => {
+      return (
+        <div 
+          key={index} 
+          className="ss-message__content--user-radio_button--radio_button_img"
+        >
+          <input
+            disabled={disabled}
+            type="radio"
+            name={`ss-message__content--user-radio_button--radio_button_img_msg${messageIndex}_content${contentIndex}_${content.type}`}
+            id="ss-message__content--user-radio_button--radio_button_img"
+            checked={radioButton.initial_selection === item.value}
+            onClick={() => onClickRadioButton(item.value)}
+            onChange={() => {
+              onChangeValue(
+                contentIndex,
+                content.type,
+                item.value,
+                "initial_selection"
+              );
+              if (notUseButtonNext) setTimeout(() => onClickNext(), 200);
+            }}
+          />
+          <img src={item.img} alt="" />
+          {item.text && (
+            <label htmlFor={`ss-message__content--user-radio_button_${item.value}`}>
+              {item.text}
+            </label>
+          )}
+        </div>
+      );
+    });
   };
 
   const renderConsumeApiResponseContent = () => {
     return (
       <>
-        {[0, 1].map((index) => {
-          const inputId = `ss-message__content--user-radio_button_api_${messageIndex}_${contentIndex}_${index}`;
-          return (
-            <div key={index} className="ss-message__content--user-radio_button">
-              <input
-                type="radio"
-                name={`ss-message__content--user-radio_button_msg${messageIndex}_content${contentIndex}_${content.type}`}
-                id={inputId}
-                checked={false}
-              />
-              <label htmlFor={inputId}>
-                ラベル
-              </label>
-            </div>
-          );
-        })}
+        <div className="ss-message__content--user-radio_button">
+          <input
+            type="radio"
+            name={`ss-message__content--user-radio_button_msg${messageIndex}_content${contentIndex}_${content.type}`}
+            id="ss-message__content--user-radio_button"
+          />
+          <label htmlFor="ss-message__content--user-radio_button">
+            ラベル
+          </label>
+        </div>
+        <div className="ss-message__content--user-radio_button">
+          <input
+            type="radio"
+            name={`ss-message__content--user-radio_button_msg${messageIndex}_content${contentIndex}_${content.type}`}
+            id="ss-message__content--user-radio_button"
+          />
+          <label htmlFor="ss-message__content--user-radio_button">
+            ラベル
+          </label>
+        </div>
       </>
     );
   };
 
   const renderBlockStyleContent = () => {
     return radioButton[radioButton.type].map((item, index) => {
-      const selectionKey = getRadioOptionSelectionKey(item);
       return (
         <div
           key={index}
-          data-editor-radio-option={buildEditorRadioOptionDataAttr(contentIndex, item)}
           className="ss-message__content--user-radio_button--block_style"
           onClick={() => {
             onChangeValue(
               contentIndex,
               content.type,
-              selectionKey,
+              item.value,
               "initial_selection"
             );
+            // if (messageContent.length === 1) onClickNext();
           }}
         >
           <span>{item.text}</span>

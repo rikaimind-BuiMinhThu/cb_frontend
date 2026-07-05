@@ -1,0 +1,520 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap');
+
+.admin-layout {
+  min-height: 100vh;
+  font-family: 'Inter', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Override legacy paper-dashboard .main-panel rules inside the new admin shell */
+.admin-layout > .ant-layout {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-layout .ant-layout-content.admin-content.main-panel {
+  float: none;
+  width: 100%;
+  max-width: 100%;
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+}
+
+.admin-layout .ant-layout-sider {
+  background: #ffffff !important;
+  border-right: 1px solid #e5e7eb;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.04);
+}
+
+.admin-layout .admin-sider-logo {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.admin-layout .admin-sider-logo img {
+  height: 40px;
+  object-fit: contain;
+}
+
+.admin-layout .ant-menu-inline {
+  border-right: none !important;
+}
+
+.admin-layout .ant-menu-item-selected {
+  background-color: #e6f4ff !important;
+  border-right: 3px solid #1677ff;
+}
+
+.admin-layout .ant-menu-item-selected a,
+.admin-layout .ant-menu-item-selected .ant-menu-title-content {
+  color: #1677ff !important;
+  font-weight: 500;
+}
+
+.admin-layout .ant-layout-header.admin-header {
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0 24px;
+  height: 64px;
+  line-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.admin-layout .admin-header-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.admin-layout .admin-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.admin-layout .admin-version-switch {
+  flex-shrink: 0;
+}
+
+.admin-layout .admin-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.admin-layout .ant-layout-content.admin-content {
+  background: #f5f7fa;
+  min-height: calc(100vh - 64px);
+  padding: 24px;
+  margin-top: 0;
+}
+
+.admin-page {
+  width: 100%;
+  max-width: 100%;
+}
+
+.admin-page-description {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0 0 20px;
+  line-height: 1.5;
+}
+
+.admin-page-card {
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+.admin-page-card .ant-card-body {
+  padding: 0;
+}
+
+.admin-page-card .admin-table-toolbar {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.admin-page-card .admin-table-body {
+  padding: 0 20px 20px;
+}
+
+.admin-page-card .admin-page-tabs > .ant-tabs-nav {
+  padding: 0 20px;
+  margin-bottom: 0;
+}
+
+.admin-page-card .admin-page-tabs > .ant-tabs-nav::before {
+  border-bottom-color: #e5e7eb;
+}
+
+.admin-page-card .admin-page-tabs .ant-tabs-tab {
+  padding: 14px 4px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.admin-page-card .admin-page-tabs .ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #1677ff;
+  font-weight: 600;
+}
+
+.admin-page-card .admin-page-tabs .ant-tabs-ink-bar {
+  background: #1677ff;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+}
+
+.admin-variable-input.ant-input {
+  border-color: #e5e7eb;
+  background: #f9fafb;
+}
+
+.admin-variable-input.ant-input:hover,
+.admin-variable-input.ant-input:focus {
+  border-color: #1677ff;
+  background: #ffffff;
+}
+
+.admin-variable-new-row {
+  margin: 0 20px 20px;
+  padding: 16px;
+  border: 1px dashed #d1d5db;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+/* Reset legacy `.content` wrapper when rendered inside the admin shell */
+.admin-layout .ant-layout-content.admin-content.main-panel > .content {
+  padding: 0;
+  margin-top: 0;
+  min-height: auto;
+}
+
+.admin-page--design-setting .design-setting-tab-content {
+  padding: 20px;
+}
+
+.admin-page--design-setting .add-bot-container {
+  width: 100%;
+  gap: 24px;
+}
+
+.admin-page--design-setting .bot-left,
+.admin-page--design-setting .bot-right {
+  width: auto;
+  flex: 1;
+  min-width: 0;
+  border-right: none;
+}
+
+.admin-page--design-setting .bot-left {
+  border-right: 1px solid #e5e7eb;
+  padding-right: 24px;
+}
+
+.admin-page--design-setting .bot-right {
+  padding-left: 8px;
+}
+
+.admin-page--design-setting .design-customize-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.admin-page--design-setting .design-customize-panels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.admin-page--design-setting .design-device-card,
+.admin-page--design-setting .design-bubble-card {
+  background: #fafafa;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.admin-page--design-setting .design-device-card__title {
+  margin: 0 0 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.admin-page--design-setting .design-device-card__grid,
+.admin-page--design-setting .design-bubble-card__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 16px;
+}
+
+.admin-page--design-setting .design-field {
+  min-width: 0;
+}
+
+.admin-page--design-setting .design-field--full {
+  grid-column: 1 / -1;
+}
+
+.admin-page--design-setting .design-field__label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.admin-page--design-setting .design-field__control {
+  width: 100%;
+}
+
+.admin-page--design-setting .design-field__control .ant-select,
+.admin-page--design-setting .design-field__control .ant-input,
+.admin-page--design-setting .design-field__control .ant-input-number,
+.admin-page--design-setting .design-field__control .ant-input-number-group-wrapper {
+  width: 100%;
+}
+
+.admin-page--design-setting .design-size-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.admin-page--design-setting .design-size-row .ant-input-number-group-wrapper,
+.admin-page--design-setting .design-size-row .ant-input-number {
+  flex: 1;
+  min-width: 120px;
+}
+
+.admin-page--design-setting .design-field__suffix {
+  flex-shrink: 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.admin-page--design-setting .design-customize-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 4px;
+}
+
+@media (max-width: 992px) {
+  .admin-page--design-setting .design-customize-panels {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-page--design-setting .design-device-card__grid,
+  .admin-page--design-setting .design-bubble-card__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 992px) {
+  .admin-page--design-setting .add-bot-container {
+    flex-direction: column;
+  }
+
+  .admin-page--design-setting .bot-left {
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+    padding-right: 0;
+    padding-bottom: 24px;
+  }
+
+  .admin-page--design-setting .bot-right {
+    padding-left: 0;
+  }
+}
+
+.admin-layout .ant-table-thead > tr > th {
+  background: #f9fafb !important;
+  color: #374151 !important;
+  font-weight: 600;
+}
+
+.admin-layout .ant-table-tbody > tr:hover > td {
+  background: #f9fafb !important;
+}
+
+.admin-layout .ant-btn-primary {
+  background: #1677ff;
+  border-color: #1677ff;
+}
+
+.admin-layout .ant-btn-primary:hover,
+.admin-layout .ant-btn-primary:focus {
+  background: #4096ff;
+  border-color: #4096ff;
+}
+
+.admin-form-row {
+  margin-bottom: 20px;
+}
+
+.admin-form-row-label {
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.admin-form-row-label .required-badge {
+  background: #ff4d4f;
+  color: #fff;
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-left: 6px;
+  font-weight: 600;
+}
+
+.admin-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.admin-search-bar .ant-input-affix-wrapper,
+.admin-search-bar .ant-select {
+  min-width: 180px;
+}
+
+.admin-table-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.admin-table-actions .ant-btn-link {
+  padding: 0 4px;
+  height: auto;
+}
+
+.admin-table-actions--client {
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.admin-table-actions--client .ant-btn-link {
+  min-width: 28px;
+  padding: 0 4px;
+}
+
+.admin-client-row--inactive > td {
+  background: #f3f4f6 !important;
+}
+
+.admin-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.admin-client-form-section {
+  margin-bottom: 24px;
+}
+
+.admin-client-form-section-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.admin-client-form-row {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  column-gap: 16px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.admin-client-form-row--align-top {
+  align-items: start;
+}
+
+.admin-client-form-row-label {
+  margin-bottom: 0;
+}
+
+.admin-client-form-row-control .ant-input,
+.admin-client-form-row-control .ant-input-affix-wrapper,
+.admin-client-form-row-control .ant-select,
+.admin-client-form-row-control .ant-picker {
+  width: 100%;
+  max-width: 480px;
+}
+
+.admin-client-form-row-control .ant-radio-group {
+  white-space: nowrap;
+}
+
+.admin-client-form-error {
+  color: #ff4d4f;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.admin-client-form-logo {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.admin-client-form-logo-preview {
+  max-height: 200px;
+  max-width: 200px;
+  object-fit: contain;
+}
+
+@media (max-width: 768px) {
+  .admin-client-form-row {
+    grid-template-columns: 1fr;
+    row-gap: 6px;
+  }
+
+  .admin-client-form-row-label {
+    margin-bottom: 0;
+  }
+
+  .admin-layout .ant-layout-content.admin-content {
+    padding: 16px;
+  }
+}
+
+.admin-scenario-list-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-scenario-list-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-scenario-list-name {
+  font-weight: 500;
+}
+
+.admin-scenario-list-meta {
+  color: #6b7280;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.admin-scenario-list-row .ant-radio-wrapper {
+  margin-right: 0;
+  flex-shrink: 0;
+}

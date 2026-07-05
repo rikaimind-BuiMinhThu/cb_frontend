@@ -637,14 +637,6 @@ export const isUserMessage = (message) => {
   return message.belong_to === 'user' && message.message_content.length > 0;
 }
 
-export const isCombineMessage = (message) => {
-  return message.belong_to === 'combine' && message.message_content.length > 0;
-}
-
-export const isInteractiveMessage = (message) => {
-  return isUserMessage(message) || isCombineMessage(message);
-}
-
 export const isCreditCardPaymentMessage = (message) => {
   return message.message_content.some(content => content.type === MESSAGE_CONTENT_TYPES.CREDIT_CARD_PAYMENT);
 }
@@ -661,7 +653,7 @@ const getNextUserMsg = (ext = null) => (item, index) => {
   const firstMsgContent = item?.message_content?.at(0);
   const isDisplayBtnNext = (item?.message_content?.length === 1 && firstMsgContent?.type != "image") || firstMsgContent?.image?.displayButtonNext != false;
 
-  const conds = !item.hidden && isInteractiveMessage(item) && isDisplayBtnNext;
+  const conds = !item.hidden && isUserMessage(item) && isDisplayBtnNext;
 
   if (ext && typeof ext === "function") {
     return conds && ext(item, index);

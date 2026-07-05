@@ -1,210 +1,206 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Space, Tag, message } from 'antd';
-import {
-  PauseCircleOutlined,
-  PlayCircleOutlined,
-} from '@ant-design/icons';
-import { useParams } from 'react-router-dom';
-import api from 'api/api-management';
-import { tokenExpired } from 'api/tokenExpired';
-import { AdminConfirmModal, AdminTable, AdminActionButton } from '../../../components/AdminShell';
-import SavePushMessageDialog from './SavePushMessageDialog';
+import React, { useEffect, useState } from "react";
+import { Space, notification, Table, Button, Modal } from "antd";
+import { ExclamationCircleFilled } from "@ant-design/icons";
+import { useParams } from "react-router-dom";
+import api from "api/api-management";
+import { tokenExpired } from "api/tokenExpired";
+import SavePushMessageDialog from "./SavePushMessageDialog";
+
+const columns = [
+  {
+    title: "No.",
+    dataIndex: "no",
+  },
+  {
+    title: "プッシュメッセージ名",
+    dataIndex: "title",
+  },
+  {
+    title: "送信方法",
+    dataIndex: "sending_method",
+  },
+  {
+    title: "開始日時",
+    dataIndex: "started_at",
+  },
+  {
+    title: "状態",
+    dataIndex: "status",
+  },
+  {
+    title: "アクション",
+    dataIndex: "action",
+  },
+];
 
 const PushMessageList = ({ tick }) => {
   const { botId } = useParams();
   const [list, setList] = useState([]);
   const [updateItem, setUpdateItem] = useState(null);
-  const [deleteId, setDeleteId] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [notificationApi, contextHolder] = notification.useNotification();
 
-  const fetchList = useCallback(() => {
-    setLoading(true);
+  useEffect(() => {
     api
       .get(`/api/v1/managements/push_messages?chatbot_id=${botId}&page=all`)
       .then((res) => {
         if (res.data.code === 1) {
-          setList(res.data.data);
-        } else if (res.data.code === 2) {
+          const list = res.data.data.map(createRenderItem);
+          setList(list);
+        } else if (res.data.code == 2) {
           console.log(res.data.message);
         }
       })
       .catch((error) => {
-        if (error?.response?.data.code === 0) {
+        if (error?.response?.data.code == 0) {
           tokenExpired();
         }
-      })
-      .finally(() => setLoading(false));
-  }, [botId]);
+      });
+  }, [tick]);
 
-  useEffect(() => {
-    fetchList();
-  }, [fetchList, tick]);
-
-  const onDelete = () => {
+  const onDelete = (id) => {
     api
-      .delete(`/api/v1/managements/push_messages/${deleteId}`)
+      .delete(`/api/v1/managements/push_messages/${id}`)
       .then((res) => {
-        if (res.data.code === 1) {
-          message.success('正常に削除しました。');
-          setList((pre) => pre.filter((each) => each.id !== deleteId));
-          setDeleteId(null);
-        } else if (res.data.code === 2) {
-          message.warning(res.data.message);
+        if (res.data.code == 1) {
+          openDeleteNotification("success", "正常に削除しました。");
+          setList((pre) =>
+            pre
+              .filter((each) => each.id !== res.data.message.id)
+              .map(createRenderItem)
+          );
+        } else if (res.data.code == 2) {
+          openDeleteNotification("warning", res.data.message);
+          console.log(res.data.message);
         }
       })
       .catch((error) => {
-        if (error?.response?.data.code === 0) {
+        if (error?.response.data.code == 0) {
           tokenExpired();
         }
       });
   };
 
-  const onChangeStatus = (item) => {
+  const onChangeStatus = (item) => () => {
+    if (!item) {
+      return;
+    }
     const url =
-      item.subscribe_status === 'subscribe'
-        ? `/api/v1/managements/push_messages/${item.id}/unsubscribe`
-        : `/api/v1/managements/push_messages/${item.id}/subscribe`;
+      item.subscribe_status === "subscribe"
+        ? `/api/v1/managements/push_messages/${item?.id}/unsubscribe`
+        : `/api/v1/managements/push_messages/${item?.id}/subscribe`;
     const newStatus =
-      item.subscribe_status === 'subscribe' ? 'unsubscribe' : 'subscribe';
-
+      item.subscribe_status === "subscribe" ? "unsubscribe" : "subscribe";
     api
       .patch(url)
       .then((res) => {
-        if (res.data.code === 1) {
-          message.success('プッシュメッセージを正常に保存しました。');
-          setList((pre) =>
-            pre.map((each) =>
-              each.id === item.id
-                ? { ...each, subscribe_status: newStatus }
-                : each
-            )
+        if (res.data.code == 1) {
+          openDeleteNotification(
+            "success",
+            "プッシュメッセージを正常に保存しました。"
           );
-        } else if (res.data.code === 2) {
-          message.warning(res.data.message);
+          setList((pre) =>
+            pre.map((each, index) => {
+              if (each.id === item.id) {
+                each.subscribe_status = newStatus;
+                return createRenderItem(each, index);
+              }
+              return each;
+            })
+          );
+        } else if (res.data.code == 2) {
+          openDeleteNotification("warning", res.data.message);
+          console.log(res.data.message);
         }
       })
       .catch((error) => {
-        if (error?.response?.data.code === 0) {
+        if (error?.response.data.code == 0) {
           tokenExpired();
         }
       });
   };
 
+  const openDeleteNotification = (type, message) => {
+    notificationApi[type]({
+      message: message || "",
+      description: "",
+      placement: "top",
+    });
+  };
+
+  const showDeleteConfirm = (id) => () => {
+    Modal.confirm({
+      title: "確認",
+      icon: <ExclamationCircleFilled />,
+      content: "本当に削除しますか。",
+      okText: "削除",
+      okType: "danger",
+      cancelText: "閉じる",
+      onOk() {
+        onDelete(id);
+      },
+    });
+  };
+
+  const onClickUpdate = (item) => () => {
+    setUpdateItem(item);
+  };
+
+  const createRenderItem = (item, index) => {
+    return {
+      ...item,
+      no: index + 1,
+      started_at: item.started_at.substring(0, 19).replaceAll("T", " "),
+      status: item.subscribe_status === "subscribe" ? "配信予約中" : "配信停止",
+      sending_method: item.sending_method === "email" ? "メール" : "SMS",
+      action: (
+        <Space>
+          {item.subscribe_status === "subscribe" ? (
+            <Button danger onClick={onChangeStatus(item)}>
+              配信停止
+            </Button>
+          ) : (
+            <Button onClick={onChangeStatus(item)}>配信する</Button>
+          )}
+          <Button type="primary" onClick={onClickUpdate(item)}>
+            編集
+          </Button>
+          <Button danger onClick={showDeleteConfirm(item.id)}>
+            削除
+          </Button>
+        </Space>
+      ),
+    };
+  };
+
   const handleUpdateSuccess = (item) => {
-    if (item) {
+    item &&
       setList((pre) =>
-        pre.map((each) => (each.id === item.id ? { ...each, ...item } : each))
+        pre.map((each, index) =>
+          each.id === item.id
+            ? createRenderItem(item, index)
+            : createRenderItem(each, index)
+        )
       );
-    }
     setUpdateItem(null);
   };
 
-  const columns = useMemo(
-    () => [
-      {
-        title: 'No.',
-        width: 70,
-        align: 'center',
-        render: (_, __, index) => index + 1,
-      },
-      {
-        title: 'プッシュメッセージ名',
-        dataIndex: 'title',
-        ellipsis: true,
-      },
-      {
-        title: '送信方法',
-        dataIndex: 'sending_method',
-        width: 110,
-        align: 'center',
-        render: (method) =>
-          method === 'email' ? (
-            <Tag color="purple">メール</Tag>
-          ) : (
-            <Tag color="blue">SMS</Tag>
-          ),
-      },
-      {
-        title: '開始日時',
-        dataIndex: 'started_at',
-        width: 180,
-        render: (value) =>
-          value ? value.substring(0, 19).replaceAll('T', ' ') : '—',
-      },
-      {
-        title: '状態',
-        dataIndex: 'subscribe_status',
-        width: 130,
-        align: 'center',
-        render: (status) =>
-          status === 'subscribe' ? (
-            <Tag color="success">配信予約中</Tag>
-          ) : (
-            <Tag>配信停止</Tag>
-          ),
-      },
-      {
-        title: 'アクション',
-        align: 'right',
-        width: 260,
-        render: (_, row) => (
-          <Space size={4} className="admin-table-actions">
-            {row.subscribe_status === 'subscribe' ? (
-              <Button
-                size="small"
-                icon={<PauseCircleOutlined />}
-                onClick={() => onChangeStatus(row)}
-              >
-                配信停止
-              </Button>
-            ) : (
-              <Button
-                size="small"
-                type="primary"
-                ghost
-                icon={<PlayCircleOutlined />}
-                onClick={() => onChangeStatus(row)}
-              >
-                配信する
-              </Button>
-            )}
-            <AdminActionButton action="edit" onClick={() => setUpdateItem(row)} />
-            <AdminActionButton action="delete" onClick={() => setDeleteId(row.id)} />
-          </Space>
-        ),
-      },
-    ],
-    []
-  );
+  const handleCancelUpdate = () => {
+    setUpdateItem(null);
+  };
 
   return (
-    <>
-      <AdminTable
-        loading={loading}
-        columns={columns}
-        dataSource={list}
-        rowKey="id"
-        emptyDescription="プッシュメッセージがありません"
-      />
-
-      <AdminConfirmModal
-        open={Boolean(deleteId)}
-        message="本当に削除しますか。"
-        okText="削除"
-        danger
-        onOk={onDelete}
-        onCancel={() => setDeleteId(null)}
-      />
-
+    <div>
+      {contextHolder}
+      <Table columns={columns} dataSource={list} />
       {updateItem && (
         <SavePushMessageDialog
           botId={botId}
           resolver={handleUpdateSuccess}
           item={updateItem}
-          onCancel={() => setUpdateItem(null)}
+          onCancel={handleCancelUpdate}
         />
       )}
-    </>
+    </div>
   );
 };
 
