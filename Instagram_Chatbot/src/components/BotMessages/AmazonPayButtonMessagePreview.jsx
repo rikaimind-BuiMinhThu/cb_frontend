@@ -7,10 +7,11 @@ const AmazonPayButtonMessagePreview = ({
   content,
   contentIndex,
   botInfor,
+  themeSettings,
 }) => {
   const config = content?.amazon_pay_button || {};
-  const messageColor = botInfor?.message_color || '#3CACEF';
-  const fontColor = botInfor?.font_color || '#fff';
+  const messageColor = themeSettings?.botMessageBgColor || botInfor?.message_color || '#3CACEF';
+  const fontColor = themeSettings?.botMessageTextColor || botInfor?.font_color || '#fff';
   const iconMess = botInfor?.icon_mess;
   const imageUrl = config.button_image_url || DEFAULT_AMAZON_PAY_BUTTON_IMAGE_URL;
   const imageWidth = config.button_image_width || '80%';

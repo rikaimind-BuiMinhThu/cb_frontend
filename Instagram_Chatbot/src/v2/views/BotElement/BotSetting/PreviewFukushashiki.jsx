@@ -34,7 +34,7 @@ import {
   CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE,
   DISPLAY_TYPES,
 } from "./PreviewComponent/Constants";
-import { injectBotThemeCss } from "utils/chatbotThemeCss";
+import { injectBotThemeCss } from "v2/utils/chatbotThemeCss";
 import { COLOR_MAP } from "v2/views/BotElement/BotSetting/DesignSetting/constants/designChatbotConstants";
 import {
   parseDesignSettings,
@@ -1156,6 +1156,7 @@ const PreviewFukushashiki = () => {
         content={content}
         contentIndex={contentIndex}
         botInfor={state.botInfor}
+        themeSettings={state.themeSettings}
         previewOrderContent={state.previewOrderContent}
         executeLpJsCode={(jsCode) => executeLpJsCode(jsCode, state)}
         variables={state.variables}

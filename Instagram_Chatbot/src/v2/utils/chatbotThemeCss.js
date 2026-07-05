@@ -13,7 +13,7 @@ ${spBodySelector} input[type="number"]:not(.theme-preview--field-focus),
 ${spBodySelector} input[type="password"]:not(.theme-preview--field-focus),
 ${spBodySelector} textarea:not(.theme-preview--field-focus),
 ${spBodySelector} select:not(.theme-preview--field-focus),
-${spBodySelector} .ss-input-value,
+${spBodySelector} .ss-input-value:not(.ss-bot-chat-detail-content),
 ${spBodySelector} .ant-select-selector
 `.trim();
 
@@ -25,7 +25,7 @@ ${spBodySelector} input[type="number"]:focus,
 ${spBodySelector} input[type="password"]:focus,
 ${spBodySelector} textarea:focus,
 ${spBodySelector} select:focus,
-${spBodySelector} .ss-input-value:focus,
+${spBodySelector} .ss-input-value:not(.ss-bot-chat-detail-content):focus,
 ${spBodySelector} .ant-select-focused .ant-select-selector
 `.trim();
 
@@ -197,8 +197,8 @@ ${scopeSelector ? `${scopeSelector} .sp-body` : '#sp-body.sp-body, .sp-body'} {
 
 ${scopePrefix}.ss-bot-message__content-wrapper,
 ${scopePrefix}.ss-bot-message .ss-bot-message__content {
-  background-color: var(--c-bot-msg-bg) !important;
-  color: var(--c-bot-msg-text) !important;
+  background-color: var(--c-bot-msg-bg, #3CACEF) !important;
+  color: var(--c-bot-msg-text, #fff) !important;
   font-size: var(--c-bot-msg-font-size, 14px) !important;
 }
 
@@ -217,6 +217,34 @@ ${fieldSelectors} {
 }
 ${focusRules}
 ${previewRules}${previewFieldFontSizeRule}
+
+${scopePrefix}.ss-bot-chat-detail-content,
+${scopePrefix}.ss-bot-chat-text-input.ss-bot-chat-detail-content {
+  background-color: var(--c-bot-msg-bg, #3CACEF) !important;
+  color: var(--c-bot-msg-text, #fff) !important;
+  font-size: var(--c-bot-msg-font-size, 14px) !important;
+  border: none !important;
+}
+
+${scopePrefix}.ss-bot-chat-text-input-bot-icon {
+  background-color: var(--c-bot-msg-bg, #3CACEF) !important;
+}
+
+${scopePrefix}.ss-bot-chat-text-input-bot-icon path {
+  fill: var(--c-bot-msg-bg, #3CACEF) !important;
+}
+
+${scopePrefix}.sp-body-user-side-messages {
+  background-color: transparent !important;
+}
+
+${scopePrefix}.sp-body-user-side-messages > .ss-user-message__content-wrapper {
+  background-color: var(--c-user-msg-bg, #fff) !important;
+  color: var(--c-user-msg-text, #333) !important;
+  font-size: var(--c-user-msg-font-size, 14px) !important;
+  padding: 10px;
+  border-radius: 20px;
+}
 
 ${btnSelector} {
   background-color: var(--c-btn-normal-bg) !important;
@@ -323,7 +351,7 @@ ${scopePrefix}.ss-bot-submit-error-message {
 const buildThemeCss = (theme, scopeSelector = '') => {
   const variablesBlock = scopeSelector
     ? `${scopeSelector} {${buildThemeVariables(theme)}\n}`
-    : `#sp-container, .sp-container {${buildThemeVariables(theme)}\n}`;
+    : `#sp-container, .sp-container, #sp-container1, .sp-container1 {${buildThemeVariables(theme)}\n}`;
 
   return `${variablesBlock}\n\n${buildThemeRules(theme, scopeSelector)}`.trim();
 };

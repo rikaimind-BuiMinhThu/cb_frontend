@@ -276,6 +276,11 @@
     border-radius: 20px;
 }
 
+.sp-body-user-side-messages > .ss-user-message__content-wrapper {
+    padding: 10px;
+    border-radius: 20px;
+}
+
 .sp-user-message-button-action {
     display: flex;
     justify-content: flex-end;

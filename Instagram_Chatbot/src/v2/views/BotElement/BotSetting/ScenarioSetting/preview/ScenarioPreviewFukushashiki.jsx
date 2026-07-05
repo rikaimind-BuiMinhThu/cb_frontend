@@ -32,7 +32,7 @@ import {
   CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE,
   DISPLAY_TYPES,
 } from "../../PreviewComponent/Constants";
-import { injectBotThemeCss } from "utils/chatbotThemeCss";
+import { injectBotThemeCss } from "v2/utils/chatbotThemeCss";
 import { COLOR_MAP } from "views/BotElement/BotSetting/DesignSetting/constants/designChatbotConstants";
 import {
   getAllUrlParams,

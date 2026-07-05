@@ -26,7 +26,7 @@ import {
   CUSTOM_JS_CODE_POSITION,
   BOT_MESSAGE_TYPES,
 } from "../../PreviewComponent/Constants";
-import { injectBotThemeCss } from "utils/chatbotThemeCss";
+import { injectBotThemeCss } from "v2/utils/chatbotThemeCss";
 import { COLOR_MAP } from "views/BotElement/BotSetting/DesignSetting/constants/designChatbotConstants";
 import {
   getAllUrlParams,

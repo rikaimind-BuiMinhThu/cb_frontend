@@ -26,7 +26,7 @@ import {
   MESSAGE_CONTENT_TYPES,
   CUSTOM_JS_CODE_POSITION,
 } from "./PreviewComponent/Constants";
-import { injectBotThemeCss } from "utils/chatbotThemeCss";
+import { injectBotThemeCss } from "v2/utils/chatbotThemeCss";
 import { COLOR_MAP } from "v2/views/BotElement/BotSetting/DesignSetting/constants/designChatbotConstants";
 import {
   parseDesignSettings,
@@ -756,6 +756,7 @@ const PreviewFaq = () => {
         content={content}
         contentIndex={contentIndex}
         botInfor={state.botInfor}
+        themeSettings={state.themeSettings}
         previewOrderContent={state.previewOrderContent}
         executeLpJsCode={(jsCode) => executeLpJsCode(jsCode, state)}
         variables={state.variables}

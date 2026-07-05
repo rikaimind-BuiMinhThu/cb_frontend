@@ -3,14 +3,15 @@ import React from 'react';
 const HtmlCodeMessagePreview = ({
   content,
   contentIndex,
-  botInfor
+  botInfor,
+  themeSettings,
 }) => {
   const defaultHtmlContent = '<p style="color: #999; font-style: italic;">HTMLコードを入力してください</p>';
   const htmlContent = content[content.type]?.content || defaultHtmlContent;
   const isUseForUgc = !!content[content.type]?.use_for_ugc;
 
-  const messageColor = botInfor?.message_color || '#3CACEF';
-  const fontColor = botInfor?.font_color || '#fff';
+  const messageColor = themeSettings?.botMessageBgColor || botInfor?.message_color || '#3CACEF';
+  const fontColor = themeSettings?.botMessageTextColor || botInfor?.font_color || '#fff';
   const iconMess = botInfor?.icon_mess;
 
   
