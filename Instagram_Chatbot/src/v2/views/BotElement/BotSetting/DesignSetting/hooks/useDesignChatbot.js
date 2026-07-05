@@ -4,12 +4,13 @@ import api from 'api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { TAB_BASIC } from '../constants/designChatbotConstants';
 import {
+  applyIconsFromApiResponse,
   buildBasicInfoPayload,
   buildDesignSettingsPayload,
+  convertImageToDataUrl,
+  findMatchingPresetIndex,
   parseDesignSettings,
-  resolveIconUrl,
   resolveMainColorFromApi,
-  toDataURL,
 } from '../utils/designChatbotUtils';
 import { deriveThemeDefaults } from '../utils/designThemeUtils';
 
@@ -18,6 +19,21 @@ const INITIAL_VALIDATION_ERRORS = {
   subtitle: '',
   botName: '',
   botImage: '',
+};
+
+const INITIAL_ICON_PRESET_INDICES = {
+  bot: null,
+  opening: null,
+  closing: null,
+};
+
+const PRESET_INDEX_BY_ICON_TYPE = {
+  bot: 'bot',
+  bot_image: 'bot',
+  opening: 'opening',
+  opening_bot_icon: 'opening',
+  closing: 'closing',
+  closing_bot_icon: 'closing',
 };
 
 export const useDesignChatbot = (initialBotId) => {
@@ -36,6 +52,7 @@ export const useDesignChatbot = (initialBotId) => {
   const [closingBotIcon, setClosingBotIcon] = useState('');
   const [botName, setBotName] = useState('');
   const [mainColor, setMainColor] = useState('#327AED');
+  const [iconPresetIndices, setIconPresetIndices] = useState(INITIAL_ICON_PRESET_INDICES);
 
   const [displayType, setDisplayType] = useState(1);
   const [widthPc, setWidthPc] = useState(380);
@@ -72,6 +89,12 @@ export const useDesignChatbot = (initialBotId) => {
     }
   }, []);
 
+  const setPresetIndexForType = useCallback((type, index) => {
+    const presetKey = PRESET_INDEX_BY_ICON_TYPE[type];
+    if (!presetKey) return;
+    setIconPresetIndices((prev) => ({ ...prev, [presetKey]: index }));
+  }, []);
+
   const setBotIcon = useCallback((type, url) => {
     const methodMap = {
       bot: setBotImage,
@@ -84,18 +107,41 @@ export const useDesignChatbot = (initialBotId) => {
     methodMap[type]?.(url);
   }, []);
 
+  const resolvePresetIndicesFromIcons = useCallback(async (icons) => {
+    const [bot, opening, closing] = await Promise.all([
+      findMatchingPresetIndex(icons.botImage),
+      findMatchingPresetIndex(icons.openingBotIcon),
+      findMatchingPresetIndex(icons.closingBotIcon),
+    ]);
+    setIconPresetIndices({ bot, opening, closing });
+  }, []);
+
+  const syncIconsFromChatbotData = useCallback(async (data) => {
+    const icons = applyIconsFromApiResponse(data, {
+      setBotImage,
+      setOpeningBotIcon,
+      setClosingBotIcon,
+    });
+    await resolvePresetIndicesFromIcons(icons);
+    return icons;
+  }, [resolvePresetIndicesFromIcons]);
+
   const handleIconClickForType = useCallback(async (index, imageDefault, type) => {
-    if (!imageDefault.includes('image/png;base64')) {
-      const dataUrl = await toDataURL(imageDefault);
+    setPresetIndexForType(type, index);
+    try {
+      const dataUrl = await convertImageToDataUrl(imageDefault);
       setBotIcon(type, dataUrl);
-    } else {
-      setBotIcon(type, imageDefault);
+      clearValidationError('botImage');
+    } catch {
+      setPresetIndexForType(type, null);
+      showNotification('アイコンの読み込みに失敗しました。', 0);
     }
-  }, [setBotIcon]);
+  }, [clearValidationError, setBotIcon, setPresetIndexForType, showNotification]);
 
   const handleRemoveImage = useCallback((type) => () => {
     setBotIcon(type, null);
-  }, [setBotIcon]);
+    setPresetIndexForType(type, null);
+  }, [setBotIcon, setPresetIndexForType]);
 
   const getBaseUrlAdd = useCallback((iconType) => (e) => {
     const file = e.target.files[0];
@@ -105,6 +151,7 @@ export const useDesignChatbot = (initialBotId) => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setBotIcon(iconType, reader.result);
+        setPresetIndexForType(iconType, null);
         clearValidationError('botImage');
       };
       reader.readAsDataURL(file);
@@ -112,12 +159,13 @@ export const useDesignChatbot = (initialBotId) => {
     }
 
     setBotIcon(iconType, '');
+    setPresetIndexForType(iconType, null);
     setValidationErrors((prev) => ({
       ...prev,
       botImage: '画像を選択してください。',
     }));
     return false;
-  }, [clearValidationError, setBotIcon]);
+  }, [clearValidationError, setBotIcon, setPresetIndexForType]);
 
   const loadChatbot = useCallback(async (id) => {
     if (!id) return;
@@ -161,13 +209,7 @@ export const useDesignChatbot = (initialBotId) => {
       setSubtitle(data.subtitle || '');
       setDesignType(data.design_type || 'flat');
 
-      const botImageUrl = resolveIconUrl(data.icon);
-      const openingBotIconUrl = resolveIconUrl(data.opening_bot_icon);
-      const closingBotIconUrl = resolveIconUrl(data.closing_bot_icon);
-
-      if (botImageUrl) setBotImage(botImageUrl);
-      if (openingBotIconUrl) setOpeningBotIcon(openingBotIconUrl);
-      if (closingBotIconUrl) setClosingBotIcon(closingBotIconUrl);
+      await syncIconsFromChatbotData(data);
 
       if (resolvedColor) {
         setMainColor(resolvedColor);
@@ -179,7 +221,7 @@ export const useDesignChatbot = (initialBotId) => {
     } finally {
       setIsLoaded(true);
     }
-  }, []);
+  }, [syncIconsFromChatbotData]);
 
   useEffect(() => {
     const id = initialBotId || Cookies.get('bot_id');
@@ -198,17 +240,6 @@ export const useDesignChatbot = (initialBotId) => {
     return errors.title === '' && errors.subtitle === '' && errors.botName === '';
   }, [botName, subtitle, title]);
 
-  const validateForPreview = useCallback(() => {
-    const errors = {
-      title: title ? '' : 'タイトルは、必ず指定してください。',
-      subtitle: subtitle ? '' : 'サブタイトルは、必ず指定ください。',
-      botName: validationErrors.botName,
-      botImage: validationErrors.botImage,
-    };
-    setValidationErrors(errors);
-    return errors.title === '' && errors.subtitle === '';
-  }, [subtitle, title, validationErrors.botImage, validationErrors.botName]);
-
   const saveBasicInfo = useCallback(() => {
     if (!validateBasicInfo()) return;
 
@@ -224,10 +255,11 @@ export const useDesignChatbot = (initialBotId) => {
     });
 
     api.put(`api/v1/managements/chatbots/${botId}`, payload)
-      .then((res) => {
+      .then(async (res) => {
         if (res.data.code === 1 || res.data.code === '1') {
           Cookies.set('bot_id', res.data.data.id);
           Cookies.set('bot_type', 'bot');
+          await syncIconsFromChatbotData(res.data.data);
           showNotification('ボットを正常に保存されました！');
         } else if (res.data?.code === 2 || res.data?.code === '2') {
           showNotification(res.data.message, 0);
@@ -248,6 +280,7 @@ export const useDesignChatbot = (initialBotId) => {
     openingBotIcon,
     showNotification,
     subtitle,
+    syncIconsFromChatbotData,
     title,
     validateBasicInfo,
   ]);
@@ -310,6 +343,98 @@ export const useDesignChatbot = (initialBotId) => {
     widthSp,
   ]);
 
+  const saveThemeCustomize = useCallback(() => {
+    const designPayload = buildDesignSettingsPayload({
+      displayType,
+      widthPc,
+      heightPc,
+      widthSp,
+      heightSp,
+      positionPc,
+      buttonTypePc,
+      rightPcTitle,
+      rightMarginPc,
+      bottomMarginPc,
+      positionSp,
+      buttonTypeSp,
+      rightSpTitle,
+      rightMarginSp,
+      bottomMarginSp,
+      popupCloseBot,
+      titleBubble,
+      themeSettings,
+    });
+
+    const basicPayload = buildBasicInfoPayload({
+      title,
+      subtitle,
+      designType,
+      botName,
+      mainColor,
+      botImage,
+      openingBotIcon,
+      closingBotIcon,
+    });
+
+    Promise.all([
+      api.post(`api/v1/managements/chatbots/${botId}/design_settings`, designPayload),
+      api.put(`api/v1/managements/chatbots/${botId}`, basicPayload),
+    ])
+      .then(async ([designRes, basicRes]) => {
+        const designOk = designRes.data.code === 1 || designRes.data.code === '1';
+        const basicOk = basicRes.data.code === 1 || basicRes.data.code === '1';
+
+        if (designOk && basicOk) {
+          if (basicRes.data.data?.id) {
+            Cookies.set('bot_id', basicRes.data.data.id);
+          }
+          await syncIconsFromChatbotData(basicRes.data.data);
+          showNotification('ボット設定を正常に保存されました！');
+          return;
+        }
+
+        const errorMessage = designRes.data?.message || basicRes.data?.message;
+        if (errorMessage) {
+          showNotification(errorMessage, 0);
+        }
+      })
+      .catch((error) => {
+        if (error.response?.data?.code === 0) {
+          tokenExpired();
+        }
+      });
+  }, [
+    botId,
+    botImage,
+    botName,
+    bottomMarginPc,
+    bottomMarginSp,
+    buttonTypePc,
+    buttonTypeSp,
+    closingBotIcon,
+    designType,
+    displayType,
+    heightPc,
+    heightSp,
+    mainColor,
+    openingBotIcon,
+    popupCloseBot,
+    positionPc,
+    positionSp,
+    rightMarginPc,
+    rightMarginSp,
+    rightPcTitle,
+    rightSpTitle,
+    showNotification,
+    subtitle,
+    syncIconsFromChatbotData,
+    themeSettings,
+    title,
+    titleBubble,
+    widthPc,
+    widthSp,
+  ]);
+
   const updateThemeField = useCallback((field, value) => {
     setThemeSettings((prev) => ({ ...prev, [field]: value }));
   }, []);
@@ -345,6 +470,7 @@ export const useDesignChatbot = (initialBotId) => {
       isOpenNoti,
       msgNoti,
       validationErrors,
+      iconPresetIndices,
       basicInfo: {
         title,
         subtitle,
@@ -390,9 +516,9 @@ export const useDesignChatbot = (initialBotId) => {
       getBaseUrlAdd,
       saveBasicInfo,
       saveDesignSettings,
+      saveThemeCustomize,
       updateDesignSettingField,
       updateThemeField,
-      validateForPreview,
     },
   };
 };

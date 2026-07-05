@@ -1,26 +1,35 @@
 import IconManDefault from '../../../../../assets/img/bot-icon/man1_new.png';
 import { EC_CHATBOT_URL } from 'v2/variables/constants';
-import { COLOR_MAP } from '../constants/designChatbotConstants';
+import { COLOR_MAP, DEFAULT_IMAGES } from '../constants/designChatbotConstants';
 import { buildThemePayload, parseThemeSettings as parseThemeFromRaw } from './designThemeUtils';
 
 export const getIconPath = (iconField) => {
   if (!iconField) return '';
-  if (typeof iconField === 'string') return iconField;
-  return iconField.url || '';
+  if (typeof iconField === 'string') return iconField.trim();
+  return (iconField.url || '').trim();
 };
 
 export const resolveIconUrl = (iconField) => {
   const path = getIconPath(iconField);
   if (!path) return '';
-  if (/^(https?:|data:)/.test(path)) return path;
+  if (/^data:/.test(path)) return path;
+  if (/^https?:\/\//.test(path)) return path;
+  if (/^\/\//.test(path)) return `https:${path}`;
 
   const base = EC_CHATBOT_URL.replace(/\/$/, '');
+  if (path.startsWith(base)) return path;
+
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
   return `${base}${normalizedPath}`;
 };
 
 export const toDataURL = (url) => fetch(url)
-  .then((response) => response.blob())
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.status}`);
+    }
+    return response.blob();
+  })
   .then(
     (blob) => new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -29,6 +38,88 @@ export const toDataURL = (url) => fetch(url)
       reader.readAsDataURL(blob);
     }),
   );
+
+const loadImageViaCanvas = (src) => new Promise((resolve, reject) => {
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = () => {
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const context = canvas.getContext('2d');
+      if (!context) {
+        reject(new Error('Canvas is not supported'));
+        return;
+      }
+      context.drawImage(img, 0, 0);
+      resolve(canvas.toDataURL('image/png'));
+    } catch (error) {
+      reject(error);
+    }
+  };
+  img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
+  img.src = src;
+});
+
+export const convertImageToDataUrl = async (src) => {
+  if (!src) {
+    throw new Error('Image source is required');
+  }
+  if (isTempImage(src)) {
+    return src;
+  }
+
+  try {
+    return await toDataURL(src);
+  } catch {
+    return loadImageViaCanvas(src);
+  }
+};
+
+let defaultImageDataUrlCache = null;
+
+export const getDefaultImageDataUrls = async (defaultImages = DEFAULT_IMAGES) => {
+  if (!defaultImageDataUrlCache) {
+    defaultImageDataUrlCache = await Promise.all(
+      defaultImages.map((image) => convertImageToDataUrl(image)),
+    );
+  }
+  return defaultImageDataUrlCache;
+};
+
+export const findMatchingPresetIndex = async (resolvedUrl, defaultImages = DEFAULT_IMAGES) => {
+  if (!resolvedUrl) return null;
+
+  const directIndex = defaultImages.indexOf(resolvedUrl);
+  if (directIndex >= 0) return directIndex;
+
+  try {
+    const currentDataUrl = await convertImageToDataUrl(resolvedUrl);
+    const presetDataUrls = await getDefaultImageDataUrls(defaultImages);
+    const matchedIndex = presetDataUrls.findIndex((preset) => preset === currentDataUrl);
+    return matchedIndex >= 0 ? matchedIndex : null;
+  } catch {
+    return null;
+  }
+};
+
+export const getIconsFromApiResponse = (data) => ({
+  botImage: resolveIconUrl(data?.icon),
+  openingBotIcon: resolveIconUrl(data?.opening_bot_icon),
+  closingBotIcon: resolveIconUrl(data?.closing_bot_icon),
+});
+
+export const applyIconsFromApiResponse = (data, setters) => {
+  const icons = getIconsFromApiResponse(data);
+  if (icons.botImage) setters.setBotImage(icons.botImage);
+  else setters.setBotImage('');
+  if (icons.openingBotIcon) setters.setOpeningBotIcon(icons.openingBotIcon);
+  else setters.setOpeningBotIcon('');
+  if (icons.closingBotIcon) setters.setClosingBotIcon(icons.closingBotIcon);
+  else setters.setClosingBotIcon('');
+  return icons;
+};
 
 export const isTempImage = (image) => !!image && (
   image.includes('image/png;base64')

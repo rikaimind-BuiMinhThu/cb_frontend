@@ -16,6 +16,7 @@ const ThemeSection = ({ title, fields, themeSettings, onFieldChange }) => (
               label={label}
               value={themeSettings[key]}
               fullWidth={fullWidth}
+              tooltipKey={key}
               onChange={(value) => onFieldChange(key, value)}
             />
           );
@@ -28,6 +29,7 @@ const ThemeSection = ({ title, fields, themeSettings, onFieldChange }) => (
               label={label}
               value={themeSettings[key]}
               fullWidth={fullWidth}
+              tooltipKey={key}
               onChange={(value) => onFieldChange(key, value)}
             />
           );
@@ -39,7 +41,8 @@ const ThemeSection = ({ title, fields, themeSettings, onFieldChange }) => (
             label={label}
             value={themeSettings[key]}
             isText={isText}
-            fullWidth={fullWidth}
+            fullWidth={fullWidth ?? true}
+            tooltipKey={key}
             onChange={(value) => onFieldChange(key, value)}
           />
         );

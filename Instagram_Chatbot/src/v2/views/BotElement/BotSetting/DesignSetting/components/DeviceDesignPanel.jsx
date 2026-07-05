@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Input, InputNumber, Select, Space } from 'antd';
 import InputNum from '../../ScenarioSetting/scenarioComon/InputNum';
+import DesignSettingInfoTooltip from './shared/DesignSettingInfoTooltip';
+import { getDesignSettingTooltip } from '../constants/designSettingTooltips';
 
 const DISPLAY_TYPE_OPTIONS = [
   { value: 1, label: 'リロード' },
@@ -19,10 +21,15 @@ const BUTTON_TYPE_OPTIONS = [
   { value: 2, label: 'ボタンのみ' },
 ];
 
-function DesignField({ label, fullWidth, children }) {
+function DesignField({ label, tooltipKey, fullWidth, children }) {
   return (
     <div className={`design-field${fullWidth ? ' design-field--full' : ''}`}>
-      <label className="design-field__label">{label}</label>
+      <label className="design-field__label">
+        {label}
+        {tooltipKey && (
+          <DesignSettingInfoTooltip text={getDesignSettingTooltip(tooltipKey)} />
+        )}
+      </label>
       <div className="design-field__control">{children}</div>
     </div>
   );
@@ -30,11 +37,13 @@ function DesignField({ label, fullWidth, children }) {
 
 DesignField.propTypes = {
   label: PropTypes.string.isRequired,
+  tooltipKey: PropTypes.string,
   fullWidth: PropTypes.bool,
   children: PropTypes.node.isRequired,
 };
 
 DesignField.defaultProps = {
+  tooltipKey: '',
   fullWidth: false,
 };
 
@@ -64,7 +73,7 @@ const DeviceDesignPanel = ({
       <h4 className="design-device-card__title">{title}</h4>
       <div className="design-device-card__grid">
         {isPc && (
-          <DesignField label="表示タイプ">
+          <DesignField label="表示タイプ" tooltipKey="displayType">
             <Select
               value={Number(displayType)}
               options={DISPLAY_TYPE_OPTIONS}
@@ -73,7 +82,7 @@ const DeviceDesignPanel = ({
           </DesignField>
         )}
 
-        <DesignField label="サイズ" fullWidth>
+        <DesignField label="サイズ" tooltipKey="size" fullWidth>
           <Space size={12} wrap className="design-size-row">
             <InputNum
               style={{ width: '100%', minWidth: 120 }}
@@ -98,7 +107,7 @@ const DeviceDesignPanel = ({
           </Space>
         </DesignField>
 
-        <DesignField label="設置場所">
+        <DesignField label="設置場所" tooltipKey="position">
           <Select
             value={positionValue}
             options={POSITION_OPTIONS}
@@ -107,7 +116,7 @@ const DeviceDesignPanel = ({
         </DesignField>
 
         {positionValue === 2 && (
-          <DesignField label={rightTitleLabel}>
+          <DesignField label={rightTitleLabel} tooltipKey="rightTitle">
             <Input
               name={`right_position_${device}_title`}
               placeholder="タイトル"
@@ -118,7 +127,7 @@ const DeviceDesignPanel = ({
         )}
 
         {positionValue === 1 && (
-          <DesignField label="ボタン内容">
+          <DesignField label="ボタン内容" tooltipKey="buttonType">
             <Select
               value={buttonTypeValue}
               options={BUTTON_TYPE_OPTIONS}
@@ -127,7 +136,7 @@ const DeviceDesignPanel = ({
           </DesignField>
         )}
 
-        <DesignField label="右マージン">
+        <DesignField label="右マージン" tooltipKey="rightMargin">
           <InputNumber
             name={`right_margin_${device}`}
             value={rightMargin}
@@ -138,7 +147,7 @@ const DeviceDesignPanel = ({
           />
         </DesignField>
 
-        <DesignField label="下マージン">
+        <DesignField label="下マージン" tooltipKey="bottomMargin">
           <InputNumber
             name={`bottom_margin_${device}`}
             value={bottomMargin}

@@ -1,13 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import DesignSettingLabel from './shared/DesignSettingLabel';
+import { getDesignSettingTooltip } from '../constants/designSettingTooltips';
 
-const ThemeNumberField = ({ label, value, onChange, suffix, fullWidth }) => {
+const ThemeNumberField = ({ label, value, onChange, suffix, fullWidth, tooltipKey }) => {
   const fieldClassName = `theme-field${fullWidth ? ' theme-field--full' : ''}`;
   const numericValue = String(value || '').replace(/px$/i, '');
 
   return (
     <div className={fieldClassName}>
-      <label className="theme-field__label">{label}</label>
+      <DesignSettingLabel tooltip={getDesignSettingTooltip(tooltipKey)} className="theme-field__label">
+        {label}
+      </DesignSettingLabel>
       <div className="theme-field__control">
         <input
           type="number"
@@ -33,12 +37,14 @@ ThemeNumberField.propTypes = {
   onChange: PropTypes.func.isRequired,
   suffix: PropTypes.string,
   fullWidth: PropTypes.bool,
+  tooltipKey: PropTypes.string,
 };
 
 ThemeNumberField.defaultProps = {
   value: '',
   suffix: 'px',
   fullWidth: false,
+  tooltipKey: '',
 };
 
 export default ThemeNumberField;

@@ -1,14 +1,26 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import PresetColorPicker from './PresetColorPicker';
+import DesignSettingLabel from './shared/DesignSettingLabel';
+import { getDesignSettingTooltip } from '../constants/designSettingTooltips';
 
-const ThemeColorField = ({ label, value, onChange, isText, fullWidth }) => {
-  const fieldClassName = `theme-field${fullWidth ? ' theme-field--full' : ''}`;
-  const colorValue = value || '#000000';
+const ThemeColorField = ({
+  label,
+  value,
+  onChange,
+  isText,
+  fullWidth,
+  tooltipKey,
+}) => {
+  const fieldClassName = `theme-field theme-field--color${fullWidth ? ' theme-field--full' : ''}`;
+  const tooltip = getDesignSettingTooltip(tooltipKey);
 
   if (isText) {
     return (
       <div className={fieldClassName}>
-        <label className="theme-field__label">{label}</label>
+        <DesignSettingLabel tooltip={tooltip} className="theme-field__label">
+          {label}
+        </DesignSettingLabel>
         <input
           type="text"
           className="theme-field__input theme-field__input--text"
@@ -22,27 +34,13 @@ const ThemeColorField = ({ label, value, onChange, isText, fullWidth }) => {
 
   return (
     <div className={fieldClassName}>
-      <label className="theme-field__label">{label}</label>
-      <div className="theme-field__control">
-        <label className="theme-field__swatch-wrap" aria-label={`${label}を選択`}>
-          <span
-            className="theme-field__swatch"
-            style={{ backgroundColor: value || '#ffffff' }}
-          />
-          <input
-            type="color"
-            className="theme-field__color-picker"
-            value={colorValue}
-            onChange={(e) => onChange(e.target.value)}
-          />
-        </label>
-        <input
-          type="text"
-          className="theme-field__input"
-          value={value || ''}
-          onChange={(e) => onChange(e.target.value)}
-        />
-      </div>
+      <DesignSettingLabel tooltip={tooltip} className="theme-field__label">
+        {label}
+      </DesignSettingLabel>
+      <PresetColorPicker
+        value={value || '#327AED'}
+        onChange={onChange}
+      />
     </div>
   );
 };
@@ -53,12 +51,14 @@ ThemeColorField.propTypes = {
   onChange: PropTypes.func.isRequired,
   isText: PropTypes.bool,
   fullWidth: PropTypes.bool,
+  tooltipKey: PropTypes.string,
 };
 
 ThemeColorField.defaultProps = {
   value: '',
   isText: false,
-  fullWidth: false,
+  fullWidth: true,
+  tooltipKey: '',
 };
 
 export default ThemeColorField;

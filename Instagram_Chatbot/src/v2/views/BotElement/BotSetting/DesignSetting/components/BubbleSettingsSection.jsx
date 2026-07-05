@@ -1,11 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Input, Radio } from 'antd';
+import DesignSettingInfoTooltip from './shared/DesignSettingInfoTooltip';
+import { getDesignSettingTooltip } from '../constants/designSettingTooltips';
 
-function DesignField({ label, children }) {
+function DesignField({ label, tooltipKey, children }) {
   return (
     <div className="design-field">
-      <label className="design-field__label">{label}</label>
+      <label className="design-field__label">
+        {label}
+        {tooltipKey && (
+          <DesignSettingInfoTooltip text={getDesignSettingTooltip(tooltipKey)} />
+        )}
+      </label>
       <div className="design-field__control">{children}</div>
     </div>
   );
@@ -13,14 +20,19 @@ function DesignField({ label, children }) {
 
 DesignField.propTypes = {
   label: PropTypes.string.isRequired,
+  tooltipKey: PropTypes.string,
   children: PropTypes.node.isRequired,
+};
+
+DesignField.defaultProps = {
+  tooltipKey: '',
 };
 
 const BubbleSettingsSection = ({ titleBubble, popupCloseBot, onChange }) => (
   <section className="design-bubble-card">
     <h4 className="design-device-card__title">バブル設定</h4>
     <div className="design-bubble-card__grid">
-      <DesignField label="タイトル">
+      <DesignField label="タイトル" tooltipKey="titleBubble">
         <Input
           name="title_bubble"
           value={titleBubble}
@@ -28,7 +40,7 @@ const BubbleSettingsSection = ({ titleBubble, popupCloseBot, onChange }) => (
           onChange={(e) => onChange('titleBubble', e.target.value)}
         />
       </DesignField>
-      <DesignField label="離脱防止">
+      <DesignField label="離脱防止" tooltipKey="popupCloseBot">
         <Radio.Group
           value={popupCloseBot}
           onChange={(e) => onChange('popupCloseBot', e.target.value)}
