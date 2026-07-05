@@ -102,7 +102,7 @@ const BotMessage = ({
       return () => clearTimeout(timeoutId);
     }
 
-    const finalDelay = getBotMessageDelay({ message_content: [content] }, isUseGlobalDelay, globalDelayTime, delayEachMessage);
+    let finalDelay = getBotMessageDelay({ message_content: [content] }, isUseGlobalDelay, globalDelayTime, delayEachMessage);
 
     if (isDelaying) {
       timeoutId = setTimeout(() => {

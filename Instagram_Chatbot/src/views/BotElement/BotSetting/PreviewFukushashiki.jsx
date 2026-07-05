@@ -114,6 +114,8 @@ const previewInitialState = {
   scenarioId: params.get("scenario_id"),
   botInfor: {},
   messagesList: [],
+  isUseGlobalDelay: false,
+  globalDelayTime: 1.0,
   urlThanksPage: "",
   urlCartConfirmPage: "",
   merchandiseId: "",
