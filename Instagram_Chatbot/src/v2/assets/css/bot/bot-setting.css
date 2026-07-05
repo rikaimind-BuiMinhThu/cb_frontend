@@ -488,7 +488,6 @@
   padding: 8px 10px;
   border-radius: 4px;
   box-sizing: border-box;
-  font-size: 14px;
 }
 
 .theme-customize-preview__button-group {
@@ -500,7 +499,6 @@
 .theme-customize-preview__button-group .btn-new-bot {
   min-width: 70px;
   min-height: 36px;
-  font-size: 13px;
   padding: 4px 10px;
   border: none;
   border-radius: 4px;

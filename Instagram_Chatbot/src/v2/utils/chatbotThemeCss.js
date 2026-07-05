@@ -48,22 +48,26 @@ const buildThemeVariables = (theme) => `
   --c-field-focus-bg: ${theme.fieldFocusBgColor};
   --c-field-unfocus-border: ${theme.fieldUnfocusBorderColor};
   --c-field-unfocus-bg: ${theme.fieldUnfocusBgColor};
+  --c-field-font-size: ${theme.fieldFontSize};
   --c-btn-normal-bg: ${theme.buttonNormalBgColor};
   --c-btn-normal-text: ${theme.buttonNormalTextColor};
   --c-btn-pressed-bg: ${theme.buttonPressedBgColor};
   --c-btn-pressed-text: ${theme.buttonPressedTextColor};
   --c-btn-disabled-bg: ${theme.buttonDisabledBgColor};
   --c-btn-disabled-text: ${theme.buttonDisabledTextColor};
+  --c-btn-font-size: ${theme.buttonFontSize};
   --c-checkbox-unchecked-bg: ${theme.checkboxUncheckedBgColor};
   --c-checkbox-unchecked-border: ${theme.checkboxUncheckedBorderColor};
   --c-checkbox-checked-bg: ${theme.checkboxCheckedBgColor};
   --c-checkbox-checked-border: ${theme.checkboxCheckedBorderColor};
+  --c-checkbox-font-size: ${theme.checkboxFontSize};
   --c-radio-unselected-bg: ${theme.radioUnselectedBgColor};
   --c-radio-selected-bg: ${theme.radioSelectedBgColor};
   --c-radio-unselected-border: ${theme.radioUnselectedBorderColor};
   --c-radio-selected-border: ${theme.radioSelectedBorderColor};
   --c-radio-input-unselected: ${theme.radioInputUnselectedColor};
   --c-radio-input-selected: ${theme.radioInputSelectedColor};
+  --c-radio-font-size: ${theme.radioFontSize};
   --c-error-bg: ${theme.errorMessageBgColor};
   --c-error-text: ${theme.errorMessageTextColor};
   --c-error-font-size: ${theme.errorMessageFontSize};
@@ -116,6 +120,9 @@ const buildThemeRules = (theme, scopeSelector = '') => {
   const previewFocusSelector = scopeSelector
     ? `${spBodySelector} input.theme-customize-preview__field.theme-preview--field-focus, ${spBodySelector} select.theme-customize-preview__field.theme-preview--field-focus, ${spBodySelector} textarea.theme-customize-preview__field.theme-preview--field-focus`
     : '';
+  const previewFieldSelector = scopeSelector
+    ? `${spBodySelector} input.theme-customize-preview__field, ${spBodySelector} select.theme-customize-preview__field, ${spBodySelector} textarea.theme-customize-preview__field`
+    : '';
   const { transitionRule, focusRules, previewRules } = buildFieldFocusStyles(
     fieldFocusSelectors,
     focusEffect,
@@ -157,6 +164,10 @@ const buildThemeRules = (theme, scopeSelector = '') => {
 ${scopeSelector} .theme-preview--btn-pressed.btn-new-bot {
   background-color: var(--c-btn-pressed-bg) !important;
   color: var(--c-btn-pressed-text, #fff) !important;
+}` : '';
+  const previewFieldFontSizeRule = previewFieldSelector ? `
+${previewFieldSelector} {
+  font-size: var(--c-field-font-size, 14px) !important;
 }` : '';
 
   return `
@@ -201,14 +212,16 @@ ${scopePrefix}.ss-user-message__content-wrapper {
 ${fieldSelectors} {
   border: 1px solid var(--c-field-unfocus-border, #ccc) !important;
   background-color: var(--c-field-unfocus-bg, #fff) !important;
+  font-size: var(--c-field-font-size, 14px) !important;
   ${transitionRule}
 }
 ${focusRules}
-${previewRules}
+${previewRules}${previewFieldFontSizeRule}
 
 ${btnSelector} {
   background-color: var(--c-btn-normal-bg) !important;
   color: var(--c-btn-normal-text, #fff) !important;
+  font-size: var(--c-btn-font-size, 14px) !important;
 }
 
 ${btnSelector}:active {
@@ -243,6 +256,12 @@ ${spBodySelector} .ss-message__content--user-checkbox--checkbox_img-item:has(inp
   background-color: var(--c-checkbox-checked-bg) !important;
   border-color: var(--c-checkbox-checked-border) !important;
   ${checkboxTwinkleAnimation}
+}
+
+${spBodySelector} .ss-message__content--user-checkbox > label,
+${spBodySelector} .ss-message__content--user-checkbox--block_style > span,
+${scopePrefix}.theme-customize-preview__checkbox-option > label {
+  font-size: var(--c-checkbox-font-size, 14px) !important;
 }
 
 ${spBodySelector} .ss-message__content--user-radio_button,
@@ -280,6 +299,12 @@ ${scopePrefix}.theme-customize-preview__radio-default input[type="radio"] {
 ${spBodySelector} .ss-message__content--user-radio_button:not(.ss-message__content--user-radio_button--radio_button_img) input[type="radio"]:not(:checked),
 ${scopePrefix}.theme-customize-preview__radio-default input[type="radio"]:not(:checked) {
   accent-color: var(--c-radio-input-unselected, #ccc) !important;
+}
+
+${spBodySelector} .ss-message__content--user-radio_button > label,
+${spBodySelector} .ss-message__content--user-radio_button--block_style > span,
+${scopePrefix}.theme-customize-preview__radio-default > label {
+  font-size: var(--c-radio-font-size, 14px) !important;
 }
 
 ${scopePrefix}.ss-bot-submit-error-message,
