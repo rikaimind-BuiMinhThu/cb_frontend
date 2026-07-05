@@ -28,17 +28,18 @@ const PresetColorPicker = ({ value, onChange, presets = MAIN_COLORS }) => {
           className={`color color-${index}${!isCustomColor && presetIndex === index ? ' active' : ''}`}
           onClick={() => handlePresetClick(color)}
         >
-          <span style={{ backgroundColor: color }} />
+          <span className="main-colors__swatch" style={{ backgroundColor: color }} />
         </div>
       ))}
 
-      <div
-        className={`color color-999${isCustomColor ? ' active' : ''}`}
-        style={{ position: 'relative' }}
-        onClick={handleCustomClick}
-      >
-        <span style={{ backgroundColor: currentColor }} />
-        <span style={{ position: 'absolute', bottom: '-35px', width: '60px' }}>カスタム</span>
+      <div className="main-colors__custom">
+        <div
+          className={`color color-999${isCustomColor ? ' active' : ''}`}
+          onClick={handleCustomClick}
+        >
+          <span className="main-colors__swatch" style={{ backgroundColor: currentColor }} />
+        </div>
+        <span className="main-colors__custom-label">カスタム</span>
       </div>
       <input
         ref={customColorRef}

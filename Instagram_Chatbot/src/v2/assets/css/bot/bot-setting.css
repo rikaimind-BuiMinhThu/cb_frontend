@@ -157,7 +157,42 @@
   gap: 10px 16px;
 }
 
+.theme-section__grid .theme-field--color,
+.theme-section__grid .theme-field--main-color {
+  grid-column: 1 / -1;
+}
+
+.theme-customize-tab-settings .main-colors {
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 3px;
+}
+
+.theme-customize-tab-settings .main-colors .color {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.theme-customize-tab-settings .main-colors__swatch {
+  width: 20px;
+  height: 20px;
+}
+
+.theme-customize-tab-settings .main-colors__custom {
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+}
+
+.theme-field--color .theme-field__control {
+  overflow-x: auto;
+}
+
 .theme-field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   min-width: 0;
 }
 
@@ -165,18 +200,58 @@
   grid-column: 1 / -1;
 }
 
+.theme-field--main-color {
+  align-items: flex-start;
+}
+
+.theme-field--main-color .theme-field__control {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.theme-field-group-label {
+  grid-column: 1 / -1;
+  margin: 8px 0 2px;
+  padding-top: 8px;
+  border-top: 1px solid #e8e8e8;
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+}
+
+.theme-field-group-label:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
 .theme-field__label {
+  flex: 0 0 38%;
+  max-width: 160px;
   display: block;
-  margin-bottom: 6px;
+  margin-bottom: 0;
   font-size: 12px;
   line-height: 1.4;
   color: #666;
 }
 
+.theme-field--full .theme-field__label {
+  flex: 0 0 120px;
+  max-width: 120px;
+}
+
 .theme-field__control {
+  flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.theme-field__control--compact {
+  flex: 0 0 auto;
+  width: auto;
 }
 
 .theme-field__suffix {
@@ -251,6 +326,15 @@
 .theme-field__input--text {
   width: 100%;
   font-family: inherit;
+}
+
+.theme-field__input--number {
+  flex: 0 0 auto;
+  width: 56px;
+  height: 26px;
+  padding: 0 6px;
+  font-size: 12px;
+  text-align: center;
 }
 
 .theme-field__select {
@@ -574,5 +658,17 @@
 
   .theme-field--full {
     grid-column: auto;
+  }
+
+  .theme-field {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  .theme-field__label,
+  .theme-field--full .theme-field__label {
+    flex: none;
+    max-width: none;
   }
 }

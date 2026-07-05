@@ -448,6 +448,7 @@ export const useDesignChatbot = (initialBotId) => {
     setThemeSettings((prev) => {
       const next = { ...prev };
       section.fields.forEach(({ key }) => {
+        if (!key) return;
         next[key] = defaults[key];
       });
       return next;

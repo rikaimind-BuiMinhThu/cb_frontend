@@ -1,9 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Collapse } from 'antd';
+import { getDesignSettingTooltip } from '../constants/designSettingTooltips';
+import MainColorPicker from './MainColorPicker';
 import ThemeColorField from './ThemeColorField';
 import ThemeEffectSelectField from './ThemeEffectSelectField';
 import ThemeNumberField from './ThemeNumberField';
+import DesignSettingLabel from './shared/DesignSettingLabel';
 
 const { Panel } = Collapse;
 
@@ -12,6 +15,8 @@ const ThemeAccordionSection = ({
   title,
   fields,
   themeSettings,
+  mainColor,
+  onMainColorChange,
   isActive,
   isExpanded,
   highlightedFieldKey,
@@ -20,7 +25,42 @@ const ThemeAccordionSection = ({
   onResetSection,
   showReset,
 }) => {
-  const renderField = ({ key, label, isText, fieldType, fullWidth }) => {
+  const renderField = (field, index) => {
+    const { key, label, isText, fieldType, fullWidth } = field;
+
+    if (fieldType === 'groupLabel') {
+      return (
+        <div
+          key={`group-${label}-${index}`}
+          className="theme-field-group-label theme-field--full"
+        >
+          {label}
+        </div>
+      );
+    }
+
+    if (fieldType === 'mainColor') {
+      return (
+        <div
+          key={`main-color-${index}`}
+          className={`theme-field theme-field--main-color${fullWidth ? ' theme-field--full' : ''}`}
+        >
+          <DesignSettingLabel
+            tooltip={getDesignSettingTooltip('mainColor')}
+            className="theme-field__label"
+          >
+            {label}
+          </DesignSettingLabel>
+          <div className="theme-field__control">
+            <MainColorPicker mainColor={mainColor} onChange={onMainColorChange} />
+            <p className="theme-section__main-color-helper">
+              メインカラーを変更しても個別設定は自動では上書きされません。セクションごとに「デフォルトに戻す」で再計算できます。
+            </p>
+          </div>
+        </div>
+      );
+    }
+
     const isHighlighted = highlightedFieldKey === key;
     const fieldClassSuffix = isHighlighted ? ' theme-field--highlighted' : '';
 
@@ -111,13 +151,15 @@ ThemeAccordionSection.propTypes = {
   sectionId: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   fields: PropTypes.arrayOf(PropTypes.shape({
-    key: PropTypes.string.isRequired,
+    key: PropTypes.string,
     label: PropTypes.string.isRequired,
     isText: PropTypes.bool,
     fieldType: PropTypes.string,
     fullWidth: PropTypes.bool,
   })).isRequired,
   themeSettings: PropTypes.object.isRequired,
+  mainColor: PropTypes.string,
+  onMainColorChange: PropTypes.func,
   isActive: PropTypes.bool,
   isExpanded: PropTypes.bool,
   highlightedFieldKey: PropTypes.string,
@@ -128,6 +170,8 @@ ThemeAccordionSection.propTypes = {
 };
 
 ThemeAccordionSection.defaultProps = {
+  mainColor: '#327AED',
+  onMainColorChange: null,
   isActive: false,
   isExpanded: false,
   highlightedFieldKey: '',

@@ -21,13 +21,15 @@ const ThemeColorField = ({
         <DesignSettingLabel tooltip={tooltip} className="theme-field__label">
           {label}
         </DesignSettingLabel>
-        <input
-          type="text"
-          className="theme-field__input theme-field__input--text"
-          value={value || ''}
-          placeholder="例: 0 0 0 2px rgba(50,122,237,0.3)"
-          onChange={(e) => onChange(e.target.value)}
-        />
+        <div className="theme-field__control">
+          <input
+            type="text"
+            className="theme-field__input theme-field__input--text"
+            value={value || ''}
+            placeholder="例: 0 0 0 2px rgba(50,122,237,0.3)"
+            onChange={(e) => onChange(e.target.value)}
+          />
+        </div>
       </div>
     );
   }
@@ -37,10 +39,12 @@ const ThemeColorField = ({
       <DesignSettingLabel tooltip={tooltip} className="theme-field__label">
         {label}
       </DesignSettingLabel>
-      <PresetColorPicker
-        value={value || '#327AED'}
-        onChange={onChange}
-      />
+      <div className="theme-field__control">
+        <PresetColorPicker
+          value={value || '#327AED'}
+          onChange={onChange}
+        />
+      </div>
     </div>
   );
 };

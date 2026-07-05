@@ -74,7 +74,9 @@
 /* main colors */
 .main-colors {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 4px;
 }
 .main-colors .color {
   cursor: pointer;
@@ -92,11 +94,25 @@
   border: 1px solid blue;
   background-color: azure;
 }
-.main-colors .color span {
+.main-colors__swatch {
   width: 30px;
   height: 30px;
   border-radius: 50%;
   display: block;
+}
+
+.main-colors__custom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.main-colors__custom-label {
+  font-size: 11px;
+  color: #666;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
 /* button wrapper */

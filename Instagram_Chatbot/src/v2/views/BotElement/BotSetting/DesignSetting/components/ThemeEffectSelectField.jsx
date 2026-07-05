@@ -10,17 +10,19 @@ const ThemeEffectSelectField = ({ label, value, onChange, fullWidth, tooltipKey 
     <DesignSettingLabel tooltip={getDesignSettingTooltip(tooltipKey)} className="theme-field__label">
       {label}
     </DesignSettingLabel>
-    <select
-      className="theme-field__select"
-      value={normalizeFieldFocusEffect(value)}
-      onChange={(e) => onChange(e.target.value)}
-    >
-      {FIELD_FOCUS_EFFECT_OPTIONS.map(({ id, label: optionLabel }) => (
-        <option key={id} value={id}>
-          {optionLabel}
-        </option>
-      ))}
-    </select>
+    <div className="theme-field__control">
+      <select
+        className="theme-field__select"
+        value={normalizeFieldFocusEffect(value)}
+        onChange={(e) => onChange(e.target.value)}
+      >
+        {FIELD_FOCUS_EFFECT_OPTIONS.map(({ id, label: optionLabel }) => (
+          <option key={id} value={id}>
+            {optionLabel}
+          </option>
+        ))}
+      </select>
+    </div>
   </div>
 );
 

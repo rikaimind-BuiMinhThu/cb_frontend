@@ -34,7 +34,7 @@ const ThemePreviewShell = ({
       <style>{scopedCss}</style>
 
       <PreviewRegion
-        sectionId="mainColor"
+        sectionId="headerMain"
         activeSectionId={activeSectionId}
         onSectionSelect={onSectionSelect}
         className="theme-preview-region--header-wrap"
@@ -44,7 +44,7 @@ const ThemePreviewShell = ({
           style={{ backgroundColor: mainColor }}
         >
           <PreviewRegion
-            sectionId="header"
+            sectionId="headerMain"
             activeSectionId={activeSectionId}
             onSectionSelect={onSectionSelect}
             className="theme-preview-region--header-text"

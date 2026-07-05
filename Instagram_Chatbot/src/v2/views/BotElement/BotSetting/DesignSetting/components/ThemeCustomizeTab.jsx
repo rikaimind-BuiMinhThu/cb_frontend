@@ -1,18 +1,12 @@
 import React, { useCallback, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Collapse } from 'antd';
 import { AdminActionButton } from '../../../../../components/AdminShell';
-import { THEME_MAIN_COLOR_SECTION, THEME_SECTIONS } from '../constants/designThemeConstants';
-import { getDesignSettingTooltip } from '../constants/designSettingTooltips';
-import MainColorPicker from './MainColorPicker';
+import { THEME_SECTIONS } from '../constants/designThemeConstants';
 import ThemeAccordionSection from './ThemeAccordionSection';
 import ThemeCustomizePreview from './ThemeCustomizePreview';
 import ThemeSectionNav from './ThemeSectionNav';
-import DesignSettingInfoTooltip from './shared/DesignSettingInfoTooltip';
 
-const DEFAULT_EXPANDED_SECTIONS = ['mainColor', 'messages'];
-
-const { Panel } = Collapse;
+const DEFAULT_EXPANDED_SECTIONS = ['headerMain', 'messages'];
 
 const ThemeCustomizeTab = ({
   themeSettings,
@@ -25,7 +19,7 @@ const ThemeCustomizeTab = ({
   onResetSection,
   onSave,
 }) => {
-  const [activeSectionId, setActiveSectionId] = useState('mainColor');
+  const [activeSectionId, setActiveSectionId] = useState('headerMain');
   const [expandedSections, setExpandedSections] = useState(DEFAULT_EXPANDED_SECTIONS);
   const sectionRefs = useRef({});
 
@@ -62,15 +56,6 @@ const ThemeCustomizeTab = ({
     onMainColorChange(color);
   }, [mainColor, onApplyDerivedTheme, onMainColorChange]);
 
-  const mainColorHeader = (
-    <div className="theme-accordion-section__header">
-      <span>
-        {THEME_MAIN_COLOR_SECTION.title}
-        <DesignSettingInfoTooltip text={getDesignSettingTooltip('mainColor')} />
-      </span>
-    </div>
-  );
-
   return (
     <div className="design-setting-tab-content">
       <div className="theme-customize-tab-layout">
@@ -93,33 +78,6 @@ const ThemeCustomizeTab = ({
             onSectionSelect={handleSectionSelect}
           />
           <div className="theme-customize-tab-settings__scroll">
-            <div
-              ref={(node) => setSectionRef(THEME_MAIN_COLOR_SECTION.id, node)}
-              className={`theme-accordion-section theme-accordion-section--main-color${activeSectionId === THEME_MAIN_COLOR_SECTION.id ? ' theme-accordion-section--active' : ''}`}
-              id={`theme-section-${THEME_MAIN_COLOR_SECTION.id}`}
-            >
-              <Collapse
-                bordered={false}
-                activeKey={expandedSections.includes(THEME_MAIN_COLOR_SECTION.id)
-                  ? THEME_MAIN_COLOR_SECTION.id
-                  : []}
-                onChange={(keys) => {
-                  const expanded = Array.isArray(keys)
-                    ? keys.includes(THEME_MAIN_COLOR_SECTION.id)
-                    : keys === THEME_MAIN_COLOR_SECTION.id;
-                  handleSectionExpand(THEME_MAIN_COLOR_SECTION.id, expanded);
-                }}
-              >
-                <Panel header={mainColorHeader} key={THEME_MAIN_COLOR_SECTION.id}>
-                  <div className="theme-section theme-section--main-color">
-                    <MainColorPicker mainColor={mainColor} onChange={handleMainColorChange} />
-                    <p className="theme-section__main-color-helper">
-                      メインカラーを変更しても個別設定は自動では上書きされません。セクションごとに「デフォルトに戻す」で再計算できます。
-                    </p>
-                  </div>
-                </Panel>
-              </Collapse>
-            </div>
             {THEME_SECTIONS.map((section) => (
               <div
                 key={section.id}
@@ -130,6 +88,8 @@ const ThemeCustomizeTab = ({
                   title={section.title}
                   fields={section.fields}
                   themeSettings={themeSettings}
+                  mainColor={mainColor}
+                  onMainColorChange={handleMainColorChange}
                   isActive={activeSectionId === section.id}
                   isExpanded={expandedSections.includes(section.id)}
                   onExpand={handleSectionExpand}

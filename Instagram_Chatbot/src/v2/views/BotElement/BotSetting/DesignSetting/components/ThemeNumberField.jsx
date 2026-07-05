@@ -12,12 +12,12 @@ const ThemeNumberField = ({ label, value, onChange, suffix, fullWidth, tooltipKe
       <DesignSettingLabel tooltip={getDesignSettingTooltip(tooltipKey)} className="theme-field__label">
         {label}
       </DesignSettingLabel>
-      <div className="theme-field__control">
+      <div className="theme-field__control theme-field__control--compact">
         <input
           type="number"
           min="8"
           max="32"
-          className="theme-field__input theme-field__input--text"
+          className="theme-field__input theme-field__input--number"
           value={numericValue}
           placeholder="14"
           onChange={(e) => {

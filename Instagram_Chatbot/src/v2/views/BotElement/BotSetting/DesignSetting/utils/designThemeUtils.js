@@ -106,14 +106,20 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
     : lightenHex(mainColorHex, -0.08) || mainColorHex;
 
   return {
-    headerTextColor: '#ffffff',
+    headerTitleTextColor: '#ffffff',
+    headerTitleFontSize: '15px',
+    headerSubtitleTextColor: '#ffffff',
+    headerSubtitleFontSize: '14px',
     progressBarBgColor: opacityColor,
     progressBarTextColor: '#ffffff',
+    progressBarFontSize: '13px',
     chatWindowBgColor: opacityColor,
     botMessageBgColor: messageColor,
     botMessageTextColor: fontColor,
+    botMessageFontSize: '14px',
     userMessageBgColor: '#ffffff',
     userMessageTextColor: '#333333',
+    userMessageFontSize: '14px',
     fieldFocusBorderColor: mainColorHex,
     fieldFocusBgColor: '#ffffff',
     fieldFocusBgEffect: 'outline_soft',
@@ -162,6 +168,16 @@ export const mergeThemeWithDefaults = (rawTheme, mainColorHex, apiColorKey) => {
   });
 
   merged.fieldFocusBgEffect = normalizeFieldFocusEffect(merged.fieldFocusBgEffect);
+
+  const legacyHeaderColor = rawTheme.headerTextColor ?? rawTheme.header_text_color;
+  if (legacyHeaderColor) {
+    if (!rawTheme.headerTitleTextColor && !rawTheme.header_title_text_color) {
+      merged.headerTitleTextColor = legacyHeaderColor;
+    }
+    if (!rawTheme.headerSubtitleTextColor && !rawTheme.header_subtitle_text_color) {
+      merged.headerSubtitleTextColor = legacyHeaderColor;
+    }
+  }
 
   return merged;
 };

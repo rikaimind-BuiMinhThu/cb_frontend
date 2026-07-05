@@ -29,14 +29,20 @@ ${spBodySelector} .ant-select-focused .ant-select-selector
 `.trim();
 
 const buildThemeVariables = (theme) => `
-  --c-header-text: ${theme.headerTextColor};
+  --c-header-title-text: ${theme.headerTitleTextColor};
+  --c-header-title-font-size: ${theme.headerTitleFontSize};
+  --c-header-subtitle-text: ${theme.headerSubtitleTextColor};
+  --c-header-subtitle-font-size: ${theme.headerSubtitleFontSize};
   --c-progress-bg: ${theme.progressBarBgColor};
   --c-progress-text: ${theme.progressBarTextColor};
+  --c-progress-font-size: ${theme.progressBarFontSize};
   --c-chat-window-bg: ${theme.chatWindowBgColor};
   --c-bot-msg-bg: ${theme.botMessageBgColor};
   --c-bot-msg-text: ${theme.botMessageTextColor};
+  --c-bot-msg-font-size: ${theme.botMessageFontSize};
   --c-user-msg-bg: ${theme.userMessageBgColor};
   --c-user-msg-text: ${theme.userMessageTextColor};
+  --c-user-msg-font-size: ${theme.userMessageFontSize};
   --c-field-focus-border: ${theme.fieldFocusBorderColor};
   --c-field-focus-bg: ${theme.fieldFocusBgColor};
   --c-field-unfocus-border: ${theme.fieldUnfocusBorderColor};
@@ -117,10 +123,14 @@ ${scopeSelector} .theme-preview--btn-pressed.btn-new-bot {
 
   return `
 ${focusEffect.keyframesCss}
-${scopePrefix}.sp-header-left-label,
-${scopePrefix}.sp-header-left-label-title,
+${scopePrefix}.sp-header-left-label-title {
+  color: var(--c-header-title-text, #fff) !important;
+  font-size: var(--c-header-title-font-size, 15px) !important;
+}
+
 ${scopePrefix}.sp-header-left-label-sub-title {
-  color: var(--c-header-text, #fff) !important;
+  color: var(--c-header-subtitle-text, #fff) !important;
+  font-size: var(--c-header-subtitle-font-size, 14px) !important;
 }
 
 ${scopePrefix}.sp-process-bar {
@@ -129,6 +139,7 @@ ${scopePrefix}.sp-process-bar {
 
 ${scopePrefix}.sp-process-bar-color {
   color: var(--c-progress-text, #fff) !important;
+  font-size: var(--c-progress-font-size, 13px) !important;
 }
 
 ${scopeSelector ? `${scopeSelector} .sp-body` : '#sp-body.sp-body, .sp-body'} {
@@ -139,12 +150,14 @@ ${scopePrefix}.ss-bot-message__content-wrapper,
 ${scopePrefix}.ss-bot-message .ss-bot-message__content {
   background-color: var(--c-bot-msg-bg) !important;
   color: var(--c-bot-msg-text) !important;
+  font-size: var(--c-bot-msg-font-size, 14px) !important;
 }
 
 ${scopePrefix}.sp-body-user-side-messages .ss-user-message__content-wrapper,
 ${scopePrefix}.ss-user-message__content-wrapper {
   background-color: var(--c-user-msg-bg, #fff) !important;
   color: var(--c-user-msg-text, #333) !important;
+  font-size: var(--c-user-msg-font-size, 14px) !important;
 }
 
 ${fieldSelectors} {
