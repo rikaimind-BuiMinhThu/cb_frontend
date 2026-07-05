@@ -1,7 +1,7 @@
 import Dashboard from './views/Dashboard.jsx';
 import Chatbot from './views/InstagramBotElement/Chatbot';
 
-import ClientManagement from './views/ClientManagement';
+import ClientManagement from './views/ClientManagement/index';
 import PlanManagement from './views/PlanManagement';
 import Policy from './views/InstagramBotElement/Policy';
 import Release from './views/InstagramBotElement/Release';

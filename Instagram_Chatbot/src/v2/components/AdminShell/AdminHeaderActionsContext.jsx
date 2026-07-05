@@ -1,17 +1,18 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
-const AdminHeaderActionsContext = createContext(null);
+const AdminHeaderActionsStateContext = createContext(null);
+const AdminHeaderActionsDispatchContext = createContext(null);
 
 export function AdminHeaderActionsProvider({ children }) {
   const [actions, setActions] = useState(null);
 
-  const value = useMemo(() => ({ actions, setActions }), [actions]);
-
   return (
-    <AdminHeaderActionsContext.Provider value={value}>
-      {children}
-    </AdminHeaderActionsContext.Provider>
+    <AdminHeaderActionsDispatchContext.Provider value={setActions}>
+      <AdminHeaderActionsStateContext.Provider value={actions}>
+        {children}
+      </AdminHeaderActionsStateContext.Provider>
+    </AdminHeaderActionsDispatchContext.Provider>
   );
 }
 
@@ -20,15 +21,22 @@ AdminHeaderActionsProvider.propTypes = {
 };
 
 export function useAdminHeaderActionsContext() {
-  const context = useContext(AdminHeaderActionsContext);
-  if (!context) {
+  const setActions = useContext(AdminHeaderActionsDispatchContext);
+  const actions = useContext(AdminHeaderActionsStateContext);
+
+  if (!setActions) {
     throw new Error('useAdminHeaderActionsContext must be used within AdminHeaderActionsProvider');
   }
-  return context;
+
+  return { actions, setActions };
 }
 
 export function useAdminHeaderActions(actions) {
-  const { setActions } = useAdminHeaderActionsContext();
+  const setActions = useContext(AdminHeaderActionsDispatchContext);
+
+  if (!setActions) {
+    throw new Error('useAdminHeaderActions must be used within AdminHeaderActionsProvider');
+  }
 
   useEffect(() => {
     setActions(actions ?? null);
