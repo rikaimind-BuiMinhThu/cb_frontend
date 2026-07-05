@@ -23,6 +23,8 @@ import {
   MESSAGE_CONTENT_TYPES,
 } from '../PreviewComponent/Constants.jsx';
 import { getDefaultValue } from '../PreviewComponent/VariablesUtils';
+import { parseThemeSettings } from '../DesignSetting/utils/designThemeUtils';
+import { resolveMainColorContext } from '../DesignSetting/utils/designChatbotUtils';
 
 const PreviewFaqReducer = (state, action) => {
   switch (action.type) {
@@ -212,6 +214,7 @@ const PreviewFaqReducer = (state, action) => {
       const isOpenFromState = Boolean(state.isOpen);
       const isOpenFromAmazonPay = Boolean(action.payload.isUsingAmazonPay);
       const isEditorPreview = Boolean(action.payload.isEditorPreview);
+      const { apiColorKey, mainColorHex } = resolveMainColorContext(chatbot);
 
       let newState = {
         ...state,
@@ -251,7 +254,8 @@ const PreviewFaqReducer = (state, action) => {
         bottomBodyCustomJsCode: chatbot?.bottom_body_custom_js_code,
         isUsedCustomCss: !!chatbot?.is_used_custom_css,
         customCssContent: chatbot?.custom_css_content,
-        themeSettings: designSetting?.theme || null,
+        themeSettings: action.payload.themeSettings
+          ?? parseThemeSettings(designSetting?.theme, mainColorHex, apiColorKey),
         manuallyClosed: false,
         autoOpenAttempted: false,
       };

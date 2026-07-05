@@ -12,6 +12,7 @@ const CombineMessage = ({
   message,
   messageIndex,
   botInfor,
+  themeSettings,
   variables,
   previewOrderContent,
   executeLpJsCode,
@@ -61,6 +62,7 @@ const CombineMessage = ({
                     content={content}
                     contentIndex={contentIndex}
                     botInfor={botInfor}
+                    themeSettings={themeSettings}
                     previewOrderContent={previewOrderContent}
                     executeLpJsCode={executeLpJsCode}
                     variables={variables}

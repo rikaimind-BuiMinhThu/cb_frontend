@@ -654,6 +654,7 @@ const PreviewFaq = () => {
       payload: {
         responseData: res.data,
         botInfor: getBotInforFromPreviewResponse(res),
+        themeSettings: parsedDesign.themeSettings,
       },
     });
   }
@@ -905,6 +906,7 @@ const PreviewFaq = () => {
           botId={state.botId}
           isProcessing={!!state.isProcessing}
           botInfor={state.botInfor}
+          themeSettings={state.themeSettings}
           previewOrderContent={state.previewOrderContent}
           executeLpJsCode={(jsCode) => executeLpJsCode(jsCode, state)}
           isBotOpen={state.isOpen}

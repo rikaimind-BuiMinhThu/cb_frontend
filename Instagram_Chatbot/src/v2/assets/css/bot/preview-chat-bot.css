@@ -281,6 +281,10 @@
     border-radius: 20px;
 }
 
+.sp-body-bot-side-messages .ss-bot-chat-detail-content.ss-input-value {
+    font-size: var(--c-bot-msg-font-size, 14px);
+}
+
 .sp-user-message-button-action {
     display: flex;
     justify-content: flex-end;
@@ -1215,6 +1219,12 @@ slideUp
   left: -3px;
   width: 12px;
   height: 18px;
+}
+
+.sp-body-bot-side-messages .ss-bot-chat-text-input-bot-icon:has(svg),
+.sp-body-bot-side-messages .html-code-message-icon:has(svg) {
+  background-color: transparent !important;
+  background-image: none !important;
 }
 
 .ss-bot-prevent-exit-chatbot-modal {

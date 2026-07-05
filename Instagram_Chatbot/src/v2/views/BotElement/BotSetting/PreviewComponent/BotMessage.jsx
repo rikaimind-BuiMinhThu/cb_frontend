@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "assets/css/bot/preview-chat-bot.css";
 import messageTypingGif from "assets/img/icons8-dots-loading.gif";
 import { resolveIconUrl } from "../DesignSetting/utils/designChatbotUtils";
+import { resolveBotMessageTheme } from "../DesignSetting/utils/designThemeUtils";
 import "moment/locale/zh-cn";
 import { BOT_MESSAGE_TYPES, RENDER_CHATBOT_CONFIG } from "./Constants";
 import HtmlCodeMessagePreview from "components/BotMessages/HtmlCodeMessagePreview";
@@ -27,8 +28,8 @@ const BotMessage = ({
   isUseGlobalDelay = false,
   globalDelayTime = 1.0,
 }) => {
-  const botMessageBgColor = themeSettings?.botMessageBgColor || botInfor?.message_color || '#3CACEF';
-  const botMessageTextColor = themeSettings?.botMessageTextColor || botInfor?.font_color || '#fff';
+  const { bgColor: botMessageBgColor, textColor: botMessageTextColor, fontSize: botMessageFontSize } =
+    resolveBotMessageTheme(themeSettings, botInfor);
 
   const [isDelaying, setIsDelaying] = useState(true);
   const [text, setText] = useState("");
@@ -222,6 +223,7 @@ const BotMessage = ({
           style={{
             backgroundColor: botMessageBgColor,
             color: botMessageTextColor,
+            fontSize: botMessageFontSize,
           }}
           dangerouslySetInnerHTML={{__html: text}}
         >
@@ -229,8 +231,9 @@ const BotMessage = ({
         <div
           className="ss-bot-chat-text-input-bot-icon position-absolute"
           style={{
-            backgroundColor: botMessageBgColor,
-            background: botInfor?.icon_mess ? `url(${botInfor.icon_mess})` : undefined,
+            ...(botInfor?.icon_mess
+              ? { background: `url(${botInfor.icon_mess})` }
+              : {}),
           }}
         >
           {!botInfor?.icon_mess && (
@@ -297,6 +300,7 @@ const BotMessage = ({
           border: "none",
           borderRadius: "20px",
           color: botMessageTextColor,
+          fontSize: botMessageFontSize,
         }}
       ></textarea>
     );

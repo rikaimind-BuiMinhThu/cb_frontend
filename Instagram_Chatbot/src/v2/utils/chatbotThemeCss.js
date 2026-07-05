@@ -226,10 +226,6 @@ ${scopePrefix}.ss-bot-chat-text-input.ss-bot-chat-detail-content {
   border: none !important;
 }
 
-${scopePrefix}.ss-bot-chat-text-input-bot-icon {
-  background-color: var(--c-bot-msg-bg, #3CACEF) !important;
-}
-
 ${scopePrefix}.ss-bot-chat-text-input-bot-icon path {
   fill: var(--c-bot-msg-bg, #3CACEF) !important;
 }

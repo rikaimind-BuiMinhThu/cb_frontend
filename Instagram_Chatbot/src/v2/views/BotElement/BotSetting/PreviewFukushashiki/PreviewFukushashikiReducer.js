@@ -28,6 +28,8 @@ import {
   RENDER_MODES,
   MESSAGE_CONTENT_TYPES,
 } from '../PreviewComponent/Constants.jsx';
+import { parseThemeSettings } from '../DesignSetting/utils/designThemeUtils';
+import { resolveMainColorContext } from '../DesignSetting/utils/designChatbotUtils';
 import { getDefaultValue } from '../PreviewComponent/VariablesUtils';
 import { savedChatbotState } from '../PreviewComponent/SessionStorageUtils';
 import { convertToFukushashikiObject } from './FukushashikiDataConverterUtils';
@@ -409,6 +411,7 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
       const { variables, all_variables } = action.payload.responseData;
 
       const isEditorPreview = Boolean(action.payload.isEditorPreview);
+      const { apiColorKey, mainColorHex } = resolveMainColorContext(chatbot);
 
       let newState = {
         ...state,
@@ -460,7 +463,8 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
         isUseBtnUpdateTracking: !!conversation?.isUseBtnUpdateTracking,
         isUseGlobalDelay: conversation?.isUseGlobalDelay || false,
         globalDelayTime: conversation?.globalDelayTime ?? 1.0,
-        themeSettings: designSetting?.theme || null,
+        themeSettings: action.payload.themeSettings
+          ?? parseThemeSettings(designSetting?.theme, mainColorHex, apiColorKey),
         manuallyClosed: false,
         autoOpenAttempted: false,
       };

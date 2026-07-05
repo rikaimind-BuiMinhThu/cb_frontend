@@ -1,4 +1,5 @@
 import { COLOR_MAP } from '../constants/designChatbotConstants';
+import { resolveMainColorContext } from './designChatbotUtils';
 import {
   BORDER_TWINKLE_EFFECT_IDS,
   CAMEL_TO_SNAKE_THEME,
@@ -257,6 +258,16 @@ export const parseThemeSettings = (rawTheme, mainColorHex, apiColorKey) => merge
   mainColorHex,
   apiColorKey,
 );
+
+export const resolveBotMessageTheme = (themeSettings, botInfor) => {
+  const { apiColorKey, mainColorHex } = resolveMainColorContext(botInfor);
+  const theme = mergeThemeWithDefaults(themeSettings, mainColorHex, apiColorKey);
+  return {
+    bgColor: theme.botMessageBgColor,
+    textColor: theme.botMessageTextColor,
+    fontSize: theme.botMessageFontSize,
+  };
+};
 
 export const buildThemePayload = (themeSettings) => {
   const payload = {};

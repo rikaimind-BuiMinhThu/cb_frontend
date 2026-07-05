@@ -62,7 +62,7 @@ import {
 import { handleValidateField, ERROR_MESSAGES } from "../../PreviewFukushashiki/ValidationUtils";
 import { buildEditorDraftPreviewUpdate } from "./buildPreviewStateFromDraft";
 import { buildScenarioPreviewHeaderMeta } from "./buildScenarioPreviewHeaderMeta";
-import { resolveIconUrl } from "../../DesignSetting/utils/designChatbotUtils";
+import { resolveIconUrl, parseDesignSettings, resolveMainColorContext } from "../../DesignSetting/utils/designChatbotUtils";
 import {
   postToParent,
   SCENARIO_PREVIEW_MESSAGES,
@@ -694,6 +694,8 @@ const ScenarioPreviewFaq = ({
     const designSetting = res.data.design_settings;
     const chatbot = res.data.chatbot;
     const conversation = res.data.data?.conversation;
+    const { apiColorKey, mainColorHex } = resolveMainColorContext(chatbot);
+    const parsedDesign = parseDesignSettings(designSetting, mainColorHex, apiColorKey);
     const shouldAutoOpen = Number(designSetting?.display_type) === 1;
     const resolvedDisplayType = Number(designSetting?.display_type ?? state.displayType ?? 2);
     let newState = {
@@ -725,7 +727,7 @@ const ScenarioPreviewFaq = ({
       useFullWidthChatbotMobile: !!chatbot?.use_fullwidth_chatbot_mobile,
       isUsedCustomCss: !!chatbot?.is_used_custom_css,
       customCssContent: chatbot?.custom_css_content,
-      themeSettings: designSetting?.theme || null,
+      themeSettings: parsedDesign.themeSettings,
     };
 
     if (!editorPreview) {
@@ -752,6 +754,7 @@ const ScenarioPreviewFaq = ({
       payload: {
         responseData: res.data,
         botInfor: getBotInforFromPreviewResponse(res),
+        themeSettings: parsedDesign.themeSettings,
         isEditorPreview: editorPreview,
       },
     });
@@ -878,6 +881,7 @@ const ScenarioPreviewFaq = ({
         content={content}
         contentIndex={contentIndex}
         botInfor={state.botInfor}
+        themeSettings={state.themeSettings}
         previewOrderContent={state.previewOrderContent}
         executeLpJsCode={(jsCode) => executeLpJsCode(jsCode, state)}
         variables={state.variables}
@@ -1027,6 +1031,7 @@ const ScenarioPreviewFaq = ({
           botId={state.botId}
           isProcessing={!!state.isProcessing}
           botInfor={state.botInfor}
+          themeSettings={state.themeSettings}
           previewOrderContent={state.previewOrderContent}
           executeLpJsCode={(jsCode) => executeLpJsCode(jsCode, state)}
           isBotOpen={state.isOpen}

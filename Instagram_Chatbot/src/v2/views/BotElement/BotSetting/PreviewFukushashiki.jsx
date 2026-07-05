@@ -948,6 +948,7 @@ const PreviewFukushashiki = () => {
       payload: {
         responseData: res.data,
         botInfor: getBotInforFromPreviewResponse(res),
+        themeSettings: parsedDesign.themeSettings,
         isLoggedIn: isLoggedIn,
         isUsingAmazonPay: params.get('is_using_amazon_pay'),
       },
@@ -1314,6 +1315,7 @@ const PreviewFukushashiki = () => {
           botId={state.botId}
           isProcessing={!!state.isProcessing}
           botInfor={state.botInfor}
+          themeSettings={state.themeSettings}
           previewOrderContent={state.previewOrderContent}
           executeLpJsCode={(jsCode) => executeLpJsCode(jsCode, state)}
           isBotOpen={state.isOpen}

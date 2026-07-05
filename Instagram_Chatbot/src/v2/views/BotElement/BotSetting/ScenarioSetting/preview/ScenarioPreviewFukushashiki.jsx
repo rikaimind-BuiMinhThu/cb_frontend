@@ -88,7 +88,7 @@ import {
   calculateTimerConfigDuration,
   getTimerConfigVariable,
 } from "./timerPreviewUtils";
-import { resolveIconUrl } from "../../DesignSetting/utils/designChatbotUtils";
+import { resolveIconUrl, parseDesignSettings, resolveMainColorContext } from "../../DesignSetting/utils/designChatbotUtils";
 import {
   postToParent,
   SCENARIO_PREVIEW_MESSAGES,
@@ -972,6 +972,8 @@ const ScenarioPreviewFukushashiki = ({
     const designSetting = res.data.design_settings;
     const chatbot = res.data.chatbot;
     const conversation = res.data.data?.conversation;
+    const { apiColorKey, mainColorHex } = resolveMainColorContext(chatbot);
+    const parsedDesign = parseDesignSettings(designSetting, mainColorHex, apiColorKey);
     let newState = {
       ...state,
       botInfor: getBotInforFromPreviewResponse(res),
@@ -1015,7 +1017,7 @@ const ScenarioPreviewFukushashiki = ({
       bottomBodyCustomJsCode: chatbot?.bottom_body_custom_js_code,
       isUsedCustomCss: !!chatbot?.is_used_custom_css,
       customCssContent: chatbot?.custom_css_content,
-      themeSettings: designSetting?.theme || null,
+      themeSettings: parsedDesign.themeSettings,
     };
 
     if (chatbot?.timer_config?.enable) {
@@ -1047,6 +1049,7 @@ const ScenarioPreviewFukushashiki = ({
       payload: {
         responseData: res.data,
         botInfor: getBotInforFromPreviewResponse(res),
+        themeSettings: parsedDesign.themeSettings,
         isLoggedIn: isLoggedIn,
         isUsingAmazonPay: params.get('is_using_amazon_pay'),
         isEditorPreview: editorPreview,
@@ -1246,6 +1249,7 @@ const ScenarioPreviewFukushashiki = ({
         content={content}
         contentIndex={contentIndex}
         botInfor={state.botInfor}
+        themeSettings={state.themeSettings}
         previewOrderContent={state.previewOrderContent}
         executeLpJsCode={(jsCode) => executeLpJsCode(jsCode, state)}
         variables={state.variables}
@@ -1406,6 +1410,7 @@ const ScenarioPreviewFukushashiki = ({
           botId={state.botId}
           isProcessing={!!state.isProcessing}
           botInfor={state.botInfor}
+          themeSettings={state.themeSettings}
           previewOrderContent={state.previewOrderContent}
           executeLpJsCode={(jsCode) => executeLpJsCode(jsCode, state)}
           isBotOpen={state.isOpen}

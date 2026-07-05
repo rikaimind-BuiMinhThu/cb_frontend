@@ -3,17 +3,21 @@ import { BOT_MESSAGE_TYPES } from './Constants';
 import HtmlCodeMessagePreview from 'components/BotMessages/HtmlCodeMessagePreview';
 import AmazonPayButtonMessagePreview from 'components/BotMessages/AmazonPayButtonMessagePreview';
 import { replaceVariables } from './VariablesUtils';
+import { resolveBotMessageTheme } from '../DesignSetting/utils/designThemeUtils';
 import { buildOrderConfirmJs, buildOrderConfirmPreviewHtml } from '../ScenarioSetting/utils/OrderConfirmLpScriptGenerator';
 
 const CombineBotBlock = ({
   content,
   contentIndex,
   botInfor,
+  themeSettings,
   previewOrderContent,
   executeLpJsCode,
   variables,
   isBotOpen,
 }) => {
+  const { bgColor: botMessageBgColor, textColor: botMessageTextColor, fontSize: botMessageFontSize } =
+    resolveBotMessageTheme(themeSettings, botInfor);
   const [text, setText] = useState('');
 
   useEffect(() => {
@@ -79,8 +83,9 @@ const CombineBotBlock = ({
         <div
           className={`ss-combine-block-preview ss-combine-block-preview--bot ss-bot-chat-overview-${contentIndex}`}
           style={{
-            backgroundColor: botInfor?.message_color,
-            color: botInfor?.font_color,
+            backgroundColor: botMessageBgColor,
+            color: botMessageTextColor,
+            fontSize: botMessageFontSize,
           }}
           dangerouslySetInnerHTML={{ __html: text }}
         />
@@ -112,6 +117,7 @@ const CombineBotBlock = ({
           content={content}
           contentIndex={contentIndex}
           botInfor={botInfor}
+          themeSettings={themeSettings}
         />
       );
     case BOT_MESSAGE_TYPES.AMAZON_PAY_BUTTON:
@@ -120,6 +126,7 @@ const CombineBotBlock = ({
           content={content}
           contentIndex={contentIndex}
           botInfor={botInfor}
+          themeSettings={themeSettings}
         />
       );
     default:
