@@ -5,7 +5,7 @@ import { CopyOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import api from 'api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
-import { getAppPath, getEcChatBotFrontEndBaseUrl } from 'v2/variables/constants';
+import { getAdminRoutePath, getEcChatBotFrontEndBaseUrl } from 'v2/variables/constants';
 import { AdminPage, AdminFormRow, AdminActionButton, useAdminHeaderActions } from '../../../components/AdminShell';
 
 function InstallationTag() {
@@ -16,7 +16,7 @@ function InstallationTag() {
   const faqScript = `<script>sessionStorage.setItem("bot_id", "${botId}");sessionStorage.setItem("bot_type", "faq");</script>\n<script src="${getEcChatBotFrontEndBaseUrl()}/v2/sdk-faq.js" defer></script>`;
 
   useEffect(() => {
-    setUrlDemo(getAppPath('/v2/admin/demo-bot/' + botId));
+    setUrlDemo(getAdminRoutePath('/demo-bot/' + botId));
     api
       .get(`/api/v1/managements/chatbots/${botId}/get_scenario_selected`)
       .catch((err) => {

@@ -4,7 +4,7 @@ import { Input, List, Modal, Radio, Select, Space, Tag, message } from 'antd';
 import api from 'api/api-management';
 import Cookies from 'js-cookie';
 import moment from 'moment';
-import { getAppPath } from 'v2/variables/constants';
+import { getAdminRoutePath } from 'v2/variables/constants';
 import { AdminPage, AdminConfirmModal, AdminActionButton, useAdminHeaderActions } from '../../../../components/AdminShell';
 
 function ScenarioList() {
@@ -129,7 +129,7 @@ function ScenarioList() {
 
   const onClickPreview = (id) => {
     Cookies.set('scenario_id', id);
-    history.push(getAppPath(`/v2/admin/demo-bot/${id}`));
+    history.push(getAdminRoutePath(`/demo-bot/${id}`));
   };
 
   const onclickEditScenario = (id) => {
@@ -167,7 +167,7 @@ function ScenarioList() {
                 background: '#fff',
               }}
               actions={[
-                <Link to={getAppPath('/v2/admin/scenario-setting')} key="edit">
+                <Link to={getAdminRoutePath('/scenario-setting')} key="edit">
                   <AdminActionButton action="edit" onClick={() => onclickEditScenario(scenario.id)} />
                 </Link>,
                 <AdminActionButton key="preview" action="preview" onClick={() => onClickPreview(scenario.id)} />,
@@ -249,7 +249,7 @@ function ScenarioList() {
         danger
       />
 
-      <Link to={getAppPath('/v2/admin/scenario-setting')}>
+      <Link to={getAdminRoutePath('/scenario-setting')}>
         <button id="to_scenario" style={{ display: 'none' }} type="button">
           ScSetting
         </button>
