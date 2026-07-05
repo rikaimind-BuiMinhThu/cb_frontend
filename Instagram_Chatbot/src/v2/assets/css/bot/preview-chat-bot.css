@@ -1025,33 +1025,38 @@ slideUp
     display: block;
 }
 
+.fullwidth_mobile_chatbot .sp-header-left {
+  gap: 8px;
+  padding: 8px 12px;
+}
+
 .fullwidth_mobile_chatbot #comment_bubble {
-  width: calc(100% - 60px) !important;
+  width: clamp(160px, calc(100% - 120px), 310px);
   height: 46px;
   background: #fff;
   border-radius: 28px;
-  flex: 1 1 auto !important;
-    min-width: 0 !important;
-    width: clamp(240px, calc(100vw - 150px), 310px) !important;
-    margin-left: 0 !important;
+  flex: 0 1 auto;
+  min-width: 0;
+  margin-left: 0;
 }
 
 .fullwidth_mobile_chatbot #comment_bubble.sp-bubble {
-  max-width: none !important;
-  padding-left: 15px !important;
+  max-width: 310px;
+  padding: 0 15px;
   display: flex;
   align-items: center;
-  padding: 0 10px;
-  width: 160px;
-  height: 55px;
+  width: clamp(160px, calc(100% - 120px), 310px);
+  height: 46px;
+  margin-left: 0;
 }
 
 .fullwidth_mobile_chatbot #comment_bubble:before {
   content: "";
   width: 0;
   height: 0;
-  left: -5px !important;
-  top: 13px;
+  left: -5px;
+  top: 50%;
+  transform: translateY(-50%);
   position: absolute;
   border-top: 9px solid transparent;
   border-right: 14px solid #fff;
@@ -1061,7 +1066,7 @@ slideUp
 @media only screen and (max-device-width: 480px) {
   .fullwidth_mobile_chatbot body.is_mobile #comment_bubble.sp-bubble,
   .fullwidth_mobile_chatbot body.is_mobile #comment_bubble {
-    width: calc(100% - 60px) !important;
+    width: clamp(160px, calc(100% - 120px), 310px);
   }
 
   .fullwidth_mobile_chatbot .sp-container1.slideUpSp {

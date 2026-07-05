@@ -64,7 +64,7 @@ import _ from "lodash";
 import {
   setConversionParamToLocalStorage, postMessageToParent, executeLpJsCode, injectCustomJsCode
 } from "./PreviewFukushashiki/LPUtils";
-import { getClosedLauncherPosition } from "v2/utils/sdkLayoutUtils";
+import { getClosedBarWidth, getClosedLauncherPosition } from "v2/utils/sdkLayoutUtils";
 import { handleValidateField, ERROR_MESSAGES } from "./PreviewFukushashiki/ValidationUtils";
 
 const clearChatbotState = () => {
@@ -1079,7 +1079,7 @@ const PreviewFaq = () => {
         onClick={() => onOpenPreview(!state.isOpen)}
         style={{
           backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
-          width: `360px`,
+          width: getClosedBarWidth(state, false),
           height: "66px",
           borderRadius: '35px',
           display: "flex",
@@ -1163,18 +1163,17 @@ const PreviewFaq = () => {
         className={state.useFullWidthChatbotMobile ? "fullwidth_mobile_chatbot" : ""}
         style={{
           backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
-          width: state.useFullWidthChatbotMobile ? "calc(100vw - 30px)" : "240px",
+          width: getClosedBarWidth(state, true),
           height: state.useFullWidthChatbotMobile ? "75px" : "48px",
           borderRadius: state.useFullWidthChatbotMobile ? "45px" :'35px',
           display: "flex",
           justifyContent: "left",
+          alignItems: "center",
           position: 'fixed',
-          // Parent iframe already applies mobile right/bottom offsets.
-          bottom: '0px',
-          right: state.useFullWidthChatbotMobile ? "0px" : "0px",
+          ...getClosedLauncherPosition(state, { isMobile: true }),
         }}
       >
-        <div className="sp-header-left" style={{ width: '100%', padding: state.useFullWidthChatbotMobile ? "15px" : '4px' }}>
+        <div className="sp-header-left" style={{ width: '100%', padding: state.useFullWidthChatbotMobile ? undefined : '4px' }}>
           <div className={state.useFullWidthChatbotMobile ? "fullwidth_mobile_chatbot sp-header-left-avatar sp-avatar" :"sp-header-left-avatar sp-avatar"} style={{ width: state.useFullWidthChatbotMobile ? "58px"  :'38px' }}>
             <img
               src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
@@ -1205,9 +1204,7 @@ const PreviewFaq = () => {
           justifyContent: "left",
           position: 'fixed',
           transform: ' rotate(-90deg)',
-          // Keep vertical mode anchored to iframe close viewport.
-          bottom: '0px',
-          right: `${-120}px`,
+          ...getClosedLauncherPosition(state, { isMobile: true, variant: 'vertical' }),
         }}
       >
         <div className="sp-header-left">

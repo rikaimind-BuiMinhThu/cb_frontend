@@ -145,19 +145,50 @@ export const formatClosedIframeSize = (contentDimensions, horizontalRule, bottom
   };
 };
 
+export const getClosedBarWidth = (state, isMobile) => {
+  if (isMobile) {
+    if (state?.useFullWidthChatbotMobile) {
+      return state?.urlReceive ? 'calc(100% - 30px)' : 'calc(100vw - 30px)';
+    }
+    return '240px';
+  }
+  return '360px';
+};
+
 export const getClosedLauncherPosition = (state, options = {}) => {
   const isEmbedded = Boolean(state?.urlReceive);
-  const { variant = 'default' } = options;
+  const { variant = 'default', isMobile = false } = options;
 
   if (variant === 'vertical') {
-    const widthPc = toLayoutNumber(state?.widthPc, 450);
     if (isEmbedded) {
+      if (isMobile) {
+        return {
+          bottom: '0px',
+          right: '-120px',
+          left: 'auto',
+        };
+      }
+      const widthPc = toLayoutNumber(state?.widthPc, 450);
       return {
         bottom: `${widthPc / 2}px`,
         right: '-120px',
         left: 'auto',
       };
     }
+
+    if (isMobile) {
+      const widthSp = toLayoutNumber(state?.widthSp, 100);
+      const bottomMargin = toLayoutNumber(state?.bottomMarginSp, 0);
+      return {
+        bottom: bottomMargin
+          ? `${bottomMargin + widthSp / 2}px`
+          : '20px',
+        right: '-120px',
+        left: 'auto',
+      };
+    }
+
+    const widthPc = toLayoutNumber(state?.widthPc, 450);
     const bottomMargin = toLayoutNumber(state?.bottomMarginPc, 0);
     return {
       bottom: bottomMargin
@@ -169,7 +200,25 @@ export const getClosedLauncherPosition = (state, options = {}) => {
   }
 
   if (isEmbedded) {
+    if (isMobile && state?.useFullWidthChatbotMobile) {
+      return { bottom: '0px', left: '15px', right: 'auto' };
+    }
     return { bottom: '0px', right: '0px', left: 'auto' };
+  }
+
+  if (isMobile) {
+    if (state?.useFullWidthChatbotMobile) {
+      return {
+        bottom: state?.bottomMarginSp ? `${state.bottomMarginSp}px` : '10px',
+        right: '15px',
+        left: 'auto',
+      };
+    }
+    return {
+      bottom: state?.bottomMarginSp ? `${state.bottomMarginSp}px` : '10px',
+      right: state?.rightMarginSp ? `${state.rightMarginSp}px` : '10px',
+      left: 'auto',
+    };
   }
 
   return {

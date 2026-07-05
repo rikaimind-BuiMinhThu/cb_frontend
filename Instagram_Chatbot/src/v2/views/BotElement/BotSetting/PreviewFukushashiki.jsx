@@ -89,7 +89,7 @@ import { resolveErrMsgLpScript } from "./ScenarioSetting/utils/resolveErrMsgLpSc
 import { generateLaunchButtonLpScript } from "./ScenarioSetting/utils/launchButtonLpScriptUtils";
 import { convertToFukushashikiObject } from "./PreviewFukushashiki/FukushashikiDataConverterUtils";
 import { handleValidateField } from "./PreviewFukushashiki/ValidationUtils";
-import { getClosedLauncherPosition } from "v2/utils/sdkLayoutUtils";
+import { getClosedBarWidth, getClosedLauncherPosition } from "v2/utils/sdkLayoutUtils";
 import { createOrAddLinesCart } from "./ShopifyUtils";
 
 const clearChatbotState = () => {
@@ -1522,7 +1522,7 @@ const PreviewFukushashiki = () => {
         onClick={() => onOpenPreview(!state.isOpen)}
         style={{
           backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
-          width: `360px`,
+          width: getClosedBarWidth(state, false),
           height: "66px",
           borderRadius: '35px',
           display: "flex",
@@ -1587,8 +1587,7 @@ const PreviewFukushashiki = () => {
           alignItems: "center",
           justifyContent: "center",
           position: 'fixed',
-          bottom: state.bottomMarginSp ? `${state.bottomMarginSp}px` : '20px',
-          right: state.rightMarginSp ? `${state.rightMarginSp}px` : '20px',
+          ...getClosedLauncherPosition(state, { isMobile: true }),
         }}
       >
         <img
@@ -1598,24 +1597,24 @@ const PreviewFukushashiki = () => {
         />
       </div>
     )
-  } else if (isMobile() === true && Number(state.positionSp) === 1 && Number(state.buttonTypeSp) === 1) {
+  } else if (!state.isOpen && isMobile() === true && Number(state.positionSp) === 1 && Number(state.buttonTypeSp) === 1) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
         className={state.useFullWidthChatbotMobile ? "fullwidth_mobile_chatbot" : ""}
         style={{
           backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
-          width: state.useFullWidthChatbotMobile ? "calc(100vw - 30px)" : "240px",
+          width: getClosedBarWidth(state, true),
           height: state.useFullWidthChatbotMobile ? "75px" : "48px",
           borderRadius: state.useFullWidthChatbotMobile ? "45px" :'35px',
           display: "flex",
           justifyContent: "left",
+          alignItems: "center",
           position: 'fixed',
-          bottom: state.bottomMarginSp ? `${state.bottomMarginSp}px` : '10px',
-          right: (state.useFullWidthChatbotMobile) ? "15px" : (state.rightMarginSp ? `${state.rightMarginSp}px` : '10px')
+          ...getClosedLauncherPosition(state, { isMobile: true }),
         }}
       >
-        <div className="sp-header-left" style={{ width: '100%', padding: state.useFullWidthChatbotMobile ? "15px" : '4px' }}>
+        <div className="sp-header-left" style={{ width: '100%', padding: state.useFullWidthChatbotMobile ? undefined : '4px' }}>
           <div className={state.useFullWidthChatbotMobile ? "fullwidth_mobile_chatbot sp-header-left-avatar sp-avatar" :"sp-header-left-avatar sp-avatar"} style={{ width: state.useFullWidthChatbotMobile ? "58px" : '38px' }}>
             <img
               src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
@@ -1633,7 +1632,7 @@ const PreviewFukushashiki = () => {
         </div>
       </div>
     )
-  } else if (isMobile() === true && Number(state.positionSp) === 2) {
+  } else if (!state.isOpen && isMobile() === true && Number(state.positionSp) === 2) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -1646,8 +1645,7 @@ const PreviewFukushashiki = () => {
           justifyContent: "left",
           position: 'fixed',
           transform: ' rotate(-90deg)',
-          bottom: state.bottomMarginSp ? `${parseInt(state.bottomMarginSp) + state.widthPc / 2}px` : '20px',
-          right: `${-120}px`,
+          ...getClosedLauncherPosition(state, { isMobile: true, variant: 'vertical' }),
         }}
       >
         <div className="sp-header-left">

@@ -4,6 +4,7 @@ import {
   computeOpenIframeSize,
   formatClosedIframeSize,
   getClosedIframeDimensions,
+  getClosedBarWidth,
   getClosedLauncherPosition,
 } from './sdkLayoutUtils';
 
@@ -139,6 +140,71 @@ describe('sdkLayoutUtils', () => {
         right: '-120px',
         left: 'auto',
       });
+    });
+
+    it('anchors embedded mobile launchers to iframe edges', () => {
+      expect(getClosedLauncherPosition({
+        urlReceive: 'https://example.com',
+        bottomMarginSp: 15,
+        rightMarginSp: 20,
+      }, { isMobile: true })).toEqual({
+        bottom: '0px',
+        right: '0px',
+        left: 'auto',
+      });
+    });
+
+    it('insets embedded fullwidth mobile bar within iframe', () => {
+      expect(getClosedLauncherPosition({
+        urlReceive: 'https://example.com',
+        useFullWidthChatbotMobile: true,
+      }, { isMobile: true })).toEqual({
+        bottom: '0px',
+        left: '15px',
+        right: 'auto',
+      });
+    });
+
+    it('applies SP margins in standalone mobile preview', () => {
+      expect(getClosedLauncherPosition({
+        bottomMarginSp: 12,
+        rightMarginSp: 8,
+      }, { isMobile: true })).toEqual({
+        bottom: '12px',
+        right: '8px',
+        left: 'auto',
+      });
+    });
+
+    it('anchors embedded mobile vertical tab to iframe bottom', () => {
+      expect(getClosedLauncherPosition({
+        urlReceive: 'https://example.com',
+        bottomMarginSp: 10,
+        widthSp: 90,
+      }, { isMobile: true, variant: 'vertical' })).toEqual({
+        bottom: '0px',
+        right: '-120px',
+        left: 'auto',
+      });
+    });
+  });
+
+  describe('getClosedBarWidth', () => {
+    it('returns iframe-relative width for embedded fullwidth mobile bar', () => {
+      expect(getClosedBarWidth({
+        urlReceive: 'https://example.com',
+        useFullWidthChatbotMobile: true,
+      }, true)).toBe('calc(100% - 30px)');
+    });
+
+    it('returns viewport width for standalone fullwidth mobile bar', () => {
+      expect(getClosedBarWidth({
+        useFullWidthChatbotMobile: true,
+      }, true)).toBe('calc(100vw - 30px)');
+    });
+
+    it('returns compact mobile bar width', () => {
+      expect(getClosedBarWidth({}, true)).toBe('240px');
     });
   });
 
