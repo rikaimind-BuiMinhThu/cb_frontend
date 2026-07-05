@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Collapse } from 'antd';
+import { BORDER_TWINKLE_EFFECT_OPTIONS } from '../constants/designThemeConstants';
 import { getDesignSettingTooltip } from '../constants/designSettingTooltips';
+import { normalizeBorderTwinkleEffect } from '../utils/designThemeUtils';
 import MainColorPicker from './MainColorPicker';
 import ThemeColorField from './ThemeColorField';
 import ThemeEffectSelectField from './ThemeEffectSelectField';
@@ -26,7 +28,7 @@ const ThemeAccordionSection = ({
   showReset,
 }) => {
   const renderField = (field, index) => {
-    const { key, label, isText, fieldType, fullWidth } = field;
+    const { key, label, isText, fieldType, fullWidth, effectOptions } = field;
 
     if (fieldType === 'groupLabel') {
       return (
@@ -65,6 +67,8 @@ const ThemeAccordionSection = ({
     const fieldClassSuffix = isHighlighted ? ' theme-field--highlighted' : '';
 
     if (fieldType === 'effectSelect') {
+      const isBorderTwinkle = effectOptions === 'borderTwinkle';
+
       return (
         <div key={key} className={fieldClassSuffix}>
           <ThemeEffectSelectField
@@ -72,6 +76,8 @@ const ThemeAccordionSection = ({
             value={themeSettings[key]}
             fullWidth={fullWidth ?? false}
             tooltipKey={key}
+            options={isBorderTwinkle ? BORDER_TWINKLE_EFFECT_OPTIONS : undefined}
+            normalizeValue={isBorderTwinkle ? normalizeBorderTwinkleEffect : undefined}
             onChange={(value) => onFieldChange(key, value)}
           />
         </div>

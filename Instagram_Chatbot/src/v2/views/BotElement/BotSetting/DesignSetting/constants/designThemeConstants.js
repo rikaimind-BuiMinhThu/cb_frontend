@@ -6,9 +6,17 @@ export const FIELD_FOCUS_EFFECT_OPTIONS = [
   { id: 'outline_strong', label: 'アウトライン（強）' },
   { id: 'border_fade', label: '枠線フェード' },
   { id: 'border_pulse', label: '枠線パルス' },
+  { id: 'border_twinkle', label: '枠線きらきら' },
 ];
 
 export const FIELD_FOCUS_EFFECT_IDS = FIELD_FOCUS_EFFECT_OPTIONS.map(({ id }) => id);
+
+export const BORDER_TWINKLE_EFFECT_OPTIONS = [
+  { id: 'none', label: 'なし' },
+  { id: 'twinkle', label: '枠線きらきら' },
+];
+
+export const BORDER_TWINKLE_EFFECT_IDS = BORDER_TWINKLE_EFFECT_OPTIONS.map(({ id }) => id);
 
 export const THEME_FIELD_KEYS = [
   'headerTitleTextColor',
@@ -40,10 +48,12 @@ export const THEME_FIELD_KEYS = [
   'checkboxUncheckedBorderColor',
   'checkboxCheckedBgColor',
   'checkboxCheckedBorderColor',
+  'checkboxCheckedBorderEffect',
   'radioUnselectedBgColor',
   'radioSelectedBgColor',
   'radioUnselectedBorderColor',
   'radioSelectedBorderColor',
+  'radioSelectedBorderEffect',
   'radioInputUnselectedColor',
   'radioInputSelectedColor',
   'errorMessageBgColor',
@@ -150,6 +160,13 @@ export const THEME_SECTIONS = [
       { fieldType: 'groupLabel', label: '選択時', fullWidth: true },
       { key: 'checkboxCheckedBgColor', label: '背景色' },
       { key: 'checkboxCheckedBorderColor', label: '枠線色' },
+      {
+        key: 'checkboxCheckedBorderEffect',
+        label: '効果',
+        fieldType: 'effectSelect',
+        effectOptions: 'borderTwinkle',
+        fullWidth: true,
+      },
     ],
   },
   {
@@ -162,6 +179,13 @@ export const THEME_SECTIONS = [
       { fieldType: 'groupLabel', label: '選択時', fullWidth: true },
       { key: 'radioSelectedBgColor', label: '背景色' },
       { key: 'radioSelectedBorderColor', label: '枠線色' },
+      {
+        key: 'radioSelectedBorderEffect',
+        label: '効果',
+        fieldType: 'effectSelect',
+        effectOptions: 'borderTwinkle',
+        fullWidth: true,
+      },
       { fieldType: 'groupLabel', label: 'input', fullWidth: true },
       { key: 'radioInputUnselectedColor', label: '未選択スタイル' },
       { key: 'radioInputSelectedColor', label: '選択時スタイル' },
@@ -210,10 +234,12 @@ export const CAMEL_TO_SNAKE_THEME = {
   checkboxUncheckedBorderColor: 'checkbox_unchecked_border_color',
   checkboxCheckedBgColor: 'checkbox_checked_bg_color',
   checkboxCheckedBorderColor: 'checkbox_checked_border_color',
+  checkboxCheckedBorderEffect: 'checkbox_checked_border_effect',
   radioUnselectedBgColor: 'radio_unselected_bg_color',
   radioSelectedBgColor: 'radio_selected_bg_color',
   radioUnselectedBorderColor: 'radio_unselected_border_color',
   radioSelectedBorderColor: 'radio_selected_border_color',
+  radioSelectedBorderEffect: 'radio_selected_border_effect',
   radioInputUnselectedColor: 'radio_input_unselected_color',
   radioInputSelectedColor: 'radio_input_selected_color',
   errorMessageBgColor: 'error_message_bg_color',

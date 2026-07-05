@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Checkbox } from 'antd';
 import ThemePreviewShell from './ThemePreviewShell';
 import PreviewRegion from './PreviewRegion';
 
@@ -129,9 +128,24 @@ const ThemeCustomizePreview = ({
       activeSectionId={activeSectionId}
       onSectionSelect={onSectionSelect}
     >
-      <div className="theme-customize-preview__checkbox-group">
-        <Checkbox>未チェック</Checkbox>
-        <Checkbox defaultChecked>チェック済み</Checkbox>
+      <div className="theme-customize-preview__checkbox-group ss-message__content--user-checkbox-wrapper">
+        <div className="ss-message__content--user-checkbox theme-customize-preview__checkbox-option">
+          <input
+            type="checkbox"
+            readOnly
+            id="theme-preview-checkbox-unchecked"
+          />
+          <label htmlFor="theme-preview-checkbox-unchecked">未チェック</label>
+        </div>
+        <div className="ss-message__content--user-checkbox ss-message__content--user-checkbox--selected theme-customize-preview__checkbox-option">
+          <input
+            type="checkbox"
+            defaultChecked
+            readOnly
+            id="theme-preview-checkbox-checked"
+          />
+          <label htmlFor="theme-preview-checkbox-checked">チェック済み</label>
+        </div>
       </div>
     </PreviewUserMessage>
 

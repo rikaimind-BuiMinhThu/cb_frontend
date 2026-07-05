@@ -1,17 +1,18 @@
 import { CAMEL_TO_SNAKE_THEME } from '../views/BotElement/BotSetting/DesignSetting/constants/designThemeConstants';
 import {
   mergeThemeWithDefaults,
+  resolveBorderTwinkleEffect,
   resolveFieldFocusEffect,
 } from '../views/BotElement/BotSetting/DesignSetting/utils/designThemeUtils';
 
 const buildFieldSelectors = (spBodySelector) => `
-${spBodySelector} input[type="text"],
-${spBodySelector} input[type="email"],
-${spBodySelector} input[type="tel"],
-${spBodySelector} input[type="number"],
-${spBodySelector} input[type="password"],
-${spBodySelector} textarea,
-${spBodySelector} select,
+${spBodySelector} input[type="text"]:not(.theme-preview--field-focus),
+${spBodySelector} input[type="email"]:not(.theme-preview--field-focus),
+${spBodySelector} input[type="tel"]:not(.theme-preview--field-focus),
+${spBodySelector} input[type="number"]:not(.theme-preview--field-focus),
+${spBodySelector} input[type="password"]:not(.theme-preview--field-focus),
+${spBodySelector} textarea:not(.theme-preview--field-focus),
+${spBodySelector} select:not(.theme-preview--field-focus),
 ${spBodySelector} .ss-input-value,
 ${spBodySelector} .ant-select-selector
 `.trim();
@@ -75,24 +76,35 @@ const buildFieldFocusStyles = (fieldFocusSelectors, focusEffect, previewFocusSel
   const animationRule = focusEffect.focusAnimation !== 'none'
     ? `animation: ${focusEffect.focusAnimation};`
     : '';
+  const focusBorderRule = focusEffect.useFocusBorderShorthand
+    ? 'border: 1px solid var(--c-field-focus-border, #327AED) !important;'
+    : 'border-color: var(--c-field-focus-border, #327AED) !important;';
+  const boxShadowRule = focusEffect.useAnimatedBoxShadow
+    ? ''
+    : `box-shadow: ${focusEffect.boxShadow} !important;`;
 
   const focusRules = `
 ${fieldFocusSelectors} {
-  border-color: var(--c-field-focus-border, #327AED) !important;
+  ${focusBorderRule}
   background-color: var(--c-field-focus-bg, #fff) !important;
-  box-shadow: ${focusEffect.boxShadow} !important;
+  ${boxShadowRule}
   ${animationRule}
 }`;
 
   const previewRules = previewFocusSelector ? `
 ${previewFocusSelector} {
-  border-color: var(--c-field-focus-border, #327AED) !important;
+  ${focusBorderRule}
   background-color: var(--c-field-focus-bg, #fff) !important;
-  box-shadow: ${focusEffect.boxShadow} !important;
+  ${boxShadowRule}
   ${animationRule}
 }` : '';
 
   return { transitionRule, focusRules, previewRules };
+};
+
+const buildTwinkleAnimationRule = (effectId, elementType) => {
+  const { animation } = resolveBorderTwinkleEffect(effectId, elementType);
+  return animation !== 'none' ? `animation: ${animation};` : '';
 };
 
 const buildThemeRules = (theme, scopeSelector = '') => {
@@ -101,12 +113,38 @@ const buildThemeRules = (theme, scopeSelector = '') => {
   const fieldSelectors = buildFieldSelectors(spBodySelector);
   const fieldFocusSelectors = buildFieldFocusSelectors(spBodySelector);
   const focusEffect = resolveFieldFocusEffect(theme.fieldFocusBgEffect, theme);
-  const previewFocusSelector = scopeSelector ? `${scopeSelector} .theme-preview--field-focus` : '';
+  const previewFocusSelector = scopeSelector
+    ? `${spBodySelector} input.theme-customize-preview__field.theme-preview--field-focus, ${spBodySelector} select.theme-customize-preview__field.theme-preview--field-focus, ${spBodySelector} textarea.theme-customize-preview__field.theme-preview--field-focus`
+    : '';
   const { transitionRule, focusRules, previewRules } = buildFieldFocusStyles(
     fieldFocusSelectors,
     focusEffect,
     previewFocusSelector,
   );
+
+  const checkboxTwinkleAnimation = buildTwinkleAnimationRule(
+    theme.checkboxCheckedBorderEffect,
+    'checkbox',
+  );
+  const radioTwinkleAnimation = buildTwinkleAnimationRule(
+    theme.radioSelectedBorderEffect,
+    'radio',
+  );
+
+  const checkboxTwinkleKeyframes = resolveBorderTwinkleEffect(
+    theme.checkboxCheckedBorderEffect,
+    'checkbox',
+  ).keyframesCss;
+  const radioTwinkleKeyframes = resolveBorderTwinkleEffect(
+    theme.radioSelectedBorderEffect,
+    'radio',
+  ).keyframesCss;
+
+  const twinkleKeyframesCss = [...new Set([
+    focusEffect.keyframesCss,
+    checkboxTwinkleKeyframes,
+    radioTwinkleKeyframes,
+  ].filter(Boolean))].join('\n');
 
   const submitBtnSelector = scopeSelector
     ? `${scopeSelector} #chatbot-submit-button, ${scopeSelector} .chatbot-submit-button, ${scopeSelector} [id^="chatbot-submit-button-"]`
@@ -122,7 +160,7 @@ ${scopeSelector} .theme-preview--btn-pressed.btn-new-bot {
 }` : '';
 
   return `
-${focusEffect.keyframesCss}
+${twinkleKeyframesCss}
 ${scopePrefix}.sp-header-left-label-title {
   color: var(--c-header-title-text, #fff) !important;
   font-size: var(--c-header-title-font-size, 15px) !important;
@@ -193,6 +231,20 @@ ${spBodySelector} .ant-checkbox-checked .ant-checkbox-inner {
   border-color: var(--c-checkbox-checked-border) !important;
 }
 
+${spBodySelector} .ss-message__content--user-checkbox {
+  background-color: var(--c-checkbox-unchecked-bg, #fff) !important;
+  border: 1px solid var(--c-checkbox-unchecked-border, #ccc) !important;
+}
+
+${spBodySelector} .ss-message__content--user-checkbox--selected,
+${spBodySelector} .ss-message__content--user-checkbox:has(input[type="checkbox"]:checked),
+${spBodySelector} .ss-message__content--user-checkbox--checkbox_img-item.ss-message__content--user-checkbox--selected,
+${spBodySelector} .ss-message__content--user-checkbox--checkbox_img-item:has(input[type="checkbox"]:checked) {
+  background-color: var(--c-checkbox-checked-bg) !important;
+  border-color: var(--c-checkbox-checked-border) !important;
+  ${checkboxTwinkleAnimation}
+}
+
 ${spBodySelector} .ss-message__content--user-radio_button,
 ${scopePrefix}.theme-customize-preview__radio-default {
   background-color: var(--c-radio-unselected-bg, #ebf7ff) !important;
@@ -204,6 +256,7 @@ ${spBodySelector} .ss-message__content--user-radio_button:has(input[type="radio"
 ${scopePrefix}.theme-customize-preview__radio-default--selected {
   background-color: var(--c-radio-selected-bg, #ebf7ff) !important;
   border-color: var(--c-radio-selected-border, transparent) !important;
+  ${radioTwinkleAnimation}
 }
 
 ${spBodySelector} .ss-message__content--user-radio_button--radio_button_img {
@@ -216,6 +269,7 @@ ${spBodySelector} .ss-message__content--user-radio_button--radio_button_img:has(
 ${scopePrefix}.theme-customize-preview__radio-img--selected {
   background-color: var(--c-radio-selected-bg, transparent) !important;
   border-color: var(--c-radio-selected-border, transparent) !important;
+  ${radioTwinkleAnimation}
 }
 
 ${spBodySelector} .ss-message__content--user-radio_button:not(.ss-message__content--user-radio_button--radio_button_img) input[type="radio"],

@@ -426,6 +426,23 @@
   gap: 8px;
 }
 
+.theme-customize-preview__checkbox-option {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.theme-customize-preview__checkbox-option label {
+  margin: 0 0 0 8px;
+}
+
+.theme-customize-preview__checkbox-option input[type="checkbox"] {
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+}
+
 .theme-customize-preview__radio-default {
   display: flex;
   align-items: center;

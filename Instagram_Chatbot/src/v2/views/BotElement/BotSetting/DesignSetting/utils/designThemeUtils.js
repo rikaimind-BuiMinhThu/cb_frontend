@@ -1,11 +1,60 @@
 import { COLOR_MAP } from '../constants/designChatbotConstants';
 import {
+  BORDER_TWINKLE_EFFECT_IDS,
   CAMEL_TO_SNAKE_THEME,
   FIELD_FOCUS_EFFECT_IDS,
   THEME_FIELD_KEYS,
 } from '../constants/designThemeConstants';
 
 const VALID_EFFECT_IDS = new Set(FIELD_FOCUS_EFFECT_IDS);
+const VALID_BORDER_TWINKLE_IDS = new Set(BORDER_TWINKLE_EFFECT_IDS);
+
+const FIELD_BORDER_TWINKLE_KEYFRAMES = `
+@keyframes themeFieldBorderTwinkle {
+  0%, 100% { box-shadow: 0 0 0 2px var(--c-field-focus-border, #327AED); }
+  50% { box-shadow: 0 0 0 2px transparent; }
+}`;
+
+const CHECKBOX_BORDER_TWINKLE_KEYFRAMES = `
+@keyframes themeCheckboxBorderTwinkle {
+  0%, 100% { box-shadow: 0 0 0 1px var(--c-checkbox-checked-border); }
+  50% { box-shadow: 0 0 0 1px transparent; }
+}`;
+
+const RADIO_BORDER_TWINKLE_KEYFRAMES = `
+@keyframes themeRadioBorderTwinkle {
+  0%, 100% { box-shadow: 0 0 0 1px var(--c-radio-selected-border, transparent); }
+  50% { box-shadow: 0 0 0 1px transparent; }
+}`;
+
+const TWINKLE_KEYFRAMES_BY_ELEMENT = {
+  field: FIELD_BORDER_TWINKLE_KEYFRAMES,
+  checkbox: CHECKBOX_BORDER_TWINKLE_KEYFRAMES,
+  radio: RADIO_BORDER_TWINKLE_KEYFRAMES,
+};
+
+const TWINKLE_ANIMATION_BY_ELEMENT = {
+  field: 'themeFieldBorderTwinkle 1.2s ease-in-out infinite',
+  checkbox: 'themeCheckboxBorderTwinkle 1.2s ease-in-out infinite',
+  radio: 'themeRadioBorderTwinkle 1.2s ease-in-out infinite',
+};
+
+export const normalizeBorderTwinkleEffect = (value) => {
+  if (!value) return 'none';
+  if (VALID_BORDER_TWINKLE_IDS.has(value)) return value;
+  return 'none';
+};
+
+export const resolveBorderTwinkleEffect = (effectId, elementType) => {
+  if (normalizeBorderTwinkleEffect(effectId) !== 'twinkle') {
+    return { animation: 'none', keyframesCss: '' };
+  }
+
+  return {
+    animation: TWINKLE_ANIMATION_BY_ELEMENT[elementType] || 'none',
+    keyframesCss: TWINKLE_KEYFRAMES_BY_ELEMENT[elementType] || '',
+  };
+};
 
 const isLegacyFocusEffectValue = (value) => typeof value === 'string' && (
   value.includes('px')
@@ -78,6 +127,15 @@ export const resolveFieldFocusEffect = (effectId, theme) => {
   50% { border-color: var(--c-field-focus-border, #327AED); }
 }`,
       };
+    case 'border_twinkle':
+      return {
+        boxShadow: 'none',
+        fieldTransition: 'none',
+        focusAnimation: TWINKLE_ANIMATION_BY_ELEMENT.field,
+        keyframesCss: FIELD_BORDER_TWINKLE_KEYFRAMES,
+        useFocusBorderShorthand: true,
+        useAnimatedBoxShadow: true,
+      };
     case 'outline_soft':
     default:
       return {
@@ -135,10 +193,12 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
     checkboxUncheckedBorderColor: '#cccccc',
     checkboxCheckedBgColor: mainColorHex,
     checkboxCheckedBorderColor: mainColorHex,
+    checkboxCheckedBorderEffect: 'none',
     radioUnselectedBgColor: opacityColor,
     radioSelectedBgColor: lightenHex(mainColorHex, 0.15) || opacityColor,
     radioUnselectedBorderColor: 'transparent',
     radioSelectedBorderColor: mainColorHex,
+    radioSelectedBorderEffect: 'none',
     radioInputUnselectedColor: '#cccccc',
     radioInputSelectedColor: mainColorHex,
     errorMessageBgColor: '#ffebee',
@@ -168,6 +228,12 @@ export const mergeThemeWithDefaults = (rawTheme, mainColorHex, apiColorKey) => {
   });
 
   merged.fieldFocusBgEffect = normalizeFieldFocusEffect(merged.fieldFocusBgEffect);
+  merged.checkboxCheckedBorderEffect = normalizeBorderTwinkleEffect(
+    merged.checkboxCheckedBorderEffect,
+  );
+  merged.radioSelectedBorderEffect = normalizeBorderTwinkleEffect(
+    merged.radioSelectedBorderEffect,
+  );
 
   const legacyHeaderColor = rawTheme.headerTextColor ?? rawTheme.header_text_color;
   if (legacyHeaderColor) {
@@ -195,6 +261,12 @@ export const buildThemePayload = (themeSettings) => {
     let value = themeSettings[key];
     if (key === 'fieldFocusBgEffect' && value) {
       value = normalizeFieldFocusEffect(value);
+    }
+    if (key === 'checkboxCheckedBorderEffect' && value) {
+      value = normalizeBorderTwinkleEffect(value);
+    }
+    if (key === 'radioSelectedBorderEffect' && value) {
+      value = normalizeBorderTwinkleEffect(value);
     }
     if (value !== undefined && value !== '') {
       payload[snakeKey] = value;
