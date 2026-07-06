@@ -10,34 +10,47 @@ import {
 const VALID_EFFECT_IDS = new Set(FIELD_FOCUS_EFFECT_IDS);
 const VALID_BORDER_TWINKLE_IDS = new Set(BORDER_TWINKLE_EFFECT_IDS);
 
-const FIELD_BORDER_TWINKLE_KEYFRAMES = `
-@keyframes themeFieldBorderTwinkle {
-  0%, 100% { box-shadow: 0 0 0 2px var(--c-field-focus-border, #327AED); }
-  50% { box-shadow: 0 0 0 2px transparent; }
-}`;
-
-const CHECKBOX_BORDER_TWINKLE_KEYFRAMES = `
-@keyframes themeCheckboxBorderTwinkle {
-  0%, 100% { box-shadow: 0 0 0 1px var(--c-checkbox-checked-border); }
-  50% { box-shadow: 0 0 0 1px transparent; }
-}`;
-
-const RADIO_BORDER_TWINKLE_KEYFRAMES = `
-@keyframes themeRadioBorderTwinkle {
-  0%, 100% { box-shadow: 0 0 0 1px var(--c-radio-selected-border, transparent); }
-  50% { box-shadow: 0 0 0 1px transparent; }
-}`;
-
-const TWINKLE_KEYFRAMES_BY_ELEMENT = {
-  field: FIELD_BORDER_TWINKLE_KEYFRAMES,
-  checkbox: CHECKBOX_BORDER_TWINKLE_KEYFRAMES,
-  radio: RADIO_BORDER_TWINKLE_KEYFRAMES,
-};
-
 const TWINKLE_ANIMATION_BY_ELEMENT = {
   field: 'themeFieldBorderTwinkle 1.2s ease-in-out infinite',
   checkbox: 'themeCheckboxBorderTwinkle 1.2s ease-in-out infinite',
   radio: 'themeRadioBorderTwinkle 1.2s ease-in-out infinite',
+};
+
+export const buildFieldBorderTwinkleKeyframes = (focusBorderColor = '#327AED') => `
+@keyframes themeFieldBorderTwinkle {
+  0%, 100% { box-shadow: 0 0 0 2px ${focusBorderColor}; }
+  50% { box-shadow: 0 0 0 2px transparent; }
+}`;
+
+export const buildFieldBorderPulseKeyframes = (unfocusBorderColor = '#cccccc', focusBorderColor = '#327AED') => `
+@keyframes themeFieldBorderPulse {
+  0%, 100% { border-color: ${unfocusBorderColor}; }
+  50% { border-color: ${focusBorderColor}; }
+}`;
+
+export const buildCheckboxBorderTwinkleKeyframes = (checkedBorderColor = '#327AED') => `
+@keyframes themeCheckboxBorderTwinkle {
+  0%, 100% { box-shadow: 0 0 0 1px ${checkedBorderColor}; }
+  50% { box-shadow: 0 0 0 1px transparent; }
+}`;
+
+export const buildRadioBorderTwinkleKeyframes = (selectedBorderColor = '#327AED') => `
+@keyframes themeRadioBorderTwinkle {
+  0%, 100% { box-shadow: 0 0 0 1px ${selectedBorderColor}; }
+  50% { box-shadow: 0 0 0 1px transparent; }
+}`;
+
+const buildTwinkleKeyframesForElement = (elementType, theme) => {
+  switch (elementType) {
+    case 'field':
+      return buildFieldBorderTwinkleKeyframes(theme.fieldFocusBorderColor || '#327AED');
+    case 'checkbox':
+      return buildCheckboxBorderTwinkleKeyframes(theme.checkboxCheckedBorderColor || '#327AED');
+    case 'radio':
+      return buildRadioBorderTwinkleKeyframes(theme.radioSelectedBorderColor || '#327AED');
+    default:
+      return '';
+  }
 };
 
 export const normalizeBorderTwinkleEffect = (value) => {
@@ -46,14 +59,16 @@ export const normalizeBorderTwinkleEffect = (value) => {
   return 'none';
 };
 
-export const resolveBorderTwinkleEffect = (effectId, elementType) => {
+export const resolveBorderTwinkleEffect = (effectId, elementType, theme = null) => {
   if (normalizeBorderTwinkleEffect(effectId) !== 'twinkle') {
     return { animation: 'none', keyframesCss: '' };
   }
 
   return {
     animation: TWINKLE_ANIMATION_BY_ELEMENT[elementType] || 'none',
-    keyframesCss: TWINKLE_KEYFRAMES_BY_ELEMENT[elementType] || '',
+    keyframesCss: theme
+      ? buildTwinkleKeyframesForElement(elementType, theme)
+      : buildTwinkleKeyframesForElement(elementType, deriveThemeDefaults()),
   };
 };
 
@@ -65,6 +80,7 @@ const isLegacyFocusEffectValue = (value) => typeof value === 'string' && (
 
 export const normalizeFieldFocusEffect = (value) => {
   if (!value) return 'outline_soft';
+  if (value === 'twinkle') return 'border_twinkle';
   if (VALID_EFFECT_IDS.has(value)) return value;
   if (isLegacyFocusEffectValue(value)) return 'outline_soft';
   return 'outline_soft';
@@ -93,6 +109,7 @@ const lightenHex = (hex, amount = 0.1) => {
 export const resolveFieldFocusEffect = (effectId, theme) => {
   const effect = normalizeFieldFocusEffect(effectId);
   const focusBorder = theme.fieldFocusBorderColor || '#327AED';
+  const unfocusBorder = theme.fieldUnfocusBorderColor || '#cccccc';
   const softGlow = lightenHex(focusBorder, 0.35);
 
   switch (effect) {
@@ -122,18 +139,14 @@ export const resolveFieldFocusEffect = (effectId, theme) => {
         boxShadow: 'none',
         fieldTransition: 'none',
         focusAnimation: 'themeFieldBorderPulse 1.2s ease-in-out infinite',
-        keyframesCss: `
-@keyframes themeFieldBorderPulse {
-  0%, 100% { border-color: var(--c-field-unfocus-border, #ccc); }
-  50% { border-color: var(--c-field-focus-border, #327AED); }
-}`,
+        keyframesCss: buildFieldBorderPulseKeyframes(unfocusBorder, focusBorder),
       };
     case 'border_twinkle':
       return {
         boxShadow: 'none',
         fieldTransition: 'none',
         focusAnimation: TWINKLE_ANIMATION_BY_ELEMENT.field,
-        keyframesCss: FIELD_BORDER_TWINKLE_KEYFRAMES,
+        keyframesCss: buildFieldBorderTwinkleKeyframes(focusBorder),
         useFocusBorderShorthand: true,
         useAnimatedBoxShadow: true,
       };

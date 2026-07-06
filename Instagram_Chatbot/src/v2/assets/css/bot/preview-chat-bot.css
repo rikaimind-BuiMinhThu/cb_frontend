@@ -290,6 +290,10 @@
     justify-content: flex-end;
 }
 
+.ss-user-message__content-wrapper > .sp-user-message-button-action {
+    margin-top: 10px;
+}
+
 .underline-none:hover {
     text-decoration: none !important;
 }
@@ -1328,11 +1332,11 @@ slideUp
 }
 
 .ss-combine-message__next-button {
-  justify-content: center;
+  justify-content: flex-end;
   margin-top: 10px;
 }
 
-.ss-combine-message__wrapper .ss-user-message__content-wrapper {
+.ss-combine-message__content .ss-user-message__content-wrapper {
   width: 100%;
   padding: 0;
 }

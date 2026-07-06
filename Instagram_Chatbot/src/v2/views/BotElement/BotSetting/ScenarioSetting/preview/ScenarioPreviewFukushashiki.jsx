@@ -3,7 +3,7 @@ import "assets/css/bot/preview-chat-bot.css";
 import Cookies from "js-cookie";
 import { MDBIcon } from "mdbreact";
 import CustomButton from "../../CustomButton";
-import { UserMessage, BotMessage, CombineMessage, CombineMessageNextButton } from "../../PreviewComponent";
+import { UserMessage, BotMessage, CombineMessage } from "../../PreviewComponent";
 import PreviewFukushashikiReducer from "../../PreviewFukushashiki/PreviewFukushashikiReducer";
 import $ from "jquery";
 import "moment/locale/zh-cn";
@@ -32,7 +32,7 @@ import {
   CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE,
   DISPLAY_TYPES,
 } from "../../PreviewComponent/Constants";
-import { injectBotThemeCss } from "v2/utils/chatbotThemeCss";
+import { applyPreviewThemeCss } from "v2/utils/chatbotThemeCss";
 import { COLOR_MAP } from "views/BotElement/BotSetting/DesignSetting/constants/designChatbotConstants";
 import {
   getAllUrlParams,
@@ -587,29 +587,24 @@ const ScenarioPreviewFukushashiki = ({
     if (existing) {
       existing.remove();
     }
-    if (!cssEnabled || !cssContent) {
-      return undefined;
+    if (cssEnabled && cssContent) {
+      const style = document.createElement('style');
+      style.id = 'custom-css';
+      style.innerHTML = cssContent;
+      document.head.appendChild(style);
     }
-    const style = document.createElement('style');
-    style.id = 'custom-css';
-    style.innerHTML = cssContent;
-    document.head.appendChild(style);
+    if (!embedded) {
+      applyPreviewThemeCss(state.botInfor, state.themeSettings);
+    }
     return () => {
-      style.remove();
+      const style = document.getElementById('custom-css');
+      if (style) style.remove();
     };
-  }, [cssEnabled, cssContent]);
+  }, [cssEnabled, cssContent, embedded, state.botInfor, state.themeSettings]);
 
   useEffect(() => {
     if (embedded || !state.botInfor) return undefined;
-    const chatbot = state.botInfor;
-    const apiColorKey = chatbot.main_color && !String(chatbot.main_color).startsWith('#')
-      ? chatbot.main_color
-      : null;
-    const mainColorHex = chatbot.main_color_other
-      || COLOR_MAP[chatbot.main_color]
-      || chatbot.main_color
-      || '#327AED';
-    injectBotThemeCss(state.themeSettings, mainColorHex, apiColorKey);
+    applyPreviewThemeCss(state.botInfor, state.themeSettings);
     return undefined;
   }, [embedded, state.themeSettings, state.botInfor]);
 
@@ -1358,8 +1353,8 @@ const ScenarioPreviewFukushashiki = ({
             botId={state.botId}
             isProcessing={!!state.isProcessing}
             cartSystem={state.cartSystem}
+            footer={renderNextButton(message, messageIndex)}
           />
-          {renderNextButton(message, messageIndex)}
         </div>
       </div>
     );
@@ -1372,8 +1367,7 @@ const ScenarioPreviewFukushashiki = ({
     const isUpdate = messageIndex >= state.renderMessagesList.length - 1;
 
     return (
-      <React.Fragment>
-        <CombineMessage
+      <CombineMessage
           postMessageToParent={(options) => postMessageToParent(options, state)}
           message={message}
           captcha={state.captcha}
@@ -1415,16 +1409,9 @@ const ScenarioPreviewFukushashiki = ({
           executeLpJsCode={(jsCode) => executeLpJsCode(jsCode, state)}
           isBotOpen={state.isOpen}
           cartSystem={state.cartSystem}
-        />
-        <CombineMessageNextButton
-          message={message}
-          messageIndex={messageIndex}
-          botInfor={state.botInfor}
-          onClickNext={onClickNext}
           isUpdate={isUpdate}
           isExtractFromSession={state.isExtractFromSession}
         />
-      </React.Fragment>
     );
   };
 

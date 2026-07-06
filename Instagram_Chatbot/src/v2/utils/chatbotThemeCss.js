@@ -1,9 +1,31 @@
 import { CAMEL_TO_SNAKE_THEME } from '../views/BotElement/BotSetting/DesignSetting/constants/designThemeConstants';
+import { resolveMainColorContext } from '../views/BotElement/BotSetting/DesignSetting/utils/designChatbotUtils';
 import {
   mergeThemeWithDefaults,
   resolveBorderTwinkleEffect,
   resolveFieldFocusEffect,
 } from '../views/BotElement/BotSetting/DesignSetting/utils/designThemeUtils';
+
+const LIVE_THEME_ROOTS = ['#sp-container1', '.sp-container1', '#sp-container', '.sp-container'];
+const LIVE_THEME_SCOPE = LIVE_THEME_ROOTS.join(', ');
+
+const toScopeIs = (scopeSelector) => {
+  const roots = scopeSelector.split(',').map((s) => s.trim()).filter(Boolean);
+  if (roots.length <= 1) return roots[0] || '';
+  return `:is(${roots.join(', ')})`;
+};
+
+const scopedDescendant = (scopeSelector, suffix) => {
+  const trimmed = suffix.trim();
+  if (!scopeSelector) return trimmed.startsWith('.') || trimmed.startsWith('#') || trimmed.startsWith('[')
+    ? trimmed
+    : `.${trimmed}`;
+  const root = toScopeIs(scopeSelector);
+  return `${root} ${trimmed}`;
+};
+
+const scopedClass = (scopeSelector, className) =>
+  scopedDescendant(scopeSelector, className.startsWith('.') ? className : `.${className}`);
 
 const buildFieldSelectors = (spBodySelector) => `
 ${spBodySelector} input[type="text"]:not(.theme-preview--field-focus),
@@ -14,6 +36,7 @@ ${spBodySelector} input[type="password"]:not(.theme-preview--field-focus),
 ${spBodySelector} textarea:not(.theme-preview--field-focus),
 ${spBodySelector} select:not(.theme-preview--field-focus),
 ${spBodySelector} .ss-input-value:not(.ss-bot-chat-detail-content),
+${spBodySelector} .ss-input-custom-field:not(.ss-bot-chat-detail-content),
 ${spBodySelector} .ant-select-selector
 `.trim();
 
@@ -26,6 +49,7 @@ ${spBodySelector} input[type="password"]:focus,
 ${spBodySelector} textarea:focus,
 ${spBodySelector} select:focus,
 ${spBodySelector} .ss-input-value:not(.ss-bot-chat-detail-content):focus,
+${spBodySelector} .ss-input-custom-field:not(.ss-bot-chat-detail-content):focus,
 ${spBodySelector} .ant-select-focused .ant-select-selector
 `.trim();
 
@@ -78,7 +102,7 @@ const buildFieldFocusStyles = (fieldFocusSelectors, focusEffect, previewFocusSel
     ? `transition: ${focusEffect.fieldTransition};`
     : '';
   const animationRule = focusEffect.focusAnimation !== 'none'
-    ? `animation: ${focusEffect.focusAnimation};`
+    ? `animation: ${focusEffect.focusAnimation} !important;`
     : '';
   const focusBorderRule = focusEffect.useFocusBorderShorthand
     ? 'border: 1px solid var(--c-field-focus-border, #327AED) !important;'
@@ -89,6 +113,7 @@ const buildFieldFocusStyles = (fieldFocusSelectors, focusEffect, previewFocusSel
 
   const focusRules = `
 ${fieldFocusSelectors} {
+  outline: none !important;
   ${focusBorderRule}
   background-color: var(--c-field-focus-bg, #fff) !important;
   ${boxShadowRule}
@@ -97,6 +122,7 @@ ${fieldFocusSelectors} {
 
   const previewRules = previewFocusSelector ? `
 ${previewFocusSelector} {
+  outline: none !important;
   ${focusBorderRule}
   background-color: var(--c-field-focus-bg, #fff) !important;
   ${boxShadowRule}
@@ -106,14 +132,15 @@ ${previewFocusSelector} {
   return { transitionRule, focusRules, previewRules };
 };
 
-const buildTwinkleAnimationRule = (effectId, elementType) => {
-  const { animation } = resolveBorderTwinkleEffect(effectId, elementType);
-  return animation !== 'none' ? `animation: ${animation};` : '';
+const buildTwinkleAnimationRule = (effectId, elementType, theme) => {
+  const { animation } = resolveBorderTwinkleEffect(effectId, elementType, theme);
+  return animation !== 'none' ? `animation: ${animation} !important;` : '';
 };
 
 const buildThemeRules = (theme, scopeSelector = '') => {
-  const scopePrefix = scopeSelector ? `${scopeSelector} ` : '';
-  const spBodySelector = scopeSelector ? `${scopeSelector} .sp-body` : '.sp-body';
+  const spBodySelector = scopeSelector
+    ? scopedDescendant(scopeSelector, '.sp-body')
+    : '.sp-body';
   const fieldSelectors = buildFieldSelectors(spBodySelector);
   const fieldFocusSelectors = buildFieldFocusSelectors(spBodySelector);
   const focusEffect = resolveFieldFocusEffect(theme.fieldFocusBgEffect, theme);
@@ -132,19 +159,23 @@ const buildThemeRules = (theme, scopeSelector = '') => {
   const checkboxTwinkleAnimation = buildTwinkleAnimationRule(
     theme.checkboxCheckedBorderEffect,
     'checkbox',
+    theme,
   );
   const radioTwinkleAnimation = buildTwinkleAnimationRule(
     theme.radioSelectedBorderEffect,
     'radio',
+    theme,
   );
 
   const checkboxTwinkleKeyframes = resolveBorderTwinkleEffect(
     theme.checkboxCheckedBorderEffect,
     'checkbox',
+    theme,
   ).keyframesCss;
   const radioTwinkleKeyframes = resolveBorderTwinkleEffect(
     theme.radioSelectedBorderEffect,
     'radio',
+    theme,
   ).keyframesCss;
 
   const twinkleKeyframesCss = [...new Set([
@@ -154,14 +185,22 @@ const buildThemeRules = (theme, scopeSelector = '') => {
   ].filter(Boolean))].join('\n');
 
   const submitBtnSelector = scopeSelector
-    ? `${scopeSelector} #chatbot-submit-button, ${scopeSelector} .chatbot-submit-button, ${scopeSelector} [id^="chatbot-submit-button-"]`
+    ? [
+      scopedDescendant(scopeSelector, '#chatbot-submit-button'),
+      scopedDescendant(scopeSelector, '.chatbot-submit-button'),
+      scopedDescendant(scopeSelector, '[id^="chatbot-submit-button-"]'),
+    ].join(', ')
     : '#chatbot-submit-button, .chatbot-submit-button, [id^="chatbot-submit-button-"]';
   const btnSelector = scopeSelector
-    ? `${submitBtnSelector}, ${scopeSelector} .btn-preview-bot, ${scopeSelector} .sp-body .btn-new-bot`
+    ? [
+      submitBtnSelector,
+      scopedDescendant(scopeSelector, '.btn-preview-bot'),
+      scopedDescendant(scopeSelector, '.sp-body .btn-new-bot'),
+    ].join(', ')
     : `${submitBtnSelector}, .btn-preview-bot, .sp-body .btn-new-bot`;
 
   const previewBtnPressedRule = scopeSelector ? `
-${scopeSelector} .theme-preview--btn-pressed.btn-new-bot {
+${scopedDescendant(scopeSelector, '.theme-preview--btn-pressed.btn-new-bot')} {
   background-color: var(--c-btn-pressed-bg) !important;
   color: var(--c-btn-pressed-text, #fff) !important;
 }` : '';
@@ -172,41 +211,34 @@ ${previewFieldSelector} {
 
   return `
 ${twinkleKeyframesCss}
-${scopePrefix}.sp-header-left-label-title {
+${scopedClass(scopeSelector, '.sp-header-left-label-title')} {
   color: var(--c-header-title-text, #fff) !important;
   font-size: var(--c-header-title-font-size, 15px) !important;
 }
 
-${scopePrefix}.sp-header-left-label-sub-title {
+${scopedClass(scopeSelector, '.sp-header-left-label-sub-title')} {
   color: var(--c-header-subtitle-text, #fff) !important;
   font-size: var(--c-header-subtitle-font-size, 14px) !important;
 }
 
-${scopePrefix}.sp-process-bar {
+${scopedClass(scopeSelector, '.sp-process-bar')} {
   background-color: var(--c-progress-bg, #EBF7FF) !important;
 }
 
-${scopePrefix}.sp-process-bar-color {
+${scopedClass(scopeSelector, '.sp-process-bar-color')} {
   color: var(--c-progress-text, #fff) !important;
   font-size: var(--c-progress-font-size, 13px) !important;
 }
 
-${scopeSelector ? `${scopeSelector} .sp-body` : '#sp-body.sp-body, .sp-body'} {
+${scopeSelector ? spBodySelector : '#sp-body.sp-body, .sp-body'} {
   background-color: var(--c-chat-window-bg, #EBF7FF) !important;
 }
 
-${scopePrefix}.ss-bot-message__content-wrapper,
-${scopePrefix}.ss-bot-message .ss-bot-message__content {
+${scopedClass(scopeSelector, '.ss-bot-message__content-wrapper')},
+${scopedDescendant(scopeSelector, '.ss-bot-message .ss-bot-message__content')} {
   background-color: var(--c-bot-msg-bg, #3CACEF) !important;
   color: var(--c-bot-msg-text, #fff) !important;
   font-size: var(--c-bot-msg-font-size, 14px) !important;
-}
-
-${scopePrefix}.sp-body-user-side-messages .ss-user-message__content-wrapper,
-${scopePrefix}.ss-user-message__content-wrapper {
-  background-color: var(--c-user-msg-bg, #fff) !important;
-  color: var(--c-user-msg-text, #333) !important;
-  font-size: var(--c-user-msg-font-size, 14px) !important;
 }
 
 ${fieldSelectors} {
@@ -218,23 +250,23 @@ ${fieldSelectors} {
 ${focusRules}
 ${previewRules}${previewFieldFontSizeRule}
 
-${scopePrefix}.ss-bot-chat-detail-content,
-${scopePrefix}.ss-bot-chat-text-input.ss-bot-chat-detail-content {
+${scopedClass(scopeSelector, '.ss-bot-chat-detail-content')},
+${scopedClass(scopeSelector, '.ss-bot-chat-text-input.ss-bot-chat-detail-content')} {
   background-color: var(--c-bot-msg-bg, #3CACEF) !important;
   color: var(--c-bot-msg-text, #fff) !important;
   font-size: var(--c-bot-msg-font-size, 14px) !important;
   border: none !important;
 }
 
-${scopePrefix}.ss-bot-chat-text-input-bot-icon path {
+${scopedDescendant(scopeSelector, '.ss-bot-chat-text-input-bot-icon path')} {
   fill: var(--c-bot-msg-bg, #3CACEF) !important;
 }
 
-${scopePrefix}.sp-body-user-side-messages {
+${scopedClass(scopeSelector, '.sp-body-user-side-messages')} {
   background-color: transparent !important;
 }
 
-${scopePrefix}.sp-body-user-side-messages > .ss-user-message__content-wrapper {
+${scopedDescendant(scopeSelector, '.sp-body-user-side-messages > .ss-user-message__content-wrapper')} {
   background-color: var(--c-user-msg-bg, #fff) !important;
   color: var(--c-user-msg-text, #333) !important;
   font-size: var(--c-user-msg-font-size, 14px) !important;
@@ -284,19 +316,19 @@ ${spBodySelector} .ss-message__content--user-checkbox--checkbox_img-item:has(inp
 
 ${spBodySelector} .ss-message__content--user-checkbox > label,
 ${spBodySelector} .ss-message__content--user-checkbox--block_style > span,
-${scopePrefix}.theme-customize-preview__checkbox-option > label {
+${scopedDescendant(scopeSelector, '.theme-customize-preview__checkbox-option > label')} {
   font-size: var(--c-checkbox-font-size, 14px) !important;
 }
 
 ${spBodySelector} .ss-message__content--user-radio_button,
-${scopePrefix}.theme-customize-preview__radio-default {
+${scopedClass(scopeSelector, '.theme-customize-preview__radio-default')} {
   background-color: var(--c-radio-unselected-bg, #ebf7ff) !important;
   border: 1px solid var(--c-radio-unselected-border, transparent) !important;
 }
 
 ${spBodySelector} .ss-message__content--user-radio_button--selected,
 ${spBodySelector} .ss-message__content--user-radio_button:has(input[type="radio"]:checked),
-${scopePrefix}.theme-customize-preview__radio-default--selected {
+${scopedClass(scopeSelector, '.theme-customize-preview__radio-default--selected')} {
   background-color: var(--c-radio-selected-bg, #ebf7ff) !important;
   border-color: var(--c-radio-selected-border, transparent) !important;
   ${radioTwinkleAnimation}
@@ -309,37 +341,37 @@ ${spBodySelector} .ss-message__content--user-radio_button--radio_button_img {
 
 ${spBodySelector} .ss-message__content--user-radio_button--radio_button_img.ss-message__content--user-radio_button--selected,
 ${spBodySelector} .ss-message__content--user-radio_button--radio_button_img:has(input[type="radio"]:checked),
-${scopePrefix}.theme-customize-preview__radio-img--selected {
+${scopedClass(scopeSelector, '.theme-customize-preview__radio-img--selected')} {
   background-color: var(--c-radio-selected-bg, transparent) !important;
   border-color: var(--c-radio-selected-border, transparent) !important;
   ${radioTwinkleAnimation}
 }
 
 ${spBodySelector} .ss-message__content--user-radio_button:not(.ss-message__content--user-radio_button--radio_button_img) input[type="radio"],
-${scopePrefix}.theme-customize-preview__radio-default input[type="radio"] {
+${scopedDescendant(scopeSelector, '.theme-customize-preview__radio-default input[type="radio"]')} {
   accent-color: var(--c-radio-input-selected, #327AED) !important;
 }
 
 ${spBodySelector} .ss-message__content--user-radio_button:not(.ss-message__content--user-radio_button--radio_button_img) input[type="radio"]:not(:checked),
-${scopePrefix}.theme-customize-preview__radio-default input[type="radio"]:not(:checked) {
+${scopedDescendant(scopeSelector, '.theme-customize-preview__radio-default input[type="radio"]:not(:checked)')} {
   accent-color: var(--c-radio-input-unselected, #ccc) !important;
 }
 
 ${spBodySelector} .ss-message__content--user-radio_button > label,
 ${spBodySelector} .ss-message__content--user-radio_button--block_style > span,
-${scopePrefix}.theme-customize-preview__radio-default > label {
+${scopedDescendant(scopeSelector, '.theme-customize-preview__radio-default > label')} {
   font-size: var(--c-radio-font-size, 14px) !important;
 }
 
-${scopePrefix}.ss-bot-submit-error-message,
-${scopePrefix}.error-container .emsg_holder,
-${scopePrefix}.error-container .error_each {
+${scopedClass(scopeSelector, '.ss-bot-submit-error-message')},
+${scopedDescendant(scopeSelector, '.error-container .emsg_holder')},
+${scopedDescendant(scopeSelector, '.error-container .error_each')} {
   background-color: var(--c-error-bg, #ffebee) !important;
   color: var(--c-error-text, #d32f2f) !important;
   font-size: var(--c-error-font-size, 14px) !important;
 }
 
-${scopePrefix}.ss-bot-submit-error-message {
+${scopedClass(scopeSelector, '.ss-bot-submit-error-message')} {
   border: 1px solid var(--c-error-text, #f44336) !important;
 }${previewBtnPressedRule}`.trim();
 };
@@ -354,7 +386,7 @@ const buildThemeCss = (theme, scopeSelector = '') => {
 
 export const generateThemeCss = (rawTheme, mainColorHex, apiColorKey) => {
   const theme = mergeThemeWithDefaults(rawTheme, mainColorHex, apiColorKey);
-  return buildThemeCss(theme);
+  return buildThemeCss(theme, LIVE_THEME_SCOPE);
 };
 
 export const generateScopedThemeCss = (
@@ -377,6 +409,12 @@ export const injectBotThemeCss = (rawTheme, mainColorHex, apiColorKey) => {
   style.id = 'bot-theme-vars';
   style.innerHTML = generateThemeCss(rawTheme, mainColorHex, apiColorKey);
   document.head.appendChild(style);
+};
+
+export const applyPreviewThemeCss = (botInfor, themeSettings) => {
+  if (!botInfor) return;
+  const { apiColorKey, mainColorHex } = resolveMainColorContext(botInfor);
+  injectBotThemeCss(themeSettings, mainColorHex, apiColorKey);
 };
 
 export const parseThemeFromDesignSettings = (designSettings) => {

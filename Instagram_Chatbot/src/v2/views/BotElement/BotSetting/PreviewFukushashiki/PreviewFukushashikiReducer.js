@@ -567,6 +567,13 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
       newState.autoOpenAttempted = false;
       newState.renderMode = RENDER_MODES.LAST;
 
+      const { apiColorKey, mainColorHex } = resolveMainColorContext(newState.botInfor);
+      newState.themeSettings = parseThemeSettings(
+        newState.themeSettings,
+        mainColorHex,
+        apiColorKey,
+      );
+
       return { ...state, ...newState };
     }
     case PREVIEW_ACTIONS.OPEN_CHATBOT: {

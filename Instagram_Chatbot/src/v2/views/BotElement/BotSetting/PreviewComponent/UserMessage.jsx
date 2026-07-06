@@ -54,6 +54,7 @@ const UserMessage = ({
   isProcessing = false,
   onRenderCompleted,
   cartSystem = "",
+  footer = null,
 }) => {
   if (!isUserMessage(message)) return null;
 
@@ -1890,6 +1891,7 @@ const UserMessage = ({
           </React.Fragment>
         );
       })}
+      {footer}
       <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
         <div style={{ width: "300px", textAlign: "center", color: "#51cbce" }}>
           <span style={{ fontSize: "16px" }}>{messageNoti}</span>

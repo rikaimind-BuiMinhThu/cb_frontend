@@ -361,6 +361,13 @@ const PreviewFaqReducer = (state, action) => {
       newState.autoOpenAttempted = false;
       newState.renderMode = RENDER_MODES.LAST;
 
+      const { apiColorKey, mainColorHex } = resolveMainColorContext(newState.botInfor);
+      newState.themeSettings = parseThemeSettings(
+        newState.themeSettings,
+        mainColorHex,
+        apiColorKey,
+      );
+
       return { ...state, ...newState };
     }
     case PREVIEW_ACTIONS.OPEN_CHATBOT: {

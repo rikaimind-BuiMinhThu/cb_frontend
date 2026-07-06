@@ -3,7 +3,7 @@ import "assets/css/bot/preview-chat-bot.css";
 import Cookies from "js-cookie";
 import { MDBIcon } from "mdbreact";
 import CustomButton from "./CustomButton";
-import { UserMessage, BotMessage, CombineMessage, CombineMessageNextButton } from "./PreviewComponent";
+import { UserMessage, BotMessage, CombineMessage } from "./PreviewComponent";
 import PreviewFaqReducer from "./PreviewFaq/PreviewFaqReducer";
 import $ from "jquery";
 import { EC_CHATBOT_URL } from "v2/variables/constants";
@@ -26,7 +26,7 @@ import {
   MESSAGE_CONTENT_TYPES,
   CUSTOM_JS_CODE_POSITION,
 } from "./PreviewComponent/Constants";
-import { injectBotThemeCss } from "v2/utils/chatbotThemeCss";
+import { applyPreviewThemeCss } from "v2/utils/chatbotThemeCss";
 import { COLOR_MAP } from "v2/views/BotElement/BotSetting/DesignSetting/constants/designChatbotConstants";
 import {
   parseDesignSettings,
@@ -289,18 +289,21 @@ const PreviewFaq = () => {
 
   // For add custom css
   useEffect(() => {
-    if (!state.isUsedCustomCss || !state.customCssContent) return;
+    const existing = document.getElementById('custom-css');
+    if (existing) existing.remove();
 
-    const style = document.createElement('style');
-    style.id = "custom-css";
-    style.innerHTML = state.customCssContent;
-    document.head.appendChild(style);
-  }, [state.isUsedCustomCss, state.customCssContent]);
+    if (state.isUsedCustomCss && state.customCssContent) {
+      const style = document.createElement('style');
+      style.id = "custom-css";
+      style.innerHTML = state.customCssContent;
+      document.head.appendChild(style);
+    }
+
+    applyPreviewThemeCss(state.botInfor, state.themeSettings);
+  }, [state.isUsedCustomCss, state.customCssContent, state.botInfor, state.themeSettings]);
 
   useEffect(() => {
-    if (!state.botInfor) return;
-    const { apiColorKey, mainColorHex } = resolveMainColorContext(state.botInfor);
-    injectBotThemeCss(state.themeSettings, mainColorHex, apiColorKey);
+    applyPreviewThemeCss(state.botInfor, state.themeSettings);
   }, [state.themeSettings, state.botInfor]);
 
   // Get Preview Scenario Data
@@ -855,8 +858,8 @@ const PreviewFaq = () => {
             botId={state.botId}
             isProcessing={!!state.isProcessing}
             cartSystem={params.get("cartSystem") ?? ""}
+            footer={renderNextButton(message, messageIndex)}
           />
-          {renderNextButton(message, messageIndex)}
         </div>
       </div>
     );
@@ -869,8 +872,7 @@ const PreviewFaq = () => {
     const isUpdate = messageIndex >= state.renderMessagesList.length - 1;
 
     return (
-      <React.Fragment>
-        <CombineMessage
+      <CombineMessage
           postMessageToParent={(options) => postMessageToParent(options, state)}
           message={message}
           captcha={state.captcha}
@@ -911,16 +913,9 @@ const PreviewFaq = () => {
           executeLpJsCode={(jsCode) => executeLpJsCode(jsCode, state)}
           isBotOpen={state.isOpen}
           cartSystem={params.get("cartSystem") ?? ""}
-        />
-        <CombineMessageNextButton
-          message={message}
-          messageIndex={messageIndex}
-          botInfor={state.botInfor}
-          onClickNext={onClickNext}
           isUpdate={isUpdate}
           isExtractFromSession={state.isExtractFromSession}
         />
-      </React.Fragment>
     );
   };
 
