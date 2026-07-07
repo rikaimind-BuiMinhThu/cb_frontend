@@ -299,6 +299,29 @@ export function getDefaultOrderConfirmConfig() {
   return normalizeOrderConfirmConfig({});
 }
 
+export function buildOrderConfirmPresetConfig(currentConfig = {}, preset) {
+  const ecforcePreset = ORDER_CONFIRM_LP_PRESETS[ORDER_CONFIRM_LP_PRESET.ECFORCE];
+  const current = normalizeOrderConfirmConfig(currentConfig);
+  let nextFieldsByGroup = current.fields_by_group;
+
+  if (preset === ORDER_CONFIRM_LP_PRESET.ECFORCE) {
+    nextFieldsByGroup = applyEcforcePresetToFields(current.fields_by_group);
+  }
+
+  const legacy = syncLegacySelectorsLabelsFromFields(nextFieldsByGroup);
+
+  return normalizeOrderConfirmConfig({
+    ...current,
+    lp_preset: preset,
+    preview_root_selector: ecforcePreset.preview_root_selector,
+    fields_by_group: nextFieldsByGroup,
+    selectors: preset === ORDER_CONFIRM_LP_PRESET.ECFORCE
+      ? JSON.parse(JSON.stringify(ecforcePreset.selectors))
+      : legacy.selectors,
+    labels: { ...current.labels, ...legacy.labels },
+  });
+}
+
 export function resolveOrderConfirmSelectors(config = {}) {
   return normalizeOrderConfirmConfig(config).selectors;
 }

@@ -13,11 +13,30 @@ export default function OrderConfirmSettingsModal({
   onChangeValueMessageContent,
   dataMessages,
   setDataMessages,
+  onConfigChange,
   buttonLabel = '詳細設定',
   title = '注文確認設定',
+  inline = false,
 }) {
   const [open, setOpen] = useState(false);
   const closeModal = () => setOpen(false);
+
+  const content = (
+    <OrderConfirmSettingsModalContent
+      config={config}
+      indexMessageSelect={indexMessageSelect}
+      indexContent={indexContent}
+      messageType={messageType}
+      onChangeValueMessageContent={onChangeValueMessageContent}
+      dataMessages={dataMessages}
+      setDataMessages={setDataMessages}
+      onConfigChange={onConfigChange}
+    />
+  );
+
+  if (inline) {
+    return content;
+  }
 
   return (
     <>
@@ -44,15 +63,7 @@ export default function OrderConfirmSettingsModal({
           />
         )}
       >
-        <OrderConfirmSettingsModalContent
-          config={config}
-          indexMessageSelect={indexMessageSelect}
-          indexContent={indexContent}
-          messageType={messageType}
-          onChangeValueMessageContent={onChangeValueMessageContent}
-          dataMessages={dataMessages}
-          setDataMessages={setDataMessages}
-        />
+        {content}
       </ScenarioModalShell>
     </>
   );
@@ -60,12 +71,14 @@ export default function OrderConfirmSettingsModal({
 
 OrderConfirmSettingsModal.propTypes = {
   config: PropTypes.object.isRequired,
-  indexMessageSelect: PropTypes.number.isRequired,
+  indexMessageSelect: PropTypes.number,
   indexContent: PropTypes.number,
   messageType: PropTypes.string,
-  onChangeValueMessageContent: PropTypes.func.isRequired,
-  dataMessages: PropTypes.array.isRequired,
-  setDataMessages: PropTypes.func.isRequired,
+  onChangeValueMessageContent: PropTypes.func,
+  dataMessages: PropTypes.array,
+  setDataMessages: PropTypes.func,
+  onConfigChange: PropTypes.func,
   buttonLabel: PropTypes.string,
   title: PropTypes.string,
+  inline: PropTypes.bool,
 };

@@ -117,6 +117,13 @@ export function getGlobalMenuItems(client) {
           icon: <BookOutlined />,
           id: 'scenarioTemplateManagement',
         },
+        {
+          key: '/admin/order-confirm-template-list',
+          label: '注文確認メッセージテンプレート',
+          path: '/admin/order-confirm-template-list',
+          icon: <BookOutlined />,
+          id: 'orderConfirmMessageTemplateManagement',
+        },
       ],
     });
   }
@@ -158,11 +165,13 @@ export function filterMenuByRole(items, userRole) {
     hiddenIds.add('sidebarUser');
     hiddenIds.add('planManagement');
     hiddenIds.add('scenarioTemplateManagement');
+    hiddenIds.add('orderConfirmMessageTemplateManagement');
   } else if (userRole === 'client') {
     hiddenIds.add('sidebarClient');
     hiddenIds.add('sidebarUser');
     hiddenIds.add('planManagement');
     hiddenIds.add('scenarioTemplateManagement');
+    hiddenIds.add('orderConfirmMessageTemplateManagement');
     hiddenIds.add('clientPaymentDetail');
   }
 
@@ -180,6 +189,8 @@ export const ROUTE_TITLES = {
   '/admin/scenario-setting': 'シナリオ設定',
   '/admin/scenario-template-list': 'シナリオテンプレート一覧',
   '/admin/scenario-template-setting': 'シナリオテンプレート設定',
+  '/admin/order-confirm-template-list': '注文確認メッセージテンプレート一覧',
+  '/admin/order-confirm-template-setting': '注文確認メッセージテンプレート設定',
   '/admin/list-email': 'メール一覧',
   '/admin/create-email': 'メール作成',
   '/admin/file-management': 'メディアファイル管理',
@@ -201,6 +212,7 @@ export const ROUTE_TITLES = {
 export const MENU_ROUTE_ALIASES = [
   { match: '/admin/scenario-setting', menuPath: '/admin/scenario-list' },
   { match: '/admin/scenario-template-setting', menuPath: '/admin/scenario-template-list' },
+  { match: '/admin/order-confirm-template-setting', menuPath: '/admin/order-confirm-template-list' },
   { match: '/admin/edit-email', menuPath: '/admin/create-email', prefix: true },
   { match: '/admin/demo-bot', menuPath: '/admin/installation-tag-demo', prefix: true },
   { match: '/admin/add-payment-gateway', menuPath: '/admin/payment-gateway', prefix: true },

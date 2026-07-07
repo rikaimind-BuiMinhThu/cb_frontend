@@ -33,6 +33,8 @@ import ListABTest from './views/BotElement/BotSetting/ABTest/ListABTest';
 import Scenario from './views/BotElement/BotSetting/ScenarioSetting/Scenario';
 import ScenarioTemplateList from './views/BotElement/BotSetting/ScenarioSetting/ScenarioTemplateList';
 import ScenarioTemplateEditor from './views/BotElement/BotSetting/ScenarioSetting/ScenarioTemplateEditor';
+import OrderConfirmMessageTemplateList from './views/BotElement/BotSetting/OrderConfirmTemplate/OrderConfirmMessageTemplateList';
+import OrderConfirmMessageTemplateEditor from './views/BotElement/BotSetting/OrderConfirmTemplate/OrderConfirmMessageTemplateEditor';
 import VariableManagement from './views/BotElement/BotSetting/VariableManagement';
 import InstallationTag from './views/BotElement/BotSetting/InstallationTag';
 import Conversion from './views/BotElement/BotSetting/Conversion';
@@ -268,6 +270,18 @@ var routes = [
     path: '/scenario-template-setting',
     name: 'シナリオテンプレート設定',
     component: ScenarioTemplateEditor,
+    layout: '/v2/admin',
+  },
+  {
+    path: '/order-confirm-template-list',
+    name: '注文確認メッセージテンプレート一覧',
+    component: OrderConfirmMessageTemplateList,
+    layout: '/v2/admin',
+  },
+  {
+    path: '/order-confirm-template-setting',
+    name: '注文確認メッセージテンプレート設定',
+    component: OrderConfirmMessageTemplateEditor,
     layout: '/v2/admin',
   },
   {

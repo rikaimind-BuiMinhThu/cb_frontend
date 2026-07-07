@@ -2,7 +2,6 @@ import React from 'react';
 import { MDBIcon } from 'mdbreact';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import InputCustom from './InputCustom';
-import InputNum from './InputNum';
 import { BOT_MESSAGE_TYPES } from '../../PreviewComponent/Constants';
 import {
   ORDER_CONFIRM_GROUP_KEYS,
@@ -15,10 +14,8 @@ import {
   syncLegacySelectorsLabelsFromFields,
   updateOrderConfirmField,
 } from '../utils/OrderConfirmLpScriptGenerator';
+import OrderConfirmAdvancedSettings from './OrderConfirmAdvancedSettings';
 import '../styles/contentSettings/orderConfirmSettings.css';
-
-const fieldLabelStyle = { fontSize: '12px', marginBottom: '4px', display: 'block' };
-const sectionLabelStyle = { fontWeight: 600, marginTop: '12px', marginBottom: '6px', display: 'block', fontSize: '12px' };
 
 export default function OrderConfirmSettingsModalContent({
   config,
@@ -28,28 +25,71 @@ export default function OrderConfirmSettingsModalContent({
   onChangeValueMessageContent,
   dataMessages,
   setDataMessages,
+  onConfigChange,
+  showAdvancedSettings = true,
 }) {
   const normalizedConfig = normalizeOrderConfirmConfig(config);
   const fieldsByGroup = normalizedConfig.fields_by_group;
   const isCustomPreset = normalizedConfig.lp_preset === ORDER_CONFIRM_LP_PRESET.CUSTOM;
 
-  const persistFieldsByGroup = (nextFieldsByGroup) => {
+  const persistConfig = (nextConfig) => {
+    if (onConfigChange) {
+      onConfigChange(normalizeOrderConfirmConfig(nextConfig));
+      return;
+    }
+
     const nextMessages = [...dataMessages];
     const content = nextMessages[indexMessageSelect]?.message_content?.[indexContent];
     if (!content) return;
 
-    const current = content[messageType] || {};
+    content[messageType] = normalizeOrderConfirmConfig(nextConfig);
+    setDataMessages(nextMessages);
+  };
+
+  const persistFieldsByGroup = (nextFieldsByGroup) => {
+    const current = normalizedConfig;
     const legacy = syncLegacySelectorsLabelsFromFields(nextFieldsByGroup);
     const isCustom = (current.lp_preset || ORDER_CONFIRM_LP_PRESET.ECFORCE) === ORDER_CONFIRM_LP_PRESET.CUSTOM;
 
-    content[messageType] = normalizeOrderConfirmConfig({
+    persistConfig({
       ...current,
       fields_by_group: nextFieldsByGroup,
       labels: { ...current.labels, ...legacy.labels },
       selectors: isCustom ? legacy.selectors : current.selectors,
     });
+  };
 
-    setDataMessages(nextMessages);
+  const updateConfigValue = (field, value, nestedKey = null) => {
+    if (onConfigChange) {
+      const next = { ...normalizedConfig };
+      if (nestedKey) {
+        next[field] = { ...(next[field] || {}), [nestedKey]: value };
+      } else {
+        next[field] = value;
+      }
+      onConfigChange(normalizeOrderConfirmConfig(next));
+      return;
+    }
+
+    if (nestedKey) {
+      onChangeValueMessageContent(
+        indexMessageSelect,
+        indexContent,
+        messageType,
+        value,
+        field,
+        nestedKey,
+      );
+      return;
+    }
+
+    onChangeValueMessageContent(
+      indexMessageSelect,
+      indexContent,
+      messageType,
+      value,
+      field,
+    );
   };
 
   const handleDragEnd = (result) => {
@@ -187,56 +227,12 @@ export default function OrderConfirmSettingsModalContent({
         ))}
       </DragDropContext>
 
-      <span style={sectionLabelStyle}>リトライ</span>
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '8px' }}>
-        <div>
-          <span style={fieldLabelStyle}>最大回数</span>
-          <InputNum
-            min={1}
-            max={50}
-            value={normalizedConfig.retry?.maxRetry ?? 20}
-            onChange={(value) => onChangeValueMessageContent(
-              indexMessageSelect,
-              indexContent,
-              messageType,
-              value,
-              'retry',
-              'maxRetry',
-            )}
-          />
-        </div>
-        <div>
-          <span style={fieldLabelStyle}>間隔 (ms)</span>
-          <InputNum
-            min={100}
-            max={5000}
-            step={100}
-            value={normalizedConfig.retry?.delay ?? 500}
-            onChange={(value) => onChangeValueMessageContent(
-              indexMessageSelect,
-              indexContent,
-              messageType,
-              value,
-              'retry',
-              'delay',
-            )}
-          />
-        </div>
-      </div>
-
-      <span style={sectionLabelStyle}>エラーメッセージ</span>
-      <textarea
-        className="ss-bot-statement-type-text-content ss-input-value"
-        rows={3}
-        value={normalizedConfig.error_message || ''}
-        onChange={(e) => onChangeValueMessageContent(
-          indexMessageSelect,
-          indexContent,
-          messageType,
-          e.target.value,
-          'error_message',
-        )}
-      />
+      {showAdvancedSettings && (
+        <OrderConfirmAdvancedSettings
+          normalizedConfig={normalizedConfig}
+          onUpdateConfigValue={updateConfigValue}
+        />
+      )}
     </div>
   );
 }

@@ -52,6 +52,8 @@ function AdminLayout(props) {
       '/admin/reply-mail-management',
       '/admin/scenario-template-list',
       '/admin/scenario-template-setting',
+      '/admin/order-confirm-template-list',
+      '/admin/order-confirm-template-setting',
     ];
     if (
       (!isInstagram && instagramRolesUrl.includes(pathname)) ||

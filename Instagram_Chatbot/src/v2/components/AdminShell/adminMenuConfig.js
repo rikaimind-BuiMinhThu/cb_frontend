@@ -118,6 +118,13 @@ export function getGlobalMenuItems(client) {
           icon: <BookOutlined />,
           id: 'scenarioTemplateManagement',
         },
+        {
+          key: p('/order-confirm-template-list'),
+          label: '注文確認メッセージテンプレート',
+          path: p('/order-confirm-template-list'),
+          icon: <BookOutlined />,
+          id: 'orderConfirmMessageTemplateManagement',
+        },
       ],
     });
   }
@@ -159,11 +166,13 @@ export function filterMenuByRole(items, userRole) {
     hiddenIds.add('sidebarUser');
     hiddenIds.add('planManagement');
     hiddenIds.add('scenarioTemplateManagement');
+    hiddenIds.add('orderConfirmMessageTemplateManagement');
   } else if (userRole === 'client') {
     hiddenIds.add('sidebarClient');
     hiddenIds.add('sidebarUser');
     hiddenIds.add('planManagement');
     hiddenIds.add('scenarioTemplateManagement');
+    hiddenIds.add('orderConfirmMessageTemplateManagement');
     hiddenIds.add('clientPaymentDetail');
   }
 
@@ -181,6 +190,8 @@ export const ROUTE_TITLES = {
   [p('/scenario-setting')]: 'シナリオ設定',
   [p('/scenario-template-list')]: 'シナリオテンプレート一覧',
   [p('/scenario-template-setting')]: 'シナリオテンプレート設定',
+  [p('/order-confirm-template-list')]: '注文確認メッセージテンプレート一覧',
+  [p('/order-confirm-template-setting')]: '注文確認メッセージテンプレート設定',
   [p('/list-email')]: 'メール一覧',
   [p('/create-email')]: 'メール作成',
   [p('/file-management')]: 'メディアファイル管理',
@@ -202,6 +213,7 @@ export const ROUTE_TITLES = {
 export const MENU_ROUTE_ALIASES = [
   { match: p('/scenario-setting'), menuPath: p('/scenario-list') },
   { match: p('/scenario-template-setting'), menuPath: p('/scenario-template-list') },
+  { match: p('/order-confirm-template-setting'), menuPath: p('/order-confirm-template-list') },
   { match: p('/edit-email'), menuPath: p('/create-email'), prefix: true },
   { match: p('/demo-bot'), menuPath: p('/installation-tag-demo'), prefix: true },
   { match: p('/add-payment-gateway'), menuPath: p('/payment-gateway'), prefix: true },

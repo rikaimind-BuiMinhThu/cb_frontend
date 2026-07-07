@@ -52,6 +52,8 @@ function AdminLayout(props) {
       getAdminRoutePath('/reply-mail-management'),
       getAdminRoutePath('/scenario-template-list'),
       getAdminRoutePath('/scenario-template-setting'),
+      getAdminRoutePath('/order-confirm-template-list'),
+      getAdminRoutePath('/order-confirm-template-setting'),
     ];
     if (
       (!isInstagram && instagramRolesUrl.includes(pathname)) ||

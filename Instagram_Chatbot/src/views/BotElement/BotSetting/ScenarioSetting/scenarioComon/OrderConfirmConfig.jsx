@@ -1,21 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import CheckboxCustom from './CheckboxCustom';
 import InputNum from './InputNum';
 import { BOT_MESSAGE_TYPES } from '../../PreviewComponent/Constants';
 import {
-  ORDER_CONFIRM_LP_PRESET,
-  ORDER_CONFIRM_LP_PRESETS,
-  applyEcforcePresetToFields,
   getDefaultOrderConfirmConfig,
   normalizeOrderConfirmConfig,
-  syncLegacySelectorsLabelsFromFields,
 } from '../utils/OrderConfirmLpScriptGenerator';
 import OrderConfirmSettingsModal from './OrderConfirmSettingsModal';
-
-const LP_PRESET_OPTIONS = [
-  [ORDER_CONFIRM_LP_PRESET.ECFORCE, 'EC Force'],
-  [ORDER_CONFIRM_LP_PRESET.CUSTOM, 'Custom'],
-];
+import useOrderConfirmMessageTemplates from '../../OrderConfirmTemplate/useOrderConfirmMessageTemplates';
 
 const sectionLabelStyle = { fontWeight: 600, marginTop: '12px', marginBottom: '6px', display: 'block', fontSize: '12px' };
 
@@ -30,47 +22,52 @@ export default function OrderConfirmConfig({
   messageContent,
 }) {
   const config = normalizeOrderConfirmConfig(typeContent || getDefaultOrderConfirmConfig());
+  const { templates, applySelection, presetOptions } = useOrderConfirmMessageTemplates();
+  const [selectedTemplateValue, setSelectedTemplateValue] = useState('');
 
-  const handlePresetChange = (preset) => {
-    const ecforcePreset = ORDER_CONFIRM_LP_PRESETS[ORDER_CONFIRM_LP_PRESET.ECFORCE];
+  const applyConfig = (nextConfig) => {
     const nextMessages = [...dataMessages];
     const content = nextMessages[indexMessageSelect]?.message_content?.[indexContent];
     if (!content) return;
 
-    const current = normalizeOrderConfirmConfig(content[messageType] || {});
-    let nextFieldsByGroup = current.fields_by_group;
-
-    if (preset === ORDER_CONFIRM_LP_PRESET.ECFORCE) {
-      nextFieldsByGroup = applyEcforcePresetToFields(current.fields_by_group);
-    }
-
-    const legacy = syncLegacySelectorsLabelsFromFields(nextFieldsByGroup);
-
-    content[messageType] = normalizeOrderConfirmConfig({
-      ...current,
-      lp_preset: preset,
-      preview_root_selector: ecforcePreset.preview_root_selector,
-      fields_by_group: nextFieldsByGroup,
-      selectors: preset === ORDER_CONFIRM_LP_PRESET.ECFORCE
-        ? JSON.parse(JSON.stringify(ecforcePreset.selectors))
-        : legacy.selectors,
-      labels: { ...current.labels, ...legacy.labels },
-    });
-
+    content[messageType] = nextConfig;
     setDataMessages(nextMessages);
+  };
+
+  const handleTemplateSelect = async (event) => {
+    const value = event.target.value;
+    setSelectedTemplateValue(value);
+    if (!value) return;
+
+    try {
+      await applySelection(value, typeContent || {}, applyConfig);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setSelectedTemplateValue('');
+    }
   };
 
   return (
     <div className="ss-bot-statement-wrapper">
-      <span style={sectionLabelStyle}>LPテンプレート</span>
+      <span style={sectionLabelStyle}>注文確認メッセージテンプレート</span>
       <select
         className="ss-input-value"
-        value={config.lp_preset || ORDER_CONFIRM_LP_PRESET.ECFORCE}
-        onChange={(e) => handlePresetChange(e.target.value)}
+        value={selectedTemplateValue}
+        onChange={handleTemplateSelect}
       >
-        {LP_PRESET_OPTIONS.map(([value, label]) => (
-          <option key={value} value={value}>{label}</option>
-        ))}
+        <option value="">選択なし</option>
+        <optgroup label="プリセット">
+          <option value={presetOptions.ECFORCE}>EC Force</option>
+          <option value={presetOptions.CUSTOM}>Custom</option>
+        </optgroup>
+        {templates.length > 0 && (
+          <optgroup label="保存済みテンプレート">
+            {templates.map((template) => (
+              <option key={template.id} value={String(template.id)}>{template.name}</option>
+            ))}
+          </optgroup>
+        )}
       </select>
 
       <div style={{ marginTop: '12px' }}>
