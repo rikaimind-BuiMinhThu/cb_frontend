@@ -1,14 +1,13 @@
 import React, { useEffect } from "react";
-import { Button } from "reactstrap";
 
-const CustomButton = ({ 
-  disabled, 
-  style, 
-  className, 
+const CustomButton = ({
+  disabled,
+  style,
+  className,
   onClick,
   children,
   autoClick,
-  messsagetype
+  messsagetype,
 }) => {
   useEffect(() => {
     if (autoClick && typeof onClick === "function") {
@@ -20,15 +19,16 @@ const CustomButton = ({
   }, [autoClick]);
 
   return (
-    <Button
+    <button
+      type="button"
       disabled={disabled}
       style={style}
-      className={className}
+      className={`btn btn-new-bot ${className || ''}`.trim()}
       onClick={onClick}
-      messsagetype={messsagetype}
+      data-messsagetype={messsagetype}
     >
       {children}
-    </Button>
+    </button>
   );
 };
 

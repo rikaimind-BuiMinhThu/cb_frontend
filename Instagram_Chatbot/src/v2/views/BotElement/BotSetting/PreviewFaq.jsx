@@ -790,9 +790,6 @@ const PreviewFaq = () => {
       <div className="sp-user-message-button-action" style={{ display: isDisplayBtnNext ? "flex" : "none" }}>
         <CustomButton
           disabled={false}
-          style={{
-            backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
-          }}
           className="ss-user-message__action-btn"
           onClick={() => {
             onClickNext(messageIndex, message)

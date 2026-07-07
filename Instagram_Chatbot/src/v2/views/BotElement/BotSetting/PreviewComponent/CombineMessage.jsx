@@ -31,9 +31,6 @@ const CombineMessageNextButton = ({
     <div className="sp-user-message-button-action ss-combine-message__next-button" style={{ display: isDisplayBtnNext ? 'flex' : 'none' }}>
       <CustomButton
         disabled={false}
-        style={{
-          backgroundColor: botInfor?.main_color || botInfor?.main_color_other,
-        }}
         className="ss-user-message__action-btn"
         onClick={() => onClickNext(messageIndex, message)}
         autoClick={isAutoClick && !isExtractFromSession}

@@ -1199,9 +1199,6 @@ const PreviewFukushashiki = () => {
       <div className="sp-user-message-button-action" style={{ display: isDisplayBtnNext ? "flex" : "none" }}>
         <CustomButton
           disabled={state.submitErrorMessage.length > 0 ? false : message.disabled}
-          style={{
-            backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
-          }}
           className={`ss-user-message__action-btn${hasBtnUpdateClass ? " btn-update" : ""}`}
           onClick={() => {
             onClickNext(messageIndex, message)

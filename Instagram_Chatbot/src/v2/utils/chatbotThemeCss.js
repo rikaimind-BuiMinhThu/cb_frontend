@@ -27,6 +27,12 @@ const scopedDescendant = (scopeSelector, suffix) => {
 const scopedClass = (scopeSelector, className) =>
   scopedDescendant(scopeSelector, className.startsWith('.') ? className : `.${className}`);
 
+const withPseudoOnEach = (selectorList, pseudo) =>
+  selectorList
+    .split(',')
+    .map((selector) => `${selector.trim()}${pseudo}`)
+    .join(', ');
+
 const buildFieldSelectors = (spBodySelector) => `
 ${spBodySelector} input[type="text"]:not(.theme-preview--field-focus),
 ${spBodySelector} input[type="email"]:not(.theme-preview--field-focus),
@@ -235,13 +241,66 @@ const buildThemeRules = (theme, scopeSelector = '') => {
       submitBtnSelector,
       scopedDescendant(scopeSelector, '.btn-preview-bot'),
       scopedDescendant(scopeSelector, '.sp-body .btn-new-bot'),
+      scopedDescendant(scopeSelector, '.sp-body .ss-user-message__action-btn'),
     ].join(', ')
-    : `${submitBtnSelector}, .btn-preview-bot, .sp-body .btn-new-bot`;
+    : `${submitBtnSelector}, .btn-preview-bot, .sp-body .btn-new-bot, .sp-body .ss-user-message__action-btn`;
+  const nextButtonSelector = scopeSelector
+    ? scopedDescendant(scopeSelector, '.sp-body .sp-user-message-button-action .ss-user-message__action-btn')
+    : '.sp-body .sp-user-message-button-action .ss-user-message__action-btn';
 
-  const previewBtnPressedRule = scopeSelector ? `
-${scopedDescendant(scopeSelector, '.theme-preview--btn-pressed.btn-new-bot')} {
+  const previewButtonBase = scopeSelector
+    ? scopedDescendant(scopeSelector, '.theme-customize-preview__button-group .btn-new-bot')
+    : '';
+  const previewButtonNormalSelector = scopeSelector
+    ? scopedDescendant(
+      scopeSelector,
+      '.theme-customize-preview__button-group .btn-new-bot:not(.theme-preview--btn-pressed):not(:disabled)',
+    )
+    : '';
+  const previewButtonPressedSelector = scopeSelector
+    ? scopedDescendant(
+      scopeSelector,
+      '.theme-customize-preview__button-group .theme-preview--btn-pressed.btn-new-bot',
+    )
+    : '';
+  const previewButtonDisabledSelector = scopeSelector
+    ? [
+      `${previewButtonBase}:disabled`,
+      `${previewButtonBase}:disabled:hover`,
+      `${previewButtonBase}:disabled:focus`,
+      `${previewButtonBase}:disabled:focus-visible`,
+    ].join(', ')
+    : '';
+  const previewButtonRules = scopeSelector ? `
+${previewButtonNormalSelector},
+${withPseudoOnEach(previewButtonNormalSelector, ':hover')},
+${withPseudoOnEach(previewButtonNormalSelector, ':focus')},
+${withPseudoOnEach(previewButtonNormalSelector, ':focus-visible')} {
+  background-color: var(--c-btn-normal-bg) !important;
+  color: var(--c-btn-normal-text, #fff) !important;
+  font-size: var(--c-btn-font-size, 14px) !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+${previewButtonPressedSelector},
+${withPseudoOnEach(previewButtonPressedSelector, ':hover')},
+${withPseudoOnEach(previewButtonPressedSelector, ':focus')},
+${withPseudoOnEach(previewButtonPressedSelector, ':focus-visible')} {
   background-color: var(--c-btn-pressed-bg) !important;
   color: var(--c-btn-pressed-text, #fff) !important;
+  font-size: var(--c-btn-font-size, 14px) !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+${previewButtonDisabledSelector} {
+  background-color: var(--c-btn-disabled-bg, #e0e0e0) !important;
+  color: var(--c-btn-disabled-text, #999) !important;
+  font-size: var(--c-btn-font-size, 14px) !important;
+  opacity: 1 !important;
+  border: none !important;
+  box-shadow: none !important;
 }` : '';
   const previewFieldPlaceholderSelector = previewFieldSelector
     ? `${previewFieldSelector}::placeholder`
@@ -328,20 +387,57 @@ ${scopedDescendant(scopeSelector, '.sp-body-user-side-messages > .ss-user-messag
   border-radius: 20px;
 }
 
-${btnSelector} {
+${btnSelector},
+${withPseudoOnEach(btnSelector, ':hover')},
+${withPseudoOnEach(btnSelector, ':focus')},
+${withPseudoOnEach(btnSelector, ':focus-visible')} {
   background-color: var(--c-btn-normal-bg) !important;
   color: var(--c-btn-normal-text, #fff) !important;
   font-size: var(--c-btn-font-size, 14px) !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
-${btnSelector}:active {
+${withPseudoOnEach(btnSelector, ':active')} {
   background-color: var(--c-btn-pressed-bg) !important;
   color: var(--c-btn-pressed-text, #fff) !important;
 }
 
-${btnSelector}:disabled {
+${withPseudoOnEach(btnSelector, ':disabled')},
+${withPseudoOnEach(btnSelector, '.disabled')} {
   background-color: var(--c-btn-disabled-bg, #e0e0e0) !important;
   color: var(--c-btn-disabled-text, #999) !important;
+  opacity: 1 !important;
+}
+
+${nextButtonSelector},
+${withPseudoOnEach(nextButtonSelector, ':hover')},
+${withPseudoOnEach(nextButtonSelector, ':focus')},
+${withPseudoOnEach(nextButtonSelector, ':focus-visible')} {
+  min-width: 70px !important;
+  min-height: 36px !important;
+  padding: 4px 10px !important;
+  border-radius: 4px !important;
+  font-weight: 500 !important;
+  background-color: var(--c-btn-normal-bg) !important;
+  color: var(--c-btn-normal-text, #fff) !important;
+  font-size: var(--c-btn-font-size, 14px) !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+${withPseudoOnEach(nextButtonSelector, ':active')} {
+  background-color: var(--c-btn-pressed-bg) !important;
+  color: var(--c-btn-pressed-text, #fff) !important;
+  font-size: var(--c-btn-font-size, 14px) !important;
+}
+
+${withPseudoOnEach(nextButtonSelector, ':disabled')},
+${withPseudoOnEach(nextButtonSelector, '.disabled')} {
+  background-color: var(--c-btn-disabled-bg, #e0e0e0) !important;
+  color: var(--c-btn-disabled-text, #999) !important;
+  font-size: var(--c-btn-font-size, 14px) !important;
+  opacity: 1 !important;
 }
 
 ${spBodySelector} .ant-checkbox-inner {
@@ -427,7 +523,7 @@ ${scopedDescendant(scopeSelector, '.error-container .error_each')} {
 
 ${scopedClass(scopeSelector, '.ss-bot-submit-error-message')} {
   border: 1px solid var(--c-error-text, #f44336) !important;
-}${previewBtnPressedRule}`.trim();
+}${previewButtonRules}`.trim();
 };
 
 const buildThemeCss = (theme, scopeSelector = '') => {

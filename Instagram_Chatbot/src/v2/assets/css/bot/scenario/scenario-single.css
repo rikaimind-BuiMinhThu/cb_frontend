@@ -265,9 +265,7 @@ textarea.ss-message__content--bot-delay {
 }
 
 .ss-user-message__action-btn {
-  background-color: #327aed;
   font-weight: 500;
-  border-radius: 25px;
 }
 
 /* user: type = 'text_input' */

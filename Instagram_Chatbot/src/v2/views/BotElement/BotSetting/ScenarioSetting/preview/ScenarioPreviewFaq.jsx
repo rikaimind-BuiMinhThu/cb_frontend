@@ -907,9 +907,6 @@ const ScenarioPreviewFaq = ({
       <div className="sp-user-message-button-action" style={{ display: isDisplayBtnNext ? "flex" : "none" }}>
         <CustomButton
           disabled={editorPreview}
-          style={{
-            backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
-          }}
           className="ss-user-message__action-btn"
           onClick={editorPreview ? undefined : () => {
             onClickNext(messageIndex, message);
