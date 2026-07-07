@@ -35,7 +35,7 @@ ${spBodySelector} input[type="number"]:not(.theme-preview--field-focus),
 ${spBodySelector} input[type="password"]:not(.theme-preview--field-focus),
 ${spBodySelector} textarea:not(.theme-preview--field-focus),
 ${spBodySelector} select:not(.theme-preview--field-focus),
-${spBodySelector} .ss-input-value:not(.ss-bot-chat-detail-content),
+${spBodySelector} .ss-input-value:not(.ss-bot-chat-detail-content):not(.theme-preview--field-focus),
 ${spBodySelector} .ss-input-custom-field:not(.ss-bot-chat-detail-content),
 ${spBodySelector} .ant-select-selector
 `.trim();
@@ -50,6 +50,7 @@ ${spBodySelector} textarea:focus,
 ${spBodySelector} select:focus,
 ${spBodySelector} .ss-input-value:not(.ss-bot-chat-detail-content):focus,
 ${spBodySelector} .ss-input-custom-field:not(.ss-bot-chat-detail-content):focus,
+${spBodySelector} .select-custom-native:focus,
 ${spBodySelector} .ant-select-focused .ant-select-selector
 `.trim();
 
@@ -132,6 +133,31 @@ ${previewFocusSelector} {
   return { transitionRule, focusRules, previewRules };
 };
 
+const buildTwinkleFieldOverrideRules = (spBodySelector, focusEffect) => {
+  if (!focusEffect.useAnimatedBoxShadow) return '';
+
+  const animationRule = focusEffect.focusAnimation !== 'none'
+    ? `animation: ${focusEffect.focusAnimation} !important;`
+    : '';
+  const focusBorderRule = focusEffect.useFocusBorderShorthand
+    ? 'border: 1px solid var(--c-field-focus-border, #327AED) !important;'
+    : 'border-color: var(--c-field-focus-border, #327AED) !important;';
+  const twinkleOverrideSelectors = `
+${spBodySelector} .ant-select-focused:not(.ant-select-disabled).ant-select:not(.ant-select-customize-input) .ant-select-selector,
+${spBodySelector} .select-custom-native:focus,
+${spBodySelector} .ss-input-value:not(.ss-bot-chat-detail-content):focus,
+${spBodySelector} .ss-input-custom-field:not(.ss-bot-chat-detail-content):focus
+`.trim();
+
+  return `
+${twinkleOverrideSelectors} {
+  outline: none !important;
+  ${focusBorderRule}
+  background-color: var(--c-field-focus-bg, #fff) !important;
+  ${animationRule}
+}`;
+};
+
 const buildTwinkleAnimationRule = (effectId, elementType, theme) => {
   const { animation } = resolveBorderTwinkleEffect(effectId, elementType, theme);
   return animation !== 'none' ? `animation: ${animation} !important;` : '';
@@ -145,7 +171,7 @@ const buildThemeRules = (theme, scopeSelector = '') => {
   const fieldFocusSelectors = buildFieldFocusSelectors(spBodySelector);
   const focusEffect = resolveFieldFocusEffect(theme.fieldFocusBgEffect, theme);
   const previewFocusSelector = scopeSelector
-    ? `${spBodySelector} input.theme-customize-preview__field.theme-preview--field-focus, ${spBodySelector} select.theme-customize-preview__field.theme-preview--field-focus, ${spBodySelector} textarea.theme-customize-preview__field.theme-preview--field-focus`
+    ? `${spBodySelector} input.theme-customize-preview__field.ss-input-value.theme-preview--field-focus, ${spBodySelector} select.theme-customize-preview__field.ss-input-value.theme-preview--field-focus, ${spBodySelector} textarea.theme-customize-preview__field.ss-input-value.theme-preview--field-focus`
     : '';
   const previewFieldSelector = scopeSelector
     ? `${spBodySelector} input.theme-customize-preview__field, ${spBodySelector} select.theme-customize-preview__field, ${spBodySelector} textarea.theme-customize-preview__field`
@@ -155,6 +181,7 @@ const buildThemeRules = (theme, scopeSelector = '') => {
     focusEffect,
     previewFocusSelector,
   );
+  const twinkleFieldOverrideRules = buildTwinkleFieldOverrideRules(spBodySelector, focusEffect);
 
   const checkboxTwinkleAnimation = buildTwinkleAnimationRule(
     theme.checkboxCheckedBorderEffect,
@@ -248,7 +275,8 @@ ${fieldSelectors} {
   ${transitionRule}
 }
 ${focusRules}
-${previewRules}${previewFieldFontSizeRule}
+${previewRules}
+${twinkleFieldOverrideRules}${previewFieldFontSizeRule}
 
 ${scopedClass(scopeSelector, '.ss-bot-chat-detail-content')},
 ${scopedClass(scopeSelector, '.ss-bot-chat-text-input.ss-bot-chat-detail-content')} {

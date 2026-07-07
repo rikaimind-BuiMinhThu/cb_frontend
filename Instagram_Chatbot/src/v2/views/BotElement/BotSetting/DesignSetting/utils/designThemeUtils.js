@@ -22,12 +22,6 @@ export const buildFieldBorderTwinkleKeyframes = (focusBorderColor = '#327AED') =
   50% { box-shadow: 0 0 0 2px transparent; }
 }`;
 
-export const buildFieldBorderPulseKeyframes = (unfocusBorderColor = '#cccccc', focusBorderColor = '#327AED') => `
-@keyframes themeFieldBorderPulse {
-  0%, 100% { border-color: ${unfocusBorderColor}; }
-  50% { border-color: ${focusBorderColor}; }
-}`;
-
 export const buildCheckboxBorderTwinkleKeyframes = (checkedBorderColor = '#327AED') => `
 @keyframes themeCheckboxBorderTwinkle {
   0%, 100% { box-shadow: 0 0 0 1px ${checkedBorderColor}; }
@@ -81,6 +75,7 @@ const isLegacyFocusEffectValue = (value) => typeof value === 'string' && (
 export const normalizeFieldFocusEffect = (value) => {
   if (!value) return 'outline_soft';
   if (value === 'twinkle') return 'border_twinkle';
+  if (value === 'border_fade' || value === 'border_pulse') return 'none';
   if (VALID_EFFECT_IDS.has(value)) return value;
   if (isLegacyFocusEffectValue(value)) return 'outline_soft';
   return 'outline_soft';
@@ -109,7 +104,6 @@ const lightenHex = (hex, amount = 0.1) => {
 export const resolveFieldFocusEffect = (effectId, theme) => {
   const effect = normalizeFieldFocusEffect(effectId);
   const focusBorder = theme.fieldFocusBorderColor || '#327AED';
-  const unfocusBorder = theme.fieldUnfocusBorderColor || '#cccccc';
   const softGlow = lightenHex(focusBorder, 0.35);
 
   switch (effect) {
@@ -126,20 +120,6 @@ export const resolveFieldFocusEffect = (effectId, theme) => {
         fieldTransition: 'none',
         focusAnimation: 'none',
         keyframesCss: '',
-      };
-    case 'border_fade':
-      return {
-        boxShadow: 'none',
-        fieldTransition: 'border-color 0.3s ease',
-        focusAnimation: 'none',
-        keyframesCss: '',
-      };
-    case 'border_pulse':
-      return {
-        boxShadow: 'none',
-        fieldTransition: 'none',
-        focusAnimation: 'themeFieldBorderPulse 1.2s ease-in-out infinite',
-        keyframesCss: buildFieldBorderPulseKeyframes(unfocusBorder, focusBorder),
       };
     case 'border_twinkle':
       return {

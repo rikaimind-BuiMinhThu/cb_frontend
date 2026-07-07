@@ -93,13 +93,13 @@ const ThemeCustomizePreview = ({
           type="text"
           readOnly
           placeholder="テキスト入力（非フォーカス）"
-          className="theme-customize-preview__field"
+          className="theme-customize-preview__field ss-input-value"
         />
         <input
           type="text"
           readOnly
           placeholder="テキスト入力（フォーカス）"
-          className="theme-customize-preview__field theme-preview--field-focus"
+          className="theme-customize-preview__field ss-input-value theme-preview--field-focus"
         />
       </div>
     </PreviewUserMessage>
@@ -110,12 +110,12 @@ const ThemeCustomizePreview = ({
       onSectionSelect={onSectionSelect}
     >
       <div className="theme-customize-preview__field-group">
-        <select className="theme-customize-preview__field" defaultValue="">
+        <select className="theme-customize-preview__field ss-input-value" defaultValue="">
           <option value="" disabled>プルダウン（非フォーカス）</option>
           <option value="1">選択肢 1</option>
         </select>
         <select
-          className="theme-customize-preview__field theme-preview--field-focus"
+          className="theme-customize-preview__field ss-input-value theme-preview--field-focus"
           defaultValue="1"
         >
           <option value="1">プルダウン（フォーカス）</option>

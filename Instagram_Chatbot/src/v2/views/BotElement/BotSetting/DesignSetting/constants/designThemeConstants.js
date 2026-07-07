@@ -4,8 +4,6 @@ export const FIELD_FOCUS_EFFECT_OPTIONS = [
   { id: 'none', label: 'なし' },
   { id: 'outline_soft', label: 'アウトライン（ソフト）' },
   { id: 'outline_strong', label: 'アウトライン（強）' },
-  { id: 'border_fade', label: '枠線フェード' },
-  { id: 'border_pulse', label: '枠線パルス' },
   { id: 'border_twinkle', label: '枠線きらきら' },
 ];
 
