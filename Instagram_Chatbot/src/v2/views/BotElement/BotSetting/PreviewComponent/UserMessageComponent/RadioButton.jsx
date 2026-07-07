@@ -1,15 +1,17 @@
 import React from "react";
-import "assets/css/bot/preview-chat-bot.css";
-import { MESSAGE_CONTENT_TYPES } from "views/BotElement/BotSetting/PreviewComponent/Constants";
+import "v2/assets/css/bot/preview-chat-bot.css";
+import { MESSAGE_CONTENT_TYPES } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 import {
   getRadioImgGridStyle,
   getRadioImgOptionStyle,
-} from "views/BotElement/BotSetting/ScenarioSetting/utils/radioButtonImgLayoutUtils";
+  getImgGridClassName,
+  normalizeRadioButtonImgLayout,
+} from "v2/views/BotElement/BotSetting/ScenarioSetting/utils/radioButtonImgLayoutUtils";
 import {
   buildEditorRadioOptionDataAttr,
   getRadioOptionSelectionKey,
   isRadioOptionInitiallySelected,
-} from "views/BotElement/BotSetting/ScenarioSetting/utils/radioButtonSelectionUtils";
+} from "v2/views/BotElement/BotSetting/ScenarioSetting/utils/radioButtonSelectionUtils";
 import OptionGender from "./OptionGender";
 
 export default function RadioButton({ content, disabled, onChangeValue, errors, contentIndex, messageIndex, notUseButtonNext, onClickNext }) {
@@ -115,11 +117,16 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
 
   const renderRadioButtonImgContent = () => {
     const items = radioButton[radioButton.type] || [];
+    const layout = normalizeRadioButtonImgLayout(radioButton);
     const gridStyle = getRadioImgGridStyle(radioButton);
+    const gridClassName = getImgGridClassName(
+      'ss-message__content--user-radio_button-img-grid',
+      layout.type,
+    );
 
     return (
       <div
-        className="ss-message__content--user-radio_button-img-grid"
+        className={gridClassName}
         style={gridStyle}
       >
         {items.map((item, index) => {

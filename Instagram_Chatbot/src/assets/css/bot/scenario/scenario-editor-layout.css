@@ -875,3 +875,20 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Overview: image checkbox/radio horizontal scroll */
+.ss-layout-overview-messages .ss-user-message__content-wrapper,
+.ss-layout-overview-messages .ss-content-preview-shell,
+.ss-combine-overview-block__body {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.ss-layout-overview-messages .ss-message__content--user-checkbox-img-grid--scroll,
+.ss-layout-overview-messages .ss-message__content--user-radio_button-img-grid--scroll {
+  max-width: 100%;
+}
+
+.ss-layout-overview-messages .ss-user-chat-detail-content {
+  overflow-x: visible;
+}

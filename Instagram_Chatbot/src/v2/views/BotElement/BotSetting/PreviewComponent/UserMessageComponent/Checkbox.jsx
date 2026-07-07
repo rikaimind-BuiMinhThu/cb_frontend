@@ -1,17 +1,19 @@
 import React from "react";
-import "assets/css/bot/preview-chat-bot.css";
-import { MESSAGE_CONTENT_TYPES } from "views/BotElement/BotSetting/PreviewComponent/Constants";
+import "v2/assets/css/bot/preview-chat-bot.css";
+import { MESSAGE_CONTENT_TYPES } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 import {
   getCheckboxImgGridStyle,
   getCheckboxImgOptionStyle,
-} from "views/BotElement/BotSetting/ScenarioSetting/utils/radioButtonImgLayoutUtils";
+  getImgGridClassName,
+  normalizeCheckboxImgLayout,
+} from "v2/views/BotElement/BotSetting/ScenarioSetting/utils/radioButtonImgLayoutUtils";
 import {
   buildEditorCheckboxOptionDataAttr,
   getCheckboxImgSelectionKey,
   getCheckboxOptionSelectionKey,
   isCheckboxImgContentChecked,
   isCheckboxOptionChecked,
-} from "views/BotElement/BotSetting/ScenarioSetting/utils/checkboxSelectionUtils";
+} from "v2/views/BotElement/BotSetting/ScenarioSetting/utils/checkboxSelectionUtils";
 
 export default function Checkbox({ content, disabled, onChangeValue, errors, contentIndex, messageIndex }) {
   if (content.type !== MESSAGE_CONTENT_TYPES.CHECKBOX) return null;
@@ -104,8 +106,13 @@ export default function Checkbox({ content, disabled, onChangeValue, errors, con
   };
 
   const renderCheckboxImgContent = () => {
+    const layout = normalizeCheckboxImgLayout(checkbox);
     const gridStyle = getCheckboxImgGridStyle(checkbox);
     const optionStyle = getCheckboxImgOptionStyle(checkbox);
+    const gridClassName = getImgGridClassName(
+      'ss-message__content--user-checkbox-img-grid',
+      layout.type,
+    );
 
     return checkbox[checkbox.type]?.map((group, groupIndex) => (
       <div
@@ -114,7 +121,7 @@ export default function Checkbox({ content, disabled, onChangeValue, errors, con
         className="ss-message__content--user-checkbox--checkbox_img"
       >
         <div
-          className="ss-message__content--user-checkbox-img-grid"
+          className={gridClassName}
           style={gridStyle}
         >
           {group.contents?.map((contentItem, contentItemIndex) => {

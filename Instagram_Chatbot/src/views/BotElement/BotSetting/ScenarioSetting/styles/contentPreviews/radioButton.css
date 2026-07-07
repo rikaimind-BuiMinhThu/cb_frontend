@@ -27,6 +27,26 @@
   width: 100%;
 }
 
+.ss-message__content--user-radio_button-img-grid--scroll {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--radio-option-margin, 5px);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.ss-message__content--user-radio_button-img-grid--scroll .ss-message__content--user-radio_button--radio_button_img {
+  flex: 0 0 calc(
+    (100% - (var(--scroll-visible-columns, 4) - 1) * var(--radio-option-margin, 5px))
+    / var(--scroll-visible-columns, 4)
+  );
+  min-width: calc(
+    (100% - (var(--scroll-visible-columns, 4) - 1) * var(--radio-option-margin, 5px))
+    / var(--scroll-visible-columns, 4)
+  );
+}
+
 .ss-message__content--user-radio_button-img-grid .ss-message__content--user-radio_button--radio_button_img {
   margin-bottom: 0;
 }

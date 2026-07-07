@@ -33,6 +33,31 @@
   width: 100%;
 }
 
+.ss-message__content--user-checkbox-img-grid--scroll {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--checkbox-option-margin, 5px);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.ss-message__content--user-checkbox-img-grid--scroll .ss-message__content--user-checkbox--checkbox_img-item {
+  flex: 0 0 calc(
+    (100% - (var(--scroll-visible-columns, 4) - 1) * var(--checkbox-option-margin, 5px))
+    / var(--scroll-visible-columns, 4)
+  );
+  min-width: calc(
+    (100% - (var(--scroll-visible-columns, 4) - 1) * var(--checkbox-option-margin, 5px))
+    / var(--scroll-visible-columns, 4)
+  );
+}
+
+.ss-content-preview-shell {
+  min-width: 0;
+  max-width: 100%;
+}
+
 .ss-message__content--user-checkbox-img-grid .ss-message__content--user-checkbox--checkbox_img-item {
   margin-bottom: 0;
 }

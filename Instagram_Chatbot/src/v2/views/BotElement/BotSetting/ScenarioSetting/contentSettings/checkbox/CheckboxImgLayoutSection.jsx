@@ -7,7 +7,12 @@ import {
   RADIO_IMG_DIRECTION_HORIZONTAL,
   RADIO_IMG_DIRECTION_OPTIONS,
   RADIO_IMG_LAYOUT_SECTION_LABELS,
+  RADIO_IMG_SCROLL_COLUMN_OPTIONS,
+  RADIO_IMG_SCROLL_ENABLED,
+  RADIO_IMG_SCROLL_NONE,
+  RADIO_IMG_SCROLL_OPTIONS,
   RADIO_IMG_WIDTH_MODE_CUSTOM,
+  RADIO_IMG_WIDTH_MODE_EQUAL,
   RADIO_IMG_WIDTH_MODE_OPTIONS,
 } from '../../constants/radioButtonImgLayoutConstants';
 import {
@@ -15,7 +20,6 @@ import {
   decodeLayoutType,
   encodeLayoutType,
   getCustomWidthColumnCount,
-  isCustomWidthLayout,
   normalizePxValue,
   normalizeCheckboxImgLayout,
   sumCustomWidths,
@@ -26,35 +30,46 @@ const DEFAULT_OPTION_MARGIN = '5px';
 
 const CheckboxImgLayoutSection = ({ checkbox, changeContent }) => {
   const layout = normalizeCheckboxImgLayout(checkbox);
-  const { direction, columns, widthMode } = decodeLayoutType(layout.type);
+  const { direction, columns, widthMode, scroll } = decodeLayoutType(layout.type);
   const isHorizontal = direction === RADIO_IMG_DIRECTION_HORIZONTAL;
-  const showCustomWidths = isHorizontal && widthMode === RADIO_IMG_WIDTH_MODE_CUSTOM;
+  const isScrollEnabled = scroll === RADIO_IMG_SCROLL_ENABLED;
+  const columnOptions = isScrollEnabled ? RADIO_IMG_SCROLL_COLUMN_OPTIONS : RADIO_IMG_COLUMN_OPTIONS;
+  const showCustomWidths = isHorizontal && !isScrollEnabled && widthMode === RADIO_IMG_WIDTH_MODE_CUSTOM;
   const customColumnCount = getCustomWidthColumnCount(layout.type);
 
-  const updateLayout = (nextDirection, nextColumns, nextWidthMode, resetWidths = false) => {
+  const updateLayout = (nextDirection, nextColumns, nextWidthMode, nextScroll, resetWidths = false) => {
     const nextType = encodeLayoutType({
       direction: nextDirection,
       columns: nextColumns,
       widthMode: nextWidthMode,
+      scroll: nextScroll,
     });
     changeContent('img_layout')(buildImgLayoutPayload(nextType, layout.custom_widths, resetWidths));
   };
 
   const handleDirectionChange = (value) => {
     if (value === RADIO_IMG_DIRECTION_HORIZONTAL) {
-      updateLayout(value, columns, widthMode, false);
+      updateLayout(value, columns, widthMode, scroll, false);
       return;
     }
-    updateLayout(value, columns, widthMode, false);
+    updateLayout(value, columns, widthMode, RADIO_IMG_SCROLL_NONE, false);
+  };
+
+  const handleScrollChange = (value) => {
+    if (value === RADIO_IMG_SCROLL_ENABLED) {
+      updateLayout(direction, '4', RADIO_IMG_WIDTH_MODE_EQUAL, value, false);
+      return;
+    }
+    updateLayout(direction, '2', RADIO_IMG_WIDTH_MODE_EQUAL, value, false);
   };
 
   const handleColumnsChange = (value) => {
-    const shouldResetWidths = widthMode === RADIO_IMG_WIDTH_MODE_CUSTOM;
-    updateLayout(direction, value, widthMode, shouldResetWidths);
+    const shouldResetWidths = !isScrollEnabled && widthMode === RADIO_IMG_WIDTH_MODE_CUSTOM;
+    updateLayout(direction, value, widthMode, scroll, shouldResetWidths);
   };
 
   const handleWidthModeChange = (value) => {
-    updateLayout(direction, columns, value, value === RADIO_IMG_WIDTH_MODE_CUSTOM);
+    updateLayout(direction, columns, value, scroll, value === RADIO_IMG_WIDTH_MODE_CUSTOM);
   };
 
   const handleCustomWidthChange = (index, value) => {
@@ -97,30 +112,45 @@ const CheckboxImgLayoutSection = ({ checkbox, changeContent }) => {
           <>
             <div className="ss-checkbox-img-layout-section__control">
               <span className="ss-checkbox-img-layout-section__label">
+                {RADIO_IMG_LAYOUT_SECTION_LABELS.scroll}
+              </span>
+              <SelectCustom
+                id="checkbox-img-layout-scroll"
+                className="ss-checkbox-img-layout-section__select"
+                value={scroll}
+                data={RADIO_IMG_SCROLL_OPTIONS}
+                onChange={handleScrollChange}
+                keyValue="key"
+              />
+            </div>
+            <div className="ss-checkbox-img-layout-section__control">
+              <span className="ss-checkbox-img-layout-section__label">
                 {RADIO_IMG_LAYOUT_SECTION_LABELS.columns}
               </span>
               <SelectCustom
                 id="checkbox-img-layout-columns"
                 className="ss-checkbox-img-layout-section__select"
                 value={columns}
-                data={RADIO_IMG_COLUMN_OPTIONS}
+                data={columnOptions}
                 onChange={handleColumnsChange}
                 keyValue="key"
               />
             </div>
-            <div className="ss-checkbox-img-layout-section__control">
-              <span className="ss-checkbox-img-layout-section__label">
-                {RADIO_IMG_LAYOUT_SECTION_LABELS.widthMode}
-              </span>
-              <SelectCustom
-                id="checkbox-img-layout-width-mode"
-                className="ss-checkbox-img-layout-section__select"
-                value={widthMode}
-                data={RADIO_IMG_WIDTH_MODE_OPTIONS}
-                onChange={handleWidthModeChange}
-                keyValue="key"
-              />
-            </div>
+            {!isScrollEnabled && (
+              <div className="ss-checkbox-img-layout-section__control">
+                <span className="ss-checkbox-img-layout-section__label">
+                  {RADIO_IMG_LAYOUT_SECTION_LABELS.widthMode}
+                </span>
+                <SelectCustom
+                  id="checkbox-img-layout-width-mode"
+                  className="ss-checkbox-img-layout-section__select"
+                  value={widthMode}
+                  data={RADIO_IMG_WIDTH_MODE_OPTIONS}
+                  onChange={handleWidthModeChange}
+                  keyValue="key"
+                />
+              </div>
+            )}
           </>
         )}
       </div>

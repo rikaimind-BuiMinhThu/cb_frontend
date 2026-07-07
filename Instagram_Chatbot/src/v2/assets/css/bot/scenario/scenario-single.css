@@ -1,3 +1,5 @@
+@import '../img-option-layout-scroll.css';
+
 /* ss actions */
 .ss-actions {
   display: flex;
@@ -419,54 +421,6 @@ input#ss-message__content--user-radio_button,
   color: black;
 }
 
-/* radio_button: type = 'radio_button_img' */
-.ss-message__content--user-radio_button-img-grid {
-  display: grid;
-  gap: var(--radio-option-margin, 5px);
-  width: 100%;
-}
-
-.ss-message__content--user-radio_button--radio_button_img {
-  position: relative;
-  margin-bottom: 0;
-  background: var(--c-radio-unselected-bg, transparent);
-  border: 1px solid var(--c-radio-unselected-border, transparent);
-  border-radius: 5px;
-  overflow: hidden;
-  cursor: pointer;
-}
-
-.ss-message__content--user-radio_button--radio_button_img--disabled {
-  cursor: default;
-}
-
-.ss-message__content--user-radio_button--radio_button_img.ss-message__content--user-radio_button--selected,
-.ss-message__content--user-radio_button--radio_button_img:has(input[type="radio"]:checked) {
-  background: var(--c-radio-selected-bg, transparent);
-  border-color: var(--c-radio-selected-border, transparent);
-}
-
-.ss-message__content--user-radio_button--radio_button_img img {
-  width: 100%;
-  height: auto;
-  display: block;
-  pointer-events: none;
-}
-
-.ss-message__content--user-radio_button--radio_button_img:last-child {
-  margin-bottom: 0;
-}
-
-.ss-message__content--user-radio_button--radio_button_img .ss-radio-button-img-input--hidden,
-.ss-message__content--user-radio_button--radio_button_img input[type="radio"] {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-  margin: 0;
-  pointer-events: none;
-}
-
 /* user: type = 'checkbox' */
 .ss-message__content--user-checkbox-top {
   display: flex;
@@ -542,66 +496,6 @@ input#ss-message__content--user-radio_button,
   font-weight: 400;
   font-size: 14px;
   color: black;
-}
-
-/* checkbox: type = 'checkbox_img' */
-.ss-message__content--user-checkbox--checkbox_img {
-  margin-bottom: 10px;
-}
-
-.ss-message__content--user-checkbox--checkbox_img:last-child {
-  margin-bottom: 0;
-}
-
-.ss-message__content--user-checkbox-img-grid {
-  display: grid;
-  gap: var(--checkbox-option-margin, 5px);
-  width: 100%;
-}
-
-.ss-message__content--user-checkbox--checkbox_img-item {
-  position: relative;
-  margin-bottom: 0;
-  background: var(--c-radio-unselected-bg, transparent);
-  border: 1px solid var(--c-radio-unselected-border, transparent);
-  border-radius: 5px;
-  overflow: hidden;
-  cursor: pointer;
-}
-
-.ss-message__content--user-checkbox--checkbox_img-item--disabled {
-  cursor: default;
-}
-
-.ss-message__content--user-checkbox--checkbox_img-item.ss-message__content--user-checkbox--selected,
-.ss-message__content--user-checkbox--checkbox_img-item:has(input[type="checkbox"]:checked) {
-  background: var(--c-radio-selected-bg, transparent);
-  border-color: var(--c-radio-selected-border, transparent);
-}
-
-.ss-message__content--user-checkbox--checkbox_img-item img {
-  width: 100%;
-  height: auto;
-  display: block;
-  pointer-events: none;
-}
-
-.ss-message__content--user-checkbox-img-text {
-  text-align: center;
-  font-size: 14px;
-  color: #6789a6;
-  font-weight: 700;
-  padding: 4px 0;
-}
-
-.ss-message__content--user-checkbox-img-grid .ss-checkbox-img-input--hidden,
-.ss-message__content--user-checkbox-img-grid input[type="checkbox"] {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-  margin: 0;
-  pointer-events: none;
 }
 
 /* user: type = 'pull_down' */

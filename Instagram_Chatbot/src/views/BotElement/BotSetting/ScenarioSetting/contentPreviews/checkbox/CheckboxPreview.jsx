@@ -5,6 +5,8 @@ import { PREVIEW_LABELS } from '../../constants/scenarioSettingLabels';
 import {
   getCheckboxImgGridStyle,
   getCheckboxImgOptionStyle,
+  getImgGridClassName,
+  normalizeCheckboxImgLayout,
 } from '../../utils/radioButtonImgLayoutUtils';
 import {
   buildEditorCheckboxOptionDataAttr,
@@ -81,8 +83,13 @@ const CheckboxPreview = ({
   );
 
   const renderCheckboxImgType = () => {
+    const layout = normalizeCheckboxImgLayout(checkbox);
     const gridStyle = getCheckboxImgGridStyle(checkbox);
     const optionStyle = getCheckboxImgOptionStyle(checkbox);
+    const gridClassName = getImgGridClassName(
+      'ss-message__content--user-checkbox-img-grid',
+      layout.type,
+    );
 
     return checkbox[checkbox.type]?.map((group, groupIndex) => (
       <div
@@ -91,7 +98,7 @@ const CheckboxPreview = ({
         className="ss-message__content--user-checkbox--checkbox_img ss-checkbox-preview__img-group"
       >
         <div
-          className="ss-message__content--user-checkbox-img-grid"
+          className={gridClassName}
           style={gridStyle}
         >
           {group.contents?.map((contentItem, contentIndex) => {

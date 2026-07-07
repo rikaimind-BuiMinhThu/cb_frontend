@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useReducer, useState, useMemo } from "react";
-import "assets/css/bot/preview-chat-bot.css";
+import "v2/assets/css/bot/preview-chat-bot.css";
 import Cookies from "js-cookie";
 import { MDBIcon } from "mdbreact";
 import CustomButton from "./CustomButton";

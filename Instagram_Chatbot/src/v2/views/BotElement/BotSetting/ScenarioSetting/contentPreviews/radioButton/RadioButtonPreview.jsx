@@ -5,6 +5,8 @@ import { PREVIEW_LABELS } from '../../constants/scenarioSettingLabels';
 import {
   getRadioImgGridStyle,
   getRadioImgOptionStyle,
+  getImgGridClassName,
+  normalizeRadioButtonImgLayout,
 } from '../../utils/radioButtonImgLayoutUtils';
 import {
   buildEditorRadioOptionDataAttr,
@@ -78,11 +80,16 @@ const RadioButtonPreview = ({
 
   const renderImgType = () => {
     const items = radioButton[radioButton.type] || [];
+    const layout = normalizeRadioButtonImgLayout(radioButton);
     const gridStyle = getRadioImgGridStyle(radioButton);
+    const gridClassName = getImgGridClassName(
+      'ss-message__content--user-radio_button-img-grid',
+      layout.type,
+    );
 
     return (
       <div
-        className="ss-message__content--user-radio_button-img-grid"
+        className={gridClassName}
         style={gridStyle}
       >
         {items.map((item, index) => {

@@ -1,3 +1,5 @@
+@import './img-option-layout-scroll.css';
+
 * {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -1339,4 +1341,23 @@ slideUp
 .ss-combine-message__content .ss-user-message__content-wrapper {
   width: 100%;
   padding: 0;
+}
+
+/* SDK / phone preview: image checkbox/radio horizontal scroll containment */
+.sp-body-user-side,
+.sp-body-user-side-messages,
+.sp-body-user-side-messages > .ss-user-message__content-wrapper,
+.ss-message__content--user-radio_button-wrapper,
+.ss-message__content--user-checkbox-wrapper,
+.ss-combine-message__content,
+.ss-combine-message__content .ss-user-message__content-wrapper {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.sp-body-user-side-messages .ss-message__content--user-radio_button-img-grid--scroll,
+.sp-body-user-side-messages .ss-message__content--user-checkbox-img-grid--scroll,
+.ss-combine-message__content .ss-message__content--user-radio_button-img-grid--scroll,
+.ss-combine-message__content .ss-message__content--user-checkbox-img-grid--scroll {
+  max-width: 100%;
 }

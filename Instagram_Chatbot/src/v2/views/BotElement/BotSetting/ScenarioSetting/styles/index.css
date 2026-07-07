@@ -1,4 +1,5 @@
 @import './base/layout.css';
+@import '../../../../../assets/css/bot/img-option-layout-scroll.css';
 @import './base/fields.css';
 @import './base/drag-drop.css';
 @import './base/fukushashiki.css';
