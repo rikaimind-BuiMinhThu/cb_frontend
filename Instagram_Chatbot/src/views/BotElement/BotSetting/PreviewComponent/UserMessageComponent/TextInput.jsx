@@ -4,6 +4,7 @@ import { MESSAGE_CONTENT_TYPES } from "views/BotElement/BotSetting/PreviewCompon
 import InputCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
 import Text from "./TextInputComponent/Text";
 import PhoneNumber from "./TextInputComponent/PhoneNumber";
+import EmailInput from "./TextInputComponent/EmailInput";
 
 export default function TextInput({ content, disabled, handleOnChangeJpConvertText, contentIndex: contentIndex, onChangeValue, errors, messageIndex }) {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.TEXT_INPUT) return null;
@@ -67,7 +68,6 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
           />
         </>;
       case "urls":
-      case "email_address":
         return <>
           <InputCustom
             disabled={disabled}
@@ -85,12 +85,13 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
             value={textInput[textInput.type]?.value || ""}
           />
         </>;
-      case "email_confirmation":
+      case "email_address":
         return <>
-          <InputCustom
-            className="m-b-5"
+          <EmailInput
             disabled={disabled}
-            placeholder={textInput[textInput.type].cfEmlAdd_email}
+            className="m-b-0"
+            placeholder={textInput[textInput.type].placeholder}
+            domainSuggestion={textInput[textInput.type]?.domain_suggestion}
             onChange={(value) =>
               onChangeValue(
                 contentIndex,
@@ -102,11 +103,29 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
             }
             value={textInput[textInput.type]?.value || ""}
           />
-          <InputCustom
+        </>;
+      case "email_confirmation":
+        return <>
+          <EmailInput
+            className="m-b-5"
             disabled={disabled}
-            placeholder={
-              textInput[textInput.type].cfEmlAdd_confirm_email
+            placeholder={textInput[textInput.type].cfEmlAdd_email}
+            domainSuggestion={textInput[textInput.type]?.domain_suggestion}
+            onChange={(value) =>
+              onChangeValue(
+                contentIndex,
+                content.type,
+                value,
+                textInput.type,
+                "value"
+              )
             }
+            value={textInput[textInput.type]?.value || ""}
+          />
+          <EmailInput
+            disabled={disabled}
+            placeholder={textInput[textInput.type].cfEmlAdd_confirm_email}
+            domainSuggestion={textInput[textInput.type]?.domain_suggestion}
             onChange={(value) =>
               onChangeValue(
                 contentIndex,
