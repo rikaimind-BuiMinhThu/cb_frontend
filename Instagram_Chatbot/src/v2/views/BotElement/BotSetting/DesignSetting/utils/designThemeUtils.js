@@ -4,6 +4,7 @@ import {
   BORDER_TWINKLE_EFFECT_IDS,
   BUTTON_BORDER_STYLE_IDS,
   BUTTON_EFFECT_IDS,
+  BUTTON_POSITION_IDS,
   CAMEL_TO_SNAKE_THEME,
   FIELD_FOCUS_EFFECT_IDS,
   THEME_FIELD_KEYS,
@@ -13,6 +14,7 @@ const VALID_EFFECT_IDS = new Set(FIELD_FOCUS_EFFECT_IDS);
 const VALID_BORDER_TWINKLE_IDS = new Set(BORDER_TWINKLE_EFFECT_IDS);
 const VALID_BUTTON_BORDER_STYLE_IDS = new Set(BUTTON_BORDER_STYLE_IDS);
 const VALID_BUTTON_EFFECT_IDS = new Set(BUTTON_EFFECT_IDS);
+const VALID_BUTTON_POSITION_IDS = new Set(BUTTON_POSITION_IDS);
 
 const BUTTON_BOUNCE_ANIMATION = 'themeButtonBounce 1.2s ease-in-out infinite';
 
@@ -20,6 +22,12 @@ const BUTTON_BORDER_RADIUS_BY_STYLE = {
   square: '0',
   rounded: '4px',
   pill: '9999px',
+};
+
+const BUTTON_POSITION_JUSTIFY = {
+  left: 'flex-start',
+  center: 'center',
+  right: 'flex-end',
 };
 
 const TWINKLE_ANIMATION_BY_ELEMENT = {
@@ -77,6 +85,12 @@ export const normalizeButtonEffect = (value) => {
   return 'none';
 };
 
+export const normalizeButtonPosition = (value) => {
+  if (!value) return 'right';
+  if (VALID_BUTTON_POSITION_IDS.has(value)) return value;
+  return 'right';
+};
+
 export const resolveButtonBorderRadius = (styleId) => {
   const style = normalizeButtonBorderStyle(styleId);
   return BUTTON_BORDER_RADIUS_BY_STYLE[style] || BUTTON_BORDER_RADIUS_BY_STYLE.rounded;
@@ -109,6 +123,11 @@ export const resolveButtonPaddingCss = (paddingValue) => {
   if (!paddingValue || typeof paddingValue !== 'string') return '4px 10px';
   const trimmed = paddingValue.trim();
   return trimmed || '4px 10px';
+};
+
+export const resolveButtonPositionJustify = (positionId) => {
+  const position = normalizeButtonPosition(positionId);
+  return BUTTON_POSITION_JUSTIFY[position] || BUTTON_POSITION_JUSTIFY.right;
 };
 
 export const resolveBorderTwinkleEffect = (effectId, elementType, theme = null) => {
@@ -247,6 +266,7 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
     buttonEffect: 'none',
     buttonWidth: '',
     buttonPadding: '4px 10px',
+    buttonPosition: 'right',
     checkboxUncheckedBgColor: '#ffffff',
     checkboxUncheckedBorderColor: '#cccccc',
     checkboxCheckedBgColor: mainColorHex,
@@ -296,6 +316,7 @@ export const mergeThemeWithDefaults = (rawTheme, mainColorHex, apiColorKey) => {
   );
   merged.buttonBorderStyle = normalizeButtonBorderStyle(merged.buttonBorderStyle);
   merged.buttonEffect = normalizeButtonEffect(merged.buttonEffect);
+  merged.buttonPosition = normalizeButtonPosition(merged.buttonPosition);
 
   const legacyHeaderColor = rawTheme.headerTextColor ?? rawTheme.header_text_color;
   if (legacyHeaderColor) {
@@ -345,6 +366,9 @@ export const buildThemePayload = (themeSettings) => {
     }
     if (key === 'buttonEffect' && value) {
       value = normalizeButtonEffect(value);
+    }
+    if (key === 'buttonPosition' && value) {
+      value = normalizeButtonPosition(value);
     }
     if (value !== undefined && value !== '') {
       payload[snakeKey] = value;

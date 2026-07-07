@@ -47,6 +47,7 @@ export const DESIGN_SETTING_TOOLTIPS = {
   buttonEffect: 'ボタンの動きの効果です。動かすを選ぶと上下にバウンスするアニメーションが付きます。',
   buttonWidth: 'ボタンの幅です。単位は % で、親要素に対する割合で指定します。空欄の場合は自動幅になります。',
   buttonPadding: 'ボタン内側の余白です。% または px で指定できます。',
+  buttonPosition: 'ボタンの横方向の配置です。次へボタンや送信ボタンの位置に反映されます。',
   checkboxUncheckedBgColor: 'チェックボックス未選択時の背景色です。',
   checkboxUncheckedBorderColor: 'チェックボックス未選択時の枠線色です。',
   checkboxCheckedBgColor: 'チェックボックス選択時の背景色です。通常はメインカラーと揃えると統一感が出ます。',

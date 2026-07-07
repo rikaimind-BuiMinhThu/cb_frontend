@@ -6,6 +6,7 @@ import {
   resolveButtonBorderRadius,
   resolveButtonBounceEffect,
   resolveButtonPaddingCss,
+  resolveButtonPositionJustify,
   resolveButtonWidthCss,
   resolveFieldFocusEffect,
 } from '../views/BotElement/BotSetting/DesignSetting/utils/designThemeUtils';
@@ -79,6 +80,7 @@ const buildThemeVariables = (theme) => {
   const buttonWidth = resolveButtonWidthCss(theme.buttonWidth);
   const buttonPadding = resolveButtonPaddingCss(theme.buttonPadding);
   const buttonBorderRadius = resolveButtonBorderRadius(theme.buttonBorderStyle);
+  const buttonPositionJustify = resolveButtonPositionJustify(theme.buttonPosition);
 
   return `
   --c-header-title-text: ${theme.headerTitleTextColor};
@@ -110,6 +112,7 @@ const buildThemeVariables = (theme) => {
   --c-btn-border-radius: ${buttonBorderRadius};
   --c-btn-width: ${buttonWidth};
   --c-btn-padding: ${buttonPadding};
+  --c-btn-position-justify: ${buttonPositionJustify};
   --c-checkbox-unchecked-bg: ${theme.checkboxUncheckedBgColor};
   --c-checkbox-unchecked-border: ${theme.checkboxUncheckedBorderColor};
   --c-checkbox-checked-bg: ${theme.checkboxCheckedBgColor};
@@ -136,6 +139,8 @@ const buildButtonLayoutRules = (hasExplicitWidth) => {
   return `
   border-radius: var(--c-btn-border-radius, 4px) !important;
   padding: var(--c-btn-padding, 4px 10px) !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
   ${widthRule}
   box-sizing: border-box !important;`;
 };
@@ -282,6 +287,37 @@ const buildThemeRules = (theme, scopeSelector = '') => {
   const nextButtonSelector = scopeSelector
     ? scopedDescendant(scopeSelector, '.sp-body .sp-user-message-button-action .ss-user-message__action-btn')
     : '.sp-body .sp-user-message-button-action .ss-user-message__action-btn';
+  const nextButtonActionSelector = scopeSelector
+    ? scopedDescendant(scopeSelector, '.sp-body .sp-user-message-button-action')
+    : '.sp-body .sp-user-message-button-action';
+  const submitButtonRowSelector = scopeSelector
+    ? [
+      scopedDescendant(scopeSelector, '.sp-body .ss-user-setting__item-text_input-top:has(.chatbot-submit-button)'),
+      scopedDescendant(scopeSelector, '.sp-body .ss-user-setting__item-text_input-top:has(#chatbot-submit-button)'),
+      scopedDescendant(scopeSelector, '.sp-body .ss-user-setting__item-text_input-top:has([id^="chatbot-submit-button-"])'),
+    ].join(', ')
+    : [
+      '.sp-body .ss-user-setting__item-text_input-top:has(.chatbot-submit-button)',
+      '.sp-body .ss-user-setting__item-text_input-top:has(#chatbot-submit-button)',
+      '.sp-body .ss-user-setting__item-text_input-top:has([id^="chatbot-submit-button-"])',
+    ].join(', ');
+  const previewButtonGroupSelector = scopeSelector
+    ? scopedDescendant(scopeSelector, '.theme-customize-preview__button-group')
+    : '';
+  const buttonPositionRules = `
+${nextButtonActionSelector} {
+  display: flex !important;
+  justify-content: var(--c-btn-position-justify, flex-end) !important;
+}
+
+${submitButtonRowSelector} {
+  display: flex !important;
+  justify-content: var(--c-btn-position-justify, flex-end) !important;
+}`;
+  const previewButtonPositionRule = previewButtonGroupSelector ? `
+${previewButtonGroupSelector} {
+  justify-content: var(--c-btn-position-justify, flex-end) !important;
+}` : '';
 
   const previewButtonBase = scopeSelector
     ? scopedDescendant(scopeSelector, '.theme-customize-preview__button-group .btn-new-bot')
@@ -426,6 +462,9 @@ ${scopedDescendant(scopeSelector, '.sp-body-user-side-messages > .ss-user-messag
   padding: 10px;
   border-radius: 20px;
 }
+
+${buttonPositionRules}
+${previewButtonPositionRule}
 
 ${btnSelector},
 ${withPseudoOnEach(btnSelector, ':hover')},

@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Collapse } from 'antd';
-import { BORDER_TWINKLE_EFFECT_OPTIONS, BUTTON_BORDER_STYLE_OPTIONS, BUTTON_EFFECT_OPTIONS } from '../constants/designThemeConstants';
+import { BORDER_TWINKLE_EFFECT_OPTIONS, BUTTON_BORDER_STYLE_OPTIONS, BUTTON_EFFECT_OPTIONS, BUTTON_POSITION_OPTIONS } from '../constants/designThemeConstants';
 import { getDesignSettingTooltip } from '../constants/designSettingTooltips';
-import { normalizeBorderTwinkleEffect, normalizeButtonBorderStyle, normalizeButtonEffect } from '../utils/designThemeUtils';
+import { normalizeBorderTwinkleEffect, normalizeButtonBorderStyle, normalizeButtonEffect, normalizeButtonPosition } from '../utils/designThemeUtils';
 import MainColorPicker from './MainColorPicker';
 import ThemeColorField from './ThemeColorField';
 import ThemeDimensionField from './ThemeDimensionField';
@@ -104,6 +104,22 @@ const ThemeAccordionSection = ({
             tooltipKey={key}
             options={BUTTON_BORDER_STYLE_OPTIONS}
             normalizeValue={normalizeButtonBorderStyle}
+            onChange={(value) => onFieldChange(key, value)}
+          />
+        </div>
+      );
+    }
+
+    if (fieldType === 'positionSelect') {
+      return (
+        <div key={key} className={fieldClassSuffix}>
+          <ThemeEffectSelectField
+            label={label}
+            value={themeSettings[key]}
+            fullWidth={fullWidth ?? false}
+            tooltipKey={key}
+            options={BUTTON_POSITION_OPTIONS}
+            normalizeValue={normalizeButtonPosition}
             onChange={(value) => onFieldChange(key, value)}
           />
         </div>

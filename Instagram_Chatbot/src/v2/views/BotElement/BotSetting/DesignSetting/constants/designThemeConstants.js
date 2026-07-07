@@ -31,6 +31,14 @@ export const BUTTON_EFFECT_OPTIONS = [
 
 export const BUTTON_EFFECT_IDS = BUTTON_EFFECT_OPTIONS.map(({ id }) => id);
 
+export const BUTTON_POSITION_OPTIONS = [
+  { id: 'left', label: '左' },
+  { id: 'center', label: '中央' },
+  { id: 'right', label: '右' },
+];
+
+export const BUTTON_POSITION_IDS = BUTTON_POSITION_OPTIONS.map(({ id }) => id);
+
 export const THEME_FIELD_KEYS = [
   'headerTitleTextColor',
   'headerTitleFontSize',
@@ -63,6 +71,7 @@ export const THEME_FIELD_KEYS = [
   'buttonEffect',
   'buttonWidth',
   'buttonPadding',
+  'buttonPosition',
   'checkboxUncheckedBgColor',
   'checkboxUncheckedBorderColor',
   'checkboxCheckedBgColor',
@@ -183,6 +192,7 @@ export const THEME_SECTIONS = [
         unitOptions: ['%', 'px'],
         fullWidth: true,
       },
+      { key: 'buttonPosition', label: 'ボタン位置', fieldType: 'positionSelect', fullWidth: true },
       { fieldType: 'groupLabel', label: '通常時', fullWidth: true },
       { key: 'buttonNormalBgColor', label: '背景色' },
       { key: 'buttonNormalTextColor', label: '文字色' },
@@ -282,6 +292,7 @@ export const CAMEL_TO_SNAKE_THEME = {
   buttonEffect: 'button_effect',
   buttonWidth: 'button_width',
   buttonPadding: 'button_padding',
+  buttonPosition: 'button_position',
   checkboxUncheckedBgColor: 'checkbox_unchecked_bg_color',
   checkboxUncheckedBorderColor: 'checkbox_unchecked_border_color',
   checkboxCheckedBgColor: 'checkbox_checked_bg_color',
