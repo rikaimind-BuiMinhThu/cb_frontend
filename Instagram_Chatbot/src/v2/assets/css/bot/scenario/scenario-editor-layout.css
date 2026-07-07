@@ -894,6 +894,11 @@
   max-width: 100%;
 }
 
+.ss-layout-overview-messages .chatbot-submit-button--image,
+.ss-combine-overview-block__body .chatbot-submit-button--image {
+  max-width: 100%;
+}
+
 .ss-layout-overview-messages .ss-user-chat-detail-content {
   overflow-x: visible;
 }

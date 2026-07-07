@@ -25,6 +25,9 @@ const ButtonSubmitSetting = ({
   renderRootFaqOption,
   dataInputVar,
   setIsOpenAddVariable,
+  setIsOpenFileReference,
+  setVarFileReference,
+  setAcceptFile,
 }) => {
   const buttonSubmit = content.button_submit;
   const messageContent = dataMessages[indexMessageSelect]?.message_content?.[indexContent];
@@ -130,6 +133,56 @@ const ButtonSubmitSetting = ({
     );
   };
 
+  const renderImageSettings = () => (
+    <div className="ss-button-submit-setting__image-section">
+      <div className="ss-button-submit-setting__field-label ss-button-submit-setting__field-label--spaced">
+        {BUTTON_SUBMIT_LABELS.buttonImage}
+      </div>
+      {buttonSubmit.button_image_url && (
+        <div className="ss-button-submit-setting__image-preview-card">
+          <img
+            className="ss-button-submit-setting__image-preview"
+            src={buttonSubmit.button_image_url}
+            alt=""
+          />
+        </div>
+      )}
+      <div className="ss-setting-file-upload-wrapper ss-button-submit-setting__image-actions">
+        <Button
+          className="ss-bot-file-reference-btn ss-setting-file-upload-btn--spaced"
+          onClick={() => {
+            setIsOpenFileReference(true);
+            setVarFileReference({
+              indexContent,
+              contentType: content.type,
+              subContentType: 'button_image_url',
+            });
+            setAcceptFile(['image']);
+          }}
+        >
+          {SETTING_BUTTON_LABELS.fileReference}
+        </Button>
+        {buttonSubmit.button_image_url && (
+          <Button
+            className="ss-bot-file-reference-btn"
+            onClick={() => changeContent('button_image_url')('')}
+          >
+            {BUTTON_SUBMIT_LABELS.clearImage}
+          </Button>
+        )}
+      </div>
+      <InputCustom
+        className="ss-user-setting-input-overview ss-button-submit-setting__field-input"
+        styleLabel={{ width: '90%', marginTop: '10px' }}
+        label={BUTTON_SUBMIT_LABELS.buttonImageWidth}
+        inline={false}
+        placeholder="80%"
+        onChange={changeContent('button_image_width')}
+        value={buttonSubmit.button_image_width || '80%'}
+      />
+    </div>
+  );
+
   const renderButtonFields = () => (
     <div className="ss-user-setting__item-text_input-top ss-button-submit-setting__fields">
       <InputCustom
@@ -150,6 +203,7 @@ const ButtonSubmitSetting = ({
         onChange={changeMessageField('button_submit_name')}
         value={content.button_submit_name}
       />
+      {renderImageSettings()}
       <SubmitButtonConfig
         content={content}
         onChange={onChangeValueMessageContent}

@@ -69,6 +69,23 @@ export default function SubmitButton({ content, submitErrorMessage = "", onChang
     )
   }
 
+  const imageUrl = buttonSubmit.button_image_url;
+  const imageWidth = buttonSubmit.button_image_width || '80%';
+
+  const renderButtonContent = () => {
+    if (imageUrl) {
+      return (
+        <img
+          src={imageUrl}
+          alt={content.button_submit_name || ''}
+          style={{ width: imageWidth, maxWidth: '100%' }}
+        />
+      );
+    }
+
+    return getButtonSubmitName();
+  };
+
   const onChangeAndClickNext = () => {
     onChangeValue(
       contentIndex,
@@ -90,10 +107,13 @@ export default function SubmitButton({ content, submitErrorMessage = "", onChang
         {buttonSubmit?.style && <style dangerouslySetInnerHTML={{ __html: buttonSubmit.style }} />}
         <button
           id={submitButtonId}
-          className="chatbot-submit-button"
+          className={[
+            'chatbot-submit-button',
+            imageUrl ? 'chatbot-submit-button--image' : '',
+          ].filter(Boolean).join(' ')}
           onClick={onChangeAndClickNext}
         >
-          {getButtonSubmitName()}
+          {renderButtonContent()}
         </button>
       </div>
       {renderLoadingUnderButton()}

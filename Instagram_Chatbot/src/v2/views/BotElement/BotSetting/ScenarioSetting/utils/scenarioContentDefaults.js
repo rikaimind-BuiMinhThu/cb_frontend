@@ -418,6 +418,8 @@ export function createDefaultContentItem(messageType, idMax) {
         is_use_js: false,
         is_used_cart_confirm_page: false,
         use_for_confirm_order: false,
+        button_image_url: '',
+        button_image_width: '80%',
       },
       button_submit_name: '',
     };

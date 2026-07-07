@@ -269,51 +269,27 @@ const buildThemeRules = (theme, scopeSelector = '') => {
     buttonBounceEffect.keyframesCss,
   ].filter(Boolean))].join('\n');
 
-  const submitBtnSelector = scopeSelector
-    ? [
-      scopedDescendant(scopeSelector, '#chatbot-submit-button'),
-      scopedDescendant(scopeSelector, '.chatbot-submit-button'),
-      scopedDescendant(scopeSelector, '[id^="chatbot-submit-button-"]'),
-    ].join(', ')
-    : '#chatbot-submit-button, .chatbot-submit-button, [id^="chatbot-submit-button-"]';
   const btnSelector = scopeSelector
     ? [
-      submitBtnSelector,
       scopedDescendant(scopeSelector, '.btn-preview-bot'),
       scopedDescendant(scopeSelector, '.sp-body .btn-new-bot'),
       scopedDescendant(scopeSelector, '.sp-body .ss-user-message__action-btn'),
     ].join(', ')
-    : `${submitBtnSelector}, .btn-preview-bot, .sp-body .btn-new-bot, .sp-body .ss-user-message__action-btn`;
+    : '.btn-preview-bot, .sp-body .btn-new-bot, .sp-body .ss-user-message__action-btn';
   const nextButtonSelector = scopeSelector
     ? scopedDescendant(scopeSelector, '.sp-body .sp-user-message-button-action .ss-user-message__action-btn')
     : '.sp-body .sp-user-message-button-action .ss-user-message__action-btn';
   const nextButtonActionSelector = scopeSelector
     ? scopedDescendant(scopeSelector, '.sp-body .sp-user-message-button-action')
     : '.sp-body .sp-user-message-button-action';
-  const submitButtonRowSelector = scopeSelector
-    ? [
-      scopedDescendant(scopeSelector, '.sp-body .ss-user-setting__item-text_input-top:has(.chatbot-submit-button)'),
-      scopedDescendant(scopeSelector, '.sp-body .ss-user-setting__item-text_input-top:has(#chatbot-submit-button)'),
-      scopedDescendant(scopeSelector, '.sp-body .ss-user-setting__item-text_input-top:has([id^="chatbot-submit-button-"])'),
-    ].join(', ')
-    : [
-      '.sp-body .ss-user-setting__item-text_input-top:has(.chatbot-submit-button)',
-      '.sp-body .ss-user-setting__item-text_input-top:has(#chatbot-submit-button)',
-      '.sp-body .ss-user-setting__item-text_input-top:has([id^="chatbot-submit-button-"])',
-    ].join(', ');
-  const previewButtonGroupSelector = scopeSelector
-    ? scopedDescendant(scopeSelector, '.theme-customize-preview__button-group')
-    : '';
   const buttonPositionRules = `
 ${nextButtonActionSelector} {
   display: flex !important;
   justify-content: var(--c-btn-position-justify, flex-end) !important;
-}
-
-${submitButtonRowSelector} {
-  display: flex !important;
-  justify-content: var(--c-btn-position-justify, flex-end) !important;
 }`;
+  const previewButtonGroupSelector = scopeSelector
+    ? scopedDescendant(scopeSelector, '.theme-customize-preview__button-group')
+    : '';
   const previewButtonPositionRule = previewButtonGroupSelector ? `
 ${previewButtonGroupSelector} {
   justify-content: var(--c-btn-position-justify, flex-end) !important;

@@ -56,3 +56,37 @@
   width: 90%;
   margin-top: 10px;
 }
+
+.ss-button-submit-setting__image-section {
+  width: 90%;
+  margin-top: 10px;
+  align-self: flex-start;
+}
+
+.ss-button-submit-setting__image-preview-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 12px;
+  background-color: #f8f9fa;
+  border: 1px solid #e0e4ea;
+  border-radius: 4px;
+}
+
+.ss-button-submit-setting__image-preview {
+  display: block;
+  max-width: 100%;
+  max-height: 140px;
+  object-fit: contain;
+}
+
+.ss-button-submit-setting__image-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 10px;
+}

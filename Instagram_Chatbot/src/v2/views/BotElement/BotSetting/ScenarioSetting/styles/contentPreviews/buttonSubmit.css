@@ -25,3 +25,17 @@
   width: 95%;
   align-content: center;
 }
+
+.ss-button-submit-preview__button.chatbot-submit-button--image {
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  width: auto;
+  max-width: 100%;
+}
+
+.ss-button-submit-preview__button.chatbot-submit-button--image img {
+  display: block;
+  max-width: 100%;
+}

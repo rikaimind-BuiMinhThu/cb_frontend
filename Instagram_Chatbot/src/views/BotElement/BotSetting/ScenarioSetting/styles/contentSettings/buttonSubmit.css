@@ -56,3 +56,28 @@
   width: 90%;
   margin-top: 10px;
 }
+
+.ss-button-submit-setting__image-section {
+  width: 90%;
+  margin-top: 10px;
+}
+
+.ss-button-submit-setting__image-preview-wrap {
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.ss-button-submit-setting__image-preview {
+  max-width: 100%;
+  max-height: 120px;
+  object-fit: contain;
+}
+
+.ss-button-submit-setting__image-clear-btn {
+  display: block;
+  margin: 8px auto 0;
+}
+
+.ss-button-submit-setting__image-file-row {
+  margin-top: 8px;
+}

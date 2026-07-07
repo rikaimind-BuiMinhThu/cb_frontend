@@ -6,6 +6,10 @@ export default function SubmitButton({ content, submitErrorMessage = "", onChang
   if (content.type !== 'button_submit') return null;
 
   const buttonSubmit = content.button_submit;
+  if (!buttonSubmit) return null;
+
+  const imageUrl = buttonSubmit.button_image_url;
+  const imageWidth = buttonSubmit.button_image_width || '80%';
 
   useEffect(() => {
     if (!buttonSubmit.is_display_error_message) return;
@@ -66,6 +70,20 @@ export default function SubmitButton({ content, submitErrorMessage = "", onChang
     )
   }
 
+  const renderButtonContent = () => {
+    if (imageUrl) {
+      return (
+        <img
+          src={imageUrl}
+          alt={content.button_submit_name || ''}
+          style={{ width: imageWidth, maxWidth: '100%' }}
+        />
+      );
+    }
+
+    return getButtonSubmitName();
+  };
+
   const onChangeAndClickNext = () => {
     onChangeValue(
       contentIndex,
@@ -85,8 +103,15 @@ export default function SubmitButton({ content, submitErrorMessage = "", onChang
       {renderSubmitErrorMessage()}
       <div className="ss-user-setting__item-text_input-top">
         {buttonSubmit?.style && <style dangerouslySetInnerHTML={{ __html: buttonSubmit.style }} />}
-        <button id="chatbot-submit-button" onClick={onChangeAndClickNext}>
-          {getButtonSubmitName()}
+        <button
+          id="chatbot-submit-button"
+          className={[
+            'chatbot-submit-button',
+            imageUrl ? 'chatbot-submit-button--image' : '',
+          ].filter(Boolean).join(' ')}
+          onClick={onChangeAndClickNext}
+        >
+          {renderButtonContent()}
         </button>
       </div>
       {renderLoadingUnderButton()}

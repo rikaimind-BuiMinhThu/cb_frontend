@@ -303,3 +303,11 @@
   margin-right: 0;
   max-width: 70%;
 }
+
+.admin-page--chat-log .ss-user-setting__item-text_input-top:has(.chatbot-submit-button),
+.admin-page--chat-log .ss-user-setting__item-text_input-top:has(#chatbot-submit-button),
+.admin-page--chat-log .ss-user-setting__item-text_input-top:has([id^="chatbot-submit-button-"]) {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}

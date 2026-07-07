@@ -268,6 +268,9 @@ export const BUTTON_SUBMIT_LABELS = {
   jsCode: 'jscode',
   buttonId: 'IDボタン',
   buttonName: 'ボタン名称',
+  buttonImage: 'ボタン画像',
+  buttonImageWidth: 'ボタン画像幅',
+  clearImage: '削除',
   sampleError: 'エラーが発生しました。もう一度お試しください。',
 };
 

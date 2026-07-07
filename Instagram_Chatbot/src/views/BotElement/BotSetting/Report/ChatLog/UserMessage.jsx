@@ -5351,8 +5351,24 @@ export default function UserMessage({
             {content.type === "button_submit" && (
               <div style={{ marginBottom: "10px" }}>
                 <div className="ss-user-setting__item-text_input-top">
-                  <button style={{ borderRadius: "25px", padding: "5px 10px", fontSize: "16px", fontWeight: "bold"}} disabled id="chatbot-submit-button" className="ss-user-setting__select-btn-add btn btn-secondary">
-                    {content.button_submit_name || buttonSubmit?.button_submit_name || "送信"}
+                  <button style={{ borderRadius: "25px", padding: "5px 10px", fontSize: "16px", fontWeight: "bold"}} disabled id="chatbot-submit-button" className={[
+                    'ss-user-setting__select-btn-add',
+                    'btn',
+                    'btn-secondary',
+                    buttonSubmit?.button_image_url ? 'chatbot-submit-button--image' : '',
+                  ].filter(Boolean).join(' ')}>
+                    {buttonSubmit?.button_image_url ? (
+                      <img
+                        src={buttonSubmit.button_image_url}
+                        alt={content.button_submit_name || buttonSubmit?.button_submit_name || '送信'}
+                        style={{
+                          width: buttonSubmit.button_image_width || '80%',
+                          maxWidth: '100%',
+                        }}
+                      />
+                    ) : (
+                      content.button_submit_name || buttonSubmit?.button_submit_name || "送信"
+                    )}
                   </button>
                 </div>
               </div>
