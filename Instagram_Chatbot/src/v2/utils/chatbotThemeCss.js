@@ -40,6 +40,17 @@ ${spBodySelector} .ss-input-custom-field:not(.ss-bot-chat-detail-content),
 ${spBodySelector} .ant-select-selector
 `.trim();
 
+const buildFieldPlaceholderSelectors = (spBodySelector) => `
+${spBodySelector} input[type="text"]::placeholder,
+${spBodySelector} input[type="email"]::placeholder,
+${spBodySelector} input[type="tel"]::placeholder,
+${spBodySelector} input[type="number"]::placeholder,
+${spBodySelector} input[type="password"]::placeholder,
+${spBodySelector} textarea::placeholder,
+${spBodySelector} .ss-input-value:not(.ss-bot-chat-detail-content)::placeholder,
+${spBodySelector} .ss-input-custom-field:not(.ss-bot-chat-detail-content)::placeholder
+`.trim();
+
 const buildFieldFocusSelectors = (spBodySelector) => `
 ${spBodySelector} input[type="text"]:focus,
 ${spBodySelector} input[type="email"]:focus,
@@ -168,6 +179,7 @@ const buildThemeRules = (theme, scopeSelector = '') => {
     ? scopedDescendant(scopeSelector, '.sp-body')
     : '.sp-body';
   const fieldSelectors = buildFieldSelectors(spBodySelector);
+  const fieldPlaceholderSelectors = buildFieldPlaceholderSelectors(spBodySelector);
   const fieldFocusSelectors = buildFieldFocusSelectors(spBodySelector);
   const focusEffect = resolveFieldFocusEffect(theme.fieldFocusBgEffect, theme);
   const previewFocusSelector = scopeSelector
@@ -231,8 +243,14 @@ ${scopedDescendant(scopeSelector, '.theme-preview--btn-pressed.btn-new-bot')} {
   background-color: var(--c-btn-pressed-bg) !important;
   color: var(--c-btn-pressed-text, #fff) !important;
 }` : '';
+  const previewFieldPlaceholderSelector = previewFieldSelector
+    ? `${previewFieldSelector}::placeholder`
+    : '';
   const previewFieldFontSizeRule = previewFieldSelector ? `
 ${previewFieldSelector} {
+  font-size: var(--c-field-font-size, 14px) !important;
+}
+${previewFieldPlaceholderSelector} {
   font-size: var(--c-field-font-size, 14px) !important;
 }` : '';
 
@@ -273,6 +291,14 @@ ${fieldSelectors} {
   background-color: var(--c-field-unfocus-bg, #fff) !important;
   font-size: var(--c-field-font-size, 14px) !important;
   ${transitionRule}
+}
+
+${fieldPlaceholderSelectors} {
+  font-size: var(--c-field-font-size, 14px) !important;
+}
+
+${spBodySelector} .ant-select-selection-placeholder {
+  font-size: var(--c-field-font-size, 14px) !important;
 }
 ${focusRules}
 ${previewRules}
