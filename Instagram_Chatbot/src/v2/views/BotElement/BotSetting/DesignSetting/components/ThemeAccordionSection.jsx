@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Collapse } from 'antd';
-import { BORDER_TWINKLE_EFFECT_OPTIONS } from '../constants/designThemeConstants';
+import { BORDER_TWINKLE_EFFECT_OPTIONS, BUTTON_BORDER_STYLE_OPTIONS, BUTTON_EFFECT_OPTIONS } from '../constants/designThemeConstants';
 import { getDesignSettingTooltip } from '../constants/designSettingTooltips';
-import { normalizeBorderTwinkleEffect } from '../utils/designThemeUtils';
+import { normalizeBorderTwinkleEffect, normalizeButtonBorderStyle, normalizeButtonEffect } from '../utils/designThemeUtils';
 import MainColorPicker from './MainColorPicker';
 import ThemeColorField from './ThemeColorField';
+import ThemeDimensionField from './ThemeDimensionField';
 import ThemeEffectSelectField from './ThemeEffectSelectField';
 import ThemeNumberField from './ThemeNumberField';
 import DesignSettingLabel from './shared/DesignSettingLabel';
@@ -28,7 +29,7 @@ const ThemeAccordionSection = ({
   showReset,
 }) => {
   const renderField = (field, index) => {
-    const { key, label, isText, fieldType, fullWidth, effectOptions } = field;
+    const { key, label, isText, fieldType, fullWidth, effectOptions, unit, unitOptions } = field;
 
     if (fieldType === 'groupLabel') {
       return (
@@ -68,6 +69,7 @@ const ThemeAccordionSection = ({
 
     if (fieldType === 'effectSelect') {
       const isBorderTwinkle = effectOptions === 'borderTwinkle';
+      const isButtonBounce = effectOptions === 'buttonBounce';
 
       return (
         <div key={key} className={fieldClassSuffix}>
@@ -76,8 +78,50 @@ const ThemeAccordionSection = ({
             value={themeSettings[key]}
             fullWidth={fullWidth ?? false}
             tooltipKey={key}
-            options={isBorderTwinkle ? BORDER_TWINKLE_EFFECT_OPTIONS : undefined}
-            normalizeValue={isBorderTwinkle ? normalizeBorderTwinkleEffect : undefined}
+            options={isBorderTwinkle
+              ? BORDER_TWINKLE_EFFECT_OPTIONS
+              : isButtonBounce
+                ? BUTTON_EFFECT_OPTIONS
+                : undefined}
+            normalizeValue={isBorderTwinkle
+              ? normalizeBorderTwinkleEffect
+              : isButtonBounce
+                ? normalizeButtonEffect
+                : undefined}
+            onChange={(value) => onFieldChange(key, value)}
+          />
+        </div>
+      );
+    }
+
+    if (fieldType === 'borderStyleSelect') {
+      return (
+        <div key={key} className={fieldClassSuffix}>
+          <ThemeEffectSelectField
+            label={label}
+            value={themeSettings[key]}
+            fullWidth={fullWidth ?? false}
+            tooltipKey={key}
+            options={BUTTON_BORDER_STYLE_OPTIONS}
+            normalizeValue={normalizeButtonBorderStyle}
+            onChange={(value) => onFieldChange(key, value)}
+          />
+        </div>
+      );
+    }
+
+    if (fieldType === 'dimension') {
+      return (
+        <div key={key} className={fieldClassSuffix}>
+          <ThemeDimensionField
+            label={label}
+            value={themeSettings[key]}
+            fullWidth={fullWidth ?? false}
+            tooltipKey={key}
+            unit={unit}
+            unitOptions={unitOptions}
+            min={unit === '%' ? 1 : 0}
+            max={unit === '%' ? 100 : 200}
             onChange={(value) => onFieldChange(key, value)}
           />
         </div>

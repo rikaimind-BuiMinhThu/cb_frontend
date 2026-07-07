@@ -16,6 +16,21 @@ export const BORDER_TWINKLE_EFFECT_OPTIONS = [
 
 export const BORDER_TWINKLE_EFFECT_IDS = BORDER_TWINKLE_EFFECT_OPTIONS.map(({ id }) => id);
 
+export const BUTTON_BORDER_STYLE_OPTIONS = [
+  { id: 'square', label: '角なし' },
+  { id: 'rounded', label: '少し丸' },
+  { id: 'pill', label: 'ピル型' },
+];
+
+export const BUTTON_BORDER_STYLE_IDS = BUTTON_BORDER_STYLE_OPTIONS.map(({ id }) => id);
+
+export const BUTTON_EFFECT_OPTIONS = [
+  { id: 'none', label: 'なし' },
+  { id: 'bounce', label: '動かす' },
+];
+
+export const BUTTON_EFFECT_IDS = BUTTON_EFFECT_OPTIONS.map(({ id }) => id);
+
 export const THEME_FIELD_KEYS = [
   'headerTitleTextColor',
   'headerTitleFontSize',
@@ -44,6 +59,10 @@ export const THEME_FIELD_KEYS = [
   'buttonDisabledBgColor',
   'buttonDisabledTextColor',
   'buttonFontSize',
+  'buttonBorderStyle',
+  'buttonEffect',
+  'buttonWidth',
+  'buttonPadding',
   'checkboxUncheckedBgColor',
   'checkboxUncheckedBorderColor',
   'checkboxCheckedBgColor',
@@ -143,6 +162,27 @@ export const THEME_SECTIONS = [
     title: 'ボタン',
     fields: [
       { key: 'buttonFontSize', label: 'フォントサイズ', fieldType: 'fontSize', fullWidth: true },
+      {
+        key: 'buttonBorderStyle',
+        label: '枠線スタイル',
+        fieldType: 'borderStyleSelect',
+        fullWidth: true,
+      },
+      {
+        key: 'buttonEffect',
+        label: '効果',
+        fieldType: 'effectSelect',
+        effectOptions: 'buttonBounce',
+        fullWidth: true,
+      },
+      { key: 'buttonWidth', label: '幅', fieldType: 'dimension', unit: '%', fullWidth: true },
+      {
+        key: 'buttonPadding',
+        label: 'パディング',
+        fieldType: 'dimension',
+        unitOptions: ['%', 'px'],
+        fullWidth: true,
+      },
       { fieldType: 'groupLabel', label: '通常時', fullWidth: true },
       { key: 'buttonNormalBgColor', label: '背景色' },
       { key: 'buttonNormalTextColor', label: '文字色' },
@@ -238,6 +278,10 @@ export const CAMEL_TO_SNAKE_THEME = {
   buttonDisabledBgColor: 'button_disabled_bg_color',
   buttonDisabledTextColor: 'button_disabled_text_color',
   buttonFontSize: 'button_font_size',
+  buttonBorderStyle: 'button_border_style',
+  buttonEffect: 'button_effect',
+  buttonWidth: 'button_width',
+  buttonPadding: 'button_padding',
   checkboxUncheckedBgColor: 'checkbox_unchecked_bg_color',
   checkboxUncheckedBorderColor: 'checkbox_unchecked_border_color',
   checkboxCheckedBgColor: 'checkbox_checked_bg_color',

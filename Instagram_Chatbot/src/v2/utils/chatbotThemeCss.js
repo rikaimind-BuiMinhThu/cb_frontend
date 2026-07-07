@@ -3,6 +3,10 @@ import { resolveMainColorContext } from '../views/BotElement/BotSetting/DesignSe
 import {
   mergeThemeWithDefaults,
   resolveBorderTwinkleEffect,
+  resolveButtonBorderRadius,
+  resolveButtonBounceEffect,
+  resolveButtonPaddingCss,
+  resolveButtonWidthCss,
   resolveFieldFocusEffect,
 } from '../views/BotElement/BotSetting/DesignSetting/utils/designThemeUtils';
 
@@ -71,7 +75,12 @@ ${spBodySelector} .select-custom-native:focus,
 ${spBodySelector} .ant-select-focused .ant-select-selector
 `.trim();
 
-const buildThemeVariables = (theme) => `
+const buildThemeVariables = (theme) => {
+  const buttonWidth = resolveButtonWidthCss(theme.buttonWidth);
+  const buttonPadding = resolveButtonPaddingCss(theme.buttonPadding);
+  const buttonBorderRadius = resolveButtonBorderRadius(theme.buttonBorderStyle);
+
+  return `
   --c-header-title-text: ${theme.headerTitleTextColor};
   --c-header-title-font-size: ${theme.headerTitleFontSize};
   --c-header-subtitle-text: ${theme.headerSubtitleTextColor};
@@ -98,6 +107,9 @@ const buildThemeVariables = (theme) => `
   --c-btn-disabled-bg: ${theme.buttonDisabledBgColor};
   --c-btn-disabled-text: ${theme.buttonDisabledTextColor};
   --c-btn-font-size: ${theme.buttonFontSize};
+  --c-btn-border-radius: ${buttonBorderRadius};
+  --c-btn-width: ${buttonWidth};
+  --c-btn-padding: ${buttonPadding};
   --c-checkbox-unchecked-bg: ${theme.checkboxUncheckedBgColor};
   --c-checkbox-unchecked-border: ${theme.checkboxUncheckedBorderColor};
   --c-checkbox-checked-bg: ${theme.checkboxCheckedBgColor};
@@ -114,6 +126,24 @@ const buildThemeVariables = (theme) => `
   --c-error-text: ${theme.errorMessageTextColor};
   --c-error-font-size: ${theme.errorMessageFontSize};
 `;
+};
+
+const buildButtonLayoutRules = (hasExplicitWidth) => {
+  const widthRule = hasExplicitWidth
+    ? 'width: var(--c-btn-width) !important; min-width: 0 !important;'
+    : 'width: auto; min-width: 70px !important;';
+
+  return `
+  border-radius: var(--c-btn-border-radius, 4px) !important;
+  padding: var(--c-btn-padding, 4px 10px) !important;
+  ${widthRule}
+  box-sizing: border-box !important;`;
+};
+
+const buildButtonBounceAnimationRule = (effectId) => {
+  const { animation } = resolveButtonBounceEffect(effectId);
+  return animation !== 'none' ? `animation: ${animation} !important;` : '';
+};
 
 const buildFieldFocusStyles = (fieldFocusSelectors, focusEffect, previewFocusSelector = '') => {
   const transitionRule = focusEffect.fieldTransition !== 'none'
@@ -222,11 +252,16 @@ const buildThemeRules = (theme, scopeSelector = '') => {
     'radio',
     theme,
   ).keyframesCss;
+  const buttonBounceEffect = resolveButtonBounceEffect(theme.buttonEffect);
+  const buttonBounceAnimation = buildButtonBounceAnimationRule(theme.buttonEffect);
+  const hasExplicitButtonWidth = resolveButtonWidthCss(theme.buttonWidth) !== 'auto';
+  const buttonLayoutRules = buildButtonLayoutRules(hasExplicitButtonWidth);
 
   const twinkleKeyframesCss = [...new Set([
     focusEffect.keyframesCss,
     checkboxTwinkleKeyframes,
     radioTwinkleKeyframes,
+    buttonBounceEffect.keyframesCss,
   ].filter(Boolean))].join('\n');
 
   const submitBtnSelector = scopeSelector
@@ -281,6 +316,8 @@ ${withPseudoOnEach(previewButtonNormalSelector, ':focus-visible')} {
   font-size: var(--c-btn-font-size, 14px) !important;
   border: none !important;
   box-shadow: none !important;
+  ${buttonLayoutRules}
+  ${buttonBounceAnimation}
 }
 
 ${previewButtonPressedSelector},
@@ -292,6 +329,7 @@ ${withPseudoOnEach(previewButtonPressedSelector, ':focus-visible')} {
   font-size: var(--c-btn-font-size, 14px) !important;
   border: none !important;
   box-shadow: none !important;
+  ${buttonLayoutRules}
 }
 
 ${previewButtonDisabledSelector} {
@@ -301,6 +339,8 @@ ${previewButtonDisabledSelector} {
   opacity: 1 !important;
   border: none !important;
   box-shadow: none !important;
+  animation: none !important;
+  ${buttonLayoutRules}
 }` : '';
   const previewFieldPlaceholderSelector = previewFieldSelector
     ? `${previewFieldSelector}::placeholder`
@@ -396,11 +436,14 @@ ${withPseudoOnEach(btnSelector, ':focus-visible')} {
   font-size: var(--c-btn-font-size, 14px) !important;
   border: none !important;
   box-shadow: none !important;
+  ${buttonLayoutRules}
+  ${buttonBounceAnimation}
 }
 
 ${withPseudoOnEach(btnSelector, ':active')} {
   background-color: var(--c-btn-pressed-bg) !important;
   color: var(--c-btn-pressed-text, #fff) !important;
+  animation: none !important;
 }
 
 ${withPseudoOnEach(btnSelector, ':disabled')},
@@ -408,28 +451,29 @@ ${withPseudoOnEach(btnSelector, '.disabled')} {
   background-color: var(--c-btn-disabled-bg, #e0e0e0) !important;
   color: var(--c-btn-disabled-text, #999) !important;
   opacity: 1 !important;
+  animation: none !important;
 }
 
 ${nextButtonSelector},
 ${withPseudoOnEach(nextButtonSelector, ':hover')},
 ${withPseudoOnEach(nextButtonSelector, ':focus')},
 ${withPseudoOnEach(nextButtonSelector, ':focus-visible')} {
-  min-width: 70px !important;
   min-height: 36px !important;
-  padding: 4px 10px !important;
-  border-radius: 4px !important;
   font-weight: 500 !important;
   background-color: var(--c-btn-normal-bg) !important;
   color: var(--c-btn-normal-text, #fff) !important;
   font-size: var(--c-btn-font-size, 14px) !important;
   border: none !important;
   box-shadow: none !important;
+  ${buttonLayoutRules}
+  ${buttonBounceAnimation}
 }
 
 ${withPseudoOnEach(nextButtonSelector, ':active')} {
   background-color: var(--c-btn-pressed-bg) !important;
   color: var(--c-btn-pressed-text, #fff) !important;
   font-size: var(--c-btn-font-size, 14px) !important;
+  animation: none !important;
 }
 
 ${withPseudoOnEach(nextButtonSelector, ':disabled')},
@@ -438,6 +482,7 @@ ${withPseudoOnEach(nextButtonSelector, '.disabled')} {
   color: var(--c-btn-disabled-text, #999) !important;
   font-size: var(--c-btn-font-size, 14px) !important;
   opacity: 1 !important;
+  animation: none !important;
 }
 
 ${spBodySelector} .ant-checkbox-inner {

@@ -2,6 +2,8 @@ import { COLOR_MAP } from '../constants/designChatbotConstants';
 import { resolveMainColorContext } from './designChatbotUtils';
 import {
   BORDER_TWINKLE_EFFECT_IDS,
+  BUTTON_BORDER_STYLE_IDS,
+  BUTTON_EFFECT_IDS,
   CAMEL_TO_SNAKE_THEME,
   FIELD_FOCUS_EFFECT_IDS,
   THEME_FIELD_KEYS,
@@ -9,6 +11,16 @@ import {
 
 const VALID_EFFECT_IDS = new Set(FIELD_FOCUS_EFFECT_IDS);
 const VALID_BORDER_TWINKLE_IDS = new Set(BORDER_TWINKLE_EFFECT_IDS);
+const VALID_BUTTON_BORDER_STYLE_IDS = new Set(BUTTON_BORDER_STYLE_IDS);
+const VALID_BUTTON_EFFECT_IDS = new Set(BUTTON_EFFECT_IDS);
+
+const BUTTON_BOUNCE_ANIMATION = 'themeButtonBounce 1.2s ease-in-out infinite';
+
+const BUTTON_BORDER_RADIUS_BY_STYLE = {
+  square: '0',
+  rounded: '4px',
+  pill: '9999px',
+};
 
 const TWINKLE_ANIMATION_BY_ELEMENT = {
   field: 'themeFieldBorderTwinkle 1.2s ease-in-out infinite',
@@ -51,6 +63,52 @@ export const normalizeBorderTwinkleEffect = (value) => {
   if (!value) return 'none';
   if (VALID_BORDER_TWINKLE_IDS.has(value)) return value;
   return 'none';
+};
+
+export const normalizeButtonBorderStyle = (value) => {
+  if (!value) return 'rounded';
+  if (VALID_BUTTON_BORDER_STYLE_IDS.has(value)) return value;
+  return 'rounded';
+};
+
+export const normalizeButtonEffect = (value) => {
+  if (!value) return 'none';
+  if (VALID_BUTTON_EFFECT_IDS.has(value)) return value;
+  return 'none';
+};
+
+export const resolveButtonBorderRadius = (styleId) => {
+  const style = normalizeButtonBorderStyle(styleId);
+  return BUTTON_BORDER_RADIUS_BY_STYLE[style] || BUTTON_BORDER_RADIUS_BY_STYLE.rounded;
+};
+
+export const buildButtonBounceKeyframes = () => `
+@keyframes themeButtonBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}`;
+
+export const resolveButtonBounceEffect = (effectId) => {
+  if (normalizeButtonEffect(effectId) !== 'bounce') {
+    return { animation: 'none', keyframesCss: '' };
+  }
+
+  return {
+    animation: BUTTON_BOUNCE_ANIMATION,
+    keyframesCss: buildButtonBounceKeyframes(),
+  };
+};
+
+export const resolveButtonWidthCss = (widthValue) => {
+  if (!widthValue || typeof widthValue !== 'string') return 'auto';
+  const trimmed = widthValue.trim();
+  return trimmed || 'auto';
+};
+
+export const resolveButtonPaddingCss = (paddingValue) => {
+  if (!paddingValue || typeof paddingValue !== 'string') return '4px 10px';
+  const trimmed = paddingValue.trim();
+  return trimmed || '4px 10px';
 };
 
 export const resolveBorderTwinkleEffect = (effectId, elementType, theme = null) => {
@@ -185,6 +243,10 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
     buttonDisabledBgColor: '#e0e0e0',
     buttonDisabledTextColor: '#999999',
     buttonFontSize: '14px',
+    buttonBorderStyle: 'rounded',
+    buttonEffect: 'none',
+    buttonWidth: '',
+    buttonPadding: '4px 10px',
     checkboxUncheckedBgColor: '#ffffff',
     checkboxUncheckedBorderColor: '#cccccc',
     checkboxCheckedBgColor: mainColorHex,
@@ -232,6 +294,8 @@ export const mergeThemeWithDefaults = (rawTheme, mainColorHex, apiColorKey) => {
   merged.radioSelectedBorderEffect = normalizeBorderTwinkleEffect(
     merged.radioSelectedBorderEffect,
   );
+  merged.buttonBorderStyle = normalizeButtonBorderStyle(merged.buttonBorderStyle);
+  merged.buttonEffect = normalizeButtonEffect(merged.buttonEffect);
 
   const legacyHeaderColor = rawTheme.headerTextColor ?? rawTheme.header_text_color;
   if (legacyHeaderColor) {
@@ -275,6 +339,12 @@ export const buildThemePayload = (themeSettings) => {
     }
     if (key === 'radioSelectedBorderEffect' && value) {
       value = normalizeBorderTwinkleEffect(value);
+    }
+    if (key === 'buttonBorderStyle' && value) {
+      value = normalizeButtonBorderStyle(value);
+    }
+    if (key === 'buttonEffect' && value) {
+      value = normalizeButtonEffect(value);
     }
     if (value !== undefined && value !== '') {
       payload[snakeKey] = value;

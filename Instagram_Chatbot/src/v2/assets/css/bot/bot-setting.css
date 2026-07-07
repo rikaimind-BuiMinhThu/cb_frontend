@@ -497,11 +497,8 @@
 }
 
 .theme-customize-preview__button-group .btn-new-bot {
-  min-width: 70px;
   min-height: 36px;
-  padding: 4px 10px;
   border: none;
-  border-radius: 4px;
 }
 
 .theme-customize-tab-preview__hint {
