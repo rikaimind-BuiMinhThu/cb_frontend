@@ -152,6 +152,7 @@ export const typeTextarea = [
 export const typeRadio = [
   { key: 'default', value: 'デフォルト' },
   { key: 'radio_button_img', value: '画像付きラジオボタン' },
+  { key: 'upsell_button', value: 'アップセールボタン' },
   { key: 'consume_api_response', value: 'API応答を利用する' },
   { key: 'block_style', value: 'ブロックスタイル' },
 ];

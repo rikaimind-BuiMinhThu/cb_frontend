@@ -4,11 +4,22 @@ import CheckboxCustom from '../../scenarioComon/CheckboxCustom';
 import { LABELS } from '../../../PreviewComponent/Constants';
 import ContentTypeSelector, { ContentTitleInput } from '../shared/ContentTypeSelector';
 import { typeRadio } from '../../constants/scenarioFormConstants';
+import { RADIO_BUTTON_TYPES } from '../../constants/contentTypeConstants';
+import { ensureUpsellButtonDefaults } from '../../constants/upsellButtonDefaults';
 import { buildRadioButtonSettingContext } from './radioButtonSettingContext';
 
 const RadioButtonCommonHeader = (props) => {
   const { radioButton } = props;
   const { changeContent } = buildRadioButtonSettingContext(props);
+
+  const handleTypeChange = (value) => {
+    changeContent('type')(value);
+    if (value === RADIO_BUTTON_TYPES.UPSELL_BUTTON) {
+      const normalized = ensureUpsellButtonDefaults({ ...radioButton, type: value });
+      changeContent(RADIO_BUTTON_TYPES.UPSELL_BUTTON)(normalized[RADIO_BUTTON_TYPES.UPSELL_BUTTON]);
+      changeContent('img_layout')(normalized.img_layout);
+    }
+  };
 
   return (
     <>
@@ -22,7 +33,7 @@ const RadioButtonCommonHeader = (props) => {
         typeValue={radioButton?.type}
         typeOptions={typeRadio}
         onTitleRequireChange={changeContent('title_require')}
-        onTypeChange={changeContent('type')}
+        onTypeChange={handleTypeChange}
       />
       {radioButton.title_require === true && (
         <ContentTitleInput

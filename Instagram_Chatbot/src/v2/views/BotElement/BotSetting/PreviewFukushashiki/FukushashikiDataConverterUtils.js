@@ -431,6 +431,9 @@ const convertRadioButtonObject = (content) => {
   if (!selectedElement) {
     selectedElement = content.radio_button.radio_button_img.find(item => item.value === initialSelection);
   }
+  if (!selectedElement && content.radio_button.upsell_button) {
+    selectedElement = content.radio_button.upsell_button.find(item => item.value === initialSelection);
+  }
   if (selectedElement) {
     const value = selectedElement.value;
     const fukuObject = {

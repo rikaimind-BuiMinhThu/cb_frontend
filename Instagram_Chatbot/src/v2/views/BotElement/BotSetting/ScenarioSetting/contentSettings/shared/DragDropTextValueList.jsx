@@ -32,6 +32,7 @@ const DragDropTextValueList = ({
   itemBodyClassName = '',
   renderItemPrefix,
   renderItemExtra,
+  minOptions = 1,
 }) => {
   const getItemPanelClassName = (item) => [
     itemClassName,
@@ -51,7 +52,7 @@ const DragDropTextValueList = ({
         placeholder={textValuePlaceholder}
         valueLeft={item.text}
         valueRight={item.value}
-        icon={items.length >= 2 && onRemoveItem ? 'times-circle' : ''}
+        icon={items.length > minOptions && onRemoveItem ? 'times-circle' : ''}
         classIcon={inputDoubleClassIcon}
         onClickIcon={onRemoveItem ? () => onRemoveItem(index) : undefined}
         onChange={(value, name) => onChangeItem(index, name === 'left' ? 'text' : 'value', value)}
@@ -160,6 +161,7 @@ DragDropTextValueList.propTypes = {
   itemBodyClassName: PropTypes.string,
   renderItemPrefix: PropTypes.func,
   renderItemExtra: PropTypes.func,
+  minOptions: PropTypes.number,
 };
 
 export default DragDropTextValueList;

@@ -1,3 +1,5 @@
+import { getDefaultUpsellButtonOptions } from '../constants/upsellButtonDefaults';
+
 export function getNextContentId(messageContentArray) {
   if (messageContentArray.length !== 0) {
     return Math.max(...messageContentArray.map((item) => item.id)) + 1;
@@ -60,6 +62,7 @@ export function createDefaultContentItem(messageType, idMax) {
         option_margin: '5px',
         default: [{ id: 1 }],
         radio_button_img: [{ id: 1 }],
+        upsell_button: getDefaultUpsellButtonOptions(),
         block_style: [{ id: 1 }],
       },
     };

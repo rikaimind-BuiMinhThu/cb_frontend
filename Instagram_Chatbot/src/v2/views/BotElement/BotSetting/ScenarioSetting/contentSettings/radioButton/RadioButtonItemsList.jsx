@@ -20,6 +20,9 @@ const RadioButtonItemsList = (props) => {
     showGripOnInputRow = true,
     droppableId = 'radio-items',
     showTextInput = true,
+    minOptions = 1,
+    maxOptions,
+    showAddButton = true,
   } = props;
 
   const { indexMessageSelect, indexContent, content, changeContent } = buildRadioButtonSettingContext(props);
@@ -91,15 +94,19 @@ const RadioButtonItemsList = (props) => {
           itemBodyClassName={itemBodyClassName}
           renderItemPrefix={renderItemPrefix}
           renderItemExtra={renderItemExtra}
+          minOptions={minOptions}
         />
       </div>
+      {showAddButton && (
       <RadioButtonAddButton
         indexMessageSelect={indexMessageSelect}
         indexContent={indexContent}
         content={content}
         radioButton={radioButton}
         handleAddItemRadioCheckbox={handleAddItemRadioCheckbox}
+        maxOptions={maxOptions}
       />
+      )}
     </>
   );
 };
@@ -118,6 +125,9 @@ RadioButtonItemsList.propTypes = {
   showGripOnInputRow: PropTypes.bool,
   droppableId: PropTypes.string,
   showTextInput: PropTypes.bool,
+  minOptions: PropTypes.number,
+  maxOptions: PropTypes.number,
+  showAddButton: PropTypes.bool,
 };
 
 export default RadioButtonItemsList;

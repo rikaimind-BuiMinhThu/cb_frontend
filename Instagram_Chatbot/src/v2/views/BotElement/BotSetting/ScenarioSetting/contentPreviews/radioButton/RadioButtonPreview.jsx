@@ -164,6 +164,8 @@ const RadioButtonPreview = ({
         return renderDefaultType();
       case RADIO_BUTTON_TYPES.RADIO_BUTTON_IMG:
         return renderImgType();
+      case RADIO_BUTTON_TYPES.UPSELL_BUTTON:
+        return renderImgType();
       case RADIO_BUTTON_TYPES.CONSUME_API_RESPONSE:
         return renderConsumeApiType();
       case RADIO_BUTTON_TYPES.BLOCK_STYLE:

@@ -1031,7 +1031,7 @@ export default function UserMessage({
                         </div>
                       );
                     })}
-                  {radioButton.type === "radio_button_img" &&
+                  {(radioButton.type === "radio_button_img" || radioButton.type === "upsell_button") &&
                     radioButton[radioButton.type].map((item, index) => {
                       return (
                         <div

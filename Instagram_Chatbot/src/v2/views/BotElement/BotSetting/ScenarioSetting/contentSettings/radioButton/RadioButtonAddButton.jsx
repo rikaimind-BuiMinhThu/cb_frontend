@@ -8,7 +8,14 @@ const RadioButtonAddButton = ({
   content,
   radioButton,
   handleAddItemRadioCheckbox,
-}) => (
+  maxOptions,
+}) => {
+  const items = radioButton?.[radioButton.type] ?? [];
+  if (maxOptions != null && items.length >= maxOptions) {
+    return null;
+  }
+
+  return (
   <div className="ss-user-setting__item-bottom ss-radio-button-setting__add-row">
     <MDBIcon
       fas
@@ -22,7 +29,8 @@ const RadioButtonAddButton = ({
       )}
     />
   </div>
-);
+  );
+};
 
 RadioButtonAddButton.propTypes = {
   indexMessageSelect: PropTypes.number.isRequired,
@@ -30,6 +38,7 @@ RadioButtonAddButton.propTypes = {
   content: PropTypes.object.isRequired,
   radioButton: PropTypes.object.isRequired,
   handleAddItemRadioCheckbox: PropTypes.func.isRequired,
+  maxOptions: PropTypes.number,
 };
 
 export default RadioButtonAddButton;

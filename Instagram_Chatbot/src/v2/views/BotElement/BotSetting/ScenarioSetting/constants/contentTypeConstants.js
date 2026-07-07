@@ -35,6 +35,7 @@ export const CHECKBOX_TYPES = {
 export const RADIO_BUTTON_TYPES = {
   DEFAULT: 'default',
   RADIO_BUTTON_IMG: 'radio_button_img',
+  UPSELL_BUTTON: 'upsell_button',
   CONSUME_API_RESPONSE: 'consume_api_response',
   BLOCK_STYLE: 'block_style',
 };

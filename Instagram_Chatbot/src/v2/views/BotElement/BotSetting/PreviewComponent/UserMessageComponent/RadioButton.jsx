@@ -217,6 +217,8 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
         return renderDefaultContent();
       case "radio_button_img":
         return renderRadioButtonImgContent();
+      case "upsell_button":
+        return renderRadioButtonImgContent();
       case "consume_api_response":
         return renderConsumeApiResponseContent();
       case "block_style":

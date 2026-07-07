@@ -103,6 +103,8 @@ const getRadioButtonDefaultValue = (subContent, value) => {
       return subContent.default.find(item => item.value === value)?.text;
     case "radio_button_img":
       return subContent.radio_button_img.find(item => item.value === value)?.text;
+    case "upsell_button":
+      return subContent.upsell_button.find(item => item.value === value)?.value;
     case "consume_api_response":
       throw new Error("getRadioButtonDefaultValue: consume_api_response is not supported");
     case "block_style":

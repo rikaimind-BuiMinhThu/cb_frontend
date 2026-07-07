@@ -344,6 +344,9 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
   }, [dataMessages, setDataMessages]);
 
   const handleAddItemRadioCheckbox = useCallback((indexMessage, indexContent, type, contentType) => {
+    if (contentType === 'upsell_button') {
+      return;
+    }
     let arr = dataMessages[indexMessage].message_content[indexContent][type][contentType];
     if (arr === undefined || arr === null) {
       dataMessages[indexMessage].message_content[indexContent][type][contentType] = [];
@@ -522,6 +525,9 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
   }, [onChangeValueMessageContent]);
 
   const handleRemoveItemContent = useCallback((indexMessage, indexContent, type, contentType, indexItem) => {
+    if (contentType === 'upsell_button') {
+      return;
+    }
     const newArrRadio = dataMessages[indexMessage].message_content[indexContent][type][contentType].filter((item, index) => index !== indexItem);
     dataMessages[indexMessage].message_content[indexContent][type][contentType] = newArrRadio;
     setDataMessages([...dataMessages]);

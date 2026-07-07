@@ -6,6 +6,7 @@ import RadioButtonFukushashikiSection from './RadioButtonFukushashikiSection';
 import DefaultTypeSetting from './DefaultTypeSetting';
 import RadioButtonImgTypeSetting from './RadioButtonImgTypeSetting';
 import BlockStyleTypeSetting from './BlockStyleTypeSetting';
+import UpsellButtonTypeSetting from './UpsellButtonTypeSetting';
 import ConsumeApiResponseTypeSetting from './ConsumeApiResponseTypeSetting';
 import '../../styles/contentSettings/radioButton.css';
 
@@ -30,6 +31,8 @@ const RadioButtonSetting = (props) => {
         return <DefaultTypeSetting {...props} />;
       case RADIO_BUTTON_TYPES.RADIO_BUTTON_IMG:
         return <RadioButtonImgTypeSetting {...props} />;
+      case RADIO_BUTTON_TYPES.UPSELL_BUTTON:
+        return <UpsellButtonTypeSetting {...props} />;
       case RADIO_BUTTON_TYPES.BLOCK_STYLE:
         return <BlockStyleTypeSetting {...props} />;
       default:
