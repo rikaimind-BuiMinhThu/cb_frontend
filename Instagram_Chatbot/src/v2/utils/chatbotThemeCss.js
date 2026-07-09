@@ -32,6 +32,39 @@ const scopedDescendant = (scopeSelector, suffix) => {
 const scopedClass = (scopeSelector, className) =>
   scopedDescendant(scopeSelector, className.startsWith('.') ? className : `.${className}`);
 
+const USER_MESSAGE_TITLE_CLASSES = [
+  '.ss-message__content--user-text-input-title',
+  '.ss-message__content--user-label-title',
+  '.ss-message__content--user-textarea-title',
+  '.ss-message__content--user-radio_button-title',
+  '.ss-message__content--user-checkbox-title',
+  '.ss-message__content--user-pull_down-title',
+  '.ss-message__content--user-zip_code_address-title',
+  '.ss-message__content--user-calender-title',
+  '.ss-message__content--user-agree_to_term-title',
+  '.ss-message__content--user-shipping-address-title',
+];
+
+const USER_MESSAGE_BUBBLE_LABEL_SELECTORS = [
+  '.ss-message__content--user-checkbox > label',
+  '.ss-message__content--user-checkbox--block_style > span',
+  '.ss-message__content--user-radio_button > label',
+  '.ss-message__content--user-radio_button--block_style > span',
+  '.theme-customize-preview__checkbox-option > label',
+  '.theme-customize-preview__radio-default > label',
+];
+
+const buildUserBubbleTextSelectors = (scopeSelector) => {
+  const wrapperPrefix = '.ss-user-message__content-wrapper';
+  const titleSelectors = USER_MESSAGE_TITLE_CLASSES.map(
+    (className) => scopedDescendant(scopeSelector, `${wrapperPrefix} ${className}`),
+  );
+  const labelSelectors = USER_MESSAGE_BUBBLE_LABEL_SELECTORS.map(
+    (selector) => scopedDescendant(scopeSelector, `${wrapperPrefix} ${selector}`),
+  );
+  return [...titleSelectors, ...labelSelectors].join(',\n');
+};
+
 const withPseudoOnEach = (selectorList, pseudo) =>
   selectorList
     .split(',')
@@ -295,6 +328,16 @@ ${previewButtonGroupSelector} {
   justify-content: var(--c-btn-position-justify, flex-end) !important;
 }` : '';
 
+  const userMessageWrapperSelector = [
+    scopedDescendant(scopeSelector, '.sp-body-user-side-messages .ss-user-message__content-wrapper'),
+    scopedClass(scopeSelector, '.ss-user-message__content-wrapper'),
+  ].join(',\n');
+  const userMessageWrapperDirectChildSelector = scopedDescendant(
+    scopeSelector,
+    '.sp-body-user-side-messages > .ss-user-message__content-wrapper',
+  );
+  const userBubbleTextSelectors = buildUserBubbleTextSelectors(scopeSelector);
+
   const previewButtonBase = scopeSelector
     ? scopedDescendant(scopeSelector, '.theme-customize-preview__button-group .btn-new-bot')
     : '';
@@ -431,10 +474,13 @@ ${scopedClass(scopeSelector, '.sp-body-user-side-messages')} {
   background-color: transparent !important;
 }
 
-${scopedDescendant(scopeSelector, '.sp-body-user-side-messages > .ss-user-message__content-wrapper')} {
+${userMessageWrapperSelector} {
   background-color: var(--c-user-msg-bg, #fff) !important;
   color: var(--c-user-msg-text, #333) !important;
   font-size: var(--c-user-msg-font-size, 14px) !important;
+}
+
+${userMessageWrapperDirectChildSelector} {
   padding: 10px;
   border-radius: 20px;
 }
@@ -571,6 +617,11 @@ ${spBodySelector} .ss-message__content--user-radio_button > label,
 ${spBodySelector} .ss-message__content--user-radio_button--block_style > span,
 ${scopedDescendant(scopeSelector, '.theme-customize-preview__radio-default > label')} {
   font-size: var(--c-radio-font-size, 14px) !important;
+}
+
+${userBubbleTextSelectors} {
+  color: var(--c-user-msg-text, #333) !important;
+  font-size: var(--c-user-msg-font-size, 14px) !important;
 }
 
 ${scopedClass(scopeSelector, '.ss-bot-submit-error-message')},

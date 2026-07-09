@@ -9,14 +9,16 @@ const SAMPLE_ERROR_MESSAGE = '入力内容に誤りがあります。ご確認�
 const PreviewUserMessage = ({ children, sectionId, activeSectionId, onSectionSelect, className }) => (
   <div className="sp-body-user-side">
     <div className="sp-body-user-side-messages">
-      <PreviewRegion
-        sectionId={sectionId}
-        activeSectionId={activeSectionId}
-        onSectionSelect={onSectionSelect}
-        className={className}
-      >
-        {children}
-      </PreviewRegion>
+      <div className="ss-user-message__content-wrapper">
+        <PreviewRegion
+          sectionId={sectionId}
+          activeSectionId={activeSectionId}
+          onSectionSelect={onSectionSelect}
+          className={className}
+        >
+          {children}
+        </PreviewRegion>
+      </div>
     </div>
   </div>
 );
@@ -78,8 +80,16 @@ const ThemeCustomizePreview = ({
       onSectionSelect={onSectionSelect}
       className="theme-preview-region--user-message"
     >
-      <div className="ss-user-message__content-wrapper">
-        ユーザーのメッセージです
+      ユーザーのメッセージです
+    </PreviewUserMessage>
+
+    <PreviewUserMessage
+      sectionId="messages"
+      activeSectionId={activeSectionId}
+      onSectionSelect={onSectionSelect}
+    >
+      <div className="ss-message__content--user-label-top">
+        <span className="ss-message__content--user-label-title">ラベルテキスト</span>
       </div>
     </PreviewUserMessage>
 
@@ -88,6 +98,9 @@ const ThemeCustomizePreview = ({
       activeSectionId={activeSectionId}
       onSectionSelect={onSectionSelect}
     >
+      <div className="ss-message__content--user-text-input-top">
+        <span className="ss-message__content--user-text-input-title">フィールドタイトル</span>
+      </div>
       <div className="theme-customize-preview__field-group">
         <input
           type="text"

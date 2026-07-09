@@ -279,8 +279,6 @@ textarea.ss-message__content--bot-delay {
 
 .ss-message__content--user-text-input-title {
   font-weight: 400;
-  color: black;
-  font-size: 12px;
   margin-right: 8px;
 }
 
@@ -307,8 +305,6 @@ textarea.ss-message__content--bot-delay {
 
 .ss-message__content--user-label-title {
   font-weight: 400;
-  color: black;
-  font-size: 12px;
   margin-right: 8px;
   white-space: pre-wrap;
 }
@@ -328,8 +324,6 @@ textarea.ss-message__content--bot-delay {
 
 .ss-message__content--user-textarea-title {
   font-weight: 400;
-  color: black;
-  font-size: 12px;
   margin-right: 8px;
 }
 
@@ -352,8 +346,6 @@ textarea.ss-message__content--bot-delay {
 
 .ss-message__content--user-radio_button-title {
   font-weight: 400;
-  color: black;
-  font-size: 12px;
   margin-right: 8px;
 }
 
@@ -430,8 +422,6 @@ input#ss-message__content--user-radio_button,
 
 .ss-message__content--user-checkbox-title {
   font-weight: 400;
-  color: black;
-  font-size: 12px;
   margin-right: 8px;
 }
 
@@ -507,8 +497,6 @@ input#ss-message__content--user-radio_button,
 
 .ss-message__content--user-pull_down-title {
   font-weight: 400;
-  color: black;
-  font-size: 12px;
   margin-right: 8px;
 }
 
@@ -605,8 +593,6 @@ input#ss-message__content--user-radio_button,
 
 .ss-message__content--user-zip_code_address-title {
   font-weight: 400;
-  color: black;
-  font-size: 12px;
 }
 
 /* user: type = 'attaching_file' */
@@ -636,8 +622,6 @@ input#ss-message__content--user-radio_button,
 
 .ss-message__content--user-calender-title {
   font-weight: 400;
-  color: black;
-  font-size: 12px;
   margin-right: 8px;
 }
 
@@ -684,8 +668,6 @@ input#ss-message__content--user-radio_button,
 
 .ss-message__content--user-agree_to_term-title {
   font-weight: 400;
-  color: black;
-  font-size: 12px;
   margin-right: 8px;
 }
 
