@@ -1,5 +1,7 @@
 import {
+  AMAZON_PAY_DETECTION_MODES,
   AMAZON_PAY_DISPLAY_MODES,
+  AMAZON_PAY_READY_MODES,
   AMAZON_PAY_URL_FLAG,
   DEFAULT_AMAZON_DETECTION,
   DEFAULT_AMAZON_PAY_CONFIG,
@@ -76,6 +78,26 @@ export const validateLpDomain = (input) => {
   return { valid: true, domain };
 };
 
+export const inferAmazonPayDetectionMode = (detection = DEFAULT_AMAZON_DETECTION) => {
+  const strategies = detection?.strategies || [];
+  if (strategies.some((strategy) => strategy.type === 'custom_js')) {
+    return AMAZON_PAY_DETECTION_MODES.JS;
+  }
+  if (strategies.some((strategy) => strategy.type === 'url_param')) {
+    return AMAZON_PAY_DETECTION_MODES.URL_PARAM;
+  }
+  if (strategies.some((strategy) => strategy.type === 'dom_selector')) {
+    return AMAZON_PAY_DETECTION_MODES.DOM_SELECTOR;
+  }
+  return AMAZON_PAY_DETECTION_MODES.JS;
+};
+
+export const inferAmazonPayReadyMode = (detection = DEFAULT_AMAZON_DETECTION) => {
+  const readyWhen = detection?.ready_when || [];
+  if (readyWhen.length > 0) return AMAZON_PAY_READY_MODES.DOM_SELECTOR;
+  return AMAZON_PAY_READY_MODES.NONE;
+};
+
 export const amazonDetectionToForm = (detection = DEFAULT_AMAZON_DETECTION) => {
   const urlParams = (detection.strategies || [])
     .filter((strategy) => strategy.type === 'url_param')
@@ -87,6 +109,12 @@ export const amazonDetectionToForm = (detection = DEFAULT_AMAZON_DETECTION) => {
     .map((strategy) => strategy.selector)
     .filter(Boolean);
 
+  const jsCode = (detection.strategies || [])
+    .filter((strategy) => strategy.type === 'custom_js')
+    .map((strategy) => strategy.code)
+    .filter(Boolean)
+    .join('\n');
+
   const readySelectors = (detection.ready_when || [])
     .filter((condition) => condition.type === 'dom_value')
     .map((condition) => condition.selector)
@@ -94,33 +122,96 @@ export const amazonDetectionToForm = (detection = DEFAULT_AMAZON_DETECTION) => {
 
   return {
     match: detection.match || 'any',
+    jsCode,
     urlParamsText: urlParams.join('\n'),
     domSelectorsText: domSelectors.join('\n'),
     readySelectorsText: readySelectors.join('\n'),
   };
 };
 
-export const amazonDetectionFromForm = ({ match, urlParamsText, domSelectorsText, readySelectorsText }) => {
+export const amazonDetectionFromForm = ({
+  detectionMode,
+  jsCode,
+  urlParamsText,
+  domSelectorsText,
+  readyMode,
+  readySelectorsText,
+}) => {
   const strategies = [];
 
-  (urlParamsText || '').split(/[\n,]+/).map((item) => item.trim()).filter(Boolean).forEach((param) => {
-    strategies.push({ type: 'url_param', param });
-  });
+  if (detectionMode === AMAZON_PAY_DETECTION_MODES.JS) {
+    const code = (jsCode || '').trim();
+    if (code) strategies.push({ type: 'custom_js', code });
+  } else if (detectionMode === AMAZON_PAY_DETECTION_MODES.URL_PARAM) {
+    (urlParamsText || '').split(/[\n,]+/).map((item) => item.trim()).filter(Boolean).forEach((param) => {
+      strategies.push({ type: 'url_param', param });
+    });
+  } else if (detectionMode === AMAZON_PAY_DETECTION_MODES.DOM_SELECTOR) {
+    (domSelectorsText || '').split('\n').map((item) => item.trim()).filter(Boolean).forEach((selector) => {
+      strategies.push({ type: 'dom_selector', selector });
+    });
+  }
 
-  (domSelectorsText || '').split('\n').map((item) => item.trim()).filter(Boolean).forEach((selector) => {
-    strategies.push({ type: 'dom_selector', selector });
-  });
-
-  const ready_when = (readySelectorsText || '').split('\n').map((item) => item.trim()).filter(Boolean).map((selector) => ({
-    type: 'dom_value',
-    selector,
-  }));
+  const ready_when = readyMode === AMAZON_PAY_READY_MODES.DOM_SELECTOR
+    ? (readySelectorsText || '').split('\n').map((item) => item.trim()).filter(Boolean).map((selector) => ({
+      type: 'dom_value',
+      selector,
+    }))
+    : [];
 
   return {
-    match: match || 'any',
+    match: 'any',
     strategies: strategies.length ? strategies : DEFAULT_AMAZON_DETECTION.strategies,
     ready_when,
   };
+};
+
+export const buildAmazonPayConfigWithDetection = ({
+  amazonPayConfig,
+  detectionMode,
+  jsCode,
+  urlParamsText,
+  domSelectorsText,
+  readyMode,
+  readySelectorsText,
+}) => normalizeAmazonPayConfig({
+  ...amazonPayConfig,
+  amazon_detection: amazonDetectionFromForm({
+    detectionMode,
+    jsCode,
+    urlParamsText,
+    domSelectorsText,
+    readyMode,
+    readySelectorsText,
+  }),
+});
+
+export const AMAZON_PAY_INCOMPLETE_DETECTION_ERROR = 'Amazon Pay連携設定の判定方法を入力してください。';
+
+export const validateAmazonPayConfig = ({
+  detectionMode,
+  jsCode,
+  urlParamsText,
+  domSelectorsText,
+  readyMode,
+  readySelectorsText,
+}, isUseAmazonPay) => {
+  if (!isUseAmazonPay) return { valid: true };
+
+  if (detectionMode === AMAZON_PAY_DETECTION_MODES.JS && !(jsCode || '').trim()) {
+    return { valid: false, message: AMAZON_PAY_INCOMPLETE_DETECTION_ERROR };
+  }
+  if (detectionMode === AMAZON_PAY_DETECTION_MODES.URL_PARAM && !(urlParamsText || '').trim()) {
+    return { valid: false, message: AMAZON_PAY_INCOMPLETE_DETECTION_ERROR };
+  }
+  if (detectionMode === AMAZON_PAY_DETECTION_MODES.DOM_SELECTOR && !(domSelectorsText || '').trim()) {
+    return { valid: false, message: AMAZON_PAY_INCOMPLETE_DETECTION_ERROR };
+  }
+  if (readyMode === AMAZON_PAY_READY_MODES.DOM_SELECTOR && !(readySelectorsText || '').trim()) {
+    return { valid: false, message: 'オートフィル完了の判定用DOMセレクターを入力してください。' };
+  }
+
+  return { valid: true };
 };
 
 export const buildAmazonPayConfigForSave = ({ poll_interval_ms, max_count, detectionForm }) => ({

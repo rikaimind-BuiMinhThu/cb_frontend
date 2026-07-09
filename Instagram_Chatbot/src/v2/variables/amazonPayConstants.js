@@ -36,6 +36,28 @@ export const LP_INTEGRATION_MODES = {
   AUTO: 'auto',
 };
 
+export const AMAZON_PAY_DETECTION_MODES = {
+  JS: 'js',
+  URL_PARAM: 'url_param',
+  DOM_SELECTOR: 'dom_selector',
+};
+
+export const AMAZON_PAY_READY_MODES = {
+  NONE: 'none',
+  DOM_SELECTOR: 'dom_selector',
+};
+
+export const AMAZON_PAY_DETECTION_MODE_OPTIONS = [
+  { key: AMAZON_PAY_DETECTION_MODES.JS, value: 'JSコードで判定' },
+  { key: AMAZON_PAY_DETECTION_MODES.URL_PARAM, value: 'URLパラメータで判定' },
+  { key: AMAZON_PAY_DETECTION_MODES.DOM_SELECTOR, value: 'DOMセレクターで判定' },
+];
+
+export const AMAZON_PAY_READY_MODE_OPTIONS = [
+  { key: AMAZON_PAY_READY_MODES.NONE, value: '待機しない（即時起動）' },
+  { key: AMAZON_PAY_READY_MODES.DOM_SELECTOR, value: 'DOMセレクターで判定' },
+];
+
 export const AMAZON_SELECTOR_KEY_TYPES = [
   'left_fukushashiki_search_value',
   'right_fukushashiki_search_value',

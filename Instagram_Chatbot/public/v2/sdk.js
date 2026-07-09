@@ -638,40 +638,6 @@
     }
   };
 
-  // src/v2/sdk/lp/domains.js
-  var isBlissLp = (url) => {
-    const domains = [
-      "skull-shaver.jp"
-    ];
-    return domains.some((domain) => url.includes(domain));
-  };
-  var isRoseMayLp = (url) => {
-    const domains = [
-      "rosemay.net",
-      "rosemay.jp"
-    ];
-    return domains.some((domain) => url.includes(domain));
-  };
-  var isPhystechLp = (url) => {
-    const domains = [
-      "livseed.jp"
-    ];
-    return domains.some((domain) => url.includes(domain));
-  };
-  var isTorizenLP = (url) => {
-    const torizenDomains = [
-      "hana.inuneko-sukoyaka.jp",
-      "sb.inuneko-sukoyaka.jp"
-    ];
-    return torizenDomains.some((domain) => url.includes(domain));
-  };
-  var isYuwaeruLP = (url) => {
-    const domains = [
-      "store.nekase-genmai.com"
-    ];
-    return domains.some((domain) => url.includes(domain));
-  };
-
   // src/v2/sdk/amazon/detection.js
   var evaluateAmazonStrategy = (strategy) => {
     if (!(strategy == null ? void 0 : strategy.type)) return false;
@@ -685,6 +651,25 @@
       const selector = strategy.selector;
       if (!selector) return false;
       return !!document.querySelector(selector);
+    }
+    if (strategy.type === "custom_js") {
+      const code = strategy.code;
+      if (!code) return false;
+      try {
+        const func = new Function(code);
+        const result = func();
+        return !!result;
+      } catch (error) {
+        try {
+          if (window.Sentry) {
+            window.Sentry.captureException(error);
+          }
+        } catch (sentryError) {
+          console.warn("Failed sending Amazon Pay custom_js error to Sentry", sentryError);
+        }
+        console.error("[AmazonPay] custom_js evaluation failed:", error);
+        return false;
+      }
     }
     return false;
   };
@@ -711,25 +696,11 @@
     return readyWhen.every((condition) => evaluateAmazonReadyCondition(condition));
   };
   var canRunGenericAmazon = (hostname, scenarioConfig) => isHostnameAllowedForLp(hostname, scenarioConfig == null ? void 0 : scenarioConfig.allowed_lp_domains) && hasAmazonPayTargets(scenarioConfig == null ? void 0 : scenarioConfig.messages) && extractSelectorBindingsFromMessages(scenarioConfig == null ? void 0 : scenarioConfig.messages).length > 0;
-  var resolveLegacyLpMode = (href) => {
-    if (isTorizenLP(href)) return "LEGACY_TORIZEN";
-    if (isYuwaeruLP(href)) return "LEGACY_YUWAERU";
-    if (isBlissLp(href) || isPhystechLp(href) || isRoseMayLp(href)) return "LEGACY_ECFORCE";
-    return "DEFAULT";
-  };
   var resolveLpMode = ({ hostname, scenarioConfig }) => {
-    const mode = (scenarioConfig == null ? void 0 : scenarioConfig.lp_integration_mode) || LP_INTEGRATION_MODES.AUTO;
-    const genericReady = canRunGenericAmazon(hostname, scenarioConfig);
-    if (mode === LP_INTEGRATION_MODES.GENERIC) {
-      return genericReady ? "GENERIC" : "DEFAULT";
-    }
-    if (mode === LP_INTEGRATION_MODES.LEGACY) {
-      return resolveLegacyLpMode(window.location.href);
-    }
-    if (mode === LP_INTEGRATION_MODES.AUTO) {
-      if (genericReady) return "GENERIC";
-      return resolveLegacyLpMode(window.location.href);
-    }
+    const allowedDomains = (scenarioConfig == null ? void 0 : scenarioConfig.allowed_lp_domains) || [];
+    if (!allowedDomains.length) return "DEFAULT";
+    if (!isHostnameAllowedForLp(hostname, allowedDomains)) return "DEFAULT";
+    if (canRunGenericAmazon(hostname, scenarioConfig)) return "GENERIC";
     return "DEFAULT";
   };
 

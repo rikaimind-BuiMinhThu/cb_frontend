@@ -173,7 +173,6 @@ export const buildScenarioSavePayload = (state) => {
     isClearLandingPageSession,
     autoLogoutConfig,
     allowedLpDomains,
-    lpIntegrationMode,
     amazonPayConfig,
     isUseAmazonPay,
   } = state;
@@ -197,7 +196,7 @@ export const buildScenarioSavePayload = (state) => {
     is_used_fukushashiki: isUseFukushashiki,
     is_use_amazon_pay: isUseAmazonPay,
     allowed_lp_domains: isUseAmazonPay ? allowedLpDomains : [],
-    lp_integration_mode: isUseAmazonPay ? lpIntegrationMode : LP_INTEGRATION_MODES.AUTO,
+    lp_integration_mode: isUseAmazonPay ? LP_INTEGRATION_MODES.GENERIC : LP_INTEGRATION_MODES.AUTO,
     amazon_pay_config: isUseAmazonPay
       ? normalizeAmazonPayConfig(amazonPayConfig)
       : normalizeAmazonPayConfig({}),

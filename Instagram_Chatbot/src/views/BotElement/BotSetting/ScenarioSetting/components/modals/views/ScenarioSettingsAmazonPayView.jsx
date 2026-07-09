@@ -1,24 +1,39 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useScenarioEditor } from '../../../context/ScenarioEditorContext';
 import SelectCustom from '../../../scenarioComon/SelectCustom';
 import InputNum from '../../../scenarioComon/InputNum';
 import ScenarioFormRow from '../shared/ScenarioFormRow';
 import ScenarioModalFooter from '../shared/ScenarioModalFooter';
-import { SCENARIO_MODAL_TOOLTIPS } from '../shared/scenarioModalTooltips';
-import { LP_INTEGRATION_MODES } from '../../../../../../../variables/amazonPayConstants';
+import ScenarioCodeTextarea from '../shared/ScenarioCodeTextarea';
+import {
+  AMAZON_PAY_DETECTION_HELP_TEXT,
+  SCENARIO_MODAL_TOOLTIPS,
+} from '../shared/scenarioModalTooltips';
+import {
+  AMAZON_PAY_DETECTION_MODE_OPTIONS,
+  AMAZON_PAY_DETECTION_MODES,
+  AMAZON_PAY_READY_MODE_OPTIONS,
+  AMAZON_PAY_READY_MODES,
+} from '../../../../../../../variables/amazonPayConstants';
 import { validateLpDomain } from '../../../utils/amazonPayConfigUtils';
+
+const HELP_TEXT_STYLE = { color: '#6b7280', fontSize: '13px', marginTop: '6px' };
 
 const ScenarioSettingsAmazonPayView = ({ onBack }) => {
   const { state, actions } = useScenarioEditor();
   const {
     allowedLpDomainsInput,
-    lpIntegrationMode,
     amazonPayConfig,
+    amazonPayDetectionMode,
+    amazonPayReadyMode,
+    amazonPayDetectionForm,
   } = state;
   const {
     setAllowedLpDomainsInput,
-    setLpIntegrationMode,
     setAmazonPayConfig,
+    setAmazonPayDetectionMode,
+    setAmazonPayReadyMode,
+    setAmazonPayDetectionForm,
   } = actions;
 
   const invalidLpDomains = (allowedLpDomainsInput || '')
@@ -27,22 +42,78 @@ const ScenarioSettingsAmazonPayView = ({ onBack }) => {
     .filter(Boolean)
     .filter((item) => !validateLpDomain(item).valid);
 
+  const updateDetectionForm = (patch) => {
+    setAmazonPayDetectionForm((prev) => ({ ...prev, ...patch }));
+  };
+
+  const detectionModeHelp = useMemo(() => {
+    switch (amazonPayDetectionMode) {
+      case AMAZON_PAY_DETECTION_MODES.URL_PARAM:
+        return AMAZON_PAY_DETECTION_HELP_TEXT.detectionUrlParams;
+      case AMAZON_PAY_DETECTION_MODES.DOM_SELECTOR:
+        return AMAZON_PAY_DETECTION_HELP_TEXT.detectionDomSelectors;
+      case AMAZON_PAY_DETECTION_MODES.JS:
+      default:
+        return AMAZON_PAY_DETECTION_HELP_TEXT.detectionJs;
+    }
+  }, [amazonPayDetectionMode]);
+
+  const renderDetectionInput = () => {
+    if (amazonPayDetectionMode === AMAZON_PAY_DETECTION_MODES.URL_PARAM) {
+      return (
+        <ScenarioFormRow
+          label="判定用URLパラメータ"
+          tooltip={SCENARIO_MODAL_TOOLTIPS.amazonPayDetectionUrlParams}
+          alignTop
+        >
+          <textarea
+            style={{ width: '100%', minHeight: '90px', padding: '10px', fontSize: '14px' }}
+            placeholder="amazonCheckoutSessionId"
+            value={amazonPayDetectionForm?.urlParamsText ?? ''}
+            onChange={(e) => updateDetectionForm({ urlParamsText: e.target.value })}
+          />
+          <p style={HELP_TEXT_STYLE}>{detectionModeHelp}</p>
+        </ScenarioFormRow>
+      );
+    }
+
+    if (amazonPayDetectionMode === AMAZON_PAY_DETECTION_MODES.DOM_SELECTOR) {
+      return (
+        <ScenarioFormRow
+          label="判定用DOMセレクター"
+          tooltip={SCENARIO_MODAL_TOOLTIPS.amazonPayDetectionDomSelectors}
+          alignTop
+        >
+          <textarea
+            style={{ width: '100%', minHeight: '90px', padding: '10px', fontSize: '14px' }}
+            placeholder="#amazon_payment_method"
+            value={amazonPayDetectionForm?.domSelectorsText ?? ''}
+            onChange={(e) => updateDetectionForm({ domSelectorsText: e.target.value })}
+          />
+          <p style={HELP_TEXT_STYLE}>{detectionModeHelp}</p>
+        </ScenarioFormRow>
+      );
+    }
+
+    return (
+      <ScenarioFormRow
+        label="判定用JSコード"
+        tooltip={SCENARIO_MODAL_TOOLTIPS.amazonPayDetectionJsCode}
+        alignTop
+      >
+        <ScenarioCodeTextarea
+          placeholder="return !!document.querySelector('#amazon_payment_method');"
+          value={amazonPayDetectionForm?.jsCode ?? ''}
+          onChange={(value) => updateDetectionForm({ jsCode: value })}
+          language="javascript"
+        />
+        <p style={HELP_TEXT_STYLE}>{detectionModeHelp}</p>
+      </ScenarioFormRow>
+    );
+  };
+
   return (
     <div>
-      <ScenarioFormRow
-        label="LP連携モード"
-        tooltip={SCENARIO_MODAL_TOOLTIPS.amazonPayLpIntegrationMode}
-      >
-        <SelectCustom
-          value={lpIntegrationMode}
-          onChange={(value) => setLpIntegrationMode(value)}
-          data={[
-            { key: LP_INTEGRATION_MODES.GENERIC, value: 'Generic（設定ベース）' },
-            { key: LP_INTEGRATION_MODES.LEGACY, value: 'Legacy（既存ドメイン判定）' },
-            { key: LP_INTEGRATION_MODES.AUTO, value: 'Auto（Generic優先、なければLegacy）' },
-          ]}
-        />
-      </ScenarioFormRow>
       <ScenarioFormRow
         label="許可LPドメイン"
         tooltip={SCENARIO_MODAL_TOOLTIPS.amazonPayAllowedLpDomains}
@@ -60,6 +131,53 @@ const ScenarioSettingsAmazonPayView = ({ onBack }) => {
           </div>
         )}
       </ScenarioFormRow>
+
+      <ScenarioFormRow
+        label="Amazon Pay利用の判定"
+        tooltip={SCENARIO_MODAL_TOOLTIPS.amazonPayUsageDetection}
+        alignTop
+      >
+        <SelectCustom
+          value={amazonPayDetectionMode}
+          onChange={(value) => setAmazonPayDetectionMode(value)}
+          data={AMAZON_PAY_DETECTION_MODE_OPTIONS}
+          allowClear={false}
+        />
+        <p style={HELP_TEXT_STYLE}>{AMAZON_PAY_DETECTION_HELP_TEXT.usageSection}</p>
+      </ScenarioFormRow>
+
+      {renderDetectionInput()}
+
+      <ScenarioFormRow
+        label="オートフィル完了の判定"
+        tooltip={SCENARIO_MODAL_TOOLTIPS.amazonPayAutofillReadyDetection}
+        alignTop
+      >
+        <SelectCustom
+          value={amazonPayReadyMode}
+          onChange={(value) => setAmazonPayReadyMode(value)}
+          data={AMAZON_PAY_READY_MODE_OPTIONS}
+          allowClear={false}
+        />
+        <p style={HELP_TEXT_STYLE}>{AMAZON_PAY_DETECTION_HELP_TEXT.autofillReadySection}</p>
+      </ScenarioFormRow>
+
+      {amazonPayReadyMode === AMAZON_PAY_READY_MODES.DOM_SELECTOR && (
+        <ScenarioFormRow
+          label="完了判定用DOMセレクター"
+          tooltip={SCENARIO_MODAL_TOOLTIPS.amazonPayReadyDomSelectors}
+          alignTop
+        >
+          <textarea
+            style={{ width: '100%', minHeight: '90px', padding: '10px', fontSize: '14px' }}
+            placeholder="input#order_shipping_address_attributes_name1"
+            value={amazonPayDetectionForm?.readySelectorsText ?? ''}
+            onChange={(e) => updateDetectionForm({ readySelectorsText: e.target.value })}
+          />
+          <p style={HELP_TEXT_STYLE}>{AMAZON_PAY_DETECTION_HELP_TEXT.readyDomSelectors}</p>
+        </ScenarioFormRow>
+      )}
+
       <ScenarioFormRow
         label="ポーリング間隔（ms）"
         tooltip={SCENARIO_MODAL_TOOLTIPS.amazonPayPollInterval}

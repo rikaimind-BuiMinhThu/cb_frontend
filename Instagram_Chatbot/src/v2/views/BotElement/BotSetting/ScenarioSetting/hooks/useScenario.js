@@ -25,9 +25,17 @@ import {
 import { SETTINGS_MODAL_VIEWS } from '../components/modals/shared/scenarioModalTooltips';
 import {
   DEFAULT_AMAZON_PAY_CONFIG,
-  LP_INTEGRATION_MODES,
+  AMAZON_PAY_DETECTION_MODES,
+  AMAZON_PAY_READY_MODES,
 } from '../../../../../variables/amazonPayConstants';
-import { normalizeAllowedLpDomains } from '../utils/amazonPayConfigUtils';
+import {
+  amazonDetectionToForm,
+  buildAmazonPayConfigWithDetection,
+  inferAmazonPayDetectionMode,
+  inferAmazonPayReadyMode,
+  normalizeAllowedLpDomains,
+  validateAmazonPayConfig,
+} from '../utils/amazonPayConfigUtils';
 
 const INITIAL_TIMER_CONFIG = {
   isOpen: false,
@@ -140,8 +148,10 @@ export const useScenario = (mode = 'scenario') => {
   const [clientCartSystem, setClientCartSystem] = useState(null);
   const [allowedLpDomains, setAllowedLpDomains] = useState([]);
   const [allowedLpDomainsInput, setAllowedLpDomainsInput] = useState('');
-  const [lpIntegrationMode, setLpIntegrationMode] = useState(LP_INTEGRATION_MODES.AUTO);
   const [amazonPayConfig, setAmazonPayConfig] = useState(DEFAULT_AMAZON_PAY_CONFIG);
+  const [amazonPayDetectionMode, setAmazonPayDetectionMode] = useState(AMAZON_PAY_DETECTION_MODES.JS);
+  const [amazonPayReadyMode, setAmazonPayReadyMode] = useState(AMAZON_PAY_READY_MODES.NONE);
+  const [amazonPayDetectionForm, setAmazonPayDetectionForm] = useState(() => amazonDetectionToForm());
   const [isUseAmazonPay, setIsUseAmazonPay] = useState(false);
 
   const [listProductVariants, setListProductVariants] = useState([]);
@@ -217,8 +227,12 @@ export const useScenario = (mode = 'scenario') => {
     setTimerConfig(parsed.timerConfig);
     setAllowedLpDomains(parsed.allowedLpDomains || []);
     setAllowedLpDomainsInput((parsed.allowedLpDomains || []).join('\n'));
-    setLpIntegrationMode(parsed.lpIntegrationMode || LP_INTEGRATION_MODES.AUTO);
-    setAmazonPayConfig(parsed.amazonPayConfig || DEFAULT_AMAZON_PAY_CONFIG);
+    const parsedAmazonPayConfig = parsed.amazonPayConfig || DEFAULT_AMAZON_PAY_CONFIG;
+    const parsedDetection = parsedAmazonPayConfig.amazon_detection;
+    setAmazonPayConfig(parsedAmazonPayConfig);
+    setAmazonPayDetectionMode(inferAmazonPayDetectionMode(parsedDetection));
+    setAmazonPayReadyMode(inferAmazonPayReadyMode(parsedDetection));
+    setAmazonPayDetectionForm(amazonDetectionToForm(parsedDetection));
     setIsUseAmazonPay(parsed.isUseAmazonPay || false);
   }, []);
 
@@ -305,6 +319,32 @@ export const useScenario = (mode = 'scenario') => {
     return true;
   }, [autoLogoutConfig?.final, isClearLandingPageSession, showNotification]);
 
+  const validateAmazonPaySettings = useCallback(() => {
+    if (!isUseAmazonPay) return true;
+
+    const validation = validateAmazonPayConfig({
+      detectionMode: amazonPayDetectionMode,
+      jsCode: amazonPayDetectionForm.jsCode,
+      urlParamsText: amazonPayDetectionForm.urlParamsText,
+      domSelectorsText: amazonPayDetectionForm.domSelectorsText,
+      readyMode: amazonPayReadyMode,
+      readySelectorsText: amazonPayDetectionForm.readySelectorsText,
+    }, isUseAmazonPay);
+
+    if (!validation.valid) {
+      showNotification(validation.message);
+      return false;
+    }
+
+    return true;
+  }, [
+    amazonPayDetectionForm,
+    amazonPayDetectionMode,
+    amazonPayReadyMode,
+    isUseAmazonPay,
+    showNotification,
+  ]);
+
   const getSavePayload = useCallback(() => buildScenarioSavePayload({
     dataMessages,
     urlThanks,
@@ -340,14 +380,23 @@ export const useScenario = (mode = 'scenario') => {
     isClearLandingPageSession,
     autoLogoutConfig,
     allowedLpDomains: normalizeAllowedLpDomains(allowedLpDomainsInput.split(/[\n,]+/)),
-    lpIntegrationMode,
-    amazonPayConfig,
+    amazonPayConfig: buildAmazonPayConfigWithDetection({
+      amazonPayConfig,
+      detectionMode: amazonPayDetectionMode,
+      jsCode: amazonPayDetectionForm.jsCode,
+      urlParamsText: amazonPayDetectionForm.urlParamsText,
+      domSelectorsText: amazonPayDetectionForm.domSelectorsText,
+      readyMode: amazonPayReadyMode,
+      readySelectorsText: amazonPayDetectionForm.readySelectorsText,
+    }),
     isUseAmazonPay,
   }), [
     autoLogoutConfig,
     allowedLpDomainsInput,
-    lpIntegrationMode,
     amazonPayConfig,
+    amazonPayDetectionForm,
+    amazonPayDetectionMode,
+    amazonPayReadyMode,
     isUseAmazonPay,
     coupon,
     customCssContent,
@@ -386,6 +435,7 @@ export const useScenario = (mode = 'scenario') => {
   const onClickSaveScenario = useCallback(async () => {
     if (!validateScenarioName()) return;
     if (!validateAutoLogoutConfig()) return;
+    if (!validateAmazonPaySettings()) return;
 
     try {
       const res = await api.post(
@@ -408,11 +458,12 @@ export const useScenario = (mode = 'scenario') => {
         tokenExpired();
       }
     }
-  }, [getConversationUrl, getSavePayload, handleGetMessage, isTemplateMode, validateAutoLogoutConfig, validateScenarioName]);
+  }, [getConversationUrl, getSavePayload, handleGetMessage, isTemplateMode, validateAmazonPaySettings, validateAutoLogoutConfig, validateScenarioName]);
 
   const onClickSavePreview = useCallback(() => {
     if (!validateScenarioName()) return;
     if (!validateAutoLogoutConfig()) return;
+    if (!validateAmazonPaySettings()) return;
 
     api.post(
       getConversationUrl(),
@@ -434,7 +485,7 @@ export const useScenario = (mode = 'scenario') => {
         tokenExpired();
       }
     });
-  }, [getConversationUrl, getSavePayload, handleGetMessage, isTemplateMode, validateAutoLogoutConfig, validateScenarioName]);
+  }, [getConversationUrl, getSavePayload, handleGetMessage, isTemplateMode, validateAmazonPaySettings, validateAutoLogoutConfig, validateScenarioName]);
 
   const handleOpenPreview = useCallback((isOpen) => {
     if (!isOpenPreview) return;
@@ -609,8 +660,10 @@ export const useScenario = (mode = 'scenario') => {
       clientCartSystem,
       allowedLpDomains,
       allowedLpDomainsInput,
-      lpIntegrationMode,
       amazonPayConfig,
+      amazonPayDetectionMode,
+      amazonPayReadyMode,
+      amazonPayDetectionForm,
       isUseAmazonPay,
       listProductVariants,
       isShopifyPaymentScenario,
@@ -700,8 +753,10 @@ export const useScenario = (mode = 'scenario') => {
       setClientCartSystem,
       setAllowedLpDomains,
       setAllowedLpDomainsInput,
-      setLpIntegrationMode,
       setAmazonPayConfig,
+      setAmazonPayDetectionMode,
+      setAmazonPayReadyMode,
+      setAmazonPayDetectionForm,
       setIsUseAmazonPay,
       setListProductVariants,
       handleGetMessage,

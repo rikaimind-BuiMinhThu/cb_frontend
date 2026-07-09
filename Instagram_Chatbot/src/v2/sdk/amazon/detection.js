@@ -4,14 +4,6 @@ import {
   hasAmazonPayTargets,
   isHostnameAllowedForLp,
 } from './bindings.js';
-import { LP_INTEGRATION_MODES } from '../constants.js';
-import {
-  isBlissLp,
-  isPhystechLp,
-  isRoseMayLp,
-  isTorizenLP,
-  isYuwaeruLP,
-} from '../lp/domains.js';
 
 export const evaluateAmazonStrategy = (strategy) => {
   if (!strategy?.type) return false;
@@ -25,6 +17,25 @@ export const evaluateAmazonStrategy = (strategy) => {
     const selector = strategy.selector;
     if (!selector) return false;
     return !!document.querySelector(selector);
+  }
+  if (strategy.type === 'custom_js') {
+    const code = strategy.code;
+    if (!code) return false;
+    try {
+      const func = new Function(code);
+      const result = func();
+      return !!result;
+    } catch (error) {
+      try {
+        if (window.Sentry) {
+          window.Sentry.captureException(error);
+        }
+      } catch (sentryError) {
+        console.warn('Failed sending Amazon Pay custom_js error to Sentry', sentryError);
+      }
+      console.error('[AmazonPay] custom_js evaluation failed:', error);
+      return false;
+    }
   }
   return false;
 };
@@ -60,25 +71,10 @@ export const canRunGenericAmazon = (hostname, scenarioConfig) => (
   && extractSelectorBindingsFromMessages(scenarioConfig?.messages).length > 0
 );
 
-export const resolveLegacyLpMode = (href) => {
-  if (isTorizenLP(href)) return 'LEGACY_TORIZEN';
-  if (isYuwaeruLP(href)) return 'LEGACY_YUWAERU';
-  if (isBlissLp(href) || isPhystechLp(href) || isRoseMayLp(href)) return 'LEGACY_ECFORCE';
-  return 'DEFAULT';
-};
-
 export const resolveLpMode = ({ hostname, scenarioConfig }) => {
-  const mode = scenarioConfig?.lp_integration_mode || LP_INTEGRATION_MODES.AUTO;
-  const genericReady = canRunGenericAmazon(hostname, scenarioConfig);
-  if (mode === LP_INTEGRATION_MODES.GENERIC) {
-    return genericReady ? 'GENERIC' : 'DEFAULT';
-  }
-  if (mode === LP_INTEGRATION_MODES.LEGACY) {
-    return resolveLegacyLpMode(window.location.href);
-  }
-  if (mode === LP_INTEGRATION_MODES.AUTO) {
-    if (genericReady) return 'GENERIC';
-    return resolveLegacyLpMode(window.location.href);
-  }
+  const allowedDomains = scenarioConfig?.allowed_lp_domains || [];
+  if (!allowedDomains.length) return 'DEFAULT';
+  if (!isHostnameAllowedForLp(hostname, allowedDomains)) return 'DEFAULT';
+  if (canRunGenericAmazon(hostname, scenarioConfig)) return 'GENERIC';
   return 'DEFAULT';
 };

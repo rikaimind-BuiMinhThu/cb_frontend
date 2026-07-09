@@ -11,8 +11,13 @@ export const SCENARIO_MODAL_TOOLTIPS = {
   isUseErrMsgByJs: 'フォームのエラーメッセージをJSまたはセレクターで取得します。',
   isUseOnlyRegularOrder: '定期注文のみを対象とします。',
   isUseFukushashiki: '複写式チャットボット機能を有効にします。',
-  isUseAmazonPay: 'Amazon Pay連携を有効にします。LP連携モードや許可ドメインを設定できます。',
-  amazonPayLpIntegrationMode: 'Amazon Pay連携時のLP判定方式を選択します。Genericは許可ドメイン設定に基づき、Legacyは既存のドメイン判定ロジックを使用します。AutoはGenericを優先し、利用できない場合はLegacyに切り替えます。',
+  isUseAmazonPay: 'Amazon Pay連携を有効にします。許可ドメインや判定方法を設定できます。',
+  amazonPayUsageDetection: 'LPページでAmazon Payが選択・利用されているかを検出する方法を設定します。',
+  amazonPayAutofillReadyDetection: 'LPフォームへのAmazon Pay情報の自動入力が完了したかを判定します。未設定の場合は検出後すぐにチャットボットを起動します。',
+  amazonPayDetectionJsCode: 'true（真）を返すJavaScriptを記述してください。',
+  amazonPayDetectionUrlParams: 'URLに含まれるパラメータ名を1行に1件ずつ入力してください。',
+  amazonPayDetectionDomSelectors: 'ページ上の要素を示すCSSセレクターを1行に1件ずつ入力してください。',
+  amazonPayReadyDomSelectors: 'LPフォームの入力欄セレクターを1行に1件ずつ入力してください。指定した欄に値が入力されるまでチャットボットの起動を待ちます。',
   amazonPayAllowedLpDomains: 'Amazon Pay連携を許可するLPのドメインを1行に1件ずつ入力してください。プロトコル（https://）やパスは不要です。',
   amazonPayPollInterval: 'LPページでAmazon Payの読み込み完了を確認する際の、ポーリング間隔（ミリ秒）です。',
   amazonPayMaxPollCount: 'Amazon Payの読み込み完了を確認する最大ポーリング回数です。この回数に達しても完了しない場合は処理を中断します。',
@@ -81,6 +86,15 @@ export const SETTINGS_MODAL_VIEWS = {
   AUTO_LOGOUT: 'autoLogout',
   AMAZON_PAY: 'amazonPay',
   GLOBAL_DELAY: 'globalDelay',
+};
+
+export const AMAZON_PAY_DETECTION_HELP_TEXT = {
+  usageSection: '購入ページ（LP）でお客様がAmazon Payを利用しているかを判定します。検出されるとチャットボットはAmazon Pay連携モードで起動し、複写式の入力項目へ自動入力が行われます。',
+  autofillReadySection: 'Amazon Pay連携時、LPのフォームへ住所・氏名などが自動入力されるまで時間がかかることがあります。入力完了を待ってからチャットボットを起動したい場合に設定します。',
+  detectionJs: "true（真）を返すJavaScriptを記述してください。例: return !!document.querySelector('#amazon_payment_method');",
+  detectionUrlParams: 'URLに含まれるパラメータ名を1行に1件ずつ入力してください。例: amazonCheckoutSessionId',
+  detectionDomSelectors: 'ページ上の要素を示すCSSセレクターを1行に1件ずつ入力してください。例: #amazon_payment_method',
+  readyDomSelectors: 'LPフォームの入力欄セレクターを1行に1件ずつ入力してください。指定した欄に値が入力されるまでチャットボットの起動を待ちます。例: input#order_shipping_address_attributes_name1',
 };
 
 export const SETTINGS_VIEW_TITLES = {
