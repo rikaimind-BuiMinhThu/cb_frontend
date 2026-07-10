@@ -1,5 +1,5 @@
 import React from "react";
-import "assets/css/bot/preview-chat-bot.css";
+import "v2/assets/css/bot/preview-chat-bot.css";
 import { MESSAGE_CONTENT_TYPES } from "../Constants";
 
 export default function Image({ content, contentIndex, messageIndex }) {

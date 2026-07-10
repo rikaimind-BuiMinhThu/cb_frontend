@@ -41,9 +41,18 @@ body.scenario-preview-editor-embedded .sp-body {
   flex: 1;
   min-height: 0;
   width: 100% !important;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
   background-color: #f6fbff;
+}
+
+body.scenario-preview-editor-embedded .sp-container1.slideUpSp,
+body.scenario-preview-editor-embedded .sp-container1.slideUp,
+body.scenario-preview-editor-embedded .slideRight,
+body.scenario-preview-editor-embedded .slideLeft {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
 }
 
 body.scenario-preview-editor-embedded .sp-header {

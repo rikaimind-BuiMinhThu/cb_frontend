@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "assets/css/bot/preview-chat-bot.css";
+import "v2/assets/css/bot/preview-chat-bot.css";
 import messageTypingGif from "assets/img/icons8-dots-loading.gif";
 import { resolveIconUrl } from "../DesignSetting/utils/designChatbotUtils";
 import { resolveBotMessageTheme } from "../DesignSetting/utils/designThemeUtils";
@@ -28,11 +28,12 @@ const BotMessage = ({
   delayEachMessage = RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE,
   isUseGlobalDelay = false,
   globalDelayTime = 1.0,
+  skipEntryDelay = false,
 }) => {
   const { bgColor: botMessageBgColor, textColor: botMessageTextColor, fontSize: botMessageFontSize } =
     resolveBotMessageTheme(themeSettings, botInfor);
 
-  const [isDelaying, setIsDelaying] = useState(true);
+  const [isDelaying, setIsDelaying] = useState(!skipEntryDelay);
   const [text, setText] = useState("");
 
   useEffect(() => {
@@ -98,7 +99,7 @@ const BotMessage = ({
   };
 
   useEffect(() => {
-    if (!isDelaying) return;
+    if (skipEntryDelay || !isDelaying) return;
 
     let timeoutId;
 
@@ -119,7 +120,7 @@ const BotMessage = ({
       return () => clearTimeout(timeoutId);
     }
 
-  }, [content.type, isDelaying, isBotOpen, content.is_use_custom_delay, content.custom_delay_time, delayEachMessage, isUseGlobalDelay, globalDelayTime]);
+  }, [content.type, isDelaying, isBotOpen, content.is_use_custom_delay, content.custom_delay_time, delayEachMessage, isUseGlobalDelay, globalDelayTime, skipEntryDelay]);
 
   useEffect(() => {
     // When hidden === undefined, it means the message is not hidden yet
@@ -375,10 +376,12 @@ const BotMessage = ({
   if (!content) return null;
   if (content.type === BOT_MESSAGE_TYPES.DELAY && !isDelaying) return null;
 
+  const entryAnimationClass = skipEntryDelay ? '' : ' slideRight';
+
   return (
     <div key={contentIndex} 
       id={getElementMessageById(messageId)}
-      className={`sp-body-bot-side slideRight ${!isShowAvatar() ? "hide_avatar" : ""} ${isUGCUsage(content) ? "ugc_usage" : ""}`}>
+      className={`sp-body-bot-side${entryAnimationClass}${!isShowAvatar() ? " hide_avatar" : ""}${isUGCUsage(content) ? " ugc_usage" : ""}`}>
       { renderAvatar() }
       <div className="sp-body-bot-side-messages">
         {content && (

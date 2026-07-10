@@ -1,5 +1,5 @@
 import React from "react";
-import "assets/css/bot/preview-chat-bot.css";
+import "v2/assets/css/bot/preview-chat-bot.css";
 import { MESSAGE_CONTENT_TYPES } from "../Constants";
 import DatePickerCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/DatePickerCustom";
 import moment from "moment-timezone";

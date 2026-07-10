@@ -17,7 +17,7 @@ import PreviewFukushashiki from 'views/BotElement/BotSetting/PreviewFukushashiki
 import PreviewFaq from 'views/BotElement/BotSetting/PreviewFaq';
 import V2PreviewFukushashiki from 'v2/views/BotElement/BotSetting/PreviewFukushashiki';
 import V2PreviewFaq from 'v2/views/BotElement/BotSetting/PreviewFaq';
-import V2ScenarioPreviewEditorPage from 'v2/views/BotElement/BotSetting/ScenarioSetting/preview/ScenarioPreviewEditorPage';
+import ScenarioPreviewEditorPage from 'v2/views/BotElement/BotSetting/ScenarioSetting/preview/ScenarioPreviewEditorPage';
 import News from 'views/Public/News';
 import Instagram from 'views/Public/Instagram';
 
@@ -48,7 +48,7 @@ class App extends Component {
             <Route exact path="/preview-faq" component={PreviewFaq} />
             <Route exact path="/v2/preview-customer-fukushashiki" component={V2PreviewFukushashiki} />
             <Route exact path="/v2/preview-faq" component={V2PreviewFaq} />
-            <Route exact path="/v2/preview-scenario-editor" component={V2ScenarioPreviewEditorPage} />
+            <Route exact path="/v2/preview-scenario-editor" component={ScenarioPreviewEditorPage} />
             <Route exact path="/news" component={News} />
             {/* <Route exact path="/instagram" component={Instagram} /> */}
             <Route exact path="/" component={Login} />

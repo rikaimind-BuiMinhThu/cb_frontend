@@ -1,5 +1,5 @@
 import React from "react";
-import "assets/css/bot/preview-chat-bot.css";
+import "v2/assets/css/bot/preview-chat-bot.css";
 import { MESSAGE_CONTENT_TYPES } from "views/BotElement/BotSetting/PreviewComponent/Constants";
 import InputCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
 import { moveToNext } from "views/BotElement/BotSetting/PreviewComponent/Utils";

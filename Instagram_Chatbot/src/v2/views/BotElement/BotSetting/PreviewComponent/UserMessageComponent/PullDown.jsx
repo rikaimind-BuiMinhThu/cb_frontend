@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "assets/css/bot/preview-chat-bot.css";
+import "v2/assets/css/bot/preview-chat-bot.css";
 import {
   MESSAGE_CONTENT_TYPES,
   dataHourFixed as HOUR_DEFAULT_OPTIONS,

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "assets/css/bot/preview-chat-bot.css";
+import "v2/assets/css/bot/preview-chat-bot.css";
 import "moment/locale/zh-cn";
 import { getTownsByCity, getCitiesByPrefecture, changeElementAttributeById } from "./Utils";
 import { MDBIcon } from "mdbreact";

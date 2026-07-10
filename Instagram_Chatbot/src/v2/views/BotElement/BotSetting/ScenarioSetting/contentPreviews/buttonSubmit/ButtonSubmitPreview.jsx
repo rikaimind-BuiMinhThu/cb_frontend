@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from 'reactstrap';
-import 'assets/css/bot/preview-chat-bot.css';
+import 'v2/assets/css/bot/preview-chat-bot.css';
 import ContentPreviewShell from '../shared/ContentPreviewShell';
 import { BUTTON_SUBMIT_LABELS } from '../../constants/scenarioSettingLabels';
 import '../../styles/contentPreviews/buttonSubmit.css';

@@ -12,6 +12,7 @@ import {
   RENDER_MODES,
 } from '../../PreviewComponent/Constants';
 import { prepareCombineMessagesForPreview } from '../../PreviewComponent/CombineMessageUtils';
+import { EDITOR_PREVIEW_FALLBACK_BOT_INFOR } from './editorPreviewUtils';
 
 export const buildEditorDraftPreviewUpdate = (draft) => {
   const messagesList = _.cloneDeep(draft?.conversation?.messages || []);
@@ -58,6 +59,11 @@ export const buildEditorDraftPreviewUpdate = (draft) => {
 
   return {
     isEditorPreviewDraft: true,
+    botInfor: {
+      ...EDITOR_PREVIEW_FALLBACK_BOT_INFOR,
+      title: draft?.scenario_name || EDITOR_PREVIEW_FALLBACK_BOT_INFOR.title,
+      titleBubble: draft?.scenario_name || EDITOR_PREVIEW_FALLBACK_BOT_INFOR.titleBubble,
+    },
     messagesList: allMessages,
     renderMessagesList: allMessages,
     currentMsgIndex,

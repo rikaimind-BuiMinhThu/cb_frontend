@@ -100,7 +100,17 @@
   flex-shrink: 0;
 }
 
-.scenario-editor-preview .theme-customize-preview__body {
+.scenario-editor-preview .theme-preview-region--body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.scenario-editor-preview .theme-customize-preview__body,
+.scenario-editor-preview .sp-body.theme-customize-preview__body {
+  height: 100%;
   flex: 1 1 auto;
   min-height: 0 !important;
   max-height: none !important;
@@ -159,6 +169,21 @@
 .scenario-editor-preview__loading-text {
   font-size: 13px;
   color: #666;
+}
+
+.scenario-editor-preview__warning {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  z-index: 3;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: rgba(255, 248, 225, 0.95);
+  border: 1px solid #f0d58c;
+  color: #7a5b00;
+  font-size: 12px;
+  line-height: 1.4;
 }
 
 @keyframes scenario-editor-preview-spin {

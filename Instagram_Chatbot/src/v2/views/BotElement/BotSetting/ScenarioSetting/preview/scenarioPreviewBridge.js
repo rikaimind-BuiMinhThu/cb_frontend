@@ -1,6 +1,9 @@
+import { getAppPath } from 'v2/variables/constants';
+
 export const SCENARIO_PREVIEW_MESSAGES = {
   EDITOR_DRAFT: 'SCENARIO_EDITOR_DRAFT',
   EDITOR_CUSTOM_CSS: 'SCENARIO_EDITOR_CUSTOM_CSS',
+  REQUEST_EDITOR_DRAFT: 'SCENARIO_EDITOR_REQUEST_DRAFT',
   PREVIEW_READY: 'SCENARIO_PREVIEW_READY',
   PREVIEW_CONTENT_READY: 'SCENARIO_PREVIEW_CONTENT_READY',
   SELECT_MESSAGE: 'SCENARIO_EDITOR_SELECT_MESSAGE',
@@ -34,5 +37,5 @@ export const buildScenarioPreviewIframeSrc = ({ scenarioId, scenarioType, botId 
   if (botId) {
     params.set('bot_id', botId);
   }
-  return `/v2/preview-scenario-editor?${params.toString()}`;
+  return getAppPath(`/preview-scenario-editor?${params.toString()}`);
 };

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "../../../../assets/css/bot/preview-chat-bot.css";
+import "v2/assets/css/bot/preview-chat-bot.css";
 import api from 'api/api-management';
 import InputCustom from "../ScenarioSetting/scenarioComon/InputCustom";
 import ModalNoti from "../../../Popup/ModalNoti";

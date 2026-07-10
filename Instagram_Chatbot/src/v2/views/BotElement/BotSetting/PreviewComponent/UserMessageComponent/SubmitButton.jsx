@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import "assets/css/bot/preview-chat-bot.css";
+import "v2/assets/css/bot/preview-chat-bot.css";
 import { getErrorMessageFromParent } from "../../PreviewFukushashiki/LPUtils"
 
 export default function SubmitButton({ content, submitErrorMessage = "", onChangeValue, onClickNext, isProcessing = false, messageIndex, contentIndex, message}) {

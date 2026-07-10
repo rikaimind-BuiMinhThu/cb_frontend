@@ -36,7 +36,11 @@ const PreviewFaqReducer = (state, action) => {
       }
       const { isEditorPreviewDraft, ...editorPreviewPayload } = action.payload || {};
       if (isEditorPreviewDraft) {
-        return { ...state, ...editorPreviewPayload };
+        return {
+          ...state,
+          ...editorPreviewPayload,
+          hasEditorPreviewDraftApplied: true,
+        };
       }
       return { ...state, ...(!!state.submitErrorMessage ? processMessagesForErrorState(action.payload): action.payload) };
     }
@@ -279,16 +283,17 @@ const PreviewFaqReducer = (state, action) => {
         newState.loopCount = 0;
       }
 
-      // Update originalContent for replace variables when after getPreviewResponse
-      newState.messagesList.filter(isBotMessage).forEach((message) => {
-        message.message_content.forEach((content) => {
-          if (content.type === BOT_MESSAGE_TYPES.TEXT_INPUT) {
-            content[content.type].originalContent = content[content.type].content;
-          }
+      if (!(isEditorPreview && state.hasEditorPreviewDraftApplied)) {
+        newState.messagesList.filter(isBotMessage).forEach((message) => {
+          message.message_content?.forEach((content) => {
+            if (content.type === BOT_MESSAGE_TYPES.TEXT_INPUT) {
+              content[content.type].originalContent = content[content.type].content;
+            }
+          });
         });
-      });
 
-      prepareCombineMessagesForPreview(newState.messagesList);
+        prepareCombineMessagesForPreview(newState.messagesList);
+      }
 
       if (variables) {
         newState.variables = [...variables, ...all_variables];
@@ -299,11 +304,39 @@ const PreviewFaqReducer = (state, action) => {
         newState.originalVariables = newState.variables;
       }
 
-      if (isEditorPreview && state.renderMessagesList?.length > 0) {
+      if (isEditorPreview && state.hasEditorPreviewDraftApplied) {
+        newState.originalMessagesList = state.originalMessagesList;
+        newState.messagesList = state.messagesList;
         newState.renderMessagesList = state.renderMessagesList;
         newState.currentMsgIndex = state.currentMsgIndex;
         newState.nextStopMsgIndex = state.nextStopMsgIndex;
         newState.renderMode = state.renderMode;
+        newState.loopCount = state.loopCount;
+        newState.progressBarMaxIndex = state.progressBarMaxIndex;
+      } else if (isEditorPreview && state.renderMessagesList?.length > 0) {
+        newState.originalMessagesList = state.originalMessagesList?.length
+          ? state.originalMessagesList
+          : state.messagesList;
+        newState.messagesList = state.messagesList;
+        newState.renderMessagesList = state.renderMessagesList;
+        newState.currentMsgIndex = state.currentMsgIndex;
+        newState.nextStopMsgIndex = state.nextStopMsgIndex;
+        newState.renderMode = state.renderMode;
+        newState.loopCount = state.loopCount;
+        newState.progressBarMaxIndex = state.progressBarMaxIndex;
+      } else if (
+        isEditorPreview
+        && !state.hasEditorPreviewDraftApplied
+        && !(state.renderMessagesList?.length > 0)
+        && (conversation?.messages?.length > 0)
+      ) {
+        const apiMessages = _.cloneDeep(conversation.messages);
+        newState.originalMessagesList = apiMessages;
+        newState.messagesList = apiMessages;
+        newState.renderMessagesList = apiMessages;
+        newState.currentMsgIndex = apiMessages.length > 0 ? apiMessages.length - 1 : 0;
+        newState.nextStopMsgIndex = apiMessages.length;
+        newState.renderMode = RENDER_MODES.LAST;
       } else if (!isEditorPreview && newState.isOpen) {
         newState.nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg()) + 1;
         if (newState.nextStopMsgIndex < newState.currentMsgIndex) {

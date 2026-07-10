@@ -93,6 +93,7 @@ import {
   postToParent,
   SCENARIO_PREVIEW_MESSAGES,
 } from "./scenarioPreviewBridge";
+import { resolveEditorPreviewBotInfor } from "./editorPreviewUtils";
 
 const isPreviewMobile = (deviceMode) => deviceMode === 'sp';
 
@@ -230,12 +231,13 @@ const ScenarioPreviewFukushashiki = ({
   }, [editorPreview, editorDraft]);
 
   useEffect(() => {
-    if (!editorPreview || !state.botInfor) return;
+    if (!editorPreview) return;
 
+    const botInfor = resolveEditorPreviewBotInfor(state.botInfor);
     const isOpen = embedded || editorPreview || state.isOpen;
     postToParent({
       type: SCENARIO_PREVIEW_MESSAGES.PREVIEW_BOT_META,
-      payload: buildScenarioPreviewHeaderMeta(state.botInfor, {
+      payload: buildScenarioPreviewHeaderMeta(botInfor, {
         isOpen,
         themeSettings: state.themeSettings,
       }),
@@ -1535,6 +1537,12 @@ const ScenarioPreviewFukushashiki = ({
   }
 
   const effectiveIsOpen = embedded || editorPreview || state.isOpen;
+  const hasApiBotInfor = Boolean(
+    state.botInfor?.title || state.botInfor?.main_color || state.botInfor?.main_color_other,
+  );
+  const displayBotInfor = editorPreview && !hasApiBotInfor
+    ? resolveEditorPreviewBotInfor(state.botInfor)
+    : state.botInfor;
 
   // body container
   if (effectiveIsOpen) {
@@ -1564,9 +1572,9 @@ const ScenarioPreviewFukushashiki = ({
             </div>
             <div className="sp-header-left-label">
               <div className="sp-header-left-label-sub-title">
-                {state.botInfor?.subtitle}
+                {displayBotInfor?.subtitle}
               </div>
-              <div className="sp-header-left-label-title">{state.botInfor?.titleBubble}</div>
+              <div className="sp-header-left-label-title">{displayBotInfor?.titleBubble}</div>
             </div>
           </div>
           <div className="sp-header-right" onClick={onChatbotHeaderClick}>
@@ -1604,7 +1612,7 @@ const ScenarioPreviewFukushashiki = ({
           </div>
         }
 
-        <ProcessBar botInfor={state.botInfor}
+        <ProcessBar botInfor={displayBotInfor}
           currentIndex={state.passedUserMsgCount}
           maxIndex={state.progressBarMaxIndex}
         />

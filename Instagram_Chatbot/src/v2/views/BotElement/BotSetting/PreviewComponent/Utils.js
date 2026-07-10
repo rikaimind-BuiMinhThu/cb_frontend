@@ -86,6 +86,10 @@ const removeLeadingZero = (value) => {
   return typeof value === 'number' ? Number(result) : result;
 };
 
+const handleChatbotApiAuthError = (error) => {
+  if (error.response?.data?.code === 0) tokenExpired();
+};
+
 const postToChatBotServer = (url, data) => {
   return new Promise((resolve, reject) => {
     api
@@ -94,7 +98,7 @@ const postToChatBotServer = (url, data) => {
         if (resolve) resolve(res);
       })
       .catch((error) => {
-        if (error.response?.data?.code === 0) tokenExpired();
+        handleChatbotApiAuthError(error);
         if (reject) reject(error);
         console.error(error);
       });
@@ -123,7 +127,7 @@ const getToChatBotServer = (url) => {
         if (resolve) resolve(res);
       })
       .catch((error) => {
-        if (error.response?.data?.code === 0) tokenExpired();
+        handleChatbotApiAuthError(error);
         if (reject) reject(error);
         console.error(error);
       });

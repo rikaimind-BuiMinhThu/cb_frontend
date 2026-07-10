@@ -8,7 +8,7 @@ import {
 } from './Constants';
 import { getElementMessageById, isCombineMessage } from './Utils';
 
-const CombineMessageNextButton = ({
+export const CombineMessageNextButton = ({
   message,
   messageIndex,
   botInfor,
@@ -68,13 +68,17 @@ const CombineMessage = ({
   cartSystem,
   isUpdate,
   isExtractFromSession,
+  skipEntryAnimation = false,
 }) => {
   if (!isCombineMessage(message)) return null;
 
   const contentGap = message.combine_message?.content_gap ?? COMBINE_MESSAGE_DEFAULTS.CONTENT_GAP;
 
   return (
-    <div className="sp-body-user-side slideLeft" id={getElementMessageById(message.id)}>
+    <div
+      className={skipEntryAnimation ? 'sp-body-user-side' : 'sp-body-user-side slideLeft'}
+      id={getElementMessageById(message.id)}
+    >
       <div className="sp-body-user-side-messages">
         <div className="ss-user-message__content-wrapper">
           <div className="ss-combine-message__content">

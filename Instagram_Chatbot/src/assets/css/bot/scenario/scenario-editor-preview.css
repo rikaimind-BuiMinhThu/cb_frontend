@@ -161,6 +161,21 @@
   color: #666;
 }
 
+.scenario-editor-preview__warning {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  z-index: 3;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: rgba(255, 248, 225, 0.95);
+  border: 1px solid #f0d58c;
+  color: #7a5b00;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
 @keyframes scenario-editor-preview-spin {
   to {
     transform: rotate(360deg);

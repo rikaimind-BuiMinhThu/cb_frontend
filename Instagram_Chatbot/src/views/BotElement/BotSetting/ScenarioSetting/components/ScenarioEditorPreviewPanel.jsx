@@ -260,7 +260,8 @@ const ScenarioEditorPreviewPanel = () => {
 
   const handleIframeLoad = useCallback(() => {
     setIsIframeReady(true);
-  }, []);
+    syncPreviewWithHighlights();
+  }, [syncPreviewWithHighlights]);
 
   useEffect(() => {
     initialSyncDoneRef.current = false;
@@ -303,6 +304,13 @@ const ScenarioEditorPreviewPanel = () => {
 
       if (type === SCENARIO_PREVIEW_MESSAGES.PREVIEW_READY) {
         setIsIframeReady(true);
+        syncPreviewWithHighlights();
+        return;
+      }
+
+      if (type === SCENARIO_PREVIEW_MESSAGES.REQUEST_EDITOR_DRAFT) {
+        setIsIframeReady(true);
+        syncPreviewWithHighlights();
         return;
       }
 
@@ -342,7 +350,7 @@ const ScenarioEditorPreviewPanel = () => {
     return () => {
       window.removeEventListener('message', handleMessage);
     };
-  }, [iframeSrc]);
+  }, [iframeSrc, syncPreviewWithHighlights]);
 
   useEffect(() => {
     if (!isIframeReady) return undefined;

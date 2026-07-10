@@ -67,6 +67,10 @@ import {
   postToParent,
   SCENARIO_PREVIEW_MESSAGES,
 } from "./scenarioPreviewBridge";
+import {
+  canRenderEditorPreviewBody,
+  resolveEditorPreviewBotInfor,
+} from "./editorPreviewUtils";
 
 const isPreviewMobile = (deviceMode) => deviceMode === 'sp';
 
@@ -176,12 +180,13 @@ const ScenarioPreviewFaq = ({
   }, [editorPreview, editorDraft]);
 
   useEffect(() => {
-    if (!editorPreview || !state.botInfor) return;
+    if (!editorPreview) return;
 
+    const botInfor = resolveEditorPreviewBotInfor(state.botInfor);
     const isOpen = embedded || editorPreview || state.isOpen;
     postToParent({
       type: SCENARIO_PREVIEW_MESSAGES.PREVIEW_BOT_META,
-      payload: buildScenarioPreviewHeaderMeta(state.botInfor, {
+      payload: buildScenarioPreviewHeaderMeta(botInfor, {
         isOpen,
         themeSettings: state.themeSettings,
       }),
@@ -1155,9 +1160,19 @@ const ScenarioPreviewFaq = ({
   const positionSp = toNumber(state.positionSp, 1);
   const buttonTypeSp = toNumber(state.buttonTypeSp, 1);
   const effectiveIsOpen = embedded || editorPreview || state.isOpen;
+  const hasApiBotInfor = Boolean(
+    state.botInfor?.title || state.botInfor?.main_color || state.botInfor?.main_color_other,
+  );
+  const displayBotInfor = editorPreview && !hasApiBotInfor
+    ? resolveEditorPreviewBotInfor(state.botInfor)
+    : state.botInfor;
+  const canRenderChatBody = effectiveIsOpen && (
+    canRenderEditorPreviewBody({ editorPreview, effectiveIsOpen, state })
+    || ((editorPreview || state.scenarioId) && hasApiBotInfor)
+  );
 
   // body container
-  if ((editorPreview || state.scenarioId) && state.botInfor && effectiveIsOpen) {
+  if (canRenderChatBody) {
     const { containerStyle, headerStyle, bodyStyle } = getOpeningBotStyle();
     return (
       <div
@@ -1173,9 +1188,9 @@ const ScenarioPreviewFaq = ({
             </div>
             <div className="sp-header-left-label">
               <div className="sp-header-left-label-sub-title">
-                {state.botInfor?.subtitle}
+                {displayBotInfor?.subtitle}
               </div>
-              <div className="sp-header-left-label-title">{state.botInfor?.titleBubble}</div>
+              <div className="sp-header-left-label-title">{displayBotInfor?.titleBubble}</div>
             </div>
           </div>
           <div className="sp-header-right" onClick={() => onOpenPreview(!state.isOpen)}>

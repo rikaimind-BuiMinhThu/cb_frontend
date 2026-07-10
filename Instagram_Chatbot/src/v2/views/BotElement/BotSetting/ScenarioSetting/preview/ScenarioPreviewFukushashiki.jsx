@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useReducer, useState, useMemo } from "react";
-import "v2/assets/css/bot/preview-chat-bot.css";
 import Cookies from "js-cookie";
 import { MDBIcon } from "mdbreact";
 import CustomButton from "../../CustomButton";
-import { UserMessage, BotMessage, CombineMessage } from "../../PreviewComponent";
+import { UserMessage, BotMessage, CombineMessage, CombineMessageNextButton } from "../../PreviewComponent";
 import PreviewFukushashikiReducer from "../../PreviewFukushashiki/PreviewFukushashikiReducer";
 import $ from "jquery";
 import "moment/locale/zh-cn";
@@ -32,8 +31,8 @@ import {
   CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE,
   DISPLAY_TYPES,
 } from "../../PreviewComponent/Constants";
-import { applyPreviewThemeCss } from "v2/utils/chatbotThemeCss";
-import { COLOR_MAP } from "views/BotElement/BotSetting/DesignSetting/constants/designChatbotConstants";
+import { injectBotThemeCss } from "v2/utils/chatbotThemeCss";
+import { COLOR_MAP } from "v2/views/BotElement/BotSetting/DesignSetting/constants/designChatbotConstants";
 import {
   getAllUrlParams,
   lightenColor,
@@ -88,11 +87,12 @@ import {
   calculateTimerConfigDuration,
   getTimerConfigVariable,
 } from "./timerPreviewUtils";
-import { resolveIconUrl, parseDesignSettings, resolveMainColorContext } from "../../DesignSetting/utils/designChatbotUtils";
+import { resolveIconUrl } from "../../DesignSetting/utils/designChatbotUtils";
 import {
   postToParent,
   SCENARIO_PREVIEW_MESSAGES,
 } from "./scenarioPreviewBridge";
+import { resolveEditorPreviewBotInfor } from "./editorPreviewUtils";
 
 const isPreviewMobile = (deviceMode) => deviceMode === 'sp';
 
@@ -230,12 +230,13 @@ const ScenarioPreviewFukushashiki = ({
   }, [editorPreview, editorDraft]);
 
   useEffect(() => {
-    if (!editorPreview || !state.botInfor) return;
+    if (!editorPreview) return;
 
+    const botInfor = resolveEditorPreviewBotInfor(state.botInfor);
     const isOpen = embedded || editorPreview || state.isOpen;
     postToParent({
       type: SCENARIO_PREVIEW_MESSAGES.PREVIEW_BOT_META,
-      payload: buildScenarioPreviewHeaderMeta(state.botInfor, {
+      payload: buildScenarioPreviewHeaderMeta(botInfor, {
         isOpen,
         themeSettings: state.themeSettings,
       }),
@@ -587,24 +588,29 @@ const ScenarioPreviewFukushashiki = ({
     if (existing) {
       existing.remove();
     }
-    if (cssEnabled && cssContent) {
-      const style = document.createElement('style');
-      style.id = 'custom-css';
-      style.innerHTML = cssContent;
-      document.head.appendChild(style);
+    if (!cssEnabled || !cssContent) {
+      return undefined;
     }
-    if (!embedded) {
-      applyPreviewThemeCss(state.botInfor, state.themeSettings);
-    }
+    const style = document.createElement('style');
+    style.id = 'custom-css';
+    style.innerHTML = cssContent;
+    document.head.appendChild(style);
     return () => {
-      const style = document.getElementById('custom-css');
-      if (style) style.remove();
+      style.remove();
     };
-  }, [cssEnabled, cssContent, embedded, state.botInfor, state.themeSettings]);
+  }, [cssEnabled, cssContent]);
 
   useEffect(() => {
     if (embedded || !state.botInfor) return undefined;
-    applyPreviewThemeCss(state.botInfor, state.themeSettings);
+    const chatbot = state.botInfor;
+    const apiColorKey = chatbot.main_color && !String(chatbot.main_color).startsWith('#')
+      ? chatbot.main_color
+      : null;
+    const mainColorHex = chatbot.main_color_other
+      || COLOR_MAP[chatbot.main_color]
+      || chatbot.main_color
+      || '#327AED';
+    injectBotThemeCss(state.themeSettings, mainColorHex, apiColorKey);
     return undefined;
   }, [embedded, state.themeSettings, state.botInfor]);
 
@@ -967,8 +973,6 @@ const ScenarioPreviewFukushashiki = ({
     const designSetting = res.data.design_settings;
     const chatbot = res.data.chatbot;
     const conversation = res.data.data?.conversation;
-    const { apiColorKey, mainColorHex } = resolveMainColorContext(chatbot);
-    const parsedDesign = parseDesignSettings(designSetting, mainColorHex, apiColorKey);
     let newState = {
       ...state,
       botInfor: getBotInforFromPreviewResponse(res),
@@ -1012,7 +1016,7 @@ const ScenarioPreviewFukushashiki = ({
       bottomBodyCustomJsCode: chatbot?.bottom_body_custom_js_code,
       isUsedCustomCss: !!chatbot?.is_used_custom_css,
       customCssContent: chatbot?.custom_css_content,
-      themeSettings: parsedDesign.themeSettings,
+      themeSettings: designSetting?.theme || null,
     };
 
     if (chatbot?.timer_config?.enable) {
@@ -1044,7 +1048,6 @@ const ScenarioPreviewFukushashiki = ({
       payload: {
         responseData: res.data,
         botInfor: getBotInforFromPreviewResponse(res),
-        themeSettings: parsedDesign.themeSettings,
         isLoggedIn: isLoggedIn,
         isUsingAmazonPay: params.get('is_using_amazon_pay'),
         isEditorPreview: editorPreview,
@@ -1224,7 +1227,7 @@ const ScenarioPreviewFukushashiki = ({
           <div
             key={`${messageIndex}-${contentIndex}`}
             id={getElementMessageById(message.id)}
-            className="sp-body-bot-side slideRight"
+            className={`sp-body-bot-side${editorPreview ? '' : ' slideRight'}`}
           >
             <div className="sp-body-bot-side-messages">
               <div className="ss-bot-message">
@@ -1244,7 +1247,6 @@ const ScenarioPreviewFukushashiki = ({
         content={content}
         contentIndex={contentIndex}
         botInfor={state.botInfor}
-        themeSettings={state.themeSettings}
         previewOrderContent={state.previewOrderContent}
         executeLpJsCode={(jsCode) => executeLpJsCode(jsCode, state)}
         variables={state.variables}
@@ -1255,6 +1257,7 @@ const ScenarioPreviewFukushashiki = ({
         delayEachMessage={editorPreview ? 0 : RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE}
         isUseGlobalDelay={editorPreview ? false : state.isUseGlobalDelay}
         globalDelayTime={state.globalDelayTime}
+        skipEntryDelay={editorPreview}
       />
       );
     });
@@ -1286,6 +1289,9 @@ const ScenarioPreviewFukushashiki = ({
       <div className="sp-user-message-button-action" style={{ display: isDisplayBtnNext ? "flex" : "none" }}>
         <CustomButton
           disabled={isEditorDisplayOnly || (state.submitErrorMessage?.length > 0 ? false : message.disabled)}
+          style={{
+            backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
+          }}
           className={`ss-user-message__action-btn${hasBtnUpdateClass ? " btn-update" : ""}`}
           onClick={isEditorDisplayOnly ? undefined : () => {
             onClickNext(messageIndex, message);
@@ -1304,7 +1310,7 @@ const ScenarioPreviewFukushashiki = ({
     if (!Array.isArray(message?.message_content) || message.message_content.length === 0) return null;
 
     return (
-      <div className="sp-body-user-side slideLeft" id={getElementMessageById(message.id)}>
+      <div className={`sp-body-user-side${editorPreview ? '' : ' slideLeft'}`} id={getElementMessageById(message.id)}>
         <div className="sp-body-user-side-messages">
           <UserMessage
             postMessageToParent={(options) => postMessageToParent(options, state)}
@@ -1350,8 +1356,8 @@ const ScenarioPreviewFukushashiki = ({
             botId={state.botId}
             isProcessing={!!state.isProcessing}
             cartSystem={state.cartSystem}
-            footer={renderNextButton(message, messageIndex)}
           />
+          {renderNextButton(message, messageIndex)}
         </div>
       </div>
     );
@@ -1364,7 +1370,8 @@ const ScenarioPreviewFukushashiki = ({
     const isUpdate = messageIndex >= state.renderMessagesList.length - 1;
 
     return (
-      <CombineMessage
+      <React.Fragment>
+        <CombineMessage
           postMessageToParent={(options) => postMessageToParent(options, state)}
           message={message}
           captcha={state.captcha}
@@ -1401,14 +1408,20 @@ const ScenarioPreviewFukushashiki = ({
           botId={state.botId}
           isProcessing={!!state.isProcessing}
           botInfor={state.botInfor}
-          themeSettings={state.themeSettings}
           previewOrderContent={state.previewOrderContent}
           executeLpJsCode={(jsCode) => executeLpJsCode(jsCode, state)}
           isBotOpen={state.isOpen}
           cartSystem={state.cartSystem}
+        />
+        <CombineMessageNextButton
+          message={message}
+          messageIndex={messageIndex}
+          botInfor={state.botInfor}
+          onClickNext={onClickNext}
           isUpdate={isUpdate}
           isExtractFromSession={state.isExtractFromSession}
         />
+      </React.Fragment>
     );
   };
 
@@ -1471,7 +1484,8 @@ const ScenarioPreviewFukushashiki = ({
           minHeight: 0,
           display: 'flex',
           flexDirection: 'column',
-          overflow: 'hidden',
+          overflowY: 'auto',
+          overflowX: 'hidden',
         },
       };
     }
@@ -1524,6 +1538,12 @@ const ScenarioPreviewFukushashiki = ({
   }
 
   const effectiveIsOpen = embedded || editorPreview || state.isOpen;
+  const hasApiBotInfor = Boolean(
+    state.botInfor?.title || state.botInfor?.main_color || state.botInfor?.main_color_other,
+  );
+  const displayBotInfor = editorPreview && !hasApiBotInfor
+    ? resolveEditorPreviewBotInfor(state.botInfor)
+    : state.botInfor;
 
   // body container
   if (effectiveIsOpen) {
@@ -1532,7 +1552,7 @@ const ScenarioPreviewFukushashiki = ({
       <div
         ref={containerRef}
         id="sp-container1"
-        className={`sp-container1 ${isPreviewMobile(previewDeviceMode) ? 'slideUpSp' : 'slideUp'}`}
+        className={`sp-container1${editorPreview ? '' : (isPreviewMobile(previewDeviceMode) ? ' slideUpSp' : ' slideUp')}`}
         style={containerStyle}
       >
         <ZipCodePopUp
@@ -1553,9 +1573,9 @@ const ScenarioPreviewFukushashiki = ({
             </div>
             <div className="sp-header-left-label">
               <div className="sp-header-left-label-sub-title">
-                {state.botInfor?.subtitle}
+                {displayBotInfor?.subtitle}
               </div>
-              <div className="sp-header-left-label-title">{state.botInfor?.titleBubble}</div>
+              <div className="sp-header-left-label-title">{displayBotInfor?.titleBubble}</div>
             </div>
           </div>
           <div className="sp-header-right" onClick={onChatbotHeaderClick}>
@@ -1593,7 +1613,7 @@ const ScenarioPreviewFukushashiki = ({
           </div>
         }
 
-        <ProcessBar botInfor={state.botInfor}
+        <ProcessBar botInfor={displayBotInfor}
           currentIndex={state.passedUserMsgCount}
           maxIndex={state.progressBarMaxIndex}
         />

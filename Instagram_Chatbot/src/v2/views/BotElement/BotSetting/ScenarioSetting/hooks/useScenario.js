@@ -89,7 +89,6 @@ export const useScenario = (mode = 'scenario') => {
   const [messageType, setMessageType] = useState('text_input');
   const [indexMessageSelect, setIndexMessageSelect] = useState('');
   const [dataInputVar, setDataInputVar] = useState([]);
-  const [isOpenPreview, setIsOpenPreview] = useState(false);
 
   const [varFileReference, setVarFileReference] = useState({});
   const [isOpenFileReference, setIsOpenFileReference] = useState(false);
@@ -487,37 +486,6 @@ export const useScenario = (mode = 'scenario') => {
     });
   }, [getConversationUrl, getSavePayload, handleGetMessage, isTemplateMode, validateAmazonPaySettings, validateAutoLogoutConfig, validateScenarioName]);
 
-  const handleOpenPreview = useCallback((isOpen) => {
-    if (!isOpenPreview) return;
-    const spContainer = document.getElementById('sp-container');
-    const spHeader = document.getElementById('sp-header');
-    const spProcessBar = document.getElementById('sp-process-bar');
-    const spBody = document.getElementById('sp-body');
-    if (spContainer && spHeader && spProcessBar && spBody) {
-      if (isOpen) {
-        spContainer.style.height = '620px';
-        spHeader.style.position = 'static';
-        spHeader.style.borderBottomLeftRadius = '0px';
-        spHeader.style.borderBottomRightRadius = '0px';
-        spHeader.style.borderTopLeftRadius = '2px';
-        spHeader.style.borderTopRightRadius = '2px';
-        spProcessBar.style.display = 'block';
-        spBody.style.display = 'block';
-      } else {
-        spContainer.style.height = '0px';
-        spProcessBar.style.display = 'none';
-        spBody.style.display = 'none';
-        spHeader.style.borderBottomLeftRadius = '25px';
-        spHeader.style.borderBottomRightRadius = '25px';
-        spHeader.style.borderTopLeftRadius = '25px';
-        spHeader.style.borderTopRightRadius = '25px';
-        spHeader.style.position = 'absolute';
-        spHeader.style.bottom = '0px';
-      }
-    }
-    setIsOpenPreview(!isOpenPreview);
-  }, [isOpenPreview]);
-
   useEffect(() => {
     if (isTemplateMode || !isShopifyPaymentScenario) {
       setListProductVariants([]);
@@ -574,11 +542,6 @@ export const useScenario = (mode = 'scenario') => {
     window.scrollTo(0, 0);
   }, [isTemplateMode]);
 
-  useEffect(() => {
-    handleOpenPreview(isOpenPreview);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return {
     state: {
       scenarioName,
@@ -614,7 +577,6 @@ export const useScenario = (mode = 'scenario') => {
       messageType,
       indexMessageSelect,
       dataInputVar,
-      isOpenPreview,
       varFileReference,
       isOpenFileReference,
       indexCarouselSlide,
@@ -707,7 +669,6 @@ export const useScenario = (mode = 'scenario') => {
       setMessageType,
       setIndexMessageSelect,
       setDataInputVar,
-      setIsOpenPreview,
       setVarFileReference,
       setIsOpenFileReference,
       setIndexCarouselSlide,
@@ -764,7 +725,6 @@ export const useScenario = (mode = 'scenario') => {
       onClickSavePreview,
       getListProductVariants,
       getListVariable,
-      handleOpenPreview,
       showNotification,
       validateScenarioName,
     },

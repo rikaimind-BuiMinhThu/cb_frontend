@@ -73,7 +73,11 @@ const PreviewFukushashikiReducer = (state, action) => {
       }
       const { isEditorPreviewDraft, timer_config, ...editorPreviewPayload } = action.payload || {};
       if (isEditorPreviewDraft) {
-        const nextState = { ...state, ...editorPreviewPayload };
+        const nextState = {
+          ...state,
+          ...editorPreviewPayload,
+          hasEditorPreviewDraftApplied: true,
+        };
         if (timer_config !== undefined) {
           nextState.botInfor = { ...state.botInfor, timer_config };
         }
@@ -482,14 +486,15 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
         newState.renderMode = RENDER_MODES.NEXT;
       }
 
-      // Update originalContent for replace variables when after getPreviewResponse
-      newState.messagesList.filter(isBotMessage).forEach((message) => {
-        message.message_content.forEach((content) => {
-          if (content.type === BOT_MESSAGE_TYPES.TEXT_INPUT) {
-            content[content.type].originalContent = content[content.type].content;
-          }
+      if (!(isEditorPreview && state.hasEditorPreviewDraftApplied)) {
+        newState.messagesList.filter(isBotMessage).forEach((message) => {
+          message.message_content?.forEach((content) => {
+            if (content.type === BOT_MESSAGE_TYPES.TEXT_INPUT) {
+              content[content.type].originalContent = content[content.type].content;
+            }
+          });
         });
-      });
+      }
 
       if (variables) {
         newState.variables = [...variables, ...all_variables];
@@ -502,11 +507,32 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
         newState.messagesList.forEach((x) => x.hidden = x.not_display_when_logged_in);
       }
 
-      if (isEditorPreview && state.renderMessagesList?.length > 0) {
+      if (isEditorPreview && state.hasEditorPreviewDraftApplied) {
+        newState.messagesList = state.messagesList;
         newState.renderMessagesList = state.renderMessagesList;
         newState.currentMsgIndex = state.currentMsgIndex;
         newState.nextStopMsgIndex = state.nextStopMsgIndex;
         newState.renderMode = state.renderMode;
+        newState.progressBarMaxIndex = state.progressBarMaxIndex;
+      } else if (isEditorPreview && state.renderMessagesList?.length > 0) {
+        newState.messagesList = state.messagesList;
+        newState.renderMessagesList = state.renderMessagesList;
+        newState.currentMsgIndex = state.currentMsgIndex;
+        newState.nextStopMsgIndex = state.nextStopMsgIndex;
+        newState.renderMode = state.renderMode;
+        newState.progressBarMaxIndex = state.progressBarMaxIndex;
+      } else if (
+        isEditorPreview
+        && !state.hasEditorPreviewDraftApplied
+        && !(state.renderMessagesList?.length > 0)
+        && (conversation?.messages?.length > 0)
+      ) {
+        const apiMessages = _.cloneDeep(conversation.messages);
+        newState.messagesList = apiMessages;
+        newState.renderMessagesList = apiMessages;
+        newState.currentMsgIndex = apiMessages.length > 0 ? apiMessages.length - 1 : 0;
+        newState.nextStopMsgIndex = apiMessages.length;
+        newState.renderMode = RENDER_MODES.LAST;
       } else if (!isEditorPreview && (newState.isOpen || action.payload.isUsingAmazonPay)) {
         newState.nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg()) + 1;
         if (newState.nextStopMsgIndex < newState.currentMsgIndex) {

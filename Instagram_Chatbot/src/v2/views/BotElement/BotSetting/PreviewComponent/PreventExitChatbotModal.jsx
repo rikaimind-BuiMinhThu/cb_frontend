@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDom from 'react-dom';
-import "assets/css/bot/preview-chat-bot.css";
+import "v2/assets/css/bot/preview-chat-bot.css";
 import { Row, Col } from "antd";
 import { Button } from "reactstrap";
 import {isMobile} from "./Utils";

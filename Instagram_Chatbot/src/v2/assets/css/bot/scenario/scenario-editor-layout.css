@@ -334,22 +334,6 @@
   color: #fff;
 }
 
-.ss-layout-preview-close-btn {
-  padding: 8px 16px;
-  font-size: 13px;
-  color: #555;
-  background: #fff;
-  border: 1px solid #d9d9d9;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
-}
-
-.ss-layout-preview-close-btn:hover {
-  background: #f5f5f5;
-  border-color: #bbb;
-}
-
 /* Settings modal */
 .ss-layout-settings-modal {
   max-height: 80vh;
@@ -871,9 +855,6 @@
     max-width: none;
   }
 
-  .ss-editor-layout-v2.ss-editor-layout-v2--with-preview {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* Overview: image checkbox/radio horizontal scroll */
