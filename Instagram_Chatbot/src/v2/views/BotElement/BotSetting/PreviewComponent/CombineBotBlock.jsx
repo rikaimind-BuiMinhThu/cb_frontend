@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { BOT_MESSAGE_TYPES } from './Constants';
 import HtmlCodeMessagePreview from 'components/BotMessages/HtmlCodeMessagePreview';
 import AmazonPayButtonMessagePreview from 'components/BotMessages/AmazonPayButtonMessagePreview';
+import CartLoginMessagePreview from 'components/BotMessages/CartLoginMessagePreview';
 import { replaceVariables } from './VariablesUtils';
 import { resolveBotMessageTheme } from '../DesignSetting/utils/designThemeUtils';
 import { buildOrderConfirmJs, buildOrderConfirmPreviewHtml } from '../ScenarioSetting/utils/OrderConfirmLpScriptGenerator';
@@ -127,6 +128,16 @@ const CombineBotBlock = ({
           contentIndex={contentIndex}
           botInfor={botInfor}
           themeSettings={themeSettings}
+        />
+      );
+    case BOT_MESSAGE_TYPES.CART_LOGIN:
+      return (
+        <CartLoginMessagePreview
+          content={content}
+          contentIndex={contentIndex}
+          botInfor={botInfor}
+          themeSettings={themeSettings}
+          executeLpJsCode={executeLpJsCode}
         />
       );
     default:

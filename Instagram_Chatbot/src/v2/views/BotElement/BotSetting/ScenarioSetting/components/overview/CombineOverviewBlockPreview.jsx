@@ -5,6 +5,7 @@ import { PREVIEW_MAP } from '../../contentPreviews';
 import { getBotFileExtension } from '../../utils/getBotMessageTitle';
 import { getCombineContentTypeLabel } from '../../utils/combineContentDefaults';
 import { buildOrderConfirmPreviewHtml } from '../../utils/OrderConfirmLpScriptGenerator';
+import { buildCartLoginStyle, normalizeCartLoginConfig } from '../../utils/cartLoginUtils';
 
 const renderBotBlockPreview = (content, index, hidden) => {
   const fileType = getBotFileExtension(content);
@@ -103,6 +104,22 @@ const renderBotBlockPreview = (content, index, hidden) => {
           __html: buildOrderConfirmPreviewHtml(content.order_confirm),
         }}
       />
+    );
+  }
+
+  if (content.type === BOT_MESSAGE_TYPES.CART_LOGIN) {
+    const cartLoginConfig = normalizeCartLoginConfig(content.cart_login);
+    const cartLoginStyle = buildCartLoginStyle(cartLoginConfig);
+    return (
+      <div className="ss-combine-block-preview ss-combine-block-preview--bot" style={opacityStyle}>
+        {cartLoginConfig.display_type === 'link' ? (
+          <span style={cartLoginStyle}>{cartLoginConfig.text}</span>
+        ) : (
+          <button type="button" style={cartLoginStyle}>
+            {cartLoginConfig.text}
+          </button>
+        )}
+      </div>
     );
   }
 

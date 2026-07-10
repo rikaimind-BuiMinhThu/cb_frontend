@@ -12,6 +12,7 @@ import { dataApiLinkage } from '../constants/scenarioFormConstants';
 import { useScenarioPanelDestructuring } from '../hooks/useScenarioPanelDestructuring';
 import ScenarioMessageSettingsAccordion from './ScenarioMessageSettingsAccordion';
 import OrderConfirmConfig from '../scenarioComon/OrderConfirmConfig';
+import CartLoginConfig from '../scenarioComon/CartLoginConfig';
 
 const STATEMENT_TYPE_OPTIONS = [
   ['text_input', 'テキスト'],
@@ -28,6 +29,7 @@ const STATEMENT_TYPE_OPTIONS = [
   ['amazon_pay_button', 'Amazon Payボタン'],
   ['use_html_ugc_config', 'HTML_UGC_CONFIG'],
   [BOT_MESSAGE_TYPES.ORDER_CONFIRM, '注文確認'],
+  [BOT_MESSAGE_TYPES.CART_LOGIN, 'カートログイン'],
 ];
 
 const removeVariableAt = (message, messageType, index) => {
@@ -455,6 +457,15 @@ const ScenarioBotSettingsPanel = () => {
               dataMessages={dataMessages}
               setDataMessages={setDataMessages}
               messageContent={messageContent}
+            />
+          )}
+          {messageType === BOT_MESSAGE_TYPES.CART_LOGIN && (
+            <CartLoginConfig
+              config={typeContent}
+              onChangeValue={onChangeValueMessageContent}
+              indexMessageSelect={indexMessageSelect}
+              dataMessages={dataMessages}
+              setDataMessages={setDataMessages}
             />
           )}
         </div>

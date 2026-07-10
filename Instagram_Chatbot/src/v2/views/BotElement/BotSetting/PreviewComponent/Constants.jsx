@@ -234,6 +234,7 @@ const BOT_MESSAGE_TYPES = {
   DELAY: 'delay',
   GETTING_ERROR_NOTIFICATION: 'getting_error_notification',
   ORDER_CONFIRM: 'order_confirm',
+  CART_LOGIN: 'cart_login',
 }
 
 const COMBINE_MESSAGE_DEFAULTS = {

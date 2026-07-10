@@ -7,6 +7,7 @@ import "moment/locale/zh-cn";
 import { BOT_MESSAGE_TYPES, RENDER_CHATBOT_CONFIG } from "./Constants";
 import HtmlCodeMessagePreview from "components/BotMessages/HtmlCodeMessagePreview";
 import AmazonPayButtonMessagePreview from "components/BotMessages/AmazonPayButtonMessagePreview";
+import CartLoginMessagePreview from "components/BotMessages/CartLoginMessagePreview";
 import { getElementMessageById, getBotMessageDelay } from "./Utils";
 import { replaceVariables } from "./VariablesUtils";
 import { buildOrderConfirmJs, buildOrderConfirmPreviewHtml } from "../ScenarioSetting/utils/OrderConfirmLpScriptGenerator";
@@ -74,6 +75,8 @@ const BotMessage = ({
       case BOT_MESSAGE_TYPES.HTML_CODE: 
         return !isUGCUsage(content);
       case BOT_MESSAGE_TYPES.AMAZON_PAY_BUTTON:
+        return true;
+      case BOT_MESSAGE_TYPES.CART_LOGIN:
         return true;
     }
   }
@@ -323,6 +326,16 @@ const BotMessage = ({
     />
   );
 
+  const renderCartLoginContent = () => (
+    <CartLoginMessagePreview
+      content={content}
+      contentIndex={contentIndex}
+      botInfor={botInfor}
+      themeSettings={themeSettings}
+      executeLpJsCode={executeLpJsCode}
+    />
+  );
+
   const renderHtmlCodeContent = () => {
     return (
       <HtmlCodeMessagePreview
@@ -354,6 +367,8 @@ const BotMessage = ({
         return renderHtmlCodeContent();
       case BOT_MESSAGE_TYPES.AMAZON_PAY_BUTTON:
         return renderAmazonPayButtonContent();
+      case BOT_MESSAGE_TYPES.CART_LOGIN:
+        return renderCartLoginContent();
     }
   }
 

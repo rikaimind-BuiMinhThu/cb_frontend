@@ -11,6 +11,7 @@ import locale from 'antd/es/date-picker/locale/ja_JP';
 import { BOT_MESSAGE_TYPES } from '../../../PreviewComponent/Constants';
 import { DEFAULT_AMAZON_PAY_BUTTON_IMAGE_URL } from '../../../../../../variables/amazonPayConstants';
 import { buildOrderConfirmPreviewHtml } from '../../utils/OrderConfirmLpScriptGenerator';
+import { buildCartLoginStyle, normalizeCartLoginConfig } from '../../utils/cartLoginUtils';
 import { PREVIEW_MAP } from '../../contentPreviews';
 import {
   getCalendarPreviewRelativeRangeLabel,
@@ -176,6 +177,25 @@ const OverviewBotMessageItem = ({
                     )}
                   </div>
                 )}
+                {/* bot: type == 'cart_login' */}
+                {content.type === BOT_MESSAGE_TYPES.CART_LOGIN && (() => {
+                  const cartLoginConfig = normalizeCartLoginConfig(content.cart_login);
+                  const cartLoginStyle = buildCartLoginStyle(cartLoginConfig);
+                  return (
+                    <div
+                      className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
+                      style={message.hidden === true ? { opacity: '0.4' } : {}}
+                    >
+                      {cartLoginConfig.display_type === 'link' ? (
+                        <span style={cartLoginStyle}>{cartLoginConfig.text}</span>
+                      ) : (
+                        <button type="button" style={cartLoginStyle}>
+                          {cartLoginConfig.text}
+                        </button>
+                      )}
+                    </div>
+                  );
+                })()}
                 {/* bot: type == 'script' */}
                 {(content.type === 'script' || content.type === BOT_MESSAGE_TYPES.HTML_CODE || content.type === BOT_MESSAGE_TYPES.UGC ) && (
                   <textarea

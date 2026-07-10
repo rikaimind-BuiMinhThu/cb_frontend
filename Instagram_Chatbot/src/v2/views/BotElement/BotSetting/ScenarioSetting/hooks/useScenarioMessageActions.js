@@ -14,6 +14,7 @@ import {
 import { DEFAULT_AMAZON_PAY_BUTTON_CONFIG } from '../../../../../variables/amazonPayConstants';
 import { applyAmazonPayDisplayModeToConditions } from '../utils/amazonPayConfigUtils';
 import { getDefaultOrderConfirmConfig } from '../utils/OrderConfirmLpScriptGenerator';
+import { getDefaultCartLoginConfig } from '../constants/cartLoginConstants';
 
 const _ = require('lodash');
 
@@ -262,6 +263,9 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
           data[i].message_content[0].type = value;
           if (value === 'order_confirm' && !data[i].message_content[0].order_confirm) {
             data[i].message_content[0].order_confirm = getDefaultOrderConfirmConfig();
+          }
+          if (value === 'cart_login' && !data[i].message_content[0].cart_login) {
+            data[i].message_content[0].cart_login = getDefaultCartLoginConfig();
           }
         }
       }
@@ -622,6 +626,7 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
                 ],
               },
               order_confirm: getDefaultOrderConfirmConfig(),
+              cart_login: getDefaultCartLoginConfig(),
             },
           ],
         },
@@ -672,6 +677,7 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
                 ],
               },
               order_confirm: getDefaultOrderConfirmConfig(),
+              cart_login: getDefaultCartLoginConfig(),
             },
           ],
         });
