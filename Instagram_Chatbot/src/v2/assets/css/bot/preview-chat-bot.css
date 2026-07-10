@@ -1233,8 +1233,16 @@ slideUp
 }
 
 .validation-error-message {
-  color: #FF7E00;
-  font-size: 12px;
+  background-color: var(--c-validation-bg, transparent);
+  color: var(--c-validation-text, #FF7E00);
+  font-size: var(--c-validation-font-size, 12px);
+}
+
+.ss-message__content--user-text-input-required,
+.ss-message__content--user-required {
+  color: var(--c-required-label-text, #FF7E00);
+  font-size: var(--c-required-label-font-size, 12px);
+  font-weight: 400;
 }
 
 

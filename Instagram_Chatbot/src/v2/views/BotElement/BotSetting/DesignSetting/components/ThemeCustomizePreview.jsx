@@ -122,6 +122,26 @@ const ThemeCustomizePreview = ({
     </PreviewUserMessage>
 
     <PreviewUserMessage
+      sectionId="validation"
+      activeSectionId={activeSectionId}
+      onSectionSelect={onSectionSelect}
+    >
+      <div className="ss-message__content--user-text-input-top">
+        <span className="ss-message__content--user-text-input-title">必須フィールド</span>
+        <span className="ss-message__content--user-text-input-required">※必須</span>
+      </div>
+      <div className="theme-customize-preview__field-group">
+        <input
+          type="text"
+          readOnly
+          placeholder="テキスト入力"
+          className="theme-customize-preview__field ss-input-value"
+        />
+      </div>
+      <div className="validation-error-message">入力してください</div>
+    </PreviewUserMessage>
+
+    <PreviewUserMessage
       sectionId="fields"
       activeSectionId={activeSectionId}
       onSectionSelect={onSectionSelect}

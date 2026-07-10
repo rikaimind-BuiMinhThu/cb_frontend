@@ -149,6 +149,11 @@ const buildThemeVariables = (theme) => {
   --c-field-unfocus-border: ${theme.fieldUnfocusBorderColor};
   --c-field-unfocus-bg: ${theme.fieldUnfocusBgColor};
   --c-field-font-size: ${theme.fieldFontSize};
+  --c-validation-bg: ${theme.validationMessageBgColor};
+  --c-validation-text: ${theme.validationMessageTextColor};
+  --c-validation-font-size: ${theme.validationMessageFontSize};
+  --c-required-label-text: ${theme.requiredLabelTextColor};
+  --c-required-label-font-size: ${theme.requiredLabelFontSize};
   --c-btn-normal-bg: ${theme.buttonNormalBgColor};
   --c-btn-normal-text: ${theme.buttonNormalTextColor};
   --c-btn-pressed-bg: ${theme.buttonPressedBgColor};
@@ -671,6 +676,21 @@ ${scopedDescendant(scopeSelector, '.theme-customize-preview__radio-default > lab
 ${userBubbleTextSelectors} {
   color: var(--c-user-msg-text, #333) !important;
   font-size: var(--c-user-msg-font-size, 14px) !important;
+}
+
+${spBodySelector} .validation-error-message,
+${scopedDescendant(scopeSelector, '.validation-error-message')} {
+  background-color: var(--c-validation-bg, transparent) !important;
+  color: var(--c-validation-text, #FF7E00) !important;
+  font-size: var(--c-validation-font-size, 12px) !important;
+}
+
+${spBodySelector} .ss-message__content--user-text-input-required,
+${spBodySelector} .ss-message__content--user-required,
+${scopedDescendant(scopeSelector, '.ss-message__content--user-text-input-required')},
+${scopedDescendant(scopeSelector, '.ss-message__content--user-required')} {
+  color: var(--c-required-label-text, #FF7E00) !important;
+  font-size: var(--c-required-label-font-size, 12px) !important;
 }
 
 ${scopedClass(scopeSelector, '.ss-bot-submit-error-message')},
