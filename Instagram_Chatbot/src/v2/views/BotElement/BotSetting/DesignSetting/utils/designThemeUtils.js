@@ -7,6 +7,7 @@ import {
   BUTTON_POSITION_IDS,
   CAMEL_TO_SNAKE_THEME,
   FIELD_FOCUS_EFFECT_IDS,
+  MODAL_TITLE_ALIGNMENT_IDS,
   THEME_FIELD_KEYS,
 } from '../constants/designThemeConstants';
 
@@ -15,6 +16,7 @@ const VALID_BORDER_TWINKLE_IDS = new Set(BORDER_TWINKLE_EFFECT_IDS);
 const VALID_BUTTON_BORDER_STYLE_IDS = new Set(BUTTON_BORDER_STYLE_IDS);
 const VALID_BUTTON_EFFECT_IDS = new Set(BUTTON_EFFECT_IDS);
 const VALID_BUTTON_POSITION_IDS = new Set(BUTTON_POSITION_IDS);
+const VALID_MODAL_TITLE_ALIGNMENT_IDS = new Set(MODAL_TITLE_ALIGNMENT_IDS);
 
 const BUTTON_BOUNCE_ANIMATION = 'themeButtonBounce 1.2s ease-in-out infinite';
 
@@ -28,6 +30,12 @@ const BUTTON_POSITION_JUSTIFY = {
   left: 'flex-start',
   center: 'center',
   right: 'flex-end',
+};
+
+const MODAL_TITLE_TEXT_ALIGN = {
+  left: 'left',
+  center: 'center',
+  right: 'right',
 };
 
 const TWINKLE_ANIMATION_BY_ELEMENT = {
@@ -89,6 +97,17 @@ export const normalizeButtonPosition = (value) => {
   if (!value) return 'right';
   if (VALID_BUTTON_POSITION_IDS.has(value)) return value;
   return 'right';
+};
+
+export const normalizeModalTitleAlignment = (value) => {
+  if (!value) return 'left';
+  if (VALID_MODAL_TITLE_ALIGNMENT_IDS.has(value)) return value;
+  return 'left';
+};
+
+export const resolveModalTitleTextAlign = (alignmentId) => {
+  const alignment = normalizeModalTitleAlignment(alignmentId);
+  return MODAL_TITLE_TEXT_ALIGN[alignment] || MODAL_TITLE_TEXT_ALIGN.left;
 };
 
 export const resolveButtonBorderRadius = (styleId) => {
@@ -284,6 +303,10 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
     errorMessageBgColor: '#ffebee',
     errorMessageTextColor: '#d32f2f',
     errorMessageFontSize: '14px',
+    modalBgColor: '#ffffff',
+    modalTitleTextColor: '#333333',
+    modalTitleFontSize: '16px',
+    modalTitleAlignment: 'left',
   };
 };
 
@@ -317,6 +340,7 @@ export const mergeThemeWithDefaults = (rawTheme, mainColorHex, apiColorKey) => {
   merged.buttonBorderStyle = normalizeButtonBorderStyle(merged.buttonBorderStyle);
   merged.buttonEffect = normalizeButtonEffect(merged.buttonEffect);
   merged.buttonPosition = normalizeButtonPosition(merged.buttonPosition);
+  merged.modalTitleAlignment = normalizeModalTitleAlignment(merged.modalTitleAlignment);
 
   const legacyHeaderColor = rawTheme.headerTextColor ?? rawTheme.header_text_color;
   if (legacyHeaderColor) {
@@ -369,6 +393,9 @@ export const buildThemePayload = (themeSettings) => {
     }
     if (key === 'buttonPosition' && value) {
       value = normalizeButtonPosition(value);
+    }
+    if (key === 'modalTitleAlignment' && value) {
+      value = normalizeModalTitleAlignment(value);
     }
     if (value !== undefined && value !== '') {
       payload[snakeKey] = value;

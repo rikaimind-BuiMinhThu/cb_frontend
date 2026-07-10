@@ -65,6 +65,10 @@ export const DESIGN_SETTING_TOOLTIPS = {
   errorMessageBgColor: 'エラーメッセージの背景色です。プレビュー上部のエラーバナーに反映されます。',
   errorMessageTextColor: 'エラーメッセージの文字色です。',
   errorMessageFontSize: 'エラーメッセージのフォントサイズです。単位は px です。',
+  modalBgColor: 'モーダルの背景色です。郵便番号検索ポップアップや離脱防止モーダルに反映されます。',
+  modalTitleTextColor: 'モーダルタイトルの文字色です。',
+  modalTitleFontSize: 'モーダルタイトルのフォントサイズです。単位は px です。',
+  modalTitleAlignment: 'モーダルタイトルの横方向の配置です。郵便番号検索ポップアップや離脱防止モーダルに反映されます。',
 };
 
 export const getDesignSettingTooltip = (key) => DESIGN_SETTING_TOOLTIPS[key] || '';

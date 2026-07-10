@@ -1,9 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Collapse } from 'antd';
-import { BORDER_TWINKLE_EFFECT_OPTIONS, BUTTON_BORDER_STYLE_OPTIONS, BUTTON_EFFECT_OPTIONS, BUTTON_POSITION_OPTIONS } from '../constants/designThemeConstants';
+import { Collapse, Checkbox } from 'antd';
+import {
+  BORDER_TWINKLE_EFFECT_OPTIONS,
+  BUTTON_BORDER_STYLE_OPTIONS,
+  BUTTON_EFFECT_OPTIONS,
+  BUTTON_POSITION_OPTIONS,
+  MODAL_TITLE_ALIGNMENT_OPTIONS,
+} from '../constants/designThemeConstants';
 import { getDesignSettingTooltip } from '../constants/designSettingTooltips';
-import { normalizeBorderTwinkleEffect, normalizeButtonBorderStyle, normalizeButtonEffect, normalizeButtonPosition } from '../utils/designThemeUtils';
+import {
+  normalizeBorderTwinkleEffect,
+  normalizeButtonBorderStyle,
+  normalizeButtonEffect,
+  normalizeButtonPosition,
+  normalizeModalTitleAlignment,
+} from '../utils/designThemeUtils';
 import MainColorPicker from './MainColorPicker';
 import ThemeColorField from './ThemeColorField';
 import ThemeDimensionField from './ThemeDimensionField';
@@ -27,6 +39,8 @@ const ThemeAccordionSection = ({
   onFieldChange,
   onResetSection,
   showReset,
+  showModalInPreview,
+  onModalPreviewToggle,
 }) => {
   const renderField = (field, index) => {
     const { key, label, isText, fieldType, fullWidth, effectOptions, unit, unitOptions } = field;
@@ -122,6 +136,40 @@ const ThemeAccordionSection = ({
             normalizeValue={normalizeButtonPosition}
             onChange={(value) => onFieldChange(key, value)}
           />
+        </div>
+      );
+    }
+
+    if (fieldType === 'modalTitleAlignmentSelect') {
+      return (
+        <div key={key} className={fieldClassSuffix}>
+          <ThemeEffectSelectField
+            label={label}
+            value={themeSettings[key]}
+            fullWidth={fullWidth ?? false}
+            tooltipKey={key}
+            options={MODAL_TITLE_ALIGNMENT_OPTIONS}
+            normalizeValue={normalizeModalTitleAlignment}
+            onChange={(value) => onFieldChange(key, value)}
+          />
+        </div>
+      );
+    }
+
+    if (fieldType === 'modalPreviewToggle') {
+      if (sectionId !== 'modal') return null;
+
+      return (
+        <div
+          key={`modal-preview-toggle-${index}`}
+          className={`theme-field theme-field--modal-preview-toggle${fullWidth ? ' theme-field--full' : ''}`}
+        >
+          <Checkbox
+            checked={showModalInPreview}
+            onChange={(event) => onModalPreviewToggle(event.target.checked)}
+          >
+            {label}
+          </Checkbox>
         </div>
       );
     }
@@ -233,6 +281,8 @@ ThemeAccordionSection.propTypes = {
   onFieldChange: PropTypes.func.isRequired,
   onResetSection: PropTypes.func.isRequired,
   showReset: PropTypes.bool,
+  showModalInPreview: PropTypes.bool,
+  onModalPreviewToggle: PropTypes.func,
 };
 
 ThemeAccordionSection.defaultProps = {
@@ -242,6 +292,8 @@ ThemeAccordionSection.defaultProps = {
   isExpanded: false,
   highlightedFieldKey: '',
   showReset: true,
+  showModalInPreview: true,
+  onModalPreviewToggle: null,
 };
 
 export default ThemeAccordionSection;

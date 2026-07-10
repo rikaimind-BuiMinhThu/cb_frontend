@@ -1,5 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Row, Col } from 'antd';
+import { Button } from 'reactstrap';
+import 'v2/assets/css/bot/preview-chat-bot.css';
 import ThemePreviewShell from './ThemePreviewShell';
 import PreviewRegion from './PreviewRegion';
 
@@ -44,6 +47,7 @@ const ThemeCustomizePreview = ({
   subtitle,
   activeSectionId,
   onSectionSelect,
+  showModalPreview,
 }) => (
   <ThemePreviewShell
     scopeId={PREVIEW_SCOPE_ID}
@@ -215,6 +219,38 @@ const ThemeCustomizePreview = ({
         <button type="button" className="btn btn-new-bot" disabled>無効</button>
       </div>
     </PreviewUserMessage>
+
+    {showModalPreview ? (
+      <PreviewRegion
+        sectionId="modal"
+        activeSectionId={activeSectionId}
+        onSectionSelect={onSectionSelect}
+        className="theme-customize-preview__modal-wrap"
+      >
+        <div className="theme-customize-preview__prevent-exit">
+          <div className="theme-customize-preview__prevent-exit-overlay" aria-hidden="true" />
+          <div className="ss-bot-prevent-exit-chatbot-modal ss-bot-prevent-exit-chatbot-modal-pc theme-customize-preview__prevent-exit-panel">
+            <Row className="theme-customize-preview__modal-title-row">
+              <Col span={24} className="theme-customize-preview__modal-title-col">
+                <span className="title-bot-modal">本当に閉じますか？</span>
+              </Col>
+            </Row>
+            <Row className="justify-content-around">
+              <Col md="6">
+                <Button type="button" className="btn-cancel__modal-bot" disabled>
+                  チャットに戻る
+                </Button>
+              </Col>
+              <Col md="6">
+                <Button type="button" className="btn-close__modal-bot" disabled>
+                  閉じる
+                </Button>
+              </Col>
+            </Row>
+          </div>
+        </div>
+      </PreviewRegion>
+    ) : null}
   </ThemePreviewShell>
 );
 
@@ -225,6 +261,7 @@ ThemeCustomizePreview.propTypes = {
   subtitle: PropTypes.string,
   activeSectionId: PropTypes.string,
   onSectionSelect: PropTypes.func,
+  showModalPreview: PropTypes.bool,
 };
 
 ThemeCustomizePreview.defaultProps = {
@@ -233,6 +270,7 @@ ThemeCustomizePreview.defaultProps = {
   subtitle: '',
   activeSectionId: '',
   onSectionSelect: null,
+  showModalPreview: true,
 };
 
 export default ThemeCustomizePreview;

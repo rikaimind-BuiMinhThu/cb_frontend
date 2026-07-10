@@ -9,6 +9,7 @@ import {
   resolveButtonPositionJustify,
   resolveButtonWidthCss,
   resolveFieldFocusEffect,
+  resolveModalTitleTextAlign,
 } from '../views/BotElement/BotSetting/DesignSetting/utils/designThemeUtils';
 
 const LIVE_THEME_ROOTS = ['#sp-container1', '.sp-container1', '#sp-container', '.sp-container'];
@@ -162,8 +163,32 @@ const buildThemeVariables = (theme) => {
   --c-error-bg: ${theme.errorMessageBgColor};
   --c-error-text: ${theme.errorMessageTextColor};
   --c-error-font-size: ${theme.errorMessageFontSize};
+  --c-modal-bg: ${theme.modalBgColor};
+  --c-modal-title-text: ${theme.modalTitleTextColor};
+  --c-modal-title-font-size: ${theme.modalTitleFontSize};
+  --c-modal-title-align: ${resolveModalTitleTextAlign(theme.modalTitleAlignment)};
 `;
 };
+
+const buildPortalModalVariables = (theme) => `
+  --c-modal-bg: ${theme.modalBgColor};
+  --c-modal-title-text: ${theme.modalTitleTextColor};
+  --c-modal-title-font-size: ${theme.modalTitleFontSize};
+  --c-modal-title-align: ${resolveModalTitleTextAlign(theme.modalTitleAlignment)};
+`;
+
+const buildPortalModalRules = () => `
+#portal .ss-bot-prevent-exit-chatbot-modal {
+  background-color: var(--c-modal-bg, #FFF) !important;
+}
+
+#portal .title-bot-modal {
+  display: block !important;
+  width: 100% !important;
+  color: var(--c-modal-title-text, #333) !important;
+  font-size: var(--c-modal-title-font-size, 16px) !important;
+  text-align: var(--c-modal-title-align, left) !important;
+}`.trim();
 
 const buildButtonLayoutRules = (hasExplicitWidth) => {
   const widthRule = hasExplicitWidth
@@ -635,6 +660,39 @@ ${scopedDescendant(scopeSelector, '.error-container .error_each')} {
 
 ${scopedClass(scopeSelector, '.ss-bot-submit-error-message')} {
   border: 1px solid var(--c-error-text, #f44336) !important;
+}
+
+${scopedClass(scopeSelector, '.sp-popup-zip-code-address')} {
+  background-color: var(--c-modal-bg, #fff) !important;
+}
+
+${scopedClass(scopeSelector, '.sp-popup-zip-code-address-header')} {
+  background-color: var(--c-modal-bg, #FAFAFA) !important;
+}
+
+${scopedClass(scopeSelector, '.sp-popup-zip-code-address-header-left')} {
+  color: var(--c-modal-title-text, #333) !important;
+  font-size: var(--c-modal-title-font-size, 16px) !important;
+  text-align: var(--c-modal-title-align, left) !important;
+  flex: 1 !important;
+}
+
+${scopedClass(scopeSelector, '.ss-bot-prevent-exit-chatbot-modal')} {
+  background-color: var(--c-modal-bg, #FFF) !important;
+}
+
+${scopedClass(scopeSelector, '.theme-customize-preview__modal-title-col')} {
+  text-align: var(--c-modal-title-align, left) !important;
+  flex: 0 0 100% !important;
+  max-width: 100% !important;
+}
+
+${scopedClass(scopeSelector, '.title-bot-modal')} {
+  display: block !important;
+  width: 100% !important;
+  color: var(--c-modal-title-text, #333) !important;
+  font-size: var(--c-modal-title-font-size, 16px) !important;
+  text-align: var(--c-modal-title-align, left) !important;
 }${previewButtonRules}`.trim();
 };
 
@@ -643,7 +701,13 @@ const buildThemeCss = (theme, scopeSelector = '') => {
     ? `${scopeSelector} {${buildThemeVariables(theme)}\n}`
     : `#sp-container, .sp-container, #sp-container1, .sp-container1 {${buildThemeVariables(theme)}\n}`;
 
-  return `${variablesBlock}\n\n${buildThemeRules(theme, scopeSelector)}`.trim();
+  const isLiveBotScope = scopeSelector.includes('sp-container');
+  const portalVariablesBlock = isLiveBotScope
+    ? `\n\n#portal {${buildPortalModalVariables(theme)}\n}`
+    : '';
+  const portalRules = isLiveBotScope ? `\n\n${buildPortalModalRules()}` : '';
+
+  return `${variablesBlock}${portalVariablesBlock}\n\n${buildThemeRules(theme, scopeSelector)}${portalRules}`.trim();
 };
 
 export const generateThemeCss = (rawTheme, mainColorHex, apiColorKey) => {

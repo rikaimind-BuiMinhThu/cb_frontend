@@ -21,6 +21,7 @@ const ThemeCustomizeTab = ({
 }) => {
   const [activeSectionId, setActiveSectionId] = useState('headerMain');
   const [expandedSections, setExpandedSections] = useState(DEFAULT_EXPANDED_SECTIONS);
+  const [showModalInPreview, setShowModalInPreview] = useState(true);
   const sectionRefs = useRef({});
 
   const setSectionRef = useCallback((sectionId, node) => {
@@ -70,6 +71,7 @@ const ThemeCustomizeTab = ({
             subtitle={subtitle}
             activeSectionId={activeSectionId}
             onSectionSelect={handleSectionSelect}
+            showModalPreview={showModalInPreview}
           />
         </div>
         <div className="theme-customize-tab-settings">
@@ -95,6 +97,8 @@ const ThemeCustomizeTab = ({
                   onExpand={handleSectionExpand}
                   onFieldChange={onFieldChange}
                   onResetSection={onResetSection}
+                  showModalInPreview={showModalInPreview}
+                  onModalPreviewToggle={setShowModalInPreview}
                 />
               </div>
             ))}

@@ -39,6 +39,14 @@ export const BUTTON_POSITION_OPTIONS = [
 
 export const BUTTON_POSITION_IDS = BUTTON_POSITION_OPTIONS.map(({ id }) => id);
 
+export const MODAL_TITLE_ALIGNMENT_OPTIONS = [
+  { id: 'left', label: '左' },
+  { id: 'center', label: '中央' },
+  { id: 'right', label: '右' },
+];
+
+export const MODAL_TITLE_ALIGNMENT_IDS = MODAL_TITLE_ALIGNMENT_OPTIONS.map(({ id }) => id);
+
 export const THEME_FIELD_KEYS = [
   'headerTitleTextColor',
   'headerTitleFontSize',
@@ -89,6 +97,10 @@ export const THEME_FIELD_KEYS = [
   'errorMessageBgColor',
   'errorMessageTextColor',
   'errorMessageFontSize',
+  'modalBgColor',
+  'modalTitleTextColor',
+  'modalTitleFontSize',
+  'modalTitleAlignment',
 ];
 
 export const THEME_PREVIEW_REGIONS = [
@@ -101,6 +113,7 @@ export const THEME_PREVIEW_REGIONS = [
   { sectionId: 'checkbox', label: 'チェックボックス', targets: ['checkboxes'] },
   { sectionId: 'radio', label: 'ラジオボタン', targets: ['radios'] },
   { sectionId: 'errors', label: 'エラーメッセージ', targets: ['errorBanner'] },
+  { sectionId: 'modal', label: 'モーダル', targets: ['modalPreview'] },
 ];
 
 export const THEME_SECTIONS = [
@@ -256,6 +269,23 @@ export const THEME_SECTIONS = [
       { key: 'errorMessageFontSize', label: 'フォントサイズ', fieldType: 'fontSize', fullWidth: true },
     ],
   },
+  {
+    id: 'modal',
+    title: 'モーダル',
+    fields: [
+      { key: 'modalBgColor', label: '背景色', fullWidth: true },
+      { fieldType: 'groupLabel', label: 'タイトル', fullWidth: true },
+      { key: 'modalTitleTextColor', label: '文字色' },
+      { key: 'modalTitleFontSize', label: 'フォントサイズ', fieldType: 'fontSize' },
+      {
+        key: 'modalTitleAlignment',
+        label: '配置',
+        fieldType: 'modalTitleAlignmentSelect',
+        fullWidth: true,
+      },
+      { fieldType: 'modalPreviewToggle', label: 'プレビューに表示', fullWidth: true },
+    ],
+  },
 ];
 
 export const THEME_SECTION_NAV_ITEMS = THEME_SECTIONS.map(({ id, title }) => ({ id, title }));
@@ -310,4 +340,8 @@ export const CAMEL_TO_SNAKE_THEME = {
   errorMessageBgColor: 'error_message_bg_color',
   errorMessageTextColor: 'error_message_text_color',
   errorMessageFontSize: 'error_message_font_size',
+  modalBgColor: 'modal_bg_color',
+  modalTitleTextColor: 'modal_title_text_color',
+  modalTitleFontSize: 'modal_title_font_size',
+  modalTitleAlignment: 'modal_title_alignment',
 };

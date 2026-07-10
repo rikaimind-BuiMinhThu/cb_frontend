@@ -532,7 +532,7 @@
 }
 
 .sp-popup-zip-code-address {
-    background-color: #fff;
+    background-color: var(--c-modal-bg, #fff);
     z-index: 99;
     height: 85%;
     position: absolute;
@@ -543,17 +543,21 @@
 }
 
 .sp-popup-zip-code-address-header {
-    background-color: #FAFAFA;
+    background-color: var(--c-modal-bg, #FAFAFA);
     border-bottom: 1px solid #E5E5E5;
     border-left: 4px solid #D74E56;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 7px;
-    font-size: 16px;
+    font-size: var(--c-modal-title-font-size, 16px);
 }
 
-.sp-popup-zip-code-address-header-left {}
+.sp-popup-zip-code-address-header-left {
+    color: var(--c-modal-title-text, inherit);
+    text-align: var(--c-modal-title-align, left);
+    flex: 1;
+}
 
 .sp-popup-zip-code-address-header-right {}
 
@@ -1270,7 +1274,7 @@ slideUp
   border-radius: 5px;
   max-height: 70%;
   overflow-y: scroll;
-  background-color: #FFF;
+  background-color: var(--c-modal-bg, #FFF);
   overflow-x: hidden;
 }
 
@@ -1292,6 +1296,14 @@ slideUp
   position: fixed;
   background-color: #000;
   z-index: 1000;
+}
+
+.title-bot-modal {
+  display: block;
+  width: 100%;
+  color: var(--c-modal-title-text, inherit);
+  font-size: var(--c-modal-title-font-size, inherit);
+  text-align: var(--c-modal-title-align, left);
 }
 
 .ss-bot-submit-error-message {
