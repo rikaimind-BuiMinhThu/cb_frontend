@@ -54,7 +54,7 @@ const PreventExitChatbotModal = ({ isOpen, onClose, onCloseBot, botConfig }) => 
       <div style={modalStyle}>
         <div className={`ss-bot-prevent-exit-chatbot-modal ${modalClassName}`}>
           <Row>
-            <Col md="12">
+            <Col span={24} className="ss-bot-prevent-exit-modal-title-col">
               {renderMessagePopup()}
               {renderImagePopup()}
             </Col>

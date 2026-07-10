@@ -1298,6 +1298,12 @@ slideUp
   z-index: 1000;
 }
 
+.ss-bot-prevent-exit-modal-title-col {
+  flex: 0 0 100%;
+  max-width: 100%;
+  text-align: var(--c-modal-title-align, left);
+}
+
 .title-bot-modal {
   display: block;
   width: 100%;

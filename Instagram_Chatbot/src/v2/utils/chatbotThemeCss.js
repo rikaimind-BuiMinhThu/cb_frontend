@@ -182,6 +182,12 @@ const buildPortalModalRules = () => `
   background-color: var(--c-modal-bg, #FFF) !important;
 }
 
+#portal .ss-bot-prevent-exit-modal-title-col {
+  flex: 0 0 100% !important;
+  max-width: 100% !important;
+  text-align: var(--c-modal-title-align, left) !important;
+}
+
 #portal .title-bot-modal {
   display: block !important;
   width: 100% !important;
