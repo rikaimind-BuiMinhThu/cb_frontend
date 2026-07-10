@@ -111,6 +111,18 @@ ${spBodySelector} .select-custom-native:focus,
 ${spBodySelector} .ant-select-focused .ant-select-selector
 `.trim();
 
+const buildFieldScopeSelectors = (scopeSelector) => [
+  scopeSelector ? scopedDescendant(scopeSelector, '.sp-body') : '.sp-body',
+  scopeSelector
+    ? scopedDescendant(scopeSelector, '.sp-popup-zip-code-address')
+    : '.sp-popup-zip-code-address',
+];
+
+const combineScopedFieldSelectors = (scopeSelector, builder) =>
+  buildFieldScopeSelectors(scopeSelector)
+    .map((fieldScope) => builder(fieldScope))
+    .join(',\n');
+
 const buildThemeVariables = (theme) => {
   const buttonWidth = resolveButtonWidthCss(theme.buttonWidth);
   const buttonPadding = resolveButtonPaddingCss(theme.buttonPadding);
@@ -281,12 +293,14 @@ const buildTwinkleAnimationRule = (effectId, elementType, theme) => {
 };
 
 const buildThemeRules = (theme, scopeSelector = '') => {
-  const spBodySelector = scopeSelector
-    ? scopedDescendant(scopeSelector, '.sp-body')
-    : '.sp-body';
-  const fieldSelectors = buildFieldSelectors(spBodySelector);
-  const fieldPlaceholderSelectors = buildFieldPlaceholderSelectors(spBodySelector);
-  const fieldFocusSelectors = buildFieldFocusSelectors(spBodySelector);
+  const fieldScopeSelectors = buildFieldScopeSelectors(scopeSelector);
+  const spBodySelector = fieldScopeSelectors[0];
+  const fieldSelectors = combineScopedFieldSelectors(scopeSelector, buildFieldSelectors);
+  const fieldPlaceholderSelectors = combineScopedFieldSelectors(
+    scopeSelector,
+    buildFieldPlaceholderSelectors,
+  );
+  const fieldFocusSelectors = combineScopedFieldSelectors(scopeSelector, buildFieldFocusSelectors);
   const focusEffect = resolveFieldFocusEffect(theme.fieldFocusBgEffect, theme);
   const previewFocusSelector = scopeSelector
     ? `${spBodySelector} input.theme-customize-preview__field.ss-input-value.theme-preview--field-focus, ${spBodySelector} select.theme-customize-preview__field.ss-input-value.theme-preview--field-focus, ${spBodySelector} textarea.theme-customize-preview__field.ss-input-value.theme-preview--field-focus`
@@ -299,7 +313,10 @@ const buildThemeRules = (theme, scopeSelector = '') => {
     focusEffect,
     previewFocusSelector,
   );
-  const twinkleFieldOverrideRules = buildTwinkleFieldOverrideRules(spBodySelector, focusEffect);
+  const twinkleFieldOverrideRules = fieldScopeSelectors
+    .map((fieldScope) => buildTwinkleFieldOverrideRules(fieldScope, focusEffect))
+    .filter(Boolean)
+    .join('\n');
 
   const checkboxTwinkleAnimation = buildTwinkleAnimationRule(
     theme.checkboxCheckedBorderEffect,
@@ -483,7 +500,7 @@ ${fieldPlaceholderSelectors} {
   font-size: var(--c-field-font-size, 14px) !important;
 }
 
-${spBodySelector} .ant-select-selection-placeholder {
+${fieldScopeSelectors.map((fieldScope) => `${fieldScope} .ant-select-selection-placeholder`).join(',\n')} {
   font-size: var(--c-field-font-size, 14px) !important;
 }
 ${focusRules}

@@ -567,6 +567,24 @@
     padding: 25px 20px;
 }
 
+.sp-popup-zip-code-address .ant-select-selector,
+.sp-popup-zip-code-address .select-custom-native {
+    border: 1px solid var(--c-field-unfocus-border, #d9d9d9);
+    background-color: var(--c-field-unfocus-bg, #fff);
+    font-size: var(--c-field-font-size, 14px);
+}
+
+.sp-popup-zip-code-address .ant-select-selection-placeholder,
+.sp-popup-zip-code-address .ant-select-selection-item {
+    font-size: var(--c-field-font-size, 14px);
+}
+
+.sp-popup-zip-code-address .select-custom-native:focus,
+.sp-popup-zip-code-address .ant-select-focused .ant-select-selector {
+    border-color: var(--c-field-focus-border, #327AED);
+    background-color: var(--c-field-focus-bg, #fff);
+}
+
 .sp-popup-zip-code-address-body-form {}
 
 .sp-popup-zip-code-address-body-form-content {
