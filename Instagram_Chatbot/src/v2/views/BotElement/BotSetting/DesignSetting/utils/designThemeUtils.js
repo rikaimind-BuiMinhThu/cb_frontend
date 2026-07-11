@@ -7,6 +7,7 @@ import {
   BUTTON_POSITION_IDS,
   CAMEL_TO_SNAKE_THEME,
   FIELD_FOCUS_EFFECT_IDS,
+  MESSAGE_BORDER_STYLE_IDS,
   MODAL_TITLE_ALIGNMENT_IDS,
   THEME_FIELD_KEYS,
 } from '../constants/designThemeConstants';
@@ -16,6 +17,7 @@ const VALID_BORDER_TWINKLE_IDS = new Set(BORDER_TWINKLE_EFFECT_IDS);
 const VALID_BUTTON_BORDER_STYLE_IDS = new Set(BUTTON_BORDER_STYLE_IDS);
 const VALID_BUTTON_EFFECT_IDS = new Set(BUTTON_EFFECT_IDS);
 const VALID_BUTTON_POSITION_IDS = new Set(BUTTON_POSITION_IDS);
+const VALID_MESSAGE_BORDER_STYLE_IDS = new Set(MESSAGE_BORDER_STYLE_IDS);
 const VALID_MODAL_TITLE_ALIGNMENT_IDS = new Set(MODAL_TITLE_ALIGNMENT_IDS);
 
 const BUTTON_BOUNCE_ANIMATION = 'themeButtonBounce 1.2s ease-in-out infinite';
@@ -85,6 +87,12 @@ export const normalizeButtonBorderStyle = (value) => {
   if (!value) return 'rounded';
   if (VALID_BUTTON_BORDER_STYLE_IDS.has(value)) return value;
   return 'rounded';
+};
+
+export const normalizeMessageBorderStyle = (value, fallback = 'with_tail') => {
+  if (!value) return fallback;
+  if (VALID_MESSAGE_BORDER_STYLE_IDS.has(value)) return value;
+  return fallback;
 };
 
 export const normalizeButtonEffect = (value) => {
@@ -265,9 +273,11 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
     botMessageBgColor: messageColor,
     botMessageTextColor: fontColor,
     botMessageFontSize: '14px',
+    botMessageBorderStyle: 'with_tail',
     userMessageBgColor: '#ffffff',
     userMessageTextColor: '#333333',
     userMessageFontSize: '14px',
+    userMessageBorderStyle: 'no_tail',
     fieldFocusBorderColor: mainColorHex,
     fieldFocusBgColor: '#ffffff',
     fieldFocusBgEffect: 'outline_soft',
@@ -343,6 +353,14 @@ export const mergeThemeWithDefaults = (rawTheme, mainColorHex, apiColorKey) => {
     merged.radioSelectedBorderEffect,
   );
   merged.buttonBorderStyle = normalizeButtonBorderStyle(merged.buttonBorderStyle);
+  merged.botMessageBorderStyle = normalizeMessageBorderStyle(
+    merged.botMessageBorderStyle,
+    'with_tail',
+  );
+  merged.userMessageBorderStyle = normalizeMessageBorderStyle(
+    merged.userMessageBorderStyle,
+    'no_tail',
+  );
   merged.buttonEffect = normalizeButtonEffect(merged.buttonEffect);
   merged.buttonPosition = normalizeButtonPosition(merged.buttonPosition);
   merged.modalTitleAlignment = normalizeModalTitleAlignment(merged.modalTitleAlignment);
@@ -376,6 +394,17 @@ export const resolveBotMessageTheme = (themeSettings, botInfor) => {
   };
 };
 
+export const resolveUserMessageTheme = (themeSettings, botInfor) => {
+  const { apiColorKey, mainColorHex } = resolveMainColorContext(botInfor);
+  const theme = mergeThemeWithDefaults(themeSettings, mainColorHex, apiColorKey);
+  return {
+    bgColor: theme.userMessageBgColor,
+    textColor: theme.userMessageTextColor,
+    fontSize: theme.userMessageFontSize,
+    showTail: normalizeMessageBorderStyle(theme.userMessageBorderStyle, 'no_tail') === 'with_tail',
+  };
+};
+
 export const buildThemePayload = (themeSettings) => {
   const payload = {};
   THEME_FIELD_KEYS.forEach((key) => {
@@ -392,6 +421,12 @@ export const buildThemePayload = (themeSettings) => {
     }
     if (key === 'buttonBorderStyle' && value) {
       value = normalizeButtonBorderStyle(value);
+    }
+    if (key === 'botMessageBorderStyle' && value) {
+      value = normalizeMessageBorderStyle(value, 'with_tail');
+    }
+    if (key === 'userMessageBorderStyle' && value) {
+      value = normalizeMessageBorderStyle(value, 'no_tail');
     }
     if (key === 'buttonEffect' && value) {
       value = normalizeButtonEffect(value);

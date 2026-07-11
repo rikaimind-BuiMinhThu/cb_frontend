@@ -2,6 +2,7 @@ import { CAMEL_TO_SNAKE_THEME } from '../views/BotElement/BotSetting/DesignSetti
 import { resolveMainColorContext } from '../views/BotElement/BotSetting/DesignSetting/utils/designChatbotUtils';
 import {
   mergeThemeWithDefaults,
+  normalizeMessageBorderStyle,
   resolveBorderTwinkleEffect,
   resolveButtonBorderRadius,
   resolveButtonBounceEffect,
@@ -392,6 +393,67 @@ ${previewButtonGroupSelector} {
   );
   const userBubbleTextSelectors = buildUserBubbleTextSelectors(scopeSelector);
 
+  const botMessageBorderStyle = normalizeMessageBorderStyle(
+    theme.botMessageBorderStyle,
+    'with_tail',
+  );
+  const userMessageBorderStyle = normalizeMessageBorderStyle(
+    theme.userMessageBorderStyle,
+    'no_tail',
+  );
+
+  const botMessageTailHideSelectors = [
+    scopedDescendant(scopeSelector, '.ss-bot-chat-text-input-bot-icon'),
+    scopedDescendant(scopeSelector, '.html-code-message-icon'),
+    scopedDescendant(scopeSelector, '.theme-customize-preview__bot-bubble-tail'),
+  ].join(',\n');
+  const botMessageTailRules = botMessageBorderStyle === 'no_tail' ? `
+${botMessageTailHideSelectors} {
+  display: none !important;
+}` : '';
+
+  const userMessageShellSelector = scopedDescendant(
+    scopeSelector,
+    '.sp-body-user-side > .sp-body-user-side-messages',
+  );
+  const userMessageDirectWrapperSelector = scopedDescendant(
+    scopeSelector,
+    '.sp-body-user-side > .sp-body-user-side-messages > .ss-user-message__content-wrapper',
+  );
+  const userMessageTailIconSelector = [
+    scopedDescendant(scopeSelector, '.ss-user-chat-text-input-user-icon'),
+    scopedDescendant(scopeSelector, '.theme-customize-preview__user-bubble-tail'),
+  ].join(',\n');
+  const userMessageTailPathSelector = [
+    scopedDescendant(scopeSelector, '.ss-user-chat-text-input-user-icon path'),
+    scopedDescendant(scopeSelector, '.theme-customize-preview__user-bubble-tail path'),
+  ].join(',\n');
+
+  const userMessageTailRules = userMessageBorderStyle === 'with_tail' ? `
+${userMessageShellSelector} {
+  position: relative !important;
+  overflow: visible !important;
+  background-color: var(--c-user-msg-bg, #fff) !important;
+  color: var(--c-user-msg-text, #333) !important;
+  font-size: var(--c-user-msg-font-size, 14px) !important;
+  border-radius: 20px !important;
+  padding: 10px !important;
+}
+${userMessageDirectWrapperSelector} {
+  background-color: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+${userMessageTailIconSelector} {
+  display: flex !important;
+}
+${userMessageTailPathSelector} {
+  fill: var(--c-user-msg-bg, #fff) !important;
+}` : `
+${userMessageTailIconSelector} {
+  display: none !important;
+}`;
+
   const previewButtonBase = scopeSelector
     ? scopedDescendant(scopeSelector, '.theme-customize-preview__button-group .btn-new-bot')
     : '';
@@ -538,6 +600,8 @@ ${userMessageWrapperDirectChildSelector} {
   padding: 10px;
   border-radius: 20px;
 }
+${botMessageTailRules}
+${userMessageTailRules}
 
 ${buttonPositionRules}
 ${previewButtonPositionRule}

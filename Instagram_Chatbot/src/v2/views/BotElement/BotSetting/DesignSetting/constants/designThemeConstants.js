@@ -24,6 +24,13 @@ export const BUTTON_BORDER_STYLE_OPTIONS = [
 
 export const BUTTON_BORDER_STYLE_IDS = BUTTON_BORDER_STYLE_OPTIONS.map(({ id }) => id);
 
+export const MESSAGE_BORDER_STYLE_OPTIONS = [
+  { id: 'with_tail', label: 'しっぽあり' },
+  { id: 'no_tail', label: 'しっぽなし' },
+];
+
+export const MESSAGE_BORDER_STYLE_IDS = MESSAGE_BORDER_STYLE_OPTIONS.map(({ id }) => id);
+
 export const BUTTON_EFFECT_OPTIONS = [
   { id: 'none', label: 'なし' },
   { id: 'bounce', label: '動かす' },
@@ -59,9 +66,11 @@ export const THEME_FIELD_KEYS = [
   'botMessageBgColor',
   'botMessageTextColor',
   'botMessageFontSize',
+  'botMessageBorderStyle',
   'userMessageBgColor',
   'userMessageTextColor',
   'userMessageFontSize',
+  'userMessageBorderStyle',
   'fieldFocusBorderColor',
   'fieldFocusBgColor',
   'fieldFocusBgEffect',
@@ -164,10 +173,22 @@ export const THEME_SECTIONS = [
       { key: 'botMessageBgColor', label: '背景色' },
       { key: 'botMessageTextColor', label: '文字色' },
       { key: 'botMessageFontSize', label: 'フォントサイズ', fieldType: 'fontSize', fullWidth: true },
+      {
+        key: 'botMessageBorderStyle',
+        label: '枠スタイル',
+        fieldType: 'messageBorderStyleSelect',
+        fullWidth: true,
+      },
       { fieldType: 'groupLabel', label: 'ユーザー', fullWidth: true },
       { key: 'userMessageBgColor', label: '背景色' },
       { key: 'userMessageTextColor', label: '文字色' },
       { key: 'userMessageFontSize', label: 'フォントサイズ', fieldType: 'fontSize', fullWidth: true },
+      {
+        key: 'userMessageBorderStyle',
+        label: '枠スタイル',
+        fieldType: 'messageBorderStyleSelect',
+        fullWidth: true,
+      },
     ],
   },
   {
@@ -325,9 +346,11 @@ export const CAMEL_TO_SNAKE_THEME = {
   botMessageBgColor: 'bot_message_bg_color',
   botMessageTextColor: 'bot_message_text_color',
   botMessageFontSize: 'bot_message_font_size',
+  botMessageBorderStyle: 'bot_message_border_style',
   userMessageBgColor: 'user_message_bg_color',
   userMessageTextColor: 'user_message_text_color',
   userMessageFontSize: 'user_message_font_size',
+  userMessageBorderStyle: 'user_message_border_style',
   fieldFocusBorderColor: 'field_focus_border_color',
   fieldFocusBgColor: 'field_focus_bg_color',
   fieldFocusBgEffect: 'field_focus_bg_effect',

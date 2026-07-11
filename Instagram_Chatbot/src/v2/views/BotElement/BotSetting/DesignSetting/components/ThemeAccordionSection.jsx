@@ -6,6 +6,7 @@ import {
   BUTTON_BORDER_STYLE_OPTIONS,
   BUTTON_EFFECT_OPTIONS,
   BUTTON_POSITION_OPTIONS,
+  MESSAGE_BORDER_STYLE_OPTIONS,
   MODAL_TITLE_ALIGNMENT_OPTIONS,
 } from '../constants/designThemeConstants';
 import { getDesignSettingTooltip } from '../constants/designSettingTooltips';
@@ -14,6 +15,7 @@ import {
   normalizeButtonBorderStyle,
   normalizeButtonEffect,
   normalizeButtonPosition,
+  normalizeMessageBorderStyle,
   normalizeModalTitleAlignment,
 } from '../utils/designThemeUtils';
 import MainColorPicker from './MainColorPicker';
@@ -118,6 +120,22 @@ const ThemeAccordionSection = ({
             tooltipKey={key}
             options={BUTTON_BORDER_STYLE_OPTIONS}
             normalizeValue={normalizeButtonBorderStyle}
+            onChange={(value) => onFieldChange(key, value)}
+          />
+        </div>
+      );
+    }
+
+    if (fieldType === 'messageBorderStyleSelect') {
+      return (
+        <div key={key} className={fieldClassSuffix}>
+          <ThemeEffectSelectField
+            label={label}
+            value={themeSettings[key]}
+            fullWidth={fullWidth ?? false}
+            tooltipKey={key}
+            options={MESSAGE_BORDER_STYLE_OPTIONS}
+            normalizeValue={normalizeMessageBorderStyle}
             onChange={(value) => onFieldChange(key, value)}
           />
         </div>

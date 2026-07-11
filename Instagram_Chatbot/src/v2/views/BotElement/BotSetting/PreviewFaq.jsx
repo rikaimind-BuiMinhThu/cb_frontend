@@ -4,6 +4,8 @@ import Cookies from "js-cookie";
 import { MDBIcon } from "mdbreact";
 import CustomButton from "./CustomButton";
 import { UserMessage, BotMessage, CombineMessage } from "./PreviewComponent";
+import UserMessageTailIcon from "./PreviewComponent/UserMessageTailIcon";
+import { resolveUserMessageTheme } from "v2/views/BotElement/BotSetting/DesignSetting/utils/designThemeUtils";
 import PreviewFaqReducer from "./PreviewFaq/PreviewFaqReducer";
 import $ from "jquery";
 import { EC_CHATBOT_URL } from "v2/variables/constants";
@@ -807,9 +809,11 @@ const PreviewFaq = () => {
     if (!message || message.belong_to !== "user") return null;
     if (!Array.isArray(message?.message_content) || message.message_content.length === 0) return null;
 
+    const userMessageTheme = resolveUserMessageTheme(state.themeSettings, state.botInfor);
+
     return (
       <div className="sp-body-user-side slideLeft" id={getElementMessageById(message.id)}>
-        <div className="sp-body-user-side-messages">
+        <div className="sp-body-user-side-messages position-relative">
           <UserMessage
             postMessageToParent={(options) => postMessageToParent(options, state)}
             message={message}
@@ -856,6 +860,10 @@ const PreviewFaq = () => {
             isProcessing={!!state.isProcessing}
             cartSystem={params.get("cartSystem") ?? ""}
             footer={renderNextButton(message, messageIndex)}
+          />
+          <UserMessageTailIcon
+            fillColor={userMessageTheme.bgColor}
+            showTail={userMessageTheme.showTail}
           />
         </div>
       </div>

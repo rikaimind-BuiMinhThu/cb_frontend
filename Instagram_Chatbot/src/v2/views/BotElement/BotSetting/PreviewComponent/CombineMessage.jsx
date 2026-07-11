@@ -1,7 +1,9 @@
 import React from 'react';
 import CustomButton from '../CustomButton';
 import UserMessage from './UserMessage';
+import UserMessageTailIcon from './UserMessageTailIcon';
 import CombineBotBlock from './CombineBotBlock';
+import { resolveUserMessageTheme } from '../DesignSetting/utils/designThemeUtils';
 import {
   COMBINE_CONTENT_ROLES,
   COMBINE_MESSAGE_DEFAULTS,
@@ -73,13 +75,14 @@ const CombineMessage = ({
   if (!isCombineMessage(message)) return null;
 
   const contentGap = message.combine_message?.content_gap ?? COMBINE_MESSAGE_DEFAULTS.CONTENT_GAP;
+  const userMessageTheme = resolveUserMessageTheme(themeSettings, botInfor);
 
   return (
     <div
       className={skipEntryAnimation ? 'sp-body-user-side' : 'sp-body-user-side slideLeft'}
       id={getElementMessageById(message.id)}
     >
-      <div className="sp-body-user-side-messages">
+      <div className="sp-body-user-side-messages position-relative">
         <div className="ss-user-message__content-wrapper">
           <div className="ss-combine-message__content">
             {message.message_content.map((content, contentIndex) => {
@@ -145,6 +148,10 @@ const CombineMessage = ({
             isExtractFromSession={isExtractFromSession}
           />
         </div>
+        <UserMessageTailIcon
+          fillColor={userMessageTheme.bgColor}
+          showTail={userMessageTheme.showTail}
+        />
       </div>
     </div>
   );

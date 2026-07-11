@@ -1292,6 +1292,24 @@ slideUp
   background-image: none !important;
 }
 
+.ss-user-chat-text-input-user-icon {
+  display: none;
+  bottom: 1px;
+  right: -3px;
+  width: 12px;
+  height: 18px;
+  overflow: visible;
+}
+
+.sp-body-user-side-messages.position-relative {
+  overflow: visible;
+}
+
+.sp-body-user-side-messages .ss-user-chat-text-input-user-icon:has(svg) {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
 .ss-bot-prevent-exit-chatbot-modal {
   position: relative;
   border: 2px solid gray;
