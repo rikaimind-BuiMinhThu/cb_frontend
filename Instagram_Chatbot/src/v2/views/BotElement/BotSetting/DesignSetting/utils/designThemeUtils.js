@@ -322,6 +322,12 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
     modalTitleTextColor: '#333333',
     modalTitleFontSize: '16px',
     modalTitleAlignment: 'left',
+    modalCancelButtonBgColor: '#ffffff',
+    modalCancelButtonTextColor: '#333333',
+    modalCancelButtonBorderColor: '#D0D6DC',
+    modalCloseButtonBgColor: '#d9534f',
+    modalCloseButtonTextColor: '#ffffff',
+    modalButtonFontSize: '14px',
   };
 };
 

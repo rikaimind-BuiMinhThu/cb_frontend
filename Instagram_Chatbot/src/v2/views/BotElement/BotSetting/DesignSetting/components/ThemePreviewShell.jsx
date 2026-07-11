@@ -19,6 +19,7 @@ const ThemePreviewShell = ({
   activeSectionId,
   onSectionSelect,
   children,
+  modalOverlay,
 }) => {
   const scopedCss = useMemo(() => {
     if (!themeSettings) return '';
@@ -111,6 +112,8 @@ const ThemePreviewShell = ({
           {children}
         </div>
       </PreviewRegion>
+
+      {modalOverlay}
     </div>
   );
 };
@@ -131,6 +134,7 @@ ThemePreviewShell.propTypes = {
   activeSectionId: PropTypes.string,
   onSectionSelect: PropTypes.func,
   children: PropTypes.node,
+  modalOverlay: PropTypes.node,
 };
 
 ThemePreviewShell.defaultProps = {
@@ -148,6 +152,7 @@ ThemePreviewShell.defaultProps = {
   activeSectionId: '',
   onSectionSelect: null,
   children: null,
+  modalOverlay: null,
 };
 
 export default ThemePreviewShell;

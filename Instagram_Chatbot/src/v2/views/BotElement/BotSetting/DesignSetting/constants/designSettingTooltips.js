@@ -76,6 +76,12 @@ export const DESIGN_SETTING_TOOLTIPS = {
   modalTitleTextColor: 'モーダルタイトルの文字色です。',
   modalTitleFontSize: 'モーダルタイトルのフォントサイズです。単位は px です。',
   modalTitleAlignment: 'モーダルタイトルの横方向の配置です。郵便番号検索ポップアップや離脱防止モーダルに反映されます。',
+  modalCancelButtonBgColor: 'モーダルの「チャットに戻る」ボタンの背景色です。離脱防止モーダルに反映されます。',
+  modalCancelButtonTextColor: 'モーダルの「チャットに戻る」ボタンの文字色です。',
+  modalCancelButtonBorderColor: 'モーダルの「チャットに戻る」ボタンの枠線色です。',
+  modalCloseButtonBgColor: 'モーダルの「閉じる」ボタンの背景色です。離脱防止モーダルに反映されます。',
+  modalCloseButtonTextColor: 'モーダルの「閉じる」ボタンの文字色です。',
+  modalButtonFontSize: 'モーダル内ボタンのフォントサイズです。単位は px です。',
 };
 
 export const getDesignSettingTooltip = (key) => DESIGN_SETTING_TOOLTIPS[key] || '';

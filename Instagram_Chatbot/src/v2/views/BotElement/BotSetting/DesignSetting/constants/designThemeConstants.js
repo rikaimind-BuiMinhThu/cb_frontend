@@ -115,6 +115,12 @@ export const THEME_FIELD_KEYS = [
   'modalTitleTextColor',
   'modalTitleFontSize',
   'modalTitleAlignment',
+  'modalCancelButtonBgColor',
+  'modalCancelButtonTextColor',
+  'modalCancelButtonBorderColor',
+  'modalCloseButtonBgColor',
+  'modalCloseButtonTextColor',
+  'modalButtonFontSize',
 ];
 
 export const THEME_PREVIEW_REGIONS = [
@@ -327,6 +333,13 @@ export const THEME_SECTIONS = [
         fieldType: 'modalTitleAlignmentSelect',
         fullWidth: true,
       },
+      { fieldType: 'groupLabel', label: 'ボタン', fullWidth: true },
+      { key: 'modalCancelButtonBgColor', label: 'キャンセル背景色' },
+      { key: 'modalCancelButtonTextColor', label: 'キャンセル文字色' },
+      { key: 'modalCancelButtonBorderColor', label: 'キャンセル枠線色' },
+      { key: 'modalCloseButtonBgColor', label: '閉じる背景色' },
+      { key: 'modalCloseButtonTextColor', label: '閉じる文字色' },
+      { key: 'modalButtonFontSize', label: 'フォントサイズ', fieldType: 'fontSize', fullWidth: true },
       { fieldType: 'modalPreviewToggle', label: 'プレビューに表示', fullWidth: true },
     ],
   },
@@ -395,4 +408,10 @@ export const CAMEL_TO_SNAKE_THEME = {
   modalTitleTextColor: 'modal_title_text_color',
   modalTitleFontSize: 'modal_title_font_size',
   modalTitleAlignment: 'modal_title_alignment',
+  modalCancelButtonBgColor: 'modal_cancel_button_bg_color',
+  modalCancelButtonTextColor: 'modal_cancel_button_text_color',
+  modalCancelButtonBorderColor: 'modal_cancel_button_border_color',
+  modalCloseButtonBgColor: 'modal_close_button_bg_color',
+  modalCloseButtonTextColor: 'modal_close_button_text_color',
+  modalButtonFontSize: 'modal_button_font_size',
 };

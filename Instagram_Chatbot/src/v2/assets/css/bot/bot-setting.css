@@ -283,15 +283,15 @@
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-.theme-customize-preview__modal-wrap {
-  flex-shrink: 0;
-  padding: 0 10px 8px;
-}
-
-.theme-customize-preview__prevent-exit {
-  position: relative;
-  margin: 8px 0 4px;
-  min-height: 120px;
+.theme-customize-preview__modal-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  padding-top: 70px;
+  overflow: hidden;
+  border-radius: 8px;
 }
 
 .theme-customize-preview__prevent-exit-overlay {
@@ -299,7 +299,6 @@
   inset: 0;
   background-color: #000;
   opacity: 0.5;
-  border-radius: 4px;
   pointer-events: none;
 }
 
@@ -308,14 +307,17 @@
   top: auto !important;
   left: auto !important;
   transform: none !important;
-  width: 100% !important;
-  max-height: none !important;
+  width: 90% !important;
+  max-height: calc(100% - 80px) !important;
   margin: 0;
   z-index: 1;
+  flex-shrink: 0;
+  align-self: flex-start;
+  pointer-events: none;
 }
 
 .theme-customize-preview__prevent-exit-panel.ss-bot-prevent-exit-chatbot-modal-pc {
-  width: 100% !important;
+  width: 90% !important;
   left: auto !important;
   transform: none !important;
 }
@@ -430,6 +432,7 @@
   display: flex;
   flex-direction: column;
   background-color: #fff;
+  position: relative;
 }
 
 .theme-customize-preview__header {

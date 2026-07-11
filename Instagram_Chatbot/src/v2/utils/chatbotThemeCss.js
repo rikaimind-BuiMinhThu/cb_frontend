@@ -185,15 +185,55 @@ const buildThemeVariables = (theme) => {
   --c-modal-title-text: ${theme.modalTitleTextColor};
   --c-modal-title-font-size: ${theme.modalTitleFontSize};
   --c-modal-title-align: ${resolveModalTitleTextAlign(theme.modalTitleAlignment)};
+  --c-modal-cancel-btn-bg: ${theme.modalCancelButtonBgColor};
+  --c-modal-cancel-btn-text: ${theme.modalCancelButtonTextColor};
+  --c-modal-cancel-btn-border: ${theme.modalCancelButtonBorderColor};
+  --c-modal-close-btn-bg: ${theme.modalCloseButtonBgColor};
+  --c-modal-close-btn-text: ${theme.modalCloseButtonTextColor};
+  --c-modal-btn-font-size: ${theme.modalButtonFontSize};
 `;
 };
+
+const buildModalButtonVariables = (theme) => `
+  --c-modal-cancel-btn-bg: ${theme.modalCancelButtonBgColor};
+  --c-modal-cancel-btn-text: ${theme.modalCancelButtonTextColor};
+  --c-modal-cancel-btn-border: ${theme.modalCancelButtonBorderColor};
+  --c-modal-close-btn-bg: ${theme.modalCloseButtonBgColor};
+  --c-modal-close-btn-text: ${theme.modalCloseButtonTextColor};
+  --c-modal-btn-font-size: ${theme.modalButtonFontSize};
+`;
+
+const buildModalButtonRules = (scopePrefix) => `
+${scopePrefix} .btn-cancel__modal-bot {
+  background-color: var(--c-modal-cancel-btn-bg, #fff) !important;
+  color: var(--c-modal-cancel-btn-text, #333) !important;
+  border: 1px solid var(--c-modal-cancel-btn-border, #D0D6DC) !important;
+  font-size: var(--c-modal-btn-font-size, 14px) !important;
+}
+
+${scopePrefix} .btn-cancel__modal-bot:hover {
+  background-color: var(--c-modal-cancel-btn-bg, #fff) !important;
+  color: var(--c-modal-cancel-btn-text, #333) !important;
+  border: 1px solid var(--c-modal-cancel-btn-border, #D0D6DC) !important;
+}
+
+${scopePrefix} .btn-close__modal-bot {
+  background-color: var(--c-modal-close-btn-bg, #d9534f) !important;
+  color: var(--c-modal-close-btn-text, #fff) !important;
+  font-size: var(--c-modal-btn-font-size, 14px) !important;
+}
+
+${scopePrefix} .btn-close__modal-bot:hover {
+  background-color: var(--c-modal-close-btn-bg, #d9534f) !important;
+  color: var(--c-modal-close-btn-text, #fff) !important;
+}`.trim();
 
 const buildPortalModalVariables = (theme) => `
   --c-modal-bg: ${theme.modalBgColor};
   --c-modal-title-text: ${theme.modalTitleTextColor};
   --c-modal-title-font-size: ${theme.modalTitleFontSize};
   --c-modal-title-align: ${resolveModalTitleTextAlign(theme.modalTitleAlignment)};
-`;
+${buildModalButtonVariables(theme)}`;
 
 const buildPortalModalRules = () => `
 #portal .ss-bot-prevent-exit-chatbot-modal {
@@ -212,7 +252,9 @@ const buildPortalModalRules = () => `
   color: var(--c-modal-title-text, #333) !important;
   font-size: var(--c-modal-title-font-size, 16px) !important;
   text-align: var(--c-modal-title-align, left) !important;
-}`.trim();
+}
+
+${buildModalButtonRules('#portal')}`.trim();
 
 const buildButtonLayoutRules = (hasExplicitWidth) => {
   const widthRule = hasExplicitWidth
@@ -800,7 +842,9 @@ ${scopedClass(scopeSelector, '.title-bot-modal')} {
   color: var(--c-modal-title-text, #333) !important;
   font-size: var(--c-modal-title-font-size, 16px) !important;
   text-align: var(--c-modal-title-align, left) !important;
-}${previewButtonRules}`.trim();
+}
+
+${buildModalButtonRules(toScopeIs(scopeSelector) || scopeSelector)}${previewButtonRules}`.trim();
 };
 
 const buildThemeCss = (theme, scopeSelector = '') => {
