@@ -2,7 +2,7 @@ import React from 'react'
 
 function Statistics() {
   return (
-    <div>Statistics</div>
+    <div>統計（準備中）</div>
   )
 }
 

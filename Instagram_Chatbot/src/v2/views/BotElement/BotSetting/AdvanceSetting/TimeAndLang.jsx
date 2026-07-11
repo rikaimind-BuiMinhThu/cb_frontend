@@ -2,7 +2,7 @@ import React from 'react'
 
 function TimeAndLang() {
   return (
-    <div>TimeAndLang</div>
+    <div>タイムゾーンと言語（準備中）</div>
   )
 }
 

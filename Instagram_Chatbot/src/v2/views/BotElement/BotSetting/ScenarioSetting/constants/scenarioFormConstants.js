@@ -138,9 +138,9 @@ export const dropDownTitle = [
 ];
 
 export const convertTextType = [
-  { key: 'katakana', value: 'Katakana' },
-  { key: 'hiragana', value: 'Hiragana' },
-  { key: 'romaji', value: 'Romaji' },
+  { key: 'katakana', value: 'カタカナ' },
+  { key: 'hiragana', value: 'ひらがな' },
+  { key: 'romaji', value: 'ローマ字' },
 ];
 
 export const typeTextarea = [
@@ -179,7 +179,7 @@ export const hyphenPhoneNumber = [
 
 export const type = [
   { key: 'text', value: 'テキスト' },
-  { key: 'urls', value: 'URLs' },
+  { key: 'urls', value: 'URL' },
   { key: 'email_address', value: 'メールアドレス' },
   { key: 'email_confirmation', value: 'メールアドレス（確認あり）' },
   { key: 'phone_number', value: '電話番号' },
@@ -267,25 +267,25 @@ export const dataConditionFixed = [
 ];
 
 export const dataSubCondition = [
-  { key: 'is', value: 'is' },
-  { key: 'is_not', value: 'is not' },
+  { key: 'is', value: '一致する' },
+  { key: 'is_not', value: '一致しない' },
   { key: 'include', value: '含む' },
   { key: 'not_include', value: '含まない' },
 ];
 
 export const dataApiLinkage = [
   { key: 'credit_card_duplication_check', value: 'クレジットカード重複チェック' },
-  { key: 'send_value_variable', value: 'sendValueVariable' },
-  { key: 'get_payment_method_name', value: 'Get payment method name' },
-  { key: 'valid_phone_number_shipping', value: 'validPhoneNumber_shipping' },
-  { key: 'valid_phone_number', value: 'validPhoneNumber' },
-  { key: 'get_new_address', value: 'getNewAddress' },
-  { key: 'get_price', value: 'getPrice' },
-  { key: 'check_duplicate_zipcode', value: 'checkDuplicate Zipcode' },
-  { key: 'click_order', value: 'Click order' },
-  { key: 'validate_email', value: 'Validate Email' },
-  { key: 'confirm', value: 'confirm' },
-  { key: 'landing', value: 'landing' },
+  { key: 'send_value_variable', value: '値を変数に送信' },
+  { key: 'get_payment_method_name', value: '支払い方法名を取得' },
+  { key: 'valid_phone_number_shipping', value: '配送先電話番号の検証' },
+  { key: 'valid_phone_number', value: '電話番号の検証' },
+  { key: 'get_new_address', value: '新しい住所を取得' },
+  { key: 'get_price', value: '価格を取得' },
+  { key: 'check_duplicate_zipcode', value: '郵便番号の重複チェック' },
+  { key: 'click_order', value: '注文ボタンをクリック' },
+  { key: 'validate_email', value: 'メールアドレスの検証' },
+  { key: 'confirm', value: '確認' },
+  { key: 'landing', value: 'ランディング' },
 ];
 
 export const installmentOptions = Array.from({ length: 23 }, (_, i) => ({

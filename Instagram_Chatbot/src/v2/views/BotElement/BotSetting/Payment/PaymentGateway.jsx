@@ -104,7 +104,7 @@ function PaymentGateway() {
   const columns = useMemo(
     () => [
       {
-        title: 'No.',
+        title: '番号',
         width: 64,
         render: (_, __, index) => (page - 1) * PAGE_SIZE + index + 1,
       },

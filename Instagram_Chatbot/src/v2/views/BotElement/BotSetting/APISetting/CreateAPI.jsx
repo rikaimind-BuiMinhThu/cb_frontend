@@ -2,7 +2,7 @@ import React from 'react'
 
 function CreateAPI() {
   return (
-    <div>CreateAPI</div>
+    <div>API作成（準備中）</div>
   )
 }
 

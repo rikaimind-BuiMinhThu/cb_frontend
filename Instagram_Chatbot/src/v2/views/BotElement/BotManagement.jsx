@@ -160,7 +160,7 @@ function BotManagement() {
 
   const columns = [
     {
-      title: 'No.',
+      title: '番号',
       width: 70,
       render: (_, __, index) => index + 1 + 10 * (page - 1),
     },

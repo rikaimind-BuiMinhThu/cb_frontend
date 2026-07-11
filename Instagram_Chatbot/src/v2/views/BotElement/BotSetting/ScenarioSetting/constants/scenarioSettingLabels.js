@@ -29,11 +29,11 @@ export const SETTING_LABELS = {
   postCode: '郵便番号',
   prefecture: '都道府県',
   htmlDescriptionCustomize: 'HTMLの説明をカスタマイズする',
-  rootFaqMessage: 'Root FAQ Message',
+  rootFaqMessage: 'ルートFAQメッセージ',
   displayTextOnRight: '文言を右に表示する',
   suffixText: '文言',
   clearEmptyOption: '空なオプション解除',
-  jscode: 'jscode',
+  jscode: 'JSコード',
   selectPlease: '選択してください。',
 };
 
@@ -41,10 +41,10 @@ export const SETTING_PLACEHOLDERS = {
   title: 'タイトル',
   text: 'テキスト',
   input: '入力',
-  type: 'type',
+  type: 'タイプ',
   colour: '色',
   comment: 'コメント',
-  selectConvertTextType: 'Select Convert Text Type',
+  selectConvertTextType: '変換タイプを選択',
   convertTextDestination: '受信反射ポイントIDを入力してください',
   convertTextDestination1: 'セル1受信点ID',
   convertTextDestination2: 'セル2受信点ID',
@@ -53,7 +53,7 @@ export const SETTING_PLACEHOLDERS = {
   customId2: 'カスタムID2',
   placeholder: 'プレースホルダ',
   subtitle: 'サブタイトル',
-  urls: 'URLs',
+  urls: 'URL',
   fileUrl: 'ファイルのURL',
   buttonTitle: 'ボタンタイトル',
   buttonId: 'IDボタン',
@@ -230,7 +230,7 @@ export const PULL_DOWN_LABELS = {
   initialSelection: '初期選択設定',
   selectPrefecture: '都道府県を選択',
   selectCity: '市区町村を選択',
-  selectApi: 'Select api',
+  selectApi: 'APIを選択',
   selectPlaceholder: '選択してください。',
   rangeSeparator: '~',
   requiredMark: '※必須',
@@ -265,7 +265,7 @@ export const BUTTON_SUBMIT_LABELS = {
   confirmOrder: '確認メッセージ用',
   confirmDisplayOnly: '確認するのみに表示',
   errorMessage: 'エラーメッセージ',
-  jsCode: 'jscode',
+  jsCode: 'JSコード',
   buttonId: 'IDボタン',
   buttonName: 'ボタン名称',
   buttonImage: 'ボタン画像',
@@ -277,23 +277,23 @@ export const BUTTON_SUBMIT_LABELS = {
 export const CAROUSEL_LABELS = {
   useShortenedUrls: '短縮URLを利用する',
   subtitle: 'サブタイトル',
-  urls: 'URLs',
+  urls: 'URL',
   fileUrl: 'ファイルのURL',
   buttonTitle: 'ボタンタイトル',
   imageHint: '※JPEGまたはPNG/縦横比1.91:1の横向き画像または縦横比1:1の正方形画像',
-  jsCode: 'jscode',
+  jsCode: 'JSコード',
   useJs: 'JavaScriptの利用',
 };
 
 export const AGREE_TERM_LABELS = {
   termText: 'テキスト',
   urlComment: 'コメント',
-  urlTitleUrls: ['タイトル', 'URLs'],
+  urlTitleUrls: ['タイトル', 'URL'],
 };
 
 export const PREVIEW_LABELS = {
   requiredMark: '※必須',
-  placeholderLabel: 'label',
+  placeholderLabel: 'ラベル',
 };
 
 export const TEXT_INPUT_LABELS = {

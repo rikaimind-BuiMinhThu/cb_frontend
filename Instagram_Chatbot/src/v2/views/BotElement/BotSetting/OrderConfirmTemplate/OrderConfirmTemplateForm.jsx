@@ -13,7 +13,7 @@ import './orderConfirmTemplateEditor.css';
 
 const LP_PRESET_OPTIONS = [
   [ORDER_CONFIRM_LP_PRESET.ECFORCE, 'EC Force'],
-  [ORDER_CONFIRM_LP_PRESET.CUSTOM, 'Custom'],
+  [ORDER_CONFIRM_LP_PRESET.CUSTOM, 'カスタム'],
 ];
 
 export default function OrderConfirmTemplateForm({

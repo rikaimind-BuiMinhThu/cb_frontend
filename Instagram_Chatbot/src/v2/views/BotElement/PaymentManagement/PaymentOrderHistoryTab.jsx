@@ -4,7 +4,7 @@ import { SearchOutlined } from '@ant-design/icons';
 import { AdminTable } from '../../../components/AdminShell';
 
 const ORDER_COLUMNS = [
-  { title: 'No', dataIndex: 'no', key: 'no', width: 60 },
+  { title: '番号', dataIndex: 'no', key: 'no', width: 60 },
   { title: 'ユーザID', dataIndex: 'userId', key: 'userId', width: 100 },
   { title: '注文番号', dataIndex: 'orderNumber', key: 'orderNumber', width: 110 },
   { title: '商品名', dataIndex: 'productName', key: 'productName', width: 140, ellipsis: true },

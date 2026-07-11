@@ -42,7 +42,7 @@ const BasicInfoTab = ({
                 name="title"
                 className="input-field"
                 value={basicInfo.title}
-                placeholder="Service name, etc. (e.g. BOTCHAN)"
+                placeholder="サービス名など（例：BOTCHAN）"
                 onChange={(e) => {
                   onFieldChange('title', e.target.value);
                   onClearError('title');
@@ -62,7 +62,7 @@ const BasicInfoTab = ({
                 type="text"
                 className="input-field"
                 value={basicInfo.subtitle}
-                placeholder="Purpose of the form (e.g. information request form)"
+                placeholder="フォームの目的（例：資料請求フォーム）"
                 onChange={(e) => {
                   onFieldChange('subtitle', e.target.value);
                   onClearError('subtitle');

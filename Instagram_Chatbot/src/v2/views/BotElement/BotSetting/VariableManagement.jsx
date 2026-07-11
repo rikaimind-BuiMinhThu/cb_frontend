@@ -205,7 +205,7 @@ function VariableManagement() {
   const userColumns = useMemo(
     () => [
       {
-        title: 'No.',
+        title: '番号',
         width: 70,
         align: 'center',
         render: (_, __, index) => (page - 1) * PAGE_SIZE + index + 1,
@@ -261,7 +261,7 @@ function VariableManagement() {
   const systemColumns = useMemo(
     () => [
       {
-        title: 'No.',
+        title: '番号',
         width: 70,
         align: 'center',
         render: (_, __, index) => index + 1,

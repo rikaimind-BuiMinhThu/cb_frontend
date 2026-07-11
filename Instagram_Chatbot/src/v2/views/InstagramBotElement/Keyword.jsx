@@ -712,7 +712,7 @@ function Keyword() {
           <Col md="12">
             <Card>
               {/* <CardHeader>
-                <div>Header</div>
+                <div>ヘッダー</div>
               </CardHeader> */}
               <CardBody>
                 <div style={{ width: '100%' }}>

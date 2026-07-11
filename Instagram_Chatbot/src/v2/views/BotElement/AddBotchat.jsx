@@ -298,7 +298,7 @@ console.log();
                             type="text"
                             name="title"
                             className="input-field"
-                            placeholder="Service name, etc. (e.g. BOTCHAN)"
+                            placeholder="サービス名など（例：BOTCHAN）"
                             onChange={(e) => {
                               setTitle(e.target.value);
                               document.querySelector('.error-message.title').style.display = 'none';
@@ -315,7 +315,7 @@ console.log();
                           <input
                             type="text"
                             className="input-field"
-                            placeholder="Purpose of the form (e.g. information request form)"
+                            placeholder="フォームの目的（例：資料請求フォーム）"
                             onChange={(e) => {
                               setSubtitle(e.target.value);
                               document.querySelector('.error-message.subtile').style.display =

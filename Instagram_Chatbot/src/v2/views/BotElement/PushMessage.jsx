@@ -683,7 +683,7 @@ function PushMessage() {
                             {item.title}
                           </td>
                           <td style={{ width: '15%', border: '1px solid #7186a0' }}>
-                            {item.sending_method === 'email' ? 'Email' : 'SMS'}
+                            {item.sending_method === 'email' ? 'メール' : 'SMS'}
                           </td>
                           <td style={{ width: '20%', border: '1px solid #7186a0' }}>
                             {item.started_at.substring(0, 19).replaceAll('T', ' ')}
@@ -1075,7 +1075,7 @@ function PushMessage() {
                       defaultValue={`and`}
                       style={{ width: '15%', margin: '1% 1%' }}
                     >
-                      <option value="and">AND</option>
+                      <option value="and">AND（かつ）</option>
                     </select>
                     <select
                       id={`var${i}`}

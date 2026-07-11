@@ -50,7 +50,7 @@ const ScenarioOverviewPanel = ({ onOpenPreview }) => {
               onChange={(e) => setScenarioType(e.target.value)}
               aria-label="シナリオタイプ"
             >
-              <option value="payment">Payment</option>
+              <option value="payment">決済</option>
               <option value="faq">FAQ</option>
             </select>
           </div>

@@ -2,7 +2,7 @@ import React from 'react'
 
 function BotAdmin() {
   return (
-    <div>BotAdmin</div>
+    <div>ボット管理者（準備中）</div>
   )
 }
 

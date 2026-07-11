@@ -2,7 +2,7 @@ import React from 'react'
 
 function PlanSelection() {
   return (
-    <div>PlanSelection</div>
+    <div>プラン選択（準備中）</div>
   )
 }
 

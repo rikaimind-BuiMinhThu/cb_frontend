@@ -2,7 +2,7 @@ import React from 'react'
 
 function APIManagement() {
   return (
-    <div>APIManagement</div>
+    <div>API管理（準備中）</div>
   )
 }
 

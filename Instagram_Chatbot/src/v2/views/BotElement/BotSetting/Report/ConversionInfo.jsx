@@ -2,7 +2,7 @@ import React from 'react'
 
 function ConversionInfo() {
   return (
-    <div>ConversionInfo</div>
+    <div>コンバージョン情報（準備中）</div>
   )
 }
 

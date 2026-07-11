@@ -59,7 +59,7 @@ export default function OrderConfirmConfig({
         <option value="">選択なし</option>
         <optgroup label="プリセット">
           <option value={presetOptions.ECFORCE}>EC Force</option>
-          <option value={presetOptions.CUSTOM}>Custom</option>
+          <option value={presetOptions.CUSTOM}>カスタム</option>
         </optgroup>
         {templates.length > 0 && (
           <optgroup label="保存済みテンプレート">

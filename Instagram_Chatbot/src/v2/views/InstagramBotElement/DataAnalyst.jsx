@@ -446,11 +446,11 @@ function DataAnalyst() {
   const options = {
     data: [
       {
-        label: 'Users in EC',
+        label: 'EC内ユーザー',
         value: percentold,
       },
       {
-        label: 'New users',
+        label: '新規ユーザー',
         value: percentNew,
       },
     ],
@@ -1594,10 +1594,10 @@ function DataAnalyst() {
                           <h6>作成/日付更新</h6>
                         </td>
                         {/* <td>
-                          <h6>Total user</h6>
+                          <h6>ユーザー合計</h6>
                         </td>
                         <td>
-                          <h6>Answer results</h6>
+                          <h6>回答結果</h6>
                         </td> */}
                         <td>
                           <h6>チャット内容</h6>

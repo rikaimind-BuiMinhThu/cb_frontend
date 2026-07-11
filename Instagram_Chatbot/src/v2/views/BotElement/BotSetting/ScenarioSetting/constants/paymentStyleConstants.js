@@ -11,9 +11,9 @@ export const DEFAULT_DISPLAY_STYLE = {
 
 export const PAYMENT_DISPLAY_STYLE_FIELDS = [
   { key: 'selected_bg_color', label: '選択された時の背景色' },
-  { key: 'selected_border_color', label: '選択された時のBorder色' },
+  { key: 'selected_border_color', label: '選択された時の枠線色' },
   { key: 'unselected_bg_color', label: '選択されない時の背景色' },
-  { key: 'unselected_border_color', label: '選択されない時のBorder色' },
+  { key: 'unselected_border_color', label: '選択されない時の枠線色' },
 ];
 
 export const PAYMENT_OPTION_IMAGE_FIELDS = [

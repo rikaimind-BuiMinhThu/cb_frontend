@@ -48,7 +48,7 @@ const CombineBotBlockSetting = ({
             <textarea
               className="ss-bot-statement-type-text-content ss-input-value"
               rows={5}
-              placeholder="JavaScript"
+              placeholder="JavaScriptコード"
               value={typeContent?.jscode || ''}
               onChange={(e) => onChangeValueMessageContent(indexMessageSelect, indexContent, messageType, e.target.value, 'jscode')}
             />

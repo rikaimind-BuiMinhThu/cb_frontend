@@ -66,6 +66,6 @@ export const RADIO_IMG_LAYOUT_SECTION_LABELS = {
   widthMode: '幅',
   customWidths: '列幅（%）',
   customWidthsHint: '合計が100%になるように設定してください',
-  optionPadding: 'オプションのPadding',
-  optionMargin: 'オプション間のMargin',
+  optionPadding: 'オプションの余白',
+  optionMargin: 'オプション間の間隔',
 };

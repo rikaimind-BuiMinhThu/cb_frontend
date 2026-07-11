@@ -1,7 +1,6 @@
 
 import React from "react";
 
-// reactstrap components
 import {
   Button,
   Card,
@@ -42,8 +41,7 @@ function User() {
                   <p className="description">@chetfaker</p>
                 </div>
                 <p className="description text-center">
-                  "I like the way you work it <br />
-                  No diggity <br />I wanna bag it up"
+                  プロフィールの紹介文がここに表示されます。
                 </p>
               </CardBody>
               <CardFooter>
@@ -53,19 +51,19 @@ function User() {
                     <Col className="ml-auto" lg="3" md="6" xs="6">
                       <h5>
                         12 <br />
-                        <small>Files</small>
+                        <small>ファイル</small>
                       </h5>
                     </Col>
                     <Col className="ml-auto mr-auto" lg="4" md="6" xs="6">
                       <h5>
                         2GB <br />
-                        <small>Used</small>
+                        <small>使用済み</small>
                       </h5>
                     </Col>
                     <Col className="mr-auto" lg="3">
                       <h5>
                         24,6$ <br />
-                        <small>Spent</small>
+                        <small>支出</small>
                       </h5>
                     </Col>
                   </Row>
@@ -74,7 +72,7 @@ function User() {
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle tag="h4">Team Members</CardTitle>
+                <CardTitle tag="h4">チームメンバー</CardTitle>
               </CardHeader>
               <CardBody>
                 <ul className="list-unstyled team-members">
@@ -95,7 +93,7 @@ function User() {
                       <Col md="7" xs="7">
                         DJ Khaled <br />
                         <span className="text-muted">
-                          <small>Offline</small>
+                          <small>オフライン</small>
                         </span>
                       </Col>
                       <Col className="text-right" md="3" xs="3">
@@ -127,7 +125,7 @@ function User() {
                       <Col md="7" xs="7">
                         Creative Tim <br />
                         <span className="text-success">
-                          <small>Available</small>
+                          <small>オンライン</small>
                         </span>
                       </Col>
                       <Col className="text-right" md="3" xs="3">
@@ -159,7 +157,7 @@ function User() {
                       <Col className="col-ms-7" xs="7">
                         Flume <br />
                         <span className="text-danger">
-                          <small>Busy</small>
+                          <small>取り込み中</small>
                         </span>
                       </Col>
                       <Col className="text-right" md="3" xs="3">
@@ -181,28 +179,28 @@ function User() {
           <Col md="8">
             <Card className="card-user">
               <CardHeader>
-                <CardTitle tag="h5">Edit Profile</CardTitle>
+                <CardTitle tag="h5">プロフィール編集</CardTitle>
               </CardHeader>
               <CardBody>
                 <Form>
                   <Row>
                     <Col className="pr-1" md="5">
                       <FormGroup>
-                        <label>Company (disabled)</label>
+                        <label>会社名（変更不可）</label>
                         <Input
                           defaultValue="Creative Code Inc."
                           disabled
-                          placeholder="Company"
+                          placeholder="会社名"
                           type="text"
                         />
                       </FormGroup>
                     </Col>
                     <Col className="px-1" md="3">
                       <FormGroup>
-                        <label>Username</label>
+                        <label>ユーザー名</label>
                         <Input
                           defaultValue="michael23"
-                          placeholder="Username"
+                          placeholder="ユーザー名"
                           type="text"
                         />
                       </FormGroup>
@@ -210,29 +208,29 @@ function User() {
                     <Col className="pl-1" md="4">
                       <FormGroup>
                         <label htmlFor="exampleInputEmail1">
-                          Email address
+                          メールアドレス
                         </label>
-                        <Input placeholder="Email" type="email" />
+                        <Input placeholder="メールアドレス" type="email" />
                       </FormGroup>
                     </Col>
                   </Row>
                   <Row>
                     <Col className="pr-1" md="6">
                       <FormGroup>
-                        <label>First Name</label>
+                        <label>名</label>
                         <Input
                           defaultValue="Chet"
-                          placeholder="Company"
+                          placeholder="名"
                           type="text"
                         />
                       </FormGroup>
                     </Col>
                     <Col className="pl-1" md="6">
                       <FormGroup>
-                        <label>Last Name</label>
+                        <label>姓</label>
                         <Input
                           defaultValue="Faker"
-                          placeholder="Last Name"
+                          placeholder="姓"
                           type="text"
                         />
                       </FormGroup>
@@ -241,10 +239,10 @@ function User() {
                   <Row>
                     <Col md="12">
                       <FormGroup>
-                        <label>Address</label>
+                        <label>住所</label>
                         <Input
                           defaultValue="Melbourne, Australia"
-                          placeholder="Home Address"
+                          placeholder="自宅住所"
                           type="text"
                         />
                       </FormGroup>
@@ -253,38 +251,38 @@ function User() {
                   <Row>
                     <Col className="pr-1" md="4">
                       <FormGroup>
-                        <label>City</label>
+                        <label>市区町村</label>
                         <Input
                           defaultValue="Melbourne"
-                          placeholder="City"
+                          placeholder="市区町村"
                           type="text"
                         />
                       </FormGroup>
                     </Col>
                     <Col className="px-1" md="4">
                       <FormGroup>
-                        <label>Country</label>
+                        <label>国</label>
                         <Input
                           defaultValue="Australia"
-                          placeholder="Country"
+                          placeholder="国"
                           type="text"
                         />
                       </FormGroup>
                     </Col>
                     <Col className="pl-1" md="4">
                       <FormGroup>
-                        <label>Postal Code</label>
-                        <Input placeholder="ZIP Code" type="number" />
+                        <label>郵便番号</label>
+                        <Input placeholder="郵便番号" type="number" />
                       </FormGroup>
                     </Col>
                   </Row>
                   <Row>
                     <Col md="12">
                       <FormGroup>
-                        <label>About Me</label>
+                        <label>自己紹介</label>
                         <Input
                           type="textarea"
-                          defaultValue="Oh so, your weak rhyme You doubt I'll bother, reading into it"
+                          defaultValue="自己紹介文を入力してください。"
                         />
                       </FormGroup>
                     </Col>
@@ -296,7 +294,7 @@ function User() {
                         color="primary"
                         type="submit"
                       >
-                        Update Profile
+                        プロフィールを更新
                       </Button>
                     </div>
                   </Row>

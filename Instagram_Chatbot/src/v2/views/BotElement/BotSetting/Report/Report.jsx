@@ -1209,7 +1209,7 @@ function Report() {
   const shortenedColumns = useMemo(
     () => [
       {
-        title: 'No.',
+        title: '番号',
         width: 70,
         align: 'center',
         render: (_, __, index) => index + 1,

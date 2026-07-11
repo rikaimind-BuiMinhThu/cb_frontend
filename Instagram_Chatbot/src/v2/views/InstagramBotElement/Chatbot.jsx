@@ -3330,7 +3330,7 @@ function Chatbot() {
             <div class="dropdown-content">
               <button id="renameBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">名前変更</button>
               <button id="copyBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">コピー</button>
-              <button id="moveBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Move</button>
+              <button id="moveBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">移動</button>
               <button id="deleteBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">削除</button>
               <button id="cancelBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">キャンセル</button>
             </div>
@@ -7645,8 +7645,8 @@ function Chatbot() {
                                                           <i className="nc-icon nc-bell-55" style={{ color: "black" }} />
                                                           <p id="a_tag" href="">&nbsp;&nbsp;{datagroup.bag_name}</p>
                                                           <DropdownButton id="dropdown-basic-button" title={<i className="nc-icon nc-bullet-list-67" style={{ color: "black", float: "right" }} />}>
-                                                            <Dropdown.Item onClick={() => renameChatbot(datagroup.bag_name, datagroup.id)}>Rename</Dropdown.Item>
-                                                            <Dropdown.Item onClick={() => deleteChatbot(datagroup.id)}>Delete</Dropdown.Item>
+                                                            <Dropdown.Item onClick={() => renameChatbot(datagroup.bag_name, datagroup.id)}>名前を変更</Dropdown.Item>
+                                                            <Dropdown.Item onClick={() => deleteChatbot(datagroup.id)}>削除</Dropdown.Item>
                                                           </DropdownButton>
                                                         </div>
                                                       </li>
@@ -7975,7 +7975,7 @@ function Chatbot() {
                   <h5>{hotTem[1].title}</h5>
                   <h6 style={{ marginTop: "-10px" }}>{hotTem[1].description}</h6>
 
-                  <Button>Select</Button>
+                  <Button>選択</Button>
                 </div>
 
               </div>
@@ -7988,7 +7988,7 @@ function Chatbot() {
                 <div style={{ marginTop: "10px" }}>
                   <h5>{hotTem[2].title}</h5>
                   <h6 style={{ marginTop: "-10px" }}>{hotTem[2].description}</h6>
-                  <Button>Select</Button>
+                  <Button>選択</Button>
                 </div>
               </div>
             </div> */}

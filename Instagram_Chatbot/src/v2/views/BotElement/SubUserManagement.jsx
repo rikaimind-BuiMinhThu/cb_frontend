@@ -75,7 +75,7 @@ function SubUserManagement() {
   }
 
   const columns = [
-    { title: 'NO.', dataIndex: 'id', width: 80 },
+    { title: '番号', dataIndex: 'id', width: 80 },
     { title: '氏名', dataIndex: 'full_name' },
     { title: 'メールアドレス', dataIndex: 'email' },
     { title: '権限', dataIndex: 'role', width: 120 },

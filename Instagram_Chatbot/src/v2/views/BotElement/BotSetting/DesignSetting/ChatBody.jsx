@@ -2,7 +2,7 @@ import React from 'react'
 
 function ChatBody() {
   return (
-    <div>ChatBody</div>
+    <div>チャット本文（準備中）</div>
   )
 }
 

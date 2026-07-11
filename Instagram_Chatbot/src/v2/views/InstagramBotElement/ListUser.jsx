@@ -281,11 +281,11 @@ function ListUser() {
   const options = {
     data: [
       {
-        label: 'Users use chatbot',
+        label: 'チャットボット利用ユーザー',
         value: percentold,
       },
       {
-        label: 'New users',
+        label: '新規ユーザー',
         value: percentNew,
       },
     ],
@@ -331,11 +331,11 @@ function ListUser() {
   const options2 = {
     data: [
       {
-        label: 'Users in EC',
+        label: 'EC内ユーザー',
         value: percentECold,
       },
       {
-        label: 'New users',
+        label: '新規ユーザー',
         value: percentECnew,
       },
     ],

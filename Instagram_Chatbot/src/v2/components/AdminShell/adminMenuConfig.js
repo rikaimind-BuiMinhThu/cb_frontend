@@ -81,7 +81,7 @@ export function getGlobalMenuItems(client) {
   if (client?.is_instagram) {
     items.push({
       key: 'instagram',
-      label: 'Instagram Chatbot',
+      label: 'Instagramチャットボット',
       icon: <InstagramOutlined />,
       children: [
         { key: p('/chatbot'), label: 'チャットボット作成', path: p('/chatbot'), icon: <RobotOutlined /> },
@@ -105,7 +105,7 @@ export function getGlobalMenuItems(client) {
   if (client?.is_web) {
     items.push({
       key: 'web-chatbot',
-      label: 'Web Chatbot',
+      label: 'Webチャットボット',
       icon: <SettingOutlined />,
       children: [
         { key: p('/basic-setting'), label: '基本設定', path: p('/basic-setting'), icon: <BookOutlined /> },
@@ -133,7 +133,7 @@ export function getGlobalMenuItems(client) {
     { key: p('/client-management'), label: 'クライアント管理', path: p('/client-management'), icon: <UserOutlined />, id: 'sidebarClient' },
     { key: p('/user-management'), label: 'ユーザー管理', path: p('/user-management'), icon: <TeamOutlined />, id: 'sidebarUser' },
     { key: p('/plan-management'), label: 'プラン管理', path: p('/plan-management'), icon: <SettingOutlined />, id: 'planManagement' },
-    { key: p('/client-payment-detail'), label: 'Payment History', path: p('/client-payment-detail'), icon: <DollarOutlined />, id: 'clientPaymentDetail', hiddenByDefault: true },
+    { key: p('/client-payment-detail'), label: '支払い履歴', path: p('/client-payment-detail'), icon: <DollarOutlined />, id: 'clientPaymentDetail', hiddenByDefault: true },
     { key: p('/dashboard'), label: 'ホーム', path: p('/dashboard'), icon: <HomeOutlined /> },
   );
 
@@ -184,7 +184,7 @@ export const ROUTE_TITLES = {
   [p('/client-management')]: 'クライアント管理',
   [p('/user-management')]: 'ユーザー管理',
   [p('/plan-management')]: 'プラン管理',
-  [p('/client-payment-detail')]: 'Payment History',
+  [p('/client-payment-detail')]: '支払い履歴',
   [p('/bot')]: 'ボット管理',
   [p('/scenario-list')]: 'シナリオ一覧',
   [p('/scenario-setting')]: 'シナリオ設定',

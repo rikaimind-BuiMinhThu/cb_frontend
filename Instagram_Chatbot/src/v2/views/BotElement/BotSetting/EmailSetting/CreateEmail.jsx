@@ -209,12 +209,12 @@ function CreateEmail() {
   function addEmail(e) {
     e.preventDefault();
     checkRequired('email_template_name', 'errEmailName', 'Emailtemplate name');
-    checkTo('to', 'errEmailTo', 'To');
+    checkTo('to', 'errEmailTo', '宛先');
     checkRequired('subject', 'errSubject', 'Subject');
     checkRequired('text', 'errText', 'text');
     if (
       checkRequired('email_template_name', 'errEmailName', 'Emailtemplate name') &&
-      checkTo('to', 'errEmailTo', 'To') &&
+      checkTo('to', 'errEmailTo', '宛先') &&
       checkRequired('subject', 'errSubject', 'Subject') &&
       checkRequired('text', 'errText', 'text')
     ) {
@@ -266,12 +266,12 @@ function CreateEmail() {
     const url = window.location.pathname;
     var id = url.slice(url.lastIndexOf('/') + 1);
     checkRequired('email_template_name', 'errEmailName', 'Emailtemplate name');
-    checkTo('to', 'errEmailTo', 'To');
+    checkTo('to', 'errEmailTo', '宛先');
     checkRequired('subject', 'errSubject', 'Subject');
     checkRequired('text', 'errText', 'text');
     if (
       checkRequired('email_template_name', 'errEmailName', 'Emailtemplate name') &&
-      checkTo('to', 'errEmailTo', 'To') &&
+      checkTo('to', 'errEmailTo', '宛先') &&
       checkRequired('subject', 'errSubject', 'Subject') &&
       checkRequired('text', 'errText', 'text')
     ) {
@@ -444,8 +444,8 @@ function CreateEmail() {
                         defaultValue={mailAction == false ? detailEmail?.email.to : ''}
                         placeholder="no-reply@ec-chatbot.com"
                         name="to"
-                        onChange={() => checkTo('to', 'errEmailTo', 'To')}
-                        onBlur={() => checkTo('to', 'errEmailTo', 'To')}
+                        onChange={() => checkTo('to', 'errEmailTo', '宛先')}
+                        onBlur={() => checkTo('to', 'errEmailTo', '宛先')}
                       ></input>
                       <span id="errEmailTo" className="err-email-format"></span>
                     </div>
@@ -468,7 +468,7 @@ function CreateEmail() {
                   </div>
 
                   <div className="field-container">
-                    <span className="field-lable">BCC</span>
+                    <span className="field-lable">BCC（同報）</span>
                     <div className="field-input-cc">
                       <div id="list-bcc"></div>
                       <input

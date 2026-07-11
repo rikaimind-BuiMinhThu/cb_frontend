@@ -305,7 +305,7 @@ export const THEME_SECTIONS = [
         effectOptions: 'borderTwinkle',
         fullWidth: true,
       },
-      { fieldType: 'groupLabel', label: 'input', fullWidth: true },
+      { fieldType: 'groupLabel', label: '入力欄', fullWidth: true },
       { key: 'radioInputUnselectedColor', label: '未選択スタイル' },
       { key: 'radioInputSelectedColor', label: '選択時スタイル' },
     ],

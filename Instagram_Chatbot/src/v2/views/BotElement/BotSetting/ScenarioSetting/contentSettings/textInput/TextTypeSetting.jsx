@@ -36,7 +36,7 @@ const TextTypeSetting = (props) => {
             data={convertTextType}
             onChange={changeContent('convertTextTypeValue')}
             keyValue="key"
-            placeholder="Select Convert Text Type"
+            placeholder="変換タイプを選択"
           />
           {textInput.text.isSplitInput ? (
             <>

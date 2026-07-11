@@ -2,7 +2,7 @@ import React from 'react'
 
 function MediaFileManagement() {
   return (
-    <div>MediaFileManagement</div>
+    <div>メディア管理（準備中）</div>
   )
 }
 

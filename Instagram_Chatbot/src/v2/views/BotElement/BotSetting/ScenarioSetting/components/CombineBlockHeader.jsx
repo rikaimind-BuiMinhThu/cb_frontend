@@ -14,7 +14,7 @@ const CombineBlockHeader = ({
   return (
     <div className="ss-combine-block-header">
       <span className={`ss-combine-block-setting__role-badge ss-combine-block-setting__role-badge--${content.role}`}>
-        {isBot ? 'Bot' : 'User'}
+        {isBot ? 'ボット' : 'ユーザー'}
       </span>
 
       {isBot ? (

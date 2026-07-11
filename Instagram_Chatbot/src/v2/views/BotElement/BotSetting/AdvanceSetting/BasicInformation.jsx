@@ -2,7 +2,7 @@ import React from 'react'
 
 function BasicInformation() {
   return (
-    <div>BasicInformation</div>
+    <div>基本情報（準備中）</div>
   )
 }
 

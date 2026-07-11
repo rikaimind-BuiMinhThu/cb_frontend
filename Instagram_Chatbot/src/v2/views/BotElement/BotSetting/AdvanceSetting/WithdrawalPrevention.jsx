@@ -99,7 +99,7 @@ function WithdrawalPrevention() {
         },
       };
     } else {
-      if (utils.checkRequired('image_URL', 'errImageURL', 'image URL')) {
+      if (utils.checkRequired('image_URL', 'errImageURL', '画像URL')) {
         // Verify image format and size
         utils.validateImageURLWithDimension(image_URL.value, {
           maxWidth: 800,
@@ -142,7 +142,7 @@ function WithdrawalPrevention() {
           }
         });
       } else {
-        utils.checkRequired('image_URL', 'errImageURL', 'image URL');
+        utils.checkRequired('image_URL', 'errImageURL', '画像URL');
       }
     }
     if (resWith) {
@@ -260,7 +260,7 @@ function WithdrawalPrevention() {
                           ? withDrawal?.withdrawal_prevention_image_url
                           : null
                       }
-                      onChange={() => utils.checkRequired('image_URL', 'errImageURL', 'image URL')}
+                      onChange={() => utils.checkRequired('image_URL', 'errImageURL', '画像URL')}
                     />
                     <span id="errImageURL" className="wp-image-err"></span>
                   </div>

@@ -2,7 +2,7 @@ import React from 'react'
 
 function StartButton() {
   return (
-    <div>StartsButton</div>
+    <div>開始ボタン（準備中）</div>
   )
 }
 

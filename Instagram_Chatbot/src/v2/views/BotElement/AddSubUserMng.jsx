@@ -25,8 +25,8 @@ function AddSubUserMng() {
     }, [])
 
     function handleInvite() {
-        utils.checkEmailRequired('add-email', 'errEmail', 'Email');
-        if (utils.checkEmailRequired('add-email', 'errEmail', 'Email')) {
+        utils.checkEmailRequired('add-email', 'errEmail', 'メールアドレス');
+        if (utils.checkEmailRequired('add-email', 'errEmail', 'メールアドレス')) {
             const formAdd = document.getElementById('sub-user__add-form');
             let user = {};
             for (let i = 0; i < formAdd.length; i++) {
@@ -78,7 +78,7 @@ function AddSubUserMng() {
                                             <input id='add-email' type='text'
                                                 placeholder='メールアドレスは、必ず指定してください。' name='email'
                                                 style={{ border: '1px solid grey', borderRadius: '5px', padding: '5px 15px' }}
-                                                onChange={() => utils.checkEmailRequired('add-email', 'errEmail', 'Email')}></input>
+                                                onChange={() => utils.checkEmailRequired('add-email', 'errEmail', 'メールアドレス')}></input>
                                             <span id="errEmail" className='sub-user__err-format'></span>
                                         </div>
                                     </div>

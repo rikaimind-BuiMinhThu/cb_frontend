@@ -218,7 +218,7 @@ function Sidebar(props) {
                     className='fab fa-instagram'
                     style={{ color: 'black', fontWeight: '800' }}
                   ></i>
-                  <p>Instagram Chatbot</p>
+                  <p>Instagramチャットボット</p>
                 </NavLink>
                 <ul
                   id='instaDropdown'
@@ -397,7 +397,7 @@ function Sidebar(props) {
                 >
                   {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
                   <MDBIcon fas icon='cogs' style={{ color: 'black' }} />
-                  <p style={{ color: 'black' }}>Web Chatbot</p>
+                  <p style={{ color: 'black' }}>Webチャットボット</p>
                 </NavLink>
                 <ul
                   id='webChatDrop'
@@ -479,19 +479,19 @@ function Sidebar(props) {
                   {/* <li className={activeRoute('plan-selection') + (true ? " active-pro" : "")} key={'plan-selection'}>
                     <NavLink to="/v2/admin/plan-selection" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                       <i className="nc-icon nc-badge" style={{ color: "black" }} />
-                      <p style={{ color: "black" }}>Plan Selection</p>
+                      <p style={{ color: "black" }}>プラン選択</p>
                     </NavLink>
                   </li>
                   <li className={activeRoute('plan-setting') + (true ? " active-pro" : "")} key={'plan-setting'}>
                     <NavLink to="/v2/admin/plan-setting" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                       <i className="nc-icon nc-badge" style={{ color: "black" }} />
-                      <p style={{ color: "black" }}>Plan Setting</p>
+                      <p style={{ color: "black" }}>プラン設定</p>
                     </NavLink>
                   </li>
                   <li className={activeRoute('payment-history') + (true ? " active-pro" : "")} key={'payment-history'}>
                     <NavLink to="/v2/admin/payment-history" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                       <i className="nc-icon nc-badge" style={{ color: "black" }} />
-                      <p style={{ color: "black" }}>Payment History</p>
+                      <p style={{ color: "black" }}>支払い履歴</p>
                     </NavLink>
                   </li> */}
                 </ul>
@@ -563,7 +563,7 @@ function Sidebar(props) {
                 activeStyle={{ color: 'black' }}
               >
                 <MDBIcon fas icon="money-check-alt" style={{color: 'black'}} />
-                <p style={{ color: 'black' }}>Payment History</p>
+                <p style={{ color: 'black' }}>支払い履歴</p>
               </NavLink>
             </li>
           </ul>
@@ -648,7 +648,7 @@ function Sidebar(props) {
                         activeStyle={{ color: 'black' }}
                       >
                         <i className="nc-icon nc-badge" style={{ color: 'black' }} />
-                        <p style={{ color: 'black' }}>Meida Management</p>
+                        <p style={{ color: 'black' }}>メディア管理</p>
                       </NavLink>
                     </li> */}
                   </ul>
@@ -778,7 +778,7 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     <i className="nc-icon nc-badge" style={{ color: 'black' }} />
-                    <p style={{ color: 'black' }}>API Setting</p>
+                    <p style={{ color: 'black' }}>API設定</p>
                   </NavLink>
                   <ul
                     id="APISetting"
@@ -800,7 +800,7 @@ function Sidebar(props) {
                         activeStyle={{ color: 'black' }}
                       >
                         <i className="nc-icon nc-badge" style={{ color: 'black' }} />
-                        <p style={{ color: 'black' }}>Create API</p>
+                        <p style={{ color: 'black' }}>API作成</p>
                       </NavLink>
                     </li>
                     <li
@@ -814,7 +814,7 @@ function Sidebar(props) {
                         activeStyle={{ color: 'black' }}
                       >
                         <i className="nc-icon nc-badge" style={{ color: 'black' }} />
-                        <p style={{ color: 'black' }}>API Management</p>
+                        <p style={{ color: 'black' }}>API管理</p>
                       </NavLink>
                     </li>
                   </ul>
@@ -843,19 +843,19 @@ function Sidebar(props) {
                 {/* <li key={'ab-test'}>
                   <NavLink onClick={() => displayABSetting()} to="/v2/admin/create-ab-test" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                     <i className="nc-icon nc-badge" style={{ color: "black" }} />
-                    <p style={{ color: "black" }}>AB Test</p>
+                    <p style={{ color: "black" }}>ABテスト</p>
                   </NavLink>
                   <ul id="ABSetting" style={{ listStyleType: "none", marginLeft: "-30px", textDecoration: "underline", display: "none" }}>
                     <li className={activeRoute('create-ab-test') + (true ? " active-pro" : "")} key={'create-ab-test'}>
                       <NavLink to="/v2/admin/create-ab-test" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                         <i className="nc-icon nc-badge" style={{ color: "black" }} />
-                        <p style={{ color: "black" }}>Create AB Test</p>
+                        <p style={{ color: "black" }}>ABテスト作成</p>
                       </NavLink>
                     </li>
                     <li className={activeRoute('list-ab-test') + (true ? " active-pro" : "")} key={'list-ab-test'}>
                       <NavLink to="/v2/admin/list-ab-test" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                         <i className="nc-icon nc-badge" style={{ color: "black" }} />
-                        <p style={{ color: "black" }}>List AB Test</p>
+                        <p style={{ color: "black" }}>ABテスト一覧</p>
                       </NavLink>
                     </li>
                   </ul>
@@ -929,13 +929,13 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     <i className="nc-icon nc-badge" style={{ color: 'black' }} />
-                    <p style={{ color: 'black' }}>Conversion</p>
+                    <p style={{ color: 'black' }}>コンバージョン</p>
                   </NavLink>
                 </li> */}
                 {/* <li className={activeRoute('preview') + (true ? " active-pro" : "")} key={'preview'}>
                   <NavLink to="/v2/admin/preview" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                     <i className="nc-icon nc-badge" style={{ color: "black" }} />
-                    <p style={{ color: "black" }}>Preview</p>
+                    <p style={{ color: "black" }}>プレビュー</p>
                   </NavLink>
                 </li> */}
 
@@ -971,7 +971,7 @@ function Sidebar(props) {
                         activeStyle={{ color: 'black' }}
                       >
                         <i className="nc-icon nc-badge" style={{ color: 'black' }} />
-                        <p style={{ color: 'black' }}>Conversion Info</p>
+                        <p style={{ color: 'black' }}>コンバージョン情報</p>
                       </NavLink>
                     </li>
                     <li
@@ -985,7 +985,7 @@ function Sidebar(props) {
                         activeStyle={{ color: 'black' }}
                       >
                         <i className="nc-icon nc-badge" style={{ color: 'black' }} />
-                        <p style={{ color: 'black' }}>Statistics</p>
+                        <p style={{ color: 'black' }}>統計</p>
                       </NavLink>
                     </li>
                   </ul> */}
@@ -1051,7 +1051,7 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     <i className="nc-icon nc-badge" style={{ color: 'black' }} />
-                    <p style={{ color: 'black' }}>Payment Service</p>
+                    <p style={{ color: 'black' }}>決済サービス</p>
                   </NavLink>
                 </li> */}
                 <li
@@ -1081,44 +1081,44 @@ function Sidebar(props) {
                 <li className={activeRoute('payment-management') + (true ? " active-pro" : "")} key={'payment'}>
                   <NavLink to="/v2/admin/payment-management" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                     <i className="nc-icon nc-badge" style={{ color: "black" }} />
-                    <p style={{ color: "black" }}>Payment Management</p>
+                    <p style={{ color: "black" }}>決済管理</p>
                   </NavLink>
                 </li>
 
                 <li key={'advance-setting'}>
                   <NavLink onClick={() => displayAVSetting()} to="/v2/admin/basic-info" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                     <i className="nc-icon nc-badge" style={{ color: "black" }} />
-                    <p style={{ color: "black" }}>Advance Setting</p>
+                    <p style={{ color: "black" }}>詳細設定</p>
                   </NavLink>
                   <ul id="AVSetting" style={{ listStyleType: "none", marginLeft: "-30px", textDecoration: "underline", display: "none" }}>
                     <li className={activeRoute('basic-info') + (true ? " active-pro" : "")} key={'basic-info'}>
                       <NavLink to="/v2/admin/basic-info" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                         <i className="nc-icon nc-badge" style={{ color: "black" }} />
-                        <p style={{ color: "black" }}>Basic Information</p>
+                        <p style={{ color: "black" }}>基本情報</p>
                       </NavLink>
                     </li>
                     <li className={activeRoute('tz-lang') + (true ? " active-pro" : "")} key={'tz-lang'}>
                       <NavLink to="/v2/admin/tz-lang" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                         <i className="nc-icon nc-badge" style={{ color: "black" }} />
-                        <p style={{ color: "black" }}>Timezone and Language</p>
+                        <p style={{ color: "black" }}>タイムゾーンと言語</p>
                       </NavLink>
                     </li>
                     <li className={activeRoute('ip-address-setting') + (true ? " active-pro" : "")} key={'ip-address-setting'}>
                       <NavLink to="/v2/admin/ip-address-setting" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                         <i className="nc-icon nc-badge" style={{ color: "black" }} />
-                        <p style={{ color: "black" }}>IP Address Setting</p>
+                        <p style={{ color: "black" }}>IPアドレス設定</p>
                       </NavLink>
                     </li>
                     <li className={activeRoute('withdrawal-prevention') + (true ? " active-pro" : "")} key={'withdrawal-prevention'}>
                       <NavLink to="/v2/admin/withdrawal-prevention" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                         <i className="nc-icon nc-badge" style={{ color: "black" }} />
-                        <p style={{ color: "black" }}>Withdrawal Prevention</p>
+                        <p style={{ color: "black" }}>離脱防止</p>
                       </NavLink>
                     </li>
                     <li className={activeRoute('bot-admin') + (true ? " active-pro" : "")} key={'bot-admin'}>
                       <NavLink to="/v2/admin/bot-admin" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                         <i className="nc-icon nc-badge" style={{ color: "black" }} />
-                        <p style={{ color: "black" }}>Bot Admin</p>
+                        <p style={{ color: "black" }}>ボット管理者</p>
                       </NavLink>
                     </li>
                   </ul>

@@ -153,7 +153,7 @@ function Header(props) {
         <Collapse isOpen={isOpen} navbar className="justify-content-end">
           {/* <form>
             <InputGroup className="no-border">
-              <Input placeholder="Search..." />
+              <Input placeholder="検索..." />
               <InputGroupAddon addonType="append">
                 <InputGroupText>
                   <i className="nc-icon nc-zoom-split" />

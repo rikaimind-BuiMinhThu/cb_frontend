@@ -55,7 +55,7 @@ const ACTION_CONFIG = {
     icon: <DeleteOutlined />,
   },
   payment: {
-    label: 'Payment',
+    label: '決済',
     type: 'link',
     size: 'small',
     icon: <DollarOutlined />,

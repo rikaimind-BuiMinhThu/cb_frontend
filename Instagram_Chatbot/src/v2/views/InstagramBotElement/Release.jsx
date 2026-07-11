@@ -3656,19 +3656,19 @@ function Release() {
 
                     {/* <div style={{ display: "flex" }}>
 
-                      <span style={{ width: "10%" }}>Srory mention</span>
+                      <span style={{ width: "10%" }}>ストーリーメンション</span>
                       <div style={{ width: "80%", display: "flex" }}>
                         <select defaultValue={""} onChange={(e) => selectedReaction(e.target.value)} className="new-faq-q-so" name="reaction">
                           <option value="" disabled hidden>Choose a reaction ...</option>
                           <option value="">Choose a group ...</option>
-                          <option value="smile">Smile</option>
-                          <option value="surprise">Surprise</option>
-                          <option value="love">Love</option>
-                          <option value="sad">Sad</option>
-                          <option value="clab">Clab</option>
-                          <option value="fire">Fire</option>
-                          <option value="papercannon">Paper cannons</option>
-                          <option value="100">One hundred</option>
+                          <option value="smile">スマイル</option>
+                          <option value="surprise">驚き</option>
+                          <option value="love">ラブ</option>
+                          <option value="sad">悲しい</option>
+                          <option value="clab">拍手</option>
+                          <option value="fire">ファイア</option>
+                          <option value="papercannon">紙吹雪</option>
+                          <option value="100">100</option>
                         </select>
                       </div>
                       

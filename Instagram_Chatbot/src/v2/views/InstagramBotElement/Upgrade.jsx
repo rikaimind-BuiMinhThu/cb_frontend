@@ -1,24 +1,5 @@
-/*!
-
-=========================================================
-* Paper Dashboard React - v1.3.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/paper-dashboard-react
-* Copyright 2021 Creative Tim (https://www.creative-tim.com)
-
-* Licensed under MIT (https://github.com/creativetimofficial/paper-dashboard-react/blob/main/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 import React from "react";
 
-// reactstrap components
 import {
   Button,
   Card,
@@ -40,8 +21,7 @@ function Upgrade() {
               <CardHeader className="text-center">
                 <CardTitle tag="h4">Paper Dashboard PRO</CardTitle>
                 <p className="card-category">
-                  Are you looking for more components? Please check our Premium
-                  Version of Paper Dashboard PRO.
+                  より多くのコンポーネントをお探しですか？Paper Dashboard PROのプレミアム版をご確認ください。
                 </p>
               </CardHeader>
               <CardBody>
@@ -49,28 +29,28 @@ function Upgrade() {
                   <thead>
                     <tr>
                       <th />
-                      <th className="text-center">Free</th>
+                      <th className="text-center">無料</th>
                       <th className="text-center">PRO</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td>Components</td>
+                      <td>コンポーネント</td>
                       <td className="text-center">16</td>
                       <td className="text-center">160</td>
                     </tr>
                     <tr>
-                      <td>Plugins</td>
+                      <td>プラグイン</td>
                       <td className="text-center">4</td>
                       <td className="text-center">13</td>
                     </tr>
                     <tr>
-                      <td>Example Pages</td>
+                      <td>サンプルページ</td>
                       <td className="text-center">7</td>
                       <td className="text-center">27</td>
                     </tr>
                     <tr>
-                      <td>Login, Register, Pricing, Lock Pages</td>
+                      <td>ログイン・登録・料金・ロックページ</td>
                       <td className="text-center">
                         <i className="nc-icon nc-simple-remove text-danger" />
                       </td>
@@ -80,8 +60,8 @@ function Upgrade() {
                     </tr>
                     <tr>
                       <td>
-                        DataTables, VectorMap, SweetAlert, Wizard,
-                        jQueryValidation, FullCalendar etc...
+                        DataTables、VectorMap、SweetAlert、Wizard、
+                        jQueryValidation、FullCalendar など
                       </td>
                       <td className="text-center">
                         <i className="nc-icon nc-simple-remove text-danger" />
@@ -91,7 +71,7 @@ function Upgrade() {
                       </td>
                     </tr>
                     <tr>
-                      <td>Mini Sidebar</td>
+                      <td>ミニサイドバー</td>
                       <td className="text-center">
                         <i className="nc-icon nc-simple-remove text-danger" />
                       </td>
@@ -100,7 +80,7 @@ function Upgrade() {
                       </td>
                     </tr>
                     <tr>
-                      <td>Premium Support</td>
+                      <td>プレミアムサポート</td>
                       <td className="text-center">
                         <i className="nc-icon nc-simple-remove text-danger" />
                       </td>
@@ -110,8 +90,8 @@ function Upgrade() {
                     </tr>
                     <tr>
                       <td />
-                      <td className="text-center">Free</td>
-                      <td className="text-center">From $49</td>
+                      <td className="text-center">無料</td>
+                      <td className="text-center">$49〜</td>
                     </tr>
                     <tr>
                       <td className="text-center" />
@@ -122,7 +102,7 @@ function Upgrade() {
                           href="#pablo"
                           onClick={(e) => e.preventDefault()}
                         >
-                          Current Version
+                          現在のバージョン
                         </Button>
                       </td>
                       <td className="text-center">
@@ -133,7 +113,7 @@ function Upgrade() {
                           rel="noopener noreferrer"
                           target="_blank"
                         >
-                          Upgrade to PRO
+                          PROにアップグレード
                         </Button>
                       </td>
                     </tr>

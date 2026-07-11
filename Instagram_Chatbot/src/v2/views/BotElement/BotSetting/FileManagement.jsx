@@ -129,7 +129,7 @@ function FileManagement() {
 
   const columns = [
     {
-      title: 'No.',
+      title: '番号',
       width: 70,
       render: (_, __, i) => i + 1 + 25 * (page - 1),
     },

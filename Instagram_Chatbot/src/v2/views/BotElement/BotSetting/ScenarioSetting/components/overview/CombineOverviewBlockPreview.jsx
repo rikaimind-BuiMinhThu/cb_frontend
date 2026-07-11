@@ -144,7 +144,7 @@ const CombineOverviewBlockPreview = ({
     <div className="ss-combine-overview-block">
       <div className="ss-combine-overview-block__header">
         <span className={`ss-combine-block-setting__role-badge ss-combine-block-setting__role-badge--${content.role}`}>
-          {isBot ? 'Bot' : 'User'}
+          {isBot ? 'ボット' : 'ユーザー'}
         </span>
         <span className="ss-combine-block-header__type-label">{typeLabel}</span>
       </div>

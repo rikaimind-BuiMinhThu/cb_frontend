@@ -2,7 +2,7 @@ import React from 'react'
 
 function PaymentHistory() {
   return (
-    <div>PaymentHistory</div>
+    <div>支払い履歴（準備中）</div>
   )
 }
 
