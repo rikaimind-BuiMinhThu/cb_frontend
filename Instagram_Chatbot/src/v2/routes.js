@@ -5,7 +5,7 @@ import ClientManagement from './views/ClientManagement/index';
 import PlanManagement from './views/PlanManagement';
 import Policy from './views/InstagramBotElement/Policy';
 import Release from './views/InstagramBotElement/Release';
-import UserManagement from './views/UserManagement';
+import UserManagement from './views/UserManagement/index';
 import Keyword from './views/InstagramBotElement/Keyword';
 import DataAnalyst from './views/InstagramBotElement/DataAnalyst';
 import ListUser from './views/InstagramBotElement/ListUser';
