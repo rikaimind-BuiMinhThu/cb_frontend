@@ -78,6 +78,14 @@ export function getBotMenuItems(botId) {
 export function getGlobalMenuItems(client) {
   const items = [];
 
+  items.push({
+    key: p('/dashboard'),
+    label: 'ホーム',
+    path: p('/dashboard'),
+    icon: <HomeOutlined />,
+    id: 'sidebarHome',
+  });
+
   if (client?.is_instagram) {
     items.push({
       key: 'instagram',
@@ -134,7 +142,6 @@ export function getGlobalMenuItems(client) {
     { key: p('/user-management'), label: 'ユーザー管理', path: p('/user-management'), icon: <TeamOutlined />, id: 'sidebarUser' },
     { key: p('/plan-management'), label: 'プラン管理', path: p('/plan-management'), icon: <SettingOutlined />, id: 'planManagement' },
     { key: p('/client-payment-detail'), label: '支払い履歴', path: p('/client-payment-detail'), icon: <DollarOutlined />, id: 'clientPaymentDetail', hiddenByDefault: true },
-    { key: p('/dashboard'), label: 'ホーム', path: p('/dashboard'), icon: <HomeOutlined /> },
   );
 
   return items;
@@ -162,12 +169,14 @@ export function filterMenuByRole(items, userRole) {
   if (userRole === 'admin_deel') {
     hiddenIds.add('clientPaymentDetail');
   } else if (userRole === 'admin_client') {
+    hiddenIds.add('sidebarHome');
     hiddenIds.add('sidebarClient');
     hiddenIds.add('sidebarUser');
     hiddenIds.add('planManagement');
     hiddenIds.add('scenarioTemplateManagement');
     hiddenIds.add('orderConfirmMessageTemplateManagement');
   } else if (userRole === 'client') {
+    hiddenIds.add('sidebarHome');
     hiddenIds.add('sidebarClient');
     hiddenIds.add('sidebarUser');
     hiddenIds.add('planManagement');

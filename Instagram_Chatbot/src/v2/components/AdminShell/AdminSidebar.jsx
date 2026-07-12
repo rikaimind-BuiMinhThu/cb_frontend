@@ -10,7 +10,7 @@ import {
   isBotMenuRoute,
   resolveMenuPath,
 } from './adminMenuConfig';
-import { getAdminRoutePath } from 'v2/variables/constants';
+import { getDefaultLandingPath } from 'v2/variables/constants';
 
 const { Sider } = Layout;
 
@@ -76,6 +76,10 @@ function AdminSidebar({ collapsed, onCollapse }) {
   const allPaths = useMemo(() => flattenPaths(menuSource), [menuSource]);
   const menuPath = resolveMenuPath(location.pathname);
   const selectedKey = findSelectedKey(menuPath, allPaths);
+  const landingPath = useMemo(
+    () => getDefaultLandingPath(userRole, client),
+    [userRole, client],
+  );
 
   const openKeysFromPath = useMemo(() => {
     const keys = [];
@@ -108,7 +112,7 @@ function AdminSidebar({ collapsed, onCollapse }) {
       theme="light"
     >
       <div className="admin-sider-logo">
-        <Link to={getAdminRoutePath('/dashboard')} onClick={() => Cookies.remove('bot_type')}>
+        <Link to={landingPath} onClick={() => Cookies.remove('bot_type')}>
           <img src={logo} alt="EC Chatbot" />
         </Link>
       </div>

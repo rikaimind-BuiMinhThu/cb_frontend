@@ -11,7 +11,8 @@ import routes from '../../routes';
 import PushMessage from '../../views/BotSettings/PushMessage/PushMessagePage';
 import ListSmsTemplate from '../../views/BotSettings/SmsTemplate/ListSmsTemplate';
 import { adminConfigProviderProps } from '../../theme/adminTheme';
-import { getAdminRoutePath } from 'v2/variables/constants';
+import { getAdminRoutePath, getDefaultLandingPath } from 'v2/variables/constants';
+import Cookies from 'js-cookie';
 import 'v2/assets/css/admin/admin-shell.css';
 
 const { Content } = Layout;
@@ -33,6 +34,17 @@ function AdminLayout(props) {
     } catch {
       client = null;
     }
+    const userRole = Cookies.get('user_role') || '';
+    const landingPath = getDefaultLandingPath(userRole, client);
+    const dashboardPath = getAdminRoutePath('/dashboard');
+
+    if (pathname === dashboardPath && userRole !== 'admin_deel') {
+      if (landingPath !== dashboardPath) {
+        window.location.href = landingPath;
+      }
+      return;
+    }
+
     const isInstagram = client?.is_instagram;
     const isWeb = client?.is_web;
     const instagramRolesUrl = [
@@ -59,7 +71,7 @@ function AdminLayout(props) {
       (!isInstagram && instagramRolesUrl.includes(pathname)) ||
       (!isWeb && webRolesUrl.includes(pathname))
     ) {
-      window.location.href = getAdminRoutePath('/dashboard');
+      window.location.href = landingPath;
     }
   }, [location]);
 

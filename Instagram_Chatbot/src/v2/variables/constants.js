@@ -12,6 +12,14 @@ export const getAdminRoutePath = (path = '') => {
     return getAppPath(normalized);
 };
 
+/** Default landing after login / logo click / unauthorized Home access. */
+export const getDefaultLandingPath = (role, client) => {
+    if (role === 'admin_deel') return getAdminRoutePath('/dashboard');
+    if (client?.is_web) return getAdminRoutePath('/bot');
+    if (client?.is_instagram) return getAdminRoutePath('/crm');
+    return getAdminRoutePath('/dashboard');
+};
+
 export const getEnvironment = () => {
     try {
         return getParamFromUrl("env") || process.env.REACT_APP_CHATBOT_ENV || "production";

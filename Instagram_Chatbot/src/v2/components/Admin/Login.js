@@ -9,7 +9,7 @@ import Cookies from 'js-cookie';
 import { setToken } from "api/auth";
 import logo from '../../assets/img/logoEC.jpg'
 import LoginFacebook from "./LoginFacebook";
-import {EC_CHATBOT_URL, getAdminRoutePath} from '../../variables/constants'
+import {EC_CHATBOT_URL, getDefaultLandingPath} from '../../variables/constants'
 class Login extends React.Component {
 
   constructor(props) {
@@ -80,7 +80,7 @@ class Login extends React.Component {
             // sessionStorage.setItem("client", JSON.stringify(res.data.client));
             // Cookies.set('refreshToken', persons.refresh_token); /{path: '/v2/admin/dashboard'}
             axios.defaults.headers.common['Authorization'] = `Bearer ${Cookies.get('token')}`;
-            getToDashboard();
+            getToDashboard(persons.user.role, res.data.client);
           } else {
             this.setState({ msgNoti: "ユーザー名またはパスワードが間違っています。" })
             document.getElementById("loginErrorMsg").style.display = "block"
@@ -89,8 +89,8 @@ class Login extends React.Component {
         })
         .catch(error => alert(error));
 
-      function getToDashboard() {
-        window.location.href = getAdminRoutePath('/dashboard')
+      function getToDashboard(role, client) {
+        window.location.href = getDefaultLandingPath(role, client)
       }
     }
   }
@@ -137,7 +137,7 @@ class Login extends React.Component {
             // sessionStorage.setItem("client", JSON.stringify(res.data.client));
             // Cookies.set('refreshToken', persons.refresh_token); /{path: '/v2/admin/dashboard'}
             axios.defaults.headers.common['Authorization'] = `Bearer ${Cookies.get('token')}`;
-            getToDashboard();
+            getToDashboard(persons.user.role, res.data.client);
           } else {
             this.setState({ msgNoti: "ユーザー名またはパスワードが間違っています。" })
             document.getElementById("loginErrorMsg").style.display = "block"
@@ -146,8 +146,8 @@ class Login extends React.Component {
         })
         .catch(error => alert(error));
 
-      function getToDashboard() {
-        window.location.href = getAdminRoutePath('/dashboard')
+      function getToDashboard(role, client) {
+        window.location.href = getDefaultLandingPath(role, client)
       }
     }
   }
