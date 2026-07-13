@@ -27,6 +27,14 @@ import DesignSettingLabel from './shared/DesignSettingLabel';
 
 const { Panel } = Collapse;
 
+const getGridItemClassName = ({ isColor = false, fullWidth = false, isHighlighted = false } = {}) => (
+  [
+    isColor ? 'theme-field--color' : '',
+    fullWidth ? 'theme-field--full' : '',
+    isHighlighted ? 'theme-field--highlighted' : '',
+  ].filter(Boolean).join(' ')
+);
+
 const ThemeAccordionSection = ({
   sectionId,
   title,
@@ -81,18 +89,22 @@ const ThemeAccordionSection = ({
     }
 
     const isHighlighted = highlightedFieldKey === key;
-    const fieldClassSuffix = isHighlighted ? ' theme-field--highlighted' : '';
+    const isFullWidth = fullWidth ?? false;
+    const wrapperClassName = getGridItemClassName({
+      fullWidth: isFullWidth,
+      isHighlighted,
+    });
 
     if (fieldType === 'effectSelect') {
       const isBorderTwinkle = effectOptions === 'borderTwinkle';
       const isButtonBounce = effectOptions === 'buttonBounce';
 
       return (
-        <div key={key} className={fieldClassSuffix}>
+        <div key={key} className={wrapperClassName}>
           <ThemeEffectSelectField
             label={label}
             value={themeSettings[key]}
-            fullWidth={fullWidth ?? false}
+            fullWidth={isFullWidth}
             tooltipKey={key}
             options={isBorderTwinkle
               ? BORDER_TWINKLE_EFFECT_OPTIONS
@@ -112,11 +124,11 @@ const ThemeAccordionSection = ({
 
     if (fieldType === 'borderStyleSelect') {
       return (
-        <div key={key} className={fieldClassSuffix}>
+        <div key={key} className={wrapperClassName}>
           <ThemeEffectSelectField
             label={label}
             value={themeSettings[key]}
-            fullWidth={fullWidth ?? false}
+            fullWidth={isFullWidth}
             tooltipKey={key}
             options={BUTTON_BORDER_STYLE_OPTIONS}
             normalizeValue={normalizeButtonBorderStyle}
@@ -128,11 +140,11 @@ const ThemeAccordionSection = ({
 
     if (fieldType === 'messageBorderStyleSelect') {
       return (
-        <div key={key} className={fieldClassSuffix}>
+        <div key={key} className={wrapperClassName}>
           <ThemeEffectSelectField
             label={label}
             value={themeSettings[key]}
-            fullWidth={fullWidth ?? false}
+            fullWidth={isFullWidth}
             tooltipKey={key}
             options={MESSAGE_BORDER_STYLE_OPTIONS}
             normalizeValue={normalizeMessageBorderStyle}
@@ -144,11 +156,11 @@ const ThemeAccordionSection = ({
 
     if (fieldType === 'positionSelect') {
       return (
-        <div key={key} className={fieldClassSuffix}>
+        <div key={key} className={wrapperClassName}>
           <ThemeEffectSelectField
             label={label}
             value={themeSettings[key]}
-            fullWidth={fullWidth ?? false}
+            fullWidth={isFullWidth}
             tooltipKey={key}
             options={BUTTON_POSITION_OPTIONS}
             normalizeValue={normalizeButtonPosition}
@@ -160,11 +172,11 @@ const ThemeAccordionSection = ({
 
     if (fieldType === 'modalTitleAlignmentSelect') {
       return (
-        <div key={key} className={fieldClassSuffix}>
+        <div key={key} className={wrapperClassName}>
           <ThemeEffectSelectField
             label={label}
             value={themeSettings[key]}
-            fullWidth={fullWidth ?? false}
+            fullWidth={isFullWidth}
             tooltipKey={key}
             options={MODAL_TITLE_ALIGNMENT_OPTIONS}
             normalizeValue={normalizeModalTitleAlignment}
@@ -194,11 +206,11 @@ const ThemeAccordionSection = ({
 
     if (fieldType === 'dimension') {
       return (
-        <div key={key} className={fieldClassSuffix}>
+        <div key={key} className={wrapperClassName}>
           <ThemeDimensionField
             label={label}
             value={themeSettings[key]}
-            fullWidth={fullWidth ?? false}
+            fullWidth={isFullWidth}
             tooltipKey={key}
             unit={unit}
             unitOptions={unitOptions}
@@ -212,11 +224,11 @@ const ThemeAccordionSection = ({
 
     if (fieldType === 'fontSize') {
       return (
-        <div key={key} className={fieldClassSuffix}>
+        <div key={key} className={wrapperClassName}>
           <ThemeNumberField
             label={label}
             value={themeSettings[key]}
-            fullWidth={fullWidth ?? false}
+            fullWidth={isFullWidth}
             tooltipKey={key}
             onChange={(value) => onFieldChange(key, value)}
           />
@@ -225,12 +237,19 @@ const ThemeAccordionSection = ({
     }
 
     return (
-      <div key={key} className={fieldClassSuffix}>
+      <div
+        key={key}
+        className={getGridItemClassName({
+          isColor: true,
+          fullWidth: isFullWidth,
+          isHighlighted,
+        })}
+      >
         <ThemeColorField
           label={label}
           value={themeSettings[key]}
           isText={isText}
-          fullWidth={fullWidth ?? false}
+          fullWidth={isFullWidth}
           tooltipKey={key}
           onChange={(value) => onFieldChange(key, value)}
         />

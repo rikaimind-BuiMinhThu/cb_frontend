@@ -6,7 +6,7 @@ import ThemeAccordionSection from './ThemeAccordionSection';
 import ThemeCustomizePreview from './ThemeCustomizePreview';
 import ThemeSectionNav from './ThemeSectionNav';
 
-const DEFAULT_EXPANDED_SECTIONS = ['headerMain', 'messages'];
+const DEFAULT_EXPANDED_SECTIONS = [];
 
 const ThemeCustomizeTab = ({
   themeSettings,
