@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Button } from 'reactstrap';
 import { hasActiveSpecialDisplayConditions } from '../utils/amazonPayConfigUtils';
 import { useScenarioPanelDestructuring } from '../hooks/useScenarioPanelDestructuring';
-import ScenarioInfoTooltip from './modals/shared/ScenarioInfoTooltip';
+import { AdminInfoTooltip } from '../../../../../components/AdminShell';
 import { SCENARIO_MODAL_TOOLTIPS } from './modals/shared/scenarioModalTooltips';
 import AudienceConditionsContent from './AudienceConditionsContent';
 import RegisterButtonSettingsContent from './RegisterButtonSettingsContent';
@@ -32,7 +32,7 @@ const renderTriggerHelp = (tooltipKey) => (
     onKeyDown={(e) => e.stopPropagation()}
     role="presentation"
   >
-    <ScenarioInfoTooltip text={SCENARIO_MODAL_TOOLTIPS[tooltipKey]} />
+    <AdminInfoTooltip text={SCENARIO_MODAL_TOOLTIPS[tooltipKey]} />
   </span>
 );
 

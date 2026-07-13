@@ -82,6 +82,7 @@
   flex-shrink: 0;
 }
 
+.ss-message-settings-accordion__trigger--active .admin-info-tooltip,
 .ss-message-settings-accordion__trigger--active .ss-settings-info-tooltip {
   color: #fff;
 }

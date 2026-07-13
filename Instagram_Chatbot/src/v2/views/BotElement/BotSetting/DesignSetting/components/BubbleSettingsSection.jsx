@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Input, Radio } from 'antd';
-import DesignSettingInfoTooltip from './shared/DesignSettingInfoTooltip';
+import { AdminInfoTooltip } from '../../../../../components/AdminShell';
 import { getDesignSettingTooltip } from '../constants/designSettingTooltips';
 
 function DesignField({ label, tooltipKey, children }) {
@@ -10,7 +10,7 @@ function DesignField({ label, tooltipKey, children }) {
       <label className="design-field__label">
         {label}
         {tooltipKey && (
-          <DesignSettingInfoTooltip text={getDesignSettingTooltip(tooltipKey)} />
+          <AdminInfoTooltip text={getDesignSettingTooltip(tooltipKey)} />
         )}
       </label>
       <div className="design-field__control">{children}</div>

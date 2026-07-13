@@ -200,7 +200,9 @@
   opacity: 0.6;
 }
 
-/* Info tooltip icon */
+/* Info tooltip icon (shared AdminInfoTooltip; scenario-specific color overrides) */
+.ss-settings-form-row__label .admin-info-tooltip,
+.ss-settings-modal-checkbox__label .admin-info-tooltip,
 .ss-settings-info-tooltip {
   display: inline-flex;
   align-items: center;
@@ -209,8 +211,11 @@
   font-size: 13px;
   line-height: 1;
   flex-shrink: 0;
+  margin-left: 4px;
 }
 
+.ss-settings-form-row__label .admin-info-tooltip:hover,
+.ss-settings-modal-checkbox__label .admin-info-tooltip:hover,
 .ss-settings-info-tooltip:hover {
   color: #024bb9;
 }
@@ -240,18 +245,18 @@
   padding-right: 4px;
 }
 
-.ss-settings-modal-checkbox__label .ss-settings-info-tooltip {
+.ss-settings-modal-checkbox__label .admin-info-tooltip {
   color: #347aed;
   margin-left: 4px;
   vertical-align: middle;
 }
 
-.ss-settings-modal-checkbox__label .ss-settings-info-tooltip:hover {
+.ss-settings-modal-checkbox__label .admin-info-tooltip:hover {
   color: #024bb9;
 }
 
-.ss-settings-modal-checkbox__label .ss-settings-info-tooltip i,
-.ss-settings-modal-checkbox__label .ss-settings-info-tooltip svg {
+.ss-settings-modal-checkbox__label .admin-info-tooltip i,
+.ss-settings-modal-checkbox__label .admin-info-tooltip svg {
   color: inherit !important;
 }
 

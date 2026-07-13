@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import InputCustom from '../scenarioComon/InputCustom';
 import ScenarioModalCheckbox from './modals/shared/ScenarioModalCheckbox';
 import ScenarioFormRow from './modals/shared/ScenarioFormRow';
-import ScenarioInfoTooltip from './modals/shared/ScenarioInfoTooltip';
+import { AdminInfoTooltip } from '../../../../../components/AdminShell';
 import ScenarioCodeTextarea from './modals/shared/ScenarioCodeTextarea';
 import {
   SCENARIO_MODAL_TOOLTIPS,
@@ -13,7 +13,7 @@ import {
 const labelWithTooltip = (text, tooltipKey) => (
   <>
     {text}
-    <ScenarioInfoTooltip text={SCENARIO_MODAL_TOOLTIPS[tooltipKey]} />
+    <AdminInfoTooltip text={SCENARIO_MODAL_TOOLTIPS[tooltipKey]} />
   </>
 );
 

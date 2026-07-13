@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import DesignSettingInfoTooltip from './DesignSettingInfoTooltip';
+import { AdminInfoTooltip } from '../../../../../../components/AdminShell';
 
 const DesignSettingLabel = ({
   children,
@@ -11,7 +11,7 @@ const DesignSettingLabel = ({
   <span className={className}>
     {children}
     {required && <span style={{ color: 'red' }}> *</span>}
-    {tooltip && <DesignSettingInfoTooltip text={tooltip} />}
+    {tooltip && <AdminInfoTooltip text={tooltip} />}
   </span>
 );
 

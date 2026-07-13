@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Button } from 'reactstrap';
 import ScenarioModalCheckbox from '../../components/modals/shared/ScenarioModalCheckbox';
-import ScenarioInfoTooltip from '../../components/modals/shared/ScenarioInfoTooltip';
+import { AdminInfoTooltip } from '../../../../../../components/AdminShell';
 import SelectCustom from '../../scenarioComon/SelectCustom';
 import {
   SCENARIO_MODAL_TOOLTIPS,
@@ -13,7 +13,7 @@ import { getUserContentOptionsConfig } from './userContentOptionsConfig';
 const labelWithTooltip = (text, tooltipKey) => (
   <>
     {text}
-    <ScenarioInfoTooltip text={SCENARIO_MODAL_TOOLTIPS[tooltipKey]} />
+    <AdminInfoTooltip text={SCENARIO_MODAL_TOOLTIPS[tooltipKey]} />
   </>
 );
 

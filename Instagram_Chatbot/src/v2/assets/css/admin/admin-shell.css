@@ -224,7 +224,7 @@
   gap: 4px;
 }
 
-.admin-page--design-setting .design-setting-info-tooltip {
+.admin-info-tooltip {
   display: inline-flex;
   align-items: center;
   margin-left: 4px;
@@ -232,9 +232,10 @@
   cursor: help;
   font-size: 14px;
   line-height: 1;
+  flex-shrink: 0;
 }
 
-.admin-page--design-setting .design-setting-info-tooltip:hover {
+.admin-info-tooltip:hover {
   color: #1677ff;
 }
 

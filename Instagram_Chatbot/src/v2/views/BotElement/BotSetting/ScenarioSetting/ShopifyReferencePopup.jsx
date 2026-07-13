@@ -3,7 +3,7 @@ import api from 'api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { Radio } from 'antd';
 import ScenarioModalFooter from './components/modals/shared/ScenarioModalFooter';
-import ScenarioInfoTooltip from './components/modals/shared/ScenarioInfoTooltip';
+import { AdminInfoTooltip } from '../../../../components/AdminShell';
 import { SCENARIO_MODAL_TOOLTIPS } from './components/modals/shared/scenarioModalTooltips';
 
 function ShopifyReferencePopup({ onCancel, onReferProductVariant }) {
@@ -40,7 +40,7 @@ function ShopifyReferencePopup({ onCancel, onReferProductVariant }) {
       <div className="fr-popup-container" style={{ minHeight: '300px' }}>
         <div style={{ padding: '5px 5px 12px', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '14px' }}>
           <span>商品バリアントを選択</span>
-          <ScenarioInfoTooltip text={SCENARIO_MODAL_TOOLTIPS.shopifyVariant} />
+          <AdminInfoTooltip text={SCENARIO_MODAL_TOOLTIPS.shopifyVariant} />
         </div>
         <div style={{ padding: '5px' }}>
           <Radio.Group

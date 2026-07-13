@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Input, InputNumber, Select, Space } from 'antd';
 import InputNum from '../../ScenarioSetting/scenarioComon/InputNum';
-import DesignSettingInfoTooltip from './shared/DesignSettingInfoTooltip';
+import { AdminInfoTooltip } from '../../../../../components/AdminShell';
 import { getDesignSettingTooltip } from '../constants/designSettingTooltips';
 
 const DISPLAY_TYPE_OPTIONS = [
@@ -27,7 +27,7 @@ function DesignField({ label, tooltipKey, fullWidth, children }) {
       <label className="design-field__label">
         {label}
         {tooltipKey && (
-          <DesignSettingInfoTooltip text={getDesignSettingTooltip(tooltipKey)} />
+          <AdminInfoTooltip text={getDesignSettingTooltip(tooltipKey)} />
         )}
       </label>
       <div className="design-field__control">{children}</div>

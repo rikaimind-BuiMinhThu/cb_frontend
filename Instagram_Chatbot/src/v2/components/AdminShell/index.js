@@ -9,3 +9,4 @@ export { default as AdminHeader } from './AdminHeader';
 export { useAdminHeaderTitle } from './AdminHeaderTitleContext';
 export { useAdminHeaderActions } from './AdminHeaderActionsContext';
 export { default as AdminActionButton } from './AdminActionButton';
+export { default as AdminInfoTooltip } from './AdminInfoTooltip';

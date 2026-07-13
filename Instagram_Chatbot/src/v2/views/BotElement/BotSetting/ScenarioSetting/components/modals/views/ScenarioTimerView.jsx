@@ -4,7 +4,7 @@ import InputCustom from '../../../scenarioComon/InputCustom';
 import ScenarioFormRow from '../shared/ScenarioFormRow';
 import ScenarioModalFooter from '../shared/ScenarioModalFooter';
 import ScenarioModalCheckbox from '../shared/ScenarioModalCheckbox';
-import ScenarioInfoTooltip from '../shared/ScenarioInfoTooltip';
+import { AdminInfoTooltip } from '../../../../../../../components/AdminShell';
 import { SCENARIO_MODAL_TOOLTIPS } from '../shared/scenarioModalTooltips';
 import { TIMER_TYPES, TIMER_VARIABLES_DESCRIPTION } from '../../../../PreviewComponent/Constants';
 
@@ -148,7 +148,7 @@ const ScenarioTimerView = ({ onBack }) => {
             label={(
               <>
                 終了メッセージを表示
-                <ScenarioInfoTooltip text={SCENARIO_MODAL_TOOLTIPS.timerFinishMessage} />
+                <AdminInfoTooltip text={SCENARIO_MODAL_TOOLTIPS.timerFinishMessage} />
               </>
             )}
           />

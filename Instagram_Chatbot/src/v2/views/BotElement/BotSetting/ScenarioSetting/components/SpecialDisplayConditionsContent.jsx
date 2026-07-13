@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ScenarioModalCheckbox from './modals/shared/ScenarioModalCheckbox';
-import ScenarioInfoTooltip from './modals/shared/ScenarioInfoTooltip';
+import { AdminInfoTooltip } from '../../../../../components/AdminShell';
 import SelectCustom from '../scenarioComon/SelectCustom';
 import { dataAmazonPayDisplayMode } from '../../../../../variables/amazonPayConstants';
 import { getAmazonPayDisplayModeFromConditions } from '../utils/amazonPayConfigUtils';
@@ -13,7 +13,7 @@ import {
 const labelWithTooltip = (text, tooltipKey) => (
   <>
     {text}
-    <ScenarioInfoTooltip text={SCENARIO_MODAL_TOOLTIPS[tooltipKey]} />
+    <AdminInfoTooltip text={SCENARIO_MODAL_TOOLTIPS[tooltipKey]} />
   </>
 );
 

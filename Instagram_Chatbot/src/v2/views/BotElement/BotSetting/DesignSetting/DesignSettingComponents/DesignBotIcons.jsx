@@ -1,13 +1,13 @@
 import PropTypes from 'prop-types';
 import './DesignBotIcons.css';
-import DesignSettingInfoTooltip from '../components/shared/DesignSettingInfoTooltip';
+import { AdminInfoTooltip } from '../../../../../components/AdminShell';
 import { getDesignSettingTooltip } from '../constants/designSettingTooltips';
 
 const IconSectionHeader = ({ label, tooltipKey }) => (
   <div className="icon_section_header">
     <span className="icon_label">
       {label}
-      <DesignSettingInfoTooltip text={getDesignSettingTooltip(tooltipKey)} />
+      <AdminInfoTooltip text={getDesignSettingTooltip(tooltipKey)} />
     </span>
   </div>
 );

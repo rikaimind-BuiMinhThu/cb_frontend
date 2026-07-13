@@ -3,7 +3,7 @@ import InputCustom from '../../../scenarioComon/InputCustom';
 import { useScenarioEditor } from '../../../context/ScenarioEditorContext';
 import OverviewCheckboxRow from '../../OverviewCheckboxRow';
 import ScenarioModalCheckbox from '../shared/ScenarioModalCheckbox';
-import ScenarioInfoTooltip from '../shared/ScenarioInfoTooltip';
+import { AdminInfoTooltip } from '../../../../../../../components/AdminShell';
 import ScenarioFormRow from '../shared/ScenarioFormRow';
 import ScenarioModalFooter from '../shared/ScenarioModalFooter';
 import {
@@ -15,7 +15,7 @@ import { createEmptyAutoLogoutConfig } from '../../../utils/autoLogoutUtils';
 const labelWithTooltip = (text, tooltipKey) => (
   <>
     {text}
-    <ScenarioInfoTooltip text={SCENARIO_MODAL_TOOLTIPS[tooltipKey]} />
+    <AdminInfoTooltip text={SCENARIO_MODAL_TOOLTIPS[tooltipKey]} />
   </>
 );
 
