@@ -29,7 +29,10 @@ import {
   MESSAGE_CONTENT_TYPES,
 } from '../PreviewComponent/Constants.jsx';
 import { parseThemeSettings } from '../DesignSetting/utils/designThemeUtils';
-import { resolveMainColorContext } from '../DesignSetting/utils/designChatbotUtils';
+import {
+  clampOpenAnimationDurationMs,
+  resolveMainColorContext,
+} from '../DesignSetting/utils/designChatbotUtils';
 import { getDefaultValue } from '../PreviewComponent/VariablesUtils';
 import { savedChatbotState } from '../PreviewComponent/SessionStorageUtils';
 import { convertToFukushashikiObject } from './FukushashikiDataConverterUtils';
@@ -443,6 +446,9 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
         rightSpTitle: designSetting?.right_position_sp_title,
         rightMarginSp: designSetting?.right_margin_sp,
         bottomMarginSp: designSetting?.bottom_margin_sp,
+        openAnimationDurationMs: clampOpenAnimationDurationMs(
+          designSetting?.open_animation_duration_ms,
+        ),
         isUsedErrMsgByJs: chatbot?.is_used_err_msg_by_js,
         errMsgJsCode: chatbot?.err_msg_js_code,
         errMsgSettingMode: chatbot?.err_msg_setting_mode || 'js',

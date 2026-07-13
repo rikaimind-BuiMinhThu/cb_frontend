@@ -283,15 +283,15 @@ const PreviewFukushashiki = () => {
     });
   }, [state.objParam?.ip, state.loadedStateFromSession]);
 
-  // Get chat bot setting
+  // Always refresh design settings from the chatbot API after load so session-restored
+  // state does not keep a stale openAnimationDurationMs (or other design fields).
   useEffect(() => {
     if (!state.loadedStateFromSession) return;
     if (!state.botId && params.get("bot_id")) {
       dispatch({ type: PREVIEW_ACTIONS.SET_BOT_ID, payload: params.get("bot_id") });
       return;
     }
-
-    if (state.displayType !== undefined && state.displayType !== null) return;
+    if (!state.botId) return;
 
     getChatBotSetting(state.botId)
       .then((response) => {
@@ -328,7 +328,7 @@ const PreviewFukushashiki = () => {
 
         dispatch({ type: PREVIEW_ACTIONS.SET_CHATBOT_SETTINGS, payload: newState });
       });
-  }, [state.botId, state.loadedStateFromSession, state.displayType]);
+  }, [state.botId, state.loadedStateFromSession]);
 
   const eventHandler = async (event) => {
     if (!event.data || !event.data.actionData) return;
@@ -907,7 +907,6 @@ const PreviewFukushashiki = () => {
       rightSpTitle: parsedDesign.rightSpTitle,
       rightMarginSp: parsedDesign.rightMarginSp,
       bottomMarginSp: parsedDesign.bottomMarginSp,
-      openAnimationDurationMs: parsedDesign.openAnimationDurationMs,
       isUsedErrMsgByJs: chatbot?.is_used_err_msg_by_js,
       errMsgJsCode: chatbot?.err_msg_js_code,
       errMsgSettingMode: chatbot?.err_msg_setting_mode || 'js',
