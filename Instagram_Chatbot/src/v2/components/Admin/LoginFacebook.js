@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import FacebookLogin from 'react-facebook-login';
 import { Button, Card, Image } from 'react-bootstrap';
-import 'assets/css/loginFacebook.css';
+import 'v2/assets/css/loginFacebook.css';
 import { margin } from '@mui/system';
 import api from 'api/api-management'
 import Cookies from 'js-cookie';

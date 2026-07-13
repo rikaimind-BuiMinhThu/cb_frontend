@@ -1,4 +1,4 @@
-import "assets/css/bot/bot-chat-log.css";
+import "v2/assets/css/bot/bot-chat-log.css";
 import UserMessage from "./UserMessage";
 import { Fragment, useEffect, useState } from "react";
 import BotMessage from "./BotMessage";

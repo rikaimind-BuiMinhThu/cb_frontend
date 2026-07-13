@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import "assets/css/bot/timer.css";
+import "v2/assets/css/bot/timer.css";
 import { TIMER_MAP_VARIABLE_METHOD, TIMER_COUNTING_DELAY } from "./PreviewComponent/Constants";
 
 const initialState = {

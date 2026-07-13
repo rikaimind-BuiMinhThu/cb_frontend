@@ -280,6 +280,23 @@
   color: #374151;
 }
 
+.admin-page--design-setting .basic-info-state-preview__open-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.admin-page--design-setting .basic-info-state-preview__open-header .basic-info-state-preview__title {
+  margin-bottom: 0;
+}
+
+.admin-page--design-setting .basic-info-state-preview__replay {
+  padding: 0;
+  height: auto;
+}
+
 .admin-page--design-setting .basic-info-state-preview__frame {
   background: #f9fafb;
   border: 1px solid #e5e7eb;
@@ -290,6 +307,7 @@
 
 .admin-page--design-setting .basic-info-state-preview__frame--open {
   min-height: 200px;
+  overflow: hidden;
 }
 
 .admin-page--design-setting .basic-info-state-preview__frame--close {

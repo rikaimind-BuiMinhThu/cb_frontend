@@ -37,8 +37,9 @@ import {
   DISPLAY_TYPES,
 } from "./PreviewComponent/Constants";
 import { applyPreviewThemeCss } from "v2/utils/chatbotThemeCss";
-import { COLOR_MAP } from "v2/views/BotElement/BotSetting/DesignSetting/constants/designChatbotConstants";
+import { COLOR_MAP, OPEN_ANIMATION_DURATION_MS_DEFAULT } from "v2/views/BotElement/BotSetting/DesignSetting/constants/designChatbotConstants";
 import {
+  clampOpenAnimationDurationMs,
   parseDesignSettings,
   resolveMainColorContext,
 } from "v2/views/BotElement/BotSetting/DesignSetting/utils/designChatbotUtils";
@@ -165,6 +166,7 @@ const previewInitialState = {
   showPopupCloseBot: false,
   activePopupCloseBot: true,
   titleBubble: "",
+  openAnimationDurationMs: OPEN_ANIMATION_DURATION_MS_DEFAULT,
   styleModal: {},
   scenarioUserResponses: [],
   checkoutUrl: "",
@@ -320,6 +322,7 @@ const PreviewFukushashiki = () => {
           rightSpTitle: parsedDesign.rightSpTitle,
           rightMarginSp: parsedDesign.rightMarginSp,
           bottomMarginSp: parsedDesign.bottomMarginSp,
+          openAnimationDurationMs: parsedDesign.openAnimationDurationMs,
           themeSettings: parsedDesign.themeSettings,
         };
 
@@ -904,6 +907,7 @@ const PreviewFukushashiki = () => {
       rightSpTitle: parsedDesign.rightSpTitle,
       rightMarginSp: parsedDesign.rightMarginSp,
       bottomMarginSp: parsedDesign.bottomMarginSp,
+      openAnimationDurationMs: parsedDesign.openAnimationDurationMs,
       isUsedErrMsgByJs: chatbot?.is_used_err_msg_by_js,
       errMsgJsCode: chatbot?.err_msg_js_code,
       errMsgSettingMode: chatbot?.err_msg_setting_mode || 'js',
@@ -1418,12 +1422,19 @@ const PreviewFukushashiki = () => {
   // body container
   if (state.isOpen) {
     const { containerStyle, headerStyle, bodyStyle } = getOpeningBotStyle();
+    const openAnimationDurationMs = clampOpenAnimationDurationMs(
+      state.openAnimationDurationMs ?? OPEN_ANIMATION_DURATION_MS_DEFAULT,
+    );
+    const openContainerStyle = {
+      ...containerStyle,
+      '--chatbot-open-animation-duration': `${openAnimationDurationMs}ms`,
+    };
     return (
       <div
         ref={containerRef}
         id="sp-container1"
         className={`sp-container1 ${isMobile() ? 'slideUpSp' : 'slideUp'}`}
-        style={containerStyle}
+        style={openContainerStyle}
       >
         <ZipCodePopUp
           onOpen={onOpenZipCodePopup}

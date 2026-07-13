@@ -1,6 +1,12 @@
 import IconManDefault from '../../../../../assets/img/bot-icon/man1_new.png';
 import { EC_CHATBOT_URL } from 'v2/variables/constants';
-import { COLOR_MAP, DEFAULT_IMAGES } from '../constants/designChatbotConstants';
+import {
+  COLOR_MAP,
+  DEFAULT_IMAGES,
+  OPEN_ANIMATION_DURATION_MS_DEFAULT,
+  OPEN_ANIMATION_DURATION_MS_MAX,
+  OPEN_ANIMATION_DURATION_MS_MIN,
+} from '../constants/designChatbotConstants';
 import { buildThemePayload, parseThemeSettings as parseThemeFromRaw } from './designThemeUtils';
 
 export const getIconPath = (iconField) => {
@@ -194,6 +200,17 @@ export const buildBasicInfoPayload = ({
   return payload;
 };
 
+export const clampOpenAnimationDurationMs = (value) => {
+  const parsed = Number(value);
+  if (Number.isNaN(parsed)) {
+    return OPEN_ANIMATION_DURATION_MS_DEFAULT;
+  }
+  return Math.min(
+    OPEN_ANIMATION_DURATION_MS_MAX,
+    Math.max(OPEN_ANIMATION_DURATION_MS_MIN, Math.round(parsed)),
+  );
+};
+
 export const buildDesignSettingsPayload = (designSettings) => {
   const payload = {
     display_type: designSettings.displayType,
@@ -213,6 +230,9 @@ export const buildDesignSettingsPayload = (designSettings) => {
     bottom_margin_sp: designSettings.bottomMarginSp,
     popup_close_bot: designSettings.popupCloseBot,
     title_bubble: designSettings.titleBubble?.trim(),
+    open_animation_duration_ms: clampOpenAnimationDurationMs(
+      designSettings.openAnimationDurationMs,
+    ),
   };
 
   if (designSettings.themeSettings) {
@@ -254,6 +274,9 @@ export const parseDesignSettings = (rawSettings, mainColorHex, apiColorKey) => {
     bottomMarginSp: parseNumericSetting(result?.bottom_margin_sp, 10),
     popupCloseBot: !!result?.popup_close_bot,
     titleBubble: result?.title_bubble || '',
+    openAnimationDurationMs: clampOpenAnimationDurationMs(
+      parseNumericSetting(result?.open_animation_duration_ms, OPEN_ANIMATION_DURATION_MS_DEFAULT),
+    ),
     themeSettings: parseThemeFromRaw(result?.theme, mainColorHex, apiColorKey),
   };
 };

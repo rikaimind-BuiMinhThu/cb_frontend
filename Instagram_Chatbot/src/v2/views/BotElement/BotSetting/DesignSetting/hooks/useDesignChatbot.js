@@ -2,11 +2,12 @@ import { useCallback, useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import api from 'api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
-import { TAB_BASIC } from '../constants/designChatbotConstants';
+import { TAB_BASIC, OPEN_ANIMATION_DURATION_MS_DEFAULT } from '../constants/designChatbotConstants';
 import {
   applyIconsFromApiResponse,
   buildBasicInfoPayload,
   buildDesignSettingsPayload,
+  clampOpenAnimationDurationMs,
   convertImageToDataUrl,
   findMatchingPresetIndex,
   parseDesignSettings,
@@ -72,6 +73,9 @@ export const useDesignChatbot = (initialBotId) => {
   const [bottomMarginSp, setBottomMarginSp] = useState(10);
   const [popupCloseBot, setPopupCloseBot] = useState(false);
   const [titleBubble, setTitleBubble] = useState('');
+  const [openAnimationDurationMs, setOpenAnimationDurationMs] = useState(
+    OPEN_ANIMATION_DURATION_MS_DEFAULT,
+  );
   const [themeSettings, setThemeSettings] = useState(() => deriveThemeDefaults());
   const [apiColorKey, setApiColorKey] = useState(null);
 
@@ -202,6 +206,7 @@ export const useDesignChatbot = (initialBotId) => {
       setBottomMarginSp(designSettings.bottomMarginSp);
       setPopupCloseBot(designSettings.popupCloseBot);
       setTitleBubble(designSettings.titleBubble);
+      setOpenAnimationDurationMs(designSettings.openAnimationDurationMs);
       setThemeSettings(designSettings.themeSettings);
       setApiColorKey(colorKey);
 
@@ -241,6 +246,48 @@ export const useDesignChatbot = (initialBotId) => {
     return errors.title === '' && errors.subtitle === '' && errors.botName === '';
   }, [botName, subtitle, title]);
 
+  const getDesignSettingsPayload = useCallback(() => buildDesignSettingsPayload({
+    displayType,
+    widthPc,
+    heightPc,
+    widthSp,
+    heightSp,
+    positionPc,
+    buttonTypePc,
+    rightPcTitle,
+    rightMarginPc,
+    bottomMarginPc,
+    positionSp,
+    buttonTypeSp,
+    rightSpTitle,
+    rightMarginSp,
+    bottomMarginSp,
+    popupCloseBot,
+    titleBubble,
+    openAnimationDurationMs,
+    themeSettings,
+  }), [
+    bottomMarginPc,
+    bottomMarginSp,
+    buttonTypePc,
+    buttonTypeSp,
+    displayType,
+    heightPc,
+    heightSp,
+    openAnimationDurationMs,
+    popupCloseBot,
+    positionPc,
+    positionSp,
+    rightMarginPc,
+    rightMarginSp,
+    rightPcTitle,
+    rightSpTitle,
+    themeSettings,
+    titleBubble,
+    widthPc,
+    widthSp,
+  ]);
+
   const saveBasicInfo = useCallback(() => {
     if (!validateBasicInfo()) return;
 
@@ -255,15 +302,30 @@ export const useDesignChatbot = (initialBotId) => {
       closingBotIcon,
     });
 
-    api.put(`api/v1/managements/chatbots/${botId}`, payload)
-      .then(async (res) => {
-        if (res.data.code === 1 || res.data.code === '1') {
-          Cookies.set('bot_id', res.data.data.id);
+    const designPayload = getDesignSettingsPayload();
+
+    Promise.all([
+      api.put(`api/v1/managements/chatbots/${botId}`, payload),
+      api.post(`api/v1/managements/chatbots/${botId}/design_settings`, designPayload),
+    ])
+      .then(async ([basicRes, designRes]) => {
+        const basicOk = basicRes.data.code === 1 || basicRes.data.code === '1';
+        const designOk = designRes.data.code === 1 || designRes.data.code === '1';
+
+        if (basicOk && designOk) {
+          Cookies.set('bot_id', basicRes.data.data.id);
           Cookies.set('bot_type', 'bot');
-          await syncIconsFromChatbotData(res.data.data);
+          await syncIconsFromChatbotData(basicRes.data.data);
           showNotification('ボットを正常に保存されました！');
-        } else if (res.data?.code === 2 || res.data?.code === '2') {
-          showNotification(res.data.message, 0);
+          return;
+        }
+
+        if (basicRes.data?.code === 2 || basicRes.data?.code === '2') {
+          showNotification(basicRes.data.message, 0);
+          return;
+        }
+        if (designRes.data?.code === 2 || designRes.data?.code === '2') {
+          showNotification(designRes.data.message, 0);
         }
       })
       .catch((error) => {
@@ -277,6 +339,7 @@ export const useDesignChatbot = (initialBotId) => {
     botName,
     closingBotIcon,
     designType,
+    getDesignSettingsPayload,
     mainColor,
     openingBotIcon,
     showNotification,
@@ -287,26 +350,7 @@ export const useDesignChatbot = (initialBotId) => {
   ]);
 
   const saveDesignSettings = useCallback(() => {
-    const payload = buildDesignSettingsPayload({
-      displayType,
-      widthPc,
-      heightPc,
-      widthSp,
-      heightSp,
-      positionPc,
-      buttonTypePc,
-      rightPcTitle,
-      rightMarginPc,
-      bottomMarginPc,
-      positionSp,
-      buttonTypeSp,
-      rightSpTitle,
-      rightMarginSp,
-      bottomMarginSp,
-      popupCloseBot,
-      titleBubble,
-      themeSettings,
-    });
+    const payload = getDesignSettingsPayload();
 
     api.post(`api/v1/managements/chatbots/${botId}/design_settings`, payload)
       .then((res) => {
@@ -323,48 +367,12 @@ export const useDesignChatbot = (initialBotId) => {
       });
   }, [
     botId,
-    bottomMarginPc,
-    bottomMarginSp,
-    buttonTypePc,
-    buttonTypeSp,
-    displayType,
-    heightPc,
-    heightSp,
-    popupCloseBot,
-    positionPc,
-    positionSp,
-    rightMarginPc,
-    rightMarginSp,
-    rightPcTitle,
-    rightSpTitle,
+    getDesignSettingsPayload,
     showNotification,
-    titleBubble,
-    themeSettings,
-    widthPc,
-    widthSp,
   ]);
 
   const saveThemeCustomize = useCallback(() => {
-    const designPayload = buildDesignSettingsPayload({
-      displayType,
-      widthPc,
-      heightPc,
-      widthSp,
-      heightSp,
-      positionPc,
-      buttonTypePc,
-      rightPcTitle,
-      rightMarginPc,
-      bottomMarginPc,
-      positionSp,
-      buttonTypeSp,
-      rightSpTitle,
-      rightMarginSp,
-      bottomMarginSp,
-      popupCloseBot,
-      titleBubble,
-      themeSettings,
-    });
+    const designPayload = getDesignSettingsPayload();
 
     const basicPayload = buildBasicInfoPayload({
       title,
@@ -408,32 +416,15 @@ export const useDesignChatbot = (initialBotId) => {
     botId,
     botImage,
     botName,
-    bottomMarginPc,
-    bottomMarginSp,
-    buttonTypePc,
-    buttonTypeSp,
     closingBotIcon,
     designType,
-    displayType,
-    heightPc,
-    heightSp,
+    getDesignSettingsPayload,
     mainColor,
     openingBotIcon,
-    popupCloseBot,
-    positionPc,
-    positionSp,
-    rightMarginPc,
-    rightMarginSp,
-    rightPcTitle,
-    rightSpTitle,
     showNotification,
     subtitle,
     syncIconsFromChatbotData,
-    themeSettings,
     title,
-    titleBubble,
-    widthPc,
-    widthSp,
   ]);
 
   const updateThemeField = useCallback((field, value) => {
@@ -479,6 +470,9 @@ export const useDesignChatbot = (initialBotId) => {
       bottomMarginSp: setBottomMarginSp,
       popupCloseBot: setPopupCloseBot,
       titleBubble: setTitleBubble,
+      openAnimationDurationMs: (nextValue) => {
+        setOpenAnimationDurationMs(clampOpenAnimationDurationMs(nextValue));
+      },
     };
     setters[field]?.(value);
   }, []);
@@ -501,6 +495,7 @@ export const useDesignChatbot = (initialBotId) => {
         closingBotIcon,
         botName,
         mainColor,
+        openAnimationDurationMs,
       },
       designSettings: {
         displayType,
@@ -520,6 +515,7 @@ export const useDesignChatbot = (initialBotId) => {
         bottomMarginSp,
         popupCloseBot,
         titleBubble,
+        openAnimationDurationMs,
         themeSettings,
       },
     },

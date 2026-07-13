@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Button } from 'reactstrap';
-import 'assets/css/bot/preview-chat-bot.css';
+import 'v2/assets/css/bot/preview-chat-bot.css';
 import { getElementMessageById } from '../../PreviewComponent/Utils';
 import { useScenarioEditor } from '../context/ScenarioEditorContext';
 import { getBotFileExtension } from '../utils/getBotMessageTitle';

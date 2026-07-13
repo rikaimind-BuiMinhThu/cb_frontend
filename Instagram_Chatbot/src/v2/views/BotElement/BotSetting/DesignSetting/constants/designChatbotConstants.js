@@ -14,6 +14,10 @@ export const TAB_DESIGN = 2;
 
 export { TAB_THEME } from './designThemeConstants';
 
+export const OPEN_ANIMATION_DURATION_MS_DEFAULT = 1000;
+export const OPEN_ANIMATION_DURATION_MS_MIN = 0;
+export const OPEN_ANIMATION_DURATION_MS_MAX = 10000;
+
 export const MAIN_COLORS = [
   '#327AED',
   '#26B197',

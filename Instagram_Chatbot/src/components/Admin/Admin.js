@@ -1,9 +1,6 @@
-import React, { Component } from 'react';
+import React, { Component, Suspense, lazy } from 'react';
 import Login from './Login';
-import Admin from '../../layouts/Admin';
-import V2Admin from '../../v2/layouts/Admin';
-import V2Login from '../../v2/components/Admin/Login';
-import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import Index from 'views/Public/Index';
 import Plan from 'views/Public/Plan';
 import PrivacyPolicy from 'views/Public/PrivacyPolicy';
@@ -12,14 +9,13 @@ import Agreement from 'views/Public/Agreement';
 import Company from 'views/Public/Company';
 import Contact from 'views/Public/Contact';
 import ShortUrl from 'views/Public/ShortUrl';
-import PreviewClone from 'views/BotElement/BotSetting/PreviewClone';
-import PreviewFukushashiki from 'views/BotElement/BotSetting/PreviewFukushashiki';
-import PreviewFaq from 'views/BotElement/BotSetting/PreviewFaq';
-import V2PreviewFukushashiki from 'v2/views/BotElement/BotSetting/PreviewFukushashiki';
-import V2PreviewFaq from 'v2/views/BotElement/BotSetting/PreviewFaq';
-import ScenarioPreviewEditorPage from 'v2/views/BotElement/BotSetting/ScenarioSetting/preview/ScenarioPreviewEditorPage';
 import News from 'views/Public/News';
-import Instagram from 'views/Public/Instagram';
+import AdminV2 from 'v2/components/Admin/AdminV2';
+
+const Admin = lazy(() => import('../../layouts/Admin'));
+const PreviewClone = lazy(() => import('views/BotElement/BotSetting/PreviewClone'));
+const PreviewFukushashiki = lazy(() => import('views/BotElement/BotSetting/PreviewFukushashiki'));
+const PreviewFaq = lazy(() => import('views/BotElement/BotSetting/PreviewFaq'));
 
 class App extends Component {
   componentDidMount() {
@@ -43,20 +39,46 @@ class App extends Component {
             <Route exact path="/agreement" component={Agreement} />
             <Route exact path="/company" component={Company} />
             <Route exact path="/contact" component={Contact} />
-            <Route exact path="/preview-customer" component={PreviewClone} />
-            <Route exact path="/preview-customer-fukushashiki" component={PreviewFukushashiki} />
-            <Route exact path="/preview-faq" component={PreviewFaq} />
-            <Route exact path="/v2/preview-customer-fukushashiki" component={V2PreviewFukushashiki} />
-            <Route exact path="/v2/preview-faq" component={V2PreviewFaq} />
-            <Route exact path="/v2/preview-scenario-editor" component={ScenarioPreviewEditorPage} />
+            <Route
+              exact
+              path="/preview-customer"
+              render={(props) => (
+                <Suspense fallback={null}>
+                  <PreviewClone {...props} />
+                </Suspense>
+              )}
+            />
+            <Route
+              exact
+              path="/preview-customer-fukushashiki"
+              render={(props) => (
+                <Suspense fallback={null}>
+                  <PreviewFukushashiki {...props} />
+                </Suspense>
+              )}
+            />
+            <Route
+              exact
+              path="/preview-faq"
+              render={(props) => (
+                <Suspense fallback={null}>
+                  <PreviewFaq {...props} />
+                </Suspense>
+              )}
+            />
             <Route exact path="/news" component={News} />
-            {/* <Route exact path="/instagram" component={Instagram} /> */}
             <Route exact path="/" component={Login} />
             <Route path="/sign-in" component={Login} />
-            <Route path="/v2/sign-in" component={V2Login} />
-            <Route path="/admin" render={(props) => <Admin {...props} />} />
-            <Route path="/v2/admin" render={(props) => <V2Admin {...props} />} />
-            <Route component={ShortUrl}></Route>
+            <Route path="/v2" component={AdminV2} />
+            <Route
+              path="/admin"
+              render={(props) => (
+                <Suspense fallback={null}>
+                  <Admin {...props} />
+                </Suspense>
+              )}
+            />
+            <Route component={ShortUrl} />
           </Switch>
         </div>
       </BrowserRouter>

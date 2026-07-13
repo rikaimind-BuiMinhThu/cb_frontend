@@ -1,7 +1,7 @@
 // import config from "@babel/core/lib/config";
 import axios from "axios";
 import React from "react";
-import "assets/css/login.css"
+import "v2/assets/css/login.css"
 import "assets/scss/paper-dashboard.scss?v=1.3.0";
 import "assets/demo/demo.css";
 import ModalNotiFail from "views/Popup/ModalNotiFail";

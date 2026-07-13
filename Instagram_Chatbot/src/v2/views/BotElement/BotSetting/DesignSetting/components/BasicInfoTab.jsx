@@ -1,9 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Typography } from 'antd';
+import { Space, Typography } from 'antd';
 import { AdminActionButton } from '../../../../../components/AdminShell';
 import DesignBotIcons from '../DesignSettingComponents/DesignBotIcons';
-import { DEFAULT_IMAGES } from '../constants/designChatbotConstants';
+import InputNum from '../../ScenarioSetting/scenarioComon/InputNum';
+import {
+  DEFAULT_IMAGES,
+  OPEN_ANIMATION_DURATION_MS_DEFAULT,
+  OPEN_ANIMATION_DURATION_MS_MAX,
+  OPEN_ANIMATION_DURATION_MS_MIN,
+} from '../constants/designChatbotConstants';
 import DesignTypePicker from './DesignTypePicker';
 import BasicInfoStatePreview from './BasicInfoStatePreview';
 import DesignSettingLabel from './shared/DesignSettingLabel';
@@ -32,6 +38,49 @@ const BasicInfoTab = ({
     <form action="">
       <div className="add-bot-container">
         <div className="bot-left">
+          <div className="field-add-bot">
+            <div className="add-bot_field-container">
+              <DesignSettingLabel tooltip={getDesignSettingTooltip('botName')} required>
+                ボット名称
+              </DesignSettingLabel>
+              <input
+                type="text"
+                name="botName"
+                value={basicInfo.botName}
+                className="input-field"
+                placeholder="サンプルボット..."
+                onChange={(e) => {
+                  onFieldChange('botName', e.target.value);
+                  onClearError('botName');
+                }}
+              />
+            </div>
+            <span className="subtitle-field">
+              ※EC-CHAT管理用の名称です。ボット内で表示されることはありません。
+            </span>
+            <span className="error-message bot-name" style={errorStyle(validationErrors.botName)}>
+              {validationErrors.botName}
+            </span>
+          </div>
+          <div className="field-add-bot">
+            <div className="add-bot_field-container">
+              <DesignSettingLabel tooltip={getDesignSettingTooltip('openAnimationDurationMs')}>
+                起動アニメーション速度
+              </DesignSettingLabel>
+              <Space size={8} align="center" className="basic-info-animation-duration">
+                <InputNum
+                  style={{ width: 140, minWidth: 120 }}
+                  name="open_animation_duration_ms"
+                  min={OPEN_ANIMATION_DURATION_MS_MIN}
+                  max={OPEN_ANIMATION_DURATION_MS_MAX}
+                  value={basicInfo.openAnimationDurationMs}
+                  placeholder={String(OPEN_ANIMATION_DURATION_MS_DEFAULT)}
+                  onChange={(value) => onFieldChange('openAnimationDurationMs', value)}
+                />
+                <span className="design-field__suffix">ms</span>
+              </Space>
+            </div>
+          </div>
           <div className="field-add-bot">
             <div className="add-bot_field-container">
               <DesignSettingLabel tooltip={getDesignSettingTooltip('title')} required>
@@ -101,30 +150,6 @@ const BasicInfoTab = ({
               onIconClick={onIconClick}
             />
           </div>
-          <div className="field-add-bot">
-            <div className="add-bot_field-container">
-              <DesignSettingLabel tooltip={getDesignSettingTooltip('botName')} required>
-                ボット名称
-              </DesignSettingLabel>
-              <input
-                type="text"
-                name="botName"
-                value={basicInfo.botName}
-                className="input-field"
-                placeholder="サンプルボット..."
-                onChange={(e) => {
-                  onFieldChange('botName', e.target.value);
-                  onClearError('botName');
-                }}
-              />
-            </div>
-            <span className="subtitle-field">
-              ※EC-CHAT管理用の名称です。ボット内で表示されることはありません。
-            </span>
-            <span className="error-message bot-name" style={errorStyle(validationErrors.botName)}>
-              {validationErrors.botName}
-            </span>
-          </div>
           <div className="btn-wrapper admin-form-actions">
             <AdminActionButton action="save" onClick={onSave} />
           </div>
@@ -137,6 +162,7 @@ const BasicInfoTab = ({
             botImage={basicInfo.botImage}
             openingBotIcon={basicInfo.openingBotIcon}
             closingBotIcon={basicInfo.closingBotIcon}
+            openAnimationDurationMs={basicInfo.openAnimationDurationMs}
           />
         </div>
       </div>
@@ -154,6 +180,7 @@ BasicInfoTab.propTypes = {
     openingBotIcon: PropTypes.string,
     closingBotIcon: PropTypes.string,
     botName: PropTypes.string,
+    openAnimationDurationMs: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   }).isRequired,
   validationErrors: PropTypes.shape({
     title: PropTypes.string,
