@@ -44,6 +44,9 @@ function DesignChatbot() {
                       openAnimationDurationMs: (nextValue) => {
                         actions.updateDesignSettingField('openAnimationDurationMs', nextValue);
                       },
+                      openAnimationStyle: (nextValue) => {
+                        actions.updateDesignSettingField('openAnimationStyle', nextValue);
+                      },
                     };
                     setters[field]?.(value);
                   }}

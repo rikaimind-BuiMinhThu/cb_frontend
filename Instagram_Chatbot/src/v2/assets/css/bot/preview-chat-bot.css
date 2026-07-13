@@ -908,6 +908,238 @@ slideUp
     }
 }
 
+/* Fade in */
+.fadeIn {
+    animation-name: fadeIn;
+    -webkit-animation-name: fadeIn;
+    animation-duration: var(--chatbot-open-animation-duration, 1000ms);
+    -webkit-animation-duration: var(--chatbot-open-animation-duration, 1000ms);
+    animation-timing-function: ease;
+    -webkit-animation-timing-function: ease;
+}
+
+.fadeInSp {
+    animation-name: fadeInSp;
+    -webkit-animation-name: fadeInSp;
+    animation-duration: var(--chatbot-open-animation-duration, 1000ms);
+    -webkit-animation-duration: var(--chatbot-open-animation-duration, 1000ms);
+    animation-timing-function: ease;
+    -webkit-animation-timing-function: ease;
+}
+
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+@-webkit-keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+@keyframes fadeInSp {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+@-webkit-keyframes fadeInSp {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+/* Zoom in */
+.zoomIn {
+    animation-name: zoomIn;
+    -webkit-animation-name: zoomIn;
+    animation-duration: var(--chatbot-open-animation-duration, 1000ms);
+    -webkit-animation-duration: var(--chatbot-open-animation-duration, 1000ms);
+    animation-timing-function: ease;
+    -webkit-animation-timing-function: ease;
+}
+
+.zoomInSp {
+    animation-name: zoomInSp;
+    -webkit-animation-name: zoomInSp;
+    animation-duration: var(--chatbot-open-animation-duration, 1000ms);
+    -webkit-animation-duration: var(--chatbot-open-animation-duration, 1000ms);
+    animation-timing-function: ease;
+    -webkit-animation-timing-function: ease;
+}
+
+@keyframes zoomIn {
+    0% {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes zoomIn {
+    0% {
+        -webkit-transform: scale(0.9);
+        opacity: 0;
+    }
+    100% {
+        -webkit-transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes zoomInSp {
+    0% {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes zoomInSp {
+    0% {
+        -webkit-transform: scale(0.9);
+        opacity: 0;
+    }
+    100% {
+        -webkit-transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Slide from right */
+.slideFromRight {
+    animation-name: slideFromRight;
+    -webkit-animation-name: slideFromRight;
+    animation-duration: var(--chatbot-open-animation-duration, 1000ms);
+    -webkit-animation-duration: var(--chatbot-open-animation-duration, 1000ms);
+    animation-timing-function: ease;
+    -webkit-animation-timing-function: ease;
+}
+
+.slideFromRightSp {
+    animation-name: slideFromRightSp;
+    -webkit-animation-name: slideFromRightSp;
+    animation-duration: var(--chatbot-open-animation-duration, 1000ms);
+    -webkit-animation-duration: var(--chatbot-open-animation-duration, 1000ms);
+    animation-timing-function: ease;
+    -webkit-animation-timing-function: ease;
+}
+
+@keyframes slideFromRight {
+    0% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0%);
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes slideFromRight {
+    0% {
+        -webkit-transform: translateX(100%);
+        opacity: 0;
+    }
+    100% {
+        -webkit-transform: translateX(0%);
+        opacity: 1;
+    }
+}
+
+@keyframes slideFromRightSp {
+    0% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0%);
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes slideFromRightSp {
+    0% {
+        -webkit-transform: translateX(100%);
+        opacity: 0;
+    }
+    100% {
+        -webkit-transform: translateX(0%);
+        opacity: 1;
+    }
+}
+
+/* Expand from corner (bottom-right) */
+.expandFromCorner {
+    transform-origin: bottom right;
+    -webkit-transform-origin: bottom right;
+    animation-name: expandFromCorner;
+    -webkit-animation-name: expandFromCorner;
+    animation-duration: var(--chatbot-open-animation-duration, 1000ms);
+    -webkit-animation-duration: var(--chatbot-open-animation-duration, 1000ms);
+    animation-timing-function: ease;
+    -webkit-animation-timing-function: ease;
+}
+
+.expandFromCornerSp {
+    transform-origin: bottom right;
+    -webkit-transform-origin: bottom right;
+    animation-name: expandFromCornerSp;
+    -webkit-animation-name: expandFromCornerSp;
+    animation-duration: var(--chatbot-open-animation-duration, 1000ms);
+    -webkit-animation-duration: var(--chatbot-open-animation-duration, 1000ms);
+    animation-timing-function: ease;
+    -webkit-animation-timing-function: ease;
+}
+
+@keyframes expandFromCorner {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes expandFromCorner {
+    0% {
+        -webkit-transform: scale(0);
+        opacity: 0;
+    }
+    100% {
+        -webkit-transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes expandFromCornerSp {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes expandFromCornerSp {
+    0% {
+        -webkit-transform: scale(0);
+        opacity: 0;
+    }
+    100% {
+        -webkit-transform: scale(1);
+        opacity: 1;
+    }
+}
+
 @media (max-width: 981px) {
     .sp-container {
       position: fixed;

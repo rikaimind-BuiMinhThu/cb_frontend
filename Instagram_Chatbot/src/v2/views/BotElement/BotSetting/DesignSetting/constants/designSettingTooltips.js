@@ -17,6 +17,7 @@ export const DESIGN_SETTING_TOOLTIPS = {
   titleBubble: 'この項目の説明は準備中です。',
   popupCloseBot: 'この項目の説明は準備中です。',
   openAnimationDurationMs: 'チャットウィンドウが開くアニメーションの長さです。単位はミリ秒（ms）で、0〜10000の範囲で指定できます。',
+  openAnimationStyle: 'チャットウィンドウが開くときのアニメーションの種類です。スライドアップ・フェードイン・ズームイン・右からスライド・角から拡大するから選べます。',
   headerTitleTextColor: 'ヘッダー内のタイトル（メイン見出し）の文字色です。メインカラーとのコントラストに注意してください。',
   headerTitleFontSize: 'ヘッダー内のタイトルのフォントサイズです。単位は px です。',
   headerSubtitleTextColor: 'ヘッダー内のサブタイトルの文字色です。メインカラーとのコントラストに注意してください。',

@@ -37,11 +37,12 @@ import {
   DISPLAY_TYPES,
 } from "./PreviewComponent/Constants";
 import { applyPreviewThemeCss } from "v2/utils/chatbotThemeCss";
-import { COLOR_MAP, OPEN_ANIMATION_DURATION_MS_DEFAULT } from "v2/views/BotElement/BotSetting/DesignSetting/constants/designChatbotConstants";
+import { COLOR_MAP, OPEN_ANIMATION_DURATION_MS_DEFAULT, OPEN_ANIMATION_STYLE_DEFAULT } from "v2/views/BotElement/BotSetting/DesignSetting/constants/designChatbotConstants";
 import {
   clampOpenAnimationDurationMs,
   parseDesignSettings,
   resolveMainColorContext,
+  resolveOpenAnimationClassName,
 } from "v2/views/BotElement/BotSetting/DesignSetting/utils/designChatbotUtils";
 import {
   getAllUrlParams,
@@ -167,6 +168,7 @@ const previewInitialState = {
   activePopupCloseBot: true,
   titleBubble: "",
   openAnimationDurationMs: OPEN_ANIMATION_DURATION_MS_DEFAULT,
+  openAnimationStyle: OPEN_ANIMATION_STYLE_DEFAULT,
   styleModal: {},
   scenarioUserResponses: [],
   checkoutUrl: "",
@@ -323,6 +325,7 @@ const PreviewFukushashiki = () => {
           rightMarginSp: parsedDesign.rightMarginSp,
           bottomMarginSp: parsedDesign.bottomMarginSp,
           openAnimationDurationMs: parsedDesign.openAnimationDurationMs,
+          openAnimationStyle: parsedDesign.openAnimationStyle,
           themeSettings: parsedDesign.themeSettings,
         };
 
@@ -1432,7 +1435,7 @@ const PreviewFukushashiki = () => {
       <div
         ref={containerRef}
         id="sp-container1"
-        className={`sp-container1 ${isMobile() ? 'slideUpSp' : 'slideUp'}`}
+        className={`sp-container1 ${resolveOpenAnimationClassName(state.openAnimationStyle, isMobile())}`}
         style={openContainerStyle}
       >
         <ZipCodePopUp

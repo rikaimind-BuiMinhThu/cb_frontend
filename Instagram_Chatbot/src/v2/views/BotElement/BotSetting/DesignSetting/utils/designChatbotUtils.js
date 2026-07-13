@@ -6,6 +6,13 @@ import {
   OPEN_ANIMATION_DURATION_MS_DEFAULT,
   OPEN_ANIMATION_DURATION_MS_MAX,
   OPEN_ANIMATION_DURATION_MS_MIN,
+  OPEN_ANIMATION_STYLE_DEFAULT,
+  OPEN_ANIMATION_STYLE_EXPAND_FROM_CORNER,
+  OPEN_ANIMATION_STYLE_FADE_IN,
+  OPEN_ANIMATION_STYLE_SLIDE_FROM_RIGHT,
+  OPEN_ANIMATION_STYLE_SLIDE_UP,
+  OPEN_ANIMATION_STYLE_ZOOM_IN,
+  OPEN_ANIMATION_STYLES,
 } from '../constants/designChatbotConstants';
 import { buildThemePayload, parseThemeSettings as parseThemeFromRaw } from './designThemeUtils';
 
@@ -211,6 +218,36 @@ export const clampOpenAnimationDurationMs = (value) => {
   );
 };
 
+const OPEN_ANIMATION_STYLE_VALUES = new Set(OPEN_ANIMATION_STYLES.map(({ value }) => value));
+
+export const normalizeOpenAnimationStyle = (value) => {
+  if (typeof value !== 'string' || !OPEN_ANIMATION_STYLE_VALUES.has(value)) {
+    return OPEN_ANIMATION_STYLE_DEFAULT;
+  }
+  return value;
+};
+
+export const resolveOpenAnimationClassName = (style, isMobileDevice) => {
+  const normalized = normalizeOpenAnimationStyle(style);
+  switch (normalized) {
+    case OPEN_ANIMATION_STYLE_FADE_IN:
+      return isMobileDevice ? 'fadeInSp' : 'fadeIn';
+    case OPEN_ANIMATION_STYLE_ZOOM_IN:
+      return isMobileDevice ? 'zoomInSp' : 'zoomIn';
+    case OPEN_ANIMATION_STYLE_SLIDE_FROM_RIGHT:
+      return isMobileDevice ? 'slideFromRightSp' : 'slideFromRight';
+    case OPEN_ANIMATION_STYLE_EXPAND_FROM_CORNER:
+      return isMobileDevice ? 'expandFromCornerSp' : 'expandFromCorner';
+    case OPEN_ANIMATION_STYLE_SLIDE_UP:
+      return isMobileDevice ? 'slideUpSp' : 'slideUp';
+    default: {
+      const _exhaustive = normalized;
+      void _exhaustive;
+      return isMobileDevice ? 'slideUpSp' : 'slideUp';
+    }
+  }
+};
+
 export const buildDesignSettingsPayload = (designSettings) => {
   const payload = {
     display_type: designSettings.displayType,
@@ -233,6 +270,7 @@ export const buildDesignSettingsPayload = (designSettings) => {
     open_animation_duration_ms: clampOpenAnimationDurationMs(
       designSettings.openAnimationDurationMs,
     ),
+    open_animation_style: normalizeOpenAnimationStyle(designSettings.openAnimationStyle),
   };
 
   if (designSettings.themeSettings) {
@@ -277,6 +315,7 @@ export const parseDesignSettings = (rawSettings, mainColorHex, apiColorKey) => {
     openAnimationDurationMs: clampOpenAnimationDurationMs(
       parseNumericSetting(result?.open_animation_duration_ms, OPEN_ANIMATION_DURATION_MS_DEFAULT),
     ),
+    openAnimationStyle: normalizeOpenAnimationStyle(result?.open_animation_style),
     themeSettings: parseThemeFromRaw(result?.theme, mainColorHex, apiColorKey),
   };
 };

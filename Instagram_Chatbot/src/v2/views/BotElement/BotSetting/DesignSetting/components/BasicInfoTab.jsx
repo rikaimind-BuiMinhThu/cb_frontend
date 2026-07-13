@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Space, Typography } from 'antd';
+import { Select, Space, Typography } from 'antd';
 import { AdminActionButton } from '../../../../../components/AdminShell';
 import DesignBotIcons from '../DesignSettingComponents/DesignBotIcons';
 import InputNum from '../../ScenarioSetting/scenarioComon/InputNum';
@@ -9,6 +9,8 @@ import {
   OPEN_ANIMATION_DURATION_MS_DEFAULT,
   OPEN_ANIMATION_DURATION_MS_MAX,
   OPEN_ANIMATION_DURATION_MS_MIN,
+  OPEN_ANIMATION_STYLE_DEFAULT,
+  OPEN_ANIMATION_STYLES,
 } from '../constants/designChatbotConstants';
 import DesignTypePicker from './DesignTypePicker';
 import BasicInfoStatePreview from './BasicInfoStatePreview';
@@ -79,6 +81,19 @@ const BasicInfoTab = ({
                 />
                 <span className="design-field__suffix">ms</span>
               </Space>
+            </div>
+          </div>
+          <div className="field-add-bot">
+            <div className="add-bot_field-container">
+              <DesignSettingLabel tooltip={getDesignSettingTooltip('openAnimationStyle')}>
+                起動アニメーションスタイル
+              </DesignSettingLabel>
+              <Select
+                style={{ width: 220 }}
+                value={basicInfo.openAnimationStyle || OPEN_ANIMATION_STYLE_DEFAULT}
+                options={OPEN_ANIMATION_STYLES}
+                onChange={(value) => onFieldChange('openAnimationStyle', value)}
+              />
             </div>
           </div>
           <div className="field-add-bot">
@@ -163,6 +178,7 @@ const BasicInfoTab = ({
             openingBotIcon={basicInfo.openingBotIcon}
             closingBotIcon={basicInfo.closingBotIcon}
             openAnimationDurationMs={basicInfo.openAnimationDurationMs}
+            openAnimationStyle={basicInfo.openAnimationStyle}
           />
         </div>
       </div>
@@ -181,6 +197,7 @@ BasicInfoTab.propTypes = {
     closingBotIcon: PropTypes.string,
     botName: PropTypes.string,
     openAnimationDurationMs: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    openAnimationStyle: PropTypes.string,
   }).isRequired,
   validationErrors: PropTypes.shape({
     title: PropTypes.string,

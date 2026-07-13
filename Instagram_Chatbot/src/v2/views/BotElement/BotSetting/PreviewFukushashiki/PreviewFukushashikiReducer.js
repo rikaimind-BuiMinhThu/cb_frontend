@@ -31,6 +31,7 @@ import {
 import { parseThemeSettings } from '../DesignSetting/utils/designThemeUtils';
 import {
   clampOpenAnimationDurationMs,
+  normalizeOpenAnimationStyle,
   resolveMainColorContext,
 } from '../DesignSetting/utils/designChatbotUtils';
 import { getDefaultValue } from '../PreviewComponent/VariablesUtils';
@@ -448,6 +449,9 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
         bottomMarginSp: designSetting?.bottom_margin_sp,
         openAnimationDurationMs: clampOpenAnimationDurationMs(
           designSetting?.open_animation_duration_ms,
+        ),
+        openAnimationStyle: normalizeOpenAnimationStyle(
+          designSetting?.open_animation_style,
         ),
         isUsedErrMsgByJs: chatbot?.is_used_err_msg_by_js,
         errMsgJsCode: chatbot?.err_msg_js_code,

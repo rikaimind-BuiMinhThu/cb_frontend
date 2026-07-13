@@ -5,8 +5,12 @@ import { Button } from 'antd';
 import 'v2/assets/css/bot/preview-chat-bot.css';
 import {
   OPEN_ANIMATION_DURATION_MS_DEFAULT,
+  OPEN_ANIMATION_STYLE_DEFAULT,
 } from '../constants/designChatbotConstants';
-import { clampOpenAnimationDurationMs } from '../utils/designChatbotUtils';
+import {
+  clampOpenAnimationDurationMs,
+  resolveOpenAnimationClassName,
+} from '../utils/designChatbotUtils';
 
 const resolveIcon = (...candidates) => candidates.find(Boolean) || '';
 
@@ -18,17 +22,19 @@ const BasicInfoStatePreview = ({
   openingBotIcon,
   closingBotIcon,
   openAnimationDurationMs,
+  openAnimationStyle,
 }) => {
   const openIcon = resolveIcon(openingBotIcon, botImage);
   const closeIcon = resolveIcon(closingBotIcon, openingBotIcon, botImage);
   const durationMs = clampOpenAnimationDurationMs(
     openAnimationDurationMs ?? OPEN_ANIMATION_DURATION_MS_DEFAULT,
   );
+  const animationClassName = resolveOpenAnimationClassName(openAnimationStyle, false);
   const [animationKey, setAnimationKey] = useState(0);
 
   useEffect(() => {
     setAnimationKey((prev) => prev + 1);
-  }, [durationMs]);
+  }, [durationMs, animationClassName]);
 
   return (
     <div className="basic-info-state-preview">
@@ -60,7 +66,7 @@ const BasicInfoStatePreview = ({
         <div className="basic-info-state-preview__frame basic-info-state-preview__frame--open">
           <div
             key={animationKey}
-            className="basic-info-state-preview__widget sp-container slideUp"
+            className={`basic-info-state-preview__widget sp-container ${animationClassName}`}
             style={{
               backgroundColor: '#EBF7FF',
               '--chatbot-open-animation-duration': `${durationMs}ms`,
@@ -101,6 +107,7 @@ BasicInfoStatePreview.propTypes = {
   openingBotIcon: PropTypes.string,
   closingBotIcon: PropTypes.string,
   openAnimationDurationMs: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  openAnimationStyle: PropTypes.string,
 };
 
 BasicInfoStatePreview.defaultProps = {
@@ -111,6 +118,7 @@ BasicInfoStatePreview.defaultProps = {
   openingBotIcon: '',
   closingBotIcon: '',
   openAnimationDurationMs: OPEN_ANIMATION_DURATION_MS_DEFAULT,
+  openAnimationStyle: OPEN_ANIMATION_STYLE_DEFAULT,
 };
 
 export default BasicInfoStatePreview;

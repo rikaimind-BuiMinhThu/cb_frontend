@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import api from 'api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
-import { TAB_BASIC, OPEN_ANIMATION_DURATION_MS_DEFAULT } from '../constants/designChatbotConstants';
+import { TAB_BASIC, OPEN_ANIMATION_DURATION_MS_DEFAULT, OPEN_ANIMATION_STYLE_DEFAULT } from '../constants/designChatbotConstants';
 import {
   applyIconsFromApiResponse,
   buildBasicInfoPayload,
@@ -10,6 +10,7 @@ import {
   clampOpenAnimationDurationMs,
   convertImageToDataUrl,
   findMatchingPresetIndex,
+  normalizeOpenAnimationStyle,
   parseDesignSettings,
   resolveMainColorFromApi,
 } from '../utils/designChatbotUtils';
@@ -76,6 +77,7 @@ export const useDesignChatbot = (initialBotId) => {
   const [openAnimationDurationMs, setOpenAnimationDurationMs] = useState(
     OPEN_ANIMATION_DURATION_MS_DEFAULT,
   );
+  const [openAnimationStyle, setOpenAnimationStyle] = useState(OPEN_ANIMATION_STYLE_DEFAULT);
   const [themeSettings, setThemeSettings] = useState(() => deriveThemeDefaults());
   const [apiColorKey, setApiColorKey] = useState(null);
 
@@ -207,6 +209,7 @@ export const useDesignChatbot = (initialBotId) => {
       setPopupCloseBot(designSettings.popupCloseBot);
       setTitleBubble(designSettings.titleBubble);
       setOpenAnimationDurationMs(designSettings.openAnimationDurationMs);
+      setOpenAnimationStyle(designSettings.openAnimationStyle);
       setThemeSettings(designSettings.themeSettings);
       setApiColorKey(colorKey);
 
@@ -265,6 +268,7 @@ export const useDesignChatbot = (initialBotId) => {
     popupCloseBot,
     titleBubble,
     openAnimationDurationMs,
+    openAnimationStyle,
     themeSettings,
   }), [
     bottomMarginPc,
@@ -275,6 +279,7 @@ export const useDesignChatbot = (initialBotId) => {
     heightPc,
     heightSp,
     openAnimationDurationMs,
+    openAnimationStyle,
     popupCloseBot,
     positionPc,
     positionSp,
@@ -473,6 +478,9 @@ export const useDesignChatbot = (initialBotId) => {
       openAnimationDurationMs: (nextValue) => {
         setOpenAnimationDurationMs(clampOpenAnimationDurationMs(nextValue));
       },
+      openAnimationStyle: (nextValue) => {
+        setOpenAnimationStyle(normalizeOpenAnimationStyle(nextValue));
+      },
     };
     setters[field]?.(value);
   }, []);
@@ -496,6 +504,7 @@ export const useDesignChatbot = (initialBotId) => {
         botName,
         mainColor,
         openAnimationDurationMs,
+        openAnimationStyle,
       },
       designSettings: {
         displayType,
@@ -516,6 +525,7 @@ export const useDesignChatbot = (initialBotId) => {
         popupCloseBot,
         titleBubble,
         openAnimationDurationMs,
+        openAnimationStyle,
         themeSettings,
       },
     },

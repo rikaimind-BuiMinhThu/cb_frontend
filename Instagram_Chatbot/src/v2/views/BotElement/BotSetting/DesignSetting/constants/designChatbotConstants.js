@@ -18,6 +18,21 @@ export const OPEN_ANIMATION_DURATION_MS_DEFAULT = 1000;
 export const OPEN_ANIMATION_DURATION_MS_MIN = 0;
 export const OPEN_ANIMATION_DURATION_MS_MAX = 10000;
 
+export const OPEN_ANIMATION_STYLE_SLIDE_UP = 'slide_up';
+export const OPEN_ANIMATION_STYLE_FADE_IN = 'fade_in';
+export const OPEN_ANIMATION_STYLE_ZOOM_IN = 'zoom_in';
+export const OPEN_ANIMATION_STYLE_SLIDE_FROM_RIGHT = 'slide_from_right';
+export const OPEN_ANIMATION_STYLE_EXPAND_FROM_CORNER = 'expand_from_corner';
+export const OPEN_ANIMATION_STYLE_DEFAULT = OPEN_ANIMATION_STYLE_SLIDE_UP;
+
+export const OPEN_ANIMATION_STYLES = [
+  { value: OPEN_ANIMATION_STYLE_SLIDE_UP, label: 'スライドアップ' },
+  { value: OPEN_ANIMATION_STYLE_FADE_IN, label: 'フェードイン' },
+  { value: OPEN_ANIMATION_STYLE_ZOOM_IN, label: 'ズームイン' },
+  { value: OPEN_ANIMATION_STYLE_SLIDE_FROM_RIGHT, label: '右からスライド' },
+  { value: OPEN_ANIMATION_STYLE_EXPAND_FROM_CORNER, label: '角から拡大する' },
+];
+
 export const MAIN_COLORS = [
   '#327AED',
   '#26B197',
