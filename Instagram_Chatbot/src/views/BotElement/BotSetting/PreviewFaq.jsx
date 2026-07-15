@@ -45,6 +45,7 @@ import {
   sendAppearLogToServer,
   isUserMessage,
   toNumber,
+  sendContactFormRequest,
 } from "./PreviewComponent/Utils";
 import {
   getChatbotSavedState,
@@ -634,6 +635,42 @@ const PreviewFaq = () => {
     });
   }
 
+  const advanceAfterClickNext = (clickedMsgIndex, clickedMsg, data) => {
+    const isBtnUpdateClick = clickedMsgIndex < state.renderMessagesList.length - 1;
+
+    sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
+
+    if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
+      executeLpJsCode(clickedMsg.jscode, state);
+    }
+
+    dispatch({
+      type: PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON,
+      payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn }
+    });
+  };
+
+  const sendContactFormIfNeeded = (clickedMsg) => {
+    const contactFormContent = (clickedMsg.message_content || []).find(
+      (content) => content.type === MESSAGE_CONTENT_TYPES.CONTACT_FORM
+    );
+    if (!contactFormContent) return Promise.resolve();
+
+    const contactForm = contactFormContent.contact_form || {};
+    return sendContactFormRequest({
+      chatbot_id: state.botId,
+      scenario_id: state.scenarioId,
+      form_template: contactForm.form_template,
+      fields: contactForm.fields || {},
+      email_settings: contactForm.email_settings || {},
+    }).then((res) => {
+      if (res?.data?.code !== 1) {
+        return Promise.reject(new Error(res?.data?.message || "Contact form send failed"));
+      }
+      return res;
+    });
+  };
+
   const onClickNext = (clickedMsgIndex, clickedMsg) => {
     const isUpdate = clickedMsgIndex < state.renderMessagesList.length - 1;
 
@@ -663,18 +700,29 @@ const PreviewFaq = () => {
       return sendErrorLogToServer(data);
     }
 
-    const isBtnUpdateClick = clickedMsgIndex < state.renderMessagesList.length - 1;
+    const hasContactForm = (clickedMsg.message_content || []).some(
+      (content) => content.type === MESSAGE_CONTENT_TYPES.CONTACT_FORM
+    );
 
-    sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
-
-    if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
-      executeLpJsCode(clickedMsg.jscode, state);
+    if (!hasContactForm) {
+      return advanceAfterClickNext(clickedMsgIndex, clickedMsg, data);
     }
 
-    dispatch({
-      type: PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON,
-      payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn}
-    });
+    dispatch({ type: PREVIEW_ACTIONS.SET_PROCESSING, payload: true });
+    sendContactFormIfNeeded(clickedMsg)
+      .then(() => {
+        advanceAfterClickNext(clickedMsgIndex, clickedMsg, data);
+      })
+      .catch((error) => {
+        console.log(error);
+        dispatch({
+          type: PREVIEW_ACTIONS.SET_SUBMIT_ERROR_MESSAGE,
+          payload: "お問い合わせの送信に失敗しました。もう一度お試しください。"
+        });
+      })
+      .finally(() => {
+        dispatch({ type: PREVIEW_ACTIONS.SET_PROCESSING, payload: false });
+      });
   };
 
   const onChangeValue = (
@@ -752,6 +800,7 @@ const PreviewFaq = () => {
 
     if (!message || message.belong_to !== "user") return null;
     if (message.message_content[0]?.type === "button_submit") return null;
+    if (message.message_content[0]?.type === MESSAGE_CONTENT_TYPES.CONTACT_FORM) return null;
 
     let btnText = message.buttonName;
     if (!btnText) {

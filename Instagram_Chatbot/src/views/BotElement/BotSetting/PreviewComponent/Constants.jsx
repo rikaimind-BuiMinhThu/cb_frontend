@@ -5,6 +5,7 @@ import jcb from "../../../../assets/img/payment-method/jcb.png";
 import master_card from "../../../../assets/img/payment-method/master_card.png";
 import visa from "../../../../assets/img/payment-method/visa.png";
 import { secondToDatetime } from "./Utils";
+import { createDefaultDomainSuggestion } from "./emailDomainDefaults";
 
 let dataHourFixed = [];
 for (let i = 0; i <= 23; i++) {
@@ -94,6 +95,7 @@ const CHATBOT_SERVER = {
   GET_SCENARIO_PREVIEW_DATA_PATH: '/api/v1/managements/chatbots/:bot_id/scenarios/:scenario_id/preview',
   GET_CHATBOT_SETTING_PATH: '/api/v1/managements/chatbots/:bot_id',
   SEND_EMAIL_PATH: '/api/v1/managements/emails/:email_id/send_email',
+  SEND_CONTACT_FORM_PATH: '/api/v1/managements/contact_forms/send',
   CONVERT_TEXT_JAPANESE_PATH: '/api/v1/jp_convert',
   WITHDRAWAL_RESPONSE: '/api/v1/chatbot_settings/withdrawal_preventions/:bot_id',
   SEND_SCENARIO_USER_RESPONSE: '/api/v1/scenario_users/scenario_user_responses',
@@ -185,6 +187,41 @@ const MESSAGE_CONTENT_TYPES = {
   CARD_PAYMENT_RADIO_BUTTON: 'card_payment_radio_button',
   SUBMIT_BUTTON: 'button_submit',
   LABEL_NO_TRANSITION: 'label_no_transition',
+  CONTACT_FORM: 'contact_form',
+};
+
+const CONTACT_FORM_TEMPLATES = {
+  BASIC: 'basic',
+  DETAILED: 'detailed',
+  PRODUCT: 'product',
+};
+
+const CONTACT_FORM_TEMPLATE_LABELS = {
+  basic: '基本（名前・メール・お問い合わせ内容）',
+  detailed: '詳細（名前・メール・電話・種別・お問い合わせ内容）',
+  product: '商品関連（名前・メール・注文番号・商品名・お問い合わせ内容）',
+};
+
+const DEFAULT_CONTACT_FORM_CONFIG = {
+  form_template: 'basic',
+  submit_button_name: '送信する',
+  inquiry_type_options: ['商品について', '配送について', 'その他'],
+  email_settings: {
+    send_to_user: true,
+    send_to_staff: true,
+    user_email_id: null,
+    staff_email_id: null,
+  },
+  domain_suggestion: createDefaultDomainSuggestion(),
+  fields: {
+    name: '',
+    email: '',
+    phone: '',
+    inquiry_type: '',
+    order_number: '',
+    product_name: '',
+    content: '',
+  },
 };
 
 const LABELS = {
@@ -285,6 +322,9 @@ export {
   CRAWL_ELEMENT_TYPES,
   SEARCH_MODES,
   MESSAGE_CONTENT_TYPES,
+  CONTACT_FORM_TEMPLATES,
+  CONTACT_FORM_TEMPLATE_LABELS,
+  DEFAULT_CONTACT_FORM_CONFIG,
   NO_ERROR,
   GETTING_ERROR_NOTIFICATION,
   REGEXP,
