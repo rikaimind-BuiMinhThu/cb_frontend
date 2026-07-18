@@ -52,6 +52,10 @@ import SubmitButtonConfig from './SubmitButtonConfig';
 import {CART_SYSTEM} from '../PreviewComponent/Constants';
 import ZipCodeAddressSetting from './Settings/ZipCodeAddressSetting';
 import { renderFukushashikiSetting } from './ScenarioUtils';
+import EmailDomainSuggestionSetting from './scenarioComon/EmailDomainSuggestionSetting';
+import {
+  createDefaultDomainSuggestion,
+} from '../PreviewComponent/emailDomainDefaults';
 
 const { Option } = Select;
 const _ = require('lodash');
@@ -2443,6 +2447,71 @@ const Scenario = () => {
     dataMessages[indexMessage].message_content[indexContent][contentType][pullDownType][name] = newArrRadio;
     setDataMessages([...dataMessages]);
   }
+
+  const ensureEmailDomainSuggestion = (indexMessage, indexContent, emailType) => {
+    const textInput = dataMessages[indexMessage].message_content[indexContent].text_input;
+    if (!textInput[emailType] || typeof textInput[emailType] !== 'object') {
+      textInput[emailType] = {};
+    }
+    if (!textInput[emailType].domain_suggestion) {
+      textInput[emailType].domain_suggestion = createDefaultDomainSuggestion();
+    }
+  };
+
+  const handleChangeTextInputType = (indexMessage, indexContent, contentType, value) => {
+    onChangeValueMessageContent(indexMessage, indexContent, contentType, value, 'type');
+    if (value === 'email_address' || value === 'email_confirmation') {
+      ensureEmailDomainSuggestion(indexMessage, indexContent, value);
+      setDataMessages([...dataMessages]);
+    }
+  };
+
+  const handleAddEmailDomain = (indexMessage, indexContent, emailType) => {
+    ensureEmailDomainSuggestion(indexMessage, indexContent, emailType);
+    const domains = dataMessages[indexMessage].message_content[indexContent].text_input[emailType].domain_suggestion.domains;
+    const idMax = domains.length > 0 ? Math.max(...domains.map((item) => item.id)) + 1 : 1;
+    domains.push({ id: idMax, domain: '' });
+    setDataMessages([...dataMessages]);
+  };
+
+  const handleRemoveEmailDomain = (indexMessage, indexContent, emailType, indexDomain) => {
+    const domains = dataMessages[indexMessage].message_content[indexContent].text_input[emailType].domain_suggestion.domains;
+    dataMessages[indexMessage].message_content[indexContent].text_input[emailType].domain_suggestion.domains = domains.filter((_, index) => index !== indexDomain);
+    setDataMessages([...dataMessages]);
+  };
+
+  const handleResetEmailDomains = (indexMessage, indexContent, emailType) => {
+    ensureEmailDomainSuggestion(indexMessage, indexContent, emailType);
+    dataMessages[indexMessage].message_content[indexContent].text_input[emailType].domain_suggestion.domains = createDefaultDomainSuggestion().domains;
+    setDataMessages([...dataMessages]);
+  };
+
+  const handleChangeEmailDomainSuggestion = (indexMessage, indexContent, emailType, field, value) => {
+    ensureEmailDomainSuggestion(indexMessage, indexContent, emailType);
+    dataMessages[indexMessage].message_content[indexContent].text_input[emailType].domain_suggestion[field] = value;
+    setDataMessages([...dataMessages]);
+  };
+
+  const handleChangeEmailDomainValue = (indexMessage, indexContent, emailType, indexDomain, value) => {
+    ensureEmailDomainSuggestion(indexMessage, indexContent, emailType);
+    dataMessages[indexMessage].message_content[indexContent].text_input[emailType].domain_suggestion.domains[indexDomain].domain = value;
+    setDataMessages([...dataMessages]);
+  };
+
+  const renderEmailDomainSuggestionSetting = (indexMessage, indexContent, emailType) => {
+    const domainSuggestion = dataMessages[indexMessage]?.message_content[indexContent]?.text_input?.[emailType]?.domain_suggestion;
+    return (
+      <EmailDomainSuggestionSetting
+        domainSuggestion={domainSuggestion}
+        onToggleEnabled={(value) => handleChangeEmailDomainSuggestion(indexMessage, indexContent, emailType, 'enabled', value)}
+        onChangeMode={(value) => handleChangeEmailDomainSuggestion(indexMessage, indexContent, emailType, 'mode', value)}
+        onChangeDomain={(indexDomain, value) => handleChangeEmailDomainValue(indexMessage, indexContent, emailType, indexDomain, value)}
+        onAddDomain={() => handleAddEmailDomain(indexMessage, indexContent, emailType)}
+        onRemoveDomain={(indexDomain) => handleRemoveEmailDomain(indexMessage, indexContent, emailType, indexDomain)}
+        onResetDomains={() => handleResetEmailDomains(indexMessage, indexContent, emailType)}
+      />
+    );
+  };
 
   const handleRemoveItemProductPullDown = (indexMessage, indexContent, contentType, name, indexPullDown) => {
     const newArrRadio = dataMessages[indexMessage].message_content[indexContent][contentType].products.filter((item, index) => index !== indexPullDown);
@@ -6789,7 +6858,7 @@ const Scenario = () => {
                                                             style={{ width: '49%' }}
                                                             value={textInput.type}
                                                             data={type}
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'type')}
+                                                            onChange={value => handleChangeTextInputType(indexMessageSelect, indexContent, content.type, value)}
                                                             keyValue="key"
                                                           />
                                                         </div>
@@ -7131,6 +7200,7 @@ const Scenario = () => {
                                                               value={textInput[textInput.type].placeholder}
                                                             />
                                                           </div>
+                                                          {renderEmailDomainSuggestionSetting(indexMessageSelect, indexContent, 'email_address')}
                                                           {isUseFukushashiki && (
                                                             <div className='ss-user-setting__item-bottom' style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                               <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
@@ -7261,6 +7331,7 @@ const Scenario = () => {
                                                               </div>
                                                             </div>
                                                           )}
+                                                          {renderEmailDomainSuggestionSetting(indexMessageSelect, indexContent, 'email_confirmation')}
                                                         </React.Fragment>
                                                       }
                                                       {/* text_input: type = phone_number */}

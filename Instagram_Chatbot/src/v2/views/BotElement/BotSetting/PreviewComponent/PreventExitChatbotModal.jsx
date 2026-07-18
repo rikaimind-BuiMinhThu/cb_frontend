@@ -35,6 +35,15 @@ const PreventExitChatbotModal = ({ isOpen, onClose, onCloseBot, botConfig }) => 
 
   const renderImagePopup = () => {
     if (preventionStatus !== "image_popup") return null;
+    if (!preventionLinkUrl) {
+      return (
+        <img
+          src={preventionImageUrl}
+          style={{ width: "100%", height: "auto" }}
+          alt="prevention"
+        />
+      );
+    }
     return (
       <a
         href={preventionLinkUrl || ""}

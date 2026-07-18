@@ -174,10 +174,25 @@ let dataClone = {
               isSplitInput: false
             },
             url: '', //string
-            email_address: '', //string
+            email_address: {
+              placeholder: '', //string
+              value: '',
+              domain_suggestion: {
+                enabled: true, //boolean
+                mode: 'suggest', // suggest | restrict
+                domains: [{ id: 1, domain: 'gmail.com' }],
+              },
+            },
             email_confirmation: {
               cfEmlAdd_email: '', //string
               cfEmlAdd_confirm_email: '', //string
+              value: '',
+              valueConfirm: '',
+              domain_suggestion: {
+                enabled: true, //boolean
+                mode: 'suggest', // suggest | restrict
+                domains: [{ id: 1, domain: 'gmail.com' }],
+              },
             },
             phone_number: {
               withHyphen: false,
@@ -799,10 +814,25 @@ let dataClone2 = {
               comment: '', //string
             },
             url: '', //string
-            email_address: '', //string
+            email_address: {
+              placeholder: '', //string
+              value: '',
+              domain_suggestion: {
+                enabled: true, //boolean
+                mode: 'suggest', // suggest | restrict
+                domains: [{ id: 1, domain: 'gmail.com' }],
+              },
+            },
             email_confirmation: {
               cfEmlAdd_email: '', //string
               cfEmlAdd_confirm_email: '', //string
+              value: '',
+              valueConfirm: '',
+              domain_suggestion: {
+                enabled: true, //boolean
+                mode: 'suggest', // suggest | restrict
+                domains: [{ id: 1, domain: 'gmail.com' }],
+              },
             },
             phone_number: {
               withHyphen: true,
@@ -1094,10 +1124,25 @@ let dataClone2 = {
               comment: '', //string
             },
             url: '', //string
-            email_address: '', //string
+            email_address: {
+              placeholder: '', //string
+              value: '',
+              domain_suggestion: {
+                enabled: true, //boolean
+                mode: 'suggest', // suggest | restrict
+                domains: [{ id: 1, domain: 'gmail.com' }],
+              },
+            },
             email_confirmation: {
               cfEmlAdd_email: '', //string
               cfEmlAdd_confirm_email: '', //string
+              value: '',
+              valueConfirm: '',
+              domain_suggestion: {
+                enabled: true, //boolean
+                mode: 'suggest', // suggest | restrict
+                domains: [{ id: 1, domain: 'gmail.com' }],
+              },
             },
             phone_number: {
               withHyphen: true,

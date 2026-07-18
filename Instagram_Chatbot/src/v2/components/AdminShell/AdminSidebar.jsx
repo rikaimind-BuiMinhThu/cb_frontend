@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Layout, Menu } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import logo from '../Sidebar/logoEC.jpg';
+import logo from '../Sidebar/ecchatbot-logo.png';
 import {
   filterMenuByRole,
   getBotMenuItems,

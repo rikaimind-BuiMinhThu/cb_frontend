@@ -6,6 +6,22 @@ import {
   addErrorMessage,
   stringNullOrEmpty
 } from "../ValidationUtils";
+import {
+  EMAIL_DOMAIN_SUGGESTION_MODES,
+  isEmailDomainAllowed,
+} from "../../PreviewComponent/emailDomainDefaults";
+
+const validateEmailDomainRestriction = (value, domainSuggestion, key, errorsMess) => {
+  if (
+    domainSuggestion?.enabled &&
+    domainSuggestion?.mode === EMAIL_DOMAIN_SUGGESTION_MODES.RESTRICT &&
+    !stringNullOrEmpty(value) &&
+    !isEmailDomainAllowed(value, domainSuggestion)
+  ) {
+    return addErrorMessage(errorsMess, key, ERROR_MESSAGES.EMAIL_DOMAIN_RESTRICT);
+  }
+  return true;
+};
 
 const validateTextInput = (contentType, messageContents, i, index, errorsMess) => {
   const key = `message${index}_content${i}_${messageContents[i].type}_${contentType.type}`;
@@ -155,6 +171,17 @@ const validateEmailType = (contentType, key, errorsMess, limitFrom, limitTo) => 
     return addErrorMessage(errorsMess, key, ERROR_MESSAGES.EMAIL_INVALID);
   }
 
+  if (
+    !validateEmailDomainRestriction(
+      value,
+      data?.domain_suggestion,
+      key,
+      errorsMess
+    )
+  ) {
+    return false;
+  }
+
   return true;
 };
 
@@ -233,6 +260,26 @@ const validateConfirmationType = (contentType, key, errorsMess, limitFrom, limit
     }
     if (!stringNullOrEmpty(valueConfirm) && !REGEX_PATTERNS.EMAIL.test(valueConfirm)) {
       return addErrorMessage(errorsMess, key, ERROR_MESSAGES.EMAIL_INVALID);
+    }
+    if (
+      !validateEmailDomainRestriction(
+        value,
+        data?.domain_suggestion,
+        key,
+        errorsMess
+      )
+    ) {
+      return false;
+    }
+    if (
+      !validateEmailDomainRestriction(
+        valueConfirm,
+        data?.domain_suggestion,
+        key,
+        errorsMess
+      )
+    ) {
+      return false;
     }
     if (!stringNullOrEmpty(value) && !stringNullOrEmpty(valueConfirm) && value !== valueConfirm) {
       return addErrorMessage(errorsMess, key, ERROR_MESSAGES.EMAIL_MISMATCH);

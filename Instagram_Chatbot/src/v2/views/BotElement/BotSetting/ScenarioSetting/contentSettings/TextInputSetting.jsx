@@ -36,7 +36,7 @@ const TextInputSetting = (props) => {
     setIsOpenAddVariable,
   } = props;
 
-  const { changeContent } = buildTextInputSettingContext(props);
+  const { changeContent, handleChangeTextInputType } = buildTextInputSettingContext(props);
 
   const renderTitleInput = () => {
     if (textInput?.title_require !== true) return null;
@@ -73,7 +73,7 @@ const TextInputSetting = (props) => {
         typeValue={textInput.type}
         typeOptions={textInputTypeOptions}
         onTitleRequireChange={changeContent('title_require')}
-        onTypeChange={changeContent('type')}
+        onTypeChange={handleChangeTextInputType}
       />
       {renderTitleInput()}
       {renderTypeContent()}

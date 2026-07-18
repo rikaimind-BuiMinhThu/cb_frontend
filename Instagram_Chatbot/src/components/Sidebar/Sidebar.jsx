@@ -3,7 +3,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { Nav, NavbarToggler } from 'reactstrap';
 // javascript plugin used to create scrollbars on windows
 import PerfectScrollbar from 'perfect-scrollbar';
-import logo from './logoEC.jpg';
+import logo from './ecchatbot-logo.png';
 import Cookies from 'js-cookie';
 import { MDBIcon } from 'mdbreact';
 
