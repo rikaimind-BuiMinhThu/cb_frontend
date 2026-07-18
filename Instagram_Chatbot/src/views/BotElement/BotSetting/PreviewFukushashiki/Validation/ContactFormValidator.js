@@ -4,7 +4,10 @@ import {
   addErrorMessage,
   stringNullOrEmpty
 } from "../ValidationUtils";
-import { CONTACT_FORM_TEMPLATES } from "../../PreviewComponent/Constants";
+import {
+  CONTACT_FORM_FIELD_KEYS,
+  getContactFormFieldSettings,
+} from "../../PreviewComponent/Constants";
 import {
   EMAIL_DOMAIN_SUGGESTION_MODES,
   isEmailDomainAllowed,
@@ -13,49 +16,36 @@ import {
 const validateContactForm = (contentType, messageContents, i, index, errorsMess) => {
   const key = `message${index}_content${i}_${messageContents[i].type}`;
   const fields = contentType?.fields || {};
-  const template = contentType?.form_template || CONTACT_FORM_TEMPLATES.BASIC;
+  const fieldSettings = getContactFormFieldSettings(contentType);
   let isValid = true;
 
-  if (stringNullOrEmpty(fields.name)) {
-    isValid = addErrorMessage(errorsMess, `${key}_name`, ERROR_MESSAGES.REQUIRED);
-  }
+  CONTACT_FORM_FIELD_KEYS.forEach((fieldName) => {
+    const setting = fieldSettings[fieldName];
+    if (!setting?.visible) return;
 
-  if (stringNullOrEmpty(fields.email)) {
-    isValid = addErrorMessage(errorsMess, `${key}_email`, ERROR_MESSAGES.REQUIRED);
-  } else if (!REGEX_PATTERNS.EMAIL.test(fields.email)) {
-    isValid = addErrorMessage(errorsMess, `${key}_email`, ERROR_MESSAGES.EMAIL_INVALID);
-  } else {
+    const value = fields[fieldName];
+
+    if (setting.required && stringNullOrEmpty(value)) {
+      isValid = addErrorMessage(errorsMess, `${key}_${fieldName}`, ERROR_MESSAGES.REQUIRED);
+      return;
+    }
+
+    if (fieldName !== "email" || stringNullOrEmpty(value)) return;
+
+    if (!REGEX_PATTERNS.EMAIL.test(value)) {
+      isValid = addErrorMessage(errorsMess, `${key}_email`, ERROR_MESSAGES.EMAIL_INVALID);
+      return;
+    }
+
     const domainSuggestion = contentType?.domain_suggestion;
     if (
       domainSuggestion?.enabled &&
       domainSuggestion?.mode === EMAIL_DOMAIN_SUGGESTION_MODES.RESTRICT &&
-      !isEmailDomainAllowed(fields.email, domainSuggestion)
+      !isEmailDomainAllowed(value, domainSuggestion)
     ) {
       isValid = addErrorMessage(errorsMess, `${key}_email`, ERROR_MESSAGES.EMAIL_DOMAIN_RESTRICT);
     }
-  }
-
-  if (stringNullOrEmpty(fields.content)) {
-    isValid = addErrorMessage(errorsMess, `${key}_content`, ERROR_MESSAGES.REQUIRED);
-  }
-
-  if (template === CONTACT_FORM_TEMPLATES.DETAILED) {
-    if (stringNullOrEmpty(fields.phone)) {
-      isValid = addErrorMessage(errorsMess, `${key}_phone`, ERROR_MESSAGES.REQUIRED);
-    }
-    if (stringNullOrEmpty(fields.inquiry_type)) {
-      isValid = addErrorMessage(errorsMess, `${key}_inquiry_type`, ERROR_MESSAGES.REQUIRED);
-    }
-  }
-
-  if (template === CONTACT_FORM_TEMPLATES.PRODUCT) {
-    if (stringNullOrEmpty(fields.order_number)) {
-      isValid = addErrorMessage(errorsMess, `${key}_order_number`, ERROR_MESSAGES.REQUIRED);
-    }
-    if (stringNullOrEmpty(fields.product_name)) {
-      isValid = addErrorMessage(errorsMess, `${key}_product_name`, ERROR_MESSAGES.REQUIRED);
-    }
-  }
+  });
 
   const emailSettings = contentType?.email_settings || {};
   if (!emailSettings.send_to_user && !emailSettings.send_to_staff) {

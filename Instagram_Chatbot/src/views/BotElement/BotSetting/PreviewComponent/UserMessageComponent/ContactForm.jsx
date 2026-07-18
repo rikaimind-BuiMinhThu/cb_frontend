@@ -2,19 +2,11 @@ import React from "react";
 import "assets/css/bot/preview-chat-bot.css";
 import {
   MESSAGE_CONTENT_TYPES,
-  CONTACT_FORM_TEMPLATES,
+  CONTACT_FORM_FIELD_KEYS,
+  CONTACT_FORM_FIELD_LABELS,
+  getContactFormFieldSettings,
 } from "views/BotElement/BotSetting/PreviewComponent/Constants";
 import EmailInput from "./TextInputComponent/EmailInput";
-
-const FIELD_LABELS = {
-  name: "お名前",
-  email: "メールアドレス",
-  phone: "電話番号",
-  inquiry_type: "お問い合わせ種別",
-  order_number: "注文番号",
-  product_name: "商品名",
-  content: "お問い合わせ内容",
-};
 
 export default function ContactForm({
   content,
@@ -31,7 +23,7 @@ export default function ContactForm({
 
   const contactForm = content.contact_form || {};
   const fields = contactForm.fields || {};
-  const template = contactForm.form_template || CONTACT_FORM_TEMPLATES.BASIC;
+  const fieldSettings = getContactFormFieldSettings(contactForm);
   const inquiryTypeOptions = contactForm.inquiry_type_options || [];
   const submitButtonName = contactForm.submit_button_name || "送信する";
 
@@ -48,13 +40,20 @@ export default function ContactForm({
     onChangeValue(contentIndex, content.type, value, "fields", fieldName);
   };
 
+  const renderRequiredBadge = (fieldName) => {
+    if (!fieldSettings[fieldName]?.required) return null;
+    return (
+      <span className="ss-message__content--user-text-input-required">※必須</span>
+    );
+  };
+
   const renderTextInput = (fieldName, type = "text") => (
     <div className="m-b-10" key={fieldName}>
       <div className="ss-message__content--user-text-input-top m-b-0">
         <span className="ss-message__content--user-text-input-title">
-          {FIELD_LABELS[fieldName]}
+          {CONTACT_FORM_FIELD_LABELS[fieldName]}
         </span>
-        <span className="ss-message__content--user-text-input-required">※必須</span>
+        {renderRequiredBadge(fieldName)}
       </div>
       <input
         type={type}
@@ -62,7 +61,7 @@ export default function ContactForm({
         className="ss-message__content--user-text-input ss-input-value"
         value={fields[fieldName] || ""}
         onChange={(e) => onChangeField(fieldName, e.target.value)}
-        placeholder={FIELD_LABELS[fieldName]}
+        placeholder={CONTACT_FORM_FIELD_LABELS[fieldName]}
       />
       {renderFieldError(fieldName)}
     </div>
@@ -72,14 +71,14 @@ export default function ContactForm({
     <div className="m-b-10" key="email">
       <div className="ss-message__content--user-text-input-top m-b-0">
         <span className="ss-message__content--user-text-input-title">
-          {FIELD_LABELS.email}
+          {CONTACT_FORM_FIELD_LABELS.email}
         </span>
-        <span className="ss-message__content--user-text-input-required">※必須</span>
+        {renderRequiredBadge("email")}
       </div>
       <EmailInput
         disabled={disabled}
         className="m-b-0"
-        placeholder={FIELD_LABELS.email}
+        placeholder={CONTACT_FORM_FIELD_LABELS.email}
         domainSuggestion={contactForm.domain_suggestion}
         value={fields.email || ""}
         onChange={(value) => onChangeField("email", value)}
@@ -92,9 +91,9 @@ export default function ContactForm({
     <div className="m-b-10" key="content">
       <div className="ss-message__content--user-textarea-top m-b-0">
         <span className="ss-message__content--user-textarea-title">
-          {FIELD_LABELS.content}
+          {CONTACT_FORM_FIELD_LABELS.content}
         </span>
-        <span className="ss-message__content--user-text-input-required">※必須</span>
+        {renderRequiredBadge("content")}
       </div>
       <textarea
         disabled={disabled}
@@ -102,7 +101,7 @@ export default function ContactForm({
         rows={4}
         value={fields.content || ""}
         onChange={(e) => onChangeField("content", e.target.value)}
-        placeholder={FIELD_LABELS.content}
+        placeholder={CONTACT_FORM_FIELD_LABELS.content}
       />
       {renderFieldError("content")}
     </div>
@@ -112,9 +111,9 @@ export default function ContactForm({
     <div className="m-b-10" key="inquiry_type">
       <div className="ss-message__content--user-radio_button-top m-b-0">
         <span className="ss-message__content--user-radio_button-title">
-          {FIELD_LABELS.inquiry_type}
+          {CONTACT_FORM_FIELD_LABELS.inquiry_type}
         </span>
-        <span className="ss-message__content--user-text-input-required">※必須</span>
+        {renderRequiredBadge("inquiry_type")}
       </div>
       {inquiryTypeOptions.map((option, index) => (
         <div key={`${option}_${index}`} className="ss-message__content--user-radio_button">
@@ -135,29 +134,32 @@ export default function ContactForm({
     </div>
   );
 
-  const renderFields = () => {
-    const common = [renderTextInput("name"), renderEmailInput()];
-
-    if (template === CONTACT_FORM_TEMPLATES.DETAILED) {
-      return [
-        ...common,
-        renderTextInput("phone", "tel"),
-        renderInquiryType(),
-        renderTextArea(),
-      ];
+  const renderField = (fieldName) => {
+    switch (fieldName) {
+      case "name":
+        return renderTextInput("name");
+      case "email":
+        return renderEmailInput();
+      case "phone":
+        return renderTextInput("phone", "tel");
+      case "inquiry_type":
+        return renderInquiryType();
+      case "order_number":
+        return renderTextInput("order_number");
+      case "product_name":
+        return renderTextInput("product_name");
+      case "content":
+        return renderTextArea();
+      default: {
+        return null;
+      }
     }
-
-    if (template === CONTACT_FORM_TEMPLATES.PRODUCT) {
-      return [
-        ...common,
-        renderTextInput("order_number"),
-        renderTextInput("product_name"),
-        renderTextArea(),
-      ];
-    }
-
-    return [...common, renderTextArea()];
   };
+
+  const renderFields = () =>
+    CONTACT_FORM_FIELD_KEYS.filter(
+      (fieldName) => fieldSettings[fieldName]?.visible
+    ).map((fieldName) => renderField(fieldName));
 
   const onSubmit = () => {
     onClickNext(messageIndex, message);

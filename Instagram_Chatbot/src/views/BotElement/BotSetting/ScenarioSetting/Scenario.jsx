@@ -44,7 +44,7 @@ import locale from 'antd/es/date-picker/locale/ja_JP';
 import 'moment/locale/zh-cn';
 import ShopifyReferenceSelect from "./ShopifyReferenceSelect";
 import { Tooltip } from '@mui/material';
-import { MESSAGE_CONTENT_TYPES, TIMER_TYPES, TIMER_VARIABLES, TIMER_VARIABLES_DESCRIPTION, BOT_MESSAGE_TYPES, RANGE_TEXT_VALIDATE, LABELS, GENDER_DISPLAY_TYPES, DEFAULT_CONTACT_FORM_CONFIG, CONTACT_FORM_TEMPLATE_LABELS } from '../PreviewComponent/Constants';
+import { MESSAGE_CONTENT_TYPES, TIMER_TYPES, TIMER_VARIABLES, TIMER_VARIABLES_DESCRIPTION, BOT_MESSAGE_TYPES, RANGE_TEXT_VALIDATE, LABELS, GENDER_DISPLAY_TYPES, DEFAULT_CONTACT_FORM_CONFIG, CONTACT_FORM_TEMPLATE_LABELS, CONTACT_FORM_FIELD_KEYS, CONTACT_FORM_FIELD_LABELS, getContactFormFieldSettings, getContactFormTemplateFieldSettings } from '../PreviewComponent/Constants';
 import HtmlCodeConfig from './scenarioComon/HtmlCodeConfig';
 import OptionGenderConfig from './OptionGenderConfig';
 import SubmitButtonLoadingConfig from './SubmitButtonLoadingConfig';
@@ -2528,6 +2528,89 @@ const Scenario = () => {
     if (!contactForm.domain_suggestion) {
       contactForm.domain_suggestion = createDefaultDomainSuggestion();
     }
+  };
+
+  const contactFormFieldRowStyle = {
+    width: '90%',
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'nowrap',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    gap: '8px',
+  };
+
+  const contactFormFieldLabelStyle = {
+    flex: '0 0 140px',
+    width: '140px',
+    textAlign: 'left',
+    marginRight: 0,
+  };
+
+  const contactFormFieldControlStyle = {
+    flex: 1,
+    minWidth: 0,
+    width: '100%',
+  };
+
+  const ensureContactFormFieldSettings = (indexMessage, indexContent) => {
+    const contactForm = dataMessages[indexMessage].message_content[indexContent].contact_form;
+    if (!contactForm) return null;
+    if (!contactForm.field_settings) {
+      contactForm.field_settings = getContactFormFieldSettings(contactForm);
+    }
+    return contactForm.field_settings;
+  };
+
+  const handleChangeContactFormTemplate = (indexMessage, indexContent, template) => {
+    const contactForm = dataMessages[indexMessage].message_content[indexContent].contact_form;
+    if (!contactForm) return;
+    contactForm.form_template = template;
+    contactForm.field_settings = getContactFormTemplateFieldSettings(template);
+    if (contactForm.email_settings?.send_to_user) {
+      contactForm.field_settings.email = { visible: true, required: true };
+    }
+    setDataMessages([...dataMessages]);
+  };
+
+  const handleChangeContactFormFieldSetting = (indexMessage, indexContent, fieldKey, settingKey, value) => {
+    const fieldSettings = ensureContactFormFieldSettings(indexMessage, indexContent);
+    if (!fieldSettings) return;
+    const contactForm = dataMessages[indexMessage].message_content[indexContent].contact_form;
+    const current = fieldSettings[fieldKey] || { visible: false, required: false };
+    const emailLocked = fieldKey === 'email' && Boolean(contactForm.email_settings?.send_to_user);
+
+    if (settingKey === 'visible') {
+      if (emailLocked && !value) return;
+      fieldSettings[fieldKey] = {
+        visible: Boolean(value),
+        required: value ? Boolean(current.required) : false,
+      };
+    } else if (settingKey === 'required') {
+      if (!current.visible) return;
+      if (emailLocked && !value) return;
+      fieldSettings[fieldKey] = {
+        visible: true,
+        required: Boolean(value),
+      };
+    }
+    setDataMessages([...dataMessages]);
+  };
+
+  const handleChangeContactFormSendToUser = (indexMessage, indexContent, value) => {
+    const contactForm = dataMessages[indexMessage].message_content[indexContent].contact_form;
+    if (!contactForm) return;
+    if (!contactForm.email_settings) {
+      contactForm.email_settings = {};
+    }
+    contactForm.email_settings.send_to_user = value;
+    if (value) {
+      const fieldSettings = ensureContactFormFieldSettings(indexMessage, indexContent);
+      if (fieldSettings) {
+        fieldSettings.email = { visible: true, required: true };
+      }
+    }
+    setDataMessages([...dataMessages]);
   };
 
   const handleChangeContactFormDomainSuggestion = (indexMessage, indexContent, field, value) => {
@@ -6178,14 +6261,17 @@ const Scenario = () => {
                                                             <div style={{ fontSize: '12px', marginBottom: '6px', color: '#666' }}>
                                                               {CONTACT_FORM_TEMPLATE_LABELS[contactForm.form_template] || 'お問い合わせフォーム'}
                                                             </div>
-                                                            <div style={{ fontSize: '12px', marginBottom: '4px' }}>お名前 / メールアドレス</div>
-                                                            {contactForm.form_template === 'detailed' && (
-                                                              <div style={{ fontSize: '12px', marginBottom: '4px' }}>電話番号 / お問い合わせ種別</div>
-                                                            )}
-                                                            {contactForm.form_template === 'product' && (
-                                                              <div style={{ fontSize: '12px', marginBottom: '4px' }}>注文番号 / 商品名</div>
-                                                            )}
-                                                            <div style={{ fontSize: '12px', marginBottom: '8px' }}>お問い合わせ内容</div>
+                                                            {(() => {
+                                                              const fieldSettings = getContactFormFieldSettings(contactForm);
+                                                              return CONTACT_FORM_FIELD_KEYS.filter(
+                                                                (fieldKey) => fieldSettings[fieldKey]?.visible
+                                                              ).map((fieldKey) => (
+                                                                <div key={fieldKey} style={{ fontSize: '12px', marginBottom: '4px' }}>
+                                                                  {CONTACT_FORM_FIELD_LABELS[fieldKey]}
+                                                                  {fieldSettings[fieldKey]?.required ? ' ※必須' : ''}
+                                                                </div>
+                                                              ));
+                                                            })()}
                                                             <Button
                                                               className="ss-user-setting__select-btn-add"
                                                               style={{
@@ -6197,6 +6283,7 @@ const Scenario = () => {
                                                                 fontSize: "14px",
                                                                 fontWeight: "bold",
                                                                 width: "100%",
+                                                                marginTop: '4px',
                                                               }}
                                                               onClick={(e) => e.stopPropagation()}
                                                             >
@@ -15083,13 +15170,14 @@ const Scenario = () => {
                                                   {/* user: type = 'contact_form' */}
                                                   {content.type === 'contact_form' && contactForm && (
                                                     <>
-                                                      <div className="ss-user-setting__item-bottom" style={{ width: '90%' }}>
+                                                      <div className="ss-user-setting__item-bottom" style={contactFormFieldRowStyle}>
                                                         <SelectCustom
                                                           id="contact_form_template"
                                                           label="フォーム種類"
-                                                          style={{ width: '100%' }}
+                                                          styleLabel={contactFormFieldLabelStyle}
+                                                          style={contactFormFieldControlStyle}
                                                           value={contactForm.form_template}
-                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'form_template')}
+                                                          onChange={value => handleChangeContactFormTemplate(indexMessageSelect, indexContent, value)}
                                                           data={[
                                                             { key: 'basic', value: CONTACT_FORM_TEMPLATE_LABELS.basic },
                                                             { key: 'detailed', value: CONTACT_FORM_TEMPLATE_LABELS.detailed },
@@ -15098,18 +15186,92 @@ const Scenario = () => {
                                                           keyValue="key"
                                                         />
                                                       </div>
-                                                      <div className="ss-user-setting__item-bottom" style={{ width: '90%' }}>
+                                                      <div className="ss-user-setting__item-bottom" style={contactFormFieldRowStyle}>
                                                         <InputCustom
-                                                          styleLabel={{ width: '100%' }}
-                                                          style={{ width: '100%' }}
+                                                          styleLabel={contactFormFieldLabelStyle}
+                                                          style={contactFormFieldControlStyle}
                                                           label="送信ボタン名称"
-                                                          inline={false}
+                                                          inline={true}
                                                           placeholder="送信する"
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'submit_button_name')}
                                                           value={contactForm.submit_button_name}
                                                         />
                                                       </div>
-                                                      {contactForm.form_template === 'detailed' && (
+                                                      <div
+                                                        className="ss-user-setting__item-bottom"
+                                                        style={{
+                                                          width: '90%',
+                                                          marginTop: '10px',
+                                                          display: 'flex',
+                                                          flexDirection: 'column',
+                                                          alignItems: 'stretch',
+                                                          justifyContent: 'flex-start',
+                                                        }}
+                                                      >
+                                                        <div style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>表示フィールド</div>
+                                                        <div
+                                                          style={{
+                                                            display: 'grid',
+                                                            gridTemplateColumns: '1fr 56px 56px',
+                                                            alignItems: 'center',
+                                                            columnGap: '8px',
+                                                            rowGap: '8px',
+                                                            width: '100%',
+                                                          }}
+                                                        >
+                                                          <div />
+                                                          <div style={{ fontSize: '12px', color: '#767676', display: 'flex', justifyContent: 'center' }}>表示</div>
+                                                          <div style={{ fontSize: '12px', color: '#767676', display: 'flex', justifyContent: 'center' }}>必須</div>
+                                                          {CONTACT_FORM_FIELD_KEYS.map((fieldKey) => {
+                                                            const fieldSetting = getContactFormFieldSettings(contactForm)[fieldKey] || {
+                                                              visible: false,
+                                                              required: false,
+                                                            };
+                                                            const emailLocked =
+                                                              fieldKey === 'email' &&
+                                                              Boolean(contactForm.email_settings?.send_to_user);
+                                                            return (
+                                                              <React.Fragment key={fieldKey}>
+                                                                <span style={{ fontSize: '13px' }}>
+                                                                  {CONTACT_FORM_FIELD_LABELS[fieldKey]}
+                                                                </span>
+                                                                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                                                  <Checkbox
+                                                                    disabled={emailLocked}
+                                                                    checked={fieldSetting.visible}
+                                                                    onChange={e => handleChangeContactFormFieldSetting(
+                                                                      indexMessageSelect,
+                                                                      indexContent,
+                                                                      fieldKey,
+                                                                      'visible',
+                                                                      e.target.checked
+                                                                    )}
+                                                                  />
+                                                                </div>
+                                                                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                                                  <Checkbox
+                                                                    disabled={!fieldSetting.visible || emailLocked}
+                                                                    checked={fieldSetting.required}
+                                                                    onChange={e => handleChangeContactFormFieldSetting(
+                                                                      indexMessageSelect,
+                                                                      indexContent,
+                                                                      fieldKey,
+                                                                      'required',
+                                                                      e.target.checked
+                                                                    )}
+                                                                  />
+                                                                </div>
+                                                              </React.Fragment>
+                                                            );
+                                                          })}
+                                                        </div>
+                                                        {contactForm.email_settings?.send_to_user && (
+                                                          <div style={{ fontSize: '12px', color: '#888', marginTop: '8px' }}>
+                                                            ユーザーへ確認メールを送信する場合、メールアドレスは必須表示になります。
+                                                          </div>
+                                                        )}
+                                                      </div>
+                                                      {getContactFormFieldSettings(contactForm).inquiry_type?.visible && (
                                                         <div className="ss-user-setting__item-bottom" style={{ width: '90%' }}>
                                                           <div style={{ fontSize: '14px', marginBottom: '5px' }}>お問い合わせ種別（改行区切り）</div>
                                                           <textarea
@@ -15130,11 +15292,21 @@ const Scenario = () => {
                                                       <div className="ss-user-setting__item-bottom" style={{ width: '90%' }}>
                                                         {renderContactFormDomainSuggestionSetting(indexMessageSelect, indexContent)}
                                                       </div>
-                                                      <div className="ss-user-setting__item-bottom" style={{ width: '90%', marginTop: '10px' }}>
+                                                      <div
+                                                        className="ss-user-setting__item-bottom"
+                                                        style={{
+                                                          width: '90%',
+                                                          marginTop: '10px',
+                                                          display: 'flex',
+                                                          flexDirection: 'column',
+                                                          alignItems: 'stretch',
+                                                          justifyContent: 'flex-start',
+                                                        }}
+                                                      >
                                                         <div style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>メール送信設定</div>
                                                         <CheckboxCustom
                                                           label="ユーザーへ確認メールを送信する"
-                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'email_settings', 'send_to_user')}
+                                                          onChange={value => handleChangeContactFormSendToUser(indexMessageSelect, indexContent, value)}
                                                           value={contactForm.email_settings?.send_to_user}
                                                         />
                                                         <CheckboxCustom
@@ -15144,11 +15316,12 @@ const Scenario = () => {
                                                         />
                                                       </div>
                                                       {contactForm.email_settings?.send_to_user && (
-                                                        <div className="ss-user-setting__item-bottom" style={{ width: '90%' }}>
+                                                        <div className="ss-user-setting__item-bottom" style={contactFormFieldRowStyle}>
                                                           <SelectCustom
                                                             id="contact_form_user_email_template"
                                                             label="ユーザー向けメールテンプレート"
-                                                            style={{ width: '100%' }}
+                                                            styleLabel={contactFormFieldLabelStyle}
+                                                            style={contactFormFieldControlStyle}
                                                             data={dataEmail}
                                                             keyValue="id"
                                                             nameValue="email_template_name"
@@ -15158,11 +15331,12 @@ const Scenario = () => {
                                                         </div>
                                                       )}
                                                       {contactForm.email_settings?.send_to_staff && (
-                                                        <div className="ss-user-setting__item-bottom" style={{ width: '90%' }}>
+                                                        <div className="ss-user-setting__item-bottom" style={contactFormFieldRowStyle}>
                                                           <SelectCustom
                                                             id="contact_form_staff_email_template"
                                                             label="担当者向けメールテンプレート"
-                                                            style={{ width: '100%' }}
+                                                            styleLabel={contactFormFieldLabelStyle}
+                                                            style={contactFormFieldControlStyle}
                                                             data={dataEmail}
                                                             keyValue="id"
                                                             nameValue="email_template_name"

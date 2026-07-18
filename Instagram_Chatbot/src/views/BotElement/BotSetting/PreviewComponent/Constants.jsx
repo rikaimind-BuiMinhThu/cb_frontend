@@ -202,6 +202,87 @@ const CONTACT_FORM_TEMPLATE_LABELS = {
   product: '商品関連（名前・メール・注文番号・商品名・お問い合わせ内容）',
 };
 
+const CONTACT_FORM_FIELD_KEYS = [
+  'name',
+  'email',
+  'phone',
+  'inquiry_type',
+  'order_number',
+  'product_name',
+  'content',
+];
+
+const CONTACT_FORM_FIELD_LABELS = {
+  name: 'お名前',
+  email: 'メールアドレス',
+  phone: '電話番号',
+  inquiry_type: 'お問い合わせ種別',
+  order_number: '注文番号',
+  product_name: '商品名',
+  content: 'お問い合わせ内容',
+};
+
+const CONTACT_FORM_FIELD_SETTING = (visible, required) => ({
+  visible: Boolean(visible),
+  required: Boolean(visible && required),
+});
+
+const getContactFormTemplateFieldSettings = (template) => {
+  const hidden = CONTACT_FORM_FIELD_SETTING(false, false);
+  const required = CONTACT_FORM_FIELD_SETTING(true, true);
+
+  const base = {
+    name: required,
+    email: required,
+    phone: hidden,
+    inquiry_type: hidden,
+    order_number: hidden,
+    product_name: hidden,
+    content: required,
+  };
+
+  if (template === CONTACT_FORM_TEMPLATES.DETAILED) {
+    return {
+      ...base,
+      phone: required,
+      inquiry_type: required,
+    };
+  }
+
+  if (template === CONTACT_FORM_TEMPLATES.PRODUCT) {
+    return {
+      ...base,
+      order_number: required,
+      product_name: required,
+    };
+  }
+
+  return base;
+};
+
+const getContactFormFieldSettings = (contactForm = {}) => {
+  const template =
+    contactForm.form_template || CONTACT_FORM_TEMPLATES.BASIC;
+  const preset = getContactFormTemplateFieldSettings(template);
+  const saved = contactForm.field_settings || {};
+
+  return CONTACT_FORM_FIELD_KEYS.reduce((settings, fieldKey) => {
+    const presetSetting = preset[fieldKey] || CONTACT_FORM_FIELD_SETTING(false, false);
+    const savedSetting = saved[fieldKey] || {};
+    const visible =
+      typeof savedSetting.visible === 'boolean'
+        ? savedSetting.visible
+        : presetSetting.visible;
+    const required =
+      typeof savedSetting.required === 'boolean'
+        ? savedSetting.required
+        : presetSetting.required;
+
+    settings[fieldKey] = CONTACT_FORM_FIELD_SETTING(visible, required);
+    return settings;
+  }, {});
+};
+
 const DEFAULT_CONTACT_FORM_CONFIG = {
   form_template: 'basic',
   submit_button_name: '送信する',
@@ -213,6 +294,7 @@ const DEFAULT_CONTACT_FORM_CONFIG = {
     staff_email_id: null,
   },
   domain_suggestion: createDefaultDomainSuggestion(),
+  field_settings: getContactFormTemplateFieldSettings(CONTACT_FORM_TEMPLATES.BASIC),
   fields: {
     name: '',
     email: '',
@@ -324,6 +406,10 @@ export {
   MESSAGE_CONTENT_TYPES,
   CONTACT_FORM_TEMPLATES,
   CONTACT_FORM_TEMPLATE_LABELS,
+  CONTACT_FORM_FIELD_KEYS,
+  CONTACT_FORM_FIELD_LABELS,
+  getContactFormTemplateFieldSettings,
+  getContactFormFieldSettings,
   DEFAULT_CONTACT_FORM_CONFIG,
   NO_ERROR,
   GETTING_ERROR_NOTIFICATION,
