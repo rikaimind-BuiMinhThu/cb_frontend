@@ -10,6 +10,7 @@ import EmailConfirmationTypeSetting from './textInput/EmailConfirmationTypeSetti
 import PhoneNumberTypeSetting from './textInput/PhoneNumberTypeSetting';
 import PasswordTypeSetting from './textInput/PasswordTypeSetting';
 import { buildTextInputSettingContext } from './textInput/textInputSettingContext';
+import EmailDomainSuggestionSettingsModal from '../scenarioComon/EmailDomainSuggestionSettingsModal';
 import '../styles/contentSettings/textInput.css';
 
 const TYPE_SETTING_MAP = {
@@ -21,6 +22,11 @@ const TYPE_SETTING_MAP = {
   [TEXT_INPUT_TYPES.PASSWORD]: PasswordTypeSetting,
   [TEXT_INPUT_TYPES.PASSWORD_CONFIRMATION]: PasswordTypeSetting,
 };
+
+const EMAIL_TYPES = new Set([
+  TEXT_INPUT_TYPES.EMAIL_ADDRESS,
+  TEXT_INPUT_TYPES.EMAIL_CONFIRMATION,
+]);
 
 const TextInputSetting = (props) => {
   const {
@@ -36,7 +42,19 @@ const TextInputSetting = (props) => {
     setIsOpenAddVariable,
   } = props;
 
-  const { changeContent, handleChangeTextInputType } = buildTextInputSettingContext(props);
+  const {
+    changeContent,
+    handleChangeTextInputType,
+    typeConfig,
+    handleChangeEmailDomainSuggestion,
+    handleChangeEmailDomainValue,
+    handleAddEmailDomain,
+    handleRemoveEmailDomain,
+    handleResetEmailDomains,
+  } = buildTextInputSettingContext(props);
+
+  const emailType = textInput?.type;
+  const showEmailDomainSuggestion = EMAIL_TYPES.has(emailType);
 
   const renderTitleInput = () => {
     if (textInput?.title_require !== true) return null;
@@ -54,6 +72,26 @@ const TextInputSetting = (props) => {
     return <TypeComponent {...props} />;
   };
 
+  const beforeRequire = showEmailDomainSuggestion ? (
+    <EmailDomainSuggestionSettingsModal
+      domainSuggestion={typeConfig?.domain_suggestion}
+      onToggleEnabled={(value) =>
+        handleChangeEmailDomainSuggestion(emailType, 'enabled', value)
+      }
+      onChangeMode={(value) =>
+        handleChangeEmailDomainSuggestion(emailType, 'mode', value)
+      }
+      onChangeDomain={(indexDomain, value) =>
+        handleChangeEmailDomainValue(emailType, indexDomain, value)
+      }
+      onAddDomain={() => handleAddEmailDomain(emailType)}
+      onRemoveDomain={(indexDomain) =>
+        handleRemoveEmailDomain(emailType, indexDomain)
+      }
+      onResetDomains={() => handleResetEmailDomains(emailType)}
+    />
+  ) : null;
+
   return (
     <ContentSettingShell
       contentType="text_input"
@@ -66,6 +104,7 @@ const TextInputSetting = (props) => {
       renderRootFaqOption={renderRootFaqOption}
       dataInputVar={dataInputVar}
       setIsOpenAddVariable={setIsOpenAddVariable}
+      beforeRequire={beforeRequire}
       className="ss-text-input-setting"
     >
       <ContentTypeSelector

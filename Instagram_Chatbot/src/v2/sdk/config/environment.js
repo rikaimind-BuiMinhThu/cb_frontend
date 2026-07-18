@@ -61,7 +61,7 @@ export const log = (message) => {
 export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const getEcChatBotApiServerBaseUrl = () => {
-  return 'https://ec-chatbot-test1.com';
+  // return 'https://ec-chatbot-test1.com';
   const environment = getEnvironment();
   switch (environment) {
     case 'staging':
@@ -77,7 +77,7 @@ export const getEcChatBotApiServerBaseUrl = () => {
 };
 
 export const getEcChatBotFrontEndBaseUrl = () => {
-  return 'http://localhost:3001';
+  // return 'http://localhost:3001';
   const environment = getEnvironment();
 
   switch (environment) {

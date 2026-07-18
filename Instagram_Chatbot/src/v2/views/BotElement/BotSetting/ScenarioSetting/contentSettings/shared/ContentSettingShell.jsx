@@ -13,6 +13,7 @@ const ContentSettingShell = ({
   renderRootFaqOption,
   dataInputVar,
   setIsOpenAddVariable,
+  beforeRequire = null,
   className = '',
   children,
 }) => (
@@ -28,6 +29,7 @@ const ContentSettingShell = ({
       renderRootFaqOption={renderRootFaqOption}
       dataInputVar={dataInputVar}
       setIsOpenAddVariable={setIsOpenAddVariable}
+      beforeRequire={beforeRequire}
     />
     <div className="ss-content-setting-body">
       {children}
@@ -46,6 +48,7 @@ ContentSettingShell.propTypes = {
   renderRootFaqOption: PropTypes.func,
   dataInputVar: PropTypes.array,
   setIsOpenAddVariable: PropTypes.func.isRequired,
+  beforeRequire: PropTypes.node,
   className: PropTypes.string,
   children: PropTypes.node,
 };

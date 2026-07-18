@@ -610,7 +610,6 @@
   };
   var sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   var getEcChatBotApiServerBaseUrl = () => {
-    return "https://ec-chatbot-test1.com";
     const environment = getEnvironment();
     switch (environment) {
       case "staging":
@@ -625,7 +624,6 @@
     }
   };
   var getEcChatBotFrontEndBaseUrl = () => {
-    return "http://localhost:3001";
     const environment = getEnvironment();
     switch (environment) {
       case "staging":

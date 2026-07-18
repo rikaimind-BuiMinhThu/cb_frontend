@@ -26,6 +26,7 @@ const UserContentCommonOptions = ({
   renderRootFaqOption,
   dataInputVar,
   setIsOpenAddVariable,
+  beforeRequire = null,
 }) => {
   const config = getUserContentOptionsConfig(contentType);
 
@@ -90,46 +91,36 @@ const UserContentCommonOptions = ({
       )}
 
       {config.apiValidation && (
-        <>
-          <div className="ss-user-setting-option-row">
-            <div className="ss-user-setting-option-row__checkbox">
-              <ScenarioModalCheckbox
-                checked={!!contentData.use_api_input_value}
-                onChange={(checked) => updateContentField('use_api_input_value', checked)}
-                label={labelWithTooltip(
-                  USER_CONTENT_OPTION_LABELS.apiValidation,
-                  'apiValidation',
-                )}
-              />
-            </div>
-            {contentData.use_api_input_value && apiSelectConfig && (
-              <div className="ss-user-setting-option-row__controls">
-                <SelectCustom
-                  id={`${contentType}-api-select`}
-                  className="ss-user-setting-option-row__select"
-                  value={contentData[apiSelectConfig.valueField]}
-                  data={apiSelectData}
-                  keyValue={apiSelectConfig.keyValue}
-                  nameValue={apiSelectConfig.nameValue}
-                  onChange={(value) => updateContentField(apiSelectConfig.changeField, value)}
-                />
-              </div>
-            )}
-          </div>
-          {config.requireInline && (
+        <div className="ss-user-setting-option-row">
+          <div className="ss-user-setting-option-row__checkbox">
             <ScenarioModalCheckbox
-              checked={!!contentData.require}
-              onChange={(checked) => updateContentField('require', checked)}
+              checked={!!contentData.use_api_input_value}
+              onChange={(checked) => updateContentField('use_api_input_value', checked)}
               label={labelWithTooltip(
-                USER_CONTENT_OPTION_LABELS.require,
-                'require',
+                USER_CONTENT_OPTION_LABELS.apiValidation,
+                'apiValidation',
               )}
             />
+          </div>
+          {contentData.use_api_input_value && apiSelectConfig && (
+            <div className="ss-user-setting-option-row__controls">
+              <SelectCustom
+                id={`${contentType}-api-select`}
+                className="ss-user-setting-option-row__select"
+                value={contentData[apiSelectConfig.valueField]}
+                data={apiSelectData}
+                keyValue={apiSelectConfig.keyValue}
+                nameValue={apiSelectConfig.nameValue}
+                onChange={(value) => updateContentField(apiSelectConfig.changeField, value)}
+              />
+            </div>
           )}
-        </>
+        </div>
       )}
 
-      {config.requireStandalone && (
+      {beforeRequire}
+
+      {(config.requireInline || config.requireStandalone) && (
         <ScenarioModalCheckbox
           checked={!!contentData.require}
           onChange={(checked) => updateContentField('require', checked)}
@@ -163,6 +154,7 @@ UserContentCommonOptions.propTypes = {
   renderRootFaqOption: PropTypes.func,
   dataInputVar: PropTypes.array,
   setIsOpenAddVariable: PropTypes.func.isRequired,
+  beforeRequire: PropTypes.node,
 };
 
 export default UserContentCommonOptions;
