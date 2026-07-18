@@ -1718,3 +1718,193 @@ slideUp
 .ss-email-domain-suggestions__item--active {
   background: #ebf7ff;
 }
+
+/* Closed launcher shell (v2 shared PreviewClosedLauncher) */
+.preview-closed-launcher {
+  position: fixed;
+  display: flex;
+  background-color: var(--pcl-bg, #327AED);
+  bottom: var(--pcl-bottom, auto);
+  right: var(--pcl-right, auto);
+  left: var(--pcl-left, auto);
+  top: var(--pcl-top, auto);
+  box-sizing: border-box;
+}
+
+.preview-closed-launcher__icon-img {
+  width: 96%;
+  height: 96%;
+  border-radius: 30px;
+}
+
+.preview-closed-launcher--circle-pc,
+.preview-closed-launcher--circle-sp,
+.preview-closed-launcher--fallback {
+  width: 56px;
+  height: 56px;
+  border-radius: 30px;
+  align-items: center;
+  justify-content: center;
+}
+
+.preview-closed-launcher--bar-pc {
+  width: var(--pcl-width, 360px);
+  height: 66px;
+  border-radius: 35px;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 3px;
+  padding-right: 3px;
+}
+
+.preview-closed-launcher__bar-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.preview-closed-launcher__bar-bubble {
+  padding-left: 20px;
+}
+
+.preview-closed-launcher__bar-title-text {
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.preview-closed-launcher__bar-arrow {
+  margin-right: 8px;
+}
+
+.preview-closed-launcher--vertical-pc {
+  width: 300px;
+  height: 65px;
+  border-radius: 0;
+  justify-content: left;
+  transform: rotate(-90deg);
+}
+
+.preview-closed-launcher--vertical-sp {
+  width: 300px;
+  height: 60px;
+  border-radius: 0;
+  justify-content: left;
+  transform: rotate(-90deg);
+}
+
+.preview-closed-launcher--bar-sp {
+  width: var(--pcl-width, 240px);
+  height: 48px;
+  border-radius: 35px;
+  justify-content: left;
+  align-items: center;
+}
+
+.preview-closed-launcher--bar-sp-fullwidth {
+  height: 75px;
+  border-radius: 45px;
+}
+
+.preview-closed-launcher__sp-bar-left {
+  width: 100%;
+}
+
+.preview-closed-launcher__sp-bar-left--padded {
+  padding: 4px;
+}
+
+.preview-closed-launcher__sp-avatar {
+  width: 38px;
+}
+
+.preview-closed-launcher__sp-avatar--full {
+  width: 58px;
+}
+
+.preview-closed-launcher__sp-title {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.preview-closed-launcher__sp-title--full {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.preview-closed-launcher__sp-arrow {
+  margin-left: auto;
+}
+
+/* Open frame shell (v2 shared PreviewOpenChatFrame) */
+.preview-open-frame {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.preview-open-frame--fixed {
+  position: fixed;
+  bottom: 0;
+  right: var(--pof-right, 10px);
+  width: var(--pof-width, 450px);
+  height: var(--pof-height, 700px);
+  z-index: 999;
+  background-color: #fff;
+}
+
+.preview-open-frame--embedded {
+  position: relative;
+  width: 100%;
+  height: auto;
+  min-height: 400px;
+  background-color: transparent;
+}
+
+.preview-open-frame--embedded.preview-open-frame--editor {
+  height: 100%;
+  min-height: 0;
+}
+
+.preview-open-frame__header {
+  background-color: var(--pof-header-bg, transparent);
+}
+
+.preview-open-frame--desktop .preview-open-frame__header {
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.preview-open-frame--mobile .preview-open-frame__header {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.preview-open-frame__body {
+  flex: 1;
+  min-height: 0;
+  background-color: var(--pof-body-bg, transparent);
+}
+
+.preview-open-frame--embedded .preview-open-frame__body {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.preview-open-frame--no-exit-popup .preview-open-frame__header {
+  position: static;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.preview-open-frame--no-exit-popup .preview-open-frame__body {
+  display: block;
+}
+
+.preview-open-frame .chatbot_timer_holder {
+  background-color: var(--pof-body-bg, transparent);
+}
+
+

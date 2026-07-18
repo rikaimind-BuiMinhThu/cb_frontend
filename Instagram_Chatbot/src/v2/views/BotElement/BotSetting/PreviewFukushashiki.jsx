@@ -1,43 +1,31 @@
-import React, { useEffect, useRef, useReducer, useState, useMemo } from "react";
+import React, { useEffect, useRef, useReducer, useState } from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
 import Cookies from "js-cookie";
-import { MDBIcon } from "mdbreact";
 import CustomButton from "./CustomButton";
-import { UserMessage, BotMessage, CombineMessage } from "./PreviewComponent";
+import {
+  UserMessage, BotMessage, CombineMessage,
+  PreviewClosedLauncher, PreviewOpenChatFrame, PreviewMessagesList,
+} from "./PreviewComponent";
 import UserMessageTailIcon from "./PreviewComponent/UserMessageTailIcon";
 import { resolveUserMessageTheme } from "v2/views/BotElement/BotSetting/DesignSetting/utils/designThemeUtils";
 import PreviewFukushashikiReducer from "./PreviewFukushashiki/PreviewFukushashikiReducer";
-import $ from "jquery";
 import { EC_CHATBOT_URL } from "v2/variables/constants";
 import "moment/locale/zh-cn";
-import iconMessageBlue from "assets/img/icon-mess/icon-message-chat-blue.png";
-import iconMessageGreen from "assets/img/icon-mess/icon-message-chat-green.png";
-import iconMessageOrange from "assets/img/icon-mess/icon-message-chat-orange.png";
-import iconMessageYellow from "assets/img/icon-mess/icon-message-chat-yellow.png";
-import iconMessagePink from "assets/img/icon-mess/icon-message-chat-pink.png";
-import iconMessagePurple from "assets/img/icon-mess/icon-message-chat-purple.png";
-import iconMessageBlack from "assets/img/icon-mess/icon-message-chat-black.png";
-import iconMessageWhite from "assets/img/icon-mess/icon-message-chat-white.png";
-import api from 'api/api-management';
 import {
   CHATBOT_ACTIONS,
   NO_ERROR,
   GETTING_ERROR_NOTIFICATION,
-  CUSTOM_JS_CODE_POSITION,
   TIMER_MAP_VARIABLES_FIELD,
   TIMER_TYPES,
   CART_SYSTEM,
   CONVERSTION_RESPONSE_STATUS,
   PREVIEW_ACTIONS,
   RENDER_CHATBOT_CONFIG,
-  RENDER_MODES,
-  MESSAGE_CONTENT_TYPES,
   CONVERSION_RESPONSE_SUBMIT_TYPE,
   CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE,
   DISPLAY_TYPES,
 } from "./PreviewComponent/Constants";
-import { applyPreviewThemeCss } from "v2/utils/chatbotThemeCss";
-import { COLOR_MAP, OPEN_ANIMATION_DURATION_MS_DEFAULT, OPEN_ANIMATION_STYLE_DEFAULT } from "v2/views/BotElement/BotSetting/DesignSetting/constants/designChatbotConstants";
+import { OPEN_ANIMATION_DURATION_MS_DEFAULT } from "v2/views/BotElement/BotSetting/DesignSetting/constants/designChatbotConstants";
 import {
   clampOpenAnimationDurationMs,
   parseDesignSettings,
@@ -45,30 +33,22 @@ import {
   resolveOpenAnimationClassName,
 } from "v2/views/BotElement/BotSetting/DesignSetting/utils/designChatbotUtils";
 import {
-  getAllUrlParams,
-  lightenColor,
   isMobile,
   getPrefectures,
   getScenarioPreviewData,
-  getChatBotSetting,
   sleep,
-  stringNullOrEmpty,
   changeElementAttributeById,
-  scrollToPosition,
-  createStatusConversion,
   userEntryScenario,
   isDislayingLoginForm,
   getElementMessageById,
   sendOpenChatbotCountRequest,
   sendCloseChatbotCountRequest,
-  isUserMessage,
   isInteractiveMessage,
   sendLogMessageToServer,
   updateStatusConversion,
   isButtonSubmitMessage,
   createScenarioUserResponseMessageHistory,
   sendErrorLogToServer,
-  sendAppearLogToServer,
 } from "./PreviewComponent/Utils";
 import {
   getChatbotSavedState,
@@ -80,129 +60,44 @@ import {
   setTimerConfig
 } from "./PreviewComponent/SessionStorageUtils";
 import { isTokyoDeveloLP, UPDATE_TOKYO_DEVELO_LP_PREFECTURE_JS_CODE } from "./PreviewComponent/TokyoLPUtils";
-import PreventExitChatbotModal from "./PreviewComponent/PreventExitChatbotModal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
 import ZipCodePopUp from "./PreviewComponent/ZipCodePopUp";
 import _ from "lodash";
 import Timer from "./Timer";
 import {
   setConversionParamToLocalStorage, fukushashikiSavedStateToLp, fukushashikiToLP,
-  executeLpJsCode, injectCustomJsCode, postMessageToParent
+  executeLpJsCode, postMessageToParent
 } from "./PreviewFukushashiki/LPUtils";
 import { resolveErrMsgLpScript } from "./ScenarioSetting/utils/resolveErrMsgLpScript";
 import { generateLaunchButtonLpScript } from "./ScenarioSetting/utils/launchButtonLpScriptUtils";
 import { convertToFukushashikiObject } from "./PreviewFukushashiki/FukushashikiDataConverterUtils";
 import { handleValidateField } from "./PreviewFukushashiki/ValidationUtils";
-import { getClosedBarWidth, getClosedLauncherPosition } from "v2/utils/sdkLayoutUtils";
 import { createOrAddLinesCart } from "./ShopifyUtils";
-
-const clearChatbotState = () => {
-  sessionStorage.removeItem('chatbotH');
-  sessionStorage.removeItem('chatbotBottom');
-  sessionStorage.removeItem('chatbotState');
-  sessionStorage.removeItem('prevOpenStatus');
-  sessionStorage.removeItem('timerConfig');
-  Object.keys(sessionStorage).forEach(key => {
-    if (key.startsWith('chatbot') || key.startsWith('messages_bot_')) {
-      sessionStorage.removeItem(key);
-    }
-  });
-};
+import { clearChatbotState } from "./PreviewComponent/previewSessionUtils";
+import { getBotInforFromPreviewResponse } from "./PreviewComponent/previewBotInfoUtils";
+import {
+  getBotHeaderIconPath,
+  getOpeningBotStyle as buildOpeningBotStyle,
+} from "./PreviewComponent/previewOpeningStyles";
+import { mapParsedDesignToState } from "./PreviewComponent/previewDesignStateUtils";
+import { createPreviewInitialState } from "./PreviewComponent/createPreviewInitialState";
+import {
+  usePreviewConversionOnOpen,
+  usePreviewIpParams,
+  usePreviewDesignSettings,
+  usePreviewParentSync,
+  usePreviewCustomJs,
+  usePreviewThemeCss,
+  usePreviewScenarioBootstrap,
+  usePreviewAutoScroll,
+  usePreviewMessageReveal,
+} from "./PreviewComponent/hooks";
 
 savePrevOpenStatus("0");
 var url = new URL(window.location.href);
 let params = new URLSearchParams(url.search);
 let isLoggedIn = params.get('isLoggedIn') === "true";
-const previewInitialState = {
-  isOpen: false,
-  urlSend: "",
-  urlReceive: "",
-  deviceReceive: "",
-  uuid: params.get("uuid"),
-  botId: Cookies.get("bot_id"),
-  scenarioId: params.get("scenario_id"),
-  botInfor: {},
-  messagesList: [],
-  isUseGlobalDelay: false,
-  globalDelayTime: 1.0,
-  urlThanksPage: "",
-  urlCartConfirmPage: "",
-  merchandiseId: "",
-  isUsedCrosssell: false,
-  productIdCrossSell: "",
-  isUsedCartConfirmPage: false,
-  currentMsgIndex: 0,
-  renderMessagesList: [],
-  passedUserMsgCount: 0,
-  errors: {},
-  variables: [],
-  isDisplayButtonNext: false,
-  captcha: [],
-  withdrawal: {},
-  variablesList: [],
-  prefecturesList: [],
-  dataCities: [],
-  dataTowns: [],
-  prefectures: "",
-  cities: "",
-  towns: "",
-  zipcode: "",
-  zipcodeContentIndex: "",
-  zipcodeIndex: -1,
-  buttonTypePc: "1",
-  positionPc: "1",
-  widthPc: 450,
-  heightPc: 700,
-  widthSp: 100,
-  heightSp: 100,
-  rightPcTitle: "",
-  positionSp: "1",
-  buttonTypeSp: "1",
-  rightMarginPc: 10,
-  bottomMarginPc: 10,
-  displayType: null,
-  rightSpTitle: "",
-  rightMarginSp: 10,
-  bottomMarginSp: 10,
-  showPopupCloseBot: false,
-  activePopupCloseBot: true,
-  titleBubble: "",
-  openAnimationDurationMs: OPEN_ANIMATION_DURATION_MS_DEFAULT,
-  openAnimationStyle: OPEN_ANIMATION_STYLE_DEFAULT,
-  styleModal: {},
-  scenarioUserResponses: [],
-  checkoutUrl: "",
-  lpOptionData: {},
-  submitErrorMessage: '',
-  isDisplayErrorMessage: false,
-  objParam: {
-    current_url: window.location.href,
-    current_url_param: getAllUrlParams(window.location.href),
-    current_url_title: document.title,
-    user_id: Cookies.get("user_id"),
-    bot_id: Cookies.get("bot_id")
-  },
-  previewOrderContent: null,
-  // loadedStateFromSession has 2 values: "wait", "loaded"
-  loadedStateFromSession: false,
-  isUsedErrMsgByJs: false,
-  errMsgJsCode: '',
-  errMsgSettingMode: 'js',
-  errMsgFieldSelectors: '',
-  errMsgFormSelectors: '',
-  launchButtonSelectors: '',
-  isProcessing: false,
-  conversionStatus: null,
-  manuallyClosed: false,
-  renderMode: RENDER_MODES.NEXT,
-  isUpsell: false,
-  progressBarMaxIndex: null,
-  isNotAutoScroll: false,
-  cartSystem: params.get("cartSystem") || "",
-  isUseBtnUpdateTracking: false,
-  isUseGlobalDelay: false,
-  globalDelayTime: 1.0,
-};
+const previewInitialState = createPreviewInitialState("fukushashiki", { params });
 
 
 const PreviewFukushashiki = () => {
@@ -211,6 +106,7 @@ const PreviewFukushashiki = () => {
   const containerRef = useRef(null);
   const hasSentCustomJs = useRef(false);
   const hasSentInitialOpenStateToParent = useRef(false);
+  const [useSharedBootstrap, setUseSharedBootstrap] = useState(() => !getChatbotSavedState());
   const [msgUpdateState, setMsgUpdateState] = useState({});
   const msgUpdateStateRef = useRef({});
   useEffect(() => { 
@@ -246,92 +142,16 @@ const PreviewFukushashiki = () => {
     };
   }, [state.isUseBtnUpdateTracking, state.isOpen]);
 
-  useEffect(() => {
-    if (state.conversionStatus || !state.uuid || !state.scenarioId || !state.isOpen) return;
-    
-    createStatusConversion({
-      scenario_id: state.scenarioId, 
-      user_input_id: state.uuid, 
-      status: CONVERSTION_RESPONSE_STATUS.UN_FINISH,
-    })
-    .then((res) => {
-      const status = res?.data?.data?.status;
-
-      if (status) {
-        dispatch({ type: PREVIEW_ACTIONS.SET_CONVERSION_STATUS, payload: status });
-      }
-    });
-  }, [state.uuid, state.scenarioId, state.conversionStatus, state.isOpen]);
-
-  // get default obj params
-  useEffect(() => {
-    if (!state.loadedStateFromSession) return;
-    if (!state.objParam?.ip) return;
-
-    $.getJSON("https://api.ipregistry.co/?key=tryout", (data) => {
-      const defaultObjParam = {
-        user_ip_address: data.ip,
-        user_country: data.location.country.name,
-        user_city: data.location.city,
-        user_device: data.user_agent.device.type,
-        user_browser: data.user_agent.name,
-        user_agent: data.user_agent.header,
-        start_datetime: new Date(),
-      };
-      dispatch({
-        type: PREVIEW_ACTIONS.SET_OBJ_PARAM,
-        payload: { ...state.objParam, ...defaultObjParam }
-      });
-    });
-  }, [state.objParam?.ip, state.loadedStateFromSession]);
-
-  // Always refresh design settings from the chatbot API after load so session-restored
-  // state does not keep a stale openAnimationDurationMs (or other design fields).
-  useEffect(() => {
-    if (!state.loadedStateFromSession) return;
-    if (!state.botId && params.get("bot_id")) {
-      dispatch({ type: PREVIEW_ACTIONS.SET_BOT_ID, payload: params.get("bot_id") });
-      return;
-    }
-    if (!state.botId) return;
-
-    getChatBotSetting(state.botId)
-      .then((response) => {
-        if (!response.data.data) return;
-
-        const { mainColorHex, apiColorKey } = resolveMainColorContext(response.data.data);
-        const parsedDesign = parseDesignSettings(
-          response.data.data?.design_settings,
-          mainColorHex,
-          apiColorKey,
-        );
-        const newState = {
-          activePopupCloseBot: parsedDesign.popupCloseBot,
-          titleBubble: parsedDesign.titleBubble || "簡単90秒で注文完了",
-          displayType: parsedDesign.displayType,
-          widthPc: parsedDesign.widthPc,
-          heightPc: parsedDesign.heightPc,
-          widthSp: parsedDesign.widthSp,
-          heightSp: parsedDesign.heightSp,
-          positionPc: String(parsedDesign.positionPc),
-          isOpen: state.isOpen,
-          rightPcTitle: parsedDesign.rightPcTitle,
-          buttonTypePc: String(parsedDesign.buttonTypePc),
-          rightMarginPc: parsedDesign.rightMarginPc,
-          bottomMarginPc: parsedDesign.bottomMarginPc,
-          positionSp: String(parsedDesign.positionSp),
-          buttonTypeSp: String(parsedDesign.buttonTypeSp),
-          rightSpTitle: parsedDesign.rightSpTitle,
-          rightMarginSp: parsedDesign.rightMarginSp,
-          bottomMarginSp: parsedDesign.bottomMarginSp,
-          openAnimationDurationMs: parsedDesign.openAnimationDurationMs,
-          openAnimationStyle: parsedDesign.openAnimationStyle,
-          themeSettings: parsedDesign.themeSettings,
-        };
-
-        dispatch({ type: PREVIEW_ACTIONS.SET_CHATBOT_SETTINGS, payload: newState });
-      });
-  }, [state.botId, state.loadedStateFromSession]);
+  usePreviewConversionOnOpen({ state, dispatch });
+  usePreviewIpParams({ state, dispatch });
+  usePreviewDesignSettings({
+    state,
+    dispatch,
+    params,
+    refreshPolicy: "always",
+    includeOpenAnimation: true,
+    designSource: "parsed",
+  });
 
   const eventHandler = async (event) => {
     if (!event.data || !event.data.actionData) return;
@@ -442,34 +262,35 @@ const PreviewFukushashiki = () => {
     }
   };
 
-  // Add event listener to receive message from parent window
-  useEffect(() => {
-    window.addEventListener("message", eventHandler, false);
-
-    return () => {
-      window.removeEventListener("message", eventHandler);
-    };
-  }, [state.isOpen])
-
-  // Add style to body tag if it's mobile
-  useEffect(() => {
-    if (isMobile()) {
-      document.body.classList.add('is_mobile');
-    }
-  }, [])
+  usePreviewParentSync({
+    state,
+    eventHandler,
+    hasSentInitialOpenStateToParent,
+  });
+  usePreviewCustomJs({ state, hasSentCustomJs });
+  usePreviewThemeCss({ state });
+  usePreviewScenarioBootstrap({
+    state,
+    dispatch,
+    params,
+    enabled: useSharedBootstrap,
+    onExtractState: (res) => extractStateFromPreviewResponse(res),
+  });
+  usePreviewAutoScroll({
+    state,
+    enabled: !state.isUpsell,
+    enableScrollAuto: true,
+    dependencyLength:
+      (state.renderMessagesList?.length ?? 0) + (state.submitErrorMessage ? 1 : 0),
+  });
+  usePreviewMessageReveal({
+    state,
+    dispatch,
+    delayMs: RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE,
+    shouldLogAppear: isInteractiveMessage,
+  });
 
   // Initial sync: parent SDK needs layout payload before first user interaction.
-  useEffect(() => {
-    if (hasSentInitialOpenStateToParent.current) return;
-    if (!state.loadedStateFromSession) return;
-    if (!state.botInfor) return;
-    if (typeof state.isOpen !== "boolean") return;
-    if (!state.deviceReceive || !state.urlReceive) return;
-
-    postMessageToParent({ isOpen: state.isOpen }, state);
-    hasSentInitialOpenStateToParent.current = true;
-  }, [state.loadedStateFromSession, state.botInfor, state.isOpen, state.deviceReceive, state.urlReceive]);
-
   // post message to parent window when layout changes after initial sync
   useEffect(() => {
     if (!hasSentInitialOpenStateToParent.current) return;
@@ -525,163 +346,65 @@ const PreviewFukushashiki = () => {
     if (jsCode) executeLpJsCode(jsCode, state);
   }, [state.launchButtonSelectors]);
 
-  // For run injectCustomJsCode
+  // Fukushashiki session restore (upsell, LP sync, timer) — not covered by shared bootstrap hook
   useEffect(() => {
-    if (!state.isUsedCustomJsCode) return;
+    if (useSharedBootstrap) return;
+    if (state.loadedStateFromSession) return;
 
-    injectCustomJsCode(hasSentCustomJs, state, {
-      head: { jsCode: state.headCustomJsCode, position: CUSTOM_JS_CODE_POSITION.HEAD },
-      top_body: { jsCode: state.topBodyCustomJsCode, position: CUSTOM_JS_CODE_POSITION.TOP_BODY },
-      bottom_body: { jsCode: state.bottomBodyCustomJsCode, position: CUSTOM_JS_CODE_POSITION.BOTTOM_BODY },
+    const savedState = getChatbotSavedState();
+    if (!savedState) {
+      // Storage cleared between mount and effect — fall through to shared bootstrap
+      setUseSharedBootstrap(true);
+      return;
+    }
+
+    const currentBotId = params.get("order_id") || params.get("bot_id") || Cookies.get("bot_id");
+    if (currentBotId && currentBotId !== savedState.botId) {
+      clearChatbotState();
+      dispatch({ type: PREVIEW_ACTIONS.SET_UPSELL_BOT_ID, payload: currentBotId });
+      return getScenarioPreviewData(currentBotId, params.get("scenario_id"))
+        .then(extractStateFromPreviewResponse);
+    }
+
+    setConversionParamToLocalStorage(
+      savedState.scenarioId,
+      'web',
+      savedState.userInputId || params.get("uuid"),
+      params.get("env") || "production",
+      savedState
+    );
+
+    if (isLoggedIn) {
+      return dispatch({
+        type: PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SESSION_STORAGE,
+        payload: {
+          savedState,
+          isLoggedIn: isLoggedIn,
+          isUsingAmazonPay: params.get('is_using_amazon_pay')
+        }
+      });
+    }
+
+    const timerConfig = getTimerConfig();
+    if (timerConfig) {
+      setTimerChanges({ timeLeft: calculateTimerConfigDuration(timerConfig?.config?.type, timerConfig?.config?.duration, { timerLeft: timerConfig.timeLeft, useTimerLeft: true }), config: timerConfig });
+    }
+
+    return fukushashikiSavedStateToLp(savedState, params, state).then(async () => {
+      if (isTokyoDeveloLP(savedState.urlReceive)) {
+        executeLpJsCode(UPDATE_TOKYO_DEVELO_LP_PREFECTURE_JS_CODE, savedState);
+      }
+
+      return dispatch({
+        type: PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SESSION_STORAGE,
+        payload: {
+          savedState,
+          isLoggedIn: isLoggedIn,
+          isUsingAmazonPay: params.get('is_using_amazon_pay')
+        }
+      });
     });
-  }, [state.isUsedCustomJsCode, state.headCustomJsCode, state.topBodyCustomJsCode, state.bottomBodyCustomJsCode]);
-
-  // For add custom css
-  useEffect(() => {
-    const existing = document.getElementById('custom-css');
-    if (existing) existing.remove();
-
-    if (state.isUsedCustomCss && state.customCssContent) {
-      const style = document.createElement('style');
-      style.id = "custom-css";
-      style.innerHTML = state.customCssContent;
-      document.head.appendChild(style);
-    }
-
-    applyPreviewThemeCss(state.botInfor, state.themeSettings);
-  }, [state.isUsedCustomCss, state.customCssContent, state.botInfor, state.themeSettings]);
-
-  useEffect(() => {
-    applyPreviewThemeCss(state.botInfor, state.themeSettings);
-  }, [state.themeSettings, state.botInfor]);
-
-  // Get Preview Scenario Data
-  useEffect(() => {
-    if (!state.loadedStateFromSession) {
-      let savedState = getChatbotSavedState();
-      if (savedState) {
-        const currentBotId = params.get("order_id") || params.get("bot_id") || Cookies.get("bot_id");
-        if (currentBotId && currentBotId !== savedState.botId) {
-          clearChatbotState();
-          dispatch ({type: PREVIEW_ACTIONS.SET_UPSELL_BOT_ID, payload: currentBotId});
-          return getScenarioPreviewData(currentBotId, params.get("scenario_id"))
-          .then(extractStateFromPreviewResponse);
-        };
-
-        setConversionParamToLocalStorage(
-          savedState.scenarioId,
-          'web',
-          savedState.userInputId || params.get("uuid"),
-          params.get("env") || "production",
-          savedState
-        );
-
-        if (isLoggedIn) {
-          return dispatch({
-            type: PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SESSION_STORAGE,
-            payload: {
-              savedState,
-              isLoggedIn: isLoggedIn,
-              isUsingAmazonPay: params.get('is_using_amazon_pay')
-            }
-          });
-        }
-
-        const timerConfig = getTimerConfig();
-        if (timerConfig) {
-          setTimerChanges({ timeLeft: calculateTimerConfigDuration(timerConfig?.config?.type, timerConfig?.config?.duration, { timerLeft: timerConfig.timeLeft, useTimerLeft: true }), config: timerConfig });
-        }
-
-        return fukushashikiSavedStateToLp(savedState, params, state).then(async () => {
-          if (isTokyoDeveloLP(savedState.urlReceive)) {
-            executeLpJsCode(UPDATE_TOKYO_DEVELO_LP_PREFECTURE_JS_CODE, savedState);
-          }
-
-          return dispatch({
-            type: PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SESSION_STORAGE,
-            payload: {
-              savedState,
-              isLoggedIn: isLoggedIn,
-              isUsingAmazonPay: params.get('is_using_amazon_pay')
-            }
-          });
-        });
-      }
-    }
-
-    if (state.loadedStateFromSession && state.botId)
-      return;
-
-    if (!state.botId) {
-      dispatch({ type: PREVIEW_ACTIONS.SET_BOT_ID, payload: params.get("bot_id") });
-      return;
-    }
-
-    if (!state.urlSend) {
-      dispatch({ type: PREVIEW_ACTIONS.SET_URL_SEND, payload: window.location.href });
-      return;
-    }
-
-    if (!state.urlReceive) {
-      dispatch({ type: PREVIEW_ACTIONS.SET_URL_RECEIVE, payload: params.get("urlReceive") });
-      return;
-    }
-
-    if (!state.deviceReceive) {
-      dispatch({ type: PREVIEW_ACTIONS.SET_DEVICE_RECEIVE, payload: params.get("deviceReceive") });
-      return;
-    }
-
-    if (!state.scenarioId) {
-      dispatch({ type: PREVIEW_ACTIONS.SET_SCENARIO_ID, payload: params.get("scenario_id") });
-      return;
-    }
-
-    return getScenarioPreviewData(state.botId, state.scenarioId)
-      .then(extractStateFromPreviewResponse);
-  }, [
-    state.botId, state.urlSend, state.urlReceive,
-    state.deviceReceive, state.scenarioId,
-    state.isDisplayErrorMessage, state.loadedStateFromSession
-  ]);
-
-  // Auto-scroll to bottom of the chatbot when render messages list changes or submit error message changes
-  useEffect(() => {
-    if (state.isUpsell) return;
-
-    const curretMsg = state.messagesList[state.currentMsgIndex];
-    if (state.isNotAutoScroll) {
-      if (curretMsg?.message_content?.[0]?.type === MESSAGE_CONTENT_TYPES.IMAGE) {
-        setTimeout(() => {
-          document.querySelector(`#msg-${state.currentMsgIndex}-0`)?.scrollIntoView({ behavior: "smooth" });
-        }, 2000);
-        return;
-      }
-
-      const bot_statement_type = curretMsg?.message_content?.[0]?.type;
-      if (bot_statement_type && curretMsg?.message_content?.[0]?.[bot_statement_type]?.scroll_auto === true) {
-        setTimeout(() => {
-          const container = document.querySelector("#sp-body");
-          const element = document.querySelector(`#msg_id_${curretMsg.id}`);
-          if (container && element) {
-            const targetScrollTop = element.getBoundingClientRect().top - container.getBoundingClientRect().top + container.scrollTop - 200;
-            container.scrollTo({
-              top: targetScrollTop,
-              behavior: "smooth"
-            });
-          }
-        }, 1000);
-        return;
-      }
-      return;
-    }
-
-    const timeoutId = setTimeout(() => {
-      scrollToPosition({ position: "b", selector: "#sp-body" });
-    }, 300);
-
-    return () => clearTimeout(timeoutId);
-  }, [state.renderMessagesList?.length, state.submitErrorMessage, state.isUpsell]);
+  }, [useSharedBootstrap, state.loadedStateFromSession]);
 
   useEffect(() => {
     if (
@@ -697,32 +420,6 @@ const PreviewFukushashiki = () => {
       }, 1000);
     }
   }, [state.loadedStateFromSession, state.displayType, state.isOpen, state.messagesList.length, state.botInfor, state.manuallyClosed]);
-
-  useEffect(() => {
-    if (!state.nextStopMsgIndex || state.currentMsgIndex + 1 >= state.nextStopMsgIndex || !state.isOpen) {
-      dispatch({ type: PREVIEW_ACTIONS.SET_IS_NOT_AUTO_SCROLL, payload: false });
-      return;
-    }
-
-    setTimeout(() => {
-      const newMsgIndex = state.currentMsgIndex + 1;
-      dispatch({
-        type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
-        payload: {
-          startIndex: 0,
-          endIndex: state.currentMsgIndex + 1 + 1,
-          fromCallback: false,
-        }
-      });
-      if (newMsgIndex < state.messagesList.length && isInteractiveMessage(state.messagesList[newMsgIndex])) {
-        sendAppearLogToServer({
-          scenario_id: state.scenarioId,
-          user_id: state.uuid,
-          message: state.messagesList[newMsgIndex],
-        });
-      }
-    }, RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE);
-  }, [state.currentMsgIndex, state.nextStopMsgIndex]);
 
   const renderNextMessage = () => {
     if (state.currentMsgIndex + 1 >= state.nextStopMsgIndex) return;
@@ -808,72 +505,6 @@ const PreviewFukushashiki = () => {
   }
 
 
-  const getBotInforFromPreviewResponse = (res) => {
-    if (!res || !res.data || !res.data.chatbot) return {};
-
-    let opacity_color, message_color, font_color, icon_mess;
-    if (res.data.chatbot.main_color === "blue") {
-      opacity_color = "#D6E0EF";
-      message_color = "#3CACEF";
-      font_color = "#fff";
-      icon_mess = iconMessageBlue;
-    } else if (res.data.chatbot.main_color === "green") {
-      opacity_color = "#DEEADB";
-      message_color = "#9DDB7C";
-      font_color = "#fff";
-      icon_mess = iconMessageGreen;
-    } else if (res.data.chatbot.main_color === "orange") {
-      opacity_color = "#F4E5DA";
-      message_color = "#EF8D2F";
-      font_color = "#fff";
-      icon_mess = iconMessageOrange;
-
-    } else if (res.data.chatbot.main_color === "yellow") {
-      opacity_color = "#F0EFEB";
-      message_color = "#F3AA2D";
-      res.data.chatbot.main_color = "#F6CA21";
-      font_color = "#fff";
-      icon_mess = iconMessageYellow;
-    } else if (res.data.chatbot.main_color === "pink") {
-      opacity_color = "#EBDDE3";
-      message_color = "#E65B83";
-      res.data.chatbot.main_color = "#F170AA";
-      font_color = "#fff";
-      icon_mess = iconMessagePink;
-    } else if (res.data.chatbot.main_color === "purple") {
-      opacity_color = "#E9E8F1";
-      message_color = "#AF82D5";
-      res.data.chatbot.main_color = "#8C66D9";
-      font_color = "#fff";
-      icon_mess = iconMessagePurple;
-    } else if (res.data.chatbot.main_color === "black") {
-      opacity_color = "#ecede8";
-      message_color = "#c3c3c3";
-      font_color = "#000";
-      icon_mess = iconMessageBlack;
-    } else if (res.data.chatbot.main_color === "white") {
-      opacity_color = "#fff";
-      message_color = "#F5F5F5";
-      font_color = "#000";
-      icon_mess = iconMessageWhite;
-    } else if (res.data.chatbot.main_color_other) {
-      opacity_color = lightenColor(res.data.chatbot.main_color_other, 0.1);
-      message_color = res.data.chatbot.main_color_other;
-      font_color = "#fff";
-    }
-
-    return {
-      ...res.data.chatbot,
-      opacity_color,
-      message_color,
-      font_color,
-      icon_mess,
-      main_color: res.data.chatbot.main_color || res.data.chatbot.main_color_other,
-      main_color_other: res.data.chatbot.main_color_other,
-      titleBubble:res.data.design_settings.title_bubble
-    };
-  }
-
   const extractStateFromPreviewResponse = async (res) => {
     if (!res || !res.data || res.data.code !== 1) return;
 
@@ -893,23 +524,7 @@ const PreviewFukushashiki = () => {
       loadedStateFromSession: true,
       messagesList: _.cloneDeep(conversation?.messages || []),
       isOpen: shouldAutoOpen ? true : Boolean(state.isOpen),
-      activePopupCloseBot: parsedDesign.popupCloseBot,
-      titleBubble: parsedDesign.titleBubble || "簡単90秒で注文完了",
-      displayType: parsedDesign.displayType,
-      widthPc: parsedDesign.widthPc,
-      heightPc: parsedDesign.heightPc,
-      widthSp: parsedDesign.widthSp,
-      heightSp: parsedDesign.heightSp,
-      positionPc: String(parsedDesign.positionPc),
-      rightPcTitle: parsedDesign.rightPcTitle,
-      buttonTypePc: String(parsedDesign.buttonTypePc),
-      rightMarginPc: parsedDesign.rightMarginPc,
-      bottomMarginPc: parsedDesign.bottomMarginPc,
-      positionSp: String(parsedDesign.positionSp),
-      buttonTypeSp: String(parsedDesign.buttonTypeSp),
-      rightSpTitle: parsedDesign.rightSpTitle,
-      rightMarginSp: parsedDesign.rightMarginSp,
-      bottomMarginSp: parsedDesign.bottomMarginSp,
+      ...mapParsedDesignToState(parsedDesign),
       isUsedErrMsgByJs: chatbot?.is_used_err_msg_by_js,
       errMsgJsCode: chatbot?.err_msg_js_code,
       errMsgSettingMode: chatbot?.err_msg_setting_mode || 'js',
@@ -929,7 +544,6 @@ const PreviewFukushashiki = () => {
       bottomBodyCustomJsCode: chatbot?.bottom_body_custom_js_code,
       isUsedCustomCss: !!chatbot?.is_used_custom_css,
       customCssContent: chatbot?.custom_css_content,
-      themeSettings: parsedDesign.themeSettings,
     };
 
     if (chatbot?.timer_config?.enable) {
@@ -1339,18 +953,14 @@ const PreviewFukushashiki = () => {
     );
   };
 
-  const renderMessages = () => {
-    return (state.renderMessagesList || []).map((message, messageIndex) => {
-      if (message.hidden && !stringNullOrEmpty(message.hidden)) return null;
-      return (
-        <React.Fragment key={messageIndex}>
-          {renderBotMessageContent(message, messageIndex)}
-          {renderUserMessageContent(message, messageIndex)}
-          {renderCombineMessageContent(message, messageIndex)}
-        </React.Fragment>
-      );
-    })
-  };
+  const renderMessages = () => (
+    <PreviewMessagesList
+      messages={state.renderMessagesList}
+      renderBotMessage={renderBotMessageContent}
+      renderUserMessage={renderUserMessageContent}
+      renderCombineMessage={renderCombineMessageContent}
+    />
+  );
 
   const renderSubmitErrorMessages = () => {
     if (!state.isUsedErrMsgByJs || !state.submitErrorMessage) return null;
@@ -1368,317 +978,88 @@ const PreviewFukushashiki = () => {
     );
   }
 
-  const getBotHeaderIcon = () => {
-    if (state.isOpen) {
-      return state.botInfor?.opening_bot_icon?.url || state.botInfor?.icon?.url;
-    }
-    return state.botInfor?.closing_bot_icon?.url || state.botInfor?.icon?.url;
-  }
-
-  const getOpeningBotStyle = () => {
-    let containerStyle = {
-      position: 'fixed',
-      bottom: "0px",
-      right: isMobile() ? state.isOpen ? 0 : `${state.rightMarginSp}px` : `${state.rightMarginPc}px`,
-      width: isMobile() ? `${state.widthSp}%` : `${state.widthPc}px`,
-      height: isMobile() ? `${state.heightSp}%` : `${state.heightPc}px`,
-      zIndex: 999,
-      display: "flex",
-      flexDirection: "column",
-      backgroundColor: "white"
-    };
-    let headerStyle = {
-      borderTopLeftRadius: isMobile() ? "0px" : "5px",
-      borderTopRightRadius: isMobile() ? "0px" : "5px",
-    };
-    let bodyStyle = {
-      backgroundColor: state.botInfor?.opacity_color,
-      flex: 1,
-    };
-
-    if (state.botInfor?.main_color || state.botInfor?.main_color_other) {
-      headerStyle.backgroundColor = state.botInfor?.main_color || state.botInfor?.main_color_other;
-    }
-
-    if (!state.activePopupCloseBot) {
-      containerStyle.height = isMobile() ? `${state.heightSp || 100}%` : `${state.heightPc || 600}px`;
-      headerStyle = {
-        ...headerStyle,
-        position: "static",
-        borderBottomLeftRadius: "0px",
-        borderBottomRightRadius: "0px",
-      };
-      bodyStyle.display = "block";
-    }
-
-    return {
-      containerStyle,
-      headerStyle,
-      bodyStyle,
-    };
-  };
-
+  const headerIconSrc = `${EC_CHATBOT_URL}${getBotHeaderIconPath(state.botInfor, state.isOpen)}`;
 
   if (!state.scenarioId || !state.botInfor || state.displayType === null) return null;
 
-  // body container
   if (state.isOpen) {
-    const { containerStyle, headerStyle, bodyStyle } = getOpeningBotStyle();
+    const { frameClassName, cssVars } = buildOpeningBotStyle(state);
     const openAnimationDurationMs = clampOpenAnimationDurationMs(
       state.openAnimationDurationMs ?? OPEN_ANIMATION_DURATION_MS_DEFAULT,
     );
-    const openContainerStyle = {
-      ...containerStyle,
-      '--chatbot-open-animation-duration': `${openAnimationDurationMs}ms`,
-    };
     return (
-      <div
-        ref={containerRef}
-        id="sp-container1"
-        className={`sp-container1 ${resolveOpenAnimationClassName(state.openAnimationStyle, isMobile())}`}
-        style={openContainerStyle}
-      >
-        <ZipCodePopUp
-          onOpen={onOpenZipCodePopup}
-          prefecturesList={state.prefecturesList}
-          message={state.messagesList[state.zipcodeIndex]}
-          messageIndex={state.currentMsgIndex}
-          zipcodeContentIndex={state.zipcodeContentIndex}
-          onChangeValue={onChangeValue}
-          onChangeErrors={onChangeErrors}
-          errors={state.errors}
-        />
-        {/* popup for shipping address can be used instead of ZipCodePopUp -> remove */}
-        <div id="sp-header" style={headerStyle} className="sp-header">
-          <div className="sp-header-left" onClick={onChatbotHeaderClick}>
-            <div className="sp-body-bot-side-avatar sp-avatar-bt">
-              <img src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`} alt="bot-header-icon"/>
-            </div>
-            <div className="sp-header-left-label">
-              <div className="sp-header-left-label-sub-title">
-                {state.botInfor?.subtitle}
+      <PreviewOpenChatFrame
+        containerRef={containerRef}
+        containerClassName={`sp-container1 ${resolveOpenAnimationClassName(state.openAnimationStyle, isMobile())}`}
+        frameClassName={frameClassName}
+        cssVars={{
+          ...cssVars,
+          "--chatbot-open-animation-duration": `${openAnimationDurationMs}ms`,
+        }}
+        headerIconSrc={headerIconSrc}
+        subtitle={state.botInfor?.subtitle}
+        titleBubble={state.botInfor?.titleBubble}
+        isOpen={state.isOpen}
+        onHeaderClick={onChatbotHeaderClick}
+        botConfig={state}
+        showPopupCloseBot={state.showPopupCloseBot}
+        onClosePopup={() => setShowPopupCloseBot(false)}
+        onCloseBot={() => onOpenPreview(false)}
+        overlays={(
+          <ZipCodePopUp
+            onOpen={onOpenZipCodePopup}
+            prefecturesList={state.prefecturesList}
+            message={state.messagesList[state.zipcodeIndex]}
+            messageIndex={state.currentMsgIndex}
+            zipcodeContentIndex={state.zipcodeContentIndex}
+            onChangeValue={onChangeValue}
+            onChangeErrors={onChangeErrors}
+            errors={state.errors}
+          />
+        )}
+        beforeBody={(
+          <>
+            {!!state.botInfor?.timer_config?.enable && (
+              <div className="chatbot_timer_holder">
+                <Timer
+                  duration={calculateTimerConfigDuration(state.botInfor.timer_config.type, state.botInfor.timer_config.duration)}
+                  timeLeft={timerChanges.timeLeft}
+                  countMsg={state.botInfor.timer_config.messages.counting}
+                  finishMsg={state.botInfor.timer_config.messages.finish}
+                  variables={getTimerConfigVariable(state.botInfor.timer_config.variables)}
+                  startCount={state.isOpen}
+                  isRealtimeRemainingTime={state.botInfor.timer_config.isRealtimeRemainingTime}
+                  scenarioId={state.scenarioId}
+                  onCounting={handleOnCounting(state.botInfor.timer_config)}
+                />
               </div>
-              <div className="sp-header-left-label-title">{state.botInfor?.titleBubble}</div>
-            </div>
-          </div>
-          <div className="sp-header-right" onClick={onChatbotHeaderClick}>
-            <div className="sp-header-right-arrow">
-              {state.isOpen ? (
-                <MDBIcon fas icon="chevron-circle-down" />
-              ) : (
-                <MDBIcon fas icon="chevron-circle-up" />
-              )}
-            </div>
-          </div>
-        </div>
-        <PreventExitChatbotModal
-          botConfig={state}
-          isOpen={state.showPopupCloseBot}
-          onClose={() => setShowPopupCloseBot(false)}
-          onCloseBot={() => onOpenPreview(false)}
-        />
-        {!!state.botInfor?.timer_config?.enable
-          &&
-          <div className="chatbot_timer_holder" style={{
-            backgroundColor: bodyStyle.backgroundColor,
-          }}>
-            <Timer
-              duration={calculateTimerConfigDuration(state.botInfor.timer_config.type, state.botInfor.timer_config.duration)}
-              timeLeft={timerChanges.timeLeft}
-              countMsg={state.botInfor.timer_config.messages.counting}
-              finishMsg={state.botInfor.timer_config.messages.finish}
-              variables={getTimerConfigVariable(state.botInfor.timer_config.variables)}
-              startCount={state.isOpen}
-              isRealtimeRemainingTime={state.botInfor.timer_config.isRealtimeRemainingTime}
-              scenarioId={state.scenarioId}
-              onCounting={handleOnCounting(state.botInfor.timer_config)}
+            )}
+            <ProcessBar
+              botInfor={state.botInfor}
+              currentIndex={state.passedUserMsgCount}
+              maxIndex={state.progressBarMaxIndex}
             />
-          </div>
-        }
-
-        <ProcessBar botInfor={state.botInfor}
-          currentIndex={state.passedUserMsgCount}
-          maxIndex={state.progressBarMaxIndex}
-        />
-        <div id="sp-body" className="sp-body" style={bodyStyle}
-        >
-          {renderMessages()}
-          {renderSubmitErrorMessages()}
-        </div>
-      </div>
-    )
-  } else if (state.displayType === DISPLAY_TYPES.HIDDEN) {
-    return null;
-  } else if (isMobile() === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 2) {
-    return (
-      <div
-        onClick={() => onOpenPreview(!state.isOpen)}
-        style={{
-          backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
-          width: "56px",
-          height: "56px",
-          borderRadius: "30px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          position: 'fixed',
-          ...getClosedLauncherPosition(state),
-        }}
+          </>
+        )}
       >
-        <img
-          style={{ width: "96%", height: "96%", borderRadius: "30px" }}
-          src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
-          alt="bot-header-icon"
-        />
-      </div>
-    )
-  } else if (isMobile() === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 1) {
-    return (
-      <div
-        onClick={() => onOpenPreview(!state.isOpen)}
-        style={{
-          backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
-          width: getClosedBarWidth(state, false),
-          height: "66px",
-          borderRadius: '35px',
-          display: "flex",
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          paddingLeft: '3px',
-          paddingRight: '3px',
-          position: 'fixed',
-          ...getClosedLauncherPosition(state),
-        }}
-      >
-        <div className="sp-header-left-bt" onClick={() => onOpenPreview(!state.isOpen)}>
-          <div className="sp-header-left-avatar sp-avatar-bt">
-            <img src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`} alt="bot-header-icon" />
-          </div>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, minWidth: 0 }}>
-          <div id="comment_bubble" style={{ paddingLeft: '20px' }}>
-            <span style={{ fontSize: '18px', fontWeight: 900 }}>{state.botInfor.title}</span>
-          </div>
-        </div>
-        <div className="sp-header-right-arrow" style={{ marginRight: '8px' }}>
-          <MDBIcon fas icon="chevron-circle-up" />
-        </div>
-      </div>
-    )
-  } else if (isMobile() === false && Number(state.positionPc) === 2) {
-    return (
-      <div
-        onClick={() => onOpenPreview(!state.isOpen)}
-        style={{
-          backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
-          width: '300px',
-          height: "65px",
-          borderRadius: "0px",
-          display: "flex",
-          justifyContent: "left",
-          position: 'fixed',
-          transform: ' rotate(-90deg)',
-          ...getClosedLauncherPosition(state, { variant: 'vertical' }),
-        }}
-      >
-        <div className="sp-header-left" onClick={() => onOpenPreview(!state.isOpen)}>
-          <div className="sp-header-left-avatar sp-avatar">
-            <img src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`} alt="bot-header-icon" />
-          </div>
-          <div className="sp-header-left-label">
-            <div className="sp-header-left-label-title">{state.rightPcTitle}</div>
-          </div>
-        </div>
-      </div>)
-  } else if (!state.isOpen && isMobile() === true && Number(state.positionSp) === 1 && Number(state.buttonTypeSp) === 2) {
-    return (
-      <div
-        onClick={() => onOpenPreview(!state.isOpen)}
-        style={{
-          backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
-          width: "56px",
-          height: "56px",
-          borderRadius: "30px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          position: 'fixed',
-          ...getClosedLauncherPosition(state, { isMobile: true }),
-        }}
-      >
-        <img
-          style={{ width: "96%", height: "96%", borderRadius: "30px" }}
-          src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
-          alt="bot-header-icon"
-        />
-      </div>
-    )
-  } else if (!state.isOpen && isMobile() === true && Number(state.positionSp) === 1 && Number(state.buttonTypeSp) === 1) {
-    return (
-      <div
-        onClick={() => onOpenPreview(!state.isOpen)}
-        className={state.useFullWidthChatbotMobile ? "fullwidth_mobile_chatbot" : ""}
-        style={{
-          backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
-          width: getClosedBarWidth(state, true),
-          height: state.useFullWidthChatbotMobile ? "75px" : "48px",
-          borderRadius: state.useFullWidthChatbotMobile ? "45px" :'35px',
-          display: "flex",
-          justifyContent: "left",
-          alignItems: "center",
-          position: 'fixed',
-          ...getClosedLauncherPosition(state, { isMobile: true }),
-        }}
-      >
-        <div className="sp-header-left" style={{ width: '100%', padding: state.useFullWidthChatbotMobile ? undefined : '4px' }}>
-          <div className={state.useFullWidthChatbotMobile ? "fullwidth_mobile_chatbot sp-header-left-avatar sp-avatar" :"sp-header-left-avatar sp-avatar"} style={{ width: state.useFullWidthChatbotMobile ? "58px" : '38px' }}>
-            <img
-              src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
-              alt="bot-header-icon"
-            />
-          </div>
-          <div>
-            <div id="comment_bubble" className="sp-bubble">
-              <span style={{ fontSize: state.useFullWidthChatbotMobile ? "17px" :'14px', fontWeight: 700 }}>{state.botInfor.title}</span>
-            </div>
-          </div>
-          <div className="sp-header-right-arrow" style={{ marginLeft: 'auto' }}>
-            <MDBIcon fas icon="chevron-circle-up" />
-          </div>
-        </div>
-      </div>
-    )
-  } else if (!state.isOpen && isMobile() === true && Number(state.positionSp) === 2) {
-    return (
-      <div
-        onClick={() => onOpenPreview(!state.isOpen)}
-        style={{
-          backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
-          width: '300px',
-          height: "60px",
-          borderRadius: "0px",
-          display: "flex",
-          justifyContent: "left",
-          position: 'fixed',
-          transform: ' rotate(-90deg)',
-          ...getClosedLauncherPosition(state, { isMobile: true, variant: 'vertical' }),
-        }}
-      >
-        <div className="sp-header-left">
-          <div className="sp-header-left-avatar sp-avatar">
-            <img
-              src={`${EC_CHATBOT_URL}${getBotHeaderIcon()}`}
-              alt="bot-header-icon"
-            />
-          </div>
-          <div className="sp-header-left-label">
-            <div className="sp-header-left-label-title">{state.rightSpTitle}</div>
-          </div>
-        </div>
-      </div>)
+        {renderMessages()}
+        {renderSubmitErrorMessages()}
+      </PreviewOpenChatFrame>
+    );
   }
 
-  return (<div></div>);
+  return (
+    <PreviewClosedLauncher
+      state={state}
+      headerIconSrc={headerIconSrc}
+      onOpen={onOpenPreview}
+      isMobileView={isMobile()}
+      showFallback={false}
+      spCircleUseParentOffsets={false}
+      requireClosed={false}
+      hideWhenDisplayHidden
+    />
+  );
 }
 
 export default PreviewFukushashiki;
