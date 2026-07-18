@@ -175,6 +175,7 @@ export const buildBasicInfoPayload = ({
   botImage,
   openingBotIcon,
   closingBotIcon,
+  chatBodyVersion,
 }) => {
   const { main_color, main_color_other } = resolveMainColorKey(mainColor);
   const payload = {
@@ -184,6 +185,7 @@ export const buildBasicInfoPayload = ({
       design_type: designType,
       bot_name: botName,
       main_color,
+      chat_body_version: chatBodyVersion || '2.0',
       ...(main_color_other ? { main_color_other } : {}),
     },
   };

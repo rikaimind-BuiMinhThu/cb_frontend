@@ -1723,8 +1723,64 @@
     }, 5e3);
   };
 
+  // src/v2/sdk/versionGate.js
+  var REDIRECT_FLAG = "__EC_CHAT_BODY_VERSION_REDIRECTED__";
+  var sdkScriptEl = typeof document !== "undefined" ? document.currentScript : null;
+  function getFrontendBaseFromScript() {
+    try {
+      const src = sdkScriptEl == null ? void 0 : sdkScriptEl.src;
+      if (src) return new URL(src).origin;
+    } catch (e) {
+    }
+    return "";
+  }
+  function injectAlternateScript(alternateScriptPath) {
+    window[REDIRECT_FLAG] = true;
+    const script = document.createElement("script");
+    script.src = `${getFrontendBaseFromScript()}${alternateScriptPath}`;
+    script.defer = true;
+    (document.head || document.documentElement).appendChild(script);
+  }
+  async function resolveChatBodyVersionGate({ entryVersion, alternateScriptPath }) {
+    var _a;
+    if (window[REDIRECT_FLAG]) {
+      return false;
+    }
+    let botId2 = null;
+    try {
+      botId2 = sessionStorage.getItem("bot_id");
+    } catch (e) {
+    }
+    if (!botId2) {
+      return false;
+    }
+    try {
+      const response = await fetch(
+        `${getEcChatBotApiServerBaseUrl()}/api/v1/managements/chatbots/${encodeURIComponent(botId2)}/chat_body_version`,
+        {
+          method: "GET",
+          headers: { Accept: "application/json" }
+        }
+      );
+      const data = await response.json();
+      const version = (_a = data == null ? void 0 : data.data) == null ? void 0 : _a.chat_body_version;
+      if (version && version !== entryVersion) {
+        injectAlternateScript(alternateScriptPath);
+        return true;
+      }
+    } catch (e) {
+    }
+    return false;
+  }
+
   // src/v2/sdk/index.js
-  initSentry();
-  ensureJQuery();
-  displayPopup();
+  resolveChatBodyVersionGate({
+    entryVersion: "2.0",
+    alternateScriptPath: "/sdk-v2.js"
+  }).then((redirected) => {
+    if (redirected) return;
+    initSentry();
+    ensureJQuery();
+    displayPopup();
+  });
 })();

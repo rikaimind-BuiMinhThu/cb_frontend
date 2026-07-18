@@ -33,6 +33,15 @@ export const OPEN_ANIMATION_STYLES = [
   { value: OPEN_ANIMATION_STYLE_EXPAND_FROM_CORNER, label: '角から拡大する' },
 ];
 
+export const CHAT_BODY_VERSION_1 = '1.0';
+export const CHAT_BODY_VERSION_2 = '2.0';
+export const CHAT_BODY_VERSION_DEFAULT = CHAT_BODY_VERSION_2;
+
+export const CHAT_BODY_VERSIONS = [
+  { value: CHAT_BODY_VERSION_1, label: '1.0' },
+  { value: CHAT_BODY_VERSION_2, label: '2.0' },
+];
+
 export const MAIN_COLORS = [
   '#327AED',
   '#26B197',

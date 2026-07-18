@@ -1,27 +1,47 @@
 import Cookies from 'js-cookie';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Button, Input, message } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import api from 'api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { getAdminRoutePath, getEcChatBotFrontEndBaseUrl } from 'v2/variables/constants';
+import {
+  CHAT_BODY_VERSION_DEFAULT,
+  buildFaqEmbedScript,
+  buildPaymentEmbedScript,
+  getSdkEmbedPaths,
+} from 'utils/sdkEmbedPaths';
 import { AdminPage, AdminFormRow, AdminActionButton, useAdminHeaderActions } from '../../../components/AdminShell';
 
 function InstallationTag() {
   const [urlDemo, setUrlDemo] = useState('');
   const [botId] = useState(Cookies.get('bot_id'));
+  const [chatBodyVersion, setChatBodyVersion] = useState(CHAT_BODY_VERSION_DEFAULT);
 
-  const paymentScript = `<script>sessionStorage.setItem("bot_id", "${botId}");</script>\n<script src="${getEcChatBotFrontEndBaseUrl()}/v2/sdk.js" defer></script>`;
-  const faqScript = `<script>sessionStorage.setItem("bot_id", "${botId}");sessionStorage.setItem("bot_type", "faq");</script>\n<script src="${getEcChatBotFrontEndBaseUrl()}/v2/sdk-faq.js" defer></script>`;
+  const { paymentSdkUrl, faqSdkUrl } = useMemo(
+    () => getSdkEmbedPaths(chatBodyVersion, getEcChatBotFrontEndBaseUrl()),
+    [chatBodyVersion],
+  );
+
+  const paymentScript = buildPaymentEmbedScript(botId, paymentSdkUrl);
+  const faqScript = buildFaqEmbedScript(botId, faqSdkUrl, { includeBotType: true });
 
   useEffect(() => {
     setUrlDemo(getAdminRoutePath('/demo-bot/' + botId));
+    if (!botId) return undefined;
+
     api
-      .get(`/api/v1/managements/chatbots/${botId}/get_scenario_selected`)
+      .get(`/api/v1/managements/chatbots/${botId}`)
+      .then((res) => {
+        const version = res?.data?.data?.chat_body_version;
+        if (version) setChatBodyVersion(version);
+      })
       .catch((err) => {
         if (err.response?.data.code === 0) tokenExpired();
       });
+
+    return undefined;
   }, [botId]);
 
   const copyText = (text) => {

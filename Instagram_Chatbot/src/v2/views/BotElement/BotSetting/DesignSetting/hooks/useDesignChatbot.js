@@ -2,7 +2,12 @@ import { useCallback, useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import api from 'api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
-import { TAB_BASIC, OPEN_ANIMATION_DURATION_MS_DEFAULT, OPEN_ANIMATION_STYLE_DEFAULT } from '../constants/designChatbotConstants';
+import {
+  TAB_BASIC,
+  OPEN_ANIMATION_DURATION_MS_DEFAULT,
+  OPEN_ANIMATION_STYLE_DEFAULT,
+  CHAT_BODY_VERSION_DEFAULT,
+} from '../constants/designChatbotConstants';
 import {
   applyIconsFromApiResponse,
   buildBasicInfoPayload,
@@ -54,6 +59,7 @@ export const useDesignChatbot = (initialBotId) => {
   const [openingBotIcon, setOpeningBotIcon] = useState('');
   const [closingBotIcon, setClosingBotIcon] = useState('');
   const [botName, setBotName] = useState('');
+  const [chatBodyVersion, setChatBodyVersion] = useState(CHAT_BODY_VERSION_DEFAULT);
   const [mainColor, setMainColor] = useState('#327AED');
   const [iconPresetIndices, setIconPresetIndices] = useState(INITIAL_ICON_PRESET_INDICES);
 
@@ -214,6 +220,7 @@ export const useDesignChatbot = (initialBotId) => {
       setApiColorKey(colorKey);
 
       setBotName(data.bot_name || '');
+      setChatBodyVersion(data.chat_body_version || CHAT_BODY_VERSION_DEFAULT);
       setTitle(data.title || '');
       setSubtitle(data.subtitle || '');
       setDesignType(data.design_type || 'flat');
@@ -305,6 +312,7 @@ export const useDesignChatbot = (initialBotId) => {
       botImage,
       openingBotIcon,
       closingBotIcon,
+      chatBodyVersion,
     });
 
     const designPayload = getDesignSettingsPayload();
@@ -342,6 +350,7 @@ export const useDesignChatbot = (initialBotId) => {
     botId,
     botImage,
     botName,
+    chatBodyVersion,
     closingBotIcon,
     designType,
     getDesignSettingsPayload,
@@ -388,6 +397,7 @@ export const useDesignChatbot = (initialBotId) => {
       botImage,
       openingBotIcon,
       closingBotIcon,
+      chatBodyVersion,
     });
 
     Promise.all([
@@ -421,6 +431,7 @@ export const useDesignChatbot = (initialBotId) => {
     botId,
     botImage,
     botName,
+    chatBodyVersion,
     closingBotIcon,
     designType,
     getDesignSettingsPayload,
@@ -502,6 +513,7 @@ export const useDesignChatbot = (initialBotId) => {
         openingBotIcon,
         closingBotIcon,
         botName,
+        chatBodyVersion,
         mainColor,
         openAnimationDurationMs,
         openAnimationStyle,
@@ -535,6 +547,7 @@ export const useDesignChatbot = (initialBotId) => {
       setSubtitle,
       setDesignType,
       setBotName,
+      setChatBodyVersion,
       setMainColor,
       setIsOpenNoti,
       clearValidationError,

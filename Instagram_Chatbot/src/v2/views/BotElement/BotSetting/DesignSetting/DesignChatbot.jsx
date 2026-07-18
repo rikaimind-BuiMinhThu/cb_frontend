@@ -41,6 +41,7 @@ function DesignChatbot() {
                       title: actions.setTitle,
                       subtitle: actions.setSubtitle,
                       botName: actions.setBotName,
+                      chatBodyVersion: actions.setChatBodyVersion,
                       openAnimationDurationMs: (nextValue) => {
                         actions.updateDesignSettingField('openAnimationDurationMs', nextValue);
                       },

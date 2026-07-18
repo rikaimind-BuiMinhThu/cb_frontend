@@ -6,6 +6,8 @@ import DesignBotIcons from '../DesignSettingComponents/DesignBotIcons';
 import InputNum from '../../ScenarioSetting/scenarioComon/InputNum';
 import {
   DEFAULT_IMAGES,
+  CHAT_BODY_VERSION_DEFAULT,
+  CHAT_BODY_VERSIONS,
   OPEN_ANIMATION_DURATION_MS_DEFAULT,
   OPEN_ANIMATION_DURATION_MS_MAX,
   OPEN_ANIMATION_DURATION_MS_MIN,
@@ -62,6 +64,22 @@ const BasicInfoTab = ({
             </span>
             <span className="error-message bot-name" style={errorStyle(validationErrors.botName)}>
               {validationErrors.botName}
+            </span>
+          </div>
+          <div className="field-add-bot">
+            <div className="add-bot_field-container">
+              <DesignSettingLabel tooltip={getDesignSettingTooltip('chatBodyVersion')}>
+                チャット本体バージョン
+              </DesignSettingLabel>
+              <Select
+                style={{ width: 220 }}
+                value={basicInfo.chatBodyVersion || CHAT_BODY_VERSION_DEFAULT}
+                options={CHAT_BODY_VERSIONS}
+                onChange={(value) => onFieldChange('chatBodyVersion', value)}
+              />
+            </div>
+            <span className="subtitle-field">
+              ※古いバージョンに変更すると、新しく実装された機能が正しく動作しない可能性があります。
             </span>
           </div>
           <div className="field-add-bot">
@@ -196,6 +214,7 @@ BasicInfoTab.propTypes = {
     openingBotIcon: PropTypes.string,
     closingBotIcon: PropTypes.string,
     botName: PropTypes.string,
+    chatBodyVersion: PropTypes.string,
     openAnimationDurationMs: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     openAnimationStyle: PropTypes.string,
   }).isRequired,
