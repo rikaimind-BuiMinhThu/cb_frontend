@@ -10,6 +10,7 @@ import { setToken } from "api/auth";
 import logo from '../../assets/img/ecchatbot-logo.png'
 import LoginFacebook from "./LoginFacebook";
 import {EC_CHATBOT_URL} from '../../variables/constants'
+import {getDefaultLandingPath} from 'v2/variables/constants'
 class Login extends React.Component {
 
   constructor(props) {
@@ -80,7 +81,7 @@ class Login extends React.Component {
             // sessionStorage.setItem("client", JSON.stringify(res.data.client));
             // Cookies.set('refreshToken', persons.refresh_token); /{path: '/admin/dashboard'}
             axios.defaults.headers.common['Authorization'] = `Bearer ${Cookies.get('token')}`;
-            getToDashboard();
+            getToDashboard(persons.user.role, res.data.client);
           } else {
             this.setState({ msgNoti: "ユーザー名またはパスワードが間違っています。" })
             document.getElementById("loginErrorMsg").style.display = "block"
@@ -89,8 +90,8 @@ class Login extends React.Component {
         })
         .catch(error => alert(error));
 
-      function getToDashboard() {
-        window.location.href = '/admin/dashboard'
+      function getToDashboard(role, client) {
+        window.location.href = getDefaultLandingPath(role, client)
       }
     }
   }
@@ -137,7 +138,7 @@ class Login extends React.Component {
             // sessionStorage.setItem("client", JSON.stringify(res.data.client));
             // Cookies.set('refreshToken', persons.refresh_token); /{path: '/admin/dashboard'}
             axios.defaults.headers.common['Authorization'] = `Bearer ${Cookies.get('token')}`;
-            getToDashboard();
+            getToDashboard(persons.user.role, res.data.client);
           } else {
             this.setState({ msgNoti: "ユーザー名またはパスワードが間違っています。" })
             document.getElementById("loginErrorMsg").style.display = "block"
@@ -146,8 +147,8 @@ class Login extends React.Component {
         })
         .catch(error => alert(error));
 
-      function getToDashboard() {
-        window.location.href = '/admin/dashboard'
+      function getToDashboard(role, client) {
+        window.location.href = getDefaultLandingPath(role, client)
       }
     }
   }
