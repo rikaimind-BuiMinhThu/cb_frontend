@@ -60,6 +60,9 @@ function ClientManagement() {
   var [buildingName, setBuildingName] = useState();
   var [email, setEmail] = useState();
   var [phone, setPhone] = useState();
+  var [replySmtpGmail, setReplySmtpGmail] = useState('');
+  var [replySmtpGmailAppPassword, setReplySmtpGmailAppPassword] = useState('');
+  var [hasReplySmtpPassword, setHasReplySmtpPassword] = useState(false);
   var [updateId, setUpdateId] = useState();
   const [updateImageChange, setUpdateImageChange] = useState(false);
 
@@ -375,6 +378,9 @@ function ClientManagement() {
         setBuildingName(data.building_name);
         setEmail(data.email);
         setPhone(data.phone_number);
+        setReplySmtpGmail(data.reply_smtp_gmail || '');
+        setReplySmtpGmailAppPassword('');
+        setHasReplySmtpPassword(Boolean(data.has_reply_smtp_password));
         setIsOpen(true);
         // console.log(data.status)
         if (data.status === 'active') {
@@ -462,6 +468,9 @@ function ClientManagement() {
         setBuildingName(data.building_name);
         setEmail(data.email);
         setPhone(data.phone_number);
+        setReplySmtpGmail(data.reply_smtp_gmail || '');
+        setReplySmtpGmailAppPassword('');
+        setHasReplySmtpPassword(Boolean(data.has_reply_smtp_password));
         setIsOpen(true);
         // console.log(data.status)
         if (data.status === 'active') {
@@ -624,6 +633,7 @@ function ClientManagement() {
       managerKata == true &&
       emailCheck == true &&
       emailCheckLen == true &&
+      validateReplySmtp({ requirePasswordIfNew: true }) === true &&
       // dateCheck === true &&
       price > 0 &&
       zipCode > 0
@@ -645,6 +655,8 @@ function ClientManagement() {
         obj.logo_url = inputImage;
       }
       obj.email = emaill;
+      obj.reply_smtp_gmail = replySmtpGmail || '';
+      obj.reply_smtp_gmail_app_password = replySmtpGmailAppPassword || '';
       // var updateClient = { client: obj };
       // console.log(newClient)
 
@@ -733,6 +745,53 @@ function ClientManagement() {
       document.getElementById(`${field}ErrMsg`).innerHTML = '';
       return true;
     }
+  }
+
+  function validateReplySmtp({ requirePasswordIfNew } = { requirePasswordIfNew: false }) {
+    const gmail = (replySmtpGmail || '').trim();
+    const password = replySmtpGmailAppPassword || '';
+    const gmailErrId = document.getElementById('newClientメール送信用GmailErrMsg')
+      || document.getElementById('addClientメール送信用GmailErrMsg');
+    const passwordErrId = document.getElementById('newClientメール送信用アプリパスワードErrMsg')
+      || document.getElementById('addClientメール送信用アプリパスワードErrMsg');
+    const mailformat = /^[a-zA-Z0-9]+[a-zA-Z0-9]+([._+-])*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/;
+
+    if (gmailErrId) {
+      gmailErrId.style.display = 'none';
+      gmailErrId.innerHTML = '';
+    }
+    if (passwordErrId) {
+      passwordErrId.style.display = 'none';
+      passwordErrId.innerHTML = '';
+    }
+
+    if (!gmail && !password) return true;
+
+    if (gmail && !mailformat.test(gmail)) {
+      if (gmailErrId) {
+        gmailErrId.style.display = 'block';
+        gmailErrId.innerHTML = 'メールを入力してください(例:abc＠abc.com)';
+      }
+      return false;
+    }
+
+    if (requirePasswordIfNew && gmail && !password && !hasReplySmtpPassword) {
+      if (passwordErrId) {
+        passwordErrId.style.display = 'block';
+        passwordErrId.innerHTML = 'アプリパスワードを入力してください。';
+      }
+      return false;
+    }
+
+    if (!gmail && password) {
+      if (gmailErrId) {
+        gmailErrId.style.display = 'block';
+        gmailErrId.innerHTML = 'メール送信用Gmailを入力してください。';
+      }
+      return false;
+    }
+
+    return true;
   }
 
   function addClient() {
@@ -877,7 +936,8 @@ function ClientManagement() {
       // dateCheck === true &&
       price > 0 &&
       zipCode > 0 &&
-      cfPass === true
+      cfPass === true &&
+      validateReplySmtp({ requirePasswordIfNew: true }) === true
     ) {
       // if (checkFieldAdd(name, 'Name') === true && checkFieldAdd(address, "Address") === true && utils.checkInputNumber(phone, "Phone") === true) {
       var elements = document.getElementById('addForm').elements;
@@ -892,6 +952,8 @@ function ClientManagement() {
       delete obj.password_confirmation;
       delete obj.password;
       obj.logo_url = inputImage;
+      obj.reply_smtp_gmail = replySmtpGmail || '';
+      obj.reply_smtp_gmail_app_password = replySmtpGmailAppPassword || '';
       var newClient = { client: obj, user: usr };
       // console.log(newClient);
 
@@ -1205,6 +1267,9 @@ function ClientManagement() {
     setShopUrl('');
     setClientId('');
     setClientSecret('');
+    setReplySmtpGmail('');
+    setReplySmtpGmailAppPassword('');
+    setHasReplySmtpPassword(false);
     setIsOpenAddUser(true);
     //detailUserClient
   }
@@ -2596,6 +2661,50 @@ function ClientManagement() {
                 <br />
                 <br />
                 <label className="label-input">
+                  メール送信用Gmail
+                  <input
+                    className="input-field"
+                    value={replySmtpGmail}
+                    disabled={disableInput == true ? true : false}
+                    onChange={(e) => setReplySmtpGmail(e.target.value)}
+                    type="text"
+                    id="editReplySmtpGmail"
+                    name="reply_smtp_gmail"
+                    placeholder="example@gmail.com"
+                  />
+                  <label
+                    id="newClientメール送信用GmailErrMsg"
+                    className="input-field"
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
+                  ></label>
+                </label>{' '}
+                <br />
+                <br />
+                <label className="label-input">
+                  メール送信用アプリパスワード
+                  <input
+                    className="input-field"
+                    value={replySmtpGmailAppPassword}
+                    disabled={disableInput == true ? true : false}
+                    onChange={(e) => setReplySmtpGmailAppPassword(e.target.value)}
+                    type="password"
+                    id="editReplySmtpGmailAppPassword"
+                    name="reply_smtp_gmail_app_password"
+                    placeholder={hasReplySmtpPassword ? '設定済み（変更する場合のみ入力）' : ''}
+                    autoComplete="new-password"
+                  />
+                  <div style={{ fontSize: '12px', color: '#767676', marginTop: '4px' }}>
+                    Gmailの2段階認証で発行したアプリパスワードを入力してください
+                  </div>
+                  <label
+                    id="newClientメール送信用アプリパスワードErrMsg"
+                    className="input-field"
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
+                  ></label>
+                </label>{' '}
+                <br />
+                <br />
+                <label className="label-input">
                   電話番号 <span className="span-require">*必須</span>
                   <input
                     className="input-field"
@@ -3531,6 +3640,47 @@ function ClientManagement() {
                   />
                   <label
                     id="newClientメールアドレスErrMsg"
+                    className="input-field"
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
+                  ></label>
+                </label>{' '}
+                <br />
+                <br />
+                <label className="label-input">
+                  メール送信用Gmail
+                  <input
+                    className="input-field"
+                    value={replySmtpGmail}
+                    onChange={(e) => setReplySmtpGmail(e.target.value)}
+                    type="text"
+                    id="addReplySmtpGmail"
+                    name="reply_smtp_gmail"
+                    placeholder="example@gmail.com"
+                  />
+                  <label
+                    id="addClientメール送信用GmailErrMsg"
+                    className="input-field"
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
+                  ></label>
+                </label>{' '}
+                <br />
+                <br />
+                <label className="label-input">
+                  メール送信用アプリパスワード
+                  <input
+                    className="input-field"
+                    value={replySmtpGmailAppPassword}
+                    onChange={(e) => setReplySmtpGmailAppPassword(e.target.value)}
+                    type="password"
+                    id="addReplySmtpGmailAppPassword"
+                    name="reply_smtp_gmail_app_password"
+                    autoComplete="new-password"
+                  />
+                  <div style={{ fontSize: '12px', color: '#767676', marginTop: '4px' }}>
+                    Gmailの2段階認証で発行したアプリパスワードを入力してください
+                  </div>
+                  <label
+                    id="addClientメール送信用アプリパスワードErrMsg"
                     className="input-field"
                     style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
