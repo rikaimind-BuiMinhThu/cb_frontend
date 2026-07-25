@@ -60,12 +60,25 @@ export default function useMessageBags(selectedGroupId) {
   }, [loadBags]);
 
   const removeBag = useCallback(async (id) => {
-    await deleteMessageBag(id);
-    antMessage.success(TOAST_MESSAGES.BAG_DELETED);
-    if (selectedBagId === id) {
-      setSelectedBagId(null);
+    try {
+      const result = await deleteMessageBag(id);
+      if (result.code === 2) {
+        antMessage.error(result.message || TOAST_MESSAGES.BAG_DELETE_IN_USE);
+        return false;
+      }
+      antMessage.success(TOAST_MESSAGES.BAG_DELETED);
+      if (selectedBagId === id) {
+        setSelectedBagId(null);
+      }
+      await loadBags();
+      return true;
+    } catch (error) {
+      console.error(error);
+      antMessage.error(
+        error.response?.data?.message || TOAST_MESSAGES.BAG_DELETE_FAILED
+      );
+      return false;
     }
-    await loadBags();
   }, [loadBags, selectedBagId]);
 
   const duplicateBag = useCallback(async (id) => {

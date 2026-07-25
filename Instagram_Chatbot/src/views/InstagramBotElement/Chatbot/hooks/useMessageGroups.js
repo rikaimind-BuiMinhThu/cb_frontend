@@ -63,12 +63,25 @@ export default function useMessageGroups() {
   }, [loadGroups, page]);
 
   const removeGroup = useCallback(async (id) => {
-    await deleteMessageGroup(id);
-    antMessage.success(TOAST_MESSAGES.GROUP_DELETED);
-    if (selectedGroupId === id) {
-      setSelectedGroupId(null);
+    try {
+      const result = await deleteMessageGroup(id);
+      if (result.code === 2) {
+        antMessage.error(result.message || TOAST_MESSAGES.GROUP_DELETE_IN_USE);
+        return false;
+      }
+      antMessage.success(TOAST_MESSAGES.GROUP_DELETED);
+      if (selectedGroupId === id) {
+        setSelectedGroupId(null);
+      }
+      await loadGroups(page);
+      return true;
+    } catch (error) {
+      console.error(error);
+      antMessage.error(
+        error.response?.data?.message || TOAST_MESSAGES.GROUP_DELETE_FAILED
+      );
+      return false;
     }
-    await loadGroups(page);
   }, [loadGroups, page, selectedGroupId]);
 
   const duplicateGroup = useCallback(async (id) => {
