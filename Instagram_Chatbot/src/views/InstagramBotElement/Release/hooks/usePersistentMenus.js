@@ -69,7 +69,7 @@ export default function usePersistentMenus(igId) {
   }, [igId, load, published]);
 
   const removeItem = useCallback(async (id) => {
-    if (items.length <= 1) {
+    if (published && items.length <= 1) {
       throw new Error('固定メッセージが最低1つの選択がある必要です。');
     }
     await deletePersistentMenu(id);

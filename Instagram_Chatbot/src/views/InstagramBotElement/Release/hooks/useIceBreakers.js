@@ -63,7 +63,7 @@ export default function useIceBreakers(igId) {
   }, [load]);
 
   const removeItem = useCallback(async (id) => {
-    if (items.length <= 1) {
+    if (published && items.length <= 1) {
       throw new Error('よくある質問が最低1つの選択がある必要です。');
     }
     await deleteIceBreaker(id);

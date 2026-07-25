@@ -52,7 +52,9 @@ export async function updateDefaultReply(settingId, instagramSettingData, defaul
         post_comment_bag_id: instagramSettingData?.post_comment_bag_id,
         story_comment_bag_id: instagramSettingData?.story_comment_bag_id,
         live_comment_bag_id: instagramSettingData?.live_comment_bag_id,
-        default_reply_bag_id: parseInt(defaultReplyBagId, 10),
+        default_reply_bag_id: defaultReplyBagId == null || defaultReplyBagId === ''
+          ? null
+          : parseInt(defaultReplyBagId, 10),
       },
     })
     .catch(handleError);

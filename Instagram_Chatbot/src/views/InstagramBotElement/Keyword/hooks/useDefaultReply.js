@@ -5,7 +5,7 @@ import {
   fetchInstagramSettings,
   updateDefaultReply,
 } from '../api/keywordSettingsApi';
-import { TOAST_MESSAGES, VALIDATION_MESSAGES } from '../constants';
+import { TOAST_MESSAGES } from '../constants';
 
 export default function useDefaultReply() {
   const [instagramSetting, setInstagramSetting] = useState(null);
@@ -56,7 +56,7 @@ export default function useDefaultReply() {
   }, []);
 
   const handleGroupChange = useCallback(async (groupId) => {
-    setDefaultReplyGroupId(groupId);
+    setDefaultReplyGroupId(groupId ?? null);
     setDefaultReplyBagId(null);
     setBagError('');
     if (!groupId) {
@@ -73,15 +73,11 @@ export default function useDefaultReply() {
   }, []);
 
   const handleBagChange = useCallback((bagId) => {
-    setDefaultReplyBagId(bagId);
+    setDefaultReplyBagId(bagId ?? null);
     setBagError('');
   }, []);
 
   const saveDefaultReply = useCallback(async () => {
-    if (!defaultReplyBagId) {
-      setBagError(VALIDATION_MESSAGES.DEFAULT_REPLY_BAG_REQUIRED);
-      return false;
-    }
     if (!instagramSetting?.id) {
       return false;
     }
