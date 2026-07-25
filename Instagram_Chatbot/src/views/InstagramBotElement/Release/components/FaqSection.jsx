@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Button, Form, Input, Select, Space, Typography } from 'antd';
+import { Button, Form, Input, Space, Typography } from 'antd';
 import { useReleaseEditor } from '../context/ReleaseEditorContext';
 import { MAX_ICE_BREAKERS, MAX_TITLE_LENGTH, TOAST_MESSAGES } from '../constants';
 import MessageBagPicker from './MessageBagPicker';
@@ -47,13 +47,9 @@ export default function FaqSection() {
       notify(`質問は${MAX_TITLE_LENGTH}文字以下にしてください。`, 'error');
       return;
     }
-    if (!draft.bagId) {
-      notify('回答を選択してください。', 'error');
-      return;
-    }
 
     try {
-      await iceBreakers.addItem({ question: draft.question.trim(), messageBagId: draft.bagId });
+      await iceBreakers.addItem({ question: draft.question.trim(), messageBagId: draft.bagId || null });
       setDraft({ question: '', groupId: defaultGroupId, bagId: null });
       notify(TOAST_MESSAGES.SAVED);
       if (iceBreakers.published) {
@@ -74,14 +70,14 @@ export default function FaqSection() {
   };
 
   const saveEdit = async (id) => {
-    if (!editDraft.question.trim() || !editDraft.bagId) {
-      notify('質問と回答を入力してください。', 'error');
+    if (!editDraft.question.trim()) {
+      notify('質問を入力してください。', 'error');
       return;
     }
     try {
       await iceBreakers.editItem(id, {
         question: editDraft.question.trim(),
-        messageBagId: editDraft.bagId,
+        messageBagId: editDraft.bagId || null,
       });
       setEditingId(null);
       notify(TOAST_MESSAGES.SAVED);
@@ -147,7 +143,7 @@ export default function FaqSection() {
               ) : (
                 <>
                   <Typography.Text>{item.question}</Typography.Text>
-                  <Typography.Text type="secondary">{item.message_bag_name}</Typography.Text>
+                  <Typography.Text type="secondary">{item.message_bag_name || '—'}</Typography.Text>
                   <Space>
                     <Button onClick={() => startEdit(item)} disabled={disabled}>編集</Button>
                     <Button danger onClick={() => handleDelete(item.id)} disabled={disabled}>削除</Button>

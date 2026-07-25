@@ -12,7 +12,7 @@ function buildPayload({ title, menuType, bagId, url, isSupport }) {
   return {
     title,
     url: '',
-    message_bag_id: bagId,
+    message_bag_id: bagId || null,
     is_support: menuType === 'support' || isSupport,
   };
 }
@@ -55,8 +55,6 @@ export default function PersistentMenuSection() {
     if (values.menuType === 'website') {
       if (!values.url.trim()) return 'URLを入力してください。';
       if (values.url.length > MAX_TITLE_LENGTH) return `URLは${MAX_TITLE_LENGTH}文字以下にしてください。`;
-    } else if (!values.bagId) {
-      return '回答を選択してください。';
     }
     return null;
   };

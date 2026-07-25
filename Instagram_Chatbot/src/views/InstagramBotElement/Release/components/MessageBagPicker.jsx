@@ -33,7 +33,13 @@ export default function MessageBagPicker({
         placeholder="グループ"
         value={groupId || undefined}
         disabled={disabled}
-        onChange={onGroupChange}
+        allowClear
+        onChange={(value) => {
+          onGroupChange(value ?? null);
+          if (value == null) {
+            onBagChange(null);
+          }
+        }}
         options={groups.map((group) => ({ value: group.id, label: group.group_name }))}
       />
       <Select
@@ -41,8 +47,9 @@ export default function MessageBagPicker({
         placeholder="メッセージバッグ"
         value={bagId || undefined}
         disabled={disabled || !groupId}
+        allowClear
         loading={loadingBags}
-        onChange={onBagChange}
+        onChange={(value) => onBagChange(value ?? null)}
         options={bags.map((bag) => ({ value: bag.id, label: bag.bag_name }))}
       />
     </Space>

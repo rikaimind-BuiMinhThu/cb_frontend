@@ -42,11 +42,7 @@ export default function CommentReplySection({ sectionKey, sectionConfig }) {
     setSaving(true);
     try {
       if (replyMode === 'direct_message') {
-        if (!bagId) {
-          notify('メッセージバッグを選択してください。', 'error');
-          return;
-        }
-        await settings.saveBagAssignment({ [sectionConfig.bagField]: bagId });
+        await settings.saveBagAssignment({ [sectionConfig.bagField]: bagId ?? null });
         if (enabled) {
           await settings.saveStatus({ [sectionConfig.statusField]: 'direct_message' });
         }
