@@ -1,7 +1,18 @@
 import { useCallback, useMemo, useState } from 'react';
-import { CHOICE_MODES } from '../constants/buttonTypes';
+import { BUTTON_TYPES, CHOICE_MODES } from '../constants/buttonTypes';
 import { DRAFT_ERRORS, MESSAGE_TYPES } from '../constants';
 import { createEmptyDraft } from '../utils/previewBuilder';
+
+function isChoiceButtonValid(btn) {
+  if (!btn.title?.trim()) return false;
+  if (btn.buttonType === BUTTON_TYPES.WEB_URL) {
+    return Boolean(btn.content?.trim());
+  }
+  if (btn.buttonType === BUTTON_TYPES.MESS) {
+    return Boolean(btn.messageBagId);
+  }
+  return false;
+}
 
 function isDraftValid(draft) {
   if (!draft) return true;
@@ -24,7 +35,7 @@ function isDraftValid(draft) {
       return draft.freeInput.labels.some((l) => l.trim());
     }
     if (draft.choiceMode === CHOICE_MODES.SINGLE || draft.choiceMode === CHOICE_MODES.THREE) {
-      return draft.choiceData.buttons.every((btn) => btn.title?.trim());
+      return draft.choiceData.buttons.every(isChoiceButtonValid);
     }
     return true;
   }

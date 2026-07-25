@@ -24,14 +24,14 @@ export default function TextMessageForm() {
         mode === CHOICE_MODES.THREE
           ? {
               buttons: [
-                { buttonType: 'mess', title: '', content: '', messageBagId: '', labels: [''] },
-                { buttonType: 'mess', title: '', content: '', messageBagId: '', labels: [''] },
-                { buttonType: 'mess', title: '', content: '', messageBagId: '', labels: [''] },
+                { buttonType: 'mess', title: '', content: '', messageBagId: '', messageGroupId: '', labels: [''] },
+                { buttonType: 'mess', title: '', content: '', messageBagId: '', messageGroupId: '', labels: [''] },
+                { buttonType: 'mess', title: '', content: '', messageBagId: '', messageGroupId: '', labels: [''] },
               ],
             }
           : {
               buttons: [
-                { buttonType: 'mess', title: '', content: '', messageBagId: '', labels: [''] },
+                { buttonType: 'mess', title: '', content: '', messageBagId: '', messageGroupId: '', labels: [''] },
               ],
             },
     }));

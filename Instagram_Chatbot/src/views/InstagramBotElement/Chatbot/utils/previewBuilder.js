@@ -142,6 +142,7 @@ export function messageFromApiToDraft(message) {
         title: btn.title || '',
         content: btn.content || '',
         messageBagId: btn.message_bag_id || '',
+        messageGroupId: btn.message_group_id || '',
         labels: (btn.message_button_labels || []).map((l) => l.label_name),
       })),
     };
@@ -162,7 +163,7 @@ export function createEmptyDraft(messageType) {
     choiceMode: CHOICE_MODES.NONE,
     choiceData: {
       buttons: [
-        { buttonType: 'mess', title: '', content: '', messageBagId: '', labels: [''] },
+        { buttonType: 'mess', title: '', content: '', messageBagId: '', messageGroupId: '', labels: [''] },
       ],
     },
     freeInput: { labels: [''], formatCheck: 'no_validate', formatCheckMessage: '' },
