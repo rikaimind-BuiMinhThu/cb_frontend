@@ -238,6 +238,13 @@ const sendEmailRequest = (emailId, data) => {
   );
 }
 
+const sendContactFormRequest = (data) => {
+  return postToChatBotServer(
+    CHATBOT_SERVER.SEND_CONTACT_FORM_PATH,
+    data
+  );
+}
+
 const sendConvertTextJapaneseRequest = (text) => {
   return postToChatBotServer(
     CHATBOT_SERVER.CONVERT_TEXT_JAPANESE_PATH,
@@ -700,7 +707,7 @@ export {
   isMobile, removeLeadingZero, sendUserInteractionData,
   sendCreateOrderData, sendCountRequest,
   getCitiesByPrefecture, getTownsByCity, getPrefectures,
-  getScenarioPreviewData, getChatBotSetting, sendEmailRequest,
+  getScenarioPreviewData, getChatBotSetting, sendEmailRequest, sendContactFormRequest,
   sleep, getCaptcha, appendParamsToUrl, checkMessageCondition, checkFaqMessageCondition,
   getAddressFromZipCode, secondToDatetime, findItem, isUndefined,
   changeElementAttributeById, toCamelCase, sendConvertTextJapaneseRequest,

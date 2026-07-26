@@ -569,6 +569,7 @@ export default function UserMessage({
         let cardPaymentRadioButton = content.card_payment_radio_button;
         let labelNoTransition = content.label_no_transition;
         let buttonSubmit = content.button_submit;
+        let contactForm = content.contact_form;
         if (
           content.type === "textarea" &&
           content.textarea &&
@@ -5353,6 +5354,28 @@ export default function UserMessage({
                 <div className="ss-user-setting__item-text_input-top">
                   <button style={{ borderRadius: "25px", padding: "5px 10px", fontSize: "16px", fontWeight: "bold"}} disabled id="chatbot-submit-button" className="ss-user-setting__select-btn-add btn btn-secondary">
                     {content.button_submit_name || buttonSubmit?.button_submit_name || "送信"}
+                  </button>
+                </div>
+              </div>
+            )}
+            {/* type == 'contact_form' */}
+            {content.type === "contact_form" && contactForm && (
+              <div style={{ marginBottom: "10px", fontSize: "13px" }}>
+                <div style={{ fontWeight: "bold", marginBottom: "6px" }}>お問い合わせフォーム</div>
+                {contactForm.fields?.name && <div>お名前: {contactForm.fields.name}</div>}
+                {contactForm.fields?.email && <div>メールアドレス: {contactForm.fields.email}</div>}
+                {contactForm.fields?.phone && <div>電話番号: {contactForm.fields.phone}</div>}
+                {contactForm.fields?.inquiry_type && <div>お問い合わせ種別: {contactForm.fields.inquiry_type}</div>}
+                {contactForm.fields?.order_number && <div>注文番号: {contactForm.fields.order_number}</div>}
+                {contactForm.fields?.product_name && <div>商品名: {contactForm.fields.product_name}</div>}
+                {contactForm.fields?.content && <div>お問い合わせ内容: {contactForm.fields.content}</div>}
+                <div className="ss-user-setting__item-text_input-top" style={{ marginTop: "8px" }}>
+                  <button
+                    style={{ borderRadius: "25px", padding: "5px 10px", fontSize: "16px", fontWeight: "bold" }}
+                    disabled
+                    className="ss-user-setting__select-btn-add btn btn-secondary"
+                  >
+                    {contactForm.submit_button_name || "送信する"}
                   </button>
                 </div>
               </div>

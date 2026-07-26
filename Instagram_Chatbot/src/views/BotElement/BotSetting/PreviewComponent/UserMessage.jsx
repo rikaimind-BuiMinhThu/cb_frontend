@@ -31,6 +31,7 @@ import Calendar from "./UserMessageComponent/Calendar";
 import AgreeTerm from "./UserMessageComponent/AgreeTerm";
 import CreditCardPayment from "./UserMessageComponent/CreditCardPayment";
 import CardPaymentRadioButton from "./UserMessageComponent/CardPaymentRadioButton";
+import ContactForm from "./UserMessageComponent/ContactForm";
 import { isUserMessage } from "./Utils";
 
 const UserMessage = ({
@@ -453,6 +454,18 @@ const UserMessage = ({
           submitErrorMessage={submitErrorMessage}
           onChangeValue={onChangeValue}
           onClickNext={onClickNext}
+          isProcessing={isProcessing}
+        />;
+      case MESSAGE_CONTENT_TYPES.CONTACT_FORM:
+        return <ContactForm
+          content={content}
+          disabled={disabled}
+          onChangeValue={onChangeValue}
+          onClickNext={onClickNext}
+          errors={errors}
+          contentIndex={contentIndex}
+          messageIndex={messageIndex}
+          message={message}
           isProcessing={isProcessing}
         />;
       case MESSAGE_CONTENT_TYPES.LABEL_NO_TRANSITION:
