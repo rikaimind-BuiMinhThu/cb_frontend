@@ -32,7 +32,7 @@ ScenarioCodeTextarea.propTypes = {
   value: PropTypes.string,
   onChange: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
-  language: PropTypes.oneOf(['javascript', 'css']),
+  language: PropTypes.oneOf(['javascript', 'css', 'html']),
   height: PropTypes.number,
   disabled: PropTypes.bool,
   className: PropTypes.string,

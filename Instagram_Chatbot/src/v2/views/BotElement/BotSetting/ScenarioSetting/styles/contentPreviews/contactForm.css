@@ -1,0 +1,25 @@
+.ss-contact-form-preview {
+  width: 100%;
+}
+
+.ss-contact-form-preview__field {
+  margin-bottom: 10px;
+}
+
+.ss-contact-form-preview__field-label {
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.ss-contact-form-preview__radio-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ss-contact-form-preview__submit {
+  border-radius: 25px;
+  padding: 5px 10px;
+  font-size: 16px;
+  font-weight: bold;
+}

@@ -102,5 +102,6 @@ export const CONTENT_SETTING_TYPES = {
   SMS_VERIFY: 'sms_verify',
   AFTEE_PAYMENT_MODULE: 'AFTEE_payment_module',
   BUTTON_SUBMIT: 'button_submit',
+  CONTACT_FORM: 'contact_form',
   LABEL_NO_TRANSITION: 'label_no_transition',
 };

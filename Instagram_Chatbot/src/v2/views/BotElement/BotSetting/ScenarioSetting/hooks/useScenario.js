@@ -62,6 +62,12 @@ export const useScenario = (mode = 'scenario') => {
   const [isUseFukushashiki, setIsUseFukushashiki] = useState(false);
   const [isUseCustomCss, setIsUseCustomCss] = useState(false);
   const [customCssContent, setCustomCssContent] = useState(INITIAL_CUSTOM_CODE);
+  const [isUseHtmlUgc, setIsUseHtmlUgc] = useState(false);
+  const [isUgcInstagram, setIsUgcInstagram] = useState(false);
+  const [isUgcTiktok, setIsUgcTiktok] = useState(false);
+  const [isUgcReview, setIsUgcReview] = useState(false);
+  const [ugcEnv, setUgcEnv] = useState('staging');
+  const [htmlUgcConfigContent, setHtmlUgcConfigContent] = useState(INITIAL_CUSTOM_CODE);
   const [isUsedCartConfirmPage, setIsUsedCartConfirmPage] = useState(false);
   const [urlCartConfirmPage, setUrlCartConfirmPage] = useState('');
   const [isOpenModalCustomCss, setIsOpenModalCustomCss] = useState(false);
@@ -204,6 +210,12 @@ export const useScenario = (mode = 'scenario') => {
     setIsUseFukushashiki(parsed.isUseFukushashiki);
     setIsUseCustomCss(parsed.isUseCustomCss);
     setCustomCssContent(parsed.customCssContent);
+    setIsUseHtmlUgc(parsed.isUseHtmlUgc);
+    setIsUgcInstagram(parsed.isUgcInstagram);
+    setIsUgcTiktok(parsed.isUgcTiktok);
+    setIsUgcReview(parsed.isUgcReview);
+    setUgcEnv(parsed.ugcEnv || 'staging');
+    setHtmlUgcConfigContent(parsed.htmlUgcConfigContent);
     setIsUseCustomJsCode(parsed.isUseCustomJsCode);
     setHeadCustomJsCode(parsed.headCustomJsCode);
     setTopBodyCustomJsCode(parsed.topBodyCustomJsCode);
@@ -361,6 +373,12 @@ export const useScenario = (mode = 'scenario') => {
     isUseFukushashiki,
     isUseCustomCss,
     customCssContent,
+    isUseHtmlUgc,
+    isUgcInstagram,
+    isUgcTiktok,
+    isUgcReview,
+    ugcEnv,
+    htmlUgcConfigContent,
     isUseCustomJsCode,
     headCustomJsCode,
     topBodyCustomJsCode,
@@ -399,6 +417,12 @@ export const useScenario = (mode = 'scenario') => {
     isUseAmazonPay,
     coupon,
     customCssContent,
+    isUseHtmlUgc,
+    isUgcInstagram,
+    isUgcTiktok,
+    isUgcReview,
+    ugcEnv,
+    htmlUgcConfigContent,
     dataMessages,
     bottomBodyCustomJsCode,
     errMsgJsCode,
@@ -554,6 +578,12 @@ export const useScenario = (mode = 'scenario') => {
       isUseFukushashiki,
       isUseCustomCss,
       customCssContent,
+      isUseHtmlUgc,
+      isUgcInstagram,
+      isUgcTiktok,
+      isUgcReview,
+      ugcEnv,
+      htmlUgcConfigContent,
       isUsedCartConfirmPage,
       urlCartConfirmPage,
       isOpenModalCustomCss,
@@ -642,6 +672,12 @@ export const useScenario = (mode = 'scenario') => {
       setIsUseFukushashiki,
       setIsUseCustomCss,
       setCustomCssContent,
+      setIsUseHtmlUgc,
+      setIsUgcInstagram,
+      setIsUgcTiktok,
+      setIsUgcReview,
+      setUgcEnv,
+      setHtmlUgcConfigContent,
       setIsUsedCartConfirmPage,
       setUrlCartConfirmPage,
       setIsOpenModalCustomCss,

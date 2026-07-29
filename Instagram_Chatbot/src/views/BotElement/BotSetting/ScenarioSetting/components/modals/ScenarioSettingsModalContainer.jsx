@@ -8,6 +8,7 @@ import {
 import ScenarioSettingsMainView from './views/ScenarioSettingsMainView';
 import ScenarioCustomCssView from './views/ScenarioCustomCssView';
 import ScenarioCustomJsView from './views/ScenarioCustomJsView';
+import ScenarioHtmlUgcView from './views/ScenarioHtmlUgcView';
 import ScenarioTimerView from './views/ScenarioTimerView';
 import ScenarioErrMsgView from './views/ScenarioErrMsgView';
 import ScenarioAutoLogoutView from './views/ScenarioAutoLogoutView';
@@ -48,6 +49,8 @@ const ScenarioSettingsModalContainer = () => {
         return <ScenarioCustomCssView onBack={backToSettingsMainView} />;
       case SETTINGS_MODAL_VIEWS.JS:
         return <ScenarioCustomJsView onBack={backToSettingsMainView} />;
+      case SETTINGS_MODAL_VIEWS.HTML_UGC:
+        return <ScenarioHtmlUgcView onBack={backToSettingsMainView} />;
       case SETTINGS_MODAL_VIEWS.TIMER:
         return <ScenarioTimerView onBack={backToSettingsMainView} />;
       case SETTINGS_MODAL_VIEWS.ERR_MSG:

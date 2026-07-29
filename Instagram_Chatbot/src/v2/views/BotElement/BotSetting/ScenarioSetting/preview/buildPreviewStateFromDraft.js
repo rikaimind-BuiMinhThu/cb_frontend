@@ -86,6 +86,8 @@ export const buildEditorDraftPreviewUpdate = (draft) => {
     productIdCrossSell: draft?.product_id_cross_sell || '',
     isUsedCustomCss: !!draft?.is_used_custom_css,
     customCssContent: draft?.custom_css_content || '',
+    isUsedHtmlUgc: !!draft?.is_used_html_ugc,
+    htmlUgcConfigContent: draft?.html_ugc_config_content || '',
     isUsedCustomJsCode: false,
     headCustomJsCode: '',
     topBodyCustomJsCode: '',

@@ -27,7 +27,6 @@ const STATEMENT_TYPE_OPTIONS = [
   ['pause', '一時停止'],
   ['html_code', 'HTMLコード'],
   ['amazon_pay_button', 'Amazon Payボタン'],
-  ['use_html_ugc_config', 'HTML_UGC_CONFIG'],
   [BOT_MESSAGE_TYPES.ORDER_CONFIRM, '注文確認'],
   [BOT_MESSAGE_TYPES.CART_LOGIN, 'カートログイン'],
 ];
@@ -424,7 +423,7 @@ const ScenarioBotSettingsPanel = () => {
           }
           {messageType === 'email' && <EmailSection {...sectionProps} dataEmail={dataEmail} />}
           {messageType === 'api_linkage' && <ApiLinkageSection {...sectionProps} />}
-          {(messageType === 'script' || messageType === BOT_MESSAGE_TYPES.UGC) && <ScriptSection {...sectionProps} />}
+          {messageType === 'script' && <ScriptSection {...sectionProps} />}
           {messageType === 'delay' && <DelaySection {...sectionProps} />}
           {messageType === 'clear_variable' && <ClearVariableSection {...sectionProps} dataInputVar={dataInputVar} />}
           {messageType === 'variable_set' && <VariableSetSection {...sectionProps} dataInputVar={dataInputVar} />}

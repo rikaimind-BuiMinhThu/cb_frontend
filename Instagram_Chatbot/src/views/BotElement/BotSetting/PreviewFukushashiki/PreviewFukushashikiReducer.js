@@ -428,6 +428,8 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
         bottomBodyCustomJsCode: chatbot?.bottom_body_custom_js_code,
         isUsedCustomCss: !!chatbot?.is_used_custom_css,
         customCssContent: chatbot?.custom_css_content,
+        isUsedHtmlUgc: !!chatbot?.is_used_html_ugc,
+        htmlUgcConfigContent: chatbot?.html_ugc_config_content,
         isUseBtnUpdateTracking: !!conversation?.isUseBtnUpdateTracking,
         currentMsgIndex: 0, // Start
         manuallyClosed: false,

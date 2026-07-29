@@ -50,6 +50,8 @@ const ScenarioEditorPreviewPanel = () => {
     isUseFukushashiki,
     isUseCustomCss,
     customCssContent,
+    isUseHtmlUgc,
+    htmlUgcConfigContent,
     isUseCustomJsCode,
     headCustomJsCode,
     topBodyCustomJsCode,
@@ -100,6 +102,8 @@ const ScenarioEditorPreviewPanel = () => {
     isUseFukushashiki,
     isUseCustomCss,
     customCssContent,
+    isUseHtmlUgc,
+    htmlUgcConfigContent,
     isUseCustomJsCode,
     headCustomJsCode,
     topBodyCustomJsCode,
@@ -119,6 +123,8 @@ const ScenarioEditorPreviewPanel = () => {
   }), [
     coupon,
     customCssContent,
+    isUseHtmlUgc,
+    htmlUgcConfigContent,
     dataMessages,
     errMsgJsCode,
     errMsgSettingMode,
@@ -155,6 +161,11 @@ const ScenarioEditorPreviewPanel = () => {
     isUseCustomCss,
     content: customCssContent?.final,
   }), [customCssContent?.final, isUseCustomCss]);
+
+  const editorHtmlUgc = useMemo(() => ({
+    isUseHtmlUgc,
+    content: htmlUgcConfigContent?.final,
+  }), [htmlUgcConfigContent?.final, isUseHtmlUgc]);
 
   const editorTimerConfig = editorDraft?.timer_config;
 
@@ -194,7 +205,11 @@ const ScenarioEditorPreviewPanel = () => {
       type: SCENARIO_PREVIEW_MESSAGES.EDITOR_CUSTOM_CSS,
       payload: editorCustomCss,
     });
-  }, [editorCustomCss, editorDraft, isIframeReady]);
+    postToIframe(iframeRef.current, {
+      type: SCENARIO_PREVIEW_MESSAGES.EDITOR_HTML_UGC,
+      payload: editorHtmlUgc,
+    });
+  }, [editorCustomCss, editorHtmlUgc, editorDraft, isIframeReady]);
 
   const syncHighlight = useCallback((messageId) => {
     if (!isIframeReady || !iframeRef.current) return;
@@ -376,7 +391,7 @@ const ScenarioEditorPreviewPanel = () => {
         draftSyncRafRef.current = null;
       }
     };
-  }, [editorDraft, editorCustomCss, isIframeReady, syncPreviewWithHighlights]);
+  }, [editorDraft, editorCustomCss, editorHtmlUgc, isIframeReady, syncPreviewWithHighlights]);
 
   useEffect(() => {
     if (!isIframeReady) return;

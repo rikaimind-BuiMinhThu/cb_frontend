@@ -2,6 +2,7 @@ import { DEFAULT_AMAZON_PAY_BUTTON_CONFIG } from '../../../../../variables/amazo
 import { COMBINE_MESSAGE_DEFAULTS } from '../../PreviewComponent/Constants';
 import { createDefaultContentItem, getNextContentId } from './scenarioContentDefaults';
 import { getDefaultOrderConfirmConfig } from './OrderConfirmLpScriptGenerator';
+import { getDefaultCartLoginConfig } from '../constants/cartLoginConstants';
 
 export const COMBINE_BOT_TYPE_OPTIONS = [
   ['text_input', 'テキスト'],
@@ -10,6 +11,7 @@ export const COMBINE_BOT_TYPE_OPTIONS = [
   ['html_code', 'HTMLコード'],
   ['amazon_pay_button', 'Amazon Payボタン'],
   ['order_confirm', '注文確認'],
+  ['cart_login', 'カートログイン'],
 ];
 
 export const COMBINE_USER_TYPE_OPTIONS = [
@@ -34,6 +36,7 @@ export const COMBINE_USER_TYPE_OPTIONS = [
   ['card_payment_radio_button', 'ラジオボタン付きカード決済'],
   ['shipping_address', '配送先住所'],
   ['button_submit', '確認する'],
+  ['contact_form', 'お問い合わせフォーム'],
 ];
 
 const COMBINE_TYPE_LABEL_MAP = Object.fromEntries([
@@ -72,6 +75,7 @@ const createBotContentStub = (type) => ({
     variables: [],
   },
   order_confirm: getDefaultOrderConfirmConfig(),
+  cart_login: getDefaultCartLoginConfig(),
 });
 
 export function createDefaultCombineMessage(dataInputVar = []) {

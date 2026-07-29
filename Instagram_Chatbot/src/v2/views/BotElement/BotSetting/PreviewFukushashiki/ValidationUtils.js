@@ -12,6 +12,7 @@ import { validateCalendar } from './Validation/CalendarValidator';
 import { validateAgreeTerm } from './Validation/AgreeTermValidator';
 import { validateCreditCardPayment } from './Validation/CreditCardPaymentValidator';
 import { validateCardPaymentRadioButton } from './Validation/CardPaymentRadioButtonValidator';
+import { validateContactForm } from './Validation/ContactFormValidator';
 
 // Regex Patterns
 export const REGEX_PATTERNS = {
@@ -127,6 +128,8 @@ const getValidator = (messageType) => {
     case MESSAGE_CONTENT_TYPES.LABEL_NO_TRANSITION:
       // No validation needed
       return null;
+    case MESSAGE_CONTENT_TYPES.CONTACT_FORM:
+      return validateContactForm;
     default:
       return null;
   }

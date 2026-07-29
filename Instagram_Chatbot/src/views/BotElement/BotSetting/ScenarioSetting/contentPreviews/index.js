@@ -22,6 +22,7 @@ import ProductPurchaseSelectOptionPreview from './ProductPurchaseSelectOptionPre
 import ProductPurchasePreview from './ProductPurchasePreview';
 import CardPaymentRadioButtonPreview from './CardPaymentRadioButtonPreview';
 import ShippingAddressPreview from './ShippingAddressPreview';
+import ContactFormPreview from './contactForm/ContactFormPreview';
 import { withContentPreviewContext } from './withContentPreviewContext';
 
 export const PREVIEW_MAP = {
@@ -49,6 +50,7 @@ export const PREVIEW_MAP = {
   product_purchase: withContentPreviewContext(ProductPurchasePreview),
   card_payment_radio_button: withContentPreviewContext(CardPaymentRadioButtonPreview),
   shipping_address: withContentPreviewContext(ShippingAddressPreview),
+  contact_form: withContentPreviewContext(ContactFormPreview),
 };
 
 export {
@@ -76,4 +78,5 @@ export {
   ProductPurchasePreview,
   CardPaymentRadioButtonPreview,
   ShippingAddressPreview,
+  ContactFormPreview,
 };

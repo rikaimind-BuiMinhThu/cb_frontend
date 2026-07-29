@@ -1,22 +1,28 @@
 import React from 'react';
 import { Card, CardHeader, CardBody, Row, Col } from 'reactstrap';
-// import api from './../../../api/api-management';
 import './../../assets/css/basic_setting.css';
 import * as utils from './../../JS/validate.js';
 import Cookies from 'js-cookie';
 import { useEffect } from 'react';
 import { useState } from 'react';
-import api from 'api/api-management';
+import api from '../../api/api-management';
 import ModalNoti from './../Popup/ModalNoti';
-import { tokenExpired } from 'v2/api/tokenExpired';
+import { tokenExpired } from 'api/tokenExpired';
+
+const MAIL_FORMAT =
+  /^[a-zA-Z0-9]+([._+-][a-zA-Z0-9]+)*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/;
 
 function BasicSetting() {
   const [userIdEC, setUsreIdEC] = useState();
   const [userDetail, setUserDetail] = useState({});
+  const [clientId, setClientId] = useState(null);
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [msgNoti, setMsgNoti] = useState();
   const [language, setLanguage] = useState('');
   const [division, setDivision] = useState('');
+  const [replySmtpGmail, setReplySmtpGmail] = useState('');
+  const [replySmtpGmailAppPassword, setReplySmtpGmailAppPassword] = useState('');
+  const [hasReplySmtpPassword, setHasReplySmtpPassword] = useState(false);
 
   // authorization
   const [isAdminDeel, setIsAdminDeel] = useState(false);
@@ -37,9 +43,14 @@ function BasicSetting() {
     api
       .get(`/api/v1/managements/users/${Cookies.get('user_id')}`)
       .then((res) => {
-        setUserDetail(res.data.data);
-        setLanguage(res.data.data.language);
-        setDivision(res.data.data.business_division);
+        const user = res.data.data;
+        setUserDetail(user);
+        setLanguage(user.language);
+        setDivision(user.business_division);
+        if (user.client_id) {
+          setClientId(user.client_id);
+          loadClientSmtp(user.client_id);
+        }
       })
       .catch((err) => {
         console.log(err);
@@ -48,6 +59,99 @@ function BasicSetting() {
         }
       });
   }, []);
+
+  function loadClientSmtp(id) {
+    api
+      .get(`/api/v1/managements/clients/${id}`)
+      .then((res) => {
+        if (res.data.code === 1 || res.data.code === '1') {
+          const data = res.data.data;
+          setReplySmtpGmail(data.reply_smtp_gmail || '');
+          setReplySmtpGmailAppPassword('');
+          setHasReplySmtpPassword(Boolean(data.has_reply_smtp_password));
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        if (err.response?.data.code === 0) {
+          tokenExpired();
+        }
+      });
+  }
+
+  function validateReplySmtp() {
+    const gmail = (replySmtpGmail || '').trim().replace(/＠/g, '@');
+    const password = replySmtpGmailAppPassword || '';
+    const gmailErr = document.getElementById('errReplySmtpGmail');
+    const passwordErr = document.getElementById('errReplySmtpPassword');
+
+    if (gmailErr) {
+      gmailErr.innerHTML = '';
+    }
+    if (passwordErr) {
+      passwordErr.innerHTML = '';
+    }
+
+    if (!gmail && !password) return true;
+
+    if (gmail && !MAIL_FORMAT.test(gmail)) {
+      if (gmailErr) {
+        gmailErr.innerHTML = 'メールを入力してください(例:abc＠abc.com)';
+      }
+      return false;
+    }
+
+    if (gmail && !password && !hasReplySmtpPassword) {
+      if (passwordErr) {
+        passwordErr.innerHTML = 'アプリパスワードを入力してください。';
+      }
+      return false;
+    }
+
+    if (!gmail && password) {
+      if (gmailErr) {
+        gmailErr.innerHTML = 'メール送信用Gmailを入力してください。';
+      }
+      return false;
+    }
+
+    return true;
+  }
+
+  function showNoti(message) {
+    setIsOpenNoti(true);
+    setMsgNoti(message);
+    setTimeout(() => {
+      setIsOpenNoti(false);
+      setMsgNoti('');
+    }, 2000);
+  }
+
+  function saveClientSmtp() {
+    if (!clientId) {
+      return Promise.resolve({ ok: true });
+    }
+
+    const clientPayload = {
+      reply_smtp_gmail: (replySmtpGmail || '').trim().replace(/＠/g, '@'),
+    };
+    if (replySmtpGmailAppPassword) {
+      clientPayload.reply_smtp_gmail_app_password = replySmtpGmailAppPassword;
+    }
+
+    return api
+      .patch(`/api/v1/managements/clients/${clientId}`, { client: clientPayload })
+      .then((res) => {
+        if (res.data.code == 1) {
+          if (replySmtpGmailAppPassword) {
+            setHasReplySmtpPassword(true);
+            setReplySmtpGmailAppPassword('');
+          }
+          return { ok: true };
+        }
+        return { ok: false, message: res.data.message || res.data.data || 'Fail' };
+      });
+  }
 
   function onSave() {
     utils.checkInput('fullname', 'errFullname', '氏名');
@@ -66,7 +170,8 @@ function BasicSetting() {
       utils.checkEmailRequired('emailAddress', 'errEmailAddress', 'メールアドレス') &&
       utils.checkTel('phone_number', 'errPhone', '電話番号') &&
       utils.checkInput('address', 'errAddress', '住所') &&
-      utils.checkUrl('url', 'errUrl', 'URL')
+      utils.checkUrl('url', 'errUrl', 'URL') &&
+      validateReplySmtp()
     ) {
       const form = document.getElementById('form-basic-setting');
       const obj = {};
@@ -74,25 +179,19 @@ function BasicSetting() {
         obj[form[i].name] = form[i].value;
       }
       const update = { user: obj };
-      console.log(update);
       api
         .patch(`/api/v1/managements/users/${userIdEC}`, update)
         .then((res) => {
-          console.log(res);
           if (res.data.code == 1) {
-            setIsOpenNoti(true);
-            setMsgNoti(`正常に更新されました！`);
-            setTimeout(() => {
-              setIsOpenNoti(false);
-              setMsgNoti('');
-            }, 2000);
+            return saveClientSmtp().then((smtpResult) => {
+              if (smtpResult.ok) {
+                showNoti('正常に更新されました！');
+              } else {
+                showNoti(smtpResult.message || 'メール送信設定の更新に失敗しました');
+              }
+            });
           } else if (res.data.code == 2) {
-            setIsOpenNoti(true);
-            setMsgNoti(res.data.data);
-            setTimeout(() => {
-              setIsOpenNoti(false);
-              setMsgNoti('');
-            }, 2000);
+            showNoti(res.data.data);
           }
         })
         .catch((err) => {
@@ -312,6 +411,46 @@ function BasicSetting() {
                     </div>
                   </div>
                 </form>
+
+                {clientId && (
+                  <>
+                    <div className="bs-field-container">
+                      <span className="bs-field-lable">メール送信用Gmail</span>
+                      <div className="bs-field-input">
+                        <input
+                          className="bs-field-input-item"
+                          id="replySmtpGmail"
+                          type="text"
+                          placeholder="example@gmail.com"
+                          value={replySmtpGmail}
+                          onChange={(e) => setReplySmtpGmail(e.target.value)}
+                          autoComplete="off"
+                        ></input>
+                        <span id="errReplySmtpGmail" className="bs-err-format"></span>
+                      </div>
+                    </div>
+                    <div className="bs-field-container">
+                      <span className="bs-field-lable">メール送信用アプリパスワード</span>
+                      <div className="bs-field-input">
+                        <input
+                          className="bs-field-input-item"
+                          id="replySmtpGmailAppPassword"
+                          type="password"
+                          placeholder={
+                            hasReplySmtpPassword ? '設定済み（変更する場合のみ入力）' : ''
+                          }
+                          value={replySmtpGmailAppPassword}
+                          onChange={(e) => setReplySmtpGmailAppPassword(e.target.value)}
+                          autoComplete="new-password"
+                        ></input>
+                        <div style={{ fontSize: '12px', color: '#767676', marginTop: '4px' }}>
+                          Gmailの2段階認証で発行したアプリパスワードを入力してください
+                        </div>
+                        <span id="errReplySmtpPassword" className="bs-err-format"></span>
+                      </div>
+                    </div>
+                  </>
+                )}
 
                 <div className="bs-field-btn">
                   <button className="btn btn-primary" onClick={() => onSave()}>

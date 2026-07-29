@@ -31,6 +31,7 @@ import Calendar from "./UserMessageComponent/Calendar";
 import AgreeTerm from "./UserMessageComponent/AgreeTerm";
 import CreditCardPayment from "./UserMessageComponent/CreditCardPayment";
 import CardPaymentRadioButton from "./UserMessageComponent/CardPaymentRadioButton";
+import ContactForm from "./UserMessageComponent/ContactForm";
 import { isUserMessage } from "./Utils";
 
 const UserMessage = ({
@@ -461,6 +462,18 @@ const UserMessage = ({
             {content.label_no_transition.value}
           </div>
         );
+      case MESSAGE_CONTENT_TYPES.CONTACT_FORM:
+        return <ContactForm
+          content={content}
+          disabled={disabled}
+          onChangeValue={onChangeValue}
+          onClickNext={onClickNext}
+          errors={errors}
+          contentIndex={contentIndex}
+          messageIndex={messageIndex}
+          message={message}
+          isProcessing={isProcessing}
+        />;
       default:
         return null;
     }

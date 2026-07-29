@@ -21,6 +21,8 @@ const DEFAULT_FORM_VALUES = {
   is_line: 'false',
   is_tiktok: 'false',
   is_web: 'false',
+  reply_smtp_gmail: '',
+  reply_smtp_gmail_app_password: '',
 };
 
 export default function useClientForm(plans) {
@@ -117,6 +119,9 @@ export default function useClientForm(plans) {
       building_name: data.building_name,
       email: data.email,
       phone_number: data.phone_number,
+      reply_smtp_gmail: data.reply_smtp_gmail || '',
+      reply_smtp_gmail_app_password: '',
+      has_reply_smtp_password: !!data.has_reply_smtp_password,
       cart_system: data.cart_system || 'cart_system_none',
     };
   }

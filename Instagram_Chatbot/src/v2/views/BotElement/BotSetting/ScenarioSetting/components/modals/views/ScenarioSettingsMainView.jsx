@@ -32,6 +32,7 @@ const ScenarioSettingsMainView = ({ onClose }) => {
     isUseAmazonPay,
     isUseCustomCss,
     isUseCustomJsCode,
+    isUseHtmlUgc,
     timerConfig,
     isUseErrMsgByJs,
     launchButtonSelectors,
@@ -54,6 +55,12 @@ const ScenarioSettingsMainView = ({ onClose }) => {
     setIsUseAmazonPay,
     setIsUseCustomCss,
     setIsUseCustomJsCode,
+    setIsUseHtmlUgc,
+    setIsUgcInstagram,
+    setIsUgcTiktok,
+    setIsUgcReview,
+    setUgcEnv,
+    setHtmlUgcConfigContent,
     setTimerConfig,
     setIsUseErrMsgByJs,
     setLaunchButtonSelectors,
@@ -75,6 +82,19 @@ const ScenarioSettingsMainView = ({ onClose }) => {
     if (!checked) {
       setIsUseAmazonPay(false);
     }
+  };
+
+  const handleToggleHtmlUgc = (checked) => {
+    setIsUseHtmlUgc(checked);
+    if (!checked) {
+      setIsUgcInstagram(false);
+      setIsUgcTiktok(false);
+      setIsUgcReview(false);
+      setUgcEnv('staging');
+      setHtmlUgcConfigContent({ temp: '', final: '' });
+      return;
+    }
+    navigateSettingsModalView(SETTINGS_MODAL_VIEWS.HTML_UGC);
   };
 
   const handleToggleAutoLogout = (checked) => {
@@ -179,6 +199,20 @@ const ScenarioSettingsMainView = ({ onClose }) => {
               type="button"
               className="ss-settings-modal-action-link"
               onClick={() => navigateSettingsModalView(SETTINGS_MODAL_VIEWS.JS)}
+            >
+              設定する →
+            </button>
+          )}
+        />
+        <OverviewCheckboxRow
+          checked={isUseHtmlUgc}
+          onChange={handleToggleHtmlUgc}
+          label={labelWithTooltip('UGCForce連携', 'isUseHtmlUgc')}
+          actionButton={isUseHtmlUgc && (
+            <button
+              type="button"
+              className="ss-settings-modal-action-link"
+              onClick={() => navigateSettingsModalView(SETTINGS_MODAL_VIEWS.HTML_UGC)}
             >
               設定する →
             </button>

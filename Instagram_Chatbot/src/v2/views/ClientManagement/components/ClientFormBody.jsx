@@ -440,6 +440,20 @@ function ClientFormBody({
           <FormFieldError message={fieldErrors.email} />
         </ClientFormRow>
 
+        <ClientFormRow label="メール送信用Gmail">
+          <Form.Item name="reply_smtp_gmail" noStyle>
+            <Input id="replySmtpGmail" />
+          </Form.Item>
+          <FormFieldError message={fieldErrors.reply_smtp_gmail} />
+        </ClientFormRow>
+
+        <ClientFormRow label="メール送信用アプリパスワード">
+          <Form.Item name="reply_smtp_gmail_app_password" noStyle>
+            <Input.Password id="replySmtpGmailAppPassword" autoComplete="new-password" />
+          </Form.Item>
+          <FormFieldError message={fieldErrors.reply_smtp_gmail_app_password} />
+        </ClientFormRow>
+
         <ClientFormRow label="電話番号" required>
           <Form.Item name="phone_number" noStyle>
             <Input

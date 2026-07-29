@@ -9,7 +9,7 @@ import { COMBINE_MESSAGE_DEFAULTS } from '../../../PreviewComponent/Constants';
 const shouldShowNextButton = (message) => {
   const contents = message?.message_content ?? [];
   if (message.not_use_button || contents.length === 0) return false;
-  const hasButtonSubmit = contents.some((item) => item.type === 'button_submit');
+  const hasButtonSubmit = contents.some((item) => item.type === 'button_submit' || item.type === 'contact_form');
   if (hasButtonSubmit) return false;
   return true;
 };

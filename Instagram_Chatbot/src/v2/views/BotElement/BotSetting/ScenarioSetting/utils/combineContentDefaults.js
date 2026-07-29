@@ -36,6 +36,7 @@ export const COMBINE_USER_TYPE_OPTIONS = [
   ['card_payment_radio_button', 'ラジオボタン付きカード決済'],
   ['shipping_address', '配送先住所'],
   ['button_submit', '確認する'],
+  ['contact_form', 'お問い合わせフォーム'],
 ];
 
 const COMBINE_TYPE_LABEL_MAP = Object.fromEntries([

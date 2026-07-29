@@ -44,9 +44,11 @@ import {
   sendLogMessageToServer,
   sendErrorLogToServer,
   sendAppearLogToServer,
+  sendContactFormRequest,
   isUserMessage,
   toNumber,
 } from "../../PreviewComponent/Utils";
+import { injectHtmlUgcConfigContent } from "../../PreviewComponent/BotMessageUtils";
 import {
   getChatbotSavedState,
   savedChatbotState,
@@ -156,6 +158,7 @@ const previewInitialState = {
 const ScenarioPreviewFaq = ({
   previewDeviceMode = 'pc',
   editorCustomCss,
+  editorHtmlUgc,
   embedded = false,
   editorPreview = false,
   editorDraft = null,
@@ -368,6 +371,16 @@ const ScenarioPreviewFaq = ({
       style.remove();
     };
   }, [cssEnabled, cssContent]);
+
+  const htmlUgcEnabled = editorHtmlUgc?.isUseHtmlUgc ?? state.isUsedHtmlUgc;
+  const htmlUgcContent = editorHtmlUgc?.isUseHtmlUgc
+    ? editorHtmlUgc.content
+    : state.htmlUgcConfigContent;
+
+  useEffect(() => {
+    if (!htmlUgcEnabled || !htmlUgcContent) return undefined;
+    return injectHtmlUgcConfigContent(htmlUgcContent);
+  }, [htmlUgcEnabled, htmlUgcContent]);
 
   useEffect(() => {
     if (embedded || !state.botInfor) return undefined;
@@ -730,6 +743,8 @@ const ScenarioPreviewFaq = ({
       useFullWidthChatbotMobile: !!chatbot?.use_fullwidth_chatbot_mobile,
       isUsedCustomCss: !!chatbot?.is_used_custom_css,
       customCssContent: chatbot?.custom_css_content,
+      isUsedHtmlUgc: !!chatbot?.is_used_html_ugc,
+      htmlUgcConfigContent: chatbot?.html_ugc_config_content,
       themeSettings: designSetting?.theme || null,
     };
 
@@ -761,6 +776,42 @@ const ScenarioPreviewFaq = ({
       },
     });
   }
+
+  const advanceAfterClickNext = (clickedMsgIndex, clickedMsg, data) => {
+    const isBtnUpdateClick = clickedMsgIndex < state.renderMessagesList.length - 1;
+
+    sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
+
+    if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
+      executeLpJsCode(clickedMsg.jscode, state);
+    }
+
+    dispatch({
+      type: PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON,
+      payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn}
+    });
+  };
+
+  const sendContactFormIfNeeded = (clickedMsg) => {
+    const contactFormContent = (clickedMsg.message_content || []).find(
+      (content) => content.type === MESSAGE_CONTENT_TYPES.CONTACT_FORM
+    );
+    if (!contactFormContent) return Promise.resolve();
+
+    const contactForm = contactFormContent.contact_form || {};
+    return sendContactFormRequest({
+      chatbot_id: state.botId,
+      scenario_id: state.scenarioId,
+      form_template: contactForm.form_template,
+      fields: contactForm.fields || {},
+      email_settings: contactForm.email_settings || {},
+    }).then((res) => {
+      if (res?.data?.code !== 1) {
+        return Promise.reject(new Error(res?.data?.message || "Contact form send failed"));
+      }
+      return res;
+    });
+  };
 
   const onClickNext = (clickedMsgIndex, clickedMsg) => {
     if (editorPreview) {
@@ -795,18 +846,29 @@ const ScenarioPreviewFaq = ({
       return sendErrorLogToServer(data);
     }
 
-    const isBtnUpdateClick = clickedMsgIndex < state.renderMessagesList.length - 1;
+    const hasContactForm = (clickedMsg.message_content || []).some(
+      (content) => content.type === MESSAGE_CONTENT_TYPES.CONTACT_FORM
+    );
 
-    sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
-
-    if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
-      executeLpJsCode(clickedMsg.jscode, state);
+    if (!hasContactForm) {
+      return advanceAfterClickNext(clickedMsgIndex, clickedMsg, data);
     }
 
-    dispatch({
-      type: PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON,
-      payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn}
-    });
+    dispatch({ type: PREVIEW_ACTIONS.SET_PROCESSING, payload: true });
+    sendContactFormIfNeeded(clickedMsg)
+      .then(() => {
+        advanceAfterClickNext(clickedMsgIndex, clickedMsg, data);
+      })
+      .catch((error) => {
+        console.log(error);
+        dispatch({
+          type: PREVIEW_ACTIONS.SET_SUBMIT_ERROR_MESSAGE,
+          payload: "お問い合わせの送信に失敗しました。もう一度お試しください。"
+        });
+      })
+      .finally(() => {
+        dispatch({ type: PREVIEW_ACTIONS.SET_PROCESSING, payload: false });
+      });
   };
 
   const onChangeValue = (

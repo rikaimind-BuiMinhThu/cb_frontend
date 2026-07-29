@@ -22,6 +22,7 @@ import SmsVerifySetting from './SmsVerifySetting';
 import AfteePaymentModuleSetting from './AfteePaymentModuleSetting';
 import ButtonSubmitSetting from './buttonSubmit/ButtonSubmitSetting';
 import LabelNoTransitionSetting from './LabelNoTransitionSetting';
+import ContactFormSetting from './contactForm/ContactFormSetting';
 import { withContentSettingContext } from './withContentSettingContext';
 
 export const CONTENT_SETTING_MAP = {
@@ -48,6 +49,7 @@ export const CONTENT_SETTING_MAP = {
   sms_verify: withContentSettingContext(SmsVerifySetting),
   AFTEE_payment_module: withContentSettingContext(AfteePaymentModuleSetting),
   button_submit: withContentSettingContext(ButtonSubmitSetting),
+  contact_form: withContentSettingContext(ContactFormSetting),
   label_no_transition: withContentSettingContext(LabelNoTransitionSetting),
 };
 
@@ -67,4 +69,5 @@ export {
   AfteePaymentModuleSetting,
   ButtonSubmitSetting,
   LabelNoTransitionSetting,
+  ContactFormSetting,
 };

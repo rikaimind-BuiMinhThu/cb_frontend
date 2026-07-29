@@ -170,11 +170,16 @@ export function buildClientPayload(values, context) {
     building_name: values.building_name,
     email: values.email,
     phone_number: values.phone_number,
+    reply_smtp_gmail: (values.reply_smtp_gmail || '').trim().replace(/＠/g, '@'),
     cart_system: values.cart_system,
     status: context.contract,
     subscription_start_at: formatDateValue(context.startDate),
     subscription_end_at: formatDateValue(context.endDate),
   };
+
+  if ((values.reply_smtp_gmail_app_password || '').trim()) {
+    payload.reply_smtp_gmail_app_password = values.reply_smtp_gmail_app_password.trim();
+  }
 
   if (values.cart_system === 'shopify') {
     payload.shop_url = context.shopUrl;

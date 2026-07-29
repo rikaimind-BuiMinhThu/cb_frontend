@@ -58,6 +58,7 @@ import {
   sendErrorLogToServer,
   sendAppearLogToServer,
 } from "../../PreviewComponent/Utils";
+import { injectHtmlUgcConfigContent } from "../../PreviewComponent/BotMessageUtils";
 import {
   getChatbotSavedState,
   savedChatbotState,
@@ -205,6 +206,7 @@ const previewInitialState = {
 const ScenarioPreviewFukushashiki = ({
   previewDeviceMode = 'pc',
   editorCustomCss,
+  editorHtmlUgc,
   embedded = false,
   editorPreview = false,
   editorDraft = null,
@@ -600,6 +602,16 @@ const ScenarioPreviewFukushashiki = ({
       style.remove();
     };
   }, [cssEnabled, cssContent]);
+
+  const htmlUgcEnabled = editorHtmlUgc?.isUseHtmlUgc ?? state.isUsedHtmlUgc;
+  const htmlUgcContent = editorHtmlUgc?.isUseHtmlUgc
+    ? editorHtmlUgc.content
+    : state.htmlUgcConfigContent;
+
+  useEffect(() => {
+    if (!htmlUgcEnabled || !htmlUgcContent) return undefined;
+    return injectHtmlUgcConfigContent(htmlUgcContent);
+  }, [htmlUgcEnabled, htmlUgcContent]);
 
   useEffect(() => {
     if (embedded || !state.botInfor) return undefined;
@@ -1017,6 +1029,8 @@ const ScenarioPreviewFukushashiki = ({
       bottomBodyCustomJsCode: chatbot?.bottom_body_custom_js_code,
       isUsedCustomCss: !!chatbot?.is_used_custom_css,
       customCssContent: chatbot?.custom_css_content,
+      isUsedHtmlUgc: !!chatbot?.is_used_html_ugc,
+      htmlUgcConfigContent: chatbot?.html_ugc_config_content,
       themeSettings: designSetting?.theme || null,
     };
 

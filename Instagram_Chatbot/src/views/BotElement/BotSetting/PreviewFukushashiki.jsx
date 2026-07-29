@@ -59,6 +59,7 @@ import {
   sendErrorLogToServer,
   sendAppearLogToServer,
 } from "./PreviewComponent/Utils";
+import { injectHtmlUgcConfigContent } from "./PreviewComponent/BotMessageUtils";
 import {
   getChatbotSavedState,
   savedChatbotState,
@@ -483,6 +484,12 @@ const PreviewFukushashiki = () => {
     document.head.appendChild(style);
   }, [state.isUsedCustomCss, state.customCssContent]);
 
+  // For add HTML_UGC_CONFIG content
+  useEffect(() => {
+    if (!state.isUsedHtmlUgc || !state.htmlUgcConfigContent) return undefined;
+    return injectHtmlUgcConfigContent(state.htmlUgcConfigContent);
+  }, [state.isUsedHtmlUgc, state.htmlUgcConfigContent]);
+
   // Get Preview Scenario Data
   useEffect(() => {
     if (!state.loadedStateFromSession) {
@@ -847,6 +854,8 @@ const PreviewFukushashiki = () => {
       bottomBodyCustomJsCode: chatbot?.bottom_body_custom_js_code,
       isUsedCustomCss: !!chatbot?.is_used_custom_css,
       customCssContent: chatbot?.custom_css_content,
+      isUsedHtmlUgc: !!chatbot?.is_used_html_ugc,
+      htmlUgcConfigContent: chatbot?.html_ugc_config_content,
     };
 
     if (chatbot?.timer_config?.enable) {

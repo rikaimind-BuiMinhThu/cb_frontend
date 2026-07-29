@@ -72,6 +72,7 @@ import { generateLaunchButtonLpScript } from "../utils/launchButtonLpScriptUtils
 import { convertToFukushashikiObject } from "../../PreviewFukushashiki/FukushashikiDataConverterUtils";
 import { handleValidateField } from "../../PreviewFukushashiki/ValidationUtils";
 import { createOrAddLinesCart } from "../../ShopifyUtils";
+import { injectHtmlUgcConfigContent } from "../../PreviewComponent/BotMessageUtils";
 import { buildEditorDraftPreviewUpdate } from "./buildPreviewStateFromDraft";
 import { buildScenarioPreviewHeaderMeta } from "./buildScenarioPreviewHeaderMeta";
 import {
@@ -110,6 +111,7 @@ const previewInitialState = createPreviewInitialState("fukushashiki", {
 const ScenarioPreviewFukushashiki = ({
   previewDeviceMode = 'pc',
   editorCustomCss,
+  editorHtmlUgc,
   embedded = false,
   editorPreview = false,
   editorDraft = null,
@@ -442,6 +444,16 @@ const ScenarioPreviewFukushashiki = ({
       style.remove();
     };
   }, [cssEnabled, cssContent]);
+
+  const htmlUgcEnabled = editorHtmlUgc?.isUseHtmlUgc ?? state.isUsedHtmlUgc;
+  const htmlUgcContent = editorHtmlUgc?.isUseHtmlUgc
+    ? editorHtmlUgc.content
+    : state.htmlUgcConfigContent;
+
+  useEffect(() => {
+    if (!htmlUgcEnabled || !htmlUgcContent) return undefined;
+    return injectHtmlUgcConfigContent(htmlUgcContent);
+  }, [htmlUgcEnabled, htmlUgcContent]);
 
   usePreviewThemeCss({
     state,

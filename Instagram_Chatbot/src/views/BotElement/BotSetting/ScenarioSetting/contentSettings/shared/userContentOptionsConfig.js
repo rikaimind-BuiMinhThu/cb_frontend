@@ -201,6 +201,14 @@ export const USER_CONTENT_OPTIONS_CONFIG = {
     requireInline: false,
     displayContinueButton: false,
   },
+  contact_form: {
+    faq: true,
+    noAutoScroll: false,
+    saveToVariable: false,
+    apiValidation: false,
+    requireInline: false,
+    displayContinueButton: false,
+  },
   label: {
     faq: false,
     noAutoScroll: false,

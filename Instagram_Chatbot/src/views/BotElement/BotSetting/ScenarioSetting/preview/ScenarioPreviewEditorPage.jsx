@@ -23,6 +23,7 @@ const ScenarioPreviewEditorPage = () => {
 
   const [editorDraft, setEditorDraft] = useState(null);
   const [editorCustomCss, setEditorCustomCss] = useState(null);
+  const [editorHtmlUgc, setEditorHtmlUgc] = useState(null);
   const pendingRadioOptionHighlightRef = useRef(null);
   const pendingCheckboxOptionHighlightRef = useRef(null);
 
@@ -56,6 +57,10 @@ const ScenarioPreviewEditorPage = () => {
 
       if (type === SCENARIO_PREVIEW_MESSAGES.EDITOR_CUSTOM_CSS) {
         setEditorCustomCss(payload);
+      }
+
+      if (type === SCENARIO_PREVIEW_MESSAGES.EDITOR_HTML_UGC) {
+        setEditorHtmlUgc(payload);
       }
 
       if (type === SCENARIO_PREVIEW_MESSAGES.HIGHLIGHT_MESSAGE) {
@@ -112,6 +117,7 @@ const ScenarioPreviewEditorPage = () => {
     previewDeviceMode: 'sp',
     editorDraft,
     editorCustomCss,
+    editorHtmlUgc,
   };
 
   if (scenarioType === 'faq') {

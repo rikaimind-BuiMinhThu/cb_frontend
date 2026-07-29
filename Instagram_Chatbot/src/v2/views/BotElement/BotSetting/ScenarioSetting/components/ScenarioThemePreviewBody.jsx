@@ -12,7 +12,7 @@ import ScenarioThemeBotMessageContent from './ScenarioThemeBotMessageContent';
 const shouldShowNextButton = (message) => {
   const contents = message?.message_content ?? [];
   if (message.not_use_button || contents.length === 0) return false;
-  if (contents[0]?.type === 'button_submit') return false;
+  if (contents[0]?.type === 'button_submit' || contents[0]?.type === 'contact_form') return false;
   if (contents.length > 1) return true;
   const first = contents[0];
   const isSelfNavigating =

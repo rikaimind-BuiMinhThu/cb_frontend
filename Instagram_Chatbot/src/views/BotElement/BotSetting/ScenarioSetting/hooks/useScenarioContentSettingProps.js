@@ -11,6 +11,7 @@ export const useScenarioContentSettingProps = (indexMessageSelect, indexContent,
     clientCartSystem, isShopifyPaymentScenario, fileErrorCarousel, indexCarouselSlide,
     editorSelectedRadioOption,
     editorSelectedCheckboxOption,
+    dataEmail,
   } = state;
   const {
     setDataMessages, setIsOpenAddVariable, setIsOpenFileReference, setVarFileReference,
@@ -136,5 +137,6 @@ export const useScenarioContentSettingProps = (indexMessageSelect, indexContent,
     setEditorSelectedRadioOption,
     editorSelectedCheckboxOption,
     setEditorSelectedCheckboxOption,
+    dataEmail,
   };
 };

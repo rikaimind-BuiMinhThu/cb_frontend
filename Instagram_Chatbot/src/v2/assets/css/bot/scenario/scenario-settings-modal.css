@@ -453,6 +453,93 @@
   accent-color: #024bb9;
 }
 
+/* HTML UGC config settings view — stacked sections */
+.ss-settings-html-ugc-view {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.ss-settings-html-ugc-view__section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ss-settings-html-ugc-view__label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  line-height: 1.4;
+}
+
+.ss-settings-html-ugc-view__control {
+  width: 100%;
+  min-width: 0;
+}
+
+.ss-settings-html-ugc-view__radio-group,
+.ss-settings-html-ugc-view__checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ss-settings-html-ugc-view__radio-option,
+.ss-settings-html-ugc-view__checkbox-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+}
+
+.ss-settings-html-ugc-view__checkbox-option {
+  align-items: center;
+}
+
+.ss-settings-html-ugc-view__radio-option input[type="radio"],
+.ss-settings-html-ugc-view__checkbox-option input[type="checkbox"] {
+  flex-shrink: 0;
+  margin-top: 2px;
+  accent-color: #024bb9;
+}
+
+.ss-settings-html-ugc-view__checkbox-option input[type="checkbox"] {
+  margin-top: 0;
+}
+
+.ss-settings-html-ugc-view__radio-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ss-settings-html-ugc-view__radio-title {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.ss-settings-html-ugc-view__radio-hint {
+  font-size: 12px;
+  line-height: 1.4;
+  color: #6b7280;
+  word-break: break-all;
+}
+
+.ss-settings-html-ugc-view__code.ss-settings-code-textarea,
+.ss-settings-html-ugc-view .ss-settings-code-textarea {
+  width: 100%;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 /* File reference popup polish */
 .ss-settings-file-ref .fr-popup-header {
   display: flex;

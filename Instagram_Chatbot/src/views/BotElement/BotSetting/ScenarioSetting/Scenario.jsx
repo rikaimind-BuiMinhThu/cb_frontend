@@ -44,7 +44,7 @@ import locale from 'antd/es/date-picker/locale/ja_JP';
 import 'moment/locale/zh-cn';
 import ShopifyReferenceSelect from "./ShopifyReferenceSelect";
 import { Tooltip } from '@mui/material';
-import { MESSAGE_CONTENT_TYPES, TIMER_TYPES, TIMER_VARIABLES, TIMER_VARIABLES_DESCRIPTION, BOT_MESSAGE_TYPES, RANGE_TEXT_VALIDATE, LABELS, GENDER_DISPLAY_TYPES } from '../PreviewComponent/Constants';
+import { MESSAGE_CONTENT_TYPES, TIMER_TYPES, TIMER_VARIABLES, TIMER_VARIABLES_DESCRIPTION, BOT_MESSAGE_TYPES, RANGE_TEXT_VALIDATE, LABELS, GENDER_DISPLAY_TYPES, DEFAULT_CONTACT_FORM_CONFIG, CONTACT_FORM_TEMPLATE_LABELS, CONTACT_FORM_FIELD_KEYS, CONTACT_FORM_FIELD_LABELS, getContactFormFieldSettings, getContactFormTemplateFieldSettings } from '../PreviewComponent/Constants';
 import HtmlCodeConfig from './scenarioComon/HtmlCodeConfig';
 import OptionGenderConfig from './OptionGenderConfig';
 import SubmitButtonLoadingConfig from './SubmitButtonLoadingConfig';
@@ -56,6 +56,7 @@ import EmailDomainSuggestionSetting from './scenarioComon/EmailDomainSuggestionS
 import {
   createDefaultDomainSuggestion,
 } from '../PreviewComponent/emailDomainDefaults';
+import { buildHtmlUgcConfigContent, UGC_HOSTS } from './HtmlUgcConfigTemplates';
 
 const { Option } = Select;
 const _ = require('lodash');
@@ -873,6 +874,17 @@ const Scenario = () => {
   const [urlCartConfirmPage, setUrlCartConfirmPage] = useState('');
   const [isOpenModalCustomCss, setIsOpenModalCustomCss] = useState(false);
 
+  const [isUseHtmlUgc, setIsUseHtmlUgc] = useState(false);
+  const [isUgcInstagram, setIsUgcInstagram] = useState(false);
+  const [isUgcTiktok, setIsUgcTiktok] = useState(false);
+  const [isUgcReview, setIsUgcReview] = useState(false);
+  const [ugcEnv, setUgcEnv] = useState('staging');
+  const [htmlUgcConfigContent, setHtmlUgcConfigContent] = useState({
+    temp: "",
+    final: ""
+  });
+  const [isOpenModalHtmlUgc, setIsOpenModalHtmlUgc] = useState(false);
+
   // New state for custom JS code (separated into 3 fields)
   const [isUseCustomJsCode, setIsUseCustomJsCode] = useState(false);
   const [headCustomJsCode, setHeadCustomJsCode] = useState({
@@ -1036,6 +1048,15 @@ const Scenario = () => {
       setCustomCssContent({
         temp: res.data.data?.custom_css_content || '',
         final: res.data.data?.custom_css_content || '',
+      });
+      setIsUseHtmlUgc(!!res.data.data?.is_used_html_ugc);
+      setIsUgcInstagram(!!res.data.data?.is_ugc_instagram);
+      setIsUgcTiktok(!!res.data.data?.is_ugc_tiktok);
+      setIsUgcReview(!!res.data.data?.is_ugc_review);
+      setUgcEnv(res.data.data?.ugc_env || 'staging');
+      setHtmlUgcConfigContent({
+        temp: res.data.data?.html_ugc_config_content || '',
+        final: res.data.data?.html_ugc_config_content || '',
       });
       setIsUseCustomJsCode(res.data.data?.is_used_custom_js_code || false);
       setHeadCustomJsCode({
@@ -1811,6 +1832,15 @@ const Scenario = () => {
           button_submit_name:''
         }
       );
+    } else if (messageType === 'contact_form') {
+      dataMessages[indexMessageSelect].message_content.push(
+        {
+          id: idMax,
+          type: messageType,
+          [messageType]: _.cloneDeep(DEFAULT_CONTACT_FORM_CONFIG),
+        }
+      );
+      dataMessages[indexMessageSelect].not_use_button = true;
     } else {
       if (messageType === 'text_input') subType = 'text';
       if (messageType === 'agree_term') subType = 'detail_content';
@@ -2513,6 +2543,146 @@ const Scenario = () => {
     );
   };
 
+  const contactFormFieldRowStyle = {
+    width: '90%',
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'nowrap',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    gap: '8px',
+  };
+
+  const contactFormFieldLabelStyle = {
+    flex: '0 0 140px',
+    width: '140px',
+    textAlign: 'left',
+    marginRight: 0,
+  };
+
+  const contactFormFieldControlStyle = {
+    flex: 1,
+    minWidth: 0,
+    width: '100%',
+  };
+
+  const ensureContactFormFieldSettings = (indexMessage, indexContent) => {
+    const contactForm = dataMessages[indexMessage].message_content[indexContent].contact_form;
+    if (!contactForm) return null;
+    if (!contactForm.field_settings) {
+      contactForm.field_settings = getContactFormFieldSettings(contactForm);
+    }
+    return contactForm.field_settings;
+  };
+
+  const handleChangeContactFormTemplate = (indexMessage, indexContent, template) => {
+    const contactForm = dataMessages[indexMessage].message_content[indexContent].contact_form;
+    if (!contactForm) return;
+    contactForm.form_template = template;
+    contactForm.field_settings = getContactFormTemplateFieldSettings(template);
+    if (contactForm.email_settings?.send_to_user) {
+      contactForm.field_settings.email = { visible: true, required: true };
+    }
+    setDataMessages([...dataMessages]);
+  };
+
+  const handleChangeContactFormFieldSetting = (indexMessage, indexContent, fieldKey, settingKey, value) => {
+    const fieldSettings = ensureContactFormFieldSettings(indexMessage, indexContent);
+    if (!fieldSettings) return;
+    const contactForm = dataMessages[indexMessage].message_content[indexContent].contact_form;
+    const current = fieldSettings[fieldKey] || { visible: false, required: false };
+    const emailLocked = fieldKey === 'email' && Boolean(contactForm.email_settings?.send_to_user);
+
+    if (settingKey === 'visible') {
+      if (emailLocked && !value) return;
+      fieldSettings[fieldKey] = {
+        visible: Boolean(value),
+        required: value ? Boolean(current.required) : false,
+      };
+    } else if (settingKey === 'required') {
+      if (!current.visible) return;
+      if (emailLocked && !value) return;
+      fieldSettings[fieldKey] = {
+        visible: true,
+        required: Boolean(value),
+      };
+    }
+    setDataMessages([...dataMessages]);
+  };
+
+  const handleChangeContactFormSendToUser = (indexMessage, indexContent, value) => {
+    const contactForm = dataMessages[indexMessage].message_content[indexContent].contact_form;
+    if (!contactForm) return;
+    if (!contactForm.email_settings) {
+      contactForm.email_settings = {};
+    }
+    contactForm.email_settings.send_to_user = value;
+    if (value) {
+      const fieldSettings = ensureContactFormFieldSettings(indexMessage, indexContent);
+      if (fieldSettings) {
+        fieldSettings.email = { visible: true, required: true };
+      }
+    }
+    setDataMessages([...dataMessages]);
+  };
+
+  const ensureContactFormDomainSuggestion = (indexMessage, indexContent) => {
+    const contactForm = dataMessages[indexMessage].message_content[indexContent].contact_form;
+    if (!contactForm) return;
+    if (!contactForm.domain_suggestion) {
+      contactForm.domain_suggestion = createDefaultDomainSuggestion();
+    }
+  };
+
+  const handleChangeContactFormDomainSuggestion = (indexMessage, indexContent, field, value) => {
+    ensureContactFormDomainSuggestion(indexMessage, indexContent);
+    dataMessages[indexMessage].message_content[indexContent].contact_form.domain_suggestion[field] = value;
+    setDataMessages([...dataMessages]);
+  };
+
+  const handleChangeContactFormDomainValue = (indexMessage, indexContent, indexDomain, value) => {
+    ensureContactFormDomainSuggestion(indexMessage, indexContent);
+    dataMessages[indexMessage].message_content[indexContent].contact_form.domain_suggestion.domains[indexDomain].domain = value;
+    setDataMessages([...dataMessages]);
+  };
+
+  const handleAddContactFormEmailDomain = (indexMessage, indexContent) => {
+    ensureContactFormDomainSuggestion(indexMessage, indexContent);
+    const domains = dataMessages[indexMessage].message_content[indexContent].contact_form.domain_suggestion.domains;
+    const idMax = domains.length > 0 ? Math.max(...domains.map((item) => item.id)) + 1 : 1;
+    domains.push({ id: idMax, domain: '' });
+    setDataMessages([...dataMessages]);
+  };
+
+  const handleRemoveContactFormEmailDomain = (indexMessage, indexContent, indexDomain) => {
+    ensureContactFormDomainSuggestion(indexMessage, indexContent);
+    const domains = dataMessages[indexMessage].message_content[indexContent].contact_form.domain_suggestion.domains;
+    dataMessages[indexMessage].message_content[indexContent].contact_form.domain_suggestion.domains = domains.filter((_, index) => index !== indexDomain);
+    setDataMessages([...dataMessages]);
+  };
+
+  const handleResetContactFormEmailDomains = (indexMessage, indexContent) => {
+    ensureContactFormDomainSuggestion(indexMessage, indexContent);
+    dataMessages[indexMessage].message_content[indexContent].contact_form.domain_suggestion.domains = createDefaultDomainSuggestion().domains;
+    setDataMessages([...dataMessages]);
+  };
+
+  const renderContactFormDomainSuggestionSetting = (indexMessage, indexContent) => {
+    ensureContactFormDomainSuggestion(indexMessage, indexContent);
+    const domainSuggestion = dataMessages[indexMessage]?.message_content[indexContent]?.contact_form?.domain_suggestion;
+    return (
+      <EmailDomainSuggestionSetting
+        domainSuggestion={domainSuggestion}
+        onToggleEnabled={(value) => handleChangeContactFormDomainSuggestion(indexMessage, indexContent, 'enabled', value)}
+        onChangeMode={(value) => handleChangeContactFormDomainSuggestion(indexMessage, indexContent, 'mode', value)}
+        onChangeDomain={(indexDomain, value) => handleChangeContactFormDomainValue(indexMessage, indexContent, indexDomain, value)}
+        onAddDomain={() => handleAddContactFormEmailDomain(indexMessage, indexContent)}
+        onRemoveDomain={(indexDomain) => handleRemoveContactFormEmailDomain(indexMessage, indexContent, indexDomain)}
+        onResetDomains={() => handleResetContactFormEmailDomains(indexMessage, indexContent)}
+      />
+    );
+  };
+
   const handleRemoveItemProductPullDown = (indexMessage, indexContent, contentType, name, indexPullDown) => {
     const newArrRadio = dataMessages[indexMessage].message_content[indexContent][contentType].products.filter((item, index) => index !== indexPullDown);
     dataMessages[indexMessage].message_content[indexContent][contentType].products = newArrRadio;
@@ -2609,6 +2779,180 @@ const Scenario = () => {
       final: prevState.temp,
     }));
   }
+
+  const regenerateHtmlUgcTempContent = (nextFlags) => {
+    const content = buildHtmlUgcConfigContent(nextFlags);
+    setHtmlUgcConfigContent((prev) => ({
+      ...prev,
+      temp: content,
+    }));
+  }
+
+  const htmlUgcFlagsSnapshotRef = React.useRef({
+    isUgcInstagram: false,
+    isUgcTiktok: false,
+    isUgcReview: false,
+    ugcEnv: 'staging',
+    isUseHtmlUgc: false,
+  });
+
+  const openHtmlUgcModal = () => {
+    htmlUgcFlagsSnapshotRef.current = {
+      isUgcInstagram,
+      isUgcTiktok,
+      isUgcReview,
+      ugcEnv,
+      isUseHtmlUgc,
+    };
+    setHtmlUgcConfigContent((prev) => ({ ...prev, temp: prev.final }));
+    setIsOpenModalHtmlUgc(true);
+  }
+
+  const handleToggleUgcType = (type) => {
+    const next = {
+      isUgcInstagram,
+      isUgcTiktok,
+      isUgcReview,
+      ugcEnv,
+    };
+    if (type === 'instagram') next.isUgcInstagram = !isUgcInstagram;
+    if (type === 'tiktok') next.isUgcTiktok = !isUgcTiktok;
+    if (type === 'review') next.isUgcReview = !isUgcReview;
+
+    setIsUgcInstagram(next.isUgcInstagram);
+    setIsUgcTiktok(next.isUgcTiktok);
+    setIsUgcReview(next.isUgcReview);
+    setIsUseHtmlUgc(next.isUgcInstagram || next.isUgcTiktok || next.isUgcReview);
+    regenerateHtmlUgcTempContent(next);
+  }
+
+  const handleChangeUgcEnv = (nextEnv) => {
+    setUgcEnv(nextEnv);
+    regenerateHtmlUgcTempContent({
+      isUgcInstagram,
+      isUgcTiktok,
+      isUgcReview,
+      ugcEnv: nextEnv,
+    });
+  }
+
+  const handleOnChangeValueHtmlUgc = (e) => {
+    e.preventDefault();
+    setHtmlUgcConfigContent((prevState) => ({
+      ...prevState,
+      temp: e.target.value,
+    }));
+  }
+
+  const closeAfterDoneHtmlUgc = (func) => (...props) => {
+    func(...props);
+    setTimeout(() => setIsOpenModalHtmlUgc(false), 0);
+  };
+
+  const handleOnCancelHtmlUgc = () => {
+    const snap = htmlUgcFlagsSnapshotRef.current;
+    setIsUgcInstagram(snap.isUgcInstagram);
+    setIsUgcTiktok(snap.isUgcTiktok);
+    setIsUgcReview(snap.isUgcReview);
+    setUgcEnv(snap.ugcEnv || 'staging');
+    setIsUseHtmlUgc(snap.isUseHtmlUgc);
+    setHtmlUgcConfigContent((prevState) => ({
+      ...prevState,
+      temp: prevState.final,
+    }));
+  }
+
+  const handleOnConfirmHtmlUgc = () => {
+    setHtmlUgcConfigContent((prevState) => ({
+      ...prevState,
+      final: prevState.temp,
+    }));
+    const enabled = isUgcInstagram || isUgcTiktok || isUgcReview || !!htmlUgcConfigContent.temp?.trim();
+    setIsUseHtmlUgc(enabled);
+    htmlUgcFlagsSnapshotRef.current = {
+      isUgcInstagram,
+      isUgcTiktok,
+      isUgcReview,
+      ugcEnv,
+      isUseHtmlUgc: enabled,
+    };
+  }
+
+  const renderModalHtmlUgcForm = (isOpen) => {
+    return (
+      <ModalShort open={isOpen} onClose={closeAfterDoneHtmlUgc(handleOnCancelHtmlUgc)}>
+        <div className="sl-popup-create-scenario-wrapper" style={{width: "750px"}}>
+          <h4>HTML_UGC_CONFIG</h4>
+          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '12px' }}>
+            {['production', 'staging', 'local'].map((env) => (
+              <label key={env} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <input
+                  type="radio"
+                  name="ugc_env"
+                  checked={ugcEnv === env}
+                  onChange={() => handleChangeUgcEnv(env)}
+                />
+                {env === 'production' ? 'Production' : env === 'staging' ? 'Staging' : 'Local'}
+                <span style={{ color: '#888', fontSize: '12px' }}>({UGC_HOSTS[env]})</span>
+              </label>
+            ))}
+          </div>
+          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '12px' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <input
+                type="checkbox"
+                checked={isUgcInstagram}
+                onChange={() => handleToggleUgcType('instagram')}
+              />
+              UGC Instagram
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <input
+                type="checkbox"
+                checked={isUgcReview}
+                onChange={() => handleToggleUgcType('review')}
+              />
+              UGC Review
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <input
+                type="checkbox"
+                checked={isUgcTiktok}
+                onChange={() => handleToggleUgcType('tiktok')}
+              />
+              UGC TikTok
+            </label>
+          </div>
+          <div style={{ marginBottom: '10px' }}>
+            <div className="sl-popup-create-scenario-input-wrapper" style={{ marginBottom: '0px' }}>
+              <span style={{ width: '120px', whiteSpace: "nowrap", wordBreak: "normal" }}>UGCコンテンツ</span>
+              <textarea
+                style={{ width: '100%', height: '280px', padding: '10px', fontSize: '13px', flexGrow: "1", fontFamily: 'monospace' }}
+                placeholder="チェックボックスで自動生成されます。手動編集も可能です。"
+                value={htmlUgcConfigContent.temp}
+                onChange={handleOnChangeValueHtmlUgc}
+              />
+            </div>
+          </div>
+          <div className="sl-popup-create-scenario-btn-wrapper">
+            <Button
+              className="ss-popup-add-variable-input-close-button"
+              onClick={closeAfterDoneHtmlUgc(handleOnCancelHtmlUgc)}
+            >
+              閉じる
+            </Button>
+            <Button
+              style={{ backgroundColor: '#024BB9' }}
+              className="ss-popup-add-variable-input-keep-button"
+              onClick={closeAfterDoneHtmlUgc(handleOnConfirmHtmlUgc)}
+            >
+              保存
+            </Button>
+          </div>
+        </div>
+      </ModalShort>
+    );
+  };
 
   // Custom JS code handlers
   const handleChangeOpenModalCustomJsCode = (value) => () => {
@@ -3061,6 +3405,12 @@ const Scenario = () => {
       is_used_fukushashiki: isUseFukushashiki,
       is_used_custom_css: isUseCustomCss,
       custom_css_content: customCssContent.final,
+      is_used_html_ugc: isUseHtmlUgc,
+      is_ugc_instagram: isUgcInstagram,
+      is_ugc_tiktok: isUgcTiktok,
+      is_ugc_review: isUgcReview,
+      ugc_env: ugcEnv,
+      html_ugc_config_content: htmlUgcConfigContent.final,
       is_used_custom_js_code: isUseCustomJsCode,
       head_custom_js_code: headCustomJsCode.final,
       top_body_custom_js_code: topBodyCustomJsCode.final,
@@ -3131,6 +3481,12 @@ const Scenario = () => {
       is_used_fukushashiki: isUseFukushashiki,
       is_used_custom_css : isUseCustomCss,
       custom_css_content: customCssContent.final,
+      is_used_html_ugc: isUseHtmlUgc,
+      is_ugc_instagram: isUgcInstagram,
+      is_ugc_tiktok: isUgcTiktok,
+      is_ugc_review: isUgcReview,
+      ugc_env: ugcEnv,
+      html_ugc_config_content: htmlUgcConfigContent.final,
       is_used_custom_js_code: isUseCustomJsCode,
       head_custom_js_code: headCustomJsCode.final,
       top_body_custom_js_code: topBodyCustomJsCode.final,
@@ -3634,6 +3990,49 @@ const Scenario = () => {
                       <div>
                         <button class="ss-user-setting-checkbox-custom-css_toggle" onClick={handleChangeOpenModalCustomJsCode(true)}>
                           {`( JSコンテンツ設定モダルを開く )`}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <div style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "16px",
+                    justifyContent: "start",
+                    width: "100%",
+                  }}>
+                    <div className='ss-user-setting-checkbox-custom_css'>
+                      <input
+                        type="checkbox"
+                        className="ss-user-setting-checkbox-custom"
+                        onChange={() => {
+                          const next = !isUseHtmlUgc;
+                          setIsUseHtmlUgc(next);
+                          if (!next) {
+                            setIsUgcInstagram(false);
+                            setIsUgcTiktok(false);
+                            setIsUgcReview(false);
+                            setUgcEnv('staging');
+                            setHtmlUgcConfigContent({ temp: '', final: '' });
+                            htmlUgcFlagsSnapshotRef.current = {
+                              isUgcInstagram: false,
+                              isUgcTiktok: false,
+                              isUgcReview: false,
+                              ugcEnv: 'staging',
+                              isUseHtmlUgc: false,
+                            };
+                          } else {
+                            openHtmlUgcModal();
+                          }
+                        }}
+                        checked={isUseHtmlUgc}
+                      />
+                      <label style={{whiteSpace: "nowrap", wordBreak: "normal"}}>HTML_UGC_CONFIGを使用</label>
+                    </div>
+                    {isUseHtmlUgc && (
+                      <div>
+                        <button className="ss-user-setting-checkbox-custom-css_toggle" onClick={openHtmlUgcModal}>
+                          {`( UGCコンテンツ設定モダルを開く )`}
                         </button>
                       </div>
                     )}
@@ -4159,6 +4558,7 @@ const Scenario = () => {
                                                     let variableSet = content.variable_set;
                                                     let buttonSubmit = content.button_submit;
                                                     let labelNoTransition = content.label_no_transition;
+                                                    let contactForm = content.contact_form;
                                                     return (
                                                       <React.Fragment key={indexContent}>
                                                         {/* type == 'text_input' */}
@@ -6115,7 +6515,7 @@ const Scenario = () => {
                                                     )
                                                   })}
                                                 </div>
-                                                {!message.not_use_button && message.message_content[0]?.type !== 'button_submit'&& message?.message_content.length !== 0 &&
+                                                {!message.not_use_button && message.message_content[0]?.type !== 'button_submit' && message.message_content[0]?.type !== 'contact_form' && message?.message_content.length !== 0 &&
                                                   ((message?.message_content.length === 1 && 
                                                     !(message.message_content[0].type === 'product_purchase_radio_button'
                                                       || (message.message_content[0].type === 'carousel' && message.message_content[0]?.[message.message_content[0].type].require)
@@ -6744,6 +7144,7 @@ const Scenario = () => {
                                         let variableSet = content.variable_set;
                                         let buttonSubmit = content.button_submit;
                                         let labelNoTransition = content.label_no_transition;
+                                        let contactForm = content.contact_form;
 
                                         let numberMaxLength = 0;
                                         if (content.type === 'checkbox') {
@@ -14980,6 +15381,187 @@ const Scenario = () => {
                                                       </div>
                                                     </React.Fragment>
                                                   )}
+                                                  {/* user: type = 'contact_form' */}
+                                                  {content.type === 'contact_form' && contactForm && (
+                                                    <>
+                                                      <div className="ss-user-setting__item-bottom" style={contactFormFieldRowStyle}>
+                                                        <SelectCustom
+                                                          id="contact_form_template"
+                                                          label="フォーム種類"
+                                                          styleLabel={contactFormFieldLabelStyle}
+                                                          style={contactFormFieldControlStyle}
+                                                          value={contactForm.form_template}
+                                                          onChange={value => handleChangeContactFormTemplate(indexMessageSelect, indexContent, value)}
+                                                          data={[
+                                                            { key: 'basic', value: CONTACT_FORM_TEMPLATE_LABELS.basic },
+                                                            { key: 'detailed', value: CONTACT_FORM_TEMPLATE_LABELS.detailed },
+                                                            { key: 'product', value: CONTACT_FORM_TEMPLATE_LABELS.product },
+                                                          ]}
+                                                          keyValue="key"
+                                                        />
+                                                      </div>
+                                                      <div className="ss-user-setting__item-bottom" style={contactFormFieldRowStyle}>
+                                                        <InputCustom
+                                                          styleLabel={contactFormFieldLabelStyle}
+                                                          style={contactFormFieldControlStyle}
+                                                          label="送信ボタン名称"
+                                                          inline={true}
+                                                          placeholder="送信する"
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'submit_button_name')}
+                                                          value={contactForm.submit_button_name}
+                                                        />
+                                                      </div>
+                                                      <div
+                                                        className="ss-user-setting__item-bottom"
+                                                        style={{
+                                                          width: '90%',
+                                                          marginTop: '10px',
+                                                          display: 'flex',
+                                                          flexDirection: 'column',
+                                                          alignItems: 'stretch',
+                                                          justifyContent: 'flex-start',
+                                                        }}
+                                                      >
+                                                        <div style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>表示フィールド</div>
+                                                        <div
+                                                          style={{
+                                                            display: 'grid',
+                                                            gridTemplateColumns: '1fr 56px 56px',
+                                                            alignItems: 'center',
+                                                            columnGap: '8px',
+                                                            rowGap: '8px',
+                                                            width: '100%',
+                                                          }}
+                                                        >
+                                                          <div />
+                                                          <div style={{ fontSize: '12px', color: '#767676', display: 'flex', justifyContent: 'center' }}>表示</div>
+                                                          <div style={{ fontSize: '12px', color: '#767676', display: 'flex', justifyContent: 'center' }}>必須</div>
+                                                          {CONTACT_FORM_FIELD_KEYS.map((fieldKey) => {
+                                                            const fieldSetting = getContactFormFieldSettings(contactForm)[fieldKey] || {
+                                                              visible: false,
+                                                              required: false,
+                                                            };
+                                                            const emailLocked =
+                                                              fieldKey === 'email' &&
+                                                              Boolean(contactForm.email_settings?.send_to_user);
+                                                            return (
+                                                              <React.Fragment key={fieldKey}>
+                                                                <span style={{ fontSize: '13px' }}>
+                                                                  {CONTACT_FORM_FIELD_LABELS[fieldKey]}
+                                                                </span>
+                                                                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                                                  <Checkbox
+                                                                    disabled={emailLocked}
+                                                                    checked={fieldSetting.visible}
+                                                                    onChange={e => handleChangeContactFormFieldSetting(
+                                                                      indexMessageSelect,
+                                                                      indexContent,
+                                                                      fieldKey,
+                                                                      'visible',
+                                                                      e.target.checked
+                                                                    )}
+                                                                  />
+                                                                </div>
+                                                                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                                                  <Checkbox
+                                                                    disabled={!fieldSetting.visible || emailLocked}
+                                                                    checked={fieldSetting.required}
+                                                                    onChange={e => handleChangeContactFormFieldSetting(
+                                                                      indexMessageSelect,
+                                                                      indexContent,
+                                                                      fieldKey,
+                                                                      'required',
+                                                                      e.target.checked
+                                                                    )}
+                                                                  />
+                                                                </div>
+                                                              </React.Fragment>
+                                                            );
+                                                          })}
+                                                        </div>
+                                                        {contactForm.email_settings?.send_to_user && (
+                                                          <div style={{ fontSize: '12px', color: '#888', marginTop: '8px' }}>
+                                                            ユーザーへ確認メールを送信する場合、メールアドレスは必須表示になります。
+                                                          </div>
+                                                        )}
+                                                      </div>
+                                                      {getContactFormFieldSettings(contactForm).inquiry_type?.visible && (
+                                                        <div className="ss-user-setting__item-bottom" style={{ width: '90%' }}>
+                                                          <div style={{ fontSize: '14px', marginBottom: '5px' }}>お問い合わせ種別（改行区切り）</div>
+                                                          <textarea
+                                                            style={{ width: '100%' }}
+                                                            className="ss-input-value"
+                                                            rows="3"
+                                                            value={(contactForm.inquiry_type_options || []).join('\n')}
+                                                            onChange={e => onChangeValueMessageContent(
+                                                              indexMessageSelect,
+                                                              indexContent,
+                                                              content.type,
+                                                              e.target.value.split('\n').map(v => v.trim()).filter(Boolean),
+                                                              'inquiry_type_options'
+                                                            )}
+                                                          />
+                                                        </div>
+                                                      )}
+                                                      <div className="ss-user-setting__item-bottom" style={{ width: '90%' }}>
+                                                        {renderContactFormDomainSuggestionSetting(indexMessageSelect, indexContent)}
+                                                      </div>
+                                                      <div
+                                                        className="ss-user-setting__item-bottom"
+                                                        style={{
+                                                          width: '90%',
+                                                          marginTop: '10px',
+                                                          display: 'flex',
+                                                          flexDirection: 'column',
+                                                          alignItems: 'stretch',
+                                                          justifyContent: 'flex-start',
+                                                        }}
+                                                      >
+                                                        <div style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>メール送信設定</div>
+                                                        <CheckboxCustom
+                                                          label="ユーザーへ確認メールを送信する"
+                                                          onChange={value => handleChangeContactFormSendToUser(indexMessageSelect, indexContent, value)}
+                                                          value={contactForm.email_settings?.send_to_user}
+                                                        />
+                                                        <CheckboxCustom
+                                                          label="担当者へ通知メールを送信する"
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'email_settings', 'send_to_staff')}
+                                                          value={contactForm.email_settings?.send_to_staff}
+                                                        />
+                                                      </div>
+                                                      {contactForm.email_settings?.send_to_user && (
+                                                        <div className="ss-user-setting__item-bottom" style={contactFormFieldRowStyle}>
+                                                          <SelectCustom
+                                                            id="contact_form_user_email_template"
+                                                            label="ユーザー向けメールテンプレート"
+                                                            styleLabel={contactFormFieldLabelStyle}
+                                                            style={contactFormFieldControlStyle}
+                                                            data={dataEmail}
+                                                            keyValue="id"
+                                                            nameValue="email_template_name"
+                                                            value={contactForm.email_settings?.user_email_id || ''}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'email_settings', 'user_email_id')}
+                                                          />
+                                                        </div>
+                                                      )}
+                                                      {contactForm.email_settings?.send_to_staff && (
+                                                        <div className="ss-user-setting__item-bottom" style={contactFormFieldRowStyle}>
+                                                          <SelectCustom
+                                                            id="contact_form_staff_email_template"
+                                                            label="担当者向けメールテンプレート"
+                                                            styleLabel={contactFormFieldLabelStyle}
+                                                            style={contactFormFieldControlStyle}
+                                                            data={dataEmail}
+                                                            keyValue="id"
+                                                            nameValue="email_template_name"
+                                                            value={contactForm.email_settings?.staff_email_id || ''}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'email_settings', 'staff_email_id')}
+                                                          />
+                                                        </div>
+                                                      )}
+                                                      {renderRootFaqOption()}
+                                                    </>
+                                                  )}
                                                 </div>
                                               </div>
                                             )}
@@ -15025,6 +15607,7 @@ const Scenario = () => {
                                   <option value="card_payment_radio_button">ラジオボタン付きカード決済</option>
                                   <option value="shipping_address">配送先住所</option>
                                   <option value="button_submit">確認する</option>
+                                  <option value="contact_form">お問い合わせフォーム</option>
                                   <option value="variable_set" style={{ display: 'none' }}>変数セット</option>
                                   <option
                                     style={dataMessages[indexMessageSelect].message_content.length > 0 && messageType !== 'label_no_transition' ? { display: 'none' } : {}}
@@ -15183,6 +15766,7 @@ const Scenario = () => {
         </div>
       </ModalNoti>
       {renderModalCustomCssForm(isOpenModalCustomCss)}
+      {renderModalHtmlUgcForm(isOpenModalHtmlUgc)}
       {renderModalCustomJsCodeForm(isOpenModalCustomJsCode)}
       {renderModalTimer(timerConfig.isOpen)}
       {renderErrMsgByJsSettingModal(isOpenErrMsgByJsSettingModal)}

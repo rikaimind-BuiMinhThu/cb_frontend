@@ -4,6 +4,7 @@ export { usePreviewDesignSettings } from "./usePreviewDesignSettings";
 export { usePreviewParentSync } from "./usePreviewParentSync";
 export { usePreviewCustomJs } from "./usePreviewCustomJs";
 export { usePreviewThemeCss } from "./usePreviewThemeCss";
+export { usePreviewHtmlUgc } from "./usePreviewHtmlUgc";
 export { usePreviewScenarioBootstrap } from "./usePreviewScenarioBootstrap";
 export { usePreviewAutoScroll } from "./usePreviewAutoScroll";
 export { usePreviewMessageReveal } from "./usePreviewMessageReveal";

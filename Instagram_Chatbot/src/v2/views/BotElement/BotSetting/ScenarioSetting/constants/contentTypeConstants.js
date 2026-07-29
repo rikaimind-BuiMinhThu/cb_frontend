@@ -104,4 +104,5 @@ export const CONTENT_SETTING_TYPES = {
   AFTEE_PAYMENT_MODULE: 'AFTEE_payment_module',
   BUTTON_SUBMIT: 'button_submit',
   LABEL_NO_TRANSITION: 'label_no_transition',
+  CONTACT_FORM: 'contact_form',
 };

@@ -1,3 +1,7 @@
+import _ from 'lodash';
+import { getDefaultUpsellButtonOptions } from '../constants/upsellButtonDefaults';
+import { DEFAULT_CONTACT_FORM_CONFIG } from '../../PreviewComponent/Constants';
+
 export function getNextContentId(messageContentArray) {
   if (messageContentArray.length !== 0) {
     return Math.max(...messageContentArray.map((item) => item.id)) + 1;
@@ -60,6 +64,7 @@ export function createDefaultContentItem(messageType, idMax) {
         option_margin: '5px',
         default: [{ id: 1 }],
         radio_button_img: [{ id: 1 }],
+        upsell_button: getDefaultUpsellButtonOptions(),
         block_style: [{ id: 1 }],
       },
     };
@@ -185,6 +190,14 @@ export function createDefaultContentItem(messageType, idMax) {
       [messageType]: {
         file_type: [],
       },
+    };
+  }
+
+  if (messageType === 'contact_form') {
+    return {
+      id: idMax,
+      type: messageType,
+      [messageType]: _.cloneDeep(DEFAULT_CONTACT_FORM_CONFIG),
     };
   }
 
