@@ -30,8 +30,10 @@ const fieldRowStyle = {
 };
 
 const fieldLabelStyle = {
-  flex: '0 0 140px',
-  width: '140px',
+  flex: '0 0 200px',
+  width: '200px',
+  minWidth: '200px',
+  whiteSpace: 'nowrap',
   textAlign: 'left',
   marginRight: 0,
 };
@@ -118,7 +120,9 @@ const ContactFormSetting = (props) => {
           const emailLocked = fieldKey === 'email' && Boolean(contactForm.email_settings?.send_to_user);
           return (
             <React.Fragment key={fieldKey}>
-              <span style={{ fontSize: '13px' }}>{CONTACT_FORM_FIELD_LABELS[fieldKey]}</span>
+              <span className="ss-contact-form-setting__fields-label">
+                {CONTACT_FORM_FIELD_LABELS[fieldKey]}
+              </span>
               <div className="ss-contact-form-setting__fields-cell">
                 <Checkbox
                   disabled={emailLocked}
@@ -185,10 +189,10 @@ const ContactFormSetting = (props) => {
 
   const renderEmailSettings = () => (
     <div
-      className="ss-user-setting__item-bottom"
-      style={{ width: '90%', marginTop: '10px', display: 'flex', flexDirection: 'column' }}
+      className="ss-user-setting__item-bottom ss-contact-form-setting__email"
+      style={{ width: '90%', marginTop: '10px' }}
     >
-      <div style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>メール送信設定</div>
+      <div className="ss-contact-form-setting__email-title">メール送信設定</div>
       <CheckboxCustom
         label="ユーザーへ確認メールを送信する"
         onChange={handleChangeContactFormSendToUser}

@@ -1,10 +1,11 @@
 .ss-contact-form-setting__fields-grid {
   display: grid;
-  grid-template-columns: 1fr 56px 56px;
+  grid-template-columns: max-content 48px 48px;
   align-items: center;
-  column-gap: 8px;
+  column-gap: 16px;
   row-gap: 8px;
-  width: 100%;
+  width: max-content;
+  max-width: 100%;
 }
 
 .ss-contact-form-setting__fields-header {
@@ -17,4 +18,23 @@
 .ss-contact-form-setting__fields-cell {
   display: flex;
   justify-content: center;
+}
+
+.ss-contact-form-setting__fields-label {
+  font-size: 13px;
+  padding-right: 4px;
+}
+
+.ss-contact-form-setting__email {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 8px;
+}
+
+.ss-contact-form-setting__email-title {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 0;
 }
