@@ -418,6 +418,12 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
         isProcessing: false,
         useFullWidthChatbotMobile: !!chatbot?.use_fullwidth_chatbot_mobile,
         cartSystem: state.cartSystem || chatbot?.client_cart_system || "",
+        orderExecutionMode: chatbot?.order_execution_mode || action.payload.responseData?.data?.order_execution_mode || "",
+        extraConfig: action.payload.responseData?.data?.extra_config || {},
+        isUseMockResponse: !!(
+          chatbot?.is_use_mock_response ||
+          action.payload.responseData?.data?.is_use_mock_response
+        ),
         merchandiseId: action.payload.responseData?.data?.merchandise_id || "",
         isUsedCrosssell: !!action.payload.responseData?.data?.is_used_crosssell,
         productIdCrossSell:

@@ -25,6 +25,7 @@ import {
   TIMER_MAP_VARIABLES_FIELD,
   TIMER_TYPES,
   CART_SYSTEM,
+  ORDER_EXECUTION_MODE,
   CONVERSTION_RESPONSE_STATUS,
   PREVIEW_ACTIONS,
   RENDER_CHATBOT_CONFIG,
@@ -53,12 +54,21 @@ import {
   sendCloseChatbotCountRequest,
   isUserMessage,
   sendLogMessageToServer,
+  sendCreateOrderData,
   updateStatusConversion,
   isButtonSubmitMessage,
   createScenarioUserResponseMessageHistory,
   sendErrorLogToServer,
   sendAppearLogToServer,
 } from "./PreviewComponent/Utils";
+import { tokenizeCreditCard, mockCreditCardFromMessages } from "./PreviewComponent/subscStore/zeusTokenize";
+import { isUpsellAcceptMessage, sendChangeOrderItems } from "./PreviewComponent/subscStore/changeOrderItems";
+import {
+  sendConfirmOrderData,
+  isConfirmOrderSubmit,
+  findUpcomingConfirmMessage,
+  formatConfirmOrderHtml,
+} from "./PreviewComponent/subscStore/confirmOrder";
 import {
   getChatbotSavedState,
   savedChatbotState,
@@ -180,6 +190,7 @@ const previewInitialState = {
   isNotAutoScroll: false,
   cartSystem: params.get("cartSystem") || "",
   isUseBtnUpdateTracking: false,
+  isUseMockResponse: false,
 };
 
 
@@ -190,6 +201,7 @@ const PreviewFukushashiki = () => {
   const hasSentCustomJs = useRef(false);
   const [msgUpdateState, setMsgUpdateState] = useState({});
   const msgUpdateStateRef = useRef({});
+  const subscCreditCardRef = useRef(null);
   useEffect(() => { 
     if (!state.isUseBtnUpdateTracking) return;
     msgUpdateStateRef.current = msgUpdateState; 
@@ -921,7 +933,91 @@ const PreviewFukushashiki = () => {
     }
   }
 
-  const onClickNext = (clickedMsgIndex, clickedMsg) => {
+  const isSubscStoreApiMode = (currentState) =>
+    currentState.cartSystem === CART_SYSTEM.SUBSC_STORE &&
+    currentState.orderExecutionMode === ORDER_EXECUTION_MODE.API_ONLY;
+
+  const ensureSubscCreditCard = async (currentState) => {
+    if (subscCreditCardRef.current) return subscCreditCardRef.current;
+    if (currentState.isUseMockResponse) {
+      const creditCard = mockCreditCardFromMessages(currentState.messagesList);
+      subscCreditCardRef.current = creditCard;
+      return creditCard;
+    }
+    const creditCard = await tokenizeCreditCard({
+      scenarioId: currentState.scenarioId,
+      messages: currentState.messagesList,
+    });
+    subscCreditCardRef.current = creditCard;
+    return creditCard;
+  };
+
+  const confirmSubscStoreOrderIfNeeded = async (currentState, clickedMsgIndex) => {
+    if (!isSubscStoreApiMode(currentState)) return true;
+    const confirmMsg = findUpcomingConfirmMessage(currentState.messagesList, clickedMsgIndex);
+    if (!confirmMsg) return true;
+
+    try {
+      const creditCard = await ensureSubscCreditCard(currentState);
+      const res = await sendConfirmOrderData({
+        scenario_id: currentState.scenarioId,
+        user_id: currentState.uuid,
+        bot_type: "web",
+        credit_card: creditCard,
+      });
+      const fields = confirmMsg.message_content?.[0]?.text_input?.confirm_display_fields;
+      dispatch({
+        type: PREVIEW_ACTIONS.UPDATE_PREVIEW_ORDER_CONTENT,
+        payload: formatConfirmOrderHtml(res.data?.display || {}, fields),
+      });
+      return true;
+    } catch (error) {
+      const message = error.response?.data?.message || "注文内容を確認できませんでした";
+      dispatch({
+        type: PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE,
+        payload: message,
+      });
+      return false;
+    }
+  };
+
+  const createSubscStoreApiOrder = async (currentState) => {
+    try {
+      const creditCard = await ensureSubscCreditCard(currentState);
+      await sendCreateOrderData({
+        scenario_id: currentState.scenarioId,
+        user_id: currentState.uuid,
+        bot_type: "web",
+        credit_card: creditCard,
+      });
+      return true;
+    } catch (error) {
+      const message = error.response?.data?.message || "注文を作成できませんでした";
+      dispatch({
+        type: PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE,
+        payload: message,
+      });
+      return false;
+    }
+  };
+
+  const submitSubscStoreRpaIfNeeded = async (currentState) => {
+    if (currentState.cartSystem !== CART_SYSTEM.SUBSC_STORE) return;
+    if (currentState.orderExecutionMode === ORDER_EXECUTION_MODE.FUKUSHASHIKI_ONLY) return;
+    if (currentState.orderExecutionMode === ORDER_EXECUTION_MODE.API_ONLY) return;
+
+    try {
+      await sendCreateOrderData({
+        scenario_id: currentState.scenarioId,
+        user_id: currentState.uuid,
+        bot_type: "web",
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const onClickNext = async (clickedMsgIndex, clickedMsg) => {
     savedChatbotState(state);
 
     const data = {
@@ -983,18 +1079,51 @@ const PreviewFukushashiki = () => {
 
     const isClickedButtonSubmit = isButtonSubmitMessage(state.messagesList[clickedMsgIndex]);
     const isClickedLastMessage = state.messagesList.length - 1 === clickedMsgIndex;
+    const isApiMode = isSubscStoreApiMode(state);
+
+    if (isApiMode) {
+      const confirmed = await confirmSubscStoreOrderIfNeeded(state, clickedMsgIndex);
+      if (!confirmed) return;
+
+      if (isConfirmOrderSubmit(clickedMsg)) {
+        const created = await createSubscStoreApiOrder(state);
+        if (!created) return;
+        updateStatusConversion({
+          scenario_id: state.scenarioId,
+          user_input_id: state.uuid,
+          status: CONVERSTION_RESPONSE_STATUS.FINISH,
+        });
+      }
+    }
 
     dispatch({
       type: PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON,
       payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn}
     });
 
-    if (isClickedButtonSubmit || isClickedLastMessage) {
+    if (!isApiMode && (isClickedButtonSubmit || isClickedLastMessage)) {
       updateStatusConversion({
         scenario_id: state.scenarioId,
         user_input_id: state.uuid,
         status: CONVERSTION_RESPONSE_STATUS.FINISH,
-      })
+      });
+      submitSubscStoreRpaIfNeeded(state);
+    }
+
+    const upsellEnabled = !!(
+      state.extraConfig?.subsc_store?.upsell?.enabled ||
+      state.extraConfig?.upsell?.enabled
+    );
+    if (
+      state.cartSystem === CART_SYSTEM.SUBSC_STORE &&
+      state.orderExecutionMode === ORDER_EXECUTION_MODE.API_ONLY &&
+      upsellEnabled &&
+      isUpsellAcceptMessage(clickedMsg)
+    ) {
+      sendChangeOrderItems({
+        scenarioId: state.scenarioId,
+        userId: state.uuid,
+      }).catch((error) => console.error(error));
     }
 
     if (isClickedLastMessage && clickedMsg?.only_display_when_confirm && !state.submitErrorMessage && Object.keys(state.errors).length === 0) {

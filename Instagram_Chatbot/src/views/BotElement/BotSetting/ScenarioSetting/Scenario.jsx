@@ -49,7 +49,7 @@ import HtmlCodeConfig from './scenarioComon/HtmlCodeConfig';
 import OptionGenderConfig from './OptionGenderConfig';
 import SubmitButtonLoadingConfig from './SubmitButtonLoadingConfig';
 import SubmitButtonConfig from './SubmitButtonConfig';
-import {CART_SYSTEM} from '../PreviewComponent/Constants';
+import {CART_SYSTEM, CONFIRM_DISPLAY_FIELDS, defaultConfirmDisplayFields} from '../PreviewComponent/Constants';
 import ZipCodeAddressSetting from './Settings/ZipCodeAddressSetting';
 import { renderFukushashikiSetting } from './ScenarioUtils';
 import EmailDomainSuggestionSetting from './scenarioComon/EmailDomainSuggestionSetting';
@@ -969,6 +969,7 @@ const Scenario = () => {
   // ProductVariant - Shopify
   const [listProductVariants, setListProductVariants] = useState([]);
   const isShopifyPaymentScenario = clientCartSystem === CART_SYSTEM.SHOPIFY && scenarioType === "payment";
+  const isSubscStorePaymentScenario = clientCartSystem === CART_SYSTEM.SUBSC_STORE && scenarioType === "payment";
 
   useEffect(() => {
     getListProductVariants(null);
@@ -6482,7 +6483,15 @@ const Scenario = () => {
                                   <div className="ss-bot-checkbox-scroll-auto">
                                     <CheckboxCustom
                                       label="確認メッセージに使用"
-                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'use_for_confirm_message')}
+                                      onChange={value => {
+                                        onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'use_for_confirm_message');
+                                        if (value && isSubscStorePaymentScenario) {
+                                          const currentFields = dataMessages[indexMessageSelect].message_content[0][messageType]?.confirm_display_fields;
+                                          if (!currentFields?.length) {
+                                            onChangeValueMessageContent(indexMessageSelect, 0, messageType, defaultConfirmDisplayFields(), 'confirm_display_fields');
+                                          }
+                                        }
+                                      }}
                                       value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['use_for_confirm_message'] || ''}
                                     />
                                   </div>
@@ -6541,21 +6550,63 @@ const Scenario = () => {
                                   )}
                                   {renderRootFaqOption('ss-bot-checkbox-scroll-auto')}
                                   {dataMessages[indexMessageSelect].message_content[0][messageType]?.['use_for_confirm_message'] && (
-                                    <div
-                                    id="ss-bot-statement-type-text"
-                                    className="ss-bot-statement-type-text ss-bot-statement-type"
-                                  >
-                                    <textarea
-                                      name="bot-statement-type-text-content"
-                                      id="bot-statement-type-text-content"
-                                      className="ss-bot-statement-type-text-content ss-input-value"
-                                      rows={5}
-                                      placeholder="入力"
-                                      value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['jscode'] || ''}
-                                      onChange={(e) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, e.target.value, 'jscode')}
-                                    >
-                                    </textarea>
-                                  </div>
+                                    isSubscStorePaymentScenario ? (
+                                      <div style={{ marginTop: '8px' }}>
+                                        <div style={{ fontSize: '12px', marginBottom: '6px' }}>注文確認に表示する項目（表示ON/OFF・順序）</div>
+                                        {(dataMessages[indexMessageSelect].message_content[0][messageType]?.confirm_display_fields || defaultConfirmDisplayFields()).map((field, fieldIndex, fields) => {
+                                          const label = CONFIRM_DISPLAY_FIELDS.find((item) => item.key === field.key)?.label || field.key;
+                                          return (
+                                            <div key={field.key} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                                              <input
+                                                type="checkbox"
+                                                checked={field.visible !== false}
+                                                onChange={() => {
+                                                  const next = fields.map((item, idx) => idx === fieldIndex ? { ...item, visible: !item.visible } : item);
+                                                  onChangeValueMessageContent(indexMessageSelect, 0, messageType, next, 'confirm_display_fields');
+                                                }}
+                                              />
+                                              <span style={{ flex: 1, fontSize: '12px' }}>{label}</span>
+                                              <button
+                                                type="button"
+                                                disabled={fieldIndex === 0}
+                                                onClick={() => {
+                                                  if (fieldIndex === 0) return;
+                                                  const next = [...fields];
+                                                  [next[fieldIndex - 1], next[fieldIndex]] = [next[fieldIndex], next[fieldIndex - 1]];
+                                                  onChangeValueMessageContent(indexMessageSelect, 0, messageType, next, 'confirm_display_fields');
+                                                }}
+                                              >↑</button>
+                                              <button
+                                                type="button"
+                                                disabled={fieldIndex === fields.length - 1}
+                                                onClick={() => {
+                                                  if (fieldIndex === fields.length - 1) return;
+                                                  const next = [...fields];
+                                                  [next[fieldIndex + 1], next[fieldIndex]] = [next[fieldIndex], next[fieldIndex + 1]];
+                                                  onChangeValueMessageContent(indexMessageSelect, 0, messageType, next, 'confirm_display_fields');
+                                                }}
+                                              >↓</button>
+                                            </div>
+                                          );
+                                        })}
+                                      </div>
+                                    ) : (
+                                      <div
+                                        id="ss-bot-statement-type-text"
+                                        className="ss-bot-statement-type-text ss-bot-statement-type"
+                                      >
+                                        <textarea
+                                          name="bot-statement-type-text-content"
+                                          id="bot-statement-type-text-content"
+                                          className="ss-bot-statement-type-text-content ss-input-value"
+                                          rows={5}
+                                          placeholder="入力"
+                                          value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['jscode'] || ''}
+                                          onChange={(e) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, e.target.value, 'jscode')}
+                                        >
+                                        </textarea>
+                                      </div>
+                                    )
                                   )}
                                 </div>
                               )}

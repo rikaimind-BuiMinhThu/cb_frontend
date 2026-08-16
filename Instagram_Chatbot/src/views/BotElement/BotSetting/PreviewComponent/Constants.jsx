@@ -88,6 +88,9 @@ const NUMBER_REGEX = /^\d+$/;
 const CHATBOT_SERVER = {
   SCENARIO_USER_RESPONSE_PATH: '/api/v1/scenario_users/scenario_user_responses',
   SCENARIO_CREATE_ORDER_PATH: '/api/v1/scenario_users/scenario_user_responses/create_order',
+  SCENARIO_CONFIRM_ORDER_PATH: '/api/v1/scenario_users/scenario_user_responses/confirm_order',
+  SCENARIO_CHANGE_ORDER_ITEMS_PATH: '/api/v1/scenario_users/scenario_user_responses/change_order_items',
+  SCENARIO_SUBSC_PAYMENT_CONFIG_PATH: '/api/v1/scenario_users/scenario_user_responses/payment_config',
   CONVERSION_PATH: '/api/v1/analytics/scenario_counts/:scenario_id',
   GET_CITIES_PATH: '/api/v1/cities?prefecture_jis_code=:prefecture_jis_code',
   GET_TOWNS_PATH: '/api/v1/towns?city_jis_code=:city_jis_code',
@@ -385,7 +388,39 @@ const RANGE_TEXT_VALIDATE = {
 const CART_SYSTEM = {
   EC_FORCE: 'ec_force',
   SHOPIFY: 'shopify',
+  SUBSC_STORE: 'subsc_store',
 }
+
+const ORDER_EXECUTION_MODE = {
+  UNDECIDED: 'undecided',
+  FUKUSHASHIKI_ONLY: 'fukushashiki_only',
+  API_ONLY: 'api_only',
+  RPA: 'rpa',
+}
+
+const CONFIRM_DISPLAY_FIELDS = [
+  { key: 'customer_name', label: 'お名前' },
+  { key: 'customer_name_kana', label: 'フリガナ' },
+  { key: 'email', label: 'メールアドレス' },
+  { key: 'tel', label: '電話番号' },
+  { key: 'zip_code', label: '郵便番号' },
+  { key: 'address', label: 'ご住所' },
+  { key: 'product', label: '商品' },
+  { key: 'quantity', label: '数量' },
+  { key: 'payment_method', label: 'お支払い方法' },
+  { key: 'card', label: 'カード' },
+  { key: 'item_total', label: '商品合計' },
+  { key: 'tax_total', label: '消費税' },
+  { key: 'shipping_fee', label: '送料' },
+  { key: 'payment_fee', label: '決済手数料' },
+  { key: 'coupon_discount', label: 'クーポン割引' },
+  { key: 'rank_discount', label: 'ランク割引' },
+  { key: 'total', label: 'お支払い合計' },
+  { key: 'delivery_date', label: 'お届け希望日' },
+]
+
+const defaultConfirmDisplayFields = () =>
+  CONFIRM_DISPLAY_FIELDS.map((field) => ({ key: field.key, visible: true }))
 
 export {
   dataHourFixed,
@@ -420,6 +455,9 @@ export {
   CONVERT_TEXT_TYPES,
   RANGE_TEXT_VALIDATE,
   CART_SYSTEM,
+  ORDER_EXECUTION_MODE,
+  CONFIRM_DISPLAY_FIELDS,
+  defaultConfirmDisplayFields,
   LABELS,
 };
 

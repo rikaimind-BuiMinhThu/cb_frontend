@@ -17,6 +17,12 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { tokenExpired } from 'api/tokenExpired';
 import { EC_CHATBOT_URL } from '../variables/constants'
 import { MDBIcon } from 'mdbreact';
+import {
+  MOCK_RESPONSE_FIELDS,
+  mergeSubscStoreConfig,
+  stringifyMockResponses,
+  parseMockResponses,
+} from './subscStoreClientSettings';
 registerLocale("ja", ja);
 
 function ClientManagement() {
@@ -73,6 +79,10 @@ function ClientManagement() {
   var [shopUrl, setShopUrl] = useState('');
   var [clientId, setClientId] = useState('');
   var [clientSecret, setClientSecret] = useState();
+  var [orderExecutionMode, setOrderExecutionMode] = useState('rpa');
+  const [isUseMockResponse, setIsUseMockResponse] = useState(false);
+  const [subscStoreConfig, setSubscStoreConfig] = useState(mergeSubscStoreConfig());
+  const [mockResponseTexts, setMockResponseTexts] = useState(stringifyMockResponses());
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [isOpenAddUser, setIsOpenAddUser] = useState(false);
@@ -357,6 +367,8 @@ function ClientManagement() {
         setShopUrl(data.shop_url || '');
         setClientId(data.client_id || '');
         setClientSecret(data.client_secret || '');
+        setOrderExecutionMode(data.order_execution_mode || 'rpa');
+        applySubscStoreClientSettings(data);
         setDepartmentName(data.department_name);
         setTitle(data.title);
         setManager(data.responsible_person);
@@ -448,6 +460,8 @@ function ClientManagement() {
         setShopUrl(data.shop_url || '');
         setClientId(data.client_id || '');
         setClientSecret(data.client_secret || '');
+        setOrderExecutionMode(data.order_execution_mode || 'rpa');
+        applySubscStoreClientSettings(data);
         setDepartmentName(data.department_name);
         setTitle(data.title);
         setManager(data.responsible_person);
@@ -629,7 +643,7 @@ function ClientManagement() {
       checkFieldAdd(building, '建物名') === true &&
       checkNameAdd(email, 'メールアドレス') === true &&
       utils.checkPhoneNumber(phone, '電話番号') === true &&
-      (cartSystem !== "shopify" || (shopUrl && clientId && clientSecret)) &&
+      (cartSystem !== "shopify" && !(cartSystem === "subsc_store" && (orderExecutionMode === "api_only" || document.getElementById('newOrderExecutionMode')?.value === "api_only") && !isUseMockResponse) || (shopUrl && clientId && clientSecret)) &&
       nameKata == true &&
       managerKata == true &&
       emailCheck == true &&
@@ -658,6 +672,7 @@ function ClientManagement() {
       obj.email = emaill;
       obj.reply_smtp_gmail = replySmtpGmail || '';
       obj.reply_smtp_gmail_app_password = replySmtpGmailAppPassword || '';
+      if (!assignSubscStoreClientPayload(obj)) return;
       // var updateClient = { client: obj };
       // console.log(newClient)
 
@@ -939,7 +954,8 @@ function ClientManagement() {
       price > 0 &&
       zipCode > 0 &&
       cfPass === true &&
-      validateReplySmtp({ requirePasswordIfNew: true }) === true
+      validateReplySmtp({ requirePasswordIfNew: true }) === true &&
+      (cartSystem !== "shopify" && !(cartSystem === "subsc_store" && (orderExecutionMode === "api_only" || document.getElementById('newOrderExecutionMode')?.value === "api_only") && !isUseMockResponse) || (shopUrl && clientId && clientSecret))
     ) {
       // if (checkFieldAdd(name, 'Name') === true && checkFieldAdd(address, "Address") === true && utils.checkInputNumber(phone, "Phone") === true) {
       var elements = document.getElementById('addForm').elements;
@@ -956,6 +972,7 @@ function ClientManagement() {
       obj.logo_url = inputImage;
       obj.reply_smtp_gmail = replySmtpGmail || '';
       obj.reply_smtp_gmail_app_password = replySmtpGmailAppPassword || '';
+      if (!assignSubscStoreClientPayload(obj)) return;
       var newClient = { client: obj, user: usr };
       // console.log(newClient);
 
@@ -1261,6 +1278,211 @@ function ClientManagement() {
     setContract(data);
   }
 
+  function applySubscStoreClientSettings(data = {}) {
+    setIsUseMockResponse(!!data.is_use_mock_response);
+    const extra = data.extra_config?.subsc_store || data.extra_config || {};
+    setSubscStoreConfig(mergeSubscStoreConfig(extra));
+    setMockResponseTexts(stringifyMockResponses(data.mock_response || {}));
+  }
+
+  function assignSubscStoreClientPayload(obj) {
+    obj.is_use_mock_response = !!(
+      cartSystem === 'subsc_store' &&
+      orderExecutionMode === 'api_only' &&
+      isUseMockResponse
+    );
+    if (cartSystem === 'subsc_store' && orderExecutionMode === 'api_only') {
+      obj.extra_config = { subsc_store: subscStoreConfig };
+      if (isUseMockResponse) {
+        try {
+          obj.mock_response = parseMockResponses(mockResponseTexts);
+        } catch (error) {
+          setMsgNoti('モックレスポンスのJSONが不正です');
+          setIsOpenNoti(true);
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  function renderSubscStoreApiSettings() {
+    if (cartSystem !== 'subsc_store' || orderExecutionMode !== 'api_only') return null;
+
+    return (
+      <>
+        <br />
+        <label className="label-input">
+          サブスクストア商品設定
+        </label>
+        <select
+          className="input-field"
+          value={subscStoreConfig.item_kind}
+          onChange={(e) => setSubscStoreConfig({ ...subscStoreConfig, item_kind: e.target.value })}
+        >
+          <option value="products">単品・セット</option>
+          <option value="regular_courses">定期コース</option>
+          <option value="distribution_courses">頒布会コース</option>
+        </select>
+        <input
+          className="input-field"
+          value={subscStoreConfig.product_name}
+          onChange={(e) => setSubscStoreConfig({ ...subscStoreConfig, product_name: e.target.value })}
+          placeholder="注文確認に表示する商品名"
+        />
+        <input
+          className="input-field"
+          value={subscStoreConfig.merchandise_id}
+          onChange={(e) => setSubscStoreConfig({ ...subscStoreConfig, merchandise_id: e.target.value })}
+          placeholder="商品ID (merchandise_id)"
+        />
+        <input
+          className="input-field"
+          value={subscStoreConfig.variant_id}
+          onChange={(e) => setSubscStoreConfig({ ...subscStoreConfig, variant_id: e.target.value })}
+          placeholder="バリエーションID (variant_id)"
+        />
+        <input
+          className="input-field"
+          value={subscStoreConfig.course_id}
+          onChange={(e) => setSubscStoreConfig({ ...subscStoreConfig, course_id: e.target.value })}
+          placeholder="コースID (定期/頒布会)"
+        />
+        <input
+          className="input-field"
+          value={subscStoreConfig.frequency_id}
+          onChange={(e) => setSubscStoreConfig({ ...subscStoreConfig, frequency_id: e.target.value })}
+          placeholder="定期頻度ID (frequency_id)"
+        />
+        <input
+          className="input-field"
+          value={subscStoreConfig.payment_method_shop_id_credit}
+          onChange={(e) => setSubscStoreConfig({ ...subscStoreConfig, payment_method_shop_id_credit: e.target.value })}
+          placeholder="ZEUS支払い方法ID"
+        />
+        <input
+          className="input-field"
+          value={subscStoreConfig.payment_method_shop_id_np}
+          onChange={(e) => setSubscStoreConfig({ ...subscStoreConfig, payment_method_shop_id_np: e.target.value })}
+          placeholder="NP後払い支払い方法ID"
+        />
+        <input
+          className="input-field"
+          value={subscStoreConfig.shop_shipping_method_id}
+          onChange={(e) => setSubscStoreConfig({ ...subscStoreConfig, shop_shipping_method_id: e.target.value })}
+          placeholder="配送方法ID"
+        />
+        <input
+          className="input-field"
+          value={subscStoreConfig.time_zone_id}
+          onChange={(e) => setSubscStoreConfig({ ...subscStoreConfig, time_zone_id: e.target.value })}
+          placeholder="配送時間帯ID"
+        />
+        <div>
+          <input
+            type="checkbox"
+            checked={!!subscStoreConfig.is_skip_tds}
+            onChange={() => setSubscStoreConfig({ ...subscStoreConfig, is_skip_tds: !subscStoreConfig.is_skip_tds })}
+          />
+          <label>3Dセキュアをスキップ</label>
+        </div>
+        <div>
+          <input
+            type="checkbox"
+            checked={!!subscStoreConfig.upsell?.enabled}
+            onChange={() => setSubscStoreConfig({
+              ...subscStoreConfig,
+              upsell: { ...subscStoreConfig.upsell, enabled: !subscStoreConfig.upsell?.enabled },
+            })}
+          />
+          <label>注文後アップセルを利用</label>
+        </div>
+        {subscStoreConfig.upsell?.enabled && (
+          <>
+            <select
+              className="input-field"
+              value={subscStoreConfig.upsell.after_item_kind}
+              onChange={(e) => setSubscStoreConfig({
+                ...subscStoreConfig,
+                upsell: { ...subscStoreConfig.upsell, after_item_kind: e.target.value },
+              })}
+            >
+              <option value="products">単品・セットへ変更</option>
+              <option value="regular_courses">定期コースへ変更</option>
+              <option value="distribution_courses">頒布会コースへ変更</option>
+            </select>
+            <input
+              className="input-field"
+              value={subscStoreConfig.upsell.after_merchandise_id}
+              onChange={(e) => setSubscStoreConfig({
+                ...subscStoreConfig,
+                upsell: { ...subscStoreConfig.upsell, after_merchandise_id: e.target.value },
+              })}
+              placeholder="アップセル先 商品ID"
+            />
+            <input
+              className="input-field"
+              value={subscStoreConfig.upsell.after_variant_id}
+              onChange={(e) => setSubscStoreConfig({
+                ...subscStoreConfig,
+                upsell: { ...subscStoreConfig.upsell, after_variant_id: e.target.value },
+              })}
+              placeholder="アップセル先 バリエーションID"
+            />
+            <input
+              className="input-field"
+              value={subscStoreConfig.upsell.after_course_id}
+              onChange={(e) => setSubscStoreConfig({
+                ...subscStoreConfig,
+                upsell: { ...subscStoreConfig.upsell, after_course_id: e.target.value },
+              })}
+              placeholder="アップセル先 コースID"
+            />
+            <input
+              className="input-field"
+              value={subscStoreConfig.upsell.after_frequency_id}
+              onChange={(e) => setSubscStoreConfig({
+                ...subscStoreConfig,
+                upsell: { ...subscStoreConfig.upsell, after_frequency_id: e.target.value },
+              })}
+              placeholder="アップセル先 定期頻度ID"
+            />
+          </>
+        )}
+        <br />
+        <div>
+          <input
+            type="checkbox"
+            checked={isUseMockResponse}
+            onChange={() => {
+              const next = !isUseMockResponse;
+              setIsUseMockResponse(next);
+              if (next) {
+                setMockResponseTexts((prev) => {
+                  const empty = !MOCK_RESPONSE_FIELDS.some(({ key }) => String(prev[key] || '').trim());
+                  return empty ? stringifyMockResponses() : prev;
+                });
+              }
+            }}
+          />
+          <label>モックレスポンスを使用</label>
+        </div>
+        {isUseMockResponse && MOCK_RESPONSE_FIELDS.map(({ key, label }) => (
+          <label key={key} className="label-input">
+            {label}
+            <textarea
+              className="input-field"
+              rows={8}
+              value={mockResponseTexts[key] || ''}
+              onChange={(e) => setMockResponseTexts({ ...mockResponseTexts, [key]: e.target.value })}
+            />
+          </label>
+        ))}
+        <br />
+      </>
+    );
+  }
+
   function addUserPopup() {
     setContract('');
     setInputStartDate('');
@@ -1269,6 +1491,8 @@ function ClientManagement() {
     setShopUrl('');
     setClientId('');
     setClientSecret('');
+    setOrderExecutionMode('rpa');
+    applySubscStoreClientSettings({});
     setReplySmtpGmail('');
     setReplySmtpGmailAppPassword('');
     setHasReplySmtpPassword(false);
@@ -2764,7 +2988,26 @@ function ClientManagement() {
                     style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
-                {cartSystem === "shopify" && (
+                <br />
+                <br />
+                <label className="label-input">
+                  実施方針
+                  <select
+                    style={{ padding: '3px 0px 3px 0px', maxHeight: '50%!important%' }}
+                    disabled={disableInput == true ? true : false}
+                    className="input-field"
+                    value={orderExecutionMode || 'rpa'}
+                    onChange={(e) => setOrderExecutionMode(e.target.value)}
+                    name="order_execution_mode"
+                    id="newOrderExecutionMode"
+                  >
+                    <option value="undecided">未定（シナリオごとで設定）</option>
+                    <option value="fukushashiki_only">複写式のみ</option>
+                    <option value="api_only">APIのみ</option>
+                    <option value="rpa">RPA</option>
+                  </select>
+                </label>
+                {(cartSystem === "shopify" || cartSystem === "subsc_store") && (
                   <>
                     <br />
                     <label className="label-input">
@@ -2800,6 +3043,7 @@ function ClientManagement() {
                       />
                     </label>
                     <br />
+                    {renderSubscStoreApiSettings()}
                   </>
                 )}
                 <br />
@@ -3744,7 +3988,26 @@ function ClientManagement() {
                     style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
-                {cartSystem === "shopify" && (
+                <br />
+                <br />
+                <label className="label-input">
+                  実施方針
+                  <select
+                    style={{ padding: '3px 0px 3px 0px', maxHeight: '50%!important%' }}
+                    disabled={disableInput == true ? true : false}
+                    className="input-field"
+                    value={orderExecutionMode || 'rpa'}
+                    onChange={(e) => setOrderExecutionMode(e.target.value)}
+                    name="order_execution_mode"
+                    id="newOrderExecutionMode"
+                  >
+                    <option value="undecided">未定（シナリオごとで設定）</option>
+                    <option value="fukushashiki_only">複写式のみ</option>
+                    <option value="api_only">APIのみ</option>
+                    <option value="rpa">RPA</option>
+                  </select>
+                </label>
+                {(cartSystem === "shopify" || cartSystem === "subsc_store") && (
                   <>
                     <br />
                     <label className="label-input">
@@ -3780,6 +4043,7 @@ function ClientManagement() {
                       />
                     </label>
                     <br />
+                    {renderSubscStoreApiSettings()}
                   </>
                 )}
                 <br />
