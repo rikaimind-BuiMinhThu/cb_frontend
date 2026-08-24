@@ -82,6 +82,8 @@ const ScenarioSettingsMainView = ({ onClose }) => {
   } = actions;
 
   const client = contextClient || JSON.parse(sessionStorage.getItem('client') || 'null');
+  const isApiPolicy = executionPolicy === EXECUTION_POLICIES.API;
+  const isFukushashikiPolicy = executionPolicy === EXECUTION_POLICIES.FUKUSHASHIKI;
 
   const handleChangeExecutionPolicy = (value) => {
     setExecutionPolicy(value);
@@ -123,29 +125,8 @@ const ScenarioSettingsMainView = ({ onClose }) => {
 
   return (
     <div className="ss-settings-main-view">
-      {scenarioType !== 'faq' && (
+      {scenarioType !== 'faq' && !isApiPolicy && (
         <section className="ss-layout-form-section">
-          <h3 className="ss-layout-form-section__title">URL設定</h3>
-          <ScenarioFormRow
-            label="商品購入のURL"
-            tooltip={SCENARIO_MODAL_TOOLTIPS.lpProductUrl}
-          >
-            <InputCustom
-              style={{ width: '100%' }}
-              value={lpProductUrl}
-              onChange={(value) => setLpProductUrl(value)}
-            />
-          </ScenarioFormRow>
-          <ScenarioFormRow
-            label="サンクスページのURL"
-            tooltip={SCENARIO_MODAL_TOOLTIPS.urlThanks}
-          >
-            <InputCustom
-              style={{ width: '100%' }}
-              value={urlThanks}
-              onChange={(value) => setUrlThanks(value)}
-            />
-          </ScenarioFormRow>
           {isShopifyPaymentScenario && (
             <>
               <ScenarioFormRow
@@ -257,6 +238,46 @@ const ScenarioSettingsMainView = ({ onClose }) => {
               ))}
             </select>
           </ScenarioFormRow>
+          {!isApiPolicy && (
+            <>
+              <ScenarioFormRow
+                label="商品購入のURL"
+                tooltip={SCENARIO_MODAL_TOOLTIPS.lpProductUrl}
+              >
+                <InputCustom
+                  style={{ width: '100%' }}
+                  value={lpProductUrl}
+                  onChange={(value) => setLpProductUrl(value)}
+                />
+              </ScenarioFormRow>
+              <ScenarioFormRow
+                label="サンクスページのURL"
+                tooltip={SCENARIO_MODAL_TOOLTIPS.urlThanks}
+              >
+                <InputCustom
+                  style={{ width: '100%' }}
+                  value={urlThanks}
+                  onChange={(value) => setUrlThanks(value)}
+                />
+              </ScenarioFormRow>
+              <div className="ss-layout-checkbox-item">
+                <ScenarioModalCheckbox
+                  checked={isUseOnlyRegularOrder}
+                  onChange={(checked) => setIsUseOnlyRegularOrder(checked)}
+                  label={labelWithTooltip('定期注文のみ', 'isUseOnlyRegularOrder')}
+                />
+              </div>
+            </>
+          )}
+          {isFukushashikiPolicy && (
+            <div className="ss-layout-checkbox-item">
+              <ScenarioModalCheckbox
+                checked={isUseBtnUpdateTracking}
+                onChange={(checked) => setIsUseBtnUpdateTracking(checked)}
+                label={labelWithTooltip('「登録」ボタンの変更を有効化する', 'isUseBtnUpdateTracking')}
+              />
+            </div>
+          )}
 
           {isUseFukushashiki && (
             <>
@@ -340,15 +361,6 @@ const ScenarioSettingsMainView = ({ onClose }) => {
       <section className="ss-layout-form-section">
         <h3 className="ss-layout-form-section__title">オプション</h3>
         <div className="ss-layout-option-grid">
-          {scenarioType !== 'faq' && (
-            <div className="ss-layout-checkbox-item">
-              <ScenarioModalCheckbox
-                checked={isUseOnlyRegularOrder}
-                onChange={(checked) => setIsUseOnlyRegularOrder(checked)}
-                label={labelWithTooltip('定期注文のみ', 'isUseOnlyRegularOrder')}
-              />
-            </div>
-          )}
           <div className="ss-layout-checkbox-item">
             <ScenarioModalCheckbox
               checked={isUsedMessageLoadedPast}
@@ -375,13 +387,6 @@ const ScenarioSettingsMainView = ({ onClose }) => {
               />
             </div>
           )}
-          <div className="ss-layout-checkbox-item">
-            <ScenarioModalCheckbox
-              checked={isUseBtnUpdateTracking}
-              onChange={(checked) => setIsUseBtnUpdateTracking(checked)}
-              label={labelWithTooltip('「登録」ボタンの変更を有効化する', 'isUseBtnUpdateTracking')}
-            />
-          </div>
           <OverviewCheckboxRow
             checked={isUseGlobalDelay}
             onChange={(checked) => setIsUseGlobalDelay(checked)}

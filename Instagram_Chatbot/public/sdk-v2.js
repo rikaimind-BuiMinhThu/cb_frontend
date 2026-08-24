@@ -417,7 +417,7 @@
 
     const getEcChatBotFrontEndBaseUrl = () => {
       // Comment out below line if you want to use the local frontend
-      return "http://localhost:3001";
+      // return "http://localhost:3001";
       const environment = getEnvironment();
 
       switch (environment) {
