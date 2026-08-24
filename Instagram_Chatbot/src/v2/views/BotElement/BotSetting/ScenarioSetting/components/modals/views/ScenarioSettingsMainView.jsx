@@ -11,6 +11,10 @@ import {
   SETTINGS_MODAL_VIEWS,
 } from '../shared/scenarioModalTooltips';
 import { createEmptyAutoLogoutConfig } from '../../../utils/autoLogoutUtils';
+import {
+  EXECUTION_POLICIES,
+  EXECUTION_POLICY_OPTIONS,
+} from '../../../../../../../variables/constants';
 
 const labelWithTooltip = (text, tooltipKey) => (
   <>
@@ -28,6 +32,7 @@ const ScenarioSettingsMainView = ({ onClose }) => {
     lpProductUrl,
     coupon,
     isUseOnlyRegularOrder,
+    executionPolicy,
     isUseFukushashiki,
     isUseAmazonPay,
     isUseCustomCss,
@@ -51,6 +56,7 @@ const ScenarioSettingsMainView = ({ onClose }) => {
     setLpProductUrl,
     setCoupon,
     setIsUseOnlyRegularOrder,
+    setExecutionPolicy,
     setIsUseFukushashiki,
     setIsUseAmazonPay,
     setIsUseCustomCss,
@@ -77,10 +83,17 @@ const ScenarioSettingsMainView = ({ onClose }) => {
 
   const client = contextClient || JSON.parse(sessionStorage.getItem('client') || 'null');
 
-  const handleToggleFukushashiki = (checked) => {
-    setIsUseFukushashiki(checked);
-    if (!checked) {
+  const handleChangeExecutionPolicy = (value) => {
+    setExecutionPolicy(value);
+    const isFukushashiki = value === EXECUTION_POLICIES.FUKUSHASHIKI;
+    setIsUseFukushashiki(isFukushashiki);
+    if (!isFukushashiki) {
+      setIsUseCustomCss(false);
+      setIsUseCustomJsCode(false);
+      setIsUseErrMsgByJs(false);
       setIsUseAmazonPay(false);
+      setIsClearLandingPageSession(false);
+      setAutoLogoutConfig(createEmptyAutoLogoutConfig());
     }
   };
 
@@ -177,34 +190,6 @@ const ScenarioSettingsMainView = ({ onClose }) => {
       <section className="ss-layout-form-section">
         <h3 className="ss-layout-form-section__title">カスタマイズ</h3>
         <OverviewCheckboxRow
-          checked={isUseCustomCss}
-          onChange={(checked) => setIsUseCustomCss(checked)}
-          label={labelWithTooltip('CSSカスタムを使用', 'isUseCustomCss')}
-          actionButton={isUseCustomCss && (
-            <button
-              type="button"
-              className="ss-settings-modal-action-link"
-              onClick={() => navigateSettingsModalView(SETTINGS_MODAL_VIEWS.CSS)}
-            >
-              設定する →
-            </button>
-          )}
-        />
-        <OverviewCheckboxRow
-          checked={isUseCustomJsCode}
-          onChange={(checked) => setIsUseCustomJsCode(checked)}
-          label={labelWithTooltip('JSカスタムを使用', 'isUseCustomJsCode')}
-          actionButton={isUseCustomJsCode && (
-            <button
-              type="button"
-              className="ss-settings-modal-action-link"
-              onClick={() => navigateSettingsModalView(SETTINGS_MODAL_VIEWS.JS)}
-            >
-              設定する →
-            </button>
-          )}
-        />
-        <OverviewCheckboxRow
           checked={isUseHtmlUgc}
           onChange={handleToggleHtmlUgc}
           label={labelWithTooltip('UGCForce連携', 'isUseHtmlUgc')}
@@ -239,20 +224,6 @@ const ScenarioSettingsMainView = ({ onClose }) => {
                 </button>
               )}
             />
-            <OverviewCheckboxRow
-              checked={isUseErrMsgByJs}
-              onChange={(checked) => setIsUseErrMsgByJs(checked)}
-              label={labelWithTooltip('エラーメッセージ取得設定', 'isUseErrMsgByJs')}
-              actionButton={isUseErrMsgByJs && (
-                <button
-                  type="button"
-                  className="ss-settings-modal-action-link"
-                  onClick={() => navigateSettingsModalView(SETTINGS_MODAL_VIEWS.ERR_MSG)}
-                >
-                  設定する →
-                </button>
-              )}
-            />
             <ScenarioFormRow
               label="起動ボタンセレクター"
               tooltip={SCENARIO_MODAL_TOOLTIPS.launchButtonSelectors}
@@ -268,26 +239,115 @@ const ScenarioSettingsMainView = ({ onClose }) => {
         )}
       </section>
 
+      {scenarioType !== 'faq' && (
+        <section className="ss-layout-form-section">
+          <h3 className="ss-layout-form-section__title">実施方針</h3>
+          <ScenarioFormRow
+            label={labelWithTooltip('実施方針', 'executionPolicy')}
+          >
+            <select
+              className="ss-input-value"
+              value={executionPolicy}
+              onChange={(e) => handleChangeExecutionPolicy(e.target.value)}
+            >
+              {EXECUTION_POLICY_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </ScenarioFormRow>
+
+          {isUseFukushashiki && (
+            <>
+              <OverviewCheckboxRow
+                checked={isUseCustomCss}
+                onChange={(checked) => setIsUseCustomCss(checked)}
+                label={labelWithTooltip('カスタムCSSを適用する', 'isUseCustomCss')}
+                actionButton={isUseCustomCss && (
+                  <button
+                    type="button"
+                    className="ss-settings-modal-action-link"
+                    onClick={() => navigateSettingsModalView(SETTINGS_MODAL_VIEWS.CSS)}
+                  >
+                    設定する →
+                  </button>
+                )}
+              />
+              <OverviewCheckboxRow
+                checked={isUseCustomJsCode}
+                onChange={(checked) => setIsUseCustomJsCode(checked)}
+                label={labelWithTooltip('カスタムJSを適用する', 'isUseCustomJsCode')}
+                actionButton={isUseCustomJsCode && (
+                  <button
+                    type="button"
+                    className="ss-settings-modal-action-link"
+                    onClick={() => navigateSettingsModalView(SETTINGS_MODAL_VIEWS.JS)}
+                  >
+                    設定する →
+                  </button>
+                )}
+              />
+              <OverviewCheckboxRow
+                checked={isUseErrMsgByJs}
+                onChange={(checked) => setIsUseErrMsgByJs(checked)}
+                label={labelWithTooltip('エラーメッセージを取得する', 'isUseErrMsgByJs')}
+                actionButton={isUseErrMsgByJs && (
+                  <button
+                    type="button"
+                    className="ss-settings-modal-action-link"
+                    onClick={() => navigateSettingsModalView(SETTINGS_MODAL_VIEWS.ERR_MSG)}
+                  >
+                    設定する →
+                  </button>
+                )}
+              />
+              {!isShopifyPaymentScenario && (
+                <OverviewCheckboxRow
+                  checked={isClearLandingPageSession}
+                  onChange={handleToggleAutoLogout}
+                  label={labelWithTooltip('ページ読み込み時にログアウトする', 'isClearLandingPageSession')}
+                  actionButton={isClearLandingPageSession && (
+                    <button
+                      type="button"
+                      className="ss-settings-modal-action-link"
+                      onClick={() => navigateSettingsModalView(SETTINGS_MODAL_VIEWS.AUTO_LOGOUT)}
+                    >
+                      設定する →
+                    </button>
+                  )}
+                />
+              )}
+              <OverviewCheckboxRow
+                checked={isUseAmazonPay}
+                onChange={(checked) => setIsUseAmazonPay(checked)}
+                label={labelWithTooltip('Amazon Payを利用する', 'isUseAmazonPay')}
+                actionButton={isUseAmazonPay && (
+                  <button
+                    type="button"
+                    className="ss-settings-modal-action-link"
+                    onClick={() => navigateSettingsModalView(SETTINGS_MODAL_VIEWS.AMAZON_PAY)}
+                  >
+                    設定する →
+                  </button>
+                )}
+              />
+            </>
+          )}
+        </section>
+      )}
+
       <section className="ss-layout-form-section">
         <h3 className="ss-layout-form-section__title">オプション</h3>
         <div className="ss-layout-option-grid">
           {scenarioType !== 'faq' && (
-            <>
-              <div className="ss-layout-checkbox-item">
-                <ScenarioModalCheckbox
-                  checked={isUseOnlyRegularOrder}
-                  onChange={(checked) => setIsUseOnlyRegularOrder(checked)}
-                  label={labelWithTooltip('定期注文のみ', 'isUseOnlyRegularOrder')}
-                />
-              </div>
-              <div className="ss-layout-checkbox-item">
-                <ScenarioModalCheckbox
-                  checked={isUseFukushashiki}
-                  onChange={handleToggleFukushashiki}
-                  label={labelWithTooltip('複写式利用フラグ', 'isUseFukushashiki')}
-                />
-              </div>
-            </>
+            <div className="ss-layout-checkbox-item">
+              <ScenarioModalCheckbox
+                checked={isUseOnlyRegularOrder}
+                onChange={(checked) => setIsUseOnlyRegularOrder(checked)}
+                label={labelWithTooltip('定期注文のみ', 'isUseOnlyRegularOrder')}
+              />
+            </div>
           )}
           <div className="ss-layout-checkbox-item">
             <ScenarioModalCheckbox
@@ -315,22 +375,6 @@ const ScenarioSettingsMainView = ({ onClose }) => {
               />
             </div>
           )}
-          {!isShopifyPaymentScenario && (
-            <OverviewCheckboxRow
-              checked={isClearLandingPageSession}
-              onChange={handleToggleAutoLogout}
-              label={labelWithTooltip('読み込み時に自動ログアウト処理を実行する', 'isClearLandingPageSession')}
-              actionButton={isClearLandingPageSession && (
-                <button
-                  type="button"
-                  className="ss-settings-modal-action-link"
-                  onClick={() => navigateSettingsModalView(SETTINGS_MODAL_VIEWS.AUTO_LOGOUT)}
-                >
-                  設定する →
-                </button>
-              )}
-            />
-          )}
           <div className="ss-layout-checkbox-item">
             <ScenarioModalCheckbox
               checked={isUseBtnUpdateTracking}
@@ -353,22 +397,6 @@ const ScenarioSettingsMainView = ({ onClose }) => {
             )}
           />
         </div>
-        {scenarioType !== 'faq' && isUseFukushashiki && (
-          <OverviewCheckboxRow
-            checked={isUseAmazonPay}
-            onChange={(checked) => setIsUseAmazonPay(checked)}
-            label={labelWithTooltip('AmazonPayを利用する', 'isUseAmazonPay')}
-            actionButton={isUseAmazonPay && (
-              <button
-                type="button"
-                className="ss-settings-modal-action-link"
-                onClick={() => navigateSettingsModalView(SETTINGS_MODAL_VIEWS.AMAZON_PAY)}
-              >
-                設定する →
-              </button>
-            )}
-          />
-        )}
       </section>
 
       <ScenarioModalFooter

@@ -106,3 +106,17 @@ export const FUKUSHASHIKI_SEARCH_VALUE_LABELS = {
     2: '複写先要素のcss_selectorを入力ください',
     3: '複写先要素のxPathを入力ください',
 };
+
+export const EXECUTION_POLICIES = {
+  RPA: 'rpa',
+  FUKUSHASHIKI: 'fukushashiki',
+  API: 'api',
+};
+
+export const EXECUTION_POLICY_OPTIONS = [
+  { value: EXECUTION_POLICIES.API, label: 'API' },
+  { value: EXECUTION_POLICIES.FUKUSHASHIKI, label: '複写式' },
+  { value: EXECUTION_POLICIES.RPA, label: 'RPA' },
+];
+
+export const DEFAULT_EXECUTION_POLICY = EXECUTION_POLICIES.RPA;

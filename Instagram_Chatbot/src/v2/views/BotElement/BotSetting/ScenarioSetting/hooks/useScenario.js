@@ -36,6 +36,7 @@ import {
   normalizeAllowedLpDomains,
   validateAmazonPayConfig,
 } from '../utils/amazonPayConfigUtils';
+import { DEFAULT_EXECUTION_POLICY } from '../../../../../variables/constants';
 
 const INITIAL_TIMER_CONFIG = {
   isOpen: false,
@@ -59,6 +60,7 @@ export const useScenario = (mode = 'scenario') => {
   const [lpProductUrl, setLpProductUrl] = useState('');
   const [coupon, setCoupon] = useState('');
   const [isUseOnlyRegularOrder, setIsUseOnlyRegularOrder] = useState(false);
+  const [executionPolicy, setExecutionPolicy] = useState(DEFAULT_EXECUTION_POLICY);
   const [isUseFukushashiki, setIsUseFukushashiki] = useState(false);
   const [isUseCustomCss, setIsUseCustomCss] = useState(false);
   const [customCssContent, setCustomCssContent] = useState(INITIAL_CUSTOM_CODE);
@@ -207,6 +209,7 @@ export const useScenario = (mode = 'scenario') => {
     setCoupon(parsed.coupon);
     setLpProductUrl(parsed.lpProductUrl);
     setIsUseOnlyRegularOrder(parsed.isUseOnlyRegularOrder);
+    setExecutionPolicy(parsed.executionPolicy || DEFAULT_EXECUTION_POLICY);
     setIsUseFukushashiki(parsed.isUseFukushashiki);
     setIsUseCustomCss(parsed.isUseCustomCss);
     setCustomCssContent(parsed.customCssContent);
@@ -370,6 +373,7 @@ export const useScenario = (mode = 'scenario') => {
     merchandiseId,
     lpProductUrl,
     isUseOnlyRegularOrder,
+    executionPolicy,
     isUseFukushashiki,
     isUseCustomCss,
     customCssContent,
@@ -439,6 +443,7 @@ export const useScenario = (mode = 'scenario') => {
     isUseCustomJsCode,
     isUseErrMsgByJs,
     isUseFukushashiki,
+    executionPolicy,
     isUseOnlyRegularOrder,
     isUsedCartConfirmPage,
     isUsedCrosssell,
@@ -575,6 +580,7 @@ export const useScenario = (mode = 'scenario') => {
       lpProductUrl,
       coupon,
       isUseOnlyRegularOrder,
+      executionPolicy,
       isUseFukushashiki,
       isUseCustomCss,
       customCssContent,
@@ -669,6 +675,7 @@ export const useScenario = (mode = 'scenario') => {
       setLpProductUrl,
       setCoupon,
       setIsUseOnlyRegularOrder,
+      setExecutionPolicy,
       setIsUseFukushashiki,
       setIsUseCustomCss,
       setCustomCssContent,
