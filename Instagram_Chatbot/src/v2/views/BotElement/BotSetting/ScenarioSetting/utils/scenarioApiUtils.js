@@ -14,6 +14,18 @@ import {
   normalizeAllowedLpDomains,
   parseAmazonPayConfigFromApi,
 } from './amazonPayConfigUtils';
+import {
+  DEFAULT_EXECUTION_POLICY,
+  EXECUTION_POLICIES,
+} from '../../../../../variables/constants';
+
+const parseExecutionPolicy = (data) => {
+  const knownPolicies = Object.values(EXECUTION_POLICIES);
+  if (knownPolicies.includes(data.execution_policy)) {
+    return data.execution_policy;
+  }
+  return data.isUseFukushashiki ? EXECUTION_POLICIES.FUKUSHASHIKI : DEFAULT_EXECUTION_POLICY;
+};
 
 export const cleanMessageTimerConfig = (config) => {
   const cleanedConfig = { ...config };
@@ -71,6 +83,7 @@ export const parseTimerConfigFromApi = (resTimerConfig) => {
 export const parseScenarioResponse = (res) => {
   const data = res?.data?.data || {};
   const conversation = data.conversation || {};
+  const executionPolicy = parseExecutionPolicy(data);
 
   return {
     dataMessages: (conversation.messages || []).map((message) => ({
@@ -87,7 +100,8 @@ export const parseScenarioResponse = (res) => {
     coupon: conversation.coupon || '',
     lpProductUrl: data.tamagoLandingPageUrl || '',
     isUseOnlyRegularOrder: data.isUseOnlyRegularOrder || false,
-    isUseFukushashiki: data.isUseFukushashiki || false,
+    executionPolicy,
+    isUseFukushashiki: executionPolicy === EXECUTION_POLICIES.FUKUSHASHIKI,
     isUseCustomCss: data.is_used_custom_css || false,
     customCssContent: {
       temp: data.custom_css_content || '',
@@ -161,7 +175,7 @@ export const buildScenarioSavePayload = (state) => {
     merchandiseId,
     lpProductUrl,
     isUseOnlyRegularOrder,
-    isUseFukushashiki,
+    executionPolicy,
     isUseCustomCss,
     customCssContent,
     isUseHtmlUgc,
@@ -208,7 +222,8 @@ export const buildScenarioSavePayload = (state) => {
     merchandise_id: merchandiseId,
     landing_page_product_url: lpProductUrl,
     is_use_only_regular_order: isUseOnlyRegularOrder,
-    is_used_fukushashiki: isUseFukushashiki,
+    execution_policy: executionPolicy,
+    is_used_fukushashiki: executionPolicy === EXECUTION_POLICIES.FUKUSHASHIKI,
     is_use_amazon_pay: isUseAmazonPay,
     allowed_lp_domains: isUseAmazonPay ? allowedLpDomains : [],
     lp_integration_mode: isUseAmazonPay ? LP_INTEGRATION_MODES.GENERIC : LP_INTEGRATION_MODES.AUTO,
