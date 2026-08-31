@@ -3,6 +3,7 @@ import { MDBIcon } from "mdbreact";
 import { DISPLAY_TYPES } from "./Constants";
 import { toNumber } from "./Utils";
 import { getClosedBarWidth, getClosedLauncherPosition } from "v2/utils/sdkLayoutUtils";
+import { resolveMainColorContext } from "../DesignSetting/utils/designChatbotUtils";
 import "v2/assets/css/bot/preview-chat-bot.css";
 
 const buildPositionVars = (position = {}) => ({
@@ -43,8 +44,10 @@ const PreviewClosedLauncher = ({
   const buttonTypePc = toNumber(state.buttonTypePc, 1);
   const positionSp = toNumber(state.positionSp, 1);
   const buttonTypeSp = toNumber(state.buttonTypeSp, 1);
-  const mainColor =
-    state.botInfor?.main_color || state.botInfor?.main_color_other;
+  // API lưu preset là key ("blue", "green"...), không phải hex.
+  // Gán thô vào CSS thì "blue" = named color #0000FF, không phải COLOR_MAP #327AED.
+  // resolveMainColorContext: key → hex (main_color_other nếu custom).
+  const { mainColorHex } = resolveMainColorContext(state.botInfor);
   const title = state.botInfor?.title;
   const toggleOpen = () => onOpen(!state.isOpen);
   const fullWidthMobile = Boolean(state.useFullWidthChatbotMobile);
@@ -64,7 +67,8 @@ const PreviewClosedLauncher = ({
   // requireClosed=false → PC vẫn render launcher chrome theo type (caller Fukushashiki).
   // requireClosed=true  → chỉ hiện khi chatbot đang đóng (caller FAQ).
   const closedOk = !requireClosed || !state.isOpen;
-  const colorVars = { "--pcl-bg": mainColor || "#327AED" };
+  // --pcl-bg phải là hex; CSS .preview-closed-launcher đọc var này.
+  const colorVars = { "--pcl-bg": mainColorHex };
 
   // PC circle: position=1 + buttonType=2 → avatar 56×56 (Bug #12 chỉ đụng nhánh này).
   if (closedOk && !isMobileView && positionPc === 1 && buttonTypePc === 2) {
