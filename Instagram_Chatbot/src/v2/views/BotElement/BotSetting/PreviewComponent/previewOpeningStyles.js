@@ -40,6 +40,10 @@ export const resolveHeaderIconSrc = (botInfor, isOpen, { absolute = false } = {}
 /**
  * Open-frame layout tokens for PreviewOpenChatFrame (CSS classes + CSS variables).
  *
+ * Bug #1: Header chatbot thật không có nền — SDK/embedded phải set --pof-header-bg
+ * (trước đây chỉ preview admin có nền, chatbot thật fallback transparent).
+ * Bug #6: Main color header không đổi màu header thật — dùng headerBgColor, không bind buttonNormalBgColor.
+ *
  * @param {object} state - preview reducer state
  * @param {object} [options]
  * @param {boolean} [options.mobile] - override isMobile(); defaults to isMobile()
@@ -53,6 +57,7 @@ export const getOpeningBotStyle = (state, options = {}) => {
     typeof options.mobile === "boolean" ? options.mobile : isMobile();
 
   const { mainColorHex } = resolveMainColorContext(state.botInfor);
+  // Bug #1 / #6: nền header từ theme.headerBgColor (Main color header), fallback #327AED.
   const headerBg = resolveHeaderBgColor(state.themeSettings, mainColorHex);
   const bodyBg = state.botInfor?.opacity_color || "";
 
@@ -66,6 +71,7 @@ export const getOpeningBotStyle = (state, options = {}) => {
     return {
       frameClassName: classNames.join(" "),
       cssVars: {
+        // Bug #1: embedded/SDK trước đây không set --pof-header-bg → header trong suốt.
         "--pof-header-bg": headerBg,
         "--c-header-bg": headerBg,
         ...(bodyBg ? { "--pof-body-bg": bodyBg } : {}),
@@ -100,6 +106,7 @@ export const getOpeningBotStyle = (state, options = {}) => {
       "--pof-right": right,
       "--pof-width": width,
       "--pof-height": height,
+      // Bug #1 / #6: chatbot đang mở cũng phải set --pof-header-bg (không chỉ preview).
       "--pof-header-bg": headerBg,
       "--c-header-bg": headerBg,
       ...(bodyBg ? { "--pof-body-bg": bodyBg } : {}),

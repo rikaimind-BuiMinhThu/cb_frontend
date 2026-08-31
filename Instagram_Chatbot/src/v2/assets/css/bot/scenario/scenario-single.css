@@ -382,6 +382,7 @@ input#ss-message__content--user-radio_button,
 .ss-message__content--user-radio_button-wrapper
   .ss-message__content--user-radio_button:not(.ss-message__content--user-radio_button--radio_button_img)
   input[type="radio"]:not(.ss-radio-button-img-input--hidden) {
+  /* Bug #10: Unselected style — appearance:none + border --c-radio-input-unselected (accent-color không tô vòng chưa chọn). */
   width: 19px !important;
   height: 19px !important;
   -webkit-appearance: none;

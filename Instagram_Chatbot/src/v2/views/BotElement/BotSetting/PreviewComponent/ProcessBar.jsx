@@ -6,6 +6,7 @@ const ProcessBar = ({
   currentIndex,
   maxIndex,
 }) => {
+  // Bug #6 / #7: fill lấy --c-progress-fill từ theme CSS, không còn inline màu header (botInfor).
   const getWidth = () => {
     let width = "0%";
     if (parseInt(currentIndex || "0") >= maxIndex) width = "100%";

@@ -29,6 +29,7 @@ const PreviewOpenChatFrame = ({
   const className = [containerClassName, frameClassName]
     .filter(Boolean)
     .join(" ");
+  // Bug #5: Header thiếu title từ Basic Information — ưu tiên `title` (基本情報), titleBubble chỉ fallback.
   const headerTitle = title || titleBubble || "";
 
   return (
@@ -41,6 +42,7 @@ const PreviewOpenChatFrame = ({
       {overlays}
       <div id="sp-header" className="sp-header preview-open-frame__header">
         <div className="sp-header-left" onClick={onHeaderClick}>
+          {/* Bug #3: Avatar header tràn ra ngoài — 40px trong header 65px, không dùng sp-avatar-bt 58px. */}
           <div className="preview-open-frame__avatar">
             {headerIconSrc ? (
               <img src={headerIconSrc} alt="bot-header-icon" />

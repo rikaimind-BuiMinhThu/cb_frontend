@@ -1196,6 +1196,8 @@ slideUp
 
     .preview-open-frame .sp-header,
     .preview-open-frame__header {
+        /* Bug #2: Mobile ép header trong suốt — @media ≤981px từng set .sp-header { transparent };
+           chatbot đang mở luôn dùng Main Color. */
         background-color: var(--pof-header-bg, #327AED);
         min-width: 0;
         width: 100%;
@@ -1575,6 +1577,7 @@ slideUp
 }
 
 .ss-bot-prevent-exit-root {
+  /* Bug #11: z-index trên khung chat để modal 本当に閉じますか？ không bị đè. */
   position: fixed;
   inset: 0;
   z-index: 2147483646;
@@ -1784,6 +1787,7 @@ slideUp
 .preview-closed-launcher--circle-pc,
 .preview-closed-launcher--circle-sp,
 .preview-closed-launcher--fallback {
+  /* Bug #12: khi đóng chỉ còn avatar tròn 56px (không còn bar + bubble). */
   width: 56px;
   height: 56px;
   border-radius: 30px;
@@ -1913,6 +1917,7 @@ slideUp
 }
 
 .preview-open-frame__header {
+  /* Bug #1: fallback #327AED khi chưa có --pof-header-bg (SDK/embedded). */
   background-color: var(--pof-header-bg, #327AED);
   min-width: 0;
   width: 100%;
@@ -1932,6 +1937,7 @@ slideUp
 }
 
 .preview-open-frame__avatar {
+  /* Bug #3: avatar 40px nằm gọn trong header 65px (trước dùng sp-avatar-bt 58px nên tràn). */
   width: 40px;
   height: 40px;
   flex-shrink: 0;

@@ -40,6 +40,7 @@ const ThemeColorField = ({
         {label}
       </DesignSettingLabel>
       <div className="theme-field__control">
+        {/* Bug #4: value || '' để picker không vỡ khi hex rỗng / 3 ký tự. */}
         <PresetColorPicker
           value={value || ''}
           onChange={onChange}

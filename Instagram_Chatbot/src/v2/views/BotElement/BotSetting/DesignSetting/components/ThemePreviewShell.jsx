@@ -37,6 +37,7 @@ const ThemePreviewShell = ({
     <div
       id={scopeId}
       className={`theme-customize-preview ${className}`.trim()}
+      // Bug #1 / #6: preview admin set --c-header-bg từ headerBgColor (trước đây chỉ inline backgroundColor nên chatbot thật sai).
       style={{ '--c-header-bg': headerBg }}
     >
       <style>{scopedCss}</style>
@@ -63,6 +64,7 @@ const ThemePreviewShell = ({
                 </div>
               )}
               <div className="sp-header-left-label">
+                {/* Bug #5: Title trên preview Theme lấy từ Basic Information, không lấy titleBubble. */}
                 <div className="sp-header-left-label-sub-title">{displaySubtitle}</div>
                 <div className="sp-header-left-label-title">{displayTitle}</div>
               </div>

@@ -83,6 +83,7 @@ const ThemeAccordionSection = ({
               mainColor={themeSettings.headerBgColor || mainColor}
               onChange={onMainColorChange}
             />
+            {/* Bug #7: Đổi Main color header không được kéo theo Progress/Message/Button/... */}
             <p className="theme-section__main-color-helper">
               メインカラーはヘッダー背景のみに適用されます。他のセクションの色は変更されません。各セクションの「デフォルトに戻す」はそのセクションだけを初期値に戻します。メインカラー・ヘッダーのリセットはメインカラーを #327AED に戻します。
             </p>

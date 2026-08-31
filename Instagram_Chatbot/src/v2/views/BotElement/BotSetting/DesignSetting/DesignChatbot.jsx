@@ -81,6 +81,7 @@ function DesignChatbot() {
                   title={state.basicInfo.title}
                   subtitle={state.basicInfo.subtitle}
                   onFieldChange={actions.updateThemeField}
+                  // Bug #6 / #7: chỉ đổi headerBgColor
                   onMainColorChange={actions.updateMainHeaderColor}
                   onResetSection={actions.resetThemeSection}
                   onSave={actions.saveThemeCustomize}

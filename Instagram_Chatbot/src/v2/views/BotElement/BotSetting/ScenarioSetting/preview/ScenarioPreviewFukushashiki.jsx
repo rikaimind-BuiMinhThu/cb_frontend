@@ -615,6 +615,7 @@ const ScenarioPreviewFukushashiki = ({
       if (opening) {
         dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { isOpen: true } });
       } else if (!state.showPopupCloseBot) {
+        // Bug #11: editor preview cũng hiện modal xác nhận khi đóng.
         dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
       } else {
         dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
@@ -1171,6 +1172,7 @@ const ScenarioPreviewFukushashiki = ({
         frameClassName={frameClassName}
         cssVars={cssVars}
         headerIconSrc={headerIconSrc}
+        // Bug #5: title từ Basic Information khi header mở.
         title={displayBotInfor?.title}
         subtitle={displayBotInfor?.subtitle}
         titleBubble={displayBotInfor?.titleBubble}

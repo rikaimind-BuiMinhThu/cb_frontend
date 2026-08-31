@@ -131,12 +131,14 @@ const buildThemeVariables = (theme) => {
   const buttonPositionJustify = resolveButtonPositionJustify(theme.buttonPosition);
 
   return `
+  /* Bug #6: header dùng headerBgColor, không còn bind nhầm buttonNormalBgColor. */
   --c-header-bg: ${theme.headerBgColor || '#327AED'};
   --c-header-title-text: ${theme.headerTitleTextColor};
   --c-header-title-font-size: ${theme.headerTitleFontSize};
   --c-header-subtitle-text: ${theme.headerSubtitleTextColor};
   --c-header-subtitle-font-size: ${theme.headerSubtitleFontSize};
   --c-progress-bg: ${theme.progressBarBgColor};
+  /* Bug #7: progress fill độc lập với Main color header. */
   --c-progress-fill: ${theme.progressBarFillColor || '#327AED'};
   --c-progress-text: ${theme.progressBarTextColor};
   --c-progress-font-size: ${theme.progressBarFontSize};
@@ -346,6 +348,8 @@ const buildTwinkleAnimationRule = (effectId, elementType, theme) => {
   return animation !== 'none' ? `animation: ${animation} !important;` : '';
 };
 
+// Bug #10: Unselected style (radio) không apply — accent-color không tô được vòng chưa chọn;
+// vẽ radio native bằng appearance:none, border = --c-radio-input-unselected.
 const buildNativeRadioInputRules = (radioSelectors) => {
   const selectors = Array.isArray(radioSelectors) ? radioSelectors : [radioSelectors];
   const baseSelector = selectors.join(',\n');
@@ -609,6 +613,7 @@ ${previewFieldPlaceholderSelector} {
 
   return `
 ${twinkleKeyframesCss}
+/* Bug #1 / #6: header thật và preview cùng lấy --c-header-bg (Main color header). */
 ${scopedClass(scopeSelector, '.sp-header')},
 ${scopedClass(scopeSelector, '.preview-open-frame__header')} {
   background-color: var(--c-header-bg, #327AED) !important;
@@ -640,17 +645,17 @@ ${scopedClass(scopeSelector, '.sp-header-right-arrow')} {
 }
 
 ${scopedClass(scopeSelector, '.sp-process-bar')} {
-  background-color: var(--c-progress-bg, #D6E0EF) !important;
+  background-color: var(--c-progress-bg, #D6E0EF) !important; /* Bug #8: track default #D6E0EF */
 }
 
 ${scopedClass(scopeSelector, '.sp-process-bar-color')} {
   color: var(--c-progress-text, #fff) !important;
   font-size: var(--c-progress-font-size, 13px) !important;
-  background-color: var(--c-progress-fill, #327AED) !important;
+  background-color: var(--c-progress-fill, #327AED) !important; /* Bug #7: fill độc lập header */
 }
 
 ${scopeSelector ? spBodySelector : '#sp-body.sp-body, .sp-body'} {
-  background-color: var(--c-chat-window-bg, #D6E0EF) !important;
+  background-color: var(--c-chat-window-bg, #D6E0EF) !important; /* Bug #8: window default #D6E0EF */
 }
 
 ${scopedClass(scopeSelector, '.ss-bot-message__content-wrapper')},
@@ -946,6 +951,7 @@ export const injectBotThemeCss = (rawTheme, mainColorHex, apiColorKey) => {
 };
 
 export const applyPreviewThemeCss = (botInfor, themeSettings) => {
+  // Bug #9: botInfor={} vẫn truthy nên từng inject palette default trước khi API về → flash xanh dương.
   const hasBotColor = Boolean(botInfor?.main_color || botInfor?.main_color_other);
   const hasTheme = Boolean(themeSettings && typeof themeSettings === 'object'
     && Object.keys(themeSettings).length > 0);

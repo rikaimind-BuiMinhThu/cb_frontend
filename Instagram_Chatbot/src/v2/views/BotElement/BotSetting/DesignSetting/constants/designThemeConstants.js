@@ -55,13 +55,13 @@ export const MODAL_TITLE_ALIGNMENT_OPTIONS = [
 export const MODAL_TITLE_ALIGNMENT_IDS = MODAL_TITLE_ALIGNMENT_OPTIONS.map(({ id }) => id);
 
 export const THEME_FIELD_KEYS = [
-  'headerBgColor',
+  'headerBgColor', // Bug #6: field riêng cho Main color header (không còn dùng buttonNormalBgColor).
   'headerTitleTextColor',
   'headerTitleFontSize',
   'headerSubtitleTextColor',
   'headerSubtitleFontSize',
   'progressBarBgColor',
-  'progressBarFillColor',
+  'progressBarFillColor', // Bug #7: fill progress độc lập, đổi header không kéo theo progress.
   'progressBarTextColor',
   'progressBarFontSize',
   'chatWindowBgColor',
@@ -148,7 +148,7 @@ export const THEME_SECTIONS = [
     id: 'headerMain',
     title: 'メインカラー・ヘッダー',
     fields: [
-      { fieldType: 'mainColor', key: 'headerBgColor', label: 'メインカラー', fullWidth: true },
+      { fieldType: 'mainColor', key: 'headerBgColor', label: 'メインカラー', fullWidth: true }, // Bug #6: picker bind headerBgColor.
       { fieldType: 'groupLabel', label: 'タイトル', fullWidth: true },
       { key: 'headerTitleTextColor', label: '文字色' },
       { key: 'headerTitleFontSize', label: 'フォントサイズ', fieldType: 'fontSize' },
@@ -309,7 +309,7 @@ export const THEME_SECTIONS = [
         fullWidth: true,
       },
       { fieldType: 'groupLabel', label: '入力欄', fullWidth: true },
-      { key: 'radioInputUnselectedColor', label: '未選択スタイル' },
+      { key: 'radioInputUnselectedColor', label: '未選択スタイル' }, // Bug #10: màu vòng radio chưa chọn.
       { key: 'radioInputSelectedColor', label: '選択時スタイル' },
     ],
   },
@@ -351,7 +351,7 @@ export const THEME_SECTIONS = [
 export const THEME_SECTION_NAV_ITEMS = THEME_SECTIONS.map(({ id, title }) => ({ id, title }));
 
 export const CAMEL_TO_SNAKE_THEME = {
-  headerBgColor: 'header_bg_color',
+  headerBgColor: 'header_bg_color', // Bug #6: persist Main color header riêng, không map vào button.
   headerTitleTextColor: 'header_title_text_color',
   headerTitleFontSize: 'header_title_font_size',
   headerSubtitleTextColor: 'header_subtitle_text_color',

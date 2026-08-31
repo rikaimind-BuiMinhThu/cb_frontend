@@ -464,6 +464,7 @@ const PreviewFukushashiki = () => {
     setTimerChanges((timerChanges) => timerChatbotStorage || timerChanges);
 
     if (!opening && !state.showPopupCloseBot) {
+      // Bug #11: Đóng chat không hiện modal — luôn mở confirm, không phụ thuộc cờ 離脱防止.
       return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
     }
 
@@ -995,6 +996,7 @@ const PreviewFukushashiki = () => {
           "--chatbot-open-animation-duration": `${openAnimationDurationMs}ms`,
         }}
         headerIconSrc={headerIconSrc}
+        // Bug #5: title từ Basic Information, không dùng titleBubble khi mở.
         title={state.botInfor?.title}
         subtitle={state.botInfor?.subtitle}
         titleBubble={state.botInfor?.titleBubble}

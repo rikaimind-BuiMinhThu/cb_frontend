@@ -459,6 +459,7 @@ export const useDesignChatbot = (initialBotId) => {
     const section = THEME_SECTIONS.find(({ id }) => id === sectionId);
     if (!section) return;
 
+    // Bug #4 / #8: restore từng section về palette test case cố định, không derive từ header đang chọn.
     const defaults = deriveThemeDefaults(DEFAULT_MAIN_COLOR, DEFAULT_MAIN_COLOR_KEY);
 
     if (sectionId === 'headerMain') {
@@ -476,6 +477,7 @@ export const useDesignChatbot = (initialBotId) => {
     });
   }, []);
 
+  // Bug #6 / #7: đổi Main color header chỉ ghi headerBgColor; không gọi deriveThemeDefaults ghi đè section khác.
   const updateMainHeaderColor = useCallback((newMainColor) => {
     const normalized = expandHexColor(newMainColor);
     if (!isCssHexColor(normalized)) return;

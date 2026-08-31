@@ -188,6 +188,7 @@ export const normalizeFieldFocusEffect = (value) => {
 export const expandHexColor = (value) => {
   if (!value || typeof value !== 'string') return '';
   const trimmed = value.trim();
+  // Bug #4: Restore to default / picker hỏng với hex 3 ký tự (vd #fff) — expand thành 6 ký tự.
   const shortMatch = /^#([0-9a-fA-F]{3})$/.exec(trimmed);
   if (shortMatch) {
     const [r, g, b] = shortMatch[1];
@@ -207,6 +208,7 @@ export const hexColorsEqual = (left, right) => {
 };
 
 const PRESET_DERIVED = {
+  // Bug #8: Màu default từng section lệch test case — palette cố định (Bot bubble #3CACEF, không derive từ header).
   blue: { opacity: '#D6E0EF', message: '#3CACEF', font: '#ffffff' },
   green: { opacity: '#DEEADB', message: '#9DDB7C', font: '#ffffff' },
   orange: { opacity: '#F4E5DA', message: '#EF8D2F', font: '#ffffff' },
@@ -287,6 +289,7 @@ export const deriveThemeDefaults = (mainColorHex = DEFAULT_MAIN_COLOR, apiColorK
     : lightenHex(normalizedMain, -0.08) || normalizedMain;
   const radioSelectedBg = lightenHex(normalizedMain, 0.15) || opacityColor;
 
+  // Bug #4 / #8: default từng section khớp test case (Header #327AED, Bot #3CACEF, User #fff/#333, ...).
   return {
     headerBgColor: normalizedMain,
     headerTitleTextColor: '#ffffff',
@@ -363,6 +366,7 @@ export const createEmptyThemeSettings = () => Object.fromEntries(
   THEME_FIELD_KEYS.map((key) => [key, '']),
 );
 
+// Bug #1 / #6: header chatbot/preview lấy headerBgColor (hoặc header_bg_color từ API), không lấy màu nút.
 export const resolveHeaderBgColor = (theme, mainColorHex = DEFAULT_MAIN_COLOR) => {
   const raw = theme?.headerBgColor || theme?.header_bg_color;
   if (raw && isCssHexColor(raw)) {

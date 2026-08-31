@@ -458,6 +458,7 @@
 }
 
 .theme-customize-preview__header {
+  /* Bug #3: overflow hidden + height 65px để avatar không tràn preview Theme. */
   min-height: 65px;
   height: 65px;
   display: flex;

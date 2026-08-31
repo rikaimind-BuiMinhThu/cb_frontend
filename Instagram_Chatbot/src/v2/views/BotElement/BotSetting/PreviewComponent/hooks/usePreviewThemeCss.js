@@ -3,8 +3,10 @@ import { applyPreviewThemeCss } from "v2/utils/chatbotThemeCss";
 
 /**
  * Custom CSS injection + theme CSS (single place; collapses duplicate theme effects).
- * useLayoutEffect so theme variables land before the browser paints — avoids a flash of
- * the static #327AED header fallback on reload.
+ *
+ * Bug #9: Reload flash màu default rồi mới đúng (FOUC).
+ * Dùng useLayoutEffect để biến theme vào DOM trước paint — tránh flash header #327AED rồi mới nhảy sang màu đã lưu.
+ *
  * @param {Function} [applyTheme] - defaults to applyPreviewThemeCss; Scenario may pass injectBotThemeCss wrapper
  */
 export const usePreviewThemeCss = ({

@@ -42,7 +42,7 @@ export const CHAT_BODY_VERSIONS = [
   { value: CHAT_BODY_VERSION_2, label: '2.0' },
 ];
 
-export const DEFAULT_MAIN_COLOR = '#327AED';
+export const DEFAULT_MAIN_COLOR = '#327AED'; // Bug #4 / #8: restore Header → Main Color test case.
 export const DEFAULT_MAIN_COLOR_KEY = 'blue';
 
 export const MAIN_COLORS = [

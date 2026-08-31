@@ -41,6 +41,7 @@ const PreventExitChatbotModal = ({ isOpen, onClose, onCloseBot, botConfig }) => 
     botInfor.withdrawal_prevention_status,
   );
   const showImagePopup = preventionStatus === WITHDRAWAL_POPUP_STATUS.IMAGE;
+  // Bug #11: portal lên document.body + z-index cao — modal không còn bị #portal / khung chat đè.
   const portalRoot = document.body;
   if (!portalRoot) return null;
 

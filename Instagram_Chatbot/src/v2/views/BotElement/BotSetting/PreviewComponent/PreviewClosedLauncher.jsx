@@ -12,6 +12,7 @@ const buildPositionVars = (position = {}) => ({
 
 /**
  * Closed chatbot launcher: circular avatar only.
+ * Bug #12: Đóng bot không chỉ còn avatar tròn — trước đây button_type mặc định là bar (avatar + bubble + mũi tên).
  * Layout lives in CSS; only dynamic tokens (color, position) use CSS variables.
  */
 const PreviewClosedLauncher = ({

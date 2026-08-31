@@ -69,6 +69,7 @@ export const buildSdkPostMessageLayout = (state, isMobile) => {
   const closedContentSize = computeClosedContentSize({
     isMobile,
     position: 1,
+    // Bug #12: luôn dùng kiểu circle (buttonType=2) khi đóng — iframe thu về kích thước avatar.
     buttonType: 2,
     useFullWidthMobile: false,
   });

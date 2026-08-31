@@ -1,3 +1,4 @@
+// Bug #11: Đóng chat không hiện modal xác nhận — chuẩn hóa status 離脱防止 và luôn cho phép hiện confirm khi đóng.
 const WITHDRAWAL_POPUP_STATUS = {
   INVALID: 'invalid',
   STANDARD: 'standard_exit_popup',
@@ -25,6 +26,7 @@ export const isWithdrawalPopupEnabled = (botInfor) => {
   return status === WITHDRAWAL_POPUP_STATUS.STANDARD || status === WITHDRAWAL_POPUP_STATUS.IMAGE;
 };
 
+// Bug #11: trước đây modal bị chặn khi 離脱防止 = off; luôn hiện confirm khi user bấm đóng.
 export const shouldShowPreventExitModal = () => true;
 
 export { WITHDRAWAL_POPUP_STATUS };

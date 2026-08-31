@@ -6,6 +6,7 @@ import { expandHexColor, hexColorsEqual, isCssHexColor } from '../utils/designTh
 const NATIVE_COLOR_FALLBACK = '#000000';
 
 const toCommittedColor = (color) => {
+  // Bug #4: hex 3 ký tự (#fff) phải expand trước khi commit, nếu không picker hiện sai.
   const expanded = expandHexColor(color);
   if (isCssHexColor(expanded)) return expanded;
   return '';
