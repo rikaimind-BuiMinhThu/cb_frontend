@@ -1789,7 +1789,8 @@ slideUp
 .preview-closed-launcher--circle-pc,
 .preview-closed-launcher--circle-sp,
 .preview-closed-launcher--fallback {
-  /* Bug #12: khi đóng chỉ còn avatar tròn 56px (không còn bar + bubble). */
+  /* Bug #12: chỉ nhánh circle/fallback là avatar 56px.
+     bar + vertical giữ size riêng — không ép mọi bot về circle. */
   width: 56px;
   height: 56px;
   border-radius: 30px;
