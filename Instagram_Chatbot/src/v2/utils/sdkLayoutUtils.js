@@ -66,12 +66,17 @@ export const computeOpenIframeSize = ({
 };
 
 export const buildSdkPostMessageLayout = (state, isMobile) => {
+  // Không hardcode position=1 / buttonType=2 / useFullWidthMobile=false:
+  // làm vậy ép iframe parent luôn 56×56 (circle) → vỡ bar (title+bubble),
+  // vertical (mép phải), và full-width mobile khi đóng.
+  // computeClosedContentSize đã trả 56×56 khi bot thật sự là circle (buttonType=2).
+  const position = isMobile ? state.positionSp : state.positionPc;
+  const buttonType = isMobile ? state.buttonTypeSp : state.buttonTypePc;
   const closedContentSize = computeClosedContentSize({
     isMobile,
-    position: 1,
-    // Bug #12: luôn dùng kiểu circle (buttonType=2) khi đóng — iframe thu về kích thước avatar.
-    buttonType: 2,
-    useFullWidthMobile: false,
+    position,
+    buttonType,
+    useFullWidthMobile: !!state.useFullWidthChatbotMobile,
   });
 
   return {
