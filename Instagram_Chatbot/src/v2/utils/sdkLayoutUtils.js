@@ -66,13 +66,11 @@ export const computeOpenIframeSize = ({
 };
 
 export const buildSdkPostMessageLayout = (state, isMobile) => {
-  const position = isMobile ? state.positionSp : state.positionPc;
-  const buttonType = isMobile ? state.buttonTypeSp : state.buttonTypePc;
   const closedContentSize = computeClosedContentSize({
     isMobile,
-    position,
-    buttonType,
-    useFullWidthMobile: !!state.useFullWidthChatbotMobile,
+    position: 1,
+    buttonType: 2,
+    useFullWidthMobile: false,
   });
 
   return {

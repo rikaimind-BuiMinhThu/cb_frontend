@@ -225,5 +225,22 @@ describe('sdkLayoutUtils', () => {
         closedContentHeight: 56,
       });
     });
+
+    it('always sizes the closed iframe to the circle avatar', () => {
+      expect(buildSdkPostMessageLayout({
+        positionPc: '1',
+        positionSp: '1',
+        buttonTypePc: '1',
+        buttonTypeSp: '1',
+        useFullWidthChatbotMobile: true,
+      }, false)).toEqual({
+        positionPc: '1',
+        positionSp: '1',
+        buttonTypePc: '1',
+        buttonTypeSp: '1',
+        closedContentWidth: 56,
+        closedContentHeight: 56,
+      });
+    });
   });
 });
