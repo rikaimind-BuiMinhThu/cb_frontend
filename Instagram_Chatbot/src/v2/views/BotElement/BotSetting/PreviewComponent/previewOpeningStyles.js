@@ -1,6 +1,7 @@
 import { EC_CHATBOT_URL } from "v2/variables/constants";
 import { isMobile } from "./Utils";
-import { resolveIconUrl } from "../DesignSetting/utils/designChatbotUtils";
+import { resolveIconUrl, resolveMainColorContext } from "../DesignSetting/utils/designChatbotUtils";
+import { resolveHeaderBgColor } from "../DesignSetting/utils/designThemeUtils";
 
 /**
  * Relative icon path used by runtime previews (prefixed with EC_CHATBOT_URL by callers).
@@ -46,15 +47,13 @@ export const resolveHeaderIconSrc = (botInfor, isOpen, { absolute = false } = {}
  * @param {boolean} [options.editorPreview]
  * @returns {{ frameClassName: string, cssVars: Record<string, string|number> }}
  */
-const DEFAULT_MAIN_COLOR = "#327AED";
-
 export const getOpeningBotStyle = (state, options = {}) => {
   const { embedded = false, editorPreview = false } = options;
   const mobile =
     typeof options.mobile === "boolean" ? options.mobile : isMobile();
 
-  const headerBg =
-    state.botInfor?.main_color || state.botInfor?.main_color_other || DEFAULT_MAIN_COLOR;
+  const { mainColorHex } = resolveMainColorContext(state.botInfor);
+  const headerBg = resolveHeaderBgColor(state.themeSettings, mainColorHex);
   const bodyBg = state.botInfor?.opacity_color || "";
 
   if (embedded) {
@@ -68,6 +67,7 @@ export const getOpeningBotStyle = (state, options = {}) => {
       frameClassName: classNames.join(" "),
       cssVars: {
         "--pof-header-bg": headerBg,
+        "--c-header-bg": headerBg,
         ...(bodyBg ? { "--pof-body-bg": bodyBg } : {}),
       },
     };
@@ -101,6 +101,7 @@ export const getOpeningBotStyle = (state, options = {}) => {
       "--pof-width": width,
       "--pof-height": height,
       "--pof-header-bg": headerBg,
+      "--c-header-bg": headerBg,
       ...(bodyBg ? { "--pof-body-bg": bodyBg } : {}),
     },
   };

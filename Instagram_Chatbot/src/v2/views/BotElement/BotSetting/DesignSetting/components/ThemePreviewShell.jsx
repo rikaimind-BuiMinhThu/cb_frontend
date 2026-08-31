@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { generateScopedThemeCss } from '../../../../../utils/chatbotThemeCss';
+import { DEFAULT_MAIN_COLOR } from '../constants/designChatbotConstants';
+import { resolveHeaderBgColor } from '../utils/designThemeUtils';
 import PreviewRegion from './PreviewRegion';
 
 const ThemePreviewShell = ({
@@ -26,6 +28,7 @@ const ThemePreviewShell = ({
     return generateScopedThemeCss(themeSettings, mainColor, null, `#${scopeId}`);
   }, [themeSettings, mainColor, scopeId]);
 
+  const headerBg = resolveHeaderBgColor(themeSettings, mainColor);
   const displayTitle = title || (showPlaceholderLabels ? 'サンプルタイトル' : '');
   const displaySubtitle = subtitle || (showPlaceholderLabels ? 'サンプルサブタイトル' : '');
   const barWidth = `${Math.min(Math.max(processPercent, 0), 100)}%`;
@@ -34,7 +37,7 @@ const ThemePreviewShell = ({
     <div
       id={scopeId}
       className={`theme-customize-preview ${className}`.trim()}
-      style={{ '--pof-header-bg': mainColor || '#327AED' }}
+      style={{ '--c-header-bg': headerBg }}
     >
       <style>{scopedCss}</style>
 
@@ -46,7 +49,6 @@ const ThemePreviewShell = ({
       >
         <div
           className="sp-header theme-customize-preview__header"
-          style={{ backgroundColor: mainColor }}
         >
           <PreviewRegion
             sectionId="headerMain"
@@ -80,7 +82,7 @@ const ThemePreviewShell = ({
         <div className="sp-process-bar">
           <div
             className="sp-process-bar-color"
-            style={{ width: barWidth, backgroundColor: mainColor }}
+            style={{ width: barWidth }}
           >
             {processLabel}
           </div>
@@ -143,7 +145,7 @@ ThemePreviewShell.propTypes = {
 
 ThemePreviewShell.defaultProps = {
   themeSettings: null,
-  mainColor: '#327AED',
+  mainColor: DEFAULT_MAIN_COLOR,
   title: '',
   subtitle: '',
   headerIconUrl: '',

@@ -13,7 +13,9 @@ export const buildScenarioPreviewHeaderMeta = (botInfor, { isOpen = true, themeS
   headerIconUrl: isOpen
     ? (resolveIconUrl(botInfor?.opening_bot_icon) || resolveIconUrl(botInfor?.icon))
     : (resolveIconUrl(botInfor?.closing_bot_icon) || resolveIconUrl(botInfor?.icon)),
-  mainColor: botInfor?.main_color || botInfor?.main_color_other || DEFAULT_MAIN_COLOR,
+  mainColor: resolveMainColorFromApi(botInfor?.main_color)
+    || botInfor?.main_color_other
+    || DEFAULT_MAIN_COLOR,
   themeSettings: themeSettings ?? null,
 });
 

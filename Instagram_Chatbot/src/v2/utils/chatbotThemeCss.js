@@ -131,12 +131,13 @@ const buildThemeVariables = (theme) => {
   const buttonPositionJustify = resolveButtonPositionJustify(theme.buttonPosition);
 
   return `
-  --c-header-bg: ${theme.buttonNormalBgColor};
+  --c-header-bg: ${theme.headerBgColor || '#327AED'};
   --c-header-title-text: ${theme.headerTitleTextColor};
   --c-header-title-font-size: ${theme.headerTitleFontSize};
   --c-header-subtitle-text: ${theme.headerSubtitleTextColor};
   --c-header-subtitle-font-size: ${theme.headerSubtitleFontSize};
   --c-progress-bg: ${theme.progressBarBgColor};
+  --c-progress-fill: ${theme.progressBarFillColor || '#327AED'};
   --c-progress-text: ${theme.progressBarTextColor};
   --c-progress-font-size: ${theme.progressBarFontSize};
   --c-chat-window-bg: ${theme.chatWindowBgColor};
@@ -571,7 +572,7 @@ ${previewFieldPlaceholderSelector} {
 ${twinkleKeyframesCss}
 ${scopedClass(scopeSelector, '.sp-header')},
 ${scopedClass(scopeSelector, '.preview-open-frame__header')} {
-  background-color: var(--pof-header-bg, var(--c-header-bg, #327AED)) !important;
+  background-color: var(--c-header-bg, #327AED) !important;
 }
 
 ${scopedClass(scopeSelector, '.sp-header-left-label')} {
@@ -606,7 +607,7 @@ ${scopedClass(scopeSelector, '.sp-process-bar')} {
 ${scopedClass(scopeSelector, '.sp-process-bar-color')} {
   color: var(--c-progress-text, #fff) !important;
   font-size: var(--c-progress-font-size, 13px) !important;
-  background-color: var(--pof-header-bg, var(--c-header-bg, #327AED)) !important;
+  background-color: var(--c-progress-fill, #327AED) !important;
 }
 
 ${scopeSelector ? spBodySelector : '#sp-body.sp-body, .sp-body'} {
@@ -615,7 +616,7 @@ ${scopeSelector ? spBodySelector : '#sp-body.sp-body, .sp-body'} {
 
 ${scopedClass(scopeSelector, '.ss-bot-message__content-wrapper')},
 ${scopedDescendant(scopeSelector, '.ss-bot-message .ss-bot-message__content')} {
-  background-color: var(--c-bot-msg-bg, #327AED) !important;
+  background-color: var(--c-bot-msg-bg, #3CACEF) !important;
   color: var(--c-bot-msg-text, #ffffff) !important;
   font-size: var(--c-bot-msg-font-size, 14px) !important;
 }
@@ -640,14 +641,14 @@ ${twinkleFieldOverrideRules}${previewFieldFontSizeRule}
 
 ${scopedClass(scopeSelector, '.ss-bot-chat-detail-content')},
 ${scopedClass(scopeSelector, '.ss-bot-chat-text-input.ss-bot-chat-detail-content')} {
-  background-color: var(--c-bot-msg-bg, #327AED) !important;
+  background-color: var(--c-bot-msg-bg, #3CACEF) !important;
   color: var(--c-bot-msg-text, #ffffff) !important;
   font-size: var(--c-bot-msg-font-size, 14px) !important;
   border: none !important;
 }
 
 ${scopedDescendant(scopeSelector, '.ss-bot-chat-text-input-bot-icon path')} {
-  fill: var(--c-bot-msg-bg, #327AED) !important;
+  fill: var(--c-bot-msg-bg, #3CACEF) !important;
 }
 
 ${scopedClass(scopeSelector, '.sp-body-user-side-messages')} {
@@ -911,7 +912,11 @@ export const injectBotThemeCss = (rawTheme, mainColorHex, apiColorKey) => {
 };
 
 export const applyPreviewThemeCss = (botInfor, themeSettings) => {
-  if (!botInfor) return;
+  const hasBotColor = Boolean(botInfor?.main_color || botInfor?.main_color_other);
+  const hasTheme = Boolean(themeSettings && typeof themeSettings === 'object'
+    && Object.keys(themeSettings).length > 0);
+  if (!hasBotColor && !hasTheme) return;
+
   const { apiColorKey, mainColorHex } = resolveMainColorContext(botInfor);
   injectBotThemeCss(themeSettings, mainColorHex, apiColorKey);
 };

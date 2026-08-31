@@ -22,7 +22,12 @@ import {
   resolveMainColorFromApi,
   resolveMainColorKey,
 } from '../utils/designChatbotUtils';
-import { deriveThemeDefaults } from '../utils/designThemeUtils';
+import {
+  deriveThemeDefaults,
+  expandHexColor,
+  hexColorsEqual,
+  isCssHexColor,
+} from '../utils/designThemeUtils';
 import { THEME_SECTIONS } from '../constants/designThemeConstants';
 
 const INITIAL_VALIDATION_ERRORS = {
@@ -454,12 +459,9 @@ export const useDesignChatbot = (initialBotId) => {
     const section = THEME_SECTIONS.find(({ id }) => id === sectionId);
     if (!section) return;
 
-    const resetMainColor = sectionId === 'headerMain';
-    const nextMainColor = resetMainColor ? DEFAULT_MAIN_COLOR : mainColor;
-    const nextApiColorKey = resetMainColor ? DEFAULT_MAIN_COLOR_KEY : apiColorKey;
-    const defaults = deriveThemeDefaults(nextMainColor, nextApiColorKey);
+    const defaults = deriveThemeDefaults(DEFAULT_MAIN_COLOR, DEFAULT_MAIN_COLOR_KEY);
 
-    if (resetMainColor) {
+    if (sectionId === 'headerMain') {
       setMainColor(DEFAULT_MAIN_COLOR);
       setApiColorKey(DEFAULT_MAIN_COLOR_KEY);
     }
@@ -472,14 +474,21 @@ export const useDesignChatbot = (initialBotId) => {
       });
       return next;
     });
-  }, [apiColorKey, mainColor]);
+  }, []);
 
-  const applyDerivedTheme = useCallback((newMainColor) => {
-    const { main_color: nextColorKey } = resolveMainColorKey(newMainColor);
+  const updateMainHeaderColor = useCallback((newMainColor) => {
+    const normalized = expandHexColor(newMainColor);
+    if (!isCssHexColor(normalized)) return;
+
+    const { main_color: nextColorKey } = resolveMainColorKey(normalized);
     const nextApiColorKey = nextColorKey || null;
-    setMainColor(newMainColor);
+
+    setMainColor((prev) => (hexColorsEqual(prev, normalized) ? prev : normalized));
     setApiColorKey(nextApiColorKey);
-    setThemeSettings(deriveThemeDefaults(newMainColor, nextApiColorKey));
+    setThemeSettings((prev) => {
+      if (hexColorsEqual(prev.headerBgColor, normalized)) return prev;
+      return { ...prev, headerBgColor: normalized };
+    });
   }, []);
 
   const updateDesignSettingField = useCallback((field, value) => {
@@ -575,7 +584,7 @@ export const useDesignChatbot = (initialBotId) => {
       updateDesignSettingField,
       updateThemeField,
       resetThemeSection,
-      applyDerivedTheme,
+      updateMainHeaderColor,
     },
   };
 };

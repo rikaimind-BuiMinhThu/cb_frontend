@@ -280,21 +280,25 @@ export const deriveThemeDefaults = (mainColorHex = DEFAULT_MAIN_COLOR, apiColorK
   const presetKey = resolvePresetKey(normalizedMain, apiColorKey);
   const preset = presetKey ? PRESET_DERIVED[presetKey] : null;
   const opacityColor = preset?.opacity || lightenHex(normalizedMain, 0.1);
+  const messageColor = preset?.message || normalizedMain;
   const fontColor = preset?.font || '#ffffff';
   const pressedColor = presetKey === 'black' || presetKey === 'white'
     ? normalizedMain
     : lightenHex(normalizedMain, -0.08) || normalizedMain;
+  const radioSelectedBg = lightenHex(normalizedMain, 0.15) || opacityColor;
 
   return {
+    headerBgColor: normalizedMain,
     headerTitleTextColor: '#ffffff',
     headerTitleFontSize: '15px',
     headerSubtitleTextColor: '#ffffff',
     headerSubtitleFontSize: '14px',
     progressBarBgColor: opacityColor,
+    progressBarFillColor: normalizedMain,
     progressBarTextColor: '#ffffff',
     progressBarFontSize: '13px',
     chatWindowBgColor: opacityColor,
-    botMessageBgColor: normalizedMain,
+    botMessageBgColor: messageColor,
     botMessageTextColor: fontColor,
     botMessageFontSize: '14px',
     botMessageBorderStyle: 'with_tail',
@@ -332,7 +336,7 @@ export const deriveThemeDefaults = (mainColorHex = DEFAULT_MAIN_COLOR, apiColorK
     checkboxCheckedBorderEffect: 'none',
     checkboxFontSize: '14px',
     radioUnselectedBgColor: opacityColor,
-    radioSelectedBgColor: lightenHex(normalizedMain, 0.15) || opacityColor,
+    radioSelectedBgColor: radioSelectedBg,
     radioUnselectedBorderColor: 'transparent',
     radioSelectedBorderColor: normalizedMain,
     radioSelectedBorderEffect: 'none',
@@ -358,6 +362,17 @@ export const deriveThemeDefaults = (mainColorHex = DEFAULT_MAIN_COLOR, apiColorK
 export const createEmptyThemeSettings = () => Object.fromEntries(
   THEME_FIELD_KEYS.map((key) => [key, '']),
 );
+
+export const resolveHeaderBgColor = (theme, mainColorHex = DEFAULT_MAIN_COLOR) => {
+  const raw = theme?.headerBgColor || theme?.header_bg_color;
+  if (raw && isCssHexColor(raw)) {
+    return expandHexColor(raw);
+  }
+  if (isCssHexColor(mainColorHex)) {
+    return expandHexColor(mainColorHex);
+  }
+  return DEFAULT_MAIN_COLOR;
+};
 
 export const mergeThemeWithDefaults = (rawTheme, mainColorHex, apiColorKey) => {
   const defaults = deriveThemeDefaults(mainColorHex, apiColorKey);

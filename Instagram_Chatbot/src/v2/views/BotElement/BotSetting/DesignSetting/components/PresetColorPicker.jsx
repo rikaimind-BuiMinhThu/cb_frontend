@@ -1,9 +1,15 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { MAIN_COLORS } from '../constants/designChatbotConstants';
 import { expandHexColor, hexColorsEqual, isCssHexColor } from '../utils/designThemeUtils';
 
 const NATIVE_COLOR_FALLBACK = '#000000';
+
+const toCommittedColor = (color) => {
+  const expanded = expandHexColor(color);
+  if (isCssHexColor(expanded)) return expanded;
+  return '';
+};
 
 const PresetColorPicker = ({ value, onChange, presets = MAIN_COLORS, showHex = true }) => {
   const customColorRef = useRef(null);
@@ -24,8 +30,20 @@ const PresetColorPicker = ({ value, onChange, presets = MAIN_COLORS, showHex = t
     ? expandedValue
     : (value && value !== 'transparent' ? value : 'transparent');
 
+  const [hexDraft, setHexDraft] = useState(hexInputValue);
+
+  useEffect(() => {
+    setHexDraft(hexInputValue);
+  }, [hexInputValue]);
+
+  const commitColor = (color) => {
+    const nextColor = toCommittedColor(color);
+    if (!nextColor) return;
+    onChange(nextColor);
+  };
+
   const handlePresetClick = (color) => {
-    onChange(expandHexColor(color) || color);
+    commitColor(color);
   };
 
   const handleCustomClick = () => {
@@ -33,7 +51,20 @@ const PresetColorPicker = ({ value, onChange, presets = MAIN_COLORS, showHex = t
   };
 
   const handleHexChange = (nextValue) => {
-    onChange(nextValue);
+    setHexDraft(nextValue);
+    const nextColor = toCommittedColor(nextValue);
+    if (nextColor) {
+      onChange(nextColor);
+    }
+  };
+
+  const handleHexBlur = () => {
+    const nextColor = toCommittedColor(hexDraft);
+    if (nextColor) {
+      onChange(nextColor);
+      return;
+    }
+    setHexDraft(hexInputValue);
   };
 
   return (
@@ -64,10 +95,11 @@ const PresetColorPicker = ({ value, onChange, presets = MAIN_COLORS, showHex = t
         <input
           type="text"
           className="theme-field__input theme-field__input--hex"
-          value={hexInputValue}
+          value={hexDraft}
           placeholder="#ffffff"
           spellCheck={false}
           onChange={(e) => handleHexChange(e.target.value)}
+          onBlur={handleHexBlur}
         />
       ) : null}
       <input
@@ -75,7 +107,7 @@ const PresetColorPicker = ({ value, onChange, presets = MAIN_COLORS, showHex = t
         id={inputIdRef.current}
         type="color"
         value={nativeColor}
-        onChange={(e) => onChange(expandHexColor(e.target.value) || e.target.value)}
+        onChange={(e) => commitColor(e.target.value)}
         style={{ visibility: 'hidden', width: '0px', height: '0px' }}
       />
     </div>

@@ -81,8 +81,7 @@ function DesignChatbot() {
                   title={state.basicInfo.title}
                   subtitle={state.basicInfo.subtitle}
                   onFieldChange={actions.updateThemeField}
-                  onMainColorChange={actions.setMainColor}
-                  onApplyDerivedTheme={actions.applyDerivedTheme}
+                  onMainColorChange={actions.updateMainHeaderColor}
                   onResetSection={actions.resetThemeSection}
                   onSave={actions.saveThemeCustomize}
                 />
