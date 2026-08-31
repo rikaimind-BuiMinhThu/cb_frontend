@@ -63,6 +63,7 @@ import {
   mapRawDesignSettingsFromExtract,
 } from "../../PreviewComponent/previewDesignStateUtils";
 import { createPreviewInitialState } from "../../PreviewComponent/createPreviewInitialState";
+import { shouldShowPreventExitModal } from "../../PreviewComponent/preventExitModalUtils";
 import {
   setConversionParamToLocalStorage, fukushashikiSavedStateToLp, fukushashikiToLP,
   executeLpJsCode, postMessageToParent
@@ -614,8 +615,9 @@ const ScenarioPreviewFukushashiki = ({
     if (editorPreview) {
       if (opening) {
         dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { isOpen: true } });
-      } else if (!state.showPopupCloseBot) {
-        // Bug #11: editor preview cũng hiện modal xác nhận khi đóng.
+      } else if (!state.showPopupCloseBot
+        && shouldShowPreventExitModal(state.botInfor, state.activePopupCloseBot)) {
+        // Bug #11: editor preview cũng chỉ hiện modal khi 離脱防止 hoặc popup_close_bot bật.
         dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
       } else {
         dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
@@ -637,7 +639,8 @@ const ScenarioPreviewFukushashiki = ({
     const timerChatbotStorage = getTimerConfig();
     setTimerChanges((timerChanges) => timerChatbotStorage || timerChanges);
 
-    if (!opening && !state.showPopupCloseBot) {
+    if (!opening && !state.showPopupCloseBot
+      && shouldShowPreventExitModal(state.botInfor, state.activePopupCloseBot)) {
       return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
     }
 
@@ -671,6 +674,9 @@ const ScenarioPreviewFukushashiki = ({
   const onChatbotHeaderClick = () => {
     if (!state.isOpen) return dispatch({ type: PREVIEW_ACTIONS.OPEN_CHATBOT });
     if (state.showPopupCloseBot) return;
+    if (!shouldShowPreventExitModal(state.botInfor, state.activePopupCloseBot)) {
+      return dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
+    }
     return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
   }
 

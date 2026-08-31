@@ -45,6 +45,7 @@ import {
   mapRawDesignSettingsFromExtract,
 } from "../../PreviewComponent/previewDesignStateUtils";
 import { createPreviewInitialState } from "../../PreviewComponent/createPreviewInitialState";
+import { shouldShowPreventExitModal } from "../../PreviewComponent/preventExitModalUtils";
 import {
   setConversionParamToLocalStorage, postMessageToParent, executeLpJsCode,
 } from "../../PreviewFukushashiki/LPUtils";
@@ -325,7 +326,8 @@ const ScenarioPreviewFaq = ({
       sendOpenChatbotCountRequest(state.scenarioId, deviceReceive);
     }
     
-    if (!opening && !state.showPopupCloseBot) {
+    if (!opening && !state.showPopupCloseBot
+      && shouldShowPreventExitModal(state.botInfor, state.activePopupCloseBot)) {
       return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
     }
 

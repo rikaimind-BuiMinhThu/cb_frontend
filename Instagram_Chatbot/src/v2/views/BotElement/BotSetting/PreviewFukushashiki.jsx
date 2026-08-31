@@ -81,6 +81,7 @@ import {
 } from "./PreviewComponent/previewOpeningStyles";
 import { mapParsedDesignToState } from "./PreviewComponent/previewDesignStateUtils";
 import { createPreviewInitialState } from "./PreviewComponent/createPreviewInitialState";
+import { shouldShowPreventExitModal } from "./PreviewComponent/preventExitModalUtils";
 import {
   usePreviewConversionOnOpen,
   usePreviewIpParams,
@@ -463,8 +464,9 @@ const PreviewFukushashiki = () => {
     const timerChatbotStorage = getTimerConfig();
     setTimerChanges((timerChanges) => timerChatbotStorage || timerChanges);
 
-    if (!opening && !state.showPopupCloseBot) {
-      // Bug #11: Đóng chat không hiện modal — luôn mở confirm, không phụ thuộc cờ 離脱防止.
+    if (!opening && !state.showPopupCloseBot
+      && shouldShowPreventExitModal(state.botInfor, state.activePopupCloseBot)) {
+      // Bug #11: chỉ mở confirm khi 離脱防止 hoặc popup_close_bot bật — cả hai off thì đóng thẳng.
       return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
     }
 
@@ -498,6 +500,9 @@ const PreviewFukushashiki = () => {
   const onChatbotHeaderClick = () => {
     if (!state.isOpen) return dispatch({ type: PREVIEW_ACTIONS.OPEN_CHATBOT });
     if (state.showPopupCloseBot) return;
+    if (!shouldShowPreventExitModal(state.botInfor, state.activePopupCloseBot)) {
+      return dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
+    }
     return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
   }
 

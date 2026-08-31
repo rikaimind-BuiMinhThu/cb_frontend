@@ -55,6 +55,7 @@ import {
 } from "./PreviewComponent/previewOpeningStyles";
 import { mapParsedDesignToState } from "./PreviewComponent/previewDesignStateUtils";
 import { createPreviewInitialState } from "./PreviewComponent/createPreviewInitialState";
+import { shouldShowPreventExitModal } from "./PreviewComponent/preventExitModalUtils";
 import {
   usePreviewConversionOnOpen,
   usePreviewIpParams,
@@ -173,7 +174,8 @@ const PreviewFaq = () => {
       sendOpenChatbotCountRequest(state.scenarioId, deviceReceive);
     }
     
-    if (!opening && !state.showPopupCloseBot) {
+    if (!opening && !state.showPopupCloseBot
+      && shouldShowPreventExitModal(state.botInfor, state.activePopupCloseBot)) {
       return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
     }
 
