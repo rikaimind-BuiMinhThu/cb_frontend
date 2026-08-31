@@ -92,7 +92,7 @@
     right: 10px;
     width: 380px;
     height: 620px;
-    background-color: #D6E0EF;
+    background-color: #EBF7FF;
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
     z-index: 900;
@@ -211,7 +211,7 @@
 }
 
 .sp-process-bar {
-    background-color: #D6E0EF;
+    background-color: #EBF7FF;
     margin-top: 1px;
 }
 
@@ -219,7 +219,7 @@
     font-size: 13px;
     min-width: 25%;
     height: 20px;
-    background-color: #327AED;
+    background-color: #70A5FC;
     padding: 0 5px;
     color: #FFFFFF;
 }

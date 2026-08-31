@@ -285,7 +285,7 @@
 .theme-customize-preview__error-top {
   flex-shrink: 0;
   padding: 0 10px;
-  background-color: var(--c-chat-window-bg, #D6E0EF);
+  background-color: var(--c-chat-window-bg, #EBF7FF);
 }
 
 .theme-customize-preview__error-top .ss-user-setting__item-text_input-top {

@@ -569,7 +569,7 @@ ${previewButtonNormalSelector},
 ${withPseudoOnEach(previewButtonNormalSelector, ':hover')},
 ${withPseudoOnEach(previewButtonNormalSelector, ':focus')},
 ${withPseudoOnEach(previewButtonNormalSelector, ':focus-visible')} {
-  background-color: var(--c-btn-normal-bg, #327AED) !important;
+  background-color: var(--c-btn-normal-bg) !important;
   color: var(--c-btn-normal-text, #fff) !important;
   font-size: var(--c-btn-font-size, 14px) !important;
   border: none !important;
@@ -646,23 +646,23 @@ ${scopedClass(scopeSelector, '.sp-header-right-arrow')} {
 }
 
 ${scopedClass(scopeSelector, '.sp-process-bar')} {
-  background-color: var(--c-progress-bg, #D6E0EF) !important; /* Bug #8: track default #D6E0EF */
+  background-color: var(--c-progress-bg, #EBF7FF) !important;
 }
 
 ${scopedClass(scopeSelector, '.sp-process-bar-color')} {
   color: var(--c-progress-text, #fff) !important;
   font-size: var(--c-progress-font-size, 13px) !important;
-  background-color: var(--c-progress-fill, #327AED) !important; /* Bug #7: fill độc lập header */
+  background-color: var(--c-progress-fill, #70A5FC) !important;
 }
 
 ${scopeSelector ? spBodySelector : '#sp-body.sp-body, .sp-body'} {
-  background-color: var(--c-chat-window-bg, #D6E0EF) !important; /* Bug #8: window default #D6E0EF */
+  background-color: var(--c-chat-window-bg, #EBF7FF) !important;
 }
 
 ${scopedClass(scopeSelector, '.ss-bot-message__content-wrapper')},
 ${scopedDescendant(scopeSelector, '.ss-bot-message .ss-bot-message__content')} {
   background-color: var(--c-bot-msg-bg, #3CACEF) !important;
-  color: var(--c-bot-msg-text, #ffffff) !important;
+  color: var(--c-bot-msg-text, #fff) !important;
   font-size: var(--c-bot-msg-font-size, 14px) !important;
 }
 
@@ -687,7 +687,7 @@ ${twinkleFieldOverrideRules}${previewFieldFontSizeRule}
 ${scopedClass(scopeSelector, '.ss-bot-chat-detail-content')},
 ${scopedClass(scopeSelector, '.ss-bot-chat-text-input.ss-bot-chat-detail-content')} {
   background-color: var(--c-bot-msg-bg, #3CACEF) !important;
-  color: var(--c-bot-msg-text, #ffffff) !important;
+  color: var(--c-bot-msg-text, #fff) !important;
   font-size: var(--c-bot-msg-font-size, 14px) !important;
   border: none !important;
 }
@@ -720,7 +720,7 @@ ${btnSelector},
 ${withPseudoOnEach(btnSelector, ':hover')},
 ${withPseudoOnEach(btnSelector, ':focus')},
 ${withPseudoOnEach(btnSelector, ':focus-visible')} {
-  background-color: var(--c-btn-normal-bg, #327AED) !important;
+  background-color: var(--c-btn-normal-bg) !important;
   color: var(--c-btn-normal-text, #fff) !important;
   font-size: var(--c-btn-font-size, 14px) !important;
   border: none !important;
@@ -749,7 +749,7 @@ ${withPseudoOnEach(nextButtonSelector, ':focus')},
 ${withPseudoOnEach(nextButtonSelector, ':focus-visible')} {
   min-height: 36px !important;
   font-weight: 500 !important;
-  background-color: var(--c-btn-normal-bg, #327AED) !important;
+  background-color: var(--c-btn-normal-bg) !important;
   color: var(--c-btn-normal-text, #fff) !important;
   font-size: var(--c-btn-font-size, 14px) !important;
   border: none !important;
@@ -780,7 +780,7 @@ ${spBodySelector} .ant-checkbox-inner {
 }
 
 ${spBodySelector} .ant-checkbox-checked .ant-checkbox-inner {
-  background-color: var(--c-checkbox-checked-bg, #327AED) !important;
+  background-color: var(--c-checkbox-checked-bg) !important;
   border-color: var(--c-checkbox-checked-border) !important;
 }
 
@@ -793,7 +793,7 @@ ${spBodySelector} .ss-message__content--user-checkbox--selected,
 ${spBodySelector} .ss-message__content--user-checkbox:has(input[type="checkbox"]:checked),
 ${spBodySelector} .ss-message__content--user-checkbox--checkbox_img-item.ss-message__content--user-checkbox--selected,
 ${spBodySelector} .ss-message__content--user-checkbox--checkbox_img-item:has(input[type="checkbox"]:checked) {
-  background-color: var(--c-checkbox-checked-bg, #327AED) !important;
+  background-color: var(--c-checkbox-checked-bg) !important;
   border-color: var(--c-checkbox-checked-border) !important;
   ${checkboxTwinkleAnimation}
 }
@@ -806,14 +806,14 @@ ${scopedDescendant(scopeSelector, '.theme-customize-preview__checkbox-option > l
 
 ${spBodySelector} .ss-message__content--user-radio_button,
 ${scopedClass(scopeSelector, '.theme-customize-preview__radio-default')} {
-  background-color: var(--c-radio-unselected-bg, #D6E0EF) !important;
+  background-color: var(--c-radio-unselected-bg, #ebf7ff) !important;
   border: 1px solid var(--c-radio-unselected-border, transparent) !important;
 }
 
 ${spBodySelector} .ss-message__content--user-radio_button--selected,
 ${spBodySelector} .ss-message__content--user-radio_button:has(input[type="radio"]:checked),
 ${scopedClass(scopeSelector, '.theme-customize-preview__radio-default--selected')} {
-  background-color: var(--c-radio-selected-bg, #D6E0EF) !important;
+  background-color: var(--c-radio-selected-bg, #ebf7ff) !important;
   border-color: var(--c-radio-selected-border, transparent) !important;
   ${radioTwinkleAnimation}
 }
