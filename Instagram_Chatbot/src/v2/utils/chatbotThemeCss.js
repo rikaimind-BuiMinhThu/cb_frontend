@@ -238,17 +238,20 @@ const buildPortalModalVariables = (theme) => `
 ${buildModalButtonVariables(theme)}`;
 
 const buildPortalModalRules = () => `
-#portal .ss-bot-prevent-exit-chatbot-modal {
+#portal .ss-bot-prevent-exit-chatbot-modal,
+.ss-bot-prevent-exit-root .ss-bot-prevent-exit-chatbot-modal {
   background-color: var(--c-modal-bg, #FFF) !important;
 }
 
-#portal .ss-bot-prevent-exit-modal-title-col {
+#portal .ss-bot-prevent-exit-modal-title-col,
+.ss-bot-prevent-exit-root .ss-bot-prevent-exit-modal-title-col {
   flex: 0 0 100% !important;
   max-width: 100% !important;
   text-align: var(--c-modal-title-align, left) !important;
 }
 
-#portal .title-bot-modal {
+#portal .title-bot-modal,
+.ss-bot-prevent-exit-root .title-bot-modal {
   display: block !important;
   width: 100% !important;
   color: var(--c-modal-title-text, #333) !important;
@@ -256,7 +259,8 @@ const buildPortalModalRules = () => `
   text-align: var(--c-modal-title-align, left) !important;
 }
 
-${buildModalButtonRules('#portal')}`.trim();
+${buildModalButtonRules('#portal')}
+${buildModalButtonRules('.ss-bot-prevent-exit-root')}`.trim();
 
 const buildButtonLayoutRules = (hasExplicitWidth) => {
   const widthRule = hasExplicitWidth

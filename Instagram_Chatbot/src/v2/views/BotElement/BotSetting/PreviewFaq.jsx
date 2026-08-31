@@ -173,11 +173,12 @@ const PreviewFaq = () => {
       sendOpenChatbotCountRequest(state.scenarioId, deviceReceive);
     }
     
-    if (state.alreadyOpenFirstTime) {
+    if (!opening && !state.showPopupCloseBot) {
+      return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
+    }
+
+    if (state.alreadyOpenFirstTime || state.isAlreadyOpenFirstTime) {
       if (!opening) {
-        if (state.activePopupCloseBot) {
-          return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
-        }
         postOpenStateToParent(false);
         return dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
       }

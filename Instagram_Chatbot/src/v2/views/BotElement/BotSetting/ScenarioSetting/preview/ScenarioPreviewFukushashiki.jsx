@@ -614,6 +614,8 @@ const ScenarioPreviewFukushashiki = ({
     if (editorPreview) {
       if (opening) {
         dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { isOpen: true } });
+      } else if (!state.showPopupCloseBot) {
+        dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
       } else {
         dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
       }
@@ -634,15 +636,15 @@ const ScenarioPreviewFukushashiki = ({
     const timerChatbotStorage = getTimerConfig();
     setTimerChanges((timerChanges) => timerChatbotStorage || timerChanges);
 
+    if (!opening && !state.showPopupCloseBot) {
+      return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
+    }
+
     // post message to parent window
     postMessageToParent({ isOpen: opening}, state);
 
-    if (state.alreadyOpenFirstTime) {
+    if (state.alreadyOpenFirstTime || state.isAlreadyOpenFirstTime) {
       if (!opening) {
-        if (state.activePopupCloseBot) {
-          return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
-        }
-
         return dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
       }
 
@@ -667,13 +669,7 @@ const ScenarioPreviewFukushashiki = ({
 
   const onChatbotHeaderClick = () => {
     if (!state.isOpen) return dispatch({ type: PREVIEW_ACTIONS.OPEN_CHATBOT });
-
-    // When closing chatbot, show popup close bot modal if has setting
-    const openPopupSetting = ["standard_exit_popup", "image_popup"];
-    const isWithDrawalEnabled = state.botInfor && openPopupSetting.includes(state.botInfor.withdrawal_prevention_status);
-
-    if (!isWithDrawalEnabled) return dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
-
+    if (state.showPopupCloseBot) return;
     return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
   }
 

@@ -629,7 +629,7 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
       return { ...state, isOpen: true, showPopupCloseBot: false, isAlreadyOpenFirstTime: true, manuallyClosed: false, autoOpenAttempted: true };
     }
     case PREVIEW_ACTIONS.CLOSE_CHATBOT:
-      return { ...state, isOpen: false, showPopupCloseBot: true, autoOpenAttempted: false, manuallyClosed: true };
+      return { ...state, isOpen: false, showPopupCloseBot: false, autoOpenAttempted: false, manuallyClosed: true };
     case PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL:
       return { ...state, showPopupCloseBot: true };
     case PREVIEW_ACTIONS.SET_CHATBOT_SETTINGS:
