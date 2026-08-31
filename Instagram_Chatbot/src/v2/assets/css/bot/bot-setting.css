@@ -163,7 +163,7 @@
 }
 
 .theme-customize-tab-settings .main-colors {
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: center;
   gap: 3px;
 }
@@ -187,6 +187,28 @@
 
 .theme-field--color .theme-field__control {
   overflow-x: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.theme-field__input--hex {
+  flex: 0 0 88px;
+  width: 88px;
+  min-width: 88px;
+  height: 32px;
+  font-family: monospace;
+  font-size: 11px;
+}
+
+.main-colors__swatch--transparent {
+  background-image: linear-gradient(45deg, #ccc 25%, transparent 25%),
+    linear-gradient(-45deg, #ccc 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #ccc 75%),
+    linear-gradient(-45deg, transparent 75%, #ccc 75%);
+  background-size: 8px 8px;
+  background-position: 0 0, 0 4px, 4px -4px, -4px 0;
+  background-color: #fff;
 }
 
 .theme-field {
@@ -263,7 +285,7 @@
 .theme-customize-preview__error-top {
   flex-shrink: 0;
   padding: 0 10px;
-  background-color: var(--c-chat-window-bg, #EBF7FF);
+  background-color: var(--c-chat-window-bg, #D6E0EF);
 }
 
 .theme-customize-preview__error-top .ss-user-setting__item-text_input-top {
@@ -437,9 +459,19 @@
 
 .theme-customize-preview__header {
   min-height: 65px;
+  height: 65px;
   display: flex;
   align-items: center;
-  padding: 0 15px;
+  padding: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.theme-customize-preview__header .sp-header-left {
+  min-width: 0;
+  flex: 1;
+  width: auto;
+  padding: 8px 12px;
 }
 
 .theme-customize-preview__body {

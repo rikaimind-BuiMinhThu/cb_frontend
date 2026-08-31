@@ -7,6 +7,8 @@ import {
   OPEN_ANIMATION_DURATION_MS_DEFAULT,
   OPEN_ANIMATION_STYLE_DEFAULT,
   CHAT_BODY_VERSION_DEFAULT,
+  DEFAULT_MAIN_COLOR,
+  DEFAULT_MAIN_COLOR_KEY,
 } from '../constants/designChatbotConstants';
 import {
   applyIconsFromApiResponse,
@@ -18,6 +20,7 @@ import {
   normalizeOpenAnimationStyle,
   parseDesignSettings,
   resolveMainColorFromApi,
+  resolveMainColorKey,
 } from '../utils/designChatbotUtils';
 import { deriveThemeDefaults } from '../utils/designThemeUtils';
 import { THEME_SECTIONS } from '../constants/designThemeConstants';
@@ -60,7 +63,7 @@ export const useDesignChatbot = (initialBotId) => {
   const [closingBotIcon, setClosingBotIcon] = useState('');
   const [botName, setBotName] = useState('');
   const [chatBodyVersion, setChatBodyVersion] = useState(CHAT_BODY_VERSION_DEFAULT);
-  const [mainColor, setMainColor] = useState('#327AED');
+  const [mainColor, setMainColor] = useState(DEFAULT_MAIN_COLOR);
   const [iconPresetIndices, setIconPresetIndices] = useState(INITIAL_ICON_PRESET_INDICES);
 
   const [displayType, setDisplayType] = useState(1);
@@ -451,21 +454,33 @@ export const useDesignChatbot = (initialBotId) => {
     const section = THEME_SECTIONS.find(({ id }) => id === sectionId);
     if (!section) return;
 
-    const defaults = deriveThemeDefaults(mainColor, apiColorKey);
+    const resetMainColor = sectionId === 'headerMain';
+    const nextMainColor = resetMainColor ? DEFAULT_MAIN_COLOR : mainColor;
+    const nextApiColorKey = resetMainColor ? DEFAULT_MAIN_COLOR_KEY : apiColorKey;
+    const defaults = deriveThemeDefaults(nextMainColor, nextApiColorKey);
+
+    if (resetMainColor) {
+      setMainColor(DEFAULT_MAIN_COLOR);
+      setApiColorKey(DEFAULT_MAIN_COLOR_KEY);
+    }
+
     setThemeSettings((prev) => {
       const next = { ...prev };
       section.fields.forEach(({ key }) => {
         if (!key) return;
-        next[key] = defaults[key];
+        next[key] = defaults[key] ?? '';
       });
       return next;
     });
   }, [apiColorKey, mainColor]);
 
   const applyDerivedTheme = useCallback((newMainColor) => {
+    const { main_color: nextColorKey } = resolveMainColorKey(newMainColor);
+    const nextApiColorKey = nextColorKey || null;
     setMainColor(newMainColor);
-    setThemeSettings(deriveThemeDefaults(newMainColor, apiColorKey));
-  }, [apiColorKey]);
+    setApiColorKey(nextApiColorKey);
+    setThemeSettings(deriveThemeDefaults(newMainColor, nextApiColorKey));
+  }, []);
 
   const updateDesignSettingField = useCallback((field, value) => {
     const setters = {

@@ -1001,6 +1001,7 @@ const PreviewFukushashiki = () => {
           "--chatbot-open-animation-duration": `${openAnimationDurationMs}ms`,
         }}
         headerIconSrc={headerIconSrc}
+        title={state.botInfor?.title}
         subtitle={state.botInfor?.subtitle}
         titleBubble={state.botInfor?.titleBubble}
         isOpen={state.isOpen}

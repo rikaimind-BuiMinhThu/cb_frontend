@@ -131,6 +131,7 @@ const buildThemeVariables = (theme) => {
   const buttonPositionJustify = resolveButtonPositionJustify(theme.buttonPosition);
 
   return `
+  --c-header-bg: ${theme.buttonNormalBgColor};
   --c-header-title-text: ${theme.headerTitleTextColor};
   --c-header-title-font-size: ${theme.headerTitleFontSize};
   --c-header-subtitle-text: ${theme.headerSubtitleTextColor};
@@ -524,7 +525,7 @@ ${previewButtonNormalSelector},
 ${withPseudoOnEach(previewButtonNormalSelector, ':hover')},
 ${withPseudoOnEach(previewButtonNormalSelector, ':focus')},
 ${withPseudoOnEach(previewButtonNormalSelector, ':focus-visible')} {
-  background-color: var(--c-btn-normal-bg) !important;
+  background-color: var(--c-btn-normal-bg, #327AED) !important;
   color: var(--c-btn-normal-text, #fff) !important;
   font-size: var(--c-btn-font-size, 14px) !important;
   border: none !important;
@@ -568,33 +569,54 @@ ${previewFieldPlaceholderSelector} {
 
   return `
 ${twinkleKeyframesCss}
+${scopedClass(scopeSelector, '.sp-header')},
+${scopedClass(scopeSelector, '.preview-open-frame__header')} {
+  background-color: var(--pof-header-bg, var(--c-header-bg, #327AED)) !important;
+}
+
+${scopedClass(scopeSelector, '.sp-header-left-label')} {
+  min-width: 0;
+  overflow: hidden;
+}
+
 ${scopedClass(scopeSelector, '.sp-header-left-label-title')} {
   color: var(--c-header-title-text, #fff) !important;
   font-size: var(--c-header-title-font-size, 15px) !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 ${scopedClass(scopeSelector, '.sp-header-left-label-sub-title')} {
   color: var(--c-header-subtitle-text, #fff) !important;
   font-size: var(--c-header-subtitle-font-size, 14px) !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+${scopedClass(scopeSelector, '.sp-header-right-arrow')} {
+  color: var(--c-header-title-text, #fff) !important;
 }
 
 ${scopedClass(scopeSelector, '.sp-process-bar')} {
-  background-color: var(--c-progress-bg, #EBF7FF) !important;
+  background-color: var(--c-progress-bg, #D6E0EF) !important;
 }
 
 ${scopedClass(scopeSelector, '.sp-process-bar-color')} {
   color: var(--c-progress-text, #fff) !important;
   font-size: var(--c-progress-font-size, 13px) !important;
+  background-color: var(--pof-header-bg, var(--c-header-bg, #327AED)) !important;
 }
 
 ${scopeSelector ? spBodySelector : '#sp-body.sp-body, .sp-body'} {
-  background-color: var(--c-chat-window-bg, #EBF7FF) !important;
+  background-color: var(--c-chat-window-bg, #D6E0EF) !important;
 }
 
 ${scopedClass(scopeSelector, '.ss-bot-message__content-wrapper')},
 ${scopedDescendant(scopeSelector, '.ss-bot-message .ss-bot-message__content')} {
-  background-color: var(--c-bot-msg-bg, #3CACEF) !important;
-  color: var(--c-bot-msg-text, #fff) !important;
+  background-color: var(--c-bot-msg-bg, #327AED) !important;
+  color: var(--c-bot-msg-text, #ffffff) !important;
   font-size: var(--c-bot-msg-font-size, 14px) !important;
 }
 
@@ -618,14 +640,14 @@ ${twinkleFieldOverrideRules}${previewFieldFontSizeRule}
 
 ${scopedClass(scopeSelector, '.ss-bot-chat-detail-content')},
 ${scopedClass(scopeSelector, '.ss-bot-chat-text-input.ss-bot-chat-detail-content')} {
-  background-color: var(--c-bot-msg-bg, #3CACEF) !important;
-  color: var(--c-bot-msg-text, #fff) !important;
+  background-color: var(--c-bot-msg-bg, #327AED) !important;
+  color: var(--c-bot-msg-text, #ffffff) !important;
   font-size: var(--c-bot-msg-font-size, 14px) !important;
   border: none !important;
 }
 
 ${scopedDescendant(scopeSelector, '.ss-bot-chat-text-input-bot-icon path')} {
-  fill: var(--c-bot-msg-bg, #3CACEF) !important;
+  fill: var(--c-bot-msg-bg, #327AED) !important;
 }
 
 ${scopedClass(scopeSelector, '.sp-body-user-side-messages')} {
@@ -652,7 +674,7 @@ ${btnSelector},
 ${withPseudoOnEach(btnSelector, ':hover')},
 ${withPseudoOnEach(btnSelector, ':focus')},
 ${withPseudoOnEach(btnSelector, ':focus-visible')} {
-  background-color: var(--c-btn-normal-bg) !important;
+  background-color: var(--c-btn-normal-bg, #327AED) !important;
   color: var(--c-btn-normal-text, #fff) !important;
   font-size: var(--c-btn-font-size, 14px) !important;
   border: none !important;
@@ -681,7 +703,7 @@ ${withPseudoOnEach(nextButtonSelector, ':focus')},
 ${withPseudoOnEach(nextButtonSelector, ':focus-visible')} {
   min-height: 36px !important;
   font-weight: 500 !important;
-  background-color: var(--c-btn-normal-bg) !important;
+  background-color: var(--c-btn-normal-bg, #327AED) !important;
   color: var(--c-btn-normal-text, #fff) !important;
   font-size: var(--c-btn-font-size, 14px) !important;
   border: none !important;
@@ -712,7 +734,7 @@ ${spBodySelector} .ant-checkbox-inner {
 }
 
 ${spBodySelector} .ant-checkbox-checked .ant-checkbox-inner {
-  background-color: var(--c-checkbox-checked-bg) !important;
+  background-color: var(--c-checkbox-checked-bg, #327AED) !important;
   border-color: var(--c-checkbox-checked-border) !important;
 }
 
@@ -725,7 +747,7 @@ ${spBodySelector} .ss-message__content--user-checkbox--selected,
 ${spBodySelector} .ss-message__content--user-checkbox:has(input[type="checkbox"]:checked),
 ${spBodySelector} .ss-message__content--user-checkbox--checkbox_img-item.ss-message__content--user-checkbox--selected,
 ${spBodySelector} .ss-message__content--user-checkbox--checkbox_img-item:has(input[type="checkbox"]:checked) {
-  background-color: var(--c-checkbox-checked-bg) !important;
+  background-color: var(--c-checkbox-checked-bg, #327AED) !important;
   border-color: var(--c-checkbox-checked-border) !important;
   ${checkboxTwinkleAnimation}
 }
@@ -738,14 +760,14 @@ ${scopedDescendant(scopeSelector, '.theme-customize-preview__checkbox-option > l
 
 ${spBodySelector} .ss-message__content--user-radio_button,
 ${scopedClass(scopeSelector, '.theme-customize-preview__radio-default')} {
-  background-color: var(--c-radio-unselected-bg, #ebf7ff) !important;
+  background-color: var(--c-radio-unselected-bg, #D6E0EF) !important;
   border: 1px solid var(--c-radio-unselected-border, transparent) !important;
 }
 
 ${spBodySelector} .ss-message__content--user-radio_button--selected,
 ${spBodySelector} .ss-message__content--user-radio_button:has(input[type="radio"]:checked),
 ${scopedClass(scopeSelector, '.theme-customize-preview__radio-default--selected')} {
-  background-color: var(--c-radio-selected-bg, #ebf7ff) !important;
+  background-color: var(--c-radio-selected-bg, #D6E0EF) !important;
   border-color: var(--c-radio-selected-border, transparent) !important;
   ${radioTwinkleAnimation}
 }

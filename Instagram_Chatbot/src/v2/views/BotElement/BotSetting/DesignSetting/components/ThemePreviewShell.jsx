@@ -31,7 +31,11 @@ const ThemePreviewShell = ({
   const barWidth = `${Math.min(Math.max(processPercent, 0), 100)}%`;
 
   return (
-    <div id={scopeId} className={`theme-customize-preview ${className}`.trim()}>
+    <div
+      id={scopeId}
+      className={`theme-customize-preview ${className}`.trim()}
+      style={{ '--pof-header-bg': mainColor || '#327AED' }}
+    >
       <style>{scopedCss}</style>
 
       <PreviewRegion
@@ -52,7 +56,7 @@ const ThemePreviewShell = ({
           >
             <div className="sp-header-left">
               {headerIconUrl && (
-                <div className="sp-body-bot-side-avatar sp-avatar-bt">
+                <div className="preview-open-frame__avatar">
                   <img src={headerIconUrl} alt="bot-header-icon" />
                 </div>
               )}

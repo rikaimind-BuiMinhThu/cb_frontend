@@ -42,8 +42,11 @@ export const CHAT_BODY_VERSIONS = [
   { value: CHAT_BODY_VERSION_2, label: '2.0' },
 ];
 
+export const DEFAULT_MAIN_COLOR = '#327AED';
+export const DEFAULT_MAIN_COLOR_KEY = 'blue';
+
 export const MAIN_COLORS = [
-  '#327AED',
+  DEFAULT_MAIN_COLOR,
   '#26B197',
   '#fC7E02',
   '#F6CA21',

@@ -198,15 +198,15 @@
   gap: 8px;
 }
 
-.scenario-editor-preview .theme-customize-preview__header .sp-avatar-bt {
-  width: 65px;
+.scenario-editor-preview .theme-customize-preview__header .preview-open-frame__avatar {
+  width: 40px;
   flex-shrink: 0;
 }
 
-.scenario-editor-preview .theme-customize-preview__header .sp-avatar-bt img {
+.scenario-editor-preview .theme-customize-preview__header .preview-open-frame__avatar img {
   border-radius: 50%;
-  width: 58px;
-  height: 58px;
+  width: 40px;
+  height: 40px;
   object-fit: cover;
   display: block;
 }

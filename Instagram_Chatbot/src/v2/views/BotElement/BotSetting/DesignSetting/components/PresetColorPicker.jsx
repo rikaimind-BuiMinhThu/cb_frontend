@@ -1,23 +1,39 @@
 import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 import { MAIN_COLORS } from '../constants/designChatbotConstants';
+import { expandHexColor, hexColorsEqual, isCssHexColor } from '../utils/designThemeUtils';
 
-const PresetColorPicker = ({ value, onChange, presets = MAIN_COLORS }) => {
+const NATIVE_COLOR_FALLBACK = '#000000';
+
+const PresetColorPicker = ({ value, onChange, presets = MAIN_COLORS, showHex = true }) => {
   const customColorRef = useRef(null);
   const inputIdRef = useRef(null);
   if (!inputIdRef.current) {
     inputIdRef.current = `preset-color-${Math.random().toString(36).slice(2, 9)}`;
   }
-  const currentColor = value || presets[0];
-  const presetIndex = presets.indexOf(currentColor);
+
+  const expandedValue = expandHexColor(value);
+  const hasHex = isCssHexColor(expandedValue);
+  const nativeColor = hasHex ? expandedValue : NATIVE_COLOR_FALLBACK;
+  const presetIndex = presets.findIndex((color) => hexColorsEqual(color, expandedValue));
   const isCustomColor = presetIndex === -1;
+  const hexInputValue = /^#[0-9a-fA-F]{6}$/.test(String(value || '').trim())
+    ? String(value).trim()
+    : (hasHex ? expandedValue : (value || ''));
+  const swatchColor = hasHex
+    ? expandedValue
+    : (value && value !== 'transparent' ? value : 'transparent');
 
   const handlePresetClick = (color) => {
-    onChange(color);
+    onChange(expandHexColor(color) || color);
   };
 
   const handleCustomClick = () => {
     customColorRef.current?.click();
+  };
+
+  const handleHexChange = (nextValue) => {
+    onChange(nextValue);
   };
 
   return (
@@ -37,16 +53,29 @@ const PresetColorPicker = ({ value, onChange, presets = MAIN_COLORS }) => {
           className={`color color-999${isCustomColor ? ' active' : ''}`}
           onClick={handleCustomClick}
         >
-          <span className="main-colors__swatch" style={{ backgroundColor: currentColor }} />
+          <span
+            className={`main-colors__swatch${value === 'transparent' ? ' main-colors__swatch--transparent' : ''}`}
+            style={{ backgroundColor: swatchColor }}
+          />
         </div>
         <span className="main-colors__custom-label">カスタム</span>
       </div>
+      {showHex ? (
+        <input
+          type="text"
+          className="theme-field__input theme-field__input--hex"
+          value={hexInputValue}
+          placeholder="#ffffff"
+          spellCheck={false}
+          onChange={(e) => handleHexChange(e.target.value)}
+        />
+      ) : null}
       <input
         ref={customColorRef}
         id={inputIdRef.current}
         type="color"
-        value={currentColor}
-        onChange={(e) => onChange(e.target.value)}
+        value={nativeColor}
+        onChange={(e) => onChange(expandHexColor(e.target.value) || e.target.value)}
         style={{ visibility: 'hidden', width: '0px', height: '0px' }}
       />
     </div>
@@ -57,6 +86,12 @@ PresetColorPicker.propTypes = {
   value: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   presets: PropTypes.arrayOf(PropTypes.string),
+  showHex: PropTypes.bool,
+};
+
+PresetColorPicker.defaultProps = {
+  presets: MAIN_COLORS,
+  showHex: true,
 };
 
 export default PresetColorPicker;

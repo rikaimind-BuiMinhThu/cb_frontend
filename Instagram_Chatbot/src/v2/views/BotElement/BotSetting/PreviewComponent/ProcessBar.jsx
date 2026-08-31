@@ -10,7 +10,7 @@ const ProcessBar = ({
   const getBackgroundColor = () => {
     if (botInfor?.main_color) return {backgroundColor: botInfor?.main_color};
     if (botInfor?.main_color_other) return {backgroundColor: botInfor?.main_color_other};
-    return {};
+    return { backgroundColor: '#327AED' };
   };
 
   const getWidth = () => {

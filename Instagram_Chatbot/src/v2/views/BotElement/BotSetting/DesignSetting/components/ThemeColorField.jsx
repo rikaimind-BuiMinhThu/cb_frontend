@@ -41,7 +41,7 @@ const ThemeColorField = ({
       </DesignSettingLabel>
       <div className="theme-field__control">
         <PresetColorPicker
-          value={value || '#327AED'}
+          value={value || ''}
           onChange={onChange}
         />
       </div>

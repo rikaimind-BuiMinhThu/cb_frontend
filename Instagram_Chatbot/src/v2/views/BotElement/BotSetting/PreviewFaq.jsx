@@ -602,6 +602,7 @@ const PreviewFaq = () => {
         frameClassName={frameClassName}
         cssVars={cssVars}
         headerIconSrc={headerIconSrc}
+        title={state.botInfor?.title}
         subtitle={state.botInfor?.subtitle}
         titleBubble={state.botInfor?.titleBubble}
         isOpen={state.isOpen}

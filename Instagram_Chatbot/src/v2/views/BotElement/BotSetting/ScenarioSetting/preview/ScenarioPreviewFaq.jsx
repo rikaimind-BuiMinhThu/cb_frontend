@@ -801,6 +801,7 @@ const ScenarioPreviewFaq = ({
         frameClassName={frameClassName}
         cssVars={cssVars}
         headerIconSrc={headerIconSrc}
+        title={displayBotInfor?.title}
         subtitle={displayBotInfor?.subtitle}
         titleBubble={displayBotInfor?.titleBubble}
         isOpen={state.isOpen}

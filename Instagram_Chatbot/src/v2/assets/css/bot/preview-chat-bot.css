@@ -92,7 +92,7 @@
     right: 10px;
     width: 380px;
     height: 620px;
-    background-color: #EBF7FF;
+    background-color: #D6E0EF;
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
     z-index: 900;
@@ -211,7 +211,7 @@
 }
 
 .sp-process-bar {
-    background-color: #EBF7FF;
+    background-color: #D6E0EF;
     margin-top: 1px;
 }
 
@@ -219,7 +219,7 @@
     font-size: 13px;
     min-width: 25%;
     height: 20px;
-    background-color: #70A5FC;
+    background-color: #327AED;
     padding: 0 5px;
     color: #FFFFFF;
 }
@@ -1193,6 +1193,14 @@ slideUp
         background-color: transparent;
         /* padding: 15px; */
     }
+
+    .preview-open-frame .sp-header,
+    .preview-open-frame__header {
+        background-color: var(--pof-header-bg, #327AED);
+        min-width: 0;
+        width: 100%;
+        max-width: 100%;
+    }
     
     .sp-header-left {
         height: 100%;
@@ -1892,7 +1900,63 @@ slideUp
 }
 
 .preview-open-frame__header {
-  background-color: var(--pof-header-bg, transparent);
+  background-color: var(--pof-header-bg, #327AED);
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  height: 65px;
+  flex-shrink: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.preview-open-frame__header .sp-header-left {
+  min-width: 0;
+  flex: 1;
+  width: auto;
+  overflow: hidden;
+  padding: 8px 12px;
+}
+
+.preview-open-frame__avatar {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+.preview-open-frame__avatar img {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  display: block;
+}
+
+.preview-open-frame__header .sp-header-left-label,
+.theme-customize-preview__header .sp-header-left-label {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+.preview-open-frame__header .sp-header-left-label-title,
+.preview-open-frame__header .sp-header-left-label-sub-title,
+.theme-customize-preview__header .sp-header-left-label-title,
+.theme-customize-preview__header .sp-header-left-label-sub-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.preview-open-frame__header .sp-header-right {
+  flex-shrink: 0;
+}
+
+.preview-open-frame__header .sp-header-right-arrow {
+  color: var(--c-header-title-text, #fff);
 }
 
 .preview-open-frame--desktop .preview-open-frame__header {

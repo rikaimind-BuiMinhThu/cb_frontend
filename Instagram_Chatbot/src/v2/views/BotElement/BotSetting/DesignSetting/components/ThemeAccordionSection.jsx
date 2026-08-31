@@ -81,7 +81,7 @@ const ThemeAccordionSection = ({
           <div className="theme-field__control">
             <MainColorPicker mainColor={mainColor} onChange={onMainColorChange} />
             <p className="theme-section__main-color-helper">
-              メインカラーを変更しても個別設定は自動では上書きされません。セクションごとに「デフォルトに戻す」で再計算できます。
+              メインカラーを変更しても個別設定は自動では上書きされません。各セクションの「デフォルトに戻す」で再計算できます。メインカラー・ヘッダーのリセットはメインカラーを #327AED に戻します。
             </p>
           </div>
         </div>
