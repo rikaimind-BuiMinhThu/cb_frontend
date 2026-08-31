@@ -617,7 +617,7 @@ const ScenarioPreviewFukushashiki = ({
         dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { isOpen: true } });
       } else if (!state.showPopupCloseBot
         && shouldShowPreventExitModal(state.botInfor, state.activePopupCloseBot)) {
-        // Bug #11: editor preview cũng chỉ hiện modal khi 離脱防止 hoặc popup_close_bot bật.
+        // Editor preview: cùng gate 離脱防止 — không ép modal khi cả hai cờ off.
         dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
       } else {
         dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
@@ -641,11 +641,12 @@ const ScenarioPreviewFukushashiki = ({
 
     if (!opening && !state.showPopupCloseBot
       && shouldShowPreventExitModal(state.botInfor, state.activePopupCloseBot)) {
+      // Bug #11: chỉ chặn đóng khi cần confirm. Không post isOpen: false khi đang mở modal.
       return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
     }
 
-    // post message to parent window
-    postMessageToParent({ isOpen: opening}, state);
+    // Đóng thẳng / đã confirm: luôn post để parent iframe không lệch (isOpen: false).
+    postMessageToParent({ isOpen: opening }, { ...state, isOpen: opening });
 
     if (state.alreadyOpenFirstTime || state.isAlreadyOpenFirstTime) {
       if (!opening) {
@@ -674,7 +675,9 @@ const ScenarioPreviewFukushashiki = ({
   const onChatbotHeaderClick = () => {
     if (!state.isOpen) return dispatch({ type: PREVIEW_ACTIONS.OPEN_CHATBOT });
     if (state.showPopupCloseBot) return;
+    // Bug #11: header đóng cũng phải close-without-modal + post parent khi 離脱防止 off.
     if (!shouldShowPreventExitModal(state.botInfor, state.activePopupCloseBot)) {
+      postMessageToParent({ isOpen: false }, { ...state, isOpen: false });
       return dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
     }
     return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });

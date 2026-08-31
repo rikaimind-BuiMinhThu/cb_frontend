@@ -176,6 +176,7 @@ const PreviewFaq = () => {
     
     if (!opening && !state.showPopupCloseBot
       && shouldShowPreventExitModal(state.botInfor, state.activePopupCloseBot)) {
+      // Bug #11: chỉ early-return khi cần confirm. Path đóng thẳng đi tiếp để post isOpen: false.
       return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
     }
 

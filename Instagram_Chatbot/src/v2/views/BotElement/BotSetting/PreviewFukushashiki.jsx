@@ -466,12 +466,15 @@ const PreviewFukushashiki = () => {
 
     if (!opening && !state.showPopupCloseBot
       && shouldShowPreventExitModal(state.botInfor, state.activePopupCloseBot)) {
-      // Bug #11: chỉ mở confirm khi 離脱防止 hoặc popup_close_bot bật — cả hai off thì đóng thẳng.
+      // Bug #11: chỉ early-return khi THẬT SỰ cần confirm (離脱防止 hoặc popup_close_bot).
+      // Không post isOpen: false ở đây — iframe parent giữ size open để modal không bị cắt;
+      // user bấm xác nhận mới đi tiếp xuống dưới (showPopupCloseBot=true) và post.
       return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
     }
 
-    // post message to parent window
-    postMessageToParent({ isOpen: opening}, state);
+    // Path 閉じる (cả hai cờ off, hoặc user đã confirm modal):
+    // BẮT BUỘC post isOpen cho parent — nếu return sớm như trước, iframe lệch state.
+    postMessageToParent({ isOpen: opening }, { ...state, isOpen: opening });
 
     if (state.alreadyOpenFirstTime || state.isAlreadyOpenFirstTime) {
       if (!opening) {
@@ -500,7 +503,10 @@ const PreviewFukushashiki = () => {
   const onChatbotHeaderClick = () => {
     if (!state.isOpen) return dispatch({ type: PREVIEW_ACTIONS.OPEN_CHATBOT });
     if (state.showPopupCloseBot) return;
+    // Cùng rule Bug #11 với nút đóng: 離脱防止 off → đóng thẳng + post parent;
+    // đang bật → chỉ mở modal, chưa post isOpen: false.
     if (!shouldShowPreventExitModal(state.botInfor, state.activePopupCloseBot)) {
+      postMessageToParent({ isOpen: false }, { ...state, isOpen: false });
       return dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
     }
     return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
