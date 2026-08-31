@@ -613,10 +613,11 @@ ${previewFieldPlaceholderSelector} {
 
   return `
 ${twinkleKeyframesCss}
-/* Bug #1 / #6: header thật và preview cùng lấy --c-header-bg (Main color header). */
+/* Bug #1 / #6: header thật và preview cùng chuỗi fallback với preview-chat-bot.css.
+   --c-header-bg (theme) → --pof-header-bg (SDK/embedded) → #327AED. */
 ${scopedClass(scopeSelector, '.sp-header')},
 ${scopedClass(scopeSelector, '.preview-open-frame__header')} {
-  background-color: var(--c-header-bg, #327AED) !important;
+  background-color: var(--c-header-bg, var(--pof-header-bg, #327AED)) !important;
 }
 
 ${scopedClass(scopeSelector, '.sp-header-left-label')} {

@@ -1197,8 +1197,10 @@ slideUp
     .preview-open-frame .sp-header,
     .preview-open-frame__header {
         /* Bug #2: Mobile ép header trong suốt — @media ≤981px từng set .sp-header { transparent };
-           chatbot đang mở luôn dùng Main Color. */
-        background-color: var(--pof-header-bg, #327AED);
+           chatbot đang mở luôn dùng Main Color.
+           Ưu tiên --c-header-bg (theme CSS / preview admin), fallback --pof-header-bg
+           (SDK/embedded từ previewOpeningStyles.js), cuối cùng #327AED. */
+        background-color: var(--c-header-bg, var(--pof-header-bg, #327AED));
         min-width: 0;
         width: 100%;
         max-width: 100%;
@@ -1917,8 +1919,9 @@ slideUp
 }
 
 .preview-open-frame__header {
-  /* Bug #1: fallback #327AED khi chưa có --pof-header-bg (SDK/embedded). */
-  background-color: var(--pof-header-bg, #327AED);
+  /* Bug #1: cùng chuỗi fallback với rule mobile ở trên — tránh 2 nguồn màu header.
+     --c-header-bg → --pof-header-bg (SDK/embedded) → #327AED. */
+  background-color: var(--c-header-bg, var(--pof-header-bg, #327AED));
   min-width: 0;
   width: 100%;
   max-width: 100%;

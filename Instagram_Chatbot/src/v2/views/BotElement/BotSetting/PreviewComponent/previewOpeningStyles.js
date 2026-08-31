@@ -72,6 +72,7 @@ export const getOpeningBotStyle = (state, options = {}) => {
       frameClassName: classNames.join(" "),
       cssVars: {
         // Bug #1: embedded/SDK trước đây không set --pof-header-bg → header trong suốt.
+        // CSS đọc --c-header-bg trước, rồi --pof-header-bg; set cả hai để cùng một màu.
         "--pof-header-bg": headerBg,
         "--c-header-bg": headerBg,
         ...(bodyBg ? { "--pof-body-bg": bodyBg } : {}),
@@ -106,7 +107,8 @@ export const getOpeningBotStyle = (state, options = {}) => {
       "--pof-right": right,
       "--pof-width": width,
       "--pof-height": height,
-      // Bug #1 / #6: chatbot đang mở cũng phải set --pof-header-bg (không chỉ preview).
+      // Bug #1 / #6: chatbot đang mở cũng phải set cả hai var (không chỉ preview).
+      // CSS: var(--c-header-bg, var(--pof-header-bg, #327AED)).
       "--pof-header-bg": headerBg,
       "--c-header-bg": headerBg,
       ...(bodyBg ? { "--pof-body-bg": bodyBg } : {}),
