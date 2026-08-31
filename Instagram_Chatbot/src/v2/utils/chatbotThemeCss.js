@@ -342,6 +342,41 @@ const buildTwinkleAnimationRule = (effectId, elementType, theme) => {
   return animation !== 'none' ? `animation: ${animation} !important;` : '';
 };
 
+const buildNativeRadioInputRules = (radioSelectors) => {
+  const selectors = Array.isArray(radioSelectors) ? radioSelectors : [radioSelectors];
+  const baseSelector = selectors.join(',\n');
+  const checkedSelector = selectors.map((selector) => `${selector}:checked`).join(',\n');
+
+  return `
+${baseSelector} {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 19px !important;
+  height: 19px !important;
+  min-width: 19px !important;
+  min-height: 19px !important;
+  margin: 0 !important;
+  flex-shrink: 0 !important;
+  box-sizing: border-box !important;
+  border-radius: 50% !important;
+  background-color: #fff !important;
+  background-image: none !important;
+  border: 2px solid var(--c-radio-input-unselected, #cccccc) !important;
+  box-shadow: none !important;
+  cursor: pointer;
+}
+
+${checkedSelector} {
+  border-color: var(--c-radio-input-selected, #327AED) !important;
+  background-color: #fff !important;
+  background-image: radial-gradient(
+    circle,
+    var(--c-radio-input-selected, #327AED) 38%,
+    #fff 42%
+  ) !important;
+}`;
+};
+
 const buildThemeRules = (theme, scopeSelector = '') => {
   const fieldScopeSelectors = buildFieldScopeSelectors(scopeSelector);
   const spBodySelector = fieldScopeSelectors[0];
@@ -786,15 +821,10 @@ ${scopedClass(scopeSelector, '.theme-customize-preview__radio-img--selected')} {
   ${radioTwinkleAnimation}
 }
 
-${spBodySelector} .ss-message__content--user-radio_button:not(.ss-message__content--user-radio_button--radio_button_img) input[type="radio"],
-${scopedDescendant(scopeSelector, '.theme-customize-preview__radio-default input[type="radio"]')} {
-  accent-color: var(--c-radio-input-selected, #327AED) !important;
-}
-
-${spBodySelector} .ss-message__content--user-radio_button:not(.ss-message__content--user-radio_button--radio_button_img) input[type="radio"]:not(:checked),
-${scopedDescendant(scopeSelector, '.theme-customize-preview__radio-default input[type="radio"]:not(:checked)')} {
-  accent-color: var(--c-radio-input-unselected, #ccc) !important;
-}
+${buildNativeRadioInputRules([
+    `${spBodySelector} .ss-message__content--user-radio_button:not(.ss-message__content--user-radio_button--radio_button_img) input[type="radio"]:not(.ss-radio-button-img-input--hidden)`,
+    scopedDescendant(scopeSelector, '.theme-customize-preview__radio-default input[type="radio"]'),
+  ])}
 
 ${spBodySelector} .ss-message__content--user-radio_button > label,
 ${spBodySelector} .ss-message__content--user-radio_button--block_style > span,

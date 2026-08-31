@@ -566,6 +566,24 @@
   width: 19px;
   height: 19px;
   flex-shrink: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background-color: #fff;
+  background-image: none;
+  border: 2px solid var(--c-radio-input-unselected, #cccccc);
+  box-shadow: none;
+}
+
+.theme-customize-preview__radio-default input[type="radio"]:checked {
+  border-color: var(--c-radio-input-selected, #327AED);
+  background-color: #fff;
+  background-image: radial-gradient(
+    circle,
+    var(--c-radio-input-selected, #327AED) 38%,
+    #fff 42%
+  );
 }
 
 .theme-customize-preview__radio-img {
