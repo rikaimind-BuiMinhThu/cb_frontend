@@ -255,8 +255,8 @@ function VariableManagement() {
         width: 180,
         render: (_, row) => (
           <Space size={4} wrap={false} className="admin-table-actions">
-            <AdminActionButton action="save" size="small" onClick={() => handleSave(row)} />
-            <AdminActionButton action="delete" onClick={() => setDeleteId(row.id)} />
+            <AdminActionButton action="save" label="保存" iconOnly onClick={() => handleSave(row)} />
+            <AdminActionButton action="delete" iconOnly onClick={() => setDeleteId(row.id)} />
           </Space>
         ),
       },
@@ -297,7 +297,7 @@ function VariableManagement() {
     tab === 'user' ? (
       <AdminActionButton
         action="create"
-        label="追加"
+        label="変数追加"
         onClick={() => setAddingNew(true)}
         disabled={addingNew}
       />

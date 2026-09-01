@@ -10,7 +10,7 @@ const DesignSettingLabel = ({
 }) => (
   <span className={className}>
     {children}
-    {required && <span style={{ color: 'red' }}> *</span>}
+    {required && <span className="required-badge">必須</span>}
     {tooltip && <AdminInfoTooltip text={tooltip} />}
   </span>
 );

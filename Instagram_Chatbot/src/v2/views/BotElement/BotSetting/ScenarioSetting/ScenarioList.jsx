@@ -5,7 +5,7 @@ import api from 'api/api-management';
 import Cookies from 'js-cookie';
 import moment from 'moment';
 import { getAdminRoutePath } from 'v2/variables/constants';
-import { AdminPage, AdminConfirmModal, AdminActionButton, useAdminHeaderActions } from '../../../../components/AdminShell';
+import { AdminPage, AdminConfirmModal, AdminActionButton, AdminFormRow, useAdminHeaderActions } from '../../../../components/AdminShell';
 
 function ScenarioList() {
   const history = useHistory();
@@ -168,12 +168,12 @@ function ScenarioList() {
               }}
               actions={[
                 <Link to={getAdminRoutePath('/scenario-setting')} key="edit">
-                  <AdminActionButton action="edit" onClick={() => onclickEditScenario(scenario.id)} />
+                  <AdminActionButton action="edit" iconOnly onClick={() => onclickEditScenario(scenario.id)} />
                 </Link>,
-                <AdminActionButton key="preview" action="preview" onClick={() => onClickPreview(scenario.id)} />,
-                <AdminActionButton key="dup" action="duplicate" onClick={() => handleDuplicationScenario(scenario.id)} />,
+                <AdminActionButton key="preview" action="preview" iconOnly onClick={() => onClickPreview(scenario.id)} />,
+                <AdminActionButton key="dup" action="duplicate" iconOnly onClick={() => handleDuplicationScenario(scenario.id)} />,
                 scenarioSelectedClone !== scenario.id ? (
-                  <AdminActionButton key="del" action="delete" onClick={() => handleDeleteScenario(scenario.id)} />
+                  <AdminActionButton key="del" action="delete" iconOnly onClick={() => handleDeleteScenario(scenario.id)} />
                 ) : null,
               ]}
             >
@@ -212,32 +212,30 @@ function ScenarioList() {
         okText="作成"
         cancelText="キャンセル"
       >
-        <div style={{ marginBottom: 8 }}>
-          <label>シナリオ名</label>
+        <AdminFormRow label="シナリオ名" htmlFor="new-scenario-name">
           <Input
+            id="new-scenario-name"
             value={newScenarioName}
             onChange={(e) => {
               setNewScenarioName(e.target.value);
               checkInputScenarioName(e.target.value);
             }}
-            style={{ marginTop: 8 }}
           />
-          {nameError && <div style={{ color: '#ff4d4f', marginTop: 4 }}>{nameError}</div>}
-        </div>
-        <div style={{ marginBottom: 8 }}>
-          <label>テンプレート（任意）</label>
+          {nameError && <div className="admin-form-error">{nameError}</div>}
+        </AdminFormRow>
+        <AdminFormRow label="テンプレート（任意）">
           <Select
             allowClear
             placeholder="テンプレートなし"
             value={selectedTemplateId}
             onChange={(value) => setSelectedTemplateId(value)}
-            style={{ width: '100%', marginTop: 8 }}
+            style={{ width: '100%' }}
             options={listTemplate.map((template) => ({
               value: template.id,
               label: template.name,
             }))}
           />
-        </div>
+        </AdminFormRow>
         <p style={{ color: '#6b7280', fontSize: 13 }}>※シナリオに任意の名称をつけることができます。</p>
       </Modal>
 

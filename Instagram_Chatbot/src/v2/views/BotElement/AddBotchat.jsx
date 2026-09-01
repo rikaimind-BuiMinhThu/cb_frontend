@@ -281,7 +281,7 @@ console.log();
         action="back"
         onClick={() => { window.location.href = '/v2/admin/bot'; }}
       />
-      <AdminActionButton action="create" label="ボット新規作成" onClick={addNewBotChat} />
+      <AdminActionButton action="create" label="ボット作成" onClick={addNewBotChat} />
     </>
   );
 
@@ -295,7 +295,7 @@ console.log();
                       <div className="field-add-bot">
                         <div className="add-bot_field-container">
                           <span className="label-field">
-                            タイトル <span style={{ color: 'red' }}>*</span>
+                            タイトル <span className="required-badge">必須</span>
                           </span>
                           <input
                             type="text"
@@ -313,7 +313,7 @@ console.log();
                       <div className="field-add-bot">
                         <div className="add-bot_field-container">
                           <span className="label-field">
-                            サブタイトル <span style={{ color: 'red' }}>*</span>
+                            サブタイトル <span className="required-badge">必須</span>
                           </span>
                           <input
                             type="text"
@@ -420,7 +420,7 @@ console.log();
                         <div className="field-add-bot">
                           <div className="add-bot_field-container">
                             <span className="label-field">
-                              ボット名称 <span style={{ color: 'red' }}>*</span>
+                              ボット名称 <span className="required-badge">必須</span>
                             </span>
                             <input
                               type="text"

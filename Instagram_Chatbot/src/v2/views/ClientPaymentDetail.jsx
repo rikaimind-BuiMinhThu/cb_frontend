@@ -440,7 +440,7 @@ function ClientPaymentDetail() {
               ></div>
               <form id="updateForm" className="swap">
                 <div className="label-input">
-                  課金開始日 <span className="span-require">*必須</span>
+                  課金開始日 <span className="required-badge">必須</span>
                   <div style={{ marginTop: "-24px" }}>
                     <DatePicker
                       id="startAt"
@@ -469,7 +469,7 @@ function ClientPaymentDetail() {
                 <br />
                 <br />
                 <div className="label-input">
-                  課金終了日 <span className="span-require">*必須</span>
+                  課金終了日 <span className="required-badge">必須</span>
                   <div style={{ marginTop: "-24px" }}>
                     <DatePicker
                       id="endAt"
@@ -538,7 +538,7 @@ function ClientPaymentDetail() {
                 <div className="label-input">
                   支払日
                   {status === "paid" ? (
-                    <span className="span-require">*必須</span>
+                    <span className="required-badge">必須</span>
                   ) : null}
                   <div style={{ marginTop: "-24px" }}>
                     <DatePicker
@@ -596,7 +596,7 @@ function ClientPaymentDetail() {
               ></div>
               <form id="addForm" className="swap">
                 <div className="label-input">
-                  課金開始日 <span className="span-require">*必須</span>
+                  課金開始日 <span className="required-badge">必須</span>
                   <div style={{ marginTop: "-24px" }}>
                     <DatePicker
                       id="startAt"
@@ -625,7 +625,7 @@ function ClientPaymentDetail() {
                 <br />
                 <br />
                 <div className="label-input">
-                  課金終了日 <span className="span-require">*必須</span>
+                  課金終了日 <span className="required-badge">必須</span>
                   <div style={{ marginTop: "-24px" }}>
                     <DatePicker
                       id="endAt"
@@ -692,7 +692,7 @@ function ClientPaymentDetail() {
                 <div className="label-input">
                   支払日{" "}
                   {status === "paid" ? (
-                    <span className="span-require">*必須</span>
+                    <span className="required-badge">必須</span>
                   ) : null}
                   <div style={{ marginTop: "-24px" }}>
                     <DatePicker

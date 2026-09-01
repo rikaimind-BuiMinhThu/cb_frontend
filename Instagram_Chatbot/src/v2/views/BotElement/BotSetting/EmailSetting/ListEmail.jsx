@@ -76,7 +76,7 @@ function ListEmail() {
   useAdminHeaderActions(
     <AdminActionButton
       action="create"
-      label="新メール追加"
+      label="メール作成"
       onClick={() => { window.location.href = '/v2/admin/create-email'; }}
     />
   );
@@ -143,14 +143,17 @@ function ListEmail() {
                 <Space className="email-list-actions admin-table-actions">
                   <AdminActionButton
                     action="edit"
+                    iconOnly
                     onClick={() => { window.location.href = `/v2/admin/edit-email/${item?.id}`; }}
                   />
                   <AdminActionButton
                     action="duplicate"
+                    iconOnly
                     onClick={() => { setIsOpenDuplicate(true); setIdEmail(item.id); }}
                   />
                   <AdminActionButton
                     action="delete"
+                    iconOnly
                     onClick={() => { setIsOpenDelete(true); setIdEmail(item.id); }}
                   />
                 </Space>

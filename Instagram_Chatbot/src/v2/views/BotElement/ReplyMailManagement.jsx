@@ -114,12 +114,12 @@ function ReplyMailManagement() {
     const nextErrors = { email: '', password: '' };
 
     if (!email) {
-      nextErrors.email = 'これは必須項目です。';
+      nextErrors.email = '入力してください。';
     } else if (!EMAIL_REGEX.test(email)) {
       nextErrors.email = 'メールフォーマットが正しくありません';
     }
     if (!password) {
-      nextErrors.password = 'これは必須項目です。';
+      nextErrors.password = '入力してください。';
     }
     if (nextErrors.email || nextErrors.password) {
       setAddErrors(nextErrors);
@@ -172,12 +172,12 @@ function ReplyMailManagement() {
     const nextErrors = { email: '', password: '' };
 
     if (!email) {
-      nextErrors.email = 'これは必須項目です。';
+      nextErrors.email = '入力してください。';
     } else if (!EMAIL_REGEX.test(email)) {
       nextErrors.email = 'メールフォーマットが正しくありません';
     }
     if (!password) {
-      nextErrors.password = 'これは必須項目です。';
+      nextErrors.password = '入力してください。';
     }
     if (nextErrors.email || nextErrors.password) {
       setRowErrors((prev) => ({ ...prev, [clientId]: nextErrors }));
@@ -261,7 +261,7 @@ function ReplyMailManagement() {
             <AdminActionButton
               action="save"
               label="更新"
-              size="small"
+              iconOnly
               onClick={() => handleUpdateBtnClick(mail.client_id, mail.id)}
             />
           </Space>

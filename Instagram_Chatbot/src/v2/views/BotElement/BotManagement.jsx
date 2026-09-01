@@ -161,7 +161,7 @@ function BotManagement() {
 
   useAdminHeaderActions(
     <Link to="/v2/admin/add-bot-management">
-      <AdminActionButton action="create" label="ボット追加" />
+      <AdminActionButton action="create" label="ボット作成" />
     </Link>
   );
 
@@ -202,18 +202,18 @@ function BotManagement() {
       width: 320,
       render: (_, record) => (
         <Space wrap className="admin-table-actions">
-          <AdminActionButton action="edit" onClick={() => openBotSetting(record.id)} />
-          <AdminActionButton action="duplicate" onClick={() => duplicateBot(record.id)} />
+          <AdminActionButton action="edit" iconOnly onClick={() => openBotSetting(record.id)} />
+          <AdminActionButton action="duplicate" iconOnly onClick={() => duplicateBot(record.id)} />
           <Link
             to={`/v2/admin/demo-bot/${record.id}`}
             onClick={() => Cookies.set('bot_id', `${record.id}`)}
           >
-            <AdminActionButton action="preview" label="デモ" />
+            <AdminActionButton action="preview" label="デモ" iconOnly />
           </Link>
           <Button type="link" size="small" onClick={() => handleStopBot(record.id, record.status)}>
             {record.status === 'off' ? 'ON' : 'OFF'}
           </Button>
-          <AdminActionButton action="delete" onClick={() => handleDeleteBot(record.id)} />
+          <AdminActionButton action="delete" iconOnly onClick={() => handleDeleteBot(record.id)} />
         </Space>
       ),
     },
@@ -271,6 +271,7 @@ function BotManagement() {
           setIsDelete(false);
         }}
         danger={isDelete}
+        cancelText={isDelete ? 'キャンセル' : 'いいえ'}
       />
     </>
   );

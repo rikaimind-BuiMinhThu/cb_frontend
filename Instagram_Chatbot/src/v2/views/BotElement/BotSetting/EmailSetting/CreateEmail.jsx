@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import api from 'api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
-import { AdminPage, AdminActionButton, useAdminHeaderTitle, useAdminHeaderActions } from '../../../../components/AdminShell';
+import { AdminPage, AdminActionButton, AdminFormRow, useAdminHeaderTitle, useAdminHeaderActions } from '../../../../components/AdminShell';
+import { Input } from 'antd';
 import ModalNoti from '../../../Popup/ModalNoti';
 import '../../../../assets/css/bot/email/create-email.css';
 
@@ -323,7 +324,7 @@ function CreateEmail() {
   function checkRequired(emailId, errEmail, lable) {
     if (field(emailId).value === '') {
       field(errEmail).style.display = 'block';
-      field(errEmail).innerHTML = `これは必須項目です。`;
+      field(errEmail).innerHTML = `入力してください。`;
       return false;
     } else {
       field(errEmail).style.display = 'none';
@@ -381,7 +382,7 @@ function CreateEmail() {
       {mailAction === false ? (
         <AdminActionButton action="save" onClick={(e) => saveEmail(e)} />
       ) : (
-        <AdminActionButton action="create" label="追加" onClick={(e) => addEmail(e)} />
+        <AdminActionButton action="create" label="作成" onClick={(e) => addEmail(e)} />
       )}
     </>
   );
@@ -389,150 +390,98 @@ function CreateEmail() {
   return (
     <>
       <AdminPage>
-        <div className="email-form-page">
+        <div className="admin-page-body">
           <form id="create-email-form">
-                  <div className="field-container">
-                    <span className="field-lable">
-                      テンプレート名 <span style={{ color: 'red' }}>*</span>
-                    </span>
-                    <div className="field-input">
-                      <input
-                        className="ce_input"
-                        id="email_template_name"
-                        defaultValue={
-                          mailAction == false ? detailEmail?.email.email_template_name : ''
-                        }
-                        type="text"
-                        placeholder="テンプレート名は、必ず指定してください。"
-                        name="email_template_name"
-                        onChange={() =>
-                          checkRequired('email_template_name', 'errEmailName', 'Emailtemplate name')
-                        }
-                        onBlur={() =>
-                          checkRequired('email_template_name', 'errEmailName', 'Emailtemplate name')
-                        }
-                      ></input>
-                      <span id="errEmailName" className="err-email-format"></span>
-                    </div>
-                  </div>
+            <AdminFormRow label="テンプレート名" required htmlFor="email_template_name">
+              <Input
+                id="email_template_name"
+                defaultValue={mailAction == false ? detailEmail?.email.email_template_name : ''}
+                placeholder="テンプレート名は、必ず指定してください。"
+                name="email_template_name"
+                onChange={() =>
+                  checkRequired('email_template_name', 'errEmailName', 'Emailtemplate name')
+                }
+                onBlur={() =>
+                  checkRequired('email_template_name', 'errEmailName', 'Emailtemplate name')
+                }
+              />
+              <span id="errEmailName" className="admin-form-error" />
+            </AdminFormRow>
 
-                  <div className="field-container">
-                    <span className="field-lable">差出人</span>
-                    <div className="field-input">
-                      <input
-                        className="ce_input"
-                        id="sender_name"
-                        type="text"
-                        defaultValue={mailAction == false ? detailEmail?.email.sender_name : ''}
-                        placeholder="差出人は、必ず指定してください。"
-                        name="sender_name"
-                      ></input>
-                      <span id="errEmailSender" className="err-email-format"></span>
-                    </div>
-                  </div>
+            <AdminFormRow label="差出人" htmlFor="sender_name">
+              <Input
+                id="sender_name"
+                defaultValue={mailAction == false ? detailEmail?.email.sender_name : ''}
+                placeholder="差出人は、必ず指定してください。"
+                name="sender_name"
+              />
+              <span id="errEmailSender" className="admin-form-error" />
+            </AdminFormRow>
 
-                  <div className="field-container">
-                    <span className="field-lable">
-                      TO <span style={{ color: 'red' }}>*</span>
-                    </span>
-                    <div className="field-input">
-                      <input
-                        className="ce_input"
-                        id="to"
-                        type="text"
-                        defaultValue={mailAction == false ? detailEmail?.email.to : ''}
-                        placeholder="no-reply@ec-chatbot.com"
-                        name="to"
-                        onChange={() => checkTo('to', 'errEmailTo', '宛先')}
-                        onBlur={() => checkTo('to', 'errEmailTo', '宛先')}
-                      ></input>
-                      <span id="errEmailTo" className="err-email-format"></span>
-                    </div>
-                  </div>
+            <AdminFormRow label="TO" required htmlFor="to">
+              <Input
+                id="to"
+                defaultValue={mailAction == false ? detailEmail?.email.to : ''}
+                placeholder="no-reply@ec-chatbot.com"
+                name="to"
+                onChange={() => checkTo('to', 'errEmailTo', '宛先')}
+                onBlur={() => checkTo('to', 'errEmailTo', '宛先')}
+              />
+              <span id="errEmailTo" className="admin-form-error" />
+            </AdminFormRow>
 
-                  <div className="field-container">
-                    <span className="field-lable">CC</span>
-                    <div className="field-input-cc">
-                      <div id="list-cc"></div>
-                      <input
-                        className="ce_input"
-                        id="cc"
-                        type="text"
-                        placeholder="no-reply@ec-chatbot.com"
-                        onKeyUp={(e) => addCC(e)}
-                      ></input>
-                      {/* <textarea className='textarea-email' placeholder='no-reply@botchan.chat' name='cc'></textarea> */}
-                      <span id="errCcMail" className="err-email-format"></span>
-                    </div>
-                  </div>
+            <AdminFormRow label="CC" htmlFor="cc" alignTop>
+              <div id="list-cc" />
+              <Input
+                id="cc"
+                placeholder="no-reply@ec-chatbot.com"
+                onKeyUp={(e) => addCC(e)}
+              />
+              <span id="errCcMail" className="admin-form-error" />
+            </AdminFormRow>
 
-                  <div className="field-container">
-                    <span className="field-lable">BCC（同報）</span>
-                    <div className="field-input-cc">
-                      <div id="list-bcc"></div>
-                      <input
-                        className="ce_input"
-                        id="bcc"
-                        type="text"
-                        placeholder="no-reply@botchan.chat"
-                        onKeyUp={(e) => addBCC(e)}
-                      ></input>
-                      {/* <textarea className='textarea-email' placeholder='no-reply@botchan.chat' name='bcc'></textarea> */}
-                      <span id="errBccMail" className="err-email-format"></span>
-                    </div>
-                  </div>
+            <AdminFormRow label="BCC（同報）" htmlFor="bcc" alignTop>
+              <div id="list-bcc" />
+              <Input
+                id="bcc"
+                placeholder="no-reply@botchan.chat"
+                onKeyUp={(e) => addBCC(e)}
+              />
+              <span id="errBccMail" className="admin-form-error" />
+            </AdminFormRow>
 
-                  <div className="field-container">
-                    <span className="field-lable">Reply-To</span>
-                    <div className="field-input">
-                      <input
-                        className="ce_input"
-                        type="text"
-                        defaultValue={mailAction == false ? detailEmail?.email.reply_to : ''}
-                        placeholder="no-reply@ec-chatbot.com"
-                        name="reply_to"
-                      ></input>
-                    </div>
-                  </div>
+            <AdminFormRow label="Reply-To">
+              <Input
+                defaultValue={mailAction == false ? detailEmail?.email.reply_to : ''}
+                placeholder="no-reply@ec-chatbot.com"
+                name="reply_to"
+              />
+            </AdminFormRow>
 
-                  <div className="field-container">
-                    <span className="field-lable">
-                      件名<span style={{ color: 'red' }}>*</span>
-                    </span>
-                    <div className="field-input">
-                      <input
-                        className="ce_input"
-                        id="subject"
-                        type="text"
-                        defaultValue={mailAction == false ? detailEmail?.email.subject : ''}
-                        placeholder="件名は、必ず指定してください。"
-                        name="subject"
-                        onChange={() => checkRequired('subject', 'errSubject', 'Subject')}
-                        onBlur={() => checkRequired('subject', 'errSubject', 'Subject')}
-                      ></input>
-                      <span id="errSubject" className="err-email-format"></span>
-                    </div>
-                  </div>
+            <AdminFormRow label="件名" required htmlFor="subject">
+              <Input
+                id="subject"
+                defaultValue={mailAction == false ? detailEmail?.email.subject : ''}
+                placeholder="件名は、必ず指定してください。"
+                name="subject"
+                onChange={() => checkRequired('subject', 'errSubject', 'Subject')}
+                onBlur={() => checkRequired('subject', 'errSubject', 'Subject')}
+              />
+              <span id="errSubject" className="admin-form-error" />
+            </AdminFormRow>
 
-                  <div className="field-container">
-                    <span className="field-lable">
-                      メール内容<span style={{ color: 'red' }}>*</span>
-                    </span>
-                    <div className="field-input">
-                      <textarea
-                        className="ce_textArea"
-                        id="text"
-                        cols="10"
-                        rows="7"
-                        defaultValue={mailAction == false ? detailEmail?.email.content : ''}
-                        placeholder="メール内容は、必ず指定してください。"
-                        name="content"
-                        onChange={() => checkRequired('text', 'errText', 'Text')}
-                        onBlur={() => checkRequired('text', 'errText', 'Text')}
-                      ></textarea>
-                      <span id="errText" className="err-email-format"></span>
-                    </div>
-                  </div>
+            <AdminFormRow label="メール内容" required htmlFor="text" alignTop>
+              <Input.TextArea
+                id="text"
+                rows={7}
+                defaultValue={mailAction == false ? detailEmail?.email.content : ''}
+                placeholder="メール内容は、必ず指定してください。"
+                name="content"
+                onChange={() => checkRequired('text', 'errText', 'Text')}
+                onBlur={() => checkRequired('text', 'errText', 'Text')}
+              />
+              <span id="errText" className="admin-form-error" />
+            </AdminFormRow>
           </form>
         </div>
 

@@ -258,17 +258,16 @@ export default function SavePushMessageDialog({
       {!item && (
         <AdminActionButton
           action="create"
-          label="追加"
-          style={{ minWidth: "100px" }}
+          label="プッシュメッセージ作成"
           onClick={handleClickOpen}
         />
       )}
       <Modal
         style={{ top: 20 }}
-        title="プッシュメッセージ追加"
+        title="プッシュメッセージ作成"
         open={open}
         okText="保存"
-        cancelText="閉じる"
+        cancelText="キャンセル"
         onCancel={handleClose}
         onOk={handleSubmit(onSubmit)}
         onClose={handleClose}

@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button } from 'antd';
+import { Button, Tooltip } from 'antd';
 import {
+  ArrowLeftOutlined,
+  CloseOutlined,
   CopyOutlined,
   DeleteOutlined,
   DollarOutlined,
@@ -57,12 +59,12 @@ const ACTION_CONFIG = {
   back: {
     label: '戻る',
     type: 'default',
-    icon: null,
+    icon: <ArrowLeftOutlined />,
   },
   cancel: {
     label: 'キャンセル',
     type: 'default',
-    icon: null,
+    icon: <CloseOutlined />,
   },
   delete: {
     label: '削除',
@@ -89,25 +91,42 @@ const ACTION_CONFIG = {
   },
 };
 
-function AdminActionButton({ action, label, className, icon: _ignoredIcon, ...rest }) {
+function AdminActionButton({
+  action,
+  label,
+  className,
+  icon: _ignoredIcon,
+  iconOnly = false,
+  ...rest
+}) {
   const config = ACTION_CONFIG[action];
 
   if (!config) {
     return null;
   }
 
-  return (
+  const resolvedLabel = label || config.label;
+  const classes = [className, iconOnly && 'admin-action-button--icon-only'].filter(Boolean).join(' ');
+
+  const button = (
     <Button
       type={config.type}
       size={config.size}
       danger={config.danger}
       icon={config.icon}
-      className={className}
+      className={classes}
+      aria-label={iconOnly ? resolvedLabel : undefined}
       {...rest}
     >
-      {label ?? config.label}
+      {iconOnly ? null : resolvedLabel}
     </Button>
   );
+
+  if (iconOnly) {
+    return <Tooltip title={resolvedLabel}>{button}</Tooltip>;
+  }
+
+  return button;
 }
 
 AdminActionButton.propTypes = {
@@ -115,6 +134,7 @@ AdminActionButton.propTypes = {
   label: PropTypes.string,
   className: PropTypes.string,
   icon: PropTypes.node,
+  iconOnly: PropTypes.bool,
 };
 
 export default AdminActionButton;

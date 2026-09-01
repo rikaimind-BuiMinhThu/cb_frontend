@@ -102,7 +102,7 @@ function SpecifyGatewaySection({
                     <span className="payment-error-text" id={`err_specifypgw_gw${i}`} />
                   </div>
                   {i > 0 && (
-                    <AdminActionButton action="delete" label="" onClick={() => onDelete(i)} />
+                    <AdminActionButton action="delete" iconOnly onClick={() => onDelete(i)} />
                   )}
                 </div>
               ))}

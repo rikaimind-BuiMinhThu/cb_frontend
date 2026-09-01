@@ -6,12 +6,12 @@ function ClientManagementActions({ item, onPayment, onView, onEdit, onDelete }) 
     <Space size={0} className="admin-table-actions admin-table-actions--client">
       <AdminActionButton
         action="payment"
-        title="Payment History"
+        iconOnly
         onClick={() => onPayment(item)}
       />
-      <AdminActionButton action="preview" label="詳細" onClick={() => onView(item)} />
-      <AdminActionButton action="edit" onClick={() => onEdit(item)} />
-      <AdminActionButton action="delete" onClick={() => onDelete(item.id)} />
+      <AdminActionButton action="preview" label="詳細" iconOnly onClick={() => onView(item)} />
+      <AdminActionButton action="edit" iconOnly onClick={() => onEdit(item)} />
+      <AdminActionButton action="delete" iconOnly onClick={() => onDelete(item.id)} />
     </Space>
   );
 }

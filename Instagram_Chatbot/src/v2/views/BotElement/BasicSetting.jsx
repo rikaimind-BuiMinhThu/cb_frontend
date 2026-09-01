@@ -1,5 +1,6 @@
 import React from 'react';
-import { AdminPage, AdminActionButton, useAdminHeaderActions } from '../../components/AdminShell';
+import { AdminPage, AdminActionButton, AdminFormRow, useAdminHeaderActions } from '../../components/AdminShell';
+import { Input } from 'antd';
 import './../../assets/css/basic_setting.css';
 import * as utils from './../../JS/validate.js';
 import Cookies from 'js-cookie';
@@ -211,247 +212,172 @@ function BasicSetting() {
     <>
       <AdminPage>
         <div className="admin-page-body">
-                <form id="form-basic-setting">
-                  <div className="bs-field-container">
-                    <span className="bs-field-lable">
-                      氏名 <span style={{ color: 'red' }}>*</span>
-                    </span>
-                    <div className="bs-field-input">
-                      <input
-                        className="bs-field-input-item"
-                        id="fullname"
-                        type="text"
-                        placeholder="必ず入力してください ..."
-                        name="full_name"
-                        defaultValue={userDetail.full_name}
-                        onChange={() => utils.checkInput('fullname', 'errFullname', '氏名')}
-                      ></input>
-                      <span id="errFullname" className="bs-err-format"></span>
-                    </div>
-                  </div>
+          <form id="form-basic-setting">
+            <AdminFormRow label="氏名" required htmlFor="fullname">
+              <Input
+                id="fullname"
+                placeholder="必ず入力してください ..."
+                name="full_name"
+                defaultValue={userDetail.full_name}
+                onChange={() => utils.checkInput('fullname', 'errFullname', '氏名')}
+              />
+              <span id="errFullname" className="admin-form-error" />
+            </AdminFormRow>
 
-                  <div className="bs-field-container">
-                    <span className="bs-field-lable">事業区分</span>
-                    <div className="bs-field-input">
-                      <select
-                        className="bs-field-input-select"
-                        name="business_division"
-                        value={division}
-                        onChange={(e) => setDivision(e.target.value)}
-                      >
-                        <option value="sole_proprietorship">個人事業</option>
-                        <option value="corporation">法人</option>
-                      </select>
-                    </div>
-                  </div>
+            <AdminFormRow label="事業区分" htmlFor="business_division">
+              <select
+                className="admin-native-select"
+                id="business_division"
+                name="business_division"
+                value={division}
+                onChange={(e) => setDivision(e.target.value)}
+              >
+                <option value="sole_proprietorship">個人事業</option>
+                <option value="corporation">法人</option>
+              </select>
+            </AdminFormRow>
 
-                  <div className="bs-field-container">
-                    <span className="bs-field-lable">
-                      企業名<span style={{ color: 'red' }}>*</span>
-                    </span>
-                    <div className="bs-field-input">
-                      <input
-                        className="bs-field-input-item"
-                        id="companyName"
-                        type="text"
-                        placeholder="必ず入力してください ..."
-                        name="company_name"
-                        defaultValue={userDetail.company_name}
-                        onChange={() => utils.checkInput('companyName', 'errCompanyname', '企業名')}
-                      ></input>
-                      <span id="errCompanyname" className="bs-err-format"></span>
-                    </div>
-                  </div>
+            <AdminFormRow label="企業名" required htmlFor="companyName">
+              <Input
+                id="companyName"
+                placeholder="必ず入力してください ..."
+                name="company_name"
+                defaultValue={userDetail.company_name}
+                onChange={() => utils.checkInput('companyName', 'errCompanyname', '企業名')}
+              />
+              <span id="errCompanyname" className="admin-form-error" />
+            </AdminFormRow>
 
-                  <div className="bs-field-container">
-                    <span className="bs-field-lable">部署</span>
-                    <div className="bs-field-input">
-                      <input
-                        className="bs-field-input-item"
-                        id="department"
-                        type="text"
-                        placeholder="必ず入力してください ..."
-                        name="department"
-                        defaultValue={userDetail.department}
-                        onChange={() =>
-                          utils.checkMaxLength('department', 'errDepartment', '部署', 50)
-                        }
-                      ></input>
-                      <span id="errDepartment" className="bs-err-format"></span>
-                    </div>
-                  </div>
+            <AdminFormRow label="部署" htmlFor="department">
+              <Input
+                id="department"
+                placeholder="必ず入力してください ..."
+                name="department"
+                defaultValue={userDetail.department}
+                onChange={() => utils.checkMaxLength('department', 'errDepartment', '部署', 50)}
+              />
+              <span id="errDepartment" className="admin-form-error" />
+            </AdminFormRow>
 
-                  <div className="bs-field-container">
-                    <span className="bs-field-lable">役職</span>
-                    <div className="bs-field-input">
-                      <input
-                        className="bs-field-input-item"
-                        id="job_title"
-                        type="text"
-                        placeholder="必ず入力してください ..."
-                        name="job_title"
-                        defaultValue={userDetail.job_title}
-                        onChange={() =>
-                          utils.checkMaxLength('job_title', 'errPosition', '役職', 50)
-                        }
-                      ></input>
-                      <span id="errPosition" className="bs-err-format"></span>
-                    </div>
-                  </div>
+            <AdminFormRow label="役職" htmlFor="job_title">
+              <Input
+                id="job_title"
+                placeholder="必ず入力してください ..."
+                name="job_title"
+                defaultValue={userDetail.job_title}
+                onChange={() => utils.checkMaxLength('job_title', 'errPosition', '役職', 50)}
+              />
+              <span id="errPosition" className="admin-form-error" />
+            </AdminFormRow>
 
-                  <div className="bs-field-container">
-                    <span className="bs-field-lable">
-                      メールアドレス {isAdminDeel && <span style={{ color: 'red' }}>*</span>}
-                    </span>
-                    <div className="bs-field-input">
-                      <input
-                        className="bs-field-input-item"
-                        id="emailAddress"
-                        type="text"
-                        placeholder="必ず入力してください ..."
-                        name="email"
-                        defaultValue={userDetail.email}
-                        onChange={() =>
-                          utils.checkEmailRequired(
-                            'emailAddress',
-                            'errEmailAddress',
-                            'メールアドレス'
-                          )
-                        }
-                        readOnly={isAdminDeel ? false : true}
-                        style={{ color: isAdminDeel ? 'inherit' : '#aaa' }}
-                      ></input>
-                      <span id="errEmailAddress" className="bs-err-format"></span>
-                      {!isAdminDeel && (
-                        <span className="bs-err-format">
-                          登録したメールアドレスを編集権限がありません。管理者へ連絡してください！
-                        </span>
-                      )}
-                    </div>
-                  </div>
+            <AdminFormRow label="メールアドレス" required={isAdminDeel} htmlFor="emailAddress">
+              <Input
+                id="emailAddress"
+                placeholder="必ず入力してください ..."
+                name="email"
+                defaultValue={userDetail.email}
+                onChange={() =>
+                  utils.checkEmailRequired('emailAddress', 'errEmailAddress', 'メールアドレス')
+                }
+                readOnly={!isAdminDeel}
+              />
+              <span id="errEmailAddress" className="admin-form-error" />
+              {!isAdminDeel && (
+                <div className="admin-form-row-hint">
+                  登録したメールアドレスを編集権限がありません。管理者へ連絡してください！
+                </div>
+              )}
+            </AdminFormRow>
 
-                  <div className="bs-field-container">
-                    <span className="bs-field-lable">
-                      電話番号<span style={{ color: 'red' }}>*</span>
-                    </span>
-                    <div className="bs-field-input">
-                      <input
-                        className="bs-field-input-item"
-                        id="phone_number"
-                        type="number"
-                        placeholder="必ず入力してください ..."
-                        name="phone_number"
-                        defaultValue={userDetail.phone_number}
-                        onChange={() => utils.checkTel('phone_number', 'errPhone', '電話番号')}
-                      ></input>
-                      <span id="errPhone" className="bs-err-format"></span>
-                    </div>
-                  </div>
+            <AdminFormRow label="電話番号" required htmlFor="phone_number">
+              <Input
+                id="phone_number"
+                type="number"
+                placeholder="必ず入力してください ..."
+                name="phone_number"
+                defaultValue={userDetail.phone_number}
+                onChange={() => utils.checkTel('phone_number', 'errPhone', '電話番号')}
+              />
+              <span id="errPhone" className="admin-form-error" />
+            </AdminFormRow>
 
-                  <div className="bs-field-container">
-                    <span className="bs-field-lable">郵便番号</span>
-                    <div className="bs-field-input">
-                      <input
-                        className="bs-field-input-item"
-                        id="post_code"
-                        type="number"
-                        placeholder="必ず入力してください ..."
-                        name="post_code"
-                        defaultValue={userDetail.post_code}
-                      ></input>
-                      <span id="errPostCost" className="bs-err-format"></span>
-                    </div>
-                  </div>
+            <AdminFormRow label="郵便番号" htmlFor="post_code">
+              <Input
+                id="post_code"
+                type="number"
+                placeholder="必ず入力してください ..."
+                name="post_code"
+                defaultValue={userDetail.post_code}
+              />
+              <span id="errPostCost" className="admin-form-error" />
+            </AdminFormRow>
 
-                  <div className="bs-field-container">
-                    <span className="bs-field-lable">
-                      住所<span style={{ color: 'red' }}>*</span>
-                    </span>
-                    <div className="bs-field-input">
-                      <input
-                        className="bs-field-input-item"
-                        id="address"
-                        type="text"
-                        placeholder="必ず入力してください ..."
-                        name="address"
-                        defaultValue={userDetail.address}
-                        onChange={() => utils.checkInput('address', 'errAddress', '住所')}
-                      ></input>
-                      <span id="errAddress" className="bs-err-format"></span>
-                    </div>
-                  </div>
-                  <div className="bs-field-container">
-                    <span className="bs-field-lable">言語</span>
-                    <div className="bs-field-input">
-                      <select
-                        className="bs-field-input-select"
-                        name="language"
-                        value={language}
-                        onChange={(e) => setLanguage(e.target.value)}
-                      >
-                        <option value="japanese">日本</option>
-                        <option value="english">英語</option>
-                        <option value="vietnamese">ベトナム語</option>
-                        <option value="chinese">中国人</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div className="bs-field-container">
-                    <span className="bs-field-lable">URL</span>
-                    <div className="bs-field-input">
-                      <input
-                        className="bs-field-input-item"
-                        id="url"
-                        type="text"
-                        placeholder="必ず入力してください ..."
-                        name="url"
-                        defaultValue={userDetail.url}
-                        onChange={() => utils.checkUrl('url', 'errUrl', 'URL')}
-                      ></input>
-                      <span id="errUrl" className="bs-err-format"></span>
-                    </div>
-                  </div>
-                </form>
+            <AdminFormRow label="住所" required htmlFor="address">
+              <Input
+                id="address"
+                placeholder="必ず入力してください ..."
+                name="address"
+                defaultValue={userDetail.address}
+                onChange={() => utils.checkInput('address', 'errAddress', '住所')}
+              />
+              <span id="errAddress" className="admin-form-error" />
+            </AdminFormRow>
 
-                {clientId && (
-                  <>
-                    <div className="bs-field-container">
-                      <span className="bs-field-lable">メール送信用Gmail</span>
-                      <div className="bs-field-input">
-                        <input
-                          className="bs-field-input-item"
-                          id="replySmtpGmail"
-                          type="text"
-                          placeholder="example@gmail.com"
-                          value={replySmtpGmail}
-                          onChange={(e) => setReplySmtpGmail(e.target.value)}
-                          autoComplete="off"
-                        ></input>
-                        <span id="errReplySmtpGmail" className="bs-err-format"></span>
-                      </div>
-                    </div>
-                    <div className="bs-field-container">
-                      <span className="bs-field-lable">メール送信用アプリパスワード</span>
-                      <div className="bs-field-input">
-                        <input
-                          className="bs-field-input-item"
-                          id="replySmtpGmailAppPassword"
-                          type="password"
-                          placeholder={
-                            hasReplySmtpPassword ? '設定済み（変更する場合のみ入力）' : ''
-                          }
-                          value={replySmtpGmailAppPassword}
-                          onChange={(e) => setReplySmtpGmailAppPassword(e.target.value)}
-                          autoComplete="new-password"
-                        ></input>
-                        <div style={{ fontSize: '12px', color: '#767676', marginTop: '4px' }}>
-                          Gmailの2段階認証で発行したアプリパスワードを入力してください
-                        </div>
-                        <span id="errReplySmtpPassword" className="bs-err-format"></span>
-                      </div>
-                    </div>
-                  </>
-                )}
+            <AdminFormRow label="言語" htmlFor="language">
+              <select
+                className="admin-native-select"
+                id="language"
+                name="language"
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+              >
+                <option value="japanese">日本</option>
+                <option value="english">英語</option>
+                <option value="vietnamese">ベトナム語</option>
+                <option value="chinese">中国人</option>
+              </select>
+            </AdminFormRow>
+
+            <AdminFormRow label="URL" htmlFor="url">
+              <Input
+                id="url"
+                placeholder="必ず入力してください ..."
+                name="url"
+                defaultValue={userDetail.url}
+                onChange={() => utils.checkUrl('url', 'errUrl', 'URL')}
+              />
+              <span id="errUrl" className="admin-form-error" />
+            </AdminFormRow>
+          </form>
+
+          {clientId && (
+            <>
+              <AdminFormRow label="メール送信用Gmail" htmlFor="replySmtpGmail">
+                <Input
+                  id="replySmtpGmail"
+                  placeholder="example@gmail.com"
+                  value={replySmtpGmail}
+                  onChange={(e) => setReplySmtpGmail(e.target.value)}
+                  autoComplete="off"
+                />
+                <span id="errReplySmtpGmail" className="admin-form-error" />
+              </AdminFormRow>
+              <AdminFormRow
+                label="メール送信用アプリパスワード"
+                htmlFor="replySmtpGmailAppPassword"
+                hint="Gmailの2段階認証で発行したアプリパスワードを入力してください"
+              >
+                <Input.Password
+                  id="replySmtpGmailAppPassword"
+                  placeholder={hasReplySmtpPassword ? '設定済み（変更する場合のみ入力）' : ''}
+                  value={replySmtpGmailAppPassword}
+                  onChange={(e) => setReplySmtpGmailAppPassword(e.target.value)}
+                  autoComplete="new-password"
+                />
+                <span id="errReplySmtpPassword" className="admin-form-error" />
+              </AdminFormRow>
+            </>
+          )}
         </div>
 
         <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>

@@ -168,8 +168,8 @@ const PushMessageList = ({ tick }) => {
                 配信する
               </Button>
             )}
-            <AdminActionButton action="edit" onClick={() => setUpdateItem(row)} />
-            <AdminActionButton action="delete" onClick={() => setDeleteId(row.id)} />
+            <AdminActionButton action="edit" iconOnly onClick={() => setUpdateItem(row)} />
+            <AdminActionButton action="delete" iconOnly onClick={() => setDeleteId(row.id)} />
           </Space>
         ),
       },

@@ -51,18 +51,24 @@ export default function CreateSmsTemplateDialog({ botId, resolver }) {
 
   return (
     <>
-      <AdminActionButton action="create" label="追加" onClick={handleClickOpen} />
+      <AdminActionButton action="create" label="SMS作成" onClick={handleClickOpen} />
       <Modal
         title="SMS作成"
         open={open}
         onCancel={handleClose}
         onOk={handleSubmit(onSubmit)}
         okText="保存"
-        cancelText="閉じる"
+        cancelText="キャンセル"
         confirmLoading={isSubmitting}
         width={520}
       >
-        <Form layout="vertical">
+        <Form
+          layout="horizontal"
+          colon={false}
+          labelAlign="left"
+          labelCol={{ flex: '0 0 140px' }}
+          wrapperCol={{ flex: 1 }}
+        >
           <Form.Item
             label="テンプレート名"
             validateStatus={errors?.name ? 'error' : ''}

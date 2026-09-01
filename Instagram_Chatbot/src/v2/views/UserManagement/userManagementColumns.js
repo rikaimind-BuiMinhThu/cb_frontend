@@ -19,8 +19,8 @@ export function createUserColumns({ onEdit, onDelete }) {
       width: 140,
       render: (_, item) => (
         <Space className="admin-table-actions">
-          <AdminActionButton action="edit" onClick={() => onEdit(item)} />
-          <AdminActionButton action="delete" onClick={() => onDelete(item.id)} />
+          <AdminActionButton action="edit" iconOnly onClick={() => onEdit(item)} />
+          <AdminActionButton action="delete" iconOnly onClick={() => onDelete(item.id)} />
         </Space>
       ),
     },

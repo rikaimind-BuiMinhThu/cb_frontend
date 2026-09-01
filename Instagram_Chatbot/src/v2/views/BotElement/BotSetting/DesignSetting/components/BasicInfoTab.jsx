@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Select, Space, Typography } from 'antd';
-import { AdminActionButton } from '../../../../../components/AdminShell';
 import DesignBotIcons from '../DesignSettingComponents/DesignBotIcons';
 import InputNum from '../../ScenarioSetting/scenarioComon/InputNum';
 import {
@@ -182,9 +181,6 @@ const BasicInfoTab = ({
               images={DEFAULT_IMAGES}
               onIconClick={onIconClick}
             />
-          </div>
-          <div className="btn-wrapper admin-form-actions">
-            <AdminActionButton action="save" onClick={onSave} />
           </div>
         </div>
         <div className="bot-right">

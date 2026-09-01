@@ -114,7 +114,7 @@ function PlanManagement() {
         width: 100,
         render: (_, item) => (
           <Space className="admin-table-actions">
-            <AdminActionButton action="edit" onClick={() => openEdit(item)} />
+            <AdminActionButton action="edit" iconOnly onClick={() => openEdit(item)} />
           </Space>
         ),
       },
@@ -144,7 +144,14 @@ function PlanManagement() {
         width={520}
         destroyOnClose
       >
-        <Form form={form} layout="vertical">
+        <Form
+          form={form}
+          layout="horizontal"
+          colon={false}
+          labelAlign="left"
+          labelCol={{ flex: '0 0 140px' }}
+          wrapperCol={{ flex: 1 }}
+        >
           <Form.Item label="プラン名称" name="name" rules={[{ required: true, message: 'プラン名称 を入力してください。' }]}>
             <Input disabled />
           </Form.Item>

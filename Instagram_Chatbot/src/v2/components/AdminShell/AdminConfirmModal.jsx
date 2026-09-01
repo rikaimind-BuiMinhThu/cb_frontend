@@ -6,26 +6,28 @@ function AdminConfirmModal({
   visible,
   title = '確認',
   message,
-  okText = 'はい',
-  cancelText = 'いいえ',
+  okText,
+  cancelText = 'キャンセル',
   onOk,
   onCancel,
   danger = false,
   loading = false,
 }) {
+  const resolvedOkText = okText ?? (danger ? '削除' : 'はい');
+
   return (
     <Modal
       title={title}
       open={open ?? visible}
       onOk={onOk}
       onCancel={onCancel}
-      okText={okText}
+      okText={resolvedOkText}
       cancelText={cancelText}
       okButtonProps={{ danger, loading }}
       centered
       width={400}
     >
-      <p style={{ margin: 0, color: '#374151' }}>{message}</p>
+      <p className="admin-confirm-modal-message">{message}</p>
     </Modal>
   );
 }

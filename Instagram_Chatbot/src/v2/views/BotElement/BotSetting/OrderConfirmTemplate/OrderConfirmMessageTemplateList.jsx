@@ -4,7 +4,7 @@ import { Input, List, Modal, message } from 'antd';
 import Cookies from 'js-cookie';
 import moment from 'moment';
 import api from 'api/api-management';
-import { AdminPage, AdminConfirmModal, AdminActionButton, useAdminHeaderActions } from '../../../../components/AdminShell';
+import { AdminPage, AdminConfirmModal, AdminActionButton, AdminFormRow, useAdminHeaderActions } from '../../../../components/AdminShell';
 
 function OrderConfirmMessageTemplateList() {
   const [isOpenCreateTemplate, setIsOpenCreateTemplate] = useState(false);
@@ -105,9 +105,9 @@ function OrderConfirmMessageTemplateList() {
               }}
               actions={[
                 <Link to="/v2/admin/order-confirm-template-setting" key="edit">
-                  <AdminActionButton action="edit" onClick={() => onclickEditTemplate(template.id)} />
+                  <AdminActionButton action="edit" iconOnly onClick={() => onclickEditTemplate(template.id)} />
                 </Link>,
-                <AdminActionButton key="del" action="delete" onClick={() => handleDeleteTemplate(template.id)} />,
+                <AdminActionButton key="del" action="delete" iconOnly onClick={() => handleDeleteTemplate(template.id)} />,
               ]}
             >
               <List.Item.Meta
@@ -131,18 +131,17 @@ function OrderConfirmMessageTemplateList() {
         okText="作成"
         cancelText="キャンセル"
       >
-        <div style={{ marginBottom: 8 }}>
-          <label>テンプレート名</label>
+        <AdminFormRow label="テンプレート名" htmlFor="new-order-template-name">
           <Input
+            id="new-order-template-name"
             value={newTemplateName}
             onChange={(e) => {
               setNewTemplateName(e.target.value);
               checkInputTemplateName(e.target.value);
             }}
-            style={{ marginTop: 8 }}
           />
-          {nameError && <div style={{ color: '#ff4d4f', marginTop: 4 }}>{nameError}</div>}
-        </div>
+          {nameError && <div className="admin-form-error">{nameError}</div>}
+        </AdminFormRow>
         <p style={{ color: '#6b7280', fontSize: 13 }}>※テンプレートに任意の名称をつけることができます。</p>
       </Modal>
 

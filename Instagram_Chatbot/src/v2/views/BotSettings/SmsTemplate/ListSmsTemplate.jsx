@@ -95,8 +95,8 @@ const ListSmsTemplate = () => {
       width: 200,
       render: (_, row) => (
         <Space className="admin-table-actions">
-          <AdminActionButton action="edit" onClick={() => handleOpenUpdateDialog(row.id)} />
-          <AdminActionButton action="delete" onClick={() => handleOpenDeleteDialog(row.id)} />
+          <AdminActionButton action="edit" iconOnly onClick={() => handleOpenUpdateDialog(row.id)} />
+          <AdminActionButton action="delete" iconOnly onClick={() => handleOpenDeleteDialog(row.id)} />
         </Space>
       ),
     },

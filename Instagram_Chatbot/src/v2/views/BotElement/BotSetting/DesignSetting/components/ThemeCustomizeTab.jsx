@@ -1,6 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { AdminActionButton } from '../../../../../components/AdminShell';
 import { THEME_SECTIONS } from '../constants/designThemeConstants';
 import ThemeAccordionSection from './ThemeAccordionSection';
 import ThemeCustomizePreview from './ThemeCustomizePreview';
@@ -102,9 +101,6 @@ const ThemeCustomizeTab = ({
                 />
               </div>
             ))}
-          </div>
-          <div className="theme-customize-tab-settings__footer admin-form-actions">
-            <AdminActionButton action="save" label="設定保存" onClick={onSave} />
           </div>
         </div>
       </div>

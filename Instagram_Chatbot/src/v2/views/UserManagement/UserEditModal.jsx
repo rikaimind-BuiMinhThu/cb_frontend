@@ -45,7 +45,14 @@ function UserEditModal({ open, onClose, listClient, editingUser, onSubmit }) {
         </div>
       }
     >
-      <Form form={form} layout="vertical">
+      <Form
+        form={form}
+        layout="horizontal"
+        colon={false}
+        labelAlign="left"
+        labelCol={{ flex: '0 0 140px' }}
+        wrapperCol={{ flex: 1 }}
+      >
         <Form.Item
           label="名称"
           name="full_name"

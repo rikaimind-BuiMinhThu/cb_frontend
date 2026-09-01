@@ -5,7 +5,8 @@ import Cookies from 'js-cookie';
 import ModalNoti from '../../views/Popup/ModalNoti';
 import * as utils from './../../JS/validate.js';
 import { tokenExpired } from 'v2/api/tokenExpired';
-import { AdminPage, AdminActionButton, useAdminHeaderActions } from '../../components/AdminShell';
+import { AdminPage, AdminActionButton, AdminFormRow, useAdminHeaderActions } from '../../components/AdminShell';
+import { Input } from 'antd';
 
 function AddSubUserMng() {
   const [botId, setBotId] = useState();
@@ -66,30 +67,23 @@ function AddSubUserMng() {
       <AdminPage>
         <div className="admin-page-body">
           <form id="sub-user__add-form">
-            <div className="sub-user__field-container">
-              <span className="sub-user__field-lable">メールアドレス</span>
-              <div className="sub-user__field-input">
-                <input
-                  id="add-email"
-                  type="text"
-                  placeholder="メールアドレスは、必ず指定してください。"
-                  name="email"
-                  onChange={() => utils.checkEmailRequired('add-email', 'errEmail', 'メールアドレス')}
-                />
-                <span id="errEmail" className="sub-user__err-format"></span>
-              </div>
-            </div>
+            <AdminFormRow label="メールアドレス" required htmlFor="add-email">
+              <Input
+                id="add-email"
+                placeholder="メールアドレスは、必ず指定してください。"
+                name="email"
+                onChange={() => utils.checkEmailRequired('add-email', 'errEmail', 'メールアドレス')}
+              />
+              <span id="errEmail" className="admin-form-error" />
+            </AdminFormRow>
 
-            <div className="sub-user__field-container">
-              <span className="sub-user__field-lable">権限</span>
-              <div className="sub-user__field-input">
-                <select name="role">
-                  <option value="bot_admin">管理者</option>
-                  <option value="editor">編集者</option>
-                  <option value="reader">観覧者</option>
-                </select>
-              </div>
-            </div>
+            <AdminFormRow label="権限" htmlFor="sub-user-role">
+              <select className="admin-native-select" id="sub-user-role" name="role">
+                <option value="bot_admin">管理者</option>
+                <option value="editor">編集者</option>
+                <option value="reader">観覧者</option>
+              </select>
+            </AdminFormRow>
           </form>
         </div>
       </AdminPage>

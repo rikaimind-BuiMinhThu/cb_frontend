@@ -160,9 +160,9 @@ function FileManagement() {
         const fullUrl = `https://ec-chatbot.s3.ap-northeast-1.amazonaws.com/${file.file_url}`;
         return (
           <Space wrap className="admin-table-actions">
-            <AdminActionButton action="preview" onClick={() => handlePreview(file)} />
-            <AdminActionButton action="copy" onClick={() => handleCopy(fullUrl)} />
-            <AdminActionButton action="delete" onClick={() => { setIsOpenDelete(true); setIdFile(file.id); }} />
+            <AdminActionButton action="preview" iconOnly onClick={() => handlePreview(file)} />
+            <AdminActionButton action="copy" iconOnly onClick={() => handleCopy(fullUrl)} />
+            <AdminActionButton action="delete" iconOnly onClick={() => { setIsOpenDelete(true); setIdFile(file.id); }} />
           </Space>
         );
       },

@@ -84,8 +84,8 @@ function SubUserManagement() {
       width: 160,
       render: (_, user) => (
         <Space className="admin-table-actions">
-          <AdminActionButton action="edit" onClick={() => openPopupEdit(user)} />
-          <AdminActionButton action="delete" onClick={() => { setDetailUser(user); setIsOpenPopupDelete(true); }} />
+          <AdminActionButton action="edit" iconOnly onClick={() => openPopupEdit(user)} />
+          <AdminActionButton action="delete" iconOnly onClick={() => { setDetailUser(user); setIsOpenPopupDelete(true); }} />
         </Space>
       ),
     },
@@ -114,7 +114,14 @@ function SubUserManagement() {
         cancelText="キャンセル"
         width={480}
       >
-        <Form form={form} layout="vertical">
+        <Form
+          form={form}
+          layout="horizontal"
+          colon={false}
+          labelAlign="left"
+          labelCol={{ flex: '0 0 140px' }}
+          wrapperCol={{ flex: 1 }}
+        >
           <Form.Item label="氏名">
             <Input disabled value={detailUser.full_name} />
           </Form.Item>

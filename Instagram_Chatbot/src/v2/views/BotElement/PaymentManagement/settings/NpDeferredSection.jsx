@@ -140,7 +140,7 @@ function NpDeferredSection({
                       <span className="payment-error-text" id={`err_np_settlement_min_value_${i}`} />
                     </div>
                     {i > 0 && (
-                      <AdminActionButton action="delete" label="" onClick={() => onDelete(i)} />
+                      <AdminActionButton action="delete" iconOnly onClick={() => onDelete(i)} />
                     )}
                   </div>
                 ))}

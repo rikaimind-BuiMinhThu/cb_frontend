@@ -57,14 +57,14 @@ function InstallationTag() {
   return (
     <AdminPage>
       <div className="admin-page-body">
-        <AdminFormRow label="決済チャットボット — サイトにボットを埋め込む" hint="ページの右下にウェブチャットを表示するためにウェブサイトの <body> タグ内に以下のコードを貼り付けてください。">
+        <AdminFormRow alignTop label="決済チャットボット — サイトにボットを埋め込む" hint="ページの右下にウェブチャットを表示するためにウェブサイトの <body> タグ内に以下のコードを貼り付けてください。">
           <Input.TextArea value={paymentScript} readOnly rows={4} style={{ fontFamily: 'monospace', fontSize: 12 }} />
           <div className="admin-form-row-action">
             <AdminActionButton action="copy" onClick={() => copyText(paymentScript)} />
           </div>
         </AdminFormRow>
 
-        <AdminFormRow label="FAQ チャットボット — サイトにボットを埋め込む" hint="ページの右下にウェブチャットを表示するためにウェブサイトの <body> タグ内に以下のコードを貼り付けてください。">
+        <AdminFormRow alignTop label="FAQ チャットボット — サイトにボットを埋め込む" hint="ページの右下にウェブチャットを表示するためにウェブサイトの <body> タグ内に以下のコードを貼り付けてください。">
           <Input.TextArea value={faqScript} readOnly rows={4} style={{ fontFamily: 'monospace', fontSize: 12 }} />
           <div className="admin-form-row-action">
             <AdminActionButton action="copy" onClick={() => copyText(faqScript)} />

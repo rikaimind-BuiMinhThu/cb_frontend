@@ -10,11 +10,22 @@ import ThemeCustomizeTab from './components/ThemeCustomizeTab';
 import useDesignChatbot from './hooks/useDesignChatbot';
 import BasicInfoTab from './components/BasicInfoTab';
 import DesignCustomizeTab from './components/DesignCustomizeTab';
-import { AdminPage } from '../../../../components/AdminShell';
+import { AdminPage, AdminActionButton, useAdminHeaderActions } from '../../../../components/AdminShell';
 
 function DesignChatbot() {
   const botId = Cookies.get('bot_id');
   const { state, actions } = useDesignChatbot(botId);
+
+  const saveHandler =
+    state.tabmenu === TAB_BASIC
+      ? actions.saveBasicInfo
+      : state.tabmenu === TAB_DESIGN
+        ? actions.saveDesignSettings
+        : actions.saveThemeCustomize;
+
+  useAdminHeaderActions(
+    state.isLoaded ? <AdminActionButton action="save" onClick={saveHandler} /> : null
+  );
 
   if (!state.isLoaded) {
     return null;

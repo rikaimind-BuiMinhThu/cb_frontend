@@ -147,9 +147,9 @@ function PaymentGateway() {
               </Button>
             )}
             <Link to={`/v2/admin/edit-payment-gateway/${item.id}`}>
-              <AdminActionButton action="edit" />
+              <AdminActionButton action="edit" iconOnly />
             </Link>
-            <AdminActionButton action="delete" onClick={() => setDeleteId(item.id)} />
+            <AdminActionButton action="delete" iconOnly onClick={() => setDeleteId(item.id)} />
           </Space>
         ),
       },
@@ -159,7 +159,7 @@ function PaymentGateway() {
 
   useAdminHeaderActions(
     <Link to="/v2/admin/add-payment-gateway">
-      <AdminActionButton action="create" label="追加" />
+      <AdminActionButton action="create" label="決済ゲートウェイ作成" />
     </Link>
   );
 

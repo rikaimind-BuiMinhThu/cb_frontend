@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardBody, Row, Col } from 'reactstrap';
+import { Input } from 'antd';
 import Cookies from 'js-cookie';
 import api from 'api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
@@ -7,7 +8,7 @@ import ModalNoti from '../../../Popup/ModalNoti';
 import * as utils from '../../../../JS/validate.js';
 import { patchWithDrawalPreview } from '../PreviewComponent/Utils';
 import 'v2/assets/css/bot/withdrawal-prevention.css';
-import { AdminPage, AdminActionButton, useAdminHeaderActions } from '../../../../components/AdminShell';
+import { AdminPage, AdminActionButton, AdminFormRow, useAdminHeaderActions } from '../../../../components/AdminShell';
 
 function WithdrawalPrevention() {
   const [valueWP, setValueWP] = useState('');
@@ -247,14 +248,9 @@ function WithdrawalPrevention() {
                   </label>
                 </div>
                 <div id='display_img_url' style={{ display: withDrawal.withdrawal_prevention_status == 'image_popup' ? 'block' : 'none' }}>
-                  <div className="wp-image-item">
-                    <label className="wp-image-label">
-                      画像URL<span style={{ color: 'red' }}>*</span>
-                    </label>
-                    <input
+                  <AdminFormRow label="画像URL" required htmlFor="image_URL">
+                    <Input
                       id="image_URL"
-                      className="wp-image-input"
-                      type="text"
                       defaultValue={
                         withDrawal?.withdrawal_prevention_image_url
                           ? withDrawal?.withdrawal_prevention_image_url
@@ -262,21 +258,18 @@ function WithdrawalPrevention() {
                       }
                       onChange={() => utils.checkRequired('image_URL', 'errImageURL', '画像URL')}
                     />
-                    <span id="errImageURL" className="wp-image-err"></span>
-                  </div>
-                  <div className="wp-image-item">
-                    <label className="wp-image-label">リンクURL</label>
-                    <input
+                    <span id="errImageURL" className="admin-form-error"></span>
+                  </AdminFormRow>
+                  <AdminFormRow label="リンクURL" htmlFor="link_URL">
+                    <Input
                       id="link_URL"
-                      className="wp-image-input"
-                      type="text"
                       defaultValue={
                         withDrawal?.withdrawal_prevention_link_url
                           ? withDrawal?.withdrawal_prevention_link_url
                           : null
                       }
                     />
-                  </div>
+                  </AdminFormRow>
                 </div>
               </CardBody>
             </Card>

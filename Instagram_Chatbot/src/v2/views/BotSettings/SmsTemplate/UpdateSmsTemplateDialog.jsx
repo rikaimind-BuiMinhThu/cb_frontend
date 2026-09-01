@@ -64,11 +64,17 @@ export default function UpdateSmsTemplateDialog({ botId, resolver, id, open }) {
       onCancel={() => resolver()}
       onOk={handleSubmit(onSubmit)}
       okText="保存"
-      cancelText="閉じる"
+      cancelText="キャンセル"
       confirmLoading={isSubmitting}
       width={520}
     >
-      <Form layout="vertical">
+      <Form
+        layout="horizontal"
+        colon={false}
+        labelAlign="left"
+        labelCol={{ flex: '0 0 140px' }}
+        wrapperCol={{ flex: 1 }}
+      >
         <Form.Item label="テンプレート名" validateStatus={errors?.name ? 'error' : ''} help={errors?.name?.message} required>
           <Controller
             name="name"
