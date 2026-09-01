@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardHeader, CardBody, Row, Col } from 'reactstrap';
+import { AdminPage, AdminActionButton, useAdminHeaderActions } from '../../components/AdminShell';
 import './../../assets/css/bot/add-bot.css';
 import api from 'api/api-management';
 // icons
@@ -18,7 +18,6 @@ import { Link } from 'react-router-dom';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import Cookies from 'js-cookie';
 import { MDBIcon } from 'mdbreact';
-import {Input} from "antd";
 
 const colors = [
   '#327AED',
@@ -276,16 +275,20 @@ console.log();
     }
   };
 
+  useAdminHeaderActions(
+    <>
+      <AdminActionButton
+        action="back"
+        onClick={() => { window.location.href = '/v2/admin/bot'; }}
+      />
+      <AdminActionButton action="create" label="ボット新規作成" onClick={addNewBotChat} />
+    </>
+  );
+
   return (
     <>
-      <div className="content">
-        <Row id="screenAll">
-          <Col md="12">
-            <Card>
-              <CardHeader>
-                <h4 style={{ margin: '10px 0' }}>ボット追加</h4>
-              </CardHeader>
-              <CardBody>
+      <AdminPage>
+        <div className="admin-page-body">
                 <form action="">
                   <div className="add-bot-container">
                     <div className="bot-left">
@@ -437,23 +440,10 @@ console.log();
                           <span className="error-message bot-name"></span>
                         </div>
                       </div>
-                      <div className="btn-wrapper">
-                        <Link to={'/v2/admin/bot'}>
-                          <button type="button" className="btn btn-close">
-                            閉じる
-                          </button>
-                        </Link>
-                        <button type="button" className="btn btn-new-bot" onClick={addNewBotChat}>
-                          ボット新規作成
-                        </button>
-                      </div>
                     </div>
                   </div>
                 </form>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
+        </div>
         {/* preview */}
         <div
           id="sp-container"
@@ -496,7 +486,7 @@ console.log();
         <Link to={'/v2/admin/scenario-list'}>
           <button style={{ display: 'none' }}>SCL</button>
         </Link>
-      </div>
+      </AdminPage>
     </>
   );
 }

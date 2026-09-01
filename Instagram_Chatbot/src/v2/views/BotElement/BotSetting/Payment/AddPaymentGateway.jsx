@@ -121,7 +121,7 @@ function AddPaymentGateway() {
   useAdminHeaderActions(
     <>
       <Link to="/v2/admin/payment-gateway">
-        <AdminActionButton action="cancel" label="戻る" />
+        <AdminActionButton action="back" />
       </Link>
       <AdminActionButton action="save" loading={saving} onClick={handleSave} />
     </>

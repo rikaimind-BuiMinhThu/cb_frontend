@@ -375,8 +375,7 @@ function CreateEmail() {
   useAdminHeaderActions(
     <>
       <AdminActionButton
-        action="cancel"
-        label="戻る"
+        action="back"
         onClick={() => { window.location.href = '/v2/admin/list-email'; }}
       />
       {mailAction === false ? (

@@ -13,6 +13,7 @@ import ModalNoti from './../Popup/ModalNoti';
 import Switch from 'react-switch';
 import { Pagination } from '@material-ui/lab';
 import { tokenExpired } from 'v2/api/tokenExpired';
+import { AdminPage } from '../../components/AdminShell';
 
 function CRM() {
   const [isOpenDetailUser, setIsOpenDetailUser] = useState(false);
@@ -570,7 +571,7 @@ function CRM() {
   };
 
   return (
-    <>
+    <AdminPage card={false}>
       <div className="content">
         <Row>
           <Col>
@@ -1441,7 +1442,7 @@ function CRM() {
           </div>
         </ModalShort>
       </div>
-    </>
+    </AdminPage>
   );
 }
 

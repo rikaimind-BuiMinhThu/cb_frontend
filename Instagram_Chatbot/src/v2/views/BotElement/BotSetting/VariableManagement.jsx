@@ -1,10 +1,16 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Input, Space, Tabs, Typography, message } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
+import { Input, Space, Tabs, Typography, message } from 'antd';
 import Cookies from 'js-cookie';
 import api from 'api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
-import { AdminConfirmModal, AdminPage, AdminTable, AdminActionButton } from '../../../components/AdminShell';
+import {
+  AdminConfirmModal,
+  AdminPage,
+  AdminTable,
+  AdminActionButton,
+  AdminSearchBar,
+  useAdminHeaderActions,
+} from '../../../components/AdminShell';
 
 const PAGE_SIZE = 25;
 
@@ -287,27 +293,24 @@ function VariableManagement() {
     []
   );
 
-  const userToolbar = (
-    <Space wrap size={12}>
-      <Input
-        placeholder="変数検索..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        onPressEnter={handleSearch}
-        prefix={<SearchOutlined style={{ color: '#9ca3af' }} />}
-        allowClear
-        style={{ width: 240 }}
-      />
-      <Button type="primary" onClick={handleSearch}>
-        検索
-      </Button>
+  useAdminHeaderActions(
+    tab === 'user' ? (
       <AdminActionButton
         action="create"
         label="追加"
         onClick={() => setAddingNew(true)}
         disabled={addingNew}
       />
-    </Space>
+    ) : null
+  );
+
+  const userToolbar = (
+    <AdminSearchBar
+      searchValue={search}
+      onSearchChange={setSearch}
+      onSearch={handleSearch}
+      searchPlaceholder="変数検索..."
+    />
   );
 
   const userTabContent = (

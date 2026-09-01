@@ -10,6 +10,7 @@ import {
   AdminSearchBar,
   AdminConfirmModal,
   AdminActionButton,
+  useAdminHeaderActions,
 } from '../../components/AdminShell';
 
 function BotManagement() {
@@ -158,6 +159,12 @@ function BotManagement() {
     setIdSelected(id);
   };
 
+  useAdminHeaderActions(
+    <Link to="/v2/admin/add-bot-management">
+      <AdminActionButton action="create" label="ボット追加" />
+    </Link>
+  );
+
   const columns = [
     {
       title: '番号',
@@ -201,7 +208,7 @@ function BotManagement() {
             to={`/v2/admin/demo-bot/${record.id}`}
             onClick={() => Cookies.set('bot_id', `${record.id}`)}
           >
-            <Button type="link" size="small">デモ</Button>
+            <AdminActionButton action="preview" label="デモ" />
           </Link>
           <Button type="link" size="small" onClick={() => handleStopBot(record.id, record.status)}>
             {record.status === 'off' ? 'ON' : 'OFF'}
@@ -221,30 +228,25 @@ function BotManagement() {
           dataSource={botList}
           rowKey="id"
           toolbar={
-            <>
-              <AdminSearchBar
-                searchValue={search}
-                onSearchChange={setSearch}
-                onSearch={handleSearch}
-                searchPlaceholder="ボット名 ..."
-                filters={[
-                  {
-                    key: 'status',
-                    label: 'ボットステータス',
-                    value: isActiveSearch,
-                    onChange: setIsActiveSearch,
-                    options: [
-                      { value: 'all', label: 'すべて' },
-                      { value: 'on', label: 'ON' },
-                      { value: 'off', label: 'OFF' },
-                    ],
-                  },
-                ]}
-              />
-              <Link to="/v2/admin/add-bot-management">
-                <AdminActionButton action="create" label="ボット追加" />
-              </Link>
-            </>
+            <AdminSearchBar
+              searchValue={search}
+              onSearchChange={setSearch}
+              onSearch={handleSearch}
+              searchPlaceholder="ボット名 ..."
+              filters={[
+                {
+                  key: 'status',
+                  label: 'ボットステータス',
+                  value: isActiveSearch,
+                  onChange: setIsActiveSearch,
+                  options: [
+                    { value: 'all', label: 'すべて' },
+                    { value: 'on', label: 'ON' },
+                    { value: 'off', label: 'OFF' },
+                  ],
+                },
+              ]}
+            />
           }
           pagination={{
             current: page,

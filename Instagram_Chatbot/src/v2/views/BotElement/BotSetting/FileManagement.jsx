@@ -1,11 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, message, Modal, Space } from 'antd';
-import { CopyOutlined, UploadOutlined } from '@ant-design/icons';
 import noImage from './../../../assets/img/no-image.jpg';
 import api from 'api/api-management';
 import axios from 'axios';
 import { tokenExpired } from 'v2/api/tokenExpired';
-import { AdminPage, AdminTable, AdminConfirmModal, AdminActionButton } from '../../../components/AdminShell';
+import {
+  AdminPage,
+  AdminTable,
+  AdminConfirmModal,
+  AdminActionButton,
+  useAdminHeaderActions,
+} from '../../../components/AdminShell';
 
 function FileManagement() {
   const [files, setFiles] = useState([]);
@@ -127,6 +132,14 @@ function FileManagement() {
     message.success('正常にURLをコピーしました！');
   }
 
+  useAdminHeaderActions(
+    <AdminActionButton
+      action="upload"
+      disabled={newFile !== null}
+      onClick={() => inputRef.current?.click()}
+    />
+  );
+
   const columns = [
     {
       title: '番号',
@@ -148,7 +161,7 @@ function FileManagement() {
         return (
           <Space wrap className="admin-table-actions">
             <AdminActionButton action="preview" onClick={() => handlePreview(file)} />
-            <Button type="link" size="small" icon={<CopyOutlined />} onClick={() => handleCopy(fullUrl)}>コピー</Button>
+            <AdminActionButton action="copy" onClick={() => handleCopy(fullUrl)} />
             <AdminActionButton action="delete" onClick={() => { setIsOpenDelete(true); setIdFile(file.id); }} />
           </Space>
         );
@@ -159,37 +172,32 @@ function FileManagement() {
   return (
     <>
       <AdminPage>
+        <input hidden ref={inputRef} type="file" onChange={handleChangeFile} />
         <AdminTable
           loading={loading}
           columns={columns}
           dataSource={files}
           rowKey="id"
           toolbar={
-            <Space direction="vertical" style={{ width: '100%' }}>
-              <Space>
-                <AdminActionButton action="create" label="ファイル追加" icon={<UploadOutlined />} disabled={newFile !== null} onClick={() => inputRef.current?.click()} />
-                <input hidden ref={inputRef} type="file" onChange={handleChangeFile} />
-              </Space>
-              {newFile && (
-                <div style={{ padding: 16, background: '#f9fafb', borderRadius: 8 }}>
-                  {['jpeg', 'jpg', 'png', 'gif'].includes(newFile.name.split('.')[1]) ? (
-                    <img src={URL.createObjectURL(newFile)} alt={newFile.name} style={{ maxHeight: 120 }} />
-                  ) : newFile.name.split('.')[1] === 'mp4' ? (
-                    <video id="preview-video" controls style={{ maxWidth: 300 }}>
-                      <source src={URL.createObjectURL(newFile)} type="video/mp4" />
-                    </video>
-                  ) : (
-                    <img src={noImage} alt="" style={{ maxHeight: 120 }} />
-                  )}
-                  <p>{newFile.name}</p>
-                  <Space className="admin-form-actions">
-                    <AdminActionButton action="cancel" onClick={() => setNewFile(null)} />
-                    <AdminActionButton action="save" onClick={handleSave} />
-                  </Space>
-                  {fileError && <div style={{ color: '#ff4d4f', marginTop: 8 }}>{fileError}</div>}
-                </div>
-              )}
-            </Space>
+            newFile ? (
+              <div className="admin-variable-new-row" style={{ margin: 0 }}>
+                {['jpeg', 'jpg', 'png', 'gif'].includes(newFile.name.split('.')[1]) ? (
+                  <img src={URL.createObjectURL(newFile)} alt={newFile.name} style={{ maxHeight: 120 }} />
+                ) : newFile.name.split('.')[1] === 'mp4' ? (
+                  <video id="preview-video" controls style={{ maxWidth: 300 }}>
+                    <source src={URL.createObjectURL(newFile)} type="video/mp4" />
+                  </video>
+                ) : (
+                  <img src={noImage} alt="" style={{ maxHeight: 120 }} />
+                )}
+                <p>{newFile.name}</p>
+                <Space className="admin-form-actions">
+                  <AdminActionButton action="cancel" onClick={() => setNewFile(null)} />
+                  <AdminActionButton action="save" onClick={handleSave} />
+                </Space>
+                {fileError && <div className="admin-client-form-error">{fileError}</div>}
+              </div>
+            ) : null
           }
           pagination={{
             current: page,

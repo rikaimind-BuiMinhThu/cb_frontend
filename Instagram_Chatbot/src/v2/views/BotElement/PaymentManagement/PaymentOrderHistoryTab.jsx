@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
-import { Button, DatePicker, Select, Space, Typography } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
-import { AdminTable } from '../../../components/AdminShell';
+import { DatePicker, Select, Space, Typography } from 'antd';
+import { AdminTable, AdminActionButton } from '../../../components/AdminShell';
 
 const ORDER_COLUMNS = [
   { title: '番号', dataIndex: 'no', key: 'no', width: 60 },
@@ -81,9 +80,7 @@ function PaymentOrderHistoryTab({
               <Select options={botOptions} style={{ minWidth: 160 }} placeholder="ボットを選択" />
             </Space>
           )}
-          <Button type="primary" icon={<SearchOutlined />} onClick={onSearch}>
-            検索
-          </Button>
+          <AdminActionButton action="search" onClick={onSearch} />
         </Space>
         {dateError && (
           <Typography.Text type="danger" className="report-date-error">

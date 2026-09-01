@@ -13,6 +13,7 @@ import { useEffect } from 'react';
 import { Pagination } from '@material-ui/lab';
 import { setToken } from './../../api/auth'
 import { tokenExpired } from 'v2/api/tokenExpired';
+import { AdminPage } from '../../components/AdminShell';
 
 function Keyword() {
   var [customDiv, setCustomDiv] = useState([]);
@@ -706,7 +707,7 @@ function Keyword() {
   };
 
   return (
-    <>
+    <AdminPage card={false}>
       <div className="content">
         <Row>
           <Col md="12">
@@ -1108,7 +1109,7 @@ function Keyword() {
           </div>
         </ModalShort>
       </div>
-    </>
+    </AdminPage>
   );
 }
 

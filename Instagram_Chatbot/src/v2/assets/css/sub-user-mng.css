@@ -76,6 +76,13 @@
     margin-bottom: 15px;
     position: relative;
 }
+.sub-user__field-input input,
+.sub-user__field-input select {
+    border: 1px solid var(--admin-border, #e5e7eb);
+    border-radius: 4px;
+    padding: 5px 15px;
+    width: 100%;
+}
 .sub-user__err-format{
     text-align: center;
     color: red;

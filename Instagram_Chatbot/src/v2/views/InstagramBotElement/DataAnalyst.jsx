@@ -7,6 +7,7 @@ import { VictoryPie } from 'victory-pie';
 import api from 'api/api-management';
 import ReactApexChart from 'react-apexcharts';
 import '../../assets/css/general.css';
+import { AdminPage } from '../../components/AdminShell';
 import { CSVLink } from 'react-csv';
 import { MDBIcon } from 'mdbreact';
 import Cookies from 'js-cookie';
@@ -1349,7 +1350,7 @@ function DataAnalyst() {
   };
 
   return (
-    <>
+    <AdminPage card={false}>
       <div className="content">
         <Row>
           <Col md="12">
@@ -1652,7 +1653,7 @@ function DataAnalyst() {
           </Col>
         </Row>
       </div>
-    </>
+    </AdminPage>
   );
 }
 

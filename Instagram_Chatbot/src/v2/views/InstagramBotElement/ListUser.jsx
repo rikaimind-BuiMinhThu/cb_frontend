@@ -11,6 +11,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import ja from "date-fns/locale/ja";
 import * as utils from './../../JS/client.js';
 import { tokenExpired } from 'v2/api/tokenExpired';
+import { AdminPage } from '../../components/AdminShell';
 registerLocale("ja", ja);
 
 function ListUser() {
@@ -707,7 +708,7 @@ function ListUser() {
   };
 
   return (
-    <>
+    <AdminPage card={false}>
       <div className="content">
         <Row>
           <Col md="12">
@@ -889,7 +890,7 @@ function ListUser() {
           </Col>
         </Row>
       </div>
-    </>
+    </AdminPage>
   );
 }
 

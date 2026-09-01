@@ -1,6 +1,4 @@
 import React from 'react';
-import { Button } from 'antd';
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { AdminFormRow, AdminActionButton } from '../../../../components/AdminShell';
 
 function NpDeferredSection({
@@ -142,19 +140,12 @@ function NpDeferredSection({
                       <span className="payment-error-text" id={`err_np_settlement_min_value_${i}`} />
                     </div>
                     {i > 0 && (
-                      <Button
-                        type="link"
-                        danger
-                        icon={<DeleteOutlined />}
-                        onClick={() => onDelete(i)}
-                      />
+                      <AdminActionButton action="delete" label="" onClick={() => onDelete(i)} />
                     )}
                   </div>
                 ))}
               </form>
-              <Button icon={<PlusOutlined />} onClick={onAdd} style={{ marginTop: 8 }}>
-                行を追加
-              </Button>
+              <AdminActionButton action="create" label="行を追加" onClick={onAdd} />
             </AdminFormRow>
           </div>
         )}

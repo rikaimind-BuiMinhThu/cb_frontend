@@ -11,6 +11,7 @@ import {
   PlusOutlined,
   SaveOutlined,
   SearchOutlined,
+  UploadOutlined,
 } from '@ant-design/icons';
 
 const ACTION_CONFIG = {
@@ -18,6 +19,11 @@ const ACTION_CONFIG = {
     label: '作成',
     type: 'primary',
     icon: <PlusOutlined />,
+  },
+  upload: {
+    label: 'ファイル追加',
+    type: 'primary',
+    icon: <UploadOutlined />,
   },
   save: {
     label: '保存',
@@ -41,6 +47,17 @@ const ACTION_CONFIG = {
     type: 'link',
     size: 'small',
     icon: <CopyOutlined />,
+  },
+  copy: {
+    label: 'コピー',
+    type: 'link',
+    size: 'small',
+    icon: <CopyOutlined />,
+  },
+  back: {
+    label: '戻る',
+    type: 'default',
+    icon: null,
   },
   cancel: {
     label: 'キャンセル',
@@ -72,7 +89,7 @@ const ACTION_CONFIG = {
   },
 };
 
-function AdminActionButton({ action, label, className, ...rest }) {
+function AdminActionButton({ action, label, className, icon: _ignoredIcon, ...rest }) {
   const config = ACTION_CONFIG[action];
 
   if (!config) {
@@ -97,6 +114,7 @@ AdminActionButton.propTypes = {
   action: PropTypes.oneOf(Object.keys(ACTION_CONFIG)).isRequired,
   label: PropTypes.string,
   className: PropTypes.string,
+  icon: PropTypes.node,
 };
 
 export default AdminActionButton;

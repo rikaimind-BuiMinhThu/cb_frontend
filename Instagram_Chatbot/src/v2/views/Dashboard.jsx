@@ -11,6 +11,7 @@ import {
 import ReactApexChart from 'react-apexcharts';
 import api from 'api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
+import { AdminPage } from '../../components/AdminShell';
 
 function Dashboard() {
   const [monthECUDisplay, setMonthECUDisplay] = useState(['1', '2', '3', '4']);
@@ -223,7 +224,7 @@ function Dashboard() {
   };
 
   return (
-    <>
+    <AdminPage card={false}>
       <div className="content">
         <Row>
           <Col lg="3" md="6" sm="6" id='client_management'>
@@ -414,7 +415,7 @@ function Dashboard() {
           </Col> */}
         </Row>
       </div>
-    </>
+    </AdminPage>
   );
 }
 

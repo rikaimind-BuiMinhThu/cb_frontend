@@ -1,4 +1,3 @@
-export { default as AdminLayout } from './AdminLayout';
 export { default as AdminPage } from './AdminPage';
 export { default as AdminTable } from './AdminTable';
 export { default as AdminSearchBar } from './AdminSearchBar';

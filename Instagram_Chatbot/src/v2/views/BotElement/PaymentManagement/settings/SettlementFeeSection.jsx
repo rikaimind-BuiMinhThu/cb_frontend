@@ -1,6 +1,4 @@
 import React from 'react';
-import { Button } from 'antd';
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { AdminFormRow, AdminActionButton } from '../../../../components/AdminShell';
 
 function SettlementFeeSection({
@@ -66,7 +64,7 @@ function SettlementFeeSection({
                 <div key={i} id={`settlementPGW${i}`} className="payment-dynamic-row">
                   <div className="payment-dynamic-row-field">
                     <div className="payment-dynamic-row-label">
-                      変数値 <span style={{ color: '#ff4d4f' }}>*</span>
+                      変数値 <span className="required-badge">必須</span>
                     </div>
                     <input
                       className="payment-native-input"
@@ -101,19 +99,12 @@ function SettlementFeeSection({
                     <span className="payment-error-text" id={`err_settpgw_commission${i}`} />
                   </div>
                   {i > 0 && (
-                    <Button
-                      type="link"
-                      danger
-                      icon={<DeleteOutlined />}
-                      onClick={() => onDelete(i)}
-                    />
+                    <AdminActionButton action="delete" label="" onClick={() => onDelete(i)} />
                   )}
                 </div>
               ))}
             </form>
-            <Button icon={<PlusOutlined />} onClick={onAdd}>
-              行を追加
-            </Button>
+            <AdminActionButton action="create" label="行を追加" onClick={onAdd} />
           </div>
         )}
         <div className="payment-setting-actions admin-form-actions">

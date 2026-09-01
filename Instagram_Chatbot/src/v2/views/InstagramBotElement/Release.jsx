@@ -17,6 +17,7 @@ import ModalNoti from './../Popup/ModalNoti';
 import axios from 'axios';
 import { useEffect } from 'react';
 import ModalShort from './../Popup/ModalShort';
+import { AdminPage } from '../../components/AdminShell';
 
 function Release() {
   const [listGroup, setListGroup] = useState([]);
@@ -3382,7 +3383,7 @@ function Release() {
   };
 
   return (
-    <>
+    <AdminPage card={false}>
       <div className="content">
         <ModalLoading open={isLoadingData} />
         <Card id="login_facebook">
@@ -4333,7 +4334,7 @@ function Release() {
           </ModalShort>
         </div>
       </div>
-    </>
+    </AdminPage>
   );
 }
 

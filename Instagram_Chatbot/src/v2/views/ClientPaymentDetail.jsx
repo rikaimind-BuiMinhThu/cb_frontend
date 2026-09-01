@@ -5,7 +5,8 @@ import Modal from "./Popup/Modal";
 import ModalNoti from "./Popup/ModalNoti";
 import "./Popup/modal.css";
 import "../assets/css/general.css";
-import { Card, CardHeader, CardBody, Table, Row, Col } from "reactstrap";
+import { Table } from "reactstrap";
+import { AdminPage, AdminActionButton, useAdminHeaderActions } from "../components/AdminShell";
 import { Button } from "react-bootstrap";
 import { Pagination } from "@material-ui/lab";
 import ModalShort from "./Popup/ModalShort";
@@ -302,49 +303,16 @@ function ClientPaymentDetail() {
     }
   }
 
+  useAdminHeaderActions(
+    editMode ? (
+      <AdminActionButton action="create" label="支払いの追加" onClick={() => addPaymentPopup()} />
+    ) : null
+  );
+
   return (
     <>
-      <div className="content">
-        <Row id="screenAll">
-          <Col md="12">
-            <Card>
-              {editMode ? (
-                <CardHeader>
-                  <div
-                    className="swap"
-                    style={{
-                      display: "flex",
-                      width: "100%",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                      }}
-                    >
-                      {/* date pick */}
-                    </div>
-                    <div
-                      className="div_right"
-                      style={{ float: "right", width: "15%" }}
-                    >
-                      <Button
-                        type="text"
-                        onClick={() => addPaymentPopup()}
-                        style={{ backgroundColor: "#66615b" }}
-                      >
-                        支払いの追加
-                      </Button>
-                    </div>
-                  </div>
-                </CardHeader>
-              ) : (
-                <></>
-              )}
-              <CardBody>
+      <AdminPage>
+        <div className="admin-page-body">
                 <div style={{ width: "100%", overflowX: "auto" }}>
                   <Table style={{ textAlign: "center", tableLayout: "fixed" }}>
                     <thead className="text-primary">
@@ -451,10 +419,6 @@ function ClientPaymentDetail() {
                   page={page}
                   onChange={handleChange}
                 />
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
 
         <Modal
           open={isOpenUpdate}
@@ -789,6 +753,7 @@ function ClientPaymentDetail() {
           </div>
         </ModalShort>
       </div>
+      </AdminPage>
     </>
   );
 }

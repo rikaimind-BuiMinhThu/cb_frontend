@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Button, DatePicker, Empty, Select, Space, Tabs, Typography } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { DatePicker, Empty, Select, Space, Tabs, Typography } from "antd";
 import api from "api/api-management";
 import Cookies from "js-cookie";
 import { format } from "date-fns";
@@ -14,7 +13,7 @@ import { findLastIndex, isBoolean } from "lodash";
 import moment from "moment";
 import jwt_decode from 'jwt-decode'
 import BotChatStatistic from "./BotChatStatistic";
-import { AdminPage } from "../../../../../components/AdminShell";
+import { AdminPage, AdminActionButton } from "../../../../../components/AdminShell";
 
 const TABS = {
   LOGS: "LOGS",
@@ -861,9 +860,7 @@ function BotChatLog() {
         }}
         format="YYYY/MM/DD"
       />
-      <Button type="primary" icon={<SearchOutlined />} onClick={pressSearchButton}>
-        検索
-      </Button>
+      <AdminActionButton action="search" onClick={pressSearchButton} />
     </Space>
   );
 

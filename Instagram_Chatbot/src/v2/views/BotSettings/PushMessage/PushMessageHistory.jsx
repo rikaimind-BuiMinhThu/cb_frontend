@@ -1,10 +1,9 @@
-import { Button, DatePicker, Space, Tag, Typography } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
+import { DatePicker, Space, Tag, Typography } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import api from 'api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
-import { AdminTable } from '../../../components/AdminShell';
+import { AdminTable, AdminActionButton } from '../../../components/AdminShell';
 
 const PushMessageHistory = () => {
   const { botId } = useParams();
@@ -115,13 +114,7 @@ const PushMessageHistory = () => {
           setDateRange([options[0] || null, options[1] || null]);
         }}
       />
-      <Button
-        type="primary"
-        icon={<SearchOutlined />}
-        onClick={handleSearch}
-      >
-        検索
-      </Button>
+      <AdminActionButton action="search" onClick={handleSearch} />
     </Space>
   );
 

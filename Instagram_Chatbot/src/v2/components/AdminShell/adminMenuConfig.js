@@ -216,6 +216,16 @@ export const ROUTE_TITLES = {
   [p('/edit-payment-gateway')]: '決済ゲートウェイ編集',
   [p('/withdrawal-prevention')]: '離脱防止',
   [p('/crm')]: 'CRM',
+  [p('/basic-setting')]: '基本設定',
+  [p('/reply-mail-management')]: '送信メール管理',
+  [p('/chatbot')]: 'チャットボット作成',
+  [p('/keyword')]: 'キーワード設定',
+  [p('/release')]: 'リリース',
+  [p('/data-analyst')]: 'サマリー',
+  [p('/list-user')]: 'ユーザー一覧',
+  [p('/attracted-customer')]: '集客',
+  [p('/add-bot-management')]: 'ボット追加',
+  [p('/add-sub-user')]: 'サブユーザー招待',
 };
 
 /** Routes not listed in the sidebar map to a related menu path for selection/open state. */

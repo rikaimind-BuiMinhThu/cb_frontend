@@ -8,6 +8,7 @@ import {
   Col,
 } from "reactstrap";
 import "../../assets/css/general.css";
+import { AdminPage } from "../../components/AdminShell";
 import Cookies from "js-cookie";
 import api from 'api/api-management'
 import requestNewToken from "api/request-new-token";
@@ -7581,7 +7582,7 @@ function Chatbot() {
   }
 
   return (
-    <>
+    <AdminPage card={false}>
       <div className="content">
         {/* <Helmet>
             <script src="https://kit.fontawesome.com/a076d05399.js" type="text/javascript" />
@@ -8497,7 +8498,7 @@ function Chatbot() {
         </ModalShort>
 
       </div>
-    </>
+    </AdminPage>
   );
 }
 

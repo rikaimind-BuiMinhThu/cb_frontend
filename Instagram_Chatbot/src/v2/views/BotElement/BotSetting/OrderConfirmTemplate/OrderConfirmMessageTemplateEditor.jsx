@@ -87,7 +87,13 @@ function OrderConfirmMessageTemplateEditor() {
   }, []);
 
   useAdminHeaderActions(
-    <AdminActionButton action="save" label="保存" onClick={saveTemplate} loading={saving} />
+    <>
+      <AdminActionButton
+        action="back"
+        onClick={() => { window.location.href = '/v2/admin/order-confirm-template-list'; }}
+      />
+      <AdminActionButton action="save" label="保存" onClick={saveTemplate} loading={saving} />
+    </>
   );
 
   return (

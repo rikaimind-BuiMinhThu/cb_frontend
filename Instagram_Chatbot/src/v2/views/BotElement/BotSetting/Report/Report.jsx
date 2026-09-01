@@ -1,26 +1,20 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-  Button,
   DatePicker,
   Empty,
   Select,
   Space,
   Spin,
   Tabs,
-  Tooltip,
   Typography,
 } from 'antd';
-import {
-  QuestionCircleOutlined,
-  SearchOutlined,
-} from '@ant-design/icons';
 import moment from 'moment';
 import ReactApexChart from 'react-apexcharts';
 import api from './../../../../api/api-management';
 import Cookies from 'js-cookie';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { utils, writeFileXLSX } from 'xlsx';
-import { AdminPage, AdminTable, AdminActionButton, useAdminHeaderActions } from '../../../../components/AdminShell';
+import { AdminPage, AdminTable, AdminActionButton, AdminInfoTooltip, useAdminHeaderActions } from '../../../../components/AdminShell';
 import { adminChartPalette } from '../../../../theme/adminTheme';
 import './../../../../assets/css/bot/report.css';
 
@@ -1315,9 +1309,7 @@ function Report() {
           style={{ minWidth: 160 }}
         />
       </Space>
-      <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
-        検索
-      </Button>
+      <AdminActionButton action="search" onClick={handleSearch} />
     </Space>
   );
 
@@ -1328,11 +1320,7 @@ function Report() {
   const renderSectionTitle = (title, tooltip) => (
     <div className="report-section-title">
       <Typography.Text strong>{title}</Typography.Text>
-      {tooltip && (
-        <Tooltip title={tooltip}>
-          <QuestionCircleOutlined style={{ marginLeft: 8, color: '#9ca3af' }} />
-        </Tooltip>
-      )}
+      {tooltip && <AdminInfoTooltip text={tooltip} />}
     </div>
   );
 

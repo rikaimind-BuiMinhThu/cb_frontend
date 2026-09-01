@@ -27,7 +27,7 @@ function AdminHeader({ collapsed, onToggleCollapse }) {
 
   return (
     <Header className="admin-header">
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+      <div className="admin-header-left">
         <Button
           type="text"
           icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
@@ -37,8 +37,8 @@ function AdminHeader({ collapsed, onToggleCollapse }) {
         {title && <h1 className="admin-header-title">{title}</h1>}
       </div>
       <div className="admin-header-right">
-        <AdminVersionSwitch variant="antd" />
         {actions && <div className="admin-header-actions">{actions}</div>}
+        <AdminVersionSwitch variant="antd" />
         <Button type="default" icon={<LogoutOutlined />} onClick={logout}>
           ログアウト
         </Button>

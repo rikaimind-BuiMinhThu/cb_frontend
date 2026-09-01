@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardHeader, CardBody, Row, Col } from 'reactstrap';
+import { AdminPage, AdminActionButton, useAdminHeaderActions } from '../../components/AdminShell';
 import './../../assets/css/basic_setting.css';
 import * as utils from './../../JS/validate.js';
 import Cookies from 'js-cookie';
@@ -202,14 +202,15 @@ function BasicSetting() {
         });
     }
   }
+
+  useAdminHeaderActions(
+    <AdminActionButton action="save" onClick={() => onSave()} />
+  );
+
   return (
     <>
-      <div className="content">
-        <Row id="screenAll">
-          <Col md="12">
-            <Card>
-              <CardHeader>基本設定</CardHeader>
-              <CardBody>
+      <AdminPage>
+        <div className="admin-page-body">
                 <form id="form-basic-setting">
                   <div className="bs-field-container">
                     <span className="bs-field-lable">
@@ -451,23 +452,14 @@ function BasicSetting() {
                     </div>
                   </>
                 )}
-
-                <div className="bs-field-btn">
-                  <button className="btn btn-primary" onClick={() => onSave()}>
-                    保存
-                  </button>
-                </div>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
+        </div>
 
         <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
           <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
             <span style={{ fontSize: '16px' }}>{msgNoti}</span>
           </div>
         </ModalNoti>
-      </div>
+      </AdminPage>
     </>
   );
 }

@@ -1,7 +1,6 @@
 import Cookies from 'js-cookie';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Button, Input, message } from 'antd';
-import { CopyOutlined } from '@ant-design/icons';
+import { Input, message } from 'antd';
 import { Link } from 'react-router-dom';
 import api from 'api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
@@ -57,15 +56,19 @@ function InstallationTag() {
 
   return (
     <AdminPage>
-      <div style={{ padding: '20px 24px' }}>
+      <div className="admin-page-body">
         <AdminFormRow label="決済チャットボット — サイトにボットを埋め込む" hint="ページの右下にウェブチャットを表示するためにウェブサイトの <body> タグ内に以下のコードを貼り付けてください。">
           <Input.TextArea value={paymentScript} readOnly rows={4} style={{ fontFamily: 'monospace', fontSize: 12 }} />
-          <Button icon={<CopyOutlined />} style={{ marginTop: 8 }} onClick={() => copyText(paymentScript)}>コピー</Button>
+          <div className="admin-form-row-action">
+            <AdminActionButton action="copy" onClick={() => copyText(paymentScript)} />
+          </div>
         </AdminFormRow>
 
         <AdminFormRow label="FAQ チャットボット — サイトにボットを埋め込む" hint="ページの右下にウェブチャットを表示するためにウェブサイトの <body> タグ内に以下のコードを貼り付けてください。">
           <Input.TextArea value={faqScript} readOnly rows={4} style={{ fontFamily: 'monospace', fontSize: 12 }} />
-          <Button icon={<CopyOutlined />} style={{ marginTop: 8 }} onClick={() => copyText(faqScript)}>コピー</Button>
+          <div className="admin-form-row-action">
+            <AdminActionButton action="copy" onClick={() => copyText(faqScript)} />
+          </div>
         </AdminFormRow>
       </div>
     </AdminPage>
