@@ -55,11 +55,13 @@ export const MODAL_TITLE_ALIGNMENT_OPTIONS = [
 export const MODAL_TITLE_ALIGNMENT_IDS = MODAL_TITLE_ALIGNMENT_OPTIONS.map(({ id }) => id);
 
 export const THEME_FIELD_KEYS = [
+  'headerBgColor', // Bug #6: field riêng cho Main color header (không còn dùng buttonNormalBgColor).
   'headerTitleTextColor',
   'headerTitleFontSize',
   'headerSubtitleTextColor',
   'headerSubtitleFontSize',
   'progressBarBgColor',
+  'progressBarFillColor', // Bug #7: fill progress độc lập, đổi header không kéo theo progress.
   'progressBarTextColor',
   'progressBarFontSize',
   'chatWindowBgColor',
@@ -124,7 +126,7 @@ export const THEME_FIELD_KEYS = [
 ];
 
 export const THEME_PREVIEW_REGIONS = [
-  { sectionId: 'headerMain', label: 'メインカラー・ヘッダー', targets: ['header', 'progressFill', 'headerText'] },
+  { sectionId: 'headerMain', label: 'メインカラー・ヘッダー', targets: ['header', 'headerText'] },
   { sectionId: 'progress', label: 'プログレスバー', targets: ['progressBar'] },
   { sectionId: 'window', label: 'チャットウィンドウ', targets: ['chatBody'] },
   { sectionId: 'messages', label: 'メッセージ', targets: ['botBubble', 'userBubble'] },
@@ -146,7 +148,7 @@ export const THEME_SECTIONS = [
     id: 'headerMain',
     title: 'メインカラー・ヘッダー',
     fields: [
-      { fieldType: 'mainColor', label: 'メインカラー', fullWidth: true },
+      { fieldType: 'mainColor', key: 'headerBgColor', label: 'メインカラー', fullWidth: true }, // Bug #6: picker bind headerBgColor.
       { fieldType: 'groupLabel', label: 'タイトル', fullWidth: true },
       { key: 'headerTitleTextColor', label: '文字色' },
       { key: 'headerTitleFontSize', label: 'フォントサイズ', fieldType: 'fontSize' },
@@ -159,6 +161,7 @@ export const THEME_SECTIONS = [
     id: 'progress',
     title: 'プログレスバー',
     fields: [
+      { key: 'progressBarFillColor', label: '塗りつぶし色' },
       { key: 'progressBarBgColor', label: '背景色' },
       { key: 'progressBarTextColor', label: '文字色' },
       { key: 'progressBarFontSize', label: 'フォントサイズ', fieldType: 'fontSize', fullWidth: true },
@@ -306,7 +309,7 @@ export const THEME_SECTIONS = [
         fullWidth: true,
       },
       { fieldType: 'groupLabel', label: '入力欄', fullWidth: true },
-      { key: 'radioInputUnselectedColor', label: '未選択スタイル' },
+      { key: 'radioInputUnselectedColor', label: '未選択スタイル' }, // Bug #10: màu vòng radio chưa chọn.
       { key: 'radioInputSelectedColor', label: '選択時スタイル' },
     ],
   },
@@ -348,11 +351,13 @@ export const THEME_SECTIONS = [
 export const THEME_SECTION_NAV_ITEMS = THEME_SECTIONS.map(({ id, title }) => ({ id, title }));
 
 export const CAMEL_TO_SNAKE_THEME = {
+  headerBgColor: 'header_bg_color', // Bug #6: persist Main color header riêng, không map vào button.
   headerTitleTextColor: 'header_title_text_color',
   headerTitleFontSize: 'header_title_font_size',
   headerSubtitleTextColor: 'header_subtitle_text_color',
   headerSubtitleFontSize: 'header_subtitle_font_size',
   progressBarBgColor: 'progress_bar_bg_color',
+  progressBarFillColor: 'progress_bar_fill_color',
   progressBarTextColor: 'progress_bar_text_color',
   progressBarFontSize: 'progress_bar_font_size',
   chatWindowBgColor: 'chat_window_bg_color',

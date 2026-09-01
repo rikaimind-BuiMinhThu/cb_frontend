@@ -13,6 +13,7 @@ const PreviewOpenChatFrame = ({
   frameClassName = "",
   cssVars = {},
   headerIconSrc,
+  title,
   subtitle,
   titleBubble,
   isOpen,
@@ -28,6 +29,8 @@ const PreviewOpenChatFrame = ({
   const className = [containerClassName, frameClassName]
     .filter(Boolean)
     .join(" ");
+  // Bug #5: Header thiếu title từ Basic Information — ưu tiên `title` (基本情報), titleBubble chỉ fallback.
+  const headerTitle = title || titleBubble || "";
 
   return (
     <div
@@ -39,14 +42,19 @@ const PreviewOpenChatFrame = ({
       {overlays}
       <div id="sp-header" className="sp-header preview-open-frame__header">
         <div className="sp-header-left" onClick={onHeaderClick}>
-          <div className="sp-body-bot-side-avatar sp-avatar-bt">
+          {/* Bug #3: Avatar header tràn ra ngoài — 40px trong header 65px, không dùng sp-avatar-bt 58px. */}
+          <div className="preview-open-frame__avatar">
             {headerIconSrc ? (
               <img src={headerIconSrc} alt="bot-header-icon" />
             ) : null}
           </div>
           <div className="sp-header-left-label">
-            <div className="sp-header-left-label-sub-title">{subtitle}</div>
-            <div className="sp-header-left-label-title">{titleBubble}</div>
+            {subtitle ? (
+              <div className="sp-header-left-label-sub-title">{subtitle}</div>
+            ) : null}
+            {headerTitle ? (
+              <div className="sp-header-left-label-title">{headerTitle}</div>
+            ) : null}
           </div>
         </div>
         <div className="sp-header-right" onClick={onHeaderClick}>

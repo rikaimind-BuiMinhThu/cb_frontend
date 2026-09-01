@@ -45,6 +45,7 @@ import {
   mapRawDesignSettingsFromExtract,
 } from "../../PreviewComponent/previewDesignStateUtils";
 import { createPreviewInitialState } from "../../PreviewComponent/createPreviewInitialState";
+import { shouldShowPreventExitModal } from "../../PreviewComponent/preventExitModalUtils";
 import {
   setConversionParamToLocalStorage, postMessageToParent, executeLpJsCode,
 } from "../../PreviewFukushashiki/LPUtils";
@@ -325,11 +326,14 @@ const ScenarioPreviewFaq = ({
       sendOpenChatbotCountRequest(state.scenarioId, deviceReceive);
     }
     
-    if (state.alreadyOpenFirstTime) {
+    if (!opening && !state.showPopupCloseBot
+      && shouldShowPreventExitModal(state.botInfor, state.activePopupCloseBot)) {
+      // Bug #11: chỉ early-return khi cần confirm. Path đóng thẳng đi tiếp để post isOpen: false.
+      return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
+    }
+
+    if (state.alreadyOpenFirstTime || state.isAlreadyOpenFirstTime) {
       if (!opening) {
-        if (state.activePopupCloseBot) {
-          return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
-        }
         postOpenStateToParent(false);
         return dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
       }
@@ -801,6 +805,7 @@ const ScenarioPreviewFaq = ({
         frameClassName={frameClassName}
         cssVars={cssVars}
         headerIconSrc={headerIconSrc}
+        title={displayBotInfor?.title}
         subtitle={displayBotInfor?.subtitle}
         titleBubble={displayBotInfor?.titleBubble}
         isOpen={state.isOpen}

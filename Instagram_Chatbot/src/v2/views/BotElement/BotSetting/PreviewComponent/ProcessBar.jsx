@@ -1,18 +1,12 @@
-import React, { } from "react";
+import React from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
 import "moment/locale/zh-cn";
 
 const ProcessBar = ({
-  botInfor,
   currentIndex,
   maxIndex,
 }) => {
-  const getBackgroundColor = () => {
-    if (botInfor?.main_color) return {backgroundColor: botInfor?.main_color};
-    if (botInfor?.main_color_other) return {backgroundColor: botInfor?.main_color_other};
-    return {};
-  };
-
+  // Bug #6 / #7: fill lấy --c-progress-fill từ theme CSS, không còn inline màu header (botInfor).
   const getWidth = () => {
     let width = "0%";
     if (parseInt(currentIndex || "0") >= maxIndex) width = "100%";
@@ -38,7 +32,6 @@ const ProcessBar = ({
         className="sp-process-bar-color animation"
         style={{
           ...getWidth(),
-          ...getBackgroundColor(),
           display: "block",
           marginTop: "1px",
         }}

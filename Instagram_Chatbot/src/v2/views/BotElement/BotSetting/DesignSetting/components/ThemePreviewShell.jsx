@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { generateScopedThemeCss } from '../../../../../utils/chatbotThemeCss';
+import { DEFAULT_MAIN_COLOR } from '../constants/designChatbotConstants';
+import { resolveHeaderBgColor } from '../utils/designThemeUtils';
 import PreviewRegion from './PreviewRegion';
 
 const ThemePreviewShell = ({
@@ -26,12 +28,18 @@ const ThemePreviewShell = ({
     return generateScopedThemeCss(themeSettings, mainColor, null, `#${scopeId}`);
   }, [themeSettings, mainColor, scopeId]);
 
+  const headerBg = resolveHeaderBgColor(themeSettings, mainColor);
   const displayTitle = title || (showPlaceholderLabels ? 'サンプルタイトル' : '');
   const displaySubtitle = subtitle || (showPlaceholderLabels ? 'サンプルサブタイトル' : '');
   const barWidth = `${Math.min(Math.max(processPercent, 0), 100)}%`;
 
   return (
-    <div id={scopeId} className={`theme-customize-preview ${className}`.trim()}>
+    <div
+      id={scopeId}
+      className={`theme-customize-preview ${className}`.trim()}
+      // Bug #1 / #6: preview admin set --c-header-bg từ headerBgColor (trước đây chỉ inline backgroundColor nên chatbot thật sai).
+      style={{ '--c-header-bg': headerBg }}
+    >
       <style>{scopedCss}</style>
 
       <PreviewRegion
@@ -42,7 +50,6 @@ const ThemePreviewShell = ({
       >
         <div
           className="sp-header theme-customize-preview__header"
-          style={{ backgroundColor: mainColor }}
         >
           <PreviewRegion
             sectionId="headerMain"
@@ -52,11 +59,12 @@ const ThemePreviewShell = ({
           >
             <div className="sp-header-left">
               {headerIconUrl && (
-                <div className="sp-body-bot-side-avatar sp-avatar-bt">
+                <div className="preview-open-frame__avatar">
                   <img src={headerIconUrl} alt="bot-header-icon" />
                 </div>
               )}
               <div className="sp-header-left-label">
+                {/* Bug #5: Title trên preview Theme lấy từ Basic Information, không lấy titleBubble. */}
                 <div className="sp-header-left-label-sub-title">{displaySubtitle}</div>
                 <div className="sp-header-left-label-title">{displayTitle}</div>
               </div>
@@ -76,7 +84,7 @@ const ThemePreviewShell = ({
         <div className="sp-process-bar">
           <div
             className="sp-process-bar-color"
-            style={{ width: barWidth, backgroundColor: mainColor }}
+            style={{ width: barWidth }}
           >
             {processLabel}
           </div>
@@ -139,7 +147,7 @@ ThemePreviewShell.propTypes = {
 
 ThemePreviewShell.defaultProps = {
   themeSettings: null,
-  mainColor: '#327AED',
+  mainColor: DEFAULT_MAIN_COLOR,
   title: '',
   subtitle: '',
   headerIconUrl: '',

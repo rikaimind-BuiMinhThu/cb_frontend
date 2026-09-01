@@ -79,9 +79,13 @@ const ThemeAccordionSection = ({
             {label}
           </DesignSettingLabel>
           <div className="theme-field__control">
-            <MainColorPicker mainColor={mainColor} onChange={onMainColorChange} />
+            <MainColorPicker
+              mainColor={themeSettings.headerBgColor || mainColor}
+              onChange={onMainColorChange}
+            />
+            {/* Bug #7: Đổi Main color header không được kéo theo Progress/Message/Button/... */}
             <p className="theme-section__main-color-helper">
-              メインカラーを変更しても個別設定は自動では上書きされません。セクションごとに「デフォルトに戻す」で再計算できます。
+              メインカラーはヘッダー背景のみに適用されます。他のセクションの色は変更されません。各セクションの「デフォルトに戻す」はそのセクションだけを初期値に戻します。メインカラー・ヘッダーのリセットはメインカラーを #327AED に戻します。
             </p>
           </div>
         </div>

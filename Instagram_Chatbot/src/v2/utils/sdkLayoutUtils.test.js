@@ -225,5 +225,56 @@ describe('sdkLayoutUtils', () => {
         closedContentHeight: 56,
       });
     });
+
+    it('sizes the closed iframe from the actual launcher (bar, not hardcoded circle)', () => {
+      expect(buildSdkPostMessageLayout({
+        positionPc: '1',
+        positionSp: '1',
+        buttonTypePc: '1',
+        buttonTypeSp: '1',
+        useFullWidthChatbotMobile: true,
+      }, false)).toEqual({
+        positionPc: '1',
+        positionSp: '1',
+        buttonTypePc: '1',
+        buttonTypeSp: '1',
+        closedContentWidth: 360,
+        closedContentHeight: 66,
+      });
+    });
+
+    it('sizes the closed iframe for a vertical right-edge launcher', () => {
+      expect(buildSdkPostMessageLayout({
+        positionPc: '2',
+        positionSp: '1',
+        buttonTypePc: '1',
+        buttonTypeSp: '1',
+        useFullWidthChatbotMobile: false,
+      }, false)).toEqual({
+        positionPc: '2',
+        positionSp: '1',
+        buttonTypePc: '1',
+        buttonTypeSp: '1',
+        closedContentWidth: 420,
+        closedContentHeight: 300,
+      });
+    });
+
+    it('sizes the closed iframe for full-width mobile bar', () => {
+      expect(buildSdkPostMessageLayout({
+        positionPc: '1',
+        positionSp: '1',
+        buttonTypePc: '1',
+        buttonTypeSp: '1',
+        useFullWidthChatbotMobile: true,
+      }, true)).toEqual({
+        positionPc: '1',
+        positionSp: '1',
+        buttonTypePc: '1',
+        buttonTypeSp: '1',
+        closedContentWidth: '100%',
+        closedContentHeight: 75,
+      });
+    });
   });
 });

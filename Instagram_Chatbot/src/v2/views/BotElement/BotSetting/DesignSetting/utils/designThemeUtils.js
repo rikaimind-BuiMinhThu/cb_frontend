@@ -1,4 +1,4 @@
-import { COLOR_MAP } from '../constants/designChatbotConstants';
+import { COLOR_MAP, DEFAULT_MAIN_COLOR } from '../constants/designChatbotConstants';
 import { resolveMainColorContext } from './designChatbotUtils';
 import {
   BORDER_TWINKLE_EFFECT_IDS,
@@ -185,15 +185,38 @@ export const normalizeFieldFocusEffect = (value) => {
   return 'outline_soft';
 };
 
+export const expandHexColor = (value) => {
+  if (!value || typeof value !== 'string') return '';
+  const trimmed = value.trim();
+  // Bug #4: Restore to default / picker hỏng với hex 3 ký tự (vd #fff) — expand thành 6 ký tự.
+  const shortMatch = /^#([0-9a-fA-F]{3})$/.exec(trimmed);
+  if (shortMatch) {
+    const [r, g, b] = shortMatch[1];
+    return `#${r}${r}${g}${g}${b}${b}`.toLowerCase();
+  }
+  const longMatch = /^#([0-9a-fA-F]{6})$/.exec(trimmed);
+  if (longMatch) return `#${longMatch[1]}`.toLowerCase();
+  return trimmed;
+};
+
+export const isCssHexColor = (value) => /^#[0-9a-f]{6}$/.test(expandHexColor(value));
+
+export const hexColorsEqual = (left, right) => {
+  const leftHex = expandHexColor(left);
+  const rightHex = expandHexColor(right);
+  return Boolean(leftHex) && leftHex === rightHex && isCssHexColor(leftHex);
+};
+
 const PRESET_DERIVED = {
-  blue: { opacity: '#D6E0EF', message: '#3CACEF', font: '#fff' },
-  green: { opacity: '#DEEADB', message: '#9DDB7C', font: '#fff' },
-  orange: { opacity: '#F4E5DA', message: '#EF8D2F', font: '#fff' },
-  yellow: { opacity: '#F0EFEB', message: '#F3AA2D', font: '#fff' },
-  pink: { opacity: '#EBDDE3', message: '#E65B83', font: '#fff' },
-  purple: { opacity: '#E9E8F1', message: '#AF82D5', font: '#fff' },
-  black: { opacity: '#ecede8', message: '#c3c3c3', font: '#000' },
-  white: { opacity: '#fff', message: '#F5F5F5', font: '#000' },
+  // Bug #8: Màu default từng section lệch test case — palette cố định (Bot bubble #3CACEF, không derive từ header).
+  blue: { opacity: '#D6E0EF', message: '#3CACEF', font: '#ffffff' },
+  green: { opacity: '#DEEADB', message: '#9DDB7C', font: '#ffffff' },
+  orange: { opacity: '#F4E5DA', message: '#EF8D2F', font: '#ffffff' },
+  yellow: { opacity: '#F0EFEB', message: '#F3AA2D', font: '#ffffff' },
+  pink: { opacity: '#EBDDE3', message: '#E65B83', font: '#ffffff' },
+  purple: { opacity: '#E9E8F1', message: '#AF82D5', font: '#ffffff' },
+  black: { opacity: '#ECEDE8', message: '#C3C3C3', font: '#000000' },
+  white: { opacity: '#ffffff', message: '#F5F5F5', font: '#000000' },
 };
 
 const lightenHex = (hex, amount = 0.1) => {
@@ -246,27 +269,35 @@ export const resolveFieldFocusEffect = (effectId, theme) => {
 };
 
 const resolvePresetKey = (mainColorHex, apiColorKey) => {
+  const hexEntry = Object.entries(COLOR_MAP).find(
+    ([, value]) => hexColorsEqual(value, mainColorHex),
+  );
+  if (hexEntry) return hexEntry[0];
   if (apiColorKey && PRESET_DERIVED[apiColorKey]) return apiColorKey;
-  const entry = Object.entries(COLOR_MAP).find(([, value]) => value === mainColorHex);
-  return entry?.[0] || null;
+  return null;
 };
 
-export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null) => {
-  const presetKey = resolvePresetKey(mainColorHex, apiColorKey);
+export const deriveThemeDefaults = (mainColorHex = DEFAULT_MAIN_COLOR, apiColorKey = null) => {
+  const normalizedMain = expandHexColor(mainColorHex) || DEFAULT_MAIN_COLOR;
+  const presetKey = resolvePresetKey(normalizedMain, apiColorKey);
   const preset = presetKey ? PRESET_DERIVED[presetKey] : null;
-  const opacityColor = preset?.opacity || lightenHex(mainColorHex, 0.1);
-  const messageColor = preset?.message || mainColorHex;
-  const fontColor = preset?.font || '#fff';
+  const opacityColor = preset?.opacity || lightenHex(normalizedMain, 0.1);
+  const messageColor = preset?.message || normalizedMain;
+  const fontColor = preset?.font || '#ffffff';
   const pressedColor = presetKey === 'black' || presetKey === 'white'
-    ? mainColorHex
-    : lightenHex(mainColorHex, -0.08) || mainColorHex;
+    ? normalizedMain
+    : lightenHex(normalizedMain, -0.08) || normalizedMain;
+  const radioSelectedBg = lightenHex(normalizedMain, 0.15) || opacityColor;
 
+  // Bug #4 / #8: default từng section khớp test case (Header #327AED, Bot #3CACEF, User #fff/#333, ...).
   return {
+    headerBgColor: normalizedMain,
     headerTitleTextColor: '#ffffff',
     headerTitleFontSize: '15px',
     headerSubtitleTextColor: '#ffffff',
     headerSubtitleFontSize: '14px',
     progressBarBgColor: opacityColor,
+    progressBarFillColor: normalizedMain,
     progressBarTextColor: '#ffffff',
     progressBarFontSize: '13px',
     chatWindowBgColor: opacityColor,
@@ -278,7 +309,7 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
     userMessageTextColor: '#333333',
     userMessageFontSize: '14px',
     userMessageBorderStyle: 'no_tail',
-    fieldFocusBorderColor: mainColorHex,
+    fieldFocusBorderColor: normalizedMain,
     fieldFocusBgColor: '#ffffff',
     fieldFocusBgEffect: 'outline_soft',
     fieldUnfocusBorderColor: '#cccccc',
@@ -289,7 +320,7 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
     validationMessageFontSize: '12px',
     requiredLabelTextColor: '#FF7E00',
     requiredLabelFontSize: '12px',
-    buttonNormalBgColor: mainColorHex,
+    buttonNormalBgColor: normalizedMain,
     buttonNormalTextColor: '#ffffff',
     buttonPressedBgColor: pressedColor,
     buttonPressedTextColor: '#ffffff',
@@ -303,17 +334,17 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
     buttonPosition: 'right',
     checkboxUncheckedBgColor: '#ffffff',
     checkboxUncheckedBorderColor: '#cccccc',
-    checkboxCheckedBgColor: mainColorHex,
-    checkboxCheckedBorderColor: mainColorHex,
+    checkboxCheckedBgColor: normalizedMain,
+    checkboxCheckedBorderColor: normalizedMain,
     checkboxCheckedBorderEffect: 'none',
     checkboxFontSize: '14px',
     radioUnselectedBgColor: opacityColor,
-    radioSelectedBgColor: lightenHex(mainColorHex, 0.15) || opacityColor,
+    radioSelectedBgColor: radioSelectedBg,
     radioUnselectedBorderColor: 'transparent',
-    radioSelectedBorderColor: mainColorHex,
+    radioSelectedBorderColor: normalizedMain,
     radioSelectedBorderEffect: 'none',
     radioInputUnselectedColor: '#cccccc',
-    radioInputSelectedColor: mainColorHex,
+    radioInputSelectedColor: normalizedMain,
     radioFontSize: '14px',
     errorMessageBgColor: '#ffebee',
     errorMessageTextColor: '#d32f2f',
@@ -334,6 +365,18 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
 export const createEmptyThemeSettings = () => Object.fromEntries(
   THEME_FIELD_KEYS.map((key) => [key, '']),
 );
+
+// Bug #1 / #6: header chatbot/preview lấy headerBgColor (hoặc header_bg_color từ API), không lấy màu nút.
+export const resolveHeaderBgColor = (theme, mainColorHex = DEFAULT_MAIN_COLOR) => {
+  const raw = theme?.headerBgColor || theme?.header_bg_color;
+  if (raw && isCssHexColor(raw)) {
+    return expandHexColor(raw);
+  }
+  if (isCssHexColor(mainColorHex)) {
+    return expandHexColor(mainColorHex);
+  }
+  return DEFAULT_MAIN_COLOR;
+};
 
 export const mergeThemeWithDefaults = (rawTheme, mainColorHex, apiColorKey) => {
   const defaults = deriveThemeDefaults(mainColorHex, apiColorKey);

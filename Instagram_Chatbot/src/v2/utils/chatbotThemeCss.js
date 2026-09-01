@@ -131,11 +131,15 @@ const buildThemeVariables = (theme) => {
   const buttonPositionJustify = resolveButtonPositionJustify(theme.buttonPosition);
 
   return `
+  /* Bug #6: header dùng headerBgColor, không còn bind nhầm buttonNormalBgColor. */
+  --c-header-bg: ${theme.headerBgColor || '#327AED'};
   --c-header-title-text: ${theme.headerTitleTextColor};
   --c-header-title-font-size: ${theme.headerTitleFontSize};
   --c-header-subtitle-text: ${theme.headerSubtitleTextColor};
   --c-header-subtitle-font-size: ${theme.headerSubtitleFontSize};
   --c-progress-bg: ${theme.progressBarBgColor};
+  /* Bug #7: progress fill độc lập với Main color header. */
+  --c-progress-fill: ${theme.progressBarFillColor || '#327AED'};
   --c-progress-text: ${theme.progressBarTextColor};
   --c-progress-font-size: ${theme.progressBarFontSize};
   --c-chat-window-bg: ${theme.chatWindowBgColor};
@@ -236,17 +240,20 @@ const buildPortalModalVariables = (theme) => `
 ${buildModalButtonVariables(theme)}`;
 
 const buildPortalModalRules = () => `
-#portal .ss-bot-prevent-exit-chatbot-modal {
+#portal .ss-bot-prevent-exit-chatbot-modal,
+.ss-bot-prevent-exit-root .ss-bot-prevent-exit-chatbot-modal {
   background-color: var(--c-modal-bg, #FFF) !important;
 }
 
-#portal .ss-bot-prevent-exit-modal-title-col {
+#portal .ss-bot-prevent-exit-modal-title-col,
+.ss-bot-prevent-exit-root .ss-bot-prevent-exit-modal-title-col {
   flex: 0 0 100% !important;
   max-width: 100% !important;
   text-align: var(--c-modal-title-align, left) !important;
 }
 
-#portal .title-bot-modal {
+#portal .title-bot-modal,
+.ss-bot-prevent-exit-root .title-bot-modal {
   display: block !important;
   width: 100% !important;
   color: var(--c-modal-title-text, #333) !important;
@@ -254,7 +261,8 @@ const buildPortalModalRules = () => `
   text-align: var(--c-modal-title-align, left) !important;
 }
 
-${buildModalButtonRules('#portal')}`.trim();
+${buildModalButtonRules('#portal')}
+${buildModalButtonRules('.ss-bot-prevent-exit-root')}`.trim();
 
 const buildButtonLayoutRules = (hasExplicitWidth) => {
   const widthRule = hasExplicitWidth
@@ -338,6 +346,43 @@ ${twinkleOverrideSelectors} {
 const buildTwinkleAnimationRule = (effectId, elementType, theme) => {
   const { animation } = resolveBorderTwinkleEffect(effectId, elementType, theme);
   return animation !== 'none' ? `animation: ${animation} !important;` : '';
+};
+
+// Bug #10: Unselected style (radio) không apply — accent-color không tô được vòng chưa chọn;
+// vẽ radio native bằng appearance:none, border = --c-radio-input-unselected.
+const buildNativeRadioInputRules = (radioSelectors) => {
+  const selectors = Array.isArray(radioSelectors) ? radioSelectors : [radioSelectors];
+  const baseSelector = selectors.join(',\n');
+  const checkedSelector = selectors.map((selector) => `${selector}:checked`).join(',\n');
+
+  return `
+${baseSelector} {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 19px !important;
+  height: 19px !important;
+  min-width: 19px !important;
+  min-height: 19px !important;
+  margin: 0 !important;
+  flex-shrink: 0 !important;
+  box-sizing: border-box !important;
+  border-radius: 50% !important;
+  background-color: #fff !important;
+  background-image: none !important;
+  border: 2px solid var(--c-radio-input-unselected, #cccccc) !important;
+  box-shadow: none !important;
+  cursor: pointer;
+}
+
+${checkedSelector} {
+  border-color: var(--c-radio-input-selected, #327AED) !important;
+  background-color: #fff !important;
+  background-image: radial-gradient(
+    circle,
+    var(--c-radio-input-selected, #327AED) 38%,
+    #fff 42%
+  ) !important;
+}`;
 };
 
 const buildThemeRules = (theme, scopeSelector = '') => {
@@ -568,14 +613,36 @@ ${previewFieldPlaceholderSelector} {
 
   return `
 ${twinkleKeyframesCss}
+/* Bug #1 / #6: header thật và preview cùng chuỗi fallback với preview-chat-bot.css.
+   --c-header-bg (theme) → --pof-header-bg (SDK/embedded) → #327AED. */
+${scopedClass(scopeSelector, '.sp-header')},
+${scopedClass(scopeSelector, '.preview-open-frame__header')} {
+  background-color: var(--c-header-bg, var(--pof-header-bg, #327AED)) !important;
+}
+
+${scopedClass(scopeSelector, '.sp-header-left-label')} {
+  min-width: 0;
+  overflow: hidden;
+}
+
 ${scopedClass(scopeSelector, '.sp-header-left-label-title')} {
   color: var(--c-header-title-text, #fff) !important;
   font-size: var(--c-header-title-font-size, 15px) !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 ${scopedClass(scopeSelector, '.sp-header-left-label-sub-title')} {
   color: var(--c-header-subtitle-text, #fff) !important;
   font-size: var(--c-header-subtitle-font-size, 14px) !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+${scopedClass(scopeSelector, '.sp-header-right-arrow')} {
+  color: var(--c-header-title-text, #fff) !important;
 }
 
 ${scopedClass(scopeSelector, '.sp-process-bar')} {
@@ -585,6 +652,7 @@ ${scopedClass(scopeSelector, '.sp-process-bar')} {
 ${scopedClass(scopeSelector, '.sp-process-bar-color')} {
   color: var(--c-progress-text, #fff) !important;
   font-size: var(--c-progress-font-size, 13px) !important;
+  background-color: var(--c-progress-fill, #70A5FC) !important;
 }
 
 ${scopeSelector ? spBodySelector : '#sp-body.sp-body, .sp-body'} {
@@ -763,15 +831,10 @@ ${scopedClass(scopeSelector, '.theme-customize-preview__radio-img--selected')} {
   ${radioTwinkleAnimation}
 }
 
-${spBodySelector} .ss-message__content--user-radio_button:not(.ss-message__content--user-radio_button--radio_button_img) input[type="radio"],
-${scopedDescendant(scopeSelector, '.theme-customize-preview__radio-default input[type="radio"]')} {
-  accent-color: var(--c-radio-input-selected, #327AED) !important;
-}
-
-${spBodySelector} .ss-message__content--user-radio_button:not(.ss-message__content--user-radio_button--radio_button_img) input[type="radio"]:not(:checked),
-${scopedDescendant(scopeSelector, '.theme-customize-preview__radio-default input[type="radio"]:not(:checked)')} {
-  accent-color: var(--c-radio-input-unselected, #ccc) !important;
-}
+${buildNativeRadioInputRules([
+    `${spBodySelector} .ss-message__content--user-radio_button:not(.ss-message__content--user-radio_button--radio_button_img) input[type="radio"]:not(.ss-radio-button-img-input--hidden)`,
+    scopedDescendant(scopeSelector, '.theme-customize-preview__radio-default input[type="radio"]'),
+  ])}
 
 ${spBodySelector} .ss-message__content--user-radio_button > label,
 ${spBodySelector} .ss-message__content--user-radio_button--block_style > span,
@@ -889,7 +952,12 @@ export const injectBotThemeCss = (rawTheme, mainColorHex, apiColorKey) => {
 };
 
 export const applyPreviewThemeCss = (botInfor, themeSettings) => {
-  if (!botInfor) return;
+  // Bug #9: botInfor={} vẫn truthy nên từng inject palette default trước khi API về → flash xanh dương.
+  const hasBotColor = Boolean(botInfor?.main_color || botInfor?.main_color_other);
+  const hasTheme = Boolean(themeSettings && typeof themeSettings === 'object'
+    && Object.keys(themeSettings).length > 0);
+  if (!hasBotColor && !hasTheme) return;
+
   const { apiColorKey, mainColorHex } = resolveMainColorContext(botInfor);
   injectBotThemeCss(themeSettings, mainColorHex, apiColorKey);
 };

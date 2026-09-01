@@ -1,8 +1,12 @@
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 import { applyPreviewThemeCss } from "v2/utils/chatbotThemeCss";
 
 /**
  * Custom CSS injection + theme CSS (single place; collapses duplicate theme effects).
+ *
+ * Bug #9: Reload flash màu default rồi mới đúng (FOUC).
+ * Dùng useLayoutEffect để biến theme vào DOM trước paint — tránh flash header #327AED rồi mới nhảy sang màu đã lưu.
+ *
  * @param {Function} [applyTheme] - defaults to applyPreviewThemeCss; Scenario may pass injectBotThemeCss wrapper
  */
 export const usePreviewThemeCss = ({
@@ -11,7 +15,7 @@ export const usePreviewThemeCss = ({
   applyTheme = applyPreviewThemeCss,
   customCssId = "custom-css",
 }) => {
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!enabled) return;
 
     const existing = document.getElementById(customCssId);

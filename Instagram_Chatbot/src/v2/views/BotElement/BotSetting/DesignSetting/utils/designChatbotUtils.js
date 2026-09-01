@@ -14,7 +14,7 @@ import {
   OPEN_ANIMATION_STYLE_ZOOM_IN,
   OPEN_ANIMATION_STYLES,
 } from '../constants/designChatbotConstants';
-import { buildThemePayload, parseThemeSettings as parseThemeFromRaw } from './designThemeUtils';
+import { buildThemePayload, hexColorsEqual, parseThemeSettings as parseThemeFromRaw } from './designThemeUtils';
 
 export const getIconPath = (iconField) => {
   if (!iconField) return '';
@@ -141,7 +141,9 @@ export const isTempImage = (image) => !!image && (
 );
 
 export const resolveMainColorKey = (mainColor) => {
-  const colorKey = Object.entries(COLOR_MAP).find(([, value]) => value === mainColor)?.[0];
+  const colorKey = Object.entries(COLOR_MAP).find(
+    ([, value]) => hexColorsEqual(value, mainColor),
+  )?.[0];
   if (colorKey) {
     return { main_color: colorKey, main_color_other: undefined };
   }

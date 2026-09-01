@@ -1,6 +1,7 @@
 import { EC_CHATBOT_URL } from "v2/variables/constants";
 import { isMobile } from "./Utils";
-import { resolveIconUrl } from "../DesignSetting/utils/designChatbotUtils";
+import { resolveIconUrl, resolveMainColorContext } from "../DesignSetting/utils/designChatbotUtils";
+import { resolveHeaderBgColor } from "../DesignSetting/utils/designThemeUtils";
 
 /**
  * Relative icon path used by runtime previews (prefixed with EC_CHATBOT_URL by callers).
@@ -39,6 +40,10 @@ export const resolveHeaderIconSrc = (botInfor, isOpen, { absolute = false } = {}
 /**
  * Open-frame layout tokens for PreviewOpenChatFrame (CSS classes + CSS variables).
  *
+ * Bug #1: Header chatbot thật không có nền — SDK/embedded phải set --pof-header-bg
+ * (trước đây chỉ preview admin có nền, chatbot thật fallback transparent).
+ * Bug #6: Main color header không đổi màu header thật — dùng headerBgColor, không bind buttonNormalBgColor.
+ *
  * @param {object} state - preview reducer state
  * @param {object} [options]
  * @param {boolean} [options.mobile] - override isMobile(); defaults to isMobile()
@@ -51,8 +56,9 @@ export const getOpeningBotStyle = (state, options = {}) => {
   const mobile =
     typeof options.mobile === "boolean" ? options.mobile : isMobile();
 
-  const headerBg =
-    state.botInfor?.main_color || state.botInfor?.main_color_other || "";
+  const { mainColorHex } = resolveMainColorContext(state.botInfor);
+  // Bug #1 / #6: nền header từ theme.headerBgColor (Main color header), fallback #327AED.
+  const headerBg = resolveHeaderBgColor(state.themeSettings, mainColorHex);
   const bodyBg = state.botInfor?.opacity_color || "";
 
   if (embedded) {
@@ -65,6 +71,10 @@ export const getOpeningBotStyle = (state, options = {}) => {
     return {
       frameClassName: classNames.join(" "),
       cssVars: {
+        // Bug #1: embedded/SDK trước đây không set --pof-header-bg → header trong suốt.
+        // CSS đọc --c-header-bg trước, rồi --pof-header-bg; set cả hai để cùng một màu.
+        "--pof-header-bg": headerBg,
+        "--c-header-bg": headerBg,
         ...(bodyBg ? { "--pof-body-bg": bodyBg } : {}),
       },
     };
@@ -97,7 +107,10 @@ export const getOpeningBotStyle = (state, options = {}) => {
       "--pof-right": right,
       "--pof-width": width,
       "--pof-height": height,
-      ...(headerBg ? { "--pof-header-bg": headerBg } : {}),
+      // Bug #1 / #6: chatbot đang mở cũng phải set cả hai var (không chỉ preview).
+      // CSS: var(--c-header-bg, var(--pof-header-bg, #327AED)).
+      "--pof-header-bg": headerBg,
+      "--c-header-bg": headerBg,
       ...(bodyBg ? { "--pof-body-bg": bodyBg } : {}),
     },
   };

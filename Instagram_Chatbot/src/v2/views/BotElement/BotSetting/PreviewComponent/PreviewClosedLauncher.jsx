@@ -3,6 +3,7 @@ import { MDBIcon } from "mdbreact";
 import { DISPLAY_TYPES } from "./Constants";
 import { toNumber } from "./Utils";
 import { getClosedBarWidth, getClosedLauncherPosition } from "v2/utils/sdkLayoutUtils";
+import { resolveMainColorContext } from "../DesignSetting/utils/designChatbotUtils";
 import "v2/assets/css/bot/preview-chat-bot.css";
 
 const buildPositionVars = (position = {}) => ({
@@ -14,7 +15,16 @@ const buildPositionVars = (position = {}) => ({
 
 /**
  * Closed chatbot launcher matrix (PC/SP × circle/bar/vertical).
- * Layout lives in CSS; only dynamic tokens (color, size, position) use CSS variables.
+ *
+ * Không ép mọi bot về avatar tròn. Bug #12 chỉ sửa nhánh circle
+ * (position=1, buttonType=2): avatar 56px / iframe vừa avatar.
+ * Bar (title + bubble + mũi tên) và vertical (mép phải, xoay -90°) giữ nguyên.
+ *
+ * Callers vẫn truyền:
+ * - showFallback: FAQ dùng true (circle dự phòng nếu không khớp matrix)
+ * - requireClosed: FAQ true = chỉ hiện khi đóng; Fukushashiki false
+ *
+ * Layout ở CSS; token động (màu, size bar, vị trí) dùng CSS variables.
  */
 const PreviewClosedLauncher = ({
   state,
@@ -34,8 +44,10 @@ const PreviewClosedLauncher = ({
   const buttonTypePc = toNumber(state.buttonTypePc, 1);
   const positionSp = toNumber(state.positionSp, 1);
   const buttonTypeSp = toNumber(state.buttonTypeSp, 1);
-  const mainColor =
-    state.botInfor?.main_color || state.botInfor?.main_color_other;
+  // API lưu preset là key ("blue", "green"...), không phải hex.
+  // Gán thô vào CSS thì "blue" = named color #0000FF, không phải COLOR_MAP #327AED.
+  // resolveMainColorContext: key → hex (main_color_other nếu custom).
+  const { mainColorHex } = resolveMainColorContext(state.botInfor);
   const title = state.botInfor?.title;
   const toggleOpen = () => onOpen(!state.isOpen);
   const fullWidthMobile = Boolean(state.useFullWidthChatbotMobile);
@@ -52,9 +64,13 @@ const PreviewClosedLauncher = ({
     <img src={headerIconSrc} alt="bot-header-icon" />
   ) : null;
 
+  // requireClosed=false → PC vẫn render launcher chrome theo type (caller Fukushashiki).
+  // requireClosed=true  → chỉ hiện khi chatbot đang đóng (caller FAQ).
   const closedOk = !requireClosed || !state.isOpen;
-  const colorVars = { "--pcl-bg": mainColor || "#327AED" };
+  // --pcl-bg phải là hex; CSS .preview-closed-launcher đọc var này.
+  const colorVars = { "--pcl-bg": mainColorHex };
 
+  // PC circle: position=1 + buttonType=2 → avatar 56×56 (Bug #12 chỉ đụng nhánh này).
   if (closedOk && !isMobileView && positionPc === 1 && buttonTypePc === 2) {
     const position = getClosedLauncherPosition(state);
     return (
@@ -68,6 +84,7 @@ const PreviewClosedLauncher = ({
     );
   }
 
+  // PC bar: position=1 + buttonType=1 → avatar + title/bubble + mũi tên.
   if (closedOk && !isMobileView && positionPc === 1 && buttonTypePc === 1) {
     const position = getClosedLauncherPosition(state);
     return (
@@ -95,6 +112,7 @@ const PreviewClosedLauncher = ({
     );
   }
 
+  // PC vertical: position=2 → tab mép phải, xoay -90°.
   if (closedOk && !isMobileView && positionPc === 2) {
     const position = getClosedLauncherPosition(state, { variant: "vertical" });
     return (
@@ -113,6 +131,7 @@ const PreviewClosedLauncher = ({
     );
   }
 
+  // SP circle: giống PC circle, 56×56. spCircleUseParentOffsets = FAQ neo 0,0 trong iframe.
   if (!state.isOpen && isMobileView && positionSp === 1 && buttonTypeSp === 2) {
     const position = spCircleUseParentOffsets
       ? { bottom: "0px", right: "0px" }
@@ -128,6 +147,7 @@ const PreviewClosedLauncher = ({
     );
   }
 
+  // SP bar: compact 240×48, hoặc full-width mobile 100% × 75.
   if (!state.isOpen && isMobileView && positionSp === 1 && buttonTypeSp === 1) {
     const position = getClosedLauncherPosition(state, { isMobile: true });
     return (
@@ -177,6 +197,7 @@ const PreviewClosedLauncher = ({
     );
   }
 
+  // SP vertical: tab mép phải trên mobile.
   if (!state.isOpen && isMobileView && positionSp === 2) {
     const position = getClosedLauncherPosition(state, {
       isMobile: true,
@@ -198,6 +219,7 @@ const PreviewClosedLauncher = ({
     );
   }
 
+  // FAQ: nếu không khớp circle/bar/vertical thì vẫn hiện circle dự phòng khi đóng.
   if (showFallback && !state.isOpen) {
     const position = isMobileView
       ? { bottom: "0px", right: "0px" }

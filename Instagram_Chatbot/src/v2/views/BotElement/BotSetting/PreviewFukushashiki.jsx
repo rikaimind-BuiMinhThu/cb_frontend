@@ -81,6 +81,7 @@ import {
 } from "./PreviewComponent/previewOpeningStyles";
 import { mapParsedDesignToState } from "./PreviewComponent/previewDesignStateUtils";
 import { createPreviewInitialState } from "./PreviewComponent/createPreviewInitialState";
+import { shouldShowPreventExitModal } from "./PreviewComponent/preventExitModalUtils";
 import {
   usePreviewConversionOnOpen,
   usePreviewIpParams,
@@ -463,15 +464,20 @@ const PreviewFukushashiki = () => {
     const timerChatbotStorage = getTimerConfig();
     setTimerChanges((timerChanges) => timerChatbotStorage || timerChanges);
 
-    // post message to parent window
-    postMessageToParent({ isOpen: opening}, state);
+    if (!opening && !state.showPopupCloseBot
+      && shouldShowPreventExitModal(state.botInfor, state.activePopupCloseBot)) {
+      // Bug #11: chỉ early-return khi THẬT SỰ cần confirm (離脱防止 hoặc popup_close_bot).
+      // Không post isOpen: false ở đây — iframe parent giữ size open để modal không bị cắt;
+      // user bấm xác nhận mới đi tiếp xuống dưới (showPopupCloseBot=true) và post.
+      return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
+    }
 
-    if (state.alreadyOpenFirstTime) {
+    // Path 閉じる (cả hai cờ off, hoặc user đã confirm modal):
+    // BẮT BUỘC post isOpen cho parent — nếu return sớm như trước, iframe lệch state.
+    postMessageToParent({ isOpen: opening }, { ...state, isOpen: opening });
+
+    if (state.alreadyOpenFirstTime || state.isAlreadyOpenFirstTime) {
       if (!opening) {
-        if (state.activePopupCloseBot) {
-          return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
-        }
-
         return dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
       }
 
@@ -496,13 +502,13 @@ const PreviewFukushashiki = () => {
 
   const onChatbotHeaderClick = () => {
     if (!state.isOpen) return dispatch({ type: PREVIEW_ACTIONS.OPEN_CHATBOT });
-
-    // When closing chatbot, show popup close bot modal if has setting
-    const openPopupSetting = ["standard_exit_popup", "image_popup"];
-    const isWithDrawalEnabled = state.botInfor && openPopupSetting.includes(state.botInfor.withdrawal_prevention_status);
-
-    if (!isWithDrawalEnabled) return dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
-
+    if (state.showPopupCloseBot) return;
+    // Cùng rule Bug #11 với nút đóng: 離脱防止 off → đóng thẳng + post parent;
+    // đang bật → chỉ mở modal, chưa post isOpen: false.
+    if (!shouldShowPreventExitModal(state.botInfor, state.activePopupCloseBot)) {
+      postMessageToParent({ isOpen: false }, { ...state, isOpen: false });
+      return dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
+    }
     return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
   }
 
@@ -1001,6 +1007,8 @@ const PreviewFukushashiki = () => {
           "--chatbot-open-animation-duration": `${openAnimationDurationMs}ms`,
         }}
         headerIconSrc={headerIconSrc}
+        // Bug #5: title từ Basic Information, không dùng titleBubble khi mở.
+        title={state.botInfor?.title}
         subtitle={state.botInfor?.subtitle}
         titleBubble={state.botInfor?.titleBubble}
         isOpen={state.isOpen}

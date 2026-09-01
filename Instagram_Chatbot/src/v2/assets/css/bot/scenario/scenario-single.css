@@ -379,14 +379,33 @@ textarea.ss-message__content--bot-delay {
 }
 
 input#ss-message__content--user-radio_button,
-.ss-message__content--user-radio_button-wrapper input[type="radio"]{
+.ss-message__content--user-radio_button-wrapper
+  .ss-message__content--user-radio_button:not(.ss-message__content--user-radio_button--radio_button_img)
+  input[type="radio"]:not(.ss-radio-button-img-input--hidden) {
+  /* Bug #10: Unselected style — appearance:none + border --c-radio-input-unselected (accent-color không tô vòng chưa chọn). */
   width: 19px !important;
   height: 19px !important;
-  accent-color: var(--c-radio-input-selected, #327AED);
+  -webkit-appearance: none;
+  appearance: none;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background-color: #fff;
+  background-image: none;
+  border: 2px solid var(--c-radio-input-unselected, #ccc);
+  box-shadow: none;
 }
 
-.ss-message__content--user-radio_button-wrapper input[type="radio"]:not(:checked) {
-  accent-color: var(--c-radio-input-unselected, #ccc);
+.ss-message__content--user-radio_button-wrapper
+  .ss-message__content--user-radio_button:not(.ss-message__content--user-radio_button--radio_button_img)
+  input[type="radio"]:not(.ss-radio-button-img-input--hidden):checked {
+  border-color: var(--c-radio-input-selected, #327AED);
+  background-color: #fff;
+  background-image: radial-gradient(
+    circle,
+    var(--c-radio-input-selected, #327AED) 38%,
+    #fff 42%
+  );
 }
 
 .ss-message__content--user-radio_button>label {
