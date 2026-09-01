@@ -81,6 +81,7 @@ const ThemeAccordionSection = ({
           <div className="theme-field__control">
             <MainColorPicker mainColor={mainColor} onChange={onMainColorChange} />
             <p className="theme-section__main-color-helper">
+              {/* Bug #6: copy khớp hành vi — đổi Main color không ghi đè section khác. */}
               メインカラーを変更しても個別設定は自動では上書きされません。セクションごとに「デフォルトに戻す」で再計算できます。
             </p>
           </div>

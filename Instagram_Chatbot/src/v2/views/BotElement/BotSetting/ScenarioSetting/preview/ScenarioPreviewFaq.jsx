@@ -802,7 +802,8 @@ const ScenarioPreviewFaq = ({
         cssVars={cssVars}
         headerIconSrc={headerIconSrc}
         subtitle={displayBotInfor?.subtitle}
-        titleBubble={displayBotInfor?.titleBubble}
+        // Bug #5: title Basic Information khi header mở (không phải titleBubble).
+        title={displayBotInfor?.title}
         isOpen={state.isOpen}
         onHeaderClick={() => onOpenPreview(!state.isOpen)}
         botConfig={state}

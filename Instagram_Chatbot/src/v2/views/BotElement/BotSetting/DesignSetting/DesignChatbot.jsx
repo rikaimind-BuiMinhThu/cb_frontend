@@ -81,8 +81,8 @@ function DesignChatbot() {
                   title={state.basicInfo.title}
                   subtitle={state.basicInfo.subtitle}
                   onFieldChange={actions.updateThemeField}
-                  onMainColorChange={actions.setMainColor}
-                  onApplyDerivedTheme={actions.applyDerivedTheme}
+                  // Bug #6: updateMainHeaderColor — không applyDerivedTheme (dialog 再計算).
+                  onMainColorChange={actions.updateMainHeaderColor}
                   onResetSection={actions.resetThemeSection}
                   onSave={actions.saveThemeCustomize}
                 />

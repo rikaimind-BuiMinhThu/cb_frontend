@@ -76,6 +76,8 @@ export const getBotInforFromPreviewResponse = (res) => {
     icon_mess,
     main_color: res.data.chatbot.main_color || res.data.chatbot.main_color_other,
     main_color_other: res.data.chatbot.main_color_other,
+    // Bug #5: giữ title Basic Information trên botInfor để header mở bind đúng (không chỉ titleBubble).
+    title: res.data.chatbot.title,
     titleBubble: res.data.design_settings.title_bubble,
   };
 };

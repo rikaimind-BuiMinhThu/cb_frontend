@@ -101,13 +101,14 @@
 }
 
 .sp-header {
-    /* background-color: #546DA7; */
+    /* Bug #1: nền header từ theme, không hardcode / để trống (lộ trắng). */
     min-width: 360px;
     height: 65px;
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
     display: flex;
     align-items: center;
+    background-color: var(--c-header-bg, var(--pof-header-bg, transparent));
     /* padding: 15px; */
 }
 
@@ -1182,7 +1183,7 @@ slideUp
     }
 
     .sp-header {
-        /* background-color: #546DA7; */
+        /* Bug #1: không ép transparent — đè mất Main color, header thành trắng trên iframe. */
         width: 100%;
         max-width: 100%;
         height: 65px;
@@ -1190,7 +1191,7 @@ slideUp
         border-top-right-radius: 2px;
         display: flex;
         align-items: center;
-        background-color: transparent;
+        background-color: var(--c-header-bg, var(--pof-header-bg, transparent));
         /* padding: 15px; */
     }
     
@@ -1892,7 +1893,8 @@ slideUp
 }
 
 .preview-open-frame__header {
-  background-color: var(--pof-header-bg, transparent);
+  /* Bug #1: fallback transparent chỉ khi chưa inject theme; có --pof-header-bg / --c-header-bg thì sơn Main color. */
+  background-color: var(--c-header-bg, var(--pof-header-bg, transparent));
 }
 
 .preview-open-frame--desktop .preview-open-frame__header {

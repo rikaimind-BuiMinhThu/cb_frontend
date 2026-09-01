@@ -14,7 +14,7 @@ const PreviewOpenChatFrame = ({
   cssVars = {},
   headerIconSrc,
   subtitle,
-  titleBubble,
+  title,
   isOpen,
   onHeaderClick,
   botConfig,
@@ -46,7 +46,8 @@ const PreviewOpenChatFrame = ({
           </div>
           <div className="sp-header-left-label">
             <div className="sp-header-left-label-sub-title">{subtitle}</div>
-            <div className="sp-header-left-label-title">{titleBubble}</div>
+            {/* Bug #5: header đang mở lấy title Basic Information, không dùng titleBubble (copy khi chatbot đóng). */}
+            <div className="sp-header-left-label-title">{title}</div>
           </div>
         </div>
         <div className="sp-header-right" onClick={onHeaderClick}>

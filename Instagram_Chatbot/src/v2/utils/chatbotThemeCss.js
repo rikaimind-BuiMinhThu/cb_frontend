@@ -124,13 +124,15 @@ const combineScopedFieldSelectors = (scopeSelector, builder) =>
     .map((fieldScope) => builder(fieldScope))
     .join(',\n');
 
-const buildThemeVariables = (theme) => {
+const buildThemeVariables = (theme, mainColorHex = '#327AED') => {
   const buttonWidth = resolveButtonWidthCss(theme.buttonWidth);
   const buttonPadding = resolveButtonPaddingCss(theme.buttonPadding);
   const buttonBorderRadius = resolveButtonBorderRadius(theme.buttonBorderStyle);
   const buttonPositionJustify = resolveButtonPositionJustify(theme.buttonPosition);
 
+  // Bug #1 / #6: --c-header-bg = Main color (hex), không lấy buttonNormalBgColor.
   return `
+  --c-header-bg: ${mainColorHex};
   --c-header-title-text: ${theme.headerTitleTextColor};
   --c-header-title-font-size: ${theme.headerTitleFontSize};
   --c-header-subtitle-text: ${theme.headerSubtitleTextColor};
@@ -568,6 +570,13 @@ ${previewFieldPlaceholderSelector} {
 
   return `
 ${twinkleKeyframesCss}
+/* Bug #1: nền header = Main color (--c-header-bg). Không để transparent → lộ trắng iframe. */
+${scopedClass(scopeSelector, '.sp-header')},
+${scopedClass(scopeSelector, '.preview-open-frame__header')},
+${scopedClass(scopeSelector, '.theme-customize-preview__header')} {
+  background-color: var(--c-header-bg, var(--pof-header-bg, transparent)) !important;
+}
+
 ${scopedClass(scopeSelector, '.sp-header-left-label-title')} {
   color: var(--c-header-title-text, #fff) !important;
   font-size: var(--c-header-title-font-size, 15px) !important;
@@ -585,6 +594,7 @@ ${scopedClass(scopeSelector, '.sp-process-bar')} {
 ${scopedClass(scopeSelector, '.sp-process-bar-color')} {
   color: var(--c-progress-text, #fff) !important;
   font-size: var(--c-progress-font-size, 13px) !important;
+  background-color: var(--c-progress-fill, #70A5FC) !important;
 }
 
 ${scopeSelector ? spBodySelector : '#sp-body.sp-body, .sp-body'} {
@@ -847,10 +857,11 @@ ${scopedClass(scopeSelector, '.title-bot-modal')} {
 ${buildModalButtonRules(toScopeIs(scopeSelector) || scopeSelector)}${previewButtonRules}`.trim();
 };
 
-const buildThemeCss = (theme, scopeSelector = '') => {
+const buildThemeCss = (theme, scopeSelector = '', mainColorHex = '#327AED') => {
+  const headerHex = mainColorHex || '#327AED';
   const variablesBlock = scopeSelector
-    ? `${scopeSelector} {${buildThemeVariables(theme)}\n}`
-    : `#sp-container, .sp-container, #sp-container1, .sp-container1 {${buildThemeVariables(theme)}\n}`;
+    ? `${scopeSelector} {${buildThemeVariables(theme, headerHex)}\n}`
+    : `#sp-container, .sp-container, #sp-container1, .sp-container1 {${buildThemeVariables(theme, headerHex)}\n}`;
 
   const isLiveBotScope = scopeSelector.includes('sp-container');
   const portalVariablesBlock = isLiveBotScope
@@ -863,7 +874,7 @@ const buildThemeCss = (theme, scopeSelector = '') => {
 
 export const generateThemeCss = (rawTheme, mainColorHex, apiColorKey) => {
   const theme = mergeThemeWithDefaults(rawTheme, mainColorHex, apiColorKey);
-  return buildThemeCss(theme, LIVE_THEME_SCOPE);
+  return buildThemeCss(theme, LIVE_THEME_SCOPE, mainColorHex);
 };
 
 export const generateScopedThemeCss = (
@@ -873,7 +884,7 @@ export const generateScopedThemeCss = (
   scopeSelector = '#theme-customize-preview',
 ) => {
   const theme = mergeThemeWithDefaults(rawTheme, mainColorHex, apiColorKey);
-  return buildThemeCss(theme, scopeSelector);
+  return buildThemeCss(theme, scopeSelector, mainColorHex);
 };
 
 export const injectBotThemeCss = (rawTheme, mainColorHex, apiColorKey) => {

@@ -1002,7 +1002,8 @@ const PreviewFukushashiki = () => {
         }}
         headerIconSrc={headerIconSrc}
         subtitle={state.botInfor?.subtitle}
-        titleBubble={state.botInfor?.titleBubble}
+        // Bug #5: title Basic Information khi header mở (không phải titleBubble).
+        title={state.botInfor?.title}
         isOpen={state.isOpen}
         onHeaderClick={onChatbotHeaderClick}
         botConfig={state}

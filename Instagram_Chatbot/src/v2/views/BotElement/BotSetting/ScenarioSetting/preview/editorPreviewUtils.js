@@ -1,4 +1,5 @@
 export const EDITOR_PREVIEW_FALLBACK_BOT_INFOR = {
+  // Bug #5: fallback header mở dùng title, titleBubble chỉ cho launcher đóng.
   title: '簡単90秒で注文完了',
   subtitle: '',
   titleBubble: '簡単90秒で注文完了',

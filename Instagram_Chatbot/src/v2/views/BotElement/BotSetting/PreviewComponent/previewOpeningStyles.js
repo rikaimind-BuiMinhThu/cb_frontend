@@ -1,6 +1,6 @@
 import { EC_CHATBOT_URL } from "v2/variables/constants";
 import { isMobile } from "./Utils";
-import { resolveIconUrl } from "../DesignSetting/utils/designChatbotUtils";
+import { resolveIconUrl, resolveMainColorContext } from "../DesignSetting/utils/designChatbotUtils";
 
 /**
  * Relative icon path used by runtime previews (prefixed with EC_CHATBOT_URL by callers).
@@ -51,8 +51,9 @@ export const getOpeningBotStyle = (state, options = {}) => {
   const mobile =
     typeof options.mobile === "boolean" ? options.mobile : isMobile();
 
-  const headerBg =
-    state.botInfor?.main_color || state.botInfor?.main_color_other || "";
+  // Bug #1: luôn sơn header bằng HEX. main_color API ("blue") không phải CSS color → header trắng/xanh nhầm.
+  // Bug #1 (embed): nhánh embedded trước đây chỉ set --pof-body-bg, bỏ --pof-header-bg → header trong suốt trên nền iframe trắng.
+  const { mainColorHex: headerBg } = resolveMainColorContext(state.botInfor);
   const bodyBg = state.botInfor?.opacity_color || "";
 
   if (embedded) {
@@ -65,6 +66,7 @@ export const getOpeningBotStyle = (state, options = {}) => {
     return {
       frameClassName: classNames.join(" "),
       cssVars: {
+        "--pof-header-bg": headerBg,
         ...(bodyBg ? { "--pof-body-bg": bodyBg } : {}),
       },
     };
@@ -97,7 +99,7 @@ export const getOpeningBotStyle = (state, options = {}) => {
       "--pof-right": right,
       "--pof-width": width,
       "--pof-height": height,
-      ...(headerBg ? { "--pof-header-bg": headerBg } : {}),
+      "--pof-header-bg": headerBg,
       ...(bodyBg ? { "--pof-body-bg": bodyBg } : {}),
     },
   };

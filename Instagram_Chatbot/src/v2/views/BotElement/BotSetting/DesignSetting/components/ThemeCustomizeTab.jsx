@@ -15,7 +15,6 @@ const ThemeCustomizeTab = ({
   subtitle,
   onFieldChange,
   onMainColorChange,
-  onApplyDerivedTheme,
   onResetSection,
   onSave,
 }) => {
@@ -47,15 +46,13 @@ const ThemeCustomizeTab = ({
     setExpandedSections((prev) => prev.filter((id) => id !== sectionId));
   }, []);
 
+  // Bug #6: Main color = màu header thôi.
+  // Không confirm「再計算」và không gọi deriveThemeDefaults — OK sẽ ghi đè button/radio/checkbox/progress.
+  // Recalculate từng section chỉ qua「デフォルトに戻す」(onResetSection).
   const handleMainColorChange = useCallback((color) => {
     if (color === mainColor) return;
-    const shouldApplyDerived = window.confirm('メインカラーに合わせて各項目を再計算しますか？');
-    if (shouldApplyDerived) {
-      onApplyDerivedTheme(color);
-      return;
-    }
     onMainColorChange(color);
-  }, [mainColor, onApplyDerivedTheme, onMainColorChange]);
+  }, [mainColor, onMainColorChange]);
 
   return (
     <div className="design-setting-tab-content">
@@ -119,7 +116,6 @@ ThemeCustomizeTab.propTypes = {
   subtitle: PropTypes.string,
   onFieldChange: PropTypes.func.isRequired,
   onMainColorChange: PropTypes.func.isRequired,
-  onApplyDerivedTheme: PropTypes.func.isRequired,
   onResetSection: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
 };

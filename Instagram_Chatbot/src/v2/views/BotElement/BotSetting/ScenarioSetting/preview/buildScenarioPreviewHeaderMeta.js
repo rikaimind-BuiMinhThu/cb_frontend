@@ -8,7 +8,8 @@ const DEFAULT_TITLE = '簡単90秒で注文完了';
 const DEFAULT_MAIN_COLOR = '#327AED';
 
 export const buildScenarioPreviewHeaderMeta = (botInfor, { isOpen = true, themeSettings = null } = {}) => ({
-  title: botInfor?.titleBubble || DEFAULT_TITLE,
+  // Bug #5: meta header preview dùng title Basic Information, không dùng title_bubble.
+  title: botInfor?.title || DEFAULT_TITLE,
   subtitle: botInfor?.subtitle || '',
   headerIconUrl: isOpen
     ? (resolveIconUrl(botInfor?.opening_bot_icon) || resolveIconUrl(botInfor?.icon))
@@ -26,7 +27,7 @@ export const buildScenarioPreviewHeaderMetaFromChatbotApi = (chatbotData) => {
 
   return {
     themeSettings: design.themeSettings,
-    title: design.titleBubble || DEFAULT_TITLE,
+    title: chatbotData.title || DEFAULT_TITLE,
     subtitle: chatbotData.subtitle || '',
     headerIconUrl: resolveIconUrl(chatbotData.opening_bot_icon) || resolveIconUrl(chatbotData.icon),
     mainColor,

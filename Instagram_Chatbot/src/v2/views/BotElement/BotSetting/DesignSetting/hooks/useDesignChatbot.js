@@ -18,6 +18,7 @@ import {
   normalizeOpenAnimationStyle,
   parseDesignSettings,
   resolveMainColorFromApi,
+  resolveMainColorKey,
 } from '../utils/designChatbotUtils';
 import { deriveThemeDefaults } from '../utils/designThemeUtils';
 import { THEME_SECTIONS } from '../constants/designThemeConstants';
@@ -451,6 +452,7 @@ export const useDesignChatbot = (initialBotId) => {
     const section = THEME_SECTIONS.find(({ id }) => id === sectionId);
     if (!section) return;
 
+    // 「デフォルトに戻す」: chỉ recalculate 1 section từ Main color hiện tại, không đụng section khác.
     const defaults = deriveThemeDefaults(mainColor, apiColorKey);
     setThemeSettings((prev) => {
       const next = { ...prev };
@@ -462,10 +464,13 @@ export const useDesignChatbot = (initialBotId) => {
     });
   }, [apiColorKey, mainColor]);
 
-  const applyDerivedTheme = useCallback((newMainColor) => {
+  // Bug #6: đổi Main color chỉ cập nhật header (main_color / main_color_other + apiColorKey).
+  // Không setThemeSettings(deriveThemeDefaults()) — hàm đó tạo lại toàn bộ button/radio/message…
+  const updateMainHeaderColor = useCallback((newMainColor) => {
     setMainColor(newMainColor);
-    setThemeSettings(deriveThemeDefaults(newMainColor, apiColorKey));
-  }, [apiColorKey]);
+    const { main_color: nextColorKey } = resolveMainColorKey(newMainColor);
+    setApiColorKey(nextColorKey || null);
+  }, []);
 
   const updateDesignSettingField = useCallback((field, value) => {
     const setters = {
@@ -560,7 +565,7 @@ export const useDesignChatbot = (initialBotId) => {
       updateDesignSettingField,
       updateThemeField,
       resetThemeSection,
-      applyDerivedTheme,
+      updateMainHeaderColor,
     },
   };
 };

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { generateScopedThemeCss } from '../../../../../utils/chatbotThemeCss';
+import { generateScopedThemeCss } from 'v2/utils/chatbotThemeCss';
 import PreviewRegion from './PreviewRegion';
 
 const ThemePreviewShell = ({
@@ -23,6 +23,8 @@ const ThemePreviewShell = ({
 }) => {
   const scopedCss = useMemo(() => {
     if (!themeSettings) return '';
+    // Bug #1 / #6: header/progress lấy CSS variable từ theme CSS, không inline mainColor
+    // (inline làm progress fill đổi theo header dù không bấm Restore).
     return generateScopedThemeCss(themeSettings, mainColor, null, `#${scopeId}`);
   }, [themeSettings, mainColor, scopeId]);
 
@@ -42,7 +44,6 @@ const ThemePreviewShell = ({
       >
         <div
           className="sp-header theme-customize-preview__header"
-          style={{ backgroundColor: mainColor }}
         >
           <PreviewRegion
             sectionId="headerMain"
@@ -57,6 +58,7 @@ const ThemePreviewShell = ({
                 </div>
               )}
               <div className="sp-header-left-label">
+                {/* Bug #5: Title trên preview Theme lấy từ Basic Information, không lấy titleBubble. */}
                 <div className="sp-header-left-label-sub-title">{displaySubtitle}</div>
                 <div className="sp-header-left-label-title">{displayTitle}</div>
               </div>
@@ -76,7 +78,7 @@ const ThemePreviewShell = ({
         <div className="sp-process-bar">
           <div
             className="sp-process-bar-color"
-            style={{ width: barWidth, backgroundColor: mainColor }}
+            style={{ width: barWidth }}
           >
             {processLabel}
           </div>
