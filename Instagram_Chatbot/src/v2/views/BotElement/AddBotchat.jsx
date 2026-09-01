@@ -13,11 +13,11 @@ import IconWomen8 from '../../assets/img/bot-icon/women8_new.png';
 import IconWomen9 from '../../assets/img/bot-icon/women9_new.png';
 import IconWomen10 from '../../assets/img/bot-icon/women10_new.png';
 import IconWomen11 from '../../assets/img/bot-icon/women11_new.png';
-import ModalNoti from '../../views/Popup/ModalNoti';
-import { Link } from 'react-router-dom';
 import { tokenExpired } from 'v2/api/tokenExpired';
+import { Link } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { MDBIcon } from 'mdbreact';
+import { message } from 'antd';
 
 const colors = [
   '#327AED',
@@ -52,8 +52,6 @@ function AddBotchat() {
   const [designType, setDesignType] = useState('flat');
   const [botImage, setBotImage] = useState(IconManDefault);
   const [botName, setBotName] = useState('');
-  const [isOpenNoti, setIsOpenNoti] = useState(false);
-  const [msgNoti, setMsgNoti] = useState('');
   const [isOpenPreview, setIsOpenPreview] = useState(false);
 console.log();
   // side effects
@@ -196,17 +194,12 @@ console.log();
           if (res.data.code === 1 || res.data.code === '1') {
             Cookies.set('bot_id', res.data.data.id);
             Cookies.set('bot_type', 'bot');
-            setMsgNoti('ボットを正常に作成されました！');
-            setIsOpenNoti(true);
+            message.success('ボットを正常に作成されました！');
             setTimeout(() => {
-              setMsgNoti('');
-              setIsOpenNoti(false);
-              
               window.location.href = '/v2/admin/scenario-list';
             }, 1500);
           } else if (res.data?.code === 2 || res.data?.code === '2') {
-            setMsgNoti(res.data.message);
-            setIsOpenNoti(true);
+            message.warning(res.data.message);
           }
         })
         .catch((error) => {
@@ -478,11 +471,6 @@ console.log();
           <div id="sp-body" className="sp-body"></div>
         </div>
         {/* end preview */}
-        <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
-          <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
-            <span style={{ fontSize: '16px' }}>{msgNoti}</span>
-          </div>
-        </ModalNoti>
         <Link to={'/v2/admin/scenario-list'}>
           <button style={{ display: 'none' }}>SCL</button>
         </Link>

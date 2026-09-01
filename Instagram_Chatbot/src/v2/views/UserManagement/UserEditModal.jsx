@@ -3,7 +3,7 @@ import { Form, Input, Modal, Select } from 'antd';
 import { AdminActionButton } from '../../components/AdminShell';
 import { EMAIL_REGEX, ROLE_OPTIONS } from './constants';
 
-function UserEditModal({ open, onClose, listClient, editingUser, onSubmit }) {
+function UserEditModal({ open, onClose, listClient, editingUser, onSubmit, loading }) {
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -34,14 +34,14 @@ function UserEditModal({ open, onClose, listClient, editingUser, onSubmit }) {
   return (
     <Modal
       title="ユーザー編集"
-      visible={open}
+      open={open}
       onCancel={onClose}
       width={520}
       destroyOnClose
       footer={
         <div className="admin-form-actions">
           <AdminActionButton action="cancel" onClick={onClose} />
-          <AdminActionButton action="save" label="更新" onClick={handleOk} />
+          <AdminActionButton action="save" label="更新" onClick={handleOk} loading={loading} />
         </div>
       }
     >
@@ -57,8 +57,8 @@ function UserEditModal({ open, onClose, listClient, editingUser, onSubmit }) {
           label="名称"
           name="full_name"
           rules={[
-            { required: true, message: '入力してください。' },
-            { max: 35, message: '35文字以下入力してください。' },
+            { required: true, message: '名称は、必ず指定してください。' },
+            { max: 35, message: '名称は35文字以下にしてください。' },
           ]}
         >
           <Input />
@@ -67,8 +67,8 @@ function UserEditModal({ open, onClose, listClient, editingUser, onSubmit }) {
           label="ログインID"
           name="email"
           rules={[
-            { required: true, message: 'メールアドレス を入力してください。' },
-            { max: 35, message: '35文字以下入力してください。' },
+            { required: true, message: 'ログインIDは、必ず指定してください。' },
+            { max: 35, message: 'ログインIDは35文字以下にしてください。' },
             { pattern: EMAIL_REGEX, message: 'メールの正しい形式で入力してください：abc@abc.com' },
           ]}
         >

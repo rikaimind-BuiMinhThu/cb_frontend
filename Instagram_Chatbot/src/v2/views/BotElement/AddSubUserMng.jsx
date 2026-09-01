@@ -2,16 +2,13 @@ import React, { useEffect, useState } from 'react';
 import './../../assets/css/sub-user-mng.css';
 import api from 'api/api-management';
 import Cookies from 'js-cookie';
-import ModalNoti from '../../views/Popup/ModalNoti';
 import * as utils from './../../JS/validate.js';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { AdminPage, AdminActionButton, AdminFormRow, useAdminHeaderActions } from '../../components/AdminShell';
-import { Input } from 'antd';
+import { Input, message } from 'antd';
 
 function AddSubUserMng() {
   const [botId, setBotId] = useState();
-  const [isOpenNoti, setIsOpenNoti] = useState(false);
-  const [msgNoti, setMsgNoti] = useState('');
 
   useEffect(() => {
     setBotId(Cookies.get('bot_id'));
@@ -28,20 +25,12 @@ function AddSubUserMng() {
       const add = { user_chatbot: { chatbot_id: botId, ...user } };
       api.post(`/api/v1/managements/user_chatbots`, add).then((res) => {
         if (res.data.code === 1) {
-          setMsgNoti(`正常に追加されました！`);
-          setIsOpenNoti(true);
+          message.success('正常に追加されました！');
           setTimeout(() => {
-            setMsgNoti('');
-            setIsOpenNoti(false);
             window.location.href = `/v2/admin/sub-user`;
           }, 2000);
         } else if (res.data.code === 2) {
-          setMsgNoti(res.data.message || res.data.data);
-          setIsOpenNoti(true);
-          setTimeout(() => {
-            setMsgNoti('');
-            setIsOpenNoti(false);
-          }, 2000);
+          message.warning(res.data.message || res.data.data);
         }
       }).catch((err) => {
         console.log(err);
@@ -87,12 +76,6 @@ function AddSubUserMng() {
           </form>
         </div>
       </AdminPage>
-
-      <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
-        <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
-          <span style={{ fontSize: '16px' }}>{msgNoti}</span>
-        </div>
-      </ModalNoti>
     </>
   );
 }

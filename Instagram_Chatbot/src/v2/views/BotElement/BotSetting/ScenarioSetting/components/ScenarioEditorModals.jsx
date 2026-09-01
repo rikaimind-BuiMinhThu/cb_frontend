@@ -1,5 +1,4 @@
 import React from 'react';
-import ModalNoti from '../../../../Popup/ModalNoti';
 import FileReferencePopup from '../FileReferencePopup';
 import ShopifyReferencePopup from '../ShopifyReferencePopup';
 import ScenarioSettingsModalContainer from './modals/ScenarioSettingsModalContainer';
@@ -16,15 +15,12 @@ const ScenarioEditorModals = () => {
     isOpenAddVariable,
     dataMessages,
     messageType,
-    isOpenNoti,
-    messageNoti,
     varFileReference,
     varShopifyReference,
     acceptFile,
     setIsOpenFileReference,
     setIsOpenShopifyReference,
     setIsOpenAddVariable,
-    setIsOpenNoti,
     setAcceptFile,
     onChangeValueMessageContent,
     createVariable,
@@ -32,12 +28,6 @@ const ScenarioEditorModals = () => {
 
   return (
     <>
-      <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
-        <div className="ss-settings-noti">
-          <span>{messageNoti}</span>
-        </div>
-      </ModalNoti>
-
       <ScenarioSettingsModalContainer />
 
       <ScenarioModalShell

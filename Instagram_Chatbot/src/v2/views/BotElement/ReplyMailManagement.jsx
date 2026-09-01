@@ -27,6 +27,7 @@ function ReplyMailManagement() {
   const [addEmail, setAddEmail] = useState('');
   const [addPassword, setAddPassword] = useState('');
   const [addErrors, setAddErrors] = useState({ email: '', password: '' });
+  const [adding, setAdding] = useState(false);
   const [rowDrafts, setRowDrafts] = useState({});
   const [rowErrors, setRowErrors] = useState({});
 
@@ -114,18 +115,19 @@ function ReplyMailManagement() {
     const nextErrors = { email: '', password: '' };
 
     if (!email) {
-      nextErrors.email = '入力してください。';
+      nextErrors.email = 'メールアドレスは、必ず指定してください。';
     } else if (!EMAIL_REGEX.test(email)) {
-      nextErrors.email = 'メールフォーマットが正しくありません';
+      nextErrors.email = 'メールの正しい形式で入力してください：abc@abc.com';
     }
     if (!password) {
-      nextErrors.password = '入力してください。';
+      nextErrors.password = 'パスワードは、必ず指定してください。';
     }
     if (nextErrors.email || nextErrors.password) {
       setAddErrors(nextErrors);
       return;
     }
 
+    setAdding(true);
     api
       .post('/api/v1/managements/client_emails', {
         email: { email, password },
@@ -144,6 +146,9 @@ function ReplyMailManagement() {
         if (error.response?.data?.code === 0) {
           tokenExpired();
         }
+      })
+      .finally(() => {
+        setAdding(false);
       });
   };
 
@@ -172,12 +177,12 @@ function ReplyMailManagement() {
     const nextErrors = { email: '', password: '' };
 
     if (!email) {
-      nextErrors.email = '入力してください。';
+      nextErrors.email = 'メールアドレスは、必ず指定してください。';
     } else if (!EMAIL_REGEX.test(email)) {
-      nextErrors.email = 'メールフォーマットが正しくありません';
+      nextErrors.email = 'メールの正しい形式で入力してください：abc@abc.com';
     }
     if (!password) {
-      nextErrors.password = '入力してください。';
+      nextErrors.password = 'パスワードは、必ず指定してください。';
     }
     if (nextErrors.email || nextErrors.password) {
       setRowErrors((prev) => ({ ...prev, [clientId]: nextErrors }));
@@ -307,19 +312,20 @@ function ReplyMailManagement() {
 
       <Modal
         title="メール追加"
-        visible={isOpenAddPopup}
+        open={isOpenAddPopup}
         onCancel={closeAddPopup}
         centered
         destroyOnClose
         footer={
           <div className="admin-form-actions">
             <AdminActionButton action="cancel" onClick={closeAddPopup} />
-            <AdminActionButton action="create" label="追加" onClick={handleAddMail} />
+            <AdminActionButton action="create" label="追加" loading={adding} onClick={handleAddMail} />
           </div>
         }
       >
-        <AdminFormRow label="メール追加" required>
+        <AdminFormRow label="メールアドレス" required error={addErrors.email} htmlFor="add-reply-email">
           <Input
+            id="add-reply-email"
             placeholder="メール入力"
             value={addEmail}
             onChange={(e) => {
@@ -327,11 +333,11 @@ function ReplyMailManagement() {
               setAddErrors((prev) => ({ ...prev, email: '' }));
             }}
           />
-          {addErrors.email && <div className="admin-client-form-error">{addErrors.email}</div>}
         </AdminFormRow>
-        <AdminFormRow label="パスワード" required>
+        <AdminFormRow label="パスワード" required error={addErrors.password} htmlFor="add-reply-password">
           <Space align="center">
             <Input
+              id="add-reply-password"
               placeholder="パスワード入力"
               type={showAddPassword ? 'text' : 'password'}
               value={addPassword}
@@ -345,7 +351,6 @@ function ReplyMailManagement() {
               onChange={(e) => setShowAddPassword(e.target.checked)}
             />
           </Space>
-          {addErrors.password && <div className="admin-client-form-error">{addErrors.password}</div>}
         </AdminFormRow>
       </Modal>
     </>

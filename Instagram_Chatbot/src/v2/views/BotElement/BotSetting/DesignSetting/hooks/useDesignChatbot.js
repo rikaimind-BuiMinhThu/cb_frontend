@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { message } from 'antd';
 import Cookies from 'js-cookie';
 import api from 'api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
@@ -48,8 +49,6 @@ export const useDesignChatbot = (initialBotId) => {
   const [tabmenu, setTabmenu] = useState(TAB_BASIC);
   const [isLoaded, setIsLoaded] = useState(false);
   const [botId, setBotId] = useState(initialBotId);
-  const [isOpenNoti, setIsOpenNoti] = useState(false);
-  const [msgNoti, setMsgNoti] = useState('');
   const [validationErrors, setValidationErrors] = useState(INITIAL_VALIDATION_ERRORS);
 
   const [title, setTitle] = useState('');
@@ -91,14 +90,12 @@ export const useDesignChatbot = (initialBotId) => {
     setValidationErrors((prev) => ({ ...prev, [field]: '' }));
   }, []);
 
-  const showNotification = useCallback((message, autoCloseMs = 1500) => {
-    setMsgNoti(message);
-    setIsOpenNoti(true);
-    if (autoCloseMs) {
-      setTimeout(() => {
-        setMsgNoti('');
-        setIsOpenNoti(false);
-      }, autoCloseMs);
+  const showNotification = useCallback((text, autoCloseMs = 1500) => {
+    if (!text) return;
+    if (autoCloseMs === 0) {
+      message.warning(text);
+    } else {
+      message.success(text);
     }
   }, []);
 
@@ -186,8 +183,6 @@ export const useDesignChatbot = (initialBotId) => {
     try {
       const response = await api.get(`/api/v1/managements/chatbots/${id}`);
       if (!response.data.data) {
-        setIsOpenNoti(true);
-        setTimeout(() => setIsOpenNoti(false), 2000);
         return;
       }
 
@@ -501,8 +496,6 @@ export const useDesignChatbot = (initialBotId) => {
       tabmenu,
       isLoaded,
       botId,
-      isOpenNoti,
-      msgNoti,
       validationErrors,
       iconPresetIndices,
       basicInfo: {
@@ -549,7 +542,6 @@ export const useDesignChatbot = (initialBotId) => {
       setBotName,
       setChatBodyVersion,
       setMainColor,
-      setIsOpenNoti,
       clearValidationError,
       handleIconClickForType,
       handleRemoveImage,

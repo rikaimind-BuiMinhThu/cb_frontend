@@ -14,8 +14,12 @@ const AddVariableModalContent = ({ onClose, onSave }) => {
       <ScenarioFormRow
         label="変数名"
         tooltip={SCENARIO_MODAL_TOOLTIPS.variableName}
+        required
+        error={errorVariable}
+        htmlFor="scenario-variable-name"
       >
         <input
+          id="scenario-variable-name"
           type="text"
           className="ss-input-value ss-user-setting-item"
           style={{ width: '100%', padding: '8px', fontSize: '14px', boxSizing: 'border-box' }}
@@ -25,11 +29,6 @@ const AddVariableModalContent = ({ onClose, onSave }) => {
           }}
         />
       </ScenarioFormRow>
-      {errorVariable && (
-        <div style={{ textAlign: 'center', color: 'red', fontSize: '13px', marginBottom: '8px' }}>
-          {errorVariable}
-        </div>
-      )}
       <ScenarioFormRow
         label="デフォルト名"
         tooltip={SCENARIO_MODAL_TOOLTIPS.variableDefault}

@@ -7,27 +7,27 @@ export function validatePickStatus(contract) {
 
 export function validateNameField(value, fieldLabel) {
   if (value === '' || value == null) {
-    return `${fieldLabel} 入力してください。`;
+    return `${fieldLabel}は、必ず指定してください。`;
   }
   if (value.length > 35) {
-    return '35文字以下入力してください。';
+    return '35文字以下にしてください。';
   }
   return null;
 }
 
 export function validateField(value, fieldLabel) {
   if (value === '' || value == null) {
-    return `${fieldLabel} 入力してください。`;
+    return `${fieldLabel}は、必ず指定してください。`;
   }
   if (value.length > 50) {
-    return '50文字以下入力してください。';
+    return '50文字以下にしてください。';
   }
   return null;
 }
 
 export function validatePasswordField(value, fieldLabel) {
   if (value === '' || value == null) {
-    return `${fieldLabel} 入力してください。`;
+    return `${fieldLabel}は、必ず指定してください。`;
   }
   if (value.length > 24) {
     return '24文字以下入力してください。6文字以上入力してください。';
@@ -37,7 +37,7 @@ export function validatePasswordField(value, fieldLabel) {
 
 export function validateZipCode(value) {
   if (value === '' || value == null) {
-    return '郵便番号 を入力してください。';
+    return '郵便番号は、必ず指定してください。';
   }
   if (!/^\d+$/.test(String(value))) {
     return '郵便番号 は整数の必要です。';
@@ -64,7 +64,7 @@ export function validatePrice(value) {
 export function validatePhoneNumber(value) {
   const phoneRe = /^[+]*[(]{0,1}[0-9]{1,3}[)]{0,1}[-\s\./0-9]*$/g;
   if (value === '' || value == null) {
-    return '電話番号 を入力してください。';
+    return '電話番号は、必ず指定してください。';
   }
   if (phoneRe.test(value) === false || parseInt(Number(value), 10) !== Number(value)) {
     return '電話番号の形式で入力してください。';

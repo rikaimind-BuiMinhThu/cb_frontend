@@ -9,6 +9,8 @@ export default function useUserMutations({ reloadList, page }) {
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [idDeleteUser, setIdDeleteUser] = useState();
+  const [submitting, setSubmitting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   function openAdd() {
     setIsOpenAdd(true);
@@ -25,18 +27,20 @@ export default function useUserMutations({ reloadList, page }) {
   }
 
   function deleteUser() {
-    setIsOpenDelete(false);
+    setDeleting(true);
     api
       .delete(`/api/v1/managements/users/${idDeleteUser}`)
       .then(() => {
         reloadList(page);
         message.success('削除しました!');
+        setIsOpenDelete(false);
       })
       .catch((error) => {
         if (error.response?.data.code === 0) {
           tokenExpired();
         }
-      });
+      })
+      .finally(() => setDeleting(false));
   }
 
   function updateUser(values) {
@@ -53,6 +57,7 @@ export default function useUserMutations({ reloadList, page }) {
       payload.user.password_confirmation = values.password_confirmation;
     }
 
+    setSubmitting(true);
     return api
       .patch(`/api/v1/managements/users/${editingUser.id}`, payload)
       .then(() => {
@@ -65,7 +70,8 @@ export default function useUserMutations({ reloadList, page }) {
         if (error.response?.data.code === 0) {
           tokenExpired();
         }
-      });
+      })
+      .finally(() => setSubmitting(false));
   }
 
   function addUser(values) {
@@ -79,6 +85,7 @@ export default function useUserMutations({ reloadList, page }) {
       },
     };
 
+    setSubmitting(true);
     return api
       .post(`/api/v1/users/registrations`, newUser)
       .then((res) => {
@@ -92,14 +99,14 @@ export default function useUserMutations({ reloadList, page }) {
           } else {
             message.warning(res.data?.message);
           }
-          setIsOpenAdd(false);
         }
       })
       .catch((error) => {
         if (error.response?.data.code === 0) {
           tokenExpired();
         }
-      });
+      })
+      .finally(() => setSubmitting(false));
   }
 
   return {
@@ -110,6 +117,8 @@ export default function useUserMutations({ reloadList, page }) {
     isOpenDelete,
     setIsOpenDelete,
     editingUser,
+    submitting,
+    deleting,
     openAdd,
     openEdit,
     confirmDelete,

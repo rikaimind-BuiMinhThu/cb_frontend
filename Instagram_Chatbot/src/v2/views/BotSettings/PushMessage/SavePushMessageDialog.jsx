@@ -2,15 +2,13 @@ import * as React from "react";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import schema from "./validates/CreateTableSchema";
-import Snackbar from "@mui/material/Snackbar";
-import MuiAlert from "@mui/material/Alert";
 import { Divider } from "antd";
 import { Checkbox } from "antd";
 import { Input } from "antd";
 import { Select } from "antd";
 import { Form } from "antd";
 import { Typography } from "antd";
-import { Modal, Space, DatePicker, Row, Col, Button } from "antd";
+import { Modal, Space, DatePicker, Row, Col, Button, message } from "antd";
 import api from "api/api-management";
 import { tokenExpired } from "v2/api/tokenExpired";
 import { MinusCircleOutlined } from "@ant-design/icons";
@@ -24,10 +22,7 @@ export default function SavePushMessageDialog({
   item,
   onCancel,
 }) {
-  console.log(item);
   const [open, setOpen] = React.useState(false);
-  const [openToast, setOpenToast] = React.useState(false);
-  const [errorMessage, setErrorMessage] = React.useState("");
   const [emailTemplateOptions, setEmailTemplateOptions] = React.useState([]);
   const [smsTemplateOptions, setSmsTemplateOptions] = React.useState([]);
   const [variables, setVariables] = React.useState([]);
@@ -62,18 +57,6 @@ export default function SavePushMessageDialog({
         : undefined,
     },
   });
-
-  const handleOpenToast = () => {
-    setOpenToast(true);
-  };
-
-  const handleCloseToast = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setOpenToast(false);
-    setErrorMessage("");
-  };
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -121,11 +104,10 @@ export default function SavePushMessageDialog({
             }
           );
       if (response?.data?.code === 2) {
-        handleOpenToast();
-        setErrorMessage(response?.data?.message);
+        message.warning(response?.data?.message);
       }
       if (response?.data?.code === 1) {
-        handleOpenToast();
+        message.success("プッシュメッセージを正常に保存しました。");
         resolver(response?.data?.data);
         handleClose();
       }
@@ -264,10 +246,11 @@ export default function SavePushMessageDialog({
       )}
       <Modal
         style={{ top: 20 }}
-        title="プッシュメッセージ作成"
+        title={item ? "プッシュメッセージ編集" : "プッシュメッセージ作成"}
         open={open}
         okText="保存"
         cancelText="キャンセル"
+        confirmLoading={isSubmitting}
         onCancel={handleClose}
         onOk={handleSubmit(onSubmit)}
         onClose={handleClose}
@@ -644,32 +627,6 @@ export default function SavePushMessageDialog({
           )}
         </Form>
       </Modal>
-      <Snackbar
-        open={openToast}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        autoHideDuration={2000}
-        onClose={handleCloseToast}
-      >
-        {errorMessage ? (
-          <MuiAlert
-            severity="error"
-            sx={{ width: "100%" }}
-            elevation={6}
-            variant="filled"
-          >
-            {errorMessage}
-          </MuiAlert>
-        ) : (
-          <MuiAlert
-            severity="success"
-            sx={{ width: "100%" }}
-            elevation={6}
-            variant="filled"
-          >
-            プッシュメッセージを正常に保存しました。
-          </MuiAlert>
-        )}
-      </Snackbar>
     </div>
   );
 }

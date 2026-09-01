@@ -1,13 +1,12 @@
 import React from 'react';
 import { AdminPage, AdminActionButton, AdminFormRow, useAdminHeaderActions } from '../../components/AdminShell';
-import { Input } from 'antd';
+import { Input, message } from 'antd';
 import './../../assets/css/basic_setting.css';
 import * as utils from './../../JS/validate.js';
 import Cookies from 'js-cookie';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import api from '../../api/api-management';
-import ModalNoti from './../Popup/ModalNoti';
 import { tokenExpired } from 'api/tokenExpired';
 
 const MAIL_FORMAT =
@@ -17,8 +16,6 @@ function BasicSetting() {
   const [userIdEC, setUsreIdEC] = useState();
   const [userDetail, setUserDetail] = useState({});
   const [clientId, setClientId] = useState(null);
-  const [isOpenNoti, setIsOpenNoti] = useState(false);
-  const [msgNoti, setMsgNoti] = useState();
   const [language, setLanguage] = useState('');
   const [division, setDivision] = useState('');
   const [replySmtpGmail, setReplySmtpGmail] = useState('');
@@ -119,13 +116,12 @@ function BasicSetting() {
     return true;
   }
 
-  function showNoti(message) {
-    setIsOpenNoti(true);
-    setMsgNoti(message);
-    setTimeout(() => {
-      setIsOpenNoti(false);
-      setMsgNoti('');
-    }, 2000);
+  function showNoti(text, type = 'success') {
+    if (type === 'warning') {
+      message.warning(text);
+    } else {
+      message.success(text);
+    }
   }
 
   function saveClientSmtp() {
@@ -188,11 +184,11 @@ function BasicSetting() {
               if (smtpResult.ok) {
                 showNoti('正常に更新されました！');
               } else {
-                showNoti(smtpResult.message || 'メール送信設定の更新に失敗しました');
+                showNoti(smtpResult.message || 'メール送信設定の更新に失敗しました', 'warning');
               }
             });
           } else if (res.data.code == 2) {
-            showNoti(res.data.data);
+            showNoti(res.data.data, 'warning');
           }
         })
         .catch((err) => {
@@ -379,12 +375,6 @@ function BasicSetting() {
             </>
           )}
         </div>
-
-        <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
-          <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
-            <span style={{ fontSize: '16px' }}>{msgNoti}</span>
-          </div>
-        </ModalNoti>
       </AdminPage>
     </>
   );

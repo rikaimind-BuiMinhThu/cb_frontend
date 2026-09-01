@@ -148,6 +148,17 @@
   box-sizing: border-box;
 }
 
+.ss-settings-form-row--error .ss-settings-form-row__control .ss-input-value,
+.ss-settings-form-row--error .ss-settings-form-row__control .ss-user-setting-item,
+.ss-settings-form-row--error .ss-settings-form-row__control textarea,
+.ss-settings-form-row--error .ss-settings-form-row__control input[type="text"] {
+  border-color: var(--admin-danger, #FF4D4F);
+}
+
+.ss-settings-form-row__label .required-badge {
+  margin-left: 6px;
+}
+
 .ss-settings-form-row__control .ss-settings-textarea {
   width: 100%;
   min-height: 120px;

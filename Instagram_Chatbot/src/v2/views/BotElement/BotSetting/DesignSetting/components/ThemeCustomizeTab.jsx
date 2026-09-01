@@ -4,6 +4,7 @@ import { THEME_SECTIONS } from '../constants/designThemeConstants';
 import ThemeAccordionSection from './ThemeAccordionSection';
 import ThemeCustomizePreview from './ThemeCustomizePreview';
 import ThemeSectionNav from './ThemeSectionNav';
+import { AdminConfirmModal } from '../../../../../components/AdminShell';
 
 const DEFAULT_EXPANDED_SECTIONS = [];
 
@@ -21,6 +22,7 @@ const ThemeCustomizeTab = ({
   const [activeSectionId, setActiveSectionId] = useState('headerMain');
   const [expandedSections, setExpandedSections] = useState(DEFAULT_EXPANDED_SECTIONS);
   const [showModalInPreview, setShowModalInPreview] = useState(true);
+  const [pendingMainColor, setPendingMainColor] = useState(null);
   const sectionRefs = useRef({});
 
   const setSectionRef = useCallback((sectionId, node) => {
@@ -48,13 +50,20 @@ const ThemeCustomizeTab = ({
 
   const handleMainColorChange = useCallback((color) => {
     if (color === mainColor) return;
-    const shouldApplyDerived = window.confirm('メインカラーに合わせて各項目を再計算しますか？');
-    if (shouldApplyDerived) {
-      onApplyDerivedTheme(color);
-      return;
-    }
-    onMainColorChange(color);
-  }, [mainColor, onApplyDerivedTheme, onMainColorChange]);
+    setPendingMainColor(color);
+  }, [mainColor]);
+
+  const handleApplyDerived = useCallback(() => {
+    if (!pendingMainColor) return;
+    onApplyDerivedTheme(pendingMainColor);
+    setPendingMainColor(null);
+  }, [pendingMainColor, onApplyDerivedTheme]);
+
+  const handleSkipDerived = useCallback(() => {
+    if (!pendingMainColor) return;
+    onMainColorChange(pendingMainColor);
+    setPendingMainColor(null);
+  }, [pendingMainColor, onMainColorChange]);
 
   return (
     <div className="design-setting-tab-content">
@@ -104,6 +113,15 @@ const ThemeCustomizeTab = ({
           </div>
         </div>
       </div>
+      <AdminConfirmModal
+        open={Boolean(pendingMainColor)}
+        title="確認"
+        message="メインカラーに合わせて各項目を再計算しますか？"
+        okText="はい"
+        cancelText="いいえ"
+        onOk={handleApplyDerived}
+        onCancel={handleSkipDerived}
+      />
     </div>
   );
 };

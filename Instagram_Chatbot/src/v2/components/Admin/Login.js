@@ -87,7 +87,11 @@ class Login extends React.Component {
             // this.setState({ isOpenNoti: true })
           }
         })
-        .catch(error => alert(error));
+        .catch(() => {
+          this.setState({ msgNoti: "ログインに失敗しました。" });
+          const loginError = document.getElementById("loginErrorMsg");
+          if (loginError) loginError.style.display = "block";
+        });
 
       function getToDashboard(role, client) {
         window.location.href = getDefaultLandingPath(role, client)
@@ -144,7 +148,11 @@ class Login extends React.Component {
             // this.setState({ isOpenNoti: true })
           }
         })
-        .catch(error => alert(error));
+        .catch(() => {
+          this.setState({ msgNoti: "ログインに失敗しました。" });
+          const loginError = document.getElementById("loginErrorMsg");
+          if (loginError) loginError.style.display = "block";
+        });
 
       function getToDashboard(role, client) {
         window.location.href = getDefaultLandingPath(role, client)

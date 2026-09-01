@@ -58,26 +58,26 @@ function validateCommonFields(values) {
 
 function validateEmailAdd(email) {
   if (!email) {
-    return 'メールを入力してください(例:abc＠abc.com)';
+    return 'メールアドレスは、必ず指定してください。';
   }
   if (email.length > 35) {
-    return '35文字以下入力してください。';
+    return 'メールアドレスは35文字以下にしてください。';
   }
   if (!email.match(MAIL_FORMAT)) {
-    return 'メールを入力してください(例:abc＠abc.com)';
+    return 'メールの正しい形式で入力してください：abc@abc.com';
   }
   return null;
 }
 
 function validateEmailUpdate(email) {
   if (!email) {
-    return 'メールアドレス 入力してください。';
+    return 'メールアドレスは、必ず指定してください。';
   }
-  if (email.length >= 35) {
-    return '35文字以下入力してください。';
+  if (email.length > 35) {
+    return 'メールアドレスは35文字以下にしてください。';
   }
   if (!email.match(MAIL_FORMAT)) {
-    return 'メールを入力してください(例:abc＠abc.com)';
+    return 'メールの正しい形式で入力してください：abc@abc.com';
   }
   return null;
 }

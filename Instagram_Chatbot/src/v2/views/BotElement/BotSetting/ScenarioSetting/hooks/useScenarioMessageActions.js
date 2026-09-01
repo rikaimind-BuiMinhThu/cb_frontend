@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { message } from 'antd';
 import moment from 'moment';
 import axios from 'axios';
 import nanoMetadata from 'nano-metadata';
@@ -34,8 +35,6 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
     setFileError,
     setFileErrorCarousel,
     setDataMessages,
-    setMessageNoti,
-    setIsOpenNoti,
     setBelongTo,
     setMessageType,
     setIndexMessageSelect,
@@ -121,19 +120,9 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
                       dataMessages[indexMessageSelect].message_content[0].file.content = S3_UPLOAD_URL + res.data.data.file_url;
                     }
                     setDataMessages([...dataMessages]);
-                    setMessageNoti('追加しました。');
-                    setIsOpenNoti(true);
-                    setTimeout(() => {
-                      setIsOpenNoti(false);
-                      setMessageNoti('');
-                    }, 2000);
+                    message.success('追加しました。');
                   } else {
-                    setMessageNoti('追加できませんでした。');
-                    setIsOpenNoti(true);
-                    setTimeout(() => {
-                      setIsOpenNoti(false);
-                      setMessageNoti('');
-                    }, 2000);
+                    message.warning('追加できませんでした。');
                   }
                 })
                 .catch((err) => {
@@ -161,7 +150,7 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
         setFileErrorCarousel('');
       }, 4000);
     }
-  }, [dataMessages, indexCarouselSlide, indexMessageSelect, setDataMessages, setFileError, setFileErrorCarousel, setIsOpenNoti, setMessageNoti]);
+  }, [dataMessages, indexCarouselSlide, indexMessageSelect, setDataMessages, setFileError, setFileErrorCarousel]);
 
   const handleSelectMessage = useCallback((index, belongTo, type) => {
     if (type) {
@@ -558,7 +547,7 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
 
   const createVariable = useCallback(() => {
     if (!variableName) {
-      setErrorVariable('変数名を入力してください。');
+      setErrorVariable('変数名は、必ず指定してください。');
       return;
     }
     const data = {
@@ -568,24 +557,19 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
       },
     };
     api.post(`/api/v1/managements/chatbots/${botId}/variables`, data).then((res) => {
-      setIsOpenAddVariable(false);
-      setIsOpenNoti(true);
       if (res.data.code === 1) {
-        setMessageNoti('変数を作成しました。');
+        setIsOpenAddVariable(false);
+        message.success('変数を作成しました。');
+        getListVariable();
       } else if (res.data.code === 2) {
-        setMessageNoti(res.data.message);
+        message.warning(res.data.message);
       }
-      getListVariable();
-      setTimeout(() => {
-        setIsOpenNoti(false);
-        setMessageNoti('');
-      }, 2000);
     }).catch((error) => {
       if (error.response?.data.code === 0) {
         tokenExpired();
       }
     });
-  }, [botId, defaultValue, getListVariable, setErrorVariable, setIsOpenAddVariable, setIsOpenNoti, setMessageNoti, variableName]);
+  }, [botId, defaultValue, getListVariable, setErrorVariable, setIsOpenAddVariable, variableName]);
 
   const onClickCreateStatement = useCallback(async (belongTo, indexMessage) => {
     let dataMessagesClone = [...dataMessages];

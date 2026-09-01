@@ -4,13 +4,13 @@ import { AdminActionButton } from '../../components/AdminShell';
 import ClientFormBody from './components/ClientFormBody';
 import { ADD_FORM_ID } from './constants';
 
-function ClientAddModal({ open, onClose, form, onSubmit }) {
+function ClientAddModal({ open, onClose, form, onSubmit, loading }) {
   const { antdForm, formBodyProps, handleImageChange, handleSelectImageClick } = form;
 
   return (
     <Modal
       title="クライアント追加"
-      visible={open}
+      open={open}
       onCancel={onClose}
       width={920}
       centered
@@ -19,7 +19,7 @@ function ClientAddModal({ open, onClose, form, onSubmit }) {
       footer={
         <div className="admin-form-actions">
           <AdminActionButton action="cancel" onClick={onClose} />
-          <AdminActionButton action="create" label="追加" id="btnSubmit" onClick={onSubmit} />
+          <AdminActionButton action="create" label="追加" id="btnSubmit" loading={loading} onClick={onSubmit} />
         </div>
       }
     >

@@ -13,6 +13,8 @@ function OrderConfirmMessageTemplateList() {
   const [templateSelectId, setTemplateSelectId] = useState('');
   const [newTemplateName, setNewTemplateName] = useState('');
   const [nameError, setNameError] = useState('');
+  const [creating, setCreating] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     const userRole = Cookies.get('user_role');
@@ -39,7 +41,7 @@ function OrderConfirmMessageTemplateList() {
 
   const checkInputTemplateName = (templateName) => {
     if (templateName.length === 0) {
-      setNameError('テンプレート名を必ず指定してください。');
+      setNameError('テンプレート名は、必ず指定してください。');
       return false;
     }
     if (templateName.length > 50) {
@@ -52,6 +54,7 @@ function OrderConfirmMessageTemplateList() {
 
   const createTemplate = () => {
     if (!checkInputTemplateName(newTemplateName)) return;
+    setCreating(true);
     api
       .post('/api/v1/managements/order_confirm_message_templates', {
         order_confirm_message_template: { name: newTemplateName },
@@ -60,15 +63,17 @@ function OrderConfirmMessageTemplateList() {
         if (res.data.code === 1) {
           message.success('正常に追加されました！');
           Cookies.set('order_confirm_message_template_id', res.data.data.id);
+          setIsOpenCreateTemplate(false);
+          setNewTemplateName('');
+          setNameError('');
           setTimeout(() => document.getElementById('to_order_confirm_template')?.click(), 1500);
         } else if (res.data.code === 2) {
           message.warning(res.data.message);
         }
         getListTemplate();
-        setIsOpenCreateTemplate(false);
-        setNewTemplateName('');
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
+      .finally(() => setCreating(false));
   };
 
   const handleDeleteTemplate = (id) => {
@@ -77,6 +82,7 @@ function OrderConfirmMessageTemplateList() {
   };
 
   const deleteTemplate = () => {
+    setDeleting(true);
     api
       .delete(`/api/v1/managements/order_confirm_message_templates/${templateSelectId}`)
       .then((res) => {
@@ -84,7 +90,8 @@ function OrderConfirmMessageTemplateList() {
         else if (res.data.code === 2) message.warning(res.data.message);
         getListTemplate();
         setIsOpenDeleteTemplate(false);
-      });
+      })
+      .finally(() => setDeleting(false));
   };
 
   const onclickEditTemplate = (id) => {
@@ -130,8 +137,15 @@ function OrderConfirmMessageTemplateList() {
         }}
         okText="作成"
         cancelText="キャンセル"
+        confirmLoading={creating}
       >
-        <AdminFormRow label="テンプレート名" htmlFor="new-order-template-name">
+        <AdminFormRow
+          label="テンプレート名"
+          htmlFor="new-order-template-name"
+          required
+          error={nameError}
+          hint="※テンプレートに任意の名称をつけることができます。"
+        >
           <Input
             id="new-order-template-name"
             value={newTemplateName}
@@ -140,9 +154,7 @@ function OrderConfirmMessageTemplateList() {
               checkInputTemplateName(e.target.value);
             }}
           />
-          {nameError && <div className="admin-form-error">{nameError}</div>}
         </AdminFormRow>
-        <p style={{ color: '#6b7280', fontSize: 13 }}>※テンプレートに任意の名称をつけることができます。</p>
       </Modal>
 
       <AdminConfirmModal
@@ -151,6 +163,7 @@ function OrderConfirmMessageTemplateList() {
         onOk={deleteTemplate}
         onCancel={() => setIsOpenDeleteTemplate(false)}
         danger
+        loading={deleting}
       />
 
       <Link to="/v2/admin/order-confirm-template-setting">

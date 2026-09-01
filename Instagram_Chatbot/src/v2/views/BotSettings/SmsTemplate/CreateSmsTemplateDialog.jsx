@@ -57,7 +57,7 @@ export default function CreateSmsTemplateDialog({ botId, resolver }) {
         open={open}
         onCancel={handleClose}
         onOk={handleSubmit(onSubmit)}
-        okText="保存"
+        okText="作成"
         cancelText="キャンセル"
         confirmLoading={isSubmitting}
         width={520}

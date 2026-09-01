@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { message as antdMessage } from 'antd';
 import Cookies from 'js-cookie';
 import api from 'api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
@@ -168,15 +169,9 @@ export const useScenario = (mode = 'scenario') => {
     [clientCartSystem, scenarioType],
   );
 
-  const showNotification = useCallback((message, autoCloseMs = 2000) => {
-    setMessageNoti(message);
-    setIsOpenNoti(true);
-    if (autoCloseMs) {
-      setTimeout(() => {
-        setIsOpenNoti(false);
-        setMessageNoti('');
-      }, autoCloseMs);
-    }
+  const showNotification = useCallback((text) => {
+    if (!text) return;
+    antdMessage.warning(text);
   }, []);
 
   const openScenarioSettingsModal = useCallback(() => {
@@ -315,7 +310,7 @@ export const useScenario = (mode = 'scenario') => {
 
   const validateScenarioName = useCallback(() => {
     if (!scenarioName) {
-      setErrorScenarioName('入力してください。');
+      setErrorScenarioName('シナリオ名は、必ず指定してください。');
       return false;
     }
     setErrorScenarioName('');
@@ -470,17 +465,12 @@ export const useScenario = (mode = 'scenario') => {
         getConversationUrl(),
         getSavePayload(),
       );
-      setIsOpenNoti(true);
       if (res.data.code === 1) {
-        setMessageNoti(isTemplateMode ? 'テンプレートを保存しました。' : 'シナリオを保存しました。');
+        antdMessage.success(isTemplateMode ? 'テンプレートを保存しました。' : 'シナリオを保存しました。');
       } else if (res.data.code === 2) {
-        setMessageNoti(res.data.message);
+        antdMessage.warning(res.data.message);
       }
       handleGetMessage();
-      setTimeout(() => {
-        setIsOpenNoti(false);
-        setMessageNoti('');
-      }, 2000);
     } catch (error) {
       if (error.response?.data?.code === 0) {
         tokenExpired();
@@ -497,17 +487,12 @@ export const useScenario = (mode = 'scenario') => {
       getConversationUrl(),
       getSavePayload(),
     ).then((res) => {
-      setIsOpenNoti(true);
       if (res.data.code === 1) {
-        setMessageNoti(isTemplateMode ? 'テンプレートを保存しました。' : 'シナリオを保存しました。');
+        antdMessage.success(isTemplateMode ? 'テンプレートを保存しました。' : 'シナリオを保存しました。');
       } else if (res.data.code === 2) {
-        setMessageNoti(res.data.message);
+        antdMessage.warning(res.data.message);
       }
       handleGetMessage();
-      setTimeout(() => {
-        setIsOpenNoti(false);
-        setMessageNoti('');
-      }, 2000);
     }).catch((error) => {
       if (error?.response?.data?.code === 0) {
         tokenExpired();

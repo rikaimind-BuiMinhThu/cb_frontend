@@ -3,8 +3,7 @@ import Cookies from 'js-cookie';
 import api from 'api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { AdminPage, AdminActionButton, AdminFormRow, useAdminHeaderTitle, useAdminHeaderActions } from '../../../../components/AdminShell';
-import { Input } from 'antd';
-import ModalNoti from '../../../Popup/ModalNoti';
+import { Input, message } from 'antd';
 import '../../../../assets/css/bot/email/create-email.css';
 
 function CreateEmail() {
@@ -13,8 +12,7 @@ function CreateEmail() {
 
   const [ccAll, setCcAll] = useState([]);
   const [bccAll, setBccAll] = useState([]);
-  const [isOpenNoti, setIsOpenNoti] = useState(false);
-  const [msgNoti, setMsgNoti] = useState();
+  const [fieldErrors, setFieldErrors] = useState({});
   const [mailAction, setMailAction] = useState(true);
   const [detailEmail, setDetailEmail] = useState();
   const [listCcDetail, setListCcDetail] = useState([]);
@@ -139,7 +137,7 @@ function CreateEmail() {
     } else {
       document.getElementById('errCcMail').style.display = 'block';
       document.getElementById('errCcMail').innerText =
-        'メールの正しいフォーマットに入力してください。';
+        'メールの正しい形式で入力してください：abc@abc.com';
     }
   }
 
@@ -180,7 +178,7 @@ function CreateEmail() {
     } else {
       document.getElementById('errBccMail').style.display = 'block';
       document.getElementById('errBccMail').innerText =
-        'メールの正しいフォーマットに入力してください。';
+        'メールの正しい形式で入力してください：abc@abc.com';
     }
   }
 
@@ -209,15 +207,15 @@ function CreateEmail() {
 
   function addEmail(e) {
     e.preventDefault();
-    checkRequired('email_template_name', 'errEmailName', 'Emailtemplate name');
+    checkRequired('email_template_name', 'errEmailName', 'テンプレート名');
     checkTo('to', 'errEmailTo', '宛先');
-    checkRequired('subject', 'errSubject', 'Subject');
-    checkRequired('text', 'errText', 'text');
+    checkRequired('subject', 'errSubject', '件名');
+    checkRequired('text', 'errText', 'メール内容');
     if (
-      checkRequired('email_template_name', 'errEmailName', 'Emailtemplate name') &&
+      checkRequired('email_template_name', 'errEmailName', 'テンプレート名') &&
       checkTo('to', 'errEmailTo', '宛先') &&
-      checkRequired('subject', 'errSubject', 'Subject') &&
-      checkRequired('text', 'errText', 'text')
+      checkRequired('subject', 'errSubject', '件名') &&
+      checkRequired('text', 'errText', 'メール内容')
     ) {
       const form = document.getElementById('create-email-form');
       const obj = {};
@@ -236,21 +234,12 @@ function CreateEmail() {
         .post('/api/v1/managements/emails', add)
         .then((res) => {
           if (res.data.code == 1) {
-            setIsOpenNoti(true);
-            setMsgNoti(`正常に追加されました！!`);
+            message.success('正常に追加されました！!');
             setTimeout(() => {
-              setIsOpenNoti(false);
-              setMsgNoti(``);
               window.location.href = `/v2/admin/list-email`;
             }, 1500);
           } else if (res.data.code == 2) {
-            console.log(res);
-            setIsOpenNoti(true);
-            setMsgNoti(res.data.message);
-            setTimeout(() => {
-              setIsOpenNoti(false);
-              setMsgNoti(``);
-            }, 2000);
+            message.warning(res.data.message);
           }
         })
         .catch((err) => {
@@ -266,15 +255,15 @@ function CreateEmail() {
     e.preventDefault();
     const url = window.location.pathname;
     var id = url.slice(url.lastIndexOf('/') + 1);
-    checkRequired('email_template_name', 'errEmailName', 'Emailtemplate name');
+    checkRequired('email_template_name', 'errEmailName', 'テンプレート名');
     checkTo('to', 'errEmailTo', '宛先');
-    checkRequired('subject', 'errSubject', 'Subject');
-    checkRequired('text', 'errText', 'text');
+    checkRequired('subject', 'errSubject', '件名');
+    checkRequired('text', 'errText', 'メール内容');
     if (
-      checkRequired('email_template_name', 'errEmailName', 'Emailtemplate name') &&
+      checkRequired('email_template_name', 'errEmailName', 'テンプレート名') &&
       checkTo('to', 'errEmailTo', '宛先') &&
-      checkRequired('subject', 'errSubject', 'Subject') &&
-      checkRequired('text', 'errText', 'text')
+      checkRequired('subject', 'errSubject', '件名') &&
+      checkRequired('text', 'errText', 'メール内容')
     ) {
       const form = document.getElementById('create-email-form');
       const obj = {};
@@ -294,20 +283,12 @@ function CreateEmail() {
         .patch(`/api/v1/managements/emails/${id}`, add)
         .then((res) => {
           if (res.data.code == 1) {
-            setIsOpenNoti(true);
-            setMsgNoti(`正常に更新されました！`);
+            message.success('正常に更新されました！');
             setTimeout(() => {
-              setIsOpenNoti(false);
-              setMsgNoti(``);
               window.location.href = `/v2/admin/list-email`;
             }, 1500);
           } else if (res.data.code == 2) {
-            setIsOpenNoti(true);
-            setMsgNoti(res.data.message);
-            setTimeout(() => {
-              setIsOpenNoti(false);
-              setMsgNoti(``);
-            }, 2000);
+            message.warning(res.data.message);
           }
         })
         .catch((err) => {
@@ -321,46 +302,35 @@ function CreateEmail() {
 
   const field = document.getElementById.bind(document);
 
+  function setFieldError(key, value) {
+    setFieldErrors((prev) => (prev[key] === value ? prev : { ...prev, [key]: value }));
+  }
+
   function checkRequired(emailId, errEmail, lable) {
     if (field(emailId).value === '') {
-      field(errEmail).style.display = 'block';
-      field(errEmail).innerHTML = `入力してください。`;
+      setFieldError(emailId, `${lable}は、必ず指定してください。`);
       return false;
-    } else {
-      field(errEmail).style.display = 'none';
-      field(errEmail).innerHTML = ``;
-      return true;
     }
+    setFieldError(emailId, '');
+    return true;
   }
 
   function checkEmail(emailId, errEmail, lable) {
     var regex = /^[a-zA-Z0-9]+([._+-][a-zA-Z0-9]+)*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/;
     let value = field(emailId).value;
     if (emailId == 'to' && value.slice(0, 2) == '{{' && value.slice(-2) == '}}') {
-      console.log(value.slice(2, value.length - 2), ': nenen')
       if (value.slice(2, value.length - 2).replace(/\s/g, '') == '') {
-        field(errEmail).style.display = 'block';
-        field(errEmail).innerHTML = `メールの変数を指定してください`;
+        setFieldError(emailId, 'メールの変数を指定してください');
         return false;
-      }else{
-        field(errEmail).style.display = 'none';
-        field(errEmail).innerHTML = ``;
-        return true;
       }
-
-    } else if (emailId == 'to' && !regex.test(field(emailId).value)) {
-      field(errEmail).style.display = 'block';
-      field(errEmail).innerHTML = `メールフォーマットが正しくありません`;
-      return false;
-    } else if (emailId != 'to' && !regex.test(field(emailId).value)) {
-      field(errEmail).style.display = 'block';
-      field(errEmail).innerHTML = `メールフォーマットが正しくありません`;
-      return false;
-    } else {
-      field(errEmail).style.display = 'none';
-      field(errEmail).innerHTML = ``;
+      setFieldError(emailId, '');
       return true;
+    } else if (!regex.test(field(emailId).value)) {
+      setFieldError(emailId, 'メールの正しい形式で入力してください：abc@abc.com');
+      return false;
     }
+    setFieldError(emailId, '');
+    return true;
   }
 
   function checkTo(emailId, errEmail, lable) {
@@ -392,20 +362,19 @@ function CreateEmail() {
       <AdminPage>
         <div className="admin-page-body">
           <form id="create-email-form">
-            <AdminFormRow label="テンプレート名" required htmlFor="email_template_name">
+            <AdminFormRow label="テンプレート名" required htmlFor="email_template_name" error={fieldErrors.email_template_name}>
               <Input
                 id="email_template_name"
                 defaultValue={mailAction == false ? detailEmail?.email.email_template_name : ''}
                 placeholder="テンプレート名は、必ず指定してください。"
                 name="email_template_name"
                 onChange={() =>
-                  checkRequired('email_template_name', 'errEmailName', 'Emailtemplate name')
+                  checkRequired('email_template_name', 'errEmailName', 'テンプレート名')
                 }
                 onBlur={() =>
-                  checkRequired('email_template_name', 'errEmailName', 'Emailtemplate name')
+                  checkRequired('email_template_name', 'errEmailName', 'テンプレート名')
                 }
               />
-              <span id="errEmailName" className="admin-form-error" />
             </AdminFormRow>
 
             <AdminFormRow label="差出人" htmlFor="sender_name">
@@ -415,10 +384,9 @@ function CreateEmail() {
                 placeholder="差出人は、必ず指定してください。"
                 name="sender_name"
               />
-              <span id="errEmailSender" className="admin-form-error" />
             </AdminFormRow>
 
-            <AdminFormRow label="TO" required htmlFor="to">
+            <AdminFormRow label="TO" required htmlFor="to" error={fieldErrors.to}>
               <Input
                 id="to"
                 defaultValue={mailAction == false ? detailEmail?.email.to : ''}
@@ -427,7 +395,6 @@ function CreateEmail() {
                 onChange={() => checkTo('to', 'errEmailTo', '宛先')}
                 onBlur={() => checkTo('to', 'errEmailTo', '宛先')}
               />
-              <span id="errEmailTo" className="admin-form-error" />
             </AdminFormRow>
 
             <AdminFormRow label="CC" htmlFor="cc" alignTop>
@@ -458,38 +425,30 @@ function CreateEmail() {
               />
             </AdminFormRow>
 
-            <AdminFormRow label="件名" required htmlFor="subject">
+            <AdminFormRow label="件名" required htmlFor="subject" error={fieldErrors.subject}>
               <Input
                 id="subject"
                 defaultValue={mailAction == false ? detailEmail?.email.subject : ''}
                 placeholder="件名は、必ず指定してください。"
                 name="subject"
-                onChange={() => checkRequired('subject', 'errSubject', 'Subject')}
-                onBlur={() => checkRequired('subject', 'errSubject', 'Subject')}
+                onChange={() => checkRequired('subject', 'errSubject', '件名')}
+                onBlur={() => checkRequired('subject', 'errSubject', '件名')}
               />
-              <span id="errSubject" className="admin-form-error" />
             </AdminFormRow>
 
-            <AdminFormRow label="メール内容" required htmlFor="text" alignTop>
+            <AdminFormRow label="メール内容" required htmlFor="text" alignTop error={fieldErrors.text}>
               <Input.TextArea
                 id="text"
                 rows={7}
                 defaultValue={mailAction == false ? detailEmail?.email.content : ''}
                 placeholder="メール内容は、必ず指定してください。"
                 name="content"
-                onChange={() => checkRequired('text', 'errText', 'Text')}
-                onBlur={() => checkRequired('text', 'errText', 'Text')}
+                onChange={() => checkRequired('text', 'errText', 'メール内容')}
+                onBlur={() => checkRequired('text', 'errText', 'メール内容')}
               />
-              <span id="errText" className="admin-form-error" />
             </AdminFormRow>
           </form>
         </div>
-
-        <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
-          <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
-            <span style={{ fontSize: '16px' }}>{msgNoti}</span>
-          </div>
-        </ModalNoti>
       </AdminPage>
     </>
   );

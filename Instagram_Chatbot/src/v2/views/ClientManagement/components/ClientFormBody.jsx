@@ -13,15 +13,6 @@ import {
 
 const { TextArea } = Input;
 
-function FormFieldError({ message }) {
-  if (!message) return null;
-  return (
-    <div className="admin-client-form-error" role="alert">
-      {message}
-    </div>
-  );
-}
-
 function Section({ title, children }) {
   return (
     <section className="admin-client-form-section">
@@ -103,7 +94,7 @@ function ClientFormBody({
       }}
     >
       <Section title="契約・プラン">
-        <ClientFormRow label="ステータス" required>
+        <ClientFormRow label="ステータス" required error={fieldErrors.status}>
           <Radio.Group
             value={contract}
             onChange={(e) => setContract(e.target.value)}
@@ -115,7 +106,6 @@ function ClientFormBody({
               </Radio>
             ))}
           </Radio.Group>
-          <FormFieldError message={fieldErrors.status} />
         </ClientFormRow>
 
         <ClientFormRow label="プラン名" required>
@@ -132,7 +122,7 @@ function ClientFormBody({
           </Form.Item>
         </ClientFormRow>
 
-        <ClientFormRow label="プラン価格">
+        <ClientFormRow label="プラン価格" error={fieldErrors.price}>
           <Form.Item name="price" noStyle>
             <Input
               id="newPlanPrice"
@@ -141,27 +131,24 @@ function ClientFormBody({
               }
             />
           </Form.Item>
-          <FormFieldError message={fieldErrors.price} />
         </ClientFormRow>
 
-        <ClientFormRow label="課金開始日">
+        <ClientFormRow label="課金開始日" error={fieldErrors.subscription_start_at}>
           <DatePicker
             id="startDate"
             format="YYYY/MM/DD"
             value={toMoment(startDate)}
             onChange={(date) => onStartDateChange(date ? date.toDate() : null)}
           />
-          <FormFieldError message={fieldErrors.subscription_start_at} />
         </ClientFormRow>
 
-        <ClientFormRow label="最低利用期間終了日">
+        <ClientFormRow label="最低利用期間終了日" error={fieldErrors.subscription_end_at}>
           <DatePicker
             id="endDate"
             format="YYYY/MM/DD"
             value={toMoment(endDate)}
             onChange={(date) => onEndDateChange(date ? date.toDate() : null)}
           />
-          <FormFieldError message={fieldErrors.subscription_end_at} />
         </ClientFormRow>
       </Section>
 
@@ -179,16 +166,15 @@ function ClientFormBody({
           <BotFeatureRadio name="is_web" id="is_web" />
         </ClientFormRow>
 
-        <ClientFormRow label="メモ" alignTop>
+        <ClientFormRow label="メモ" alignTop error={fieldErrors.note}>
           <Form.Item name="note" noStyle>
             <TextArea id="newNote" rows={4} />
           </Form.Item>
-          <FormFieldError message={fieldErrors.note} />
         </ClientFormRow>
       </Section>
 
       <Section title="会社情報">
-        <ClientFormRow label="名称" required>
+        <ClientFormRow label="名称" required error={fieldErrors.name}>
           <Form.Item name="name" noStyle>
             <Input
               id="newName"
@@ -197,10 +183,9 @@ function ClientFormBody({
               }
             />
           </Form.Item>
-          <FormFieldError message={fieldErrors.name} />
         </ClientFormRow>
 
-        <ClientFormRow label="名称カナ" required>
+        <ClientFormRow label="名称カナ" required error={fieldErrors.name_katakana}>
           <Form.Item name="name_katakana" noStyle>
             <Input
               id="newNameKata"
@@ -209,10 +194,9 @@ function ClientFormBody({
               }
             />
           </Form.Item>
-          <FormFieldError message={fieldErrors.name_katakana} />
         </ClientFormRow>
 
-        <ClientFormRow label="企業種別" required>
+        <ClientFormRow label="企業種別" required error={fieldErrors.enterprise_type}>
           <Form.Item name="enterprise_type" noStyle>
             <Select
               id="newCompanyType"
@@ -221,20 +205,18 @@ function ClientFormBody({
               options={ENTERPRISE_TYPE_OPTIONS.map((value) => ({ value, label: value }))}
             />
           </Form.Item>
-          <FormFieldError message={fieldErrors.enterprise_type} />
         </ClientFormRow>
 
-        <ClientFormRow label="企業種別２" required>
+        <ClientFormRow label="企業種別２" required error={fieldErrors.enterprise_type_2}>
           <Form.Item name="enterprise_type_2" noStyle>
             <Select
               id="newCompanyType2"
               options={ENTERPRISE_TYPE_2_OPTIONS.map((value) => ({ value, label: value }))}
             />
           </Form.Item>
-          <FormFieldError message={fieldErrors.enterprise_type_2} />
         </ClientFormRow>
 
-        <ClientFormRow label="部署名" required>
+        <ClientFormRow label="部署名" required error={fieldErrors.department_name}>
           <Form.Item name="department_name" noStyle>
             <Input
               id="newDepartmentName"
@@ -243,10 +225,9 @@ function ClientFormBody({
               }
             />
           </Form.Item>
-          <FormFieldError message={fieldErrors.department_name} />
         </ClientFormRow>
 
-        <ClientFormRow label="肩書" required>
+        <ClientFormRow label="肩書" required error={fieldErrors.title}>
           <Form.Item name="title" noStyle>
             <Input
               id="newTitle"
@@ -255,12 +236,11 @@ function ClientFormBody({
               }
             />
           </Form.Item>
-          <FormFieldError message={fieldErrors.title} />
         </ClientFormRow>
       </Section>
 
       <Section title="担当者">
-        <ClientFormRow label="担当者" required>
+        <ClientFormRow label="担当者" required error={fieldErrors.responsible_person}>
           <Form.Item name="responsible_person" noStyle>
             <Input
               id="newManager"
@@ -272,10 +252,9 @@ function ClientFormBody({
               }
             />
           </Form.Item>
-          <FormFieldError message={fieldErrors.responsible_person} />
         </ClientFormRow>
 
-        <ClientFormRow label="担当者カナ" required>
+        <ClientFormRow label="担当者カナ" required error={fieldErrors.responsible_person_katakana}>
           <Form.Item name="responsible_person_katakana" noStyle>
             <Input
               id="newManagerKata"
@@ -287,12 +266,11 @@ function ClientFormBody({
               }
             />
           </Form.Item>
-          <FormFieldError message={fieldErrors.responsible_person_katakana} />
         </ClientFormRow>
 
         {showPasswordFields && (
           <>
-            <ClientFormRow label="パスワード" required>
+            <ClientFormRow label="パスワード" required error={fieldErrors.password}>
               <Form.Item name="password" noStyle>
                 <Input.Password
                   id="newPassword"
@@ -304,10 +282,9 @@ function ClientFormBody({
                   }
                 />
               </Form.Item>
-              <FormFieldError message={fieldErrors.password} />
             </ClientFormRow>
 
-            <ClientFormRow label="パスワード(確認用)" required>
+            <ClientFormRow label="パスワード(確認用)" required error={fieldErrors.password_confirmation}>
               <Form.Item name="password_confirmation" noStyle>
                 <Input.Password
                   id="newConfirmPassword"
@@ -319,14 +296,13 @@ function ClientFormBody({
                   }
                 />
               </Form.Item>
-              <FormFieldError message={fieldErrors.password_confirmation} />
             </ClientFormRow>
           </>
         )}
       </Section>
 
       <Section title="ロゴ・サイト">
-        <ClientFormRow label="画像（ロゴ）" required={showPasswordFields} alignTop>
+        <ClientFormRow label="画像（ロゴ）" required={showPasswordFields} alignTop error={fieldErrors.logo}>
           <div className="admin-client-form-logo">
             <div>
               <input
@@ -343,7 +319,6 @@ function ClientFormBody({
                   画像変更
                 </Button>
               )}
-              <FormFieldError message={fieldErrors.logo} />
             </div>
             {urlLogo ? (
               <img
@@ -356,19 +331,18 @@ function ClientFormBody({
           </div>
         </ClientFormRow>
 
-        <ClientFormRow label="サイトURL" required>
+        <ClientFormRow label="サイトURL" required error={fieldErrors.url}>
           <Form.Item name="url" noStyle>
             <Input
               id="newURL"
               onBlur={(e) => validateAndSetField('url', validateField(e.target.value, 'URL'))}
             />
           </Form.Item>
-          <FormFieldError message={fieldErrors.url} />
         </ClientFormRow>
       </Section>
 
       <Section title="住所・連絡先">
-        <ClientFormRow label="郵便番号" required>
+        <ClientFormRow label="郵便番号" required error={fieldErrors.zip_code}>
           <Form.Item name="zip_code" noStyle>
             <Input
               id="newPostCode"
@@ -377,10 +351,9 @@ function ClientFormBody({
               }
             />
           </Form.Item>
-          <FormFieldError message={fieldErrors.zip_code} />
         </ClientFormRow>
 
-        <ClientFormRow label="都道府県" required>
+        <ClientFormRow label="都道府県" required error={fieldErrors.prefecture}>
           <Form.Item name="prefecture" noStyle>
             <Select
               id="newPrefectures"
@@ -389,10 +362,9 @@ function ClientFormBody({
               options={PREFECTURE_OPTIONS.map((value) => ({ value, label: value }))}
             />
           </Form.Item>
-          <FormFieldError message={fieldErrors.prefecture} />
         </ClientFormRow>
 
-        <ClientFormRow label="市区町村" required>
+        <ClientFormRow label="市区町村" required error={fieldErrors.municipality}>
           <Form.Item name="municipality" noStyle>
             <Input
               id="newMunicipalities"
@@ -401,10 +373,9 @@ function ClientFormBody({
               }
             />
           </Form.Item>
-          <FormFieldError message={fieldErrors.municipality} />
         </ClientFormRow>
 
-        <ClientFormRow label="住所" required>
+        <ClientFormRow label="住所" required error={fieldErrors.address}>
           <Form.Item name="address" noStyle>
             <Input
               id="newAddress"
@@ -413,10 +384,9 @@ function ClientFormBody({
               }
             />
           </Form.Item>
-          <FormFieldError message={fieldErrors.address} />
         </ClientFormRow>
 
-        <ClientFormRow label="建物名" required>
+        <ClientFormRow label="建物名" required error={fieldErrors.building_name}>
           <Form.Item name="building_name" noStyle>
             <Input
               id="newBuildingName"
@@ -425,10 +395,9 @@ function ClientFormBody({
               }
             />
           </Form.Item>
-          <FormFieldError message={fieldErrors.building_name} />
         </ClientFormRow>
 
-        <ClientFormRow label="メールアドレス" required>
+        <ClientFormRow label="メールアドレス" required error={fieldErrors.email}>
           <Form.Item name="email" noStyle>
             <Input
               id="newEmail"
@@ -437,24 +406,21 @@ function ClientFormBody({
               }
             />
           </Form.Item>
-          <FormFieldError message={fieldErrors.email} />
         </ClientFormRow>
 
-        <ClientFormRow label="メール送信用Gmail">
+        <ClientFormRow label="メール送信用Gmail" error={fieldErrors.reply_smtp_gmail}>
           <Form.Item name="reply_smtp_gmail" noStyle>
             <Input id="replySmtpGmail" />
           </Form.Item>
-          <FormFieldError message={fieldErrors.reply_smtp_gmail} />
         </ClientFormRow>
 
-        <ClientFormRow label="メール送信用アプリパスワード">
+        <ClientFormRow label="メール送信用アプリパスワード" error={fieldErrors.reply_smtp_gmail_app_password}>
           <Form.Item name="reply_smtp_gmail_app_password" noStyle>
             <Input.Password id="replySmtpGmailAppPassword" autoComplete="new-password" />
           </Form.Item>
-          <FormFieldError message={fieldErrors.reply_smtp_gmail_app_password} />
         </ClientFormRow>
 
-        <ClientFormRow label="電話番号" required>
+        <ClientFormRow label="電話番号" required error={fieldErrors.phone_number}>
           <Form.Item name="phone_number" noStyle>
             <Input
               id="newPhone"
@@ -463,16 +429,14 @@ function ClientFormBody({
               }
             />
           </Form.Item>
-          <FormFieldError message={fieldErrors.phone_number} />
         </ClientFormRow>
       </Section>
 
       <Section title="カート連携">
-        <ClientFormRow label="カートシステム" required>
+        <ClientFormRow label="カートシステム" required error={fieldErrors.cart_system}>
           <Form.Item name="cart_system" noStyle>
             <Select id="newCartSystem" options={CART_SYSTEM_OPTIONS} />
           </Form.Item>
-          <FormFieldError message={fieldErrors.cart_system} />
         </ClientFormRow>
 
         {cartSystem === 'shopify' && (

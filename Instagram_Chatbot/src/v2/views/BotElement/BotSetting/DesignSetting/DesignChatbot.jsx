@@ -2,7 +2,6 @@ import React from 'react';
 import { Tabs } from 'antd';
 import { Link } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import ModalNoti from '../../../Popup/ModalNoti';
 import './../../../../assets/css/bot/bot-setting.css';
 import './../../../../assets/css/bot/add-bot.css';
 import { TAB_BASIC, TAB_DESIGN, TAB_THEME } from './constants/designChatbotConstants';
@@ -102,12 +101,6 @@ function DesignChatbot() {
           ]}
         />
       </AdminPage>
-
-      <ModalNoti open={state.isOpenNoti} onClose={() => actions.setIsOpenNoti(false)}>
-        <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
-          <span style={{ fontSize: '16px' }}>{state.msgNoti}</span>
-        </div>
-      </ModalNoti>
       <Link to="/v2/admin/scenario-list">
         <button style={{ display: 'none' }} type="button">
           SCL

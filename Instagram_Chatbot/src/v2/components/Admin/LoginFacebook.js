@@ -8,6 +8,7 @@ import Cookies from 'js-cookie';
 import axios from 'axios';
 import { event } from 'jquery';
 import {FACEBOOK_APP_ID, META_GRAPH_API_VERSION} from 'v2/variables/constants';
+import { message } from 'antd';
 
 function LoginFacebook({ checkLogin }) {
 
@@ -179,7 +180,7 @@ function LoginFacebook({ checkLogin }) {
               console.log("data post insta connect", data)
               api.post(`/api/v1/instagram_connect`, data).then(res => {
                 if (res.data.code == 2) {
-                  alert("This account didn't link to instagram")//Didn't link to insta
+                  message.error('このアカウントはInstagramに連携されていません。');
                 } else if (res.data.code == 1) {
                 //change this to come to releases move to code = 1
                 checkLogin(true, ig_id)
@@ -200,7 +201,7 @@ function LoginFacebook({ checkLogin }) {
             }
           );
         } else {
-          alert("this account does not have instagram page")
+          message.error('このアカウントにはInstagramページがありません。');
         }
 
       }

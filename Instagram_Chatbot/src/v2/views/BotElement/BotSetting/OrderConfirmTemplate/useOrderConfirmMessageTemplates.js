@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Modal } from 'antd';
 import api from 'api/api-management';
+import { AdminConfirmModal } from '../../../../components/AdminShell';
 import {
   ORDER_CONFIRM_LP_PRESET,
   buildOrderConfirmPresetConfig,
@@ -17,6 +17,7 @@ export const ORDER_CONFIRM_PRESET_OPTION_PREFIX = 'preset:';
 export default function useOrderConfirmMessageTemplates() {
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [pendingApply, setPendingApply] = useState(null);
 
   const fetchTemplates = useCallback(() => {
     setLoading(true);
@@ -46,14 +47,14 @@ export default function useOrderConfirmMessageTemplates() {
   }, []);
 
   const confirmAndApply = useCallback((nextConfig, onApply) => {
-    Modal.confirm({
-      title: 'テンプレートを適用しますか？',
-      content: '現在の注文確認設定はテンプレートの内容で上書きされます。',
-      okText: '適用',
-      cancelText: 'キャンセル',
-      onOk: () => onApply(JSON.parse(JSON.stringify(nextConfig))),
-    });
+    setPendingApply({ nextConfig, onApply });
   }, []);
+
+  const applyPending = useCallback(() => {
+    if (!pendingApply) return;
+    pendingApply.onApply(JSON.parse(JSON.stringify(pendingApply.nextConfig)));
+    setPendingApply(null);
+  }, [pendingApply]);
 
   const applyTemplate = useCallback(async (templateId, onApply) => {
     const nextConfig = await fetchTemplateConfig(templateId);
@@ -75,6 +76,17 @@ export default function useOrderConfirmMessageTemplates() {
     await applyTemplate(value, onApply);
   }, [applyTemplate, confirmAndApply]);
 
+  const confirmModal = (
+    <AdminConfirmModal
+      open={Boolean(pendingApply)}
+      title="テンプレートを適用しますか？"
+      message="現在の注文確認設定はテンプレートの内容で上書きされます。"
+      okText="適用"
+      onOk={applyPending}
+      onCancel={() => setPendingApply(null)}
+    />
+  );
+
   return {
     templates,
     loading,
@@ -83,5 +95,6 @@ export default function useOrderConfirmMessageTemplates() {
     applyTemplate,
     applySelection,
     presetOptions: ORDER_CONFIRM_PRESET_OPTION,
+    confirmModal,
   };
 }

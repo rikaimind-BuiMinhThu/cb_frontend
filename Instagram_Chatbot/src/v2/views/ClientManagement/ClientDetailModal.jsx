@@ -4,7 +4,7 @@ import { AdminActionButton } from '../../components/AdminShell';
 import ClientFormBody from './components/ClientFormBody';
 import { DETAIL_FORM_ID } from './constants';
 
-function ClientDetailModal({ open, onClose, title, form, onSubmit }) {
+function ClientDetailModal({ open, onClose, title, form, onSubmit, loading }) {
   const { antdForm, formBodyProps, formMode, disableInput, handleImageChange, handleSelectImageClick } =
     form;
 
@@ -12,7 +12,7 @@ function ClientDetailModal({ open, onClose, title, form, onSubmit }) {
     <Modal
       key={form.detailData?.id}
       title={title}
-      visible={open}
+      open={open}
       onCancel={onClose}
       width={920}
       centered
@@ -22,7 +22,7 @@ function ClientDetailModal({ open, onClose, title, form, onSubmit }) {
         formMode === 'edit' ? (
           <div className="admin-form-actions">
             <AdminActionButton action="cancel" onClick={onClose} />
-            <AdminActionButton action="save" label="更新" id="btnUpdate" onClick={onSubmit} />
+            <AdminActionButton action="save" label="更新" id="btnUpdate" loading={loading} onClick={onSubmit} />
           </div>
         ) : null
       }

@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Tabs } from 'antd';
+import { Tabs, message } from 'antd';
 import moment from 'moment';
 import api from 'api/api-management';
 import Cookies from 'js-cookie';
 import { tokenExpired } from 'v2/api/tokenExpired';
-import ModalNoti from './../Popup/ModalNoti';
 import { AdminPage } from '../../components/AdminShell';
 import PaymentOrderHistoryTab from './PaymentManagement/PaymentOrderHistoryTab';
 import PaymentSettingsTab from './PaymentManagement/PaymentSettingsTab';
@@ -32,8 +31,6 @@ function PaymentManagement() {
 
   const [paymentGateway, setPaymentGateway] = useState([]);
   const [payment, setPayment] = useState({});
-  const [isOpenNoti, setIsOpenNoti] = useState(false);
-  const [msgNoti, setMsgNoti] = useState();
 
   const [prefectures, setPrefectures] = useState([
     { prefectur: 'hokkaido', prefectureName: '北海道' },
@@ -271,21 +268,11 @@ function PaymentManagement() {
       .then((respon) => {
         console.log(respon);
         if (respon.data.code == 1) {
-          setMsgNoti(`正常に更新されました！`);
-          setIsOpenNoti(true);
+          message.success('正常に更新されました！');
           reload();
-          setTimeout(() => {
-            setMsgNoti('');
-            setIsOpenNoti(false);
-          }, 2000);
         }
         if (respon.data.code == 2) {
-          setMsgNoti(respon.data.message);
-          setIsOpenNoti(true);
-          setTimeout(() => {
-            setMsgNoti('');
-            setIsOpenNoti(false);
-          }, 2000);
+          message.warning(respon.data.message);
         }
       })
       .catch((err) => {
@@ -408,21 +395,11 @@ function PaymentManagement() {
         .then((respon) => {
           console.log(respon);
           if (respon.data.code == 1) {
-            setMsgNoti(`正常に更新されました！`);
-            setIsOpenNoti(true);
-            reload();
-            setTimeout(() => {
-              setMsgNoti('');
-              setIsOpenNoti(false);
-            }, 2000);
+            message.success('正常に更新されました！');
+          reload();
           }
           if (respon.data.code == 2) {
-            setMsgNoti(respon.data.message);
-            setIsOpenNoti(true);
-            setTimeout(() => {
-              setMsgNoti('');
-              setIsOpenNoti(false);
-            }, 2000);
+            message.warning(respon.data.message);
           }
         })
         .catch((err) => {
@@ -507,21 +484,11 @@ function PaymentManagement() {
         .then((respon) => {
           console.log(respon);
           if (respon.data.code == 1) {
-            setMsgNoti(`正常に更新されました！`);
-            setIsOpenNoti(true);
-            reload();
-            setTimeout(() => {
-              setMsgNoti('');
-              setIsOpenNoti(false);
-            }, 2000);
+            message.success('正常に更新されました！');
+          reload();
           }
           if (respon.data.code == 2) {
-            setMsgNoti(respon.data.message);
-            setIsOpenNoti(true);
-            setTimeout(() => {
-              setMsgNoti('');
-              setIsOpenNoti(false);
-            }, 2000);
+            message.warning(respon.data.message);
           }
         })
         .catch((err) => {
@@ -585,21 +552,11 @@ function PaymentManagement() {
         .then((respon) => {
           console.log(respon);
           if (respon.data.code == 1) {
-            setMsgNoti(`正常に更新されました！`);
-            setIsOpenNoti(true);
-            reload();
-            setTimeout(() => {
-              setMsgNoti('');
-              setIsOpenNoti(false);
-            }, 2000);
+            message.success('正常に更新されました！');
+          reload();
           }
           if (respon.data.code == 2) {
-            setMsgNoti(respon.data.message);
-            setIsOpenNoti(true);
-            setTimeout(() => {
-              setMsgNoti('');
-              setIsOpenNoti(false);
-            }, 2000);
+            message.warning(respon.data.message);
           }
         })
         .catch((err) => {
@@ -726,21 +683,11 @@ function PaymentManagement() {
         .then((respon) => {
           console.log(respon);
           if (respon.data.code == 1) {
-            setMsgNoti(`正常に更新されました！`);
-            setIsOpenNoti(true);
-            reload();
-            setTimeout(() => {
-              setMsgNoti('');
-              setIsOpenNoti(false);
-            }, 2000);
+            message.success('正常に更新されました！');
+          reload();
           }
           if (respon.data.code == 2) {
-            setMsgNoti(respon.data.message);
-            setIsOpenNoti(true);
-            setTimeout(() => {
-              setMsgNoti('');
-              setIsOpenNoti(false);
-            }, 2000);
+            message.warning(respon.data.message);
           }
         })
         .catch((err) => {
@@ -870,11 +817,6 @@ function PaymentManagement() {
             },
           ]}
       />
-      <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
-        <div style={{ width: '300px', textAlign: 'center', color: '#1677ff' }}>
-          <span style={{ fontSize: '16px' }}>{msgNoti}</span>
-        </div>
-      </ModalNoti>
     </AdminPage>
   );
 

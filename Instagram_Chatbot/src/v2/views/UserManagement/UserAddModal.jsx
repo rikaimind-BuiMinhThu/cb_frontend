@@ -3,7 +3,7 @@ import { Form, Input, Modal, Select } from 'antd';
 import { AdminActionButton } from '../../components/AdminShell';
 import { EMAIL_REGEX, ROLE_OPTIONS } from './constants';
 
-function UserAddModal({ open, onClose, listClient, onSubmit }) {
+function UserAddModal({ open, onClose, listClient, onSubmit, loading }) {
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -28,14 +28,14 @@ function UserAddModal({ open, onClose, listClient, onSubmit }) {
   return (
     <Modal
       title="ユーザー追加"
-      visible={open}
+      open={open}
       onCancel={onClose}
       width={520}
       destroyOnClose
       footer={
         <div className="admin-form-actions">
           <AdminActionButton action="cancel" onClick={onClose} />
-          <AdminActionButton action="create" label="追加" onClick={handleOk} />
+          <AdminActionButton action="create" label="追加" onClick={handleOk} loading={loading} />
         </div>
       }
     >
@@ -51,8 +51,8 @@ function UserAddModal({ open, onClose, listClient, onSubmit }) {
           label="名称"
           name="full_name"
           rules={[
-            { required: true, message: '入力してください。' },
-            { max: 35, message: '35文字以下入力してください。' },
+            { required: true, message: '名称は、必ず指定してください。' },
+            { max: 35, message: '名称は35文字以下にしてください。' },
           ]}
         >
           <Input />
@@ -61,8 +61,8 @@ function UserAddModal({ open, onClose, listClient, onSubmit }) {
           label="ログインID"
           name="email"
           rules={[
-            { required: true, message: 'メールアドレス を入力してください。' },
-            { max: 35, message: '35文字以下入力してください。' },
+            { required: true, message: 'ログインIDは、必ず指定してください。' },
+            { max: 35, message: 'ログインIDは35文字以下にしてください。' },
             { pattern: EMAIL_REGEX, message: 'メールの正しい形式で入力してください：abc@abc.com' },
           ]}
         >
@@ -72,7 +72,7 @@ function UserAddModal({ open, onClose, listClient, onSubmit }) {
           label="パスワード"
           name="password"
           rules={[
-            { required: true, message: '入力してください。' },
+            { required: true, message: 'パスワードは、必ず指定してください。' },
             {
               validator: (_, value) => {
                 if (!value) return Promise.resolve();
@@ -93,7 +93,7 @@ function UserAddModal({ open, onClose, listClient, onSubmit }) {
           name="password_confirmation"
           dependencies={['password']}
           rules={[
-            { required: true, message: '入力してください。' },
+            { required: true, message: 'パスワード（確認用）は、必ず指定してください。' },
             ({ getFieldValue }) => ({
               validator(_, value) {
                 if (!value || getFieldValue('password') === value) {

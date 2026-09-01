@@ -22,6 +22,8 @@ function ScenarioList() {
   const [nameError, setNameError] = useState('');
   const [listTemplate, setListTemplate] = useState([]);
   const [selectedTemplateId, setSelectedTemplateId] = useState(undefined);
+  const [creating, setCreating] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     setBotId(Cookies.get('bot_id'));
@@ -56,7 +58,7 @@ function ScenarioList() {
 
   const checkInputScenarioName = (scenarioName) => {
     if (scenarioName.length === 0) {
-      setNameError('シナリオ名を必ず指定してください。');
+      setNameError('シナリオ名は、必ず指定してください。');
       return false;
     }
     if (scenarioName.length > 50) {
@@ -69,6 +71,7 @@ function ScenarioList() {
 
   const createScenario = () => {
     if (!checkInputScenarioName(newScenarioName)) return;
+    setCreating(true);
     api
       .post(`/api/v1/managements/chatbots/${botId}/scenarios`, {
         scenario: { name: newScenarioName },
@@ -78,16 +81,18 @@ function ScenarioList() {
         if (res.data.code === 1) {
           message.success('正常に追加されました！');
           Cookies.set('scenario_id', res.data.data.id);
+          setIsOpenCreateScenario(false);
+          setNewScenarioName('');
+          setNameError('');
+          setSelectedTemplateId(undefined);
           setTimeout(() => document.getElementById('to_scenario')?.click(), 1500);
         } else if (res.data.code === 2) {
           message.warning(res.data.message);
         }
         getListScenario(page);
-        setIsOpenCreateScenario(false);
-        setNewScenarioName('');
-        setSelectedTemplateId(undefined);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
+      .finally(() => setCreating(false));
   };
 
   const handleDuplicationScenario = (id) => {
@@ -107,6 +112,7 @@ function ScenarioList() {
   };
 
   const deleteScenario = () => {
+    setDeleting(true);
     api
       .delete(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioSelectId}`)
       .then((res) => {
@@ -114,7 +120,8 @@ function ScenarioList() {
         else if (res.data.code === 2) message.warning(res.data.message);
         getListScenario(page);
         setIsOpenDeleteScenario(false);
-      });
+      })
+      .finally(() => setDeleting(false));
   };
 
   const handleSaveSelectScenario = () => {
@@ -211,8 +218,15 @@ function ScenarioList() {
         }}
         okText="作成"
         cancelText="キャンセル"
+        confirmLoading={creating}
       >
-        <AdminFormRow label="シナリオ名" htmlFor="new-scenario-name">
+        <AdminFormRow
+          label="シナリオ名"
+          htmlFor="new-scenario-name"
+          required
+          error={nameError}
+          hint="※シナリオに任意の名称をつけることができます。"
+        >
           <Input
             id="new-scenario-name"
             value={newScenarioName}
@@ -221,7 +235,6 @@ function ScenarioList() {
               checkInputScenarioName(e.target.value);
             }}
           />
-          {nameError && <div className="admin-form-error">{nameError}</div>}
         </AdminFormRow>
         <AdminFormRow label="テンプレート（任意）">
           <Select
@@ -236,7 +249,6 @@ function ScenarioList() {
             }))}
           />
         </AdminFormRow>
-        <p style={{ color: '#6b7280', fontSize: 13 }}>※シナリオに任意の名称をつけることができます。</p>
       </Modal>
 
       <AdminConfirmModal
@@ -245,6 +257,7 @@ function ScenarioList() {
         onOk={deleteScenario}
         onCancel={() => setIsOpenDeleteScenario(false)}
         danger
+        loading={deleting}
       />
 
       <Link to={getAdminRoutePath('/scenario-setting')}>

@@ -33,6 +33,7 @@ function UserManagement() {
         onClose={() => mutations.setIsOpenAdd(false)}
         listClient={list.listClient}
         onSubmit={mutations.addUser}
+        loading={mutations.submitting}
       />
       <UserEditModal
         open={mutations.isOpenEdit}
@@ -40,13 +41,15 @@ function UserManagement() {
         listClient={list.listClient}
         editingUser={mutations.editingUser}
         onSubmit={mutations.updateUser}
+        loading={mutations.submitting}
       />
       <AdminConfirmModal
         open={mutations.isOpenDelete}
-        message="ユーザーを削除しますか。"
+        message="本当に削除しますか。"
         onOk={mutations.deleteUser}
         onCancel={() => mutations.setIsOpenDelete(false)}
         danger
+        loading={mutations.deleting}
       />
     </>
   );

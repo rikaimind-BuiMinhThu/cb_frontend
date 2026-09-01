@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { message } from 'antd';
 import api from 'api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import {
@@ -10,8 +12,6 @@ export default function useClientMutations({
   form,
   reloadListClient,
   page,
-  setMsgNoti,
-  setIsOpenNoti,
 }) {
   const {
     antdForm,
@@ -33,6 +33,9 @@ export default function useClientMutations({
     idDeleteClient,
     setIsOpenDeleteClient,
   } = form;
+
+  const [submitting, setSubmitting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   function getValidationContext(isAdd) {
     return {
@@ -62,19 +65,26 @@ export default function useClientMutations({
       obj.logo_url = inputImage;
     }
 
+    setSubmitting(true);
     api
       .patch(`/api/v1/managements/clients/${updateId}`, { client: obj })
-      .then(() => {
+      .then((res) => {
+        if (res.data?.code === 2 || res.data?.code === '2') {
+          message.warning(res.data.message);
+          return;
+        }
         reloadListClient(page);
-        setMsgNoti('クライアント更新しました!');
+        message.success('クライアント更新しました!');
         setIsOpen(false);
-        setIsOpenNoti(true);
       })
       .catch((error) => {
         console.log(error);
         if (error.response?.data.code === 0) {
           tokenExpired();
         }
+      })
+      .finally(() => {
+        setSubmitting(false);
       });
   }
 
@@ -96,26 +106,24 @@ export default function useClientMutations({
       password_confirmation: values.password_confirmation,
     };
 
+    setSubmitting(true);
     api
       .post(`/api/v1/managements/clients`, { client: obj, user: usr })
       .then((res) => {
         if (res.data.code === 1 || res.data.code === '1') {
           reloadListClient();
-          setMsgNoti('クライアント追加しました!');
+          message.success('クライアント追加しました!');
           setIsOpenAddUser(false);
-          setIsOpenNoti(true);
         } else if (res.data?.code === 2 || res.data?.code === '2') {
           if (res.data.message.includes('Client name has')) {
-            setMsgNoti('クライアント名は既に存在しています。');
+            message.warning('クライアント名は既に存在しています。');
           } else if (res.data.message.includes('Duplicate entry')) {
-            setMsgNoti('メールアドレスはは既に存在しています。');
+            message.warning('メールアドレスはは既に存在しています。');
           } else if (res.data.message.includes("Password confirmation doesn't match Password")) {
-            setMsgNoti('パスワードが一致しません。もう一度ご入力ください。');
+            message.warning('パスワードが一致しません。もう一度ご入力ください。');
           } else {
-            setMsgNoti(res.data.message);
+            message.warning(res.data.message);
           }
-          setIsOpenAddUser(false);
-          setIsOpenNoti(true);
         }
       })
       .catch((error) => {
@@ -123,29 +131,31 @@ export default function useClientMutations({
         if (error.response?.data.code === 0) {
           tokenExpired();
         }
+      })
+      .finally(() => {
+        setSubmitting(false);
       });
   }
 
   function deleteClientUser() {
+    setDeleting(true);
     api
       .delete(`/api/v1/managements/clients/${idDeleteClient}`)
       .then(() => {
         setIsOpenDeleteClient(false);
         reloadListClient(page);
-        setMsgNoti('削除しました!');
-        setIsOpenNoti(true);
-        setTimeout(() => {
-          setMsgNoti('');
-          setIsOpenNoti(false);
-        }, 2000);
+        message.success('削除しました!');
       })
       .catch((error) => {
         console.log(error);
         if (error.response?.data.code === 0) {
           tokenExpired();
         }
+      })
+      .finally(() => {
+        setDeleting(false);
       });
   }
 
-  return { updateClient, addClient, deleteClientUser };
+  return { updateClient, addClient, deleteClientUser, submitting, deleting };
 }

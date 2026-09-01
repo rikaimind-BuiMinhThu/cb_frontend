@@ -136,7 +136,7 @@ function PlanManagement() {
 
       <Modal
         title="プラン編集"
-        visible={isOpenUpdate}
+        open={isOpenUpdate}
         onOk={updatePlan}
         onCancel={() => setIsOpenUpdate(false)}
         okText="更新"
@@ -152,18 +152,18 @@ function PlanManagement() {
           labelCol={{ flex: '0 0 140px' }}
           wrapperCol={{ flex: 1 }}
         >
-          <Form.Item label="プラン名称" name="name" rules={[{ required: true, message: 'プラン名称 を入力してください。' }]}>
+          <Form.Item label="プラン名称" name="name" rules={[{ required: true, message: 'プラン名称は、必ず指定してください。' }]}>
             <Input disabled />
           </Form.Item>
           <Form.Item
             label={code === 4 ? 'プラン価格 / CV' : 'プラン価格'}
             name="price"
             rules={[
-              { required: true, message: 'プラン価格 を入力してください。' },
+              { required: true, message: 'プラン価格は、必ず指定してください。' },
               {
                 validator: (_, value) => {
                   if (value === undefined || value === null || value === '') {
-                    return Promise.reject(new Error('プラン価格 を入力してください。'));
+                    return Promise.reject(new Error('プラン価格は、必ず指定してください。'));
                   }
                   if (Number(value) < 0) {
                     return Promise.reject(new Error('正数を入力してください。'));

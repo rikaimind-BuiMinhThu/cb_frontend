@@ -4,7 +4,7 @@ import { Input } from 'antd';
 import Cookies from 'js-cookie';
 import api from 'api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
-import ModalNoti from '../../../Popup/ModalNoti';
+import { message } from 'antd';
 import * as utils from '../../../../JS/validate.js';
 import { patchWithDrawalPreview } from '../PreviewComponent/Utils';
 import 'v2/assets/css/bot/withdrawal-prevention.css';
@@ -15,8 +15,6 @@ function WithdrawalPrevention() {
   const [chooseImage, setChooseImage] = useState(false);
   const [botId, setBotId] = useState(Cookies.get('bot_id'));
   const [withDrawal, setWithDrawal] = useState({});
-  const [isOpenNoti, setIsOpenNoti] = useState(false);
-  const [msgNoti, setMsgNoti] = useState();
   const [checkedChoose, setCheckedChoose] = useState({
     invalid: false,
     standard: false,
@@ -121,13 +119,8 @@ function WithdrawalPrevention() {
                   .then((res) => {
                     console.log(res);
                     if (res.data.code == 1) {
-                      setMsgNoti(`更新しました。`);
-                      setIsOpenNoti(true);
+                      message.success('更新しました。');
                       reload();
-                      setTimeout(() => {
-                        setIsOpenNoti(false);
-                        setMsgNoti(``);
-                      }, 2000);
                     }
                   })
                   .catch((err) => {
@@ -151,13 +144,8 @@ function WithdrawalPrevention() {
         .then((res) => {
           console.log(res);
           if (res.data.code == 1) {
-            setMsgNoti(`更新しました。`);
-            setIsOpenNoti(true);
+            message.success('更新しました。');
             reload();
-            setTimeout(() => {
-              setIsOpenNoti(false);
-              setMsgNoti(``);
-            }, 2000);
           }
         })
         .catch((err) => {
@@ -275,12 +263,6 @@ function WithdrawalPrevention() {
             </Card>
           </Col>
         </Row>
-
-        <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
-          <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
-            <span style={{ fontSize: '16px' }}>{msgNoti}</span>
-          </div>
-        </ModalNoti>
       </AdminPage>
     </>
   );

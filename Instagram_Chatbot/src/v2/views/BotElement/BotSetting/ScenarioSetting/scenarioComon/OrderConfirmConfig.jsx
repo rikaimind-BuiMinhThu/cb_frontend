@@ -22,7 +22,7 @@ export default function OrderConfirmConfig({
   messageContent,
 }) {
   const config = normalizeOrderConfirmConfig(typeContent || getDefaultOrderConfirmConfig());
-  const { templates, applySelection, presetOptions } = useOrderConfirmMessageTemplates();
+  const { templates, applySelection, presetOptions, confirmModal } = useOrderConfirmMessageTemplates();
   const [selectedTemplateValue, setSelectedTemplateValue] = useState('');
 
   const applyConfig = (nextConfig) => {
@@ -50,6 +50,7 @@ export default function OrderConfirmConfig({
 
   return (
     <div className="ss-bot-statement-wrapper">
+      {confirmModal}
       <span style={sectionLabelStyle}>注文確認メッセージテンプレート</span>
       <select
         className="ss-input-value"

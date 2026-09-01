@@ -4,7 +4,7 @@ const schema = yup.object({
   name: yup
     .string()
     .required("プッシュメッセージ名は、必ず指定してください。")
-    .max(40),
+    .max(40, "プッシュメッセージ名は40文字以下にしてください。"),
   sending_method: yup
     .string()
     .required("送信方法は、必ず指定してください。")
@@ -16,7 +16,7 @@ const schema = yup.object({
   exclude_start_time: yup.number(),
   exclude_end_time: yup.number(),
   exclude_push_time: yup.number(),
-  last_message_datetime_since: yup.number().required(),
+  last_message_datetime_since: yup.number().required("最終メッセージ日時は、必ず指定してください。"),
 });
 
 export default schema;

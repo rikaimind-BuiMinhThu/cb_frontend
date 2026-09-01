@@ -110,7 +110,7 @@ function SubUserManagement() {
         open={isOpenEdit}
         onOk={handleEdit}
         onCancel={() => setIsOpenEdit(false)}
-        okText="編集"
+        okText="更新"
         cancelText="キャンセル"
         width={480}
       >
@@ -125,7 +125,7 @@ function SubUserManagement() {
           <Form.Item label="氏名">
             <Input disabled value={detailUser.full_name} />
           </Form.Item>
-          <Form.Item label="権限" name="role" rules={[{ required: true }]}>
+          <Form.Item label="権限" name="role" rules={[{ required: true, message: '権限を選択してください。' }]}>
             <Select
               options={[
                 { value: 'bot_admin', label: '管理者' },
@@ -139,7 +139,7 @@ function SubUserManagement() {
 
       <AdminConfirmModal
         open={isOpenPopupDelete}
-        message="本当にこのサブユーザーを削除しますか?"
+        message="本当に削除しますか。"
         onOk={handleDelete}
         onCancel={() => setIsOpenPopupDelete(false)}
         danger

@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import api from 'api/api-management';
-import Modal from "./Popup/Modal";
-import ModalNoti from "./Popup/ModalNoti";
-import "./Popup/modal.css";
 import "../assets/css/general.css";
 import { Table } from "reactstrap";
-import { AdminPage, AdminActionButton, useAdminHeaderActions } from "../components/AdminShell";
-import { Button } from "react-bootstrap";
+import { Modal, Select, Input, message } from "antd";
+import {
+  AdminPage,
+  AdminActionButton,
+  AdminFormRow,
+  AdminConfirmModal,
+  useAdminHeaderActions,
+} from "../components/AdminShell";
 import { Pagination } from "@material-ui/lab";
-import ModalShort from "./Popup/ModalShort";
 import { tokenExpired } from "v2/api/tokenExpired";
 import DatePicker, { registerLocale } from "react-datepicker";
 import ja from "date-fns/locale/ja";
@@ -17,6 +19,91 @@ import "react-datepicker/dist/react-datepicker.css";
 import { MDBIcon } from "mdbreact";
 import moment from "moment-timezone";
 registerLocale("ja", ja);
+
+const PAYMENT_STATUS_OPTIONS = [
+  { value: "paid", label: "支払済" },
+  { value: "unpaid", label: "未払い" },
+];
+
+const EMPTY_FORM_ERRORS = { startAt: "", endAt: "", paidAt: "" };
+
+function formatPaymentDate(date) {
+  if (!date) return "";
+  const tokyoTime = moment.tz("Asia/Tokyo").toISOString().slice(10);
+  return moment(date).format("YYYY-MM-DD") + tokyoTime;
+}
+
+function PaymentFormFields({
+  startAt,
+  endAt,
+  paidAt,
+  status,
+  price,
+  subscriptionStartAt,
+  errors,
+  onChangeStartAt,
+  onChangeEndAt,
+  onChangePaidAt,
+  onChangeStatus,
+}) {
+  return (
+    <>
+      <AdminFormRow label="課金開始日" required error={errors.startAt} htmlFor="startAt">
+        <DatePicker
+          id="startAt"
+          className="input-field"
+          selected={startAt || null}
+          onChange={onChangeStartAt}
+          dateFormat="yyyy/MM/dd"
+          locale="ja"
+          placeholderText="yyyy/mm/dd"
+          minDate={subscriptionStartAt}
+        />
+      </AdminFormRow>
+      <AdminFormRow label="課金終了日" required error={errors.endAt} htmlFor="endAt">
+        <DatePicker
+          id="endAt"
+          className="input-field"
+          selected={endAt || null}
+          onChange={onChangeEndAt}
+          dateFormat="yyyy/MM/dd"
+          locale="ja"
+          placeholderText="yyyy/mm/dd"
+          minDate={startAt || subscriptionStartAt}
+        />
+      </AdminFormRow>
+      <AdminFormRow label="価格" htmlFor="price">
+        <Input id="price" value={price} disabled />
+      </AdminFormRow>
+      <AdminFormRow label="スターテス" htmlFor="status">
+        <Select
+          id="status"
+          value={status}
+          onChange={onChangeStatus}
+          options={PAYMENT_STATUS_OPTIONS}
+        />
+      </AdminFormRow>
+      <AdminFormRow
+        label="支払日"
+        required={status === "paid"}
+        error={errors.paidAt}
+        htmlFor="paidAt"
+      >
+        <DatePicker
+          id="paidAt"
+          className="input-field"
+          selected={paidAt || null}
+          onChange={onChangePaidAt}
+          dateFormat="yyyy/MM/dd"
+          locale="ja"
+          placeholderText="yyyy/mm/dd"
+          disabled={status === "unpaid"}
+          minDate={startAt || subscriptionStartAt}
+        />
+      </AdminFormRow>
+    </>
+  );
+}
 
 function ClientPaymentDetail() {
   const [editMode, setEditMode] = useState(true);
@@ -35,11 +122,12 @@ function ClientPaymentDetail() {
   const [paidAt, setPaidAt] = useState();
   const [price, setPrice] = useState(0);
 
-  const [msgNoti, setMsgNoti] = useState();
   const [isOpenUpdate, setIsOpenUpdate] = useState(false);
-  const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [isOpenAddPayment, setIsOpenAddPayment] = useState(false);
   const [isOpenDeletePaymentHis, setIsOpenDeletePaymentHis] = useState(false);
+  const [formErrors, setFormErrors] = useState(EMPTY_FORM_ERRORS);
+  const [submitting, setSubmitting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   function getClientId() {
     const url = window.location.pathname;
@@ -149,6 +237,7 @@ function ClientPaymentDetail() {
       setPaidAt(moment.tz(item.paid_at, "Asia/Tokyo").toDate());
     setStatus(item.status);
     setPrice(item.price);
+    setFormErrors(EMPTY_FORM_ERRORS);
 
     setIsOpenUpdate(true);
   }
@@ -158,31 +247,40 @@ function ClientPaymentDetail() {
     setIsOpenDeletePaymentHis(true);
   }
   function deletePaymentHis() {
-    setIsOpenDeletePaymentHis(false);
+    setDeleting(true);
     api
       .delete(`/api/v1/managements/payment_histories/${paymentHisId}`)
-      .then((res) => {
+      .then(() => {
+        setIsOpenDeletePaymentHis(false);
         reloadListPayment(page);
-        showNotification("削除しました!");
+        message.success("削除しました!");
       })
       .catch((error) => {
         console.log(error);
         if (error.response?.data.code === 0) {
           tokenExpired();
         }
+      })
+      .finally(() => {
+        setDeleting(false);
       });
   }
 
   function updatePayment() {
     if (!checkStatus()) return;
-    var obj = getFormData("updateForm");
+    const obj = buildPaymentPayload();
+    setSubmitting(true);
     api
       .patch(`/api/v1/managements/payment_histories/${paymentHisId}`, {
         payment: obj,
       })
       .then((res) => {
+        if (res.data?.code === 2 || res.data?.code === "2") {
+          message.warning(res.data.message);
+          return;
+        }
         reloadListPayment(page);
-        showNotification("クライアント更新しました!");
+        message.success("クライアント更新しました!");
         setIsOpenUpdate(false);
         resetVariable();
       })
@@ -191,28 +289,31 @@ function ClientPaymentDetail() {
         if (error.response?.data.code === 0) {
           tokenExpired();
         }
+      })
+      .finally(() => {
+        setSubmitting(false);
       });
   }
 
   function addPaymentPopup() {
+    resetVariable();
     setIsOpenAddPayment(true);
   }
   function addPayment() {
     if (!checkStatus()) return;
-    var obj = getFormData("addForm");
-    obj["client_id"] = clientDetail.id;
+    const obj = buildPaymentPayload();
+    obj.client_id = clientDetail.id;
+    setSubmitting(true);
     api
       .post(`/api/v1/managements/payment_histories`, { payment: obj })
       .then((res) => {
         if (res.data.code === 1 || res.data.code === "1") {
-          reloadListPayment();
-          showNotification("クライアント追加しました!");
+          reloadListPayment(page);
+          message.success("クライアント追加しました!");
           setIsOpenAddPayment(false);
           resetVariable();
         } else if (res.data?.code === 2 || res.data?.code === "2") {
-          showNotification(res.data.message);
-          setIsOpenAddPayment(false);
-          resetVariable();
+          message.warning(res.data.message);
         }
       })
       .catch((error) => {
@@ -220,6 +321,9 @@ function ClientPaymentDetail() {
         if (error.response?.data.code === 0) {
           tokenExpired();
         }
+      })
+      .finally(() => {
+        setSubmitting(false);
       });
   }
 
@@ -228,78 +332,55 @@ function ClientPaymentDetail() {
     reloadListPayment(value);
     document.querySelector(".main-panel").scrollTop = 0;
   }
-  function showNotification(message) {
-    setMsgNoti(message);
-    setIsOpenNoti(true);
-    setTimeout(() => {
-      setMsgNoti("");
-      setIsOpenNoti(false);
-    }, 2000);
-  }
-
   function resetVariable() {
     setPaymentHisId("");
     setStartAt("");
     setEndAt("");
     setStatus("unpaid");
     setPaidAt("");
+    setPrice(0);
+    setFormErrors(EMPTY_FORM_ERRORS);
   }
 
   function checkStatus() {
-    var status = document.getElementById("status").value;
-    var paidAt = document.getElementById("paidAt").value;
-    var startAt = document.getElementById("startAt").value;
-    var endAt = document.getElementById("endAt").value;
-    var error = 0;
-    if (status === "paid") {
-      if (!paidAt) {
-        document.getElementById("paidAtErrMsg").innerHTML = "支払日は必須です";
-        document.getElementById("paidAtErrMsg").style.display = "block";
-        error += 1;
-      }
+    const nextErrors = { ...EMPTY_FORM_ERRORS };
+    if (status === "paid" && !paidAt) {
+      nextErrors.paidAt = "支払日は、必ず指定してください。";
     }
     if (!startAt) {
-      document.getElementById("startAtErrMsg").innerHTML =
-        "課金開始日は必須です";
-      document.getElementById("startAtErrMsg").style.display = "block";
-      error += 1;
+      nextErrors.startAt = "課金開始日は、必ず指定してください。";
     }
     if (!endAt) {
-      document.getElementById("endAtErrMsg").innerHTML = "課金終了日は必須です";
-      document.getElementById("endAtErrMsg").style.display = "block";
-      error += 1;
+      nextErrors.endAt = "課金終了日は、必ず指定してください。";
     }
-    return error === 0;
+    setFormErrors(nextErrors);
+    return !nextErrors.startAt && !nextErrors.endAt && !nextErrors.paidAt;
   }
 
-  function getFormData(formId) {
-    var elements = document.getElementById(formId).elements;
-    var obj = {};
-    let now = new moment.tz("Asia/Tokyo").toISOString().slice(10);
-    for (var i = 0; i < elements.length - 1; i++) {
-      var item = elements.item(i);
-      obj[item.name] = item.value;
-    }
-    obj.start_at = obj.start_at.replaceAll("/", "-") + now;
-    obj.end_at = obj.end_at.replaceAll("/", "-") + now;
-    if (obj.paid_at) {
-      obj.paid_at = obj.paid_at.replaceAll("/", "-") + now;
-    }
-    return obj;
+  function buildPaymentPayload() {
+    return {
+      start_at: formatPaymentDate(startAt),
+      end_at: formatPaymentDate(endAt),
+      status,
+      price,
+      paid_at: paidAt ? formatPaymentDate(paidAt) : "",
+    };
   }
 
   function onChangeStartAt(date) {
     setStartAt(date);
+    setFormErrors((prev) => ({ ...prev, startAt: "" }));
     if (!endAt) {
       setEndAt(moment(date).add(1, "months").subtract(1, 'days').toDate());
     } else if (endAt && date > endAt) {
       setEndAt(date);
     }
   }
-  function onChangeStatus(event) {
-    setStatus(event.target.value);
-    if (event.target.value === "unpaid") {
+  function onChangeStatus(value) {
+    setStatus(value);
+    if (value === "unpaid") {
       setPaidAt(null);
+      setFormErrors((prev) => ({ ...prev, paidAt: "" }));
     }
   }
 
@@ -353,7 +434,7 @@ function ClientPaymentDetail() {
                             </td>
                             <td colSpan={1}>{item.price}</td>
                             <td colSpan={1}>
-                              {item.status === "paid" ? "支払われた" : "未払い"}
+                              {item.status === "paid" ? "支払済" : "未払い"}
                             </td>
                             <td colSpan={2}>
                               {item.paid_at
@@ -421,337 +502,109 @@ function ClientPaymentDetail() {
                 />
 
         <Modal
+          title="支払いの更新"
           open={isOpenUpdate}
-          onClose={() => {
+          onCancel={() => {
             setIsOpenUpdate(false);
             resetVariable();
           }}
-        >
-          <div style={{ width: "100%", minHeight: "500px" }}>
-            <div style={{ marginTop: "-30px" }}>
-              <h4>支払いの更新</h4>
-              <div
-                style={{
-                  width: "100%",
-                  height: "2px",
-                  backgroundColor: "#bbb",
-                  marginBottom: "15px",
+          centered
+          destroyOnClose
+          footer={
+            <div className="admin-form-actions">
+              <AdminActionButton
+                action="cancel"
+                onClick={() => {
+                  setIsOpenUpdate(false);
+                  resetVariable();
                 }}
-              ></div>
-              <form id="updateForm" className="swap">
-                <div className="label-input">
-                  課金開始日 <span className="required-badge">必須</span>
-                  <div style={{ marginTop: "-24px" }}>
-                    <DatePicker
-                      id="startAt"
-                      className="input-field"
-                      selected={startAt && startAt}
-                      onChange={(date) => onChangeStartAt(date)}
-                      dateFormat="yyyy/MM/dd"
-                      name="start_at"
-                      locale="ja"
-                      value={startAt}
-                      placeholderText="yyyy/mm/dd"
-                      minDate={subscriptionStartAt}
-                    />
-                  </div>
-                  <label
-                    id="startAtErrMsg"
-                    className="input-field"
-                    style={{
-                      display: "none",
-                      color: "red",
-                      border: "none",
-                      padding: "2px",
-                    }}
-                  ></label>
-                </div>
-                <br />
-                <br />
-                <div className="label-input">
-                  課金終了日 <span className="required-badge">必須</span>
-                  <div style={{ marginTop: "-24px" }}>
-                    <DatePicker
-                      id="endAt"
-                      className="input-field"
-                      selected={endAt && endAt}
-                      onChange={(date) => setEndAt(date)}
-                      dateFormat="yyyy/MM/dd"
-                      name="end_at"
-                      locale="ja"
-                      value={endAt}
-                      placeholderText="yyyy/mm/dd"
-                      minDate={startAt ?? subscriptionStartAt}
-                    />
-                  </div>
-                  <label
-                    id="endAtErrMsg"
-                    className="input-field"
-                    style={{
-                      display: "none",
-                      color: "red",
-                      border: "none",
-                      padding: "2px",
-                    }}
-                  ></label>
-                </div>
-                <br />
-                <br />
-
-                <label className="label-input">
-                  価格
-                  <input
-                    style={{ padding: "3px 0px 3px 5px" }}
-                    className="input-field"
-                    defaultValue={0}
-                    name="price"
-                    id="price"
-                    onChange={(e) => onChangeStatus(e)}
-                    value={price}
-                    disabled={true}
-                  />
-                </label>
-                <br />
-                <br />
-
-                <label className="label-input">
-                  スターテス
-                  <select
-                    style={{ padding: "3px 0px 3px 0px" }}
-                    className="input-field"
-                    defaultValue={status}
-                    name="status"
-                    id="status"
-                    onChange={(e) => onChangeStatus(e)}
-                  >
-                    <option key={0} value="paid">
-                      Paid
-                    </option>
-                    <option key={1} value="unpaid">
-                      Unpaid
-                    </option>
-                  </select>
-                </label>
-                <br />
-                <br />
-
-                <div className="label-input">
-                  支払日
-                  {status === "paid" ? (
-                    <span className="required-badge">必須</span>
-                  ) : null}
-                  <div style={{ marginTop: "-24px" }}>
-                    <DatePicker
-                      id="paidAt"
-                      className="input-field"
-                      selected={paidAt && paidAt}
-                      onChange={(date) => setPaidAt(date)}
-                      dateFormat="yyyy/MM/dd"
-                      name="paid_at"
-                      locale="ja"
-                      value={paidAt}
-                      placeholderText="yyyy/mm/dd"
-                      disabled={status === "unpaid"}
-                      minDate={startAt ?? subscriptionStartAt}
-                    />
-                  </div>
-                  <label
-                    id="paidAtErrMsg"
-                    className="input-field"
-                    style={{
-                      display: "none",
-                      color: "red",
-                      border: "none",
-                      padding: "2px",
-                    }}
-                  ></label>
-                </div>
-                <br />
-                <br />
-                <Button id="btnSubmit" onClick={updatePayment}>
-                  更新
-                </Button>
-              </form>
+              />
+              <AdminActionButton
+                action="save"
+                label="更新"
+                loading={submitting}
+                onClick={updatePayment}
+              />
             </div>
-          </div>
+          }
+        >
+          <PaymentFormFields
+            startAt={startAt}
+            endAt={endAt}
+            paidAt={paidAt}
+            status={status}
+            price={price}
+            subscriptionStartAt={subscriptionStartAt}
+            errors={formErrors}
+            onChangeStartAt={onChangeStartAt}
+            onChangeEndAt={(date) => {
+              setEndAt(date);
+              setFormErrors((prev) => ({ ...prev, endAt: "" }));
+            }}
+            onChangePaidAt={(date) => {
+              setPaidAt(date);
+              setFormErrors((prev) => ({ ...prev, paidAt: "" }));
+            }}
+            onChangeStatus={onChangeStatus}
+          />
         </Modal>
 
         <Modal
+          title="支払いの追加"
           open={isOpenAddPayment}
-          onClose={() => {
+          onCancel={() => {
             setIsOpenAddPayment(false);
             resetVariable();
           }}
-        >
-          <div style={{ width: "100%", minHeight: "500px" }}>
-            <div style={{ marginTop: "-30px" }}>
-              <h4>支払いの追加</h4>
-              <div
-                style={{
-                  width: "100%",
-                  height: "2px",
-                  backgroundColor: "#bbb",
-                  marginBottom: "15px",
+          centered
+          destroyOnClose
+          footer={
+            <div className="admin-form-actions">
+              <AdminActionButton
+                action="cancel"
+                onClick={() => {
+                  setIsOpenAddPayment(false);
+                  resetVariable();
                 }}
-              ></div>
-              <form id="addForm" className="swap">
-                <div className="label-input">
-                  課金開始日 <span className="required-badge">必須</span>
-                  <div style={{ marginTop: "-24px" }}>
-                    <DatePicker
-                      id="startAt"
-                      className="input-field"
-                      selected={startAt && startAt}
-                      onChange={(date) => onChangeStartAt(date)}
-                      dateFormat="yyyy/MM/dd"
-                      name="start_at"
-                      locale="ja"
-                      value={startAt}
-                      placeholderText="yyyy/mm/dd"
-                      minDate={subscriptionStartAt}
-                    />
-                  </div>
-                  <label
-                    id="startAtErrMsg"
-                    className="input-field"
-                    style={{
-                      display: "none",
-                      color: "red",
-                      border: "none",
-                      padding: "2px",
-                    }}
-                  ></label>
-                </div>
-                <br />
-                <br />
-                <div className="label-input">
-                  課金終了日 <span className="required-badge">必須</span>
-                  <div style={{ marginTop: "-24px" }}>
-                    <DatePicker
-                      id="endAt"
-                      className="input-field"
-                      selected={endAt && endAt}
-                      onChange={(date) => setEndAt(date)}
-                      dateFormat="yyyy/MM/dd"
-                      name="end_at"
-                      locale="ja"
-                      value={endAt}
-                      placeholderText="yyyy/mm/dd"
-                      minDate={startAt ?? subscriptionStartAt}
-                    />
-                  </div>
-                  <label
-                    id="endAtErrMsg"
-                    className="input-field"
-                    style={{
-                      display: "none",
-                      color: "red",
-                      border: "none",
-                      padding: "2px",
-                    }}
-                  ></label>
-                </div>
-                <br />
-                <br />
-                <label className="label-input">
-                  価格
-                  <input
-                    style={{ padding: "3px 0px 3px 5px" }}
-                    className="input-field"
-                    defaultValue={0}
-                    name="price"
-                    id="price"
-                    onChange={(e) => onChangeStatus(e)}
-                    value={price}
-                    disabled={true}
-                  />
-                </label>
-                <br />
-                <br />
-                <label className="label-input">
-                  スターテス
-                  <select
-                    style={{ padding: "3px 0px 3px 0px" }}
-                    className="input-field"
-                    defaultValue={"unpaid"}
-                    name="status"
-                    id="status"
-                    onChange={(e) => onChangeStatus(e)}
-                  >
-                    <option key={0} value="paid">
-                      Paid
-                    </option>
-                    <option key={1} value="unpaid">
-                      Unpaid
-                    </option>
-                  </select>
-                </label>
-                <br />
-                <br />
-
-                <div className="label-input">
-                  支払日{" "}
-                  {status === "paid" ? (
-                    <span className="required-badge">必須</span>
-                  ) : null}
-                  <div style={{ marginTop: "-24px" }}>
-                    <DatePicker
-                      id="paidAt"
-                      className="input-field"
-                      selected={paidAt && paidAt}
-                      onChange={(date) => setPaidAt(date)}
-                      dateFormat="yyyy/MM/dd"
-                      name="paid_at"
-                      locale="ja"
-                      value={paidAt}
-                      placeholderText="yyyy/mm/dd"
-                      disabled={status === "unpaid"}
-                      minDate={startAt ?? subscriptionStartAt}
-                    />
-                  </div>
-                  <label
-                    id="paidAtErrMsg"
-                    className="input-field"
-                    style={{
-                      display: "none",
-                      color: "red",
-                      border: "none",
-                      padding: "2px",
-                    }}
-                  ></label>
-                </div>
-                <br />
-                <br />
-                <Button id="btnSubmit" onClick={addPayment}>
-                  追加
-                </Button>
-              </form>
+              />
+              <AdminActionButton
+                action="create"
+                label="追加"
+                loading={submitting}
+                onClick={addPayment}
+              />
             </div>
-          </div>
+          }
+        >
+          <PaymentFormFields
+            startAt={startAt}
+            endAt={endAt}
+            paidAt={paidAt}
+            status={status}
+            price={price}
+            subscriptionStartAt={subscriptionStartAt}
+            errors={formErrors}
+            onChangeStartAt={onChangeStartAt}
+            onChangeEndAt={(date) => {
+              setEndAt(date);
+              setFormErrors((prev) => ({ ...prev, endAt: "" }));
+            }}
+            onChangePaidAt={(date) => {
+              setPaidAt(date);
+              setFormErrors((prev) => ({ ...prev, paidAt: "" }));
+            }}
+            onChangeStatus={onChangeStatus}
+          />
         </Modal>
 
-        <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
-          <div
-            style={{ width: "400px", textAlign: "center", color: "#51cbce" }}
-          >
-            <span style={{ fontSize: "16px" }}>{msgNoti}</span>
-          </div>
-        </ModalNoti>
-
-        <ModalShort
+        <AdminConfirmModal
           open={isOpenDeletePaymentHis}
-          onClose={() => setIsOpenDeletePaymentHis(false)}
-        >
-          <div
-            style={{ width: "400px", textAlign: "center", color: "#51cbce" }}
-          >
-            <h4>この支払い履歴を削除してもよろしいですか?</h4>
-            <Button onClick={() => deletePaymentHis()}>はい</Button>
-            <Button onClick={() => setIsOpenDeletePaymentHis(false)}>
-              いいえ
-            </Button>
-          </div>
-        </ModalShort>
+          danger
+          loading={deleting}
+          message="本当に削除しますか。"
+          onOk={deletePaymentHis}
+          onCancel={() => setIsOpenDeletePaymentHis(false)}
+        />
       </div>
       </AdminPage>
     </>
