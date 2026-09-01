@@ -172,6 +172,9 @@ export function buildClientPayload(values, context) {
     phone_number: values.phone_number,
     reply_smtp_gmail: (values.reply_smtp_gmail || '').trim().replace(/＠/g, '@'),
     cart_system: values.cart_system,
+    lexica_max_chrome: values.cart_system === 'lexica' && values.lexica_max_chrome !== '' && values.lexica_max_chrome != null
+      ? Number(values.lexica_max_chrome)
+      : null,
     status: context.contract,
     subscription_start_at: formatDateValue(context.startDate),
     subscription_end_at: formatDateValue(context.endDate),

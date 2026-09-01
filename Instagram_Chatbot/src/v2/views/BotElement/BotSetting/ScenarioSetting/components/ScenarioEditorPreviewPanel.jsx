@@ -72,6 +72,8 @@ const ScenarioEditorPreviewPanel = () => {
     botId,
     editorSelectedRadioOption,
     editorSelectedCheckboxOption,
+    orderResultMode,
+    lexicaCartUrl,
   } = state;
   const { handleSelectMessage } = messages;
 
@@ -98,6 +100,8 @@ const ScenarioEditorPreviewPanel = () => {
     scenarioType,
     merchandiseId,
     lpProductUrl,
+    orderResultMode,
+    lexicaCartUrl,
     isUseOnlyRegularOrder,
     isUseFukushashiki,
     isUseCustomCss,
@@ -146,6 +150,8 @@ const ScenarioEditorPreviewPanel = () => {
     isUsedMessageLoadedPast,
     lpProductUrl,
     merchandiseId,
+    orderResultMode,
+    lexicaCartUrl,
     productIdCrossSell,
     scenarioName,
     scenarioType,

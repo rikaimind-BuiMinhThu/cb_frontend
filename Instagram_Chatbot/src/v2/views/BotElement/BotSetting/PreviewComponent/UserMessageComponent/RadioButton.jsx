@@ -12,7 +12,25 @@ import {
   getRadioOptionSelectionKey,
   isRadioOptionInitiallySelected,
 } from "v2/views/BotElement/BotSetting/ScenarioSetting/utils/radioButtonSelectionUtils";
+import { isMobile } from "v2/views/BotElement/BotSetting/PreviewComponent/Utils";
 import OptionGender from "./OptionGender";
+
+function isLexicaPathRadio(radioButton) {
+  const key = String(radioButton?.save_input_content || '');
+  return key === 'path' || key === 'order_path';
+}
+
+function isFirstTimeOption(item) {
+  const value = String(item?.value ?? '').toLowerCase();
+  const text = String(item?.text || '');
+  return value === 'first_time' || text.includes('はじめて');
+}
+
+function visibleRadioItems(radioButton) {
+  const items = radioButton?.[radioButton.type] || [];
+  if (!isMobile() || !isLexicaPathRadio(radioButton)) return items;
+  return items.filter((item) => !isFirstTimeOption(item));
+}
 
 export default function RadioButton({ content, disabled, onChangeValue, errors, contentIndex, messageIndex, notUseButtonNext, onClickNext }) {
   if (content.type !== MESSAGE_CONTENT_TYPES.RADIO_BUTTON) return null;
@@ -65,7 +83,7 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
         options={radioButton[radioButton.type]}
       />;
 
-    return radioButton[radioButton.type].map((item, index) => {
+    return visibleRadioItems(radioButton).map((item, index) => {
       const selectionKey = getRadioOptionSelectionKey(item);
       const inputId = `ss-message__content--user-radio_button_${messageIndex}_${contentIndex}_${selectionKey}_${index}`;
       const isSelected = isRadioOptionInitiallySelected(radioButton, item);
@@ -116,7 +134,7 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
   };
 
   const renderRadioButtonImgContent = () => {
-    const items = radioButton[radioButton.type] || [];
+    const items = visibleRadioItems(radioButton);
     const layout = normalizeRadioButtonImgLayout(radioButton);
     const gridStyle = getRadioImgGridStyle(radioButton);
     const gridClassName = getImgGridClassName(
@@ -196,7 +214,7 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
   };
 
   const renderBlockStyleContent = () => {
-    return radioButton[radioButton.type].map((item, index) => {
+    return visibleRadioItems(radioButton).map((item, index) => {
       const selectionKey = getRadioOptionSelectionKey(item);
       return (
         <div

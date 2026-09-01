@@ -56,6 +56,8 @@ import ReplyMailManagement from './views/BotElement/ReplyMailManagement';
 import DesignChatbot from './views/BotElement/BotSetting/DesignSetting/DesignChatbot';
 import ClientPaymentDetail from './views/ClientPaymentDetail';
 import BotChatLog from './views/BotElement/BotSetting/Report/ChatLog/BotChatLog';
+import BotOrderList from './views/BotElement/BotSetting/BotOrders/BotOrderList';
+import BotOrderDetail from './views/BotElement/BotSetting/BotOrders/BotOrderDetail';
 
 var routes = [
   {
@@ -475,6 +477,19 @@ var routes = [
     path: '/bot-chat-log',
     name: '会話',
     component: BotChatLog,
+    layout: '/v2/admin',
+  },
+  {
+    path: '/bot-orders',
+    name: '注文一覧',
+    component: BotOrderList,
+    layout: '/v2/admin',
+    exact: true,
+  },
+  {
+    path: '/bot-orders/:id',
+    name: '注文詳細',
+    component: BotOrderDetail,
     layout: '/v2/admin',
   },
 ];

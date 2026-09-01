@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, DatePicker, Form, Input, Radio, Select } from 'antd';
 import moment from 'moment';
+import Cookies from 'js-cookie';
 import ClientFormRow from './ClientFormRow';
 import {
   BOT_FEATURE_RADIO_OPTIONS,
@@ -474,6 +475,20 @@ function ClientFormBody({
           </Form.Item>
           <FormFieldError message={fieldErrors.cart_system} />
         </ClientFormRow>
+
+        {cartSystem === 'lexica' && Cookies.get('user_role') === 'admin_deel' && (
+          <ClientFormRow label="このクライアントの同時 Chromium 上限">
+            <Form.Item name="lexica_max_chrome" noStyle>
+              <Input
+                id="lexicaMaxChrome"
+                placeholder="空欄なら全体と同じ"
+                type="number"
+                min={1}
+                max={20}
+              />
+            </Form.Item>
+          </ClientFormRow>
+        )}
 
         {cartSystem === 'shopify' && (
           <>

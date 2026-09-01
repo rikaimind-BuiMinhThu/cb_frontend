@@ -52,6 +52,7 @@ export const CART_SYSTEM_OPTIONS = [
   { value: 'shopify', label: 'Shopify' },
   { value: 'ec_force', label: 'Ec-Force' },
   { value: 'repeat_plus', label: 'リピートPLUS' },
+  { value: 'lexica', label: 'レキシカ' },
 ];
 
 export const BOT_FEATURE_RADIO_OPTIONS = [

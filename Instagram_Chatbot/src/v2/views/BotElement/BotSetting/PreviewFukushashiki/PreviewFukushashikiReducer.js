@@ -464,6 +464,7 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
         isProcessing: false,
         useFullWidthChatbotMobile: !!chatbot?.use_fullwidth_chatbot_mobile,
         cartSystem: state.cartSystem || chatbot?.client_cart_system || "",
+        orderResultMode: chatbot?.order_result_mode || state.orderResultMode || "wait",
         merchandiseId: action.payload.responseData?.data?.merchandise_id || "",
         isUsedCrosssell: !!action.payload.responseData?.data?.is_used_crosssell,
         productIdCrossSell:

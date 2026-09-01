@@ -104,6 +104,9 @@ const CHATBOT_SERVER = {
   CREATE_USER_SCENARIO_RESPONSE_MESSAGE_HISTORY: '/api/v1/scenario_users/scenario_user_responses_message',
   USER_ENTRY_SCENARIO: '/api/v1/scenario_users/entry',
   GET_ADDRESS_FROM_ZIP_CODE_PATH: '/api/v1/get_address_from_zip_code?zip_code=:zip_code',
+  ZEUS_CONFIG_PATH: '/api/v1/scenario_users/scenario_user_responses/zeus_config',
+  TOKEN_FAILURES_PATH: '/api/v1/scenario_users/scenario_user_responses/token_failures',
+  SELENIUM_RESULTS_PATH: '/api/v1/scenario_users/scenario_user_responses/selenium_results',
 };
 
 const GET_CAPTCHA_PATH = `https://svg-captcha-nodejs.vercel.app/captcha?size=:size&color=:color&charPreset=:char_preset`;
@@ -399,6 +402,7 @@ const RANGE_TEXT_VALIDATE = {
 const CART_SYSTEM = {
   EC_FORCE: 'ec_force',
   SHOPIFY: 'shopify',
+  LEXICA: 'lexica',
 }
 
 export {

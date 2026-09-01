@@ -49,6 +49,9 @@ const ScenarioSettingsMainView = ({ onClose }) => {
     isUseGlobalDelay,
     useFullwidthChatbotMobile,
     isShopifyPaymentScenario,
+    orderResultMode,
+    lexicaCartUrl,
+    clientCartSystem,
   } = state;
   const {
     setUrlThanks,
@@ -79,9 +82,14 @@ const ScenarioSettingsMainView = ({ onClose }) => {
     setIsUseGlobalDelay,
     setUseFullwidthChatbotMobile,
     navigateSettingsModalView,
+    setOrderResultMode,
+    setLexicaCartUrl,
   } = actions;
 
-  const client = contextClient || JSON.parse(sessionStorage.getItem('client') || 'null');
+  const client = contextClient
+    || JSON.parse(sessionStorage.getItem('client') || 'null')
+    || JSON.parse(localStorage.getItem('client') || 'null');
+  const isLexicaCart = client?.cart_system === 'lexica' || clientCartSystem === 'lexica';
   const isApiPolicy = executionPolicy === EXECUTION_POLICIES.API;
   const isFukushashikiPolicy = executionPolicy === EXECUTION_POLICIES.FUKUSHASHIKI;
 
@@ -164,6 +172,35 @@ const ScenarioSettingsMainView = ({ onClose }) => {
                 onChange={(value) => setCoupon(value)}
               />
             </ScenarioFormRow>
+          )}
+          {isLexicaCart && (
+            <>
+              <ScenarioFormRow label="注文確定後の表示">
+                <select
+                  className="ss-input-value"
+                  value={orderResultMode}
+                  onChange={(e) => setOrderResultMode(e.target.value)}
+                >
+                  <option value="wait">待ち（完了まで表示）</option>
+                  <option value="async">受付（裏で処理）</option>
+                </select>
+              </ScenarioFormRow>
+              <ScenarioFormRow label="SKU">
+                <InputCustom
+                  style={{ width: '100%' }}
+                  value={merchandiseId}
+                  onChange={(value) => setMerchandiseId(value)}
+                />
+              </ScenarioFormRow>
+              <ScenarioFormRow label="カートURL">
+                <InputCustom
+                  style={{ width: '100%' }}
+                  value={lexicaCartUrl}
+                  onChange={(value) => setLexicaCartUrl(value)}
+                  placeholder="https://cart.example.com"
+                />
+              </ScenarioFormRow>
+            </>
           )}
         </section>
       )}

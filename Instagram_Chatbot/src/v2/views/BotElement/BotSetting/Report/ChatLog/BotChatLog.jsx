@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { Button, DatePicker, Empty, Select, Space, Tabs, Typography } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import api from "api/api-management";
@@ -904,6 +905,19 @@ function BotChatLog() {
                       {item.is_done ? "完了" : "未完了"}
                     </span>
                   </button>
+                  {item.order_status && (
+                    <Link
+                      to={`/v2/admin/bot-orders/${item.order_id}`}
+                      className="chat-log-order-badge"
+                    >
+                      注文
+                      {item.order_status === "done"
+                        ? "完了"
+                        : item.order_status === "error"
+                          ? "エラー"
+                          : "処理中"}
+                    </Link>
+                  )}
                 </li>
               );
             })}

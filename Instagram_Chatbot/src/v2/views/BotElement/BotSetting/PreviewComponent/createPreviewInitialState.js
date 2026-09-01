@@ -104,6 +104,7 @@ const fukushashikiExtras = (params) => ({
   isNotAutoScroll: false,
   cartSystem: params.get("cartSystem") || "",
   isUseBtnUpdateTracking: false,
+  orderResultMode: "wait",
 });
 
 /**

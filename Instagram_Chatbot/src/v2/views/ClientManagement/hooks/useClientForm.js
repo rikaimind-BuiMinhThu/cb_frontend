@@ -123,6 +123,7 @@ export default function useClientForm(plans) {
       reply_smtp_gmail_app_password: '',
       has_reply_smtp_password: !!data.has_reply_smtp_password,
       cart_system: data.cart_system || 'cart_system_none',
+      lexica_max_chrome: data.lexica_max_chrome ?? '',
     };
   }
 

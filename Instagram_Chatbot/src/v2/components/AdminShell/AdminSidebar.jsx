@@ -67,7 +67,7 @@ function AdminSidebar({ collapsed, onCollapse }) {
 
   const menuSource = useMemo(() => {
     if (botType === 'bot' || isBotMenuRoute(location.pathname)) {
-      return getBotMenuItems(botId);
+      return getBotMenuItems(botId, client);
     }
     return filterMenuByRole(getGlobalMenuItems(client), userRole);
   }, [botType, botId, client, userRole, location.pathname]);

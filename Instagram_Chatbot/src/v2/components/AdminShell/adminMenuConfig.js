@@ -31,9 +31,10 @@ import {
 } from '@ant-design/icons';
 import { getAdminRoutePath as p } from 'v2/variables/constants';
 
-export function getBotMenuItems(botId) {
+export function getBotMenuItems(botId, client) {
   const smsPath = p(`/bot-settings/${botId || ''}/sms-template`);
   const pushPath = p(`/bot-settings/${botId || ''}/push-message`);
+  const isLexica = client?.cart_system === 'lexica';
 
   return [
     {
@@ -67,6 +68,7 @@ export function getBotMenuItems(botId) {
         { key: p('/design-setting'), label: 'デザイン設定', path: p('/design-setting'), icon: <FormatPainterOutlined /> },
         { key: p('/report'), label: 'レポート', path: p('/report'), icon: <LineChartOutlined /> },
         { key: p('/bot-chat-log'), label: '会話', path: p('/bot-chat-log'), icon: <CommentOutlined /> },
+        ...(isLexica ? [{ key: p('/bot-orders'), label: '注文', path: p('/bot-orders'), icon: <UnorderedListOutlined /> }] : []),
         { key: p('/payment-management'), label: '決済管理', path: p('/payment-management'), icon: <CreditCardOutlined /> },
         { key: p('/payment-gateway'), label: 'ペイメントゲートウェイ', path: p('/payment-gateway'), icon: <CloudServerOutlined /> },
         { key: p('/withdrawal-prevention'), label: '離脱防止', path: p('/withdrawal-prevention'), icon: <DesktopOutlined /> },
@@ -210,6 +212,7 @@ export const ROUTE_TITLES = {
   [p('/design-setting')]: 'デザイン設定',
   [p('/report')]: 'レポート',
   [p('/bot-chat-log')]: '会話',
+  [p('/bot-orders')]: '注文一覧',
   [p('/payment-management')]: '決済管理',
   [p('/payment-gateway')]: '決済ゲートウェイ一覧',
   [p('/add-payment-gateway')]: '決済ゲートウェイ追加',
@@ -227,6 +230,7 @@ export const MENU_ROUTE_ALIASES = [
   { match: p('/demo-bot'), menuPath: p('/installation-tag-demo'), prefix: true },
   { match: p('/add-payment-gateway'), menuPath: p('/payment-gateway'), prefix: true },
   { match: p('/edit-payment-gateway'), menuPath: p('/payment-gateway'), prefix: true },
+  { match: p('/bot-orders/'), menuPath: p('/bot-orders'), prefix: true },
 ];
 
 export function resolveMenuPath(pathname) {
@@ -258,6 +262,7 @@ const BOT_MENU_PATH_PREFIXES = [
   p('/design-setting'),
   p('/report'),
   p('/bot-chat-log'),
+  p('/bot-orders'),
   p('/payment-management'),
   p('/payment-gateway'),
   p('/add-payment-gateway'),
@@ -274,7 +279,7 @@ export function getPageTitle(pathname) {
   if (ROUTE_TITLES[pathname]) return ROUTE_TITLES[pathname];
   if (pathname.includes('/sms-template')) return 'SMS一覧';
   if (pathname.includes('/push-message')) return 'プッシュメッセージ';
-  if (pathname.includes('/demo-bot')) return 'ボットデモ';
+  if (pathname.includes('/bot-orders/')) return '注文詳細';
   if (pathname.includes('/edit-email')) return 'メール編集';
   return '管理画面';
 }

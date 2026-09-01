@@ -88,6 +88,7 @@ function AdminLayout(props) {
               <Switch>
                 {routes.map((route, key) => (
                   <Route
+                    exact={route.exact}
                     path={route.layout + route.path}
                     component={route.component}
                     key={key}

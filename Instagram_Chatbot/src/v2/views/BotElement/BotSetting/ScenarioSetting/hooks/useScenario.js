@@ -58,6 +58,8 @@ export const useScenario = (mode = 'scenario') => {
   const [urlThanks, setUrlThanks] = useState('');
   const [merchandiseId, setMerchandiseId] = useState('');
   const [lpProductUrl, setLpProductUrl] = useState('');
+  const [orderResultMode, setOrderResultMode] = useState('wait');
+  const [lexicaCartUrl, setLexicaCartUrl] = useState('');
   const [coupon, setCoupon] = useState('');
   const [isUseOnlyRegularOrder, setIsUseOnlyRegularOrder] = useState(false);
   const [executionPolicy, setExecutionPolicy] = useState(DEFAULT_EXECUTION_POLICY);
@@ -208,6 +210,8 @@ export const useScenario = (mode = 'scenario') => {
     setUrlCartConfirmPage(parsed.urlCartConfirmPage);
     setCoupon(parsed.coupon);
     setLpProductUrl(parsed.lpProductUrl);
+    setOrderResultMode(parsed.orderResultMode || 'wait');
+    setLexicaCartUrl(parsed.lexicaCartUrl || '');
     setIsUseOnlyRegularOrder(parsed.isUseOnlyRegularOrder);
     setExecutionPolicy(parsed.executionPolicy || DEFAULT_EXECUTION_POLICY);
     setIsUseFukushashiki(parsed.isUseFukushashiki);
@@ -372,6 +376,8 @@ export const useScenario = (mode = 'scenario') => {
     scenarioType,
     merchandiseId,
     lpProductUrl,
+    orderResultMode,
+    lexicaCartUrl,
     isUseOnlyRegularOrder,
     executionPolicy,
     isUseFukushashiki,
@@ -450,6 +456,8 @@ export const useScenario = (mode = 'scenario') => {
     isUsedMessageLoadedPast,
     lpProductUrl,
     merchandiseId,
+    orderResultMode,
+    lexicaCartUrl,
     productIdCrossSell,
     scenarioName,
     scenarioType,
@@ -578,6 +586,8 @@ export const useScenario = (mode = 'scenario') => {
       urlThanks,
       merchandiseId,
       lpProductUrl,
+      orderResultMode,
+      lexicaCartUrl,
       coupon,
       isUseOnlyRegularOrder,
       executionPolicy,
@@ -673,6 +683,8 @@ export const useScenario = (mode = 'scenario') => {
       setUrlThanks,
       setMerchandiseId,
       setLpProductUrl,
+      setOrderResultMode,
+      setLexicaCartUrl,
       setCoupon,
       setIsUseOnlyRegularOrder,
       setExecutionPolicy,

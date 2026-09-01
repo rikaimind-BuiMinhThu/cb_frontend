@@ -51,6 +51,11 @@ import {
   sendErrorLogToServer,
 } from "./PreviewComponent/Utils";
 import {
+  followLexicaOrder,
+  LEXICA_COPY,
+  prepareLexicaCreditToken,
+} from "./PreviewFukushashiki/zeusToken";
+import {
   getChatbotSavedState,
   savedChatbotState,
   saveCheckpointTime,
@@ -110,6 +115,7 @@ const PreviewFukushashiki = () => {
   const [useSharedBootstrap, setUseSharedBootstrap] = useState(() => !getChatbotSavedState());
   const [msgUpdateState, setMsgUpdateState] = useState({});
   const msgUpdateStateRef = useRef({});
+  const lexicaSubmitLockRef = useRef(false);
   useEffect(() => { 
     if (!state.isUseBtnUpdateTracking) return;
     msgUpdateStateRef.current = msgUpdateState; 
@@ -548,6 +554,7 @@ const PreviewFukushashiki = () => {
       customCssContent: chatbot?.custom_css_content,
       isUsedHtmlUgc: !!chatbot?.is_used_html_ugc,
       htmlUgcConfigContent: chatbot?.html_ugc_config_content,
+      orderResultMode: chatbot?.order_result_mode || "wait",
     };
 
     if (chatbot?.timer_config?.enable) {
@@ -649,61 +656,102 @@ const PreviewFukushashiki = () => {
 
     const isBtnUpdateClick = clickedMsgIndex < state.renderMessagesList.length - 1;
     const isShopify = state.cartSystem === CART_SYSTEM.SHOPIFY;
+    const isLexica = state.cartSystem === CART_SYSTEM.LEXICA;
+    const isClickedButtonSubmit = isButtonSubmitMessage(clickedMsg)
+      || isButtonSubmitMessage(state.messagesList[clickedMsgIndex]);
 
-    if (isShopify) {
-      sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
+    const continueAfterOptionalToken = () => {
+      if (isShopify) {
+        sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
 
-      if (isButtonSubmitMessage(clickedMsg)) {
-        createOrAddLinesCart(state);
+        if (isButtonSubmitMessage(clickedMsg)) {
+          createOrAddLinesCart(state);
+        }
+      } else {
+        sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
       }
-    } else {
-      sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
-    }
 
-    if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
-      executeLpJsCode(clickedMsg.jscode, state);
-    }
-
-    if (clickedMsg.message_content[0]?.type === "button_submit"
-      && clickedMsg.message_content[0]?.button_submit_id) {
-      const buttonId = clickedMsg.message_content[0]?.button_submit_id;
-
-      if (!isShopify) {
-        postMessageToParent({
-          action: CHATBOT_ACTIONS.CLICK_BUTTON,
-          actionData: buttonId,
-          isOpen: true,
-        }, state);
+      if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
+        executeLpJsCode(clickedMsg.jscode, state);
       }
+
+      if (clickedMsg.message_content[0]?.type === "button_submit"
+        && clickedMsg.message_content[0]?.button_submit_id) {
+        const buttonId = clickedMsg.message_content[0]?.button_submit_id;
+
+        if (!isShopify) {
+          postMessageToParent({
+            action: CHATBOT_ACTIONS.CLICK_BUTTON,
+            actionData: buttonId,
+            isOpen: true,
+          }, state);
+        }
+      }
+
+      if (isDislayingLoginForm(clickedMsg)) return;
+
+      const fukuData = convertToFukushashikiObject(data);
+      fukushashikiToLP(fukuData, state);
+
+      const isClickedLastMessage = state.messagesList.length - 1 === clickedMsgIndex;
+
+      dispatch({
+        type: PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON,
+        payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn}
+      });
+
+      if (!isLexica && (isClickedButtonSubmit || isClickedLastMessage)) {
+        updateStatusConversion({
+          scenario_id: state.scenarioId,
+          user_input_id: state.uuid,
+          status: CONVERSTION_RESPONSE_STATUS.FINISH,
+        })
+      }
+
+      if (isClickedLastMessage && clickedMsg?.only_display_when_confirm && !state.submitErrorMessage && Object.keys(state.errors).length === 0) {
+        setTimeout(() => {
+          dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
+        }, 1000);
+      }
+    };
+
+    if (isLexica && isClickedButtonSubmit) {
+      if (lexicaSubmitLockRef.current || state.isProcessing) return;
+      lexicaSubmitLockRef.current = true;
+      dispatch({ type: PREVIEW_ACTIONS.SET_PROCESSING, payload: true });
+      (async () => {
+        const tokenResult = await prepareLexicaCreditToken({
+          scenarioId: state.scenarioId,
+          userId: state.uuid,
+          messages: state.messagesList,
+        });
+        if (!tokenResult.ok) {
+          dispatch({
+            type: PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE,
+            payload: tokenResult.copy || LEXICA_COPY.TOKEN_FAIL_COPY,
+          });
+          return;
+        }
+        continueAfterOptionalToken();
+        await followLexicaOrder({
+          scenarioId: state.scenarioId,
+          userId: state.uuid,
+          orderResultMode: state.orderResultMode,
+          onStatus: (copy) => {
+            dispatch({
+              type: PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE,
+              payload: copy,
+            });
+          },
+        });
+      })().finally(() => {
+        lexicaSubmitLockRef.current = false;
+        dispatch({ type: PREVIEW_ACTIONS.SET_PROCESSING, payload: false });
+      });
+      return;
     }
 
-    // For GINZA AIRA
-    if (isDislayingLoginForm(clickedMsg)) return;
-
-    const fukuData = convertToFukushashikiObject(data);
-    fukushashikiToLP(fukuData, state);
-
-    const isClickedButtonSubmit = isButtonSubmitMessage(state.messagesList[clickedMsgIndex]);
-    const isClickedLastMessage = state.messagesList.length - 1 === clickedMsgIndex;
-
-    dispatch({
-      type: PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON,
-      payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn}
-    });
-
-    if (isClickedButtonSubmit || isClickedLastMessage) {
-      updateStatusConversion({
-        scenario_id: state.scenarioId,
-        user_input_id: state.uuid,
-        status: CONVERSTION_RESPONSE_STATUS.FINISH,
-      })
-    }
-
-    if (isClickedLastMessage && clickedMsg?.only_display_when_confirm && !state.submitErrorMessage && Object.keys(state.errors).length === 0) {
-      setTimeout(() => {
-        dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
-      }, 1000);
-    }
+    continueAfterOptionalToken();
   };
 
   const onChangeValue = (
@@ -967,7 +1015,8 @@ const PreviewFukushashiki = () => {
   );
 
   const renderSubmitErrorMessages = () => {
-    if (!state.isUsedErrMsgByJs || !state.submitErrorMessage) return null;
+    const isLexicaStatus = state.cartSystem === CART_SYSTEM.LEXICA && state.submitErrorMessage;
+    if (!isLexicaStatus && (!state.isUsedErrMsgByJs || !state.submitErrorMessage)) return null;
 
     const className = state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "ss-bot-getting-error-notification" : "ss-bot-submit-error-message";
     const text = state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "処理中..." : state.submitErrorMessage;

@@ -7,10 +7,11 @@ import { AdminFormRow, AdminPage, AdminActionButton, useAdminHeaderTitle, useAdm
 import '../../../../assets/css/bot/payment-gateway-form.css';
 
 function buildPayload(values) {
+  const mode = values.mode === 'production' ? 'product' : values.mode;
   const base = {
     gateway_name: values.gateway_name.trim(),
     payment_agency: values.payment_agency,
-    mode: values.mode,
+    mode,
   };
 
   if (values.payment_agency === 'gmo') {
@@ -24,6 +25,23 @@ function buildPayload(values) {
         terminal_id: '',
         client_ip: '',
         store_id: '',
+      },
+    };
+  }
+
+  if (values.payment_agency === 'zeus') {
+    return {
+      payment: {
+        ...base,
+        shop_id: '',
+        shop_pass: '',
+        merchant_code: '',
+        sp_code: '',
+        terminal_id: '',
+        store_id: '',
+        token_js_url: values.token_js_url.trim(),
+        client_ip: values.client_ip.trim(),
+        ipcode: values.ipcode.trim(),
       },
     };
   }
@@ -69,12 +87,15 @@ function AddPaymentGateway() {
           form.setFieldsValue({
             gateway_name: data.gateway_name,
             payment_agency: data.payment_agency || 'gmo',
-            mode: data.mode || 'test',
+            mode: data.mode === 'product' ? 'production' : (data.mode || 'test'),
             shop_id: data.shop_id || '',
             shop_pass: '',
             merchant_code: data.merchant_code || '',
             sp_code: data.sp_code || '',
             terminal_id: data.terminal_id || '',
+            token_js_url: data.token_js_url || '',
+            client_ip: data.client_ip || '',
+            ipcode: data.ipcode || '',
           });
         } else if (res.data.code === 2) {
           message.error('ゲートウェイが見つかりません。');
@@ -155,6 +176,7 @@ function AddPaymentGateway() {
                   options={[
                     { value: 'gmo', label: 'GMOペイメントゲートウェイ' },
                     { value: 'np_payment', label: 'NP後払い' },
+                    { value: 'zeus', label: 'ZEUS' },
                   ]}
                 />
               </Form.Item>
@@ -200,6 +222,36 @@ function AddPaymentGateway() {
                     normalize={(value) => (value ? value.replace(/\s/g, '') : value)}
                   >
                     <Input.Password placeholder="ショップパスワードを入力" />
+                  </Form.Item>
+                </AdminFormRow>
+              </>
+            )}
+
+            {paymentAgency === 'zeus' && (
+              <>
+                <h3 className="payment-gateway-form-section">接続設定（ZEUS）</h3>
+                <AdminFormRow label="token.js URL" required>
+                  <Form.Item
+                    name="token_js_url"
+                    rules={[{ required: true, whitespace: true, message: '入力してください。' }]}
+                  >
+                    <Input placeholder="https://.../token.js" />
+                  </Form.Item>
+                </AdminFormRow>
+                <AdminFormRow label="clientip" required>
+                  <Form.Item
+                    name="client_ip"
+                    rules={[{ required: true, whitespace: true, message: '入力してください。' }]}
+                  >
+                    <Input placeholder="clientip" />
+                  </Form.Item>
+                </AdminFormRow>
+                <AdminFormRow label="ipcode" required>
+                  <Form.Item
+                    name="ipcode"
+                    rules={[{ required: true, whitespace: true, message: '入力してください。' }]}
+                  >
+                    <Input placeholder="ipcode" />
                   </Form.Item>
                 </AdminFormRow>
               </>

@@ -821,13 +821,14 @@ const ScenarioPreviewFukushashiki = ({
 
     const isClickedButtonSubmit = isButtonSubmitMessage(state.messagesList[clickedMsgIndex]);
     const isClickedLastMessage = state.messagesList.length - 1 === clickedMsgIndex;
+    const isLexica = state.cartSystem === CART_SYSTEM.LEXICA;
 
     dispatch({
       type: PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON,
       payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn}
     });
 
-    if (isClickedButtonSubmit || isClickedLastMessage) {
+    if (!isLexica && (isClickedButtonSubmit || isClickedLastMessage)) {
       updateStatusConversion({
         scenario_id: state.scenarioId,
         user_input_id: state.uuid,

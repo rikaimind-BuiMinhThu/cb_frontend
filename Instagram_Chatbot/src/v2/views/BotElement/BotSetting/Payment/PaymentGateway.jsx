@@ -10,6 +10,7 @@ const PAGE_SIZE = 25;
 const AGENCY_LABELS = {
   gmo: 'GMO',
   np_payment: 'NP後払い',
+  zeus: 'ZEUS',
 };
 
 function formatAgency(agency) {
@@ -28,6 +29,9 @@ function formatConfigInfo(item) {
   }
   if (item.payment_agency === 'np_payment') {
     return item.merchant_code ? `加盟店コード: ${item.merchant_code}` : '—';
+  }
+  if (item.payment_agency === 'zeus') {
+    return item.ipcode ? `ipcode: ${item.ipcode}` : '—';
   }
   return '—';
 }
