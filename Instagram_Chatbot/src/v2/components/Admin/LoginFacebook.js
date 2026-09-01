@@ -7,7 +7,7 @@ import api from 'api/api-management'
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import { event } from 'jquery';
-import {FACEBOOK_APP_ID} from 'v2/variables/constants';
+import {FACEBOOK_APP_ID, META_GRAPH_API_VERSION} from 'v2/variables/constants';
 
 function LoginFacebook({ checkLogin }) {
 
@@ -69,7 +69,7 @@ function LoginFacebook({ checkLogin }) {
       // });
       // console.log("chua login fb dau ne")
     } else {
-      axios.get(`https://graph.facebook.com/v14.0/${ig_id}?fields=id,username,ig_id,name,profile_picture_url&access_token=${page_access_token}`).then(res => {
+      axios.get(`https://graph.facebook.com/${META_GRAPH_API_VERSION}/${ig_id}?fields=id,username,ig_id,name,profile_picture_url&access_token=${page_access_token}`).then(res => {
         checkLogin(true, ig_id)
         document.getElementById("btnLoginFB").style.display = "none"
         document.getElementById("listPage").style.display = "none"
@@ -100,7 +100,7 @@ function LoginFacebook({ checkLogin }) {
       appId: FACEBOOK_APP_ID,
       cookie: true,
       xfbml: true,
-      version: 'v14.0'
+      version: META_GRAPH_API_VERSION
     });
 
     window.FB.getLoginStatus(function (response) {

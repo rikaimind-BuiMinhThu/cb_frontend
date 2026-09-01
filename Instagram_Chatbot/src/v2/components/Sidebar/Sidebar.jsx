@@ -280,7 +280,7 @@ function Sidebar(props) {
                     key={'data'}
                   >
                     <NavLink
-                      to='/v2/admin/data'
+                      to='/v2/admin/data-analyst'
                       onClick={hide}
                       className='nav-link'
                       activeClassName='active'

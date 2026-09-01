@@ -1,16 +1,16 @@
 import Dashboard from './views/Dashboard.jsx';
-import Chatbot from './views/InstagramBotElement/Chatbot';
+import Chatbot from 'views/InstagramBotElement/Chatbot';
 
 import ClientManagement from './views/ClientManagement/index';
 import PlanManagement from './views/PlanManagement';
 import Policy from './views/InstagramBotElement/Policy';
-import Release from './views/InstagramBotElement/Release';
+import ReleasePage from 'views/InstagramBotElement/Release/ReleasePage';
 import UserManagement from './views/UserManagement/index';
-import Keyword from './views/InstagramBotElement/Keyword';
-import DataAnalyst from './views/InstagramBotElement/DataAnalyst';
-import ListUser from './views/InstagramBotElement/ListUser';
-import AttractedCustomer from './views/InstagramBotElement/AttractedCusomer';
-import CRM from './views/InstagramBotElement/CRM';
+import Keyword from 'views/InstagramBotElement/Keyword';
+import DataAnalyst from 'views/InstagramBotElement/DataAnalyst';
+import ListUser from 'views/InstagramBotElement/ListUser';
+import AttractedCustomer from 'views/InstagramBotElement/AttractedCustomer';
+import CRM from 'views/InstagramBotElement/CRM';
 import Template from './views/InstagramBotElement/Template';
 import BotManagement from './views/BotElement/BotManagement';
 import AddBotchat from './views/BotElement/AddBotchat';
@@ -111,7 +111,7 @@ var routes = [
     path: '/release',
     name: 'リリース',
     icon: 'nc-icon nc-air-baloon',
-    component: Release,
+    component: ReleasePage,
     layout: '/v2/admin',
   },
   {
