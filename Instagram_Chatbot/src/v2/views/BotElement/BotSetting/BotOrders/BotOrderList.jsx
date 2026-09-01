@@ -78,7 +78,7 @@ function BotOrderList() {
       { title: '注文タイプ', dataIndex: 'path_label', render: (value) => value || '—' },
       { title: '支払い', dataIndex: 'payment_label', render: (value) => value || '—' },
       { title: 'メール', dataIndex: 'email', render: (value) => value || '—' },
-      { title: 'SKU', dataIndex: 'sku', render: (value) => value || '—' },
+      { title: '商品コード', dataIndex: 'sku', render: (value) => value || '—' },
       { title: 'レキシカ注文ID', dataIndex: 'lexica_order_id', render: (value) => value || '—' },
       { title: '最終ステップ', dataIndex: 'last_step_description', render: (value) => formatStep(value) },
     ],

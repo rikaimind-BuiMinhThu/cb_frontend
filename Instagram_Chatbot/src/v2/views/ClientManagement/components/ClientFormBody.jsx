@@ -477,7 +477,7 @@ function ClientFormBody({
         </ClientFormRow>
 
         {cartSystem === 'lexica' && Cookies.get('user_role') === 'admin_deel' && (
-          <ClientFormRow label="このクライアントの同時 Chromium 上限">
+          <ClientFormRow label="このクライアントの同時ブラウザ上限">
             <Form.Item name="lexica_max_chrome" noStyle>
               <Input
                 id="lexicaMaxChrome"

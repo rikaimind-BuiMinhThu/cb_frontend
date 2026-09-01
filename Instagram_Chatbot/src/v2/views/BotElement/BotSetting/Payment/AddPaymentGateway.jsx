@@ -230,7 +230,7 @@ function AddPaymentGateway() {
             {paymentAgency === 'zeus' && (
               <>
                 <h3 className="payment-gateway-form-section">接続設定（ZEUS）</h3>
-                <AdminFormRow label="token.js URL" required>
+                <AdminFormRow label="トークンJS URL" required>
                   <Form.Item
                     name="token_js_url"
                     rules={[{ required: true, whitespace: true, message: '入力してください。' }]}
@@ -238,7 +238,7 @@ function AddPaymentGateway() {
                     <Input placeholder="https://.../token.js" />
                   </Form.Item>
                 </AdminFormRow>
-                <AdminFormRow label="clientip" required>
+                <AdminFormRow label="クライアントIP" required>
                   <Form.Item
                     name="client_ip"
                     rules={[{ required: true, whitespace: true, message: '入力してください。' }]}
@@ -246,7 +246,7 @@ function AddPaymentGateway() {
                     <Input placeholder="clientip" />
                   </Form.Item>
                 </AdminFormRow>
-                <AdminFormRow label="ipcode" required>
+                <AdminFormRow label="IPコード" required>
                   <Form.Item
                     name="ipcode"
                     rules={[{ required: true, whitespace: true, message: '入力してください。' }]}

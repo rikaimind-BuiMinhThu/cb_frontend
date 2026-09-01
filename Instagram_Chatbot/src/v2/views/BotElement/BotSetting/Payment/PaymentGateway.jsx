@@ -31,7 +31,7 @@ function formatConfigInfo(item) {
     return item.merchant_code ? `加盟店コード: ${item.merchant_code}` : '—';
   }
   if (item.payment_agency === 'zeus') {
-    return item.ipcode ? `ipcode: ${item.ipcode}` : '—';
+    return item.ipcode ? `IPコード: ${item.ipcode}` : '—';
   }
   return '—';
 }

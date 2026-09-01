@@ -126,7 +126,7 @@ export function formatRpaLog(steps) {
         lines.push('         -> OK');
       } else if (step.ok === false) {
         lines.push('         -> NG');
-        if (step.error) lines.push(`       exception: ${step.error}`);
+        if (step.error) lines.push(`       例外: ${step.error}`);
       }
       return lines.join('\n');
     })

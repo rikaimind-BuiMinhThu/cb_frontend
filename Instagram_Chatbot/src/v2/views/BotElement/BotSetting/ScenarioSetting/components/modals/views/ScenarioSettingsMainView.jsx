@@ -185,7 +185,7 @@ const ScenarioSettingsMainView = ({ onClose }) => {
                   <option value="async">受付（裏で処理）</option>
                 </select>
               </ScenarioFormRow>
-              <ScenarioFormRow label="SKU">
+              <ScenarioFormRow label="商品コード">
                 <InputCustom
                   style={{ width: '100%' }}
                   value={merchandiseId}

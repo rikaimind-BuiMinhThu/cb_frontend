@@ -111,7 +111,7 @@ function BotOrderDetail() {
                 <Descriptions.Item label="注文タイプ">{row.path_label || '—'}</Descriptions.Item>
                 <Descriptions.Item label="支払い">{row.payment_label || '—'}</Descriptions.Item>
                 <Descriptions.Item label="メール">{row.email || '—'}</Descriptions.Item>
-                <Descriptions.Item label="SKU">{row.sku || '—'}</Descriptions.Item>
+                <Descriptions.Item label="商品コード">{row.sku || '—'}</Descriptions.Item>
                 <Descriptions.Item label="商品URL">
                   <ExternalLink href={row.product_url} />
                 </Descriptions.Item>

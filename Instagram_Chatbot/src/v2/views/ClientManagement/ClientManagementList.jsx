@@ -83,7 +83,7 @@ function ClientManagementList({
   return (
     <AdminPage>
       <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 12 }}>
-        <span style={{ color: '#6b7280', fontSize: 13 }}>レキシカ 同時 Chromium 数（全体）</span>
+        <span style={{ color: '#6b7280', fontSize: 13 }}>レキシカ 同時ブラウザ数（全体）</span>
         <InputNumber
           min={1}
           max={20}
