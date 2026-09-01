@@ -237,33 +237,14 @@ ${scopePrefix}.theme-customize-preview__radio-img--selected {
   border-color: var(--c-radio-selected-border, transparent) !important;
 }
 
-${spBodySelector} .ss-message__content--user-radio_button:not(.ss-message__content--user-radio_button--radio_button_img) input[type="radio"]:not(.ss-radio-button-img-input--hidden),
+${spBodySelector} .ss-message__content--user-radio_button:not(.ss-message__content--user-radio_button--radio_button_img) input[type="radio"],
 ${scopePrefix}.theme-customize-preview__radio-default input[type="radio"] {
-  -webkit-appearance: none !important;
-  appearance: none !important;
-  width: 19px !important;
-  height: 19px !important;
-  min-width: 19px !important;
-  min-height: 19px !important;
-  margin: 0 !important;
-  flex-shrink: 0 !important;
-  box-sizing: border-box !important;
-  border-radius: 50% !important;
-  background-color: #fff !important;
-  background-image: none !important;
-  border: 2px solid var(--c-radio-input-unselected, #cccccc) !important;
-  box-shadow: none !important;
+  accent-color: var(--c-radio-input-selected, #327AED) !important;
 }
 
-${spBodySelector} .ss-message__content--user-radio_button:not(.ss-message__content--user-radio_button--radio_button_img) input[type="radio"]:not(.ss-radio-button-img-input--hidden):checked,
-${scopePrefix}.theme-customize-preview__radio-default input[type="radio"]:checked {
-  border-color: var(--c-radio-input-selected, #327AED) !important;
-  background-color: #fff !important;
-  background-image: radial-gradient(
-    circle,
-    var(--c-radio-input-selected, #327AED) 38%,
-    #fff 42%
-  ) !important;
+${spBodySelector} .ss-message__content--user-radio_button:not(.ss-message__content--user-radio_button--radio_button_img) input[type="radio"]:not(:checked),
+${scopePrefix}.theme-customize-preview__radio-default input[type="radio"]:not(:checked) {
+  accent-color: var(--c-radio-input-unselected, #ccc) !important;
 }
 
 ${scopePrefix}.ss-bot-submit-error-message,
