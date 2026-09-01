@@ -5,12 +5,12 @@ import Chatbot from 'views/InstagramBotElement/Chatbot';
 import ClientManagement from 'views/ClientManagement';
 import PlanManagement from 'views/PlanManagement';
 import Policy from 'views/InstagramBotElement/Policy';
-import Release from 'views/InstagramBotElement/Release';
+import ReleasePage from 'views/InstagramBotElement/Release/ReleasePage';
 import UserManagement from 'views/UserManagement';
 import Keyword from 'views/InstagramBotElement/Keyword';
 import DataAnalyst from 'views/InstagramBotElement/DataAnalyst';
 import ListUser from 'views/InstagramBotElement/ListUser';
-import AttractedCustomer from 'views/InstagramBotElement/AttractedCusomer';
+import AttractedCustomer from 'views/InstagramBotElement/AttractedCustomer';
 import CRM from 'views/InstagramBotElement/CRM';
 import Template from 'views/InstagramBotElement/Template';
 import BotManagement from 'views/BotElement/BotManagement';
@@ -109,7 +109,7 @@ var routes = [
     path: '/release',
     name: 'リリース',
     icon: 'nc-icon nc-air-baloon',
-    component: Release,
+    component: ReleasePage,
     layout: '/admin',
   },
   {
@@ -117,13 +117,6 @@ var routes = [
     name: 'ポリシー',
     // icon: "nc-icon nc-bell-55",
     component: HtmlScreen,
-    layout: '/admin',
-  },
-  {
-    path: '/data',
-    name: 'データ分析',
-    // icon: "nc-icon nc-bell-55",
-    component: DataAnalyst,
     layout: '/admin',
   },
   {

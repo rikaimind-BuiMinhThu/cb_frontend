@@ -100,7 +100,7 @@ function LoginFacebook({ checkLogin }) {
       appId: FACEBOOK_APP_ID,
       cookie: true,
       xfbml: true,
-      version: 'v14.0'
+      version: 'v25.0'
     });
 
     window.FB.getLoginStatus(function (response) {
