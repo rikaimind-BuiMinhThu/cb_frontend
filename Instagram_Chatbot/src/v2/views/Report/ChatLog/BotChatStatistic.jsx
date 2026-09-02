@@ -1,4 +1,4 @@
-import 'v2/assets/css/bot/bot-chat-log.css';
+import 'v2/views/Report/styles/bot-chat-log.css';
 import UserMessage from './UserMessage';
 import { Fragment, useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';

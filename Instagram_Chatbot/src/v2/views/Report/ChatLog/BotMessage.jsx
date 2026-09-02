@@ -6,7 +6,7 @@ import {
   BOT_MESSAGE_FILE_DOWNLOAD_NAME,
   BOT_MESSAGE_ICON_ALT,
 } from 'v2/views/Report/constants';
-import messageTypingGif from 'assets/img/icons8-dots-loading.gif';
+import messageTypingGif from 'v2/assets/img/icons8-dots-loading.gif';
 
 const BotMessage = ({ content, index, botInfor }) => {
   const handleDownloadFile = (file) => {

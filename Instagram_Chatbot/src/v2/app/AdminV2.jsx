@@ -1,8 +1,8 @@
 import React from 'react';
 import { Route, Switch } from 'react-router-dom';
-import V2PreviewFaq from 'v2/views/BotElement/BotSetting/PreviewFaq';
-import V2PreviewFukushashiki from 'v2/views/BotElement/BotSetting/PreviewFukushashiki';
-import ScenarioPreviewEditorPage from 'v2/views/BotElement/BotSetting/ScenarioSetting/preview/ScenarioPreviewEditorPage';
+import V2PreviewFaq from 'v2/views/Preview/PreviewFaq';
+import V2PreviewFukushashiki from 'v2/views/Preview/PreviewFukushashiki';
+import ScenarioPreviewEditorPage from 'v2/views/ScenarioSetting/preview/ScenarioPreviewEditorPage';
 import { getAppPath, getSignInPath } from 'v2/variables/constants';
 import V2Admin from './layouts/Admin';
 import V2Login from './Login.jsx';

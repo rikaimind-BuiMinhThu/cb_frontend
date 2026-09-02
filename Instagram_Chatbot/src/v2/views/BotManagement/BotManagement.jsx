@@ -13,7 +13,7 @@ import {
   AdminActionButton,
   useAdminHeaderActions,
 } from 'v2/components/AdminShell';
-import 'v2/assets/css/bot/bot-list.css';
+import 'v2/views/BotManagement/styles/bot-list.css';
 import {
   ADD_BOT_PATH,
   API_SUCCESS_CODE,

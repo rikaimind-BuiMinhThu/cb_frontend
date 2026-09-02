@@ -24,7 +24,7 @@ import {
   WP_IMAGE_FIELDS_HIDDEN,
   WP_IMAGE_FIELDS_VISIBLE,
 } from './withdrawalPreventionConstants';
-import 'v2/assets/css/bot/withdrawal-prevention.css';
+import 'v2/views/AdvanceSetting/styles/withdrawal-prevention.css';
 
 const patchWithdrawalPreview = (botId, data) => api.patch(
   `${WITHDRAWAL_PREVENTION_PATH_PREFIX}/${botId}`,

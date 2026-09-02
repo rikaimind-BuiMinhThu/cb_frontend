@@ -1,0 +1,812 @@
+/* eslint-disable default-case */
+import _ from 'lodash';
+import { 
+  stringNullOrEmpty, 
+  checkMessageCondition, 
+  processMessagesForErrorState, 
+  isTempDelay,
+  buildConditionParams,
+  isCreditCardPaymentMessage,
+  findItem,
+} from 'v2/views/Preview/PreviewComponent/Utils';
+import { processForBotMessage } from 'v2/views/Preview/PreviewComponent/BotMessageUtils';
+import { processForUserMessage } from 'v2/views/Preview/PreviewComponent/UserMessageUtils';
+import { processForCombineMessage } from 'v2/views/Preview/PreviewComponent/CombineMessageUtils';
+import { isBotMessage, isUserMessage, isCombineMessage, getNextUserMsg } from 'v2/views/Preview/PreviewComponent/Utils';
+import { mapAmazonPayDataToMessagesList } from 'v2/views/Preview/PreviewComponent/TorizenUtils';
+import { mapAmazonPayDataToMessagesListForBliss } from 'v2/views/Preview/PreviewComponent/BlissUtils';
+import { mapAmazonPayDataToMessagesListForRoseMay } from 'v2/views/Preview/PreviewComponent/RoseMayUtils';
+import { mapAmazonPayDataToMessagesListForPhystech } from 'v2/views/Preview/PreviewComponent/PhysTechUtils';
+import { mapAmazonPayDataToMessagesListForYuwaeru, isYuwaeruLP } from 'v2/views/Preview/PreviewComponent/YuwaeruUtils';
+import { mapAmazonPayDataBySelector } from 'v2/views/Preview/PreviewComponent/AmazonPayGenericUtils';
+import {
+  RENDER_CHATBOT_CONFIG,
+  GETTING_ERROR_NOTIFICATION,
+  PREVIEW_ACTIONS,
+  CART_SYSTEM,
+  CONVERSTION_RESPONSE_STATUS,
+  BOT_MESSAGE_TYPES,
+  RENDER_MODES,
+  MESSAGE_CONTENT_TYPES,
+} from 'v2/views/Preview/PreviewComponent/Constants.jsx';
+import { parseThemeSettings } from 'v2/views/DesignSetting/utils/designThemeUtils';
+import {
+  clampOpenAnimationDurationMs,
+  normalizeOpenAnimationStyle,
+  resolveMainColorContext,
+} from 'v2/views/DesignSetting/utils/designChatbotUtils';
+import { getDefaultValue } from 'v2/views/Preview/PreviewComponent/VariablesUtils';
+import { savedChatbotState } from 'v2/views/Preview/PreviewComponent/SessionStorageUtils';
+import { convertToFukushashikiObject } from './FukushashikiDataConverterUtils';
+import { fukushashikiToLP } from './LPUtils';
+import { applyLpFieldValue } from './LpFieldSyncUtils';
+
+const PreviewFukushashikiReducer = (state, action) => {
+  switch (action.type) {
+    case PREVIEW_ACTIONS.UPDATE_CREDIT_CARD_FORM: {
+      // For yuwaeru lp, when update payment method message, we need to check and update hidden for credit card payment message
+      if (action.payload.hidden === undefined || action.payload.hidden === null) return state;
+
+      const newMessagesList = _.cloneDeep(state.messagesList).map(message => {
+        if (isCreditCardPaymentMessage(message)) {
+          message.hidden = action.payload.hidden;
+          if (!action.payload.hidden) {
+            const data = {
+              scenario_id: state.scenarioId,
+              message: message,
+              user_id: state.uuid,
+              bot_type: "web"
+            };
+            const fukuData = convertToFukushashikiObject(data);
+            fukushashikiToLP(fukuData, state);
+          }
+        }
+        return message;
+      });
+      return {
+        ...state,
+        messagesList: newMessagesList,
+        renderMessagesList: newMessagesList.slice(0, state.currentMsgIndex + 1),
+      };
+    }
+      
+    case PREVIEW_ACTIONS.UPDATE_MULTI_STATE: {
+      if (action.payload.removeTempDelay && action.payload.renderMessagesList?.length) {
+        action.payload.renderMessagesList = action.payload.renderMessagesList?.filter(m => {
+          return !isTempDelay(m, RENDER_CHATBOT_CONFIG.TEMP_DELAY_PREFIX);
+        }) || [];
+      }
+      const { isEditorPreviewDraft, timer_config, ...editorPreviewPayload } = action.payload || {};
+      if (isEditorPreviewDraft) {
+        const nextState = {
+          ...state,
+          ...editorPreviewPayload,
+          hasEditorPreviewDraftApplied: true,
+        };
+        if (timer_config !== undefined) {
+          nextState.botInfor = { ...state.botInfor, timer_config };
+        }
+        return nextState;
+      }
+      return { ...state, ...(!!state.submitErrorMessage ? processMessagesForErrorState(action.payload): action.payload) };
+    }
+
+    case PREVIEW_ACTIONS.ADD_LP_OPTION_DATA:
+      return { ...state, lpOptionData: { ...state.lpOptionData, ...action.payload, isProcessing: false } };
+    case PREVIEW_ACTIONS.UPDATE_PREVIEW_ORDER_CONTENT:
+      return { ...state, previewOrderContent: action.payload, isProcessing: false };
+    case PREVIEW_ACTIONS.SET_PROCESSING: 
+      return { ...state, isProcessing: action.payload };
+    case PREVIEW_ACTIONS.SET_IS_NOT_AUTO_SCROLL:
+      return { ...state, isNotAutoScroll: action.payload };
+    case PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES:
+      if (action.payload.fromCallback) return state;
+
+      const renderBaseState = {
+        messagesList: _.cloneDeep(state.messagesList),
+        variables: _.cloneDeep(state.variables),
+      };
+      const updatedState = Array.from(
+        { length: action.payload.endIndex - action.payload.startIndex },
+        (_, offset) => action.payload.startIndex + offset,
+      ).reduce((acc, index) => {
+        if (!isBotMessage(acc.messagesList[index])) return acc;
+        return {
+          ...acc,
+          ...processForBotMessage(acc.messagesList, index, acc, false, false),
+        };
+      }, renderBaseState);
+
+      const currentMsg = updatedState.messagesList[action.payload.endIndex - 1];
+      const isNotAutoScroll = (() => {
+        if (currentMsg?.message_content?.[0]?.type === MESSAGE_CONTENT_TYPES.IMAGE) {
+          return currentMsg?.message_content?.[0]?.image?.is_not_auto_scroll || false;
+        }
+        const botStatementType = currentMsg?.message_content?.[0]?.type;
+        if (botStatementType && currentMsg?.message_content?.[0]?.[botStatementType]?.scroll_auto === true) {
+          return true;
+        }
+        return state.isNotAutoScroll || false;
+      })();
+
+      return {
+        ...state,
+        ...updatedState,
+        renderMessagesList: updatedState.messagesList.slice(action.payload.startIndex, action.payload.endIndex),
+        currentMsgIndex: action.payload.endIndex - 1,
+        isNotAutoScroll: isNotAutoScroll,
+      };
+    case PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE: {
+      if (action.payload === GETTING_ERROR_NOTIFICATION) {
+        return {
+          ...state,
+          submitErrorMessage: action.payload,
+          isProcessing: false,
+        };
+      }
+
+      if (stringNullOrEmpty(action.payload)) {
+        const conditionParams = buildConditionParams(state);
+        const messagesList = _.cloneDeep(state.messagesList).map((message) => {
+          if ((message.hidden || message.hidden === undefined) && message.not_display_when_have_error) {
+            message.hidden = !checkMessageCondition(message, conditionParams);
+          }
+          return message;
+        });
+
+        const nextStopMsgIndex = (() => {
+          const current = state.nextStopMsgIndex;
+          if (!current || (current < messagesList.length && current > 0 && messagesList[current - 1].hidden) || (current <= state.currentMsgIndex)) {
+            return messagesList.findIndex(getNextUserMsg((_, index) => index > state.currentMsgIndex)) + 1;
+          }
+          return current;
+        })();
+
+        return {
+          ...state,
+          messagesList: messagesList,
+          renderMessagesList: messagesList.slice(0, state.currentMsgIndex + 1),
+          submitErrorMessage: action.payload,
+          isProcessing: false,
+          nextStopMsgIndex: nextStopMsgIndex,
+        };
+      }
+
+      const messagesList = _.cloneDeep(state.messagesList).map((message) => {
+        if (!message.hidden) {
+          message.hidden = message.not_display_when_have_error;
+        }
+        return message;
+      });
+
+      const renderMessagesList = messagesList.slice(0, state.currentMsgIndex + 1);
+      return { ...state,
+        messagesList: messagesList,
+        renderMessagesList: renderMessagesList,
+        submitErrorMessage: action.payload,
+        isProcessing: false,
+      };
+    }
+
+    case PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG: {
+      const messagesList = (action.payload.displayMsg || []).length > 0
+        ? _.cloneDeep(state.messagesList).map((message) => {
+          if (action.payload.displayMsg.includes(message.name?.trim())) {
+            message.hidden = false;
+          }
+          return message;
+        })
+        : _.cloneDeep(state.messagesList);
+      const renderMessagesList = messagesList.slice(0, state.currentMsgIndex + 1)
+      return { ...state,
+        messagesList: messagesList,
+        renderMessagesList: renderMessagesList,
+        submitErrorMessage: action.payload.error,
+        isProcessing: false,
+      };
+    }
+    case PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON:
+      // TODO: Update state after click Next in here
+      // In here, default is validation ok
+      const { clickedMsgIndex, isLoggedIn } = action.payload;
+      const isUpdateClicked = clickedMsgIndex < state.renderMessagesList.length - 1;
+      const clickAcc = {
+        state: {
+          errors: {},
+          messagesList: _.cloneDeep(state.messagesList),
+          variables: _.cloneDeep(state.variables),
+          nextStopMsgIndex: state.nextStopMsgIndex,
+          currentMsgIndex: state.currentMsgIndex,
+        },
+      };
+
+      if (state.conversionStatus === CONVERSTION_RESPONSE_STATUS.FINISH && isUpdateClicked) {
+        clickAcc.state.conversionStatus = undefined;
+        clickAcc.state.isProcessing = false;
+      }
+      
+      if (isLoggedIn) {
+        clickAcc.state.messagesList = clickAcc.state.messagesList.map(x => ({...x, hidden: x.not_display_when_logged_in}));
+      }
+
+      const isClickedLastMessage = state.messagesList.length - 1 === clickedMsgIndex;
+
+      if (isClickedLastMessage) {
+        clickAcc.state.conversionStatus = CONVERSTION_RESPONSE_STATUS.FINISH;
+        clickAcc.state.isProcessing = true;
+      } else {
+        clickAcc.state = processFukushashikiMessagesAfterClickNext(
+          clickAcc.state,
+          buildConditionParams(state),
+          clickedMsgIndex,
+        );
+      }
+
+      const newState = clickAcc.state;
+
+      // Calculate next stop message index
+      const nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex)) + 1;
+
+      newState.renderMode = (isUpdateClicked && state.isUsedPastMessageLoaded) ? RENDER_MODES.LAST : RENDER_MODES.NEXT;
+      if (newState.renderMode === RENDER_MODES.LAST) {
+        // LAST mode: render all messages up to the next user message
+        if (!isUpdateClicked) {
+          newState.nextStopMsgIndex = nextStopMsgIndex;
+          if (newState.nextStopMsgIndex <= 0) {
+            // If click to last message -> render message from 1 to last message
+            // currentMsgIndex is not changed
+            newState.nextStopMsgIndex = newState.messagesList.length;
+          } else {
+            newState.currentMsgIndex = newState.nextStopMsgIndex - 1;
+          }
+        }
+      } else {
+        // NEXT mode: render messages one by one
+        newState.currentMsgIndex = clickedMsgIndex; 
+        newState.nextStopMsgIndex = nextStopMsgIndex;
+      }
+      
+      // Ensure nextStopMsgIndex is not less than currentMsgIndex (common validation)
+      if (newState.nextStopMsgIndex < newState.currentMsgIndex) {
+        newState.nextStopMsgIndex = newState.currentMsgIndex;
+      }
+
+      newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+      newState.isUpdateClicked = isUpdateClicked;
+      if (isUpdateClicked) {
+        if (newState.renderMode === RENDER_MODES.NEXT) {
+          newState.passedUserMsgCount = newState.renderMessagesList.filter(m => isUserMessage(m)).length - 1;
+        }
+      } else {
+          newState.passedUserMsgCount = state.passedUserMsgCount + 1;
+      }
+      return { ...state, ...newState };
+    case PREVIEW_ACTIONS.UPDATE_PREFECTURES_LIST:
+      return { ...state, prefecturesList: action.payload.prefecturesList };
+    case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA:
+      // Support only for amazon pay and subscstore cart system
+      const newMessagesList = mapAmazonPayDataToMessagesList(action.payload, state.messagesList, state.prefecturesList);
+      const renderMessagesList = newMessagesList.slice(0, state.currentMsgIndex + 1);
+      return { ...state, messagesList: newMessagesList, renderMessagesList: renderMessagesList };
+    case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_BLISS:
+      const newMessagesListForBliss = mapAmazonPayDataToMessagesListForBliss(action.payload, state.messagesList, state.prefecturesList);
+      const renderMessagesListForBliss = newMessagesListForBliss.slice(0, state.currentMsgIndex + 1);
+      return { ...state, messagesList: newMessagesListForBliss, renderMessagesList: renderMessagesListForBliss};
+    case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_ROSEMAY:
+      const newMessagesListForRoseMay = mapAmazonPayDataToMessagesListForRoseMay(action.payload, state.messagesList, state.prefecturesList);
+      const renderMessagesListForRoseMay = newMessagesListForRoseMay.slice(0, state.currentMsgIndex + 1);
+      return { ...state, messagesList: newMessagesListForRoseMay, renderMessagesList: renderMessagesListForRoseMay};
+    case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_PHYSTECH:
+      const newMessagesListForPhystech = mapAmazonPayDataToMessagesListForPhystech(action.payload, state.messagesList, state.prefecturesList);
+      const renderMessagesListForPhystech = newMessagesListForPhystech.slice(0, state.currentMsgIndex + 1);
+      return { ...state, messagesList: newMessagesListForPhystech, renderMessagesList: renderMessagesListForPhystech};
+case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
+      const newMessagesListForYuwaeru = mapAmazonPayDataToMessagesListForYuwaeru(action.payload, state.messagesList, state.prefecturesList);
+      const renderMessagesListForYuwaeru = newMessagesListForYuwaeru.slice(0, state.currentMsgIndex + 1);
+      return { ...state, messagesList: newMessagesListForYuwaeru, renderMessagesList: renderMessagesListForYuwaeru};
+    case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_BY_SELECTOR: {
+      const { messagesList, changed } = mapAmazonPayDataBySelector(action.payload, state.messagesList);
+      if (!changed) return state;
+
+      const updatedRenderMessagesList = messagesList.slice(0, state.currentMsgIndex + 1);
+      return { ...state, messagesList, renderMessagesList: updatedRenderMessagesList };
+    }
+    case PREVIEW_ACTIONS.UPDATE_LP_FIELD_VALUE: {
+      const { messagesList, changed } = applyLpFieldValue(state.messagesList, action.payload);
+      if (!changed) return state;
+
+      const newState = {
+        ...state,
+        messagesList,
+        renderMessagesList: messagesList.slice(0, state.currentMsgIndex + 1),
+      };
+      savedChatbotState(newState);
+      return newState;
+    }
+    case PREVIEW_ACTIONS.UPDATE_AFTER_CHANGE_VALUE: {
+      const { contentIndex, contentType, value, field, subField1, subField2, message } = action.payload;
+      const newState = {
+        messagesList: _.cloneDeep(state.messagesList),
+        variables: _.cloneDeep(state.variables),
+        objParam: _.cloneDeep(state.objParam),
+        prefecturesList: _.cloneDeep(state.prefecturesList),
+      };
+
+      const subContent = message.message_content[contentIndex][contentType];
+
+      switch (contentType) {
+        case 'zip_code_address':
+          changeZipCodeAddress(subContent, value, field, state.prefecturesList);
+          break;
+        case 'product_purchase':
+          changeProductPurchase(newState, subContent, value, field);
+          break;
+        case 'product_purchase_radio_button':
+          changeProductPurchaseRadioButton(newState, subContent, field, value);
+          break;
+        default:
+          changeContentValue(subContent, value, field, subField1, subField2);
+          break;
+      }
+
+      // Update value of message
+      const messageIndex = newState.messagesList.findIndex(x => x.id === message.id);
+      if (messageIndex === -1) {
+        throw new Error(`${PREVIEW_ACTIONS.UPDATE_AFTER_CHANGE_VALUE}: Message with id ${message.id} not found`);
+      }
+      newState.messagesList[messageIndex].message_content[contentIndex][contentType] = _.cloneDeep(subContent);
+
+      handleSaveInputContent(newState, subContent, contentType, field, value);
+
+      return { ...state, ...newState };
+    }
+    case PREVIEW_ACTIONS.SET_CHECKOUT_URL:
+      return { ...state, checkoutUrl: action.payload };
+    case PREVIEW_ACTIONS.SET_OBJ_PARAM:
+      return { ...state, objParam: action.payload };
+    case PREVIEW_ACTIONS.SET_SHOW_POPUP_CLOSE_BOT:
+      return { ...state, showPopupCloseBot: action.payload };
+    case PREVIEW_ACTIONS.SET_SCENARIO_USER_RESPONSES:
+      return { ...state, scenarioUserResponses: action.payload };
+    case PREVIEW_ACTIONS.SET_BOT_ID:
+      return { ...state, botId: action.payload };
+    case PREVIEW_ACTIONS.SET_UPSELL_BOT_ID:
+      return {...state, botId: action.payload, isUpsell: true};
+    case PREVIEW_ACTIONS.SET_CAPTCHA:
+      return { ...state, captcha: action.payload };
+    case PREVIEW_ACTIONS.SET_URL_SEND:
+      return { ...state, urlSend: action.payload };
+    case PREVIEW_ACTIONS.SET_URL_RECEIVE:
+      return { ...state, urlReceive: action.payload };
+    case PREVIEW_ACTIONS.SET_DEVICE_RECEIVE:
+      return { ...state, deviceReceive: action.payload };
+    case PREVIEW_ACTIONS.SET_SCENARIO_ID:
+      return { ...state, scenarioId: action.payload };
+    case PREVIEW_ACTIONS.SET_CONVERSION_STATUS:
+      return { ...state, conversionStatus: action.payload };
+    case PREVIEW_ACTIONS.SET_STOP_RENDER:
+      return { ...state, stopRender: action.payload };
+    case PREVIEW_ACTIONS.SET_ERRORS:
+      return { ...state, errors: action.payload };
+    case PREVIEW_ACTIONS.SET_DELAYING:
+      return { ...state, isDelaying: action.payload };
+    case PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SERVER: {
+      // This action is used to set the state after retrieve scenario
+      const designSetting = action.payload.responseData.design_settings;
+      const chatbot = action.payload.responseData.chatbot;
+      const botInfor = action.payload.botInfor;
+      const { conversation } = action.payload.responseData?.data;
+      const { variables, all_variables } = action.payload.responseData;
+
+      const isEditorPreview = Boolean(action.payload.isEditorPreview);
+      const { apiColorKey, mainColorHex } = resolveMainColorContext(chatbot);
+
+      const newState = {
+        ...state,
+        botInfor: botInfor,
+        objParam: isEditorPreview ? state.objParam : {},
+        loadedStateFromSession: true,
+        messagesList: conversation?.messages || [],
+        isOpen: isEditorPreview ? true : (state.isOpen || action.payload.isUsingAmazonPay),
+        activePopupCloseBot: Boolean(designSetting?.popup_close_bot),
+        titleBubble: designSetting?.title_bubble || "簡単90秒で注文完了",
+        displayType: designSetting?.display_type ?? (isEditorPreview ? (state.displayType ?? 1) : designSetting?.display_type),
+        widthPc: designSetting?.width_pc || 450,
+        heightPc: designSetting?.height_pc || 700,
+        widthSp: designSetting?.width_sp || 100,
+        heightSp: designSetting?.height_sp || 100,
+        positionPc: designSetting?.position_pc || "1",
+        rightPcTitle: designSetting?.right_position_pc_title,
+        buttonTypePc: designSetting?.button_type_pc || "1",
+        rightMarginPc: designSetting?.right_margin_pc || 10,
+        bottomMarginPc: designSetting?.bottom_margin_pc || 0,
+        positionSp: designSetting?.position_sp || "1",
+        buttonTypeSp: designSetting?.button_type_sp || "1",
+        rightSpTitle: designSetting?.right_position_sp_title,
+        rightMarginSp: designSetting?.right_margin_sp,
+        bottomMarginSp: designSetting?.bottom_margin_sp,
+        openAnimationDurationMs: clampOpenAnimationDurationMs(
+          designSetting?.open_animation_duration_ms,
+        ),
+        openAnimationStyle: normalizeOpenAnimationStyle(
+          designSetting?.open_animation_style,
+        ),
+        isUsedErrMsgByJs: chatbot?.is_used_err_msg_by_js,
+        errMsgJsCode: chatbot?.err_msg_js_code,
+        errMsgSettingMode: chatbot?.err_msg_setting_mode || 'js',
+        errMsgFieldSelectors: chatbot?.err_msg_field_selectors || '',
+        errMsgFormSelectors: chatbot?.err_msg_form_selectors || '',
+        launchButtonSelectors: chatbot?.launch_button_selectors || '',
+        useNewProcess: chatbot?.client_cart_system === CART_SYSTEM.EC_FORCE,
+        isUsedPastMessageLoaded: !!chatbot?.is_used_message_loaded_past,
+        isProcessing: false,
+        useFullWidthChatbotMobile: !!chatbot?.use_fullwidth_chatbot_mobile,
+        cartSystem: state.cartSystem || chatbot?.client_cart_system || "",
+        merchandiseId: action.payload.responseData?.data?.merchandise_id || "",
+        isUsedCrosssell: !!action.payload.responseData?.data?.is_used_crosssell,
+        productIdCrossSell:
+          String(action.payload.responseData?.data?.product_id_cross_sell || "").trim(),
+        isUsedCustomJsCode: !!chatbot?.is_used_custom_js_code,
+        headCustomJsCode: chatbot?.head_custom_js_code,
+        topBodyCustomJsCode: chatbot?.top_body_custom_js_code,
+        bottomBodyCustomJsCode: chatbot?.bottom_body_custom_js_code,
+        isUsedCustomCss: !!chatbot?.is_used_custom_css,
+        customCssContent: chatbot?.custom_css_content,
+        isUsedHtmlUgc: !!chatbot?.is_used_html_ugc,
+        htmlUgcConfigContent: chatbot?.html_ugc_config_content,
+        isUseBtnUpdateTracking: !!conversation?.isUseBtnUpdateTracking,
+        isUseGlobalDelay: conversation?.isUseGlobalDelay || false,
+        globalDelayTime: conversation?.globalDelayTime ?? 1.0,
+        themeSettings: action.payload.themeSettings
+          ?? parseThemeSettings(designSetting?.theme, mainColorHex, apiColorKey),
+        manuallyClosed: false,
+        autoOpenAttempted: false,
+      };
+
+      if (isEditorPreview) {
+        newState.messagesList = state.messagesList;
+        newState.renderMessagesList = state.renderMessagesList;
+        newState.currentMsgIndex = state.currentMsgIndex;
+        newState.nextStopMsgIndex = state.nextStopMsgIndex;
+        newState.renderMode = state.renderMode;
+        newState.progressBarMaxIndex = state.progressBarMaxIndex;
+      } else {
+        newState.messagesList = conversation?.messages || [];
+        newState.currentMsgIndex = 0;
+        newState.renderMode = RENDER_MODES.NEXT;
+      }
+
+      if (!(isEditorPreview && state.hasEditorPreviewDraftApplied)) {
+        newState.messagesList.filter(isBotMessage).forEach((message) => {
+          message.message_content?.forEach((content) => {
+            if (content.type === BOT_MESSAGE_TYPES.TEXT_INPUT) {
+              content[content.type].originalContent = content[content.type].content;
+            }
+          });
+        });
+      }
+
+      if (variables) {
+        newState.variables = [...variables, ...all_variables];
+        newState.variables.forEach((item) => {
+          newState.objParam[item.variable_name] = item.default_value;
+        });
+      }
+
+      if (action.payload.isLoggedIn) {
+        newState.messagesList.forEach((x) => x.hidden = x.not_display_when_logged_in);
+      }
+
+      if (isEditorPreview && state.hasEditorPreviewDraftApplied) {
+        newState.messagesList = state.messagesList;
+        newState.renderMessagesList = state.renderMessagesList;
+        newState.currentMsgIndex = state.currentMsgIndex;
+        newState.nextStopMsgIndex = state.nextStopMsgIndex;
+        newState.renderMode = state.renderMode;
+        newState.progressBarMaxIndex = state.progressBarMaxIndex;
+      } else if (isEditorPreview && state.renderMessagesList?.length > 0) {
+        newState.messagesList = state.messagesList;
+        newState.renderMessagesList = state.renderMessagesList;
+        newState.currentMsgIndex = state.currentMsgIndex;
+        newState.nextStopMsgIndex = state.nextStopMsgIndex;
+        newState.renderMode = state.renderMode;
+        newState.progressBarMaxIndex = state.progressBarMaxIndex;
+      } else if (
+        isEditorPreview
+        && !state.hasEditorPreviewDraftApplied
+        && !(state.renderMessagesList?.length > 0)
+        && (conversation?.messages?.length > 0)
+      ) {
+        const apiMessages = _.cloneDeep(conversation.messages);
+        newState.messagesList = apiMessages;
+        newState.renderMessagesList = apiMessages;
+        newState.currentMsgIndex = apiMessages.length > 0 ? apiMessages.length - 1 : 0;
+        newState.nextStopMsgIndex = apiMessages.length;
+        newState.renderMode = RENDER_MODES.LAST;
+      } else if (!isEditorPreview && (newState.isOpen || action.payload.isUsingAmazonPay)) {
+        newState.nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg()) + 1;
+        if (newState.nextStopMsgIndex < newState.currentMsgIndex) {
+          newState.nextStopMsgIndex = newState.currentMsgIndex + 1;
+        }
+        newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+      } else if (!isEditorPreview) {
+        newState.currentMsgIndex = -1;
+        newState.nextStopMsgIndex = -1;
+        newState.renderMessagesList = [];
+      }
+
+      const conditionParams = buildConditionParams(newState);
+      if (!isEditorPreview) {
+        newState.messagesList.forEach((message, index) => {
+          const result = checkMessageCondition(message, conditionParams);
+          newState.messagesList[index].hidden = !result;
+        });
+      }
+
+      const progressBarTargetCountMessagesList = newState.messagesList.filter(msg => {
+        if (!isUserMessage(msg)) return false;
+
+        const contentCount = msg?.message_content?.length;
+        const firstMsgContent = msg?.message_content?.[0];
+        const isDisplayBtnNext = firstMsgContent?.type !== MESSAGE_CONTENT_TYPES.IMAGE || firstMsgContent?.image?.displayButtonNext !== false;
+        if (!isDisplayBtnNext) return false;
+        if (firstMsgContent?.type === MESSAGE_CONTENT_TYPES.SUBMIT_BUTTON && contentCount === 1) return false;
+
+        return true;
+      });
+
+      newState.progressBarMaxIndex = progressBarTargetCountMessagesList.length;
+
+      return { ...state, ...newState };
+    }
+    case PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SESSION_STORAGE: {
+      const newState = {...action.payload.savedState};
+
+      if (action.payload.isUsingAmazonPay || isYuwaeruLP(newState.urlReceive)) {
+        // Support only for amazon pay and subscstore cart system (torizen san)
+        const conditionParams = buildConditionParams(newState);
+        newState.messagesList.forEach((message, index) => {
+          const result = checkMessageCondition(message, conditionParams);
+          newState.messagesList[index].hidden = !result;
+        });
+      }
+
+      if (action.payload.isLoggedIn) {
+        newState.messagesList.forEach((x) => x.hidden = x.not_display_when_logged_in);
+      }
+
+      newState.renderMessagesList = newState.messagesList.slice(0, newState.nextStopMsgIndex);
+      newState.currentMsgIndex = newState.nextStopMsgIndex - 1;
+      newState.loadedStateFromSession = true;
+      newState.isExtractFromSession = false;
+      newState.manuallyClosed = false;
+      newState.autoOpenAttempted = false;
+      newState.renderMode = RENDER_MODES.LAST;
+
+      const { apiColorKey, mainColorHex } = resolveMainColorContext(newState.botInfor);
+      newState.themeSettings = parseThemeSettings(
+        newState.themeSettings,
+        mainColorHex,
+        apiColorKey,
+      );
+
+      return { ...state, ...newState };
+    }
+    case PREVIEW_ACTIONS.OPEN_CHATBOT: {
+      if (state.currentMsgIndex === -1) {
+        const openedState = {
+          messagesList: _.cloneDeep(state.messagesList),
+          currentMsgIndex: 0,
+        };
+        openedState.nextStopMsgIndex = openedState.messagesList.findIndex(getNextUserMsg()) + 1;
+        openedState.renderMessagesList = openedState.messagesList.slice(0, openedState.currentMsgIndex + 1);
+        return { ...state, isOpen: true, showPopupCloseBot: false, isAlreadyOpenFirstTime: true, manuallyClosed: false, autoOpenAttempted: true, ...openedState };
+      }
+
+      return { ...state, isOpen: true, showPopupCloseBot: false, isAlreadyOpenFirstTime: true, manuallyClosed: false, autoOpenAttempted: true };
+    }
+    case PREVIEW_ACTIONS.CLOSE_CHATBOT:
+      return { ...state, isOpen: false, showPopupCloseBot: true, autoOpenAttempted: false, manuallyClosed: true };
+    case PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL:
+      return { ...state, showPopupCloseBot: true };
+    case PREVIEW_ACTIONS.SET_CHATBOT_SETTINGS:
+      return { ...state, ...action.payload };
+    case PREVIEW_ACTIONS.SET_MANUALLY_CLOSED:
+      return { ...state, manuallyClosed: action.payload };
+    case PREVIEW_ACTIONS.UPDATE_NUMBER_ORDER_TO_UPSELL:
+      const {variables, objParam} = action.payload;
+      const newVariables = [...state.variables];
+      
+      if (variables) {
+        const entries = Array.isArray(variables) 
+          ? variables.filter(v => v?.variable_name).map(v => [v.variable_name, v])
+          : Object.entries(variables).map(([k, v]) => [k, {variable_name: k, default_value: String(v)}])
+
+        entries.forEach(([name, data]) => {
+          const idx = newVariables.findIndex(v => v.variable_name === name);
+          if (idx >= 0) {
+            newVariables[idx] = { ...newVariables[idx], ...data };
+          } else {
+            newVariables.push(data);
+          }
+        })
+      }
+      return {
+        ...state,
+        variables: newVariables,
+        objParam: objParam ? {...state.objParam, ...objParam} : state.objParam
+      };
+
+  }
+
+  return state;
+};
+
+const processFukushashikiMessagesAfterClickNext = (initialState, conditionParams, clickedMsgIndex) => {
+  const acc = { state: initialState };
+  initialState.messagesList.forEach((message, index) => {
+    if (message.conditions && message.conditions.length !== 0) {
+      const result = checkMessageCondition(message, conditionParams);
+      acc.state.messagesList[index].hidden = !result;
+    }
+
+    if (index <= clickedMsgIndex) return;
+    if (acc.state.messagesList[index].hidden && !stringNullOrEmpty(acc.state.messagesList[index].hidden)) return;
+
+    if (isBotMessage(acc.state.messagesList[index])) {
+      acc.state = {
+        ...acc.state,
+        ...processForBotMessage(acc.state.messagesList, index, acc.state, false, false),
+      };
+    } else if (isUserMessage(acc.state.messagesList[index])) {
+      acc.state = {
+        ...acc.state,
+        ...processForUserMessage(acc.state.messagesList, index, acc.state, false),
+      };
+    } else if (isCombineMessage(acc.state.messagesList[index])) {
+      acc.state = {
+        ...acc.state,
+        ...processForCombineMessage(acc.state.messagesList, index, acc.state, false),
+      };
+    }
+  });
+  return acc.state;
+};
+
+const changeContentValue = (subContent, value, field, subField1 = null, subField2 = null) => {
+  if (!field) return;
+
+  if (subField2) {
+    subContent[field] = subContent[field] || {};
+    subContent[field][subField1] = subContent[field][subField1] || {};
+    subContent[field][subField1][subField2] = value;
+  } else if (subField1) {
+    subContent[field] = subContent[field] || {};
+    subContent[field][subField1] = value;
+  } else {
+    subContent[field] = value;
+  }
+};
+
+const changeZipCodeAddress = (subContent, value, field, prefecturesList) => {
+  subContent.value_prefecture_type = subContent.is_use_dropdown ? "id" : "name";
+
+  if (typeof value === "object") {
+    const transformField = {
+      value_prefecture: (value) => {
+        if (subContent.value_prefecture_type === "id") {
+          return value;
+        }
+        return findItem(prefecturesList, { 
+          keys: 'id', 
+          value: value, 
+          callbackValue: value,
+          onSuccess: (item) => item.name,
+        });
+      }
+    };
+    
+    Object.keys(value).forEach((key) => {
+      subContent[key] = transformField[key] ? transformField[key](value[key]) : value[key];
+    });
+  } else {
+    subContent[field] = value;
+  }
+}
+
+const changeProductPurchase = (newState, subContent, value, field) => {
+  if (field !== "initial_selection" || !value.length) return;
+
+  const { codesArray, namesArray, pricesArray, orderQuantitiesArray } = getProductDetailsForProductPurchase(subContent, value);
+
+  const productVariables = [
+    { variable_name: "product_code", default_value: codesArray.join(",") },
+    { variable_name: "product_name", default_value: namesArray.join(",") },
+    { variable_name: "product_unit_price", default_value: pricesArray.join(",") },
+    { variable_name: "order_quantity", default_value: orderQuantitiesArray.join(",") }
+  ];
+
+  newState.variables.push(...productVariables);
+  newState.objParam = {
+    ...newState.objParam,
+    product_code: codesArray.join(","),
+    product_name: namesArray.join(","),
+    product_unit_price: pricesArray.join(","),
+    order_quantity: orderQuantitiesArray.join(","),
+  };
+}
+
+const changeProductPurchaseRadioButton = (newState, subContent, field, value) => {
+  if (field !== "initial_selection") return;
+
+  const { valueCode, valueName, valuePrice } = getProductDetailsForProductPurchaseRadioButton(subContent, value);
+
+  const productVariables = [
+    { variable_name: "product_code", default_value: valueCode },
+    { variable_name: "product_name", default_value: valueName },
+    { variable_name: "product_unit_price", default_value: valuePrice }
+  ];
+
+  newState.variables.push(...productVariables);
+  newState.objParam = {
+    ...newState.objParam,
+    product_code: valueCode,
+    product_name: valueName,
+    product_unit_price: valuePrice,
+  };
+};
+
+const getProductDetailsForProductPurchaseRadioButton = (subContent, value) => {
+  const product = subContent.products?.find((item) => item.id === value);
+  return {
+    valueCode: product?.item_number,
+    valueName: product?.title,
+    valuePrice: product?.item_price,
+  };
+};
+
+const getProductDetailsForProductPurchase = (subContent, value) => (
+  (subContent.products || []).reduce((acc, product) => {
+    value.forEach((val) => {
+      if (!product.id !== val) return;
+
+      acc.codesArray.push(product?.item_number);
+      acc.namesArray.push(product?.title);
+      acc.pricesArray.push(product?.item_price);
+      acc.orderQuantitiesArray.push(product?.quantity_select);
+    });
+    return acc;
+  }, {
+    codesArray: [],
+    namesArray: [],
+    pricesArray: [],
+    orderQuantitiesArray: [],
+  })
+);
+
+const handleSaveInputContent = (newState, subContent, contentType, field, value) => {
+  if (contentType === 'zip_code_address' && subContent) {
+    const serialized =
+      typeof subContent === 'string' ? subContent : JSON.stringify(subContent);
+    newState.objParam = { ...newState.objParam, zip_code_address: serialized };
+  }
+
+  if (!subContent.is_save_input_content) return;
+  if (contentType === 'card_payment_radio_button' && !['initial_selection', 'initial_selection_picture'].includes(field)) {
+    return;
+  }
+
+  const variableName = subContent.save_input_content;
+
+  newState.variables.forEach((item) => {
+    if (item.variable_name !== variableName) {
+      return item;
+    }
+
+    item.default_value = getDefaultValue(subContent, contentType, field, value, newState.prefecturesList, newState.variables, variableName);
+
+    newState.objParam[variableName] = value;
+  });
+};
+
+export default PreviewFukushashikiReducer;

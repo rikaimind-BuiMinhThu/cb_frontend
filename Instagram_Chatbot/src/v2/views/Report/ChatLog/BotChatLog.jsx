@@ -3,9 +3,9 @@ import { DatePicker, Empty, Select, Space, Tabs, Typography, message } from 'ant
 import api from 'v2/api/api-management';
 import Cookies from 'js-cookie';
 import { format } from 'date-fns';
-import 'v2/assets/css/bot/bot-chat-log.css';
+import 'v2/views/Report/styles/bot-chat-log.css';
 import 'v2/assets/css/bot/report.css';
-import 'v2/assets/css/bot/chat-log.css';
+import 'v2/views/Report/styles/chat-log.css';
 import $ from 'jquery';
 import BotMessage from './BotMessage';
 import UserMessage from './UserMessage';

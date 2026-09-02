@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import InputCustom from 'v2/components/BotMessages/InputCustom';
 import SelectCustom from 'v2/components/BotMessages/SelectCustom';
 import InputNum from 'v2/components/BotMessages/InputNum';
-import cvcIcon from 'assets/img/cvc-icon.png';
+import cvcIcon from 'v2/assets/img/cvc-icon.png';
 import {
   REQUIRED_LABEL,
   LABEL_CARD_NUMBER,

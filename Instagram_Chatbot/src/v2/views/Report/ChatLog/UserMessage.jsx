@@ -1,7 +1,7 @@
 /* cSpell: disable */
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import 'v2/assets/css/bot/chat-log.css';
+import 'v2/views/Report/styles/chat-log.css';
 import {
   CALENDAR_TYPE,
   CHECKBOX_TYPE,

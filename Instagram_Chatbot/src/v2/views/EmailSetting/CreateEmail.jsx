@@ -35,7 +35,7 @@ import {
   VARIABLE_REQUIRED,
   requiredMessage,
 } from './constants';
-import 'v2/assets/css/bot/email/create-email.css';
+import 'v2/views/EmailSetting/styles/create-email.css';
 
 const CHIP_REMOVE_LABEL = 'X';
 const ENTER_KEY = 'Enter';

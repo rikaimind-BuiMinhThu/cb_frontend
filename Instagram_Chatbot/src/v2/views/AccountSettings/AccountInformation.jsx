@@ -35,7 +35,7 @@ import {
   SETTING_COMPLETE_LABEL,
   START_PLAN_BUTTON_LABEL,
 } from './constants';
-import 'v2/assets/css/account-info.css';
+import 'v2/views/AccountSettings/styles/account-info.css';
 
 const AccountInformation = () => {
   const [userDetail, setUserDetail] = useState({});

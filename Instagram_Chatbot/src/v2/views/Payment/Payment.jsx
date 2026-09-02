@@ -22,7 +22,7 @@ import {
   YEAR_PLACEHOLDER,
   YEAR_RANGE_COUNT,
 } from './paymentConstants';
-import 'v2/assets/css/bot/payment-management.css';
+import 'v2/views/Payment/styles/payment-management.css';
 
 const MONTH_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 

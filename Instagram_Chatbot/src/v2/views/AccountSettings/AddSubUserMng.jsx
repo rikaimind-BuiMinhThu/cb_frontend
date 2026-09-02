@@ -29,7 +29,7 @@ import {
   USER_CHATBOTS_PATH,
   ROLE_BOT_ADMIN,
 } from './addSubUserConstants';
-import 'v2/assets/css/sub-user-mng.css';
+import 'v2/views/AccountSettings/styles/sub-user-mng.css';
 
 const AddSubUserMng = () => {
   const [botId] = useState(() => Cookies.get(BOT_ID_COOKIE_KEY));

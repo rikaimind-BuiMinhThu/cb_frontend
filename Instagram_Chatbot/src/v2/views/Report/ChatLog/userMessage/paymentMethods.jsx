@@ -1,10 +1,10 @@
 import React from 'react';
-import americanExpress from 'assets/img/payment-method/american_express.png';
-import dinerClub from 'assets/img/payment-method/diner_club.png';
-import discover from 'assets/img/payment-method/discover.png';
-import jcb from 'assets/img/payment-method/jcb.png';
-import masterCard from 'assets/img/payment-method/master_card.png';
-import visa from 'assets/img/payment-method/visa.png';
+import americanExpress from 'v2/assets/img/payment-method/american_express.png';
+import dinerClub from 'v2/assets/img/payment-method/diner_club.png';
+import discover from 'v2/assets/img/payment-method/discover.png';
+import jcb from 'v2/assets/img/payment-method/jcb.png';
+import masterCard from 'v2/assets/img/payment-method/master_card.png';
+import visa from 'v2/assets/img/payment-method/visa.png';
 import {
   ALT_EMPTY,
   PAYMENT_METHOD_AMERICAN_EXPRESS,

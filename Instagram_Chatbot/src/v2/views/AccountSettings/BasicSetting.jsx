@@ -68,7 +68,7 @@ import {
   URL_LABEL,
   USERS_PATH,
 } from './basicSettingConstants';
-import 'v2/assets/css/basic_setting.css';
+import 'v2/views/AccountSettings/styles/basic-setting.css';
 
 const isApiSuccess = (code) => code === API_SUCCESS_CODE || code === String(API_SUCCESS_CODE);
 

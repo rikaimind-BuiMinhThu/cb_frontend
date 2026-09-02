@@ -11,7 +11,7 @@ import {
   AdminActionButton,
   useAdminHeaderActions,
 } from 'v2/components/AdminShell';
-import 'v2/assets/css/file-mng.css';
+import 'v2/views/FileManagement/styles/file-mng.css';
 import {
   ALLOWED_FILE_TYPES,
   API_SUCCESS_CODE,

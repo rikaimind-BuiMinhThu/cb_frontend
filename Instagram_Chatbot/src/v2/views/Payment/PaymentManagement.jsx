@@ -21,7 +21,7 @@ import {
   TAB_SETTINGS,
   TAB_SETTINGS_LABEL,
 } from './paymentConstants';
-import 'v2/assets/css/bot/payment-management.css';
+import 'v2/views/Payment/styles/payment-management.css';
 import 'v2/assets/css/bot/report.css';
 
 const PaymentManagement = () => {

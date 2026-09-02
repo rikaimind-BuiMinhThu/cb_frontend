@@ -49,7 +49,7 @@ import {
   TITLE_ADD,
   TITLE_EDIT,
 } from './gatewayFormConstants';
-import 'v2/assets/css/bot/payment-gateway-form.css';
+import 'v2/views/Payment/styles/payment-gateway-form.css';
 
 const buildPayload = (values) => {
   const base = {

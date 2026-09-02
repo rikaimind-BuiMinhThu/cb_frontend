@@ -31,7 +31,7 @@ import {
   LABEL_ACTION,
   EXPAND_CONTENT_HEADER,
 } from './constants';
-import 'v2/assets/css/bot/email/list-email.css';
+import 'v2/views/EmailSetting/styles/list-email.css';
 
 const ListEmail = () => {
   const [emailList, setEmailList] = useState([]);

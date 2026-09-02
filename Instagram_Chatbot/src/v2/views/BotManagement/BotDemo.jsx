@@ -4,7 +4,7 @@ import Cookies from 'js-cookie';
 import api from 'v2/api/api-management';
 import { BOT_ID_COOKIE_KEY, SCENARIO_ID_COOKIE_KEY } from 'v2/api/constants';
 import { AdminPage } from 'v2/components/AdminShell';
-import PreviewFukushashiki from 'v2/views/BotElement/BotSetting/PreviewFukushashiki';
+import PreviewFukushashiki from 'v2/views/Preview/PreviewFukushashiki';
 import {
   ACTION_CLICK_TITLE,
   BOT_DEMO_PREVIEW_CLOSED_CLASS,

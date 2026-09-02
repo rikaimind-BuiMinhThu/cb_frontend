@@ -5,7 +5,7 @@ import { Link, useLocation } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { BOT_ID_COOKIE_KEY, BOT_TYPE_BOT, BOT_TYPE_COOKIE_KEY, USER_ROLE_COOKIE_KEY } from 'v2/api/constants';
 import { getDefaultLandingPath } from 'v2/variables/constants';
-import logo from '../Sidebar/ecchatbot-logo.png';
+import logo from 'v2/assets/img/ecchatbot-logo.png';
 import {
   filterMenuByRole,
   getBotMenuItems,

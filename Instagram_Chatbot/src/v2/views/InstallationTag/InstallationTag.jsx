@@ -10,7 +10,7 @@ import {
   buildFaqEmbedScript,
   buildPaymentEmbedScript,
   getSdkEmbedPaths,
-} from 'v2/utils/sdkEmbedPaths';
+} from 'v2/views/InstallationTag/sdkEmbedPaths';
 import { AdminPage, AdminFormRow, AdminActionButton, useAdminHeaderActions } from 'v2/components/AdminShell';
 import {
   BOT_ID_COOKIE_KEY,

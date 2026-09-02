@@ -7,8 +7,8 @@ import {
   getCartLoginHoverBackgroundColor,
   normalizeCartLoginConfig,
   shouldCloseBotAfterCartLoginClick,
-} from '../../v2/views/BotElement/BotSetting/ScenarioSetting/utils/cartLoginUtils';
-import { CART_LOGIN_PROCESS_AFTER_CLICK } from '../../v2/views/BotElement/BotSetting/ScenarioSetting/constants/cartLoginConstants';
+} from '../../v2/views/ScenarioSetting/utils/cartLoginUtils';
+import { CART_LOGIN_PROCESS_AFTER_CLICK } from '../../v2/views/ScenarioSetting/constants/cartLoginConstants';
 
 const CartLoginMessagePreview = ({
   content,
