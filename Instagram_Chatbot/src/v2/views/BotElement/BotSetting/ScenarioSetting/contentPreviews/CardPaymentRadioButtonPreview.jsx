@@ -1,1 +1,1 @@
-export { default } from './cardPaymentRadioButton';
+export { default } from './cardPaymentRadioButton/CardPaymentRadioButtonPreview';

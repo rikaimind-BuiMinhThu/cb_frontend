@@ -52,6 +52,8 @@ export const CALENDAR_TYPES = {
   START_END_DATE: 'start_end_date',
 };
 
+export const CALENDAR_DATE_FORMAT = 'YYYY-MM-DD';
+
 export const CAROUSEL_TYPES = {
   DEFAULT: 'default',
   CONSUME_API_RESPONSE: 'consume_api_response',

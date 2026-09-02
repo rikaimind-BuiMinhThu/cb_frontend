@@ -1,5 +1,10 @@
 import React from 'react';
 import SelectCustom from '../../scenarioComon/SelectCustom';
+import { SETTING_PLACEHOLDERS } from '../../constants/scenarioSettingLabels';
+
+const VALUE2_KEY = 'value2';
+const TEXT_NAME_KEY = 'text';
+const TEXT2_NAME_KEY = 'text2';
 
 const CustomizationPreview = ({ pullDown }) => {
   const typeConfig = pullDown[pullDown.type];
@@ -14,10 +19,10 @@ const CustomizationPreview = ({ pullDown }) => {
     <div className="ss-message__content--user-pull_down-col col-12 ss-pull-down-preview__select-col--full">
       <SelectCustom
         data={typeConfig.options_without_comment}
-        keyValue="値"
+        keyValue={SETTING_PLACEHOLDERS.value}
         className="ss-pull-down-preview__select--full"
         placeholder={typeConfig.display_unselected}
-        nameValue="text"
+        nameValue={TEXT_NAME_KEY}
       />
     </div>
   );
@@ -26,17 +31,17 @@ const CustomizationPreview = ({ pullDown }) => {
     <div className="ss-message__content--user-pull_down-col col-12 ss-pull-down-preview__select-col--dual">
       <SelectCustom
         data={typeConfig.options_with_comment}
-        keyValue="値"
+        keyValue={SETTING_PLACEHOLDERS.value}
         className="ss-pull-down-preview__select--half"
         placeholder={typeConfig.display_unselected}
-        nameValue="text"
+        nameValue={TEXT_NAME_KEY}
       />
       <SelectCustom
         data={typeConfig.options_with_comment}
-        keyValue="value2"
+        keyValue={VALUE2_KEY}
         className="ss-pull-down-preview__select--half"
         placeholder={typeConfig.display_unselected}
-        nameValue="text2"
+        nameValue={TEXT2_NAME_KEY}
       />
     </div>
   );

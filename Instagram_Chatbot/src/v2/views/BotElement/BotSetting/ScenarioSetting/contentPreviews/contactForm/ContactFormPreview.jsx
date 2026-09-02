@@ -3,21 +3,27 @@ import ContentPreviewShell from '../shared/ContentPreviewShell';
 import {
   CONTACT_FORM_FIELD_KEYS,
   CONTACT_FORM_FIELD_LABELS,
+  DEFAULT_CONTACT_FORM_CONFIG,
   getContactFormFieldSettings,
 } from '../../../PreviewComponent/Constants';
+import { CONTENT_SETTING_TYPES } from '../../constants/contentTypeConstants';
 import '../../styles/contentPreviews/contactForm.css';
+
+const INQUIRY_TYPE_FIELD = 'inquiry_type';
+const CONTENT_FIELD = 'content';
 
 const ContactFormPreview = ({ content }) => {
   const contactForm = content.contact_form;
 
-  if (content.type !== 'contact_form' || !contactForm) return null;
+  if (content.type !== CONTENT_SETTING_TYPES.CONTACT_FORM || !contactForm) return null;
 
   const fieldSettings = getContactFormFieldSettings(contactForm);
   const inquiryTypeOptions = contactForm.inquiry_type_options || [];
-  const submitButtonName = contactForm.submit_button_name || '送信する';
+  const submitButtonName = contactForm.submit_button_name
+    || DEFAULT_CONTACT_FORM_CONFIG.submit_button_name;
 
   const renderField = (fieldKey) => {
-    if (fieldKey === 'inquiry_type') {
+    if (fieldKey === INQUIRY_TYPE_FIELD) {
       return (
         <div key={fieldKey} className="ss-contact-form-preview__field">
           <div className="ss-contact-form-preview__field-label">
@@ -32,7 +38,7 @@ const ContactFormPreview = ({ content }) => {
         </div>
       );
     }
-    if (fieldKey === 'content') {
+    if (fieldKey === CONTENT_FIELD) {
       return (
         <div key={fieldKey} className="ss-contact-form-preview__field">
           <div className="ss-contact-form-preview__field-label">

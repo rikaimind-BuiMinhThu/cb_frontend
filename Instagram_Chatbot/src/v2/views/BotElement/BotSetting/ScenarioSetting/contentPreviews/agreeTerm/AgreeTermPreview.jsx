@@ -1,14 +1,14 @@
 import React from 'react';
 import CheckboxCustom from '../../scenarioComon/CheckboxCustom';
 import ContentPreviewShell from '../shared/ContentPreviewShell';
-import { AGREE_TERM_TYPES } from '../../constants/contentTypeConstants';
+import { AGREE_TERM_TYPES, CONTENT_SETTING_TYPES } from '../../constants/contentTypeConstants';
 import { PREVIEW_LABELS } from '../../constants/scenarioSettingLabels';
 import '../../styles/contentPreviews/agreeTerm.css';
 
 const AgreeTermPreview = ({ content }) => {
   const agreeTerm = content.agree_term;
 
-  if (content.type !== 'agree_term') return null;
+  if (content.type !== CONTENT_SETTING_TYPES.AGREE_TERM) return null;
 
   const renderHeader = () => (
     <div className="ss-message__content--user-agree_to_term-top ss-agree-term-preview__header">

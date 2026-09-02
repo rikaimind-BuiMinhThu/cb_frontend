@@ -1,15 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Calendar } from 'antd';
-import moment from 'moment';
 import locale from 'antd/es/date-picker/locale/ja_JP';
-import DatePickerCustom from '../../scenarioComon/DatePickerCustom';
-import { CALENDAR_TYPES } from '../../constants/contentTypeConstants';
+import moment from 'moment';
 import {
   handleDisableDateCalendar,
   handleDisableEndDateCalendar,
 } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/scenarioCalendarUtils';
+import DatePickerCustom from '../../scenarioComon/DatePickerCustom';
 import CalendarEmbeddedHeader from '../../contentSettings/calendar/shared/CalendarEmbeddedHeader';
+import {
+  CALENDAR_DATE_FORMAT,
+  CALENDAR_TYPES,
+  CONTENT_SETTING_TYPES,
+} from '../../constants/contentTypeConstants';
 import { PREVIEW_LABELS } from '../../constants/scenarioSettingLabels';
 import '../../styles/contentPreviews/calendar.css';
 
@@ -33,7 +37,7 @@ const CalendarPreview = ({ content }) => {
   const renderDateSelection = () => (
     <DatePickerCustom
       className="ss-calendar-preview__picker"
-      value={calendar.date_selection_test ? moment(calendar.date_selection_test, 'YYYY-MM-DD') : null}
+      value={calendar.date_selection_test ? moment(calendar.date_selection_test, CALENDAR_DATE_FORMAT) : null}
       disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
     />
   );
@@ -47,7 +51,7 @@ const CalendarPreview = ({ content }) => {
         headerRender={({ value, type, onChange, onTypeChange }) => (
           <CalendarEmbeddedHeader value={value} type={type} onChange={onChange} onTypeChange={onTypeChange} />
         )}
-        value={calendar.date_selection_test ? moment(calendar.date_selection_test, 'YYYY-MM-DD') : null}
+        value={calendar.date_selection_test ? moment(calendar.date_selection_test, CALENDAR_DATE_FORMAT) : null}
         disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
       />
     </div>
@@ -58,12 +62,12 @@ const CalendarPreview = ({ content }) => {
       <DatePickerCustom
         className="ss-calendar-preview__start-end-picker"
         disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
-        value={calendar.start_date_test ? moment(calendar.start_date_test, 'YYYY-MM-DD') : null}
+        value={calendar.start_date_test ? moment(calendar.start_date_test, CALENDAR_DATE_FORMAT) : null}
       />
       <DatePickerCustom
         className="ss-calendar-preview__start-end-picker"
         disabledDate={(current) => handleDisableEndDateCalendar(current, calendar)}
-        value={calendar.end_date_test ? moment(calendar.end_date_test, 'YYYY-MM-DD') : null}
+        value={calendar.end_date_test ? moment(calendar.end_date_test, CALENDAR_DATE_FORMAT) : null}
       />
     </div>
   );
@@ -81,7 +85,7 @@ const CalendarPreview = ({ content }) => {
     }
   };
 
-  if (content.type !== 'calendar') return null;
+  if (content.type !== CONTENT_SETTING_TYPES.CALENDAR) return null;
 
   return (
     <div className="ss-calendar-preview__wrapper">

@@ -176,6 +176,8 @@ export const PRODUCT_PURCHASE_SETTING_LABELS = {
   itemNumber: '商品番号',
   price: '値段',
   variantId: 'バリアントID',
+  quantityMaxPrefix: '数量：最大',
+  quantityMaxSuffix: '個まで',
 };
 
 export const CARD_PAYMENT_RADIO_TYPE_OPTIONS = [
@@ -304,6 +306,9 @@ export const PREVIEW_LABELS = {
   emptyMessages: 'メッセージがありません',
   unselected: '未選択',
   selectFile: 'ファイルを選択',
+  capture: 'キャプチャ',
+  yen: '円',
+  dashPlaceholder: '--',
 };
 
 export const TEXT_INPUT_LABELS = {

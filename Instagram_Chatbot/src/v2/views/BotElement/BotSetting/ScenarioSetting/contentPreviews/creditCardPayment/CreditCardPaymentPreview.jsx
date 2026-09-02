@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import InputCustom from '../../scenarioComon/InputCustom';
 import SelectCustom from '../../scenarioComon/SelectCustom';
 import { CREDIT_CARD_SETTING_LABELS, PREVIEW_LABELS } from '../../constants/scenarioSettingLabels';
+import { CONTENT_SETTING_TYPES } from '../../constants/contentTypeConstants';
 import '../../styles/contentPreviews/creditCardPayment.css';
 
 const CreditCardPaymentPreview = ({ content }) => {
@@ -103,7 +104,7 @@ const CreditCardPaymentPreview = ({ content }) => {
     );
   };
 
-  if (content.type !== 'credit_card_payment') return null;
+  if (content.type !== CONTENT_SETTING_TYPES.CREDIT_CARD_PAYMENT) return null;
 
   return (
     <div className="ss-credit-card-preview__wrapper">
