@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Card, CardBody, CardFooter, CardTitle, Row, Col } from 'reactstrap';
+import { Card, CardBody, Row, Col } from 'reactstrap';
 import Cookies from 'js-cookie';
 import ReactApexChart from 'react-apexcharts';
 import api from 'v2/api/api-management';
@@ -19,7 +19,7 @@ import {
   DASHBOARD_CHART_USER_CLIENT_LABEL,
   DASHBOARD_CHART_MESSAGE_LABEL,
   DASHBOARD_OVERVIEW_TITLE,
-  DASHBOARD_UPDATED_LABEL,
+  DASHBOARD_CHART_EMPTY,
   DASHBOARD_CLIENT_MANAGEMENT,
   DASHBOARD_USER_MANAGEMENT,
   DASHBOARD_KEYWORD_SETTING,
@@ -38,12 +38,21 @@ import {
   parseStoredClient,
 } from './Dashboard/constants';
 
+const hasChartActivity = (userData, messageData) => {
+  const combined = [...(userData || []), ...(messageData || [])];
+  if (combined.length === 0) {
+    return false;
+  }
+  return combined.some((value) => Number(value) > 0);
+};
+
 const Dashboard = () => {
   const [dateLabels, setDateLabels] = useState([]);
   const [userCounts, setUserCounts] = useState([]);
   const [messageCounts, setMessageCounts] = useState([]);
   const [lineDataWithoutRole, setLineDataWithoutRole] = useState([]);
   const [isAdminDeel, setIsAdminDeel] = useState(false);
+  const [hasLoadedChartData, setHasLoadedChartData] = useState(false);
   const client = parseStoredClient();
 
   useEffect(() => {
@@ -65,53 +74,48 @@ const Dashboard = () => {
     const { beginDate, endDate, monthIndex } = buildDateRange();
     const querySuffix = `?begin_date=${beginDate}&end_date=${endDate}`;
 
-    api
-      .get(`${DASHBOARD_ANALYTICS_USER_PATH}${querySuffix}`)
-      .then((res) => {
-        const usageEntries = res.data.counts || [];
-        setDateLabels(usageEntries.map((entry) => formatChartDateLabel(entry.log_date)));
-        setUserCounts(usageEntries.map((entry) => entry.user_count));
-      })
-      .catch((error) => {
-        if (error.response?.data.code === 0) {
-          tokenExpired();
-        }
-      });
+    const handleAnalyticsError = (error) => {
+      if (error.response?.data.code === 0) {
+        tokenExpired();
+      }
+    };
 
-    api
-      .get(`${DASHBOARD_ANALYTICS_MESSAGE_PATH}${querySuffix}`)
-      .then((res) => {
-        const messageEntries = res.data.counts || [];
-        setMessageCounts(messageEntries.map((entry) => entry.message_count));
-      })
-      .catch((error) => {
-        if (error.response?.data.code === 0) {
-          tokenExpired();
-        }
-      });
-
-    api
-      .get(`${DASHBOARD_ANALYTICS_USERS_PATH}${querySuffix}`)
-      .then((res) => {
-        setLineDataWithoutRole(res.data?.user_counts?.map((user) => user.user_count) || []);
-      })
-      .catch((error) => {
-        if (error.response?.data.code === 0) {
-          tokenExpired();
-        }
-      });
+    Promise.all([
+      api
+        .get(`${DASHBOARD_ANALYTICS_USER_PATH}${querySuffix}`)
+        .then((res) => {
+          const usageEntries = res.data.counts || [];
+          setDateLabels(usageEntries.map((entry) => formatChartDateLabel(entry.log_date)));
+          setUserCounts(usageEntries.map((entry) => entry.user_count));
+        })
+        .catch(handleAnalyticsError),
+      api
+        .get(`${DASHBOARD_ANALYTICS_MESSAGE_PATH}${querySuffix}`)
+        .then((res) => {
+          const messageEntries = res.data.counts || [];
+          setMessageCounts(messageEntries.map((entry) => entry.message_count));
+        })
+        .catch(handleAnalyticsError),
+      api
+        .get(`${DASHBOARD_ANALYTICS_USERS_PATH}${querySuffix}`)
+        .then((res) => {
+          setLineDataWithoutRole(res.data?.user_counts?.map((user) => user.user_count) || []);
+        })
+        .catch(handleAnalyticsError),
+    ]).finally(() => {
+      setHasLoadedChartData(true);
+    });
 
     api
       .get(`${DASHBOARD_ANALYTICS_USERS_PATH}?begin_date=${buildHistoricalBeginDate(beginDate, monthIndex)}&end_date=${endDate}`)
-      .catch((error) => {
-        if (error.response?.data.code === 0) {
-          tokenExpired();
-        }
-      });
+      .catch(handleAnalyticsError);
   }, []);
 
   const userSeriesLabel = isAdminDeel ? DASHBOARD_CHART_USER_ADMIN_LABEL : DASHBOARD_CHART_USER_CLIENT_LABEL;
   const userSeriesData = isAdminDeel ? userCounts : lineDataWithoutRole;
+  const hasActivity = hasChartActivity(userSeriesData, messageCounts);
+  const showChart = hasLoadedChartData && hasActivity;
+  const showChartEmpty = hasLoadedChartData && !hasActivity;
 
   const chartConfig = useMemo(() => ({
     series: [
@@ -160,7 +164,7 @@ const Dashboard = () => {
       tooltip: {
         shared: true,
         intersect: false,
-        enabled: false,
+        enabled: true,
         y: {
           formatter: (value) => (typeof value !== 'undefined' ? `${value.toFixed(0)}` : value),
         },
@@ -168,55 +172,38 @@ const Dashboard = () => {
     },
   }), [dateLabels, messageCounts, userSeriesData, userSeriesLabel]);
 
-  const renderStatCard = (href, iconName, iconColor, title) => (
-    <a href={href}>
-      <Card className="card-stats">
-        <CardBody>
-          <Row>
-            <Col md="3" xs="5">
-              <div className="icon-big text-center icon-warning">
-                <i className={`nc-icon ${iconName} ${iconColor}`} />
-              </div>
-            </Col>
-            <Col md="9" xs="7">
-              <div className="numbers">
-                <CardTitle tag="p" className="admin-dashboard-card-title">
-                  {title}
-                </CardTitle>
-                <p />
-              </div>
-            </Col>
-          </Row>
-        </CardBody>
-        <CardFooter>
-          <hr />
-          <div className="stats" />
-        </CardFooter>
-      </Card>
+  const renderShortcutTile = (href, iconName, iconColor, title) => (
+    <a href={href} className="admin-dashboard-tile-link">
+      <div className="admin-dashboard-tile">
+        <div className={`admin-dashboard-tile-icon ${iconColor}`}>
+          <i className={`nc-icon ${iconName}`} />
+        </div>
+        <span className="admin-dashboard-tile-label">{title}</span>
+      </div>
     </a>
   );
 
   return (
     <AdminPage card={false}>
-      <div className="content">
-        <Row>
+      <div className="content admin-dashboard">
+        <Row className="admin-dashboard-tiles">
           {isAdminDeel ? (
             <>
               <Col lg="3" md="6" sm="6">
-                {renderStatCard(DASHBOARD_CLIENT_ROUTE, 'nc-badge', 'text-warning', DASHBOARD_CLIENT_MANAGEMENT)}
+                {renderShortcutTile(DASHBOARD_CLIENT_ROUTE, 'nc-badge', 'text-warning', DASHBOARD_CLIENT_MANAGEMENT)}
               </Col>
               <Col lg="3" md="6" sm="6">
-                {renderStatCard(DASHBOARD_USER_ROUTE, 'nc-circle-10', 'text-success', DASHBOARD_USER_MANAGEMENT)}
+                {renderShortcutTile(DASHBOARD_USER_ROUTE, 'nc-circle-10', 'text-success', DASHBOARD_USER_MANAGEMENT)}
               </Col>
             </>
           ) : null}
           {client?.is_instagram ? (
             <>
               <Col lg="3" md="6" sm="6">
-                {renderStatCard(DASHBOARD_KEYWORD_ROUTE, 'nc-key-25', 'text-danger', DASHBOARD_KEYWORD_SETTING)}
+                {renderShortcutTile(DASHBOARD_KEYWORD_ROUTE, 'nc-key-25', 'text-danger', DASHBOARD_KEYWORD_SETTING)}
               </Col>
               <Col lg="3" md="6" sm="6">
-                {renderStatCard(DASHBOARD_CHATBOT_ROUTE, 'nc-atom', 'text-primary', DASHBOARD_CHATBOT)}
+                {renderShortcutTile(DASHBOARD_CHATBOT_ROUTE, 'nc-atom', 'text-primary', DASHBOARD_CHATBOT)}
               </Col>
             </>
           ) : null}
@@ -224,24 +211,25 @@ const Dashboard = () => {
         {client?.is_instagram ? (
           <Row>
             <Col md="12">
-              <Card>
+              <Card className="admin-dashboard-overview">
                 <CardBody>
-                  <div className="admin-dashboard-chart-center">
-                    <h3>{DASHBOARD_OVERVIEW_TITLE}</h3>
+                  <div className="admin-dashboard-overview-header">
+                    <h3 className="admin-dashboard-overview-title">{DASHBOARD_OVERVIEW_TITLE}</h3>
                   </div>
-                  <ReactApexChart
-                    options={chartConfig.options}
-                    series={chartConfig.series}
-                    type="line"
-                    height={DASHBOARD_CHART_HEIGHT}
-                  />
+                  {showChart ? (
+                    <ReactApexChart
+                      options={chartConfig.options}
+                      series={chartConfig.series}
+                      type="line"
+                      height={DASHBOARD_CHART_HEIGHT}
+                    />
+                  ) : null}
+                  {showChartEmpty ? (
+                    <div className="admin-dashboard-chart-empty">
+                      <p className="admin-dashboard-chart-empty-text">{DASHBOARD_CHART_EMPTY}</p>
+                    </div>
+                  ) : null}
                 </CardBody>
-                <CardFooter>
-                  <hr />
-                  <div className="stats">
-                    <i className="fa fa-history" /> {DASHBOARD_UPDATED_LABEL}
-                  </div>
-                </CardFooter>
               </Card>
             </Col>
           </Row>

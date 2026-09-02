@@ -1058,17 +1058,103 @@
   width: 100%;
 }
 
-.admin-dashboard-card-title {
-  font-size: 23px;
+.admin-dashboard-tiles {
+  margin-bottom: 8px;
 }
 
-.admin-dashboard-chart-center {
-  width: 100%;
+.admin-dashboard-tile-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.admin-dashboard-tile-link:hover,
+.admin-dashboard-tile-link:focus {
+  color: inherit;
+  text-decoration: none;
+}
+
+.admin-dashboard-tile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 72px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+  box-shadow: none;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.admin-dashboard-tile-link:hover .admin-dashboard-tile {
+  border-color: var(--admin-primary);
+  background: var(--admin-primary-selected);
+}
+
+.admin-dashboard-tile-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.admin-dashboard-tile-icon .nc-icon {
+  font-size: 28px;
+}
+
+.admin-dashboard-tile-label {
+  flex: 1;
+  min-width: 0;
+  color: var(--admin-text-primary);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-dashboard-overview {
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+  box-shadow: none;
+}
+
+.admin-dashboard-overview-header {
+  margin-bottom: 16px;
+}
+
+.admin-dashboard-overview-title {
+  margin: 0;
+  color: var(--admin-text-primary);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.admin-dashboard-chart-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  padding: 24px;
+  background: var(--admin-surface-muted);
+  border-radius: var(--admin-radius);
+}
+
+.admin-dashboard-chart-empty-text {
+  margin: 0;
+  color: var(--admin-text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
   text-align: center;
-}
-
-.admin-dashboard-chart-body {
-  height: 266px;
 }
 
 .user-message-tail-icon-svg {
