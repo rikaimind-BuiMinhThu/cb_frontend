@@ -42,12 +42,6 @@ class Login extends React.Component {
     var nameValue = document.getElementById("email").value;
     var password = document.getElementById("password").value;
 
-    const config = {
-      headers: {
-        'Access-Control-Allow-Origin': '*'
-      }
-    };
-
     if (nameValue === "" || password === "") {
       this.setState({
         passwordError: password === "" ? "パスワードを入力してください。" : "",
@@ -91,12 +85,6 @@ class Login extends React.Component {
     event.preventDefault()
     var nameValue = document.getElementById("email").value;
     var password = document.getElementById("password").value;
-
-    const config = {
-      headers: {
-        'Access-Control-Allow-Origin': '*'
-      }
-    };
 
     if (nameValue === "" || password === "") {
       this.setState({

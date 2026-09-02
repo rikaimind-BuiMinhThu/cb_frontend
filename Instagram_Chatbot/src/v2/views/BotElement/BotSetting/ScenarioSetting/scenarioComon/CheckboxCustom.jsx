@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Checkbox } from 'antd';
 
 const CheckboxCustom = ({ id, label, value = false, onChange, className, styleSpan, disabled = false, style }) => {

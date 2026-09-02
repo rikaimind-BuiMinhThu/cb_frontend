@@ -267,6 +267,7 @@ const ScenarioPreviewFaq = ({
 
     return getScenarioPreviewData(state.botId, state.scenarioId)
       .then(extractStateFromPreviewResponse);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- preview bootstrap once
   }, [editorPreview, state.botId, state.scenarioId, state.loadedStateFromSession]);
 
   usePreviewScenarioBootstrap({
@@ -322,7 +323,7 @@ const ScenarioPreviewFaq = ({
     // Send data to count open chatbot window
     const prevOpenStatus = getPrevOpenStatus();
 
-    if (prevOpenStatus == "0" && opening) {
+    if (prevOpenStatus === "0" && opening) {
       savePrevOpenStatus("1");
       sendOpenChatbotCountRequest(state.scenarioId, deviceReceive);
     }
@@ -386,7 +387,7 @@ const ScenarioPreviewFaq = ({
     if (!editorPreview) {
       const prevOpenStatus = getPrevOpenStatus();
 
-      if (designSetting.display_type == 1 && prevOpenStatus == "0") {
+      if (designSetting.display_type === 1 && prevOpenStatus === "0") {
         savePrevOpenStatus("1");
         sendOpenChatbotCountRequest(state.scenarioId, state.deviceReceive);
       }
@@ -597,7 +598,7 @@ const ScenarioPreviewFaq = ({
   const renderNextButton = (message, messageIndex) => {
     const isUpdate = messageIndex >= state.renderMessagesList.length - 1;
     const firstMsgContent = message?.message_content?.[0];
-    const isDisplayBtnNext = firstMsgContent?.type != "image" || firstMsgContent?.image?.displayButtonNext != false;
+    const isDisplayBtnNext = firstMsgContent?.type !== "image" || firstMsgContent?.image?.displayButtonNext !== false;
     const isAutoClick = !isDisplayBtnNext && isUpdate;
 
     if (!message || message.belong_to !== "user") return null;

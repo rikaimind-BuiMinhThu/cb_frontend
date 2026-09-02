@@ -12,7 +12,6 @@ const ZipCodeAddressSetting = (props) => {
   const {
     indexMessageSelect,
     indexContent,
-    content,
     zipCodeAddress,
     dataMessages,
     setDataMessages,

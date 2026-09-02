@@ -23,5 +23,6 @@ export const usePreviewIpParams = ({ state, dispatch, enabled = true }) => {
         payload: { ...state.objParam, ...defaultObjParam },
       });
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- adding state.objParam would retrigger IP fetch after SET_OBJ_PARAM
   }, [enabled, state.objParam?.ip, state.loadedStateFromSession, dispatch]);
 };

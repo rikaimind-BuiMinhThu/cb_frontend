@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 const RadioCustom = ({ id, label, value = false, onChange, className, styleSpan, disabled = false }) => {
     return (

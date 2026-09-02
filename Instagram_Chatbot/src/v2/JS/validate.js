@@ -2,7 +2,7 @@ const field = document.getElementById.bind(document);
 
 export function checkEmail(inputId, errId, label) {
   var regex = /^[a-zA-Z0-9]+[a-zA-Z0-9]+([._+-])*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/;
-  if (!regex.test(field(inputId).value) && field(inputId).value != '') {
+  if (!regex.test(field(inputId).value) && field(inputId).value !== '') {
     field(errId).style.display = 'block';
     field(errId).textContent = `${label}項目は正しくありません。`;
     return false;
@@ -14,8 +14,8 @@ export function checkEmail(inputId, errId, label) {
 }
 export function checkUrl(inputId, errId, label) {
   var regex =
-    /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/;
-  if (!regex.test(field(inputId).value) && field(inputId).value != '') {
+    /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[\w]*))?)/;
+  if (!regex.test(field(inputId).value) && field(inputId).value !== '') {
     field(errId).style.display = 'block';
     field(errId).textContent = `${label}フォーマとは正しくありません。`;
     return false;
@@ -27,7 +27,7 @@ export function checkUrl(inputId, errId, label) {
 }
 
 export function checkMaxLength(inputId, errId, label, length) {
-  if (field(inputId).value.length > length && field(inputId).value != '') {
+  if (field(inputId).value.length > length && field(inputId).value !== '') {
     field(errId).style.display = 'block';
     field(errId).textContent = `${label}を${length}文字以下入力してください。`;
     return false;

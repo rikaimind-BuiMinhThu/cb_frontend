@@ -35,10 +35,13 @@ const BotMessage = ({
 
   const [isDelaying, setIsDelaying] = useState(!skipEntryDelay);
   const [text, setText] = useState("");
+  const originalContent = content?.[content?.type]?.originalContent;
+  const confirmJsCode = content?.text_input?.jscode?.trim();
 
   useEffect(() => {
     if (isDelaying) return;
     onRenderCompleted();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- prop callback identity is unstable / mount-once
   }, [isDelaying]);
 
   useEffect(() => {
@@ -53,7 +56,7 @@ const BotMessage = ({
       return;
     }
 
-    if (!content[content.type]?.originalContent) return;
+    if (!originalContent) return;
 
     if (![BOT_MESSAGE_TYPES.TEXT_INPUT, BOT_MESSAGE_TYPES.GETTING_ERROR_NOTIFICATION].includes(content.type)) return;
 
@@ -61,8 +64,8 @@ const BotMessage = ({
       return setText(previewOrderContent);
     }
 
-    setText(replaceVariables(content[content.type]?.originalContent || "", variables));
-  }, [content, content?.[content?.type]?.originalContent, variables, previewOrderContent, isBotOpen]);
+    setText(replaceVariables(originalContent || "", variables));
+  }, [content, originalContent, variables, previewOrderContent, isBotOpen]);
 
   const isShowAvatar = () => {
     if (!content) return false;
@@ -79,6 +82,8 @@ const BotMessage = ({
         return true;
       case BOT_MESSAGE_TYPES.CART_LOGIN:
         return true;
+      default:
+        return false;
     }
   }
 
@@ -120,6 +125,7 @@ const BotMessage = ({
       return () => clearTimeout(timeoutId);
     }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- delay timer must not reset when whole content identity changes
   }, [content.type, isDelaying, isBotOpen, content.is_use_custom_delay, content.custom_delay_time, delayEachMessage, isUseGlobalDelay, globalDelayTime, skipEntryDelay]);
 
   useEffect(() => {
@@ -131,16 +137,17 @@ const BotMessage = ({
       return;
     }
 
-    if (content.text_input?.use_for_confirm_message && content.text_input?.jscode?.trim() && isBotOpen) {
+    if (content.text_input?.use_for_confirm_message && confirmJsCode && isBotOpen) {
       executeLpJsCode(content.text_input.jscode);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- prop callback identity is unstable; avoid re-running LP side effects
   }, [
     currentMsgIndex,
     hidden,
     content.type,
     content.order_confirm,
     content.text_input?.use_for_confirm_message,
-    content.text_input?.jscode?.trim(),
+    confirmJsCode,
     isBotOpen,
   ]);
 
@@ -314,7 +321,7 @@ const BotMessage = ({
     if (!isDelaying) return null;
     
     return (
-      <img src={messageTypingGif} className="ss-bot-chat-delay" />
+      <img src={messageTypingGif} className="ss-bot-chat-delay" alt="" />
     )
   }
 
@@ -370,6 +377,8 @@ const BotMessage = ({
         return renderAmazonPayButtonContent();
       case BOT_MESSAGE_TYPES.CART_LOGIN:
         return renderCartLoginContent();
+      default:
+        return null;
     }
   }
 

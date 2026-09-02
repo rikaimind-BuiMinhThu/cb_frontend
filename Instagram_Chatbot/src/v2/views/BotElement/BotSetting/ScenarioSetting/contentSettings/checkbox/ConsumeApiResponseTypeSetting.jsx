@@ -5,7 +5,7 @@ import { buildCheckboxSettingContext } from './checkboxSettingContext';
 
 const ConsumeApiResponseTypeSetting = (props) => {
   const { checkbox } = props;
-  const { indexMessageSelect, indexContent, changeContent } = buildCheckboxSettingContext(props);
+  const { indexMessageSelect, indexContent } = buildCheckboxSettingContext(props);
 
   const renderApiSelect = () => (
     <div className="ss-user-setting__item-bottom">

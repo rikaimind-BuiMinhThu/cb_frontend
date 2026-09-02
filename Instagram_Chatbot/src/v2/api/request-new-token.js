@@ -1,10 +1,7 @@
 import axios from "axios";
-import React, { useState } from "react";
 import Cookies from "js-cookie";
-import { useEffect } from "react";
-import { setToken } from "./auth";
 import { EC_CHATBOT_URL } from "v2/variables/constants";
-export default function requestNewToken(pathname) {
+export default function requestNewToken(_pathname) {
     var header = `Authorization: Bearer ${Cookies.get('refreshToken')}`;
     axios.defaults.headers.common['Authorization'] = `Bearer ${Cookies.get('refreshToken')}`;
     

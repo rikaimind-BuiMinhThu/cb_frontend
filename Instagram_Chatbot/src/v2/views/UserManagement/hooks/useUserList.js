@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Cookies from 'js-cookie';
 import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
@@ -53,7 +53,7 @@ export default function useUserList() {
 
   const fetchRequestId = useRef(0);
 
-  function fetchUsers(pageNum, name = namesearch) {
+  const fetchUsers = useCallback((pageNum, name = namesearch) => {
     setLoading(true);
     const requestId = ++fetchRequestId.current;
     api
@@ -86,11 +86,12 @@ export default function useUserList() {
       .finally(() => {
         if (requestId === fetchRequestId.current) setLoading(false);
       });
-  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- name is always passed at call sites; namesearch would retrigger mount fetch with ''
+  }, []);
 
   useEffect(() => {
     fetchUsers(1, '');
-  }, []);
+  }, [fetchUsers]);
 
   function handleSearch() {
     fetchUsers(1, namesearch);

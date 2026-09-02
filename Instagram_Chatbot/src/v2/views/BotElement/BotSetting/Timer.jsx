@@ -149,6 +149,7 @@ export default function Timer({
         ? TIMER_COMPONENT_STATUS.COUNTING
         : TIMER_COMPONENT_STATUS.PAUSE
     );
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- timer tick must not reset when status/onCounting/config identity changes
   }, [startCount]);
 
   useEffect(() => {
@@ -176,6 +177,7 @@ export default function Timer({
     }, TIMER_COUNTING_DELAY);
 
     return () => clearTimeout(timeout);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- timer tick must not reset when status/onCounting/config identity changes
   }, [timer, status, isRealtimeRemainingTime, duration, scenarioId]);
 
   useEffect(() => {
@@ -216,6 +218,7 @@ export default function Timer({
     if (timer <= 0) {
       setStatus(TIMER_COMPONENT_STATUS.FINISH);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- timer tick must not reset when status/onCounting/config identity changes
   }, [timeLeft, duration, finishMsg, countMsg, variables, isRealtimeRemainingTime, scenarioId]);
 
   if (!config) return null;

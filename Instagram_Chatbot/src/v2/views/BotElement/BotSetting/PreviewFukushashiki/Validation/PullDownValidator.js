@@ -41,7 +41,7 @@ const validatePullDown = (contentType, messageContents, i, index, errorsMess) =>
 
 const validateCustomizationType = (contentType, key, errorsMess) => {
   const subContent = contentType[contentType.type];
-  const { value, valueLeft, valueRight, is_comment } = subContent;
+  const { value, is_comment } = subContent;
 
   if (is_comment === false) {
     if (contentType.require && stringNullOrEmpty(value)) {

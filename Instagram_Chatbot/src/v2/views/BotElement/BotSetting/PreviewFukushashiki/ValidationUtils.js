@@ -1,5 +1,5 @@
 import { stringNullOrEmpty } from '../PreviewComponent/Utils';
-import { MESSAGE_CONTENT_TYPES, PREVIEW_ACTIONS } from '../PreviewComponent/Constants';
+import { MESSAGE_CONTENT_TYPES } from '../PreviewComponent/Constants';
 import { validateTextInput } from './Validation/TextInputValidator';
 import { validateTextArea } from './Validation/TextAreaValidator';
 import { validateRadioButton } from './Validation/RadioButtonValidator';
@@ -17,7 +17,7 @@ import { validateContactForm } from './Validation/ContactFormValidator';
 // Regex Patterns
 export const REGEX_PATTERNS = {
   PASSWORD: /^[A-Za-z0-9 ]+$/,
-  PASSWORD_WITH_SPECIAL: /^[A-Za-z0-9 !@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$/,
+  PASSWORD_WITH_SPECIAL: /^[A-Za-z0-9 !@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+$/,
   EMAIL: /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}$/,
   PHONE: /^0\d{9}$|^0\d{10}$/,
   URLS: /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/,

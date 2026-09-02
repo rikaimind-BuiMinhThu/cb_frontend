@@ -62,12 +62,12 @@ const buildDayFixedOptions = () => {
 };
 
 const buildPaymentMethodOptions = () => [
-  { key: 'visa', value: <img src={visa} /> },
-  { key: 'jcb', value: <img src={jcb} /> },
-  { key: 'master_card', value: <img src={master_card} /> },
-  { key: 'american_express', value: <img src={american_express} /> },
-  { key: 'diner_club', value: <img src={diner_club} /> },
-  { key: 'discover', value: <img src={discover} /> },
+  { key: 'visa', value: <img src={visa} alt="visa" /> },
+  { key: 'jcb', value: <img src={jcb} alt="jcb" /> },
+  { key: 'master_card', value: <img src={master_card} alt="master card" /> },
+  { key: 'american_express', value: <img src={american_express} alt="american express" /> },
+  { key: 'diner_club', value: <img src={diner_club} alt="diner club" /> },
+  { key: 'discover', value: <img src={discover} alt="discover" /> },
 ];
 
 export const dataPaymentMethod = buildPaymentMethodOptions();

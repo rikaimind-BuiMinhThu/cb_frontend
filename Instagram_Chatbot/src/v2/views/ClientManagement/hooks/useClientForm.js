@@ -245,7 +245,7 @@ export default function useClientForm(plans) {
   }
 
   function onSelectPlan(planCode) {
-    const selected = plans.find((o) => o.code == planCode);
+    const selected = plans.find((o) => o.code === planCode);
     if (selected) {
       antdForm.setFieldsValue({ price: selected.price });
       clearFieldError('price');

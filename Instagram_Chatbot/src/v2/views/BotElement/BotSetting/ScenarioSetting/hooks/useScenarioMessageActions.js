@@ -33,7 +33,6 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
     variableName,
     defaultValue,
     dataInputVar,
-    conditions,
   } = state;
 
   const {
@@ -50,7 +49,6 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
     setErrorVariable,
     setVariableName,
     setDefaultValue,
-    setConditions,
     getListVariable,
   } = actions;
 
@@ -77,7 +75,7 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
     }
     let file;
     if (trueFile) {
-      if (type != 'pdf' && type != 'mp4' && fileInput.size / 1024 / 1024 >= 2) {
+      if (type !== 'pdf' && type !== 'mp4' && fileInput.size / 1024 / 1024 >= 2) {
         setFileError('ファイルサイズは2MB以下です。');
         return;
       } if (type === 'pdf' && fileInput.size / 1024 / 1024 >= 3) {
@@ -96,16 +94,16 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
       }
       setFileError('');
       const video = document.getElementById('preview-video');
-      file = { user_file: { file_type: type, size: fileInput.size, timeplay: `${type == 'mp4' ? video?.duration : ''}` } };
+      file = { user_file: { file_type: type, size: fileInput.size, timeplay: `${type === 'mp4' ? video?.duration : ''}` } };
       api
         .post('/api/v1/managements/file/upload', file)
         .then((res) => {
           const urlFile = res.data.data.url;
           const filePost = { user_file: { file_type: type, file_url: res.data.data.path } };
           let typeUpload = '';
-          if (type == 'mp4') {
+          if (type === 'mp4') {
             typeUpload = 'video/mp4';
-          } else if (type == 'pdf') {
+          } else if (type === 'pdf') {
             typeUpload = 'application/pdf';
           } else {
             typeUpload = `image/${type}`;
@@ -121,7 +119,7 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
               api
                 .post('/api/v1/managements/file', filePost)
                 .then((res) => {
-                  if (res.data.code == 1) {
+                  if (res.data.code === 1) {
                     setDataMessages(withClonedMessages(dataMessages, (next) => {
                       if (next[indexMessageSelect].belong_to === 'user') {
                         next[indexMessageSelect].message_content[indexContent].carousel.default.contents[indexCarouselSlide].fileUrl = S3_UPLOAD_URL + res.data.data.file_url;
@@ -730,9 +728,9 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
   const isColor = useCallback((strColor) => {
     const s = new Option().style;
     s.color = strColor;
-    const test1 = s.color == strColor;
+    const test1 = s.color === strColor;
     const test2 = /^#[a-fA-F0-9]{3,6}$/i.test(strColor);
-    if (test1 == true || test2 == true) {
+    if (test1 === true || test2 === true) {
       return true;
     }
     return false;

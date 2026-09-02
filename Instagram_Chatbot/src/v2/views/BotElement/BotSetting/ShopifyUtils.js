@@ -407,7 +407,7 @@ const collectShopifyCartLinesFromMessages = (state) => {
     const configuredVariantId = String(state.productIdCrossSell || "").trim();
     const choice = String(getResponseValue(state, "cross_sell_option") || "").trim();
     let crossMerchandiseId = "";
-    if (choice == "1" && configuredVariantId) {
+    if (choice === "1" && configuredVariantId) {
       crossMerchandiseId = configuredVariantId;
     }
     if (

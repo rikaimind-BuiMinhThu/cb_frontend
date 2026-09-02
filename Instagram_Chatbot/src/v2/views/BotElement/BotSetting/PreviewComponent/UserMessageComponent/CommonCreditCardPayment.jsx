@@ -306,7 +306,7 @@ export default function CommonCreditCardPayment({ content, messageIndex, content
     if (creditCardPayment.is_hide_cvc) return null;
     const cvcLabel = (
       <span className="f-weight-400">
-        CVC <img className="w-8-percent" src={cvcIcon} />
+        CVC <img className="w-8-percent" src={cvcIcon} alt="" />
       </span>
     );
 

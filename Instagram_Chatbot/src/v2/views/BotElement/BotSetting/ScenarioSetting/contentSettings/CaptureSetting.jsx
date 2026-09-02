@@ -1,6 +1,5 @@
 import React from 'react';
 import SelectCustom from '../scenarioComon/SelectCustom';
-import InputCustom from '../scenarioComon/InputCustom';
 import InputNum from '../scenarioComon/InputNum';
 import { dropDownTitle } from '../constants/scenarioFormConstants';
 import {

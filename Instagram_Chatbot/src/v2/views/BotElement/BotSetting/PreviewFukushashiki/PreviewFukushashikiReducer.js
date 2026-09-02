@@ -211,7 +211,7 @@ const PreviewFukushashikiReducer = (state, action) => {
     case PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON:
       // TODO: Update state after click Next in here
       // In here, default is validation ok
-      const { clickedMsgIndex, clickedMsg, isLoggedIn } = action.payload;
+      const { clickedMsgIndex, isLoggedIn } = action.payload;
       const isUpdateClicked = clickedMsgIndex < state.renderMessagesList.length - 1;
       let newState = {
         errors: {},
@@ -428,8 +428,6 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
         objParam: isEditorPreview ? state.objParam : {},
         loadedStateFromSession: true,
         messagesList: conversation?.messages || [],
-        isUseGlobalDelay: conversation?.isUseGlobalDelay || false,
-        globalDelayTime: conversation?.globalDelayTime ?? 1.0,
         isOpen: isEditorPreview ? true : (state.isOpen || action.payload.isUsingAmazonPay),
         activePopupCloseBot: Boolean(designSetting?.popup_close_bot),
         titleBubble: designSetting?.title_bubble || "簡単90秒で注文完了",

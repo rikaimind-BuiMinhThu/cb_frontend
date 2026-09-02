@@ -14,7 +14,6 @@ const CheckboxSetting = (props) => {
   const {
     indexMessageSelect,
     indexContent,
-    content,
     checkbox,
     numberMaxLength,
     dataMessages,

@@ -11,7 +11,7 @@ export default function HtmlCodeConfig({
 }) {
   const messageType = BOT_MESSAGE_TYPES.HTML_CODE;
 
-  const [htmlValidationError, setHtmlvalidationError] = useState("");
+  const [htmlValidationError] = useState("");
 
   const onChangeContent = (value) => {
     onChangeValue(indexMessageSelect, indexContent, messageType, value, "content");

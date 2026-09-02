@@ -9,7 +9,7 @@ import "v2/assets/css/bot/chat-log.css";
 import $ from "jquery";
 import BotMessage from "./BotMessage";
 import UserMessage from "./UserMessage";
-import { findLastIndex, isBoolean } from "lodash";
+import { findLastIndex } from "lodash";
 import moment from "moment";
 import jwt_decode from 'jwt-decode'
 import BotChatStatistic from "./BotChatStatistic";
@@ -25,14 +25,13 @@ function BotChatLog() {
   const botId = Cookies.get("bot_id");
   const [scenarios, setScenarios] = useState([]);
   const [chats, setChats] = useState([]);
-  const [conversions, setConversions] = useState([]);
+  const [, setConversions] = useState([]);
   const [selectScenario, setSelectScenario] = useState(null);
-  const [selectStatisticScenarioId, setSelectStatisticScenarioId] = useState(null);
   const [selectUserId, setSelectUserId] = useState(null);
   const [selectTab, setSelectTab] = useState(TABS.LOGS);
 
   const [searchScenarioId, setSearchScenarioId] = useState(null);
-  const [searchDate, setSearchDate] = useState(null);
+  const [searchDate] = useState(null);
   const [searchStartDate, setSearchStartDate] = useState(null);
   const [searchEndDate, setSearchEndDate] = useState(null);
 
@@ -117,16 +116,16 @@ function BotChatLog() {
 
   const [botInfor, setBotInfor] = useState();
   const [dataMessages, setDataMessages] = useState([]);
-  const [dataVariables, setDataVariables] = useState([]);
+  const [, setDataVariables] = useState([]);
   const [variables, setVariables] = useState([]);
 
-  const [messageUser, setMessageUser] = useState([]);
+  const [, setMessageUser] = useState([]);
   const [indexMessageRender, setIndexMessageRender] = useState(0);
   const [renderMessageArr, setRenderMessageArr] = useState([]);
   const [renderMessageStatisticArr, setRenderMessageStatisticArr] = useState([]);
-  const [indexUser, setIndexUser] = useState(0);
+  const [, setIndexUser] = useState(0);
   const [captcha, setCaptcha] = useState([]);
-  const [dataPrefectures, setDataPrefectures] = useState([]);
+  const [dataPrefectures] = useState([]);
   const [statistic, setStatistic] = useState([]);
   const [overall, setOverall] = useState({});
 
@@ -244,10 +243,6 @@ function BotChatLog() {
           );
           setMessageUser([...messageUserVar]);
           let renderMessage = [];
-          let index;
-          const userMessageLength = messageArr.filter(
-            (e) => e.belong_to === "user"
-          ).length;
 
           if (!conversion.length) {
             return;
@@ -338,8 +333,9 @@ function BotChatLog() {
             ) {
               if (messageArr[i]?.message_content[0]?.type === "delay") {
                 if (messageArr[i]?.message_content[0]?.delay.typing_on) {
+                  const rows = messageArr;
                   await new Promise((resolve) => {
-                    renderMessage.push({ ...messageArr[i] });
+                    renderMessage.push({ ...rows[i] });
                     setRenderMessageArr([...renderMessage]);
                     resolve();
                   }).then(() => {
@@ -351,14 +347,9 @@ function BotChatLog() {
                 } else {
                   setIndexMessageRender(i);
                 }
-                index = i;
               } else if (
                 messageArr[i]?.message_content[0]?.type === "email"
               ) {
-                let emailId =
-                  messageArr[i]?.message_content[0][
-                    messageArr[i]?.message_content[0].type
-                  ].contentId;
                 let variablesData = {};
                 variablesAll.forEach((item) => {
                   variablesData[item.variable_name] = item.default_value;
@@ -371,7 +362,6 @@ function BotChatLog() {
                 setRenderMessageArr([...renderMessage]);
                 setIndexMessageRender(i);
                 setVariables([...variables]);
-                index = i;
               } else if (
                 messageArr[i]?.message_content[0]?.type === "variable_set"
               ) {
@@ -392,7 +382,6 @@ function BotChatLog() {
                 renderMessage.push({});
                 setRenderMessageArr([...renderMessage]);
                 setIndexMessageRender(i);
-                index = i;
               } else if (
                 messageArr[i]?.message_content[0]?.type ===
                 "clear_variable"
@@ -414,14 +403,12 @@ function BotChatLog() {
                 renderMessage.push({});
                 setRenderMessageArr([...renderMessage]);
                 setIndexMessageRender(i);
-                index = i;
               } else if (
                 messageArr[i]?.message_content[0]?.type === "pause"
               ) {
                 renderMessage.push({});
                 setRenderMessageArr([...renderMessage]);
                 setIndexMessageRender(i);
-                index = i;
                 break;
               } else if (messageArr[i].belong_to !== "bot") {
                 for (
@@ -469,7 +456,6 @@ function BotChatLog() {
                 setIndexMessageRender(i);
                 setRenderMessageArr([...renderMessage]);
                 setIndexUser((prev) => prev + 1);
-                index = i;
                 // break;
               } else {
                 if (
@@ -514,8 +500,9 @@ function BotChatLog() {
               ) {
                 const element = messageArr[i].message_content[msIndex];
                 //TODO: find message type
+                const rows = messageArr;
                 let chats = conversations.filter(
-                  (c) => c?.message_id === messageArr[i].id
+                  (c) => c?.message_id === rows[i].id
                   && (c?.message_child_id >= 0 ? c.message_child_id === element.id : true)
                 );
 

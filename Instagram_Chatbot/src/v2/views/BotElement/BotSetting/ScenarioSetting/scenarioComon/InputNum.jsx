@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { InputNumber } from 'antd';
 
 const InputNum = ({ id, addonAfter, maxLength, addonBefore, label, value, onChange, placeholder, max = 99999999, min = 0, className, disabled = false, style, styleLabel, controls, formatter, parser, onPaste, autoComplete }) => {

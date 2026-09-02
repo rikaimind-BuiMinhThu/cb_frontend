@@ -89,7 +89,7 @@ function FileManagement() {
           .put(urlFile, newFile, { headers: { 'Content-Type': typeUpload } })
           .then(() => {
             api.post(`/api/v1/managements/file`, filePost).then((res) => {
-              if (res.data.code == 1) {
+              if (res.data.code === 1) {
                 message.success('正常にファイル追加されました！');
                 fetchFiles(page);
                 setNewFile(null);
@@ -115,7 +115,7 @@ function FileManagement() {
       .delete(`/api/v1/managements/file/${idFile}`)
       .then((res) => {
         setIsOpenDelete(false);
-        if (res.data.code == 1) {
+        if (res.data.code === 1) {
           message.success('正常に削除されました！');
           fetchFiles(page);
         } else {

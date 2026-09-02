@@ -16,8 +16,9 @@ const LPIntegrationOptionPullDown = ({
   nameValue="text",
   hidden = false
 }) => {
+  const hasData = Boolean(data && data.length > 0);
   useEffect(() => {
-    if (hidden || (data && data.length > 0)) return;
+    if (hidden || hasData) return;
 
     const crawlOption = {
       targetElementType,
@@ -31,7 +32,8 @@ const LPIntegrationOptionPullDown = ({
       actionData: crawlOption,
       action: CHATBOT_ACTIONS.CRAWL_DATA,
     });
-  }, [hidden, data && data.length > 0]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- mount-once parent postMessage
+  }, [hidden, hasData]);
 
   if (data === null || data === undefined) return null;
   const selectWidth = pullDown.with_suffix ? '70%' : '100%';

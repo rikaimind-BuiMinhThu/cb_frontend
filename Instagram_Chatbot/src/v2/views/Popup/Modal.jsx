@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import "../Popup/modal.css";
 import ReactDom from 'react-dom'
-import { Button } from "react-bootstrap";
 
 const MODAL_STYLES = {
   width: '45%',

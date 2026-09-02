@@ -1,6 +1,5 @@
 import React from 'react';
 import SelectCustom from '../../scenarioComon/SelectCustom';
-import { PULL_DOWN_LABELS } from '../../constants/scenarioSettingLabels';
 
 const CustomizationPreview = ({ pullDown }) => {
   const typeConfig = pullDown[pullDown.type];

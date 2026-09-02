@@ -39,7 +39,7 @@ const ProductPurchaseRadioButtonPreview = ({
                       return <Radio value={itemProduct.id} key={indexProduct}>
                         <div className="ss-user-overview-product-purchase-container">
                           <div className="ss-user-overview-product-purchase-img">
-                            <img src={itemProduct.img_url} />
+                            <img src={itemProduct.img_url} alt={itemProduct.title || ""} />
                           </div>
                           {(productPurchaseRadioButton.product_name_display || productPurchaseRadioButton.price_display || productPurchaseRadioButton.product_number_display) &&
                             <div className="ss-user-overview-product-purchase-infor">
@@ -81,7 +81,7 @@ const ProductPurchaseRadioButtonPreview = ({
                       return <Radio value={itemProduct.id} key={indexProduct}>
                         <div className="ss-user-overview-product-purchase-container-type-text_image">
                           <div className="ss-user-overview-product-purchase-img-type-text_image">
-                            <img src={itemProduct.img_url} />
+                            <img src={itemProduct.img_url} alt={itemProduct.title || ""} />
                           </div>
                           {(productPurchaseRadioButton.product_name_display || productPurchaseRadioButton.price_display || productPurchaseRadioButton.product_number_display) &&
                             <div className="ss-user-overview-product-purchase-infor-type-text_image">

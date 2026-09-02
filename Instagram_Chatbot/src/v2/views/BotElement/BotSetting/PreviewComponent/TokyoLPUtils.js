@@ -28,7 +28,7 @@ const TOKYO_DEVELO_LP_CONFIRM_MESSAGE_JS_CODE = String(`
 
     const prefecture = document.querySelector("button[data-id='drpPrefecture']")?.title || "";
 
-    const address = \`\${prefecture} \${address1} \${address2} \${address3}\`.replace(/^\s+|\s+$/g, '');
+    const address = \`\${prefecture} \${address1} \${address2} \${address3}\`.replace(/^s+|s+$/g, '');
     const mobile = document.getElementById("txtTel")?.value || "";
     const email = document.getElementById("txtMail")?.value || "";
 

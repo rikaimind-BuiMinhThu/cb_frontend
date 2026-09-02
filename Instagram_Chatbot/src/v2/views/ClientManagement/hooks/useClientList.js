@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Cookies from 'js-cookie';
 import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
@@ -32,13 +32,13 @@ export default function useClientList() {
 
   useEffect(() => {
     if (
-      Cookies.get('token') == undefined ||
-      Cookies.get('token') == null ||
-      Cookies.get('token') == ''
+      Cookies.get('token') === undefined ||
+      Cookies.get('token') === null ||
+      Cookies.get('token') === ''
     ) {
       window.location.href = getSignInPath();
     }
-    if (Cookies.get('is_auth') == 'false') {
+    if (Cookies.get('is_auth') === 'false') {
       window.location.href = getSignInPath();
     }
   }, []);
@@ -61,7 +61,7 @@ export default function useClientList() {
 
   const fetchRequestId = useRef(0);
 
-  function fetchClients(pageNum, name = namesearch, range = conversionRange) {
+  const fetchClients = useCallback((pageNum, name = namesearch, range = conversionRange) => {
     const { startPreview, endPreview } = getConversionPreviewDates(range);
 
     if (range?.[0] && !range?.[1]) {
@@ -118,11 +118,11 @@ export default function useClientList() {
       .finally(() => {
         if (requestId === fetchRequestId.current) setLoading(false);
       });
-  }
+  }, [namesearch, conversionRange]);
 
   useEffect(() => {
     fetchClients(1);
-  }, []);
+  }, [fetchClients]);
 
   function handleSearch() {
     setPage(1);

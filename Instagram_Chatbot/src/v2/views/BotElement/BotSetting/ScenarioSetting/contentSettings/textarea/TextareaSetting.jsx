@@ -19,7 +19,6 @@ const TextareaSetting = (props) => {
   const {
     indexMessageSelect,
     indexContent,
-    content,
     textarea,
     dataMessages,
     setDataMessages,

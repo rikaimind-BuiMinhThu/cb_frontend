@@ -2,8 +2,6 @@ import React from 'react'
 import './html.css'
 import Iframe from 'react-iframe'
 
-var __html = require('./html.js');
-var template = { __html: __html };
  function HtmlScreen() {
   return (
     <div>

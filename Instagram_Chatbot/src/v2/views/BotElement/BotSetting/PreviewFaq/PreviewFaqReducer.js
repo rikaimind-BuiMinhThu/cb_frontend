@@ -17,7 +17,6 @@ import { isBotMessage, isUserMessage, isCombineMessage, getNextUserMsg } from '.
 import {
   RENDER_CHATBOT_CONFIG,
   PREVIEW_ACTIONS,
-  CART_SYSTEM,
   CONVERSTION_RESPONSE_STATUS,
   BOT_MESSAGE_TYPES,
   RENDER_MODES,
@@ -86,7 +85,7 @@ const PreviewFaqReducer = (state, action) => {
     case PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON:
       // TODO: Update state after click Next in here
       // In here, default is validation ok
-      const { clickedMsgIndex, clickedMsg, isLoggedIn } = action.payload;
+      const { clickedMsgIndex } = action.payload;
       const isUpdateClicked = clickedMsgIndex < state.renderMessagesList.length - 1;
       let newState = {
         errors: {},

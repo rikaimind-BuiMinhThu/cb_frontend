@@ -9,7 +9,7 @@ export default function Image({ content, contentIndex, messageIndex }) {
 
   return (
     <div id={`msg-${messageIndex}-${contentIndex}`} className="ss-message__content--user-text-input-top ss-message__content--user-chat-image">
-      <img src={image.imageURL} style={{ width: image.image_width, height: image.image_height }} />
+      <img src={image.imageURL} alt="" style={{ width: image.image_width, height: image.image_height }} />
     </div>
   );
 };

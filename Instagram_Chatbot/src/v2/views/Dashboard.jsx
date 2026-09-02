@@ -1,13 +1,7 @@
 
 import React, { useState } from 'react';
-import { Line, Pie } from 'react-chartjs-2';
-import { Card, CardHeader, CardBody, CardFooter, CardTitle, Row, Col } from 'reactstrap';
+import { Card, CardBody, CardFooter, CardTitle, Row, Col } from 'reactstrap';
 import Cookies from 'js-cookie';
-import {
-  dashboard24HoursPerformanceChart,
-  dashboardEmailStatisticsChart,
-  dashboardNASDAQChart,
-} from 'variables/charts.js';
 import ReactApexChart from 'react-apexcharts';
 import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
@@ -15,15 +9,11 @@ import { AdminPage } from '../../components/AdminShell';
 import { getSignInPath } from 'v2/variables/constants';
 
 function Dashboard() {
-  const [monthECUDisplay, setMonthECUDisplay] = useState(['1', '2', '3', '4']);
-  const [monthInstaUser, setMonthInstaUser] = useState([]);
-
   const [dateECU, setDateECU] = useState([]);
   const [userECC, setUserECC] = useState([]);
   const [messageEC, setMessageEC] = useState([]);
-  const [userChatwithCB, setUserChatwithCB] = useState([]);
-  const [userChatwithCBAll, setUserChatwithCBAll] = useState();
-  const [userTotal, setUserTotal] = useState();
+  const [, setUserChatwithCB] = useState([]);
+  const [, setUserChatwithCBAll] = useState();
   const [isAdminDeel, setIsAdminDeel] = useState(false);
   const [lineDataWithoutRole, setLineDataWithoutRole] = useState([]);
   let client = null;
@@ -50,19 +40,18 @@ function Dashboard() {
 
   React.useEffect(() => {
     if (
-      Cookies.get('token') == undefined ||
-      Cookies.get('token') == null ||
-      Cookies.get('token') == ''
+      Cookies.get('token') === undefined ||
+      Cookies.get('token') === null ||
+      Cookies.get('token') === ''
     ) {
       window.location.href = getSignInPath();
     }
-    if (Cookies.get('is_auth') == 'false') {
+    if (Cookies.get('is_auth') === 'false') {
       window.location.href = getSignInPath();
     }
   }, []);
 
   React.useEffect(() => {
-    var path = window.location.pathname;
     let dateStart = new Date();
     let dateEnd = new Date();
     dateStart = dateStart.setDate(dateEnd.getDate() - 15);

@@ -1,6 +1,6 @@
 import "v2/assets/css/bot/bot-chat-log.css";
 import UserMessage from "./UserMessage";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import BotMessage from "./BotMessage";
 import { Empty } from "antd";
 import { parseQuantity } from "../../PreviewComponent/Utils";
@@ -16,11 +16,6 @@ export default function BotChatStatistic({
 }) {
   const [msgs, setMsgs] = useState([]);
   const [chatbotOverall, setChatbotOverall] = useState([]);
-
-  const bindStatistic = (messages, statistic, overall) => {
-    setMsgs(parseMessageDetail(messages, statistic));
-    setChatbotOverall(parseOverall(overall));
-  };
 
   const parseMessageDetail = (messages, statistic) => {
     const mapMsgId = new Map();
@@ -56,9 +51,15 @@ export default function BotChatStatistic({
     }));
   };
 
+  const bindStatistic = useCallback((messages, statistic, overall) => {
+    setMsgs(parseMessageDetail(messages, statistic));
+    setChatbotOverall(parseOverall(overall));
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- parse helpers are pure and recreated each render
+  }, []);
+
   useEffect(() => {
     bindStatistic(messages, statistic, overall);
-  }, [messages, statistic, overall]);
+  }, [messages, statistic, overall, bindStatistic]);
 
   if (!messages.length) {
     return (

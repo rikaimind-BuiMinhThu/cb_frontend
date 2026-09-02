@@ -346,7 +346,7 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
     () => withJaShortWeekDays(locale || pickerLocaleJaJP),
     [locale]
   );
-  const [previewTimeTick, setPreviewTimeTick] = React.useState(0);
+  const [, setPreviewTimeTick] = React.useState(0);
   React.useEffect(() => {
     if (!content || content.type !== MESSAGE_CONTENT_TYPES.CALENDAR) return undefined;
     if (!isCalendarPreviewRelativeOn(content.calendar)) return undefined;
@@ -359,7 +359,7 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
     const cal = content.calendar;
     if (!cal || !isCalendarPreviewRelativeOn(cal)) return null;
     return mergeCalendarForPreviewRelativeRange(cal);
-  }, [content, previewTimeTick]);
+  }, [content]);
 
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.CALENDAR) return null;
 
@@ -457,6 +457,7 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
           } else if (type === "day") {
             return nonSelectWeekdayJst(current) === 0;
           }
+          return undefined;
         })
       );
     }
@@ -572,6 +573,7 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
           } else if (type === "day") {
             return nonSelectWeekdayJst(current) === 0;
           }
+          return undefined;
         })
       );
     }

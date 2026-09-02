@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Form, Input, InputNumber, Modal, Space, message } from 'antd';
 import Cookies from 'js-cookie';
 import api from 'v2/api/api-management';
@@ -29,7 +29,7 @@ function PlanManagement() {
     ) {
       window.location.href = getSignInPath();
     }
-    if (Cookies.get('is_auth') == 'false') {
+    if (Cookies.get('is_auth') === 'false') {
       window.location.href = getSignInPath();
     }
   }, []);
@@ -53,7 +53,7 @@ function PlanManagement() {
     reloadList();
   }, []);
 
-  function openEdit(item) {
+  const openEdit = useCallback((item) => {
     api
       .get(`/api/v1/managements/plans/${item.id}`)
       .then((res) => {
@@ -72,7 +72,7 @@ function PlanManagement() {
           tokenExpired();
         }
       });
-  }
+  }, [form]);
 
   function updatePlan() {
     form.validateFields().then((values) => {
@@ -120,7 +120,7 @@ function PlanManagement() {
         ),
       },
     ],
-    []
+    [openEdit]
   );
 
   return (

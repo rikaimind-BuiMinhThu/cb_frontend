@@ -11,7 +11,6 @@ import {
 import {
   buildEditorCheckboxOptionDataAttr,
   getCheckboxImgSelectionKey,
-  getCheckboxOptionSelectionKey,
   isCheckboxImgContentChecked,
   isCheckboxOptionChecked,
   isEditorCheckboxOptionHighlighted,
@@ -54,7 +53,6 @@ const CheckboxPreview = ({
 
   const renderDefaultType = () => (
     checkbox[checkbox.type].map((item, index) => {
-      const selectionKey = getCheckboxOptionSelectionKey(item);
       const inputId = `ss-checkbox-preview-default-${index}`;
       const isChecked = isCheckboxOptionChecked(checkbox, item);
       return (

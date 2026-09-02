@@ -21,7 +21,6 @@ const ProductPurchaseRadioButtonSetting = (props) => {
   const {
     indexMessageSelect,
     indexContent,
-    content,
     dataMessages,
     setDataMessages,
     onChangeValueMessageContent,

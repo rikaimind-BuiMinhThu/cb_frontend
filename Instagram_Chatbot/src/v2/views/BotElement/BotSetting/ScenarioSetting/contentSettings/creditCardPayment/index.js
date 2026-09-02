@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { Button } from 'reactstrap';
 import SelectCustom from '../../scenarioComon/SelectCustom';
 import CheckboxCustom from '../../scenarioComon/CheckboxCustom';
-import InputNum from '../../scenarioComon/InputNum';
 import InputCustom from '../../scenarioComon/InputCustom';
 import CheckboxGroupCustom from '../../scenarioComon/CheckboxGroupCustom';
 import { dropDownTitle, dataPaymentMethod, dataYearFixed, dataMonthFixed, installmentOptions } from '../../constants/scenarioFormConstants';
@@ -24,7 +23,6 @@ const CreditCardPaymentSetting = (props) => {
   const {
     indexMessageSelect,
     indexContent,
-    content,
     dataMessages,
     setDataMessages,
     onChangeValueMessageContent,

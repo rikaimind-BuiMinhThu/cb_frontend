@@ -16,7 +16,7 @@ const convertTextInputTextObject = (content) => {
     return [];
   }
   const result = [];
-  if (isSplitInput == true) {
+  if (isSplitInput === true) {
     const fukuObjectLeft = {
       type: content.type,
       bindingMode: leftSearchMode,
@@ -234,14 +234,14 @@ const convertSliderObject = (content) => {
 const convertPullDownObject = (content) => {
   const result = [];
   // Handle customization
-  if (content.pull_down?.customization.length != 0) {
+  if (content.pull_down?.customization.length !== 0) {
     const textInDropdown = content.pull_down.customization.value || content.pull_down.initial_selection;
-    if (content.pull_down.customization.is_comment == true) {
+    if (content.pull_down.customization.is_comment === true) {
       // Handle comment case
     }
     else {
       content.pull_down.customization.options_without_comment.forEach((item) => {
-        if (!!textInDropdown && item.value == textInDropdown) {
+        if (!!textInDropdown && item.value === textInDropdown) {
           const fukuObject = {
             type: content.type,
             bindingMode: content.fukushashiki_search_mode,
@@ -255,8 +255,8 @@ const convertPullDownObject = (content) => {
   }
 
   // Handle LP integration option
-  if (content.pull_down?.type == "lp_integration_option") {
-    if (content.pull_down.lp_integration_option.value != "") {
+  if (content.pull_down?.type === "lp_integration_option") {
+    if (content.pull_down.lp_integration_option.value !== "") {
       const fukuObject = {
         type: content.type,
         pulldownType: content.pull_down.type,
@@ -269,8 +269,8 @@ const convertPullDownObject = (content) => {
   }
 
   // Handle from JS result
-  if (content.pull_down?.type == MESSAGE_CONTENT_TYPES.PULLDOWN.FROM_JS) {
-    if (content.pull_down.from_js_result.value?.toString() != "") {
+  if (content.pull_down?.type === MESSAGE_CONTENT_TYPES.PULLDOWN.FROM_JS) {
+    if (content.pull_down.from_js_result.value?.toString() !== "") {
       const fukuObject = {
         type: content.type,
         pulldownType: content.pull_down.type,
@@ -325,7 +325,7 @@ const convertPullDownObject = (content) => {
 
 const convertTextareaObject = (content) => {
   const result = [];
-  if (content.textarea.text_input.value != undefined) {
+  if (content.textarea.text_input.value !== undefined) {
     const fukuObject = {
       type: content.type,
       bindingMode: content.fukushashiki_search_mode,
@@ -391,10 +391,10 @@ const convertShippingAddressObject = (content) => {
     .map(type => {
       const bindingMode = dataInforFukushashiki[`${type}_fukushashiki_search_mode`];
       const bindingValue = dataInforFukushashiki[`${type}_fukushashiki_search_value`];
-      if (bindingMode === undefined || bindingValue == undefined || bindingValue.length == 0) {
+      if (bindingMode === undefined || bindingValue === undefined || bindingValue.length === 0) {
         return null;
       }
-      if (type == "initial_selection") {
+      if (type === "initial_selection") {
         const objA = {
           type: "initial_selection",
           bindingMode,
@@ -403,7 +403,7 @@ const convertShippingAddressObject = (content) => {
         };
         result.push(objA)
       }
-      if (type == "address") {
+      if (type === "address") {
         const objA = {
           type: "zip_code_address",
           bindingMode,
@@ -500,12 +500,12 @@ const convertCardPaymentObject = (content) => {
         bindingValue: userInputData[`${type}`]
       }
 
-      if (!fukuData.bindingMode || !fukuData.bindingValue || !fukuData.bindingAddress) return;
+      if (!fukuData.bindingMode || !fukuData.bindingValue || !fukuData.bindingAddress) return undefined;
 
-      if (type == "initial_selection") {
+      if (type === "initial_selection") {
         return { type: "payment_method_id", ...fukuData }
       }
-      if (type == "card_number") {
+      if (type === "card_number") {
         return { type: "card_number", ...fukuData };
       }
       return { type: content.type, ...fukuData };

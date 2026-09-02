@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import InputCustom from '../ScenarioSetting/scenarioComon/InputCustom'
-import { Card, CardHeader, CardBody, CardTitle, Table, Row, Col } from 'reactstrap';
+import { Card, CardHeader, CardBody, Row, Col } from 'reactstrap';
 import './test-payment.js';
 function Payment() {
 
     const [yearExpired, setYearExpired] = useState([]);
-    const [monthExpired, setMonthExpired] = useState([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+    const [monthExpired] = useState([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
     useEffect(() => {
         var date = (new Date()).getFullYear();
         var year = []
@@ -22,9 +22,6 @@ function Payment() {
         document.body.appendChild(script);
     }, [])
 
-    function scriptLoaded() {
-        doPurchase()
-    }
     function doPurchase() {
         // var cardno, expire, securitycode, holdername;
 
@@ -33,9 +30,8 @@ function Payment() {
         var expireMonth = document.getElementById("monthEx").value;
         var securitycode = document.getElementById("securityCode").value;
         var cardHolder = document.getElementById("cardHolder").value;
-        var tokennumber = 1;
 
-        if (cardNumber == '' || expireYear == '' || expireMonth == '' || securitycode == '' || cardHolder == '') {
+        if (cardNumber === '' || expireYear === '' || expireMonth === '' || securitycode === '' || cardHolder === '') {
             document.getElementById('purchaseErr').style.display = 'block'
         } else {
             if(parseInt(expireMonth) <10 ){
@@ -54,11 +50,9 @@ function Payment() {
                 expire: `${'2019'}${expireMonth}`,                     // expiry in format 'YYYYMM'
                 securitycode: securitycode
             }, res => {
-                if (res.resultCode != '000') {
+                if (res.resultCode !== '000') {
                     // show error message
                     console.log('error code ' + res.resultCode);
-                } else {
-                    let token = res.tokenObject.token;
                 }
             });
 

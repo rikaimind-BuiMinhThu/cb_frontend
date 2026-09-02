@@ -113,7 +113,7 @@ const PreviewFukushashiki = () => {
   useEffect(() => { 
     if (!state.isUseBtnUpdateTracking) return;
     msgUpdateStateRef.current = msgUpdateState; 
-  }, [msgUpdateState]);
+  }, [msgUpdateState, state.isUseBtnUpdateTracking]);
 
   // Initialize conversion status when chatbot opens
   useEffect(() => {
@@ -298,6 +298,7 @@ const PreviewFukushashiki = () => {
     if (!hasSentInitialOpenStateToParent.current) return;
     if (!state.urlReceive) return;
     postMessageToParent({ isOpen: state.isOpen }, state);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- avoid re-running preview bootstrap on every state change
   }, [
     state.urlReceive,
     state.isOpen,
@@ -332,6 +333,7 @@ const PreviewFukushashiki = () => {
     if (!state.isUsedErrMsgByJs) return;
     const jsCode = resolveErrMsgLpScript(state);
     if (jsCode) executeLpJsCode(jsCode, state);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- avoid re-running preview bootstrap on every state change
   }, [
     state.isUsedErrMsgByJs,
     state.errMsgJsCode,
@@ -346,6 +348,7 @@ const PreviewFukushashiki = () => {
     if (!state.launchButtonSelectors) return;
     const jsCode = generateLaunchButtonLpScript(state.launchButtonSelectors);
     if (jsCode) executeLpJsCode(jsCode, state);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- avoid re-running preview bootstrap on every state change
   }, [state.launchButtonSelectors]);
 
   // Fukushashiki session restore (upsell, LP sync, timer) — not covered by shared bootstrap hook
@@ -406,6 +409,7 @@ const PreviewFukushashiki = () => {
         }
       });
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- avoid re-running preview bootstrap on every state change
   }, [useSharedBootstrap, state.loadedStateFromSession]);
 
   useEffect(() => {
@@ -456,7 +460,7 @@ const PreviewFukushashiki = () => {
     // Send data to count open chatbot window
     const prevOpenStatus = getPrevOpenStatus();
 
-    if (prevOpenStatus == "0" && opening) {
+    if (prevOpenStatus === "0" && opening) {
       savePrevOpenStatus("1");
       sendOpenChatbotCountRequest(state.scenarioId, deviceReceive);
     }
@@ -558,7 +562,7 @@ const PreviewFukushashiki = () => {
 
     const prevOpenStatus = getPrevOpenStatus();
 
-    if (parsedDesign.displayType == DISPLAY_TYPES.RELOAD && prevOpenStatus == "0") {
+    if (parsedDesign.displayType === DISPLAY_TYPES.RELOAD && prevOpenStatus === "0") {
       savePrevOpenStatus("1");
       sendOpenChatbotCountRequest(state.scenarioId, state.deviceReceive);
     }
@@ -804,7 +808,7 @@ const PreviewFukushashiki = () => {
   const renderNextButton = (message, messageIndex) => {
     const isUpdate = messageIndex >= state.renderMessagesList.length - 1;
     const firstMsgContent = message?.message_content?.[0];
-    const isDisplayBtnNext = (firstMsgContent?.type != "image" && !message.not_use_button) || (firstMsgContent?.type == "image" && firstMsgContent?.image?.displayButtonNext != false);
+    const isDisplayBtnNext = (firstMsgContent?.type !== "image" && !message.not_use_button) || (firstMsgContent?.type === "image" && firstMsgContent?.image?.displayButtonNext !== false);
     const isAutoClick = !isDisplayBtnNext && isUpdate;
 
     if (!message || message.belong_to !== "user") return null;

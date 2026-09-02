@@ -28,10 +28,6 @@ const { Option } = Select;
 
 const CalendarCommonSections = (props) => {
   const {
-    indexMessageSelect,
-    indexContent,
-    content,
-    dataMessages,
     dataInputVar,
     setIsOpenAddVariable,
   } = props;
@@ -39,7 +35,6 @@ const CalendarCommonSections = (props) => {
   const {
     calendar,
     changeCalendar,
-    changeMessageField,
     handleInitialSelectionChange,
     onChangeFixedDate,
   } = buildCalendarSettingContext(props);

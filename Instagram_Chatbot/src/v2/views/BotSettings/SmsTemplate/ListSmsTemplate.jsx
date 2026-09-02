@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Button, message, Space } from 'antd';
+import { message, Space } from 'antd';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import api from 'v2/api/api-management';
 import CreateSmsTemplateDialog from './CreateSmsTemplateDialog';

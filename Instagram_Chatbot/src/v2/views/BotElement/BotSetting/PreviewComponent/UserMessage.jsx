@@ -236,6 +236,7 @@ const UserMessage = ({
         });
       }
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- init-once; prop callback identity is unstable
   }, []);
 
   useEffect(() => {
@@ -245,6 +246,7 @@ const UserMessage = ({
     if (messageContent[0].type !== MESSAGE_CONTENT_TYPES.IMAGE) return;
     
     onRenderCompleted();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- init-once; prop callback identity is unstable
   }, []);
 
   if (!isUserMessage(message)) return null;
@@ -487,7 +489,7 @@ const UserMessage = ({
         let productPurchaseRadioButton = content.product_purchase_radio_button;
         let slider = content.slider;
 
-        if (content.type == 'textarea' && content.textarea && content.textarea.invalid_input && content.textarea.invalid_input.content) {
+        if (content.type === 'textarea' && content.textarea && content.textarea.invalid_input && content.textarea.invalid_input.content) {
           content.textarea.invalid_input.content = replaceVariable(content.textarea.invalid_input.content);
         }
 
@@ -538,6 +540,7 @@ const UserMessage = ({
                                 <div className="sp-carousel-preview-img">
                                   <img
                                     src={itemCarousel.fileUrl}
+                                    alt={itemCarousel.title || ""}
                                     style={{ width: "100%" }}
                                   />
                                 </div>
@@ -560,7 +563,7 @@ const UserMessage = ({
                                       : {}
                                 }
                                 onClick={() => {
-                                  if (carousel.is_use_js == true && carousel.jscode?.length > 0) {
+                                  if (carousel.is_use_js === true && carousel.jscode?.length > 0) {
                                     postMessageToParent({
                                       action: CHATBOT_ACTIONS.EXCUTE_JS,
                                       actionData: carousel.jscode,
@@ -722,7 +725,7 @@ const UserMessage = ({
                                   >
                                     <div className="ss-user-overview-product-purchase-container">
                                       <div className="ss-user-preivew-product-purchase-img">
-                                        <img src={itemProduct.img_url} />
+                                        <img src={itemProduct.img_url} alt={itemProduct.title || ""} />
                                       </div>
                                       {(productPurchase.product_name_display ||
                                         productPurchase.price_display ||
@@ -974,7 +977,7 @@ const UserMessage = ({
                                   >
                                     <div className="ss-user-overview-product-purchase-container">
                                       <div className="ss-user-preivew-product-purchase-img">
-                                        <img src={itemProduct.img_url} />
+                                        <img src={itemProduct.img_url} alt={itemProduct.title || ""} />
                                       </div>
                                       {(productPurchase.product_name_display ||
                                         productPurchase.price_display ||
@@ -1230,7 +1233,7 @@ const UserMessage = ({
                                   >
                                     <div className="ss-user-overview-product-purchase-container-type-text_image">
                                       <div className="ss-user-overview-product-purchase-img-type-text_image">
-                                        <img src={itemProduct.img_url} />
+                                        <img src={itemProduct.img_url} alt={itemProduct.title || ""} />
                                       </div>
                                       {(productPurchase.product_name_display ||
                                         productPurchase.price_display ||
@@ -1465,7 +1468,7 @@ const UserMessage = ({
                                   >
                                     <div className="ss-user-overview-product-purchase-container-type-text_image">
                                       <div className="ss-user-overview-product-purchase-img-type-text_image">
-                                        <img src={itemProduct.img_url} />
+                                        <img src={itemProduct.img_url} alt={itemProduct.title || ""} />
                                       </div>
                                       {(productPurchase.product_name_display ||
                                         productPurchase.price_display ||
@@ -1716,7 +1719,7 @@ const UserMessage = ({
                                 >
                                   <div className="ss-user-overview-product-purchase-container">
                                     <div className="ss-user-preivew-product-purchase-img">
-                                      <img src={itemProduct.img_url} />
+                                      <img src={itemProduct.img_url} alt={itemProduct.title || ""} />
                                     </div>
                                     {(productPurchaseRadioButton.product_name_display ||
                                       productPurchaseRadioButton.price_display ||
@@ -1787,7 +1790,7 @@ const UserMessage = ({
                               >
                                 <div className="ss-user-overview-product-purchase-container-type-text_image">
                                   <div className="ss-user-overview-product-purchase-img-type-text_image">
-                                    <img src={itemProduct.img_url} />
+                                    <img src={itemProduct.img_url} alt={itemProduct.title || ""} />
                                   </div>
                                   {(productPurchaseRadioButton.product_name_display ||
                                     productPurchaseRadioButton.price_display ||

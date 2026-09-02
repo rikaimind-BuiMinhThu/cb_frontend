@@ -6,12 +6,7 @@ import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
 
 function AccountInformation() {
-  const [userIdEC, setUserIdEC] = useState();
   const [userDetail, setUserDetail] = useState({});
-
-  useEffect(() => {
-    setUserIdEC(Cookies.get('user_id'));
-  }, []);
 
   useEffect(() => {
     api

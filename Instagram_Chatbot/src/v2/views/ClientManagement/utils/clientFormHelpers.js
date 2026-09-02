@@ -62,7 +62,7 @@ export function validatePrice(value) {
 }
 
 export function validatePhoneNumber(value) {
-  const phoneRe = /^[+]*[(]{0,1}[0-9]{1,3}[)]{0,1}[-\s\./0-9]*$/g;
+  const phoneRe = /^[+]*[(]{0,1}[0-9]{1,3}[)]{0,1}[-\s./0-9]*$/g;
   if (value === '' || value == null) {
     return '電話番号は、必ず指定してください。';
   }

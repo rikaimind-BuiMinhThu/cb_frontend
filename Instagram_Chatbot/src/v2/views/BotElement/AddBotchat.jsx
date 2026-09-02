@@ -112,8 +112,6 @@ function AddBotchat() {
     }
   };
 
-  const [defaultIcon, setDefaultIcon] = useState('')
-
   const toDataURL = url => fetch(url)
     .then(response => response.blob())
     .then(blob => new Promise((resolve, reject) => {

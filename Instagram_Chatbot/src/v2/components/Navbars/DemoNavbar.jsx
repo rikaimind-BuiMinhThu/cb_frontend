@@ -17,7 +17,7 @@
 
 */
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import {
   Collapse,
   Navbar,
@@ -25,27 +25,15 @@ import {
   NavbarBrand,
   Nav,
   NavItem,
-  Dropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
   Container,
-  InputGroup,
-  InputGroupText,
-  InputGroupAddon,
-  Input,
   Button,
 } from "reactstrap";
 import Cookies from 'js-cookie'
 import routes from "routes.js";
-import { useCookies } from "react-cookie";
 import { getSignInPath } from 'v2/variables/constants';
-var Cookiess = require('js-cookie-remove-all');
 
 function Header(props) {
-  const [cookie, setCookie, removeCookie] = useCookies(['token']);
   const [isOpen, setIsOpen] = React.useState(false);
-  const [dropdownOpen, setDropdownOpen] = React.useState(false);
   const [color, setColor] = React.useState("transparent");
   const sidebarToggle = React.useRef();
   const location = useLocation();
@@ -57,9 +45,6 @@ function Header(props) {
       setColor("dark");
     }
     setIsOpen(!isOpen);
-  };
-  const dropdownToggle = (e) => {
-    setDropdownOpen(!dropdownOpen);
   };
   const getBrand = () => {
     let brandName = "Default Brand";

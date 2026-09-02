@@ -1,12 +1,10 @@
-import React, { useState } from 'react'
-import { Card, CardHeader, CardBody, Row, Col } from "reactstrap";
+import React from 'react'
+import { Row, Col } from "reactstrap";
 // import workingtable from "../views/Popup/workingtable.jpg"
 // import registration from "../views/Popup/registration.jpeg"
 // import chatbot from "../views/Popup/chatbot.png"
-import { Button } from 'react-bootstrap';
 
 function Template() {
-    var tag = ["ab", "cd", "ef", "gh", "ik"]
     return (
         <>
             <div className="content">

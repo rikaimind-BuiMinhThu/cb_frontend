@@ -2,23 +2,15 @@ import React from 'react';
 import { MDBIcon } from 'mdbreact';
 import SelectCustom from '../../scenarioComon/SelectCustom';
 import CheckboxCustom from '../../scenarioComon/CheckboxCustom';
-import InputNum from '../../scenarioComon/InputNum';
 import InputDouble from '../../scenarioComon/InputDouble';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import InputCustom from '../../scenarioComon/InputCustom';
 import CheckboxGroupCustom from '../../scenarioComon/CheckboxGroupCustom';
 import { Tooltip } from '@mui/material';
 import { PAYMENT_OPTION_IMAGE_FIELDS } from '../../constants/paymentStyleConstants';
-import FukushashikiSearchRow from '../shared/FukushashikiSearchRow';
 import {
   dataPaymentMethod, dataYearFixed, dataMonthFixed, installmentOptions,
 } from '../../constants/scenarioFormConstants';
-import {
-  CARD_PAYMENT_RADIO_SETTING_LABELS,
-  CREDIT_CARD_EXPIRY_TYPE_OPTIONS,
-  CREDIT_CARD_SETTING_LABELS,
-  FUKUSHASHIKI_VARIANTS,
-} from '../../constants/scenarioSettingLabels';
 import { buildCardPaymentRadioContext } from './cardPaymentRadioButtonContext';
 import '../../styles/contentSettings/cardPaymentRadioButton.css';
 
@@ -33,9 +25,6 @@ const DefaultTypeSetting = (props) => {
     isUseFukushashiki,
     renderPaymentMethodDescriptionInput,
     handleDragEndRadioCheckbox,
-    setIsOpenFileReference,
-    setVarFileReference,
-    setAcceptFile,
   } = props;
   const { cardPaymentRadioButton } = buildCardPaymentRadioContext(props);
 

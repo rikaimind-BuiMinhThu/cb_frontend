@@ -1,7 +1,6 @@
 import React from 'react';
 import { Button } from 'reactstrap';
 import ContentSettingShell from './shared/ContentSettingShell';
-import { ContentTitleInput } from './shared/ContentTypeSelector';
 import { SETTING_BUTTON_LABELS } from '../constants/scenarioSettingLabels';
 import '../styles/contentSettings/image.css';
 

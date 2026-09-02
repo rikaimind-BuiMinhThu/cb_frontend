@@ -52,10 +52,10 @@ function ListEmail() {
       .post(`/api/v1/managements/emails/${idEmail}/duplicate`)
       .then((res) => {
         setIsOpenDuplicate(false);
-        if (res.data.code == 1) {
+        if (res.data.code === 1) {
           message.success('正常に複製されました！');
           fetchEmails(page);
-        } else if (res.data.code == 2) {
+        } else if (res.data.code === 2) {
           message.warning(res.data.message);
         }
       })
@@ -69,10 +69,10 @@ function ListEmail() {
       .delete(`/api/v1/managements/emails/${idEmail}`)
       .then((res) => {
         setIsOpenDelete(false);
-        if (res.data.code == 1) {
+        if (res.data.code === 1) {
           message.success('正常に削除されました！');
           fetchEmails(page);
-        } else if (res.data.code == 2) {
+        } else if (res.data.code === 2) {
           message.warning(res.data.message);
         }
       })

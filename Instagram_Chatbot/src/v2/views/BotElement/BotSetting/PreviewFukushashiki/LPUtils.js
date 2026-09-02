@@ -7,7 +7,7 @@ import { isPhystechLpAmazonData, isPhystechLP } from "../PreviewComponent/PhysTe
 import { isRoseMayLpAmazonData, isRoseMayLP } from "../PreviewComponent/RoseMayUtils";
 import { isYuwaeruLpAmazonData, isYuwaeruLP } from "../PreviewComponent/YuwaeruUtils";
 import { convertToFukushashikiObject } from "./FukushashikiDataConverterUtils";
-import { isUserMessage, sendOpenChatbotCountRequest } from "../PreviewComponent/Utils";
+import { isUserMessage } from "../PreviewComponent/Utils";
 
 const postMessageToParent = (options, state) => {
   if (!window || !window.parent) return;

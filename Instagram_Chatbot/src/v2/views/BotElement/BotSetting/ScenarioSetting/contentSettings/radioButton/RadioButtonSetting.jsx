@@ -14,7 +14,6 @@ const RadioButtonSetting = (props) => {
   const {
     indexMessageSelect,
     indexContent,
-    content,
     radioButton,
     dataMessages,
     setDataMessages,

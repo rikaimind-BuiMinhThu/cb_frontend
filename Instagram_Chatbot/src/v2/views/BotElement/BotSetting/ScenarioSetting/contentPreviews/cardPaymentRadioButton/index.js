@@ -75,7 +75,7 @@ const RadioOptions = ({ data }) => (
                 key={indexContent}
                 className="ss-content-preview__picture-radio-item"
               >
-                <img src={itemPaymentContent.file_url}></img>
+                <img src={itemPaymentContent.file_url} alt={itemPaymentContent.text || ""}></img>
                 <div className="ss-content-preview__picture-radio-caption">
                   {itemPaymentContent.text}
                 </div>

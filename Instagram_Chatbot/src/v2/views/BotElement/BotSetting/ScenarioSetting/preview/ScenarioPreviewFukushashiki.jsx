@@ -162,7 +162,7 @@ const ScenarioPreviewFukushashiki = ({
   useEffect(() => { 
     if (!state.isUseBtnUpdateTracking) return;
     msgUpdateStateRef.current = msgUpdateState; 
-  }, [msgUpdateState]);
+  }, [msgUpdateState, state.isUseBtnUpdateTracking]);
 
   // Initialize conversion status when chatbot opens
   useEffect(() => {
@@ -372,6 +372,7 @@ const ScenarioPreviewFukushashiki = ({
       chatbotBottom: state.bottomMarginPc,
     };
     postMessageToParent(options, state);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- avoid re-running preview bootstrap on every state change
   }, [
     editorPreview,
     state.urlReceive,
@@ -402,6 +403,7 @@ const ScenarioPreviewFukushashiki = ({
     const jsCode = resolveErrMsgLpScript(state);
     if (jsCode) executeLpJsCode(jsCode, state);
     return undefined;
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- avoid re-running preview bootstrap on every state change
   }, [
     editorPreview,
     state.isUsedErrMsgByJs,
@@ -419,6 +421,7 @@ const ScenarioPreviewFukushashiki = ({
     const jsCode = generateLaunchButtonLpScript(state.launchButtonSelectors);
     if (jsCode) executeLpJsCode(jsCode, state);
     return undefined;
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- avoid re-running preview bootstrap on every state change
   }, [editorPreview, state.launchButtonSelectors]);
 
   usePreviewCustomJs({ state, hasSentCustomJs, enabled: !editorPreview });
@@ -484,6 +487,7 @@ const ScenarioPreviewFukushashiki = ({
 
     return getScenarioPreviewData(state.botId, state.scenarioId)
       .then(extractStateFromPreviewResponse);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- avoid re-running preview bootstrap on every state change
   }, [editorPreview, state.botId, state.scenarioId, state.loadedStateFromSession]);
 
   // Fukushashiki session restore (upsell, LP sync, timer) — not covered by shared bootstrap hook
@@ -544,6 +548,7 @@ const ScenarioPreviewFukushashiki = ({
         }
       });
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- avoid re-running preview bootstrap on every state change
   }, [editorPreview, useSharedBootstrap, state.loadedStateFromSession]);
 
   usePreviewScenarioBootstrap({
@@ -627,7 +632,7 @@ const ScenarioPreviewFukushashiki = ({
     // Send data to count open chatbot window
     const prevOpenStatus = getPrevOpenStatus();
 
-    if (prevOpenStatus == "0" && opening) {
+    if (prevOpenStatus === "0" && opening) {
       savePrevOpenStatus("1");
       sendOpenChatbotCountRequest(state.scenarioId, deviceReceive);
     }
@@ -691,7 +696,7 @@ const ScenarioPreviewFukushashiki = ({
       objParam: {},
       loadedStateFromSession: true,
       messagesList: _.cloneDeep(conversation?.messages || []),
-      isOpen: embedded || editorPreview ? true : (designSetting?.display_type && Number(designSetting?.display_type) === 1 || state.isOpen),
+      isOpen: (embedded || editorPreview) ? true : ((designSetting?.display_type && Number(designSetting?.display_type) === 1) || state.isOpen),
       ...mapRawDesignSettingsFromExtract(designSetting),
       isUsedErrMsgByJs: chatbot?.is_used_err_msg_by_js,
       errMsgJsCode: chatbot?.err_msg_js_code,
@@ -722,7 +727,7 @@ const ScenarioPreviewFukushashiki = ({
     if (!editorPreview) {
       const prevOpenStatus = getPrevOpenStatus();
 
-      if (designSetting.display_type == DISPLAY_TYPES.RELOAD && prevOpenStatus == "0") {
+      if (designSetting.display_type === DISPLAY_TYPES.RELOAD && prevOpenStatus === "0") {
         savePrevOpenStatus("1");
         sendOpenChatbotCountRequest(state.scenarioId, state.deviceReceive);
       }
@@ -961,7 +966,7 @@ const ScenarioPreviewFukushashiki = ({
   const renderNextButton = (message, messageIndex) => {
     const isUpdate = messageIndex >= state.renderMessagesList.length - 1;
     const firstMsgContent = message?.message_content?.[0];
-    const isDisplayBtnNext = (firstMsgContent?.type != "image" && !message.not_use_button) || (firstMsgContent?.type == "image" && firstMsgContent?.image?.displayButtonNext != false);
+    const isDisplayBtnNext = (firstMsgContent?.type !== "image" && !message.not_use_button) || (firstMsgContent?.type === "image" && firstMsgContent?.image?.displayButtonNext !== false);
     const isAutoClick = !isDisplayBtnNext && isUpdate;
 
     if (!message || message.belong_to !== "user") return null;

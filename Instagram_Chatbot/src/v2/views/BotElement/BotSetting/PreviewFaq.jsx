@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useReducer } from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
-import Cookies from "js-cookie";
 import CustomButton from "./CustomButton";
 import {
   UserMessage,
@@ -170,7 +169,7 @@ const PreviewFaq = () => {
     // Send data to count open chatbot window
     const prevOpenStatus = getPrevOpenStatus();
 
-    if (prevOpenStatus == "0" && opening) {
+    if (prevOpenStatus === "0" && opening) {
       savePrevOpenStatus("1");
       sendOpenChatbotCountRequest(state.scenarioId, deviceReceive);
     }
@@ -236,7 +235,7 @@ const PreviewFaq = () => {
 
     const prevOpenStatus = getPrevOpenStatus();
 
-    if (parsedDesign.displayType == 1 && prevOpenStatus == "0") {
+    if (parsedDesign.displayType === 1 && prevOpenStatus === "0") {
       savePrevOpenStatus("1");
       sendOpenChatbotCountRequest(state.scenarioId, state.deviceReceive);
     }
@@ -422,7 +421,7 @@ const PreviewFaq = () => {
   const renderNextButton = (message, messageIndex) => {
     const isUpdate = messageIndex >= state.renderMessagesList.length - 1;
     const firstMsgContent = message?.message_content?.[0];
-    const isDisplayBtnNext = firstMsgContent?.type != "image" || firstMsgContent?.image?.displayButtonNext != false;
+    const isDisplayBtnNext = firstMsgContent?.type !== "image" || firstMsgContent?.image?.displayButtonNext !== false;
     const isAutoClick = !isDisplayBtnNext && isUpdate;
 
     if (!message || message.belong_to !== "user") return null;

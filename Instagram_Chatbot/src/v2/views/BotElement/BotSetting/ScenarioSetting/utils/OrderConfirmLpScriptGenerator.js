@@ -258,8 +258,6 @@ export function normalizeOrderConfirmConfig(config = {}) {
     lp_preset: ORDER_CONFIRM_LP_PRESET.ECFORCE,
     preview_root_selector: ecforcePreset.preview_root_selector,
     selectors: JSON.parse(JSON.stringify(ecforcePreset.selectors)),
-    labels: { ...DEFAULT_LABELS },
-    retry: { maxRetry: 20, delay: 500 },
     error_message: '入力エラーが発生しています。修正の上、再度お試しください。',
     scroll_auto: false,
     ...config,

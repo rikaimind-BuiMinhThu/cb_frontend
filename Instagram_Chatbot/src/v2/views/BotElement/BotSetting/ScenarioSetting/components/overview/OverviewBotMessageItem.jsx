@@ -1,28 +1,10 @@
 import React from 'react';
-import { Button } from 'reactstrap';
 import icon from '../../../../../../assets/img/bot-icon/man1_new.png';
-import { MDBIcon } from 'mdbreact';
-import SelectCustom from '../../scenarioComon/SelectCustom';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import moment from 'moment';
-import { Carousel, Checkbox, Radio, Slider, Calendar, Select } from 'antd';
-import shopifIcon from '../../../../../../assets/img/shopify-icon.png';
-import locale from 'antd/es/date-picker/locale/ja_JP';
+import { Draggable } from 'react-beautiful-dnd';
 import { BOT_MESSAGE_TYPES } from '../../../PreviewComponent/Constants';
 import { DEFAULT_AMAZON_PAY_BUTTON_IMAGE_URL } from '../../../../../../variables/amazonPayConstants';
 import { buildOrderConfirmPreviewHtml } from '../../utils/OrderConfirmLpScriptGenerator';
 import { buildCartLoginStyle, normalizeCartLoginConfig } from '../../utils/cartLoginUtils';
-import { PREVIEW_MAP } from '../../contentPreviews';
-import {
-  getCalendarPreviewRelativeRangeLabel,
-  isCalendarPreviewRelativeRangeEnabled,
-  isCalendarPreviewDaysSplitEnabled,
-  deliveryCutOffTimeSelectValue,
-  handleDisableDateCalendar,
-  handleDisableEndDateCalendar,
-  mergePreviewRelativeCalendar,
-} from '../../utils/scenarioCalendarUtils';
-import { settingsCarousel } from '../scenarioCarouselSettings';
 
 import OverviewMessageActions from './OverviewMessageActions';
 import OverviewAddStatementMenu from './OverviewAddStatementMenu';

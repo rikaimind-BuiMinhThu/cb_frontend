@@ -20,6 +20,7 @@ const CombineBotBlock = ({
   const { bgColor: botMessageBgColor, textColor: botMessageTextColor, fontSize: botMessageFontSize } =
     resolveBotMessageTheme(themeSettings, botInfor);
   const [text, setText] = useState('');
+  const originalContent = content?.[content?.type]?.originalContent;
 
   useEffect(() => {
     if (!content) return;
@@ -33,7 +34,7 @@ const CombineBotBlock = ({
       return;
     }
 
-    if (!content[content.type]?.originalContent) return;
+    if (!originalContent) return;
     if (![BOT_MESSAGE_TYPES.TEXT_INPUT, BOT_MESSAGE_TYPES.GETTING_ERROR_NOTIFICATION].includes(content.type)) return;
 
     if (content.text_input?.use_for_confirm_message && previewOrderContent && isBotOpen) {
@@ -41,8 +42,8 @@ const CombineBotBlock = ({
       return;
     }
 
-    setText(replaceVariables(content[content.type]?.originalContent || '', variables));
-  }, [content, content?.[content?.type]?.originalContent, variables, previewOrderContent, isBotOpen]);
+    setText(replaceVariables(originalContent || '', variables));
+  }, [content, originalContent, variables, previewOrderContent, isBotOpen]);
 
   useEffect(() => {
     if (content.type === BOT_MESSAGE_TYPES.ORDER_CONFIRM && content.order_confirm && isBotOpen) {

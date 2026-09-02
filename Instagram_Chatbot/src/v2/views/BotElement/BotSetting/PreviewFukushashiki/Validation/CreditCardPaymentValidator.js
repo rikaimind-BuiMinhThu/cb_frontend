@@ -48,7 +48,7 @@ const validateCardNumber = (contentType) => {
   const { card_number, card_number1, card_number2, card_number3, card_number4, separate_type } = contentType;
 
   const len = (card_number + "").length;
-  if (card_number && (len !== 15 && len !== 16 || /[^0-9]+/.test(card_number))) {
+  if (card_number && ((len !== 15 && len !== 16) || /[^0-9]+/.test(card_number))) {
     return false;
   }
 

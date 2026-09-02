@@ -51,6 +51,7 @@ const PreventExitChatbotModal = ({ isOpen, onClose, onCloseBot, botConfig }) => 
       >
         <img
           src={preventionImageUrl}
+          alt=""
           style={{ width: "100%", height: "auto" }}
         />
       </a>

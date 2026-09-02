@@ -22,6 +22,7 @@ export const evaluateAmazonStrategy = (strategy) => {
     const code = strategy.code;
     if (!code) return false;
     try {
+      // eslint-disable-next-line no-new-func -- intentional LP custom JS evaluation
       const func = new Function(code);
       const result = func();
       return !!result;

@@ -87,6 +87,9 @@ export default function SavePushMessageDialog({
     "exclude_end_time",
     "exclude_push_time",
   ]);
+  const excludeFrom = watchExculdeTime[0];
+  const excludeTo = watchExculdeTime[1];
+  const excludePushTime = watchExculdeTime[2];
 
   const onSubmit = async (data) => {
     const push_message = {
@@ -137,7 +140,7 @@ export default function SavePushMessageDialog({
       .get(`/api/v1/managements/emails?page=all&chatbot_id=${botId}`)
       .then((res) => {
         if (cancelled) return;
-        if (res.data.code == 1) {
+        if (res.data.code === 1) {
           const options = res.data?.data?.map((each) => ({
             value: each.id,
             label: each.email_template_name,
@@ -157,7 +160,8 @@ export default function SavePushMessageDialog({
     return () => {
       cancelled = true;
     };
-  }, [botId]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- adding item may reset form on parent rerender
+  }, [botId, setValue]);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -165,7 +169,7 @@ export default function SavePushMessageDialog({
       .get(`/api/v1/managements/sms_templates?page=all&chatbot_id=${botId}`)
       .then((res) => {
         if (cancelled) return;
-        if (res.data.code == 1) {
+        if (res.data.code === 1) {
           const options = res.data?.data?.map((each) => ({
             value: each.id,
             label: each.name,
@@ -189,7 +193,7 @@ export default function SavePushMessageDialog({
       return;
     }
 
-    const [from, to, pushTime] = watchExculdeTime;
+    const [from, to, pushTime] = [excludeFrom, excludeTo, excludePushTime];
     const hours = [...Array(24).keys()];
 
     if (from < to) {
@@ -218,9 +222,12 @@ export default function SavePushMessageDialog({
     clearErrors("exclude_push_time");
   }, [
     watchIsExcludeTime,
-    watchExculdeTime[0],
-    watchExculdeTime[1],
-    watchExculdeTime[2],
+    excludeFrom,
+    excludeTo,
+    excludePushTime,
+    watchExculdeTime,
+    clearErrors,
+    setError,
   ]);
 
   React.useEffect(() => {
@@ -264,6 +271,7 @@ export default function SavePushMessageDialog({
         })
       );
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- hydrate from item.push_message_variables; full item identity is unstable
   }, [item?.push_message_variables]);
 
   return (

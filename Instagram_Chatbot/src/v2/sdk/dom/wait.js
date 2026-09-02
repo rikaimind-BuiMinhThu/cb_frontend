@@ -29,7 +29,7 @@ export const waitForElement = (mode, address, options = { type: 'WAIT_FOR_LOADIN
           ? options.value
           : removeLeadingZero(options.value);
 
-        if (isNullOption || (element.value != options.value && element.value != altBinding && element.value != yearsValue)) {
+        if (isNullOption || (element.value !== options.value && element.value !== altBinding && element.value !== yearsValue)) {
           setValueToElement(element, options.value, options.disableRemoveLeadingZero);
           break;
         }

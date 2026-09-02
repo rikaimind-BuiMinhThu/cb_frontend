@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Button, message, Space, Tag } from 'antd';
 import { Link } from 'react-router-dom';
 import Cookies from 'js-cookie';
@@ -30,18 +30,18 @@ function BotManagement() {
 
   useEffect(() => {
     if (
-      Cookies.get('token') == undefined ||
-      Cookies.get('token') == null ||
-      Cookies.get('token') == ''
+      Cookies.get('token') === undefined ||
+      Cookies.get('token') === null ||
+      Cookies.get('token') === ''
     ) {
       window.location.href = getSignInPath();
     }
-    if (Cookies.get('is_auth') == 'false') {
+    if (Cookies.get('is_auth') === 'false') {
       window.location.href = getSignInPath();
     }
   }, []);
 
-  const fetchList = (pgIndex, status = isActiveSearch, name = search) => {
+  const fetchList = useCallback((pgIndex, status = isActiveSearch, name = search) => {
     setLoading(true);
     api
       .get(`/api/v1/managements/chatbots?page=${pgIndex}&name=${name}&status=${status}`)
@@ -56,11 +56,11 @@ function BotManagement() {
         }
       })
       .finally(() => setLoading(false));
-  };
+  }, [isActiveSearch, search]);
 
   useEffect(() => {
     fetchList(1);
-  }, []);
+  }, [fetchList]);
 
   function handleSearch() {
     setPage(1);
@@ -78,10 +78,10 @@ function BotManagement() {
     api
       .post(`/api/v1/managements/chatbots/${id}/duplicate`)
       .then((res) => {
-        if (res.data.code == 1) {
+        if (res.data.code === 1) {
           message.success('正常に複製されました！');
           fetchList(page);
-        } else if (res.data.code == 2) {
+        } else if (res.data.code === 2) {
           message.warning(res.data?.message);
         }
       })

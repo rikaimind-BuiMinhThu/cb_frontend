@@ -48,7 +48,7 @@ function NpDeferredSection({
                     id="not_included"
                     value="not_included"
                     defaultChecked={
-                      payment.np_invoice_included == 'not_include' ||
+                      payment.np_invoice_included === 'not_include' ||
                       payment.np_invoice_included == null
                     }
                   />
@@ -60,7 +60,7 @@ function NpDeferredSection({
                     name="invoice_included"
                     id="enclosed"
                     value="enclosed"
-                    defaultChecked={payment.np_invoice_included == 'enclosed'}
+                    defaultChecked={payment.np_invoice_included === 'enclosed'}
                   />
                   同梱する（NP後払いwiz）
                 </label>

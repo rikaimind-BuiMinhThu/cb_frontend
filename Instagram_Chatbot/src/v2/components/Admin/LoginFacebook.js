@@ -1,32 +1,28 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import FacebookLogin from 'react-facebook-login';
-import { Button, Card, Image } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import 'v2/assets/css/loginFacebook.css';
-import { margin } from '@mui/system';
 import api from 'v2/api/api-management'
 import Cookies from 'js-cookie';
 import axios from 'axios';
-import { event } from 'jquery';
 import {FACEBOOK_APP_ID, META_GRAPH_API_VERSION} from 'v2/variables/constants';
 import { message } from 'antd';
 
 function LoginFacebook({ checkLogin }) {
 
-  const [login, setLogin] = useState(false);
-  const [data, setData] = useState({});
-  const [picture, setPicture] = useState('');
+  const [, setLogin] = useState(false);
   const [page, setPage] = useState([]);
-  const [userID, setUserID] = useState();
-  const [userName, setUserName] = useState();
+  const [, setUserID] = useState();
+  const [, setUserName] = useState();
   const [urlImg, setUrlImg] = useState();
   const [username, setUsername] = useState();
-  const [accessToken2, setAccessToken2] = useState()
+  const [, setAccessToken2] = useState()
 
   function logoutFB() {
     window.FB.getLoginStatus(function (response) {
       var ig_id = Cookies.get("ig_id");
       api.post(`/api/v1/logout_fb`, {ig_id: ig_id}).then(res => {
-        if (res.data.code == 1) {
+        if (res.data.code === 1) {
           setLogin(false);
           Cookies.remove("ig_id");
           Cookies.remove("page_access_token");
@@ -64,7 +60,7 @@ function LoginFacebook({ checkLogin }) {
 
     var page_access_token = Cookies.get("page_access_token");
     var ig_id = Cookies.get("ig_id");
-    if (page_access_token == "" || page_access_token == null || page_access_token == undefined) {
+    if (page_access_token === "" || page_access_token === null || page_access_token === undefined) {
       // window.FB.getLoginStatus(function (response) {
       //   statusChangeCallback(response);
       // });
@@ -107,7 +103,6 @@ function LoginFacebook({ checkLogin }) {
       statusChangeCallback(response);
     });
 
-    var authRes = window.FB.getAuthResponse();
     //check if login successfully:       loginToFB
     // console.log("authRes: ", authRes);
   }
@@ -134,18 +129,6 @@ function LoginFacebook({ checkLogin }) {
     );
     setUserID(authRes.userID)
 
-    const responseFacebook = (response) => {
-      // console.log('accessToken', response.accessToken)
-      // console.log(response);
-      setData(response);
-      setPicture(response.picture.data.url);
-      if (response.accessToken) {
-        setLogin(true);
-      } else {
-        setLogin(false);
-      }
-    }
-
   }
 
 
@@ -165,7 +148,7 @@ function LoginFacebook({ checkLogin }) {
       function (response) {
         console.log("instagram_business_account: ", response)
         console.log(value)
-        if (response.instagram_business_account && response.id != "") {
+        if (response.instagram_business_account && response.id !== "") {
           window.FB.api(`/${response.instagram_business_account.id}`, //this 
             function (res) {
               var ig_id = res.id;
@@ -177,9 +160,9 @@ function LoginFacebook({ checkLogin }) {
               Cookies.set("page_access_token", fb_AuthResponse.accessToken);
               console.log("data post insta connect", data)
               api.post(`/api/v1/instagram_connect`, data).then(res => {
-                if (res.data.code == 2) {
+                if (res.data.code === 2) {
                   message.error('このアカウントはInstagramに連携されていません。');
-                } else if (res.data.code == 1) {
+                } else if (res.data.code === 1) {
                 //change this to come to releases move to code = 1
                 checkLogin(true, ig_id)
                 window.FB.api(`/${ig_id}?fields=id,username,ig_id,name,profile_picture_url`, function(res) {
@@ -207,7 +190,7 @@ function LoginFacebook({ checkLogin }) {
 
   }
   setTimeout(() => {
-    if (document.getElementById("divLoginFB") != null) {
+    if (document.getElementById("divLoginFB") !== null) {
       document.getElementById("divLoginFB").onload = checkIsExisted()
     } else {
       checkIsExisted()
@@ -229,13 +212,13 @@ function LoginFacebook({ checkLogin }) {
         </div> */}
       </div>
       <div id="profileFB" style={{ width: "100%", textAlign: "center", margin: "auto", display: "none" }}>
-        <img style={{ width: "120px" }} src={urlImg} />
+        <img style={{ width: "120px" }} src={urlImg} alt={username || ""} />
         <h4>{username}</h4>
       </div>
       <div id='listPage' style={{ display: "none" }}>
-        {page != undefined ? (page.map((item, i) => (
+        {page !== undefined ? (page.map((item, i) => (
           <div key={i} style={{ display: "flex", height: "70px", textAlign: "left", margin: "auto", padding: "10px" }}>
-            <img style={{ paddingLeft: "2.5%" }} src={item.picture.data.url}></img>
+            <img style={{ paddingLeft: "2.5%" }} src={item.picture.data.url} alt={item.name || ""}></img>
             <div style={{ paddingLeft: "10px", height: "70px", width: "20%", justifyContent: "center" }}>{item.name}</div>
             <div style={{ width: "70%", textAlign: "right" }}><Button onClick={() => selectPage(item.id)}>Select</Button></div>
           </div>

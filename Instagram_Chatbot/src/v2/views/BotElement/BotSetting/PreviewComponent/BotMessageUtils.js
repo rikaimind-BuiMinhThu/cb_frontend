@@ -1,50 +1,5 @@
-import { sleep, sendEmailRequest } from "./Utils";
+import { sendEmailRequest } from "./Utils";
 import { BOT_MESSAGE_TYPES } from "./Constants";
-
-const processBotDelayMessage = async (messagesList, i, newState, options = {}) => {
-  const {
-    isPassDelay = false,
-  } = options;
-  
-  if (isPassDelay) {
-    newState.currentMsgIndex = i;
-    return newState;
-  }
-  if (messagesList[i]?.message_content[0]?.delay?.typing_on) {
-    // TODO: Need display typing on
-    // return new Promise(async (resolve) => {
-    //   const newRenderMessagesList = [...state.renderMessagesList, messagesList[i]];
-    //   dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { renderMessagesList: newRenderMessagesList } });
-    //   await sleep(messagesList[i].message_content[0].delay.content * 1000);
-    //   resolve();
-    // }).then(() => {
-    //   let messagesList = state.messagesList;
-    //   messagesList[i].hidden = true;
-    //   let newRenderMessagesList = [...state.renderMessagesList];
-    //   newRenderMessagesList[i].hidden = true;
-      
-    //   if (isLastMessageInCreateOrderFlow() && state.urlThanksPage)
-    //     return redirectToThanksPage();
-
-    //   return dispatch({
-    //     type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: {
-    //       renderMessagesList: [...newRenderMessagesList],
-    //       messagesList: messagesList,
-    //       currentMsgIndex: i,
-    //     }
-    //   });
-    // });
-  }
-  if (newState.renderMessagesList?.length - 1 === i) {
-    await sleep(messagesList[i].message_content[0].delay.content * 1000);
-  }
-
-  // if (newState.currentMsgIndex === newState.messagesList.length - 1)
-  //   return redirectToCartPage();
-  newState.currentMsgIndex = i;
-  newState.messagesList[i].hidden = true;
-  return newState;
-}
 
 const processBotEmailMessage = (messagesList, i, newState) => {
   const msgContent = messagesList[i]?.message_content?.[0];
@@ -132,6 +87,7 @@ const processBotScriptMessage = (messagesList, i, newState) => {
   if (!script) return newState;
 
   try {
+    // eslint-disable-next-line no-new-func -- intentional LP custom JS evaluation
     const func = new Function(script);
     func();
   } catch {
@@ -163,6 +119,7 @@ const processBotUgcMessage = async (messagesList, i, newState) => {
     }
   } else {
     try {
+      // eslint-disable-next-line no-new-func -- intentional LP custom JS evaluation
       const func = new Function(content);
       func();
     } catch (error) {

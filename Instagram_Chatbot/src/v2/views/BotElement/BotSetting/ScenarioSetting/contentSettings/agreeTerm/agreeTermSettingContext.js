@@ -1,14 +1,10 @@
 import React from 'react';
-import { MDBIcon } from 'mdbreact';
 import InputCustom from '../../scenarioComon/InputCustom';
-import InputDouble from '../../scenarioComon/InputDouble';
 import CheckboxCustom from '../../scenarioComon/CheckboxCustom';
 import FukushashikiSearchRow from '../shared/FukushashikiSearchRow';
 import {
   AGREE_TERM_LABELS,
   FUKUSHASHIKI_VARIANTS,
-  SETTING_LABELS,
-  SETTING_PLACEHOLDERS,
 } from '../../constants/scenarioSettingLabels';
 
 export const buildAgreeTermSettingContext = (props) => {

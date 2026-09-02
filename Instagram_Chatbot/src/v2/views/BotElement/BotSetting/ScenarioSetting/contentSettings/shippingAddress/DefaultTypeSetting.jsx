@@ -1,22 +1,12 @@
 import React from 'react';
-import { Button } from 'reactstrap';
 import { MDBIcon } from 'mdbreact';
 import SelectCustom from '../../scenarioComon/SelectCustom';
 import CheckboxCustom from '../../scenarioComon/CheckboxCustom';
-import InputNum from '../../scenarioComon/InputNum';
 import InputDouble from '../../scenarioComon/InputDouble';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import InputCustom from '../../scenarioComon/InputCustom';
 import { Tooltip } from '@mui/material';
-import FukushashikiSearchRow from '../shared/FukushashikiSearchRow';
 import { hyphenPhoneNumber } from '../../constants/scenarioFormConstants';
-import {
-  SHIPPING_ADDRESS_SETTING_LABELS,
-  SETTING_BUTTON_LABELS,
-  SETTING_LABELS,
-  SETTING_PLACEHOLDERS,
-  FUKUSHASHIKI_VARIANTS,
-} from '../../constants/scenarioSettingLabels';
 import {
   AddressFieldSettingsModal,
   AddressFieldsGroup,
@@ -36,8 +26,6 @@ const DefaultTypeSetting = (props) => {
     handleDragEndRadioCheckbox,
     handleRemoveItemZipCodeAddress,
     dataInputVar,
-    dataPrefectures,
-    
   } = props;
   const { shippingAddress } = buildShippingAddressContext(props);
 
@@ -201,12 +189,11 @@ const DefaultTypeSetting = (props) => {
                                                             />
                                                           </div>
                                                           <MDBIcon
-                                                            className="ss-shipping-address-setting__icon-col"
+                                                            className="ss-shipping-address-setting__icon-col ss-plus-circle-option-icon-times-custom"
                                                             // onClick={onClickIcon}
                                                             onClick={() => handleRemoveItemZipCodeAddress(indexMessageSelect, indexContent, content.type, 'name')}
                                                             fas
                                                             icon="times-circle"
-                                                            className={"ss-plus-circle-option-icon-times-custom"}
                                                           />
                                                         </div>
                                                       )}
@@ -320,12 +307,11 @@ const DefaultTypeSetting = (props) => {
                                                             />
                                                           </div>
                                                           <MDBIcon
-                                                            className="ss-shipping-address-setting__icon-col"
+                                                            className="ss-shipping-address-setting__icon-col ss-plus-circle-option-icon-times-custom"
                                                             // onClick={onClickIcon}
                                                             onClick={() => handleRemoveItemZipCodeAddress(indexMessageSelect, indexContent, content.type, 'kana_name')}
                                                             fas
                                                             icon="times-circle"
-                                                            className={"ss-plus-circle-option-icon-times-custom"}
                                                           />
                                                         </div>
                                                       )}
@@ -450,12 +436,11 @@ const DefaultTypeSetting = (props) => {
                                                               />
                                                             </div>
                                                             <MDBIcon
-                                                              className="ss-shipping-address-setting__icon-col"
+                                                              className="ss-shipping-address-setting__icon-col ss-plus-circle-option-icon-times-custom"
                                                               // onClick={onClickIcon}
                                                               onClick={() => handleRemoveItemZipCodeAddress(indexMessageSelect, indexContent, content.type, 'number')}
                                                               fas
                                                               icon="times-circle"
-                                                              className={"ss-plus-circle-option-icon-times-custom"}
                                                             />
                                                             {isUseFukushashiki && (
                                                               <>

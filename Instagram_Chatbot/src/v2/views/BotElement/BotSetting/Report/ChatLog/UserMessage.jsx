@@ -1,6 +1,6 @@
 /* cSpell: disable */
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import api from 'v2/api/api-management';
 import InputCustom from "../../ScenarioSetting/scenarioComon/InputCustom";
 
@@ -23,7 +23,6 @@ import InputNum from "../../ScenarioSetting/scenarioComon/InputNum";
 import { REGEXP } from "../../PreviewComponent/Constants";
 
 import cvcIcon from "assets/img/cvc-icon.png";
-import ModalNoti from "views/Popup/ModalNoti";
 let dataHourFixed = [];
 for (let i = 0; i <= 23; i++) {
   if (i < 10) {
@@ -132,14 +131,14 @@ export default function UserMessage({
   dataPrefectures,
   variables,
 }) {
-  const [dataHour, setDataHour] = useState(dataHourFixed);
-  const [dataYear, setDataYear] = useState(dataYearFixed);
+  const [dataHour] = useState(dataHourFixed);
+  const [dataYear] = useState(dataYearFixed);
   const [dataCity, setDataCity] = useState([]);
   // const [dataPrefectures, setDataPrefectures] = useState([...dataPrefectures]);
   const [messageContent, setMessageContent] = useState(messageContentProps);
   const [errors, setErrors] = useState(errorsProps);
 
-  const applyCaptcha = (contentIndex) => {
+  const applyCaptcha = useCallback((contentIndex) => {
     const el = document.getElementById(`captcha-${indexMessage}-${contentIndex}`);
     if (!el || !captcha?.length) return;
     el.innerHTML =
@@ -147,7 +146,7 @@ export default function UserMessage({
         (item) =>
           item.index === indexMessage && item.indexContent === contentIndex
       )?.[0]?.data || "";
-  };
+  }, [captcha, indexMessage]);
 
   const stringNullOrEmpty = (string) => {
     if (
@@ -192,6 +191,7 @@ export default function UserMessage({
     } else {
       displayButtonNext(true);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- one-shot; prop callback identity is unstable
   }, []);
 
   useEffect(() => {
@@ -209,7 +209,7 @@ export default function UserMessage({
         applyCaptcha(indexContent);
       }
     });
-  }, [captcha, indexMessage, messageContent]);
+  }, [captcha, indexMessage, messageContent, applyCaptcha]);
 
   useEffect(() => {
     messageContent.forEach((content, indexContent) => {
@@ -320,6 +320,7 @@ export default function UserMessage({
         );
       }
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- init-once; prop callback identity is unstable
   }, []);
 
   function botUploadFile() {
@@ -910,7 +911,7 @@ export default function UserMessage({
               </div>
             )}
             {content.type === 'image' && (
-              <img src={content?.image?.imageURL} alt="image" style={{ width: content?.image?.image_width, height: content?.image?.image_height }} />
+              <img src={content?.image?.imageURL} alt="" style={{ width: content?.image?.image_width, height: content?.image?.image_height }} />
             )}
             {/* type == 'label' */}
             {content.type === "label" && label.lbl_content && (
@@ -1016,7 +1017,7 @@ export default function UserMessage({
                             disabled={true}
                             type="radio"
                             id="ss-message__content--user-radio_button"
-                            checked={radioButton.initial_selection == item.value}
+                            checked={radioButton.initial_selection === item.value}
                             onChange={() => {
                               onChangeValue(
                                 indexContent,

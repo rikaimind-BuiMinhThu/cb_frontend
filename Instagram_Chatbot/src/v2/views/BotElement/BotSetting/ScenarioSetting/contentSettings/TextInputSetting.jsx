@@ -32,7 +32,6 @@ const TextInputSetting = (props) => {
   const {
     indexMessageSelect,
     indexContent,
-    content,
     textInput,
     dataMessages,
     setDataMessages,

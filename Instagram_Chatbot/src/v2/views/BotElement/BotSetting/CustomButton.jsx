@@ -16,6 +16,7 @@ const CustomButton = ({
         onClick();
       return
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- mount/click wiring; messsagetype/onClick identity is unstable
   }, [autoClick]);
 
   return (

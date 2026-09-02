@@ -81,7 +81,7 @@ function PaymentGateway() {
       });
   };
 
-  const handleSetDefault = (id) => {
+  const handleSetDefault = useCallback((id) => {
     api
       .patch(`/api/v1/payment_managements/payment_gateways/${id}`, {
         payment: {
@@ -99,7 +99,7 @@ function PaymentGateway() {
       .catch((error) => {
         console.log(error);
       });
-  };
+  }, [fetchGateways, page]);
 
   const columns = useMemo(
     () => [
@@ -154,7 +154,7 @@ function PaymentGateway() {
         ),
       },
     ],
-    [page]
+    [page, handleSetDefault]
   );
 
   useAdminHeaderActions(

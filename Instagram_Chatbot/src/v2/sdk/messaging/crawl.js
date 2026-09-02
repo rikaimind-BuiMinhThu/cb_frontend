@@ -8,6 +8,7 @@ import { getElementByAddress } from '../dom/lookup.js';
 
 export const excuteJSCode = (jscode) => {
   if (!jscode) return;
+  // eslint-disable-next-line no-new-func -- intentional LP custom JS evaluation
   const func = new Function(jscode);
   func();
 };
@@ -34,6 +35,7 @@ export const extractFromJs = async (options) => {
   if (!jsCode) return;
 
   try {
+    // eslint-disable-next-line no-new-func -- intentional LP custom JS evaluation
     const func = new Function(jsCode);
     const result = await func();
 

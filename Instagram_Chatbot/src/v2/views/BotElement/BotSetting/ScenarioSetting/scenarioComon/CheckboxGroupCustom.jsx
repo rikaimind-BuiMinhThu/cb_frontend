@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Checkbox, Row, Col } from 'antd';
 
 const CheckboxGroupCustom = ({ id, value = [], onChange, className, disabled = false, data, style, styleCol, direct = "horizontal" }) => {

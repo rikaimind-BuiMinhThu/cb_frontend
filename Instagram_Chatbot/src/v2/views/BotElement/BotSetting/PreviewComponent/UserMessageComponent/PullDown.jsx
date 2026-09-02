@@ -203,10 +203,6 @@ export default function PullDown({ content, errors, contentIndex, messageIndex, 
         return renderUpToMunicipality();
       case "consume_api_response":
         return renderConsumeApiResponse();
-      case "date_ym":
-        return renderDateYm();
-      case "date_ymd_hm":
-        return renderDateYmdHm();
       default:
         return null;
     }

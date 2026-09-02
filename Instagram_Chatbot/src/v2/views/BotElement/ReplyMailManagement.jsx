@@ -105,9 +105,9 @@ function ReplyMailManagement() {
     setIsOpenAddPopup(true);
   };
 
-  const closeAddPopup = () => {
+  const closeAddPopup = useCallback(() => {
     setIsOpenAddPopup(false);
-  };
+  }, []);
 
   const handleAddMail = () => {
     const email = addEmail.trim();
@@ -170,7 +170,7 @@ function ReplyMailManagement() {
     }));
   };
 
-  const handleUpdateBtnClick = (clientId, id) => {
+  const handleUpdateBtnClick = useCallback((clientId, id) => {
     const draft = rowDrafts[clientId] || {};
     const email = (draft.email || '').trim();
     const password = draft.password || '';
@@ -211,7 +211,7 @@ function ReplyMailManagement() {
           tokenExpired();
         }
       });
-  };
+  }, [rowDrafts, page, reloadReplyMails, closeAddPopup]);
 
   useAdminHeaderActions(
     <AdminActionButton
@@ -273,7 +273,7 @@ function ReplyMailManagement() {
         ),
       },
     ],
-    [rowDrafts, rowErrors]
+    [rowDrafts, rowErrors, handleUpdateBtnClick]
   );
 
   return (

@@ -1,7 +1,5 @@
 import '../styles/base/preview-common.css';
 import React from 'react';
-import { Checkbox } from 'antd';
-import SelectCustom from '../scenarioComon/SelectCustom';
 
 const TextInputPreview = ({
   textInput,

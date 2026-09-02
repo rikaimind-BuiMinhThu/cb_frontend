@@ -17,7 +17,7 @@ export function checkInputNumber(value, field) {
 }
 
 export function checkPhoneNumber(value, field) {
-  var phoneRe = /^[+]*[(]{0,1}[0-9]{1,3}[)]{0,1}[-\s\./0-9]*$/g;
+  var phoneRe = /^[+]*[(]{0,1}[0-9]{1,3}[)]{0,1}[-\s./0-9]*$/g;
   if (value === '') {
     document.getElementById(`newClient${field}ErrMsg`).style.display = 'block';
     document.getElementById(`newClient${field}ErrMsg`).innerHTML = `${field} を入力してください。`;

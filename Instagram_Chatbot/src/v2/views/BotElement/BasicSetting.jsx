@@ -152,7 +152,7 @@ function BasicSetting() {
     return api
       .patch(`/api/v1/managements/clients/${clientId}`, { client: clientPayload })
       .then((res) => {
-        if (res.data.code == 1) {
+        if (res.data.code === 1) {
           if (replySmtpGmailAppPassword) {
             setHasReplySmtpPassword(true);
             setReplySmtpGmailAppPassword('');
@@ -203,7 +203,7 @@ function BasicSetting() {
       api
         .patch(`/api/v1/managements/users/${userIdEC}`, update)
         .then((res) => {
-          if (res.data.code == 1) {
+          if (res.data.code === 1) {
             return saveClientSmtp().then((smtpResult) => {
               if (smtpResult.ok) {
                 showNoti('正常に更新されました！');
@@ -211,7 +211,7 @@ function BasicSetting() {
                 showNoti(smtpResult.message || 'メール送信設定の更新に失敗しました', 'warning');
               }
             });
-          } else if (res.data.code == 2) {
+          } else if (res.data.code === 2) {
             showNoti(res.data.data, 'warning');
           }
         })

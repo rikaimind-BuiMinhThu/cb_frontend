@@ -3,7 +3,6 @@ import { Button } from 'reactstrap';
 import SelectCustom from '../scenarioComon/SelectCustom';
 import ContentSettingShell from './shared/ContentSettingShell';
 import { dataTypeFile } from '../constants/scenarioFormConstants';
-import { SETTING_BUTTON_LABELS } from '../constants/scenarioSettingLabels';
 import '../styles/contentSettings/attachingFile.css';
 
 const AttachingFileSetting = ({

@@ -25,7 +25,7 @@ function Report() {
   const [endDate, setEndDate] = useState(() => moment().subtract(1, 'day'));
   const [allScenarios, setAllScenarios] = useState([]);
   const [scenarioId, setScenarioId] = useState(null);
-  const [dataReportCount, setDataReportCount] = useState();
+  const [, setDataReportCount] = useState();
   const [device, setDevice] = useState('all');
   const [loading, setLoading] = useState(false);
   const [dateError, setDateError] = useState('');
@@ -36,10 +36,10 @@ function Report() {
   //
   const [devicePieChartSeries, setDevicePieChartSeries] = useState([]);
   const [devicePieChartSeriesCount, setDevicePieChartSeriesCount] = useState([]);
-  const [conversionAll, setConversionAll] = useState(0);
-  const [opWinAll, setOpWinAll] = useState(0);
-  const [opPCAll, setOpPCAll] = useState(0);
-  const [closeAll, setCloseAll] = useState(0);
+  const [, setConversionAll] = useState(0);
+  const [, setOpWinAll] = useState(0);
+  const [, setOpPCAll] = useState(0);
+  const [, setCloseAll] = useState(0);
   const [conversionCVRCTR, setConversionCVRCTR] = useState(0);
   const [CVRCTR, setCVRCTR] = useState(false);
   const [shortenedList, setShortenedList] = useState([]);
@@ -114,7 +114,7 @@ function Report() {
       .then((res) => {
         if (res.data.code === 1) {
           let dataScenario = res?.data?.data;
-          if (dataScenario != []) {
+          if (dataScenario !== []) {
             api
               .get(
                 `/api/v1/analytics/scenario_counts/${dataScenario[0].id}?begin_date=${new Date(
@@ -170,9 +170,9 @@ function Report() {
                   chatbotData.tablet_open_chatbot_window_count,
                 ];
                 if (
-                  chatbotData.pc_count == 0 &&
-                  chatbotData.pc_count == 0 &&
-                  chatbotData.pc_count == 0
+                  chatbotData.pc_count === 0 &&
+                  chatbotData.pc_count === 0 &&
+                  chatbotData.pc_count === 0
                 ) {
                   // chatbotValue = [1, 1, 1];
                   setEmptyDevice(true);
@@ -577,83 +577,9 @@ function Report() {
     },
   };
 
-  const numOfConversionBotStart = {
-    series: [
-      {
-        data: [conversionCVRCTR ?? 0, numOfBotStart ?? 0],
-      },
-    ],
-    options: {
-      chart: {
-        type: 'bar',
-        height: 380,
-      },
-      plotOptions: {
-        bar: {
-          barHeight: '100%',
-          distributed: true,
-          horizontal: true,
-          dataLabels: {
-            position: 'bottom',
-          },
-        },
-      },
-      colors: [adminChartPalette[0], adminChartPalette[1]],
-      dataLabels: {
-        enabled: true,
-        textAnchor: 'start',
-        style: {
-          colors: ['#fff'],
-        },
-        formatter: function (val, opt) {
-          return opt.w.globals.labels[opt.dataPointIndex] + ':  ' + val;
-        },
-        offsetX: 0,
-        dropShadow: {
-          enabled: true,
-        },
-      },
-      stroke: {
-        width: 1,
-        colors: ['#fff'],
-      },
-      xaxis: {
-        categories: ['コンバージョンレート', 'クリックスルーレート'],
-      },
-      yaxis: {
-        labels: {
-          show: false,
-        },
-      },
-      title: {
-        text: 'コンバージョン数/BOT開始数',
-        align: 'center',
-        floating: true,
-      },
-      subtitle: {
-        text: `CTR (BOT開始数/BOT起動数: ${numOfBotStart === 0 ? 0 : Math.round((conversionCVRCTR * 100) / numOfBotStart).toFixed(2)
-          }%`,
-        align: 'center',
-      },
-      tooltip: {
-        theme: 'dark',
-        x: {
-          show: false,
-        },
-        y: {
-          title: {
-            formatter: function () {
-              return '';
-            },
-          },
-        },
-      },
-    },
-  };
-
   // chart
   let devicePieChartConfig = {
-    series: emptyDevice == true ? [0, 0, 0] : devicePieChartSeries,
+    series: emptyDevice === true ? [0, 0, 0] : devicePieChartSeries,
     options: {
       chart: {
         width: 380,
@@ -765,9 +691,9 @@ function Report() {
               chatbotData.tablet_open_chatbot_window_count,
             ];
             if (
-              chatbotData.pc_count == 0 &&
-              chatbotData.pc_count == 0 &&
-              chatbotData.pc_count == 0
+              chatbotData.pc_count === 0 &&
+              chatbotData.pc_count === 0 &&
+              chatbotData.pc_count === 0
             ) {
               // chatbotValue = [1, 1, 1];
               setEmptyDevice(true);
@@ -804,22 +730,22 @@ function Report() {
             setDevicePieChartSeries(chatbotValue);
             setDevicePieChartSeriesCount(chatbotValue);
 
-            if (searchVal.device == 'all') {
+            if (searchVal.device === 'all') {
               setConversionCVRCTR(numOfCon);
               setNumofBotStart(numOfBS);
               setNumOfOpenBot(numOfOB);
               setNumOfCloseBot(numOfCB);
-            } else if (searchVal.device == 'computer') {
+            } else if (searchVal.device === 'computer') {
               setConversionCVRCTR(chatbotData.pc_conversion_count);
               setNumofBotStart(chatbotData.pc_count);
               setNumOfOpenBot(chatbotData.pc_open_chatbot_window_count);
               setNumOfCloseBot(chatbotData.pc_close_chatbot_window_count);
-            } else if (searchVal.device == 'tablet') {
+            } else if (searchVal.device === 'tablet') {
               setConversionCVRCTR(chatbotData.tablet_conversion_count);
               setNumofBotStart(chatbotData.tablet_count);
               setNumOfOpenBot(chatbotData.tablet_open_chatbot_window_count);
               setNumOfCloseBot(chatbotData.tablet_close_chatbot_window_count);
-            } else if (searchVal.device == 'smartphone') {
+            } else if (searchVal.device === 'smartphone') {
               setConversionCVRCTR(chatbotData.smartphone_conversion_count);
               setNumofBotStart(chatbotData.smartphone_count);
               setNumOfOpenBot(chatbotData.smartphone_open_chatbot_window_count);
@@ -852,28 +778,28 @@ function Report() {
             let lBTB = 0;
             let lBSP = 0;
             let exportCV =
-              searchVal.device == 'all'
+              searchVal.device === 'all'
                 ? [['集計期間', 'CV PC', 'CV タブレット', 'CV スマートフォン']]
-                : searchVal.device == 'computer'
+                : searchVal.device === 'computer'
                   ? [['集計期間', 'CV PC']]
-                  : searchVal.device == 'tablet'
+                  : searchVal.device === 'tablet'
                     ? [['集計期間', 'CV タブレット']]
                     : [['集計期間', 'CV スマートフォン']];
 
             let exportCVR = [['集計期間', `${searchVal.startDate}~${searchVal.endDate}`]];
             exportCVR.push(
-              searchVal.device == 'all'
+              searchVal.device === 'all'
                 ? ['CV PC', 'CV タブレット', 'CV スマートフォン', 'CV合計数', 'BOT起動']
-                : searchVal.device == 'computer'
+                : searchVal.device === 'computer'
                   ? ['CV PC', 'CV合計数', 'BOT起動']
-                  : searchVal.device == 'tablet'
+                  : searchVal.device === 'tablet'
                     ? ['CV タブレット', 'CV合計数', 'BOT起動']
                     : ['CV スマートフォン', 'CV合計数', 'BOT起動']
             );
             let exportCTR = [['集計期間', `${searchVal.startDate}~${searchVal.endDate}`]];
             let exportClickThrough = [['集計期間', 'BOT開始', 'BOT起動']];
             let exportBotLeave = [
-              searchVal.device == 'all'
+              searchVal.device === 'all'
                 ? [
                   '集計期間',
                   'PC離脱',
@@ -882,54 +808,54 @@ function Report() {
                   'BOT開始',
                   'BOT離脱',
                 ]
-                : searchVal.device == 'computer'
+                : searchVal.device === 'computer'
                   ? ['集計期間', 'PC離脱', 'BOT開始', 'BOT離脱']
-                  : searchVal.device == 'tablet'
+                  : searchVal.device === 'tablet'
                     ? ['集計期間', 'タブレット離脱', 'BOT開始', 'BOT離脱']
                     : ['集計期間', 'スマートフォン離脱', 'BOT開始', 'BOT離脱'],
             ];
             exportCTR.push(
-              searchVal.device == 'all'
+              searchVal.device === 'all'
                 ? ['CT PC', 'CT タブレット', 'CT スマートフォン', 'BOT開始', 'BOT起動']
-                : searchVal.device == 'computer'
+                : searchVal.device === 'computer'
                   ? ['CT PC', 'BOT開始', 'BOT起動']
-                  : searchVal.device == 'tablet'
+                  : searchVal.device === 'tablet'
                     ? ['CT タブレット', 'BOT開始', 'BOT起動']
                     : ['CT スマートフォン', 'BOT開始', 'BOT起動']
             );
             let exportLeaveBotRate = [['集計期間', `${searchVal.startDate}~${searchVal.endDate}`]];
             exportLeaveBotRate.push(
-              searchVal.device == 'all'
+              searchVal.device === 'all'
                 ? ['PC', 'タブレット', 'スマートフォン', '合計', 'BOT開始']
-                : searchVal.device == 'computer'
+                : searchVal.device === 'computer'
                   ? ['PC', '合計', 'BOT開始']
-                  : searchVal.device == 'tablet'
+                  : searchVal.device === 'tablet'
                     ? ['タブレット', '合計', 'BOT開始']
                     : ['スマートフォン', '合計', 'BOT開始']
             );
             exportData.forEach((index) => {
               exportCV.push(
-                searchVal.device == 'all'
+                searchVal.device === 'all'
                   ? [
                     index.log_date,
                     index.pc_conversion_count,
                     index.tablet_conversion_count,
                     index.smartphone_conversion_count,
                   ]
-                  : searchVal.device == 'computer'
+                  : searchVal.device === 'computer'
                     ? [index.log_date, index.pc_conversion_count]
-                    : searchVal.device == 'tablet'
+                    : searchVal.device === 'tablet'
                       ? [index.log_date, index.tablet_conversion_count]
                       : [index.log_date, index.smartphone_conversion_count]
               );
               totalConversion +=
-                searchVal.device == 'all'
+                searchVal.device === 'all'
                   ? index.pc_conversion_count +
                   index.tablet_conversion_count +
                   index.smartphone_conversion_count
-                  : searchVal.device == 'computer'
+                  : searchVal.device === 'computer'
                     ? index.pc_conversion_count
-                    : searchVal.device == 'tablet'
+                    : searchVal.device === 'tablet'
                       ? index.tablet_conversion_count
                       : index.smartphone_conversion_count;
 
@@ -938,46 +864,46 @@ function Report() {
               cvrSP += index.smartphone_conversion_count;
               exportClickThrough.push([
                 index.log_date,
-                searchVal.device == 'all'
+                searchVal.device === 'all'
                   ? index.pc_open_chatbot_window_count +
                   index.smartphone_open_chatbot_window_count +
                   index.tablet_open_chatbot_window_count
-                  : searchVal.device == 'computer'
+                  : searchVal.device === 'computer'
                     ? index.pc_open_chatbot_window_count
-                    : searchVal.device == 'tablet'
+                    : searchVal.device === 'tablet'
                       ? index.tablet_open_chatbot_window_count
                       : index.smartphone_open_chatbot_window_count,
-                searchVal.device == 'all'
+                searchVal.device === 'all'
                   ? index.pc_count + index.smartphone_count + index.tablet_count
-                  : searchVal.device == 'computer'
+                  : searchVal.device === 'computer'
                     ? index.pc_count
-                    : searchVal == 'tablet'
+                    : searchVal === 'tablet'
                       ? index.tablet_count
                       : index.smartphone_count,
               ]);
               totalBotStart +=
-                searchVal.device == 'all'
+                searchVal.device === 'all'
                   ? index.pc_count +
                   index.smartphone_count +
                   index.tablet_count
-                  : searchVal.device == 'computer'
+                  : searchVal.device === 'computer'
                     ? index.pc_count
-                    : searchVal.device == 'tablet'
+                    : searchVal.device === 'tablet'
                       ? index.tablet_count
                       : index.smartphone_count;
               totalBotOpen +=
-                searchVal.device == 'all'
+                searchVal.device === 'all'
                   ? index.pc_open_chatbot_window_count + index.smartphone_open_chatbot_window_count + index.tablet_open_chatbot_window_count
-                  : (searchVal.device == 'computer'
+                  : (searchVal.device === 'computer'
                     ? index.pc_open_chatbot_window_count
-                    : searchVal.device == 'tablet'
+                    : searchVal.device === 'tablet'
                       ? index.tablet_open_chatbot_window_count
                       : index.smartphone_open_chatbot_window_count)
               ctrPC += index.pc_count;
               ctrTB += index.tablet_count;
               ctrSP += index.smartphone_count;
               exportBotLeave.push(
-                searchVal.device == 'all'
+                searchVal.device === 'all'
                   ? [
                     index.log_date,
                     index.pc_close_chatbot_window_count,
@@ -990,14 +916,14 @@ function Report() {
                     index.tablet_close_chatbot_window_count +
                     index.smartphone_close_chatbot_window_count,
                   ]
-                  : searchVal.device == 'computer'
+                  : searchVal.device === 'computer'
                     ? [
                       index.log_date,
                       index.pc_close_chatbot_window_count,
                       index.pc_open_chatbot_window_count,
                       index.pc_close_chatbot_window_count,
                     ]
-                    : searchVal.device == 'tablet'
+                    : searchVal.device === 'tablet'
                       ? [
                         index.log_date,
                         index.tablet_close_chatbot_window_count,
@@ -1012,13 +938,13 @@ function Report() {
                       ]
               );
               totalBotLeave +=
-                searchVal.device == 'all'
+                searchVal.device === 'all'
                   ? index.pc_close_chatbot_window_count +
                   index.tablet_close_chatbot_window_count +
                   index.smartphone_close_chatbot_window_count
-                  : searchVal.device == 'computer'
+                  : searchVal.device === 'computer'
                     ? index.pc_close_chatbot_window_count
-                    : searchVal.device == 'tablet'
+                    : searchVal.device === 'tablet'
                       ? index.tablet_close_chatbot_window_count
                       : index.smartphone_close_chatbot_window_count;
               lBPC += index.pc_close_chatbot_window_count;
@@ -1026,11 +952,11 @@ function Report() {
               lBSP += index.smartphone_close_chatbot_window_count;
             });
             exportCVR.push(
-              searchVal.device == 'all'
+              searchVal.device === 'all'
                 ? [cvrPC, cvrTB, cvrSP, totalConversion, totalBotOpen]
-                : searchVal.device == 'computer'
+                : searchVal.device === 'computer'
                   ? [cvrPC, totalConversion, totalBotOpen]
-                  : searchVal.device == 'tablet'
+                  : searchVal.device === 'tablet'
                     ? [cvrTB, totalConversion, totalBotOpen]
                     : [cvrSP, totalConversion, totalBotOpen]
             );
@@ -1044,11 +970,11 @@ function Report() {
               '',
             ]);
             exportCTR.push(
-              searchVal.device == 'all'
+              searchVal.device === 'all'
                 ? [ctrPC, ctrTB, ctrSP, totalBotStart, totalBotOpen]
-                : searchVal.device == 'computer'
+                : searchVal.device === 'computer'
                   ? [ctrPC, totalBotStart, totalBotOpen]
-                  : searchVal.device == 'tablet'
+                  : searchVal.device === 'tablet'
                     ? [ctrTB, totalBotStart, totalBotOpen]
                     : [ctrSP, totalBotStart, totalBotOpen]
             );
@@ -1062,11 +988,11 @@ function Report() {
               '',
             ]);
             exportLeaveBotRate.push(
-              searchVal.device == 'all'
+              searchVal.device === 'all'
                 ? [lBPC, lBTB, lBSP, totalBotLeave, totalBotStart]
-                : searchVal.device == 'computer'
+                : searchVal.device === 'computer'
                   ? [lBPC, totalBotLeave, totalBotStart]
-                  : searchVal.device == 'tablet'
+                  : searchVal.device === 'tablet'
                     ? [lBTB, totalBotLeave, totalBotStart]
                     : [lBSP, totalBotLeave, totalBotStart]
             );

@@ -62,7 +62,6 @@ const PullDownSetting = (props) => {
   const {
     indexMessageSelect,
     indexContent,
-    content,
     pullDown,
     dataMessages,
     setDataMessages,
