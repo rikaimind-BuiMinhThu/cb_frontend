@@ -1,3 +1,24 @@
+import {
+  BOOLEAN_STRING_FALSE,
+  BOOLEAN_STRING_TRUE,
+  CART_SYSTEM_NONE,
+  CART_SYSTEM_SHOPIFY,
+  FEATURE_NO,
+  FEATURE_YES,
+  STATUS_ACTIVE,
+  STATUS_ENDED,
+  STATUS_ID_ACTIVE,
+  STATUS_ID_ENDED,
+  STATUS_ID_PAUSE,
+  STATUS_ID_TRIAL,
+  STATUS_LABEL_ACTIVE,
+  STATUS_LABEL_ENDED,
+  STATUS_LABEL_PAUSE,
+  STATUS_LABEL_TRIAL,
+  STATUS_PAUSE,
+  STATUS_TRIAL,
+} from './constants';
+
 export const ENTERPRISE_TYPE_OPTIONS = [
   '株式会社',
   '有限会社',
@@ -33,7 +54,7 @@ export const ENTERPRISE_TYPE_OPTIONS = [
   '社会保険労務士法人',
 ];
 
-export const ENTERPRISE_TYPE_2_OPTIONS = ['先頭に使う', '末尾に使う', 'なし'];
+export const ENTERPRISE_TYPE_2_OPTIONS = ['先頭に使う', '末尾に使う', FEATURE_NO];
 
 export const PREFECTURE_OPTIONS = [
   '北海道', '青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県',
@@ -45,23 +66,35 @@ export const PREFECTURE_OPTIONS = [
   '熊本県', '大分県', '宮崎県', '鹿児島県', '沖縄県',
 ];
 
+export const CART_SYSTEM_TAMAGO_REPEAT = 'tamago_repeat';
+export const CART_SYSTEM_SUBSC_STORE = 'subsc_store';
+export const CART_SYSTEM_EC_FORCE = 'ec_force';
+export const CART_SYSTEM_REPEAT_PLUS = 'repeat_plus';
+
+export const CART_LABEL_NONE = FEATURE_NO;
+export const CART_LABEL_TAMAGO_REPEAT = 'たまごリピート';
+export const CART_LABEL_SUBSC_STORE = 'サブスクストア';
+export const CART_LABEL_SHOPIFY = 'Shopify';
+export const CART_LABEL_EC_FORCE = 'Ec-Force';
+export const CART_LABEL_REPEAT_PLUS = 'リピートPLUS';
+
 export const CART_SYSTEM_OPTIONS = [
-  { value: 'cart_system_none', label: 'なし' },
-  { value: 'tamago_repeat', label: 'たまごリピート' },
-  { value: 'subsc_store', label: 'サブスクストア' },
-  { value: 'shopify', label: 'Shopify' },
-  { value: 'ec_force', label: 'Ec-Force' },
-  { value: 'repeat_plus', label: 'リピートPLUS' },
+  { value: CART_SYSTEM_NONE, label: CART_LABEL_NONE },
+  { value: CART_SYSTEM_TAMAGO_REPEAT, label: CART_LABEL_TAMAGO_REPEAT },
+  { value: CART_SYSTEM_SUBSC_STORE, label: CART_LABEL_SUBSC_STORE },
+  { value: CART_SYSTEM_SHOPIFY, label: CART_LABEL_SHOPIFY },
+  { value: CART_SYSTEM_EC_FORCE, label: CART_LABEL_EC_FORCE },
+  { value: CART_SYSTEM_REPEAT_PLUS, label: CART_LABEL_REPEAT_PLUS },
 ];
 
 export const BOT_FEATURE_RADIO_OPTIONS = [
-  { value: 'true', label: 'あり' },
-  { value: 'false', label: 'なし' },
+  { value: BOOLEAN_STRING_TRUE, label: FEATURE_YES },
+  { value: BOOLEAN_STRING_FALSE, label: FEATURE_NO },
 ];
 
 export const STATUS_OPTIONS = [
-  { value: 'active', label: '契約', id: 'in_contract' },
-  { value: 'pause', label: '休止', id: 'pause_contract' },
-  { value: 'ended', label: '解約', id: 'finished_contract' },
-  { value: 'trial', label: 'お試し', id: 'trial_contract' },
+  { value: STATUS_ACTIVE, label: STATUS_LABEL_ACTIVE, id: STATUS_ID_ACTIVE },
+  { value: STATUS_PAUSE, label: STATUS_LABEL_PAUSE, id: STATUS_ID_PAUSE },
+  { value: STATUS_ENDED, label: STATUS_LABEL_ENDED, id: STATUS_ID_ENDED },
+  { value: STATUS_TRIAL, label: STATUS_LABEL_TRIAL, id: STATUS_ID_TRIAL },
 ];

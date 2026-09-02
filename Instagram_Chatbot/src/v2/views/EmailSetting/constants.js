@@ -1,0 +1,13 @@
+export const CREATE_EMAIL_LABEL = 'メール作成';
+export const DUPLICATE_CONFIRM = '本当に複製しますか。';
+export const DELETE_CONFIRM = '本当に削除しますか。';
+export const CREATE_BUTTON = '作成';
+export const LABEL_TEMPLATE_NAME = 'テンプレート名';
+export const LABEL_SENDER = '差出人';
+export const LABEL_BCC = 'BCC（同報）';
+export const LABEL_SUBJECT = '件名';
+export const LABEL_CONTENT = 'メール内容';
+export const PLACEHOLDER_TEMPLATE_NAME = 'テンプレート名は、必ず指定してください。';
+export const PLACEHOLDER_SENDER = '差出人は、必ず指定してください。';
+export const PLACEHOLDER_SUBJECT = '件名は、必ず指定してください。';
+export const PLACEHOLDER_CONTENT = 'メール内容は、必ず指定してください。';

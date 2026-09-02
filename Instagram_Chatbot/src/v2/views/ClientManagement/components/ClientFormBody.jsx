@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Button, DatePicker, Form, Input, Radio, Select } from 'antd';
 import moment from 'moment';
 import ClientFormRow from './ClientFormRow';
@@ -10,33 +11,132 @@ import {
   PREFECTURE_OPTIONS,
   STATUS_OPTIONS,
 } from '../clientFormOptions';
+import {
+  BOOLEAN_STRING_FALSE,
+  CART_SYSTEM_NONE,
+  CART_SYSTEM_SHOPIFY,
+  CHANGE_IMAGE_LABEL,
+  DATE_FORMAT,
+  FIELD_ID_ADDRESS,
+  FIELD_ID_BUILDING,
+  FIELD_ID_CART,
+  FIELD_ID_COMPANY_TYPE,
+  FIELD_ID_COMPANY_TYPE_2,
+  FIELD_ID_DEPARTMENT,
+  FIELD_ID_EMAIL,
+  FIELD_ID_END_DATE,
+  FIELD_ID_IMAGE_BUTTON,
+  FIELD_ID_IMAGE_PREVIEW,
+  FIELD_ID_INSTAGRAM,
+  FIELD_ID_LINE,
+  FIELD_ID_MANAGER,
+  FIELD_ID_MANAGER_KATA,
+  FIELD_ID_MUNICIPALITY,
+  FIELD_ID_NAME,
+  FIELD_ID_NAME_KATA,
+  FIELD_ID_NOTE,
+  FIELD_ID_PASSWORD,
+  FIELD_ID_PASSWORD_CONFIRM,
+  FIELD_ID_PHONE,
+  FIELD_ID_PLAN,
+  FIELD_ID_PREFECTURE,
+  FIELD_ID_PRICE,
+  FIELD_ID_REPLY_APP_PASSWORD,
+  FIELD_ID_REPLY_GMAIL,
+  FIELD_ID_START_DATE,
+  FIELD_ID_TIKTOK,
+  FIELD_ID_TITLE,
+  FIELD_ID_URL,
+  FIELD_ID_WEB,
+  FIELD_ID_ZIP,
+  FILE_ACCEPT_IMAGES,
+  LABEL_ADDRESS,
+  LABEL_BUILDING,
+  LABEL_CART_SYSTEM,
+  LABEL_CLIENT_ID,
+  LABEL_CLIENT_SECRET,
+  LABEL_DEPARTMENT,
+  LABEL_EMAIL,
+  LABEL_ENTERPRISE_TYPE,
+  LABEL_ENTERPRISE_TYPE_2,
+  LABEL_LOGO,
+  LABEL_MANAGER,
+  LABEL_MANAGER_KATAKANA,
+  LABEL_MUNICIPALITY,
+  LABEL_NAME,
+  LABEL_NAME_KATAKANA,
+  LABEL_NOTE,
+  LABEL_PASSWORD,
+  LABEL_PASSWORD_CONFIRM,
+  LABEL_PHONE,
+  LABEL_PLAN_NAME,
+  LABEL_PLAN_PRICE,
+  LABEL_PREFECTURE,
+  LABEL_REPLY_APP_PASSWORD,
+  LABEL_REPLY_GMAIL,
+  LABEL_SHOP_URL,
+  LABEL_SITE_URL,
+  LABEL_STATUS,
+  LABEL_TITLE,
+  LABEL_TITLE_VALIDATE,
+  LABEL_URL,
+  LABEL_ZIP,
+  LABEL_BILLING_START,
+  LABEL_INSTAGRAM_BOT,
+  LABEL_LINE_BOT,
+  LABEL_MIN_PERIOD_END,
+  LABEL_TIKTOK_BOT,
+  LABEL_WEB_BOT,
+  PLAN_NAME_SUFFIX,
+  SECTION_BOT_FEATURES,
+  SECTION_CART,
+  SECTION_COMPANY,
+  SECTION_CONTACT,
+  SECTION_CONTRACT,
+  SECTION_LOGO_SITE,
+  SECTION_MANAGER,
+  SELECT_PLAN_PLACEHOLDER,
+} from '../constants';
 
 const { TextArea } = Input;
 
-function Section({ title, children }) {
-  return (
-    <section className="admin-client-form-section">
-      <h5 className="admin-client-form-section-title">{title}</h5>
-      {children}
-    </section>
-  );
-}
+const Section = ({ title, children }) => (
+  <section className="admin-client-form-section">
+    <h5 className="admin-client-form-section-title">{title}</h5>
+    {children}
+  </section>
+);
 
-function BotFeatureRadio({ name, id }) {
-  return (
-    <Form.Item name={name} noStyle>
-      <Radio.Group id={id}>
-        {BOT_FEATURE_RADIO_OPTIONS.map((option) => (
-          <Radio key={option.value} value={option.value}>
-            {option.label}
-          </Radio>
-        ))}
-      </Radio.Group>
-    </Form.Item>
-  );
-}
+Section.propTypes = {
+  title: PropTypes.string,
+  children: PropTypes.node,
+};
 
-function ClientFormBody({
+const BotFeatureRadio = ({ name, id }) => (
+  <Form.Item name={name} noStyle>
+    <Radio.Group id={id}>
+      {BOT_FEATURE_RADIO_OPTIONS.map((option) => (
+        <Radio key={option.value} value={option.value}>
+          {option.label}
+        </Radio>
+      ))}
+    </Radio.Group>
+  </Form.Item>
+);
+
+BotFeatureRadio.propTypes = {
+  name: PropTypes.string,
+  id: PropTypes.string,
+};
+
+const toMoment = (value) => {
+  if (!value) return null;
+  if (moment.isMoment(value)) return value;
+  if (value instanceof Date) return moment(value);
+  return moment(value);
+};
+
+const ClientFormBody = ({
   formId,
   antdForm,
   showPasswordFields,
@@ -68,15 +168,8 @@ function ClientFormBody({
   validatePrice,
   validateZipCode,
   validatePhoneNumber,
-}) {
+}) => {
   const cartSystem = Form.useWatch('cart_system', antdForm);
-
-  const toMoment = (value) => {
-    if (!value) return null;
-    if (moment.isMoment(value)) return value;
-    if (value instanceof Date) return moment(value);
-    return moment(value);
-  };
 
   return (
     <Form
@@ -86,15 +179,15 @@ function ClientFormBody({
       disabled={disableInput}
       className="admin-client-form"
       initialValues={{
-        cart_system: 'cart_system_none',
-        is_instagram: 'false',
-        is_line: 'false',
-        is_tiktok: 'false',
-        is_web: 'false',
+        cart_system: CART_SYSTEM_NONE,
+        is_instagram: BOOLEAN_STRING_FALSE,
+        is_line: BOOLEAN_STRING_FALSE,
+        is_tiktok: BOOLEAN_STRING_FALSE,
+        is_web: BOOLEAN_STRING_FALSE,
       }}
     >
-      <Section title="契約・プラン">
-        <ClientFormRow label="ステータス" required error={fieldErrors.status}>
+      <Section title={SECTION_CONTRACT}>
+        <ClientFormRow label={LABEL_STATUS} required error={fieldErrors.status}>
           <Radio.Group
             value={contract}
             onChange={(e) => setContract(e.target.value)}
@@ -108,24 +201,24 @@ function ClientFormBody({
           </Radio.Group>
         </ClientFormRow>
 
-        <ClientFormRow label="プラン名" required>
+        <ClientFormRow label={LABEL_PLAN_NAME} required>
           <Form.Item name="plan" noStyle>
             <Select
-              id="plan"
-              placeholder="プランを選択"
+              id={FIELD_ID_PLAN}
+              placeholder={SELECT_PLAN_PLACEHOLDER}
               onChange={onSelectPlan}
               options={plans.map((planItem) => ({
                 value: planItem.code,
-                label: `${planItem.name}プラン`,
+                label: `${planItem.name}${PLAN_NAME_SUFFIX}`,
               }))}
             />
           </Form.Item>
         </ClientFormRow>
 
-        <ClientFormRow label="プラン価格" error={fieldErrors.price}>
+        <ClientFormRow label={LABEL_PLAN_PRICE} error={fieldErrors.price}>
           <Form.Item name="price" noStyle>
             <Input
-              id="newPlanPrice"
+              id={FIELD_ID_PRICE}
               onBlur={(e) =>
                 validateAndSetField('price', validatePrice(e.target.value))
               }
@@ -133,73 +226,73 @@ function ClientFormBody({
           </Form.Item>
         </ClientFormRow>
 
-        <ClientFormRow label="課金開始日" error={fieldErrors.subscription_start_at}>
+        <ClientFormRow label={LABEL_BILLING_START} error={fieldErrors.subscription_start_at}>
           <DatePicker
-            id="startDate"
-            format="YYYY/MM/DD"
+            id={FIELD_ID_START_DATE}
+            format={DATE_FORMAT}
             value={toMoment(startDate)}
             onChange={(date) => onStartDateChange(date ? date.toDate() : null)}
           />
         </ClientFormRow>
 
-        <ClientFormRow label="最低利用期間終了日" error={fieldErrors.subscription_end_at}>
+        <ClientFormRow label={LABEL_MIN_PERIOD_END} error={fieldErrors.subscription_end_at}>
           <DatePicker
-            id="endDate"
-            format="YYYY/MM/DD"
+            id={FIELD_ID_END_DATE}
+            format={DATE_FORMAT}
             value={toMoment(endDate)}
             onChange={(date) => onEndDateChange(date ? date.toDate() : null)}
           />
         </ClientFormRow>
       </Section>
 
-      <Section title="ボット機能">
-        <ClientFormRow label="Instagramチャットボット機能">
-          <BotFeatureRadio name="is_instagram" id="is_instagram" />
+      <Section title={SECTION_BOT_FEATURES}>
+        <ClientFormRow label={LABEL_INSTAGRAM_BOT}>
+          <BotFeatureRadio name="is_instagram" id={FIELD_ID_INSTAGRAM} />
         </ClientFormRow>
-        <ClientFormRow label="LINEチャットボット機能">
-          <BotFeatureRadio name="is_line" id="is_line" />
+        <ClientFormRow label={LABEL_LINE_BOT}>
+          <BotFeatureRadio name="is_line" id={FIELD_ID_LINE} />
         </ClientFormRow>
-        <ClientFormRow label="TikTokチャットボット機能">
-          <BotFeatureRadio name="is_tiktok" id="is_tiktok" />
+        <ClientFormRow label={LABEL_TIKTOK_BOT}>
+          <BotFeatureRadio name="is_tiktok" id={FIELD_ID_TIKTOK} />
         </ClientFormRow>
-        <ClientFormRow label="WEBチャットボット機能">
-          <BotFeatureRadio name="is_web" id="is_web" />
+        <ClientFormRow label={LABEL_WEB_BOT}>
+          <BotFeatureRadio name="is_web" id={FIELD_ID_WEB} />
         </ClientFormRow>
 
-        <ClientFormRow label="メモ" alignTop error={fieldErrors.note}>
+        <ClientFormRow label={LABEL_NOTE} alignTop error={fieldErrors.note}>
           <Form.Item name="note" noStyle>
-            <TextArea id="newNote" rows={4} />
+            <TextArea id={FIELD_ID_NOTE} rows={4} />
           </Form.Item>
         </ClientFormRow>
       </Section>
 
-      <Section title="会社情報">
-        <ClientFormRow label="名称" required error={fieldErrors.name}>
+      <Section title={SECTION_COMPANY}>
+        <ClientFormRow label={LABEL_NAME} required error={fieldErrors.name}>
           <Form.Item name="name" noStyle>
             <Input
-              id="newName"
+              id={FIELD_ID_NAME}
               onBlur={(e) =>
-                validateAndSetField('name', validateNameField(e.target.value, '名称'))
+                validateAndSetField('name', validateNameField(e.target.value, LABEL_NAME))
               }
             />
           </Form.Item>
         </ClientFormRow>
 
-        <ClientFormRow label="名称カナ" required error={fieldErrors.name_katakana}>
+        <ClientFormRow label={LABEL_NAME_KATAKANA} required error={fieldErrors.name_katakana}>
           <Form.Item name="name_katakana" noStyle>
             <Input
-              id="newNameKata"
+              id={FIELD_ID_NAME_KATA}
               onBlur={(e) =>
-                validateAndSetField('name_katakana', validateNameField(e.target.value, '名称カナ'))
+                validateAndSetField('name_katakana', validateNameField(e.target.value, LABEL_NAME_KATAKANA))
               }
             />
           </Form.Item>
         </ClientFormRow>
 
-        <ClientFormRow label="企業種別" required error={fieldErrors.enterprise_type}>
+        <ClientFormRow label={LABEL_ENTERPRISE_TYPE} required error={fieldErrors.enterprise_type}>
           <Form.Item name="enterprise_type" noStyle>
             <Select
-              id="newCompanyType"
+              id={FIELD_ID_COMPANY_TYPE}
               showSearch
               optionFilterProp="label"
               options={ENTERPRISE_TYPE_OPTIONS.map((value) => ({ value, label: value }))}
@@ -207,61 +300,61 @@ function ClientFormBody({
           </Form.Item>
         </ClientFormRow>
 
-        <ClientFormRow label="企業種別２" required error={fieldErrors.enterprise_type_2}>
+        <ClientFormRow label={LABEL_ENTERPRISE_TYPE_2} required error={fieldErrors.enterprise_type_2}>
           <Form.Item name="enterprise_type_2" noStyle>
             <Select
-              id="newCompanyType2"
+              id={FIELD_ID_COMPANY_TYPE_2}
               options={ENTERPRISE_TYPE_2_OPTIONS.map((value) => ({ value, label: value }))}
             />
           </Form.Item>
         </ClientFormRow>
 
-        <ClientFormRow label="部署名" required error={fieldErrors.department_name}>
+        <ClientFormRow label={LABEL_DEPARTMENT} required error={fieldErrors.department_name}>
           <Form.Item name="department_name" noStyle>
             <Input
-              id="newDepartmentName"
+              id={FIELD_ID_DEPARTMENT}
               onBlur={(e) =>
-                validateAndSetField('department_name', validateNameField(e.target.value, '部署名'))
+                validateAndSetField('department_name', validateNameField(e.target.value, LABEL_DEPARTMENT))
               }
             />
           </Form.Item>
         </ClientFormRow>
 
-        <ClientFormRow label="肩書" required error={fieldErrors.title}>
+        <ClientFormRow label={LABEL_TITLE} required error={fieldErrors.title}>
           <Form.Item name="title" noStyle>
             <Input
-              id="newTitle"
+              id={FIELD_ID_TITLE}
               onBlur={(e) =>
-                validateAndSetField('title', validateField(e.target.value, 'タイトル'))
+                validateAndSetField('title', validateField(e.target.value, LABEL_TITLE_VALIDATE))
               }
             />
           </Form.Item>
         </ClientFormRow>
       </Section>
 
-      <Section title="担当者">
-        <ClientFormRow label="担当者" required error={fieldErrors.responsible_person}>
+      <Section title={SECTION_MANAGER}>
+        <ClientFormRow label={LABEL_MANAGER} required error={fieldErrors.responsible_person}>
           <Form.Item name="responsible_person" noStyle>
             <Input
-              id="newManager"
+              id={FIELD_ID_MANAGER}
               onBlur={(e) =>
                 validateAndSetField(
                   'responsible_person',
-                  validateNameField(e.target.value, '担当者'),
+                  validateNameField(e.target.value, LABEL_MANAGER),
                 )
               }
             />
           </Form.Item>
         </ClientFormRow>
 
-        <ClientFormRow label="担当者カナ" required error={fieldErrors.responsible_person_katakana}>
+        <ClientFormRow label={LABEL_MANAGER_KATAKANA} required error={fieldErrors.responsible_person_katakana}>
           <Form.Item name="responsible_person_katakana" noStyle>
             <Input
-              id="newManagerKata"
+              id={FIELD_ID_MANAGER_KATA}
               onBlur={(e) =>
                 validateAndSetField(
                   'responsible_person_katakana',
-                  validateNameField(e.target.value, '担当者カナ'),
+                  validateNameField(e.target.value, LABEL_MANAGER_KATAKANA),
                 )
               }
             />
@@ -270,28 +363,28 @@ function ClientFormBody({
 
         {showPasswordFields && (
           <>
-            <ClientFormRow label="パスワード" required error={fieldErrors.password}>
+            <ClientFormRow label={LABEL_PASSWORD} required error={fieldErrors.password}>
               <Form.Item name="password" noStyle>
                 <Input.Password
-                  id="newPassword"
+                  id={FIELD_ID_PASSWORD}
                   onBlur={(e) =>
                     validateAndSetField(
                       'password',
-                      validatePasswordField(e.target.value, 'パスワード'),
+                      validatePasswordField(e.target.value, LABEL_PASSWORD),
                     )
                   }
                 />
               </Form.Item>
             </ClientFormRow>
 
-            <ClientFormRow label="パスワード(確認用)" required error={fieldErrors.password_confirmation}>
+            <ClientFormRow label={LABEL_PASSWORD_CONFIRM} required error={fieldErrors.password_confirmation}>
               <Form.Item name="password_confirmation" noStyle>
                 <Input.Password
-                  id="newConfirmPassword"
+                  id={FIELD_ID_PASSWORD_CONFIRM}
                   onBlur={(e) =>
                     validateAndSetField(
                       'password_confirmation',
-                      validateField(e.target.value, 'パスワード(確認用)'),
+                      validateField(e.target.value, LABEL_PASSWORD_CONFIRM),
                     )
                   }
                 />
@@ -301,28 +394,28 @@ function ClientFormBody({
         )}
       </Section>
 
-      <Section title="ロゴ・サイト">
-        <ClientFormRow label="画像（ロゴ）" required={showPasswordFields} alignTop error={fieldErrors.logo}>
+      <Section title={SECTION_LOGO_SITE}>
+        <ClientFormRow label={LABEL_LOGO} required={showPasswordFields} alignTop error={fieldErrors.logo}>
           <div className="admin-client-form-logo">
             <div>
               <input
                 ref={avatarInputRef}
                 type="file"
                 id={avatarId}
-                style={{ display: 'none' }}
+                className="admin-client-form-logo-input"
                 onChange={onImageChange}
                 disabled={disableInput}
-                accept="image/png, image/jpeg"
+                accept={FILE_ACCEPT_IMAGES}
               />
               {!disableInput && (
-                <Button id="btnimgNum" onClick={onSelectImageClick}>
-                  画像変更
+                <Button id={FIELD_ID_IMAGE_BUTTON} onClick={onSelectImageClick}>
+                  {CHANGE_IMAGE_LABEL}
                 </Button>
               )}
             </div>
             {urlLogo ? (
               <img
-                id="imgUpdatesrc"
+                id={FIELD_ID_IMAGE_PREVIEW}
                 src={urlLogo}
                 className="admin-client-form-logo-preview"
                 alt=""
@@ -331,21 +424,21 @@ function ClientFormBody({
           </div>
         </ClientFormRow>
 
-        <ClientFormRow label="サイトURL" required error={fieldErrors.url}>
+        <ClientFormRow label={LABEL_SITE_URL} required error={fieldErrors.url}>
           <Form.Item name="url" noStyle>
             <Input
-              id="newURL"
-              onBlur={(e) => validateAndSetField('url', validateField(e.target.value, 'URL'))}
+              id={FIELD_ID_URL}
+              onBlur={(e) => validateAndSetField('url', validateField(e.target.value, LABEL_URL))}
             />
           </Form.Item>
         </ClientFormRow>
       </Section>
 
-      <Section title="住所・連絡先">
-        <ClientFormRow label="郵便番号" required error={fieldErrors.zip_code}>
+      <Section title={SECTION_CONTACT}>
+        <ClientFormRow label={LABEL_ZIP} required error={fieldErrors.zip_code}>
           <Form.Item name="zip_code" noStyle>
             <Input
-              id="newPostCode"
+              id={FIELD_ID_ZIP}
               onBlur={(e) =>
                 validateAndSetField('zip_code', validateZipCode(e.target.value))
               }
@@ -353,10 +446,10 @@ function ClientFormBody({
           </Form.Item>
         </ClientFormRow>
 
-        <ClientFormRow label="都道府県" required error={fieldErrors.prefecture}>
+        <ClientFormRow label={LABEL_PREFECTURE} required error={fieldErrors.prefecture}>
           <Form.Item name="prefecture" noStyle>
             <Select
-              id="newPrefectures"
+              id={FIELD_ID_PREFECTURE}
               showSearch
               optionFilterProp="label"
               options={PREFECTURE_OPTIONS.map((value) => ({ value, label: value }))}
@@ -364,66 +457,66 @@ function ClientFormBody({
           </Form.Item>
         </ClientFormRow>
 
-        <ClientFormRow label="市区町村" required error={fieldErrors.municipality}>
+        <ClientFormRow label={LABEL_MUNICIPALITY} required error={fieldErrors.municipality}>
           <Form.Item name="municipality" noStyle>
             <Input
-              id="newMunicipalities"
+              id={FIELD_ID_MUNICIPALITY}
               onBlur={(e) =>
-                validateAndSetField('municipality', validateField(e.target.value, '都道府県'))
+                validateAndSetField('municipality', validateField(e.target.value, LABEL_PREFECTURE))
               }
             />
           </Form.Item>
         </ClientFormRow>
 
-        <ClientFormRow label="住所" required error={fieldErrors.address}>
+        <ClientFormRow label={LABEL_ADDRESS} required error={fieldErrors.address}>
           <Form.Item name="address" noStyle>
             <Input
-              id="newAddress"
+              id={FIELD_ID_ADDRESS}
               onBlur={(e) =>
-                validateAndSetField('address', validateField(e.target.value, '住所'))
+                validateAndSetField('address', validateField(e.target.value, LABEL_ADDRESS))
               }
             />
           </Form.Item>
         </ClientFormRow>
 
-        <ClientFormRow label="建物名" required error={fieldErrors.building_name}>
+        <ClientFormRow label={LABEL_BUILDING} required error={fieldErrors.building_name}>
           <Form.Item name="building_name" noStyle>
             <Input
-              id="newBuildingName"
+              id={FIELD_ID_BUILDING}
               onBlur={(e) =>
-                validateAndSetField('building_name', validateField(e.target.value, '建物名'))
+                validateAndSetField('building_name', validateField(e.target.value, LABEL_BUILDING))
               }
             />
           </Form.Item>
         </ClientFormRow>
 
-        <ClientFormRow label="メールアドレス" required error={fieldErrors.email}>
+        <ClientFormRow label={LABEL_EMAIL} required error={fieldErrors.email}>
           <Form.Item name="email" noStyle>
             <Input
-              id="newEmail"
+              id={FIELD_ID_EMAIL}
               onBlur={(e) =>
-                validateAndSetField('email', validateNameField(e.target.value, 'メールアドレス'))
+                validateAndSetField('email', validateNameField(e.target.value, LABEL_EMAIL))
               }
             />
           </Form.Item>
         </ClientFormRow>
 
-        <ClientFormRow label="メール送信用Gmail" error={fieldErrors.reply_smtp_gmail}>
+        <ClientFormRow label={LABEL_REPLY_GMAIL} error={fieldErrors.reply_smtp_gmail}>
           <Form.Item name="reply_smtp_gmail" noStyle>
-            <Input id="replySmtpGmail" />
+            <Input id={FIELD_ID_REPLY_GMAIL} />
           </Form.Item>
         </ClientFormRow>
 
-        <ClientFormRow label="メール送信用アプリパスワード" error={fieldErrors.reply_smtp_gmail_app_password}>
+        <ClientFormRow label={LABEL_REPLY_APP_PASSWORD} error={fieldErrors.reply_smtp_gmail_app_password}>
           <Form.Item name="reply_smtp_gmail_app_password" noStyle>
-            <Input.Password id="replySmtpGmailAppPassword" autoComplete="new-password" />
+            <Input.Password id={FIELD_ID_REPLY_APP_PASSWORD} autoComplete="new-password" />
           </Form.Item>
         </ClientFormRow>
 
-        <ClientFormRow label="電話番号" required error={fieldErrors.phone_number}>
+        <ClientFormRow label={LABEL_PHONE} required error={fieldErrors.phone_number}>
           <Form.Item name="phone_number" noStyle>
             <Input
-              id="newPhone"
+              id={FIELD_ID_PHONE}
               onBlur={(e) =>
                 validateAndSetField('phone_number', validatePhoneNumber(e.target.value))
               }
@@ -432,22 +525,22 @@ function ClientFormBody({
         </ClientFormRow>
       </Section>
 
-      <Section title="カート連携">
-        <ClientFormRow label="カートシステム" required error={fieldErrors.cart_system}>
+      <Section title={SECTION_CART}>
+        <ClientFormRow label={LABEL_CART_SYSTEM} required error={fieldErrors.cart_system}>
           <Form.Item name="cart_system" noStyle>
-            <Select id="newCartSystem" options={CART_SYSTEM_OPTIONS} />
+            <Select id={FIELD_ID_CART} options={CART_SYSTEM_OPTIONS} />
           </Form.Item>
         </ClientFormRow>
 
-        {cartSystem === 'shopify' && (
+        {cartSystem === CART_SYSTEM_SHOPIFY && (
           <>
-            <ClientFormRow label="Shop URL">
+            <ClientFormRow label={LABEL_SHOP_URL}>
               <Input value={shopUrl} onChange={(e) => setShopUrl(e.target.value)} />
             </ClientFormRow>
-            <ClientFormRow label="Client ID">
+            <ClientFormRow label={LABEL_CLIENT_ID}>
               <Input value={clientId} onChange={(e) => setClientId(e.target.value)} />
             </ClientFormRow>
-            <ClientFormRow label="Client Secret">
+            <ClientFormRow label={LABEL_CLIENT_SECRET}>
               <Input value={clientSecret} onChange={(e) => setClientSecret(e.target.value)} />
             </ClientFormRow>
           </>
@@ -455,6 +548,40 @@ function ClientFormBody({
       </Section>
     </Form>
   );
-}
+};
+
+ClientFormBody.propTypes = {
+  formId: PropTypes.string,
+  antdForm: PropTypes.object,
+  showPasswordFields: PropTypes.bool,
+  disableInput: PropTypes.bool,
+  avatarId: PropTypes.string,
+  avatarInputRef: PropTypes.object,
+  plans: PropTypes.array,
+  contract: PropTypes.string,
+  setContract: PropTypes.func,
+  startDate: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+  endDate: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+  onStartDateChange: PropTypes.func,
+  onEndDateChange: PropTypes.func,
+  urlLogo: PropTypes.string,
+  shopUrl: PropTypes.string,
+  setShopUrl: PropTypes.func,
+  clientId: PropTypes.string,
+  setClientId: PropTypes.func,
+  clientSecret: PropTypes.string,
+  setClientSecret: PropTypes.func,
+  onSelectPlan: PropTypes.func,
+  onImageChange: PropTypes.func,
+  onSelectImageClick: PropTypes.func,
+  fieldErrors: PropTypes.object,
+  validateAndSetField: PropTypes.func,
+  validateNameField: PropTypes.func,
+  validateField: PropTypes.func,
+  validatePasswordField: PropTypes.func,
+  validatePrice: PropTypes.func,
+  validateZipCode: PropTypes.func,
+  validatePhoneNumber: PropTypes.func,
+};
 
 export default ClientFormBody;

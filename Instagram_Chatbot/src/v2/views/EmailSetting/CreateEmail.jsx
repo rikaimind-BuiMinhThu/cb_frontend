@@ -5,7 +5,23 @@ import { tokenExpired } from 'v2/api/tokenExpired';
 import { AdminPage, AdminActionButton, AdminFormRow, useAdminHeaderTitle, useAdminHeaderActions } from 'v2/components/AdminShell';
 import { Input, message } from 'antd';
 import { getAdminRoutePath } from 'v2/variables/constants';
+import {
+  CREATE_BUTTON,
+  LABEL_BCC,
+  LABEL_CONTENT,
+  LABEL_SENDER,
+  LABEL_SUBJECT,
+  LABEL_TEMPLATE_NAME,
+  PLACEHOLDER_CONTENT,
+  PLACEHOLDER_SENDER,
+  PLACEHOLDER_SUBJECT,
+  PLACEHOLDER_TEMPLATE_NAME,
+} from './constants';
 import 'v2/assets/css/bot/email/create-email.css';
+
+const CHIP_REMOVE_LABEL = 'X';
+const ENTER_KEY = 'Enter';
+const SPACE_KEY = ' ';
 
 const EMAIL_FORMAT =
   /^[a-zA-Z0-9]+([._+-][a-zA-Z0-9]+)*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/;
@@ -19,40 +35,28 @@ const EMPTY_FORM = {
   content: '',
 };
 
-const chipStyle = {
-  margin: '0 5px 5px 0',
-  borderRadius: 5,
-  width: 'max-content',
-  backgroundColor: '#e0e0e0',
-  display: 'flex',
-  alignItems: 'center',
-  padding: '2px 8px',
-};
+const EmailChipList = ({ emails, onRemove }) => (
+  <div className="email-chip-list">
+    {emails.map((email, index) => (
+      <div key={`${email}-${index}`} className="email-chip">
+        <span>{email}</span>
+        <span
+          role="button"
+          tabIndex={0}
+          className="email-chip-remove"
+          onClick={() => onRemove(index)}
+          onKeyDown={(event) => {
+            if (event.key === ENTER_KEY || event.key === SPACE_KEY) onRemove(index);
+          }}
+        >
+          {CHIP_REMOVE_LABEL}
+        </span>
+      </div>
+    ))}
+  </div>
+);
 
-function EmailChipList({ emails, onRemove }) {
-  return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: 8 }}>
-      {emails.map((email, index) => (
-        <div key={`${email}-${index}`} style={chipStyle}>
-          <span>{email}</span>
-          <span
-            role="button"
-            tabIndex={0}
-            style={{ cursor: 'pointer', marginLeft: 8 }}
-            onClick={() => onRemove(index)}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' || event.key === ' ') onRemove(index);
-            }}
-          >
-            X
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function CreateEmail() {
+const CreateEmail = () => {
   const isEdit = window.location.pathname.includes('edit-email');
   const [ccAll, setCcAll] = useState([]);
   const [bccAll, setBccAll] = useState([]);
@@ -67,11 +71,11 @@ function CreateEmail() {
   useEffect(() => {
     if (!isEdit) return undefined;
     const id = window.location.pathname.slice(window.location.pathname.lastIndexOf('/') + 1);
-    let cancelled = false;
+    const cancellation = { aborted: false };
     api
       .get(`/api/v1/managements/emails/${id}`)
       .then((res) => {
-        if (cancelled) return;
+        if (cancellation.aborted) return;
         if (res.data.code === 1) {
           const email = res.data.data?.email || {};
           setFormValues({
@@ -87,21 +91,21 @@ function CreateEmail() {
         }
       })
       .catch((err) => {
-        if (cancelled) return;
+        if (cancellation.aborted) return;
         if (err.response?.data.code === 0) {
           tokenExpired();
         }
       });
     return () => {
-      cancelled = true;
+      cancellation.aborted = true;
     };
   }, [isEdit]);
 
-  function updateField(key, value) {
+  const updateField = (key, value) => {
     setFormValues((prev) => ({ ...prev, [key]: value }));
   }
 
-  function addAddress(value, list, setList, setError, setInput) {
+  const addAddress = (value, list, setList, setError, setInput) => {
     const trimmed = (value || '').trim();
     if (!trimmed) return;
     if (!EMAIL_FORMAT.test(trimmed)) {
@@ -117,21 +121,21 @@ function CreateEmail() {
     setInput('');
   }
 
-  function addCC(e) {
+  const addCC = (e) => {
     if (e.keyCode === 13) {
       e.preventDefault();
       addAddress(ccInput, ccAll, setCcAll, setCcError, setCcInput);
     }
   }
 
-  function addBCC(e) {
+  const addBCC = (e) => {
     if (e.keyCode === 13) {
       e.preventDefault();
       addAddress(bccInput, bccAll, setBccAll, setBccError, setBccInput);
     }
   }
 
-  function collectForm() {
+  const collectForm = () => {
     return {
       email: {
         ...formValues,
@@ -142,11 +146,11 @@ function CreateEmail() {
     };
   }
 
-  function setFieldError(key, value) {
+  const setFieldError = (key, value) => {
     setFieldErrors((prev) => (prev[key] === value ? prev : { ...prev, [key]: value }));
   }
 
-  function checkRequired(key, label, errorKey = key) {
+  const checkRequired = (key, label, errorKey = key) => {
     if (!formValues[key]) {
       setFieldError(errorKey, `${label}は、必ず指定してください。`);
       return false;
@@ -155,7 +159,7 @@ function CreateEmail() {
     return true;
   }
 
-  function checkEmail(key) {
+  const checkEmail = (key) => {
     const value = formValues[key] || '';
     if (key === 'to' && value.slice(0, 2) === '{{' && value.slice(-2) === '}}') {
       if (value.slice(2, value.length - 2).replace(/\s/g, '') === '') {
@@ -173,11 +177,11 @@ function CreateEmail() {
     return true;
   }
 
-  function checkTo(key, label) {
+  const checkTo = (key, label) => {
     return checkRequired(key, label) && checkEmail(key);
   }
 
-  function isFormValid() {
+  const isFormValid = () => {
     return (
       checkRequired('email_template_name', 'テンプレート名') &&
       checkTo('to', '宛先') &&
@@ -186,7 +190,7 @@ function CreateEmail() {
     );
   }
 
-  function addEmail(e) {
+  const addEmail = (e) => {
     e.preventDefault();
     if (saving || !isFormValid()) return;
     setSaving(true);
@@ -213,7 +217,7 @@ function CreateEmail() {
       });
   }
 
-  function saveEmail(e) {
+  const saveEmail = (e) => {
     e.preventDefault();
     if (saving || !isFormValid()) return;
     const id = window.location.pathname.slice(window.location.pathname.lastIndexOf('/') + 1);
@@ -252,7 +256,7 @@ function CreateEmail() {
       {isEdit ? (
         <AdminActionButton action="save" loading={saving} onClick={(e) => saveEmail(e)} />
       ) : (
-        <AdminActionButton action="create" label="作成" loading={saving} onClick={(e) => addEmail(e)} />
+        <AdminActionButton action="create" label={CREATE_BUTTON} loading={saving} onClick={(e) => addEmail(e)} />
       )}
     </>
   );
@@ -262,11 +266,11 @@ function CreateEmail() {
       <AdminPage>
         <div className="admin-page-body">
           <form id="create-email-form">
-            <AdminFormRow label="テンプレート名" required htmlFor="email_template_name" error={fieldErrors.email_template_name}>
+            <AdminFormRow label={LABEL_TEMPLATE_NAME} required htmlFor="email_template_name" error={fieldErrors.email_template_name}>
               <Input
                 id="email_template_name"
                 value={formValues.email_template_name}
-                placeholder="テンプレート名は、必ず指定してください。"
+                placeholder={PLACEHOLDER_TEMPLATE_NAME}
                 name="email_template_name"
                 onChange={(e) => {
                   updateField('email_template_name', e.target.value);
@@ -276,11 +280,11 @@ function CreateEmail() {
               />
             </AdminFormRow>
 
-            <AdminFormRow label="差出人" htmlFor="sender_name">
+            <AdminFormRow label={LABEL_SENDER} htmlFor="sender_name">
               <Input
                 id="sender_name"
                 value={formValues.sender_name}
-                placeholder="差出人は、必ず指定してください。"
+                placeholder={PLACEHOLDER_SENDER}
                 name="sender_name"
                 onChange={(e) => updateField('sender_name', e.target.value)}
               />
@@ -310,7 +314,7 @@ function CreateEmail() {
               />
             </AdminFormRow>
 
-            <AdminFormRow label="BCC（同報）" htmlFor="bcc" alignTop error={bccError}>
+            <AdminFormRow label={LABEL_BCC} htmlFor="bcc" alignTop error={bccError}>
               <EmailChipList emails={bccAll} onRemove={(index) => setBccAll(bccAll.filter((_, i) => i !== index))} />
               <Input
                 id="bcc"
@@ -330,11 +334,11 @@ function CreateEmail() {
               />
             </AdminFormRow>
 
-            <AdminFormRow label="件名" required htmlFor="subject" error={fieldErrors.subject}>
+            <AdminFormRow label={LABEL_SUBJECT} required htmlFor="subject" error={fieldErrors.subject}>
               <Input
                 id="subject"
                 value={formValues.subject}
-                placeholder="件名は、必ず指定してください。"
+                placeholder={PLACEHOLDER_SUBJECT}
                 name="subject"
                 onChange={(e) => {
                   updateField('subject', e.target.value);
@@ -344,12 +348,12 @@ function CreateEmail() {
               />
             </AdminFormRow>
 
-            <AdminFormRow label="メール内容" required htmlFor="text" alignTop error={fieldErrors.text}>
+            <AdminFormRow label={LABEL_CONTENT} required htmlFor="text" alignTop error={fieldErrors.text}>
               <Input.TextArea
                 id="text"
                 rows={7}
                 value={formValues.content}
-                placeholder="メール内容は、必ず指定してください。"
+                placeholder={PLACEHOLDER_CONTENT}
                 name="content"
                 onChange={(e) => {
                   updateField('content', e.target.value);
@@ -363,6 +367,6 @@ function CreateEmail() {
       </AdminPage>
     </>
   );
-}
+};
 
 export default CreateEmail;

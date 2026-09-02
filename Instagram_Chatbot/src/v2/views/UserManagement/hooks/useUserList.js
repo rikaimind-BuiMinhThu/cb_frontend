@@ -2,10 +2,18 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Cookies from 'js-cookie';
 import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
-import { PAGE_SIZE } from '../constants';
-import { getSignInPath } from 'v2/variables/constants';
+import {
+  AUTH_FALSE_VALUE,
+  IS_AUTH_COOKIE_KEY,
+  ROLE_ADMIN_CLIENT,
+  ROLE_CLIENT,
+  TOKEN_COOKIE_KEY,
+  USER_ROLE_COOKIE_KEY,
+} from 'v2/api/constants';
+import { getAdminRoutePath, getSignInPath } from 'v2/variables/constants';
+import { CLIENTS_API_PATH, DASHBOARD_PATH, PAGE_SIZE, USERS_API_PATH } from '../constants';
 
-export default function useUserList() {
+const useUserList = () => {
   const [users, setUsers] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -14,40 +22,37 @@ export default function useUserList() {
   const [listClient, setListClient] = useState([]);
 
   useEffect(() => {
-    const cook = Cookies.get('user_role');
-    if (cook === 'admin_client' || cook === 'client') {
-      window.location.href = '/v2/admin/dashboard';
+    const cook = Cookies.get(USER_ROLE_COOKIE_KEY);
+    if (cook === ROLE_ADMIN_CLIENT || cook === ROLE_CLIENT) {
+      window.location.href = getAdminRoutePath(DASHBOARD_PATH);
     }
   }, []);
 
   useEffect(() => {
-    if (
-      Cookies.get('token') === undefined ||
-      Cookies.get('token') == null ||
-      Cookies.get('token') === ''
-    ) {
+    const token = Cookies.get(TOKEN_COOKIE_KEY);
+    if (token === undefined || token == null || token === '') {
       window.location.href = getSignInPath();
     }
-    if (Cookies.get('is_auth') === 'false') {
+    if (Cookies.get(IS_AUTH_COOKIE_KEY) === AUTH_FALSE_VALUE) {
       window.location.href = getSignInPath();
     }
   }, []);
 
   useEffect(() => {
-    let cancelled = false;
+    const cancellation = { aborted: false };
     api
-      .get(`/api/v1/managements/clients`)
+      .get(CLIENTS_API_PATH)
       .then((res) => {
-        if (!cancelled) setListClient(res.data.data || []);
+        if (!cancellation.aborted) setListClient(res.data.data || []);
       })
       .catch((error) => {
-        if (cancelled) return;
+        if (cancellation.aborted) return;
         if (error.response?.data.code === 0) {
           tokenExpired();
         }
       });
     return () => {
-      cancelled = true;
+      cancellation.aborted = true;
     };
   }, []);
 
@@ -57,14 +62,14 @@ export default function useUserList() {
     setLoading(true);
     const requestId = ++fetchRequestId.current;
     api
-      .get(`/api/v1/managements/users?name=${name}&page=${pageNum}&client_id=`)
+      .get(`${USERS_API_PATH}?name=${name}&page=${pageNum}&client_id=`)
       .then((res) => {
         if (requestId !== fetchRequestId.current) return undefined;
         const totalCount = res.data.total || 0;
         const totalPage = Math.ceil(totalCount / PAGE_SIZE) || 1;
         if (pageNum > totalPage && totalCount > 0) {
           return api
-            .get(`/api/v1/managements/users?name=${name}&page=${totalPage}&client_id=`)
+            .get(`${USERS_API_PATH}?name=${name}&page=${totalPage}&client_id=`)
             .then((resp) => {
               if (requestId !== fetchRequestId.current) return;
               setUsers(resp.data.users || []);
@@ -93,19 +98,18 @@ export default function useUserList() {
     fetchUsers(1, '');
   }, [fetchUsers]);
 
-  function handleSearch() {
+  const handleSearch = () => {
     fetchUsers(1, namesearch);
-  }
+  };
 
-  function handlePageChange(nextPage) {
+  const handlePageChange = (nextPage) => {
     fetchUsers(nextPage, namesearch);
-    const panel = document.querySelector('.main-panel');
-    if (panel) panel.scrollTop = 0;
-  }
+    window.scrollTo(0, 0);
+  };
 
-  function reloadList(pageNum = page) {
+  const reloadList = (pageNum = page) => {
     fetchUsers(pageNum, namesearch);
-  }
+  };
 
   return {
     users,
@@ -119,4 +123,6 @@ export default function useUserList() {
     handlePageChange,
     reloadList,
   };
-}
+};
+
+export default useUserList;

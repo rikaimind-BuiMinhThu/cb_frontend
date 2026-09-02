@@ -5,8 +5,9 @@ import UserAddModal from './UserAddModal';
 import UserEditModal from './UserEditModal';
 import useUserList from './hooks/useUserList';
 import useUserMutations from './hooks/useUserMutations';
+import { DELETE_CONFIRM_MESSAGE } from './constants';
 
-function UserManagement() {
+const UserManagement = () => {
   const list = useUserList();
   const mutations = useUserMutations({
     reloadList: list.reloadList,
@@ -45,7 +46,7 @@ function UserManagement() {
       />
       <AdminConfirmModal
         open={mutations.isOpenDelete}
-        message="本当に削除しますか。"
+        message={DELETE_CONFIRM_MESSAGE}
         onOk={mutations.deleteUser}
         onCancel={() => mutations.setIsOpenDelete(false)}
         danger
@@ -53,6 +54,6 @@ function UserManagement() {
       />
     </>
   );
-}
+};
 
 export default UserManagement;

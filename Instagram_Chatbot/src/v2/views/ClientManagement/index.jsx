@@ -6,8 +6,9 @@ import ClientAddModal from './ClientAddModal';
 import useClientList from './hooks/useClientList';
 import useClientForm from './hooks/useClientForm';
 import useClientMutations from './hooks/useClientMutations';
+import { DELETE_CONFIRM_MESSAGE } from './constants';
 
-function ClientManagement() {
+const ClientManagement = () => {
   const list = useClientList();
   const form = useClientForm(list.plans);
   const mutations = useClientMutations({
@@ -42,7 +43,7 @@ function ClientManagement() {
       />
       <AdminConfirmModal
         open={form.isOpenDeleteClient}
-        message="本当に削除しますか。"
+        message={DELETE_CONFIRM_MESSAGE}
         onOk={mutations.deleteClientUser}
         onCancel={() => form.setIsOpenDeleteClient(false)}
         loading={mutations.deleting}
@@ -50,6 +51,6 @@ function ClientManagement() {
       />
     </>
   );
-}
+};
 
 export default ClientManagement;

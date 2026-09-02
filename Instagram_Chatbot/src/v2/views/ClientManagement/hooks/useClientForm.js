@@ -14,18 +14,30 @@ import {
   validateStartDate,
   validateZipCode,
 } from 'v2/views/ClientManagement/utils/clientFormHelpers';
+import {
+  BOOLEAN_STRING_FALSE,
+  CART_SYSTEM_NONE,
+  CLIENTS_API_PATH,
+  DETAIL_TITLE,
+  EDIT_CLIENT_TITLE,
+  FORM_MODE_ADD,
+  FORM_MODE_EDIT,
+  FORM_MODE_VIEW,
+  SELECT_IMAGE,
+  STATUS_REQUIRED,
+} from '../constants';
 
 const DEFAULT_FORM_VALUES = {
-  cart_system: 'cart_system_none',
-  is_instagram: 'false',
-  is_line: 'false',
-  is_tiktok: 'false',
-  is_web: 'false',
+  cart_system: CART_SYSTEM_NONE,
+  is_instagram: BOOLEAN_STRING_FALSE,
+  is_line: BOOLEAN_STRING_FALSE,
+  is_tiktok: BOOLEAN_STRING_FALSE,
+  is_web: BOOLEAN_STRING_FALSE,
   reply_smtp_gmail: '',
   reply_smtp_gmail_app_password: '',
 };
 
-export default function useClientForm(plans) {
+const useClientForm = (plans) => {
   const [antdForm] = Form.useForm();
   const avatarInputRef = useRef(null);
   const [detailData, setDetailData] = useState({});
@@ -49,7 +61,7 @@ export default function useClientForm(plans) {
   const [clientSecret, setClientSecret] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenAddUser, setIsOpenAddUser] = useState(false);
-  const [formMode, setFormMode] = useState('edit');
+  const [formMode, setFormMode] = useState(FORM_MODE_EDIT);
 
   const clearFieldError = useCallback((key) => {
     setFieldErrors((prev) => {
@@ -87,46 +99,44 @@ export default function useClientForm(plans) {
     [clearFieldError, setFieldError],
   );
 
-  function resetFormState() {
+  const resetFormState = () => {
     clearAllFieldErrors();
     setAvatarFile(null);
     setInputImage('');
     setUpdateImageChange(false);
-  }
+  };
 
-  function mapDataToFormValues(data) {
-    return {
-      plan: data.plan,
-      price: data.price,
-      is_instagram: String(data.is_instagram),
-      is_line: String(data.is_line),
-      is_tiktok: String(data.is_tiktok),
-      is_web: String(data.is_web),
-      note: data.note || '',
-      name: data.name,
-      name_katakana: data.name_katakana,
-      enterprise_type: data.enterprise_type,
-      enterprise_type_2: data.enterprise_type_2,
-      department_name: data.department_name,
-      title: data.title,
-      responsible_person: data.responsible_person,
-      responsible_person_katakana: data.responsible_person_katakana,
-      url: data.url,
-      zip_code: data.zip_code,
-      prefecture: data.prefecture,
-      municipality: data.municipality !== null ? data.municipality : '',
-      address: data.address,
-      building_name: data.building_name,
-      email: data.email,
-      phone_number: data.phone_number,
-      reply_smtp_gmail: data.reply_smtp_gmail || '',
-      reply_smtp_gmail_app_password: '',
-      has_reply_smtp_password: !!data.has_reply_smtp_password,
-      cart_system: data.cart_system || 'cart_system_none',
-    };
-  }
+  const mapDataToFormValues = (data) => ({
+    plan: data.plan,
+    price: data.price,
+    is_instagram: String(data.is_instagram),
+    is_line: String(data.is_line),
+    is_tiktok: String(data.is_tiktok),
+    is_web: String(data.is_web),
+    note: data.note || '',
+    name: data.name,
+    name_katakana: data.name_katakana,
+    enterprise_type: data.enterprise_type,
+    enterprise_type_2: data.enterprise_type_2,
+    department_name: data.department_name,
+    title: data.title,
+    responsible_person: data.responsible_person,
+    responsible_person_katakana: data.responsible_person_katakana,
+    url: data.url,
+    zip_code: data.zip_code,
+    prefecture: data.prefecture,
+    municipality: data.municipality !== null ? data.municipality : '',
+    address: data.address,
+    building_name: data.building_name,
+    email: data.email,
+    phone_number: data.phone_number,
+    reply_smtp_gmail: data.reply_smtp_gmail || '',
+    reply_smtp_gmail_app_password: '',
+    has_reply_smtp_password: !!data.has_reply_smtp_password,
+    cart_system: data.cart_system || CART_SYSTEM_NONE,
+  });
 
-  function populateClientForm(data, { mode, title: modalTitle }) {
+  const populateClientForm = (data, { mode, title: modalTitle }) => {
     resetFormState();
     setDetailData(data);
     setUpdateId(data.id);
@@ -139,34 +149,32 @@ export default function useClientForm(plans) {
     setClientId(data.client_id || '');
     setClientSecret(data.client_secret || '');
     setUrlLogo(data.logo_url?.url ? `${EC_CHATBOT_URL}/${data.logo_url.url}` : '');
-    setDisableInput(mode === 'view');
+    setDisableInput(mode === FORM_MODE_VIEW);
     antdForm.setFieldsValue(mapDataToFormValues(data));
     setIsOpen(true);
-  }
+  };
 
-  function openDetail(item) {
+  const openDetail = (item) => {
     api
-      .get(`/api/v1/managements/clients/${item.id}`)
-      .then((res) => populateClientForm(res.data.data, { mode: 'view', title: '詳細' }))
+      .get(`${CLIENTS_API_PATH}/${item.id}`)
+      .then((res) => populateClientForm(res.data.data, { mode: FORM_MODE_VIEW, title: DETAIL_TITLE }))
       .catch((error) => {
-        console.log(error);
         if (error.response?.data.code === 0) tokenExpired();
       });
-  }
+  };
 
-  function openEdit(item) {
+  const openEdit = (item) => {
     api
-      .get(`/api/v1/managements/clients/${item.id}`)
-      .then((res) => populateClientForm(res.data.data, { mode: 'edit', title: 'クライアント更新' }))
+      .get(`${CLIENTS_API_PATH}/${item.id}`)
+      .then((res) => populateClientForm(res.data.data, { mode: FORM_MODE_EDIT, title: EDIT_CLIENT_TITLE }))
       .catch((error) => {
-        console.log(error);
         if (error.response?.data.code === 0) tokenExpired();
       });
-  }
+  };
 
-  function openAdd() {
+  const openAdd = () => {
     resetFormState();
-    setFormMode('add');
+    setFormMode(FORM_MODE_ADD);
     setContract('');
     setInputStartDate('');
     setInputEndDate('');
@@ -179,48 +187,48 @@ export default function useClientForm(plans) {
     antdForm.resetFields();
     antdForm.setFieldsValue(DEFAULT_FORM_VALUES);
     setIsOpenAddUser(true);
-  }
+  };
 
-  function checkInputDate(inputdate) {
+  const checkInputDate = (inputdate) => {
     setInputStartDate(inputdate);
     validateAndSetField('subscription_start_at', validateStartDate(inputdate));
     validateAndSetField(
       'subscription_end_at',
       validateDateRange(inputdate, inputEndDate),
     );
-  }
+  };
 
-  function checkInputDateAdd(inputdate) {
+  const checkInputDateAdd = (inputdate) => {
     setInputStartDateAdd(inputdate);
     validateAndSetField('subscription_start_at', validateStartDate(inputdate));
     validateAndSetField(
       'subscription_end_at',
       validateDateRange(inputdate, inputEndDateAdd),
     );
-  }
+  };
 
-  function checkEndDate(endDateIn) {
+  const checkEndDate = (endDateIn) => {
     setInputEndDate(endDateIn);
     validateAndSetField(
       'subscription_end_at',
       validateDateRange(inputStartDate, endDateIn),
     );
-  }
+  };
 
-  function checkEndDateAdd(endDateIn) {
+  const checkEndDateAdd = (endDateIn) => {
     setInputEndDateAdd(endDateIn);
     validateAndSetField(
       'subscription_end_at',
       validateDateRange(inputStartDateAdd, endDateIn),
     );
-  }
+  };
 
-  function handleImageChange(event, isAdd) {
+  const handleImageChange = (event, isAdd) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     if (!isValidImageFile(file)) {
-      setFieldError('logo', '画像を選択してください。');
+      setFieldError('logo', SELECT_IMAGE);
       return;
     }
 
@@ -237,32 +245,32 @@ export default function useClientForm(plans) {
     if (!isAdd) {
       setUpdateImageChange(true);
     }
-  }
+  };
 
-  function handleSelectImageClick(event) {
+  const handleSelectImageClick = (event) => {
     event.preventDefault();
     avatarInputRef.current?.click();
-  }
+  };
 
-  function onSelectPlan(planCode) {
+  const onSelectPlan = (planCode) => {
     const selected = plans.find((o) => o.code === planCode);
     if (selected) {
       antdForm.setFieldsValue({ price: selected.price });
       clearFieldError('price');
     }
-  }
+  };
 
-  function handleContractChange(value) {
+  const handleContractChange = (value) => {
     setContract(value);
-    validateAndSetField('status', value ? null : 'ステータスを選択してください。');
-  }
+    validateAndSetField('status', value ? null : STATUS_REQUIRED);
+  };
 
-  function deleteClientPopup(id) {
+  const deleteClientPopup = (id) => {
     setIsOpenDeleteClient(true);
     setIdDeleteClient(id);
-  }
+  };
 
-  const isAddMode = formMode === 'add';
+  const isAddMode = formMode === FORM_MODE_ADD;
   const startDate = isAddMode ? inputStartDateAdd : inputStartDate;
   const endDate = isAddMode ? inputEndDateAdd : inputEndDate;
   const onStartDateChange = isAddMode ? checkInputDateAdd : checkInputDate;
@@ -331,4 +339,6 @@ export default function useClientForm(plans) {
     handleImageChange,
     handleSelectImageClick,
   };
-}
+};
+
+export default useClientForm;

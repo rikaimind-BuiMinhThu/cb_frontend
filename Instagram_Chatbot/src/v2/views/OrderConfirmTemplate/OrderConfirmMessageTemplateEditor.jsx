@@ -4,13 +4,28 @@ import Cookies from 'js-cookie';
 import api from 'v2/api/api-management';
 import { AdminPage, AdminActionButton, useAdminHeaderActions } from 'v2/components/AdminShell';
 import OrderConfirmTemplateForm from './OrderConfirmTemplateForm';
-import { getSignInPath } from 'v2/variables/constants';
+import { getAdminRoutePath, getSignInPath } from 'v2/variables/constants';
 import {
   getDefaultOrderConfirmConfig,
   normalizeOrderConfirmConfig,
 } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/OrderConfirmLpScriptGenerator';
+import {
+  API_SUCCESS_CODE,
+  API_WARNING_CODE,
+  LOAD_FAILED,
+  NAME_MAX,
+  NAME_MAX_LENGTH,
+  NAME_REQUIRED_SHORT,
+  ROLE_ADMIN_DEEL,
+  SAVE_LABEL,
+  SUCCESS_SAVED,
+  TEMPLATE_ID_COOKIE_KEY,
+  TEMPLATE_LIST_PATH,
+  TEMPLATES_API_PATH,
+  USER_ROLE_COOKIE_KEY,
+} from './constants';
 
-function OrderConfirmMessageTemplateEditor() {
+const OrderConfirmMessageTemplateEditor = () => {
   const [templateId, setTemplateId] = useState('');
   const [templateName, setTemplateName] = useState('');
   const [config, setConfig] = useState(getDefaultOrderConfirmConfig());
@@ -19,26 +34,25 @@ function OrderConfirmMessageTemplateEditor() {
 
   const loadTemplate = (id) => {
     api
-      .get(`/api/v1/managements/order_confirm_message_templates/${id}`)
+      .get(`${TEMPLATES_API_PATH}/${id}`)
       .then((res) => {
-        if (res.data.code !== 1) {
-          message.warning(res.data.message || 'テンプレートの読み込みに失敗しました');
+        if (res.data.code !== API_SUCCESS_CODE) {
+          message.warning(res.data.message || LOAD_FAILED);
           return;
         }
         const data = res.data.data;
         setTemplateName(data.name || '');
         setConfig(normalizeOrderConfirmConfig(data.config || {}));
-      })
-      .catch((error) => console.error(error));
+      });
   };
 
   const validateName = (name) => {
     if (!name || name.length === 0) {
-      setNameError('テンプレート名を必ず指定してください。');
+      setNameError(NAME_REQUIRED_SHORT);
       return false;
     }
-    if (name.length > 50) {
-      setNameError('テンプレート名は50文字以下にしてください。');
+    if (name.length > NAME_MAX_LENGTH) {
+      setNameError(NAME_MAX);
       return false;
     }
     setNameError('');
@@ -50,18 +64,17 @@ function OrderConfirmMessageTemplateEditor() {
 
     setSaving(true);
     api
-      .put(`/api/v1/managements/order_confirm_message_templates/${templateId}`, {
+      .put(`${TEMPLATES_API_PATH}/${templateId}`, {
         order_confirm_message_template: { name: templateName },
         config: normalizeOrderConfirmConfig(config),
       })
       .then((res) => {
-        if (res.data.code === 1) {
-          message.success('正常に保存されました！');
-        } else if (res.data.code === 2) {
+        if (res.data.code === API_SUCCESS_CODE) {
+          message.success(SUCCESS_SAVED);
+        } else if (res.data.code === API_WARNING_CODE) {
           message.warning(res.data.message);
         }
       })
-      .catch((error) => console.error(error))
       .finally(() => setSaving(false));
   };
 
@@ -71,15 +84,15 @@ function OrderConfirmMessageTemplateEditor() {
   };
 
   useEffect(() => {
-    const userRole = Cookies.get('user_role');
-    if (!userRole || userRole !== 'admin_deel') {
+    const userRole = Cookies.get(USER_ROLE_COOKIE_KEY);
+    if (!userRole || userRole !== ROLE_ADMIN_DEEL) {
       window.location.href = getSignInPath();
       return;
     }
 
-    const id = Cookies.get('order_confirm_message_template_id');
+    const id = Cookies.get(TEMPLATE_ID_COOKIE_KEY);
     if (!id) {
-      window.location.href = '/v2/admin/order-confirm-template-list';
+      window.location.href = getAdminRoutePath(TEMPLATE_LIST_PATH);
       return;
     }
 
@@ -91,9 +104,9 @@ function OrderConfirmMessageTemplateEditor() {
     <>
       <AdminActionButton
         action="back"
-        onClick={() => { window.location.href = '/v2/admin/order-confirm-template-list'; }}
+        onClick={() => { window.location.href = getAdminRoutePath(TEMPLATE_LIST_PATH); }}
       />
-      <AdminActionButton action="save" label="保存" onClick={saveTemplate} loading={saving} />
+      <AdminActionButton action="save" label={SAVE_LABEL} onClick={saveTemplate} loading={saving} />
     </>
   );
 
@@ -108,6 +121,6 @@ function OrderConfirmMessageTemplateEditor() {
       />
     </AdminPage>
   );
-}
+};
 
 export default OrderConfirmMessageTemplateEditor;

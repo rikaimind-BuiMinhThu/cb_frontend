@@ -1,11 +1,19 @@
 import { useCallback, useEffect, useState } from 'react';
 import api from 'v2/api/api-management';
 import { AdminConfirmModal } from 'v2/components/AdminShell';
+import { API_SUCCESS_CODE } from 'v2/api/constants';
 import {
   ORDER_CONFIRM_LP_PRESET,
   buildOrderConfirmPresetConfig,
   normalizeOrderConfirmConfig,
 } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/OrderConfirmLpScriptGenerator';
+import {
+  APPLY_OK_TEXT,
+  APPLY_TEMPLATE_MESSAGE,
+  APPLY_TEMPLATE_TITLE,
+  LOAD_TEMPLATE_FAILED,
+  TEMPLATES_API_PATH,
+} from './constants';
 
 export const ORDER_CONFIRM_PRESET_OPTION = {
   ECFORCE: 'preset:ecforce',
@@ -14,7 +22,7 @@ export const ORDER_CONFIRM_PRESET_OPTION = {
 
 export const ORDER_CONFIRM_PRESET_OPTION_PREFIX = 'preset:';
 
-export default function useOrderConfirmMessageTemplates() {
+const useOrderConfirmMessageTemplates = () => {
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pendingApply, setPendingApply] = useState(null);
@@ -22,15 +30,12 @@ export default function useOrderConfirmMessageTemplates() {
   const fetchTemplates = useCallback(() => {
     setLoading(true);
     return api
-      .get('/api/v1/managements/order_confirm_message_templates')
+      .get(TEMPLATES_API_PATH)
       .then((res) => {
         setTemplates(res?.data?.data || []);
         return res?.data?.data || [];
       })
-      .catch((error) => {
-        console.error(error);
-        return [];
-      })
+      .catch(() => [])
       .finally(() => setLoading(false));
   }, []);
 
@@ -39,9 +44,9 @@ export default function useOrderConfirmMessageTemplates() {
   }, [fetchTemplates]);
 
   const fetchTemplateConfig = useCallback(async (templateId) => {
-    const res = await api.get(`/api/v1/managements/order_confirm_message_templates/${templateId}`);
-    if (res?.data?.code !== 1) {
-      throw new Error(res?.data?.message || 'Failed to load template');
+    const res = await api.get(`${TEMPLATES_API_PATH}/${templateId}`);
+    if (res?.data?.code !== API_SUCCESS_CODE) {
+      throw new Error(res?.data?.message || LOAD_TEMPLATE_FAILED);
     }
     return normalizeOrderConfirmConfig(res.data.data.config || {});
   }, []);
@@ -79,9 +84,9 @@ export default function useOrderConfirmMessageTemplates() {
   const confirmModal = (
     <AdminConfirmModal
       open={Boolean(pendingApply)}
-      title="テンプレートを適用しますか？"
-      message="現在の注文確認設定はテンプレートの内容で上書きされます。"
-      okText="適用"
+      title={APPLY_TEMPLATE_TITLE}
+      message={APPLY_TEMPLATE_MESSAGE}
+      okText={APPLY_OK_TEXT}
       onOk={applyPending}
       onCancel={() => setPendingApply(null)}
     />
@@ -97,4 +102,6 @@ export default function useOrderConfirmMessageTemplates() {
     presetOptions: ORDER_CONFIRM_PRESET_OPTION,
     confirmModal,
   };
-}
+};
+
+export default useOrderConfirmMessageTemplates;

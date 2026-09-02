@@ -1,25 +1,40 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Modal } from 'antd';
 import { AdminActionButton } from 'v2/components/AdminShell';
 import ClientFormBody from './components/ClientFormBody';
-import { ADD_FORM_ID } from './constants';
+import {
+  ADD_AVATAR_ID,
+  ADD_CLIENT_BUTTON_LABEL,
+  ADD_CLIENT_TITLE,
+  ADD_FORM_ID,
+  CLIENT_MODAL_WIDTH,
+  MODAL_SCROLL_CLASS,
+  SUBMIT_BUTTON_ID,
+} from './constants';
 
-function ClientAddModal({ open, onClose, form, onSubmit, loading }) {
+const ClientAddModal = ({ open, onClose, form, onSubmit, loading }) => {
   const { antdForm, formBodyProps, handleImageChange, handleSelectImageClick } = form;
 
   return (
     <Modal
-      title="クライアント追加"
+      title={ADD_CLIENT_TITLE}
       open={open}
       onCancel={onClose}
-      width={920}
+      width={CLIENT_MODAL_WIDTH}
       centered
       destroyOnClose
-      bodyStyle={{ maxHeight: '70vh', overflowY: 'auto' }}
+      className={MODAL_SCROLL_CLASS}
       footer={
         <div className="admin-form-actions">
           <AdminActionButton action="cancel" onClick={onClose} />
-          <AdminActionButton action="create" label="追加" id="btnSubmit" loading={loading} onClick={onSubmit} />
+          <AdminActionButton
+            action="create"
+            label={ADD_CLIENT_BUTTON_LABEL}
+            id={SUBMIT_BUTTON_ID}
+            loading={loading}
+            onClick={onSubmit}
+          />
         </div>
       }
     >
@@ -28,13 +43,21 @@ function ClientAddModal({ open, onClose, form, onSubmit, loading }) {
         antdForm={antdForm}
         showPasswordFields
         disableInput={false}
-        avatarId="avatar_add"
+        avatarId={ADD_AVATAR_ID}
         onImageChange={(e) => handleImageChange(e, true)}
         onSelectImageClick={handleSelectImageClick}
         {...formBodyProps}
       />
     </Modal>
   );
-}
+};
+
+ClientAddModal.propTypes = {
+  open: PropTypes.bool,
+  onClose: PropTypes.func,
+  form: PropTypes.object,
+  onSubmit: PropTypes.func,
+  loading: PropTypes.bool,
+};
 
 export default ClientAddModal;

@@ -1,124 +1,147 @@
-export function validatePickStatus(contract) {
-  if (['active', 'pause', 'ended', 'trial'].includes(contract)) {
+import {
+  DATE_SLICE_LENGTH,
+  END_DATE_BEFORE_START,
+  FIELD_MAX_LENGTH,
+  IMAGE_TYPE_JPEG,
+  IMAGE_TYPE_PNG,
+  INTEGER_REGEX,
+  MAX_FIELD_LENGTH,
+  MAX_NAME_LENGTH,
+  NAME_MAX_LENGTH,
+  PASSWORD_LENGTH,
+  PASSWORD_MAX_LENGTH,
+  PHONE_FORMAT,
+  PHONE_REGEX,
+  PHONE_REQUIRED,
+  POSITIVE_NUMBER,
+  PRICE_INTEGER,
+  START_DATE_REQUIRED_FIELD,
+  STATUS_ACTIVE,
+  STATUS_ENDED,
+  STATUS_PAUSE,
+  STATUS_REQUIRED,
+  STATUS_TRIAL,
+  ZIP_INTEGER,
+  ZIP_REQUIRED,
+  requiredMessage,
+} from '../constants';
+
+export const validatePickStatus = (contract) => {
+  if ([STATUS_ACTIVE, STATUS_PAUSE, STATUS_ENDED, STATUS_TRIAL].includes(contract)) {
     return null;
   }
-  return 'ステータスを選択してください。';
-}
+  return STATUS_REQUIRED;
+};
 
-export function validateNameField(value, fieldLabel) {
+export const validateNameField = (value, fieldLabel) => {
   if (value === '' || value == null) {
-    return `${fieldLabel}は、必ず指定してください。`;
+    return requiredMessage(fieldLabel);
   }
-  if (value.length > 35) {
-    return '35文字以下にしてください。';
+  if (value.length > NAME_MAX_LENGTH) {
+    return MAX_NAME_LENGTH;
   }
   return null;
-}
+};
 
-export function validateField(value, fieldLabel) {
+export const validateField = (value, fieldLabel) => {
   if (value === '' || value == null) {
-    return `${fieldLabel}は、必ず指定してください。`;
+    return requiredMessage(fieldLabel);
   }
-  if (value.length > 50) {
-    return '50文字以下にしてください。';
+  if (value.length > FIELD_MAX_LENGTH) {
+    return MAX_FIELD_LENGTH;
   }
   return null;
-}
+};
 
-export function validatePasswordField(value, fieldLabel) {
+export const validatePasswordField = (value, fieldLabel) => {
   if (value === '' || value == null) {
-    return `${fieldLabel}は、必ず指定してください。`;
+    return requiredMessage(fieldLabel);
   }
-  if (value.length > 24) {
-    return '24文字以下入力してください。6文字以上入力してください。';
+  if (value.length > PASSWORD_MAX_LENGTH) {
+    return PASSWORD_LENGTH;
   }
   return null;
-}
+};
 
-export function validateZipCode(value) {
+export const validateZipCode = (value) => {
   if (value === '' || value == null) {
-    return '郵便番号は、必ず指定してください。';
+    return ZIP_REQUIRED;
   }
-  if (!/^\d+$/.test(String(value))) {
-    return '郵便番号 は整数の必要です。';
+  if (!INTEGER_REGEX.test(String(value))) {
+    return ZIP_INTEGER;
   }
   if (Number(value) <= 0) {
-    return '正数を入力してください。';
+    return POSITIVE_NUMBER;
   }
   return null;
-}
+};
 
-export function validatePrice(value) {
+export const validatePrice = (value) => {
   if (value === '' || value == null) {
-    return '正数を入力してください。';
+    return POSITIVE_NUMBER;
   }
-  if (!/^\d+$/.test(String(value))) {
-    return 'プラン価格 は整数の必要です。';
+  if (!INTEGER_REGEX.test(String(value))) {
+    return PRICE_INTEGER;
   }
   if (Number(value) <= 0) {
-    return '正数を入力してください。';
+    return POSITIVE_NUMBER;
   }
   return null;
-}
+};
 
-export function validatePhoneNumber(value) {
-  const phoneRe = /^[+]*[(]{0,1}[0-9]{1,3}[)]{0,1}[-\s./0-9]*$/g;
+export const validatePhoneNumber = (value) => {
   if (value === '' || value == null) {
-    return '電話番号は、必ず指定してください。';
+    return PHONE_REQUIRED;
   }
-  if (phoneRe.test(value) === false || parseInt(Number(value), 10) !== Number(value)) {
-    return '電話番号の形式で入力してください。';
+  if (PHONE_REGEX.test(value) === false || parseInt(Number(value), 10) !== Number(value)) {
+    return PHONE_FORMAT;
   }
   return null;
-}
+};
 
-export function validateStartDate(date) {
+export const validateStartDate = (date) => {
   if (!date) {
-    return '開始日を入力してください。';
+    return START_DATE_REQUIRED_FIELD;
   }
   return null;
-}
+};
 
-export function validateDateRange(startDate, endDate) {
+export const validateDateRange = (startDate, endDate) => {
   if (!startDate || !endDate) {
     return null;
   }
 
   const startStr =
     startDate instanceof Date
-      ? startDate.toISOString().slice(0, 10)
-      : String(startDate).slice(0, 10);
+      ? startDate.toISOString().slice(0, DATE_SLICE_LENGTH)
+      : String(startDate).slice(0, DATE_SLICE_LENGTH);
   const endStr =
-    endDate instanceof Date ? endDate.toISOString().slice(0, 10) : String(endDate).slice(0, 10);
+    endDate instanceof Date ? endDate.toISOString().slice(0, DATE_SLICE_LENGTH) : String(endDate).slice(0, DATE_SLICE_LENGTH);
 
   const start = parseInt(startStr.replaceAll('-', ''), 10);
   const end = parseInt(endStr.replaceAll('-', ''), 10);
 
   if (start > end) {
-    return '終了日を開始日の前に設定することはできません';
+    return END_DATE_BEFORE_START;
   }
   return null;
-}
+};
 
-export function isKatakanaValid(value) {
+export const isKatakanaValid = (value) => {
   if (!value) return false;
   const bytes = encodeURI(value).split(/%..|./).length - 1;
   return bytes === value.length * 3;
-}
+};
 
-export function isValidImageFile(file) {
-  return Boolean(file && (file.type === 'image/png' || file.type === 'image/jpeg'));
-}
+export const isValidImageFile = (file) =>
+  Boolean(file && (file.type === IMAGE_TYPE_PNG || file.type === IMAGE_TYPE_JPEG));
 
-export function mergeFieldErrors(...errorMaps) {
-  return Object.assign({}, ...errorMaps.filter(Boolean));
-}
+export const mergeFieldErrors = (...errorMaps) => Object.assign({}, ...errorMaps.filter(Boolean));
 
-export function collectFieldErrors(entries) {
-  return entries.reduce((errors, [key, message]) => {
+export const collectFieldErrors = (entries) =>
+  entries.reduce((errors, [key, message]) => {
     if (message) {
       errors[key] = message;
     }
     return errors;
   }, {});
-}

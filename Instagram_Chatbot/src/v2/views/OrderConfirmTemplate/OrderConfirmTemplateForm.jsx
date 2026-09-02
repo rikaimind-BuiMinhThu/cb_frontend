@@ -9,20 +9,30 @@ import {
   getDefaultOrderConfirmConfig,
   normalizeOrderConfirmConfig,
 } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/OrderConfirmLpScriptGenerator';
+import {
+  CARD_ADVANCED,
+  CARD_BASIC,
+  CARD_FIELDS,
+  LABEL_LP_TYPE,
+  LABEL_NO_AUTO_SCROLL,
+  LABEL_TEMPLATE_NAME,
+  PRESET_CUSTOM_LABEL,
+  PRESET_ECFORCE_LABEL,
+} from './constants';
 import './orderConfirmTemplateEditor.css';
 
 const LP_PRESET_OPTIONS = [
-  [ORDER_CONFIRM_LP_PRESET.ECFORCE, 'EC Force'],
-  [ORDER_CONFIRM_LP_PRESET.CUSTOM, 'カスタム'],
+  [ORDER_CONFIRM_LP_PRESET.ECFORCE, PRESET_ECFORCE_LABEL],
+  [ORDER_CONFIRM_LP_PRESET.CUSTOM, PRESET_CUSTOM_LABEL],
 ];
 
-export default function OrderConfirmTemplateForm({
+const OrderConfirmTemplateForm = ({
   templateName,
   nameError,
   onTemplateNameChange,
   config,
   onConfigChange,
-}) {
+}) => {
   const normalizedConfig = normalizeOrderConfirmConfig(config || getDefaultOrderConfirmConfig());
 
   const handlePresetChange = (preset) => {
@@ -41,11 +51,11 @@ export default function OrderConfirmTemplateForm({
 
   return (
     <div className="order-confirm-template-editor">
-      <Card title="基本設定" className="order-confirm-template-editor__card" bordered={false}>
+      <Card title={CARD_BASIC} className="order-confirm-template-editor__card" bordered={false}>
         <div className="order-confirm-template-editor__form-grid">
           <div className="order-confirm-template-editor__form-row order-confirm-template-editor__form-row--top">
             <label className="order-confirm-template-editor__label" htmlFor="order-confirm-template-name">
-              テンプレート名
+              {LABEL_TEMPLATE_NAME}
             </label>
             <div className="order-confirm-template-editor__control">
               <Input
@@ -59,7 +69,7 @@ export default function OrderConfirmTemplateForm({
 
           <div className="order-confirm-template-editor__form-row">
             <label className="order-confirm-template-editor__label" htmlFor="order-confirm-lp-preset">
-              LP種別
+              {LABEL_LP_TYPE}
             </label>
             <div className="order-confirm-template-editor__control">
               <select
@@ -77,7 +87,7 @@ export default function OrderConfirmTemplateForm({
 
           <div className="order-confirm-template-editor__scroll-row">
             <CheckboxCustom
-              label="自動でスクロールさせない"
+              label={LABEL_NO_AUTO_SCROLL}
               onChange={(value) => onConfigChange(normalizeOrderConfirmConfig({
                 ...normalizedConfig,
                 scroll_auto: value,
@@ -88,7 +98,7 @@ export default function OrderConfirmTemplateForm({
         </div>
       </Card>
 
-      <Card title="項目設定" className="order-confirm-template-editor__card order-confirm-template-editor__fields-card" bordered={false}>
+      <Card title={CARD_FIELDS} className="order-confirm-template-editor__card order-confirm-template-editor__fields-card" bordered={false}>
         <OrderConfirmSettingsModalContent
           config={normalizedConfig}
           onConfigChange={onConfigChange}
@@ -96,7 +106,7 @@ export default function OrderConfirmTemplateForm({
         />
       </Card>
 
-      <Card title="詳細設定" className="order-confirm-template-editor__card" bordered={false}>
+      <Card title={CARD_ADVANCED} className="order-confirm-template-editor__card" bordered={false}>
         <OrderConfirmAdvancedSettings
           className="order-confirm-template-editor__advanced"
           normalizedConfig={normalizedConfig}
@@ -105,4 +115,6 @@ export default function OrderConfirmTemplateForm({
       </Card>
     </div>
   );
-}
+};
+
+export default OrderConfirmTemplateForm;

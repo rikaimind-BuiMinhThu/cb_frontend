@@ -129,6 +129,27 @@
   color: #597ef7;
 }
 
+.email-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.email-chip {
+  margin: 0 5px 5px 0;
+  border-radius: 5px;
+  width: max-content;
+  background-color: #e0e0e0;
+  display: flex;
+  align-items: center;
+  padding: 2px 8px;
+}
+
+.email-chip-remove {
+  cursor: pointer;
+  margin-left: 8px;
+}
+
 @media (max-width: 768px) {
   .email-form-page {
     padding: 16px;

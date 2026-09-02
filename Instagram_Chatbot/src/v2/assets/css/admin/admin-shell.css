@@ -960,3 +960,34 @@
 .bot-demo-preview--open .sp-body {
   display: block;
 }
+
+.admin-modal-scroll .ant-modal-body {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.admin-client-form-logo-input {
+  display: none;
+}
+
+.admin-client-logo-thumb {
+  height: 60px;
+  width: 60px;
+  object-fit: cover;
+}
+
+.admin-search-bar-error {
+  color: var(--admin-danger);
+  font-size: 13px;
+  width: 100%;
+}
+
+.admin-code-textarea.ant-input,
+.admin-code-textarea.ant-input-disabled {
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.admin-visually-hidden {
+  display: none;
+}

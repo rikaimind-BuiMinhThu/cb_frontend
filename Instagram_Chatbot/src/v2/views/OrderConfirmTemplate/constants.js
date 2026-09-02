@@ -1,0 +1,42 @@
+import { API_SUCCESS_CODE, ROLE_ADMIN_DEEL, USER_ROLE_COOKIE_KEY } from 'v2/api/constants';
+
+export const TEMPLATES_API_PATH = '/api/v1/managements/order_confirm_message_templates';
+export const TEMPLATE_ID_COOKIE_KEY = 'order_confirm_message_template_id';
+export const TEMPLATE_SETTING_PATH = '/order-confirm-template-setting';
+export const TEMPLATE_LIST_PATH = '/order-confirm-template-list';
+export const DATE_FORMAT = 'YYYY/MM/DD';
+export const NAME_MAX_LENGTH = 50;
+export const API_WARNING_CODE = 2;
+
+export const CREATE_TEMPLATE_TITLE = 'テンプレート作成';
+export const CREATE_TEMPLATE_BUTTON = 'テンプレート作成';
+export const CREATE_OK_TEXT = '作成';
+export const CANCEL_TEXT = 'キャンセル';
+export const LABEL_TEMPLATE_NAME = 'テンプレート名';
+export const HINT_TEMPLATE_NAME = '※テンプレートに任意の名称をつけることができます。';
+export const COL_TEMPLATE_NAME = 'テンプレート名';
+export const COL_UPDATED_AT = '最後の更新日時';
+export const COL_ACTIONS = 'アクション';
+export const DELETE_CONFIRM_MESSAGE = '本当に削除しますか。';
+export const NAME_REQUIRED = 'テンプレート名は、必ず指定してください。';
+export const NAME_REQUIRED_SHORT = 'テンプレート名を必ず指定してください。';
+export const NAME_MAX = 'テンプレート名は50文字以下にしてください。';
+export const SUCCESS_ADDED = '正常に追加されました！';
+export const SUCCESS_DELETED = '正常に削除されました！';
+export const SUCCESS_SAVED = '正常に保存されました！';
+export const LOAD_FAILED = 'テンプレートの読み込みに失敗しました';
+export const SAVE_LABEL = '保存';
+export const NEW_TEMPLATE_NAME_ID = 'new-order-template-name';
+export const CARD_BASIC = '基本設定';
+export const CARD_FIELDS = '項目設定';
+export const CARD_ADVANCED = '詳細設定';
+export const LABEL_LP_TYPE = 'LP種別';
+export const LABEL_NO_AUTO_SCROLL = '自動でスクロールさせない';
+export const PRESET_ECFORCE_LABEL = 'EC Force';
+export const PRESET_CUSTOM_LABEL = 'カスタム';
+export const APPLY_TEMPLATE_TITLE = 'テンプレートを適用しますか？';
+export const APPLY_TEMPLATE_MESSAGE = '現在の注文確認設定はテンプレートの内容で上書きされます。';
+export const APPLY_OK_TEXT = '適用';
+export const LOAD_TEMPLATE_FAILED = 'Failed to load template';
+
+export { API_SUCCESS_CODE, ROLE_ADMIN_DEEL, USER_ROLE_COOKIE_KEY };

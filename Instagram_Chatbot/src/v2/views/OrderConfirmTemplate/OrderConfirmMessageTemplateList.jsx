@@ -1,13 +1,41 @@
-import { Link } from 'react-router-dom';
+import React from 'react';
+import { Link, useHistory } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Input, Modal, Space, message } from 'antd';
 import Cookies from 'js-cookie';
 import moment from 'moment';
 import api from 'v2/api/api-management';
 import { AdminPage, AdminTable, AdminConfirmModal, AdminActionButton, AdminFormRow, useAdminHeaderActions } from 'v2/components/AdminShell';
-import { getSignInPath } from 'v2/variables/constants';
+import { getAdminRoutePath, getSignInPath } from 'v2/variables/constants';
+import {
+  API_SUCCESS_CODE,
+  API_WARNING_CODE,
+  CANCEL_TEXT,
+  COL_ACTIONS,
+  COL_TEMPLATE_NAME,
+  COL_UPDATED_AT,
+  CREATE_OK_TEXT,
+  CREATE_TEMPLATE_BUTTON,
+  CREATE_TEMPLATE_TITLE,
+  DATE_FORMAT,
+  DELETE_CONFIRM_MESSAGE,
+  HINT_TEMPLATE_NAME,
+  LABEL_TEMPLATE_NAME,
+  NAME_MAX,
+  NAME_MAX_LENGTH,
+  NAME_REQUIRED,
+  NEW_TEMPLATE_NAME_ID,
+  ROLE_ADMIN_DEEL,
+  SUCCESS_ADDED,
+  SUCCESS_DELETED,
+  TEMPLATE_ID_COOKIE_KEY,
+  TEMPLATE_SETTING_PATH,
+  TEMPLATES_API_PATH,
+  USER_ROLE_COOKIE_KEY,
+} from './constants';
 
-function OrderConfirmMessageTemplateList() {
+const OrderConfirmMessageTemplateList = () => {
+  const history = useHistory();
   const [isOpenCreateTemplate, setIsOpenCreateTemplate] = useState(false);
   const [isOpenDeleteTemplate, setIsOpenDeleteTemplate] = useState(false);
   const [listTemplate, setListTemplate] = useState([]);
@@ -18,9 +46,19 @@ function OrderConfirmMessageTemplateList() {
   const [deleting, setDeleting] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const getListTemplate = () => {
+    setLoading(true);
+    api
+      .get(TEMPLATES_API_PATH)
+      .then((res) => {
+        setListTemplate(res?.data?.data || []);
+      })
+      .finally(() => setLoading(false));
+  };
+
   useEffect(() => {
-    const userRole = Cookies.get('user_role');
-    if (!userRole || userRole !== 'admin_deel') {
+    const userRole = Cookies.get(USER_ROLE_COOKIE_KEY);
+    if (!userRole || userRole !== ROLE_ADMIN_DEEL) {
       window.location.href = getSignInPath();
       return;
     }
@@ -29,27 +67,16 @@ function OrderConfirmMessageTemplateList() {
   }, []);
 
   useAdminHeaderActions(
-    <AdminActionButton action="create" label="テンプレート作成" onClick={() => setIsOpenCreateTemplate(true)} />
+    <AdminActionButton action="create" label={CREATE_TEMPLATE_BUTTON} onClick={() => setIsOpenCreateTemplate(true)} />
   );
-
-  const getListTemplate = () => {
-    setLoading(true);
-    api
-      .get('/api/v1/managements/order_confirm_message_templates')
-      .then((res) => {
-        setListTemplate(res?.data?.data || []);
-      })
-      .catch((error) => console.error(error))
-      .finally(() => setLoading(false));
-  };
 
   const checkInputTemplateName = (templateName) => {
     if (templateName.length === 0) {
-      setNameError('テンプレート名は、必ず指定してください。');
+      setNameError(NAME_REQUIRED);
       return false;
     }
-    if (templateName.length > 50) {
-      setNameError('テンプレート名は50文字以下にしてください。');
+    if (templateName.length > NAME_MAX_LENGTH) {
+      setNameError(NAME_MAX);
       return false;
     }
     setNameError('');
@@ -60,23 +87,22 @@ function OrderConfirmMessageTemplateList() {
     if (!checkInputTemplateName(newTemplateName)) return;
     setCreating(true);
     api
-      .post('/api/v1/managements/order_confirm_message_templates', {
+      .post(TEMPLATES_API_PATH, {
         order_confirm_message_template: { name: newTemplateName },
       })
       .then((res) => {
-        if (res.data.code === 1) {
-          message.success('正常に追加されました！');
-          Cookies.set('order_confirm_message_template_id', res.data.data.id);
+        if (res.data.code === API_SUCCESS_CODE) {
+          message.success(SUCCESS_ADDED);
+          Cookies.set(TEMPLATE_ID_COOKIE_KEY, res.data.data.id);
           setIsOpenCreateTemplate(false);
           setNewTemplateName('');
           setNameError('');
-          setTimeout(() => document.getElementById('to_order_confirm_template')?.click(), 1500);
-        } else if (res.data.code === 2) {
+          history.push(getAdminRoutePath(TEMPLATE_SETTING_PATH));
+        } else if (res.data.code === API_WARNING_CODE) {
           message.warning(res.data.message);
         }
         getListTemplate();
       })
-      .catch((err) => console.log(err))
       .finally(() => setCreating(false));
   };
 
@@ -88,10 +114,10 @@ function OrderConfirmMessageTemplateList() {
   const deleteTemplate = () => {
     setDeleting(true);
     api
-      .delete(`/api/v1/managements/order_confirm_message_templates/${templateSelectId}`)
+      .delete(`${TEMPLATES_API_PATH}/${templateSelectId}`)
       .then((res) => {
-        if (res.data.code === 1) message.success('正常に削除されました！');
-        else if (res.data.code === 2) message.warning(res.data.message);
+        if (res.data.code === API_SUCCESS_CODE) message.success(SUCCESS_DELETED);
+        else if (res.data.code === API_WARNING_CODE) message.warning(res.data.message);
         getListTemplate();
         setIsOpenDeleteTemplate(false);
       })
@@ -99,22 +125,22 @@ function OrderConfirmMessageTemplateList() {
   };
 
   const onclickEditTemplate = (id) => {
-    Cookies.set('order_confirm_message_template_id', id);
+    Cookies.set(TEMPLATE_ID_COOKIE_KEY, id);
   };
 
   const columns = [
-    { title: 'テンプレート名', dataIndex: 'name' },
+    { title: COL_TEMPLATE_NAME, dataIndex: 'name' },
     {
-      title: '最後の更新日時',
+      title: COL_UPDATED_AT,
       dataIndex: 'updated_at',
-      render: (value) => moment(value).format('YYYY/MM/DD'),
+      render: (value) => moment(value).format(DATE_FORMAT),
     },
     {
-      title: 'アクション',
+      title: COL_ACTIONS,
       width: 140,
       render: (_, template) => (
         <Space className="admin-table-actions">
-          <Link to="/v2/admin/order-confirm-template-setting">
+          <Link to={getAdminRoutePath(TEMPLATE_SETTING_PATH)}>
             <AdminActionButton action="edit" iconOnly onClick={() => onclickEditTemplate(template.id)} />
           </Link>
           <AdminActionButton action="delete" iconOnly onClick={() => handleDeleteTemplate(template.id)} />
@@ -136,7 +162,7 @@ function OrderConfirmMessageTemplateList() {
       </AdminPage>
 
       <Modal
-        title="テンプレート作成"
+        title={CREATE_TEMPLATE_TITLE}
         open={isOpenCreateTemplate}
         onOk={createTemplate}
         onCancel={() => {
@@ -144,19 +170,19 @@ function OrderConfirmMessageTemplateList() {
           setNewTemplateName('');
           setNameError('');
         }}
-        okText="作成"
-        cancelText="キャンセル"
+        okText={CREATE_OK_TEXT}
+        cancelText={CANCEL_TEXT}
         confirmLoading={creating}
       >
         <AdminFormRow
-          label="テンプレート名"
-          htmlFor="new-order-template-name"
+          label={LABEL_TEMPLATE_NAME}
+          htmlFor={NEW_TEMPLATE_NAME_ID}
           required
           error={nameError}
-          hint="※テンプレートに任意の名称をつけることができます。"
+          hint={HINT_TEMPLATE_NAME}
         >
           <Input
-            id="new-order-template-name"
+            id={NEW_TEMPLATE_NAME_ID}
             value={newTemplateName}
             onChange={(e) => {
               setNewTemplateName(e.target.value);
@@ -168,20 +194,14 @@ function OrderConfirmMessageTemplateList() {
 
       <AdminConfirmModal
         open={isOpenDeleteTemplate}
-        message="本当に削除しますか。"
+        message={DELETE_CONFIRM_MESSAGE}
         onOk={deleteTemplate}
         onCancel={() => setIsOpenDeleteTemplate(false)}
         danger
         loading={deleting}
       />
-
-      <Link to="/v2/admin/order-confirm-template-setting">
-        <button id="to_order_confirm_template" style={{ display: 'none' }} type="button">
-          OrderConfirmTemplateSetting
-        </button>
-      </Link>
     </>
   );
-}
+};
 
 export default OrderConfirmMessageTemplateList;

@@ -11,9 +11,14 @@ import {
   useAdminHeaderActions,
 } from 'v2/components/AdminShell';
 import { getAdminRoutePath } from 'v2/variables/constants';
+import {
+  CREATE_EMAIL_LABEL,
+  DELETE_CONFIRM,
+  DUPLICATE_CONFIRM,
+} from './constants';
 import 'v2/assets/css/bot/email/list-email.css';
 
-function ListEmail() {
+const ListEmail = () => {
   const [emailList, setEmailList] = useState([]);
   const [clientEmail, setClientEmail] = useState(null);
   const [isOpenDuplicate, setIsOpenDuplicate] = useState(false);
@@ -47,7 +52,7 @@ function ListEmail() {
     return () => setEmailList([]);
   }, []);
 
-  function duplicateEmail() {
+  const duplicateEmail = () => {
     api
       .post(`/api/v1/managements/emails/${idEmail}/duplicate`)
       .then((res) => {
@@ -64,7 +69,7 @@ function ListEmail() {
       });
   }
 
-  function deleteEmail() {
+  const deleteEmail = () => {
     api
       .delete(`/api/v1/managements/emails/${idEmail}`)
       .then((res) => {
@@ -84,7 +89,7 @@ function ListEmail() {
   useAdminHeaderActions(
     <AdminActionButton
       action="create"
-      label="メール作成"
+      label={CREATE_EMAIL_LABEL}
       onClick={() => { window.location.href = getAdminRoutePath('/create-email'); }}
     />
   );
@@ -188,10 +193,10 @@ function ListEmail() {
         />
       </AdminPage>
 
-      <AdminConfirmModal open={isOpenDuplicate} message="本当に複製しますか。" onOk={duplicateEmail} onCancel={() => setIsOpenDuplicate(false)} />
-      <AdminConfirmModal open={isOpenDelete} message="本当に削除しますか。" onOk={deleteEmail} onCancel={() => setIsOpenDelete(false)} danger />
+      <AdminConfirmModal open={isOpenDuplicate} message={DUPLICATE_CONFIRM} onOk={duplicateEmail} onCancel={() => setIsOpenDuplicate(false)} />
+      <AdminConfirmModal open={isOpenDelete} message={DELETE_CONFIRM} onOk={deleteEmail} onCancel={() => setIsOpenDelete(false)} danger />
     </>
   );
-}
+};
 
 export default ListEmail;

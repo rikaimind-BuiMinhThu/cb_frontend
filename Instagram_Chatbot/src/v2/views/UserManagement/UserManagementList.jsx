@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import PropTypes from 'prop-types';
 import {
   AdminPage,
   AdminTable,
@@ -6,10 +7,10 @@ import {
   AdminActionButton,
   useAdminHeaderActions,
 } from 'v2/components/AdminShell';
-import { PAGE_SIZE } from './constants';
+import { ADD_USER_TITLE, PAGE_SIZE, SEARCH_PLACEHOLDER } from './constants';
 import { createUserColumns } from './userManagementColumns';
 
-function UserManagementList({
+const UserManagementList = ({
   users,
   total,
   page,
@@ -21,14 +22,14 @@ function UserManagementList({
   onAdd,
   onEdit,
   onDelete,
-}) {
+}) => {
   const columns = useMemo(
     () => createUserColumns({ onEdit, onDelete }),
     [onEdit, onDelete]
   );
 
   useAdminHeaderActions(
-    <AdminActionButton action="create" label="ユーザー追加" onClick={onAdd} />
+    <AdminActionButton action="create" label={ADD_USER_TITLE} onClick={onAdd} />
   );
 
   return (
@@ -43,7 +44,7 @@ function UserManagementList({
             searchValue={namesearch}
             onSearchChange={setNamesearch}
             onSearch={handleSearch}
-            searchPlaceholder="ユーザー名 ..."
+            searchPlaceholder={SEARCH_PLACEHOLDER}
           />
         }
         pagination={{
@@ -55,6 +56,20 @@ function UserManagementList({
       />
     </AdminPage>
   );
-}
+};
+
+UserManagementList.propTypes = {
+  users: PropTypes.array,
+  total: PropTypes.number,
+  page: PropTypes.number,
+  loading: PropTypes.bool,
+  namesearch: PropTypes.string,
+  setNamesearch: PropTypes.func,
+  handleSearch: PropTypes.func,
+  handlePageChange: PropTypes.func,
+  onAdd: PropTypes.func,
+  onEdit: PropTypes.func,
+  onDelete: PropTypes.func,
+};
 
 export default UserManagementList;

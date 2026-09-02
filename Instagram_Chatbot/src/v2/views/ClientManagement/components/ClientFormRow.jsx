@@ -2,20 +2,18 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import AdminFormRow from 'v2/components/AdminShell/AdminFormRow';
 
-function ClientFormRow({ label, required, alignTop, error, htmlFor, children }) {
-  return (
-    <AdminFormRow
-      layout="horizontal"
-      label={label}
-      required={required}
-      alignTop={alignTop}
-      error={error}
-      htmlFor={htmlFor}
-    >
-      {children}
-    </AdminFormRow>
-  );
-}
+const ClientFormRow = ({ label, required, alignTop, error, htmlFor, children }) => (
+  <AdminFormRow
+    layout="horizontal"
+    label={label}
+    required={required}
+    alignTop={alignTop}
+    error={error}
+    htmlFor={htmlFor}
+  >
+    {children}
+  </AdminFormRow>
+);
 
 ClientFormRow.propTypes = {
   label: PropTypes.string,

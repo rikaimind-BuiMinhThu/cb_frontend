@@ -1,9 +1,45 @@
 import React, { useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { Form, Input, Modal, Select } from 'antd';
 import { AdminActionButton } from 'v2/components/AdminShell';
-import { EMAIL_REGEX, ROLE_OPTIONS } from './constants';
+import {
+  CLIENT_REQUIRED,
+  EMAIL_FORMAT,
+  EMAIL_REGEX,
+  EDIT_USER_TITLE,
+  FORM_LABEL_COL,
+  FORM_WRAPPER_COL,
+  LABEL_CLIENT,
+  LABEL_LOGIN_ID,
+  LABEL_NAME,
+  LABEL_PASSWORD,
+  LABEL_PASSWORD_CONFIRM,
+  LABEL_ROLE,
+  LOGIN_MAX,
+  LOGIN_REQUIRED,
+  NAME_MAX,
+  NAME_MAX_LENGTH,
+  NAME_REQUIRED,
+  PASSWORD_LENGTH,
+  PASSWORD_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
+  PASSWORD_MISMATCH,
+  PLACEHOLDER_CLIENT,
+  ROLE_OPTIONS,
+  ROLE_REQUIRED,
+  UPDATE_BUTTON_LABEL,
+  USER_MODAL_WIDTH,
+} from './constants';
 
-function UserEditModal({ open, onClose, listClient, editingUser, onSubmit, loading }) {
+const validateOptionalPasswordLength = (_, value) => {
+  if (!value) return Promise.resolve();
+  if (value.length < PASSWORD_MIN_LENGTH || value.length > PASSWORD_MAX_LENGTH) {
+    return Promise.reject(new Error(PASSWORD_LENGTH));
+  }
+  return Promise.resolve();
+};
+
+const UserEditModal = ({ open, onClose, listClient, editingUser, onSubmit, loading }) => {
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -19,11 +55,11 @@ function UserEditModal({ open, onClose, listClient, editingUser, onSubmit, loadi
     }
   }, [open, editingUser, form]);
 
-  function handleOk() {
+  const handleOk = () => {
     form.validateFields().then((values) => {
       onSubmit(values);
     });
-  }
+  };
 
   const clientOptions =
     listClient?.clients?.map((client) => ({
@@ -33,15 +69,15 @@ function UserEditModal({ open, onClose, listClient, editingUser, onSubmit, loadi
 
   return (
     <Modal
-      title="ユーザー編集"
+      title={EDIT_USER_TITLE}
       open={open}
       onCancel={onClose}
-      width={520}
+      width={USER_MODAL_WIDTH}
       destroyOnClose
       footer={
         <div className="admin-form-actions">
           <AdminActionButton action="cancel" onClick={onClose} />
-          <AdminActionButton action="save" label="更新" onClick={handleOk} loading={loading} />
+          <AdminActionButton action="save" label={UPDATE_BUTTON_LABEL} onClick={handleOk} loading={loading} />
         </div>
       }
     >
@@ -50,76 +86,62 @@ function UserEditModal({ open, onClose, listClient, editingUser, onSubmit, loadi
         layout="horizontal"
         colon={false}
         labelAlign="left"
-        labelCol={{ flex: '0 0 140px' }}
-        wrapperCol={{ flex: 1 }}
+        labelCol={FORM_LABEL_COL}
+        wrapperCol={FORM_WRAPPER_COL}
       >
         <Form.Item
-          label="名称"
+          label={LABEL_NAME}
           name="full_name"
           rules={[
-            { required: true, message: '名称は、必ず指定してください。' },
-            { max: 35, message: '名称は35文字以下にしてください。' },
+            { required: true, message: NAME_REQUIRED },
+            { max: NAME_MAX_LENGTH, message: NAME_MAX },
           ]}
         >
           <Input />
         </Form.Item>
         <Form.Item
-          label="ログインID"
+          label={LABEL_LOGIN_ID}
           name="email"
           rules={[
-            { required: true, message: 'ログインIDは、必ず指定してください。' },
-            { max: 35, message: 'ログインIDは35文字以下にしてください。' },
-            { pattern: EMAIL_REGEX, message: 'メールの正しい形式で入力してください：abc@abc.com' },
+            { required: true, message: LOGIN_REQUIRED },
+            { max: NAME_MAX_LENGTH, message: LOGIN_MAX },
+            { pattern: EMAIL_REGEX, message: EMAIL_FORMAT },
           ]}
         >
           <Input />
         </Form.Item>
         <Form.Item
-          label="クライアント"
+          label={LABEL_CLIENT}
           name="client_id"
-          rules={[{ required: true, message: 'クライアントを選択してください。' }]}
+          rules={[{ required: true, message: CLIENT_REQUIRED }]}
         >
-          <Select options={clientOptions} placeholder="クライアントを選択" />
+          <Select options={clientOptions} placeholder={PLACEHOLDER_CLIENT} />
         </Form.Item>
         <Form.Item
-          label="権限"
+          label={LABEL_ROLE}
           name="role"
-          rules={[{ required: true, message: '権限を選択してください。' }]}
+          rules={[{ required: true, message: ROLE_REQUIRED }]}
         >
           <Select options={ROLE_OPTIONS} />
         </Form.Item>
         <Form.Item
-          label="パスワード"
+          label={LABEL_PASSWORD}
           name="password"
-          rules={[
-            {
-              validator: (_, value) => {
-                if (!value) return Promise.resolve();
-                if (value.length < 6 || value.length > 24) {
-                  return Promise.reject(
-                    new Error('24文字以下入力してください。6文字以上入力してください。')
-                  );
-                }
-                return Promise.resolve();
-              },
-            },
-          ]}
+          rules={[{ validator: validateOptionalPasswordLength }]}
         >
           <Input.Password />
         </Form.Item>
         <Form.Item
-          label="パスワード（確認用）"
+          label={LABEL_PASSWORD_CONFIRM}
           name="password_confirmation"
           dependencies={['password']}
           rules={[
             ({ getFieldValue }) => ({
-              validator(_, value) {
+              validator: (_, value) => {
                 const password = getFieldValue('password');
                 if (!password && !value) return Promise.resolve();
                 if (password === value) return Promise.resolve();
-                return Promise.reject(
-                  new Error('パスワードが一致しません。もう一度ご入力ください。')
-                );
+                return Promise.reject(new Error(PASSWORD_MISMATCH));
               },
             }),
           ]}
@@ -129,6 +151,15 @@ function UserEditModal({ open, onClose, listClient, editingUser, onSubmit, loadi
       </Form>
     </Modal>
   );
-}
+};
+
+UserEditModal.propTypes = {
+  open: PropTypes.bool,
+  onClose: PropTypes.func,
+  listClient: PropTypes.object,
+  editingUser: PropTypes.object,
+  onSubmit: PropTypes.func,
+  loading: PropTypes.bool,
+};
 
 export default UserEditModal;
