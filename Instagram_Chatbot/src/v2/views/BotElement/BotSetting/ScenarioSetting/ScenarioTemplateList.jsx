@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Input, List, Modal, Space, message } from 'antd';
+import { Input, Modal, Space, message } from 'antd';
 import Cookies from 'js-cookie';
 import moment from 'moment';
-import api from 'api/api-management';
-import { AdminPage, AdminConfirmModal, AdminActionButton, AdminFormRow, useAdminHeaderActions } from '../../../../components/AdminShell';
+import api from 'v2/api/api-management';
+import { AdminPage, AdminTable, AdminConfirmModal, AdminActionButton, AdminFormRow, useAdminHeaderActions } from '../../../../components/AdminShell';
+import { getSignInPath } from 'v2/variables/constants';
 
 function ScenarioTemplateList() {
   const [isOpenCreateTemplate, setIsOpenCreateTemplate] = useState(false);
@@ -15,11 +16,12 @@ function ScenarioTemplateList() {
   const [nameError, setNameError] = useState('');
   const [creating, setCreating] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const userRole = Cookies.get('user_role');
     if (!userRole || userRole !== 'admin_deel') {
-      window.location.href = '/';
+      window.location.href = getSignInPath();
       return;
     }
     window.scrollTo(0, 0);
@@ -31,12 +33,14 @@ function ScenarioTemplateList() {
   );
 
   const getListTemplate = () => {
+    setLoading(true);
     api
       .get('/api/v1/managements/scenario_templates')
       .then((res) => {
         setListTemplate(res?.data?.data || []);
       })
-      .catch((error) => console.error(error));
+      .catch((error) => console.error(error))
+      .finally(() => setLoading(false));
   };
 
   const checkInputTemplateName = (templateName) => {
@@ -98,31 +102,36 @@ function ScenarioTemplateList() {
     Cookies.set('scenario_template_id', id);
   };
 
+  const columns = [
+    { title: 'テンプレート名', dataIndex: 'name' },
+    {
+      title: '最後の更新日時',
+      dataIndex: 'updated_at',
+      render: (value) => moment(value).format('YYYY/MM/DD'),
+    },
+    {
+      title: 'アクション',
+      width: 140,
+      render: (_, template) => (
+        <Space className="admin-table-actions">
+          <Link to="/v2/admin/scenario-template-setting">
+            <AdminActionButton action="edit" iconOnly onClick={() => onclickEditTemplate(template.id)} />
+          </Link>
+          <AdminActionButton action="delete" iconOnly onClick={() => handleDeleteTemplate(template.id)} />
+        </Space>
+      ),
+    },
+  ];
+
   return (
     <>
       <AdminPage>
-        <List
+        <AdminTable
+          loading={loading}
+          columns={columns}
           dataSource={listTemplate}
-          renderItem={(template) => (
-            <List.Item
-              style={{
-                padding: '16px 20px',
-                borderBottom: '1px solid #e5e7eb',
-                background: '#fff',
-              }}
-              actions={[
-                <Link to="/v2/admin/scenario-template-setting" key="edit">
-                  <AdminActionButton action="edit" iconOnly onClick={() => onclickEditTemplate(template.id)} />
-                </Link>,
-                <AdminActionButton key="del" action="delete" iconOnly onClick={() => handleDeleteTemplate(template.id)} />,
-              ]}
-            >
-              <List.Item.Meta
-                title={<span style={{ fontWeight: 500 }}>{template.name}</span>}
-                description={`最後の更新日時 ${moment(template.updated_at).format('YYYY/MM/DD')}`}
-              />
-            </List.Item>
-          )}
+          rowKey="id"
+          pagination={false}
         />
       </AdminPage>
 

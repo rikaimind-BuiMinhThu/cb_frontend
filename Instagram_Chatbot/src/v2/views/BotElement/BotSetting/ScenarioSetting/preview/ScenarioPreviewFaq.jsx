@@ -286,10 +286,12 @@ const ScenarioPreviewFaq = ({
 
   useEffect(() => {
     if (state.submitErrorMessage) {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         dispatch({ type: PREVIEW_ACTIONS.CLEAR_SUBMIT_ERROR_MESSAGE });
       }, RENDER_CHATBOT_CONFIG.FAQ_DELAY_CLEAR_SUBMIT_ERROR_MESSAGE);
+      return () => clearTimeout(timer);
     }
+    return undefined;
   }, [state.submitErrorMessage]);
 
   const renderNextMessage = () => {

@@ -1,7 +1,16 @@
 import React from 'react';
 import { AdminFormRow, AdminActionButton } from '../../../../components/AdminShell';
 
-function ConsumptionTaxSection({ openTax, setOpenTax, payment, onSave }) {
+function ConsumptionTaxSection({
+  openTax,
+  setOpenTax,
+  saleTaxRate,
+  setSaleTaxRate,
+  calculateOneYen,
+  setCalculateOneYen,
+  taxSaving,
+  onSave,
+}) {
   return (
     <div className="payment-setting-section">
       <h3 className="payment-setting-section-title">消費税</h3>
@@ -13,7 +22,7 @@ function ConsumptionTaxSection({ openTax, setOpenTax, payment, onSave }) {
                 type="radio"
                 name="included_outside_tax"
                 id="included_tax"
-                defaultChecked={openTax}
+                checked={openTax}
                 value="internal_tax"
                 onChange={() => setOpenTax(true)}
               />
@@ -25,7 +34,7 @@ function ConsumptionTaxSection({ openTax, setOpenTax, payment, onSave }) {
                 id="outside_tax"
                 name="included_outside_tax"
                 value="outside"
-                defaultChecked={!openTax}
+                checked={!openTax}
                 onChange={() => setOpenTax(false)}
               />
               外税
@@ -38,7 +47,8 @@ function ConsumptionTaxSection({ openTax, setOpenTax, payment, onSave }) {
                   id="sales_tax_rate"
                   name="sales_tax_rate"
                   className="payment-native-select"
-                  defaultValue={payment.sale_tax_rate ? payment.sale_tax_rate : 'eight_percent'}
+                  value={saleTaxRate || 'eight_percent'}
+                  onChange={(e) => setSaleTaxRate(e.target.value)}
                 >
                   <option value="eight_percent">8</option>
                   <option value="ten_percent">10</option>
@@ -51,11 +61,9 @@ function ConsumptionTaxSection({ openTax, setOpenTax, payment, onSave }) {
                       type="radio"
                       name="truncation_rounded"
                       id="truncation"
-                      defaultChecked={
-                        payment.calculate_one_yen == 'truncation' ||
-                        payment.calculate_one_yen == null
-                      }
+                      checked={calculateOneYen !== 'rounded_up'}
                       value="truncation"
+                      onChange={() => setCalculateOneYen('truncation')}
                     />
                     切り捨て
                   </label>
@@ -64,8 +72,9 @@ function ConsumptionTaxSection({ openTax, setOpenTax, payment, onSave }) {
                       type="radio"
                       name="truncation_rounded"
                       id="rounded"
-                      defaultChecked={payment.calculate_one_yen == 'rounded_up'}
+                      checked={calculateOneYen === 'rounded_up'}
                       value="rounded_up"
+                      onChange={() => setCalculateOneYen('rounded_up')}
                     />
                     切り上げ
                   </label>
@@ -81,7 +90,7 @@ function ConsumptionTaxSection({ openTax, setOpenTax, payment, onSave }) {
           </p>
         </form>
         <div className="payment-setting-actions admin-form-actions">
-          <AdminActionButton action="save" onClick={onSave} />
+          <AdminActionButton action="save" loading={taxSaving} onClick={onSave} />
         </div>
       </div>
     </div>

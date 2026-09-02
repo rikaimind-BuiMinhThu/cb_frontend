@@ -85,7 +85,7 @@ export const DEFAULT_IMAGES = [
 
 export const VALIDATION_MESSAGES = {
   title: 'タイトルは、必ず指定してください。',
-  subtitle: 'サブタイトルは、必ず指定ください。',
+  subtitle: 'サブタイトルは、必ず指定してください。',
   botName: 'ボット名は、必ず指定してください。',
   botImage: '画像を選択してください。',
 };

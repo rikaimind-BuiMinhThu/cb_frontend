@@ -41,8 +41,9 @@ const ButtonSubmitSetting = ({
     onChangeValueMessageContent(indexMessageSelect, indexContent, field, value);
 
   const updateMessageField = (field, value) => {
-    Object.assign(dataMessages[indexMessageSelect], { [field]: value });
-    setDataMessages([...dataMessages]);
+    setDataMessages(dataMessages.map((msg, i) => (
+      i === indexMessageSelect ? { ...msg, [field]: value } : msg
+    )));
   };
 
   const renderOptionCheckbox = (label, field, useMessageField = false) => (

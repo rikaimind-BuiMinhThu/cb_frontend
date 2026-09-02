@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Button, message, Space, Tag } from 'antd';
 import { Link } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import api from 'api/api-management';
+import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
+import { getSignInPath } from 'v2/variables/constants';
 import {
   AdminPage,
   AdminTable,
@@ -33,10 +34,10 @@ function BotManagement() {
       Cookies.get('token') == null ||
       Cookies.get('token') == ''
     ) {
-      window.location.href = '/';
+      window.location.href = getSignInPath();
     }
     if (Cookies.get('is_auth') == 'false') {
-      window.location.href = '/';
+      window.location.href = getSignInPath();
     }
   }, []);
 

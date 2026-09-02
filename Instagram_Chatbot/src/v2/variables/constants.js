@@ -36,11 +36,13 @@ export const getParamFromUrl = (paramName) => {
     return params[paramName];
 }
 
+export const getSignInPath = () => getAppPath('/sign-in');
+
 export const getDebugFlag = () =>  {
     try {
-        return getParamFromUrl("debug") || true;
+        return getParamFromUrl("debug") === "true";
     } catch (e) {
-        return getParamFromUrl("debug") || true;
+        return false;
     }
 };
 

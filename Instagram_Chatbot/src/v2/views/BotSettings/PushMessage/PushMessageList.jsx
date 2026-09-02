@@ -5,7 +5,7 @@ import {
   PlayCircleOutlined,
 } from '@ant-design/icons';
 import { useParams } from 'react-router-dom';
-import api from 'api/api-management';
+import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { AdminConfirmModal, AdminTable, AdminActionButton } from '../../../components/AdminShell';
 import SavePushMessageDialog from './SavePushMessageDialog';

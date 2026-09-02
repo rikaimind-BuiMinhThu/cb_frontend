@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
-import api from 'api/api-management';
+import api from 'v2/api/api-management';
 import "../assets/css/general.css";
 import { Table } from "reactstrap";
 import { Modal, Select, Input, message } from "antd";
@@ -18,6 +18,7 @@ import ja from "date-fns/locale/ja";
 import "react-datepicker/dist/react-datepicker.css";
 import { MDBIcon } from "mdbreact";
 import moment from "moment-timezone";
+import { getSignInPath } from 'v2/variables/constants';
 registerLocale("ja", ja);
 
 const PAYMENT_STATUS_OPTIONS = [
@@ -151,16 +152,16 @@ function ClientPaymentDetail() {
       Cookies.get("token") == null ||
       Cookies.get("token") === ""
     ) {
-      window.location.href = "/";
+      window.location.href = getSignInPath();
     }
     if (Cookies.get("is_auth") === "false") {
-      window.location.href = "/";
+      window.location.href = getSignInPath();
     }
     const userRole = Cookies.get("user_role");
     if (
       !(userRole || userRole === "admin_deel" || userRole === "admin_client")
     ) {
-      window.location.href = "/";
+      window.location.href = getSignInPath();
     }
   }, []);
 

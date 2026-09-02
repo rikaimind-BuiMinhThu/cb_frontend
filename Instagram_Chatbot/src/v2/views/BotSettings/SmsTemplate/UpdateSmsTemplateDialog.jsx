@@ -3,7 +3,7 @@ import { Form, Input, Modal, message } from 'antd';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import schema from './schema/createSmsTemplateFormSchema';
-import api from 'api/api-management';
+import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
 
 export default function UpdateSmsTemplateDialog({ botId, resolver, id, open }) {
@@ -40,21 +40,27 @@ export default function UpdateSmsTemplateDialog({ botId, resolver, id, open }) {
   };
 
   useEffect(() => {
+    let cancelled = false;
     if (open && id) {
       api
         .get(`/api/v1/managements/sms_templates/${id}`, { params: { chatbot_id: botId } })
         .then((res) => {
+          if (cancelled) return;
           if (res?.data.code === 1) {
-            setValue('name', res?.data?.data?.name, true);
-            setValue('content', res?.data?.data?.content, true);
+            setValue('name', res?.data?.data?.name, { shouldValidate: true });
+            setValue('content', res?.data?.data?.content, { shouldValidate: true });
           }
           if (res?.data.code === 2) resolver();
         })
         .catch((error) => {
+          if (cancelled) return;
           if (error.response?.data.code === 0) tokenExpired();
         });
     }
     if (!open) reset();
+    return () => {
+      cancelled = true;
+    };
   }, [open, id, botId, setValue, reset, resolver]);
 
   return (

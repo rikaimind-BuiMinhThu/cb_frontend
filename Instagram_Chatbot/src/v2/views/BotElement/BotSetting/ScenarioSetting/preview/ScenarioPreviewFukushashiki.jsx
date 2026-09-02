@@ -570,9 +570,10 @@ const ScenarioPreviewFukushashiki = ({
       state.botInfor &&
       !state.manuallyClosed
     ) {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         dispatch({ type: PREVIEW_ACTIONS.OPEN_CHATBOT });
       }, 1000);
+      return () => clearTimeout(timer);
     }
   }, [state.loadedStateFromSession, state.displayType, state.isOpen, state.messagesList.length, state.botInfor, state.manuallyClosed]);
 

@@ -24,7 +24,17 @@ const ScenarioEditorModals = () => {
     setAcceptFile,
     onChangeValueMessageContent,
     createVariable,
+    setVariableName,
+    setDefaultValue,
+    setErrorVariable,
   } = panel;
+
+  const closeAddVariable = () => {
+    setIsOpenAddVariable(false);
+    setVariableName('');
+    setDefaultValue('');
+    setErrorVariable('');
+  };
 
   return (
     <>
@@ -32,12 +42,12 @@ const ScenarioEditorModals = () => {
 
       <ScenarioModalShell
         open={isOpenAddVariable}
-        onClose={() => setIsOpenAddVariable(false)}
+        onClose={closeAddVariable}
         title="変数追加"
         width={500}
       >
         <AddVariableModalContent
-          onClose={() => setIsOpenAddVariable(false)}
+          onClose={closeAddVariable}
           onSave={() => createVariable()}
         />
       </ScenarioModalShell>

@@ -9,7 +9,7 @@ import { Select } from "antd";
 import { Form } from "antd";
 import { Typography } from "antd";
 import { Modal, Space, DatePicker, Row, Col, Button, message } from "antd";
-import api from "api/api-management";
+import api from 'v2/api/api-management';
 import { tokenExpired } from "v2/api/tokenExpired";
 import { MinusCircleOutlined } from "@ant-design/icons";
 import { sinceMinutesOptions, hoursOptions, sinceOptions } from "./utils";
@@ -35,6 +35,7 @@ export default function SavePushMessageDialog({
     setError,
     clearErrors,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: yupResolver(schema),
@@ -64,6 +65,18 @@ export default function SavePushMessageDialog({
 
   const handleClose = () => {
     setOpen(false);
+    reset({
+      name: "",
+      sending_method: "email",
+      sending_template: undefined,
+      is_exclude_time: false,
+      exclude_start_time: 0,
+      exclude_end_time: 0,
+      exclude_push_time: 0,
+      last_message_datetime_since: sinceMinutesOptions[0].value,
+      start_time: undefined,
+    });
+    setSelectedVariables([]);
     onCancel?.();
   };
 
@@ -119,9 +132,11 @@ export default function SavePushMessageDialog({
   };
 
   React.useEffect(() => {
+    let cancelled = false;
     api
       .get(`/api/v1/managements/emails?page=all&chatbot_id=${botId}`)
       .then((res) => {
+        if (cancelled) return;
         if (res.data.code == 1) {
           const options = res.data?.data?.map((each) => ({
             value: each.id,
@@ -134,16 +149,22 @@ export default function SavePushMessageDialog({
         }
       })
       .catch((err) => {
+        if (cancelled) return;
         if (err.response?.data.code === 0) {
           tokenExpired();
         }
       });
+    return () => {
+      cancelled = true;
+    };
   }, [botId]);
 
   React.useEffect(() => {
+    let cancelled = false;
     api
       .get(`/api/v1/managements/sms_templates?page=all&chatbot_id=${botId}`)
       .then((res) => {
+        if (cancelled) return;
         if (res.data.code == 1) {
           const options = res.data?.data?.map((each) => ({
             value: each.id,
@@ -153,10 +174,14 @@ export default function SavePushMessageDialog({
         }
       })
       .catch((err) => {
+        if (cancelled) return;
         if (err.response?.data.code === 0) {
           tokenExpired();
         }
       });
+    return () => {
+      cancelled = true;
+    };
   }, [botId]);
 
   React.useEffect(() => {
@@ -199,9 +224,11 @@ export default function SavePushMessageDialog({
   ]);
 
   React.useEffect(() => {
+    let cancelled = false;
     api
       .get(`/api/v1/managements/chatbots/${botId}/variables?page=all`)
       .then((res) => {
+        if (cancelled) return;
         const vars = res.data.data.map((each) => ({
           value: each.id,
           label: each.variable_name,
@@ -209,11 +236,15 @@ export default function SavePushMessageDialog({
         setVariables(vars);
       })
       .catch((err) => {
+        if (cancelled) return;
         if (err.response?.data.code === 0) {
           tokenExpired();
         }
       });
-  }, []);
+    return () => {
+      cancelled = true;
+    };
+  }, [botId]);
 
   React.useEffect(() => {
     if (item) {
@@ -299,7 +330,7 @@ export default function SavePushMessageDialog({
           </Form.Item>
           {/** template */}
           <Form.Item
-            label="鋳型"
+            label="テンプレート"
             required
             validateStatus={
               errors?.sending_template?.message ? "error" : undefined

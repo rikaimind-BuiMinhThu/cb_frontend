@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Tabs, message } from 'antd';
 import moment from 'moment';
-import api from 'api/api-management';
+import api from 'v2/api/api-management';
 import Cookies from 'js-cookie';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { AdminPage } from '../../components/AdminShell';
@@ -11,12 +11,15 @@ import '../../assets/css/bot/payment-management.css';
 import '../../assets/css/bot/report.css';
 
 function PaymentManagement() {
-  const [botId, setBotId] = useState(Cookies.get('bot_id'));
+  const [botId] = useState(Cookies.get('bot_id'));
   const [startDate, setStartDate] = useState(() => moment().startOf('month'));
   const [endDate, setEndDate] = useState(() => moment().subtract(1, 'day'));
   const [tab, setTab] = useState('orders');
   const [dateError, setDateError] = useState('');
   const [openTax, setOpenTax] = useState(true);
+  const [saleTaxRate, setSaleTaxRate] = useState('eight_percent');
+  const [calculateOneYen, setCalculateOneYen] = useState('truncation');
+  const [taxSaving, setTaxSaving] = useState(false);
   const [noCan, setNoCan] = useState(true);
   const [noPaid, setNoPaid] = useState(true);
   const [noShip, setNoShip] = useState(true);
@@ -82,18 +85,10 @@ function PaymentManagement() {
     { prefectur: 'okinawa', prefectureName: '沖縄県' },
   ]);
   // authorization
-  const [isAdminDeel, setIsAdminDeel] = useState(false);
+  const [isAdminDeel] = useState(() => Cookies.get('user_role') === 'admin_deel');
   const [allClient, setAllClient] = useState([]);
   const [allBot, setAllBot] = useState([]);
   const [currentClientId, setCurrentClientId] = useState('deel');
-
-  useEffect(() => {
-    if (Cookies.get('user_role') === 'admin_deel') {
-      setIsAdminDeel(true);
-    } else {
-      setIsAdminDeel(false);
-    }
-  }, []);
 
   useEffect(() => {
     if (isAdminDeel) {
@@ -112,97 +107,98 @@ function PaymentManagement() {
   }, [isAdminDeel]);
 
   useEffect(() => {
-    setBotId(Cookies.get('bot_id'));
-  }, []);
-  useEffect(() => {
+    if (!botId) return undefined;
+    let cancelled = false;
     api
       .get(`/api/v1/managements/chatbots/${botId}/variables?page=all`)
       .then((res) => {
+        if (cancelled) return;
         setListVar(res?.data?.data);
       })
       .catch((err) => {
+        if (cancelled) return;
         console.log(err);
         if (err?.response?.data?.code == 0) {
           tokenExpired();
         }
       });
+    return () => {
+      cancelled = true;
+    };
   }, [botId]);
 
+  function applyPayment(data) {
+    setPayment(data);
+    setOpenTax(data?.include_tax === 'internal_tax');
+    setSaleTaxRate(data?.sale_tax_rate || 'eight_percent');
+    setCalculateOneYen(data?.calculate_one_yen || 'truncation');
+    if (data?.can_specify_payment === 'no') setNoCan(true);
+    else setNoCan(false);
+    if (data?.need_paid_settlement_fee === 'free') setNoPaid(true);
+    else setNoPaid(false);
+    if (data?.need_paid_shipping_fee === 'free') setNoShip(true);
+    else setNoShip(false);
+    if (data?.need_np_deferred_payment === 'no') setNoNP(true);
+    else setNoNP(false);
+    if (data?.specify_payment_variables?.[0]?.id !== null) {
+      setCustomDivSpecifyPaymentGW(data?.specify_payment_variables);
+    }
+    if (data?.settlement_fee_variables?.[0]?.id !== null) {
+      setCustomDivSettlementPaymentGW(data?.settlement_fee_variables);
+    }
+    if (data?.np_value_settlements?.[0]?.id !== null) {
+      setCustomDivSettlementFee(data?.np_value_settlements);
+    }
+  }
+
   useEffect(() => {
+    let cancelled = false;
     api
       .get(`/api/v1/payment_managements/payment_gateways?page=all`)
       .then((res) => {
+        if (cancelled) return;
         if (res.data.code == 1) {
           setPaymentGateway(res.data.data);
         }
       })
       .catch((err) => {
+        if (cancelled) return;
         console.log(err);
         if (err?.response.data.code == 0) {
           tokenExpired();
         }
       });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
+    if (!botId) return undefined;
+    let cancelled = false;
     api
       .get(`/api/v1/payment_managements/payment_managements/${botId}`)
       .then((res) => {
-        console.log(res.data.data);
-        setPayment(res.data.data);
-        if (res.data?.data?.include_tax === 'internal_tax') setOpenTax(true);
-        else setOpenTax(false);
-        if (res.data?.data?.can_specify_payment === 'no') setNoCan(true);
-        else setNoCan(false);
-        if (res.data?.data?.need_paid_settlement_fee === 'free') setNoPaid(true);
-        else setNoPaid(false);
-        if (res.data?.data?.need_paid_shipping_fee === 'free') setNoShip(true);
-        else setNoShip(false);
-        if (res.data?.data?.need_np_deferred_payment === 'no') setNoNP(true);
-        else setNoNP(false);
-        if (res.data?.data?.specify_payment_variables[0]?.id !== null) {
-          setCustomDivSpecifyPaymentGW(res.data?.data?.specify_payment_variables);
-        }
-        if (res.data?.data?.settlement_fee_variables[0]?.id !== null) {
-          setCustomDivSettlementPaymentGW(res.data?.data?.settlement_fee_variables);
-        }
-        if (res.data?.data?.np_value_settlements[0]?.id !== null) {
-          setCustomDivSettlementFee(res.data?.data?.np_value_settlements);
-        }
+        if (cancelled) return;
+        applyPayment(res.data.data);
       })
       .catch((err) => {
+        if (cancelled) return;
         console.log(err);
         if (err?.response?.data?.code == 0) {
           tokenExpired();
         }
       });
+    return () => {
+      cancelled = true;
+    };
   }, [botId]);
 
   function reload() {
     api
       .get(`/api/v1/payment_managements/payment_managements/${botId}`)
       .then((res) => {
-        console.log(res.data.data);
-        setPayment(res.data.data);
-        if (res.data?.data?.include_tax === 'internal_tax') setOpenTax(true);
-        else setOpenTax(false);
-        if (res.data?.data?.can_specify_payment === 'no') setNoCan(true);
-        else setNoCan(false);
-        if (res.data?.data?.need_paid_settlement_fee === 'free') setNoPaid(true);
-        else setNoPaid(false);
-        if (res.data?.data?.need_paid_shipping_fee === 'free') setNoShip(true);
-        else setNoShip(false);
-        if (res.data?.data?.need_np_deferred_payment === 'no') setNoNP(true);
-        else setNoNP(false);
-        if (res.data?.data?.specify_payment_variables[0]?.id !== null) {
-          setCustomDivSpecifyPaymentGW(res.data?.data?.specify_payment_variables);
-        }
-        if (res.data?.data?.settlement_fee_variables[0]?.id !== null) {
-          setCustomDivSettlementPaymentGW(res.data?.data?.settlement_fee_variables);
-        }
-        if (res.data?.data?.np_value_settlements[0]?.id !== null) {
-          setCustomDivSettlementFee(res.data?.data?.np_value_settlements);
-        }
+        applyPayment(res.data.data);
       })
       .catch((err) => {
         console.log(err);
@@ -236,37 +232,24 @@ function PaymentManagement() {
   }
 
   function saveConsumptionTax() {
-    //consumption_tax
-    // var obj = {};
-    var elements = document.getElementById('included_tax').checked;
-    var elements0 = document.getElementById('outside_tax').checked;
-    var elements1 = document.getElementById('sales_tax_rate').value;
-    var elements2 = document.getElementById('truncation').checked;
-    var elements3 = document.getElementById('rounded').checked;
-
-    let objDefault = {
-      include_tax: 'internal_tax',
-      sale_tax_rate: payment.sale_tax_rate,
-      calculate_one_yen: payment.calculate_one_yen,
+    if (taxSaving) return;
+    const res = {
+      consumption_tax: openTax
+        ? {
+            include_tax: 'internal_tax',
+            sale_tax_rate: saleTaxRate,
+            calculate_one_yen: calculateOneYen,
+          }
+        : {
+            include_tax: 'foreign_tax',
+            sale_tax_rate: saleTaxRate,
+            calculate_one_yen: calculateOneYen,
+          },
     };
-    let obj = {
-      include_tax: 'foreign_tax', // {internal_tax: false, foreign_tax: true}
-      sale_tax_rate: elements1, // {eight_percent: 0, ten_percent: 1}
-      calculate_one_yen:
-        elements2 == false && elements3 == false
-          ? ''
-          : elements2 == true
-          ? 'truncation'
-          : 'rounded_up',
-    };
-    let res = {
-      consumption_tax: elements == true ? objDefault : obj,
-    };
-    console.log(res);
+    setTaxSaving(true);
     api
       .patch(`/api/v1/payment_managements/payment_managements/${botId}/update_consumption_tax`, res)
       .then((respon) => {
-        console.log(respon);
         if (respon.data.code == 1) {
           message.success('正常に更新されました！');
           reload();
@@ -280,7 +263,8 @@ function PaymentManagement() {
         if (err.response?.data.code === 0) {
           tokenExpired();
         }
-      });
+      })
+      .finally(() => setTaxSaving(false));
   }
 
   function addNewSpecifyPaymentGW() {
@@ -333,20 +317,20 @@ function PaymentManagement() {
       if (pm_var[i] == '') {
         checkVar = true;
         if (document.getElementById(`err_specifypgw_variable${i}`))
-          document.getElementById(`err_specifypgw_variable${i}`).innerHTML =
+          document.getElementById(`err_specifypgw_variable${i}`).textContent =
             '変数は、必ず指定してください。';
       } else {
         if (document.getElementById(`err_specifypgw_variable${i}`))
-          document.getElementById(`err_specifypgw_variable${i}`).innerHTML = '';
+          document.getElementById(`err_specifypgw_variable${i}`).textContent = '';
       }
       if (pm_val[i] == '') {
         checkVal = true;
         if (document.getElementById(`err_specifypgw_gw${i}`))
-          document.getElementById(`err_specifypgw_gw${i}`).innerHTML =
+          document.getElementById(`err_specifypgw_gw${i}`).textContent =
             '決済ゲートウェイは、必ず指定してください。';
       } else {
         if (document.getElementById(`err_specifypgw_gw${i}`))
-          document.getElementById(`err_specifypgw_gw${i}`).innerHTML = '';
+          document.getElementById(`err_specifypgw_gw${i}`).textContent = '';
       }
       pm.push({
         variable_value: pm_var[i],
@@ -435,20 +419,20 @@ function PaymentManagement() {
       if (pm_var[i] == '') {
         checkVar = true;
         if (document.getElementById(`err_settpgw_variable${i}`))
-          document.getElementById(`err_settpgw_variable${i}`).innerHTML =
+          document.getElementById(`err_settpgw_variable${i}`).textContent =
             '変数は、必ず指定してください。';
       } else {
         if (document.getElementById(`err_settpgw_variable${i}`))
-          document.getElementById(`err_settpgw_variable${i}`).innerHTML = '';
+          document.getElementById(`err_settpgw_variable${i}`).textContent = '';
       }
       if (pm_val[i] == '') {
         checkVal = true;
         if (document.getElementById(`err_settpgw_commission${i}`))
-          document.getElementById(`err_settpgw_commission${i}`).innerHTML =
+          document.getElementById(`err_settpgw_commission${i}`).textContent =
             '手数料を入力してください。';
       } else {
         if (document.getElementById(`err_settpgw_commission${i}`))
-          document.getElementById(`err_settpgw_commission${i}`).innerHTML = '';
+          document.getElementById(`err_settpgw_commission${i}`).textContent = '';
       }
       pm.push({
         variable_value: pm_var[i],
@@ -522,10 +506,10 @@ function PaymentManagement() {
       if (formAdd[i].value == '') {
         checkAmount = true;
         if (document.getElementById(`err_amount_of_money_${i}`))
-          document.getElementById(`err_amount_of_money_${i}`).innerHTML = '必ず指定してください。';
+          document.getElementById(`err_amount_of_money_${i}`).textContent = '必ず指定してください。';
       } else {
         if (document.getElementById(`err_amount_of_money_${i}`))
-          document.getElementById(`err_amount_of_money_${i}`).innerHTML = '';
+          document.getElementById(`err_amount_of_money_${i}`).textContent = '';
       }
     }
     let res;
@@ -605,44 +589,44 @@ function PaymentManagement() {
     if (np_maximum_amount === '') {
       checkMaxAmount = true;
       if (document.getElementById(`err_np_maximum_amount`))
-        document.getElementById(`err_np_maximum_amount`).innerHTML = '必ず指定してください。';
+        document.getElementById(`err_np_maximum_amount`).textContent = '必ず指定してください。';
     } else {
       if (document.getElementById(`err_np_maximum_amount`))
-        document.getElementById(`err_np_maximum_amount`).innerHTML = '';
+        document.getElementById(`err_np_maximum_amount`).textContent = '';
     }
     for (var i = 0; i < pmFreeValue.length; i++) {
       if (pmFreeValue[i] == '') {
         checkFreeValue = true;
         if (document.getElementById(`err_np_settlement_fee_value_${i}`)) {
-          document.getElementById(`err_np_settlement_fee_value_${i}`).innerHTML =
+          document.getElementById(`err_np_settlement_fee_value_${i}`).textContent =
             '必ず指定してください。';
         }
       } else {
         if (document.getElementById(`err_np_settlement_fee_value_${i}`))
-          document.getElementById(`err_np_settlement_fee_value_${i}`).innerHTML = '';
+          document.getElementById(`err_np_settlement_fee_value_${i}`).textContent = '';
       }
       if (pmMaxValue[i] == '') {
         checkMaxValue = true;
         if (document.getElementById(`err_np_settlement_max_value_${i}`))
-          document.getElementById(`err_np_settlement_max_value_${i}`).innerHTML =
+          document.getElementById(`err_np_settlement_max_value_${i}`).textContent =
             '必ず指定してください。';
       } else if (pmMaxValue[i] < pmMinValue[i]) {
         checkMaxValue = true;
         if (document.getElementById(`err_np_settlement_max_value_${i}`))
-          document.getElementById(`err_np_settlement_max_value_${i}`).innerHTML =
+          document.getElementById(`err_np_settlement_max_value_${i}`).textContent =
             'NP 決済の最大値は最小値より大きくなければなりません。';
       } else {
         if (document.getElementById(`err_np_settlement_max_value_${i}`))
-          document.getElementById(`err_np_settlement_max_value_${i}`).innerHTML = '';
+          document.getElementById(`err_np_settlement_max_value_${i}`).textContent = '';
       }
       if (pmMinValue[i] == '') {
         checkMinValue = true;
         if (document.getElementById(`err_np_settlement_min_value_${i}`))
-          document.getElementById(`err_np_settlement_min_value_${i}`).innerHTML =
+          document.getElementById(`err_np_settlement_min_value_${i}`).textContent =
             '必ず指定してください。';
       } else {
         if (document.getElementById(`err_np_settlement_min_value_${i}`))
-          document.getElementById(`err_np_settlement_min_value_${i}`).innerHTML = '';
+          document.getElementById(`err_np_settlement_min_value_${i}`).textContent = '';
       }
     }
 
@@ -786,6 +770,11 @@ function PaymentManagement() {
                 <PaymentSettingsTab
                   openTax={openTax}
                   setOpenTax={setOpenTax}
+                  saleTaxRate={saleTaxRate}
+                  setSaleTaxRate={setSaleTaxRate}
+                  calculateOneYen={calculateOneYen}
+                  setCalculateOneYen={setCalculateOneYen}
+                  taxSaving={taxSaving}
                   noCan={noCan}
                   setNoCan={setNoCan}
                   noPaid={noPaid}

@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { findItem } from "./Utils";
 
 const YUWAERU_AMAZON_FUKUSHASHIKI_ELEMENTS = {

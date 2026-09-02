@@ -10,7 +10,7 @@ const schema = yup.object({
     .required("送信方法は、必ず指定してください。")
     .oneOf(["email", "sms"])
     .default("email"),
-  sending_template: yup.number().required("鋳型は、必ず指定してください。"),
+  sending_template: yup.number().required("テンプレートは、必ず指定してください。"),
   start_time: yup.date().required("開始日時は、必ず指定してください。"),
   is_exclude_time: yup.boolean(),
   exclude_start_time: yup.number(),

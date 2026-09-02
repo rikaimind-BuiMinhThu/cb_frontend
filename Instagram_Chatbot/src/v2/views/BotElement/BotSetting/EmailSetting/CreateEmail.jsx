@@ -1,358 +1,258 @@
 import React, { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
-import api from 'api/api-management';
+import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { AdminPage, AdminActionButton, AdminFormRow, useAdminHeaderTitle, useAdminHeaderActions } from '../../../../components/AdminShell';
 import { Input, message } from 'antd';
+import { getAdminRoutePath } from 'v2/variables/constants';
 import '../../../../assets/css/bot/email/create-email.css';
 
-function CreateEmail() {
-  const [ccNum, setCcNum] = useState(0);
-  const [bccNum, setBccNum] = useState(0);
+const EMAIL_FORMAT =
+  /^[a-zA-Z0-9]+([._+-][a-zA-Z0-9]+)*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/;
 
+const EMPTY_FORM = {
+  email_template_name: '',
+  sender_name: '',
+  to: '',
+  reply_to: '',
+  subject: '',
+  content: '',
+};
+
+const chipStyle = {
+  margin: '0 5px 5px 0',
+  borderRadius: 5,
+  width: 'max-content',
+  backgroundColor: '#e0e0e0',
+  display: 'flex',
+  alignItems: 'center',
+  padding: '2px 8px',
+};
+
+function EmailChipList({ emails, onRemove }) {
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: 8 }}>
+      {emails.map((email, index) => (
+        <div key={`${email}-${index}`} style={chipStyle}>
+          <span>{email}</span>
+          <span
+            role="button"
+            tabIndex={0}
+            style={{ cursor: 'pointer', marginLeft: 8 }}
+            onClick={() => onRemove(index)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') onRemove(index);
+            }}
+          >
+            X
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function CreateEmail() {
+  const isEdit = window.location.pathname.includes('edit-email');
   const [ccAll, setCcAll] = useState([]);
   const [bccAll, setBccAll] = useState([]);
+  const [ccInput, setCcInput] = useState('');
+  const [bccInput, setBccInput] = useState('');
+  const [ccError, setCcError] = useState('');
+  const [bccError, setBccError] = useState('');
   const [fieldErrors, setFieldErrors] = useState({});
-  const [mailAction, setMailAction] = useState(true);
-  const [detailEmail, setDetailEmail] = useState();
-  const [listCcDetail, setListCcDetail] = useState([]);
-  const [listBccDetail, setListBccDetail] = useState([]);
-  const [isAdminDeel, setIsAdminDeel] = useState(false);
+  const [formValues, setFormValues] = useState(EMPTY_FORM);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (Cookies.get('user_role') === 'admin_deel') {
-      setIsAdminDeel(true);
-    } else {
-      setIsAdminDeel(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    const url = window.location.pathname;
-    if (url.includes(`edit-email`)) {
-      var id = url.slice(url.lastIndexOf('/') + 1);
-      console.log('id', id);
-      let ccList = [];
-      let bccList = [];
-      setMailAction(false);
-      api
-        .get(`/api/v1/managements/emails/${id}`)
-        .then((res) => {
-          if (res.data.code == 1) {
-            setDetailEmail(res.data.data);
-            //CC
-            for (var i = 0; i < res.data.data.email_cc.length; i++) {
-              ccList.push(res.data?.data?.email_cc[i].to);
-            }
-            setCcNum(res.data.data.email_cc.length);
-            ccList.forEach((index, i) => {
-              let cc = document.getElementById('list-cc');
-              var newCc = document.createElement('div');
-              newCc.setAttribute('id', `cc${i}`);
-              newCc.innerHTML = `
-              <div style="margin:0px 5px 0px 0px; border-radius:5px; width:max-content; background-color:#e0e0e0; display:flex">
-              <span style="width:max-content;">${index}</span>&ensp; 
-              <span id="deleteCc${i}">X</span></div>
-            `;
-              cc.appendChild(newCc);
-              document.getElementById(`deleteCc${i}`).addEventListener('click', () => {
-                var ele = document.getElementById(`cc${i}`);
-                ele?.parentNode?.removeChild(ele);
-                var listcc = ccList;
-                listcc.splice(i, 1);
-                // console.log('listcc detail: ', listcc);
-                setCcAll(listcc);
-              });
-            });
-            setListCcDetail(ccList);
-
-            for (var i = 0; i < res.data.data.email_bcc.length; i++) {
-              bccList.push(res.data?.data?.email_bcc[i].to);
-            }
-            setBccNum(res.data.data.email_bcc.length);
-            bccList.forEach((index, i) => {
-              let bcc = document.getElementById('list-bcc');
-              var newBcc = document.createElement('div');
-              newBcc.setAttribute('id', `bcc${i}`);
-              newBcc.innerHTML = `
-            <div style="margin:0px 5px 0px 0px; border-radius:5px; width:max-content; background-color:#e0e0e0; display:flex">
-            <span style="width:max-content;">${index}</span>&ensp; 
-            <span id="deleteBCc${i}">X</span></div>
-            `;
-              bcc.appendChild(newBcc);
-              document.getElementById(`deleteBCc${i}`).addEventListener('click', () => {
-                var ele = document.getElementById(`bcc${i}`);
-                ele?.parentNode?.removeChild(ele);
-                var listbcc = bccList;
-                listbcc.splice(i, 1);
-                setBccAll(listbcc);
-              });
-            });
-            setListBccDetail(bccList);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          if (err.response?.data.code === 0) {
-            tokenExpired();
-          }
-        });
-    }
-  }, []);
-
-  function checkListcc(value, listcc) {
-    var mailformat = /^[a-zA-Z0-9]+[a-zA-Z0-9]+([._+-])*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/;
-    if (value.match(mailformat)) {
-      let i = 0;
-      listcc.forEach((cc) => {
-        if (cc === value) i = i + 1;
+    if (!isEdit) return undefined;
+    const id = window.location.pathname.slice(window.location.pathname.lastIndexOf('/') + 1);
+    let cancelled = false;
+    api
+      .get(`/api/v1/managements/emails/${id}`)
+      .then((res) => {
+        if (cancelled) return;
+        if (res.data.code === 1) {
+          const email = res.data.data?.email || {};
+          setFormValues({
+            email_template_name: email.email_template_name || '',
+            sender_name: email.sender_name || '',
+            to: email.to || '',
+            reply_to: email.reply_to || '',
+            subject: email.subject || '',
+            content: email.content || '',
+          });
+          setCcAll((res.data.data.email_cc || []).map((item) => item.to).filter(Boolean));
+          setBccAll((res.data.data.email_bcc || []).map((item) => item.to).filter(Boolean));
+        }
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        if (err.response?.data.code === 0) {
+          tokenExpired();
+        }
       });
-      if (i === 0) {
-        listcc.push(value);
-        setCcAll(listcc);
+    return () => {
+      cancelled = true;
+    };
+  }, [isEdit]);
 
-        let cc = document.getElementById('list-cc');
-        var newCc = document.createElement('div');
-        newCc.setAttribute('id', `cc${ccNum}`);
-        newCc.innerHTML = `
-          <div style="margin:0px 5px 0px 0px; border-radius:5px; width:max-content; background-color:#e0e0e0; display:flex">
-          <span style="width:max-content;">${value}</span>&ensp; 
-          <span id="deleteCc${ccNum}FI">X</span></div>
-          `;
-        cc.appendChild(newCc);
-        document.getElementById(`deleteCc${ccNum}FI`).addEventListener('click', () => {
-          var ele = document.getElementById(`cc${ccNum}`);
-          ele?.parentNode?.removeChild(ele);
-          listcc.splice(ccNum, 1);
-          setCcAll(listcc);
-          setListCcDetail(listcc);
-        });
-        document.getElementById('cc').value = '';
-        setCcNum(ccNum + 1);
-        document.getElementById('errCcMail').style.display = 'none';
-      } else {
-        document.getElementById('errCcMail').style.display = 'block';
-        document.getElementById('errCcMail').innerText = 'メール複製';
-      }
-    } else {
-      document.getElementById('errCcMail').style.display = 'block';
-      document.getElementById('errCcMail').innerText =
-        'メールの正しい形式で入力してください：abc@abc.com';
-    }
+  function updateField(key, value) {
+    setFormValues((prev) => ({ ...prev, [key]: value }));
   }
 
-  function checkListBcc(value, listbcc) {
-    var mailformat = /^[a-zA-Z0-9]+([._+-][a-zA-Z0-9]+)*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/;
-    if (value.match(mailformat)) {
-      let i = 0;
-      listbcc.forEach((bcc) => {
-        if (bcc === value) i = i + 1;
-      });
-      if (i === 0) {
-        listbcc.push(value);
-        setBccAll(listbcc);
-
-        let bcc = document.getElementById('list-bcc');
-        var newBcc = document.createElement('div');
-        newBcc.setAttribute('id', `bcc${bccNum}`);
-        newBcc.innerHTML = `
-        <div style="margin:0px 5px 0px 0px; border-radius:5px; width:max-content; background-color:#e0e0e0; display:flex">
-        <span style="width:max-content;">${value}</span>&ensp; 
-        <span id="deleteBCc${bccNum}FI">X</span></div>
-        `;
-        bcc.appendChild(newBcc);
-        document.getElementById(`deleteBCc${bccNum}FI`).addEventListener('click', () => {
-          // console.log('clicked delete bcc');
-          var ele = document.getElementById(`bcc${bccNum}`);
-          ele?.parentNode?.removeChild(ele);
-          listbcc.splice(bccNum, 1);
-          setBccAll(listbcc);
-          setListBccDetail(listbcc);
-        });
-        document.getElementById('bcc').value = '';
-        setBccNum(bccNum + 1);
-        document.getElementById('errBccMail').style.display = 'none';
-      } else {
-        document.getElementById('errBccMail').innerText = 'メール複製';
-      }
-    } else {
-      document.getElementById('errBccMail').style.display = 'block';
-      document.getElementById('errBccMail').innerText =
-        'メールの正しい形式で入力してください：abc@abc.com';
+  function addAddress(value, list, setList, setError, setInput) {
+    const trimmed = (value || '').trim();
+    if (!trimmed) return;
+    if (!EMAIL_FORMAT.test(trimmed)) {
+      setError('メールの正しい形式で入力してください：abc@abc.com');
+      return;
     }
+    if (list.indexOf(trimmed) !== -1) {
+      setError('メール複製');
+      return;
+    }
+    setList(list.concat(trimmed));
+    setError('');
+    setInput('');
   }
 
   function addCC(e) {
     if (e.keyCode === 13) {
-      var value = e.target.value;
-      if (mailAction == false) {
-        checkListcc(value, listCcDetail);
-      } else {
-        checkListcc(value, ccAll);
-      }
+      e.preventDefault();
+      addAddress(ccInput, ccAll, setCcAll, setCcError, setCcInput);
     }
   }
 
   function addBCC(e) {
     if (e.keyCode === 13) {
-      //check email form
-      var value = e.target.value;
-      if (mailAction == false) {
-        checkListBcc(value, listBccDetail);
-      } else {
-        checkListBcc(value, bccAll);
-      }
+      e.preventDefault();
+      addAddress(bccInput, bccAll, setBccAll, setBccError, setBccInput);
     }
   }
 
-  function addEmail(e) {
-    e.preventDefault();
-    checkRequired('email_template_name', 'errEmailName', 'テンプレート名');
-    checkTo('to', 'errEmailTo', '宛先');
-    checkRequired('subject', 'errSubject', '件名');
-    checkRequired('text', 'errText', 'メール内容');
-    if (
-      checkRequired('email_template_name', 'errEmailName', 'テンプレート名') &&
-      checkTo('to', 'errEmailTo', '宛先') &&
-      checkRequired('subject', 'errSubject', '件名') &&
-      checkRequired('text', 'errText', 'メール内容')
-    ) {
-      const form = document.getElementById('create-email-form');
-      const obj = {};
-      for (let i = 0; i < form.length; i++) {
-        obj[form[i].name] = form[i].value;
-      }
-      obj.cc = ccAll;
-      obj.bcc = bccAll;
-
-      var bot_id = Cookies.get('bot_id');
-      obj.chatbot_id = bot_id;
-      console.log('bot_id: ', bot_id);
-      let add = { email: obj };
-      console.log(add);
-      api
-        .post('/api/v1/managements/emails', add)
-        .then((res) => {
-          if (res.data.code == 1) {
-            message.success('正常に追加されました！!');
-            setTimeout(() => {
-              window.location.href = `/v2/admin/list-email`;
-            }, 1500);
-          } else if (res.data.code == 2) {
-            message.warning(res.data.message);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          if (err.response?.data.code === 0) {
-            tokenExpired();
-          }
-        });
-    }
+  function collectForm() {
+    return {
+      email: {
+        ...formValues,
+        cc: ccAll,
+        bcc: bccAll,
+        chatbot_id: Cookies.get('bot_id'),
+      },
+    };
   }
-
-  function saveEmail(e) {
-    e.preventDefault();
-    const url = window.location.pathname;
-    var id = url.slice(url.lastIndexOf('/') + 1);
-    checkRequired('email_template_name', 'errEmailName', 'テンプレート名');
-    checkTo('to', 'errEmailTo', '宛先');
-    checkRequired('subject', 'errSubject', '件名');
-    checkRequired('text', 'errText', 'メール内容');
-    if (
-      checkRequired('email_template_name', 'errEmailName', 'テンプレート名') &&
-      checkTo('to', 'errEmailTo', '宛先') &&
-      checkRequired('subject', 'errSubject', '件名') &&
-      checkRequired('text', 'errText', 'メール内容')
-    ) {
-      const form = document.getElementById('create-email-form');
-      const obj = {};
-      for (let i = 0; i < form.length; i++) {
-        obj[form[i].name] = form[i].value;
-      }
-      obj.cc = ccAll;
-      obj.bcc = bccAll;
-
-      var bot_id = Cookies.get('bot_id');
-      obj.chatbot_id = bot_id;
-      // console.log('bot_id: ', bot_id);
-      let add = { email: obj };
-      console.log(add);
-
-      api
-        .patch(`/api/v1/managements/emails/${id}`, add)
-        .then((res) => {
-          if (res.data.code == 1) {
-            message.success('正常に更新されました！');
-            setTimeout(() => {
-              window.location.href = `/v2/admin/list-email`;
-            }, 1500);
-          } else if (res.data.code == 2) {
-            message.warning(res.data.message);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          if (err.response?.data.code === 0) {
-            tokenExpired();
-          }
-        });
-    }
-  }
-
-  const field = document.getElementById.bind(document);
 
   function setFieldError(key, value) {
     setFieldErrors((prev) => (prev[key] === value ? prev : { ...prev, [key]: value }));
   }
 
-  function checkRequired(emailId, errEmail, lable) {
-    if (field(emailId).value === '') {
-      setFieldError(emailId, `${lable}は、必ず指定してください。`);
+  function checkRequired(key, label, errorKey = key) {
+    if (!formValues[key]) {
+      setFieldError(errorKey, `${label}は、必ず指定してください。`);
       return false;
     }
-    setFieldError(emailId, '');
+    setFieldError(errorKey, '');
     return true;
   }
 
-  function checkEmail(emailId, errEmail, lable) {
-    var regex = /^[a-zA-Z0-9]+([._+-][a-zA-Z0-9]+)*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/;
-    let value = field(emailId).value;
-    if (emailId == 'to' && value.slice(0, 2) == '{{' && value.slice(-2) == '}}') {
-      if (value.slice(2, value.length - 2).replace(/\s/g, '') == '') {
-        setFieldError(emailId, 'メールの変数を指定してください');
+  function checkEmail(key) {
+    const value = formValues[key] || '';
+    if (key === 'to' && value.slice(0, 2) === '{{' && value.slice(-2) === '}}') {
+      if (value.slice(2, value.length - 2).replace(/\s/g, '') === '') {
+        setFieldError(key, 'メールの変数を指定してください');
         return false;
       }
-      setFieldError(emailId, '');
+      setFieldError(key, '');
       return true;
-    } else if (!regex.test(field(emailId).value)) {
-      setFieldError(emailId, 'メールの正しい形式で入力してください：abc@abc.com');
+    }
+    if (!EMAIL_FORMAT.test(value)) {
+      setFieldError(key, 'メールの正しい形式で入力してください：abc@abc.com');
       return false;
     }
-    setFieldError(emailId, '');
+    setFieldError(key, '');
     return true;
   }
 
-  function checkTo(emailId, errEmail, lable) {
-    console.log(checkEmail(emailId, errEmail, lable));
-    checkEmail(emailId, errEmail, lable);
-    checkRequired(emailId, errEmail, lable);
-    if (checkRequired(emailId, errEmail, lable) && checkEmail(emailId, errEmail, lable))
-      return true;
+  function checkTo(key, label) {
+    return checkRequired(key, label) && checkEmail(key);
   }
 
-  useAdminHeaderTitle(mailAction === false ? 'メール編集' : 'メール作成');
+  function isFormValid() {
+    return (
+      checkRequired('email_template_name', 'テンプレート名') &&
+      checkTo('to', '宛先') &&
+      checkRequired('subject', '件名') &&
+      checkRequired('content', 'メール内容', 'text')
+    );
+  }
+
+  function addEmail(e) {
+    e.preventDefault();
+    if (saving || !isFormValid()) return;
+    setSaving(true);
+    api
+      .post('/api/v1/managements/emails', collectForm())
+      .then((res) => {
+        if (res.data.code === 1) {
+          message.success('正常に追加されました！!');
+          setTimeout(() => {
+            window.location.href = getAdminRoutePath('/list-email');
+          }, 1500);
+        } else if (res.data.code === 2) {
+          setSaving(false);
+          message.warning(res.data.message);
+        } else {
+          setSaving(false);
+        }
+      })
+      .catch((err) => {
+        setSaving(false);
+        if (err.response?.data.code === 0) {
+          tokenExpired();
+        }
+      });
+  }
+
+  function saveEmail(e) {
+    e.preventDefault();
+    if (saving || !isFormValid()) return;
+    const id = window.location.pathname.slice(window.location.pathname.lastIndexOf('/') + 1);
+    setSaving(true);
+    api
+      .patch(`/api/v1/managements/emails/${id}`, collectForm())
+      .then((res) => {
+        if (res.data.code === 1) {
+          message.success('正常に更新されました！');
+          setTimeout(() => {
+            window.location.href = getAdminRoutePath('/list-email');
+          }, 1500);
+        } else if (res.data.code === 2) {
+          setSaving(false);
+          message.warning(res.data.message);
+        } else {
+          setSaving(false);
+        }
+      })
+      .catch((err) => {
+        setSaving(false);
+        if (err.response?.data.code === 0) {
+          tokenExpired();
+        }
+      });
+  }
+
+  useAdminHeaderTitle(isEdit ? 'メール編集' : 'メール作成');
 
   useAdminHeaderActions(
     <>
       <AdminActionButton
         action="back"
-        onClick={() => { window.location.href = '/v2/admin/list-email'; }}
+        onClick={() => { window.location.href = getAdminRoutePath('/list-email'); }}
       />
-      {mailAction === false ? (
-        <AdminActionButton action="save" onClick={(e) => saveEmail(e)} />
+      {isEdit ? (
+        <AdminActionButton action="save" loading={saving} onClick={(e) => saveEmail(e)} />
       ) : (
-        <AdminActionButton action="create" label="作成" onClick={(e) => addEmail(e)} />
+        <AdminActionButton action="create" label="作成" loading={saving} onClick={(e) => addEmail(e)} />
       )}
     </>
   );
@@ -365,74 +265,82 @@ function CreateEmail() {
             <AdminFormRow label="テンプレート名" required htmlFor="email_template_name" error={fieldErrors.email_template_name}>
               <Input
                 id="email_template_name"
-                defaultValue={mailAction == false ? detailEmail?.email.email_template_name : ''}
+                value={formValues.email_template_name}
                 placeholder="テンプレート名は、必ず指定してください。"
                 name="email_template_name"
-                onChange={() =>
-                  checkRequired('email_template_name', 'errEmailName', 'テンプレート名')
-                }
-                onBlur={() =>
-                  checkRequired('email_template_name', 'errEmailName', 'テンプレート名')
-                }
+                onChange={(e) => {
+                  updateField('email_template_name', e.target.value);
+                  setFieldError('email_template_name', e.target.value ? '' : 'テンプレート名は、必ず指定してください。');
+                }}
+                onBlur={() => checkRequired('email_template_name', 'テンプレート名')}
               />
             </AdminFormRow>
 
             <AdminFormRow label="差出人" htmlFor="sender_name">
               <Input
                 id="sender_name"
-                defaultValue={mailAction == false ? detailEmail?.email.sender_name : ''}
+                value={formValues.sender_name}
                 placeholder="差出人は、必ず指定してください。"
                 name="sender_name"
+                onChange={(e) => updateField('sender_name', e.target.value)}
               />
             </AdminFormRow>
 
             <AdminFormRow label="TO" required htmlFor="to" error={fieldErrors.to}>
               <Input
                 id="to"
-                defaultValue={mailAction == false ? detailEmail?.email.to : ''}
+                value={formValues.to}
                 placeholder="no-reply@ec-chatbot.com"
                 name="to"
-                onChange={() => checkTo('to', 'errEmailTo', '宛先')}
-                onBlur={() => checkTo('to', 'errEmailTo', '宛先')}
+                onChange={(e) => {
+                  updateField('to', e.target.value);
+                }}
+                onBlur={() => checkTo('to', '宛先')}
               />
             </AdminFormRow>
 
-            <AdminFormRow label="CC" htmlFor="cc" alignTop>
-              <div id="list-cc" />
+            <AdminFormRow label="CC" htmlFor="cc" alignTop error={ccError}>
+              <EmailChipList emails={ccAll} onRemove={(index) => setCcAll(ccAll.filter((_, i) => i !== index))} />
               <Input
                 id="cc"
+                value={ccInput}
                 placeholder="no-reply@ec-chatbot.com"
-                onKeyUp={(e) => addCC(e)}
+                onChange={(e) => setCcInput(e.target.value)}
+                onKeyDown={addCC}
               />
-              <span id="errCcMail" className="admin-form-error" />
             </AdminFormRow>
 
-            <AdminFormRow label="BCC（同報）" htmlFor="bcc" alignTop>
-              <div id="list-bcc" />
+            <AdminFormRow label="BCC（同報）" htmlFor="bcc" alignTop error={bccError}>
+              <EmailChipList emails={bccAll} onRemove={(index) => setBccAll(bccAll.filter((_, i) => i !== index))} />
               <Input
                 id="bcc"
+                value={bccInput}
                 placeholder="no-reply@botchan.chat"
-                onKeyUp={(e) => addBCC(e)}
+                onChange={(e) => setBccInput(e.target.value)}
+                onKeyDown={addBCC}
               />
-              <span id="errBccMail" className="admin-form-error" />
             </AdminFormRow>
 
             <AdminFormRow label="Reply-To">
               <Input
-                defaultValue={mailAction == false ? detailEmail?.email.reply_to : ''}
+                value={formValues.reply_to}
                 placeholder="no-reply@ec-chatbot.com"
                 name="reply_to"
+                onChange={(e) => updateField('reply_to', e.target.value)}
               />
             </AdminFormRow>
 
             <AdminFormRow label="件名" required htmlFor="subject" error={fieldErrors.subject}>
               <Input
                 id="subject"
-                defaultValue={mailAction == false ? detailEmail?.email.subject : ''}
+                value={formValues.subject}
                 placeholder="件名は、必ず指定してください。"
                 name="subject"
-                onChange={() => checkRequired('subject', 'errSubject', '件名')}
-                onBlur={() => checkRequired('subject', 'errSubject', '件名')}
+                onChange={(e) => {
+                  updateField('subject', e.target.value);
+                  setFieldError('subject', e.target.value ? '' : '件名は、必ず指定してください。');
+                }}
+                onBlur={() => checkRequired('subject', '件名')}
               />
             </AdminFormRow>
 
@@ -440,11 +348,14 @@ function CreateEmail() {
               <Input.TextArea
                 id="text"
                 rows={7}
-                defaultValue={mailAction == false ? detailEmail?.email.content : ''}
+                value={formValues.content}
                 placeholder="メール内容は、必ず指定してください。"
                 name="content"
-                onChange={() => checkRequired('text', 'errText', 'メール内容')}
-                onBlur={() => checkRequired('text', 'errText', 'メール内容')}
+                onChange={(e) => {
+                  updateField('content', e.target.value);
+                  setFieldError('text', e.target.value ? '' : 'メール内容は、必ず指定してください。');
+                }}
+                onBlur={() => checkRequired('content', 'メール内容', 'text')}
               />
             </AdminFormRow>
           </form>

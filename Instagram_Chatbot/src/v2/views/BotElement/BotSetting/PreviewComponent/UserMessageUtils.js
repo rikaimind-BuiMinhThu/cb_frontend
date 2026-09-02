@@ -1,22 +1,28 @@
-import { getCaptcha, scrollToPosition } from "./Utils";
-import { PREVIEW_ACTIONS } from "views/BotElement/BotSetting/PreviewComponent/Constants";
+import { getCaptcha } from "./Utils";
 
 const processForUserCaptchaMessage = (messagesList, i, msgContentIndex, newState) => {
   const msgContent = messagesList[i]?.message_content?.[msgContentIndex];
-  const msgContentType = msgContent.type;
   if (!msgContent) return newState;
 
+  const msgContentType = msgContent.type;
   const size = msgContent[msgContentType].length;
   const color = msgContent[msgContentType].colour ? "true" : "";
   const charPreset = msgContent[msgContentType].type;
 
   getCaptcha(size, color, charPreset)
     .then((res) => {
-      let newCaptcha = [...state.captcha];
-      newCaptcha.push({index: i, contentIndex: msgContentIndex, ...res.data});
-      dispatch({ type: PREVIEW_ACTIONS.SET_CAPTCHA, payload: [...newCaptcha] });
+      const nextCaptcha = [
+        ...(newState.captcha || []),
+        { index: i, contentIndex: msgContentIndex, ...res.data },
+      ];
+      newState.captcha = nextCaptcha;
+      if (typeof newState.onCaptchaLoaded === 'function') {
+        newState.onCaptchaLoaded(nextCaptcha);
+      }
     });
-}
+
+  return newState;
+};
 
 export const processForUserMessage = (messagesList, i, newState, assignToState = true) => {
   for (
@@ -34,7 +40,5 @@ export const processForUserMessage = (messagesList, i, newState, assignToState =
     newState.currentMsgIndex = i;
   }
 
-  // scrollToPosition({ position: "b", selector: "#sp-body" });
-
   return newState;
-}
+};

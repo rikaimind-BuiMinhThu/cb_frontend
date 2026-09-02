@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button, message, Space } from 'antd';
 import { tokenExpired } from 'v2/api/tokenExpired';
-import api from 'api/api-management';
+import api from 'v2/api/api-management';
 import CreateSmsTemplateDialog from './CreateSmsTemplateDialog';
 import UpdateSmsTemplateDialog from './UpdateSmsTemplateDialog';
 import { AdminPage, AdminTable, AdminConfirmModal, AdminActionButton, useAdminHeaderActions } from '../../../components/AdminShell';

@@ -613,6 +613,51 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
     );
   };
 
+  const renderStartEndDateContent = () => {
+    return (
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <DatePickerCustom
+          disabled={disabled}
+          locale={mergedJaPickerLocale}
+          style={{ width: "49%", marginTop: "5px" }}
+          disabledDate={previewDisableDateStart}
+          value={
+            calendar.start_date_select
+              ? moment(calendar.start_date_select, "YYYY-MM-DD")
+              : null
+          }
+          onChange={(date, dateString) =>
+            onChangeValue(
+              contentIndex,
+              content.type,
+              dateString,
+              "start_date_select"
+            )
+          }
+        />
+        <DatePickerCustom
+          disabled={disabled}
+          locale={mergedJaPickerLocale}
+          style={{ width: "49%", marginTop: "5px" }}
+          disabledDate={previewDisableDateEnd}
+          value={
+            calendar.end_date_select
+              ? moment(calendar.end_date_select, "YYYY-MM-DD")
+              : null
+          }
+          onChange={(date, dateString) =>
+            onChangeValue(
+              contentIndex,
+              content.type,
+              dateString,
+              "end_date_select"
+            )
+          }
+        />
+      </div>
+    );
+  };
+
   const renderContent = () => {
     switch (calendar.type) {
       case "date_selection":
@@ -937,51 +982,6 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
             />
           </div>
         </React.Fragment>
-      )}
-      {/* calendar: type = 'start_end_date' */}
-      {calendar.type === "start_end_date" && (
-        <div
-          style={{ display: "flex", justifyContent: "space-between" }}
-        >
-          <DatePickerCustom
-            disabled={disabled}
-            locale={mergedJaPickerLocale}
-            style={{ width: "49%", marginTop: "5px" }}
-            disabledDate={previewDisableDateStart}
-            value={
-              calendar.start_date_select
-                ? moment(calendar.start_date_select, "YYYY-MM-DD")
-                : null
-            }
-            onChange={(date, dateString) =>
-              onChangeValue(
-                contentIndex,
-                content.type,
-                dateString,
-                "start_date_select"
-              )
-            }
-          />
-          <DatePickerCustom
-            disabled={disabled}
-            locale={mergedJaPickerLocale}
-            style={{ width: "49%", marginTop: "5px" }}
-            disabledDate={previewDisableDateEnd}
-            value={
-              calendar.end_date_select
-                ? moment(calendar.end_date_select, "YYYY-MM-DD")
-                : null
-            }
-            onChange={(date, dateString) =>
-              onChangeValue(
-                contentIndex,
-                content.type,
-                dateString,
-                "end_date_select"
-              )
-            }
-          />
-        </div>
       )}
       {errors?.[
         `message${messageIndex}_content${contentIndex}_${content.type}`

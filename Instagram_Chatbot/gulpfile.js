@@ -1,26 +1,6 @@
 const gulp = require("gulp");
-const gap = require("gulp-append-prepend");
 
+// License banners were removed; keep this task so `npm run build` still exits 0.
 gulp.task("licenses", async function () {
-  gulp
-    .src("build/static/js/*chunk.js", { base: "./" })
-    .pipe(
-      gap.prependText(``)
-    )
-    .pipe(gulp.dest("./", { overwrite: true }));
-
-  gulp
-    .src("build/index.html", { base: "./" })
-    .pipe(
-      gap.prependText(``)
-    )
-    .pipe(gulp.dest("./", { overwrite: true }));
-
-  gulp
-    .src("build/static/css/*chunk.css", { base: "./" })
-    .pipe(
-      gap.prependText(``)
-    )
-    .pipe(gulp.dest("./", { overwrite: true }));
-  return;
+  return undefined;
 });

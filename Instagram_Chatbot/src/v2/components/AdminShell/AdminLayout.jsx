@@ -11,7 +11,7 @@ import routes from '../../routes';
 import PushMessage from '../../views/BotSettings/PushMessage/PushMessagePage';
 import ListSmsTemplate from '../../views/BotSettings/SmsTemplate/ListSmsTemplate';
 import { adminConfigProviderProps } from '../../theme/adminTheme';
-import { getAdminRoutePath, getDefaultLandingPath } from 'v2/variables/constants';
+import { getAdminRoutePath, getDefaultLandingPath, getSignInPath } from 'v2/variables/constants';
 import Cookies from 'js-cookie';
 import 'v2/assets/css/admin/admin-shell.css';
 
@@ -21,12 +21,19 @@ function AdminLayout(props) {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const mainPanelRef = React.useRef();
+  const token = Cookies.get('token');
+  const isAuthenticated = Boolean(token) && Cookies.get('is_auth') !== 'false';
 
   React.useEffect(() => {
     if (mainPanelRef.current) {
       mainPanelRef.current.scrollTop = 0;
     }
     window.scrollTo(0, 0);
+    const token = Cookies.get('token');
+    if (!token || Cookies.get('is_auth') === 'false') {
+      window.location.href = getSignInPath();
+      return;
+    }
     const pathname = location?.pathname;
     let client = null;
     try {
@@ -74,6 +81,11 @@ function AdminLayout(props) {
       window.location.href = landingPath;
     }
   }, [location]);
+
+  if (!isAuthenticated) {
+    window.location.href = getSignInPath();
+    return null;
+  }
 
   return (
     <ConfigProvider locale={jaJP} {...adminConfigProviderProps}>

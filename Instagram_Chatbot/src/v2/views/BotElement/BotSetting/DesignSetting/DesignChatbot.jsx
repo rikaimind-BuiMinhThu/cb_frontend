@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tabs } from 'antd';
+import { Tabs, Spin } from 'antd';
 import { Link } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import './../../../../assets/css/bot/bot-setting.css';
@@ -27,7 +27,13 @@ function DesignChatbot() {
   );
 
   if (!state.isLoaded) {
-    return null;
+    return (
+      <AdminPage className="admin-page--design-setting">
+        <div style={{ padding: 48, textAlign: 'center' }}>
+          <Spin />
+        </div>
+      </AdminPage>
+    );
   }
 
   return (

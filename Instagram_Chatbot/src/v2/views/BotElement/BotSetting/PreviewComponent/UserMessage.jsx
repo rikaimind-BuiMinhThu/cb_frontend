@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
-import api from 'api/api-management';
+import api from 'v2/api/api-management';
 import InputCustom from "../ScenarioSetting/scenarioComon/InputCustom";
 import ModalNoti from "../../../Popup/ModalNoti";
 import { CHATBOT_ACTIONS, MESSAGE_CONTENT_TYPES, SCAN_REGEX } from "../PreviewComponent/Constants";
@@ -33,6 +33,7 @@ import CreditCardPayment from "./UserMessageComponent/CreditCardPayment";
 import CardPaymentRadioButton from "./UserMessageComponent/CardPaymentRadioButton";
 import ContactForm from "./UserMessageComponent/ContactForm";
 import { isUserMessage } from "./Utils";
+import { handleDisableDateCalendar } from "../ScenarioSetting/utils/scenarioCalendarUtils";
 
 const UserMessage = ({
   message,
@@ -57,31 +58,10 @@ const UserMessage = ({
   cartSystem = "",
   footer = null,
 }) => {
-  if (!isUserMessage(message)) return null;
-
-  // UserMesssage sẽ có những nhiệm vụ:
-  //   + Check xem content thuộc dạng nào và render ra component tương ứng
-  //   + Sau khi mà render xong UserMessage thì sẽ validate cho phần tương ứng như vậy
-  //   + Hiển thị errorsMessage tương ứng cho content đó nếu validate có lỗi
-
   const [messageContent, setMessageContent] = useState(messageContentProps);
   const [errors, setErrors] = useState(errorsProps);
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [messageNoti, setMessageNoti] = useState("");
-
-  function loadCaptcha(contentIndex) {
-    if (
-      document.getElementById(`captcha-${messageIndex}-${contentIndex}`) &&
-      captcha.length !== 0
-    )
-      document.getElementById(
-        `captcha-${messageIndex}-${contentIndex}`
-      ).innerHTML =
-        captcha.filter(
-          (item) =>
-            item.index === messageIndex && item.contentIndex === contentIndex
-        )?.[0]?.data || "";
-  }
 
   const handleOnChangeJpConvertText = (contentIndex, contentType, field, subField) => (value) => {
     onChangeValue(contentIndex, contentType, value, field, subField);
@@ -105,6 +85,21 @@ const UserMessage = ({
   }, [messageContentProps]);
 
   useEffect(() => {
+    if (!isUserMessage(message) || !captcha?.length || !messageContent) return;
+    messageContent.forEach((content, contentIndex) => {
+      if (content.type !== "capture") return;
+      const el = document.getElementById(`captcha-${messageIndexRender}-${contentIndex}`);
+      if (!el) return;
+      el.innerHTML =
+        captcha.filter(
+          (item) =>
+            item.index === messageIndex && item.contentIndex === contentIndex
+        )?.[0]?.data || "";
+    });
+  }, [captcha, message, messageContent, messageIndex, messageIndexRender]);
+
+  useEffect(() => {
+    if (!isUserMessage(message) || !messageContent) return;
     messageContent.forEach((content, contentIndex) => {
       if (content.type === "calendar") {
         let calendar = content.calendar;
@@ -132,7 +127,7 @@ const UserMessage = ({
           let i = 0;
           calendar.start_date_select = moment();
           calendar.end_date_select = moment().add(1, "days");
-          while (isCalendarDateDisabledInRange(moment().add(i, "days"), calForDisable)) {
+          while (handleDisableDateCalendar(moment().add(i, "days"), calendar)) {
             if (i === 100) {
               calendar.start_date_select = null;
               calendar.end_date_select = null;
@@ -244,12 +239,15 @@ const UserMessage = ({
   }, []);
 
   useEffect(() => {
+    if (!isUserMessage(message)) return;
     if (!messageContent) return;
     if (messageContent.length > 1) return;
     if (messageContent[0].type !== MESSAGE_CONTENT_TYPES.IMAGE) return;
     
     onRenderCompleted();
   }, []);
+
+  if (!isUserMessage(message)) return null;
 
   const handleClickCarousel = (urls, use_shortened_urls) => {
     if (!urls.trim().length) return;
@@ -487,6 +485,7 @@ const UserMessage = ({
         let capture = content.capture;
         let productPurchase = content.product_purchase;
         let productPurchaseRadioButton = content.product_purchase_radio_button;
+        let slider = content.slider;
 
         if (content.type == 'textarea' && content.textarea && content.textarea.invalid_input && content.textarea.invalid_input.content) {
           content.textarea.invalid_input.content = replaceVariable(content.textarea.invalid_input.content);
@@ -641,7 +640,6 @@ const UserMessage = ({
                   <div
                     id={`captcha-${messageIndexRender}-${contentIndex}`}
                     style={{ width: "50%" }}
-                    onLoad={loadCaptcha(contentIndex)}
                   ></div>
                 </div>
                 {errors?.[

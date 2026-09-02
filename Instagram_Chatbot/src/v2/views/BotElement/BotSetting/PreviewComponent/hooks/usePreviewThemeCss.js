@@ -12,19 +12,24 @@ export const usePreviewThemeCss = ({
   customCssId = "custom-css",
 }) => {
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled) return undefined;
 
     const existing = document.getElementById(customCssId);
     if (existing) existing.remove();
 
+    let style;
     if (state.isUsedCustomCss && state.customCssContent) {
-      const style = document.createElement("style");
+      style = document.createElement("style");
       style.id = customCssId;
       style.innerHTML = state.customCssContent;
       document.head.appendChild(style);
     }
 
     applyTheme(state.botInfor, state.themeSettings);
+
+    return () => {
+      if (style) style.remove();
+    };
   }, [
     enabled,
     state.isUsedCustomCss,

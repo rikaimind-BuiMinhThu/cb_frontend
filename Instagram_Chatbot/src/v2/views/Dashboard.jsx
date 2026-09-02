@@ -9,9 +9,10 @@ import {
   dashboardNASDAQChart,
 } from 'variables/charts.js';
 import ReactApexChart from 'react-apexcharts';
-import api from 'api/api-management';
+import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { AdminPage } from '../../components/AdminShell';
+import { getSignInPath } from 'v2/variables/constants';
 
 function Dashboard() {
   const [monthECUDisplay, setMonthECUDisplay] = useState(['1', '2', '3', '4']);
@@ -25,45 +26,38 @@ function Dashboard() {
   const [userTotal, setUserTotal] = useState();
   const [isAdminDeel, setIsAdminDeel] = useState(false);
   const [lineDataWithoutRole, setLineDataWithoutRole] = useState([]);
-  // const client = JSON.parse(sessionStorage.getItem('client'));
-  const client = JSON.parse(localStorage.getItem('client'));
+  let client = null;
+  try {
+    client = JSON.parse(localStorage.getItem('client'));
+  } catch (e) {
+    client = null;
+  }
 
   React.useEffect(() => {
     var cook = Cookies.get('user_role');
     if (cook === 'admin_deel') {
       setIsAdminDeel(true);
     }
-    if(cook !== "admin_deel"){
-      document.getElementById('client_management').style.display = 'none'
-      document.getElementById('user_management').style.display = 'none'
-    }else{
-      document.getElementById('client_management').style.display = 'block'
-      document.getElementById('user_management').style.display = 'block'
+    const clientManagement = document.getElementById('client_management');
+    const userManagement = document.getElementById('user_management');
+    if (clientManagement) {
+      clientManagement.style.display = cook !== 'admin_deel' ? 'none' : 'block';
     }
-    console.log("cook: ", cook)
+    if (userManagement) {
+      userManagement.style.display = cook !== 'admin_deel' ? 'none' : 'block';
+    }
   }, []);
 
   React.useEffect(() => {
-    console.log('token in dashboard', Cookies.get('token'));
-  }, []);
-  // React.useEffect(() => {
-  //   console.log('token in dashboard', Cookies.get('token'))
-  //   if(Cookies.get('token') == undefined){
-  //     window.location.href ='/'
-  //   }
-  // }, [])
-  React.useEffect(() => {
-    console.log('token in dashboard', Cookies.get('token'));
-    console.log('is_auth', Cookies.get('is_auth'));
     if (
       Cookies.get('token') == undefined ||
       Cookies.get('token') == null ||
       Cookies.get('token') == ''
     ) {
-      window.location.href = '/';
+      window.location.href = getSignInPath();
     }
     if (Cookies.get('is_auth') == 'false') {
-      window.location.href = '/';
+      window.location.href = getSignInPath();
     }
   }, []);
 

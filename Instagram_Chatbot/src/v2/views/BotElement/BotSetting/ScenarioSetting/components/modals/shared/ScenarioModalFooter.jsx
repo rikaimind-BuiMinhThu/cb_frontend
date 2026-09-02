@@ -8,6 +8,7 @@ const ScenarioModalFooter = ({
   closeLabel = '閉じる',
   confirmLabel = '保存',
   showConfirm = true,
+  confirmDisabled = false,
 }) => (
   <div className="ss-settings-modal-footer">
     <Button
@@ -22,6 +23,7 @@ const ScenarioModalFooter = ({
         type="button"
         className="ss-settings-modal-footer__btn ss-settings-modal-footer__btn--primary"
         onClick={onConfirm}
+        disabled={confirmDisabled}
       >
         {confirmLabel}
       </Button>
@@ -35,6 +37,7 @@ ScenarioModalFooter.propTypes = {
   closeLabel: PropTypes.string,
   confirmLabel: PropTypes.string,
   showConfirm: PropTypes.bool,
+  confirmDisabled: PropTypes.bool,
 };
 
 export default ScenarioModalFooter;

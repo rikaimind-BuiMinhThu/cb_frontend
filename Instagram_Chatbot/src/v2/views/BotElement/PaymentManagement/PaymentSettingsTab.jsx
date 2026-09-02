@@ -8,6 +8,11 @@ import NpDeferredSection from './settings/NpDeferredSection';
 function PaymentSettingsTab({
   openTax,
   setOpenTax,
+  saleTaxRate,
+  setSaleTaxRate,
+  calculateOneYen,
+  setCalculateOneYen,
+  taxSaving,
   noCan,
   setNoCan,
   noPaid,
@@ -40,7 +45,11 @@ function PaymentSettingsTab({
       <ConsumptionTaxSection
         openTax={openTax}
         setOpenTax={setOpenTax}
-        payment={payment}
+        saleTaxRate={saleTaxRate}
+        setSaleTaxRate={setSaleTaxRate}
+        calculateOneYen={calculateOneYen}
+        setCalculateOneYen={setCalculateOneYen}
+        taxSaving={taxSaving}
         onSave={onSaveConsumptionTax}
       />
       <SpecifyGatewaySection

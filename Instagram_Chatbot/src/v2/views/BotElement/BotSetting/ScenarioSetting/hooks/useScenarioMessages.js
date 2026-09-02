@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import cloneDeep from 'lodash/cloneDeep';
 import { mutateMessageContent } from '../utils/scenarioMessageMutations';
 import { dataHourFixed, dataYearFixed } from '../constants/scenarioFormConstants';
 
@@ -19,8 +20,9 @@ export const useScenarioMessages = ({
     subName,
     variable,
   ) => {
+    const next = cloneDeep(dataMessages);
     mutateMessageContent(
-      dataMessages,
+      next,
       indexMessage,
       indexContent,
       type,
@@ -31,7 +33,7 @@ export const useScenarioMessages = ({
       subName,
       variable,
     );
-    setDataMessages([...dataMessages]);
+    setDataMessages(next);
   }, [dataMessages, setDataMessages]);
 
   const onChangeTimePullDown = useCallback((
@@ -43,8 +45,9 @@ export const useScenarioMessages = ({
     subField,
     typeData,
   ) => {
-    mutateMessageContent(dataMessages, indexMessage, indexContent, type, value, name, subField);
-    const field = dataMessages[indexMessage].message_content[indexContent][type][name];
+    const next = cloneDeep(dataMessages);
+    mutateMessageContent(next, indexMessage, indexContent, type, value, name, subField);
+    const field = next[indexMessage].message_content[indexContent][type][name];
     if (typeData === 'dataHour') {
       if (subField === 'start_at') {
         setDataHour(dataHourFixed.filter((item) => (
@@ -70,12 +73,13 @@ export const useScenarioMessages = ({
         )));
       }
     }
-    setDataMessages([...dataMessages]);
+    setDataMessages(next);
   }, [dataMessages, setDataHour, setDataMessages, setDataYear]);
 
   const onChangeValueNameMessage = useCallback((indexMessage, vari, value) => {
-    dataMessages[indexMessage][vari] = value;
-    setDataMessages([...dataMessages]);
+    const next = cloneDeep(dataMessages);
+    next[indexMessage][vari] = value;
+    setDataMessages(next);
   }, [dataMessages, setDataMessages]);
 
   return {

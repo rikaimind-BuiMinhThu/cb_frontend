@@ -3,15 +3,11 @@ import "v2/assets/css/bot/preview-chat-bot.css";
 import { getErrorMessageFromParent } from "../../PreviewFukushashiki/LPUtils"
 
 export default function SubmitButton({ content, submitErrorMessage = "", onChangeValue, onClickNext, isProcessing = false, messageIndex, contentIndex, message}) {
-  if (content.type !== 'button_submit') return null;
-
-  const buttonSubmit = content.button_submit;
-  if (!buttonSubmit) return null;
-
+  const buttonSubmit = content?.button_submit;
   const submitButtonId = `chatbot-submit-button-${message?.id ?? 'msg'}-${messageIndex}-${contentIndex}`;
 
   useEffect(() => {
-    if (!buttonSubmit.is_display_error_message) return;
+    if (content?.type !== 'button_submit' || !buttonSubmit?.is_display_error_message) return;
 
     const error_message_display_element_search_type = content.error_message_display_element_search_type;
     const error_message_display_element_search_value = content.error_message_display_element_search_value;
@@ -23,7 +19,13 @@ export default function SubmitButton({ content, submitErrorMessage = "", onChang
       error_message_display_element_search_value, 
       buttonSubmit.is_display_error_message
     );
-  }, []);
+  }, [
+    buttonSubmit,
+    content,
+  ]);
+
+  if (content.type !== 'button_submit') return null;
+  if (!buttonSubmit) return null;
 
   const renderSubmitErrorMessage = () => {
     if (!buttonSubmit.is_display_error_message) return null;

@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { findItem } from "./Utils";
 
 export const mapAmazonPayDataToMessagesList = (amazonPayData, messagesList, prefectureList) => {

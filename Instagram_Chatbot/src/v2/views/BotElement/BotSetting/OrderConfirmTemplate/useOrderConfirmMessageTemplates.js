@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import api from 'api/api-management';
+import api from 'v2/api/api-management';
 import { AdminConfirmModal } from '../../../../components/AdminShell';
 import {
   ORDER_CONFIRM_LP_PRESET,

@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Cookies from 'js-cookie';
-import api from 'api/api-management';
+import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
+import { getSignInPath } from 'v2/variables/constants';
 import {
   buildClientsUrl,
   getConversionPreviewDates,
@@ -22,7 +23,7 @@ export default function useClientList() {
   useEffect(() => {
     const userRole = Cookies.get('user_role');
     if (!userRole) {
-      window.location.href = '/';
+      window.location.href = getSignInPath();
     }
     if (userRole === 'admin_client' || userRole === 'client') {
       window.location.href = '/v2/admin/dashboard';
@@ -35,21 +36,30 @@ export default function useClientList() {
       Cookies.get('token') == null ||
       Cookies.get('token') == ''
     ) {
-      window.location.href = '/';
+      window.location.href = getSignInPath();
     }
     if (Cookies.get('is_auth') == 'false') {
-      window.location.href = '/';
+      window.location.href = getSignInPath();
     }
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
     api
       .get('/api/v1/managements/plans')
-      .then((res) => setPlans(res.data.data))
+      .then((res) => {
+        if (!cancelled) setPlans(res.data.data);
+      })
       .catch((error) => {
+        if (cancelled) return;
         if (error.response?.data.code === 0) tokenExpired();
       });
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  const fetchRequestId = useRef(0);
 
   function fetchClients(pageNum, name = namesearch, range = conversionRange) {
     const { startPreview, endPreview } = getConversionPreviewDates(range);
@@ -72,10 +82,12 @@ export default function useClientList() {
     }
     setDateRangeError('');
     setLoading(true);
+    const requestId = ++fetchRequestId.current;
 
     api
       .get(buildClientsUrl(pageNum, name, startPreview, endPreview))
       .then((res) => {
+        if (requestId !== fetchRequestId.current) return undefined;
         const data = res?.data?.data || {};
         const totalCount = data.total || 0;
         const maxPage = Math.max(1, Math.ceil(totalCount / PAGE_SIZE) || 1);
@@ -85,6 +97,7 @@ export default function useClientList() {
           return api
             .get(buildClientsUrl(targetPage, name, startPreview, endPreview))
             .then((retryRes) => {
+              if (requestId !== fetchRequestId.current) return;
               const retryData = retryRes?.data?.data || {};
               setClients(retryData.clients || []);
               setTotal(retryData.total || 0);
@@ -98,10 +111,13 @@ export default function useClientList() {
         return undefined;
       })
       .catch((error) => {
+        if (requestId !== fetchRequestId.current) return;
         console.log(error);
         if (error.response?.data.code === 0) tokenExpired();
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (requestId === fetchRequestId.current) setLoading(false);
+      });
   }
 
   useEffect(() => {

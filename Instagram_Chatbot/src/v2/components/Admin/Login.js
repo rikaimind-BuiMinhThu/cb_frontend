@@ -4,17 +4,15 @@ import React from "react";
 import "v2/assets/css/login.css"
 import "assets/scss/paper-dashboard.scss?v=1.3.0";
 import "assets/demo/demo.css";
-import ModalNotiFail from "views/Popup/ModalNotiFail";
 import Cookies from 'js-cookie';
-import { setToken } from "api/auth";
+import { setToken } from "v2/api/auth";
 import logo from '../../assets/img/ecchatbot-logo.png'
-import LoginFacebook from "./LoginFacebook";
 import {EC_CHATBOT_URL, getDefaultLandingPath} from '../../variables/constants'
 class Login extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { token: '', navigator: 'false', msgNoti: '', isOpenNoti: false };
+    this.state = { token: '', navigator: 'false', msgNoti: '', emailError: '', passwordError: '' };
     Cookies.remove('bot_type');
 
     if (!localStorage.getItem("env")) {
@@ -37,7 +35,7 @@ class Login extends React.Component {
       get: (searchParams, prop) => searchParams.get(prop),
     });
 
-    return params.debug === "true" || true;
+    return params.debug === "true";
   }
 
   handleLogin = (props) => {
@@ -51,24 +49,18 @@ class Login extends React.Component {
     };
 
     if (nameValue === "" || password === "") {
-      if (password === "") {
-        document.getElementById('passwordMessage').innerHTML = "パスワードを入力してください。"
-      } else {
-        document.getElementById('passwordMessage').innerHTML = ""
-      }
-      if (nameValue === "") {
-        document.getElementById('emailMessage').innerHTML = "メールを入力してください。"
-      } else {
-        document.getElementById('emailMessage').innerHTML = ""
-      }
+      this.setState({
+        passwordError: password === "" ? "パスワードを入力してください。" : "",
+        emailError: nameValue === "" ? "メールを入力してください。" : "",
+        msgNoti: "",
+      });
     } else {
-      document.getElementById('emailMessage').innerHTML = ""
-      document.getElementById('passwordMessage').innerHTML = ""
+      this.setState({ emailError: "", passwordError: "", msgNoti: "" });
       // const loginInfo = { username: nameValue, password: password };
       const loginInfo = { user: { email: nameValue, password: password } }
       axios.post(`${EC_CHATBOT_URL}/api/v1/sign_in`, loginInfo)
         .then(res => {
-          document.getElementById("loginErrorMsg").style.display = "none"
+          this.setState({ msgNoti: "" });
           const persons = res.data;
           if (persons.code === 1 || persons.code === "1") {
             setToken(persons.token)
@@ -83,14 +75,10 @@ class Login extends React.Component {
             getToDashboard(persons.user.role, res.data.client);
           } else {
             this.setState({ msgNoti: "ユーザー名またはパスワードが間違っています。" })
-            document.getElementById("loginErrorMsg").style.display = "block"
-            // this.setState({ isOpenNoti: true })
           }
         })
         .catch(() => {
           this.setState({ msgNoti: "ログインに失敗しました。" });
-          const loginError = document.getElementById("loginErrorMsg");
-          if (loginError) loginError.style.display = "block";
         });
 
       function getToDashboard(role, client) {
@@ -111,25 +99,18 @@ class Login extends React.Component {
     };
 
     if (nameValue === "" || password === "") {
-      if (password === "") {
-        document.getElementById('passwordMessage').innerHTML = "パスワードを入力してください。"
-      } else {
-        document.getElementById('passwordMessage').innerHTML = ""
-      }
-      if (nameValue === "") {
-        document.getElementById('emailMessage').innerHTML = "メールを入力してください。"
-      } else {
-        document.getElementById('emailMessage').innerHTML = ""
-      }
+      this.setState({
+        passwordError: password === "" ? "パスワードを入力してください。" : "",
+        emailError: nameValue === "" ? "メールを入力してください。" : "",
+        msgNoti: "",
+      });
     } else {
-      document.getElementById('emailMessage').innerHTML = ""
-      document.getElementById('passwordMessage').innerHTML = ""
+      this.setState({ emailError: "", passwordError: "", msgNoti: "" });
       // const loginInfo = { username: nameValue, password: password };
       const loginInfo = { user: { email: nameValue, password: password } }
       axios.post(`${EC_CHATBOT_URL}/api/v1/sign_in`, loginInfo)
         .then(res => {
-          document.getElementById("loginErrorMsg").style.display = "none"
-          console.log(res)
+          this.setState({ msgNoti: "" });
           const persons = res.data;
           if (persons.code === 1 || persons.code === "1") {
             setToken(persons.token)
@@ -144,14 +125,10 @@ class Login extends React.Component {
             getToDashboard(persons.user.role, res.data.client);
           } else {
             this.setState({ msgNoti: "ユーザー名またはパスワードが間違っています。" })
-            document.getElementById("loginErrorMsg").style.display = "block"
-            // this.setState({ isOpenNoti: true })
           }
         })
         .catch(() => {
           this.setState({ msgNoti: "ログインに失敗しました。" });
-          const loginError = document.getElementById("loginErrorMsg");
-          if (loginError) loginError.style.display = "block";
         });
 
       function getToDashboard(role, client) {
@@ -172,29 +149,35 @@ class Login extends React.Component {
               <h3>ログイン</h3>
               <form onSubmit={this.handleSubmit}>
                 <div className="mb-3">
-                  <label>メールアドレス</label>
+                  <label htmlFor="email">メールアドレス</label>
                   <input
                     type="email"
                     className="form-control"
                     placeholder="メールアドレス入力"
                     id="email"
+                    aria-describedby="emailMessage"
                   />
-                  <span id="emailMessage" style={{ color: 'red' }}></span>
+                  <span id="emailMessage" role="alert" style={{ color: 'red' }}>{this.state.emailError}</span>
                 </div>
                 <div className="mb-3">
-                  <label>パスワード</label>
+                  <label htmlFor="password">パスワード</label>
                   <input
                     type="password"
                     className="form-control"
                     placeholder="パスワード入力"
                     id="password"
+                    aria-describedby="passwordMessage"
                   />
-                  <span id="passwordMessage" style={{ color: 'red' }}></span>
+                  <span id="passwordMessage" role="alert" style={{ color: 'red' }}>{this.state.passwordError}</span>
                 </div>
                 <input type="submit" hidden value="Submit"></input>
               </form>
               <br />
-              <div style={{ width: "100%", textAlign: "center" }}><span id="loginErrorMsg" style={{ color: 'red', display: "none" }}>{this.state.msgNoti}</span></div>
+              <div style={{ width: "100%", textAlign: "center" }}>
+                {this.state.msgNoti && (
+                  <span id="loginErrorMsg" role="alert" style={{ color: 'red' }}>{this.state.msgNoti}</span>
+                )}
+              </div>
               <div style={{ textAlign: "center" }} className="d-grid">
                 <button
                   onClick={this.handleLogin}
@@ -207,14 +190,9 @@ class Login extends React.Component {
               </div>
             </div>
 
-            {/* <LoginFacebook></LoginFacebook> */}
+            {/* Facebook login is available via LoginFacebook when enabled */}
           </div>
         </div>
-        <ModalNotiFail open={this.state.isOpenNoti} onClose={() => this.setState({ isOpenNoti: false })}>
-          <div style={{ width: "300px", textAlign: "center", color: "red" }}>
-            <span style={{ fontSize: "16px" }}>{this.state.msgNoti}</span>
-          </div>
-        </ModalNotiFail>
       </div>
     );
   }

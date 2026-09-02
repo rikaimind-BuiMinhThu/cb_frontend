@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Form, Input, InputNumber, Modal, Space, message } from 'antd';
 import Cookies from 'js-cookie';
-import api from 'api/api-management';
+import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { AdminPage, AdminTable, AdminActionButton } from '../components/AdminShell';
+import { getSignInPath } from 'v2/variables/constants';
 
 function PlanManagement() {
   const [dataList, setDataList] = useState([]);
@@ -16,7 +17,7 @@ function PlanManagement() {
   useEffect(() => {
     const userRole = Cookies.get('user_role');
     if (!userRole || userRole !== 'admin_deel') {
-      window.location.href = '/';
+      window.location.href = getSignInPath();
     }
   }, []);
 
@@ -26,10 +27,10 @@ function PlanManagement() {
       Cookies.get('token') == null ||
       Cookies.get('token') === ''
     ) {
-      window.location.href = '/';
+      window.location.href = getSignInPath();
     }
     if (Cookies.get('is_auth') == 'false') {
-      window.location.href = '/';
+      window.location.href = getSignInPath();
     }
   }, []);
 

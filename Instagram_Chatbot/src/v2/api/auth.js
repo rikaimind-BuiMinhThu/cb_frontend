@@ -6,9 +6,7 @@ const RefreshToken = 'RefreshToken'
 const userNameLogin = 'uMythos'
 
 export function getToken() {
-  console.log('token get in auth: ', Cookies.get(TokenKey))
   return (`Authorization = Bearer ${Cookies.get(TokenKey)}`)
-  // axios.defaults.headers.common['Authorization'] = `Bearer ${Cookies.get(TokenKey)}`
 }
 
 export function getRefreshToken() {
@@ -20,7 +18,6 @@ export function setRefreshToken(token) {
 }
 
 export function setToken(token, pathname) {
-  console.log(pathname)
   Cookies.set(TokenKey, token, { path: pathname });
   Cookies.set(TokenKey, token, { path: '/' });
   Cookies.set(TokenKey, token, { path: '/v2/admin/dashboard' });

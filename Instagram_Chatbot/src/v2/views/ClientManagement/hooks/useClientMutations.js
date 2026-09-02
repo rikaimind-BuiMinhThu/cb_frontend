@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { message } from 'antd';
-import api from 'api/api-management';
+import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import {
   buildClientPayload,

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { message } from 'antd';
 import Cookies from 'js-cookie';
-import api from 'api/api-management';
+import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import {
   TAB_BASIC,
@@ -177,12 +177,12 @@ export const useDesignChatbot = (initialBotId) => {
     return false;
   }, [clearValidationError, setBotIcon, setPresetIndexForType]);
 
-  const loadChatbot = useCallback(async (id) => {
+  const loadChatbot = useCallback(async (id, isCancelled = () => false) => {
     if (!id) return;
 
     try {
       const response = await api.get(`/api/v1/managements/chatbots/${id}`);
-      if (!response.data.data) {
+      if (isCancelled() || !response.data.data) {
         return;
       }
 
@@ -221,29 +221,35 @@ export const useDesignChatbot = (initialBotId) => {
       setDesignType(data.design_type || 'flat');
 
       await syncIconsFromChatbotData(data);
+      if (isCancelled()) return;
 
       if (resolvedColor) {
         setMainColor(resolvedColor);
       }
     } catch (error) {
+      if (isCancelled()) return;
       if (error.response?.data?.code === 0) {
         tokenExpired();
       }
     } finally {
-      setIsLoaded(true);
+      if (!isCancelled()) setIsLoaded(true);
     }
   }, [syncIconsFromChatbotData]);
 
   useEffect(() => {
+    let cancelled = false;
     const id = initialBotId || Cookies.get('bot_id');
     setBotId(id);
-    loadChatbot(id);
+    loadChatbot(id, () => cancelled);
+    return () => {
+      cancelled = true;
+    };
   }, [initialBotId, loadChatbot]);
 
   const validateBasicInfo = useCallback(() => {
     const errors = {
       title: title ? '' : 'タイトルは、必ず指定してください。',
-      subtitle: subtitle ? '' : 'サブタイトルは、必ず指定ください。',
+      subtitle: subtitle ? '' : 'サブタイトルは、必ず指定してください。',
       botName: botName ? '' : 'ボット名は、必ず指定してください。',
       botImage: '',
     };

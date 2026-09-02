@@ -2,7 +2,7 @@ import { tokenExpired } from 'v2/api/tokenExpired';
 import React, { useEffect, useState } from 'react';
 import { Form, Input, message, Select, Spin } from 'antd';
 import { Link, useHistory, useParams } from 'react-router-dom';
-import api from 'api/api-management';
+import api from 'v2/api/api-management';
 import { AdminFormRow, AdminPage, AdminActionButton, useAdminHeaderTitle, useAdminHeaderActions } from '../../../../components/AdminShell';
 import '../../../../assets/css/bot/payment-gateway-form.css';
 

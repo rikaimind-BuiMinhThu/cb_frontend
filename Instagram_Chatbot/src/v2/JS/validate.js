@@ -4,11 +4,11 @@ export function checkEmail(inputId, errId, label) {
   var regex = /^[a-zA-Z0-9]+[a-zA-Z0-9]+([._+-])*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/;
   if (!regex.test(field(inputId).value) && field(inputId).value != '') {
     field(errId).style.display = 'block';
-    field(errId).innerHTML = `${label}項目は正しくありません。`;
+    field(errId).textContent = `${label}項目は正しくありません。`;
     return false;
   } else {
     field(errId).style.display = 'none';
-    field(errId).innerHTML = ``;
+    field(errId).textContent = ``;
     return true;
   }
 }
@@ -17,11 +17,11 @@ export function checkUrl(inputId, errId, label) {
     /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/;
   if (!regex.test(field(inputId).value) && field(inputId).value != '') {
     field(errId).style.display = 'block';
-    field(errId).innerHTML = `${label}フォーマとは正しくありません。`;
+    field(errId).textContent = `${label}フォーマとは正しくありません。`;
     return false;
   } else {
     field(errId).style.display = 'none';
-    field(errId).innerHTML = ``;
+    field(errId).textContent = ``;
     return true;
   }
 }
@@ -29,11 +29,11 @@ export function checkUrl(inputId, errId, label) {
 export function checkMaxLength(inputId, errId, label, length) {
   if (field(inputId).value.length > length && field(inputId).value != '') {
     field(errId).style.display = 'block';
-    field(errId).innerHTML = `${label}を${length}文字以下入力してください。`;
+    field(errId).textContent = `${label}を${length}文字以下入力してください。`;
     return false;
   } else {
     field(errId).style.display = 'none';
-    field(errId).innerHTML = ``;
+    field(errId).textContent = ``;
     return true;
   }
 }
@@ -41,11 +41,11 @@ export function checkMaxLength(inputId, errId, label, length) {
 export function checkRequired(inputId, errId, label) {
   if (field(inputId).value === '') {
     field(errId).style.display = 'block';
-    field(errId).innerHTML = `${label}は、必ず指定してください。`;
+    field(errId).textContent = `${label}は、必ず指定してください。`;
     return false;
   } else {
     field(errId).style.display = 'none';
-    field(errId).innerHTML = ``;
+    field(errId).textContent = ``;
     return true;
   }
 }
@@ -53,11 +53,11 @@ export function checkRequired(inputId, errId, label) {
 export function checkSelect(inputId, errId, label) {
   if (field(inputId).value === '') {
     field(errId).style.display = 'block';
-    field(errId).innerHTML = `${label}はすでに選択されました！`;
+    field(errId).textContent = `${label}はすでに選択されました！`;
     return false;
   } else {
     field(errId).style.display = 'none';
-    field(errId).innerHTML = ``;
+    field(errId).textContent = ``;
     return true;
   }
 }

@@ -13,7 +13,6 @@ module.exports = `
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QSMNQ8CKJG"></script>
 <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@16/umd/react.development.js" crossorigin></script>
-<script src="./htmlTest.js" crossorigin></script>
 <script defer>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}

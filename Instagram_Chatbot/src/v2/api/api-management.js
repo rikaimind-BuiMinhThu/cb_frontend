@@ -1,12 +1,34 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { EC_CHATBOT_URL } from 'v2/variables/constants';
-var service = axios.create(
-    {
-        // baseURL: 'http://rikai-dev.ddns.net:8000',
-        baseURL: EC_CHATBOT_URL,
-        data:'',
-        headers: { 'Authorization': 'Bearer ' + Cookies.get('token') }
-    });
+import { tokenExpired } from './tokenExpired';
 
-export default service
+const service = axios.create({
+  baseURL: EC_CHATBOT_URL,
+  timeout: 30000,
+});
+
+service.interceptors.request.use((config) => {
+  const token = Cookies.get('token');
+  const headers = config.headers || {};
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  } else if (headers.Authorization) {
+    delete headers.Authorization;
+  }
+  config.headers = headers;
+  return config;
+});
+
+service.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const code = error.response && error.response.data && error.response.data.code;
+    if (code === 0) {
+      tokenExpired();
+    }
+    return Promise.reject(error);
+  }
+);
+
+export default service;

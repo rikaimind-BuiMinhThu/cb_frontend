@@ -10,7 +10,7 @@ import {
 } from 'antd';
 import moment from 'moment';
 import ReactApexChart from 'react-apexcharts';
-import api from './../../../../api/api-management';
+import api from 'v2/api/api-management';
 import Cookies from 'js-cookie';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { utils, writeFileXLSX } from 'xlsx';

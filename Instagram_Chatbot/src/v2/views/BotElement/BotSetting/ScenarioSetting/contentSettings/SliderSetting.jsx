@@ -111,7 +111,7 @@ const SliderSetting = ({
           />
         </div>
         {!isValid && (
-          <div className="ss-slider-setting__error">必ず指定ください。</div>
+          <div className="ss-slider-setting__error">必ず指定してください。</div>
         )}
       </div>
     );

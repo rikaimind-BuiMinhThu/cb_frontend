@@ -1,4 +1,4 @@
-import { sleep, scrollToPosition } from "./Utils";
+import { sleep, sendEmailRequest } from "./Utils";
 import { BOT_MESSAGE_TYPES } from "./Constants";
 
 const processBotDelayMessage = async (messagesList, i, newState, options = {}) => {

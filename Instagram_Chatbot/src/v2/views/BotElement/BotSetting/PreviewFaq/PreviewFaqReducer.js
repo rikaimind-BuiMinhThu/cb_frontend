@@ -7,7 +7,8 @@ import {
   processMessagesForErrorState, 
   isTempDelay,
   buildConditionParams,
-  toNumber
+  toNumber,
+  findItem,
 } from '../PreviewComponent/Utils';
 import { processForBotMessage } from '../PreviewComponent/BotMessageUtils';
 import { processForUserMessage } from '../PreviewComponent/UserMessageUtils';

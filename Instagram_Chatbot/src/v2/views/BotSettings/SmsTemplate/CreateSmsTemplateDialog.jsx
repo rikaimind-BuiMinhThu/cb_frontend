@@ -3,7 +3,7 @@ import { Form, Input, Modal, message } from 'antd';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import schema from './schema/createSmsTemplateFormSchema';
-import api from 'api/api-management';
+import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { AdminActionButton } from '../../../components/AdminShell';
 

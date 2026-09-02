@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { message } from 'antd';
 import Cookies from 'js-cookie';
-import api from 'api/api-management';
+import api from 'v2/api/api-management';
 import { AdminPage, AdminActionButton, useAdminHeaderActions } from '../../../../components/AdminShell';
 import OrderConfirmTemplateForm from './OrderConfirmTemplateForm';
+import { getSignInPath } from 'v2/variables/constants';
 import {
   getDefaultOrderConfirmConfig,
   normalizeOrderConfirmConfig,
@@ -72,7 +73,7 @@ function OrderConfirmMessageTemplateEditor() {
   useEffect(() => {
     const userRole = Cookies.get('user_role');
     if (!userRole || userRole !== 'admin_deel') {
-      window.location.href = '/';
+      window.location.href = getSignInPath();
       return;
     }
 

@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { findItem } from "./Utils";
 export const mapAmazonPayDataToMessagesListForPhystech = (amazonPayData, messagesList, prefectureList) => {
   // No support for other customer and other cart system

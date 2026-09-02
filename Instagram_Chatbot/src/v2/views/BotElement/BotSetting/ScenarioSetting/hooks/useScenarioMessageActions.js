@@ -1,9 +1,10 @@
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { message } from 'antd';
 import moment from 'moment';
 import axios from 'axios';
 import nanoMetadata from 'nano-metadata';
-import api from 'api/api-management';
+import cloneDeep from 'lodash/cloneDeep';
+import api from 'v2/api/api-management';
 import { S3_UPLOAD_URL } from '../../../../../variables/constants';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { createDefaultContentItem, getNextContentId } from '../utils/scenarioContentDefaults';
@@ -17,7 +18,11 @@ import { applyAmazonPayDisplayModeToConditions } from '../utils/amazonPayConfigU
 import { getDefaultOrderConfirmConfig } from '../utils/OrderConfirmLpScriptGenerator';
 import { getDefaultCartLoginConfig } from '../constants/cartLoginConstants';
 
-const _ = require('lodash');
+function withClonedMessages(dataMessages, mutator) {
+  const next = cloneDeep(dataMessages);
+  mutator(next);
+  return next;
+}
 
 export const useScenarioMessageActions = ({ state, actions, messages }) => {
   const {
@@ -43,11 +48,14 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
     setEditorSelectedCheckboxOption,
     setIsOpenAddVariable,
     setErrorVariable,
+    setVariableName,
+    setDefaultValue,
     setConditions,
     getListVariable,
   } = actions;
 
   const { onChangeValueMessageContent } = messages;
+  const creatingVariableRef = useRef(false);
 
   const botUploadFile = useCallback(() => {
     document.getElementById('ss-bot-file-upload').click();
@@ -114,12 +122,13 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
                 .post('/api/v1/managements/file', filePost)
                 .then((res) => {
                   if (res.data.code == 1) {
-                    if (dataMessages[indexMessageSelect].belong_to === 'user') {
-                      dataMessages[indexMessageSelect].message_content[indexContent].carousel.default.contents[indexCarouselSlide].fileUrl = S3_UPLOAD_URL + res.data.data.file_url;
-                    } else {
-                      dataMessages[indexMessageSelect].message_content[0].file.content = S3_UPLOAD_URL + res.data.data.file_url;
-                    }
-                    setDataMessages([...dataMessages]);
+                    setDataMessages(withClonedMessages(dataMessages, (next) => {
+                      if (next[indexMessageSelect].belong_to === 'user') {
+                        next[indexMessageSelect].message_content[indexContent].carousel.default.contents[indexCarouselSlide].fileUrl = S3_UPLOAD_URL + res.data.data.file_url;
+                      } else {
+                        next[indexMessageSelect].message_content[0].file.content = S3_UPLOAD_URL + res.data.data.file_url;
+                      }
+                    }));
                     message.success('追加しました。');
                   } else {
                     message.warning('追加できませんでした。');
@@ -193,31 +202,33 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
   }, [dataMessages, setBelongTo, setEditorSelectedRadioOption, setEditorSelectedCheckboxOption, setIndexMessageSelect, setIsConditionUp, setMessageType]);
 
   const handleHiddenMessage = useCallback((index, role) => {
-    dataMessages[index].hidden = !dataMessages[index].hidden;
+    const next = withClonedMessages(dataMessages, (cloned) => {
+      cloned[index].hidden = !cloned[index].hidden;
+    });
 
     if (role === 'bot') {
       document.querySelectorAll('.ss-bot-chat-detail-content').forEach((ele) => {
         if (ele.classList.contains(`ss-bot-chat-overview-${index}`)) {
-          if (!dataMessages[index].hidden) ele.style.opacity = '1';
-          if (dataMessages[index].hidden) ele.style.opacity = '0.4';
+          if (!next[index].hidden) ele.style.opacity = '1';
+          if (next[index].hidden) ele.style.opacity = '0.4';
         }
       });
     } else if (role === 'user') {
       document.querySelectorAll('.ss-user-chat-detail-content').forEach((ele) => {
         if (ele.classList.contains(`ss-user-chat-detail-content-${index}`)) {
-          if (!dataMessages[index].hidden) ele.style.opacity = '1';
-          if (dataMessages[index].hidden) ele.style.opacity = '0.4';
+          if (!next[index].hidden) ele.style.opacity = '1';
+          if (next[index].hidden) ele.style.opacity = '0.4';
         }
       });
     } else if (role === 'combine') {
       document.querySelectorAll('.ss-combine-chat-detail-content').forEach((ele) => {
         if (ele.classList.contains(`ss-combine-chat-detail-content-${index}`)) {
-          ele.style.opacity = dataMessages[index].hidden ? '0.4' : '1';
+          ele.style.opacity = next[index].hidden ? '0.4' : '1';
         }
       });
     }
 
-    setDataMessages([...dataMessages]);
+    setDataMessages(next);
   }, [dataMessages, setDataMessages]);
 
   const handleSelectContentMessage = useCallback((indexContent, contentType) => {
@@ -245,8 +256,7 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
 
   const handleChangeBotStatementType = useCallback((value) => {
     setMessageType(value);
-    const data = [...dataMessages];
-    if (data) {
+    setDataMessages(withClonedMessages(dataMessages, (data) => {
       for (let i = 0; i < data.length; i++) {
         if (indexMessageSelect !== undefined && i === indexMessageSelect) {
           data[i].message_content[0].type = value;
@@ -258,70 +268,67 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
           }
         }
       }
-      setDataMessages(data);
-    }
+    }));
   }, [dataMessages, indexMessageSelect, setMessageType, setDataMessages]);
 
   const handleAddItemSetting = useCallback((messageType) => {
-    const arrMess = [...dataMessages[indexMessageSelect].message_content];
-    const idMax = getNextContentId(arrMess);
-    dataMessages[indexMessageSelect].message_content.push(
-      createDefaultContentItem(messageType, idMax),
-    );
-    setDataMessages([...dataMessages]);
+    setDataMessages(withClonedMessages(dataMessages, (next) => {
+      const arrMess = next[indexMessageSelect].message_content;
+      const idMax = getNextContentId(arrMess);
+      arrMess.push(createDefaultContentItem(messageType, idMax));
+    }));
   }, [dataMessages, indexMessageSelect, setDataMessages]);
 
   const handleAddCombineBlock = useCallback((role, blockType) => {
-    const message = dataMessages[indexMessageSelect];
-    const newBlock = createDefaultCombineBlock(role, blockType, message.message_content);
-    message.message_content.push(newBlock);
+    setDataMessages(withClonedMessages(dataMessages, (next) => {
+      const newBlock = createDefaultCombineBlock(role, blockType, next[indexMessageSelect].message_content);
+      next[indexMessageSelect].message_content.push(newBlock);
+    }));
     setMessageType(blockType);
-    setDataMessages([...dataMessages]);
   }, [dataMessages, indexMessageSelect, setDataMessages, setMessageType]);
 
   const handleChangeCombineBlockType = useCallback((indexContent, blockType) => {
-    const message = dataMessages[indexMessageSelect];
-    const currentBlock = message.message_content[indexContent];
-    const newBlock = createDefaultCombineBotBlock(blockType, currentBlock.id);
-    newBlock.padding = currentBlock.padding;
-    message.message_content[indexContent] = newBlock;
+    setDataMessages(withClonedMessages(dataMessages, (next) => {
+      const currentBlock = next[indexMessageSelect].message_content[indexContent];
+      const newBlock = createDefaultCombineBotBlock(blockType, currentBlock.id);
+      newBlock.padding = currentBlock.padding;
+      next[indexMessageSelect].message_content[indexContent] = newBlock;
+    }));
     setMessageType(blockType);
-    setDataMessages([...dataMessages]);
   }, [dataMessages, indexMessageSelect, setDataMessages, setMessageType]);
 
   const handleChangeCombineContentGap = useCallback((value) => {
-    const message = dataMessages[indexMessageSelect];
-    if (!message.combine_message) {
-      message.combine_message = {};
-    }
-    message.combine_message.content_gap = value;
-    setDataMessages([...dataMessages]);
+    setDataMessages(withClonedMessages(dataMessages, (next) => {
+      if (!next[indexMessageSelect].combine_message) {
+        next[indexMessageSelect].combine_message = {};
+      }
+      next[indexMessageSelect].combine_message.content_gap = value;
+    }));
   }, [dataMessages, indexMessageSelect, setDataMessages]);
 
   const handleChangeCombineBlockPadding = useCallback((indexContent, value) => {
-    dataMessages[indexMessageSelect].message_content[indexContent].padding = value;
-    setDataMessages([...dataMessages]);
+    setDataMessages(withClonedMessages(dataMessages, (next) => {
+      next[indexMessageSelect].message_content[indexContent].padding = value;
+    }));
   }, [dataMessages, indexMessageSelect, setDataMessages]);
 
   const handleCopyMessage = useCallback((index) => {
+    const next = [...dataMessages];
     const idMax = Math.max(...dataMessages.map((item) => item.id)) + 1;
-    const arrMessage = _.cloneDeep(dataMessages[index]);
+    const arrMessage = cloneDeep(dataMessages[index]);
     arrMessage.id = idMax;
-
-    dataMessages.splice(index, 0, arrMessage);
-    setDataMessages([...dataMessages]);
+    next.splice(index, 0, arrMessage);
+    setDataMessages(next);
   }, [dataMessages, setDataMessages]);
 
   const handleDeleteMessageContent = useCallback((indexMessage, indexContent) => {
-    const arrMessage = [...dataMessages[indexMessage].message_content];
-    const startArr = arrMessage.slice(0, indexContent);
-    const lastArr = arrMessage.slice(indexContent + 1, arrMessage.length);
-    for (let i = 0; i < dataMessages.length; i++) {
-      if (indexMessage === i) {
-        dataMessages[i].message_content = [...startArr, ...lastArr];
-      }
-    }
-    setDataMessages([...dataMessages]);
+    setDataMessages(withClonedMessages(dataMessages, (next) => {
+      const arrMessage = next[indexMessage].message_content;
+      next[indexMessage].message_content = [
+        ...arrMessage.slice(0, indexContent),
+        ...arrMessage.slice(indexContent + 1),
+      ];
+    }));
   }, [dataMessages, setDataMessages]);
 
   const handleDeleteMessage = useCallback((index) => {
@@ -340,169 +347,126 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
     if (contentType === 'upsell_button') {
       return;
     }
-    let arr = dataMessages[indexMessage].message_content[indexContent][type][contentType];
-    if (arr === undefined || arr === null) {
-      dataMessages[indexMessage].message_content[indexContent][type][contentType] = [];
-      arr = dataMessages[indexMessage].message_content[indexContent][type][contentType];
-    }
-    let idMax;
-    if (arr.length !== 0) {
-      idMax = Math.max(...arr.map((item) => item.id)) + 1;
-    } else {
-      idMax = 1;
-    }
-    if (type === 'radio_button') {
-      arr.push({
-        id: idMax,
-        value: String(idMax),
-      });
-    } else {
-      arr.push({
-        id: idMax,
-        contents: [
-          { id: 1 },
-        ],
-      });
-    }
-    setDataMessages([...dataMessages]);
+    setDataMessages(withClonedMessages(dataMessages, (next) => {
+      let arr = next[indexMessage].message_content[indexContent][type][contentType];
+      if (arr === undefined || arr === null) {
+        next[indexMessage].message_content[indexContent][type][contentType] = [];
+        arr = next[indexMessage].message_content[indexContent][type][contentType];
+      }
+      const idMax = arr.length !== 0 ? Math.max(...arr.map((item) => item.id)) + 1 : 1;
+      if (type === 'radio_button') {
+        arr.push({ id: idMax, value: String(idMax) });
+      } else {
+        arr.push({ id: idMax, contents: [{ id: 1 }] });
+      }
+    }));
   }, [dataMessages, setDataMessages]);
 
   const handleAddItemCustomizePullDown = useCallback((indexMessage, indexContent, contentType, pullDownType, name) => {
-    let arr = dataMessages[indexMessage].message_content[indexContent][contentType][pullDownType][name];
-    if (arr === undefined || arr === null) {
-      dataMessages[indexMessage].message_content[indexContent][contentType][pullDownType][name] = [];
-      arr = dataMessages[indexMessage].message_content[indexContent][contentType][pullDownType][name];
-    }
-    let idMax;
-    if (arr.length !== 0) {
-      idMax = Math.max(...arr.map((item) => item.id)) + 1;
-    } else {
-      idMax = 1;
-    }
-
-    arr.push({
-      id: idMax,
-    });
-    setDataMessages([...dataMessages]);
+    setDataMessages(withClonedMessages(dataMessages, (next) => {
+      let arr = next[indexMessage].message_content[indexContent][contentType][pullDownType][name];
+      if (arr === undefined || arr === null) {
+        next[indexMessage].message_content[indexContent][contentType][pullDownType][name] = [];
+        arr = next[indexMessage].message_content[indexContent][contentType][pullDownType][name];
+      }
+      const idMax = arr.length !== 0 ? Math.max(...arr.map((item) => item.id)) + 1 : 1;
+      arr.push({ id: idMax });
+    }));
   }, [dataMessages, setDataMessages]);
 
   const handleAddItemProductPullDown = useCallback((indexMessage, indexContent, contentType) => {
-    let arr = dataMessages[indexMessage].message_content[indexContent][contentType].products;
-
-    if (arr === undefined || arr === null) {
-      dataMessages[indexMessage].message_content[indexContent][contentType].products = [];
-      arr = dataMessages[indexMessage].message_content[indexContent][contentType].products;
-    }
-    let idMax;
-    if (arr.length !== 0) {
-      idMax = Math.max(...arr.map((item) => item.id)) + 1;
-    } else {
-      idMax = 1;
-    }
-
-    arr.push({
-      id: idMax,
-    });
-    setDataMessages([...dataMessages]);
+    setDataMessages(withClonedMessages(dataMessages, (next) => {
+      let arr = next[indexMessage].message_content[indexContent][contentType].products;
+      if (arr === undefined || arr === null) {
+        next[indexMessage].message_content[indexContent][contentType].products = [];
+        arr = next[indexMessage].message_content[indexContent][contentType].products;
+      }
+      const idMax = arr.length !== 0 ? Math.max(...arr.map((item) => item.id)) + 1 : 1;
+      arr.push({ id: idMax });
+    }));
   }, [dataMessages, setDataMessages]);
 
   const handleAddItemAgreeTerm = useCallback((indexMessage, indexContent, type, contentType) => {
-    let arr = dataMessages[indexMessage].message_content[indexContent][type][contentType];
-    if (arr === undefined || arr === null) {
-      dataMessages[indexMessage].message_content[indexContent][type][contentType] = [];
-      arr = dataMessages[indexMessage].message_content[indexContent][type][contentType];
-    }
-
-    arr.push({
-      title_comment: '',
-      title: '',
-      urls: '',
-      url_comment: '',
-    });
-    setDataMessages([...dataMessages]);
+    setDataMessages(withClonedMessages(dataMessages, (next) => {
+      let arr = next[indexMessage].message_content[indexContent][type][contentType];
+      if (arr === undefined || arr === null) {
+        next[indexMessage].message_content[indexContent][type][contentType] = [];
+        arr = next[indexMessage].message_content[indexContent][type][contentType];
+      }
+      arr.push({
+        title_comment: '',
+        title: '',
+        urls: '',
+        url_comment: '',
+      });
+    }));
   }, [dataMessages, setDataMessages]);
 
   const handleDragEnd = useCallback((result) => {
     if (!result.destination) return;
-    const messageArr = [...dataMessages[indexMessageSelect].message_content];
-    const items = Array.from(messageArr);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-
-    dataMessages[indexMessageSelect].message_content = items;
-    setDataMessages([...dataMessages]);
+    setDataMessages(withClonedMessages(dataMessages, (next) => {
+      const items = Array.from(next[indexMessageSelect].message_content);
+      const [reorderedItem] = items.splice(result.source.index, 1);
+      items.splice(result.destination.index, 0, reorderedItem);
+      next[indexMessageSelect].message_content = items;
+    }));
   }, [dataMessages, indexMessageSelect, setDataMessages]);
 
   const handleDragEndMessageOverview = useCallback((result) => {
     if (!result.destination) return;
-    const messageArr = [...dataMessages];
-    const items = Array.from(messageArr);
+    const items = Array.from(dataMessages);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
 
     handleSelectMessage(result.destination.index, 'user');
-    setDataMessages([...items]);
+    setDataMessages(items);
   }, [dataMessages, handleSelectMessage, setDataMessages]);
 
   const handleDragEndRadioCheckbox = useCallback((result, idContent, type, contentType) => {
     if (!result.destination) return;
-    const messageArr = dataMessages.filter((message, index) => message.belong_to === 'user' && index === indexMessageSelect)[0].message_content
-      .filter((content) => content.id === idContent)[0][type][contentType];
-    const items = Array.from(messageArr);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-
-    let indexItem;
-    for (let i = 0; i < dataMessages[indexMessageSelect].message_content.length; i++) {
-      if (dataMessages[indexMessageSelect].message_content[i].id === idContent) {
-        indexItem = i;
-      }
-    }
-    dataMessages[indexMessageSelect].message_content[indexItem][type][contentType] = items;
-    setDataMessages([...dataMessages]);
+    setDataMessages(withClonedMessages(dataMessages, (next) => {
+      const messageArr = next.filter((message, index) => message.belong_to === 'user' && index === indexMessageSelect)[0].message_content
+        .filter((content) => content.id === idContent)[0][type][contentType];
+      const items = Array.from(messageArr);
+      const [reorderedItem] = items.splice(result.source.index, 1);
+      items.splice(result.destination.index, 0, reorderedItem);
+      const indexItem = next[indexMessageSelect].message_content.findIndex((content) => content.id === idContent);
+      next[indexMessageSelect].message_content[indexItem][type][contentType] = items;
+    }));
   }, [dataMessages, indexMessageSelect, setDataMessages]);
 
   const handleDragEndPullDown = useCallback((result, idContent, type, contentType, subContentType) => {
     if (!result.destination) return;
-    const messageArr = dataMessages[indexMessageSelect].message_content.filter((content) => content.id === idContent)[0][type][contentType][subContentType];
-    const items = Array.from(messageArr);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-
-    let indexItem;
-    for (let i = 0; i < dataMessages[indexMessageSelect].message_content.length; i++) {
-      if (dataMessages[indexMessageSelect].message_content[i].id === idContent) {
-        indexItem = i;
-      }
-    }
-    dataMessages[indexMessageSelect].message_content[indexItem][type][contentType][subContentType] = items;
-    setDataMessages([...dataMessages]);
+    setDataMessages(withClonedMessages(dataMessages, (next) => {
+      const messageArr = next[indexMessageSelect].message_content.filter((content) => content.id === idContent)[0][type][contentType][subContentType];
+      const items = Array.from(messageArr);
+      const [reorderedItem] = items.splice(result.source.index, 1);
+      items.splice(result.destination.index, 0, reorderedItem);
+      const indexItem = next[indexMessageSelect].message_content.findIndex((content) => content.id === idContent);
+      next[indexMessageSelect].message_content[indexItem][type][contentType][subContentType] = items;
+    }));
   }, [dataMessages, indexMessageSelect, setDataMessages]);
 
   const handleDragEndProduct = useCallback((result, idContent, type, contentType) => {
     if (!result.destination) return;
-    const messageArr = dataMessages.filter((message, index) => message.belong_to === 'user' && index === indexMessageSelect)[0].message_content
-      .filter((content) => content.id === idContent)[0][type][contentType];
-    const items = Array.from(messageArr);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-
-    let indexItem;
-    for (let i = 0; i < dataMessages[indexMessageSelect].message_content.length; i++) {
-      if (dataMessages[indexMessageSelect].message_content[i].id === idContent) {
-        indexItem = i;
-      }
-    }
-    dataMessages[indexMessageSelect].message_content[indexItem][type][contentType] = items;
-    setDataMessages([...dataMessages]);
+    setDataMessages(withClonedMessages(dataMessages, (next) => {
+      const messageArr = next.filter((message, index) => message.belong_to === 'user' && index === indexMessageSelect)[0].message_content
+        .filter((content) => content.id === idContent)[0][type][contentType];
+      const items = Array.from(messageArr);
+      const [reorderedItem] = items.splice(result.source.index, 1);
+      items.splice(result.destination.index, 0, reorderedItem);
+      const indexItem = next[indexMessageSelect].message_content.findIndex((content) => content.id === idContent);
+      next[indexMessageSelect].message_content[indexItem][type][contentType] = items;
+    }));
   }, [dataMessages, indexMessageSelect, setDataMessages]);
 
   const onChangeFixedDate = useCallback((indexMessage, indexContent, type, value, name) => {
-    if (value) {
-      dataMessages[indexMessage].message_content[indexContent][type][name].push(moment(value, 'YYYY-MM-DD').format('YYYY-MM-DD'));
-    }
-    dataMessages[indexMessage].message_content[indexContent][type].select_fixed_date = value;
-    setDataMessages([...dataMessages]);
+    setDataMessages(withClonedMessages(dataMessages, (next) => {
+      if (value) {
+        next[indexMessage].message_content[indexContent][type][name].push(moment(value, 'YYYY-MM-DD').format('YYYY-MM-DD'));
+      }
+      next[indexMessage].message_content[indexContent][type].select_fixed_date = value;
+    }));
   }, [dataMessages, setDataMessages]);
 
   const handleChangeValueRequireZipCode = useCallback((indexMessage, indexContent, type, value, name) => {
@@ -521,35 +485,39 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
     if (contentType === 'upsell_button') {
       return;
     }
-    const newArrRadio = dataMessages[indexMessage].message_content[indexContent][type][contentType].filter((item, index) => index !== indexItem);
-    dataMessages[indexMessage].message_content[indexContent][type][contentType] = newArrRadio;
-    setDataMessages([...dataMessages]);
+    setDataMessages(withClonedMessages(dataMessages, (next) => {
+      next[indexMessage].message_content[indexContent][type][contentType] =
+        next[indexMessage].message_content[indexContent][type][contentType].filter((_, index) => index !== indexItem);
+    }));
   }, [dataMessages, setDataMessages]);
 
   const handleRemoveItemCustomizePullDown = useCallback((indexMessage, indexContent, contentType, pullDownType, name, indexPullDown) => {
-    const newArrRadio = dataMessages[indexMessage].message_content[indexContent][contentType][pullDownType][name].filter((item, index) => index !== indexPullDown);
-    dataMessages[indexMessage].message_content[indexContent][contentType][pullDownType][name] = newArrRadio;
-    setDataMessages([...dataMessages]);
+    setDataMessages(withClonedMessages(dataMessages, (next) => {
+      next[indexMessage].message_content[indexContent][contentType][pullDownType][name] =
+        next[indexMessage].message_content[indexContent][contentType][pullDownType][name].filter((_, index) => index !== indexPullDown);
+    }));
   }, [dataMessages, setDataMessages]);
 
   const handleRemoveItemProductPullDown = useCallback((indexMessage, indexContent, contentType, name, indexPullDown) => {
-    const newArrRadio = dataMessages[indexMessage].message_content[indexContent][contentType].products.filter((item, index) => index !== indexPullDown);
-    dataMessages[indexMessage].message_content[indexContent][contentType].products = newArrRadio;
-    setDataMessages([...dataMessages]);
+    setDataMessages(withClonedMessages(dataMessages, (next) => {
+      next[indexMessage].message_content[indexContent][contentType].products =
+        next[indexMessage].message_content[indexContent][contentType].products.filter((_, index) => index !== indexPullDown);
+    }));
   }, [dataMessages, setDataMessages]);
 
   const handleRemoveItemZipCodeAddress = useCallback((indexMessage, indexContent, contentType, field) => {
-    const newArr = dataMessages[indexMessage].message_content[indexContent][contentType];
-    delete newArr[field];
-    dataMessages[indexMessage].message_content[indexContent][contentType] = newArr;
-    setDataMessages([...dataMessages]);
+    setDataMessages(withClonedMessages(dataMessages, (next) => {
+      delete next[indexMessage].message_content[indexContent][contentType][field];
+    }));
   }, [dataMessages, setDataMessages]);
 
   const createVariable = useCallback(() => {
+    if (creatingVariableRef.current) return;
     if (!variableName) {
       setErrorVariable('変数名は、必ず指定してください。');
       return;
     }
+    creatingVariableRef.current = true;
     const data = {
       variable: {
         variable_name: variableName,
@@ -559,6 +527,9 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
     api.post(`/api/v1/managements/chatbots/${botId}/variables`, data).then((res) => {
       if (res.data.code === 1) {
         setIsOpenAddVariable(false);
+        setVariableName('');
+        setDefaultValue('');
+        setErrorVariable('');
         message.success('変数を作成しました。');
         getListVariable();
       } else if (res.data.code === 2) {
@@ -568,11 +539,13 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
       if (error.response?.data.code === 0) {
         tokenExpired();
       }
+    }).finally(() => {
+      creatingVariableRef.current = false;
     });
-  }, [botId, defaultValue, getListVariable, setErrorVariable, setIsOpenAddVariable, variableName]);
+  }, [botId, defaultValue, getListVariable, setDefaultValue, setErrorVariable, setIsOpenAddVariable, setVariableName, variableName]);
 
   const onClickCreateStatement = useCallback(async (belongTo, indexMessage) => {
-    let dataMessagesClone = [...dataMessages];
+    let dataMessagesClone = cloneDeep(dataMessages);
     if (indexMessage === undefined && belongTo === 'bot') {
       dataMessagesClone = [
         {
@@ -716,31 +689,32 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
   }, [setIsConditionUp]);
 
   const onChangeValueCondition = useCallback((index, value, name) => {
-    dataMessages[indexMessageSelect].conditions[index][name] = value;
-    setDataMessages([...dataMessages]);
+    setDataMessages(withClonedMessages(dataMessages, (next) => {
+      next[indexMessageSelect].conditions[index][name] = value;
+    }));
   }, [dataMessages, indexMessageSelect, setDataMessages]);
 
   const onClickAddCondition = useCallback(() => {
-    dataMessages[indexMessageSelect].conditions.push({
-      linkCondition: 'and',
-      condition: 'is',
-      nameCondition: 'current_url',
-      inputCondition: '',
-    });
-    setDataMessages([...dataMessages]);
+    setDataMessages(withClonedMessages(dataMessages, (next) => {
+      next[indexMessageSelect].conditions.push({
+        linkCondition: 'and',
+        condition: 'is',
+        nameCondition: 'current_url',
+        inputCondition: '',
+      });
+    }));
   }, [dataMessages, indexMessageSelect, setDataMessages]);
 
   const handleDeleteCondition = useCallback((indexCondition) => {
-    const dataMessageClone = [...dataMessages];
-    const dataConditionFilter = dataMessageClone[indexMessageSelect].conditions.filter((item, index) => index !== indexCondition);
-    dataMessageClone[indexMessageSelect].conditions = dataConditionFilter;
-    setDataMessages([...dataMessageClone]);
+    setDataMessages(withClonedMessages(dataMessages, (next) => {
+      next[indexMessageSelect].conditions = next[indexMessageSelect].conditions.filter((_, index) => index !== indexCondition);
+    }));
   }, [dataMessages, indexMessageSelect, setDataMessages]);
 
   const onChangeAmazonPayDisplayMode = useCallback((mode) => {
-    const message = dataMessages[indexMessageSelect];
-    message.conditions = applyAmazonPayDisplayModeToConditions(message.conditions || [], mode);
-    setDataMessages([...dataMessages]);
+    setDataMessages(withClonedMessages(dataMessages, (next) => {
+      next[indexMessageSelect].conditions = applyAmazonPayDisplayModeToConditions(next[indexMessageSelect].conditions || [], mode);
+    }));
   }, [dataMessages, indexMessageSelect, setDataMessages]);
 
   const handleDownloadFile = useCallback((file) => {

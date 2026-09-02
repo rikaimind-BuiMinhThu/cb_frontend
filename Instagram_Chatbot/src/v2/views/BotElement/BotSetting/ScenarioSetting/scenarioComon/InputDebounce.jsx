@@ -19,7 +19,7 @@ export default function InputDebounce({ value, onChange, debounceTime = 500, onC
     if(!isComposing) {
       onChange(debouncedValue)
     }
-  }, [debouncedValue, isComposing]);
+  }, [debouncedValue, isComposing, onChange]);
 
   return (
     <InputCustom

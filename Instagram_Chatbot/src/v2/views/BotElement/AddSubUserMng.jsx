@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './../../assets/css/sub-user-mng.css';
-import api from 'api/api-management';
+import api from 'v2/api/api-management';
 import Cookies from 'js-cookie';
 import * as utils from './../../JS/validate.js';
 import { tokenExpired } from 'v2/api/tokenExpired';

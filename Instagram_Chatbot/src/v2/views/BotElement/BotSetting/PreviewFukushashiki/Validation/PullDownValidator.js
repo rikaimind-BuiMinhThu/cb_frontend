@@ -90,6 +90,16 @@ const validatePeriodFromToType = (contentType, key, errorsMess) => {
   return validateMultipleValueField(contentType, key, errorsMess, fields);
 };
 
+const validateUpToMunicipalityType = (contentType, key, errorsMess) => {
+  const data = contentType[contentType.type] || {};
+  const { prefecture, city } = data;
+
+  if (contentType.require && (stringNullOrEmpty(prefecture) || stringNullOrEmpty(city))) {
+    return addErrorMessage(errorsMess, key, ERROR_MESSAGES.REQUIRED);
+  }
+  return true;
+};
+
 const validateValueField = (contentType, key, errorsMess) => {
   const subContent = contentType[contentType.type];
   const { value } = subContent;

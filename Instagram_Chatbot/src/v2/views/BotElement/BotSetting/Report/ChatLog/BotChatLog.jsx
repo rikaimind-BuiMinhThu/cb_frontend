@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { DatePicker, Empty, Select, Space, Tabs, Typography } from "antd";
-import api from "api/api-management";
+import api from 'v2/api/api-management';
 import Cookies from "js-cookie";
 import { format } from "date-fns";
 import "v2/assets/css/bot/bot-chat-log.css";
@@ -14,6 +14,7 @@ import moment from "moment";
 import jwt_decode from 'jwt-decode'
 import BotChatStatistic from "./BotChatStatistic";
 import { AdminPage, AdminActionButton } from "../../../../../components/AdminShell";
+import { getSignInPath } from 'v2/variables/constants';
 
 const TABS = {
   LOGS: "LOGS",
@@ -41,10 +42,10 @@ function BotChatLog() {
       Cookies.get("token") == null ||
       Cookies.get("token") === ""
     ) {
-      window.location.href = "/";
+      window.location.href = getSignInPath();
     }
     if (Cookies.get("is_auth") === "false") {
-      window.location.href = "/";
+      window.location.href = getSignInPath();
     }
   }, []);
 
@@ -152,11 +153,12 @@ function BotChatLog() {
 
   function onSelectChat(item) {
     setSelectUserId(item.user_input_id);
-    var sc = scenarios.find((s) => s.id === item.scenario_id);
-    sc.conversations = JSON.parse(sc.conversation).messages.sort(
+    const sc = scenarios.find((s) => s.id === item.scenario_id);
+    if (!sc) return;
+    const conversations = [...JSON.parse(sc.conversation).messages].sort(
       (a, b) => a.id - b.id
     );
-    setSelectScenario(sc);
+    setSelectScenario({ ...sc, conversations });
     setRenderMessageArr([]);
 
     getMessageData(item)

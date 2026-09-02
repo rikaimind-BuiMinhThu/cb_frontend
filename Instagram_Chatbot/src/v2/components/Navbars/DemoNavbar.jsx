@@ -39,6 +39,7 @@ import {
 import Cookies from 'js-cookie'
 import routes from "routes.js";
 import { useCookies } from "react-cookie";
+import { getSignInPath } from 'v2/variables/constants';
 var Cookiess = require('js-cookie-remove-all');
 
 function Header(props) {
@@ -110,8 +111,8 @@ function Header(props) {
     Cookies.remove('bot_type')
     Cookies.remove('bot_id')
     
-    window.location.href ='/'
-    // window.location.href ='/'
+    window.location.href = getSignInPath()
+    // window.location.href = getSignInPath()
   }
   return (
     // add or remove classes depending if we are on full-screen-maps page or not

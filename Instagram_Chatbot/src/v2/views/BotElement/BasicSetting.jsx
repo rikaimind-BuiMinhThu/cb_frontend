@@ -6,62 +6,77 @@ import * as utils from './../../JS/validate.js';
 import Cookies from 'js-cookie';
 import { useEffect } from 'react';
 import { useState } from 'react';
-import api from '../../api/api-management';
-import { tokenExpired } from 'api/tokenExpired';
+import api from 'v2/api/api-management';
+import { tokenExpired } from 'v2/api/tokenExpired';
 
 const MAIL_FORMAT =
   /^[a-zA-Z0-9]+([._+-][a-zA-Z0-9]+)*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/;
 
 function BasicSetting() {
-  const [userIdEC, setUsreIdEC] = useState();
-  const [userDetail, setUserDetail] = useState({});
+  const isAdminDeel = Cookies.get('user_role') === 'admin_deel';
+  const [userIdEC] = useState(() => Cookies.get('user_id'));
+  const [userDetail, setUserDetail] = useState({
+    full_name: '',
+    company_name: '',
+    department: '',
+    job_title: '',
+    email: '',
+    phone_number: '',
+    post_code: '',
+    address: '',
+    url: '',
+  });
   const [clientId, setClientId] = useState(null);
   const [language, setLanguage] = useState('');
   const [division, setDivision] = useState('');
   const [replySmtpGmail, setReplySmtpGmail] = useState('');
   const [replySmtpGmailAppPassword, setReplySmtpGmailAppPassword] = useState('');
   const [hasReplySmtpPassword, setHasReplySmtpPassword] = useState(false);
-
-  // authorization
-  const [isAdminDeel, setIsAdminDeel] = useState(false);
-
-  useEffect(() => {
-    if (Cookies.get('user_role') === 'admin_deel') {
-      setIsAdminDeel(true);
-    } else {
-      setIsAdminDeel(false);
-    }
-  }, []);
+  const [smtpErrors, setSmtpErrors] = useState({ gmail: '', password: '' });
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    setUsreIdEC(Cookies.get('user_id'));
-  }, []);
-
-  useEffect(() => {
+    let cancelled = false;
     api
       .get(`/api/v1/managements/users/${Cookies.get('user_id')}`)
       .then((res) => {
-        const user = res.data.data;
-        setUserDetail(user);
-        setLanguage(user.language);
-        setDivision(user.business_division);
+        if (cancelled) return;
+        const user = res.data.data || {};
+        setUserDetail({
+          full_name: user.full_name || '',
+          company_name: user.company_name || '',
+          department: user.department || '',
+          job_title: user.job_title || '',
+          email: user.email || '',
+          phone_number: user.phone_number || '',
+          post_code: user.post_code || '',
+          address: user.address || '',
+          url: user.url || '',
+        });
+        setLanguage(user.language || '');
+        setDivision(user.business_division || '');
         if (user.client_id) {
           setClientId(user.client_id);
-          loadClientSmtp(user.client_id);
+          loadClientSmtp(user.client_id, () => cancelled);
         }
       })
       .catch((err) => {
+        if (cancelled) return;
         console.log(err);
         if (err.response?.data.code === 0) {
           tokenExpired();
         }
       });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  function loadClientSmtp(id) {
+  function loadClientSmtp(id, isCancelled) {
     api
       .get(`/api/v1/managements/clients/${id}`)
       .then((res) => {
+        if (isCancelled?.()) return;
         if (res.data.code === 1 || res.data.code === '1') {
           const data = res.data.data;
           setReplySmtpGmail(data.reply_smtp_gmail || '');
@@ -70,6 +85,7 @@ function BasicSetting() {
         }
       })
       .catch((err) => {
+        if (isCancelled?.()) return;
         console.log(err);
         if (err.response?.data.code === 0) {
           tokenExpired();
@@ -77,42 +93,39 @@ function BasicSetting() {
       });
   }
 
+  function updateUserField(key, value) {
+    setUserDetail((prev) => ({ ...prev, [key]: value }));
+  }
+
   function validateReplySmtp() {
     const gmail = (replySmtpGmail || '').trim().replace(/＠/g, '@');
     const password = replySmtpGmailAppPassword || '';
-    const gmailErr = document.getElementById('errReplySmtpGmail');
-    const passwordErr = document.getElementById('errReplySmtpPassword');
+    const nextErrors = { gmail: '', password: '' };
 
-    if (gmailErr) {
-      gmailErr.innerHTML = '';
+    if (!gmail && !password) {
+      setSmtpErrors(nextErrors);
+      return true;
     }
-    if (passwordErr) {
-      passwordErr.innerHTML = '';
-    }
-
-    if (!gmail && !password) return true;
 
     if (gmail && !MAIL_FORMAT.test(gmail)) {
-      if (gmailErr) {
-        gmailErr.innerHTML = 'メールを入力してください(例:abc＠abc.com)';
-      }
+      nextErrors.gmail = 'メールを入力してください(例:abc＠abc.com)';
+      setSmtpErrors(nextErrors);
       return false;
     }
 
     if (gmail && !password && !hasReplySmtpPassword) {
-      if (passwordErr) {
-        passwordErr.innerHTML = 'アプリパスワードを入力してください。';
-      }
+      nextErrors.password = 'アプリパスワードを入力してください。';
+      setSmtpErrors(nextErrors);
       return false;
     }
 
     if (!gmail && password) {
-      if (gmailErr) {
-        gmailErr.innerHTML = 'メール送信用Gmailを入力してください。';
-      }
+      nextErrors.gmail = 'メール送信用Gmailを入力してください。';
+      setSmtpErrors(nextErrors);
       return false;
     }
 
+    setSmtpErrors(nextErrors);
     return true;
   }
 
@@ -151,6 +164,7 @@ function BasicSetting() {
   }
 
   function onSave() {
+    if (saving) return;
     utils.checkInput('fullname', 'errFullname', '氏名');
     utils.checkInput('companyName', 'errCompanyname', '企業名');
     utils.checkMaxLength('department', 'errDepartment', '部署', 50);
@@ -170,12 +184,22 @@ function BasicSetting() {
       utils.checkUrl('url', 'errUrl', 'URL') &&
       validateReplySmtp()
     ) {
-      const form = document.getElementById('form-basic-setting');
-      const obj = {};
-      for (let i = 0; i < form.length; i++) {
-        obj[form[i].name] = form[i].value;
-      }
-      const update = { user: obj };
+      const update = {
+        user: {
+          full_name: userDetail.full_name,
+          business_division: division,
+          company_name: userDetail.company_name,
+          department: userDetail.department,
+          job_title: userDetail.job_title,
+          email: userDetail.email,
+          phone_number: userDetail.phone_number,
+          post_code: userDetail.post_code,
+          address: userDetail.address,
+          language,
+          url: userDetail.url,
+        },
+      };
+      setSaving(true);
       api
         .patch(`/api/v1/managements/users/${userIdEC}`, update)
         .then((res) => {
@@ -196,12 +220,13 @@ function BasicSetting() {
           if (err.response?.data.code === 0) {
             tokenExpired();
           }
-        });
+        })
+        .finally(() => setSaving(false));
     }
   }
 
   useAdminHeaderActions(
-    <AdminActionButton action="save" onClick={() => onSave()} />
+    <AdminActionButton action="save" loading={saving} onClick={() => onSave()} />
   );
 
   return (
@@ -214,8 +239,11 @@ function BasicSetting() {
                 id="fullname"
                 placeholder="必ず入力してください ..."
                 name="full_name"
-                defaultValue={userDetail.full_name}
-                onChange={() => utils.checkInput('fullname', 'errFullname', '氏名')}
+                value={userDetail.full_name}
+                onChange={(e) => {
+                  updateUserField('full_name', e.target.value);
+                  utils.checkInput('fullname', 'errFullname', '氏名');
+                }}
               />
               <span id="errFullname" className="admin-form-error" />
             </AdminFormRow>
@@ -238,8 +266,11 @@ function BasicSetting() {
                 id="companyName"
                 placeholder="必ず入力してください ..."
                 name="company_name"
-                defaultValue={userDetail.company_name}
-                onChange={() => utils.checkInput('companyName', 'errCompanyname', '企業名')}
+                value={userDetail.company_name}
+                onChange={(e) => {
+                  updateUserField('company_name', e.target.value);
+                  utils.checkInput('companyName', 'errCompanyname', '企業名');
+                }}
               />
               <span id="errCompanyname" className="admin-form-error" />
             </AdminFormRow>
@@ -249,8 +280,11 @@ function BasicSetting() {
                 id="department"
                 placeholder="必ず入力してください ..."
                 name="department"
-                defaultValue={userDetail.department}
-                onChange={() => utils.checkMaxLength('department', 'errDepartment', '部署', 50)}
+                value={userDetail.department}
+                onChange={(e) => {
+                  updateUserField('department', e.target.value);
+                  utils.checkMaxLength('department', 'errDepartment', '部署', 50);
+                }}
               />
               <span id="errDepartment" className="admin-form-error" />
             </AdminFormRow>
@@ -260,8 +294,11 @@ function BasicSetting() {
                 id="job_title"
                 placeholder="必ず入力してください ..."
                 name="job_title"
-                defaultValue={userDetail.job_title}
-                onChange={() => utils.checkMaxLength('job_title', 'errPosition', '役職', 50)}
+                value={userDetail.job_title}
+                onChange={(e) => {
+                  updateUserField('job_title', e.target.value);
+                  utils.checkMaxLength('job_title', 'errPosition', '役職', 50);
+                }}
               />
               <span id="errPosition" className="admin-form-error" />
             </AdminFormRow>
@@ -271,10 +308,11 @@ function BasicSetting() {
                 id="emailAddress"
                 placeholder="必ず入力してください ..."
                 name="email"
-                defaultValue={userDetail.email}
-                onChange={() =>
-                  utils.checkEmailRequired('emailAddress', 'errEmailAddress', 'メールアドレス')
-                }
+                value={userDetail.email}
+                onChange={(e) => {
+                  updateUserField('email', e.target.value);
+                  utils.checkEmailRequired('emailAddress', 'errEmailAddress', 'メールアドレス');
+                }}
                 readOnly={!isAdminDeel}
               />
               <span id="errEmailAddress" className="admin-form-error" />
@@ -291,8 +329,11 @@ function BasicSetting() {
                 type="number"
                 placeholder="必ず入力してください ..."
                 name="phone_number"
-                defaultValue={userDetail.phone_number}
-                onChange={() => utils.checkTel('phone_number', 'errPhone', '電話番号')}
+                value={userDetail.phone_number}
+                onChange={(e) => {
+                  updateUserField('phone_number', e.target.value);
+                  utils.checkTel('phone_number', 'errPhone', '電話番号');
+                }}
               />
               <span id="errPhone" className="admin-form-error" />
             </AdminFormRow>
@@ -303,7 +344,8 @@ function BasicSetting() {
                 type="number"
                 placeholder="必ず入力してください ..."
                 name="post_code"
-                defaultValue={userDetail.post_code}
+                value={userDetail.post_code}
+                onChange={(e) => updateUserField('post_code', e.target.value)}
               />
               <span id="errPostCost" className="admin-form-error" />
             </AdminFormRow>
@@ -313,8 +355,11 @@ function BasicSetting() {
                 id="address"
                 placeholder="必ず入力してください ..."
                 name="address"
-                defaultValue={userDetail.address}
-                onChange={() => utils.checkInput('address', 'errAddress', '住所')}
+                value={userDetail.address}
+                onChange={(e) => {
+                  updateUserField('address', e.target.value);
+                  utils.checkInput('address', 'errAddress', '住所');
+                }}
               />
               <span id="errAddress" className="admin-form-error" />
             </AdminFormRow>
@@ -339,8 +384,11 @@ function BasicSetting() {
                 id="url"
                 placeholder="必ず入力してください ..."
                 name="url"
-                defaultValue={userDetail.url}
-                onChange={() => utils.checkUrl('url', 'errUrl', 'URL')}
+                value={userDetail.url}
+                onChange={(e) => {
+                  updateUserField('url', e.target.value);
+                  utils.checkUrl('url', 'errUrl', 'URL');
+                }}
               />
               <span id="errUrl" className="admin-form-error" />
             </AdminFormRow>
@@ -348,7 +396,7 @@ function BasicSetting() {
 
           {clientId && (
             <>
-              <AdminFormRow label="メール送信用Gmail" htmlFor="replySmtpGmail">
+              <AdminFormRow label="メール送信用Gmail" htmlFor="replySmtpGmail" error={smtpErrors.gmail}>
                 <Input
                   id="replySmtpGmail"
                   placeholder="example@gmail.com"
@@ -356,12 +404,12 @@ function BasicSetting() {
                   onChange={(e) => setReplySmtpGmail(e.target.value)}
                   autoComplete="off"
                 />
-                <span id="errReplySmtpGmail" className="admin-form-error" />
               </AdminFormRow>
               <AdminFormRow
                 label="メール送信用アプリパスワード"
                 htmlFor="replySmtpGmailAppPassword"
                 hint="Gmailの2段階認証で発行したアプリパスワードを入力してください"
+                error={smtpErrors.password}
               >
                 <Input.Password
                   id="replySmtpGmailAppPassword"
@@ -370,7 +418,6 @@ function BasicSetting() {
                   onChange={(e) => setReplySmtpGmailAppPassword(e.target.value)}
                   autoComplete="new-password"
                 />
-                <span id="errReplySmtpPassword" className="admin-form-error" />
               </AdminFormRow>
             </>
           )}

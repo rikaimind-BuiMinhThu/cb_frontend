@@ -5,6 +5,7 @@ import Cookies from 'js-cookie';
 import { useAdminHeaderTitleContext } from './AdminHeaderTitleContext';
 import { useAdminHeaderActionsContext } from './AdminHeaderActionsContext';
 import AdminVersionSwitch from 'components/AdminVersionSwitch/AdminVersionSwitch';
+import { getSignInPath } from 'v2/variables/constants';
 
 const { Header } = Layout;
 
@@ -22,7 +23,7 @@ function AdminHeader({ collapsed, onToggleCollapse }) {
     Cookies.remove('refreshToken');
     Cookies.remove('bot_type');
     Cookies.remove('bot_id');
-    window.location.href = '/';
+    window.location.href = getSignInPath();
   };
 
   return (

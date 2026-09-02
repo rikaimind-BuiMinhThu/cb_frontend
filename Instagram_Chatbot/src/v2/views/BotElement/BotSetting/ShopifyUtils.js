@@ -1,4 +1,4 @@
-import api from "api/api-management";
+import api from 'v2/api/api-management';
 import { shortestDeliverableDateJpFromOrderClockJst } from "./deliveryDateRules";
 import {
   isCalendarPreviewRelativeOn,

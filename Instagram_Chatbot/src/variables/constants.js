@@ -18,9 +18,9 @@ export const getParamFromUrl = (paramName) => {
 
 export const getDebugFlag = () =>  {
     try {
-        return getParamFromUrl("debug") || true;
+        return getParamFromUrl("debug") === "true";
     } catch (e) {
-        return getParamFromUrl("debug") || true;
+        return false;
     }
 };
 

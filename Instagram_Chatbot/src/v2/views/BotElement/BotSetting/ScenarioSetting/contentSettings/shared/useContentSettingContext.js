@@ -17,8 +17,9 @@ export const useContentSettingContext = (props) => {
     ctx.onChangeValueMessageContent(indexMessageSelect, indexContent, field, value);
 
   const updateMessageField = (field, value) => {
-    Object.assign(ctx.dataMessages[indexMessageSelect], { [field]: value });
-    ctx.setDataMessages([...ctx.dataMessages]);
+    ctx.setDataMessages(ctx.dataMessages.map((msg, i) => (
+      i === indexMessageSelect ? { ...msg, [field]: value } : msg
+    )));
   };
 
   return {

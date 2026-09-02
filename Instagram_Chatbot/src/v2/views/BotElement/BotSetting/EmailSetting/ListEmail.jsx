@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Collapse, message, Space } from 'antd';
-import api from './../../../../api/api-management';
+import { Space, message } from 'antd';
+import api from 'v2/api/api-management';
 import Cookies from 'js-cookie';
 import { tokenExpired } from 'v2/api/tokenExpired';
-import { AdminPage, AdminConfirmModal, AdminActionButton, useAdminHeaderActions } from '../../../../components/AdminShell';
+import {
+  AdminPage,
+  AdminTable,
+  AdminConfirmModal,
+  AdminActionButton,
+  useAdminHeaderActions,
+} from '../../../../components/AdminShell';
+import { getAdminRoutePath } from 'v2/variables/constants';
 import '../../../../assets/css/bot/email/list-email.css';
-
-const { Panel } = Collapse;
 
 function ListEmail() {
   const [emailList, setEmailList] = useState([]);
@@ -16,10 +21,12 @@ function ListEmail() {
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const fetchEmails = (pgIndex) => {
     const bot_id = Cookies.get('bot_id');
     if (!bot_id) return;
+    setLoading(true);
     api
       .get(`/api/v1/managements/emails?page=${pgIndex}&chatbot_id=${bot_id}`)
       .then((res) => {
@@ -31,7 +38,8 @@ function ListEmail() {
       })
       .catch((err) => {
         if (err.response?.data.code === 0) tokenExpired();
-      });
+      })
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -77,32 +85,76 @@ function ListEmail() {
     <AdminActionButton
       action="create"
       label="メール作成"
-      onClick={() => { window.location.href = '/v2/admin/create-email'; }}
+      onClick={() => { window.location.href = getAdminRoutePath('/create-email'); }}
     />
   );
+
+  const columns = [
+    {
+      title: 'テンプレート名',
+      dataIndex: 'email_template_name',
+      render: (value) => value || '—',
+    },
+    {
+      title: '件名',
+      dataIndex: 'subject',
+      render: (value) => value || '—',
+    },
+    {
+      title: '宛先',
+      dataIndex: 'to',
+      render: (value) => `${value || '—'}${clientEmail != null ? ` (${clientEmail})` : ''}`,
+    },
+    {
+      title: 'アクション',
+      width: 180,
+      render: (_, item) => (
+        <Space className="admin-table-actions">
+          <AdminActionButton
+            action="edit"
+            iconOnly
+            onClick={() => { window.location.href = getAdminRoutePath(`/edit-email/${item?.id}`); }}
+          />
+          <AdminActionButton
+            action="duplicate"
+            iconOnly
+            onClick={() => { setIsOpenDuplicate(true); setIdEmail(item.id); }}
+          />
+          <AdminActionButton
+            action="delete"
+            iconOnly
+            onClick={() => { setIsOpenDelete(true); setIdEmail(item.id); }}
+          />
+        </Space>
+      ),
+    },
+  ];
 
   return (
     <>
       <AdminPage>
-        <div className="email-list-page">
-          <Collapse accordion className="email-list-collapse">
-            {emailList?.map((item) => (
-              <Panel
-                header={item?.email_template_name || item?.subject || 'メール'}
-                key={item.id}
-              >
+        <AdminTable
+          loading={loading}
+          columns={columns}
+          dataSource={emailList}
+          rowKey="id"
+          pagination={{
+            current: page,
+            pageSize: 25,
+            total,
+            onChange: (p) => {
+              setPage(p);
+              fetchEmails(p);
+            },
+          }}
+          expandable={{
+            expandedRowRender: (item) => (
+              <div className="email-list-page">
                 <table className="email-list-detail-table">
                   <tbody>
                     <tr>
                       <th>差出人</th>
                       <td>{item?.sender_name || '—'}</td>
-                    </tr>
-                    <tr>
-                      <th>宛先</th>
-                      <td>
-                        {item?.to || '—'}
-                        {clientEmail != null ? ` (${clientEmail})` : ''}
-                      </td>
                     </tr>
                     <tr>
                       <th>CC</th>
@@ -124,58 +176,16 @@ function ListEmail() {
                       <th>Reply-To</th>
                       <td>{item?.reply_to || '—'}</td>
                     </tr>
-                    <tr>
-                      <th>件名</th>
-                      <td>{item?.subject || '—'}</td>
-                    </tr>
-                    <tr>
-                      <th>テンプレート名</th>
-                      <td>{item?.email_template_name || '—'}</td>
-                    </tr>
                   </tbody>
                 </table>
-
                 <div className="email-content-preview">
                   <div className="email-content-preview__header">メール内容</div>
                   <pre className="email-content-preview__body">{item?.content || '—'}</pre>
                 </div>
-
-                <Space className="email-list-actions admin-table-actions">
-                  <AdminActionButton
-                    action="edit"
-                    iconOnly
-                    onClick={() => { window.location.href = `/v2/admin/edit-email/${item?.id}`; }}
-                  />
-                  <AdminActionButton
-                    action="duplicate"
-                    iconOnly
-                    onClick={() => { setIsOpenDuplicate(true); setIdEmail(item.id); }}
-                  />
-                  <AdminActionButton
-                    action="delete"
-                    iconOnly
-                    onClick={() => { setIsOpenDelete(true); setIdEmail(item.id); }}
-                  />
-                </Space>
-              </Panel>
-            ))}
-          </Collapse>
-
-          {total > 25 && (
-            <div className="email-list-pagination">
-              <Button disabled={page <= 1} onClick={() => { setPage(page - 1); fetchEmails(page - 1); }}>
-                前へ
-              </Button>
-              <span style={{ margin: '0 16px' }}>{page} / {Math.ceil(total / 25)}</span>
-              <Button
-                disabled={page >= Math.ceil(total / 25)}
-                onClick={() => { setPage(page + 1); fetchEmails(page + 1); }}
-              >
-                次へ
-              </Button>
-            </div>
-          )}
-        </div>
+              </div>
+            ),
+          }}
+        />
       </AdminPage>
 
       <AdminConfirmModal open={isOpenDuplicate} message="本当に複製しますか。" onOk={duplicateEmail} onCancel={() => setIsOpenDuplicate(false)} />

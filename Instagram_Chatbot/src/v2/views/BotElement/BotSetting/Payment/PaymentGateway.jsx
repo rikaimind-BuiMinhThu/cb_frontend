@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, message, Space, Tag } from 'antd';
 import { Link } from 'react-router-dom';
-import api from 'api/api-management';
+import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { AdminConfirmModal, AdminPage, AdminTable, AdminActionButton, useAdminHeaderActions } from '../../../../components/AdminShell';
 

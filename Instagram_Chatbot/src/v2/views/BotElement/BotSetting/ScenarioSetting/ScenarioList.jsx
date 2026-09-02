@@ -1,11 +1,11 @@
 import { Link, useHistory } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Input, List, Modal, Radio, Select, Space, Tag, message } from 'antd';
-import api from 'api/api-management';
+import { Input, Modal, Radio, Select, Space, Tag, message } from 'antd';
+import api from 'v2/api/api-management';
 import Cookies from 'js-cookie';
 import moment from 'moment';
 import { getAdminRoutePath } from 'v2/variables/constants';
-import { AdminPage, AdminConfirmModal, AdminActionButton, AdminFormRow, useAdminHeaderActions } from '../../../../components/AdminShell';
+import { AdminPage, AdminTable, AdminConfirmModal, AdminActionButton, AdminFormRow, useAdminHeaderActions } from '../../../../components/AdminShell';
 
 function ScenarioList() {
   const history = useHistory();
@@ -24,6 +24,7 @@ function ScenarioList() {
   const [selectedTemplateId, setSelectedTemplateId] = useState(undefined);
   const [creating, setCreating] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setBotId(Cookies.get('bot_id'));
@@ -45,6 +46,7 @@ function ScenarioList() {
   };
 
   const getListScenario = (pgIndex) => {
+    setLoading(true);
     api
       .get(`/api/v1/managements/chatbots/${Cookies.get('bot_id')}/scenarios?page=${pgIndex}`)
       .then((res) => {
@@ -53,7 +55,8 @@ function ScenarioList() {
         setScenarioSelectedClone(res.data.scenario_selected);
         setListScenario(res?.data?.data || []);
       })
-      .catch((error) => console.error(error));
+      .catch((error) => console.error(error))
+      .finally(() => setLoading(false));
   };
 
   const checkInputScenarioName = (scenarioName) => {
@@ -150,12 +153,62 @@ function ScenarioList() {
     </Space>
   );
 
+  const columns = [
+    {
+      title: '',
+      width: 48,
+      render: (_, scenario) => (
+        <Radio
+          checked={scenarioSelected === scenario.id}
+          onChange={() => setScenarioSelected(scenario.id)}
+        />
+      ),
+    },
+    {
+      title: 'ステータス',
+      width: 90,
+      render: (_, scenario) => (
+        <Tag color={scenarioSelectedClone === scenario.id ? 'green' : 'default'}>
+          {scenarioSelectedClone === scenario.id ? '有効' : '無効'}
+        </Tag>
+      ),
+    },
+    {
+      title: 'シナリオ名',
+      dataIndex: 'name',
+    },
+    {
+      title: '最後の更新日時',
+      dataIndex: 'updated_at',
+      render: (value) => moment(value).format('YYYY/MM/DD'),
+    },
+    {
+      title: 'アクション',
+      width: 220,
+      render: (_, scenario) => (
+        <Space className="admin-table-actions">
+          <Link to={getAdminRoutePath('/scenario-setting')}>
+            <AdminActionButton action="edit" iconOnly onClick={() => onclickEditScenario(scenario.id)} />
+          </Link>
+          <AdminActionButton action="preview" iconOnly onClick={() => onClickPreview(scenario.id)} />
+          <AdminActionButton action="duplicate" iconOnly onClick={() => handleDuplicationScenario(scenario.id)} />
+          {scenarioSelectedClone !== scenario.id ? (
+            <AdminActionButton action="delete" iconOnly onClick={() => handleDeleteScenario(scenario.id)} />
+          ) : null}
+        </Space>
+      ),
+    },
+  ];
+
   return (
     <>
       <AdminPage>
-        <List
+        <AdminTable
           className="admin-scenario-list"
+          loading={loading}
+          columns={columns}
           dataSource={listScenario}
+          rowKey="id"
           pagination={{
             current: page,
             pageSize: 25,
@@ -166,43 +219,6 @@ function ScenarioList() {
               window.scrollTo(0, 0);
             },
           }}
-          renderItem={(scenario) => (
-            <List.Item
-              style={{
-                padding: '16px 20px',
-                borderBottom: '1px solid #e5e7eb',
-                background: '#fff',
-              }}
-              actions={[
-                <Link to={getAdminRoutePath('/scenario-setting')} key="edit">
-                  <AdminActionButton action="edit" iconOnly onClick={() => onclickEditScenario(scenario.id)} />
-                </Link>,
-                <AdminActionButton key="preview" action="preview" iconOnly onClick={() => onClickPreview(scenario.id)} />,
-                <AdminActionButton key="dup" action="duplicate" iconOnly onClick={() => handleDuplicationScenario(scenario.id)} />,
-                scenarioSelectedClone !== scenario.id ? (
-                  <AdminActionButton key="del" action="delete" iconOnly onClick={() => handleDeleteScenario(scenario.id)} />
-                ) : null,
-              ]}
-            >
-              <div className="admin-scenario-list-row">
-                <Radio
-                  checked={scenarioSelected === scenario.id}
-                  onChange={() => setScenarioSelected(scenario.id)}
-                />
-                <div className="admin-scenario-list-content">
-                  <Space>
-                    <Tag color={scenarioSelectedClone === scenario.id ? 'green' : 'default'}>
-                      {scenarioSelectedClone === scenario.id ? '有効' : '無効'}
-                    </Tag>
-                    <span className="admin-scenario-list-name">{scenario.name}</span>
-                  </Space>
-                  <div className="admin-scenario-list-meta">
-                    {`最後の更新日時 ${moment(scenario.updated_at).format('YYYY/MM/DD')}`}
-                  </div>
-                </div>
-              </div>
-            </List.Item>
-          )}
         />
       </AdminPage>
 

@@ -1,7 +1,7 @@
 /* cSpell: disable */
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import api from "api/api-management";
+import api from 'v2/api/api-management';
 import InputCustom from "../../ScenarioSetting/scenarioComon/InputCustom";
 
 import { Checkbox, Radio, Slider, Calendar, Row, Select, Col } from "antd";
@@ -139,21 +139,15 @@ export default function UserMessage({
   const [messageContent, setMessageContent] = useState(messageContentProps);
   const [errors, setErrors] = useState(errorsProps);
 
-  console.log('messageContent', messageContent);
-
-  function loadCaptcha(indexContent) {
-    if (
-      document.getElementById(`captcha-${indexMessage}-${indexContent}`) &&
-      captcha.length !== 0
-    )
-      document.getElementById(
-        `captcha-${indexMessage}-${indexContent}`
-      ).innerHTML =
-        captcha.filter(
-          (item) =>
-            item.index === indexMessage && item.indexContent === indexContent
-        )?.[0]?.data || "";
-  }
+  const applyCaptcha = (contentIndex) => {
+    const el = document.getElementById(`captcha-${indexMessage}-${contentIndex}`);
+    if (!el || !captcha?.length) return;
+    el.innerHTML =
+      captcha.filter(
+        (item) =>
+          item.index === indexMessage && item.indexContent === contentIndex
+      )?.[0]?.data || "";
+  };
 
   const stringNullOrEmpty = (string) => {
     if (
@@ -207,6 +201,15 @@ export default function UserMessage({
   useEffect(() => {
     setMessageContent(messageContentProps);
   }, [messageContentProps]);
+
+  useEffect(() => {
+    if (!messageContent || !captcha?.length) return;
+    messageContent.forEach((content, indexContent) => {
+      if (content.type === "capture") {
+        applyCaptcha(indexContent);
+      }
+    });
+  }, [captcha, indexMessage, messageContent]);
 
   useEffect(() => {
     messageContent.forEach((content, indexContent) => {
@@ -3416,7 +3419,6 @@ export default function UserMessage({
                   <div
                     id={`captcha-${indexMessage}-${indexContent}`}
                     style={{ width: "50%" }}
-                    onLoad={loadCaptcha(indexContent)}
                   ></div>
                 </div>
                 {errors?.[

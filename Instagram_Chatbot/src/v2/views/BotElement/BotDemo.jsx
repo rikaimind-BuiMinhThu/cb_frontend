@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Button, Card, message } from 'antd';
 import PreviewFukushashiki from './BotSetting/PreviewFukushashiki';
 import Cookies from 'js-cookie';
-import api from 'api/api-management';
+import api from 'v2/api/api-management';
 import { AdminPage } from '../../components/AdminShell';
 
 const BotDemo = () => {
@@ -11,11 +11,15 @@ const BotDemo = () => {
   const bot_id = Cookies.get('bot_id');
 
   useEffect(() => {
-    setTimeout(() => setIsChatBoxClick(true), 300);
+    const timer = setTimeout(() => setIsChatBoxClick(true), 300);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
+    if (!bot_id) return undefined;
+    let cancelled = false;
     api.get(`/api/v1/managements/chatbots/${bot_id}/get_scenario_selected`).then((response) => {
+      if (cancelled) return;
       if (response.data.data) {
         setScenarioId(response.data.data.id);
         Cookies.set('scenario_id', response.data.data.id);
@@ -23,6 +27,9 @@ const BotDemo = () => {
         message.warning('シナリオがありません。');
       }
     });
+    return () => {
+      cancelled = true;
+    };
   }, [bot_id]);
 
   const handleOpenPreview = (isOpen) => {

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, message, Modal, Space } from 'antd';
 import noImage from './../../../assets/img/no-image.jpg';
-import api from 'api/api-management';
+import api from 'v2/api/api-management';
 import axios from 'axios';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import {

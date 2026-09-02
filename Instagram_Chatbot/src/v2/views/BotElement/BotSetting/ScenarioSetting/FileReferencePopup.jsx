@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api from 'api/api-management';
+import api from 'v2/api/api-management';
 import {
   S3_UPLOAD_URL,
 } from '../../../../variables/constants';

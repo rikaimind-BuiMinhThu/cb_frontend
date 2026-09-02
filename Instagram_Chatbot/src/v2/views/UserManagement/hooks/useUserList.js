@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Cookies from 'js-cookie';
-import api from 'api/api-management';
+import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { PAGE_SIZE } from '../constants';
+import { getSignInPath } from 'v2/variables/constants';
 
 export default function useUserList() {
   const [users, setUsers] = useState([]);
@@ -25,37 +26,47 @@ export default function useUserList() {
       Cookies.get('token') == null ||
       Cookies.get('token') === ''
     ) {
-      window.location.href = '/';
+      window.location.href = getSignInPath();
     }
     if (Cookies.get('is_auth') === 'false') {
-      window.location.href = '/';
+      window.location.href = getSignInPath();
     }
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
     api
       .get(`/api/v1/managements/clients`)
       .then((res) => {
-        setListClient(res.data.data || []);
+        if (!cancelled) setListClient(res.data.data || []);
       })
       .catch((error) => {
+        if (cancelled) return;
         if (error.response?.data.code === 0) {
           tokenExpired();
         }
       });
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  const fetchRequestId = useRef(0);
 
   function fetchUsers(pageNum, name = namesearch) {
     setLoading(true);
+    const requestId = ++fetchRequestId.current;
     api
       .get(`/api/v1/managements/users?name=${name}&page=${pageNum}&client_id=`)
       .then((res) => {
+        if (requestId !== fetchRequestId.current) return undefined;
         const totalCount = res.data.total || 0;
         const totalPage = Math.ceil(totalCount / PAGE_SIZE) || 1;
         if (pageNum > totalPage && totalCount > 0) {
           return api
             .get(`/api/v1/managements/users?name=${name}&page=${totalPage}&client_id=`)
             .then((resp) => {
+              if (requestId !== fetchRequestId.current) return;
               setUsers(resp.data.users || []);
               setTotal(resp.data.total || 0);
               setPage(totalPage);
@@ -64,13 +75,17 @@ export default function useUserList() {
         setUsers(res.data.users || []);
         setTotal(totalCount);
         setPage(pageNum);
+        return undefined;
       })
       .catch((error) => {
+        if (requestId !== fetchRequestId.current) return;
         if (error.response?.data.code === 0) {
           tokenExpired();
         }
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (requestId === fetchRequestId.current) setLoading(false);
+      });
   }
 
   useEffect(() => {

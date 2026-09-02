@@ -3,7 +3,7 @@ import FacebookLogin from 'react-facebook-login';
 import { Button, Card, Image } from 'react-bootstrap';
 import 'v2/assets/css/loginFacebook.css';
 import { margin } from '@mui/system';
-import api from 'api/api-management'
+import api from 'v2/api/api-management'
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import { event } from 'jquery';
@@ -90,7 +90,6 @@ function LoginFacebook({ checkLogin }) {
 
   function checkLoginState() {
     window.FB.getLoginStatus(function (response) {
-      console.log(response.authResponse.accessToken)
       setAccessToken2(response.authResponse.accessToken)
       statusChangeCallback(response);
     });
@@ -105,7 +104,6 @@ function LoginFacebook({ checkLogin }) {
     });
 
     window.FB.getLoginStatus(function (response) {
-      console.log("getLoginStatus: ", response)
       statusChangeCallback(response);
     });
 

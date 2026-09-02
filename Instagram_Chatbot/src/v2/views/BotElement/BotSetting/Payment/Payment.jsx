@@ -59,8 +59,6 @@ function Payment() {
                     console.log('error code ' + res.resultCode);
                 } else {
                     let token = res.tokenObject.token;
-                    // use this token instead of card details to create transactions
-                    console.log(token)
                 }
             });
 

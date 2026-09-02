@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { message as antdMessage } from 'antd';
 import Cookies from 'js-cookie';
-import api from 'api/api-management';
+import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { CART_SYSTEM, TIMER_VARIABLES } from '../../PreviewComponent/Constants';
 import {
@@ -527,28 +527,38 @@ export const useScenario = (mode = 'scenario') => {
   }, [getListVariable, isTemplateMode]);
 
   useEffect(() => {
-    if (isTemplateMode || !botId) return;
+    if (isTemplateMode || !botId) return undefined;
+    let cancelled = false;
     api.get(`/api/v1/managements/emails?page=all&chatbot_id=${botId}`)
       .then((res) => {
-        setDataEmail(res.data.data);
+        if (!cancelled) setDataEmail(res.data.data);
       })
       .catch((error) => {
+        if (cancelled) return;
         if (error.response?.data?.code === 0) {
           tokenExpired();
         }
       });
-  }, [botId]);
+    return () => {
+      cancelled = true;
+    };
+  }, [botId, isTemplateMode]);
 
   useEffect(() => {
+    let cancelled = false;
     api.get('/api/v1/prefectures')
       .then((res) => {
-        setDataPrefectures(res.data.data);
+        if (!cancelled) setDataPrefectures(res.data.data);
       })
       .catch((error) => {
+        if (cancelled) return;
         if (error.response?.data?.code === 0) {
           tokenExpired();
         }
       });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {

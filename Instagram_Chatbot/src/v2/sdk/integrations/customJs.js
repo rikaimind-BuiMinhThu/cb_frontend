@@ -1,5 +1,7 @@
 import { CUSTOM_JS_CODE_POSITION } from '../constants.js';
 
+// Merchant-authored custom JS is a privileged bot setting. The shop page
+// executes it as written; operators must treat this as trusted input.
 export const injectCustomJS = (injectCustomJsCodes) => {
   for (const { jsCode, position } of injectCustomJsCodes) {
     const script = document.createElement('script');

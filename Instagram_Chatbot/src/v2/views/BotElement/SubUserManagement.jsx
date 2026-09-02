@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Button, Form, Input, message, Modal, Select, Space } from 'antd';
 import { Link } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import api from 'api/api-management';
+import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { AdminPage, AdminTable, AdminConfirmModal, AdminActionButton, useAdminHeaderActions } from '../../components/AdminShell';
 
@@ -12,12 +12,14 @@ function SubUserManagement() {
   const [isOpenPopupDelete, setIsOpenPopupDelete] = useState(false);
   const [isOpenEdit, setIsOpenEdit] = useState(false);
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     loadData();
   }, []);
 
   function loadData() {
+    setLoading(true);
     api
       .get(`/api/v1/managements/user_chatbots?chatbot_id=${Cookies.get('bot_id')}`)
       .then((res) => {
@@ -27,7 +29,8 @@ function SubUserManagement() {
       })
       .catch((err) => {
         if (err.response?.data.code === 0) tokenExpired();
-      });
+      })
+      .finally(() => setLoading(false));
   }
 
   function handleDelete() {
@@ -102,7 +105,7 @@ function SubUserManagement() {
       <AdminPage
         description="利用中のプランのボットの管理者として追加されているユーザーを表示します。EC-CHATBOTのアカウントを持たないユーザーを管理者に追加したい場合は、招待ボタンからユーザーを招待してからボットの管理者を追加してください。"
       >
-        <AdminTable columns={columns} dataSource={subUsers} rowKey="id" pagination={false} />
+        <AdminTable loading={loading} columns={columns} dataSource={subUsers} rowKey="id" pagination={false} />
       </AdminPage>
 
       <Modal

@@ -1,7 +1,7 @@
 import { DatePicker, Space, Tag, Typography } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import api from 'api/api-management';
+import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { AdminTable, AdminActionButton } from '../../../components/AdminShell';
 

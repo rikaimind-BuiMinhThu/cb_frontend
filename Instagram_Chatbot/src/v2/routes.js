@@ -3,7 +3,6 @@ import Chatbot from 'views/InstagramBotElement/Chatbot';
 
 import ClientManagement from './views/ClientManagement/index';
 import PlanManagement from './views/PlanManagement';
-import Policy from './views/InstagramBotElement/Policy';
 import ReleasePage from 'views/InstagramBotElement/Release/ReleasePage';
 import UserManagement from './views/UserManagement/index';
 import Keyword from 'views/InstagramBotElement/Keyword';
@@ -22,7 +21,6 @@ import PaymentSetting from './views/BotElement/PaymentSetting';
 import PaymentHistory from './views/BotElement/PaymentHistory';
 import IPAddressSetting from './views/BotElement/IPAddressSetting';
 import ScenarioList from './views/BotElement/BotSetting/ScenarioSetting/ScenarioList';
-import MediaFileManagement from './views/BotElement/BotSetting/ScenarioSetting/MediaFileManagement';
 import CreateEmail from './views/BotElement/BotSetting/EmailSetting/CreateEmail';
 import ListEmail from './views/BotElement/BotSetting/EmailSetting/ListEmail';
 import BotDemo from './views/BotElement/BotDemo';
@@ -39,7 +37,6 @@ import VariableManagement from './views/BotElement/BotSetting/VariableManagement
 import InstallationTag from './views/BotElement/BotSetting/InstallationTag';
 import Conversion from './views/BotElement/BotSetting/Conversion';
 import ConversionInfo from './views/BotElement/BotSetting/Report/ConversionInfo';
-import { Statistic } from 'semantic-ui-react';
 import BasicInformation from './views/BotElement/BotSetting/AdvanceSetting/BasicInformation';
 import TimeAndLang from './views/BotElement/BotSetting/AdvanceSetting/TimeAndLang';
 import WithdrawalPrevention from './views/BotElement/BotSetting/AdvanceSetting/WithdrawalPrevention';

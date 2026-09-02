@@ -21,7 +21,8 @@ export const usePreviewScenarioBootstrap = ({
   onExtractStateRef.current = onExtractState;
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled) return undefined;
+    let cancelled = false;
 
     if (!state.loadedStateFromSession) {
       const savedState = getChatbotSavedState();
@@ -29,10 +30,15 @@ export const usePreviewScenarioBootstrap = ({
         const currentBotId = params.get("bot_id") || Cookies.get("bot_id");
         if (currentBotId && currentBotId !== savedState.botId) {
           clearChatbotState();
-          return getScenarioPreviewData(
+          getScenarioPreviewData(
             currentBotId,
             params.get("scenario_id"),
-          ).then((res) => onExtractStateRef.current(res));
+          ).then((res) => {
+            if (!cancelled) onExtractStateRef.current(res);
+          });
+          return () => {
+            cancelled = true;
+          };
         }
 
         setConversionParamToLocalStorage(
@@ -43,24 +49,25 @@ export const usePreviewScenarioBootstrap = ({
           savedState,
         );
 
-        return dispatch({
+        dispatch({
           type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
           payload: {
             ...savedState,
             loadedStateFromSession: true,
           },
         });
+        return undefined;
       }
     }
 
-    if (state.loadedStateFromSession && state.botId) return;
+    if (state.loadedStateFromSession && state.botId) return undefined;
 
     if (!state.botId) {
       dispatch({
         type: PREVIEW_ACTIONS.SET_BOT_ID,
         payload: params.get("bot_id"),
       });
-      return;
+      return undefined;
     }
 
     if (!state.urlSend) {
@@ -68,7 +75,7 @@ export const usePreviewScenarioBootstrap = ({
         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
         payload: { urlSend: window.location.href },
       });
-      return;
+      return undefined;
     }
 
     if (!state.urlReceive) {
@@ -76,7 +83,7 @@ export const usePreviewScenarioBootstrap = ({
         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
         payload: { urlReceive: params.get("urlReceive") },
       });
-      return;
+      return undefined;
     }
 
     if (!state.deviceReceive) {
@@ -84,7 +91,7 @@ export const usePreviewScenarioBootstrap = ({
         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
         payload: { deviceReceive: params.get("deviceReceive") },
       });
-      return;
+      return undefined;
     }
 
     if (!state.scenarioId) {
@@ -92,12 +99,16 @@ export const usePreviewScenarioBootstrap = ({
         type: PREVIEW_ACTIONS.SET_SCENARIO_ID,
         payload: params.get("scenario_id"),
       });
-      return;
+      return undefined;
     }
 
-    return getScenarioPreviewData(state.botId, state.scenarioId).then((res) =>
-      onExtractStateRef.current(res),
-    );
+    getScenarioPreviewData(state.botId, state.scenarioId).then((res) => {
+      if (!cancelled) onExtractStateRef.current(res);
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [
     enabled,
     state.botId,

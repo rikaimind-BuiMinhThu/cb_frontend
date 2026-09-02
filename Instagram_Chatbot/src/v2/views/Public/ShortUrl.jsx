@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import api from 'api/api-management';
+import api from 'v2/api/api-management';
 function ShortUrl() {
 
   useEffect(() => {

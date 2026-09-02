@@ -27,8 +27,9 @@ const SpecialDisplayConditionsContent = ({
   if (!selectedMessage) return null;
 
   const updateMessageField = (field, value) => {
-    Object.assign(selectedMessage, { [field]: value });
-    setDataMessages([...dataMessages]);
+    setDataMessages(dataMessages.map((msg) => (
+      msg.id === selectedMessage.id ? { ...msg, [field]: value } : msg
+    )));
   };
 
   const amazonPayDisplayMode = getAmazonPayDisplayModeFromConditions(selectedMessage.conditions);

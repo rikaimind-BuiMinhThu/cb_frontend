@@ -25,8 +25,9 @@ const RegisterButtonSettingsContent = ({
   const [alignBeginningStop, setAlignBeginningStop] = useState(false);
 
   const updateMessage = (updates) => {
-    Object.assign(selectedMessage, updates);
-    setDataMessages([...dataMessages]);
+    setDataMessages(dataMessages.map((msg) => (
+      msg.id === selectedMessage.id ? { ...msg, ...updates } : msg
+    )));
   };
 
   const showCodeEditor = !!selectedMessage.button_jscode;
