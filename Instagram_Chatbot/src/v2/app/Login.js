@@ -16,7 +16,7 @@ import {
   getDefaultLandingPath,
   getEnvironment,
 } from 'v2/variables/constants';
-import logo from '../../assets/img/ecchatbot-logo.png';
+import logo from '../assets/img/ecchatbot-logo.png';
 import {
   CLIENT_STORAGE_KEY,
   DEBUG_STORAGE_KEY,
@@ -41,8 +41,6 @@ import {
   SUBMIT_FORM_BUTTON_ID,
 } from './constants';
 import 'v2/assets/css/login.css';
-import 'assets/scss/paper-dashboard.scss?v=1.3.0';
-import 'assets/demo/demo.css';
 
 const persistSession = (data) => {
   setToken(data.token);

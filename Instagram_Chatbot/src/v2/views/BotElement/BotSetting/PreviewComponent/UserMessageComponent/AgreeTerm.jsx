@@ -1,7 +1,7 @@
 import React from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
 import { MESSAGE_CONTENT_TYPES } from "../Constants";
-import CheckboxCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/CheckboxCustom";
+import CheckboxCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/CheckboxCustom";
 
 export default function AgreeTerm({ content, messageIndex, contentIndex, onChangeValue, errors, disabled }) {
 if (!content || content.type !== MESSAGE_CONTENT_TYPES.AGREE_TERM) return null;

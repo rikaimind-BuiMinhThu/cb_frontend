@@ -8,11 +8,11 @@ import {
   dataMonth as MONTH_DEFAULT_OPTIONS,
   dataDay as DAY_DEFAULT_OPTIONS,
   CRAWL_ELEMENT_TYPES,
-} from "views/BotElement/BotSetting/PreviewComponent/Constants";
-import { getCitiesByPrefecture } from "views/BotElement/BotSetting/PreviewComponent/Utils";
+} from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
+import { getCitiesByPrefecture } from "v2/views/BotElement/BotSetting/PreviewComponent/Utils";
 import { tokenExpired } from "v2/api/tokenExpired";
-import LPIntegrationOptionPullDown from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/LPIntegrationOptionPullDown";
-import SelectCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/SelectCustom";
+import LPIntegrationOptionPullDown from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/LPIntegrationOptionPullDown";
+import SelectCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/SelectCustom";
 
 export default function PullDown({ content, errors, contentIndex, messageIndex, disabled, onChangeValue, prefecturesList, lpOptionData, postMessageToParent, hidden }) {
   const [cityOptions, setCityOptions] = useState([]);

@@ -1,8 +1,8 @@
 import React from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
-import { MESSAGE_CONTENT_TYPES, RENDER_CHATBOT_CONFIG } from "views/BotElement/BotSetting/PreviewComponent/Constants";
-import InputCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
-import InputDebounce from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputDebounce";
+import { MESSAGE_CONTENT_TYPES, RENDER_CHATBOT_CONFIG } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
+import InputCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
+import InputDebounce from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputDebounce";
 
 export default function Text({ content, disabled, handleOnChangeJpConvertText, contentIndex, onChangeValue }) {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.TEXT_INPUT || content.text_input.type !== "text") return null;

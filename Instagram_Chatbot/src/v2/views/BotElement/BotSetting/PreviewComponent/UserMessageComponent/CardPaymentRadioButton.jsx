@@ -1,6 +1,6 @@
 import React from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
-import { MESSAGE_CONTENT_TYPES } from "views/BotElement/BotSetting/PreviewComponent/Constants";
+import { MESSAGE_CONTENT_TYPES } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 import CommonCreditCardPayment from "./CommonCreditCardPayment";
 import { Radio } from "antd";
 import {
@@ -8,7 +8,7 @@ import {
   getPaymentOptionImage,
   getPaymentOptionStyle,
   normalizePaymentConfig,
-} from "views/BotElement/BotSetting/ScenarioSetting/utils/paymentStyleUtils";
+} from "v2/views/BotElement/BotSetting/ScenarioSetting/utils/paymentStyleUtils";
 
 const renderOptionLabel = (itemPayment, isSelected, displayStyle) => {
   const image = getPaymentOptionImage(itemPayment, isSelected);

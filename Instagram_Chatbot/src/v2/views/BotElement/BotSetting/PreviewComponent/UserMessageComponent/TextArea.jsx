@@ -1,6 +1,6 @@
 import React from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
-import { MESSAGE_CONTENT_TYPES } from "views/BotElement/BotSetting/PreviewComponent/Constants";
+import { MESSAGE_CONTENT_TYPES } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 
 export default function TextArea({ content, disabled, onChangeValue, errors, contentIndex, messageIndex }) {
   if (content.type !== MESSAGE_CONTENT_TYPES.TEXT_AREA) return null;

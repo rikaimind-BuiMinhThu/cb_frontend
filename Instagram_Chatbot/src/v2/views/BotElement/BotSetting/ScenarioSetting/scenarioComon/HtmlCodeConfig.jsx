@@ -1,4 +1,4 @@
-import { HtmlCodeMessage } from "components/BotMessages";
+import { HtmlCodeMessage } from "v2/components/BotMessages";
 import CheckboxCustom from "./CheckboxCustom";
 import { useState } from "react";
 import { BOT_MESSAGE_TYPES } from "../../PreviewComponent/Constants";

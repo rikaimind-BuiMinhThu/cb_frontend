@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { BOT_MESSAGE_TYPES } from './Constants';
-import HtmlCodeMessagePreview from 'components/BotMessages/HtmlCodeMessagePreview';
-import AmazonPayButtonMessagePreview from 'components/BotMessages/AmazonPayButtonMessagePreview';
-import CartLoginMessagePreview from 'components/BotMessages/CartLoginMessagePreview';
+import HtmlCodeMessagePreview from 'v2/components/BotMessages/HtmlCodeMessagePreview';
+import AmazonPayButtonMessagePreview from 'v2/components/BotMessages/AmazonPayButtonMessagePreview';
+import CartLoginMessagePreview from 'v2/components/BotMessages/CartLoginMessagePreview';
 import { replaceVariables } from './VariablesUtils';
 import { resolveBotMessageTheme } from '../DesignSetting/utils/designThemeUtils';
 import { buildOrderConfirmJs, buildOrderConfirmPreviewHtml } from '../ScenarioSetting/utils/OrderConfirmLpScriptGenerator';

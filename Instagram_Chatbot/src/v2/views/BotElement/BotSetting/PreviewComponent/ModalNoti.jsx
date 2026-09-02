@@ -1,10 +1,10 @@
 import React from "react";
-import "../Popup/modal.css";
+import "./modal.css";
 import ReactDom from 'react-dom'
 
 const MODAL_STYLES = {
   position: 'fixed',
-  top: '46.5%',
+  top: '17%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
   backgroundColor: '#FFF',
@@ -25,7 +25,7 @@ const OVERLAY_STYLES = {
   zIndex: 1000
 }
 
-export default function ModalShortTem({ open, children, onClose }) {
+export default function ModalNoti({ open, children, onClose }) {
   if (!open) return null
 
   return ReactDom.createPortal(

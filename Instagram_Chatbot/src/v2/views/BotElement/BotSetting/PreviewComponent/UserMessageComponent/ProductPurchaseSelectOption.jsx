@@ -1,7 +1,7 @@
 import React from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
-import { MESSAGE_CONTENT_TYPES } from "views/BotElement/BotSetting/PreviewComponent/Constants";
-import SelectCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/SelectCustom";
+import { MESSAGE_CONTENT_TYPES } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
+import SelectCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/SelectCustom";
 
 export default function ProductPurchaseSelectOption({ content, messageIndex, contentIndex, onChangeValue, errors }) {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.PRODUCT_PURCHASE_SELECT_OPTION) return null;

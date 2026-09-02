@@ -1,4 +1,4 @@
-import useDebounce from "hook/useDebounce";
+import useDebounce from "v2/hooks/useDebounce";
 import { useEffect, useState } from "react";
 import InputCustom from "./InputCustom";
 export default function InputDebounce({ value, onChange, debounceTime = 500, onCompositionStart, onCompositionEnd, ...props}) {

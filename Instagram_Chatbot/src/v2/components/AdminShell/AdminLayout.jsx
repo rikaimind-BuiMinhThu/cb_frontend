@@ -6,10 +6,8 @@ import { Route, Switch, useLocation } from 'react-router-dom';
 import { getToken } from 'v2/api/auth';
 import { AUTH_FALSE_VALUE, IS_AUTH_COOKIE_KEY, USER_ROLE_COOKIE_KEY } from 'v2/api/constants';
 import { getAdminRoutePath, getDefaultLandingPath, getSignInPath } from 'v2/variables/constants';
-import routes from '../../routes';
+import routes from 'v2/app/routes';
 import { adminConfigProviderProps } from '../../theme/adminTheme';
-import ListSmsTemplate from '../../views/BotSettings/SmsTemplate/ListSmsTemplate';
-import PushMessage from '../../views/BotSettings/PushMessage/PushMessagePage';
 import AdminHeader from './AdminHeader';
 import { AdminHeaderActionsProvider } from './AdminHeaderActionsContext';
 import { AdminHeaderTitleProvider } from './AdminHeaderTitleContext';
@@ -20,8 +18,6 @@ import {
   EMPTY_VALUE,
   INSTAGRAM_ROLE_PATHS,
   parseStoredClient,
-  PUSH_MESSAGE_ROUTE,
-  SMS_TEMPLATE_ROUTE,
   USER_ROLE_ADMIN_DEEL,
   WEB_ROLE_PATHS,
 } from './constants';
@@ -97,14 +93,6 @@ const AdminLayout = () => {
                       key={`${route.layout}${route.path}`}
                     />
                   ))}
-                  <Route
-                    path={getAdminRoutePath(SMS_TEMPLATE_ROUTE)}
-                    component={ListSmsTemplate}
-                  />
-                  <Route
-                    path={getAdminRoutePath(PUSH_MESSAGE_ROUTE)}
-                    component={PushMessage}
-                  />
                 </Switch>
               </Content>
             </Layout>

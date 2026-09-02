@@ -3,7 +3,7 @@ import "v2/assets/css/bot/preview-chat-bot.css";
 import { Button } from "reactstrap";
 import { MDBIcon } from "mdbreact";
 import { MESSAGE_CONTENT_TYPES } from "../Constants";
-import InputCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
+import InputCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
 
 export default function Attachment({ content, messageIndex, contentIndex, onChangeValue, onChangeErrors, errors, disabled }) {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.ATTACHMENT) return null;

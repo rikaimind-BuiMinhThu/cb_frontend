@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
 import api from 'v2/api/api-management';
 import InputCustom from "../ScenarioSetting/scenarioComon/InputCustom";
-import ModalNoti from "../../../Popup/ModalNoti";
+import ModalNoti from "./ModalNoti";
 import { CHATBOT_ACTIONS, MESSAGE_CONTENT_TYPES, SCAN_REGEX } from "../PreviewComponent/Constants";
 import {
   Checkbox as AntdCheckbox,
@@ -15,7 +15,7 @@ import { SHORTEN_URL } from "v2/variables/constants";
 import locale from "antd/es/date-picker/locale/ja_JP";
 import "moment/locale/zh-cn";
 import SubmitButton from "./UserMessageComponent/SubmitButton";
-import { convertTextJapaneseByApi } from "utils/japaneseConverter";
+import { convertTextJapaneseByApi } from "v2/utils/japaneseConverter";
 import Image from "./UserMessageComponent/Image";
 import TextInput from "./UserMessageComponent/TextInput";
 import Label from "./UserMessageComponent/Label";

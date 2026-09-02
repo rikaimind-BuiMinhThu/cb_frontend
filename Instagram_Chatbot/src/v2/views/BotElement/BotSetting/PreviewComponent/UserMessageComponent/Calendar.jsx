@@ -1,11 +1,11 @@
 import React from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
 import { MESSAGE_CONTENT_TYPES } from "../Constants";
-import DatePickerCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/DatePickerCustom";
+import DatePickerCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/DatePickerCustom";
 import moment from "moment-timezone";
 import { Select, Radio, Row, Col, Calendar as AntdCalendar } from "antd";
 import pickerLocaleJaJP from "antd/es/date-picker/locale/ja_JP";
-import { withJaShortWeekDays } from "utils/ensureMomentJaSundayFirstWeek";
+import { withJaShortWeekDays } from "v2/utils/ensureMomentJaSundayFirstWeek";
 
 export function isCalendarPreviewRelativeOn(calendar) {
   const v = calendar?.preview_relative_range_enabled;

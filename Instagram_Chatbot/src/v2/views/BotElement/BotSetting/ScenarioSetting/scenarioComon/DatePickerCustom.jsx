@@ -4,7 +4,7 @@ import localeJaJP from 'antd/es/date-picker/locale/ja_JP';
 import {
   ensureMomentJaSundayFirstWeek,
   withJaShortWeekDays,
-} from 'utils/ensureMomentJaSundayFirstWeek';
+} from 'v2/utils/ensureMomentJaSundayFirstWeek';
 
 ensureMomentJaSundayFirstWeek();
 

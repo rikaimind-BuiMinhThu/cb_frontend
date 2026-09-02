@@ -5,7 +5,7 @@ import Cookies from 'js-cookie';
 import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { message } from 'antd';
-import * as utils from '../../../../JS/validate.js';
+import * as utils from 'v2/utils/formValidate';
 import { patchWithDrawalPreview } from '../PreviewComponent/Utils';
 import 'v2/assets/css/bot/withdrawal-prevention.css';
 import { AdminPage, AdminActionButton, AdminFormRow, useAdminHeaderActions } from '../../../../components/AdminShell';

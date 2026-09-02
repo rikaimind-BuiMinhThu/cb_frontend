@@ -5,7 +5,7 @@ import {
   CONTACT_FORM_FIELD_KEYS,
   CONTACT_FORM_FIELD_LABELS,
   getContactFormFieldSettings,
-} from "views/BotElement/BotSetting/PreviewComponent/Constants";
+} from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 import EmailInput from "./TextInputComponent/EmailInput";
 
 export default function ContactForm({

@@ -4,7 +4,7 @@ import V2PreviewFaq from 'v2/views/BotElement/BotSetting/PreviewFaq';
 import V2PreviewFukushashiki from 'v2/views/BotElement/BotSetting/PreviewFukushashiki';
 import ScenarioPreviewEditorPage from 'v2/views/BotElement/BotSetting/ScenarioSetting/preview/ScenarioPreviewEditorPage';
 import { getAppPath, getSignInPath } from 'v2/variables/constants';
-import V2Admin from '../../layouts/Admin';
+import V2Admin from './layouts/Admin';
 import V2Login from './Login';
 import {
   ADMIN_APP_PATH,

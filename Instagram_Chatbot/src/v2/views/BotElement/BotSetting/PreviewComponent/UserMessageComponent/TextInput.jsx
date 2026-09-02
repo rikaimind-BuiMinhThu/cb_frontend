@@ -1,7 +1,7 @@
 import React from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
-import { MESSAGE_CONTENT_TYPES } from "views/BotElement/BotSetting/PreviewComponent/Constants";
-import InputCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
+import { MESSAGE_CONTENT_TYPES } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
+import InputCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
 import Text from "./TextInputComponent/Text";
 import PhoneNumber from "./TextInputComponent/PhoneNumber";
 import EmailInput from "./TextInputComponent/EmailInput";

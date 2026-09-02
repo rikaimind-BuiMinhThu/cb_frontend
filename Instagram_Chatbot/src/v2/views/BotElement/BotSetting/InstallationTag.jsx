@@ -10,7 +10,7 @@ import {
   buildFaqEmbedScript,
   buildPaymentEmbedScript,
   getSdkEmbedPaths,
-} from 'utils/sdkEmbedPaths';
+} from 'v2/utils/sdkEmbedPaths';
 import { AdminPage, AdminFormRow, AdminActionButton, useAdminHeaderActions } from '../../../components/AdminShell';
 
 function InstallationTag() {

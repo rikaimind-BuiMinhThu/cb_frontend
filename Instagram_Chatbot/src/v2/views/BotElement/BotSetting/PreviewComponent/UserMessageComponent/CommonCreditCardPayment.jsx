@@ -5,11 +5,11 @@ import {
   dataPaymentMethod as cardBrands,
   dataMonth as cardExpiredMonthOptions
 } from "../Constants";
-import InputCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
-import InputNum from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputNum";
-import SelectCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/SelectCustom";
+import InputCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
+import InputNum from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputNum";
+import SelectCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/SelectCustom";
 import cvcIcon from "assets/img/cvc-icon.png";
-import { moveToNext } from "views/BotElement/BotSetting/PreviewComponent/Utils";
+import { moveToNext } from "v2/views/BotElement/BotSetting/PreviewComponent/Utils";
 
 import moment from "moment";
 

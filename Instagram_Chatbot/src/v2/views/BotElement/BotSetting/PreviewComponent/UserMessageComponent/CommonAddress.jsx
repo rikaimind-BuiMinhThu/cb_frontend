@@ -1,10 +1,10 @@
 import React from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
-import { MESSAGE_CONTENT_TYPES, NUMBER_REGEX } from "views/BotElement/BotSetting/PreviewComponent/Constants";
-import { getAddressFromZipCode, moveToNext } from "views/BotElement/BotSetting/PreviewComponent/Utils";
+import { MESSAGE_CONTENT_TYPES, NUMBER_REGEX } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
+import { getAddressFromZipCode, moveToNext } from "v2/views/BotElement/BotSetting/PreviewComponent/Utils";
 
-import InputCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
-import SelectCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/SelectCustom";
+import InputCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
+import SelectCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/SelectCustom";
 
 export default function CommonAddress({ content, prefecturesList, messageIndexRender, messageIndex, contentIndex, messageContent, onChangeValue, onChangeErrors, errors, disabled, onOpen, isDisplayError = true }) {
   

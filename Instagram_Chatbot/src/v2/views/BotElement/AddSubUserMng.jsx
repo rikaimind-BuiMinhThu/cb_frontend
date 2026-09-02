@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './../../assets/css/sub-user-mng.css';
 import api from 'v2/api/api-management';
 import Cookies from 'js-cookie';
-import * as utils from './../../JS/validate.js';
+import * as utils from 'v2/utils/formValidate';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { AdminPage, AdminActionButton, AdminFormRow, useAdminHeaderActions } from '../../components/AdminShell';
 import { Input, message } from 'antd';

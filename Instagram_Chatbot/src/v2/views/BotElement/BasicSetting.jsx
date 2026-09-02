@@ -2,7 +2,7 @@ import React from 'react';
 import { AdminPage, AdminActionButton, AdminFormRow, useAdminHeaderActions } from '../../components/AdminShell';
 import { Input, message } from 'antd';
 import './../../assets/css/basic_setting.css';
-import * as utils from './../../JS/validate.js';
+import * as utils from 'v2/utils/formValidate';
 import Cookies from 'js-cookie';
 import { useEffect } from 'react';
 import { useState } from 'react';

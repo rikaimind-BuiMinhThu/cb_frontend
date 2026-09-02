@@ -1,8 +1,8 @@
 import React from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
-import { MESSAGE_CONTENT_TYPES } from "views/BotElement/BotSetting/PreviewComponent/Constants";
-import InputCustom from "views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
-import { moveToNext } from "views/BotElement/BotSetting/PreviewComponent/Utils";
+import { MESSAGE_CONTENT_TYPES } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
+import InputCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
+import { moveToNext } from "v2/views/BotElement/BotSetting/PreviewComponent/Utils";
 
 export default function PhoneNumber({ content, disabled, contentIndex, onChangeValue }) {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.TEXT_INPUT || content.text_input.type !== "phone_number") return null;
