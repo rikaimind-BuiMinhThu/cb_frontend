@@ -7,6 +7,7 @@ import { resolveUserMessageTheme } from 'v2/views/DesignSetting/utils/designThem
 import {
   COMBINE_CONTENT_ROLES,
   COMBINE_MESSAGE_DEFAULTS,
+  NEXT_BUTTON_LABEL,
 } from './Constants';
 import { getElementMessageById, isCombineMessage } from './Utils';
 
@@ -22,7 +23,7 @@ export const CombineMessageNextButton = ({
   if (message.not_use_button) return null;
   if (message.message_content.some((block) => block.type === 'button_submit')) return null;
 
-  const btnText = message.buttonName || '次へ';
+  const btnText = message.buttonName || NEXT_BUTTON_LABEL;
   const firstUserBlock = message.message_content.find((block) => block.role === COMBINE_CONTENT_ROLES.USER);
   const isDisplayBtnNext = !firstUserBlock
     || firstUserBlock.type !== 'image'

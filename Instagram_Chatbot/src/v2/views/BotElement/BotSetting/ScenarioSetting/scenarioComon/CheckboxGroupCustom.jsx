@@ -1,20 +1,21 @@
 import React from 'react';
 import { Checkbox, Row, Col } from 'antd';
 
+const CHECKBOX_GROUP_COL_SPAN = 8;
+
 const CheckboxGroupCustom = ({
   value = [],
   onChange,
   data,
-  style,
-  styleCol,
+  className = '',
   direct = 'horizontal',
 }) => (
-  <div style={style}>
+  <div className={className}>
     <Checkbox.Group className="ss-checkbox-group" onChange={onChange} value={value}>
       {direct === 'horizontal' ? (
         <Row>
           {data.map((item, index) => (
-            <Col span={8} key={index} className="ss-checkbox-group__col" style={styleCol}>
+            <Col span={CHECKBOX_GROUP_COL_SPAN} key={item.key ?? index} className="ss-checkbox-group__col">
               <Checkbox value={item.key}>{item.value}</Checkbox>
             </Col>
           ))}
@@ -22,7 +23,7 @@ const CheckboxGroupCustom = ({
       ) : (
         <div>
           {data.map((item, index) => (
-            <Checkbox key={index} value={item.key}>{item.value}</Checkbox>
+            <Checkbox key={item.key ?? index} value={item.key}>{item.value}</Checkbox>
           ))}
         </div>
       )}

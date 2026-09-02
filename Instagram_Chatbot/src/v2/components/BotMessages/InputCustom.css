@@ -45,6 +45,23 @@
   margin-bottom: 4px;
 }
 
+.ss-input-custom-label--full {
+  width: 100%;
+}
+
+.ss-input-custom-label--wide {
+  width: 90%;
+}
+
+.ss-input-custom-label--spaced {
+  width: 90%;
+  margin-top: 10px;
+}
+
+.ss-checkbox-custom-label--full {
+  width: 100%;
+}
+
 .ss-input-custom-editable-label {
   border-radius: 5px;
   border: 1px solid gray;

@@ -1,6 +1,7 @@
 import '../../styles/base/preview-common.css';
 import React from 'react';
 import { Radio } from 'antd';
+import { PREVIEW_LABELS } from '../../constants/scenarioSettingLabels';
 
 const ProductPurchaseRadioButtonPreview = ({
   content,
@@ -22,7 +23,7 @@ const ProductPurchaseRadioButtonPreview = ({
                 }
                 {productPurchaseRadioButton.require === true &&
                   <span className="ss-message__content--user-text-input-required">
-                    ※必須
+                    {PREVIEW_LABELS.requiredMark}
                   </span>
                 }
               </div>
@@ -33,7 +34,6 @@ const ProductPurchaseRadioButtonPreview = ({
                   <Radio.Group
                     className="ss-user-overview-product-purchase-radio-group ss-user-overview-product-purchase-style-width ss-content-preview__group--full"
 
-                    onChange={(value) => console.log(value)}
                   >
                     {productPurchaseRadioButton.products.map((itemProduct, indexProduct) => {
                       return <Radio value={itemProduct.id} key={indexProduct}>
@@ -75,7 +75,6 @@ const ProductPurchaseRadioButtonPreview = ({
                   <Radio.Group
                     className="ss-user-overview-product-purchase-radio-group-type-text_image ss-user-overview-product-purchase-style-width ss-content-preview__group--full"
 
-                    onChange={(value) => console.log(value)}
                   >
                     {productPurchaseRadioButton.products && productPurchaseRadioButton.products.map((itemProduct, indexProduct) => {
                       return <Radio value={itemProduct.id} key={indexProduct}>

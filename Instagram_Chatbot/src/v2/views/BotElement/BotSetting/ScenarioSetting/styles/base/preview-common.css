@@ -177,3 +177,7 @@
   box-sizing: border-box;
   display: block;
 }
+
+.ss-content-preview__slider .ant-slider-track {
+  background-color: var(--preview-slider-color, #2C75F0);
+}

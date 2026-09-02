@@ -5,6 +5,7 @@
   display: grid;
   gap: var(--radio-option-margin, 5px);
   width: 100%;
+  grid-template-columns: var(--preview-grid-columns);
 }
 
 .ss-message__content--user-radio_button-img-grid--scroll {
@@ -51,6 +52,8 @@
 
 .ss-message__content--user-radio_button-img-grid .ss-message__content--user-radio_button--radio_button_img {
   margin-bottom: 0;
+  padding: var(--radio-option-padding);
+  box-sizing: border-box;
 }
 
 .ss-message__content--user-radio_button--radio_button_img img,
@@ -92,6 +95,7 @@
   display: grid;
   gap: var(--checkbox-option-margin, 5px);
   width: 100%;
+  grid-template-columns: var(--preview-grid-columns);
 }
 
 .ss-message__content--user-checkbox-img-grid--scroll {
@@ -138,6 +142,8 @@
 
 .ss-message__content--user-checkbox-img-grid .ss-message__content--user-checkbox--checkbox_img-item {
   margin-bottom: 0;
+  padding: var(--checkbox-option-padding);
+  box-sizing: border-box;
 }
 
 .ss-message__content--user-checkbox--checkbox_img-item img,

@@ -3,6 +3,8 @@ import { MDBIcon } from 'mdbreact';
 import CheckboxCustom from './CheckboxCustom';
 import './InputCustom.css';
 
+const USE_DROPDOWN_LABEL = 'Use the dropdown';
+
 const InputCustom = ({
   id,
   type = "text",
@@ -21,7 +23,6 @@ const InputCustom = ({
   classLabel,
   labelClassName,
   disabled = false,
-  styleLabel,
   inline = true,
   onKeyPress,
   pattern,
@@ -106,11 +107,10 @@ const InputCustom = ({
           value={labelValue ?? ''}
           onChange={e => onLabelChange(e.target.value)}
           className={`ss-input-custom-editable-label ${resolvedClassLabel || ''}`}
-          style={styleLabel}
         />
       ) : (
         label && (
-          <div className={labelElementClassName} style={styleLabel}>
+          <div className={labelElementClassName}>
             {label}
           </div>
         )
@@ -118,7 +118,7 @@ const InputCustom = ({
       {clearable ? renderInputField(true) : renderInputField(false)}
       {handleCheckBox && (
         <CheckboxCustom
-          label="Use the dropdown"
+          label={USE_DROPDOWN_LABEL}
           className="ss-user-setting-checkbox-custom"
           onChange={value => handleCheckBox(value)}
           value={valueCheckbox}

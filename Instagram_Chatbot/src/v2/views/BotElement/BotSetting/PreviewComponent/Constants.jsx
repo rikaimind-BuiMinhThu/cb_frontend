@@ -539,6 +539,8 @@ export const ALT_EMPTY = '';
 export const EMPTY_STRING = '';
 export const LABEL_SELECT = '選択';
 export const NEXT_BUTTON_LABEL = '次へ';
+export const PROCESS_BAR_COMPLETE_TEXT = '完了しました。';
+export const formatProcessBarRemainingText = (remainingCount) => `あと${remainingCount}問`;
 export const UPDATE_BUTTON_LABEL = '更新';
 export const OK_BUTTON_LABEL = 'OK';
 export const PRODUCT_NUMBER_PREFIX = '商品番号: ';

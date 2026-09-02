@@ -1,8 +1,15 @@
 import React, { useEffect } from "react";
+import { MESSAGE_CONTENT_TYPES } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
+
+const AUTO_CLICK_MESSAGE_TYPES = [
+  MESSAGE_CONTENT_TYPES.PULL_DOWN,
+  MESSAGE_CONTENT_TYPES.AGREE_TERM,
+  MESSAGE_CONTENT_TYPES.CARD_PAYMENT_RADIO_BUTTON,
+];
 
 const CustomButton = ({
   disabled,
-  style,
+  cssVars,
   className,
   onClick,
   children,
@@ -11,10 +18,9 @@ const CustomButton = ({
 }) => {
   useEffect(() => {
     if (autoClick && typeof onClick === "function") {
-      const acceptableTypes = ['pull_down', 'agree_term', 'card_payment_radio_button'];
-      if (acceptableTypes.includes(messsagetype))
+      if (AUTO_CLICK_MESSAGE_TYPES.includes(messsagetype))
         onClick();
-      return
+      return;
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- mount/click wiring; messsagetype/onClick identity is unstable
   }, [autoClick]);
@@ -23,7 +29,7 @@ const CustomButton = ({
     <button
       type="button"
       disabled={disabled}
-      style={style}
+      style={cssVars}
       className={`btn btn-new-bot ${className || ''}`.trim()}
       onClick={onClick}
       data-messsagetype={messsagetype}

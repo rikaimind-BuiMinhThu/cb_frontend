@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { DatePicker, Empty, Select, Space, Tabs, Typography } from 'antd';
+import { DatePicker, Empty, Select, Space, Tabs, Typography, message } from 'antd';
 import api from 'v2/api/api-management';
 import Cookies from 'js-cookie';
 import { format } from 'date-fns';
@@ -19,6 +19,9 @@ import {
   CHAT_LOG_DATE_FORMAT,
   CHAT_LOG_DATE_PICKER_FORMAT,
   CHAT_LOG_DISPLAY_DATE_FORMAT,
+  CHAT_LOG_LIST_PATH,
+  CHAT_LOG_LOAD_ERROR,
+  CHAT_LOG_CAPTCHA_ERROR,
   CHAT_LOG_NEXT_BUTTON,
   CHAT_LOG_PASSWORD_MASK,
   CHAT_LOG_SCENARIO_LABEL,
@@ -26,6 +29,7 @@ import {
   CHAT_LOG_SELECT_CONVERSATION,
   CHAT_LOG_STATUS_DONE,
   CHAT_LOG_STATUS_NOT_DONE,
+  CHAT_LOG_STATISTIC_PATH,
   CHAT_LOG_TAB_LOGS,
   CHAT_LOG_TAB_LOGS_LABEL,
   CHAT_LOG_TAB_STATISTIC,
@@ -94,19 +98,28 @@ const BotChatLog = () => {
   }, []);
 
   useEffect(() => {
+    const request = { cancelled: false };
     const params = {
       sc_id: searchScenarioId ? parseInt(searchScenarioId) : null,
       date: searchDate ? searchDate : null,
     };
     api
-      .get(`/api/v1/managements/chat_log/${botId}/list`, params)
+      .get(`${CHAT_LOG_LIST_PATH}/${botId}/list`, params)
       .then((res) => {
+        if (request.cancelled) return;
         if (res.data.code === 1) {
           setScenarios(res.data.scenarios);
           setChats(assignUserNamesToChats(res.data.chats));
         }
+      })
+      .catch(() => {
+        if (request.cancelled) return;
+        message.error(CHAT_LOG_LOAD_ERROR);
       });
-      getScenarioStatistic({sc_id: searchScenarioId ? parseInt(searchScenarioId) : null, bot_id: botId});
+    getScenarioStatistic({sc_id: searchScenarioId ? parseInt(searchScenarioId) : null, bot_id: botId});
+    return () => {
+      request.cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -125,12 +138,15 @@ const BotChatLog = () => {
 
   const searchLog = (params) => {
     api
-      .get(`/api/v1/managements/chat_log/${botId}/list`, {params})
+      .get(`${CHAT_LOG_LIST_PATH}/${botId}/list`, {params})
       .then((res) => {
         if (res.data.code === 1) {
           setScenarios(res.data.scenarios);
           setChats(assignUserNamesToChats(res.data.chats));
         }
+      })
+      .catch(() => {
+        message.error(CHAT_LOG_LOAD_ERROR);
       });
 
   }
@@ -476,8 +492,8 @@ const BotChatLog = () => {
                         });
                         setCaptcha([...captcha]);
                       })
-                      .catch((error) => {
-                        console.log(error);
+                      .catch(() => {
+                        message.error(CHAT_LOG_CAPTCHA_ERROR);
                       });
                     // break;
                   }
@@ -790,8 +806,8 @@ const BotChatLog = () => {
           }
         }
       })
-      .catch((error) => {
-        console.log(error);
+      .catch(() => {
+        message.error(CHAT_LOG_LOAD_ERROR);
       })
       .finally(() => {
         if (saveMsgStatistic) {
@@ -806,7 +822,7 @@ const BotChatLog = () => {
   const getMessageData = (item) => {
     api
       .get(
-        `/api/v1/managements/chat_log/${item.scenario_id}/${item.user_input_id}`
+        `${CHAT_LOG_LIST_PATH}/${item.scenario_id}/${item.user_input_id}`
       )
       .then((response) => {
         if (response.data.code === 1) {
@@ -815,19 +831,24 @@ const BotChatLog = () => {
 
           getScenarioMessages(botId, item.scenario_id, conversations, { saveMsgRender: true });
         }
+      })
+      .catch(() => {
+        message.error(CHAT_LOG_LOAD_ERROR);
       });
   }
 
   const getScenarioStatistic = async (params) => {
-    api.get(`/api/v1/managements/chat_log/statistic`, { params })
+    api.get(CHAT_LOG_STATISTIC_PATH, { params })
       .then((response) => {
         if (response.data.code === 1) {
           setStatistic(response.data.statistic);
           setOverall(response.data.overall);
           getScenarioMessages(botId, params.sc_id, [], { saveMsgStatistic: true });
         }
-      }
-    )
+      })
+      .catch(() => {
+        message.error(CHAT_LOG_LOAD_ERROR);
+      });
   }
 
   const filterToolbar = (
@@ -905,23 +926,23 @@ const BotChatLog = () => {
       <div className="chat-log-preview">
         {selectScenario ? (
           <div id="csp-body" className="sp-body csp-body chat-area">
-            {renderMessageArr.map((message, indexMessage) => (
-              <React.Fragment key={indexMessage}>
-                {message.belong_to === "bot" &&
-                  message?.message_content.map((content, index) => (
+            {renderMessageArr.map((messageItem, indexMessage) => (
+              <React.Fragment key={messageItem.id ?? indexMessage}>
+                {messageItem.belong_to === "bot" &&
+                  messageItem?.message_content.map((content, index) => (
                     <BotMessage
-                      key={index}
+                      key={content.id ?? index}
                       content={content}
                       index={index}
                       botInfor={botInfor}
                     />
                   ))}
-                {message.belong_to === "user" && (
+                {messageItem.belong_to === "user" && (
                   <div className="sp-body-user-side csp-body-user-side slideLeft chat-log-user-side">
                     <p className="chat-log-user-message-time">
-                      {message.message_content[0].updated_at
+                      {messageItem.message_content[0].updated_at
                         ? format(
-                            new Date(message.message_content[0].updated_at),
+                            new Date(messageItem.message_content[0].updated_at),
                             CHAT_LOG_DISPLAY_DATE_FORMAT,
                           )
                         : ""}
@@ -929,14 +950,17 @@ const BotChatLog = () => {
                     <div className="sp-body-user-side-messages csp-body-user-side-messages">
                       <UserMessage
                         captcha={captcha}
-                        messageContentProps={message.message_content}
-                        disabled={message.disabled}
+                        messageContentProps={messageItem.message_content}
+                        disabled={messageItem.disabled}
                         onChangeValue={() => {}}
                         indexMessageRender={indexMessageRender}
                         indexMessage={indexMessage}
                         displayButtonNext={(value) => {
-                          dataMessages[indexMessage].is_display_button_next = value;
-                          setDataMessages([...dataMessages]);
+                          setDataMessages((prev) => prev.map((msg, idx) => (
+                            idx === indexMessage
+                              ? { ...msg, is_display_button_next: value }
+                              : msg
+                          )));
                         }}
                         dataPrefectures={[...dataPrefectures]}
                         variables={variables}
@@ -954,7 +978,7 @@ const BotChatLog = () => {
                               '--chat-log-action-bg': botInfor?.main_color,
                             }}
                           >
-                            {message.buttonName || CHAT_LOG_NEXT_BUTTON}
+                            {messageItem.buttonName || CHAT_LOG_NEXT_BUTTON}
                           </button>
                         </div>
                       )}

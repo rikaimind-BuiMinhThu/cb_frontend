@@ -47,7 +47,7 @@ export const getDebugFlag = () =>  {
 };
 
 export const log = (message) => {
-    let debugFlag = getDebugFlag();
+    const debugFlag = getDebugFlag();
 
     if (debugFlag) {
         console.log(message);

@@ -4,7 +4,6 @@ import { RADIO_BUTTON_TYPES } from '../../constants/contentTypeConstants';
 import { PREVIEW_LABELS } from '../../constants/scenarioSettingLabels';
 import {
   getRadioImgGridStyle,
-  getRadioImgOptionStyle,
   getImgGridClassName,
   normalizeRadioButtonImgLayout,
 } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/radioButtonImgLayoutUtils';
@@ -104,7 +103,6 @@ const RadioButtonPreview = ({
                 isSelected ? 'ss-message__content--user-radio_button--selected' : '',
                 getEditorHighlightClassName(item),
               ].filter(Boolean).join(' ')}
-              style={getRadioImgOptionStyle(radioButton)}
             >
               <input
                 type="radio"

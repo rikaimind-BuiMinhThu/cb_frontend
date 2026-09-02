@@ -9,6 +9,7 @@ import { getAdminRoutePath, getSignInPath } from 'v2/variables/constants';
 import { AdminPage, AdminTable, AdminConfirmModal, AdminActionButton, AdminFormRow, useAdminHeaderActions } from 'v2/components/AdminShell';
 import {
   TEMPLATE_CREATE_SUCCESS,
+  TEMPLATE_REQUEST_FAILED,
   TEMPLATE_DELETE_SUCCESS,
   TEMPLATE_CREATE_TITLE,
   TEMPLATE_NAME_LABEL,
@@ -102,7 +103,7 @@ const ScenarioTemplateList = () => {
         }
         getListTemplate();
       })
-      .catch((err) => console.log(err))
+      .catch(() => message.error(TEMPLATE_REQUEST_FAILED))
       .finally(() => setCreating(false));
   };
 

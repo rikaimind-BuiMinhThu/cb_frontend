@@ -9,11 +9,12 @@ import { useScenarioPanelDestructuring } from '../hooks/useScenarioPanelDestruct
 import ScenarioMessageSettingsAccordion from './ScenarioMessageSettingsAccordion';
 import CombineBotBlockSetting from './CombineBotBlockSetting';
 import CombineBlockHeader from './CombineBlockHeader';
-import { COMBINE_CONTENT_ROLES } from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants';
+import { COMBINE_CONTENT_ROLES, COMBINE_MESSAGE_DEFAULTS } from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants';
 import {
   COMBINE_BOT_TYPE_OPTIONS,
   COMBINE_USER_TYPE_OPTIONS,
 } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/combineContentDefaults';
+import { SETTING_LABELS, SETTING_PLACEHOLDERS } from '../constants/scenarioSettingLabels';
 
 const AddBlockSelect = ({ options, defaultType, onAdd, label }) => {
   const [blockType, setBlockType] = useState(defaultType);
@@ -71,26 +72,26 @@ const ScenarioCombineSettingsPanel = () => {
       <div className="ss-combine-setting__top">
         <div className="ss-user-setting__name-wrapper">
           <div>
-            <span>名称</span>
-            <span className="ss-user-setting__name-error">※必須</span>
+            <span>{SETTING_LABELS.name}</span>
+            <span className="ss-user-setting__name-error">{SETTING_LABELS.requiredMark}</span>
           </div>
           <InputCustom
-            placeholder="名称を入力"
+            placeholder={SETTING_PLACEHOLDERS.messageName}
             className={selectedMessage.message_name ? '' : 'ss-input--invalid'}
             onChange={(value) => onChangeValueNameMessage(indexMessageSelect, 'message_name', value)}
             value={selectedMessage.message_name}
           />
           {!selectedMessage.message_name && (
-            <div className="ss-field-required-error">必ず指定してください。</div>
+            <div className="ss-field-required-error">{SETTING_LABELS.requiredFieldError}</div>
           )}
         </div>
         <div className="ss-combine-setting__gap-wrapper">
-          <span className="ss-combine-setting__gap-label">コンテンツ間の余白 (px)</span>
+          <span className="ss-combine-setting__gap-label">{SETTING_LABELS.contentGap}</span>
           <InputNum
             min={0}
             max={100}
             className="ss-combine-setting__gap-input"
-            value={selectedMessage.combine_message?.content_gap ?? 10}
+            value={selectedMessage.combine_message?.content_gap ?? COMBINE_MESSAGE_DEFAULTS.CONTENT_GAP}
             onChange={(value) => handleChangeCombineContentGap(value)}
           />
         </div>

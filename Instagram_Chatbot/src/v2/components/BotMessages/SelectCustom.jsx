@@ -25,7 +25,6 @@ const SelectCustom = ({
   mode,
   label,
   disabled = false,
-  styleLabel,
   showSearch = true,
   className = '',
   labelClassName = '',
@@ -34,7 +33,7 @@ const SelectCustom = ({
     return (
       <>
         {label && (
-          <span className={`select-custom-label ${labelClassName}`.trim()} style={styleLabel}>
+          <span className={`select-custom-label ${labelClassName}`.trim()}>
             {label}
           </span>
         )}
@@ -69,7 +68,7 @@ const SelectCustom = ({
   return (
     <>
       {label && (
-        <span className={`select-custom-label ${labelClassName}`.trim()} style={styleLabel}>
+        <span className={`select-custom-label ${labelClassName}`.trim()}>
           {label}
         </span>
       )}
@@ -123,7 +122,6 @@ SelectCustom.propTypes = {
   mode: PropTypes.string,
   label: PropTypes.node,
   disabled: PropTypes.bool,
-  styleLabel: PropTypes.object,
   showSearch: PropTypes.bool,
   className: PropTypes.string,
   labelClassName: PropTypes.string,

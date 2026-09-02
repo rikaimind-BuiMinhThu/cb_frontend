@@ -4,6 +4,7 @@ import React from 'react';
 import { Radio } from 'antd';
 import InputCustom from '../../scenarioComon/InputCustom';
 import SelectCustom from '../../scenarioComon/SelectCustom';
+import { PREVIEW_LABELS } from '../../constants/scenarioSettingLabels';
 
 const PreviewTitle = ({ data }) => {
   if (!data.title_require && !data.require) return null;
@@ -16,7 +17,7 @@ const PreviewTitle = ({ data }) => {
       }
       {data.require === true &&
         <span className="ss-message__content--user-text-input-required">
-          ※必須
+          {PREVIEW_LABELS.requiredMark}
         </span>
       }
     </div>
@@ -28,7 +29,6 @@ const RadioOptions = ({ data }) => (
     {data.type === 'default' &&
       <Radio.Group
         className="ss-content-preview__radio-group"
-        onChange={(value) => console.log(value)}
         value={data.initial_selection}
       >
         {data.radio_contents && data.radio_contents.map((itemPayment, indexPayment) => (
@@ -45,7 +45,6 @@ const RadioOptions = ({ data }) => (
     {data.type === 'customized_style' &&
       <Radio.Group
         className="ss-content-preview__radio-group"
-        onChange={(value) => console.log(value)}
         value={data.initial_selection}
         buttonStyle="solid"
       >
@@ -66,7 +65,6 @@ const RadioOptions = ({ data }) => (
           <Radio.Group
             className="ss-content-preview__radio-group--flex ss-user-overview-product-purchase-radio-group-type-text_image ss-user-overview-product-purchase-style-width"
 
-            onChange={(value) => console.log(value)}
             value={data.initial_selection_picture}
           >
             {itemPaymentImg.contents.map((itemPaymentContent, indexContent) => (
@@ -93,7 +91,7 @@ const CardNumberField = ({ data }) => (
     <div className="ss-user-setting__item-bottom">
       <InputCustom
         className="ss-user-setting-input-overview"
-        styleLabel={{ width: '100%' }}
+        labelClassName="ss-input-custom-label--full"
         label="カード番号"
         inline={false}
         disabled={true}
@@ -134,7 +132,7 @@ const CardHolderField = ({ data }) => {
     <div className="ss-user-setting__item-bottom">
       <InputCustom
         className="ss-user-setting-input-overview"
-        styleLabel={{ width: '100%' }}
+        labelClassName="ss-input-custom-label--full"
         label="カード名義"
         inline={false}
         disabled={true}
@@ -154,7 +152,7 @@ const CardHolderField = ({ data }) => {
         />
         <InputCustom
           className="ss-user-setting-input-overview"
-          styleLabel={{ width: '100%' }}
+          labelClassName="ss-input-custom-label--full"
           inline={false}
           disabled={true}
           value={data.card_holder2}
@@ -191,7 +189,7 @@ const CvcField = ({ data }) => {
     <div className="ss-user-setting__item-bottom">
       <InputCustom
         className="ss-user-setting-input-overview"
-        styleLabel={{ width: '100%' }}
+        labelClassName="ss-input-custom-label--full"
         label="CVC非表示"
         inline={false}
         disabled={true}

@@ -1,6 +1,6 @@
 import React from 'react';
 import InputCustom from '../scenarioComon/InputCustom';
-import { SETTING_LABELS } from '../constants/scenarioSettingLabels';
+import { SETTING_LABELS, PREVIEW_LABELS } from '../constants/scenarioSettingLabels';
 
 const renderLabeledAddressInput = (label, placeholder) => (
   <div className="ss-user-setting__item-bottom">
@@ -115,7 +115,7 @@ export const createRenderZipCodeAddressTitle = () => {
         )}
         {isRequired && (
           <span className="ss-message__content--user-text-input-required">
-            ※必須
+            {PREVIEW_LABELS.requiredMark}
           </span>
         )}
       </div>

@@ -10,6 +10,7 @@ import {
   handleDisableEndDateCalendar,
 } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/scenarioCalendarUtils';
 import CalendarEmbeddedHeader from '../../contentSettings/calendar/shared/CalendarEmbeddedHeader';
+import { PREVIEW_LABELS } from '../../constants/scenarioSettingLabels';
 import '../../styles/contentPreviews/calendar.css';
 
 const CalendarPreview = ({ content }) => {
@@ -23,7 +24,7 @@ const CalendarPreview = ({ content }) => {
           <span className="ss-message__content--user-calender-title">{calendar.title}</span>
         )}
         {calendar.require === true && (
-          <span className="ss-message__content--user-text-input-required">※必須</span>
+          <span className="ss-message__content--user-text-input-required">{PREVIEW_LABELS.requiredMark}</span>
         )}
       </div>
     );
@@ -33,7 +34,6 @@ const CalendarPreview = ({ content }) => {
     <DatePickerCustom
       className="ss-calendar-preview__picker"
       value={calendar.date_selection_test ? moment(calendar.date_selection_test, 'YYYY-MM-DD') : null}
-      onChange={(date, dateString) => console.log(dateString)}
       disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
     />
   );
@@ -48,7 +48,6 @@ const CalendarPreview = ({ content }) => {
           <CalendarEmbeddedHeader value={value} type={type} onChange={onChange} onTypeChange={onTypeChange} />
         )}
         value={calendar.date_selection_test ? moment(calendar.date_selection_test, 'YYYY-MM-DD') : null}
-        onChange={(value) => console.log(value.format('DD/MM/YYYY'))}
         disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
       />
     </div>
@@ -60,13 +59,11 @@ const CalendarPreview = ({ content }) => {
         className="ss-calendar-preview__start-end-picker"
         disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
         value={calendar.start_date_test ? moment(calendar.start_date_test, 'YYYY-MM-DD') : null}
-        onChange={(date, dateString) => console.log(dateString)}
       />
       <DatePickerCustom
         className="ss-calendar-preview__start-end-picker"
         disabledDate={(current) => handleDisableEndDateCalendar(current, calendar)}
         value={calendar.end_date_test ? moment(calendar.end_date_test, 'YYYY-MM-DD') : null}
-        onChange={(date, dateString) => console.log(dateString)}
       />
     </div>
   );

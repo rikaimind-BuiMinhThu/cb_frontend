@@ -8,7 +8,7 @@ export const UPSELL_BUTTON_OPTION_LABELS = [
   'そのまま注文する',
 ];
 
-export function createUpsellButtonPlaceholderImage(label) {
+export const createUpsellButtonPlaceholderImage = (label) => {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="80">
     <rect width="100%" height="100%" fill="#f5f5f5" stroke="#dddddd" stroke-width="1"/>
     <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="16" font-family="sans-serif" fill="#333333">${label}</text>
@@ -16,7 +16,7 @@ export function createUpsellButtonPlaceholderImage(label) {
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
 
-export function getDefaultUpsellButtonOptions() {
+export const getDefaultUpsellButtonOptions = () => {
   return UPSELL_BUTTON_OPTION_LABELS.map((label, index) => ({
     id: index + 1,
     value: label,
@@ -24,14 +24,14 @@ export function getDefaultUpsellButtonOptions() {
   }));
 }
 
-export function getDefaultUpsellButtonLayout() {
+export const getDefaultUpsellButtonLayout = () => {
   return {
     type: RADIO_IMG_LAYOUT_VERTICAL,
     custom_widths: ['100'],
   };
 }
 
-export function ensureUpsellButtonDefaults(radioButton) {
+export const ensureUpsellButtonDefaults = (radioButton) => {
   const defaults = getDefaultUpsellButtonOptions();
   const existing = radioButton?.[RADIO_BUTTON_TYPES.UPSELL_BUTTON];
 

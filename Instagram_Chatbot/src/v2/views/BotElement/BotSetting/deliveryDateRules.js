@@ -8,12 +8,10 @@ const isDeliverableWeekday = (m) => {
 };
 
 const firstDeliverableOnOrAfter = (startDayJst) => {
-  let x = startDayJst.clone().startOf("day");
-  for (let i = 0; i < 21; i += 1) {
-    if (isDeliverableWeekday(x)) return x;
-    x = x.add(1, "day");
-  }
-  return startDayJst.clone().startOf("day");
+  const candidates = Array.from({ length: 21 }, (_, index) =>
+    startDayJst.clone().startOf("day").add(index, "day")
+  );
+  return candidates.find(isDeliverableWeekday) ?? startDayJst.clone().startOf("day");
 };
 
 export const shortestDeliverableDateJpFromOrderClockJst = (reference, calendar) => {

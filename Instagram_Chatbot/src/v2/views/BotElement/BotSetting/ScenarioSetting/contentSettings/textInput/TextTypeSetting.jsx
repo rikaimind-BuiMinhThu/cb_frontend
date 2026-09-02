@@ -42,7 +42,7 @@ const TextTypeSetting = (props) => {
             <>
               <InputCustom
                 placeholder="セル1受信点ID"
-                styleLabel={{ width: '100%' }}
+                labelClassName="ss-input-custom-label--full"
                 maxLength={250}
                 useFukushashiki={true}
                 onChange={changeMessageField('convertTextDestination1')}
@@ -50,7 +50,7 @@ const TextTypeSetting = (props) => {
               />
               <InputCustom
                 placeholder="セル2受信点ID"
-                styleLabel={{ width: '100%' }}
+                labelClassName="ss-input-custom-label--full"
                 maxLength={250}
                 useFukushashiki={true}
                 onChange={changeMessageField('convertTextDestination2')}
@@ -60,7 +60,7 @@ const TextTypeSetting = (props) => {
           ) : (
             <InputCustom
               placeholder="受信反射ポイントIDを入力してください"
-              styleLabel={{ width: '100%' }}
+              labelClassName="ss-input-custom-label--full"
               maxLength={250}
               useFukushashiki={true}
               onChange={changeMessageField('convertTextDestination')}
@@ -84,7 +84,7 @@ const TextTypeSetting = (props) => {
             <>
               <InputCustom
                 placeholder="セル 1 のオプション ID"
-                styleLabel={{ width: '100%' }}
+                labelClassName="ss-input-custom-label--full"
                 maxLength={250}
                 useFukushashiki={true}
                 onChange={changeMessageField('customId1')}
@@ -92,7 +92,7 @@ const TextTypeSetting = (props) => {
               />
               <InputCustom
                 placeholder="セル 2 のオプション ID"
-                styleLabel={{ width: '100%' }}
+                labelClassName="ss-input-custom-label--full"
                 maxLength={250}
                 useFukushashiki={true}
                 onChange={changeMessageField('customId2')}
@@ -102,7 +102,7 @@ const TextTypeSetting = (props) => {
           ) : (
             <InputCustom
               placeholder="オプションIDを入力してください"
-              styleLabel={{ width: '100%' }}
+              labelClassName="ss-input-custom-label--full"
               maxLength={250}
               useFukushashiki={true}
               onChange={changeMessageField('customId')}

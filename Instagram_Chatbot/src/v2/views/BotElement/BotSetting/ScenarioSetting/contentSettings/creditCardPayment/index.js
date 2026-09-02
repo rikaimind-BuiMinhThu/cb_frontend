@@ -167,7 +167,7 @@ const CreditCardPaymentSetting = (props) => {
       return (
         <div className="ss-user-setting__item-bottom">
           <InputCustom
-            styleLabel={{ width: '90%' }}
+            labelClassName="ss-input-custom-label--wide"
             label={CREDIT_CARD_SETTING_LABELS.cardNumber}
             inline={false}
             placeholder={CREDIT_CARD_SETTING_LABELS.placeholder}
@@ -216,7 +216,7 @@ const CreditCardPaymentSetting = (props) => {
   const renderCardHolder = () => (
     <div className="ss-user-setting__item-bottom">
       <InputCustom
-        styleLabel={{ width: '90%' }}
+        labelClassName="ss-input-custom-label--wide"
         label={CREDIT_CARD_SETTING_LABELS.cardHolder}
         inline={false}
         placeholder={CREDIT_CARD_SETTING_LABELS.placeholder}
@@ -271,7 +271,7 @@ const CreditCardPaymentSetting = (props) => {
   const renderCvc = () => (
     <div className="ss-user-setting__item-bottom">
       <InputCustom
-        styleLabel={{ width: '90%' }}
+        labelClassName="ss-input-custom-label--wide"
         label={CREDIT_CARD_SETTING_LABELS.cvc}
         inline={false}
         placeholder={CREDIT_CARD_SETTING_LABELS.placeholder}
@@ -292,7 +292,7 @@ const CreditCardPaymentSetting = (props) => {
     return (
       <div className="ss-user-setting__item-bottom">
         <SelectCustom
-          styleLabel={{ width: '90%' }}
+          labelClassName="ss-input-custom-label--wide"
           label={CREDIT_CARD_SETTING_LABELS.installmentCount}
           inline={false}
           placeholder={CREDIT_CARD_SETTING_LABELS.placeholder}

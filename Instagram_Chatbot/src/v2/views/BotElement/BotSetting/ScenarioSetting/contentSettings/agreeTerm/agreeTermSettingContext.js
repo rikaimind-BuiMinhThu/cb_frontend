@@ -50,7 +50,7 @@ export const renderAgreeTermCheckbox = (ctx) => (
   <div className="ss-user-setting__item-bottom">
     <CheckboxCustom
       className="ss-user-setting__item-custom-input-checkbox"
-      styleSpan={{ width: '100%' }}
+      labelClassName="ss-checkbox-custom-label--full"
       disabled
       label={(
         <InputCustom
@@ -61,7 +61,6 @@ export const renderAgreeTermCheckbox = (ctx) => (
           onChange={ctx.changeContent('term')}
         />
       )}
-      onChange={(value) => console.log(value)}
       value={false}
     />
   </div>

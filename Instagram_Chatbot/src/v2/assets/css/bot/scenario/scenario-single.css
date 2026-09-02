@@ -1330,6 +1330,14 @@ input#ss-message__content--user-radio_button,
   border-top-left-radius: 5px;
 }
 
+.ss-user-setting-double-input--right-half input:nth-child(2) {
+  width: 50%;
+}
+
+.ss-user-setting-double-input--almost-full {
+  width: 95%;
+}
+
 .ss-user-setting-item {
   width: 90%;
 }

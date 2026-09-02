@@ -3,6 +3,7 @@ import { Button } from 'reactstrap';
 import SelectCustom from '../scenarioComon/SelectCustom';
 import ContentSettingShell from './shared/ContentSettingShell';
 import { dataTypeFile } from '../constants/scenarioFormConstants';
+import { PREVIEW_LABELS } from '../constants/scenarioSettingLabels';
 import '../styles/contentSettings/attachingFile.css';
 
 const AttachingFileSetting = ({
@@ -37,9 +38,9 @@ const AttachingFileSetting = ({
     <div className="ss-user-setting__item-bottom">
       <Button
         className="ss-user-setting__select-btn-add ss-attaching-file__select-btn"
-        onClick={() => console.log('Click select file')}
+        type="button"
       >
-        ファイルを選択
+        {PREVIEW_LABELS.selectFile}
       </Button>
     </div>
   );

@@ -1,23 +1,30 @@
-import React, { } from "react";
+import React from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
 import "moment/locale/zh-cn";
+import {
+  PROCESS_BAR_COMPLETE_TEXT,
+  formatProcessBarRemainingText,
+} from "./Constants";
+
+const PROCESS_BAR_EMPTY_INDEX = "0";
+const PROCESS_BAR_FULL_WIDTH = "100%";
 
 const ProcessBar = ({
   botInfor,
   currentIndex,
   maxIndex,
 }) => {
-  const current = parseInt(currentIndex || "0", 10);
-  const width = current >= maxIndex ? "100%" : `${(current / maxIndex) * 100}%`;
+  const current = parseInt(currentIndex || PROCESS_BAR_EMPTY_INDEX, 10);
+  const width = current >= maxIndex ? PROCESS_BAR_FULL_WIDTH : `${(current / maxIndex) * 100}%`;
   const backgroundColor = botInfor?.main_color || botInfor?.main_color_other;
 
   const getText = () => {
     if (currentIndex) {
-      if (maxIndex > currentIndex) return `あと${maxIndex - currentIndex}問`;
-      return "完了しました。";
+      if (maxIndex > currentIndex) return formatProcessBarRemainingText(maxIndex - currentIndex);
+      return PROCESS_BAR_COMPLETE_TEXT;
     }
-    return `あと${maxIndex}問`;
-  }
+    return formatProcessBarRemainingText(maxIndex);
+  };
 
   return (
     <div

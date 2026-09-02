@@ -41,7 +41,7 @@ const DatePickerCustom = ({
   className = '',
   disabled = false,
   style,
-  styleLabel,
+  labelClassName = '',
   getPopupContainer,
   locale: localeProp,
 }) => {
@@ -51,7 +51,7 @@ const DatePickerCustom = ({
 
   return (
     <>
-      {label && <div className="ss-input-custom-label" style={styleLabel}>{label}</div>}
+      {label && <div className={`ss-input-custom-label ${labelClassName}`.trim()}>{label}</div>}
       <DatePicker
         allowClear={allowClear}
         locale={mergedLocale}
@@ -80,7 +80,7 @@ DatePickerCustom.propTypes = {
   className: PropTypes.string,
   disabled: PropTypes.bool,
   style: PropTypes.object,
-  styleLabel: PropTypes.object,
+  labelClassName: PropTypes.string,
   getPopupContainer: PropTypes.func,
   locale: PropTypes.object,
 };

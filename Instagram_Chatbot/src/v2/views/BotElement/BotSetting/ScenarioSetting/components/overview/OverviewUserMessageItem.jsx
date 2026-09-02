@@ -5,6 +5,7 @@ import { Draggable } from 'react-beautiful-dnd';
 import UserContentPreviewList from './UserContentPreviewList';
 import OverviewMessageActions from './OverviewMessageActions';
 import OverviewAddStatementMenu from './OverviewAddStatementMenu';
+import { NEXT_BUTTON_LABEL } from '../../../PreviewComponent/Constants';
 
 // Ẩn nút khi content tự điều hướng (radio chưa chọn sẵn, carousel require, button_submit...)
 const shouldShowNextButton = (message) => {
@@ -23,7 +24,7 @@ const shouldShowNextButton = (message) => {
 const NextButton = ({ label }) => (
   <div className="ss-user-message__action-wrapper">
     <Button className="ss-user-message__action-btn">
-      {label || "次へ"}
+      {label || NEXT_BUTTON_LABEL}
     </Button>
   </div>
 );

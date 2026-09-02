@@ -979,7 +979,7 @@ const ScenarioPreviewFukushashiki = ({
       <div className={`sp-user-message-button-action${isDisplayBtnNext ? '' : ' sp-user-message-button-action--hidden'}`}>
         <CustomButton
           disabled={isEditorDisplayOnly || (state.submitErrorMessage?.length > 0 ? false : message.disabled)}
-          style={actionBtnBg ? { '--ss-action-btn-bg': actionBtnBg } : undefined}
+          cssVars={actionBtnBg ? { '--ss-action-btn-bg': actionBtnBg } : undefined}
           className={`ss-user-message__action-btn${hasBtnUpdateClass ? " btn-update" : ""}`}
           onClick={isEditorDisplayOnly ? undefined : () => {
             onClickNext(messageIndex, message);

@@ -54,7 +54,7 @@ const DefaultTypeSetting = (props) => {
                     </Tooltip>
                     <div className="ss-fukushashiki-row__value--75">
                       <InputCustom
-                        styleLabel={{ width: '100%' }}
+                        labelClassName="ss-input-custom-label--full"
                         maxLength={250}
                         useFukushashiki={true}
                         onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'initial_selection_fukushashiki_search_value', value)}
@@ -191,7 +191,6 @@ const DefaultTypeSetting = (props) => {
                                               const updatedInstallment = baseInstallment.includes(itemPaymentRadio.value)
                                                 ? baseInstallment.filter((id) => id !== itemPaymentRadio.value)
                                                 : [...baseInstallment, itemPaymentRadio.value];
-                                              console.log("Updated installment:", updatedInstallment);
                                               onChangeValueMessageContent(
                                                 indexMessageSelect,
                                                 indexContent,
@@ -253,7 +252,7 @@ const DefaultTypeSetting = (props) => {
                                     {cardPaymentRadioButton.separate_type === false ?
                                       <div className="ss-user-setting__item-bottom">
                                         <InputCustom
-                                          styleLabel={{ width: '90%' }}
+                                          labelClassName="ss-input-custom-label--wide"
                                           label="カード番号"
                                           inline={false}
                                           placeholder="プレースホルダ"
@@ -289,7 +288,7 @@ const DefaultTypeSetting = (props) => {
                                               ] || ''} placement="top">
                                                 <div className="ss-card-payment-radio-setting__fukushashiki-value-col">
                                                   <InputCustom
-                                                    styleLabel={{ width: '100%' }}
+                                                    labelClassName="ss-input-custom-label--full"
                                                     className="ss-input--full"
                                                     onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'card_number_fukushashiki_search_value', value)}
                                                     value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_number_fukushashiki_search_value']}
@@ -344,7 +343,7 @@ const DefaultTypeSetting = (props) => {
                                                 ] || ''} placement="top">
                                                   <div className="ss-card-payment-radio-setting__fukushashiki-value-col">
                                                     <InputCustom
-                                                      styleLabel={{ width: '100%' }}
+                                                      labelClassName="ss-input-custom-label--full"
                                                       className="ss-input--full"
                                                       onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'card_number1_fukushashiki_search_value', value)}
                                                       value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_number1_fukushashiki_search_value']}
@@ -395,7 +394,7 @@ const DefaultTypeSetting = (props) => {
                                                 ] || ''} placement="top">
                                                   <div className="ss-card-payment-radio-setting__fukushashiki-value-col">
                                                     <InputCustom
-                                                      styleLabel={{ width: '100%' }}
+                                                      labelClassName="ss-input-custom-label--full"
                                                       className="ss-input--full"
                                                       onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'card_number2_fukushashiki_search_value', value)}
                                                       value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_number2_fukushashiki_search_value']}
@@ -446,7 +445,7 @@ const DefaultTypeSetting = (props) => {
                                                 ] || ''} placement="top">
                                                   <div className="ss-card-payment-radio-setting__fukushashiki-value-col">
                                                     <InputCustom
-                                                      styleLabel={{ width: '100%' }}
+                                                      labelClassName="ss-input-custom-label--full"
                                                       className="ss-input--full"
                                                       onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'card_number3_fukushashiki_search_value', value)}
                                                       value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_number3_fukushashiki_search_value']}
@@ -497,7 +496,7 @@ const DefaultTypeSetting = (props) => {
                                                 ] || ''} placement="top">
                                                   <div className="ss-card-payment-radio-setting__fukushashiki-value-col">
                                                     <InputCustom
-                                                      styleLabel={{ width: '100%' }}
+                                                      labelClassName="ss-input-custom-label--full"
                                                       className="ss-input--full"
                                                       onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'card_number4_fukushashiki_search_value', value)}
                                                       value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_number4_fukushashiki_search_value']}
@@ -520,7 +519,7 @@ const DefaultTypeSetting = (props) => {
                                     {cardPaymentRadioButton.separate_name === false ?
                                       <div className="ss-user-setting__item-bottom">
                                         <InputCustom
-                                          styleLabel={{ width: '90%' }}
+                                          labelClassName="ss-input-custom-label--wide"
                                           label="カード名義"
                                           inline={false}
                                           placeholder="プレースホルダ"
@@ -556,7 +555,7 @@ const DefaultTypeSetting = (props) => {
                                               ] || ''} placement="top">
                                                 <div className="ss-card-payment-radio-setting__fukushashiki-value-col">
                                                   <InputCustom
-                                                    styleLabel={{ width: '100%' }}
+                                                    labelClassName="ss-input-custom-label--full"
                                                     className="ss-input--full"
                                                     onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'card_holder_fukushashiki_search_value', value)}
                                                     value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_holder_fukushashiki_search_value']}
@@ -624,7 +623,7 @@ const DefaultTypeSetting = (props) => {
                                               ] || ''} placement="top">
                                                 <div className="ss-card-payment-radio-setting__fukushashiki-value-col">
                                                   <InputCustom
-                                                    styleLabel={{ width: '100%' }}
+                                                    labelClassName="ss-input-custom-label--full"
                                                     className="ss-input--full"
                                                     onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'card_holder1_fukushashiki_search_value', value)}
                                                     value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_holder1_fukushashiki_search_value']}
@@ -669,7 +668,7 @@ const DefaultTypeSetting = (props) => {
                                               ] || ''} placement="top">
                                                 <div className="ss-card-payment-radio-setting__fukushashiki-value-col">
                                                   <InputCustom
-                                                    styleLabel={{ width: '100%' }}
+                                                    labelClassName="ss-input-custom-label--full"
                                                     className="ss-input--full"
                                                     onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'card_holder2_fukushashiki_search_value', value)}
                                                     value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_holder2_fukushashiki_search_value']}
@@ -690,7 +689,7 @@ const DefaultTypeSetting = (props) => {
                                     {Array.isArray(cardPaymentRadioButton.is_use_installment) && cardPaymentRadioButton.is_use_installment.includes(itemPaymentRadio.value) &&
                                       <div className="ss-user-setting__item-bottom">
                                         <SelectCustom
-                                          styleLabel={{ width: '90%' }}
+                                          labelClassName="ss-input-custom-label--wide"
                                           label="お支払い回数"
                                           inline={false}
                                           placeholder="プレースホルダ"
@@ -727,7 +726,7 @@ const DefaultTypeSetting = (props) => {
                                               ] || ''} placement="top">
                                                 <div className="ss-card-payment-radio-setting__fukushashiki-value-col">
                                                   <InputCustom
-                                                    styleLabel={{ width: '100%' }}
+                                                    labelClassName="ss-input-custom-label--full"
                                                     className="ss-input--full"
                                                     onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'installment_fukushashiki_search_value', value)}
                                                     value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['installment_fukushashiki_search_value']}
@@ -785,7 +784,7 @@ const DefaultTypeSetting = (props) => {
                                                 ] || ''} placement="top">
                                                   <div className="ss-card-payment-radio-setting__fukushashiki-value-col">
                                                     <InputCustom
-                                                      styleLabel={{ width: '100%' }}
+                                                      labelClassName="ss-input-custom-label--full"
                                                       className="ss-input--full"
                                                       onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'year_fukushashiki_search_value', value)}
                                                       value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['year_fukushashiki_search_value']}
@@ -840,7 +839,7 @@ const DefaultTypeSetting = (props) => {
                                                 ] || ''} placement="top">
                                                   <div className="ss-card-payment-radio-setting__fukushashiki-value-col">
                                                     <InputCustom
-                                                      styleLabel={{ width: '100%' }}
+                                                      labelClassName="ss-input-custom-label--full"
                                                       className="ss-input--full"
                                                       onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'month_fukushashiki_search_value', value)}
                                                       value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['month_fukushashiki_search_value']}
@@ -863,7 +862,7 @@ const DefaultTypeSetting = (props) => {
                                     <div className="ss-user-setting__item-bottom">
 
                                       <InputCustom
-                                        styleLabel={{ width: '90%' }}
+                                        labelClassName="ss-input-custom-label--wide"
                                         label="CVC非表示"
                                         inline={false}
                                         placeholder="プレースホルダ"
@@ -899,7 +898,7 @@ const DefaultTypeSetting = (props) => {
                                             ] || ''} placement="top">
                                               <div className="ss-card-payment-radio-setting__fukushashiki-value-col">
                                                 <InputCustom
-                                                  styleLabel={{ width: '100%' }}
+                                                  labelClassName="ss-input-custom-label--full"
                                                   className="ss-input--full"
                                                   onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'cvc_fukushashiki_search_value', value)}
                                                   value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['cvc_fukushashiki_search_value']}

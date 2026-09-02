@@ -198,6 +198,10 @@
   width: 15px;
 }
 
+.ss-radio-custom-label--full {
+  width: 100%;
+}
+
 .ss-help-icon {
   color: #347aed;
   margin-left: 5px;

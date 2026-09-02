@@ -5,6 +5,25 @@
   font-weight: 400;
 }
 
+.select-custom-label--full,
+.ss-input-custom-label--full {
+  width: 100%;
+  display: inline-block;
+}
+
+.select-custom-label--wide,
+.ss-input-custom-label--wide {
+  width: 90%;
+  display: inline-block;
+}
+
+.select-custom-label--spaced,
+.ss-input-custom-label--spaced {
+  width: 90%;
+  display: inline-block;
+  margin-top: 10px;
+}
+
 .select-custom-native {
   width: 90%;
   padding: 8px 12px;

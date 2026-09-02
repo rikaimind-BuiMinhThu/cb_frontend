@@ -282,6 +282,10 @@ export const CHAT_LOG_DATE_PICKER_FORMAT = 'YYYY/MM/DD';
 export const CHAT_LOG_DISPLAY_DATE_FORMAT = 'yyyy-MM-dd HH:mm';
 export const CHAT_LOG_PASSWORD_MASK = '********';
 export const EMPTY_STRING = '';
+export const CHAT_LOG_LOAD_ERROR = '会話ログの取得に失敗しました';
+export const CHAT_LOG_CAPTCHA_ERROR = 'キャプチャの取得に失敗しました';
+export const CHAT_LOG_LIST_PATH = '/api/v1/managements/chat_log';
+export const CHAT_LOG_STATISTIC_PATH = '/api/v1/managements/chat_log/statistic';
 
 export const formatChatLogConversationHeader = (count) =>
   `${CHAT_LOG_CONVERSATION_PREFIX}${count}${CHAT_LOG_CONVERSATION_SUFFIX}`;

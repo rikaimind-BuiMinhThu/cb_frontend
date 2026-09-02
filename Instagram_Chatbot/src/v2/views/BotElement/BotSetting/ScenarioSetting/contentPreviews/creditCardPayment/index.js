@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import InputCustom from '../../scenarioComon/InputCustom';
 import SelectCustom from '../../scenarioComon/SelectCustom';
-import { CREDIT_CARD_SETTING_LABELS } from '../../constants/scenarioSettingLabels';
+import { CREDIT_CARD_SETTING_LABELS, PREVIEW_LABELS } from '../../constants/scenarioSettingLabels';
 import '../../styles/contentPreviews/creditCardPayment.css';
 
 const CreditCardPaymentPreview = ({ content }) => {
@@ -16,7 +16,7 @@ const CreditCardPaymentPreview = ({ content }) => {
           <span className="ss-message__content--user-text-input-title">{creditCardPayment.title}</span>
         )}
         {creditCardPayment.require === true && (
-          <span className="ss-message__content--user-text-input-required">※必須</span>
+          <span className="ss-message__content--user-text-input-required">{PREVIEW_LABELS.requiredMark}</span>
         )}
       </div>
     );
@@ -28,7 +28,7 @@ const CreditCardPaymentPreview = ({ content }) => {
         <div className="ss-user-setting__item-bottom">
           <InputCustom
             className="ss-user-setting-input-overview"
-            styleLabel={{ width: '100%' }}
+            labelClassName="ss-input-custom-label--full"
             label={CREDIT_CARD_SETTING_LABELS.cardNumber}
             inline={false}
             disabled
@@ -57,7 +57,7 @@ const CreditCardPaymentPreview = ({ content }) => {
       <div className="ss-user-setting__item-bottom">
         <InputCustom
           className="ss-user-setting-input-overview"
-          styleLabel={{ width: '100%' }}
+          labelClassName="ss-input-custom-label--full"
           label={CREDIT_CARD_SETTING_LABELS.cardHolder}
           inline={false}
           disabled
@@ -93,7 +93,7 @@ const CreditCardPaymentPreview = ({ content }) => {
       <div className="ss-user-setting__item-bottom">
         <InputCustom
           className="ss-user-setting-input-overview"
-          styleLabel={{ width: '100%' }}
+          labelClassName="ss-input-custom-label--full"
           label={CREDIT_CARD_SETTING_LABELS.cvc}
           inline={false}
           disabled

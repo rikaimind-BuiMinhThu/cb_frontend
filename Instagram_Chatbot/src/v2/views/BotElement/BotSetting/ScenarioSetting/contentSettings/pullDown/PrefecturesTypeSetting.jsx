@@ -14,7 +14,7 @@ const PrefecturesTypeSetting = (props) => {
           disabled
           valueLeft={item.name}
           valueRight={index < 9 ? `0${index + 1}` : `${index + 1}`}
-          rightWidth={{ width: '50%' }}
+          rightWidth
         />
       ))}
     </div>

@@ -194,77 +194,35 @@ export const getColumnWidths = (layout) => {
   return EQUAL_WIDTHS[layout.type] || EQUAL_WIDTHS[RADIO_IMG_LAYOUT_HORIZONTAL_EQUAL_2];
 };
 
-export const getRadioImgGridStyle = (radioButton) => {
-  const layout = normalizeRadioButtonImgLayout(radioButton);
-  const style = {
-    '--radio-option-margin': layout.option_margin,
-    '--radio-option-padding': layout.option_padding,
-  };
-
+const buildImgGridColumns = (layout) => {
   if (isScrollLayout(layout.type)) {
-    return {
-      ...style,
-      '--scroll-visible-columns': getLayoutColumnCount(layout.type),
-      gridTemplateColumns: 'none',
-    };
+    return 'none';
   }
-
   if (layout.type === RADIO_IMG_LAYOUT_VERTICAL) {
-    return {
-      ...style,
-      gridTemplateColumns: '1fr',
-    };
+    return '1fr';
   }
-
-  const widths = getColumnWidths(layout);
-  return {
-    ...style,
-    gridTemplateColumns: widths.map((width) => `${parseFloat(width) || 1}fr`).join(' '),
-  };
+  return getColumnWidths(layout)
+    .map((width) => `${parseFloat(width) || 1}fr`)
+    .join(' ');
 };
 
-export const getRadioImgOptionStyle = (radioButton) => {
+export const getRadioImgGridStyle = (radioButton) => {
   const layout = normalizeRadioButtonImgLayout(radioButton);
   return {
-    padding: layout.option_padding,
-    boxSizing: 'border-box',
+    '--radio-option-margin': layout.option_margin,
+    '--radio-option-padding': layout.option_padding,
+    '--scroll-visible-columns': getLayoutColumnCount(layout.type),
+    '--preview-grid-columns': buildImgGridColumns(layout),
   };
 };
 
 export const getCheckboxImgGridStyle = (checkbox) => {
   const layout = normalizeCheckboxImgLayout(checkbox);
-  const style = {
+  return {
     '--checkbox-option-margin': layout.option_margin,
     '--checkbox-option-padding': layout.option_padding,
-  };
-
-  if (isScrollLayout(layout.type)) {
-    return {
-      ...style,
-      '--scroll-visible-columns': getLayoutColumnCount(layout.type),
-      gridTemplateColumns: 'none',
-    };
-  }
-
-  if (layout.type === RADIO_IMG_LAYOUT_VERTICAL) {
-    return {
-      ...style,
-      gridTemplateColumns: '1fr',
-    };
-  }
-
-  const widths = getColumnWidths(layout);
-  return {
-    ...style,
-    gridTemplateColumns: widths.map((width) => `${parseFloat(width) || 1}fr`).join(' '),
-  };
-};
-
-export const getCheckboxImgOptionStyle = (checkbox) => {
-  const layout = normalizeCheckboxImgLayout(checkbox);
-  return {
-    padding: layout.option_padding,
-    boxSizing: 'border-box',
+    '--scroll-visible-columns': getLayoutColumnCount(layout.type),
+    '--preview-grid-columns': buildImgGridColumns(layout),
   };
 };
 

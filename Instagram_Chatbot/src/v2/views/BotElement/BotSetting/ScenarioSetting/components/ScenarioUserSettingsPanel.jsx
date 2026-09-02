@@ -7,33 +7,12 @@ import InputCustom from '../scenarioComon/InputCustom';
 import { CONTENT_SETTING_MAP } from '../contentSettings';
 import { useScenarioPanelDestructuring } from '../hooks/useScenarioPanelDestructuring';
 import ScenarioMessageSettingsAccordion from './ScenarioMessageSettingsAccordion';
-
-const CONTENT_TYPE_OPTIONS = [
-  ['text_input', 'テキスト入力'],
-  ['image', '画像'],
-  ['label', 'ラベル'],
-  ['textarea', 'テキストエリア'],
-  ['radio_button', 'ラジオボタン'],
-  ['checkbox', 'チェックボックス'],
-  ['pull_down', 'プルダウン'],
-  ['zip_code_address', '郵便番号と住所'],
-  ['attaching_file', 'ファイル添付'],
-  ['calendar', 'カレンダー'],
-  ['agree_term', '規約同意'],
-  ['carousel', 'カルーセル'],
-  ['credit_card_payment', 'カード決済'],
-  ['capture', 'キャプチャ'],
-  ['product_purchase', '商品購入'],
-  ['product_purchase_radio_button', '商品購入（ラジオボタン型）'],
-  ['product_purchase_select_option', '商品購入（プルダウン）'],
-  ['sms_verify', 'SMS Verify'],
-  ['AFTEE_payment_module', 'AFTEE決済モジュール'],
-  ['slider', 'スライダー'],
-  ['card_payment_radio_button', 'ラジオボタン付きカード決済'],
-  ['shipping_address', '配送先住所'],
-  ['button_submit', '確認する'],
-  ['contact_form', 'お問い合わせフォーム'],
-];
+import { SETTING_LABELS, SETTING_PLACEHOLDERS, SETTING_BUTTON_LABELS } from '../constants/scenarioSettingLabels';
+import {
+  USER_CONTENT_TYPE_OPTIONS,
+  USER_CONTENT_TYPE_VARIABLE_SET,
+  USER_CONTENT_TYPE_LABEL_NO_TRANSITION,
+} from '../constants/scenarioPanelOptions';
 
 const AddContentSelect = ({ messageType, setMessageType, hasContent, onAdd }) => (
   <div className="ss-user-setting__select-wrapper">
@@ -44,17 +23,17 @@ const AddContentSelect = ({ messageType, setMessageType, hasContent, onAdd }) =>
       className="ss-input-value"
       value={messageType}
     >
-      {CONTENT_TYPE_OPTIONS.map(([value, label]) => (
+      {USER_CONTENT_TYPE_OPTIONS.map(([value, label]) => (
         <option key={value} value={value}>{label}</option>
       ))}
-      <option value="variable_set" className="ss-option--hidden">変数セット</option>
+      <option value={USER_CONTENT_TYPE_VARIABLE_SET[0]} className="ss-option--hidden">{USER_CONTENT_TYPE_VARIABLE_SET[1]}</option>
       <option
-        className={hasContent && messageType !== 'label_no_transition' ? 'ss-option--hidden' : ''}
-        value="label_no_transition">
-        ラベル（推移記録なし）
+        className={hasContent && messageType !== USER_CONTENT_TYPE_LABEL_NO_TRANSITION[0] ? 'ss-option--hidden' : ''}
+        value={USER_CONTENT_TYPE_LABEL_NO_TRANSITION[0]}>
+        {USER_CONTENT_TYPE_LABEL_NO_TRANSITION[1]}
       </option>
     </select>
-    <Button className="ss-user-setting__select-btn-add ss-user-setting__select-btn-add--padded" onClick={onAdd}>追加</Button>
+    <Button className="ss-user-setting__select-btn-add ss-user-setting__select-btn-add--padded" onClick={onAdd}>{SETTING_BUTTON_LABELS.add}</Button>
   </div>
 );
 
@@ -76,18 +55,18 @@ const ScenarioUserSettingsPanel = () => {
       <div className="ss-user-setting__top">
         <div className="ss-user-setting__name-wrapper">
           <div>
-            <span>名称</span>
-            <span className="ss-user-setting__name-error">※必須</span>
+            <span>{SETTING_LABELS.name}</span>
+            <span className="ss-user-setting__name-error">{SETTING_LABELS.requiredMark}</span>
           </div>
           <InputCustom
-            placeholder="名称を入力"
+            placeholder={SETTING_PLACEHOLDERS.messageName}
             className={selectedMessage.message_name ? '' : 'ss-input--invalid'}
             onChange={value => onChangeValueNameMessage(indexMessageSelect, 'message_name', value)}
             value={selectedMessage.message_name}
           />
           {!selectedMessage.message_name &&
             <div className="ss-field-required-error">
-              必ず指定してください。
+              {SETTING_LABELS.requiredFieldError}
             </div>
           }
         </div>

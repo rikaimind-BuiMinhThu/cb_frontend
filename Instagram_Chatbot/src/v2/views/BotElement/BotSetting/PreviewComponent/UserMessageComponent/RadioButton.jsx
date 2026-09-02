@@ -136,14 +136,9 @@ const RadioButton = ({ content, disabled, onChangeValue, errors, contentIndex, m
 
     return (
       <div
-        className={gridClassName}
-        style={{
-          '--radio-option-margin': gridStyle['--radio-option-margin'],
-          '--radio-option-padding': gridStyle['--radio-option-padding'],
-          '--scroll-visible-columns': gridStyle['--scroll-visible-columns'],
-          '--preview-grid-columns': gridStyle.gridTemplateColumns,
-        }}
-      >
+          className={gridClassName}
+          style={gridStyle}
+        >
         {items.map((item, index) => {
           const selectionKey = getRadioOptionSelectionKey(item);
           const inputId = `ss-message__content--user-radio_button_img_${messageIndex}_${contentIndex}_${selectionKey}_${index}`;

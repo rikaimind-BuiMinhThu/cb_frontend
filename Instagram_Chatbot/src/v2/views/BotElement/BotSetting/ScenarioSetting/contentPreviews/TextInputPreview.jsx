@@ -1,5 +1,6 @@
 import '../styles/base/preview-common.css';
 import React from 'react';
+import { PREVIEW_LABELS } from '../constants/scenarioSettingLabels';
 
 const TextInputPreview = ({
   textInput,
@@ -15,7 +16,7 @@ const TextInputPreview = ({
                                                                   }
                                                                   {textInput.require === true &&
                                                                     <span className="ss-message__content--user-text-input-required">
-                                                                      ※必須
+                                                                      {PREVIEW_LABELS.requiredMark}
                                                                     </span>
                                                                   }
                                                                 </div>

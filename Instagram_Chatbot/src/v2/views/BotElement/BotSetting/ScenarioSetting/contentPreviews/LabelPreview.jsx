@@ -1,5 +1,6 @@
 import React from 'react';
 import ContentPreviewShell from './shared/ContentPreviewShell';
+import { PREVIEW_LABELS } from '../constants/scenarioSettingLabels';
 import '../styles/contentPreviews/label.css';
 
 const LabelPreview = ({ label }) => {
@@ -9,7 +10,7 @@ const LabelPreview = ({ label }) => {
     if (label?.require !== true) return null;
     return (
       <span className="ss-message__content--user-required">
-        ※必須
+        {PREVIEW_LABELS.requiredMark}
       </span>
     );
   };

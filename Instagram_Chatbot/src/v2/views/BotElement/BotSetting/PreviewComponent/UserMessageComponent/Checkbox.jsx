@@ -128,12 +128,7 @@ const Checkbox = ({ content, disabled, onChangeValue, errors, contentIndex, mess
       >
         <div
           className={gridClassName}
-          style={{
-            '--checkbox-option-margin': gridStyle['--checkbox-option-margin'],
-            '--checkbox-option-padding': gridStyle['--checkbox-option-padding'],
-            '--scroll-visible-columns': gridStyle['--scroll-visible-columns'],
-            '--preview-grid-columns': gridStyle.gridTemplateColumns,
-          }}
+          style={gridStyle}
         >
           {group.contents?.map((contentItem, contentItemIndex) => {
             const compositeKey = getCheckboxImgSelectionKey(group, contentItem);

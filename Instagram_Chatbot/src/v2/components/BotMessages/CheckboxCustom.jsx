@@ -9,31 +9,28 @@ const CheckboxCustom = ({
   value = false,
   onChange,
   className,
-  styleSpan,
+  labelClassName = '',
   disabled = false,
-  style,
 }) => (
-  <>
-    <div
-      style={style}
-      className={`ss-user-setting__item-checkbox ${className || ''}`}
+  <div className={`ss-user-setting__item-checkbox ${className || ''}`}>
+    <Checkbox
+      disabled={disabled}
+      id={id}
+      className="ss-checkbox-label-color"
+      checked={value}
+      onChange={(event) => onChange(event.target.checked)}
+      name="ss-user-setting__item-text_input-save-variable"
     >
-      <Checkbox
-        disabled={disabled}
-        id={id}
-        className="ss-checkbox-label-color"
-        checked={value}
-        onChange={(event) => onChange(event.target.checked)}
-        name="ss-user-setting__item-text_input-save-variable"
-      >
-        {label && typeof label === 'string' ? (
-          <div style={styleSpan} dangerouslySetInnerHTML={{ __html: label }} />
-        ) : (
-          <div style={styleSpan}>{label}</div>
-        )}
-      </Checkbox>
-    </div>
-  </>
+      {label && typeof label === 'string' ? (
+        <div
+          className={labelClassName}
+          dangerouslySetInnerHTML={{ __html: label }}
+        />
+      ) : (
+        <div className={labelClassName}>{label}</div>
+      )}
+    </Checkbox>
+  </div>
 );
 
 CheckboxCustom.propTypes = {
@@ -42,9 +39,8 @@ CheckboxCustom.propTypes = {
   value: PropTypes.bool,
   onChange: PropTypes.func,
   className: PropTypes.string,
-  styleSpan: PropTypes.object,
+  labelClassName: PropTypes.string,
   disabled: PropTypes.bool,
-  style: PropTypes.object,
 };
 
 export default CheckboxCustom;

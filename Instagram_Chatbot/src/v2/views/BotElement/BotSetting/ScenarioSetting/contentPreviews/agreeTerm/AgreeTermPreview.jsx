@@ -32,7 +32,7 @@ const AgreeTermPreview = ({ content }) => {
         className="ss-input-value"
         readOnly
       />
-      <CheckboxCustom onChange={(value) => console.log(value)} label={agreeTerm.term} />
+      <CheckboxCustom label={agreeTerm.term} />
     </div>
   );
 
@@ -45,7 +45,7 @@ const AgreeTermPreview = ({ content }) => {
           <span className="ss-agree-term-preview__url-comment">{item.url_comment}</span>
         </div>
       ))}
-      <CheckboxCustom onChange={(value) => console.log(value)} label={agreeTerm.term} />
+      <CheckboxCustom label={agreeTerm.term} />
     </div>
   );
 

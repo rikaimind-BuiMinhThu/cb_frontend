@@ -87,13 +87,13 @@ const BotChatStatistic = ({
     <div className="chat-log-stats-panel">
       <ChatbotOverall overall={chatbotOverall} />
       <div className="chat-log-steps">
-        {msgs.map((message, indexMessage) => (
-          <Fragment key={indexMessage}>
-            {message.belong_to === 'bot' && (
+        {msgs.map((messageItem, indexMessage) => (
+          <Fragment key={messageItem.id ?? indexMessage}>
+            {messageItem.belong_to === 'bot' && (
               <div className="chat-log-bot-messages">
-                {message?.message_content.map((content, index) => (
+                {messageItem?.message_content.map((content, index) => (
                   <BotMessage
-                    key={index}
+                    key={content.id ?? index}
                     content={content}
                     index={index}
                     botInfor={botInfor}
@@ -101,21 +101,19 @@ const BotChatStatistic = ({
                 ))}
               </div>
             )}
-            {message.belong_to === 'user' && (
+            {messageItem.belong_to === 'user' && (
               <div className="chat-log-step-card">
-                <MessageStatisticDetail stats={message.stats} />
+                <MessageStatisticDetail stats={messageItem.stats} />
                 <div className="chat-log-step-preview">
                   <div className="sp-body-user-side-messages csp-body-user-side-messages">
                     <UserMessage
                       captcha={[]}
-                      messageContentProps={message.message_content}
-                      disabled={message.disabled}
+                      messageContentProps={messageItem.message_content}
+                      disabled={messageItem.disabled}
                       onChangeValue={() => {}}
                       indexMessageRender={indexMessage}
                       indexMessage={indexMessage}
-                      displayButtonNext={(value) => {
-                        dataMessages[indexMessage].is_display_button_next = value;
-                      }}
+                      displayButtonNext={() => {}}
                       dataPrefectures={[]}
                       variables={[]}
                     />
@@ -129,7 +127,7 @@ const BotChatStatistic = ({
                           className="chat-log-action-btn"
                           style={actionButtonStyle}
                         >
-                          {message.buttonName || CHAT_LOG_NEXT_BUTTON}
+                          {messageItem.buttonName || CHAT_LOG_NEXT_BUTTON}
                         </button>
                       </div>
                     )}

@@ -1,4 +1,5 @@
 export const TEMPLATE_CREATE_SUCCESS = '正常に追加されました！';
+export const TEMPLATE_REQUEST_FAILED = '処理に失敗しました。もう一度お試しください。';
 export const TEMPLATE_DELETE_SUCCESS = '正常に削除されました！';
 export const TEMPLATE_CREATE_TITLE = 'テンプレート作成';
 export const TEMPLATE_NAME_LABEL = 'テンプレート名';

@@ -13,23 +13,8 @@ import { useScenarioPanelDestructuring } from '../hooks/useScenarioPanelDestruct
 import ScenarioMessageSettingsAccordion from './ScenarioMessageSettingsAccordion';
 import OrderConfirmConfig from '../scenarioComon/OrderConfirmConfig';
 import CartLoginConfig from '../scenarioComon/CartLoginConfig';
-
-const STATEMENT_TYPE_OPTIONS = [
-  ['text_input', 'テキスト'],
-  ['getting_error_notification', 'エラー取得の通知'],
-  ['file', 'ファイル'],
-  ['email', 'メール'],
-  ['api_linkage', 'API連携'],
-  ['script', 'スクリプト'],
-  ['delay', '遅延'],
-  ['clear_variable', '変数クリア'],
-  ['variable_set', '変数セット'],
-  ['pause', '一時停止'],
-  ['html_code', 'HTMLコード'],
-  ['amazon_pay_button', 'Amazon Payボタン'],
-  [BOT_MESSAGE_TYPES.ORDER_CONFIRM, '注文確認'],
-  [BOT_MESSAGE_TYPES.CART_LOGIN, 'カートログイン'],
-];
+import { SETTING_LABELS, SETTING_PLACEHOLDERS } from '../constants/scenarioSettingLabels';
+import { BOT_STATEMENT_TYPE_OPTIONS } from '../constants/scenarioPanelOptions';
 
 const removeVariableAt = (message, messageType, index) => {
   const variables = message.message_content[0][messageType].variables;
@@ -384,17 +369,17 @@ const ScenarioBotSettingsPanel = () => {
           <div className="ss-user-setting__top">
             <div className="ss-user-setting__name-wrapper ss-name-wrapper--spaced">
               <div>
-                <span>名称</span>
-                <span className="ss-user-setting__name-error ss-name-error--flush">※必須</span>
+                <span>{SETTING_LABELS.name}</span>
+                <span className="ss-user-setting__name-error ss-name-error--flush">{SETTING_LABELS.requiredMark}</span>
               </div>
               <InputCustom
-                placeholder="名称"
+                placeholder={SETTING_PLACEHOLDERS.messageNameShort}
                 onChange={value => onChangeValueNameMessage(indexMessageSelect, 'message_name', value)}
                 value={selectedMessage.message_name}
               />
             </div>
           </div>
-          <label htmlFor="ss-bot-statement-title" className="ss-bot-statement-type-label">タイプ</label>
+          <label htmlFor="ss-bot-statement-type" className="ss-bot-statement-type-label">{SETTING_LABELS.type}</label>
           <select
             name="bot_statement_type"
             id="ss-bot-statement-type"
@@ -402,7 +387,7 @@ const ScenarioBotSettingsPanel = () => {
             value={messageType}
             onChange={e => handleChangeBotStatementType(e.target.value)}
           >
-            {STATEMENT_TYPE_OPTIONS.map(([value, label]) => (
+            {BOT_STATEMENT_TYPE_OPTIONS.map(([value, label]) => (
               <option key={value} value={value}>{label}</option>
             ))}
           </select>

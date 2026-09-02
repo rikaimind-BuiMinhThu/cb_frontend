@@ -56,7 +56,7 @@ const DefaultTypeSetting = (props) => {
                                 </Tooltip>
                                 <div className="ss-fukushashiki-row__value--75">
                                     <InputCustom
-                                        styleLabel={{ width: '100%' }}
+                                        labelClassName="ss-input-custom-label--full"
                                         maxLength={250}
                                         useFukushashiki={true}
                                         onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'initial_selection_fukushashiki_search_value', value)}
@@ -223,7 +223,7 @@ const DefaultTypeSetting = (props) => {
                                                               </Tooltip>
                                                               <div className="ss-fukushashiki-row__value--70">
                                                                 <InputCustom
-                                                                  styleLabel={{ width: '100%' }}
+                                                                  labelClassName="ss-input-custom-label--full"
                                                                   maxLength={250}
                                                                   useFukushashiki={true}
                                                                   onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'name_left_fukushashiki_search_value', value)}
@@ -264,7 +264,7 @@ const DefaultTypeSetting = (props) => {
                                                               </Tooltip>
                                                               <div className="ss-fukushashiki-row__value--70">
                                                                 <InputCustom
-                                                                  styleLabel={{ width: '100%' }}
+                                                                  labelClassName="ss-input-custom-label--full"
                                                                   maxLength={250}
                                                                   useFukushashiki={true}
                                                                   onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'name_right_fukushashiki_search_value', value)}
@@ -341,7 +341,7 @@ const DefaultTypeSetting = (props) => {
                                                               </Tooltip>
                                                               <div className="ss-fukushashiki-row__value--70">
                                                                 <InputCustom
-                                                                  styleLabel={{ width: '100%' }}
+                                                                  labelClassName="ss-input-custom-label--full"
                                                                   maxLength={250}
                                                                   useFukushashiki={true}
                                                                   onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'kana_left_fukushashiki_search_value', value)}
@@ -382,7 +382,7 @@ const DefaultTypeSetting = (props) => {
                                                               </Tooltip>
                                                               <div className="ss-fukushashiki-row__value--70">
                                                                 <InputCustom
-                                                                  styleLabel={{ width: '100%' }}
+                                                                  labelClassName="ss-input-custom-label--full"
                                                                   maxLength={250}
                                                                   useFukushashiki={true}
                                                                   onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'kana_right_fukushashiki_search_value', value)}
@@ -467,7 +467,7 @@ const DefaultTypeSetting = (props) => {
                                                                     </Tooltip>
                                                                     <div className="ss-fukushashiki-row__value--70">
                                                                       <InputCustom
-                                                                        styleLabel={{ width: '100%' }}
+                                                                        labelClassName="ss-input-custom-label--full"
                                                                         maxLength={250}
                                                                         useFukushashiki={true}
                                                                         onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number1_fukushashiki_search_value', value)}
@@ -508,7 +508,7 @@ const DefaultTypeSetting = (props) => {
                                                                     </Tooltip>
                                                                     <div className="ss-fukushashiki-row__value--70">
                                                                       <InputCustom
-                                                                        styleLabel={{ width: '100%' }}
+                                                                        labelClassName="ss-input-custom-label--full"
                                                                         maxLength={250}
                                                                         useFukushashiki={true}
                                                                         onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number2_fukushashiki_search_value', value)}
@@ -549,7 +549,7 @@ const DefaultTypeSetting = (props) => {
                                                                     </Tooltip>
                                                                     <div className="ss-fukushashiki-row__value--70">
                                                                       <InputCustom
-                                                                        styleLabel={{ width: '100%' }}
+                                                                        labelClassName="ss-input-custom-label--full"
                                                                         maxLength={250}
                                                                         useFukushashiki={true}
                                                                         onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number3_fukushashiki_search_value', value)}
@@ -616,7 +616,7 @@ const DefaultTypeSetting = (props) => {
                                                                 </Tooltip>
                                                                 <div className="ss-fukushashiki-row__value--70">
                                                                   <InputCustom
-                                                                    styleLabel={{ width: '100%' }}
+                                                                    labelClassName="ss-input-custom-label--full"
                                                                     maxLength={250}
                                                                     useFukushashiki={true}
                                                                     onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number_fukushashiki_search_value', value)}

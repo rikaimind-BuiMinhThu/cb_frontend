@@ -70,8 +70,10 @@ const CustomizationTypeSetting = (props) => {
           <div className="ss-pull-down-setting__customization-drag-item">
             <MDBIcon fas icon="grip-horizontal" />
             <InputDouble
-              style={array.length === 1 && !isComment ? { width: '95%' } : undefined}
-              classCustom={isComment ? 'ss-user-setting-custom-double-input-custom' : ''}
+              classCustom={[
+                isComment ? 'ss-user-setting-custom-double-input-custom' : '',
+                array.length === 1 && !isComment ? 'ss-user-setting-double-input--almost-full' : '',
+              ].filter(Boolean).join(' ')}
               onChange={(value, name) => onChangeValueMessageContent(
                 indexMessageSelect,
                 indexContent,

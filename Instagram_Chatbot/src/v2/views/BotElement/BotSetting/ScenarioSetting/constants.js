@@ -1,4 +1,5 @@
 export const SCENARIO_CREATE_SUCCESS = '正常に追加されました！';
+export const SCENARIO_REQUEST_FAILED = '処理に失敗しました。もう一度お試しください。';
 export const SCENARIO_DUPLICATE_SUCCESS = '正常に複製されました！';
 export const SCENARIO_DELETE_SUCCESS = '正常に削除されました！';
 export const SCENARIO_SAVE_SUCCESS = '正常に保存されました！';

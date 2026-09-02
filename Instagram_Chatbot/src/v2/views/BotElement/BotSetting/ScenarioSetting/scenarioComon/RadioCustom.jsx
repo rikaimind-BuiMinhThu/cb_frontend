@@ -6,26 +6,24 @@ const RadioCustom = ({
   value = false,
   onChange,
   className,
-  styleSpan,
+  labelClassName = '',
   disabled = false,
 }) => (
-  <React.Fragment>
-    <div
-      onClick={() => { onChange(!value); }}
-      className={`ss-user-setting__item-text_input-save-variable-wrapper ${className ? className : ''}`}
-    >
-      <input
-        disabled={disabled}
-        id={id}
-        className="ss-radio-custom__input"
-        checked={value}
-        onChange={(e) => onChange(e.target.checked)}
-        type="radio"
-        name="ss-user-setting__item-text_input-save-variable"
-      />
-      {label && <span style={styleSpan}>{label}</span>}
-    </div>
-  </React.Fragment>
+  <div
+    onClick={() => { onChange(!value); }}
+    className={`ss-user-setting__item-text_input-save-variable-wrapper ${className || ''}`}
+  >
+    <input
+      disabled={disabled}
+      id={id}
+      className="ss-radio-custom__input"
+      checked={value}
+      onChange={(e) => onChange(e.target.checked)}
+      type="radio"
+      name="ss-user-setting__item-text_input-save-variable"
+    />
+    {label && <span className={labelClassName}>{label}</span>}
+  </div>
 );
 
 export default RadioCustom;

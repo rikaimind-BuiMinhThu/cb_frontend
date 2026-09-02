@@ -1,6 +1,7 @@
 import '../../styles/base/preview-common.css';
 import React from 'react';
 import SelectCustom from '../../scenarioComon/SelectCustom';
+import { PREVIEW_LABELS } from '../../constants/scenarioSettingLabels';
 
 const ProductPurchaseSelectOptionPreview = ({
   content,
@@ -22,7 +23,7 @@ const ProductPurchaseSelectOptionPreview = ({
                       }
                       {productPurchaseSelectOption.require === true &&
                           <span className="ss-message__content--user-text-input-required">
-                    ※必須
+                    {PREVIEW_LABELS.requiredMark}
                   </span>
                       }
                     </div>

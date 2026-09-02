@@ -35,4 +35,18 @@
   color: black;
   font-size: 15px;
   line-height: 1.5715;
+  position: absolute;
+  top: 50%;
+  display: block;
+  transform: translateY(-50%);
+  z-index: 1;
+  cursor: pointer;
+}
+
+.ss-carousel-arrow.slick-prev {
+  left: 0;
+}
+
+.ss-carousel-arrow.slick-next {
+  right: 0;
 }

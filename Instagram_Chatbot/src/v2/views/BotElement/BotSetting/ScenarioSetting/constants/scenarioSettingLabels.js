@@ -12,6 +12,7 @@ export const SETTING_LABELS = {
   add: '追加',
   fileReference: 'ファイル参照',
   require: '必須',
+  requiredMark: '※必須',
   saveToVariable: '入力された内容を変数に保存する。',
   autoConvertText: '文字を自動変換する',
   customId: 'IDのカスタマイズ',
@@ -35,6 +36,9 @@ export const SETTING_LABELS = {
   clearEmptyOption: '空なオプション解除',
   jscode: 'JSコード',
   selectPlease: '選択してください。',
+  name: '名称',
+  requiredFieldError: '必ず指定してください。',
+  contentGap: 'コンテンツ間の余白 (px)',
 };
 
 export const SETTING_PLACEHOLDERS = {
@@ -60,6 +64,9 @@ export const SETTING_PLACEHOLDERS = {
   buttonName: 'ボタン名称',
   htmlDescription: 'ここにHTMLを入力してください',
   textarea: 'テキスト',
+  value: '値',
+  messageName: '名称を入力',
+  messageNameShort: '名称',
 };
 
 export const SETTING_BUTTON_LABELS = {
@@ -294,6 +301,9 @@ export const AGREE_TERM_LABELS = {
 export const PREVIEW_LABELS = {
   requiredMark: '※必須',
   placeholderLabel: 'ラベル',
+  emptyMessages: 'メッセージがありません',
+  unselected: '未選択',
+  selectFile: 'ファイルを選択',
 };
 
 export const TEXT_INPUT_LABELS = {

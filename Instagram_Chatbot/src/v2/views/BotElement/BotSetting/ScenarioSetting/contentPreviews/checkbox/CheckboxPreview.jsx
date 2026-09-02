@@ -4,7 +4,6 @@ import { CHECKBOX_TYPES } from '../../constants/contentTypeConstants';
 import { PREVIEW_LABELS } from '../../constants/scenarioSettingLabels';
 import {
   getCheckboxImgGridStyle,
-  getCheckboxImgOptionStyle,
   getImgGridClassName,
   normalizeCheckboxImgLayout,
 } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/radioButtonImgLayoutUtils';
@@ -83,7 +82,6 @@ const CheckboxPreview = ({
   const renderCheckboxImgType = () => {
     const layout = normalizeCheckboxImgLayout(checkbox);
     const gridStyle = getCheckboxImgGridStyle(checkbox);
-    const optionStyle = getCheckboxImgOptionStyle(checkbox);
     const gridClassName = getImgGridClassName(
       'ss-message__content--user-checkbox-img-grid',
       layout.type,
@@ -112,7 +110,6 @@ const CheckboxPreview = ({
                   isChecked ? 'ss-message__content--user-checkbox--selected' : '',
                   getEditorHighlightClassName(compositeKey),
                 ].filter(Boolean).join(' ')}
-                style={optionStyle}
               >
                 <input
                   type="checkbox"

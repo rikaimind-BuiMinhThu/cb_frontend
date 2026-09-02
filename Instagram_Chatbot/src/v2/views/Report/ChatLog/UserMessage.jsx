@@ -234,20 +234,25 @@ const UserMessage = ({
   return (
     <div className="ss-user-message__content-wrapper">
       {messageContent?.map((content, indexContent) => {
-        if (
+        const nextContent = (
           content.type === CONTENT_TYPE.TEXTAREA
-          && content.textarea
-          && content.textarea.invalid_input
-          && content.textarea.invalid_input.content
-        ) {
-          content.textarea.invalid_input.content = replaceVariable(
-            content.textarea.invalid_input.content,
-            variables,
-          );
-        }
+          && content.textarea?.invalid_input?.content
+        ) ? {
+          ...content,
+          textarea: {
+            ...content.textarea,
+            invalid_input: {
+              ...content.textarea.invalid_input,
+              content: replaceVariable(
+                content.textarea.invalid_input.content,
+                variables,
+              ),
+            },
+          },
+        } : content;
         return (
-          <React.Fragment key={indexContent}>
-            {renderContent(content, indexContent)}
+          <React.Fragment key={nextContent.id ?? indexContent}>
+            {renderContent(nextContent, indexContent)}
           </React.Fragment>
         );
       })}

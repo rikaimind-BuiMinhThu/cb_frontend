@@ -2,6 +2,7 @@ import '../../styles/contentPreviews/productPurchase.css';
 import '../../styles/base/preview-common.css';
 import React from 'react';
 import { Radio, Checkbox } from 'antd';
+import { PREVIEW_LABELS } from '../../constants/scenarioSettingLabels';
 
 const ProductPurchasePreview = ({
   content,
@@ -23,7 +24,7 @@ const ProductPurchasePreview = ({
                 }
                 {productPurchase.require === true &&
                   <span className="ss-message__content--user-text-input-required">
-                    ※必須
+                    {PREVIEW_LABELS.requiredMark}
                   </span>
                 }
               </div>
@@ -34,8 +35,6 @@ const ProductPurchasePreview = ({
                   <React.Fragment>
                     <Checkbox.Group
                       className="ss-user-overview-product-purchase-checkbox-group ss-user-overview-product-purchase-style-width ss-content-preview__group--full"
-
-                      onChange={(value) => console.log(value)}
                       value={productPurchase.initial_selection}
                     >
                       {productPurchase.products.map((itemProduct, indexProduct) => {
@@ -83,7 +82,6 @@ const ProductPurchasePreview = ({
                     <Radio.Group
                       className="ss-user-overview-product-purchase-radio-group ss-user-overview-product-purchase-style-width ss-content-preview__group--full"
 
-                      onChange={(value) => console.log(value)}
                       value={productPurchase.initial_selection[0]}
                     >
                       {productPurchase.products.map((itemProduct, indexProduct) => {
@@ -134,7 +132,6 @@ const ProductPurchasePreview = ({
                     <Checkbox.Group
                       className="ss-user-overview-product-purchase-checkbox-group-type-text_image ss-user-overview-product-purchase-style-width ss-content-preview__group--full"
 
-                      onChange={(value) => console.log(value)}
                       value={productPurchase.initial_selection}
                     >
                       {productPurchase.products.map((itemProduct, indexProduct) => {
@@ -164,7 +161,6 @@ const ProductPurchasePreview = ({
                     <Radio.Group
                       className="ss-user-overview-product-purchase-radio-group-type-text_image ss-user-overview-product-purchase-style-width ss-content-preview__group--full"
 
-                      onChange={(value) => console.log(value)}
                       value={productPurchase.initial_selection[0]}
                     >
                       {productPurchase.products.map((itemProduct, indexProduct) => {
@@ -204,3 +200,4 @@ const ProductPurchasePreview = ({
 };
 
 export default ProductPurchasePreview;
+

@@ -174,7 +174,7 @@ const ButtonSubmitSetting = ({
       </div>
       <InputCustom
         className="ss-user-setting-input-overview ss-button-submit-setting__field-input"
-        styleLabel={{ width: '90%', marginTop: '10px' }}
+        labelClassName="ss-input-custom-label--spaced"
         label={BUTTON_SUBMIT_LABELS.buttonImageWidth}
         inline={false}
         placeholder="80%"
@@ -188,7 +188,7 @@ const ButtonSubmitSetting = ({
     <div className="ss-user-setting__item-text_input-top ss-button-submit-setting__fields">
       <InputCustom
         className="ss-user-setting-input-overview ss-button-submit-setting__field-input"
-        styleLabel={{ width: '90%' }}
+        labelClassName="ss-input-custom-label--wide"
         label={BUTTON_SUBMIT_LABELS.buttonId}
         inline={false}
         placeholder={SETTING_PLACEHOLDERS.buttonId}
@@ -197,7 +197,7 @@ const ButtonSubmitSetting = ({
       />
       <InputCustom
         className="ss-user-setting-input-overview ss-button-submit-setting__field-input"
-        styleLabel={{ width: '90%', marginTop: '10px' }}
+        labelClassName="ss-input-custom-label--spaced"
         label={BUTTON_SUBMIT_LABELS.buttonName}
         inline={false}
         placeholder={SETTING_PLACEHOLDERS.buttonName}

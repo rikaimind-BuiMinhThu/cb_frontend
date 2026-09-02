@@ -4,7 +4,7 @@ import { Draggable } from 'react-beautiful-dnd';
 import OverviewMessageActions from './OverviewMessageActions';
 import OverviewAddStatementMenu from './OverviewAddStatementMenu';
 import CombineOverviewBlockPreview from './CombineOverviewBlockPreview';
-import { COMBINE_MESSAGE_DEFAULTS } from '../../../PreviewComponent/Constants';
+import { COMBINE_MESSAGE_DEFAULTS, NEXT_BUTTON_LABEL } from '../../../PreviewComponent/Constants';
 
 const shouldShowNextButton = (message) => {
   const contents = message?.message_content ?? [];
@@ -16,7 +16,7 @@ const shouldShowNextButton = (message) => {
 
 const NextButton = ({ label }) => (
   <div className="ss-user-message__action-wrapper">
-    <Button className="ss-user-message__action-btn">{label || '次へ'}</Button>
+    <Button className="ss-user-message__action-btn">{label || NEXT_BUTTON_LABEL}</Button>
   </div>
 );
 

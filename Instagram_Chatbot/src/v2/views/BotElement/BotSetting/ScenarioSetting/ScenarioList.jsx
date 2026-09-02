@@ -9,6 +9,7 @@ import { BOT_ID_COOKIE_KEY, SCENARIO_ID_COOKIE_KEY } from 'v2/api/constants';
 import { AdminPage, AdminTable, AdminConfirmModal, AdminActionButton, AdminFormRow, useAdminHeaderActions } from 'v2/components/AdminShell';
 import {
   SCENARIO_CREATE_SUCCESS,
+  SCENARIO_REQUEST_FAILED,
   SCENARIO_DUPLICATE_SUCCESS,
   SCENARIO_DELETE_SUCCESS,
   SCENARIO_SAVE_SUCCESS,
@@ -127,7 +128,7 @@ const ScenarioList = () => {
         }
         getListScenario(page);
       })
-      .catch((err) => console.log(err))
+      .catch(() => message.error(SCENARIO_REQUEST_FAILED))
       .finally(() => setCreating(false));
   };
 

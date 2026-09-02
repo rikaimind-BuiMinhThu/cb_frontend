@@ -7,9 +7,9 @@ export const UGC_HOSTS = {
 /** @deprecated use getUgcHost(env) — kept as staging alias for compatibility */
 export const UGC_HOST = UGC_HOSTS.staging;
 
-export function getUgcHost(env = 'staging') {
-  return UGC_HOSTS[env] || UGC_HOSTS.staging;
-}
+export const getUgcHost = (env = 'staging') => (
+  UGC_HOSTS[env] || UGC_HOSTS.staging
+);
 
 const buildSharedAssets = (ugcHost) => [
   `<script src="${ugcHost}/ugc/js/chatbot_ugc_modal_bridge.js"></script>`,
@@ -34,12 +34,12 @@ const buildReviewSnippet = (ugcHost) => [
  * Build HTML_UGC_CONFIG content from selected UGC types and host env.
  * Hidden inputs + take.js first; bridge last so it can read #ugc-*-slider-info.
  */
-export function buildHtmlUgcConfigContent({
+export const buildHtmlUgcConfigContent = ({
   isUgcInstagram,
   isUgcTiktok,
   isUgcReview,
   ugcEnv = 'staging',
-}) {
+}) => {
   const ugcHost = getUgcHost(ugcEnv);
   const parts = [];
 

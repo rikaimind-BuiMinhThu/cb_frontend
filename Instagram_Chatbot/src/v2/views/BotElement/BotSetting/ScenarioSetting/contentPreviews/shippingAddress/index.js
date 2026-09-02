@@ -3,6 +3,7 @@ import '../../styles/base/preview-common.css';
 import React from 'react';
 import { Radio } from 'antd';
 import InputCustom from '../../scenarioComon/InputCustom';
+import { PREVIEW_LABELS } from '../../constants/scenarioSettingLabels';
 
 const ShippingAddressPreview = ({
   content,
@@ -24,7 +25,7 @@ const ShippingAddressPreview = ({
                 }
                 {shippingAddress.require === true &&
                   <span className="ss-message__content--user-text-input-required">
-                    ※必須
+                    {PREVIEW_LABELS.requiredMark}
                   </span>
                 }
               </div>
@@ -32,7 +33,6 @@ const ShippingAddressPreview = ({
             {
               <Radio.Group
                 className="ss-content-preview__radio-group"
-                onChange={(value) => console.log(value)}
                 value={shippingAddress.value_initial_selection}
               >
                 {shippingAddress.radio_contents && shippingAddress.radio_contents.map((itemPayment, indexPayment) => {
@@ -97,7 +97,7 @@ const ShippingAddressPreview = ({
                   {(shippingAddress.isCheckRequire === 'all_items_require' ||
                     shippingAddress.isCheckRequire === 'require') &&
                     <span className="ss-message__content--user-text-input-required">
-                      ※必須
+                      {PREVIEW_LABELS.requiredMark}
                     </span>
                   }
                 </div>

@@ -495,8 +495,7 @@ const ScenarioPreviewFaq = ({
       .then(() => {
         advanceAfterClickNext(clickedMsgIndex, clickedMsg, data);
       })
-      .catch((error) => {
-        console.log(error);
+      .catch(() => {
         dispatch({
           type: PREVIEW_ACTIONS.SET_SUBMIT_ERROR_MESSAGE,
           payload: "お問い合わせの送信に失敗しました。もう一度お試しください。"
@@ -609,7 +608,7 @@ const ScenarioPreviewFaq = ({
       <div className={`sp-user-message-button-action${isDisplayBtnNext ? '' : ' sp-user-message-button-action--hidden'}`}>
         <CustomButton
           disabled={editorPreview}
-          style={actionBtnBg ? { '--ss-action-btn-bg': actionBtnBg } : undefined}
+          cssVars={actionBtnBg ? { '--ss-action-btn-bg': actionBtnBg } : undefined}
           className="ss-user-message__action-btn"
           onClick={editorPreview ? undefined : () => {
             onClickNext(messageIndex, message);

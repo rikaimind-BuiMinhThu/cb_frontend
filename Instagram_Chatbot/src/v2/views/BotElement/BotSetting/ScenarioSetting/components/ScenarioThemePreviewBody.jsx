@@ -3,6 +3,11 @@ import PropTypes from 'prop-types';
 import { Button } from 'reactstrap';
 import 'v2/assets/css/bot/preview-chat-bot.css';
 import { getElementMessageById } from 'v2/views/BotElement/BotSetting/PreviewComponent/Utils';
+import {
+  COMBINE_MESSAGE_DEFAULTS,
+  NEXT_BUTTON_LABEL,
+} from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants';
+import { PREVIEW_LABELS } from 'v2/views/BotElement/BotSetting/ScenarioSetting/constants/scenarioSettingLabels';
 import { useScenarioEditor } from '../context/ScenarioEditorContext';
 import { getBotFileExtension } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/getBotMessageTitle';
 import UserContentPreviewList from './overview/UserContentPreviewList';
@@ -25,7 +30,7 @@ const shouldShowNextButton = (message) => {
 const NextButton = ({ label }) => (
   <div className="ss-user-message__action-wrapper">
     <Button className="ss-user-message__action-btn" disabled>
-      {label || '次へ'}
+      {label || NEXT_BUTTON_LABEL}
     </Button>
   </div>
 );
@@ -51,7 +56,7 @@ const ScenarioThemePreviewBody = () => {
         <div className="sp-body-bot-side-messages">
           <div className="ss-bot-message">
             <div className="ss-bot-message__content-wrapper theme-customize-preview__bot-bubble">
-              メッセージがありません
+              {PREVIEW_LABELS.emptyMessages}
             </div>
           </div>
         </div>
@@ -86,7 +91,7 @@ const ScenarioThemePreviewBody = () => {
         }
 
         if (message.belong_to === 'combine') {
-          const contentGap = message.combine_message?.content_gap ?? 10;
+          const contentGap = message.combine_message?.content_gap ?? COMBINE_MESSAGE_DEFAULTS.CONTENT_GAP;
 
           return (
             <div
@@ -97,7 +102,8 @@ const ScenarioThemePreviewBody = () => {
               {message.message_content.map((content, indexContent) => (
                 <div
                   key={content.id ?? indexContent}
-                  style={indexContent > 0 ? { marginTop: `${contentGap}px` } : undefined}
+                  className={indexContent > 0 ? 'ss-combine-overview-block--gapped' : undefined}
+                  style={indexContent > 0 ? { '--ss-combine-gap': `${contentGap}px` } : undefined}
                 >
                   <CombineOverviewBlockPreview
                     content={content}
