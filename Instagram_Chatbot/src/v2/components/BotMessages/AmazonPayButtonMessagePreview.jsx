@@ -3,6 +3,17 @@ import PropTypes from 'prop-types';
 import { CHATBOT_ACTIONS } from 'v2/variables/chatbotActions';
 import { DEFAULT_AMAZON_PAY_BUTTON_IMAGE_URL } from 'v2/variables/amazonPayConstants';
 import { buildAmazonPayButtonClickActionData } from 'v2/utils/amazonPayButtonUtils';
+import 'v2/assets/css/bot/preview-chat-bot.css';
+
+const AMAZON_PAY_LABEL = 'Amazon Pay';
+const DEFAULT_MESSAGE_COLOR = '#3CACEF';
+const DEFAULT_FONT_COLOR = '#fff';
+const DEFAULT_IMAGE_WIDTH = '80%';
+const SEARCH_MODE = {
+  ID: 1,
+  CSS_SELECTOR: 2,
+  XPATH: 3,
+};
 
 const AmazonPayButtonMessagePreview = ({
   content,
@@ -11,11 +22,11 @@ const AmazonPayButtonMessagePreview = ({
   themeSettings,
 }) => {
   const config = content?.amazon_pay_button || {};
-  const messageColor = themeSettings?.botMessageBgColor || botInfor?.message_color || '#3CACEF';
-  const fontColor = themeSettings?.botMessageTextColor || botInfor?.font_color || '#fff';
+  const messageColor = themeSettings?.botMessageBgColor || botInfor?.message_color || DEFAULT_MESSAGE_COLOR;
+  const fontColor = themeSettings?.botMessageTextColor || botInfor?.font_color || DEFAULT_FONT_COLOR;
   const iconMess = botInfor?.icon_mess;
   const imageUrl = config.button_image_url || DEFAULT_AMAZON_PAY_BUTTON_IMAGE_URL;
-  const imageWidth = config.button_image_width || '80%';
+  const imageWidth = config.button_image_width || DEFAULT_IMAGE_WIDTH;
 
   const handleClick = () => {
     const actionData = buildAmazonPayButtonClickActionData(config);
@@ -38,11 +49,11 @@ const AmazonPayButtonMessagePreview = ({
     const { searchMode, searchValue } = actionData;
     const findElement = () => {
       switch (searchMode) {
-        case 1:
+        case SEARCH_MODE.ID:
           return document.getElementById(searchValue);
-        case 2:
+        case SEARCH_MODE.CSS_SELECTOR:
           return document.querySelector(searchValue);
-        case 3:
+        case SEARCH_MODE.XPATH:
           return document.evaluate(searchValue, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
         default:
           return null;
@@ -57,37 +68,30 @@ const AmazonPayButtonMessagePreview = ({
       <div
         className={`ss-bot-chat-overview-${contentIndex} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value position-relative amazon-pay-button-message`}
         style={{
-          backgroundColor: messageColor,
-          color: fontColor,
+          '--amazon-pay-bg': messageColor,
+          '--amazon-pay-color': fontColor,
+          '--amazon-pay-img-width': imageWidth,
         }}
       >
         {config.text_above && (
-          <div style={{ whiteSpace: 'pre-line', marginBottom: '8px' }}>
+          <div className="amazon-pay-button-message__text-above">
             {config.text_above}
           </div>
         )}
         <button
           type="button"
           onClick={handleClick}
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            width: '100%',
-            padding: 0,
-            border: 'none',
-            background: 'transparent',
-            cursor: 'pointer',
-          }}
-          aria-label="Amazon Pay"
+          className="amazon-pay-button-message__button"
+          aria-label={AMAZON_PAY_LABEL}
         >
           <img
             src={imageUrl}
-            alt="Amazon Pay"
-            style={{ width: imageWidth, maxWidth: '100%' }}
+            alt={AMAZON_PAY_LABEL}
+            className="amazon-pay-button-message__img"
           />
         </button>
         {config.text_below && (
-          <div style={{ whiteSpace: 'pre-line', marginTop: '8px' }}>
+          <div className="amazon-pay-button-message__text-below">
             {config.text_below}
           </div>
         )}
@@ -95,8 +99,7 @@ const AmazonPayButtonMessagePreview = ({
       <div
         className="ss-bot-chat-text-input-bot-icon position-absolute"
         style={{
-          backgroundColor: messageColor,
-          background: iconMess ? `url(${iconMess})` : undefined,
+          '--bot-icon-mess': iconMess ? `url(${iconMess})` : 'none',
         }}
       >
         {!iconMess && (

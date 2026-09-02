@@ -7,19 +7,9 @@ const ProcessBar = ({
   currentIndex,
   maxIndex,
 }) => {
-  const getBackgroundColor = () => {
-    if (botInfor?.main_color) return {backgroundColor: botInfor?.main_color};
-    if (botInfor?.main_color_other) return {backgroundColor: botInfor?.main_color_other};
-    return {};
-  };
-
-  const getWidth = () => {
-    let width = "0%";
-    if (parseInt(currentIndex || "0") >= maxIndex) width = "100%";
-    else width = `${(currentIndex /maxIndex ) * 100}%`;
-
-    return { width: width };
-  };
+  const current = parseInt(currentIndex || "0", 10);
+  const width = current >= maxIndex ? "100%" : `${(current / maxIndex) * 100}%`;
+  const backgroundColor = botInfor?.main_color || botInfor?.main_color_other;
 
   const getText = () => {
     if (currentIndex) {
@@ -37,10 +27,8 @@ const ProcessBar = ({
       <div
         className="sp-process-bar-color animation"
         style={{
-          ...getWidth(),
-          ...getBackgroundColor(),
-          display: "block",
-          marginTop: "1px",
+          '--sp-process-bar-width': width,
+          ...(backgroundColor ? { '--sp-process-bar-color': backgroundColor } : {}),
         }}
       >
         {getText()}

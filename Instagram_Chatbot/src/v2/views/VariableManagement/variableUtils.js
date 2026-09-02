@@ -1,14 +1,15 @@
 import { message } from 'antd';
 import { tokenExpired } from 'v2/api/tokenExpired';
+import { NAME_MAX, NAME_MAX_LENGTH, NAME_REQUIRED } from './constants';
 
 const getErrorData = (error) => (error && error.response && error.response.data) || {};
 
 export const validateVariableName = (name) => {
   if (!name || !String(name).trim()) {
-    return '変数名は、必ず指定してください。';
+    return NAME_REQUIRED;
   }
-  if (name.length > 30) {
-    return '変数名は30文字以内で入力してください。';
+  if (name.length > NAME_MAX_LENGTH) {
+    return NAME_MAX;
   }
   return '';
 };

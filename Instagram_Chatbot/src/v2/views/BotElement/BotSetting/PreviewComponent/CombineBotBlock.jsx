@@ -4,7 +4,6 @@ import HtmlCodeMessagePreview from 'v2/components/BotMessages/HtmlCodeMessagePre
 import AmazonPayButtonMessagePreview from 'v2/components/BotMessages/AmazonPayButtonMessagePreview';
 import CartLoginMessagePreview from 'v2/components/BotMessages/CartLoginMessagePreview';
 import { replaceVariables } from './VariablesUtils';
-import { resolveBotMessageTheme } from 'v2/views/DesignSetting/utils/designThemeUtils';
 import { buildOrderConfirmJs, buildOrderConfirmPreviewHtml } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/OrderConfirmLpScriptGenerator';
 
 const CombineBotBlock = ({
@@ -17,8 +16,6 @@ const CombineBotBlock = ({
   variables,
   isBotOpen,
 }) => {
-  const { bgColor: botMessageBgColor, textColor: botMessageTextColor, fontSize: botMessageFontSize } =
-    resolveBotMessageTheme(themeSettings, botInfor);
   const [text, setText] = useState('');
   const originalContent = content?.[content?.type]?.originalContent;
 
@@ -84,18 +81,13 @@ const CombineBotBlock = ({
       return (
         <div
           className={`ss-combine-block-preview ss-combine-block-preview--bot ss-bot-chat-overview-${contentIndex}`}
-          style={{
-            backgroundColor: botMessageBgColor,
-            color: botMessageTextColor,
-            fontSize: botMessageFontSize,
-          }}
           dangerouslySetInnerHTML={{ __html: text }}
         />
       );
     case BOT_MESSAGE_TYPES.FILE: {
       const fileContent = content[content.type]?.content;
       if (fileContent && isImageExtension(fileContent)) {
-        return <img src={fileContent} alt="" className="ss-combine-block-preview ss-combine-block-preview--bot ss-bot-chat-file-content-image" style={{ width: '100%' }} />;
+        return <img src={fileContent} alt="" className="ss-combine-block-preview ss-combine-block-preview--bot ss-bot-chat-file-content-image" />;
       }
       if (fileContent && isPdfExtension(fileContent)) {
         return (
@@ -107,7 +99,7 @@ const CombineBotBlock = ({
       if (fileContent && isMp4Extension(fileContent)) {
         return (
           <div className="ss-combine-block-preview ss-combine-block-preview--bot">
-            <video src={fileContent} autoPlay controls className="ss-bot-chat-file-content-video" style={{ width: '100%' }} />
+            <video src={fileContent} autoPlay controls className="ss-bot-chat-file-content-video" />
           </div>
         );
       }

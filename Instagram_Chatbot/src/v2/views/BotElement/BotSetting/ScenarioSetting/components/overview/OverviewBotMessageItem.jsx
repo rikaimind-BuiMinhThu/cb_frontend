@@ -159,9 +159,9 @@ const OverviewBotMessageItem = ({
                       className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value${hiddenClass}`}
                     >
                       {cartLoginConfig.display_type === 'link' ? (
-                        <span style={cartLoginStyle}>{cartLoginConfig.text}</span>
+                        <span className="cart-login-interactive cart-login-interactive--link" style={cartLoginStyle}>{cartLoginConfig.text}</span>
                       ) : (
-                        <button type="button" style={cartLoginStyle}>
+                        <button type="button" className="cart-login-interactive" style={cartLoginStyle}>
                           {cartLoginConfig.text}
                         </button>
                       )}

@@ -11,7 +11,7 @@ export const mapAmazonPayDataBySelector = (payload, messagesList) => {
   }
 
   const newMessages = _.cloneDeep(messagesList);
-  let changed = false;
+  const changeState = { changed: false };
 
   newMessages.forEach((msg) => {
     if (msg.belong_to !== 'user' || !msg.is_used_when_amazon_pay) return;
@@ -26,12 +26,12 @@ export const mapAmazonPayDataBySelector = (payload, messagesList) => {
         if (currentValue === value) return;
 
         _.set(content, valuePath, value);
-        changed = true;
+        changeState.changed = true;
       });
     });
   });
 
-  return { messagesList: newMessages, changed };
+  return { messagesList: newMessages, changed: changeState.changed };
 };
 
 export const buildAmazonSelectorPayloadFromMessages = ({

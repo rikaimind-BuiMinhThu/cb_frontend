@@ -3,7 +3,7 @@ import {
   AdminTable,
   AdminSearchBar,
 } from 'v2/components/AdminShell';
-import { PAGE_SIZE } from './constants';
+import { EMPTY_USER_VARIABLES, PAGE_SIZE, SEARCH_PLACEHOLDER } from './constants';
 import { createUserVariableColumns } from './columns';
 import VariableCreateRow from './VariableCreateRow';
 
@@ -49,13 +49,13 @@ const UserVariablesTab = ({
             searchValue={keyword}
             onSearchChange={onKeywordChange}
             onSearch={onSearch}
-            searchPlaceholder="変数検索..."
+            searchPlaceholder={SEARCH_PLACEHOLDER}
           />
         }
         columns={columns}
         dataSource={variables}
         rowKey="id"
-        emptyDescription="変数がありません"
+        emptyDescription={EMPTY_USER_VARIABLES}
         pagination={{
           current: page,
           total,

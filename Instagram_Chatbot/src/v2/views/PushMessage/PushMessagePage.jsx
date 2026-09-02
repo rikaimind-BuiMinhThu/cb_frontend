@@ -5,10 +5,17 @@ import SavePushMessageDialog from './SavePushMessageDialog';
 import PushMessageList from './PushMessageList';
 import PushMessageHistory from './PushMessageHistory';
 import { AdminPage, useAdminHeaderActions } from 'v2/components/AdminShell';
+import {
+  PAGE_DESCRIPTION,
+  TAB_HISTORY,
+  TAB_HISTORY_LABEL,
+  TAB_LIST,
+  TAB_LIST_LABEL,
+} from './constants';
 
 const PushMessagePage = () => {
   const { botId } = useParams();
-  const [tab, setTab] = React.useState('list');
+  const [tab, setTab] = React.useState(TAB_LIST);
   const [tick, setTick] = React.useState(0);
 
   const handleCreateSuccess = () => {
@@ -16,27 +23,27 @@ const PushMessagePage = () => {
   };
 
   const headerActions = React.useMemo(
-    () => (tab === 'list' ? <SavePushMessageDialog botId={botId} resolver={handleCreateSuccess} /> : null),
+    () => (tab === TAB_LIST ? <SavePushMessageDialog botId={botId} resolver={handleCreateSuccess} /> : null),
     [tab, botId]
   );
 
   useAdminHeaderActions(headerActions);
 
   return (
-    <AdminPage description="プッシュメッセージの作成・配信管理">
+    <AdminPage description={PAGE_DESCRIPTION}>
       <Tabs
         activeKey={tab}
         onChange={setTab}
         className="admin-page-tabs"
         items={[
           {
-            key: 'list',
-            label: 'プッシュメッセージ一覧',
+            key: TAB_LIST,
+            label: TAB_LIST_LABEL,
             children: <PushMessageList tick={tick} />,
           },
           {
-            key: 'history',
-            label: '配信履歴',
+            key: TAB_HISTORY,
+            label: TAB_HISTORY_LABEL,
             children: <PushMessageHistory />,
           },
         ]}

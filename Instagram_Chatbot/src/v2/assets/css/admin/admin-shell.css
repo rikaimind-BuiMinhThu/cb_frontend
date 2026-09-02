@@ -1075,3 +1075,37 @@
   transform: scaleX(-1);
 }
 
+.admin-payment-detail-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table.admin-payment-detail-table {
+  text-align: center;
+  table-layout: fixed;
+}
+
+table.admin-payment-detail-table tr.admin-payment-detail-row {
+  overflow: visible;
+  height: 14px;
+  background-color: #fff;
+}
+
+.admin-payment-detail-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.admin-payment-detail-icon {
+  margin-top: 5px;
+  font-size: 1.5em;
+}
+
+.admin-payment-detail-icon--edit {
+  margin-right: 20px;
+}
+
+.admin-payment-detail-icon--delete {
+  cursor: pointer;
+}
+

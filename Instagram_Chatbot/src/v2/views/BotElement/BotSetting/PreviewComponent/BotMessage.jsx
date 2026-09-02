@@ -30,8 +30,7 @@ const BotMessage = ({
   globalDelayTime = 1.0,
   skipEntryDelay = false,
 }) => {
-  const { bgColor: botMessageBgColor, textColor: botMessageTextColor, fontSize: botMessageFontSize } =
-    resolveBotMessageTheme(themeSettings, botInfor);
+  const { bgColor: botMessageBgColor } = resolveBotMessageTheme(themeSettings, botInfor);
 
   const [isDelaying, setIsDelaying] = useState(!skipEntryDelay);
   const [text, setText] = useState("");
@@ -94,7 +93,7 @@ const BotMessage = ({
   }
 
   const handleDownloadFile = (file) => {
-    let link = document.createElement("a");
+    const link = document.createElement("a");
     link.href = file;
     link.download = "file";
     link.target = "_blank";
@@ -106,20 +105,18 @@ const BotMessage = ({
   useEffect(() => {
     if (skipEntryDelay || !isDelaying) return;
 
-    let timeoutId;
-
     if (content.type === BOT_MESSAGE_TYPES.DELAY) {
       setIsDelaying(true);
-      timeoutId = setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         setIsDelaying(false);
       }, content.delay.content * 1000);
       return () => clearTimeout(timeoutId);
     }
 
-    let finalDelay = getBotMessageDelay({ message_content: [content] }, isUseGlobalDelay, globalDelayTime, delayEachMessage);
+    const finalDelay = getBotMessageDelay({ message_content: [content] }, isUseGlobalDelay, globalDelayTime, delayEachMessage);
 
     if (isDelaying) {
-      timeoutId = setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         setIsDelaying(false);
       }, finalDelay);
       return () => clearTimeout(timeoutId);
@@ -231,21 +228,12 @@ const BotMessage = ({
       <div className="position-relative">
         <div
           className={`ss-bot-chat-overview-${contentIndex} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value ss-bot-chat-text-input position-relative`}
-          style={{
-            backgroundColor: botMessageBgColor,
-            color: botMessageTextColor,
-            fontSize: botMessageFontSize,
-          }}
           dangerouslySetInnerHTML={{__html: text}}
         >
         </div>
         <div
           className="ss-bot-chat-text-input-bot-icon position-absolute"
-          style={{
-            ...(botInfor?.icon_mess
-              ? { background: `url(${botInfor.icon_mess})` }
-              : {}),
-          }}
+          style={botInfor?.icon_mess ? { '--bot-icon-mess': `url(${botInfor.icon_mess})` } : undefined}
         >
           {!botInfor?.icon_mess && (
             <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="12" height="18" viewBox="0 0 37 54">
@@ -303,16 +291,9 @@ const BotMessage = ({
 
     return (
       <textarea
-        className={`ss-bot-chat-overview-${contentIndex} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
+        className={`ss-bot-chat-overview-${contentIndex} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value ss-bot-chat-file-fallback`}
         value={""}
         readOnly
-        style={{
-          backgroundColor: botMessageBgColor,
-          border: "none",
-          borderRadius: "20px",
-          color: botMessageTextColor,
-          fontSize: botMessageFontSize,
-        }}
       ></textarea>
     );
   }

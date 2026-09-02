@@ -49,30 +49,34 @@ export const usePreviewDesignSettings = ({
     getChatBotSetting(state.botId).then((response) => {
       if (!response.data.data) return;
 
-      let newState;
       if (designSource === "raw") {
         const raw = response.data.data?.design_settings;
         if (raw == null) return;
         const result = typeof raw === "string" ? JSON.parse(raw) : raw;
-        newState = mapRawDesignSettingsToState(result, {
+        const newState = mapRawDesignSettingsToState(result, {
           includeIsOpen: true,
           currentIsOpen: state.isOpen,
         });
-      } else {
-        const { mainColorHex, apiColorKey } = resolveMainColorContext(
-          response.data.data,
-        );
-        const parsedDesign = parseDesignSettings(
-          response.data.data?.design_settings,
-          mainColorHex,
-          apiColorKey,
-        );
-        newState = mapParsedDesignToState(parsedDesign, {
-          includeIsOpen: true,
-          currentIsOpen: state.isOpen,
-          includeOpenAnimation,
+        dispatch({
+          type: PREVIEW_ACTIONS.SET_CHATBOT_SETTINGS,
+          payload: newState,
         });
+        return;
       }
+
+      const { mainColorHex, apiColorKey } = resolveMainColorContext(
+        response.data.data,
+      );
+      const parsedDesign = parseDesignSettings(
+        response.data.data?.design_settings,
+        mainColorHex,
+        apiColorKey,
+      );
+      const newState = mapParsedDesignToState(parsedDesign, {
+        includeIsOpen: true,
+        currentIsOpen: state.isOpen,
+        includeOpenAnimation,
+      });
 
       dispatch({
         type: PREVIEW_ACTIONS.SET_CHATBOT_SETTINGS,

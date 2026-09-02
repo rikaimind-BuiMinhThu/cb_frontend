@@ -76,3 +76,20 @@ export const FILTER_VAR_VALUE = 'var';
 export const FILTER_LAST_VALUE = 'last';
 export const FILTER_OF_VALUE = 'of';
 export const FILTER_AND_VALUE = 'and';
+
+export const PAGE_DESCRIPTION = 'プッシュメッセージの作成・配信管理';
+export const TAB_LIST = 'list';
+export const TAB_HISTORY = 'history';
+export const TAB_LIST_LABEL = 'プッシュメッセージ一覧';
+export const TAB_HISTORY_LABEL = '配信履歴';
+
+export const NAME_MAX_LENGTH = 40;
+export const NAME_REQUIRED = 'プッシュメッセージ名は、必ず指定してください。';
+export const NAME_MAX = 'プッシュメッセージ名は40文字以下にしてください。';
+export const SENDING_METHOD_REQUIRED = '送信方法は、必ず指定してください。';
+export const TEMPLATE_REQUIRED = 'テンプレートは、必ず指定してください。';
+export const START_TIME_REQUIRED = '開始日時は、必ず指定してください。';
+export const LAST_MESSAGE_REQUIRED = '最終メッセージ日時は、必ず指定してください。';
+
+export const SINCE_HOUR_SUFFIX = '時間後';
+export const SINCE_MINUTE_SUFFIX = '分後';

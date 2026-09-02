@@ -20,17 +20,11 @@ const YUWAERU_AMAZON_FUKUSHASHIKI_ELEMENTS = {
 }
 
 const findContentsByFukushashikiSearchValue = (userMessages, fukushaKey, fukushaValue) => {
-  if (!Array.isArray(userMessages)) userMessages = [userMessages];
+  const messages = Array.isArray(userMessages) ? userMessages : [userMessages];
 
-  let result = [];
-  userMessages.forEach(message => {
-    message.message_content.forEach(content => {
-      if (content[fukushaKey] === fukushaValue) {
-        result.push(content);
-      }
-    });
-  });
-  return result;
+  return messages.flatMap((message) =>
+    message.message_content.filter((content) => content[fukushaKey] === fukushaValue)
+  );
 }
 
 export const mapAmazonPayDataToMessagesListForYuwaeru = (amazonPayData, messagesList, prefectureList) => {

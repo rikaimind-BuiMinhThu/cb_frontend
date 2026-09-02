@@ -5,8 +5,57 @@ import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { AdminPage, AdminTable, AdminActionButton } from 'v2/components/AdminShell';
 import { getSignInPath } from 'v2/variables/constants';
+import {
+  AUTH_FALSE_VALUE,
+  CANCEL_BUTTON_LABEL,
+  COL_ACTIONS,
+  COL_DESCRIPTION,
+  COL_ID,
+  COL_PLAN_NAME,
+  COL_PLAN_PRICE,
+  DESCRIPTION_ROWS,
+  EDIT_PLAN_TITLE,
+  EMPTY_STRING,
+  FORM_LABEL_COL,
+  FORM_WRAPPER_COL,
+  INTEGER_REGEX,
+  IS_AUTH_COOKIE_KEY,
+  LABEL_DESCRIPTION,
+  LABEL_PLAN_NAME,
+  LABEL_PLAN_PRICE,
+  LABEL_PLAN_PRICE_CV,
+  NAME_REQUIRED,
+  PLAN_CODE_CV,
+  PLAN_MODAL_WIDTH,
+  PLANS_API_PATH,
+  POSITIVE_NUMBER,
+  PRICE_INTEGER,
+  PRICE_MIN,
+  PRICE_PER_CV_SUFFIX,
+  PRICE_PRECISION,
+  PRICE_REQUIRED,
+  ROLE_ADMIN_DEEL,
+  SUCCESS_CLIENT_UPDATED,
+  TOKEN_COOKIE_KEY,
+  TOKEN_EXPIRED_CODE,
+  UPDATE_BUTTON_LABEL,
+  USER_ROLE_COOKIE_KEY,
+} from './planManagementConstants';
 
-function PlanManagement() {
+const validatePlanPrice = (_, value) => {
+  if (value === undefined || value === null || value === EMPTY_STRING) {
+    return Promise.reject(new Error(PRICE_REQUIRED));
+  }
+  if (Number(value) < PRICE_MIN) {
+    return Promise.reject(new Error(POSITIVE_NUMBER));
+  }
+  if (!INTEGER_REGEX.test(String(value))) {
+    return Promise.reject(new Error(PRICE_INTEGER));
+  }
+  return Promise.resolve();
+};
+
+const PlanManagement = () => {
   const [dataList, setDataList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [planId, setPlanId] = useState();
@@ -15,39 +64,39 @@ function PlanManagement() {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    const userRole = Cookies.get('user_role');
-    if (!userRole || userRole !== 'admin_deel') {
+    const userRole = Cookies.get(USER_ROLE_COOKIE_KEY);
+    if (!userRole || userRole !== ROLE_ADMIN_DEEL) {
       window.location.href = getSignInPath();
     }
   }, []);
 
   useEffect(() => {
     if (
-      Cookies.get('token') === undefined ||
-      Cookies.get('token') == null ||
-      Cookies.get('token') === ''
+      Cookies.get(TOKEN_COOKIE_KEY) === undefined ||
+      Cookies.get(TOKEN_COOKIE_KEY) == null ||
+      Cookies.get(TOKEN_COOKIE_KEY) === EMPTY_STRING
     ) {
       window.location.href = getSignInPath();
     }
-    if (Cookies.get('is_auth') === 'false') {
+    if (Cookies.get(IS_AUTH_COOKIE_KEY) === AUTH_FALSE_VALUE) {
       window.location.href = getSignInPath();
     }
   }, []);
 
-  function reloadList() {
+  const reloadList = () => {
     setLoading(true);
     api
-      .get(`/api/v1/managements/plans`)
+      .get(PLANS_API_PATH)
       .then((res) => {
         setDataList(res.data.data || []);
       })
       .catch((error) => {
-        if (error.response?.data.code === 0) {
+        if (error.response?.data.code === TOKEN_EXPIRED_CODE) {
           tokenExpired();
         }
       })
       .finally(() => setLoading(false));
-  }
+  };
 
   useEffect(() => {
     reloadList();
@@ -55,7 +104,7 @@ function PlanManagement() {
 
   const openEdit = useCallback((item) => {
     api
-      .get(`/api/v1/managements/plans/${item.id}`)
+      .get(`${PLANS_API_PATH}/${item.id}`)
       .then((res) => {
         const data = res.data.data;
         setPlanId(data.id);
@@ -68,50 +117,50 @@ function PlanManagement() {
         setIsOpenUpdate(true);
       })
       .catch((error) => {
-        if (error.response?.data.code === 0) {
+        if (error.response?.data.code === TOKEN_EXPIRED_CODE) {
           tokenExpired();
         }
       });
   }, [form]);
 
-  function updatePlan() {
+  const updatePlan = () => {
     form.validateFields().then((values) => {
       api
-        .patch(`/api/v1/managements/plans/${planId}`, {
+        .patch(`${PLANS_API_PATH}/${planId}`, {
           name: values.name,
           price: values.price,
           description: values.description,
         })
         .then(() => {
           reloadList();
-          message.success('クライアント更新しました!');
+          message.success(SUCCESS_CLIENT_UPDATED);
           setIsOpenUpdate(false);
         })
         .catch((error) => {
-          if (error.response?.data.code === 0) {
+          if (error.response?.data.code === TOKEN_EXPIRED_CODE) {
             tokenExpired();
           }
         });
     });
-  }
+  };
 
   const columns = useMemo(
     () => [
-      { title: 'ID', dataIndex: 'id', width: 80 },
-      { title: 'プラン名称', dataIndex: 'name' },
+      { title: COL_ID, dataIndex: 'id', width: 80 },
+      { title: COL_PLAN_NAME, dataIndex: 'name' },
       {
-        title: 'プラン価格',
+        title: COL_PLAN_PRICE,
         dataIndex: 'price',
         render: (price, record) => (
           <>
             {price}
-            {record.code === 4 ? ' / CV' : ''}
+            {record.code === PLAN_CODE_CV ? PRICE_PER_CV_SUFFIX : EMPTY_STRING}
           </>
         ),
       },
-      { title: '説明', dataIndex: 'description' },
+      { title: COL_DESCRIPTION, dataIndex: 'description' },
       {
-        title: 'アクション',
+        title: COL_ACTIONS,
         width: 100,
         render: (_, item) => (
           <Space className="admin-table-actions">
@@ -136,13 +185,13 @@ function PlanManagement() {
       </AdminPage>
 
       <Modal
-        title="プラン編集"
+        title={EDIT_PLAN_TITLE}
         open={isOpenUpdate}
         onOk={updatePlan}
         onCancel={() => setIsOpenUpdate(false)}
-        okText="更新"
-        cancelText="キャンセル"
-        width={520}
+        okText={UPDATE_BUTTON_LABEL}
+        cancelText={CANCEL_BUTTON_LABEL}
+        width={PLAN_MODAL_WIDTH}
         destroyOnClose
       >
         <Form
@@ -150,42 +199,33 @@ function PlanManagement() {
           layout="horizontal"
           colon={false}
           labelAlign="left"
-          labelCol={{ flex: '0 0 140px' }}
-          wrapperCol={{ flex: 1 }}
+          labelCol={FORM_LABEL_COL}
+          wrapperCol={FORM_WRAPPER_COL}
         >
-          <Form.Item label="プラン名称" name="name" rules={[{ required: true, message: 'プラン名称は、必ず指定してください。' }]}>
+          <Form.Item
+            label={LABEL_PLAN_NAME}
+            name="name"
+            rules={[{ required: true, message: NAME_REQUIRED }]}
+          >
             <Input disabled />
           </Form.Item>
           <Form.Item
-            label={code === 4 ? 'プラン価格 / CV' : 'プラン価格'}
+            label={code === PLAN_CODE_CV ? LABEL_PLAN_PRICE_CV : LABEL_PLAN_PRICE}
             name="price"
             rules={[
-              { required: true, message: 'プラン価格は、必ず指定してください。' },
-              {
-                validator: (_, value) => {
-                  if (value === undefined || value === null || value === '') {
-                    return Promise.reject(new Error('プラン価格は、必ず指定してください。'));
-                  }
-                  if (Number(value) < 0) {
-                    return Promise.reject(new Error('正数を入力してください。'));
-                  }
-                  if (!/^\d+$/.test(String(value))) {
-                    return Promise.reject(new Error('プラン価格 は整数の必要です。'));
-                  }
-                  return Promise.resolve();
-                },
-              },
+              { required: true, message: PRICE_REQUIRED },
+              { validator: validatePlanPrice },
             ]}
           >
-            <InputNumber style={{ width: '100%' }} min={0} precision={0} />
+            <InputNumber className="admin-field-full-width" min={PRICE_MIN} precision={PRICE_PRECISION} />
           </Form.Item>
-          <Form.Item label="説明" name="description">
-            <Input.TextArea rows={5} />
+          <Form.Item label={LABEL_DESCRIPTION} name="description">
+            <Input.TextArea rows={DESCRIPTION_ROWS} />
           </Form.Item>
         </Form>
       </Modal>
     </>
   );
-}
+};
 
 export default PlanManagement;

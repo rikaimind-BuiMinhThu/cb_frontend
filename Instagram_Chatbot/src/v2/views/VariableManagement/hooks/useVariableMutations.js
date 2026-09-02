@@ -1,7 +1,20 @@
 import { useCallback, useRef, useState } from 'react';
 import { message } from 'antd';
 import api from 'v2/api/api-management';
-import { EMPTY_VARIABLE } from '../constants';
+import { API_SUCCESS_CODE } from 'v2/api/constants';
+import {
+  EMPTY_VARIABLE,
+  FAIL_CREATE,
+  FAIL_CREATE_WARNING,
+  FAIL_DELETE,
+  FAIL_DELETE_ERROR,
+  FAIL_UPDATE,
+  FAIL_UPDATE_WARNING,
+  NEW_VARIABLE_NAME_ERROR_KEY,
+  SUCCESS_CREATE,
+  SUCCESS_DELETE,
+  SUCCESS_UPDATE,
+} from '../constants';
 import {
   notifyApiError,
   omitKey,
@@ -31,19 +44,19 @@ const useVariableMutations = ({ botId, reload, goToFirstPage }) => {
   const startCreate = useCallback(() => {
     setAddingNew(true);
     setNewVariable(EMPTY_VARIABLE);
-    clearFieldError('new_variable_name');
+    clearFieldError(NEW_VARIABLE_NAME_ERROR_KEY);
   }, [clearFieldError]);
 
   const cancelCreate = useCallback(() => {
     setAddingNew(false);
     setNewVariable(EMPTY_VARIABLE);
-    clearFieldError('new_variable_name');
+    clearFieldError(NEW_VARIABLE_NAME_ERROR_KEY);
   }, [clearFieldError]);
 
   const changeNewVariable = useCallback((field, value) => {
     setNewVariable((prev) => ({ ...prev, [field]: value }));
     if (field === 'variable_name') {
-      clearFieldError('new_variable_name');
+      clearFieldError(NEW_VARIABLE_NAME_ERROR_KEY);
     }
   }, [clearFieldError]);
 
@@ -69,14 +82,14 @@ const useVariableMutations = ({ botId, reload, goToFirstPage }) => {
           default_value: defaultValue || '',
         },
       });
-      if (data.code === 1) {
-        message.success('更新しました。');
+      if (data.code === API_SUCCESS_CODE) {
+        message.success(SUCCESS_UPDATE);
         reload();
       } else {
-        message.warning(data.message || '更新できませんでした。');
+        message.warning(data.message || FAIL_UPDATE_WARNING);
       }
     } catch (error) {
-      notifyApiError(error, '更新に失敗しました。');
+      notifyApiError(error, FAIL_UPDATE);
     } finally {
       setSavingIds((prev) => omitKey(prev, id));
     }
@@ -88,7 +101,7 @@ const useVariableMutations = ({ botId, reload, goToFirstPage }) => {
     const { variable_name: variableName, default_value: defaultValue } = newVariable;
     const nameError = validateVariableName(variableName);
     if (nameError) {
-      setFieldErrors((prev) => ({ ...prev, new_variable_name: nameError }));
+      setFieldErrors((prev) => ({ ...prev, [NEW_VARIABLE_NAME_ERROR_KEY]: nameError }));
       return;
     }
 
@@ -102,16 +115,16 @@ const useVariableMutations = ({ botId, reload, goToFirstPage }) => {
           default_value: defaultValue || '',
         },
       });
-      if (data.code === 1) {
-        message.success('保存しました。');
+      if (data.code === API_SUCCESS_CODE) {
+        message.success(SUCCESS_CREATE);
         cancelCreate();
         goToFirstPage();
         reload();
       } else {
-        message.warning(data.message || '保存できませんでした。');
+        message.warning(data.message || FAIL_CREATE_WARNING);
       }
     } catch (error) {
-      notifyApiError(error, '保存に失敗しました。');
+      notifyApiError(error, FAIL_CREATE);
     } finally {
       creatingRef.current = false;
       setCreating(false);
@@ -135,14 +148,14 @@ const useVariableMutations = ({ botId, reload, goToFirstPage }) => {
 
     try {
       const { data } = await api.delete(variablesApiPath(botId, deleteId));
-      if (data.code === 1) {
-        message.success('削除しました。');
+      if (data.code === API_SUCCESS_CODE) {
+        message.success(SUCCESS_DELETE);
         reload();
       } else {
-        message.error('削除できませんでした。');
+        message.error(FAIL_DELETE);
       }
     } catch (error) {
-      notifyApiError(error, '削除に失敗しました。');
+      notifyApiError(error, FAIL_DELETE_ERROR);
     } finally {
       deletingRef.current = false;
       setDeleteId(null);

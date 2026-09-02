@@ -219,9 +219,12 @@
     font-size: 13px;
     min-width: 25%;
     height: 20px;
-    background-color: #70A5FC;
+    width: var(--sp-process-bar-width, 0%);
+    background-color: var(--sp-process-bar-color, #70A5FC);
     padding: 0 5px;
     color: #FFFFFF;
+    display: block;
+    margin-top: 1px;
 }
 
 .sp-body {
@@ -593,7 +596,11 @@
 
 .sp-popup-zip-code-address-header-right {}
 
-.sp-plus-circle-option-icon-times-custom {}
+.sp-plus-circle-option-icon-times-custom {
+    width: 5%;
+    margin-left: 3px;
+    cursor: pointer;
+}
 
 .sp-popup-zip-code-address-body {
     padding: 25px 20px;
@@ -617,7 +624,11 @@
     background-color: var(--c-field-focus-bg, #fff);
 }
 
-.sp-popup-zip-code-address-body-form {}
+.sp-popup-zip-code-address-body-form .select-custom-antd,
+.sp-popup-zip-code-address-body-form .select-custom-native {
+    width: 100%;
+    margin-bottom: 7px;
+}
 
 .sp-popup-zip-code-address-body-form-content {
     font-weight: 700;
@@ -649,6 +660,10 @@
     border: 1px solid #000;
     color: #fff;
     cursor: pointer;
+}
+
+.sp-popup-zip-code-address-body-button-selection--disabled {
+    opacity: 0.5;
 }
 
 .ant-checkbox+span {
@@ -1588,6 +1603,12 @@ slideUp
   left: -3px;
   width: 12px;
   height: 18px;
+  background: var(--bot-icon-mess);
+}
+
+.ss-bot-chat-file-fallback {
+  border: none;
+  border-radius: 20px;
 }
 
 .sp-body-bot-side-messages .ss-bot-chat-text-input-bot-icon:has(svg),
@@ -1644,6 +1665,19 @@ slideUp
   position: fixed;
   background-color: #000;
   z-index: 1000;
+}
+
+.ss-bot-prevent-exit-chatbot-modal-frame {
+  position: absolute;
+  width: var(--prevent-exit-width);
+  height: var(--prevent-exit-height);
+  bottom: var(--prevent-exit-bottom);
+  right: var(--prevent-exit-right);
+}
+
+.ss-bot-prevent-exit-chatbot-modal-image {
+  width: 100%;
+  height: auto;
 }
 
 .ss-bot-prevent-exit-modal-title-col {
@@ -1715,6 +1749,8 @@ slideUp
 .ss-combine-message__block {
   width: 100%;
   box-sizing: border-box;
+  padding: var(--ss-combine-block-padding, 0px);
+  margin-top: var(--ss-combine-block-gap, 0px);
 }
 
 .ss-combine-message__block-inner {
@@ -1722,10 +1758,13 @@ slideUp
   box-sizing: border-box;
 }
 
-.ss-combine-block-preview--bot {
+.ss-combine-block-preview.ss-combine-block-preview--bot {
   width: 100%;
   border-radius: 8px;
   word-break: break-word;
+  background-color: var(--c-bot-msg-bg, #3CACEF);
+  color: var(--c-bot-msg-text, #fff);
+  font-size: var(--c-bot-msg-font-size, 14px);
 }
 
 .ss-combine-message__next-button {
@@ -2101,5 +2140,67 @@ slideUp
 .html-code-message-preview__icon {
   background-color: var(--html-preview-bg, #3CACEF);
   background: var(--html-preview-icon-bg);
+}
+
+.amazon-pay-button-message {
+  background-color: var(--amazon-pay-bg, #3CACEF);
+  color: var(--amazon-pay-color, #fff);
+}
+
+.amazon-pay-button-message__text-above {
+  white-space: pre-line;
+  margin-bottom: 8px;
+}
+
+.amazon-pay-button-message__button {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.amazon-pay-button-message__img {
+  width: var(--amazon-pay-img-width, 80%);
+  max-width: 100%;
+}
+
+.amazon-pay-button-message__text-below {
+  white-space: pre-line;
+  margin-top: 8px;
+}
+
+.cart-login-message {
+  background-color: var(--cart-login-message-bg, #3CACEF);
+  color: var(--cart-login-message-color, #fff);
+  padding: 0;
+}
+
+.cart-login-interactive {
+  width: var(--cart-login-width);
+  padding: var(--cart-login-padding);
+  background: var(--cart-login-bg);
+  color: var(--cart-login-color);
+  font-size: var(--cart-login-font-size);
+  font-weight: var(--cart-login-font-weight);
+  border: var(--cart-login-border);
+  border-radius: var(--cart-login-radius);
+  text-align: var(--cart-login-align);
+  cursor: pointer;
+  line-height: 1.6;
+  transition: all 0.2s ease;
+  display: block;
+  text-decoration: var(--cart-login-decoration);
+  box-sizing: border-box;
+}
+
+.cart-login-interactive:hover {
+  background: var(--cart-login-hover-bg, var(--cart-login-bg));
+}
+
+.cart-login-interactive--link:hover {
+  background: var(--cart-login-bg);
 }
 

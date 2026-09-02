@@ -26,6 +26,26 @@ export const DELETE_CONFIRM = '変数を削除しますか。';
 export const DELETE_OK = '削除';
 export const FETCH_ERROR = '変数の取得に失敗しました。';
 
+export const SEARCH_PLACEHOLDER = '変数検索...';
+export const EMPTY_USER_VARIABLES = '変数がありません';
+export const EMPTY_SYSTEM_VARIABLES = 'システム変数がありません';
+
+export const NAME_MAX_LENGTH = 30;
+export const NAME_REQUIRED = '変数名は、必ず指定してください。';
+export const NAME_MAX = '変数名は30文字以内で入力してください。';
+
+export const SUCCESS_UPDATE = '更新しました。';
+export const FAIL_UPDATE_WARNING = '更新できませんでした。';
+export const FAIL_UPDATE = '更新に失敗しました。';
+export const SUCCESS_CREATE = '保存しました。';
+export const FAIL_CREATE_WARNING = '保存できませんでした。';
+export const FAIL_CREATE = '保存に失敗しました。';
+export const SUCCESS_DELETE = '削除しました。';
+export const FAIL_DELETE = '削除できませんでした。';
+export const FAIL_DELETE_ERROR = '削除に失敗しました。';
+
+export const NEW_VARIABLE_NAME_ERROR_KEY = 'new_variable_name';
+
 export const TABS = {
   USER: 'user',
   SYSTEM: 'system',

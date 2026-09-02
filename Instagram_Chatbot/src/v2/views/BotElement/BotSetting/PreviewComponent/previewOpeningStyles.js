@@ -76,7 +76,10 @@ export const getOpeningBotStyle = (state, options = {}) => {
       : `${state.rightMarginSp}px`
     : `${state.rightMarginPc}px`;
   const width = mobile ? `${state.widthSp}%` : `${state.widthPc}px`;
-  let height = mobile ? `${state.heightSp}%` : `${state.heightPc}px`;
+  const hasExitPopup = Boolean(state.activePopupCloseBot);
+  const height = hasExitPopup
+    ? (mobile ? `${state.heightSp}%` : `${state.heightPc}px`)
+    : (mobile ? `${state.heightSp || 100}%` : `${state.heightPc || 600}px`);
 
   const classNames = [
     "preview-open-frame",
@@ -84,11 +87,8 @@ export const getOpeningBotStyle = (state, options = {}) => {
     mobile ? "preview-open-frame--mobile" : "preview-open-frame--desktop",
   ];
 
-  if (!state.activePopupCloseBot) {
+  if (!hasExitPopup) {
     classNames.push("preview-open-frame--no-exit-popup");
-    height = mobile
-      ? `${state.heightSp || 100}%`
-      : `${state.heightPc || 600}px`;
   }
 
   return {

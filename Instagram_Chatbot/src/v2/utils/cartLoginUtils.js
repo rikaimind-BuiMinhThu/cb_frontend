@@ -61,23 +61,20 @@ export const buildCartLoginStyle = (config) => {
   const borderStyle = style.border_style === 'none'
     ? 'none'
     : `${style.border_width} ${style.border_style} ${style.border_color}`;
+  const hoverBackgroundColor = getCartLoginHoverBackgroundColor(normalized);
 
   return {
-    width: style.width,
-    padding: style.padding,
-    background: style.background_color,
-    color: style.text_color,
-    fontSize: style.font_size,
-    fontWeight: style.font_weight,
-    border: borderStyle,
-    borderRadius: style.border_radius,
-    textAlign: style.text_align,
-    cursor: 'pointer',
-    lineHeight: 1.6,
-    transition: 'all 0.2s ease',
-    display: 'block',
-    textDecoration: normalized.display_type === 'link' ? 'underline' : 'none',
-    boxSizing: 'border-box',
+    '--cart-login-width': style.width,
+    '--cart-login-padding': style.padding,
+    '--cart-login-bg': style.background_color,
+    '--cart-login-hover-bg': hoverBackgroundColor,
+    '--cart-login-color': style.text_color,
+    '--cart-login-font-size': style.font_size,
+    '--cart-login-font-weight': style.font_weight,
+    '--cart-login-border': borderStyle,
+    '--cart-login-radius': style.border_radius,
+    '--cart-login-align': style.text_align,
+    '--cart-login-decoration': normalized.display_type === 'link' ? 'underline' : 'none',
   };
 };
 

@@ -9,7 +9,7 @@ import {
   PreviewOpenChatFrame,
   PreviewMessagesList,
 } from "./PreviewComponent";
-import UserMessageTailIcon from "./PreviewComponent/UserMessageTailIcon";
+import UserMessageTailIcon from 'v2/components/BotMessages/UserMessageTailIcon';
 import { resolveMainColorContext, resolveUserMessageTheme } from "v2/utils/designThemeCore";
 import PreviewFaqReducer from "./PreviewFaq/PreviewFaqReducer";
 import { EC_CHATBOT_URL } from "v2/variables/constants";

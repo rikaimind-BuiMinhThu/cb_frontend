@@ -288,3 +288,16 @@ export const formatChatLogConversationHeader = (count) =>
 
 export const formatChatLogUserName = (index, total) =>
   `${CHAT_LOG_USER_NAME_PREFIX}${total - index}`;
+
+export const STAT_DETAIL_KEY_APPEAR_COUNT = 'appear_count';
+export const STAT_DETAIL_KEY_ERROR_COUNT = 'error_count';
+export const STAT_DETAIL_KEY_COMPLETE_COUNT = 'complete_count';
+export const STAT_DETAIL_KEY_RETRY_COUNT = 'retry_count';
+export const STAT_DETAIL_KEY_COMPLETION_RATE = 'completion_rate';
+
+export const STAT_DETAIL_LABEL_APPEAR_COUNT = '表示回数';
+export const STAT_DETAIL_LABEL_ERROR_COUNT = 'エラー回数';
+export const STAT_DETAIL_LABEL_COMPLETE_COUNT = '入力完了数';
+export const STAT_DETAIL_LABEL_RETRY_COUNT = '再入力回数';
+export const STAT_DETAIL_LABEL_COMPLETION_RATE = '入力完了率';
+export const STAT_DETAIL_COUNT_SUFFIX = '回';

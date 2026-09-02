@@ -1,14 +1,22 @@
-import * as yup from "yup";
+import * as yup from 'yup';
+import {
+  CONTENT_MAX,
+  CONTENT_MAX_LENGTH,
+  CONTENT_REQUIRED,
+  NAME_MAX,
+  NAME_MAX_LENGTH,
+  NAME_REQUIRED,
+} from '../constants';
 
 const schema = yup.object({
   name: yup
     .string()
-    .required("テンプレート名は、必ず指定してください。")
-    .max(50, "テンプレート名は50文字以下にしてください。"),
+    .required(NAME_REQUIRED)
+    .max(NAME_MAX_LENGTH, NAME_MAX),
   content: yup
     .string()
-    .required("メッセージは、必ず指定してください。")
-    .max(200, "メッセージは200文字以下にしてください。"),
+    .required(CONTENT_REQUIRED)
+    .max(CONTENT_MAX_LENGTH, CONTENT_MAX),
 });
 
 export default schema;

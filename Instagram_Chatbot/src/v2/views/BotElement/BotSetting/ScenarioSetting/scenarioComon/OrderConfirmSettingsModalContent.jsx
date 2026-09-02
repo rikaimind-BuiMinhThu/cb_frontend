@@ -17,7 +17,7 @@ import {
 import OrderConfirmAdvancedSettings from './OrderConfirmAdvancedSettings';
 import '../styles/contentSettings/orderConfirmSettings.css';
 
-export default function OrderConfirmSettingsModalContent({
+const OrderConfirmSettingsModalContent = ({
   config,
   indexMessageSelect,
   indexContent = 0,
@@ -27,7 +27,7 @@ export default function OrderConfirmSettingsModalContent({
   setDataMessages,
   onConfigChange,
   showAdvancedSettings = true,
-}) {
+}) => {
   const normalizedConfig = normalizeOrderConfirmConfig(config);
   const fieldsByGroup = normalizedConfig.fields_by_group;
   const isCustomPreset = normalizedConfig.lp_preset === ORDER_CONFIRM_LP_PRESET.CUSTOM;
@@ -235,4 +235,6 @@ export default function OrderConfirmSettingsModalContent({
       )}
     </div>
   );
-}
+};
+
+export default OrderConfirmSettingsModalContent;

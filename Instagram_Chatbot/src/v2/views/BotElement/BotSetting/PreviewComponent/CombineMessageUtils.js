@@ -23,20 +23,19 @@ const prepareCombineBotBlocks = (messagesList, messageIndex) => {
 export const processForCombineMessage = (messagesList, i, newState, assignToState = true) => {
   prepareCombineBotBlocks(messagesList, i);
 
-  for (let j = 0; j < messagesList[i].message_content.length; j++) {
-    const content = messagesList[i].message_content[j];
-    if (content.role !== COMBINE_CONTENT_ROLES.USER || content.type !== 'capture') continue;
+  messagesList[i].message_content.forEach((content) => {
+    if (content.role !== COMBINE_CONTENT_ROLES.USER || content.type !== 'capture') return;
 
     const msgContentType = content.type;
     const captureConfig = content[msgContentType];
-    if (!captureConfig) continue;
+    if (!captureConfig) return;
 
     getCaptcha(
       captureConfig.length,
       captureConfig.colour ? 'true' : '',
       captureConfig.type,
     );
-  }
+  });
 
   if (assignToState) {
     newState.renderMessagesList.push(messagesList[i]);

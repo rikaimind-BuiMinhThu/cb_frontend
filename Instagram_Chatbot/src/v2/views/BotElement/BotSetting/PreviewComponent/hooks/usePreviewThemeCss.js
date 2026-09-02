@@ -17,9 +17,10 @@ export const usePreviewThemeCss = ({
     const existing = document.getElementById(customCssId);
     if (existing) existing.remove();
 
-    let style;
-    if (state.isUsedCustomCss && state.customCssContent) {
-      style = document.createElement("style");
+    const style = (state.isUsedCustomCss && state.customCssContent)
+      ? document.createElement("style")
+      : null;
+    if (style) {
       style.id = customCssId;
       style.innerHTML = state.customCssContent;
       document.head.appendChild(style);

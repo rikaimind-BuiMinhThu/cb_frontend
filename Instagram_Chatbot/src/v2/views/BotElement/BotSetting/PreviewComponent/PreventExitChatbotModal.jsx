@@ -8,12 +8,11 @@ import {isMobile} from "./Utils";
 const PreventExitChatbotModal = ({ isOpen, onClose, onCloseBot, botConfig }) => {
   const modalClassName = isMobile() ? "ss-bot-prevent-exit-chatbot-modal-sp" : "ss-bot-prevent-exit-chatbot-modal-pc";
   const {widthSp, heightSp, widthPc, heightPc, bottomMarginPc, rightMarginPc, botInfor} = botConfig;
-  const modalStyle = {
-    position: 'absolute',
-    width: isMobile() ? `${widthSp || 100}%` : `${widthPc || 450}px`,
-    height: isMobile() ? `${heightSp || 100}%` : `${heightPc || 700}px`,
-    bottom: isMobile() ? `0px` : `${bottomMarginPc || 0}px`,
-    right: isMobile() ? `0px` : `${rightMarginPc || 30}px`,
+  const modalCssVars = {
+    '--prevent-exit-width': isMobile() ? `${widthSp || 100}%` : `${widthPc || 450}px`,
+    '--prevent-exit-height': isMobile() ? `${heightSp || 100}%` : `${heightPc || 700}px`,
+    '--prevent-exit-bottom': isMobile() ? `0px` : `${bottomMarginPc || 0}px`,
+    '--prevent-exit-right': isMobile() ? `0px` : `${rightMarginPc || 30}px`,
   };
 
   if (!isOpen) return null;
@@ -39,7 +38,7 @@ const PreventExitChatbotModal = ({ isOpen, onClose, onCloseBot, botConfig }) => 
       return (
         <img
           src={preventionImageUrl}
-          style={{ width: "100%", height: "auto" }}
+          className="ss-bot-prevent-exit-chatbot-modal-image"
           alt="prevention"
         />
       );
@@ -52,7 +51,7 @@ const PreventExitChatbotModal = ({ isOpen, onClose, onCloseBot, botConfig }) => 
         <img
           src={preventionImageUrl}
           alt=""
-          style={{ width: "100%", height: "auto" }}
+          className="ss-bot-prevent-exit-chatbot-modal-image"
         />
       </a>
     );
@@ -61,7 +60,7 @@ const PreventExitChatbotModal = ({ isOpen, onClose, onCloseBot, botConfig }) => 
   return ReactDom.createPortal(
     <>
       <div className="ss-bot-prevent-exit-chatbot-modal-container" onClick={onClose} />
-      <div style={modalStyle}>
+      <div className="ss-bot-prevent-exit-chatbot-modal-frame" style={modalCssVars}>
         <div className={`ss-bot-prevent-exit-chatbot-modal ${modalClassName}`}>
           <Row>
             <Col span={24} className="ss-bot-prevent-exit-modal-title-col">

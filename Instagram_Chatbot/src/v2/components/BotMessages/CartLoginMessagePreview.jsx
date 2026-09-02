@@ -5,11 +5,14 @@ import {
   buildCartLoginClickJs,
   buildCartLoginStyle,
   getCartLoginCloseDelayMs,
-  getCartLoginHoverBackgroundColor,
   normalizeCartLoginConfig,
   shouldCloseBotAfterCartLoginClick,
 } from 'v2/utils/cartLoginUtils';
-import { CART_LOGIN_PROCESS_AFTER_CLICK } from 'v2/variables/cartLoginConstants';
+import { CART_LOGIN_DISPLAY_TYPES, CART_LOGIN_PROCESS_AFTER_CLICK } from 'v2/variables/cartLoginConstants';
+import 'v2/assets/css/bot/preview-chat-bot.css';
+
+const DEFAULT_MESSAGE_COLOR = '#3CACEF';
+const DEFAULT_FONT_COLOR = '#fff';
 
 const CartLoginMessagePreview = ({
   content,
@@ -22,12 +25,11 @@ const CartLoginMessagePreview = ({
     () => normalizeCartLoginConfig(content?.cart_login),
     [content?.cart_login],
   );
-  const messageColor = themeSettings?.botMessageBgColor || botInfor?.message_color || '#3CACEF';
-  const fontColor = themeSettings?.botMessageTextColor || botInfor?.font_color || '#fff';
+  const messageColor = themeSettings?.botMessageBgColor || botInfor?.message_color || DEFAULT_MESSAGE_COLOR;
+  const fontColor = themeSettings?.botMessageTextColor || botInfor?.font_color || DEFAULT_FONT_COLOR;
   const iconMess = botInfor?.icon_mess;
   const elementStyle = buildCartLoginStyle(config);
-  const hoverBackgroundColor = getCartLoginHoverBackgroundColor(config);
-  const isLink = config.display_type === 'link';
+  const isLink = config.display_type === CART_LOGIN_DISPLAY_TYPES.LINK;
 
   const handleClick = (event) => {
     event.preventDefault();
@@ -78,44 +80,30 @@ const CartLoginMessagePreview = ({
     }
   };
 
-  const handleMouseEnter = (event) => {
-    if (!isLink) {
-      event.currentTarget.style.background = hoverBackgroundColor;
-    }
-  };
-
-  const handleMouseLeave = (event) => {
-    if (!isLink) {
-      event.currentTarget.style.background = config.style.background_color;
-    }
-  };
-
-  const interactiveProps = {
-    onClick: handleClick,
-    onMouseEnter: handleMouseEnter,
-    onMouseLeave: handleMouseLeave,
-    style: elementStyle,
-  };
+  const interactiveClassName = `cart-login-interactive${isLink ? ' cart-login-interactive--link' : ''}`;
 
   return (
     <div className="position-relative">
       <div
         className={`ss-bot-chat-overview-${contentIndex} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value position-relative cart-login-message`}
         style={{
-          backgroundColor: messageColor,
-          color: fontColor,
-          padding: 0,
+          '--cart-login-message-bg': messageColor,
+          '--cart-login-message-color': fontColor,
         }}
       >
-        <button type="button" {...interactiveProps}>
+        <button
+          type="button"
+          className={interactiveClassName}
+          style={elementStyle}
+          onClick={handleClick}
+        >
           {config.text}
         </button>
       </div>
       <div
         className="ss-bot-chat-text-input-bot-icon position-absolute"
         style={{
-          backgroundColor: messageColor,
-          background: iconMess ? `url(${iconMess})` : undefined,
+          '--bot-icon-mess': iconMess ? `url(${iconMess})` : 'none',
         }}
       >
         {!iconMess && (

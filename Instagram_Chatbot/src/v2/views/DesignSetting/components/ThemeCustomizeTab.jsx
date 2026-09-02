@@ -1,6 +1,14 @@
 import React, { useCallback, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { THEME_SECTIONS } from '../constants/designThemeConstants';
+import {
+  THEME_SECTIONS,
+  THEME_MAIN_COLOR_CONFIRM_CANCEL,
+  THEME_MAIN_COLOR_CONFIRM_MESSAGE,
+  THEME_MAIN_COLOR_CONFIRM_OK,
+  THEME_MAIN_COLOR_CONFIRM_TITLE,
+  THEME_PREVIEW_CLICK_HINT,
+} from '../constants/designThemeConstants';
+import { DEFAULT_MAIN_COLOR } from '../constants/designChatbotConstants';
 import ThemeAccordionSection from './ThemeAccordionSection';
 import ThemeCustomizePreview from './ThemeCustomizePreview';
 import ThemeSectionNav from './ThemeSectionNav';
@@ -70,7 +78,7 @@ const ThemeCustomizeTab = ({
       <div className="theme-customize-tab-layout">
         <div className="theme-customize-tab-preview">
           <p className="theme-customize-tab-preview__hint">
-            プレビューをクリックして設定箇所へ移動
+            {THEME_PREVIEW_CLICK_HINT}
           </p>
           <ThemeCustomizePreview
             themeSettings={themeSettings}
@@ -115,10 +123,10 @@ const ThemeCustomizeTab = ({
       </div>
       <AdminConfirmModal
         open={Boolean(pendingMainColor)}
-        title="確認"
-        message="メインカラーに合わせて各項目を再計算しますか？"
-        okText="はい"
-        cancelText="いいえ"
+        title={THEME_MAIN_COLOR_CONFIRM_TITLE}
+        message={THEME_MAIN_COLOR_CONFIRM_MESSAGE}
+        okText={THEME_MAIN_COLOR_CONFIRM_OK}
+        cancelText={THEME_MAIN_COLOR_CONFIRM_CANCEL}
         onOk={handleApplyDerived}
         onCancel={handleSkipDerived}
       />
@@ -139,7 +147,7 @@ ThemeCustomizeTab.propTypes = {
 };
 
 ThemeCustomizeTab.defaultProps = {
-  mainColor: '#327AED',
+  mainColor: DEFAULT_MAIN_COLOR,
   title: '',
   subtitle: '',
 };

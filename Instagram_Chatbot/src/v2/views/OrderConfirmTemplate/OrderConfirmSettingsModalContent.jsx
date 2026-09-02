@@ -14,11 +14,17 @@ import {
   updateOrderConfirmField,
 } from 'v2/utils/orderConfirmLpScriptGenerator';
 import OrderConfirmAdvancedSettings from './OrderConfirmAdvancedSettings';
-import 'v2/views/BotElement/BotSetting/ScenarioSetting/styles/contentSettings/orderConfirmSettings.css';
+import {
+  ADD_FIELD,
+  COL_FIELD,
+  COL_LABEL,
+  COL_SELECTOR,
+} from './constants';
+import './orderConfirmTemplateEditor.css';
 
 const ORDER_CONFIRM_MESSAGE_TYPE = 'order_confirm';
 
-export default function OrderConfirmSettingsModalContent({
+const OrderConfirmSettingsModalContent = ({
   config,
   indexMessageSelect,
   indexContent = 0,
@@ -28,7 +34,7 @@ export default function OrderConfirmSettingsModalContent({
   setDataMessages,
   onConfigChange,
   showAdvancedSettings = true,
-}) {
+}) => {
   const normalizedConfig = normalizeOrderConfirmConfig(config);
   const fieldsByGroup = normalizedConfig.fields_by_group;
   const isCustomPreset = normalizedConfig.lp_preset === ORDER_CONFIRM_LP_PRESET.CUSTOM;
@@ -180,9 +186,9 @@ export default function OrderConfirmSettingsModalContent({
     <div className="ss-order-confirm-settings-modal__body">
       <div className="ss-order-confirm-fields-grid ss-order-confirm-fields-grid--header">
         <span />
-        <span>項目</span>
-        <span>セレクター</span>
-        <span>ラベル</span>
+        <span>{COL_FIELD}</span>
+        <span>{COL_SELECTOR}</span>
+        <span>{COL_LABEL}</span>
         <span />
       </div>
 
@@ -222,7 +228,7 @@ export default function OrderConfirmSettingsModalContent({
                 if (event.key === 'Enter' || event.key === ' ') handleAddField(groupKey);
               }}
             >
-              + 項目を追加
+              {ADD_FIELD}
             </span>
           </div>
         ))}
@@ -236,4 +242,6 @@ export default function OrderConfirmSettingsModalContent({
       )}
     </div>
   );
-}
+};
+
+export default OrderConfirmSettingsModalContent;

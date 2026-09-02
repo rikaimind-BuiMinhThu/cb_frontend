@@ -13,7 +13,6 @@ const ZipCodePopUp = ({
   onOpen,
   onChangeValue,
   onChangeErrors,
-  errors = {},
 }) => {
   const [state, setState] = useState({});
 
@@ -53,7 +52,7 @@ const ZipCodePopUp = ({
   const onChangeCity = (value) => {
     if (!value) return;
 
-    let city_jis_code = state.citiesList.find((item) => item.city_name === value)?.city_jis_code;
+    const city_jis_code = state.citiesList.find((item) => item.city_name === value)?.city_jis_code;
 
     if (!city_jis_code) {
       console.error("city_jis_code not found");
@@ -96,20 +95,15 @@ const ZipCodePopUp = ({
   };
 
   const onSelectZipcode = () => {
-    let index = zipcodeContentIndex; 
-    if (!zipcodeContentIndex && zipcodeContentIndex !== 0) {
-      index = message.message_content
-        .findIndex((item) => item.type === "zip_code_address");
-    }
+    const index = (!zipcodeContentIndex && zipcodeContentIndex !== 0)
+      ? message.message_content.findIndex((item) => item.type === "zip_code_address")
+      : zipcodeContentIndex;
 
     if (state.selectedZipcode) {
       changeElementAttributeById([
         { id: "sp-withdrawal-container", style: { display: "none" }},
         { id: "sp-popup-zip-code-address", style: { display: "none" }}
       ]);
-
-      let newErrors = { ...errors };
-      newErrors[`message${messageIndex}_content${index}_zip_code_address`] = "";
 
       const newZipCodeAddress = {
         value_post_code: state.selectedZipcode,
@@ -135,7 +129,6 @@ const ZipCodePopUp = ({
         </div>
         <div className="sp-popup-zip-code-address-header-right">
           <MDBIcon
-            style={{ width: "5%", marginLeft: "3px", cursor: "pointer" }}
             fas
             onClick={() => onOpen(false)}
             icon="times"
@@ -146,7 +139,6 @@ const ZipCodePopUp = ({
       <div className="sp-popup-zip-code-address-body">
         <div className="sp-popup-zip-code-address-body-form">
           <SelectCustom
-            style={{ width: "100%", marginBottom: "7px" }}
             keyValue="id"
             nameValue="name"
             placeholder="都道府県を選択してください"
@@ -155,7 +147,6 @@ const ZipCodePopUp = ({
             value={state.selectedPrefecture}
           />
           <SelectCustom
-            style={{ width: "100%", marginBottom: "7px" }}
             keyValue="city_name"
             nameValue="city_name"
             placeholder="市区を選択してください"
@@ -164,7 +155,6 @@ const ZipCodePopUp = ({
             value={state.selectedCity}
           />
           <SelectCustom
-            style={{ width: "100%", marginBottom: "7px" }}
             keyValue="town_name"
             nameValue="town_name"
             placeholder="町村を選択してください"
@@ -186,8 +176,7 @@ const ZipCodePopUp = ({
             キャンセル
           </div>
           <div
-            className="sp-popup-zip-code-address-body-button-selection"
-            style={state.selectedZipcode ? {} : { opacity: "0.5" }}
+            className={`sp-popup-zip-code-address-body-button-selection${state.selectedZipcode ? "" : " sp-popup-zip-code-address-body-button-selection--disabled"}`}
             onClick={onSelectZipcode}
           >
             選択

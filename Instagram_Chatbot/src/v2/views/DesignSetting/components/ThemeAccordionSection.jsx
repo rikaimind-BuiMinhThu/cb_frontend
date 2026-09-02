@@ -8,7 +8,10 @@ import {
   BUTTON_POSITION_OPTIONS,
   MESSAGE_BORDER_STYLE_OPTIONS,
   MODAL_TITLE_ALIGNMENT_OPTIONS,
+  THEME_MAIN_COLOR_HELPER,
+  THEME_RESET_SECTION_LABEL,
 } from '../constants/designThemeConstants';
+import { DEFAULT_MAIN_COLOR } from '../constants/designChatbotConstants';
 import { getDesignSettingTooltip } from '../constants/designSettingTooltips';
 import {
   normalizeBorderTwinkleEffect,
@@ -81,7 +84,7 @@ const ThemeAccordionSection = ({
           <div className="theme-field__control">
             <MainColorPicker mainColor={mainColor} onChange={onMainColorChange} />
             <p className="theme-section__main-color-helper">
-              メインカラーを変更しても個別設定は自動では上書きされません。セクションごとに「デフォルトに戻す」で再計算できます。
+              {THEME_MAIN_COLOR_HELPER}
             </p>
           </div>
         </div>
@@ -269,7 +272,7 @@ const ThemeAccordionSection = ({
             onResetSection(sectionId);
           }}
         >
-          デフォルトに戻す
+          {THEME_RESET_SECTION_LABEL}
         </button>
       )}
     </div>
@@ -323,7 +326,7 @@ ThemeAccordionSection.propTypes = {
 };
 
 ThemeAccordionSection.defaultProps = {
-  mainColor: '#327AED',
+  mainColor: DEFAULT_MAIN_COLOR,
   onMainColorChange: null,
   isActive: false,
   isExpanded: false,

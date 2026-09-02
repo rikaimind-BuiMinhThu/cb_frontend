@@ -56,11 +56,11 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
   const creatingVariableRef = useRef(false);
 
   const botUploadFile = useCallback(() => {
-    document.getElementById('ss-bot-file-upload').click();
+    document.getElementById('ss-bot-file-upload')?.click();
   }, []);
 
   const carouselUploadFile = useCallback(() => {
-    document.getElementById('ss-carouse-file-upload').click();
+    document.getElementById('ss-carouse-file-upload')?.click();
   }, []);
 
   const getBaseUrl = useCallback(async (event, indexContent) => {

@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { THEME_SECTION_NAV_ITEMS } from '../constants/designThemeConstants';
+import { THEME_SECTION_NAV_ARIA_LABEL, THEME_SECTION_NAV_ITEMS } from '../constants/designThemeConstants';
 
 const ThemeSectionNav = ({ activeSectionId, onSectionSelect }) => (
-  <nav className="theme-section-nav" aria-label="テーマ設定セクション">
+  <nav className="theme-section-nav" aria-label={THEME_SECTION_NAV_ARIA_LABEL}>
     {THEME_SECTION_NAV_ITEMS.map(({ id, title }) => (
       <button
         key={id}

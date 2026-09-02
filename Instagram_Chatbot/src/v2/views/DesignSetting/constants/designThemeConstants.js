@@ -347,4 +347,15 @@ export const THEME_SECTIONS = [
 
 export const THEME_SECTION_NAV_ITEMS = THEME_SECTIONS.map(({ id, title }) => ({ id, title }));
 
+export const THEME_PREVIEW_CLICK_HINT = 'プレビューをクリックして設定箇所へ移動';
+export const THEME_MAIN_COLOR_CONFIRM_TITLE = '確認';
+export const THEME_MAIN_COLOR_CONFIRM_MESSAGE = 'メインカラーに合わせて各項目を再計算しますか？';
+export const THEME_MAIN_COLOR_CONFIRM_OK = 'はい';
+export const THEME_MAIN_COLOR_CONFIRM_CANCEL = 'いいえ';
+export const THEME_MAIN_COLOR_HELPER =
+  'メインカラーを変更しても個別設定は自動では上書きされません。セクションごとに「デフォルトに戻す」で再計算できます。';
+export const THEME_RESET_SECTION_LABEL = 'デフォルトに戻す';
+export const THEME_SECTION_NAV_ARIA_LABEL = 'テーマ設定セクション';
+export const THEME_COLOR_TEXT_PLACEHOLDER = '例: 0 0 0 2px rgba(50,122,237,0.3)';
+
 export { CAMEL_TO_SNAKE_THEME } from 'v2/utils/designThemeCore';

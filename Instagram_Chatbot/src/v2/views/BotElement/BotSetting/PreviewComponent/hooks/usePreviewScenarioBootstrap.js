@@ -22,7 +22,7 @@ export const usePreviewScenarioBootstrap = ({
 
   useEffect(() => {
     if (!enabled) return undefined;
-    let cancelled = false;
+    const request = { cancelled: false };
 
     if (!state.loadedStateFromSession) {
       const savedState = getChatbotSavedState();
@@ -34,10 +34,10 @@ export const usePreviewScenarioBootstrap = ({
             currentBotId,
             params.get("scenario_id"),
           ).then((res) => {
-            if (!cancelled) onExtractStateRef.current(res);
+            if (!request.cancelled) onExtractStateRef.current(res);
           });
           return () => {
-            cancelled = true;
+            request.cancelled = true;
           };
         }
 
@@ -103,11 +103,11 @@ export const usePreviewScenarioBootstrap = ({
     }
 
     getScenarioPreviewData(state.botId, state.scenarioId).then((res) => {
-      if (!cancelled) onExtractStateRef.current(res);
+      if (!request.cancelled) onExtractStateRef.current(res);
     });
 
     return () => {
-      cancelled = true;
+      request.cancelled = true;
     };
   }, [
     enabled,

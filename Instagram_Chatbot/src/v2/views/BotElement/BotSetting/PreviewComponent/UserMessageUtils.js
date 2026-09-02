@@ -25,15 +25,11 @@ const processForUserCaptchaMessage = (messagesList, i, msgContentIndex, newState
 };
 
 export const processForUserMessage = (messagesList, i, newState, assignToState = true) => {
-  for (
-    let j = 0;
-    j < messagesList[i].message_content.length;
-    j++
-  ) {
-    if (messagesList[i].message_content[j].type === "capture") {
+  messagesList[i].message_content.forEach((content, j) => {
+    if (content.type === "capture") {
       processForUserCaptchaMessage(messagesList, i, j, newState);
     }
-  }
+  });
 
   if (assignToState) {
     newState.renderMessagesList.push(messagesList[i]);

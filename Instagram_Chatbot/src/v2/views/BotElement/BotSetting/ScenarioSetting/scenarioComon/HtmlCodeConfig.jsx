@@ -3,12 +3,12 @@ import CheckboxCustom from "./CheckboxCustom";
 import { useState } from "react";
 import { BOT_MESSAGE_TYPES } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 
-export default function HtmlCodeConfig({
+const HtmlCodeConfig = ({
   indexMessageSelect,
   indexContent = 0,
   config,
   onChangeValue,
-}) {
+}) => {
   const messageType = BOT_MESSAGE_TYPES.HTML_CODE;
 
   const [htmlValidationError] = useState("");
@@ -51,3 +51,5 @@ export default function HtmlCodeConfig({
     </>
   );
 }
+
+export default HtmlCodeConfig;

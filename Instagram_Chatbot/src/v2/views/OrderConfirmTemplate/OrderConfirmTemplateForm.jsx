@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Input } from 'antd';
-import CheckboxCustom from './CheckboxCustom';
+import CheckboxCustom from 'v2/components/BotMessages/CheckboxCustom';
 import OrderConfirmSettingsModalContent from './OrderConfirmSettingsModalContent';
 import OrderConfirmAdvancedSettings from './OrderConfirmAdvancedSettings';
 import {

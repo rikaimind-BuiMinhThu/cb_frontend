@@ -1,7 +1,7 @@
 import React from 'react';
 import CustomButton from '../CustomButton';
 import UserMessage from './UserMessage';
-import UserMessageTailIcon from './UserMessageTailIcon';
+import UserMessageTailIcon from 'v2/components/BotMessages/UserMessageTailIcon';
 import CombineBotBlock from './CombineBotBlock';
 import { resolveUserMessageTheme } from 'v2/views/DesignSetting/utils/designThemeUtils';
 import {
@@ -30,7 +30,7 @@ export const CombineMessageNextButton = ({
   const isAutoClick = !isDisplayBtnNext && isUpdate;
 
   return (
-    <div className="sp-user-message-button-action ss-combine-message__next-button" style={{ display: isDisplayBtnNext ? 'flex' : 'none' }}>
+    <div className={`sp-user-message-button-action ss-combine-message__next-button${isDisplayBtnNext ? '' : ' sp-user-message-button-action--hidden'}`}>
       <CustomButton
         disabled={false}
         className="ss-user-message__action-btn"
@@ -87,16 +87,15 @@ const CombineMessage = ({
           <div className="ss-combine-message__content">
             {message.message_content.map((content, contentIndex) => {
               const padding = content.padding ?? COMBINE_MESSAGE_DEFAULTS.BLOCK_PADDING;
-              const blockStyle = {
-                padding: `${padding}px`,
-                ...(contentIndex > 0 ? { marginTop: `${contentGap}px` } : {}),
-              };
 
               return (
                 <div
                   key={content.id ?? contentIndex}
                   className="ss-combine-message__block"
-                  style={blockStyle}
+                  style={{
+                    '--ss-combine-block-padding': `${padding}px`,
+                    ...(contentIndex > 0 ? { '--ss-combine-block-gap': `${contentGap}px` } : {}),
+                  }}
                 >
                   <div className="ss-combine-message__block-inner">
                     {content.role === COMBINE_CONTENT_ROLES.BOT ? (

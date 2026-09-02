@@ -79,3 +79,127 @@
 .admin-page--order-confirm-template .order-confirm-template-editor__scroll-row {
   padding-top: 4px;
 }
+
+.ss-order-confirm-settings-modal__body {
+  width: 100%;
+}
+
+.ss-order-confirm-fields-grid {
+  display: grid;
+  grid-template-columns: 22px minmax(120px, 150px) minmax(0, 1fr) minmax(0, 1fr) 24px;
+  column-gap: 8px;
+  align-items: center;
+  width: 100%;
+}
+
+.ss-order-confirm-fields-grid--header {
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.ss-order-confirm-fields-grid--header span {
+  padding-bottom: 2px;
+}
+
+.ss-order-confirm-field-row {
+  display: grid;
+  grid-template-columns: 22px minmax(120px, 150px) minmax(0, 1fr) minmax(0, 1fr) 24px;
+  column-gap: 8px;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 8px;
+  min-width: 0;
+}
+
+.ss-order-confirm-field-row__grip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  font-size: 14px;
+  cursor: grab;
+}
+
+.ss-order-confirm-field-row__name {
+  font-size: 12px;
+  line-height: 1.4;
+  color: #111827;
+  word-break: break-word;
+  padding-right: 4px;
+}
+
+.ss-order-confirm-field-row__cell {
+  min-width: 0;
+  width: 100%;
+}
+
+.ss-order-confirm-field-row__cell .ss-input-custom-container {
+  width: 100%;
+}
+
+.ss-order-confirm-field-row__cell .ss-input-value {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ss-order-confirm-field-row__empty {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.ss-order-confirm-field-row__remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #dc2626;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.ss-order-confirm-field-group {
+  margin-bottom: 12px;
+}
+
+.ss-order-confirm-field-group__title {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #111827;
+}
+
+.ss-order-confirm-field-group__add {
+  display: inline-block;
+  margin-top: 2px;
+  margin-bottom: 4px;
+  font-size: 12px;
+  color: #2563eb;
+  cursor: pointer;
+}
+
+.ss-order-confirm-field-group__add:hover {
+  text-decoration: underline;
+}
+
+.ss-order-confirm-fields-section-title {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 12px;
+  margin-bottom: 8px;
+  color: #111827;
+}
+
+.ss-order-confirm-retry-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.ss-order-confirm-retry-row__label {
+  font-size: 12px;
+  margin-bottom: 4px;
+  display: block;
+}

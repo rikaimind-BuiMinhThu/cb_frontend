@@ -4,11 +4,10 @@ import { BOT_MESSAGE_TYPES } from "./Constants";
 const processBotEmailMessage = (messagesList, i, newState) => {
   const msgContent = messagesList[i]?.message_content?.[0];
   const emailId = msgContent[msgContent.type].contentId;
-  let variablesData = {};
-
-  newState.variablesList.forEach((item) => {
-    variablesData[item.variable_name] = item.default_value;
-  });
+  const variablesData = newState.variablesList.reduce((acc, item) => {
+    acc[item.variable_name] = item.default_value;
+    return acc;
+  }, {});
 
   sendEmailRequest(emailId, {variables: variablesData})
     .then((res) => {console.log(res)});

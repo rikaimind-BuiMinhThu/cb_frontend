@@ -5,7 +5,7 @@ import ScenarioModalShell from '../components/modals/shared/ScenarioModalShell';
 import ScenarioModalFooter from '../components/modals/shared/ScenarioModalFooter';
 import OrderConfirmSettingsModalContent from './OrderConfirmSettingsModalContent';
 
-export default function OrderConfirmSettingsModal({
+const OrderConfirmSettingsModal = ({
   config,
   indexMessageSelect,
   indexContent,
@@ -17,7 +17,7 @@ export default function OrderConfirmSettingsModal({
   buttonLabel = '詳細設定',
   title = '注文確認設定',
   inline = false,
-}) {
+}) => {
   const [open, setOpen] = useState(false);
   const closeModal = () => setOpen(false);
 
@@ -82,3 +82,5 @@ OrderConfirmSettingsModal.propTypes = {
   title: PropTypes.string,
   inline: PropTypes.bool,
 };
+
+export default OrderConfirmSettingsModal;

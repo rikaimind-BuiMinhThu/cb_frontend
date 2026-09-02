@@ -5,7 +5,7 @@ import ScenarioModalShell from '../components/modals/shared/ScenarioModalShell';
 import ScenarioModalFooter from '../components/modals/shared/ScenarioModalFooter';
 import { EmailDomainSuggestionListContent } from './EmailDomainSuggestionSetting';
 
-export default function EmailDomainSuggestionSettingsModal({
+const EmailDomainSuggestionSettingsModal = ({
   domainSuggestion,
   onToggleEnabled,
   onChangeMode,
@@ -15,7 +15,7 @@ export default function EmailDomainSuggestionSettingsModal({
   onResetDomains,
   linkLabel = '設定する →',
   title = 'ドメインサジェスト設定',
-}) {
+}) => {
   const [open, setOpen] = useState(false);
   const closeModal = () => setOpen(false);
   const isEnabled = Boolean(domainSuggestion?.enabled);
@@ -76,3 +76,5 @@ EmailDomainSuggestionSettingsModal.propTypes = {
   linkLabel: PropTypes.string,
   title: PropTypes.string,
 };
+
+export default EmailDomainSuggestionSettingsModal;

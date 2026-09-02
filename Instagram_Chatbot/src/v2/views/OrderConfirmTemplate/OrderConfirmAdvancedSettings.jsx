@@ -1,46 +1,57 @@
 import React from 'react';
 import InputNum from 'v2/components/BotMessages/InputNum';
+import {
+  LABEL_ERROR_MESSAGE,
+  LABEL_MAX_RETRY,
+  LABEL_RETRY,
+  LABEL_RETRY_DELAY,
+  RETRY_DELAY_DEFAULT,
+  RETRY_DELAY_MAX,
+  RETRY_DELAY_MIN,
+  RETRY_DELAY_STEP,
+  RETRY_MAX_DEFAULT,
+  RETRY_MAX_MAX,
+  RETRY_MAX_MIN,
+  TEXTAREA_ROWS,
+} from './constants';
 
-const fieldLabelStyle = { fontSize: '12px', marginBottom: '4px', display: 'block' };
-const sectionLabelStyle = { fontWeight: 600, marginTop: '12px', marginBottom: '6px', display: 'block', fontSize: '12px' };
-
-export default function OrderConfirmAdvancedSettings({
+const OrderConfirmAdvancedSettings = ({
   normalizedConfig,
   onUpdateConfigValue,
   className = '',
-}) {
-  return (
-    <div className={className}>
-      <span style={sectionLabelStyle}>リトライ</span>
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '8px' }}>
-        <div>
-          <span style={fieldLabelStyle}>最大回数</span>
-          <InputNum
-            min={1}
-            max={50}
-            value={normalizedConfig.retry?.maxRetry ?? 20}
-            onChange={(value) => onUpdateConfigValue('retry', value, 'maxRetry')}
-          />
-        </div>
-        <div>
-          <span style={fieldLabelStyle}>間隔 (ms)</span>
-          <InputNum
-            min={100}
-            max={5000}
-            step={100}
-            value={normalizedConfig.retry?.delay ?? 500}
-            onChange={(value) => onUpdateConfigValue('retry', value, 'delay')}
-          />
-        </div>
+}) => (
+  <div className={className}>
+    <span className="ss-order-confirm-fields-section-title">{LABEL_RETRY}</span>
+    <div className="ss-order-confirm-retry-row">
+      <div>
+        <span className="ss-order-confirm-retry-row__label">{LABEL_MAX_RETRY}</span>
+        <InputNum
+          min={RETRY_MAX_MIN}
+          max={RETRY_MAX_MAX}
+          value={normalizedConfig.retry?.maxRetry ?? RETRY_MAX_DEFAULT}
+          onChange={(value) => onUpdateConfigValue('retry', value, 'maxRetry')}
+        />
       </div>
-
-      <span style={sectionLabelStyle}>エラーメッセージ</span>
-      <textarea
-        className="ss-bot-statement-type-text-content ss-input-value"
-        rows={3}
-        value={normalizedConfig.error_message || ''}
-        onChange={(e) => onUpdateConfigValue('error_message', e.target.value)}
-      />
+      <div>
+        <span className="ss-order-confirm-retry-row__label">{LABEL_RETRY_DELAY}</span>
+        <InputNum
+          min={RETRY_DELAY_MIN}
+          max={RETRY_DELAY_MAX}
+          step={RETRY_DELAY_STEP}
+          value={normalizedConfig.retry?.delay ?? RETRY_DELAY_DEFAULT}
+          onChange={(value) => onUpdateConfigValue('retry', value, 'delay')}
+        />
+      </div>
     </div>
-  );
-}
+
+    <span className="ss-order-confirm-fields-section-title">{LABEL_ERROR_MESSAGE}</span>
+    <textarea
+      className="ss-bot-statement-type-text-content ss-input-value"
+      rows={TEXTAREA_ROWS}
+      value={normalizedConfig.error_message || ''}
+      onChange={(event) => onUpdateConfigValue('error_message', event.target.value)}
+    />
+  </div>
+);
+
+export default OrderConfirmAdvancedSettings;

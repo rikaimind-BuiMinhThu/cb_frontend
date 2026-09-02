@@ -6,7 +6,7 @@ import {
   UserMessage, BotMessage, CombineMessage,
   PreviewClosedLauncher, PreviewOpenChatFrame, PreviewMessagesList,
 } from "./PreviewComponent";
-import UserMessageTailIcon from "./PreviewComponent/UserMessageTailIcon";
+import UserMessageTailIcon from 'v2/components/BotMessages/UserMessageTailIcon';
 import { resolveMainColorContext, resolveUserMessageTheme } from "v2/utils/designThemeCore";
 import PreviewFukushashikiReducer from "./PreviewFukushashiki/PreviewFukushashikiReducer";
 import { EC_CHATBOT_URL } from "v2/variables/constants";

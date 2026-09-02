@@ -22,3 +22,11 @@ export const DELETE_CONFIRM = '本当に削除しますか。';
 export const DELETE_OK = '削除';
 
 export const PAGE_SIZE = 10;
+
+export const NAME_MAX_LENGTH = 50;
+export const CONTENT_MAX_LENGTH = 200;
+
+export const NAME_REQUIRED = 'テンプレート名は、必ず指定してください。';
+export const NAME_MAX = 'テンプレート名は50文字以下にしてください。';
+export const CONTENT_REQUIRED = 'メッセージは、必ず指定してください。';
+export const CONTENT_MAX = 'メッセージは200文字以下にしてください。';

@@ -38,5 +38,21 @@ export const APPLY_TEMPLATE_TITLE = 'テンプレートを適用しますか？'
 export const APPLY_TEMPLATE_MESSAGE = '現在の注文確認設定はテンプレートの内容で上書きされます。';
 export const APPLY_OK_TEXT = '適用';
 export const LOAD_TEMPLATE_FAILED = 'Failed to load template';
+export const LABEL_RETRY = 'リトライ';
+export const LABEL_MAX_RETRY = '最大回数';
+export const LABEL_RETRY_DELAY = '間隔 (ms)';
+export const LABEL_ERROR_MESSAGE = 'エラーメッセージ';
+export const COL_FIELD = '項目';
+export const COL_SELECTOR = 'セレクター';
+export const COL_LABEL = 'ラベル';
+export const ADD_FIELD = '+ 項目を追加';
+export const TEXTAREA_ROWS = 3;
+export const RETRY_MAX_MIN = 1;
+export const RETRY_MAX_MAX = 50;
+export const RETRY_MAX_DEFAULT = 20;
+export const RETRY_DELAY_MIN = 100;
+export const RETRY_DELAY_MAX = 5000;
+export const RETRY_DELAY_STEP = 100;
+export const RETRY_DELAY_DEFAULT = 500;
 
 export { API_SUCCESS_CODE, ROLE_ADMIN_DEEL, USER_ROLE_COOKIE_KEY };

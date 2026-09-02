@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import PresetColorPicker from './PresetColorPicker';
 import DesignSettingLabel from './shared/DesignSettingLabel';
 import { getDesignSettingTooltip } from '../constants/designSettingTooltips';
+import { THEME_COLOR_TEXT_PLACEHOLDER } from '../constants/designThemeConstants';
+import { DEFAULT_MAIN_COLOR } from '../constants/designChatbotConstants';
 
 const ThemeColorField = ({
   label,
@@ -26,7 +28,7 @@ const ThemeColorField = ({
             type="text"
             className="theme-field__input theme-field__input--text"
             value={value || ''}
-            placeholder="例: 0 0 0 2px rgba(50,122,237,0.3)"
+            placeholder={THEME_COLOR_TEXT_PLACEHOLDER}
             onChange={(e) => onChange(e.target.value)}
           />
         </div>
@@ -41,7 +43,7 @@ const ThemeColorField = ({
       </DesignSettingLabel>
       <div className="theme-field__control">
         <PresetColorPicker
-          value={value || '#327AED'}
+          value={value || DEFAULT_MAIN_COLOR}
           onChange={onChange}
         />
       </div>

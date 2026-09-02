@@ -2382,3 +2382,29 @@ input#ss-message__content--user-radio_button,
 .ss-combine-message__wrapper--theme {
   padding: 10px;
 }
+
+.cart-login-interactive {
+  width: var(--cart-login-width);
+  padding: var(--cart-login-padding);
+  background: var(--cart-login-bg);
+  color: var(--cart-login-color);
+  font-size: var(--cart-login-font-size);
+  font-weight: var(--cart-login-font-weight);
+  border: var(--cart-login-border);
+  border-radius: var(--cart-login-radius);
+  text-align: var(--cart-login-align);
+  cursor: pointer;
+  line-height: 1.6;
+  transition: all 0.2s ease;
+  display: block;
+  text-decoration: var(--cart-login-decoration);
+  box-sizing: border-box;
+}
+
+.cart-login-interactive:hover {
+  background: var(--cart-login-hover-bg, var(--cart-login-bg));
+}
+
+.cart-login-interactive--link:hover {
+  background: var(--cart-login-bg);
+}
