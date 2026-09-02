@@ -15,90 +15,110 @@ import {
   SearchOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
+import {
+  ACTION_BACK,
+  ACTION_CANCEL,
+  ACTION_COPY,
+  ACTION_CREATE,
+  ACTION_DELETE,
+  ACTION_DOWNLOAD,
+  ACTION_DUPLICATE,
+  ACTION_EDIT,
+  ACTION_LABELS,
+  ACTION_PAYMENT,
+  ACTION_PREVIEW,
+  ACTION_SAVE,
+  ACTION_SEARCH,
+  ACTION_UPLOAD,
+  BUTTON_SIZE_SMALL,
+  BUTTON_TYPE_DEFAULT,
+  BUTTON_TYPE_LINK,
+  BUTTON_TYPE_PRIMARY,
+} from './constants';
 
 const ACTION_CONFIG = {
-  create: {
-    label: '作成',
-    type: 'primary',
+  [ACTION_CREATE]: {
+    label: ACTION_LABELS[ACTION_CREATE],
+    type: BUTTON_TYPE_PRIMARY,
     icon: <PlusOutlined />,
   },
-  upload: {
-    label: 'ファイル追加',
-    type: 'primary',
+  [ACTION_UPLOAD]: {
+    label: ACTION_LABELS[ACTION_UPLOAD],
+    type: BUTTON_TYPE_PRIMARY,
     icon: <UploadOutlined />,
   },
-  save: {
-    label: '保存',
-    type: 'primary',
+  [ACTION_SAVE]: {
+    label: ACTION_LABELS[ACTION_SAVE],
+    type: BUTTON_TYPE_PRIMARY,
     icon: <SaveOutlined />,
   },
-  edit: {
-    label: '編集',
-    type: 'link',
-    size: 'small',
+  [ACTION_EDIT]: {
+    label: ACTION_LABELS[ACTION_EDIT],
+    type: BUTTON_TYPE_LINK,
+    size: BUTTON_SIZE_SMALL,
     icon: <EditOutlined />,
   },
-  preview: {
-    label: 'プレビュー',
-    type: 'link',
-    size: 'small',
+  [ACTION_PREVIEW]: {
+    label: ACTION_LABELS[ACTION_PREVIEW],
+    type: BUTTON_TYPE_LINK,
+    size: BUTTON_SIZE_SMALL,
     icon: <EyeOutlined />,
   },
-  duplicate: {
-    label: '複製',
-    type: 'link',
-    size: 'small',
+  [ACTION_DUPLICATE]: {
+    label: ACTION_LABELS[ACTION_DUPLICATE],
+    type: BUTTON_TYPE_LINK,
+    size: BUTTON_SIZE_SMALL,
     icon: <CopyOutlined />,
   },
-  copy: {
-    label: 'コピー',
-    type: 'link',
-    size: 'small',
+  [ACTION_COPY]: {
+    label: ACTION_LABELS[ACTION_COPY],
+    type: BUTTON_TYPE_LINK,
+    size: BUTTON_SIZE_SMALL,
     icon: <CopyOutlined />,
   },
-  back: {
-    label: '戻る',
-    type: 'default',
+  [ACTION_BACK]: {
+    label: ACTION_LABELS[ACTION_BACK],
+    type: BUTTON_TYPE_DEFAULT,
     icon: <ArrowLeftOutlined />,
   },
-  cancel: {
-    label: 'キャンセル',
-    type: 'default',
+  [ACTION_CANCEL]: {
+    label: ACTION_LABELS[ACTION_CANCEL],
+    type: BUTTON_TYPE_DEFAULT,
     icon: <CloseOutlined />,
   },
-  delete: {
-    label: '削除',
-    type: 'link',
-    size: 'small',
+  [ACTION_DELETE]: {
+    label: ACTION_LABELS[ACTION_DELETE],
+    type: BUTTON_TYPE_LINK,
+    size: BUTTON_SIZE_SMALL,
     danger: true,
     icon: <DeleteOutlined />,
   },
-  payment: {
-    label: '決済',
-    type: 'link',
-    size: 'small',
+  [ACTION_PAYMENT]: {
+    label: ACTION_LABELS[ACTION_PAYMENT],
+    type: BUTTON_TYPE_LINK,
+    size: BUTTON_SIZE_SMALL,
     icon: <DollarOutlined />,
   },
-  search: {
-    label: '検索',
-    type: 'primary',
+  [ACTION_SEARCH]: {
+    label: ACTION_LABELS[ACTION_SEARCH],
+    type: BUTTON_TYPE_PRIMARY,
     icon: <SearchOutlined />,
   },
-  download: {
-    label: 'ダウンロード',
-    type: 'primary',
+  [ACTION_DOWNLOAD]: {
+    label: ACTION_LABELS[ACTION_DOWNLOAD],
+    type: BUTTON_TYPE_PRIMARY,
     icon: <DownloadOutlined />,
   },
 };
 
-function AdminActionButton({
+const AdminActionButton = ({
   action,
   label,
   className,
   icon: _ignoredIcon,
   iconOnly = false,
   ...rest
-}) {
+}) => {
   const config = ACTION_CONFIG[action];
 
   if (!config) {
@@ -106,7 +126,9 @@ function AdminActionButton({
   }
 
   const resolvedLabel = label || config.label;
-  const classes = [className, iconOnly && 'admin-action-button--icon-only'].filter(Boolean).join(' ');
+  const classes = [className, iconOnly && 'admin-action-button--icon-only']
+    .filter(Boolean)
+    .join(' ');
 
   const button = (
     <Button
@@ -127,7 +149,7 @@ function AdminActionButton({
   }
 
   return button;
-}
+};
 
 AdminActionButton.propTypes = {
   action: PropTypes.oneOf(Object.keys(ACTION_CONFIG)).isRequired,

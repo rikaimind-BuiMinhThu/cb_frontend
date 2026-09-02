@@ -1,51 +1,50 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Button, Layout } from 'antd';
 import { MenuFoldOutlined, MenuUnfoldOutlined, LogoutOutlined } from '@ant-design/icons';
-import Cookies from 'js-cookie';
-import { useAdminHeaderTitleContext } from './AdminHeaderTitleContext';
-import { useAdminHeaderActionsContext } from './AdminHeaderActionsContext';
 import AdminVersionSwitch from 'components/AdminVersionSwitch/AdminVersionSwitch';
-import { getSignInPath } from 'v2/variables/constants';
+import { tokenExpired } from 'v2/api/tokenExpired';
+import { useAdminHeaderActionsContext } from './AdminHeaderActionsContext';
+import { useAdminHeaderTitleContext } from './AdminHeaderTitleContext';
+import {
+  ADMIN_VERSION_SWITCH_VARIANT,
+  BUTTON_TYPE_DEFAULT,
+  BUTTON_TYPE_TEXT,
+  LOGOUT_LABEL,
+  TOGGLE_SIDEBAR_ARIA_LABEL,
+} from './constants';
 
 const { Header } = Layout;
 
-function AdminHeader({ collapsed, onToggleCollapse }) {
+const AdminHeader = ({ collapsed, onToggleCollapse }) => {
   const { title } = useAdminHeaderTitleContext();
   const { actions } = useAdminHeaderActionsContext();
-
-  const logout = () => {
-    Cookies.set('is_auth', 'false');
-    Cookies.remove('token', '/');
-    Cookies.remove('user_role');
-    Cookies.remove('user_id');
-    Cookies.remove('page_access_token');
-    Cookies.remove('scenario_id');
-    Cookies.remove('refreshToken');
-    Cookies.remove('bot_type');
-    Cookies.remove('bot_id');
-    window.location.href = getSignInPath();
-  };
 
   return (
     <Header className="admin-header">
       <div className="admin-header-left">
         <Button
-          type="text"
+          type={BUTTON_TYPE_TEXT}
           icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           onClick={onToggleCollapse}
-          aria-label="Toggle sidebar"
+          aria-label={TOGGLE_SIDEBAR_ARIA_LABEL}
         />
         {title && <h1 className="admin-header-title">{title}</h1>}
       </div>
       <div className="admin-header-right">
         {actions && <div className="admin-header-actions">{actions}</div>}
-        <AdminVersionSwitch variant="antd" />
-        <Button type="default" icon={<LogoutOutlined />} onClick={logout}>
-          ログアウト
+        <AdminVersionSwitch variant={ADMIN_VERSION_SWITCH_VARIANT} />
+        <Button type={BUTTON_TYPE_DEFAULT} icon={<LogoutOutlined />} onClick={tokenExpired}>
+          {LOGOUT_LABEL}
         </Button>
       </div>
     </Header>
   );
-}
+};
+
+AdminHeader.propTypes = {
+  collapsed: PropTypes.bool,
+  onToggleCollapse: PropTypes.func,
+};
 
 export default AdminHeader;

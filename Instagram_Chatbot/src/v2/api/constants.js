@@ -12,6 +12,8 @@ export const CLIENT_ID_COOKIE_KEY = 'client_id';
 export const USER_ID_COOKIE_KEY = 'user_id';
 export const USER_ROLE_COOKIE_KEY = 'user_role';
 export const SCENARIO_ID_COOKIE_KEY = 'scenario_id';
+export const CLIENT_STORAGE_KEY = 'client';
+export const BOT_TYPE_BOT = 'bot';
 export const COOKIE_ROOT_PATH = '/';
 export const AUTHORIZATION_HEADER = 'Authorization';
 export const BEARER_PREFIX = 'Bearer ';
@@ -24,8 +26,10 @@ export const INSTAGRAM_NOT_LINKED_CODE = 2;
 
 export const SESSION_COOKIE_KEYS = [
   BOT_ID_COOKIE_KEY,
+  BOT_TYPE_COOKIE_KEY,
   CLIENT_ID_COOKIE_KEY,
   USER_ID_COOKIE_KEY,
   USER_ROLE_COOKIE_KEY,
   SCENARIO_ID_COOKIE_KEY,
+  PAGE_ACCESS_TOKEN_COOKIE_KEY,
 ];

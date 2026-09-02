@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { getPageTitle } from './adminMenuConfig';
 import { useAdminHeaderTitleContext } from './AdminHeaderTitleContext';
 
-function AdminRouteTitleSync() {
+const AdminRouteTitleSync = () => {
   const location = useLocation();
   const { setTitle } = useAdminHeaderTitleContext();
 
@@ -12,6 +12,6 @@ function AdminRouteTitleSync() {
   }, [location.pathname, setTitle]);
 
   return null;
-}
+};
 
 export default AdminRouteTitleSync;

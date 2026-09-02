@@ -2,11 +2,12 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from '
 import PropTypes from 'prop-types';
 import { useLocation } from 'react-router-dom';
 import { getPageTitle } from './adminMenuConfig';
+import { EMPTY_VALUE, HEADER_TITLE_CONTEXT_ERROR } from './constants';
 
 const AdminHeaderTitleContext = createContext(null);
 
-export function AdminHeaderTitleProvider({ children }) {
-  const [title, setTitle] = useState('');
+export const AdminHeaderTitleProvider = ({ children }) => {
+  const [title, setTitle] = useState(EMPTY_VALUE);
 
   const value = useMemo(() => ({ title, setTitle }), [title]);
 
@@ -15,26 +16,26 @@ export function AdminHeaderTitleProvider({ children }) {
       {children}
     </AdminHeaderTitleContext.Provider>
   );
-}
+};
 
 AdminHeaderTitleProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-export function useAdminHeaderTitleContext() {
+export const useAdminHeaderTitleContext = () => {
   const context = useContext(AdminHeaderTitleContext);
   if (!context) {
-    throw new Error('useAdminHeaderTitleContext must be used within AdminHeaderTitleProvider');
+    throw new Error(HEADER_TITLE_CONTEXT_ERROR);
   }
   return context;
-}
+};
 
-export function useAdminHeaderTitle(title) {
+export const useAdminHeaderTitle = (title) => {
   const { setTitle } = useAdminHeaderTitleContext();
   const location = useLocation();
 
   useEffect(() => {
-    setTitle(title || '');
+    setTitle(title || EMPTY_VALUE);
     return () => setTitle(getPageTitle(location.pathname));
   }, [title, setTitle, location.pathname]);
-}
+};

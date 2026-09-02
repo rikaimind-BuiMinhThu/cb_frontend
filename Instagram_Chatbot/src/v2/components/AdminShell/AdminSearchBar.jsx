@@ -1,16 +1,18 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Input, Select, Space } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import AdminActionButton from './AdminActionButton';
+import { ACTION_SEARCH, SEARCH_FILTER_SPACE_SIZE, SEARCH_PLACEHOLDER } from './constants';
 
-function AdminSearchBar({
+const AdminSearchBar = ({
   searchValue,
   onSearchChange,
   onSearch,
-  searchPlaceholder = '検索...',
+  searchPlaceholder = SEARCH_PLACEHOLDER,
   filters = [],
   extra,
-}) {
+}) => {
   const showSearch = onSearchChange != null || onSearch != null;
 
   return (
@@ -19,7 +21,7 @@ function AdminSearchBar({
         <Input
           placeholder={searchPlaceholder}
           value={searchValue}
-          onChange={(e) => onSearchChange?.(e.target.value)}
+          onChange={(event) => onSearchChange?.(event.target.value)}
           onPressEnter={onSearch}
           prefix={<SearchOutlined className="admin-search-bar-icon" />}
           allowClear
@@ -27,8 +29,10 @@ function AdminSearchBar({
         />
       )}
       {filters.map((filter) => (
-        <Space key={filter.key} size={4}>
-          {filter.label && <span className="admin-search-bar-filter-label">{filter.label}</span>}
+        <Space key={filter.key} size={SEARCH_FILTER_SPACE_SIZE}>
+          {filter.label && (
+            <span className="admin-search-bar-filter-label">{filter.label}</span>
+          )}
           <Select
             value={filter.value}
             onChange={filter.onChange}
@@ -39,10 +43,19 @@ function AdminSearchBar({
           />
         </Space>
       ))}
-      {onSearch && <AdminActionButton action="search" onClick={onSearch} />}
+      {onSearch && <AdminActionButton action={ACTION_SEARCH} onClick={onSearch} />}
       {extra}
     </div>
   );
-}
+};
+
+AdminSearchBar.propTypes = {
+  searchValue: PropTypes.string,
+  onSearchChange: PropTypes.func,
+  onSearch: PropTypes.func,
+  searchPlaceholder: PropTypes.string,
+  filters: PropTypes.arrayOf(PropTypes.object),
+  extra: PropTypes.node,
+};
 
 export default AdminSearchBar;

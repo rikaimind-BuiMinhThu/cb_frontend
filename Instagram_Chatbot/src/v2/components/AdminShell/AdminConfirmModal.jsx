@@ -1,19 +1,27 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Modal } from 'antd';
+import {
+  CONFIRM_CANCEL,
+  CONFIRM_DELETE,
+  CONFIRM_MODAL_WIDTH,
+  CONFIRM_OK,
+  CONFIRM_TITLE,
+} from './constants';
 
-function AdminConfirmModal({
+const AdminConfirmModal = ({
   open,
   visible,
-  title = '確認',
+  title = CONFIRM_TITLE,
   message,
   okText,
-  cancelText = 'キャンセル',
+  cancelText = CONFIRM_CANCEL,
   onOk,
   onCancel,
   danger = false,
   loading = false,
-}) {
-  const resolvedOkText = okText ?? (danger ? '削除' : 'はい');
+}) => {
+  const resolvedOkText = okText ?? (danger ? CONFIRM_DELETE : CONFIRM_OK);
 
   return (
     <Modal
@@ -25,11 +33,24 @@ function AdminConfirmModal({
       cancelText={cancelText}
       okButtonProps={{ danger, loading }}
       centered
-      width={400}
+      width={CONFIRM_MODAL_WIDTH}
     >
       <p className="admin-confirm-modal-message">{message}</p>
     </Modal>
   );
-}
+};
+
+AdminConfirmModal.propTypes = {
+  open: PropTypes.bool,
+  visible: PropTypes.bool,
+  title: PropTypes.string,
+  message: PropTypes.node,
+  okText: PropTypes.string,
+  cancelText: PropTypes.string,
+  onOk: PropTypes.func,
+  onCancel: PropTypes.func,
+  danger: PropTypes.bool,
+  loading: PropTypes.bool,
+};
 
 export default AdminConfirmModal;

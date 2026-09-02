@@ -1,51 +1,58 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ConfigProvider, Layout } from 'antd';
 import jaJP from 'antd/es/locale/ja_JP';
-import { Route, Switch, useLocation } from 'react-router-dom';
-import AdminSidebar from './AdminSidebar';
-import AdminHeader from './AdminHeader';
-import { AdminHeaderTitleProvider } from './AdminHeaderTitleContext';
-import { AdminHeaderActionsProvider } from './AdminHeaderActionsContext';
-import AdminRouteTitleSync from './AdminRouteTitleSync';
-import routes from '../../routes';
-import PushMessage from '../../views/BotSettings/PushMessage/PushMessagePage';
-import ListSmsTemplate from '../../views/BotSettings/SmsTemplate/ListSmsTemplate';
-import { adminConfigProviderProps } from '../../theme/adminTheme';
-import { getAdminRoutePath, getDefaultLandingPath, getSignInPath } from 'v2/variables/constants';
 import Cookies from 'js-cookie';
+import { Route, Switch, useLocation } from 'react-router-dom';
+import { getToken } from 'v2/api/auth';
+import { AUTH_FALSE_VALUE, IS_AUTH_COOKIE_KEY, USER_ROLE_COOKIE_KEY } from 'v2/api/constants';
+import { getAdminRoutePath, getDefaultLandingPath, getSignInPath } from 'v2/variables/constants';
+import routes from '../../routes';
+import { adminConfigProviderProps } from '../../theme/adminTheme';
+import ListSmsTemplate from '../../views/BotSettings/SmsTemplate/ListSmsTemplate';
+import PushMessage from '../../views/BotSettings/PushMessage/PushMessagePage';
+import AdminHeader from './AdminHeader';
+import { AdminHeaderActionsProvider } from './AdminHeaderActionsContext';
+import { AdminHeaderTitleProvider } from './AdminHeaderTitleContext';
+import AdminRouteTitleSync from './AdminRouteTitleSync';
+import AdminSidebar from './AdminSidebar';
+import {
+  ADMIN_PATHS,
+  EMPTY_VALUE,
+  INSTAGRAM_ROLE_PATHS,
+  parseStoredClient,
+  PUSH_MESSAGE_ROUTE,
+  SMS_TEMPLATE_ROUTE,
+  USER_ROLE_ADMIN_DEEL,
+  WEB_ROLE_PATHS,
+} from './constants';
 import 'v2/assets/css/admin/admin-shell.css';
 
 const { Content } = Layout;
 
-function AdminLayout(props) {
+const AdminLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
-  const mainPanelRef = React.useRef();
-  const token = Cookies.get('token');
-  const isAuthenticated = Boolean(token) && Cookies.get('is_auth') !== 'false';
+  const mainPanelRef = useRef();
+  const token = getToken();
+  const isAuthenticated = Boolean(token) && Cookies.get(IS_AUTH_COOKIE_KEY) !== AUTH_FALSE_VALUE;
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (mainPanelRef.current) {
       mainPanelRef.current.scrollTop = 0;
     }
     window.scrollTo(0, 0);
-    const token = Cookies.get('token');
-    if (!token || Cookies.get('is_auth') === 'false') {
+    const currentToken = getToken();
+    if (!currentToken || Cookies.get(IS_AUTH_COOKIE_KEY) === AUTH_FALSE_VALUE) {
       window.location.href = getSignInPath();
       return;
     }
     const pathname = location?.pathname;
-    let client = null;
-    try {
-      client = JSON.parse(localStorage.getItem('client'));
-    } catch {
-      client = null;
-    }
-    const userRole = Cookies.get('user_role') || '';
+    const client = parseStoredClient();
+    const userRole = Cookies.get(USER_ROLE_COOKIE_KEY) || EMPTY_VALUE;
     const landingPath = getDefaultLandingPath(userRole, client);
-    const dashboardPath = getAdminRoutePath('/dashboard');
+    const dashboardPath = getAdminRoutePath(ADMIN_PATHS.DASHBOARD);
 
-    if (pathname === dashboardPath && userRole !== 'admin_deel') {
+    if (pathname === dashboardPath && userRole !== USER_ROLE_ADMIN_DEEL) {
       if (landingPath !== dashboardPath) {
         window.location.href = landingPath;
       }
@@ -54,26 +61,8 @@ function AdminLayout(props) {
 
     const isInstagram = client?.is_instagram;
     const isWeb = client?.is_web;
-    const instagramRolesUrl = [
-      getAdminRoutePath('/chatbot'),
-      getAdminRoutePath('/keyword'),
-      getAdminRoutePath('/release'),
-      getAdminRoutePath('/data'),
-      getAdminRoutePath('/data-analyst'),
-      getAdminRoutePath('/list-user'),
-      getAdminRoutePath('/attracted-customer'),
-      getAdminRoutePath('/crm'),
-    ];
-    const webRolesUrl = [
-      getAdminRoutePath('/bot'),
-      getAdminRoutePath('/account-information'),
-      getAdminRoutePath('/basic-setting'),
-      getAdminRoutePath('/reply-mail-management'),
-      getAdminRoutePath('/scenario-template-list'),
-      getAdminRoutePath('/scenario-template-setting'),
-      getAdminRoutePath('/order-confirm-template-list'),
-      getAdminRoutePath('/order-confirm-template-setting'),
-    ];
+    const instagramRolesUrl = INSTAGRAM_ROLE_PATHS.map(getAdminRoutePath);
+    const webRolesUrl = WEB_ROLE_PATHS.map(getAdminRoutePath);
     if (
       (!isInstagram && instagramRolesUrl.includes(pathname)) ||
       (!isWeb && webRolesUrl.includes(pathname))
@@ -95,25 +84,28 @@ function AdminLayout(props) {
           <Layout className="admin-layout">
             <AdminSidebar collapsed={collapsed} onCollapse={setCollapsed} />
             <Layout>
-              <AdminHeader collapsed={collapsed} onToggleCollapse={() => setCollapsed(!collapsed)} />
+              <AdminHeader
+                collapsed={collapsed}
+                onToggleCollapse={() => setCollapsed(!collapsed)}
+              />
               <Content className="admin-content main-panel" ref={mainPanelRef}>
-              <Switch>
-                {routes.map((route, key) => (
+                <Switch>
+                  {routes.map((route) => (
+                    <Route
+                      path={`${route.layout}${route.path}`}
+                      component={route.component}
+                      key={`${route.layout}${route.path}`}
+                    />
+                  ))}
                   <Route
-                    path={route.layout + route.path}
-                    component={route.component}
-                    key={key}
+                    path={getAdminRoutePath(SMS_TEMPLATE_ROUTE)}
+                    component={ListSmsTemplate}
                   />
-                ))}
-                <Route
-                  path={getAdminRoutePath('/bot-settings/:botId/sms-template')}
-                  component={ListSmsTemplate}
-                />
-                <Route
-                  path={getAdminRoutePath('/bot-settings/:botId/push-message')}
-                  component={PushMessage}
-                />
-              </Switch>
+                  <Route
+                    path={getAdminRoutePath(PUSH_MESSAGE_ROUTE)}
+                    component={PushMessage}
+                  />
+                </Switch>
               </Content>
             </Layout>
           </Layout>
@@ -121,6 +113,6 @@ function AdminLayout(props) {
       </AdminHeaderTitleProvider>
     </ConfigProvider>
   );
-}
+};
 
 export default AdminLayout;

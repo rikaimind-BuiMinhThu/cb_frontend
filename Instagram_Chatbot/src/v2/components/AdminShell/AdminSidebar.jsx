@@ -1,7 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import PropTypes from 'prop-types';
 import { Layout, Menu } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 import Cookies from 'js-cookie';
+import { BOT_ID_COOKIE_KEY, BOT_TYPE_BOT, BOT_TYPE_COOKIE_KEY, USER_ROLE_COOKIE_KEY } from 'v2/api/constants';
+import { getDefaultLandingPath } from 'v2/variables/constants';
 import logo from '../Sidebar/ecchatbot-logo.png';
 import {
   filterMenuByRole,
@@ -10,63 +13,70 @@ import {
   isBotMenuRoute,
   resolveMenuPath,
 } from './adminMenuConfig';
-import { getDefaultLandingPath } from 'v2/variables/constants';
+import {
+  EMPTY_VALUE,
+  LOGO_ALT,
+  MENU_MODE_INLINE,
+  parseStoredClient,
+  SIDER_THEME_LIGHT,
+  SIDER_WIDTH,
+} from './constants';
 
 const { Sider } = Layout;
 
-function flattenPaths(items, paths = []) {
-  items.forEach((item) => {
-    if (item.path) paths.push(item.path);
-    if (item.children) flattenPaths(item.children, paths);
-  });
-  return paths;
-}
+const flattenPaths = (items) => items.reduce((paths, item) => {
+  const next = item.path ? [...paths, item.path] : paths;
+  return item.children ? [...next, ...flattenPaths(item.children)] : next;
+}, []);
 
-function buildMenuItems(items) {
-  return items.map((item) => {
-    if (item.children) {
-      return {
-        key: item.key,
-        icon: item.icon,
-        label: item.label,
-        children: buildMenuItems(item.children),
-      };
-    }
+const buildMenuItems = (items) => items.map((item) => {
+  if (item.children) {
     return {
-      key: item.key || item.path,
+      key: item.key,
       icon: item.icon,
-      label: <Link to={item.path}>{item.label}</Link>,
+      label: item.label,
+      children: buildMenuItems(item.children),
     };
-  });
-}
+  }
+  return {
+    key: item.key || item.path,
+    icon: item.icon,
+    label: <Link to={item.path}>{item.label}</Link>,
+  };
+});
 
-function findSelectedKey(pathname, paths) {
+const findSelectedKey = (pathname, paths) => {
   const match = paths
-    .filter((p) => pathname === p || pathname.startsWith(`${p}/`))
-    .sort((a, b) => b.length - a.length)[0];
+    .filter((path) => pathname === path || pathname.startsWith(`${path}/`))
+    .sort((left, right) => right.length - left.length)[0];
   return match || pathname;
-}
+};
 
-function AdminSidebar({ collapsed, onCollapse }) {
+const collectOpenKeys = (items, selectedKey, parents = []) =>
+  items.reduce((keys, item) => {
+    const current = [...parents, item.key];
+    const withMatch = item.path === selectedKey ? [...keys, ...parents] : keys;
+    return item.children
+      ? [...withMatch, ...collectOpenKeys(item.children, selectedKey, current)]
+      : withMatch;
+  }, []);
+
+const AdminSidebar = ({ collapsed, onCollapse }) => {
   const location = useLocation();
-  const [botId, setBotId] = useState('');
-  const [userRole, setUserRole] = useState('');
-  const [botType, setBotType] = useState('');
+  const [botId, setBotId] = useState(EMPTY_VALUE);
+  const [userRole, setUserRole] = useState(EMPTY_VALUE);
+  const [botType, setBotType] = useState(EMPTY_VALUE);
   const [client, setClient] = useState(null);
 
   useEffect(() => {
-    setBotId(Cookies.get('bot_id') || '');
-    setUserRole(Cookies.get('user_role') || '');
-    setBotType(Cookies.get('bot_type') || '');
-    try {
-      setClient(JSON.parse(localStorage.getItem('client')));
-    } catch {
-      setClient(null);
-    }
+    setBotId(Cookies.get(BOT_ID_COOKIE_KEY) || EMPTY_VALUE);
+    setUserRole(Cookies.get(USER_ROLE_COOKIE_KEY) || EMPTY_VALUE);
+    setBotType(Cookies.get(BOT_TYPE_COOKIE_KEY) || EMPTY_VALUE);
+    setClient(parseStoredClient());
   }, [location.pathname]);
 
   const menuSource = useMemo(() => {
-    if (botType === 'bot' || isBotMenuRoute(location.pathname)) {
+    if (botType === BOT_TYPE_BOT || isBotMenuRoute(location.pathname)) {
       return getBotMenuItems(botId);
     }
     return filterMenuByRole(getGlobalMenuItems(client), userRole);
@@ -81,20 +91,10 @@ function AdminSidebar({ collapsed, onCollapse }) {
     [userRole, client],
   );
 
-  const openKeysFromPath = useMemo(() => {
-    const keys = [];
-    const findParents = (items, parents = []) => {
-      items.forEach((item) => {
-        const current = [...parents, item.key];
-        if (item.path === selectedKey) {
-          keys.push(...parents);
-        }
-        if (item.children) findParents(item.children, current);
-      });
-    };
-    findParents(menuSource);
-    return [...new Set(keys)];
-  }, [menuSource, selectedKey]);
+  const openKeysFromPath = useMemo(
+    () => [...new Set(collectOpenKeys(menuSource, selectedKey))],
+    [menuSource, selectedKey],
+  );
 
   const [openKeys, setOpenKeys] = useState(openKeysFromPath);
 
@@ -107,25 +107,30 @@ function AdminSidebar({ collapsed, onCollapse }) {
       collapsible
       collapsed={collapsed}
       onCollapse={onCollapse}
-      width={240}
+      width={SIDER_WIDTH}
       className="admin-sider"
-      theme="light"
+      theme={SIDER_THEME_LIGHT}
     >
       <div className="admin-sider-logo">
-        <Link to={landingPath} onClick={() => Cookies.remove('bot_type')}>
-          <img src={logo} alt="EC Chatbot" />
+        <Link to={landingPath} onClick={() => Cookies.remove(BOT_TYPE_COOKIE_KEY)}>
+          <img src={logo} alt={LOGO_ALT} />
         </Link>
       </div>
       <Menu
-        mode="inline"
+        mode={MENU_MODE_INLINE}
         selectedKeys={[selectedKey]}
         openKeys={collapsed ? [] : openKeys}
         onOpenChange={setOpenKeys}
         items={menuItems}
-        style={{ borderRight: 0, padding: '8px 0' }}
+        className="admin-sider-menu"
       />
     </Sider>
   );
-}
+};
+
+AdminSidebar.propTypes = {
+  collapsed: PropTypes.bool,
+  onCollapse: PropTypes.func,
+};
 
 export default AdminSidebar;
