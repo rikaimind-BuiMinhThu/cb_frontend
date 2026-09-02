@@ -6,18 +6,19 @@ import ScenarioModalFooter from '../../../components/modals/shared/ScenarioModal
 import AddressLayoutOptions from './AddressLayoutOptions';
 import AddressRequireOptions from './AddressRequireOptions';
 import { buildAddressFieldSettingContext } from './addressFieldSettingContext';
+import { ADDRESS_FIELD_MODAL_LABELS } from '../../../constants/scenarioSettingLabels';
 
 const REQUIRE_LABELS = {
-  require: '必須',
-  all_items_require: '全項目必須',
-  set_required_for_each_item: '項目ごとに必須設定',
+  require: ADDRESS_FIELD_MODAL_LABELS.require,
+  all_items_require: ADDRESS_FIELD_MODAL_LABELS.allItemsRequire,
+  set_required_for_each_item: ADDRESS_FIELD_MODAL_LABELS.setRequiredForEachItem,
 };
 
 const LAYOUT_LABELS = {
-  split_postal_code: '郵便番号を3桁+4桁に分割する',
-  compact_municipality_and_address: '市区町村と番地を１フィールドで利用',
-  is_display_address_field: '番地入力欄表示',
-  compact_municipality_and_address_and_building_name: '市区町村・番地・建物名を１フィールドで利用',
+  split_postal_code: ADDRESS_FIELD_MODAL_LABELS.splitPostalCode,
+  compact_municipality_and_address: ADDRESS_FIELD_MODAL_LABELS.compactMunicipalityAndAddress,
+  is_display_address_field: ADDRESS_FIELD_MODAL_LABELS.displayAddressField,
+  compact_municipality_and_address_and_building_name: ADDRESS_FIELD_MODAL_LABELS.compactAll,
 };
 
 const getActiveSettingLabels = (addressData, showDisplayAddressField) => {
@@ -40,8 +41,8 @@ const getActiveSettingLabels = (addressData, showDisplayAddressField) => {
 };
 
 const AddressFieldSettingsModal = ({
-  title = '住所フィールド設定',
-  buttonLabel = '詳細設定',
+  title = ADDRESS_FIELD_MODAL_LABELS.title,
+  buttonLabel = ADDRESS_FIELD_MODAL_LABELS.buttonLabel,
   showDisplayAddressField = false,
   requireExtra,
   ...props
@@ -92,13 +93,13 @@ const AddressFieldSettingsModal = ({
       >
         <div className="ss-address-field-settings-modal__body">
           <section className="ss-address-field-settings-modal__section">
-            <h5 className="ss-address-field-settings-modal__section-title">必須設定</h5>
+            <h5 className="ss-address-field-settings-modal__section-title">{ADDRESS_FIELD_MODAL_LABELS.requireSection}</h5>
             <AddressRequireOptions {...props}>
               {requireExtra}
             </AddressRequireOptions>
           </section>
           <section className="ss-address-field-settings-modal__section">
-            <h5 className="ss-address-field-settings-modal__section-title">レイアウト設定</h5>
+            <h5 className="ss-address-field-settings-modal__section-title">{ADDRESS_FIELD_MODAL_LABELS.layoutSection}</h5>
             <AddressLayoutOptions {...props} showDisplayAddressField={showDisplayAddressField} />
           </section>
         </div>

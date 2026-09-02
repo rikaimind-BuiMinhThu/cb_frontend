@@ -371,14 +371,12 @@ export const UPDATE_TOKYO_DEVELO_LP_PREFECTURE_JS_CODE = String(`setTimeout(() =
     
     const interval = setInterval(() => {
       tryTimes--;
-      console.log("tryTimes", tryTimes);
       if (tryTimes < 0) {
         clearInterval(interval);
         return;
       }
       
       let prefId = document.getElementById("drpPrefecture")?.value;
-      console.log("prefId", prefId);
       if (prefId) {
         let prefName = prefId;
         if (parseInt(prefId))

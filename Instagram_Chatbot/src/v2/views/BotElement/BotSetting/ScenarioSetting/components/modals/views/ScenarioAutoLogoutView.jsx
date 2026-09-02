@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useScenarioEditor } from '../../../context/ScenarioEditorContext';
-import InputCustom from '../../../scenarioComon/InputCustom';
+import InputCustom from '../../../scenarioCommon/InputCustom';
 import ScenarioFormRow from '../shared/ScenarioFormRow';
 import ScenarioModalFooter from '../shared/ScenarioModalFooter';
 import { SCENARIO_MODAL_TOOLTIPS } from '../shared/scenarioModalTooltips';

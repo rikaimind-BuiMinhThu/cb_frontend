@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 import { Button } from 'reactstrap';
 import { Checkbox, Select } from 'antd';
 import moment from 'moment';
-import SelectCustom from '../../scenarioComon/SelectCustom';
-import CheckboxCustom from '../../scenarioComon/CheckboxCustom';
-import InputNum from '../../scenarioComon/InputNum';
-import InputCustom from '../../scenarioComon/InputCustom';
-import DatePickerCustom from '../../scenarioComon/DatePickerCustom';
+import SelectCustom from '../../scenarioCommon/SelectCustom';
+import CheckboxCustom from '../../scenarioCommon/CheckboxCustom';
+import InputNum from '../../scenarioCommon/InputNum';
+import InputCustom from '../../scenarioCommon/InputCustom';
+import DatePickerCustom from '../../scenarioCommon/DatePickerCustom';
 import { dropDownTitle, typeCalendar, dataSelectDateTime } from '../../constants/scenarioFormConstants';
 import {
   CALENDAR_SETTING_LABELS,

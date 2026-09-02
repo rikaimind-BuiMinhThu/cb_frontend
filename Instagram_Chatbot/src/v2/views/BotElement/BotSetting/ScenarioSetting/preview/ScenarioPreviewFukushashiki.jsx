@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useReducer, useState, useCallback } from "react";
 import Cookies from "js-cookie";
-import CustomButton from "../../CustomButton";
+import CustomButton from "../../PreviewComponent/CustomButton";
 import {
   UserMessage, BotMessage, CombineMessage, CombineMessageNextButton,
   PreviewClosedLauncher, PreviewOpenChatFrame, PreviewMessagesList,
@@ -19,6 +19,11 @@ import {
   CONVERSION_RESPONSE_SUBMIT_TYPE,
   CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE,
   DISPLAY_TYPES,
+  NEXT_BUTTON_LABEL,
+  UPDATE_BUTTON_LABEL,
+  OK_BUTTON_LABEL,
+  DELAY_SECONDS_UNIT,
+  PROCESSING_LABEL,
 } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 import { injectBotThemeCss } from "v2/utils/chatbotThemeCss";
 import { COLOR_MAP } from "v2/views/DesignSetting/constants/designChatbotConstants";
@@ -52,7 +57,7 @@ import { isTokyoDeveloLP, UPDATE_TOKYO_DEVELO_LP_PREFECTURE_JS_CODE } from "v2/v
 import ProcessBar from "v2/views/BotElement/BotSetting/PreviewComponent/ProcessBar";
 import ZipCodePopUp from "v2/views/BotElement/BotSetting/PreviewComponent/ZipCodePopUp";
 import _ from "lodash";
-import Timer from "../../Timer";
+import Timer from "../../PreviewComponent/Timer";
 import { clearChatbotState } from "v2/views/BotElement/BotSetting/PreviewComponent/previewSessionUtils";
 import { getBotInforFromPreviewResponse } from "v2/views/BotElement/BotSetting/PreviewComponent/previewBotInfoUtils";
 import {
@@ -71,7 +76,7 @@ import { resolveErrMsgLpScript } from "v2/views/BotElement/BotSetting/ScenarioSe
 import { generateLaunchButtonLpScript } from "v2/views/BotElement/BotSetting/ScenarioSetting/utils/launchButtonLpScriptUtils";
 import { convertToFukushashikiObject } from "../../PreviewFukushashiki/FukushashikiDataConverterUtils";
 import { handleValidateField } from "../../PreviewFukushashiki/ValidationUtils";
-import { createOrAddLinesCart } from "../../ShopifyUtils";
+import { createOrAddLinesCart } from "../../PreviewComponent/ShopifyUtils";
 import { injectHtmlUgcConfigContent } from "v2/views/BotElement/BotSetting/PreviewComponent/BotMessageUtils";
 import { buildEditorDraftPreviewUpdate } from "./buildPreviewStateFromDraft";
 import { buildScenarioPreviewHeaderMeta } from "./buildScenarioPreviewHeaderMeta";
@@ -925,7 +930,7 @@ const ScenarioPreviewFukushashiki = ({
             <div className="sp-body-bot-side-messages">
               <div className="ss-bot-message">
                 <div className="ss-bot-message__content-wrapper">
-                  {`${content.delay?.content || 0} 秒`}
+                  {`${content.delay?.content || 0} ${DELAY_SECONDS_UNIT}`}
                 </div>
               </div>
             </div>
@@ -970,8 +975,8 @@ const ScenarioPreviewFukushashiki = ({
 
     const btnText = message.buttonName
       || (isBtnUpdateMode && msgState === 'clicked'
-        ? 'OK'
-        : (isUpdate ? '次へ' : '更新'));
+        ? OK_BUTTON_LABEL
+        : (isUpdate ? NEXT_BUTTON_LABEL : UPDATE_BUTTON_LABEL));
     const hasBtnUpdateClass = isBtnUpdateMode && msgState !== 'editing';
     const isEditorDisplayOnly = editorPreview;
     const actionBtnBg = state.botInfor?.main_color || state.botInfor?.main_color_other;
@@ -979,13 +984,13 @@ const ScenarioPreviewFukushashiki = ({
       <div className={`sp-user-message-button-action${isDisplayBtnNext ? '' : ' sp-user-message-button-action--hidden'}`}>
         <CustomButton
           disabled={isEditorDisplayOnly || (state.submitErrorMessage?.length > 0 ? false : message.disabled)}
-          cssVars={actionBtnBg ? { '--ss-action-btn-bg': actionBtnBg } : undefined}
+          actionBtnBg={actionBtnBg}
           className={`ss-user-message__action-btn${hasBtnUpdateClass ? " btn-update" : ""}`}
           onClick={isEditorDisplayOnly ? undefined : () => {
             onClickNext(messageIndex, message);
           }}
           autoClick={!isEditorDisplayOnly && isAutoClick && !state.isExtractFromSession}
-          messsagetype={message.message_content[0]?.type}
+          messageType={message.message_content[0]?.type}
         >
           {btnText}
         </CustomButton>
@@ -1130,7 +1135,7 @@ const ScenarioPreviewFukushashiki = ({
     if (!state.isUsedErrMsgByJs || !state.submitErrorMessage) return null;
 
     const className = state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "ss-bot-getting-error-notification" : "ss-bot-submit-error-message";
-    const text = state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "処理中..." : state.submitErrorMessage;
+    const text = state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? PROCESSING_LABEL : state.submitErrorMessage;
     const htmlText = text.replace(/¥n/g, "<br/>");
     return (
       <div className="ss-user-setting__item-text_input-top">

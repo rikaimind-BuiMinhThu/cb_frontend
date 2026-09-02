@@ -1,10 +1,10 @@
 import React from 'react';
 import { Button } from 'reactstrap';
-import CheckboxCustom from '../scenarioComon/CheckboxCustom';
-import HtmlCodeConfig from '../scenarioComon/HtmlCodeConfig';
-import AmazonPayButtonConfig from '../scenarioComon/AmazonPayButtonConfig';
+import CheckboxCustom from '../scenarioCommon/CheckboxCustom';
+import HtmlCodeConfig from '../scenarioCommon/HtmlCodeConfig';
+import AmazonPayButtonConfig from '../scenarioCommon/AmazonPayButtonConfig';
 import { BOT_MESSAGE_TYPES } from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants';
-import OrderConfirmConfig from '../scenarioComon/OrderConfirmConfig';
+import OrderConfirmConfig from '../scenarioCommon/OrderConfirmConfig';
 
 const CombineBotBlockSetting = ({
   content,

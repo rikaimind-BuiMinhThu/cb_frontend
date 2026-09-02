@@ -1,6 +1,6 @@
 import React from 'react';
 import { MDBIcon } from 'mdbreact';
-import InputCustom from '../../scenarioComon/InputCustom';
+import InputCustom from '../../scenarioCommon/InputCustom';
 import { RADIO_BUTTON_LABELS } from '../../constants/scenarioSettingLabels';
 import { buildRadioButtonSettingContext } from './radioButtonSettingContext';
 import { InitialSelectionCheckbox } from './radioButtonShared';

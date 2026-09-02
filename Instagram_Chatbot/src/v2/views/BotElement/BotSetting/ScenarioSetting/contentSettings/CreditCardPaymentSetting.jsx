@@ -1,1 +1,1 @@
-export { default } from './creditCardPayment';
+export { default } from './creditCardPayment/CreditCardPaymentSetting';

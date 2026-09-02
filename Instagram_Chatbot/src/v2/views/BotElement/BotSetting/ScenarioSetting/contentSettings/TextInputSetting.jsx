@@ -10,7 +10,7 @@ import EmailConfirmationTypeSetting from './textInput/EmailConfirmationTypeSetti
 import PhoneNumberTypeSetting from './textInput/PhoneNumberTypeSetting';
 import PasswordTypeSetting from './textInput/PasswordTypeSetting';
 import { buildTextInputSettingContext } from './textInput/textInputSettingContext';
-import EmailDomainSuggestionSettingsModal from '../scenarioComon/EmailDomainSuggestionSettingsModal';
+import EmailDomainSuggestionSettingsModal from '../scenarioCommon/EmailDomainSuggestionSettingsModal';
 import '../styles/contentSettings/textInput.css';
 
 const TYPE_SETTING_MAP = {

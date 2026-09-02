@@ -1,5 +1,5 @@
 import React from 'react';
-import InputNum from '../scenarioComon/InputNum';
+import InputNum from '../scenarioCommon/InputNum';
 import { COMBINE_CONTENT_ROLES } from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants';
 import { COMBINE_BOT_TYPE_OPTIONS, getCombineContentTypeLabel } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/combineContentDefaults';
 

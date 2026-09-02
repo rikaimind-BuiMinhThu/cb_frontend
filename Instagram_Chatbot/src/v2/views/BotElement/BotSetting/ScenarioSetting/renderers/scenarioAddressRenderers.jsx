@@ -1,5 +1,5 @@
 import React from 'react';
-import InputCustom from '../scenarioComon/InputCustom';
+import InputCustom from '../scenarioCommon/InputCustom';
 import { SETTING_LABELS, PREVIEW_LABELS } from '../constants/scenarioSettingLabels';
 
 const renderLabeledAddressInput = (label, placeholder) => (

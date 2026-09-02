@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ScenarioModalCheckbox from '../../../components/modals/shared/ScenarioModalCheckbox';
+import { ADDRESS_FIELD_MODAL_LABELS } from '../../../constants/scenarioSettingLabels';
 import { buildAddressFieldSettingContext } from './addressFieldSettingContext';
 
 const AddressLayoutOptions = (props) => {
@@ -12,7 +13,7 @@ const AddressLayoutOptions = (props) => {
       <ScenarioModalCheckbox
         checked={!!addressData.split_postal_code}
         onChange={(checked) => changeAddressField('split_postal_code')(checked)}
-        label="郵便番号を3桁+4桁に分割する"
+        label={ADDRESS_FIELD_MODAL_LABELS.splitPostalCode}
       />
       <ScenarioModalCheckbox
         checked={!!addressData.compact_municipality_and_address}
@@ -22,14 +23,14 @@ const AddressLayoutOptions = (props) => {
             changeAddressField('compact_municipality_and_address_and_building_name')(false);
           }
         }}
-        label="市区町村と番地を１フィールドで利用"
+        label={ADDRESS_FIELD_MODAL_LABELS.compactMunicipalityAndAddress}
       />
       {showDisplayAddressField && (
         <ScenarioModalCheckbox
           checked={!!addressData.compact_municipality_and_address && !!addressData.is_display_address_field}
           disabled={!addressData.compact_municipality_and_address}
           onChange={(checked) => changeAddressField('is_display_address_field')(checked)}
-          label="番地入力欄表示"
+          label={ADDRESS_FIELD_MODAL_LABELS.displayAddressField}
         />
       )}
       <ScenarioModalCheckbox
@@ -40,7 +41,7 @@ const AddressLayoutOptions = (props) => {
             changeAddressField('compact_municipality_and_address')(false);
           }
         }}
-        label="市区町村・番地・建物名を１フィールドで利用"
+        label={ADDRESS_FIELD_MODAL_LABELS.compactAll}
       />
     </div>
   );

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useScenarioEditor } from '../../../context/ScenarioEditorContext';
-import SelectCustom from '../../../scenarioComon/SelectCustom';
-import InputNum from '../../../scenarioComon/InputNum';
+import SelectCustom from '../../../scenarioCommon/SelectCustom';
+import InputNum from '../../../scenarioCommon/InputNum';
 import ScenarioFormRow from '../shared/ScenarioFormRow';
 import ScenarioModalFooter from '../shared/ScenarioModalFooter';
 import ScenarioCodeTextarea from '../shared/ScenarioCodeTextarea';

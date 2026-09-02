@@ -1,5 +1,5 @@
 import React from 'react';
-import SelectCustom from "./scenarioComon/SelectCustom";
+import SelectCustom from "./scenarioCommon/SelectCustom";
 
 const ShopifyReferenceSelect = ({listProductVariants, value, onChange, placeholder}) => {
     return (

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import FukushashikiSearchRow from '../shared/FukushashikiSearchRow';
-import SelectCustom from '../../scenarioComon/SelectCustom';
+import SelectCustom from '../../scenarioCommon/SelectCustom';
 import { LABELS } from '../../../PreviewComponent/Constants';
 import { FUKUSHASHIKI_VARIANTS } from '../../constants/scenarioSettingLabels';
 import { buildRadioButtonSettingContext } from './radioButtonSettingContext';

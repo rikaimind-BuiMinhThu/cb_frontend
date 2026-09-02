@@ -12,7 +12,7 @@ import ProductPurchaseSetting from './ProductPurchaseSetting';
 import ProductPurchaseRadioButtonSetting from './ProductPurchaseRadioButtonSetting';
 import ProductPurchaseSelectOptionSetting from './ProductPurchaseSelectOptionSetting';
 import SliderSetting from './SliderSetting';
-import ZipCodeAddressSetting from './zipCodeAddress';
+import ZipCodeAddressSetting from './zipCodeAddress/ZipCodeAddressSetting';
 import AttachingFileSetting from './AttachingFileSetting';
 import AgreeTermSetting from './agreeTerm/AgreeTermSetting';
 import ImageSetting from './ImageSetting';

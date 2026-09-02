@@ -53,9 +53,6 @@ const PushMessageHistory = () => {
         if (res.data.code === 1) {
           setList(res.data.data);
         }
-        if (res.data.code === 2) {
-          console.log(res.data.message);
-        }
       })
       .catch((error) => {
         if (error?.response?.data.code === 0) {

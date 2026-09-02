@@ -7,7 +7,7 @@ import {
   handleDisableDateCalendar,
   handleDisableEndDateCalendar,
 } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/scenarioCalendarUtils';
-import DatePickerCustom from '../../scenarioComon/DatePickerCustom';
+import DatePickerCustom from '../../scenarioCommon/DatePickerCustom';
 import CalendarEmbeddedHeader from '../../contentSettings/calendar/shared/CalendarEmbeddedHeader';
 import {
   CALENDAR_DATE_FORMAT,

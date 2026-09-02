@@ -1,5 +1,5 @@
 import React from 'react';
-import SelectCustom from '../../scenarioComon/SelectCustom';
+import SelectCustom from '../../scenarioCommon/SelectCustom';
 import { dataConsumeApiResponse } from '../../constants/scenarioFormConstants';
 import { buildCheckboxSettingContext } from './checkboxSettingContext';
 

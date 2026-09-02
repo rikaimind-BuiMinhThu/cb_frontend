@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Button } from 'reactstrap';
-import SelectCustom from '../../scenarioComon/SelectCustom';
-import CheckboxCustom from '../../scenarioComon/CheckboxCustom';
-import InputCustom from '../../scenarioComon/InputCustom';
-import CheckboxGroupCustom from '../../scenarioComon/CheckboxGroupCustom';
+import SelectCustom from '../../scenarioCommon/SelectCustom';
+import CheckboxCustom from '../../scenarioCommon/CheckboxCustom';
+import InputCustom from '../../scenarioCommon/InputCustom';
+import CheckboxGroupCustom from '../../scenarioCommon/CheckboxGroupCustom';
 import { dropDownTitle, dataPaymentMethod, dataYearFixed, dataMonthFixed, installmentOptions } from '../../constants/scenarioFormConstants';
 import {
   CREDIT_CARD_EXPIRY_TYPE_OPTIONS,

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import InputCustom from '../../scenarioComon/InputCustom';
-import SelectCustom from '../../scenarioComon/SelectCustom';
+import InputCustom from '../../scenarioCommon/InputCustom';
+import SelectCustom from '../../scenarioCommon/SelectCustom';
 import { CREDIT_CARD_SETTING_LABELS, PREVIEW_LABELS } from '../../constants/scenarioSettingLabels';
 import { CONTENT_SETTING_TYPES } from '../../constants/contentTypeConstants';
 import '../../styles/contentPreviews/creditCardPayment.css';

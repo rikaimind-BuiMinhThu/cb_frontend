@@ -73,7 +73,7 @@ const CheckboxItemsList = (props) => {
           containerClassName="ss-user-setting-item-checkbox-button-drag ss-checkbox-setting__drag-container"
           itemClassName="ss-checkbox-setting__item-panel"
           dragRowClassName="ss-checkbox-setting__default-row"
-          textValuePlaceholder={showTextInput ? SETTING_LABELS.textValue : ['値']}
+          textValuePlaceholder={showTextInput ? SETTING_LABELS.textValue : SETTING_LABELS.valueOnly}
           inputDoubleClassCustom="ss-user-radio-custom-class"
           inputDoubleClassIcon="ss-plus-circle-option-icon-times"
           showAddButton={false}

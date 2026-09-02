@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ScenarioModalCheckbox from '../../../components/modals/shared/ScenarioModalCheckbox';
-import { SETTING_LABELS } from '../../../constants/scenarioSettingLabels';
+import { SETTING_LABELS, ADDRESS_FIELD_MODAL_LABELS } from '../../../constants/scenarioSettingLabels';
 import { buildAddressFieldSettingContext } from './addressFieldSettingContext';
 
 const PER_FIELD_REQUIRE_LABELS = {
@@ -40,12 +40,12 @@ const AddressRequireOptions = ({ children, ...props }) => {
       <ScenarioModalCheckbox
         checked={addressData.isCheckRequire === 'all_items_require'}
         onChange={() => changeRequireMode('all_items_require')}
-        label="全項目必須"
+        label={ADDRESS_FIELD_MODAL_LABELS.allItemsRequire}
       />
       <ScenarioModalCheckbox
         checked={addressData.isCheckRequire === 'set_required_for_each_item'}
         onChange={() => changeRequireMode('set_required_for_each_item')}
-        label="項目ごとに必須設定"
+        label={ADDRESS_FIELD_MODAL_LABELS.setRequiredForEachItem}
       />
       {addressData.isCheckRequire === 'set_required_for_each_item' && (
         <div className="ss-address-require-options__per-field">

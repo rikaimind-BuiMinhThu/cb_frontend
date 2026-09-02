@@ -3,7 +3,7 @@ import { Button } from 'reactstrap';
 import { MDBIcon } from 'mdbreact';
 import 'react-datepicker/dist/react-datepicker.css';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import InputCustom from '../scenarioComon/InputCustom';
+import InputCustom from '../scenarioCommon/InputCustom';
 import { CONTENT_SETTING_MAP } from '../contentSettings';
 import { useScenarioPanelDestructuring } from '../hooks/useScenarioPanelDestructuring';
 import ScenarioMessageSettingsAccordion from './ScenarioMessageSettingsAccordion';

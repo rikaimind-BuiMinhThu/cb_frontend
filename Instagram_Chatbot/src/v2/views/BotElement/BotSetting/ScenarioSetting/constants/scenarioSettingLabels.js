@@ -9,6 +9,7 @@ export const SETTING_LABELS = {
   comment: 'コメント',
   defaultOption: 'デフォルトオプション',
   textValue: ['テキスト', '値'],
+  valueOnly: ['値'],
   add: '追加',
   fileReference: 'ファイル参照',
   require: '必須',
@@ -55,6 +56,10 @@ export const SETTING_PLACEHOLDERS = {
   customId: 'カスタムID',
   customId1: 'カスタムID1',
   customId2: 'カスタムID2',
+  optionIdCell1: 'セル 1 のオプション ID',
+  optionIdCell2: 'セル 2 のオプション ID',
+  optionId: 'オプションIDを入力してください',
+  characterLimitExample: '0000',
   placeholder: 'プレースホルダ',
   subtitle: 'サブタイトル',
   urls: 'URL',
@@ -309,10 +314,56 @@ export const PREVIEW_LABELS = {
   capture: 'キャプチャ',
   yen: '円',
   dashPlaceholder: '--',
+  secondsUnit: '秒',
+  ok: 'OK',
+  next: '次へ',
+  update: '更新',
+  processing: '処理中...',
 };
 
 export const TEXT_INPUT_LABELS = {
   allowSpecialChars: '特殊文字を許可する',
   disableRemoveLeadingZero: '先頭の0は削除しない（「0000」などもそのままLPへ反映）',
   placeholder: 'プレースホルダ',
+};
+
+export const SLIDER_SETTING_LABELS = {
+  continuousType: '連続タイプ',
+  discreteType: '離散タイプ',
+  minValue: '最小値',
+  maxValueLabel: '最大値のラベル',
+  minValueLabel: '最小値のラベル',
+  color: 'カラー',
+  colorPlaceholder: '#2c75f0',
+  colorInvalid: 'カラーには、有効な正規表現を指定してください。',
+};
+
+export const CONTACT_FORM_SETTING_LABELS = {
+  formType: 'フォーム種類',
+  submitButtonName: '送信ボタン名称',
+  submitPlaceholder: '送信する',
+  visibleFields: '表示フィールド',
+  visible: '表示',
+  required: '必須',
+  emailRequiredHint: 'ユーザーへ確認メールを送信する場合、メールアドレスは必須表示になります。',
+  inquiryType: 'お問い合わせ種別（改行区切り）',
+  emailSettings: 'メール送信設定',
+  sendConfirmToUser: 'ユーザーへ確認メールを送信する',
+  sendNotifyToStaff: '担当者へ通知メールを送信する',
+  userEmailTemplate: 'ユーザー向けメールテンプレート',
+  staffEmailTemplate: '担当者向けメールテンプレート',
+};
+
+export const ADDRESS_FIELD_MODAL_LABELS = {
+  title: '住所フィールド設定',
+  buttonLabel: '詳細設定',
+  requireSection: '必須設定',
+  layoutSection: 'レイアウト設定',
+  require: '必須',
+  allItemsRequire: '全項目必須',
+  setRequiredForEachItem: '項目ごとに必須設定',
+  splitPostalCode: '郵便番号を3桁+4桁に分割する',
+  compactMunicipalityAndAddress: '市区町村と番地を１フィールドで利用',
+  displayAddressField: '番地入力欄表示',
+  compactAll: '市区町村・番地・建物名を１フィールドで利用',
 };

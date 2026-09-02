@@ -68,4 +68,13 @@ export const RADIO_IMG_LAYOUT_SECTION_LABELS = {
   customWidthsHint: '合計が100%になるように設定してください',
   optionPadding: 'オプションの余白',
   optionMargin: 'オプション間の間隔',
+  columnPrefix: '列',
+  currentWidthPrefix: ' (現在: ',
+  currentWidthSuffix: '%)',
 };
+
+export const formatRadioImgColumnPlaceholder = (index) =>
+  `${RADIO_IMG_LAYOUT_SECTION_LABELS.columnPrefix}${index + 1}`;
+
+export const formatRadioImgCurrentWidth = (widthSum) =>
+  `${RADIO_IMG_LAYOUT_SECTION_LABELS.currentWidthPrefix}${widthSum}${RADIO_IMG_LAYOUT_SECTION_LABELS.currentWidthSuffix}`;

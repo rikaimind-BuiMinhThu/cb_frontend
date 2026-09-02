@@ -1,6 +1,6 @@
 import React from 'react';
-import SelectCustom from '../../scenarioComon/SelectCustom';
-import InputCustom from '../../scenarioComon/InputCustom';
+import SelectCustom from '../../scenarioCommon/SelectCustom';
+import InputCustom from '../../scenarioCommon/InputCustom';
 import { PULL_DOWN_LABELS, SETTING_PLACEHOLDERS } from '../../constants/scenarioSettingLabels';
 import { buildPullDownSettingContext } from './pullDownSettingContext';
 

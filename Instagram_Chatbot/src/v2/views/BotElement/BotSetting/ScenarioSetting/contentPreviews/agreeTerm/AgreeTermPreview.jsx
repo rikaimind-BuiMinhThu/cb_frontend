@@ -1,5 +1,5 @@
 import React from 'react';
-import CheckboxCustom from '../../scenarioComon/CheckboxCustom';
+import CheckboxCustom from '../../scenarioCommon/CheckboxCustom';
 import ContentPreviewShell from '../shared/ContentPreviewShell';
 import { AGREE_TERM_TYPES, CONTENT_SETTING_TYPES } from '../../constants/contentTypeConstants';
 import { PREVIEW_LABELS } from '../../constants/scenarioSettingLabels';

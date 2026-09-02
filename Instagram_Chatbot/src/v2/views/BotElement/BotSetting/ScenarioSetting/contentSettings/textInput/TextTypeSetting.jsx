@@ -1,9 +1,10 @@
 import React from 'react';
-import CheckboxCustom from '../../scenarioComon/CheckboxCustom';
-import SelectCustom from '../../scenarioComon/SelectCustom';
-import InputDouble from '../../scenarioComon/InputDouble';
-import InputCustom from '../../scenarioComon/InputCustom';
+import CheckboxCustom from '../../scenarioCommon/CheckboxCustom';
+import SelectCustom from '../../scenarioCommon/SelectCustom';
+import InputDouble from '../../scenarioCommon/InputDouble';
+import InputCustom from '../../scenarioCommon/InputCustom';
 import { convertTextType, rangeText } from '../../constants/scenarioFormConstants';
+import { SETTING_LABELS, SETTING_PLACEHOLDERS } from '../../constants/scenarioSettingLabels';
 import { buildTextInputSettingContext } from './textInputSettingContext';
 import CharacterLimitRow from './CharacterLimitRow';
 
@@ -22,7 +23,7 @@ const TextTypeSetting = (props) => {
     <div className="ss-user-setting-option-row">
       <div className="ss-user-setting-option-row__checkbox">
         <CheckboxCustom
-          label="文字を自動変換する"
+          label={SETTING_LABELS.autoConvertText}
           onChange={changeContent('isUseConvertText')}
           value={textInput.isUseConvertText}
         />
@@ -36,12 +37,12 @@ const TextTypeSetting = (props) => {
             data={convertTextType}
             onChange={changeContent('convertTextTypeValue')}
             keyValue="key"
-            placeholder="変換タイプを選択"
+            placeholder={SETTING_PLACEHOLDERS.selectConvertTextType}
           />
           {textInput.text.isSplitInput ? (
             <>
               <InputCustom
-                placeholder="セル1受信点ID"
+                placeholder={SETTING_PLACEHOLDERS.convertTextDestination1}
                 labelClassName="ss-input-custom-label--full"
                 maxLength={250}
                 useFukushashiki={true}
@@ -49,7 +50,7 @@ const TextTypeSetting = (props) => {
                 value={messageContent?.convertTextDestination1}
               />
               <InputCustom
-                placeholder="セル2受信点ID"
+                placeholder={SETTING_PLACEHOLDERS.convertTextDestination2}
                 labelClassName="ss-input-custom-label--full"
                 maxLength={250}
                 useFukushashiki={true}
@@ -59,7 +60,7 @@ const TextTypeSetting = (props) => {
             </>
           ) : (
             <InputCustom
-              placeholder="受信反射ポイントIDを入力してください"
+              placeholder={SETTING_PLACEHOLDERS.convertTextDestination}
               labelClassName="ss-input-custom-label--full"
               maxLength={250}
               useFukushashiki={true}
@@ -73,7 +74,7 @@ const TextTypeSetting = (props) => {
     <div className="ss-user-setting-option-row">
       <div className="ss-user-setting-option-row__checkbox">
         <CheckboxCustom
-          label="IDのカスタマイズ"
+          label={SETTING_LABELS.customId}
           onChange={changeContent('isCustomID')}
           value={textInput.isCustomID}
         />
@@ -83,7 +84,7 @@ const TextTypeSetting = (props) => {
           {textInput.text.isSplitInput ? (
             <>
               <InputCustom
-                placeholder="セル 1 のオプション ID"
+                placeholder={SETTING_PLACEHOLDERS.optionIdCell1}
                 labelClassName="ss-input-custom-label--full"
                 maxLength={250}
                 useFukushashiki={true}
@@ -91,7 +92,7 @@ const TextTypeSetting = (props) => {
                 value={messageContent?.customId1}
               />
               <InputCustom
-                placeholder="セル 2 のオプション ID"
+                placeholder={SETTING_PLACEHOLDERS.optionIdCell2}
                 labelClassName="ss-input-custom-label--full"
                 maxLength={250}
                 useFukushashiki={true}
@@ -101,7 +102,7 @@ const TextTypeSetting = (props) => {
             </>
           ) : (
             <InputCustom
-              placeholder="オプションIDを入力してください"
+              placeholder={SETTING_PLACEHOLDERS.optionId}
               labelClassName="ss-input-custom-label--full"
               maxLength={250}
               useFukushashiki={true}
@@ -139,7 +140,7 @@ const TextTypeSetting = (props) => {
         onClickIcon={() =>
           changeContent(textInput.type, 'isSplitInput')(!typeConfig?.isSplitInput)
         }
-        placeholder={['プレースホルダ', 'プレースホルダ']}
+        placeholder={[SETTING_PLACEHOLDERS.placeholder, SETTING_PLACEHOLDERS.placeholder]}
       />
     </div>
     {isUseFukushashiki && textInput.text.isSplitInput && (

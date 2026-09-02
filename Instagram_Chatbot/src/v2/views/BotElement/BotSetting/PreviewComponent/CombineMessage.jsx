@@ -1,5 +1,5 @@
 import React from 'react';
-import CustomButton from '../CustomButton';
+import CustomButton from './CustomButton';
 import UserMessage from './UserMessage';
 import UserMessageTailIcon from 'v2/components/BotMessages/UserMessageTailIcon';
 import CombineBotBlock from './CombineBotBlock';
@@ -37,7 +37,7 @@ export const CombineMessageNextButton = ({
         className="ss-user-message__action-btn"
         onClick={() => onClickNext(messageIndex, message)}
         autoClick={isAutoClick && !isExtractFromSession}
-        messsagetype={firstUserBlock?.type}
+        messageType={firstUserBlock?.type}
       >
         {btnText}
       </CustomButton>

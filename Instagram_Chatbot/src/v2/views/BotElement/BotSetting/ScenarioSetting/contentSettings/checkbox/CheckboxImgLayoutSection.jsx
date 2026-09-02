@@ -1,12 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import InputCustom from '../../scenarioComon/InputCustom';
-import SelectCustom from '../../scenarioComon/SelectCustom';
+import InputCustom from '../../scenarioCommon/InputCustom';
+import SelectCustom from '../../scenarioCommon/SelectCustom';
 import {
   RADIO_IMG_COLUMN_OPTIONS,
   RADIO_IMG_DIRECTION_HORIZONTAL,
   RADIO_IMG_DIRECTION_OPTIONS,
   RADIO_IMG_LAYOUT_SECTION_LABELS,
+  formatRadioImgColumnPlaceholder,
+  formatRadioImgCurrentWidth,
   RADIO_IMG_SCROLL_COLUMN_OPTIONS,
   RADIO_IMG_SCROLL_ENABLED,
   RADIO_IMG_SCROLL_NONE,
@@ -167,7 +169,7 @@ const CheckboxImgLayoutSection = ({ checkbox, changeContent }) => {
                   className="ss-checkbox-img-layout-section__width-input"
                   value={layout.custom_widths[index] || ''}
                   onChange={(value) => handleCustomWidthChange(index, value)}
-                  placeholder={`列${index + 1}`}
+                  placeholder={formatRadioImgColumnPlaceholder(index)}
                 />
                 <span className="ss-checkbox-img-layout-section__input-suffix">%</span>
               </div>
@@ -175,7 +177,7 @@ const CheckboxImgLayoutSection = ({ checkbox, changeContent }) => {
           </div>
           <div className={`ss-checkbox-img-layout-section__hint${widthSum !== 100 ? ' ss-checkbox-img-layout-section__hint--warn' : ''}`}>
             {RADIO_IMG_LAYOUT_SECTION_LABELS.customWidthsHint}
-            {widthSum !== 100 && ` (現在: ${widthSum}%)`}
+            {widthSum !== 100 && formatRadioImgCurrentWidth(widthSum)}
           </div>
         </div>
       )}

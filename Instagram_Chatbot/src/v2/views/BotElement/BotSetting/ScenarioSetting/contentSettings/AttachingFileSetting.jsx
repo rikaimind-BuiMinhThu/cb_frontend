@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from 'reactstrap';
-import SelectCustom from '../scenarioComon/SelectCustom';
+import SelectCustom from '../scenarioCommon/SelectCustom';
 import ContentSettingShell from './shared/ContentSettingShell';
 import { dataTypeFile } from '../constants/scenarioFormConstants';
 import { PREVIEW_LABELS } from '../constants/scenarioSettingLabels';

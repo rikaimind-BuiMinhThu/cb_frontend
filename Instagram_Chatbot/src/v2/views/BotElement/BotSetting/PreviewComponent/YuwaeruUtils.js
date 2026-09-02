@@ -55,8 +55,6 @@ export const mapAmazonPayDataToMessagesListForYuwaeru = (amazonPayData, messages
   const mappedBuildingName = ownerAddr4 || "";
   const mappedTel = ownerTel1 || "";
 
-  console.log("ownerTel1", ownerTel1);
-
   const userMessages = newMessagesList.filter(message => message.belong_to === "user");
   if (!userMessages) return newMessagesList;
 

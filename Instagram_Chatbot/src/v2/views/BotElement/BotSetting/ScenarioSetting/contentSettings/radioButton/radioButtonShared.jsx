@@ -1,5 +1,5 @@
 import React from 'react';
-import CheckboxCustom from '../../scenarioComon/CheckboxCustom';
+import CheckboxCustom from '../../scenarioCommon/CheckboxCustom';
 import { RADIO_BUTTON_LABELS } from '../../constants/scenarioSettingLabels';
 import { isRadioOptionInitiallySelected } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/radioButtonSelectionUtils';
 

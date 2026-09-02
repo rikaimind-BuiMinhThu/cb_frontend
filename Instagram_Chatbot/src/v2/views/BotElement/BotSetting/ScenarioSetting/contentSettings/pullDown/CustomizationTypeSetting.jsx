@@ -1,9 +1,9 @@
 import React from 'react';
 import { MDBIcon } from 'mdbreact';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import InputDouble from '../../scenarioComon/InputDouble';
-import InputCustom from '../../scenarioComon/InputCustom';
-import CheckboxCustom from '../../scenarioComon/CheckboxCustom';
+import InputDouble from '../../scenarioCommon/InputDouble';
+import InputCustom from '../../scenarioCommon/InputCustom';
+import CheckboxCustom from '../../scenarioCommon/CheckboxCustom';
 import {
   PULL_DOWN_LABELS,
   SETTING_LABELS,

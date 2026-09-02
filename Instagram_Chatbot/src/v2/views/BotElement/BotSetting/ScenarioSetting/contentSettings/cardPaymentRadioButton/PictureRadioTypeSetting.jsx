@@ -1,10 +1,15 @@
 import React from 'react';
 import { MDBIcon } from 'mdbreact';
-import CheckboxCustom from '../../scenarioComon/CheckboxCustom';
-import InputDouble from '../../scenarioComon/InputDouble';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import InputCustom from '../../scenarioComon/InputCustom';
+import CheckboxCustom from '../../scenarioCommon/CheckboxCustom';
+import InputDouble from '../../scenarioCommon/InputDouble';
+import InputCustom from '../../scenarioCommon/InputCustom';
 import { buildCardPaymentRadioContext } from './cardPaymentRadioButtonContext';
+import {
+  SETTING_LABELS,
+  SETTING_PLACEHOLDERS,
+  CARD_PAYMENT_RADIO_SETTING_LABELS,
+} from '../../constants/scenarioSettingLabels';
 import '../../styles/contentSettings/cardPaymentRadioButton.css';
 
 const PictureRadioTypeSetting = (props) => {
@@ -50,7 +55,7 @@ const PictureRadioTypeSetting = (props) => {
                                       <div className="ss-user-setting__item-bottom ss-card-payment-radio-setting__file-input-row">
                                         <InputCustom
                                           className="ss-card-payment-radio-setting__file-input"
-                                          placeholder="ファイルのURL"
+                                          placeholder={SETTING_PLACEHOLDERS.fileUrl}
                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'radio_contents_img', indexPaymentRadioImg, 'contents', indexContentPayment, 'file_url')}
                                           value={itemContentPayment.file_url}
                                         />
@@ -65,7 +70,7 @@ const PictureRadioTypeSetting = (props) => {
                                       </div>
                                       <div className="ss-drag-option-row">
                                         <InputDouble
-                                          placeholder={["テキスト", "値"]}
+                                          placeholder={SETTING_LABELS.textValue}
                                           valueLeft={itemContentPayment.text}
                                           valueRight={itemContentPayment.value}
                                           onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'radio_contents_img', indexPaymentRadioImg, 'contents', indexContentPayment, name === 'left' ? 'text' : 'value')}
@@ -73,7 +78,7 @@ const PictureRadioTypeSetting = (props) => {
                                       </div>
                                       <div className="ss-user-setting__item-select-bottom-wrapper-flex">
                                         <CheckboxCustom
-                                          label="初期選択設定"
+                                          label={CARD_PAYMENT_RADIO_SETTING_LABELS.initialSelection}
                                           value={cardPaymentRadioButton.initial_selection_picture === `${itemPaymentRadioImg.id}-${itemContentPayment.id}`}
                                           onChange={() => {
                                             if (cardPaymentRadioButton.initial_selection_picture !== `${itemPaymentRadioImg.id}-${itemContentPayment.id}`) {
@@ -84,7 +89,7 @@ const PictureRadioTypeSetting = (props) => {
                                           }}
                                         />
                                         <CheckboxCustom
-                                          label="カード決済連動設定"
+                                          label={CARD_PAYMENT_RADIO_SETTING_LABELS.cardLinkedSetting}
                                           value={cardPaymentRadioButton.card_linked_setting_picture === `${itemPaymentRadioImg.id}-${itemContentPayment.id}`}
                                           onChange={() => {
                                             if (cardPaymentRadioButton.card_linked_setting_picture !== `${itemPaymentRadioImg.id}-${itemContentPayment.id}`) {

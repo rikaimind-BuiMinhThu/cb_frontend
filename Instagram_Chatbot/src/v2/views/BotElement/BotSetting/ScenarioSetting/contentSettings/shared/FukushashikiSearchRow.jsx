@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Tooltip } from '@mui/material';
-import SelectCustom from '../../scenarioComon/SelectCustom';
-import InputCustom from '../../scenarioComon/InputCustom';
+import SelectCustom from '../../scenarioCommon/SelectCustom';
+import InputCustom from '../../scenarioCommon/InputCustom';
 import { FUKUSHASHIKI_SEARCH_MODE_OPTIONS, FUKUSHASHIKI_SEARCH_VALUE_LABELS } from '../../../../../../variables/constants';
 import { FUKUSHASHIKI_VARIANTS, SETTING_LABELS } from '../../constants/scenarioSettingLabels';
 

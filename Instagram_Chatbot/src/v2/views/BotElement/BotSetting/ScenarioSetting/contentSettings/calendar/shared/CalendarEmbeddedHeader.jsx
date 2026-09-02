@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Radio, Select, Row, Col } from 'antd';
 import moment from 'moment';
+import { PULL_DOWN_LABELS } from '../../../constants/scenarioSettingLabels';
 
 const CalendarEmbeddedHeader = ({ value, type, onChange, onTypeChange }) => {
   const start = 0;
@@ -62,8 +63,8 @@ const CalendarEmbeddedHeader = ({ value, type, onChange, onTypeChange }) => {
         </Col>
         <Col xs={4}>
           <Radio.Group size="small" onChange={(e) => onTypeChange(e.target.value)} value={type}>
-            <Radio.Button value="month">月</Radio.Button>
-            <Radio.Button value="year">年</Radio.Button>
+            <Radio.Button value="month">{PULL_DOWN_LABELS.month}</Radio.Button>
+            <Radio.Button value="year">{PULL_DOWN_LABELS.year}</Radio.Button>
           </Radio.Group>
         </Col>
       </Row>

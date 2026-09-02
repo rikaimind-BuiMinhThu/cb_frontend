@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import 'v2/assets/css/bot/timer.css';
-import { TIMER_MAP_VARIABLE_METHOD, TIMER_COUNTING_DELAY } from './PreviewComponent/Constants';
+import { TIMER_MAP_VARIABLE_METHOD, TIMER_COUNTING_DELAY } from './Constants';
 
 const INVALID_HTML_MESSAGE = 'Invalid HTML';
 const TIMER_START_STORAGE_PREFIX = 'timer_start_time';

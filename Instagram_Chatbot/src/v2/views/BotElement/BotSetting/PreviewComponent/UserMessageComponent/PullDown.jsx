@@ -15,7 +15,7 @@ import {
 } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 import { getCitiesByPrefecture } from "v2/views/BotElement/BotSetting/PreviewComponent/Utils";
 import { tokenExpired } from "v2/api/tokenExpired";
-import LPIntegrationOptionPullDown from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/LPIntegrationOptionPullDown";
+import LPIntegrationOptionPullDown from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioCommon/LPIntegrationOptionPullDown";
 import SelectCustom from "v2/components/BotMessages/SelectCustom";
 
 const PullDown = ({ content, errors, contentIndex, messageIndex, disabled, onChangeValue, prefecturesList, lpOptionData, postMessageToParent, hidden }) => {

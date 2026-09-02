@@ -1,15 +1,16 @@
 import React from 'react';
 import { Checkbox } from 'antd';
 import ContentSettingShell from '../shared/ContentSettingShell';
-import SelectCustom from '../../scenarioComon/SelectCustom';
-import InputCustom from '../../scenarioComon/InputCustom';
-import CheckboxCustom from '../../scenarioComon/CheckboxCustom';
-import EmailDomainSuggestionSettingsModal from '../../scenarioComon/EmailDomainSuggestionSettingsModal';
+import SelectCustom from '../../scenarioCommon/SelectCustom';
+import InputCustom from '../../scenarioCommon/InputCustom';
+import CheckboxCustom from '../../scenarioCommon/CheckboxCustom';
+import EmailDomainSuggestionSettingsModal from '../../scenarioCommon/EmailDomainSuggestionSettingsModal';
 import {
   CONTACT_FORM_TEMPLATE_LABELS,
   CONTACT_FORM_FIELD_KEYS,
   CONTACT_FORM_FIELD_LABELS,
 } from '../../../PreviewComponent/Constants';
+import { CONTACT_FORM_SETTING_LABELS } from '../../constants/scenarioSettingLabels';
 import { buildContactFormSettingContext } from './contactFormSettingContext';
 import '../../styles/contentSettings/contactForm.css';
 
@@ -54,7 +55,7 @@ const ContactFormSetting = (props) => {
     <div className="ss-user-setting__item-bottom ss-contact-form-setting__row">
       <SelectCustom
         id="contact_form_template"
-        label="フォーム種類"
+        label={CONTACT_FORM_SETTING_LABELS.formType}
         labelClassName="ss-contact-form-setting__label"
         className="ss-contact-form-setting__control"
         value={contactForm.form_template}
@@ -71,9 +72,9 @@ const ContactFormSetting = (props) => {
       <InputCustom
         classLabel="ss-contact-form-setting__label"
         containerClassName="ss-contact-form-setting__control"
-        label="送信ボタン名称"
+        label={CONTACT_FORM_SETTING_LABELS.submitButtonName}
         inline
-        placeholder="送信する"
+        placeholder={CONTACT_FORM_SETTING_LABELS.submitPlaceholder}
         onChange={changeContent('submit_button_name')}
         value={contactForm.submit_button_name}
       />
@@ -84,11 +85,11 @@ const ContactFormSetting = (props) => {
     <div
       className="ss-user-setting__item-bottom ss-contact-form-setting__fields"
     >
-      <div className="ss-contact-form-setting__fields-title">表示フィールド</div>
+      <div className="ss-contact-form-setting__fields-title">{CONTACT_FORM_SETTING_LABELS.visibleFields}</div>
       <div className="ss-contact-form-setting__fields-grid">
         <div />
-        <div className="ss-contact-form-setting__fields-header">表示</div>
-        <div className="ss-contact-form-setting__fields-header">必須</div>
+        <div className="ss-contact-form-setting__fields-header">{CONTACT_FORM_SETTING_LABELS.visible}</div>
+        <div className="ss-contact-form-setting__fields-header">{CONTACT_FORM_SETTING_LABELS.required}</div>
         {CONTACT_FORM_FIELD_KEYS.map((fieldKey) => {
           const fieldSetting = fieldSettings[fieldKey] || { visible: false, required: false };
           const emailLocked = fieldKey === 'email' && Boolean(contactForm.email_settings?.send_to_user);
@@ -121,7 +122,7 @@ const ContactFormSetting = (props) => {
       </div>
       {contactForm.email_settings?.send_to_user && (
         <div className="ss-contact-form-setting__fields-hint">
-          ユーザーへ確認メールを送信する場合、メールアドレスは必須表示になります。
+          {CONTACT_FORM_SETTING_LABELS.emailRequiredHint}
         </div>
       )}
     </div>
@@ -131,7 +132,7 @@ const ContactFormSetting = (props) => {
     if (!fieldSettings.inquiry_type?.visible) return null;
     return (
       <div className="ss-user-setting__item-bottom ss-contact-form-setting__inquiry">
-        <div className="ss-contact-form-setting__inquiry-label">お問い合わせ種別（改行区切り）</div>
+        <div className="ss-contact-form-setting__inquiry-label">{CONTACT_FORM_SETTING_LABELS.inquiryType}</div>
         <textarea
           className="ss-input-value ss-contact-form-setting__inquiry-textarea"
           rows="3"
@@ -164,14 +165,14 @@ const ContactFormSetting = (props) => {
     <div
       className="ss-user-setting__item-bottom ss-contact-form-setting__email"
     >
-      <div className="ss-contact-form-setting__email-title">メール送信設定</div>
+      <div className="ss-contact-form-setting__email-title">{CONTACT_FORM_SETTING_LABELS.emailSettings}</div>
       <CheckboxCustom
-        label="ユーザーへ確認メールを送信する"
+        label={CONTACT_FORM_SETTING_LABELS.sendConfirmToUser}
         onChange={handleChangeContactFormSendToUser}
         value={contactForm.email_settings?.send_to_user}
       />
       <CheckboxCustom
-        label="担当者へ通知メールを送信する"
+        label={CONTACT_FORM_SETTING_LABELS.sendNotifyToStaff}
         onChange={changeContent('email_settings', 'send_to_staff')}
         value={contactForm.email_settings?.send_to_staff}
       />
@@ -184,7 +185,7 @@ const ContactFormSetting = (props) => {
       <div className="ss-user-setting__item-bottom ss-contact-form-setting__row">
         <SelectCustom
           id="contact_form_user_email_template"
-          label="ユーザー向けメールテンプレート"
+          label={CONTACT_FORM_SETTING_LABELS.userEmailTemplate}
           labelClassName="ss-contact-form-setting__label"
           className="ss-contact-form-setting__control"
           data={dataEmail}
@@ -203,7 +204,7 @@ const ContactFormSetting = (props) => {
       <div className="ss-user-setting__item-bottom ss-contact-form-setting__row">
         <SelectCustom
           id="contact_form_staff_email_template"
-          label="担当者向けメールテンプレート"
+          label={CONTACT_FORM_SETTING_LABELS.staffEmailTemplate}
           labelClassName="ss-contact-form-setting__label"
           className="ss-contact-form-setting__control"
           data={dataEmail}

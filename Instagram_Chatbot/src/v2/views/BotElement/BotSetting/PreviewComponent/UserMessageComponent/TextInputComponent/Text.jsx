@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import "v2/assets/css/bot/preview-chat-bot.css";
 import { EMPTY_INPUT_VALUE, MESSAGE_CONTENT_TYPES, RENDER_CHATBOT_CONFIG } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 import InputCustom from "v2/components/BotMessages/InputCustom";
-import InputDebounce from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputDebounce";
+import InputDebounce from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioCommon/InputDebounce";
 
 const TEXT_INPUT_TYPE_TEXT = "text";
 

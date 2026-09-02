@@ -73,7 +73,6 @@ const Dashboard = () => {
         setUserCounts(usageEntries.map((entry) => entry.user_count));
       })
       .catch((error) => {
-        console.log(error);
         if (error.response?.data.code === 0) {
           tokenExpired();
         }
@@ -86,7 +85,6 @@ const Dashboard = () => {
         setMessageCounts(messageEntries.map((entry) => entry.message_count));
       })
       .catch((error) => {
-        console.log(error);
         if (error.response?.data.code === 0) {
           tokenExpired();
         }
@@ -98,7 +96,6 @@ const Dashboard = () => {
         setLineDataWithoutRole(res.data?.user_counts?.map((user) => user.user_count) || []);
       })
       .catch((error) => {
-        console.log(error);
         if (error.response?.data.code === 0) {
           tokenExpired();
         }
@@ -107,7 +104,6 @@ const Dashboard = () => {
     api
       .get(`${DASHBOARD_ANALYTICS_USERS_PATH}?begin_date=${buildHistoricalBeginDate(beginDate, monthIndex)}&end_date=${endDate}`)
       .catch((error) => {
-        console.log(error);
         if (error.response?.data.code === 0) {
           tokenExpired();
         }

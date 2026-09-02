@@ -1,5 +1,5 @@
 import React from 'react';
-import CheckboxCustom from '../scenarioComon/CheckboxCustom';
+import CheckboxCustom from '../scenarioCommon/CheckboxCustom';
 import { SETTING_LABELS } from '../constants/scenarioSettingLabels';
 
 export const createRenderRootFaqOption = ({

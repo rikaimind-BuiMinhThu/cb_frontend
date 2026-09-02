@@ -1,4 +1,4 @@
-import InputCustom from "./scenarioComon/InputCustom";
+import InputCustom from "./scenarioCommon/InputCustom";
 import "../../../../assets/css/bot/scenario/option-gender-config.css";
 import { Fragment, useState } from "react";
 import { getColor } from "v2/views/BotElement/BotSetting/PreviewComponent/Utils";

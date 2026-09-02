@@ -1,5 +1,5 @@
 import React from 'react';
-import InputCustom from '../scenarioComon/InputCustom';
+import InputCustom from '../scenarioCommon/InputCustom';
 import { SETTING_LABELS, SETTING_PLACEHOLDERS } from '../constants/scenarioSettingLabels';
 
 export const createRenderPaymentMethodDescriptionInput = ({ setDataMessages }) => {

@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { MDBIcon } from 'mdbreact';
-import SelectCustom from '../../../scenarioComon/SelectCustom';
-import InputCustom from '../../../scenarioComon/InputCustom';
+import SelectCustom from '../../../scenarioCommon/SelectCustom';
+import InputCustom from '../../../scenarioCommon/InputCustom';
 import ScenarioModalCheckbox from '../../../components/modals/shared/ScenarioModalCheckbox';
-import { SETTING_LABELS, SETTING_PLACEHOLDERS } from '../../../constants/scenarioSettingLabels';
+import { SETTING_LABELS, SETTING_PLACEHOLDERS, SHIPPING_ADDRESS_SETTING_LABELS } from '../../../constants/scenarioSettingLabels';
 import { buildAddressFieldSettingContext } from './addressFieldSettingContext';
 import AddressFukushashikiRow from './AddressFukushashikiRow';
 
@@ -71,7 +71,7 @@ const PrefectureFieldSection = ({
           <ScenarioModalCheckbox
             checked={!!addressData.is_use_dropdown}
             onChange={(checked) => changeAddressField('is_use_dropdown')(checked)}
-            label="プルダウンを利用"
+            label={SHIPPING_ADDRESS_SETTING_LABELS.useDropdown}
           />
         </div>
       </div>

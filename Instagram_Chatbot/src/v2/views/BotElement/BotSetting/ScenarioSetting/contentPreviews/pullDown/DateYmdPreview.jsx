@@ -1,5 +1,5 @@
 import React from 'react';
-import SelectCustom from '../../scenarioComon/SelectCustom';
+import SelectCustom from '../../scenarioCommon/SelectCustom';
 import { PULL_DOWN_LABELS } from '../../constants/scenarioSettingLabels';
 
 const DateYmdPreview = ({ pullDown, dataYear, dataMonth, dataDay }) => {

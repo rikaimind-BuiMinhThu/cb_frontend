@@ -2,7 +2,7 @@ import React from 'react';
 import { Carousel } from 'antd';
 import { Button } from 'reactstrap';
 import { MDBIcon } from 'mdbreact';
-import InputCustom from '../../scenarioComon/InputCustom';
+import InputCustom from '../../scenarioCommon/InputCustom';
 import { settingsCarousel } from '../../components/scenarioCarouselSettings';
 import {
   CAROUSEL_LABELS,

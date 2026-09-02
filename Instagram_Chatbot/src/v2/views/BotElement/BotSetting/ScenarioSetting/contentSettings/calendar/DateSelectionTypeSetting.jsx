@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import DatePickerCustom from '../../scenarioComon/DatePickerCustom';
+import DatePickerCustom from '../../scenarioCommon/DatePickerCustom';
 import { buildCalendarSettingContext } from './calendarSettingContext';
 
 const DateSelectionTypeSetting = (props) => {

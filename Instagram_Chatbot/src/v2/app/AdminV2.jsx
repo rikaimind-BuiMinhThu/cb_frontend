@@ -5,7 +5,7 @@ import V2PreviewFukushashiki from 'v2/views/BotElement/BotSetting/PreviewFukusha
 import ScenarioPreviewEditorPage from 'v2/views/BotElement/BotSetting/ScenarioSetting/preview/ScenarioPreviewEditorPage';
 import { getAppPath, getSignInPath } from 'v2/variables/constants';
 import V2Admin from './layouts/Admin';
-import V2Login from './Login';
+import V2Login from './Login.jsx';
 import {
   ADMIN_APP_PATH,
   PREVIEW_CUSTOMER_FUKUSHASHIKI_PATH,

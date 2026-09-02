@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import CheckboxCustom from '../../scenarioComon/CheckboxCustom';
+import CheckboxCustom from '../../scenarioCommon/CheckboxCustom';
 import { LABELS } from '../../../PreviewComponent/Constants';
 import ContentTypeSelector, { ContentTitleInput } from '../shared/ContentTypeSelector';
 import { typeRadio } from '../../constants/scenarioFormConstants';

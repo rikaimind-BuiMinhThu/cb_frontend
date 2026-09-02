@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { MDBIcon } from 'mdbreact';
-import InputCustom from '../../../scenarioComon/InputCustom';
+import InputCustom from '../../../scenarioCommon/InputCustom';
 import { SETTING_PLACEHOLDERS } from '../../../constants/scenarioSettingLabels';
 import { buildAddressFieldSettingContext } from './addressFieldSettingContext';
 import AddressFukushashikiRow from './AddressFukushashikiRow';

@@ -1,5 +1,5 @@
 import React from 'react';
-import InputCustom from '../../../scenarioComon/InputCustom';
+import InputCustom from '../../../scenarioCommon/InputCustom';
 import { useScenarioEditor } from '../../../context/ScenarioEditorContext';
 import OverviewCheckboxRow from '../../OverviewCheckboxRow';
 import ScenarioModalCheckbox from '../shared/ScenarioModalCheckbox';

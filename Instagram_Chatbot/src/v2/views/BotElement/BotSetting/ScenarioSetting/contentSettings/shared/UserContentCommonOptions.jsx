@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Button } from 'reactstrap';
 import ScenarioModalCheckbox from '../../components/modals/shared/ScenarioModalCheckbox';
 import { AdminInfoTooltip } from 'v2/components/AdminShell';
-import SelectCustom from '../../scenarioComon/SelectCustom';
+import SelectCustom from '../../scenarioCommon/SelectCustom';
 import {
   SCENARIO_MODAL_TOOLTIPS,
   USER_CONTENT_OPTION_LABELS,
@@ -83,7 +83,7 @@ const UserContentCommonOptions = ({
                 className="ss-user-setting__select-btn-add ss-user-setting-option-row__action"
                 onClick={() => setIsOpenAddVariable(true)}
               >
-                追加
+                {USER_CONTENT_OPTION_LABELS.add}
               </Button>
             </div>
           )}

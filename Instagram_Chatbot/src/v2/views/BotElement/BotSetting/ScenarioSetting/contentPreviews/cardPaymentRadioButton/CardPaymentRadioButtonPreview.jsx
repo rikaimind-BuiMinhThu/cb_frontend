@@ -1,7 +1,7 @@
 import React from 'react';
 import { Radio } from 'antd';
-import InputCustom from '../../scenarioComon/InputCustom';
-import SelectCustom from '../../scenarioComon/SelectCustom';
+import InputCustom from '../../scenarioCommon/InputCustom';
+import SelectCustom from '../../scenarioCommon/SelectCustom';
 import {
   PREVIEW_LABELS,
   CREDIT_CARD_SETTING_LABELS,

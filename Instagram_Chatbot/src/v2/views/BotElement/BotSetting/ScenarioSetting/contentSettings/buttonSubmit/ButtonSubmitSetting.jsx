@@ -1,8 +1,8 @@
 import React from 'react';
 import { Button } from 'reactstrap';
-import InputCustom from '../../scenarioComon/InputCustom';
-import SelectCustom from '../../scenarioComon/SelectCustom';
-import CheckboxCustom from '../../scenarioComon/CheckboxCustom';
+import InputCustom from '../../scenarioCommon/InputCustom';
+import SelectCustom from '../../scenarioCommon/SelectCustom';
+import CheckboxCustom from '../../scenarioCommon/CheckboxCustom';
 import FukushashikiSearchRow from '../shared/FukushashikiSearchRow';
 import ContentSettingShell from '../shared/ContentSettingShell';
 import SubmitButtonConfig from '../../SubmitButtonConfig';

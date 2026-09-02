@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useReducer, useCallback } from "react";
 import Cookies from "js-cookie";
-import CustomButton from "../../CustomButton";
+import CustomButton from "../../PreviewComponent/CustomButton";
 import {
   UserMessage, BotMessage, CombineMessage, CombineMessageNextButton,
   PreviewClosedLauncher, PreviewOpenChatFrame, PreviewMessagesList,
@@ -15,6 +15,8 @@ import {
   BOT_MESSAGE_TYPES,
   MESSAGE_CONTENT_TYPES,
   NO_ERROR,
+  NEXT_BUTTON_LABEL,
+  CONTACT_FORM_SUBMIT_FAILED,
 } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 import { injectBotThemeCss } from "v2/utils/chatbotThemeCss";
 import { COLOR_MAP } from "v2/views/DesignSetting/constants/designChatbotConstants";
@@ -498,7 +500,7 @@ const ScenarioPreviewFaq = ({
       .catch(() => {
         dispatch({
           type: PREVIEW_ACTIONS.SET_SUBMIT_ERROR_MESSAGE,
-          payload: "お問い合わせの送信に失敗しました。もう一度お試しください。"
+          payload: CONTACT_FORM_SUBMIT_FAILED
         });
       })
       .finally(() => {
@@ -602,19 +604,19 @@ const ScenarioPreviewFaq = ({
     if (!message || message.belong_to !== "user") return null;
     if (message.message_content[0]?.type === "button_submit") return null;
 
-    const btnText = message.buttonName || (isUpdate ? '次へ' : '次へ');
+    const btnText = message.buttonName || NEXT_BUTTON_LABEL;
     const actionBtnBg = state.botInfor?.main_color || state.botInfor?.main_color_other;
     return (
       <div className={`sp-user-message-button-action${isDisplayBtnNext ? '' : ' sp-user-message-button-action--hidden'}`}>
         <CustomButton
           disabled={editorPreview}
-          cssVars={actionBtnBg ? { '--ss-action-btn-bg': actionBtnBg } : undefined}
+          actionBtnBg={actionBtnBg}
           className="ss-user-message__action-btn"
           onClick={editorPreview ? undefined : () => {
             onClickNext(messageIndex, message);
           }}
           autoClick={!editorPreview && isAutoClick && !state.isExtractFromSession}
-          messsagetype={message.message_content[0]?.type}
+          messageType={message.message_content[0]?.type}
         >
           {btnText}
         </CustomButton>

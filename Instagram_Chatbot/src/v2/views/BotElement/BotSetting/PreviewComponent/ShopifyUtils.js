@@ -3,7 +3,7 @@ import { shortestDeliverableDateJpFromOrderClockJst } from "./deliveryDateRules"
 import {
   isCalendarPreviewRelativeOn,
   mergeCalendarForPreviewRelativeRange,
-} from "./PreviewComponent/UserMessageComponent/Calendar";
+} from "./UserMessageComponent/Calendar";
 
 const findLastScenarioUserResponseRow = (state, dataInputName) => {
   const rows = state.scenarioUserResponses;

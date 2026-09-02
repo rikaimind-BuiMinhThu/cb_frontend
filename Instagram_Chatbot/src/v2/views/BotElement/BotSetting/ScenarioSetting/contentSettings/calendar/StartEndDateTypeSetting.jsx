@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import InputNum from '../../scenarioComon/InputNum';
-import DatePickerCustom from '../../scenarioComon/DatePickerCustom';
+import InputNum from '../../scenarioCommon/InputNum';
+import DatePickerCustom from '../../scenarioCommon/DatePickerCustom';
 import { CALENDAR_SETTING_LABELS } from '../../constants/scenarioSettingLabels';
 import { buildCalendarSettingContext } from './calendarSettingContext';
 

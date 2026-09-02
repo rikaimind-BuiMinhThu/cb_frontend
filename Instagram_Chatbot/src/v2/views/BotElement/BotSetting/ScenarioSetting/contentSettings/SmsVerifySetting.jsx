@@ -1,7 +1,7 @@
 import React from 'react';
 import ContentSettingShell from './shared/ContentSettingShell';
 import { ContentTitleInput } from './shared/ContentTypeSelector';
-import SelectCustom from '../scenarioComon/SelectCustom';
+import SelectCustom from '../scenarioCommon/SelectCustom';
 import { dropDownTitle } from '../constants/scenarioFormConstants';
 
 const SmsVerifySetting = ({

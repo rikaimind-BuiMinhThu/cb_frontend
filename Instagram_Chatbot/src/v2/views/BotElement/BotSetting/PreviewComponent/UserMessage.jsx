@@ -256,7 +256,6 @@ const UserMessage = ({
         }
       })
       .catch((error) => {
-        console.log(error);
         if (error.response?.data.code === 0) {
           tokenExpired();
         }

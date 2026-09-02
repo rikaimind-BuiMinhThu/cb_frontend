@@ -1,16 +1,16 @@
 import React from 'react';
-import SelectCustom from '../scenarioComon/SelectCustom';
-import InputCustom from '../scenarioComon/InputCustom';
+import SelectCustom from '../scenarioCommon/SelectCustom';
+import InputCustom from '../scenarioCommon/InputCustom';
 import ContentSettingShell from './shared/ContentSettingShell';
 import { ContentTitleInput } from './shared/ContentTypeSelector';
 import FukushashikiSearchRow from './shared/FukushashikiSearchRow';
 import { dropDownTitle, dataMaxRangSlider } from '../constants/scenarioFormConstants';
-import { FUKUSHASHIKI_VARIANTS } from '../constants/scenarioSettingLabels';
+import { FUKUSHASHIKI_VARIANTS, SETTING_LABELS, SLIDER_SETTING_LABELS } from '../constants/scenarioSettingLabels';
 import '../styles/contentSettings/slider.css';
 
 const SLIDER_TYPE_OPTIONS = [
-  { key: 'continuous_type', value: '連続タイプ' },
-  { key: 'discrete_type', value: '離散タイプ' },
+  { key: 'continuous_type', value: SLIDER_SETTING_LABELS.continuousType },
+  { key: 'discrete_type', value: SLIDER_SETTING_LABELS.discreteType },
 ];
 
 const SLIDER_MIN_VALUE_OPTIONS = [
@@ -78,14 +78,14 @@ const SliderSetting = ({
       <div className="ss-user-setting__item-bottom">
         <div className="ss-user-setting__item-select-bottom-wrapper-flex ss-slider-setting__discrete-row">
           <SelectCustom
-            label="最小値"
+            label={SLIDER_SETTING_LABELS.minValue}
             className="ss-slider-setting__discrete-select"
             value={slider.min_value}
             data={SLIDER_MIN_VALUE_OPTIONS}
             onChange={changeField('min_value')}
           />
           <SelectCustom
-            label="最大値のラベル"
+            label={SLIDER_SETTING_LABELS.maxValueLabel}
             className="ss-slider-setting__discrete-select-max"
             value={slider.max_value}
             data={dataMaxRangSlider}
@@ -111,14 +111,14 @@ const SliderSetting = ({
           />
         </div>
         {!isValid && (
-          <div className="ss-slider-setting__error">必ず指定してください。</div>
+          <div className="ss-slider-setting__error">{SETTING_LABELS.requiredFieldError}</div>
         )}
       </div>
     );
   };
 
-  const renderMinLabel = () => renderLabelField('min_label', '最小値のラベル');
-  const renderMaxLabel = () => renderLabelField('max_label', '最大値のラベル');
+  const renderMinLabel = () => renderLabelField('min_label', SLIDER_SETTING_LABELS.minValueLabel);
+  const renderMaxLabel = () => renderLabelField('max_label', SLIDER_SETTING_LABELS.maxValueLabel);
 
   const renderColorField = () => {
     const colorValid = !slider.color || isColor(slider.color);
@@ -126,9 +126,9 @@ const SliderSetting = ({
       <div className="ss-user-setting__item-bottom">
         <div className="ss-slider-setting__color-row">
           <InputCustom
-            label="カラー"
+            label={SLIDER_SETTING_LABELS.color}
             className={`ss-slider-setting__color-input ${colorValid ? 'ss-slider-setting__label-input--valid' : 'ss-slider-setting__label-input--invalid'}`}
-            placeholder="#2c75f0"
+            placeholder={SLIDER_SETTING_LABELS.colorPlaceholder}
             onChange={changeField('color')}
             value={slider.color}
           />
@@ -138,7 +138,7 @@ const SliderSetting = ({
           />
         </div>
         {slider.color && !isColor(slider.color) && (
-          <div className="ss-slider-setting__error">カラーには、有効な正規表現を指定してください。</div>
+          <div className="ss-slider-setting__error">{SLIDER_SETTING_LABELS.colorInvalid}</div>
         )}
       </div>
     );

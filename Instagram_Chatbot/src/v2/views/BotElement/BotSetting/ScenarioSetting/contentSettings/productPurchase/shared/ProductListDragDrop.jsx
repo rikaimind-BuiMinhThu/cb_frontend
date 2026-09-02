@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import { Button } from 'reactstrap';
 import { MDBIcon } from 'mdbreact';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import InputCustom from '../../../scenarioComon/InputCustom';
-import InputNum from '../../../scenarioComon/InputNum';
-import CheckboxCustom from '../../../scenarioComon/CheckboxCustom';
+import InputCustom from '../../../scenarioCommon/InputCustom';
+import InputNum from '../../../scenarioCommon/InputNum';
+import CheckboxCustom from '../../../scenarioCommon/CheckboxCustom';
 import ShopifyReferenceSelect from '../../../ShopifyReferenceSelect';
 import shopifIcon from 'v2/assets/img/shopify-icon.png';
 import {

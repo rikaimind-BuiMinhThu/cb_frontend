@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import InputCustom from '../scenarioComon/InputCustom';
+import InputCustom from '../scenarioCommon/InputCustom';
 import { useScenarioEditor } from '../context/ScenarioEditorContext';
 
 const ScenarioOverviewPanel = ({ onOpenPreview }) => {

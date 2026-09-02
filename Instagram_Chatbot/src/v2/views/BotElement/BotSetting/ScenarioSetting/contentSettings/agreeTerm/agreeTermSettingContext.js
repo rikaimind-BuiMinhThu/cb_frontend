@@ -1,6 +1,6 @@
 import React from 'react';
-import InputCustom from '../../scenarioComon/InputCustom';
-import CheckboxCustom from '../../scenarioComon/CheckboxCustom';
+import InputCustom from '../../scenarioCommon/InputCustom';
+import CheckboxCustom from '../../scenarioCommon/CheckboxCustom';
 import FukushashikiSearchRow from '../shared/FukushashikiSearchRow';
 import {
   AGREE_TERM_LABELS,

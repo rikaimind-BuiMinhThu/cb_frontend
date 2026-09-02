@@ -1,5 +1,5 @@
 import React from 'react';
-import SelectCustom from '../../scenarioComon/SelectCustom';
+import SelectCustom from '../../scenarioCommon/SelectCustom';
 import { SETTING_PLACEHOLDERS } from '../../constants/scenarioSettingLabels';
 
 const VALUE2_KEY = 'value2';

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import InputCustom from '../scenarioComon/InputCustom';
+import InputCustom from '../scenarioCommon/InputCustom';
 import ScenarioModalCheckbox from './modals/shared/ScenarioModalCheckbox';
 import ScenarioFormRow from './modals/shared/ScenarioFormRow';
 import { AdminInfoTooltip } from 'v2/components/AdminShell';

@@ -1,5 +1,5 @@
 import React from 'react';
-import InputDouble from '../../scenarioComon/InputDouble';
+import InputDouble from '../../scenarioCommon/InputDouble';
 import { buildPullDownSettingContext } from './pullDownSettingContext';
 
 const PrefecturesTypeSetting = (props) => {

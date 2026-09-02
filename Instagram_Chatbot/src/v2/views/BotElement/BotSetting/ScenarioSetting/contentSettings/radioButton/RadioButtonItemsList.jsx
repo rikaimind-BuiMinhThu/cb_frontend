@@ -76,7 +76,7 @@ const RadioButtonItemsList = (props) => {
           containerClassName="ss-user-setting-item-radio-button-drag ss-radio-button-setting__drag-container"
           itemClassName="ss-radio-button-setting__item-panel"
           dragRowClassName="ss-radio-button-setting__default-row"
-          textValuePlaceholder={showTextInput ? SETTING_LABELS.textValue : ['値']}
+          textValuePlaceholder={showTextInput ? SETTING_LABELS.textValue : SETTING_LABELS.valueOnly}
           inputDoubleClassCustom="ss-user-radio-custom-class"
           inputDoubleClassIcon="ss-plus-circle-option-icon-times"
           showAddButton={false}

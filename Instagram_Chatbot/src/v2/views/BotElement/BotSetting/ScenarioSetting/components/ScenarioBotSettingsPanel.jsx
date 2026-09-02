@@ -1,18 +1,18 @@
 import React from 'react';
 import { Button } from 'reactstrap';
 import { MDBIcon } from 'mdbreact';
-import SelectCustom from '../scenarioComon/SelectCustom';
-import CheckboxCustom from '../scenarioComon/CheckboxCustom';
-import InputNum from '../scenarioComon/InputNum';
-import InputCustom from '../scenarioComon/InputCustom';
-import HtmlCodeConfig from '../scenarioComon/HtmlCodeConfig';
-import AmazonPayButtonConfig from '../scenarioComon/AmazonPayButtonConfig';
+import SelectCustom from '../scenarioCommon/SelectCustom';
+import CheckboxCustom from '../scenarioCommon/CheckboxCustom';
+import InputNum from '../scenarioCommon/InputNum';
+import InputCustom from '../scenarioCommon/InputCustom';
+import HtmlCodeConfig from '../scenarioCommon/HtmlCodeConfig';
+import AmazonPayButtonConfig from '../scenarioCommon/AmazonPayButtonConfig';
 import { BOT_MESSAGE_TYPES } from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants';
 import { dataApiLinkage } from '../constants/scenarioFormConstants';
 import { useScenarioPanelDestructuring } from '../hooks/useScenarioPanelDestructuring';
 import ScenarioMessageSettingsAccordion from './ScenarioMessageSettingsAccordion';
-import OrderConfirmConfig from '../scenarioComon/OrderConfirmConfig';
-import CartLoginConfig from '../scenarioComon/CartLoginConfig';
+import OrderConfirmConfig from '../scenarioCommon/OrderConfirmConfig';
+import CartLoginConfig from '../scenarioCommon/CartLoginConfig';
 import { SETTING_LABELS, SETTING_PLACEHOLDERS } from '../constants/scenarioSettingLabels';
 import { BOT_STATEMENT_TYPE_OPTIONS } from '../constants/scenarioPanelOptions';
 

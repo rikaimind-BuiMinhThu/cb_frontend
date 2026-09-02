@@ -1,6 +1,6 @@
 import React from 'react';
-import CheckboxCustom from '../../scenarioComon/CheckboxCustom';
-import InputCustom from '../../scenarioComon/InputCustom';
+import CheckboxCustom from '../../scenarioCommon/CheckboxCustom';
+import InputCustom from '../../scenarioCommon/InputCustom';
 import { TEXT_INPUT_LABELS } from '../../constants/scenarioSettingLabels';
 import { buildTextInputSettingContext } from './textInputSettingContext';
 import CharacterLimitRow from './CharacterLimitRow';

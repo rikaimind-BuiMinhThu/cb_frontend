@@ -182,9 +182,7 @@ const Report = () => {
             setAllClient(res.data?.data);
           }
         })
-        .catch((error) => {
-          console.log(error);
-        });
+        .catch(() => {});
     }
   }, [isAdminDeel]);
 
@@ -249,9 +247,7 @@ const Report = () => {
                 setDevicePieChartSeries(chatbotValue);
                 setDevicePieChartSeriesCount(chatbotValue);
               })
-              .catch((error) => {
-                console.log(error);
-              });
+              .catch(() => {});
             api
               .get(getScenarioCountsDownloadPath(dataScenario[0].id, range.start, range.end))
               .then((downloadRes) => {
@@ -263,9 +259,7 @@ const Report = () => {
                   formatDateRangeLabel(range.start, range.end),
                 ));
               })
-              .catch((error) => {
-                console.log(error);
-              });
+              .catch(() => {});
           }
           setAllScenarios(dataScenario);
           if (dataScenario?.[0]?.id) {
@@ -405,9 +399,7 @@ const Report = () => {
           setNumOfCloseBot(chatbotData.smartphone_close_chatbot_window_count);
         }
       })
-      .catch((error) => {
-        console.log(error);
-      })
+      .catch(() => {})
       .finally(finishLoading);
 
     api
@@ -416,9 +408,7 @@ const Report = () => {
         const exportData = res?.data.data;
         applyExportSheets(buildSearchDownloadExport(exportData, searchVal));
       })
-      .catch((error) => {
-        console.log(error);
-      })
+      .catch(() => {})
       .finally(finishLoading);
   };
 
@@ -450,8 +440,7 @@ const Report = () => {
         startDateEx,
         endDateEx,
       });
-    } catch (error) {
-      console.log(error);
+    } catch {
     }
   };
 
@@ -465,9 +454,7 @@ const Report = () => {
             setScenarioId(res.data?.data?.[0]?.id ?? null);
           }
         })
-        .catch((error) => {
-          console.log(error);
-        });
+        .catch(() => {});
       setCurrentClientId(value);
     } else {
       api
@@ -477,9 +464,7 @@ const Report = () => {
           setAllScenarios(scenarios);
           setScenarioId(scenarios[0]?.id ?? null);
         })
-        .catch((error) => {
-          console.log(error);
-        });
+        .catch(() => {});
       setCurrentClientId(value);
     }
   };

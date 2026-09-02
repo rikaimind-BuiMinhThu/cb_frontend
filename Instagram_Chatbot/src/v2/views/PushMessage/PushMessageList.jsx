@@ -49,8 +49,6 @@ const PushMessageList = ({ tick }) => {
       .then((res) => {
         if (res.data.code === 1) {
           setList(res.data.data);
-        } else if (res.data.code === 2) {
-          console.log(res.data.message);
         }
       })
       .catch((error) => {

@@ -1,5 +1,5 @@
 import React from 'react';
-import CheckboxCustom from '../../scenarioComon/CheckboxCustom';
+import CheckboxCustom from '../../scenarioCommon/CheckboxCustom';
 import { CHECKBOX_LABELS } from '../../constants/scenarioSettingLabels';
 import {
   isCheckboxImgContentChecked,

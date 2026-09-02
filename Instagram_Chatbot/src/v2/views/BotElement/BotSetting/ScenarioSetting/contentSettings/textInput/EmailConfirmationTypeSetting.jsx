@@ -1,5 +1,6 @@
 import React from 'react';
-import InputCustom from '../../scenarioComon/InputCustom';
+import InputCustom from '../../scenarioCommon/InputCustom';
+import { SETTING_PLACEHOLDERS } from '../../constants/scenarioSettingLabels';
 import { buildTextInputSettingContext } from './textInputSettingContext';
 
 const EmailConfirmationTypeSetting = (props) => {
@@ -10,7 +11,7 @@ const EmailConfirmationTypeSetting = (props) => {
     <>
       <div className="ss-user-setting__item-bottom">
         <InputCustom
-          placeholder="プレースホルダ"
+          placeholder={SETTING_PLACEHOLDERS.placeholder}
           onChange={changeContent(textInput.type, 'cfEmlAdd_email')}
           value={typeConfig?.cfEmlAdd_email || ''}
         />
@@ -21,7 +22,7 @@ const EmailConfirmationTypeSetting = (props) => {
         })}
       <div className="ss-user-setting__item-bottom">
         <InputCustom
-          placeholder="プレースホルダ"
+          placeholder={SETTING_PLACEHOLDERS.placeholder}
           onChange={changeContent(textInput.type, 'cfEmlAdd_confirm_email')}
           value={typeConfig?.cfEmlAdd_confirm_email || ''}
         />

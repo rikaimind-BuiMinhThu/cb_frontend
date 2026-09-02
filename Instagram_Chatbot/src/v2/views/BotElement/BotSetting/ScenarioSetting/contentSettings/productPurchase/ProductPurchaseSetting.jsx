@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import SelectCustom from '../../scenarioComon/SelectCustom';
-import CheckboxCustom from '../../scenarioComon/CheckboxCustom';
-import InputCustom from '../../scenarioComon/InputCustom';
+import SelectCustom from '../../scenarioCommon/SelectCustom';
+import CheckboxCustom from '../../scenarioCommon/CheckboxCustom';
+import InputCustom from '../../scenarioCommon/InputCustom';
 import { Row, Col } from 'antd';
 import { dropDownTitle } from '../../constants/scenarioFormConstants';
 import {

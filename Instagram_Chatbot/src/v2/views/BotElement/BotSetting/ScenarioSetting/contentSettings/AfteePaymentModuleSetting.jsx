@@ -1,5 +1,5 @@
 import React from 'react';
-import SelectCustom from '../scenarioComon/SelectCustom';
+import SelectCustom from '../scenarioCommon/SelectCustom';
 import { AFTEE_PAYMENT_TYPE_OPTIONS, SETTING_PLACEHOLDERS } from '../constants/scenarioSettingLabels';
 import '../styles/contentSettings/aftee.css';
 

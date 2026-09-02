@@ -1,6 +1,6 @@
 import React from 'react';
-import SelectCustom from '../../scenarioComon/SelectCustom';
-import InputCustom from '../../scenarioComon/InputCustom';
+import SelectCustom from '../../scenarioCommon/SelectCustom';
+import InputCustom from '../../scenarioCommon/InputCustom';
 import FukushashikiSearchRow from '../shared/FukushashikiSearchRow';
 import {
   dataHourFixed,

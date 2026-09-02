@@ -1,6 +1,6 @@
 import React from 'react';
-import CheckboxCustom from '../../scenarioComon/CheckboxCustom';
-import InputNum from '../../scenarioComon/InputNum';
+import CheckboxCustom from '../../scenarioCommon/CheckboxCustom';
+import InputNum from '../../scenarioCommon/InputNum';
 import {
   CHECKBOX_LABELS,
   PULL_DOWN_LABELS,

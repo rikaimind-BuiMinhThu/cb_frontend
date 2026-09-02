@@ -80,6 +80,7 @@ export const USER_CONTENT_OPTION_LABELS = {
   apiValidation: '入力値をAPIで検証する',
   displayContinueButton: '「続行」ボタンを表示する',
   require: '必須',
+  add: '追加',
 };
 
 export const SETTINGS_MODAL_VIEWS = {

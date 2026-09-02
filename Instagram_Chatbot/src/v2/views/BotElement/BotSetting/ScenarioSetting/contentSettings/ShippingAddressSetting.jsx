@@ -1,1 +1,1 @@
-export { default } from './shippingAddress';
+export { default } from './shippingAddress/ShippingAddressSetting';

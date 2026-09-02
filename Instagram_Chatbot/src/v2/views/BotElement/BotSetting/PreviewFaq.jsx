@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useReducer } from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
-import CustomButton from "./CustomButton";
+import CustomButton from "./PreviewComponent/CustomButton";
 import {
   UserMessage,
   BotMessage,
@@ -24,6 +24,7 @@ import {
   QUERY_PARAM_IS_LOGGED_IN,
   QUERY_PARAM_VALUE_TRUE,
   NEXT_BUTTON_LABEL,
+  CONTACT_FORM_SUBMIT_FAILED,
 } from "./PreviewComponent/Constants";
 import { parseDesignSettings } from "v2/views/DesignSetting/utils/designChatbotUtils";
 import {
@@ -338,11 +339,10 @@ const PreviewFaq = () => {
       .then(() => {
         advanceAfterClickNext(clickedMsgIndex, clickedMsg, data);
       })
-      .catch((error) => {
-        console.log(error);
+      .catch(() => {
         dispatch({
           type: PREVIEW_ACTIONS.SET_SUBMIT_ERROR_MESSAGE,
-          payload: "お問い合わせの送信に失敗しました。もう一度お試しください。"
+          payload: CONTACT_FORM_SUBMIT_FAILED
         });
       })
       .finally(() => {
@@ -436,7 +436,7 @@ const PreviewFaq = () => {
             onClickNext(messageIndex, message)
           }}
           autoClick={isAutoClick && !state.isExtractFromSession}
-          messsagetype={message.message_content[0]?.type}
+          messageType={message.message_content[0]?.type}
         >
           {btnText}
         </CustomButton>

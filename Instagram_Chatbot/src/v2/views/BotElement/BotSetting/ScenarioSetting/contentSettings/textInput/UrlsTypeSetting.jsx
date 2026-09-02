@@ -1,5 +1,6 @@
 import React from 'react';
-import InputCustom from '../../scenarioComon/InputCustom';
+import InputCustom from '../../scenarioCommon/InputCustom';
+import { SETTING_PLACEHOLDERS } from '../../constants/scenarioSettingLabels';
 import { buildTextInputSettingContext } from './textInputSettingContext';
 
 const UrlsTypeSetting = (props) => {
@@ -10,7 +11,7 @@ const UrlsTypeSetting = (props) => {
     <>
       <div className="ss-user-setting__item-bottom">
         <InputCustom
-          placeholder="プレースホルダ"
+          placeholder={SETTING_PLACEHOLDERS.placeholder}
           onChange={changeContent(textInput.type, 'placeholder')}
           value={typeConfig?.placeholder}
         />

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from 'reactstrap';
-import CheckboxCustom from '../../scenarioComon/CheckboxCustom';
-import SelectCustom from '../../scenarioComon/SelectCustom';
+import CheckboxCustom from '../../scenarioCommon/CheckboxCustom';
+import SelectCustom from '../../scenarioCommon/SelectCustom';
 import ContentSettingShell from '../shared/ContentSettingShell';
 import ContentTypeSelector, { ContentTitleInput } from '../shared/ContentTypeSelector';
 import { CAROUSEL_TYPES } from '../../constants/contentTypeConstants';

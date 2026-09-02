@@ -9,8 +9,7 @@ const processBotEmailMessage = (messagesList, i, newState) => {
     return acc;
   }, {});
 
-  sendEmailRequest(emailId, {variables: variablesData})
-    .then((res) => {console.log(res)});
+  sendEmailRequest(emailId, {variables: variablesData});
 
   newState.renderMessagesList.push({});
   newState.currentMsgIndex = i;

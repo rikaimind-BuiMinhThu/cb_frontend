@@ -1,8 +1,8 @@
 import React from 'react';
 import { MDBIcon } from 'mdbreact';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import InputCustom from '../../scenarioComon/InputCustom';
-import InputDouble from '../../scenarioComon/InputDouble';
+import InputCustom from '../../scenarioCommon/InputCustom';
+import InputDouble from '../../scenarioCommon/InputDouble';
 import { CHECKBOX_LABELS, SETTING_LABELS } from '../../constants/scenarioSettingLabels';
 import { getCheckboxImgSelectionKey } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/checkboxSelectionUtils';
 import { buildCheckboxSettingContext } from './checkboxSettingContext';

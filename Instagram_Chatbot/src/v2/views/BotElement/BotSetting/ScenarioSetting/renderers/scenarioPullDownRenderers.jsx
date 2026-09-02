@@ -1,7 +1,7 @@
 import React from 'react';
-import InputCustom from '../scenarioComon/InputCustom';
-import CheckboxCustom from '../scenarioComon/CheckboxCustom';
-import SelectCustom from '../scenarioComon/SelectCustom';
+import InputCustom from '../scenarioCommon/InputCustom';
+import CheckboxCustom from '../scenarioCommon/CheckboxCustom';
+import SelectCustom from '../scenarioCommon/SelectCustom';
 import { MESSAGE_CONTENT_TYPES } from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants';
 import { renderFukushashikiSetting } from '../ScenarioUtils';
 import {

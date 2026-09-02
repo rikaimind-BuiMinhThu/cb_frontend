@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useReducer, useState } from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
 import Cookies from "js-cookie";
-import CustomButton from "./CustomButton";
+import CustomButton from "./PreviewComponent/CustomButton";
 import {
   UserMessage, BotMessage, CombineMessage,
   PreviewClosedLauncher, PreviewOpenChatFrame, PreviewMessagesList,
@@ -67,7 +67,7 @@ import { isTokyoDeveloLP, UPDATE_TOKYO_DEVELO_LP_PREFECTURE_JS_CODE } from "./Pr
 import ProcessBar from "./PreviewComponent/ProcessBar";
 import ZipCodePopUp from "./PreviewComponent/ZipCodePopUp";
 import _ from "lodash";
-import Timer from "./Timer";
+import Timer from "./PreviewComponent/Timer";
 import {
   setConversionParamToLocalStorage, fukushashikiSavedStateToLp, fukushashikiToLP,
   executeLpJsCode, postMessageToParent
@@ -76,7 +76,7 @@ import { resolveErrMsgLpScript } from "./ScenarioSetting/utils/resolveErrMsgLpSc
 import { generateLaunchButtonLpScript } from "./ScenarioSetting/utils/launchButtonLpScriptUtils";
 import { convertToFukushashikiObject } from "./PreviewFukushashiki/FukushashikiDataConverterUtils";
 import { handleValidateField } from "./PreviewFukushashiki/ValidationUtils";
-import { createOrAddLinesCart } from "./ShopifyUtils";
+import { createOrAddLinesCart } from "./PreviewComponent/ShopifyUtils";
 import { clearChatbotState } from "./PreviewComponent/previewSessionUtils";
 import { getBotInforFromPreviewResponse } from "./PreviewComponent/previewBotInfoUtils";
 import {
@@ -831,7 +831,7 @@ const PreviewFukushashiki = () => {
             onClickNext(messageIndex, message)
           }}
           autoClick={isAutoClick && !state.isExtractFromSession}
-          messsagetype={message.message_content[0]?.type}
+          messageType={message.message_content[0]?.type}
         >
           {btnText}
         </CustomButton>

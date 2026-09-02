@@ -1,7 +1,7 @@
 import React from 'react';
 import { MDBIcon } from 'mdbreact';
-import InputCustom from '../../scenarioComon/InputCustom';
-import InputDouble from '../../scenarioComon/InputDouble';
+import InputCustom from '../../scenarioCommon/InputCustom';
+import InputDouble from '../../scenarioCommon/InputDouble';
 import {
   AGREE_TERM_LABELS,
   SETTING_LABELS,

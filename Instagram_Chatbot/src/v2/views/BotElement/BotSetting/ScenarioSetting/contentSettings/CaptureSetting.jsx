@@ -1,6 +1,6 @@
 import React from 'react';
-import SelectCustom from '../scenarioComon/SelectCustom';
-import InputNum from '../scenarioComon/InputNum';
+import SelectCustom from '../scenarioCommon/SelectCustom';
+import InputNum from '../scenarioCommon/InputNum';
 import { dropDownTitle } from '../constants/scenarioFormConstants';
 import {
   CAPTURE_COLOUR_OPTIONS,

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Radio } from 'antd';
-import InputCustom from '../../scenarioComon/InputCustom';
+import InputCustom from '../../scenarioCommon/InputCustom';
 import {
   PREVIEW_LABELS,
   SHIPPING_ADDRESS_SETTING_LABELS,

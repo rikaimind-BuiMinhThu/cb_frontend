@@ -49,7 +49,6 @@ const LOGOUT_JS_TEMPLATES = {
     credentials: "include"
   })
     .then(res => res.text())
-    .then(data => console.log(data))
     .catch(err => console.error(err));
 }`,
 };
