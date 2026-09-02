@@ -11,25 +11,78 @@ import {
   AdminActionButton,
   useAdminHeaderActions,
 } from 'v2/components/AdminShell';
+import 'v2/assets/css/file-mng.css';
+import {
+  ALLOWED_FILE_TYPES,
+  API_SUCCESS_CODE,
+  BYTES_PER_KB,
+  CLOSE_BUTTON,
+  COL_ACTIONS,
+  COL_ACTIONS_WIDTH,
+  COL_NUMBER,
+  COL_NUMBER_WIDTH,
+  COL_TYPE,
+  COL_TYPE_WIDTH,
+  COL_URL,
+  DELETE_CONFIRM_MESSAGE,
+  EMPTY_DURATION,
+  ERROR_FILE_ADD,
+  ERROR_FILE_DELETE,
+  ERROR_FILE_TYPE,
+  ERROR_IMAGE_SIZE,
+  ERROR_PDF_SIZE,
+  ERROR_VIDEO_DURATION,
+  FILE_TYPE_MP4,
+  FILE_TYPE_PDF,
+  FILES_API_PATH,
+  FILES_UPLOAD_PATH,
+  IMAGE_MAX_MB,
+  IMAGE_PREVIEW_TYPES,
+  INITIAL_PAGE,
+  MIME_APPLICATION_PDF,
+  MIME_IMAGE_PREFIX,
+  MIME_VIDEO_MP4,
+  PAGE_SIZE,
+  PDF_MAX_MB,
+  PREVIEW_MODAL_WIDTH,
+  PREVIEW_TITLE,
+  S3_FILE_BASE_URL,
+  SUCCESS_FILE_ADDED,
+  SUCCESS_FILE_DELETED,
+  SUCCESS_URL_COPIED,
+  TOKEN_EXPIRED_CODE,
+  VIDEO_MAX_SECONDS,
+} from './constants';
 
-function FileManagement() {
+const buildS3Url = (fileUrl) => `${S3_FILE_BASE_URL}/${fileUrl}`;
+
+const getFileExtension = (fileName) => fileName.split('.')[1]?.toLowerCase();
+
+const getUploadMimeType = (type) => {
+  if (type === FILE_TYPE_MP4) return MIME_VIDEO_MP4;
+  if (type === FILE_TYPE_PDF) return MIME_APPLICATION_PDF;
+  return `${MIME_IMAGE_PREFIX}${type}`;
+};
+
+const FileManagement = () => {
   const [files, setFiles] = useState([]);
   const [newFile, setNewFile] = useState(null);
   const [typeFilePreview, setTypeFilePreview] = useState('');
   const [srcPreview, setSrcPreview] = useState('');
   const [isOpenPreview, setIsOpenPreview] = useState(false);
   const inputRef = useRef(null);
+  const videoPreviewRef = useRef(null);
   const [fileError, setFileError] = useState('');
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [idFile, setIdFile] = useState();
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(INITIAL_PAGE);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
 
   const fetchFiles = (pageIndex) => {
     setLoading(true);
     api
-      .get(`/api/v1/managements/file?page=${pageIndex}`)
+      .get(`${FILES_API_PATH}?page=${pageIndex}`)
       .then((res) => {
         if (res.data.data !== [] && res.data.total !== 0) {
           setFiles(res.data?.data || []);
@@ -37,100 +90,101 @@ function FileManagement() {
         }
       })
       .catch((err) => {
-        if (err.response?.data.code === 0) tokenExpired();
+        if (err.response?.data.code === TOKEN_EXPIRED_CODE) tokenExpired();
       })
       .finally(() => setLoading(false));
   };
 
   useEffect(() => {
-    fetchFiles(1);
+    fetchFiles(INITIAL_PAGE);
   }, []);
 
-  function handleChangeFile(e) {
+  const handleChangeFile = (e) => {
     setNewFile(e.target.files[0]);
     setFileError('');
-  }
+  };
 
-  function handleSave() {
+  const handleSave = () => {
     if (!newFile) return;
-    const type = newFile.name.split('.')[1].toLowerCase();
-    const trueFile = ['jpeg', 'jpg', 'png', 'pdf', 'mp4', 'gif'].includes(type);
+    const type = getFileExtension(newFile.name);
+    const trueFile = ALLOWED_FILE_TYPES.includes(type);
     if (!trueFile) {
-      setFileError('jpeg/ jpg/ png/ pdf/ mp4/ gifのファイルを入力が必要です。');
+      setFileError(ERROR_FILE_TYPE);
       return;
     }
-    if (type !== 'pdf' && type !== 'mp4' && newFile.size / 1024 / 1024 > 2) {
-      setFileError('2MB以下のファイルをアップロードしてください。');
+    const sizeMb = newFile.size / BYTES_PER_KB / BYTES_PER_KB;
+    if (type !== FILE_TYPE_PDF && type !== FILE_TYPE_MP4 && sizeMb > IMAGE_MAX_MB) {
+      setFileError(ERROR_IMAGE_SIZE);
       return;
     }
-    if (type === 'pdf' && newFile.size / 1024 / 1024 > 3) {
-      setFileError('3MB以下のファイルをアップロードしてください。');
+    if (type === FILE_TYPE_PDF && sizeMb > PDF_MAX_MB) {
+      setFileError(ERROR_PDF_SIZE);
       return;
     }
-    const video = document.getElementById('preview-video');
-    if (type === 'mp4' && video?.duration > 15) {
-      setFileError('15秒以下のビデオをアップロードしてください。');
+    const video = videoPreviewRef.current;
+    if (type === FILE_TYPE_MP4 && video?.duration > VIDEO_MAX_SECONDS) {
+      setFileError(ERROR_VIDEO_DURATION);
       return;
     }
     const file = {
       user_file: {
         file_type: type,
         size: newFile.size,
-        timeplay: `${type === 'mp4' ? video.duration : ''}`,
+        timeplay: `${type === FILE_TYPE_MP4 ? video.duration : EMPTY_DURATION}`,
       },
     };
     api
-      .post(`/api/v1/managements/file/upload`, file)
+      .post(FILES_UPLOAD_PATH, file)
       .then((res) => {
         const urlFile = res.data.data.url;
         const filePost = { user_file: { file_type: type, file_url: res.data.data.path } };
-        let typeUpload = type === 'mp4' ? 'video/mp4' : type === 'pdf' ? 'application/pdf' : `image/${type}`;
+        const typeUpload = getUploadMimeType(type);
         axios
           .put(urlFile, newFile, { headers: { 'Content-Type': typeUpload } })
           .then(() => {
-            api.post(`/api/v1/managements/file`, filePost).then((res) => {
-              if (res.data.code === 1) {
-                message.success('正常にファイル追加されました！');
+            api.post(FILES_API_PATH, filePost).then((saveRes) => {
+              if (saveRes.data.code === API_SUCCESS_CODE) {
+                message.success(SUCCESS_FILE_ADDED);
                 fetchFiles(page);
                 setNewFile(null);
               } else {
-                message.error('ファイルの追加ができませんでした。');
+                message.error(ERROR_FILE_ADD);
               }
             });
           });
       })
       .catch((err) => {
-        if (err.response?.data.code === 0) tokenExpired();
+        if (err.response?.data.code === TOKEN_EXPIRED_CODE) tokenExpired();
       });
-  }
+  };
 
-  function handlePreview(file) {
-    setSrcPreview(`https://ec-chatbot.s3.ap-northeast-1.amazonaws.com/${file.file_url}`);
-    setTypeFilePreview(file.file_url.split('.')[1].toLowerCase());
+  const handlePreview = (file) => {
+    setSrcPreview(buildS3Url(file.file_url));
+    setTypeFilePreview(getFileExtension(file.file_url));
     setIsOpenPreview(true);
-  }
+  };
 
-  function handleDelete() {
+  const handleDelete = () => {
     api
-      .delete(`/api/v1/managements/file/${idFile}`)
+      .delete(`${FILES_API_PATH}/${idFile}`)
       .then((res) => {
         setIsOpenDelete(false);
-        if (res.data.code === 1) {
-          message.success('正常に削除されました！');
+        if (res.data.code === API_SUCCESS_CODE) {
+          message.success(SUCCESS_FILE_DELETED);
           fetchFiles(page);
         } else {
-          message.error('削除できませんでした。');
+          message.error(ERROR_FILE_DELETE);
         }
       })
       .catch((err) => {
-        if (err.response?.data.code === 0) tokenExpired();
+        if (err.response?.data.code === TOKEN_EXPIRED_CODE) tokenExpired();
       });
-  }
+  };
 
-  function handleCopy(file_url) {
-    navigator.clipboard.writeText(file_url);
-    message.success('正常にURLをコピーしました！');
-  }
+  const handleCopy = (fileUrl) => {
+    navigator.clipboard.writeText(fileUrl);
+    message.success(SUCCESS_URL_COPIED);
+  };
 
   useAdminHeaderActions(
     <AdminActionButton
@@ -142,22 +196,22 @@ function FileManagement() {
 
   const columns = [
     {
-      title: '番号',
-      width: 70,
-      render: (_, __, i) => i + 1 + 25 * (page - 1),
+      title: COL_NUMBER,
+      width: COL_NUMBER_WIDTH,
+      render: (_, __, i) => i + 1 + PAGE_SIZE * (page - 1),
     },
-    { title: 'タイプ', dataIndex: 'file_type', width: 100 },
+    { title: COL_TYPE, dataIndex: 'file_type', width: COL_TYPE_WIDTH },
     {
-      title: 'URL',
+      title: COL_URL,
       dataIndex: 'file_url',
-      render: (url) => `https://ec-chatbot.s3.ap-northeast-1.amazonaws.com/${url}`,
+      render: (url) => buildS3Url(url),
       ellipsis: true,
     },
     {
-      title: 'アクション',
-      width: 260,
+      title: COL_ACTIONS,
+      width: COL_ACTIONS_WIDTH,
       render: (_, file) => {
-        const fullUrl = `https://ec-chatbot.s3.ap-northeast-1.amazonaws.com/${file.file_url}`;
+        const fullUrl = buildS3Url(file.file_url);
         return (
           <Space wrap className="admin-table-actions">
             <AdminActionButton action="preview" iconOnly onClick={() => handlePreview(file)} />
@@ -168,6 +222,8 @@ function FileManagement() {
       },
     },
   ];
+
+  const fileExtension = newFile ? newFile.name.split('.')[1] : '';
 
   return (
     <>
@@ -180,15 +236,15 @@ function FileManagement() {
           rowKey="id"
           toolbar={
             newFile ? (
-              <div className="admin-variable-new-row" style={{ margin: 0 }}>
-                {['jpeg', 'jpg', 'png', 'gif'].includes(newFile.name.split('.')[1]) ? (
-                  <img src={URL.createObjectURL(newFile)} alt={newFile.name} style={{ maxHeight: 120 }} />
-                ) : newFile.name.split('.')[1] === 'mp4' ? (
-                  <video id="preview-video" controls style={{ maxWidth: 300 }}>
-                    <source src={URL.createObjectURL(newFile)} type="video/mp4" />
+              <div className="admin-variable-new-row file-mng__upload-row">
+                {IMAGE_PREVIEW_TYPES.includes(fileExtension) ? (
+                  <img src={URL.createObjectURL(newFile)} alt={newFile.name} className="file-mng__thumb" />
+                ) : fileExtension === FILE_TYPE_MP4 ? (
+                  <video ref={videoPreviewRef} controls className="file-mng__video-thumb">
+                    <source src={URL.createObjectURL(newFile)} type={MIME_VIDEO_MP4} />
                   </video>
                 ) : (
-                  <img src={noImage} alt="" style={{ maxHeight: 120 }} />
+                  <img src={noImage} alt="" className="file-mng__thumb" />
                 )}
                 <p>{newFile.name}</p>
                 <Space className="admin-form-actions">
@@ -202,35 +258,43 @@ function FileManagement() {
           pagination={{
             current: page,
             total,
-            pageSize: 25,
-            onChange: (p) => {
-              setPage(p);
-              fetchFiles(p);
+            pageSize: PAGE_SIZE,
+            onChange: (nextPage) => {
+              setPage(nextPage);
+              fetchFiles(nextPage);
               window.scrollTo(0, 0);
             },
           }}
         />
       </AdminPage>
 
-      <Modal open={isOpenPreview} onCancel={() => setIsOpenPreview(false)} footer={<Button onClick={() => setIsOpenPreview(false)}>閉じる</Button>} width={720} title="プレビュー">
-        {typeFilePreview === 'mp4' ? (
-          <video style={{ width: '100%' }} controls><source src={srcPreview} type="video/mp4" /></video>
-        ) : typeFilePreview === 'pdf' ? (
-          <embed style={{ width: '100%', height: 500 }} src={srcPreview} />
+      <Modal
+        open={isOpenPreview}
+        onCancel={() => setIsOpenPreview(false)}
+        footer={<Button onClick={() => setIsOpenPreview(false)}>{CLOSE_BUTTON}</Button>}
+        width={PREVIEW_MODAL_WIDTH}
+        title={PREVIEW_TITLE}
+      >
+        {typeFilePreview === FILE_TYPE_MP4 ? (
+          <video className="file-mng__preview-media" controls>
+            <source src={srcPreview} type={MIME_VIDEO_MP4} />
+          </video>
+        ) : typeFilePreview === FILE_TYPE_PDF ? (
+          <embed className="file-mng__preview-embed" src={srcPreview} />
         ) : (
-          <img src={srcPreview} alt="" style={{ width: '100%' }} />
+          <img src={srcPreview} alt="" className="file-mng__preview-media" />
         )}
       </Modal>
 
       <AdminConfirmModal
         open={isOpenDelete}
-        message="本当にファイルを削除しますか。"
+        message={DELETE_CONFIRM_MESSAGE}
         onOk={handleDelete}
         onCancel={() => setIsOpenDelete(false)}
         danger
       />
     </>
   );
-}
+};
 
 export default FileManagement;

@@ -1,160 +1,170 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { AdminFormRow, AdminActionButton } from 'v2/components/AdminShell';
+import {
+  ADD_ROW_LABEL,
+  INVOICE_ENCLOSED_LABEL,
+  INVOICE_INCLUDED_LABEL,
+  INVOICE_NOT_INCLUDED_LABEL,
+  NONE_LABEL,
+  NP_CONTRACT_HINT,
+  NP_DEFERRED_TITLE,
+  NP_INVOICE_ENCLOSED,
+  NP_INVOICE_NOT_INCLUDE,
+  NP_MAX_AMOUNT_LABEL,
+  NP_SETTLEMENT_FEE_LABEL,
+  RANGE_SEPARATOR,
+  YEN_LABEL,
+  YES_LABEL,
+  ZERO_PLACEHOLDER,
+} from '../paymentConstants';
 
 const NpDeferredSection = ({
   noNP,
   setNoNP,
-  payment,
-  customDivSettlementFee,
+  npInvoiceIncluded,
+  setNpInvoiceIncluded,
+  npMaximumAmount,
+  setNpMaximumAmount,
+  npMaxAmountError,
+  npRows,
+  npErrors,
+  onUpdateNpRow,
   onAdd,
   onDelete,
   onSave,
-}) => {
-  return (
-    <div className="payment-setting-section">
-      <h3 className="payment-setting-section-title">NP後払い</h3>
-      <div className="payment-setting-section-body">
-        <div className="payment-native-radio-group">
-          <label>
-            <input
-              type="radio"
-              name="np_deferred"
-              id="np_deferred_no"
-              value="no"
-              checked={noNP}
-              onChange={() => setNoNP(true)}
-            />
-            無し
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="np_deferred"
-              id="np_deferred_can"
-              checked={!noNP}
-              onChange={() => setNoNP(false)}
-            />
-            あり
-          </label>
-        </div>
-        {!noNP && (
-          <div className="payment-conditional-block">
-            <AdminFormRow label="請求書の同梱">
-              <div className="payment-native-radio-group">
-                <label>
-                  <input
-                    type="radio"
-                    name="invoice_included"
-                    id="not_included"
-                    value="not_included"
-                    defaultChecked={
-                      payment.np_invoice_included === 'not_include' ||
-                      payment.np_invoice_included == null
-                    }
-                  />
-                  同梱しない
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    name="invoice_included"
-                    id="enclosed"
-                    value="enclosed"
-                    defaultChecked={payment.np_invoice_included === 'enclosed'}
-                  />
-                  同梱する（NP後払いwiz）
-                </label>
-              </div>
-              <p className="payment-hint-text" style={{ marginTop: 8 }}>
-                ※別途ヤマトクレジットファイナンスとの契約が必要になります。
-              </p>
-            </AdminFormRow>
-            <AdminFormRow label="上限金額" required>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+}) => (
+  <div className="payment-setting-section">
+    <h3 className="payment-setting-section-title">{NP_DEFERRED_TITLE}</h3>
+    <div className="payment-setting-section-body">
+      <div className="payment-native-radio-group">
+        <label>
+          <input
+            type="radio"
+            name="np_deferred"
+            checked={noNP}
+            onChange={() => setNoNP(true)}
+          />
+          {NONE_LABEL}
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="np_deferred"
+            checked={!noNP}
+            onChange={() => setNoNP(false)}
+          />
+          {YES_LABEL}
+        </label>
+      </div>
+      {!noNP && (
+        <div className="payment-conditional-block">
+          <AdminFormRow label={INVOICE_INCLUDED_LABEL}>
+            <div className="payment-native-radio-group">
+              <label>
                 <input
-                  className="payment-native-input"
-                  style={{ width: 160 }}
-                  type="number"
-                  placeholder="0"
-                  id="np_maximum_amount"
-                  defaultValue={payment.np_maximum_amount}
+                  type="radio"
+                  name="invoice_included"
+                  checked={npInvoiceIncluded === NP_INVOICE_NOT_INCLUDE}
+                  onChange={() => setNpInvoiceIncluded(NP_INVOICE_NOT_INCLUDE)}
                 />
-                <span className="payment-hint-text">円</span>
-              </div>
-              <span className="payment-error-text" id="err_np_maximum_amount" />
-            </AdminFormRow>
-            <AdminFormRow label="決済手数料（税込）" required>
-              <form id="customNP">
-                {customDivSettlementFee.map((cdiv, i) => (
-                  <div className="payment-np-fee-row" key={i} id={`settlementFee${i}`}>
-                    <div className="payment-np-fee-field">
-                      <input
-                        className="payment-native-input"
-                        style={{ width: 100 }}
-                        type="number"
-                        placeholder="0"
-                        name={`np_settlement_fee_value${i}`}
-                        defaultValue={
-                          payment?.np_value_settlements?.length > 0
-                            ? payment?.np_value_settlements[i]?.np_settlement_fee_value
-                            : ''
-                        }
-                      />
-                      <span className="payment-hint-text">~</span>
-                      <span className="payment-error-text" id={`err_np_settlement_fee_value_${i}`} />
-                    </div>
-                    <div className="payment-np-fee-field">
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                        <input
-                          className="payment-native-input"
-                          style={{ width: 100 }}
-                          type="number"
-                          placeholder="0"
-                          name={`np_settlement_max_value${i}`}
-                          defaultValue={
-                            payment?.np_value_settlements?.length > 0
-                              ? payment?.np_value_settlements[i]?.np_settlement_max_value
-                              : ''
-                          }
-                        />
-                        <span className="payment-hint-text">円</span>
-                      </div>
-                      <span className="payment-error-text" id={`err_np_settlement_max_value_${i}`} />
-                    </div>
-                    <div className="payment-np-fee-field">
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                        <input
-                          className="payment-native-input"
-                          style={{ width: 100 }}
-                          type="number"
-                          placeholder="0"
-                          name={`np_settlement_min_value${i}`}
-                          defaultValue={
-                            payment?.np_value_settlements?.length > 0
-                              ? payment?.np_value_settlements[i]?.np_settlement_min_value
-                              : ''
-                          }
-                        />
-                        <span className="payment-hint-text">円</span>
-                      </div>
-                      <span className="payment-error-text" id={`err_np_settlement_min_value_${i}`} />
-                    </div>
-                    {i > 0 && (
-                      <AdminActionButton action="delete" iconOnly onClick={() => onDelete(i)} />
-                    )}
+                {INVOICE_NOT_INCLUDED_LABEL}
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="invoice_included"
+                  checked={npInvoiceIncluded === NP_INVOICE_ENCLOSED}
+                  onChange={() => setNpInvoiceIncluded(NP_INVOICE_ENCLOSED)}
+                />
+                {INVOICE_ENCLOSED_LABEL}
+              </label>
+            </div>
+            <p className="payment-hint-text payment-hint-text--spaced">{NP_CONTRACT_HINT}</p>
+          </AdminFormRow>
+          <AdminFormRow label={NP_MAX_AMOUNT_LABEL} required>
+            <div className="payment-inline-field">
+              <input
+                className="payment-native-input payment-native-input--md"
+                type="number"
+                placeholder={ZERO_PLACEHOLDER}
+                value={npMaximumAmount}
+                onChange={(e) => setNpMaximumAmount(e.target.value)}
+              />
+              <span className="payment-hint-text">{YEN_LABEL}</span>
+            </div>
+            <span className="payment-error-text">{npMaxAmountError}</span>
+          </AdminFormRow>
+          <AdminFormRow label={NP_SETTLEMENT_FEE_LABEL} required>
+            {npRows.map((row, index) => (
+              <div className="payment-np-fee-row" key={`np-row-${index}`}>
+                <div className="payment-np-fee-field">
+                  <input
+                    className="payment-native-input payment-native-input--xs"
+                    type="number"
+                    placeholder={ZERO_PLACEHOLDER}
+                    value={row.feeValue}
+                    onChange={(e) => onUpdateNpRow(index, 'feeValue', e.target.value)}
+                  />
+                  <span className="payment-hint-text">{RANGE_SEPARATOR}</span>
+                  <span className="payment-error-text">{npErrors[index]?.fee}</span>
+                </div>
+                <div className="payment-np-fee-field">
+                  <div className="payment-inline-field--tight">
+                    <input
+                      className="payment-native-input payment-native-input--xs"
+                      type="number"
+                      placeholder={ZERO_PLACEHOLDER}
+                      value={row.maxValue}
+                      onChange={(e) => onUpdateNpRow(index, 'maxValue', e.target.value)}
+                    />
+                    <span className="payment-hint-text">{YEN_LABEL}</span>
                   </div>
-                ))}
-              </form>
-              <AdminActionButton action="create" label="行を追加" onClick={onAdd} />
-            </AdminFormRow>
-          </div>
-        )}
-        <div className="payment-setting-actions admin-form-actions">
-          <AdminActionButton action="save" onClick={onSave} />
+                  <span className="payment-error-text">{npErrors[index]?.max}</span>
+                </div>
+                <div className="payment-np-fee-field">
+                  <div className="payment-inline-field--tight">
+                    <input
+                      className="payment-native-input payment-native-input--xs"
+                      type="number"
+                      placeholder={ZERO_PLACEHOLDER}
+                      value={row.minValue}
+                      onChange={(e) => onUpdateNpRow(index, 'minValue', e.target.value)}
+                    />
+                    <span className="payment-hint-text">{YEN_LABEL}</span>
+                  </div>
+                  <span className="payment-error-text">{npErrors[index]?.min}</span>
+                </div>
+                {index > 0 && (
+                  <AdminActionButton action="delete" iconOnly onClick={() => onDelete(index)} />
+                )}
+              </div>
+            ))}
+            <AdminActionButton action="create" label={ADD_ROW_LABEL} onClick={onAdd} />
+          </AdminFormRow>
         </div>
+      )}
+      <div className="payment-setting-actions admin-form-actions">
+        <AdminActionButton action="save" onClick={onSave} />
       </div>
     </div>
-  );
+  </div>
+);
+
+NpDeferredSection.propTypes = {
+  noNP: PropTypes.bool,
+  setNoNP: PropTypes.func,
+  npInvoiceIncluded: PropTypes.string,
+  setNpInvoiceIncluded: PropTypes.func,
+  npMaximumAmount: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  setNpMaximumAmount: PropTypes.func,
+  npMaxAmountError: PropTypes.string,
+  npRows: PropTypes.array,
+  npErrors: PropTypes.array,
+  onUpdateNpRow: PropTypes.func,
+  onAdd: PropTypes.func,
+  onDelete: PropTypes.func,
+  onSave: PropTypes.func,
 };
 
 export default NpDeferredSection;

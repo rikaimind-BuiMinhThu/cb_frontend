@@ -4,36 +4,42 @@ import { Input, InputNumber, Select, Space } from 'antd';
 import InputNum from 'v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputNum';
 import { AdminInfoTooltip } from 'v2/components/AdminShell';
 import { getDesignSettingTooltip } from '../constants/designSettingTooltips';
+import {
+  BUTTON_TYPE_OPTIONS,
+  DEVICE_PC,
+  DEVICE_SP,
+  DISPLAY_TYPE_OPTIONS,
+  LABEL_BOTTOM_MARGIN,
+  LABEL_BUTTON_CONTENT,
+  LABEL_DISPLAY_TYPE,
+  LABEL_POSITION,
+  LABEL_RIGHT_MARGIN,
+  LABEL_RIGHT_TITLE_PC,
+  LABEL_RIGHT_TITLE_SP,
+  LABEL_SIZE,
+  PLACEHOLDER_BOTTOM_MARGIN,
+  PLACEHOLDER_HEIGHT,
+  PLACEHOLDER_RIGHT_MARGIN,
+  PLACEHOLDER_TITLE_FIELD,
+  PLACEHOLDER_WIDTH,
+  WIDTH_UNIT_PERCENT,
+  WIDTH_UNIT_PX,
+  POSITION_BOTTOM,
+  POSITION_OPTIONS,
+  POSITION_RIGHT,
+} from '../constants/designChatbotConstants';
 
-const DISPLAY_TYPE_OPTIONS = [
-  { value: 1, label: 'リロード' },
-  { value: 2, label: '非表示' },
-  { value: 3, label: 'ボタン押下' },
-];
-
-const POSITION_OPTIONS = [
-  { value: 1, label: '底辺に設置' },
-  { value: 2, label: '右辺に設置' },
-];
-
-const BUTTON_TYPE_OPTIONS = [
-  { value: 1, label: 'ボタンとタイトル' },
-  { value: 2, label: 'ボタンのみ' },
-];
-
-function DesignField({ label, tooltipKey, fullWidth, children }) {
-  return (
-    <div className={`design-field${fullWidth ? ' design-field--full' : ''}`}>
-      <label className="design-field__label">
-        {label}
-        {tooltipKey && (
-          <AdminInfoTooltip text={getDesignSettingTooltip(tooltipKey)} />
-        )}
-      </label>
-      <div className="design-field__control">{children}</div>
-    </div>
-  );
-}
+const DesignField = ({ label, tooltipKey, fullWidth, children }) => (
+  <div className={`design-field${fullWidth ? ' design-field--full' : ''}`}>
+    <label className="design-field__label">
+      {label}
+      {tooltipKey && (
+        <AdminInfoTooltip text={getDesignSettingTooltip(tooltipKey)} />
+      )}
+    </label>
+    <div className="design-field__control">{children}</div>
+  </div>
+);
 
 DesignField.propTypes = {
   label: PropTypes.string.isRequired,
@@ -61,9 +67,9 @@ const DeviceDesignPanel = ({
   bottomMargin,
   onChange,
 }) => {
-  const isPc = device === 'pc';
+  const isPc = device === DEVICE_PC;
   const fieldPrefix = isPc ? 'Pc' : 'Sp';
-  const rightTitleLabel = isPc ? '右のタイトル' : 'タイトル';
+  const rightTitleLabel = isPc ? LABEL_RIGHT_TITLE_PC : LABEL_RIGHT_TITLE_SP;
   const sizeMax = isPc ? 1000 : 100;
   const positionValue = Number(position);
   const buttonTypeValue = Number(buttonType);
@@ -73,7 +79,7 @@ const DeviceDesignPanel = ({
       <h4 className="design-device-card__title">{title}</h4>
       <div className="design-device-card__grid">
         {isPc && (
-          <DesignField label="表示タイプ" tooltipKey="displayType">
+          <DesignField label={LABEL_DISPLAY_TYPE} tooltipKey="displayType">
             <Select
               value={Number(displayType)}
               options={DISPLAY_TYPE_OPTIONS}
@@ -82,32 +88,30 @@ const DeviceDesignPanel = ({
           </DesignField>
         )}
 
-        <DesignField label="サイズ" tooltipKey="size" fullWidth>
+        <DesignField label={LABEL_SIZE} tooltipKey="size" fullWidth>
           <Space size={12} wrap className="design-size-row">
             <InputNum
-              style={{ width: '100%', minWidth: 120 }}
               name={`width_${device}`}
               min={1}
               max={sizeMax}
               value={width}
-              placeholder="幅"
+              placeholder={PLACEHOLDER_WIDTH}
               onChange={(value) => onChange(`width${fieldPrefix}`, value)}
             />
             <span className="design-field__suffix">{widthUnit}</span>
             <InputNum
-              style={{ width: '100%', minWidth: 120 }}
               name={`height_${device}`}
               min={1}
               max={sizeMax}
               value={height}
-              placeholder="高さ"
+              placeholder={PLACEHOLDER_HEIGHT}
               onChange={(value) => onChange(`height${fieldPrefix}`, value)}
             />
             <span className="design-field__suffix">{widthUnit}</span>
           </Space>
         </DesignField>
 
-        <DesignField label="設置場所" tooltipKey="position">
+        <DesignField label={LABEL_POSITION} tooltipKey="position">
           <Select
             value={positionValue}
             options={POSITION_OPTIONS}
@@ -115,19 +119,19 @@ const DeviceDesignPanel = ({
           />
         </DesignField>
 
-        {positionValue === 2 && (
+        {positionValue === POSITION_RIGHT && (
           <DesignField label={rightTitleLabel} tooltipKey="rightTitle">
             <Input
               name={`right_position_${device}_title`}
-              placeholder="タイトル"
+              placeholder={PLACEHOLDER_TITLE_FIELD}
               value={rightTitle}
               onChange={(e) => onChange(`right${fieldPrefix}Title`, e.target.value)}
             />
           </DesignField>
         )}
 
-        {positionValue === 1 && (
-          <DesignField label="ボタン内容" tooltipKey="buttonType">
+        {positionValue === POSITION_BOTTOM && (
+          <DesignField label={LABEL_BUTTON_CONTENT} tooltipKey="buttonType">
             <Select
               value={buttonTypeValue}
               options={BUTTON_TYPE_OPTIONS}
@@ -136,24 +140,22 @@ const DeviceDesignPanel = ({
           </DesignField>
         )}
 
-        <DesignField label="右マージン" tooltipKey="rightMargin">
+        <DesignField label={LABEL_RIGHT_MARGIN} tooltipKey="rightMargin">
           <InputNumber
             name={`right_margin_${device}`}
             value={rightMargin}
-            placeholder="右マージン"
+            placeholder={PLACEHOLDER_RIGHT_MARGIN}
             min={0}
-            style={{ width: '100%' }}
             onChange={(value) => onChange(`rightMargin${fieldPrefix}`, value ?? '')}
           />
         </DesignField>
 
-        <DesignField label="下マージン" tooltipKey="bottomMargin">
+        <DesignField label={LABEL_BOTTOM_MARGIN} tooltipKey="bottomMargin">
           <InputNumber
             name={`bottom_margin_${device}`}
             value={bottomMargin}
-            placeholder="下マージン"
+            placeholder={PLACEHOLDER_BOTTOM_MARGIN}
             min={0}
-            style={{ width: '100%' }}
             onChange={(value) => onChange(`bottomMargin${fieldPrefix}`, value ?? '')}
           />
         </DesignField>
@@ -163,12 +165,12 @@ const DeviceDesignPanel = ({
 };
 
 DeviceDesignPanel.propTypes = {
-  device: PropTypes.oneOf(['pc', 'sp']).isRequired,
+  device: PropTypes.oneOf([DEVICE_PC, DEVICE_SP]).isRequired,
   title: PropTypes.string.isRequired,
   displayType: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   height: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
-  widthUnit: PropTypes.oneOf(['px', '%']).isRequired,
+  widthUnit: PropTypes.oneOf([WIDTH_UNIT_PX, WIDTH_UNIT_PERCENT]).isRequired,
   position: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   buttonType: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   rightTitle: PropTypes.string.isRequired,

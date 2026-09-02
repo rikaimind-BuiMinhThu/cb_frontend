@@ -2,6 +2,13 @@ import PropTypes from 'prop-types';
 import './DesignBotIcons.css';
 import { AdminInfoTooltip } from 'v2/components/AdminShell';
 import { getDesignSettingTooltip } from '../constants/designSettingTooltips';
+import {
+  CLOSING_ICON_LABEL,
+  ICON_ADD_PLUS,
+  MESSAGE_ICON_LABEL,
+  OPENING_ICON_LABEL,
+  SELECT_ICON_LABEL,
+} from '../constants/designChatbotConstants';
 
 const IconSectionHeader = ({ label, tooltipKey }) => (
   <div className="icon_section_header">
@@ -33,7 +40,7 @@ const DesignBotIcons = ({
 }) => (
   <div className="icon_holder">
     <div className="icon_holder_section">
-      <IconSectionHeader label="メッセージアイコン" tooltipKey="messageIcon" />
+      <IconSectionHeader label={MESSAGE_ICON_LABEL} tooltipKey="messageIcon" />
       <div className="icon_preview_container">
         <div className="icon_preview">
           {!!botIcon ? (
@@ -45,7 +52,7 @@ const DesignBotIcons = ({
             </div>
           ) : (
             <div className="preview_placeholder">
-              <span>アイコンを選択</span>
+              <span>{SELECT_ICON_LABEL}</span>
             </div>
           )}
         </div>
@@ -62,7 +69,7 @@ const DesignBotIcons = ({
             ))}
           </div>
           <div className="add-icon">
-            <span>+</span>
+            <span>{ICON_ADD_PLUS}</span>
             <input
               type="file"
               onChange={onBotIconChange}
@@ -77,7 +84,7 @@ const DesignBotIcons = ({
     </div>
 
     <div className="icon_holder_section">
-      <IconSectionHeader label="開く時のボットアイコン" tooltipKey="openingIcon" />
+      <IconSectionHeader label={OPENING_ICON_LABEL} tooltipKey="openingIcon" />
       <div className="icon_preview_container">
         <div className="icon_preview">
           {!!openingBotIcon ? (
@@ -89,7 +96,7 @@ const DesignBotIcons = ({
             </div>
           ) : (
             <div className="preview_placeholder">
-              <span>アイコンを選択</span>
+              <span>{SELECT_ICON_LABEL}</span>
             </div>
           )}
         </div>
@@ -106,7 +113,7 @@ const DesignBotIcons = ({
             ))}
           </div>
           <div className="add-icon">
-            <span>+</span>
+            <span>{ICON_ADD_PLUS}</span>
             <input
               type="file"
               onChange={onOpeningBotIconChange}
@@ -121,7 +128,7 @@ const DesignBotIcons = ({
     </div>
 
     <div className="icon_holder_section">
-      <IconSectionHeader label="閉じる時のボットアイコン" tooltipKey="closingIcon" />
+      <IconSectionHeader label={CLOSING_ICON_LABEL} tooltipKey="closingIcon" />
       <div className="icon_preview_container">
         <div className="icon_preview">
           {!!closingBotIcon ? (
@@ -133,7 +140,7 @@ const DesignBotIcons = ({
             </div>
           ) : (
             <div className="preview_placeholder">
-              <span>アイコンを選択</span>
+              <span>{SELECT_ICON_LABEL}</span>
             </div>
           )}
         </div>
@@ -150,7 +157,7 @@ const DesignBotIcons = ({
             ))}
           </div>
           <div className="add-icon">
-            <span>+</span>
+            <span>{ICON_ADD_PLUS}</span>
             <input
               type="file"
               onChange={onClosingBotIconChange}

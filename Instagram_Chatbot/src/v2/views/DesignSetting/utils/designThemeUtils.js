@@ -411,38 +411,25 @@ export const resolveUserMessageTheme = (themeSettings, botInfor) => {
   };
 };
 
+const THEME_VALUE_NORMALIZERS = {
+  fieldFocusBgEffect: (value) => (value ? normalizeFieldFocusEffect(value) : value),
+  checkboxCheckedBorderEffect: (value) => (value ? normalizeBorderTwinkleEffect(value) : value),
+  radioSelectedBorderEffect: (value) => (value ? normalizeBorderTwinkleEffect(value) : value),
+  buttonBorderStyle: (value) => (value ? normalizeButtonBorderStyle(value) : value),
+  botMessageBorderStyle: (value) => (value ? normalizeMessageBorderStyle(value, 'with_tail') : value),
+  userMessageBorderStyle: (value) => (value ? normalizeMessageBorderStyle(value, 'no_tail') : value),
+  buttonEffect: (value) => (value ? normalizeButtonEffect(value) : value),
+  buttonPosition: (value) => (value ? normalizeButtonPosition(value) : value),
+  modalTitleAlignment: (value) => (value ? normalizeModalTitleAlignment(value) : value),
+};
+
 export const buildThemePayload = (themeSettings) => {
   const payload = {};
   THEME_FIELD_KEYS.forEach((key) => {
     const snakeKey = CAMEL_TO_SNAKE_THEME[key];
-    let value = themeSettings[key];
-    if (key === 'fieldFocusBgEffect' && value) {
-      value = normalizeFieldFocusEffect(value);
-    }
-    if (key === 'checkboxCheckedBorderEffect' && value) {
-      value = normalizeBorderTwinkleEffect(value);
-    }
-    if (key === 'radioSelectedBorderEffect' && value) {
-      value = normalizeBorderTwinkleEffect(value);
-    }
-    if (key === 'buttonBorderStyle' && value) {
-      value = normalizeButtonBorderStyle(value);
-    }
-    if (key === 'botMessageBorderStyle' && value) {
-      value = normalizeMessageBorderStyle(value, 'with_tail');
-    }
-    if (key === 'userMessageBorderStyle' && value) {
-      value = normalizeMessageBorderStyle(value, 'no_tail');
-    }
-    if (key === 'buttonEffect' && value) {
-      value = normalizeButtonEffect(value);
-    }
-    if (key === 'buttonPosition' && value) {
-      value = normalizeButtonPosition(value);
-    }
-    if (key === 'modalTitleAlignment' && value) {
-      value = normalizeModalTitleAlignment(value);
-    }
+    const rawValue = themeSettings[key];
+    const normalize = THEME_VALUE_NORMALIZERS[key];
+    const value = normalize ? normalize(rawValue) : rawValue;
     if (value !== undefined && value !== '') {
       payload[snakeKey] = value;
     }

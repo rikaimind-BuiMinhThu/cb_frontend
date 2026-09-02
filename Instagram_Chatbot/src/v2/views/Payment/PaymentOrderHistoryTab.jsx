@@ -1,22 +1,48 @@
 import React, { useMemo } from 'react';
+import PropTypes from 'prop-types';
 import { DatePicker, Select, Space, Typography } from 'antd';
 import { AdminTable, AdminActionButton } from 'v2/components/AdminShell';
+import {
+  BOT_LABEL,
+  CLIENT_FILTER_DEEL,
+  CLIENT_LABEL,
+  COL_MODE,
+  COL_NO,
+  COL_ORDERED_AT,
+  COL_ORDER_NUMBER,
+  COL_PRICE,
+  COL_PRODUCT_NAME,
+  COL_QUANTITY,
+  COL_SETTLEMENT_FEE,
+  COL_SHIPPING_FEE,
+  COL_STATUS,
+  COL_TAX,
+  COL_TOTAL,
+  COL_UNIT_PRICE,
+  COL_USER_ID,
+  DATE_FORMAT,
+  DEEL_LABEL,
+  EMPTY_ORDERS_DESCRIPTION,
+  ORDER_DATETIME_LABEL,
+  ORDER_TABLE_SCROLL_X,
+  SELECT_BOT_PLACEHOLDER,
+} from './paymentConstants';
 
 const ORDER_COLUMNS = [
-  { title: '番号', dataIndex: 'no', key: 'no', width: 60 },
-  { title: 'ユーザID', dataIndex: 'userId', key: 'userId', width: 100 },
-  { title: '注文番号', dataIndex: 'orderNumber', key: 'orderNumber', width: 110 },
-  { title: '商品名', dataIndex: 'productName', key: 'productName', width: 140, ellipsis: true },
-  { title: '単価', dataIndex: 'unitPrice', key: 'unitPrice', width: 90, align: 'right' },
-  { title: '数量', dataIndex: 'quantity', key: 'quantity', width: 70, align: 'right' },
-  { title: '価格', dataIndex: 'price', key: 'price', width: 90, align: 'right' },
-  { title: '消費税', dataIndex: 'tax', key: 'tax', width: 90, align: 'right' },
-  { title: '決済手数料（税込）', dataIndex: 'settlementFee', key: 'settlementFee', width: 130, align: 'right' },
-  { title: '送料（税込）', dataIndex: 'shippingFee', key: 'shippingFee', width: 110, align: 'right' },
-  { title: '合計（税込）', dataIndex: 'total', key: 'total', width: 110, align: 'right' },
-  { title: 'モード', dataIndex: 'mode', key: 'mode', width: 90 },
-  { title: '状態', dataIndex: 'status', key: 'status', width: 90 },
-  { title: '注文日時', dataIndex: 'orderedAt', key: 'orderedAt', width: 150 },
+  { title: COL_NO, dataIndex: 'no', key: 'no', width: 60 },
+  { title: COL_USER_ID, dataIndex: 'userId', key: 'userId', width: 100 },
+  { title: COL_ORDER_NUMBER, dataIndex: 'orderNumber', key: 'orderNumber', width: 110 },
+  { title: COL_PRODUCT_NAME, dataIndex: 'productName', key: 'productName', width: 140, ellipsis: true },
+  { title: COL_UNIT_PRICE, dataIndex: 'unitPrice', key: 'unitPrice', width: 90, align: 'right' },
+  { title: COL_QUANTITY, dataIndex: 'quantity', key: 'quantity', width: 70, align: 'right' },
+  { title: COL_PRICE, dataIndex: 'price', key: 'price', width: 90, align: 'right' },
+  { title: COL_TAX, dataIndex: 'tax', key: 'tax', width: 90, align: 'right' },
+  { title: COL_SETTLEMENT_FEE, dataIndex: 'settlementFee', key: 'settlementFee', width: 130, align: 'right' },
+  { title: COL_SHIPPING_FEE, dataIndex: 'shippingFee', key: 'shippingFee', width: 110, align: 'right' },
+  { title: COL_TOTAL, dataIndex: 'total', key: 'total', width: 110, align: 'right' },
+  { title: COL_MODE, dataIndex: 'mode', key: 'mode', width: 90 },
+  { title: COL_STATUS, dataIndex: 'status', key: 'status', width: 90 },
+  { title: COL_ORDERED_AT, dataIndex: 'orderedAt', key: 'orderedAt', width: 150 },
 ];
 
 const PaymentOrderHistoryTab = ({
@@ -33,7 +59,7 @@ const PaymentOrderHistoryTab = ({
 }) => {
   const clientOptions = useMemo(
     () => [
-      { value: 'deel', label: 'Deel' },
+      { value: CLIENT_FILTER_DEEL, label: DEEL_LABEL },
       ...allClient.map((client) => ({
         value: client.id,
         label: client.name,
@@ -56,28 +82,32 @@ const PaymentOrderHistoryTab = ({
       <div className="report-filter-panel">
         <Space wrap size={12} className="report-filter-toolbar">
           <Space size={4}>
-            <Typography.Text type="secondary">注文日時</Typography.Text>
+            <Typography.Text type="secondary">{ORDER_DATETIME_LABEL}</Typography.Text>
             <DatePicker.RangePicker
               value={[startDate, endDate]}
               onChange={(dates) => onDateChange(dates?.[0] ?? null, dates?.[1] ?? null)}
-              format="YYYY-MM-DD"
+              format={DATE_FORMAT}
             />
           </Space>
           {isAdminDeel && (
             <Space size={4}>
-              <Typography.Text type="secondary">クライアント</Typography.Text>
+              <Typography.Text type="secondary">{CLIENT_LABEL}</Typography.Text>
               <Select
                 value={currentClientId}
                 onChange={onSelectClient}
                 options={clientOptions}
-                style={{ minWidth: 140 }}
+                className="payment-filter-select"
               />
             </Space>
           )}
-          {currentClientId !== 'deel' && botOptions.length > 0 && (
+          {currentClientId !== CLIENT_FILTER_DEEL && botOptions.length > 0 && (
             <Space size={4}>
-              <Typography.Text type="secondary">ボット</Typography.Text>
-              <Select options={botOptions} style={{ minWidth: 160 }} placeholder="ボットを選択" />
+              <Typography.Text type="secondary">{BOT_LABEL}</Typography.Text>
+              <Select
+                options={botOptions}
+                className="payment-filter-select--bot"
+                placeholder={SELECT_BOT_PLACEHOLDER}
+              />
             </Space>
           )}
           <AdminActionButton action="search" onClick={onSearch} />
@@ -93,13 +123,26 @@ const PaymentOrderHistoryTab = ({
           columns={ORDER_COLUMNS}
           dataSource={[]}
           rowKey="no"
-          scroll={{ x: 1400 }}
+          scroll={{ x: ORDER_TABLE_SCROLL_X }}
           pagination={false}
-          emptyDescription="注文データがありません"
+          emptyDescription={EMPTY_ORDERS_DESCRIPTION}
         />
       </div>
     </>
   );
+};
+
+PaymentOrderHistoryTab.propTypes = {
+  startDate: PropTypes.object,
+  endDate: PropTypes.object,
+  dateError: PropTypes.string,
+  isAdminDeel: PropTypes.bool,
+  allClient: PropTypes.array,
+  allBot: PropTypes.array,
+  currentClientId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  onDateChange: PropTypes.func,
+  onSearch: PropTypes.func,
+  onSelectClient: PropTypes.func,
 };
 
 export default PaymentOrderHistoryTab;

@@ -172,10 +172,60 @@
   border-bottom: none;
 }
 
+.admin-page--payment-management .payment-prefecture-table-header .payment-prefecture-name,
+.admin-page--payment-management .payment-prefecture-table-header .payment-prefecture-amount {
+  padding: 10px 16px;
+}
+
 .admin-page--payment-management .payment-prefecture-name {
   width: 35%;
   font-size: 14px;
   color: #374151;
+}
+
+.admin-page--payment-management .payment-native-select--wide {
+  width: 100%;
+  max-width: 320px;
+}
+
+.admin-page--payment-management .payment-native-input--full {
+  width: 100%;
+}
+
+.admin-page--payment-management .payment-native-input--xs {
+  width: 100px;
+}
+
+.admin-page--payment-management .payment-native-input--sm {
+  width: 120px;
+}
+
+.admin-page--payment-management .payment-native-input--md {
+  width: 160px;
+}
+
+.admin-page--payment-management .payment-inline-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-page--payment-management .payment-inline-field--tight {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.admin-page--payment-management .payment-hint-text--spaced {
+  margin-top: 8px;
+}
+
+.admin-page--payment-management .payment-filter-select {
+  min-width: 140px;
+}
+
+.admin-page--payment-management .payment-filter-select--bot {
+  min-width: 160px;
 }
 
 .admin-page--payment-management .payment-prefecture-amount {

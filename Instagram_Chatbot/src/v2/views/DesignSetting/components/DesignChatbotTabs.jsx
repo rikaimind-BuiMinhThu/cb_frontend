@@ -1,42 +1,41 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { CardHeader } from 'reactstrap';
-import { TAB_BASIC, TAB_DESIGN, TAB_THEME } from '../constants/designChatbotConstants';
+import {
+  TAB_BASIC,
+  TAB_BASIC_LABEL,
+  TAB_DESIGN,
+  TAB_DESIGN_LABEL,
+  TAB_THEME,
+  TAB_THEME_LABEL,
+} from '../constants/designChatbotConstants';
 
-const tabStyle = (activeTab, tabId) => ({
-  color: activeTab === tabId ? '#4DBEB6' : '#9B9B9B',
-  backgroundColor: activeTab === tabId ? '#fff' : '#F4F3EF',
-  boxShadow: activeTab !== tabId
-    ? 'rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px'
-    : 'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px',
-  marginRight: '4px',
-});
+const tabClassName = (activeTab, tabId) => (
+  `tab-menu ${activeTab === tabId ? 'tab-menu--active' : 'tab-menu--inactive'}`
+);
 
 const DesignChatbotTabs = ({ activeTab, onChange }) => (
   <CardHeader>
     <button
       onClick={() => onChange(TAB_BASIC)}
-      style={tabStyle(activeTab, TAB_BASIC)}
-      className="tab-menu"
+      className={tabClassName(activeTab, TAB_BASIC)}
       type="button"
     >
-      基本情報
+      {TAB_BASIC_LABEL}
     </button>
     <button
       onClick={() => onChange(TAB_DESIGN)}
-      style={tabStyle(activeTab, TAB_DESIGN)}
-      className="tab-menu"
+      className={tabClassName(activeTab, TAB_DESIGN)}
       type="button"
     >
-      デザインカスタマイズ
+      {TAB_DESIGN_LABEL}
     </button>
     <button
       onClick={() => onChange(TAB_THEME)}
-      style={tabStyle(activeTab, TAB_THEME)}
-      className="tab-menu"
+      className={tabClassName(activeTab, TAB_THEME)}
       type="button"
     >
-      テーマカスタマイズ
+      {TAB_THEME_LABEL}
     </button>
   </CardHeader>
 );

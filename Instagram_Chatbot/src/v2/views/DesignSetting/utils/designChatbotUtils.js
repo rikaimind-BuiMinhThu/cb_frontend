@@ -1,8 +1,10 @@
 import IconManDefault from 'v2/assets/img/bot-icon/man1_new.png';
 import { EC_CHATBOT_URL } from 'v2/variables/constants';
 import {
+  CHAT_BODY_VERSION_DEFAULT,
   COLOR_MAP,
   DEFAULT_IMAGES,
+  DEFAULT_MAIN_COLOR,
   OPEN_ANIMATION_DURATION_MS_DEFAULT,
   OPEN_ANIMATION_DURATION_MS_MAX,
   OPEN_ANIMATION_DURATION_MS_MIN,
@@ -90,15 +92,15 @@ export const convertImageToDataUrl = async (src) => {
   }
 };
 
-let defaultImageDataUrlCache = null;
+const defaultImageDataUrlCache = { value: null };
 
 export const getDefaultImageDataUrls = async (defaultImages = DEFAULT_IMAGES) => {
-  if (!defaultImageDataUrlCache) {
-    defaultImageDataUrlCache = await Promise.all(
+  if (!defaultImageDataUrlCache.value) {
+    defaultImageDataUrlCache.value = await Promise.all(
       defaultImages.map((image) => convertImageToDataUrl(image)),
     );
   }
-  return defaultImageDataUrlCache;
+  return defaultImageDataUrlCache.value;
 };
 
 export const findMatchingPresetIndex = async (resolvedUrl, defaultImages = DEFAULT_IMAGES) => {
@@ -161,7 +163,7 @@ export const resolveMainColorContext = (chatbot) => {
   const mainColorHex = chatbot?.main_color_other
     || resolveMainColorFromApi(chatbot?.main_color)
     || chatbot?.main_color
-    || '#327AED';
+    || DEFAULT_MAIN_COLOR;
 
   return { apiColorKey, mainColorHex };
 };
@@ -185,7 +187,7 @@ export const buildBasicInfoPayload = ({
       design_type: designType,
       bot_name: botName,
       main_color,
-      chat_body_version: chatBodyVersion || '2.0',
+      chat_body_version: chatBodyVersion || CHAT_BODY_VERSION_DEFAULT,
       ...(main_color_other ? { main_color_other } : {}),
     },
   };

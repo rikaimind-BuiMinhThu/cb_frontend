@@ -1,9 +1,11 @@
-import React from 'react'
+import React from 'react';
+import { AdminPage } from 'v2/components/AdminShell';
+import { PLAN_SELECTION_PLACEHOLDER } from './constants';
 
-function PlanSelection() {
-  return (
-    <div>プラン選択（準備中）</div>
-  )
-}
+const PlanSelection = () => (
+  <AdminPage>
+    <div>{PLAN_SELECTION_PLACEHOLDER}</div>
+  </AdminPage>
+);
 
-export default PlanSelection
+export default PlanSelection;

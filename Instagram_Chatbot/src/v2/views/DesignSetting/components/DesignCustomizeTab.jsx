@@ -1,20 +1,28 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {
+  DEVICE_PC,
+  DEVICE_SP,
+  PC_PANEL_TITLE,
+  SP_PANEL_TITLE,
+  WIDTH_UNIT_PERCENT,
+  WIDTH_UNIT_PX,
+} from '../constants/designChatbotConstants';
 import DeviceDesignPanel from './DeviceDesignPanel';
 import BubbleSettingsSection from './BubbleSettingsSection';
 
-const DesignCustomizeTab = ({ designSettings, onFieldChange, onSave }) => (
+const DesignCustomizeTab = ({ designSettings, onFieldChange }) => (
   <div className="design-setting-tab-content">
     <form action="POST">
       <div className="design-customize-sections">
         <div className="design-customize-panels">
           <DeviceDesignPanel
-            device="pc"
-            title="PC"
+            device={DEVICE_PC}
+            title={PC_PANEL_TITLE}
             displayType={designSettings.displayType}
             width={designSettings.widthPc}
             height={designSettings.heightPc}
-            widthUnit="px"
+            widthUnit={WIDTH_UNIT_PX}
             position={designSettings.positionPc}
             buttonType={designSettings.buttonTypePc}
             rightTitle={designSettings.rightPcTitle}
@@ -23,11 +31,11 @@ const DesignCustomizeTab = ({ designSettings, onFieldChange, onSave }) => (
             onChange={onFieldChange}
           />
           <DeviceDesignPanel
-            device="sp"
-            title="スマートフォン"
+            device={DEVICE_SP}
+            title={SP_PANEL_TITLE}
             width={designSettings.widthSp}
             height={designSettings.heightSp}
-            widthUnit="%"
+            widthUnit={WIDTH_UNIT_PERCENT}
             position={designSettings.positionSp}
             buttonType={designSettings.buttonTypeSp}
             rightTitle={designSettings.rightSpTitle}

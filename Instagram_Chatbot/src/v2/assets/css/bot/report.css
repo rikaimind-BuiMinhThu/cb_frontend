@@ -109,3 +109,15 @@
   flex-direction: column;
   gap: 0;
 }
+
+.admin-page--report .report-filter-select {
+  min-width: 140px;
+}
+
+.admin-page--report .report-filter-select--agg {
+  min-width: 130px;
+}
+
+.admin-page--report .report-filter-select--scenario {
+  min-width: 160px;
+}

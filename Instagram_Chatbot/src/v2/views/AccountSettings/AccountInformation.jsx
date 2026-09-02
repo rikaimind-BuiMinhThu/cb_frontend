@@ -1,37 +1,74 @@
 import Cookies from 'js-cookie';
 import React, { useEffect, useState } from 'react';
 import { Card, CardHeader, CardBody, Row, Col } from 'reactstrap';
-import './../../assets/css/account-info.css';
 import api from 'v2/api/api-management';
+import { USER_ID_COOKIE_KEY } from 'v2/api/constants';
 import { tokenExpired } from 'v2/api/tokenExpired';
+import { ACTION_EDIT, ACTION_LABELS, ADMIN_PATHS, MENU_LABELS } from 'v2/components/AdminShell/constants';
+import { getAdminRoutePath } from 'v2/variables/constants';
+import {
+  COMPANY_NAME_LABEL,
+  PHONE_LABEL,
+  USERS_PATH,
+} from './basicSettingConstants';
+import {
+  ACCOUNT_INFO_HEADING,
+  ACCOUNT_INFO_TITLE,
+  ACTIVE_BOT_COUNT_PREFIX,
+  ACTIVE_BOT_COUNT_VALUE,
+  API_EXPIRED_CODE,
+  ASCII_COLON_SPACE,
+  AUTH_EMAIL_PREFIX,
+  CANCEL_BUTTON_LABEL,
+  CANCEL_SECTION_TITLE,
+  COL_MD_12,
+  EMAIL_AUTH_HEADING,
+  FULLWIDTH_COLON,
+  HISTORY_BUTTON_LABEL,
+  INPUT_REQUIRED_LABEL,
+  PAYMENT_INFO_HEADING,
+  PAYMENT_INFO_HINT,
+  PLAN_PRO_LABEL,
+  PLAN_SELECTION_HEADING,
+  SCREEN_ALL_ID,
+  SELECTED_PLAN_PREFIX,
+  SETTING_COMPLETE_LABEL,
+  START_PLAN_BUTTON_LABEL,
+} from './constants';
+import 'v2/assets/css/account-info.css';
 
-function AccountInformation() {
+const AccountInformation = () => {
   const [userDetail, setUserDetail] = useState({});
 
   useEffect(() => {
+    const request = { cancelled: false };
     api
-      .get(`/api/v1/managements/users/${Cookies.get('user_id')}`)
+      .get(`${USERS_PATH}/${Cookies.get(USER_ID_COOKIE_KEY)}`)
       .then((res) => {
-        console.log(res.data.data);
+        if (request.cancelled) return;
         setUserDetail(res.data.data);
       })
       .catch((err) => {
-        console.log(err);
-        if (err.response?.data.code === 0) {
-          tokenExpired()
+        if (request.cancelled) return;
+        if (err.response?.data.code === API_EXPIRED_CODE) {
+          tokenExpired();
         }
       });
+    return () => {
+      request.cancelled = true;
+    };
   }, []);
+
   return (
     <>
       <div className="content">
-        <Row id="screenAll">
-          <Col md="12">
+        <Row id={SCREEN_ALL_ID}>
+          <Col md={COL_MD_12}>
             <Card>
               <CardHeader>
-                <div className="acc-info__title">アカウント情報トップ</div>
+                <div className="acc-info__title">{ACCOUNT_INFO_TITLE}</div>
                 <div className="acc-info__heading">
-                  有料プランを開始するには下記の4項目全てを設定する必要があります。内容を確認の上、プランを開始してください。
+                  {ACCOUNT_INFO_HEADING}
                 </div>
               </CardHeader>
               <CardBody>
@@ -40,18 +77,18 @@ function AccountInformation() {
                     <div className="acc-info__item">
                       <div className="acc-info__item-top">
                         <div className="acc-info__item-head">
-                          <div>基本設定</div>
-                          <div className="acc-info__item-complete">設定完了</div>
+                          <div>{MENU_LABELS.BASIC_SETTING}</div>
+                          <div className="acc-info__item-complete">{SETTING_COMPLETE_LABEL}</div>
                         </div>
                         <div className="acc-info__item-desc">
                           <p>
-                            設定完了: <span>{userDetail.full_name}</span>
+                            {SETTING_COMPLETE_LABEL}{ASCII_COLON_SPACE}<span>{userDetail.full_name}</span>
                           </p>
                           <p>
-                            企業名：<span>{userDetail.company_name}</span>
+                            {COMPANY_NAME_LABEL}{FULLWIDTH_COLON}<span>{userDetail.company_name}</span>
                           </p>
                           <p>
-                            電話番号：<span>{userDetail.phone_number}</span>
+                            {PHONE_LABEL}{FULLWIDTH_COLON}<span>{userDetail.phone_number}</span>
                           </p>
                         </div>
                       </div>
@@ -60,10 +97,10 @@ function AccountInformation() {
                         <button
                           className="btn btn btn-outline-primary"
                           onClick={() => {
-                            window.location.href = '/v2/admin/basic-setting';
+                            window.location.href = getAdminRoutePath(ADMIN_PATHS.BASIC_SETTING);
                           }}
                         >
-                          編集
+                          {ACTION_LABELS[ACTION_EDIT]}
                         </button>
                       </div>
                     </div>
@@ -71,40 +108,40 @@ function AccountInformation() {
                     <div className="acc-info__item">
                       <div className="acc-info__item-top">
                         <div className="acc-info__item-head">
-                          <div>プラン選択</div>
-                          <div className="acc-info__item-complete">設定完了</div>
+                          <div>{PLAN_SELECTION_HEADING}</div>
+                          <div className="acc-info__item-complete">{SETTING_COMPLETE_LABEL}</div>
                         </div>
                         <div className="acc-info__item-desc">
                           <p>
-                            選択中のプラン：<span className="acc-info__item-desc--pro">Pro</span>
+                            {SELECTED_PLAN_PREFIX}{FULLWIDTH_COLON}<span className="acc-info__item-desc--pro">{PLAN_PRO_LABEL}</span>
                           </p>
                           <p>
-                            アクティブボット数：<span>0 / 1</span>
+                            {ACTIVE_BOT_COUNT_PREFIX}{FULLWIDTH_COLON}<span>{ACTIVE_BOT_COUNT_VALUE}</span>
                           </p>
                         </div>
                       </div>
                       <div className="acc-info__item-bottom">
                         <div></div>
-                        <button className="btn btn-outline-primary">編集</button>
+                        <button className="btn btn-outline-primary">{ACTION_LABELS[ACTION_EDIT]}</button>
                       </div>
                     </div>
 
                     <div className="acc-info__item">
                       <div className="acc-info__item-top">
                         <div className="acc-info__item-head">
-                          <div>メール認証</div>
-                          <div className="acc-info__item-complete">設定完了</div>
+                          <div>{EMAIL_AUTH_HEADING}</div>
+                          <div className="acc-info__item-complete">{SETTING_COMPLETE_LABEL}</div>
                         </div>
                         <div className="acc-info__item-desc">
                           <p>
-                            認証先のメールアドレス：<span>{userDetail.email}</span>
+                            {AUTH_EMAIL_PREFIX}{FULLWIDTH_COLON}<span>{userDetail.email}</span>
                           </p>
                         </div>
                       </div>
                       <div className="acc-info__item-bottom">
                         <div></div>
                         <button className="btn btn-outline-primary" disabled>
-                          設定完了
+                          {SETTING_COMPLETE_LABEL}
                         </button>
                       </div>
                     </div>
@@ -112,20 +149,20 @@ function AccountInformation() {
                     <div className="acc-info__item">
                       <div className="acc-info__item-top">
                         <div className="acc-info__item-head">
-                          <div>支払い情報</div>
-                          <div className="acc-info__item-complete">入力が必要です</div>
+                          <div>{PAYMENT_INFO_HEADING}</div>
+                          <div className="acc-info__item-complete">{INPUT_REQUIRED_LABEL}</div>
                         </div>
                         <div className="acc-info__item-desc">
                           <p className="acc-info__item-desc-pri">
-                            ※プランを開始するためのお支払い情報が設定されておりません。「編集」から設定してください。
+                            {PAYMENT_INFO_HINT}
                           </p>
                         </div>
                       </div>
                       <div className="acc-info__item-bottom">
                         <button className="btn" disabled>
-                          履歴を確認
+                          {HISTORY_BUTTON_LABEL}
                         </button>
-                        <button className="btn btn-outline-primary">編集</button>
+                        <button className="btn btn-outline-primary">{ACTION_LABELS[ACTION_EDIT]}</button>
                       </div>
                     </div>
                   </div>
@@ -133,10 +170,10 @@ function AccountInformation() {
 
                 <div className="acc-info_footer">
                   <button className="btn acc-info_footer-btn" disabled>
-                    プランを開始する
+                    {START_PLAN_BUTTON_LABEL}
                   </button>
-                  <div className="acc-info__title">解約する場合はこちらから</div>
-                  <button className="btn btn-outline-default">解約する</button>
+                  <div className="acc-info__title">{CANCEL_SECTION_TITLE}</div>
+                  <button className="btn btn-outline-default">{CANCEL_BUTTON_LABEL}</button>
                 </div>
               </CardBody>
             </Card>
@@ -145,6 +182,6 @@ function AccountInformation() {
       </div>
     </>
   );
-}
+};
 
 export default AccountInformation;

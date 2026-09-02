@@ -1,9 +1,11 @@
-import React from 'react'
+import React from 'react';
+import { AdminPage } from 'v2/components/AdminShell';
+import { PAYMENT_SETTING_PLACEHOLDER } from './constants';
 
-function PaymentSetting() {
-  return (
-    <div>決済設定（準備中）</div>
-  )
-}
+const PaymentSetting = () => (
+  <AdminPage>
+    <div>{PAYMENT_SETTING_PLACEHOLDER}</div>
+  </AdminPage>
+);
 
-export default PaymentSetting
+export default PaymentSetting;

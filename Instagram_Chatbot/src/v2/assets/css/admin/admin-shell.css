@@ -252,6 +252,19 @@
   padding: 20px;
 }
 
+.admin-page--design-setting .design-setting-loading {
+  padding: 48px;
+  text-align: center;
+}
+
+.admin-visually-hidden {
+  display: none;
+}
+
+.admin-link-unstyled {
+  padding: 0;
+}
+
 .admin-page--design-setting .add-bot-container {
   width: 100%;
   gap: 24px;
@@ -387,10 +400,38 @@
   z-index: 0;
 }
 
+.admin-page--design-setting .basic-info-tab-title.ant-typography,
+.admin-page--design-setting .basic-info-tab-title {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.admin-page--design-setting .basic-info-select,
+.admin-page--design-setting .basic-info-select.ant-select {
+  width: 220px;
+}
+
+.admin-page--design-setting .basic-info-animation-duration .ant-input-number,
+.admin-page--design-setting .basic-info-animation-duration .ant-input-number-group-wrapper {
+  width: 140px;
+  min-width: 120px;
+}
+
 .admin-page--design-setting .basic-info-state-preview__widget .sp-header {
   min-width: 0;
   width: 100%;
   cursor: default;
+  background-color: var(--theme-main-color);
+}
+
+.admin-page--design-setting .main-colors__swatch {
+  background-color: var(--theme-main-color);
+}
+
+.admin-page--design-setting .main-colors__color-input {
+  visibility: hidden;
+  width: 0;
+  height: 0;
 }
 
 .admin-page--design-setting .basic-info-state-preview__body.sp-body {

@@ -1,6 +1,15 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { generateScopedThemeCss } from 'v2/utils/chatbotThemeCss';
+import {
+  DEFAULT_MAIN_COLOR,
+  THEME_CSS_VAR_MAIN_COLOR,
+  THEME_CSS_VAR_PROGRESS_WIDTH,
+  THEME_PREVIEW_HEADER_ICON_ALT,
+  THEME_PREVIEW_PROCESS_LABEL,
+  THEME_PREVIEW_SAMPLE_SUBTITLE,
+  THEME_PREVIEW_SAMPLE_TITLE,
+} from '../constants/designChatbotConstants';
 import PreviewRegion from './PreviewRegion';
 
 const ThemePreviewShell = ({
@@ -26,12 +35,20 @@ const ThemePreviewShell = ({
     return generateScopedThemeCss(themeSettings, mainColor, null, `#${scopeId}`);
   }, [themeSettings, mainColor, scopeId]);
 
-  const displayTitle = title || (showPlaceholderLabels ? 'サンプルタイトル' : '');
-  const displaySubtitle = subtitle || (showPlaceholderLabels ? 'サンプルサブタイトル' : '');
+  const displayTitle = title || (showPlaceholderLabels ? THEME_PREVIEW_SAMPLE_TITLE : '');
+  const displaySubtitle = subtitle || (showPlaceholderLabels ? THEME_PREVIEW_SAMPLE_SUBTITLE : '');
   const barWidth = `${Math.min(Math.max(processPercent, 0), 100)}%`;
+  const themeVars = {
+    [THEME_CSS_VAR_MAIN_COLOR]: mainColor,
+    [THEME_CSS_VAR_PROGRESS_WIDTH]: barWidth,
+  };
 
   return (
-    <div id={scopeId} className={`theme-customize-preview ${className}`.trim()}>
+    <div
+      id={scopeId}
+      className={`theme-customize-preview ${className}`.trim()}
+      style={themeVars}
+    >
       <style>{scopedCss}</style>
 
       <PreviewRegion
@@ -40,10 +57,7 @@ const ThemePreviewShell = ({
         onSectionSelect={onSectionSelect}
         className="theme-preview-region--header-wrap"
       >
-        <div
-          className="sp-header theme-customize-preview__header"
-          style={{ backgroundColor: mainColor }}
-        >
+        <div className="sp-header theme-customize-preview__header">
           <PreviewRegion
             sectionId="headerMain"
             activeSectionId={activeSectionId}
@@ -53,7 +67,7 @@ const ThemePreviewShell = ({
             <div className="sp-header-left">
               {headerIconUrl && (
                 <div className="sp-body-bot-side-avatar sp-avatar-bt">
-                  <img src={headerIconUrl} alt="bot-header-icon" />
+                  <img src={headerIconUrl} alt={THEME_PREVIEW_HEADER_ICON_ALT} />
                 </div>
               )}
               <div className="sp-header-left-label">
@@ -74,10 +88,7 @@ const ThemePreviewShell = ({
         className="theme-preview-region--progress"
       >
         <div className="sp-process-bar">
-          <div
-            className="sp-process-bar-color"
-            style={{ width: barWidth, backgroundColor: mainColor }}
-          >
+          <div className="sp-process-bar-color">
             {processLabel}
           </div>
         </div>
@@ -139,12 +150,12 @@ ThemePreviewShell.propTypes = {
 
 ThemePreviewShell.defaultProps = {
   themeSettings: null,
-  mainColor: '#327AED',
+  mainColor: DEFAULT_MAIN_COLOR,
   title: '',
   subtitle: '',
   headerIconUrl: '',
   showPlaceholderLabels: true,
-  processLabel: '1 / 3',
+  processLabel: THEME_PREVIEW_PROCESS_LABEL,
   processPercent: 33,
   className: '',
   errorPreviewText: '',

@@ -4,23 +4,33 @@ import { Select, Space, Typography } from 'antd';
 import DesignBotIcons from '../DesignSettingComponents/DesignBotIcons';
 import InputNum from 'v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputNum';
 import {
-  DEFAULT_IMAGES,
+  BASIC_INFO_SECTION_TITLE,
+  BOT_NAME_HINT,
   CHAT_BODY_VERSION_DEFAULT,
+  CHAT_BODY_VERSION_HINT,
   CHAT_BODY_VERSIONS,
+  DEFAULT_IMAGES,
+  DURATION_UNIT_MS,
+  LABEL_BOT_NAME,
+  LABEL_CHAT_BODY_VERSION,
+  LABEL_DESIGN_TYPE,
+  LABEL_OPEN_ANIMATION_DURATION,
+  LABEL_OPEN_ANIMATION_STYLE,
+  LABEL_SUBTITLE,
+  LABEL_TITLE,
   OPEN_ANIMATION_DURATION_MS_DEFAULT,
   OPEN_ANIMATION_DURATION_MS_MAX,
   OPEN_ANIMATION_DURATION_MS_MIN,
   OPEN_ANIMATION_STYLE_DEFAULT,
   OPEN_ANIMATION_STYLES,
+  PLACEHOLDER_BOT_NAME,
+  PLACEHOLDER_SUBTITLE,
+  PLACEHOLDER_TITLE,
 } from '../constants/designChatbotConstants';
 import DesignTypePicker from './DesignTypePicker';
 import BasicInfoStatePreview from './BasicInfoStatePreview';
 import DesignSettingLabel from './shared/DesignSettingLabel';
 import { getDesignSettingTooltip } from '../constants/designSettingTooltips';
-
-const errorStyle = (message) => ({
-  display: message ? 'block' : 'none',
-});
 
 const BasicInfoTab = ({
   basicInfo,
@@ -29,14 +39,13 @@ const BasicInfoTab = ({
   onFieldChange,
   onClearError,
   onDesignTypeChange,
-  onSave,
   onIconClick,
   onIconRemove,
   onIconUpload,
 }) => (
   <div className="design-setting-tab-content">
-    <Typography.Title level={5} style={{ marginTop: 0, marginBottom: 16 }}>
-      ボット設定
+    <Typography.Title level={5} className="basic-info-tab-title">
+      {BASIC_INFO_SECTION_TITLE}
     </Typography.Title>
     <form action="">
       <div className="add-bot-container">
@@ -44,14 +53,14 @@ const BasicInfoTab = ({
           <div className="field-add-bot">
             <div className="add-bot_field-container">
               <DesignSettingLabel tooltip={getDesignSettingTooltip('botName')} required>
-                ボット名称
+                {LABEL_BOT_NAME}
               </DesignSettingLabel>
               <input
                 type="text"
                 name="botName"
                 value={basicInfo.botName}
                 className="input-field"
-                placeholder="サンプルボット..."
+                placeholder={PLACEHOLDER_BOT_NAME}
                 onChange={(e) => {
                   onFieldChange('botName', e.target.value);
                   onClearError('botName');
@@ -59,36 +68,37 @@ const BasicInfoTab = ({
               />
             </div>
             <span className="subtitle-field">
-              ※EC-CHAT管理用の名称です。ボット内で表示されることはありません。
+              {BOT_NAME_HINT}
             </span>
-            <span className="error-message bot-name" style={errorStyle(validationErrors.botName)}>
-              {validationErrors.botName}
-            </span>
+            {validationErrors.botName ? (
+              <span className="error-message bot-name">
+                {validationErrors.botName}
+              </span>
+            ) : null}
           </div>
           <div className="field-add-bot">
             <div className="add-bot_field-container">
               <DesignSettingLabel tooltip={getDesignSettingTooltip('chatBodyVersion')}>
-                チャット本体バージョン
+                {LABEL_CHAT_BODY_VERSION}
               </DesignSettingLabel>
               <Select
-                style={{ width: 220 }}
+                className="basic-info-select"
                 value={basicInfo.chatBodyVersion || CHAT_BODY_VERSION_DEFAULT}
                 options={CHAT_BODY_VERSIONS}
                 onChange={(value) => onFieldChange('chatBodyVersion', value)}
               />
             </div>
             <span className="subtitle-field">
-              ※古いバージョンに変更すると、新しく実装された機能が正しく動作しない可能性があります。
+              {CHAT_BODY_VERSION_HINT}
             </span>
           </div>
           <div className="field-add-bot">
             <div className="add-bot_field-container">
               <DesignSettingLabel tooltip={getDesignSettingTooltip('openAnimationDurationMs')}>
-                起動アニメーション速度
+                {LABEL_OPEN_ANIMATION_DURATION}
               </DesignSettingLabel>
               <Space size={8} align="center" className="basic-info-animation-duration">
                 <InputNum
-                  style={{ width: 140, minWidth: 120 }}
                   name="open_animation_duration_ms"
                   min={OPEN_ANIMATION_DURATION_MS_MIN}
                   max={OPEN_ANIMATION_DURATION_MS_MAX}
@@ -96,17 +106,17 @@ const BasicInfoTab = ({
                   placeholder={String(OPEN_ANIMATION_DURATION_MS_DEFAULT)}
                   onChange={(value) => onFieldChange('openAnimationDurationMs', value)}
                 />
-                <span className="design-field__suffix">ms</span>
+                <span className="design-field__suffix">{DURATION_UNIT_MS}</span>
               </Space>
             </div>
           </div>
           <div className="field-add-bot">
             <div className="add-bot_field-container">
               <DesignSettingLabel tooltip={getDesignSettingTooltip('openAnimationStyle')}>
-                起動アニメーションスタイル
+                {LABEL_OPEN_ANIMATION_STYLE}
               </DesignSettingLabel>
               <Select
-                style={{ width: 220 }}
+                className="basic-info-select"
                 value={basicInfo.openAnimationStyle || OPEN_ANIMATION_STYLE_DEFAULT}
                 options={OPEN_ANIMATION_STYLES}
                 onChange={(value) => onFieldChange('openAnimationStyle', value)}
@@ -116,48 +126,52 @@ const BasicInfoTab = ({
           <div className="field-add-bot">
             <div className="add-bot_field-container">
               <DesignSettingLabel tooltip={getDesignSettingTooltip('title')} required>
-                タイトル
+                {LABEL_TITLE}
               </DesignSettingLabel>
               <input
                 type="text"
                 name="title"
                 className="input-field"
                 value={basicInfo.title}
-                placeholder="サービス名など（例：BOTCHAN）"
+                placeholder={PLACEHOLDER_TITLE}
                 onChange={(e) => {
                   onFieldChange('title', e.target.value);
                   onClearError('title');
                 }}
               />
             </div>
-            <span className="error-message title" style={errorStyle(validationErrors.title)}>
-              {validationErrors.title}
-            </span>
+            {validationErrors.title ? (
+              <span className="error-message title">
+                {validationErrors.title}
+              </span>
+            ) : null}
           </div>
           <div className="field-add-bot">
             <div className="add-bot_field-container">
               <DesignSettingLabel tooltip={getDesignSettingTooltip('subtitle')} required>
-                サブタイトル
+                {LABEL_SUBTITLE}
               </DesignSettingLabel>
               <input
                 type="text"
                 className="input-field"
                 value={basicInfo.subtitle}
-                placeholder="フォームの目的（例：資料請求フォーム）"
+                placeholder={PLACEHOLDER_SUBTITLE}
                 onChange={(e) => {
                   onFieldChange('subtitle', e.target.value);
                   onClearError('subtitle');
                 }}
               />
             </div>
-            <span className="error-message subtile" style={errorStyle(validationErrors.subtitle)}>
-              {validationErrors.subtitle}
-            </span>
+            {validationErrors.subtitle ? (
+              <span className="error-message subtile">
+                {validationErrors.subtitle}
+              </span>
+            ) : null}
           </div>
           <div className="field-add-bot">
             <div className="add-bot_field-container">
               <DesignSettingLabel tooltip={getDesignSettingTooltip('designType')}>
-                デザインタイプ
+                {LABEL_DESIGN_TYPE}
               </DesignSettingLabel>
               <DesignTypePicker
                 designType={basicInfo.designType}

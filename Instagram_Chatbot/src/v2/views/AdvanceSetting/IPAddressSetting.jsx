@@ -1,9 +1,11 @@
-import React from 'react'
+import React from 'react';
+import { AdminPage } from 'v2/components/AdminShell';
+import { IP_ADDRESS_SETTING_PLACEHOLDER } from './constants';
 
-function IPAddressSetting() {
-  return (
-    <div>IPアドレス設定（準備中）</div>
-  )
-}
+const IPAddressSetting = () => (
+  <AdminPage>
+    <div>{IP_ADDRESS_SETTING_PLACEHOLDER}</div>
+  </AdminPage>
+);
 
-export default IPAddressSetting
+export default IPAddressSetting;

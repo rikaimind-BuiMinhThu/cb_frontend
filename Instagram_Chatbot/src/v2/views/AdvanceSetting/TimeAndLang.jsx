@@ -1,9 +1,11 @@
-import React from 'react'
+import React from 'react';
+import { AdminPage } from 'v2/components/AdminShell';
+import { TIME_AND_LANG_PLACEHOLDER } from './constants';
 
-function TimeAndLang() {
-  return (
-    <div>タイムゾーンと言語（準備中）</div>
-  )
-}
+const TimeAndLang = () => (
+  <AdminPage>
+    <div>{TIME_AND_LANG_PLACEHOLDER}</div>
+  </AdminPage>
+);
 
-export default TimeAndLang
+export default TimeAndLang;

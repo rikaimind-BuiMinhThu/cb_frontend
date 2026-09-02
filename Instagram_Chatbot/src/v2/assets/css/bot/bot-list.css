@@ -179,3 +179,7 @@ table.bl-table thead tr th {
     margin-right: 70px;
   }
 }
+
+.bot-name-link {
+  padding: 0;
+}

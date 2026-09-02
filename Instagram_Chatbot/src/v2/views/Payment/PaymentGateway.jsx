@@ -2,37 +2,82 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, message, Space, Tag } from 'antd';
 import { Link } from 'react-router-dom';
 import api from 'v2/api/api-management';
+import { API_SUCCESS_CODE } from 'v2/api/constants';
 import { tokenExpired } from 'v2/api/tokenExpired';
-import { AdminConfirmModal, AdminPage, AdminTable, AdminActionButton, useAdminHeaderActions } from 'v2/components/AdminShell';
-
-const PAGE_SIZE = 25;
+import {
+  AdminConfirmModal,
+  AdminPage,
+  AdminTable,
+  AdminActionButton,
+  useAdminHeaderActions,
+} from 'v2/components/AdminShell';
+import {
+  ADD_GATEWAY_PATH,
+  AGENCY_GMO,
+  AGENCY_GMO_SHORT_LABEL,
+  AGENCY_NP,
+  AGENCY_NP_LABEL,
+  API_WARNING_CODE,
+  COL_ACTIONS,
+  COL_ACTIONS_WIDTH,
+  COL_AGENCY_WIDTH,
+  COL_CONFIG,
+  COL_MODE_WIDTH,
+  COL_NO,
+  COL_NO_WIDTH,
+  CREATE_GATEWAY_LABEL,
+  DASH,
+  DEFAULT_TAG,
+  DEFAULT_YES,
+  DELETE_CONFIRM_MESSAGE,
+  EDIT_GATEWAY_PATH_PREFIX,
+  EMPTY_GATEWAYS,
+  FAIL_UPDATE,
+  GATEWAYS_API_PATH,
+  IS_DEFAULT_PAYLOAD,
+  LABEL_AGENCY,
+  LABEL_GATEWAY_NAME,
+  LABEL_MODE,
+  MERCHANT_CODE_PREFIX,
+  MODE_PRODUCTION,
+  MODE_PRODUCTION_LABEL,
+  MODE_TEST,
+  MODE_TEST_LABEL,
+  PAGE_SIZE,
+  SET_DEFAULT_LABEL,
+  SHOP_ID_PREFIX,
+  SUCCESS_DEFAULT,
+  SUCCESS_DELETED,
+} from './gatewayFormConstants';
 
 const AGENCY_LABELS = {
-  gmo: 'GMO',
-  np_payment: 'NP後払い',
+  [AGENCY_GMO]: AGENCY_GMO_SHORT_LABEL,
+  [AGENCY_NP]: AGENCY_NP_LABEL,
 };
 
-function formatAgency(agency) {
-  return AGENCY_LABELS[agency] || agency || '—';
-}
+const formatAgency = (agency) => AGENCY_LABELS[agency] || agency || DASH;
 
-function formatMode(mode) {
-  if (mode === 'test') return 'テスト';
-  if (mode === 'production') return '本番';
-  return mode || '—';
-}
-
-function formatConfigInfo(item) {
-  if (item.payment_agency === 'gmo') {
-    return item.shop_id ? `ショップID: ${item.shop_id}` : '—';
+const formatMode = (mode) => {
+  if (mode === MODE_TEST) {
+    return MODE_TEST_LABEL;
   }
-  if (item.payment_agency === 'np_payment') {
-    return item.merchant_code ? `加盟店コード: ${item.merchant_code}` : '—';
+  if (mode === MODE_PRODUCTION) {
+    return MODE_PRODUCTION_LABEL;
   }
-  return '—';
-}
+  return mode || DASH;
+};
 
-function PaymentGateway() {
+const formatConfigInfo = (item) => {
+  if (item.payment_agency === AGENCY_GMO) {
+    return item.shop_id ? `${SHOP_ID_PREFIX}${item.shop_id}` : DASH;
+  }
+  if (item.payment_agency === AGENCY_NP) {
+    return item.merchant_code ? `${MERCHANT_CODE_PREFIX}${item.merchant_code}` : DASH;
+  }
+  return DASH;
+};
+
+const PaymentGateway = () => {
   const [gateway, setGateway] = useState([]);
   const [deleteId, setDeleteId] = useState(null);
   const [total, setTotal] = useState(0);
@@ -42,9 +87,9 @@ function PaymentGateway() {
   const fetchGateways = useCallback((pageIndex) => {
     setLoading(true);
     api
-      .get(`/api/v1/payment_managements/payment_gateways?page=${pageIndex}`)
+      .get(`${GATEWAYS_API_PATH}?page=${pageIndex}`)
       .then((res) => {
-        if (res?.data?.code === 1) {
+        if (res?.data?.code === API_SUCCESS_CODE) {
           setGateway(res.data.data || []);
           setTotal(res.data.total || 0);
         }
@@ -63,13 +108,15 @@ function PaymentGateway() {
 
   const handleDelete = () => {
     api
-      .delete(`/api/v1/payment_managements/payment_gateways/${deleteId}`)
+      .delete(`${GATEWAYS_API_PATH}/${deleteId}`)
       .then((res) => {
-        if (res.data.code === 1) {
-          message.success('決済ゲートウェイを削除しました。');
+        if (res.data.code === API_SUCCESS_CODE) {
+          message.success(SUCCESS_DELETED);
           setDeleteId(null);
           fetchGateways(page);
-        } else if (res.data.code === 2) {
+          return;
+        }
+        if (res.data.code === API_WARNING_CODE) {
           message.warning(res.data.message);
           setDeleteId(null);
         }
@@ -83,70 +130,68 @@ function PaymentGateway() {
 
   const handleSetDefault = useCallback((id) => {
     api
-      .patch(`/api/v1/payment_managements/payment_gateways/${id}`, {
-        payment: {
-          is_default: 'yes',
-        },
-      })
+      .patch(`${GATEWAYS_API_PATH}/${id}`, IS_DEFAULT_PAYLOAD)
       .then((res) => {
-        if (res.data?.code === 1) {
-          message.success('デフォルト決済ゲートウェイを更新しました。');
+        if (res.data?.code === API_SUCCESS_CODE) {
+          message.success(SUCCESS_DEFAULT);
           fetchGateways(page);
-        } else if (res.data?.code !== 1) {
-          message.warning(res.data?.message || '更新に失敗しました。');
+          return;
         }
+        message.warning(res.data?.message || FAIL_UPDATE);
       })
       .catch((error) => {
-        console.log(error);
+        if (error.response?.data?.code === 0) {
+          tokenExpired();
+        }
       });
   }, [fetchGateways, page]);
 
   const columns = useMemo(
     () => [
       {
-        title: '番号',
-        width: 64,
+        title: COL_NO,
+        width: COL_NO_WIDTH,
         render: (_, __, index) => (page - 1) * PAGE_SIZE + index + 1,
       },
       {
-        title: '決済ゲートウェイ名',
+        title: LABEL_GATEWAY_NAME,
         dataIndex: 'gateway_name',
         render: (name, item) => (
           <Space size={8} wrap>
             <span>{name}</span>
-            {item?.is_default === 'yes' && <Tag color="blue">デフォルト</Tag>}
+            {item?.is_default === DEFAULT_YES && <Tag color="blue">{DEFAULT_TAG}</Tag>}
           </Space>
         ),
       },
       {
-        title: '決済代行会社',
+        title: LABEL_AGENCY,
         dataIndex: 'payment_agency',
-        width: 140,
+        width: COL_AGENCY_WIDTH,
         render: (agency) => formatAgency(agency),
       },
       {
-        title: 'モード',
+        title: LABEL_MODE,
         dataIndex: 'mode',
-        width: 100,
+        width: COL_MODE_WIDTH,
         render: (mode) => (
-          <Tag color={mode === 'production' ? 'green' : 'default'}>{formatMode(mode)}</Tag>
+          <Tag color={mode === MODE_PRODUCTION ? 'green' : 'default'}>{formatMode(mode)}</Tag>
         ),
       },
       {
-        title: '設定情報',
+        title: COL_CONFIG,
         render: (_, item) => formatConfigInfo(item),
       },
       {
-        title: 'アクション',
-        width: 200,
+        title: COL_ACTIONS,
+        width: COL_ACTIONS_WIDTH,
         render: (_, item) => (
           <Space size="small" className="admin-table-actions">
-            {item?.is_default !== 'yes' && (
+            {item?.is_default !== DEFAULT_YES && (
               <Button type="link" size="small" onClick={() => handleSetDefault(item.id)}>
-                デフォルト
+                {SET_DEFAULT_LABEL}
               </Button>
             )}
-            <Link to={`/v2/admin/edit-payment-gateway/${item.id}`}>
+            <Link to={`${EDIT_GATEWAY_PATH_PREFIX}${item.id}`}>
               <AdminActionButton action="edit" iconOnly />
             </Link>
             <AdminActionButton action="delete" iconOnly onClick={() => setDeleteId(item.id)} />
@@ -158,8 +203,8 @@ function PaymentGateway() {
   );
 
   useAdminHeaderActions(
-    <Link to="/v2/admin/add-payment-gateway">
-      <AdminActionButton action="create" label="決済ゲートウェイ作成" />
+    <Link to={ADD_GATEWAY_PATH}>
+      <AdminActionButton action="create" label={CREATE_GATEWAY_LABEL} />
     </Link>
   );
 
@@ -171,7 +216,7 @@ function PaymentGateway() {
           dataSource={gateway}
           rowKey="id"
           loading={loading}
-          emptyDescription="決済ゲートウェイがありません"
+          emptyDescription={EMPTY_GATEWAYS}
           pagination={{
             current: page,
             pageSize: PAGE_SIZE,
@@ -183,14 +228,13 @@ function PaymentGateway() {
 
       <AdminConfirmModal
         open={Boolean(deleteId)}
-        message="本当に削除しますか。"
-        okText="削除"
+        message={DELETE_CONFIRM_MESSAGE}
         danger
         onOk={handleDelete}
         onCancel={() => setDeleteId(null)}
       />
     </>
   );
-}
+};
 
 export default PaymentGateway;

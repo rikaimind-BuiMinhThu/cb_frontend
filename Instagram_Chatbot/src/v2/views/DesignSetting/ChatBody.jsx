@@ -1,9 +1,8 @@
-import React from 'react'
+import React from 'react';
+import { CHAT_BODY_PLACEHOLDER } from './constants/designChatbotConstants';
 
-function ChatBody() {
-  return (
-    <div>チャット本文（準備中）</div>
-  )
-}
+const ChatBody = () => (
+  <div>{CHAT_BODY_PLACEHOLDER}</div>
+);
 
-export default ChatBody
+export default ChatBody;

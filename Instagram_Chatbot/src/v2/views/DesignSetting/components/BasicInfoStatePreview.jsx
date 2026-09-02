@@ -4,8 +4,17 @@ import { MDBIcon } from 'mdbreact';
 import { Button } from 'antd';
 import 'v2/assets/css/bot/preview-chat-bot.css';
 import {
+  DEFAULT_MAIN_COLOR,
   OPEN_ANIMATION_DURATION_MS_DEFAULT,
   OPEN_ANIMATION_STYLE_DEFAULT,
+  PREVIEW_CLOSED_TITLE,
+  PREVIEW_ICON_PLACEHOLDER,
+  PREVIEW_OPEN_TITLE,
+  PREVIEW_REPLAY_LABEL,
+  PREVIEW_SUBTITLE_FALLBACK,
+  PREVIEW_TITLE_FALLBACK,
+  THEME_CSS_VAR_ANIMATION_DURATION,
+  THEME_CSS_VAR_MAIN_COLOR,
 } from '../constants/designChatbotConstants';
 import {
   clampOpenAnimationDurationMs,
@@ -39,13 +48,13 @@ const BasicInfoStatePreview = ({
   return (
     <div className="basic-info-state-preview">
       <div className="basic-info-state-preview__section">
-        <h6 className="basic-info-state-preview__title">チャットを閉じたとき</h6>
+        <h6 className="basic-info-state-preview__title">{PREVIEW_CLOSED_TITLE}</h6>
         <div className="basic-info-state-preview__frame basic-info-state-preview__frame--close">
           <div className="basic-info-state-preview__launcher">
             {closeIcon ? (
               <img src={closeIcon} alt="" className="basic-info-state-preview__launcher-icon" />
             ) : (
-              <span className="basic-info-state-preview__launcher-placeholder">アイコン</span>
+              <span className="basic-info-state-preview__launcher-placeholder">{PREVIEW_ICON_PLACEHOLDER}</span>
             )}
           </div>
         </div>
@@ -53,14 +62,14 @@ const BasicInfoStatePreview = ({
 
       <div className="basic-info-state-preview__section">
         <div className="basic-info-state-preview__open-header">
-          <h6 className="basic-info-state-preview__title">チャットを開いたとき</h6>
+          <h6 className="basic-info-state-preview__title">{PREVIEW_OPEN_TITLE}</h6>
           <Button
             type="link"
             size="small"
             className="basic-info-state-preview__replay"
             onClick={() => setAnimationKey((prev) => prev + 1)}
           >
-            再生
+            {PREVIEW_REPLAY_LABEL}
           </Button>
         </div>
         <div className="basic-info-state-preview__frame basic-info-state-preview__frame--open">
@@ -68,21 +77,18 @@ const BasicInfoStatePreview = ({
             key={animationKey}
             className={`basic-info-state-preview__widget sp-container ${animationClassName}`}
             style={{
-              backgroundColor: '#EBF7FF',
-              '--chatbot-open-animation-duration': `${durationMs}ms`,
+              [THEME_CSS_VAR_MAIN_COLOR]: mainColor,
+              [THEME_CSS_VAR_ANIMATION_DURATION]: `${durationMs}ms`,
             }}
           >
-            <div
-              className="sp-header"
-              style={{ backgroundColor: mainColor }}
-            >
+            <div className="sp-header">
               <div className="sp-header-left">
                 <div className="sp-header-left-avatar sp-avatar">
                   {openIcon ? <img src={openIcon} alt="" /> : null}
                 </div>
                 <div className="sp-header-left-label">
-                  <div className="sp-header-left-label-sub-title">{subtitle || 'サブタイトル'}</div>
-                  <div className="sp-header-left-label-title">{title || 'タイトル'}</div>
+                  <div className="sp-header-left-label-sub-title">{subtitle || PREVIEW_SUBTITLE_FALLBACK}</div>
+                  <div className="sp-header-left-label-title">{title || PREVIEW_TITLE_FALLBACK}</div>
                 </div>
               </div>
               <div className="sp-header-right">
@@ -111,7 +117,7 @@ BasicInfoStatePreview.propTypes = {
 };
 
 BasicInfoStatePreview.defaultProps = {
-  mainColor: '#327AED',
+  mainColor: DEFAULT_MAIN_COLOR,
   title: '',
   subtitle: '',
   botImage: '',

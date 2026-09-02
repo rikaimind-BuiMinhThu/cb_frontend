@@ -4,15 +4,25 @@ import { Link } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import 'v2/assets/css/bot/bot-setting.css';
 import 'v2/assets/css/bot/add-bot.css';
-import { TAB_BASIC, TAB_DESIGN, TAB_THEME } from './constants/designChatbotConstants';
+import {
+  BOT_ID_COOKIE_KEY,
+  SCL_BUTTON_LABEL,
+  SCENARIO_LIST_PATH,
+  TAB_BASIC,
+  TAB_BASIC_LABEL,
+  TAB_DESIGN,
+  TAB_DESIGN_LABEL,
+  TAB_THEME,
+  TAB_THEME_LABEL,
+} from './constants/designChatbotConstants';
 import ThemeCustomizeTab from './components/ThemeCustomizeTab';
 import useDesignChatbot from './hooks/useDesignChatbot';
 import BasicInfoTab from './components/BasicInfoTab';
 import DesignCustomizeTab from './components/DesignCustomizeTab';
 import { AdminPage, AdminActionButton, useAdminHeaderActions } from 'v2/components/AdminShell';
 
-function DesignChatbot() {
-  const botId = Cookies.get('bot_id');
+const DesignChatbot = () => {
+  const botId = Cookies.get(BOT_ID_COOKIE_KEY);
   const { state, actions } = useDesignChatbot(botId);
 
   const saveHandler =
@@ -29,7 +39,7 @@ function DesignChatbot() {
   if (!state.isLoaded) {
     return (
       <AdminPage className="admin-page--design-setting">
-        <div style={{ padding: 48, textAlign: 'center' }}>
+        <div className="design-setting-loading">
           <Spin />
         </div>
       </AdminPage>
@@ -46,7 +56,7 @@ function DesignChatbot() {
           items={[
             {
               key: String(TAB_BASIC),
-              label: '基本情報',
+              label: TAB_BASIC_LABEL,
               children: (
                 <BasicInfoTab
                   basicInfo={state.basicInfo}
@@ -78,7 +88,7 @@ function DesignChatbot() {
             },
             {
               key: String(TAB_DESIGN),
-              label: 'デザインカスタマイズ',
+              label: TAB_DESIGN_LABEL,
               children: (
                 <DesignCustomizeTab
                   designSettings={state.designSettings}
@@ -89,7 +99,7 @@ function DesignChatbot() {
             },
             {
               key: String(TAB_THEME),
-              label: 'テーマカスタマイズ',
+              label: TAB_THEME_LABEL,
               children: (
                 <ThemeCustomizeTab
                   themeSettings={state.designSettings.themeSettings}
@@ -107,13 +117,13 @@ function DesignChatbot() {
           ]}
         />
       </AdminPage>
-      <Link to="/v2/admin/scenario-list">
-        <button style={{ display: 'none' }} type="button">
-          SCL
+      <Link to={SCENARIO_LIST_PATH}>
+        <button className="admin-visually-hidden" type="button">
+          {SCL_BUTTON_LABEL}
         </button>
       </Link>
     </>
   );
-}
+};
 
 export default DesignChatbot;

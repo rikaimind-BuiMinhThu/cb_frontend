@@ -1,9 +1,8 @@
-import React from 'react'
+import React from 'react';
+import { START_BUTTON_PLACEHOLDER } from './constants/designChatbotConstants';
 
-function StartButton() {
-  return (
-    <div>開始ボタン（準備中）</div>
-  )
-}
+const StartButton = () => (
+  <div>{START_BUTTON_PLACEHOLDER}</div>
+);
 
-export default StartButton
+export default StartButton;

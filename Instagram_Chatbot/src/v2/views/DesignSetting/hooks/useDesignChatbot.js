@@ -4,10 +4,32 @@ import Cookies from 'js-cookie';
 import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import {
-  TAB_BASIC,
+  API_SUCCESS_CODE,
+  API_SUCCESS_CODE_STRING,
+  API_WARNING_CODE,
+  API_WARNING_CODE_STRING,
+  BOT_ID_COOKIE_KEY,
+  BOT_TYPE_BOT,
+  BOT_TYPE_COOKIE_KEY,
+  CHAT_BODY_VERSION_DEFAULT,
+  CHATBOTS_API_PATH,
+  CHATBOTS_API_PATH_RELATIVE,
+  DEFAULT_MAIN_COLOR,
+  DESIGN_SETTINGS_SUFFIX,
+  DESIGN_TYPE_DEFAULT,
+  ICON_LOAD_ERROR,
+  IMAGE_TYPE_JPEG,
+  IMAGE_TYPE_JPG,
+  IMAGE_TYPE_PNG,
+  NOTIFICATION_SUCCESS_MS,
+  NOTIFICATION_WARNING_MS,
   OPEN_ANIMATION_DURATION_MS_DEFAULT,
   OPEN_ANIMATION_STYLE_DEFAULT,
-  CHAT_BODY_VERSION_DEFAULT,
+  SAVE_BOT_SUCCESS,
+  SAVE_DESIGN_SUCCESS,
+  TAB_BASIC,
+  TOKEN_EXPIRED_CODE,
+  VALIDATION_MESSAGES,
 } from '../constants/designChatbotConstants';
 import {
   applyIconsFromApiResponse,
@@ -53,13 +75,13 @@ export const useDesignChatbot = (initialBotId) => {
 
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
-  const [designType, setDesignType] = useState('flat');
+  const [designType, setDesignType] = useState(DESIGN_TYPE_DEFAULT);
   const [botImage, setBotImage] = useState('');
   const [openingBotIcon, setOpeningBotIcon] = useState('');
   const [closingBotIcon, setClosingBotIcon] = useState('');
   const [botName, setBotName] = useState('');
   const [chatBodyVersion, setChatBodyVersion] = useState(CHAT_BODY_VERSION_DEFAULT);
-  const [mainColor, setMainColor] = useState('#327AED');
+  const [mainColor, setMainColor] = useState(DEFAULT_MAIN_COLOR);
   const [iconPresetIndices, setIconPresetIndices] = useState(INITIAL_ICON_PRESET_INDICES);
 
   const [displayType, setDisplayType] = useState(1);
@@ -90,9 +112,9 @@ export const useDesignChatbot = (initialBotId) => {
     setValidationErrors((prev) => ({ ...prev, [field]: '' }));
   }, []);
 
-  const showNotification = useCallback((text, autoCloseMs = 1500) => {
+  const showNotification = useCallback((text, autoCloseMs = NOTIFICATION_SUCCESS_MS) => {
     if (!text) return;
-    if (autoCloseMs === 0) {
+    if (autoCloseMs === NOTIFICATION_WARNING_MS) {
       message.warning(text);
     } else {
       message.success(text);
@@ -144,7 +166,7 @@ export const useDesignChatbot = (initialBotId) => {
       clearValidationError('botImage');
     } catch {
       setPresetIndexForType(type, null);
-      showNotification('アイコンの読み込みに失敗しました。', 0);
+      showNotification(ICON_LOAD_ERROR, NOTIFICATION_WARNING_MS);
     }
   }, [clearValidationError, setBotIcon, setPresetIndexForType, showNotification]);
 
@@ -157,7 +179,7 @@ export const useDesignChatbot = (initialBotId) => {
     const file = e.target.files[0];
     e.target.value = null;
 
-    if (file?.type === 'image/png' || file?.type === 'image/jpeg' || file?.type === 'image/jpg') {
+    if (file?.type === IMAGE_TYPE_PNG || file?.type === IMAGE_TYPE_JPEG || file?.type === IMAGE_TYPE_JPG) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setBotIcon(iconType, reader.result);
@@ -172,7 +194,7 @@ export const useDesignChatbot = (initialBotId) => {
     setPresetIndexForType(iconType, null);
     setValidationErrors((prev) => ({
       ...prev,
-      botImage: '画像を選択してください。',
+      botImage: VALIDATION_MESSAGES.botImage,
     }));
     return false;
   }, [clearValidationError, setBotIcon, setPresetIndexForType]);
@@ -181,7 +203,7 @@ export const useDesignChatbot = (initialBotId) => {
     if (!id) return;
 
     try {
-      const response = await api.get(`/api/v1/managements/chatbots/${id}`);
+      const response = await api.get(`${CHATBOTS_API_PATH}/${id}`);
       if (isCancelled() || !response.data.data) {
         return;
       }
@@ -189,7 +211,7 @@ export const useDesignChatbot = (initialBotId) => {
       const data = response.data.data;
       const colorKey = data.main_color || null;
       const resolvedColor = resolveMainColorFromApi(colorKey || data.main_color_other);
-      const mainColorHex = resolvedColor || '#327AED';
+      const mainColorHex = resolvedColor || DEFAULT_MAIN_COLOR;
       const designSettings = parseDesignSettings(data.design_settings, mainColorHex, colorKey);
 
       setDisplayType(designSettings.displayType);
@@ -218,7 +240,7 @@ export const useDesignChatbot = (initialBotId) => {
       setChatBodyVersion(data.chat_body_version || CHAT_BODY_VERSION_DEFAULT);
       setTitle(data.title || '');
       setSubtitle(data.subtitle || '');
-      setDesignType(data.design_type || 'flat');
+      setDesignType(data.design_type || DESIGN_TYPE_DEFAULT);
 
       await syncIconsFromChatbotData(data);
       if (isCancelled()) return;
@@ -228,7 +250,7 @@ export const useDesignChatbot = (initialBotId) => {
       }
     } catch (error) {
       if (isCancelled()) return;
-      if (error.response?.data?.code === 0) {
+      if (error.response?.data?.code === TOKEN_EXPIRED_CODE) {
         tokenExpired();
       }
     } finally {
@@ -237,20 +259,20 @@ export const useDesignChatbot = (initialBotId) => {
   }, [syncIconsFromChatbotData]);
 
   useEffect(() => {
-    let cancelled = false;
-    const id = initialBotId || Cookies.get('bot_id');
+    const request = { cancelled: false };
+    const id = initialBotId || Cookies.get(BOT_ID_COOKIE_KEY);
     setBotId(id);
-    loadChatbot(id, () => cancelled);
+    loadChatbot(id, () => request.cancelled);
     return () => {
-      cancelled = true;
+      request.cancelled = true;
     };
   }, [initialBotId, loadChatbot]);
 
   const validateBasicInfo = useCallback(() => {
     const errors = {
-      title: title ? '' : 'タイトルは、必ず指定してください。',
-      subtitle: subtitle ? '' : 'サブタイトルは、必ず指定してください。',
-      botName: botName ? '' : 'ボット名は、必ず指定してください。',
+      title: title ? '' : VALIDATION_MESSAGES.title,
+      subtitle: subtitle ? '' : VALIDATION_MESSAGES.subtitle,
+      botName: botName ? '' : VALIDATION_MESSAGES.botName,
       botImage: '',
     };
     setValidationErrors(errors);
@@ -319,31 +341,31 @@ export const useDesignChatbot = (initialBotId) => {
     const designPayload = getDesignSettingsPayload();
 
     Promise.all([
-      api.put(`api/v1/managements/chatbots/${botId}`, payload),
-      api.post(`api/v1/managements/chatbots/${botId}/design_settings`, designPayload),
+      api.put(`${CHATBOTS_API_PATH_RELATIVE}/${botId}`, payload),
+      api.post(`${CHATBOTS_API_PATH_RELATIVE}/${botId}/${DESIGN_SETTINGS_SUFFIX}`, designPayload),
     ])
       .then(async ([basicRes, designRes]) => {
-        const basicOk = basicRes.data.code === 1 || basicRes.data.code === '1';
-        const designOk = designRes.data.code === 1 || designRes.data.code === '1';
+        const basicOk = basicRes.data.code === API_SUCCESS_CODE || basicRes.data.code === API_SUCCESS_CODE_STRING;
+        const designOk = designRes.data.code === API_SUCCESS_CODE || designRes.data.code === API_SUCCESS_CODE_STRING;
 
         if (basicOk && designOk) {
-          Cookies.set('bot_id', basicRes.data.data.id);
-          Cookies.set('bot_type', 'bot');
+          Cookies.set(BOT_ID_COOKIE_KEY, basicRes.data.data.id);
+          Cookies.set(BOT_TYPE_COOKIE_KEY, BOT_TYPE_BOT);
           await syncIconsFromChatbotData(basicRes.data.data);
-          showNotification('ボットを正常に保存されました！');
+          showNotification(SAVE_BOT_SUCCESS);
           return;
         }
 
-        if (basicRes.data?.code === 2 || basicRes.data?.code === '2') {
-          showNotification(basicRes.data.message, 0);
+        if (basicRes.data?.code === API_WARNING_CODE || basicRes.data?.code === API_WARNING_CODE_STRING) {
+          showNotification(basicRes.data.message, NOTIFICATION_WARNING_MS);
           return;
         }
-        if (designRes.data?.code === 2 || designRes.data?.code === '2') {
-          showNotification(designRes.data.message, 0);
+        if (designRes.data?.code === API_WARNING_CODE || designRes.data?.code === API_WARNING_CODE_STRING) {
+          showNotification(designRes.data.message, NOTIFICATION_WARNING_MS);
         }
       })
       .catch((error) => {
-        if (error.response?.data?.code === 0) {
+        if (error.response?.data?.code === TOKEN_EXPIRED_CODE) {
           tokenExpired();
         }
       });
@@ -367,16 +389,16 @@ export const useDesignChatbot = (initialBotId) => {
   const saveDesignSettings = useCallback(() => {
     const payload = getDesignSettingsPayload();
 
-    api.post(`api/v1/managements/chatbots/${botId}/design_settings`, payload)
+    api.post(`${CHATBOTS_API_PATH_RELATIVE}/${botId}/${DESIGN_SETTINGS_SUFFIX}`, payload)
       .then((res) => {
-        if (res.data.code === 1 || res.data.code === '1') {
-          showNotification('ボット設定を正常に保存されました！');
-        } else if (res.data?.code === 2 || res.data?.code === '2') {
-          showNotification(res.data.message, 0);
+        if (res.data.code === API_SUCCESS_CODE || res.data.code === API_SUCCESS_CODE_STRING) {
+          showNotification(SAVE_DESIGN_SUCCESS);
+        } else if (res.data?.code === API_WARNING_CODE || res.data?.code === API_WARNING_CODE_STRING) {
+          showNotification(res.data.message, NOTIFICATION_WARNING_MS);
         }
       })
       .catch((error) => {
-        if (error.response?.data?.code === 0) {
+        if (error.response?.data?.code === TOKEN_EXPIRED_CODE) {
           tokenExpired();
         }
       });
@@ -402,29 +424,29 @@ export const useDesignChatbot = (initialBotId) => {
     });
 
     Promise.all([
-      api.post(`api/v1/managements/chatbots/${botId}/design_settings`, designPayload),
-      api.put(`api/v1/managements/chatbots/${botId}`, basicPayload),
+      api.post(`${CHATBOTS_API_PATH_RELATIVE}/${botId}/${DESIGN_SETTINGS_SUFFIX}`, designPayload),
+      api.put(`${CHATBOTS_API_PATH_RELATIVE}/${botId}`, basicPayload),
     ])
       .then(async ([designRes, basicRes]) => {
-        const designOk = designRes.data.code === 1 || designRes.data.code === '1';
-        const basicOk = basicRes.data.code === 1 || basicRes.data.code === '1';
+        const designOk = designRes.data.code === API_SUCCESS_CODE || designRes.data.code === API_SUCCESS_CODE_STRING;
+        const basicOk = basicRes.data.code === API_SUCCESS_CODE || basicRes.data.code === API_SUCCESS_CODE_STRING;
 
         if (designOk && basicOk) {
           if (basicRes.data.data?.id) {
-            Cookies.set('bot_id', basicRes.data.data.id);
+            Cookies.set(BOT_ID_COOKIE_KEY, basicRes.data.data.id);
           }
           await syncIconsFromChatbotData(basicRes.data.data);
-          showNotification('ボット設定を正常に保存されました！');
+          showNotification(SAVE_DESIGN_SUCCESS);
           return;
         }
 
         const errorMessage = designRes.data?.message || basicRes.data?.message;
         if (errorMessage) {
-          showNotification(errorMessage, 0);
+          showNotification(errorMessage, NOTIFICATION_WARNING_MS);
         }
       })
       .catch((error) => {
-        if (error.response?.data?.code === 0) {
+        if (error.response?.data?.code === TOKEN_EXPIRED_CODE) {
           tokenExpired();
         }
       });

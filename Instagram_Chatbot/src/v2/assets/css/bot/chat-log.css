@@ -311,3 +311,460 @@
   justify-content: center;
   width: 100%;
 }
+
+.chat-log-um-block {
+  margin-bottom: 10px;
+}
+
+.chat-log-um-title-row {
+  margin-bottom: 0;
+}
+
+.chat-log-um-split {
+  display: flex;
+  justify-content: space-between;
+}
+
+.chat-log-um-field-full {
+  width: 100%;
+}
+
+.chat-log-um-field-half {
+  width: 49%;
+}
+
+.chat-log-um-field-third {
+  width: 32%;
+}
+
+.chat-log-um-field-45 {
+  width: 45%;
+}
+
+.chat-log-um-error {
+  color: #ff7e00;
+  font-size: 12px;
+}
+
+.chat-log-um-center {
+  text-align: center;
+}
+
+.chat-log-um-caption {
+  font-weight: 400;
+  font-size: 12px;
+}
+
+.chat-log-um-relative {
+  position: relative;
+}
+
+.chat-log-um-mt-4 {
+  margin-top: 4px;
+}
+
+.chat-log-um-mb-4 {
+  margin-bottom: 4px;
+}
+
+.chat-log-um-mb-5 {
+  margin-bottom: 5px;
+}
+
+.chat-log-um-mb-0 {
+  margin-bottom: 0;
+}
+
+.chat-log-um-inline {
+  display: flex;
+  align-items: center;
+}
+
+.chat-log-um-image {
+  width: var(--um-img-w);
+  height: var(--um-img-h);
+}
+
+.chat-log-um-split-wrap {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.chat-log-um-split-full {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.chat-log-um-flex-full {
+  display: flex;
+  width: 100%;
+}
+
+.chat-log-um-flex-start {
+  display: flex;
+  justify-content: flex-start;
+  margin: 5px 0;
+}
+
+.chat-log-um-center-flex {
+  display: flex;
+  justify-content: center;
+}
+
+.chat-log-um-field-33 {
+  width: 33%;
+}
+
+.chat-log-um-field-33-ml {
+  width: 33%;
+  margin-left: 10px;
+}
+
+.chat-log-um-field-50 {
+  width: 50%;
+}
+
+.chat-log-um-field-46 {
+  width: 46%;
+}
+
+.chat-log-um-field-46-ml {
+  width: 46%;
+  margin-left: 177px;
+}
+
+.chat-log-um-field-99 {
+  width: 99%;
+  margin-top: 5px;
+}
+
+.chat-log-um-field-half-mt {
+  width: 49%;
+  margin-top: 5px;
+}
+
+.chat-log-um-field-third-mb {
+  width: 32%;
+  margin-bottom: 10px;
+}
+
+.chat-log-um-field-third-mt {
+  width: 32%;
+  margin-top: 4px;
+}
+
+.chat-log-um-ml-0 {
+  margin-left: 0;
+}
+
+.chat-log-um-ml-7 {
+  margin-left: 7px;
+}
+
+.chat-log-um-ml-8 {
+  margin-left: 8px;
+}
+
+.chat-log-um-ml-10 {
+  margin-left: 10px;
+}
+
+.chat-log-um-ml-18 {
+  margin-left: 18px;
+}
+
+.chat-log-um-mr-0 {
+  margin-right: 0;
+}
+
+.chat-log-um-mr-8 {
+  margin-right: 8px;
+}
+
+.chat-log-um-mt-5 {
+  margin-top: 5px;
+}
+
+.chat-log-um-mt-8 {
+  margin-top: 8px;
+}
+
+.chat-log-um-mb-3 {
+  margin-bottom: 3px;
+}
+
+.chat-log-um-mb-6 {
+  margin-bottom: 6px;
+}
+
+.chat-log-um-mb-neg-5 {
+  margin-bottom: -5px;
+}
+
+.chat-log-um-placeholder-hint {
+  font-weight: 400;
+  color: black;
+  font-size: 12px;
+  margin-left: 18px;
+}
+
+.chat-log-um-block-style {
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.chat-log-um-block-style--selected {
+  background-color: #347aed;
+}
+
+.chat-log-um-checkbox-img-row {
+  color: #6789a6;
+  display: flex;
+}
+
+.chat-log-um-checkbox-img-text {
+  text-align: center;
+  font-size: 14px;
+  color: #6789a6;
+  font-weight: 700;
+}
+
+.chat-log-um-checkbox-group {
+  width: 100%;
+  font-size: 14px;
+}
+
+.chat-log-um-zip-search {
+  margin-bottom: 10px;
+  text-decoration: underline;
+  text-align: right;
+}
+
+.chat-log-um-zip-search--active {
+  color: #2c76f0;
+}
+
+.chat-log-um-zip-search--disabled {
+  color: gray;
+}
+
+.chat-log-um-pointer {
+  cursor: pointer;
+}
+
+.chat-log-um-micro-label {
+  font-weight: 400;
+  font-size: 10px;
+  width: 100%;
+  margin-bottom: 3px;
+}
+
+.chat-log-um-micro-label-mb5 {
+  font-weight: 400;
+  font-size: 10px;
+  width: 100%;
+  margin-bottom: 5px;
+}
+
+.chat-log-um-upload-btn {
+  background-color: #a3b1bf;
+  margin-top: 3px;
+  width: 100%;
+}
+
+.chat-log-um-calendar-pad {
+  padding: 8px;
+}
+
+.chat-log-um-calendar-box {
+  top: 20px;
+  width: 300px;
+  border: 1px solid grey;
+}
+
+.chat-log-um-payment-icon {
+  width: 15.6667%;
+  margin-right: 1%;
+}
+
+.chat-log-um-cvc-icon {
+  width: 8%;
+}
+
+.chat-log-um-display-block {
+  display: block;
+}
+
+.chat-log-um-font-400 {
+  font-weight: 400;
+}
+
+.chat-log-um-borderless {
+  border: none;
+  padding: 0;
+}
+
+.chat-log-um-option-pad {
+  padding: 4px 11px;
+  cursor: pointer;
+}
+
+.chat-log-um-option-box {
+  padding: 5px;
+  border: 1px solid #8bc5ff;
+  margin-bottom: 5px;
+}
+
+.chat-log-um-product-header {
+  background-color: #ecf5fa;
+  margin-bottom: 5px;
+  padding: 5px;
+  width: 100%;
+}
+
+.chat-log-um-product-center {
+  margin-bottom: 5px;
+  padding: 5px;
+  width: 100%;
+  text-align: center;
+  line-height: 22px;
+}
+
+.chat-log-um-color-muted {
+  color: #6789a6;
+}
+
+.chat-log-um-flex-fs14 {
+  width: 100%;
+  font-size: 14px;
+  display: flex;
+}
+
+.chat-log-um-error-indent {
+  color: #ff7e00;
+  font-size: 11px;
+  width: 46%;
+  margin-left: 137px;
+}
+
+.chat-log-um-error-11 {
+  color: #ff7e00;
+  font-size: 11px;
+}
+
+.chat-log-um-submit-btn {
+  border-radius: 25px;
+  padding: 5px 10px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.chat-log-um-submit-image {
+  width: var(--um-btn-w, 80%);
+  max-width: 100%;
+}
+
+.chat-log-um-contact-note {
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+.chat-log-um-contact-title {
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.chat-log-um-carousel-selected {
+  background-color: white;
+}
+
+.chat-log-um-carousel-disabled {
+  background-color: #b2b0ae;
+}
+
+.ss-input-custom-container.chat-log-um-field-half,
+.ss-input-custom-container.chat-log-um-field-third,
+.ss-input-custom-container.chat-log-um-field-full,
+.ss-input-custom-container.chat-log-um-field-50,
+.ss-input-custom-container.chat-log-um-field-45 {
+  width: inherit;
+}
+
+.ss-input-custom-container.chat-log-um-field-half {
+  width: 49%;
+}
+
+.ss-input-custom-container.chat-log-um-field-third {
+  width: 32%;
+}
+
+.ss-input-custom-container.chat-log-um-field-50 {
+  width: 50%;
+}
+
+.ss-input-custom-container.chat-log-um-field-45 {
+  width: 45%;
+}
+
+.select-custom-antd.chat-log-um-field-third,
+.select-custom-native.chat-log-um-field-third {
+  width: 32%;
+}
+
+.select-custom-antd.chat-log-um-field-half,
+.select-custom-native.chat-log-um-field-half {
+  width: 49%;
+}
+
+.select-custom-antd.chat-log-um-field-33,
+.select-custom-native.chat-log-um-field-33 {
+  width: 33%;
+}
+
+.select-custom-antd.chat-log-um-field-33-ml,
+.select-custom-native.chat-log-um-field-33-ml {
+  width: 33%;
+  margin-left: 10px;
+}
+
+.select-custom-antd.chat-log-um-field-45,
+.select-custom-native.chat-log-um-field-45 {
+  width: 45%;
+}
+
+.chat-log-um-datepicker-99 {
+  width: 99%;
+  margin-top: 5px;
+}
+
+.chat-log-um-datepicker-half {
+  width: 49%;
+  margin-top: 5px;
+}
+
+.ant-input-number.chat-log-um-ml-0 {
+  margin-left: 0;
+}
+
+.ant-input-number.chat-log-um-ml-7 {
+  margin-left: 7px;
+}
+
+.ant-checkbox-wrapper.chat-log-um-borderless,
+.ant-radio-wrapper.chat-log-um-borderless {
+  border: none;
+  padding: 0;
+}
+
+.ant-radio-wrapper.chat-log-um-product-header {
+  background-color: #ecf5fa;
+  margin-bottom: 5px;
+  padding: 5px;
+  width: 100%;
+}
+
+.chat-log-um-slider .ant-slider-track {
+  background-color: var(--um-slider-color);
+}

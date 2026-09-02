@@ -13,10 +13,61 @@ import {
   AdminActionButton,
   useAdminHeaderActions,
 } from 'v2/components/AdminShell';
+import 'v2/assets/css/bot/bot-list.css';
+import {
+  ADD_BOT_PATH,
+  API_SUCCESS_CODE,
+  API_WARNING_CODE,
+  AUTH_FALSE_VALUE,
+  BOT_ID_COOKIE_KEY,
+  BOT_TYPE_BOT,
+  BOT_TYPE_COOKIE_KEY,
+  CANCEL_TEXT,
+  CHATBOTS_API_PATH,
+  COL_ACTIONS,
+  COL_ACTIONS_WIDTH,
+  COL_BOT_NAME,
+  COL_NUMBER,
+  COL_NUMBER_WIDTH,
+  COL_OWNER_NAME,
+  COL_PERMISSION,
+  COL_PERMISSION_WIDTH,
+  COL_STATUS,
+  COL_STATUS_WIDTH,
+  CONFIRM_BOT_DELETE,
+  CONFIRM_BOT_OFF,
+  CONFIRM_BOT_ON,
+  CREATE_BOT_LABEL,
+  DEMO_BOT_PATH_PREFIX,
+  DEMO_LABEL,
+  DUPLICATE_PATH_SUFFIX,
+  FILTER_ALL_LABEL,
+  FILTER_STATUS_KEY,
+  FILTER_STATUS_LABEL,
+  INITIAL_PAGE,
+  IS_AUTH_COOKIE_KEY,
+  NO_TEXT,
+  PAGE_SIZE,
+  ROLE_OWNER_LABEL,
+  SCENARIO_LIST_PATH,
+  SEARCH_PLACEHOLDER,
+  STATUS_ALL,
+  STATUS_OFF,
+  STATUS_OFF_LABEL,
+  STATUS_ON,
+  STATUS_ON_LABEL,
+  SUCCESS_DELETED,
+  SUCCESS_DUPLICATED,
+  SUCCESS_STATUS_CHANGED,
+  TAG_COLOR_OFF,
+  TAG_COLOR_ON,
+  TOKEN_COOKIE_KEY,
+  TOKEN_EXPIRED_CODE,
+} from './constants';
 
-function BotManagement() {
+const BotManagement = () => {
   const [botList, setBotList] = useState([]);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(INITIAL_PAGE);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [isOpenPopupConfirm, setIsOpenPopupConfirm] = useState(false);
@@ -26,17 +77,17 @@ function BotManagement() {
   const [idSelected, setIdSelected] = useState('');
   const [statusSelected, setStatusSelected] = useState('');
   const [search, setSearch] = useState('');
-  const [isActiveSearch, setIsActiveSearch] = useState('all');
+  const [isActiveSearch, setIsActiveSearch] = useState(STATUS_ALL);
 
   useEffect(() => {
     if (
-      Cookies.get('token') === undefined ||
-      Cookies.get('token') === null ||
-      Cookies.get('token') === ''
+      Cookies.get(TOKEN_COOKIE_KEY) === undefined ||
+      Cookies.get(TOKEN_COOKIE_KEY) === null ||
+      Cookies.get(TOKEN_COOKIE_KEY) === ''
     ) {
       window.location.href = getSignInPath();
     }
-    if (Cookies.get('is_auth') === 'false') {
+    if (Cookies.get(IS_AUTH_COOKIE_KEY) === AUTH_FALSE_VALUE) {
       window.location.href = getSignInPath();
     }
   }, []);
@@ -44,14 +95,13 @@ function BotManagement() {
   const fetchList = useCallback((pgIndex, status = isActiveSearch, name = search) => {
     setLoading(true);
     api
-      .get(`/api/v1/managements/chatbots?page=${pgIndex}&name=${name}&status=${status}`)
+      .get(`${CHATBOTS_API_PATH}?page=${pgIndex}&name=${name}&status=${status}`)
       .then((res) => {
         setBotList(res.data?.data || []);
         setTotal(res.data?.total || 0);
       })
       .catch((error) => {
-        console.log(error);
-        if (error.response?.data.code === 0) {
+        if (error.response?.data.code === TOKEN_EXPIRED_CODE) {
           tokenExpired();
         }
       })
@@ -59,84 +109,81 @@ function BotManagement() {
   }, [isActiveSearch, search]);
 
   useEffect(() => {
-    fetchList(1);
+    fetchList(INITIAL_PAGE);
   }, [fetchList]);
 
-  function handleSearch() {
-    setPage(1);
-    fetchList(1);
-  }
+  const handleSearch = () => {
+    setPage(INITIAL_PAGE);
+    fetchList(INITIAL_PAGE);
+  };
 
-  function openBotSetting(id) {
-    Cookies.remove('bot_id');
-    Cookies.set('bot_type', 'bot');
-    Cookies.set('bot_id', `${id}`);
-    window.location.href = '/v2/admin/scenario-list';
-  }
+  const openBotSetting = (id) => {
+    Cookies.remove(BOT_ID_COOKIE_KEY);
+    Cookies.set(BOT_TYPE_COOKIE_KEY, BOT_TYPE_BOT);
+    Cookies.set(BOT_ID_COOKIE_KEY, `${id}`);
+    window.location.href = SCENARIO_LIST_PATH;
+  };
 
-  function duplicateBot(id) {
+  const duplicateBot = (id) => {
     api
-      .post(`/api/v1/managements/chatbots/${id}/duplicate`)
+      .post(`${CHATBOTS_API_PATH}/${id}/${DUPLICATE_PATH_SUFFIX}`)
       .then((res) => {
-        if (res.data.code === 1) {
-          message.success('正常に複製されました！');
+        if (res.data.code === API_SUCCESS_CODE) {
+          message.success(SUCCESS_DUPLICATED);
           fetchList(page);
-        } else if (res.data.code === 2) {
+        } else if (res.data.code === API_WARNING_CODE) {
           message.warning(res.data?.message);
         }
       })
       .catch((error) => {
-        console.log(error);
-        if (error.response?.data.code === 0) {
+        if (error.response?.data.code === TOKEN_EXPIRED_CODE) {
           tokenExpired();
         }
       });
-  }
+  };
 
   const confirmAction = () => {
     if (isStop) {
       api
-        .patch(`/api/v1/managements/chatbots/${idSelected}`, {
-          chatbot: { status: statusSelected === 'off' ? 'on' : 'off' },
+        .patch(`${CHATBOTS_API_PATH}/${idSelected}`, {
+          chatbot: { status: statusSelected === STATUS_OFF ? STATUS_ON : STATUS_OFF },
         })
         .then((res) => {
-          if (res.data?.code === 1) {
-            message.success('正常に変更されました！');
+          if (res.data?.code === API_SUCCESS_CODE) {
+            message.success(SUCCESS_STATUS_CHANGED);
             setIsStop(false);
             setIsOpenPopupConfirm(false);
             fetchList(page);
-          } else if (res.data?.code === 2) {
+          } else if (res.data?.code === API_WARNING_CODE) {
             message.warning(res.data?.message);
             setIsStop(false);
             setIsOpenPopupConfirm(false);
           }
         })
         .catch((error) => {
-          console.log(error);
-          if (error.response?.data.code === 0) {
+          if (error.response?.data.code === TOKEN_EXPIRED_CODE) {
             tokenExpired();
           }
         });
     }
     if (isDelete) {
       api
-        .delete(`/api/v1/managements/chatbots/${idSelected}`)
+        .delete(`${CHATBOTS_API_PATH}/${idSelected}`)
         .then((res) => {
-          if (res.data?.code === 1) {
-            message.success('正常に削除されました！');
+          if (res.data?.code === API_SUCCESS_CODE) {
+            message.success(SUCCESS_DELETED);
             setIsDelete(false);
             setIsOpenPopupConfirm(false);
-            fetchList(1);
-            setPage(1);
-          } else if (res.data?.code === 2) {
+            fetchList(INITIAL_PAGE);
+            setPage(INITIAL_PAGE);
+          } else if (res.data?.code === API_WARNING_CODE) {
             message.warning(res.data?.message);
             setIsDelete(false);
             setIsOpenPopupConfirm(false);
           }
         })
         .catch((error) => {
-          console.log(error);
-          if (error.response?.data.code === 0) {
+          if (error.response?.data.code === TOKEN_EXPIRED_CODE) {
             tokenExpired();
           }
         });
@@ -147,7 +194,7 @@ function BotManagement() {
     setIsStop(true);
     setIsDelete(false);
     setIsOpenPopupConfirm(true);
-    setMsgConfirm(status === 'on' ? '本当にボットをOFFにしますか。' : '本当にボットをONにしますか。');
+    setMsgConfirm(status === STATUS_ON ? CONFIRM_BOT_OFF : CONFIRM_BOT_ON);
     setIdSelected(id);
     setStatusSelected(status);
   };
@@ -156,63 +203,63 @@ function BotManagement() {
     setIsDelete(true);
     setIsStop(false);
     setIsOpenPopupConfirm(true);
-    setMsgConfirm('本当にボットを削除しますか。');
+    setMsgConfirm(CONFIRM_BOT_DELETE);
     setIdSelected(id);
   };
 
   useAdminHeaderActions(
-    <Link to="/v2/admin/add-bot-management">
-      <AdminActionButton action="create" label="ボット作成" />
+    <Link to={ADD_BOT_PATH}>
+      <AdminActionButton action="create" label={CREATE_BOT_LABEL} />
     </Link>
   );
 
   const columns = [
     {
-      title: '番号',
-      width: 70,
-      render: (_, __, index) => index + 1 + 10 * (page - 1),
+      title: COL_NUMBER,
+      width: COL_NUMBER_WIDTH,
+      render: (_, __, index) => index + 1 + PAGE_SIZE * (page - 1),
     },
     {
-      title: 'ボット名',
+      title: COL_BOT_NAME,
       dataIndex: 'bot_name',
       render: (name, record) => (
-        <Button type="link" onClick={() => openBotSetting(record.id)} style={{ padding: 0 }}>
+        <Button type="link" onClick={() => openBotSetting(record.id)} className="bot-name-link">
           {name}
         </Button>
       ),
     },
     {
-      title: 'ステータス',
+      title: COL_STATUS,
       dataIndex: 'status',
-      width: 120,
+      width: COL_STATUS_WIDTH,
       render: (status) => (
-        <Tag color={status === 'on' ? 'green' : 'default'}>{status?.toUpperCase()}</Tag>
+        <Tag color={status === STATUS_ON ? TAG_COLOR_ON : TAG_COLOR_OFF}>{status?.toUpperCase()}</Tag>
       ),
     },
     {
-      title: '所有者名',
+      title: COL_OWNER_NAME,
       dataIndex: 'owner_name',
     },
     {
-      title: '自分の権限',
-      width: 120,
-      render: () => '所有者',
+      title: COL_PERMISSION,
+      width: COL_PERMISSION_WIDTH,
+      render: () => ROLE_OWNER_LABEL,
     },
     {
-      title: 'アクション',
-      width: 320,
+      title: COL_ACTIONS,
+      width: COL_ACTIONS_WIDTH,
       render: (_, record) => (
         <Space wrap className="admin-table-actions">
           <AdminActionButton action="edit" iconOnly onClick={() => openBotSetting(record.id)} />
           <AdminActionButton action="duplicate" iconOnly onClick={() => duplicateBot(record.id)} />
           <Link
-            to={`/v2/admin/demo-bot/${record.id}`}
-            onClick={() => Cookies.set('bot_id', `${record.id}`)}
+            to={`${DEMO_BOT_PATH_PREFIX}/${record.id}`}
+            onClick={() => Cookies.set(BOT_ID_COOKIE_KEY, `${record.id}`)}
           >
-            <AdminActionButton action="preview" label="デモ" iconOnly />
+            <AdminActionButton action="preview" label={DEMO_LABEL} iconOnly />
           </Link>
           <Button type="link" size="small" onClick={() => handleStopBot(record.id, record.status)}>
-            {record.status === 'off' ? 'ON' : 'OFF'}
+            {record.status === STATUS_OFF ? STATUS_ON_LABEL : STATUS_OFF_LABEL}
           </Button>
           <AdminActionButton action="delete" iconOnly onClick={() => handleDeleteBot(record.id)} />
         </Space>
@@ -233,17 +280,17 @@ function BotManagement() {
               searchValue={search}
               onSearchChange={setSearch}
               onSearch={handleSearch}
-              searchPlaceholder="ボット名 ..."
+              searchPlaceholder={SEARCH_PLACEHOLDER}
               filters={[
                 {
-                  key: 'status',
-                  label: 'ボットステータス',
+                  key: FILTER_STATUS_KEY,
+                  label: FILTER_STATUS_LABEL,
                   value: isActiveSearch,
                   onChange: setIsActiveSearch,
                   options: [
-                    { value: 'all', label: 'すべて' },
-                    { value: 'on', label: 'ON' },
-                    { value: 'off', label: 'OFF' },
+                    { value: STATUS_ALL, label: FILTER_ALL_LABEL },
+                    { value: STATUS_ON, label: STATUS_ON_LABEL },
+                    { value: STATUS_OFF, label: STATUS_OFF_LABEL },
                   ],
                 },
               ]}
@@ -252,10 +299,10 @@ function BotManagement() {
           pagination={{
             current: page,
             total,
-            pageSize: 10,
-            onChange: (p) => {
-              setPage(p);
-              fetchList(p);
+            pageSize: PAGE_SIZE,
+            onChange: (nextPage) => {
+              setPage(nextPage);
+              fetchList(nextPage);
               window.scrollTo(0, 0);
             },
           }}
@@ -272,10 +319,10 @@ function BotManagement() {
           setIsDelete(false);
         }}
         danger={isDelete}
-        cancelText={isDelete ? 'キャンセル' : 'いいえ'}
+        cancelText={isDelete ? CANCEL_TEXT : NO_TEXT}
       />
     </>
   );
-}
+};
 
 export default BotManagement;

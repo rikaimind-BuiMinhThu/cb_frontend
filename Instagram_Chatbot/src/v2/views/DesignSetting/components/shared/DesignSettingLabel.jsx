@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { AdminInfoTooltip } from 'v2/components/AdminShell';
+import { REQUIRED_BADGE } from '../../constants/designChatbotConstants';
 
 const DesignSettingLabel = ({
   children,
@@ -10,7 +11,7 @@ const DesignSettingLabel = ({
 }) => (
   <span className={className}>
     {children}
-    {required && <span className="required-badge">必須</span>}
+    {required && <span className="required-badge">{REQUIRED_BADGE}</span>}
     {tooltip && <AdminInfoTooltip text={tooltip} />}
   </span>
 );
