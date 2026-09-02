@@ -10,7 +10,7 @@ import {
   PreviewMessagesList,
 } from "./PreviewComponent";
 import UserMessageTailIcon from "./PreviewComponent/UserMessageTailIcon";
-import { resolveUserMessageTheme } from "v2/views/DesignSetting/utils/designThemeUtils";
+import { resolveMainColorContext, resolveUserMessageTheme } from "v2/utils/designThemeCore";
 import PreviewFaqReducer from "./PreviewFaq/PreviewFaqReducer";
 import { EC_CHATBOT_URL } from "v2/variables/constants";
 import "moment/locale/zh-cn";
@@ -21,11 +21,11 @@ import {
   CONVERSION_RESPONSE_SUBMIT_TYPE,
   MESSAGE_CONTENT_TYPES,
   NO_ERROR,
+  QUERY_PARAM_IS_LOGGED_IN,
+  QUERY_PARAM_VALUE_TRUE,
+  NEXT_BUTTON_LABEL,
 } from "./PreviewComponent/Constants";
-import {
-  parseDesignSettings,
-  resolveMainColorContext,
-} from "v2/views/DesignSetting/utils/designChatbotUtils";
+import { parseDesignSettings } from "v2/views/DesignSetting/utils/designChatbotUtils";
 import {
   isMobile,
   sleep,
@@ -68,9 +68,9 @@ import {
 } from "./PreviewComponent/hooks";
 
 savePrevOpenStatus("0");
-var url = new URL(window.location.href);
-let params = new URLSearchParams(url.search);
-let isLoggedIn = params.get('isLoggedIn') === "true";
+const url = new URL(window.location.href);
+const params = new URLSearchParams(url.search);
+const isLoggedIn = params.get(QUERY_PARAM_IS_LOGGED_IN) === QUERY_PARAM_VALUE_TRUE;
 const previewInitialState = createPreviewInitialState("faq", { params });
 
 const PreviewFaq = () => {
@@ -216,7 +216,7 @@ const PreviewFaq = () => {
       apiColorKey,
     );
     const shouldAutoOpen = Number(parsedDesign.displayType) === 1;
-    let newState = {
+    const newState = {
       ...state,
       botInfor: getBotInforFromPreviewResponse(res),
       objParam: {},
@@ -390,8 +390,7 @@ const PreviewFaq = () => {
   };
 
   const onChangeErrors = (field, value) => {
-    let newErrors = { ...state.errors };
-    newErrors[field] = value;
+    const newErrors = { ...state.errors, [field]: value };
     dispatch({ type: PREVIEW_ACTIONS.SET_ERRORS, payload: { newErrors } });
   };
 
@@ -427,12 +426,9 @@ const PreviewFaq = () => {
     if (!message || message.belong_to !== "user") return null;
     if (message.message_content[0]?.type === "button_submit") return null;
 
-    let btnText = message.buttonName;
-    if (!btnText) {
-      btnText = isUpdate ? "次へ" : "次へ";
-    }
+    const btnText = message.buttonName || NEXT_BUTTON_LABEL;
     return (
-      <div className="sp-user-message-button-action" style={{ display: isDisplayBtnNext ? "flex" : "none" }}>
+      <div className={isDisplayBtnNext ? 'sp-user-message-button-action' : 'sp-user-message-button-action sp-user-message-button-action--hidden'}>
         <CustomButton
           disabled={false}
           className="ss-user-message__action-btn"

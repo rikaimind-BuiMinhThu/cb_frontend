@@ -528,36 +528,36 @@ export const useScenario = (mode = 'scenario') => {
 
   useEffect(() => {
     if (isTemplateMode || !botId) return undefined;
-    let cancelled = false;
+    const cancellation = { cancelled: false };
     api.get(`/api/v1/managements/emails?page=all&chatbot_id=${botId}`)
       .then((res) => {
-        if (!cancelled) setDataEmail(res.data.data);
+        if (!cancellation.cancelled) setDataEmail(res.data.data);
       })
       .catch((error) => {
-        if (cancelled) return;
+        if (cancellation.cancelled) return;
         if (error.response?.data?.code === 0) {
           tokenExpired();
         }
       });
     return () => {
-      cancelled = true;
+      cancellation.cancelled = true;
     };
   }, [botId, isTemplateMode]);
 
   useEffect(() => {
-    let cancelled = false;
+    const cancellation = { cancelled: false };
     api.get('/api/v1/prefectures')
       .then((res) => {
-        if (!cancelled) setDataPrefectures(res.data.data);
+        if (!cancellation.cancelled) setDataPrefectures(res.data.data);
       })
       .catch((error) => {
-        if (cancelled) return;
+        if (cancellation.cancelled) return;
         if (error.response?.data?.code === 0) {
           tokenExpired();
         }
       });
     return () => {
-      cancelled = true;
+      cancellation.cancelled = true;
     };
   }, []);
 

@@ -66,7 +66,7 @@ const CombineBotBlockSetting = ({
             onChange={(e) => onChangeValueMessageContent(indexMessageSelect, indexContent, messageType, e.target.value, 'content')}
           />
           <input type="file" id="ss-bot-file-upload" name="bot-file-upload" hidden onChange={(e) => getBaseUrl(e)} />
-          {fileError && <div style={{ color: '#FF7E00', fontSize: '12px' }}>{fileError}</div>}
+          {fileError && <div className="ss-file-error">{fileError}</div>}
           <CheckboxCustom
             label="自動でスクロールさせない"
             value={typeContent?.scroll_auto || false}

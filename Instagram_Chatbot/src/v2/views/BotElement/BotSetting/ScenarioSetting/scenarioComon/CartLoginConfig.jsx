@@ -17,28 +17,9 @@ import {
 } from '../constants/cartLoginConstants';
 import { normalizeCartLoginConfig } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/cartLoginUtils';
 
-const sectionLabelStyle = {
-  fontWeight: 600,
-  marginTop: '12px',
-  marginBottom: '6px',
-  display: 'block',
-  fontSize: '12px',
-};
-
-const fieldLabelStyle = {
-  display: 'block',
-  marginBottom: '6px',
-  fontSize: '12px',
-};
-
-const toColorPickerValue = (value, fallback) => {
-  const normalized = (value || fallback || '#000000').trim();
-  return /^#[0-9a-fA-F]{6}$/.test(normalized) ? normalized : fallback;
-};
-
 const SelectField = ({ label, value, options, onChange }) => (
-  <div style={{ marginTop: '10px' }}>
-    <span style={fieldLabelStyle}>{label}</span>
+  <div className="ss-config-field">
+    <span className="ss-config-field__label">{label}</span>
     <select className="ss-input-value" value={value} onChange={(e) => onChange(e.target.value)}>
       {options.map(([optionValue, optionLabel]) => (
         <option key={optionValue} value={optionValue}>{optionLabel}</option>
@@ -47,14 +28,19 @@ const SelectField = ({ label, value, options, onChange }) => (
   </div>
 );
 
-export default function CartLoginConfig({
+const toColorPickerValue = (value, fallback) => {
+  const normalized = (value || fallback || '#000000').trim();
+  return /^#[0-9a-fA-F]{6}$/.test(normalized) ? normalized : fallback;
+};
+
+const CartLoginConfig = ({
   indexMessageSelect,
   indexContent = 0,
   config,
   onChangeValue,
   dataMessages,
   setDataMessages,
-}) {
+}) => {
   const messageType = 'cart_login';
   const normalizedConfig = normalizeCartLoginConfig(config);
   const processAfterClick = normalizedConfig.process_after_click;
@@ -114,14 +100,13 @@ export default function CartLoginConfig({
 
   return (
     <div className="ss-bot-statement-wrapper ss-bot-statement-type">
-      <div style={{ marginTop: '10px' }}>
-        <span style={fieldLabelStyle}>{CART_LOGIN_FIELD_LABELS.text}</span>
+      <div className="ss-config-field">
+        <span className="ss-config-field__label">{CART_LOGIN_FIELD_LABELS.text}</span>
         <textarea
           className="ss-input-value"
           rows={3}
           value={normalizedConfig.text}
           onChange={(e) => handleFieldChange('text')(e.target.value)}
-          style={{ width: '100%' }}
         />
       </div>
 
@@ -132,13 +117,12 @@ export default function CartLoginConfig({
         onChange={handleFieldChange('display_type')}
       />
 
-      <span style={sectionLabelStyle}>スタイル設定</span>
+      <span className="ss-config-section-label">スタイル設定</span>
 
-      <div style={{ marginTop: '10px' }}>
-        <span style={fieldLabelStyle}>{CART_LOGIN_FIELD_LABELS.font_size}</span>
-        <InputCustom
-          style={{ width: '100%' }}
-          value={normalizedConfig.style.font_size}
+      <div className="ss-config-field">
+        <span className="ss-config-field__label">{CART_LOGIN_FIELD_LABELS.font_size}</span>
+          <InputCustom
+            value={normalizedConfig.style.font_size}
           onChange={handleStyleChange('font_size')}
         />
       </div>
@@ -164,11 +148,10 @@ export default function CartLoginConfig({
         onChange={handleStyleChange('text_color')}
       />
 
-      <div style={{ marginTop: '10px' }}>
-        <span style={fieldLabelStyle}>{CART_LOGIN_FIELD_LABELS.border_width}</span>
-        <InputCustom
-          style={{ width: '100%' }}
-          value={normalizedConfig.style.border_width}
+      <div className="ss-config-field">
+        <span className="ss-config-field__label">{CART_LOGIN_FIELD_LABELS.border_width}</span>
+          <InputCustom
+            value={normalizedConfig.style.border_width}
           onChange={handleStyleChange('border_width')}
         />
       </div>
@@ -187,11 +170,10 @@ export default function CartLoginConfig({
         onChange={handleStyleChange('border_color')}
       />
 
-      <div style={{ marginTop: '10px' }}>
-        <span style={fieldLabelStyle}>{CART_LOGIN_FIELD_LABELS.border_radius}</span>
-        <InputCustom
-          style={{ width: '100%' }}
-          value={normalizedConfig.style.border_radius}
+      <div className="ss-config-field">
+        <span className="ss-config-field__label">{CART_LOGIN_FIELD_LABELS.border_radius}</span>
+          <InputCustom
+            value={normalizedConfig.style.border_radius}
           onChange={handleStyleChange('border_radius')}
         />
       </div>
@@ -203,20 +185,18 @@ export default function CartLoginConfig({
         onChange={handleStyleChange('text_align')}
       />
 
-      <div style={{ marginTop: '10px' }}>
-        <span style={fieldLabelStyle}>{CART_LOGIN_FIELD_LABELS.padding}</span>
-        <InputCustom
-          style={{ width: '100%' }}
-          value={normalizedConfig.style.padding}
+      <div className="ss-config-field">
+        <span className="ss-config-field__label">{CART_LOGIN_FIELD_LABELS.padding}</span>
+          <InputCustom
+            value={normalizedConfig.style.padding}
           onChange={handleStyleChange('padding')}
         />
       </div>
 
-      <div style={{ marginTop: '10px' }}>
-        <span style={fieldLabelStyle}>{CART_LOGIN_FIELD_LABELS.width}</span>
-        <InputCustom
-          style={{ width: '100%' }}
-          value={normalizedConfig.style.width}
+      <div className="ss-config-field">
+        <span className="ss-config-field__label">{CART_LOGIN_FIELD_LABELS.width}</span>
+          <InputCustom
+            value={normalizedConfig.style.width}
           onChange={handleStyleChange('width')}
         />
       </div>
@@ -238,8 +218,8 @@ export default function CartLoginConfig({
       />
 
       {showLoginTrigger && (
-        <div style={{ marginTop: '10px' }}>
-          <span style={fieldLabelStyle}>{CART_LOGIN_FIELD_LABELS.open_login_trigger}</span>
+        <div className="ss-config-field">
+          <span className="ss-config-field__label">{CART_LOGIN_FIELD_LABELS.open_login_trigger}</span>
           <FukushashikiSearchRow
             mode={processConfig.open_login_trigger.search_mode}
             inputValue={processConfig.open_login_trigger.search_value || ''}
@@ -253,8 +233,8 @@ export default function CartLoginConfig({
 
       {showScrollSettings && (
         <>
-          <div style={{ marginTop: '10px' }}>
-            <span style={fieldLabelStyle}>{CART_LOGIN_FIELD_LABELS.scroll_target}</span>
+          <div className="ss-config-field">
+            <span className="ss-config-field__label">{CART_LOGIN_FIELD_LABELS.scroll_target}</span>
             <FukushashikiSearchRow
               mode={processConfig.scroll_target.search_mode}
               inputValue={processConfig.scroll_target.search_value || ''}
@@ -265,8 +245,8 @@ export default function CartLoginConfig({
             />
           </div>
 
-          <div style={{ marginTop: '10px' }}>
-            <span style={fieldLabelStyle}>{CART_LOGIN_FIELD_LABELS.action_delay_ms}</span>
+          <div className="ss-config-field">
+            <span className="ss-config-field__label">{CART_LOGIN_FIELD_LABELS.action_delay_ms}</span>
             <InputNum
               min={0}
               max={10000}
@@ -293,4 +273,6 @@ export default function CartLoginConfig({
       )}
     </div>
   );
-}
+};
+
+export default CartLoginConfig;

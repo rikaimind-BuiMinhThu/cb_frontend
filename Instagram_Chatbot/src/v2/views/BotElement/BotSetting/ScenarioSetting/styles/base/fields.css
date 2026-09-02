@@ -90,3 +90,314 @@
 .ss-select--70 {
   width: 70%;
 }
+
+.ss-select--14 {
+  width: 14%;
+}
+
+.ss-select--24 {
+  width: 24%;
+}
+
+.ss-select--30 {
+  width: 30%;
+}
+
+.ss-select--59 {
+  width: 59%;
+}
+
+.ss-select--30-mt {
+  width: 30%;
+  margin-top: 5px;
+}
+
+.ss-input-custom-field.ss-input--60-ml {
+  width: 60%;
+  margin-left: 10px;
+  margin-top: 5px;
+}
+
+.ss-input-custom-field.ss-input--full-mb0 {
+  width: 100%;
+  margin-bottom: 0;
+}
+
+.ss-input-custom-field.ss-input--invalid,
+.ss-input--invalid {
+  border-color: red;
+}
+
+.ss-config-field {
+  margin-top: 10px;
+}
+
+.ss-config-field--mt12 {
+  margin-top: 12px;
+}
+
+.ss-config-field--mt15 {
+  margin-top: 15px;
+}
+
+.ss-config-field--mt16 {
+  margin-top: 16px;
+}
+
+.ss-config-field__label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+
+.ss-config-section-label {
+  font-weight: 600;
+  margin-top: 12px;
+  margin-bottom: 6px;
+  display: block;
+  font-size: 12px;
+}
+
+.ss-delay-setting {
+  margin-left: 25px;
+  margin-bottom: 10px;
+}
+
+.ss-delay-setting__label {
+  margin-right: 10px;
+  font-size: 12px;
+}
+
+.ss-file-error {
+  color: #ff7e00;
+  font-size: 12px;
+}
+
+.ss-field-required-error {
+  color: rgb(185, 74, 72);
+}
+
+.ant-checkbox-wrapper.ss-checkbox-label-color {
+  color: #767676;
+}
+
+.ss-user-setting__item-checkbox {
+  width: fit-content;
+}
+
+.ss-checkbox-group {
+  width: 100%;
+}
+
+.ss-checkbox-group__col {
+  display: flex;
+  justify-content: space-around;
+}
+
+.ss-radio-custom__input {
+  width: 15px;
+}
+
+.ss-help-icon {
+  color: #347aed;
+  margin-left: 5px;
+  font-size: 13px;
+}
+
+.ss-icon-remove {
+  margin-left: 5px;
+}
+
+.ss-icon-remove--lg {
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.ss-flex-center {
+  display: flex;
+  align-items: center;
+}
+
+.ss-variable-row {
+  display: flex;
+  align-items: center;
+}
+
+.ss-option--hidden {
+  display: none;
+}
+
+.ss-display-none {
+  display: none !important;
+}
+
+.ss-media--full {
+  width: 100%;
+}
+
+.ss-media--cover {
+  width: 100%;
+  height: 100%;
+}
+
+.ss-overview-message-body {
+  width: 65%;
+}
+
+.ss-overview-message-titles {
+  display: flex;
+  padding-left: 10px;
+}
+
+.ss-overview-message-name {
+  background-color: #fff;
+  max-width: 60%;
+}
+
+.ss-overview-file-thumb {
+  width: 27%;
+  border: none;
+  height: auto;
+}
+
+.ss-overview-bg-white {
+  background-color: white;
+}
+
+.ss-overview-user-column {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.ss-overview-user-name {
+  background-color: #fff;
+  max-width: 60%;
+  margin-right: 10px;
+}
+
+.ss-overview-combine-body {
+  width: 100%;
+}
+
+.ss-overview-combine-titles {
+  display: flex;
+  padding-left: 10px;
+  margin-bottom: 6px;
+}
+
+.ss-pre-line-above {
+  white-space: pre-line;
+  margin-bottom: 6px;
+}
+
+.ss-pre-line-below {
+  white-space: pre-line;
+  margin-top: 6px;
+}
+
+.ss-amazon-pay-button-img {
+  width: var(--ss-amazon-pay-btn-width, 80%);
+  max-width: 100%;
+}
+
+.ss-amazon-pay-button-preview {
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.ss-amazon-pay-button-preview .ss-amazon-pay-button-img {
+  max-width: 280px;
+}
+
+.ss-amazon-pay-hint {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #666;
+}
+
+.ss-lp-option-suffix {
+  width: 30%;
+}
+
+.ss-email-domain-list {
+  background-color: #f8f9fa;
+  width: 100%;
+  padding: 5px;
+  margin-bottom: 10px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.ss-email-domain-list__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.ss-email-domain-list__actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.ss-email-domain-list__btn {
+  margin: 0;
+  line-height: normal;
+}
+
+.ss-bot-statement-pad {
+  padding: 10px;
+}
+
+.ss-bot-statement-type-label {
+  margin-bottom: 1px;
+}
+
+.ss-bot-pause-title {
+  margin-top: 15px;
+  font-weight: 700;
+}
+
+.ss-bot-variable-label {
+  font-weight: 400;
+}
+
+.ss-bot-variable-label--block {
+  font-weight: 400;
+  margin-top: 15px;
+  display: block;
+}
+
+.ss-name-wrapper--spaced {
+  margin-bottom: 10px;
+}
+
+.ss-user-setting__name-error.ss-name-error--flush {
+  margin-top: 0;
+}
+
+.ss-file-ref-pagination {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.fr-popup-body-container--selected {
+  box-shadow: 0 0 5px 5px #93d8fe;
+  border: 1px solid #337bed;
+}
+
+.ss-overview-name-error {
+  font-size: 12px;
+  color: #ff621d;
+}
+
+.ss-theme-file-img {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border: none;
+}

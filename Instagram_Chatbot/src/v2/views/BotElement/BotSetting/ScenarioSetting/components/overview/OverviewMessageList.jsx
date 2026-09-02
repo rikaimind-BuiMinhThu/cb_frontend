@@ -14,10 +14,9 @@ const OverviewMessageList = (bindings) => {
         {(provided) => (
           <div className="" {...provided.droppableProps} ref={provided.innerRef}>
             {dataMessages && dataMessages.map((message, index) => {
-              let content;
-              if (message.belong_to === 'bot') {
-                content = message.message_content[0];
-              }
+              const content = message.belong_to === 'bot'
+                ? message.message_content[0]
+                : undefined;
               const fileType = getBotFileExtension(content);
               const titleMessage = getBotMessageTitle(content);
 

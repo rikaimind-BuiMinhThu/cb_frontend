@@ -1,10 +1,11 @@
-import React from "react";
+import React from 'react';
+import { baseUserMessageComponentPropTypes } from './userMessageComponentPropTypes';
 import "v2/assets/css/bot/preview-chat-bot.css";
 import { EMPTY_INPUT_VALUE, MESSAGE_CONTENT_TYPES, NUMBER_REGEX, REQUIRED_FIELD_LABEL } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 import { getAddressFromZipCode, moveToNext } from "v2/views/BotElement/BotSetting/PreviewComponent/Utils";
 
-import InputCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
-import SelectCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/SelectCustom";
+import InputCustom from "v2/components/BotMessages/InputCustom";
+import SelectCustom from "v2/components/BotMessages/SelectCustom";
 
 const REQUIRE_CHECK_EACH_ITEM = "set_required_for_each_item";
 const REQUIRE_CHECK_ALL_ITEMS = "all_items_require";
@@ -369,6 +370,10 @@ const CommonAddress = ({ content, prefecturesList, messageIndexRender, messageIn
       {renderErrorMessage()}
     </div>
   );
+};
+
+CommonAddress.propTypes = {
+  ...baseUserMessageComponentPropTypes,
 };
 
 export default CommonAddress;

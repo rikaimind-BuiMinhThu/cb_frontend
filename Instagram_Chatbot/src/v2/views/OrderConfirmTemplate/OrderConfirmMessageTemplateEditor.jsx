@@ -8,7 +8,7 @@ import { getAdminRoutePath, getSignInPath } from 'v2/variables/constants';
 import {
   getDefaultOrderConfirmConfig,
   normalizeOrderConfirmConfig,
-} from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/OrderConfirmLpScriptGenerator';
+} from 'v2/utils/orderConfirmLpScriptGenerator';
 import {
   API_SUCCESS_CODE,
   API_WARNING_CODE,

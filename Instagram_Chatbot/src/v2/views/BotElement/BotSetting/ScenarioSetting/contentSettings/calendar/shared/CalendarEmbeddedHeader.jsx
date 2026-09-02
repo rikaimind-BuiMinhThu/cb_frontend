@@ -6,35 +6,31 @@ import moment from 'moment';
 const CalendarEmbeddedHeader = ({ value, type, onChange, onTypeChange }) => {
   const start = 0;
   const end = 12;
-  const monthOptions = [];
   const currentValue = value || moment();
-  let current = currentValue.clone();
   const localeData = currentValue.localeData();
-  const months = [];
+  const months = Array.from({ length: 12 }, (_, monthIndex) => (
+    localeData.monthsShort(currentValue.clone().month(monthIndex))
+  ));
 
-  for (let i = 0; i < 12; i += 1) {
-    current = current.month(i);
-    months.push(localeData.monthsShort(current));
-  }
-
-  for (let i = start; i < end; i += 1) {
-    monthOptions.push(
-      <Select.Option key={i} value={i} className="month-item">
-        {months[i]}
-      </Select.Option>,
+  const monthOptions = Array.from({ length: end - start }, (_, offset) => {
+    const monthIndex = start + offset;
+    return (
+      <Select.Option key={monthIndex} value={monthIndex} className="month-item">
+        {months[monthIndex]}
+      </Select.Option>
     );
-  }
+  });
 
   const year = currentValue.year();
   const month = currentValue.month();
-  const yearOptions = [];
-  for (let i = year - 50; i < year + 50; i += 1) {
-    yearOptions.push(
-      <Select.Option key={i} value={i} className="year-item">
-        {i}
-      </Select.Option>,
+  const yearOptions = Array.from({ length: 100 }, (_, offset) => {
+    const yearValue = year - 50 + offset;
+    return (
+      <Select.Option key={yearValue} value={yearValue} className="year-item">
+        {yearValue}
+      </Select.Option>
     );
-  }
+  });
 
   return (
     <div className="ss-calendar-setting__header-padding">

@@ -1,9 +1,8 @@
-import React from 'react'
+import React from 'react';
+import { STATISTICS_PENDING_LABEL } from 'v2/views/Report/constants';
 
-function Statistics() {
-  return (
-    <div>統計（準備中）</div>
-  )
-}
+const Statistics = () => (
+  <div>{STATISTICS_PENDING_LABEL}</div>
+);
 
-export default Statistics
+export default Statistics;

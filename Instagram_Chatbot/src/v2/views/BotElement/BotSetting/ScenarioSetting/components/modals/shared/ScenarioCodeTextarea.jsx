@@ -14,7 +14,7 @@ const ScenarioCodeTextarea = ({
   <textarea
     id={id}
     className={`ss-settings-code-textarea ${className}`.trim()}
-    style={{ height: `${height}px`, minHeight: `${height}px` }}
+    style={{ '--ss-code-textarea-height': `${height}px` }}
     placeholder={placeholder}
     value={value}
     disabled={disabled}

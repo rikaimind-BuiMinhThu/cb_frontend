@@ -134,7 +134,6 @@ const ScenarioSettingsMainView = ({ onClose }) => {
                 tooltip={SCENARIO_MODAL_TOOLTIPS.merchandiseId}
               >
                 <InputCustom
-                  style={{ width: '100%' }}
                   value={merchandiseId}
                   onChange={(value) => setMerchandiseId(value)}
                 />
@@ -145,7 +144,6 @@ const ScenarioSettingsMainView = ({ onClose }) => {
                   tooltip={SCENARIO_MODAL_TOOLTIPS.productIdCrossSell}
                 >
                   <InputCustom
-                    style={{ width: '100%' }}
                     value={productIdCrossSell}
                     onChange={(value) => setProductIdCrossSell(value)}
                   />
@@ -159,7 +157,6 @@ const ScenarioSettingsMainView = ({ onClose }) => {
               tooltip={SCENARIO_MODAL_TOOLTIPS.coupon}
             >
               <InputCustom
-                style={{ width: '100%' }}
                 value={coupon}
                 onChange={(value) => setCoupon(value)}
               />
@@ -210,7 +207,6 @@ const ScenarioSettingsMainView = ({ onClose }) => {
               tooltip={SCENARIO_MODAL_TOOLTIPS.launchButtonSelectors}
             >
               <InputCustom
-                style={{ width: '100%' }}
                 value={launchButtonSelectors}
                 onChange={(value) => setLaunchButtonSelectors(value)}
                 placeholder='例: a[href="#target_cart"] img'
@@ -245,7 +241,6 @@ const ScenarioSettingsMainView = ({ onClose }) => {
                 tooltip={SCENARIO_MODAL_TOOLTIPS.lpProductUrl}
               >
                 <InputCustom
-                  style={{ width: '100%' }}
                   value={lpProductUrl}
                   onChange={(value) => setLpProductUrl(value)}
                 />
@@ -255,7 +250,6 @@ const ScenarioSettingsMainView = ({ onClose }) => {
                 tooltip={SCENARIO_MODAL_TOOLTIPS.urlThanks}
               >
                 <InputCustom
-                  style={{ width: '100%' }}
                   value={urlThanks}
                   onChange={(value) => setUrlThanks(value)}
                 />

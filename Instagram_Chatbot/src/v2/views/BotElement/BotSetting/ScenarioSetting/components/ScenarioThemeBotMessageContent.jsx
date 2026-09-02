@@ -5,15 +5,14 @@ import { buildOrderConfirmPreviewHtml } from 'v2/views/BotElement/BotSetting/Sce
 
 const ScenarioThemeBotMessageContent = ({ content, fileType, hidden }) => {
   const type = fileType;
-  const hiddenStyle = hidden ? { opacity: '0.4' } : {};
+  const hiddenClass = hidden ? ' ss-message-hidden-style' : '';
 
   if (!content) return null;
 
   if (content.type === 'text_input' || content.type === 'getting_error_notification') {
     return (
       <div
-        className="ss-message__content--bot-text"
-        style={hiddenStyle}
+        className={`ss-message__content--bot-text${hiddenClass}`}
         dangerouslySetInnerHTML={{ __html: content[content.type]?.content || '' }}
       />
     );
@@ -22,27 +21,26 @@ const ScenarioThemeBotMessageContent = ({ content, fileType, hidden }) => {
   if (content.type === 'file') {
     if (!content[content.type]?.content) {
       return (
-        <div className="ss-message__content--bot-text" style={hiddenStyle} />
+        <div className={`ss-message__content--bot-text${hiddenClass}`} />
       );
     }
 
     return (
       <>
         {type === 'mp4' && (
-          <div className="ss-message__content ss-message__content--bot-file-video" style={hiddenStyle}>
+          <div className={`ss-message__content ss-message__content--bot-file-video${hiddenClass}`}>
             <video src={content[content.type]?.content} controls />
           </div>
         )}
         {(type === 'jpeg' || type === 'png' || type === 'jpg') && (
           <img
-            className="ss-message__content"
+            className={`ss-message__content ss-theme-file-img${hiddenClass}`}
             src={content[content.type]?.content}
             alt=""
-            style={{ width: '100%', maxWidth: '100%', height: 'auto', border: 'none', ...hiddenStyle }}
           />
         )}
         {type === 'pdf' && (
-          <div className="ss-message__content--bot-text" style={hiddenStyle}>
+          <div className={`ss-message__content--bot-text${hiddenClass}`}>
             {content[content.type]?.content}
           </div>
         )}
@@ -52,14 +50,14 @@ const ScenarioThemeBotMessageContent = ({ content, fileType, hidden }) => {
 
   if (content.type === 'email') {
     return (
-      <div className="ss-message__content--bot-text" style={hiddenStyle}>
+      <div className={`ss-message__content--bot-text${hiddenClass}`}>
         {content[content.type]?.content || ''}
       </div>
     );
   }
 
   if (content.type === 'api_linkage' || content.type === 'pause') {
-    return <div className="ss-message__content--bot-text" style={hiddenStyle} />;
+    return <div className={`ss-message__content--bot-text${hiddenClass}`} />;
   }
 
   if (
@@ -69,8 +67,7 @@ const ScenarioThemeBotMessageContent = ({ content, fileType, hidden }) => {
   ) {
     return (
       <div
-        className="ss-message__content--bot-text"
-        style={hiddenStyle}
+        className={`ss-message__content--bot-text${hiddenClass}`}
         dangerouslySetInnerHTML={{ __html: content[content.type]?.content || '' }}
       />
     );
@@ -78,7 +75,7 @@ const ScenarioThemeBotMessageContent = ({ content, fileType, hidden }) => {
 
   if (content.type === 'delay') {
     return (
-      <div className="ss-message__content--bot-text" style={hiddenStyle}>
+      <div className={`ss-message__content--bot-text${hiddenClass}`}>
         {`${content[content.type]?.content || 0} 秒`}
       </div>
     );
@@ -86,7 +83,7 @@ const ScenarioThemeBotMessageContent = ({ content, fileType, hidden }) => {
 
   if (content.type === 'clear_variable') {
     return (
-      <div className="ss-message__content--bot-text" style={hiddenStyle}>
+      <div className={`ss-message__content--bot-text${hiddenClass}`}>
         <ul>
           {(content[content.type]?.variables || []).map((item) => (
             <li key={item}>{item}</li>
@@ -98,7 +95,7 @@ const ScenarioThemeBotMessageContent = ({ content, fileType, hidden }) => {
 
   if (content.type === 'variable_set') {
     return (
-      <div className="ss-message__content--bot-text" style={hiddenStyle}>
+      <div className={`ss-message__content--bot-text${hiddenClass}`}>
         <ul>
           {(content[content.type]?.variables || []).map((item) => (
             <li key={`${item.key}-${item.value}`}>
@@ -113,8 +110,7 @@ const ScenarioThemeBotMessageContent = ({ content, fileType, hidden }) => {
   if (content.type === BOT_MESSAGE_TYPES.ORDER_CONFIRM) {
     return (
       <div
-        className="ss-message__content--bot-text"
-        style={hiddenStyle}
+        className={`ss-message__content--bot-text${hiddenClass}`}
         dangerouslySetInnerHTML={{
           __html: buildOrderConfirmPreviewHtml(content.order_confirm),
         }}

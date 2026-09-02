@@ -44,27 +44,26 @@ const OverviewCombineMessageItem = ({ message, index, bindings }) => {
               className="ss-combine-chat-detail ss-message__detail"
               onClick={() => handleSelectMessage(index, message.belong_to, lastContent?.type)}
             >
-              <div style={{ width: '100%' }}>
-                <div style={{ display: 'flex', paddingLeft: '10px', marginBottom: '6px' }}>
+              <div className="ss-overview-combine-body">
+                <div className="ss-overview-combine-titles">
                   <div className="ss-sub-title-message">結合メッセージ</div>
                   {message.message_name && (
                     <div
-                      className="ss-sub-title-message ss-truncation-text"
-                      style={{ backgroundColor: '#fff', maxWidth: '60%' }}
+                      className="ss-sub-title-message ss-truncation-text ss-overview-message-name"
                     >
                       {message.message_name}
                     </div>
                   )}
                 </div>
                 <div
-                  className={`ss-combine-chat-detail-content ss-combine-chat-detail-content-${index} ${message.hidden === true ? 'ss-message-hidden-style' : ''}`}
-                  style={message.message_name ? {} : { borderColor: 'red' }}
+                  className={`ss-combine-chat-detail-content ss-combine-chat-detail-content-${index} ${message.hidden === true ? 'ss-message-hidden-style' : ''} ${message.message_name ? '' : 'ss-input--invalid'}`}
                 >
                   <div className="ss-combine-message__wrapper">
                     {message.message_content.map((content, indexContent) => (
                       <div
                         key={content.id ?? indexContent}
-                        style={indexContent > 0 ? { marginTop: `${contentGap}px` } : undefined}
+                        className={indexContent > 0 ? 'ss-combine-overview-block--gapped' : undefined}
+                        style={indexContent > 0 ? { '--ss-combine-gap': `${contentGap}px` } : undefined}
                       >
                         <CombineOverviewBlockPreview
                           content={content}

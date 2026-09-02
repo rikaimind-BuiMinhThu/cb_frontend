@@ -1,7 +1,9 @@
-import React from "react";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { baseUserMessageComponentPropTypes } from './userMessageComponentPropTypes';
 import "v2/assets/css/bot/preview-chat-bot.css";
 import { MESSAGE_CONTENT_TYPES, REQUIRED_FIELD_LABEL } from "../Constants";
-import DatePickerCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/DatePickerCustom";
+import DatePickerCustom from "v2/components/BotMessages/DatePickerCustom";
 import moment from "moment-timezone";
 import { Select, Radio, Row, Col, Calendar as AntdCalendar } from "antd";
 import pickerLocaleJaJP from "antd/es/date-picker/locale/ja_JP";
@@ -958,6 +960,12 @@ const Calendar = ({ content, messageIndex, contentIndex, onChangeValue, errors, 
         )}
     </div>
   );
+};
+
+Calendar.propTypes = {
+  ...baseUserMessageComponentPropTypes,
+  locale: PropTypes.object,
+  cartSystem: PropTypes.string,
 };
 
 export default Calendar;

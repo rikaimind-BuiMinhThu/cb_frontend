@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import 'v2/assets/css/bot/preview-chat-bot.css';
 import { normalizeMessageBorderStyle } from 'v2/views/DesignSetting/utils/designThemeUtils';
-import UserMessageTailIcon from 'v2/views/BotElement/BotSetting/PreviewComponent/UserMessageTailIcon';
+import UserMessageTailIcon from 'v2/components/BotMessages/UserMessageTailIcon';
 import ThemePreviewShell from './ThemePreviewShell';
 import ThemeModalPreviewOverlay from './ThemeModalPreviewOverlay';
 import PreviewRegion from './PreviewRegion';

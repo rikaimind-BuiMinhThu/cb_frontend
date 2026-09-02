@@ -70,3 +70,9 @@
   margin: 0;
   margin-right: 15px;
 }
+
+.ss-carousel-arrow {
+  color: black;
+  font-size: 15px;
+  line-height: 1.5715;
+}

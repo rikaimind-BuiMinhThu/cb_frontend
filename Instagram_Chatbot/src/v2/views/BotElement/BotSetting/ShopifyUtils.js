@@ -9,13 +9,13 @@ const findLastScenarioUserResponseRow = (state, dataInputName) => {
   const rows = state.scenarioUserResponses;
   if (!Array.isArray(rows) || rows.length === 0) return undefined;
   const want = String(dataInputName);
-  for (let i = rows.length - 1; i >= 0; i--) {
-    const r = rows[i];
-    if (r == null) continue;
-    const key = r.data_input_name ?? r.dataInputName;
-    if (String(key) === want) return r;
-  }
-  return undefined;
+  const reversedRows = [...rows].reverse();
+  const match = reversedRows.find((row) => {
+    if (row == null) return false;
+    const key = row.data_input_name ?? row.dataInputName;
+    return String(key) === want;
+  });
+  return match;
 };
 
 const findCrossSellRadioInMessages = (state) => {
@@ -43,16 +43,19 @@ const resolveCrossSellOptionFromMessages = (state) => {
   const rb = findCrossSellRadioInMessages(state);
   if (!rb) return undefined;
   const items = crossSellOptionItems(rb);
-  let sel = rb.initial_selection;
-  if (sel == null || String(sel).trim() === "") {
-    sel = items[0]?.value ?? items[0]?.id;
-  }
-  if (sel == null || String(sel).trim() === "") return undefined;
+  const sel = (() => {
+    const initial = rb.initial_selection;
+    if (initial == null || String(initial).trim() === '') {
+      return items[0]?.value ?? items[0]?.id;
+    }
+    return initial;
+  })();
+  if (sel == null || String(sel).trim() === '') return undefined;
   const hit = items.find(
     (o) => String(o?.id) === String(sel) || String(o?.value) === String(sel)
   );
   const raw = hit?.value ?? hit?.id ?? sel;
-  const out = raw != null ? String(raw).trim() : "";
+  const out = raw != null ? String(raw).trim() : '';
   return out || undefined;
 };
 
@@ -128,19 +131,19 @@ const parsePullDownQuantity = (pd) => {
   const opts = cust.is_comment
     ? cust.options_with_comment || []
     : cust.options_without_comment || [];
-  let opt = opts.find(
-    (o) =>
-      String(o.id) === sel ||
-      String(o.value) === sel ||
-      String(o.text) === sel
-  );
-  if (!opt) {
+  const opt = (() => {
+    const directMatch = opts.find(
+      (option) =>
+        String(option.id) === sel
+        || String(option.value) === sel
+        || String(option.text) === sel
+    );
+    if (directMatch) return directMatch;
     const idx = parseInt(sel, 10);
-    if (!Number.isNaN(idx)) {
-      if (idx >= 1 && opts[idx - 1]) opt = opts[idx - 1];
-      if (!opt && opts[idx]) opt = opts[idx];
-    }
-  }
+    if (Number.isNaN(idx)) return undefined;
+    if (idx >= 1 && opts[idx - 1]) return opts[idx - 1];
+    return opts[idx];
+  })();
   const val = opt?.value ?? opt?.text;
   const n = Number.parseInt(String(val ?? "").trim(), 10);
   if (Number.isNaN(n)) return null;
@@ -209,21 +212,27 @@ const parseAddress = (zip_code_address, prefecturesList) => {
 };
 
 const parseName = (state) => {
-  let first = getResponseValue(state, "first_name") || "";
-  let last = getResponseValue(state, "last_name") || "";
-  for (const msg of state.messagesList || []) {
-    if (msg.belong_to !== "user") continue;
-    for (const c of msg.message_content || []) {
-      if (c.type !== "text_input" || !c.text_input?.text?.isSplitInput) continue;
-      const ti = c.text_input;
-      if (ti.save_input_content !== "user_name") continue;
-      const vl = String(ti.text.valueLeft ?? "").trim();
-      const vr = String(ti.text.valueRight ?? "").trim();
-      if (vl) first = vl || "";
-      if (vr) last = vr || "";
-    }
-  }
-  return { firstName: first, lastName: last };
+  const fromResponses = {
+    first: getResponseValue(state, 'first_name') || '',
+    last: getResponseValue(state, 'last_name') || '',
+  };
+
+  const fromMessages = (state.messagesList || []).reduce((acc, msg) => {
+    if (msg.belong_to !== 'user') return acc;
+    return (msg.message_content || []).reduce((nameAcc, content) => {
+      if (content.type !== 'text_input' || !content.text_input?.text?.isSplitInput) return nameAcc;
+      const textInput = content.text_input;
+      if (textInput.save_input_content !== 'user_name') return nameAcc;
+      const vl = String(textInput.text.valueLeft ?? '').trim();
+      const vr = String(textInput.text.valueRight ?? '').trim();
+      return {
+        first: vl || nameAcc.first,
+        last: vr || nameAcc.last,
+      };
+    }, acc);
+  }, fromResponses);
+
+  return { firstName: fromMessages.first, lastName: fromMessages.last };
 };
 
 const formatPhoneForCart = (state) => {
@@ -236,26 +245,30 @@ const formatPhoneForCart = (state) => {
     return pn.withHyphen ? `${a}-${b}-${c}` : `${a}${b}${c}`;
   };
 
-  let s = "";
-  for (const msg of state.messagesList || []) {
-    if (msg.belong_to !== "user") continue;
-    for (const c of msg.message_content || []) {
-      if (c.type !== "text_input" || c.text_input?.type !== "phone_number") continue;
-      const out = join(c.text_input.phone_number);
-      if (out) s = out;
-    }
-  }
-  if (s) return s;
+  const fromMessages = (state.messagesList || []).reduce((phone, msg) => {
+    if (msg.belong_to !== 'user') return phone;
+    return (msg.message_content || []).reduce((currentPhone, content) => {
+      if (content.type !== 'text_input' || content.text_input?.type !== 'phone_number') return currentPhone;
+      const out = join(content.text_input.phone_number);
+      return out || currentPhone;
+    }, phone);
+  }, '');
 
-  let p = state.objParam?.phone_number;
-  if (typeof p === "string" && p.trim().startsWith("{")) {
-    try {
-      p = JSON.parse(p);
-    } catch (e) {
-      p = null;
+  if (fromMessages) return fromMessages;
+
+  const parsedPhone = (() => {
+    const rawPhone = state.objParam?.phone_number;
+    if (typeof rawPhone === 'string' && rawPhone.trim().startsWith('{')) {
+      try {
+        return JSON.parse(rawPhone);
+      } catch (e) {
+        return null;
+      }
     }
-  }
-  return join(typeof p === "object" ? p : null) || "";
+    return typeof rawPhone === 'object' ? rawPhone : null;
+  })();
+
+  return join(parsedPhone) || '';
 };
 
 const jpFromIso = (v) => {
@@ -312,18 +325,17 @@ const normalizeSavedDeliveryDate = (raw) => {
   return t;
 };
 
-const findLastDeliveryCalendarFromMessages = (state) => {
-  let cal;
-  for (const msg of state.messagesList || []) {
-    if (msg.belong_to !== "user") continue;
-    for (const c of msg.message_content || []) {
-      if (c.type === "calendar" && c.calendar?.save_input_content === "delivery_date") {
-        cal = c.calendar;
+const findLastDeliveryCalendarFromMessages = (state) => (
+  (state.messagesList || []).reduce((lastCalendar, msg) => {
+    if (msg.belong_to !== 'user') return lastCalendar;
+    return (msg.message_content || []).reduce((currentCalendar, content) => {
+      if (content.type === 'calendar' && content.calendar?.save_input_content === 'delivery_date') {
+        return content.calendar;
       }
-    }
-  }
-  return cal;
-};
+      return currentCalendar;
+    }, lastCalendar);
+  }, undefined)
+);
 
 const formatSkipDeliveryDateLikeCalendarPreview = (state) => {
   const cal = findLastDeliveryCalendarFromMessages(state);
@@ -340,21 +352,20 @@ const formatDeliveryDateFromPullDown = (state) => {
   if (resolveSkipDeliveryDatetime(state)) {
     return formatSkipDeliveryDateLikeCalendarPreview(state);
   }
-  let last;
-  for (const msg of state.messagesList || []) {
-    if (msg.belong_to !== "user") continue;
-    for (const c of msg.message_content || []) {
-      let v;
-      if (c.type === "calendar" && c.calendar?.save_input_content === "delivery_date") {
-        v = deliveryJpFromCalendar(c.calendar);
-      }
-      if (!v && c.pull_down?.save_input_content === "delivery_date") {
-        v = deliveryJpFromPullDown(c.pull_down);
-      }
-      if (v) last = v;
-    }
-  }
-  return last || normalizeSavedDeliveryDate(getResponseValue(state, "delivery_date"));
+  const last = (state.messagesList || []).reduce((latestValue, msg) => {
+    if (msg.belong_to !== 'user') return latestValue;
+    return (msg.message_content || []).reduce((messageLatest, content) => {
+      const calendarValue = content.type === 'calendar' && content.calendar?.save_input_content === 'delivery_date'
+        ? deliveryJpFromCalendar(content.calendar)
+        : undefined;
+      const pullDownValue = !calendarValue && content.pull_down?.save_input_content === 'delivery_date'
+        ? deliveryJpFromPullDown(content.pull_down)
+        : undefined;
+      const resolved = calendarValue || pullDownValue;
+      return resolved || messageLatest;
+    }, latestValue);
+  }, undefined);
+  return last || normalizeSavedDeliveryDate(getResponseValue(state, 'delivery_date'));
 };
 
 const formatDeliveryTimeFromPullDown = (state) => {
@@ -382,8 +393,8 @@ const collectShopLinePropertyAttributesFromMessages = (state) => {
 
 const collectShopifyCartLinesFromMessages = (state) => {
   const qtyQueue = collectQuantityQueueFromState(state);
-  let qi = 0;
-  const nextQty = () => (qi < qtyQueue.length ? qtyQueue[qi++] : 1);
+  const qtyCursor = { index: 0 };
+  const nextQty = () => (qtyCursor.index < qtyQueue.length ? qtyQueue[qtyCursor.index++] : 1);
   const mainLineAttrs = collectShopLinePropertyAttributesFromMessages(state);
   const lines = [];
 
@@ -404,12 +415,9 @@ const collectShopifyCartLinesFromMessages = (state) => {
   }
 
   if (state.isUsedCrosssell) {
-    const configuredVariantId = String(state.productIdCrossSell || "").trim();
-    const choice = String(getResponseValue(state, "cross_sell_option") || "").trim();
-    let crossMerchandiseId = "";
-    if (choice === "1" && configuredVariantId) {
-      crossMerchandiseId = configuredVariantId;
-    }
+    const configuredVariantId = String(state.productIdCrossSell || '').trim();
+    const choice = String(getResponseValue(state, 'cross_sell_option') || '').trim();
+    const crossMerchandiseId = choice === '1' && configuredVariantId ? configuredVariantId : '';
     if (
       crossMerchandiseId &&
       !lines.some((l) => l.merchandiseId === crossMerchandiseId)
@@ -434,7 +442,7 @@ const toStorefrontCartLineInput = (line) => {
 };
 
 const createOrAddLinesCart = (state) => {
-  let linesWithAttrs = collectShopifyCartLinesFromMessages(state);
+  const linesWithAttrs = collectShopifyCartLinesFromMessages(state);
   const email = getResponseValue(state, "email");
   const zip_code_address = getResponseValue(state, "zip_code_address");
 

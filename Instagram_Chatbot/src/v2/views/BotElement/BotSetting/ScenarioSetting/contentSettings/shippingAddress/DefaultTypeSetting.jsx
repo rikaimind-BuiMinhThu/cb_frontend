@@ -117,9 +117,9 @@ const DefaultTypeSetting = (props) => {
                                                             <div className="ss-user-setting-payment-radio-times-icons">
                                                                 <MDBIcon fas icon="times-circle"
                                                                     onClick={() => {
-                                                                        let arrMessage = [...dataMessages[indexMessageSelect].message_content[indexContent][content.type].radio_contents];
-                                                                        let startArr = arrMessage.slice(0, indexPaymentRadio);
-                                                                        let lastArr = arrMessage.slice(indexPaymentRadio + 1, arrMessage.length);
+                                                                        const arrMessage = [...dataMessages[indexMessageSelect].message_content[indexContent][content.type].radio_contents];
+                                                                        const startArr = arrMessage.slice(0, indexPaymentRadio);
+                                                                        const lastArr = arrMessage.slice(indexPaymentRadio + 1, arrMessage.length);
                                                                         dataMessages[indexMessageSelect].message_content[indexContent][content.type].radio_contents = [...startArr, ...lastArr];
                                                                         setDataMessages([...dataMessages]);
                                                                     }} />

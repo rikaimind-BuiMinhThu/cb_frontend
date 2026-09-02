@@ -1,6 +1,14 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Input } from 'antd';
 import { AdminActionButton, AdminFormRow } from 'v2/components/AdminShell';
+import {
+  NEW_VARIABLE_TITLE,
+  VARIABLE_NAME_LABEL,
+  DEFAULT_VALUE_LABEL,
+  PLACEHOLDER_NAME,
+  PLACEHOLDER_VALUE,
+} from './constants';
 
 const VariableCreateRow = ({
   values,
@@ -14,11 +22,11 @@ const VariableCreateRow = ({
 
   return (
     <div className="admin-variable-new-row">
-      <p className="admin-variable-new-row__title">新しい変数を追加</p>
+      <p className="admin-variable-new-row__title">{NEW_VARIABLE_TITLE}</p>
       <div className="admin-variable-new-row__fields">
         <div className="admin-variable-new-row__field">
           <AdminFormRow
-            label="変数名"
+            label={VARIABLE_NAME_LABEL}
             required
             htmlFor="new-variable-name"
             error={nameError}
@@ -27,7 +35,7 @@ const VariableCreateRow = ({
             <Input
               id="new-variable-name"
               className="admin-variable-input"
-              placeholder="変数名をご入力ください"
+              placeholder={PLACEHOLDER_NAME}
               value={variableName}
               status={nameError ? 'error' : undefined}
               onChange={(event) => onChange('variable_name', event.target.value)}
@@ -36,14 +44,14 @@ const VariableCreateRow = ({
         </div>
         <div className="admin-variable-new-row__field">
           <AdminFormRow
-            label="デフォルト値"
+            label={DEFAULT_VALUE_LABEL}
             htmlFor="new-variable-default"
             layout="stacked"
           >
             <Input
               id="new-variable-default"
               className="admin-variable-input"
-              placeholder="変数値をご入力ください"
+              placeholder={PLACEHOLDER_VALUE}
               value={defaultValue}
               onChange={(event) => onChange('default_value', event.target.value)}
             />
@@ -56,6 +64,18 @@ const VariableCreateRow = ({
       </div>
     </div>
   );
+};
+
+VariableCreateRow.propTypes = {
+  values: PropTypes.shape({
+    variable_name: PropTypes.string,
+    default_value: PropTypes.string,
+  }).isRequired,
+  nameError: PropTypes.string,
+  creating: PropTypes.bool,
+  onChange: PropTypes.func.isRequired,
+  onSave: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
 };
 
 export default VariableCreateRow;

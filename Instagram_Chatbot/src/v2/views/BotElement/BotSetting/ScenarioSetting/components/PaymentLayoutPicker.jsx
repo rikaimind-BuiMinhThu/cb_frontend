@@ -27,7 +27,7 @@ const OPTIONS = [
 ];
 
 const PaymentLayoutPicker = ({ layout, onChange }) => (
-  <div className="payment-layout-picker" style={{ display: 'flex', gap: '16px' }}>
+  <div className="payment-layout-picker">
     {OPTIONS.map(({ value, label, Sketch }) => (
       <div
         key={value}
@@ -36,18 +36,9 @@ const PaymentLayoutPicker = ({ layout, onChange }) => (
         className={`payment-layout-option${layout === value ? ' active' : ''}`}
         onClick={() => onChange(value)}
         onKeyDown={(e) => e.key === 'Enter' && onChange(value)}
-        style={{
-          border: layout === value ? '2px solid #4DBEB6' : '1px solid #ddd',
-          borderRadius: '8px',
-          padding: '12px',
-          cursor: 'pointer',
-          textAlign: 'center',
-          minWidth: '100px',
-          backgroundColor: layout === value ? '#f0faf9' : '#fff',
-        }}
       >
         <Sketch />
-        <div style={{ marginTop: '8px', fontSize: '13px' }}>{label}</div>
+        <div className="payment-layout-option__label">{label}</div>
       </div>
     ))}
   </div>

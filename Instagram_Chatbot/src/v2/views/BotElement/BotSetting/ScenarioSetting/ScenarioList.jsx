@@ -1,13 +1,42 @@
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Input, Modal, Radio, Select, Space, Tag, message } from 'antd';
 import api from 'v2/api/api-management';
 import Cookies from 'js-cookie';
 import moment from 'moment';
 import { getAdminRoutePath } from 'v2/variables/constants';
+import { BOT_ID_COOKIE_KEY, SCENARIO_ID_COOKIE_KEY } from 'v2/api/constants';
 import { AdminPage, AdminTable, AdminConfirmModal, AdminActionButton, AdminFormRow, useAdminHeaderActions } from 'v2/components/AdminShell';
+import {
+  SCENARIO_CREATE_SUCCESS,
+  SCENARIO_DUPLICATE_SUCCESS,
+  SCENARIO_DELETE_SUCCESS,
+  SCENARIO_SAVE_SUCCESS,
+  SCENARIO_CREATE_TITLE,
+  SCENARIO_NAME_LABEL,
+  SCENARIO_NAME_REQUIRED,
+  SCENARIO_NAME_MAX_LENGTH,
+  SCENARIO_NAME_HINT,
+  SCENARIO_TEMPLATE_LABEL,
+  SCENARIO_TEMPLATE_PLACEHOLDER,
+  SCENARIO_CREATE_BUTTON,
+  SCENARIO_CANCEL_BUTTON,
+  SCENARIO_DELETE_CONFIRM,
+  SCENARIO_CREATE_ACTION,
+  SCENARIO_STATUS_ACTIVE,
+  SCENARIO_STATUS_INACTIVE,
+  SCENARIO_COLUMN_STATUS,
+  SCENARIO_COLUMN_NAME,
+  SCENARIO_COLUMN_UPDATED,
+  SCENARIO_COLUMN_ACTION,
+  SCENARIO_NAV_DELAY_MS,
+  SCENARIO_TEMPLATES_API,
+  SCENARIO_LIST_API,
+  SCENARIO_SELECTED_API,
+  SCENARIO_SETTING_ROUTE,
+} from './constants';
 
-function ScenarioList() {
+const ScenarioList = () => {
   const history = useHistory();
   const [isOpenCreateScenario, setIsOpenCreateScenario] = useState(false);
   const [scenarioSelectId, setScenarioSelectId] = useState('');
@@ -27,7 +56,7 @@ function ScenarioList() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setBotId(Cookies.get('bot_id'));
+    setBotId(Cookies.get(BOT_ID_COOKIE_KEY));
     window.scrollTo(0, 0);
   }, []);
 
@@ -38,7 +67,7 @@ function ScenarioList() {
 
   const getListTemplate = () => {
     api
-      .get('/api/v1/managements/scenario_templates')
+      .get(SCENARIO_TEMPLATES_API)
       .then((res) => {
         setListTemplate(res?.data?.data || []);
       })
@@ -48,7 +77,7 @@ function ScenarioList() {
   const getListScenario = (pgIndex) => {
     setLoading(true);
     api
-      .get(`/api/v1/managements/chatbots/${Cookies.get('bot_id')}/scenarios?page=${pgIndex}`)
+      .get(`${SCENARIO_LIST_API}/${Cookies.get(BOT_ID_COOKIE_KEY)}/scenarios?page=${pgIndex}`)
       .then((res) => {
         setTotal(res?.data?.total || 0);
         setScenarioSelected(res.data.scenario_selected);
@@ -61,34 +90,38 @@ function ScenarioList() {
 
   const checkInputScenarioName = (scenarioName) => {
     if (scenarioName.length === 0) {
-      setNameError('シナリオ名は、必ず指定してください。');
+      setNameError(SCENARIO_NAME_REQUIRED);
       return false;
     }
     if (scenarioName.length > 50) {
-      setNameError('シナリオ名は50文字以下にしてください。');
+      setNameError(SCENARIO_NAME_MAX_LENGTH);
       return false;
     }
     setNameError('');
     return true;
   };
 
+  const navigateToScenarioSetting = () => {
+    history.push(getAdminRoutePath(SCENARIO_SETTING_ROUTE));
+  };
+
   const createScenario = () => {
     if (!checkInputScenarioName(newScenarioName)) return;
     setCreating(true);
     api
-      .post(`/api/v1/managements/chatbots/${botId}/scenarios`, {
+      .post(`${SCENARIO_LIST_API}/${botId}/scenarios`, {
         scenario: { name: newScenarioName },
         template_id: selectedTemplateId || undefined,
       })
       .then((res) => {
         if (res.data.code === 1) {
-          message.success('正常に追加されました！');
-          Cookies.set('scenario_id', res.data.data.id);
+          message.success(SCENARIO_CREATE_SUCCESS);
+          Cookies.set(SCENARIO_ID_COOKIE_KEY, res.data.data.id);
           setIsOpenCreateScenario(false);
           setNewScenarioName('');
           setNameError('');
           setSelectedTemplateId(undefined);
-          setTimeout(() => document.getElementById('to_scenario')?.click(), 1500);
+          setTimeout(navigateToScenarioSetting, SCENARIO_NAV_DELAY_MS);
         } else if (res.data.code === 2) {
           message.warning(res.data.message);
         }
@@ -100,9 +133,9 @@ function ScenarioList() {
 
   const handleDuplicationScenario = (id) => {
     api
-      .post(`/api/v1/managements/chatbots/${botId}/scenarios/${id}/duplicate`)
+      .post(`${SCENARIO_LIST_API}/${botId}/scenarios/${id}/duplicate`)
       .then((res) => {
-        if (res.data.code === 1) message.success('正常に複製されました！');
+        if (res.data.code === 1) message.success(SCENARIO_DUPLICATE_SUCCESS);
         else if (res.data.code === 2) message.warning(res.data.message);
         getListScenario(page);
       })
@@ -117,9 +150,9 @@ function ScenarioList() {
   const deleteScenario = () => {
     setDeleting(true);
     api
-      .delete(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioSelectId}`)
+      .delete(`${SCENARIO_LIST_API}/${botId}/scenarios/${scenarioSelectId}`)
       .then((res) => {
-        if (res.data.code === 1) message.success('正常に削除されました！');
+        if (res.data.code === 1) message.success(SCENARIO_DELETE_SUCCESS);
         else if (res.data.code === 2) message.warning(res.data.message);
         getListScenario(page);
         setIsOpenDeleteScenario(false);
@@ -129,26 +162,26 @@ function ScenarioList() {
 
   const handleSaveSelectScenario = () => {
     api
-      .post(`/api/v1/managements/chatbots/${botId}/scenario_selected`, { scenario_selected: scenarioSelected })
+      .post(`${SCENARIO_LIST_API}/${botId}${SCENARIO_SELECTED_API}`, { scenario_selected: scenarioSelected })
       .then((res) => {
-        if (res.data.code === 1) message.success('正常に保存されました！');
+        if (res.data.code === 1) message.success(SCENARIO_SAVE_SUCCESS);
         else if (res.data.code === 2) message.warning(res.data.message);
         getListScenario(page);
       });
   };
 
   const onClickPreview = (id) => {
-    Cookies.set('scenario_id', id);
+    Cookies.set(SCENARIO_ID_COOKIE_KEY, id);
     history.push(getAdminRoutePath(`/demo-bot/${id}`));
   };
 
   const onclickEditScenario = (id) => {
-    Cookies.set('scenario_id', id);
+    Cookies.set(SCENARIO_ID_COOKIE_KEY, id);
   };
 
   useAdminHeaderActions(
     <Space>
-      <AdminActionButton action="create" label="シナリオ作成" onClick={() => setIsOpenCreateScenario(true)} />
+      <AdminActionButton action="create" label={SCENARIO_CREATE_ACTION} onClick={() => setIsOpenCreateScenario(true)} />
       <AdminActionButton action="save" onClick={handleSaveSelectScenario} />
     </Space>
   );
@@ -165,31 +198,36 @@ function ScenarioList() {
       ),
     },
     {
-      title: 'ステータス',
+      title: SCENARIO_COLUMN_STATUS,
       width: 90,
       render: (_, scenario) => (
         <Tag color={scenarioSelectedClone === scenario.id ? 'green' : 'default'}>
-          {scenarioSelectedClone === scenario.id ? '有効' : '無効'}
+          {scenarioSelectedClone === scenario.id ? SCENARIO_STATUS_ACTIVE : SCENARIO_STATUS_INACTIVE}
         </Tag>
       ),
     },
     {
-      title: 'シナリオ名',
+      title: SCENARIO_COLUMN_NAME,
       dataIndex: 'name',
     },
     {
-      title: '最後の更新日時',
+      title: SCENARIO_COLUMN_UPDATED,
       dataIndex: 'updated_at',
       render: (value) => moment(value).format('YYYY/MM/DD'),
     },
     {
-      title: 'アクション',
+      title: SCENARIO_COLUMN_ACTION,
       width: 220,
       render: (_, scenario) => (
         <Space className="admin-table-actions">
-          <Link to={getAdminRoutePath('/scenario-setting')}>
-            <AdminActionButton action="edit" iconOnly onClick={() => onclickEditScenario(scenario.id)} />
-          </Link>
+          <AdminActionButton
+            action="edit"
+            iconOnly
+            onClick={() => {
+              onclickEditScenario(scenario.id);
+              history.push(getAdminRoutePath(SCENARIO_SETTING_ROUTE));
+            }}
+          />
           <AdminActionButton action="preview" iconOnly onClick={() => onClickPreview(scenario.id)} />
           <AdminActionButton action="duplicate" iconOnly onClick={() => handleDuplicationScenario(scenario.id)} />
           {scenarioSelectedClone !== scenario.id ? (
@@ -223,7 +261,7 @@ function ScenarioList() {
       </AdminPage>
 
       <Modal
-        title="シナリオ作成"
+        title={SCENARIO_CREATE_TITLE}
         open={isOpenCreateScenario}
         onOk={createScenario}
         onCancel={() => {
@@ -232,16 +270,16 @@ function ScenarioList() {
           setNameError('');
           setSelectedTemplateId(undefined);
         }}
-        okText="作成"
-        cancelText="キャンセル"
+        okText={SCENARIO_CREATE_BUTTON}
+        cancelText={SCENARIO_CANCEL_BUTTON}
         confirmLoading={creating}
       >
         <AdminFormRow
-          label="シナリオ名"
+          label={SCENARIO_NAME_LABEL}
           htmlFor="new-scenario-name"
           required
           error={nameError}
-          hint="※シナリオに任意の名称をつけることができます。"
+          hint={SCENARIO_NAME_HINT}
         >
           <Input
             id="new-scenario-name"
@@ -252,13 +290,13 @@ function ScenarioList() {
             }}
           />
         </AdminFormRow>
-        <AdminFormRow label="テンプレート（任意）">
+        <AdminFormRow label={SCENARIO_TEMPLATE_LABEL}>
           <Select
             allowClear
-            placeholder="テンプレートなし"
+            placeholder={SCENARIO_TEMPLATE_PLACEHOLDER}
             value={selectedTemplateId}
             onChange={(value) => setSelectedTemplateId(value)}
-            style={{ width: '100%' }}
+            className="admin-field-full-width"
             options={listTemplate.map((template) => ({
               value: template.id,
               label: template.name,
@@ -269,20 +307,14 @@ function ScenarioList() {
 
       <AdminConfirmModal
         open={isOpenDeleteScenario}
-        message="本当に削除しますか。"
+        message={SCENARIO_DELETE_CONFIRM}
         onOk={deleteScenario}
         onCancel={() => setIsOpenDeleteScenario(false)}
         danger
         loading={deleting}
       />
-
-      <Link to={getAdminRoutePath('/scenario-setting')}>
-        <button id="to_scenario" style={{ display: 'none' }} type="button">
-          ScSetting
-        </button>
-      </Link>
     </>
   );
-}
+};
 
 export default ScenarioList;

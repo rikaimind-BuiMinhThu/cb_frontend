@@ -53,3 +53,37 @@
   background: #919191;
   border-radius: 5px;
 }
+
+.chat-log-bot-text {
+  overflow-wrap: break-word;
+  height: auto;
+  overflow-y: hidden;
+  border: none;
+  border-radius: 20px;
+  background-color: var(--bot-message-bg);
+  color: var(--bot-message-color);
+}
+
+.chat-log-bot-file-image {
+  width: 100%;
+}
+
+.chat-log-bot-download {
+  color: #089be5;
+  font-size: 17px;
+  display: block;
+  height: 50px;
+  cursor: pointer;
+}
+
+.chat-log-bot-video {
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
+}
+
+.chat-log-bot-typing {
+  background-color: #ebf7ff;
+  height: 40px;
+  border-radius: 10px;
+}

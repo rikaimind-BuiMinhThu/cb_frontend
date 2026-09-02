@@ -99,9 +99,9 @@ import {
 const isPreviewMobile = (deviceMode) => deviceMode === 'sp';
 
 savePrevOpenStatus("0");
-var url = new URL(window.location.href);
-let params = new URLSearchParams(url.search);
-let isLoggedIn = params.get('isLoggedIn') === "true";
+const url = new URL(window.location.href);
+const params = new URLSearchParams(url.search);
+const isLoggedIn = params.get('isLoggedIn') === 'true';
 const previewInitialState = createPreviewInitialState("fukushashiki", {
   params,
   includeOpenAnimation: false,
@@ -240,8 +240,7 @@ const ScenarioPreviewFukushashiki = ({
           payload: actionData,
         });
       case CHATBOT_ACTIONS.CRAWL_DATA:
-        let receiveOptionData = {};
-        receiveOptionData[actionData.searchAddress] = actionData.result;
+        const receiveOptionData = { [actionData.searchAddress]: actionData.result };
 
         return dispatch({
           type: PREVIEW_ACTIONS.ADD_LP_OPTION_DATA,
@@ -690,7 +689,7 @@ const ScenarioPreviewFukushashiki = ({
     const designSetting = res.data.design_settings;
     const chatbot = res.data.chatbot;
     const conversation = res.data.data?.conversation;
-    let newState = {
+    const newState = {
       ...state,
       botInfor: getBotInforFromPreviewResponse(res),
       objParam: {},
@@ -877,14 +876,10 @@ const ScenarioPreviewFukushashiki = ({
   };
 
   const onOpenZipCodePopup = (isOpen, contentIndex, messageIndex) => {
-    let newState = {};
-
-    if (contentIndex !== undefined) {
-      newState.zipcodeContentIndex = contentIndex;
-    }
-    if (messageIndex !== undefined) {
-      newState.zipcodeIndex = messageIndex;
-    }
+    const baseState = {
+      ...(contentIndex !== undefined ? { zipcodeContentIndex: contentIndex } : {}),
+      ...(messageIndex !== undefined ? { zipcodeIndex: messageIndex } : {}),
+    };
 
     if (isOpen) {
       changeElementAttributeById([
@@ -892,16 +887,15 @@ const ScenarioPreviewFukushashiki = ({
         { id: "sp-popup-zip-code-address", style: { display: "block" }}
       ]);
 
-      newState = {
-        ...newState,
-        prefectures: null,
-        cities: null,
-        towns: null,
-        zipcode: null,
-      };
       dispatch({
         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-        payload: { ...newState }
+        payload: {
+          ...baseState,
+          prefectures: null,
+          cities: null,
+          towns: null,
+          zipcode: null,
+        },
       });
       return;
     }
@@ -913,8 +907,7 @@ const ScenarioPreviewFukushashiki = ({
   };
 
   const onChangeErrors = (field, value) => {
-    let newErrors = { ...state.errors };
-    newErrors[field] = value;
+    const newErrors = { ...state.errors, [field]: value };
     dispatch({ type: PREVIEW_ACTIONS.SET_ERRORS, payload: { newErrors } });
   };
 
@@ -975,23 +968,18 @@ const ScenarioPreviewFukushashiki = ({
     const isBtnUpdateMode = state.isUseBtnUpdateTracking && !message.buttonName && !isUpdate;
     const msgState = msgUpdateState[message.id]; 
 
-    let btnText = message.buttonName;
-    if (!btnText) {
-      if (isBtnUpdateMode && msgState === 'clicked') {
-        btnText = "OK";
-      } else {
-        btnText = isUpdate ? "次へ" : "更新";
-      }
-    }
+    const btnText = message.buttonName
+      || (isBtnUpdateMode && msgState === 'clicked'
+        ? 'OK'
+        : (isUpdate ? '次へ' : '更新'));
     const hasBtnUpdateClass = isBtnUpdateMode && msgState !== 'editing';
     const isEditorDisplayOnly = editorPreview;
+    const actionBtnBg = state.botInfor?.main_color || state.botInfor?.main_color_other;
     return (
-      <div className="sp-user-message-button-action" style={{ display: isDisplayBtnNext ? "flex" : "none" }}>
+      <div className={`sp-user-message-button-action${isDisplayBtnNext ? '' : ' sp-user-message-button-action--hidden'}`}>
         <CustomButton
           disabled={isEditorDisplayOnly || (state.submitErrorMessage?.length > 0 ? false : message.disabled)}
-          style={{
-            backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
-          }}
+          style={actionBtnBg ? { '--ss-action-btn-bg': actionBtnBg } : undefined}
           className={`ss-user-message__action-btn${hasBtnUpdateClass ? " btn-update" : ""}`}
           onClick={isEditorDisplayOnly ? undefined : () => {
             onClickNext(messageIndex, message);

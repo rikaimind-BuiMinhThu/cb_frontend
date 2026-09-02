@@ -1,4 +1,6 @@
-import React from "react";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { baseUserMessageComponentPropTypes } from './userMessageComponentPropTypes';
 import "v2/assets/css/bot/preview-chat-bot.css";
 import { MESSAGE_CONTENT_TYPES } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 import CommonAddress from "./CommonAddress";
@@ -21,6 +23,15 @@ const ZipCodeAddress = ({ content, prefecturesList, messageIndexRender, messageI
       onOpen={onOpen}
     />
   );
+};
+
+ZipCodeAddress.propTypes = {
+  ...baseUserMessageComponentPropTypes,
+  prefecturesList: PropTypes.array,
+  messageIndexRender: PropTypes.number,
+  messageContent: PropTypes.array,
+  onChangeErrors: PropTypes.func,
+  onOpen: PropTypes.func,
 };
 
 export default ZipCodeAddress;

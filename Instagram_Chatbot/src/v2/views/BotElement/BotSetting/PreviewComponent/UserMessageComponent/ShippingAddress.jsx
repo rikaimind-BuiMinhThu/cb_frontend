@@ -1,10 +1,12 @@
-import React from "react";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { baseUserMessageComponentPropTypes } from './userMessageComponentPropTypes';
 import "v2/assets/css/bot/preview-chat-bot.css";
 import { EMPTY_INPUT_VALUE, MESSAGE_CONTENT_TYPES, REQUIRED_FIELD_LABEL } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 import { Radio } from "antd";
 import CommonAddress from "./CommonAddress";
 
-import InputCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
+import InputCustom from "v2/components/BotMessages/InputCustom";
 
 const SHIPPING_NAME_LABEL = "名前";
 const SHIPPING_KANA_NAME_LABEL = "フリガナ";
@@ -198,6 +200,15 @@ const ShippingAddress = ({ content, prefecturesList, messageIndexRender, message
       {renderCardLinkSetting()}
     </div>
   );
+};
+
+ShippingAddress.propTypes = {
+  ...baseUserMessageComponentPropTypes,
+  prefecturesList: PropTypes.array,
+  messageIndexRender: PropTypes.number,
+  messageContent: PropTypes.array,
+  onChangeErrors: PropTypes.func,
+  onOpen: PropTypes.func,
 };
 
 export default ShippingAddress;

@@ -109,3 +109,15 @@
   margin-bottom: 8px;
   color: #111827;
 }
+
+.ss-order-confirm-retry-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.ss-order-confirm-retry-row__label {
+  font-size: 12px;
+  margin-bottom: 4px;
+  display: block;
+}

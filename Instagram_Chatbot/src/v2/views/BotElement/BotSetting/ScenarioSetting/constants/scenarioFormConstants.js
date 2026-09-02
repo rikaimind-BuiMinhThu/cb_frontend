@@ -11,55 +11,43 @@ import {
   TIMER_TYPES,
 } from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants';
 
-const buildHourFixedOptions = () => {
-  const options = [];
-  for (let i = 0; i <= 23; i++) {
-    options.push({ key: i + '', value: i + '' });
-  }
-  return options;
-};
+const buildHourFixedOptions = () => (
+  Array.from({ length: 24 }, (_, i) => ({ key: `${i}`, value: `${i}` }))
+);
 
-const buildMinutesFixedOptions = () => {
-  const options = [];
-  for (let i = 0; i <= 59; i++) {
-    options.push({ key: i + '', value: i + '' });
-  }
-  return options;
-};
+const buildMinutesFixedOptions = () => (
+  Array.from({ length: 60 }, (_, i) => ({ key: `${i}`, value: `${i}` }))
+);
 
-const buildYearFixedOptions = () => {
-  const options = [];
-  for (let i = 1935; i <= 2072; i++) {
-    options.push({ key: i + '', value: i + '' });
-  }
-  return options;
-};
+const buildYearFixedOptions = () => (
+  Array.from({ length: 2072 - 1935 + 1 }, (_, offset) => {
+    const i = 1935 + offset;
+    return { key: `${i}`, value: `${i}` };
+  })
+);
 
-const buildMonthFixedOptions = () => {
-  const options = [];
-  for (let i = 1; i <= 12; i++) {
-    const value = i < 10 ? `0${i}` : i + '';
-    options.push({ key: value, value });
-  }
-  return options;
-};
+const buildMonthFixedOptions = () => (
+  Array.from({ length: 12 }, (_, offset) => {
+    const i = offset + 1;
+    const value = i < 10 ? `0${i}` : `${i}`;
+    return { key: value, value };
+  })
+);
 
-const buildMaxRangSliderOptions = () => {
-  const options = [];
-  for (let i = 2; i <= 10; i++) {
-    options.push({ key: i + '', value: i + '' });
-  }
-  return options;
-};
+const buildMaxRangSliderOptions = () => (
+  Array.from({ length: 9 }, (_, offset) => {
+    const i = offset + 2;
+    return { key: `${i}`, value: `${i}` };
+  })
+);
 
-const buildDayFixedOptions = () => {
-  const options = [];
-  for (let i = 1; i <= 31; i++) {
-    const value = i < 10 ? `0${i}` : i + '';
-    options.push({ key: value, value });
-  }
-  return options;
-};
+const buildDayFixedOptions = () => (
+  Array.from({ length: 31 }, (_, offset) => {
+    const i = offset + 1;
+    const value = i < 10 ? `0${i}` : `${i}`;
+    return { key: value, value };
+  })
+);
 
 const buildPaymentMethodOptions = () => [
   { key: 'visa', value: <img src={visa} alt="visa" /> },

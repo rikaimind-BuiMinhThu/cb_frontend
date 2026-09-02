@@ -52,27 +52,25 @@ const PreviewFaqReducer = (state, action) => {
     case PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES:
       if (action.payload.fromCallback) return state;
 
-      let updatedState = {
+      const renderBaseState = {
         messagesList: _.cloneDeep(state.messagesList),
         variables: _.cloneDeep(state.variables),
       };
-
-      for (let i = action.payload.startIndex; i < action.payload.endIndex; i++) {
-        if (isBotMessage(updatedState.messagesList[i])) {
-          const result = processForBotMessage(updatedState.messagesList, i, updatedState, false, false);
-          updatedState = {
-            ...updatedState,
-            ...result
-          };
-        }
-      }
+      const updatedState = Array.from(
+        { length: action.payload.endIndex - action.payload.startIndex },
+        (_, offset) => action.payload.startIndex + offset,
+      ).reduce((acc, index) => {
+        if (!isBotMessage(acc.messagesList[index])) return acc;
+        return {
+          ...acc,
+          ...processForBotMessage(acc.messagesList, index, acc, false, false),
+        };
+      }, renderBaseState);
 
       const currentMsg = updatedState.messagesList[action.payload.endIndex - 1];
-      let isNotAutoScroll = state.isNotAutoScroll || false;
-
-      if (currentMsg?.message_content?.[0]?.type === MESSAGE_CONTENT_TYPES.IMAGE) {
-        isNotAutoScroll = currentMsg?.message_content?.[0]?.image?.is_not_auto_scroll || false;
-      }
+      const isNotAutoScroll = currentMsg?.message_content?.[0]?.type === MESSAGE_CONTENT_TYPES.IMAGE
+        ? (currentMsg?.message_content?.[0]?.image?.is_not_auto_scroll || false)
+        : (state.isNotAutoScroll || false);
 
       return {
         ...state,
@@ -87,33 +85,35 @@ const PreviewFaqReducer = (state, action) => {
       // In here, default is validation ok
       const { clickedMsgIndex } = action.payload;
       const isUpdateClicked = clickedMsgIndex < state.renderMessagesList.length - 1;
-      let newState = {
-        errors: {},
-        originalMessagesList: _.cloneDeep(state.originalMessagesList),
-        messagesList: _.cloneDeep(state.messagesList),
-        originalVariables: _.cloneDeep(state.originalVariables),
-        variables: _.cloneDeep(state.variables),
-        nextStopMsgIndex: state.nextStopMsgIndex,
-        currentMsgIndex: state.currentMsgIndex,
-        loopCount: state.loopCount,
+      const clickAcc = {
+        state: {
+          errors: {},
+          originalMessagesList: _.cloneDeep(state.originalMessagesList),
+          messagesList: _.cloneDeep(state.messagesList),
+          originalVariables: _.cloneDeep(state.originalVariables),
+          variables: _.cloneDeep(state.variables),
+          nextStopMsgIndex: state.nextStopMsgIndex,
+          currentMsgIndex: state.currentMsgIndex,
+          loopCount: state.loopCount,
+        },
       };
 
       if (state.conversionStatus === CONVERSTION_RESPONSE_STATUS.FINISH && isUpdateClicked) {
-        newState.conversionStatus = undefined;
-        newState.isProcessing = false;
+        clickAcc.state.conversionStatus = undefined;
+        clickAcc.state.isProcessing = false;
       }
 
-      newState = processMessagesAfterClickNext(newState, state, clickedMsgIndex);
+      clickAcc.state = processMessagesAfterClickNext(clickAcc.state, state, clickedMsgIndex);
       
-      // Calculate next stop message index
-      let nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex)) + 1;
+      const nextStopMsgIndexInitial = clickAcc.state.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex)) + 1;
 
-      if (nextStopMsgIndex < newState.currentMsgIndex) {
-        // Add more one messageList to messsageList from root message to last message
-        newState = appendRootMessagesToMessagesList(newState);
-        newState = processMessagesAfterClickNext(newState, state, clickedMsgIndex);
-        nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex)) + 1;
+      if (nextStopMsgIndexInitial < clickAcc.state.currentMsgIndex) {
+        clickAcc.state = appendRootMessagesToMessagesList(clickAcc.state);
+        clickAcc.state = processMessagesAfterClickNext(clickAcc.state, state, clickedMsgIndex);
       }
+
+      const newState = clickAcc.state;
+      const nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex)) + 1;
 
       newState.renderMode = (isUpdateClicked && state.isUsedPastMessageLoaded) ? RENDER_MODES.LAST : RENDER_MODES.NEXT;
       if (newState.renderMode === RENDER_MODES.LAST) {
@@ -220,7 +220,7 @@ const PreviewFaqReducer = (state, action) => {
       const isEditorPreview = Boolean(action.payload.isEditorPreview);
       const { apiColorKey, mainColorHex } = resolveMainColorContext(chatbot);
 
-      let newState = {
+      const newState = {
         ...state,
         botInfor: botInfor,
         objParam: isEditorPreview ? state.objParam : {},
@@ -353,40 +353,39 @@ const PreviewFaqReducer = (state, action) => {
 
       const conditionParams = buildConditionParams(newState);
       if (!isEditorPreview) {
-        for (let i = 0; i < newState.messagesList.length; i++) {
-          const result = checkMessageCondition(newState.messagesList[i], conditionParams);
-          newState.messagesList[i].hidden = !result;
-        }
+        newState.messagesList.forEach((message, index) => {
+          const result = checkMessageCondition(message, conditionParams);
+          newState.messagesList[index].hidden = !result;
+        });
       }
 
       return { ...state, ...newState };
     }
     case PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SESSION_STORAGE: {
-      let newState = {...action.payload.savedState};
+      const newState = {...action.payload.savedState};
 
       if (action.payload.isUsingAmazonPay) {
-        // Support only for amazon pay and subscstore cart system (torizen san)
         const conditionParams = buildConditionParams(newState);
-        for (let i = 0; i < newState.messagesList.length; i++) {
-          const clickedMsgLoopNumber = Math.floor(i / newState.originalMessagesList.length);
-          const result = checkFaqMessageCondition(newState.messagesList[i], conditionParams, clickedMsgLoopNumber);
-          newState.messagesList[i].hidden = !result;
-        }
+        newState.messagesList.forEach((message, index) => {
+          const clickedMsgLoopNumber = Math.floor(index / newState.originalMessagesList.length);
+          const result = checkFaqMessageCondition(message, conditionParams, clickedMsgLoopNumber);
+          newState.messagesList[index].hidden = !result;
+        });
       }
 
       if (action.payload.isLoggedIn) {
         newState.messagesList.forEach((x) => x.hidden = x.not_display_when_logged_in);
       }
 
-      for (let i = 0; i < newState.nextStopMsgIndex && i < newState.messagesList.length; i++) {
-        if (isBotMessage(newState.messagesList[i])) {
-          const result = processForBotMessage(newState.messagesList, i, newState, false, false);
-          newState = {
-            ...newState,
-            ...result
-          };
+      Array.from(
+        { length: Math.min(newState.nextStopMsgIndex, newState.messagesList.length) },
+        (_, index) => index,
+      ).forEach((index) => {
+        if (isBotMessage(newState.messagesList[index])) {
+          const result = processForBotMessage(newState.messagesList, index, newState, false, false);
+          Object.assign(newState, result);
         }
-      }
+      });
 
       newState.renderMessagesList = newState.messagesList.slice(0, newState.nextStopMsgIndex);
       newState.currentMsgIndex = newState.nextStopMsgIndex - 1;
@@ -407,14 +406,13 @@ const PreviewFaqReducer = (state, action) => {
     }
     case PREVIEW_ACTIONS.OPEN_CHATBOT: {
       if (state.currentMsgIndex === -1) {
-        // First time open chatbot
-        let newState = {
+        const openedState = {
           messagesList: _.cloneDeep(state.messagesList),
+          currentMsgIndex: 0,
         };
-        newState.currentMsgIndex = 0;
-        newState.nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg()) + 1;
-        newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
-        return { ...state, isOpen: true, showPopupCloseBot: false, isAlreadyOpenFirstTime: true, manuallyClosed: false, autoOpenAttempted: true, ...newState };
+        openedState.nextStopMsgIndex = openedState.messagesList.findIndex(getNextUserMsg()) + 1;
+        openedState.renderMessagesList = openedState.messagesList.slice(0, openedState.currentMsgIndex + 1);
+        return { ...state, isOpen: true, showPopupCloseBot: false, isAlreadyOpenFirstTime: true, manuallyClosed: false, autoOpenAttempted: true, ...openedState };
       }
 
       return { ...state, isOpen: true, showPopupCloseBot: false, isAlreadyOpenFirstTime: true, manuallyClosed: false, autoOpenAttempted: true };
@@ -437,8 +435,10 @@ const PreviewFaqReducer = (state, action) => {
 };
 
 const appendRootMessagesToMessagesList = (newState) => {
-  let rootMessageIndex = newState.originalMessagesList.findIndex(msg => msg.is_root_faq_msg === true);
-  if (rootMessageIndex === -1) rootMessageIndex = 0;
+  const rootMessageIndex = (() => {
+    const found = newState.originalMessagesList.findIndex(msg => msg.is_root_faq_msg === true);
+    return found === -1 ? 0 : found;
+  })();
   const lastMessageIndex = newState.originalMessagesList.length - 1;
   newState.loopCount++;
 
@@ -482,36 +482,36 @@ const pushNewVariablesToVariablesList = (newState) => {
 };
 
 const processMessagesAfterClickNext = (newState, oldState, clickedMsgIndex) => {
-  const conditionParams = buildConditionParams(oldState); // Build with oldState objParams
-  for (let i = 0; i < newState.messagesList.length; i++) {
-    if (newState.messagesList[i].conditions && newState.messagesList[i].conditions.length !== 0) {
-      const clickedMsgLoopNumber = Math.floor(i / newState.originalMessagesList.length);
-      const result = checkFaqMessageCondition(newState.messagesList[i], conditionParams, clickedMsgLoopNumber);
-      newState.messagesList[i].hidden = !result;
+  const conditionParams = buildConditionParams(oldState);
+  const acc = { state: newState };
+  newState.messagesList.forEach((message, index) => {
+    if (message.conditions && message.conditions.length !== 0) {
+      const clickedMsgLoopNumber = Math.floor(index / acc.state.originalMessagesList.length);
+      const result = checkFaqMessageCondition(message, conditionParams, clickedMsgLoopNumber);
+      acc.state.messagesList[index].hidden = !result;
     }
 
-    if (i <= clickedMsgIndex) continue;
-    if (newState.messagesList[i].hidden && !stringNullOrEmpty(newState.messagesList[i].hidden)) continue;
+    if (index <= clickedMsgIndex) return;
+    if (acc.state.messagesList[index].hidden && !stringNullOrEmpty(acc.state.messagesList[index].hidden)) return;
 
-    if (isBotMessage(newState.messagesList[i])) {
-      const result = processForBotMessage(newState.messagesList, i, newState, false, false);
-      newState = {
-        ...newState,
-        ...result
+    if (isBotMessage(acc.state.messagesList[index])) {
+      acc.state = {
+        ...acc.state,
+        ...processForBotMessage(acc.state.messagesList, index, acc.state, false, false),
       };
-    } else if (isUserMessage(newState.messagesList[i])) {
-      newState = {
-        ...newState,
-        ...processForUserMessage(newState.messagesList, i, newState, false)
+    } else if (isUserMessage(acc.state.messagesList[index])) {
+      acc.state = {
+        ...acc.state,
+        ...processForUserMessage(acc.state.messagesList, index, acc.state, false),
       };
-    } else if (isCombineMessage(newState.messagesList[i])) {
-      newState = {
-        ...newState,
-        ...processForCombineMessage(newState.messagesList, i, newState, false)
+    } else if (isCombineMessage(acc.state.messagesList[index])) {
+      acc.state = {
+        ...acc.state,
+        ...processForCombineMessage(acc.state.messagesList, index, acc.state, false),
       };
     }
-  }
-  return newState;
+  });
+  return acc.state;
 };
 
 const changeContentValue = (subContent, value, field, subField1 = null, subField2 = null) => {
@@ -598,37 +598,32 @@ const changeProductPurchaseRadioButton = (newState, subContent, field, value) =>
 };
 
 const getProductDetailsForProductPurchaseRadioButton = (subContent, value) => {
-  let valueCode, valueName, valuePrice;
+  const product = subContent.products?.find((item) => item.id === value);
+  return {
+    valueCode: product?.item_number,
+    valueName: product?.title,
+    valuePrice: product?.item_price,
+  };
+};
 
-  const product = subContent.products?.find(product => product.id === value);
-  if (product) {
-    valueCode = product.item_number;
-    valueName = product.title;
-    valuePrice = product.item_price;
-  }
-
-  return { valueCode, valueName, valuePrice };
-}
-
-const getProductDetailsForProductPurchase = (subContent, value) => {
-  let codesArray = [];
-  let namesArray = [];
-  let pricesArray = [];
-  let orderQuantitiesArray = [];
-
-  subContent.products?.forEach((product) => {
+const getProductDetailsForProductPurchase = (subContent, value) => (
+  (subContent.products || []).reduce((acc, product) => {
     value.forEach((val) => {
       if (!product.id !== val) return;
 
-      codesArray.push(product?.item_number);
-      namesArray.push(product?.title);
-      pricesArray.push(product?.item_price);
-      orderQuantitiesArray.push(product?.quantity_select);
+      acc.codesArray.push(product?.item_number);
+      acc.namesArray.push(product?.title);
+      acc.pricesArray.push(product?.item_price);
+      acc.orderQuantitiesArray.push(product?.quantity_select);
     });
-  });
-
-  return { codesArray, namesArray, pricesArray, orderQuantitiesArray };
-}
+    return acc;
+  }, {
+    codesArray: [],
+    namesArray: [],
+    pricesArray: [],
+    orderQuantitiesArray: [],
+  })
+);
 
 const handleSaveInputContent = (newState, subContent, contentType, field, value) => {
   if (!subContent.is_save_input_content) return;

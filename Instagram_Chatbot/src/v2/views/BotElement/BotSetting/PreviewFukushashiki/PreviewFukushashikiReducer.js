@@ -102,32 +102,32 @@ const PreviewFukushashikiReducer = (state, action) => {
     case PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES:
       if (action.payload.fromCallback) return state;
 
-      let updatedState = {
+      const renderBaseState = {
         messagesList: _.cloneDeep(state.messagesList),
         variables: _.cloneDeep(state.variables),
       };
-
-      for (let i = action.payload.startIndex; i < action.payload.endIndex; i++) {
-        if (isBotMessage(updatedState.messagesList[i])) {
-          const result = processForBotMessage(updatedState.messagesList, i, updatedState, false, false);
-          updatedState = {
-            ...updatedState,
-            ...result
-          };
-        }
-      }
+      const updatedState = Array.from(
+        { length: action.payload.endIndex - action.payload.startIndex },
+        (_, offset) => action.payload.startIndex + offset,
+      ).reduce((acc, index) => {
+        if (!isBotMessage(acc.messagesList[index])) return acc;
+        return {
+          ...acc,
+          ...processForBotMessage(acc.messagesList, index, acc, false, false),
+        };
+      }, renderBaseState);
 
       const currentMsg = updatedState.messagesList[action.payload.endIndex - 1];
-      let isNotAutoScroll = state.isNotAutoScroll || false;
-
-      if (currentMsg?.message_content?.[0]?.type === MESSAGE_CONTENT_TYPES.IMAGE) {
-        isNotAutoScroll = currentMsg?.message_content?.[0]?.image?.is_not_auto_scroll || false;
-      }
-
-      const bot_statement_type = currentMsg?.message_content?.[0]?.type;
-      if (bot_statement_type && currentMsg?.message_content?.[0]?.[bot_statement_type]?.scroll_auto === true) {
-        isNotAutoScroll = true;
-      }
+      const isNotAutoScroll = (() => {
+        if (currentMsg?.message_content?.[0]?.type === MESSAGE_CONTENT_TYPES.IMAGE) {
+          return currentMsg?.message_content?.[0]?.image?.is_not_auto_scroll || false;
+        }
+        const botStatementType = currentMsg?.message_content?.[0]?.type;
+        if (botStatementType && currentMsg?.message_content?.[0]?.[botStatementType]?.scroll_auto === true) {
+          return true;
+        }
+        return state.isNotAutoScroll || false;
+      })();
 
       return {
         ...state,
@@ -137,8 +137,6 @@ const PreviewFukushashikiReducer = (state, action) => {
         isNotAutoScroll: isNotAutoScroll,
       };
     case PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE: {
-      let messagesList = _.cloneDeep(state.messagesList);
-
       if (action.payload === GETTING_ERROR_NOTIFICATION) {
         return {
           ...state,
@@ -149,19 +147,20 @@ const PreviewFukushashikiReducer = (state, action) => {
 
       if (stringNullOrEmpty(action.payload)) {
         const conditionParams = buildConditionParams(state);
-
-        messagesList = messagesList.map((message) => {
+        const messagesList = _.cloneDeep(state.messagesList).map((message) => {
           if ((message.hidden || message.hidden === undefined) && message.not_display_when_have_error) {
             message.hidden = !checkMessageCondition(message, conditionParams);
           }
           return message;
         });
 
-        let nextStopMsgIndex = state.nextStopMsgIndex;
-
-        if (!nextStopMsgIndex || (nextStopMsgIndex < messagesList.length && nextStopMsgIndex > 0 && messagesList[nextStopMsgIndex - 1].hidden) || (nextStopMsgIndex <= state.currentMsgIndex)){
-          nextStopMsgIndex = messagesList.findIndex(getNextUserMsg((_, index) => index > state.currentMsgIndex)) + 1;
-        }
+        const nextStopMsgIndex = (() => {
+          const current = state.nextStopMsgIndex;
+          if (!current || (current < messagesList.length && current > 0 && messagesList[current - 1].hidden) || (current <= state.currentMsgIndex)) {
+            return messagesList.findIndex(getNextUserMsg((_, index) => index > state.currentMsgIndex)) + 1;
+          }
+          return current;
+        })();
 
         return {
           ...state,
@@ -173,7 +172,7 @@ const PreviewFukushashikiReducer = (state, action) => {
         };
       }
 
-      messagesList = messagesList.map((message) => {
+      const messagesList = _.cloneDeep(state.messagesList).map((message) => {
         if (!message.hidden) {
           message.hidden = message.not_display_when_have_error;
         }
@@ -190,16 +189,14 @@ const PreviewFukushashikiReducer = (state, action) => {
     }
 
     case PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG: {
-      let messagesList = _.cloneDeep(state.messagesList);
-
-      if ((action.payload.displayMsg || []).length > 0) {
-        messagesList = messagesList.map((message) => {
+      const messagesList = (action.payload.displayMsg || []).length > 0
+        ? _.cloneDeep(state.messagesList).map((message) => {
           if (action.payload.displayMsg.includes(message.name?.trim())) {
             message.hidden = false;
           }
           return message;
-        });
-      }
+        })
+        : _.cloneDeep(state.messagesList);
       const renderMessagesList = messagesList.slice(0, state.currentMsgIndex + 1)
       return { ...state,
         messagesList: messagesList,
@@ -213,57 +210,39 @@ const PreviewFukushashikiReducer = (state, action) => {
       // In here, default is validation ok
       const { clickedMsgIndex, isLoggedIn } = action.payload;
       const isUpdateClicked = clickedMsgIndex < state.renderMessagesList.length - 1;
-      let newState = {
-        errors: {},
-        messagesList: _.cloneDeep(state.messagesList),
-        variables: _.cloneDeep(state.variables),
-        nextStopMsgIndex: state.nextStopMsgIndex,
-        currentMsgIndex: state.currentMsgIndex,
+      const clickAcc = {
+        state: {
+          errors: {},
+          messagesList: _.cloneDeep(state.messagesList),
+          variables: _.cloneDeep(state.variables),
+          nextStopMsgIndex: state.nextStopMsgIndex,
+          currentMsgIndex: state.currentMsgIndex,
+        },
       };
 
       if (state.conversionStatus === CONVERSTION_RESPONSE_STATUS.FINISH && isUpdateClicked) {
-        newState.conversionStatus = undefined;
-        newState.isProcessing = false;
+        clickAcc.state.conversionStatus = undefined;
+        clickAcc.state.isProcessing = false;
       }
       
       if (isLoggedIn) {
-        newState.messagesList = newState.messagesList.map(x => ({...x, hidden: x.not_display_when_logged_in}));
+        clickAcc.state.messagesList = clickAcc.state.messagesList.map(x => ({...x, hidden: x.not_display_when_logged_in}));
       }
 
       const isClickedLastMessage = state.messagesList.length - 1 === clickedMsgIndex;
 
       if (isClickedLastMessage) {
-        newState.conversionStatus = CONVERSTION_RESPONSE_STATUS.FINISH;
-        newState.isProcessing = true;
+        clickAcc.state.conversionStatus = CONVERSTION_RESPONSE_STATUS.FINISH;
+        clickAcc.state.isProcessing = true;
       } else {
-        const conditionParams = buildConditionParams(state); // Build with oldState objParams
-        for (let i = 0; i < newState.messagesList.length; i++) {
-          if (newState.messagesList[i].conditions && newState.messagesList[i].conditions.length !== 0) {
-            const result = checkMessageCondition(newState.messagesList[i], conditionParams);
-            newState.messagesList[i].hidden = !result;
-          }
-
-          if (i <= clickedMsgIndex) continue;
-          if (newState.messagesList[i].hidden && !stringNullOrEmpty(newState.messagesList[i].hidden)) continue;
-
-          if (isBotMessage(newState.messagesList[i])) {
-            newState = {
-              ...newState,
-              ...processForBotMessage(newState.messagesList, i, newState, false, false)
-            };
-          } else if (isUserMessage(newState.messagesList[i])) {
-            newState = {
-              ...newState,
-              ...processForUserMessage(newState.messagesList, i, newState, false)
-            };
-          } else if (isCombineMessage(newState.messagesList[i])) {
-            newState = {
-              ...newState,
-              ...processForCombineMessage(newState.messagesList, i, newState, false)
-            };
-          }
-        }
+        clickAcc.state = processFukushashikiMessagesAfterClickNext(
+          clickAcc.state,
+          buildConditionParams(state),
+          clickedMsgIndex,
+        );
       }
+
+      const newState = clickAcc.state;
 
       // Calculate next stop message index
       const nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex)) + 1;
@@ -422,7 +401,7 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
       const isEditorPreview = Boolean(action.payload.isEditorPreview);
       const { apiColorKey, mainColorHex } = resolveMainColorContext(chatbot);
 
-      let newState = {
+      const newState = {
         ...state,
         botInfor: botInfor,
         objParam: isEditorPreview ? state.objParam : {},
@@ -558,10 +537,10 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
 
       const conditionParams = buildConditionParams(newState);
       if (!isEditorPreview) {
-        for (let i = 0; i < newState.messagesList.length; i++) {
-          const result = checkMessageCondition(newState.messagesList[i], conditionParams);
-          newState.messagesList[i].hidden = !result;
-        }
+        newState.messagesList.forEach((message, index) => {
+          const result = checkMessageCondition(message, conditionParams);
+          newState.messagesList[index].hidden = !result;
+        });
       }
 
       const progressBarTargetCountMessagesList = newState.messagesList.filter(msg => {
@@ -586,10 +565,10 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
       if (action.payload.isUsingAmazonPay || isYuwaeruLP(newState.urlReceive)) {
         // Support only for amazon pay and subscstore cart system (torizen san)
         const conditionParams = buildConditionParams(newState);
-        for (let i = 0; i < newState.messagesList.length; i++) {
-          const result = checkMessageCondition(newState.messagesList[i], conditionParams);
-          newState.messagesList[i].hidden = !result;
-        }
+        newState.messagesList.forEach((message, index) => {
+          const result = checkMessageCondition(message, conditionParams);
+          newState.messagesList[index].hidden = !result;
+        });
       }
 
       if (action.payload.isLoggedIn) {
@@ -615,14 +594,13 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
     }
     case PREVIEW_ACTIONS.OPEN_CHATBOT: {
       if (state.currentMsgIndex === -1) {
-        // First time open chatbot
-        let newState = {
+        const openedState = {
           messagesList: _.cloneDeep(state.messagesList),
+          currentMsgIndex: 0,
         };
-        newState.currentMsgIndex = 0;
-        newState.nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg()) + 1;
-        newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
-        return { ...state, isOpen: true, showPopupCloseBot: false, isAlreadyOpenFirstTime: true, manuallyClosed: false, autoOpenAttempted: true, ...newState };
+        openedState.nextStopMsgIndex = openedState.messagesList.findIndex(getNextUserMsg()) + 1;
+        openedState.renderMessagesList = openedState.messagesList.slice(0, openedState.currentMsgIndex + 1);
+        return { ...state, isOpen: true, showPopupCloseBot: false, isAlreadyOpenFirstTime: true, manuallyClosed: false, autoOpenAttempted: true, ...openedState };
       }
 
       return { ...state, isOpen: true, showPopupCloseBot: false, isAlreadyOpenFirstTime: true, manuallyClosed: false, autoOpenAttempted: true };
@@ -637,7 +615,7 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
       return { ...state, manuallyClosed: action.payload };
     case PREVIEW_ACTIONS.UPDATE_NUMBER_ORDER_TO_UPSELL:
       const {variables, objParam} = action.payload;
-      let newVariables = [...state.variables];
+      const newVariables = [...state.variables];
       
       if (variables) {
         const entries = Array.isArray(variables) 
@@ -646,9 +624,11 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
 
         entries.forEach(([name, data]) => {
           const idx = newVariables.findIndex(v => v.variable_name === name);
-          idx >= 0 
-          ? newVariables[idx] = {...newVariables[idx] = {...newVariables[idx], ...data}}
-          : newVariables.push(data);
+          if (idx >= 0) {
+            newVariables[idx] = { ...newVariables[idx], ...data };
+          } else {
+            newVariables.push(data);
+          }
         })
       }
       return {
@@ -660,6 +640,37 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
   }
 
   return state;
+};
+
+const processFukushashikiMessagesAfterClickNext = (initialState, conditionParams, clickedMsgIndex) => {
+  const acc = { state: initialState };
+  initialState.messagesList.forEach((message, index) => {
+    if (message.conditions && message.conditions.length !== 0) {
+      const result = checkMessageCondition(message, conditionParams);
+      acc.state.messagesList[index].hidden = !result;
+    }
+
+    if (index <= clickedMsgIndex) return;
+    if (acc.state.messagesList[index].hidden && !stringNullOrEmpty(acc.state.messagesList[index].hidden)) return;
+
+    if (isBotMessage(acc.state.messagesList[index])) {
+      acc.state = {
+        ...acc.state,
+        ...processForBotMessage(acc.state.messagesList, index, acc.state, false, false),
+      };
+    } else if (isUserMessage(acc.state.messagesList[index])) {
+      acc.state = {
+        ...acc.state,
+        ...processForUserMessage(acc.state.messagesList, index, acc.state, false),
+      };
+    } else if (isCombineMessage(acc.state.messagesList[index])) {
+      acc.state = {
+        ...acc.state,
+        ...processForCombineMessage(acc.state.messagesList, index, acc.state, false),
+      };
+    }
+  });
+  return acc.state;
 };
 
 const changeContentValue = (subContent, value, field, subField1 = null, subField2 = null) => {
@@ -746,37 +757,32 @@ const changeProductPurchaseRadioButton = (newState, subContent, field, value) =>
 };
 
 const getProductDetailsForProductPurchaseRadioButton = (subContent, value) => {
-  let valueCode, valueName, valuePrice;
+  const product = subContent.products?.find((item) => item.id === value);
+  return {
+    valueCode: product?.item_number,
+    valueName: product?.title,
+    valuePrice: product?.item_price,
+  };
+};
 
-  const product = subContent.products?.find(product => product.id === value);
-  if (product) {
-    valueCode = product.item_number;
-    valueName = product.title;
-    valuePrice = product.item_price;
-  }
-
-  return { valueCode, valueName, valuePrice };
-}
-
-const getProductDetailsForProductPurchase = (subContent, value) => {
-  let codesArray = [];
-  let namesArray = [];
-  let pricesArray = [];
-  let orderQuantitiesArray = [];
-
-  subContent.products?.forEach((product) => {
+const getProductDetailsForProductPurchase = (subContent, value) => (
+  (subContent.products || []).reduce((acc, product) => {
     value.forEach((val) => {
       if (!product.id !== val) return;
 
-      codesArray.push(product?.item_number);
-      namesArray.push(product?.title);
-      pricesArray.push(product?.item_price);
-      orderQuantitiesArray.push(product?.quantity_select);
+      acc.codesArray.push(product?.item_number);
+      acc.namesArray.push(product?.title);
+      acc.pricesArray.push(product?.item_price);
+      acc.orderQuantitiesArray.push(product?.quantity_select);
     });
-  });
-
-  return { codesArray, namesArray, pricesArray, orderQuantitiesArray };
-}
+    return acc;
+  }, {
+    codesArray: [],
+    namesArray: [],
+    pricesArray: [],
+    orderQuantitiesArray: [],
+  })
+);
 
 const handleSaveInputContent = (newState, subContent, contentType, field, value) => {
   if (contentType === 'zip_code_address' && subContent) {

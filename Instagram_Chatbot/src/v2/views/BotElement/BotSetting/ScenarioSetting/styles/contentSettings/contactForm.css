@@ -31,10 +31,71 @@
   align-items: flex-start;
   text-align: left;
   gap: 8px;
+  width: 90%;
+  margin-top: 10px;
 }
 
 .ss-contact-form-setting__email-title {
   font-size: 14px;
   font-weight: bold;
   margin-bottom: 0;
+}
+
+.ss-contact-form-setting__row {
+  width: 90%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.ss-contact-form-setting__label {
+  flex: 0 0 200px;
+  width: 200px;
+  min-width: 200px;
+  white-space: nowrap;
+  text-align: left;
+  margin-right: 0;
+}
+
+.ss-contact-form-setting__control {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+}
+
+.ss-contact-form-setting__fields {
+  width: 90%;
+  margin-top: 10px;
+}
+
+.ss-contact-form-setting__fields-title {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.ss-contact-form-setting__fields-hint {
+  font-size: 12px;
+  color: #888;
+  margin-top: 8px;
+}
+
+.ss-contact-form-setting__inquiry {
+  width: 90%;
+}
+
+.ss-contact-form-setting__inquiry-label {
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.ss-contact-form-setting__inquiry-textarea {
+  width: 100%;
+}
+
+.ss-contact-form-setting__domain {
+  width: 90%;
 }

@@ -238,3 +238,53 @@ export const formatRateNumber = (numerator, denominator) => {
   }
   return Math.round((numerator * 100) / denominator).toFixed(2);
 };
+
+export const STATISTICS_PENDING_LABEL = '統計（準備中）';
+
+export const CHAT_LOG_TAB_LOGS = 'LOGS';
+export const CHAT_LOG_TAB_STATISTIC = 'STATICTIC';
+export const CHAT_LOG_TAB_LOGS_LABEL = '会話ログ';
+export const CHAT_LOG_TAB_STATISTIC_LABEL = '統計';
+export const CHAT_LOG_SCENARIO_LABEL = 'シナリオ';
+export const CHAT_LOG_SCENARIO_PLACEHOLDER = 'すべて';
+export const CHAT_LOG_CONVERSATION_PREFIX = '会話（';
+export const CHAT_LOG_CONVERSATION_SUFFIX = '人）';
+export const CHAT_LOG_USER_NAME_PREFIX = 'ユーザー ';
+export const CHAT_LOG_STATUS_DONE = '完了';
+export const CHAT_LOG_STATUS_NOT_DONE = '未完了';
+export const CHAT_LOG_SELECT_CONVERSATION = '会話を選択してください';
+export const CHAT_LOG_NEXT_BUTTON = '次へ';
+export const CHAT_LOG_STATS_EMPTY_DESCRIPTION = 'メッセージが存在しないか、シナリオが未選択です';
+export const CHAT_LOG_METRIC_NO_LABEL = 'No label';
+export const BOT_MESSAGE_DOWNLOAD_FILE = 'ファイルをダウンロード';
+export const BOT_MESSAGE_ICON_ALT = 'icon';
+export const BOT_MESSAGE_FILE_DOWNLOAD_NAME = 'file';
+
+export const METRIC_KEY_ENTRY_COUNT = 'entry_count';
+export const METRIC_KEY_FORM_COMPLETED_COUNT = 'form_completed_count';
+export const METRIC_KEY_FORM_COMPLETION_RATE = 'form_completion_rate';
+export const METRIC_KEY_PGS_CV_COUNT = 'pgs_cv_count';
+export const METRIC_KEY_PGS_CV_ENTRY_RATE = 'pgs_cv_entry_rate';
+export const METRIC_KEY_IMPRESSION_COUNT = 'impression_count';
+
+export const METRIC_LABEL_ENTRY_COUNT = 'エントリー数';
+export const METRIC_LABEL_FORM_COMPLETED_COUNT = '入力完了数';
+export const METRIC_LABEL_FORM_COMPLETION_RATE = '入力完了率';
+export const METRIC_LABEL_CV_COUNT = 'CV数';
+export const METRIC_LABEL_CV_ENTRY_RATE = 'CV数';
+export const METRIC_LABEL_CV_ENTRY_RATE_DIVIDER = '/ エントリー数';
+export const METRIC_LABEL_IMPRESSION_COUNT = 'インプレッション数';
+export const METRIC_UNIT_PERCENT = '%';
+export const METRIC_PGS_PREFIX = 'PGS-';
+
+export const CHAT_LOG_DATE_FORMAT = 'YYYY-MM-DD';
+export const CHAT_LOG_DATE_PICKER_FORMAT = 'YYYY/MM/DD';
+export const CHAT_LOG_DISPLAY_DATE_FORMAT = 'yyyy-MM-dd HH:mm';
+export const CHAT_LOG_PASSWORD_MASK = '********';
+export const EMPTY_STRING = '';
+
+export const formatChatLogConversationHeader = (count) =>
+  `${CHAT_LOG_CONVERSATION_PREFIX}${count}${CHAT_LOG_CONVERSATION_SUFFIX}`;
+
+export const formatChatLogUserName = (index, total) =>
+  `${CHAT_LOG_USER_NAME_PREFIX}${total - index}`;

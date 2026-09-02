@@ -18,11 +18,11 @@ import { applyAmazonPayDisplayModeToConditions } from 'v2/views/BotElement/BotSe
 import { getDefaultOrderConfirmConfig } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/OrderConfirmLpScriptGenerator';
 import { getDefaultCartLoginConfig } from '../constants/cartLoginConstants';
 
-function withClonedMessages(dataMessages, mutator) {
+const withClonedMessages = (dataMessages, mutator) => {
   const next = cloneDeep(dataMessages);
   mutator(next);
   return next;
-}
+};
 
 export const useScenarioMessageActions = ({ state, actions, messages }) => {
   const {
@@ -67,13 +67,9 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
     const fileInput = event.target.files[0];
     const type = fileInput.name.slice(fileInput.name.lastIndexOf('.') + 1).toLowerCase();
 
-    let trueFile;
-    if (dataMessages[indexMessageSelect].belong_to === 'user') {
-      trueFile = ['jpeg', 'jpg', 'png'].includes(type);
-    } else {
-      trueFile = ['jpeg', 'jpg', 'png', 'pdf', 'mp4'].includes(type);
-    }
-    let file;
+    const trueFile = dataMessages[indexMessageSelect].belong_to === 'user'
+      ? ['jpeg', 'jpg', 'png'].includes(type)
+      : ['jpeg', 'jpg', 'png', 'pdf', 'mp4'].includes(type);
     if (trueFile) {
       if (type !== 'pdf' && type !== 'mp4' && fileInput.size / 1024 / 1024 >= 2) {
         setFileError('ファイルサイズは2MB以下です。');
@@ -94,20 +90,17 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
       }
       setFileError('');
       const video = document.getElementById('preview-video');
-      file = { user_file: { file_type: type, size: fileInput.size, timeplay: `${type === 'mp4' ? video?.duration : ''}` } };
+      const file = { user_file: { file_type: type, size: fileInput.size, timeplay: `${type === 'mp4' ? video?.duration : ''}` } };
       api
         .post('/api/v1/managements/file/upload', file)
         .then((res) => {
           const urlFile = res.data.data.url;
           const filePost = { user_file: { file_type: type, file_url: res.data.data.path } };
-          let typeUpload = '';
-          if (type === 'mp4') {
-            typeUpload = 'video/mp4';
-          } else if (type === 'pdf') {
-            typeUpload = 'application/pdf';
-          } else {
-            typeUpload = `image/${type}`;
-          }
+          const typeUpload = type === 'mp4'
+            ? 'video/mp4'
+            : type === 'pdf'
+              ? 'application/pdf'
+              : `image/${type}`;
 
           axios
             .put(urlFile, fileInput, {
@@ -255,7 +248,7 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
   const handleChangeBotStatementType = useCallback((value) => {
     setMessageType(value);
     setDataMessages(withClonedMessages(dataMessages, (data) => {
-      for (let i = 0; i < data.length; i++) {
+      data.forEach((item, i) => {
         if (indexMessageSelect !== undefined && i === indexMessageSelect) {
           data[i].message_content[0].type = value;
           if (value === 'order_confirm' && !data[i].message_content[0].order_confirm) {
@@ -265,7 +258,7 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
             data[i].message_content[0].cart_login = getDefaultCartLoginConfig();
           }
         }
-      }
+      });
     }));
   }, [dataMessages, indexMessageSelect, setMessageType, setDataMessages]);
 
@@ -346,11 +339,11 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
       return;
     }
     setDataMessages(withClonedMessages(dataMessages, (next) => {
-      let arr = next[indexMessage].message_content[indexContent][type][contentType];
-      if (arr === undefined || arr === null) {
-        next[indexMessage].message_content[indexContent][type][contentType] = [];
-        arr = next[indexMessage].message_content[indexContent][type][contentType];
+      const contentNode = next[indexMessage].message_content[indexContent][type];
+      if (contentNode[contentType] === undefined || contentNode[contentType] === null) {
+        contentNode[contentType] = [];
       }
+      const arr = contentNode[contentType];
       const idMax = arr.length !== 0 ? Math.max(...arr.map((item) => item.id)) + 1 : 1;
       if (type === 'radio_button') {
         arr.push({ id: idMax, value: String(idMax) });
@@ -362,11 +355,11 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
 
   const handleAddItemCustomizePullDown = useCallback((indexMessage, indexContent, contentType, pullDownType, name) => {
     setDataMessages(withClonedMessages(dataMessages, (next) => {
-      let arr = next[indexMessage].message_content[indexContent][contentType][pullDownType][name];
-      if (arr === undefined || arr === null) {
-        next[indexMessage].message_content[indexContent][contentType][pullDownType][name] = [];
-        arr = next[indexMessage].message_content[indexContent][contentType][pullDownType][name];
+      const pullDownNode = next[indexMessage].message_content[indexContent][contentType][pullDownType];
+      if (pullDownNode[name] === undefined || pullDownNode[name] === null) {
+        pullDownNode[name] = [];
       }
+      const arr = pullDownNode[name];
       const idMax = arr.length !== 0 ? Math.max(...arr.map((item) => item.id)) + 1 : 1;
       arr.push({ id: idMax });
     }));
@@ -374,11 +367,11 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
 
   const handleAddItemProductPullDown = useCallback((indexMessage, indexContent, contentType) => {
     setDataMessages(withClonedMessages(dataMessages, (next) => {
-      let arr = next[indexMessage].message_content[indexContent][contentType].products;
-      if (arr === undefined || arr === null) {
-        next[indexMessage].message_content[indexContent][contentType].products = [];
-        arr = next[indexMessage].message_content[indexContent][contentType].products;
+      const productNode = next[indexMessage].message_content[indexContent][contentType];
+      if (productNode.products === undefined || productNode.products === null) {
+        productNode.products = [];
       }
+      const arr = productNode.products;
       const idMax = arr.length !== 0 ? Math.max(...arr.map((item) => item.id)) + 1 : 1;
       arr.push({ id: idMax });
     }));
@@ -386,11 +379,11 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
 
   const handleAddItemAgreeTerm = useCallback((indexMessage, indexContent, type, contentType) => {
     setDataMessages(withClonedMessages(dataMessages, (next) => {
-      let arr = next[indexMessage].message_content[indexContent][type][contentType];
-      if (arr === undefined || arr === null) {
-        next[indexMessage].message_content[indexContent][type][contentType] = [];
-        arr = next[indexMessage].message_content[indexContent][type][contentType];
+      const termNode = next[indexMessage].message_content[indexContent][type];
+      if (termNode[contentType] === undefined || termNode[contentType] === null) {
+        termNode[contentType] = [];
       }
+      const arr = termNode[contentType];
       arr.push({
         title_comment: '',
         title: '',
@@ -543,66 +536,71 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
   }, [botId, defaultValue, getListVariable, setDefaultValue, setErrorVariable, setIsOpenAddVariable, setVariableName, variableName]);
 
   const onClickCreateStatement = useCallback(async (belongTo, indexMessage) => {
-    let dataMessagesClone = cloneDeep(dataMessages);
-    if (indexMessage === undefined && belongTo === 'bot') {
-      dataMessagesClone = [
-        {
-          id: 1,
-          hidden: false,
-          belong_to: belongTo,
-          conditions: [],
-          message_content: [
-            {
-              type: 'text_input',
-              text_input: {
-                use_for_confirm_message: false,
+    const dataMessagesClone = (() => {
+      if (indexMessage === undefined && belongTo === 'bot') {
+        return [
+          {
+            id: 1,
+            hidden: false,
+            belong_to: belongTo,
+            conditions: [],
+            message_content: [
+              {
+                type: 'text_input',
+                text_input: {
+                  use_for_confirm_message: false,
+                },
+                getting_error_notification: {
+                  use_for_confirm_message: false,
+                },
+                email: {},
+                file: {},
+                script: {},
+                html_code: {},
+                amazon_pay_button: { ...DEFAULT_AMAZON_PAY_BUTTON_CONFIG },
+                delay: {
+                  typing_on: false,
+                },
+                api_link_age: {},
+                clear_variable: {
+                  variables: [dataInputVar[0]?.variable_name],
+                },
+                variable_set: {
+                  variables: [
+                    {
+                      key: dataInputVar[0]?.variable_name,
+                      value: '',
+                    },
+                  ],
+                },
+                order_confirm: getDefaultOrderConfirmConfig(),
+                cart_login: getDefaultCartLoginConfig(),
               },
-              getting_error_notification: {
-                use_for_confirm_message: false,
-              },
-              email: {},
-              file: {},
-              script: {},
-              html_code: {},
-              amazon_pay_button: { ...DEFAULT_AMAZON_PAY_BUTTON_CONFIG },
-              delay: {
-                typing_on: false,
-              },
-              api_link_age: {},
-              clear_variable: {
-                variables: [dataInputVar[0]?.variable_name],
-              },
-              variable_set: {
-                variables: [
-                  {
-                    key: dataInputVar[0]?.variable_name,
-                    value: '',
-                  },
-                ],
-              },
-              order_confirm: getDefaultOrderConfirmConfig(),
-              cart_login: getDefaultCartLoginConfig(),
-            },
-          ],
-        },
-      ];
-    } else if (indexMessage === undefined && belongTo === 'user') {
-      dataMessagesClone = [
-        {
-          id: 1,
-          hidden: false,
-          belong_to: belongTo,
-          conditions: [],
-          is_display_button_next: true,
-          message_content: [],
-        },
-      ];
-    } else if (indexMessage === undefined && belongTo === 'combine') {
-      dataMessagesClone = [createDefaultCombineMessage(dataInputVar)];
-    } else if (belongTo === 'bot') {
-      const idMax = Math.max(...dataMessagesClone.map((item) => item.id)) + 1;
-      dataMessagesClone.splice(indexMessage + 1, 0,
-        {
+            ],
+          },
+        ];
+      }
+      if (indexMessage === undefined && belongTo === 'user') {
+        return [
+          {
+            id: 1,
+            hidden: false,
+            belong_to: belongTo,
+            conditions: [],
+            is_display_button_next: true,
+            message_content: [],
+          },
+        ];
+      }
+      if (indexMessage === undefined && belongTo === 'combine') {
+        return [createDefaultCombineMessage(dataInputVar)];
+      }
+
+      const cloned = cloneDeep(dataMessages);
+      const idMax = Math.max(...cloned.map((item) => item.id)) + 1;
+
+      if (belongTo === 'bot') {
+        cloned.splice(indexMessage + 1, 0, {
           id: idMax,
           hidden: false,
           belong_to: belongTo,
@@ -636,10 +634,11 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
             },
           ],
         });
-    } else if (belongTo === 'user') {
-      const idMax = Math.max(...dataMessagesClone.map((item) => item.id)) + 1;
-      dataMessagesClone.splice(indexMessage + 1, 0,
-        {
+        return cloned;
+      }
+
+      if (belongTo === 'user') {
+        cloned.splice(indexMessage + 1, 0, {
           id: idMax,
           hidden: false,
           belong_to: belongTo,
@@ -647,12 +646,18 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
           is_display_button_next: true,
           message_content: [],
         });
-    } else if (belongTo === 'combine') {
-      const idMax = Math.max(...dataMessagesClone.map((item) => item.id)) + 1;
-      const combineMessage = createDefaultCombineMessage(dataInputVar);
-      combineMessage.id = idMax;
-      dataMessagesClone.splice(indexMessage + 1, 0, combineMessage);
-    }
+        return cloned;
+      }
+
+      if (belongTo === 'combine') {
+        const combineMessage = createDefaultCombineMessage(dataInputVar);
+        combineMessage.id = idMax;
+        cloned.splice(indexMessage + 1, 0, combineMessage);
+        return cloned;
+      }
+
+      return cloned;
+    })();
 
     setBelongTo('');
     setDataMessages([...dataMessagesClone]);

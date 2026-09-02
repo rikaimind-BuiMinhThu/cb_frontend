@@ -1,41 +1,35 @@
-import React from "react";
-import "./modal.css";
-import ReactDom from 'react-dom'
+import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
+import ReactDom from 'react-dom';
+import './modal.css';
 
-const MODAL_STYLES = {
-  position: 'fixed',
-  top: '17%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  backgroundColor: '#FFF',
-  padding: '20px',
-  zIndex: 1000,
-  border: '2px solid gray',
-  borderRadius: '5px'
-}
+const PORTAL_ELEMENT_ID = 'portal';
 
-const OVERLAY_STYLES = {
-  // opacity: '0.05',
-  position: 'fixed',
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  // backgroundColor: "grey",
-  zIndex: 1000
-}
+const ModalNoti = ({ open, children, onClose }) => {
+  const [portalElement, setPortalElement] = useState(null);
 
-export default function ModalNoti({ open, children, onClose }) {
-  if (!open) return null
+  useEffect(() => {
+    setPortalElement(document.getElementById(PORTAL_ELEMENT_ID));
+  }, []);
+
+  if (!open || !portalElement) return null;
 
   return ReactDom.createPortal(
     <>
-      <div style={OVERLAY_STYLES} onClick={onClose} />
-      <div style={MODAL_STYLES}>
-      <i className="nc-icon nc-simple-remove" onClick={onClose} style={{ color: "black" , float:"right"}} />
+      <div className="preview-modal-overlay" onClick={onClose} />
+      <div className="preview-modal-content">
+        <i className="nc-icon nc-simple-remove preview-modal-close" onClick={onClose} />
         {children}
       </div>
     </>,
-    document.getElementById('portal')
-  )
-}
+    portalElement,
+  );
+};
+
+ModalNoti.propTypes = {
+  open: PropTypes.bool,
+  children: PropTypes.node,
+  onClose: PropTypes.func,
+};
+
+export default ModalNoti;

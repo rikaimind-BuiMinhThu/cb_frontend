@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import api from 'v2/api/api-management';
 import { tokenExpired } from "v2/api/tokenExpired";
+import { isAndroid } from 'v2/utils/deviceUtils';
 import {
   CHATBOT_SERVER,
   CURRENCY_UNITS,
@@ -20,70 +21,57 @@ const stringNullOrEmpty = (string) => {
 };
 
 const getAllUrlParams = (url) => {
-  var queryString = url ? url.split("?")[1] : window.location.search.slice(1);
-  var obj = {};
-  if (queryString) {
-    queryString = queryString.split("#")[0];
-    var arr = queryString.split("&");
-    for (var i = 0; i < arr.length; i++) {
-      var a = arr[i].split("=");
-      var paramName = a[0];
-      var paramValue = typeof a[1] === "undefined" ? true : a[1];
-      paramName = paramName.toLowerCase();
-      if (typeof paramValue === "string")
-        paramValue = paramValue.toLowerCase();
-      if (paramName.match(/\[(\d+)?\]$/)) {
-        var key = paramName.replace(/\[(\d+)?\]/, "");
-        if (!obj[key]) obj[key] = [];
-        if (paramName.match(/\[\d+\]$/)) {
-          var index = /\[(\d+)\]/.exec(paramName)[1];
-          obj[key][index] = paramValue;
-        } else {
-          obj[key].push(paramValue);
-        }
-      } else {
-        if (!obj[paramName]) {
-          obj[paramName] = paramValue;
-        } else if (obj[paramName] && typeof obj[paramName] === "string") {
-          obj[paramName] = [obj[paramName]];
-          obj[paramName].push(paramValue);
-        } else {
-          obj[paramName].push(paramValue);
-        }
-      }
-    }
-  }
+  const queryString = url ? url.split('?')[1] : window.location.search.slice(1);
+  if (!queryString) return {};
 
-  return obj;
+  const cleanQuery = queryString.split('#')[0];
+  return cleanQuery.split('&').reduce((obj, param) => {
+    const parts = param.split('=');
+    const rawName = parts[0];
+    const rawValue = typeof parts[1] === 'undefined' ? true : parts[1];
+    const paramName = rawName.toLowerCase();
+    const paramValue = typeof rawValue === 'string' ? rawValue.toLowerCase() : rawValue;
+
+    if (paramName.match(/\[(\d+)?\]$/)) {
+      const key = paramName.replace(/\[(\d+)?\]/, '');
+      const existing = obj[key];
+      const baseArray = existing ? [...existing] : [];
+      if (paramName.match(/\[\d+\]$/)) {
+        const index = /\[(\d+)\]/.exec(paramName)[1];
+        baseArray[index] = paramValue;
+        return { ...obj, [key]: baseArray };
+      }
+      return { ...obj, [key]: [...baseArray, paramValue] };
+    }
+
+    if (!obj[paramName]) {
+      return { ...obj, [paramName]: paramValue };
+    }
+    if (typeof obj[paramName] === 'string') {
+      return { ...obj, [paramName]: [obj[paramName], paramValue] };
+    }
+    return { ...obj, [paramName]: [...obj[paramName], paramValue] };
+  }, {});
 };
 
 const lightenColor = (hex, opacity) => {
-  let r = parseInt(hex.slice(1, 3), 16);
-  let g = parseInt(hex.slice(3, 5), 16);
-  let b = parseInt(hex.slice(5, 7), 16);
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
 
   return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 };
 
 const isMobile = () => {
-  let check = false;
-  (function (a) {
-    if (
-      /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(
-        a
-      ) ||
-      /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw-(n|u)|c55\/|capi|ccwa|cdm-|cell|chtm|cldc|cmd-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc-s|devi|dica|dmob|do(c|p)o|ds(12|-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(-|_)|g1 u|g560|gene|gf-5|g-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd-(m|p|t)|hei-|hi(pt|ta)|hp( i|ip)|hs-c|ht(c(-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i-(20|go|ma)|i230|iac( |-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|-[a-w])|libw|lynx|m1-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|-([1-8]|c))|phil|pire|pl(ay|uc)|pn-2|po(ck|rt|se)|prox|psio|pt-g|qa-a|qc(07|12|21|32|60|-[2-7]|i-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h-|oo|p-)|sdk\/|se(c(-|0|1)|47|mc|nd|ri)|sgh-|shar|sie(-|m)|sk-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h-|v-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl-|tdg-|tel(i|m)|tim-|t-mo|to(pl|sh)|ts(70|m-|m3|m5)|tx-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas-|your|zeto|zte-/i.test(
-        a.substr(0, 4)
-      )
-    )
-      check = true;
-  })(navigator.userAgent || navigator.vendor || window.opera);
-  return check;
+  const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+  const mobilePattern = /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i;
+  const shortPattern = /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw-(n|u)|c55\/|capi|ccwa|cdm-|cell|chtm|cldc|cmd-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc-s|devi|dica|dmob|do(c|p)o|ds(12|-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(-|_)|g1 u|g560|gene|gf-5|g-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd-(m|p|t)|hei-|hi(pt|ta)|hp( i|ip)|hs-c|ht(c(-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i-(20|go|ma)|i230|iac( |-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|-[a-w])|libw|lynx|m1-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|-([1-8]|c))|phil|pire|pl(ay|uc)|pn-2|po(ck|rt|se)|prox|psio|pt-g|qa-a|qc(07|12|21|32|60|-[2-7]|i-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h-|oo|p-)|sdk\/|se(c(-|0|1)|47|mc|nd|ri)|sgh-|shar|sie(-|m)|sk-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h-|v-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl-|tdg-|tel(i|m)|tim-|t-mo|to(pl|sh)|ts(70|m-|m3|m5)|tx-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas-|your|zeto|zte-/i;
+  return mobilePattern.test(userAgent) || shortPattern.test(userAgent.substr(0, 4));
 };
 
 const removeLeadingZero = (value) => {
-  let strValue = value.toString();
-  let result = strValue.replace(/^0+/, '');
+  const strValue = value.toString();
+  const result = strValue.replace(/^0+/, '');
   return typeof value === 'number' ? Number(result) : result;
 };
 
@@ -335,82 +323,51 @@ const appendParamsToUrl = (url, params) => {
     : `${url}?${queryString}`;
 };
 
+const evaluateConditionItem = (conditionItem, buildParamValue) => {
+  switch (conditionItem.condition) {
+    case 'include':
+      return Boolean(buildParamValue && buildParamValue.includes(conditionItem.inputCondition));
+    case 'is':
+      return Boolean(buildParamValue && buildParamValue === conditionItem.inputCondition);
+    case 'not_include':
+      return !buildParamValue || !buildParamValue.includes(conditionItem.inputCondition);
+    case 'is_not':
+      return !buildParamValue || buildParamValue !== conditionItem.inputCondition;
+    default:
+      return false;
+  }
+};
+
+const combineConditionChecks = (checked, subCheck, linkCondition) => {
+  if (linkCondition === 'and') return checked && subCheck;
+  if (linkCondition === 'or') return checked || subCheck;
+  return checked;
+};
+
 const checkMessageCondition = (message, buildParam) => {
   if (message.conditions.length === 0) return true;
 
-  let checked = false;
-  for (let j = 0; j < message.conditions.length; j++) {
-    const conditionItem = message.conditions[j];
+  return message.conditions.reduce((checked, conditionItem, index) => {
     const buildParamValue = buildParam[conditionItem.nameCondition];
-
-    let subCheck = false;
-
-    switch (conditionItem.condition) {
-      case "include":
-        subCheck = buildParamValue && buildParamValue.includes(conditionItem.inputCondition);
-        break;
-      case "is":
-        subCheck = buildParamValue && buildParamValue === conditionItem.inputCondition;
-        break;
-      case "not_include":
-        subCheck = !buildParamValue || !buildParamValue.includes(conditionItem.inputCondition);
-        break;
-      case "is_not":
-        subCheck = !buildParamValue || buildParamValue !== conditionItem.inputCondition;
-        break;
-      default:
-        break;
-    }
-    if (j === 0) {
-      checked = subCheck;
-    } else if (conditionItem?.linkCondition === "and") {
-      checked = checked && subCheck;
-    } else if (conditionItem?.linkCondition === "or") {
-      checked = checked || subCheck;
-    }
-  }
-
-  return checked;
-}
+    const subCheck = evaluateConditionItem(conditionItem, buildParamValue);
+    if (index === 0) return subCheck;
+    return combineConditionChecks(checked, subCheck, conditionItem?.linkCondition);
+  }, false);
+};
 
 const checkFaqMessageCondition = (message, buildParam, loopCount) => {
   if (message.conditions.length === 0) return true;
 
-  let checked = false;
-  for (let j = 0; j < message.conditions.length; j++) {
-    const conditionItem = message.conditions[j];
-    const nameCondition = loopCount > 0 ? `${loopCount}_${conditionItem.nameCondition}` : conditionItem.nameCondition;
+  return message.conditions.reduce((checked, conditionItem, index) => {
+    const nameCondition = loopCount > 0
+      ? `${loopCount}_${conditionItem.nameCondition}`
+      : conditionItem.nameCondition;
     const buildParamValue = buildParam[nameCondition];
-
-    let subCheck = false;
-
-    switch (conditionItem.condition) {
-      case "include":
-        subCheck = buildParamValue && buildParamValue.includes(conditionItem.inputCondition);
-        break;
-      case "is":
-        subCheck = buildParamValue && buildParamValue === conditionItem.inputCondition;
-        break;
-      case "not_include":
-        subCheck = !buildParamValue || !buildParamValue.includes(conditionItem.inputCondition);
-        break;
-      case "is_not":
-        subCheck = !buildParamValue || buildParamValue !== conditionItem.inputCondition;
-        break;
-      default:
-        break;
-    }
-    if (j === 0) {
-      checked = subCheck;
-    } else if (conditionItem?.linkCondition === "and") {
-      checked = checked && subCheck;
-    } else if (conditionItem?.linkCondition === "or") {
-      checked = checked || subCheck;
-    }
-  }
-
-  return checked;
-}
+    const subCheck = evaluateConditionItem(conditionItem, buildParamValue);
+    if (index === 0) return subCheck;
+    return combineConditionChecks(checked, subCheck, conditionItem?.linkCondition);
+  }, false);
+};
 
 const getAddressFromZipCode = (zipCode) => {
   return getToChatBotServer(
@@ -433,7 +390,7 @@ const secondToDatetime =(
   format = "{{dd}}:{{hh}}:{{mm}}:{{ss}}:{{ms}}",
   omitLeadingZero = true,
 ) => {
-  let paramsSec = sec < 0 ? 0 : (sec || 0);
+  const paramsSec = sec < 0 ? 0 : (sec || 0);
 
   const SECONDS_IN_MINUTE = 60;
   const SECONDS_IN_HOUR = 60 * SECONDS_IN_MINUTE;     
@@ -453,24 +410,16 @@ const secondToDatetime =(
   const regex = /{{(dd|hh|mm|ss||ms)}}[^{{}]*/g;
   const matches = [...format.matchAll(regex)];
 
-  let formatted = "";
+  const firstNonZeroIndex = (() => {
+    if (!omitLeadingZero) return 0;
+    const nonZeroIndex = matches.findIndex(([, key]) => timeParts[key] > 0);
+    return nonZeroIndex === -1 ? matches.length - 1 : nonZeroIndex;
+  })();
 
-  let firstNonZeroIndex = 0;
-  
-  if (omitLeadingZero) {
-    firstNonZeroIndex = matches.findIndex(([match, key]) => timeParts[key] > 0);
-
-    if (firstNonZeroIndex === -1) firstNonZeroIndex = matches.length - 1;
-  }
-
-  for (let i = firstNonZeroIndex; i < matches.length; i++) {
-    const [match, key] = matches[i];
+  return matches.slice(firstNonZeroIndex).reduce((formatted, [match, key]) => {
     const value = pad(timeParts[key]);
-
-    formatted += match.replace(`{{${key}}}`, value);
-  }
-
-  return formatted;
+    return formatted + match.replace(`{{${key}}}`, value);
+  }, "");
 }
 const isUndefined = (value) => {
   return value === undefined;
@@ -481,16 +430,11 @@ const isUndefined = (value) => {
  */
 const findItem = (array, { keys, value, onSuccess = (v) => v, callbackValue = null }) => {
   if (!array || !keys) return callbackValue;
-  let keysArray = [];
-
-  if (typeof keys === 'string') {
-    keysArray = keys.split('.');
-  } else if (Array.isArray(keys)) {
-    keysArray = keys;
-  } else {
-    return callbackValue;
-  }
-
+  const keysArray = typeof keys === 'string'
+    ? keys.split('.')
+    : Array.isArray(keys)
+      ? keys
+      : [];
 
   if (keysArray.length === 0) return callbackValue;
 
@@ -501,18 +445,16 @@ const findItem = (array, { keys, value, onSuccess = (v) => v, callbackValue = nu
     return itemValue === value;
   });
 
-  let returnValue = foundItem;
-
   if (onSuccess && foundItem) {
     try {
-      returnValue = onSuccess(foundItem);
+      return onSuccess(foundItem) || callbackValue;
     } catch {
       return callbackValue;
     }
   }
 
-  return returnValue || callbackValue;
-} 
+  return foundItem || callbackValue;
+}
 const toCamelCase = (str = "") => str.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
 
 const changeElementAttributeById = (ids = []) => {
@@ -548,18 +490,16 @@ const scrollToPosition = (options = {}) => {
   const element = document.querySelector(selector);
   if (!element) return;
 
-  let top = 0;
-
-  switch (position) {
-    case "b":
-      top = element.scrollHeight;
-      break;
-    case "t":
-      top = 0;
-      break;
-    default:
-      break;
-  }
+  const top = (() => {
+    switch (position) {
+      case 'b':
+        return element.scrollHeight;
+      case 't':
+        return 0;
+      default:
+        return 0;
+    }
+  })();
 
   element.scrollTo({
     top,
@@ -574,24 +514,17 @@ const removeSpace = (text, trim = true) => {
 
 const getColor = (color, options = {}) => {
   const { toUpperCase = false, trim = true, addHash = true, ignoreEmpty } = options;
-  
-  let baseColor = color;
 
-  if (toUpperCase) {
-    baseColor = baseColor.toUpperCase();
-  }
+  const uppercased = toUpperCase ? color.toUpperCase() : color;
+  const trimmed = trim ? uppercased.trim() : uppercased;
 
-  if (trim) {
-    baseColor = baseColor.trim();
-  }
-
-  if (addHash && !baseColor.startsWith("#")) {
-    if (!ignoreEmpty || baseColor !== "") {
-      baseColor = `#${baseColor}`;
+  if (addHash && !trimmed.startsWith('#')) {
+    if (!ignoreEmpty || trimmed !== '') {
+      return `#${trimmed}`;
     }
   }
 
-  return baseColor;
+  return trimmed;
 };
 
 const hideMessageOnError = (message) => {
@@ -689,12 +622,6 @@ export const getElementMessageById = (id) => {
   if (!id) return;
   
   return `msg_id_${id}`;
-};
-
-// Device detection utilities
-const isAndroid = () => {
-  const userAgent = navigator.userAgent.toLowerCase();
-  return /android/i.test(userAgent);
 };
 
 const getBotMessageDelay = (message, isUseGlobalDelay, globalDelayTime, fallbackDelay = 1000) => {

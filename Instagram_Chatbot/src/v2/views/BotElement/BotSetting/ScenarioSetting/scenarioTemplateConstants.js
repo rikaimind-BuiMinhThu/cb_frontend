@@ -1,0 +1,19 @@
+export const TEMPLATE_CREATE_SUCCESS = '正常に追加されました！';
+export const TEMPLATE_DELETE_SUCCESS = '正常に削除されました！';
+export const TEMPLATE_CREATE_TITLE = 'テンプレート作成';
+export const TEMPLATE_NAME_LABEL = 'テンプレート名';
+export const TEMPLATE_NAME_REQUIRED = 'テンプレート名は、必ず指定してください。';
+export const TEMPLATE_NAME_MAX_LENGTH = 'テンプレート名は50文字以下にしてください。';
+export const TEMPLATE_NAME_HINT = '※テンプレートに任意の名称をつけることができます。';
+export const TEMPLATE_CREATE_BUTTON = '作成';
+export const TEMPLATE_CANCEL_BUTTON = 'キャンセル';
+export const TEMPLATE_DELETE_CONFIRM = '本当に削除しますか。';
+export const TEMPLATE_CREATE_ACTION = 'テンプレート作成';
+export const TEMPLATE_COLUMN_NAME = 'テンプレート名';
+export const TEMPLATE_COLUMN_UPDATED = '最後の更新日時';
+export const TEMPLATE_COLUMN_ACTION = 'アクション';
+export const TEMPLATE_NAV_DELAY_MS = 1500;
+export const TEMPLATE_COOKIE_KEY = 'scenario_template_id';
+
+export const TEMPLATE_LIST_API = '/api/v1/managements/scenario_templates';
+export const TEMPLATE_SETTING_ROUTE = '/scenario-template-setting';

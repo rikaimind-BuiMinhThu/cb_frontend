@@ -43,16 +43,16 @@ const AudienceConditionsContent = ({
             <div className="ss-bot-setting-condition-content">
               {indexCondition !== 0 ? (
                 <SelectCustom
-                  style={{ width: '14%' }}
+                  className="ss-select--14"
                   data={[{ key: 'and', value: 'AND' }, { key: 'or', value: 'OR' }]}
                   value={condition.linkCondition}
                   onChange={(value) => onChangeValueCondition(indexCondition, value, 'linkCondition')}
                 />
               ) : (
-                <div style={{ width: '14%' }} />
+                <div className="ss-audience-condition-spacer" />
               )}
               <SelectCustom
-                style={{ width: '59%', marginBottom: '5px' }}
+                className="ss-select--59 ss-audience-condition-name"
                 data={dataCondition}
                 value={condition.nameCondition}
                 keyValue="variable_name"
@@ -60,13 +60,12 @@ const AudienceConditionsContent = ({
                 onChange={(value) => onChangeValueCondition(indexCondition, value, 'nameCondition')}
               />
               <SelectCustom
-                style={{ width: '24%' }}
+                className="ss-select--24"
                 data={dataSubCondition}
                 value={condition.condition}
                 onChange={(value) => onChangeValueCondition(indexCondition, value, 'condition')}
               />
               <InputCustom
-                style={{ width: '100%' }}
                 value={condition.inputCondition}
                 onChange={(value) => onChangeValueCondition(indexCondition, value, 'inputCondition')}
               />
@@ -78,7 +77,7 @@ const AudienceConditionsContent = ({
         ))}
         {showAddButtonInContents && (
           <div className="ss-bot-setting-condition-add-condition-button">
-            <Button onClick={() => onClickAddCondition()} className="ss-bot-setting-add-condition-button" style={{ backgroundColor: '#347AED' }}>
+            <Button onClick={() => onClickAddCondition()} className="ss-bot-setting-add-condition-button">
               条件追加
             </Button>
           </div>
@@ -87,7 +86,7 @@ const AudienceConditionsContent = ({
       {variant === 'bot' && (
         <div className="ss-bot-setting-condition-footer-button">
           <div className="ss-bot-setting-condition-add-condition-button">
-            <Button onClick={() => onClickAddCondition()} className="ss-bot-setting-add-condition-button" style={{ backgroundColor: '#347AED' }}>
+            <Button onClick={() => onClickAddCondition()} className="ss-bot-setting-add-condition-button">
               条件追加
             </Button>
           </div>

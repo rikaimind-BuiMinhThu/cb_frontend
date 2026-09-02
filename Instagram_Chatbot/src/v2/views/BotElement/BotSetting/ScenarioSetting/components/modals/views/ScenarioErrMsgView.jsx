@@ -72,7 +72,6 @@ const ScenarioErrMsgView = ({ onBack }) => {
               <input
                 type="text"
                 className="ss-input-value ss-user-setting-item"
-                style={{ width: '100%', padding: '8px', fontSize: '14px' }}
                 placeholder="例: .formErrorContent, .field-error"
                 value={errMsgFieldSelectors}
                 onChange={(e) => setErrMsgFieldSelectors(e.target.value)}
@@ -85,7 +84,6 @@ const ScenarioErrMsgView = ({ onBack }) => {
               <input
                 type="text"
                 className="ss-input-value ss-user-setting-item"
-                style={{ width: '100%', padding: '8px', fontSize: '14px' }}
                 placeholder="例: #alert-box, .form-errors"
                 value={errMsgFormSelectors}
                 onChange={(e) => setErrMsgFormSelectors(e.target.value)}

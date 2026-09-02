@@ -42,7 +42,7 @@ const ButtonSubmitPreview = ({ content, message, indexContent }) => {
             <img
               src={imageUrl}
               alt={content.button_submit_name || ''}
-              style={{ width: imageWidth, maxWidth: '100%' }}
+              style={{ '--ss-submit-img-width': imageWidth }}
             />
           ) : (
             content.button_submit_name

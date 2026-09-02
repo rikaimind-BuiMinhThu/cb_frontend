@@ -1,7 +1,17 @@
 import React from 'react';
 import { Input, Space, Typography } from 'antd';
 import { AdminActionButton } from 'v2/components/AdminShell';
-import { PAGE_SIZE } from './constants';
+import {
+  PAGE_SIZE,
+  COL_NO,
+  COL_NAME,
+  COL_DEFAULT,
+  COL_ACTION,
+  COL_NOTE,
+  SAVE_LABEL,
+  PLACEHOLDER_NAME,
+  PLACEHOLDER_VALUE,
+} from './constants';
 import { variableFieldErrorKey } from './variableUtils';
 
 const VariableNameInput = ({ value, error, placeholder, onChange }) => (
@@ -30,45 +40,45 @@ export const createUserVariableColumns = ({
   onDelete,
 }) => [
   {
-    title: '番号',
+    title: COL_NO,
     width: 70,
     align: 'center',
     render: (_, __, index) => (page - 1) * PAGE_SIZE + index + 1,
   },
   {
-    title: '変数名',
+    title: COL_NAME,
     dataIndex: 'variable_name',
     width: '28%',
     render: (value, row) => (
       <VariableNameInput
         value={value}
         error={fieldErrors[variableFieldErrorKey(row.id, 'variable_name')]}
-        placeholder="変数名をご入力ください"
+        placeholder={PLACEHOLDER_NAME}
         onChange={(nextValue) => onChangeField(row.id, 'variable_name', nextValue)}
       />
     ),
   },
   {
-    title: 'デフォルト値',
+    title: COL_DEFAULT,
     dataIndex: 'default_value',
     render: (value, row) => (
       <Input
         className="admin-variable-input"
         value={value || ''}
-        placeholder="変数値をご入力ください"
+        placeholder={PLACEHOLDER_VALUE}
         onChange={(event) => onChangeField(row.id, 'default_value', event.target.value)}
       />
     ),
   },
   {
-    title: 'アクション',
+    title: COL_ACTION,
     align: 'right',
     width: 180,
     render: (_, row) => (
       <Space size={4} wrap={false} className="admin-table-actions">
         <AdminActionButton
           action="save"
-          label="保存"
+          label={SAVE_LABEL}
           iconOnly
           loading={Boolean(savingIds[row.id])}
           onClick={() => onSave(row)}
@@ -85,13 +95,13 @@ export const createUserVariableColumns = ({
 
 export const SYSTEM_COLUMNS = [
   {
-    title: '番号',
+    title: COL_NO,
     width: 70,
     align: 'center',
     render: (_, __, index) => index + 1,
   },
   {
-    title: '変数名',
+    title: COL_NAME,
     dataIndex: 'name',
     width: 220,
     render: (name) => (
@@ -101,7 +111,7 @@ export const SYSTEM_COLUMNS = [
     ),
   },
   {
-    title: '変数備考',
+    title: COL_NOTE,
     dataIndex: 'description',
     render: (description) => (
       <Typography.Text type="secondary">{description}</Typography.Text>

@@ -1,4 +1,5 @@
-import React from "react";
+import React from 'react';
+import { baseUserMessageComponentPropTypes } from './userMessageComponentPropTypes';
 import "v2/assets/css/bot/preview-chat-bot.css";
 import { EMPTY_INPUT_VALUE, MESSAGE_CONTENT_TYPES, REQUIRED_FIELD_LABEL } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 
@@ -76,6 +77,10 @@ const TextArea = ({ content, disabled, onChangeValue, errors, contentIndex, mess
       {renderErrorMessage()}
     </div>
   );
+};
+
+TextArea.propTypes = {
+  ...baseUserMessageComponentPropTypes,
 };
 
 export default TextArea;

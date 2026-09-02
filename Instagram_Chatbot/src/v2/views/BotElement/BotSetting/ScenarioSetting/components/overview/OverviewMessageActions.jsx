@@ -13,16 +13,16 @@ const OverviewMessageActions = ({
   onDeleteMessage,
   emptyContent = false,
 }) => {
-  const optionStyle = belongTo === 'bot' && contentType !== 'text_input'
-    ? { marginTop: '25px' }
+  const optionClassName = belongTo === 'bot' && contentType !== 'text_input'
+    ? 'ss-chat-option ss-chat-option--spaced'
     : messageName
-      ? { marginTop: '25px' }
-      : {};
+      ? 'ss-chat-option ss-chat-option--spaced'
+      : 'ss-chat-option';
 
   return (
-    <div className="ss-chat-option" style={optionStyle}>
+    <div className={optionClassName}>
       <MDBIcon fas icon="pencil-alt" onClick={() => onEditIconClick(index)} />
-      <MDBIcon fas icon="grip-vertical" style={{ marginTop: '10px' }} />
+      <MDBIcon fas icon="grip-vertical" className="ss-chat-option__grip" />
       <div className={`ss-edit-option-wrapper ss-edit-option-wrapper-${index}`}>
         <div onClick={() => onCopyMessage(index)} className="ss-option-wrapper">
           <MDBIcon fas icon="copy" className="ss-add-option-icon" />

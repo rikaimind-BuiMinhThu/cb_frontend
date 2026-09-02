@@ -1,7 +1,7 @@
 /* cSpell: disable */
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import SelectCustom from 'v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/SelectCustom';
+import SelectCustom from 'v2/components/BotMessages/SelectCustom';
 import api from 'v2/api/api-management';
 import {
   REQUIRED_LABEL,

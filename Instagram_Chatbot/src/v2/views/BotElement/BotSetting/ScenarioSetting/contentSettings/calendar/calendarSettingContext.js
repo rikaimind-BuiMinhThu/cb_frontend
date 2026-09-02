@@ -5,6 +5,32 @@ import {
   handleDisableEndDateCalendar,
 } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/scenarioCalendarUtils';
 
+const findFirstSelectableCalendarDate = (calendar, maxAttempts = 100) => {
+  const attemptIndices = Array.from({ length: maxAttempts + 1 }, (_, index) => index);
+  const match = attemptIndices.find((index) => (
+    !handleDisableDateCalendar(moment().add(index, 'days'), calendar)
+  ));
+  if (match === undefined) return null;
+  return moment().add(match, 'days').format('YYYY-MM-DD');
+};
+
+const findFirstSelectableStartEndDates = (calendar, maxAttempts = 100) => {
+  if (!handleDisableDateCalendar(moment(), calendar)) {
+    return { startDateSelect: undefined, endDateSelect: undefined };
+  }
+  const scan = { index: 0, startDateSelect: undefined, endDateSelect: undefined };
+  while (handleDisableDateCalendar(moment().add(scan.index, 'days'), calendar)) {
+    if (scan.index === maxAttempts) {
+      return { startDateSelect: null, endDateSelect: null };
+    }
+    const nextDate = moment().add(scan.index + 1, 'days');
+    scan.startDateSelect = nextDate;
+    scan.endDateSelect = nextDate.clone();
+    scan.index += 1;
+  }
+  return { startDateSelect: scan.startDateSelect, endDateSelect: scan.endDateSelect };
+};
+
 export const buildCalendarSettingContext = (props) => {
   const {
     indexMessageSelect,
@@ -32,31 +58,10 @@ export const buildCalendarSettingContext = (props) => {
   const handleInitialSelectionChange = (value) => {
     if (value === true) {
       if (calendar.type !== CALENDAR_TYPES.START_END_DATE) {
-        let i = 0;
-        let dateSelect = moment().add(i, 'days').format('YYYY-MM-DD');
-        while (handleDisableDateCalendar(moment().add(i, 'days'), calendar)) {
-          if (i === 100) {
-            dateSelect = null;
-            break;
-          }
-          dateSelect = moment().add(i + 1, 'days').format('YYYY-MM-DD');
-          i += 1;
-        }
+        const dateSelect = findFirstSelectableCalendarDate(calendar);
         onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, dateSelect, 'date_selection_test');
       } else {
-        let i = 0;
-        let startDateSelect;
-        let endDateSelect;
-        while (handleDisableDateCalendar(moment().add(i, 'days'), calendar)) {
-          if (i === 100) {
-            startDateSelect = null;
-            endDateSelect = null;
-            break;
-          }
-          startDateSelect = moment().add(i + 1, 'days');
-          endDateSelect = moment().add(i + 1, 'days');
-          i += 1;
-        }
+        const { startDateSelect, endDateSelect } = findFirstSelectableStartEndDates(calendar);
         onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, startDateSelect, 'start_date_test');
         onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, endDateSelect, 'end_date_test');
       }

@@ -1,5 +1,7 @@
-import { useState } from "react";
-import { EMPTY_INPUT_VALUE } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+import { baseUserMessageComponentPropTypes } from './userMessageComponentPropTypes';
+import { EMPTY_INPUT_VALUE } from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants';
 
 const GENDER_DISPLAY_CLASS = {
   horizontal: "gender-display-row",
@@ -111,6 +113,17 @@ const OptionGenderItem = ({ contentIndex, item, onChangeValue, isSelected }) => 
       )}
     </div>
   );
+};
+
+OptionGender.propTypes = {
+  ...baseUserMessageComponentPropTypes,
+};
+
+OptionGenderItem.propTypes = {
+  contentIndex: PropTypes.number,
+  item: PropTypes.object,
+  onChangeValue: PropTypes.func,
+  isSelected: PropTypes.bool,
 };
 
 export default OptionGender;

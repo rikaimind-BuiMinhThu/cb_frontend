@@ -1,13 +1,35 @@
-import { Link } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Input, Modal, Space, message } from 'antd';
 import Cookies from 'js-cookie';
 import moment from 'moment';
 import api from 'v2/api/api-management';
+import { USER_ROLE_COOKIE_KEY, ROLE_ADMIN_DEEL } from 'v2/api/constants';
+import { getAdminRoutePath, getSignInPath } from 'v2/variables/constants';
 import { AdminPage, AdminTable, AdminConfirmModal, AdminActionButton, AdminFormRow, useAdminHeaderActions } from 'v2/components/AdminShell';
-import { getSignInPath } from 'v2/variables/constants';
+import {
+  TEMPLATE_CREATE_SUCCESS,
+  TEMPLATE_DELETE_SUCCESS,
+  TEMPLATE_CREATE_TITLE,
+  TEMPLATE_NAME_LABEL,
+  TEMPLATE_NAME_REQUIRED,
+  TEMPLATE_NAME_MAX_LENGTH,
+  TEMPLATE_NAME_HINT,
+  TEMPLATE_CREATE_BUTTON,
+  TEMPLATE_CANCEL_BUTTON,
+  TEMPLATE_DELETE_CONFIRM,
+  TEMPLATE_CREATE_ACTION,
+  TEMPLATE_COLUMN_NAME,
+  TEMPLATE_COLUMN_UPDATED,
+  TEMPLATE_COLUMN_ACTION,
+  TEMPLATE_NAV_DELAY_MS,
+  TEMPLATE_LIST_API,
+  TEMPLATE_SETTING_ROUTE,
+  TEMPLATE_COOKIE_KEY,
+} from './scenarioTemplateConstants';
 
-function ScenarioTemplateList() {
+const ScenarioTemplateList = () => {
+  const history = useHistory();
   const [isOpenCreateTemplate, setIsOpenCreateTemplate] = useState(false);
   const [isOpenDeleteTemplate, setIsOpenDeleteTemplate] = useState(false);
   const [listTemplate, setListTemplate] = useState([]);
@@ -19,8 +41,8 @@ function ScenarioTemplateList() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const userRole = Cookies.get('user_role');
-    if (!userRole || userRole !== 'admin_deel') {
+    const userRole = Cookies.get(USER_ROLE_COOKIE_KEY);
+    if (!userRole || userRole !== ROLE_ADMIN_DEEL) {
       window.location.href = getSignInPath();
       return;
     }
@@ -29,13 +51,13 @@ function ScenarioTemplateList() {
   }, []);
 
   useAdminHeaderActions(
-    <AdminActionButton action="create" label="テンプレート作成" onClick={() => setIsOpenCreateTemplate(true)} />
+    <AdminActionButton action="create" label={TEMPLATE_CREATE_ACTION} onClick={() => setIsOpenCreateTemplate(true)} />
   );
 
   const getListTemplate = () => {
     setLoading(true);
     api
-      .get('/api/v1/managements/scenario_templates')
+      .get(TEMPLATE_LIST_API)
       .then((res) => {
         setListTemplate(res?.data?.data || []);
       })
@@ -45,32 +67,36 @@ function ScenarioTemplateList() {
 
   const checkInputTemplateName = (templateName) => {
     if (templateName.length === 0) {
-      setNameError('テンプレート名は、必ず指定してください。');
+      setNameError(TEMPLATE_NAME_REQUIRED);
       return false;
     }
     if (templateName.length > 50) {
-      setNameError('テンプレート名は50文字以下にしてください。');
+      setNameError(TEMPLATE_NAME_MAX_LENGTH);
       return false;
     }
     setNameError('');
     return true;
   };
 
+  const navigateToTemplateSetting = () => {
+    history.push(getAdminRoutePath(TEMPLATE_SETTING_ROUTE));
+  };
+
   const createTemplate = () => {
     if (!checkInputTemplateName(newTemplateName)) return;
     setCreating(true);
     api
-      .post('/api/v1/managements/scenario_templates', {
+      .post(TEMPLATE_LIST_API, {
         scenario_template: { name: newTemplateName },
       })
       .then((res) => {
         if (res.data.code === 1) {
-          message.success('正常に追加されました！');
-          Cookies.set('scenario_template_id', res.data.data.id);
+          message.success(TEMPLATE_CREATE_SUCCESS);
+          Cookies.set(TEMPLATE_COOKIE_KEY, res.data.data.id);
           setIsOpenCreateTemplate(false);
           setNewTemplateName('');
           setNameError('');
-          setTimeout(() => document.getElementById('to_scenario_template')?.click(), 1500);
+          setTimeout(navigateToTemplateSetting, TEMPLATE_NAV_DELAY_MS);
         } else if (res.data.code === 2) {
           message.warning(res.data.message);
         }
@@ -88,9 +114,9 @@ function ScenarioTemplateList() {
   const deleteTemplate = () => {
     setDeleting(true);
     api
-      .delete(`/api/v1/managements/scenario_templates/${templateSelectId}`)
+      .delete(`${TEMPLATE_LIST_API}/${templateSelectId}`)
       .then((res) => {
-        if (res.data.code === 1) message.success('正常に削除されました！');
+        if (res.data.code === 1) message.success(TEMPLATE_DELETE_SUCCESS);
         else if (res.data.code === 2) message.warning(res.data.message);
         getListTemplate();
         setIsOpenDeleteTemplate(false);
@@ -99,24 +125,23 @@ function ScenarioTemplateList() {
   };
 
   const onclickEditTemplate = (id) => {
-    Cookies.set('scenario_template_id', id);
+    Cookies.set(TEMPLATE_COOKIE_KEY, id);
+    history.push(getAdminRoutePath(TEMPLATE_SETTING_ROUTE));
   };
 
   const columns = [
-    { title: 'テンプレート名', dataIndex: 'name' },
+    { title: TEMPLATE_COLUMN_NAME, dataIndex: 'name' },
     {
-      title: '最後の更新日時',
+      title: TEMPLATE_COLUMN_UPDATED,
       dataIndex: 'updated_at',
       render: (value) => moment(value).format('YYYY/MM/DD'),
     },
     {
-      title: 'アクション',
+      title: TEMPLATE_COLUMN_ACTION,
       width: 140,
       render: (_, template) => (
         <Space className="admin-table-actions">
-          <Link to="/v2/admin/scenario-template-setting">
-            <AdminActionButton action="edit" iconOnly onClick={() => onclickEditTemplate(template.id)} />
-          </Link>
+          <AdminActionButton action="edit" iconOnly onClick={() => onclickEditTemplate(template.id)} />
           <AdminActionButton action="delete" iconOnly onClick={() => handleDeleteTemplate(template.id)} />
         </Space>
       ),
@@ -136,7 +161,7 @@ function ScenarioTemplateList() {
       </AdminPage>
 
       <Modal
-        title="テンプレート作成"
+        title={TEMPLATE_CREATE_TITLE}
         open={isOpenCreateTemplate}
         onOk={createTemplate}
         onCancel={() => {
@@ -144,16 +169,16 @@ function ScenarioTemplateList() {
           setNewTemplateName('');
           setNameError('');
         }}
-        okText="作成"
-        cancelText="キャンセル"
+        okText={TEMPLATE_CREATE_BUTTON}
+        cancelText={TEMPLATE_CANCEL_BUTTON}
         confirmLoading={creating}
       >
         <AdminFormRow
-          label="テンプレート名"
+          label={TEMPLATE_NAME_LABEL}
           htmlFor="new-template-name"
           required
           error={nameError}
-          hint="※テンプレートに任意の名称をつけることができます。"
+          hint={TEMPLATE_NAME_HINT}
         >
           <Input
             id="new-template-name"
@@ -168,20 +193,14 @@ function ScenarioTemplateList() {
 
       <AdminConfirmModal
         open={isOpenDeleteTemplate}
-        message="本当に削除しますか。"
+        message={TEMPLATE_DELETE_CONFIRM}
         onOk={deleteTemplate}
         onCancel={() => setIsOpenDeleteTemplate(false)}
         danger
         loading={deleting}
       />
-
-      <Link to="/v2/admin/scenario-template-setting">
-        <button id="to_scenario_template" style={{ display: 'none' }} type="button">
-          TemplateSetting
-        </button>
-      </Link>
     </>
   );
-}
+};
 
 export default ScenarioTemplateList;

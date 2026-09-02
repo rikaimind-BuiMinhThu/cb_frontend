@@ -8,6 +8,17 @@ import { AdminInfoTooltip } from 'v2/components/AdminShell';
 import { SCENARIO_MODAL_TOOLTIPS } from '../shared/scenarioModalTooltips';
 import { TIMER_TYPES, TIMER_VARIABLES_DESCRIPTION } from '../../../../PreviewComponent/Constants';
 
+const setNestedConfigValue = (config, keyPath, value) => {
+  if (keyPath.length === 1) {
+    return { ...config, [keyPath[0]]: value };
+  }
+  const [head, ...rest] = keyPath;
+  return {
+    ...config,
+    [head]: setNestedConfigValue({ ...(config[head] || {}) }, rest, value),
+  };
+};
+
 const ScenarioTimerView = ({ onBack }) => {
   const { state, actions } = useScenarioEditor();
   const { timerConfig } = state;
@@ -16,26 +27,18 @@ const ScenarioTimerView = ({ onBack }) => {
   const handleChangeTimerConfig = ({ keyPath = [], instanceValue = null, useEventValue = false, transform = (v) => v, defaultValue = null }) => (e) => {
     if (!keyPath.length) return;
 
-    let value = instanceValue;
-
-    if (!!e && useEventValue) {
-      e.preventDefault?.();
-      value = e.target?.value ?? e;
-    }
-
-    setTimerConfig((prevConfig) => {
-      const newConfig = { ...prevConfig };
-      let current = newConfig;
-
-      for (let i = 0; i < keyPath.length - 1; i++) {
-        const key = keyPath[i];
-        current[key] = { ...(current[key] || {}) };
-        current = current[key];
+    const value = (() => {
+      if (instanceValue !== null) return instanceValue;
+      if (!!e && useEventValue) {
+        e.preventDefault?.();
+        return e.target?.value ?? e;
       }
+      return null;
+    })();
 
-      current[keyPath[keyPath.length - 1]] = transform(value ?? defaultValue);
-      return newConfig;
-    });
+    setTimerConfig((prevConfig) => (
+      setNestedConfigValue(prevConfig, keyPath, transform(value ?? defaultValue))
+    ));
   };
 
   const handleOnCancelTimerConfig = () => {

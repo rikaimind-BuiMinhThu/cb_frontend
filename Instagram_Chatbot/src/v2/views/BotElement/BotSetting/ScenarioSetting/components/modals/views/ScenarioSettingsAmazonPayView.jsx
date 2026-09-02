@@ -17,8 +17,6 @@ import {
 } from '../../../../../../../variables/amazonPayConstants';
 import { validateLpDomain } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/amazonPayConfigUtils';
 
-const HELP_TEXT_STYLE = { color: '#6b7280', fontSize: '13px', marginTop: '6px' };
-
 const ScenarioSettingsAmazonPayView = ({ onBack }) => {
   const { state, actions } = useScenarioEditor();
   const {
@@ -67,12 +65,12 @@ const ScenarioSettingsAmazonPayView = ({ onBack }) => {
           alignTop
         >
           <textarea
-            style={{ width: '100%', minHeight: '90px', padding: '10px', fontSize: '14px' }}
+            className="ss-settings-textarea ss-settings-textarea--short"
             placeholder="amazonCheckoutSessionId"
             value={amazonPayDetectionForm?.urlParamsText ?? ''}
             onChange={(e) => updateDetectionForm({ urlParamsText: e.target.value })}
           />
-          <p style={HELP_TEXT_STYLE}>{detectionModeHelp}</p>
+          <p className="ss-settings-help-text">{detectionModeHelp}</p>
         </ScenarioFormRow>
       );
     }
@@ -85,12 +83,12 @@ const ScenarioSettingsAmazonPayView = ({ onBack }) => {
           alignTop
         >
           <textarea
-            style={{ width: '100%', minHeight: '90px', padding: '10px', fontSize: '14px' }}
+            className="ss-settings-textarea ss-settings-textarea--short"
             placeholder="#amazon_payment_method"
             value={amazonPayDetectionForm?.domSelectorsText ?? ''}
             onChange={(e) => updateDetectionForm({ domSelectorsText: e.target.value })}
           />
-          <p style={HELP_TEXT_STYLE}>{detectionModeHelp}</p>
+          <p className="ss-settings-help-text">{detectionModeHelp}</p>
         </ScenarioFormRow>
       );
     }
@@ -107,7 +105,7 @@ const ScenarioSettingsAmazonPayView = ({ onBack }) => {
           onChange={(value) => updateDetectionForm({ jsCode: value })}
           language="javascript"
         />
-        <p style={HELP_TEXT_STYLE}>{detectionModeHelp}</p>
+        <p className="ss-settings-help-text">{detectionModeHelp}</p>
       </ScenarioFormRow>
     );
   };
@@ -120,13 +118,13 @@ const ScenarioSettingsAmazonPayView = ({ onBack }) => {
         alignTop
       >
         <textarea
-          style={{ width: '100%', minHeight: '90px', padding: '10px', fontSize: '14px' }}
+          className="ss-settings-textarea ss-settings-textarea--short"
           placeholder={'example.jp\nshop.example.jp'}
           value={allowedLpDomainsInput ?? ''}
           onChange={(e) => setAllowedLpDomainsInput(e.target.value)}
         />
         {invalidLpDomains.length > 0 && (
-          <div style={{ color: 'rgb(185, 74, 72)', fontSize: '13px', marginTop: '6px' }}>
+          <div className="ss-settings-field-error">
             無効なドメイン: {invalidLpDomains.join(', ')}
           </div>
         )}
@@ -143,7 +141,7 @@ const ScenarioSettingsAmazonPayView = ({ onBack }) => {
           data={AMAZON_PAY_DETECTION_MODE_OPTIONS}
           allowClear={false}
         />
-        <p style={HELP_TEXT_STYLE}>{AMAZON_PAY_DETECTION_HELP_TEXT.usageSection}</p>
+        <p className="ss-settings-help-text">{AMAZON_PAY_DETECTION_HELP_TEXT.usageSection}</p>
       </ScenarioFormRow>
 
       {renderDetectionInput()}
@@ -159,7 +157,7 @@ const ScenarioSettingsAmazonPayView = ({ onBack }) => {
           data={AMAZON_PAY_READY_MODE_OPTIONS}
           allowClear={false}
         />
-        <p style={HELP_TEXT_STYLE}>{AMAZON_PAY_DETECTION_HELP_TEXT.autofillReadySection}</p>
+        <p className="ss-settings-help-text">{AMAZON_PAY_DETECTION_HELP_TEXT.autofillReadySection}</p>
       </ScenarioFormRow>
 
       {amazonPayReadyMode === AMAZON_PAY_READY_MODES.DOM_SELECTOR && (
@@ -169,12 +167,12 @@ const ScenarioSettingsAmazonPayView = ({ onBack }) => {
           alignTop
         >
           <textarea
-            style={{ width: '100%', minHeight: '90px', padding: '10px', fontSize: '14px' }}
+            className="ss-settings-textarea ss-settings-textarea--short"
             placeholder="input#order_shipping_address_attributes_name1"
             value={amazonPayDetectionForm?.readySelectorsText ?? ''}
             onChange={(e) => updateDetectionForm({ readySelectorsText: e.target.value })}
           />
-          <p style={HELP_TEXT_STYLE}>{AMAZON_PAY_DETECTION_HELP_TEXT.readyDomSelectors}</p>
+          <p className="ss-settings-help-text">{AMAZON_PAY_DETECTION_HELP_TEXT.readyDomSelectors}</p>
         </ScenarioFormRow>
       )}
 

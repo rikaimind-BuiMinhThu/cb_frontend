@@ -50,18 +50,16 @@ const OverviewUserMessageItem = ({ message, index, bindings }) => {
                 handleSelectMessage(index, message.belong_to, message.message_content[message.message_content.length - 1])
               }
             >
-              <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+              <div className="ss-overview-user-column">
                 {message.message_name &&
                   <div
-                    className="ss-sub-title-message ss-truncation-text"
-                    style={{ backgroundColor: '#fff', maxWidth: '60%', marginRight: '10px' }}
+                    className="ss-sub-title-message ss-truncation-text ss-overview-user-name"
                   >
                     {message.message_name}
                   </div>
                 }
                 <div
-                  className={`ss-user-chat-detail-content ss-user-chat-detail-content-${index} ${message.hidden === true ? "ss-message-hidden-style" : ""}`}
-                  style={message.message_name ? {} : { borderColor: 'red' }}
+                  className={`ss-user-chat-detail-content ss-user-chat-detail-content-${index} ${message.hidden === true ? "ss-message-hidden-style" : ""} ${message.message_name ? "" : "ss-input--invalid"}`}
                 >
                   <div className="ss-user-message__content-wrapper">
                     <UserContentPreviewList message={message} index={index} />

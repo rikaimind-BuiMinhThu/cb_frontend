@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Input, InputNumber, Select, Space } from 'antd';
-import InputNum from 'v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputNum';
 import { AdminInfoTooltip } from 'v2/components/AdminShell';
 import { getDesignSettingTooltip } from '../constants/designSettingTooltips';
 import {
@@ -90,7 +89,7 @@ const DeviceDesignPanel = ({
 
         <DesignField label={LABEL_SIZE} tooltipKey="size" fullWidth>
           <Space size={12} wrap className="design-size-row">
-            <InputNum
+            <InputNumber
               name={`width_${device}`}
               min={1}
               max={sizeMax}
@@ -99,7 +98,7 @@ const DeviceDesignPanel = ({
               onChange={(value) => onChange(`width${fieldPrefix}`, value)}
             />
             <span className="design-field__suffix">{widthUnit}</span>
-            <InputNum
+            <InputNumber
               name={`height_${device}`}
               min={1}
               max={sizeMax}

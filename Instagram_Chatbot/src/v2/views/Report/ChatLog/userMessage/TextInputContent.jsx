@@ -1,7 +1,7 @@
 /* cSpell: disable */
 import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
-import InputCustom from 'v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom';
+import InputCustom from 'v2/components/BotMessages/InputCustom';
 import {
   REQUIRED_LABEL,
   PASSWORD_TYPE,

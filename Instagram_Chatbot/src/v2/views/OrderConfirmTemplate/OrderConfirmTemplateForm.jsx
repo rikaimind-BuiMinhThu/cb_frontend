@@ -1,14 +1,14 @@
 import React from 'react';
 import { Card, Input } from 'antd';
-import CheckboxCustom from 'v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/CheckboxCustom';
-import OrderConfirmSettingsModalContent from 'v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/OrderConfirmSettingsModalContent';
-import OrderConfirmAdvancedSettings from 'v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/OrderConfirmAdvancedSettings';
+import CheckboxCustom from './CheckboxCustom';
+import OrderConfirmSettingsModalContent from './OrderConfirmSettingsModalContent';
+import OrderConfirmAdvancedSettings from './OrderConfirmAdvancedSettings';
 import {
   ORDER_CONFIRM_LP_PRESET,
   buildOrderConfirmPresetConfig,
   getDefaultOrderConfirmConfig,
   normalizeOrderConfirmConfig,
-} from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/OrderConfirmLpScriptGenerator';
+} from 'v2/utils/orderConfirmLpScriptGenerator';
 import {
   CARD_ADVANCED,
   CARD_BASIC,

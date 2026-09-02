@@ -1,7 +1,8 @@
 import React from 'react';
-import { CHATBOT_ACTIONS } from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants';
+import PropTypes from 'prop-types';
+import { CHATBOT_ACTIONS } from 'v2/variables/chatbotActions';
 import { DEFAULT_AMAZON_PAY_BUTTON_IMAGE_URL } from 'v2/variables/amazonPayConstants';
-import { buildAmazonPayButtonClickActionData } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/amazonPayConfigUtils';
+import { buildAmazonPayButtonClickActionData } from 'v2/utils/amazonPayButtonUtils';
 
 const AmazonPayButtonMessagePreview = ({
   content,
@@ -110,6 +111,20 @@ const AmazonPayButtonMessagePreview = ({
       </div>
     </div>
   );
+};
+
+AmazonPayButtonMessagePreview.propTypes = {
+  content: PropTypes.shape({
+    amazon_pay_button: PropTypes.object,
+  }).isRequired,
+  contentIndex: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  botInfor: PropTypes.object,
+  themeSettings: PropTypes.object,
+};
+
+AmazonPayButtonMessagePreview.defaultProps = {
+  botInfor: null,
+  themeSettings: null,
 };
 
 export default AmazonPayButtonMessagePreview;

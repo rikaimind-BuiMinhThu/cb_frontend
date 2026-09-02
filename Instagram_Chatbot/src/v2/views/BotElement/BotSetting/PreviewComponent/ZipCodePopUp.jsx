@@ -3,7 +3,7 @@ import "v2/assets/css/bot/preview-chat-bot.css";
 import "moment/locale/zh-cn";
 import { getTownsByCity, getCitiesByPrefecture, changeElementAttributeById } from "./Utils";
 import { MDBIcon } from "mdbreact";
-import SelectCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/SelectCustom";
+import SelectCustom from "v2/components/BotMessages/SelectCustom";
 
 const ZipCodePopUp = ({
   prefecturesList,

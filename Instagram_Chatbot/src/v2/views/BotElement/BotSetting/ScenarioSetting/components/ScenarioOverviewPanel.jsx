@@ -65,7 +65,7 @@ const ScenarioOverviewPanel = ({ onOpenPreview }) => {
           </div>
         </div>
         {errorScenarioName && (
-          <span style={{ fontSize: '12px', color: '#FF621D' }}>{errorScenarioName}</span>
+          <span className="ss-overview-name-error">{errorScenarioName}</span>
         )}
       </section>
     </div>

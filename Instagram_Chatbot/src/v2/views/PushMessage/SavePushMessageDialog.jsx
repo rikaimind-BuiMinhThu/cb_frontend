@@ -1,32 +1,100 @@
-import * as React from "react";
-import { Controller, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import schema from "./validates/CreateTableSchema";
-import { Divider } from "antd";
-import { Checkbox } from "antd";
-import { Input } from "antd";
-import { Select } from "antd";
-import { Form } from "antd";
-import { Typography } from "antd";
-import { Modal, Space, DatePicker, Row, Col, Button, message } from "antd";
+import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
+import { Controller, useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import schema from './validates/CreateTableSchema';
+import {
+  Checkbox,
+  Input,
+  Select,
+  Form,
+  Typography,
+  Modal,
+  Space,
+  DatePicker,
+  Row,
+  Col,
+  Button,
+  message,
+  Divider,
+} from 'antd';
 import api from 'v2/api/api-management';
-import { tokenExpired } from "v2/api/tokenExpired";
-import { MinusCircleOutlined } from "@ant-design/icons";
-import { sinceMinutesOptions, hoursOptions, sinceOptions } from "./utils";
-import moment from "moment";
-import { AdminActionButton } from "v2/components/AdminShell";
+import { tokenExpired } from 'v2/api/tokenExpired';
+import { MinusCircleOutlined } from '@ant-design/icons';
+import { sinceMinutesOptions, hoursOptions, sinceOptions } from './utils';
+import moment from 'moment';
+import { AdminActionButton } from 'v2/components/AdminShell';
+import {
+  PUSH_MESSAGES_PATH,
+  EMAILS_PATH,
+  SMS_TEMPLATES_PATH,
+  CREATE_LABEL,
+  EDIT_TITLE,
+  SAVE_OK,
+  CANCEL,
+  SUCCESS_SAVE,
+  LABEL_NAME,
+  PLACEHOLDER_NAME,
+  NAME_HINT,
+  LABEL_SENDING_METHOD,
+  LABEL_TEMPLATE,
+  LABEL_START_TIME,
+  START_TIME_HINT,
+  LABEL_EXCLUDE_TIME,
+  LABEL_EXCLUDE_RANGE,
+  LABEL_ALTERNATE_TIME,
+  EXCLUDE_RANGE_SEPARATOR,
+  EXCLUDE_PUSH_TIME_ERROR,
+  FILTER_TITLE,
+  FILTER_HINT,
+  FILTER_VAR_LABEL,
+  FILTER_LAST_LABEL,
+  FILTER_OF_LABEL,
+  BTN_ADD_CONDITION,
+  TAG_EMAIL,
+  TAG_SMS,
+  METHOD_EMAIL,
+  METHOD_SMS,
+  STATUS_UNSUBSCRIBE,
+  DATETIME_FORMAT,
+  DEFAULT_HOUR,
+  FILTER_VAR_VALUE,
+  FILTER_LAST_VALUE,
+  FILTER_OF_VALUE,
+  FILTER_AND_VALUE,
+  OPERATOR_CONTAINS,
+  OPERATOR_IS,
+  OPERATOR_IS_NOT,
+  OPERATOR_AND,
+} from './constants';
 
-export default function SavePushMessageDialog({
+const SENDING_METHOD_OPTIONS = [
+  { value: METHOD_EMAIL, label: TAG_EMAIL },
+  { value: METHOD_SMS, label: TAG_SMS },
+];
+
+const FILTER_VAR_OPTIONS = [{ value: FILTER_VAR_VALUE, label: FILTER_VAR_LABEL }];
+const FILTER_LAST_OPTIONS = [{ value: FILTER_LAST_VALUE, label: FILTER_LAST_LABEL }];
+const FILTER_OF_OPTIONS = [{ value: FILTER_OF_VALUE, label: FILTER_OF_LABEL }];
+const FILTER_AND_OPTIONS = [{ value: FILTER_AND_VALUE, label: OPERATOR_AND }];
+
+const COMPARISON_OPTIONS = [
+  { value: OPERATOR_CONTAINS, label: OPERATOR_CONTAINS },
+  { value: OPERATOR_IS, label: OPERATOR_IS },
+  { value: OPERATOR_IS_NOT, label: OPERATOR_IS_NOT },
+];
+
+const SavePushMessageDialog = ({
   botId,
   resolver,
   item,
   onCancel,
-}) {
-  const [open, setOpen] = React.useState(false);
-  const [emailTemplateOptions, setEmailTemplateOptions] = React.useState([]);
-  const [smsTemplateOptions, setSmsTemplateOptions] = React.useState([]);
-  const [variables, setVariables] = React.useState([]);
-  const [selectedVariables, setSelectedVariables] = React.useState([]);
+}) => {
+  const [open, setOpen] = useState(false);
+  const [emailTemplateOptions, setEmailTemplateOptions] = useState([]);
+  const [smsTemplateOptions, setSmsTemplateOptions] = useState([]);
+  const [variables, setVariables] = useState([]);
+  const [selectedVariables, setSelectedVariables] = useState([]);
 
   const {
     control,
@@ -40,21 +108,21 @@ export default function SavePushMessageDialog({
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      name: item?.title || "",
-      sending_method: item?.sending_method || "email",
+      name: item?.title || '',
+      sending_method: item?.sending_method || METHOD_EMAIL,
       sending_template: item
-        ? item.sending_method === "email"
+        ? item.sending_method === METHOD_EMAIL
           ? item.email_id
           : item.sms_template_id
         : undefined,
-      is_exclude_time: item?.has_timezone_exclusion === "yes" ? true : false,
+      is_exclude_time: item?.has_timezone_exclusion === 'yes' ? true : false,
       exclude_start_time: item?.excluded_time_from || 0,
       exclude_end_time: item?.excluded_time_to || 0,
       exclude_push_time: item?.alternate_send_time || 0,
       last_message_datetime_since:
         item?.last_message_datetime_since || sinceMinutesOptions[0].value,
       start_time: item
-        ? moment(item.started_at, "YYYY-MM-DD HH:mm")
+        ? moment(item.started_at, DATETIME_FORMAT)
         : undefined,
     },
   });
@@ -66,8 +134,8 @@ export default function SavePushMessageDialog({
   const handleClose = () => {
     setOpen(false);
     reset({
-      name: "",
-      sending_method: "email",
+      name: '',
+      sending_method: METHOD_EMAIL,
       sending_template: undefined,
       is_exclude_time: false,
       exclude_start_time: 0,
@@ -80,12 +148,12 @@ export default function SavePushMessageDialog({
     onCancel?.();
   };
 
-  const watchSendingMethod = watch("sending_method");
-  const watchIsExcludeTime = watch("is_exclude_time");
+  const watchSendingMethod = watch('sending_method');
+  const watchIsExcludeTime = watch('is_exclude_time');
   const watchExculdeTime = watch([
-    "exclude_start_time",
-    "exclude_end_time",
-    "exclude_push_time",
+    'exclude_start_time',
+    'exclude_end_time',
+    'exclude_push_time',
   ]);
   const excludeFrom = watchExculdeTime[0];
   const excludeTo = watchExculdeTime[1];
@@ -95,26 +163,26 @@ export default function SavePushMessageDialog({
     const push_message = {
       title: data.name,
       sending_method: data.sending_method,
-      email_id: data.sending_method === "email" ? data.sending_template : null,
+      email_id: data.sending_method === METHOD_EMAIL ? data.sending_template : null,
       sms_template_id:
-        data.sending_method === "sms" ? data.sending_template : null,
+        data.sending_method === METHOD_SMS ? data.sending_template : null,
       started_at: data.start_time,
       has_timezone_exclusion: data.is_exclude_time,
       excluded_time_from: data.exclude_start_time,
       excluded_time_to: data.exclude_end_time,
       alternate_send_time: data.exclude_push_time,
-      subscribe_status: item?.subscribe_status || "unsubscribe",
+      subscribe_status: item?.subscribe_status || STATUS_UNSUBSCRIBE,
       last_message_datetime_since: data.last_message_datetime_since,
       variables: selectedVariables,
     };
     try {
       const response = item
-        ? await api.put(`/api/v1/managements/push_messages/${item.id}`, {
+        ? await api.put(`${PUSH_MESSAGES_PATH}/${item.id}`, {
             chatbot_id: botId,
             push_message,
           })
         : await api.post(
-            `/api/v1/managements/push_messages?chatbot_id=${botId}`,
+            `${PUSH_MESSAGES_PATH}?chatbot_id=${botId}`,
             {
               push_message,
             }
@@ -123,7 +191,7 @@ export default function SavePushMessageDialog({
         message.warning(response?.data?.message);
       }
       if (response?.data?.code === 1) {
-        message.success("プッシュメッセージを正常に保存しました。");
+        message.success(SUCCESS_SAVE);
         resolver(response?.data?.data);
         handleClose();
       }
@@ -134,12 +202,12 @@ export default function SavePushMessageDialog({
     }
   };
 
-  React.useEffect(() => {
-    let cancelled = false;
+  useEffect(() => {
+    const request = { cancelled: false };
     api
-      .get(`/api/v1/managements/emails?page=all&chatbot_id=${botId}`)
+      .get(`${EMAILS_PATH}?page=all&chatbot_id=${botId}`)
       .then((res) => {
-        if (cancelled) return;
+        if (request.cancelled) return;
         if (res.data.code === 1) {
           const options = res.data?.data?.map((each) => ({
             value: each.id,
@@ -147,28 +215,28 @@ export default function SavePushMessageDialog({
           }));
           setEmailTemplateOptions(options);
           if (!item && options.length > 0) {
-            setValue("sending_template", options[0].value);
+            setValue('sending_template', options[0].value);
           }
         }
       })
       .catch((err) => {
-        if (cancelled) return;
+        if (request.cancelled) return;
         if (err.response?.data.code === 0) {
           tokenExpired();
         }
       });
     return () => {
-      cancelled = true;
+      request.cancelled = true;
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps -- adding item may reset form on parent rerender
   }, [botId, setValue]);
 
-  React.useEffect(() => {
-    let cancelled = false;
+  useEffect(() => {
+    const request = { cancelled: false };
     api
-      .get(`/api/v1/managements/sms_templates?page=all&chatbot_id=${botId}`)
+      .get(`${SMS_TEMPLATES_PATH}?page=all&chatbot_id=${botId}`)
       .then((res) => {
-        if (cancelled) return;
+        if (request.cancelled) return;
         if (res.data.code === 1) {
           const options = res.data?.data?.map((each) => ({
             value: each.id,
@@ -178,17 +246,17 @@ export default function SavePushMessageDialog({
         }
       })
       .catch((err) => {
-        if (cancelled) return;
+        if (request.cancelled) return;
         if (err.response?.data.code === 0) {
           tokenExpired();
         }
       });
     return () => {
-      cancelled = true;
+      request.cancelled = true;
     };
   }, [botId]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!watchIsExcludeTime) {
       return;
     }
@@ -199,9 +267,9 @@ export default function SavePushMessageDialog({
     if (from < to) {
       const rangeHours = hours.slice(from, to + 1);
       if (rangeHours.includes(pushTime)) {
-        setError("exclude_push_time", {
-          type: "custom",
-          message: "代替送信時間を除外時間以外と設定してください。",
+        setError('exclude_push_time', {
+          type: 'custom',
+          message: EXCLUDE_PUSH_TIME_ERROR,
         });
         return;
       }
@@ -212,14 +280,14 @@ export default function SavePushMessageDialog({
       const toHours = hours.slice(0, to + 1);
       const rangeHours = [...fromHours, ...toHours];
       if (rangeHours.includes(pushTime)) {
-        setError("exclude_push_time", {
-          type: "custom",
-          message: "代替送信時間を除外時間以外と設定してください。",
+        setError('exclude_push_time', {
+          type: 'custom',
+          message: EXCLUDE_PUSH_TIME_ERROR,
         });
         return;
       }
     }
-    clearErrors("exclude_push_time");
+    clearErrors('exclude_push_time');
   }, [
     watchIsExcludeTime,
     excludeFrom,
@@ -230,12 +298,12 @@ export default function SavePushMessageDialog({
     setError,
   ]);
 
-  React.useEffect(() => {
-    let cancelled = false;
+  useEffect(() => {
+    const request = { cancelled: false };
     api
       .get(`/api/v1/managements/chatbots/${botId}/variables?page=all`)
       .then((res) => {
-        if (cancelled) return;
+        if (request.cancelled) return;
         const vars = res.data.data.map((each) => ({
           value: each.id,
           label: each.variable_name,
@@ -243,32 +311,30 @@ export default function SavePushMessageDialog({
         setVariables(vars);
       })
       .catch((err) => {
-        if (cancelled) return;
+        if (request.cancelled) return;
         if (err.response?.data.code === 0) {
           tokenExpired();
         }
       });
     return () => {
-      cancelled = true;
+      request.cancelled = true;
     };
   }, [botId]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (item) {
       handleClickOpen();
     }
   }, [item]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (item && item.push_message_variables > 0) {
       setSelectedVariables(
-        item?.push_message_variables.map((each) => {
-          return {
-            variable_id: each.id,
-            value: each.value,
-            operator: each.operator,
-          };
-        })
+        item?.push_message_variables.map((each) => ({
+          variable_id: each.id,
+          value: each.value,
+          operator: each.operator,
+        }))
       );
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- hydrate from item.push_message_variables; full item identity is unstable
@@ -279,46 +345,44 @@ export default function SavePushMessageDialog({
       {!item && (
         <AdminActionButton
           action="create"
-          label="プッシュメッセージ作成"
+          label={CREATE_LABEL}
           onClick={handleClickOpen}
         />
       )}
       <Modal
-        style={{ top: 20 }}
-        title={item ? "プッシュメッセージ編集" : "プッシュメッセージ作成"}
+        className="admin-push-modal"
+        title={item ? EDIT_TITLE : CREATE_LABEL}
         open={open}
-        okText="保存"
-        cancelText="キャンセル"
+        okText={SAVE_OK}
+        cancelText={CANCEL}
         confirmLoading={isSubmitting}
         onCancel={handleClose}
         onOk={handleSubmit(onSubmit)}
         onClose={handleClose}
       >
         <Form labelCol={{ span: 10 }} wrapperCol={{ span: 24 }}>
-          {/** name */}
           <Form.Item
-            label="プッシュメッセージ名"
+            label={LABEL_NAME}
             required
-            validateStatus={errors?.name?.message ? "error" : undefined}
+            validateStatus={errors?.name?.message ? 'error' : undefined}
             help={errors?.name?.message}
           >
             <Controller
               name="name"
               control={control}
               render={({ field }) => (
-                <Input placeholder="プッシュメッセージ名" {...field} />
+                <Input placeholder={PLACEHOLDER_NAME} {...field} />
               )}
             />
             <Typography.Text>
-              ※プッシュメッセージに任意の名前をつけます。この名称がチャットに表示されることはありません。
+              {NAME_HINT}
             </Typography.Text>
           </Form.Item>
-          {/** method */}
           <Form.Item
-            label="送信方法"
+            label={LABEL_SENDING_METHOD}
             required
             validateStatus={
-              errors?.sending_method?.message ? "error" : undefined
+              errors?.sending_method?.message ? 'error' : undefined
             }
             help={errors?.sending_method?.message}
           >
@@ -327,46 +391,39 @@ export default function SavePushMessageDialog({
               control={control}
               render={({ field }) => (
                 <Select
-                  options={[
-                    { value: "email", label: "メール" },
-                    { value: "sms", label: "SMS" },
-                  ]}
+                  options={SENDING_METHOD_OPTIONS}
                   {...field}
                 />
               )}
             />
           </Form.Item>
-          {/** template */}
           <Form.Item
-            label="テンプレート"
+            label={LABEL_TEMPLATE}
             required
             validateStatus={
-              errors?.sending_template?.message ? "error" : undefined
+              errors?.sending_template?.message ? 'error' : undefined
             }
             help={errors?.sending_template?.message}
           >
             <Controller
               name="sending_template"
               control={control}
-              render={({ field }) => {
-                return (
-                  <Select
-                    options={
-                      watchSendingMethod === "email"
-                        ? emailTemplateOptions
-                        : smsTemplateOptions
-                    }
-                    {...field}
-                  />
-                );
-              }}
+              render={({ field }) => (
+                <Select
+                  options={
+                    watchSendingMethod === METHOD_EMAIL
+                      ? emailTemplateOptions
+                      : smsTemplateOptions
+                  }
+                  {...field}
+                />
+              )}
             />
           </Form.Item>
-          {/** Start time */}
           <Form.Item
-            label="開始日時"
+            label={LABEL_START_TIME}
             required
-            validateStatus={errors?.start_time?.message ? "error" : undefined}
+            validateStatus={errors?.start_time?.message ? 'error' : undefined}
             help={errors?.start_time?.message}
           >
             <Space direction="vertical">
@@ -375,7 +432,7 @@ export default function SavePushMessageDialog({
                 name="start_time"
                 render={({ field }) => (
                   <DatePicker
-                    format="YYYY-MM-DD HH:mm"
+                    format={DATETIME_FORMAT}
                     showTime={true}
                     onChange={(date) => field.onChange(date)}
                     value={field.value}
@@ -384,15 +441,14 @@ export default function SavePushMessageDialog({
                 )}
               />
               <Typography.Text>
-                ※プッシュメッセージを送信する日時を指定します。
+                {START_TIME_HINT}
               </Typography.Text>
             </Space>
           </Form.Item>
-          {/** exclude time */}
           <Form.Item
-            label="自動送信プッシュの時間帯除外"
+            label={LABEL_EXCLUDE_TIME}
             validateStatus={
-              errors?.is_exclude_time?.message ? "error" : undefined
+              errors?.is_exclude_time?.message ? 'error' : undefined
             }
             help={errors?.is_exclude_time?.message}
           >
@@ -400,32 +456,32 @@ export default function SavePushMessageDialog({
               control={control}
               name="is_exclude_time"
               render={({ field }) => (
-                <Checkbox {...field} checked={field.value}></Checkbox>
+                <Checkbox {...field} checked={field.value} />
               )}
             />
           </Form.Item>
           {watchIsExcludeTime && (
             <>
-              <Form.Item label="除外時間" required>
+              <Form.Item label={LABEL_EXCLUDE_RANGE} required>
                 <Space direction="horizontal">
                   <Controller
                     name="exclude_start_time"
                     control={control}
                     render={({ field }) => (
                       <Select
-                        defaultValue={"00"}
+                        defaultValue={DEFAULT_HOUR}
                         options={hoursOptions}
                         {...field}
                       />
                     )}
                   />
-                  ~
+                  {EXCLUDE_RANGE_SEPARATOR}
                   <Controller
                     name="exclude_end_time"
                     control={control}
                     render={({ field }) => (
                       <Select
-                        defaultValue={"00"}
+                        defaultValue={DEFAULT_HOUR}
                         options={hoursOptions}
                         {...field}
                       />
@@ -434,10 +490,10 @@ export default function SavePushMessageDialog({
                 </Space>
               </Form.Item>
               <Form.Item
-                label="代替送信時間"
+                label={LABEL_ALTERNATE_TIME}
                 required
                 validateStatus={
-                  errors?.exclude_push_time?.message ? "error" : undefined
+                  errors?.exclude_push_time?.message ? 'error' : undefined
                 }
                 help={errors?.exclude_push_time?.message}
               >
@@ -447,7 +503,7 @@ export default function SavePushMessageDialog({
                     control={control}
                     render={({ field }) => (
                       <Select
-                        defaultValue={"00"}
+                        defaultValue={DEFAULT_HOUR}
                         options={hoursOptions}
                         {...field}
                       />
@@ -458,12 +514,11 @@ export default function SavePushMessageDialog({
             </>
           )}
           <Divider />
-          {/** filter */}
           <Row>
             <Space direction="vertical">
-              <Typography.Text strong>対象者指定</Typography.Text>
+              <Typography.Text strong>{FILTER_TITLE}</Typography.Text>
               <Typography.Text>
-                ※条件を加えることでプッシュメッセージを送信する対象者を絞り込むことができます。
+                {FILTER_HINT}
               </Typography.Text>
             </Space>
           </Row>
@@ -471,20 +526,20 @@ export default function SavePushMessageDialog({
             <Col span={4}> </Col>
             <Col span={3}>
               <Select
-                defaultValue={"var"}
-                options={[{ value: "var", label: "変数" }]}
+                defaultValue={FILTER_VAR_VALUE}
+                options={FILTER_VAR_OPTIONS}
               />
             </Col>
             <Col span={6}>
               <Select
-                defaultValue={"last"}
-                options={[{ value: "last", label: "last_message_datetime" }]}
+                defaultValue={FILTER_LAST_VALUE}
+                options={FILTER_LAST_OPTIONS}
               />
             </Col>
             <Col span={3}>
               <Select
-                defaultValue={"of"}
-                options={[{ value: "of", label: "の" }]}
+                defaultValue={FILTER_OF_VALUE}
+                options={FILTER_OF_OPTIONS}
               />
             </Col>
             <Col span={4}>
@@ -496,170 +551,161 @@ export default function SavePushMessageDialog({
                     defaultValue={sinceMinutesOptions[0]}
                     options={sinceOptions}
                     {...field}
-                    style={{ minWidth: "100px" }}
+                    className="push-select-min-width"
                   />
                 )}
               />
             </Col>
             <Col span={4}> </Col>
           </Row>
-          {/** variables */}
           {variables.length > 0 && (
-            <Row gutter={[16, 16]} style={{ width: "100%" }}>
+            <Row gutter={[16, 16]} className="push-variables-row">
               <Col span={24}>
                 <Form.List
                   name="variables"
                   initialValue={item?.push_message_variables?.map(
-                    (_, index) => {
-                      return {
-                        fieldKey: index,
-                        isListField: true,
-                        key: index,
-                        name: index,
-                      };
-                    }
+                    (_, index) => ({
+                      fieldKey: index,
+                      isListField: true,
+                      key: index,
+                      name: index,
+                    })
                   )}
                 >
-                  {(fields, { add, remove }) => {
-                    return (
-                      <>
-                        {fields.map(({ key, name, ...restField }) => (
-                          <Row gutter={16} style={{ width: "100%" }} key={name}>
-                            <Col span={4}>
-                              <Form.Item {...restField} name={[name, "and"]}>
-                                <Select
-                                  defaultValue={"and"}
-                                  options={[{ value: "and", label: "AND" }]}
-                                />
-                              </Form.Item>
-                            </Col>
-                            <Col span={4}>
-                              <Form.Item {...restField} name={[name, "var"]}>
-                                <Select
-                                  defaultValue={"var"}
-                                  options={[{ value: "var", label: "変数" }]}
-                                />
-                              </Form.Item>
-                            </Col>
-                            <Col span={6}>
-                              <Form.Item
-                                {...restField}
-                                name={[name, "variable"]}
-                              >
-                                <Select
-                                  defaultValue={
-                                    item
-                                      ? item.push_message_variables[name]
-                                          ?.variable_id
-                                      : variables[0]?.value
-                                  }
-                                  options={variables}
-                                  onChange={(value) =>
-                                    setSelectedVariables((pre) =>
-                                      pre.map((each, index) =>
-                                        index === name
-                                          ? { ...each, variable_id: value }
-                                          : each
-                                      )
-                                    )
-                                  }
-                                />
-                              </Form.Item>
-                            </Col>
-                            <Col span={4}>
-                              <Form.Item
-                                {...restField}
-                                name={[name, "comparation"]}
-                                required
-                              >
-                                <Select
-                                  defaultValue={
-                                    item
-                                      ? item.push_message_variables[name]
-                                          ?.operator
-                                      : "is"
-                                  }
-                                  options={[
-                                    { value: "contains", label: "contains" },
-                                    { value: "is", label: "is" },
-                                    { value: "is_not", label: "is not" },
-                                  ]}
-                                  onChange={(value) =>
-                                    setSelectedVariables((pre) =>
-                                      pre.map((each, index) =>
-                                        index === name
-                                          ? { ...each, operator: value }
-                                          : each
-                                      )
-                                    )
-                                  }
-                                />
-                              </Form.Item>
-                            </Col>
-
-                            <Col span={4}>
-                              <Form.Item
-                                {...restField}
-                                name={[name, "value"]}
-                                required
-                              >
-                                <Input
-                                  defaultValue={
-                                    item
-                                      ? item.push_message_variables[name]?.value
-                                      : ""
-                                  }
-                                  onChange={(e) => {
-                                    setSelectedVariables((pre) =>
-                                      pre.map((each, index) =>
-                                        index === name
-                                          ? { ...each, value: e.target.value }
-                                          : each
-                                      )
-                                    );
-                                  }}
-                                />
-                              </Form.Item>
-                            </Col>
-                            <Col span={2}>
-                              <MinusCircleOutlined
-                                className="dynamic-delete-button"
-                                onClick={() => {
-                                  remove(name);
+                  {(fields, { add, remove }) => (
+                    <>
+                      {fields.map(({ key, name, ...restField }) => (
+                        <Row gutter={16} className="push-variables-row" key={name}>
+                          <Col span={4}>
+                            <Form.Item {...restField} name={[name, 'and']}>
+                              <Select
+                                defaultValue={FILTER_AND_VALUE}
+                                options={FILTER_AND_OPTIONS}
+                              />
+                            </Form.Item>
+                          </Col>
+                          <Col span={4}>
+                            <Form.Item {...restField} name={[name, 'var']}>
+                              <Select
+                                defaultValue={FILTER_VAR_VALUE}
+                                options={FILTER_VAR_OPTIONS}
+                              />
+                            </Form.Item>
+                          </Col>
+                          <Col span={6}>
+                            <Form.Item
+                              {...restField}
+                              name={[name, 'variable']}
+                            >
+                              <Select
+                                defaultValue={
+                                  item
+                                    ? item.push_message_variables[name]
+                                        ?.variable_id
+                                    : variables[0]?.value
+                                }
+                                options={variables}
+                                onChange={(value) =>
                                   setSelectedVariables((pre) =>
-                                    pre.filter((_, index) => index !== name)
+                                    pre.map((each, index) =>
+                                      index === name
+                                        ? { ...each, variable_id: value }
+                                        : each
+                                    )
+                                  )
+                                }
+                              />
+                            </Form.Item>
+                          </Col>
+                          <Col span={4}>
+                            <Form.Item
+                              {...restField}
+                              name={[name, 'comparation']}
+                              required
+                            >
+                              <Select
+                                defaultValue={
+                                  item
+                                    ? item.push_message_variables[name]
+                                        ?.operator
+                                    : OPERATOR_IS
+                                }
+                                options={COMPARISON_OPTIONS}
+                                onChange={(value) =>
+                                  setSelectedVariables((pre) =>
+                                    pre.map((each, index) =>
+                                      index === name
+                                        ? { ...each, operator: value }
+                                        : each
+                                    )
+                                  )
+                                }
+                              />
+                            </Form.Item>
+                          </Col>
+
+                          <Col span={4}>
+                            <Form.Item
+                              {...restField}
+                              name={[name, 'value']}
+                              required
+                            >
+                              <Input
+                                defaultValue={
+                                  item
+                                    ? item.push_message_variables[name]?.value
+                                    : ''
+                                }
+                                onChange={(e) => {
+                                  setSelectedVariables((pre) =>
+                                    pre.map((each, index) =>
+                                      index === name
+                                        ? { ...each, value: e.target.value }
+                                        : each
+                                    )
                                   );
                                 }}
                               />
-                            </Col>
-                          </Row>
-                        ))}
-                        <Form.Item>
-                          <Space
-                            direction="vertical"
-                            style={{ alignItems: "flex-end", width: "100%" }}
-                          >
-                            <Button
+                            </Form.Item>
+                          </Col>
+                          <Col span={2}>
+                            <MinusCircleOutlined
+                              className="dynamic-delete-button"
                               onClick={() => {
-                                add();
-                                setSelectedVariables((pre) => [
-                                  ...pre,
-                                  {
-                                    variable_id: variables[0].value,
-                                    value: "",
-                                    operator: "is",
-                                  },
-                                ]);
+                                remove(name);
+                                setSelectedVariables((pre) =>
+                                  pre.filter((_, index) => index !== name)
+                                );
                               }}
-                              type="primary"
-                            >
-                              条件追加
-                            </Button>
-                          </Space>
-                        </Form.Item>
-                      </>
-                    );
-                  }}
+                            />
+                          </Col>
+                        </Row>
+                      ))}
+                      <Form.Item>
+                        <Space
+                          direction="vertical"
+                          className="push-add-condition-space"
+                        >
+                          <Button
+                            onClick={() => {
+                              add();
+                              setSelectedVariables((pre) => [
+                                ...pre,
+                                {
+                                  variable_id: variables[0].value,
+                                  value: '',
+                                  operator: OPERATOR_IS,
+                                },
+                              ]);
+                            }}
+                            type="primary"
+                          >
+                            {BTN_ADD_CONDITION}
+                          </Button>
+                        </Space>
+                      </Form.Item>
+                    </>
+                  )}
                 </Form.List>
               </Col>
             </Row>
@@ -668,4 +714,13 @@ export default function SavePushMessageDialog({
       </Modal>
     </div>
   );
-}
+};
+
+SavePushMessageDialog.propTypes = {
+  botId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  resolver: PropTypes.func.isRequired,
+  item: PropTypes.object,
+  onCancel: PropTypes.func,
+};
+
+export default SavePushMessageDialog;

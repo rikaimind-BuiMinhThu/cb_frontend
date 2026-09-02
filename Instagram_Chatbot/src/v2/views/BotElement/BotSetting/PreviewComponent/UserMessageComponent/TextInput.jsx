@@ -1,7 +1,9 @@
-import React from "react";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { baseUserMessageComponentPropTypes } from './userMessageComponentPropTypes';
 import "v2/assets/css/bot/preview-chat-bot.css";
 import { EMPTY_INPUT_VALUE, MESSAGE_CONTENT_TYPES, REQUIRED_FIELD_LABEL } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
-import InputCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
+import InputCustom from "v2/components/BotMessages/InputCustom";
 import Text from "./TextInputComponent/Text";
 import PhoneNumber from "./TextInputComponent/PhoneNumber";
 import EmailInput from "./TextInputComponent/EmailInput";
@@ -203,6 +205,11 @@ const TextInput = ({ content, disabled, handleOnChangeJpConvertText, contentInde
       {renderErrorMessage()}
     </div>
   );
+};
+
+TextInput.propTypes = {
+  ...baseUserMessageComponentPropTypes,
+  handleOnChangeJpConvertText: PropTypes.func,
 };
 
 export default TextInput;

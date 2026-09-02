@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import "v2/assets/css/bot/preview-chat-bot.css";
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+import 'v2/assets/css/bot/preview-chat-bot.css';
 import {
   MESSAGE_CONTENT_TYPES,
   dataHourFixed as HOUR_DEFAULT_OPTIONS,
@@ -15,7 +16,7 @@ import {
 import { getCitiesByPrefecture } from "v2/views/BotElement/BotSetting/PreviewComponent/Utils";
 import { tokenExpired } from "v2/api/tokenExpired";
 import LPIntegrationOptionPullDown from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/LPIntegrationOptionPullDown";
-import SelectCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/SelectCustom";
+import SelectCustom from "v2/components/BotMessages/SelectCustom";
 
 const PullDown = ({ content, errors, contentIndex, messageIndex, disabled, onChangeValue, prefecturesList, lpOptionData, postMessageToParent, hidden }) => {
   const [cityOptions, setCityOptions] = useState([]);
@@ -624,6 +625,19 @@ const PullDown = ({ content, errors, contentIndex, messageIndex, disabled, onCha
       {renderErrorMessage()}
     </div>
   );
+};
+
+PullDown.propTypes = {
+  content: PropTypes.object,
+  errors: PropTypes.object,
+  contentIndex: PropTypes.number,
+  messageIndex: PropTypes.number,
+  disabled: PropTypes.bool,
+  onChangeValue: PropTypes.func,
+  prefecturesList: PropTypes.array,
+  lpOptionData: PropTypes.object,
+  postMessageToParent: PropTypes.func,
+  hidden: PropTypes.bool,
 };
 
 export default PullDown;

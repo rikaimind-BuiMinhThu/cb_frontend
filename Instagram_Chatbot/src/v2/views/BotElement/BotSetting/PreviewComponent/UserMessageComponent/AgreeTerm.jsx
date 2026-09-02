@@ -1,7 +1,8 @@
-import React from "react";
+import React from 'react';
+import { baseUserMessageComponentPropTypes } from './userMessageComponentPropTypes';
 import "v2/assets/css/bot/preview-chat-bot.css";
 import { MESSAGE_CONTENT_TYPES, REQUIRED_FIELD_LABEL } from "../Constants";
-import CheckboxCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/CheckboxCustom";
+import CheckboxCustom from "v2/components/BotMessages/CheckboxCustom";
 
 const AGREE_TERM_TYPES = {
   DETAIL_CONTENT: "detail_content",
@@ -128,6 +129,10 @@ const AgreeTerm = ({ content, messageIndex, contentIndex, onChangeValue, errors,
       {renderErrorMessage()}
     </div>
   );
+};
+
+AgreeTerm.propTypes = {
+  ...baseUserMessageComponentPropTypes,
 };
 
 export default AgreeTerm;

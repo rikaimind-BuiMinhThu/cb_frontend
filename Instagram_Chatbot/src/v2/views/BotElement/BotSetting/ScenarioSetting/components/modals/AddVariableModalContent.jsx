@@ -22,7 +22,6 @@ const AddVariableModalContent = ({ onClose, onSave, saving = false }) => {
           id="scenario-variable-name"
           type="text"
           className="ss-input-value ss-user-setting-item"
-          style={{ width: '100%', padding: '8px', fontSize: '14px', boxSizing: 'border-box' }}
           value={variableName}
           onChange={(e) => {
             setErrorVariable('');
@@ -37,7 +36,6 @@ const AddVariableModalContent = ({ onClose, onSave, saving = false }) => {
         <input
           type="text"
           className="ss-input-value ss-user-setting-item"
-          style={{ width: '100%', padding: '8px', fontSize: '14px', boxSizing: 'border-box' }}
           value={defaultValue}
           onChange={(e) => setDefaultValue(e.target.value)}
         />

@@ -47,14 +47,14 @@ const AddContentSelect = ({ messageType, setMessageType, hasContent, onAdd }) =>
       {CONTENT_TYPE_OPTIONS.map(([value, label]) => (
         <option key={value} value={value}>{label}</option>
       ))}
-      <option value="variable_set" style={{ display: 'none' }}>変数セット</option>
+      <option value="variable_set" className="ss-option--hidden">変数セット</option>
       <option
-        style={hasContent && messageType !== 'label_no_transition' ? { display: 'none' } : {}}
+        className={hasContent && messageType !== 'label_no_transition' ? 'ss-option--hidden' : ''}
         value="label_no_transition">
         ラベル（推移記録なし）
       </option>
     </select>
-    <Button className="ss-user-setting__select-btn-add" style={{ padding: '9px 23px' }} onClick={onAdd}>追加</Button>
+    <Button className="ss-user-setting__select-btn-add ss-user-setting__select-btn-add--padded" onClick={onAdd}>追加</Button>
   </div>
 );
 
@@ -77,16 +77,16 @@ const ScenarioUserSettingsPanel = () => {
         <div className="ss-user-setting__name-wrapper">
           <div>
             <span>名称</span>
-            <span className="ss-user-setting__name-error" style={{ marginLeft: '5px' }}>※必須</span>
+            <span className="ss-user-setting__name-error">※必須</span>
           </div>
           <InputCustom
             placeholder="名称を入力"
-            style={selectedMessage.message_name ? {} : { borderColor: 'red' }}
+            className={selectedMessage.message_name ? '' : 'ss-input--invalid'}
             onChange={value => onChangeValueNameMessage(indexMessageSelect, 'message_name', value)}
             value={selectedMessage.message_name}
           />
           {!selectedMessage.message_name &&
-            <div style={{ color: 'rgb(185, 74, 72)' }}>
+            <div className="ss-field-required-error">
               必ず指定してください。
             </div>
           }

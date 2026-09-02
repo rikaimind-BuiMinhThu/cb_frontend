@@ -8,32 +8,30 @@ export const mergePreviewRelativeCalendar = (calendar) => {
   const fromToday = Number(calendar.preview_days_from_today) || 0;
   const spanDays = Number(calendar.preview_days_relative_to_end_date);
 
-  let start = moment().startOf('day').add(fromToday, 'days');
-  let end = start.clone();
+  const baseStart = moment().startOf('day').add(fromToday, 'days');
+  const spanEnd = (Number.isFinite(spanDays) && spanDays !== 0)
+    ? baseStart.clone().add(spanDays - 1, 'days')
+    : (calendar.end_date ? moment(calendar.end_date, 'YYYY-MM-DD') : baseStart.clone());
 
-  if (Number.isFinite(spanDays) && spanDays !== 0) {
-    end = start.clone().add(spanDays - 1, 'days');
-  } else if (calendar.end_date) {
-    end = moment(calendar.end_date, 'YYYY-MM-DD');
-  }
-
-  if (calendar.start_date) {
+  const start = (() => {
+    if (!calendar.start_date) return baseStart;
     const configuredStart = moment(calendar.start_date, 'YYYY-MM-DD');
-    if (configuredStart.isValid() && start.isBefore(configuredStart)) {
-      start = configuredStart.clone();
+    if (configuredStart.isValid() && baseStart.isBefore(configuredStart)) {
+      return configuredStart.clone();
     }
-  }
+    return baseStart;
+  })();
 
-  if (calendar.end_date) {
+  const endBeforeClamp = (() => {
+    if (!calendar.end_date) return spanEnd;
     const configuredEnd = moment(calendar.end_date, 'YYYY-MM-DD');
-    if (configuredEnd.isValid() && end.isAfter(configuredEnd)) {
-      end = configuredEnd.clone();
+    if (configuredEnd.isValid() && spanEnd.isAfter(configuredEnd)) {
+      return configuredEnd.clone();
     }
-  }
+    return spanEnd;
+  })();
 
-  if (end.isBefore(start)) {
-    end = start.clone();
-  }
+  const end = endBeforeClamp.isBefore(start) ? start.clone() : endBeforeClamp;
 
   return {
     start_date: start.format('YYYY-MM-DD'),

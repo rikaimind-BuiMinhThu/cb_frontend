@@ -1,4 +1,6 @@
-import React from "react";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { baseUserMessageComponentPropTypes } from './userMessageComponentPropTypes';
 import "v2/assets/css/bot/preview-chat-bot.css";
 import { MESSAGE_CONTENT_TYPES, REQUIRED_FIELD_LABEL } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 import {
@@ -265,6 +267,12 @@ const RadioButton = ({ content, disabled, onChangeValue, errors, contentIndex, m
       {renderErrorMessage()}
     </div>
   );
+};
+
+RadioButton.propTypes = {
+  ...baseUserMessageComponentPropTypes,
+  onClickNext: PropTypes.func,
+  notUseButtonNext: PropTypes.bool,
 };
 
 export default RadioButton;

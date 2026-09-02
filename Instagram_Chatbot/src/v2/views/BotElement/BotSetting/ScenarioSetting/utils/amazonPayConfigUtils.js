@@ -54,11 +54,10 @@ export const applyAmazonPayDisplayModeToConditions = (conditions = [], mode) => 
 
 export const normalizeLpDomain = (input) => {
   if (!input || typeof input !== 'string') return '';
-  let domain = input.trim().toLowerCase();
-  domain = domain.replace(/^https?:\/\//, '');
-  domain = domain.split('/')[0].split('?')[0].split('#')[0];
-  domain = domain.replace(/^www\./, '');
-  return domain;
+  const trimmed = input.trim().toLowerCase();
+  const withoutProtocol = trimmed.replace(/^https?:\/\//, '');
+  const hostOnly = withoutProtocol.split('/')[0].split('?')[0].split('#')[0];
+  return hostOnly.replace(/^www\./, '');
 };
 
 export const normalizeAllowedLpDomains = (domains) => {
@@ -234,14 +233,4 @@ export const hasValidAmazonPaySelectors = (message) => {
 
 export const parseAmazonPayConfigFromApi = (rawConfig) => normalizeAmazonPayConfig(rawConfig || DEFAULT_AMAZON_PAY_CONFIG);
 
-export const buildAmazonPayButtonClickActionData = (config = {}) => {
-  const searchValue = (config.button_fukushashiki_search_value || '').trim();
-  if (searchValue) {
-    return {
-      searchMode: config.button_fukushashiki_search_mode,
-      searchValue,
-    };
-  }
-
-  return (config.button_selector || 'amazon_payment_method').replace(/^#/, '');
-};
+export { buildAmazonPayButtonClickActionData } from 'v2/utils/amazonPayButtonUtils';

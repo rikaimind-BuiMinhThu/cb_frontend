@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import PropTypes from 'prop-types';
 import { Button, Space, Tag, message } from 'antd';
 import {
   PauseCircleOutlined,
@@ -9,6 +10,30 @@ import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { AdminConfirmModal, AdminTable, AdminActionButton } from 'v2/components/AdminShell';
 import SavePushMessageDialog from './SavePushMessageDialog';
+import {
+  PUSH_MESSAGES_PATH,
+  SUCCESS_DELETE,
+  SUCCESS_SAVE,
+  COL_NO,
+  COL_TITLE,
+  COL_SENDING_METHOD,
+  COL_STARTED_AT,
+  COL_STATUS,
+  COL_ACTION,
+  TAG_EMAIL,
+  TAG_SMS,
+  TAG_SUBSCRIBE,
+  TAG_UNSUBSCRIBE,
+  BTN_PAUSE,
+  BTN_RESUME,
+  EMPTY_CELL,
+  EMPTY_LIST,
+  DELETE_CONFIRM,
+  DELETE_OK,
+  METHOD_EMAIL,
+  STATUS_SUBSCRIBE,
+  STATUS_UNSUBSCRIBE,
+} from './constants';
 
 const PushMessageList = ({ tick }) => {
   const { botId } = useParams();
@@ -20,7 +45,7 @@ const PushMessageList = ({ tick }) => {
   const fetchList = useCallback(() => {
     setLoading(true);
     api
-      .get(`/api/v1/managements/push_messages?chatbot_id=${botId}&page=all`)
+      .get(`${PUSH_MESSAGES_PATH}?chatbot_id=${botId}&page=all`)
       .then((res) => {
         if (res.data.code === 1) {
           setList(res.data.data);
@@ -42,10 +67,10 @@ const PushMessageList = ({ tick }) => {
 
   const onDelete = () => {
     api
-      .delete(`/api/v1/managements/push_messages/${deleteId}`)
+      .delete(`${PUSH_MESSAGES_PATH}/${deleteId}`)
       .then((res) => {
         if (res.data.code === 1) {
-          message.success('正常に削除しました。');
+          message.success(SUCCESS_DELETE);
           setList((pre) => pre.filter((each) => each.id !== deleteId));
           setDeleteId(null);
         } else if (res.data.code === 2) {
@@ -61,17 +86,17 @@ const PushMessageList = ({ tick }) => {
 
   const onChangeStatus = (item) => {
     const url =
-      item.subscribe_status === 'subscribe'
-        ? `/api/v1/managements/push_messages/${item.id}/unsubscribe`
-        : `/api/v1/managements/push_messages/${item.id}/subscribe`;
+      item.subscribe_status === STATUS_SUBSCRIBE
+        ? `${PUSH_MESSAGES_PATH}/${item.id}/unsubscribe`
+        : `${PUSH_MESSAGES_PATH}/${item.id}/subscribe`;
     const newStatus =
-      item.subscribe_status === 'subscribe' ? 'unsubscribe' : 'subscribe';
+      item.subscribe_status === STATUS_SUBSCRIBE ? STATUS_UNSUBSCRIBE : STATUS_SUBSCRIBE;
 
     api
       .patch(url)
       .then((res) => {
         if (res.data.code === 1) {
-          message.success('プッシュメッセージを正常に保存しました。');
+          message.success(SUCCESS_SAVE);
           setList((pre) =>
             pre.map((each) =>
               each.id === item.id
@@ -102,60 +127,60 @@ const PushMessageList = ({ tick }) => {
   const columns = useMemo(
     () => [
       {
-        title: '番号',
+        title: COL_NO,
         width: 70,
         align: 'center',
         render: (_, __, index) => index + 1,
       },
       {
-        title: 'プッシュメッセージ名',
+        title: COL_TITLE,
         dataIndex: 'title',
         ellipsis: true,
       },
       {
-        title: '送信方法',
+        title: COL_SENDING_METHOD,
         dataIndex: 'sending_method',
         width: 110,
         align: 'center',
         render: (method) =>
-          method === 'email' ? (
-            <Tag color="purple">メール</Tag>
+          method === METHOD_EMAIL ? (
+            <Tag color="purple">{TAG_EMAIL}</Tag>
           ) : (
-            <Tag color="blue">SMS</Tag>
+            <Tag color="blue">{TAG_SMS}</Tag>
           ),
       },
       {
-        title: '開始日時',
+        title: COL_STARTED_AT,
         dataIndex: 'started_at',
         width: 180,
         render: (value) =>
-          value ? value.substring(0, 19).replaceAll('T', ' ') : '—',
+          value ? value.substring(0, 19).replaceAll('T', ' ') : EMPTY_CELL,
       },
       {
-        title: '状態',
+        title: COL_STATUS,
         dataIndex: 'subscribe_status',
         width: 130,
         align: 'center',
         render: (status) =>
-          status === 'subscribe' ? (
-            <Tag color="success">配信予約中</Tag>
+          status === STATUS_SUBSCRIBE ? (
+            <Tag color="success">{TAG_SUBSCRIBE}</Tag>
           ) : (
-            <Tag>配信停止</Tag>
+            <Tag>{TAG_UNSUBSCRIBE}</Tag>
           ),
       },
       {
-        title: 'アクション',
+        title: COL_ACTION,
         align: 'right',
         width: 260,
         render: (_, row) => (
           <Space size={4} className="admin-table-actions">
-            {row.subscribe_status === 'subscribe' ? (
+            {row.subscribe_status === STATUS_SUBSCRIBE ? (
               <Button
                 size="small"
                 icon={<PauseCircleOutlined />}
                 onClick={() => onChangeStatus(row)}
               >
-                配信停止
+                {BTN_PAUSE}
               </Button>
             ) : (
               <Button
@@ -165,7 +190,7 @@ const PushMessageList = ({ tick }) => {
                 icon={<PlayCircleOutlined />}
                 onClick={() => onChangeStatus(row)}
               >
-                配信する
+                {BTN_RESUME}
               </Button>
             )}
             <AdminActionButton action="edit" iconOnly onClick={() => setUpdateItem(row)} />
@@ -184,13 +209,13 @@ const PushMessageList = ({ tick }) => {
         columns={columns}
         dataSource={list}
         rowKey="id"
-        emptyDescription="プッシュメッセージがありません"
+        emptyDescription={EMPTY_LIST}
       />
 
       <AdminConfirmModal
         open={Boolean(deleteId)}
-        message="本当に削除しますか。"
-        okText="削除"
+        message={DELETE_CONFIRM}
+        okText={DELETE_OK}
         danger
         onOk={onDelete}
         onCancel={() => setDeleteId(null)}
@@ -206,6 +231,10 @@ const PushMessageList = ({ tick }) => {
       )}
     </>
   );
+};
+
+PushMessageList.propTypes = {
+  tick: PropTypes.number,
 };
 
 export default PushMessageList;

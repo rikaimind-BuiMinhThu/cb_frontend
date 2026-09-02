@@ -7,49 +7,36 @@ import visa from "v2/assets/img/payment-method/visa.png";
 import { secondToDatetime } from "./Utils";
 import { createDefaultDomainSuggestion } from "./emailDomainDefaults";
 
-let dataHourFixed = [];
-for (let i = 0; i <= 23; i++) {
-  const formattedValue = i < 10 ? `0${i}` : i.toString();
-  dataHourFixed.push({
-    key: formattedValue,
-    value: formattedValue,
-  });
-}
+const HOUR_RANGE_START = 0;
+const HOUR_RANGE_END = 23;
+const MINUTE_RANGE_START = 0;
+const MINUTE_RANGE_END = 59;
+const YEAR_RANGE_START = 1935;
+const YEAR_RANGE_END = 2072;
+const MONTH_RANGE_START = 1;
+const MONTH_RANGE_END = 12;
+const DAY_RANGE_START = 1;
+const DAY_RANGE_END = 31;
 
-let dataMinutes = [];
-for (let i = 0; i <= 59; i++) {
-  const formattedValue = i < 10 ? `0${i}` : i.toString();
-  dataMinutes.push({
-    key: formattedValue,
-    value: formattedValue,
-  });
-}
+const padTwoDigits = (value) => (value < 10 ? `0${value}` : `${value}`);
 
-let dataYearFixed = [];
-for (let i = 1935; i <= 2072; i++) {
-  dataYearFixed.push({
-    key: i.toString(),
-    value: i.toString(),
-  });
-}
+const buildKeyValueRange = (start, end, pad) => Array.from(
+  { length: end - start + 1 },
+  (_, index) => {
+    const current = start + index;
+    const formattedValue = pad ? padTwoDigits(current) : `${current}`;
+    return {
+      key: formattedValue,
+      value: formattedValue,
+    };
+  },
+);
 
-let dataMonth = [];
-for (let i = 1; i <= 12; i++) {
-  const formattedValue = i < 10 ? `0${i}` : i.toString();
-  dataMonth.push({
-    key: formattedValue,
-    value: formattedValue,
-  });
-}
-
-let dataDay = [];
-for (let i = 1; i <= 31; i++) {
-  const formattedValue = i < 10 ? `0${i}` : i.toString();
-  dataDay.push({
-    key: formattedValue,
-    value: formattedValue,
-  });
-}
+const dataHourFixed = buildKeyValueRange(HOUR_RANGE_START, HOUR_RANGE_END, true);
+const dataMinutes = buildKeyValueRange(MINUTE_RANGE_START, MINUTE_RANGE_END, true);
+const dataYearFixed = buildKeyValueRange(YEAR_RANGE_START, YEAR_RANGE_END, false);
+const dataMonth = buildKeyValueRange(MONTH_RANGE_START, MONTH_RANGE_END, true);
+const dataDay = buildKeyValueRange(DAY_RANGE_START, DAY_RANGE_END, true);
 
 const dataPaymentMethod = [
   {
@@ -124,28 +111,7 @@ const CRAWL_ELEMENT_TYPES = {
 const NO_ERROR = 'NO_ERROR';
 const GETTING_ERROR_NOTIFICATION = 'getting_error_notification';
 
-const CHATBOT_ACTIONS = {
-  UPDATE_CREDIT_CARD_FORM: 'updateCreditCardForm',
-  CLICK_BUTTON: 'clickButton',
-  EXCUTE_JS: 'excuteJS',
-  FUKUSHASHIKI: 'fukushashiki',
-  GET_ERROR_MESSAGE: 'getErrorMessage',
-  GET_ERROR_MESSAGE_WITH_DISPLAY_MSG: 'getErrorMessageWithDisplayMsg',
-  CRAWL_DATA: 'crawlData',
-  OPEN_PREVIEW: 'openPreview',
-  GET_PREVIEW_ORDER_CONTENT: 'getPreviewOrderContent',
-  PREVIEW_OBJECT: 'previewObject',
-  SET_CHATBOT_CONVERSION_PARAMS_TO_LOCAL_STORAGE: 'setChatbotConversionParamsToLocalStorage',
-  INJECT_CUSTOM_JS: 'injectCustomJS',
-  UPDATE_AMAZON_PAY_DATA: 'updateAmazonPayData',
-  UPDATE_AMAZON_PAY_DATA_FOR_BLISS: 'updateAmazonPayDataForBliss',
-  UPDATE_AMAZON_PAY_DATA_FOR_ROSEMAY: 'updateAmazonPayDataForRoseMay',
-  UPDATE_AMAZON_PAY_DATA_FOR_PHYSTECH: 'updateAmazonPayDataForPhystech',
-  UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU: 'updateAmazonPayDataForYuwaeru',
-  UPDATE_AMAZON_PAY_DATA_BY_SELECTOR: 'updateAmazonPayDataBySelector',
-  UPDATE_NUMBER_ORDER_TO_UPSELL: "updateNumberOrderToUpsell",
-  LP_FIELD_CHANGED: 'lpFieldChanged',
-};
+export { CHATBOT_ACTIONS } from 'v2/variables/chatbotActions';
 
 const SEARCH_MODES = {
   ID: 1,
@@ -414,7 +380,6 @@ export {
   CHATBOT_SERVER,
   GET_CAPTCHA_PATH,
   SESSION_STORAGE_KEY,
-  CHATBOT_ACTIONS,
   CRAWL_ELEMENT_TYPES,
   SEARCH_MODES,
   MESSAGE_CONTENT_TYPES,
@@ -555,9 +520,50 @@ export const PREVIEW_ACTIONS = {
   UPDATE_LP_FIELD_VALUE: "UPDATE_LP_FIELD_VALUE",
 };
 
+export const QUERY_PARAM_IS_LOGGED_IN = 'isLoggedIn';
+export const QUERY_PARAM_VALUE_TRUE = 'true';
+
+export const PREVIEW_MESSAGE_CONTENT_TYPES = {
+  CAROUSEL: 'carousel',
+  CAPTURE: 'capture',
+  PRODUCT_PURCHASE: 'product_purchase',
+  PRODUCT_PURCHASE_RADIO_BUTTON: 'product_purchase_radio_button',
+  SLIDER: 'slider',
+};
+
 export const REQUIRED_FIELD_LABEL = '※必須';
 
 export const EMPTY_INPUT_VALUE = '';
+
+export const ALT_EMPTY = '';
+export const EMPTY_STRING = '';
+export const LABEL_SELECT = '選択';
+export const NEXT_BUTTON_LABEL = '次へ';
+export const UPDATE_BUTTON_LABEL = '更新';
+export const OK_BUTTON_LABEL = 'OK';
+export const PRODUCT_NUMBER_PREFIX = '商品番号: ';
+export const PRICE_PREFIX = '値段: ';
+export const PRICE_SUFFIX = ' 円';
+export const QUANTITY_PREFIX = '数量：最大';
+export const QUANTITY_SUFFIX = '個まで';
+export const DEFAULT_SLIDER_COLOR = '#2C75F0';
+export const SLIDER_CONTINUOUS_MIN = 0;
+export const SLIDER_CONTINUOUS_MAX = 100;
+export const SLIDER_CONTINUOUS_STEP = 0.1;
+
+export const CAROUSEL_TYPE = {
+  DEFAULT: 'default',
+};
+
+export const PRODUCT_PURCHASE_TYPE = {
+  TEXT_WITH_THUMBNAIL_IMAGE: 'text_with_thumbnail_image',
+  TEXT_WITH_IMAGE: 'text_with_image',
+  CONSUME_API_RESPONSE: 'consume_api_response',
+};
+
+export const SLIDER_TYPE = {
+  DISCRETE: 'discrete_type',
+};
 
 export const PULL_DOWN_PLACEHOLDERS = {
   YEAR: '年',

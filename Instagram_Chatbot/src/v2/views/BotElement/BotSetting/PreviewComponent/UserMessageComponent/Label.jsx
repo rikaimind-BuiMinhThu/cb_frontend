@@ -1,4 +1,5 @@
-import React from "react";
+import React from 'react';
+import { baseUserMessageComponentPropTypes } from './userMessageComponentPropTypes';
 import "v2/assets/css/bot/preview-chat-bot.css";
 import { MESSAGE_CONTENT_TYPES, REQUIRED_FIELD_LABEL } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 
@@ -22,6 +23,10 @@ const Label = ({ content }) => {
       </div>
     </div>
   );
+};
+
+Label.propTypes = {
+  ...baseUserMessageComponentPropTypes,
 };
 
 export default Label;

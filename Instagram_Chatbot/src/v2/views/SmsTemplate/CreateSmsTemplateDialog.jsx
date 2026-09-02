@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { Form, Input, Modal, message } from 'antd';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -6,8 +7,18 @@ import schema from './schema/createSmsTemplateFormSchema';
 import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { AdminActionButton } from 'v2/components/AdminShell';
+import {
+  SMS_TEMPLATES_PATH,
+  CREATE_LABEL,
+  TEMPLATE_NAME_LABEL,
+  MESSAGE_LABEL,
+  CREATE_OK,
+  CANCEL,
+  CHAR_COUNT_SUFFIX,
+  SUCCESS_CREATE,
+} from './constants';
 
-export default function CreateSmsTemplateDialog({ botId, resolver }) {
+const CreateSmsTemplateDialog = ({ botId, resolver }) => {
   const [open, setOpen] = React.useState(false);
 
   const {
@@ -28,7 +39,7 @@ export default function CreateSmsTemplateDialog({ botId, resolver }) {
 
   const onSubmit = async (data) => {
     try {
-      const response = await api.post(`/api/v1/managements/sms_templates`, {
+      const response = await api.post(SMS_TEMPLATES_PATH, {
         chatbot_id: botId,
         sms_template: { name: data.name, content: data.content },
       });
@@ -36,7 +47,7 @@ export default function CreateSmsTemplateDialog({ botId, resolver }) {
         message.error(response?.data?.message);
       }
       if (response?.data?.code === 1) {
-        message.success('テンプレートが正常に作成されました。');
+        message.success(SUCCESS_CREATE);
         resolver(response?.data?.data);
         handleClose();
       }
@@ -51,14 +62,14 @@ export default function CreateSmsTemplateDialog({ botId, resolver }) {
 
   return (
     <>
-      <AdminActionButton action="create" label="SMS作成" onClick={handleClickOpen} />
+      <AdminActionButton action="create" label={CREATE_LABEL} onClick={handleClickOpen} />
       <Modal
-        title="SMS作成"
+        title={CREATE_LABEL}
         open={open}
         onCancel={handleClose}
         onOk={handleSubmit(onSubmit)}
-        okText="作成"
-        cancelText="キャンセル"
+        okText={CREATE_OK}
+        cancelText={CANCEL}
         confirmLoading={isSubmitting}
         width={520}
       >
@@ -70,7 +81,7 @@ export default function CreateSmsTemplateDialog({ botId, resolver }) {
           wrapperCol={{ flex: 1 }}
         >
           <Form.Item
-            label="テンプレート名"
+            label={TEMPLATE_NAME_LABEL}
             validateStatus={errors?.name ? 'error' : ''}
             help={errors?.name?.message}
             required
@@ -78,16 +89,23 @@ export default function CreateSmsTemplateDialog({ botId, resolver }) {
             <Input {...register('name')} />
           </Form.Item>
           <Form.Item
-            label="メッセージ"
+            label={MESSAGE_LABEL}
             validateStatus={errors?.content ? 'error' : ''}
             help={errors?.content?.message}
             required
           >
             <Input.TextArea rows={4} {...register('content')} />
           </Form.Item>
-          <span style={{ color: '#6b7280' }}>{watchContent?.length || 0} 文字</span>
+          <span className="admin-char-count">{watchContent?.length || 0}{CHAR_COUNT_SUFFIX}</span>
         </Form>
       </Modal>
     </>
   );
-}
+};
+
+CreateSmsTemplateDialog.propTypes = {
+  botId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  resolver: PropTypes.func.isRequired,
+};
+
+export default CreateSmsTemplateDialog;

@@ -5,13 +5,8 @@ const SampleNextArrow = (props) => {
   const { className, style, onClick } = props;
   return (
     <RightOutlined
-      className={className}
-      style={{
-        ...style,
-        color: 'black',
-        fontSize: '15px',
-        lineHeight: '1.5715',
-      }}
+      className={`${className} ss-carousel-arrow`.trim()}
+      style={style}
       onClick={onClick}
     />
   );
@@ -21,13 +16,8 @@ const SamplePrevArrow = (props) => {
   const { className, style, onClick } = props;
   return (
     <LeftOutlined
-      className={className}
-      style={{
-        ...style,
-        color: 'black',
-        fontSize: '15px',
-        lineHeight: '1.5715',
-      }}
+      className={`${className} ss-carousel-arrow`.trim()}
+      style={style}
       onClick={onClick}
     />
   );

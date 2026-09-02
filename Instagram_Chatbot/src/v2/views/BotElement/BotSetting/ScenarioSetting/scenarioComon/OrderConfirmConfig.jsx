@@ -9,9 +9,7 @@ import {
 import OrderConfirmSettingsModal from './OrderConfirmSettingsModal';
 import useOrderConfirmMessageTemplates from 'v2/views/OrderConfirmTemplate/useOrderConfirmMessageTemplates';
 
-const sectionLabelStyle = { fontWeight: 600, marginTop: '12px', marginBottom: '6px', display: 'block', fontSize: '12px' };
-
-export default function OrderConfirmConfig({
+const OrderConfirmConfig = ({
   indexMessageSelect,
   indexContent = 0,
   typeContent,
@@ -20,7 +18,7 @@ export default function OrderConfirmConfig({
   dataMessages,
   setDataMessages,
   messageContent,
-}) {
+}) => {
   const config = normalizeOrderConfirmConfig(typeContent || getDefaultOrderConfirmConfig());
   const { templates, applySelection, presetOptions, confirmModal } = useOrderConfirmMessageTemplates();
   const [selectedTemplateValue, setSelectedTemplateValue] = useState('');
@@ -51,7 +49,7 @@ export default function OrderConfirmConfig({
   return (
     <div className="ss-bot-statement-wrapper">
       {confirmModal}
-      <span style={sectionLabelStyle}>注文確認メッセージテンプレート</span>
+      <span className="ss-config-section-label">注文確認メッセージテンプレート</span>
       <select
         className="ss-input-value"
         value={selectedTemplateValue}
@@ -71,7 +69,7 @@ export default function OrderConfirmConfig({
         )}
       </select>
 
-      <div style={{ marginTop: '12px' }}>
+      <div className="ss-config-field--mt12">
         <OrderConfirmSettingsModal
           config={config}
           indexMessageSelect={indexMessageSelect}
@@ -83,7 +81,7 @@ export default function OrderConfirmConfig({
         />
       </div>
 
-      <div className="ss-bot-checkbox-scroll-auto" style={{ marginTop: '10px' }}>
+      <div className="ss-bot-checkbox-scroll-auto ss-config-field">
         <CheckboxCustom
           label="自動でスクロールさせない"
           onChange={(value) => onChangeValueMessageContent(
@@ -113,8 +111,8 @@ export default function OrderConfirmConfig({
             />
           </div>
           {messageContent.is_use_custom_delay && (
-            <div className="ss-user-setting__item-bottom-flex-start" style={{ marginLeft: '25px', marginBottom: '10px' }}>
-              <span style={{ marginRight: '10px', fontSize: '12px' }}>待ち時間 (秒)</span>
+            <div className="ss-user-setting__item-bottom-flex-start ss-delay-setting">
+              <span className="ss-delay-setting__label">待ち時間 (秒)</span>
               <InputNum
                 step={0.1}
                 min={0}
@@ -133,4 +131,6 @@ export default function OrderConfirmConfig({
       )}
     </div>
   );
-}
+};
+
+export default OrderConfirmConfig;

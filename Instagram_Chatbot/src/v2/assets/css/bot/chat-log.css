@@ -133,6 +133,7 @@
   color: #fff;
   cursor: default;
   opacity: 0.85;
+  background-color: var(--chat-log-action-bg);
 }
 
 .admin-page--chat-log .chat-log-metrics-grid {
@@ -191,6 +192,38 @@
   width: 20px;
   height: 20px;
   filter: brightness(0) invert(1);
+}
+
+.admin-page--chat-log .chat-log-metric-card__icon--entry {
+  background-color: #1677ff;
+}
+
+.admin-page--chat-log .chat-log-metric-card__icon--form-completed {
+  background-color: #52c41a;
+}
+
+.admin-page--chat-log .chat-log-metric-card__icon--form-completion-rate {
+  background-color: #f59e0b;
+}
+
+.admin-page--chat-log .chat-log-metric-card__icon--cv-count {
+  background-color: #6366f1;
+}
+
+.admin-page--chat-log .chat-log-metric-card__icon--cv-entry-rate {
+  background-color: #ec4899;
+}
+
+.admin-page--chat-log .chat-log-metric-card__icon--impression {
+  background-color: #6b7280;
+}
+
+.admin-page--chat-log .chat-log-metric-card__icon--default {
+  background-color: #6b7280;
+}
+
+.admin-page--chat-log .chat-log-scenario-select {
+  min-width: 200px;
 }
 
 .admin-page--chat-log .chat-log-metric-card__info {

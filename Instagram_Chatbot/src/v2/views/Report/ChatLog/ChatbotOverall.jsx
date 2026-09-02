@@ -1,54 +1,74 @@
-import IconCheckCircle from "v2/assets/img/bot-icon/check-circle.svg";
-import IconEye from "v2/assets/img/bot-icon/eye.svg";
-import IconPercent from "v2/assets/img/bot-icon/percent.svg";
-import IconTrendingUp from "v2/assets/img/bot-icon/trending-up.svg";
-import IconUserCheck from "v2/assets/img/bot-icon/user-check.svg";
-import IconUserPlus from "v2/assets/img/bot-icon/user-plus.svg";
+import IconCheckCircle from 'v2/assets/img/bot-icon/check-circle.svg';
+import IconEye from 'v2/assets/img/bot-icon/eye.svg';
+import IconPercent from 'v2/assets/img/bot-icon/percent.svg';
+import IconTrendingUp from 'v2/assets/img/bot-icon/trending-up.svg';
+import IconUserCheck from 'v2/assets/img/bot-icon/user-check.svg';
+import IconUserPlus from 'v2/assets/img/bot-icon/user-plus.svg';
+import PropTypes from 'prop-types';
+import {
+  METRIC_KEY_ENTRY_COUNT,
+  METRIC_KEY_FORM_COMPLETED_COUNT,
+  METRIC_KEY_FORM_COMPLETION_RATE,
+  METRIC_KEY_IMPRESSION_COUNT,
+  METRIC_KEY_PGS_CV_COUNT,
+  METRIC_KEY_PGS_CV_ENTRY_RATE,
+  METRIC_LABEL_CV_COUNT,
+  METRIC_LABEL_CV_ENTRY_RATE,
+  METRIC_LABEL_CV_ENTRY_RATE_DIVIDER,
+  METRIC_LABEL_ENTRY_COUNT,
+  METRIC_LABEL_FORM_COMPLETED_COUNT,
+  METRIC_LABEL_FORM_COMPLETION_RATE,
+  METRIC_LABEL_IMPRESSION_COUNT,
+  METRIC_PGS_PREFIX,
+  METRIC_UNIT_PERCENT,
+} from 'v2/views/Report/constants';
 
 export const CONVERTERS_OVERALL = {
-  entry_count: {
+  [METRIC_KEY_ENTRY_COUNT]: {
     icon: IconUserPlus,
-    label: ["エントリー数"],
-    color: "#1677ff",
+    label: [METRIC_LABEL_ENTRY_COUNT],
+    iconClass: 'chat-log-metric-card__icon--entry',
   },
-  form_completed_count: {
+  [METRIC_KEY_FORM_COMPLETED_COUNT]: {
     icon: IconCheckCircle,
-    label: ["入力完了数"],
-    color: "#52c41a",
+    label: [METRIC_LABEL_FORM_COMPLETED_COUNT],
+    iconClass: 'chat-log-metric-card__icon--form-completed',
   },
-  form_completion_rate: {
+  [METRIC_KEY_FORM_COMPLETION_RATE]: {
     icon: IconPercent,
-    label: ["入力完了率"],
-    unit: "%",
-    color: "#f59e0b",
+    label: [METRIC_LABEL_FORM_COMPLETION_RATE],
+    unit: METRIC_UNIT_PERCENT,
+    iconClass: 'chat-log-metric-card__icon--form-completion-rate',
   },
-  pgs_cv_count: {
+  [METRIC_KEY_PGS_CV_COUNT]: {
     icon: IconUserCheck,
-    label: ["CV数"],
-    color: "#6366f1",
+    label: [METRIC_LABEL_CV_COUNT],
+    iconClass: 'chat-log-metric-card__icon--cv-count',
   },
-  pgs_cv_entry_rate: {
+  [METRIC_KEY_PGS_CV_ENTRY_RATE]: {
     icon: IconTrendingUp,
-    label: ["CV数", "/ エントリー数"],
-    unit: "%",
-    color: "#ec4899",
+    label: [METRIC_LABEL_CV_ENTRY_RATE, METRIC_LABEL_CV_ENTRY_RATE_DIVIDER],
+    unit: METRIC_UNIT_PERCENT,
+    iconClass: 'chat-log-metric-card__icon--cv-entry-rate',
   },
-  impression_count: {
+  [METRIC_KEY_IMPRESSION_COUNT]: {
     icon: IconEye,
-    label: ["インプレッション数"],
-    color: "#6b7280",
+    label: [METRIC_LABEL_IMPRESSION_COUNT],
+    iconClass: 'chat-log-metric-card__icon--impression',
   },
 };
 
-const ChatbotOverall = ({ overall }) => {
-  if (!overall.length) return null;
+const removePGSLabel = (label) => {
+  if (label.includes(METRIC_PGS_PREFIX)) {
+    return label.replace(METRIC_PGS_PREFIX, '');
+  }
+  return label;
+};
 
-  const removePGSLabel = (label) => {
-    if (label.includes("PGS-")) {
-      return label.replace("PGS-", "");
-    }
-    return label;
-  };
+const ChatbotOverall = ({ overall }) => {
+  if (!overall.length) {
+    return null;
+  }
 
   return (
     <div className="chat-log-metrics-grid">
@@ -56,27 +76,30 @@ const ChatbotOverall = ({ overall }) => {
         <div key={item.key} className="chat-log-metric-card">
           {item.icon && (
             <div
-              className="chat-log-metric-card__icon"
-              style={{ backgroundColor: item.color || "#6b7280" }}
+              className={`chat-log-metric-card__icon ${item.iconClass || 'chat-log-metric-card__icon--default'}`}
             >
               <img alt={`icon-${item.key}`} src={item.icon} />
             </div>
           )}
           <div className="chat-log-metric-card__info">
             <div className="chat-log-metric-card__label">
-              {item.label.map((l) => (
-                <span key={l}>{removePGSLabel(l)}</span>
+              {item.label.map((labelText) => (
+                <span key={labelText}>{removePGSLabel(labelText)}</span>
               ))}
             </div>
             <div className="chat-log-metric-card__value">
               {item.value}
-              {item.unit || ""}
+              {item.unit || ''}
             </div>
           </div>
         </div>
       ))}
     </div>
   );
+};
+
+ChatbotOverall.propTypes = {
+  overall: PropTypes.array,
 };
 
 export default ChatbotOverall;

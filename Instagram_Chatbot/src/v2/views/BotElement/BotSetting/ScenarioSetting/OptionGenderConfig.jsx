@@ -64,7 +64,6 @@ const OptionGenderConfig = ({ value, onChange })  => {
               preview={{ type: "text", text: "px" }}
               value={genderConfig.preset.icon.height}
               onChange={handleChangePreset("icon", "height", false)}
-              style={{ width: "50px" }}
               type="number"
             />
             <InputWithPreview
@@ -72,7 +71,6 @@ const OptionGenderConfig = ({ value, onChange })  => {
               preview={{ type: "text", text: "px" }}
               value={genderConfig.preset.icon.width}
               onChange={handleChangePreset("icon", "width", false)}
-              style={{ width: "50px" }}
               type="number"
             />
           </Fragment>
@@ -145,10 +143,11 @@ const InputWithPreview = ({ preview, ...props }) => {
       {!!preview[preview.type]?.length && (
         <div
           className={`preview`}
-          style={{
-            backgroundColor:
-              preview.type === "color" ? getColor(preview.color) : "",
-          }}
+          style={
+            preview.type === 'color'
+              ? { '--preview-bg': getColor(preview.color) }
+              : undefined
+          }
         >
           {preview.type === "text" && (
             <p className="preview-text">{preview.text}</p>

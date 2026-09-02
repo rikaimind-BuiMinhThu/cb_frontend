@@ -2,16 +2,14 @@ import _ from 'lodash';
 import { getDefaultUpsellButtonOptions } from '../constants/upsellButtonDefaults';
 import { DEFAULT_CONTACT_FORM_CONFIG } from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants';
 
-export function getNextContentId(messageContentArray) {
+export const getNextContentId = (messageContentArray) => {
   if (messageContentArray.length !== 0) {
     return Math.max(...messageContentArray.map((item) => item.id)) + 1;
   }
   return 1;
-}
+};
 
-export function createDefaultContentItem(messageType, idMax) {
-  let subType;
-
+export const createDefaultContentItem = (messageType, idMax) => {
   if (messageType === 'zip_code_address') {
     return {
       id: idMax,
@@ -444,8 +442,11 @@ export function createDefaultContentItem(messageType, idMax) {
     };
   }
 
-  if (messageType === 'text_input') subType = 'text';
-  if (messageType === 'agree_term') subType = 'detail_content';
+  const subType = messageType === 'text_input'
+    ? 'text'
+    : messageType === 'agree_term'
+      ? 'detail_content'
+      : messageType;
 
   return {
     id: idMax,

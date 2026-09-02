@@ -1,4 +1,5 @@
-import React from "react";
+import React from 'react';
+import PropTypes from 'prop-types';
 import "v2/assets/css/bot/preview-chat-bot.css";
 import {
   EMPTY_INPUT_VALUE,
@@ -7,9 +8,9 @@ import {
   dataPaymentMethod as cardBrands,
   dataMonth as cardExpiredMonthOptions
 } from "../Constants";
-import InputCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
-import InputNum from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputNum";
-import SelectCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/SelectCustom";
+import InputCustom from "v2/components/BotMessages/InputCustom";
+import InputNum from "v2/components/BotMessages/InputNum";
+import SelectCustom from "v2/components/BotMessages/SelectCustom";
 import cvcIcon from "assets/img/cvc-icon.png";
 import { moveToNext } from "v2/views/BotElement/BotSetting/PreviewComponent/Utils";
 
@@ -83,21 +84,17 @@ const CreditCardPayment = ({ content, messageIndex, contentIndex, onChangeValue,
             }}
             disabled={disabled}
             onPaste={(e) => {
+              e.preventDefault();
               const value = e.clipboardData
-                .getData("text")
-                .replace(/[^0-9]/g, "")
+                .getData('text')
+                .replace(/[^0-9]/g, '')
                 .slice(0, 16);
-              setTimeout(() => {
-                document.getElementById(
-                  "sp_credit_card_payment"
-                ).value = value;
-                onChangeValue(
-                  contentIndex,
-                  content.type,
-                  value,
-                  "card_number"
-                );
-              }, 10);
+              onChangeValue(
+                contentIndex,
+                content.type,
+                value,
+                'card_number'
+              );
             }}
             className="w-100-flush"
             value={creditCardPayment.card_number || EMPTY_INPUT_VALUE}
@@ -309,6 +306,15 @@ const CreditCardPayment = ({ content, messageIndex, contentIndex, onChangeValue,
       {renderErrorMessage()}
     </div>
   );
+};
+
+CreditCardPayment.propTypes = {
+  content: PropTypes.object,
+  messageIndex: PropTypes.number,
+  contentIndex: PropTypes.number,
+  onChangeValue: PropTypes.func,
+  errors: PropTypes.object,
+  disabled: PropTypes.bool,
 };
 
 export default CreditCardPayment;

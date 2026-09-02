@@ -11,21 +11,21 @@ const DOMAIN_MODE_OPTIONS = [
 ];
 
 /** Mode select + domain list + add/reset actions (for use inside a modal). */
-export function EmailDomainSuggestionListContent({
+export const EmailDomainSuggestionListContent = ({
   domainSuggestion,
   onChangeMode,
   onChangeDomain,
   onAddDomain,
   onRemoveDomain,
   onResetDomains,
-}) {
+}) => {
   const domains = domainSuggestion?.domains || [];
 
   return (
     <>
       <div className="ss-user-setting__item-bottom">
         <SelectCustom
-          style={{ width: '100%' }}
+          className="ss-select--full"
           value={domainSuggestion?.mode || EMAIL_DOMAIN_SUGGESTION_MODES.SUGGEST}
           data={DOMAIN_MODE_OPTIONS}
           onChange={onChangeMode}
@@ -33,28 +33,14 @@ export function EmailDomainSuggestionListContent({
           allowClear={false}
         />
       </div>
-      <div
-        style={{
-          backgroundColor: '#F8F9FA',
-          width: '100%',
-          padding: '5px',
-          marginBottom: '10px',
-          maxHeight: '320px',
-          overflowY: 'auto',
-        }}
-      >
+      <div className="ss-email-domain-list">
         {domains.map((item, index) => (
           <div
             key={item.id ?? index}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              marginBottom: '8px',
-            }}
+            className="ss-email-domain-list__row"
           >
             <InputCustom
-              style={{ width: '100%', marginBottom: 0 }}
+              className="ss-input--full-mb0"
               placeholder="example.com"
               value={item.domain || ''}
               onChange={(value) => onChangeDomain(index, value)}
@@ -62,7 +48,7 @@ export function EmailDomainSuggestionListContent({
             {domains.length > 1 && (
               <MDBIcon
                 fas
-                style={{ fontSize: '22px', cursor: 'pointer' }}
+                className="ss-icon-remove--lg"
                 icon="times-circle"
                 onClick={() => onRemoveDomain(index)}
               />
@@ -70,16 +56,15 @@ export function EmailDomainSuggestionListContent({
           </div>
         ))}
       </div>
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
+      <div className="ss-email-domain-list__actions">
         <Button
-          style={{ margin: 0, lineHeight: 'normal' }}
-          className="ss-user-setting__select-btn-add"
+          className="ss-user-setting__select-btn-add ss-email-domain-list__btn"
           onClick={onAddDomain}
         >
           ドメイン追加
         </Button>
         <Button
-          style={{ margin: 0, lineHeight: 'normal' }}
+          className="ss-email-domain-list__btn"
           color="secondary"
           outline
           onClick={onResetDomains}
@@ -89,6 +74,6 @@ export function EmailDomainSuggestionListContent({
       </div>
     </>
   );
-}
+};
 
 export default EmailDomainSuggestionListContent;

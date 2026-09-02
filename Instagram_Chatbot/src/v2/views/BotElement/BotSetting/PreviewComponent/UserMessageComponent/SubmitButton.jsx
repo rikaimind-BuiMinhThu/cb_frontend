@@ -1,5 +1,7 @@
-import React, { useEffect } from "react";
-import "v2/assets/css/bot/preview-chat-bot.css";
+import React, { useEffect } from 'react';
+import PropTypes from 'prop-types';
+import { baseUserMessageComponentPropTypes } from './userMessageComponentPropTypes';
+import 'v2/assets/css/bot/preview-chat-bot.css';
 import { EMPTY_INPUT_VALUE, MESSAGE_CONTENT_TYPES } from "../Constants";
 import { getErrorMessageFromParent } from "../../PreviewFukushashiki/LPUtils";
 
@@ -125,6 +127,14 @@ const SubmitButton = ({ content, submitErrorMessage = EMPTY_INPUT_VALUE, onChang
       {renderLoadingUnderButton()}
     </>
   );
+};
+
+SubmitButton.propTypes = {
+  ...baseUserMessageComponentPropTypes,
+  message: PropTypes.object,
+  submitErrorMessage: PropTypes.string,
+  onClickNext: PropTypes.func,
+  isProcessing: PropTypes.bool,
 };
 
 export default SubmitButton;

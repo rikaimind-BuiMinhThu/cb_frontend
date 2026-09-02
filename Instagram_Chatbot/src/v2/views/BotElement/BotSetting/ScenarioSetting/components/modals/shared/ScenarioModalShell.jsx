@@ -21,7 +21,7 @@ const ScenarioModalShell = ({
     <div className="ss-settings-modal-overlay" onClick={onClose} role="presentation">
       <div
         className={`ss-settings-modal-shell ${className}`.trim()}
-        style={{ width: `${width}px`, maxWidth: '95vw' }}
+        style={{ '--ss-modal-width': `${width}px` }}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"

@@ -6,7 +6,15 @@ import {
   AdminConfirmModal,
   useAdminHeaderActions,
 } from 'v2/components/AdminShell';
-import { TABS } from './constants';
+import {
+  TABS,
+  ADD_VARIABLE_LABEL,
+  TAB_USER_LABEL,
+  TAB_SYSTEM_LABEL,
+  PAGE_DESCRIPTION,
+  DELETE_CONFIRM,
+  DELETE_OK,
+} from './constants';
 import { variableFieldErrorKey } from './variableUtils';
 import UserVariablesTab from './UserVariablesTab';
 import SystemVariablesTab from './SystemVariablesTab';
@@ -57,7 +65,7 @@ const VariableManagement = () => {
     tab === TABS.USER ? (
       <AdminActionButton
         action="create"
-        label="変数追加"
+        label={ADD_VARIABLE_LABEL}
         onClick={startCreate}
         disabled={addingNew}
       />
@@ -66,7 +74,7 @@ const VariableManagement = () => {
 
   return (
     <>
-      <AdminPage description="※ユーザの入力内容などを保管する変数です。シナリオの中で代入や参照ができます。">
+      <AdminPage description={PAGE_DESCRIPTION}>
         <Tabs
           activeKey={tab}
           onChange={setTab}
@@ -74,7 +82,7 @@ const VariableManagement = () => {
           items={[
             {
               key: TABS.USER,
-              label: 'ユーザー定義関数',
+              label: TAB_USER_LABEL,
               children: (
                 <UserVariablesTab
                   variables={variables}
@@ -101,7 +109,7 @@ const VariableManagement = () => {
             },
             {
               key: TABS.SYSTEM,
-              label: 'システム変数',
+              label: TAB_SYSTEM_LABEL,
               children: <SystemVariablesTab />,
             },
           ]}
@@ -110,8 +118,8 @@ const VariableManagement = () => {
 
       <AdminConfirmModal
         open={Boolean(deleteId)}
-        message="変数を削除しますか。"
-        okText="削除"
+        message={DELETE_CONFIRM}
+        okText={DELETE_OK}
         danger
         loading={deleting}
         onOk={handleDelete}

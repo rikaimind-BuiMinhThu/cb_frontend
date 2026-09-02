@@ -1,4 +1,8 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
+const HTML_PLACEHOLDER = '<p style="color: #999; font-style: italic;">HTMLコードを入力してください</p>';
+const DISPLAY_UGC_CLASS = 'display_ugc';
 
 const HtmlCodeMessagePreview = ({
   content,
@@ -6,33 +10,30 @@ const HtmlCodeMessagePreview = ({
   botInfor,
   themeSettings,
 }) => {
-  const defaultHtmlContent = '<p style="color: #999; font-style: italic;">HTMLコードを入力してください</p>';
-  const htmlContent = content[content.type]?.content || defaultHtmlContent;
+  const htmlContent = content[content.type]?.content || HTML_PLACEHOLDER;
   const isUseForUgc = !!content[content.type]?.use_for_ugc;
 
   const messageColor = themeSettings?.botMessageBgColor || botInfor?.message_color || '#3CACEF';
   const fontColor = themeSettings?.botMessageTextColor || botInfor?.font_color || '#fff';
   const iconMess = botInfor?.icon_mess;
 
-  
-
   return (
     <div className="position-relative">
       <div
-        className={`ss-bot-chat-overview-${contentIndex} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value position-relative html-code-message-preview ${isUseForUgc ? 'display_ugc' : ""}`}
+        className={`ss-bot-chat-overview-${contentIndex} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value position-relative html-code-message-preview ${isUseForUgc ? DISPLAY_UGC_CLASS : ''}`}
         style={{
-          backgroundColor: messageColor,
-          color: fontColor
+          '--html-preview-bg': messageColor,
+          '--html-preview-color': fontColor,
         }}
         dangerouslySetInnerHTML={{
-          __html: htmlContent
+          __html: htmlContent,
         }}
       />
       <div
-        className="html-code-message-icon"
+        className="html-code-message-icon html-code-message-preview__icon"
         style={{
-          backgroundColor: messageColor,
-          background: iconMess ? `url(${iconMess})` : undefined
+          '--html-preview-bg': messageColor,
+          '--html-preview-icon-bg': iconMess ? `url(${iconMess})` : undefined,
         }}
       >
         {!iconMess && (
@@ -47,6 +48,18 @@ const HtmlCodeMessagePreview = ({
       </div>
     </div>
   );
+};
+
+HtmlCodeMessagePreview.propTypes = {
+  content: PropTypes.object.isRequired,
+  contentIndex: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  botInfor: PropTypes.object,
+  themeSettings: PropTypes.object,
+};
+
+HtmlCodeMessagePreview.defaultProps = {
+  botInfor: null,
+  themeSettings: null,
 };
 
 export default HtmlCodeMessagePreview;

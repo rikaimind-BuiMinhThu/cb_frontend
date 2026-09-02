@@ -347,6 +347,14 @@
     justify-content: flex-end;
 }
 
+.sp-user-message-button-action .ss-user-message__action-btn {
+    background-color: var(--ss-action-btn-bg);
+}
+
+.sp-user-message-button-action--hidden {
+    display: none;
+}
+
 .ss-user-message__content-wrapper > .sp-user-message-button-action {
     margin-top: 10px;
 }
@@ -1498,6 +1506,42 @@ slideUp
   font-size: var(--c-validation-font-size, 12px);
 }
 
+.preview-um-block {
+  margin-bottom: 10px;
+}
+
+.preview-um-title-row-mb-0 {
+  margin-bottom: 0;
+}
+
+.preview-um-capture-title-row {
+  margin-bottom: -5px;
+}
+
+.preview-um-field-bottom-mb-0 {
+  margin-bottom: 0;
+}
+
+.preview-um-field-half {
+  width: 50%;
+}
+
+.preview-um-carousel-img {
+  width: 100%;
+}
+
+.preview-um-carousel-selected {
+  background-color: white;
+}
+
+.preview-um-carousel-disabled {
+  background-color: #B2B0AE;
+}
+
+.preview-um-slider .ant-slider-track {
+  background-color: var(--preview-slider-color, #2C75F0);
+}
+
 .ss-message__content--user-text-input-required,
 .ss-message__content--user-required {
   color: var(--c-required-label-text, #FF7E00);
@@ -2045,4 +2089,17 @@ slideUp
   pointer-events: none;
 }
 
+.user-message-tail-icon-svg {
+  transform: scaleX(-1);
+}
+
+.html-code-message-preview {
+  background-color: var(--html-preview-bg, #3CACEF);
+  color: var(--html-preview-color, #fff);
+}
+
+.html-code-message-preview__icon {
+  background-color: var(--html-preview-bg, #3CACEF);
+  background: var(--html-preview-icon-bg);
+}
 

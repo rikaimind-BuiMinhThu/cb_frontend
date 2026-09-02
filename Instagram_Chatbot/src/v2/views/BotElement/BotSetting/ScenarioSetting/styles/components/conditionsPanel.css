@@ -133,6 +133,18 @@
   gap: 8px;
 }
 
+.ss-audience-condition-spacer {
+  width: 14%;
+}
+
+.ss-bot-setting-add-condition-button {
+  background-color: #347aed !important;
+}
+
+.ss-audience-condition-name {
+  margin-bottom: 5px;
+}
+
 .ss-conditions-more-settings__summary {
   display: flex;
   flex-wrap: wrap;

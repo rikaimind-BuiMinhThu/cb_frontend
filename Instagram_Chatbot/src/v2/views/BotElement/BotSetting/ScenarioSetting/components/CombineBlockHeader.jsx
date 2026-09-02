@@ -40,7 +40,6 @@ const CombineBlockHeader = ({
           min={0}
           max={100}
           className="ss-combine-block-header__padding-input"
-          style={{ width: 72, height: 32 }}
           value={content.padding ?? 10}
           onChange={(value) => onChangeBlockPadding(indexContent, value)}
         />

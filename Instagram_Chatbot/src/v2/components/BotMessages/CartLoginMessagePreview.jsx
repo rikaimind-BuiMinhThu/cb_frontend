@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
-import { CHATBOT_ACTIONS } from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants';
+import PropTypes from 'prop-types';
+import { CHATBOT_ACTIONS } from 'v2/variables/chatbotActions';
 import {
   buildCartLoginClickJs,
   buildCartLoginStyle,
@@ -7,8 +8,8 @@ import {
   getCartLoginHoverBackgroundColor,
   normalizeCartLoginConfig,
   shouldCloseBotAfterCartLoginClick,
-} from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/cartLoginUtils';
-import { CART_LOGIN_PROCESS_AFTER_CLICK } from 'v2/views/BotElement/BotSetting/ScenarioSetting/constants/cartLoginConstants';
+} from 'v2/utils/cartLoginUtils';
+import { CART_LOGIN_PROCESS_AFTER_CLICK } from 'v2/variables/cartLoginConstants';
 
 const CartLoginMessagePreview = ({
   content,
@@ -129,6 +130,22 @@ const CartLoginMessagePreview = ({
       </div>
     </div>
   );
+};
+
+CartLoginMessagePreview.propTypes = {
+  content: PropTypes.shape({
+    cart_login: PropTypes.object,
+  }).isRequired,
+  contentIndex: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  botInfor: PropTypes.object,
+  themeSettings: PropTypes.object,
+  executeLpJsCode: PropTypes.func,
+};
+
+CartLoginMessagePreview.defaultProps = {
+  botInfor: null,
+  themeSettings: null,
+  executeLpJsCode: null,
 };
 
 export default CartLoginMessagePreview;

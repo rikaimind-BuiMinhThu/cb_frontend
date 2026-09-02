@@ -1,34 +1,79 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { DatePicker, Empty, Select, Space, Tabs, Typography } from "antd";
+import React, { useState, useEffect, useMemo } from 'react';
+import { DatePicker, Empty, Select, Space, Tabs, Typography } from 'antd';
 import api from 'v2/api/api-management';
-import Cookies from "js-cookie";
-import { format } from "date-fns";
-import "v2/assets/css/bot/bot-chat-log.css";
-import "v2/assets/css/bot/report.css";
-import "v2/assets/css/bot/chat-log.css";
-import $ from "jquery";
-import BotMessage from "./BotMessage";
-import UserMessage from "./UserMessage";
-import { findLastIndex } from "lodash";
-import moment from "moment";
-import jwt_decode from 'jwt-decode'
-import BotChatStatistic from "./BotChatStatistic";
-import { AdminPage, AdminActionButton } from "v2/components/AdminShell";
+import Cookies from 'js-cookie';
+import { format } from 'date-fns';
+import 'v2/assets/css/bot/bot-chat-log.css';
+import 'v2/assets/css/bot/report.css';
+import 'v2/assets/css/bot/chat-log.css';
+import $ from 'jquery';
+import BotMessage from './BotMessage';
+import UserMessage from './UserMessage';
+import { findLastIndex } from 'lodash';
+import moment from 'moment';
+import jwt_decode from 'jwt-decode';
+import BotChatStatistic from './BotChatStatistic';
+import { AdminPage, AdminActionButton } from 'v2/components/AdminShell';
 import { getSignInPath } from 'v2/variables/constants';
+import {
+  CHAT_LOG_DATE_FORMAT,
+  CHAT_LOG_DATE_PICKER_FORMAT,
+  CHAT_LOG_DISPLAY_DATE_FORMAT,
+  CHAT_LOG_NEXT_BUTTON,
+  CHAT_LOG_PASSWORD_MASK,
+  CHAT_LOG_SCENARIO_LABEL,
+  CHAT_LOG_SCENARIO_PLACEHOLDER,
+  CHAT_LOG_SELECT_CONVERSATION,
+  CHAT_LOG_STATUS_DONE,
+  CHAT_LOG_STATUS_NOT_DONE,
+  CHAT_LOG_TAB_LOGS,
+  CHAT_LOG_TAB_LOGS_LABEL,
+  CHAT_LOG_TAB_STATISTIC,
+  CHAT_LOG_TAB_STATISTIC_LABEL,
+  EMPTY_STRING,
+  formatChatLogConversationHeader,
+  formatChatLogUserName,
+} from 'v2/views/Report/constants';
 
-const TABS = {
-  LOGS: "LOGS",
-  STATICTIC: "STATICTIC",
-}
+const SCAN_REGEX = /\{\{(.*?)\}\}/g;
 
-function BotChatLog() {
+const assignUserNamesToChats = (chats) =>
+  chats.map((chat, index) => ({
+    ...chat,
+    name: formatChatLogUserName(index, chats.length),
+  }));
+
+const normalizeConversationEntry = (conversation) => {
+  const next = { ...conversation };
+  if (
+    ['data_name', 'zip_code_address', 'birth_date'].includes(
+      next.data_input_name,
+    )
+  ) {
+    const str = next.string_value
+      ? next.string_value.replaceAll(SCAN_REGEX)
+      : next.text_value
+        ? next.text_value.replaceAll(SCAN_REGEX)
+        : undefined;
+    next.content = JSON.parse(str ?? '');
+  }
+  next.value =
+    next.content ??
+    next.boolean_value ??
+    next.string_value ??
+    next.text_value ??
+    next.integer_value;
+  return next;
+};
+
+const BotChatLog = () => {
   const botId = Cookies.get("bot_id");
   const [scenarios, setScenarios] = useState([]);
   const [chats, setChats] = useState([]);
   const [, setConversions] = useState([]);
   const [selectScenario, setSelectScenario] = useState(null);
   const [selectUserId, setSelectUserId] = useState(null);
-  const [selectTab, setSelectTab] = useState(TABS.LOGS);
+  const [selectTab, setSelectTab] = useState(CHAT_LOG_TAB_LOGS);
 
   const [searchScenarioId, setSearchScenarioId] = useState(null);
   const [searchDate] = useState(null);
@@ -58,11 +103,7 @@ function BotChatLog() {
       .then((res) => {
         if (res.data.code === 1) {
           setScenarios(res.data.scenarios);
-          var chatLength = res.data.chats.length;
-          for (var i = 0; i < chatLength; i++) {
-            res.data.chats[i].name = "ユーザー " + (chatLength - i);
-          }
-          setChats(res.data.chats);
+          setChats(assignUserNamesToChats(res.data.chats));
         }
       });
       getScenarioStatistic({sc_id: searchScenarioId ? parseInt(searchScenarioId) : null, bot_id: botId});
@@ -78,27 +119,23 @@ function BotChatLog() {
     [scenarios]
   );
 
-  function formatDate(date) {
-    return moment(date).format("YYYY-MM-DD");
-  }
+  const formatDate = (date) => {
+    return moment(date).format(CHAT_LOG_DATE_FORMAT);
+  };
 
-  function searchLog(params) {
+  const searchLog = (params) => {
     api
       .get(`/api/v1/managements/chat_log/${botId}/list`, {params})
       .then((res) => {
         if (res.data.code === 1) {
           setScenarios(res.data.scenarios);
-          var chatLength = res.data.chats.length;
-          for (var i = 0; i < chatLength; i++) {
-            res.data.chats[i].name = "ユーザー " + (chatLength - i);
-          }
-          setChats(res.data.chats);
+          setChats(assignUserNamesToChats(res.data.chats));
         }
       });
 
   }
 
-  function pressSearchButton() {
+  const pressSearchButton = () => {
     const params = {
       sc_id: searchScenarioId ? parseInt(searchScenarioId) : null,
       date: searchDate ? formatDate(searchDate) : null,
@@ -129,16 +166,14 @@ function BotChatLog() {
   const [statistic, setStatistic] = useState([]);
   const [overall, setOverall] = useState({});
 
-  let SCAN_REGEX = /\{\{(.*?)\}\}/g;
-
   const [objParam, setObjParam] = useState(() => {
-    let dataObj = {
+    const dataObj = {
       current_url: window.location.href,
       current_url_title: document.title,
-      user_id: Cookies.get("user_id"),
-      bot_id: Cookies.get("bot_id"),
+      user_id: Cookies.get('user_id'),
+      bot_id: Cookies.get('bot_id'),
     };
-    $.getJSON("https://api.ipregistry.co/?key=tryout", function (data) {
+    $.getJSON('https://api.ipregistry.co/?key=tryout', (data) => {
       dataObj.user_ip_address = data.ip;
       dataObj.user_country = data.location.country.name;
       dataObj.user_city = data.location.city;
@@ -150,7 +185,7 @@ function BotChatLog() {
     return dataObj;
   });
 
-  function onSelectChat(item) {
+  const onSelectChat = (item) => {
     setSelectUserId(item.user_input_id);
     const sc = scenarios.find((s) => s.id === item.scenario_id);
     if (!sc) return;
@@ -163,9 +198,9 @@ function BotChatLog() {
     getMessageData(item)
   }
 
-  function getScenarioMessages(botId, scenario_id, conversion = [], options = {}) {
-    let messageArr = [];
-    let conversations = conversion;
+  const getScenarioMessages = (botId, scenario_id, conversion = [], options = {}) => {
+    const messageArr = [];
+    const conversationState = { list: conversion };
 
     const { saveMsgRender = true, saveMsgStatistic = true } = options;
 
@@ -176,56 +211,56 @@ function BotChatLog() {
       .then(async (res) => {
         if (res.data.code === 1) {
           if (res.data.data?.conversation?.messages?.length > 0) {
-            messageArr = [...res.data.data?.conversation?.messages];
+            messageArr.push(...res.data.data.conversation.messages);
           }
-          let variablesAll = res.data?.all_variables || [];
+          const variablesAll = res.data?.all_variables || [];
           setDataVariables(variablesAll);
           setDataMessages(messageArr);
           if (res.data.chatbot) {
-            let opacity_color, message_color, font_color;
-            if (res.data.chatbot.main_color === "blue") {
-              opacity_color = "#D6E0EF";
-              message_color = "#3CACEF";
-              font_color = "#fff";
-            } else if (res.data.chatbot.main_color === "green") {
-              opacity_color = "#DEEADB";
-              message_color = "#9DDB7C";
-              font_color = "#fff";
-            } else if (res.data.chatbot.main_color === "orange") {
-              opacity_color = "#F4E5DA";
-              message_color = "#EF8D2F";
-              font_color = "#fff";
-            } else if (res.data.chatbot.main_color === "yellow") {
-              opacity_color = "#F0EFEB";
-              message_color = "#F3AA2D";
-              res.data.chatbot.main_color = "#F6CA21";
-              font_color = "#fff";
-            } else if (res.data.chatbot.main_color === "pink") {
-              opacity_color = "#EBDDE3";
-              message_color = "#E65B83";
-              res.data.chatbot.main_color = "#F170AA";
-              font_color = "#fff";
-            } else if (res.data.chatbot.main_color === "purple") {
-              opacity_color = "#E9E8F1";
-              message_color = "#AF82D5";
-              res.data.chatbot.main_color = "#8C66D9";
-              font_color = "#fff";
-            } else if (res.data.chatbot.main_color === "black") {
-              opacity_color = "#ECEDE8";
-              message_color = "#fff";
-              font_color = "#333333";
-            } else if (res.data.chatbot.main_color === "white") {
-              opacity_color = "#fff";
-              message_color = "#F5F5F5";
-              font_color = "#000";
+            const colorState = { opacity_color: null, message_color: null, font_color: null };
+            if (res.data.chatbot.main_color === 'blue') {
+              colorState.opacity_color = '#D6E0EF';
+              colorState.message_color = '#3CACEF';
+              colorState.font_color = '#fff';
+            } else if (res.data.chatbot.main_color === 'green') {
+              colorState.opacity_color = '#DEEADB';
+              colorState.message_color = '#9DDB7C';
+              colorState.font_color = '#fff';
+            } else if (res.data.chatbot.main_color === 'orange') {
+              colorState.opacity_color = '#F4E5DA';
+              colorState.message_color = '#EF8D2F';
+              colorState.font_color = '#fff';
+            } else if (res.data.chatbot.main_color === 'yellow') {
+              colorState.opacity_color = '#F0EFEB';
+              colorState.message_color = '#F3AA2D';
+              res.data.chatbot.main_color = '#F6CA21';
+              colorState.font_color = '#fff';
+            } else if (res.data.chatbot.main_color === 'pink') {
+              colorState.opacity_color = '#EBDDE3';
+              colorState.message_color = '#E65B83';
+              res.data.chatbot.main_color = '#F170AA';
+              colorState.font_color = '#fff';
+            } else if (res.data.chatbot.main_color === 'purple') {
+              colorState.opacity_color = '#E9E8F1';
+              colorState.message_color = '#AF82D5';
+              res.data.chatbot.main_color = '#8C66D9';
+              colorState.font_color = '#fff';
+            } else if (res.data.chatbot.main_color === 'black') {
+              colorState.opacity_color = '#ECEDE8';
+              colorState.message_color = '#fff';
+              colorState.font_color = '#333333';
+            } else if (res.data.chatbot.main_color === 'white') {
+              colorState.opacity_color = '#fff';
+              colorState.message_color = '#F5F5F5';
+              colorState.font_color = '#000';
             } else {
-              opacity_color = res.data.chatbot.main_color_other;
-              message_color = res.data.chatbot.main_color_other;
-              font_color = res.data.chatbot.font_color;
+              colorState.opacity_color = res.data.chatbot.main_color_other;
+              colorState.message_color = res.data.chatbot.main_color_other;
+              colorState.font_color = res.data.chatbot.font_color;
             }
-            res.data.chatbot.opacity_color = opacity_color;
-            res.data.chatbot.message_color = message_color;
-            res.data.chatbot.font_color = font_color;
+            res.data.chatbot.opacity_color = colorState.opacity_color;
+            res.data.chatbot.message_color = colorState.message_color;
+            res.data.chatbot.font_color = colorState.font_color;
           }
 
           setBotInfor(res.data.chatbot);
@@ -236,92 +271,92 @@ function BotChatLog() {
             });
           }
           setObjParam({ ...objParam });
-          let variables = [...res.data.variables];
-          let messageUserVar = messageArr.filter(
+          const variables = [...res.data.variables];
+          const messageUserVar = messageArr.filter(
             (item) =>
               item.belong_to === "user" && item.message_content.length > 0
           );
           setMessageUser([...messageUserVar]);
-          let renderMessage = [];
+          const renderMessage = [];
 
           if (!conversion.length) {
             return;
           }
 
-          for (let i = 0; i < messageArr.length; i++) {
+          for (const [i] of messageArr.entries()) {
             if (messageArr[i].conditions?.length > 0) {
-              var checked = true;
-              for (let j = 0; j < messageArr[i].conditions.length; j++) {
-                let conditionItem = messageArr[i].conditions[j];
+              const checkState = { checked: true };
+              for (const [j] of messageArr[i].conditions.entries()) {
+                const conditionItem = messageArr[i].conditions[j];
                 if (j === 0) {
                   if (conditionItem.condition === "include") {
-                    checked = objParam[
+                    checkState.checked = objParam[
                       conditionItem.nameCondition
                     ].includes(conditionItem.inputCondition);
                   } else if (conditionItem.condition === "is") {
-                    checked =
+                    checkState.checked =
                       objParam[conditionItem.nameCondition] ===
                       conditionItem.inputCondition;
                   } else if (conditionItem.condition === "not_include") {
-                    checked = !objParam[
+                    checkState.checked = !objParam[
                       conditionItem.nameCondition
                     ].includes(conditionItem.inputCondition);
                   } else if (conditionItem.condition === "is_not") {
-                    checked =
+                    checkState.checked =
                       objParam[conditionItem.nameCondition] !==
                       conditionItem.inputCondition;
                   }
                 } else if (conditionItem?.linkCondition === "and") {
                   if (conditionItem.condition === "include") {
-                    checked =
-                      checked &&
+                    checkState.checked =
+                      checkState.checked &&
                       objParam[conditionItem.nameCondition].includes(
                         conditionItem.inputCondition
                       );
                   } else if (conditionItem.condition === "is") {
-                    checked =
-                      checked &&
+                    checkState.checked =
+                      checkState.checked &&
                       objParam[conditionItem.nameCondition] ===
                         conditionItem.inputCondition;
                   } else if (conditionItem.condition === "not_include") {
-                    checked =
-                      checked &&
+                    checkState.checked =
+                      checkState.checked &&
                       !objParam[conditionItem.nameCondition].includes(
                         conditionItem.inputCondition
                       );
                   } else if (conditionItem.condition === "is_not") {
-                    checked =
-                      checked &&
+                    checkState.checked =
+                      checkState.checked &&
                       objParam[conditionItem.nameCondition] !==
                         conditionItem.inputCondition;
                   }
                 } else if (conditionItem?.linkCondition === "or") {
                   if (conditionItem.condition === "include") {
-                    checked =
-                      checked ||
+                    checkState.checked =
+                      checkState.checked ||
                       objParam[conditionItem.nameCondition].includes(
                         conditionItem.inputCondition
                       );
                   } else if (conditionItem.condition === "is") {
-                    checked =
-                      checked ||
+                    checkState.checked =
+                      checkState.checked ||
                       objParam[conditionItem.nameCondition] ===
                         conditionItem.inputCondition;
                   } else if (conditionItem.condition === "not_include") {
-                    checked =
-                      checked ||
+                    checkState.checked =
+                      checkState.checked ||
                       !objParam[conditionItem.nameCondition].includes(
                         conditionItem.inputCondition
                       );
                   } else if (conditionItem.condition === "is_not") {
-                    checked =
-                      checked ||
+                    checkState.checked =
+                      checkState.checked ||
                       objParam[conditionItem.nameCondition] !==
                         conditionItem.inputCondition;
                   }
                 }
               }
-              if (checked === false) {
+              if (checkState.checked === false) {
                 if (messageArr[i].belong_to === "user")
                   setIndexUser((prev) => prev + 1);
                 // continue;
@@ -350,7 +385,7 @@ function BotChatLog() {
               } else if (
                 messageArr[i]?.message_content[0]?.type === "email"
               ) {
-                let variablesData = {};
+                const variablesData = {};
                 variablesAll.forEach((item) => {
                   variablesData[item.variable_name] = item.default_value;
                 });
@@ -366,12 +401,12 @@ function BotChatLog() {
                 messageArr[i]?.message_content[0]?.type === "variable_set"
               ) {
                 if (variables.length !== 0) {
-                  let dataVarExist =
+                  const dataVarExist =
                     messageArr[i]?.message_content[0][
                       messageArr[i]?.message_content[0].type
                     ].variables;
                   variables.forEach((item) => {
-                    for (let z = 0; z < dataVarExist.length; z++) {
+                    for (const [z] of dataVarExist.entries()) {
                       if (item.variable_name === dataVarExist[z].key) {
                         item.default_value = dataVarExist[z].value;
                       }
@@ -387,12 +422,12 @@ function BotChatLog() {
                 "clear_variable"
               ) {
                 if (variables.length !== 0) {
-                  let dataVarExist =
+                  const dataVarExist =
                     messageArr[i]?.message_content[0][
                       messageArr[i]?.message_content[0].type
                     ].variables;
                   variables.forEach((item) => {
-                    for (let z = 0; z < dataVarExist.length; z++) {
+                    for (const [z] of dataVarExist.entries()) {
                       if (item.variable_name === dataVarExist[z]) {
                         item.default_value = "";
                       }
@@ -411,11 +446,7 @@ function BotChatLog() {
                 setIndexMessageRender(i);
                 break;
               } else if (messageArr[i].belong_to !== "bot") {
-                for (
-                  let j = 0;
-                  j < messageArr[i].message_content.length;
-                  j++
-                ) {
+                for (const [j] of messageArr[i].message_content.entries()) {
                   if (
                     messageArr[i].message_content[j].type === "capture"
                   ) {
@@ -470,15 +501,15 @@ function BotChatLog() {
                       SCAN_REGEX,
                       (text, variable) => {
                         if (variables.length !== 0) {
-                          let valueVar = "";
-                          for (let j = 0; j < variables.length; j++) {
+                          const valueVarRef = { value: '' };
+                          for (const [j] of variables.entries()) {
                             if (variables[j].variable_name === variable) {
-                              valueVar = variables[j].default_value;
+                              valueVarRef.value = variables[j].default_value;
                             }
                           }
-                          return valueVar;
+                          return valueVarRef.value;
                         } else {
-                          return "";
+                          return EMPTY_STRING;
                         }
                       }
                     );
@@ -490,76 +521,72 @@ function BotChatLog() {
               }
             }
             if (messageArr[i]?.belong_to === "user") {
-              if (conversations.length === 0) {
+              if (conversationState.list.length === 0) {
                 break;
               }
-              for (
-                let msIndex = 0;
-                msIndex < messageArr[i].message_content.length;
-                msIndex++
-              ) {
+              for (const [msIndex] of messageArr[i].message_content.entries()) {
                 const element = messageArr[i].message_content[msIndex];
                 //TODO: find message type
                 const rows = messageArr;
-                let chats = conversations.filter(
+                const chats = conversationState.list.filter(
                   (c) => c?.message_id === rows[i].id
                   && (c?.message_child_id >= 0 ? c.message_child_id === element.id : true)
                 );
 
-                let lastIndexChat = findLastIndex(chats, (c) =>
+                const lastIndexChatByName = findLastIndex(chats, (c) =>
                   c?.data_input_name ===
                   element[element.type]?.save_input_content && element[element.type]?.save_input_content);
-
-                if (lastIndexChat < 0) {
-                  lastIndexChat = findLastIndex(chats, (c) => c?.ui_type === element.type);
-                }
+                const lastIndexChat = lastIndexChatByName < 0
+                  ? findLastIndex(chats, (c) => c?.ui_type === element.type)
+                  : lastIndexChatByName;
 
                 const chat = chats[lastIndexChat];
                 if (!chat) {
                   continue;
                 }
 
-                conversations = conversations.filter((c) => !(
+                conversationState.list = conversationState.list.filter((c) => !(
                   c?.message_id === chat.message_id 
                   && (c?.message_child_id >= 0 ? c.message_child_id === chat.message_child_id : true)
                 ));
 
                 const subElement = element[element.type];
                 if (element.type === "text_input") {
-                  if (subElement.type === "text") {
-                    let data;
+                  if (subElement.type === 'text') {
+                    const dataState = { value: chat };
                     try {
-                      data = JSON.parse(chat.value);
+                      dataState.value = JSON.parse(chat.value);
                     } catch (error) {
-                      data = chat;
+                      dataState.value = chat;
                     }
                     if (element[element.type][subElement.type].isSplitInput) {
-                      element[element.type][subElement.type].valueLeft = data.valueLeft;
-                      element[element.type][subElement.type].valueRight = data.valueRight;
-                    } else
-                      element[element.type][subElement.type].value = data?.value;
+                      element[element.type][subElement.type].valueLeft = dataState.value.valueLeft;
+                      element[element.type][subElement.type].valueRight = dataState.value.valueRight;
+                    } else {
+                      element[element.type][subElement.type].value = dataState.value?.value;
+                    }
                   }
                   if (subElement.type === "phone_number") {
                     if (subElement[subElement.type]?.withHyphen) {
-                      let parsedValues = {
-                        value1: "",
-                        value2: "",
-                        value3: "",
+                      const parsedValuesState = {
+                        value1: '',
+                        value2: '',
+                        value3: '',
                       };
 
                       try {
-                        parsedValues = { ...parsedValues, ...JSON.parse(chat.value) };
+                        Object.assign(parsedValuesState, JSON.parse(chat.value));
                       } catch {
-                        parsedValues = {
-                          value1: "",
-                          value2: "",
-                          value3: "",
-                        }
+                        Object.assign(parsedValuesState, {
+                          value1: '',
+                          value2: '',
+                          value3: '',
+                        });
                       }
 
                       element[element.type][subElement.type] = {
                         ...element[element.type][subElement.type],
-                        ...parsedValues,
+                        ...parsedValuesState,
                       };
                     } else {
                       element[element.type][subElement.type].value =
@@ -568,7 +595,7 @@ function BotChatLog() {
                   }
                   if (subElement.type === "password") {
                     element[element.type][subElement.type].password =
-                      "********";
+                      CHAT_LOG_PASSWORD_MASK;
                   }
                   if (
                     ["urls", "email_address"].includes(subElement.type)
@@ -584,10 +611,10 @@ function BotChatLog() {
                   }
                   if (subElement.type === "password_confirmation") {
                     element[element.type][subElement.type].password =
-                      "********";
+                      CHAT_LOG_PASSWORD_MASK;
                     element[element.type][
                       subElement.type
-                    ].confirm_password = "********";
+                    ].confirm_password = CHAT_LOG_PASSWORD_MASK;
                   }
                 }
                 if (element.type === "radio_button") {
@@ -776,36 +803,14 @@ function BotChatLog() {
       });
   }
 
-  function getMessageData(item) {
+  const getMessageData = (item) => {
     api
       .get(
         `/api/v1/managements/chat_log/${item.scenario_id}/${item.user_input_id}`
       )
       .then((response) => {
         if (response.data.code === 1) {
-          var conversations = response.data.conversations;
-          for (var i = 0; i < conversations.length; i++) {
-            if (
-              ["data_name", "zip_code_address", "birth_date"].includes(
-                conversations[i].data_input_name
-              )
-            ) {
-              let str;
-              if (conversations[i].string_value) {
-                str = conversations[i].string_value.replaceAll(SCAN_REGEX);
-              } else if (conversations[i].text_value) {
-                str = conversations[i].text_value.replaceAll(SCAN_REGEX);
-              }
-
-              conversations[i].content = JSON.parse(str ?? "");
-            }
-            conversations[i].value =
-              conversations[i].content ??
-              conversations[i].boolean_value ??
-              conversations[i].string_value ??
-              conversations[i].text_value ??
-              conversations[i].integer_value;
-          }
+          const conversations = response.data.conversations.map(normalizeConversationEntry);
           setConversions(conversations);
 
           getScenarioMessages(botId, item.scenario_id, conversations, { saveMsgRender: true });
@@ -813,7 +818,7 @@ function BotChatLog() {
       });
   }
 
-  async function getScenarioStatistic(params) {
+  const getScenarioStatistic = async (params) => {
     api.get(`/api/v1/managements/chat_log/statistic`, { params })
       .then((response) => {
         if (response.data.code === 1) {
@@ -828,14 +833,14 @@ function BotChatLog() {
   const filterToolbar = (
     <Space wrap size={12} className="report-filter-toolbar">
       <Space size={4}>
-        <Typography.Text type="secondary">シナリオ</Typography.Text>
+        <Typography.Text type="secondary">{CHAT_LOG_SCENARIO_LABEL}</Typography.Text>
         <Select
           allowClear
-          placeholder="すべて"
+          placeholder={CHAT_LOG_SCENARIO_PLACEHOLDER}
           value={searchScenarioId ?? undefined}
           onChange={(value) => setSearchScenarioId(value ?? null)}
           options={scenarioOptions}
-          style={{ minWidth: 200 }}
+          className="chat-log-scenario-select"
         />
       </Space>
       <DatePicker.RangePicker
@@ -847,7 +852,7 @@ function BotChatLog() {
           setSearchStartDate(dates?.[0]?.toDate() ?? null);
           setSearchEndDate(dates?.[1]?.toDate() ?? null);
         }}
-        format="YYYY/MM/DD"
+        format={CHAT_LOG_DATE_PICKER_FORMAT}
       />
       <AdminActionButton action="search" onClick={pressSearchButton} />
     </Space>
@@ -857,7 +862,7 @@ function BotChatLog() {
     <div className="chat-log-content">
       <div className="chat-log-user-list">
         <div className="chat-log-user-list-header">
-          会話（{chats.length}人）
+          {formatChatLogConversationHeader(chats.length)}
         </div>
         <div className="chat-log-user-list-body">
           <ul className="chat-log-user-list-items">
@@ -881,13 +886,13 @@ function BotChatLog() {
                     <div className="chat-log-user-meta">
                       <p className="chat-log-user-name">{item.name}</p>
                       <p className="chat-log-user-date">
-                        {format(new Date(item.newest), "yyyy-MM-dd HH:mm")}
+                        {format(new Date(item.newest), CHAT_LOG_DISPLAY_DATE_FORMAT)}
                       </p>
                     </div>
                     <span
                       className={`is-done_label ${item.is_done ? "finished" : ""}`}
                     >
-                      {item.is_done ? "完了" : "未完了"}
+                      {item.is_done ? CHAT_LOG_STATUS_DONE : CHAT_LOG_STATUS_NOT_DONE}
                     </span>
                   </button>
                 </li>
@@ -917,7 +922,7 @@ function BotChatLog() {
                       {message.message_content[0].updated_at
                         ? format(
                             new Date(message.message_content[0].updated_at),
-                            "yyyy-MM-dd HH:mm"
+                            CHAT_LOG_DISPLAY_DATE_FORMAT,
                           )
                         : ""}
                     </p>
@@ -946,10 +951,10 @@ function BotChatLog() {
                             disabled
                             className="chat-log-action-btn"
                             style={{
-                              backgroundColor: botInfor?.main_color,
+                              '--chat-log-action-bg': botInfor?.main_color,
                             }}
                           >
-                            {message.buttonName || "次へ"}
+                            {message.buttonName || CHAT_LOG_NEXT_BUTTON}
                           </button>
                         </div>
                       )}
@@ -961,7 +966,7 @@ function BotChatLog() {
           </div>
         ) : (
           <div className="chat-log-preview-empty">
-            <Empty description="会話を選択してください" />
+            <Empty description={CHAT_LOG_SELECT_CONVERSATION} />
           </div>
         )}
       </div>
@@ -978,13 +983,13 @@ function BotChatLog() {
           className="admin-page-tabs"
           items={[
             {
-              key: TABS.LOGS,
-              label: "会話ログ",
+              key: CHAT_LOG_TAB_LOGS,
+              label: CHAT_LOG_TAB_LOGS_LABEL,
               children: logsTabContent,
             },
             {
-              key: TABS.STATICTIC,
-              label: "統計",
+              key: CHAT_LOG_TAB_STATISTIC,
+              label: CHAT_LOG_TAB_STATISTIC_LABEL,
               children: (
                 <BotChatStatistic
                   overall={overall}
@@ -1000,6 +1005,6 @@ function BotChatLog() {
       </div>
     </AdminPage>
   );
-}
+};
 
 export default BotChatLog;

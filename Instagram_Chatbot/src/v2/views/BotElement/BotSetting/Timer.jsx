@@ -1,17 +1,25 @@
-import { useEffect, useState } from "react";
-import "v2/assets/css/bot/timer.css";
-import { TIMER_MAP_VARIABLE_METHOD, TIMER_COUNTING_DELAY } from "./PreviewComponent/Constants";
+import { useEffect, useState } from 'react';
+import 'v2/assets/css/bot/timer.css';
+import { TIMER_MAP_VARIABLE_METHOD, TIMER_COUNTING_DELAY } from './PreviewComponent/Constants';
+
+const INVALID_HTML_MESSAGE = 'Invalid HTML';
+const TIMER_START_STORAGE_PREFIX = 'timer_start_time';
+const MIDNIGHT_HOUR = 0;
+const MIDNIGHT_MINUTE = 0;
+const MIDNIGHT_SECOND = 0;
+const MIDNIGHT_MILLISECOND = 0;
+const TIMER_ROUND_PRECISION = 1000;
 
 const initialState = {
   duration: 0,
   messages: {
     finish: {
-      content: "",
+      content: '',
       useHtml: false,
       isShow: false,
     },
     counting: {
-      content: "",
+      content: '',
       useHtml: false,
       isShow: false,
     },
@@ -25,7 +33,7 @@ export const TIMER_COMPONENT_STATUS = {
   FINISH: 2,
 };
 
-export default function Timer({
+const Timer = ({
   duration = initialState.duration,
   timeLeft = 0,
   countMsg = initialState.messages.counting,
@@ -33,48 +41,42 @@ export default function Timer({
   variables = initialState.variables,
   startCount = false,
   isRealtimeRemainingTime = false,
-  scenarioId = "",
-  onCounting = (timer) => {}
-}) {
+  scenarioId = '',
+  onCounting = () => {},
+}) => {
   const [config, setConfig] = useState(null);
   const [status, setStatus] = useState(TIMER_COMPONENT_STATUS.PAUSE);
   const [timer, setTimer] = useState(-1);
 
   const checkHtmlMessage = (rawHtml) => {
-    const temp = document.createElement("div");
+    const temp = document.createElement('div');
     try {
       temp.innerHTML = rawHtml;
       return rawHtml;
     } catch (err) {
-      return "Invalid HTML";
+      return INVALID_HTML_MESSAGE;
     } finally {
       temp.remove();
     }
   };
 
-  const checkTextMessage = (rawText) => {
-    return rawText;
-  };
+  const checkTextMessage = (rawText) => rawText;
 
   const checkTimerMessage = (message, mappingValues) => {
-    if (!message) return "";
+    if (!message) return '';
 
-    let checkMsgFunc = checkTextMessage;
-
-    if (message.useHtml) {
-      checkMsgFunc = checkHtmlMessage;
-    }
+    const checkMsgFunc = message.useHtml ? checkHtmlMessage : checkTextMessage;
 
     return replaceStringVariables(
       checkMsgFunc(message.content),
-      mappingValues || {}
+      mappingValues || {},
     );
   };
 
-  const mapVariableByMethod = (variable, config, state) => {
+  const mapVariableByMethod = (variable, timerConfig, state) => {
     switch (variable.method) {
       case TIMER_MAP_VARIABLE_METHOD.CONFIG: {
-        return variable.field ? config[variable.field] : undefined;
+        return variable.field ? timerConfig[variable.field] : undefined;
       }
 
       case TIMER_MAP_VARIABLE_METHOD.PARAMS: {
@@ -91,54 +93,49 @@ export default function Timer({
     }
   };
 
-  const getMappingVariables = (variables) => {
+  const getMappingVariables = (timerVariables) => {
     const mappingVariables = [];
 
-    if (!variables) return mappingVariables;
-    if (typeof variables !== "object" && !Array.isArray(variables))
+    if (!timerVariables) return mappingVariables;
+    if (typeof timerVariables !== 'object' && !Array.isArray(timerVariables)) {
       return mappingVariables;
+    }
 
-    for (const variable of variables) {
+    timerVariables.forEach((variable) => {
       if (!variable.name) {
-        continue;
+        return;
       }
 
-      let value = mapVariableByMethod(variable, config, { status, timer });
-
-      if (variable.transform && typeof variable.transform === "function") {
-        value = variable.transform(value);
-      }
+      const mappedValue = mapVariableByMethod(variable, config, { status, timer });
+      const value = variable.transform && typeof variable.transform === 'function'
+        ? variable.transform(mappedValue)
+        : mappedValue;
 
       if (value !== undefined) {
         mappingVariables.push({ key: variable.name, value });
       }
-    }
+    });
 
     return mappingVariables;
   };
 
-  const replaceStringVariables = (str, variables) => {
-    const mappingVariables = getMappingVariables(variables);
+  const replaceStringVariables = (str, timerVariables) => {
+    const mappingVariables = getMappingVariables(timerVariables);
 
     return mappingVariables.reduce(
-      (result, { key, value }) =>
-        result.replace(new RegExp(`{{${key}}}`, "g"), value),
-      str
+      (result, { key, value }) => result.replace(new RegExp(`{{${key}}}`, 'g'), value),
+      str,
     );
   };
 
-  const botTimerMessage = (config) => {
-    let timerMessage = null;
+  const botTimerMessage = (timerConfig) => {
+    const timerMessage = timer <= 0 && timerConfig.messages.finish.isShow
+      ? timerConfig.messages.finish
+      : timerConfig.messages.counting.isShow
+        ? timerConfig.messages.counting
+        : null;
 
-    if (!!config.messages.counting.isShow) {
-      timerMessage = config.messages.counting;
-    }
-
-    if (timer <= 0 && !!config.messages.finish.isShow) {
-      timerMessage = config.messages.finish;
-    }
-
-    return checkTimerMessage(timerMessage, config.variables);
+    return checkTimerMessage(timerMessage, timerConfig.variables);
   };
 
   useEffect(() => {
@@ -147,7 +144,7 @@ export default function Timer({
     setStatus(
       startCount
         ? TIMER_COMPONENT_STATUS.COUNTING
-        : TIMER_COMPONENT_STATUS.PAUSE
+        : TIMER_COMPONENT_STATUS.PAUSE,
     );
   // eslint-disable-next-line react-hooks/exhaustive-deps -- timer tick must not reset when status/onCounting/config identity changes
   }, [startCount]);
@@ -156,24 +153,22 @@ export default function Timer({
     if (status !== TIMER_COMPONENT_STATUS.COUNTING || timer <= 0) return;
 
     const timeout = setTimeout(() => {
-      let newTimer;
-      if (isRealtimeRemainingTime) {
-        const storageKey = scenarioId ? `timer_start_time_${scenarioId}` : 'timer_start_time';
-        const startTime = Number(sessionStorage.getItem(storageKey) || new Date().getTime());
-        const elapsed = (new Date().getTime() - startTime) / 1000;
-        newTimer = Math.max(0, duration - elapsed);
-      } else {
-        newTimer = Math.round((timer - (TIMER_COUNTING_DELAY/1000)) * 1000) / 1000;
-      }
+      const newTimer = isRealtimeRemainingTime
+        ? (() => {
+          const storageKey = scenarioId ? `${TIMER_START_STORAGE_PREFIX}_${scenarioId}` : TIMER_START_STORAGE_PREFIX;
+          const startTime = Number(sessionStorage.getItem(storageKey) || new Date().getTime());
+          const elapsed = (new Date().getTime() - startTime) / 1000;
+          return Math.max(0, duration - elapsed);
+        })()
+        : Math.round((timer - (TIMER_COUNTING_DELAY / 1000)) * TIMER_ROUND_PRECISION) / TIMER_ROUND_PRECISION;
+
       setTimer(newTimer);
 
-      let newStatus = status;
       if (newTimer <= 0) {
-        newStatus = TIMER_COMPONENT_STATUS.FINISH;
-        setStatus(newStatus);
+        setStatus(TIMER_COMPONENT_STATUS.FINISH);
       }
 
-      onCounting(newTimer)
+      onCounting(newTimer);
     }, TIMER_COUNTING_DELAY);
 
     return () => clearTimeout(timeout);
@@ -194,28 +189,31 @@ export default function Timer({
 
     setConfig(newConfig);
 
-    let timer;
-    if (isRealtimeRemainingTime) {
-      const storageKey = scenarioId ? `timer_start_time_${scenarioId}` : 'timer_start_time';
-      let startTime = sessionStorage.getItem(storageKey);
+    const nextTimer = isRealtimeRemainingTime
+      ? (() => {
+        const storageKey = scenarioId ? `${TIMER_START_STORAGE_PREFIX}_${scenarioId}` : TIMER_START_STORAGE_PREFIX;
+        const storedStartTime = sessionStorage.getItem(storageKey);
 
-      const midnight = new Date();
-      midnight.setHours(0, 0, 0, 0);
-      const currentMidnightTime = midnight.getTime();
+        const midnight = new Date();
+        midnight.setHours(MIDNIGHT_HOUR, MIDNIGHT_MINUTE, MIDNIGHT_SECOND, MIDNIGHT_MILLISECOND);
+        const currentMidnightTime = midnight.getTime();
 
-      if (!startTime || Number(startTime) !== currentMidnightTime) {
-        startTime = currentMidnightTime.toString();
-        sessionStorage.setItem(storageKey, startTime);
-      }
+        const startTime = !storedStartTime || Number(storedStartTime) !== currentMidnightTime
+          ? currentMidnightTime.toString()
+          : storedStartTime;
 
-      const elapsed = (new Date().getTime() - Number(startTime)) / 1000;
-      timer = Math.max(0, duration - elapsed);
-    } else {
-      timer = timeLeft;
-    }
-    setTimer(timer);
+        if (!storedStartTime || Number(storedStartTime) !== currentMidnightTime) {
+          sessionStorage.setItem(storageKey, startTime);
+        }
 
-    if (timer <= 0) {
+        const elapsed = (new Date().getTime() - Number(startTime)) / 1000;
+        return Math.max(0, duration - elapsed);
+      })()
+      : timeLeft;
+
+    setTimer(nextTimer);
+
+    if (nextTimer <= 0) {
       setStatus(TIMER_COMPONENT_STATUS.FINISH);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- timer tick must not reset when status/onCounting/config identity changes
@@ -226,6 +224,8 @@ export default function Timer({
   if (status === TIMER_COMPONENT_STATUS.FINISH && !finishMsg.isShow) return null;
 
   return (
-    <div className="timer" dangerouslySetInnerHTML={{ __html: botTimerMessage(config) }}></div>
+    <div className="timer" dangerouslySetInnerHTML={{ __html: botTimerMessage(config) }} />
   );
-}
+};
+
+export default Timer;

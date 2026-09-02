@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Select, Space, Typography } from 'antd';
+import { InputNumber, Select, Space, Typography } from 'antd';
 import DesignBotIcons from '../DesignSettingComponents/DesignBotIcons';
-import InputNum from 'v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputNum';
 import {
   BASIC_INFO_SECTION_TITLE,
   BOT_NAME_HINT,
@@ -98,7 +97,7 @@ const BasicInfoTab = ({
                 {LABEL_OPEN_ANIMATION_DURATION}
               </DesignSettingLabel>
               <Space size={8} align="center" className="basic-info-animation-duration">
-                <InputNum
+                <InputNumber
                   name="open_animation_duration_ms"
                   min={OPEN_ANIMATION_DURATION_MS_MIN}
                   max={OPEN_ANIMATION_DURATION_MS_MAX}

@@ -5,7 +5,7 @@ import FukushashikiSearchRow from '../contentSettings/shared/FukushashikiSearchR
 import { DEFAULT_AMAZON_PAY_BUTTON_IMAGE_URL } from '../../../../../variables/amazonPayConstants';
 import { FUKUSHASHIKI_VARIANTS, SETTING_BUTTON_LABELS } from '../constants/scenarioSettingLabels';
 
-export default function AmazonPayButtonConfig({
+const AmazonPayButtonConfig = ({
   indexMessageSelect,
   indexContent = 0,
   config,
@@ -13,7 +13,7 @@ export default function AmazonPayButtonConfig({
   isUseFukushashiki,
   setIsOpenFileReference,
   setVarFileReference,
-}) {
+}) => {
   const messageType = 'amazon_pay_button';
   const imageUrl = config?.button_image_url || DEFAULT_AMAZON_PAY_BUTTON_IMAGE_URL;
 
@@ -23,36 +23,35 @@ export default function AmazonPayButtonConfig({
 
   return (
     <div className="ss-bot-statement-wrapper ss-bot-statement-type">
-      <div style={{ marginTop: '10px' }}>
-        <span style={{ display: 'block', marginBottom: '6px' }}>ボタン上のテキスト</span>
+      <div className="ss-config-field">
+        <span className="ss-config-field__label">ボタン上のテキスト</span>
         <textarea
-          className="ss-input-value"
+          className="ss-input-value ss-textarea--setting"
           rows={3}
           placeholder="ボタンの上に表示するテキスト"
           value={config?.text_above || ''}
           onChange={(e) => handleFieldChange('text_above')(e.target.value)}
-          style={{ width: '100%' }}
         />
       </div>
-      <div style={{ marginTop: '10px' }}>
-        <span style={{ display: 'block', marginBottom: '6px' }}>ボタン下のテキスト</span>
+      <div className="ss-config-field">
+        <span className="ss-config-field__label">ボタン下のテキスト</span>
         <textarea
-          className="ss-input-value"
+          className="ss-input-value ss-textarea--setting"
           rows={2}
           placeholder="ボタンの下に表示するテキスト"
           value={config?.text_below || ''}
           onChange={(e) => handleFieldChange('text_below')(e.target.value)}
-          style={{ width: '100%' }}
         />
       </div>
-      <div style={{ marginTop: '10px' }}>
-        <span style={{ display: 'block', marginBottom: '6px' }}>ボタン画像</span>
+      <div className="ss-config-field">
+        <span className="ss-config-field__label">ボタン画像</span>
         {imageUrl && (
-          <div style={{ marginBottom: '8px', textAlign: 'center' }}>
+          <div className="ss-amazon-pay-button-preview">
             <img
               src={imageUrl}
               alt="Amazon Pay button preview"
-              style={{ width: config?.button_image_width || '80%', maxWidth: '280px' }}
+              className="ss-amazon-pay-button-img"
+              style={{ '--ss-amazon-pay-btn-width': config?.button_image_width || '80%' }}
             />
           </div>
         )}
@@ -68,18 +67,17 @@ export default function AmazonPayButtonConfig({
           </Button>
         </div>
       </div>
-      <div style={{ marginTop: '10px' }}>
-        <span style={{ display: 'block', marginBottom: '6px' }}>ボタン画像幅</span>
+      <div className="ss-config-field">
+        <span className="ss-config-field__label">ボタン画像幅</span>
         <InputCustom
-          style={{ width: '100%' }}
           value={config?.button_image_width || '80%'}
           placeholder="80%"
           onChange={handleFieldChange('button_image_width')}
         />
       </div>
       {isUseFukushashiki && (
-        <div style={{ marginTop: '10px' }}>
-          <span style={{ display: 'block', marginBottom: '6px' }}>クリック先（複写式）</span>
+        <div className="ss-config-field">
+          <span className="ss-config-field__label">クリック先（複写式）</span>
           <FukushashikiSearchRow
             mode={config?.button_fukushashiki_search_mode}
             inputValue={config?.button_fukushashiki_search_value || ''}
@@ -91,9 +89,11 @@ export default function AmazonPayButtonConfig({
           />
         </div>
       )}
-      <p style={{ marginTop: '10px', fontSize: '13px', color: '#666' }}>
+      <p className="ss-amazon-pay-hint">
         HTMLコードを手動入力する場合は、従来の「HTMLコード」タイプをご利用ください。
       </p>
     </div>
   );
-}
+};
+
+export default AmazonPayButtonConfig;

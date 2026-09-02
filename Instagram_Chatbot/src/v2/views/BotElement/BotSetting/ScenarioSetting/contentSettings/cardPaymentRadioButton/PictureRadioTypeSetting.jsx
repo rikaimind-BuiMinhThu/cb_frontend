@@ -104,13 +104,8 @@ const PictureRadioTypeSetting = (props) => {
                                   {itemPaymentRadioImg.contents.length < 3 &&
                                     <div className="ss-card-payment-radio-setting__counter-add"
                                       onClick={() => {
-                                        let arrMess = [...dataMessages[indexMessageSelect].message_content[indexContent][content.type].radio_contents_img[indexPaymentRadioImg].contents];
-                                        let idMax;
-                                        if (arrMess.length !== 0) {
-                                          idMax = Math.max(...arrMess.map(item => item.id)) + 1;
-                                        } else {
-                                          idMax = 1;
-                                        }
+                                        const arrMess = [...dataMessages[indexMessageSelect].message_content[indexContent][content.type].radio_contents_img[indexPaymentRadioImg].contents];
+                                        const idMax = arrMess.length !== 0 ? Math.max(...arrMess.map((item) => item.id)) + 1 : 1;
                                         dataMessages[indexMessageSelect].message_content[indexContent][content.type].radio_contents_img[indexPaymentRadioImg].contents.push({
                                           id: idMax
                                         });
@@ -130,9 +125,9 @@ const PictureRadioTypeSetting = (props) => {
                                 <div className="ss-user-setting-payment-radio-times-icons">
                                   <MDBIcon fas icon="times-circle"
                                     onClick={() => {
-                                      let arrMessage = [...dataMessages[indexMessageSelect].message_content[indexContent][content.type].radio_contents_img];
-                                      let startArr = arrMessage.slice(0, indexPaymentRadioImg);
-                                      let lastArr = arrMessage.slice(indexPaymentRadioImg + 1, arrMessage.length);
+                                      const arrMessage = [...dataMessages[indexMessageSelect].message_content[indexContent][content.type].radio_contents_img];
+                                      const startArr = arrMessage.slice(0, indexPaymentRadioImg);
+                                      const lastArr = arrMessage.slice(indexPaymentRadioImg + 1, arrMessage.length);
                                       dataMessages[indexMessageSelect].message_content[indexContent][content.type].radio_contents_img = [...startArr, ...lastArr];
                                       setDataMessages([...dataMessages]);
                                     }} />

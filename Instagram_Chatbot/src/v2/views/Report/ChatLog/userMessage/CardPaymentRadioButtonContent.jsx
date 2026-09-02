@@ -1,9 +1,9 @@
 /* cSpell: disable */
 import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
-import InputCustom from 'v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom';
-import SelectCustom from 'v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/SelectCustom';
-import InputNum from 'v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputNum';
+import InputCustom from 'v2/components/BotMessages/InputCustom';
+import SelectCustom from 'v2/components/BotMessages/SelectCustom';
+import InputNum from 'v2/components/BotMessages/InputNum';
 import { Radio } from 'antd';
 import cvcIcon from 'assets/img/cvc-icon.png';
 

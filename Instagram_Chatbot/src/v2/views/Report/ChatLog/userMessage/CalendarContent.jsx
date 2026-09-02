@@ -1,7 +1,7 @@
 /* cSpell: disable */
 import React from 'react';
 import PropTypes from 'prop-types';
-import DatePickerCustom from 'v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/DatePickerCustom';
+import DatePickerCustom from 'v2/components/BotMessages/DatePickerCustom';
 import locale from 'antd/es/date-picker/locale/ja_JP';
 import moment from 'moment';
 import { Radio, Calendar, Row, Select, Col } from 'antd';

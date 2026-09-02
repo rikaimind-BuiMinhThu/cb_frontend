@@ -1,4 +1,6 @@
-import React from "react";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { baseUserMessageComponentPropTypes } from './userMessageComponentPropTypes';
 import "v2/assets/css/bot/preview-chat-bot.css";
 import {
   CONTACT_FORM_FIELD_KEYS,
@@ -198,6 +200,13 @@ const ContactForm = ({
       </div>
     </div>
   );
+};
+
+ContactForm.propTypes = {
+  ...baseUserMessageComponentPropTypes,
+  message: PropTypes.object,
+  onClickNext: PropTypes.func,
+  isProcessing: PropTypes.bool,
 };
 
 export default ContactForm;

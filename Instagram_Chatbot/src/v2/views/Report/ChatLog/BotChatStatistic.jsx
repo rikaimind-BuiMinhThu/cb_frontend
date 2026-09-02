@@ -1,31 +1,39 @@
-import "v2/assets/css/bot/bot-chat-log.css";
-import UserMessage from "./UserMessage";
-import { Fragment, useCallback, useEffect, useState } from "react";
-import BotMessage from "./BotMessage";
-import { Empty } from "antd";
-import { parseQuantity } from "v2/views/BotElement/BotSetting/PreviewComponent/Utils";
-import ChatbotOverall, { CONVERTERS_OVERALL } from "./ChatbotOverall";
-import MessageStatisticDetail from "./MessageStatisticDetail";
+import 'v2/assets/css/bot/bot-chat-log.css';
+import UserMessage from './UserMessage';
+import { Fragment, useCallback, useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
+import BotMessage from './BotMessage';
+import { Empty } from 'antd';
+import { parseQuantity } from 'v2/views/Report/utils/parseQuantity';
+import ChatbotOverall, { CONVERTERS_OVERALL } from './ChatbotOverall';
+import MessageStatisticDetail from './MessageStatisticDetail';
+import {
+  CHAT_LOG_METRIC_NO_LABEL,
+  CHAT_LOG_NEXT_BUTTON,
+  CHAT_LOG_STATS_EMPTY_DESCRIPTION,
+} from 'v2/views/Report/constants';
 
-export default function BotChatStatistic({
+const BotChatStatistic = ({
   botInfor = null,
   messages = [],
   dataMessages = [],
   statistic = [],
   overall = {},
-}) {
+}) => {
   const [msgs, setMsgs] = useState([]);
   const [chatbotOverall, setChatbotOverall] = useState([]);
 
-  const parseMessageDetail = (messages, statistic) => {
+  const parseMessageDetail = (messageList, statisticList) => {
     const mapMsgId = new Map();
 
-    statistic.forEach((s) => {
-      mapMsgId.set(s.msg_id, s);
+    statisticList.forEach((statItem) => {
+      mapMsgId.set(statItem.msg_id, statItem);
     });
 
-    return messages.map((msg) => {
-      if (msg.belong_to === "bot") return msg;
+    return messageList.map((msg) => {
+      if (msg.belong_to === 'bot') {
+        return msg;
+      }
 
       const msgStats = mapMsgId.get(msg.id);
 
@@ -42,18 +50,17 @@ export default function BotChatStatistic({
     });
   };
 
-  const parseOverall = (overall) => {
-    return Object.entries(overall).map(([key, value]) => ({
+  const parseOverall = (overallData) =>
+    Object.entries(overallData).map(([key, value]) => ({
       key,
       value:
-        typeof value === "number" ? parseQuantity(value) : String(value || 0),
-      ...(CONVERTERS_OVERALL[key] || { label: ["No label"], icon: null }),
+        typeof value === 'number' ? parseQuantity(value) : String(value || 0),
+      ...(CONVERTERS_OVERALL[key] || { label: [CHAT_LOG_METRIC_NO_LABEL], icon: null }),
     }));
-  };
 
-  const bindStatistic = useCallback((messages, statistic, overall) => {
-    setMsgs(parseMessageDetail(messages, statistic));
-    setChatbotOverall(parseOverall(overall));
+  const bindStatistic = useCallback((messageList, statisticList, overallData) => {
+    setMsgs(parseMessageDetail(messageList, statisticList));
+    setChatbotOverall(parseOverall(overallData));
   // eslint-disable-next-line react-hooks/exhaustive-deps -- parse helpers are pure and recreated each render
   }, []);
 
@@ -61,12 +68,16 @@ export default function BotChatStatistic({
     bindStatistic(messages, statistic, overall);
   }, [messages, statistic, overall, bindStatistic]);
 
+  const actionButtonStyle = {
+    '--chat-log-action-bg': botInfor?.main_color,
+  };
+
   if (!messages.length) {
     return (
       <div className="chat-log-stats-panel">
         <ChatbotOverall overall={chatbotOverall} />
         <div className="chat-log-stats-empty">
-          <Empty description="メッセージが存在しないか、シナリオが未選択です" />
+          <Empty description={CHAT_LOG_STATS_EMPTY_DESCRIPTION} />
         </div>
       </div>
     );
@@ -76,65 +87,69 @@ export default function BotChatStatistic({
     <div className="chat-log-stats-panel">
       <ChatbotOverall overall={chatbotOverall} />
       <div className="chat-log-steps">
-        {msgs.map((message, indexMessage) => {
-          return (
-            <Fragment key={indexMessage}>
-              {message.belong_to === "bot" && (
-                <div className="chat-log-bot-messages">
-                  {message?.message_content.map((content, index) => (
-                    <BotMessage
-                      key={index}
-                      content={content}
-                      index={index}
-                      botInfor={botInfor}
+        {msgs.map((message, indexMessage) => (
+          <Fragment key={indexMessage}>
+            {message.belong_to === 'bot' && (
+              <div className="chat-log-bot-messages">
+                {message?.message_content.map((content, index) => (
+                  <BotMessage
+                    key={index}
+                    content={content}
+                    index={index}
+                    botInfor={botInfor}
+                  />
+                ))}
+              </div>
+            )}
+            {message.belong_to === 'user' && (
+              <div className="chat-log-step-card">
+                <MessageStatisticDetail stats={message.stats} />
+                <div className="chat-log-step-preview">
+                  <div className="sp-body-user-side-messages csp-body-user-side-messages">
+                    <UserMessage
+                      captcha={[]}
+                      messageContentProps={message.message_content}
+                      disabled={message.disabled}
+                      onChangeValue={() => {}}
+                      indexMessageRender={indexMessage}
+                      indexMessage={indexMessage}
+                      displayButtonNext={(value) => {
+                        dataMessages[indexMessage].is_display_button_next = value;
+                      }}
+                      dataPrefectures={[]}
+                      variables={[]}
                     />
-                  ))}
-                </div>
-              )}
-              {message.belong_to === "user" && (
-                <div className="chat-log-step-card">
-                  <MessageStatisticDetail stats={message.stats} />
-                  <div className="chat-log-step-preview">
-                    <div className="sp-body-user-side-messages csp-body-user-side-messages">
-                      <UserMessage
-                        captcha={[]}
-                        messageContentProps={message.message_content}
-                        disabled={message.disabled}
-                        onChangeValue={() => {}}
-                        indexMessageRender={indexMessage}
-                        indexMessage={indexMessage}
-                        displayButtonNext={(value) => {
-                          dataMessages[indexMessage].is_display_button_next =
-                            value;
-                        }}
-                        dataPrefectures={[]}
-                        variables={[]}
-                      />
-                      {(dataMessages[indexMessage]?.is_display_button_next !==
-                      undefined
-                        ? dataMessages[indexMessage].is_display_button_next
-                        : true) && (
-                        <div className="sp-user-message-button-action">
-                          <button
-                            type="button"
-                            disabled
-                            className="chat-log-action-btn"
-                            style={{
-                              backgroundColor: botInfor?.main_color,
-                            }}
-                          >
-                            {message.buttonName || "次へ"}
-                          </button>
-                        </div>
-                      )}
-                    </div>
+                    {(dataMessages[indexMessage]?.is_display_button_next !== undefined
+                      ? dataMessages[indexMessage].is_display_button_next
+                      : true) && (
+                      <div className="sp-user-message-button-action">
+                        <button
+                          type="button"
+                          disabled
+                          className="chat-log-action-btn"
+                          style={actionButtonStyle}
+                        >
+                          {message.buttonName || CHAT_LOG_NEXT_BUTTON}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
-              )}
-            </Fragment>
-          );
-        })}
+              </div>
+            )}
+          </Fragment>
+        ))}
       </div>
     </div>
   );
-}
+};
+
+BotChatStatistic.propTypes = {
+  botInfor: PropTypes.object,
+  messages: PropTypes.array,
+  dataMessages: PropTypes.array,
+  statistic: PropTypes.array,
+  overall: PropTypes.object,
+};
+
+export default BotChatStatistic;

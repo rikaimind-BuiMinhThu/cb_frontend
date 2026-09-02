@@ -1,7 +1,7 @@
 /* cSpell: disable */
 import React from 'react';
 import PropTypes from 'prop-types';
-import InputNum from 'v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputNum';
+import InputNum from 'v2/components/BotMessages/InputNum';
 import { Checkbox, Radio } from 'antd';
 
 import {

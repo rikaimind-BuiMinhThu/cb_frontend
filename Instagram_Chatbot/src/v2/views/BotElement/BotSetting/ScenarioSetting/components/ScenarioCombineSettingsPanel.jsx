@@ -30,7 +30,7 @@ const AddBlockSelect = ({ options, defaultType, onAdd, label }) => {
           <option key={value} value={value}>{optionLabel}</option>
         ))}
       </select>
-      <Button className="ss-user-setting__select-btn-add" style={{ padding: '9px 23px' }} onClick={() => onAdd(blockType)}>
+      <Button className="ss-user-setting__select-btn-add ss-user-setting__select-btn-add--padded" onClick={() => onAdd(blockType)}>
         追加
       </Button>
     </div>
@@ -72,16 +72,16 @@ const ScenarioCombineSettingsPanel = () => {
         <div className="ss-user-setting__name-wrapper">
           <div>
             <span>名称</span>
-            <span className="ss-user-setting__name-error" style={{ marginLeft: '5px' }}>※必須</span>
+            <span className="ss-user-setting__name-error">※必須</span>
           </div>
           <InputCustom
             placeholder="名称を入力"
-            style={selectedMessage.message_name ? {} : { borderColor: 'red' }}
+            className={selectedMessage.message_name ? '' : 'ss-input--invalid'}
             onChange={(value) => onChangeValueNameMessage(indexMessageSelect, 'message_name', value)}
             value={selectedMessage.message_name}
           />
           {!selectedMessage.message_name && (
-            <div style={{ color: 'rgb(185, 74, 72)' }}>必ず指定してください。</div>
+            <div className="ss-field-required-error">必ず指定してください。</div>
           )}
         </div>
         <div className="ss-combine-setting__gap-wrapper">
@@ -90,7 +90,6 @@ const ScenarioCombineSettingsPanel = () => {
             min={0}
             max={100}
             className="ss-combine-setting__gap-input"
-            style={{ width: 72, height: 32 }}
             value={selectedMessage.combine_message?.content_gap ?? 10}
             onChange={(value) => handleChangeCombineContentGap(value)}
           />

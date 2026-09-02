@@ -8,7 +8,7 @@ import { tokenExpired } from 'v2/api/tokenExpired';
 import Pagination from '@material-ui/lab/Pagination';
 import ScenarioModalFooter from './components/modals/shared/ScenarioModalFooter';
 
-function FileReferencePopup({ onCancel, onReferFile, acceptFile = ['image', 'pdf', 'mp4'] }) {
+const FileReferencePopup = ({ onCancel, onReferFile, acceptFile = ['image', 'pdf', 'mp4'] }) => {
   const [fileType, setFileType] = useState('image');
   const [dataFile, setDataFile] = useState([]);
   const [fileChose, setFileChose] = useState('');
@@ -94,7 +94,7 @@ function FileReferencePopup({ onCancel, onReferFile, acceptFile = ['image', 'pdf
             </React.Fragment>
           ))}
         </div>
-        <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'flex-end' }}>
+        <div className="ss-file-ref-pagination">
           <Pagination
             count={totalPage}
             variant="outlined"
@@ -108,9 +108,8 @@ function FileReferencePopup({ onCancel, onReferFile, acceptFile = ['image', 'pdf
               return (
                 <div
                   key={index}
-                  className="fr-popup-body-container"
+                  className={`fr-popup-body-container${fileChose === item.file_url ? ' fr-popup-body-container--selected' : ''}`}
                   onClick={() => setFileChose(item.file_url)}
-                  style={fileChose === item.file_url ? { boxShadow: '0 0 5px 5px #93D8FE', border: '1px solid #337BED' } : {}}
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => e.key === 'Enter' && setFileChose(item.file_url)}
@@ -126,9 +125,8 @@ function FileReferencePopup({ onCancel, onReferFile, acceptFile = ['image', 'pdf
               return (
                 <div
                   key={index}
-                  className="fr-popup-body-container"
+                  className={`fr-popup-body-container${fileChose === item.file_url ? ' fr-popup-body-container--selected' : ''}`}
                   onClick={() => setFileChose(item.file_url)}
-                  style={fileChose === item.file_url ? { boxShadow: '0 0 5px 5px #93D8FE', border: '1px solid #337BED' } : {}}
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => e.key === 'Enter' && setFileChose(item.file_url)}
@@ -144,15 +142,14 @@ function FileReferencePopup({ onCancel, onReferFile, acceptFile = ['image', 'pdf
               return (
                 <div
                   key={index}
-                  className="fr-popup-body-container"
+                  className={`fr-popup-body-container${fileChose === item.file_url ? ' fr-popup-body-container--selected' : ''}`}
                   onClick={() => setFileChose(item.file_url)}
-                  style={fileChose === item.file_url ? { boxShadow: '0 0 5px 5px #93D8FE', border: '1px solid #337BED' } : {}}
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => e.key === 'Enter' && setFileChose(item.file_url)}
                 >
                   <div className="fr-popup-body-img">
-                    <video src={S3_UPLOAD_URL + item.file_url} controls style={{ width: '100%', height: '100%' }} />
+                    <video src={S3_UPLOAD_URL + item.file_url} controls className="ss-media--cover" />
                   </div>
                   <div className="fr-popup-body-name-img">{item.file_url.split('/')[2]}</div>
                 </div>

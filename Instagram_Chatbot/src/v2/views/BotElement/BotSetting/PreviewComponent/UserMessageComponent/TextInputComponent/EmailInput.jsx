@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import InputCustom from "../../../ScenarioSetting/scenarioComon/InputCustom";
+import PropTypes from "prop-types";
+import InputCustom from "v2/components/BotMessages/InputCustom";
 import {
   buildEmailWithDomain,
   filterDomainSuggestions,
@@ -13,6 +14,14 @@ const KEY_ARROW_UP = "ArrowUp";
 const KEY_ENTER = "Enter";
 const KEY_ESCAPE = "Escape";
 const FULLWIDTH_AT = "＠";
+const EMAIL_INPUT_PROP_TYPES = {
+  disabled: PropTypes.bool,
+  placeholder: PropTypes.string,
+  value: PropTypes.string,
+  onChange: PropTypes.func,
+  domainSuggestion: PropTypes.object,
+  className: PropTypes.string,
+};
 
 const EmailInput = ({
   disabled,
@@ -131,5 +140,7 @@ const EmailInput = ({
     </div>
   );
 };
+
+EmailInput.propTypes = EMAIL_INPUT_PROP_TYPES;
 
 export default EmailInput;

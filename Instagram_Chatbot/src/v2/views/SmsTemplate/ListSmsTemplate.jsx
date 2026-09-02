@@ -6,6 +6,17 @@ import api from 'v2/api/api-management';
 import CreateSmsTemplateDialog from './CreateSmsTemplateDialog';
 import UpdateSmsTemplateDialog from './UpdateSmsTemplateDialog';
 import { AdminPage, AdminTable, AdminConfirmModal, AdminActionButton, useAdminHeaderActions } from 'v2/components/AdminShell';
+import {
+  SMS_TEMPLATES_PATH,
+  SUCCESS_DELETE,
+  COL_NO,
+  COL_NAME,
+  COL_CONTENT,
+  COL_ACTION,
+  DELETE_CONFIRM,
+  DELETE_OK,
+  PAGE_SIZE,
+} from './constants';
 
 const ListSmsTemplate = () => {
   const { botId } = useParams();
@@ -25,10 +36,10 @@ const ListSmsTemplate = () => {
 
   const onDelete = () => {
     api
-      .delete(`/api/v1/managements/sms_templates/${deleteId}`, { params: { chatbot_id: botId } })
+      .delete(`${SMS_TEMPLATES_PATH}/${deleteId}`, { params: { chatbot_id: botId } })
       .then((response) => {
         if (response.data.code === 1) {
-          message.success('正常に削除しました。');
+          message.success(SUCCESS_DELETE);
           setList((pre) => pre.filter((each) => each.id !== deleteId));
           handleCloseDeleteDialog();
         }
@@ -65,7 +76,7 @@ const ListSmsTemplate = () => {
     const getList = async () => {
       setLoading(true);
       try {
-        const response = await api.get(`/api/v1/managements/sms_templates`, {
+        const response = await api.get(SMS_TEMPLATES_PATH, {
           params: { page, chatbot_id: botId },
         });
         if (response.data.code === 1) {
@@ -83,14 +94,14 @@ const ListSmsTemplate = () => {
 
   const columns = [
     {
-      title: '番号',
+      title: COL_NO,
       width: 70,
-      render: (_, __, index) => index + 1 + 10 * (page - 1),
+      render: (_, __, index) => index + 1 + PAGE_SIZE * (page - 1),
     },
-    { title: 'テンプレート名', dataIndex: 'name', align: 'center' },
-    { title: 'メール内容', dataIndex: 'content', align: 'center', ellipsis: true },
+    { title: COL_NAME, dataIndex: 'name', align: 'center' },
+    { title: COL_CONTENT, dataIndex: 'content', align: 'center', ellipsis: true },
     {
-      title: 'アクション',
+      title: COL_ACTION,
       align: 'right',
       width: 200,
       render: (_, row) => (
@@ -117,7 +128,7 @@ const ListSmsTemplate = () => {
           pagination={{
             current: page,
             total: count,
-            pageSize: 10,
+            pageSize: PAGE_SIZE,
             onChange: setPage,
           }}
         />
@@ -125,10 +136,10 @@ const ListSmsTemplate = () => {
 
       <AdminConfirmModal
         open={openDeleteDialog}
-        message="本当に削除しますか。"
+        message={DELETE_CONFIRM}
         onOk={onDelete}
         onCancel={handleCloseDeleteDialog}
-        okText="削除"
+        okText={DELETE_OK}
         danger
       />
 

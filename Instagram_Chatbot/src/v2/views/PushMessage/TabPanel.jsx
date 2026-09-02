@@ -1,17 +1,21 @@
-import Box from "@mui/material/Box";
+import PropTypes from 'prop-types';
 
-export default function TabPanel(props) {
-  const { children, value, selected, ...other } = props;
+const TabPanel = ({ children, value, selected, ...other }) => (
+  <div
+    role="tabpanel"
+    hidden={value !== selected}
+    id={`simple-tabpanel-${value}`}
+    aria-labelledby={`simple-tab-${value}`}
+    {...other}
+  >
+    <div className="push-tab-panel-body">{children}</div>
+  </div>
+);
 
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== selected}
-      id={`simple-tabpanel-${value}`}
-      aria-labelledby={`simple-tab-${value}`}
-      {...other}
-    >
-      <Box sx={{ pt: 3, pb: 3 }}>{children}</Box>
-    </div>
-  );
-}
+TabPanel.propTypes = {
+  children: PropTypes.node,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  selected: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+};
+
+export default TabPanel;

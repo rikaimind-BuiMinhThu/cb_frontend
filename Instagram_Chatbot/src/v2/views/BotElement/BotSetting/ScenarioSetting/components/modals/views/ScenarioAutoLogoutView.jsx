@@ -84,7 +84,6 @@ const ScenarioAutoLogoutView = ({ onBack }) => {
         tooltip={SCENARIO_MODAL_TOOLTIPS.autoLogoutLpUrl}
       >
         <InputCustom
-          style={{ width: '100%' }}
           value={autoLogoutConfig.temp.lpUrl}
           onChange={handleChangeLpUrl}
           placeholder="https://example.com/lp"
@@ -95,14 +94,13 @@ const ScenarioAutoLogoutView = ({ onBack }) => {
         tooltip={SCENARIO_MODAL_TOOLTIPS.autoLogoutSignoutUrl}
       >
         <InputCustom
-          style={{ width: '100%' }}
           value={autoLogoutConfig.temp.signoutUrl}
           onChange={handleChangeSignoutUrl}
           placeholder="https://example.com/shop/customers/sign_out"
         />
       </ScenarioFormRow>
       {errorMessage && (
-        <div style={{ color: 'red', fontSize: '13px', marginBottom: '8px' }}>
+        <div className="ss-settings-form-error">
           {errorMessage}
         </div>
       )}

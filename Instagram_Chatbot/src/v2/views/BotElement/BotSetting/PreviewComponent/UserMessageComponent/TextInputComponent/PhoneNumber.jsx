@@ -1,7 +1,8 @@
 import React from "react";
+import PropTypes from "prop-types";
 import "v2/assets/css/bot/preview-chat-bot.css";
 import { EMPTY_INPUT_VALUE, MESSAGE_CONTENT_TYPES } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
-import InputCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
+import InputCustom from "v2/components/BotMessages/InputCustom";
 import { moveToNext } from "v2/views/BotElement/BotSetting/PreviewComponent/Utils";
 
 const TEXT_INPUT_TYPE_PHONE_NUMBER = "phone_number";
@@ -112,6 +113,13 @@ const PhoneNumber = ({ content, disabled, contentIndex, onChangeValue }) => {
       </div>
     </React.Fragment>
   );
+};
+
+PhoneNumber.propTypes = {
+  content: PropTypes.object,
+  disabled: PropTypes.bool,
+  contentIndex: PropTypes.number,
+  onChangeValue: PropTypes.func,
 };
 
 export default PhoneNumber;

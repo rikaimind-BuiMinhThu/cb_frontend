@@ -1,7 +1,7 @@
 /* cSpell: disable */
 import React from 'react';
 import PropTypes from 'prop-types';
-import CheckboxCustom from 'v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/CheckboxCustom';
+import CheckboxCustom from 'v2/components/BotMessages/CheckboxCustom';
 import {
   REQUIRED_LABEL,
   AGREE_TERM_TYPE,

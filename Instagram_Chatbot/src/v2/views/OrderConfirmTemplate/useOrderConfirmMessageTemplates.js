@@ -6,7 +6,7 @@ import {
   ORDER_CONFIRM_LP_PRESET,
   buildOrderConfirmPresetConfig,
   normalizeOrderConfirmConfig,
-} from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/OrderConfirmLpScriptGenerator';
+} from 'v2/utils/orderConfirmLpScriptGenerator';
 import {
   APPLY_OK_TEXT,
   APPLY_TEMPLATE_MESSAGE,

@@ -11,7 +11,6 @@ import {
   IMAGE_MAX_HEIGHT,
   IMAGE_MAX_WIDTH,
 } from 'v2/utils/formValidate';
-import { patchWithDrawalPreview } from 'v2/views/BotElement/BotSetting/PreviewComponent/Utils';
 import {
   EMPTY_VALUE,
   IMAGE_POPUP_LABEL,
@@ -26,6 +25,11 @@ import {
   WP_IMAGE_FIELDS_VISIBLE,
 } from './withdrawalPreventionConstants';
 import 'v2/assets/css/bot/withdrawal-prevention.css';
+
+const patchWithdrawalPreview = (botId, data) => api.patch(
+  `${WITHDRAWAL_PREVENTION_PATH_PREFIX}/${botId}`,
+  data,
+);
 
 const WithdrawalPrevention = () => {
   const [botId] = useState(() => Cookies.get(BOT_ID_COOKIE_KEY));
@@ -81,7 +85,7 @@ const WithdrawalPrevention = () => {
   const savePayload = (payload) => {
     if (saving) return;
     setSaving(true);
-    patchWithDrawalPreview(botId, payload)
+    patchWithdrawalPreview(botId, payload)
       .then((res) => {
         if (res.data.code === API_SUCCESS_CODE) {
           message.success(UPDATE_SUCCESS_MESSAGE);

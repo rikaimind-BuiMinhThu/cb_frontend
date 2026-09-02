@@ -94,8 +94,8 @@ const TextStatementSection = ({
       />
     </div>
     {messageContent?.is_use_custom_delay && (
-      <div className="ss-user-setting__item-bottom-flex-start" style={{ marginLeft: '25px', marginBottom: '10px' }}>
-        <span style={{ marginRight: '10px', fontSize: '12px' }}>待ち時間 (秒)</span>
+      <div className="ss-user-setting__item-bottom-flex-start ss-delay-setting">
+        <span className="ss-delay-setting__label">待ち時間 (秒)</span>
         <InputNum
           step={0.1}
           min={0}
@@ -158,12 +158,12 @@ const FileStatementSection = ({
         onChange={(e) => getBaseUrl(e)}
       />
       {fileError &&
-        <div style={{ color: '#FF7E00', fontSize: '12px' }}>
+        <div className="ss-file-error">
           {fileError}
         </div>
       }
       <CheckboxCustom
-        label={<span>自動でスクロールさせない<MDBIcon fas icon="question-circle" style={{ color: '#347AED', marginLeft: '5px', fontSize: '13px' }} /></span>}
+        label={<span>自動でスクロールさせない<MDBIcon fas icon="question-circle" className="ss-help-icon" /></span>}
         value={typeContent?.scroll_auto || false}
         onChange={(value) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'scroll_auto')}
       />
@@ -187,7 +187,7 @@ const EmailSection = ({ messageType, typeContent, indexMessageSelect, onChangeVa
       className="ss-bot-statement-type-email ss-bot-statement-type"
     >
       <SelectCustom
-        style={{ width: '100%' }}
+        className="ss-select--full"
         id="title"
         data={dataEmail}
         keyValue={"id"}
@@ -207,7 +207,7 @@ const ApiLinkageSection = ({ messageType, typeContent, indexMessageSelect, onCha
   <div className="ss-bot-statement-wrapper">
     <div className="ss-bot-statement-type-email ss-bot-statement-type">
       <SelectCustom
-        style={{ width: '100%' }}
+        className="ss-select--full"
         id="title"
         data={dataApiLinkage}
         value={typeContent?.type || ''}
@@ -220,7 +220,6 @@ const ApiLinkageSection = ({ messageType, typeContent, indexMessageSelect, onCha
         onChange={(value) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'isShowProcessing')}
       />
       <InputCustom
-        style={{ width: '100%' }}
         value={typeContent?.titleProcessing}
         onChange={(value) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'titleProcessing')}
       />
@@ -262,7 +261,7 @@ const DelaySection = ({ messageType, typeContent, indexMessageSelect, onChangeVa
       className="ss-bot-statement-type-delay ss-bot-statement-type"
     >
       <div className="ss-user-setting__item-bottom-flex-start">
-        <span style={{ marginRight: '10px' }}>遅延（秒）</span>
+        <span className="ss-delay-setting__label">遅延（秒）</span>
         <InputNum
           placeholder="00"
           className="ss-user-setting-input-delay ss-user-setting-input-limit-character"
@@ -288,13 +287,13 @@ const ClearVariableSection = ({
   messageType, typeContent, indexMessageSelect, selectedMessage,
   dataMessages, setDataMessages, onChangeValueMessageContent, dataInputVar,
 }) => (
-  <div className="ss-bot-statement-wrapper" style={{ marginTop: '15px' }}>
-    <span style={{ fontWeight: '400' }}>変数</span>
+  <div className="ss-bot-statement-wrapper ss-config-field--mt15">
+    <span className="ss-bot-variable-label">変数</span>
     {typeContent?.variables &&
       typeContent?.variables.map((item, index, arr) => (
-        <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
+        <div key={index} className="ss-variable-row">
           <SelectCustom
-            style={{ width: '30%', marginTop: '5px' }}
+            className="ss-select--30-mt"
             data={dataInputVar}
             keyValue="variable_name"
             nameValue="variable_name"
@@ -302,7 +301,7 @@ const ClearVariableSection = ({
             onChange={value => onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'variables', index)}
           />
           {arr.length > 1 &&
-            <MDBIcon style={{ marginLeft: '5px' }} fas icon="times-circle" onClick={() => {
+            <MDBIcon className="ss-icon-remove" fas icon="times-circle" onClick={() => {
               removeVariableAt(selectedMessage, messageType, index);
               setDataMessages([...dataMessages]);
             }} />
@@ -322,14 +321,14 @@ const VariableSetSection = ({
   messageType, typeContent, indexMessageSelect, selectedMessage,
   dataMessages, setDataMessages, onChangeValueMessageContent, dataInputVar,
 }) => (
-  <div className="ss-bot-statement-wrapper" style={{ marginTop: '15px' }}>
+  <div className="ss-bot-statement-wrapper ss-config-field--mt15">
     <span>※直後の条件分岐に変数を使用したい場合、ユーザー側の変数セットブロックをご利用ください。</span>
-    <span style={{ fontWeight: '400', marginTop: '15px', display: 'block' }}>変数</span>
+    <span className="ss-bot-variable-label--block">変数</span>
     {typeContent?.variables &&
       typeContent?.variables.map((item, index, arr) => (
-        <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
+        <div key={index} className="ss-variable-row">
           <SelectCustom
-            style={{ width: '30%', marginTop: '5px' }}
+            className="ss-select--30-mt"
             data={dataInputVar}
             keyValue="variable_name"
             nameValue="variable_name"
@@ -337,12 +336,12 @@ const VariableSetSection = ({
             onChange={value => onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'variables', index, 'key')}
           />
           <InputCustom
-            style={{ width: '60%', marginLeft: '10px', marginTop: '5px' }}
+            className="ss-input--60-ml"
             value={item.value}
             onChange={value => onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'variables', index, 'value')}
           />
           {arr.length > 1 &&
-            <MDBIcon style={{ marginLeft: '5px' }} fas icon="times-circle" onClick={() => {
+            <MDBIcon className="ss-icon-remove" fas icon="times-circle" onClick={() => {
               removeVariableAt(selectedMessage, messageType, index);
               setDataMessages([...dataMessages]);
             }} />
@@ -381,22 +380,21 @@ const ScenarioBotSettingsPanel = () => {
   return (
     <div className="ss-bot-setting-container ss-layout-bot-setting">
       <div id="bot-statement" className="ss-bot-statement-detail-setting">
-        <div style={{ padding: '10px' }}>
+        <div className="ss-bot-statement-pad">
           <div className="ss-user-setting__top">
-            <div className="ss-user-setting__name-wrapper" style={{ marginBottom: '10px' }}>
+            <div className="ss-user-setting__name-wrapper ss-name-wrapper--spaced">
               <div>
                 <span>名称</span>
-                <span className="ss-user-setting__name-error" style={{ marginLeft: '5px', marginTop: '0px' }}>※必須</span>
+                <span className="ss-user-setting__name-error ss-name-error--flush">※必須</span>
               </div>
               <InputCustom
                 placeholder="名称"
-                style={{ width: '100%' }}
                 onChange={value => onChangeValueNameMessage(indexMessageSelect, 'message_name', value)}
                 value={selectedMessage.message_name}
               />
             </div>
           </div>
-          <label htmlFor="ss-bot-statement-title" style={{ marginBottom: '1px' }}>タイプ</label>
+          <label htmlFor="ss-bot-statement-title" className="ss-bot-statement-type-label">タイプ</label>
           <select
             name="bot_statement_type"
             id="ss-bot-statement-type"
@@ -429,7 +427,7 @@ const ScenarioBotSettingsPanel = () => {
           {messageType === 'variable_set' && <VariableSetSection {...sectionProps} dataInputVar={dataInputVar} />}
 
           {messageType === 'pause' && (
-            <div style={{ marginTop: '15px', fontWeight: '700' }}>一時停止</div>
+            <div className="ss-bot-pause-title">一時停止</div>
           )}
           {messageType === BOT_MESSAGE_TYPES.HTML_CODE && (
             <HtmlCodeConfig

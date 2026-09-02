@@ -7,7 +7,7 @@ import {
   PreviewClosedLauncher, PreviewOpenChatFrame, PreviewMessagesList,
 } from "./PreviewComponent";
 import UserMessageTailIcon from "./PreviewComponent/UserMessageTailIcon";
-import { resolveUserMessageTheme } from "v2/views/DesignSetting/utils/designThemeUtils";
+import { resolveMainColorContext, resolveUserMessageTheme } from "v2/utils/designThemeCore";
 import PreviewFukushashikiReducer from "./PreviewFukushashiki/PreviewFukushashikiReducer";
 import { EC_CHATBOT_URL } from "v2/variables/constants";
 import "moment/locale/zh-cn";
@@ -24,12 +24,16 @@ import {
   CONVERSION_RESPONSE_SUBMIT_TYPE,
   CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE,
   DISPLAY_TYPES,
+  QUERY_PARAM_IS_LOGGED_IN,
+  QUERY_PARAM_VALUE_TRUE,
+  NEXT_BUTTON_LABEL,
+  UPDATE_BUTTON_LABEL,
+  OK_BUTTON_LABEL,
 } from "./PreviewComponent/Constants";
 import { OPEN_ANIMATION_DURATION_MS_DEFAULT } from "v2/views/DesignSetting/constants/designChatbotConstants";
 import {
   clampOpenAnimationDurationMs,
   parseDesignSettings,
-  resolveMainColorContext,
   resolveOpenAnimationClassName,
 } from "v2/views/DesignSetting/utils/designChatbotUtils";
 import {
@@ -95,9 +99,9 @@ import {
 } from "./PreviewComponent/hooks";
 
 savePrevOpenStatus("0");
-var url = new URL(window.location.href);
-let params = new URLSearchParams(url.search);
-let isLoggedIn = params.get('isLoggedIn') === "true";
+const url = new URL(window.location.href);
+const params = new URLSearchParams(url.search);
+const isLoggedIn = params.get(QUERY_PARAM_IS_LOGGED_IN) === QUERY_PARAM_VALUE_TRUE;
 const previewInitialState = createPreviewInitialState("fukushashiki", { params });
 
 
@@ -164,14 +168,16 @@ const PreviewFukushashiki = () => {
           type: PREVIEW_ACTIONS.UPDATE_CREDIT_CARD_FORM,
           payload: actionData,
         });
-      case CHATBOT_ACTIONS.CRAWL_DATA:
-        let receiveOptionData = {};
-        receiveOptionData[actionData.searchAddress] = actionData.result;
+      case CHATBOT_ACTIONS.CRAWL_DATA: {
+        const receiveOptionData = {
+          [actionData.searchAddress]: actionData.result,
+        };
 
         return dispatch({
           type: PREVIEW_ACTIONS.ADD_LP_OPTION_DATA,
           payload: receiveOptionData
         });
+      }
 
       case CHATBOT_ACTIONS.GET_ERROR_MESSAGE_WITH_DISPLAY_MSG: {
         const error = actionData.error === NO_ERROR ? "" : actionData.error;
@@ -524,7 +530,7 @@ const PreviewFukushashiki = () => {
       apiColorKey,
     );
     const shouldAutoOpen = Number(parsedDesign.displayType) === DISPLAY_TYPES.RELOAD;
-    let newState = {
+    const newState = {
       ...state,
       botInfor: getBotInforFromPreviewResponse(res),
       objParam: {},
@@ -740,14 +746,10 @@ const PreviewFukushashiki = () => {
   };
 
   const onOpenZipCodePopup = (isOpen, contentIndex, messageIndex) => {
-    let newState = {};
-
-    if (contentIndex !== undefined) {
-      newState.zipcodeContentIndex = contentIndex;
-    }
-    if (messageIndex !== undefined) {
-      newState.zipcodeIndex = messageIndex;
-    }
+    const zipIndexes = {
+      ...(contentIndex !== undefined ? { zipcodeContentIndex: contentIndex } : {}),
+      ...(messageIndex !== undefined ? { zipcodeIndex: messageIndex } : {}),
+    };
 
     if (isOpen) {
       changeElementAttributeById([
@@ -755,16 +757,15 @@ const PreviewFukushashiki = () => {
         { id: "sp-popup-zip-code-address", style: { display: "block" }}
       ]);
 
-      newState = {
-        ...newState,
-        prefectures: null,
-        cities: null,
-        towns: null,
-        zipcode: null,
-      };
       dispatch({
         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-        payload: { ...newState }
+        payload: {
+          ...zipIndexes,
+          prefectures: null,
+          cities: null,
+          towns: null,
+          zipcode: null,
+        }
       });
       return;
     }
@@ -776,8 +777,7 @@ const PreviewFukushashiki = () => {
   };
 
   const onChangeErrors = (field, value) => {
-    let newErrors = { ...state.errors };
-    newErrors[field] = value;
+    const newErrors = { ...state.errors, [field]: value };
     dispatch({ type: PREVIEW_ACTIONS.SET_ERRORS, payload: { newErrors } });
   };
 
@@ -817,17 +817,13 @@ const PreviewFukushashiki = () => {
     const isBtnUpdateMode = state.isUseBtnUpdateTracking && !message.buttonName && !isUpdate;
     const msgState = msgUpdateState[message.id]; 
 
-    let btnText = message.buttonName;
-    if (!btnText) {
-      if (isBtnUpdateMode && msgState === 'clicked') {
-        btnText = "OK";
-      } else {
-        btnText = isUpdate ? "次へ" : "更新";
-      }
-    }
+    const btnText = message.buttonName
+      || (isBtnUpdateMode && msgState === 'clicked'
+        ? OK_BUTTON_LABEL
+        : (isUpdate ? NEXT_BUTTON_LABEL : UPDATE_BUTTON_LABEL));
     const hasBtnUpdateClass = isBtnUpdateMode && msgState !== 'editing';
     return (
-      <div className="sp-user-message-button-action" style={{ display: isDisplayBtnNext ? "flex" : "none" }}>
+      <div className={isDisplayBtnNext ? 'sp-user-message-button-action' : 'sp-user-message-button-action sp-user-message-button-action--hidden'}>
         <CustomButton
           disabled={state.submitErrorMessage.length > 0 ? false : message.disabled}
           className={`ss-user-message__action-btn${hasBtnUpdateClass ? " btn-update" : ""}`}

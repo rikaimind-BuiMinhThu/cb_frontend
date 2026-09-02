@@ -1,11 +1,12 @@
-import React from "react";
+import React from 'react';
+import { baseUserMessageComponentPropTypes } from './userMessageComponentPropTypes';
 import "v2/assets/css/bot/preview-chat-bot.css";
 import {
   EMPTY_INPUT_VALUE,
   MESSAGE_CONTENT_TYPES,
   REQUIRED_FIELD_LABEL,
 } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
-import SelectCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/SelectCustom";
+import SelectCustom from "v2/components/BotMessages/SelectCustom";
 
 const PRODUCT_VARIANT_ID_KEY = "productVariantId";
 const PRODUCT_TITLE_KEY = "title";
@@ -77,6 +78,10 @@ const ProductPurchaseSelectOption = ({ content, messageIndex, contentIndex, onCh
       {renderErrorMessage()}
     </div>
   );
+};
+
+ProductPurchaseSelectOption.propTypes = {
+  ...baseUserMessageComponentPropTypes,
 };
 
 export default ProductPurchaseSelectOption;

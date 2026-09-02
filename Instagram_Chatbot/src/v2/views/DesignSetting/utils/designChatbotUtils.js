@@ -4,7 +4,6 @@ import {
   CHAT_BODY_VERSION_DEFAULT,
   COLOR_MAP,
   DEFAULT_IMAGES,
-  DEFAULT_MAIN_COLOR,
   OPEN_ANIMATION_DURATION_MS_DEFAULT,
   OPEN_ANIMATION_DURATION_MS_MAX,
   OPEN_ANIMATION_DURATION_MS_MIN,
@@ -156,17 +155,7 @@ export const resolveMainColorFromApi = (apiColor) => {
   return apiColor;
 };
 
-export const resolveMainColorContext = (chatbot) => {
-  const apiColorKey = chatbot?.main_color && !String(chatbot.main_color).startsWith('#')
-    ? chatbot.main_color
-    : null;
-  const mainColorHex = chatbot?.main_color_other
-    || resolveMainColorFromApi(chatbot?.main_color)
-    || chatbot?.main_color
-    || DEFAULT_MAIN_COLOR;
-
-  return { apiColorKey, mainColorHex };
-};
+export { resolveMainColorContext } from 'v2/utils/designThemeCore';
 
 export const buildBasicInfoPayload = ({
   title,

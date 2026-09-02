@@ -41,3 +41,39 @@ body.active-modal {
   right: 10px;
   padding: 5px 7px;
 }
+
+.preview-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+}
+
+.preview-modal-content {
+  position: fixed;
+  top: 17%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #FFF;
+  padding: 20px;
+  z-index: 1000;
+  border: 2px solid gray;
+  border-radius: 5px;
+}
+
+.preview-modal-close {
+  color: black;
+  float: right;
+}
+
+.preview-modal-noti-body {
+  width: 300px;
+  text-align: center;
+  color: #51cbce;
+}
+
+.preview-modal-noti-text {
+  font-size: 16px;
+}

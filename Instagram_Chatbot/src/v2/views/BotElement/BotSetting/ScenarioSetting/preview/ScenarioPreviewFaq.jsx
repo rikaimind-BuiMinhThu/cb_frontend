@@ -75,9 +75,9 @@ import {
 const isPreviewMobile = (deviceMode) => deviceMode === 'sp';
 
 savePrevOpenStatus("0");
-var url = new URL(window.location.href);
-let params = new URLSearchParams(url.search);
-let isLoggedIn = params.get('isLoggedIn') === "true";
+const url = new URL(window.location.href);
+const params = new URLSearchParams(url.search);
+const isLoggedIn = params.get('isLoggedIn') === 'true';
 const previewInitialState = createPreviewInitialState("faq", { params });
 
 const ScenarioPreviewFaq = ({
@@ -366,7 +366,7 @@ const ScenarioPreviewFaq = ({
     const conversation = res.data.data?.conversation;
     const shouldAutoOpen = Number(designSetting?.display_type) === 1;
     const resolvedDisplayType = Number(designSetting?.display_type ?? state.displayType ?? 2);
-    let newState = {
+    const newState = {
       ...state,
       botInfor: getBotInforFromPreviewResponse(res),
       objParam: {},
@@ -547,8 +547,7 @@ const ScenarioPreviewFaq = ({
   };
 
   const onChangeErrors = (field, value) => {
-    let newErrors = { ...state.errors };
-    newErrors[field] = value;
+    const newErrors = { ...state.errors, [field]: value };
     dispatch({ type: PREVIEW_ACTIONS.SET_ERRORS, payload: { newErrors } });
   };
 
@@ -604,17 +603,13 @@ const ScenarioPreviewFaq = ({
     if (!message || message.belong_to !== "user") return null;
     if (message.message_content[0]?.type === "button_submit") return null;
 
-    let btnText = message.buttonName;
-    if (!btnText) {
-      btnText = isUpdate ? "次へ" : "次へ";
-    }
+    const btnText = message.buttonName || (isUpdate ? '次へ' : '次へ');
+    const actionBtnBg = state.botInfor?.main_color || state.botInfor?.main_color_other;
     return (
-      <div className="sp-user-message-button-action" style={{ display: isDisplayBtnNext ? "flex" : "none" }}>
+      <div className={`sp-user-message-button-action${isDisplayBtnNext ? '' : ' sp-user-message-button-action--hidden'}`}>
         <CustomButton
           disabled={editorPreview}
-          style={{
-            backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
-          }}
+          style={actionBtnBg ? { '--ss-action-btn-bg': actionBtnBg } : undefined}
           className="ss-user-message__action-btn"
           onClick={editorPreview ? undefined : () => {
             onClickNext(messageIndex, message);

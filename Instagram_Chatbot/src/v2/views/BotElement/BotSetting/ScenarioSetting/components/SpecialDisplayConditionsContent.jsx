@@ -53,11 +53,11 @@ const SpecialDisplayConditionsContent = ({
         )}
       />
       {isUseFukushashiki && (
-        <div style={{ marginTop: '16px' }}>
+        <div className="ss-config-field--mt16">
           <SelectCustom
             label="表示"
             allowClear={false}
-            style={{ width: '100%' }}
+            className="ss-select--full"
             data={dataAmazonPayDisplayMode}
             value={amazonPayDisplayMode}
             onChange={onChangeAmazonPayDisplayMode}

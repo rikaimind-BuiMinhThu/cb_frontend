@@ -1,4 +1,30 @@
+import { BOT_ID_COOKIE_KEY } from 'v2/api/constants';
+
+export { BOT_ID_COOKIE_KEY };
+
 export const PAGE_SIZE = 25;
+
+export const NEW_VARIABLE_TITLE = '新しい変数を追加';
+export const VARIABLE_NAME_LABEL = '変数名';
+export const DEFAULT_VALUE_LABEL = 'デフォルト値';
+export const PLACEHOLDER_NAME = '変数名をご入力ください';
+export const PLACEHOLDER_VALUE = '変数値をご入力ください';
+
+export const COL_NO = '番号';
+export const COL_NAME = '変数名';
+export const COL_DEFAULT = 'デフォルト値';
+export const COL_ACTION = 'アクション';
+export const COL_NOTE = '変数備考';
+
+export const SAVE_LABEL = '保存';
+export const ADD_VARIABLE_LABEL = '変数追加';
+export const TAB_USER_LABEL = 'ユーザー定義関数';
+export const TAB_SYSTEM_LABEL = 'システム変数';
+export const PAGE_DESCRIPTION = '※ユーザの入力内容などを保管する変数です。シナリオの中で代入や参照ができます。';
+
+export const DELETE_CONFIRM = '変数を削除しますか。';
+export const DELETE_OK = '削除';
+export const FETCH_ERROR = '変数の取得に失敗しました。';
 
 export const TABS = {
   USER: 'user',

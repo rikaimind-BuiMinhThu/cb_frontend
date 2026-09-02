@@ -2,20 +2,38 @@ import React, { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
+import { BOT_ID_COOKIE_KEY } from 'v2/api/constants';
 import { AdminPage, AdminActionButton, AdminFormRow, useAdminHeaderTitle, useAdminHeaderActions } from 'v2/components/AdminShell';
 import { Input, message } from 'antd';
 import { getAdminRoutePath } from 'v2/variables/constants';
 import {
+  EMAILS_PATH,
   CREATE_BUTTON,
+  CREATE_EMAIL_LABEL,
+  EDIT_TITLE,
   LABEL_BCC,
+  LABEL_CC,
   LABEL_CONTENT,
+  LABEL_REPLY_TO,
   LABEL_SENDER,
   LABEL_SUBJECT,
   LABEL_TEMPLATE_NAME,
+  LABEL_TO,
+  LABEL_TO_VALIDATE,
+  PLACEHOLDER_BCC,
+  PLACEHOLDER_CC,
   PLACEHOLDER_CONTENT,
+  PLACEHOLDER_REPLY_TO,
   PLACEHOLDER_SENDER,
   PLACEHOLDER_SUBJECT,
   PLACEHOLDER_TEMPLATE_NAME,
+  PLACEHOLDER_TO,
+  CREATE_SUCCESS,
+  UPDATE_SUCCESS,
+  EMAIL_FORMAT_ERROR,
+  DUPLICATE_ERROR_TITLE,
+  VARIABLE_REQUIRED,
+  requiredMessage,
 } from './constants';
 import 'v2/assets/css/bot/email/create-email.css';
 
@@ -73,7 +91,7 @@ const CreateEmail = () => {
     const id = window.location.pathname.slice(window.location.pathname.lastIndexOf('/') + 1);
     const cancellation = { aborted: false };
     api
-      .get(`/api/v1/managements/emails/${id}`)
+      .get(`${EMAILS_PATH}/${id}`)
       .then((res) => {
         if (cancellation.aborted) return;
         if (res.data.code === 1) {
@@ -103,37 +121,37 @@ const CreateEmail = () => {
 
   const updateField = (key, value) => {
     setFormValues((prev) => ({ ...prev, [key]: value }));
-  }
+  };
 
   const addAddress = (value, list, setList, setError, setInput) => {
     const trimmed = (value || '').trim();
     if (!trimmed) return;
     if (!EMAIL_FORMAT.test(trimmed)) {
-      setError('メールの正しい形式で入力してください：abc@abc.com');
+      setError(EMAIL_FORMAT_ERROR);
       return;
     }
     if (list.indexOf(trimmed) !== -1) {
-      setError('メール複製');
+      setError(DUPLICATE_ERROR_TITLE);
       return;
     }
     setList(list.concat(trimmed));
     setError('');
     setInput('');
-  }
+  };
 
   const addCC = (e) => {
     if (e.keyCode === 13) {
       e.preventDefault();
       addAddress(ccInput, ccAll, setCcAll, setCcError, setCcInput);
     }
-  }
+  };
 
   const addBCC = (e) => {
     if (e.keyCode === 13) {
       e.preventDefault();
       addAddress(bccInput, bccAll, setBccAll, setBccError, setBccInput);
     }
-  }
+  };
 
   const collectForm = () => {
     return {
@@ -141,64 +159,64 @@ const CreateEmail = () => {
         ...formValues,
         cc: ccAll,
         bcc: bccAll,
-        chatbot_id: Cookies.get('bot_id'),
+        chatbot_id: Cookies.get(BOT_ID_COOKIE_KEY),
       },
     };
-  }
+  };
 
   const setFieldError = (key, value) => {
     setFieldErrors((prev) => (prev[key] === value ? prev : { ...prev, [key]: value }));
-  }
+  };
 
   const checkRequired = (key, label, errorKey = key) => {
     if (!formValues[key]) {
-      setFieldError(errorKey, `${label}は、必ず指定してください。`);
+      setFieldError(errorKey, requiredMessage(label));
       return false;
     }
     setFieldError(errorKey, '');
     return true;
-  }
+  };
 
   const checkEmail = (key) => {
     const value = formValues[key] || '';
     if (key === 'to' && value.slice(0, 2) === '{{' && value.slice(-2) === '}}') {
       if (value.slice(2, value.length - 2).replace(/\s/g, '') === '') {
-        setFieldError(key, 'メールの変数を指定してください');
+        setFieldError(key, VARIABLE_REQUIRED);
         return false;
       }
       setFieldError(key, '');
       return true;
     }
     if (!EMAIL_FORMAT.test(value)) {
-      setFieldError(key, 'メールの正しい形式で入力してください：abc@abc.com');
+      setFieldError(key, EMAIL_FORMAT_ERROR);
       return false;
     }
     setFieldError(key, '');
     return true;
-  }
+  };
 
   const checkTo = (key, label) => {
     return checkRequired(key, label) && checkEmail(key);
-  }
+  };
 
   const isFormValid = () => {
     return (
-      checkRequired('email_template_name', 'テンプレート名') &&
-      checkTo('to', '宛先') &&
-      checkRequired('subject', '件名') &&
-      checkRequired('content', 'メール内容', 'text')
+      checkRequired('email_template_name', LABEL_TEMPLATE_NAME) &&
+      checkTo('to', LABEL_TO_VALIDATE) &&
+      checkRequired('subject', LABEL_SUBJECT) &&
+      checkRequired('content', LABEL_CONTENT, 'text')
     );
-  }
+  };
 
   const addEmail = (e) => {
     e.preventDefault();
     if (saving || !isFormValid()) return;
     setSaving(true);
     api
-      .post('/api/v1/managements/emails', collectForm())
+      .post(EMAILS_PATH, collectForm())
       .then((res) => {
         if (res.data.code === 1) {
-          message.success('正常に追加されました！!');
+          message.success(CREATE_SUCCESS);
           setTimeout(() => {
             window.location.href = getAdminRoutePath('/list-email');
           }, 1500);
@@ -215,7 +233,7 @@ const CreateEmail = () => {
           tokenExpired();
         }
       });
-  }
+  };
 
   const saveEmail = (e) => {
     e.preventDefault();
@@ -223,10 +241,10 @@ const CreateEmail = () => {
     const id = window.location.pathname.slice(window.location.pathname.lastIndexOf('/') + 1);
     setSaving(true);
     api
-      .patch(`/api/v1/managements/emails/${id}`, collectForm())
+      .patch(`${EMAILS_PATH}/${id}`, collectForm())
       .then((res) => {
         if (res.data.code === 1) {
-          message.success('正常に更新されました！');
+          message.success(UPDATE_SUCCESS);
           setTimeout(() => {
             window.location.href = getAdminRoutePath('/list-email');
           }, 1500);
@@ -243,9 +261,9 @@ const CreateEmail = () => {
           tokenExpired();
         }
       });
-  }
+  };
 
-  useAdminHeaderTitle(isEdit ? 'メール編集' : 'メール作成');
+  useAdminHeaderTitle(isEdit ? EDIT_TITLE : CREATE_EMAIL_LABEL);
 
   useAdminHeaderActions(
     <>
@@ -274,9 +292,9 @@ const CreateEmail = () => {
                 name="email_template_name"
                 onChange={(e) => {
                   updateField('email_template_name', e.target.value);
-                  setFieldError('email_template_name', e.target.value ? '' : 'テンプレート名は、必ず指定してください。');
+                  setFieldError('email_template_name', e.target.value ? '' : requiredMessage(LABEL_TEMPLATE_NAME));
                 }}
-                onBlur={() => checkRequired('email_template_name', 'テンプレート名')}
+                onBlur={() => checkRequired('email_template_name', LABEL_TEMPLATE_NAME)}
               />
             </AdminFormRow>
 
@@ -290,25 +308,25 @@ const CreateEmail = () => {
               />
             </AdminFormRow>
 
-            <AdminFormRow label="TO" required htmlFor="to" error={fieldErrors.to}>
+            <AdminFormRow label={LABEL_TO} required htmlFor="to" error={fieldErrors.to}>
               <Input
                 id="to"
                 value={formValues.to}
-                placeholder="no-reply@ec-chatbot.com"
+                placeholder={PLACEHOLDER_TO}
                 name="to"
                 onChange={(e) => {
                   updateField('to', e.target.value);
                 }}
-                onBlur={() => checkTo('to', '宛先')}
+                onBlur={() => checkTo('to', LABEL_TO_VALIDATE)}
               />
             </AdminFormRow>
 
-            <AdminFormRow label="CC" htmlFor="cc" alignTop error={ccError}>
+            <AdminFormRow label={LABEL_CC} htmlFor="cc" alignTop error={ccError}>
               <EmailChipList emails={ccAll} onRemove={(index) => setCcAll(ccAll.filter((_, i) => i !== index))} />
               <Input
                 id="cc"
                 value={ccInput}
-                placeholder="no-reply@ec-chatbot.com"
+                placeholder={PLACEHOLDER_CC}
                 onChange={(e) => setCcInput(e.target.value)}
                 onKeyDown={addCC}
               />
@@ -319,16 +337,16 @@ const CreateEmail = () => {
               <Input
                 id="bcc"
                 value={bccInput}
-                placeholder="no-reply@botchan.chat"
+                placeholder={PLACEHOLDER_BCC}
                 onChange={(e) => setBccInput(e.target.value)}
                 onKeyDown={addBCC}
               />
             </AdminFormRow>
 
-            <AdminFormRow label="Reply-To">
+            <AdminFormRow label={LABEL_REPLY_TO}>
               <Input
                 value={formValues.reply_to}
-                placeholder="no-reply@ec-chatbot.com"
+                placeholder={PLACEHOLDER_REPLY_TO}
                 name="reply_to"
                 onChange={(e) => updateField('reply_to', e.target.value)}
               />
@@ -342,9 +360,9 @@ const CreateEmail = () => {
                 name="subject"
                 onChange={(e) => {
                   updateField('subject', e.target.value);
-                  setFieldError('subject', e.target.value ? '' : '件名は、必ず指定してください。');
+                  setFieldError('subject', e.target.value ? '' : requiredMessage(LABEL_SUBJECT));
                 }}
-                onBlur={() => checkRequired('subject', '件名')}
+                onBlur={() => checkRequired('subject', LABEL_SUBJECT)}
               />
             </AdminFormRow>
 
@@ -357,9 +375,9 @@ const CreateEmail = () => {
                 name="content"
                 onChange={(e) => {
                   updateField('content', e.target.value);
-                  setFieldError('text', e.target.value ? '' : 'メール内容は、必ず指定してください。');
+                  setFieldError('text', e.target.value ? '' : requiredMessage(LABEL_CONTENT));
                 }}
-                onBlur={() => checkRequired('content', 'メール内容', 'text')}
+                onBlur={() => checkRequired('content', LABEL_CONTENT, 'text')}
               />
             </AdminFormRow>
           </form>

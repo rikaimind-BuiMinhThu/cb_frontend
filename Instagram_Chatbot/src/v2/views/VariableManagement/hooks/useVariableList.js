@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import api from 'v2/api/api-management';
+import { BOT_ID_COOKIE_KEY } from 'v2/api/constants';
 import { notifyApiError, variablesApiPath } from '../variableUtils';
+import { FETCH_ERROR } from '../constants';
 
 const useVariableList = () => {
-  const botId = Cookies.get('bot_id');
+  const botId = Cookies.get(BOT_ID_COOKIE_KEY);
 
   const [variables, setVariables] = useState([]);
   const [total, setTotal] = useState(0);
@@ -25,7 +27,7 @@ const useVariableList = () => {
   useEffect(() => {
     if (!botId) return undefined;
 
-    let cancelled = false;
+    const request = { cancelled: false };
 
     const fetchVariables = async () => {
       setLoading(true);
@@ -33,21 +35,21 @@ const useVariableList = () => {
         const { data } = await api.get(variablesApiPath(botId), {
           params: { page, name: appliedKeyword },
         });
-        if (cancelled) return;
+        if (request.cancelled) return;
         setVariables(data.data || []);
         setTotal(data.total || 0);
       } catch (error) {
-        if (cancelled) return;
-        notifyApiError(error, '変数の取得に失敗しました。');
+        if (request.cancelled) return;
+        notifyApiError(error, FETCH_ERROR);
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!request.cancelled) setLoading(false);
       }
     };
 
     fetchVariables();
 
     return () => {
-      cancelled = true;
+      request.cancelled = true;
     };
   }, [appliedKeyword, botId, page, reloadTick]);
 

@@ -6,7 +6,7 @@ import ScenarioModalFooter from './components/modals/shared/ScenarioModalFooter'
 import { AdminInfoTooltip } from 'v2/components/AdminShell';
 import { SCENARIO_MODAL_TOOLTIPS } from './components/modals/shared/scenarioModalTooltips';
 
-function ShopifyReferencePopup({ onCancel, onReferProductVariant }) {
+const ShopifyReferencePopup = ({ onCancel, onReferProductVariant }) => {
   const [productVariantSelected, setProductVariantSelected] = useState(null);
   const [displayName, setDisplayName] = useState('');
   const [listProductVariants, setListProductVariants] = useState([]);
@@ -37,12 +37,12 @@ function ShopifyReferencePopup({ onCancel, onReferProductVariant }) {
 
   return (
     <div className="ss-settings-shopify-ref">
-      <div className="fr-popup-container" style={{ minHeight: '300px' }}>
-        <div style={{ padding: '5px 5px 12px', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '14px' }}>
+      <div className="fr-popup-container">
+        <div className="ss-settings-shopify-ref__heading">
           <span>商品バリアントを選択</span>
           <AdminInfoTooltip text={SCENARIO_MODAL_TOOLTIPS.shopifyVariant} />
         </div>
-        <div style={{ padding: '5px' }}>
+        <div className="ss-settings-shopify-ref__list-wrap">
           <Radio.Group
             value={productVariantSelected}
             onChange={onChangeProductVariant}

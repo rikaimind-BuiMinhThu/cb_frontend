@@ -1032,3 +1032,46 @@
 .admin-visually-hidden {
   display: none;
 }
+
+.admin-char-count {
+  color: #6b7280;
+}
+
+.push-tab-panel-body {
+  padding-top: 24px;
+  padding-bottom: 24px;
+}
+
+.admin-push-modal {
+  top: 20px;
+}
+
+.push-select-min-width {
+  min-width: 100px;
+}
+
+.push-variables-row {
+  width: 100%;
+}
+
+.admin-field-full-width {
+  width: 100%;
+}
+
+.admin-dashboard-card-title {
+  font-size: 23px;
+}
+
+.admin-dashboard-chart-center {
+  width: 100%;
+  text-align: center;
+}
+
+.admin-dashboard-chart-body {
+  height: 266px;
+}
+
+.user-message-tail-icon-svg {
+  transform: scaleX(-1);
+}
+

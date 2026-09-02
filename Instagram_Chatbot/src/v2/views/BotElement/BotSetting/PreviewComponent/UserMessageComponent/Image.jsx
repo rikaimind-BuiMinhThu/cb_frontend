@@ -1,4 +1,5 @@
-import React from "react";
+import React from 'react';
+import { baseUserMessageComponentPropTypes } from './userMessageComponentPropTypes';
 import "v2/assets/css/bot/preview-chat-bot.css";
 import { MESSAGE_CONTENT_TYPES } from "../Constants";
 
@@ -20,6 +21,10 @@ const Image = ({ content, contentIndex, messageIndex }) => {
       />
     </div>
   );
+};
+
+Image.propTypes = {
+  ...baseUserMessageComponentPropTypes,
 };
 
 export default Image;

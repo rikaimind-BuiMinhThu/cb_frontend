@@ -61,7 +61,6 @@ const RegisterButtonSettingsContent = ({
             tooltip={SCENARIO_MODAL_TOOLTIPS.registerButtonName}
           >
             <InputCustom
-              style={{ width: '100%' }}
               placeholder="例：次へ、登録する"
               value={selectedMessage.buttonName}
               maxLength={30}

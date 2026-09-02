@@ -4,6 +4,26 @@ import { useParams } from 'react-router-dom';
 import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { AdminTable, AdminActionButton } from 'v2/components/AdminShell';
+import {
+  PUSH_MESSAGE_HISTORIES_PATH,
+  COL_NO,
+  COL_TITLE,
+  COL_SENDING_METHOD,
+  COL_SENT_TIME,
+  COL_STATUS,
+  COL_DESTINATION,
+  COL_FAILED_COUNT,
+  TAG_EMAIL,
+  TAG_SMS,
+  TAG_SUCCESS,
+  TAG_FAILURE,
+  EMPTY_CELL,
+  EMPTY_HISTORY,
+  HISTORY_PERIOD_LABEL,
+  DATE_FORMAT,
+  METHOD_EMAIL,
+  STATUS_SUCCESS,
+} from './constants';
 
 const PushMessageHistory = () => {
   const { botId } = useParams();
@@ -21,7 +41,7 @@ const PushMessageHistory = () => {
   useEffect(() => {
     setLoading(true);
     api
-      .get('/api/v1/managements/push_message_histories', {
+      .get(PUSH_MESSAGE_HISTORIES_PATH, {
         params: {
           chatbot_id: botId,
           page: 'all',
@@ -48,54 +68,54 @@ const PushMessageHistory = () => {
   const columns = useMemo(
     () => [
       {
-        title: '番号',
+        title: COL_NO,
         width: 70,
         align: 'center',
         render: (_, __, index) => index + 1,
       },
       {
-        title: 'プッシュメッセージ名',
+        title: COL_TITLE,
         dataIndex: ['push_message', 'title'],
         ellipsis: true,
       },
       {
-        title: '送信方法',
+        title: COL_SENDING_METHOD,
         dataIndex: ['push_message', 'sending_method'],
         width: 110,
         align: 'center',
         render: (method) =>
-          method === 'email' ? (
-            <Tag color="purple">メール</Tag>
+          method === METHOD_EMAIL ? (
+            <Tag color="purple">{TAG_EMAIL}</Tag>
           ) : (
-            <Tag color="blue">SMS</Tag>
+            <Tag color="blue">{TAG_SMS}</Tag>
           ),
       },
       {
-        title: '配信日時',
+        title: COL_SENT_TIME,
         dataIndex: 'sent_time',
         width: 180,
         render: (value) =>
-          value ? value.substring(0, 19).replaceAll('T', ' ') : '—',
+          value ? value.substring(0, 19).replaceAll('T', ' ') : EMPTY_CELL,
       },
       {
-        title: '状態',
+        title: COL_STATUS,
         dataIndex: ['push_message', 'status'],
         width: 110,
         align: 'center',
         render: (status) =>
-          status === 'success' ? (
-            <Tag color="success">成功</Tag>
+          status === STATUS_SUCCESS ? (
+            <Tag color="success">{TAG_SUCCESS}</Tag>
           ) : (
-            <Tag color="error">失敗</Tag>
+            <Tag color="error">{TAG_FAILURE}</Tag>
           ),
       },
       {
-        title: '行き先',
+        title: COL_DESTINATION,
         dataIndex: 'destination',
         ellipsis: true,
       },
       {
-        title: '送信失敗の件数',
+        title: COL_FAILED_COUNT,
         dataIndex: 'number_of_failed_transmissions',
         width: 140,
         align: 'center',
@@ -107,9 +127,9 @@ const PushMessageHistory = () => {
 
   const searchToolbar = (
     <Space align="center" size={12} wrap>
-      <Typography.Text type="secondary">集計期間</Typography.Text>
+      <Typography.Text type="secondary">{HISTORY_PERIOD_LABEL}</Typography.Text>
       <DatePicker.RangePicker
-        format="YYYY-MM-DD"
+        format={DATE_FORMAT}
         onChange={(_, options) => {
           setDateRange([options[0] || null, options[1] || null]);
         }}
@@ -125,7 +145,7 @@ const PushMessageHistory = () => {
       columns={columns}
       dataSource={list}
       rowKey="id"
-      emptyDescription="配信履歴がありません"
+      emptyDescription={EMPTY_HISTORY}
     />
   );
 };
