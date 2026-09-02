@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Button, message, Space, Tag } from 'antd';
+import { Button, message, Space, Switch } from 'antd';
 import { Link } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import api from 'v2/api/api-management';
@@ -59,8 +59,6 @@ import {
   SUCCESS_DELETED,
   SUCCESS_DUPLICATED,
   SUCCESS_STATUS_CHANGED,
-  TAG_COLOR_OFF,
-  TAG_COLOR_ON,
   TOKEN_COOKIE_KEY,
   TOKEN_EXPIRED_CODE,
 } from './constants';
@@ -232,8 +230,13 @@ const BotManagement = () => {
       title: COL_STATUS,
       dataIndex: 'status',
       width: COL_STATUS_WIDTH,
-      render: (status) => (
-        <Tag color={status === STATUS_ON ? TAG_COLOR_ON : TAG_COLOR_OFF}>{status?.toUpperCase()}</Tag>
+      render: (status, record) => (
+        <Switch
+          checked={status === STATUS_ON}
+          checkedChildren={STATUS_ON_LABEL}
+          unCheckedChildren={STATUS_OFF_LABEL}
+          onChange={() => handleStopBot(record.id, status)}
+        />
       ),
     },
     {
@@ -258,9 +261,6 @@ const BotManagement = () => {
           >
             <AdminActionButton action="preview" label={DEMO_LABEL} iconOnly />
           </Link>
-          <Button type="link" size="small" onClick={() => handleStopBot(record.id, record.status)}>
-            {record.status === STATUS_OFF ? STATUS_ON_LABEL : STATUS_OFF_LABEL}
-          </Button>
           <AdminActionButton action="delete" iconOnly onClick={() => handleDeleteBot(record.id)} />
         </Space>
       ),

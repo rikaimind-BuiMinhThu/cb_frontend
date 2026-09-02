@@ -33,9 +33,6 @@ export const STATUS_ALL = 'all';
 export const STATUS_ON = 'on';
 export const STATUS_OFF = 'off';
 
-export const TAG_COLOR_ON = 'green';
-export const TAG_COLOR_OFF = 'default';
-
 export const CREATE_BOT_LABEL = 'ボット作成';
 export const SEARCH_PLACEHOLDER = 'ボット名 ...';
 export const FILTER_STATUS_LABEL = 'ボットステータス';
@@ -58,7 +55,7 @@ export const COL_ACTIONS = 'アクション';
 export const COL_NUMBER_WIDTH = 70;
 export const COL_STATUS_WIDTH = 120;
 export const COL_PERMISSION_WIDTH = 120;
-export const COL_ACTIONS_WIDTH = 320;
+export const COL_ACTIONS_WIDTH = 240;
 
 export const SUCCESS_DUPLICATED = '正常に複製されました！';
 export const SUCCESS_STATUS_CHANGED = '正常に変更されました！';

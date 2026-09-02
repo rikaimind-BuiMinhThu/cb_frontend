@@ -20,6 +20,8 @@ export const SCENARIO_COLUMN_STATUS = 'ステータス';
 export const SCENARIO_COLUMN_NAME = 'シナリオ名';
 export const SCENARIO_COLUMN_UPDATED = '最後の更新日時';
 export const SCENARIO_COLUMN_ACTION = 'アクション';
+export const SCENARIO_COLUMN_STATUS_WIDTH = 110;
+export const SCENARIO_COLUMN_ACTION_WIDTH = 220;
 export const SCENARIO_NAV_DELAY_MS = 1500;
 
 export const SCENARIO_TEMPLATES_API = '/api/v1/managements/scenario_templates';

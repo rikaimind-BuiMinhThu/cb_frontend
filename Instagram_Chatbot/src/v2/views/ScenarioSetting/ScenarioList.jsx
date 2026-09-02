@@ -1,6 +1,6 @@
 import { useHistory } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Input, Modal, Radio, Select, Space, Tag, message } from 'antd';
+import { Input, Modal, Select, Space, Switch, message } from 'antd';
 import api from 'v2/api/api-management';
 import Cookies from 'js-cookie';
 import moment from 'moment';
@@ -27,9 +27,11 @@ import {
   SCENARIO_STATUS_ACTIVE,
   SCENARIO_STATUS_INACTIVE,
   SCENARIO_COLUMN_STATUS,
+  SCENARIO_COLUMN_STATUS_WIDTH,
   SCENARIO_COLUMN_NAME,
   SCENARIO_COLUMN_UPDATED,
   SCENARIO_COLUMN_ACTION,
+  SCENARIO_COLUMN_ACTION_WIDTH,
   SCENARIO_NAV_DELAY_MS,
   SCENARIO_TEMPLATES_API,
   SCENARIO_LIST_API,
@@ -180,6 +182,13 @@ const ScenarioList = () => {
     Cookies.set(SCENARIO_ID_COOKIE_KEY, id);
   };
 
+  const handleSelectScenario = (scenarioId, checked) => {
+    if (!checked) {
+      return;
+    }
+    setScenarioSelected(scenarioId);
+  };
+
   useAdminHeaderActions(
     <Space>
       <AdminActionButton action="create" label={SCENARIO_CREATE_ACTION} onClick={() => setIsOpenCreateScenario(true)} />
@@ -189,22 +198,15 @@ const ScenarioList = () => {
 
   const columns = [
     {
-      title: '',
-      width: 48,
-      render: (_, scenario) => (
-        <Radio
-          checked={scenarioSelected === scenario.id}
-          onChange={() => setScenarioSelected(scenario.id)}
-        />
-      ),
-    },
-    {
       title: SCENARIO_COLUMN_STATUS,
-      width: 90,
+      width: SCENARIO_COLUMN_STATUS_WIDTH,
       render: (_, scenario) => (
-        <Tag color={scenarioSelectedClone === scenario.id ? 'green' : 'default'}>
-          {scenarioSelectedClone === scenario.id ? SCENARIO_STATUS_ACTIVE : SCENARIO_STATUS_INACTIVE}
-        </Tag>
+        <Switch
+          checked={scenarioSelected === scenario.id}
+          checkedChildren={SCENARIO_STATUS_ACTIVE}
+          unCheckedChildren={SCENARIO_STATUS_INACTIVE}
+          onChange={(checked) => handleSelectScenario(scenario.id, checked)}
+        />
       ),
     },
     {
@@ -218,7 +220,7 @@ const ScenarioList = () => {
     },
     {
       title: SCENARIO_COLUMN_ACTION,
-      width: 220,
+      width: SCENARIO_COLUMN_ACTION_WIDTH,
       render: (_, scenario) => (
         <Space className="admin-table-actions">
           <AdminActionButton
