@@ -1,46 +1,44 @@
-import Cookies from 'js-cookie'
-import axios from 'axios'
+import axios from 'axios';
+import Cookies from 'js-cookie';
+import {
+  AUTHORIZATION_HEADER,
+  BEARER_PREFIX,
+  COOKIE_ROOT_PATH,
+  REFRESH_TOKEN_COOKIE_KEY,
+  TOKEN_COOKIE_KEY,
+  USER_NAME_COOKIE_KEY,
+} from './constants';
 
-const TokenKey = 'token'
-const RefreshToken = 'RefreshToken'
-const userNameLogin = 'uMythos'
+const getCookieOptions = (pathname) => ({
+  path: pathname || COOKIE_ROOT_PATH,
+});
 
-export function getToken() {
-  return (`Authorization = Bearer ${Cookies.get(TokenKey)}`)
-}
+const applyAuthorizationHeader = (token) => {
+  axios.defaults.headers.common[AUTHORIZATION_HEADER] = `${BEARER_PREFIX}${token}`;
+};
 
-export function getRefreshToken() {
-  return Cookies.get(RefreshToken)
-}
+export const getToken = () => Cookies.get(TOKEN_COOKIE_KEY);
 
-export function setRefreshToken(token) {
-  return Cookies.set(RefreshToken, token.refresh_token, token)
-}
+export const getRefreshToken = () => Cookies.get(REFRESH_TOKEN_COOKIE_KEY);
 
-export function setToken(token, pathname) {
-  Cookies.set(TokenKey, token, { path: pathname });
-  Cookies.set(TokenKey, token, { path: '/' });
-  Cookies.set(TokenKey, token, { path: '/v2/admin/dashboard' });
-  // Cookies.set(RefreshToken, refresh_token, { path: pathname });
-  // Cookies.set(RefreshToken, refresh_token, { path: '/' });
-  // Cookies.set(RefreshToken, refresh_token, { path: '/v2/admin/dashboard' });
-  axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-  // console.log("token set in auth: ", Cookies.get(TokenKey))
-  window.location.reload()
-}
+export const setRefreshToken = (refreshToken, pathname) => Cookies.set(
+  REFRESH_TOKEN_COOKIE_KEY,
+  refreshToken,
+  getCookieOptions(pathname),
+);
 
-export function setUserName(name) {
-  return Cookies.set(userNameLogin, name)
-}
+export const setToken = (token, pathname) => {
+  Cookies.set(TOKEN_COOKIE_KEY, token, getCookieOptions(pathname));
+  applyAuthorizationHeader(token);
+};
 
-export function getUserName() {
-  return Cookies.get(userNameLogin)
-}
+export const setUserName = (name) => Cookies.set(USER_NAME_COOKIE_KEY, name);
 
-export function removeToken() {
-  return Cookies.remove(TokenKey)
-}
+export const getUserName = () => Cookies.get(USER_NAME_COOKIE_KEY);
 
-export function removeTokenRefresh() {
-  return Cookies.remove(RefreshToken)
-}
+export const removeToken = () => Cookies.remove(TOKEN_COOKIE_KEY, getCookieOptions());
+
+export const removeTokenRefresh = () => Cookies.remove(
+  REFRESH_TOKEN_COOKIE_KEY,
+  getCookieOptions(),
+);

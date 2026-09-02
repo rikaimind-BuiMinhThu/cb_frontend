@@ -1,27 +1,44 @@
-import axios from "axios";
-import Cookies from "js-cookie";
-import { EC_CHATBOT_URL } from "v2/variables/constants";
-export default function requestNewToken(_pathname) {
-    var header = `Authorization: Bearer ${Cookies.get('refreshToken')}`;
-    axios.defaults.headers.common['Authorization'] = `Bearer ${Cookies.get('refreshToken')}`;
-    
-    axios
-        .post(`${EC_CHATBOT_URL}/api/v1/refresh_token`, header)
-        .then(data => {
-            // console.log("data ne: ", data.data.token)
-            // setToken('token', data.data.access_token);
-            // setToken('token', data.data.access_token, pathname);
-        }).catch(error => {
-            console.log(error)
-        });
+import axios from 'axios';
+import { EC_CHATBOT_URL } from 'v2/variables/constants';
+import { getRefreshToken, setToken } from './auth';
+import {
+  API_SUCCESS_CODE,
+  AUTHORIZATION_HEADER,
+  BEARER_PREFIX,
+  REFRESH_TOKEN_PATH,
+} from './constants';
+import { tokenExpired } from './tokenExpired';
+
+const requestNewToken = () => {
+  const refreshToken = getRefreshToken();
+
+  if (!refreshToken) {
+    tokenExpired();
+    return Promise.resolve();
+  }
+
+  return axios
+    .post(
+      `${EC_CHATBOT_URL}${REFRESH_TOKEN_PATH}`,
+      {},
+      {
+        headers: {
+          [AUTHORIZATION_HEADER]: `${BEARER_PREFIX}${refreshToken}`,
+        },
+      },
+    )
+    .then((response) => {
+      const token = response.data?.token;
+      if (response.data?.code === API_SUCCESS_CODE && token) {
+        setToken(token);
+        return token;
+      }
+      tokenExpired();
+      return undefined;
+    })
+    .catch(() => {
+      tokenExpired();
+    });
 };
 
-// var service1 = axios.create(
-//     {
-//         // baseURL: 'http://rikai-dev.ddns.net:8000',
-//         baseURL: 'https://ec-chatbot-test1.com',
-//         data:'',
-//         headers: { 'Authorization': 'Bearer ' + Cookies.get('refreshToken') }
-//     });
-
-// export default service1
+export default requestNewToken;
