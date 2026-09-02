@@ -120,3 +120,25 @@ html,
     transform: rotate(360deg);
   }
 }
+
+.login-page {
+  margin-top: 1%;
+}
+
+.login-logo {
+  height: 45px;
+  padding-left: 2%;
+}
+
+.login-error {
+  color: red;
+}
+
+.login-notice {
+  width: 100%;
+  text-align: center;
+}
+
+.login-submit {
+  text-align: center;
+}

@@ -1,260 +1,277 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import FacebookLogin from 'react-facebook-login';
 import { Button } from 'react-bootstrap';
-import 'v2/assets/css/loginFacebook.css';
-import api from 'v2/api/api-management'
-import Cookies from 'js-cookie';
-import axios from 'axios';
-import {FACEBOOK_APP_ID, META_GRAPH_API_VERSION} from 'v2/variables/constants';
 import { message } from 'antd';
+import axios from 'axios';
+import Cookies from 'js-cookie';
+import api from 'v2/api/api-management';
+import {
+  API_SUCCESS_CODE,
+  IG_ID_COOKIE_KEY,
+  INSTAGRAM_CONNECT_PATH,
+  INSTAGRAM_NOT_LINKED_CODE,
+  LOGOUT_FB_PATH,
+  PAGE_ACCESS_TOKEN_COOKIE_KEY,
+} from 'v2/api/constants';
+import { FACEBOOK_APP_ID, META_GRAPH_API_VERSION } from 'v2/variables/constants';
+import {
+  EMPTY_VALUE,
+  FACEBOOK_ACTION_FAILED_MESSAGE,
+  FACEBOOK_CONNECTED_STATUS,
+  FACEBOOK_GRAPH_BASE_URL,
+  FACEBOOK_LOGIN_SCOPE,
+  FACEBOOK_ME_PATH,
+  FACEBOOK_PAGE_FIELDS,
+  FACEBOOK_SDK_SCRIPT_ID,
+  FACEBOOK_SDK_URL,
+  INSTAGRAM_BUSINESS_ACCOUNT_FIELDS,
+  INSTAGRAM_LOGOUT_BUTTON,
+  INSTAGRAM_NO_PAGE_MESSAGE,
+  INSTAGRAM_NOT_LINKED_MESSAGE,
+  INSTAGRAM_PROFILE_FIELDS,
+  SCRIPT_ELEMENT,
+  SELECT_PAGE_BUTTON,
+  SESSION_CHECK_DELAY_MS,
+} from './constants';
+import 'v2/assets/css/loginFacebook.css';
 
-function LoginFacebook({ checkLogin }) {
+const loadFacebookSdk = () => {
+  if (window.FB) {
+    return;
+  }
+  const script = document.createElement(SCRIPT_ELEMENT);
+  script.id = FACEBOOK_SDK_SCRIPT_ID;
+  script.src = FACEBOOK_SDK_URL;
+  script.async = true;
+  document.body.appendChild(script);
+};
 
-  const [, setLogin] = useState(false);
-  const [page, setPage] = useState([]);
-  const [, setUserID] = useState();
-  const [, setUserName] = useState();
-  const [urlImg, setUrlImg] = useState();
+const getInstagramProfileUrl = (igId, accessToken) =>
+  `${FACEBOOK_GRAPH_BASE_URL}/${META_GRAPH_API_VERSION}/${igId}?fields=${INSTAGRAM_PROFILE_FIELDS}&access_token=${accessToken}`;
+
+const LoginFacebook = ({ checkLogin }) => {
+  const [pages, setPages] = useState([]);
+  const [profileImageUrl, setProfileImageUrl] = useState();
   const [username, setUsername] = useState();
-  const [, setAccessToken2] = useState()
+  const [showLoginButton, setShowLoginButton] = useState(true);
+  const [showProfile, setShowProfile] = useState(false);
+  const [showPageList, setShowPageList] = useState(false);
+  const [showLogout, setShowLogout] = useState(false);
 
-  function logoutFB() {
-    window.FB.getLoginStatus(function (response) {
-      var ig_id = Cookies.get("ig_id");
-      api.post(`/api/v1/logout_fb`, {ig_id: ig_id}).then(res => {
-        if (res.data.code === 1) {
-          setLogin(false);
-          Cookies.remove("ig_id");
-          Cookies.remove("page_access_token");
+  useEffect(() => {
+    const applyProfile = (profile) => {
+      setShowLoginButton(false);
+      setShowPageList(false);
+      setShowProfile(true);
+      setShowLogout(true);
+      setProfileImageUrl(profile.profile_picture_url);
+      setUsername(profile.username);
+    };
+
+    const restoreConnectedSession = () => {
+      const pageAccessToken = Cookies.get(PAGE_ACCESS_TOKEN_COOKIE_KEY);
+      const igId = Cookies.get(IG_ID_COOKIE_KEY);
+      if (!pageAccessToken || !igId) {
+        return;
+      }
+      axios
+        .get(getInstagramProfileUrl(igId, pageAccessToken))
+        .then((response) => {
+          checkLogin(true, igId);
+          applyProfile(response.data);
+        })
+        .catch(() => undefined);
+    };
+
+    const loadFacebookPages = () => {
+      const authResponse = window.FB.getAuthResponse();
+      setShowLoginButton(false);
+      setShowProfile(true);
+      setShowPageList(true);
+      setShowLogout(true);
+      window.FB.api(FACEBOOK_ME_PATH, (response) => {
+        setUsername(response.name);
+      });
+      window.FB.api(
+        `${authResponse.userID}/accounts?fields=${FACEBOOK_PAGE_FIELDS}`,
+        (pageResponse) => {
+          setPages(pageResponse.data || []);
+        },
+      );
+    };
+
+    window.fbAsyncInit = () => {
+      window.FB.init({
+        appId: FACEBOOK_APP_ID,
+        cookie: true,
+        xfbml: true,
+        version: META_GRAPH_API_VERSION,
+      });
+      window.FB.getLoginStatus((response) => {
+        if (response.status === FACEBOOK_CONNECTED_STATUS) {
+          loadFacebookPages();
         }
-        if (response.authResponse) {
-          window.FB.logout(function (response) {   // See the onlogin handler
-            window.location.reload();
-          });
-        } else {
+      });
+    };
+
+    loadFacebookSdk();
+    const timer = window.setTimeout(restoreConnectedSession, SESSION_CHECK_DELAY_MS);
+    return () => window.clearTimeout(timer);
+  }, [checkLogin]);
+
+  const logoutFacebook = () => {
+    window.FB.getLoginStatus((statusResponse) => {
+      const igId = Cookies.get(IG_ID_COOKIE_KEY);
+      api
+        .post(LOGOUT_FB_PATH, { ig_id: igId })
+        .then((response) => {
+          if (Number(response.data.code) === API_SUCCESS_CODE) {
+            Cookies.remove(IG_ID_COOKIE_KEY);
+            Cookies.remove(PAGE_ACCESS_TOKEN_COOKIE_KEY);
+            setShowLoginButton(true);
+            setShowProfile(false);
+            setShowPageList(false);
+            setShowLogout(false);
+          }
+          if (statusResponse.authResponse) {
+            window.FB.logout(() => {
+              window.location.reload();
+            });
+            return;
+          }
           window.location.reload();
-        }
-      }).catch(error => {
-        console.log(error)
-      })
+        })
+        .catch(() => {
+          message.error(FACEBOOK_ACTION_FAILED_MESSAGE);
+        });
     });
-  }
+  };
 
-  function statusChangeCallback(response) {
-    // console.log('statusChangeCallback');
-    // console.log(response);
-    if (response.status === 'connected') {
-      testAPI();
-    } else {
-
-    }
-  }
-
-  function checkIsExisted() {
-    // window.FB.init({
-    //   appId: '1733245763691008',
-    //   cookie: true,
-    //   xfbml: true,
-    //   version: 'v14.0'
-    // });
-
-    var page_access_token = Cookies.get("page_access_token");
-    var ig_id = Cookies.get("ig_id");
-    if (page_access_token === "" || page_access_token === null || page_access_token === undefined) {
-      // window.FB.getLoginStatus(function (response) {
-      //   statusChangeCallback(response);
-      // });
-      // console.log("chua login fb dau ne")
-    } else {
-      axios.get(`https://graph.facebook.com/${META_GRAPH_API_VERSION}/${ig_id}?fields=id,username,ig_id,name,profile_picture_url&access_token=${page_access_token}`).then(res => {
-        checkLogin(true, ig_id)
-        document.getElementById("btnLoginFB").style.display = "none"
-        document.getElementById("listPage").style.display = "none"
-        document.getElementById("profileFB").style.display = "block"
-        document.getElementById("logoutFB").style.display = 'block'
-        setUrlImg(res.data.profile_picture_url)
-        setUsername(res.data.username)
-        // window.location.reload()
-      }).catch(error => {
-        console.log(error)
-        // if (error.response.data.code === 3) {
-        //   requestNewToken(path)
-        // }
-      })
-    }
-  }
-
-  function checkLoginState() {
-    window.FB.getLoginStatus(function (response) {
-      setAccessToken2(response.authResponse.accessToken)
-      statusChangeCallback(response);
-    });
-  }
-
-  window.fbAsyncInit = function () {
-    window.FB.init({
-      appId: FACEBOOK_APP_ID,
-      cookie: true,
-      xfbml: true,
-      version: META_GRAPH_API_VERSION
-    });
-
-    window.FB.getLoginStatus(function (response) {
-      statusChangeCallback(response);
-    });
-
-    //check if login successfully:       loginToFB
-    // console.log("authRes: ", authRes);
-  }
-
-  function testAPI() {
-    document.getElementById("loginToFB").style.display = 'none'
-    document.getElementById("profileFB").style.display = 'block'
-    document.getElementById("listPage").style.display = 'block'
-    document.getElementById("logoutFB").style.display = 'block'
-    // console.log('Welcome!  Fetching your information.... ');
-    window.FB.api('/me', function (response) {
-      setUserName(response.name)
-      // document.getElementById('status').innerHTML =
-      //   'Thanks for logging in, ' + response.name + '!';
-    });
-
-
-    var authRes = window.FB.getAuthResponse();
-    window.FB.api(`${authRes.userID}/accounts?fields=id,name,picture`,
-      function (resPage) {
-        console.log("getPage: ", resPage)
-        setPage(resPage.data)
+  const checkLoginState = () => {
+    window.FB.getLoginStatus((response) => {
+      if (response.status === FACEBOOK_CONNECTED_STATUS) {
+        const authResponse = window.FB.getAuthResponse();
+        setShowLoginButton(false);
+        setShowProfile(true);
+        setShowPageList(true);
+        setShowLogout(true);
+        window.FB.api(FACEBOOK_ME_PATH, (profileResponse) => {
+          setUsername(profileResponse.name);
+        });
+        window.FB.api(
+          `${authResponse.userID}/accounts?fields=${FACEBOOK_PAGE_FIELDS}`,
+          (pageResponse) => {
+            setPages(pageResponse.data || []);
+          },
+        );
       }
-    );
-    setUserID(authRes.userID)
+    });
+  };
 
-  }
-
-
-
-  (function (d, s, id) {
-    var js, fjs = d.getElementsByTagName(s)[0];
-    if (d.getElementById(id)) { return; }
-    js = d.createElement(s); js.id = id;
-    js.src = "https://connect.facebook.net/en_US/sdk.js";
-    fjs.parentNode.insertBefore(js, fjs);
-  }(document, 'script', 'facebook-jssdk'));
-
-  function selectPage(value) {
-    document.getElementById("listPage").style.display = 'none'
-    // checkLogin(true)
-    window.FB.api(`/${value}?fields=instagram_business_account`,
-      function (response) {
-        console.log("instagram_business_account: ", response)
-        console.log(value)
-        if (response.instagram_business_account && response.id !== "") {
-          window.FB.api(`/${response.instagram_business_account.id}`, //this 
-            function (res) {
-              var ig_id = res.id;
-              var ig_name = res.name;
-              console.log(ig_id, ig_name)
-              var fb_AuthResponse = window.FB.getAuthResponse();
-              var data = { "fb_AuthResponse": fb_AuthResponse, "page_id": value, "ig_id": res.id }
-              Cookies.set("ig_id", ig_id);
-              Cookies.set("page_access_token", fb_AuthResponse.accessToken);
-              console.log("data post insta connect", data)
-              api.post(`/api/v1/instagram_connect`, data).then(res => {
-                if (res.data.code === 2) {
-                  message.error('このアカウントはInstagramに連携されていません。');
-                } else if (res.data.code === 1) {
-                //change this to come to releases move to code = 1
-                checkLogin(true, ig_id)
-                window.FB.api(`/${ig_id}?fields=id,username,ig_id,name,profile_picture_url`, function(res) {
-                  checkLogin(true, ig_id)
-                  document.getElementById("btnLoginFB").style.display = "none"
-                  document.getElementById("listPage").style.display = "none"
-                  document.getElementById("profileFB").style.display = "block"
-                  setUrlImg(res.profile_picture_url)
-                  setUsername(res.username)
-                })
-                }
-                
-              }).catch(error => {
-                console.log(error)
+  const selectPage = (pageId) => {
+    setShowPageList(false);
+    window.FB.api(
+      `/${pageId}?fields=${INSTAGRAM_BUSINESS_ACCOUNT_FIELDS}`,
+      (response) => {
+        if (!response.instagram_business_account || response.id === EMPTY_VALUE) {
+          message.error(INSTAGRAM_NO_PAGE_MESSAGE);
+          return;
+        }
+        window.FB.api(
+          `/${response.instagram_business_account.id}`,
+          (instagramAccount) => {
+            const igId = instagramAccount.id;
+            const facebookAuthResponse = window.FB.getAuthResponse();
+            Cookies.set(IG_ID_COOKIE_KEY, igId);
+            Cookies.set(
+              PAGE_ACCESS_TOKEN_COOKIE_KEY,
+              facebookAuthResponse.accessToken,
+            );
+            api
+              .post(INSTAGRAM_CONNECT_PATH, {
+                fb_AuthResponse: facebookAuthResponse,
+                page_id: pageId,
+                ig_id: igId,
               })
-
-            }
-          );
-        } else {
-          message.error('このアカウントにはInstagramページがありません。');
-        }
-
-      }
+              .then((connectResponse) => {
+                if (Number(connectResponse.data.code) === INSTAGRAM_NOT_LINKED_CODE) {
+                  message.error(INSTAGRAM_NOT_LINKED_MESSAGE);
+                  return;
+                }
+                if (Number(connectResponse.data.code) !== API_SUCCESS_CODE) {
+                  return;
+                }
+                checkLogin(true, igId);
+                window.FB.api(
+                  `/${igId}?fields=${INSTAGRAM_PROFILE_FIELDS}`,
+                  (profile) => {
+                    checkLogin(true, igId);
+                    setShowLoginButton(false);
+                    setShowPageList(false);
+                    setShowProfile(true);
+                    setProfileImageUrl(profile.profile_picture_url);
+                    setUsername(profile.username);
+                  },
+                );
+              })
+              .catch(() => {
+                message.error(FACEBOOK_ACTION_FAILED_MESSAGE);
+              });
+          },
+        );
+      },
     );
-
-  }
-  setTimeout(() => {
-    if (document.getElementById("divLoginFB") !== null) {
-      document.getElementById("divLoginFB").onload = checkIsExisted()
-    } else {
-      checkIsExisted()
-    }
-
-  }, 500)
+  };
 
   return (
-
-    <div id='divLoginFB' style={{ padding: "30px" }}>
-      <div id="loginToFB" style={{ width: "100%", textAlign: "center", margin: "auto" }}>
-        <div id='btnLoginFB'>
+    <div className="login-facebook">
+      {showLoginButton && (
+        <div className="login-facebook-section">
           <FacebookLogin
-            scope="public_profile,email,instagram_basic,pages_show_list,ads_management,pages_read_engagement,pages_manage_metadata,business_management,instagram_manage_messages,instagram_manage_comments,pages_messaging"
-            callback={() => checkLoginState()}>
-          </FacebookLogin>
+            scope={FACEBOOK_LOGIN_SCOPE}
+            callback={() => checkLoginState()}
+          />
         </div>
-        {/* <div id="status">
-        </div> */}
-      </div>
-      <div id="profileFB" style={{ width: "100%", textAlign: "center", margin: "auto", display: "none" }}>
-        <img style={{ width: "120px" }} src={urlImg} alt={username || ""} />
-        <h4>{username}</h4>
-      </div>
-      <div id='listPage' style={{ display: "none" }}>
-        {page !== undefined ? (page.map((item, i) => (
-          <div key={i} style={{ display: "flex", height: "70px", textAlign: "left", margin: "auto", padding: "10px" }}>
-            <img style={{ paddingLeft: "2.5%" }} src={item.picture.data.url} alt={item.name || ""}></img>
-            <div style={{ paddingLeft: "10px", height: "70px", width: "20%", justifyContent: "center" }}>{item.name}</div>
-            <div style={{ width: "70%", textAlign: "right" }}><Button onClick={() => selectPage(item.id)}>Select</Button></div>
-          </div>
-        )
-        )) : ""}
-      </div>
-      <div id='logoutFB' style={{ width: "100%", margin: "auto", textAlign: "center", display: "none" }}>
-        <Button onClick={() => logoutFB()}>インスタグラムログアウト</Button>
-      </div>
-
-      {/* <Card >
-        <Card.Header>
-          {!login &&
-            <FacebookLogin
-              appId="1733245763691008"
-              autoLoad={false}
-              fields="name,email,picture"
-              scope="public_profile,user_friends"
-              callback={responseFacebook}
-              icon="fa-facebook" />
-          }
-          {login &&
-            <Image src={picture} roundedCircle />
-          }
-        </Card.Header>
-        {login &&
-          <Card.Body>
-            <Card.Title>{data.name}</Card.Title>
-            <Card.Text>
-              {data.email}
-            </Card.Text>
-          </Card.Body>
-        }
-      </Card> */}
+      )}
+      {showProfile && (
+        <div className="login-facebook-section">
+          <img
+            className="login-facebook-avatar"
+            src={profileImageUrl}
+            alt={username || EMPTY_VALUE}
+          />
+          <h4>{username}</h4>
+        </div>
+      )}
+      {showPageList && (
+        <div>
+          {pages.map((item) => (
+            <div key={item.id} className="login-facebook-page">
+              <img
+                className="login-facebook-page-image"
+                src={item.picture.data.url}
+                alt={item.name || EMPTY_VALUE}
+              />
+              <div className="login-facebook-page-name">{item.name}</div>
+              <div className="login-facebook-page-action">
+                <Button onClick={() => selectPage(item.id)}>{SELECT_PAGE_BUTTON}</Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+      {showLogout && (
+        <div className="login-facebook-section login-facebook-logout">
+          <Button onClick={() => logoutFacebook()}>{INSTAGRAM_LOGOUT_BUTTON}</Button>
+        </div>
+      )}
     </div>
   );
-}
+};
+
+LoginFacebook.propTypes = {
+  checkLogin: PropTypes.func.isRequired,
+};
 
 export default LoginFacebook;

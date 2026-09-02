@@ -1,189 +1,165 @@
-// import config from "@babel/core/lib/config";
-import axios from "axios";
-import React from "react";
-import "v2/assets/css/login.css"
-import "assets/scss/paper-dashboard.scss?v=1.3.0";
-import "assets/demo/demo.css";
+import React, { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
-import { setToken } from "v2/api/auth";
-import logo from '../../assets/img/ecchatbot-logo.png'
-import {EC_CHATBOT_URL, getDefaultLandingPath} from '../../variables/constants'
-class Login extends React.Component {
+import api from 'v2/api/api-management';
+import { setRefreshToken, setToken } from 'v2/api/auth';
+import {
+  API_SUCCESS_CODE,
+  AUTH_TRUE_VALUE,
+  BOT_TYPE_COOKIE_KEY,
+  IS_AUTH_COOKIE_KEY,
+  SIGN_IN_PATH,
+  USER_ID_COOKIE_KEY,
+  USER_ROLE_COOKIE_KEY,
+} from 'v2/api/constants';
+import {
+  getDebugFlag,
+  getDefaultLandingPath,
+  getEnvironment,
+} from 'v2/variables/constants';
+import logo from '../../assets/img/ecchatbot-logo.png';
+import {
+  CLIENT_STORAGE_KEY,
+  DEBUG_STORAGE_KEY,
+  EMAIL_INPUT_ID,
+  EMAIL_LABEL,
+  EMAIL_MESSAGE_ID,
+  EMAIL_PLACEHOLDER,
+  EMAIL_REQUIRED_MESSAGE,
+  EMPTY_VALUE,
+  ENV_STORAGE_KEY,
+  LOGIN_BUTTON,
+  LOGIN_ERROR_MSG_ID,
+  LOGIN_FAILED_MESSAGE,
+  LOGIN_INVALID_MESSAGE,
+  LOGIN_TITLE,
+  LOGO_ALT,
+  PASSWORD_INPUT_ID,
+  PASSWORD_LABEL,
+  PASSWORD_MESSAGE_ID,
+  PASSWORD_PLACEHOLDER,
+  PASSWORD_REQUIRED_MESSAGE,
+  SUBMIT_FORM_BUTTON_ID,
+} from './constants';
+import 'v2/assets/css/login.css';
+import 'assets/scss/paper-dashboard.scss?v=1.3.0';
+import 'assets/demo/demo.css';
 
-  constructor(props) {
-    super(props);
-    this.state = { token: '', navigator: 'false', msgNoti: '', emailError: '', passwordError: '' };
-    Cookies.remove('bot_type');
+const persistSession = (data) => {
+  setToken(data.token);
+  setRefreshToken(data.refresh_token);
+  Cookies.set(USER_ROLE_COOKIE_KEY, data.user.role);
+  Cookies.set(USER_ID_COOKIE_KEY, data.user.id);
+  Cookies.set(IS_AUTH_COOKIE_KEY, AUTH_TRUE_VALUE);
+  localStorage.setItem(CLIENT_STORAGE_KEY, JSON.stringify(data.client));
+};
 
-    if (!localStorage.getItem("env")) {
-      localStorage.setItem("env", this.getEnvironment());
+const Login = () => {
+  const [email, setEmail] = useState(EMPTY_VALUE);
+  const [password, setPassword] = useState(EMPTY_VALUE);
+  const [emailError, setEmailError] = useState(EMPTY_VALUE);
+  const [passwordError, setPasswordError] = useState(EMPTY_VALUE);
+  const [notice, setNotice] = useState(EMPTY_VALUE);
+
+  useEffect(() => {
+    Cookies.remove(BOT_TYPE_COOKIE_KEY);
+    if (!localStorage.getItem(ENV_STORAGE_KEY)) {
+      localStorage.setItem(ENV_STORAGE_KEY, getEnvironment());
+    }
+    localStorage.setItem(DEBUG_STORAGE_KEY, getDebugFlag());
+  }, []);
+
+  const submitLogin = (event) => {
+    event.preventDefault();
+    const hasEmail = Boolean(email);
+    const hasPassword = Boolean(password);
+
+    if (!hasEmail || !hasPassword) {
+      setEmailError(hasEmail ? EMPTY_VALUE : EMAIL_REQUIRED_MESSAGE);
+      setPasswordError(hasPassword ? EMPTY_VALUE : PASSWORD_REQUIRED_MESSAGE);
+      setNotice(EMPTY_VALUE);
+      return;
     }
 
-    localStorage.setItem("debug", this.getDebugFlag());
-  }
+    setEmailError(EMPTY_VALUE);
+    setPasswordError(EMPTY_VALUE);
+    setNotice(EMPTY_VALUE);
 
-  getEnvironment() {
-    const params = new Proxy(new URLSearchParams(window.location.search), {
-      get: (searchParams, prop) => searchParams.get(prop),
-    });
-
-    return params.env || "production";
-  }
-
-  getDebugFlag(){
-    const params = new Proxy(new URLSearchParams(window.location.search), {
-      get: (searchParams, prop) => searchParams.get(prop),
-    });
-
-    return params.debug === "true";
-  }
-
-  handleLogin = (props) => {
-    var nameValue = document.getElementById("email").value;
-    var password = document.getElementById("password").value;
-
-    if (nameValue === "" || password === "") {
-      this.setState({
-        passwordError: password === "" ? "パスワードを入力してください。" : "",
-        emailError: nameValue === "" ? "メールを入力してください。" : "",
-        msgNoti: "",
+    api
+      .post(SIGN_IN_PATH, { user: { email, password } })
+      .then((response) => {
+        const data = response.data;
+        if (Number(data.code) === API_SUCCESS_CODE) {
+          persistSession(data);
+          window.location.href = getDefaultLandingPath(data.user.role, data.client);
+          return;
+        }
+        setNotice(LOGIN_INVALID_MESSAGE);
+      })
+      .catch(() => {
+        setNotice(LOGIN_FAILED_MESSAGE);
       });
-    } else {
-      this.setState({ emailError: "", passwordError: "", msgNoti: "" });
-      // const loginInfo = { username: nameValue, password: password };
-      const loginInfo = { user: { email: nameValue, password: password } }
-      axios.post(`${EC_CHATBOT_URL}/api/v1/sign_in`, loginInfo)
-        .then(res => {
-          this.setState({ msgNoti: "" });
-          const persons = res.data;
-          if (persons.code === 1 || persons.code === "1") {
-            setToken(persons.token)
-            Cookies.set('refreshToken', persons.refresh_token); // {path: '/'}
-            Cookies.set('user_role', persons.user.role); // {path: '/'}
-            Cookies.set('user_id', persons.user.id); // {path: '/'}
-            Cookies.set('is_auth', 'true');
-            localStorage.setItem("client", JSON.stringify(res.data.client));
-            // sessionStorage.setItem("client", JSON.stringify(res.data.client));
-            // Cookies.set('refreshToken', persons.refresh_token); /{path: '/v2/admin/dashboard'}
-            axios.defaults.headers.common['Authorization'] = `Bearer ${Cookies.get('token')}`;
-            getToDashboard(persons.user.role, res.data.client);
-          } else {
-            this.setState({ msgNoti: "ユーザー名またはパスワードが間違っています。" })
-          }
-        })
-        .catch(() => {
-          this.setState({ msgNoti: "ログインに失敗しました。" });
-        });
+  };
 
-      function getToDashboard(role, client) {
-        window.location.href = getDefaultLandingPath(role, client)
-      }
-    }
-  }
-
-  handleSubmit = (event) => {
-    event.preventDefault()
-    var nameValue = document.getElementById("email").value;
-    var password = document.getElementById("password").value;
-
-    if (nameValue === "" || password === "") {
-      this.setState({
-        passwordError: password === "" ? "パスワードを入力してください。" : "",
-        emailError: nameValue === "" ? "メールを入力してください。" : "",
-        msgNoti: "",
-      });
-    } else {
-      this.setState({ emailError: "", passwordError: "", msgNoti: "" });
-      // const loginInfo = { username: nameValue, password: password };
-      const loginInfo = { user: { email: nameValue, password: password } }
-      axios.post(`${EC_CHATBOT_URL}/api/v1/sign_in`, loginInfo)
-        .then(res => {
-          this.setState({ msgNoti: "" });
-          const persons = res.data;
-          if (persons.code === 1 || persons.code === "1") {
-            setToken(persons.token)
-            Cookies.set('refreshToken', persons.refresh_token); // {path: '/'}
-            Cookies.set('user_role', persons.user.role);
-            Cookies.set('user_id', persons.user.id); // {path: '/'}
-            Cookies.set('is_auth', 'true');
-            localStorage.setItem("client", JSON.stringify(res.data.client));
-            // sessionStorage.setItem("client", JSON.stringify(res.data.client));
-            // Cookies.set('refreshToken', persons.refresh_token); /{path: '/v2/admin/dashboard'}
-            axios.defaults.headers.common['Authorization'] = `Bearer ${Cookies.get('token')}`;
-            getToDashboard(persons.user.role, res.data.client);
-          } else {
-            this.setState({ msgNoti: "ユーザー名またはパスワードが間違っています。" })
-          }
-        })
-        .catch(() => {
-          this.setState({ msgNoti: "ログインに失敗しました。" });
-        });
-
-      function getToDashboard(role, client) {
-        window.location.href = getDefaultLandingPath(role, client)
-      }
-    }
-  }
-  render() {
-    return (
-      <div className="App" style={{ marginTop: "1%" }}>
-        <div>
-          <img src={logo} alt="react-logo" style={{ height: "45px", paddingLeft: "2%" }} />
-        </div>
-        <div className="auth-wrapper" >
-          <div className="auth-inner">
-
-            <div>
-              <h3>ログイン</h3>
-              <form onSubmit={this.handleSubmit}>
-                <div className="mb-3">
-                  <label htmlFor="email">メールアドレス</label>
-                  <input
-                    type="email"
-                    className="form-control"
-                    placeholder="メールアドレス入力"
-                    id="email"
-                    aria-describedby="emailMessage"
-                  />
-                  <span id="emailMessage" role="alert" style={{ color: 'red' }}>{this.state.emailError}</span>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="password">パスワード</label>
-                  <input
-                    type="password"
-                    className="form-control"
-                    placeholder="パスワード入力"
-                    id="password"
-                    aria-describedby="passwordMessage"
-                  />
-                  <span id="passwordMessage" role="alert" style={{ color: 'red' }}>{this.state.passwordError}</span>
-                </div>
-                <input type="submit" hidden value="Submit"></input>
-              </form>
-              <br />
-              <div style={{ width: "100%", textAlign: "center" }}>
-                {this.state.msgNoti && (
-                  <span id="loginErrorMsg" role="alert" style={{ color: 'red' }}>{this.state.msgNoti}</span>
-                )}
-              </div>
-              <div style={{ textAlign: "center" }} className="d-grid">
-                <button
-                  onClick={this.handleLogin}
-                  id="submitForm"
-                  type="submit"
-                  className="btn btn-primary"
-                >
-                  ログイン
-                </button>
-              </div>
+  return (
+    <div className="App login-page">
+      <div>
+        <img src={logo} alt={LOGO_ALT} className="login-logo" />
+      </div>
+      <div className="auth-wrapper">
+        <div className="auth-inner">
+          <h3>{LOGIN_TITLE}</h3>
+          <form onSubmit={submitLogin}>
+            <div className="mb-3">
+              <label htmlFor={EMAIL_INPUT_ID}>{EMAIL_LABEL}</label>
+              <input
+                type="email"
+                className="form-control"
+                placeholder={EMAIL_PLACEHOLDER}
+                id={EMAIL_INPUT_ID}
+                aria-describedby={EMAIL_MESSAGE_ID}
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+              />
+              <span id={EMAIL_MESSAGE_ID} role="alert" className="login-error">
+                {emailError}
+              </span>
             </div>
-
-            {/* Facebook login is available via LoginFacebook when enabled */}
-          </div>
+            <div className="mb-3">
+              <label htmlFor={PASSWORD_INPUT_ID}>{PASSWORD_LABEL}</label>
+              <input
+                type="password"
+                className="form-control"
+                placeholder={PASSWORD_PLACEHOLDER}
+                id={PASSWORD_INPUT_ID}
+                aria-describedby={PASSWORD_MESSAGE_ID}
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+              />
+              <span id={PASSWORD_MESSAGE_ID} role="alert" className="login-error">
+                {passwordError}
+              </span>
+            </div>
+            <div className="login-notice">
+              {notice && (
+                <span id={LOGIN_ERROR_MSG_ID} role="alert" className="login-error">
+                  {notice}
+                </span>
+              )}
+            </div>
+            <div className="d-grid login-submit">
+              <button
+                id={SUBMIT_FORM_BUTTON_ID}
+                type="submit"
+                className="btn btn-primary"
+              >
+                {LOGIN_BUTTON}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 export default Login;
