@@ -1414,6 +1414,10 @@ slideUp
   justify-content: space-between;
 }
 
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
 .ss-message__content--user-zip-code-address-search-link {
   margin-bottom: 5px;
   text-decoration: underline;

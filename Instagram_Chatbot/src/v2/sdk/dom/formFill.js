@@ -1,4 +1,12 @@
-import { ELEMENT_TAGS, WAIT_OPTION_TYPES } from '../constants.js';
+import {
+  AWAIT_FILL_TYPE,
+  ELEMENT_TAGS,
+  EMPTY_VALUE,
+  MESSAGE_CONTENT_TYPES,
+  NULL_OPTION_VALUE,
+  PAYMENT_METHOD_ID_TYPE,
+  WAIT_OPTION_TYPES,
+} from '../constants.js';
 import { sleep } from '../config/environment.js';
 import { isDisabledElement } from './disabled.js';
 import { getElementByAddress, removeLeadingZero } from './lookup.js';
@@ -10,21 +18,50 @@ import {
 } from './formValues.js';
 import { waitForElement } from './wait.js';
 
+const FILL_SLEEP_MS = 1500;
+const ELEMENT_NOT_FOUND_MESSAGE = 'Element not found for binding';
+const ELEMENT_DISABLED_PREFIX = 'Element is disabled: ';
+const FILL_ITEM_ERROR_PREFIX = 'Error processing item in fillDataFromMessage:';
+const ELEMENT_NOT_FOUND_LOG_PREFIX = 'Element not found:';
+const DISABLED_ELEMENT_LOG_PREFIX = 'Disabled element:';
+
 export const movePaymentMethodToTop = (data) => {
-  const index = data.findIndex((item) => item.type === 'payment_method_id');
-  if (index !== -1) {
-    const [paymentMethod] = data.splice(index, 1);
-    data.unshift({ additionalType: 'await' }, paymentMethod, { additionalType: 'await' });
+  const paymentMethodIndex = data.findIndex((item) => item.type === PAYMENT_METHOD_ID_TYPE);
+  if (paymentMethodIndex === -1) return data;
+
+  const nextData = [...data];
+  const [paymentMethod] = nextData.splice(paymentMethodIndex, 1);
+  nextData.unshift(
+    { additionalType: AWAIT_FILL_TYPE },
+    paymentMethod,
+    { additionalType: AWAIT_FILL_TYPE },
+  );
+  return nextData;
+};
+
+const waitToSetValue = (item, bindingValue) => {
+  const waitOpts = {
+    type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE,
+    value: bindingValue,
+  };
+  if (item.disableRemoveLeadingZero) {
+    waitOpts.disableRemoveLeadingZero = true;
   }
-  return data;
+  return waitForElement(item.bindingMode, item.bindingAddress, waitOpts);
+};
+
+const resolveSelectBindingValue = (element, bindingValue) => {
+  const acceptableValues = [bindingValue.toString(), removeLeadingZero(bindingValue).toString()];
+  const selectedOption = Array.from(element.options).find((option) => (
+    acceptableValues.includes(option.value.toString())
+  ));
+  return selectedOption ? bindingValue : EMPTY_VALUE;
 };
 
 export const fillDataFromMessage = async (data) => {
-  for (let i = 0; i < data.length; i++) {
-    const item = data[i];
-
-    if (item.additionalType === 'await') {
-      await sleep(1500);
+  for (const item of data) {
+    if (item.additionalType === AWAIT_FILL_TYPE) {
+      await sleep(FILL_SLEEP_MS);
       continue;
     }
 
@@ -32,7 +69,7 @@ export const fillDataFromMessage = async (data) => {
       const element = getElementByAddress(item.bindingMode, item.bindingAddress);
 
       if (!element) {
-        const err = new Error('Element not found for binding');
+        const err = new Error(ELEMENT_NOT_FOUND_MESSAGE);
         if (window.Sentry) {
           window.Sentry.captureException(err, {
             level: 'warning',
@@ -40,12 +77,12 @@ export const fillDataFromMessage = async (data) => {
             extra: { item },
           });
         }
-        console.warn('Element not found:', item.bindingAddress);
+        console.warn(ELEMENT_NOT_FOUND_LOG_PREFIX, item.bindingAddress);
         continue;
       }
 
       if (isDisabledElement(element)) {
-        const err = new Error(`Element is disabled: ${item.bindingAddress}`);
+        const err = new Error(`${ELEMENT_DISABLED_PREFIX}${item.bindingAddress}`);
         if (window.Sentry) {
           window.Sentry.captureException(err, {
             level: 'info',
@@ -53,7 +90,7 @@ export const fillDataFromMessage = async (data) => {
             extra: { item },
           });
         }
-        console.warn('Disabled element:', item.bindingAddress);
+        console.warn(DISABLED_ELEMENT_LOG_PREFIX, item.bindingAddress);
         continue;
       }
 
@@ -64,54 +101,43 @@ export const fillDataFromMessage = async (data) => {
         case 'credit_card_payment':
         case 'text_input':
         case 'textarea':
-        case 'slider': {
-          const waitOpts = {
-            type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE,
-            value: item.bindingValue,
-          };
-          if (item.disableRemoveLeadingZero) {
-            waitOpts.disableRemoveLeadingZero = true;
-          }
-          waitForElement(item.bindingMode, item.bindingAddress, waitOpts);
+        case 'slider':
+          waitToSetValue(item, item.bindingValue);
           break;
-        }
 
-        case 'payment_method_id': {
+        case PAYMENT_METHOD_ID_TYPE:
           setValuePaymentMethodToElement(element, item.bindingValue);
           break;
-        }
 
         case 'dropdown_prefecture': {
-          if (element.tagName === ELEMENT_TAGS.SELECT) {
-            const acceptableValues = [item.bindingValue.toString(), removeLeadingZero(item.bindingValue).toString()];
-            const selectedOption = Array.from(element.options).find((option) => acceptableValues.includes(option.value.toString()));
-            if (!selectedOption) item.bindingValue = '';
-          }
+          const prefectureValue = element.tagName === ELEMENT_TAGS.SELECT
+            ? resolveSelectBindingValue(element, item.bindingValue)
+            : item.bindingValue;
           waitForElement(
-            item.bindingMode, item.bindingAddress,
-            { type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue },
+            item.bindingMode,
+            item.bindingAddress,
+            { type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: prefectureValue },
           );
           break;
         }
 
         case 'agree_term':
-        case 'checkbox': {
+        case 'checkbox':
           setCheckToCheckboxElement(element, item.bindingValue);
           break;
-        }
 
         case 'pull_down': {
-          if (item.pulldownType === 'lp_integration_option') {
-            const isNullOption = item.bindingValue === 'NULL_OPTION';
-            if (isNullOption) item.bindingValue = '';
-
-            const hasOption = Array.from(element.options).some((option) => option.value === item.bindingValue);
-            if (!hasOption) item.bindingValue = '';
-          }
-
+          const isLpIntegration = item.pulldownType === MESSAGE_CONTENT_TYPES.PULLDOWN.LP_INTEGRATION_OPTION;
+          const pullDownValue = (isLpIntegration && item.bindingValue === NULL_OPTION_VALUE)
+            ? EMPTY_VALUE
+            : item.bindingValue;
+          const hasOption = !isLpIntegration
+            || Array.from(element.options).some((option) => option.value === pullDownValue);
+          const bindingValue = hasOption ? pullDownValue : EMPTY_VALUE;
           waitForElement(
-            item.bindingMode, item.bindingAddress,
-            { type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue },
+            item.bindingMode,
+            item.bindingAddress,
+            { type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: bindingValue },
           );
           break;
         }
@@ -126,17 +152,17 @@ export const fillDataFromMessage = async (data) => {
           break;
         }
 
-        case 'password': {
+        case 'password':
           element.setRangeText(item.bindingValue, 0, element.value.length);
           element.dispatchEvent(new Event('input', { bubbles: true }));
           element.dispatchEvent(new Event('change', { bubbles: true }));
           break;
-        }
+
         default:
           break;
       }
     } catch (err) {
-      console.error('Error processing item in fillDataFromMessage:', err);
+      console.error(FILL_ITEM_ERROR_PREFIX, err);
       if (window.Sentry) {
         window.Sentry.captureException(err, {
           level: 'error',

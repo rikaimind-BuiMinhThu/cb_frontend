@@ -1,9 +1,17 @@
 import React from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
-import { MESSAGE_CONTENT_TYPES } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
+import {
+  EMPTY_INPUT_VALUE,
+  MESSAGE_CONTENT_TYPES,
+  REQUIRED_FIELD_LABEL,
+} from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 import SelectCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/SelectCustom";
 
-export default function ProductPurchaseSelectOption({ content, messageIndex, contentIndex, onChangeValue, errors }) {
+const PRODUCT_VARIANT_ID_KEY = "productVariantId";
+const PRODUCT_TITLE_KEY = "title";
+const THUMBNAIL_OPTION_TYPE = "text_with_thumbnail_image";
+
+const ProductPurchaseSelectOption = ({ content, messageIndex, contentIndex, onChangeValue, errors }) => {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.PRODUCT_PURCHASE_SELECT_OPTION) return null;
 
   const productPurchaseSelectOption = content.product_purchase_select_option;
@@ -17,7 +25,7 @@ export default function ProductPurchaseSelectOption({ content, messageIndex, con
 
     const requiredLabel = productPurchaseSelectOption.require === true && (
       <span className="ss-message__content--user-text-input-required">
-        ※必須
+        {REQUIRED_FIELD_LABEL}
       </span>
     );
 
@@ -30,27 +38,23 @@ export default function ProductPurchaseSelectOption({ content, messageIndex, con
   };
 
   const renderContent = () => {
-    if (productPurchaseSelectOption.type !== 'text_with_thumbnail_image') return null;
+    if (productPurchaseSelectOption.type !== THUMBNAIL_OPTION_TYPE) return null;
 
     return (
-      <>
-        <div className="ss-message__content--user-pull_down--customization">
-          <div className="">
-            <div className="ss-message__content--user-pull_down-col col-12 p-0">
-              <SelectCustom
-                showSearch={false}
-                data={productPurchaseSelectOption.products}
-                className="w-100-percent"
-                placeholder={productPurchaseSelectOption.display_unselected}
-                keyValue="productVariantId"
-                nameValue="title"
-                onChange={(value) => onChangeValue(contentIndex, content.type, value, 'value')}
-                value={productPurchaseSelectOption.value || ""}
-              />
-            </div>
-          </div>
+      <div className="ss-message__content--user-pull_down--customization">
+        <div className="ss-message__content--user-pull_down-col col-12 p-0">
+          <SelectCustom
+            showSearch={false}
+            data={productPurchaseSelectOption.products}
+            className="w-100-percent"
+            placeholder={productPurchaseSelectOption.display_unselected}
+            keyValue={PRODUCT_VARIANT_ID_KEY}
+            nameValue={PRODUCT_TITLE_KEY}
+            onChange={(value) => onChangeValue(contentIndex, content.type, value, 'value')}
+            value={productPurchaseSelectOption.value || EMPTY_INPUT_VALUE}
+          />
         </div>
-      </>
+      </div>
     );
   };
 
@@ -74,3 +78,5 @@ export default function ProductPurchaseSelectOption({ content, messageIndex, con
     </div>
   );
 };
+
+export default ProductPurchaseSelectOption;

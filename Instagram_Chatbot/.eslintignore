@@ -2,7 +2,6 @@ node_modules
 build
 public
 **/*.min.js
-src/v2/components/canvasjs-3.6.6
 src/views
 src/layouts
 src/assets

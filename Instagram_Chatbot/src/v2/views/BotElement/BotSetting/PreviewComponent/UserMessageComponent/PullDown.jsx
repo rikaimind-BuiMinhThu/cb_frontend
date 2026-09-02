@@ -8,13 +8,16 @@ import {
   dataMonth as MONTH_DEFAULT_OPTIONS,
   dataDay as DAY_DEFAULT_OPTIONS,
   CRAWL_ELEMENT_TYPES,
+  REQUIRED_FIELD_LABEL,
+  EMPTY_INPUT_VALUE,
+  PULL_DOWN_PLACEHOLDERS,
 } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 import { getCitiesByPrefecture } from "v2/views/BotElement/BotSetting/PreviewComponent/Utils";
 import { tokenExpired } from "v2/api/tokenExpired";
 import LPIntegrationOptionPullDown from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/LPIntegrationOptionPullDown";
 import SelectCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/SelectCustom";
 
-export default function PullDown({ content, errors, contentIndex, messageIndex, disabled, onChangeValue, prefecturesList, lpOptionData, postMessageToParent, hidden }) {
+const PullDown = ({ content, errors, contentIndex, messageIndex, disabled, onChangeValue, prefecturesList, lpOptionData, postMessageToParent, hidden }) => {
   const [cityOptions, setCityOptions] = useState([]);
 
   if (content.type !== MESSAGE_CONTENT_TYPES.PULL_DOWN) return null;
@@ -47,7 +50,7 @@ export default function PullDown({ content, errors, contentIndex, messageIndex, 
       <SelectCustom
         disabled={disabled}
         data={yearOptions}
-        placeholder="年"
+        placeholder={PULL_DOWN_PLACEHOLDERS.YEAR}
         className={className}
         onChange={(value) =>
           onChangeValue(
@@ -58,7 +61,7 @@ export default function PullDown({ content, errors, contentIndex, messageIndex, 
             valueKey
           )
         }
-        value={pullDown[pullDown.type][valueKey] || ""}
+        value={pullDown[pullDown.type][valueKey] || EMPTY_INPUT_VALUE}
       />
     );
   };
@@ -70,7 +73,7 @@ export default function PullDown({ content, errors, contentIndex, messageIndex, 
       <SelectCustom
         disabled={disabled}
         data={MONTH_DEFAULT_OPTIONS}
-        placeholder="月"
+        placeholder={PULL_DOWN_PLACEHOLDERS.MONTH}
         className={className}
         onChange={(value) =>
           onChangeValue(
@@ -81,7 +84,7 @@ export default function PullDown({ content, errors, contentIndex, messageIndex, 
             valueKey
           )
         }
-        value={pullDown[pullDown.type][valueKey] || ""}
+        value={pullDown[pullDown.type][valueKey] || EMPTY_INPUT_VALUE}
       />
     );
   };
@@ -93,7 +96,7 @@ export default function PullDown({ content, errors, contentIndex, messageIndex, 
       <SelectCustom
         disabled={disabled}
         data={DAY_DEFAULT_OPTIONS}
-        placeholder="日"
+        placeholder={PULL_DOWN_PLACEHOLDERS.DAY}
         className={className}
         onChange={(value) =>
           onChangeValue(
@@ -104,7 +107,7 @@ export default function PullDown({ content, errors, contentIndex, messageIndex, 
             valueKey
           )
         }
-        value={pullDown[pullDown.type][valueKey] || ""}
+        value={pullDown[pullDown.type][valueKey] || EMPTY_INPUT_VALUE}
       />
     );
   };
@@ -115,7 +118,7 @@ export default function PullDown({ content, errors, contentIndex, messageIndex, 
       <SelectCustom
         disabled={disabled}
         data={hourOptions}
-        placeholder="時"
+        placeholder={PULL_DOWN_PLACEHOLDERS.HOUR}
         className={`w-32-percent ${additionalProps.className}`}
         onChange={(value) =>
           onChangeValue(
@@ -126,7 +129,7 @@ export default function PullDown({ content, errors, contentIndex, messageIndex, 
             valueKey
           )
         }
-        value={pullDown[pullDown.type][valueKey] || ""}
+        value={pullDown[pullDown.type][valueKey] || EMPTY_INPUT_VALUE}
       />
     );
   };
@@ -147,7 +150,7 @@ export default function PullDown({ content, errors, contentIndex, messageIndex, 
             valueKey
           )
         }
-        value={pullDown[pullDown.type][valueKey] || ""}
+        value={pullDown[pullDown.type][valueKey] || EMPTY_INPUT_VALUE}
       />
     );
   };
@@ -161,7 +164,7 @@ export default function PullDown({ content, errors, contentIndex, messageIndex, 
 
     const requiredLabel = pullDown.require === true && (
       <span className="ss-message__content--user-text-input-required">
-        ※必須
+        {REQUIRED_FIELD_LABEL}
       </span>
     );
 
@@ -246,7 +249,7 @@ export default function PullDown({ content, errors, contentIndex, messageIndex, 
               "value"
             )
           }
-          value={pullDown[pullDown.type].value || pullDown.initial_selection || ""}
+          value={pullDown[pullDown.type].value || pullDown.initial_selection || EMPTY_INPUT_VALUE}
         />
       </div>
     );
@@ -275,7 +278,7 @@ export default function PullDown({ content, errors, contentIndex, messageIndex, 
               "valueLeft"
             )
           }
-          value={pullDown[pullDown.type].valueLeft || ""}
+          value={pullDown[pullDown.type].valueLeft || EMPTY_INPUT_VALUE}
         />
         <SelectCustom
           disabled={disabled}
@@ -297,7 +300,7 @@ export default function PullDown({ content, errors, contentIndex, messageIndex, 
               "valueRight"
             )
           }
-          value={pullDown[pullDown.type].valueRight || ""}
+          value={pullDown[pullDown.type].valueRight || EMPTY_INPUT_VALUE}
         />
       </div>
     );
@@ -321,7 +324,7 @@ export default function PullDown({ content, errors, contentIndex, messageIndex, 
             <SelectCustom
               disabled={disabled}
               data={hourOptions}
-              placeholder="時"
+              placeholder={PULL_DOWN_PLACEHOLDERS.HOUR}
               className="w-32-percent"
               onChange={(value) =>
                 onChangeValue(
@@ -332,12 +335,12 @@ export default function PullDown({ content, errors, contentIndex, messageIndex, 
                   "valueHour"
                 )
               }
-              value={pullDown[pullDown.type].valueHour || ""}
+              value={pullDown[pullDown.type].valueHour || EMPTY_INPUT_VALUE}
             />
             <SelectCustom
               disabled={disabled}
               data={MINUTES_DEFAULT_OPTIONS}
-              placeholder="分"
+              placeholder={PULL_DOWN_PLACEHOLDERS.MINUTE}
               className="w-32-percent"
               onChange={(value) =>
                 onChangeValue(
@@ -363,14 +366,7 @@ export default function PullDown({ content, errors, contentIndex, messageIndex, 
     return (
       <React.Fragment>
         <div className="ss-message__content--user-pull_down--time_hm">
-          <div
-            className=""
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              flexWrap: "wrap",
-            }}
-          >
+          <div className="ss-message__content--user-chat-container flex-wrap">
             {renderYearSelect({ className: widthClass })}
             {renderMonthSelect({ className: widthClass })}
             {!isHideDay && renderDaySelect()}
@@ -468,7 +464,7 @@ export default function PullDown({ content, errors, contentIndex, messageIndex, 
         <SelectCustom
           disabled={disabled}
           data={prefecturesList}
-          placeholder="選択してください。"
+          placeholder={PULL_DOWN_PLACEHOLDERS.SELECT}
           className="w-100-percent"
           keyValue="id"
           nameValue="name"
@@ -542,7 +538,7 @@ export default function PullDown({ content, errors, contentIndex, messageIndex, 
           <SelectCustom
             disabled={disabled}
             data={prefecturesList}
-            placeholder="都道府県を選択"
+            placeholder={PULL_DOWN_PLACEHOLDERS.PREFECTURE}
             className="w-45-percent"
             keyValue="id"
             nameValue="name"
@@ -555,16 +551,14 @@ export default function PullDown({ content, errors, contentIndex, messageIndex, 
                 "prefecture"
               );
               if (value) {
-                let prefecture_jis_code = prefecturesList.find(
-                  (item) => item.id === value
-                ).prefecture_jis_code;
-                getCitiesByPrefecture(prefecture_jis_code).then((res) => {
+                const selectedPrefecture = prefecturesList.find((item) => item.id === value);
+                const prefectureJisCode = selectedPrefecture?.prefecture_jis_code;
+                getCitiesByPrefecture(prefectureJisCode).then((res) => {
                   if (res.data.code !== 1) return;
                   setCityOptions(res.data.data);
                 })
                 .catch((error) => {
-                  console.log(error);
-                  if (error.response?.data.code !== 0) {
+                  if (error.response?.data.code === 0) {
                     tokenExpired();
                   }
                 });
@@ -585,7 +579,7 @@ export default function PullDown({ content, errors, contentIndex, messageIndex, 
           <SelectCustom
             disabled={disabled}
             data={cityOptions}
-            placeholder="市区町村を選択"
+            placeholder={PULL_DOWN_PLACEHOLDERS.CITY}
             className="w-45-percent"
             keyValue="city_name"
             nameValue="city_name"
@@ -624,10 +618,12 @@ export default function PullDown({ content, errors, contentIndex, messageIndex, 
   };
 
   return (
-    <div style={{ marginBottom: "10px" }}>
+    <div className="m-b-10">
       {renderTitle()}
       {renderContent()}
       {renderErrorMessage()}
     </div>
   );
 };
+
+export default PullDown;

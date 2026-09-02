@@ -1,45 +1,72 @@
-import { WAIT_OPTION_TYPES } from '../constants.js';
+import {
+  NULL_OPTION_VALUE,
+  WAIT_FOR_ELEMENT_INTERVAL_MS,
+  WAIT_FOR_ELEMENT_MAX_COUNT,
+  WAIT_OPTION_TYPES,
+  YEAR_VALUE_PREFIX,
+} from '../constants.js';
 import { log } from '../config/environment.js';
 import { getElementByAddress, removeLeadingZero } from './lookup.js';
 import { setValueToElement } from './formValues.js';
 
-export const waitForElement = (mode, address, options = { type: 'WAIT_FOR_LOADING' }, callback = () => {}) => {
-  let count = 0;
-  const poops = setInterval(function () {
-    count++;
-    log(`Waiting for element address: ${address}, mode: ${mode}, options: ${JSON.stringify(options)}: ${count} times`);
-    if (count > 50) {
-      clearInterval(poops);
-      console.log(`Timeout for element address: ${address}, mode: ${mode}, options: ${JSON.stringify(options)}`);
-      return;
-    }
+const DEFAULT_WAIT_OPTIONS = Object.freeze({
+  type: WAIT_OPTION_TYPES.WAIT_FOR_LOADING,
+});
 
-    const element = getElementByAddress(mode, address);
-    if (!element) return;
-    switch (options.type) {
-      case WAIT_OPTION_TYPES.WAIT_FOR_LOADING:
-        clearInterval(poops);
-        callback();
-        break;
-      case WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE: {
-        const yearsValue = `20${options.value}`;
-        const isNullOption = options.value === 'NULL_OPTION';
+const INVALID_WAIT_OPTION_TYPE_PREFIX = 'Invalid wait option type ';
 
-        const altBinding = options.disableRemoveLeadingZero
-          ? options.value
-          : removeLeadingZero(options.value);
+const isValueUnset = (element, waitOptions) => {
+  const yearsValue = `${YEAR_VALUE_PREFIX}${waitOptions.value}`;
+  const isNullOption = waitOptions.value === NULL_OPTION_VALUE;
+  const altBinding = waitOptions.disableRemoveLeadingZero
+    ? waitOptions.value
+    : removeLeadingZero(waitOptions.value);
 
-        if (isNullOption || (element.value !== options.value && element.value !== altBinding && element.value !== yearsValue)) {
-          setValueToElement(element, options.value, options.disableRemoveLeadingZero);
-          break;
-        }
+  return isNullOption
+    || (element.value !== waitOptions.value
+      && element.value !== altBinding
+      && element.value !== yearsValue);
+};
 
-        clearInterval(poops);
-        callback();
-        break;
+export const waitForElement = (mode, address, options, callback = () => {}) => {
+  const waitOptions = options ?? DEFAULT_WAIT_OPTIONS;
+  const tick = { count: 0 };
+
+  return new Promise((resolve, reject) => {
+    const intervalId = setInterval(() => {
+      tick.count += 1;
+      log(`Waiting for element address: ${address}, mode: ${mode}, options: ${JSON.stringify(waitOptions)}: ${tick.count} times`);
+
+      if (tick.count > WAIT_FOR_ELEMENT_MAX_COUNT) {
+        clearInterval(intervalId);
+        log(`Timeout for element address: ${address}, mode: ${mode}, options: ${JSON.stringify(waitOptions)}`);
+        resolve();
+        return;
       }
-      default:
-        throw new Error(`Invalid wait option type ${options.type}`);
-    }
-  }, 500);
+
+      const element = getElementByAddress(mode, address);
+      if (!element) return;
+
+      switch (waitOptions.type) {
+        case WAIT_OPTION_TYPES.WAIT_FOR_LOADING:
+          clearInterval(intervalId);
+          callback();
+          resolve();
+          break;
+        case WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE:
+          if (isValueUnset(element, waitOptions)) {
+            setValueToElement(element, waitOptions.value, waitOptions.disableRemoveLeadingZero);
+            break;
+          }
+          clearInterval(intervalId);
+          callback();
+          resolve();
+          break;
+        default: {
+          clearInterval(intervalId);
+          reject(new Error(`${INVALID_WAIT_OPTION_TYPE_PREFIX}${waitOptions.type}`));
+        }
+      }
+    }, WAIT_FOR_ELEMENT_INTERVAL_MS);
+  });
 };

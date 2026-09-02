@@ -554,3 +554,18 @@ export const PREVIEW_ACTIONS = {
   CLEAR_SUBMIT_ERROR_MESSAGE: "CLEAR_SUBMIT_ERROR_MESSAGE",
   UPDATE_LP_FIELD_VALUE: "UPDATE_LP_FIELD_VALUE",
 };
+
+export const REQUIRED_FIELD_LABEL = '※必須';
+
+export const EMPTY_INPUT_VALUE = '';
+
+export const PULL_DOWN_PLACEHOLDERS = {
+  YEAR: '年',
+  MONTH: '月',
+  DAY: '日',
+  HOUR: '時',
+  MINUTE: '分',
+  SELECT: '選択してください。',
+  PREFECTURE: '都道府県を選択',
+  CITY: '市区町村を選択',
+};

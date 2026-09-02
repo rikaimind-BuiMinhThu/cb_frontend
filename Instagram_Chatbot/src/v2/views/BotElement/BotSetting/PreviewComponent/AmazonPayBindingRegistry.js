@@ -191,6 +191,23 @@ const extractTextareaBindings = (content) => buildBindingsFromSelectorKey({
   valuePath: 'textarea.text_input.value',
 });
 
+const extractPullDownBindings = (content) => {
+  const pullDownType = content.pull_down?.type;
+  if (!pullDownType) return [];
+
+  return buildBindingsFromSelectorKey({
+    selectorKeyType: 'fukushashiki_search_value',
+    rawValue: content.fukushashiki_search_value,
+    valuePath: `pull_down.${pullDownType}.value`,
+  });
+};
+
+const extractProductPurchaseSelectOptionBindings = (content) => buildBindingsFromSelectorKey({
+  selectorKeyType: 'fukushashiki_search_value',
+  rawValue: content.fukushashiki_search_value,
+  valuePath: 'product_purchase_select_option.value',
+});
+
 export const extractBindingsFromContent = (content) => {
   if (!content?.type) return [];
 
@@ -210,6 +227,10 @@ export const extractBindingsFromContent = (content) => {
       return extractRadioButtonBindings(content);
     case 'textarea':
       return extractTextareaBindings(content);
+    case 'pull_down':
+      return extractPullDownBindings(content);
+    case 'product_purchase_select_option':
+      return extractProductPurchaseSelectOptionBindings(content);
     default:
       return [];
   }

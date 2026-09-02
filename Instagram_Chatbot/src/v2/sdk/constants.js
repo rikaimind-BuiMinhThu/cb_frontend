@@ -1,4 +1,11 @@
 export const WAIT_TO_LOAD_AMAZON_DATA_MAX_COUNT = 20;
+export const WAIT_FOR_ELEMENT_MAX_COUNT = 50;
+export const WAIT_FOR_ELEMENT_INTERVAL_MS = 500;
+export const YEAR_VALUE_PREFIX = '20';
+export const NULL_OPTION_VALUE = 'NULL_OPTION';
+export const AWAIT_FILL_TYPE = 'await';
+export const PAYMENT_METHOD_ID_TYPE = 'payment_method_id';
+export const EMPTY_VALUE = '';
 
 export const CHATBOT_ACTIONS = {
   CLICK_BUTTON: 'clickButton',
