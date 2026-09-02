@@ -4,7 +4,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import InputCustom from '../../scenarioComon/InputCustom';
 import InputDouble from '../../scenarioComon/InputDouble';
 import { CHECKBOX_LABELS, SETTING_LABELS } from '../../constants/scenarioSettingLabels';
-import { getCheckboxImgSelectionKey } from '../../utils/checkboxSelectionUtils';
+import { getCheckboxImgSelectionKey } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/checkboxSelectionUtils';
 import { buildCheckboxSettingContext } from './checkboxSettingContext';
 import { InitialCheckedCheckbox } from './checkboxShared';
 import CheckboxImgLayoutSection from './CheckboxImgLayoutSection';

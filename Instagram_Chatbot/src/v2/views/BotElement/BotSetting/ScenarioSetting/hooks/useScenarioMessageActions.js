@@ -7,15 +7,15 @@ import cloneDeep from 'lodash/cloneDeep';
 import api from 'v2/api/api-management';
 import { S3_UPLOAD_URL } from '../../../../../variables/constants';
 import { tokenExpired } from 'v2/api/tokenExpired';
-import { createDefaultContentItem, getNextContentId } from '../utils/scenarioContentDefaults';
+import { createDefaultContentItem, getNextContentId } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/scenarioContentDefaults';
 import {
   createDefaultCombineBlock,
   createDefaultCombineMessage,
   createDefaultCombineBotBlock,
-} from '../utils/combineContentDefaults';
+} from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/combineContentDefaults';
 import { DEFAULT_AMAZON_PAY_BUTTON_CONFIG } from '../../../../../variables/amazonPayConstants';
-import { applyAmazonPayDisplayModeToConditions } from '../utils/amazonPayConfigUtils';
-import { getDefaultOrderConfirmConfig } from '../utils/OrderConfirmLpScriptGenerator';
+import { applyAmazonPayDisplayModeToConditions } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/amazonPayConfigUtils';
+import { getDefaultOrderConfirmConfig } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/OrderConfirmLpScriptGenerator';
 import { getDefaultCartLoginConfig } from '../constants/cartLoginConstants';
 
 function withClonedMessages(dataMessages, mutator) {

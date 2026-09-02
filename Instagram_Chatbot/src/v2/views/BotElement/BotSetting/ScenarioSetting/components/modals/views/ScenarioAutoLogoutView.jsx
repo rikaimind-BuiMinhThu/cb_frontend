@@ -4,7 +4,7 @@ import InputCustom from '../../../scenarioComon/InputCustom';
 import ScenarioFormRow from '../shared/ScenarioFormRow';
 import ScenarioModalFooter from '../shared/ScenarioModalFooter';
 import { SCENARIO_MODAL_TOOLTIPS } from '../shared/scenarioModalTooltips';
-import { buildAutoLogoutConfigFromUrls } from '../../../utils/autoLogoutUtils';
+import { buildAutoLogoutConfigFromUrls } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/autoLogoutUtils';
 
 const ScenarioAutoLogoutView = ({ onBack }) => {
   const { state, actions } = useScenarioEditor();

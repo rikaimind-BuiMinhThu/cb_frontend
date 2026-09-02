@@ -1,7 +1,7 @@
 import '../../../../assets/css/bot/scenario/scenario-editor-layout.css';
 import './styles/index.css';
 import React, { useState } from 'react';
-import { AdminPage, AdminActionButton, useAdminHeaderTitle } from '../../../../components/AdminShell';
+import { AdminPage, AdminActionButton, useAdminHeaderTitle } from 'v2/components/AdminShell';
 import { useScenarioEditor } from './context/ScenarioEditorContext';
 import ScenarioOverviewPanel from './components/ScenarioOverviewPanel';
 import ScenarioMessageDetailPanel from './components/ScenarioMessageDetailPanel';

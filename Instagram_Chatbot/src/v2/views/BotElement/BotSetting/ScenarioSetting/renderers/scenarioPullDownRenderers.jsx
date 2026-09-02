@@ -2,7 +2,7 @@ import React from 'react';
 import InputCustom from '../scenarioComon/InputCustom';
 import CheckboxCustom from '../scenarioComon/CheckboxCustom';
 import SelectCustom from '../scenarioComon/SelectCustom';
-import { MESSAGE_CONTENT_TYPES } from '../../PreviewComponent/Constants';
+import { MESSAGE_CONTENT_TYPES } from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants';
 import { renderFukushashikiSetting } from '../ScenarioUtils';
 import {
   PULL_DOWN_LABELS,

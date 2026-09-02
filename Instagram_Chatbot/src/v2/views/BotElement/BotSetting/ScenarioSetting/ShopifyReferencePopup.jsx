@@ -3,7 +3,7 @@ import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { Radio } from 'antd';
 import ScenarioModalFooter from './components/modals/shared/ScenarioModalFooter';
-import { AdminInfoTooltip } from '../../../../components/AdminShell';
+import { AdminInfoTooltip } from 'v2/components/AdminShell';
 import { SCENARIO_MODAL_TOOLTIPS } from './components/modals/shared/scenarioModalTooltips';
 
 function ShopifyReferencePopup({ onCancel, onReferProductVariant }) {

@@ -2,10 +2,10 @@ import React from 'react';
 import { BOT_MESSAGE_TYPES, COMBINE_CONTENT_ROLES } from '../../../PreviewComponent/Constants';
 import { DEFAULT_AMAZON_PAY_BUTTON_IMAGE_URL } from '../../../../../../variables/amazonPayConstants';
 import { PREVIEW_MAP } from '../../contentPreviews';
-import { getBotFileExtension } from '../../utils/getBotMessageTitle';
-import { getCombineContentTypeLabel } from '../../utils/combineContentDefaults';
-import { buildOrderConfirmPreviewHtml } from '../../utils/OrderConfirmLpScriptGenerator';
-import { buildCartLoginStyle, normalizeCartLoginConfig } from '../../utils/cartLoginUtils';
+import { getBotFileExtension } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/getBotMessageTitle';
+import { getCombineContentTypeLabel } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/combineContentDefaults';
+import { buildOrderConfirmPreviewHtml } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/OrderConfirmLpScriptGenerator';
+import { buildCartLoginStyle, normalizeCartLoginConfig } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/cartLoginUtils';
 
 const renderBotBlockPreview = (content, index, hidden) => {
   const fileType = getBotFileExtension(content);

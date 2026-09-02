@@ -7,7 +7,7 @@ import {
   PreviewClosedLauncher, PreviewOpenChatFrame, PreviewMessagesList,
 } from "./PreviewComponent";
 import UserMessageTailIcon from "./PreviewComponent/UserMessageTailIcon";
-import { resolveUserMessageTheme } from "v2/views/BotElement/BotSetting/DesignSetting/utils/designThemeUtils";
+import { resolveUserMessageTheme } from "v2/views/DesignSetting/utils/designThemeUtils";
 import PreviewFukushashikiReducer from "./PreviewFukushashiki/PreviewFukushashikiReducer";
 import { EC_CHATBOT_URL } from "v2/variables/constants";
 import "moment/locale/zh-cn";
@@ -25,13 +25,13 @@ import {
   CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE,
   DISPLAY_TYPES,
 } from "./PreviewComponent/Constants";
-import { OPEN_ANIMATION_DURATION_MS_DEFAULT } from "v2/views/BotElement/BotSetting/DesignSetting/constants/designChatbotConstants";
+import { OPEN_ANIMATION_DURATION_MS_DEFAULT } from "v2/views/DesignSetting/constants/designChatbotConstants";
 import {
   clampOpenAnimationDurationMs,
   parseDesignSettings,
   resolveMainColorContext,
   resolveOpenAnimationClassName,
-} from "v2/views/BotElement/BotSetting/DesignSetting/utils/designChatbotUtils";
+} from "v2/views/DesignSetting/utils/designChatbotUtils";
 import {
   isMobile,
   getPrefectures,

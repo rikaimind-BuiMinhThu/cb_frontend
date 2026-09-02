@@ -3,7 +3,7 @@ import { Select } from 'antd';
 import { InboxOutlined } from "@ant-design/icons";
 import 'antd/dist/antd.css';
 import './SelectCustom.css';
-import { isAndroid } from '../../PreviewComponent/Utils';
+import { isAndroid } from 'v2/views/BotElement/BotSetting/PreviewComponent/Utils';
 
 const { Option } = Select;
 

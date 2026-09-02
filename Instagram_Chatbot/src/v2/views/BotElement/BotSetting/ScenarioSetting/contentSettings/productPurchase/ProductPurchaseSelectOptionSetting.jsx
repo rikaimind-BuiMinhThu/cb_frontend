@@ -8,7 +8,7 @@ import CheckboxCustom from '../../scenarioComon/CheckboxCustom';
 import SelectCustom from '../../scenarioComon/SelectCustom';
 import { dropDownTitle } from '../../constants/scenarioFormConstants';
 import ShopifyReferenceSelect from '../../ShopifyReferenceSelect';
-import shopifIcon from '../../../../../../assets/img/shopify-icon.png';
+import shopifIcon from 'v2/assets/img/shopify-icon.png';
 import {
   PRODUCT_PURCHASE_SETTING_LABELS,
   SETTING_LABELS,

@@ -4,8 +4,8 @@ import HtmlCodeMessagePreview from 'v2/components/BotMessages/HtmlCodeMessagePre
 import AmazonPayButtonMessagePreview from 'v2/components/BotMessages/AmazonPayButtonMessagePreview';
 import CartLoginMessagePreview from 'v2/components/BotMessages/CartLoginMessagePreview';
 import { replaceVariables } from './VariablesUtils';
-import { resolveBotMessageTheme } from '../DesignSetting/utils/designThemeUtils';
-import { buildOrderConfirmJs, buildOrderConfirmPreviewHtml } from '../ScenarioSetting/utils/OrderConfirmLpScriptGenerator';
+import { resolveBotMessageTheme } from 'v2/views/DesignSetting/utils/designThemeUtils';
+import { buildOrderConfirmJs, buildOrderConfirmPreviewHtml } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/OrderConfirmLpScriptGenerator';
 
 const CombineBotBlock = ({
   content,

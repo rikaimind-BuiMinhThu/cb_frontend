@@ -7,7 +7,7 @@ import InputCustom from '../../../scenarioComon/InputCustom';
 import InputNum from '../../../scenarioComon/InputNum';
 import CheckboxCustom from '../../../scenarioComon/CheckboxCustom';
 import ShopifyReferenceSelect from '../../../ShopifyReferenceSelect';
-import shopifIcon from '../../../../../../../assets/img/shopify-icon.png';
+import shopifIcon from 'v2/assets/img/shopify-icon.png';
 import {
   PRODUCT_PURCHASE_SETTING_LABELS,
   SETTING_BUTTON_LABELS,

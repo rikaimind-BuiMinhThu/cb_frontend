@@ -3,7 +3,7 @@ import { message as antdMessage } from 'antd';
 import Cookies from 'js-cookie';
 import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
-import { CART_SYSTEM, TIMER_VARIABLES } from '../../PreviewComponent/Constants';
+import { CART_SYSTEM, TIMER_VARIABLES } from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants';
 import {
   dataHourFixed,
   dataMinutesFixed,
@@ -17,12 +17,12 @@ import {
 import {
   buildScenarioSavePayload,
   parseScenarioResponse,
-} from '../utils/scenarioApiUtils';
+} from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/scenarioApiUtils';
 import {
   AUTO_LOGOUT_INCOMPLETE_CONFIG_ERROR,
   createEmptyAutoLogoutConfig,
   isAutoLogoutConfigValid,
-} from '../utils/autoLogoutUtils';
+} from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/autoLogoutUtils';
 import { SETTINGS_MODAL_VIEWS } from '../components/modals/shared/scenarioModalTooltips';
 import {
   DEFAULT_AMAZON_PAY_CONFIG,
@@ -36,7 +36,7 @@ import {
   inferAmazonPayReadyMode,
   normalizeAllowedLpDomains,
   validateAmazonPayConfig,
-} from '../utils/amazonPayConfigUtils';
+} from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/amazonPayConfigUtils';
 import { DEFAULT_EXECUTION_POLICY } from '../../../../../variables/constants';
 
 const INITIAL_TIMER_CONFIG = {

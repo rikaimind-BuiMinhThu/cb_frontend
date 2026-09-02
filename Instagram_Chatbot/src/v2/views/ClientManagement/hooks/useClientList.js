@@ -8,7 +8,7 @@ import {
   getConversionPreviewDates,
   isValidConversionDateRange,
   PAGE_SIZE,
-} from '../utils/clientManagementUtils';
+} from 'v2/views/ClientManagement/utils/clientManagementUtils';
 
 export default function useClientList() {
   const [clients, setClients] = useState([]);

@@ -1,6 +1,6 @@
 import { EC_CHATBOT_URL } from "v2/variables/constants";
 import { isMobile } from "./Utils";
-import { resolveIconUrl } from "../DesignSetting/utils/designChatbotUtils";
+import { resolveIconUrl } from "v2/views/DesignSetting/utils/designChatbotUtils";
 
 /**
  * Relative icon path used by runtime previews (prefixed with EC_CHATBOT_URL by callers).

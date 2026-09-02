@@ -3,14 +3,14 @@ import InputCustom from '../../../scenarioComon/InputCustom';
 import { useScenarioEditor } from '../../../context/ScenarioEditorContext';
 import OverviewCheckboxRow from '../../OverviewCheckboxRow';
 import ScenarioModalCheckbox from '../shared/ScenarioModalCheckbox';
-import { AdminInfoTooltip } from '../../../../../../../components/AdminShell';
+import { AdminInfoTooltip } from 'v2/components/AdminShell';
 import ScenarioFormRow from '../shared/ScenarioFormRow';
 import ScenarioModalFooter from '../shared/ScenarioModalFooter';
 import {
   SCENARIO_MODAL_TOOLTIPS,
   SETTINGS_MODAL_VIEWS,
 } from '../shared/scenarioModalTooltips';
-import { createEmptyAutoLogoutConfig } from '../../../utils/autoLogoutUtils';
+import { createEmptyAutoLogoutConfig } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/autoLogoutUtils';
 import {
   EXECUTION_POLICIES,
   EXECUTION_POLICY_OPTIONS,

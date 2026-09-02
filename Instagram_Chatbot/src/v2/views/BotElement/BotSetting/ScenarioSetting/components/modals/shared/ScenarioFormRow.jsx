@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { AdminInfoTooltip } from '../../../../../../../components/AdminShell';
+import { AdminInfoTooltip } from 'v2/components/AdminShell';
 
 const ScenarioFormRow = ({
   label,

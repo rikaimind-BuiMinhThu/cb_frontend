@@ -3,7 +3,7 @@ import api from 'v2/api/api-management';
 import {
   S3_UPLOAD_URL,
 } from '../../../../variables/constants';
-import iconPdf from '../../../../assets/img/icons8-pdf-80.png';
+import iconPdf from 'v2/assets/img/icons8-pdf-80.png';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import Pagination from '@material-ui/lab/Pagination';
 import ScenarioModalFooter from './components/modals/shared/ScenarioModalFooter';

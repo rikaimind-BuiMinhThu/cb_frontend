@@ -1,4 +1,4 @@
-import { getErrorThemeStyles } from '../../../../../utils/chatbotThemeCss';
+import { getErrorThemeStyles } from 'v2/utils/chatbotThemeCss';
 import { generateErrMsgLpScript } from './errMsgLpScriptUtils';
 
 export const resolveErrMsgLpScript = (state) => {

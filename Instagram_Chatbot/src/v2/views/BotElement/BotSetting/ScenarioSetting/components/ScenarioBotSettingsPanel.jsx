@@ -7,7 +7,7 @@ import InputNum from '../scenarioComon/InputNum';
 import InputCustom from '../scenarioComon/InputCustom';
 import HtmlCodeConfig from '../scenarioComon/HtmlCodeConfig';
 import AmazonPayButtonConfig from '../scenarioComon/AmazonPayButtonConfig';
-import { BOT_MESSAGE_TYPES } from '../../PreviewComponent/Constants';
+import { BOT_MESSAGE_TYPES } from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants';
 import { dataApiLinkage } from '../constants/scenarioFormConstants';
 import { useScenarioPanelDestructuring } from '../hooks/useScenarioPanelDestructuring';
 import ScenarioMessageSettingsAccordion from './ScenarioMessageSettingsAccordion';

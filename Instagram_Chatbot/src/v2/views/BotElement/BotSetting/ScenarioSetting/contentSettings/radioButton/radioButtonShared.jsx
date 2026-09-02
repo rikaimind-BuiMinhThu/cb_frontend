@@ -1,7 +1,7 @@
 import React from 'react';
 import CheckboxCustom from '../../scenarioComon/CheckboxCustom';
 import { RADIO_BUTTON_LABELS } from '../../constants/scenarioSettingLabels';
-import { isRadioOptionInitiallySelected } from '../../utils/radioButtonSelectionUtils';
+import { isRadioOptionInitiallySelected } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/radioButtonSelectionUtils';
 
 export const InitialSelectionCheckbox = ({ item, radioButton, toggleInitialSelection }) => (
   <div

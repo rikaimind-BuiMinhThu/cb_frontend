@@ -7,12 +7,12 @@ import {
   getRadioImgOptionStyle,
   getImgGridClassName,
   normalizeRadioButtonImgLayout,
-} from '../../utils/radioButtonImgLayoutUtils';
+} from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/radioButtonImgLayoutUtils';
 import {
   buildEditorRadioOptionDataAttr,
   isEditorRadioOptionHighlighted,
   isRadioOptionInitiallySelected,
-} from '../../utils/radioButtonSelectionUtils';
+} from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/radioButtonSelectionUtils';
 import '../../styles/contentPreviews/radioButton.css';
 
 const RadioButtonPreview = ({

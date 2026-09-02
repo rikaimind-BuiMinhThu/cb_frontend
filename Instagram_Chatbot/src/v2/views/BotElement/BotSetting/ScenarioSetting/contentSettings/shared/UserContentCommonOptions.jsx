@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Button } from 'reactstrap';
 import ScenarioModalCheckbox from '../../components/modals/shared/ScenarioModalCheckbox';
-import { AdminInfoTooltip } from '../../../../../../components/AdminShell';
+import { AdminInfoTooltip } from 'v2/components/AdminShell';
 import SelectCustom from '../../scenarioComon/SelectCustom';
 import {
   SCENARIO_MODAL_TOOLTIPS,

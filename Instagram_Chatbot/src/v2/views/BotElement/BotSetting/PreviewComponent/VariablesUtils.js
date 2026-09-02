@@ -1,6 +1,6 @@
 import moment from 'moment';
-import { findItem, stringNullOrEmpty } from '../PreviewComponent/Utils';
-import { MESSAGE_CONTENT_TYPES, SCAN_REGEX } from '../PreviewComponent/Constants';
+import { findItem, stringNullOrEmpty } from 'v2/views/BotElement/BotSetting/PreviewComponent/Utils';
+import { MESSAGE_CONTENT_TYPES, SCAN_REGEX } from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants';
 
 const getTextInputValue = (subContent, field) => {
   switch (subContent.type) {

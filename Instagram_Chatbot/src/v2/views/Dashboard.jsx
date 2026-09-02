@@ -5,7 +5,7 @@ import Cookies from 'js-cookie';
 import ReactApexChart from 'react-apexcharts';
 import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
-import { AdminPage } from '../../components/AdminShell';
+import { AdminPage } from 'v2/components/AdminShell';
 import { getSignInPath } from 'v2/variables/constants';
 
 function Dashboard() {

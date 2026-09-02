@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button } from 'reactstrap';
-import { hasActiveSpecialDisplayConditions } from '../utils/amazonPayConfigUtils';
+import { hasActiveSpecialDisplayConditions } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/amazonPayConfigUtils';
 import { useScenarioPanelDestructuring } from '../hooks/useScenarioPanelDestructuring';
-import { AdminInfoTooltip } from '../../../../../components/AdminShell';
+import { AdminInfoTooltip } from 'v2/components/AdminShell';
 import { SCENARIO_MODAL_TOOLTIPS } from './modals/shared/scenarioModalTooltips';
 import AudienceConditionsContent from './AudienceConditionsContent';
 import RegisterButtonSettingsContent from './RegisterButtonSettingsContent';

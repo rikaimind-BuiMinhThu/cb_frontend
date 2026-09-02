@@ -2,7 +2,7 @@ import React from 'react';
 import { MDBIcon } from 'mdbreact';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import InputCustom from './InputCustom';
-import { BOT_MESSAGE_TYPES } from '../../PreviewComponent/Constants';
+import { BOT_MESSAGE_TYPES } from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants';
 import {
   ORDER_CONFIRM_GROUP_KEYS,
   ORDER_CONFIRM_GROUP_META,
@@ -13,7 +13,7 @@ import {
   reorderOrderConfirmFields,
   syncLegacySelectorsLabelsFromFields,
   updateOrderConfirmField,
-} from '../utils/OrderConfirmLpScriptGenerator';
+} from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/OrderConfirmLpScriptGenerator';
 import OrderConfirmAdvancedSettings from './OrderConfirmAdvancedSettings';
 import '../styles/contentSettings/orderConfirmSettings.css';
 

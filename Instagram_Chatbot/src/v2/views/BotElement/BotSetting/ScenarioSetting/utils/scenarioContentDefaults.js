@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { getDefaultUpsellButtonOptions } from '../constants/upsellButtonDefaults';
-import { DEFAULT_CONTACT_FORM_CONFIG } from '../../PreviewComponent/Constants';
+import { DEFAULT_CONTACT_FORM_CONFIG } from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants';
 
 export function getNextContentId(messageContentArray) {
   if (messageContentArray.length !== 0) {

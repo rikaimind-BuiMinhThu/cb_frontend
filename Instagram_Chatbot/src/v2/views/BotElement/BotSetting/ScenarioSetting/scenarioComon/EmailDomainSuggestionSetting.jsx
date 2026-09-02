@@ -3,7 +3,7 @@ import { MDBIcon } from 'mdbreact';
 import { Button } from 'reactstrap';
 import SelectCustom from './SelectCustom';
 import InputCustom from './InputCustom';
-import { EMAIL_DOMAIN_SUGGESTION_MODES } from '../../PreviewComponent/emailDomainDefaults';
+import { EMAIL_DOMAIN_SUGGESTION_MODES } from 'v2/views/BotElement/BotSetting/PreviewComponent/emailDomainDefaults';
 
 const DOMAIN_MODE_OPTIONS = [
   { key: EMAIL_DOMAIN_SUGGESTION_MODES.SUGGEST, value: 'サジェストのみ' },

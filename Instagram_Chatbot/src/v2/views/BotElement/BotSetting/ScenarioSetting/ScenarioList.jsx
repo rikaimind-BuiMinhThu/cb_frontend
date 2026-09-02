@@ -5,7 +5,7 @@ import api from 'v2/api/api-management';
 import Cookies from 'js-cookie';
 import moment from 'moment';
 import { getAdminRoutePath } from 'v2/variables/constants';
-import { AdminPage, AdminTable, AdminConfirmModal, AdminActionButton, AdminFormRow, useAdminHeaderActions } from '../../../../components/AdminShell';
+import { AdminPage, AdminTable, AdminConfirmModal, AdminActionButton, AdminFormRow, useAdminHeaderActions } from 'v2/components/AdminShell';
 
 function ScenarioList() {
   const history = useHistory();

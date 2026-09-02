@@ -3,7 +3,7 @@ import { Form, Input, InputNumber, Modal, Space, message } from 'antd';
 import Cookies from 'js-cookie';
 import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
-import { AdminPage, AdminTable, AdminActionButton } from '../components/AdminShell';
+import { AdminPage, AdminTable, AdminActionButton } from 'v2/components/AdminShell';
 import { getSignInPath } from 'v2/variables/constants';
 
 function PlanManagement() {

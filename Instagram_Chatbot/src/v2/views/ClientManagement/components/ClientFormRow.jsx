@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import AdminFormRow from '../../../components/AdminShell/AdminFormRow';
+import AdminFormRow from 'v2/components/AdminShell/AdminFormRow';
 
 function ClientFormRow({ label, required, alignTop, error, htmlFor, children }) {
   return (

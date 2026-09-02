@@ -1,8 +1,8 @@
 import InputCustom from "./scenarioComon/InputCustom";
 import "../../../../assets/css/bot/scenario/option-gender-config.css";
 import { Fragment, useState } from "react";
-import { getColor } from "../PreviewComponent/Utils";
-import { LABELS } from "../PreviewComponent/Constants";
+import { getColor } from "v2/views/BotElement/BotSetting/PreviewComponent/Utils";
+import { LABELS } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 
 const defaultGenderConfig = {
   preset: {

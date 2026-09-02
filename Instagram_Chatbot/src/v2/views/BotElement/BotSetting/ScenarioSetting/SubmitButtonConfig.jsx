@@ -1,6 +1,6 @@
 import CheckboxCustom from "./scenarioComon/CheckboxCustom";
 import SubmitButtonLoadingConfig from "./SubmitButtonLoadingConfig";
-import { LABELS } from "../PreviewComponent/Constants";
+import { LABELS } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 
 const SubmitButtonConfig = ({
   content,

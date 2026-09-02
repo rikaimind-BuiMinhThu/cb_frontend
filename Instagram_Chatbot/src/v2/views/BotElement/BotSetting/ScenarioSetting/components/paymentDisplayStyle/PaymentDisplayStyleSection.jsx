@@ -8,7 +8,7 @@ import {
   PAYMENT_DISPLAY_STYLE_FIELDS,
   PAYMENT_DISPLAY_STYLE_SECTION_LABELS,
 } from '../../constants/paymentStyleConstants';
-import { normalizePaymentConfig } from '../../utils/paymentStyleUtils';
+import { normalizePaymentConfig } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/paymentStyleUtils';
 import '../../styles/components/paymentDisplayStyle.css';
 
 const PaymentDisplayStyleSection = ({ cardPaymentRadioButton, onChange }) => {

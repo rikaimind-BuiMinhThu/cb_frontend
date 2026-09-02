@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal } from 'antd';
-import { AdminActionButton } from '../../components/AdminShell';
+import { AdminActionButton } from 'v2/components/AdminShell';
 import ClientFormBody from './components/ClientFormBody';
 import { DETAIL_FORM_ID } from './constants';
 

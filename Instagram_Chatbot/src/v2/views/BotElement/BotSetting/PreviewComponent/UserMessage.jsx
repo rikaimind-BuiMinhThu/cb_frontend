@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
 import api from 'v2/api/api-management';
-import InputCustom from "../ScenarioSetting/scenarioComon/InputCustom";
+import InputCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
 import ModalNoti from "./ModalNoti";
-import { CHATBOT_ACTIONS, MESSAGE_CONTENT_TYPES, SCAN_REGEX } from "../PreviewComponent/Constants";
+import { CHATBOT_ACTIONS, MESSAGE_CONTENT_TYPES, SCAN_REGEX } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 import {
   Checkbox as AntdCheckbox,
   Radio,
   Slider} from "antd";
 import moment from "moment";
-import InputNum from "../ScenarioSetting/scenarioComon/InputNum";
+import InputNum from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputNum";
 import { tokenExpired } from "v2/api/tokenExpired";
 import { SHORTEN_URL } from "v2/variables/constants";
 import locale from "antd/es/date-picker/locale/ja_JP";
@@ -33,7 +33,7 @@ import CreditCardPayment from "./UserMessageComponent/CreditCardPayment";
 import CardPaymentRadioButton from "./UserMessageComponent/CardPaymentRadioButton";
 import ContactForm from "./UserMessageComponent/ContactForm";
 import { isUserMessage } from "./Utils";
-import { handleDisableDateCalendar } from "../ScenarioSetting/utils/scenarioCalendarUtils";
+import { handleDisableDateCalendar } from "v2/views/BotElement/BotSetting/ScenarioSetting/utils/scenarioCalendarUtils";
 
 const UserMessage = ({
   message,

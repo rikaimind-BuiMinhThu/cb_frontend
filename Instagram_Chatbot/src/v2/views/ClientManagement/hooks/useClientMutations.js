@@ -6,7 +6,7 @@ import {
   buildClientPayload,
   validateAddClient,
   validateUpdateClient,
-} from '../utils/clientValidation';
+} from 'v2/views/ClientManagement/utils/clientValidation';
 
 export default function useClientMutations({
   form,

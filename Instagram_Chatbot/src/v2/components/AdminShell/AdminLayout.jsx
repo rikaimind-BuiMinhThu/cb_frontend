@@ -7,7 +7,7 @@ import { getToken } from 'v2/api/auth';
 import { AUTH_FALSE_VALUE, IS_AUTH_COOKIE_KEY, USER_ROLE_COOKIE_KEY } from 'v2/api/constants';
 import { getAdminRoutePath, getDefaultLandingPath, getSignInPath } from 'v2/variables/constants';
 import routes from 'v2/app/routes';
-import { adminConfigProviderProps } from '../../theme/adminTheme';
+import { adminConfigProviderProps } from 'v2/theme/adminTheme';
 import AdminHeader from './AdminHeader';
 import { AdminHeaderActionsProvider } from './AdminHeaderActionsContext';
 import { AdminHeaderTitleProvider } from './AdminHeaderTitleContext';

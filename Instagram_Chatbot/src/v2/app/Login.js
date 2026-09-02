@@ -16,7 +16,7 @@ import {
   getDefaultLandingPath,
   getEnvironment,
 } from 'v2/variables/constants';
-import logo from '../assets/img/ecchatbot-logo.png';
+import logo from 'v2/assets/img/ecchatbot-logo.png';
 import {
   CLIENT_STORAGE_KEY,
   DEBUG_STORAGE_KEY,

@@ -9,11 +9,11 @@ import { useScenarioPanelDestructuring } from '../hooks/useScenarioPanelDestruct
 import ScenarioMessageSettingsAccordion from './ScenarioMessageSettingsAccordion';
 import CombineBotBlockSetting from './CombineBotBlockSetting';
 import CombineBlockHeader from './CombineBlockHeader';
-import { COMBINE_CONTENT_ROLES } from '../../PreviewComponent/Constants';
+import { COMBINE_CONTENT_ROLES } from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants';
 import {
   COMBINE_BOT_TYPE_OPTIONS,
   COMBINE_USER_TYPE_OPTIONS,
-} from '../utils/combineContentDefaults';
+} from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/combineContentDefaults';
 
 const AddBlockSelect = ({ options, defaultType, onAdd, label }) => {
   const [blockType, setBlockType] = useState(defaultType);

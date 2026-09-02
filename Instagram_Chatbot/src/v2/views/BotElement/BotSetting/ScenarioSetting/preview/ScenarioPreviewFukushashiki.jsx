@@ -19,9 +19,9 @@ import {
   CONVERSION_RESPONSE_SUBMIT_TYPE,
   CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE,
   DISPLAY_TYPES,
-} from "../../PreviewComponent/Constants";
+} from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 import { injectBotThemeCss } from "v2/utils/chatbotThemeCss";
-import { COLOR_MAP } from "v2/views/BotElement/BotSetting/DesignSetting/constants/designChatbotConstants";
+import { COLOR_MAP } from "v2/views/DesignSetting/constants/designChatbotConstants";
 import {
   getPrefectures,
   getScenarioPreviewData,
@@ -38,7 +38,7 @@ import {
   isButtonSubmitMessage,
   createScenarioUserResponseMessageHistory,
   sendErrorLogToServer,
-} from "../../PreviewComponent/Utils";
+} from "v2/views/BotElement/BotSetting/PreviewComponent/Utils";
 import {
   getChatbotSavedState,
   savedChatbotState,
@@ -47,32 +47,32 @@ import {
   getPrevOpenStatus,
   getTimerConfig,
   setTimerConfig
-} from "../../PreviewComponent/SessionStorageUtils";
-import { isTokyoDeveloLP, UPDATE_TOKYO_DEVELO_LP_PREFECTURE_JS_CODE } from "../../PreviewComponent/TokyoLPUtils";
-import ProcessBar from "../../PreviewComponent/ProcessBar";
-import ZipCodePopUp from "../../PreviewComponent/ZipCodePopUp";
+} from "v2/views/BotElement/BotSetting/PreviewComponent/SessionStorageUtils";
+import { isTokyoDeveloLP, UPDATE_TOKYO_DEVELO_LP_PREFECTURE_JS_CODE } from "v2/views/BotElement/BotSetting/PreviewComponent/TokyoLPUtils";
+import ProcessBar from "v2/views/BotElement/BotSetting/PreviewComponent/ProcessBar";
+import ZipCodePopUp from "v2/views/BotElement/BotSetting/PreviewComponent/ZipCodePopUp";
 import _ from "lodash";
 import Timer from "../../Timer";
-import { clearChatbotState } from "../../PreviewComponent/previewSessionUtils";
-import { getBotInforFromPreviewResponse } from "../../PreviewComponent/previewBotInfoUtils";
+import { clearChatbotState } from "v2/views/BotElement/BotSetting/PreviewComponent/previewSessionUtils";
+import { getBotInforFromPreviewResponse } from "v2/views/BotElement/BotSetting/PreviewComponent/previewBotInfoUtils";
 import {
   getBotHeaderIconUrl as resolveBotHeaderIconUrl,
   getOpeningBotStyle as buildOpeningBotStyle,
-} from "../../PreviewComponent/previewOpeningStyles";
+} from "v2/views/BotElement/BotSetting/PreviewComponent/previewOpeningStyles";
 import {
   mapRawDesignSettingsFromExtract,
-} from "../../PreviewComponent/previewDesignStateUtils";
-import { createPreviewInitialState } from "../../PreviewComponent/createPreviewInitialState";
+} from "v2/views/BotElement/BotSetting/PreviewComponent/previewDesignStateUtils";
+import { createPreviewInitialState } from "v2/views/BotElement/BotSetting/PreviewComponent/createPreviewInitialState";
 import {
   setConversionParamToLocalStorage, fukushashikiSavedStateToLp, fukushashikiToLP,
   executeLpJsCode, postMessageToParent
 } from "../../PreviewFukushashiki/LPUtils";
-import { resolveErrMsgLpScript } from "../utils/resolveErrMsgLpScript";
-import { generateLaunchButtonLpScript } from "../utils/launchButtonLpScriptUtils";
+import { resolveErrMsgLpScript } from "v2/views/BotElement/BotSetting/ScenarioSetting/utils/resolveErrMsgLpScript";
+import { generateLaunchButtonLpScript } from "v2/views/BotElement/BotSetting/ScenarioSetting/utils/launchButtonLpScriptUtils";
 import { convertToFukushashikiObject } from "../../PreviewFukushashiki/FukushashikiDataConverterUtils";
 import { handleValidateField } from "../../PreviewFukushashiki/ValidationUtils";
 import { createOrAddLinesCart } from "../../ShopifyUtils";
-import { injectHtmlUgcConfigContent } from "../../PreviewComponent/BotMessageUtils";
+import { injectHtmlUgcConfigContent } from "v2/views/BotElement/BotSetting/PreviewComponent/BotMessageUtils";
 import { buildEditorDraftPreviewUpdate } from "./buildPreviewStateFromDraft";
 import { buildScenarioPreviewHeaderMeta } from "./buildScenarioPreviewHeaderMeta";
 import {
@@ -94,7 +94,7 @@ import {
   usePreviewScenarioBootstrap,
   usePreviewAutoScroll,
   usePreviewMessageReveal,
-} from "../../PreviewComponent/hooks";
+} from "v2/views/BotElement/BotSetting/PreviewComponent/hooks";
 
 const isPreviewMobile = (deviceMode) => deviceMode === 'sp';
 

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
 import messageTypingGif from "assets/img/icons8-dots-loading.gif";
-import { resolveIconUrl } from "../DesignSetting/utils/designChatbotUtils";
-import { resolveBotMessageTheme } from "../DesignSetting/utils/designThemeUtils";
+import { resolveIconUrl } from "v2/views/DesignSetting/utils/designChatbotUtils";
+import { resolveBotMessageTheme } from "v2/views/DesignSetting/utils/designThemeUtils";
 import "moment/locale/zh-cn";
 import { BOT_MESSAGE_TYPES, RENDER_CHATBOT_CONFIG } from "./Constants";
 import HtmlCodeMessagePreview from "v2/components/BotMessages/HtmlCodeMessagePreview";
@@ -10,7 +10,7 @@ import AmazonPayButtonMessagePreview from "v2/components/BotMessages/AmazonPayBu
 import CartLoginMessagePreview from "v2/components/BotMessages/CartLoginMessagePreview";
 import { getElementMessageById, getBotMessageDelay } from "./Utils";
 import { replaceVariables } from "./VariablesUtils";
-import { buildOrderConfirmJs, buildOrderConfirmPreviewHtml } from "../ScenarioSetting/utils/OrderConfirmLpScriptGenerator";
+import { buildOrderConfirmJs, buildOrderConfirmPreviewHtml } from "v2/views/BotElement/BotSetting/ScenarioSetting/utils/OrderConfirmLpScriptGenerator";
 
 const BotMessage = ({
   content,

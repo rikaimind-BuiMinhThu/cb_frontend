@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import CheckboxCustom from './CheckboxCustom';
 import InputNum from './InputNum';
-import { BOT_MESSAGE_TYPES } from '../../PreviewComponent/Constants';
+import { BOT_MESSAGE_TYPES } from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants';
 import {
   getDefaultOrderConfirmConfig,
   normalizeOrderConfirmConfig,
-} from '../utils/OrderConfirmLpScriptGenerator';
+} from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/OrderConfirmLpScriptGenerator';
 import OrderConfirmSettingsModal from './OrderConfirmSettingsModal';
-import useOrderConfirmMessageTemplates from '../../OrderConfirmTemplate/useOrderConfirmMessageTemplates';
+import useOrderConfirmMessageTemplates from 'v2/views/OrderConfirmTemplate/useOrderConfirmMessageTemplates';
 
 const sectionLabelStyle = { fontWeight: 600, marginTop: '12px', marginBottom: '6px', display: 'block', fontSize: '12px' };
 

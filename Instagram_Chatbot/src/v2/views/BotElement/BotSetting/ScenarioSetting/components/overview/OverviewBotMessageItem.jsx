@@ -1,10 +1,10 @@
 import React from 'react';
-import icon from '../../../../../../assets/img/bot-icon/man1_new.png';
+import icon from 'v2/assets/img/bot-icon/man1_new.png';
 import { Draggable } from 'react-beautiful-dnd';
 import { BOT_MESSAGE_TYPES } from '../../../PreviewComponent/Constants';
 import { DEFAULT_AMAZON_PAY_BUTTON_IMAGE_URL } from '../../../../../../variables/amazonPayConstants';
-import { buildOrderConfirmPreviewHtml } from '../../utils/OrderConfirmLpScriptGenerator';
-import { buildCartLoginStyle, normalizeCartLoginConfig } from '../../utils/cartLoginUtils';
+import { buildOrderConfirmPreviewHtml } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/OrderConfirmLpScriptGenerator';
+import { buildCartLoginStyle, normalizeCartLoginConfig } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/cartLoginUtils';
 
 import OverviewMessageActions from './OverviewMessageActions';
 import OverviewAddStatementMenu from './OverviewAddStatementMenu';

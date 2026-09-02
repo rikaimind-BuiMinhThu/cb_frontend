@@ -1,5 +1,5 @@
 import { Space } from 'antd';
-import { AdminActionButton } from '../../../components/AdminShell';
+import { AdminActionButton } from 'v2/components/AdminShell';
 
 function ClientManagementActions({ item, onPayment, onView, onEdit, onDelete }) {
   return (

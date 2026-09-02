@@ -1,9 +1,9 @@
-import american_express from "../../../../assets/img/payment-method/american_express.png";
-import diner_club from "../../../../assets/img/payment-method/diner_club.png";
-import discover from "../../../../assets/img/payment-method/discover.png";
-import jcb from "../../../../assets/img/payment-method/jcb.png";
-import master_card from "../../../../assets/img/payment-method/master_card.png";
-import visa from "../../../../assets/img/payment-method/visa.png";
+import american_express from "v2/assets/img/payment-method/american_express.png";
+import diner_club from "v2/assets/img/payment-method/diner_club.png";
+import discover from "v2/assets/img/payment-method/discover.png";
+import jcb from "v2/assets/img/payment-method/jcb.png";
+import master_card from "v2/assets/img/payment-method/master_card.png";
+import visa from "v2/assets/img/payment-method/visa.png";
 import { secondToDatetime } from "./Utils";
 import { createDefaultDomainSuggestion } from "./emailDomainDefaults";
 

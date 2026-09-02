@@ -1,13 +1,13 @@
-import { CHATBOT_ACTIONS } from "../PreviewComponent/Constants";
+import { CHATBOT_ACTIONS } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 import { buildSdkPostMessageLayout } from "v2/utils/sdkLayoutUtils";
-import { isMobile } from "../PreviewComponent/Utils";
-import { isTorizenLpAmazonData, isTorizenLP } from "../PreviewComponent/TorizenUtils";
-import { isBlissLpAmazonData, isBlissLP } from "../PreviewComponent/BlissUtils";
-import { isPhystechLpAmazonData, isPhystechLP } from "../PreviewComponent/PhysTechUtils";
-import { isRoseMayLpAmazonData, isRoseMayLP } from "../PreviewComponent/RoseMayUtils";
-import { isYuwaeruLpAmazonData, isYuwaeruLP } from "../PreviewComponent/YuwaeruUtils";
+import { isMobile } from "v2/views/BotElement/BotSetting/PreviewComponent/Utils";
+import { isTorizenLpAmazonData, isTorizenLP } from "v2/views/BotElement/BotSetting/PreviewComponent/TorizenUtils";
+import { isBlissLpAmazonData, isBlissLP } from "v2/views/BotElement/BotSetting/PreviewComponent/BlissUtils";
+import { isPhystechLpAmazonData, isPhystechLP } from "v2/views/BotElement/BotSetting/PreviewComponent/PhysTechUtils";
+import { isRoseMayLpAmazonData, isRoseMayLP } from "v2/views/BotElement/BotSetting/PreviewComponent/RoseMayUtils";
+import { isYuwaeruLpAmazonData, isYuwaeruLP } from "v2/views/BotElement/BotSetting/PreviewComponent/YuwaeruUtils";
 import { convertToFukushashikiObject } from "./FukushashikiDataConverterUtils";
-import { isUserMessage } from "../PreviewComponent/Utils";
+import { isUserMessage } from "v2/views/BotElement/BotSetting/PreviewComponent/Utils";
 
 const postMessageToParent = (options, state) => {
   if (!window || !window.parent) return;

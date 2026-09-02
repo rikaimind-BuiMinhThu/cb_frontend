@@ -1,7 +1,7 @@
 import { HtmlCodeMessage } from "v2/components/BotMessages";
 import CheckboxCustom from "./CheckboxCustom";
 import { useState } from "react";
-import { BOT_MESSAGE_TYPES } from "../../PreviewComponent/Constants";
+import { BOT_MESSAGE_TYPES } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 
 export default function HtmlCodeConfig({
   indexMessageSelect,

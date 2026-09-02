@@ -1,5 +1,5 @@
-import { stringNullOrEmpty } from '../PreviewComponent/Utils';
-import { MESSAGE_CONTENT_TYPES } from '../PreviewComponent/Constants';
+import { stringNullOrEmpty } from 'v2/views/BotElement/BotSetting/PreviewComponent/Utils';
+import { MESSAGE_CONTENT_TYPES } from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants';
 import { validateTextInput } from './Validation/TextInputValidator';
 import { validateTextArea } from './Validation/TextAreaValidator';
 import { validateRadioButton } from './Validation/RadioButtonValidator';

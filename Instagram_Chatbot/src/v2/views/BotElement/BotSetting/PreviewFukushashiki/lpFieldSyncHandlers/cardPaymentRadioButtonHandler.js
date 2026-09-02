@@ -1,4 +1,4 @@
-import { MESSAGE_CONTENT_TYPES } from '../../PreviewComponent/Constants.jsx';
+import { MESSAGE_CONTENT_TYPES } from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants.jsx';
 
 const CARD_PAYMENT_RADIO = MESSAGE_CONTENT_TYPES.CARD_PAYMENT_RADIO_BUTTON;
 

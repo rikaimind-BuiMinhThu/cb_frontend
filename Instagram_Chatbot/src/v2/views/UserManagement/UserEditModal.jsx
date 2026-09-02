@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Form, Input, Modal, Select } from 'antd';
-import { AdminActionButton } from '../../components/AdminShell';
+import { AdminActionButton } from 'v2/components/AdminShell';
 import { EMAIL_REGEX, ROLE_OPTIONS } from './constants';
 
 function UserEditModal({ open, onClose, listClient, editingUser, onSubmit, loading }) {

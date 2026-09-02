@@ -3,7 +3,7 @@ import { FUKUSHASHIKI_VARIANTS } from '../../constants/scenarioSettingLabels';
 import {
   getCheckboxImgSelectionKey,
   getCheckboxOptionSelectionKey,
-} from '../../utils/checkboxSelectionUtils';
+} from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/checkboxSelectionUtils';
 
 export const buildCheckboxSettingContext = (props) => {
   const {

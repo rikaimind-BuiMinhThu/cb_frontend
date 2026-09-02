@@ -8,7 +8,7 @@ import { CALENDAR_TYPES } from '../../constants/contentTypeConstants';
 import {
   handleDisableDateCalendar,
   handleDisableEndDateCalendar,
-} from '../../utils/scenarioCalendarUtils';
+} from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/scenarioCalendarUtils';
 import CalendarEmbeddedHeader from '../../contentSettings/calendar/shared/CalendarEmbeddedHeader';
 import '../../styles/contentPreviews/calendar.css';
 

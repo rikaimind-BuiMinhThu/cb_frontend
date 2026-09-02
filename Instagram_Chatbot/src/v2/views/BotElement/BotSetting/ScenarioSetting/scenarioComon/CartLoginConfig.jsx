@@ -15,7 +15,7 @@ import {
   CART_LOGIN_SCROLL_BLOCK_OPTIONS,
   CART_LOGIN_TEXT_ALIGN_OPTIONS,
 } from '../constants/cartLoginConstants';
-import { normalizeCartLoginConfig } from '../utils/cartLoginUtils';
+import { normalizeCartLoginConfig } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/cartLoginUtils';
 
 const sectionLabelStyle = {
   fontWeight: 600,

@@ -4,7 +4,7 @@ import { getChatBotSetting } from "../Utils";
 import {
   parseDesignSettings,
   resolveMainColorContext,
-} from "../../DesignSetting/utils/designChatbotUtils";
+} from "v2/views/DesignSetting/utils/designChatbotUtils";
 import {
   mapParsedDesignToState,
   mapRawDesignSettingsToState,

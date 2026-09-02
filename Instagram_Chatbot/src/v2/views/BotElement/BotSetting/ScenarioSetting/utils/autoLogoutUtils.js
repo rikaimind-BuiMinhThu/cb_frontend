@@ -1,4 +1,4 @@
-import { CART_SYSTEM } from '../../PreviewComponent/Constants';
+import { CART_SYSTEM } from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants';
 
 export const AUTO_LOGOUT_DOMAIN_MISMATCH_ERROR = 'ドメインが一致しないため、ログアウト処理を行えず保存できません。';
 export const AUTO_LOGOUT_TEMPLATE_MISSING_ERROR = 'このカートシステム用のログアウトテンプレートが未定義です。スーパー管理者にテンプレートの定義を依頼してください。';

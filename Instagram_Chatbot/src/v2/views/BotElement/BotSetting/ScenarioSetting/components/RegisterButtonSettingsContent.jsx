@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import InputCustom from '../scenarioComon/InputCustom';
 import ScenarioModalCheckbox from './modals/shared/ScenarioModalCheckbox';
 import ScenarioFormRow from './modals/shared/ScenarioFormRow';
-import { AdminInfoTooltip } from '../../../../../components/AdminShell';
+import { AdminInfoTooltip } from 'v2/components/AdminShell';
 import ScenarioCodeTextarea from './modals/shared/ScenarioCodeTextarea';
 import {
   SCENARIO_MODAL_TOOLTIPS,

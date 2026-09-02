@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Cookies from 'js-cookie';
-import { getChatBotSetting } from '../../PreviewComponent/Utils';
-import ThemePreviewShell from '../../DesignSetting/components/ThemePreviewShell';
+import { getChatBotSetting } from 'v2/views/BotElement/BotSetting/PreviewComponent/Utils';
+import ThemePreviewShell from 'v2/views/DesignSetting/components/ThemePreviewShell';
 import Timer from '../../Timer';
 import { useScenarioEditor } from '../context/ScenarioEditorContext';
-import { buildScenarioSavePayload } from '../utils/scenarioApiUtils';
+import { buildScenarioSavePayload } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/scenarioApiUtils';
 import { buildScenarioPreviewHeaderMetaFromChatbotApi } from '../preview/buildScenarioPreviewHeaderMeta';
 import {
   calculateTimerConfigDuration,

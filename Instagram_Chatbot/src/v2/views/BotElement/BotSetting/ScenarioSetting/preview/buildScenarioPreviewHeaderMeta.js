@@ -2,7 +2,7 @@ import {
   parseDesignSettings,
   resolveIconUrl,
   resolveMainColorFromApi,
-} from '../../DesignSetting/utils/designChatbotUtils';
+} from 'v2/views/DesignSetting/utils/designChatbotUtils';
 
 const DEFAULT_TITLE = '簡単90秒で注文完了';
 const DEFAULT_MAIN_COLOR = '#327AED';

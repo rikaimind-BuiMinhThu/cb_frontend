@@ -1,5 +1,5 @@
-import { CAMEL_TO_SNAKE_THEME } from '../views/BotElement/BotSetting/DesignSetting/constants/designThemeConstants';
-import { resolveMainColorContext } from '../views/BotElement/BotSetting/DesignSetting/utils/designChatbotUtils';
+import { CAMEL_TO_SNAKE_THEME } from '../views/DesignSetting/constants/designThemeConstants';
+import { resolveMainColorContext } from '../views/DesignSetting/utils/designChatbotUtils';
 import {
   mergeThemeWithDefaults,
   normalizeMessageBorderStyle,
@@ -11,7 +11,7 @@ import {
   resolveButtonWidthCss,
   resolveFieldFocusEffect,
   resolveModalTitleTextAlign,
-} from '../views/BotElement/BotSetting/DesignSetting/utils/designThemeUtils';
+} from '../views/DesignSetting/utils/designThemeUtils';
 
 const LIVE_THEME_ROOTS = ['#sp-container1', '.sp-container1', '#sp-container', '.sp-container'];
 const LIVE_THEME_SCOPE = LIVE_THEME_ROOTS.join(', ');

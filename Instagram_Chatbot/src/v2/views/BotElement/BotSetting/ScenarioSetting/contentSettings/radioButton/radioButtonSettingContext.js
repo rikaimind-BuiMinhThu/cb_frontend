@@ -1,4 +1,4 @@
-import { getRadioOptionSelectionKey } from '../../utils/radioButtonSelectionUtils';
+import { getRadioOptionSelectionKey } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/radioButtonSelectionUtils';
 
 export const buildRadioButtonSettingContext = (props) => {
   const {

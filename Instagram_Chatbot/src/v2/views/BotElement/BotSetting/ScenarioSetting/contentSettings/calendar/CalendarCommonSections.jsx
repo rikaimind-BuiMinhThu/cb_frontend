@@ -21,7 +21,7 @@ import {
   getCalendarPreviewRelativeRangeLabel,
   isCalendarPreviewDaysSplitEnabled,
   isCalendarPreviewRelativeRangeEnabled,
-} from '../../utils/scenarioCalendarUtils';
+} from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/scenarioCalendarUtils';
 import { buildCalendarSettingContext } from './calendarSettingContext';
 
 const { Option } = Select;

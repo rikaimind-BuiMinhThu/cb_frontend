@@ -4,7 +4,7 @@ import { Input, Modal, Space, message } from 'antd';
 import Cookies from 'js-cookie';
 import moment from 'moment';
 import api from 'v2/api/api-management';
-import { AdminPage, AdminTable, AdminConfirmModal, AdminActionButton, AdminFormRow, useAdminHeaderActions } from '../../../../components/AdminShell';
+import { AdminPage, AdminTable, AdminConfirmModal, AdminActionButton, AdminFormRow, useAdminHeaderActions } from 'v2/components/AdminShell';
 import { getSignInPath } from 'v2/variables/constants';
 
 function ScenarioTemplateList() {

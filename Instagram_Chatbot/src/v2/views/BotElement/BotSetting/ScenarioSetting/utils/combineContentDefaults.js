@@ -1,5 +1,5 @@
 import { DEFAULT_AMAZON_PAY_BUTTON_CONFIG } from '../../../../../variables/amazonPayConstants';
-import { COMBINE_MESSAGE_DEFAULTS } from '../../PreviewComponent/Constants';
+import { COMBINE_MESSAGE_DEFAULTS } from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants';
 import { createDefaultContentItem, getNextContentId } from './scenarioContentDefaults';
 import { getDefaultOrderConfirmConfig } from './OrderConfirmLpScriptGenerator';
 import { getDefaultCartLoginConfig } from '../constants/cartLoginConstants';

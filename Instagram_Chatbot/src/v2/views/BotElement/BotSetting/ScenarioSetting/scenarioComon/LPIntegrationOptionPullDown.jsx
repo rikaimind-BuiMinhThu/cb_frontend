@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import SelectCustom from "./SelectCustom";
-import { CRAWL_ELEMENT_TYPES, CHATBOT_ACTIONS } from "../../PreviewComponent/Constants";
+import { CRAWL_ELEMENT_TYPES, CHATBOT_ACTIONS } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 
 const LPIntegrationOptionPullDown = ({
   search_element_type,

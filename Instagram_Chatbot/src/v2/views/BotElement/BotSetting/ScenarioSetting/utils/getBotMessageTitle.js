@@ -1,4 +1,4 @@
-import { BOT_MESSAGE_TYPES } from '../../PreviewComponent/Constants';
+import { BOT_MESSAGE_TYPES } from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants';
 
 export const getBotMessageTitle = (content) => {
   if (!content) return '';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Space } from 'antd';
-import { AdminActionButton } from '../../components/AdminShell';
+import { AdminActionButton } from 'v2/components/AdminShell';
 
 export function createUserColumns({ onEdit, onDelete }) {
   return [

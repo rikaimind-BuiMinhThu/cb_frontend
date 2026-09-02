@@ -10,7 +10,7 @@ import {
   PreviewMessagesList,
 } from "./PreviewComponent";
 import UserMessageTailIcon from "./PreviewComponent/UserMessageTailIcon";
-import { resolveUserMessageTheme } from "v2/views/BotElement/BotSetting/DesignSetting/utils/designThemeUtils";
+import { resolveUserMessageTheme } from "v2/views/DesignSetting/utils/designThemeUtils";
 import PreviewFaqReducer from "./PreviewFaq/PreviewFaqReducer";
 import { EC_CHATBOT_URL } from "v2/variables/constants";
 import "moment/locale/zh-cn";
@@ -25,7 +25,7 @@ import {
 import {
   parseDesignSettings,
   resolveMainColorContext,
-} from "v2/views/BotElement/BotSetting/DesignSetting/utils/designChatbotUtils";
+} from "v2/views/DesignSetting/utils/designChatbotUtils";
 import {
   isMobile,
   sleep,

@@ -10,7 +10,7 @@ import {
   AdminFormRow,
   AdminConfirmModal,
   useAdminHeaderActions,
-} from "../components/AdminShell";
+} from "v2/components/AdminShell";
 import { Pagination } from "@material-ui/lab";
 import { tokenExpired } from "v2/api/tokenExpired";
 import DatePicker, { registerLocale } from "react-datepicker";

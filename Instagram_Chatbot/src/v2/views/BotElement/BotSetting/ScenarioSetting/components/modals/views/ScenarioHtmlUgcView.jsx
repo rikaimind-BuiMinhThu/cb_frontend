@@ -1,6 +1,6 @@
 import React from 'react';
 import { useScenarioEditor } from '../../../context/ScenarioEditorContext';
-import { AdminInfoTooltip } from '../../../../../../../components/AdminShell';
+import { AdminInfoTooltip } from 'v2/components/AdminShell';
 import ScenarioModalFooter from '../shared/ScenarioModalFooter';
 import ScenarioCodeTextarea from '../shared/ScenarioCodeTextarea';
 import { SCENARIO_MODAL_TOOLTIPS } from '../shared/scenarioModalTooltips';

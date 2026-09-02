@@ -23,7 +23,7 @@ import {
   normalizePxValue,
   normalizeCheckboxImgLayout,
   sumCustomWidths,
-} from '../../utils/radioButtonImgLayoutUtils';
+} from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/radioButtonImgLayoutUtils';
 
 const DEFAULT_OPTION_PADDING = '0px';
 const DEFAULT_OPTION_MARGIN = '5px';

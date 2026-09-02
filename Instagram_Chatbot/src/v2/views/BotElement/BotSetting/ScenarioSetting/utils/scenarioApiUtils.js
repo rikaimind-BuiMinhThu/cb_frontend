@@ -1,4 +1,4 @@
-import { TIMER_TYPES, TIMER_VARIABLES } from '../../PreviewComponent/Constants';
+import { TIMER_TYPES, TIMER_VARIABLES } from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants';
 import _ from 'lodash';
 import { initialTimeConfig } from '../constants/scenarioFormConstants';
 import {

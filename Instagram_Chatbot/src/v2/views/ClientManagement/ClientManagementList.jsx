@@ -7,7 +7,7 @@ import {
   AdminSearchBar,
   AdminActionButton,
   useAdminHeaderActions,
-} from '../../components/AdminShell';
+} from 'v2/components/AdminShell';
 import { PAGE_SIZE } from './constants';
 import { createClientColumns } from './clientManagementColumns';
 import { gotoPaymentDetail } from './utils/clientManagementUtils';

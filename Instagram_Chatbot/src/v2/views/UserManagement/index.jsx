@@ -1,5 +1,5 @@
 import React from 'react';
-import { AdminConfirmModal } from '../../components/AdminShell';
+import { AdminConfirmModal } from 'v2/components/AdminShell';
 import UserManagementList from './UserManagementList';
 import UserAddModal from './UserAddModal';
 import UserEditModal from './UserEditModal';

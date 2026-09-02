@@ -3,7 +3,7 @@ import CustomButton from '../CustomButton';
 import UserMessage from './UserMessage';
 import UserMessageTailIcon from './UserMessageTailIcon';
 import CombineBotBlock from './CombineBotBlock';
-import { resolveUserMessageTheme } from '../DesignSetting/utils/designThemeUtils';
+import { resolveUserMessageTheme } from 'v2/views/DesignSetting/utils/designThemeUtils';
 import {
   COMBINE_CONTENT_ROLES,
   COMBINE_MESSAGE_DEFAULTS,

@@ -9,11 +9,11 @@ import {
   buildConditionParams,
   toNumber,
   findItem,
-} from '../PreviewComponent/Utils';
-import { processForBotMessage } from '../PreviewComponent/BotMessageUtils';
-import { processForUserMessage } from '../PreviewComponent/UserMessageUtils';
-import { processForCombineMessage, prepareCombineMessagesForPreview } from '../PreviewComponent/CombineMessageUtils';
-import { isBotMessage, isUserMessage, isCombineMessage, getNextUserMsg } from '../PreviewComponent/Utils';
+} from 'v2/views/BotElement/BotSetting/PreviewComponent/Utils';
+import { processForBotMessage } from 'v2/views/BotElement/BotSetting/PreviewComponent/BotMessageUtils';
+import { processForUserMessage } from 'v2/views/BotElement/BotSetting/PreviewComponent/UserMessageUtils';
+import { processForCombineMessage, prepareCombineMessagesForPreview } from 'v2/views/BotElement/BotSetting/PreviewComponent/CombineMessageUtils';
+import { isBotMessage, isUserMessage, isCombineMessage, getNextUserMsg } from 'v2/views/BotElement/BotSetting/PreviewComponent/Utils';
 import {
   RENDER_CHATBOT_CONFIG,
   PREVIEW_ACTIONS,
@@ -21,10 +21,10 @@ import {
   BOT_MESSAGE_TYPES,
   RENDER_MODES,
   MESSAGE_CONTENT_TYPES,
-} from '../PreviewComponent/Constants.jsx';
-import { getDefaultValue } from '../PreviewComponent/VariablesUtils';
-import { parseThemeSettings } from '../DesignSetting/utils/designThemeUtils';
-import { resolveMainColorContext } from '../DesignSetting/utils/designChatbotUtils';
+} from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants.jsx';
+import { getDefaultValue } from 'v2/views/BotElement/BotSetting/PreviewComponent/VariablesUtils';
+import { parseThemeSettings } from 'v2/views/DesignSetting/utils/designThemeUtils';
+import { resolveMainColorContext } from 'v2/views/DesignSetting/utils/designChatbotUtils';
 
 const PreviewFaqReducer = (state, action) => {
   switch (action.type) {

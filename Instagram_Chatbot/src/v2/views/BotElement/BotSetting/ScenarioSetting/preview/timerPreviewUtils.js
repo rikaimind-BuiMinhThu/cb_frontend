@@ -1,7 +1,7 @@
 import {
   TIMER_MAP_VARIABLES_FIELD,
   TIMER_TYPES,
-} from '../../PreviewComponent/Constants';
+} from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants';
 
 export const getTimerConfigVariable = (configVariables) => {
   const variables = Object.values(configVariables || {})

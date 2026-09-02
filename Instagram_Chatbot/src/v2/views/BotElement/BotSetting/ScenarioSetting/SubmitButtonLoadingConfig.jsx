@@ -1,4 +1,4 @@
-import { LABELS } from "../PreviewComponent/Constants";
+import { LABELS } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 import { useState } from "react";
 
 const defaultValue = {

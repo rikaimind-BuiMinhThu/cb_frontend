@@ -3,7 +3,7 @@ import { Button } from 'reactstrap';
 import CheckboxCustom from '../scenarioComon/CheckboxCustom';
 import HtmlCodeConfig from '../scenarioComon/HtmlCodeConfig';
 import AmazonPayButtonConfig from '../scenarioComon/AmazonPayButtonConfig';
-import { BOT_MESSAGE_TYPES } from '../../PreviewComponent/Constants';
+import { BOT_MESSAGE_TYPES } from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants';
 import OrderConfirmConfig from '../scenarioComon/OrderConfirmConfig';
 
 const CombineBotBlockSetting = ({

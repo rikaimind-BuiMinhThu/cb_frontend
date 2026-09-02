@@ -2,7 +2,7 @@ import Cookies from "js-cookie";
 import {
   OPEN_ANIMATION_DURATION_MS_DEFAULT,
   OPEN_ANIMATION_STYLE_DEFAULT,
-} from "../DesignSetting/constants/designChatbotConstants";
+} from "v2/views/DesignSetting/constants/designChatbotConstants";
 import { RENDER_MODES } from "./Constants";
 import { getAllUrlParams } from "./Utils";
 

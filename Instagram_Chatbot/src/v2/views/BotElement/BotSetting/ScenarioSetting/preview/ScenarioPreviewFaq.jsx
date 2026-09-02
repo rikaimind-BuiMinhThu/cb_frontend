@@ -15,9 +15,9 @@ import {
   BOT_MESSAGE_TYPES,
   MESSAGE_CONTENT_TYPES,
   NO_ERROR,
-} from "../../PreviewComponent/Constants";
+} from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 import { injectBotThemeCss } from "v2/utils/chatbotThemeCss";
-import { COLOR_MAP } from "v2/views/BotElement/BotSetting/DesignSetting/constants/designChatbotConstants";
+import { COLOR_MAP } from "v2/views/DesignSetting/constants/designChatbotConstants";
 import {
   getScenarioPreviewData,
   sleep,
@@ -28,28 +28,28 @@ import {
   sendLogMessageToServer,
   sendErrorLogToServer,
   sendContactFormRequest,
-} from "../../PreviewComponent/Utils";
+} from "v2/views/BotElement/BotSetting/PreviewComponent/Utils";
 import {
   savedChatbotState,
   saveCheckpointTime,
   savePrevOpenStatus,
   getPrevOpenStatus,
-} from "../../PreviewComponent/SessionStorageUtils";
-import { clearChatbotState } from "../../PreviewComponent/previewSessionUtils";
-import { getBotInforFromPreviewResponse } from "../../PreviewComponent/previewBotInfoUtils";
+} from "v2/views/BotElement/BotSetting/PreviewComponent/SessionStorageUtils";
+import { clearChatbotState } from "v2/views/BotElement/BotSetting/PreviewComponent/previewSessionUtils";
+import { getBotInforFromPreviewResponse } from "v2/views/BotElement/BotSetting/PreviewComponent/previewBotInfoUtils";
 import {
   getBotHeaderIconUrl as resolveBotHeaderIconUrl,
   getOpeningBotStyle as buildOpeningBotStyle,
-} from "../../PreviewComponent/previewOpeningStyles";
+} from "v2/views/BotElement/BotSetting/PreviewComponent/previewOpeningStyles";
 import {
   mapRawDesignSettingsFromExtract,
-} from "../../PreviewComponent/previewDesignStateUtils";
-import { createPreviewInitialState } from "../../PreviewComponent/createPreviewInitialState";
+} from "v2/views/BotElement/BotSetting/PreviewComponent/previewDesignStateUtils";
+import { createPreviewInitialState } from "v2/views/BotElement/BotSetting/PreviewComponent/createPreviewInitialState";
 import {
   setConversionParamToLocalStorage, postMessageToParent, executeLpJsCode,
 } from "../../PreviewFukushashiki/LPUtils";
 import { handleValidateField, ERROR_MESSAGES } from "../../PreviewFukushashiki/ValidationUtils";
-import { injectHtmlUgcConfigContent } from "../../PreviewComponent/BotMessageUtils";
+import { injectHtmlUgcConfigContent } from "v2/views/BotElement/BotSetting/PreviewComponent/BotMessageUtils";
 import { buildEditorDraftPreviewUpdate } from "./buildPreviewStateFromDraft";
 import { buildScenarioPreviewHeaderMeta } from "./buildScenarioPreviewHeaderMeta";
 import {
@@ -70,7 +70,7 @@ import {
   usePreviewScenarioBootstrap,
   usePreviewAutoScroll,
   usePreviewMessageReveal,
-} from "../../PreviewComponent/hooks";
+} from "v2/views/BotElement/BotSetting/PreviewComponent/hooks";
 
 const isPreviewMobile = (deviceMode) => deviceMode === 'sp';
 

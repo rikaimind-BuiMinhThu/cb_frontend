@@ -13,7 +13,7 @@ import {
   validatePrice,
   validateStartDate,
   validateZipCode,
-} from '../utils/clientFormHelpers';
+} from 'v2/views/ClientManagement/utils/clientFormHelpers';
 
 const DEFAULT_FORM_VALUES = {
   cart_system: 'cart_system_none',

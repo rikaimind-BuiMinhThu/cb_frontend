@@ -3,7 +3,7 @@ import {
   formatClosedIframeSize,
   formatOpenIframeSize,
   getClosedIframeDimensions,
-} from '../../utils/sdkLayoutUtils.js';
+} from 'v2/utils/sdkLayoutUtils.js';
 import { chatbotLayout } from '../state.js';
 import { mobileCheck } from '../device.js';
 

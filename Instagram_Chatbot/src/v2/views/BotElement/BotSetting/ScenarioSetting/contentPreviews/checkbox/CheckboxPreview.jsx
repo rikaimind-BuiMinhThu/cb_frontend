@@ -7,14 +7,14 @@ import {
   getCheckboxImgOptionStyle,
   getImgGridClassName,
   normalizeCheckboxImgLayout,
-} from '../../utils/radioButtonImgLayoutUtils';
+} from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/radioButtonImgLayoutUtils';
 import {
   buildEditorCheckboxOptionDataAttr,
   getCheckboxImgSelectionKey,
   isCheckboxImgContentChecked,
   isCheckboxOptionChecked,
   isEditorCheckboxOptionHighlighted,
-} from '../../utils/checkboxSelectionUtils';
+} from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/checkboxSelectionUtils';
 import '../../styles/contentPreviews/checkbox.css';
 
 const CheckboxPreview = ({

@@ -15,7 +15,7 @@ import {
   AMAZON_PAY_READY_MODE_OPTIONS,
   AMAZON_PAY_READY_MODES,
 } from '../../../../../../../variables/amazonPayConstants';
-import { validateLpDomain } from '../../../utils/amazonPayConfigUtils';
+import { validateLpDomain } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/amazonPayConfigUtils';
 
 const HELP_TEXT_STYLE = { color: '#6b7280', fontSize: '13px', marginTop: '6px' };
 

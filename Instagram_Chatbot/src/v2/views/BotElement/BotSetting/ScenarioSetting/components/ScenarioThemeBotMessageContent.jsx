@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { BOT_MESSAGE_TYPES } from '../../PreviewComponent/Constants';
-import { buildOrderConfirmPreviewHtml } from '../utils/OrderConfirmLpScriptGenerator';
+import { BOT_MESSAGE_TYPES } from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants';
+import { buildOrderConfirmPreviewHtml } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/OrderConfirmLpScriptGenerator';
 
 const ScenarioThemeBotMessageContent = ({ content, fileType, hidden }) => {
   const type = fileType;

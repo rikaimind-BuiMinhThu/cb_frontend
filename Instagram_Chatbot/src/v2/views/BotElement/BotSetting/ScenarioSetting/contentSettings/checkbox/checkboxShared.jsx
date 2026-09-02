@@ -4,7 +4,7 @@ import { CHECKBOX_LABELS } from '../../constants/scenarioSettingLabels';
 import {
   isCheckboxImgContentChecked,
   isCheckboxOptionChecked,
-} from '../../utils/checkboxSelectionUtils';
+} from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/checkboxSelectionUtils';
 
 export const InitialCheckedCheckbox = ({
   item,

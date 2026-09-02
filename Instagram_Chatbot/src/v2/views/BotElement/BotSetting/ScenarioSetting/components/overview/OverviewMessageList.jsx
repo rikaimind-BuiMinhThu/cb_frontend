@@ -1,6 +1,6 @@
 import React from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import { getBotMessageTitle, getBotFileExtension } from '../../utils/getBotMessageTitle';
+import { getBotMessageTitle, getBotFileExtension } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/getBotMessageTitle';
 import OverviewBotMessageItem from './OverviewBotMessageItem';
 import OverviewUserMessageItem from './OverviewUserMessageItem';
 import OverviewCombineMessageItem from './OverviewCombineMessageItem';

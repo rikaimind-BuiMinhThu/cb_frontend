@@ -7,11 +7,11 @@ import {
 import {
   CONTACT_FORM_FIELD_KEYS,
   getContactFormFieldSettings,
-} from "../../PreviewComponent/Constants";
+} from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 import {
   EMAIL_DOMAIN_SUGGESTION_MODES,
   isEmailDomainAllowed,
-} from "../../PreviewComponent/emailDomainDefaults";
+} from "v2/views/BotElement/BotSetting/PreviewComponent/emailDomainDefaults";
 
 const validateContactForm = (contentType, messageContents, i, index, errorsMess) => {
   const key = `message${index}_content${i}_${messageContents[i].type}`;

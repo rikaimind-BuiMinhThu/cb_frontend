@@ -8,17 +8,17 @@ import {
   buildConditionParams,
   isCreditCardPaymentMessage,
   findItem,
-} from '../PreviewComponent/Utils';
-import { processForBotMessage } from '../PreviewComponent/BotMessageUtils';
-import { processForUserMessage } from '../PreviewComponent/UserMessageUtils';
-import { processForCombineMessage } from '../PreviewComponent/CombineMessageUtils';
-import { isBotMessage, isUserMessage, isCombineMessage, getNextUserMsg } from '../PreviewComponent/Utils';
-import { mapAmazonPayDataToMessagesList } from '../PreviewComponent/TorizenUtils';
-import { mapAmazonPayDataToMessagesListForBliss } from '../PreviewComponent/BlissUtils';
-import { mapAmazonPayDataToMessagesListForRoseMay } from '../PreviewComponent/RoseMayUtils';
-import { mapAmazonPayDataToMessagesListForPhystech } from '../PreviewComponent/PhysTechUtils';
-import { mapAmazonPayDataToMessagesListForYuwaeru, isYuwaeruLP } from '../PreviewComponent/YuwaeruUtils';
-import { mapAmazonPayDataBySelector } from '../PreviewComponent/AmazonPayGenericUtils';
+} from 'v2/views/BotElement/BotSetting/PreviewComponent/Utils';
+import { processForBotMessage } from 'v2/views/BotElement/BotSetting/PreviewComponent/BotMessageUtils';
+import { processForUserMessage } from 'v2/views/BotElement/BotSetting/PreviewComponent/UserMessageUtils';
+import { processForCombineMessage } from 'v2/views/BotElement/BotSetting/PreviewComponent/CombineMessageUtils';
+import { isBotMessage, isUserMessage, isCombineMessage, getNextUserMsg } from 'v2/views/BotElement/BotSetting/PreviewComponent/Utils';
+import { mapAmazonPayDataToMessagesList } from 'v2/views/BotElement/BotSetting/PreviewComponent/TorizenUtils';
+import { mapAmazonPayDataToMessagesListForBliss } from 'v2/views/BotElement/BotSetting/PreviewComponent/BlissUtils';
+import { mapAmazonPayDataToMessagesListForRoseMay } from 'v2/views/BotElement/BotSetting/PreviewComponent/RoseMayUtils';
+import { mapAmazonPayDataToMessagesListForPhystech } from 'v2/views/BotElement/BotSetting/PreviewComponent/PhysTechUtils';
+import { mapAmazonPayDataToMessagesListForYuwaeru, isYuwaeruLP } from 'v2/views/BotElement/BotSetting/PreviewComponent/YuwaeruUtils';
+import { mapAmazonPayDataBySelector } from 'v2/views/BotElement/BotSetting/PreviewComponent/AmazonPayGenericUtils';
 import {
   RENDER_CHATBOT_CONFIG,
   GETTING_ERROR_NOTIFICATION,
@@ -28,15 +28,15 @@ import {
   BOT_MESSAGE_TYPES,
   RENDER_MODES,
   MESSAGE_CONTENT_TYPES,
-} from '../PreviewComponent/Constants.jsx';
-import { parseThemeSettings } from '../DesignSetting/utils/designThemeUtils';
+} from 'v2/views/BotElement/BotSetting/PreviewComponent/Constants.jsx';
+import { parseThemeSettings } from 'v2/views/DesignSetting/utils/designThemeUtils';
 import {
   clampOpenAnimationDurationMs,
   normalizeOpenAnimationStyle,
   resolveMainColorContext,
-} from '../DesignSetting/utils/designChatbotUtils';
-import { getDefaultValue } from '../PreviewComponent/VariablesUtils';
-import { savedChatbotState } from '../PreviewComponent/SessionStorageUtils';
+} from 'v2/views/DesignSetting/utils/designChatbotUtils';
+import { getDefaultValue } from 'v2/views/BotElement/BotSetting/PreviewComponent/VariablesUtils';
+import { savedChatbotState } from 'v2/views/BotElement/BotSetting/PreviewComponent/SessionStorageUtils';
 import { convertToFukushashikiObject } from './FukushashikiDataConverterUtils';
 import { fukushashikiToLP } from './LPUtils';
 import { applyLpFieldValue } from './LpFieldSyncUtils';

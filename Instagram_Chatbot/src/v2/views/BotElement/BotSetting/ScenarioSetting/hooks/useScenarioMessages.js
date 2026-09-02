@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
-import { mutateMessageContent } from '../utils/scenarioMessageMutations';
+import { mutateMessageContent } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/scenarioMessageMutations';
 import { dataHourFixed, dataYearFixed } from '../constants/scenarioFormConstants';
 
 export const useScenarioMessages = ({

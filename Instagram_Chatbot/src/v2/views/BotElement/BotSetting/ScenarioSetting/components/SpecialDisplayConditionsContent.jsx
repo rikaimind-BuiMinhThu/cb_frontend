@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ScenarioModalCheckbox from './modals/shared/ScenarioModalCheckbox';
-import { AdminInfoTooltip } from '../../../../../components/AdminShell';
+import { AdminInfoTooltip } from 'v2/components/AdminShell';
 import SelectCustom from '../scenarioComon/SelectCustom';
 import { dataAmazonPayDisplayMode } from '../../../../../variables/amazonPayConstants';
-import { getAmazonPayDisplayModeFromConditions } from '../utils/amazonPayConfigUtils';
+import { getAmazonPayDisplayModeFromConditions } from 'v2/views/BotElement/BotSetting/ScenarioSetting/utils/amazonPayConfigUtils';
 import {
   SCENARIO_MODAL_TOOLTIPS,
   USER_CONTENT_OPTION_LABELS,

@@ -9,7 +9,7 @@ import {
 import {
   EMAIL_DOMAIN_SUGGESTION_MODES,
   isEmailDomainAllowed,
-} from "../../PreviewComponent/emailDomainDefaults";
+} from "v2/views/BotElement/BotSetting/PreviewComponent/emailDomainDefaults";
 
 const validateEmailDomainRestriction = (value, domainSuggestion, key, errorsMess) => {
   if (

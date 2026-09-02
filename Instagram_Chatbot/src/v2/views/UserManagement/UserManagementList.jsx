@@ -5,7 +5,7 @@ import {
   AdminSearchBar,
   AdminActionButton,
   useAdminHeaderActions,
-} from '../../components/AdminShell';
+} from 'v2/components/AdminShell';
 import { PAGE_SIZE } from './constants';
 import { createUserColumns } from './userManagementColumns';
 
