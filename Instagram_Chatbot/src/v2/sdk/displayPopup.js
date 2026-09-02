@@ -39,7 +39,7 @@ import {
 } from './messaging/crawl.js';
 import {
   botId,
-  scenarioId,
+  chatbotLayout,
   setGlobalIframe,
   setScenarioId,
   updateChatbotOffsetsFromMessage,
@@ -228,7 +228,7 @@ export const displayPopup = async () => {
   iframe.style.zIndex = '999999';
   iframe.style.width = `${iframe.width} !important`;
   iframe.style.height = `${iframe.height} !important`;
-  iframe.src = `${getEcChatBotFrontEndBaseUrl()}${getSdkPreviewBasePath()}/preview-customer-fukushashiki?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin
+  iframe.src = `${getEcChatBotFrontEndBaseUrl()}${getSdkPreviewBasePath()}/preview-customer-fukushashiki?bot_id=${botId}&scenario_id=${chatbotLayout.scenarioId}&urlReceive=${window.location.origin
   }&deviceReceive=${device}&uuid=${uuid}&env=${getEnvironment()}&debug=${getDebugFlag()}&cartSystem=${data.cart_system}&isLoggedIn=${window.logged_in}`;
 
   const lpMode = resolveLpMode({
@@ -265,6 +265,6 @@ export const displayPopup = async () => {
   log('device: ', device);
   setTimeout(() => {
     const checkDevice = { scenario_data: device };
-    getUser(`${getEcChatBotApiServerBaseUrl()}/api/v1/analytics/scenario_counts/${scenarioId}`, checkDevice);
+    getUser(`${getEcChatBotApiServerBaseUrl()}/api/v1/analytics/scenario_counts/${chatbotLayout.scenarioId}`, checkDevice);
   }, 5000);
 };

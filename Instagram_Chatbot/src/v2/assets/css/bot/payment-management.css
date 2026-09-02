@@ -212,3 +212,33 @@
   flex-direction: column;
   gap: 16px;
 }
+
+.payment-test-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.payment-test-label {
+  display: block;
+}
+
+.payment-test-input {
+  width: 100%;
+}
+
+.payment-test-expiry {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.payment-test-error {
+  color: #ff4d4f;
+}
+
+.payment-test-actions {
+  width: 100%;
+  text-align: center;
+  margin-top: 12px;
+}

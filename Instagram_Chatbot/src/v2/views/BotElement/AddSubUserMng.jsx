@@ -1,83 +1,106 @@
-import React, { useEffect, useState } from 'react';
-import './../../assets/css/sub-user-mng.css';
-import api from 'v2/api/api-management';
-import Cookies from 'js-cookie';
-import * as utils from 'v2/utils/formValidate';
-import { tokenExpired } from 'v2/api/tokenExpired';
-import { AdminPage, AdminActionButton, AdminFormRow, useAdminHeaderActions } from '../../components/AdminShell';
+import React, { useState } from 'react';
 import { Input, message } from 'antd';
+import Cookies from 'js-cookie';
+import api from 'v2/api/api-management';
+import {
+  API_SUCCESS_CODE,
+  BOT_ID_COOKIE_KEY,
+} from 'v2/api/constants';
+import { tokenExpired } from 'v2/api/tokenExpired';
+import {
+  AdminActionButton,
+  AdminFormRow,
+  AdminPage,
+  useAdminHeaderActions,
+} from 'v2/components/AdminShell';
+import { ADMIN_PATHS } from 'v2/components/AdminShell/constants';
+import { getAdminRoutePath } from 'v2/variables/constants';
+import { getEmailRequiredError } from 'v2/utils/formValidate';
+import {
+  ADD_SUCCESS_MESSAGE,
+  API_WARNING_CODE,
+  EMAIL_LABEL,
+  EMAIL_PLACEHOLDER,
+  EMPTY_VALUE,
+  INVITE_LABEL,
+  REDIRECT_DELAY_MS,
+  ROLE_LABEL,
+  ROLE_OPTIONS,
+  USER_CHATBOTS_PATH,
+  ROLE_BOT_ADMIN,
+} from './addSubUserConstants';
+import 'v2/assets/css/sub-user-mng.css';
 
-function AddSubUserMng() {
-  const [botId, setBotId] = useState();
+const AddSubUserMng = () => {
+  const [botId] = useState(() => Cookies.get(BOT_ID_COOKIE_KEY));
+  const [email, setEmail] = useState(EMPTY_VALUE);
+  const [role, setRole] = useState(ROLE_BOT_ADMIN);
+  const [emailError, setEmailError] = useState(EMPTY_VALUE);
 
-  useEffect(() => {
-    setBotId(Cookies.get('bot_id'));
-  }, []);
+  const goToSubUserList = () => {
+    window.location.href = getAdminRoutePath(ADMIN_PATHS.SUB_USER);
+  };
 
-  function handleInvite() {
-    utils.checkEmailRequired('add-email', 'errEmail', 'メールアドレス');
-    if (utils.checkEmailRequired('add-email', 'errEmail', 'メールアドレス')) {
-      const formAdd = document.getElementById('sub-user__add-form');
-      let user = {};
-      for (let i = 0; i < formAdd.length; i++) {
-        user[formAdd[i].name] = formAdd[i].value;
+  const handleInvite = () => {
+    const nextEmailError = getEmailRequiredError(email, EMAIL_LABEL);
+    setEmailError(nextEmailError);
+    if (nextEmailError) return;
+
+    const add = { user_chatbot: { chatbot_id: botId, email, role } };
+    api.post(USER_CHATBOTS_PATH, add).then((res) => {
+      if (res.data.code === API_SUCCESS_CODE) {
+        message.success(ADD_SUCCESS_MESSAGE);
+        setTimeout(goToSubUserList, REDIRECT_DELAY_MS);
+        return;
       }
-      const add = { user_chatbot: { chatbot_id: botId, ...user } };
-      api.post(`/api/v1/managements/user_chatbots`, add).then((res) => {
-        if (res.data.code === 1) {
-          message.success('正常に追加されました！');
-          setTimeout(() => {
-            window.location.href = `/v2/admin/sub-user`;
-          }, 2000);
-        } else if (res.data.code === 2) {
-          message.warning(res.data.message || res.data.data);
-        }
-      }).catch((err) => {
-        console.log(err);
-        if (err.response?.data.code === 0) {
-          tokenExpired();
-        }
-      });
-    }
-  }
+      if (res.data.code === API_WARNING_CODE) {
+        message.warning(res.data.message || res.data.data);
+      }
+    }).catch((err) => {
+      if (err.response?.data.code === 0) {
+        tokenExpired();
+      }
+    });
+  };
 
   useAdminHeaderActions(
     <>
-      <AdminActionButton
-        action="back"
-        onClick={() => { window.location.href = '/v2/admin/sub-user'; }}
-      />
-      <AdminActionButton action="create" label="招待する" onClick={handleInvite} />
+      <AdminActionButton action="back" onClick={goToSubUserList} />
+      <AdminActionButton action="create" label={INVITE_LABEL} onClick={handleInvite} />
     </>
   );
 
   return (
-    <>
-      <AdminPage>
-        <div className="admin-page-body">
-          <form id="sub-user__add-form">
-            <AdminFormRow label="メールアドレス" required htmlFor="add-email">
-              <Input
-                id="add-email"
-                placeholder="メールアドレスは、必ず指定してください。"
-                name="email"
-                onChange={() => utils.checkEmailRequired('add-email', 'errEmail', 'メールアドレス')}
-              />
-              <span id="errEmail" className="admin-form-error" />
-            </AdminFormRow>
-
-            <AdminFormRow label="権限" htmlFor="sub-user-role">
-              <select className="admin-native-select" id="sub-user-role" name="role">
-                <option value="bot_admin">管理者</option>
-                <option value="editor">編集者</option>
-                <option value="reader">観覧者</option>
-              </select>
-            </AdminFormRow>
-          </form>
-        </div>
-      </AdminPage>
-    </>
+    <AdminPage>
+      <div className="admin-page-body">
+        <AdminFormRow label={EMAIL_LABEL} required htmlFor="add-email" error={emailError}>
+          <Input
+            id="add-email"
+            placeholder={EMAIL_PLACEHOLDER}
+            name="email"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setEmailError(getEmailRequiredError(e.target.value, EMAIL_LABEL));
+            }}
+          />
+        </AdminFormRow>
+        <AdminFormRow label={ROLE_LABEL} htmlFor="sub-user-role">
+          <select
+            className="admin-native-select"
+            id="sub-user-role"
+            name="role"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+          >
+            {ROLE_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+          </select>
+        </AdminFormRow>
+      </div>
+    </AdminPage>
   );
-}
+};
 
 export default AddSubUserMng;

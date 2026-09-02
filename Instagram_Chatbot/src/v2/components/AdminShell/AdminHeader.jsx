@@ -2,12 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, Layout } from 'antd';
 import { MenuFoldOutlined, MenuUnfoldOutlined, LogoutOutlined } from '@ant-design/icons';
-import AdminVersionSwitch from 'components/AdminVersionSwitch/AdminVersionSwitch';
+import AdminVersionSwitch from './AdminVersionSwitch';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { useAdminHeaderActionsContext } from './AdminHeaderActionsContext';
 import { useAdminHeaderTitleContext } from './AdminHeaderTitleContext';
 import {
-  ADMIN_VERSION_SWITCH_VARIANT,
   BUTTON_TYPE_DEFAULT,
   BUTTON_TYPE_TEXT,
   LOGOUT_LABEL,
@@ -33,7 +32,7 @@ const AdminHeader = ({ collapsed, onToggleCollapse }) => {
       </div>
       <div className="admin-header-right">
         {actions && <div className="admin-header-actions">{actions}</div>}
-        <AdminVersionSwitch variant={ADMIN_VERSION_SWITCH_VARIANT} />
+        <AdminVersionSwitch />
         <Button type={BUTTON_TYPE_DEFAULT} icon={<LogoutOutlined />} onClick={tokenExpired}>
           {LOGOUT_LABEL}
         </Button>

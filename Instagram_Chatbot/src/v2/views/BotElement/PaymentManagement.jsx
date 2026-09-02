@@ -3,15 +3,17 @@ import { Tabs, message } from 'antd';
 import moment from 'moment';
 import api from 'v2/api/api-management';
 import Cookies from 'js-cookie';
+import { BOT_ID_COOKIE_KEY, USER_ROLE_COOKIE_KEY } from 'v2/api/constants';
 import { tokenExpired } from 'v2/api/tokenExpired';
-import { AdminPage } from '../../components/AdminShell';
+import { AdminPage } from 'v2/components/AdminShell';
+import { USER_ROLE_ADMIN_DEEL } from 'v2/components/AdminShell/constants';
 import PaymentOrderHistoryTab from './PaymentManagement/PaymentOrderHistoryTab';
 import PaymentSettingsTab from './PaymentManagement/PaymentSettingsTab';
-import '../../assets/css/bot/payment-management.css';
-import '../../assets/css/bot/report.css';
+import 'v2/assets/css/bot/payment-management.css';
+import 'v2/assets/css/bot/report.css';
 
-function PaymentManagement() {
-  const [botId] = useState(Cookies.get('bot_id'));
+const PaymentManagement = () => {
+  const [botId] = useState(Cookies.get(BOT_ID_COOKIE_KEY));
   const [startDate, setStartDate] = useState(() => moment().startOf('month'));
   const [endDate, setEndDate] = useState(() => moment().subtract(1, 'day'));
   const [tab, setTab] = useState('orders');
@@ -28,9 +30,9 @@ function PaymentManagement() {
   const [customDivSpecifyPaymentGW, setCustomDivSpecifyPaymentGW] = useState(['newDiv0']);
   const [customDivSettlementPaymentGW, setCustomDivSettlementPaymentGW] = useState(['newDiv0']);
   const [customDivSettlementFee, setCustomDivSettlementFee] = useState(['newDiv0']);
-  var [numSpecifyPaymentGW, setNumSpecifyPaymentGW] = useState(1);
-  var [numSettlementPaymentGW, setNumSettlementPaymentGW] = useState(1);
-  var [numSettlementFee, setNumSettlementFee] = useState(1);
+  const [numSpecifyPaymentGW, setNumSpecifyPaymentGW] = useState(1);
+  const [numSettlementPaymentGW, setNumSettlementPaymentGW] = useState(1);
+  const [numSettlementFee, setNumSettlementFee] = useState(1);
 
   const [paymentGateway, setPaymentGateway] = useState([]);
   const [payment, setPayment] = useState({});
@@ -85,7 +87,7 @@ function PaymentManagement() {
     { prefectur: 'okinawa', prefectureName: '沖縄県' },
   ]);
   // authorization
-  const [isAdminDeel] = useState(() => Cookies.get('user_role') === 'admin_deel');
+  const [isAdminDeel] = useState(() => Cookies.get(USER_ROLE_COOKIE_KEY) === USER_ROLE_ADMIN_DEEL);
   const [allClient, setAllClient] = useState([]);
   const [allBot, setAllBot] = useState([]);
   const [currentClientId, setCurrentClientId] = useState('deel');
@@ -108,26 +110,26 @@ function PaymentManagement() {
 
   useEffect(() => {
     if (!botId) return undefined;
-    let cancelled = false;
+    const request = { cancelled: false };
     api
       .get(`/api/v1/managements/chatbots/${botId}/variables?page=all`)
       .then((res) => {
-        if (cancelled) return;
+        if (request.cancelled) return;
         setListVar(res?.data?.data);
       })
       .catch((err) => {
-        if (cancelled) return;
+        if (request.cancelled) return;
         console.log(err);
         if (err?.response?.data?.code === 0) {
           tokenExpired();
         }
       });
     return () => {
-      cancelled = true;
+      request.cancelled = true;
     };
   }, [botId]);
 
-  function applyPayment(data) {
+  const applyPayment = (data) => {
     setPayment(data);
     setOpenTax(data?.include_tax === 'internal_tax');
     setSaleTaxRate(data?.sale_tax_rate || 'eight_percent');
@@ -152,49 +154,49 @@ function PaymentManagement() {
   }
 
   useEffect(() => {
-    let cancelled = false;
+    const request = { cancelled: false };
     api
       .get(`/api/v1/payment_managements/payment_gateways?page=all`)
       .then((res) => {
-        if (cancelled) return;
+        if (request.cancelled) return;
         if (res.data.code === 1) {
           setPaymentGateway(res.data.data);
         }
       })
       .catch((err) => {
-        if (cancelled) return;
+        if (request.cancelled) return;
         console.log(err);
         if (err?.response.data.code === 0) {
           tokenExpired();
         }
       });
     return () => {
-      cancelled = true;
+      request.cancelled = true;
     };
   }, []);
 
   useEffect(() => {
     if (!botId) return undefined;
-    let cancelled = false;
+    const request = { cancelled: false };
     api
       .get(`/api/v1/payment_managements/payment_managements/${botId}`)
       .then((res) => {
-        if (cancelled) return;
+        if (request.cancelled) return;
         applyPayment(res.data.data);
       })
       .catch((err) => {
-        if (cancelled) return;
+        if (request.cancelled) return;
         console.log(err);
         if (err?.response?.data?.code === 0) {
           tokenExpired();
         }
       });
     return () => {
-      cancelled = true;
+      request.cancelled = true;
     };
   }, [botId]);
 
-  function reload() {
+  const reload = () => {
     api
       .get(`/api/v1/payment_managements/payment_managements/${botId}`)
       .then((res) => {
@@ -208,7 +210,7 @@ function PaymentManagement() {
       });
   }
 
-  function validateDateRange(start, end) {
+  const validateDateRange = (start, end) => {
     if (start && end && start.isAfter(end)) {
       setDateError('開始日の値は、終了日の値より小さいです。');
       return false;
@@ -217,7 +219,7 @@ function PaymentManagement() {
     return true;
   }
 
-  function handleDateChange(start, end) {
+  const handleDateChange = (start, end) => {
     setStartDate(start);
     setEndDate(end);
     if (start && end) {
@@ -227,11 +229,11 @@ function PaymentManagement() {
     }
   }
 
-  function handleSearch() {
+  const handleSearch = () => {
     validateDateRange(startDate, endDate);
   }
 
-  function saveConsumptionTax() {
+  const saveConsumptionTax = () => {
     if (taxSaving) return;
     const res = {
       consumption_tax: openTax
@@ -267,34 +269,31 @@ function PaymentManagement() {
       .finally(() => setTaxSaving(false));
   }
 
-  function addNewSpecifyPaymentGW() {
-    let cDivs = customDivSpecifyPaymentGW;
-
-    cDivs.push(`newDiv${numSpecifyPaymentGW}`);
-    // console.log(cDivs)
-    setCustomDivSpecifyPaymentGW(cDivs);
+  const addNewSpecifyPaymentGW = () => {
+    setCustomDivSpecifyPaymentGW([
+      ...customDivSpecifyPaymentGW,
+      `newDiv${numSpecifyPaymentGW}`,
+    ]);
     setNumSpecifyPaymentGW(numSpecifyPaymentGW + 1);
   }
 
-  function addNewSettlementPaymentGW() {
-    let cDivs = customDivSettlementPaymentGW;
-
-    cDivs.push(`newDiv${numSettlementPaymentGW}`);
-    // console.log(cDivs)
-    setCustomDivSettlementPaymentGW(cDivs);
+  const addNewSettlementPaymentGW = () => {
+    setCustomDivSettlementPaymentGW([
+      ...customDivSettlementPaymentGW,
+      `newDiv${numSettlementPaymentGW}`,
+    ]);
     setNumSettlementPaymentGW(numSettlementPaymentGW + 1);
   }
 
-  function addNewSettlementFee() {
-    let cDivs = customDivSettlementFee;
-
-    cDivs.push(`newDiv${numSettlementFee}`);
-    // console.log(cDivs)
-    setCustomDivSettlementFee(cDivs);
+  const addNewSettlementFee = () => {
+    setCustomDivSettlementFee([
+      ...customDivSettlementFee,
+      `newDiv${numSettlementFee}`,
+    ]);
     setNumSettlementFee(numSettlementFee + 1);
   }
 
-  function saveSpecifyPaymentGateway() {
+  const saveSpecifyPaymentGateway = () => {
     let formAdd = document.getElementById('customSPGW');
     let payment_method_variable = document.getElementById('specify_payment_method_variable')?.value;
     let specify_pg_none = document.getElementById('specify_pg_none')?.checked;
@@ -393,7 +392,7 @@ function PaymentManagement() {
     }
   }
 
-  function saveSettlementPaymentGateway() {
+  const saveSettlementPaymentGateway = () => {
     let formAdd = document.getElementById('settlement_PMGW');
     let payment_method_variable = document.getElementById(
       'settlement_payment_method_variable'
@@ -480,7 +479,7 @@ function PaymentManagement() {
     }
   }
 
-  function savePrefecturesTax() {
+  const savePrefecturesTax = () => {
     let checkAmount = false;
     let formAdd = document.getElementById('shipping_fee_tax');
     let payment_method_variable = document.getElementById('shipping_fee_address_variable')?.value;
@@ -547,7 +546,7 @@ function PaymentManagement() {
     }
   }
 
-  function saveNPDeferredPayment() {
+  const saveNPDeferredPayment = () => {
     let np_deferred_no = document.getElementById('np_deferred_no').checked;
     let not_included = document.getElementById('not_included')?.checked;
     let enclosed = document.getElementById('enclosed')?.checked;
@@ -678,7 +677,7 @@ function PaymentManagement() {
     }
   }
 
-  function deleteCdivSpecifyPGW(id) {
+  const deleteCdivSpecifyPGW = (id) => {
     var ele = document.getElementById(`specifyPGW${id}`);
     const customSPGW = document.getElementById(`customSPGW`);
     if (ele?.parentNode === customSPGW) {
@@ -688,7 +687,7 @@ function PaymentManagement() {
     // ele.remove();
   }
 
-  function deleteCdivSettlementPGW(id) {
+  const deleteCdivSettlementPGW = (id) => {
     var ele = document.getElementById(`settlementPGW${id}`);
     const settlement_PMGW = document.getElementById(`settlement_PMGW`);
     if (ele?.parentNode === settlement_PMGW) {
@@ -700,7 +699,7 @@ function PaymentManagement() {
     // ele.remove();
   }
 
-  function deleteCdivSettlementFee(id) {
+  const deleteCdivSettlementFee = (id) => {
     console.log(customDivSettlementFee);
     var ele = document.getElementById(`settlementFee${id}`);
     const customNPElement = document.getElementById(`customNP`);

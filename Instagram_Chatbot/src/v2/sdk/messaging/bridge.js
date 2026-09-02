@@ -1,6 +1,6 @@
-import { globalIframe } from '../state.js';
+import { chatbotLayout } from '../state.js';
 
 export const sendMessageToChatbot = (contentMessage, action) => {
   const data = { action, actionData: contentMessage };
-  globalIframe.contentWindow.postMessage(data, '*');
+  chatbotLayout.globalIframe.contentWindow.postMessage(data, '*');
 };

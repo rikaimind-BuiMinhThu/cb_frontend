@@ -1,159 +1,140 @@
-import React, { useEffect, useState } from 'react'
-import InputCustom from '../ScenarioSetting/scenarioComon/InputCustom'
-import { Card, CardHeader, CardBody, Row, Col } from 'reactstrap';
-import './test-payment.js';
-function Payment() {
+import React, { useEffect, useState } from 'react';
+import { Button, Input, message } from 'antd';
+import { AdminPage } from 'v2/components/AdminShell';
+import {
+  CARD_EXPIRY_LABEL,
+  CARD_HOLDER_LABEL,
+  CARD_HOLDER_PLACEHOLDER,
+  CARD_NUMBER_LABEL,
+  CARD_NUMBER_PLACEHOLDER,
+  EMPTY_VALUE,
+  EXPIRE_YEAR_PREFIX,
+  GMO_SHOP_ID,
+  GMO_SUCCESS_CODE,
+  GMO_TOKEN_SCRIPT_SRC,
+  MONTH_PAD_PREFIX,
+  MONTH_PAD_THRESHOLD,
+  MONTH_PLACEHOLDER,
+  PURCHASE_BUTTON,
+  PURCHASE_ERROR,
+  SECURITY_CODE_LABEL,
+  SECURITY_CODE_PLACEHOLDER,
+  YEAR_PLACEHOLDER,
+  YEAR_RANGE_COUNT,
+} from './paymentConstants';
+import 'v2/assets/css/bot/payment-management.css';
 
-    const [yearExpired, setYearExpired] = useState([]);
-    const [monthExpired] = useState([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
-    useEffect(() => {
-        var date = (new Date()).getFullYear();
-        var year = []
-        for (let i = parseInt(date); i <= parseInt(date) + 8
-            ; i++) {
-            year.push(i)
-        }
-        setYearExpired(year)
-        const script = document.createElement("script");
-        script.src = "https://stg.static.mul-pay.jp/ext/js/token.js";
-        script.async = true;
-        // script.onload = () => scriptLoaded();
+const MONTH_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
-        document.body.appendChild(script);
-    }, [])
+const Payment = () => {
+  const [yearExpired, setYearExpired] = useState([]);
+  const [cardNumber, setCardNumber] = useState(EMPTY_VALUE);
+  const [cardHolder, setCardHolder] = useState(EMPTY_VALUE);
+  const [expireYear, setExpireYear] = useState(EMPTY_VALUE);
+  const [expireMonth, setExpireMonth] = useState(EMPTY_VALUE);
+  const [securityCode, setSecurityCode] = useState(EMPTY_VALUE);
+  const [purchaseError, setPurchaseError] = useState(EMPTY_VALUE);
 
-    function doPurchase() {
-        // var cardno, expire, securitycode, holdername;
+  useEffect(() => {
+    const currentYear = new Date().getFullYear();
+    const years = Array.from({ length: YEAR_RANGE_COUNT + 1 }, (_, index) => currentYear + index);
+    setYearExpired(years);
+    const script = document.createElement('script');
+    script.src = GMO_TOKEN_SCRIPT_SRC;
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      script.remove();
+    };
+  }, []);
 
-        var cardNumber = document.getElementById("cardNumber").value;
-        var expireYear = document.getElementById("yearEx").value;
-        var expireMonth = document.getElementById("monthEx").value;
-        var securitycode = document.getElementById("securityCode").value;
-        var cardHolder = document.getElementById("cardHolder").value;
-
-        if (cardNumber === '' || expireYear === '' || expireMonth === '' || securitycode === '' || cardHolder === '') {
-            document.getElementById('purchaseErr').style.display = 'block'
-        } else {
-            if(parseInt(expireMonth) <10 ){
-                expireMonth = `0${expireMonth}`
-            }
-            document.getElementById('purchaseErr').style.display = 'none'
-            var shop_id = 'tshop00058883';
-            window.Multipayment.init(shop_id);
-            window.Multipayment.getToken({
-                // holdername: 'Abby Yarbro',
-                // cardno: '4111111111111111',           // card number without spaces
-                // expire: '201905',                     // expiry in format 'YYYYMM'
-                // securitycode: '123'
-                holdername: cardHolder,
-                cardno: cardNumber,                     // card number without spaces
-                expire: `${'2019'}${expireMonth}`,                     // expiry in format 'YYYYMM'
-                securitycode: securitycode
-            }, res => {
-                if (res.resultCode !== '000') {
-                    // show error message
-                    console.log('error code ' + res.resultCode);
-                }
-            });
-
-        }
-
-        // callback function should be a string only
+  const doPurchase = () => {
+    if (!cardNumber || !expireYear || !expireMonth || !securityCode || !cardHolder) {
+      setPurchaseError(PURCHASE_ERROR);
+      return;
     }
+    setPurchaseError(EMPTY_VALUE);
+    const monthValue = parseInt(expireMonth, 10) < MONTH_PAD_THRESHOLD
+      ? `${MONTH_PAD_PREFIX}${expireMonth}`
+      : String(expireMonth);
+    window.Multipayment.init(GMO_SHOP_ID);
+    window.Multipayment.getToken({
+      holdername: cardHolder,
+      cardno: cardNumber,
+      expire: `${EXPIRE_YEAR_PREFIX}${monthValue}`,
+      securitycode: securityCode,
+    }, (res) => {
+      if (res.resultCode !== GMO_SUCCESS_CODE) {
+        message.error(res.resultCode);
+      }
+    });
+  };
 
-    //   function gmoResponseHandler(res) {
-    //     console.log(res)
-    //     // if(res.resultCode != '000') {
-    //     //   // show error message
-    //     //   console.log('error code ' + res.resultCode);
-    //     // } else {
-    //     //   var token = res.tokenObject.token;
-    //     //   // use this token instead of card details to create transactions
-    //     //   document.getElementById('token').innerHTML = token;
-    //     // }
-    //   };
+  return (
+    <AdminPage>
+      <div className="admin-page-body payment-test-form">
+        <label className="payment-test-label" htmlFor="cardNumber">{CARD_NUMBER_LABEL}</label>
+        <Input
+          id="cardNumber"
+          className="payment-test-input"
+          placeholder={CARD_NUMBER_PLACEHOLDER}
+          value={cardNumber}
+          onChange={(e) => setCardNumber(e.target.value)}
+        />
+        <label className="payment-test-label" htmlFor="cardHolder">{CARD_HOLDER_LABEL}</label>
+        <Input
+          id="cardHolder"
+          className="payment-test-input"
+          placeholder={CARD_HOLDER_PLACEHOLDER}
+          value={cardHolder}
+          onChange={(e) => setCardHolder(e.target.value)}
+        />
+        <span className="payment-test-label">{CARD_EXPIRY_LABEL}</span>
+        <div className="payment-test-expiry">
+          <select
+            name="yearEx"
+            id="yearEx"
+            className="admin-native-select"
+            value={expireYear}
+            onChange={(e) => setExpireYear(e.target.value)}
+          >
+            <option value={EMPTY_VALUE}>{YEAR_PLACEHOLDER}</option>
+            {yearExpired.map((item) => (
+              <option key={item} value={item}>{item}</option>
+            ))}
+          </select>
+          <select
+            name="monthEx"
+            id="monthEx"
+            className="admin-native-select"
+            value={expireMonth}
+            onChange={(e) => setExpireMonth(e.target.value)}
+          >
+            <option value={EMPTY_VALUE} disabled>{MONTH_PLACEHOLDER}</option>
+            {MONTH_OPTIONS.map((item) => (
+              <option key={item} value={item}>{item}</option>
+            ))}
+          </select>
+        </div>
+        <label className="payment-test-label" htmlFor="securityCode">{SECURITY_CODE_LABEL}</label>
+        <Input
+          id="securityCode"
+          className="payment-test-input"
+          placeholder={SECURITY_CODE_PLACEHOLDER}
+          value={securityCode}
+          onChange={(e) => setSecurityCode(e.target.value)}
+        />
+        {purchaseError && (
+          <span className="payment-test-error">{purchaseError}</span>
+        )}
+        <div className="payment-test-actions">
+          <Button id="btnPurchase" onClick={doPurchase}>
+            {PURCHASE_BUTTON}
+          </Button>
+        </div>
+      </div>
+    </AdminPage>
+  );
+};
 
-    function onChangeValue(contentIndex) {
-        
-    }
-
-    function purchase() {
-        doPurchase()
-    }
-    return (
-        <>
-            <div className="content">
-                <Row id="screenAll">
-                    <Col md="12">
-                        <Card>
-                            <CardHeader>ádasasd</CardHeader>
-                            <CardBody>
-                                <div style={{ width: '100%' }}>
-                                    <span>Card Number:</span>
-                                    <InputCustom
-                                        id={`cardNumber`}
-                                        style={{ width: "100%" }}
-                                        placeholder={`Please input card number...`}
-                                        onChange={value => onChangeValue(value)}
-                                        // value={''}
-                                    />
-                                    <br />
-                                    <span>Card Holder:</span>
-                                    <InputCustom
-                                        id={`cardHolder`}
-                                        style={{ width: "100%" }}
-                                        placeholder={`Please input card holder...`}
-                                        onChange={value => onChangeValue(value)}
-                                    />
-                                    <br />
-                                    <span>Card expiry date:</span>
-                                    <div style={{ display: "flex" }}>
-                                        {/* <InputCustom
-                                   style={{width:"49%"}}
-                                        placeholder={`Expire year`}
-                                        onChange={value => onChangeValue(value)}
-                                        value={``}
-                                    /> */}
-                                        <select name="yearEx" id="yearEx" defaultValue={""}>
-                                            <option value="">Year</option>
-                                            {yearExpired.map((item) => (
-                                                <option key={item} value={item}>{item}</option>
-                                            ))}
-                                        </select>
-
-                                        <span className='span_end'>&</span>
-                                        <select name="monthEx" id="monthEx" defaultValue={""}>
-                                            <option value="" disabled>Month</option>
-                                            {monthExpired.map((item) => (
-                                                <option key={item} value={item}>{item}</option>
-                                            ))}
-                                        </select>
-                                        <br />
-                                    </div>
-                                    <span>Security code:</span>
-                                    <InputCustom
-                                        id={`securityCode`}
-                                        style={{ width: "100%" }}
-                                        placeholder={`Please input security code...`}
-                                        onChange={value => onChangeValue(value)}
-                                        // value={``}
-                                    />
-                                    <br />
-                                    <span id='purchaseErr' style={{ color: 'red', display: 'none' }}>Please input all field</span>
-                                </div>
-                                <div style={{ width: "100%", textAlign: "center" }}>
-                                    <button style={{backgroundColor:"white", border:'1px solid black', borderRadius:"5px"}} id='btnPurchase' onClick={() => purchase()}>
-                                        Purchase
-                                    </button>
-                                </div>
-                            </CardBody>
-                        </Card>
-                    </Col>
-                </Row>
-            </div>
-
-        </>
-    )
-}
-
-export default Payment
+export default Payment;

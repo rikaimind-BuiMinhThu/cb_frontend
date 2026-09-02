@@ -1,14 +1,14 @@
 import React from 'react';
 import { AdminFormRow, AdminActionButton } from '../../../../components/AdminShell';
 
-function ShippingFeeSection({
+const ShippingFeeSection = ({
   noShip,
   setNoShip,
   listvar,
   payment,
   prefectures,
   onSave,
-}) {
+}) => {
   return (
     <div className="payment-setting-section">
       <h3 className="payment-setting-section-title">送料（税込）</h3>
@@ -95,6 +95,6 @@ function ShippingFeeSection({
       </div>
     </div>
   );
-}
+};
 
 export default ShippingFeeSection;

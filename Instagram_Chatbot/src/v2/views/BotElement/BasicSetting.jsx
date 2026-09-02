@@ -1,106 +1,165 @@
-import React from 'react';
-import { AdminPage, AdminActionButton, AdminFormRow, useAdminHeaderActions } from '../../components/AdminShell';
+import React, { useEffect, useState } from 'react';
 import { Input, message } from 'antd';
-import './../../assets/css/basic_setting.css';
-import * as utils from 'v2/utils/formValidate';
 import Cookies from 'js-cookie';
-import { useEffect } from 'react';
-import { useState } from 'react';
 import api from 'v2/api/api-management';
+import {
+  API_SUCCESS_CODE,
+  USER_ID_COOKIE_KEY,
+  USER_ROLE_COOKIE_KEY,
+} from 'v2/api/constants';
 import { tokenExpired } from 'v2/api/tokenExpired';
+import {
+  AdminActionButton,
+  AdminFormRow,
+  AdminPage,
+  useAdminHeaderActions,
+} from 'v2/components/AdminShell';
+import { USER_ROLE_ADMIN_DEEL } from 'v2/components/AdminShell/constants';
+import {
+  DEFAULT_MAX_LENGTH,
+  getEmailRequiredError,
+  getInputError,
+  getMaxLengthError,
+  getTelError,
+  getUrlError,
+} from 'v2/utils/formValidate';
+import {
+  ADDRESS_LABEL,
+  API_WARNING_CODE,
+  APP_PASSWORD_REQUIRED_MESSAGE,
+  ASCII_AT,
+  BUSINESS_DIVISION_LABEL,
+  CLIENTS_PATH,
+  COMPANY_NAME_LABEL,
+  CORPORATION,
+  DEPARTMENT_LABEL,
+  DIVISION_CORP_LABEL,
+  DIVISION_SOLE_LABEL,
+  EMAIL_LABEL,
+  EMAIL_READONLY_HINT,
+  EMPTY_VALUE,
+  FAIL_FALLBACK,
+  FULL_NAME_LABEL,
+  FULL_WIDTH_AT,
+  GMAIL_REQUIRED_MESSAGE,
+  INVALID_GMAIL_MESSAGE,
+  JOB_TITLE_LABEL,
+  LANGUAGE_CHINESE,
+  LANGUAGE_EN_LABEL,
+  LANGUAGE_ENGLISH,
+  LANGUAGE_JA_LABEL,
+  LANGUAGE_JAPANESE,
+  LANGUAGE_LABEL,
+  LANGUAGE_VI_LABEL,
+  LANGUAGE_VIETNAMESE,
+  LANGUAGE_ZH_LABEL,
+  MAIL_FORMAT,
+  PHONE_LABEL,
+  POST_CODE_LABEL,
+  REQUIRED_PLACEHOLDER,
+  SMTP_GMAIL_LABEL,
+  SMTP_GMAIL_PLACEHOLDER,
+  SMTP_PASSWORD_HINT,
+  SMTP_PASSWORD_LABEL,
+  SMTP_PASSWORD_SET_PLACEHOLDER,
+  SMTP_UPDATE_FAILED,
+  SOLE_PROPRIETORSHIP,
+  UPDATE_SUCCESS_MESSAGE,
+  URL_LABEL,
+  USERS_PATH,
+} from './basicSettingConstants';
+import 'v2/assets/css/basic_setting.css';
 
-const MAIL_FORMAT =
-  /^[a-zA-Z0-9]+([._+-][a-zA-Z0-9]+)*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/;
+const isApiSuccess = (code) => code === API_SUCCESS_CODE || code === String(API_SUCCESS_CODE);
 
-function BasicSetting() {
-  const isAdminDeel = Cookies.get('user_role') === 'admin_deel';
-  const [userIdEC] = useState(() => Cookies.get('user_id'));
+const BasicSetting = () => {
+  const isAdminDeel = Cookies.get(USER_ROLE_COOKIE_KEY) === USER_ROLE_ADMIN_DEEL;
+  const [userIdEC] = useState(() => Cookies.get(USER_ID_COOKIE_KEY));
   const [userDetail, setUserDetail] = useState({
-    full_name: '',
-    company_name: '',
-    department: '',
-    job_title: '',
-    email: '',
-    phone_number: '',
-    post_code: '',
-    address: '',
-    url: '',
+    full_name: EMPTY_VALUE,
+    company_name: EMPTY_VALUE,
+    department: EMPTY_VALUE,
+    job_title: EMPTY_VALUE,
+    email: EMPTY_VALUE,
+    phone_number: EMPTY_VALUE,
+    post_code: EMPTY_VALUE,
+    address: EMPTY_VALUE,
+    url: EMPTY_VALUE,
   });
   const [clientId, setClientId] = useState(null);
-  const [language, setLanguage] = useState('');
-  const [division, setDivision] = useState('');
-  const [replySmtpGmail, setReplySmtpGmail] = useState('');
-  const [replySmtpGmailAppPassword, setReplySmtpGmailAppPassword] = useState('');
+  const [language, setLanguage] = useState(EMPTY_VALUE);
+  const [division, setDivision] = useState(EMPTY_VALUE);
+  const [replySmtpGmail, setReplySmtpGmail] = useState(EMPTY_VALUE);
+  const [replySmtpGmailAppPassword, setReplySmtpGmailAppPassword] = useState(EMPTY_VALUE);
   const [hasReplySmtpPassword, setHasReplySmtpPassword] = useState(false);
-  const [smtpErrors, setSmtpErrors] = useState({ gmail: '', password: '' });
+  const [smtpErrors, setSmtpErrors] = useState({ gmail: EMPTY_VALUE, password: EMPTY_VALUE });
+  const [fieldErrors, setFieldErrors] = useState({});
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    let cancelled = false;
-    api
-      .get(`/api/v1/managements/users/${Cookies.get('user_id')}`)
-      .then((res) => {
-        if (cancelled) return;
-        const user = res.data.data || {};
-        setUserDetail({
-          full_name: user.full_name || '',
-          company_name: user.company_name || '',
-          department: user.department || '',
-          job_title: user.job_title || '',
-          email: user.email || '',
-          phone_number: user.phone_number || '',
-          post_code: user.post_code || '',
-          address: user.address || '',
-          url: user.url || '',
-        });
-        setLanguage(user.language || '');
-        setDivision(user.business_division || '');
-        if (user.client_id) {
-          setClientId(user.client_id);
-          loadClientSmtp(user.client_id, () => cancelled);
-        }
-      })
-      .catch((err) => {
-        if (cancelled) return;
-        console.log(err);
-        if (err.response?.data.code === 0) {
-          tokenExpired();
-        }
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const updateUserField = (key, value) => {
+    setUserDetail((prev) => ({ ...prev, [key]: value }));
+  };
 
-  function loadClientSmtp(id, isCancelled) {
+  const loadClientSmtp = (id, isCancelled) => {
     api
-      .get(`/api/v1/managements/clients/${id}`)
+      .get(`${CLIENTS_PATH}/${id}`)
       .then((res) => {
         if (isCancelled?.()) return;
-        if (res.data.code === 1 || res.data.code === '1') {
+        if (isApiSuccess(res.data.code)) {
           const data = res.data.data;
-          setReplySmtpGmail(data.reply_smtp_gmail || '');
-          setReplySmtpGmailAppPassword('');
+          setReplySmtpGmail(data.reply_smtp_gmail || EMPTY_VALUE);
+          setReplySmtpGmailAppPassword(EMPTY_VALUE);
           setHasReplySmtpPassword(Boolean(data.has_reply_smtp_password));
         }
       })
       .catch((err) => {
         if (isCancelled?.()) return;
-        console.log(err);
         if (err.response?.data.code === 0) {
           tokenExpired();
         }
       });
-  }
+  };
 
-  function updateUserField(key, value) {
-    setUserDetail((prev) => ({ ...prev, [key]: value }));
-  }
+  useEffect(() => {
+    const request = { cancelled: false };
+    api
+      .get(`${USERS_PATH}/${Cookies.get(USER_ID_COOKIE_KEY)}`)
+      .then((res) => {
+        if (request.cancelled) return;
+        const user = res.data.data || {};
+        setUserDetail({
+          full_name: user.full_name || EMPTY_VALUE,
+          company_name: user.company_name || EMPTY_VALUE,
+          department: user.department || EMPTY_VALUE,
+          job_title: user.job_title || EMPTY_VALUE,
+          email: user.email || EMPTY_VALUE,
+          phone_number: user.phone_number || EMPTY_VALUE,
+          post_code: user.post_code || EMPTY_VALUE,
+          address: user.address || EMPTY_VALUE,
+          url: user.url || EMPTY_VALUE,
+        });
+        setLanguage(user.language || EMPTY_VALUE);
+        setDivision(user.business_division || EMPTY_VALUE);
+        if (user.client_id) {
+          setClientId(user.client_id);
+          loadClientSmtp(user.client_id, () => request.cancelled);
+        }
+      })
+      .catch((err) => {
+        if (request.cancelled) return;
+        if (err.response?.data.code === 0) {
+          tokenExpired();
+        }
+      });
+    return () => {
+      request.cancelled = true;
+    };
+  }, []);
 
-  function validateReplySmtp() {
-    const gmail = (replySmtpGmail || '').trim().replace(/＠/g, '@');
-    const password = replySmtpGmailAppPassword || '';
-    const nextErrors = { gmail: '', password: '' };
+  const validateReplySmtp = () => {
+    const gmail = (replySmtpGmail || EMPTY_VALUE).trim().replace(new RegExp(FULL_WIDTH_AT, 'g'), ASCII_AT);
+    const password = replySmtpGmailAppPassword || EMPTY_VALUE;
+    const nextErrors = { gmail: EMPTY_VALUE, password: EMPTY_VALUE };
 
     if (!gmail && !password) {
       setSmtpErrors(nextErrors);
@@ -108,323 +167,334 @@ function BasicSetting() {
     }
 
     if (gmail && !MAIL_FORMAT.test(gmail)) {
-      nextErrors.gmail = 'メールを入力してください(例:abc＠abc.com)';
+      nextErrors.gmail = INVALID_GMAIL_MESSAGE;
       setSmtpErrors(nextErrors);
       return false;
     }
 
     if (gmail && !password && !hasReplySmtpPassword) {
-      nextErrors.password = 'アプリパスワードを入力してください。';
+      nextErrors.password = APP_PASSWORD_REQUIRED_MESSAGE;
       setSmtpErrors(nextErrors);
       return false;
     }
 
     if (!gmail && password) {
-      nextErrors.gmail = 'メール送信用Gmailを入力してください。';
+      nextErrors.gmail = GMAIL_REQUIRED_MESSAGE;
       setSmtpErrors(nextErrors);
       return false;
     }
 
     setSmtpErrors(nextErrors);
     return true;
-  }
+  };
 
-  function showNoti(text, type = 'success') {
+  const showNoti = (text, type = 'success') => {
     if (type === 'warning') {
       message.warning(text);
-    } else {
-      message.success(text);
+      return;
     }
-  }
+    message.success(text);
+  };
 
-  function saveClientSmtp() {
+  const saveClientSmtp = () => {
     if (!clientId) {
       return Promise.resolve({ ok: true });
     }
 
     const clientPayload = {
-      reply_smtp_gmail: (replySmtpGmail || '').trim().replace(/＠/g, '@'),
+      reply_smtp_gmail: (replySmtpGmail || EMPTY_VALUE).trim().replace(new RegExp(FULL_WIDTH_AT, 'g'), ASCII_AT),
     };
     if (replySmtpGmailAppPassword) {
       clientPayload.reply_smtp_gmail_app_password = replySmtpGmailAppPassword;
     }
 
     return api
-      .patch(`/api/v1/managements/clients/${clientId}`, { client: clientPayload })
+      .patch(`${CLIENTS_PATH}/${clientId}`, { client: clientPayload })
       .then((res) => {
-        if (res.data.code === 1) {
+        if (res.data.code === API_SUCCESS_CODE) {
           if (replySmtpGmailAppPassword) {
             setHasReplySmtpPassword(true);
-            setReplySmtpGmailAppPassword('');
+            setReplySmtpGmailAppPassword(EMPTY_VALUE);
           }
           return { ok: true };
         }
-        return { ok: false, message: res.data.message || res.data.data || 'Fail' };
+        return { ok: false, message: res.data.message || res.data.data || FAIL_FALLBACK };
       });
-  }
+  };
 
-  function onSave() {
+  const onSave = () => {
     if (saving) return;
-    utils.checkInput('fullname', 'errFullname', '氏名');
-    utils.checkInput('companyName', 'errCompanyname', '企業名');
-    utils.checkMaxLength('department', 'errDepartment', '部署', 50);
-    utils.checkMaxLength('job_title', 'errPosition', 'Positi役職on', 50);
-    utils.checkEmailRequired('emailAddress', 'errEmailAddress', 'メールアドレス');
-    utils.checkTel('phone_number', 'errPhone', '電話番号');
-    utils.checkInput('address', 'errAddress', '住所');
-    utils.checkUrl('url', 'errUrl', 'URL');
-    if (
-      utils.checkInput('fullname', 'errFullname', '氏名') &&
-      utils.checkInput('companyName', 'errCompanyname', '企業名') &&
-      utils.checkMaxLength('department', 'errDepartment', '企業名', 50) &&
-      utils.checkMaxLength('job_title', 'errPosition', '役職', 50) &&
-      utils.checkEmailRequired('emailAddress', 'errEmailAddress', 'メールアドレス') &&
-      utils.checkTel('phone_number', 'errPhone', '電話番号') &&
-      utils.checkInput('address', 'errAddress', '住所') &&
-      utils.checkUrl('url', 'errUrl', 'URL') &&
-      validateReplySmtp()
-    ) {
-      const update = {
-        user: {
-          full_name: userDetail.full_name,
-          business_division: division,
-          company_name: userDetail.company_name,
-          department: userDetail.department,
-          job_title: userDetail.job_title,
-          email: userDetail.email,
-          phone_number: userDetail.phone_number,
-          post_code: userDetail.post_code,
-          address: userDetail.address,
-          language,
-          url: userDetail.url,
-        },
-      };
-      setSaving(true);
-      api
-        .patch(`/api/v1/managements/users/${userIdEC}`, update)
-        .then((res) => {
-          if (res.data.code === 1) {
-            return saveClientSmtp().then((smtpResult) => {
-              if (smtpResult.ok) {
-                showNoti('正常に更新されました！');
-              } else {
-                showNoti(smtpResult.message || 'メール送信設定の更新に失敗しました', 'warning');
-              }
-            });
-          } else if (res.data.code === 2) {
-            showNoti(res.data.data, 'warning');
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          if (err.response?.data.code === 0) {
-            tokenExpired();
-          }
-        })
-        .finally(() => setSaving(false));
-    }
-  }
+    const nextErrors = {
+      full_name: getInputError(userDetail.full_name, FULL_NAME_LABEL),
+      company_name: getInputError(userDetail.company_name, COMPANY_NAME_LABEL),
+      department: getMaxLengthError(userDetail.department, DEPARTMENT_LABEL, DEFAULT_MAX_LENGTH),
+      job_title: getMaxLengthError(userDetail.job_title, JOB_TITLE_LABEL, DEFAULT_MAX_LENGTH),
+      email: getEmailRequiredError(userDetail.email, EMAIL_LABEL),
+      phone_number: getTelError(userDetail.phone_number, PHONE_LABEL),
+      address: getInputError(userDetail.address, ADDRESS_LABEL),
+      url: getUrlError(userDetail.url, URL_LABEL),
+    };
+    setFieldErrors(nextErrors);
+    const hasFieldError = Object.values(nextErrors).some(Boolean);
+    if (hasFieldError || !validateReplySmtp()) return;
+
+    const update = {
+      user: {
+        full_name: userDetail.full_name,
+        business_division: division,
+        company_name: userDetail.company_name,
+        department: userDetail.department,
+        job_title: userDetail.job_title,
+        email: userDetail.email,
+        phone_number: userDetail.phone_number,
+        post_code: userDetail.post_code,
+        address: userDetail.address,
+        language,
+        url: userDetail.url,
+      },
+    };
+    setSaving(true);
+    api
+      .patch(`${USERS_PATH}/${userIdEC}`, update)
+      .then((res) => {
+        if (res.data.code === API_SUCCESS_CODE) {
+          return saveClientSmtp().then((smtpResult) => {
+            if (smtpResult.ok) {
+              showNoti(UPDATE_SUCCESS_MESSAGE);
+              return;
+            }
+            showNoti(smtpResult.message || SMTP_UPDATE_FAILED, 'warning');
+          });
+        }
+        if (res.data.code === API_WARNING_CODE) {
+          showNoti(res.data.data, 'warning');
+        }
+        return undefined;
+      })
+      .catch((err) => {
+        if (err.response?.data.code === 0) {
+          tokenExpired();
+        }
+      })
+      .finally(() => setSaving(false));
+  };
 
   useAdminHeaderActions(
-    <AdminActionButton action="save" loading={saving} onClick={() => onSave()} />
+    <AdminActionButton action="save" loading={saving} onClick={onSave} />
   );
 
   return (
-    <>
-      <AdminPage>
-        <div className="admin-page-body">
-          <form id="form-basic-setting">
-            <AdminFormRow label="氏名" required htmlFor="fullname">
-              <Input
-                id="fullname"
-                placeholder="必ず入力してください ..."
-                name="full_name"
-                value={userDetail.full_name}
-                onChange={(e) => {
-                  updateUserField('full_name', e.target.value);
-                  utils.checkInput('fullname', 'errFullname', '氏名');
-                }}
-              />
-              <span id="errFullname" className="admin-form-error" />
-            </AdminFormRow>
+    <AdminPage>
+      <div className="admin-page-body">
+        <AdminFormRow label={FULL_NAME_LABEL} required htmlFor="fullname" error={fieldErrors.full_name}>
+          <Input
+            id="fullname"
+            placeholder={REQUIRED_PLACEHOLDER}
+            name="full_name"
+            value={userDetail.full_name}
+            onChange={(e) => {
+              updateUserField('full_name', e.target.value);
+              setFieldErrors((prev) => ({
+                ...prev,
+                full_name: getInputError(e.target.value, FULL_NAME_LABEL),
+              }));
+            }}
+          />
+        </AdminFormRow>
 
-            <AdminFormRow label="事業区分" htmlFor="business_division">
-              <select
-                className="admin-native-select"
-                id="business_division"
-                name="business_division"
-                value={division}
-                onChange={(e) => setDivision(e.target.value)}
-              >
-                <option value="sole_proprietorship">個人事業</option>
-                <option value="corporation">法人</option>
-              </select>
-            </AdminFormRow>
+        <AdminFormRow label={BUSINESS_DIVISION_LABEL} htmlFor="business_division">
+          <select
+            className="admin-native-select"
+            id="business_division"
+            name="business_division"
+            value={division}
+            onChange={(e) => setDivision(e.target.value)}
+          >
+            <option value={SOLE_PROPRIETORSHIP}>{DIVISION_SOLE_LABEL}</option>
+            <option value={CORPORATION}>{DIVISION_CORP_LABEL}</option>
+          </select>
+        </AdminFormRow>
 
-            <AdminFormRow label="企業名" required htmlFor="companyName">
-              <Input
-                id="companyName"
-                placeholder="必ず入力してください ..."
-                name="company_name"
-                value={userDetail.company_name}
-                onChange={(e) => {
-                  updateUserField('company_name', e.target.value);
-                  utils.checkInput('companyName', 'errCompanyname', '企業名');
-                }}
-              />
-              <span id="errCompanyname" className="admin-form-error" />
-            </AdminFormRow>
+        <AdminFormRow label={COMPANY_NAME_LABEL} required htmlFor="companyName" error={fieldErrors.company_name}>
+          <Input
+            id="companyName"
+            placeholder={REQUIRED_PLACEHOLDER}
+            name="company_name"
+            value={userDetail.company_name}
+            onChange={(e) => {
+              updateUserField('company_name', e.target.value);
+              setFieldErrors((prev) => ({
+                ...prev,
+                company_name: getInputError(e.target.value, COMPANY_NAME_LABEL),
+              }));
+            }}
+          />
+        </AdminFormRow>
 
-            <AdminFormRow label="部署" htmlFor="department">
-              <Input
-                id="department"
-                placeholder="必ず入力してください ..."
-                name="department"
-                value={userDetail.department}
-                onChange={(e) => {
-                  updateUserField('department', e.target.value);
-                  utils.checkMaxLength('department', 'errDepartment', '部署', 50);
-                }}
-              />
-              <span id="errDepartment" className="admin-form-error" />
-            </AdminFormRow>
+        <AdminFormRow label={DEPARTMENT_LABEL} htmlFor="department" error={fieldErrors.department}>
+          <Input
+            id="department"
+            placeholder={REQUIRED_PLACEHOLDER}
+            name="department"
+            value={userDetail.department}
+            onChange={(e) => {
+              updateUserField('department', e.target.value);
+              setFieldErrors((prev) => ({
+                ...prev,
+                department: getMaxLengthError(e.target.value, DEPARTMENT_LABEL, DEFAULT_MAX_LENGTH),
+              }));
+            }}
+          />
+        </AdminFormRow>
 
-            <AdminFormRow label="役職" htmlFor="job_title">
-              <Input
-                id="job_title"
-                placeholder="必ず入力してください ..."
-                name="job_title"
-                value={userDetail.job_title}
-                onChange={(e) => {
-                  updateUserField('job_title', e.target.value);
-                  utils.checkMaxLength('job_title', 'errPosition', '役職', 50);
-                }}
-              />
-              <span id="errPosition" className="admin-form-error" />
-            </AdminFormRow>
+        <AdminFormRow label={JOB_TITLE_LABEL} htmlFor="job_title" error={fieldErrors.job_title}>
+          <Input
+            id="job_title"
+            placeholder={REQUIRED_PLACEHOLDER}
+            name="job_title"
+            value={userDetail.job_title}
+            onChange={(e) => {
+              updateUserField('job_title', e.target.value);
+              setFieldErrors((prev) => ({
+                ...prev,
+                job_title: getMaxLengthError(e.target.value, JOB_TITLE_LABEL, DEFAULT_MAX_LENGTH),
+              }));
+            }}
+          />
+        </AdminFormRow>
 
-            <AdminFormRow label="メールアドレス" required={isAdminDeel} htmlFor="emailAddress">
-              <Input
-                id="emailAddress"
-                placeholder="必ず入力してください ..."
-                name="email"
-                value={userDetail.email}
-                onChange={(e) => {
-                  updateUserField('email', e.target.value);
-                  utils.checkEmailRequired('emailAddress', 'errEmailAddress', 'メールアドレス');
-                }}
-                readOnly={!isAdminDeel}
-              />
-              <span id="errEmailAddress" className="admin-form-error" />
-              {!isAdminDeel && (
-                <div className="admin-form-row-hint">
-                  登録したメールアドレスを編集権限がありません。管理者へ連絡してください！
-                </div>
-              )}
-            </AdminFormRow>
-
-            <AdminFormRow label="電話番号" required htmlFor="phone_number">
-              <Input
-                id="phone_number"
-                type="number"
-                placeholder="必ず入力してください ..."
-                name="phone_number"
-                value={userDetail.phone_number}
-                onChange={(e) => {
-                  updateUserField('phone_number', e.target.value);
-                  utils.checkTel('phone_number', 'errPhone', '電話番号');
-                }}
-              />
-              <span id="errPhone" className="admin-form-error" />
-            </AdminFormRow>
-
-            <AdminFormRow label="郵便番号" htmlFor="post_code">
-              <Input
-                id="post_code"
-                type="number"
-                placeholder="必ず入力してください ..."
-                name="post_code"
-                value={userDetail.post_code}
-                onChange={(e) => updateUserField('post_code', e.target.value)}
-              />
-              <span id="errPostCost" className="admin-form-error" />
-            </AdminFormRow>
-
-            <AdminFormRow label="住所" required htmlFor="address">
-              <Input
-                id="address"
-                placeholder="必ず入力してください ..."
-                name="address"
-                value={userDetail.address}
-                onChange={(e) => {
-                  updateUserField('address', e.target.value);
-                  utils.checkInput('address', 'errAddress', '住所');
-                }}
-              />
-              <span id="errAddress" className="admin-form-error" />
-            </AdminFormRow>
-
-            <AdminFormRow label="言語" htmlFor="language">
-              <select
-                className="admin-native-select"
-                id="language"
-                name="language"
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-              >
-                <option value="japanese">日本</option>
-                <option value="english">英語</option>
-                <option value="vietnamese">ベトナム語</option>
-                <option value="chinese">中国人</option>
-              </select>
-            </AdminFormRow>
-
-            <AdminFormRow label="URL" htmlFor="url">
-              <Input
-                id="url"
-                placeholder="必ず入力してください ..."
-                name="url"
-                value={userDetail.url}
-                onChange={(e) => {
-                  updateUserField('url', e.target.value);
-                  utils.checkUrl('url', 'errUrl', 'URL');
-                }}
-              />
-              <span id="errUrl" className="admin-form-error" />
-            </AdminFormRow>
-          </form>
-
-          {clientId && (
-            <>
-              <AdminFormRow label="メール送信用Gmail" htmlFor="replySmtpGmail" error={smtpErrors.gmail}>
-                <Input
-                  id="replySmtpGmail"
-                  placeholder="example@gmail.com"
-                  value={replySmtpGmail}
-                  onChange={(e) => setReplySmtpGmail(e.target.value)}
-                  autoComplete="off"
-                />
-              </AdminFormRow>
-              <AdminFormRow
-                label="メール送信用アプリパスワード"
-                htmlFor="replySmtpGmailAppPassword"
-                hint="Gmailの2段階認証で発行したアプリパスワードを入力してください"
-                error={smtpErrors.password}
-              >
-                <Input.Password
-                  id="replySmtpGmailAppPassword"
-                  placeholder={hasReplySmtpPassword ? '設定済み（変更する場合のみ入力）' : ''}
-                  value={replySmtpGmailAppPassword}
-                  onChange={(e) => setReplySmtpGmailAppPassword(e.target.value)}
-                  autoComplete="new-password"
-                />
-              </AdminFormRow>
-            </>
+        <AdminFormRow
+          label={EMAIL_LABEL}
+          required={isAdminDeel}
+          htmlFor="emailAddress"
+          error={fieldErrors.email}
+        >
+          <Input
+            id="emailAddress"
+            placeholder={REQUIRED_PLACEHOLDER}
+            name="email"
+            value={userDetail.email}
+            onChange={(e) => {
+              updateUserField('email', e.target.value);
+              setFieldErrors((prev) => ({
+                ...prev,
+                email: getEmailRequiredError(e.target.value, EMAIL_LABEL),
+              }));
+            }}
+            readOnly={!isAdminDeel}
+          />
+          {!isAdminDeel && (
+            <div className="admin-form-row-hint">
+              {EMAIL_READONLY_HINT}
+            </div>
           )}
-        </div>
-      </AdminPage>
-    </>
+        </AdminFormRow>
+
+        <AdminFormRow label={PHONE_LABEL} required htmlFor="phone_number" error={fieldErrors.phone_number}>
+          <Input
+            id="phone_number"
+            type="number"
+            placeholder={REQUIRED_PLACEHOLDER}
+            name="phone_number"
+            value={userDetail.phone_number}
+            onChange={(e) => {
+              updateUserField('phone_number', e.target.value);
+              setFieldErrors((prev) => ({
+                ...prev,
+                phone_number: getTelError(e.target.value, PHONE_LABEL),
+              }));
+            }}
+          />
+        </AdminFormRow>
+
+        <AdminFormRow label={POST_CODE_LABEL} htmlFor="post_code">
+          <Input
+            id="post_code"
+            type="number"
+            placeholder={REQUIRED_PLACEHOLDER}
+            name="post_code"
+            value={userDetail.post_code}
+            onChange={(e) => updateUserField('post_code', e.target.value)}
+          />
+        </AdminFormRow>
+
+        <AdminFormRow label={ADDRESS_LABEL} required htmlFor="address" error={fieldErrors.address}>
+          <Input
+            id="address"
+            placeholder={REQUIRED_PLACEHOLDER}
+            name="address"
+            value={userDetail.address}
+            onChange={(e) => {
+              updateUserField('address', e.target.value);
+              setFieldErrors((prev) => ({
+                ...prev,
+                address: getInputError(e.target.value, ADDRESS_LABEL),
+              }));
+            }}
+          />
+        </AdminFormRow>
+
+        <AdminFormRow label={LANGUAGE_LABEL} htmlFor="language">
+          <select
+            className="admin-native-select"
+            id="language"
+            name="language"
+            value={language}
+            onChange={(e) => setLanguage(e.target.value)}
+          >
+            <option value={LANGUAGE_JAPANESE}>{LANGUAGE_JA_LABEL}</option>
+            <option value={LANGUAGE_ENGLISH}>{LANGUAGE_EN_LABEL}</option>
+            <option value={LANGUAGE_VIETNAMESE}>{LANGUAGE_VI_LABEL}</option>
+            <option value={LANGUAGE_CHINESE}>{LANGUAGE_ZH_LABEL}</option>
+          </select>
+        </AdminFormRow>
+
+        <AdminFormRow label={URL_LABEL} htmlFor="url" error={fieldErrors.url}>
+          <Input
+            id="url"
+            placeholder={REQUIRED_PLACEHOLDER}
+            name="url"
+            value={userDetail.url}
+            onChange={(e) => {
+              updateUserField('url', e.target.value);
+              setFieldErrors((prev) => ({
+                ...prev,
+                url: getUrlError(e.target.value, URL_LABEL),
+              }));
+            }}
+          />
+        </AdminFormRow>
+
+        {clientId && (
+          <>
+            <AdminFormRow label={SMTP_GMAIL_LABEL} htmlFor="replySmtpGmail" error={smtpErrors.gmail}>
+              <Input
+                id="replySmtpGmail"
+                placeholder={SMTP_GMAIL_PLACEHOLDER}
+                value={replySmtpGmail}
+                onChange={(e) => setReplySmtpGmail(e.target.value)}
+                autoComplete="off"
+              />
+            </AdminFormRow>
+            <AdminFormRow
+              label={SMTP_PASSWORD_LABEL}
+              htmlFor="replySmtpGmailAppPassword"
+              hint={SMTP_PASSWORD_HINT}
+              error={smtpErrors.password}
+            >
+              <Input.Password
+                id="replySmtpGmailAppPassword"
+                placeholder={hasReplySmtpPassword ? SMTP_PASSWORD_SET_PLACEHOLDER : EMPTY_VALUE}
+                value={replySmtpGmailAppPassword}
+                onChange={(e) => setReplySmtpGmailAppPassword(e.target.value)}
+                autoComplete="new-password"
+              />
+            </AdminFormRow>
+          </>
+        )}
+      </div>
+    </AdminPage>
   );
-}
+};
 
 export default BasicSetting;

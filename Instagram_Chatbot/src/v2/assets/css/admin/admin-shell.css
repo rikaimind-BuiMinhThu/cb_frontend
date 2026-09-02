@@ -925,3 +925,38 @@
   margin-right: 0;
   flex-shrink: 0;
 }
+
+.bot-demo-title {
+  margin-bottom: 16px;
+}
+
+.bot-demo-toggle {
+  margin-bottom: 24px;
+}
+
+.bot-demo-preview--closed .sp-container1 {
+  height: 0;
+}
+
+.bot-demo-preview--closed .sp-process-bar,
+.bot-demo-preview--closed .sp-body {
+  display: none;
+}
+
+.bot-demo-preview--closed .sp-header {
+  position: absolute;
+  bottom: 13px;
+}
+
+.bot-demo-preview--open .sp-container1 {
+  height: 620px;
+}
+
+.bot-demo-preview--open .sp-header {
+  position: static;
+}
+
+.bot-demo-preview--open .sp-process-bar,
+.bot-demo-preview--open .sp-body {
+  display: block;
+}

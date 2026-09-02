@@ -7,81 +7,87 @@ import { Select, Radio, Row, Col, Calendar as AntdCalendar } from "antd";
 import pickerLocaleJaJP from "antd/es/date-picker/locale/ja_JP";
 import { withJaShortWeekDays } from "v2/utils/ensureMomentJaSundayFirstWeek";
 
-export function isCalendarPreviewRelativeOn(calendar) {
+export const isCalendarPreviewRelativeOn = (calendar) => {
   const v = calendar?.preview_relative_range_enabled;
   return v === true || v === 1 || v === "true" || v === "1";
-}
+};
 
 const JST = "Asia/Tokyo";
+const MAX_CLOSED_BUMP_DAYS = 366;
+const DEFAULT_DELIVERY_CUT_OFF = "14:00";
+const DELIVERY_CUT_OFF_NONE = "__delivery_cut_off_none__";
+const AGG_FROM_KEY = "aggregation_target_period_from";
+const AGG_TO_KEY = "aggregation_target_period_to";
 
-export function getEffectivePreviewClosedWeekdays(calendar) {
+export const getEffectivePreviewClosedWeekdays = (calendar) => {
   const arr = calendar?.preview_closed_weekdays;
   return Array.isArray(arr) ? [...arr] : [];
-}
+};
 
-function isCalendarPreviewDaysSplitEnabled(calendar) {
+const isCalendarPreviewDaysSplitEnabled = (calendar) => {
   const v = calendar?.preview_days_split_enabled;
   return v === true || v === 1 || v === "true" || v === "1";
-}
+};
 
-function advanceBusinessDaysJst(fromDay, businessDays, closed) {
-  let d = fromDay.clone().startOf("day");
+const skipClosedWeekdays = (day, closed) => {
+  if (!closed.length || !closed.includes(day.day())) return day;
+  return skipClosedWeekdays(day.clone().add(1, "day"), closed);
+};
+
+const advanceBusinessDaysJst = (fromDay, businessDays, closed) => {
   const m = Number.isFinite(businessDays) && businessDays > 0 ? Math.floor(businessDays) : 0;
-  for (let i = 0; i < m; i += 1) {
-    d = d.clone().add(1, "day");
-    while (closed.length > 0 && closed.includes(d.day())) {
-      d = d.clone().add(1, "day");
-    }
-  }
-  return d;
-}
+  const step = (day, remaining) => {
+    if (remaining <= 0) return day;
+    return step(skipClosedWeekdays(day.clone().add(1, "day"), closed), remaining - 1);
+  };
+  return step(fromDay.clone().startOf("day"), m);
+};
 
-function addCalendarDaysJst(fromDay, calendarDays) {
+const addCalendarDaysJst = (fromDay, calendarDays) => {
   const n = Number.isFinite(calendarDays) && calendarDays > 0 ? Math.floor(calendarDays) : 0;
   return fromDay.clone().startOf("day").add(n, "days");
-}
+};
 
-function bumpEffStartPastAnyClosedWeekday(effStart, closed) {
+const bumpEffStartPastAnyClosedWeekday = (effStart, closed) => {
   if (!closed || !closed.length) return effStart.clone().startOf("day");
-  let d = effStart.clone().startOf("day");
-  for (let i = 0; i < 366; i += 1) {
-    if (!closed.includes(d.day())) break;
-    d = d.clone().add(1, "day");
-  }
-  return d;
-}
+  const step = (day, remaining) => {
+    if (remaining <= 0 || !closed.includes(day.day())) return day;
+    return step(day.clone().add(1, "day"), remaining - 1);
+  };
+  return step(effStart.clone().startOf("day"), MAX_CLOSED_BUMP_DAYS);
+};
 
-function bumpPreviewAnchorPastClosedTodayOrTomorrow(cursor, closed) {
+const bumpPreviewAnchorPastClosedTodayOrTomorrow = (cursor, closed) => {
   if (!closed || !closed.length) return cursor.clone().startOf("day");
-  let d = cursor.clone().startOf("day");
-  for (let i = 0; i < 366; i += 1) {
-    const next = d.clone().add(1, "day");
-    const curClosed = closed.includes(d.day());
+  const step = (day, remaining) => {
+    if (remaining <= 0) return day;
+    const next = day.clone().add(1, "day");
+    const curClosed = closed.includes(day.day());
     const nextClosed = closed.includes(next.day());
-    if (!curClosed && !nextClosed) break;
-    d = d.clone().add(1, "day");
-  }
-  return d;
-}
+    if (!curClosed && !nextClosed) return day;
+    return step(day.clone().add(1, "day"), remaining - 1);
+  };
+  return step(cursor.clone().startOf("day"), MAX_CLOSED_BUMP_DAYS);
+};
 
-function clampDayToCfgRange(d, cfgStart, cfgEnd, cfgStartOk, cfgEndOk) {
-  let x = d.clone().startOf("day");
-  if (cfgStartOk && x.isBefore(cfgStart)) x = cfgStart.clone();
-  if (cfgEndOk && x.isAfter(cfgEnd)) x = cfgEnd.clone();
-  return x;
-}
+const clampDayToCfgRange = (d, cfgStart, cfgEnd, cfgStartOk, cfgEndOk) => {
+  const started = d.clone().startOf("day");
+  const afterStart = cfgStartOk && started.isBefore(cfgStart) ? cfgStart.clone() : started;
+  return cfgEndOk && afterStart.isAfter(cfgEnd) ? cfgEnd.clone() : afterStart;
+};
 
-function clampEffStartToCfgThenBumpClosed(effStart, closed, cfgStart, cfgEnd, cfgStartOk, cfgEndOk) {
-  let d = effStart.clone().startOf("day");
-  if (cfgStartOk && d.isBefore(cfgStart)) d = cfgStart.clone();
-  if (cfgEndOk && d.isAfter(cfgEnd)) d = cfgEnd.clone();
-  d = bumpEffStartPastAnyClosedWeekday(d, closed);
-  if (cfgStartOk && d.isBefore(cfgStart)) d = cfgStart.clone();
-  if (cfgEndOk && d.isAfter(cfgEnd)) d = cfgEnd.clone();
-  return d;
-}
+const clampEffStartToCfgThenBumpClosed = (effStart, closed, cfgStart, cfgEnd, cfgStartOk, cfgEndOk) => {
+  const clamped = clampDayToCfgRange(effStart, cfgStart, cfgEnd, cfgStartOk, cfgEndOk);
+  return clampDayToCfgRange(
+    bumpEffStartPastAnyClosedWeekday(clamped, closed),
+    cfgStart,
+    cfgEnd,
+    cfgStartOk,
+    cfgEndOk,
+  );
+};
 
-function resolvePreviewRelativeEffStartNonSplit(cursor, closed, daysFromToday, cfgStart, cfgEnd, cfgStartOk, cfgEndOk) {
+const resolvePreviewRelativeEffStartNonSplit = (cursor, closed, daysFromToday, cfgStart, cfgEnd, cfgStartOk, cfgEndOk) => {
   const c0 = cursor.clone().startOf("day");
   const bumpedCursor = bumpEffStartPastAnyClosedWeekday(c0, closed);
   const spanDays = bumpedCursor.diff(c0, "days");
@@ -102,14 +108,12 @@ function resolvePreviewRelativeEffStartNonSplit(cursor, closed, daysFromToday, c
         ? pathA
         : pathB;
   return clampEffStartToCfgThenBumpClosed(pick, closed, cfgStart, cfgEnd, cfgStartOk, cfgEndOk);
-}
+};
 
-function shouldShiftPreviewMinOffsetAfterCutOffJst(calendar) {
-  let t = calendar?.preview_delivery_cut_off_time;
-  if (t === "" || t === "__delivery_cut_off_none__") return false;
-  if (t === undefined || t === null) {
-    t = "14:00";
-  }
+const shouldShiftPreviewMinOffsetAfterCutOffJst = (calendar) => {
+  const rawTime = calendar?.preview_delivery_cut_off_time;
+  if (rawTime === "" || rawTime === DELIVERY_CUT_OFF_NONE) return false;
+  const t = rawTime === undefined || rawTime === null ? DEFAULT_DELIVERY_CUT_OFF : rawTime;
   if (typeof t !== "string" || !t.trim()) return false;
   const m = t.trim().match(/^(\d{1,2}):(\d{2})$/);
   if (!m) return false;
@@ -134,23 +138,23 @@ function shouldShiftPreviewMinOffsetAfterCutOffJst(calendar) {
     .second(0)
     .millisecond(0);
   return now.isAfter(cutoff);
-}
+};
 
-function getCalendarPreviewDayZeroJst() {
+const getCalendarPreviewDayZeroJst = () => {
   return moment.tz(JST).clone().startOf("day");
-}
+};
 
-function isJstTodayOrTomorrowCalendarDay(current) {
+const isJstTodayOrTomorrowCalendarDay = (current) => {
   const ymd = moment.tz(current, JST).format("YYYY-MM-DD");
   const z0 = getCalendarPreviewDayZeroJst();
   const z1 = z0.clone().add(1, "day");
   return ymd === z0.format("YYYY-MM-DD") || ymd === z1.format("YYYY-MM-DD");
-}
+};
 
-function nonSelectWeekdayJst(current) {
+const nonSelectWeekdayJst = (current) => {
   const ymd = moment.tz(current, JST).format("YYYY-MM-DD");
   return moment.tz(ymd, "YYYY-MM-DD", JST).day();
-}
+};
 
 const NON_SELECT_WEEKDAY_KANJI = {
   日: "day",
@@ -162,36 +166,36 @@ const NON_SELECT_WEEKDAY_KANJI = {
   土: "soil",
 };
 
-function calendarNonSelectTypeKey(type) {
+const calendarNonSelectTypeKey = (type) => {
   if (type == null) return "";
-  let raw = "";
-  if (typeof type === "object" && type !== null) {
-    if ("key" in type && type.key != null && type.key !== "") raw = String(type.key);
-    else if ("value" in type && type.value != null && type.value !== "") raw = String(type.value);
-  } else {
-    raw = String(type);
-  }
-  raw = raw.trim();
+  const fromObject = typeof type === "object" && type !== null
+    ? ("key" in type && type.key != null && type.key !== ""
+      ? String(type.key)
+      : ("value" in type && type.value != null && type.value !== ""
+        ? String(type.value)
+        : ""))
+    : String(type);
+  const raw = fromObject.trim();
   if (NON_SELECT_WEEKDAY_KANJI[raw]) return NON_SELECT_WEEKDAY_KANJI[raw];
   return raw.toLowerCase();
-}
+};
 
-function getCalendarNonSelectList(cal) {
+const getCalendarNonSelectList = (cal) => {
   const x = cal?.non_select_date_time;
   if (x == null || x === "") return [];
   return Array.isArray(x) ? x : [x];
-}
+};
 
-export function shouldDisablePreviewClosedWeekdayAtJstTodayOrTomorrow(current, calendar) {
+export const shouldDisablePreviewClosedWeekdayAtJstTodayOrTomorrow = (current, calendar) => {
   if (!calendar || !isCalendarPreviewRelativeOn(calendar)) return false;
   const closed = getEffectivePreviewClosedWeekdays(calendar);
   if (!closed.length) return false;
   if (!isJstTodayOrTomorrowCalendarDay(current)) return false;
   const cur = moment.tz(current, JST).startOf("day");
   return closed.includes(cur.day());
-}
+};
 
-function previewCalendarDateFullCellRenderHideLimboDayAfterCutoffShift(value, calendar, mergedPreviewCalendar) {
+const previewCalendarDateFullCellRenderHideLimboDayAfterCutoffShift = (value, calendar, mergedPreviewCalendar) => {
   if (!value || !isCalendarPreviewRelativeOn(calendar)) return null;
   if (!shouldShiftPreviewMinOffsetAfterCutOffJst(calendar)) return null;
   const merged = mergedPreviewCalendar || mergeCalendarForPreviewRelativeRange(calendar);
@@ -205,9 +209,9 @@ function previewCalendarDateFullCellRenderHideLimboDayAfterCutoffShift(value, ca
     return <div className="calendar-hidden-cell" aria-hidden />;
   }
   return null;
-}
+};
 
-export function mergeCalendarForPreviewRelativeRange(calendar) {
+export const mergeCalendarForPreviewRelativeRange = (calendar) => {
   if (!calendar || !isCalendarPreviewRelativeOn(calendar)) return calendar;
 
   const d0 = Number(calendar.preview_days_from_today);
@@ -231,79 +235,72 @@ export function mergeCalendarForPreviewRelativeRange(calendar) {
 
   const dayZero = getCalendarPreviewDayZeroJst();
   const closed = getEffectivePreviewClosedWeekdays(calendar);
+  const cutoffShiftedDay = (day) => (
+    shouldShiftPreviewMinOffsetAfterCutOffJst(calendar)
+      ? day.clone().add(1, "day")
+      : day.clone()
+  );
 
-  let effStart;
-  if (isCalendarPreviewDaysSplitEnabled(calendar)) {
-    const b = Number(calendar.preview_business_days);
-    const c = Number(calendar.preview_calendar_days);
-    const biz = Number.isFinite(b) && b > 0 ? Math.floor(b) : 0;
-    const cal = Number.isFinite(c) && c > 0 ? Math.floor(c) : 0;
-    if (biz === 0 && cal === 0) {
-      let cursor = dayZero.clone();
-      if (shouldShiftPreviewMinOffsetAfterCutOffJst(calendar)) {
-        cursor = cursor.clone().add(1, "day");
-      }
-      effStart = resolvePreviewRelativeEffStartNonSplit(
-        cursor,
+  const computeEffStart = () => {
+    if (!isCalendarPreviewDaysSplitEnabled(calendar)) {
+      return resolvePreviewRelativeEffStartNonSplit(
+        cutoffShiftedDay(dayZero),
         closed,
         daysFromToday,
         cfgStart,
         cfgEnd,
         cfgStartOk,
-        cfgEndOk
+        cfgEndOk,
       );
-    } else {
-      effStart = dayZero.clone();
-      if (shouldShiftPreviewMinOffsetAfterCutOffJst(calendar)) {
-        effStart = effStart.clone().add(1, "day");
-      }
-      if (effStart.day() !== 6) {
-        effStart = bumpPreviewAnchorPastClosedTodayOrTomorrow(effStart, closed);
-      }
-      effStart = advanceBusinessDaysJst(effStart, biz, closed);
-      effStart = addCalendarDaysJst(effStart, cal);
-      if (cfgStartOk && effStart.isBefore(cfgStart)) effStart = cfgStart.clone();
-      if (cfgEndOk && effStart.isAfter(cfgEnd)) effStart = cfgEnd.clone();
     }
-  } else {
-    let cursor = dayZero.clone();
-    if (shouldShiftPreviewMinOffsetAfterCutOffJst(calendar)) {
-      cursor = cursor.clone().add(1, "day");
+    const b = Number(calendar.preview_business_days);
+    const c = Number(calendar.preview_calendar_days);
+    const biz = Number.isFinite(b) && b > 0 ? Math.floor(b) : 0;
+    const calDays = Number.isFinite(c) && c > 0 ? Math.floor(c) : 0;
+    if (biz === 0 && calDays === 0) {
+      return resolvePreviewRelativeEffStartNonSplit(
+        cutoffShiftedDay(dayZero),
+        closed,
+        daysFromToday,
+        cfgStart,
+        cfgEnd,
+        cfgStartOk,
+        cfgEndOk,
+      );
     }
-    effStart = resolvePreviewRelativeEffStartNonSplit(
-      cursor,
-      closed,
-      daysFromToday,
-      cfgStart,
-      cfgEnd,
-      cfgStartOk,
-      cfgEndOk
-    );
-  }
+    const afterCutoff = cutoffShiftedDay(dayZero);
+    const afterAnchor = afterCutoff.day() !== 6
+      ? bumpPreviewAnchorPastClosedTodayOrTomorrow(afterCutoff, closed)
+      : afterCutoff;
+    const afterBiz = advanceBusinessDaysJst(afterAnchor, biz, closed);
+    const afterCal = addCalendarDaysJst(afterBiz, calDays);
+    return clampDayToCfgRange(afterCal, cfgStart, cfgEnd, cfgStartOk, cfgEndOk);
+  };
 
-  let effEnd;
-  if (daysFromEnd > 0) {
-    effEnd = dayZero.clone().add(daysFromEnd, "days");
-  } else if (daysFromEnd < 0) {
-    effEnd = effStart.clone().add(daysFromEnd, "days");
-  } else {
-    effEnd = effStart.clone();
-  }
-  if (cfgStartOk && effEnd.isBefore(cfgStart)) effEnd = cfgStart.clone();
-  if (cfgEndOk && effEnd.isAfter(cfgEnd)) effEnd = cfgEnd.clone();
-  if (effStart.isAfter(effEnd)) effEnd = effStart.clone();
+  const computeEffEnd = (start) => {
+    const rawEnd = daysFromEnd > 0
+      ? dayZero.clone().add(daysFromEnd, "days")
+      : daysFromEnd < 0
+        ? start.clone().add(daysFromEnd, "days")
+        : start.clone();
+    const clamped = clampDayToCfgRange(rawEnd, cfgStart, cfgEnd, cfgStartOk, cfgEndOk);
+    return start.isAfter(clamped) ? start.clone() : clamped;
+  };
 
-  const merged = {
-    ...calendar,
+  const effStart = computeEffStart();
+  const effEnd = computeEffEnd(effStart);
+  const calendarWithoutAgg = Object.fromEntries(
+    Object.entries(calendar).filter(([key]) => key !== AGG_FROM_KEY && key !== AGG_TO_KEY),
+  );
+
+  return {
+    ...calendarWithoutAgg,
     start_date: effStart.format("YYYY-MM-DD"),
     end_date: effEnd.format("YYYY-MM-DD"),
   };
-  delete merged.aggregation_target_period_from;
-  delete merged.aggregation_target_period_to;
-  return merged;
-}
+};
 
-export function isCalendarDateOutsideConfiguredRangeJst(current, cal) {
+export const isCalendarDateOutsideConfiguredRangeJst = (current, cal) => {
   if (!cal) return false;
   const startStr = String(cal.start_date ?? "").trim();
   const endStr = String(cal.end_date ?? "").trim();
@@ -313,17 +310,17 @@ export function isCalendarDateOutsideConfiguredRangeJst(current, cal) {
   const maxD = moment.tz(endStr, "YYYY-MM-DD", JST).startOf("day");
   if (!minD.isValid() || !maxD.isValid()) return false;
   return d.isBefore(minD) || d.isAfter(maxD);
-}
+};
 
-function shouldSkipWeekdayNonSelectInPreviewMergedRange(cal, current) {
+const shouldSkipWeekdayNonSelectInPreviewMergedRange = (cal, current) => {
   if (!cal || !isCalendarPreviewRelativeOn(cal)) return false;
   const startStr = String(cal.start_date ?? "").trim();
   const endStr = String(cal.end_date ?? "").trim();
   if (!startStr || !endStr) return false;
   return !isCalendarDateOutsideConfiguredRangeJst(current, cal);
-}
+};
 
-function shouldSkipDayMoonNonSelectUnlessSunMonOnJstTodayOrTomorrow(cal, current) {
+const shouldSkipDayMoonNonSelectUnlessSunMonOnJstTodayOrTomorrow = (cal, current) => {
   const dow = nonSelectWeekdayJst(current);
   if (dow !== 0 && dow !== 1) return true;
   if (!isJstTodayOrTomorrowCalendarDay(current)) return true;
@@ -333,7 +330,7 @@ function shouldSkipDayMoonNonSelectUnlessSunMonOnJstTodayOrTomorrow(cal, current
   if (!startStr || !endStr) return false;
   if (isCalendarDateOutsideConfiguredRangeJst(current, cal)) return true;
   return false;
-}
+};
 
 const Calendar = ({ content, messageIndex, contentIndex, onChangeValue, errors, disabled, locale }) => {
   const mergedJaPickerLocale = React.useMemo(

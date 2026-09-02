@@ -6,6 +6,7 @@ export const NULL_OPTION_VALUE = 'NULL_OPTION';
 export const AWAIT_FILL_TYPE = 'await';
 export const PAYMENT_METHOD_ID_TYPE = 'payment_method_id';
 export const EMPTY_VALUE = '';
+export const BOT_ID_STORAGE_KEY = 'bot_id';
 
 export const CHATBOT_ACTIONS = {
   CLICK_BUTTON: 'clickButton',
@@ -111,6 +112,46 @@ export const MESSAGE_CONTENT_TYPES = {
     UP_TO_MUNICIPALITY: 'up_to_municipality',
     CONSUME_API_RESPONSE: 'comsume_api_response',
   },
+  TEXT_INPUT: 'text_input',
+  TEXT_AREA: 'textarea',
+  RADIO_BUTTON: 'radio_button',
+  CHECKBOX: 'checkbox',
+  PULL_DOWN: 'pull_down',
+  ZIP_CODE_ADDRESS: 'zip_code_address',
+  SHIPPING_ADDRESS: 'shipping_address',
+  PRODUCT_PURCHASE_SELECT_OPTION: 'product_purchase_select_option',
+  CREDIT_CARD_PAYMENT: 'credit_card_payment',
+  CARD_PAYMENT_RADIO_BUTTON: 'card_payment_radio_button',
+};
+
+export const TEXT_INPUT_TYPES = {
+  TEXT: 'text',
+  PHONE_NUMBER: 'phone_number',
+  EMAIL_CONFIRMATION: 'email_confirmation',
+  PASSWORD_CONFIRMATION: 'password_confirmation',
+  EMAIL_ADDRESS: 'email_address',
+  URLS: 'urls',
+  PASSWORD: 'password',
+};
+
+export const AMAZON_STRATEGY_TYPES = {
+  URL_PARAM: 'url_param',
+  DOM_SELECTOR: 'dom_selector',
+  CUSTOM_JS: 'custom_js',
+};
+
+export const AMAZON_MATCH_MODES = {
+  ANY: 'any',
+  ALL: 'all',
+};
+
+export const AMAZON_READY_CONDITION_TYPES = {
+  DOM_VALUE: 'dom_value',
+};
+
+export const LP_RESOLVE_MODES = {
+  DEFAULT: 'DEFAULT',
+  GENERIC: 'GENERIC',
 };
 
 export const WAIT_OPTION_TYPES = {

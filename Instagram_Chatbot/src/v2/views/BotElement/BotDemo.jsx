@@ -1,68 +1,71 @@
 import { useEffect, useState } from 'react';
-import { Button, Card, message } from 'antd';
-import PreviewFukushashiki from './BotSetting/PreviewFukushashiki';
+import { Button, message } from 'antd';
 import Cookies from 'js-cookie';
 import api from 'v2/api/api-management';
-import { AdminPage } from '../../components/AdminShell';
+import { BOT_ID_COOKIE_KEY, SCENARIO_ID_COOKIE_KEY } from 'v2/api/constants';
+import { AdminPage } from 'v2/components/AdminShell';
+import PreviewFukushashiki from './BotSetting/PreviewFukushashiki';
+import {
+  ACTION_CLICK_TITLE,
+  BOT_DEMO_PREVIEW_CLOSED_CLASS,
+  BOT_DEMO_PREVIEW_OPEN_CLASS,
+  CHATBOTS_MANAGEMENT_PATH,
+  EMPTY_SCENARIO_ID,
+  NO_SCENARIO_WARNING,
+  OPEN_CLOSE_BUTTON,
+  OPEN_PREVIEW_DELAY_MS,
+  SCENARIO_SELECTED_SUFFIX,
+} from './botDemoConstants';
 
 const BotDemo = () => {
   const [isChatBoxClick, setIsChatBoxClick] = useState(true);
-  const [scenarioId, setScenarioId] = useState('');
-  const bot_id = Cookies.get('bot_id');
+  const [scenarioId, setScenarioId] = useState(EMPTY_SCENARIO_ID);
+  const botId = Cookies.get(BOT_ID_COOKIE_KEY);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsChatBoxClick(true), 300);
+    const timer = setTimeout(() => setIsChatBoxClick(true), OPEN_PREVIEW_DELAY_MS);
     return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
-    if (!bot_id) return undefined;
-    let cancelled = false;
-    api.get(`/api/v1/managements/chatbots/${bot_id}/get_scenario_selected`).then((response) => {
-      if (cancelled) return;
-      if (response.data.data) {
-        setScenarioId(response.data.data.id);
-        Cookies.set('scenario_id', response.data.data.id);
-      } else {
-        message.warning('シナリオがありません。');
-      }
-    });
+    if (!botId) return undefined;
+    const request = { cancelled: false };
+    api
+      .get(`${CHATBOTS_MANAGEMENT_PATH}/${botId}/${SCENARIO_SELECTED_SUFFIX}`)
+      .then((response) => {
+        if (request.cancelled) return;
+        if (response.data.data) {
+          setScenarioId(response.data.data.id);
+          Cookies.set(SCENARIO_ID_COOKIE_KEY, response.data.data.id);
+          return;
+        }
+        message.warning(NO_SCENARIO_WARNING);
+      });
     return () => {
-      cancelled = true;
+      request.cancelled = true;
     };
-  }, [bot_id]);
+  }, [botId]);
 
-  const handleOpenPreview = (isOpen) => {
-    const container = document.getElementById('sp-container');
-    if (!container) return;
-    if (isOpen) {
-      container.style.height = '620px';
-      document.getElementById('sp-header').style.position = 'static';
-      document.getElementById('sp-process-bar').style.display = 'block';
-      document.getElementById('sp-body').style.display = 'block';
-    } else {
-      container.style.height = '0px';
-      document.getElementById('sp-process-bar').style.display = 'none';
-      document.getElementById('sp-body').style.display = 'none';
-      document.getElementById('sp-header').style.position = 'absolute';
-      document.getElementById('sp-header').style.bottom = '13px';
-    }
-    setIsChatBoxClick(isOpen);
-  };
+  const previewClassName = isChatBoxClick
+    ? BOT_DEMO_PREVIEW_OPEN_CLASS
+    : BOT_DEMO_PREVIEW_CLOSED_CLASS;
 
   return (
-    <AdminPage card={false}>
-      <Card bordered={false} style={{ borderRadius: 8, border: '1px solid #e5e7eb' }}>
-        <div style={{ padding: 24 }}>
-          <h3 style={{ marginBottom: 16 }}>アクションクリック</h3>
-          <Button onClick={() => handleOpenPreview(!isChatBoxClick)} style={{ marginBottom: 24 }}>
-            open-close
-          </Button>
-          {scenarioId && (
-            <PreviewFukushashiki isOpen={isChatBoxClick} onOpenPreview={(isOpen) => handleOpenPreview(isOpen)} />
-          )}
-        </div>
-      </Card>
+    <AdminPage>
+      <div className="admin-page-body">
+        <h3 className="bot-demo-title">{ACTION_CLICK_TITLE}</h3>
+        <Button
+          className="bot-demo-toggle"
+          onClick={() => setIsChatBoxClick(!isChatBoxClick)}
+        >
+          {OPEN_CLOSE_BUTTON}
+        </Button>
+        {scenarioId && (
+          <div className={previewClassName}>
+            <PreviewFukushashiki />
+          </div>
+        )}
+      </div>
     </AdminPage>
   );
 };

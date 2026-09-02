@@ -4,16 +4,7 @@ import {
   formatOpenIframeSize,
   getClosedIframeDimensions,
 } from '../../utils/sdkLayoutUtils.js';
-import {
-  chatbotBottom,
-  chatbotBottomPc,
-  chatbotBottomSp,
-  chatbotH,
-  chatbotRight,
-  chatbotRightPc,
-  chatbotRightSp,
-  chatbotW,
-} from '../state.js';
+import { chatbotLayout } from '../state.js';
 import { mobileCheck } from '../device.js';
 
 const resolveOffsetPx = (primaryValue, fallbackValue, defaultValue = 0) => {
@@ -86,13 +77,13 @@ const resetIframeHorizontalForFullBleed = (iframe) => {
 };
 
 export const getMobileCloseOffsets = () => ({
-  horizontal: resolveHorizontalMarginRule(chatbotRightSp, chatbotRight),
-  bottom: resolveOffsetPx(chatbotBottomSp, chatbotBottom, 0),
+  horizontal: resolveHorizontalMarginRule(chatbotLayout.chatbotRightSp, chatbotLayout.chatbotRight),
+  bottom: resolveOffsetPx(chatbotLayout.chatbotBottomSp, chatbotLayout.chatbotBottom, 0),
 });
 
 export const getDesktopOffsets = () => ({
-  horizontal: resolveHorizontalMarginRule(chatbotRightPc, chatbotRight),
-  bottom: resolveOffsetPx(chatbotBottomPc, chatbotBottom, 0),
+  horizontal: resolveHorizontalMarginRule(chatbotLayout.chatbotRightPc, chatbotLayout.chatbotRight),
+  bottom: resolveOffsetPx(chatbotLayout.chatbotBottomPc, chatbotLayout.chatbotBottom, 0),
 });
 
 export const getUseMobileFullwidth = (messageData) => {
@@ -114,10 +105,10 @@ export const getClosedContentDimensions = (messageData, useMoblieFullwidth) => (
 export const getOpenDimensions = (messageData, isMobileDevice) => (
   computeOpenIframeSize({
     isMobile: isMobileDevice,
-    widthPc: messageData?.widthPc ?? chatbotW,
-    heightPc: messageData?.heightPc ?? chatbotH,
-    widthSp: messageData?.widthSp ?? chatbotW,
-    heightSp: messageData?.heightSp ?? chatbotH,
+    widthPc: messageData?.widthPc ?? chatbotLayout.chatbotW,
+    heightPc: messageData?.heightPc ?? chatbotLayout.chatbotH,
+    widthSp: messageData?.widthSp ?? chatbotLayout.chatbotW,
+    heightSp: messageData?.heightSp ?? chatbotLayout.chatbotH,
   })
 );
 

@@ -19,7 +19,7 @@ const ORDER_COLUMNS = [
   { title: '注文日時', dataIndex: 'orderedAt', key: 'orderedAt', width: 150 },
 ];
 
-function PaymentOrderHistoryTab({
+const PaymentOrderHistoryTab = ({
   startDate,
   endDate,
   dateError,
@@ -30,7 +30,7 @@ function PaymentOrderHistoryTab({
   onDateChange,
   onSearch,
   onSelectClient,
-}) {
+}) => {
   const clientOptions = useMemo(
     () => [
       { value: 'deel', label: 'Deel' },
@@ -100,6 +100,6 @@ function PaymentOrderHistoryTab({
       </div>
     </>
   );
-}
+};
 
 export default PaymentOrderHistoryTab;

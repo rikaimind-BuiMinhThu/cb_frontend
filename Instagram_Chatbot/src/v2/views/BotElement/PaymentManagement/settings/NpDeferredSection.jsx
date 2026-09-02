@@ -1,7 +1,7 @@
 import React from 'react';
 import { AdminFormRow, AdminActionButton } from '../../../../components/AdminShell';
 
-function NpDeferredSection({
+const NpDeferredSection = ({
   noNP,
   setNoNP,
   payment,
@@ -9,7 +9,7 @@ function NpDeferredSection({
   onAdd,
   onDelete,
   onSave,
-}) {
+}) => {
   return (
     <div className="payment-setting-section">
       <h3 className="payment-setting-section-title">NP後払い</h3>
@@ -155,6 +155,6 @@ function NpDeferredSection({
       </div>
     </div>
   );
-}
+};
 
 export default NpDeferredSection;

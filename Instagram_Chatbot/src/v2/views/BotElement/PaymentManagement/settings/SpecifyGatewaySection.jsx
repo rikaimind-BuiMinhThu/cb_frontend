@@ -1,7 +1,7 @@
 import React from 'react';
 import { AdminFormRow, AdminActionButton } from '../../../../components/AdminShell';
 
-function SpecifyGatewaySection({
+const SpecifyGatewaySection = ({
   noCan,
   setNoCan,
   listvar,
@@ -11,7 +11,7 @@ function SpecifyGatewaySection({
   onAdd,
   onDelete,
   onSave,
-}) {
+}) => {
   return (
     <div className="payment-setting-section">
       <h3 className="payment-setting-section-title">決済ゲートウェイ指定</h3>
@@ -116,6 +116,6 @@ function SpecifyGatewaySection({
       </div>
     </div>
   );
-}
+};
 
 export default SpecifyGatewaySection;

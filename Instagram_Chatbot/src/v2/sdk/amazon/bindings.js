@@ -1,6 +1,7 @@
 import {
   AMAZON_SELECTOR_TO_VALUE_PATH,
   FUKUSHIASHIKI_SELECTOR_VALUE_SUFFIX,
+  MESSAGE_CONTENT_TYPES,
 } from '../constants.js';
 
 const ZIP_FIELD_TYPES = [
@@ -212,16 +213,16 @@ const extractProductPurchaseSelectOptionBindings = (content) => buildBindingsFro
 const extractBindingsFromContent = (content) => {
   if (!content?.type) return [];
   switch (content.type) {
-    case 'text_input': return extractTextInputBindings(content);
-    case 'zip_code_address': return extractZipCodeAddressBindings(content);
-    case 'shipping_address': return extractShippingAddressBindings(content);
-    case 'card_payment_radio_button':
-    case 'credit_card_payment': return extractCardPaymentBindings(content);
-    case 'checkbox': return extractCheckboxBindings(content);
-    case 'radio_button': return extractRadioButtonBindings(content);
-    case 'textarea': return extractTextareaBindings(content);
-    case 'pull_down': return extractPullDownBindings(content);
-    case 'product_purchase_select_option': return extractProductPurchaseSelectOptionBindings(content);
+    case MESSAGE_CONTENT_TYPES.TEXT_INPUT: return extractTextInputBindings(content);
+    case MESSAGE_CONTENT_TYPES.ZIP_CODE_ADDRESS: return extractZipCodeAddressBindings(content);
+    case MESSAGE_CONTENT_TYPES.SHIPPING_ADDRESS: return extractShippingAddressBindings(content);
+    case MESSAGE_CONTENT_TYPES.CARD_PAYMENT_RADIO_BUTTON:
+    case MESSAGE_CONTENT_TYPES.CREDIT_CARD_PAYMENT: return extractCardPaymentBindings(content);
+    case MESSAGE_CONTENT_TYPES.CHECKBOX: return extractCheckboxBindings(content);
+    case MESSAGE_CONTENT_TYPES.RADIO_BUTTON: return extractRadioButtonBindings(content);
+    case MESSAGE_CONTENT_TYPES.TEXT_AREA: return extractTextareaBindings(content);
+    case MESSAGE_CONTENT_TYPES.PULL_DOWN: return extractPullDownBindings(content);
+    case MESSAGE_CONTENT_TYPES.PRODUCT_PURCHASE_SELECT_OPTION: return extractProductPurchaseSelectOptionBindings(content);
     default: return [];
   }
 };

@@ -1,7 +1,7 @@
 import React from 'react';
 import { AdminFormRow, AdminActionButton } from '../../../../components/AdminShell';
 
-function ConsumptionTaxSection({
+const ConsumptionTaxSection = ({
   openTax,
   setOpenTax,
   saleTaxRate,
@@ -10,7 +10,7 @@ function ConsumptionTaxSection({
   setCalculateOneYen,
   taxSaving,
   onSave,
-}) {
+}) => {
   return (
     <div className="payment-setting-section">
       <h3 className="payment-setting-section-title">消費税</h3>
@@ -95,6 +95,6 @@ function ConsumptionTaxSection({
       </div>
     </div>
   );
-}
+};
 
 export default ConsumptionTaxSection;

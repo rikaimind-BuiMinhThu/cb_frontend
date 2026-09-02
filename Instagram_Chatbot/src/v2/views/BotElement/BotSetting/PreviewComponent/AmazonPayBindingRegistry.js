@@ -2,6 +2,7 @@ import {
   bindingsFromFieldTypes,
   buildBindingsFromSelectorKey,
 } from './FukushashikiBindingMetaUtils';
+import { MESSAGE_CONTENT_TYPES } from './Constants';
 
 const ZIP_FIELD_TYPES = [
   'post_code',
@@ -212,24 +213,24 @@ export const extractBindingsFromContent = (content) => {
   if (!content?.type) return [];
 
   switch (content.type) {
-    case 'text_input':
+    case MESSAGE_CONTENT_TYPES.TEXT_INPUT:
       return extractTextInputBindings(content);
-    case 'zip_code_address':
+    case MESSAGE_CONTENT_TYPES.ZIP_CODE_ADDRESS:
       return extractZipCodeAddressBindings(content);
-    case 'shipping_address':
+    case MESSAGE_CONTENT_TYPES.SHIPPING_ADDRESS:
       return extractShippingAddressBindings(content);
-    case 'card_payment_radio_button':
-    case 'credit_card_payment':
+    case MESSAGE_CONTENT_TYPES.CARD_PAYMENT_RADIO_BUTTON:
+    case MESSAGE_CONTENT_TYPES.CREDIT_CARD_PAYMENT:
       return extractCardPaymentBindings(content);
-    case 'checkbox':
+    case MESSAGE_CONTENT_TYPES.CHECKBOX:
       return extractCheckboxBindings(content);
-    case 'radio_button':
+    case MESSAGE_CONTENT_TYPES.RADIO_BUTTON:
       return extractRadioButtonBindings(content);
-    case 'textarea':
+    case MESSAGE_CONTENT_TYPES.TEXT_AREA:
       return extractTextareaBindings(content);
-    case 'pull_down':
+    case MESSAGE_CONTENT_TYPES.PULL_DOWN:
       return extractPullDownBindings(content);
-    case 'product_purchase_select_option':
+    case MESSAGE_CONTENT_TYPES.PRODUCT_PURCHASE_SELECT_OPTION:
       return extractProductPurchaseSelectOptionBindings(content);
     default:
       return [];

@@ -5,7 +5,7 @@ import SettlementFeeSection from './settings/SettlementFeeSection';
 import ShippingFeeSection from './settings/ShippingFeeSection';
 import NpDeferredSection from './settings/NpDeferredSection';
 
-function PaymentSettingsTab({
+const PaymentSettingsTab = ({
   openTax,
   setOpenTax,
   saleTaxRate,
@@ -39,7 +39,7 @@ function PaymentSettingsTab({
   onSaveSettlementPaymentGateway,
   onSavePrefecturesTax,
   onSaveNPDeferredPayment,
-}) {
+}) => {
   return (
     <div className="payment-settings-wrap">
       <ConsumptionTaxSection
@@ -92,6 +92,6 @@ function PaymentSettingsTab({
       />
     </div>
   );
-}
+};
 
 export default PaymentSettingsTab;

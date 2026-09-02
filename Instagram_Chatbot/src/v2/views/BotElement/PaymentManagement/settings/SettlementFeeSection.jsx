@@ -1,7 +1,7 @@
 import React from 'react';
 import { AdminFormRow, AdminActionButton } from '../../../../components/AdminShell';
 
-function SettlementFeeSection({
+const SettlementFeeSection = ({
   noPaid,
   setNoPaid,
   listvar,
@@ -10,7 +10,7 @@ function SettlementFeeSection({
   onAdd,
   onDelete,
   onSave,
-}) {
+}) => {
   return (
     <div className="payment-setting-section">
       <h3 className="payment-setting-section-title">決済手数料（税込）</h3>
@@ -113,6 +113,6 @@ function SettlementFeeSection({
       </div>
     </div>
   );
-}
+};
 
 export default SettlementFeeSection;
