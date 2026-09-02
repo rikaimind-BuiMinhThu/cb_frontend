@@ -1,195 +1,215 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Card, CardHeader, CardBody, Row, Col } from 'reactstrap';
 import './../../assets/css/bot/add-bot.css';
+import './../../assets/css/bot/add-bot-management.css';
 import api from 'api/api-management';
-// icons
 import IconManDefault from '../../assets/img/bot-icon/man1_new.png';
-import IconWomenDefault from '../../assets/img/bot-icon/women1_new.png';
-import IconWomen4 from '../../assets/img/bot-icon/women4_new.png';
-import IconWomen5 from '../../assets/img/bot-icon/women5_new.png';
-import IconWomen6 from '../../assets/img/bot-icon/women6_new.png';
-import IconWomen7 from '../../assets/img/bot-icon/women7_new.png';
-import IconWomen8 from '../../assets/img/bot-icon/women8_new.png';
-import IconWomen9 from '../../assets/img/bot-icon/women9_new.png';
-import IconWomen10 from '../../assets/img/bot-icon/women10_new.png';
-import IconWomen11 from '../../assets/img/bot-icon/women11_new.png';
 import ModalNoti from '../../views/Popup/ModalNoti';
 import { Link } from 'react-router-dom';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import Cookies from 'js-cookie';
-import { MDBIcon } from 'mdbreact';
-import {Input} from "antd";
+import DesignTypePicker from './BotSetting/DesignSetting/components/DesignTypePicker';
+import MainColorPicker from './BotSetting/DesignSetting/components/MainColorPicker';
+import { DEFAULT_IMAGES } from './BotSetting/DesignSetting/constants/designChatbotConstants';
+import {
+  convertImageToDataUrl,
+  isTempImage,
+  resolveMainColorKey,
+} from './BotSetting/DesignSetting/utils/designChatbotUtils';
 
-const colors = [
-  '#327AED',
-  '#26B197',
-  '#fC7E02',
-  '#F6CA21',
-  '#F16FAA',
-  '#8C66D9',
-  '#7C8290',
-  '#D8E2EF',
-];
-const images = [
-  IconManDefault,
-  IconWomenDefault,
-  IconWomen4,
-  IconWomen5,
-  IconWomen6,
-  IconWomen7,
-  IconWomen8,
-  IconWomen9,
-  IconWomen10,
-  IconWomen11,
-];
+// Maps click/upload/remove `type` to an independent preset slot.
+// Each type updates only its own Message / Opening / Closing index.
+const PRESET_INDEX_BY_ICON_TYPE = {
+  bot: 'bot',
+  bot_image: 'bot',
+  opening: 'opening',
+  opening_bot_icon: 'opening',
+  closing: 'closing',
+  closing_bot_icon: 'closing',
+};
+
+const resolvePreviewIcon = (...candidates) => candidates.find(Boolean) || '';
+
+// Add Bot V2 local icon group. Not DesignBotIcons — avoids loading DesignBotIcons.css
+// into the AddBotchat module graph (that CSS reordered cascade on Design Settings).
+function AddBotIconGroup({
+  label,
+  iconUrl,
+  activeIndex,
+  images,
+  onPresetClick,
+  onUpload,
+  onRemove,
+  inputId,
+}) {
+  return (
+    <div className="add-bot-icon-section">
+      <span className="add-bot-icon-label">{label}</span>
+      <div className="add-bot-icon-preview-row">
+        <div className="add-bot-icon-preview">
+          {iconUrl ? (
+            <div className="add-bot-icon-preview-image">
+              <img src={iconUrl} alt="" />
+              <div className="add-bot-icon-clear" onClick={onRemove}>
+                <span>×</span>
+              </div>
+            </div>
+          ) : (
+            <div className="add-bot-icon-placeholder">
+              <span>アイコンを選択</span>
+            </div>
+          )}
+        </div>
+        <div className="add-bot-icon-selection">
+          <div className="add-bot-icon-grid">
+            {images.map((icon, index) => (
+              <div
+                key={`${inputId}-${index}`}
+                className={`add-bot-icon-item${activeIndex === index ? ' is-active' : ''}`}
+                onClick={() => onPresetClick(index, icon)}
+              >
+                <img src={icon} alt="" />
+              </div>
+            ))}
+          </div>
+          <div className="add-bot-icon-upload">
+            <span>+</span>
+            <input
+              type="file"
+              id={inputId}
+              name={inputId}
+              className="add-bot-icon-file"
+              accept="image/png, image/jpeg"
+              onChange={onUpload}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function AddBotchat() {
-  // states
-  // const [scenario, setScenario] = useState('');
-  // const [urlExistForm, setUrlExistForm] = useState('');
   const [mainColor, setMainColor] = useState('#327AED');
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
   const [designType, setDesignType] = useState('flat');
+  // Message icon → chatbot.icon. Keep existing Add Bot V2 default.
+  // Independent from openingBotIcon and closingBotIcon.
   const [botImage, setBotImage] = useState(IconManDefault);
+  // Opening bot icon → chatbot.opening_bot_icon. Independent from the other two.
+  const [openingBotIcon, setOpeningBotIcon] = useState('');
+  // Closing bot icon → chatbot.closing_bot_icon. Independent from the other two.
+  const [closingBotIcon, setClosingBotIcon] = useState('');
+  // Preset highlight per group. bot: 0 matches IconManDefault.
+  const [iconPresetIndices, setIconPresetIndices] = useState({
+    bot: 0,
+    opening: null,
+    closing: null,
+  });
   const [botName, setBotName] = useState('');
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [msgNoti, setMsgNoti] = useState('');
-  const [isOpenPreview, setIsOpenPreview] = useState(false);
-console.log();
-  // side effects
-  useEffect(() => {
-    document.querySelector('.main-colors .color.color-0').classList.add('active');
-    document.querySelector('.icons .icon.icon-0').classList.add('active');
+
+  const setPresetIndexForType = useCallback((type, index) => {
+    const presetKey = PRESET_INDEX_BY_ICON_TYPE[type];
+    if (!presetKey) return;
+    setIconPresetIndices((prev) => ({ ...prev, [presetKey]: index }));
   }, []);
 
-  // design type: handle click
-  const designTypeClick = (e) => {
-    let value = ''
-    if (e.target.innerText == 'ポップ') {
-      value = 'pop'
-    } else if (e.target.innerText == 'フラット') {
-      value = 'flat'
-    } else if (e.target.innerText == 'マテリアル') {
-      value = 'material'
-    }
-    setDesignType(value);
-    const typeActive = document.querySelector('.design-types .type.active');
-    typeActive.classList.remove('active');
-    if (e.target.localName !== 'div') {
-      e.target.offsetParent.classList.add('active');
-    } else {
-      e.target.classList.add('active');
+  // Writes exactly one of the three independent icon states.
+  const setBotIconByType = useCallback((type, url) => {
+    const methodMap = {
+      bot: setBotImage,
+      opening: setOpeningBotIcon,
+      closing: setClosingBotIcon,
+      bot_image: setBotImage,
+      opening_bot_icon: setOpeningBotIcon,
+      closing_bot_icon: setClosingBotIcon,
+    };
+    methodMap[type]?.(url);
+  }, []);
+
+  const hideIconError = () => {
+    const errorEl = document.querySelector('.add-bot-management .error-message.bot-image');
+    if (errorEl) errorEl.style.display = 'none';
+  };
+
+  const showIconError = (message) => {
+    const errorEl = document.querySelector('.add-bot-management .error-message.bot-image');
+    if (!errorEl) return;
+    errorEl.innerHTML = message;
+    errorEl.style.display = 'block';
+  };
+
+  // Convert preset to data URL and update only the targeted Message / Opening / Closing state.
+  const handleIconClickForType = async (index, imageDefault, type) => {
+    setPresetIndexForType(type, index);
+    try {
+      const dataUrl = await convertImageToDataUrl(imageDefault);
+      setBotIconByType(type, dataUrl);
+      hideIconError();
+    } catch {
+      setPresetIndexForType(type, null);
+      setMsgNoti('アイコンの読み込みに失敗しました。');
+      setIsOpenNoti(true);
     }
   };
 
-  // color: handle click
-  const handleColorClick = (index, color) => {
-    if (color) {
-      setMainColor(color);
-    } else {
-      const customColor = document.querySelector('#custom-color')
-      customColor.click()
-    }
-    document.querySelector('.main-colors .color.active').classList.remove('active');
-    document.querySelector(`.main-colors .color.color-${index}`).classList.add('active');
+  const handleRemoveImage = (type) => () => {
+    setBotIconByType(type, null);
+    setPresetIndexForType(type, null);
   };
 
-  // icon: handle click
-  const handleIconClick = (index, imageDefault) => {
-    document.querySelector('.icons .icon.active').classList.remove('active');
-    document.querySelector(`.icons .icon.icon-${index}`).classList.add('active');
-    // console.log('imageDefault: ', imageDefault);
+  // Custom "+" upload for one icon group only (Message / Opening / Closing).
+  const handleIconUpload = (iconType) => (e) => {
+    const file = e.target.files[0];
+    e.target.value = null;
 
-    // console.log('imageDefault: ', imageDefault);
-    if (!imageDefault.includes('image/png;base64')) {
-      toDataURL(imageDefault)
-        .then(dataUrl => {
-          console.log('RESULT:',)
-          // setDefaultIcon(dataUrl)
-          setBotImage(dataUrl)
-        })
-    } else {
-      setBotImage(imageDefault);
-    }
-
-  };
-
-  // get base url image add
-  const getBaseUrlAdd = () => {
-    const file = document.getElementById('bot_image')?.files[0];
     if (file?.type === 'image/png' || file?.type === 'image/jpeg' || file?.type === 'image/jpg') {
-      let reader = new FileReader();
-      let baseString;
-      reader.onloadend = function () {
-        baseString = reader.result;
-        setBotImage(baseString);
-        if (baseString !== undefined || baseString !== '') {
-          document.querySelector('.error-message.bot-image').style.display = 'none';
-        }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setBotIconByType(iconType, reader.result);
+        setPresetIndexForType(iconType, null);
+        hideIconError();
       };
       reader.readAsDataURL(file);
       return true;
-    } else {
-      setBotImage('');
-      document.querySelector('.error-message.bot-image').innerHTML = '画像を選択してください。';
-      document.querySelector('.error-message.bot-image').style.display = 'block';
-      return false;
     }
+
+    setBotIconByType(iconType, '');
+    setPresetIndexForType(iconType, null);
+    showIconError('画像を選択してください。');
+    return false;
   };
 
-  const [defaultIcon, setDefaultIcon] = useState('')
-
-  const toDataURL = url => fetch(url)
-    .then(response => response.blob())
-    .then(blob => new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onloadend = () => resolve(reader.result)
-      reader.onerror = reject
-      reader.readAsDataURL(blob)
-    }))
-
-
-  // add new bot chat
   const addNewBotChat = () => {
     if (title && subtitle && botName) {
-      let iconBot = '';
-      if (botImage === '') {
-        iconBot = IconManDefault;
-      } else {
-        iconBot = botImage;
-      }
-      let main_color = {
-        blue: '#327AED',
-        green: '#26B197',
-        orange: '#fC7E02',
-        yellow: '#F6CA21',
-        pink: '#F16FAA',
-        purple: '#8C66D9',
-        black: '#7C8290',
-        white: '#D8E2EF',
-      };
-      let color;
-      Object.entries(main_color).forEach(([key, val]) => {
-        if (mainColor === val) {
-          color = key;
-        }
-      });
+      // Message icon → chatbot.icon. Keep IconManDefault when the field is empty after remove.
+      const iconBot = botImage === '' || botImage == null ? IconManDefault : botImage;
+      const { main_color, main_color_other } = resolveMainColorKey(mainColor);
 
-      let bot = {
+      const bot = {
         chatbot: {
           title: title,
           subtitle: subtitle,
           design_type: designType,
-          // main_color: color,
-          // main_color: mainColor,
           icon: iconBot,
           bot_name: botName,
         },
       };
 
-      if (color) bot.chatbot.main_color = color
-      else bot.chatbot.main_color_other = mainColor
+      if (main_color) bot.chatbot.main_color = main_color;
+      else bot.chatbot.main_color_other = main_color_other;
+
+      // Opening bot icon → chatbot.opening_bot_icon. CREATE only; no remove_* flags.
+      if (isTempImage(openingBotIcon)) {
+        bot.chatbot.opening_bot_icon = openingBotIcon;
+      }
+      // Closing bot icon → chatbot.closing_bot_icon. Independent of the other two.
+      if (isTempImage(closingBotIcon)) {
+        bot.chatbot.closing_bot_icon = closingBotIcon;
+      }
 
       api
         .post(`api/v1/managements/chatbots`, bot)
@@ -202,7 +222,7 @@ console.log();
             setTimeout(() => {
               setMsgNoti('');
               setIsOpenNoti(false);
-              
+
               window.location.href = '/v2/admin/scenario-list';
             }, 1500);
           } else if (res.data?.code === 2 || res.data?.code === '2') {
@@ -218,67 +238,31 @@ console.log();
         });
     } else {
       if (!title) {
-        document.querySelector('.error-message.title').innerHTML =
+        document.querySelector('.add-bot-management .error-message.title').innerHTML =
           'タイトルは、必ず指定してください。';
-        document.querySelector('.error-message.title').style.display = 'block';
+        document.querySelector('.add-bot-management .error-message.title').style.display = 'block';
       }
       if (!subtitle) {
-        document.querySelector('.error-message.subtile').innerHTML =
+        document.querySelector('.add-bot-management .error-message.subtile').innerHTML =
           'サブタイトルは、必ず指定ください。';
-        document.querySelector('.error-message.subtile').style.display = 'block';
+        document.querySelector('.add-bot-management .error-message.subtile').style.display = 'block';
       }
       if (!botName) {
-        document.querySelector('.error-message.bot-name').innerHTML =
+        document.querySelector('.add-bot-management .error-message.bot-name').innerHTML =
           'ボット名は、必ず指定してください。';
-        document.querySelector('.error-message.bot-name').style.display = 'block';
+        document.querySelector('.add-bot-management .error-message.bot-name').style.display = 'block';
       }
     }
   };
 
-  // handle preview
-  const handlePreview = () => {
-    if (title && subtitle) {
-      document.getElementById('sp-container').style.height = '620px';
-      document.getElementById('sp-header').style.position = 'static';
-      document.getElementById('sp-header').style.borderBottomLeftRadius = '0px';
-      document.getElementById('sp-header').style.borderBottomRightRadius = '0px';
-      document.getElementById('sp-body').style.display = 'block';
-      setIsOpenPreview(true);
-    } else {
-      if (!title) {
-        document.querySelector('.error-message.title').innerHTML =
-          'タイトルは、必ず指定してください。';
-        document.querySelector('.error-message.title').style.display = 'block';
-      }
-      if (!subtitle) {
-        document.querySelector('.error-message.subtile').innerHTML =
-          'サブタイトルは、必ず指定ください。';
-        document.querySelector('.error-message.subtile').style.display = 'block';
-      }
-    }
-  };
-
-  // handle toggle preview
-  const handleTogglePreview = () => {
-    if (document.getElementById('sp-body').style.display === 'none') {
-      document.getElementById('sp-container').style.height = '620px';
-      document.getElementById('sp-header').style.position = 'static';
-      document.getElementById('sp-header').style.borderBottomLeftRadius = '0px';
-      document.getElementById('sp-header').style.borderBottomRightRadius = '0px';
-      document.getElementById('sp-body').style.display = 'block';
-    } else {
-      document.getElementById('sp-container').style.height = '0px';
-      document.getElementById('sp-body').style.display = 'none';
-      document.getElementById('sp-header').style.borderBottomLeftRadius = '25px';
-      document.getElementById('sp-header').style.borderBottomRightRadius = '25px';
-      document.getElementById('sp-header').style.position = 'absolute';
-      document.getElementById('sp-header').style.bottom = '13px';
-    }
-  };
+  // Preview fallbacks match Design Settings display rules, without importing its preview CSS.
+  const openingPreviewIcon = resolvePreviewIcon(openingBotIcon, botImage);
+  const closingPreviewIcon = resolvePreviewIcon(closingBotIcon, openingBotIcon, botImage);
+  const messagePreviewIcon = resolvePreviewIcon(botImage, openingBotIcon, closingBotIcon);
 
   return (
     <>
-      <div className="content">
+      <div className="content add-bot-management">
         <Row id="screenAll">
           <Col md="12">
             <Card>
@@ -301,7 +285,9 @@ console.log();
                             placeholder="サービス名など（例：BOTCHAN）"
                             onChange={(e) => {
                               setTitle(e.target.value);
-                              document.querySelector('.error-message.title').style.display = 'none';
+                              document.querySelector(
+                                '.add-bot-management .error-message.title',
+                              ).style.display = 'none';
                             }}
                           />
                         </div>
@@ -318,8 +304,9 @@ console.log();
                             placeholder="フォームの目的（例：資料請求フォーム）"
                             onChange={(e) => {
                               setSubtitle(e.target.value);
-                              document.querySelector('.error-message.subtile').style.display =
-                                'none';
+                              document.querySelector(
+                                '.add-bot-management .error-message.subtile',
+                              ).style.display = 'none';
                             }}
                           />
                         </div>
@@ -328,114 +315,80 @@ console.log();
                       <div className="field-add-bot">
                         <div className="add-bot_field-container">
                           <span className="label-field">デザインタイプ</span>
-                          <div className="design-types">
-                            <div className="type" onClick={(e) => designTypeClick(e)}>
-                              <span>ポップ</span>
-                            </div>
-                            <div className="type active" onClick={(e) => designTypeClick(e)}>
-                              <span>フラット</span>
-                            </div>
-                            <div className="type" onClick={(e) => designTypeClick(e)}>
-                              <span>マテリアル</span>
-                            </div>
-                          </div>
+                          <DesignTypePicker
+                            designType={designType}
+                            onChange={setDesignType}
+                          />
                         </div>
                         <span className="error-message design-types"></span>
                       </div>
                       <div className="field-add-bot">
                         <div className="add-bot_field-container">
                           <span className="label-field">メインカラー</span>
-                          <div className="main-colors">
-                            {colors.map((color, index) => (
-                                <div
-                                    key={index}
-                                    className={`color color-${index}`}
-                                    onClick={() => handleColorClick(index, color)}
-                                >
-                                  <span style={{backgroundColor: color}}></span>
-                                </div>
-                            ))}
-
-                            <div
-                                className={`color color-999`}
-                                style={{position: "relative"}}
-                                onClick={() => handleColorClick(999)}
-                            >
-                              <span style={{backgroundColor: mainColor}}></span>
-                              <span style={{position: "absolute", bottom: "-35px", width: "60px"}}>カスタム</span>
-                            </div>
-                            <input id="custom-color" type="color"
-                                   value={mainColor}
-                                   onChange={(e) => {setMainColor(e.target.value)}}
-                                   style={{visibility: "hidden", width: "0px", height: "0px"}}/>
-                          </div>
+                          <MainColorPicker
+                            mainColor={mainColor}
+                            onChange={setMainColor}
+                          />
                         </div>
                         <span className="error-message main-colors"></span>
                       </div>
-                      <div className="btn-wrapper">
-                        <button type="button" className="btn btn-preview" onClick={handlePreview}>
-                          プレビュー
-                        </button>
-                      </div>
-                    </div>
-                    <div className="bot-right">
-                      <div>
-                        <div className="field-add-bot">
-                          <div className="add-bot_field-container">
-                            <span className="label-field">アイコン</span>
-                            <div className="icons">
-                              {images.map((icon, index) => (
-                                <div
-                                  key={index}
-                                  className={`icon icon-${index}`}
-                                  onClick={() => handleIconClick(index, icon)}
-                                >
-                                  <img src={icon} alt="" />
-                                </div>
-                              ))}
-                            </div>
-                            <div className="add-icon">
-                              <span>+</span>
-                              <input
-                                type="file"
-                                id="bot_image"
-                                onChange={getBaseUrlAdd}
-                                name="bot_image"
-                                accept="image/png, image/jpeg"
-                              />
-                            </div>
-                          </div>
-                          <span className="error-message bot-image"></span>
-                        </div>
-                        {botImage && (
-                          <div className="field-add-bot">
-                            <div className="image-show">
-                              <img src={botImage} alt="" />
-                            </div>
-                          </div>
-                        )}
-                        <div className="field-add-bot">
-                          <div className="add-bot_field-container">
-                            <span className="label-field">
-                              ボット名称 <span style={{ color: 'red' }}>*</span>
-                            </span>
-                            <input
-                              type="text"
-                              name="title"
-                              className="input-field"
-                              placeholder="サンプルボット..."
-                              onChange={(e) => {
-                                setBotName(e.target.value);
-                                document.querySelector('.error-message.bot-name').style.display =
-                                  'none';
-                              }}
-                            />
-                          </div>
-                          <span className="subtitle-field">
-                            ※EC-CHAT管理用の名称です。ボット内で表示されることはありません。
+                      <div className="field-add-bot">
+                        <div className="add-bot_field-container">
+                          <span className="label-field">
+                            ボット名称 <span style={{ color: 'red' }}>*</span>
                           </span>
-                          <span className="error-message bot-name"></span>
+                          <input
+                            type="text"
+                            name="botName"
+                            className="input-field"
+                            placeholder="サンプルボット..."
+                            onChange={(e) => {
+                              setBotName(e.target.value);
+                              document.querySelector(
+                                '.add-bot-management .error-message.bot-name',
+                              ).style.display = 'none';
+                            }}
+                          />
                         </div>
+                        <span className="subtitle-field">
+                          ※EC-CHAT管理用の名称です。ボット内で表示されることはありません。
+                        </span>
+                        <span className="error-message bot-name"></span>
+                      </div>
+                      <div className="field-add-bot">
+                        <div className="add-bot-icon-holder">
+                          <AddBotIconGroup
+                            label="メッセージアイコン"
+                            iconUrl={botImage}
+                            activeIndex={iconPresetIndices.bot}
+                            images={DEFAULT_IMAGES}
+                            inputId="add-bot-message-icon"
+                            onPresetClick={(index, icon) => handleIconClickForType(index, icon, 'bot')}
+                            onUpload={handleIconUpload('bot_image')}
+                            onRemove={handleRemoveImage('bot_image')}
+                          />
+                          <AddBotIconGroup
+                            label="開く時のボットアイコン"
+                            iconUrl={openingBotIcon}
+                            activeIndex={iconPresetIndices.opening}
+                            images={DEFAULT_IMAGES}
+                            inputId="add-bot-opening-icon"
+                            onPresetClick={(index, icon) => handleIconClickForType(index, icon, 'opening')}
+                            onUpload={handleIconUpload('opening_bot_icon')}
+                            onRemove={handleRemoveImage('opening_bot_icon')}
+                          />
+                          <AddBotIconGroup
+                            label="閉じる時のボットアイコン"
+                            iconUrl={closingBotIcon}
+                            activeIndex={iconPresetIndices.closing}
+                            images={DEFAULT_IMAGES}
+                            inputId="add-bot-closing-icon"
+                            onPresetClick={(index, icon) => handleIconClickForType(index, icon, 'closing')}
+                            onUpload={handleIconUpload('closing_bot_icon')}
+                            onRemove={handleRemoveImage('closing_bot_icon')}
+                          />
+                        </div>
+                        <span className="error-message bot-image"></span>
                       </div>
                       <div className="btn-wrapper">
                         <Link to={'/v2/admin/bot'}>
@@ -448,46 +401,65 @@ console.log();
                         </button>
                       </div>
                     </div>
+                    <div className="bot-right">
+                      <div className="add-bot-preview">
+                        <div>
+                          <h6 className="add-bot-preview__title">チャットを閉じたとき</h6>
+                          <div className="add-bot-preview__frame add-bot-preview__frame--close">
+                            <div className="add-bot-preview__launcher">
+                              {closingPreviewIcon ? (
+                                <img src={closingPreviewIcon} alt="" />
+                              ) : (
+                                <span className="add-bot-preview__launcher-placeholder">アイコン</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <h6 className="add-bot-preview__title">チャットを開いたとき</h6>
+                          <div className="add-bot-preview__frame add-bot-preview__frame--open">
+                            <div className="add-bot-preview__widget">
+                              <div
+                                className="add-bot-preview__header"
+                                style={{ backgroundColor: mainColor }}
+                              >
+                                <div className="add-bot-preview__header-left">
+                                  <div className="add-bot-preview__header-avatar">
+                                    {openingPreviewIcon ? (
+                                      <img src={openingPreviewIcon} alt="" />
+                                    ) : null}
+                                  </div>
+                                  <div>
+                                    <div className="add-bot-preview__header-subtitle">
+                                      {subtitle || 'サブタイトル'}
+                                    </div>
+                                    <div className="add-bot-preview__header-title">
+                                      {title || 'タイトル'}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="add-bot-preview__body">
+                                <div className="add-bot-preview__message">
+                                  <div className="add-bot-preview__message-avatar">
+                                    {messagePreviewIcon ? (
+                                      <img src={messagePreviewIcon} alt="" />
+                                    ) : null}
+                                  </div>
+                                  <div className="add-bot-preview__message-bubble">メッセージ</div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </form>
               </CardBody>
             </Card>
           </Col>
         </Row>
-        {/* preview */}
-        <div
-          id="sp-container"
-          className="sp-container"
-          style={{ display: !isOpenPreview && 'none' }}
-        >
-          <div
-            id="sp-header"
-            style={{ backgroundColor: mainColor }}
-            className="sp-header"
-            onClick={handleTogglePreview}
-          >
-            <div className="sp-header-left">
-              <div className="sp-header-left-avatar sp-avatar">
-                <img src={botImage} alt="" />
-              </div>
-              <div className="sp-header-left-label">
-                <div className="sp-header-left-label-sub-title">{subtitle}</div>
-                <div className="sp-header-left-label-title">{title}</div>
-              </div>
-            </div>
-            <div className="sp-header-right">
-              <div className="sp-header-right-arrow">
-                {isOpenPreview ? (
-                  <MDBIcon fas icon="chevron-down" />
-                ) : (
-                  <MDBIcon fas icon="chevron-up" />
-                )}
-              </div>
-            </div>
-          </div>
-          <div id="sp-body" className="sp-body"></div>
-        </div>
-        {/* end preview */}
         <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
           <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
             <span style={{ fontSize: '16px' }}>{msgNoti}</span>
@@ -502,4 +474,3 @@ console.log();
 }
 
 export default AddBotchat;
-
