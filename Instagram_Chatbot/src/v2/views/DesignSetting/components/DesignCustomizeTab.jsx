@@ -47,7 +47,6 @@ const DesignCustomizeTab = ({ designSettings, onFieldChange }) => (
 
         <BubbleSettingsSection
           titleBubble={designSettings.titleBubble}
-          popupCloseBot={designSettings.popupCloseBot}
           onChange={onFieldChange}
         />
       </div>
@@ -72,7 +71,6 @@ DesignCustomizeTab.propTypes = {
     rightSpTitle: PropTypes.string,
     rightMarginSp: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     bottomMarginSp: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    popupCloseBot: PropTypes.bool,
     titleBubble: PropTypes.string,
   }).isRequired,
   onFieldChange: PropTypes.func.isRequired,

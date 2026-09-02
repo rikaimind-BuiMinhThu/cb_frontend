@@ -68,6 +68,7 @@ import {
   mapRawDesignSettingsFromExtract,
 } from "v2/views/Preview/PreviewComponent/previewDesignStateUtils";
 import { createPreviewInitialState } from "v2/views/Preview/PreviewComponent/createPreviewInitialState";
+import { isWithdrawalPreventionEnabled } from "v2/views/Preview/PreviewComponent/previewWithdrawalUtils";
 import {
   setConversionParamToLocalStorage, fukushashikiSavedStateToLp, fukushashikiToLP,
   executeLpJsCode, postMessageToParent
@@ -649,7 +650,7 @@ const ScenarioPreviewFukushashiki = ({
 
     if (state.alreadyOpenFirstTime) {
       if (!opening) {
-        if (state.activePopupCloseBot) {
+        if (isWithdrawalPreventionEnabled(state.botInfor?.withdrawal_prevention_status)) {
           return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
         }
 
@@ -678,11 +679,9 @@ const ScenarioPreviewFukushashiki = ({
   const onChatbotHeaderClick = () => {
     if (!state.isOpen) return dispatch({ type: PREVIEW_ACTIONS.OPEN_CHATBOT });
 
-    // When closing chatbot, show popup close bot modal if has setting
-    const openPopupSetting = ["standard_exit_popup", "image_popup"];
-    const isWithDrawalEnabled = state.botInfor && openPopupSetting.includes(state.botInfor.withdrawal_prevention_status);
-
-    if (!isWithDrawalEnabled) return dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
+    if (!isWithdrawalPreventionEnabled(state.botInfor?.withdrawal_prevention_status)) {
+      return dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
+    }
 
     return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
   }

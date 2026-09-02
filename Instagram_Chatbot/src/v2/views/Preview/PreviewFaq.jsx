@@ -54,6 +54,7 @@ import {
   getOpeningBotStyle as buildOpeningBotStyle,
 } from "./PreviewComponent/previewOpeningStyles";
 import { mapParsedDesignToState } from "./PreviewComponent/previewDesignStateUtils";
+import { isWithdrawalPreventionEnabled } from "./PreviewComponent/previewWithdrawalUtils";
 import { createPreviewInitialState } from "./PreviewComponent/createPreviewInitialState";
 import {
   usePreviewConversionOnOpen,
@@ -177,7 +178,7 @@ const PreviewFaq = () => {
     
     if (state.alreadyOpenFirstTime) {
       if (!opening) {
-        if (state.activePopupCloseBot) {
+        if (isWithdrawalPreventionEnabled(state.botInfor?.withdrawal_prevention_status)) {
           return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
         }
         postOpenStateToParent(false);

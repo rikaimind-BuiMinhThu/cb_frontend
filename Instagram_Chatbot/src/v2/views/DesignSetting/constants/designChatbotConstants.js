@@ -210,10 +210,7 @@ export const PLACEHOLDER_BOTTOM_MARGIN = '下マージン';
 
 export const BUBBLE_SECTION_TITLE = 'バブル設定';
 export const LABEL_BUBBLE_TITLE = 'タイトル';
-export const LABEL_POPUP_CLOSE = '離脱防止';
 export const PLACEHOLDER_BUBBLE_TITLE = '簡単90秒で注文完了';
-export const RADIO_DISABLED = '無効';
-export const RADIO_ENABLED = '有効';
 
 export const PRESET_COLOR_CUSTOM_LABEL = 'カスタム';
 export const PRESET_COLOR_INPUT_ID_PREFIX = 'preset-color-';

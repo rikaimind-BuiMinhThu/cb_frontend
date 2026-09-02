@@ -1,6 +1,7 @@
 import { EC_CHATBOT_URL } from "v2/variables/constants";
-import { isMobile } from "./Utils";
 import { resolveIconUrl } from "v2/views/DesignSetting/utils/designChatbotUtils";
+import { isMobile } from "./Utils";
+import { isWithdrawalPreventionEnabled } from "./previewWithdrawalUtils";
 
 /**
  * Relative icon path used by runtime previews (prefixed with EC_CHATBOT_URL by callers).
@@ -76,7 +77,9 @@ export const getOpeningBotStyle = (state, options = {}) => {
       : `${state.rightMarginSp}px`
     : `${state.rightMarginPc}px`;
   const width = mobile ? `${state.widthSp}%` : `${state.widthPc}px`;
-  const hasExitPopup = Boolean(state.activePopupCloseBot);
+  const hasExitPopup = isWithdrawalPreventionEnabled(
+    state.botInfor?.withdrawal_prevention_status,
+  );
   const height = hasExitPopup
     ? (mobile ? `${state.heightSp}%` : `${state.heightPc}px`)
     : (mobile ? `${state.heightSp || 100}%` : `${state.heightPc || 600}px`);

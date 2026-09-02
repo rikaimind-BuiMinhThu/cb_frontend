@@ -47,6 +47,7 @@ import {
   mapRawDesignSettingsFromExtract,
 } from "v2/views/Preview/PreviewComponent/previewDesignStateUtils";
 import { createPreviewInitialState } from "v2/views/Preview/PreviewComponent/createPreviewInitialState";
+import { isWithdrawalPreventionEnabled } from "v2/views/Preview/PreviewComponent/previewWithdrawalUtils";
 import {
   setConversionParamToLocalStorage, postMessageToParent, executeLpJsCode,
 } from "v2/views/Preview/PreviewFukushashiki/LPUtils";
@@ -332,7 +333,7 @@ const ScenarioPreviewFaq = ({
     
     if (state.alreadyOpenFirstTime) {
       if (!opening) {
-        if (state.activePopupCloseBot) {
+        if (isWithdrawalPreventionEnabled(state.botInfor?.withdrawal_prevention_status)) {
           return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
         }
         postOpenStateToParent(false);

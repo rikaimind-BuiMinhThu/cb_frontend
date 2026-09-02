@@ -4,6 +4,11 @@ import "v2/assets/css/bot/preview-chat-bot.css";
 import { Row, Col } from "antd";
 import { Button } from "reactstrap";
 import {isMobile} from "./Utils";
+import {
+  isWithdrawalPreventionEnabled,
+  WITHDRAWAL_STATUS_IMAGE,
+  WITHDRAWAL_STATUS_STANDARD,
+} from "./previewWithdrawalUtils";
 
 const PreventExitChatbotModal = ({ isOpen, onClose, onCloseBot, botConfig }) => {
   const modalClassName = isMobile() ? "ss-bot-prevent-exit-chatbot-modal-sp" : "ss-bot-prevent-exit-chatbot-modal-pc";
@@ -17,7 +22,7 @@ const PreventExitChatbotModal = ({ isOpen, onClose, onCloseBot, botConfig }) => 
 
   if (!isOpen) return null;
 
-  const isPopUpDisPlayed = ["standard_exit_popup", "image_popup"].includes(botInfor?.withdrawal_prevention_status)
+  const isPopUpDisPlayed = isWithdrawalPreventionEnabled(botInfor?.withdrawal_prevention_status)
   if (!isPopUpDisPlayed) return null;
   const {
     withdrawal_prevention_status: preventionStatus,
@@ -26,14 +31,14 @@ const PreventExitChatbotModal = ({ isOpen, onClose, onCloseBot, botConfig }) => 
   } = botInfor;
 
   const renderMessagePopup = () => {
-    if (preventionStatus !== "standard_exit_popup") return null;
+    if (preventionStatus !== WITHDRAWAL_STATUS_STANDARD) return null;
     return (
       <span className="title-bot-modal">本当に閉じますか？</span>
     );
   };
 
   const renderImagePopup = () => {
-    if (preventionStatus !== "image_popup") return null;
+    if (preventionStatus !== WITHDRAWAL_STATUS_IMAGE) return null;
     if (!preventionLinkUrl) {
       return (
         <img
