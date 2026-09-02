@@ -1,8 +1,11 @@
 import React from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
-import { MESSAGE_CONTENT_TYPES } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
+import { EMPTY_INPUT_VALUE, MESSAGE_CONTENT_TYPES, REQUIRED_FIELD_LABEL } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 
-export default function TextArea({ content, disabled, onChangeValue, errors, contentIndex, messageIndex }) {
+const TEXT_AREA_TYPE_TEXT_INPUT = "text_input";
+const TEXT_AREA_TYPE_INVALID_INPUT = "invalid_input";
+
+const TextArea = ({ content, disabled, onChangeValue, errors, contentIndex, messageIndex }) => {
   if (content.type !== MESSAGE_CONTENT_TYPES.TEXT_AREA) return null;
 
   const textarea = content.textarea;
@@ -19,7 +22,7 @@ export default function TextArea({ content, disabled, onChangeValue, errors, con
 
     const requiredLabel = textarea.require && (
       <span className="ss-message__content--user-text-input-required">
-        ※必須
+        {REQUIRED_FIELD_LABEL}
       </span>
     );
 
@@ -34,12 +37,12 @@ export default function TextArea({ content, disabled, onChangeValue, errors, con
   const renderContent = () => {
     const textareaType = textarea?.type;
     if (!textareaType) return null;
-    if (textareaType !== "text_input" && textareaType !== "invalid_input") return null;
-    const textareaValue = textareaType === "invalid_input" ? textarea[textareaType]?.content : textarea[textareaType]?.value;
+    if (textareaType !== TEXT_AREA_TYPE_TEXT_INPUT && textareaType !== TEXT_AREA_TYPE_INVALID_INPUT) return null;
+    const textareaValue = textareaType === TEXT_AREA_TYPE_INVALID_INPUT ? textarea[textareaType]?.content : textarea[textareaType]?.value;
 
     return (
       <textarea
-        disabled={disabled || textareaType === "invalid_input"}
+        disabled={disabled || textareaType === TEXT_AREA_TYPE_INVALID_INPUT}
         className="ss-message__content--user-textarea ss-input-value"
         placeholder={textarea[textareaType]?.content}
         rows={3}
@@ -52,7 +55,7 @@ export default function TextArea({ content, disabled, onChangeValue, errors, con
             "value"
           )
         }
-        value={textareaValue || ""}
+        value={textareaValue || EMPTY_INPUT_VALUE}
       ></textarea>
     );
   };
@@ -74,3 +77,5 @@ export default function TextArea({ content, disabled, onChangeValue, errors, con
     </div>
   );
 };
+
+export default TextArea;

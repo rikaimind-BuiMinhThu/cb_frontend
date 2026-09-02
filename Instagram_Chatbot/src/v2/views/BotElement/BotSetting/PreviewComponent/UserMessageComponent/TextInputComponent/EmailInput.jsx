@@ -6,16 +6,22 @@ import {
   getEmailLocalAndDomainParts,
   normalizeEmailAt,
 } from "../../emailDomainDefaults";
+import { EMPTY_INPUT_VALUE } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 
-export default function EmailInput({
+const KEY_ARROW_DOWN = "ArrowDown";
+const KEY_ARROW_UP = "ArrowUp";
+const KEY_ENTER = "Enter";
+const KEY_ESCAPE = "Escape";
+const FULLWIDTH_AT = "＠";
+
+const EmailInput = ({
   disabled,
   placeholder,
-  value = "",
+  value = EMPTY_INPUT_VALUE,
   onChange,
   domainSuggestion,
   className = "m-b-0",
-  style,
-}) {
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(0);
   const containerRef = useRef(null);
@@ -61,24 +67,24 @@ export default function EmailInput({
   const handleKeyDown = (event) => {
     if (!isOpen || suggestions.length === 0) return;
 
-    if (event.key === "ArrowDown") {
+    if (event.key === KEY_ARROW_DOWN) {
       event.preventDefault();
       setHighlightedIndex((prev) => (prev + 1) % suggestions.length);
-    } else if (event.key === "ArrowUp") {
+    } else if (event.key === KEY_ARROW_UP) {
       event.preventDefault();
       setHighlightedIndex((prev) =>
         prev === 0 ? suggestions.length - 1 : prev - 1
       );
-    } else if (event.key === "Enter") {
+    } else if (event.key === KEY_ENTER) {
       event.preventDefault();
       handleSelectDomain(suggestions[highlightedIndex].domain);
-    } else if (event.key === "Escape") {
+    } else if (event.key === KEY_ESCAPE) {
       setIsOpen(false);
     }
   };
 
   const handleBlur = () => {
-    if (value.includes("＠")) {
+    if (value.includes(FULLWIDTH_AT)) {
       onChange(normalizeEmailAt(value));
     }
   };
@@ -87,14 +93,13 @@ export default function EmailInput({
     <div
       className="ss-email-domain-suggestions"
       ref={containerRef}
-      style={style}
     >
       <InputCustom
         disabled={disabled}
         className={className}
         placeholder={placeholder}
         onChange={handleChange}
-        value={value || ""}
+        value={value || EMPTY_INPUT_VALUE}
         onKeyDown={handleKeyDown}
         onBlur={handleBlur}
         onFocus={() => openSuggestionsIfNeeded(value)}
@@ -125,4 +130,6 @@ export default function EmailInput({
       )}
     </div>
   );
-}
+};
+
+export default EmailInput;

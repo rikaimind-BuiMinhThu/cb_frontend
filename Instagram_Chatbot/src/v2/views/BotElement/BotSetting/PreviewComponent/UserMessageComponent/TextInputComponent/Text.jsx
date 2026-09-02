@@ -1,30 +1,32 @@
 import React from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
-import { MESSAGE_CONTENT_TYPES, RENDER_CHATBOT_CONFIG } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
+import { EMPTY_INPUT_VALUE, MESSAGE_CONTENT_TYPES, RENDER_CHATBOT_CONFIG } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 import InputCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
 import InputDebounce from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputDebounce";
 
-export default function Text({ content, disabled, handleOnChangeJpConvertText, contentIndex, onChangeValue }) {
-  if (!content || content.type !== MESSAGE_CONTENT_TYPES.TEXT_INPUT || content.text_input.type !== "text") return null;
+const TEXT_INPUT_TYPE_TEXT = "text";
+
+const Text = ({ content, disabled, handleOnChangeJpConvertText, contentIndex, onChangeValue }) => {
+  if (!content || content.type !== MESSAGE_CONTENT_TYPES.TEXT_INPUT || content.text_input.type !== TEXT_INPUT_TYPE_TEXT) return null;
   const textInput = content.text_input;
 
   if (textInput.text?.isSplitInput) {
     return (
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
+      <div className="ss-message__split-row">
         <SplitInputText content={content} disabled={disabled} handleOnChangeJpConvertText={handleOnChangeJpConvertText} contentIndex={contentIndex} onChangeValue={onChangeValue} />
       </div>
-    )
+    );
   }
 
   return (
-    <div style={{ display: "flex", justifyContent: "space-between" }}>
+    <div className="ss-message__split-row">
       <SingleInputText content={content} disabled={disabled} handleOnChangeJpConvertText={handleOnChangeJpConvertText} contentIndex={contentIndex} onChangeValue={onChangeValue} />
     </div>
-  )
-}
+  );
+};
 
 const SplitInputText = ({ content, disabled, handleOnChangeJpConvertText, contentIndex, onChangeValue }) => {
-  if (!content || content.type !== MESSAGE_CONTENT_TYPES.TEXT_INPUT || content.text_input.type !== "text") return null;
+  if (!content || content.type !== MESSAGE_CONTENT_TYPES.TEXT_INPUT || content.text_input.type !== TEXT_INPUT_TYPE_TEXT) return null;
   const textInput = content.text_input;
   if (!textInput.text?.isSplitInput) return null;
 
@@ -35,62 +37,64 @@ const SplitInputText = ({ content, disabled, handleOnChangeJpConvertText, conten
           id={content.customId1 || undefined}
           disabled={disabled}
           placeholder={textInput.text?.placeholderLeft}
-          style={{ width: "49%", marginBottom: "0px" }}
+          className="w-49-percent-flush"
           onChange={handleOnChangeJpConvertText(contentIndex, content.type, textInput.type, "valueLeft")}
-          value={textInput[textInput.type]?.valueLeft || ""}
+          value={textInput[textInput.type]?.valueLeft || EMPTY_INPUT_VALUE}
           debounceTime={RENDER_CHATBOT_CONFIG.DEBOUNCE_INPUT_TEXT_JP_CONVERT}
         />
         <InputDebounce
           id={content.customId2 || undefined}
           disabled={disabled}
           placeholder={textInput.text?.placeholderRight}
-          style={{ width: "49%" }}
+          className="w-49-percent"
           onChange={handleOnChangeJpConvertText(contentIndex, content.type, textInput.type, "valueRight")}
-          value={textInput[textInput.type]?.valueRight || ""}
+          value={textInput[textInput.type]?.valueRight || EMPTY_INPUT_VALUE}
           debounceTime={RENDER_CHATBOT_CONFIG.DEBOUNCE_INPUT_TEXT_JP_CONVERT}
         />
       </>
-    )
+    );
   }
 
-  return <>
-    <InputCustom
-      id={content.customId1 || undefined}
-      disabled={disabled}
-      placeholder={textInput.text?.placeholderLeft}
-      style={{ width: "49%", marginBottom: "0px" }}
-      onChange={(value) =>
-        onChangeValue(
-          contentIndex,
-          content.type,
-          value,
-          textInput.type,
-          "valueLeft",
-        )
-      }
-      value={textInput[textInput.type]?.valueLeft || ""}
-    />
-    <InputCustom
-      id={content.customId2 || undefined}
-      disabled={disabled}
-      placeholder={textInput.text?.placeholderRight}
-      style={{ width: "49%" }}
-      onChange={(value) =>
-        onChangeValue(
-          contentIndex,
-          content.type,
-          value,
-          textInput.type,
-          "valueRight"
-        )
-      }
-      value={textInput[textInput.type]?.valueRight || ""}
-    />
-  </>
-}
+  return (
+    <>
+      <InputCustom
+        id={content.customId1 || undefined}
+        disabled={disabled}
+        placeholder={textInput.text?.placeholderLeft}
+        className="w-49-percent-flush"
+        onChange={(value) =>
+          onChangeValue(
+            contentIndex,
+            content.type,
+            value,
+            textInput.type,
+            "valueLeft",
+          )
+        }
+        value={textInput[textInput.type]?.valueLeft || EMPTY_INPUT_VALUE}
+      />
+      <InputCustom
+        id={content.customId2 || undefined}
+        disabled={disabled}
+        placeholder={textInput.text?.placeholderRight}
+        className="w-49-percent"
+        onChange={(value) =>
+          onChangeValue(
+            contentIndex,
+            content.type,
+            value,
+            textInput.type,
+            "valueRight"
+          )
+        }
+        value={textInput[textInput.type]?.valueRight || EMPTY_INPUT_VALUE}
+      />
+    </>
+  );
+};
 
 const SingleInputText = ({ content, disabled, handleOnChangeJpConvertText, contentIndex, onChangeValue }) => {
-  if (!content || content.type !== MESSAGE_CONTENT_TYPES.TEXT_INPUT || content.text_input.type !== "text") return null;
+  if (!content || content.type !== MESSAGE_CONTENT_TYPES.TEXT_INPUT || content.text_input.type !== TEXT_INPUT_TYPE_TEXT) return null;
   const textInput = content.text_input;
   if (textInput.text?.isSplitInput) return null;
 
@@ -101,11 +105,11 @@ const SingleInputText = ({ content, disabled, handleOnChangeJpConvertText, conte
         disabled={disabled}
         placeholder={textInput.text?.placeholderLeft}
         onChange={handleOnChangeJpConvertText(contentIndex, content.type, textInput.type, "value")}
-        style={{ width: "49%", marginBottom: "0px" }}
-        value={textInput[textInput.type]?.value || ""}
+        className="w-49-percent-flush"
+        value={textInput[textInput.type]?.value || EMPTY_INPUT_VALUE}
         debounceTime={RENDER_CHATBOT_CONFIG.DEBOUNCE_INPUT_TEXT_JP_CONVERT}
       />
-    )
+    );
   }
 
   return (
@@ -113,7 +117,7 @@ const SingleInputText = ({ content, disabled, handleOnChangeJpConvertText, conte
       id={content.customId || undefined}
       disabled={disabled}
       placeholder={textInput.text?.placeholderLeft}
-      style={{ width: "49%", marginBottom: "0px" }}
+      className="w-49-percent-flush"
       onChange={(value) =>
         onChangeValue(
           contentIndex,
@@ -123,7 +127,9 @@ const SingleInputText = ({ content, disabled, handleOnChangeJpConvertText, conte
           "value"
         )
       }
-      value={textInput[textInput.type]?.value || ""}
+      value={textInput[textInput.type]?.value || EMPTY_INPUT_VALUE}
     />
-  )
-}
+  );
+};
+
+export default Text;

@@ -2,10 +2,16 @@ import React from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
 import { Button } from "reactstrap";
 import { MDBIcon } from "mdbreact";
-import { MESSAGE_CONTENT_TYPES } from "../Constants";
+import { EMPTY_INPUT_VALUE, MESSAGE_CONTENT_TYPES, REQUIRED_FIELD_LABEL } from "../Constants";
 import InputCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
 
-export default function Attachment({ content, messageIndex, contentIndex, onChangeValue, onChangeErrors, errors, disabled }) {
+const FILE_UPLOAD_INPUT_ID = "ss-bot-file-upload-preview";
+const UNSELECTED_FILE_LABEL = "未選択";
+const SELECT_FILE_BUTTON_LABEL = "ファイルを選択";
+const FILE_SIZE_ERROR_MESSAGE = "ファイルサイズは2MB以下です。";
+const MAX_FILE_SIZE_MB = 2;
+
+const Attachment = ({ content, messageIndex, contentIndex, onChangeValue, onChangeErrors, errors, disabled }) => {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.ATTACHMENT) return null;
 
   const attachingFile = content.attaching_file;
@@ -18,21 +24,21 @@ export default function Attachment({ content, messageIndex, contentIndex, onChan
   };
 
   const clearErrorMessage = () => {
-    onChangeErrors(errorKey, "");
+    onChangeErrors(errorKey, EMPTY_INPUT_VALUE);
   };
 
   const onClickUploadFile = () => {
-    document.getElementById("ss-bot-file-upload-preview").click();
-  }
+    document.getElementById(FILE_UPLOAD_INPUT_ID).click();
+  };
 
   const getBaseUrl = (event, contentIndex) => {
-    var file = event.target.files[0];
+    const file = event.target.files[0];
     const type = file.name.slice(file.name.lastIndexOf(".") + 1);
     if (attachingFile.file_type.length > 0 && !attachingFile.file_type.includes(type.toLowerCase())) {
       return changeErrorMessage(`ファイルには${attachingFile.file_type.join(", ")}タイプのファイルを指定してください。`);
     }
-    if (file.size / 1024 / 1024 >= 2) {
-      return changeErrorMessage("ファイルサイズは2MB以下です。");
+    if (file.size / 1024 / 1024 >= MAX_FILE_SIZE_MB) {
+      return changeErrorMessage(FILE_SIZE_ERROR_MESSAGE);
     }
 
     clearErrorMessage();
@@ -42,11 +48,11 @@ export default function Attachment({ content, messageIndex, contentIndex, onChan
 
   const renderRequireLabel = () => {
     if (!attachingFile.require) return;
-    
+
     return (
       <div className="ss-message__content--user-attaching_file-top">
         <span className="ss-message__content--user-text-input-required">
-          ※必須
+          {REQUIRED_FIELD_LABEL}
         </span>
       </div>
     );
@@ -55,9 +61,9 @@ export default function Attachment({ content, messageIndex, contentIndex, onChan
   const renderAttachmentUploadForm = () => {
     return (
       <div className="ss-message__content--user-attaching_file">
-        <div style={{ position: "relative" }}>
+        <div className="attachment-relative">
           <InputCustom
-            value={attachingFile.value || "未選択"}
+            value={attachingFile.value || UNSELECTED_FILE_LABEL}
             disabled={true}
           />
           <MDBIcon
@@ -66,14 +72,14 @@ export default function Attachment({ content, messageIndex, contentIndex, onChan
             className={`ss-message-custom-icon-times ${disabled && "ss-message-custom-icon-times-disabled"}`}
             onClick={() => {
               if (!disabled) {
-                onChangeValue(contentIndex, content.type, "", "value");
+                onChangeValue(contentIndex, content.type, EMPTY_INPUT_VALUE, "value");
               }
             }}
           />
         </div>
         <input
           type="file"
-          id="ss-bot-file-upload-preview"
+          id={FILE_UPLOAD_INPUT_ID}
           name="bot-file-upload"
           hidden
           onChange={(e) => getBaseUrl(e, contentIndex)}
@@ -84,7 +90,7 @@ export default function Attachment({ content, messageIndex, contentIndex, onChan
           disabled={disabled}
           onClick={onClickUploadFile}
         >
-          ファイルを選択
+          {SELECT_FILE_BUTTON_LABEL}
         </Button>
       </div>
     );
@@ -92,7 +98,7 @@ export default function Attachment({ content, messageIndex, contentIndex, onChan
 
   const renderErrorMessage = () => {
     if (!errors?.[errorKey]) return;
-    
+
     return (
       <div className="validation-error-message">
         {errors?.[errorKey]}
@@ -108,3 +114,5 @@ export default function Attachment({ content, messageIndex, contentIndex, onChan
     </div>
   );
 };
+
+export default Attachment;

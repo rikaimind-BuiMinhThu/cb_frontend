@@ -1,8 +1,8 @@
 import React from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
-import { MESSAGE_CONTENT_TYPES } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
+import { MESSAGE_CONTENT_TYPES, REQUIRED_FIELD_LABEL } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 
-export default function Label({ content }) {
+const Label = ({ content }) => {
   if (content.type !== MESSAGE_CONTENT_TYPES.LABEL) return null;
 
   const label = content.label;
@@ -16,10 +16,12 @@ export default function Label({ content }) {
         </span>
         {label?.require === true && (
           <span className="ss-message__content--user-required">
-            ※必須
+            {REQUIRED_FIELD_LABEL}
           </span>
         )}
       </div>
     </div>
   );
 };
+
+export default Label;

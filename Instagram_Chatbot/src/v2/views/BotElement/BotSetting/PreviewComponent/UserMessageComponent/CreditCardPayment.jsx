@@ -1,7 +1,9 @@
 import React from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
 import {
+  EMPTY_INPUT_VALUE,
   MESSAGE_CONTENT_TYPES,
+  REQUIRED_FIELD_LABEL,
   dataPaymentMethod as cardBrands,
   dataMonth as cardExpiredMonthOptions
 } from "../Constants";
@@ -13,7 +15,14 @@ import { moveToNext } from "v2/views/BotElement/BotSetting/PreviewComponent/Util
 
 import moment from "moment";
 
-export default function CreditCardPayment({ content, messageIndex, contentIndex, onChangeValue, errors, disabled }) {
+const CARD_NUMBER_LABEL = "カード番号";
+const CARD_HOLDER_LABEL = "カード名義";
+const CARD_EXPIRY_LABEL = "有効期限";
+const CARD_CVC_LABEL = "CVC";
+const CVC_PATTERN = /^[0-9]{0,4}$/;
+const EXPIRY_TYPE_YM = "ym";
+
+const CreditCardPayment = ({ content, messageIndex, contentIndex, onChangeValue, errors, disabled }) => {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.CREDIT_CARD_PAYMENT) return null;
 
   const creditCardPayment = content.credit_card_payment;
@@ -37,7 +46,7 @@ export default function CreditCardPayment({ content, messageIndex, contentIndex,
         )}
         {creditCardPayment.require && (
           <span className="ss-message__content--user-text-input-required">
-            ※必須
+            {REQUIRED_FIELD_LABEL}
           </span>
         )}
       </div>
@@ -48,10 +57,10 @@ export default function CreditCardPayment({ content, messageIndex, contentIndex,
     if (creditCardPayment.payment_method.length === 0) return null;
 
     return (
-      <div style={{ display: "flex", justifyContent: "flex-start", margin: "5px 0px" }}>
+      <div className="credit-card-bank-row">
         {creditCardPayment.payment_method.map((itemPayment, index) => {
           return (
-            <div key={index} className="ss-img-list-bank" style={{ width: `${15.6667}%`, marginRight: "1%" }}>
+            <div key={index} className="ss-img-list-bank credit-card-bank-thumb">
               {cardBrands.find((item) => item.key === itemPayment).value}
             </div>
           );
@@ -65,16 +74,15 @@ export default function CreditCardPayment({ content, messageIndex, contentIndex,
       return (
         <div className="ss-user-setting__item-bottom">
           <InputCustom
-            styleLabel={{ width: "100%" }}
+            classLabel="w-100-percent"
             id="sp_credit_card_payment"
-            label="カード番号"
+            label={CARD_NUMBER_LABEL}
             type="number"
             onKeyPress={(e) => {
               if (e.target.value.length >= 16) e.preventDefault();
             }}
             disabled={disabled}
             onPaste={(e) => {
-              // Get the pasted value and remove all white space
               const value = e.clipboardData
                 .getData("text")
                 .replace(/[^0-9]/g, "")
@@ -90,12 +98,9 @@ export default function CreditCardPayment({ content, messageIndex, contentIndex,
                   "card_number"
                 );
               }, 10);
-              // Set the value of the input to the pasted value
-              // return value;
             }}
-            // max={9999999999999999}
-            style={{ width: "100%", marginLeft: "0px" }}
-            value={creditCardPayment.card_number || ""}
+            className="w-100-flush"
+            value={creditCardPayment.card_number || EMPTY_INPUT_VALUE}
             placeholder={creditCardPayment.card_number_placeholder}
             onChange={(value) =>
               onChangeValue(
@@ -112,18 +117,17 @@ export default function CreditCardPayment({ content, messageIndex, contentIndex,
 
     return (
       <div className="ss-user-setting__item-bottom">
-        <div className="w-100-percent">カード番号</div>
+        <div className="w-100-percent">{CARD_NUMBER_LABEL}</div>
         <div
           className="ss-user-setting__item-select-bottom-wrapper-flex ss-user-setting-card-number-separate-type w-100-percent"
         >
           <InputNum
             max={9999}
             controls={false}
-            style={{ marginLeft: "0px" }}
             disabled={disabled}
             maxLength={4}
-            className="ss-user-setting-input-limit-character"
-            value={creditCardPayment.card_number1 || ""}
+            className="ss-user-setting-input-limit-character m-l-0"
+            value={creditCardPayment.card_number1 || EMPTY_INPUT_VALUE}
             placeholder={creditCardPayment.card_number_placeholder1}
             onChange={(value) => {
               onChangeValue(
@@ -141,11 +145,10 @@ export default function CreditCardPayment({ content, messageIndex, contentIndex,
             max={9999}
             id="ss-user-card-number-radio-input2"
             controls={false}
-            style={{ marginLeft: "7px" }}
             disabled={disabled}
             maxLength={4}
-            className="ss-user-setting-input-limit-character"
-            value={creditCardPayment.card_number2 || ""}
+            className="ss-user-setting-input-limit-character m-l-7"
+            value={creditCardPayment.card_number2 || EMPTY_INPUT_VALUE}
             placeholder={creditCardPayment.card_number_placeholder2}
             onChange={(value) => {
               onChangeValue(
@@ -163,11 +166,10 @@ export default function CreditCardPayment({ content, messageIndex, contentIndex,
             id="ss-user-card-number-radio-input3"
             max={9999}
             controls={false}
-            style={{ marginLeft: "7px" }}
             disabled={disabled}
             maxLength={4}
-            className="ss-user-setting-input-limit-character"
-            value={creditCardPayment.card_number3 || ""}
+            className="ss-user-setting-input-limit-character m-l-7"
+            value={creditCardPayment.card_number3 || EMPTY_INPUT_VALUE}
             placeholder={creditCardPayment.card_number_placeholder3}
             onChange={(value) => {
               onChangeValue(
@@ -185,11 +187,10 @@ export default function CreditCardPayment({ content, messageIndex, contentIndex,
             id="ss-user-card-number-radio-input4"
             max={9999}
             controls={false}
-            style={{ marginLeft: "7px" }}
             disabled={disabled}
             maxLength={4}
-            className="ss-user-setting-input-limit-character"
-            value={creditCardPayment.card_number4 || ""}
+            className="ss-user-setting-input-limit-character m-l-7"
+            value={creditCardPayment.card_number4 || EMPTY_INPUT_VALUE}
             placeholder={creditCardPayment.card_number_placeholder4}
             onChange={(value) =>
               onChangeValue(
@@ -211,11 +212,11 @@ export default function CreditCardPayment({ content, messageIndex, contentIndex,
     return (
       <div className="ss-user-setting__item-bottom">
         <InputCustom
-          styleLabel={{ width: "100%" }}
-          label="カード名義"
+          classLabel="w-100-percent"
+          label={CARD_HOLDER_LABEL}
           inline={false}
           disabled={disabled}
-          value={creditCardPayment.card_holder || ""}
+          value={creditCardPayment.card_holder || EMPTY_INPUT_VALUE}
           placeholder={creditCardPayment.card_holder_placeholder}
           onChange={(value) =>
             onChangeValue(
@@ -232,28 +233,28 @@ export default function CreditCardPayment({ content, messageIndex, contentIndex,
 
   const renderExpirationDateYm = () => {
     return (
-      <div style={{ display: "flex", width: "100%" }}>
-        <SelectCustom style={{ width: "33%" }} value={creditCardPayment.year} disabled={disabled} placeholder={creditCardPayment.year_placeholder} data={cardExpiredYearOptions} onChange={(value) => onChangeValue(contentIndex, content.type, value, "year")} />
-        <SelectCustom style={{ width: "33%", marginLeft: "10px" }} value={creditCardPayment.month} placeholder={creditCardPayment.month_placeholder} data={cardExpiredMonthOptions} disabled={disabled} onChange={(value) => onChangeValue(contentIndex, content.type, value, "month")} />
+      <div className="credit-card-expire-row">
+        <SelectCustom className="w-33-percent" value={creditCardPayment.year} disabled={disabled} placeholder={creditCardPayment.year_placeholder} data={cardExpiredYearOptions} onChange={(value) => onChangeValue(contentIndex, content.type, value, "year")} />
+        <SelectCustom className="w-33-percent m-l-10" value={creditCardPayment.month} placeholder={creditCardPayment.month_placeholder} data={cardExpiredMonthOptions} disabled={disabled} onChange={(value) => onChangeValue(contentIndex, content.type, value, "month")} />
       </div>
     );
   };
 
   const renderExpirationDateMy = () => {
     return (
-      <div style={{ display: "flex", width: "100%" }}>
-        <SelectCustom style={{ width: "33%" }} value={creditCardPayment.month} placeholder={creditCardPayment.month_placeholder} data={cardExpiredMonthOptions} disabled={disabled} onChange={(value) => onChangeValue(contentIndex, content.type, value, "month")} />
-        <SelectCustom style={{ width: "33%", marginLeft: "10px" }} value={creditCardPayment.year} disabled={disabled} placeholder={creditCardPayment.year_placeholder} data={cardExpiredYearOptions} onChange={(value) => onChangeValue(contentIndex, content.type, value, "year")} />
+      <div className="credit-card-expire-row">
+        <SelectCustom className="w-33-percent" value={creditCardPayment.month} placeholder={creditCardPayment.month_placeholder} data={cardExpiredMonthOptions} disabled={disabled} onChange={(value) => onChangeValue(contentIndex, content.type, value, "month")} />
+        <SelectCustom className="w-33-percent m-l-10" value={creditCardPayment.year} disabled={disabled} placeholder={creditCardPayment.year_placeholder} data={cardExpiredYearOptions} onChange={(value) => onChangeValue(contentIndex, content.type, value, "year")} />
       </div>
     );
   };
 
   const renderExpirationDate = () => {
-    const expirationForm = creditCardPayment.type_date_of_expiry === "ym" ? renderExpirationDateYm() : renderExpirationDateMy();
+    const expirationForm = creditCardPayment.type_date_of_expiry === EXPIRY_TYPE_YM ? renderExpirationDateYm() : renderExpirationDateMy();
 
     return (
       <div className="ss-user-setting__item-bottom">
-        <div className="w-100-percent">有効期限</div>
+        <div className="w-100-percent">{CARD_EXPIRY_LABEL}</div>
         {expirationForm}
       </div>
     );
@@ -263,19 +264,18 @@ export default function CreditCardPayment({ content, messageIndex, contentIndex,
     if (creditCardPayment.is_hide_cvc) return null;
     const cvcLabel = (
       <span className="f-weight-400">
-        CVC <img className="w-8-percent" src={cvcIcon} alt="" />
+        {CARD_CVC_LABEL} <img className="w-8-percent" src={cvcIcon} alt="" />
       </span>
     );
 
     return (
       <div className="ss-user-setting__item-bottom d-block">
         <InputCustom
-          className="ss-user-setting-input-limit-character"
+          className="ss-user-setting-input-limit-character w-33-percent m-l-0"
           disabled={disabled}
-          style={{ marginLeft: "0px", width: "33%" }}
-          value={creditCardPayment.cvc || ""}
+          value={creditCardPayment.cvc || EMPTY_INPUT_VALUE}
           onChange={(value) => {
-            if (/^[0-9]{0,4}$/.test(value)) {
+            if (CVC_PATTERN.test(value)) {
               onChangeValue(contentIndex, content.type, value, "cvc")
             }
           }}
@@ -310,3 +310,5 @@ export default function CreditCardPayment({ content, messageIndex, contentIndex,
     </div>
   );
 };
+
+export default CreditCardPayment;

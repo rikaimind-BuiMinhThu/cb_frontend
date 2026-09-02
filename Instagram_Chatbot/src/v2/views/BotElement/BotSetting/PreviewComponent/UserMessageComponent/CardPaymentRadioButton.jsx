@@ -1,24 +1,46 @@
 import React from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
-import { MESSAGE_CONTENT_TYPES } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
+import { EMPTY_INPUT_VALUE, MESSAGE_CONTENT_TYPES, REQUIRED_FIELD_LABEL } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 import CommonCreditCardPayment from "./CommonCreditCardPayment";
 import { Radio } from "antd";
 import {
-  getPaymentGroupStyle,
   getPaymentOptionImage,
-  getPaymentOptionStyle,
   normalizePaymentConfig,
 } from "v2/views/BotElement/BotSetting/ScenarioSetting/utils/paymentStyleUtils";
 
-const renderOptionLabel = (itemPayment, isSelected, displayStyle) => {
+const CARD_PAYMENT_TYPES = {
+  DEFAULT: "default",
+  CUSTOMIZED_STYLE: "customized_style",
+  PICTURE_RADIO: "picture_radio",
+};
+const PAYMENT_GROUP_CLASS = {
+  horizontal: "payment-group-row",
+  vertical: "payment-group-column",
+};
+
+const getPaymentOptionVarStyle = (isSelected, displayStyle = {}) => {
+  const backgroundColor = isSelected
+    ? displayStyle.selected_bg_color
+    : displayStyle.unselected_bg_color;
+  const borderColor = isSelected
+    ? displayStyle.selected_border_color
+    : displayStyle.unselected_border_color;
+
+  return {
+    ...(backgroundColor ? { "--payment-option-bg": backgroundColor } : {}),
+    ...(borderColor ? { "--payment-option-border": borderColor } : {}),
+  };
+};
+
+const renderOptionLabel = (itemPayment, isSelected) => {
   const image = getPaymentOptionImage(itemPayment, isSelected);
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+    <span className="preview-inline-center">
       {image && (
         <img
           src={image}
           alt=""
-          style={{ width: '24px', height: '24px', objectFit: 'contain' }}
+          className="preview-icon-24"
         />
       )}
       <span>{itemPayment.text}</span>
@@ -26,12 +48,12 @@ const renderOptionLabel = (itemPayment, isSelected, displayStyle) => {
   );
 };
 
-export default function CardPaymentRadioButton({ content, messageIndex, contentIndex, onChangeValue, errors, disabled }) {
+const CardPaymentRadioButton = ({ content, messageIndex, contentIndex, onChangeValue, errors, disabled }) => {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.CARD_PAYMENT_RADIO_BUTTON) return null;
 
   const cardPaymentRadioButton = content.card_payment_radio_button;
   const { layout, display_style: displayStyle } = normalizePaymentConfig(cardPaymentRadioButton);
-  const groupStyle = getPaymentGroupStyle(layout);
+  const groupClassName = PAYMENT_GROUP_CLASS[layout] || PAYMENT_GROUP_CLASS.vertical;
 
   const renderTitle = () => {
     if (!cardPaymentRadioButton.title_require && !cardPaymentRadioButton.require) return null;
@@ -45,7 +67,7 @@ export default function CardPaymentRadioButton({ content, messageIndex, contentI
         )}
         {cardPaymentRadioButton.require === true && (
           <span className="ss-message__content--user-text-input-required">
-            ※必須
+            {REQUIRED_FIELD_LABEL}
           </span>
         )}
       </div>
@@ -54,11 +76,11 @@ export default function CardPaymentRadioButton({ content, messageIndex, contentI
 
   const renderRadioContent = () => {
     switch (cardPaymentRadioButton.type) {
-      case "default":
+      case CARD_PAYMENT_TYPES.DEFAULT:
         return renderDefaultRadioContent();
-      case "customized_style":
+      case CARD_PAYMENT_TYPES.CUSTOMIZED_STYLE:
         return renderCustomizedStyleRadioContent();
-      case "picture_radio":
+      case CARD_PAYMENT_TYPES.PICTURE_RADIO:
         return renderPictureRadioContent();
       default:
         return null;
@@ -78,7 +100,7 @@ export default function CardPaymentRadioButton({ content, messageIndex, contentI
         key={foundItem.value}
         dangerouslySetInnerHTML={{ __html: foundItem.descriptionContent }}
       />
-    )
+    );
   };
 
   const renderDefaultRadioContent = () => {
@@ -86,7 +108,7 @@ export default function CardPaymentRadioButton({ content, messageIndex, contentI
 
     return (
       <Radio.Group
-        style={{ ...groupStyle, fontSize: "14px" }}
+        className={`${groupClassName} radio-group-font-14`}
         disabled={disabled}
         value={cardPaymentRadioButton.initial_selection}
       >
@@ -98,11 +120,11 @@ export default function CardPaymentRadioButton({ content, messageIndex, contentI
                 <Radio
                   value={itemPayment.value}
                   key={indexPayment}
-                  className="ss-message__content--user-card-payment-radio-content"
-                  style={getPaymentOptionStyle(isSelected, displayStyle)}
+                  className="ss-message__content--user-card-payment-radio-content payment-option"
+                  style={getPaymentOptionVarStyle(isSelected, displayStyle)}
                   onChange={onRadioChange}
                 >
-                  {renderOptionLabel(itemPayment, isSelected, displayStyle)}
+                  {renderOptionLabel(itemPayment, isSelected)}
                 </Radio>
               );
             }
@@ -117,8 +139,7 @@ export default function CardPaymentRadioButton({ content, messageIndex, contentI
 
     return (
       <Radio.Group
-        className="ss-message__content--user-card-payment-radio-container"
-        style={groupStyle}
+        className={`ss-message__content--user-card-payment-radio-container ${groupClassName}`}
         disabled={disabled}
         value={cardPaymentRadioButton.initial_selection}
         buttonStyle="solid"
@@ -131,11 +152,11 @@ export default function CardPaymentRadioButton({ content, messageIndex, contentI
                 <Radio.Button
                   value={itemPayment.value}
                   key={indexPayment}
-                  className="ss-message__content--user-card-payment-radio-customized-style"
-                  style={getPaymentOptionStyle(isSelected, displayStyle)}
+                  className="ss-message__content--user-card-payment-radio-customized-style payment-option"
+                  style={getPaymentOptionVarStyle(isSelected, displayStyle)}
                   onChange={onRadioChange}
                 >
-                  {renderOptionLabel(itemPayment, isSelected, displayStyle)}
+                  {renderOptionLabel(itemPayment, isSelected)}
                 </Radio.Button>
               );
             }
@@ -149,11 +170,10 @@ export default function CardPaymentRadioButton({ content, messageIndex, contentI
 
     return cardPaymentRadioButton.radio_contents_img.map((itemPaymentImg, indexPaymentImg) => {
       return (
-        <div key={indexPaymentImg} style={{ color: "#6789A6" }}>
+        <div key={indexPaymentImg} className="card-payment-img-label">
           <Radio.Group
             disabled={disabled}
-            className="ss-message__content--user-card-payment-radio-group-type-text_image"
-            style={groupStyle}
+            className={`ss-message__content--user-card-payment-radio-group-type-text_image ${groupClassName}`}
             value={cardPaymentRadioButton.initial_selection_picture}
           >
             {itemPaymentImg.contents &&
@@ -173,10 +193,10 @@ export default function CardPaymentRadioButton({ content, messageIndex, contentI
                     <Radio
                       value={optionValue}
                       key={indexPaymentContent}
-                      className="m-r-0"
-                      style={getPaymentOptionStyle(isSelected, displayStyle)}
+                      className="m-r-0 payment-option"
+                      style={getPaymentOptionVarStyle(isSelected, displayStyle)}
                       onChange={() => {
-                        const value = cardPaymentRadioButton.initial_selection_picture !== optionValue ? optionValue : "";
+                        const value = cardPaymentRadioButton.initial_selection_picture !== optionValue ? optionValue : EMPTY_INPUT_VALUE;
                         const isDisplayCardPayment = cardPaymentRadioButton.card_linked_setting_picture === value;
 
                         onChangeValue(
@@ -210,7 +230,7 @@ export default function CardPaymentRadioButton({ content, messageIndex, contentI
 
   const onRadioChange = (e) => {
     const itemPayment = e.target;
-    const value = cardPaymentRadioButton.initial_selection !== itemPayment.value ? itemPayment.value : "";
+    const value = cardPaymentRadioButton.initial_selection !== itemPayment.value ? itemPayment.value : EMPTY_INPUT_VALUE;
     const isDisplayCardPayment = cardPaymentRadioButton.card_linked_setting.includes(value);
 
     onChangeValue(
@@ -229,16 +249,12 @@ export default function CardPaymentRadioButton({ content, messageIndex, contentI
   };
 
   const renderCreditCardPayment = () => {
-    const isPictureRadio = cardPaymentRadioButton.type === "picture_radio";
-    let isSelectLinkedCard = false;
-    
-    if (isPictureRadio) {
-      const {card_linked_setting_picture, initial_selection_picture} = cardPaymentRadioButton;
-      isSelectLinkedCard = !!card_linked_setting_picture && card_linked_setting_picture === initial_selection_picture;
-    } else {
-      const {card_linked_setting, initial_selection} = cardPaymentRadioButton;
-      isSelectLinkedCard = card_linked_setting.length > 0 && card_linked_setting.includes(initial_selection);
-    }
+    const isPictureRadio = cardPaymentRadioButton.type === CARD_PAYMENT_TYPES.PICTURE_RADIO;
+    const isSelectLinkedCard = isPictureRadio
+      ? !!cardPaymentRadioButton.card_linked_setting_picture
+        && cardPaymentRadioButton.card_linked_setting_picture === cardPaymentRadioButton.initial_selection_picture
+      : cardPaymentRadioButton.card_linked_setting.length > 0
+        && cardPaymentRadioButton.card_linked_setting.includes(cardPaymentRadioButton.initial_selection);
 
     if (!isSelectLinkedCard) return null;
 
@@ -274,3 +290,5 @@ export default function CardPaymentRadioButton({ content, messageIndex, contentI
     </div>
   );
 };
+
+export default CardPaymentRadioButton;

@@ -1,12 +1,22 @@
 import React from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
-import { MESSAGE_CONTENT_TYPES } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
+import { EMPTY_INPUT_VALUE, MESSAGE_CONTENT_TYPES, REQUIRED_FIELD_LABEL } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 import InputCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
 import Text from "./TextInputComponent/Text";
 import PhoneNumber from "./TextInputComponent/PhoneNumber";
 import EmailInput from "./TextInputComponent/EmailInput";
 
-export default function TextInput({ content, disabled, handleOnChangeJpConvertText, contentIndex, onChangeValue, errors, messageIndex }) {
+const TEXT_INPUT_TYPES = {
+  TEXT: "text",
+  PHONE_NUMBER: "phone_number",
+  PASSWORD: "password",
+  URLS: "urls",
+  EMAIL_ADDRESS: "email_address",
+  EMAIL_CONFIRMATION: "email_confirmation",
+  PASSWORD_CONFIRMATION: "password_confirmation",
+};
+
+const TextInput = ({ content, disabled, handleOnChangeJpConvertText, contentIndex, onChangeValue, errors, messageIndex }) => {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.TEXT_INPUT) return null;
   const errorKey = `message${messageIndex}_content${contentIndex}_${content.type}_${content.text_input.type}`;
   const textInput = content.text_input;
@@ -21,10 +31,10 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
 
     const requiredLabel = textInput.require && (
       <span className="ss-message__content--user-text-input-required">
-        ※必須
+        {REQUIRED_FIELD_LABEL}
       </span>
     );
-    
+
     return (
       <div className="ss-message__content--user-text-input-top m-b-0">
         {title}
@@ -35,20 +45,20 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
 
   const renderContent = () => {
     switch (textInput.type) {
-      case "text":
+      case TEXT_INPUT_TYPES.TEXT:
         return <Text content={content}
           disabled={disabled}
           handleOnChangeJpConvertText={handleOnChangeJpConvertText}
           contentIndex={contentIndex}
           onChangeValue={onChangeValue}
         />;
-      case "phone_number":
+      case TEXT_INPUT_TYPES.PHONE_NUMBER:
         return <PhoneNumber content={content}
           disabled={disabled}
           contentIndex={contentIndex}
           onChangeValue={onChangeValue}
         />;
-      case "password":
+      case TEXT_INPUT_TYPES.PASSWORD:
         return <>
           <InputCustom
             disabled={disabled}
@@ -64,10 +74,10 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
                 "value"
               )
             }
-            value={textInput[textInput.type]?.value || ""}
+            value={textInput[textInput.type]?.value || EMPTY_INPUT_VALUE}
           />
         </>;
-      case "urls":
+      case TEXT_INPUT_TYPES.URLS:
         return <>
           <InputCustom
             disabled={disabled}
@@ -82,10 +92,10 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
                 "value"
               )
             }
-            value={textInput[textInput.type]?.value || ""}
+            value={textInput[textInput.type]?.value || EMPTY_INPUT_VALUE}
           />
         </>;
-      case "email_address":
+      case TEXT_INPUT_TYPES.EMAIL_ADDRESS:
         return <>
           <EmailInput
             disabled={disabled}
@@ -101,10 +111,10 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
                 "value"
               )
             }
-            value={textInput[textInput.type]?.value || ""}
+            value={textInput[textInput.type]?.value || EMPTY_INPUT_VALUE}
           />
         </>;
-      case "email_confirmation":
+      case TEXT_INPUT_TYPES.EMAIL_CONFIRMATION:
         return <>
           <EmailInput
             className="m-b-5"
@@ -120,7 +130,7 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
                 "value"
               )
             }
-            value={textInput[textInput.type]?.value || ""}
+            value={textInput[textInput.type]?.value || EMPTY_INPUT_VALUE}
           />
           <EmailInput
             disabled={disabled}
@@ -135,10 +145,10 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
                 "valueConfirm"
               )
             }
-            value={textInput[textInput.type]?.valueConfirm || ""}
+            value={textInput[textInput.type]?.valueConfirm || EMPTY_INPUT_VALUE}
           />
         </>;
-      case "password_confirmation":
+      case TEXT_INPUT_TYPES.PASSWORD_CONFIRMATION:
         return <>
           <InputCustom
             className="m-b-5"
@@ -154,7 +164,7 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
                 "value"
               )
             }
-            value={textInput[textInput.type]?.value || ""}
+            value={textInput[textInput.type]?.value || EMPTY_INPUT_VALUE}
           />
           <InputCustom
             disabled={disabled}
@@ -169,7 +179,7 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
                 "valueConfirm"
               )
             }
-            value={textInput[textInput.type]?.valueConfirm || ""}
+            value={textInput[textInput.type]?.valueConfirm || EMPTY_INPUT_VALUE}
           />
         </>;
       default:
@@ -192,5 +202,7 @@ export default function TextInput({ content, disabled, handleOnChangeJpConvertTe
       {renderContent()}
       {renderErrorMessage()}
     </div>
-  )
+  );
 };
+
+export default TextInput;

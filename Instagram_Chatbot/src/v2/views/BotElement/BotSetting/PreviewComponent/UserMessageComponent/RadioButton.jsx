@@ -1,9 +1,8 @@
 import React from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
-import { MESSAGE_CONTENT_TYPES } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
+import { MESSAGE_CONTENT_TYPES, REQUIRED_FIELD_LABEL } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 import {
   getRadioImgGridStyle,
-  getRadioImgOptionStyle,
   getImgGridClassName,
   normalizeRadioButtonImgLayout,
 } from "v2/views/BotElement/BotSetting/ScenarioSetting/utils/radioButtonImgLayoutUtils";
@@ -14,7 +13,16 @@ import {
 } from "v2/views/BotElement/BotSetting/ScenarioSetting/utils/radioButtonSelectionUtils";
 import OptionGender from "./OptionGender";
 
-export default function RadioButton({ content, disabled, onChangeValue, errors, contentIndex, messageIndex, notUseButtonNext, onClickNext }) {
+const RADIO_BUTTON_TYPES = {
+  DEFAULT: "default",
+  RADIO_BUTTON_IMG: "radio_button_img",
+  UPSELL_BUTTON: "upsell_button",
+  CONSUME_API_RESPONSE: "consume_api_response",
+  BLOCK_STYLE: "block_style",
+};
+const PREVIEW_OPTION_PLACEHOLDER_LABEL = "ラベル";
+
+const RadioButton = ({ content, disabled, onChangeValue, errors, contentIndex, messageIndex, notUseButtonNext, onClickNext }) => {
   if (content.type !== MESSAGE_CONTENT_TYPES.RADIO_BUTTON) return null;
 
   const radioButton = content.radio_button;
@@ -29,7 +37,7 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
     );
     const requiredLabel = radioButton.require === true && (
       <span className="ss-message__content--user-text-input-required">
-        ※必須
+        {REQUIRED_FIELD_LABEL}
       </span>
     );
 
@@ -58,10 +66,10 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
 
   const renderDefaultContent = () => {
     if (radioButton.use_as_gender)
-      return <OptionGender 
-        contentIndex={contentIndex} 
-        radioButton={radioButton} 
-        onChangeValue={onChangeValue} 
+      return <OptionGender
+        contentIndex={contentIndex}
+        radioButton={radioButton}
+        onChangeValue={onChangeValue}
         options={radioButton[radioButton.type]}
       />;
 
@@ -70,7 +78,7 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
       const inputId = `ss-message__content--user-radio_button_${messageIndex}_${contentIndex}_${selectionKey}_${index}`;
       const isSelected = isRadioOptionInitiallySelected(radioButton, item);
       return (
-        <div 
+        <div
           key={index}
           data-editor-radio-option={buildEditorRadioOptionDataAttr(contentIndex, item)}
           className={getDefaultOptionClassName(item)}
@@ -127,7 +135,12 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
     return (
       <div
         className={gridClassName}
-        style={gridStyle}
+        style={{
+          '--radio-option-margin': gridStyle['--radio-option-margin'],
+          '--radio-option-padding': gridStyle['--radio-option-padding'],
+          '--scroll-visible-columns': gridStyle['--scroll-visible-columns'],
+          '--preview-grid-columns': gridStyle.gridTemplateColumns,
+        }}
       >
         {items.map((item, index) => {
           const selectionKey = getRadioOptionSelectionKey(item);
@@ -142,7 +155,6 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
                 isSelected ? "ss-message__content--user-radio_button--selected" : "",
                 disabled ? "ss-message__content--user-radio_button--radio_button_img--disabled" : "",
               ].filter(Boolean).join(" ")}
-              style={getRadioImgOptionStyle(radioButton)}
               onClick={() => handleImageOptionSelect(item)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -186,7 +198,7 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
                 checked={false}
               />
               <label htmlFor={inputId}>
-                ラベル
+                {PREVIEW_OPTION_PLACEHOLDER_LABEL}
               </label>
             </div>
           );
@@ -220,15 +232,15 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
 
   const renderContent = () => {
     switch (radioButton.type) {
-      case "default":
+      case RADIO_BUTTON_TYPES.DEFAULT:
         return renderDefaultContent();
-      case "radio_button_img":
+      case RADIO_BUTTON_TYPES.RADIO_BUTTON_IMG:
         return renderRadioButtonImgContent();
-      case "upsell_button":
+      case RADIO_BUTTON_TYPES.UPSELL_BUTTON:
         return renderRadioButtonImgContent();
-      case "consume_api_response":
+      case RADIO_BUTTON_TYPES.CONSUME_API_RESPONSE:
         return renderConsumeApiResponseContent();
-      case "block_style":
+      case RADIO_BUTTON_TYPES.BLOCK_STYLE:
         return renderBlockStyleContent();
       default:
         return null;
@@ -245,7 +257,7 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
   };
 
   return (
-    <div style={{ marginBottom: "10px" }}>
+    <div className="m-b-10">
       {renderTitle()}
       <div className="ss-message__content--user-radio_button-wrapper">
         {renderContent()}
@@ -254,3 +266,5 @@ export default function RadioButton({ content, disabled, onChangeValue, errors, 
     </div>
   );
 };
+
+export default RadioButton;

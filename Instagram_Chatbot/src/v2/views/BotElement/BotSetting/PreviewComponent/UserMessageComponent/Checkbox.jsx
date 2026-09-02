@@ -1,9 +1,8 @@
 import React from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
-import { MESSAGE_CONTENT_TYPES } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
+import { MESSAGE_CONTENT_TYPES, REQUIRED_FIELD_LABEL } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 import {
   getCheckboxImgGridStyle,
-  getCheckboxImgOptionStyle,
   getImgGridClassName,
   normalizeCheckboxImgLayout,
 } from "v2/views/BotElement/BotSetting/ScenarioSetting/utils/radioButtonImgLayoutUtils";
@@ -15,7 +14,14 @@ import {
   isCheckboxOptionChecked,
 } from "v2/views/BotElement/BotSetting/ScenarioSetting/utils/checkboxSelectionUtils";
 
-export default function Checkbox({ content, disabled, onChangeValue, errors, contentIndex, messageIndex }) {
+const CHECKBOX_TYPES = {
+  DEFAULT: "default",
+  CHECKBOX_IMG: "checkbox_img",
+  CONSUME_API_RESPONSE: "consume_api_response",
+};
+const PREVIEW_OPTION_PLACEHOLDER_LABEL = "ラベル";
+
+const Checkbox = ({ content, disabled, onChangeValue, errors, contentIndex, messageIndex }) => {
   if (content.type !== MESSAGE_CONTENT_TYPES.CHECKBOX) return null;
 
   const checkbox = content.checkbox;
@@ -32,7 +38,7 @@ export default function Checkbox({ content, disabled, onChangeValue, errors, con
 
     const requiredLabel = checkbox.require === true && (
       <span className="ss-message__content--user-text-input-required">
-        ※必須
+        {REQUIRED_FIELD_LABEL}
       </span>
     );
 
@@ -108,7 +114,6 @@ export default function Checkbox({ content, disabled, onChangeValue, errors, con
   const renderCheckboxImgContent = () => {
     const layout = normalizeCheckboxImgLayout(checkbox);
     const gridStyle = getCheckboxImgGridStyle(checkbox);
-    const optionStyle = getCheckboxImgOptionStyle(checkbox);
     const gridClassName = getImgGridClassName(
       'ss-message__content--user-checkbox-img-grid',
       layout.type,
@@ -122,7 +127,12 @@ export default function Checkbox({ content, disabled, onChangeValue, errors, con
       >
         <div
           className={gridClassName}
-          style={gridStyle}
+          style={{
+            '--checkbox-option-margin': gridStyle['--checkbox-option-margin'],
+            '--checkbox-option-padding': gridStyle['--checkbox-option-padding'],
+            '--scroll-visible-columns': gridStyle['--scroll-visible-columns'],
+            '--preview-grid-columns': gridStyle.gridTemplateColumns,
+          }}
         >
           {group.contents?.map((contentItem, contentItemIndex) => {
             const compositeKey = getCheckboxImgSelectionKey(group, contentItem);
@@ -137,7 +147,6 @@ export default function Checkbox({ content, disabled, onChangeValue, errors, con
                   isSelected ? "ss-message__content--user-checkbox--selected" : "",
                   disabled ? "ss-message__content--user-checkbox--checkbox_img-item--disabled" : "",
                 ].filter(Boolean).join(" ")}
-                style={optionStyle}
                 onClick={() => {
                   if (disabled) return;
                   handleCheckboxImgChange(group, contentItem);
@@ -188,7 +197,7 @@ export default function Checkbox({ content, disabled, onChangeValue, errors, con
                 disabled={disabled}
               />
               <label htmlFor={inputId}>
-                ラベル
+                {PREVIEW_OPTION_PLACEHOLDER_LABEL}
               </label>
             </div>
           );
@@ -199,11 +208,11 @@ export default function Checkbox({ content, disabled, onChangeValue, errors, con
 
   const renderContent = () => {
     switch (checkbox.type) {
-      case "default":
+      case CHECKBOX_TYPES.DEFAULT:
         return renderDefaultContent();
-      case "checkbox_img":
+      case CHECKBOX_TYPES.CHECKBOX_IMG:
         return renderCheckboxImgContent();
-      case "consume_api_response":
+      case CHECKBOX_TYPES.CONSUME_API_RESPONSE:
         return renderConsumeApiResponseContent();
       default:
         return null;
@@ -220,7 +229,7 @@ export default function Checkbox({ content, disabled, onChangeValue, errors, con
   };
 
   return (
-    <div style={{ marginBottom: "10px" }}>
+    <div className="m-b-10">
       {renderTitle()}
       <div className="ss-message__content--user-checkbox-wrapper">
         {renderContent()}
@@ -228,4 +237,6 @@ export default function Checkbox({ content, disabled, onChangeValue, errors, con
       {renderErrorMessage()}
     </div>
   );
-}
+};
+
+export default Checkbox;

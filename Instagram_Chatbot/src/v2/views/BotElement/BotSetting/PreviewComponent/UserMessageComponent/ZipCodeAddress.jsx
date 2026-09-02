@@ -3,7 +3,7 @@ import "v2/assets/css/bot/preview-chat-bot.css";
 import { MESSAGE_CONTENT_TYPES } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 import CommonAddress from "./CommonAddress";
 
-export default function ZipCodeAddress({ content, prefecturesList, messageIndexRender, messageIndex, contentIndex, messageContent, onChangeValue, onChangeErrors, errors, disabled, onOpen }) {
+const ZipCodeAddress = ({ content, prefecturesList, messageIndexRender, messageIndex, contentIndex, messageContent, onChangeValue, onChangeErrors, errors, disabled, onOpen }) => {
   if (content.type !== MESSAGE_CONTENT_TYPES.ZIP_CODE_ADDRESS) return <></>;
 
   return (
@@ -20,5 +20,7 @@ export default function ZipCodeAddress({ content, prefecturesList, messageIndexR
       disabled={disabled}
       onOpen={onOpen}
     />
-  )
+  );
 };
+
+export default ZipCodeAddress;

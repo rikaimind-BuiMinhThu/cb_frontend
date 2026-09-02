@@ -1,11 +1,13 @@
 import React from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
-import { MESSAGE_CONTENT_TYPES } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
+import { EMPTY_INPUT_VALUE, MESSAGE_CONTENT_TYPES } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 import InputCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
 import { moveToNext } from "v2/views/BotElement/BotSetting/PreviewComponent/Utils";
 
-export default function PhoneNumber({ content, disabled, contentIndex, onChangeValue }) {
-  if (!content || content.type !== MESSAGE_CONTENT_TYPES.TEXT_INPUT || content.text_input.type !== "phone_number") return null;
+const TEXT_INPUT_TYPE_PHONE_NUMBER = "phone_number";
+
+const PhoneNumber = ({ content, disabled, contentIndex, onChangeValue }) => {
+  if (!content || content.type !== MESSAGE_CONTENT_TYPES.TEXT_INPUT || content.text_input.type !== TEXT_INPUT_TYPE_PHONE_NUMBER) return null;
   const textInput = content.text_input;
   const phoneNumber = textInput.phone_number;
 
@@ -25,7 +27,7 @@ export default function PhoneNumber({ content, disabled, contentIndex, onChangeV
                 "value"
               )
             }
-            value={textInput[textInput.type]?.value || ""}
+            value={textInput[textInput.type]?.value || EMPTY_INPUT_VALUE}
             inputMode="numeric"
           ></InputCustom>
       </React.Fragment>
@@ -59,7 +61,7 @@ export default function PhoneNumber({ content, disabled, contentIndex, onChangeV
               moveToNext(`ss-user-message-phone_number_2_${contentIndex}`);
             }
           }}
-          value={textInput[textInput.type]?.value1 || ""}
+          value={textInput[textInput.type]?.value1 || EMPTY_INPUT_VALUE}
         ></InputCustom>
         <InputCustom
           id={`ss-user-message-phone_number_2_${contentIndex}`}
@@ -86,7 +88,7 @@ export default function PhoneNumber({ content, disabled, contentIndex, onChangeV
               moveToNext(`ss-user-message-phone_number_3_${contentIndex}`);
             }
           }}
-          value={textInput[textInput.type]?.value2 || ""}
+          value={textInput[textInput.type]?.value2 || EMPTY_INPUT_VALUE}
         ></InputCustom>
         <InputCustom
           id={`ss-user-message-phone_number_3_${contentIndex}`}
@@ -105,10 +107,11 @@ export default function PhoneNumber({ content, disabled, contentIndex, onChangeV
               "value3"
             )
           }
-          value={textInput[textInput.type]?.value3 || ""}
+          value={textInput[textInput.type]?.value3 || EMPTY_INPUT_VALUE}
         ></InputCustom>
       </div>
     </React.Fragment>
   );
-}
+};
 
+export default PhoneNumber;

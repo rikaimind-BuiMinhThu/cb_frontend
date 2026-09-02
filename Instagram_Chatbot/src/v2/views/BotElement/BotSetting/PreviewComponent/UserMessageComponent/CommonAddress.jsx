@@ -1,21 +1,32 @@
 import React from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
-import { MESSAGE_CONTENT_TYPES, NUMBER_REGEX } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
+import { EMPTY_INPUT_VALUE, MESSAGE_CONTENT_TYPES, NUMBER_REGEX, REQUIRED_FIELD_LABEL } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 import { getAddressFromZipCode, moveToNext } from "v2/views/BotElement/BotSetting/PreviewComponent/Utils";
 
 import InputCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
 import SelectCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/SelectCustom";
 
-export default function CommonAddress({ content, prefecturesList, messageIndexRender, messageIndex, contentIndex, messageContent, onChangeValue, onChangeErrors, errors, disabled, onOpen, isDisplayError = true }) {
-  
+const REQUIRE_CHECK_EACH_ITEM = "set_required_for_each_item";
+const REQUIRE_CHECK_ALL_ITEMS = "all_items_require";
+const REQUIRE_CHECK_REQUIRE = "require";
+const INVALID_ZIP_CODE_ERROR = "無効な郵便番号です。";
+const ZIP_SEARCH_LINK_LABEL = "〒検索はこちら";
+const DEFAULT_POST_CODE_LABEL = "郵便番号";
+const DEFAULT_PREFECTURE_LABEL = "都道府県";
+const DEFAULT_MUNICIPALITY_LABEL = "市区町村";
+const DEFAULT_ADDRESS_LABEL = "番地";
+const DEFAULT_BUILDING_NAME_LABEL = "建物名";
+const REQUIRED_ITEM_KEYS = ["postCode", "prefecture", "municipality", "address", "buildingName"];
+
+const CommonAddress = ({ content, prefecturesList, messageIndexRender, messageIndex, contentIndex, messageContent, onChangeValue, onChangeErrors, errors, disabled, onOpen, isDisplayError = true }) => {
   if (content.type !== MESSAGE_CONTENT_TYPES.ZIP_CODE_ADDRESS && content.type !== MESSAGE_CONTENT_TYPES.SHIPPING_ADDRESS) return <></>;
-  
+
   const addressContent = content.type === MESSAGE_CONTENT_TYPES.ZIP_CODE_ADDRESS ? content.zip_code_address : content.shipping_address;
   if (!addressContent) return <></>;
 
   const getPrefectureIdCodeFromName = (name) => {
     return prefecturesList.find((prefecture) => prefecture.name === name)?.id;
-  }
+  };
 
   const renderTitle = () => {
     const title = addressContent.title_require && (
@@ -25,15 +36,15 @@ export default function CommonAddress({ content, prefecturesList, messageIndexRe
     );
 
     const hasRequiredItem = () => {
-      if (addressContent.isCheckRequire !== 'set_required_for_each_item') return false;
-      return ['postCode', 'prefecture', 'municipality', 'address', 'buildingName'].some(item => addressContent[`${item}Required`]);
-    }
+      if (addressContent.isCheckRequire !== REQUIRE_CHECK_EACH_ITEM) return false;
+      return REQUIRED_ITEM_KEYS.some((item) => addressContent[`${item}Required`]);
+    };
 
-    const isRequired = addressContent.isCheckRequire === "all_items_require" || addressContent.isCheckRequire === "require" || hasRequiredItem();
+    const isRequired = addressContent.isCheckRequire === REQUIRE_CHECK_ALL_ITEMS || addressContent.isCheckRequire === REQUIRE_CHECK_REQUIRE || hasRequiredItem();
 
     const requiredLabel = isRequired && (
       <span className="ss-message__content--user-text-input-required">
-        ※必須
+        {REQUIRED_FIELD_LABEL}
       </span>
     );
 
@@ -46,31 +57,28 @@ export default function CommonAddress({ content, prefecturesList, messageIndexRe
   };
 
   const renderSearchLink = () => {
-    const linkColor = disabled ? "gray" : "#2c76f0";
-    const cursor = disabled ? "default" : "pointer";
     return (
-      <div className="ss-message__content--user-zip-code-address-search-link"
-        style={{ color: linkColor }}
+      <div className={`ss-message__content--user-zip-code-address-search-link${disabled ? " is-disabled" : ""}`}
       >
-        <span style={{ cursor }}
+        <span
           onClick={() => {
             if (disabled !== true) onOpen(true, contentIndex);
           }}
         >
-          〒検索はこちら
+          {ZIP_SEARCH_LINK_LABEL}
         </span>
       </div>
-    )
+    );
   };
 
   const changeInvalidZipCodeError = () => {
     const errorKey = `message${messageIndexRender}_content${contentIndex}_${messageContent[contentIndex].type}`;
-    onChangeErrors(errorKey, "無効な郵便番号です。");
+    onChangeErrors(errorKey, INVALID_ZIP_CODE_ERROR);
   };
 
   const clearZipCodeError = () => {
     const errorKey = `message${messageIndexRender}_content${contentIndex}_${messageContent[contentIndex].type}`;
-    onChangeErrors(errorKey, "");
+    onChangeErrors(errorKey, EMPTY_INPUT_VALUE);
   };
 
   const retrieveAddressFromZipCode = (zipCode) => {
@@ -80,18 +88,23 @@ export default function CommonAddress({ content, prefecturesList, messageIndexRe
       }
 
       const {town_name, city_name, prefecture_name, building_name} = res.data.data;
-      let newZipCodeAddress = {
-        value_prefecture: addressContent.is_use_dropdown ? getPrefectureIdCodeFromName(prefecture_name) : prefecture_name,
-      };
+      const prefectureValue = addressContent.is_use_dropdown ? getPrefectureIdCodeFromName(prefecture_name) : prefecture_name;
 
-      if (addressContent.compact_municipality_and_address) {
-        newZipCodeAddress.value_municipality = `${city_name}${town_name}`;
-      } else if (addressContent.compact_municipality_and_address_and_building_name) {
-        newZipCodeAddress.value_municipality = `${city_name}${town_name}${building_name}`.replace('undefined', '');
-      } else {
-        newZipCodeAddress.value_municipality = city_name;
-        newZipCodeAddress.value_address = town_name;
-      }
+      const newZipCodeAddress = addressContent.compact_municipality_and_address
+        ? {
+          value_prefecture: prefectureValue,
+          value_municipality: `${city_name}${town_name}`,
+        }
+        : addressContent.compact_municipality_and_address_and_building_name
+          ? {
+            value_prefecture: prefectureValue,
+            value_municipality: `${city_name}${town_name}${building_name}`.replace('undefined', EMPTY_INPUT_VALUE),
+          }
+          : {
+            value_prefecture: prefectureValue,
+            value_municipality: city_name,
+            value_address: town_name,
+          };
 
       onChangeValue(contentIndex, content.type, newZipCodeAddress.value_prefecture, "value_prefecture");
       onChangeValue(contentIndex, content.type, newZipCodeAddress.value_municipality, "value_municipality");
@@ -101,7 +114,7 @@ export default function CommonAddress({ content, prefecturesList, messageIndexRe
       moveToNext(`ss-user-input-address${contentIndex}`);
       clearZipCodeError();
 
-    }).catch((error) => {
+    }).catch(() => {
       changeInvalidZipCodeError();
     });
   };
@@ -117,7 +130,7 @@ export default function CommonAddress({ content, prefecturesList, messageIndexRe
         onKeyPress={(e) => {
           if (String(e.target.value).length >= 7) e.preventDefault();
         }}
-        style={{ width: "100%", marginLeft: "0px" }}
+        className="w-100-flush"
         onChange={async (value) => {
           onChangeValue(
             contentIndex,
@@ -133,7 +146,7 @@ export default function CommonAddress({ content, prefecturesList, messageIndexRe
             clearZipCodeError();
           }
         }}
-        value={addressContent.value_post_code || ""}
+        value={addressContent.value_post_code || EMPTY_INPUT_VALUE}
         clearable={true}
       />
     );
@@ -147,7 +160,7 @@ export default function CommonAddress({ content, prefecturesList, messageIndexRe
           inputMode="numeric"
           placeholder={addressContent.post_code_left}
           disabled={disabled}
-          containerStyle={{ width: "39%" }}
+          containerClassName="w-39-percent"
           onKeyPress={(e) => {
             if (String(e.target.value).length >= 3) e.preventDefault();
           }}
@@ -165,7 +178,7 @@ export default function CommonAddress({ content, prefecturesList, messageIndexRe
             }
 
             const zipCode = value + addressContent.value_post_code_right;
-            
+
             if (String(zipCode).length === 7) {
               retrieveAddressFromZipCode(zipCode);
             } else if (String(zipCode).length !== 0) {
@@ -174,7 +187,7 @@ export default function CommonAddress({ content, prefecturesList, messageIndexRe
               clearZipCodeError();
             }
           }}
-          value={addressContent.value_post_code_left || ""}
+          value={addressContent.value_post_code_left || EMPTY_INPUT_VALUE}
           clearable={true}
         />
         <InputCustom
@@ -183,7 +196,7 @@ export default function CommonAddress({ content, prefecturesList, messageIndexRe
           placeholder={addressContent.post_code_right}
           disabled={disabled}
           id={`ss-user-post-code-right-input${contentIndex}`}
-          containerStyle={{ width: "59%" }}
+          containerClassName="w-59-percent"
           onKeyPress={(e) => {
             if (String(e.target.value).length >= 4) e.preventDefault();
           }}
@@ -196,7 +209,7 @@ export default function CommonAddress({ content, prefecturesList, messageIndexRe
               "value_post_code_right"
             );
             const zipCode = addressContent.value_post_code_left + value;
-            
+
             if (String(zipCode).length === 7) {
               retrieveAddressFromZipCode(zipCode);
             } else if (String(zipCode).length !== 0) {
@@ -205,7 +218,7 @@ export default function CommonAddress({ content, prefecturesList, messageIndexRe
               clearZipCodeError();
             }
           }}
-          value={addressContent.value_post_code_right || ""}
+          value={addressContent.value_post_code_right || EMPTY_INPUT_VALUE}
           clearable={true}
         />
       </div>
@@ -214,7 +227,7 @@ export default function CommonAddress({ content, prefecturesList, messageIndexRe
 
   const renderPostCode = () => {
     if (addressContent.post_code === undefined) return;
-    const postCodeLabel = addressContent.post_code_label?.trim() !== "" ? addressContent.post_code_label : "郵便番号";
+    const postCodeLabel = addressContent.post_code_label?.trim() !== EMPTY_INPUT_VALUE ? addressContent.post_code_label : DEFAULT_POST_CODE_LABEL;
 
     return (
       <div className="ss-user-setting__item-bottom">
@@ -229,37 +242,32 @@ export default function CommonAddress({ content, prefecturesList, messageIndexRe
   const renderPrefecture = () => {
     if (addressContent.prefecture === undefined) return;
 
-    const prefectureLabel = addressContent.prefecture_label?.trim() !== "" ? addressContent.prefecture_label : "都道府県";
-    let prefectureInput = null;
+    const prefectureLabel = addressContent.prefecture_label?.trim() !== EMPTY_INPUT_VALUE ? addressContent.prefecture_label : DEFAULT_PREFECTURE_LABEL;
 
-    if (addressContent.is_use_dropdown) {
-      prefectureInput = (
-        <SelectCustom
-          className="w-100-percent"
-          value={addressContent?.value_prefecture || ""}
-          data={prefecturesList}
-          keyValue="id"
-          nameValue="name"
-          placeholder={addressContent.prefecture}
-          onChange={(value) =>
-            onChangeValue(contentIndex, content.type, value, "value_prefecture")
-          }
-        />
-      );
-    } else {
-      prefectureInput = (
-        <InputCustom
-          placeholder={addressContent.prefecture}
-          disabled={disabled}
-          className="w-100-percent"
-          onChange={(value) =>
-            onChangeValue(contentIndex, content.type, value, "value_prefecture")
-          }
-          value={addressContent.value_prefecture || ""}
-          clearable={true}
-        />
-      );
-    }
+    const prefectureInput = addressContent.is_use_dropdown ? (
+      <SelectCustom
+        className="w-100-percent"
+        value={addressContent?.value_prefecture || EMPTY_INPUT_VALUE}
+        data={prefecturesList}
+        keyValue="id"
+        nameValue="name"
+        placeholder={addressContent.prefecture}
+        onChange={(value) =>
+          onChangeValue(contentIndex, content.type, value, "value_prefecture")
+        }
+      />
+    ) : (
+      <InputCustom
+        placeholder={addressContent.prefecture}
+        disabled={disabled}
+        className="w-100-percent"
+        onChange={(value) =>
+          onChangeValue(contentIndex, content.type, value, "value_prefecture")
+        }
+        value={addressContent.value_prefecture || EMPTY_INPUT_VALUE}
+        clearable={true}
+      />
+    );
 
     return (
       <div className="ss-user-setting__item-bottom">
@@ -272,8 +280,8 @@ export default function CommonAddress({ content, prefecturesList, messageIndexRe
   const renderMunicipality = () => {
     if (addressContent.municipality === undefined) return;
 
-    const municipalityLabel = addressContent.municipality_label?.trim() !== "" ? addressContent.municipality_label : "市区町村";
-    
+    const municipalityLabel = addressContent.municipality_label?.trim() !== EMPTY_INPUT_VALUE ? addressContent.municipality_label : DEFAULT_MUNICIPALITY_LABEL;
+
     return (
       <div className="ss-user-setting__item-bottom">
         <div className="ss-message__content--user-zip-code-address-label">{municipalityLabel}</div>
@@ -284,7 +292,7 @@ export default function CommonAddress({ content, prefecturesList, messageIndexRe
           onChange={(value) =>
             onChangeValue(contentIndex, content.type, value, "value_municipality")
           }
-          value={addressContent.value_municipality || ""}
+          value={addressContent.value_municipality || EMPTY_INPUT_VALUE}
           clearable={true}
         />
       </div>
@@ -295,7 +303,7 @@ export default function CommonAddress({ content, prefecturesList, messageIndexRe
     if ((addressContent.compact_municipality_and_address && !addressContent.is_display_address_field) || addressContent.compact_municipality_and_address_and_building_name) return;
     if (addressContent.address === undefined) return;
 
-    const addressLabel = addressContent.address_label?.trim() !== "" ? addressContent.address_label : "番地";
+    const addressLabel = addressContent.address_label?.trim() !== EMPTY_INPUT_VALUE ? addressContent.address_label : DEFAULT_ADDRESS_LABEL;
 
     return (
       <div className="ss-user-setting__item-bottom">
@@ -308,17 +316,17 @@ export default function CommonAddress({ content, prefecturesList, messageIndexRe
           onChange={(value) =>
             onChangeValue(contentIndex, content.type, value, "value_address")
           }
-          value={addressContent.value_address || ""}
+          value={addressContent.value_address || EMPTY_INPUT_VALUE}
           clearable={true}
         />
       </div>
     );
-  }
+  };
 
   const renderBuildingName = () => {
     if (addressContent.compact_municipality_and_address_and_building_name) return;
     if (addressContent.building_name === undefined) return;
-    const buildingNameLabel = addressContent.building_name_label?.trim() !== "" ? addressContent.building_name_label : "建物名";
+    const buildingNameLabel = addressContent.building_name_label?.trim() !== EMPTY_INPUT_VALUE ? addressContent.building_name_label : DEFAULT_BUILDING_NAME_LABEL;
 
     return (
       <div className="ss-user-setting__item-bottom">
@@ -331,7 +339,7 @@ export default function CommonAddress({ content, prefecturesList, messageIndexRe
           onChange={(value) =>
             onChangeValue(contentIndex, content.type, value, "value_building_name")
           }
-          value={addressContent.value_building_name || ""}
+          value={addressContent.value_building_name || EMPTY_INPUT_VALUE}
           clearable={true}
         />
       </div>
@@ -362,3 +370,5 @@ export default function CommonAddress({ content, prefecturesList, messageIndexRe
     </div>
   );
 };
+
+export default CommonAddress;

@@ -1,12 +1,16 @@
 import React from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
-import { MESSAGE_CONTENT_TYPES } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
+import { EMPTY_INPUT_VALUE, MESSAGE_CONTENT_TYPES, REQUIRED_FIELD_LABEL } from "v2/views/BotElement/BotSetting/PreviewComponent/Constants";
 import { Radio } from "antd";
 import CommonAddress from "./CommonAddress";
 
 import InputCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/InputCustom";
 
-export default function ShippingAddress({ content, prefecturesList, messageIndexRender, messageIndex, contentIndex, messageContent, onChangeValue, onChangeErrors, errors, disabled, onOpen }) {
+const SHIPPING_NAME_LABEL = "名前";
+const SHIPPING_KANA_NAME_LABEL = "フリガナ";
+const SHIPPING_ADDRESS_LABEL = "お届け先住所";
+
+const ShippingAddress = ({ content, prefecturesList, messageIndexRender, messageIndex, contentIndex, messageContent, onChangeValue, onChangeErrors, errors, disabled, onOpen }) => {
   if (content.type !== MESSAGE_CONTENT_TYPES.SHIPPING_ADDRESS) return <></>;
 
   const shippingAddress = content.shipping_address;
@@ -18,17 +22,17 @@ export default function ShippingAddress({ content, prefecturesList, messageIndex
       <Radio.Group
         className="f-size-14 w-100-percent"
         disabled={disabled}
-        value={shippingAddress.value_initial_selection || ""}
+        value={shippingAddress.value_initial_selection || EMPTY_INPUT_VALUE}
       >
         {
           shippingAddress.radio_contents.map((itemPayment, indexPayment) => {
             return (
               <Radio
-                value={itemPayment.value || ""}
+                value={itemPayment.value || EMPTY_INPUT_VALUE}
                 key={indexPayment}
                 className="ss-message__content--user-shipping-address-radio-content"
                 onChange={() => {
-                  const value = shippingAddress.value_initial_selection !== itemPayment.value ? itemPayment.value : "";
+                  const value = shippingAddress.value_initial_selection !== itemPayment.value ? itemPayment.value : EMPTY_INPUT_VALUE;
                   onChangeValue(
                     contentIndex,
                     content.type,
@@ -43,8 +47,6 @@ export default function ShippingAddress({ content, prefecturesList, messageIndex
                     isDisplayCardPayment,
                     "is_display_card_payment"
                   );
-
-                  // if (messageContent.length === 1) onClickNext();
                 }}
               >
                 {itemPayment.text}
@@ -67,7 +69,7 @@ export default function ShippingAddress({ content, prefecturesList, messageIndex
         )}
         {shippingAddress.require === true && (
           <span className="ss-message__content--user-text-input-required">
-            ※必須
+            {REQUIRED_FIELD_LABEL}
           </span>
         )}
       </div>
@@ -79,7 +81,7 @@ export default function ShippingAddress({ content, prefecturesList, messageIndex
     return (
       <React.Fragment>
         <div className="ss-message__content--user-shipping-address-title">
-          名前
+          {SHIPPING_NAME_LABEL}
         </div>
         <div className="ss-message__content--user-chat-container">
           <InputCustom
@@ -94,7 +96,7 @@ export default function ShippingAddress({ content, prefecturesList, messageIndex
                 "value_name_left"
               )
             }
-            value={shippingAddress.text?.name_valueLeft || ""}
+            value={shippingAddress.text?.name_valueLeft || EMPTY_INPUT_VALUE}
           />
           <InputCustom
             disabled={disabled}
@@ -108,7 +110,7 @@ export default function ShippingAddress({ content, prefecturesList, messageIndex
                 "value_name_right"
               )
             }
-            value={shippingAddress.text?.name_valueRight || ""}
+            value={shippingAddress.text?.name_valueRight || EMPTY_INPUT_VALUE}
           />
         </div>
       </React.Fragment>
@@ -120,7 +122,7 @@ export default function ShippingAddress({ content, prefecturesList, messageIndex
     return (
       <React.Fragment>
         <div className="ss-message__content--user-shipping-address-title">
-          フリガナ
+          {SHIPPING_KANA_NAME_LABEL}
         </div>
         <div className="ss-message__content--user-chat-container">
           <InputCustom
@@ -135,7 +137,7 @@ export default function ShippingAddress({ content, prefecturesList, messageIndex
                 "value_kana_left"
               )
             }
-            value={shippingAddress.text?.kana_name_valueLeft || ""}
+            value={shippingAddress.text?.kana_name_valueLeft || EMPTY_INPUT_VALUE}
           />
           <InputCustom
             disabled={disabled}
@@ -149,7 +151,7 @@ export default function ShippingAddress({ content, prefecturesList, messageIndex
                 "value_kana_right"
               )
             }
-            value={shippingAddress.text?.kana_name_valueRight || ""}
+            value={shippingAddress.text?.kana_name_valueRight || EMPTY_INPUT_VALUE}
           />
         </div>
       </React.Fragment>
@@ -189,11 +191,13 @@ export default function ShippingAddress({ content, prefecturesList, messageIndex
     <div className="m-b-10">
       <>
         <div className="ss-message__content--user-shipping-address-title">
-          お届け先住所
+          {SHIPPING_ADDRESS_LABEL}
         </div>
         {renderRadioContents()}
       </>
       {renderCardLinkSetting()}
     </div>
-  )
+  );
 };
+
+export default ShippingAddress;

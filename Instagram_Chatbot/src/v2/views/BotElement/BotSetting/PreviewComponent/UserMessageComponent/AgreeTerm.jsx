@@ -1,10 +1,15 @@
 import React from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
-import { MESSAGE_CONTENT_TYPES } from "../Constants";
+import { MESSAGE_CONTENT_TYPES, REQUIRED_FIELD_LABEL } from "../Constants";
 import CheckboxCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/CheckboxCustom";
 
-export default function AgreeTerm({ content, messageIndex, contentIndex, onChangeValue, errors, disabled }) {
-if (!content || content.type !== MESSAGE_CONTENT_TYPES.AGREE_TERM) return null;
+const AGREE_TERM_TYPES = {
+  DETAIL_CONTENT: "detail_content",
+  POST_LINK_ONLY: "post_link_only",
+};
+
+const AgreeTerm = ({ content, messageIndex, contentIndex, onChangeValue, errors, disabled }) => {
+  if (!content || content.type !== MESSAGE_CONTENT_TYPES.AGREE_TERM) return null;
 
   const agreeTerm = content.agree_term;
 
@@ -20,7 +25,7 @@ if (!content || content.type !== MESSAGE_CONTENT_TYPES.AGREE_TERM) return null;
         )}
         {agreeTerm.require && (
           <span className="ss-message__content--user-text-input-required">
-            ※必須
+            {REQUIRED_FIELD_LABEL}
           </span>
         )}
       </div>
@@ -29,9 +34,9 @@ if (!content || content.type !== MESSAGE_CONTENT_TYPES.AGREE_TERM) return null;
 
   const renderContent = () => {
     switch (agreeTerm.type) {
-      case "detail_content":
+      case AGREE_TERM_TYPES.DETAIL_CONTENT:
         return renderDetailContent();
-      case "post_link_only":
+      case AGREE_TERM_TYPES.POST_LINK_ONLY:
         return renderPostLinkOnly();
       default:
         return null;
@@ -104,7 +109,7 @@ if (!content || content.type !== MESSAGE_CONTENT_TYPES.AGREE_TERM) return null;
       </div>
     );
   };
-  
+
   const renderErrorMessage = () => {
     const errorKey = `message${messageIndex}_content${contentIndex}_${content.type}`;
     if (!errors?.[errorKey]) return null;
@@ -124,3 +129,5 @@ if (!content || content.type !== MESSAGE_CONTENT_TYPES.AGREE_TERM) return null;
     </div>
   );
 };
+
+export default AgreeTerm;

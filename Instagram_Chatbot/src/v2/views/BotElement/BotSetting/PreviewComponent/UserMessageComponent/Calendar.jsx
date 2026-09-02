@@ -1,6 +1,6 @@
 import React from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
-import { MESSAGE_CONTENT_TYPES } from "../Constants";
+import { MESSAGE_CONTENT_TYPES, REQUIRED_FIELD_LABEL } from "../Constants";
 import DatePickerCustom from "v2/views/BotElement/BotSetting/ScenarioSetting/scenarioComon/DatePickerCustom";
 import moment from "moment-timezone";
 import { Select, Radio, Row, Col, Calendar as AntdCalendar } from "antd";
@@ -191,12 +191,6 @@ export function shouldDisablePreviewClosedWeekdayAtJstTodayOrTomorrow(current, c
   return closed.includes(cur.day());
 }
 
-const HIDDEN_CELL_STYLE = {
-  minHeight: 24,
-  visibility: "hidden",
-  pointerEvents: "none",
-};
-
 function previewCalendarDateFullCellRenderHideLimboDayAfterCutoffShift(value, calendar, mergedPreviewCalendar) {
   if (!value || !isCalendarPreviewRelativeOn(calendar)) return null;
   if (!shouldShiftPreviewMinOffsetAfterCutOffJst(calendar)) return null;
@@ -208,7 +202,7 @@ function previewCalendarDateFullCellRenderHideLimboDayAfterCutoffShift(value, ca
   const limbo = startD.clone().subtract(1, "day");
   const d = moment.tz(value, JST).startOf("day");
   if (d.isSame(limbo, "day")) {
-    return <div style={HIDDEN_CELL_STYLE} aria-hidden />;
+    return <div className="calendar-hidden-cell" aria-hidden />;
   }
   return null;
 }
@@ -341,7 +335,7 @@ function shouldSkipDayMoonNonSelectUnlessSunMonOnJstTodayOrTomorrow(cal, current
   return false;
 }
 
-export default function Calendar({ content, messageIndex, contentIndex, onChangeValue, errors, disabled, locale }) {
+const Calendar = ({ content, messageIndex, contentIndex, onChangeValue, errors, disabled, locale }) => {
   const mergedJaPickerLocale = React.useMemo(
     () => withJaShortWeekDays(locale || pickerLocaleJaJP),
     [locale]
@@ -600,7 +594,7 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
     if (!calendar.title_require && !calendar.require) return null;
 
     return (
-      <div className="ss-message__content--user-calender-top" style={{ marginBottom: "0px" }}>
+      <div className="ss-message__content--user-calender-top m-b-0">
         {calendar.title_require && (
           <span className="ss-message__content--user-calender-title">
             {calendar.title}
@@ -608,7 +602,7 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
         )}
         {calendar.require === true && (
           <span className="ss-message__content--user-text-input-required">
-            ※必須
+            {REQUIRED_FIELD_LABEL}
           </span>
         )}
       </div>
@@ -617,11 +611,11 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
 
   const renderStartEndDateContent = () => {
     return (
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
+      <div className="ss-message__split-row">
         <DatePickerCustom
           disabled={disabled}
           locale={mergedJaPickerLocale}
-          style={{ width: "49%", marginTop: "5px" }}
+          className="w-49-percent m-t-5"
           disabledDate={previewDisableDateStart}
           value={
             calendar.start_date_select
@@ -640,7 +634,7 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
         <DatePickerCustom
           disabled={disabled}
           locale={mergedJaPickerLocale}
-          style={{ width: "49%", marginTop: "5px" }}
+          className="w-49-percent m-t-5"
           disabledDate={previewDisableDateEnd}
           value={
             calendar.end_date_select
@@ -705,12 +699,9 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
       <React.Fragment>
         <div className="ss-message__content--user-calender-embedded m-t-5">
           <AntdCalendar
-            // onLoad={
-            //   checkLoadCalendar()
-            // }
             disabled={disabled}
             fullscreen={false}
-            className="ss-custom-calendar"
+            className="ss-custom-calendar preview-calendar-panel"
             locale={mergedJaPickerLocale}
             dateFullCellRender={(v) => {
               const limbo = previewCalendarDateFullCellRenderHideLimboDayAfterCutoffShift(
@@ -721,7 +712,6 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
               if (limbo) return limbo;
               return <div className="ant-picker-cell-inner">{v.date()}</div>;
             }}
-            // format={"YYYY-MM-DD"}
             headerRender={({
               value,
               type,
@@ -730,42 +720,35 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
             }) => {
               const start = 0;
               const end = 12;
-              const monthOptions = [];
-              value = value ? value : moment();
-              let current = value.clone();
-              const localeData = value.localeData();
-              const months = [];
-              for (let i = 0; i < 12; i++) {
-                current = current.month(i);
-                months.push(localeData.monthsShort(current));
-              }
+              const pickerValue = value ? value : moment();
+              const localeData = pickerValue.localeData();
+              const months = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((monthIndex) =>
+                localeData.monthsShort(pickerValue.clone().month(monthIndex))
+              );
 
-              for (let i = start; i < end; i++) {
-                monthOptions.push(
-                  <Select.Option
-                    key={i}
-                    value={i}
-                    className="month-item"
-                  >
-                    {months[i]}
-                  </Select.Option>
-                );
-              }
+              const monthOptions = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+                .filter((monthIndex) => monthIndex >= start && monthIndex < end)
+                .map((monthIndex) => (
+                    <Select.Option
+                      key={monthIndex}
+                      value={monthIndex}
+                      className="month-item"
+                    >
+                      {months[monthIndex]}
+                    </Select.Option>
+                ));
 
-              const year = value.year();
-              const month = value.month();
-              const options = [];
-              for (let i = year - 50; i < year + 50; i += 1) {
-                options.push(
-                  <Select.Option
-                    key={i}
-                    value={i}
-                    className="year-item"
-                  >
-                    {i}
-                  </Select.Option>
-                );
-              }
+              const year = pickerValue.year();
+              const month = pickerValue.month();
+              const options = Array.from({ length: 100 }, (_, index) => year - 50 + index).map((yearValue) => (
+                <Select.Option
+                  key={yearValue}
+                  value={yearValue}
+                  className="year-item"
+                >
+                  {yearValue}
+                </Select.Option>
+              ));
               return (
                 <div className="p-8">
                   <Row gutter={8}>
@@ -776,7 +759,7 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
                         className="my-year-select"
                         value={year}
                         onChange={(newYear) => {
-                          const now = value.clone().year(newYear);
+                          const now = pickerValue.clone().year(newYear);
                           onChange(now);
                         }}
                       >
@@ -789,7 +772,7 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
                         dropdownMatchSelectWidth={false}
                         value={month}
                         onChange={(newMonth) => {
-                          const now = value.clone().month(newMonth);
+                          const now = pickerValue.clone().month(newMonth);
                           onChange(now);
                         }}
                       >
@@ -813,12 +796,6 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
                   </Row>
                 </div>
               );
-            }}
-            
-            style={{
-              top: "20px",
-              width: "300px",
-              border: "1px solid grey",
             }}
             value={
               calendar.date_select
@@ -849,15 +826,14 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
       {calendar.type === "embedded" && (
         <React.Fragment>
           <div
-            className="ss-message__content--user-calender-embedded"
-            style={{ marginTop: "5px" }}
+            className="ss-message__content--user-calender-embedded m-t-5"
           >
             <AntdCalendar
               // onLoad={
               //   checkLoadCalendar()
               // }
               disabled={disabled}
-              className="ss-custom-calendar"
+              className="ss-custom-calendar preview-calendar-panel"
               fullscreen={false}
               locale={mergedJaPickerLocale}
               dateFullCellRender={(v) => {
@@ -878,44 +854,36 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
               }) => {
                 const start = 0;
                 const end = 12;
-                const monthOptions = [];
-                value = value ? value : moment();
-                let current = value.clone();
-                const localeData = value.localeData();
-                const months = [];
-                for (let i = 0; i < 12; i++) {
-                  current = current.month(i);
-                  months.push(localeData.monthsShort(current));
-                }
-
-                for (let i = start; i < end; i++) {
-                  monthOptions.push(
+                const pickerValue = value ? value : moment();
+                const localeData = pickerValue.localeData();
+                const months = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((monthIndex) =>
+                  localeData.monthsShort(pickerValue.clone().month(monthIndex))
+                );
+                const monthOptions = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+                  .filter((monthIndex) => monthIndex >= start && monthIndex < end)
+                  .map((monthIndex) => (
                     <Select.Option
-                      key={i}
-                      value={i}
+                      key={monthIndex}
+                      value={monthIndex}
                       className="month-item"
                     >
-                      {months[i]}
+                      {months[monthIndex]}
                     </Select.Option>
-                  );
-                }
+                  ));
 
-                const year = value.year();
-                const month = value.month();
-                const options = [];
-                for (let i = year - 50; i < year + 50; i += 1) {
-                  options.push(
-                    <Select.Option
-                      key={i}
-                      value={i}
-                      className="year-item"
-                    >
-                      {i}
-                    </Select.Option>
-                  );
-                }
+                const year = pickerValue.year();
+                const month = pickerValue.month();
+                const options = Array.from({ length: 100 }, (_, index) => year - 50 + index).map((yearValue) => (
+                  <Select.Option
+                    key={yearValue}
+                    value={yearValue}
+                    className="year-item"
+                  >
+                    {yearValue}
+                  </Select.Option>
+                ));
                 return (
-                  <div style={{ padding: 8 }}>
+                  <div className="calendar-pad-8">
                     <Row gutter={8}>
                       <Col>
                         <Select
@@ -924,7 +892,7 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
                           className="my-year-select"
                           value={year}
                           onChange={(newYear) => {
-                            const now = value.clone().year(newYear);
+                            const now = pickerValue.clone().year(newYear);
                             onChange(now);
                           }}
                         >
@@ -937,7 +905,7 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
                           dropdownMatchSelectWidth={false}
                           value={month}
                           onChange={(newMonth) => {
-                            const now = value.clone().month(newMonth);
+                            const now = pickerValue.clone().month(newMonth);
                             onChange(now);
                           }}
                         >
@@ -962,11 +930,6 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
                   </div>
                 );
               }}
-              style={{
-                top: "20px",
-                width: "300px",
-                border: "1px solid grey",
-              }}
               value={
                 calendar.date_select
                   ? moment(calendar.date_select, "YYYY-MM-DD")
@@ -988,7 +951,7 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
       {errors?.[
         `message${messageIndex}_content${contentIndex}_${content.type}`
       ] && (
-          <div style={{ color: "#FF7E00", fontSize: "12px" }}>
+          <div className="calendar-hint">
             {
               errors?.[
               `message${messageIndex}_content${contentIndex}_${content.type}`
@@ -997,5 +960,7 @@ export default function Calendar({ content, messageIndex, contentIndex, onChange
           </div>
         )}
     </div>
-  )
+  );
 };
+
+export default Calendar;
