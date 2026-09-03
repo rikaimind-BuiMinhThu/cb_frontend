@@ -104,6 +104,7 @@ const DesignChatbot = () => {
                 <ThemeCustomizeTab
                   themeSettings={state.designSettings.themeSettings}
                   mainColor={state.basicInfo.mainColor}
+                  designType={state.basicInfo.designType}
                   title={state.basicInfo.title}
                   subtitle={state.basicInfo.subtitle}
                   onFieldChange={actions.updateThemeField}

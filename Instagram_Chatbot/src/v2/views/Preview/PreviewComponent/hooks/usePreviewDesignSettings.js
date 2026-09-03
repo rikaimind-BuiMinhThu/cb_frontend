@@ -49,8 +49,18 @@ export const usePreviewDesignSettings = ({
     getChatBotSetting(state.botId).then((response) => {
       if (!response.data.data) return;
 
+      const chatbotData = response.data.data;
+      const withDesignTypeOnBotInfor = chatbotData.design_type != null && state.botInfor
+        ? {
+          botInfor: {
+            ...state.botInfor,
+            design_type: chatbotData.design_type,
+          },
+        }
+        : {};
+
       if (designSource === "raw") {
-        const raw = response.data.data?.design_settings;
+        const raw = chatbotData?.design_settings;
         if (raw == null) return;
         const result = typeof raw === "string" ? JSON.parse(raw) : raw;
         const newState = mapRawDesignSettingsToState(result, {
@@ -59,16 +69,19 @@ export const usePreviewDesignSettings = ({
         });
         dispatch({
           type: PREVIEW_ACTIONS.SET_CHATBOT_SETTINGS,
-          payload: newState,
+          payload: {
+            ...newState,
+            ...withDesignTypeOnBotInfor,
+          },
         });
         return;
       }
 
       const { mainColorHex, apiColorKey } = resolveMainColorContext(
-        response.data.data,
+        chatbotData,
       );
       const parsedDesign = parseDesignSettings(
-        response.data.data?.design_settings,
+        chatbotData?.design_settings,
         mainColorHex,
         apiColorKey,
       );
@@ -80,7 +93,10 @@ export const usePreviewDesignSettings = ({
 
       dispatch({
         type: PREVIEW_ACTIONS.SET_CHATBOT_SETTINGS,
-        payload: newState,
+        payload: {
+          ...newState,
+          ...withDesignTypeOnBotInfor,
+        },
       });
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps -- deps mirror legacy preview effects

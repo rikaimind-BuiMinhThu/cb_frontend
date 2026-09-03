@@ -125,6 +125,7 @@ PreviewUserMessage.defaultProps = {
 const ThemeCustomizePreview = ({
   themeSettings,
   mainColor,
+  designType,
   title,
   subtitle,
   activeSectionId,
@@ -135,6 +136,7 @@ const ThemeCustomizePreview = ({
     scopeId={PREVIEW_SCOPE_ID}
     themeSettings={themeSettings}
     mainColor={mainColor}
+    designType={designType}
     title={title}
     subtitle={subtitle}
     processLabel={THEME_PREVIEW_PROCESS_LABEL}
@@ -340,6 +342,7 @@ const ThemeCustomizePreview = ({
 ThemeCustomizePreview.propTypes = {
   themeSettings: PropTypes.object.isRequired,
   mainColor: PropTypes.string,
+  designType: PropTypes.string,
   title: PropTypes.string,
   subtitle: PropTypes.string,
   activeSectionId: PropTypes.string,
@@ -349,6 +352,7 @@ ThemeCustomizePreview.propTypes = {
 
 ThemeCustomizePreview.defaultProps = {
   mainColor: '#327AED',
+  designType: '',
   title: '',
   subtitle: '',
   activeSectionId: '',

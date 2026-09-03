@@ -19,6 +19,7 @@ const DEFAULT_EXPANDED_SECTIONS = [];
 const ThemeCustomizeTab = ({
   themeSettings,
   mainColor,
+  designType,
   title,
   subtitle,
   onFieldChange,
@@ -83,6 +84,7 @@ const ThemeCustomizeTab = ({
           <ThemeCustomizePreview
             themeSettings={themeSettings}
             mainColor={mainColor}
+            designType={designType}
             title={title}
             subtitle={subtitle}
             activeSectionId={activeSectionId}
@@ -137,6 +139,7 @@ const ThemeCustomizeTab = ({
 ThemeCustomizeTab.propTypes = {
   themeSettings: PropTypes.object.isRequired,
   mainColor: PropTypes.string,
+  designType: PropTypes.string,
   title: PropTypes.string,
   subtitle: PropTypes.string,
   onFieldChange: PropTypes.func.isRequired,
@@ -148,6 +151,7 @@ ThemeCustomizeTab.propTypes = {
 
 ThemeCustomizeTab.defaultProps = {
   mainColor: DEFAULT_MAIN_COLOR,
+  designType: '',
   title: '',
   subtitle: '',
 };

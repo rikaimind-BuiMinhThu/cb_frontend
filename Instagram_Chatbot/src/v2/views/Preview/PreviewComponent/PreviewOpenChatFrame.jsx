@@ -1,6 +1,8 @@
 import React from "react";
 import { MDBIcon } from "mdbreact";
+import PropTypes from "prop-types";
 import PreventExitChatbotModal from "./PreventExitChatbotModal";
+import { getDesignTypeClassName } from "v2/utils/designTypeChrome";
 import "v2/assets/css/bot/preview-chat-bot.css";
 
 /**
@@ -18,6 +20,7 @@ const PreviewOpenChatFrame = ({
   isOpen,
   onHeaderClick,
   botConfig,
+  designType,
   showPopupCloseBot,
   onClosePopup,
   onCloseBot,
@@ -25,7 +28,10 @@ const PreviewOpenChatFrame = ({
   beforeBody = null,
   children,
 }) => {
-  const className = [containerClassName, frameClassName]
+  const designTypeClass = getDesignTypeClassName(
+    designType || botConfig?.botInfor?.design_type,
+  );
+  const className = [containerClassName, frameClassName, designTypeClass]
     .filter(Boolean)
     .join(" ");
 
@@ -71,6 +77,29 @@ const PreviewOpenChatFrame = ({
       </div>
     </div>
   );
+};
+
+PreviewOpenChatFrame.propTypes = {
+  containerRef: PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.shape({ current: PropTypes.any }),
+  ]),
+  containerClassName: PropTypes.string,
+  frameClassName: PropTypes.string,
+  cssVars: PropTypes.object,
+  headerIconSrc: PropTypes.string,
+  subtitle: PropTypes.string,
+  titleBubble: PropTypes.string,
+  isOpen: PropTypes.bool,
+  onHeaderClick: PropTypes.func,
+  botConfig: PropTypes.object,
+  designType: PropTypes.string,
+  showPopupCloseBot: PropTypes.bool,
+  onClosePopup: PropTypes.func,
+  onCloseBot: PropTypes.func,
+  overlays: PropTypes.node,
+  beforeBody: PropTypes.node,
+  children: PropTypes.node,
 };
 
 export default PreviewOpenChatFrame;

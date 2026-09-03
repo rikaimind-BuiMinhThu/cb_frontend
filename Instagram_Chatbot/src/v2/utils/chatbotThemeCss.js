@@ -12,6 +12,7 @@ import {
   resolveMainColorContext,
   CAMEL_TO_SNAKE_THEME,
 } from './designThemeCore';
+import { buildDesignTypeChromeCss } from './designTypeChrome';
 
 const LIVE_THEME_ROOTS = ['#sp-container1', '.sp-container1', '#sp-container', '.sp-container'];
 const LIVE_THEME_SCOPE = LIVE_THEME_ROOTS.join(', ');
@@ -847,7 +848,7 @@ ${scopedClass(scopeSelector, '.title-bot-modal')} {
 ${buildModalButtonRules(toScopeIs(scopeSelector) || scopeSelector)}${previewButtonRules}`.trim();
 };
 
-const buildThemeCss = (theme, scopeSelector = '') => {
+const buildThemeCss = (theme, scopeSelector = '', designType) => {
   const variablesBlock = scopeSelector
     ? `${scopeSelector} {${buildThemeVariables(theme)}\n}`
     : `#sp-container, .sp-container, #sp-container1, .sp-container1 {${buildThemeVariables(theme)}\n}`;
@@ -857,13 +858,14 @@ const buildThemeCss = (theme, scopeSelector = '') => {
     ? `\n\n#portal {${buildPortalModalVariables(theme)}\n}`
     : '';
   const portalRules = isLiveBotScope ? `\n\n${buildPortalModalRules()}` : '';
+  const chromeCss = `\n\n${buildDesignTypeChromeCss(designType, scopeSelector)}`;
 
-  return `${variablesBlock}${portalVariablesBlock}\n\n${buildThemeRules(theme, scopeSelector)}${portalRules}`.trim();
+  return `${variablesBlock}${portalVariablesBlock}\n\n${buildThemeRules(theme, scopeSelector)}${portalRules}${chromeCss}`.trim();
 };
 
-export const generateThemeCss = (rawTheme, mainColorHex, apiColorKey) => {
+export const generateThemeCss = (rawTheme, mainColorHex, apiColorKey, designType) => {
   const theme = mergeThemeWithDefaults(rawTheme, mainColorHex, apiColorKey);
-  return buildThemeCss(theme, LIVE_THEME_SCOPE);
+  return buildThemeCss(theme, LIVE_THEME_SCOPE, designType);
 };
 
 export const generateScopedThemeCss = (
@@ -871,12 +873,13 @@ export const generateScopedThemeCss = (
   mainColorHex,
   apiColorKey,
   scopeSelector = '#theme-customize-preview',
+  designType,
 ) => {
   const theme = mergeThemeWithDefaults(rawTheme, mainColorHex, apiColorKey);
-  return buildThemeCss(theme, scopeSelector);
+  return buildThemeCss(theme, scopeSelector, designType);
 };
 
-export const injectBotThemeCss = (rawTheme, mainColorHex, apiColorKey) => {
+export const injectBotThemeCss = (rawTheme, mainColorHex, apiColorKey, designType) => {
   const existing = document.getElementById('bot-theme-vars');
   if (existing) existing.remove();
 
@@ -884,14 +887,14 @@ export const injectBotThemeCss = (rawTheme, mainColorHex, apiColorKey) => {
 
   const style = document.createElement('style');
   style.id = 'bot-theme-vars';
-  style.innerHTML = generateThemeCss(rawTheme, mainColorHex, apiColorKey);
+  style.innerHTML = generateThemeCss(rawTheme, mainColorHex, apiColorKey, designType);
   document.head.appendChild(style);
 };
 
 export const applyPreviewThemeCss = (botInfor, themeSettings) => {
   if (!botInfor) return;
   const { apiColorKey, mainColorHex } = resolveMainColorContext(botInfor);
-  injectBotThemeCss(themeSettings, mainColorHex, apiColorKey);
+  injectBotThemeCss(themeSettings, mainColorHex, apiColorKey, botInfor.design_type);
 };
 
 export const parseThemeFromDesignSettings = (designSettings) => {

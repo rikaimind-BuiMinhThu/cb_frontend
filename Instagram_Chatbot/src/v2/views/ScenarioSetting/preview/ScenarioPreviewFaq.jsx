@@ -151,7 +151,7 @@ const ScenarioPreviewFaq = ({
       || COLOR_MAP[chatbot.main_color]
       || chatbot.main_color
       || '#327AED';
-    injectBotThemeCss(themeSettings, mainColorHex, apiColorKey);
+    injectBotThemeCss(themeSettings, mainColorHex, apiColorKey, chatbot.design_type);
   }, []);
 
   const eventHandler = async (event) => {

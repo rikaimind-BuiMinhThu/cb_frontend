@@ -3,6 +3,7 @@ import { MDBIcon } from "mdbreact";
 import { DISPLAY_TYPES } from "./Constants";
 import { toNumber } from "./Utils";
 import { getClosedBarWidth, getClosedLauncherPosition } from "v2/utils/sdkLayoutUtils";
+import { getDesignTypeClassName } from "v2/utils/designTypeChrome";
 import "v2/assets/css/bot/preview-chat-bot.css";
 
 const buildPositionVars = (position = {}) => ({
@@ -11,6 +12,8 @@ const buildPositionVars = (position = {}) => ({
   ...(position.left != null ? { "--pcl-left": position.left } : {}),
   ...(position.top != null ? { "--pcl-top": position.top } : {}),
 });
+
+const joinLauncherClassName = (...parts) => parts.filter(Boolean).join(" ");
 
 /**
  * Closed chatbot launcher matrix (PC/SP × circle/bar/vertical).
@@ -39,6 +42,7 @@ const PreviewClosedLauncher = ({
   const title = state.botInfor?.title;
   const toggleOpen = () => onOpen(!state.isOpen);
   const fullWidthMobile = Boolean(state.useFullWidthChatbotMobile);
+  const designTypeClass = getDesignTypeClassName(state.botInfor?.design_type);
 
   const iconImg = headerIconSrc ? (
     <img
@@ -59,7 +63,11 @@ const PreviewClosedLauncher = ({
     const position = getClosedLauncherPosition(state);
     return (
       <div
-        className="preview-closed-launcher preview-closed-launcher--circle-pc"
+        className={joinLauncherClassName(
+          "preview-closed-launcher",
+          "preview-closed-launcher--circle-pc",
+          designTypeClass,
+        )}
         onClick={toggleOpen}
         style={{ ...colorVars, ...buildPositionVars(position) }}
       >
@@ -72,7 +80,11 @@ const PreviewClosedLauncher = ({
     const position = getClosedLauncherPosition(state);
     return (
       <div
-        className="preview-closed-launcher preview-closed-launcher--bar-pc"
+        className={joinLauncherClassName(
+          "preview-closed-launcher",
+          "preview-closed-launcher--bar-pc",
+          designTypeClass,
+        )}
         onClick={toggleOpen}
         style={{
           ...colorVars,
@@ -99,7 +111,11 @@ const PreviewClosedLauncher = ({
     const position = getClosedLauncherPosition(state, { variant: "vertical" });
     return (
       <div
-        className="preview-closed-launcher preview-closed-launcher--vertical-pc"
+        className={joinLauncherClassName(
+          "preview-closed-launcher",
+          "preview-closed-launcher--vertical-pc",
+          designTypeClass,
+        )}
         onClick={toggleOpen}
         style={{ ...colorVars, ...buildPositionVars(position) }}
       >
@@ -119,7 +135,11 @@ const PreviewClosedLauncher = ({
       : getClosedLauncherPosition(state, { isMobile: true });
     return (
       <div
-        className="preview-closed-launcher preview-closed-launcher--circle-sp"
+        className={joinLauncherClassName(
+          "preview-closed-launcher",
+          "preview-closed-launcher--circle-sp",
+          designTypeClass,
+        )}
         onClick={toggleOpen}
         style={{ ...colorVars, ...buildPositionVars(position) }}
       >
@@ -132,9 +152,12 @@ const PreviewClosedLauncher = ({
     const position = getClosedLauncherPosition(state, { isMobile: true });
     return (
       <div
-        className={`preview-closed-launcher preview-closed-launcher--bar-sp${
-          fullWidthMobile ? " preview-closed-launcher--bar-sp-fullwidth fullwidth_mobile_chatbot" : ""
-        }`}
+        className={joinLauncherClassName(
+          "preview-closed-launcher",
+          "preview-closed-launcher--bar-sp",
+          fullWidthMobile ? "preview-closed-launcher--bar-sp-fullwidth fullwidth_mobile_chatbot" : "",
+          designTypeClass,
+        )}
         onClick={toggleOpen}
         style={{
           ...colorVars,
@@ -184,7 +207,11 @@ const PreviewClosedLauncher = ({
     });
     return (
       <div
-        className="preview-closed-launcher preview-closed-launcher--vertical-sp"
+        className={joinLauncherClassName(
+          "preview-closed-launcher",
+          "preview-closed-launcher--vertical-sp",
+          designTypeClass,
+        )}
         onClick={toggleOpen}
         style={{ ...colorVars, ...buildPositionVars(position) }}
       >
@@ -207,7 +234,11 @@ const PreviewClosedLauncher = ({
         };
     return (
       <div
-        className="preview-closed-launcher preview-closed-launcher--fallback"
+        className={joinLauncherClassName(
+          "preview-closed-launcher",
+          "preview-closed-launcher--fallback",
+          designTypeClass,
+        )}
         onClick={() => onOpen(true)}
         style={{ ...colorVars, ...buildPositionVars(position) }}
       >

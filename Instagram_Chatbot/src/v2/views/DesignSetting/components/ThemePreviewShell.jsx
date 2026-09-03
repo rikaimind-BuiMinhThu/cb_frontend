@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { generateScopedThemeCss } from 'v2/utils/chatbotThemeCss';
+import { getDesignTypeClassName } from 'v2/utils/designTypeChrome';
 import {
   DEFAULT_MAIN_COLOR,
   THEME_CSS_VAR_MAIN_COLOR,
@@ -16,6 +17,7 @@ const ThemePreviewShell = ({
   scopeId,
   themeSettings,
   mainColor,
+  designType,
   title,
   subtitle,
   headerIconUrl,
@@ -32,8 +34,14 @@ const ThemePreviewShell = ({
 }) => {
   const scopedCss = useMemo(() => {
     if (!themeSettings) return '';
-    return generateScopedThemeCss(themeSettings, mainColor, null, `#${scopeId}`);
-  }, [themeSettings, mainColor, scopeId]);
+    return generateScopedThemeCss(
+      themeSettings,
+      mainColor,
+      null,
+      `#${scopeId}`,
+      designType,
+    );
+  }, [themeSettings, mainColor, scopeId, designType]);
 
   const displayTitle = title || (showPlaceholderLabels ? THEME_PREVIEW_SAMPLE_TITLE : '');
   const displaySubtitle = subtitle || (showPlaceholderLabels ? THEME_PREVIEW_SAMPLE_SUBTITLE : '');
@@ -42,11 +50,13 @@ const ThemePreviewShell = ({
     [THEME_CSS_VAR_MAIN_COLOR]: mainColor,
     [THEME_CSS_VAR_PROGRESS_WIDTH]: barWidth,
   };
+  const designTypeClass = getDesignTypeClassName(designType);
+  const rootClassName = `theme-customize-preview ${designTypeClass} ${className}`.trim();
 
   return (
     <div
       id={scopeId}
-      className={`theme-customize-preview ${className}`.trim()}
+      className={rootClassName}
       style={themeVars}
     >
       <style>{scopedCss}</style>
@@ -133,6 +143,7 @@ ThemePreviewShell.propTypes = {
   scopeId: PropTypes.string.isRequired,
   themeSettings: PropTypes.object,
   mainColor: PropTypes.string,
+  designType: PropTypes.string,
   title: PropTypes.string,
   subtitle: PropTypes.string,
   headerIconUrl: PropTypes.string,
@@ -151,6 +162,7 @@ ThemePreviewShell.propTypes = {
 ThemePreviewShell.defaultProps = {
   themeSettings: null,
   mainColor: DEFAULT_MAIN_COLOR,
+  designType: '',
   title: '',
   subtitle: '',
   headerIconUrl: '',
