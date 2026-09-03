@@ -213,6 +213,19 @@ const BotManagement = () => {
 
   const columns = [
     {
+      title: COL_STATUS,
+      dataIndex: 'status',
+      width: COL_STATUS_WIDTH,
+      render: (status, record) => (
+        <Switch
+          checked={status === STATUS_ON}
+          checkedChildren={STATUS_ON_LABEL}
+          unCheckedChildren={STATUS_OFF_LABEL}
+          onChange={() => handleStopBot(record.id, status)}
+        />
+      ),
+    },
+    {
       title: COL_NUMBER,
       width: COL_NUMBER_WIDTH,
       render: (_, __, index) => index + 1 + PAGE_SIZE * (page - 1),
@@ -224,19 +237,6 @@ const BotManagement = () => {
         <Button type="link" onClick={() => openBotSetting(record.id)} className="bot-name-link">
           {name}
         </Button>
-      ),
-    },
-    {
-      title: COL_STATUS,
-      dataIndex: 'status',
-      width: COL_STATUS_WIDTH,
-      render: (status, record) => (
-        <Switch
-          checked={status === STATUS_ON}
-          checkedChildren={STATUS_ON_LABEL}
-          unCheckedChildren={STATUS_OFF_LABEL}
-          onChange={() => handleStopBot(record.id, status)}
-        />
       ),
     },
     {
