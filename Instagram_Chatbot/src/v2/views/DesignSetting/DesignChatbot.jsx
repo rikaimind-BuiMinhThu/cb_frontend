@@ -1,11 +1,23 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Tabs, Spin } from 'antd';
 import { Link } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import 'v2/assets/css/bot/bot-setting.css';
-import 'v2/assets/css/bot/add-bot.css';
+import {
+  AdminPage,
+  AdminActionButton,
+  useAdminHeaderActions,
+} from 'v2/components/AdminShell';
+import ThemeCustomizeTab from './components/ThemeCustomizeTab';
+import BasicInfoTab from './components/BasicInfoTab';
+import DesignCustomizeTab from './components/DesignCustomizeTab';
+import useDesignChatbot from './hooks/useDesignChatbot';
 import {
   BOT_ID_COOKIE_KEY,
+  BOT_LIST_PATH,
+  CREATE_BOT_LABEL,
+  MODE_CREATE,
+  MODE_EDIT,
   SCL_BUTTON_LABEL,
   SCENARIO_LIST_PATH,
   TAB_BASIC,
@@ -15,26 +27,57 @@ import {
   TAB_THEME,
   TAB_THEME_LABEL,
 } from './constants/designChatbotConstants';
-import ThemeCustomizeTab from './components/ThemeCustomizeTab';
-import useDesignChatbot from './hooks/useDesignChatbot';
-import BasicInfoTab from './components/BasicInfoTab';
-import DesignCustomizeTab from './components/DesignCustomizeTab';
-import { AdminPage, AdminActionButton, useAdminHeaderActions } from 'v2/components/AdminShell';
+import 'v2/assets/css/bot/bot-setting.css';
+import 'v2/assets/css/bot/add-bot.css';
 
-const DesignChatbot = () => {
-  const botId = Cookies.get(BOT_ID_COOKIE_KEY);
-  const { state, actions } = useDesignChatbot(botId);
+const resolveEditSaveHandler = (tabmenu, actions) => {
+  if (tabmenu === TAB_BASIC) {
+    return actions.saveBasicInfo;
+  }
+  if (tabmenu === TAB_DESIGN) {
+    return actions.saveDesignSettings;
+  }
+  return actions.saveThemeCustomize;
+};
 
-  const saveHandler =
-    state.tabmenu === TAB_BASIC
-      ? actions.saveBasicInfo
-      : state.tabmenu === TAB_DESIGN
-        ? actions.saveDesignSettings
-        : actions.saveThemeCustomize;
+const DesignChatbot = ({ mode = MODE_EDIT }) => {
+  const isCreateMode = mode === MODE_CREATE;
+  const botId = isCreateMode ? null : Cookies.get(BOT_ID_COOKIE_KEY);
+  const { state, actions } = useDesignChatbot(botId, { mode });
 
-  useAdminHeaderActions(
-    state.isLoaded ? <AdminActionButton action="save" onClick={saveHandler} /> : null
+  const createHeaderActions = (
+    <>
+      <AdminActionButton
+        action="back"
+        onClick={() => { window.location.href = BOT_LIST_PATH; }}
+      />
+      <AdminActionButton
+        action="create"
+        label={CREATE_BOT_LABEL}
+        loading={state.isSaving}
+        onClick={actions.createBot}
+      />
+    </>
   );
+
+  const editHeaderActions = (
+    <AdminActionButton
+      action="save"
+      onClick={resolveEditSaveHandler(state.tabmenu, actions)}
+    />
+  );
+
+  const resolveHeaderActions = () => {
+    if (!state.isLoaded) {
+      return null;
+    }
+    if (isCreateMode) {
+      return createHeaderActions;
+    }
+    return editHeaderActions;
+  };
+
+  useAdminHeaderActions(resolveHeaderActions());
 
   if (!state.isLoaded) {
     return (
@@ -79,7 +122,7 @@ const DesignChatbot = () => {
                   }}
                   onClearError={actions.clearValidationError}
                   onDesignTypeChange={actions.setDesignType}
-                  onSave={actions.saveBasicInfo}
+                  onSave={isCreateMode ? actions.createBot : actions.saveBasicInfo}
                   onIconClick={actions.handleIconClickForType}
                   onIconRemove={actions.handleRemoveImage}
                   onIconUpload={actions.getBaseUrlAdd}
@@ -93,7 +136,7 @@ const DesignChatbot = () => {
                 <DesignCustomizeTab
                   designSettings={state.designSettings}
                   onFieldChange={actions.updateDesignSettingField}
-                  onSave={actions.saveDesignSettings}
+                  onSave={isCreateMode ? actions.createBot : actions.saveDesignSettings}
                 />
               ),
             },
@@ -111,7 +154,7 @@ const DesignChatbot = () => {
                   onMainColorChange={actions.setMainColor}
                   onApplyDerivedTheme={actions.applyDerivedTheme}
                   onResetSection={actions.resetThemeSection}
-                  onSave={actions.saveThemeCustomize}
+                  onSave={isCreateMode ? actions.createBot : actions.saveThemeCustomize}
                 />
               ),
             },
@@ -125,6 +168,14 @@ const DesignChatbot = () => {
       </Link>
     </>
   );
+};
+
+DesignChatbot.propTypes = {
+  mode: PropTypes.oneOf([MODE_EDIT, MODE_CREATE]),
+};
+
+DesignChatbot.defaultProps = {
+  mode: MODE_EDIT,
 };
 
 export default DesignChatbot;

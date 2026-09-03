@@ -248,11 +248,11 @@
   min-height: auto;
 }
 
-.admin-page--design-setting .design-setting-tab-content {
+:is(.admin-page--design-setting, .admin-page--add-bot) .design-setting-tab-content {
   padding: 20px;
 }
 
-.admin-page--design-setting .design-setting-loading {
+:is(.admin-page--design-setting, .admin-page--add-bot) .design-setting-loading {
   padding: 48px;
   text-align: center;
 }
@@ -265,30 +265,30 @@
   padding: 0;
 }
 
-.admin-page--design-setting .add-bot-container {
+:is(.admin-page--design-setting, .admin-page--add-bot) .add-bot-container {
   width: 100%;
   gap: 24px;
 }
 
-.admin-page--design-setting .bot-left,
-.admin-page--design-setting .bot-right {
+:is(.admin-page--design-setting, .admin-page--add-bot) .bot-left,
+:is(.admin-page--design-setting, .admin-page--add-bot) .bot-right {
   width: auto;
   flex: 1;
   min-width: 0;
   border-right: none;
 }
 
-.admin-page--design-setting .bot-left {
+:is(.admin-page--design-setting, .admin-page--add-bot) .bot-left {
   border-right: 1px solid #e5e7eb;
   padding-right: 24px;
 }
 
-.admin-page--design-setting .bot-right {
+:is(.admin-page--design-setting, .admin-page--add-bot) .bot-right {
   padding-left: 8px;
   justify-content: flex-start;
 }
 
-.admin-page--design-setting .design-field__label {
+:is(.admin-page--design-setting, .admin-page--add-bot) .design-field__label {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -309,33 +309,33 @@
   color: var(--admin-primary);
 }
 
-.admin-page--design-setting .theme-section__title {
+:is(.admin-page--design-setting, .admin-page--add-bot) .theme-section__title {
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
-.admin-page--design-setting .theme-field__label {
+:is(.admin-page--design-setting, .admin-page--add-bot) .theme-field__label {
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
-.admin-page--design-setting .theme-field--color .main-colors {
+:is(.admin-page--design-setting, .admin-page--add-bot) .theme-field--color .main-colors {
   margin-top: 0;
 }
 
-.admin-page--design-setting .theme-section--main-color .main-colors {
+:is(.admin-page--design-setting, .admin-page--add-bot) .theme-section--main-color .main-colors {
   padding: 0 4px 8px;
 }
 
-.admin-page--design-setting .icon_label {
+:is(.admin-page--design-setting, .admin-page--add-bot) .icon_label {
   display: inline-flex;
   align-items: center;
   gap: 4px;
 }
 
-.admin-page--design-setting .basic-info-state-preview {
+:is(.admin-page--design-setting, .admin-page--add-bot) .basic-info-state-preview {
   position: sticky;
   top: 16px;
   display: flex;
@@ -344,14 +344,14 @@
   width: 100%;
 }
 
-.admin-page--design-setting .basic-info-state-preview__title {
+:is(.admin-page--design-setting, .admin-page--add-bot) .basic-info-state-preview__title {
   margin: 0 0 10px;
   font-size: 14px;
   font-weight: 600;
   color: #374151;
 }
 
-.admin-page--design-setting .basic-info-state-preview__open-header {
+:is(.admin-page--design-setting, .admin-page--add-bot) .basic-info-state-preview__open-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -359,16 +359,16 @@
   margin-bottom: 10px;
 }
 
-.admin-page--design-setting .basic-info-state-preview__open-header .basic-info-state-preview__title {
+:is(.admin-page--design-setting, .admin-page--add-bot) .basic-info-state-preview__open-header .basic-info-state-preview__title {
   margin-bottom: 0;
 }
 
-.admin-page--design-setting .basic-info-state-preview__replay {
+:is(.admin-page--design-setting, .admin-page--add-bot) .basic-info-state-preview__replay {
   padding: 0;
   height: auto;
 }
 
-.admin-page--design-setting .basic-info-state-preview__frame {
+:is(.admin-page--design-setting, .admin-page--add-bot) .basic-info-state-preview__frame {
   background: #f9fafb;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
@@ -376,19 +376,19 @@
   min-height: 120px;
 }
 
-.admin-page--design-setting .basic-info-state-preview__frame--open {
+:is(.admin-page--design-setting, .admin-page--add-bot) .basic-info-state-preview__frame--open {
   min-height: 200px;
   overflow: hidden;
 }
 
-.admin-page--design-setting .basic-info-state-preview__frame--close {
+:is(.admin-page--design-setting, .admin-page--add-bot) .basic-info-state-preview__frame--close {
   display: flex;
   align-items: flex-end;
   justify-content: flex-end;
   min-height: 140px;
 }
 
-.admin-page--design-setting .basic-info-state-preview__widget.sp-container {
+:is(.admin-page--design-setting, .admin-page--add-bot) .basic-info-state-preview__widget.sp-container {
   position: relative;
   bottom: auto;
   right: auto;
@@ -400,46 +400,46 @@
   z-index: 0;
 }
 
-.admin-page--design-setting .basic-info-tab-title.ant-typography,
-.admin-page--design-setting .basic-info-tab-title {
+:is(.admin-page--design-setting, .admin-page--add-bot) .basic-info-tab-title.ant-typography,
+:is(.admin-page--design-setting, .admin-page--add-bot) .basic-info-tab-title {
   margin-top: 0;
   margin-bottom: 16px;
 }
 
-.admin-page--design-setting .basic-info-select,
-.admin-page--design-setting .basic-info-select.ant-select {
+:is(.admin-page--design-setting, .admin-page--add-bot) .basic-info-select,
+:is(.admin-page--design-setting, .admin-page--add-bot) .basic-info-select.ant-select {
   width: 220px;
 }
 
-.admin-page--design-setting .basic-info-animation-duration .ant-input-number,
-.admin-page--design-setting .basic-info-animation-duration .ant-input-number-group-wrapper {
+:is(.admin-page--design-setting, .admin-page--add-bot) .basic-info-animation-duration .ant-input-number,
+:is(.admin-page--design-setting, .admin-page--add-bot) .basic-info-animation-duration .ant-input-number-group-wrapper {
   width: 140px;
   min-width: 120px;
 }
 
-.admin-page--design-setting .basic-info-state-preview__widget .sp-header {
+:is(.admin-page--design-setting, .admin-page--add-bot) .basic-info-state-preview__widget .sp-header {
   min-width: 0;
   width: 100%;
   cursor: default;
   background-color: var(--theme-main-color);
 }
 
-.admin-page--design-setting .main-colors__swatch {
+:is(.admin-page--design-setting, .admin-page--add-bot) .main-colors__swatch {
   background-color: var(--theme-main-color);
 }
 
-.admin-page--design-setting .main-colors__color-input {
+:is(.admin-page--design-setting, .admin-page--add-bot) .main-colors__color-input {
   visibility: hidden;
   width: 0;
   height: 0;
 }
 
-.admin-page--design-setting .basic-info-state-preview__body.sp-body {
+:is(.admin-page--design-setting, .admin-page--add-bot) .basic-info-state-preview__body.sp-body {
   min-height: 100px;
   flex: 1;
 }
 
-.admin-page--design-setting .basic-info-state-preview__launcher {
+:is(.admin-page--design-setting, .admin-page--add-bot) .basic-info-state-preview__launcher {
   width: 64px;
   height: 64px;
   border-radius: 50%;
@@ -452,38 +452,38 @@
   background: #fff;
 }
 
-.admin-page--design-setting .basic-info-state-preview__launcher-icon {
+:is(.admin-page--design-setting, .admin-page--add-bot) .basic-info-state-preview__launcher-icon {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.admin-page--design-setting .basic-info-state-preview__launcher-placeholder {
+:is(.admin-page--design-setting, .admin-page--add-bot) .basic-info-state-preview__launcher-placeholder {
   font-size: 11px;
   color: #9ca3af;
 }
 
-.admin-page--design-setting .design-customize-sections {
+:is(.admin-page--design-setting, .admin-page--add-bot) .design-customize-sections {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.admin-page--design-setting .design-customize-panels {
+:is(.admin-page--design-setting, .admin-page--add-bot) .design-customize-panels {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
 }
 
-.admin-page--design-setting .design-device-card,
-.admin-page--design-setting .design-bubble-card {
+:is(.admin-page--design-setting, .admin-page--add-bot) .design-device-card,
+:is(.admin-page--design-setting, .admin-page--add-bot) .design-bubble-card {
   background: #fafafa;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   padding: 16px;
 }
 
-.admin-page--design-setting .design-device-card__title {
+:is(.admin-page--design-setting, .admin-page--add-bot) .design-device-card__title {
   margin: 0 0 14px;
   padding-bottom: 10px;
   border-bottom: 1px solid #e5e7eb;
@@ -492,22 +492,22 @@
   color: #374151;
 }
 
-.admin-page--design-setting .design-device-card__grid,
-.admin-page--design-setting .design-bubble-card__grid {
+:is(.admin-page--design-setting, .admin-page--add-bot) .design-device-card__grid,
+:is(.admin-page--design-setting, .admin-page--add-bot) .design-bubble-card__grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px 16px;
 }
 
-.admin-page--design-setting .design-field {
+:is(.admin-page--design-setting, .admin-page--add-bot) .design-field {
   min-width: 0;
 }
 
-.admin-page--design-setting .design-field--full {
+:is(.admin-page--design-setting, .admin-page--add-bot) .design-field--full {
   grid-column: 1 / -1;
 }
 
-.admin-page--design-setting .design-field__label {
+:is(.admin-page--design-setting, .admin-page--add-bot) .design-field__label {
   display: block;
   margin-bottom: 6px;
   font-size: 13px;
@@ -515,65 +515,65 @@
   color: #374151;
 }
 
-.admin-page--design-setting .design-field__control {
+:is(.admin-page--design-setting, .admin-page--add-bot) .design-field__control {
   width: 100%;
 }
 
-.admin-page--design-setting .design-field__control .ant-select,
-.admin-page--design-setting .design-field__control .ant-input,
-.admin-page--design-setting .design-field__control .ant-input-number,
-.admin-page--design-setting .design-field__control .ant-input-number-group-wrapper {
+:is(.admin-page--design-setting, .admin-page--add-bot) .design-field__control .ant-select,
+:is(.admin-page--design-setting, .admin-page--add-bot) .design-field__control .ant-input,
+:is(.admin-page--design-setting, .admin-page--add-bot) .design-field__control .ant-input-number,
+:is(.admin-page--design-setting, .admin-page--add-bot) .design-field__control .ant-input-number-group-wrapper {
   width: 100%;
 }
 
-.admin-page--design-setting .design-size-row {
+:is(.admin-page--design-setting, .admin-page--add-bot) .design-size-row {
   display: flex;
   align-items: center;
   width: 100%;
 }
 
-.admin-page--design-setting .design-size-row .ant-input-number-group-wrapper,
-.admin-page--design-setting .design-size-row .ant-input-number {
+:is(.admin-page--design-setting, .admin-page--add-bot) .design-size-row .ant-input-number-group-wrapper,
+:is(.admin-page--design-setting, .admin-page--add-bot) .design-size-row .ant-input-number {
   flex: 1;
   min-width: 120px;
 }
 
-.admin-page--design-setting .design-field__suffix {
+:is(.admin-page--design-setting, .admin-page--add-bot) .design-field__suffix {
   flex-shrink: 0;
   font-size: 13px;
   color: #6b7280;
 }
 
-.admin-page--design-setting .design-customize-footer {
+:is(.admin-page--design-setting, .admin-page--add-bot) .design-customize-footer {
   display: flex;
   justify-content: flex-end;
   padding-top: 4px;
 }
 
 @media (max-width: 992px) {
-  .admin-page--design-setting .design-customize-panels {
+  :is(.admin-page--design-setting, .admin-page--add-bot) .design-customize-panels {
     grid-template-columns: 1fr;
   }
 
-  .admin-page--design-setting .design-device-card__grid,
-  .admin-page--design-setting .design-bubble-card__grid {
+  :is(.admin-page--design-setting, .admin-page--add-bot) .design-device-card__grid,
+  :is(.admin-page--design-setting, .admin-page--add-bot) .design-bubble-card__grid {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 992px) {
-  .admin-page--design-setting .add-bot-container {
+  :is(.admin-page--design-setting, .admin-page--add-bot) .add-bot-container {
     flex-direction: column;
   }
 
-  .admin-page--design-setting .bot-left {
+  :is(.admin-page--design-setting, .admin-page--add-bot) .bot-left {
     border-right: none;
     border-bottom: 1px solid #e5e7eb;
     padding-right: 0;
     padding-bottom: 24px;
   }
 
-  .admin-page--design-setting .bot-right {
+  :is(.admin-page--design-setting, .admin-page--add-bot) .bot-right {
     padding-left: 0;
   }
 }

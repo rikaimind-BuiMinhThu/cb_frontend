@@ -29,6 +29,10 @@
 }
 .label-field {
   width: 30%;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
 }
 .input-field {
   flex: 1;
@@ -116,17 +120,13 @@
   white-space: nowrap;
 }
 
+.add-bot_field-container .design-types,
+.add-bot_field-container .main-colors {
+  flex: 1;
+  min-width: 0;
+}
+
 /* button wrapper */
-.btn-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding: 10px;
-}
-.btn.btn-preview {
-  color: rgb(51, 45, 45);
-  background-color: #51c4fd;
-}
 .btn.btn-close {
   color: rgb(51, 45, 45);
   background-color: white;
@@ -216,17 +216,6 @@
   transform: rotate(45deg);
 }
 
-/* image show */
-.image-show {
-  display: flex;
-  justify-content: center;
-  max-height: 200px;
-}
-
-.image-show img {
-  object-fit: contain;
-}
-
 /* error message */
 .error-message {
   display: inline-block;
@@ -259,66 +248,4 @@
   height: 100%;
   opacity: 0;
   cursor: pointer;
-}
-
-.add-bot-preview--hidden {
-  display: none;
-}
-
-.add-bot-preview--open .sp-container,
-.sp-container.add-bot-preview--expanded {
-  height: 620px;
-}
-
-.sp-container.add-bot-preview--expanded .sp-header {
-  position: static;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
-.sp-container.add-bot-preview--expanded .sp-body {
-  display: block;
-}
-
-.add-bot-preview--collapsed {
-  height: 0;
-}
-
-.sp-container.add-bot-preview--collapsed .sp-body {
-  display: none;
-}
-
-.sp-container.add-bot-preview--collapsed .sp-header {
-  border-bottom-left-radius: 25px;
-  border-bottom-right-radius: 25px;
-  position: absolute;
-  bottom: 13px;
-}
-
-.add-bot-color-swatch {
-  display: block;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background-color: var(--bot-main-color);
-}
-
-.add-bot-preview-header {
-  background-color: var(--bot-main-color);
-}
-
-.add-bot-custom-color {
-  position: relative;
-}
-
-.add-bot-custom-label {
-  position: absolute;
-  bottom: -35px;
-  width: 60px;
-}
-
-.add-bot-color-input {
-  visibility: hidden;
-  width: 0;
-  height: 0;
 }

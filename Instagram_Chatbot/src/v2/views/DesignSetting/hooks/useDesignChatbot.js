@@ -14,6 +14,10 @@ import {
   CHAT_BODY_VERSION_DEFAULT,
   CHATBOTS_API_PATH,
   CHATBOTS_API_PATH_RELATIVE,
+  CREATE_BOT_SUCCESS,
+  CREATE_REDIRECT_DELAY_MS,
+  DEFAULT_ICON_PRESET_INDEX,
+  DEFAULT_IMAGES,
   DEFAULT_MAIN_COLOR,
   DESIGN_SETTINGS_SUFFIX,
   DESIGN_TYPE_DEFAULT,
@@ -21,12 +25,15 @@ import {
   IMAGE_TYPE_JPEG,
   IMAGE_TYPE_JPG,
   IMAGE_TYPE_PNG,
+  MODE_CREATE,
+  MODE_EDIT,
   NOTIFICATION_SUCCESS_MS,
   NOTIFICATION_WARNING_MS,
   OPEN_ANIMATION_DURATION_MS_DEFAULT,
   OPEN_ANIMATION_STYLE_DEFAULT,
   SAVE_BOT_SUCCESS,
   SAVE_DESIGN_SUCCESS,
+  SCENARIO_LIST_PATH,
   TAB_BASIC,
   TOKEN_EXPIRED_CODE,
   VALIDATION_MESSAGES,
@@ -44,6 +51,8 @@ import {
 } from 'v2/views/DesignSetting/utils/designChatbotUtils';
 import { deriveThemeDefaults } from 'v2/views/DesignSetting/utils/designThemeUtils';
 import { THEME_SECTIONS } from '../constants/designThemeConstants';
+
+const EMPTY_OPTIONS = {};
 
 const INITIAL_VALIDATION_ERRORS = {
   title: '',
@@ -67,9 +76,13 @@ const PRESET_INDEX_BY_ICON_TYPE = {
   closing_bot_icon: 'closing',
 };
 
-export const useDesignChatbot = (initialBotId) => {
+export const useDesignChatbot = (initialBotId, options = EMPTY_OPTIONS) => {
+  const mode = options.mode === MODE_CREATE ? MODE_CREATE : MODE_EDIT;
+  const isCreateMode = mode === MODE_CREATE;
+
   const [tabmenu, setTabmenu] = useState(TAB_BASIC);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [botId, setBotId] = useState(initialBotId);
   const [validationErrors, setValidationErrors] = useState(INITIAL_VALIDATION_ERRORS);
 
@@ -259,14 +272,41 @@ export const useDesignChatbot = (initialBotId) => {
   }, [syncIconsFromChatbotData]);
 
   useEffect(() => {
+    if (!isCreateMode) {
+      const request = { cancelled: false };
+      const id = initialBotId || Cookies.get(BOT_ID_COOKIE_KEY);
+      setBotId(id);
+      loadChatbot(id, () => request.cancelled);
+      return () => {
+        request.cancelled = true;
+      };
+    }
+
     const request = { cancelled: false };
-    const id = initialBotId || Cookies.get(BOT_ID_COOKIE_KEY);
-    setBotId(id);
-    loadChatbot(id, () => request.cancelled);
+    const initCreateDefaults = async () => {
+      try {
+        const defaultIcon = DEFAULT_IMAGES[DEFAULT_ICON_PRESET_INDEX];
+        const dataUrl = await convertImageToDataUrl(defaultIcon);
+        if (request.cancelled) return;
+        setBotImage(dataUrl);
+        setIconPresetIndices({
+          bot: DEFAULT_ICON_PRESET_INDEX,
+          opening: null,
+          closing: null,
+        });
+      } catch {
+        if (request.cancelled) return;
+      } finally {
+        if (!request.cancelled) {
+          setIsLoaded(true);
+        }
+      }
+    };
+    initCreateDefaults();
     return () => {
       request.cancelled = true;
     };
-  }, [initialBotId, loadChatbot]);
+  }, [initialBotId, isCreateMode, loadChatbot]);
 
   const validateBasicInfo = useCallback(() => {
     const errors = {
@@ -466,6 +506,87 @@ export const useDesignChatbot = (initialBotId) => {
     title,
   ]);
 
+  const createBot = useCallback(() => {
+    if (isSaving) return;
+    if (!validateBasicInfo()) return;
+
+    const payload = buildBasicInfoPayload({
+      title,
+      subtitle,
+      designType,
+      botName,
+      mainColor,
+      botImage,
+      openingBotIcon,
+      closingBotIcon,
+      chatBodyVersion,
+    });
+    const designPayload = getDesignSettingsPayload();
+
+    setIsSaving(true);
+    api
+      .post(CHATBOTS_API_PATH, payload)
+      .then((basicRes) => {
+        const basicOk = basicRes.data.code === API_SUCCESS_CODE
+          || basicRes.data.code === API_SUCCESS_CODE_STRING;
+        if (!basicOk) {
+          setIsSaving(false);
+          if (basicRes.data?.code === API_WARNING_CODE || basicRes.data?.code === API_WARNING_CODE_STRING) {
+            showNotification(basicRes.data.message, NOTIFICATION_WARNING_MS);
+          }
+          return null;
+        }
+
+        const createdId = basicRes.data.data.id;
+        Cookies.set(BOT_ID_COOKIE_KEY, createdId);
+        Cookies.set(BOT_TYPE_COOKIE_KEY, BOT_TYPE_BOT);
+        setBotId(createdId);
+
+        return api
+          .post(`${CHATBOTS_API_PATH_RELATIVE}/${createdId}/${DESIGN_SETTINGS_SUFFIX}`, designPayload)
+          .then((designRes) => {
+            if (designRes.data?.code === API_WARNING_CODE || designRes.data?.code === API_WARNING_CODE_STRING) {
+              showNotification(designRes.data.message, NOTIFICATION_WARNING_MS);
+            }
+            return createdId;
+          })
+          .catch((error) => {
+            if (error.response?.data?.code === TOKEN_EXPIRED_CODE) {
+              tokenExpired();
+              return null;
+            }
+            return createdId;
+          });
+      })
+      .then((createdId) => {
+        if (!createdId) return;
+        showNotification(CREATE_BOT_SUCCESS);
+        setTimeout(() => {
+          window.location.href = SCENARIO_LIST_PATH;
+        }, CREATE_REDIRECT_DELAY_MS);
+      })
+      .catch((error) => {
+        setIsSaving(false);
+        if (error.response?.data?.code === TOKEN_EXPIRED_CODE) {
+          tokenExpired();
+        }
+      });
+  }, [
+    botImage,
+    botName,
+    chatBodyVersion,
+    closingBotIcon,
+    designType,
+    getDesignSettingsPayload,
+    isSaving,
+    mainColor,
+    openingBotIcon,
+    showNotification,
+    subtitle,
+    title,
+    validateBasicInfo,
+  ]);
+
   const updateThemeField = useCallback((field, value) => {
     setThemeSettings((prev) => ({ ...prev, [field]: value }));
   }, []);
@@ -521,8 +642,10 @@ export const useDesignChatbot = (initialBotId) => {
 
   return {
     state: {
+      mode,
       tabmenu,
       isLoaded,
+      isSaving,
       botId,
       validationErrors,
       iconPresetIndices,
@@ -577,6 +700,7 @@ export const useDesignChatbot = (initialBotId) => {
       saveBasicInfo,
       saveDesignSettings,
       saveThemeCustomize,
+      createBot,
       updateDesignSettingField,
       updateThemeField,
       resetThemeSection,

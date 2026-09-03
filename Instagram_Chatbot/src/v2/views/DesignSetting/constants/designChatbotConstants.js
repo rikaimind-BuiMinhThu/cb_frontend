@@ -115,6 +115,14 @@ export const TAB_DESIGN_LABEL = 'デザインカスタマイズ';
 export const TAB_THEME_LABEL = 'テーマカスタマイズ';
 export const SCL_BUTTON_LABEL = 'SCL';
 export const SCENARIO_LIST_PATH = '/v2/admin/scenario-list';
+export const BOT_LIST_PATH = '/v2/admin/bot';
+
+export const MODE_EDIT = 'edit';
+export const MODE_CREATE = 'create';
+export const CREATE_BOT_LABEL = 'ボット作成';
+export const CREATE_BOT_SUCCESS = 'ボットを正常に作成されました！';
+export const CREATE_REDIRECT_DELAY_MS = 1500;
+export const DEFAULT_ICON_PRESET_INDEX = 0;
 
 export const START_BUTTON_PLACEHOLDER = '開始ボタン（準備中）';
 export const CHAT_BODY_PLACEHOLDER = 'チャット本文（準備中）';

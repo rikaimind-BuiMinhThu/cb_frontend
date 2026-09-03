@@ -12,7 +12,7 @@ import AttractedCustomer from 'views/InstagramBotElement/AttractedCustomer';
 import CRM from 'views/InstagramBotElement/CRM';
 import Template from 'v2/views/InstagramBotElement/Template';
 import BotManagement from 'v2/views/BotManagement/BotManagement';
-import AddBotchat from 'v2/views/BotManagement/AddBotchat';
+import DesignChatbotCreate from 'v2/views/DesignSetting/DesignChatbotCreate';
 import BasicSetting from 'v2/views/AccountSettings/BasicSetting';
 import SubUserManagement from 'v2/views/AccountSettings/SubUserManagement';
 import PaymentSetting from 'v2/views/AccountSettings/PaymentSetting';
@@ -164,7 +164,7 @@ const routes = [
     path: '/add-bot-management',
     name: 'ボット管理追加',
     // icon: "nc-icon nc-single-02",
-    component: AddBotchat,
+    component: DesignChatbotCreate,
     layout: '/v2/admin',
   },
   // {
