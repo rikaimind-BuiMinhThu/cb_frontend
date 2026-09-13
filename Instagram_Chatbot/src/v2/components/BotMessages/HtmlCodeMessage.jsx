@@ -1,17 +1,20 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
+const HTML_CODE_PLACEHOLDER = 'HTMLコード...';
+const TEXTAREA_ROWS_DEFAULT = 5;
 
 const HtmlCodeMessage = ({
   value = '',
   onChange,
   validationError = '',
-  placeholder = 'HTMLコード...',
-  rows = 5,
-  className = ''
+  placeholder = HTML_CODE_PLACEHOLDER,
+  rows = TEXTAREA_ROWS_DEFAULT,
+  className = '',
 }) => {
-  const handleChange = (e) => {
-    const newValue = e.target.value;
+  const handleChange = (event) => {
     if (onChange) {
-      onChange(newValue);
+      onChange(event.target.value);
     }
   };
 
@@ -38,6 +41,15 @@ const HtmlCodeMessage = ({
       </div>
     </div>
   );
+};
+
+HtmlCodeMessage.propTypes = {
+  value: PropTypes.string,
+  onChange: PropTypes.func,
+  validationError: PropTypes.string,
+  placeholder: PropTypes.string,
+  rows: PropTypes.number,
+  className: PropTypes.string,
 };
 
 export default HtmlCodeMessage;

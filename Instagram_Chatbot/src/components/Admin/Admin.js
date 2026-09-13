@@ -10,7 +10,7 @@ import Company from 'views/Public/Company';
 import Contact from 'views/Public/Contact';
 import ShortUrl from 'views/Public/ShortUrl';
 import News from 'views/Public/News';
-import AdminV2 from 'v2/components/Admin/AdminV2';
+import AdminV2 from 'v2/app/AdminV2';
 
 const Admin = lazy(() => import('../../layouts/Admin'));
 const PreviewClone = lazy(() => import('views/BotElement/BotSetting/PreviewClone'));

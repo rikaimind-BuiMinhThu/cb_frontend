@@ -29,6 +29,10 @@
 }
 .label-field {
   width: 30%;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
 }
 .input-field {
   flex: 1;
@@ -99,6 +103,7 @@
   height: 30px;
   border-radius: 50%;
   display: block;
+  background-color: var(--theme-main-color);
 }
 
 .main-colors__custom {
@@ -115,17 +120,13 @@
   white-space: nowrap;
 }
 
+.add-bot_field-container .design-types,
+.add-bot_field-container .main-colors {
+  flex: 1;
+  min-width: 0;
+}
+
 /* button wrapper */
-.btn-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding: 10px;
-}
-.btn.btn-preview {
-  color: rgb(51, 45, 45);
-  background-color: #51c4fd;
-}
 .btn.btn-close {
   color: rgb(51, 45, 45);
   background-color: white;
@@ -213,17 +214,6 @@
   color: #ff5b5b;
   cursor: pointer;
   transform: rotate(45deg);
-}
-
-/* image show */
-.image-show {
-  display: flex;
-  justify-content: center;
-  max-height: 200px;
-}
-
-.image-show img {
-  object-fit: contain;
 }
 
 /* error message */

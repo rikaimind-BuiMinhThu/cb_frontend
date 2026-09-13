@@ -1,6 +1,7 @@
 import {
   AMAZON_SELECTOR_TO_VALUE_PATH,
   FUKUSHIASHIKI_SELECTOR_VALUE_SUFFIX,
+  MESSAGE_CONTENT_TYPES,
 } from '../constants.js';
 
 const ZIP_FIELD_TYPES = [
@@ -193,17 +194,35 @@ const extractTextareaBindings = (content) => buildBindingsFromSelectorKey({
   valuePath: 'textarea.text_input.value',
 });
 
+const extractPullDownBindings = (content) => {
+  const pullDownType = content.pull_down?.type;
+  if (!pullDownType) return [];
+  return buildBindingsFromSelectorKey({
+    selectorKeyType: 'fukushashiki_search_value',
+    rawValue: content.fukushashiki_search_value,
+    valuePath: `pull_down.${pullDownType}.value`,
+  });
+};
+
+const extractProductPurchaseSelectOptionBindings = (content) => buildBindingsFromSelectorKey({
+  selectorKeyType: 'fukushashiki_search_value',
+  rawValue: content.fukushashiki_search_value,
+  valuePath: 'product_purchase_select_option.value',
+});
+
 const extractBindingsFromContent = (content) => {
   if (!content?.type) return [];
   switch (content.type) {
-    case 'text_input': return extractTextInputBindings(content);
-    case 'zip_code_address': return extractZipCodeAddressBindings(content);
-    case 'shipping_address': return extractShippingAddressBindings(content);
-    case 'card_payment_radio_button':
-    case 'credit_card_payment': return extractCardPaymentBindings(content);
-    case 'checkbox': return extractCheckboxBindings(content);
-    case 'radio_button': return extractRadioButtonBindings(content);
-    case 'textarea': return extractTextareaBindings(content);
+    case MESSAGE_CONTENT_TYPES.TEXT_INPUT: return extractTextInputBindings(content);
+    case MESSAGE_CONTENT_TYPES.ZIP_CODE_ADDRESS: return extractZipCodeAddressBindings(content);
+    case MESSAGE_CONTENT_TYPES.SHIPPING_ADDRESS: return extractShippingAddressBindings(content);
+    case MESSAGE_CONTENT_TYPES.CARD_PAYMENT_RADIO_BUTTON:
+    case MESSAGE_CONTENT_TYPES.CREDIT_CARD_PAYMENT: return extractCardPaymentBindings(content);
+    case MESSAGE_CONTENT_TYPES.CHECKBOX: return extractCheckboxBindings(content);
+    case MESSAGE_CONTENT_TYPES.RADIO_BUTTON: return extractRadioButtonBindings(content);
+    case MESSAGE_CONTENT_TYPES.TEXT_AREA: return extractTextareaBindings(content);
+    case MESSAGE_CONTENT_TYPES.PULL_DOWN: return extractPullDownBindings(content);
+    case MESSAGE_CONTENT_TYPES.PRODUCT_PURCHASE_SELECT_OPTION: return extractProductPurchaseSelectOptionBindings(content);
     default: return [];
   }
 };
@@ -238,16 +257,44 @@ const extractGenericFallbackBindings = (content) => {
   return bindings;
 };
 
+const isAmazonPayUserMessage = (msg) => {
+  if (msg?.belong_to !== 'user') return false;
+  if (msg.is_used_when_amazon_pay) return true;
+  return (msg.message_content || []).some((content) => (
+    !!content?.is_used_when_amazon_pay
+    || Object.values(content?.amazon_pay_fields || {}).some(Boolean)
+  ));
+};
+
+const isAmazonPayFieldEnabled = (content, selectorKeyType) => {
+  const fields = content?.amazon_pay_fields;
+  if (!fields || typeof fields !== 'object') return true;
+  if (!Object.prototype.hasOwnProperty.call(fields, selectorKeyType)) return true;
+  return fields[selectorKeyType] !== false;
+};
+
+const filterEnabledBindings = (content, bindings) => (
+  (bindings || []).filter((binding) => isAmazonPayFieldEnabled(content, binding.selectorKeyType))
+);
+
 export const extractSelectorBindingsFromMessages = (messages) => {
   const bindings = [];
   const seen = new Set();
   (messages || [])
-    .filter((msg) => msg.belong_to === 'user' && msg.is_used_when_amazon_pay)
+    .filter(isAmazonPayUserMessage)
     .forEach((msg) => {
       (msg.message_content || []).forEach((content, contentIndex) => {
         const meta = { messageId: msg.id, contentIndex };
-        appendBindings(bindings, seen, extractBindingsFromContent(content).map((binding) => ({ ...binding, ...meta })));
-        appendBindings(bindings, seen, extractGenericFallbackBindings(content).map((binding) => ({ ...binding, ...meta })));
+        appendBindings(
+          bindings,
+          seen,
+          filterEnabledBindings(content, extractBindingsFromContent(content)).map((binding) => ({ ...binding, ...meta })),
+        );
+        appendBindings(
+          bindings,
+          seen,
+          filterEnabledBindings(content, extractGenericFallbackBindings(content)).map((binding) => ({ ...binding, ...meta })),
+        );
       });
     });
   return bindings;
@@ -305,7 +352,7 @@ export const safeGetAmazonPayload = async () => {
 };
 
 export const hasAmazonPayTargets = (messages) => (
-  (messages || []).some((msg) => msg.belong_to === 'user' && msg.is_used_when_amazon_pay)
+  (messages || []).some(isAmazonPayUserMessage)
 );
 
 export const normalizeLpDomain = (input) => {

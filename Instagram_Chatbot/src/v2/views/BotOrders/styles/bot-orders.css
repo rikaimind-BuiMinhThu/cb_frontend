@@ -1,0 +1,48 @@
+.bot-orders-page {
+  padding: 20px;
+}
+
+.bot-orders-table .ant-table-row {
+  cursor: pointer;
+}
+
+.bot-orders-filter-status {
+  width: 140px;
+}
+
+.bot-orders-filter-path {
+  width: 160px;
+}
+
+.bot-orders-back {
+  margin-bottom: 16px;
+}
+
+.bot-orders-section {
+  margin-bottom: 24px;
+}
+
+.bot-orders-rpa-log {
+  background: #f5f7fa;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+  overflow: auto;
+  padding: 16px;
+  white-space: pre-wrap;
+}
+
+.bot-orders-screenshot {
+  margin-top: 16px;
+}
+
+.bot-orders-screenshot-image {
+  max-width: 100%;
+}
+
+.bot-orders-footer {
+  margin-top: 24px;
+}

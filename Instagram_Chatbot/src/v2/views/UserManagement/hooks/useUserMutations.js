@@ -1,45 +1,64 @@
 import { useState } from 'react';
 import { message } from 'antd';
-import api from 'api/api-management';
+import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
+import { API_SUCCESS_CODE } from 'v2/api/constants';
+import {
+  API_WARNING_CODE,
+  API_WARNING_CODE_STRING,
+  EMAIL_TAKEN_TOKEN,
+  SUCCESS_USER_ADDED,
+  SUCCESS_USER_DELETED,
+  SUCCESS_USER_UPDATED,
+  USER_REGISTRATIONS_PATH,
+  USERS_API_PATH,
+  WARNING_EMAIL_EXISTS,
+} from '../constants';
 
-export default function useUserMutations({ reloadList, page }) {
+const isWarningCode = (code) => code === API_WARNING_CODE || code === API_WARNING_CODE_STRING;
+const isSuccessCode = (code) => code === API_SUCCESS_CODE || code === String(API_SUCCESS_CODE);
+
+const useUserMutations = ({ reloadList, page }) => {
   const [isOpenAdd, setIsOpenAdd] = useState(false);
   const [isOpenEdit, setIsOpenEdit] = useState(false);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [idDeleteUser, setIdDeleteUser] = useState();
+  const [submitting, setSubmitting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
-  function openAdd() {
+  const openAdd = () => {
     setIsOpenAdd(true);
-  }
+  };
 
-  function openEdit(item) {
+  const openEdit = (item) => {
     setEditingUser(item);
     setIsOpenEdit(true);
-  }
+  };
 
-  function confirmDelete(id) {
+  const confirmDelete = (id) => {
     setIdDeleteUser(id);
     setIsOpenDelete(true);
-  }
+  };
 
-  function deleteUser() {
-    setIsOpenDelete(false);
+  const deleteUser = () => {
+    setDeleting(true);
     api
-      .delete(`/api/v1/managements/users/${idDeleteUser}`)
+      .delete(`${USERS_API_PATH}/${idDeleteUser}`)
       .then(() => {
         reloadList(page);
-        message.success('削除しました!');
+        message.success(SUCCESS_USER_DELETED);
+        setIsOpenDelete(false);
       })
       .catch((error) => {
         if (error.response?.data.code === 0) {
           tokenExpired();
         }
-      });
-  }
+      })
+      .finally(() => setDeleting(false));
+  };
 
-  function updateUser(values) {
+  const updateUser = (values) => {
     const payload = {
       user: {
         full_name: values.full_name,
@@ -53,11 +72,12 @@ export default function useUserMutations({ reloadList, page }) {
       payload.user.password_confirmation = values.password_confirmation;
     }
 
+    setSubmitting(true);
     return api
-      .patch(`/api/v1/managements/users/${editingUser.id}`, payload)
+      .patch(`${USERS_API_PATH}/${editingUser.id}`, payload)
       .then(() => {
         reloadList(page);
-        message.success('ユーザーを更新しました!');
+        message.success(SUCCESS_USER_UPDATED);
         setIsOpenEdit(false);
         setEditingUser(null);
       })
@@ -65,10 +85,11 @@ export default function useUserMutations({ reloadList, page }) {
         if (error.response?.data.code === 0) {
           tokenExpired();
         }
-      });
-  }
+      })
+      .finally(() => setSubmitting(false));
+  };
 
-  function addUser(values) {
+  const addUser = (values) => {
     const newUser = {
       user: {
         full_name: values.full_name,
@@ -79,28 +100,29 @@ export default function useUserMutations({ reloadList, page }) {
       },
     };
 
+    setSubmitting(true);
     return api
-      .post(`/api/v1/users/registrations`, newUser)
+      .post(USER_REGISTRATIONS_PATH, newUser)
       .then((res) => {
-        if (res.data?.code === 1 || res.data?.code === '1') {
+        if (isSuccessCode(res.data?.code)) {
           reloadList(page);
-          message.success('ユーザーを追加しました!');
+          message.success(SUCCESS_USER_ADDED);
           setIsOpenAdd(false);
-        } else if (res.data?.code === 2 || res.data?.code === '2') {
-          if (res.data?.message?.includes('Email has already been taken')) {
-            message.warning('メールアドレスはは既に存在しています。');
+        } else if (isWarningCode(res.data?.code)) {
+          if (res.data?.message?.includes(EMAIL_TAKEN_TOKEN)) {
+            message.warning(WARNING_EMAIL_EXISTS);
           } else {
             message.warning(res.data?.message);
           }
-          setIsOpenAdd(false);
         }
       })
       .catch((error) => {
         if (error.response?.data.code === 0) {
           tokenExpired();
         }
-      });
-  }
+      })
+      .finally(() => setSubmitting(false));
+  };
 
   return {
     isOpenAdd,
@@ -110,6 +132,8 @@ export default function useUserMutations({ reloadList, page }) {
     isOpenDelete,
     setIsOpenDelete,
     editingUser,
+    submitting,
+    deleting,
     openAdd,
     openEdit,
     confirmDelete,
@@ -117,4 +141,6 @@ export default function useUserMutations({ reloadList, page }) {
     updateUser,
     addUser,
   };
-}
+};
+
+export default useUserMutations;

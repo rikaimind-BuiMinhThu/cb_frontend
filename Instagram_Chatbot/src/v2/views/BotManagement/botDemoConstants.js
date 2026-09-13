@@ -1,0 +1,9 @@
+export const OPEN_PREVIEW_DELAY_MS = 300;
+export const CHATBOTS_MANAGEMENT_PATH = '/api/v1/managements/chatbots';
+export const SCENARIO_SELECTED_SUFFIX = 'get_scenario_selected';
+export const NO_SCENARIO_WARNING = 'シナリオがありません。';
+export const ACTION_CLICK_TITLE = 'アクションクリック';
+export const OPEN_CLOSE_BUTTON = 'open-close';
+export const EMPTY_SCENARIO_ID = '';
+export const BOT_DEMO_PREVIEW_OPEN_CLASS = 'bot-demo-preview bot-demo-preview--open';
+export const BOT_DEMO_PREVIEW_CLOSED_CLASS = 'bot-demo-preview bot-demo-preview--closed';

@@ -1,23 +1,62 @@
 import React, { useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { Form, Input, Modal, Select } from 'antd';
-import { AdminActionButton } from '../../components/AdminShell';
-import { EMAIL_REGEX, ROLE_OPTIONS } from './constants';
+import { AdminActionButton } from 'v2/components/AdminShell';
+import {
+  ADD_BUTTON_LABEL,
+  ADD_USER_TITLE,
+  CLIENT_REQUIRED,
+  EMAIL_FORMAT,
+  EMAIL_REGEX,
+  FORM_LABEL_COL,
+  FORM_WRAPPER_COL,
+  LABEL_CLIENT,
+  LABEL_LOGIN_ID,
+  LABEL_NAME,
+  LABEL_PASSWORD,
+  LABEL_PASSWORD_CONFIRM,
+  LABEL_ROLE,
+  LOGIN_MAX,
+  LOGIN_REQUIRED,
+  NAME_MAX,
+  NAME_MAX_LENGTH,
+  NAME_REQUIRED,
+  PASSWORD_CONFIRM_REQUIRED,
+  PASSWORD_LENGTH,
+  PASSWORD_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
+  PASSWORD_MISMATCH,
+  PASSWORD_REQUIRED,
+  PLACEHOLDER_CLIENT,
+  ROLE_ADMIN_CLIENT,
+  ROLE_OPTIONS,
+  ROLE_REQUIRED,
+  USER_MODAL_WIDTH,
+} from './constants';
 
-function UserAddModal({ open, onClose, listClient, onSubmit }) {
+const validatePasswordLength = (_, value) => {
+  if (!value) return Promise.resolve();
+  if (value.length < PASSWORD_MIN_LENGTH || value.length > PASSWORD_MAX_LENGTH) {
+    return Promise.reject(new Error(PASSWORD_LENGTH));
+  }
+  return Promise.resolve();
+};
+
+const UserAddModal = ({ open, onClose, listClient, onSubmit, loading }) => {
   const [form] = Form.useForm();
 
   useEffect(() => {
     if (open) {
       form.resetFields();
-      form.setFieldsValue({ role: 'admin_client' });
+      form.setFieldsValue({ role: ROLE_ADMIN_CLIENT });
     }
   }, [open, form]);
 
-  function handleOk() {
+  const handleOk = () => {
     form.validateFields().then((values) => {
       onSubmit(values);
     });
-  }
+  };
 
   const clientOptions =
     listClient?.clients?.map((client) => ({
@@ -27,74 +66,69 @@ function UserAddModal({ open, onClose, listClient, onSubmit }) {
 
   return (
     <Modal
-      title="ユーザー追加"
-      visible={open}
+      title={ADD_USER_TITLE}
+      open={open}
       onCancel={onClose}
-      width={520}
+      width={USER_MODAL_WIDTH}
       destroyOnClose
       footer={
         <div className="admin-form-actions">
           <AdminActionButton action="cancel" onClick={onClose} />
-          <AdminActionButton action="create" label="追加" onClick={handleOk} />
+          <AdminActionButton action="create" label={ADD_BUTTON_LABEL} onClick={handleOk} loading={loading} />
         </div>
       }
     >
-      <Form form={form} layout="vertical">
+      <Form
+        form={form}
+        layout="horizontal"
+        colon={false}
+        labelAlign="left"
+        labelCol={FORM_LABEL_COL}
+        wrapperCol={FORM_WRAPPER_COL}
+      >
         <Form.Item
-          label="名称"
+          label={LABEL_NAME}
           name="full_name"
           rules={[
-            { required: true, message: '入力してください。' },
-            { max: 35, message: '35文字以下入力してください。' },
+            { required: true, message: NAME_REQUIRED },
+            { max: NAME_MAX_LENGTH, message: NAME_MAX },
           ]}
         >
           <Input />
         </Form.Item>
         <Form.Item
-          label="ログインID"
+          label={LABEL_LOGIN_ID}
           name="email"
           rules={[
-            { required: true, message: 'メールアドレス を入力してください。' },
-            { max: 35, message: '35文字以下入力してください。' },
-            { pattern: EMAIL_REGEX, message: 'メールの正しい形式で入力してください：abc@abc.com' },
+            { required: true, message: LOGIN_REQUIRED },
+            { max: NAME_MAX_LENGTH, message: LOGIN_MAX },
+            { pattern: EMAIL_REGEX, message: EMAIL_FORMAT },
           ]}
         >
           <Input />
         </Form.Item>
         <Form.Item
-          label="パスワード"
+          label={LABEL_PASSWORD}
           name="password"
           rules={[
-            { required: true, message: '入力してください。' },
-            {
-              validator: (_, value) => {
-                if (!value) return Promise.resolve();
-                if (value.length < 6 || value.length > 24) {
-                  return Promise.reject(
-                    new Error('24文字以下入力してください。6文字以上入力してください。')
-                  );
-                }
-                return Promise.resolve();
-              },
-            },
+            { required: true, message: PASSWORD_REQUIRED },
+            { validator: validatePasswordLength },
           ]}
         >
           <Input.Password />
         </Form.Item>
         <Form.Item
-          label="パスワード（確認用）"
+          label={LABEL_PASSWORD_CONFIRM}
           name="password_confirmation"
           dependencies={['password']}
           rules={[
-            { required: true, message: '入力してください。' },
+            { required: true, message: PASSWORD_CONFIRM_REQUIRED },
             ({ getFieldValue }) => ({
-              validator(_, value) {
+              validator: (_, value) => {
                 if (!value || getFieldValue('password') === value) {
                   return Promise.resolve();
                 }
-                return Promise.reject(
-                  new Error('パスワードが一致しません。もう一度ご入力ください。')
-                );
+                return Promise.reject(new Error(PASSWORD_MISMATCH));
               },
             }),
           ]}
@@ -102,22 +136,30 @@ function UserAddModal({ open, onClose, listClient, onSubmit }) {
           <Input.Password />
         </Form.Item>
         <Form.Item
-          label="クライアント"
+          label={LABEL_CLIENT}
           name="client_id"
-          rules={[{ required: true, message: 'クライアントを選択してください。' }]}
+          rules={[{ required: true, message: CLIENT_REQUIRED }]}
         >
-          <Select options={clientOptions} placeholder="クライアントを選択" />
+          <Select options={clientOptions} placeholder={PLACEHOLDER_CLIENT} />
         </Form.Item>
         <Form.Item
-          label="権限"
+          label={LABEL_ROLE}
           name="role"
-          rules={[{ required: true, message: '権限を選択してください。' }]}
+          rules={[{ required: true, message: ROLE_REQUIRED }]}
         >
           <Select options={ROLE_OPTIONS} />
         </Form.Item>
       </Form>
     </Modal>
   );
-}
+};
+
+UserAddModal.propTypes = {
+  open: PropTypes.bool,
+  onClose: PropTypes.func,
+  listClient: PropTypes.object,
+  onSubmit: PropTypes.func,
+  loading: PropTypes.bool,
+};
 
 export default UserAddModal;

@@ -1,15 +1,31 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Cookies from 'js-cookie';
-import api from 'api/api-management';
+import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
+import {
+  AUTH_FALSE_VALUE,
+  IS_AUTH_COOKIE_KEY,
+  ROLE_ADMIN_CLIENT,
+  ROLE_CLIENT,
+  TOKEN_COOKIE_KEY,
+  USER_ROLE_COOKIE_KEY,
+} from 'v2/api/constants';
+import { getAdminRoutePath, getSignInPath } from 'v2/variables/constants';
 import {
   buildClientsUrl,
   getConversionPreviewDates,
   isValidConversionDateRange,
   PAGE_SIZE,
-} from '../utils/clientManagementUtils';
+} from 'v2/views/ClientManagement/utils/clientManagementUtils';
+import {
+  DATE_SLICE_LENGTH,
+  END_DATE_AFTER_START,
+  END_DATE_REQUIRED,
+  PLANS_API_PATH,
+  START_DATE_REQUIRED,
+} from '../constants';
 
-export default function useClientList() {
+const useClientList = () => {
   const [clients, setClients] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -20,62 +36,70 @@ export default function useClientList() {
   const [plans, setPlans] = useState([]);
 
   useEffect(() => {
-    const userRole = Cookies.get('user_role');
+    const userRole = Cookies.get(USER_ROLE_COOKIE_KEY);
     if (!userRole) {
-      window.location.href = '/';
+      window.location.href = getSignInPath();
     }
-    if (userRole === 'admin_client' || userRole === 'client') {
-      window.location.href = '/v2/admin/dashboard';
-    }
-  }, []);
-
-  useEffect(() => {
-    if (
-      Cookies.get('token') == undefined ||
-      Cookies.get('token') == null ||
-      Cookies.get('token') == ''
-    ) {
-      window.location.href = '/';
-    }
-    if (Cookies.get('is_auth') == 'false') {
-      window.location.href = '/';
+    if (userRole === ROLE_ADMIN_CLIENT || userRole === ROLE_CLIENT) {
+      window.location.href = getAdminRoutePath('/dashboard');
     }
   }, []);
 
   useEffect(() => {
+    const token = Cookies.get(TOKEN_COOKIE_KEY);
+    if (token === undefined || token === null || token === '') {
+      window.location.href = getSignInPath();
+    }
+    if (Cookies.get(IS_AUTH_COOKIE_KEY) === AUTH_FALSE_VALUE) {
+      window.location.href = getSignInPath();
+    }
+  }, []);
+
+  useEffect(() => {
+    const cancellation = { aborted: false };
     api
-      .get('/api/v1/managements/plans')
-      .then((res) => setPlans(res.data.data))
+      .get(PLANS_API_PATH)
+      .then((res) => {
+        if (!cancellation.aborted) setPlans(res.data.data);
+      })
       .catch((error) => {
+        if (cancellation.aborted) return;
         if (error.response?.data.code === 0) tokenExpired();
       });
+    return () => {
+      cancellation.aborted = true;
+    };
   }, []);
 
-  function fetchClients(pageNum, name = namesearch, range = conversionRange) {
+  const fetchRequestId = useRef(0);
+
+  const fetchClients = useCallback((pageNum, name = namesearch, range = conversionRange) => {
     const { startPreview, endPreview } = getConversionPreviewDates(range);
 
     if (range?.[0] && !range?.[1]) {
-      setDateRangeError('終了日を指定してください');
+      setDateRangeError(END_DATE_REQUIRED);
       return;
     }
     if (!range?.[0] && range?.[1]) {
-      setDateRangeError('開始日を指定してください');
+      setDateRangeError(START_DATE_REQUIRED);
       return;
     }
     if (startPreview && endPreview) {
-      const startD = startPreview.toISOString().slice(0, 10);
-      const endD = endPreview.toISOString().slice(0, 10);
+      const startD = startPreview.toISOString().slice(0, DATE_SLICE_LENGTH);
+      const endD = endPreview.toISOString().slice(0, DATE_SLICE_LENGTH);
       if (!isValidConversionDateRange(startD, endD)) {
-        setDateRangeError('終了日は開始日以降を指定してください');
+        setDateRangeError(END_DATE_AFTER_START);
         return;
       }
     }
     setDateRangeError('');
     setLoading(true);
+    const requestId = ++fetchRequestId.current;
 
     api
       .get(buildClientsUrl(pageNum, name, startPreview, endPreview))
       .then((res) => {
+        if (requestId !== fetchRequestId.current) return undefined;
         const data = res?.data?.data || {};
         const totalCount = data.total || 0;
         const maxPage = Math.max(1, Math.ceil(totalCount / PAGE_SIZE) || 1);
@@ -85,6 +109,7 @@ export default function useClientList() {
           return api
             .get(buildClientsUrl(targetPage, name, startPreview, endPreview))
             .then((retryRes) => {
+              if (requestId !== fetchRequestId.current) return;
               const retryData = retryRes?.data?.data || {};
               setClients(retryData.clients || []);
               setTotal(retryData.total || 0);
@@ -98,27 +123,29 @@ export default function useClientList() {
         return undefined;
       })
       .catch((error) => {
-        console.log(error);
+        if (requestId !== fetchRequestId.current) return;
         if (error.response?.data.code === 0) tokenExpired();
       })
-      .finally(() => setLoading(false));
-  }
+      .finally(() => {
+        if (requestId === fetchRequestId.current) setLoading(false);
+      });
+  }, [namesearch, conversionRange]);
 
   useEffect(() => {
     fetchClients(1);
-  }, []);
+  }, [fetchClients]);
 
-  function handleSearch() {
+  const handleSearch = () => {
     setPage(1);
     fetchClients(1, namesearch);
-  }
+  };
 
-  function handlePageChange(nextPage) {
+  const handlePageChange = (nextPage) => {
     fetchClients(nextPage, namesearch);
     window.scrollTo(0, 0);
-  }
+  };
 
-  function handleConversionDateChange(dates) {
+  const handleConversionDateChange = (dates) => {
     setConversionRange(dates);
     if (!dates?.[0] || !dates?.[1]) {
       setDateRangeError('');
@@ -127,21 +154,21 @@ export default function useClientList() {
     }
 
     const { startPreview, endPreview } = getConversionPreviewDates(dates);
-    const startD = startPreview.toISOString().slice(0, 10);
-    const endD = endPreview.toISOString().slice(0, 10);
+    const startD = startPreview.toISOString().slice(0, DATE_SLICE_LENGTH);
+    const endD = endPreview.toISOString().slice(0, DATE_SLICE_LENGTH);
     if (!isValidConversionDateRange(startD, endD)) {
-      setDateRangeError('終了日は開始日以降を指定してください');
+      setDateRangeError(END_DATE_AFTER_START);
       return;
     }
 
     setDateRangeError('');
     setPage(1);
     fetchClients(1, namesearch, dates);
-  }
+  };
 
-  function reloadListClient(pgIndex = page) {
+  const reloadListClient = (pgIndex = page) => {
     fetchClients(pgIndex, namesearch);
-  }
+  };
 
   return {
     clients,
@@ -158,4 +185,6 @@ export default function useClientList() {
     handleConversionDateChange,
     reloadListClient,
   };
-}
+};
+
+export default useClientList;

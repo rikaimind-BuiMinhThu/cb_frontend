@@ -1,0 +1,52 @@
+.ss-carousel-preview {
+  margin-bottom: 10px;
+}
+
+.ss-carousel-preview__header {
+  margin-bottom: 0;
+}
+
+.ss-carousel-preview__slide {
+  width: 100%;
+  min-height: 298px;
+}
+
+.ss-carousel-preview__title {
+  font-weight: 800;
+}
+
+.ss-carousel-preview__button-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.ss-carousel-preview__button {
+  min-width: 10%;
+  height: 10%;
+  background-color: #088c43;
+  padding: 7px;
+  color: white;
+  font-weight: 400;
+  border-radius: 5px;
+}
+
+.ss-carousel-arrow {
+  color: black;
+  font-size: 15px;
+  line-height: 1.5715;
+  position: absolute;
+  top: 50%;
+  display: block;
+  transform: translateY(-50%);
+  z-index: 1;
+  cursor: pointer;
+}
+
+.ss-carousel-arrow.slick-prev {
+  left: 0;
+}
+
+.ss-carousel-arrow.slick-next {
+  right: 0;
+}

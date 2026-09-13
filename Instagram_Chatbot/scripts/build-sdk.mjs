@@ -13,7 +13,7 @@ const buildOptions = {
   entryPoints: [entryPoint],
   bundle: true,
   format: 'iife',
-  target: ['es2018'],
+  target: ['es2015'],
   outfile,
   minify: false,
   banner: { js: banner },

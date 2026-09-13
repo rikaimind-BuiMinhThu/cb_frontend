@@ -1,0 +1,138 @@
+export const SCENARIO_MODAL_TOOLTIPS = {
+  lpProductUrl: '商品購入ページのURLを入力してください。',
+  urlThanks: '購入完了後のサンクスページのURLを入力してください。',
+  merchandiseId: 'Shopifyの商品IDまたはバリアントIDを入力してください。',
+  productIdCrossSell: 'クロスセル用の商品IDまたはバリアントIDを入力してください。',
+  coupon: '適用するクーポンコードを入力してください。',
+  launchButtonSelectors: '複数セレクターはカンマ区切り。クリックでチャットボットを開きます。',
+  isUseCustomCss: 'カスタムCSSをチャットボットに適用します。',
+  isUseCustomJsCode: 'カスタムJSコードをチャットボットに適用します。',
+  isUseHtmlUgc: 'UGCコンテンツ（Instagram/TikTok/レビュー）をチャットボットに埋め込みます。',
+  timer: 'チャットボット内にカウントダウンタイマーを表示します。',
+  isUseErrMsgByJs: 'フォームのエラーメッセージをJSまたはセレクターで取得します。',
+  isUseOnlyRegularOrder: '定期注文のみを対象とします。',
+  executionPolicy: '注文の実施方針を選択します。複写式を選ぶとLP連携用の設定が表示されます。',
+  isUseFukushashiki: '複写式チャットボット機能を有効にします。',
+  isUseAmazonPay: 'Amazon Pay連携を有効にします。許可ドメインや判定方法を設定できます。',
+  amazonPayUsageDetection: 'LPページでAmazon Payが選択・利用されているかを検出する方法を設定します。',
+  amazonPayAutofillReadyDetection: 'LPフォームへのAmazon Pay情報の自動入力が完了したかを判定します。未設定の場合は検出後すぐにチャットボットを起動します。',
+  amazonPayDetectionJsCode: 'true（真）を返すJavaScriptを記述してください。',
+  amazonPayDetectionUrlParams: 'URLに含まれるパラメータ名を1行に1件ずつ入力してください。',
+  amazonPayDetectionDomSelectors: 'ページ上の要素を示すCSSセレクターを1行に1件ずつ入力してください。',
+  amazonPayReadyDomSelectors: 'LPフォームの入力欄セレクターを1行に1件ずつ入力してください。指定した欄に値が入力されるまでチャットボットの起動を待ちます。',
+  amazonPayAllowedLpDomains: 'Amazon Pay連携を許可するLPのドメインを1行に1件ずつ入力してください。プロトコル（https://）やパスは不要です。',
+  amazonPayPollInterval: 'LPページでAmazon Payの読み込み完了を確認する際の、ポーリング間隔（ミリ秒）です。',
+  amazonPayMaxPollCount: 'Amazon Payの読み込み完了を確認する最大ポーリング回数です。この回数に達しても完了しない場合は処理を中断します。',
+  amazonPayHtmlExtraction: 'LPのHTMLからチャットボットへ自動入力する項目のセレクターを設定します。',
+  isUsedMessageLoadedPast: '過去のメッセージ履歴を読み込みます。',
+  useFullwidthChatbotMobile: 'モバイル端末でチャットボットを全画面表示します。',
+  isUsedCrosssell: 'クロスセル商品をカートに自動追加します。',
+  isClearLandingPageSession: 'ページ読み込み時に自動ログアウト処理を実行します。',
+  isUseBtnUpdateTracking: '「登録」ボタンの変更を有効化する',
+  cssContent: 'ここにカスタムCSSコンテンツを入力してください。',
+  ugcEnv: 'UGCコンテンツの配信元環境を選択してください。',
+  ugcTypes: '埋め込みたいUGCコンテンツの種類を選択してください。',
+  htmlUgcConfigContent: 'チェックボックスで自動生成されます。手動編集も可能です。',
+  headJsContent: 'HTMLのheadタグ内に挿入するJSコードを入力してください。',
+  topBodyJsContent: 'bodyタグ上部に挿入するJSコードを入力してください。',
+  bottomBodyJsContent: 'bodyタグ下部に挿入するJSコードを入力してください。',
+  timerDuration: 'タイマーのカウントダウン時間を設定します。',
+  timerCountingMessage: 'カウント中に表示するメッセージを入力してください。',
+  timerFinishMessage: 'タイマー終了時に表示するメッセージを入力してください。',
+  isUseGlobalDelay: 'すべてのボットメッセージ表示前に待ち時間を設けます。',
+  useTagFiring: 'チャットボット内の操作でGTMまたはGA4へイベントを送信します。',
+  globalDelayTime: 'ボットメッセージが表示されるまでの待ち時間（秒）を設定します。',
+  errMsgJsCode: 'エラーメッセージを取得するJSコードを入力してください。',
+  errMsgFieldSelectors: 'フィールドエラーを取得するCSSセレクター（カンマ区切り）。',
+  errMsgFormSelectors: 'フォームエラーを取得するCSSセレクター（カンマ区切り）。',
+  autoLogoutLpUrl: 'ランディングページのURLを入力してください。',
+  autoLogoutSignoutUrl: 'ログアウト処理を行うURLを入力してください。',
+  variableName: 'シナリオ内で使用する変数名を入力してください。',
+  variableDefault: '変数のデフォルト値を入力してください。',
+  shopifyVariant: '参照するShopify商品バリアントを選択してください。',
+  alignBeginningStop: 'このメッセージを表示したとき、チャットの先頭位置でスクロールを止めます。',
+  notUseButton: '登録ボタンをチャット画面に表示しません。',
+  registerButtonName: 'ユーザーに表示するボタンの文言を入力します。（例：次へ、登録する）',
+  useButtonJavascript: 'ボタンをクリックしたときに、下記のJavaScriptを実行します。',
+  registerButtonJscode: 'ボタンクリック時に実行するコードを入力してください。',
+  fireTag: 'このチャット内ボタンをクリックしたときにタグを発火します。',
+  useForAmazonPay: 'このユーザー入力にAmazon Payの情報を自動入力します。',
+  hideWhenLoggedIn: 'ログイン済みユーザーにはこのメッセージを表示しません。',
+  hideWhenError: 'エラー発生時にはこのメッセージを表示しません。',
+  audienceConditionsSettings: '※設定すると、条件に当てはまるユーザーに対してのみ表示されます。',
+  otherSettings: '登録ボタンの表示、ボタン名、JavaScript実行などを設定します。',
+  noAutoScroll: 'このメッセージ表示時に自動スクロールしません。',
+  saveToVariable: 'ユーザーの入力を指定した変数に保存します。',
+  apiValidation: '入力値の検証にAPIを利用します。',
+  displayContinueButton: 'チャット内に「続行」ボタンを表示します。',
+  require: 'この入力を必須にします。',
+};
+
+export const REGISTER_BUTTON_LABELS = {
+  alignBeginningStop: '先頭でスクロールを止める',
+  notUseButton: '登録ボタンを表示しない',
+  registerButtonName: 'ボタンの表示名',
+  useButtonJavascript: 'JavaScriptを実行する',
+  fireTag: 'タグを発火する',
+  useForAmazonPay: 'Amazon Payの情報を自動入力する',
+  tagEvent: 'イベント名',
+  tagLabel: 'イベントラベル',
+  registerButtonJscode: 'JavaScriptコード',
+};
+
+export const USER_CONTENT_OPTION_LABELS = {
+  hideWhenLoggedIn: 'ログイン済みのときは表示しない',
+  hideWhenError: 'エラー時は表示しない',
+  noAutoScroll: '自動でスクロールしない',
+  saveToVariable: '入力内容を変数に保存する',
+  apiValidation: '入力値をAPIで検証する',
+  displayContinueButton: '「続行」ボタンを表示する',
+  require: '必須',
+  add: '追加',
+};
+
+export const SETTINGS_MODAL_VIEWS = {
+  MAIN: 'main',
+  CSS: 'css',
+  JS: 'js',
+  HTML_UGC: 'htmlUgc',
+  TIMER: 'timer',
+  ERR_MSG: 'errMsg',
+  AUTO_LOGOUT: 'autoLogout',
+  AMAZON_PAY: 'amazonPay',
+  AMAZON_PAY_HTML: 'amazonPayHtml',
+  GLOBAL_DELAY: 'globalDelay',
+  TAGS: 'tags',
+};
+
+export const AMAZON_PAY_DETECTION_HELP_TEXT = {
+  usageSection: '購入ページ（LP）でお客様がAmazon Payを利用しているかを判定します。検出されるとチャットボットはAmazon Pay連携モードで起動し、複写式の入力項目へ自動入力が行われます。',
+  autofillReadySection: 'Amazon Pay連携時、LPのフォームへ住所・氏名などが自動入力されるまで時間がかかることがあります。入力完了を待ってからチャットボットを起動したい場合に設定します。',
+  detectionJs: "true（真）を返すJavaScriptを記述してください。例: return !!document.querySelector('#amazon_payment_method');",
+  detectionUrlParams: 'URLに含まれるパラメータ名を1行に1件ずつ入力してください。例: amazonCheckoutSessionId',
+  detectionDomSelectors: 'ページ上の要素を示すCSSセレクターを1行に1件ずつ入力してください。例: #amazon_payment_method',
+  readyDomSelectors: 'LPフォームの入力欄セレクターを1行に1件ずつ入力してください。指定した欄に値が入力されるまでチャットボットの起動を待ちます。例: input#order_shipping_address_attributes_name1',
+};
+
+export const SETTINGS_MODAL_WIDTH = 750;
+export const SETTINGS_CODE_MODAL_WIDTH = 1100;
+export const SETTINGS_AMAZON_PAY_HTML_MODAL_WIDTH = 960;
+export const SETTINGS_CODE_MODAL_CLASS = 'ss-layout-settings-modal ss-layout-settings-modal--code';
+export const SETTINGS_DEFAULT_MODAL_CLASS = 'ss-layout-settings-modal';
+export const CSS_TEXTAREA_HEIGHT = 360;
+export const JS_TEXTAREA_HEIGHT = 220;
+export const CODE_TEXTAREA_RESIZABLE_CLASS = 'ss-settings-code-textarea--resizable';
+
+export const SETTINGS_VIEW_TITLES = {
+  [SETTINGS_MODAL_VIEWS.MAIN]: 'シナリオ設定',
+  [SETTINGS_MODAL_VIEWS.CSS]: 'カスタム CSS を入力',
+  [SETTINGS_MODAL_VIEWS.JS]: 'カスタムJSコードを入力',
+  [SETTINGS_MODAL_VIEWS.HTML_UGC]: 'UGCForce連携を設定',
+  [SETTINGS_MODAL_VIEWS.TIMER]: 'タイマーを使用する',
+  [SETTINGS_MODAL_VIEWS.ERR_MSG]: 'エラーメッセージ取得設定',
+  [SETTINGS_MODAL_VIEWS.AUTO_LOGOUT]: '自動ログアウト設定',
+  [SETTINGS_MODAL_VIEWS.AMAZON_PAY]: 'Amazon Pay 連携設定',
+  [SETTINGS_MODAL_VIEWS.AMAZON_PAY_HTML]: 'Amazon Pay HTML抽出設定',
+  [SETTINGS_MODAL_VIEWS.GLOBAL_DELAY]: '表示待ち時間を設定する',
+  [SETTINGS_MODAL_VIEWS.TAGS]: 'タグ発火設定',
+};

@@ -1,5 +1,5 @@
 import { ELEMENT_TAGS } from '../constants.js';
-import { getElementByAddress, removeLeadingZero } from './lookup.js';
+import { removeLeadingZero } from './lookup.js';
 
 export const setCheckToCheckboxElement = (element, value) => {
   if (element.type !== 'checkbox') return;

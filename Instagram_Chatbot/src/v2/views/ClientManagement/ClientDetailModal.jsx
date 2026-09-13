@@ -1,10 +1,19 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Modal } from 'antd';
-import { AdminActionButton } from '../../components/AdminShell';
+import { AdminActionButton } from 'v2/components/AdminShell';
 import ClientFormBody from './components/ClientFormBody';
-import { DETAIL_FORM_ID } from './constants';
+import {
+  CLIENT_MODAL_WIDTH,
+  DETAIL_AVATAR_ID,
+  DETAIL_FORM_ID,
+  FORM_MODE_EDIT,
+  MODAL_SCROLL_CLASS,
+  UPDATE_BUTTON_ID,
+  UPDATE_CLIENT_BUTTON_LABEL,
+} from './constants';
 
-function ClientDetailModal({ open, onClose, title, form, onSubmit }) {
+const ClientDetailModal = ({ open, onClose, title, form, onSubmit, loading }) => {
   const { antdForm, formBodyProps, formMode, disableInput, handleImageChange, handleSelectImageClick } =
     form;
 
@@ -12,17 +21,23 @@ function ClientDetailModal({ open, onClose, title, form, onSubmit }) {
     <Modal
       key={form.detailData?.id}
       title={title}
-      visible={open}
+      open={open}
       onCancel={onClose}
-      width={920}
+      width={CLIENT_MODAL_WIDTH}
       centered
       destroyOnClose
-      bodyStyle={{ maxHeight: '70vh', overflowY: 'auto' }}
+      className={MODAL_SCROLL_CLASS}
       footer={
-        formMode === 'edit' ? (
+        formMode === FORM_MODE_EDIT ? (
           <div className="admin-form-actions">
             <AdminActionButton action="cancel" onClick={onClose} />
-            <AdminActionButton action="save" label="更新" id="btnUpdate" onClick={onSubmit} />
+            <AdminActionButton
+              action="save"
+              label={UPDATE_CLIENT_BUTTON_LABEL}
+              id={UPDATE_BUTTON_ID}
+              loading={loading}
+              onClick={onSubmit}
+            />
           </div>
         ) : null
       }
@@ -32,13 +47,22 @@ function ClientDetailModal({ open, onClose, title, form, onSubmit }) {
         antdForm={antdForm}
         showPasswordFields={false}
         disableInput={disableInput}
-        avatarId="avatar"
+        avatarId={DETAIL_AVATAR_ID}
         onImageChange={(e) => handleImageChange(e, false)}
         onSelectImageClick={handleSelectImageClick}
         {...formBodyProps}
       />
     </Modal>
   );
-}
+};
+
+ClientDetailModal.propTypes = {
+  open: PropTypes.bool,
+  onClose: PropTypes.func,
+  title: PropTypes.string,
+  form: PropTypes.object,
+  onSubmit: PropTypes.func,
+  loading: PropTypes.bool,
+};
 
 export default ClientDetailModal;

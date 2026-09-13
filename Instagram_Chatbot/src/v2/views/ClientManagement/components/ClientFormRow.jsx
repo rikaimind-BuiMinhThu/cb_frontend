@@ -1,28 +1,26 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import AdminFormRow from 'v2/components/AdminShell/AdminFormRow';
 
-function ClientFormRow({ label, required, alignTop, children }) {
-  const rowClass = alignTop
-    ? 'admin-client-form-row admin-client-form-row--align-top'
-    : 'admin-client-form-row';
-
-  return (
-    <div className={rowClass}>
-      {label && (
-        <label className="admin-form-row-label admin-client-form-row-label">
-          {label}
-          {required && <span className="required-badge">必須</span>}
-        </label>
-      )}
-      <div className="admin-client-form-row-control">{children}</div>
-    </div>
-  );
-}
+const ClientFormRow = ({ label, required, alignTop, error, htmlFor, children }) => (
+  <AdminFormRow
+    layout="horizontal"
+    label={label}
+    required={required}
+    alignTop={alignTop}
+    error={error}
+    htmlFor={htmlFor}
+  >
+    {children}
+  </AdminFormRow>
+);
 
 ClientFormRow.propTypes = {
   label: PropTypes.string,
   required: PropTypes.bool,
   alignTop: PropTypes.bool,
+  error: PropTypes.node,
+  htmlFor: PropTypes.string,
   children: PropTypes.node,
 };
 
