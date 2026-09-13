@@ -19,10 +19,18 @@ export const DEFAULT_TAG_FIRING_EVENTS = {
 export const DEFAULT_TAG_FIRING = {
   enabled: false,
   provider: TAG_FIRING_PROVIDERS.GTM,
+  measurement_id: '',
   open_event: DEFAULT_TAG_FIRING_EVENTS.open,
   start_event: DEFAULT_TAG_FIRING_EVENTS.start,
   complete_event: DEFAULT_TAG_FIRING_EVENTS.complete,
 };
+
+export const GA4_MEASUREMENT_ID_PLACEHOLDER = 'G-XXXXXXXX';
+export const GA4_MEASUREMENT_ID_PREFIX = 'G-';
+export const GA4_MEASUREMENT_ID_PATTERN = /^G-[A-Z0-9]+$/;
+export const GTAG_SCRIPT_BASE_URL = 'https://www.googletagmanager.com/gtag/js?id=';
+export const GTAG_SCRIPT_ATTR = 'data-ecch-gtag';
+export const GTAG_SEND_PAGE_VIEW = false;
 
 export const DEFAULT_TAG_BUTTON_LABEL = '次へ';
 export const DEFAULT_TAG_SUBMIT_LABEL = '送信';

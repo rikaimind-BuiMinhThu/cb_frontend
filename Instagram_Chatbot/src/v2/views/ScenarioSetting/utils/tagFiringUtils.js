@@ -4,11 +4,30 @@ import {
   DEFAULT_TAG_BUTTON_LABEL,
   DEFAULT_TAG_FIRING,
   DEFAULT_TAG_SUBMIT_LABEL,
+  GA4_MEASUREMENT_ID_PATTERN,
+  GA4_MEASUREMENT_ID_PREFIX,
   TAG_FIRING_PROVIDERS,
   TAG_STEP_EVENT_PREFIX,
   TAG_SUBMIT_EVENT_PREFIX,
   USER_BELONG_TO,
 } from 'v2/variables/tagFiringConstants';
+
+const LOWERCASE_GA4_PREFIX = 'g-';
+
+export const normalizeGa4MeasurementId = (value) => {
+  const trimmed = String(value || '').trim();
+  if (!trimmed) {
+    return '';
+  }
+  if (trimmed.slice(0, 2).toLowerCase() !== LOWERCASE_GA4_PREFIX) {
+    return trimmed;
+  }
+  return `${GA4_MEASUREMENT_ID_PREFIX}${trimmed.slice(2).toUpperCase()}`;
+};
+
+export const isValidGa4MeasurementId = (value) => (
+  GA4_MEASUREMENT_ID_PATTERN.test(String(value || ''))
+);
 
 export const parseTagFiringFromApi = (raw) => {
   if (!raw || typeof raw !== 'object') {
@@ -20,6 +39,7 @@ export const parseTagFiringFromApi = (raw) => {
     provider: raw.provider === TAG_FIRING_PROVIDERS.GA4
       ? TAG_FIRING_PROVIDERS.GA4
       : TAG_FIRING_PROVIDERS.GTM,
+    measurement_id: raw.measurement_id || DEFAULT_TAG_FIRING.measurement_id,
     open_event: raw.open_event || DEFAULT_TAG_FIRING.open_event,
     start_event: raw.start_event || DEFAULT_TAG_FIRING.start_event,
     complete_event: raw.complete_event || DEFAULT_TAG_FIRING.complete_event,
@@ -30,6 +50,7 @@ export const fillTagFiringDefaults = (current) => ({
   ...DEFAULT_TAG_FIRING,
   ...current,
   enabled: true,
+  measurement_id: current?.measurement_id || DEFAULT_TAG_FIRING.measurement_id,
   open_event: current?.open_event || DEFAULT_TAG_FIRING.open_event,
   start_event: current?.start_event || DEFAULT_TAG_FIRING.start_event,
   complete_event: current?.complete_event || DEFAULT_TAG_FIRING.complete_event,

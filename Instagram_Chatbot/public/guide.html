@@ -17,7 +17,7 @@
       .error_inline (約19件、多くは空・非表示)
       a.forward.btn.btn-large.btn-success — ご注文内容の確認へ（起動ボタンには使わない）
       起動ボタン記入例: a[href="#target_cart"] img（LP CTA）
-    【EC Chatbot実装】 ScenarioSettingsMainView / AmazonPayView / ScenarioErrMsgView
+    【EC Chatbot実装】 ScenarioSettingsMainView / AmazonPayView / ScenarioErrMsgView / ScenarioSettingsTagFiringView
     Sensitive values from the saved HTML are omitted or replaced with ********.
   -->
   <style>
@@ -916,12 +916,17 @@
     <a class="sub" href="#sec-ap-carts">カート別サンプル</a>
     <a href="#sec-error"><span class="toc-num">3</span>エラーメッセージ取得設定</a>
     <a href="#sec-launch"><span class="toc-num">4</span>起動ボタン設定</a>
-    <a href="#sec-check"><span class="toc-num">5</span>設定後の確認方法</a>
+    <a href="#sec-tags"><span class="toc-num">5</span>タグ発火設定</a>
+    <a class="sub" href="#sec-tag-gtm">GTMの設置</a>
+    <a class="sub" href="#sec-tag-ga4">GA4の設置</a>
+    <a class="sub" href="#sec-tag-scenario">シナリオ</a>
+    <a class="sub" href="#sec-tag-button">ボタン毎</a>
+    <a href="#sec-check"><span class="toc-num">6</span>設定後の確認方法</a>
   </nav>
   <div class="page">
     <header class="hero">
       <h1>ECチャットボット 設定ガイド</h1>
-      <p class="hero-lead">Amazon Payログイン後の実LPをもとに、管理者がCSSセレクタを取得し、設定画面へ入れる手順です。長い文章より、画面を見て進めてください。</p>
+      <p class="hero-lead">Amazon Payログイン後の実LPをもとに、管理者がCSSセレクタを取得し、設定画面へ入れる手順です。タグ発火はチャット内操作の計測で、LPの要素は対象外です。長い文章より、画面を見て進めてください。</p>
       <div class="legend">
         <span class="badge badge-lp">【実際のLP】 保存HTMLで確認</span>
         <span class="badge badge-impl">【EC Chatbot実装】 管理画面の実ラベル</span>
@@ -1764,10 +1769,373 @@ store.nekase-genmai.com</textarea>
       </div>
     </section>
 
+    <section class="guide-section" id="sec-tags">
+      <div class="section-head">
+        <div>
+          <h2>5. タグ発火設定</h2>
+          <p class="section-kicker">チャット内の操作（開く・開始・完了・各ボタン）を GTM または GA4 へ送ります。GTMはLPのコンテナ、GA4は管理画面の測定ID（iframe内のgtag）です。</p>
+        </div>
+        <span class="badge badge-impl">【EC Chatbot実装】</span>
+      </div>
+
+      <p class="field-plain">配信先はどちらか一方です。GTMは親ページのコンテナへ送ります。GA4はチャットiframe内でgtagを読み、チャット画面のURLとして計測します。</p>
+
+      <div class="flow-grid" style="margin-bottom:16px;">
+        <div class="flow-card"><div class="flow-num">1</div>タグ発火を利用する</div>
+        <div class="flow-card"><div class="flow-num">2</div>配信先を選ぶ</div>
+        <div class="flow-card"><div class="flow-num">3</div>GTMならLPへコンテナ / GA4なら測定ID</div>
+        <div class="flow-card"><div class="flow-num">4</div>シナリオのイベント名を入れる</div>
+        <div class="flow-card"><div class="flow-num">5</div>必要なボタンだけ発火する</div>
+      </div>
+
+      <div class="check-grid" style="margin-bottom:16px;">
+        <div class="ok-box">
+          <h4>使う</h4>
+          <p>チャット内の操作。GTMはLPにコンテナがあるとき。GA4は管理画面の測定IDがあるとき。</p>
+        </div>
+        <div class="ng-box">
+          <h4>使わない</h4>
+          <ul>
+            <li>LPのCTA（今すぐ申し込む）— 起動ボタン用です。</li>
+            <li>LP上の要素セレクター — タグ発火の対象外です。</li>
+            <li>GA4なのにLPへgtagを重ねて入れること。</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="note warn">配信先はどちらか一方です。LPにGTMがあるなら「Google タグマネージャー」を選びます。GA4を選ぶときは測定IDを管理画面へ入れ、LPのgtagは不要です。</p>
+    </section>
+
+    <section class="guide-section" id="sec-tag-gtm">
+      <div class="section-head">
+        <div>
+          <h2>GTMの取得と設置</h2>
+          <p class="section-kicker">推奨です。管理画面の初期値もこちらです。GTMで受けてから GA4 へ転送します。</p>
+        </div>
+        <span class="badge badge-mock">【説明用Mockup】</span>
+      </div>
+
+      <article class="field-card">
+        <h3>コンテナIDを取る</h3>
+        <p class="field-plain">tagmanager.google.com で Web コンテナを作り、コンテナIDをコピーします。</p>
+        <div class="value-list">
+          <strong>値の入れ方</strong>
+          <ul>
+            <li>アカウント → コンテナを作成 → ターゲット「ウェブ」。</li>
+            <li>IDの形は <code>GTM-XXXXXXX</code> です。</li>
+            <li>チャットボットの管理画面には、このIDは入れません。LPのHTMLへ貼ります。</li>
+          </ul>
+        </div>
+        <div class="cart-samples">
+          <h4>記入例</h4>
+          <div class="cart-row"><span class="cart-chip">コンテナID</span><code>GTM-XXXXXXX</code></div>
+        </div>
+      </article>
+
+      <article class="field-card">
+        <h3>見本：LPへ入れる公式スニペット</h3>
+        <p class="field-plain"><code>&lt;head&gt;</code> の先頭と、<code>&lt;body&gt;</code> 開始直後へ公式スニペットを入れます。IDは自分のコンテナに置き換えてください。</p>
+        <div class="code-box">
+&lt;!-- Google Tag Manager --&gt;
+&lt;script&gt;(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&amp;l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-XXXXXXX');&lt;/script&gt;
+&lt;!-- End Google Tag Manager --&gt;
+          <button class="btn btn-copy copy-abs" type="button" data-copy="(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-XXXXXXX');">コピー</button>
+        </div>
+        <p class="caption" style="text-align:left;margin-top:10px;">body 直後（noscript）</p>
+        <div class="code-box">
+&lt;noscript&gt;&lt;iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"
+height="0" width="0" style="display:none;visibility:hidden"&gt;&lt;/iframe&gt;&lt;/noscript&gt;
+        </div>
+      </article>
+
+      <article class="field-card">
+        <h3>チャットボットが送る dataLayer</h3>
+        <p class="field-plain">配信先が GTM のとき、SDKは親ページで次を実行します。</p>
+        <div class="code-box">
+dataLayer.push({
+  event: 'chatbot_open',
+  chatbot_event: 'open',
+  chatbot_scenario_id: '123',
+  chatbot_scenario_name: '購入シナリオ',
+  chatbot_step_id: '',
+  chatbot_button_name: '',
+  chatbot_event_label: ''
+});
+          <button class="btn btn-copy copy-abs" type="button" data-copy="dataLayer.push({ event: 'chatbot_open', chatbot_event: 'open', chatbot_scenario_id: '123', chatbot_scenario_name: '購入シナリオ', chatbot_step_id: '', chatbot_button_name: '', chatbot_event_label: '' });">コピー</button>
+        </div>
+        <div class="cart-samples" style="margin-top:12px;">
+          <h4>chatbot_event の値</h4>
+          <div class="cart-row"><span class="cart-chip">open</span>チャットボットを開いたとき</div>
+          <div class="cart-row"><span class="cart-chip">start</span>シナリオ開始時</div>
+          <div class="cart-row"><span class="cart-chip">complete</span>シナリオ完了時</div>
+          <div class="cart-row"><span class="cart-chip">button_click</span>チャット内ボタン</div>
+        </div>
+      </article>
+
+      <article class="field-card">
+        <h3>GTMで受けて GA4 へ送る</h3>
+        <p class="field-plain">dataLayer に出ただけでは GA4 のレポートには入りません。トリガーとタグを作り、公開します。</p>
+        <div class="value-list">
+          <strong>値の入れ方</strong>
+          <ul>
+            <li><strong>変数</strong> — データレイヤー変数。名前は下表と同じにします。</li>
+            <li><strong>トリガー</strong> — 種類「カスタムイベント」。イベント名は <code>chatbot_open</code> など、または正規表現 <code>^chatbot_</code>。</li>
+            <li><strong>タグ</strong> — 「Google アナリティクス: GA4 イベント」。イベント名は <code>{{Event}}</code>。パラメータに変数を割り当てます。</li>
+          </ul>
+        </div>
+        <table class="sample-table">
+          <thead>
+            <tr>
+              <th>データレイヤー変数</th>
+              <th>用途</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code>event</code></td><td>イベント名（chatbot_open など）</td></tr>
+            <tr><td><code>chatbot_event</code></td><td>種類（open / start / complete / button_click）</td></tr>
+            <tr><td><code>chatbot_scenario_id</code></td><td>シナリオの識別。シナリオ毎の集計</td></tr>
+            <tr><td><code>chatbot_scenario_name</code></td><td>シナリオ名</td></tr>
+            <tr><td><code>chatbot_step_id</code></td><td>メッセージID（ボタン時）</td></tr>
+            <tr><td><code>chatbot_button_name</code></td><td>ボタンの表示名</td></tr>
+            <tr><td><code>chatbot_event_label</code></td><td>イベントラベル。ボタン毎の集計</td></tr>
+          </tbody>
+        </table>
+      </article>
+
+      <div class="admin" style="margin-top:16px;">
+        <div class="admin-bar">Google タグマネージャー　／　トリガー <small>【説明用Mockup】</small></div>
+        <div class="admin-body">
+          <div class="field">
+            <label class="field-label" for="gtm-trigger-type">トリガーの種類</label>
+            <input class="field-input" id="gtm-trigger-type" value="カスタムイベント" readonly>
+          </div>
+          <div class="field">
+            <label class="field-label" for="gtm-event-name">イベント名</label>
+            <input class="field-input" id="gtm-event-name" value="^chatbot_" readonly>
+            <p class="field-help">このトリガーの発生場所を「一部のカスタムイベント」にし、正規表現に一致させます。</p>
+            <div class="lp-example"><strong>記入例:</strong> <code>chatbot_open</code> 単体、または <code>^chatbot_</code></div>
+          </div>
+          <div class="admin-footer">
+            <button class="btn btn-ghost" type="button">キャンセル</button>
+            <button class="btn btn-primary" type="button">保存</button>
+          </div>
+        </div>
+      </div>
+      <p class="note" style="margin-top:12px;">管理画面の配信先は「Google タグマネージャー（dataLayer.push）」にします。確認は GTM のプレビューで <code>chatbot_open</code> が出ることです。</p>
+    </section>
+
+    <section class="guide-section" id="sec-tag-ga4">
+      <div class="section-head">
+        <div>
+          <h2>GA4の測定ID</h2>
+          <p class="section-kicker">測定IDは管理画面へ入れます。チャットiframeが gtag を読み込み、チャット画面のURLとして計測します。LPへスニペットは不要です。</p>
+        </div>
+        <span class="badge badge-impl">【EC Chatbot実装】</span>
+      </div>
+
+      <article class="field-card">
+        <h3>測定IDを取る</h3>
+        <p class="field-plain">GA4 の管理 → データの収集と修正 → データストリーム → ウェブから、測定IDをコピーします。プロパティの詳細にはありません。</p>
+        <div class="value-list">
+          <strong>値の入れ方</strong>
+          <ul>
+            <li>IDの形は <code>G-XXXXXXXX</code> です。アカウントIDやプロパティIDではありません。</li>
+            <li>シナリオ設定 → タグ発火を利用する → 設定する → 配信先を GA4 にし、測定IDへ貼ります。</li>
+            <li>LPにすでに GTM がある場合は、こちらではなく <a href="#sec-tag-gtm">GTMの設置</a> を使います。</li>
+          </ul>
+        </div>
+        <div class="cart-samples">
+          <h4>記入例</h4>
+          <div class="cart-row"><span class="cart-chip">測定ID</span><code>G-XXXXXXXX</code></div>
+        </div>
+      </article>
+
+      <article class="field-card">
+        <h3>管理画面へ入れる</h3>
+        <ol class="howto">
+          <li>シナリオ設定 → カスタマイズ → タグ発火を利用する をオンにします。</li>
+          <li>設定する → で タグ発火設定 を開きます。</li>
+          <li>配信先を「Google アナリティクス 4（gtag）」にします。</li>
+          <li>測定IDに <code>G-XXXXXXXX</code> を入れます。</li>
+          <li>シナリオを保存します。LPへ gtag スニペットは入れません。</li>
+        </ol>
+        <p class="note warn">GA4 はチャットiframeのURLを計測します。購入LPのセッションとは別です。</p>
+      </article>
+
+      <article class="field-card">
+        <h3>GA4側で見やすくする（任意）</h3>
+        <p class="field-plain">カスタムイベントのトリガーは不要です。シナリオ毎・ボタン毎にレポートしたいときだけ、カスタム定義を追加します。</p>
+        <div class="cart-samples">
+          <h4>よく使うディメンション</h4>
+          <div class="cart-row"><span class="cart-chip">シナリオ</span><code>chatbot_scenario_id</code></div>
+          <div class="cart-row"><span class="cart-chip">ボタン</span><code>chatbot_event_label</code></div>
+        </div>
+        <p class="field-help" style="margin-top:10px;">確認は GA4 の DebugView、またはチャットiframeのコンソールで <code>typeof gtag === 'function'</code> が <code>true</code> になることです。</p>
+      </article>
+    </section>
+
+    <section class="guide-section" id="sec-tag-scenario">
+      <div class="section-head">
+        <div>
+          <h2>シナリオのイベント</h2>
+          <p class="section-kicker">シナリオ設定でオンにします。GA4なら測定IDもここに入れます。開く・開始・完了の3つです。</p>
+        </div>
+        <span class="badge badge-impl">【EC Chatbot実装】</span>
+      </div>
+
+      <div class="admin admin-map">
+        <div class="admin-bar">シナリオ設定　／　カスタマイズ <small>【EC Chatbot実装】</small></div>
+        <div class="admin-body">
+          <div class="toggle-row field">
+            <div>
+              <strong>タグ発火を利用する</strong>
+              <p class="field-help">チャットボット内の操作でGTMまたはGA4へイベントを送信します。</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="switch" aria-hidden="true"></div>
+              <span class="link-btn">設定する →</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flow-arrow">↓</div>
+      <div class="admin admin-map">
+        <div class="admin-bar">タグ発火設定 <small>【EC Chatbot実装】</small></div>
+        <div class="admin-body">
+          <div class="field">
+            <span class="field-label">配信先</span>
+            <div class="radio-row">
+              <label><input type="radio" name="tag-provider" value="gtm"> Google タグマネージャー（dataLayer.push）</label>
+              <label><input type="radio" name="tag-provider" value="ga4" checked> Google アナリティクス 4（gtag）</label>
+            </div>
+          </div>
+          <div class="field" id="tag-measurement-panel">
+            <label class="field-label" for="tag-measurement">測定ID</label>
+            <input class="field-input" id="tag-measurement" value="G-XXXXXXXX" readonly>
+            <p class="field-help">iframe内でgtagを読み込み、チャット画面のURLとして計測します。LPへgtagを入れる必要はありません。</p>
+          </div>
+          <div class="field">
+            <label class="field-label" for="tag-open">チャットボットを開いたとき</label>
+            <input class="field-input" id="tag-open" value="chatbot_open" readonly>
+          </div>
+          <div class="field">
+            <label class="field-label" for="tag-start">シナリオ開始時</label>
+            <input class="field-input" id="tag-start" value="chatbot_start" readonly>
+          </div>
+          <div class="field">
+            <label class="field-label" for="tag-complete">シナリオ完了時</label>
+            <input class="field-input" id="tag-complete" value="chatbot_complete" readonly>
+          </div>
+          <p class="field-help">イベントはチャットボット内の操作で発火します。測定IDを入れるとiframe内のgtagへ送ります。LPのgtagは使いません。</p>
+          <div class="admin-footer">
+            <button class="btn btn-ghost" type="button">閉じる</button>
+          </div>
+        </div>
+      </div>
+
+      <article class="field-card">
+        <h3>配信先</h3>
+        <p class="field-plain">LPに入れたコンテナと揃えます。違うとイベントは届きません。</p>
+        <div class="value-list">
+          <strong>値の入れ方</strong>
+          <ul>
+            <li><strong>Google タグマネージャー（dataLayer.push）</strong> — LPに GTM があるとき。初期値です。</li>
+            <li><strong>Google アナリティクス 4（gtag）</strong> — 測定IDを管理画面へ入れ、iframe内で計測するとき。</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="field-card">
+        <h3>チャットボットを開いたとき / シナリオ開始時 / シナリオ完了時</h3>
+        <p class="field-plain">空欄なら初期値が入ります。名前を変えた場合は、GTMのトリガーも同じ名前にします。</p>
+        <div class="cart-samples">
+          <h4>初期値と発火タイミング</h4>
+          <div class="cart-row"><span class="cart-chip">開いたとき</span><code>chatbot_open</code> — チャットが開いたとき</div>
+          <div class="cart-row"><span class="cart-chip">開始時</span><code>chatbot_start</code> — シナリオ開始時（同じセッションでは一度）</div>
+          <div class="cart-row"><span class="cart-chip">完了時</span><code>chatbot_complete</code> — 最後のユーザー入力のあと</div>
+        </div>
+      </article>
+    </section>
+
+    <section class="guide-section" id="sec-tag-button">
+      <div class="section-head">
+        <div>
+          <h2>ボタンごとの発火</h2>
+          <p class="section-kicker">シナリオ全体の3イベントに加え、測りたいチャット内ボタンだけオンにします。</p>
+        </div>
+        <span class="badge badge-impl">【EC Chatbot実装】</span>
+      </div>
+
+      <p class="field-plain">登録ボタンの「その他の設定」、または送信ボタンの設定にあります。</p>
+
+      <article class="field-card">
+        <h3>タグを発火する</h3>
+        <p class="field-plain">このチャット内ボタンをクリックしたときにタグを発火します。オンにするとイベント名とイベントラベルが出ます。</p>
+        <div class="value-list">
+          <strong>値の入れ方</strong>
+          <ul>
+            <li>測りたいステップだけオンにします。全部オンにする必要はありません。</li>
+            <li>シナリオ側の「タグ発火を利用する」がオフだと、ボタンをオンにしても送られません。</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="field-card">
+        <h3>イベント名 / イベントラベル</h3>
+        <p class="field-plain">イベント名は GTM / GA4 に届く名前です。ラベルはボタン毎の見分けに使います。</p>
+        <div class="cart-samples">
+          <h4>記入例（初期値）</h4>
+          <div class="cart-row"><span class="cart-chip">登録ボタン</span><code>chatbot_step_1</code>　ラベル <code>次へ</code></div>
+          <div class="cart-row"><span class="cart-chip">送信ボタン</span><code>chatbot_submit_1</code>　ラベル <code>送信</code></div>
+        </div>
+        <p class="field-help">数字はユーザー入力の順番です。ラベルを空にすると、ボタン名または直前のボット文が入ります。</p>
+      </article>
+
+      <div class="admin" style="margin-top:16px;">
+        <div class="admin-bar">その他の設定 <small>【EC Chatbot実装】</small></div>
+        <div class="admin-body">
+          <div class="toggle-row field">
+            <div>
+              <strong>タグを発火する</strong>
+              <p class="field-help">このチャット内ボタンをクリックしたときにタグを発火します。</p>
+            </div>
+            <div class="switch" aria-hidden="true"></div>
+          </div>
+          <div class="field">
+            <label class="field-label" for="btn-tag-event">イベント名</label>
+            <input class="field-input" id="btn-tag-event" value="chatbot_step_1" readonly>
+          </div>
+          <div class="field">
+            <label class="field-label" for="btn-tag-label">イベントラベル</label>
+            <input class="field-input" id="btn-tag-label" value="次へ" readonly>
+          </div>
+          <div class="admin-footer">
+            <button class="btn btn-ghost" type="button">閉じる</button>
+          </div>
+        </div>
+      </div>
+
+      <article class="field-card">
+        <h3>やり方</h3>
+        <ol class="howto">
+          <li>シナリオ設定 → タグ発火を利用する → 設定する → 配信先を選びます。</li>
+          <li>GTM なら LP へコンテナを入れます。GA4 なら測定IDを管理画面へ入れます（LPのgtagは不要）。</li>
+          <li>開いたとき / 開始時 / 完了時は初期値のままで構いません。変えたら GTM のトリガーも同じ名前にします。</li>
+          <li>測りたいステップで「タグを発火する」をオンにし、イベント名とラベルを確認します。</li>
+          <li>GTM の場合は、カスタムイベントトリガーと GA4 イベントタグを作り、プレビューしてから公開します。</li>
+          <li>GA4 の場合は、チャットiframeのコンソールまたは DebugView で <code>chatbot_*</code> を確認します。</li>
+        </ol>
+      </article>
+    </section>
+
     <section class="guide-section" id="sec-check">
       <div class="section-head">
         <div>
-          <h2>5. 設定後の確認方法</h2>
+          <h2>6. 設定後の確認方法</h2>
           <p class="section-kicker">シナリオを保存したあと、LPで次を確認します。</p>
         </div>
         <span class="badge badge-mock">【説明用Mockup】</span>
@@ -1780,6 +2148,8 @@ store.nekase-genmai.com</textarea>
           <p class="console-line console-out">&lt;a id="lbChangePayment" ...&gt;</p>
           <p class="console-line console-in">&gt; document.querySelector('#no-such-id')</p>
           <p class="console-line console-null">null</p>
+          <p class="console-line console-in">&gt; dataLayer.filter(function (row) { return String(row.event || '').indexOf('chatbot_') === 0; })</p>
+          <p class="console-line console-out">[{ event: "chatbot_open", chatbot_event: "open", ... }]</p>
         </div>
       </div>
 
@@ -1791,6 +2161,10 @@ store.nekase-genmai.com</textarea>
             <li>氏名などが自動入力されるまで待ってから起動する（完了判定を入れた場合）</li>
             <li>LPのCTAをクリックしてチャットが開く</li>
             <li>入力エラーを出したとき、チャットにエラー文が届く</li>
+            <li>GTM: チャットを開くと <code>chatbot_open</code> / <code>chatbot_start</code> が LP の dataLayer に出る</li>
+            <li>GA4: チャットiframeの gtag / DebugView に同じイベントが出る（page はプレビューURL）</li>
+            <li>対象ボタンをクリックすると <code>chatbot_step_N</code> が出る</li>
+            <li>最後の入力後に <code>chatbot_complete</code> が出る</li>
           </ul>
         </div>
         <div class="ng-box">
@@ -1800,6 +2174,11 @@ store.nekase-genmai.com</textarea>
             <li>length が 2以上 → 対象が広すぎる</li>
             <li>.error_inline が空のまま → 実エラーを出して再確認</li>
             <li>Amazon Pay判定が動かない → キャンセルボタンID、または URLパラメータ名を確認</li>
+            <li>GTMでイベントが出ない → タグ発火を利用するがオフ、またはLPにGTMコンテナがない</li>
+            <li>GA4でイベントが出ない → 測定IDが空、形式が違う、または配信先がGTMのまま</li>
+            <li>GTMプレビューに出るがGA4にない → GA4イベントタグ未作成 / 未公開</li>
+            <li>ボタンだけ出ない → そのメッセージで「タグを発火する」がオフ</li>
+            <li>LPのCTAをクリックしてもタグが出ない → 仕様どおり（LP要素は対象外）</li>
           </ul>
         </div>
       </div>
@@ -1864,6 +2243,17 @@ store.nekase-genmai.com</textarea>
         input.addEventListener('change', syncErrMode);
       });
       syncErrMode();
+
+      function syncTagProvider() {
+        const checked = document.querySelector('input[name="tag-provider"]:checked');
+        const panel = document.getElementById('tag-measurement-panel');
+        if (!checked || !panel) return;
+        panel.classList.toggle('hidden', checked.value !== 'ga4');
+      }
+      document.querySelectorAll('input[name="tag-provider"]').forEach(function (input) {
+        input.addEventListener('change', syncTagProvider);
+      });
+      syncTagProvider();
 
       const toast = document.getElementById('copy-toast');
       document.querySelectorAll('[data-copy]').forEach(function (button) {
