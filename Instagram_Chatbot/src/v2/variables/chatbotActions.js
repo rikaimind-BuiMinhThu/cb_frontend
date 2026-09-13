@@ -19,4 +19,5 @@ export const CHATBOT_ACTIONS = {
   UPDATE_AMAZON_PAY_DATA_BY_SELECTOR: 'updateAmazonPayDataBySelector',
   UPDATE_NUMBER_ORDER_TO_UPSELL: 'updateNumberOrderToUpsell',
   LP_FIELD_CHANGED: 'lpFieldChanged',
+  CHATBOT_TAG_EVENT: 'CHATBOT_TAG_EVENT',
 };

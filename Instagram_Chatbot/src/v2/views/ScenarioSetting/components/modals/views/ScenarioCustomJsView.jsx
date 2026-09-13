@@ -3,7 +3,7 @@ import { useScenarioEditor } from '../../../context/ScenarioEditorContext';
 import ScenarioFormRow from '../shared/ScenarioFormRow';
 import ScenarioModalFooter from '../shared/ScenarioModalFooter';
 import ScenarioCodeTextarea from '../shared/ScenarioCodeTextarea';
-import { SCENARIO_MODAL_TOOLTIPS } from '../shared/scenarioModalTooltips';
+import { SCENARIO_MODAL_TOOLTIPS, JS_TEXTAREA_HEIGHT } from '../shared/scenarioModalTooltips';
 
 const ScenarioCustomJsView = ({ onBack }) => {
   const { state, actions } = useScenarioEditor();
@@ -36,6 +36,8 @@ const ScenarioCustomJsView = ({ onBack }) => {
           value={headCustomJsCode.temp}
           onChange={(value) => setHeadCustomJsCode((prevState) => ({ ...prevState, temp: value }))}
           language="javascript"
+          height={JS_TEXTAREA_HEIGHT}
+          resizable
         />
       </ScenarioFormRow>
       <ScenarioFormRow
@@ -48,6 +50,8 @@ const ScenarioCustomJsView = ({ onBack }) => {
           value={topBodyCustomJsCode.temp}
           onChange={(value) => setTopBodyCustomJsCode((prevState) => ({ ...prevState, temp: value }))}
           language="javascript"
+          height={JS_TEXTAREA_HEIGHT}
+          resizable
         />
       </ScenarioFormRow>
       <ScenarioFormRow
@@ -60,6 +64,8 @@ const ScenarioCustomJsView = ({ onBack }) => {
           value={bottomBodyCustomJsCode.temp}
           onChange={(value) => setBottomBodyCustomJsCode((prevState) => ({ ...prevState, temp: value }))}
           language="javascript"
+          height={JS_TEXTAREA_HEIGHT}
+          resizable
         />
       </ScenarioFormRow>
       <ScenarioModalFooter

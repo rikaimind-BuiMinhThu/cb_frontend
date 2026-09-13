@@ -25,6 +25,7 @@ import {
 import { getDefaultValue } from 'v2/views/Preview/PreviewComponent/VariablesUtils';
 import { parseThemeSettings } from 'v2/views/DesignSetting/utils/designThemeUtils';
 import { resolveMainColorContext } from 'v2/views/DesignSetting/utils/designChatbotUtils';
+import { parseTagFiringFromApi } from 'v2/views/ScenarioSetting/utils/tagFiringUtils';
 
 const PreviewFaqReducer = (state, action) => {
   switch (action.type) {
@@ -252,6 +253,8 @@ const PreviewFaqReducer = (state, action) => {
         isUsedPastMessageLoaded: !!chatbot?.is_used_message_loaded_past,
         isProcessing: false,
         useFullWidthChatbotMobile: !!chatbot?.use_fullwidth_chatbot_mobile,
+        tagFiring: parseTagFiringFromApi(chatbot?.tag_firing),
+        scenarioName: action.payload.responseData?.data?.name || state.scenarioName || '',
         isUsedCustomJsCode: !!chatbot?.is_used_custom_js_code,
         headCustomJsCode: chatbot?.head_custom_js_code,
         topBodyCustomJsCode: chatbot?.top_body_custom_js_code,

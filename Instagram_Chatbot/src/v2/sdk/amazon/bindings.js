@@ -257,16 +257,44 @@ const extractGenericFallbackBindings = (content) => {
   return bindings;
 };
 
+const isAmazonPayUserMessage = (msg) => {
+  if (msg?.belong_to !== 'user') return false;
+  if (msg.is_used_when_amazon_pay) return true;
+  return (msg.message_content || []).some((content) => (
+    !!content?.is_used_when_amazon_pay
+    || Object.values(content?.amazon_pay_fields || {}).some(Boolean)
+  ));
+};
+
+const isAmazonPayFieldEnabled = (content, selectorKeyType) => {
+  const fields = content?.amazon_pay_fields;
+  if (!fields || typeof fields !== 'object') return true;
+  if (!Object.prototype.hasOwnProperty.call(fields, selectorKeyType)) return true;
+  return fields[selectorKeyType] !== false;
+};
+
+const filterEnabledBindings = (content, bindings) => (
+  (bindings || []).filter((binding) => isAmazonPayFieldEnabled(content, binding.selectorKeyType))
+);
+
 export const extractSelectorBindingsFromMessages = (messages) => {
   const bindings = [];
   const seen = new Set();
   (messages || [])
-    .filter((msg) => msg.belong_to === 'user' && msg.is_used_when_amazon_pay)
+    .filter(isAmazonPayUserMessage)
     .forEach((msg) => {
       (msg.message_content || []).forEach((content, contentIndex) => {
         const meta = { messageId: msg.id, contentIndex };
-        appendBindings(bindings, seen, extractBindingsFromContent(content).map((binding) => ({ ...binding, ...meta })));
-        appendBindings(bindings, seen, extractGenericFallbackBindings(content).map((binding) => ({ ...binding, ...meta })));
+        appendBindings(
+          bindings,
+          seen,
+          filterEnabledBindings(content, extractBindingsFromContent(content)).map((binding) => ({ ...binding, ...meta })),
+        );
+        appendBindings(
+          bindings,
+          seen,
+          filterEnabledBindings(content, extractGenericFallbackBindings(content)).map((binding) => ({ ...binding, ...meta })),
+        );
       });
     });
   return bindings;
@@ -324,7 +352,7 @@ export const safeGetAmazonPayload = async () => {
 };
 
 export const hasAmazonPayTargets = (messages) => (
-  (messages || []).some((msg) => msg.belong_to === 'user' && msg.is_used_when_amazon_pay)
+  (messages || []).some(isAmazonPayUserMessage)
 );
 
 export const normalizeLpDomain = (input) => {

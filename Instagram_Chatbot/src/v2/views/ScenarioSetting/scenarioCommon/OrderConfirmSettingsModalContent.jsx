@@ -15,7 +15,10 @@ import {
   updateOrderConfirmField,
 } from 'v2/views/ScenarioSetting/utils/OrderConfirmLpScriptGenerator';
 import OrderConfirmAdvancedSettings from './OrderConfirmAdvancedSettings';
+import OrderConfirmDesignCard from 'v2/views/OrderConfirmTemplate/OrderConfirmDesignCard';
+import { CARD_DESIGN } from 'v2/views/OrderConfirmTemplate/constants';
 import '../styles/contentSettings/orderConfirmSettings.css';
+import 'v2/views/OrderConfirmTemplate/orderConfirmTemplateEditor.css';
 
 const OrderConfirmSettingsModalContent = ({
   config,
@@ -228,10 +231,17 @@ const OrderConfirmSettingsModalContent = ({
       </DragDropContext>
 
       {showAdvancedSettings && (
-        <OrderConfirmAdvancedSettings
-          normalizedConfig={normalizedConfig}
-          onUpdateConfigValue={updateConfigValue}
-        />
+        <>
+          <span className="ss-order-confirm-fields-section-title">{CARD_DESIGN}</span>
+          <OrderConfirmDesignCard
+            config={normalizedConfig}
+            onChange={persistConfig}
+          />
+          <OrderConfirmAdvancedSettings
+            normalizedConfig={normalizedConfig}
+            onUpdateConfigValue={updateConfigValue}
+          />
+        </>
       )}
     </div>
   );

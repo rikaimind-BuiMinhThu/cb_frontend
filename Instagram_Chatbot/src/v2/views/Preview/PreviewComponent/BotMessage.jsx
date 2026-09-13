@@ -50,7 +50,7 @@ const BotMessage = ({
       if (previewOrderContent && isBotOpen) {
         setText(previewOrderContent);
       } else {
-        setText(buildOrderConfirmPreviewHtml(content.order_confirm));
+        setText(buildOrderConfirmPreviewHtml(content.order_confirm, themeSettings));
       }
       return;
     }
@@ -64,7 +64,7 @@ const BotMessage = ({
     }
 
     setText(replaceVariables(originalContent || "", variables));
-  }, [content, originalContent, variables, previewOrderContent, isBotOpen]);
+  }, [content, originalContent, variables, previewOrderContent, isBotOpen, themeSettings]);
 
   const isShowAvatar = () => {
     if (!content) return false;

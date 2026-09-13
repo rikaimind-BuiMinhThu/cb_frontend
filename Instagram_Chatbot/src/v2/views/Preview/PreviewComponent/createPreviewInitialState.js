@@ -3,6 +3,7 @@ import {
   OPEN_ANIMATION_DURATION_MS_DEFAULT,
   OPEN_ANIMATION_STYLE_DEFAULT,
 } from "v2/views/DesignSetting/constants/designChatbotConstants";
+import { DEFAULT_TAG_FIRING } from "v2/variables/tagFiringConstants";
 import { RENDER_MODES } from "./Constants";
 import { getAllUrlParams } from "./Utils";
 
@@ -57,6 +58,8 @@ const sharedPreviewInitialState = (params) => ({
   manuallyClosed: false,
   renderMode: RENDER_MODES.NEXT,
   progressBarMaxIndex: null,
+  tagFiring: { ...DEFAULT_TAG_FIRING },
+  scenarioName: "",
 });
 
 const faqExtras = () => ({

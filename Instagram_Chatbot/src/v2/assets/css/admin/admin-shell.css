@@ -16,6 +16,9 @@
   --admin-surface-muted: #f9fafb;
   --admin-radius: 8px;
   --admin-header-height: 64px;
+  --admin-content-padding: 24px;
+  --admin-card-padding-x: 24px;
+  --admin-card-padding-y: 20px;
   min-height: 100vh;
   font-family: 'Inter', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
 }
@@ -32,7 +35,7 @@
   max-width: 100%;
   flex: 1;
   min-width: 0;
-  padding: 0;
+  padding: var(--admin-content-padding);
 }
 
 .admin-layout .ant-layout-sider {
@@ -123,7 +126,7 @@
 .admin-layout .ant-layout-content.admin-content {
   background: var(--admin-page-bg);
   min-height: calc(100vh - var(--admin-header-height));
-  padding: 24px;
+  padding: var(--admin-content-padding);
   margin-top: 0;
 }
 
@@ -140,7 +143,7 @@
 }
 
 .admin-page-body {
-  padding: 20px;
+  padding: var(--admin-card-padding-y) var(--admin-card-padding-x);
 }
 
 .admin-page-card {
@@ -155,7 +158,7 @@
 }
 
 .admin-page-card .admin-table-toolbar {
-  padding: 16px 20px;
+  padding: 16px var(--admin-card-padding-x);
   border-bottom: 1px solid var(--admin-border);
   display: flex;
   align-items: center;
@@ -165,11 +168,11 @@
 }
 
 .admin-page-card .admin-table-body {
-  padding: 0 20px 20px;
+  padding: 0 var(--admin-card-padding-x) var(--admin-card-padding-y);
 }
 
 .admin-page-card .admin-page-tabs > .ant-tabs-nav {
-  padding: 0 20px;
+  padding: 0 var(--admin-card-padding-x);
   margin-bottom: 0;
 }
 

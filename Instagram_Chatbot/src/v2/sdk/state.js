@@ -28,6 +28,8 @@ export const chatbotLayout = {
   chatbotW: sessionStorage.getItem(CHATBOT_W_KEY),
   scenarioId: '',
   globalIframe: null,
+  pendingAmazonSelectorPayload: null,
+  amazonSelectorPayloadSent: false,
 };
 
 export const updateChatbotOffsetsFromMessage = (messageData) => {

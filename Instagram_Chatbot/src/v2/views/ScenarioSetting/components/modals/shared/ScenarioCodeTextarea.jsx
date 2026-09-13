@@ -1,5 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { CODE_TEXTAREA_RESIZABLE_CLASS } from './scenarioModalTooltips';
+
+const EMPTY_CLASS = '';
 
 const ScenarioCodeTextarea = ({
   id,
@@ -9,23 +12,28 @@ const ScenarioCodeTextarea = ({
   language = 'javascript',
   height = 150,
   disabled = false,
-  className = '',
-}) => (
-  <textarea
-    id={id}
-    className={`ss-settings-code-textarea ${className}`.trim()}
-    style={{ '--ss-code-textarea-height': `${height}px` }}
-    placeholder={placeholder}
-    value={value}
-    disabled={disabled}
-    spellCheck={false}
-    autoComplete="off"
-    autoCorrect="off"
-    autoCapitalize="off"
-    data-language={language}
-    onChange={(e) => onChange(e.target.value)}
-  />
-);
+  className = EMPTY_CLASS,
+  resizable = false,
+}) => {
+  const resizableClass = resizable ? CODE_TEXTAREA_RESIZABLE_CLASS : EMPTY_CLASS;
+
+  return (
+    <textarea
+      id={id}
+      className={`ss-settings-code-textarea ${resizableClass} ${className}`.trim()}
+      style={{ '--ss-code-textarea-height': `${height}px` }}
+      placeholder={placeholder}
+      value={value}
+      disabled={disabled}
+      spellCheck={false}
+      autoComplete="off"
+      autoCorrect="off"
+      autoCapitalize="off"
+      data-language={language}
+      onChange={(e) => onChange(e.target.value)}
+    />
+  );
+};
 
 ScenarioCodeTextarea.propTypes = {
   id: PropTypes.string,
@@ -36,6 +44,7 @@ ScenarioCodeTextarea.propTypes = {
   height: PropTypes.number,
   disabled: PropTypes.bool,
   className: PropTypes.string,
+  resizable: PropTypes.bool,
 };
 
 export default ScenarioCodeTextarea;

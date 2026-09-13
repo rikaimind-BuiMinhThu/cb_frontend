@@ -211,6 +211,71 @@
   width: 100%;
 }
 
+.ss-layout-settings-modal--code {
+  --ss-modal-width: 1100px;
+  max-height: 90vh;
+}
+
+.ss-amazon-pay-html-view {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ss-amazon-pay-html-view__empty {
+  margin: 16px 0 8px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.ss-amazon-pay-html-view > .ss-settings-modal-footer {
+  padding-top: 16px;
+}
+
+.ss-amazon-pay-html-table {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ss-amazon-pay-html-table__header,
+.ss-amazon-pay-html-table__row {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) 160px minmax(200px, 2fr);
+  gap: 8px 12px;
+  align-items: center;
+}
+
+.ss-amazon-pay-html-table__header {
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #eee;
+}
+
+.ss-amazon-pay-html-table__label,
+.ss-amazon-pay-html-table__mode,
+.ss-amazon-pay-html-table__value {
+  font-size: 13px;
+  color: #111827;
+  word-break: break-all;
+}
+
+.ss-tag-firing-view__providers {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ss-tag-firing-view__provider {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #374151;
+}
+
 .ss-settings-code-textarea {
   width: 100%;
   height: var(--ss-code-textarea-height, 150px);
@@ -228,6 +293,10 @@
   box-sizing: border-box;
   overflow: auto;
   white-space: pre;
+}
+
+.ss-settings-code-textarea--resizable {
+  resize: vertical;
 }
 
 .ss-settings-code-textarea:focus {

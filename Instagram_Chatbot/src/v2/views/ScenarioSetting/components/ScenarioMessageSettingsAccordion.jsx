@@ -4,7 +4,7 @@ import { Button } from 'reactstrap';
 import { hasActiveSpecialDisplayConditions } from 'v2/views/ScenarioSetting/utils/amazonPayConfigUtils';
 import { useScenarioPanelDestructuring } from '../hooks/useScenarioPanelDestructuring';
 import { AdminInfoTooltip } from 'v2/components/AdminShell';
-import { SCENARIO_MODAL_TOOLTIPS } from './modals/shared/scenarioModalTooltips';
+import { REGISTER_BUTTON_LABELS, SCENARIO_MODAL_TOOLTIPS } from './modals/shared/scenarioModalTooltips';
 import AudienceConditionsContent from './AudienceConditionsContent';
 import RegisterButtonSettingsContent from './RegisterButtonSettingsContent';
 
@@ -50,6 +50,7 @@ const ScenarioMessageSettingsAccordion = ({
   } = useScenarioPanelDestructuring();
 
   const [activePanel, setActivePanel] = useState(null);
+  const selectedMessageId = selectedMessage?.id;
 
   const role = variant === 'bot' ? 'bot' : 'user';
   const showOtherSettings = variant !== 'bot';
@@ -64,7 +65,9 @@ const ScenarioMessageSettingsAccordion = ({
     setActivePanel(hasConditions || hasSpecial ? PANEL.AUDIENCE : null);
     resetConditionPanelLayout(role);
     clearAccordionPanelLayout(role);
-  }, [indexMessageSelect, selectedMessage, isUseFukushashiki, resetConditionPanelLayout, role]);
+    // Only reset when switching messages. Edits to the open message (tag firing,
+    // button name, etc.) must not collapse その他の設定.
+  }, [indexMessageSelect, selectedMessageId, isUseFukushashiki, resetConditionPanelLayout, role]);
 
   const hasActiveSpecialDisplay = hasActiveSpecialDisplayConditions(selectedMessage, isUseFukushashiki);
   const hasAudienceConditions = (selectedMessage?.conditions?.length ?? 0) > 0;
@@ -82,6 +85,10 @@ const ScenarioMessageSettingsAccordion = ({
     if (selectedMessage.button_jscode || selectedMessage.jscode) {
       tags.push('JavaScript');
     }
+    if (selectedMessage.is_used_when_amazon_pay) {
+      tags.push(REGISTER_BUTTON_LABELS.useForAmazonPay);
+    }
+
     return tags;
   }, [selectedMessage]);
 

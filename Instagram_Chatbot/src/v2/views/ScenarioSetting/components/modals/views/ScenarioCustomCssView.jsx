@@ -3,7 +3,7 @@ import { useScenarioEditor } from '../../../context/ScenarioEditorContext';
 import ScenarioFormRow from '../shared/ScenarioFormRow';
 import ScenarioModalFooter from '../shared/ScenarioModalFooter';
 import ScenarioCodeTextarea from '../shared/ScenarioCodeTextarea';
-import { SCENARIO_MODAL_TOOLTIPS } from '../shared/scenarioModalTooltips';
+import { SCENARIO_MODAL_TOOLTIPS, CSS_TEXTAREA_HEIGHT } from '../shared/scenarioModalTooltips';
 
 const ScenarioCustomCssView = ({ onBack }) => {
   const { state, actions } = useScenarioEditor();
@@ -41,6 +41,8 @@ const ScenarioCustomCssView = ({ onBack }) => {
             temp: value,
           }))}
           language="css"
+          height={CSS_TEXTAREA_HEIGHT}
+          resizable
         />
       </ScenarioFormRow>
       <ScenarioModalFooter

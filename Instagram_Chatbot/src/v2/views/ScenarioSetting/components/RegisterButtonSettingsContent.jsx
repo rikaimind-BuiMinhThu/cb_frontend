@@ -9,6 +9,11 @@ import {
   SCENARIO_MODAL_TOOLTIPS,
   REGISTER_BUTTON_LABELS,
 } from './modals/shared/scenarioModalTooltips';
+import {
+  getDefaultStepTagEvent,
+  getDefaultTagLabelForMessage,
+  shouldShowMessageTagBlock,
+} from '../utils/tagFiringUtils';
 
 const labelWithTooltip = (text, tooltipKey) => (
   <>
@@ -76,6 +81,58 @@ const RegisterButtonSettingsContent = ({
             'useButtonJavascript',
           )}
         />
+        <ScenarioModalCheckbox
+          checked={!!selectedMessage.is_used_when_amazon_pay}
+          onChange={(checked) => updateMessage({ is_used_when_amazon_pay: checked })}
+          label={labelWithTooltip(
+            REGISTER_BUTTON_LABELS.useForAmazonPay,
+            'useForAmazonPay',
+          )}
+        />
+        {shouldShowMessageTagBlock(selectedMessage) && (
+          <>
+            <ScenarioModalCheckbox
+              checked={!!selectedMessage.tag_enabled}
+              onChange={(checked) => {
+                if (!checked) {
+                  updateMessage({ tag_enabled: false });
+                  return;
+                }
+                updateMessage({
+                  tag_enabled: true,
+                  tag_event: selectedMessage.tag_event || getDefaultStepTagEvent(dataMessages, selectedMessage),
+                  tag_label: selectedMessage.tag_label || getDefaultTagLabelForMessage(dataMessages, selectedMessage),
+                });
+              }}
+              label={labelWithTooltip(
+                REGISTER_BUTTON_LABELS.fireTag,
+                'fireTag',
+              )}
+            />
+            {!!selectedMessage.tag_enabled && (
+              <>
+                <ScenarioFormRow
+                  label={REGISTER_BUTTON_LABELS.tagEvent}
+                  tooltip={SCENARIO_MODAL_TOOLTIPS.fireTag}
+                >
+                  <InputCustom
+                    value={selectedMessage.tag_event || ''}
+                    onChange={(value) => updateMessage({ tag_event: value })}
+                  />
+                </ScenarioFormRow>
+                <ScenarioFormRow
+                  label={REGISTER_BUTTON_LABELS.tagLabel}
+                  tooltip={SCENARIO_MODAL_TOOLTIPS.fireTag}
+                >
+                  <InputCustom
+                    value={selectedMessage.tag_label || ''}
+                    onChange={(value) => updateMessage({ tag_label: value })}
+                  />
+                </ScenarioFormRow>
+              </>
+            )}
+          </>
+        )}
       </div>
       {showCodeEditor && (
         <div className="ss-user-register-button-settings__code-flyout">

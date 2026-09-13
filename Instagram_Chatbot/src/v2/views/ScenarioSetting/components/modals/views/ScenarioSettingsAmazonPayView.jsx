@@ -8,6 +8,7 @@ import ScenarioCodeTextarea from '../shared/ScenarioCodeTextarea';
 import {
   AMAZON_PAY_DETECTION_HELP_TEXT,
   SCENARIO_MODAL_TOOLTIPS,
+  SETTINGS_MODAL_VIEWS,
 } from '../shared/scenarioModalTooltips';
 import {
   AMAZON_PAY_DETECTION_MODE_OPTIONS,
@@ -16,6 +17,7 @@ import {
   AMAZON_PAY_READY_MODES,
 } from 'v2/variables/amazonPayConstants';
 import { validateLpDomain } from 'v2/views/ScenarioSetting/utils/amazonPayConfigUtils';
+import { AMAZON_PAY_HTML_LABELS } from '../../../constants/amazonPayHtmlLabels';
 
 const ScenarioSettingsAmazonPayView = ({ onBack }) => {
   const { state, actions } = useScenarioEditor();
@@ -32,6 +34,7 @@ const ScenarioSettingsAmazonPayView = ({ onBack }) => {
     setAmazonPayDetectionMode,
     setAmazonPayReadyMode,
     setAmazonPayDetectionForm,
+    navigateSettingsModalView,
   } = actions;
 
   const invalidLpDomains = (allowedLpDomainsInput || '')
@@ -193,6 +196,20 @@ const ScenarioSettingsAmazonPayView = ({ onBack }) => {
           value={amazonPayConfig?.max_count ?? ''}
           onChange={(value) => setAmazonPayConfig((prev) => ({ ...prev, max_count: value }))}
         />
+      </ScenarioFormRow>
+      <ScenarioFormRow
+        label={AMAZON_PAY_HTML_LABELS.section}
+        tooltip={SCENARIO_MODAL_TOOLTIPS.amazonPayHtmlExtraction}
+        alignTop
+      >
+        <p className="ss-settings-help-text">{AMAZON_PAY_HTML_LABELS.help}</p>
+        <button
+          type="button"
+          className="ss-settings-modal-action-link"
+          onClick={() => navigateSettingsModalView(SETTINGS_MODAL_VIEWS.AMAZON_PAY_HTML)}
+        >
+          {AMAZON_PAY_HTML_LABELS.openSettings}
+        </button>
       </ScenarioFormRow>
       <ScenarioModalFooter
         onClose={onBack}

@@ -18,6 +18,7 @@ import {
   DEFAULT_EXECUTION_POLICY,
   EXECUTION_POLICIES,
 } from 'v2/variables/constants';
+import { parseTagFiringFromApi } from './tagFiringUtils';
 
 const parseExecutionPolicy = (data) => {
   const knownPolicies = Object.values(EXECUTION_POLICIES);
@@ -157,6 +158,7 @@ export const parseScenarioResponse = (res) => {
     lpIntegrationMode: data.lp_integration_mode || LP_INTEGRATION_MODES.AUTO,
     amazonPayConfig: parseAmazonPayConfigFromApi(data.amazon_pay_config),
     isUseAmazonPay: data.is_use_amazon_pay ?? (normalizeAllowedLpDomains(data.allowed_lp_domains || []).length > 0),
+    tagFiring: parseTagFiringFromApi(data.tag_firing),
   };
 };
 
@@ -204,6 +206,7 @@ export const buildScenarioSavePayload = (state) => {
     allowedLpDomains,
     amazonPayConfig,
     isUseAmazonPay,
+    tagFiring,
   } = state;
 
   return {
@@ -230,6 +233,7 @@ export const buildScenarioSavePayload = (state) => {
     amazon_pay_config: isUseAmazonPay
       ? normalizeAmazonPayConfig(amazonPayConfig)
       : normalizeAmazonPayConfig({}),
+    tag_firing: tagFiring,
     is_used_custom_css: isUseCustomCss,
     custom_css_content: customCssContent.final,
     is_used_html_ugc: isUseHtmlUgc,

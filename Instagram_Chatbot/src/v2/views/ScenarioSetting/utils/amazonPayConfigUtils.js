@@ -6,6 +6,7 @@ import {
   DEFAULT_AMAZON_DETECTION,
   DEFAULT_AMAZON_PAY_CONFIG,
   FUKUSHIASHIKI_SELECTOR_VALUE_SUFFIX,
+  getAmazonPayCartPreset,
   normalizeAmazonPayConfig,
 } from 'v2/variables/amazonPayConstants';
 
@@ -184,6 +185,26 @@ export const buildAmazonPayConfigWithDetection = ({
     readySelectorsText,
   }),
 });
+
+export const applyAmazonPayCartPreset = (currentConfig, cartSystem) => {
+  const preset = getAmazonPayCartPreset(cartSystem);
+  if (!preset) return null;
+
+  const next = normalizeAmazonPayConfig({
+    ...currentConfig,
+    amazon_detection: {
+      ...(currentConfig?.amazon_detection || {}),
+      ...preset.amazon_detection,
+    },
+  });
+
+  return {
+    config: next,
+    detectionMode: inferAmazonPayDetectionMode(next.amazon_detection),
+    readyMode: inferAmazonPayReadyMode(next.amazon_detection),
+    detectionForm: amazonDetectionToForm(next.amazon_detection),
+  };
+};
 
 export const AMAZON_PAY_INCOMPLETE_DETECTION_ERROR = 'Amazon Pay連携設定の判定方法を入力してください。';
 

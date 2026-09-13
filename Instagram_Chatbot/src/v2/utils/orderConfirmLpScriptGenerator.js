@@ -1,3 +1,92 @@
+export const FONT_WEIGHT_BOLD = 'bold';
+export const FONT_WEIGHT_NORMAL = 'normal';
+
+export const DEFAULT_ORDER_CONFIRM_DESIGN = {
+  backgroundColor: '#ffffff',
+  textColor: '#000000',
+  borderRadiusPx: 15,
+  paddingPx: 15,
+  sectionFontSizePx: 18,
+  sectionColor: '#000000',
+  sectionFontWeight: FONT_WEIGHT_BOLD,
+  labelFontSizePx: 14,
+  labelColor: '#000000',
+  labelFontWeight: FONT_WEIGHT_BOLD,
+  valueFontSizePx: 14,
+  valueColor: '#444444',
+  valueFontWeight: FONT_WEIGHT_NORMAL,
+  totalColor: '#000000',
+  totalFontWeight: FONT_WEIGHT_BOLD,
+  noteFontSizePx: 13,
+  noteColor: '#000000',
+  noteFontWeight: FONT_WEIGHT_NORMAL,
+  dividerColor: '#cccccc',
+};
+
+const toPositiveNumber = (value, fallback) => {
+  const parsed = Number(value);
+  if (Number.isFinite(parsed) && parsed >= 0) return parsed;
+  return fallback;
+};
+
+const colorOrEmpty = (value) => (typeof value === 'string' ? value.trim() : '');
+
+const weightOrDefault = (value, fallback) => (
+  value === FONT_WEIGHT_BOLD || value === FONT_WEIGHT_NORMAL ? value : fallback
+);
+
+export const normalizeOrderConfirmDesign = (design = {}) => ({
+  backgroundColor: colorOrEmpty(design.backgroundColor) || DEFAULT_ORDER_CONFIRM_DESIGN.backgroundColor,
+  textColor: colorOrEmpty(design.textColor) || DEFAULT_ORDER_CONFIRM_DESIGN.textColor,
+  borderRadiusPx: toPositiveNumber(design.borderRadiusPx, DEFAULT_ORDER_CONFIRM_DESIGN.borderRadiusPx),
+  paddingPx: toPositiveNumber(design.paddingPx, DEFAULT_ORDER_CONFIRM_DESIGN.paddingPx),
+  sectionFontSizePx: toPositiveNumber(design.sectionFontSizePx, DEFAULT_ORDER_CONFIRM_DESIGN.sectionFontSizePx),
+  sectionColor: colorOrEmpty(design.sectionColor) || DEFAULT_ORDER_CONFIRM_DESIGN.sectionColor,
+  sectionFontWeight: weightOrDefault(design.sectionFontWeight, DEFAULT_ORDER_CONFIRM_DESIGN.sectionFontWeight),
+  labelFontSizePx: toPositiveNumber(design.labelFontSizePx, DEFAULT_ORDER_CONFIRM_DESIGN.labelFontSizePx),
+  labelColor: colorOrEmpty(design.labelColor) || DEFAULT_ORDER_CONFIRM_DESIGN.labelColor,
+  labelFontWeight: weightOrDefault(design.labelFontWeight, DEFAULT_ORDER_CONFIRM_DESIGN.labelFontWeight),
+  valueFontSizePx: toPositiveNumber(design.valueFontSizePx, DEFAULT_ORDER_CONFIRM_DESIGN.valueFontSizePx),
+  valueColor: colorOrEmpty(design.valueColor) || DEFAULT_ORDER_CONFIRM_DESIGN.valueColor,
+  valueFontWeight: weightOrDefault(design.valueFontWeight, DEFAULT_ORDER_CONFIRM_DESIGN.valueFontWeight),
+  totalColor: colorOrEmpty(design.totalColor) || DEFAULT_ORDER_CONFIRM_DESIGN.totalColor,
+  totalFontWeight: weightOrDefault(design.totalFontWeight, DEFAULT_ORDER_CONFIRM_DESIGN.totalFontWeight),
+  noteFontSizePx: toPositiveNumber(design.noteFontSizePx, DEFAULT_ORDER_CONFIRM_DESIGN.noteFontSizePx),
+  noteColor: colorOrEmpty(design.noteColor) || DEFAULT_ORDER_CONFIRM_DESIGN.noteColor,
+  noteFontWeight: weightOrDefault(design.noteFontWeight, DEFAULT_ORDER_CONFIRM_DESIGN.noteFontWeight),
+  dividerColor: colorOrEmpty(design.dividerColor) || DEFAULT_ORDER_CONFIRM_DESIGN.dividerColor,
+});
+
+export const resolveOrderConfirmDesign = (design = {}, themeSettings = {}) => {
+  const normalized = normalizeOrderConfirmDesign(design);
+  return {
+    ...normalized,
+    backgroundColor: colorOrEmpty(design.backgroundColor)
+      || themeSettings?.botMessageBgColor
+      || DEFAULT_ORDER_CONFIRM_DESIGN.backgroundColor,
+    textColor: colorOrEmpty(design.textColor)
+      || themeSettings?.botMessageTextColor
+      || DEFAULT_ORDER_CONFIRM_DESIGN.textColor,
+  };
+};
+
+export const buildOrderConfirmStyleMap = (design = {}, themeSettings = {}) => {
+  const resolved = resolveOrderConfirmDesign(design, themeSettings);
+  return {
+    box: `background-color:${resolved.backgroundColor};color:${resolved.textColor};border-radius:${resolved.borderRadiusPx}px;padding:${resolved.paddingPx}px;margin:0px!important;`,
+    section: `font-size:${resolved.sectionFontSizePx}px;font-weight:${resolved.sectionFontWeight};color:${resolved.sectionColor};margin:0;`,
+    label: `font-size:${resolved.labelFontSizePx}px;font-weight:${resolved.labelFontWeight};color:${resolved.labelColor};`,
+    value: `font-size:${resolved.valueFontSizePx}px;font-weight:${resolved.valueFontWeight};color:${resolved.valueColor};`,
+    total: `font-size:${resolved.valueFontSizePx}px;font-weight:${resolved.totalFontWeight};color:${resolved.totalColor};`,
+    note: `font-size:${resolved.noteFontSizePx}px;font-weight:${resolved.noteFontWeight};color:${resolved.noteColor};margin:0;`,
+    divider: `border:none;border-top:1px solid ${resolved.dividerColor};`,
+  };
+};
+
+export const buildOrderConfirmBoxStyle = (design = {}, themeSettings = {}) => (
+  buildOrderConfirmStyleMap(design, themeSettings).box
+);
+
 export const ORDER_CONFIRM_LP_PRESET = {
   ECFORCE: 'ecforce',
   CUSTOM: 'custom',
@@ -289,6 +378,7 @@ export const normalizeOrderConfirmConfig = (config = {}) => {
     ? JSON.parse(JSON.stringify(ecforcePreset.selectors))
     : legacy.selectors;
   base.labels = { ...base.labels, ...legacy.labels };
+  base.design = normalizeOrderConfirmDesign(config.design || base.design);
 
   return base;
 }
@@ -330,41 +420,42 @@ const resolveTaxNote = (label, fieldsByGroup, dataByFieldId) => {
     .replace('{tax10}', (tax10Field && dataByFieldId[tax10Field.id]) || '');
 };
 
-const renderFieldHtml = (field, fieldsByGroup, dataByFieldId) => {
+const renderFieldHtml = (field, fieldsByGroup, dataByFieldId, styles) => {
   const value = dataByFieldId[field.id] || '';
 
   if (field.type === 'selector_only') return '';
 
   if (field.type === 'label_only') {
     if (field.style === 'section') {
-      return `<p style="font-size:18px;font-weight:bold;margin:0;">${field.label || ''}</p>`;
+      return `<p style="${styles.section}">${field.label || ''}</p>`;
     }
     if (field.style === 'note') {
-      return `<p style="font-size:13px;margin:0;">${resolveTaxNote(field.label, fieldsByGroup, dataByFieldId)}</p>`;
+      return `<p style="${styles.note}">${resolveTaxNote(field.label, fieldsByGroup, dataByFieldId)}</p>`;
     }
     return `<p style="margin:0;">${field.label || ''}</p>`;
   }
 
   const isTotal = field.preset_key === 'summary.total';
-  const valueStyle = isTotal ? 'font-weight:bold;' : 'color:#444;';
-  return `<p style="margin:0;"><span style="font-weight:bold;">${field.label || ''}：</span><span style="${valueStyle}">${value}</span></p>`;
+  const valueStyle = isTotal ? styles.total : styles.value;
+  return `<p style="margin:0;"><span style="${styles.label}">${field.label || ''}：</span><span style="${valueStyle}">${value}</span></p>`;
 };
 
-export const buildOrderConfirmHtmlFromFields = (fieldsByGroup, dataByFieldId = {}) => {
+export const buildOrderConfirmHtmlFromFields = (fieldsByGroup, dataByFieldId = {}, design = {}, themeSettings = {}) => {
+  const styles = buildOrderConfirmStyleMap(design, themeSettings);
   const parts = [];
 
   ORDER_CONFIRM_GROUP_KEYS.forEach((groupKey) => {
     (fieldsByGroup[groupKey] || []).forEach((field) => {
-      const html = renderFieldHtml(field, fieldsByGroup, dataByFieldId);
+      const html = renderFieldHtml(field, fieldsByGroup, dataByFieldId, styles);
       if (html) parts.push(html);
     });
 
     if (groupKey === 'customer' || groupKey === 'product') {
-      parts.push('<hr style="border:none;border-top:1px solid #ccc;">');
+      parts.push(`<hr style="${styles.divider}">`);
     }
   });
 
-  return `<div style="background-color:#ffffff;color:#000000;border-radius:15px;padding:15px;margin:0px!important;">${parts.join('')}</div>`;
+  return `<div style="${styles.box}">${parts.join('')}</div>`;
 }
 
 export const buildPreviewDataByFieldId = (config = {}) => {
@@ -384,22 +475,66 @@ export const buildPreviewDataByFieldId = (config = {}) => {
   return dataByFieldId;
 }
 
-export const buildOrderConfirmHtml = (config = {}, dataByFieldId = null) => {
+export const ORDER_CONFIRM_DESIGN_PREVIEW_VALUES = {
+  'customer.name': '山田 太郎',
+  'customer.address': '東京都渋谷区...',
+  'product.name': '定期便',
+  'product.price': '¥4,800',
+  'product.quantity': '1',
+  'product.subtotal': '¥4,800',
+  'summary.subtotal': '¥4,800',
+  'summary.deliveryFee': '¥500',
+  'summary.charge': '¥0',
+  'summary.tax': '¥480',
+  'summary.total': '¥5,280',
+  'discount.subtotal10': '¥4,800',
+  'discount.tax10': '¥480',
+};
+
+export const buildOrderConfirmDesignPreviewData = (config = {}) => {
+  const normalized = normalizeOrderConfirmConfig(config);
+  const dataByFieldId = {};
+
+  ORDER_CONFIRM_GROUP_KEYS.forEach((groupKey) => {
+    (normalized.fields_by_group[groupKey] || []).forEach((field) => {
+      if (field.type === 'paired' || field.type === 'selector_only') {
+        dataByFieldId[field.id] = ORDER_CONFIRM_DESIGN_PREVIEW_VALUES[field.preset_key]
+          || PRESET_KEY_PREVIEW_PLACEHOLDERS[field.preset_key]
+          || `{{field_${field.id}}}`;
+      }
+    });
+  });
+
+  return dataByFieldId;
+};
+
+export const buildOrderConfirmHtml = (config = {}, dataByFieldId = null, themeSettings = {}) => {
   const normalized = normalizeOrderConfirmConfig(config);
   const resolvedData = dataByFieldId || buildPreviewDataByFieldId(normalized);
-  return buildOrderConfirmHtmlFromFields(normalized.fields_by_group, resolvedData);
+  return buildOrderConfirmHtmlFromFields(
+    normalized.fields_by_group,
+    resolvedData,
+    normalized.design,
+    themeSettings,
+  );
 }
 
-export const buildOrderConfirmPreviewHtml = (config = {}) => (
-  buildOrderConfirmHtml(config, buildPreviewDataByFieldId(config))
+export const buildOrderConfirmPreviewHtml = (config = {}, themeSettings = {}) => (
+  buildOrderConfirmHtml(config, buildPreviewDataByFieldId(config), themeSettings)
+);
+
+export const buildOrderConfirmDesignPreviewHtml = (config = {}, themeSettings = {}) => (
+  buildOrderConfirmHtml(config, buildOrderConfirmDesignPreviewData(config), themeSettings)
 );
 
 export const buildOrderConfirmJs = (config = {}) => {
   const mergedConfig = normalizeOrderConfirmConfig(config);
   const payload = JSON.stringify(mergedConfig);
+  const styles = JSON.stringify(buildOrderConfirmStyleMap(mergedConfig.design));
 
   return `(function() {
   var CONFIG = ${payload};
+  var STYLES = ${styles};
   var GROUP_KEYS = ${JSON.stringify(ORDER_CONFIRM_GROUP_KEYS)};
 
   var LOADING_STYLES = ".loader{display:flex;align-items:flex-end;justify-content:center;gap:5px;height:40px}.loader span{width:10px;height:10px;background-color:#333;border-radius:50%;display:inline-block;animation:bounce 1.2s infinite ease-in-out;transform:translateY(-225%)}.loader span:nth-child(1){animation-delay:0s}.loader span:nth-child(2){animation-delay:0.2s}.loader span:nth-child(3){animation-delay:0.4s}@keyframes bounce{0%{transform:translateY(-225%)}20%{transform:translateY(-125%)}40%{transform:translateY(-225%)}100%{transform:translateY(-275%)}}";
@@ -415,7 +550,7 @@ export const buildOrderConfirmJs = (config = {}) => {
   }
 
   function cleanHTML(text) {
-    return '<div style="background-color:#ffffff;color:#000000;border-radius:15px;padding:15px;margin:0px!important;">' + text + '</div>';
+    return '<div style="' + STYLES.box + '">' + text + '</div>';
   }
 
   function resolveTaxNote(label, fieldsByGroup, dataByFieldId) {
@@ -432,16 +567,16 @@ export const buildOrderConfirmJs = (config = {}) => {
     if (field.type === "selector_only") return "";
     if (field.type === "label_only") {
       if (field.style === "section") {
-        return '<p style="font-size:18px;font-weight:bold;margin:0;">' + (field.label || "") + '</p>';
+        return '<p style="' + STYLES.section + '">' + (field.label || "") + '</p>';
       }
       if (field.style === "note") {
-        return '<p style="font-size:13px;margin:0;">' + resolveTaxNote(field.label, fieldsByGroup, dataByFieldId) + '</p>';
+        return '<p style="' + STYLES.note + '">' + resolveTaxNote(field.label, fieldsByGroup, dataByFieldId) + '</p>';
       }
       return '<p style="margin:0;">' + (field.label || "") + '</p>';
     }
     var isTotal = field.preset_key === "summary.total";
-    var valueStyle = isTotal ? "font-weight:bold;" : "color:#444;";
-    return '<p style="margin:0;"><span style="font-weight:bold;">' + (field.label || "") + '：</span><span style="' + valueStyle + '">' + value + '</span></p>';
+    var valueStyle = isTotal ? STYLES.total : STYLES.value;
+    return '<p style="margin:0;"><span style="' + STYLES.label + '">' + (field.label || "") + '：</span><span style="' + valueStyle + '">' + value + '</span></p>';
   }
 
   function buildOrderHtml(fieldsByGroup, dataByFieldId) {
@@ -452,7 +587,7 @@ export const buildOrderConfirmJs = (config = {}) => {
         if (html) parts.push(html);
       });
       if (groupKey === "customer" || groupKey === "product") {
-        parts.push('<hr style="border:none;border-top:1px solid #ccc;">');
+        parts.push('<hr style="' + STYLES.divider + '">');
       }
     });
     return cleanHTML(parts.join(""));
@@ -490,11 +625,11 @@ export const buildOrderConfirmJs = (config = {}) => {
   }
 
   function generateLoadingText() {
-    return '<style>' + LOADING_STYLES + '</style><div style="background-color:#fcc660;padding:9px;border-radius:20px;height:50px;width:70px;"><div class="loader"><span></span><span></span><span></span></div></div>';
+    return '<style>' + LOADING_STYLES + '</style><div style="' + STYLES.box + 'height:50px;width:70px;"><div class="loader"><span></span><span></span><span></span></div></div>';
   }
 
   function generateOrderErrorText() {
-    return '<div style="background-color:#fcc660;color:rgb(255,0,0);padding:6px 9px;border-radius:20px;font-weight:bold;"><span>' + (CONFIG.error_message || "") + '</span></div>';
+    return '<div style="' + STYLES.box + '"><span>' + (CONFIG.error_message || "") + '</span></div>';
   }
 
   function retry(fn, options) {

@@ -26,7 +26,7 @@ const CombineBotBlock = ({
       if (previewOrderContent && isBotOpen) {
         setText(previewOrderContent);
       } else {
-        setText(buildOrderConfirmPreviewHtml(content.order_confirm));
+        setText(buildOrderConfirmPreviewHtml(content.order_confirm, themeSettings));
       }
       return;
     }
@@ -40,7 +40,7 @@ const CombineBotBlock = ({
     }
 
     setText(replaceVariables(originalContent || '', variables));
-  }, [content, originalContent, variables, previewOrderContent, isBotOpen]);
+  }, [content, originalContent, variables, previewOrderContent, isBotOpen, themeSettings]);
 
   useEffect(() => {
     if (content.type === BOT_MESSAGE_TYPES.ORDER_CONFIRM && content.order_confirm && isBotOpen) {

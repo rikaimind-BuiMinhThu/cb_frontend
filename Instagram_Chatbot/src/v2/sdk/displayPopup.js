@@ -1,8 +1,10 @@
 import { CHATBOT_ACTIONS, LP_INTEGRATION_MODES } from './constants.js';
 import { extractSelectorBindingsFromMessages } from './amazon/bindings.js';
 import { resolveLpMode } from './amazon/detection.js';
+import { pushChatbotTagEvent } from './tagFiring.js';
 import {
   appendIframeToBody,
+  flushQueuedAmazonPaySelectorPayload,
   loadIframeForW2Repeat,
   waitToLoadAmazonEcForce,
   waitToLoadAmazonGeneric,
@@ -63,6 +65,7 @@ const handleChatbotMessage = async (e, iframe) => {
   if (typeof e.data !== 'object') return;
   if (e.data.source !== 'ec-chatbot') return;
 
+  flushQueuedAmazonPaySelectorPayload();
   updateChatbotOffsetsFromMessage(e.data);
 
   switch (e.data.action) {
@@ -136,6 +139,9 @@ const handleChatbotMessage = async (e, iframe) => {
       break;
     case CHATBOT_ACTIONS.INJECT_CUSTOM_JS:
       injectCustomJS(e.data.actionData);
+      break;
+    case CHATBOT_ACTIONS.CHATBOT_TAG_EVENT:
+      pushChatbotTagEvent(e.data);
       break;
     default:
       break;

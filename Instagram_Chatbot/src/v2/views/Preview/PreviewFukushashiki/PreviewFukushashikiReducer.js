@@ -40,6 +40,22 @@ import { savedChatbotState } from 'v2/views/Preview/PreviewComponent/SessionStor
 import { convertToFukushashikiObject } from './FukushashikiDataConverterUtils';
 import { fukushashikiToLP } from './LPUtils';
 import { applyLpFieldValue } from './LpFieldSyncUtils';
+import { parseTagFiringFromApi } from 'v2/views/ScenarioSetting/utils/tagFiringUtils';
+
+const applyAmazonSelectorPayloadToDraft = (payload, draft) => {
+  if (!payload) return false;
+  const mappedAmazon = mapAmazonPayDataBySelector(payload, draft.messagesList || []);
+  if (!mappedAmazon.changed) return false;
+  draft.messagesList = mappedAmazon.messagesList;
+  if ((draft.renderMessagesList || []).length) {
+    draft.renderMessagesList = mappedAmazon.messagesList.slice(
+      0,
+      (draft.currentMsgIndex ?? 0) + 1,
+    );
+  }
+  draft.pendingAmazonPaySelectorPayload = null;
+  return true;
+};
 
 const PreviewFukushashikiReducer = (state, action) => {
   switch (action.type) {
@@ -305,11 +321,23 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
       const renderMessagesListForYuwaeru = newMessagesListForYuwaeru.slice(0, state.currentMsgIndex + 1);
       return { ...state, messagesList: newMessagesListForYuwaeru, renderMessagesList: renderMessagesListForYuwaeru};
     case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_BY_SELECTOR: {
-      const { messagesList, changed } = mapAmazonPayDataBySelector(action.payload, state.messagesList);
+      const currentMessages = state.messagesList || [];
+      if (!currentMessages.length) {
+        return {
+          ...state,
+          pendingAmazonPaySelectorPayload: action.payload,
+        };
+      }
+
+      const { messagesList, changed } = mapAmazonPayDataBySelector(action.payload, currentMessages);
       if (!changed) return state;
 
-      const updatedRenderMessagesList = messagesList.slice(0, state.currentMsgIndex + 1);
-      return { ...state, messagesList, renderMessagesList: updatedRenderMessagesList };
+      return {
+        ...state,
+        messagesList,
+        renderMessagesList: messagesList.slice(0, (state.currentMsgIndex ?? 0) + 1),
+        pendingAmazonPaySelectorPayload: null,
+      };
     }
     case PREVIEW_ACTIONS.UPDATE_LP_FIELD_VALUE: {
       const { messagesList, changed } = applyLpFieldValue(state.messagesList, action.payload);
@@ -441,6 +469,8 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
         isUsedPastMessageLoaded: !!chatbot?.is_used_message_loaded_past,
         isProcessing: false,
         useFullWidthChatbotMobile: !!chatbot?.use_fullwidth_chatbot_mobile,
+        tagFiring: parseTagFiringFromApi(chatbot?.tag_firing),
+        scenarioName: action.payload.responseData?.data?.name || state.scenarioName || "",
         cartSystem: state.cartSystem || chatbot?.client_cart_system || "",
         merchandiseId: action.payload.responseData?.data?.merchandise_id || "",
         isUsedCrosssell: !!action.payload.responseData?.data?.is_used_crosssell,
@@ -556,6 +586,7 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
       });
 
       newState.progressBarMaxIndex = progressBarTargetCountMessagesList.length;
+      applyAmazonSelectorPayloadToDraft(state.pendingAmazonPaySelectorPayload, newState);
 
       return { ...state, ...newState };
     }
@@ -575,6 +606,7 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
         newState.messagesList.forEach((x) => x.hidden = x.not_display_when_logged_in);
       }
 
+      applyAmazonSelectorPayloadToDraft(state.pendingAmazonPaySelectorPayload, newState);
       newState.renderMessagesList = newState.messagesList.slice(0, newState.nextStopMsgIndex);
       newState.currentMsgIndex = newState.nextStopMsgIndex - 1;
       newState.loadedStateFromSession = true;
@@ -599,6 +631,7 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
           currentMsgIndex: 0,
         };
         openedState.nextStopMsgIndex = openedState.messagesList.findIndex(getNextUserMsg()) + 1;
+        applyAmazonSelectorPayloadToDraft(state.pendingAmazonPaySelectorPayload, openedState);
         openedState.renderMessagesList = openedState.messagesList.slice(0, openedState.currentMsgIndex + 1);
         return { ...state, isOpen: true, showPopupCloseBot: false, isAlreadyOpenFirstTime: true, manuallyClosed: false, autoOpenAttempted: true, ...openedState };
       }

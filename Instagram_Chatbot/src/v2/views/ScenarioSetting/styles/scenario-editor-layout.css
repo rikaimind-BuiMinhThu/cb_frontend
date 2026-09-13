@@ -9,6 +9,7 @@
   min-height: 0;
   box-sizing: border-box;
   overflow: hidden;
+  padding: 0;
 }
 
 .admin-page--scenario-editor {

@@ -1,11 +1,13 @@
 import {
+  AMAZON_SELECTOR_POST_LOAD_DELAY_MS,
+  AMAZON_SELECTOR_SEND_RETRY_DELAYS_MS,
   CHATBOT_ACTIONS,
   DEFAULT_AMAZON_DETECTION,
   DEFAULT_AMAZON_PAY_CONFIG,
   WAIT_TO_LOAD_AMAZON_DATA_MAX_COUNT,
 } from '../constants.js';
 import { getParam } from '../config/environment.js';
-import { setGlobalIframe } from '../state.js';
+import { chatbotLayout, setGlobalIframe } from '../state.js';
 import { sendMessageToChatbot } from '../messaging/bridge.js';
 import {
   buildAmazonSelectorPayload,
@@ -20,7 +22,34 @@ export const appendIframeToBody = (iframe) => {
 
 const sendAmazonPayDataBySelector = (payload) => {
   if (!payload?.selectorValues?.length) return;
+  if (!chatbotLayout.globalIframe?.contentWindow) return;
   sendMessageToChatbot(payload, CHATBOT_ACTIONS.UPDATE_AMAZON_PAY_DATA_BY_SELECTOR);
+};
+
+const queueAmazonPaySelectorPayload = (payload) => {
+  chatbotLayout.pendingAmazonSelectorPayload = payload;
+};
+
+const sendAmazonPaySelectorAfterIframeLoad = (iframe, payload) => {
+  queueAmazonPaySelectorPayload(payload);
+  const send = () => sendAmazonPayDataBySelector(payload);
+  const scheduleRetries = () => {
+    send();
+    AMAZON_SELECTOR_SEND_RETRY_DELAYS_MS.forEach((delayMs) => {
+      setTimeout(send, delayMs);
+    });
+  };
+  iframe.addEventListener('load', () => {
+    setTimeout(scheduleRetries, AMAZON_SELECTOR_POST_LOAD_DELAY_MS);
+  });
+};
+
+export const flushQueuedAmazonPaySelectorPayload = () => {
+  if (chatbotLayout.amazonSelectorPayloadSent) return;
+  const payload = chatbotLayout.pendingAmazonSelectorPayload;
+  if (!payload?.selectorValues?.length) return;
+  chatbotLayout.amazonSelectorPayloadSent = true;
+  sendAmazonPayDataBySelector(payload);
 };
 
 export const waitToLoadAmazonGeneric = (iframe, amazonConfig) => {
@@ -57,8 +86,8 @@ export const waitToLoadAmazonGeneric = (iframe, amazonConfig) => {
     }
     if (payload?.selectorValues?.length) {
       if (!sent) {
+        sendAmazonPaySelectorAfterIframeLoad(iframe, payload);
         appendIframeToBody(iframe);
-        setTimeout(() => sendAmazonPayDataBySelector(payload), 500);
         sent = true;
       }
       clearInterval(interval);

@@ -4,6 +4,7 @@ import { Button } from 'reactstrap';
 import ScenarioModalShell from '../components/modals/shared/ScenarioModalShell';
 import ScenarioModalFooter from '../components/modals/shared/ScenarioModalFooter';
 import OrderConfirmSettingsModalContent from './OrderConfirmSettingsModalContent';
+import { ORDER_CONFIRM_SETTINGS_MODAL_WIDTH } from 'v2/views/OrderConfirmTemplate/constants';
 
 const OrderConfirmSettingsModal = ({
   config,
@@ -54,7 +55,7 @@ const OrderConfirmSettingsModal = ({
         open={open}
         onClose={closeModal}
         title={title}
-        width={750}
+        width={ORDER_CONFIRM_SETTINGS_MODAL_WIDTH}
         className="ss-order-confirm-settings-modal"
         footer={(
           <ScenarioModalFooter

@@ -276,6 +276,9 @@ export const RADIO_BUTTON_LABELS = {
 export const BUTTON_SUBMIT_LABELS = {
   displayErrorMessage: 'エラーメッセージを表示する',
   useJs: 'JavaScriptの利用',
+  fireTag: 'タグを発火する',
+  tagEvent: 'イベント名',
+  tagLabel: 'イベントラベル',
   confirmOrder: '確認メッセージ用',
   confirmDisplayOnly: '確認するのみに表示',
   errorMessage: 'エラーメッセージ',

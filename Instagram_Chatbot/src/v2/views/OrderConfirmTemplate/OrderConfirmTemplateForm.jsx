@@ -3,6 +3,7 @@ import { Card, Input } from 'antd';
 import CheckboxCustom from 'v2/components/BotMessages/CheckboxCustom';
 import OrderConfirmSettingsModalContent from './OrderConfirmSettingsModalContent';
 import OrderConfirmAdvancedSettings from './OrderConfirmAdvancedSettings';
+import OrderConfirmDesignCard from './OrderConfirmDesignCard';
 import {
   ORDER_CONFIRM_LP_PRESET,
   buildOrderConfirmPresetConfig,
@@ -12,6 +13,7 @@ import {
 import {
   CARD_ADVANCED,
   CARD_BASIC,
+  CARD_DESIGN,
   CARD_FIELDS,
   LABEL_LP_TYPE,
   LABEL_NO_AUTO_SCROLL,
@@ -103,6 +105,13 @@ const OrderConfirmTemplateForm = ({
           config={normalizedConfig}
           onConfigChange={onConfigChange}
           showAdvancedSettings={false}
+        />
+      </Card>
+
+      <Card title={CARD_DESIGN} className="order-confirm-template-editor__card" bordered={false}>
+        <OrderConfirmDesignCard
+          config={normalizedConfig}
+          onChange={onConfigChange}
         />
       </Card>
 

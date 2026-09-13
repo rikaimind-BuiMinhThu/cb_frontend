@@ -49,6 +49,7 @@ import {
   sendCloseChatbotCountRequest,
   isInteractiveMessage,
   sendLogMessageToServer,
+  sendCreateOrderData,
   updateStatusConversion,
   isButtonSubmitMessage,
   createScenarioUserResponseMessageHistory,
@@ -74,6 +75,12 @@ import {
 } from "./PreviewFukushashiki/LPUtils";
 import { resolveErrMsgLpScript } from "v2/views/ScenarioSetting/utils/resolveErrMsgLpScript";
 import { generateLaunchButtonLpScript } from "v2/views/ScenarioSetting/utils/launchButtonLpScriptUtils";
+import {
+  fireChatbotButtonTags,
+  fireChatbotCompleteTag,
+  fireChatbotLifecycleTagsOnOpen,
+  isScenarioCompleteClick,
+} from "v2/views/Preview/utils/chatbotTagEventUtils";
 import { convertToFukushashikiObject } from "./PreviewFukushashiki/FukushashikiDataConverterUtils";
 import { handleValidateField } from "./PreviewFukushashiki/ValidationUtils";
 import { createOrAddLinesCart } from "./PreviewComponent/ShopifyUtils";
@@ -112,6 +119,9 @@ const PreviewFukushashiki = () => {
   const containerRef = useRef(null);
   const hasSentCustomJs = useRef(false);
   const hasSentInitialOpenStateToParent = useRef(false);
+  const hasFiredStartTagRef = useRef(false);
+  const previewStateRef = useRef(state);
+  previewStateRef.current = state;
   const [useSharedBootstrap, setUseSharedBootstrap] = useState(() => !getChatbotSavedState());
   const [msgUpdateState, setMsgUpdateState] = useState({});
   const msgUpdateStateRef = useRef({});
@@ -147,6 +157,14 @@ const PreviewFukushashiki = () => {
       spBody.removeEventListener('change', handleChange, true);
     };
   }, [state.isUseBtnUpdateTracking, state.isOpen]);
+
+  useEffect(() => {
+    if (!state.isOpen) return;
+    fireChatbotLifecycleTagsOnOpen({
+      state: previewStateRef.current,
+      hasFiredStartRef: hasFiredStartTagRef,
+    });
+  }, [state.isOpen, state.tagFiring, state.scenarioId, state.scenarioName]);
 
   usePreviewConversionOnOpen({ state, dispatch });
   usePreviewIpParams({ state, dispatch });
@@ -670,6 +688,8 @@ const PreviewFukushashiki = () => {
       sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
     }
 
+    fireChatbotButtonTags(state, clickedMsg);
+
     if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
       executeLpJsCode(clickedMsg.jscode, state);
     }
@@ -695,11 +715,20 @@ const PreviewFukushashiki = () => {
 
     const isClickedButtonSubmit = isButtonSubmitMessage(state.messagesList[clickedMsgIndex]);
     const isClickedLastMessage = state.messagesList.length - 1 === clickedMsgIndex;
+    const shouldFireCompleteTag = isScenarioCompleteClick(state.messagesList, clickedMsgIndex);
 
     dispatch({
       type: PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON,
       payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn}
     });
+
+    if (isClickedLastMessage) {
+      sendCreateOrderData(data);
+    }
+
+    if (shouldFireCompleteTag) {
+      fireChatbotCompleteTag(state);
+    }
 
     if (isClickedButtonSubmit || isClickedLastMessage) {
       updateStatusConversion({

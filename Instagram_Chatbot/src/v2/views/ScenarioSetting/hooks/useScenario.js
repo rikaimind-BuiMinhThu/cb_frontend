@@ -38,6 +38,7 @@ import {
   validateAmazonPayConfig,
 } from 'v2/views/ScenarioSetting/utils/amazonPayConfigUtils';
 import { DEFAULT_EXECUTION_POLICY } from 'v2/variables/constants';
+import { DEFAULT_TAG_FIRING } from 'v2/variables/tagFiringConstants';
 
 const INITIAL_TIMER_CONFIG = {
   isOpen: false,
@@ -161,6 +162,7 @@ export const useScenario = (mode = 'scenario') => {
   const [amazonPayReadyMode, setAmazonPayReadyMode] = useState(AMAZON_PAY_READY_MODES.NONE);
   const [amazonPayDetectionForm, setAmazonPayDetectionForm] = useState(() => amazonDetectionToForm());
   const [isUseAmazonPay, setIsUseAmazonPay] = useState(false);
+  const [tagFiring, setTagFiring] = useState(DEFAULT_TAG_FIRING);
 
   const [listProductVariants, setListProductVariants] = useState([]);
 
@@ -243,6 +245,7 @@ export const useScenario = (mode = 'scenario') => {
     setAmazonPayReadyMode(inferAmazonPayReadyMode(parsedDetection));
     setAmazonPayDetectionForm(amazonDetectionToForm(parsedDetection));
     setIsUseAmazonPay(parsed.isUseAmazonPay || false);
+    setTagFiring(parsed.tagFiring || DEFAULT_TAG_FIRING);
   }, []);
 
   const getConversationUrl = useCallback(() => {
@@ -406,6 +409,7 @@ export const useScenario = (mode = 'scenario') => {
       readySelectorsText: amazonPayDetectionForm.readySelectorsText,
     }),
     isUseAmazonPay,
+    tagFiring,
   }), [
     autoLogoutConfig,
     allowedLpDomainsInput,
@@ -414,6 +418,7 @@ export const useScenario = (mode = 'scenario') => {
     amazonPayDetectionMode,
     amazonPayReadyMode,
     isUseAmazonPay,
+    tagFiring,
     coupon,
     customCssContent,
     isUseHtmlUgc,
@@ -658,6 +663,7 @@ export const useScenario = (mode = 'scenario') => {
       amazonPayReadyMode,
       amazonPayDetectionForm,
       isUseAmazonPay,
+      tagFiring,
       listProductVariants,
       isShopifyPaymentScenario,
       editorMode: mode,
@@ -757,6 +763,7 @@ export const useScenario = (mode = 'scenario') => {
       setAmazonPayReadyMode,
       setAmazonPayDetectionForm,
       setIsUseAmazonPay,
+      setTagFiring,
       setListProductVariants,
       handleGetMessage,
       onClickSaveScenario,

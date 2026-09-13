@@ -41,37 +41,132 @@
     });
   };
 
+  // src/v2/sdk/config/environment.js
+  var getEnvFromScriptSrc = () => {
+    var _a;
+    try {
+      if (window.getSdkEnv) return window.sdkEnv;
+      window.getSdkEnv = true;
+      const SRC_PARSER = {
+        "ec-chatbot1.com": "staging",
+        "ec-chatbot.com": "production",
+        "localhost:3001": "local"
+      };
+      const src = ((_a = document.currentScript) == null ? void 0 : _a.src) || "";
+      if (!src) return null;
+      const host = new URL(src).host;
+      const sdkEnv = SRC_PARSER[host];
+      if (sdkEnv) {
+        window.sdkEnv = sdkEnv;
+        return sdkEnv;
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  };
+  var getEnvironment = () => {
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+      get: (searchParams, prop) => searchParams.get(prop)
+    });
+    return params.env || getEnvFromScriptSrc() || "production";
+  };
+  var getDebugFlag = () => {
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+      get: (searchParams, prop) => searchParams.get(prop)
+    });
+    return params.debug === "true" || params.debug === "1";
+  };
+  var getParam = (paramName) => {
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+      get: (searchParams, prop) => searchParams.get(prop)
+    });
+    return params[paramName];
+  };
+  var log = (message) => {
+    const debugFlag = getDebugFlag();
+    if (debugFlag) {
+      console.log(message);
+    }
+  };
+  var sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  var getEcChatBotApiServerBaseUrl = () => {
+    const environment = getEnvironment();
+    switch (environment) {
+      case "staging":
+      case "test":
+        return "https://ec-chatbot-test1.com";
+      case "production":
+        return "https://ec-chatbot-test.com";
+      case "local":
+        return "http://localhost:3000";
+      default:
+        return "http://localhost:3000";
+    }
+  };
+  var getEcChatBotFrontEndBaseUrl = () => {
+    const environment = getEnvironment();
+    switch (environment) {
+      case "staging":
+      case "test":
+        return "https://ec-chatbot1.com";
+      case "production":
+        return "https://ec-chatbot.com";
+      case "local":
+        return "http://localhost:3001";
+      default:
+        return "http://localhost:3001";
+    }
+  };
+
   // src/v2/sdk/sentry.js
   var SENTRY_CDN_URL = "https://browser.sentry-cdn.com/7.57.0/bundle.min.js";
   var SENTRY_DSN = "https://12b50bfdf6c0598e78a84630e5f7e40b@o4510197539930112.ingest.us.sentry.io/4510256042868736";
   var SDK_LABEL = "sdk-v2";
-  function captureExceptionSafe(error, captureContext) {
+  var WINDOW_ERROR_PREFIX = "window.error: ";
+  var UNHANDLED_REJECTION_MESSAGE = "Unhandled rejection";
+  var SENTRY_CAPTURE_FAILED_PREFIX = "Sentry.captureException failed (";
+  var SENTRY_INITIALIZED_SUFFIX = ")";
+  var SENTRY_INIT_LOG = `Sentry initialized (${SDK_LABEL})`;
+  var SENTRY_EVENT_ID_PREFIX = "Sentry.captureException eventId:";
+  var SENTRY_AXIOS_EVENT_ID_PREFIX = "Sentry.captureException eventId (axios):";
+  var WINDOW_ERROR_CAPTURED = "Sentry captured window.error";
+  var REJECTION_CAPTURED = "Sentry captured unhandledrejection";
+  var WINDOW_ERROR_FORWARD_FAILED = "Error forwarding window.error to Sentry";
+  var REJECTION_FORWARD_FAILED = "Error forwarding unhandledrejection to Sentry";
+  var AXIOS_INTERCEPTOR_FAILED_PREFIX = "Failed to install axios interceptor (";
+  var HANDLERS_FAILED_PREFIX = "Failed to attach global Sentry handlers (";
+  var INIT_ERROR_PREFIX = "Sentry init error (";
+  var SCRIPT_LOAD_FAILED_PREFIX = "Failed to load Sentry script (";
+  var SETUP_FAILED_PREFIX = "Failed to setup Sentry loader (";
+  var CROSS_ORIGIN_ANONYMOUS = "anonymous";
+  var ERROR_EVENT = "error";
+  var UNHANDLED_REJECTION_EVENT = "unhandledrejection";
+  var captureExceptionSafe = (error, captureContext) => {
     if (!window.Sentry) return null;
     try {
       return window.Sentry.captureException(error, captureContext);
-    } catch (e) {
-      console.warn(`Sentry.captureException failed (${SDK_LABEL})`, e);
+    } catch (sentryError) {
+      console.warn(`${SENTRY_CAPTURE_FAILED_PREFIX}${SDK_LABEL}${SENTRY_INITIALIZED_SUFFIX}`, sentryError);
       return null;
     }
-  }
-  function errorFromWindowEvent(evt) {
+  };
+  var errorFromWindowEvent = (evt) => {
     if (evt == null ? void 0 : evt.error) return evt.error;
     const message = (evt == null ? void 0 : evt.message) ? evt.message : String(evt);
-    return new Error(`window.error: ${message}`);
-  }
-  function errorFromRejection(evt) {
-    return (evt == null ? void 0 : evt.reason) ? evt.reason : new Error("Unhandled rejection");
-  }
-  function errorFromConsoleArgs(args) {
+    return new Error(`${WINDOW_ERROR_PREFIX}${message}`);
+  };
+  var errorFromRejection = (evt) => (evt == null ? void 0 : evt.reason) ? evt.reason : new Error(UNHANDLED_REJECTION_MESSAGE);
+  var errorFromConsoleArgs = (args) => {
     const first = args[0];
     if (first instanceof Error) return first;
     try {
-      return new Error(args.map((a) => typeof a === "string" ? a : JSON.stringify(a)).join(" "));
-    } catch (e) {
+      return new Error(args.map((arg) => typeof arg === "string" ? arg : JSON.stringify(arg)).join(" "));
+    } catch (parseError) {
       return new Error(String(first));
     }
-  }
-  function initializeSentryClient() {
+  };
+  var initializeSentryClient = () => {
     if (!window.Sentry || window.__SENTRY_INITIALIZED__) return false;
     window.__SENTRY_INITIALIZED__ = true;
     window.Sentry.init({
@@ -80,104 +175,101 @@
       sendDefaultPii: true,
       integrations: typeof window.Sentry.BrowserTracing === "function" ? [new window.Sentry.BrowserTracing()] : []
     });
-    console.log(`Sentry initialized (${SDK_LABEL})`);
+    log(SENTRY_INIT_LOG);
     return true;
-  }
-  function installConsoleErrorBridge() {
+  };
+  var installConsoleErrorBridge = () => {
     var _a;
-    const origConsoleError = ((_a = console.error) == null ? void 0 : _a.bind) ? console.error.bind(console) : function() {
-      return;
-    };
-    let inProgress = false;
-    console.error = function() {
-      const args = Array.prototype.slice.call(arguments);
-      if (inProgress) {
+    const origConsoleError = ((_a = console.error) == null ? void 0 : _a.bind) ? console.error.bind(console) : () => void 0;
+    const bridgeState = { inProgress: false };
+    console.error = (...args) => {
+      if (bridgeState.inProgress) {
         return origConsoleError.apply(console, args);
       }
       try {
-        inProgress = true;
+        bridgeState.inProgress = true;
         if (window.Sentry) {
           const err = errorFromConsoleArgs(args);
-          const eid = captureExceptionSafe(err);
-          if (eid != null) {
-            origConsoleError("Sentry.captureException eventId:", eid);
+          const eventId = captureExceptionSafe(err);
+          if (eventId != null) {
+            origConsoleError(SENTRY_EVENT_ID_PREFIX, eventId);
           }
         }
       } finally {
-        inProgress = false;
-        return origConsoleError.apply(console, args);
+        bridgeState.inProgress = false;
       }
+      return origConsoleError.apply(console, args);
     };
-  }
-  function installAxiosInterceptor() {
+  };
+  var installAxiosInterceptor = () => {
     if (!window.axios || !window.Sentry || window.__sdk_v2_axios_installed__) return;
     window.__sdk_v2_axios_installed__ = true;
     window.axios.interceptors.response.use(
       (resp) => resp,
       (error) => {
-        const ev = captureExceptionSafe(error);
-        if (ev != null) {
-          console.log("Sentry.captureException eventId (axios):", ev);
+        const eventId = captureExceptionSafe(error);
+        if (eventId != null) {
+          log(`${SENTRY_AXIOS_EVENT_ID_PREFIX} ${eventId}`);
         }
         return Promise.reject(error);
       }
     );
-  }
-  function attachGlobalHandlers() {
+  };
+  var attachGlobalHandlers = () => {
     try {
-      window.addEventListener("error", (evt) => {
+      window.addEventListener(ERROR_EVENT, (evt) => {
         try {
           const err = errorFromWindowEvent(evt);
           captureExceptionSafe(err);
-          console.log("Sentry captured window.error");
-        } catch (e) {
-          console.warn("Error forwarding window.error to Sentry", e);
+          log(WINDOW_ERROR_CAPTURED);
+        } catch (handlerError) {
+          console.warn(WINDOW_ERROR_FORWARD_FAILED, handlerError);
         }
       });
-      window.addEventListener("unhandledrejection", (evt) => {
+      window.addEventListener(UNHANDLED_REJECTION_EVENT, (evt) => {
         try {
           const reason = errorFromRejection(evt);
           captureExceptionSafe(reason);
-          console.log("Sentry captured unhandledrejection");
-        } catch (e) {
-          console.warn("Error forwarding unhandledrejection to Sentry", e);
+          log(REJECTION_CAPTURED);
+        } catch (handlerError) {
+          console.warn(REJECTION_FORWARD_FAILED, handlerError);
         }
       });
-      window.__sdk_v2_captureException = (e) => captureExceptionSafe(e);
+      window.__sdk_v2_captureException = (error) => captureExceptionSafe(error);
       installConsoleErrorBridge();
       try {
         installAxiosInterceptor();
-      } catch (e) {
-        console.warn(`Failed to install axios interceptor (${SDK_LABEL}):`, e);
+      } catch (interceptorError) {
+        console.warn(`${AXIOS_INTERCEPTOR_FAILED_PREFIX}${SDK_LABEL}):`, interceptorError);
       }
     } catch (handlerErr) {
-      console.warn(`Failed to attach global Sentry handlers (${SDK_LABEL}):`, handlerErr);
+      console.warn(`${HANDLERS_FAILED_PREFIX}${SDK_LABEL}):`, handlerErr);
     }
-  }
-  function onSentryBundleLoad() {
+  };
+  var onSentryBundleLoad = () => {
     try {
       if (!initializeSentryClient()) return;
       attachGlobalHandlers();
-    } catch (e) {
-      console.error(`Sentry init error (${SDK_LABEL}):`, e);
+    } catch (initError) {
+      console.error(`${INIT_ERROR_PREFIX}${SDK_LABEL}):`, initError);
     }
-  }
-  function initSentry() {
+  };
+  var initSentry = () => {
     try {
       if (window.__SENTRY_SDK_V2_INITIALIZED__) return;
       window.__SENTRY_SDK_V2_INITIALIZED__ = true;
       const sentryScript = document.createElement("script");
       sentryScript.src = SENTRY_CDN_URL;
-      sentryScript.crossOrigin = "anonymous";
+      sentryScript.crossOrigin = CROSS_ORIGIN_ANONYMOUS;
       sentryScript.onload = onSentryBundleLoad;
       sentryScript.onerror = (err) => {
-        console.error(`Failed to load Sentry script (${SDK_LABEL}):`, err);
+        console.error(`${SCRIPT_LOAD_FAILED_PREFIX}${SDK_LABEL}):`, err);
       };
       document.head.appendChild(sentryScript);
     } catch (outer) {
-      console.error(`Failed to setup Sentry loader (${SDK_LABEL}):`, outer);
+      console.error(`${SETUP_FAILED_PREFIX}${SDK_LABEL}):`, outer);
     }
-  }
+  };
 
   // src/v2/sdk/integrations/jquery.js
   var ensureJQuery = () => {
@@ -192,6 +284,16 @@
 
   // src/v2/sdk/constants.js
   var WAIT_TO_LOAD_AMAZON_DATA_MAX_COUNT = 20;
+  var WAIT_FOR_ELEMENT_MAX_COUNT = 50;
+  var WAIT_FOR_ELEMENT_INTERVAL_MS = 500;
+  var AMAZON_SELECTOR_POST_LOAD_DELAY_MS = 500;
+  var AMAZON_SELECTOR_SEND_RETRY_DELAYS_MS = [500, 1500, 3e3];
+  var YEAR_VALUE_PREFIX = "20";
+  var NULL_OPTION_VALUE = "NULL_OPTION";
+  var AWAIT_FILL_TYPE = "await";
+  var PAYMENT_METHOD_ID_TYPE = "payment_method_id";
+  var EMPTY_VALUE = "";
+  var BOT_ID_STORAGE_KEY = "bot_id";
   var CHATBOT_ACTIONS = {
     CLICK_BUTTON: "clickButton",
     EXCUTE_JS: "excuteJS",
@@ -202,7 +304,8 @@
     OPEN_PREVIEW: "openPreview",
     GET_PREVIEW_ORDER_CONTENT: "getPreviewOrderContent",
     SET_CHATBOT_CONVERSION_PARAMS_TO_LOCAL_STORAGE: "setChatbotConversionParamsToLocalStorage",
-    UPDATE_AMAZON_PAY_DATA_BY_SELECTOR: "updateAmazonPayDataBySelector"
+    UPDATE_AMAZON_PAY_DATA_BY_SELECTOR: "updateAmazonPayDataBySelector",
+    CHATBOT_TAG_EVENT: "CHATBOT_TAG_EVENT"
   };
   var LP_INTEGRATION_MODES = {
     GENERIC: "generic",
@@ -266,6 +369,51 @@
   var ELEMENT_TAGS = {
     SELECT: "SELECT",
     INPUT: "INPUT"
+  };
+  var MESSAGE_CONTENT_TYPES = {
+    PULLDOWN: {
+      LP_INTEGRATION_OPTION: "lp_integration_option",
+      FROM_JS: "from_js_result",
+      CUSTOMIZATION: "customization",
+      TIME_HM: "time_hm",
+      DATE_YMD: "date_ymd",
+      DATE_MD: "date_md",
+      DATE_YM: "date_ym",
+      DATE_YMD_HM: "date_ymd_hm",
+      DOB_YMD: "dob_ymd",
+      DOB_YM: "dob_ym",
+      TIMEZONE_FROM_TO: "timezone_from_to",
+      PERIOD_FROM_TO: "period_from_to",
+      PREFECTURES: "prefectures",
+      UP_TO_MUNICIPALITY: "up_to_municipality",
+      CONSUME_API_RESPONSE: "comsume_api_response"
+    },
+    TEXT_INPUT: "text_input",
+    TEXT_AREA: "textarea",
+    RADIO_BUTTON: "radio_button",
+    CHECKBOX: "checkbox",
+    PULL_DOWN: "pull_down",
+    ZIP_CODE_ADDRESS: "zip_code_address",
+    SHIPPING_ADDRESS: "shipping_address",
+    PRODUCT_PURCHASE_SELECT_OPTION: "product_purchase_select_option",
+    CREDIT_CARD_PAYMENT: "credit_card_payment",
+    CARD_PAYMENT_RADIO_BUTTON: "card_payment_radio_button"
+  };
+  var AMAZON_STRATEGY_TYPES = {
+    URL_PARAM: "url_param",
+    DOM_SELECTOR: "dom_selector",
+    CUSTOM_JS: "custom_js"
+  };
+  var AMAZON_MATCH_MODES = {
+    ANY: "any",
+    ALL: "all"
+  };
+  var AMAZON_READY_CONDITION_TYPES = {
+    DOM_VALUE: "dom_value"
+  };
+  var LP_RESOLVE_MODES = {
+    DEFAULT: "DEFAULT",
+    GENERIC: "GENERIC"
   };
   var WAIT_OPTION_TYPES = {
     WAIT_FOR_LOADING: "WAIT_FOR_LOADING",
@@ -477,24 +625,43 @@
     rawValue: content.fukushashiki_search_value,
     valuePath: "textarea.text_input.value"
   });
+  var extractPullDownBindings = (content) => {
+    var _a;
+    const pullDownType = (_a = content.pull_down) == null ? void 0 : _a.type;
+    if (!pullDownType) return [];
+    return buildBindingsFromSelectorKey({
+      selectorKeyType: "fukushashiki_search_value",
+      rawValue: content.fukushashiki_search_value,
+      valuePath: `pull_down.${pullDownType}.value`
+    });
+  };
+  var extractProductPurchaseSelectOptionBindings = (content) => buildBindingsFromSelectorKey({
+    selectorKeyType: "fukushashiki_search_value",
+    rawValue: content.fukushashiki_search_value,
+    valuePath: "product_purchase_select_option.value"
+  });
   var extractBindingsFromContent = (content) => {
     if (!(content == null ? void 0 : content.type)) return [];
     switch (content.type) {
-      case "text_input":
+      case MESSAGE_CONTENT_TYPES.TEXT_INPUT:
         return extractTextInputBindings(content);
-      case "zip_code_address":
+      case MESSAGE_CONTENT_TYPES.ZIP_CODE_ADDRESS:
         return extractZipCodeAddressBindings(content);
-      case "shipping_address":
+      case MESSAGE_CONTENT_TYPES.SHIPPING_ADDRESS:
         return extractShippingAddressBindings(content);
-      case "card_payment_radio_button":
-      case "credit_card_payment":
+      case MESSAGE_CONTENT_TYPES.CARD_PAYMENT_RADIO_BUTTON:
+      case MESSAGE_CONTENT_TYPES.CREDIT_CARD_PAYMENT:
         return extractCardPaymentBindings(content);
-      case "checkbox":
+      case MESSAGE_CONTENT_TYPES.CHECKBOX:
         return extractCheckboxBindings(content);
-      case "radio_button":
+      case MESSAGE_CONTENT_TYPES.RADIO_BUTTON:
         return extractRadioButtonBindings(content);
-      case "textarea":
+      case MESSAGE_CONTENT_TYPES.TEXT_AREA:
         return extractTextareaBindings(content);
+      case MESSAGE_CONTENT_TYPES.PULL_DOWN:
+        return extractPullDownBindings(content);
+      case MESSAGE_CONTENT_TYPES.PRODUCT_PURCHASE_SELECT_OPTION:
+        return extractProductPurchaseSelectOptionBindings(content);
       default:
         return [];
     }
@@ -528,14 +695,34 @@
     });
     return bindings;
   };
+  var isAmazonPayUserMessage = (msg) => {
+    if ((msg == null ? void 0 : msg.belong_to) !== "user") return false;
+    if (msg.is_used_when_amazon_pay) return true;
+    return (msg.message_content || []).some((content) => !!(content == null ? void 0 : content.is_used_when_amazon_pay) || Object.values((content == null ? void 0 : content.amazon_pay_fields) || {}).some(Boolean));
+  };
+  var isAmazonPayFieldEnabled = (content, selectorKeyType) => {
+    const fields = content == null ? void 0 : content.amazon_pay_fields;
+    if (!fields || typeof fields !== "object") return true;
+    if (!Object.prototype.hasOwnProperty.call(fields, selectorKeyType)) return true;
+    return fields[selectorKeyType] !== false;
+  };
+  var filterEnabledBindings = (content, bindings) => (bindings || []).filter((binding) => isAmazonPayFieldEnabled(content, binding.selectorKeyType));
   var extractSelectorBindingsFromMessages = (messages) => {
     const bindings = [];
     const seen = /* @__PURE__ */ new Set();
-    (messages || []).filter((msg) => msg.belong_to === "user" && msg.is_used_when_amazon_pay).forEach((msg) => {
+    (messages || []).filter(isAmazonPayUserMessage).forEach((msg) => {
       (msg.message_content || []).forEach((content, contentIndex) => {
         const meta = { messageId: msg.id, contentIndex };
-        appendBindings(bindings, seen, extractBindingsFromContent(content).map((binding) => __spreadValues(__spreadValues({}, binding), meta)));
-        appendBindings(bindings, seen, extractGenericFallbackBindings(content).map((binding) => __spreadValues(__spreadValues({}, binding), meta)));
+        appendBindings(
+          bindings,
+          seen,
+          filterEnabledBindings(content, extractBindingsFromContent(content)).map((binding) => __spreadValues(__spreadValues({}, binding), meta))
+        );
+        appendBindings(
+          bindings,
+          seen,
+          filterEnabledBindings(content, extractGenericFallbackBindings(content)).map((binding) => __spreadValues(__spreadValues({}, binding), meta))
+        );
       });
     });
     return bindings;
@@ -585,7 +772,7 @@
       return null;
     }
   });
-  var hasAmazonPayTargets = (messages) => (messages || []).some((msg) => msg.belong_to === "user" && msg.is_used_when_amazon_pay);
+  var hasAmazonPayTargets = (messages) => (messages || []).some(isAmazonPayUserMessage);
   var normalizeLpDomain = (input) => {
     if (!input || typeof input !== "string") return "";
     let domain = input.trim().toLowerCase();
@@ -600,121 +787,50 @@
     return (allowedDomains || []).some((domain) => host === domain || host.endsWith(`.${domain}`));
   };
 
-  // src/v2/sdk/config/environment.js
-  var getEnvFromScriptSrc = () => {
-    var _a;
-    try {
-      if (window.getSdkEnv) return window.sdkEnv;
-      window.getSdkEnv = true;
-      const SRC_PARSER = {
-        "ec-chatbot1.com": "staging",
-        "ec-chatbot.com": "production",
-        "localhost:3001": "local"
-      };
-      const src = ((_a = document.currentScript) == null ? void 0 : _a.src) || "";
-      if (!src) return null;
-      const host = new URL(src).host;
-      const sdkEnv = SRC_PARSER[host];
-      if (sdkEnv) {
-        window.sdkEnv = sdkEnv;
-        return sdkEnv;
-      }
-      return null;
-    } catch (e) {
-      return null;
-    }
-  };
-  var getEnvironment = () => {
-    const params = new Proxy(new URLSearchParams(window.location.search), {
-      get: (searchParams, prop) => searchParams.get(prop)
-    });
-    return params.env || getEnvFromScriptSrc() || "production";
-  };
-  var getDebugFlag = () => {
-    const params = new Proxy(new URLSearchParams(window.location.search), {
-      get: (searchParams, prop) => searchParams.get(prop)
-    });
-    return params.debug === "true" || params.debug === "1";
-  };
-  var getParam = (paramName) => {
-    const params = new Proxy(new URLSearchParams(window.location.search), {
-      get: (searchParams, prop) => searchParams.get(prop)
-    });
-    return params[paramName];
-  };
-  var log = (message) => {
-    const debugFlag = getDebugFlag();
-    if (debugFlag) {
-      console.log(message);
-    }
-  };
-  var sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-  var getEcChatBotApiServerBaseUrl = () => {
-    const environment = getEnvironment();
-    switch (environment) {
-      case "staging":
-      case "test":
-        return "https://ec-chatbot-test1.com";
-      case "production":
-        return "https://ec-chatbot-test.com";
-      case "local":
-        return "http://localhost:3000";
-      default:
-        return "http://localhost:3000";
-    }
-  };
-  var getEcChatBotFrontEndBaseUrl = () => {
-    const environment = getEnvironment();
-    switch (environment) {
-      case "staging":
-      case "test":
-        return "https://ec-chatbot1.com";
-      case "production":
-        return "https://ec-chatbot.com";
-      case "local":
-        return "http://localhost:3001";
-      default:
-        return "http://localhost:3001";
-    }
-  };
-
   // src/v2/sdk/amazon/detection.js
+  var CUSTOM_JS_SENTRY_FAILED = "Failed sending Amazon Pay custom_js error to Sentry";
+  var CUSTOM_JS_EVAL_FAILED = "[AmazonPay] custom_js evaluation failed:";
+  var evaluateCustomJsCode = (code) => {
+    const evaluate = new Function(code);
+    return evaluate();
+  };
   var evaluateAmazonStrategy = (strategy) => {
     if (!(strategy == null ? void 0 : strategy.type)) return false;
-    if (strategy.type === "url_param") {
-      const param = strategy.param;
-      if (!param) return false;
-      const value = getParam(param);
-      return value != null && String(value).trim() !== "";
-    }
-    if (strategy.type === "dom_selector") {
-      const selector = strategy.selector;
-      if (!selector) return false;
-      return !!document.querySelector(selector);
-    }
-    if (strategy.type === "custom_js") {
-      const code = strategy.code;
-      if (!code) return false;
-      try {
-        const func = new Function(code);
-        const result = func();
-        return !!result;
-      } catch (error) {
-        try {
-          if (window.Sentry) {
-            window.Sentry.captureException(error);
-          }
-        } catch (sentryError) {
-          console.warn("Failed sending Amazon Pay custom_js error to Sentry", sentryError);
-        }
-        console.error("[AmazonPay] custom_js evaluation failed:", error);
-        return false;
+    switch (strategy.type) {
+      case AMAZON_STRATEGY_TYPES.URL_PARAM: {
+        const param = strategy.param;
+        if (!param) return false;
+        const value = getParam(param);
+        return value != null && String(value).trim() !== "";
       }
+      case AMAZON_STRATEGY_TYPES.DOM_SELECTOR: {
+        const selector = strategy.selector;
+        if (!selector) return false;
+        return !!document.querySelector(selector);
+      }
+      case AMAZON_STRATEGY_TYPES.CUSTOM_JS: {
+        const code = strategy.code;
+        if (!code) return false;
+        try {
+          return !!evaluateCustomJsCode(code);
+        } catch (error) {
+          try {
+            if (window.Sentry) {
+              window.Sentry.captureException(error);
+            }
+          } catch (sentryError) {
+            console.warn(CUSTOM_JS_SENTRY_FAILED, sentryError);
+          }
+          console.error(CUSTOM_JS_EVAL_FAILED, error);
+          return false;
+        }
+      }
+      default:
+        return false;
     }
-    return false;
   };
   var evaluateAmazonReadyCondition = (condition) => {
-    if ((condition == null ? void 0 : condition.type) !== "dom_value") return false;
+    if ((condition == null ? void 0 : condition.type) !== AMAZON_READY_CONDITION_TYPES.DOM_VALUE) return false;
     const selector = condition.selector;
     if (!selector) return false;
     const el = document.querySelector(selector);
@@ -724,8 +840,8 @@
   var isAmazonPayActive = (detection) => {
     const strategies = (detection == null ? void 0 : detection.strategies) || [];
     if (!strategies.length) return false;
-    const match = (detection == null ? void 0 : detection.match) || "any";
-    if (match === "all") {
+    const match = (detection == null ? void 0 : detection.match) || AMAZON_MATCH_MODES.ANY;
+    if (match === AMAZON_MATCH_MODES.ALL) {
       return strategies.every((strategy) => evaluateAmazonStrategy(strategy));
     }
     return strategies.some((strategy) => evaluateAmazonStrategy(strategy));
@@ -738,46 +854,112 @@
   var canRunGenericAmazon = (hostname, scenarioConfig) => isHostnameAllowedForLp(hostname, scenarioConfig == null ? void 0 : scenarioConfig.allowed_lp_domains) && hasAmazonPayTargets(scenarioConfig == null ? void 0 : scenarioConfig.messages) && extractSelectorBindingsFromMessages(scenarioConfig == null ? void 0 : scenarioConfig.messages).length > 0;
   var resolveLpMode = ({ hostname, scenarioConfig }) => {
     const allowedDomains = (scenarioConfig == null ? void 0 : scenarioConfig.allowed_lp_domains) || [];
-    if (!allowedDomains.length) return "DEFAULT";
-    if (!isHostnameAllowedForLp(hostname, allowedDomains)) return "DEFAULT";
-    if (canRunGenericAmazon(hostname, scenarioConfig)) return "GENERIC";
-    return "DEFAULT";
+    if (!allowedDomains.length) return LP_RESOLVE_MODES.DEFAULT;
+    if (!isHostnameAllowedForLp(hostname, allowedDomains)) return LP_RESOLVE_MODES.DEFAULT;
+    if (canRunGenericAmazon(hostname, scenarioConfig)) return LP_RESOLVE_MODES.GENERIC;
+    return LP_RESOLVE_MODES.DEFAULT;
+  };
+
+  // src/v2/variables/tagFiringConstants.js
+  var TAG_FIRING_PROVIDERS = {
+    GTM: "gtm",
+    GA4: "ga4"
+  };
+  var DEFAULT_TAG_FIRING_EVENTS = {
+    open: "chatbot_open",
+    start: "chatbot_start",
+    complete: "chatbot_complete"
+  };
+  var DEFAULT_TAG_FIRING = {
+    enabled: false,
+    provider: TAG_FIRING_PROVIDERS.GTM,
+    open_event: DEFAULT_TAG_FIRING_EVENTS.open,
+    start_event: DEFAULT_TAG_FIRING_EVENTS.start,
+    complete_event: DEFAULT_TAG_FIRING_EVENTS.complete
+  };
+
+  // src/v2/sdk/tagFiring.js
+  var pushChatbotTagEvent = (payload = {}) => {
+    const eventName = payload.event;
+    if (!eventName) return;
+    const params = payload.params || {};
+    const provider = payload.provider || TAG_FIRING_PROVIDERS.GTM;
+    if (provider === TAG_FIRING_PROVIDERS.GA4 && typeof window.gtag === "function") {
+      window.gtag("event", eventName, params);
+      return;
+    }
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push(__spreadValues({
+      event: eventName
+    }, params));
   };
 
   // src/v2/sdk/state.js
-  var botId = sessionStorage.getItem("bot_id");
-  var uuid = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-  var chatbotBottom = sessionStorage.getItem("chatbotBottom");
-  var chatbotH = sessionStorage.getItem("chatbotH");
-  var chatbotRight = sessionStorage.getItem("chatbotRight");
-  var chatbotBottomPc = sessionStorage.getItem("chatbotBottomPc");
-  var chatbotRightPc = sessionStorage.getItem("chatbotRightPc");
-  var chatbotBottomSp = sessionStorage.getItem("chatbotBottomSp");
-  var chatbotRightSp = sessionStorage.getItem("chatbotRightSp");
-  var chatbotW = sessionStorage.getItem("chatbotW");
-  var scenarioId = "";
-  var globalIframe;
+  var CHATBOT_BOTTOM_KEY = "chatbotBottom";
+  var CHATBOT_H_KEY = "chatbotH";
+  var CHATBOT_RIGHT_KEY = "chatbotRight";
+  var CHATBOT_BOTTOM_PC_KEY = "chatbotBottomPc";
+  var CHATBOT_RIGHT_PC_KEY = "chatbotRightPc";
+  var CHATBOT_BOTTOM_SP_KEY = "chatbotBottomSp";
+  var CHATBOT_RIGHT_SP_KEY = "chatbotRightSp";
+  var CHATBOT_W_KEY = "chatbotW";
+  var UUID_RADIX = 36;
+  var UUID_START = 2;
+  var UUID_END = 15;
+  var randomIdPart = () => Math.random().toString(UUID_RADIX).substring(UUID_START, UUID_END);
+  var botId = sessionStorage.getItem(BOT_ID_STORAGE_KEY);
+  var uuid = `${randomIdPart()}${randomIdPart()}`;
+  var chatbotLayout = {
+    chatbotBottom: sessionStorage.getItem(CHATBOT_BOTTOM_KEY),
+    chatbotH: sessionStorage.getItem(CHATBOT_H_KEY),
+    chatbotRight: sessionStorage.getItem(CHATBOT_RIGHT_KEY),
+    chatbotBottomPc: sessionStorage.getItem(CHATBOT_BOTTOM_PC_KEY),
+    chatbotRightPc: sessionStorage.getItem(CHATBOT_RIGHT_PC_KEY),
+    chatbotBottomSp: sessionStorage.getItem(CHATBOT_BOTTOM_SP_KEY),
+    chatbotRightSp: sessionStorage.getItem(CHATBOT_RIGHT_SP_KEY),
+    chatbotW: sessionStorage.getItem(CHATBOT_W_KEY),
+    scenarioId: "",
+    globalIframe: null,
+    pendingAmazonSelectorPayload: null,
+    amazonSelectorPayloadSent: false
+  };
   var updateChatbotOffsetsFromMessage = (messageData) => {
-    if (messageData.widthPc !== void 0 && messageData.widthPc !== null) chatbotW = messageData.widthPc;
-    if (messageData.heightPc !== void 0 && messageData.heightPc !== null) chatbotH = messageData.heightPc;
-    if (messageData.chatbotRightPc !== void 0 && messageData.chatbotRightPc !== null) chatbotRightPc = messageData.chatbotRightPc;
-    if (messageData.chatbotBottomPc !== void 0 && messageData.chatbotBottomPc !== null) chatbotBottomPc = messageData.chatbotBottomPc;
-    if (messageData.chatbotRightSp !== void 0 && messageData.chatbotRightSp !== null) chatbotRightSp = messageData.chatbotRightSp;
-    if (messageData.chatbotBottomSp !== void 0 && messageData.chatbotBottomSp !== null) chatbotBottomSp = messageData.chatbotBottomSp;
-    if (messageData.chatbotRight !== void 0 && messageData.chatbotRight !== null) chatbotRight = messageData.chatbotRight;
-    if (messageData.chatbotBottom !== void 0 && messageData.chatbotBottom !== null) chatbotBottom = messageData.chatbotBottom;
+    if (messageData.widthPc !== void 0 && messageData.widthPc !== null) {
+      chatbotLayout.chatbotW = messageData.widthPc;
+    }
+    if (messageData.heightPc !== void 0 && messageData.heightPc !== null) {
+      chatbotLayout.chatbotH = messageData.heightPc;
+    }
+    if (messageData.chatbotRightPc !== void 0 && messageData.chatbotRightPc !== null) {
+      chatbotLayout.chatbotRightPc = messageData.chatbotRightPc;
+    }
+    if (messageData.chatbotBottomPc !== void 0 && messageData.chatbotBottomPc !== null) {
+      chatbotLayout.chatbotBottomPc = messageData.chatbotBottomPc;
+    }
+    if (messageData.chatbotRightSp !== void 0 && messageData.chatbotRightSp !== null) {
+      chatbotLayout.chatbotRightSp = messageData.chatbotRightSp;
+    }
+    if (messageData.chatbotBottomSp !== void 0 && messageData.chatbotBottomSp !== null) {
+      chatbotLayout.chatbotBottomSp = messageData.chatbotBottomSp;
+    }
+    if (messageData.chatbotRight !== void 0 && messageData.chatbotRight !== null) {
+      chatbotLayout.chatbotRight = messageData.chatbotRight;
+    }
+    if (messageData.chatbotBottom !== void 0 && messageData.chatbotBottom !== null) {
+      chatbotLayout.chatbotBottom = messageData.chatbotBottom;
+    }
   };
   var setScenarioId = (id) => {
-    scenarioId = id;
+    chatbotLayout.scenarioId = id;
   };
   var setGlobalIframe = (iframe) => {
-    globalIframe = iframe;
+    chatbotLayout.globalIframe = iframe;
   };
 
   // src/v2/sdk/messaging/bridge.js
   var sendMessageToChatbot = (contentMessage, action) => {
     const data = { action, actionData: contentMessage };
-    globalIframe.contentWindow.postMessage(data, "*");
+    chatbotLayout.globalIframe.contentWindow.postMessage(data, "*");
   };
 
   // src/v2/sdk/amazon/loaders.js
@@ -786,9 +968,34 @@
     document.body.appendChild(iframe);
   };
   var sendAmazonPayDataBySelector = (payload) => {
-    var _a;
+    var _a, _b;
     if (!((_a = payload == null ? void 0 : payload.selectorValues) == null ? void 0 : _a.length)) return;
+    if (!((_b = chatbotLayout.globalIframe) == null ? void 0 : _b.contentWindow)) return;
     sendMessageToChatbot(payload, CHATBOT_ACTIONS.UPDATE_AMAZON_PAY_DATA_BY_SELECTOR);
+  };
+  var queueAmazonPaySelectorPayload = (payload) => {
+    chatbotLayout.pendingAmazonSelectorPayload = payload;
+  };
+  var sendAmazonPaySelectorAfterIframeLoad = (iframe, payload) => {
+    queueAmazonPaySelectorPayload(payload);
+    const send = () => sendAmazonPayDataBySelector(payload);
+    const scheduleRetries = () => {
+      send();
+      AMAZON_SELECTOR_SEND_RETRY_DELAYS_MS.forEach((delayMs) => {
+        setTimeout(send, delayMs);
+      });
+    };
+    iframe.addEventListener("load", () => {
+      setTimeout(scheduleRetries, AMAZON_SELECTOR_POST_LOAD_DELAY_MS);
+    });
+  };
+  var flushQueuedAmazonPaySelectorPayload = () => {
+    var _a;
+    if (chatbotLayout.amazonSelectorPayloadSent) return;
+    const payload = chatbotLayout.pendingAmazonSelectorPayload;
+    if (!((_a = payload == null ? void 0 : payload.selectorValues) == null ? void 0 : _a.length)) return;
+    chatbotLayout.amazonSelectorPayloadSent = true;
+    sendAmazonPayDataBySelector(payload);
   };
   var waitToLoadAmazonGeneric = (iframe, amazonConfig) => {
     const config = __spreadValues(__spreadValues({}, DEFAULT_AMAZON_PAY_CONFIG), (amazonConfig == null ? void 0 : amazonConfig.amazon_pay_config) || {});
@@ -824,8 +1031,8 @@
       }
       if ((_a = payload == null ? void 0 : payload.selectorValues) == null ? void 0 : _a.length) {
         if (!sent) {
+          sendAmazonPaySelectorAfterIframeLoad(iframe, payload);
           appendIframeToBody(iframe);
-          setTimeout(() => sendAmazonPayDataBySelector(payload), 500);
           sent = true;
         }
         clearInterval(interval);
@@ -970,7 +1177,7 @@
     (function(a) {
       if (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(
         a
-      ) || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(
+      ) || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw-(n|u)|c55\/|capi|ccwa|cdm-|cell|chtm|cldc|cmd-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc-s|devi|dica|dmob|do(c|p)o|ds(12|-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(-|_)|g1 u|g560|gene|gf-5|g-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd-(m|p|t)|hei-|hi(pt|ta)|hp( i|ip)|hs-c|ht(c(-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i-(20|go|ma)|i230|iac( |-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|-[a-w])|libw|lynx|m1-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|-([1-8]|c))|phil|pire|pl(ay|uc)|pn-2|po(ck|rt|se)|prox|psio|pt-g|qa-a|qc(07|12|21|32|60|-[2-7]|i-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h-|oo|p-)|sdk\/|se(c(-|0|1)|47|mc|nd|ri)|sgh-|shar|sie(-|m)|sk-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h-|v-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl-|tdg-|tel(i|m)|tim-|t-mo|to(pl|sh)|ts(70|m-|m3|m5)|tx-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas-|your|zeto|zte-/i.test(
         a.substr(0, 4)
       )) {
         check = true;
@@ -1047,62 +1254,100 @@
   };
 
   // src/v2/sdk/dom/wait.js
-  var waitForElement = (mode, address, options = { type: "WAIT_FOR_LOADING" }, callback = () => {
+  var DEFAULT_WAIT_OPTIONS = Object.freeze({
+    type: WAIT_OPTION_TYPES.WAIT_FOR_LOADING
+  });
+  var INVALID_WAIT_OPTION_TYPE_PREFIX = "Invalid wait option type ";
+  var isValueUnset = (element, waitOptions) => {
+    const yearsValue = `${YEAR_VALUE_PREFIX}${waitOptions.value}`;
+    const isNullOption = waitOptions.value === NULL_OPTION_VALUE;
+    const altBinding = waitOptions.disableRemoveLeadingZero ? waitOptions.value : removeLeadingZero(waitOptions.value);
+    return isNullOption || element.value !== waitOptions.value && element.value !== altBinding && element.value !== yearsValue;
+  };
+  var waitForElement = (mode, address, options, callback = () => {
   }) => {
-    let count = 0;
-    const poops = setInterval(function() {
-      count++;
-      log(`Waiting for element address: ${address}, mode: ${mode}, options: ${JSON.stringify(options)}: ${count} times`);
-      if (count > 50) {
-        clearInterval(poops);
-        console.log(`Timeout for element address: ${address}, mode: ${mode}, options: ${JSON.stringify(options)}`);
-        return;
-      }
-      const element = getElementByAddress(mode, address);
-      if (!element) return;
-      switch (options.type) {
-        case WAIT_OPTION_TYPES.WAIT_FOR_LOADING:
-          clearInterval(poops);
-          callback();
-          break;
-        case WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE: {
-          const yearsValue = `20${options.value}`;
-          const isNullOption = options.value === "NULL_OPTION";
-          const altBinding = options.disableRemoveLeadingZero ? options.value : removeLeadingZero(options.value);
-          if (isNullOption || element.value != options.value && element.value != altBinding && element.value != yearsValue) {
-            setValueToElement(element, options.value, options.disableRemoveLeadingZero);
-            break;
-          }
-          clearInterval(poops);
-          callback();
-          break;
+    const waitOptions = options != null ? options : DEFAULT_WAIT_OPTIONS;
+    const tick = { count: 0 };
+    return new Promise((resolve, reject) => {
+      const intervalId = setInterval(() => {
+        tick.count += 1;
+        log(`Waiting for element address: ${address}, mode: ${mode}, options: ${JSON.stringify(waitOptions)}: ${tick.count} times`);
+        if (tick.count > WAIT_FOR_ELEMENT_MAX_COUNT) {
+          clearInterval(intervalId);
+          log(`Timeout for element address: ${address}, mode: ${mode}, options: ${JSON.stringify(waitOptions)}`);
+          resolve();
+          return;
         }
-        default:
-          throw new Error(`Invalid wait option type ${options.type}`);
-      }
-    }, 500);
+        const element = getElementByAddress(mode, address);
+        if (!element) return;
+        switch (waitOptions.type) {
+          case WAIT_OPTION_TYPES.WAIT_FOR_LOADING:
+            clearInterval(intervalId);
+            callback();
+            resolve();
+            break;
+          case WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE:
+            if (isValueUnset(element, waitOptions)) {
+              setValueToElement(element, waitOptions.value, waitOptions.disableRemoveLeadingZero);
+              break;
+            }
+            clearInterval(intervalId);
+            callback();
+            resolve();
+            break;
+          default: {
+            clearInterval(intervalId);
+            reject(new Error(`${INVALID_WAIT_OPTION_TYPE_PREFIX}${waitOptions.type}`));
+          }
+        }
+      }, WAIT_FOR_ELEMENT_INTERVAL_MS);
+    });
   };
 
   // src/v2/sdk/dom/formFill.js
+  var FILL_SLEEP_MS = 1500;
+  var ELEMENT_NOT_FOUND_MESSAGE = "Element not found for binding";
+  var ELEMENT_DISABLED_PREFIX = "Element is disabled: ";
+  var FILL_ITEM_ERROR_PREFIX = "Error processing item in fillDataFromMessage:";
+  var ELEMENT_NOT_FOUND_LOG_PREFIX = "Element not found:";
+  var DISABLED_ELEMENT_LOG_PREFIX = "Disabled element:";
   var movePaymentMethodToTop = (data) => {
-    const index = data.findIndex((item) => item.type === "payment_method_id");
-    if (index !== -1) {
-      const [paymentMethod] = data.splice(index, 1);
-      data.unshift({ additionalType: "await" }, paymentMethod, { additionalType: "await" });
+    const paymentMethodIndex = data.findIndex((item) => item.type === PAYMENT_METHOD_ID_TYPE);
+    if (paymentMethodIndex === -1) return data;
+    const nextData = [...data];
+    const [paymentMethod] = nextData.splice(paymentMethodIndex, 1);
+    nextData.unshift(
+      { additionalType: AWAIT_FILL_TYPE },
+      paymentMethod,
+      { additionalType: AWAIT_FILL_TYPE }
+    );
+    return nextData;
+  };
+  var waitToSetValue = (item, bindingValue) => {
+    const waitOpts = {
+      type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE,
+      value: bindingValue
+    };
+    if (item.disableRemoveLeadingZero) {
+      waitOpts.disableRemoveLeadingZero = true;
     }
-    return data;
+    return waitForElement(item.bindingMode, item.bindingAddress, waitOpts);
+  };
+  var resolveSelectBindingValue = (element, bindingValue) => {
+    const acceptableValues = [bindingValue.toString(), removeLeadingZero(bindingValue).toString()];
+    const selectedOption = Array.from(element.options).find((option) => acceptableValues.includes(option.value.toString()));
+    return selectedOption ? bindingValue : EMPTY_VALUE;
   };
   var fillDataFromMessage = (data) => __async(null, null, function* () {
-    for (let i = 0; i < data.length; i++) {
-      const item = data[i];
-      if (item.additionalType === "await") {
-        yield sleep(1500);
+    for (const item of data) {
+      if (item.additionalType === AWAIT_FILL_TYPE) {
+        yield sleep(FILL_SLEEP_MS);
         continue;
       }
       try {
         const element = getElementByAddress(item.bindingMode, item.bindingAddress);
         if (!element) {
-          const err = new Error("Element not found for binding");
+          const err = new Error(ELEMENT_NOT_FOUND_MESSAGE);
           if (window.Sentry) {
             window.Sentry.captureException(err, {
               level: "warning",
@@ -1110,11 +1355,11 @@
               extra: { item }
             });
           }
-          console.warn("Element not found:", item.bindingAddress);
+          console.warn(ELEMENT_NOT_FOUND_LOG_PREFIX, item.bindingAddress);
           continue;
         }
         if (isDisabledElement(element)) {
-          const err = new Error(`Element is disabled: ${item.bindingAddress}`);
+          const err = new Error(`${ELEMENT_DISABLED_PREFIX}${item.bindingAddress}`);
           if (window.Sentry) {
             window.Sentry.captureException(err, {
               level: "info",
@@ -1122,7 +1367,7 @@
               extra: { item }
             });
           }
-          console.warn("Disabled element:", item.bindingAddress);
+          console.warn(DISABLED_ELEMENT_LOG_PREFIX, item.bindingAddress);
           continue;
         }
         switch (item.type) {
@@ -1132,50 +1377,34 @@
           case "credit_card_payment":
           case "text_input":
           case "textarea":
-          case "slider": {
-            const waitOpts = {
-              type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE,
-              value: item.bindingValue
-            };
-            if (item.disableRemoveLeadingZero) {
-              waitOpts.disableRemoveLeadingZero = true;
-            }
-            waitForElement(item.bindingMode, item.bindingAddress, waitOpts);
+          case "slider":
+            waitToSetValue(item, item.bindingValue);
             break;
-          }
-          case "payment_method_id": {
+          case PAYMENT_METHOD_ID_TYPE:
             setValuePaymentMethodToElement(element, item.bindingValue);
             break;
-          }
           case "dropdown_prefecture": {
-            if (element.tagName === ELEMENT_TAGS.SELECT) {
-              const acceptableValues = [item.bindingValue.toString(), removeLeadingZero(item.bindingValue).toString()];
-              const selectedOption = Array.from(element.options).find((option) => acceptableValues.includes(option.value.toString()));
-              if (!selectedOption) item.bindingValue = "";
-            }
+            const prefectureValue = element.tagName === ELEMENT_TAGS.SELECT ? resolveSelectBindingValue(element, item.bindingValue) : item.bindingValue;
             waitForElement(
               item.bindingMode,
               item.bindingAddress,
-              { type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue }
+              { type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: prefectureValue }
             );
             break;
           }
           case "agree_term":
-          case "checkbox": {
+          case "checkbox":
             setCheckToCheckboxElement(element, item.bindingValue);
             break;
-          }
           case "pull_down": {
-            if (item.pulldownType === "lp_integration_option") {
-              const isNullOption = item.bindingValue === "NULL_OPTION";
-              if (isNullOption) item.bindingValue = "";
-              const hasOption = Array.from(element.options).some((option) => option.value === item.bindingValue);
-              if (!hasOption) item.bindingValue = "";
-            }
+            const isLpIntegration = item.pulldownType === MESSAGE_CONTENT_TYPES.PULLDOWN.LP_INTEGRATION_OPTION;
+            const pullDownValue = isLpIntegration && item.bindingValue === NULL_OPTION_VALUE ? EMPTY_VALUE : item.bindingValue;
+            const hasOption = !isLpIntegration || Array.from(element.options).some((option) => option.value === pullDownValue);
+            const bindingValue = hasOption ? pullDownValue : EMPTY_VALUE;
             waitForElement(
               item.bindingMode,
               item.bindingAddress,
-              { type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue }
+              { type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: bindingValue }
             );
             break;
           }
@@ -1187,17 +1416,16 @@
             setRadioValue(element, item.bindingValue);
             break;
           }
-          case "password": {
+          case "password":
             element.setRangeText(item.bindingValue, 0, element.value.length);
             element.dispatchEvent(new Event("input", { bubbles: true }));
             element.dispatchEvent(new Event("change", { bubbles: true }));
             break;
-          }
           default:
             break;
         }
       } catch (err) {
-        console.error("Error processing item in fillDataFromMessage:", err);
+        console.error(FILL_ITEM_ERROR_PREFIX, err);
         if (window.Sentry) {
           window.Sentry.captureException(err, {
             level: "error",
@@ -1377,12 +1605,12 @@
     iframe.style.setProperty("right", "0px", "important");
   };
   var getMobileCloseOffsets = () => ({
-    horizontal: resolveHorizontalMarginRule(chatbotRightSp, chatbotRight),
-    bottom: resolveOffsetPx(chatbotBottomSp, chatbotBottom, 0)
+    horizontal: resolveHorizontalMarginRule(chatbotLayout.chatbotRightSp, chatbotLayout.chatbotRight),
+    bottom: resolveOffsetPx(chatbotLayout.chatbotBottomSp, chatbotLayout.chatbotBottom, 0)
   });
   var getDesktopOffsets = () => ({
-    horizontal: resolveHorizontalMarginRule(chatbotRightPc, chatbotRight),
-    bottom: resolveOffsetPx(chatbotBottomPc, chatbotBottom, 0)
+    horizontal: resolveHorizontalMarginRule(chatbotLayout.chatbotRightPc, chatbotLayout.chatbotRight),
+    bottom: resolveOffsetPx(chatbotLayout.chatbotBottomPc, chatbotLayout.chatbotBottom, 0)
   });
   var getUseMobileFullwidth = (messageData) => {
     if (typeof messageData.useMoblieFullwidth === "boolean") {
@@ -1400,10 +1628,10 @@
     var _a, _b, _c, _d;
     return computeOpenIframeSize({
       isMobile: isMobileDevice,
-      widthPc: (_a = messageData == null ? void 0 : messageData.widthPc) != null ? _a : chatbotW,
-      heightPc: (_b = messageData == null ? void 0 : messageData.heightPc) != null ? _b : chatbotH,
-      widthSp: (_c = messageData == null ? void 0 : messageData.widthSp) != null ? _c : chatbotW,
-      heightSp: (_d = messageData == null ? void 0 : messageData.heightSp) != null ? _d : chatbotH
+      widthPc: (_a = messageData == null ? void 0 : messageData.widthPc) != null ? _a : chatbotLayout.chatbotW,
+      heightPc: (_b = messageData == null ? void 0 : messageData.heightPc) != null ? _b : chatbotLayout.chatbotH,
+      widthSp: (_c = messageData == null ? void 0 : messageData.widthSp) != null ? _c : chatbotLayout.chatbotW,
+      heightSp: (_d = messageData == null ? void 0 : messageData.heightSp) != null ? _d : chatbotLayout.chatbotH
     });
   };
   var applyIframeLayout = (iframe, width, height, options = {}) => {
@@ -1579,6 +1807,7 @@
   var handleChatbotMessage = (e, iframe) => __async(null, null, function* () {
     if (typeof e.data !== "object") return;
     if (e.data.source !== "ec-chatbot") return;
+    flushQueuedAmazonPaySelectorPayload();
     updateChatbotOffsetsFromMessage(e.data);
     switch (e.data.action) {
       case CHATBOT_ACTIONS.FUKUSHASHIKI:
@@ -1648,6 +1877,9 @@
         break;
       case CHATBOT_ACTIONS.INJECT_CUSTOM_JS:
         injectCustomJS(e.data.actionData);
+        break;
+      case CHATBOT_ACTIONS.CHATBOT_TAG_EVENT:
+        pushChatbotTagEvent(e.data);
         break;
       default:
         break;
@@ -1724,7 +1956,7 @@
     iframe.style.zIndex = "999999";
     iframe.style.width = `${iframe.width} !important`;
     iframe.style.height = `${iframe.height} !important`;
-    iframe.src = `${getEcChatBotFrontEndBaseUrl()}${getSdkPreviewBasePath()}/preview-customer-fukushashiki?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin}&deviceReceive=${device}&uuid=${uuid}&env=${getEnvironment()}&debug=${getDebugFlag()}&cartSystem=${data.cart_system}&isLoggedIn=${window.logged_in}`;
+    iframe.src = `${getEcChatBotFrontEndBaseUrl()}${getSdkPreviewBasePath()}/preview-customer-fukushashiki?bot_id=${botId}&scenario_id=${chatbotLayout.scenarioId}&urlReceive=${window.location.origin}&deviceReceive=${device}&uuid=${uuid}&env=${getEnvironment()}&debug=${getDebugFlag()}&cartSystem=${data.cart_system}&isLoggedIn=${window.logged_in}`;
     const lpMode = resolveLpMode({
       hostname: window.location.hostname,
       scenarioConfig: amazonRuntimeConfig
@@ -1756,7 +1988,7 @@
     log("device: ", device);
     setTimeout(() => {
       const checkDevice = { scenario_data: device };
-      getUser(`${getEcChatBotApiServerBaseUrl()}/api/v1/analytics/scenario_counts/${scenarioId}`, checkDevice);
+      getUser(`${getEcChatBotApiServerBaseUrl()}/api/v1/analytics/scenario_counts/${chatbotLayout.scenarioId}`, checkDevice);
     }, 5e3);
   });
 

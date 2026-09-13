@@ -2,6 +2,7 @@ import _ from 'lodash';
 import {
   collectSelectorValuesFromBindings,
   extractSelectorBindingsFromMessages,
+  isAmazonPayUserMessage,
 } from './AmazonPaySelectorUtils';
 
 export const mapAmazonPayDataBySelector = (payload, messagesList) => {
@@ -14,7 +15,7 @@ export const mapAmazonPayDataBySelector = (payload, messagesList) => {
   const changeState = { changed: false };
 
   newMessages.forEach((msg) => {
-    if (msg.belong_to !== 'user' || !msg.is_used_when_amazon_pay) return;
+    if (!isAmazonPayUserMessage(msg)) return;
 
     (msg.message_content || []).forEach((content) => {
       selectorValues.forEach(({ selectorKeyType, sourceSelector, valuePath, value }) => {

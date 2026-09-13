@@ -28,6 +28,12 @@ import {
 } from "./PreviewComponent/Constants";
 import { parseDesignSettings } from "v2/views/DesignSetting/utils/designChatbotUtils";
 import {
+  fireChatbotButtonTags,
+  fireChatbotCompleteTag,
+  fireChatbotLifecycleTagsOnOpen,
+  isScenarioCompleteClick,
+} from "v2/views/Preview/utils/chatbotTagEventUtils";
+import {
   isMobile,
   sleep,
   userEntryScenario,
@@ -80,6 +86,17 @@ const PreviewFaq = () => {
   const containerRef = useRef(null);
   const hasSentCustomJs = useRef(false);
   const hasSentInitialOpenStateToParent = useRef(false);
+  const hasFiredStartTagRef = useRef(false);
+  const previewStateRef = useRef(state);
+  previewStateRef.current = state;
+
+  useEffect(() => {
+    if (!state.isOpen) return;
+    fireChatbotLifecycleTagsOnOpen({
+      state: previewStateRef.current,
+      hasFiredStartRef: hasFiredStartTagRef,
+    });
+  }, [state.isOpen, state.tagFiring, state.scenarioId, state.scenarioName]);
 
   usePreviewConversionOnOpen({ state, dispatch });
   usePreviewIpParams({ state, dispatch });
@@ -266,6 +283,11 @@ const PreviewFaq = () => {
     const isBtnUpdateClick = clickedMsgIndex < state.renderMessagesList.length - 1;
 
     sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
+
+    fireChatbotButtonTags(state, clickedMsg);
+    if (isScenarioCompleteClick(state.messagesList, clickedMsgIndex)) {
+      fireChatbotCompleteTag(state);
+    }
 
     if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
       executeLpJsCode(clickedMsg.jscode, state);

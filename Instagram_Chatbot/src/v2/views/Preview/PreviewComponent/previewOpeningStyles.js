@@ -1,5 +1,5 @@
 import { EC_CHATBOT_URL } from "v2/variables/constants";
-import { resolveIconUrl } from "v2/views/DesignSetting/utils/designChatbotUtils";
+import { resolveIconUrl, resolveMainColorFromApi } from "v2/views/DesignSetting/utils/designChatbotUtils";
 import { isMobile } from "./Utils";
 import { isWithdrawalPreventionEnabled } from "./previewWithdrawalUtils";
 
@@ -53,7 +53,9 @@ export const getOpeningBotStyle = (state, options = {}) => {
     typeof options.mobile === "boolean" ? options.mobile : isMobile();
 
   const headerBg =
-    state.botInfor?.main_color || state.botInfor?.main_color_other || "";
+    resolveMainColorFromApi(state.botInfor?.main_color) ||
+    state.botInfor?.main_color_other ||
+    "";
   const bodyBg = state.botInfor?.opacity_color || "";
 
   if (embedded) {

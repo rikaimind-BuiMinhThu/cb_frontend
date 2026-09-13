@@ -1,6 +1,8 @@
 export const WAIT_TO_LOAD_AMAZON_DATA_MAX_COUNT = 20;
 export const WAIT_FOR_ELEMENT_MAX_COUNT = 50;
 export const WAIT_FOR_ELEMENT_INTERVAL_MS = 500;
+export const AMAZON_SELECTOR_POST_LOAD_DELAY_MS = 500;
+export const AMAZON_SELECTOR_SEND_RETRY_DELAYS_MS = [500, 1500, 3000];
 export const YEAR_VALUE_PREFIX = '20';
 export const NULL_OPTION_VALUE = 'NULL_OPTION';
 export const AWAIT_FILL_TYPE = 'await';
@@ -19,6 +21,7 @@ export const CHATBOT_ACTIONS = {
   GET_PREVIEW_ORDER_CONTENT: 'getPreviewOrderContent',
   SET_CHATBOT_CONVERSION_PARAMS_TO_LOCAL_STORAGE: 'setChatbotConversionParamsToLocalStorage',
   UPDATE_AMAZON_PAY_DATA_BY_SELECTOR: 'updateAmazonPayDataBySelector',
+  CHATBOT_TAG_EVENT: 'CHATBOT_TAG_EVENT',
 };
 
 export const LP_INTEGRATION_MODES = {

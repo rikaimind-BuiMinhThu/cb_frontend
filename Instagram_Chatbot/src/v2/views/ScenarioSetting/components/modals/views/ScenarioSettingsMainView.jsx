@@ -11,6 +11,9 @@ import {
   SETTINGS_MODAL_VIEWS,
 } from '../shared/scenarioModalTooltips';
 import { createEmptyAutoLogoutConfig } from 'v2/views/ScenarioSetting/utils/autoLogoutUtils';
+import { applyAmazonPayCartPreset } from 'v2/views/ScenarioSetting/utils/amazonPayConfigUtils';
+import { fillTagFiringDefaults } from 'v2/views/ScenarioSetting/utils/tagFiringUtils';
+import { TAG_FIRING_LABELS } from '../../../constants/tagFiringLabels';
 import {
   EXECUTION_POLICIES,
   EXECUTION_POLICY_OPTIONS,
@@ -35,6 +38,8 @@ const ScenarioSettingsMainView = ({ onClose }) => {
     executionPolicy,
     isUseFukushashiki,
     isUseAmazonPay,
+    amazonPayConfig,
+    clientCartSystem,
     isUseCustomCss,
     isUseCustomJsCode,
     isUseHtmlUgc,
@@ -47,6 +52,7 @@ const ScenarioSettingsMainView = ({ onClose }) => {
     isClearLandingPageSession,
     isUseBtnUpdateTracking,
     isUseGlobalDelay,
+    tagFiring,
     useFullwidthChatbotMobile,
     isShopifyPaymentScenario,
   } = state;
@@ -59,6 +65,10 @@ const ScenarioSettingsMainView = ({ onClose }) => {
     setExecutionPolicy,
     setIsUseFukushashiki,
     setIsUseAmazonPay,
+    setAmazonPayConfig,
+    setAmazonPayDetectionMode,
+    setAmazonPayReadyMode,
+    setAmazonPayDetectionForm,
     setIsUseCustomCss,
     setIsUseCustomJsCode,
     setIsUseHtmlUgc,
@@ -77,6 +87,7 @@ const ScenarioSettingsMainView = ({ onClose }) => {
     setAutoLogoutConfig,
     setIsUseBtnUpdateTracking,
     setIsUseGlobalDelay,
+    setTagFiring,
     setUseFullwidthChatbotMobile,
     navigateSettingsModalView,
   } = actions;
@@ -110,6 +121,29 @@ const ScenarioSettingsMainView = ({ onClose }) => {
       return;
     }
     navigateSettingsModalView(SETTINGS_MODAL_VIEWS.HTML_UGC);
+  };
+
+  const handleToggleTagFiring = (checked) => {
+    if (!checked) {
+      setTagFiring({
+        ...tagFiring,
+        enabled: false,
+      });
+      return;
+    }
+    setTagFiring(fillTagFiringDefaults(tagFiring));
+    navigateSettingsModalView(SETTINGS_MODAL_VIEWS.TAGS);
+  };
+
+  const handleToggleAmazonPay = (checked) => {
+    setIsUseAmazonPay(checked);
+    if (!checked) return;
+    const preset = applyAmazonPayCartPreset(amazonPayConfig, clientCartSystem || client?.cart_system);
+    if (!preset) return;
+    setAmazonPayConfig(preset.config);
+    setAmazonPayDetectionMode(preset.detectionMode);
+    setAmazonPayReadyMode(preset.readyMode);
+    setAmazonPayDetectionForm(preset.detectionForm);
   };
 
   const handleToggleAutoLogout = (checked) => {
@@ -335,7 +369,7 @@ const ScenarioSettingsMainView = ({ onClose }) => {
               )}
               <OverviewCheckboxRow
                 checked={isUseAmazonPay}
-                onChange={(checked) => setIsUseAmazonPay(checked)}
+                onChange={handleToggleAmazonPay}
                 label={labelWithTooltip('Amazon Payを利用する', 'isUseAmazonPay')}
                 actionButton={isUseAmazonPay && (
                   <button
@@ -392,6 +426,20 @@ const ScenarioSettingsMainView = ({ onClose }) => {
                 onClick={() => navigateSettingsModalView(SETTINGS_MODAL_VIEWS.GLOBAL_DELAY)}
               >
                 設定する →
+              </button>
+            )}
+          />
+          <OverviewCheckboxRow
+            checked={!!tagFiring?.enabled}
+            onChange={handleToggleTagFiring}
+            label={labelWithTooltip(TAG_FIRING_LABELS.useTagFiring, 'useTagFiring')}
+            actionButton={!!tagFiring?.enabled && (
+              <button
+                type="button"
+                className="ss-settings-modal-action-link"
+                onClick={() => navigateSettingsModalView(SETTINGS_MODAL_VIEWS.TAGS)}
+              >
+                {TAG_FIRING_LABELS.openSettings}
               </button>
             )}
           />

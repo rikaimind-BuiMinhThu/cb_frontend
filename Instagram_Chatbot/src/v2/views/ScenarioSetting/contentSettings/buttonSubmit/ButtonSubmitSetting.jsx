@@ -13,6 +13,10 @@ import {
   SETTING_LABELS,
   SETTING_PLACEHOLDERS,
 } from '../../constants/scenarioSettingLabels';
+import {
+  getDefaultSubmitTagEvent,
+  getDefaultSubmitTagLabel,
+} from '../../utils/tagFiringUtils';
 import '../../styles/contentSettings/buttonSubmit.css';
 
 const ButtonSubmitSetting = ({
@@ -113,6 +117,52 @@ const ButtonSubmitSetting = ({
       </div>
     );
   };
+
+  const renderTagFiring = () => (
+    <>
+      <div className="ss-user-setting__item-bottom ss-button-submit-setting__options-row">
+        <div className="ss-button-submit-setting__option-col">
+          <CheckboxCustom
+            label={BUTTON_SUBMIT_LABELS.fireTag}
+            onChange={(checked) => {
+              if (!checked) {
+                changeContent('tag_enabled')(false);
+                return;
+              }
+              changeContent('tag_enabled')(true);
+              if (!buttonSubmit.tag_event) {
+                changeContent('tag_event')(getDefaultSubmitTagEvent(dataMessages, dataMessages[indexMessageSelect]));
+              }
+              if (!buttonSubmit.tag_label) {
+                changeContent('tag_label')(getDefaultSubmitTagLabel(content));
+              }
+            }}
+            value={!!buttonSubmit.tag_enabled}
+          />
+        </div>
+      </div>
+      {!!buttonSubmit.tag_enabled && (
+        <>
+          <InputCustom
+            className="ss-user-setting-input-overview ss-button-submit-setting__field-input"
+            labelClassName="ss-input-custom-label--spaced"
+            label={BUTTON_SUBMIT_LABELS.tagEvent}
+            inline={false}
+            onChange={changeContent('tag_event')}
+            value={buttonSubmit.tag_event || ''}
+          />
+          <InputCustom
+            className="ss-user-setting-input-overview ss-button-submit-setting__field-input"
+            labelClassName="ss-input-custom-label--spaced"
+            label={BUTTON_SUBMIT_LABELS.tagLabel}
+            inline={false}
+            onChange={changeContent('tag_label')}
+            value={buttonSubmit.tag_label || ''}
+          />
+        </>
+      )}
+    </>
+  );
 
   const renderJsCode = () => {
     if (!buttonSubmit.is_use_js) return null;
@@ -232,6 +282,7 @@ const ButtonSubmitSetting = ({
       {renderSaveVariableSelect()}
       {renderErrorMessageRow()}
       {renderJsCode()}
+      {renderTagFiring()}
       {renderButtonFields()}
     </ContentSettingShell>
   );
