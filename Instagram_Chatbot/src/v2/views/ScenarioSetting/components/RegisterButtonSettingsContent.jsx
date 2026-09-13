@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { AdminInfoTooltip } from 'v2/components/AdminShell';
 import InputCustom from '../scenarioCommon/InputCustom';
 import ScenarioModalCheckbox from './modals/shared/ScenarioModalCheckbox';
 import ScenarioFormRow from './modals/shared/ScenarioFormRow';
-import { AdminInfoTooltip } from 'v2/components/AdminShell';
 import ScenarioCodeTextarea from './modals/shared/ScenarioCodeTextarea';
 import {
   SCENARIO_MODAL_TOOLTIPS,
@@ -14,6 +14,7 @@ import {
   getDefaultTagLabelForMessage,
   shouldShowMessageTagBlock,
 } from '../utils/tagFiringUtils';
+import { applyAmazonPayUsageToMessage } from '../utils/amazonPayConfigUtils';
 
 const labelWithTooltip = (text, tooltipKey) => (
   <>
@@ -83,7 +84,7 @@ const RegisterButtonSettingsContent = ({
         />
         <ScenarioModalCheckbox
           checked={!!selectedMessage.is_used_when_amazon_pay}
-          onChange={(checked) => updateMessage({ is_used_when_amazon_pay: checked })}
+          onChange={(checked) => updateMessage(applyAmazonPayUsageToMessage(selectedMessage, checked))}
           label={labelWithTooltip(
             REGISTER_BUTTON_LABELS.useForAmazonPay,
             'useForAmazonPay',

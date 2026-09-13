@@ -1,5 +1,13 @@
-import { TIMER_TYPES, TIMER_VARIABLES } from 'v2/views/Preview/PreviewComponent/Constants';
 import _ from 'lodash';
+import { TIMER_TYPES, TIMER_VARIABLES } from 'v2/views/Preview/PreviewComponent/Constants';
+import {
+  LP_INTEGRATION_MODES,
+  normalizeAmazonPayConfig,
+} from 'v2/variables/amazonPayConstants';
+import {
+  DEFAULT_EXECUTION_POLICY,
+  EXECUTION_POLICIES,
+} from 'v2/variables/constants';
 import { initialTimeConfig } from '../constants/scenarioFormConstants';
 import {
   buildAutoLogoutApiPayload,
@@ -7,17 +15,10 @@ import {
   parseAutoLogoutFromApi,
 } from './autoLogoutUtils';
 import {
-  LP_INTEGRATION_MODES,
-  normalizeAmazonPayConfig,
-} from 'v2/variables/amazonPayConstants';
-import {
+  ensureAmazonPayUsageDisplayCondition,
   normalizeAllowedLpDomains,
   parseAmazonPayConfigFromApi,
 } from './amazonPayConfigUtils';
-import {
-  DEFAULT_EXECUTION_POLICY,
-  EXECUTION_POLICIES,
-} from 'v2/variables/constants';
 import { parseTagFiringFromApi } from './tagFiringUtils';
 
 const parseExecutionPolicy = (data) => {
@@ -87,7 +88,7 @@ export const parseScenarioResponse = (res) => {
   const executionPolicy = parseExecutionPolicy(data);
 
   return {
-    dataMessages: (conversation.messages || []).map((message) => ({
+    dataMessages: (conversation.messages || []).map((message) => ensureAmazonPayUsageDisplayCondition({
       ...message,
       conditions: message.conditions || [],
     })),
@@ -211,7 +212,7 @@ export const buildScenarioSavePayload = (state) => {
 
   return {
     conversation: {
-      messages: _.cloneDeep(dataMessages),
+      messages: _.cloneDeep(dataMessages).map(ensureAmazonPayUsageDisplayCondition),
       urlThanksPage: urlThanks,
       urlCartConfirmPage,
       isUsedCartConfirmPage,

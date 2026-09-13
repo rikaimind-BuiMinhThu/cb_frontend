@@ -53,6 +53,41 @@ export const applyAmazonPayDisplayModeToConditions = (conditions = [], mode) => 
   return filtered;
 };
 
+export const applyAmazonPayUsageToMessage = (message = {}, checked) => {
+  if (!checked) {
+    return {
+      ...message,
+      is_used_when_amazon_pay: false,
+      conditions: applyAmazonPayDisplayModeToConditions(
+        message.conditions || [],
+        AMAZON_PAY_DISPLAY_MODES.ALWAYS,
+      ),
+    };
+  }
+
+  const currentMode = getAmazonPayDisplayModeFromConditions(message.conditions);
+  if (currentMode === AMAZON_PAY_DISPLAY_MODES.UNDISPLAY_WHEN) {
+    return {
+      ...message,
+      is_used_when_amazon_pay: true,
+    };
+  }
+
+  return {
+    ...message,
+    is_used_when_amazon_pay: true,
+    conditions: applyAmazonPayDisplayModeToConditions(
+      message.conditions || [],
+      AMAZON_PAY_DISPLAY_MODES.DISPLAY_WHEN,
+    ),
+  };
+};
+
+export const ensureAmazonPayUsageDisplayCondition = (message) => {
+  if (!message?.is_used_when_amazon_pay) return message;
+  return applyAmazonPayUsageToMessage(message, true);
+};
+
 export const normalizeLpDomain = (input) => {
   if (!input || typeof input !== 'string') return '';
   const trimmed = input.trim().toLowerCase();

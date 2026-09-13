@@ -3,7 +3,7 @@ export const AMAZON_PAY_HTML_LABELS = {
   help: 'メッセージ設定の複写式セレクターを確認できます。',
   openSettings: '確認する →',
   description: 'ユーザー入力の複写式セレクターです。変更はメッセージ設定で行ってください。',
-  emptyState: 'ユーザー入力の「その他の設定」で「Amazon Payで使用する」をオンにすると、ここに表示されます。',
+  emptyState: 'ユーザー入力の「その他の設定」で「Amazon Payの情報を自動入力する」をオンにすると、ここに表示されます。',
   chatField: 'チャット項目',
   searchMode: '取得方法',
   lpSelector: 'LPセレクター',
