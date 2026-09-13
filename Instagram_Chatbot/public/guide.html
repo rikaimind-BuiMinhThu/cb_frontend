@@ -15,7 +15,8 @@
       #ctl00_ContentPlaceHolder1_ucInputForm_lbCancelAmazonPay — Amazonお支払いをやめる
       .amazon-pay-img / JapanCreditBureau ****1013 (Amazon Pay)
       .error_inline (約19件、多くは空・非表示)
-      a.forward.btn.btn-large.btn-success — ご注文内容の確認へ
+      a.forward.btn.btn-large.btn-success — ご注文内容の確認へ（起動ボタンには使わない）
+      起動ボタン記入例: a[href="#target_cart"] img（LP CTA）
     【EC Chatbot実装】 ScenarioSettingsMainView / AmazonPayView / ScenarioErrMsgView
     Sensitive values from the saved HTML are omitted or replaced with ********.
   -->
@@ -780,6 +781,48 @@
     .admin-map {
       margin-bottom: 20px;
     }
+    .howto {
+      margin: 0 0 16px;
+      padding: 12px 14px 12px 36px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+    .howto li {
+      margin: 0 0 8px;
+      font-size: 14px;
+    }
+    .howto li:last-child { margin-bottom: 0; }
+    .cta-stage {
+      background: linear-gradient(180deg, #fbf7f2 0%, #f4eee6 100%);
+      border: 1px solid #e5d9cc;
+      border-radius: var(--radius);
+      padding: 28px 16px 16px;
+      position: relative;
+    }
+    .cta-banner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      background: linear-gradient(180deg, #ff6b35 0%, #e84d1a 100%);
+      color: #fff;
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: 0.04em;
+      padding: 16px 12px;
+      border-radius: 6px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(232, 77, 26, 0.28);
+    }
+    .cta-banner small {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      opacity: 0.92;
+      margin-bottom: 2px;
+    }
 
     .step-nav {
       display: flex;
@@ -1464,13 +1507,21 @@ store.nekase-genmai.com</textarea>
       <div class="section-head">
         <div>
           <h2>3. エラーメッセージ取得設定</h2>
-          <p class="section-kicker">シナリオ設定で「エラーメッセージを取得する」をオンにし、「設定する →」を開きます。</p>
+          <p class="section-kicker">LPに赤字のエラーが出たとき、同じ文をチャットにも出す設定です。</p>
         </div>
         <span class="badge badge-impl">【EC Chatbot実装】</span>
       </div>
 
-      <div class="admin" style="margin-bottom:16px;">
-        <div class="admin-bar">シナリオ設定</div>
+      <p class="field-plain">お客さまが空欄のまま進むと、LPに「入力してください」などの赤字が出ます。この設定で、同じ文をチャットにも届けます。</p>
+
+      <div class="flow-grid" style="margin-bottom:16px;">
+        <div class="flow-card"><div class="flow-num">1</div>LPに赤字が出る</div>
+        <div class="flow-card"><div class="flow-num">2</div>セレクターで文を取る</div>
+        <div class="flow-card"><div class="flow-num">3</div>チャットに表示する</div>
+      </div>
+
+      <div class="admin admin-map">
+        <div class="admin-bar">シナリオ設定 <small>【EC Chatbot実装】</small></div>
         <div class="admin-body">
           <div class="toggle-row">
             <div>
@@ -1484,38 +1535,9 @@ store.nekase-genmai.com</textarea>
           </div>
         </div>
       </div>
-
-      <div class="split" style="margin-bottom:16px;">
-        <div class="browser">
-          <div class="browser-bar">
-            <div class="browser-dots"><span></span><span></span><span></span></div>
-            <div class="url-bar">ご注文内容入力（説明用）</div>
-          </div>
-          <div class="browser-body" style="background:#fff;">
-            <div class="lp-card">
-              <h3>注文者情報</h3>
-              <p style="margin:0 0 6px;font-size:0.85rem;">氏名 <span style="color:#c00;">※</span></p>
-              <div style="display:flex;gap:8px;margin-bottom:8px;">
-                <input class="field-input" value="" placeholder="例）山田" readonly>
-                <input class="field-input" value="" placeholder="例）太郎" readonly>
-              </div>
-              <p class="highlight-box" style="color:#c00;font-size:0.82rem;margin:0;display:inline-block;padding:2px 6px;">入力してください</p>
-            </div>
-          </div>
-        </div>
-        <div class="devtools">
-          <div class="devtools-tabs"><span class="on">Elements</span></div>
-          <div class="devtools-body">
-            <div>&lt;<span class="html-tag">span</span> class=<span class="html-val">"error_inline"</span>&gt;</div>
-            <div><span class="html-text">入力してください</span></div>
-            <div>&lt;/<span class="html-tag">span</span>&gt;</div>
-          </div>
-        </div>
-      </div>
-      <p class="note warn">【実際のLP】 class は <code>.error_inline</code> です。ただし約19件あり、多くは空で非表示です。本番設定の前に、実際にエラーを出してから Console で確認してください。</p>
-
-      <div class="admin" style="margin-top:16px;">
-        <div class="admin-bar">エラーメッセージ取得設定</div>
+      <div class="flow-arrow">↓</div>
+      <div class="admin admin-map">
+        <div class="admin-bar">エラーメッセージ取得設定 <small>【EC Chatbot実装】</small></div>
         <div class="admin-body">
           <div class="radio-row">
             <label><input type="radio" name="err-mode" value="js"> JSコードで設定</label>
@@ -1532,14 +1554,12 @@ store.nekase-genmai.com</textarea>
             <label class="field-label" for="err-field">フィールドエラーセレクター</label>
             <input class="field-input" id="err-field" value=".error_inline" readonly>
             <p class="field-help">フィールドエラーを取得するCSSセレクター（カンマ区切り）。</p>
-            <div class="lp-example"><strong>このLPの例:</strong> <code>.error_inline</code> — 件数が多いので、実エラー表示後に <code>document.querySelectorAll('.error_inline')</code> で確認します。</div>
           </div>
 
           <div class="field err-panel" id="err-form-panel">
             <label class="field-label" for="err-form">フォームエラーセレクター</label>
             <input class="field-input" id="err-form" placeholder="例: #alert-box, .form-errors" readonly>
             <p class="field-help">フォームエラーを取得するCSSセレクター（カンマ区切り）。</p>
-            <div class="lp-example"><strong>このLP:</strong> フォーム全体のエラー用に、安定したID / class は確認できませんでした。空欄のままで問題ありません。</div>
           </div>
 
           <div class="admin-footer">
@@ -1548,49 +1568,194 @@ store.nekase-genmai.com</textarea>
           </div>
         </div>
       </div>
+      <p class="caption">上は画面の見取り図です。各項目の意味は、下のカードで説明します。</p>
+
+      <article class="field-card">
+        <h3>取得方法</h3>
+        <p class="field-plain">赤字の文を、どうやって取るかを選びます。ふつうはセレクターで足ります。</p>
+        <div class="value-list">
+          <strong>値の説明</strong>
+          <ul>
+            <li><strong>セレクターで設定</strong> — 赤字の要素をCSSセレクターで指定します。まずはこちらです。</li>
+            <li><strong>JSコードで設定</strong> — 自分で取る処理を書く上級向けです。</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="field-card">
+        <h3>フィールドエラーセレクター</h3>
+        <p class="field-plain">各入力欄のすぐ下に出る赤字です。「入力してください」など、欄ごとのメッセージを取ります。</p>
+        <p class="field-help">フィールドエラーを取得するCSSセレクター（カンマ区切り）。</p>
+        <div class="value-list">
+          <strong>値の入れ方</strong>
+          <ul>
+            <li>カンマ区切りで複数指定できます。Amazon Pay の判定用 DOM（1行1件）とは違います。</li>
+            <li>実際にエラーを出してから、赤字の要素をコピーします。</li>
+          </ul>
+        </div>
+        <div class="cart-samples">
+          <h4>このLPの見本</h4>
+          <div class="cart-row"><span class="cart-chip">リピートPLUS</span><code>.error_inline</code></div>
+        </div>
+      </article>
+
+      <article class="field-card">
+        <h3>フォームエラーセレクター</h3>
+        <p class="field-plain">画面上部など、フォーム全体に出る警告です。欄の下の赤字ではありません。</p>
+        <p class="field-help">フォームエラーを取得するCSSセレクター（カンマ区切り）。</p>
+        <div class="value-list">
+          <strong>値の入れ方</strong>
+          <ul>
+            <li>全体の警告があるときだけ入れます。なければ空欄で問題ありません。</li>
+            <li>このLPでは、安定したID / class は確認できませんでした。</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="field-card">
+        <h3>見本：氏名を空にして進む</h3>
+        <p class="field-plain">空欄のまま進むと「入力してください」が出ます。この赤字の class が <code>.error_inline</code> です。</p>
+        <div class="split" style="margin-bottom:12px;">
+          <div class="browser">
+            <div class="browser-bar">
+              <div class="browser-dots"><span></span><span></span><span></span></div>
+              <div class="url-bar">ご注文内容入力（説明用）</div>
+            </div>
+            <div class="browser-body" style="background:#fff;">
+              <div class="lp-card">
+                <h3>注文者情報</h3>
+                <p style="margin:0 0 6px;font-size:0.85rem;">氏名 <span style="color:#c00;">※</span></p>
+                <div style="display:flex;gap:8px;margin-bottom:8px;">
+                  <input class="field-input" value="" placeholder="例）山田" readonly>
+                  <input class="field-input" value="" placeholder="例）太郎" readonly>
+                </div>
+                <p class="highlight-box" style="color:#c00;font-size:0.82rem;margin:0;display:inline-block;padding:2px 6px;">入力してください</p>
+              </div>
+            </div>
+          </div>
+          <div class="devtools">
+            <div class="devtools-tabs"><span class="on">Elements</span></div>
+            <div class="devtools-body">
+              <div>&lt;<span class="html-tag">span</span> class=<span class="html-val">"error_inline"</span>&gt;</div>
+              <div><span class="html-text">入力してください</span></div>
+              <div>&lt;/<span class="html-tag">span</span>&gt;</div>
+            </div>
+          </div>
+        </div>
+        <p class="note warn">【実際のLP】 class は <code>.error_inline</code> です。ただし約19件あり、多くは空で非表示です。本番設定の前に、実際にエラーを出してから Console で確認してください。</p>
+      </article>
+
+      <article class="field-card">
+        <h3>やり方</h3>
+        <ol class="howto">
+          <li>LPでわざとエラーを出します（空欄のまま進む）。</li>
+          <li>赤字を右クリック → 検証 → Copy selector。</li>
+          <li>Console で <code>document.querySelectorAll('.error_inline')</code> を確認します。</li>
+          <li>管理画面の「フィールドエラーセレクター」へ貼ります。</li>
+        </ol>
+        <p class="caption" style="text-align:left;">セレクタの取り方の画面操作は、<a href="#sec-how">1. 取得方法</a>と同じです。</p>
+      </article>
     </section>
 
     <section class="guide-section" id="sec-launch">
       <div class="section-head">
         <div>
           <h2>4. 起動ボタン設定</h2>
-          <p class="section-kicker">独立した画面はありません。シナリオ設定の「起動ボタンセレクター」に入れます。</p>
+          <p class="section-kicker">LPのCTA（今すぐ申し込む・購入するなどの呼び出しボタン）をクリックしたら、チャットを開く設定です。</p>
         </div>
         <span class="badge badge-impl">【EC Chatbot実装】</span>
       </div>
 
-      <div class="browser" style="margin-bottom:12px;">
-        <div class="browser-bar">
-          <div class="browser-dots"><span></span><span></span><span></span></div>
-          <div class="url-bar">カート下部</div>
+      <p class="field-plain">独立した画面はありません。シナリオ設定の「カスタマイズ」にある「起動ボタンセレクター」へ、LPのCTAを入れます。</p>
+
+      <div class="flow-grid" style="margin-bottom:16px;">
+        <div class="flow-card"><div class="flow-num">1</div>LPのCTAをクリック</div>
+        <div class="flow-card"><div class="flow-num">2</div>チャットが開く</div>
+      </div>
+
+      <div class="check-grid" style="margin-bottom:16px;">
+        <div class="ok-box">
+          <h4>使う</h4>
+          <p>LPのCTA。固定フッターの購入ボタン、<code>#target_cart</code> へ飛ぶ画像ボタンなどです。</p>
         </div>
-        <div class="browser-body" style="background:#fff;">
-          <div style="padding:12px 0;">
-            <span class="lp-btn success highlight-box">ご注文内容の確認へ</span>
+        <div class="ng-box">
+          <h4>使わない</h4>
+          <ul>
+            <li>「ご注文内容の確認へ」— カートの次へです。起動に入れると注文が進みません。</li>
+            <li>「お支払い方法を変更」— Amazon Pay判定用です。</li>
+          </ul>
+        </div>
+      </div>
+
+      <article class="field-card">
+        <h3>起動ボタンセレクター</h3>
+        <p class="field-plain">クリックでチャットを開きたい <strong>CTA</strong> のセレクターです。カートの「次へ」ではありません。</p>
+        <p class="field-help">複数セレクターはカンマ区切り。クリックでチャットボットを開きます。</p>
+        <div class="value-list">
+          <strong>値の入れ方</strong>
+          <ul>
+            <li>カンマ区切りで複数指定できます。</li>
+            <li>商品LP上の購入・申し込みボタンを指定します。</li>
+            <li>記入例は管理画面のプレースホルダと同じです。</li>
+          </ul>
+        </div>
+        <div class="cart-samples">
+          <h4>記入例</h4>
+          <div class="cart-row"><span class="cart-chip">CTA</span><code>a[href="#target_cart"] img</code></div>
+        </div>
+      </article>
+
+      <article class="field-card">
+        <h3>見本：LPのCTA</h3>
+        <p class="field-plain">Amazon Payログイン後のカート画面ではなく、商品LPの呼び出しボタンです。</p>
+        <div class="browser" style="margin-bottom:12px;">
+          <div class="browser-bar">
+            <div class="browser-dots"><span></span><span></span><span></span></div>
+            <div class="url-bar">商品LP（説明用）</div>
+          </div>
+          <div class="browser-body" style="background:#fff;padding-bottom:18px;">
+            <span class="badge badge-mock" style="margin-bottom:10px;">【説明用Mockup】</span>
+            <div class="cta-stage">
+              <div class="cta-banner highlight-box">
+                <small>LPのCTA</small>
+                今すぐ申し込む
+              </div>
+              <span class="callout" style="right:12px;bottom:10px;">起動に使う</span>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="flow-arrow">↓ 右クリック → 検証</div>
-      <div class="code-box">
-&lt;a class="forward btn btn-large btn-success"&gt;
-    ご注文内容の確認へ
+        <div class="flow-arrow">↓ 右クリック → 検証</div>
+        <div class="code-box">
+&lt;a href="#target_cart" class="lp-buy-btn"&gt;
+    &lt;img alt="今すぐ申し込む"&gt;
 &lt;/a&gt;
-      </div>
-      <div class="flow-arrow">↓</div>
-      <div class="code-box">
-        a.forward.btn.btn-large.btn-success
-        <button class="btn btn-copy copy-abs" type="button" data-copy="a.forward.btn.btn-large.btn-success">コピー</button>
-      </div>
-      <p class="note warn">Amazon Payの「お支払い方法を変更」は、起動ボタンには使いません。クリックでチャットを開きたいボタンを指定します。</p>
+        </div>
+        <div class="flow-arrow">↓</div>
+        <div class="code-box">
+          a[href="#target_cart"] img
+          <button class="btn btn-copy copy-abs" type="button" data-copy="a[href=&quot;#target_cart&quot;] img">コピー</button>
+        </div>
+        <p class="note warn">「ご注文内容の確認へ」は起動ボタンに使いません。クリックするとページ遷移が止まり、注文が進まなくなります。</p>
+      </article>
+
+      <article class="field-card">
+        <h3>やり方</h3>
+        <ol class="howto">
+          <li>商品LP上のCTA（購入・申し込みボタン）を右クリック → 検証します。</li>
+          <li>Copy selector を選びます。</li>
+          <li>シナリオ設定 → 起動ボタンセレクターへ貼ります。</li>
+        </ol>
+        <p class="caption" style="text-align:left;">セレクタの取り方の画面操作は、<a href="#sec-how">1. 取得方法</a>と同じです。</p>
+      </article>
 
       <div class="admin" style="margin-top:16px;">
-        <div class="admin-bar">シナリオ設定　／　カスタマイズ</div>
+        <div class="admin-bar">シナリオ設定　／　カスタマイズ <small>【EC Chatbot実装】</small></div>
         <div class="admin-body">
           <div class="field">
             <label class="field-label" for="launch-sel">起動ボタンセレクター</label>
-            <input class="field-input" id="launch-sel" value="a.forward.btn.btn-large.btn-success" readonly>
+            <input class="field-input" id="launch-sel" value='a[href="#target_cart"] img' readonly>
             <p class="field-help">複数セレクターはカンマ区切り。クリックでチャットボットを開きます。</p>
-            <div class="lp-example"><strong>このLPの例:</strong> <code>a.forward.btn.btn-large.btn-success</code>（一意のidはありません）</div>
+            <div class="lp-example"><strong>記入例:</strong> <code>a[href="#target_cart"] img</code>（管理画面のプレースホルダと同じ）</div>
           </div>
           <div class="admin-footer">
             <button class="btn btn-ghost" type="button">閉じる</button>
@@ -1624,7 +1789,7 @@ store.nekase-genmai.com</textarea>
           <ul>
             <li>Amazon Payログイン後に、連携モードでチャットが起動する</li>
             <li>氏名などが自動入力されるまで待ってから起動する（完了判定を入れた場合）</li>
-            <li>「ご注文内容の確認へ」でチャットが開く</li>
+            <li>LPのCTAをクリックしてチャットが開く</li>
             <li>入力エラーを出したとき、チャットにエラー文が届く</li>
           </ul>
         </div>
