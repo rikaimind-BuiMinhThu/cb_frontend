@@ -57,7 +57,6 @@ const ScenarioSettingsMainView = ({ onClose }) => {
     isShopifyPaymentScenario,
     orderResultMode,
     lexicaCartUrl,
-    clientCartSystem,
   } = state;
   const {
     setUrlThanks,

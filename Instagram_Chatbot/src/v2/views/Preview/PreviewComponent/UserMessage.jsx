@@ -35,6 +35,7 @@ import Carousel from './UserMessageComponent/Carousel';
 import ProductPurchase from './UserMessageComponent/ProductPurchase';
 import ProductPurchaseRadioButton from './UserMessageComponent/ProductPurchaseRadioButton';
 import SliderInput from './UserMessageComponent/Slider';
+import HtmlCode from './UserMessageComponent/HtmlCode';
 import { isUserMessage } from './Utils';
 import { handleDisableDateCalendar } from 'v2/views/ScenarioSetting/utils/scenarioCalendarUtils';
 
@@ -427,6 +428,8 @@ const UserMessage = ({
             cartSystem={cartSystem}
           />
         );
+      case MESSAGE_CONTENT_TYPES.HTML_CODE:
+        return <HtmlCode content={content} />;
       case MESSAGE_CONTENT_TYPES.AGREE_TERM:
         return (
           <AgreeTerm

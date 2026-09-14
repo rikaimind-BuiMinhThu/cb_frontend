@@ -45,6 +45,7 @@ const RADIO_BUTTON_TYPES = {
   BLOCK_STYLE: "block_style",
 };
 const PREVIEW_OPTION_PLACEHOLDER_LABEL = "ラベル";
+const EMPTY_IMAGE_ALT = "";
 
 const RadioButton = ({ content, disabled, onChangeValue, errors, contentIndex, messageIndex, notUseButtonNext, onClickNext }) => {
   if (content.type !== MESSAGE_CONTENT_TYPES.RADIO_BUTTON) return null;
@@ -195,7 +196,7 @@ const RadioButton = ({ content, disabled, onChangeValue, errors, contentIndex, m
                 tabIndex={-1}
                 aria-hidden="true"
               />
-              <img src={item.img} alt="" />
+              <img src={item.img} alt={item.alt || item.text || EMPTY_IMAGE_ALT} />
             </div>
           );
         })}

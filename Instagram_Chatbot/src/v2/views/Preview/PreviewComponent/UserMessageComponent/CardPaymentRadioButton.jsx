@@ -40,7 +40,7 @@ const renderOptionLabel = (itemPayment, isSelected) => {
       {image && (
         <img
           src={image}
-          alt=""
+          alt={itemPayment.text}
           className="preview-icon-24"
         />
       )}
@@ -215,7 +215,7 @@ const CardPaymentRadioButton = ({ content, messageIndex, contentIndex, onChangeV
                         );
                       }}
                     >
-                      <img src={stateImage || itemPaymentContent.file_url} alt="" />
+                      <img src={stateImage || itemPaymentContent.file_url} alt={itemPaymentContent.text} />
                       <div className="ss-message__content--user-card-payment-radio-group-type-text_image-text">
                         {itemPaymentContent.text}
                       </div>
@@ -232,7 +232,8 @@ const CardPaymentRadioButton = ({ content, messageIndex, contentIndex, onChangeV
   const onRadioChange = (e) => {
     const itemPayment = e.target;
     const value = cardPaymentRadioButton.initial_selection !== itemPayment.value ? itemPayment.value : EMPTY_INPUT_VALUE;
-    const isDisplayCardPayment = cardPaymentRadioButton.card_linked_setting.includes(value);
+    const linkedSettings = cardPaymentRadioButton.card_linked_setting || [];
+    const isDisplayCardPayment = linkedSettings.length === 0 || linkedSettings.includes(value);
 
     onChangeValue(
       contentIndex,
@@ -251,11 +252,13 @@ const CardPaymentRadioButton = ({ content, messageIndex, contentIndex, onChangeV
 
   const renderCreditCardPayment = () => {
     const isPictureRadio = cardPaymentRadioButton.type === CARD_PAYMENT_TYPES.PICTURE_RADIO;
+    const linkedSettings = cardPaymentRadioButton.card_linked_setting || [];
+    const selectedValue = cardPaymentRadioButton.initial_selection;
     const isSelectLinkedCard = isPictureRadio
       ? !!cardPaymentRadioButton.card_linked_setting_picture
         && cardPaymentRadioButton.card_linked_setting_picture === cardPaymentRadioButton.initial_selection_picture
-      : cardPaymentRadioButton.card_linked_setting.length > 0
-        && cardPaymentRadioButton.card_linked_setting.includes(cardPaymentRadioButton.initial_selection);
+      : Boolean(selectedValue)
+        && (linkedSettings.length === 0 || linkedSettings.includes(selectedValue));
 
     if (!isSelectLinkedCard) return null;
 

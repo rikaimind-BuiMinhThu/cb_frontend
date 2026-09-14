@@ -108,9 +108,8 @@ const OptionGenderItem = ({ contentIndex, item, onChangeValue, isSelected }) => 
           alt={item.text}
           style={getIconVarStyle(item.preset_config.preset.icon.url)}
         />
-      ) : (
-        <div className="option-gender-icon-text" style={getIconVarStyle()}>{item.text}</div>
-      )}
+      ) : null}
+      <div className="option-gender-icon-text" style={getIconVarStyle()}>{item.text}</div>
     </div>
   );
 };

@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
 
-const useDebounce = (value, delay, isComposing = false) => {
+const useDebounce = (value, delay, isComposing = false, skipValueSync = false) => {
   const [inputValue, setInputValue] = useState(value);
   const [debouncedValue, setDebouncedValue] = useState(inputValue);
 
   useEffect(() => {
+    if (skipValueSync || isComposing) {
+      return;
+    }
     setInputValue(value);
-  }, [value]);
+  }, [value, skipValueSync, isComposing]);
 
   useEffect(() => {
     if (!inputValue || isComposing) {

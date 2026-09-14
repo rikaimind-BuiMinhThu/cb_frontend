@@ -888,6 +888,7 @@ const PreviewFukushashiki = () => {
     const isAutoClick = !isDisplayBtnNext && isUpdate;
 
     if (!message || message.belong_to !== "user") return null;
+    if (message.is_display_button_next === false) return null;
     if (message.message_content[0]?.type === "button_submit") return null;
 
     const isBtnUpdateMode = state.isUseBtnUpdateTracking && !message.buttonName && !isUpdate;

@@ -153,6 +153,7 @@ const MESSAGE_CONTENT_TYPES = {
   ATTACHMENT: 'attaching_file',
   CALENDAR: 'calendar',
   AGREE_TERM: 'agree_term',
+  HTML_CODE: 'html_code',
   CREDIT_CARD_PAYMENT: 'credit_card_payment',
   CARD_PAYMENT_RADIO_BUTTON: 'card_payment_radio_button',
   SUBMIT_BUTTON: 'button_submit',

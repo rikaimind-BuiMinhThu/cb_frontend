@@ -3,6 +3,8 @@ import { baseUserMessageComponentPropTypes } from './userMessageComponentPropTyp
 import "v2/assets/css/bot/preview-chat-bot.css";
 import { MESSAGE_CONTENT_TYPES } from "../Constants";
 
+const EMPTY_IMAGE_ALT = "";
+
 const Image = ({ content, contentIndex, messageIndex }) => {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.IMAGE) return null;
 
@@ -12,7 +14,7 @@ const Image = ({ content, contentIndex, messageIndex }) => {
     <div id={`msg-${messageIndex}-${contentIndex}`} className="ss-message__content--user-text-input-top ss-message__content--user-chat-image">
       <img
         src={image.imageURL}
-        alt=""
+        alt={image.alt || EMPTY_IMAGE_ALT}
         className="preview-img-runtime"
         style={{
           '--preview-img-width': image.image_width,

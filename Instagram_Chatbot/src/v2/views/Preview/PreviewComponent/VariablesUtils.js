@@ -25,7 +25,7 @@ const getTextInputValue = (subContent, field) => {
     case "email_address":
     case "password": {
       const container = subContent[field];
-      return container.value;
+      return container?.value ?? "";
     }
     case "email_confirmation": 
     case "password_confirmation": {
