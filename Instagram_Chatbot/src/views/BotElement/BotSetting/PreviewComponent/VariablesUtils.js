@@ -185,6 +185,22 @@ const getCardPaymentRadioButtonValue = (subContent, value, field) => {
   }
 }
 
+const getCreditCardPaymentValue = (subContent) => {
+  if (!subContent) return "";
+  const panDigits = String(
+    subContent.card_number
+      || [
+        subContent.card_number1,
+        subContent.card_number2,
+        subContent.card_number3,
+        subContent.card_number4,
+      ].filter((part) => part != null && part !== "").join("")
+      || ""
+  ).replace(/\D/g, "");
+  if (!panDigits) return "";
+  return `****${panDigits.slice(-4)}`;
+}
+
 const getCarouselDefaultValue = (subContent,value) => {
   // TODO: Need check to find value
   return value;
@@ -246,9 +262,9 @@ const getDefaultValue = (subContent, contentType, value, field, prefecturesList,
     case MESSAGE_CONTENT_TYPES.AGREE_TERM:
       throw new Error(`getDefaultValue: ${contentType} is not supported`);
     case MESSAGE_CONTENT_TYPES.CREDIT_CARD_PAYMENT:
-      throw new Error(`getDefaultValue: ${contentType} is not supported`);
+      return getCreditCardPaymentValue(subContent);
     case MESSAGE_CONTENT_TYPES.CARD_PAYMENT_RADIO_BUTTON:
-      return getCardPaymentRadioButtonValue(subContent, field, value);
+      return getCardPaymentRadioButtonValue(subContent, value, field);
     case MESSAGE_CONTENT_TYPES.SUBMIT_BUTTON:
       return getSubmitButtonDefaultValue(value, variables, variableName);
     case MESSAGE_CONTENT_TYPES.IMAGE:
