@@ -4,6 +4,7 @@ import FukushashikiSearchRow from '../shared/FukushashikiSearchRow';
 import SelectCustom from '../../scenarioCommon/SelectCustom';
 import { LABELS } from 'v2/views/Preview/PreviewComponent/Constants';
 import { FUKUSHASHIKI_VARIANTS } from '../../constants/scenarioSettingLabels';
+import { isGenderRadio } from '../../utils/radioButtonGenderUtils';
 import { buildRadioButtonSettingContext } from './radioButtonSettingContext';
 
 const RadioButtonFukushashikiSection = (props) => {
@@ -27,7 +28,7 @@ const RadioButtonFukushashikiSection = (props) => {
         />
         <div className="ss-radio-button-setting__fukushashiki-spacer" />
       </div>
-      {radioButton.use_as_gender && (
+      {isGenderRadio(radioButton) && (
         <div className="ss-radio-button-setting__gender-display">
           <SelectCustom
             data={[

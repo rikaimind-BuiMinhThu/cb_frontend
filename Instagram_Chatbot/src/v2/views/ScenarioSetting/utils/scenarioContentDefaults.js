@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { getDefaultUpsellButtonOptions } from '../constants/upsellButtonDefaults';
+import { getDefaultGenderOptions } from '../constants/genderOptionDefaults';
 import { DEFAULT_CONTACT_FORM_CONFIG } from 'v2/views/Preview/PreviewComponent/Constants';
 
 export const getNextContentId = (messageContentArray) => {
@@ -61,6 +62,7 @@ export const createDefaultContentItem = (messageType, idMax) => {
         option_padding: '0px',
         option_margin: '5px',
         default: [{ id: 1 }],
+        gender: getDefaultGenderOptions(),
         radio_button_img: [{ id: 1 }],
         upsell_button: getDefaultUpsellButtonOptions(),
         block_style: [{ id: 1 }],

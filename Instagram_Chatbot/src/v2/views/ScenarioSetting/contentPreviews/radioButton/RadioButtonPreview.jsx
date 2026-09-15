@@ -12,7 +12,13 @@ import {
   isEditorRadioOptionHighlighted,
   isRadioOptionInitiallySelected,
 } from 'v2/views/ScenarioSetting/utils/radioButtonSelectionUtils';
+import {
+  getGenderOptions,
+  isGenderRadio,
+} from 'v2/views/ScenarioSetting/utils/radioButtonGenderUtils';
 import '../../styles/contentPreviews/radioButton.css';
+import 'v2/assets/css/bot/preview-chat-bot.css';
+import { EMPTY_INPUT_VALUE } from 'v2/views/Preview/PreviewComponent/Constants';
 
 const RadioButtonPreview = ({
   radioButton,
@@ -76,6 +82,54 @@ const RadioButtonPreview = ({
       );
     })
   );
+
+  const renderGenderType = () => {
+    const options = getGenderOptions(radioButton);
+    const displayClass = radioButton.gender_display_type === 'vertical'
+      ? 'gender-display-column'
+      : radioButton.gender_display_type === 'horizontal'
+        ? 'gender-display-row'
+        : EMPTY_INPUT_VALUE;
+
+    return (
+      <div className="options-gender_wrapper">
+        <div className={`options-gender_wrapper-item ${displayClass}`}>
+          {options.map((item) => {
+            const isSelected = isRadioOptionInitiallySelected(radioButton, item);
+            const buttonColor = item?.preset_config?.preset?.button?.default;
+            const icon = item?.preset_config?.preset?.icon;
+            return (
+              <div
+                key={item.id}
+                data-editor-radio-option={buildEditorRadioOptionDataAttr(indexContent, item)}
+                className={[
+                  'option-gender-item',
+                  buttonColor ? 'option-gender-item--preset' : '',
+                  isSelected ? 'ss-radio-button-preview__option--selected' : '',
+                  getEditorHighlightClassName(item),
+                ].filter(Boolean).join(' ')}
+                style={buttonColor ? { '--gender-btn-bg': buttonColor } : undefined}
+              >
+                {icon?.url ? (
+                  <div
+                    className="ico option-gender-icon-mask"
+                    style={{
+                      '--gender-icon-mask': `url(${icon.url})`,
+                      '--gender-icon-color': icon.default,
+                      '--gender-icon-width': `${icon.width || 24}px`,
+                      '--gender-icon-height': `${icon.height || 24}px`,
+                    }}
+                  />
+                ) : (
+                  <div className="option-gender-icon-text">{item.text}</div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
 
   const renderImgType = () => {
     const items = radioButton[radioButton.type] || [];
@@ -164,9 +218,14 @@ const RadioButtonPreview = ({
   );
 
   const renderTypeBody = () => {
+    if (isGenderRadio(radioButton)) {
+      return renderGenderType();
+    }
     switch (radioButton.type) {
       case RADIO_BUTTON_TYPES.DEFAULT:
         return renderDefaultType();
+      case RADIO_BUTTON_TYPES.GENDER:
+        return renderGenderType();
       case RADIO_BUTTON_TYPES.RADIO_BUTTON_IMG:
         return renderImgType();
       case RADIO_BUTTON_TYPES.UPSELL_BUTTON:

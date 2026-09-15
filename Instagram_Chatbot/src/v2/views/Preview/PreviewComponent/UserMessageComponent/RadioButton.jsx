@@ -13,15 +13,12 @@ import {
   getRadioOptionSelectionKey,
   isRadioOptionInitiallySelected,
 } from "v2/views/ScenarioSetting/utils/radioButtonSelectionUtils";
+import { RADIO_BUTTON_TYPES } from "v2/views/ScenarioSetting/constants/contentTypeConstants";
+import {
+  getGenderOptions,
+  isGenderRadio,
+} from "v2/views/ScenarioSetting/utils/radioButtonGenderUtils";
 import OptionGender from "./OptionGender";
-
-const RADIO_BUTTON_TYPES = {
-  DEFAULT: "default",
-  RADIO_BUTTON_IMG: "radio_button_img",
-  UPSELL_BUTTON: "upsell_button",
-  CONSUME_API_RESPONSE: "consume_api_response",
-  BLOCK_STYLE: "block_style",
-};
 const PREVIEW_OPTION_PLACEHOLDER_LABEL = "ラベル";
 
 const RadioButton = ({ content, disabled, onChangeValue, errors, contentIndex, messageIndex, notUseButtonNext, onClickNext }) => {
@@ -66,14 +63,17 @@ const RadioButton = ({ content, disabled, onChangeValue, errors, contentIndex, m
     ].filter(Boolean).join(" ");
   };
 
+  const renderGenderContent = () => (
+    <OptionGender
+      contentIndex={contentIndex}
+      radioButton={radioButton}
+      onChangeValue={onChangeValue}
+      options={getGenderOptions(radioButton)}
+    />
+  );
+
   const renderDefaultContent = () => {
-    if (radioButton.use_as_gender)
-      return <OptionGender
-        contentIndex={contentIndex}
-        radioButton={radioButton}
-        onChangeValue={onChangeValue}
-        options={radioButton[radioButton.type]}
-      />;
+    if (isGenderRadio(radioButton)) return renderGenderContent();
 
     return radioButton[radioButton.type].map((item, index) => {
       const selectionKey = getRadioOptionSelectionKey(item);
@@ -231,6 +231,8 @@ const RadioButton = ({ content, disabled, onChangeValue, errors, contentIndex, m
     switch (radioButton.type) {
       case RADIO_BUTTON_TYPES.DEFAULT:
         return renderDefaultContent();
+      case RADIO_BUTTON_TYPES.GENDER:
+        return renderGenderContent();
       case RADIO_BUTTON_TYPES.RADIO_BUTTON_IMG:
         return renderRadioButtonImgContent();
       case RADIO_BUTTON_TYPES.UPSELL_BUTTON:

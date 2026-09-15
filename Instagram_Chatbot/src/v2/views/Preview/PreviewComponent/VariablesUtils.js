@@ -101,6 +101,8 @@ const getRadioButtonDefaultValue = (subContent, value) => {
   switch (subContent.type) {
     case "default":
       return subContent.default.find(item => item.value === value)?.text;
+    case "gender":
+      return subContent.gender?.find(item => item.value === value)?.text;
     case "radio_button_img":
       return subContent.radio_button_img.find(item => item.value === value)?.text;
     case "upsell_button":
