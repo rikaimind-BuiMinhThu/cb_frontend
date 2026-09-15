@@ -89,7 +89,7 @@ const ShippingAddress = ({ content, prefecturesList, messageIndexRender, message
           <InputCustom
             disabled={disabled}
             placeholder={shippingAddress.text?.placeholderLeft}
-            className="w-49-percent m-b-0"
+            containerClassName="w-49-percent-flush"
             onChange={(value) =>
               onChangeValue(
                 contentIndex,
@@ -103,7 +103,7 @@ const ShippingAddress = ({ content, prefecturesList, messageIndexRender, message
           <InputCustom
             disabled={disabled}
             placeholder={shippingAddress.text?.placeholderRight}
-            className="w-49-percent"
+            containerClassName="w-49-percent"
             onChange={(value) =>
               onChangeValue(
                 contentIndex,
@@ -130,7 +130,7 @@ const ShippingAddress = ({ content, prefecturesList, messageIndexRender, message
           <InputCustom
             disabled={disabled}
             placeholder={shippingAddress.text?.placeholderLeft}
-            className="w-49-percent m-b-0"
+            containerClassName="w-49-percent-flush"
             onChange={(value) =>
               onChangeValue(
                 contentIndex,
@@ -144,7 +144,7 @@ const ShippingAddress = ({ content, prefecturesList, messageIndexRender, message
           <InputCustom
             disabled={disabled}
             placeholder={shippingAddress.text?.placeholderRight}
-            className="w-49-percent"
+            containerClassName="w-49-percent"
             onChange={(value) =>
               onChangeValue(
                 contentIndex,

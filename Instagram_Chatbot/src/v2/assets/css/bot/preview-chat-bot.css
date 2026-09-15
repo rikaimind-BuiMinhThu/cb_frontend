@@ -1443,6 +1443,21 @@ slideUp
 .ss-message__content--user-chat-container {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: 4px;
+}
+
+.ss-message__content--user-chat-container > .ss-input-custom-container.ss-message__phone-segment {
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto !important;
+  margin-bottom: 0;
+}
+
+.ss-hyphen-separator {
+  font-size: 20px;
+  flex-shrink: 0;
+  line-height: 1;
 }
 
 .flex-wrap {
@@ -2027,7 +2042,7 @@ slideUp
 }
 
 .ss-message__split-row { display: flex; justify-content: space-between; }
-.w-49-percent-flush { width: 49%; margin-bottom: 0; }
+.w-49-percent-flush { width: 49% !important; margin-bottom: 0; }
 .w-33-percent { width: 33% !important; }
 .m-l-0 { margin-left: 0; }
 .m-l-7 { margin-left: 7px; }

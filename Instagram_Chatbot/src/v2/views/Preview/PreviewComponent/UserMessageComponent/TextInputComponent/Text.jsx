@@ -26,9 +26,7 @@ const Text = ({ content, disabled, handleOnChangeJpConvertText, contentIndex, on
   }
 
   return (
-    <div className="ss-message__split-row">
-      <SingleInputText content={content} disabled={disabled} handleOnChangeJpConvertText={handleOnChangeJpConvertText} contentIndex={contentIndex} onChangeValue={onChangeValue} />
-    </div>
+    <SingleInputText content={content} disabled={disabled} handleOnChangeJpConvertText={handleOnChangeJpConvertText} contentIndex={contentIndex} onChangeValue={onChangeValue} />
   );
 };
 
@@ -49,7 +47,7 @@ const SplitInputText = ({ content, disabled, handleOnChangeJpConvertText, conten
           id={content.customId1 || undefined}
           disabled={disabled}
           placeholder={leftPlaceholder}
-          className="w-49-percent-flush"
+          containerClassName="w-49-percent-flush"
           onChange={handleOnChangeJpConvertText(contentIndex, content.type, textInput.type, "valueLeft")}
           value={leftValue}
           debounceTime={RENDER_CHATBOT_CONFIG.DEBOUNCE_INPUT_TEXT_JP_CONVERT}
@@ -58,7 +56,7 @@ const SplitInputText = ({ content, disabled, handleOnChangeJpConvertText, conten
           id={content.customId2 || undefined}
           disabled={disabled}
           placeholder={rightPlaceholder}
-          className="w-49-percent"
+          containerClassName="w-49-percent"
           onChange={handleOnChangeJpConvertText(contentIndex, content.type, textInput.type, "valueRight")}
           value={rightValue}
           debounceTime={RENDER_CHATBOT_CONFIG.DEBOUNCE_INPUT_TEXT_JP_CONVERT}
@@ -73,7 +71,7 @@ const SplitInputText = ({ content, disabled, handleOnChangeJpConvertText, conten
         id={content.customId1 || undefined}
         disabled={disabled}
         placeholder={leftPlaceholder}
-        className="w-49-percent-flush"
+        containerClassName="w-49-percent-flush"
         onChange={(value) =>
           onChangeValue(
             contentIndex,
@@ -89,7 +87,7 @@ const SplitInputText = ({ content, disabled, handleOnChangeJpConvertText, conten
         id={content.customId2 || undefined}
         disabled={disabled}
         placeholder={rightPlaceholder}
-        className="w-49-percent"
+        containerClassName="w-49-percent"
         onChange={(value) =>
           onChangeValue(
             contentIndex,
@@ -120,7 +118,7 @@ const SingleInputText = ({ content, disabled, handleOnChangeJpConvertText, conte
         disabled={disabled}
         placeholder={placeholder}
         onChange={handleOnChangeJpConvertText(contentIndex, content.type, textInput.type, "value")}
-        className="w-49-percent-flush"
+        className="m-b-0"
         value={inputValue}
         debounceTime={RENDER_CHATBOT_CONFIG.DEBOUNCE_INPUT_TEXT_JP_CONVERT}
       />
@@ -132,7 +130,7 @@ const SingleInputText = ({ content, disabled, handleOnChangeJpConvertText, conte
       id={content.customId || undefined}
       disabled={disabled}
       placeholder={placeholder}
-      className="w-49-percent-flush"
+      className="m-b-0"
       onChange={(value) =>
         onChangeValue(
           contentIndex,
