@@ -18,7 +18,7 @@ const HtmlCodeMessagePreview = ({
   const iconMess = botInfor?.icon_mess;
 
   return (
-    <div className="position-relative">
+    <div className="ss-bot-chat-text-input-shell position-relative">
       <div
         className={`ss-bot-chat-overview-${contentIndex} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value position-relative html-code-message-preview ${isUseForUgc ? DISPLAY_UGC_CLASS : ''}`}
         style={{

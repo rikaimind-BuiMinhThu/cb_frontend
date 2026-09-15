@@ -212,7 +212,7 @@
 }
 
 .ss-layout-settings-modal--code {
-  --ss-modal-width: 1100px;
+  --ss-modal-width: 1280px;
   max-height: 90vh;
 }
 
@@ -518,10 +518,34 @@
 
 .ss-settings-timer-view .counting_down_input_wrapper {
   display: flex;
-  align-items: center;
-  gap: 4px;
+  align-items: stretch;
+  gap: 0;
   flex: 1;
-  min-width: 80px;
+  min-width: 96px;
+}
+
+.ss-settings-timer-view .counting_down_input_wrapper .ss-input-value,
+.ss-settings-timer-view .counting_down_input_wrapper input {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  min-width: 0;
+  flex: 1;
+}
+
+.ss-settings-timer-view .counting_down_input_label {
+  aspect-ratio: auto;
+  height: auto;
+  min-width: 36px;
+  padding: 0 10px;
+  border: 1px solid #d9d9d9;
+  border-left: none;
+  border-radius: 0 6px 6px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fafafa;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .ss-settings-timer-view .modal_timer_config-html_holder {

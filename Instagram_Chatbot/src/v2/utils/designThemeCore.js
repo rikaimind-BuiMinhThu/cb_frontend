@@ -550,6 +550,7 @@ export const resolveBotMessageTheme = (themeSettings, botInfor) => {
     bgColor: theme.botMessageBgColor,
     textColor: theme.botMessageTextColor,
     fontSize: theme.botMessageFontSize,
+    showTail: normalizeMessageBorderStyle(theme.botMessageBorderStyle, 'with_tail') === 'with_tail',
   };
 };
 

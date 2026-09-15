@@ -101,8 +101,6 @@ const ScenarioSettingsMainView = ({ onClose }) => {
     const isFukushashiki = value === EXECUTION_POLICIES.FUKUSHASHIKI;
     setIsUseFukushashiki(isFukushashiki);
     if (!isFukushashiki) {
-      setIsUseCustomCss(false);
-      setIsUseCustomJsCode(false);
       setIsUseErrMsgByJs(false);
       setIsUseAmazonPay(false);
       setIsClearLandingPageSession(false);
@@ -307,36 +305,37 @@ const ScenarioSettingsMainView = ({ onClose }) => {
             </div>
           )}
 
+          <OverviewCheckboxRow
+            checked={isUseCustomCss}
+            onChange={(checked) => setIsUseCustomCss(checked)}
+            label={labelWithTooltip('カスタムCSSを適用する', 'isUseCustomCss')}
+            actionButton={isUseCustomCss && (
+              <button
+                type="button"
+                className="ss-settings-modal-action-link"
+                onClick={() => navigateSettingsModalView(SETTINGS_MODAL_VIEWS.CSS)}
+              >
+                設定する →
+              </button>
+            )}
+          />
+          <OverviewCheckboxRow
+            checked={isUseCustomJsCode}
+            onChange={(checked) => setIsUseCustomJsCode(checked)}
+            label={labelWithTooltip('カスタムJSを適用する', 'isUseCustomJsCode')}
+            actionButton={isUseCustomJsCode && (
+              <button
+                type="button"
+                className="ss-settings-modal-action-link"
+                onClick={() => navigateSettingsModalView(SETTINGS_MODAL_VIEWS.JS)}
+              >
+                設定する →
+              </button>
+            )}
+          />
+
           {isUseFukushashiki && (
             <>
-              <OverviewCheckboxRow
-                checked={isUseCustomCss}
-                onChange={(checked) => setIsUseCustomCss(checked)}
-                label={labelWithTooltip('カスタムCSSを適用する', 'isUseCustomCss')}
-                actionButton={isUseCustomCss && (
-                  <button
-                    type="button"
-                    className="ss-settings-modal-action-link"
-                    onClick={() => navigateSettingsModalView(SETTINGS_MODAL_VIEWS.CSS)}
-                  >
-                    設定する →
-                  </button>
-                )}
-              />
-              <OverviewCheckboxRow
-                checked={isUseCustomJsCode}
-                onChange={(checked) => setIsUseCustomJsCode(checked)}
-                label={labelWithTooltip('カスタムJSを適用する', 'isUseCustomJsCode')}
-                actionButton={isUseCustomJsCode && (
-                  <button
-                    type="button"
-                    className="ss-settings-modal-action-link"
-                    onClick={() => navigateSettingsModalView(SETTINGS_MODAL_VIEWS.JS)}
-                  >
-                    設定する →
-                  </button>
-                )}
-              />
               <OverviewCheckboxRow
                 checked={isUseErrMsgByJs}
                 onChange={(checked) => setIsUseErrMsgByJs(checked)}

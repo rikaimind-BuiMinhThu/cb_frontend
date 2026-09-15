@@ -9,7 +9,7 @@ const DefaultTypeSetting = (props) => {
   const { changeContent, toggleInitialSelection } = buildRadioButtonSettingContext(props);
 
   const renderItemExtra = (itemRadio, indexRadio) => (
-    <>
+    <div className="ss-radio-button-setting__default-item-extra">
       <InitialSelectionCheckbox
         item={itemRadio}
         radioButton={radioButton}
@@ -21,7 +21,7 @@ const DefaultTypeSetting = (props) => {
           onChange={changeContent(radioButton.type, indexRadio, 'preset_config')}
         />
       )}
-    </>
+    </div>
   );
 
   return (

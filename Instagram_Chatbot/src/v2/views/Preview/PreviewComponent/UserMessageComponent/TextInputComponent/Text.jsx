@@ -7,6 +7,12 @@ import InputDebounce from "v2/views/ScenarioSetting/scenarioCommon/InputDebounce
 
 const TEXT_INPUT_TYPE_TEXT = "text";
 
+const resolveChatInputValue = (value, placeholder) => {
+  if (value == null || value === EMPTY_INPUT_VALUE) return EMPTY_INPUT_VALUE;
+  if (placeholder && String(value) === String(placeholder)) return EMPTY_INPUT_VALUE;
+  return value;
+};
+
 const Text = ({ content, disabled, handleOnChangeJpConvertText, contentIndex, onChangeValue }) => {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.TEXT_INPUT || content.text_input.type !== TEXT_INPUT_TYPE_TEXT) return null;
   const textInput = content.text_input;
@@ -31,25 +37,30 @@ const SplitInputText = ({ content, disabled, handleOnChangeJpConvertText, conten
   const textInput = content.text_input;
   if (!textInput.text?.isSplitInput) return null;
 
+  const leftPlaceholder = textInput.text?.placeholderLeft;
+  const rightPlaceholder = textInput.text?.placeholderRight;
+  const leftValue = resolveChatInputValue(textInput[textInput.type]?.valueLeft, leftPlaceholder);
+  const rightValue = resolveChatInputValue(textInput[textInput.type]?.valueRight, rightPlaceholder);
+
   if (textInput.isUseConvertText) {
     return (
       <>
         <InputDebounce
           id={content.customId1 || undefined}
           disabled={disabled}
-          placeholder={textInput.text?.placeholderLeft}
+          placeholder={leftPlaceholder}
           className="w-49-percent-flush"
           onChange={handleOnChangeJpConvertText(contentIndex, content.type, textInput.type, "valueLeft")}
-          value={textInput[textInput.type]?.valueLeft || EMPTY_INPUT_VALUE}
+          value={leftValue}
           debounceTime={RENDER_CHATBOT_CONFIG.DEBOUNCE_INPUT_TEXT_JP_CONVERT}
         />
         <InputDebounce
           id={content.customId2 || undefined}
           disabled={disabled}
-          placeholder={textInput.text?.placeholderRight}
+          placeholder={rightPlaceholder}
           className="w-49-percent"
           onChange={handleOnChangeJpConvertText(contentIndex, content.type, textInput.type, "valueRight")}
-          value={textInput[textInput.type]?.valueRight || EMPTY_INPUT_VALUE}
+          value={rightValue}
           debounceTime={RENDER_CHATBOT_CONFIG.DEBOUNCE_INPUT_TEXT_JP_CONVERT}
         />
       </>
@@ -61,7 +72,7 @@ const SplitInputText = ({ content, disabled, handleOnChangeJpConvertText, conten
       <InputCustom
         id={content.customId1 || undefined}
         disabled={disabled}
-        placeholder={textInput.text?.placeholderLeft}
+        placeholder={leftPlaceholder}
         className="w-49-percent-flush"
         onChange={(value) =>
           onChangeValue(
@@ -72,12 +83,12 @@ const SplitInputText = ({ content, disabled, handleOnChangeJpConvertText, conten
             "valueLeft",
           )
         }
-        value={textInput[textInput.type]?.valueLeft || EMPTY_INPUT_VALUE}
+        value={leftValue}
       />
       <InputCustom
         id={content.customId2 || undefined}
         disabled={disabled}
-        placeholder={textInput.text?.placeholderRight}
+        placeholder={rightPlaceholder}
         className="w-49-percent"
         onChange={(value) =>
           onChangeValue(
@@ -88,7 +99,7 @@ const SplitInputText = ({ content, disabled, handleOnChangeJpConvertText, conten
             "valueRight"
           )
         }
-        value={textInput[textInput.type]?.valueRight || EMPTY_INPUT_VALUE}
+        value={rightValue}
       />
     </>
   );
@@ -99,15 +110,18 @@ const SingleInputText = ({ content, disabled, handleOnChangeJpConvertText, conte
   const textInput = content.text_input;
   if (textInput.text?.isSplitInput) return null;
 
+  const placeholder = textInput.text?.placeholderLeft;
+  const inputValue = resolveChatInputValue(textInput[textInput.type]?.value, placeholder);
+
   if (textInput.isUseConvertText) {
     return (
       <InputDebounce
         id={content.customId || undefined}
         disabled={disabled}
-        placeholder={textInput.text?.placeholderLeft}
+        placeholder={placeholder}
         onChange={handleOnChangeJpConvertText(contentIndex, content.type, textInput.type, "value")}
         className="w-49-percent-flush"
-        value={textInput[textInput.type]?.value || EMPTY_INPUT_VALUE}
+        value={inputValue}
         debounceTime={RENDER_CHATBOT_CONFIG.DEBOUNCE_INPUT_TEXT_JP_CONVERT}
       />
     );
@@ -117,7 +131,7 @@ const SingleInputText = ({ content, disabled, handleOnChangeJpConvertText, conte
     <InputCustom
       id={content.customId || undefined}
       disabled={disabled}
-      placeholder={textInput.text?.placeholderLeft}
+      placeholder={placeholder}
       className="w-49-percent-flush"
       onChange={(value) =>
         onChangeValue(
@@ -128,7 +142,7 @@ const SingleInputText = ({ content, disabled, handleOnChangeJpConvertText, conte
           "value"
         )
       }
-      value={textInput[textInput.type]?.value || EMPTY_INPUT_VALUE}
+      value={inputValue}
     />
   );
 };

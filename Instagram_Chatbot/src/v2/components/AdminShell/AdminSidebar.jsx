@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Layout, Menu } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import { BOT_ID_COOKIE_KEY, BOT_TYPE_BOT, BOT_TYPE_COOKIE_KEY, USER_ROLE_COOKIE_KEY } from 'v2/api/constants';
+import { BOT_ID_COOKIE_KEY, BOT_TYPE_COOKIE_KEY, USER_ROLE_COOKIE_KEY } from 'v2/api/constants';
 import { getDefaultLandingPath } from 'v2/variables/constants';
 import logo from 'v2/assets/img/ecchatbot-logo.png';
 import {
@@ -65,22 +65,20 @@ const AdminSidebar = ({ collapsed, onCollapse }) => {
   const location = useLocation();
   const [botId, setBotId] = useState(EMPTY_VALUE);
   const [userRole, setUserRole] = useState(EMPTY_VALUE);
-  const [botType, setBotType] = useState(EMPTY_VALUE);
   const [client, setClient] = useState(null);
 
   useEffect(() => {
     setBotId(Cookies.get(BOT_ID_COOKIE_KEY) || EMPTY_VALUE);
     setUserRole(Cookies.get(USER_ROLE_COOKIE_KEY) || EMPTY_VALUE);
-    setBotType(Cookies.get(BOT_TYPE_COOKIE_KEY) || EMPTY_VALUE);
     setClient(parseStoredClient());
   }, [location.pathname]);
 
   const menuSource = useMemo(() => {
-    if (botType === BOT_TYPE_BOT || isBotMenuRoute(location.pathname)) {
+    if (isBotMenuRoute(location.pathname)) {
       return getBotMenuItems(botId);
     }
     return filterMenuByRole(getGlobalMenuItems(client), userRole);
-  }, [botType, botId, client, userRole, location.pathname]);
+  }, [botId, client, userRole, location.pathname]);
 
   const menuItems = useMemo(() => buildMenuItems(menuSource), [menuSource]);
   const allPaths = useMemo(() => flattenPaths(menuSource), [menuSource]);

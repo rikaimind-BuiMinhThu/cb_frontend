@@ -34,7 +34,7 @@ const InputDouble = ({
       {!valueOnly && (
         <input
           onChange={(e) => onChange(e.target.value, 'left')}
-          value={valueLeft}
+          value={valueLeft ?? ''}
           type="text"
           name="ss-user-setting__name"
           placeholder={placeholder?.[0]}
@@ -45,7 +45,7 @@ const InputDouble = ({
       {(showSecondInput || valueOnly) && (
         <input
           onChange={(e) => onChange(e.target.value, 'right')}
-          value={valueRight}
+          value={valueRight ?? ''}
           type="text"
           disabled={disabled}
           name="ss-user-setting__name"

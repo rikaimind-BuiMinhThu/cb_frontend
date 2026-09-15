@@ -37,6 +37,7 @@
 
 .ss-radio-button-setting__item-panel {
   display: flex;
+  flex-direction: column;
   align-items: flex-start;
   gap: 8px;
   margin-bottom: 10px;
@@ -45,6 +46,11 @@
   padding: 8px 10px;
   border-radius: 4px;
   box-sizing: border-box;
+}
+
+/* Image / upsell options keep grip + body as a horizontal row */
+.ss-radio-button-setting__item-panel:has(> .ss-radio-button-setting__img-grip) {
+  flex-direction: row;
 }
 
 .ss-radio-button-setting__img-grip {
@@ -110,6 +116,15 @@
 .ss-radio-button-setting__default-row {
   display: flex;
   align-items: center;
+  width: 100%;
+}
+
+.ss-radio-button-setting__default-item-extra {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
 }
 
 .ss-radio-button-setting__add-row {
@@ -141,6 +156,13 @@
 
 .ss-radio-button-setting__initial-selection {
   width: 100%;
+}
+
+.ss-radio-button-setting__initial-selection .ant-checkbox-wrapper {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  white-space: nowrap;
 }
 
 .ss-radio-button-setting__img-item-footer {

@@ -1,7 +1,13 @@
+const EMPTY_SELECTION_VALUE = '';
+const PLACEHOLDER_VALUE_LABEL = '値';
+
 export const getRadioOptionSelectionKey = (item) => {
   const value = item?.value;
-  if (value !== undefined && value !== null && String(value).trim() !== '') {
-    return value;
+  if (value !== undefined && value !== null) {
+    const trimmed = String(value).trim();
+    if (trimmed !== EMPTY_SELECTION_VALUE && trimmed !== PLACEHOLDER_VALUE_LABEL) {
+      return value;
+    }
   }
   return item?.id;
 };

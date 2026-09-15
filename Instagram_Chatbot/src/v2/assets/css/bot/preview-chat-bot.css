@@ -321,6 +321,14 @@
     width: 87%;
     display: flex;
     align-items: center;
+    overflow: visible;
+}
+
+.ss-bot-chat-text-input-shell {
+  position: relative;
+  overflow: visible;
+  width: fit-content;
+  max-width: 100%;
 }
 
 .sp-body-user-side {

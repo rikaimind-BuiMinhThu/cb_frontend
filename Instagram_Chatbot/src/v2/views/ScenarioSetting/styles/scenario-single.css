@@ -1273,8 +1273,16 @@ input#ss-message__content--user-radio_button,
 }
 
 ::placeholder {
-  color: #ccc;
+  color: #9ca3af;
   font-size: 14px;
+  opacity: 1;
+}
+
+.ss-input-value::placeholder,
+.ss-user-setting__item-input-bottom::placeholder,
+.ss-user-setting-double-input input::placeholder {
+  color: #9ca3af !important;
+  opacity: 1;
 }
 
 .ss-user-setting-phone-number-hyphens {
@@ -2123,17 +2131,23 @@ input#ss-message__content--user-radio_button,
 
 .counting_down_input_wrapper {
   display: flex;
-  gap: 5px;
+  align-items: stretch;
+  gap: 0;
 }
 
 .counting_down_input_label {
-  aspect-ratio: 1/1;
-  height: 100%;
+  aspect-ratio: auto;
+  height: auto;
+  min-width: 36px;
+  padding: 0 10px;
   border: 1px solid grey;
-  border-radius: 5px;
+  border-left: none;
+  border-radius: 0 5px 5px 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .loading-submit-button_holder {

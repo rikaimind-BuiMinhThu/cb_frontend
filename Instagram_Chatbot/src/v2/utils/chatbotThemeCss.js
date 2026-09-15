@@ -450,10 +450,25 @@ ${previewButtonGroupSelector} {
     scopedDescendant(scopeSelector, '.html-code-message-icon'),
     scopedDescendant(scopeSelector, '.theme-customize-preview__bot-bubble-tail'),
   ].join(',\n');
+  const botMessageTailShowSelectors = [
+    scopedDescendant(scopeSelector, '.ss-bot-chat-text-input-bot-icon'),
+    scopedDescendant(scopeSelector, '.html-code-message-icon'),
+    scopedDescendant(scopeSelector, '.theme-customize-preview__bot-bubble-tail'),
+  ].join(',\n');
+  const botMessageTailShellSelectors = [
+    scopedDescendant(scopeSelector, '.ss-bot-chat-text-input-shell'),
+    scopedDescendant(scopeSelector, '.sp-body-bot-side-messages'),
+  ].join(',\n');
   const botMessageTailRules = botMessageBorderStyle === 'no_tail' ? `
 ${botMessageTailHideSelectors} {
   display: none !important;
-}` : '';
+}` : `
+${botMessageTailShellSelectors} {
+  overflow: visible !important;
+}
+${botMessageTailShowSelectors} {
+  display: flex !important;
+}`;
 
   const userMessageShellSelector = scopedDescendant(
     scopeSelector,

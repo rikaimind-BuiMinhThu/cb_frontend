@@ -108,7 +108,11 @@ const EmailInput = ({
         className={className}
         placeholder={placeholder}
         onChange={handleChange}
-        value={value || EMPTY_INPUT_VALUE}
+        value={
+          placeholder && value === placeholder
+            ? EMPTY_INPUT_VALUE
+            : (value || EMPTY_INPUT_VALUE)
+        }
         onKeyDown={handleKeyDown}
         onBlur={handleBlur}
         onFocus={() => openSuggestionsIfNeeded(value)}
