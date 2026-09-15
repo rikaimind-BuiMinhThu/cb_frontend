@@ -836,7 +836,7 @@ const handleSaveInputContent = (newState, subContent, contentType, field, value)
       return item;
     }
 
-    item.default_value = getDefaultValue(subContent, contentType, field, value, newState.prefecturesList, newState.variables, variableName);
+    item.default_value = getDefaultValue(subContent, contentType, value, field, newState.prefecturesList, newState.variables, variableName);
 
     newState.objParam[variableName] = value;
   });
