@@ -75,17 +75,26 @@ const withPseudoOnEach = (selectorList, pseudo) =>
     .map((selector) => `${selector.trim()}${pseudo}`)
     .join(', ');
 
-const buildFieldSelectors = (spBodySelector) => `
+const buildFieldTextSelectors = (spBodySelector) => `
 ${spBodySelector} input[type="text"]:not(.theme-preview--field-focus),
 ${spBodySelector} input[type="email"]:not(.theme-preview--field-focus),
 ${spBodySelector} input[type="tel"]:not(.theme-preview--field-focus),
 ${spBodySelector} input[type="number"]:not(.theme-preview--field-focus),
 ${spBodySelector} input[type="password"]:not(.theme-preview--field-focus),
 ${spBodySelector} textarea:not(.theme-preview--field-focus),
-${spBodySelector} select:not(.theme-preview--field-focus),
 ${spBodySelector} .ss-input-value:not(.ss-bot-chat-detail-content):not(.theme-preview--field-focus),
-${spBodySelector} .ss-input-custom-field:not(.ss-bot-chat-detail-content),
+${spBodySelector} .ss-input-custom-field:not(.ss-bot-chat-detail-content)
+`.trim();
+
+const buildFieldSelectSelectors = (spBodySelector) => `
+${spBodySelector} select:not(.theme-preview--field-focus),
+${spBodySelector} .select-custom-native:not(.theme-preview--field-focus),
 ${spBodySelector} .ant-select-selector
+`.trim();
+
+const buildFieldSelectors = (spBodySelector) => `
+${buildFieldTextSelectors(spBodySelector)},
+${buildFieldSelectSelectors(spBodySelector)}
 `.trim();
 
 const buildFieldPlaceholderSelectors = (spBodySelector) => `
@@ -350,7 +359,8 @@ const buildTwinkleAnimationRule = (effectId, elementType, theme) => {
 const buildThemeRules = (theme, scopeSelector = '') => {
   const fieldScopeSelectors = buildFieldScopeSelectors(scopeSelector);
   const spBodySelector = fieldScopeSelectors[0];
-  const fieldSelectors = combineScopedFieldSelectors(scopeSelector, buildFieldSelectors);
+  const fieldTextSelectors = combineScopedFieldSelectors(scopeSelector, buildFieldTextSelectors);
+  const fieldSelectSelectors = combineScopedFieldSelectors(scopeSelector, buildFieldSelectSelectors);
   const fieldPlaceholderSelectors = combineScopedFieldSelectors(
     scopeSelector,
     buildFieldPlaceholderSelectors,
@@ -640,9 +650,16 @@ ${scopedDescendant(scopeSelector, '.ss-bot-message .ss-bot-message__content')} {
   font-size: var(--c-bot-msg-font-size, 14px) !important;
 }
 
-${fieldSelectors} {
+${fieldTextSelectors} {
   border: 1px solid var(--c-field-unfocus-border, gray) !important;
   background-color: var(--c-field-unfocus-bg, #EFF4FD) !important;
+  font-size: var(--c-field-font-size, 14px) !important;
+  ${transitionRule}
+}
+
+${fieldSelectSelectors} {
+  border: 1px solid var(--c-field-unfocus-border, gray) !important;
+  background-color: #ffffff !important;
   font-size: var(--c-field-font-size, 14px) !important;
   ${transitionRule}
 }
