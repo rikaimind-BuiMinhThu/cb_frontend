@@ -7,7 +7,7 @@ export const SCENARIO_MODAL_TOOLTIPS = {
   launchButtonSelectors: '複数セレクターはカンマ区切り。クリックでチャットボットを開きます。',
   isUseCustomCss: 'カスタムCSSをチャットボットに適用します。',
   isUseCustomJsCode: 'カスタムJSコードをチャットボットに適用します。',
-  isUseHtmlUgc: 'UGCコンテンツ（Instagram/TikTok/レビュー）をチャットボットに埋め込みます。',
+  isUseHtmlUgc: 'UGCコンテンツ（Instagram/TikTok/レビュー）をチャットボットに埋め込みます。「設定する」から種別（Instagram / TikTok / レビュー）を選択してください。',
   timer: 'チャットボット内にカウントダウンタイマーを表示します。',
   isUseErrMsgByJs: 'フォームのエラーメッセージをJSまたはセレクターで取得します。',
   isUseOnlyRegularOrder: '定期注文のみを対象とします。',

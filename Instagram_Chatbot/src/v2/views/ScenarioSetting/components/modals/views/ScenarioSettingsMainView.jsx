@@ -209,7 +209,7 @@ const ScenarioSettingsMainView = ({ onClose }) => {
               className="ss-settings-modal-action-link"
               onClick={() => navigateSettingsModalView(SETTINGS_MODAL_VIEWS.HTML_UGC)}
             >
-              設定する →
+              設定する（Instagram / TikTok / レビュー） →
             </button>
           )}
         />

@@ -282,6 +282,79 @@
     }
   };
 
+  // src/v2/sdk/integrations/ugcModalBridge.js
+  var DEFAULT_UGC_HOST = "https://st.ugc-creative.com";
+  var appendStylesheet = (href) => {
+    if (document.querySelector(`link[href="${href}"]`)) return;
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = href;
+    document.head.appendChild(link);
+  };
+  var appendScript = (src) => new Promise((resolve) => {
+    if (document.querySelector(`script[src="${src}"]`)) {
+      resolve();
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = src;
+    script.onload = script.onerror = () => resolve();
+    document.body.appendChild(script);
+  });
+  var ensureHiddenHostInput = (id, ugcHost) => {
+    let el = document.getElementById(id);
+    if (!el) {
+      el = document.createElement("input");
+      el.type = "hidden";
+      el.id = id;
+      document.body.appendChild(el);
+    }
+    el.setAttribute("data-host", ugcHost);
+  };
+  var injectUgcHostModalAssets = (..._0) => __async(null, [..._0], function* ({
+    ugcHost = DEFAULT_UGC_HOST,
+    hasInstagram = false,
+    hasTiktok = false
+  } = {}) {
+    if (window.__ugcHostModalAssetsLoaded) return;
+    window.__ugcHostModalAssetsLoaded = true;
+    if (!document.getElementById("ugc-host-swal-zindex")) {
+      const style = document.createElement("style");
+      style.id = "ugc-host-swal-zindex";
+      style.textContent = ".swal2-container{z-index:10000000!important;}";
+      document.head.appendChild(style);
+    }
+    appendStylesheet(
+      "https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/10.7.0/sweetalert2.min.css"
+    );
+    appendStylesheet(`${ugcHost}/ugc/css/popup.css`);
+    appendStylesheet(
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css"
+    );
+    yield appendScript(
+      "https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/10.7.0/sweetalert2.min.js"
+    );
+    if (hasInstagram) {
+      ensureHiddenHostInput("ugc-slider-info", ugcHost);
+      yield appendScript(`${ugcHost}/ugc/js/take.js`);
+    }
+    if (hasTiktok) {
+      ensureHiddenHostInput("ugc-tiktok-slider-info", ugcHost);
+      yield appendScript(`${ugcHost}/ugc/js/tiktoks/take.js`);
+    }
+  });
+  var registerUgcChatbotModalBridge = () => {
+    window.addEventListener("message", (e) => {
+      if (!e.data || e.data.action !== "ugcEnableChatbotModalBridge") return;
+      window.__ugcChatbotModalBridgeEnabled = true;
+      injectUgcHostModalAssets({
+        ugcHost: e.data.ugcHost || DEFAULT_UGC_HOST,
+        hasInstagram: !!e.data.hasInstagram,
+        hasTiktok: !!e.data.hasTiktok
+      });
+    });
+  };
+
   // src/v2/sdk/constants.js
   var WAIT_TO_LOAD_AMAZON_DATA_MAX_COUNT = 20;
   var WAIT_FOR_ELEMENT_MAX_COUNT = 50;
@@ -2055,6 +2128,7 @@
     if (redirected) return;
     initSentry();
     ensureJQuery();
+    registerUgcChatbotModalBridge();
     displayPopup();
   });
 })();
