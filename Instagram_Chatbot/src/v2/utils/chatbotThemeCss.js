@@ -680,7 +680,7 @@ ${userMessageWrapperDirectChildSelector} {
 }
 
 ${userMessageWrapperDirectChildSelector}:has(.ss-message__content--user-zip-code-address-search-link) {
-  padding: 20px;
+  padding: 30px;
 }
 ${botMessageTailRules}
 ${userMessageTailRules}
