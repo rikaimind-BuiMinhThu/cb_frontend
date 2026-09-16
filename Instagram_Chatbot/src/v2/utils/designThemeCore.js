@@ -445,7 +445,7 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
     fieldFocusBgColor: '#ffffff',
     fieldFocusBgEffect: 'outline_soft',
     fieldUnfocusBorderColor: '#cccccc',
-    fieldUnfocusBgColor: '#ffffff',
+    fieldUnfocusBgColor: '#EFF4FD',
     fieldFontSize: '14px',
     validationMessageBgColor: 'transparent',
     validationMessageTextColor: '#FF7E00',
@@ -538,6 +538,21 @@ export const mergeThemeWithDefaults = (rawTheme, mainColorHex, apiColorKey) => {
     if (!rawTheme.headerSubtitleTextColor && !rawTheme.header_subtitle_text_color) {
       merged.headerSubtitleTextColor = legacyHeaderColor;
     }
+  }
+
+  // Prior factory default was #ffffff; v1 never applied it (CSS #EFF4FD). Coerce
+  // saved pure white so v2 LP matches v1 default field background.
+  const unfocusBg = typeof merged.fieldUnfocusBgColor === 'string'
+    ? merged.fieldUnfocusBgColor.trim().toLowerCase()
+    : '';
+  if (
+    unfocusBg === '#fff'
+    || unfocusBg === '#ffffff'
+    || unfocusBg === 'rgb(255, 255, 255)'
+    || unfocusBg === 'rgb(255,255,255)'
+    || unfocusBg === 'white'
+  ) {
+    merged.fieldUnfocusBgColor = '#EFF4FD';
   }
 
   return merged;

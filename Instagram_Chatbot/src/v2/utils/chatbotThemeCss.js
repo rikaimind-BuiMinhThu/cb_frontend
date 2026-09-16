@@ -636,7 +636,7 @@ ${scopedDescendant(scopeSelector, '.ss-bot-message .ss-bot-message__content')} {
 
 ${fieldSelectors} {
   border: 1px solid var(--c-field-unfocus-border, #ccc) !important;
-  background-color: var(--c-field-unfocus-bg, #fff) !important;
+  background-color: var(--c-field-unfocus-bg, #EFF4FD) !important;
   font-size: var(--c-field-font-size, 14px) !important;
   ${transitionRule}
 }
@@ -677,6 +677,10 @@ ${userMessageWrapperSelector} {
 ${userMessageWrapperDirectChildSelector} {
   padding: 10px;
   border-radius: 20px;
+}
+
+${userMessageWrapperDirectChildSelector}:has(.ss-message__content--user-zip-code-address-search-link) {
+  padding: 20px;
 }
 ${botMessageTailRules}
 ${userMessageTailRules}

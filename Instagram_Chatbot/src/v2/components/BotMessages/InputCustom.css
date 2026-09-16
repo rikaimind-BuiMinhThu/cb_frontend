@@ -16,6 +16,8 @@
   box-sizing: border-box;
   flex: 1 1 auto;
   min-width: 0;
+  /* Match v1 InputCustom: always reserve clear-icon gutter */
+  padding-right: 30px;
 }
 
 .ss-input-custom-field--with-clear {
