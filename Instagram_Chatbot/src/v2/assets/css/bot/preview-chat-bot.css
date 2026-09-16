@@ -84,8 +84,8 @@
     display: flex;
     justify-content: center;
     width: 100%;
-    /* with item-bottom mb 10px → ~30px like v1 (wrap pb 20 + mb 10) */
-    padding-top: 20px;
+    /* padding avoids collapse with prior .ss-user-setting__item-bottom margin (→ ~20px like v1) */
+    padding-top: 10px;
 }
 
 .sp-container {
@@ -375,9 +375,9 @@
 }
 
 .ss-user-message__content-wrapper > .sp-user-message-button-action {
-    /* with item-bottom mb 10px → ~30px like v1 (wrap pb 20 + mb 10) */
+    /* padding avoids collapse with prior .ss-user-setting__item-bottom margin (→ ~20px like v1) */
     margin-top: 0;
-    padding-top: 20px;
+    padding-top: 10px;
 }
 
 .underline-none:hover {
@@ -1481,12 +1481,10 @@ slideUp
   text-align: right;
 }
 
-/* Match v1 〒検索 inset (~29px from white msgs edge = msgs 10 + wrap ~20) */
-.sp-container .ss-user-message__content-wrapper:has(.ss-message__content--user-zip-code-address-search-link),
-.sp-container1 .ss-user-message__content-wrapper:has(.ss-message__content--user-zip-code-address-search-link),
-#sp-container .ss-user-message__content-wrapper:has(.ss-message__content--user-zip-code-address-search-link),
-#sp-container1 .ss-user-message__content-wrapper:has(.ss-message__content--user-zip-code-address-search-link) {
-  padding: 30px;
+/* v2-only (.preview-open-frame): zip white card is content-wrapper — pad 20 to match v1 msgs-edge ~20.
+   Do not use unscoped .sp-container1 rules (shared with body 1.0 preview). */
+.preview-open-frame .ss-user-message__content-wrapper:has(.ss-message__content--user-zip-code-address-search-link) {
+  padding: 20px;
 }
 
 .ss-message__content--user-zip-code-address-post-code-label {
