@@ -873,6 +873,7 @@
   var DEFAULT_TAG_FIRING = {
     enabled: false,
     provider: TAG_FIRING_PROVIDERS.GTM,
+    measurement_id: "",
     open_event: DEFAULT_TAG_FIRING_EVENTS.open,
     start_event: DEFAULT_TAG_FIRING_EVENTS.start,
     complete_event: DEFAULT_TAG_FIRING_EVENTS.complete
@@ -1471,6 +1472,8 @@
   };
 
   // src/v2/utils/sdkLayoutUtils.js
+  var DEFAULT_WIDTH_PC = 380;
+  var DEFAULT_HEIGHT_PC = 620;
   var toLayoutNumber = (value, defaultValue) => {
     if (value == null || value === "") {
       return defaultValue;
@@ -1494,8 +1497,8 @@
       };
     }
     return {
-      width: toLayoutNumber(widthPc, 450),
-      height: toLayoutNumber(heightPc, 700)
+      width: toLayoutNumber(widthPc, DEFAULT_WIDTH_PC),
+      height: toLayoutNumber(heightPc, DEFAULT_HEIGHT_PC)
     };
   };
   var getClosedIframeDimensions = ({

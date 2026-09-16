@@ -9,7 +9,7 @@ const DESIGN_TYPE_CHROME = {
     windowRadius: '5px',
     headerRadius: '5px',
     windowShadow: '0 2px 5px rgba(0, 0, 0, 0.2)',
-    bubbleRadius: '16px',
+    bubbleRadius: '20px',
     launcherRadius: '25px',
     launcherShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
   },

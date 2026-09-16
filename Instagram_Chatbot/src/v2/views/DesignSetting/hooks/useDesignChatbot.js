@@ -16,9 +16,11 @@ import {
   CHATBOTS_API_PATH_RELATIVE,
   CREATE_BOT_SUCCESS,
   CREATE_REDIRECT_DELAY_MS,
+  DEFAULT_HEIGHT_PC,
   DEFAULT_ICON_PRESET_INDEX,
   DEFAULT_IMAGES,
   DEFAULT_MAIN_COLOR,
+  DEFAULT_WIDTH_PC,
   DESIGN_SETTINGS_SUFFIX,
   DESIGN_TYPE_DEFAULT,
   ICON_LOAD_ERROR,
@@ -98,8 +100,8 @@ export const useDesignChatbot = (initialBotId, options = EMPTY_OPTIONS) => {
   const [iconPresetIndices, setIconPresetIndices] = useState(INITIAL_ICON_PRESET_INDICES);
 
   const [displayType, setDisplayType] = useState(1);
-  const [widthPc, setWidthPc] = useState(380);
-  const [heightPc, setHeightPc] = useState(620);
+  const [widthPc, setWidthPc] = useState(DEFAULT_WIDTH_PC);
+  const [heightPc, setHeightPc] = useState(DEFAULT_HEIGHT_PC);
   const [widthSp, setWidthSp] = useState(100);
   const [heightSp, setHeightSp] = useState(100);
   const [positionPc, setPositionPc] = useState(1);

@@ -3,6 +3,10 @@ import ReactDom from 'react-dom';
 import "v2/assets/css/bot/preview-chat-bot.css";
 import { Row, Col } from "antd";
 import { Button } from "reactstrap";
+import {
+  DEFAULT_HEIGHT_PC,
+  DEFAULT_WIDTH_PC,
+} from "v2/views/DesignSetting/constants/designChatbotConstants";
 import {isMobile} from "./Utils";
 import {
   isWithdrawalPreventionEnabled,
@@ -14,8 +18,8 @@ const PreventExitChatbotModal = ({ isOpen, onClose, onCloseBot, botConfig }) => 
   const modalClassName = isMobile() ? "ss-bot-prevent-exit-chatbot-modal-sp" : "ss-bot-prevent-exit-chatbot-modal-pc";
   const {widthSp, heightSp, widthPc, heightPc, bottomMarginPc, rightMarginPc, botInfor} = botConfig;
   const modalCssVars = {
-    '--prevent-exit-width': isMobile() ? `${widthSp || 100}%` : `${widthPc || 450}px`,
-    '--prevent-exit-height': isMobile() ? `${heightSp || 100}%` : `${heightPc || 700}px`,
+    '--prevent-exit-width': isMobile() ? `${widthSp || 100}%` : `${widthPc || DEFAULT_WIDTH_PC}px`,
+    '--prevent-exit-height': isMobile() ? `${heightSp || 100}%` : `${heightPc || DEFAULT_HEIGHT_PC}px`,
     '--prevent-exit-bottom': isMobile() ? `0px` : `${bottomMarginPc || 0}px`,
     '--prevent-exit-right': isMobile() ? `0px` : `${rightMarginPc || 30}px`,
   };

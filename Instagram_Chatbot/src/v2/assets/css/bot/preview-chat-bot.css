@@ -92,7 +92,7 @@
     right: 10px;
     width: 380px;
     height: 620px;
-    background-color: #EBF7FF;
+    background-color: #D6E0EF;
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
     z-index: 900;
@@ -211,7 +211,7 @@
 }
 
 .sp-process-bar {
-    background-color: #EBF7FF;
+    background-color: #D6E0EF;
     margin-top: 1px;
 }
 
@@ -220,7 +220,7 @@
     min-width: 25%;
     height: 20px;
     width: var(--sp-process-bar-width, 0%);
-    background-color: var(--sp-process-bar-color, #70A5FC);
+    background-color: var(--sp-process-bar-color, #327AED);
     padding: 0 5px;
     color: #FFFFFF;
     display: block;
@@ -1607,7 +1607,7 @@ slideUp
 }
 
 .ss-bot-chat-delay {
-  background-color: #EBF7FF;
+  background-color: #D6E0EF;
   height: 40px;
   border-radius: 10px;
 }

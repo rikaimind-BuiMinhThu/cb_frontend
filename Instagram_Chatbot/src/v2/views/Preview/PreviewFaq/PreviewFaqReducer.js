@@ -25,6 +25,10 @@ import {
 import { getDefaultValue } from 'v2/views/Preview/PreviewComponent/VariablesUtils';
 import { parseThemeSettings } from 'v2/views/DesignSetting/utils/designThemeUtils';
 import { resolveMainColorContext } from 'v2/views/DesignSetting/utils/designChatbotUtils';
+import {
+  DEFAULT_HEIGHT_PC,
+  DEFAULT_WIDTH_PC,
+} from 'v2/views/DesignSetting/constants/designChatbotConstants';
 import { parseTagFiringFromApi } from 'v2/views/ScenarioSetting/utils/tagFiringUtils';
 
 const PreviewFaqReducer = (state, action) => {
@@ -230,8 +234,8 @@ const PreviewFaqReducer = (state, action) => {
         activePopupCloseBot: Boolean(designSetting?.popup_close_bot),
         titleBubble: designSetting?.title_bubble || "簡単90秒で注文完了",
         displayType: resolvedDisplayType,
-        widthPc: toNumber(designSetting?.width_pc, 450),
-        heightPc: toNumber(designSetting?.height_pc, 700),
+        widthPc: toNumber(designSetting?.width_pc, DEFAULT_WIDTH_PC),
+        heightPc: toNumber(designSetting?.height_pc, DEFAULT_HEIGHT_PC),
         widthSp: toNumber(designSetting?.width_sp, 100),
         heightSp: toNumber(designSetting?.height_sp, 100),
         positionPc: designSetting?.position_pc || "1",

@@ -1,3 +1,6 @@
+export const DEFAULT_WIDTH_PC = 380;
+export const DEFAULT_HEIGHT_PC = 620;
+
 export const toLayoutNumber = (value, defaultValue) => {
   if (value == null || value === '') {
     return defaultValue;
@@ -60,8 +63,8 @@ export const computeOpenIframeSize = ({
   }
 
   return {
-    width: toLayoutNumber(widthPc, 450),
-    height: toLayoutNumber(heightPc, 700),
+    width: toLayoutNumber(widthPc, DEFAULT_WIDTH_PC),
+    height: toLayoutNumber(heightPc, DEFAULT_HEIGHT_PC),
   };
 };
 
@@ -168,7 +171,7 @@ export const getClosedLauncherPosition = (state, options = {}) => {
           left: 'auto',
         };
       }
-      const widthPc = toLayoutNumber(state?.widthPc, 450);
+      const widthPc = toLayoutNumber(state?.widthPc, DEFAULT_WIDTH_PC);
       return {
         bottom: `${widthPc / 2}px`,
         right: '-120px',
@@ -188,7 +191,7 @@ export const getClosedLauncherPosition = (state, options = {}) => {
       };
     }
 
-    const widthPc = toLayoutNumber(state?.widthPc, 450);
+    const widthPc = toLayoutNumber(state?.widthPc, DEFAULT_WIDTH_PC);
     const bottomMargin = toLayoutNumber(state?.bottomMarginPc, 0);
     return {
       bottom: bottomMargin

@@ -3,7 +3,9 @@ import { EC_CHATBOT_URL } from 'v2/variables/constants';
 import {
   CHAT_BODY_VERSION_DEFAULT,
   COLOR_MAP,
+  DEFAULT_HEIGHT_PC,
   DEFAULT_IMAGES,
+  DEFAULT_WIDTH_PC,
   OPEN_ANIMATION_DURATION_MS_DEFAULT,
   OPEN_ANIMATION_DURATION_MS_MAX,
   OPEN_ANIMATION_DURATION_MS_MIN,
@@ -289,8 +291,8 @@ export const parseDesignSettings = (rawSettings, mainColorHex, apiColorKey) => {
 
   return {
     displayType: parseNumericSetting(result?.display_type, 1),
-    widthPc: parseNumericSetting(result?.width_pc, 380),
-    heightPc: parseNumericSetting(result?.height_pc, 620),
+    widthPc: parseNumericSetting(result?.width_pc, DEFAULT_WIDTH_PC),
+    heightPc: parseNumericSetting(result?.height_pc, DEFAULT_HEIGHT_PC),
     widthSp: parseNumericSetting(result?.width_sp, 100),
     heightSp: parseNumericSetting(result?.height_sp, 100),
     positionPc: parseNumericSetting(result?.position_pc, 1),

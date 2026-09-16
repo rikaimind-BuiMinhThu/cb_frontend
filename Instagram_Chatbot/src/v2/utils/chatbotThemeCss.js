@@ -595,7 +595,7 @@ ${scopedClass(scopeSelector, '.sp-header-left-label-sub-title')} {
 }
 
 ${scopedClass(scopeSelector, '.sp-process-bar')} {
-  background-color: var(--c-progress-bg, #EBF7FF) !important;
+  background-color: var(--c-progress-bg, #D6E0EF) !important;
 }
 
 ${scopedClass(scopeSelector, '.sp-process-bar-color')} {
@@ -604,7 +604,7 @@ ${scopedClass(scopeSelector, '.sp-process-bar-color')} {
 }
 
 ${scopeSelector ? spBodySelector : '#sp-body.sp-body, .sp-body'} {
-  background-color: var(--c-chat-window-bg, #EBF7FF) !important;
+  background-color: var(--c-chat-window-bg, #D6E0EF) !important;
 }
 
 ${scopedClass(scopeSelector, '.ss-bot-message__content-wrapper')},
