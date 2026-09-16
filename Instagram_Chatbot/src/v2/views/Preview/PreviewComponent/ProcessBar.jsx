@@ -1,7 +1,7 @@
 import React from "react";
 import "v2/assets/css/bot/preview-chat-bot.css";
 import "moment/locale/zh-cn";
-import { resolveMainColorFromApi } from "v2/views/DesignSetting/utils/designChatbotUtils";
+import { resolveMainColorCss } from "v2/views/DesignSetting/utils/designChatbotUtils";
 import {
   PROCESS_BAR_COMPLETE_TEXT,
   formatProcessBarRemainingText,
@@ -17,8 +17,10 @@ const ProcessBar = ({
 }) => {
   const current = parseInt(currentIndex || PROCESS_BAR_EMPTY_INDEX, 10);
   const width = current >= maxIndex ? PROCESS_BAR_FULL_WIDTH : `${(current / maxIndex) * 100}%`;
-  const backgroundColor =
-    resolveMainColorFromApi(botInfor?.main_color) || botInfor?.main_color_other;
+  const backgroundColor = resolveMainColorCss(
+    botInfor?.main_color,
+    botInfor?.main_color_other,
+  );
 
   const getText = () => {
     if (currentIndex) {

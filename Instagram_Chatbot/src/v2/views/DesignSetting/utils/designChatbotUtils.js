@@ -157,7 +157,10 @@ export const resolveMainColorFromApi = (apiColor) => {
   return apiColor;
 };
 
-export { resolveMainColorContext } from 'v2/utils/designThemeCore';
+export {
+  resolveMainColorContext,
+  resolveMainColorCss,
+} from 'v2/utils/designThemeCore';
 
 export const buildBasicInfoPayload = ({
   title,

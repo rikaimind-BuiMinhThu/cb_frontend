@@ -163,6 +163,18 @@ const resolveMainColorFromApi = (apiColor) => {
   return apiColor;
 };
 
+/**
+ * CSS color for chrome surfaces (header / launcher / progress fill / buttons).
+ * Named API colors (e.g. "blue") stay as CSS keywords so computed styles match v1
+ * (`blue` → rgb(0,0,255)), not the Design Setting swatch hex (#327AED).
+ */
+export const resolveMainColorCss = (apiColor, otherColor) => {
+  if (apiColor && !String(apiColor).startsWith('#')) return apiColor;
+  if (otherColor) return otherColor;
+  if (apiColor) return apiColor;
+  return null;
+};
+
 export const resolveMainColorContext = (chatbot) => {
   const apiColorKey = chatbot?.main_color && !String(chatbot.main_color).startsWith('#')
     ? chatbot.main_color
@@ -171,8 +183,10 @@ export const resolveMainColorContext = (chatbot) => {
     || resolveMainColorFromApi(chatbot?.main_color)
     || chatbot?.main_color
     || DEFAULT_MAIN_COLOR;
+  const mainColorCss = resolveMainColorCss(chatbot?.main_color, chatbot?.main_color_other)
+    || mainColorHex;
 
-  return { apiColorKey, mainColorHex };
+  return { apiColorKey, mainColorHex, mainColorCss };
 };
 
 const VALID_EFFECT_IDS = new Set(FIELD_FOCUS_EFFECT_IDS);
@@ -380,6 +394,7 @@ export const resolveFieldFocusEffect = (effectId, theme) => {
         fieldTransition: 'none',
         focusAnimation: 'none',
         keyframesCss: '',
+        skipFocusStyle: true,
       };
     case 'outline_strong':
       return {
@@ -420,9 +435,11 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
   const opacityColor = preset?.opacity || lightenHex(mainColorHex, 0.1);
   const messageColor = preset?.message || mainColorHex;
   const fontColor = preset?.font || '#fff';
+  // Named main_color → CSS keyword for chrome/buttons (v1 parity: blue → #0000FF).
+  const chromeColor = apiColorKey || mainColorHex;
   const pressedColor = presetKey === 'black' || presetKey === 'white'
-    ? mainColorHex
-    : lightenHex(mainColorHex, -0.08) || mainColorHex;
+    ? chromeColor
+    : (apiColorKey ? chromeColor : (lightenHex(mainColorHex, -0.08) || mainColorHex));
 
   return {
     headerTitleTextColor: '#ffffff',
@@ -441,10 +458,11 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
     userMessageTextColor: '#333333',
     userMessageFontSize: '14px',
     userMessageBorderStyle: 'no_tail',
-    fieldFocusBorderColor: mainColorHex,
-    fieldFocusBgColor: '#ffffff',
-    fieldFocusBgEffect: 'outline_soft',
-    fieldUnfocusBorderColor: '#cccccc',
+    // Match v1 live fields: gray border, no focus chrome
+    fieldFocusBorderColor: 'gray',
+    fieldFocusBgColor: '#EFF4FD',
+    fieldFocusBgEffect: 'none',
+    fieldUnfocusBorderColor: 'gray',
     fieldUnfocusBgColor: '#EFF4FD',
     fieldFontSize: '14px',
     validationMessageBgColor: 'transparent',
@@ -452,7 +470,7 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
     validationMessageFontSize: '12px',
     requiredLabelTextColor: '#FF7E00',
     requiredLabelFontSize: '12px',
-    buttonNormalBgColor: mainColorHex,
+    buttonNormalBgColor: chromeColor,
     buttonNormalTextColor: '#ffffff',
     buttonPressedBgColor: pressedColor,
     buttonPressedTextColor: '#ffffff',
@@ -466,17 +484,17 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
     buttonPosition: 'right',
     checkboxUncheckedBgColor: '#ffffff',
     checkboxUncheckedBorderColor: '#cccccc',
-    checkboxCheckedBgColor: mainColorHex,
-    checkboxCheckedBorderColor: mainColorHex,
+    checkboxCheckedBgColor: chromeColor,
+    checkboxCheckedBorderColor: chromeColor,
     checkboxCheckedBorderEffect: 'none',
     checkboxFontSize: '14px',
     radioUnselectedBgColor: opacityColor,
     radioSelectedBgColor: lightenHex(mainColorHex, 0.15) || opacityColor,
     radioUnselectedBorderColor: 'transparent',
-    radioSelectedBorderColor: mainColorHex,
+    radioSelectedBorderColor: chromeColor,
     radioSelectedBorderEffect: 'none',
     radioInputUnselectedColor: '#cccccc',
-    radioInputSelectedColor: mainColorHex,
+    radioInputSelectedColor: chromeColor,
     radioFontSize: '14px',
     errorMessageBgColor: '#ffebee',
     errorMessageTextColor: '#d32f2f',

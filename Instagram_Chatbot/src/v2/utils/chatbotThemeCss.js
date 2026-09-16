@@ -280,6 +280,12 @@ const buildFieldFocusStyles = (fieldFocusSelectors, focusEffect, previewFocusSel
   const transitionRule = focusEffect.fieldTransition !== 'none'
     ? `transition: ${focusEffect.fieldTransition};`
     : '';
+
+  // v1 has no dedicated focus chrome; skip injected focus rules when effect is none.
+  if (focusEffect.skipFocusStyle) {
+    return { transitionRule, focusRules: '', previewRules: '' };
+  }
+
   const animationRule = focusEffect.focusAnimation !== 'none'
     ? `animation: ${focusEffect.focusAnimation} !important;`
     : '';
@@ -635,7 +641,7 @@ ${scopedDescendant(scopeSelector, '.ss-bot-message .ss-bot-message__content')} {
 }
 
 ${fieldSelectors} {
-  border: 1px solid var(--c-field-unfocus-border, #ccc) !important;
+  border: 1px solid var(--c-field-unfocus-border, gray) !important;
   background-color: var(--c-field-unfocus-bg, #EFF4FD) !important;
   font-size: var(--c-field-font-size, 14px) !important;
   ${transitionRule}
