@@ -2002,7 +2002,7 @@ slideUp
 }
 
 .preview-open-frame__header {
-  background-color: var(--pof-header-bg, transparent);
+  background-color: var(--pof-header-bg, #327AED);
 }
 
 .preview-open-frame--desktop .preview-open-frame__header {

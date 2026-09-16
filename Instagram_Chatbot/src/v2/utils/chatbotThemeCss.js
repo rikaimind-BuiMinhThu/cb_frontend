@@ -260,11 +260,11 @@ ${buildModalButtonRules('#portal')}`.trim();
 const buildButtonLayoutRules = (hasExplicitWidth) => {
   const widthRule = hasExplicitWidth
     ? 'width: var(--c-btn-width) !important; min-width: 0 !important;'
-    : 'width: auto; min-width: 70px !important;';
+    : 'width: auto; min-width: 90px !important;';
 
   return `
   border-radius: var(--c-btn-border-radius, 4px) !important;
-  padding: var(--c-btn-padding, 4px 10px) !important;
+  padding: var(--c-btn-padding, 1px 8px) !important;
   margin-left: 0 !important;
   margin-right: 0 !important;
   ${widthRule}
@@ -405,11 +405,31 @@ const buildThemeRules = (theme, scopeSelector = '') => {
       scopedDescendant(scopeSelector, '.btn-preview-bot'),
       scopedDescendant(scopeSelector, '.sp-body .btn-new-bot'),
       scopedDescendant(scopeSelector, '.sp-body .ss-user-message__action-btn'),
+      scopedDescendant(scopeSelector, '.sp-body .chatbot-submit-button'),
+      scopedDescendant(scopeSelector, '.sp-body #chatbot-submit-button'),
+      scopedDescendant(scopeSelector, '.sp-body [id^="chatbot-submit-button-"]'),
     ].join(', ')
-    : '.btn-preview-bot, .sp-body .btn-new-bot, .sp-body .ss-user-message__action-btn';
+    : [
+      '.btn-preview-bot',
+      '.sp-body .btn-new-bot',
+      '.sp-body .ss-user-message__action-btn',
+      '.sp-body .chatbot-submit-button',
+      '.sp-body #chatbot-submit-button',
+      '.sp-body [id^="chatbot-submit-button-"]',
+    ].join(', ');
   const nextButtonSelector = scopeSelector
-    ? scopedDescendant(scopeSelector, '.sp-body .sp-user-message-button-action .ss-user-message__action-btn')
-    : '.sp-body .sp-user-message-button-action .ss-user-message__action-btn';
+    ? [
+      scopedDescendant(scopeSelector, '.sp-body .sp-user-message-button-action .ss-user-message__action-btn'),
+      scopedDescendant(scopeSelector, '.sp-body .chatbot-submit-button'),
+      scopedDescendant(scopeSelector, '.sp-body #chatbot-submit-button'),
+      scopedDescendant(scopeSelector, '.sp-body [id^="chatbot-submit-button-"]'),
+    ].join(', ')
+    : [
+      '.sp-body .sp-user-message-button-action .ss-user-message__action-btn',
+      '.sp-body .chatbot-submit-button',
+      '.sp-body #chatbot-submit-button',
+      '.sp-body [id^="chatbot-submit-button-"]',
+    ].join(', ');
   const nextButtonActionSelector = scopeSelector
     ? scopedDescendant(scopeSelector, '.sp-body .sp-user-message-button-action')
     : '.sp-body .sp-user-message-button-action';
@@ -540,7 +560,7 @@ ${previewButtonNormalSelector},
 ${withPseudoOnEach(previewButtonNormalSelector, ':hover')},
 ${withPseudoOnEach(previewButtonNormalSelector, ':focus')},
 ${withPseudoOnEach(previewButtonNormalSelector, ':focus-visible')} {
-  background-color: var(--c-btn-normal-bg) !important;
+  background: var(--c-btn-normal-bg, #327AED) !important;
   color: var(--c-btn-normal-text, #fff) !important;
   font-size: var(--c-btn-font-size, 14px) !important;
   border: none !important;
@@ -553,7 +573,7 @@ ${previewButtonPressedSelector},
 ${withPseudoOnEach(previewButtonPressedSelector, ':hover')},
 ${withPseudoOnEach(previewButtonPressedSelector, ':focus')},
 ${withPseudoOnEach(previewButtonPressedSelector, ':focus-visible')} {
-  background-color: var(--c-btn-pressed-bg) !important;
+  background: var(--c-btn-pressed-bg, #2A68D1) !important;
   color: var(--c-btn-pressed-text, #fff) !important;
   font-size: var(--c-btn-font-size, 14px) !important;
   border: none !important;
@@ -668,7 +688,7 @@ ${btnSelector},
 ${withPseudoOnEach(btnSelector, ':hover')},
 ${withPseudoOnEach(btnSelector, ':focus')},
 ${withPseudoOnEach(btnSelector, ':focus-visible')} {
-  background-color: var(--c-btn-normal-bg) !important;
+  background: var(--c-btn-normal-bg, #327AED) !important;
   color: var(--c-btn-normal-text, #fff) !important;
   font-size: var(--c-btn-font-size, 14px) !important;
   border: none !important;
@@ -678,7 +698,7 @@ ${withPseudoOnEach(btnSelector, ':focus-visible')} {
 }
 
 ${withPseudoOnEach(btnSelector, ':active')} {
-  background-color: var(--c-btn-pressed-bg) !important;
+  background: var(--c-btn-pressed-bg, #2A68D1) !important;
   color: var(--c-btn-pressed-text, #fff) !important;
   animation: none !important;
 }
@@ -695,9 +715,9 @@ ${nextButtonSelector},
 ${withPseudoOnEach(nextButtonSelector, ':hover')},
 ${withPseudoOnEach(nextButtonSelector, ':focus')},
 ${withPseudoOnEach(nextButtonSelector, ':focus-visible')} {
-  min-height: 36px !important;
+  min-height: 42px !important;
   font-weight: 500 !important;
-  background-color: var(--c-btn-normal-bg) !important;
+  background: var(--c-btn-normal-bg, #327AED) !important;
   color: var(--c-btn-normal-text, #fff) !important;
   font-size: var(--c-btn-font-size, 14px) !important;
   border: none !important;
@@ -707,7 +727,7 @@ ${withPseudoOnEach(nextButtonSelector, ':focus-visible')} {
 }
 
 ${withPseudoOnEach(nextButtonSelector, ':active')} {
-  background-color: var(--c-btn-pressed-bg) !important;
+  background: var(--c-btn-pressed-bg, #2A68D1) !important;
   color: var(--c-btn-pressed-text, #fff) !important;
   font-size: var(--c-btn-font-size, 14px) !important;
   animation: none !important;

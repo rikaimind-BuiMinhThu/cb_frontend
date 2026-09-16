@@ -1,4 +1,5 @@
 import { EC_CHATBOT_URL } from "v2/variables/constants";
+import { DEFAULT_HEIGHT_PC } from "v2/utils/sdkLayoutUtils";
 import { resolveIconUrl, resolveMainColorFromApi } from "v2/views/DesignSetting/utils/designChatbotUtils";
 import { isMobile } from "./Utils";
 import { isWithdrawalPreventionEnabled } from "./previewWithdrawalUtils";
@@ -68,6 +69,7 @@ export const getOpeningBotStyle = (state, options = {}) => {
     return {
       frameClassName: classNames.join(" "),
       cssVars: {
+        ...(headerBg ? { "--pof-header-bg": headerBg } : {}),
         ...(bodyBg ? { "--pof-body-bg": bodyBg } : {}),
       },
     };
@@ -84,7 +86,7 @@ export const getOpeningBotStyle = (state, options = {}) => {
   );
   const height = hasExitPopup
     ? (mobile ? `${state.heightSp}%` : `${state.heightPc}px`)
-    : (mobile ? `${state.heightSp || 100}%` : `${state.heightPc || 600}px`);
+    : (mobile ? `${state.heightSp || 100}%` : `${state.heightPc || DEFAULT_HEIGHT_PC}px`);
 
   const classNames = [
     "preview-open-frame",

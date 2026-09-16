@@ -310,9 +310,9 @@ export const resolveButtonWidthCss = (widthValue) => {
 };
 
 export const resolveButtonPaddingCss = (paddingValue) => {
-  if (!paddingValue || typeof paddingValue !== 'string') return '4px 10px';
+  if (!paddingValue || typeof paddingValue !== 'string') return '1px 8px';
   const trimmed = paddingValue.trim();
-  return trimmed || '4px 10px';
+  return trimmed || '1px 8px';
 };
 
 export const resolveButtonPositionJustify = (positionId) => {
@@ -462,7 +462,7 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
     buttonBorderStyle: 'rounded',
     buttonEffect: 'none',
     buttonWidth: '',
-    buttonPadding: '4px 10px',
+    buttonPadding: '1px 8px',
     buttonPosition: 'right',
     checkboxUncheckedBgColor: '#ffffff',
     checkboxUncheckedBorderColor: '#cccccc',
