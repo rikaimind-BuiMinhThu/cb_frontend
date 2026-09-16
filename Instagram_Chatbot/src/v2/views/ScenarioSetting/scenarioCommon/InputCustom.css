@@ -16,7 +16,11 @@
   box-sizing: border-box;
   flex: 1 1 auto;
   min-width: 0;
-  padding-right: 30px;
+  padding: 6px 30px 6px 12px;
+}
+
+.ss-input-value.ss-input-custom-field {
+  padding: 6px 30px 6px 12px;
 }
 
 .ss-input-custom-field--with-clear {
