@@ -113,6 +113,7 @@ export const ADMIN_PATHS = {
   SUB_USER: '/sub-user',
   VARIABLE_MANAGEMENT: '/variable-management',
   INSTALLATION_TAG_DEMO: '/installation-tag-demo',
+  GUIDE: '/guide',
   DESIGN_SETTING: '/design-setting',
   REPORT: '/report',
   BOT_CHAT_LOG: '/bot-chat-log',
@@ -194,6 +195,7 @@ export const MENU_LABELS = {
   ADD_BOT: 'ボット追加',
   INVITE_SUB_USER: 'サブユーザー招待',
   INSTALLATION_GUIDE: '設定ガイドとデモ',
+  SETUP_GUIDE: '設定ガイド',
 };
 
 export const MENU_KEYS = {

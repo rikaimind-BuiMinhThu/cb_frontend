@@ -34,6 +34,7 @@ import BotAdmin from 'v2/views/AdvanceSetting/BotAdmin';
 import FileManagement from 'v2/views/FileManagement/FileManagement';
 import AddSubUserMng from 'v2/views/AccountSettings/AddSubUserMng';
 import HtmlScreen from 'v2/views/HtmlScreen';
+import GuidePage from 'v2/views/Guide/GuidePage';
 import Report from 'v2/views/Report/Report';
 import PaymentManagement from 'v2/views/Payment/PaymentManagement';
 import Payment from 'v2/views/Payment/Payment';
@@ -415,6 +416,12 @@ const routes = [
     path: '/bot-settings/:botId/push-message',
     name: MENU_LABELS.PUSH_MESSAGE,
     component: PushMessage,
+    layout: '/v2/admin',
+  },
+  {
+    path: '/guide',
+    name: MENU_LABELS.SETUP_GUIDE,
+    component: GuidePage,
     layout: '/v2/admin',
   },
 ];
