@@ -683,7 +683,8 @@ ${scopedClass(scopeSelector, '.ss-bot-chat-text-input.ss-bot-chat-detail-content
   border: none !important;
 }
 
-${scopedDescendant(scopeSelector, '.ss-bot-chat-text-input-bot-icon path')} {
+${scopedDescendant(scopeSelector, '.ss-bot-chat-text-input-bot-icon path')},
+${scopedDescendant(scopeSelector, '.html-code-message-icon path')} {
   fill: var(--c-bot-msg-bg, #3CACEF) !important;
 }
 

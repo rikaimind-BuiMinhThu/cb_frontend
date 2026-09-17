@@ -265,16 +265,19 @@
 }
 
 .sp-body-bot-side.ugc_usage > .sp-body-bot-side-messages {
-    width: 100%;
-    padding: 0;
+    width: 87%;
 }
 
 .sp-body-bot-side.ugc_usage > .sp-body-bot-side-messages .ss-bot-chat-detail-content.display_ugc {
   white-space: normal;
   width: 100% !important;
-  background-color: transparent !important;
-  color: auto;
-  padding: 0;
+  max-width: 100%;
+  /* Same fill as text bot bubbles + tail (theme --c-bot-msg-bg) */
+  background-color: var(--c-bot-msg-bg, var(--html-preview-bg, #3CACEF)) !important;
+  padding: 8px 8px 2px;
+  border-radius: 20px;
+  overflow: visible; /* allow message tail like text bubbles */
+  box-sizing: border-box;
 }
 
 .sp-body-bot-side.ugc_usage > .sp-body-bot-side-messages .ss-bot-chat-detail-content.display_ugc iframe.ugc-slider,
