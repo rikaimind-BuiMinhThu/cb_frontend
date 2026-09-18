@@ -92,11 +92,6 @@ ${spBodySelector} .select-custom-native:not(.theme-preview--field-focus),
 ${spBodySelector} .ant-select-selector
 `.trim();
 
-const buildFieldSelectors = (spBodySelector) => `
-${buildFieldTextSelectors(spBodySelector)},
-${buildFieldSelectSelectors(spBodySelector)}
-`.trim();
-
 const buildFieldPlaceholderSelectors = (spBodySelector) => `
 ${spBodySelector} input[type="text"]::placeholder,
 ${spBodySelector} input[type="email"]::placeholder,

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button } from 'reactstrap';
 import { hasActiveSpecialDisplayConditions } from 'v2/views/ScenarioSetting/utils/amazonPayConfigUtils';
@@ -51,6 +51,8 @@ const ScenarioMessageSettingsAccordion = ({
 
   const [activePanel, setActivePanel] = useState(null);
   const selectedMessageId = selectedMessage?.id;
+  const selectedMessageRef = useRef(selectedMessage);
+  selectedMessageRef.current = selectedMessage;
 
   const role = variant === 'bot' ? 'bot' : 'user';
   const showOtherSettings = variant !== 'bot';
@@ -59,8 +61,9 @@ const ScenarioMessageSettingsAccordion = ({
     : 'ss-user-setting-condition-container ss-message-settings-accordion';
 
   useEffect(() => {
-    const hasConditions = (selectedMessage?.conditions?.length ?? 0) > 0;
-    const hasSpecial = hasActiveSpecialDisplayConditions(selectedMessage, isUseFukushashiki);
+    const message = selectedMessageRef.current;
+    const hasConditions = (message?.conditions?.length ?? 0) > 0;
+    const hasSpecial = hasActiveSpecialDisplayConditions(message, isUseFukushashiki);
 
     setActivePanel(hasConditions || hasSpecial ? PANEL.AUDIENCE : null);
     resetConditionPanelLayout(role);
