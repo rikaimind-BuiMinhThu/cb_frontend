@@ -1925,6 +1925,30 @@ slideUp
   padding-right: 3px;
 }
 
+/* Beat @media (max-width: 981px): box stays 40px tall while the image is 58px. */
+.preview-closed-launcher--bar-pc .sp-header-left-bt {
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+}
+
+.preview-closed-launcher--bar-pc .sp-avatar-bt {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.preview-closed-launcher--bar-pc .sp-avatar-bt img {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
 .preview-closed-launcher__bar-title {
   display: flex;
   align-items: center;
@@ -1985,10 +2009,28 @@ slideUp
 
 .preview-closed-launcher__sp-avatar {
   width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
 .preview-closed-launcher__sp-avatar--full {
   width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.preview-closed-launcher--bar-sp .sp-avatar img {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
 }
 
 .preview-closed-launcher__sp-title {
