@@ -123,6 +123,20 @@
 
 .sp-header-left-avatar {}
 
+/* Open-frame header avatar (desktop + mobile; was mobile-only under max-width 981px) */
+.sp-avatar-bt {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+}
+.sp-avatar-bt img {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    display: block;
+}
+
 .sp-withdrawal-container {
     background-color: #000;
     height: 90%;
@@ -289,6 +303,7 @@
   width: 100% !important;
   max-width: 100% !important;
   display: block;
+  overflow: hidden !important;
 }
 
 /* Review iframe: grow with take.js height posts; avoid nested scroll / height:100% fight */
@@ -2022,6 +2037,23 @@ slideUp
 
 .preview-open-frame__header {
   background-color: var(--pof-header-bg, #327AED);
+  overflow: hidden;
+}
+
+/* Beat @media (max-width: 981px) 58px avatar — preview iframe is always <981px */
+.preview-open-frame .sp-header-left {
+  padding: 8px 12px;
+  align-items: center;
+}
+
+.preview-open-frame .sp-avatar-bt {
+  width: 40px;
+  height: 40px;
+}
+
+.preview-open-frame .sp-avatar-bt img {
+  width: 40px;
+  height: 40px;
 }
 
 .preview-open-frame--desktop .preview-open-frame__header {

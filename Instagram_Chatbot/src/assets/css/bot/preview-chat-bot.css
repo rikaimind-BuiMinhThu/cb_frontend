@@ -256,6 +256,7 @@
   width: 100% !important;
   max-width: 100% !important;
   display: block;
+  overflow: hidden !important;
 }
 
 /* Review iframe: grow with take.js height posts; avoid nested scroll / height:100% fight */
