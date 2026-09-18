@@ -311,15 +311,18 @@
     }
     el.setAttribute("data-host", ugcHost);
   };
+  var modalFlags = () => {
+    if (!window.__ugcHostModalFlags) {
+      window.__ugcHostModalFlags = { swal: false, ig: false, tt: false };
+    }
+    return window.__ugcHostModalFlags;
+  };
   var injectUgcHostModalAssets = (..._0) => __async(null, [..._0], function* ({
     ugcHost = DEFAULT_UGC_HOST,
     hasInstagram = false,
     hasTiktok = false
   } = {}) {
-    if (!window.__ugcHostModalFlags) {
-      window.__ugcHostModalFlags = { swal: false, ig: false, tt: false };
-    }
-    const flags = window.__ugcHostModalFlags;
+    const flags = modalFlags();
     if (!flags.swal) {
       flags.swal = true;
       window.__ugcHostModalAssetsLoaded = true;
@@ -375,6 +378,8 @@
   var PAYMENT_METHOD_ID_TYPE = "payment_method_id";
   var EMPTY_VALUE = "";
   var BOT_ID_STORAGE_KEY = "bot_id";
+  var PREVIEW_SDK_ID = "previewSdk";
+  var PREVIEW_SDK_IFRAME_SELECTOR = "iframe#previewSdk";
   var CHATBOT_ACTIONS = {
     CLICK_BUTTON: "clickButton",
     EXCUTE_JS: "excuteJS",
@@ -1046,6 +1051,10 @@
 
   // src/v2/sdk/amazon/loaders.js
   var appendIframeToBody = (iframe) => {
+    Array.from(document.querySelectorAll(PREVIEW_SDK_IFRAME_SELECTOR)).forEach((existing) => {
+      if (existing === iframe || !existing.parentNode) return;
+      existing.parentNode.removeChild(existing);
+    });
     setGlobalIframe(iframe);
     document.body.appendChild(iframe);
   };
@@ -1888,7 +1897,14 @@
     const data = yield response.json();
     log(data);
   });
-  var handleChatbotMessage = (e, iframe) => __async(null, null, function* () {
+  var getLivePreviewIframe = () => {
+    const byId = document.getElementById(PREVIEW_SDK_ID);
+    if (byId && byId.isConnected) return byId;
+    const global = chatbotLayout.globalIframe;
+    if (global && global.isConnected) return global;
+    return null;
+  };
+  var handleChatbotMessage = (e) => __async(null, null, function* () {
     if (typeof e.data !== "object") return;
     if (e.data.source !== "ec-chatbot") return;
     flushQueuedAmazonPaySelectorPayload();
@@ -1969,6 +1985,8 @@
         break;
     }
     if (e.data.isOpen === void 0) return;
+    const iframe = getLivePreviewIframe();
+    if (!iframe) return;
     resizeIframeFromMessage(iframe, e.data);
     iframe.style.width = `${iframe.width} !important`;
     iframe.style.height = `${iframe.height} !important`;
@@ -2065,7 +2083,7 @@
     window.addEventListener(
       "message",
       (e) => {
-        handleChatbotMessage(e, iframe);
+        handleChatbotMessage(e);
       },
       false
     );

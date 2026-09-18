@@ -12,7 +12,6 @@ import {
 import UserMessageTailIcon from 'v2/components/BotMessages/UserMessageTailIcon';
 import { resolveMainColorContext, resolveUserMessageTheme } from "v2/utils/designThemeCore";
 import PreviewFaqReducer from "./PreviewFaq/PreviewFaqReducer";
-import { EC_CHATBOT_URL } from "v2/variables/constants";
 import "moment/locale/zh-cn";
 import {
   CHATBOT_ACTIONS,
@@ -56,7 +55,7 @@ import {
 import { handleValidateField, ERROR_MESSAGES } from "./PreviewFukushashiki/ValidationUtils";
 import { getBotInforFromPreviewResponse } from "./PreviewComponent/previewBotInfoUtils";
 import {
-  getBotHeaderIconPath,
+  getBotHeaderIconUrl,
   getOpeningBotStyle as buildOpeningBotStyle,
 } from "./PreviewComponent/previewOpeningStyles";
 import { mapParsedDesignToState } from "./PreviewComponent/previewDesignStateUtils";
@@ -611,7 +610,7 @@ const PreviewFaq = () => {
     );
   }
 
-  const headerIconSrc = `${EC_CHATBOT_URL}${getBotHeaderIconPath(state.botInfor, state.isOpen)}`;
+  const headerIconSrc = getBotHeaderIconUrl(state.botInfor, state.isOpen);
 
   if (state.scenarioId && state.botInfor && state.isOpen) {
     const { frameClassName, cssVars } = buildOpeningBotStyle(state);

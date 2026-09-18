@@ -862,53 +862,58 @@
 
           if (e.data.isOpen === undefined) return;
 
+          const byId = document.getElementById('previewSdk');
+          const liveIframe = (byId && byId.isConnected)
+            ? byId
+            : (globalIframe && globalIframe.isConnected ? globalIframe : null);
+          if (!liveIframe) return;
+
           if (e.data.isOpen && mobileCheck()) {
-            iframe.width = "100%";
-            // iframe.height = "620px";
-            iframe.height = "100%";
-            iframe.style.setProperty("width", "100%", "important");
-            iframe.style.setProperty("height", "100%", "important");
-            iframe.style.bottom = "0px";
-            iframe.style.right = "0px";
+            liveIframe.width = "100%";
+            liveIframe.height = "100%";
+            liveIframe.style.setProperty("width", "100%", "important");
+            liveIframe.style.setProperty("height", "100%", "important");
+            liveIframe.style.bottom = "0px";
+            liveIframe.style.right = "0px";
           } else if (e.data.isOpen) {
             let w = chatbotW && (chatbotRight !== null) ? `${parseInt(chatbotW) + parseInt(chatbotRight)}px` : "460px";
             let h = chatbotH && (chatbotBottom !== null) ? `${parseInt(chatbotH) + parseInt(chatbotBottom)}px` : "700px";
-            iframe.width = w;
-            iframe.height = h;
-            iframe.style.setProperty("width", w, "important");
-            iframe.style.setProperty("height", h, "important");
-            iframe.style.bottom = "0px";
-            iframe.style.right = "0px";
+            liveIframe.width = w;
+            liveIframe.height = h;
+            liveIframe.style.setProperty("width", w, "important");
+            liveIframe.style.setProperty("height", h, "important");
+            liveIframe.style.bottom = "0px";
+            liveIframe.style.right = "0px";
           } else if (!e.data.isOpen && mobileCheck()) {
             const useMoblieFullwidth = (typeof e.data.useMoblieFullwidth === 'boolean')
               ? e.data.useMoblieFullwidth
               : (sessionStorage.getItem("useFullwidthChatbotMobile") === "true");
             let w = useMoblieFullwidth ? "100%" : "250px";
             let h = useMoblieFullwidth ? "85px" : "58px";
-            iframe.width = w;
-            iframe.height = h;
-            iframe.style.setProperty("width", w, "important");
-            iframe.style.setProperty("height", h, "important");
-            iframe.style.bottom = "0px";
-            iframe.style.right = "0px";
+            liveIframe.width = w;
+            liveIframe.height = h;
+            liveIframe.style.setProperty("width", w, "important");
+            liveIframe.style.setProperty("height", h, "important");
+            liveIframe.style.bottom = "0px";
+            liveIframe.style.right = "0px";
           } else if (!e.data.isOpen) {
             let w = chatbotRight ? `${parseInt(chatbotRight) + 400}px` : "400px";
             let h = chatbotBottom ? `${parseInt(chatbotBottom) + 85}px` : "85px";
-            iframe.width = w;
-            iframe.height = h;
-            iframe.style.setProperty("width", w, "important");
-            iframe.style.setProperty("height", h, "important");
-            iframe.style.bottom = "0px";
-            iframe.style.right = "0px";
+            liveIframe.width = w;
+            liveIframe.height = h;
+            liveIframe.style.setProperty("width", w, "important");
+            liveIframe.style.setProperty("height", h, "important");
+            liveIframe.style.bottom = "0px";
+            liveIframe.style.right = "0px";
           }
-          iframe.style.width = `${iframe.width} !important`;
-          iframe.style.height = `${iframe.height} !important`;
+          liveIframe.style.width = `${liveIframe.width} !important`;
+          liveIframe.style.height = `${liveIframe.height} !important`;
           if (e.data.isOpen && mobileCheck() && !e.data.isUpsell) {
             document.body.style.overflow = 'hidden';
           } else {
             document.body.style.overflow = 'scroll';
           }
-          globalIframe = iframe;
+          globalIframe = liveIframe;
         },
         false
       );
@@ -1303,6 +1308,10 @@
     }
 
     const appendIframeToBody = (iframe) => {
+      Array.from(document.querySelectorAll('iframe#previewSdk')).forEach((existing) => {
+        if (existing === iframe || !existing.parentNode) return;
+        existing.parentNode.removeChild(existing);
+      });
       globalIframe = iframe;
       document.body.appendChild(iframe);
     }

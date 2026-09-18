@@ -9,6 +9,8 @@ export const AWAIT_FILL_TYPE = 'await';
 export const PAYMENT_METHOD_ID_TYPE = 'payment_method_id';
 export const EMPTY_VALUE = '';
 export const BOT_ID_STORAGE_KEY = 'bot_id';
+export const PREVIEW_SDK_ID = 'previewSdk';
+export const PREVIEW_SDK_IFRAME_SELECTOR = 'iframe#previewSdk';
 
 export const CHATBOT_ACTIONS = {
   CLICK_BUTTON: 'clickButton',

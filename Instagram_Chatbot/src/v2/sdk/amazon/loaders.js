@@ -5,6 +5,7 @@ import {
   DEFAULT_AMAZON_DETECTION,
   DEFAULT_AMAZON_PAY_CONFIG,
   WAIT_TO_LOAD_AMAZON_DATA_MAX_COUNT,
+  PREVIEW_SDK_IFRAME_SELECTOR,
 } from '../constants.js';
 import { getParam } from '../config/environment.js';
 import { chatbotLayout, setGlobalIframe } from '../state.js';
@@ -16,6 +17,10 @@ import {
 import { isAmazonPayActive, isAmazonPayReady } from './detection.js';
 
 export const appendIframeToBody = (iframe) => {
+  Array.from(document.querySelectorAll(PREVIEW_SDK_IFRAME_SELECTOR)).forEach((existing) => {
+    if (existing === iframe || !existing.parentNode) return;
+    existing.parentNode.removeChild(existing);
+  });
   setGlobalIframe(iframe);
   document.body.appendChild(iframe);
 };
