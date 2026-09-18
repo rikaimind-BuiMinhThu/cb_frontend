@@ -31,42 +31,56 @@ const ensureHiddenHostInput = (id, ugcHost) => {
   el.setAttribute('data-host', ugcHost);
 };
 
+const modalFlags = () => {
+  if (!window.__ugcHostModalFlags) {
+    window.__ugcHostModalFlags = { swal: false, ig: false, tt: false };
+  }
+  return window.__ugcHostModalFlags;
+};
+
 /**
  * Load SweetAlert + take.js on the host LP so UGC openModal (posted to window.top)
  * opens a fullscreen modal on the landing page, not inside #previewSdk.
+ * Incremental: later bridge messages can add the missing IG or TT take.js.
  */
 export const injectUgcHostModalAssets = async ({
   ugcHost = DEFAULT_UGC_HOST,
   hasInstagram = false,
   hasTiktok = false,
 } = {}) => {
-  if (window.__ugcHostModalAssetsLoaded) return;
-  window.__ugcHostModalAssetsLoaded = true;
+  const flags = modalFlags();
 
-  if (!document.getElementById('ugc-host-swal-zindex')) {
-    const style = document.createElement('style');
-    style.id = 'ugc-host-swal-zindex';
-    style.textContent = '.swal2-container{z-index:10000000!important;}';
-    document.head.appendChild(style);
+  if (!flags.swal) {
+    flags.swal = true;
+    window.__ugcHostModalAssetsLoaded = true;
+
+    if (!document.getElementById('ugc-host-swal-zindex')) {
+      const style = document.createElement('style');
+      style.id = 'ugc-host-swal-zindex';
+      style.textContent = '.swal2-container{z-index:10000000!important;}';
+      document.head.appendChild(style);
+    }
+
+    appendStylesheet(
+      'https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/10.7.0/sweetalert2.min.css',
+    );
+    appendStylesheet(`${ugcHost}/ugc/css/popup.css`);
+    appendStylesheet(
+      'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css',
+    );
+
+    await appendScript(
+      'https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/10.7.0/sweetalert2.min.js',
+    );
   }
 
-  appendStylesheet(
-    'https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/10.7.0/sweetalert2.min.css',
-  );
-  appendStylesheet(`${ugcHost}/ugc/css/popup.css`);
-  appendStylesheet(
-    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css',
-  );
-
-  await appendScript(
-    'https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/10.7.0/sweetalert2.min.js',
-  );
-
-  if (hasInstagram) {
+  if (hasInstagram && !flags.ig) {
+    flags.ig = true;
     ensureHiddenHostInput('ugc-slider-info', ugcHost);
     await appendScript(`${ugcHost}/ugc/js/take.js`);
   }
-  if (hasTiktok) {
+  if (hasTiktok && !flags.tt) {
+    flags.tt = true;
     ensureHiddenHostInput('ugc-tiktok-slider-info', ugcHost);
     await appendScript(`${ugcHost}/ugc/js/tiktoks/take.js`);
   }
