@@ -25,7 +25,6 @@ const MIN_HEIGHT_PROP = "min-height";
 const DATA_UGC_TAKE_INITED = "data-ugc-take-inited";
 const DATA_NUM = "data-num";
 const DATA_HOST = "data-host";
-const UGC_IFRAME_SELECTOR = "iframe.ugc-slider, iframe.ugc-tiktok-slider, iframe.ugc-review-slider";
 const REVIEW_TYPE = "rv";
 const SEND_FRAME_DELAY_MS = 400;
 const SEND_FRAME_RETRY_MS = 800;
@@ -63,17 +62,19 @@ export const clearChatbotState = () => {
   });
 };
 
-const notifyLpSwap = (action) => {
+const notifyLpSwap = (action, type) => {
   try {
     if (window.parent && window.parent !== window) {
-      window.parent.postMessage({ action }, "*");
+      const payload = { action };
+      if (type) {
+        payload.type = type;
+      }
+      window.parent.postMessage(payload, "*");
     }
   } catch {
     // ignore cross-origin notify failures
   }
 };
-
-const queryUgcIframes = () => document.querySelectorAll(UGC_IFRAME_SELECTOR);
 
 const qidFromSrc = (src) => {
   try {
@@ -109,31 +110,31 @@ const holdIframeBox = (iframe, spec) => {
 export const applyLpUgcSampleSwap = (data) => {
   const spec = LP_UGC_IFRAME_INFO[data?.type];
   if (!spec || !data?.src) {
-    notifyLpSwap(LP_SWAP_MISS);
+    notifyLpSwap(LP_SWAP_MISS, data?.type);
     return false;
   }
 
-  const frames = Array.from(queryUgcIframes());
-  const iframe = frames[0];
+  const iframe = document.querySelector(`iframe.${spec.iframeClass}`);
   if (!iframe) {
-    notifyLpSwap(LP_SWAP_MISS);
+    notifyLpSwap(LP_SWAP_MISS, data.type);
     return false;
   }
+
+  const locks = window[LP_SWAP_LOCK_KEY] && typeof window[LP_SWAP_LOCK_KEY] === "object"
+    ? window[LP_SWAP_LOCK_KEY]
+    : {};
+  window[LP_SWAP_LOCK_KEY] = locks;
 
   const qid = data.qid || qidFromSrc(data.src);
   const force = data.force === true;
-  if (!force && (iframeHasQid(iframe, qid) || window[LP_SWAP_LOCK_KEY] === data.src)) {
+  if (!force && (iframeHasQid(iframe, qid) || locks[data.type] === data.src)) {
     if (iframeHasQid(iframe, qid)) {
-      notifyLpSwap(LP_SWAP_DONE);
+      notifyLpSwap(LP_SWAP_DONE, data.type);
     }
     return true;
   }
 
-  window[LP_SWAP_LOCK_KEY] = data.src;
-
-  frames.slice(1).forEach((el) => {
-    el.parentNode?.removeChild(el);
-  });
+  locks[data.type] = data.src;
 
   holdIframeBox(iframe, spec);
   iframe.removeAttribute(DATA_UGC_TAKE_INITED);
@@ -144,7 +145,7 @@ export const applyLpUgcSampleSwap = (data) => {
     infoEl.setAttribute(DATA_HOST, data.host);
   }
 
-  notifyLpSwap(LP_SWAP_DONE);
+  notifyLpSwap(LP_SWAP_DONE, data.type);
 
   if (data.type === REVIEW_TYPE) {
     iframe.src = data.src;
