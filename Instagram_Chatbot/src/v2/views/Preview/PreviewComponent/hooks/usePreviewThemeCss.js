@@ -14,6 +14,8 @@ export const usePreviewThemeCss = ({
   useEffect(() => {
     if (!enabled) return undefined;
 
+    applyTheme(state.botInfor, state.themeSettings);
+
     const existing = document.getElementById(customCssId);
     if (existing) existing.remove();
 
@@ -25,8 +27,6 @@ export const usePreviewThemeCss = ({
       style.innerHTML = state.customCssContent;
       document.head.appendChild(style);
     }
-
-    applyTheme(state.botInfor, state.themeSettings);
 
     return () => {
       if (style) style.remove();

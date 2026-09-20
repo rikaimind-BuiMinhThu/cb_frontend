@@ -94,6 +94,7 @@ export const getBotInforFromPreviewResponse = (res) => {
     ...palette,
     main_color: res.data.chatbot.main_color || res.data.chatbot.main_color_other,
     main_color_other: res.data.chatbot.main_color_other,
+    design_settings: res.data.design_settings,
     titleBubble: res.data.design_settings.title_bubble,
   };
 };

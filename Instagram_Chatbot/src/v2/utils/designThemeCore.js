@@ -382,6 +382,23 @@ const lightenHex = (hex, amount = 0.1) => {
   return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
 };
 
+/** v1 `lightenColor(hex, 0.1)` — opacity, not a solid mix toward white. */
+const hexToRgba = (hex, opacity) => {
+  if (!hex || !String(hex).startsWith('#') || String(hex).length < 7) return hex;
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  if ([r, g, b].some((n) => Number.isNaN(n))) return hex;
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+};
+
+export const hasExplicitThemeValue = (rawTheme, camelKey) => {
+  if (!rawTheme || typeof rawTheme !== 'object') return false;
+  const snakeKey = CAMEL_TO_SNAKE_THEME[camelKey];
+  const value = rawTheme[camelKey] ?? (snakeKey ? rawTheme[snakeKey] : undefined);
+  return value !== undefined && value !== null && value !== '';
+};
+
 export const resolveFieldFocusEffect = (effectId, theme) => {
   const effect = normalizeFieldFocusEffect(effectId);
   const focusBorder = theme.fieldFocusBorderColor || '#327AED';
@@ -433,6 +450,7 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
   const presetKey = resolvePresetKey(mainColorHex, apiColorKey);
   const preset = presetKey ? PRESET_DERIVED[presetKey] : null;
   const opacityColor = preset?.opacity || lightenHex(mainColorHex, 0.1);
+  const chatWindowBgColor = preset?.opacity || hexToRgba(mainColorHex, 0.1);
   const messageColor = preset?.message || mainColorHex;
   const fontColor = preset?.font || '#fff';
   // Named main_color → CSS keyword for chrome/buttons (v1 parity: blue → #0000FF).
@@ -449,7 +467,7 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
     progressBarBgColor: opacityColor,
     progressBarTextColor: '#ffffff',
     progressBarFontSize: '13px',
-    chatWindowBgColor: opacityColor,
+    chatWindowBgColor,
     botMessageBgColor: messageColor,
     botMessageTextColor: fontColor,
     botMessageFontSize: '14px',

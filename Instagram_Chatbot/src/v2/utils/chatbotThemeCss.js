@@ -10,6 +10,7 @@ import {
   resolveFieldFocusEffect,
   resolveModalTitleTextAlign,
   resolveMainColorContext,
+  hasExplicitThemeValue,
   CAMEL_TO_SNAKE_THEME,
 } from './designThemeCore';
 import { buildDesignTypeChromeCss } from './designTypeChrome';
@@ -351,7 +352,7 @@ const buildTwinkleAnimationRule = (effectId, elementType, theme) => {
   return animation !== 'none' ? `animation: ${animation} !important;` : '';
 };
 
-const buildThemeRules = (theme, scopeSelector = '') => {
+const buildThemeRules = (theme, scopeSelector = '', options = {}) => {
   const fieldScopeSelectors = buildFieldScopeSelectors(scopeSelector);
   const spBodySelector = fieldScopeSelectors[0];
   const fieldTextSelectors = combineScopedFieldSelectors(scopeSelector, buildFieldTextSelectors);
@@ -634,9 +635,9 @@ ${scopedClass(scopeSelector, '.sp-process-bar-color')} {
   font-size: var(--c-progress-font-size, 13px) !important;
 }
 
-${scopeSelector ? spBodySelector : '#sp-body.sp-body, .sp-body'} {
+${options.applyChatWindowBg ? `${scopeSelector ? spBodySelector : '#sp-body.sp-body, .sp-body'} {
   background-color: var(--c-chat-window-bg, #D6E0EF) !important;
-}
+}` : ''}
 
 ${scopedClass(scopeSelector, '.ss-bot-message__content-wrapper')},
 ${scopedDescendant(scopeSelector, '.ss-bot-message .ss-bot-message__content')} {
@@ -906,7 +907,13 @@ ${scopedClass(scopeSelector, '.title-bot-modal')} {
 ${buildModalButtonRules(toScopeIs(scopeSelector) || scopeSelector)}${previewButtonRules}`.trim();
 };
 
-const buildThemeCss = (theme, scopeSelector = '', designType) => {
+const resolveApplyChatWindowBg = (rawTheme, options = {}) => (
+  typeof options.applyChatWindowBg === 'boolean'
+    ? options.applyChatWindowBg
+    : hasExplicitThemeValue(rawTheme, 'chatWindowBgColor')
+);
+
+const buildThemeCss = (theme, scopeSelector = '', designType, options = {}) => {
   const variablesBlock = scopeSelector
     ? `${scopeSelector} {${buildThemeVariables(theme)}\n}`
     : `#sp-container, .sp-container, #sp-container1, .sp-container1 {${buildThemeVariables(theme)}\n}`;
@@ -918,12 +925,17 @@ const buildThemeCss = (theme, scopeSelector = '', designType) => {
   const portalRules = isLiveBotScope ? `\n\n${buildPortalModalRules()}` : '';
   const chromeCss = `\n\n${buildDesignTypeChromeCss(designType, scopeSelector)}`;
 
-  return `${variablesBlock}${portalVariablesBlock}\n\n${buildThemeRules(theme, scopeSelector)}${portalRules}${chromeCss}`.trim();
+  return `${variablesBlock}${portalVariablesBlock}\n\n${buildThemeRules(theme, scopeSelector, options)}${portalRules}${chromeCss}`.trim();
 };
 
-export const generateThemeCss = (rawTheme, mainColorHex, apiColorKey, designType) => {
+export const generateThemeCss = (rawTheme, mainColorHex, apiColorKey, designType, options = {}) => {
   const theme = mergeThemeWithDefaults(rawTheme, mainColorHex, apiColorKey);
-  return buildThemeCss(theme, LIVE_THEME_SCOPE, designType);
+  return buildThemeCss(
+    theme,
+    LIVE_THEME_SCOPE,
+    designType,
+    { applyChatWindowBg: resolveApplyChatWindowBg(rawTheme, options) },
+  );
 };
 
 export const generateScopedThemeCss = (
@@ -932,12 +944,18 @@ export const generateScopedThemeCss = (
   apiColorKey,
   scopeSelector = '#theme-customize-preview',
   designType,
+  options = {},
 ) => {
   const theme = mergeThemeWithDefaults(rawTheme, mainColorHex, apiColorKey);
-  return buildThemeCss(theme, scopeSelector, designType);
+  return buildThemeCss(
+    theme,
+    scopeSelector,
+    designType,
+    { applyChatWindowBg: resolveApplyChatWindowBg(rawTheme, options) },
+  );
 };
 
-export const injectBotThemeCss = (rawTheme, mainColorHex, apiColorKey, designType) => {
+export const injectBotThemeCss = (rawTheme, mainColorHex, apiColorKey, designType, options = {}) => {
   const existing = document.getElementById('bot-theme-vars');
   if (existing) existing.remove();
 
@@ -945,14 +963,8 @@ export const injectBotThemeCss = (rawTheme, mainColorHex, apiColorKey, designTyp
 
   const style = document.createElement('style');
   style.id = 'bot-theme-vars';
-  style.innerHTML = generateThemeCss(rawTheme, mainColorHex, apiColorKey, designType);
+  style.innerHTML = generateThemeCss(rawTheme, mainColorHex, apiColorKey, designType, options);
   document.head.appendChild(style);
-};
-
-export const applyPreviewThemeCss = (botInfor, themeSettings) => {
-  if (!botInfor) return;
-  const { apiColorKey, mainColorHex } = resolveMainColorContext(botInfor);
-  injectBotThemeCss(themeSettings, mainColorHex, apiColorKey, botInfor.design_type);
 };
 
 export const parseThemeFromDesignSettings = (designSettings) => {
@@ -961,6 +973,15 @@ export const parseThemeFromDesignSettings = (designSettings) => {
     ? JSON.parse(designSettings)
     : designSettings;
   return parsed?.theme || null;
+};
+
+export const applyPreviewThemeCss = (botInfor, themeSettings) => {
+  if (!botInfor) return;
+  const { apiColorKey, mainColorHex } = resolveMainColorContext(botInfor);
+  const savedTheme = parseThemeFromDesignSettings(botInfor.design_settings);
+  injectBotThemeCss(themeSettings, mainColorHex, apiColorKey, botInfor.design_type, {
+    applyChatWindowBg: hasExplicitThemeValue(savedTheme, 'chatWindowBgColor'),
+  });
 };
 
 export const getErrorThemeStyles = (rawTheme, mainColorHex, apiColorKey) => {
