@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Fira+Sans:400,500,600,700,800');
+
 * {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -662,6 +664,16 @@
     overflow-y: unset;
     height: auto;
     border-radius: 20px;
+}
+
+/* Production customer iframe inherits Fira Sans from login.css in the main chunk.
+   Staging webpack omits that file on v1 preview, so system UI wraps differently
+   at the same 16px/700. Pin the measured production bubble values. */
+.sp-body-bot-side-messages .ss-bot-chat-detail-content.ss-message__content--bot-text.ss-input-value {
+    font-family: 'Fira Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 6px 9px;
 }
 
 .sp-body-bot-side-messages .ss-bot-chat-detail-content a:hover {
