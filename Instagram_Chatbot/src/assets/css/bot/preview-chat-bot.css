@@ -215,13 +215,45 @@
 
 /* Production customer iframe loads scenario-single.css via the main CSS chunk.
    Staging webpack splits that file onto the admin Scenario route, so v1 preview
-   needs these field/button radii here. Do not set font-size — scenario custom CSS
-   owns type (Rosemay: .ss-input-value { 16px }). Do not add bot-specific colors. */
+   needs these field/button radii here. Input type stays with scenario custom CSS
+   (Rosemay: .ss-input-value { 16px }). Title/必須/gaps copy scenario-single so
+   they match production when custom CSS is injected last. */
 .sp-body .ss-input-value:not(.ss-bot-chat-detail-content) {
     padding: 6px 12px;
     border-radius: 5px;
     width: 100%;
     border: 1px solid gray;
+}
+
+.ss-message__content--user-text-input-required,
+.ss-message__content--user-radio_button-required,
+.ss-message__content--user-agree_to_term-required,
+.ss-message__content--user-pull_down-required,
+.ss-message__content--user-checkbox-required {
+    color: #ff7e00 !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+}
+
+.ss-message__content--user-text-input-title,
+.ss-message__content--user-radio_button-title,
+.ss-message__content--user-agree_to_term-title,
+.ss-message__content--user-pull_down-title,
+.ss-message__content--user-checkbox-title {
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    color: black !important;
+    margin-right: 8px;
+}
+
+.ss-message__content--user-text-input-top.m-b-0,
+.ss-message__content--user-radio_button-top.m-b-0,
+.ss-message__content--user-agree_to_term-top.m-b-0,
+.ss-message__content--user-pull_down-top.m-b-0,
+.ss-message__content--user-checkbox-top.m-b-0 {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
 }
 
 #sp-container1 .ant-select-selector,
@@ -630,6 +662,11 @@
     overflow-y: unset;
     height: auto;
     border-radius: 20px;
+}
+
+.sp-body-bot-side-messages .ss-bot-chat-detail-content.ss-input-value {
+    font-size: 14px;
+    font-weight: 400;
 }
 
 .sp-body-bot-side-messages .ss-bot-chat-detail-content a:hover {
