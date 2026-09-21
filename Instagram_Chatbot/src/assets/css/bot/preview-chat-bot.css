@@ -664,11 +664,6 @@
     border-radius: 20px;
 }
 
-.sp-body-bot-side-messages .ss-bot-chat-detail-content.ss-input-value {
-    font-size: 14px;
-    font-weight: 400;
-}
-
 .sp-body-bot-side-messages .ss-bot-chat-detail-content a:hover {
     text-decoration: underline;
 }
@@ -1100,6 +1095,15 @@ slideUp
   height: fit-content;
 }
 
+.ss-user-setting__item-bottom {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  width: 100%;
+  align-items: center;
+}
+
 /* Custom width for post code inputs */
 .ss-user-setting__item-bottom div[style*="display: flex"] > div:first-child {
   width: 39% !important;
@@ -1221,18 +1225,11 @@ slideUp
   text-align: right;
 }
 
-.ss-message__content--user-zip-code-address-post-code-label {
-  font-weight: 400;
-  font-size: 12px;
-  width: 100%;
-  margin-bottom: 5px;
-}
-
+.ss-message__content--user-zip-code-address-post-code-label,
 .ss-message__content--user-zip-code-address-label {
   font-weight: 400;
-  font-size: 12px;
   width: 100%;
-  margin-bottom: 3px;
+  margin-bottom: 5px;
 }
 
 .ss-message__content--attaching_file-button-upload {
