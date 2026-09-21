@@ -215,10 +215,9 @@
 
 /* Production customer iframe loads scenario-single.css via the main CSS chunk.
    Staging webpack splits that file onto the admin Scenario route, so v1 preview
-   needs these field/button radii here. Do not add bot-specific colors. */
+   needs these field/button radii here. Do not set font-size — scenario custom CSS
+   owns type (Rosemay: .ss-input-value { 16px }). Do not add bot-specific colors. */
 .sp-body .ss-input-value:not(.ss-bot-chat-detail-content) {
-    font-weight: 400;
-    font-size: 14px;
     padding: 6px 12px;
     border-radius: 5px;
     width: 100%;
@@ -229,8 +228,6 @@
 .sp-popup-zip-code-address .ant-select-selector,
 .sp-body .ant-select-selector {
     border: 1px solid gray !important;
-    font-weight: 400;
-    font-size: 14px;
     border-radius: 5px !important;
     min-height: 36px !important;
     display: flex;
@@ -1029,31 +1026,9 @@ slideUp
     }
   }
 
-/* Beat @media (max-width: 981px) 58px avatar — preview iframe is always <981px */
+/* Clip the header photo without shrinking it — let custom CSS / @media 58px win. */
 #sp-header.sp-header {
     overflow: hidden;
-}
-
-#sp-header .sp-header-left {
-    padding: 8px 12px;
-    align-items: center;
-}
-
-#sp-header .sp-avatar-bt {
-    flex-shrink: 0;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    overflow: hidden;
-}
-
-#sp-header .sp-avatar-bt img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-    object-position: center;
-    display: block;
 }
 
 /* Closed pill: clip 58px photo inside the 60×60 bar (3px padding + 58px overflows) */
