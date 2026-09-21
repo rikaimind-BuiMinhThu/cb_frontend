@@ -258,6 +258,18 @@
     margin-bottom: 8px;
 }
 
+/* Production (scenario-single): empty post_link_only is display:flex so it
+   collapses to 0px. Without this it is display:block and keeps a ~23px line
+   box, which adds to the ご利用規約 title-to-checkbox gap. */
+.ss-message__content--user-agree_to_term-post_link_only {
+    display: flex;
+    align-items: center;
+}
+
+.ss-message__content--user-agree_to_term-top.m-b-0 + * .ss-user-setting__item-checkbox {
+    margin-top: 0;
+}
+
 #sp-container1 .ant-select-selector,
 .sp-popup-zip-code-address .ant-select-selector,
 .sp-body .ant-select-selector {
