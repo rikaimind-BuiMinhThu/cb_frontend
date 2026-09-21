@@ -213,6 +213,32 @@
     width: 100%;
 }
 
+/* Production customer iframe loads scenario-single.css via the main CSS chunk.
+   Staging webpack splits that file onto the admin Scenario route, so v1 preview
+   needs these field/button radii here. Do not add bot-specific colors. */
+.sp-body .ss-input-value:not(.ss-bot-chat-detail-content) {
+    font-weight: 400;
+    font-size: 14px;
+    padding: 6px 12px;
+    border-radius: 5px;
+    width: 100%;
+    border: 1px solid gray;
+}
+
+.sp-body .ant-select-selector {
+    border: 1px solid gray !important;
+    font-weight: 400;
+    font-size: 14px;
+    border-radius: 5px !important;
+    min-height: 36px !important;
+    display: flex;
+    align-items: center;
+}
+
+.sp-body .ss-user-message__action-btn {
+    border-radius: 25px;
+}
+
 .is_mobile .sp-body input {
     font-size: 16px;
 }
