@@ -88,13 +88,14 @@ const validateCommonFields = (values) => {
 };
 
 const validateEmailValue = (email) => {
-  if (!email) {
+  const normalizedEmail = (email || '').replace(new RegExp(FULLWIDTH_AT, 'g'), ASCII_AT);
+  if (!normalizedEmail) {
     return EMAIL_REQUIRED;
   }
-  if (email.length > NAME_MAX_LENGTH) {
+  if (normalizedEmail.length > NAME_MAX_LENGTH) {
     return EMAIL_MAX_LENGTH;
   }
-  if (!email.match(MAIL_FORMAT)) {
+  if (!normalizedEmail.match(MAIL_FORMAT)) {
     return EMAIL_FORMAT;
   }
   return null;

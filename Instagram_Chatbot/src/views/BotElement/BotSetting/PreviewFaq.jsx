@@ -46,6 +46,7 @@ import {
   sendContactFormRequest,
   isUserMessage,
   toNumber,
+  sendContactFormRequest,
 } from "./PreviewComponent/Utils";
 import { injectHtmlUgcConfigContent } from "./PreviewComponent/BotMessageUtils";
 import {
@@ -660,7 +661,7 @@ const PreviewFaq = () => {
 
     dispatch({
       type: PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON,
-      payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn}
+      payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn }
     });
   };
 
@@ -814,6 +815,7 @@ const PreviewFaq = () => {
 
     if (!message || message.belong_to !== "user") return null;
     if (message.message_content[0]?.type === "button_submit") return null;
+    if (message.message_content[0]?.type === MESSAGE_CONTENT_TYPES.CONTACT_FORM) return null;
 
     let btnText = message.buttonName;
     if (!btnText) {

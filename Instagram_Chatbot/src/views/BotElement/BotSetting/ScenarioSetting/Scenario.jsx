@@ -6505,6 +6505,42 @@ const Scenario = () => {
                                                             </div>
                                                           </>
                                                         }
+                                                        {/* type == 'contact_form' */}
+                                                        {content.type === 'contact_form' && contactForm && (
+                                                          <div style={{ marginBottom: '10px', padding: '8px', width: '95%' }}>
+                                                            <div style={{ fontSize: '12px', marginBottom: '6px', color: '#666' }}>
+                                                              {CONTACT_FORM_TEMPLATE_LABELS[contactForm.form_template] || 'お問い合わせフォーム'}
+                                                            </div>
+                                                            {(() => {
+                                                              const fieldSettings = getContactFormFieldSettings(contactForm);
+                                                              return CONTACT_FORM_FIELD_KEYS.filter(
+                                                                (fieldKey) => fieldSettings[fieldKey]?.visible
+                                                              ).map((fieldKey) => (
+                                                                <div key={fieldKey} style={{ fontSize: '12px', marginBottom: '4px' }}>
+                                                                  {CONTACT_FORM_FIELD_LABELS[fieldKey]}
+                                                                  {fieldSettings[fieldKey]?.required ? ' ※必須' : ''}
+                                                                </div>
+                                                              ));
+                                                            })()}
+                                                            <Button
+                                                              className="ss-user-setting__select-btn-add"
+                                                              style={{
+                                                                background: "linear-gradient(135deg, #4caf50, #43a047)",
+                                                                color: "#fff",
+                                                                border: "none",
+                                                                borderRadius: "25px",
+                                                                padding: "10px 20px",
+                                                                fontSize: "14px",
+                                                                fontWeight: "bold",
+                                                                width: "100%",
+                                                                marginTop: '4px',
+                                                              }}
+                                                              onClick={(e) => e.stopPropagation()}
+                                                            >
+                                                              {contactForm.submit_button_name || '送信する'}
+                                                            </Button>
+                                                          </div>
+                                                        )}
                                                         {/* type == 'label_no_transition' */}
                                                         {content.type === 'label_no_transition' && (
                                                           <div style={{ marginBottom: '10px' }}>
