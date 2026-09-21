@@ -1001,6 +1001,60 @@ slideUp
     }
   }
 
+/* Beat @media (max-width: 981px) 58px avatar — preview iframe is always <981px */
+#sp-header.sp-header {
+    overflow: hidden;
+}
+
+#sp-header .sp-header-left {
+    padding: 8px 12px;
+    align-items: center;
+}
+
+#sp-header .sp-avatar-bt {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+#sp-header .sp-avatar-bt img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+/* Closed pill: clip 58px photo inside the 60×60 bar (3px padding + 58px overflows) */
+.sp-header-left-bt,
+.slideDown .sp-header {
+    overflow: hidden;
+}
+
+.slideDown .sp-header-left {
+    padding: 0 !important;
+}
+
+.sp-header-left-bt .sp-avatar-bt {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.sp-header-left-bt .sp-avatar-bt img {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
 .chatbot_timer_holder {
   width: 100%;
   height: fit-content;

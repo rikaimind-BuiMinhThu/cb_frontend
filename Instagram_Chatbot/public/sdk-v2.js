@@ -1,4 +1,10 @@
-/* __EC_CHAT_BODY_VERSION_GATE__ */
+/* __EC_CHAT_BODY_VERSION_GATE__
+ *
+ * DO NOT upload this file to https://ec-chatbot.com/sdk-v2.js
+ * Existing LPs embed that URL. Production root must keep the ungated
+ * file from the production branch. This gated copy is for feature/bot-v2
+ * (staging / the /v2/ frontend). New v2 customers use /v2/sdk.js.
+ */
 (function () {
   var currentScript = document.currentScript;
   var ENTRY_VERSION = "1.0";

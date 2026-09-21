@@ -6,7 +6,7 @@ import api from 'v2/api/api-management';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { getAdminRoutePath, getEcChatBotFrontEndBaseUrl } from 'v2/variables/constants';
 import {
-  CHAT_BODY_VERSION_DEFAULT,
+  CHAT_BODY_VERSION_1,
   buildFaqEmbedScript,
   buildPaymentEmbedScript,
   getSdkEmbedPaths,
@@ -27,7 +27,7 @@ import {
 const InstallationTag = () => {
   const [urlDemo, setUrlDemo] = useState('');
   const [botId] = useState(Cookies.get(BOT_ID_COOKIE_KEY));
-  const [chatBodyVersion, setChatBodyVersion] = useState(CHAT_BODY_VERSION_DEFAULT);
+  const [chatBodyVersion, setChatBodyVersion] = useState(CHAT_BODY_VERSION_1);
 
   const { paymentSdkUrl, faqSdkUrl } = useMemo(
     () => getSdkEmbedPaths(chatBodyVersion, getEcChatBotFrontEndBaseUrl()),

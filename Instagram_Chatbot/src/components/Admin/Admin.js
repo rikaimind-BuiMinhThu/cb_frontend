@@ -10,9 +10,9 @@ import Company from 'views/Public/Company';
 import Contact from 'views/Public/Contact';
 import ShortUrl from 'views/Public/ShortUrl';
 import News from 'views/Public/News';
-import AdminV2 from 'v2/app/AdminV2';
 
 const Admin = lazy(() => import('../../layouts/Admin'));
+const AdminV2 = lazy(() => import('v2/app/AdminV2'));
 const PreviewClone = lazy(() => import('views/BotElement/BotSetting/PreviewClone'));
 const PreviewFukushashiki = lazy(() => import('views/BotElement/BotSetting/PreviewFukushashiki'));
 const PreviewFaq = lazy(() => import('views/BotElement/BotSetting/PreviewFaq'));
@@ -69,7 +69,14 @@ class App extends Component {
             <Route exact path="/news" component={News} />
             <Route exact path="/" component={Login} />
             <Route path="/sign-in" component={Login} />
-            <Route path="/v2" component={AdminV2} />
+            <Route
+              path="/v2"
+              render={(props) => (
+                <Suspense fallback={null}>
+                  <AdminV2 {...props} />
+                </Suspense>
+              )}
+            />
             <Route
               path="/admin"
               render={(props) => (

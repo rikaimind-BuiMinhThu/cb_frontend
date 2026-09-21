@@ -70,6 +70,7 @@ const ScenarioMessageSettingsAccordion = ({
     clearAccordionPanelLayout(role);
     // Only reset when switching messages. Edits to the open message (tag firing,
     // button name, etc.) must not collapse その他の設定.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- selectedMessage is read via ref
   }, [indexMessageSelect, selectedMessageId, isUseFukushashiki, resetConditionPanelLayout, role]);
 
   const hasActiveSpecialDisplay = hasActiveSpecialDisplayConditions(selectedMessage, isUseFukushashiki);

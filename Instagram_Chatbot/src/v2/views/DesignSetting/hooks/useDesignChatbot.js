@@ -11,6 +11,7 @@ import {
   BOT_ID_COOKIE_KEY,
   BOT_TYPE_BOT,
   BOT_TYPE_COOKIE_KEY,
+  CHAT_BODY_VERSION_1,
   CHAT_BODY_VERSION_DEFAULT,
   CHATBOTS_API_PATH,
   CHATBOTS_API_PATH_RELATIVE,
@@ -252,7 +253,7 @@ export const useDesignChatbot = (initialBotId, options = EMPTY_OPTIONS) => {
       setApiColorKey(colorKey);
 
       setBotName(data.bot_name || '');
-      setChatBodyVersion(data.chat_body_version || CHAT_BODY_VERSION_DEFAULT);
+      setChatBodyVersion(data.chat_body_version || CHAT_BODY_VERSION_1);
       setTitle(data.title || '');
       setSubtitle(data.subtitle || '');
       setDesignType(data.design_type || DESIGN_TYPE_DEFAULT);

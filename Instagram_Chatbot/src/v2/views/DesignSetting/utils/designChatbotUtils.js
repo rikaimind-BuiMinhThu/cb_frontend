@@ -1,7 +1,7 @@
 import IconManDefault from 'v2/assets/img/bot-icon/man1_new.png';
 import { EC_CHATBOT_URL } from 'v2/variables/constants';
 import {
-  CHAT_BODY_VERSION_DEFAULT,
+  CHAT_BODY_VERSION_1,
   COLOR_MAP,
   DEFAULT_HEIGHT_PC,
   DEFAULT_IMAGES,
@@ -181,7 +181,7 @@ export const buildBasicInfoPayload = ({
       design_type: designType,
       bot_name: botName,
       main_color,
-      chat_body_version: chatBodyVersion || CHAT_BODY_VERSION_DEFAULT,
+      chat_body_version: chatBodyVersion || CHAT_BODY_VERSION_1,
       ...(main_color_other ? { main_color_other } : {}),
     },
   };

@@ -71,7 +71,7 @@ const notifyLpSwap = (action, type) => {
       }
       window.parent.postMessage(payload, "*");
     }
-  } catch {
+  } catch (_error) {
     // ignore cross-origin notify failures
   }
 };
@@ -79,7 +79,7 @@ const notifyLpSwap = (action, type) => {
 const qidFromSrc = (src) => {
   try {
     return new URL(src, window.location.href).searchParams.get(QID_PARAM) || "";
-  } catch {
+  } catch (_error) {
     return "";
   }
 };
@@ -164,7 +164,7 @@ export const applyLpUgcSampleSwap = (data) => {
         { action: data.type === TIKTOK_TYPE ? TAKEJS_TIKTOK_LOADED_ACTION : TAKEJS_LOADED_ACTION },
         "*",
       );
-    } catch {
+    } catch (_error) {
       // ignore
     }
   };
