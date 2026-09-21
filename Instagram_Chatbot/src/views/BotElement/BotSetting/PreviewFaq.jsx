@@ -46,7 +46,6 @@ import {
   sendContactFormRequest,
   isUserMessage,
   toNumber,
-  sendContactFormRequest,
 } from "./PreviewComponent/Utils";
 import { injectHtmlUgcConfigContent } from "./PreviewComponent/BotMessageUtils";
 import {
