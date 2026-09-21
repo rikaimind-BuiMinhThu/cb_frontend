@@ -225,6 +225,8 @@
     border: 1px solid gray;
 }
 
+#sp-container1 .ant-select-selector,
+.sp-popup-zip-code-address .ant-select-selector,
 .sp-body .ant-select-selector {
     border: 1px solid gray !important;
     font-weight: 400;
