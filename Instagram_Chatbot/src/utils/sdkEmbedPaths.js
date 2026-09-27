@@ -1,6 +1,6 @@
 export const CHAT_BODY_VERSION_1 = '1.0';
 export const CHAT_BODY_VERSION_2 = '2.0';
-export const CHAT_BODY_VERSION_DEFAULT = CHAT_BODY_VERSION_2;
+export const CHAT_BODY_VERSION_DEFAULT = CHAT_BODY_VERSION_1;
 
 /**
  * Resolve recommended SDK embed script paths for a chatbot version.

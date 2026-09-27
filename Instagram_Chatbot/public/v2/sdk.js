@@ -282,6 +282,90 @@
     }
   };
 
+  // src/v2/sdk/integrations/ugcModalBridge.js
+  var DEFAULT_UGC_HOST = "https://st.ugc-creative.com";
+  var appendStylesheet = (href) => {
+    if (document.querySelector(`link[href="${href}"]`)) return;
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = href;
+    document.head.appendChild(link);
+  };
+  var appendScript = (src) => new Promise((resolve) => {
+    if (document.querySelector(`script[src="${src}"]`)) {
+      resolve();
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = src;
+    script.onload = script.onerror = () => resolve();
+    document.body.appendChild(script);
+  });
+  var ensureHiddenHostInput = (id, ugcHost) => {
+    let el = document.getElementById(id);
+    if (!el) {
+      el = document.createElement("input");
+      el.type = "hidden";
+      el.id = id;
+      document.body.appendChild(el);
+    }
+    el.setAttribute("data-host", ugcHost);
+  };
+  var modalFlags = () => {
+    if (!window.__ugcHostModalFlags) {
+      window.__ugcHostModalFlags = { swal: false, ig: false, tt: false };
+    }
+    return window.__ugcHostModalFlags;
+  };
+  var injectUgcHostModalAssets = (..._0) => __async(null, [..._0], function* ({
+    ugcHost = DEFAULT_UGC_HOST,
+    hasInstagram = false,
+    hasTiktok = false
+  } = {}) {
+    const flags = modalFlags();
+    if (!flags.swal) {
+      flags.swal = true;
+      window.__ugcHostModalAssetsLoaded = true;
+      if (!document.getElementById("ugc-host-swal-zindex")) {
+        const style = document.createElement("style");
+        style.id = "ugc-host-swal-zindex";
+        style.textContent = ".swal2-container{z-index:10000000!important;}";
+        document.head.appendChild(style);
+      }
+      appendStylesheet(
+        "https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/10.7.0/sweetalert2.min.css"
+      );
+      appendStylesheet(`${ugcHost}/ugc/css/popup.css`);
+      appendStylesheet(
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css"
+      );
+      yield appendScript(
+        "https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/10.7.0/sweetalert2.min.js"
+      );
+    }
+    if (hasInstagram && !flags.ig) {
+      flags.ig = true;
+      ensureHiddenHostInput("ugc-slider-info", ugcHost);
+      yield appendScript(`${ugcHost}/ugc/js/take.js`);
+    }
+    if (hasTiktok && !flags.tt) {
+      flags.tt = true;
+      ensureHiddenHostInput("ugc-tiktok-slider-info", ugcHost);
+      yield appendScript(`${ugcHost}/ugc/js/tiktoks/take.js`);
+    }
+  });
+  var registerUgcChatbotModalBridge = () => {
+    window.addEventListener("message", (e) => {
+      if (!e.data || e.data.action !== "ugcEnableChatbotModalBridge") return;
+      window.__ugcChatbotModalBridgeEnabled = true;
+      injectUgcHostModalAssets({
+        ugcHost: e.data.ugcHost || DEFAULT_UGC_HOST,
+        hasInstagram: !!e.data.hasInstagram,
+        hasTiktok: !!e.data.hasTiktok
+      });
+    });
+  };
+
   // src/v2/sdk/constants.js
   var WAIT_TO_LOAD_AMAZON_DATA_MAX_COUNT = 20;
   var WAIT_FOR_ELEMENT_MAX_COUNT = 50;
@@ -294,6 +378,8 @@
   var PAYMENT_METHOD_ID_TYPE = "payment_method_id";
   var EMPTY_VALUE = "";
   var BOT_ID_STORAGE_KEY = "bot_id";
+  var PREVIEW_SDK_ID = "previewSdk";
+  var PREVIEW_SDK_IFRAME_SELECTOR = "iframe#previewSdk";
   var CHATBOT_ACTIONS = {
     CLICK_BUTTON: "clickButton",
     EXCUTE_JS: "excuteJS",
@@ -873,6 +959,7 @@
   var DEFAULT_TAG_FIRING = {
     enabled: false,
     provider: TAG_FIRING_PROVIDERS.GTM,
+    measurement_id: "",
     open_event: DEFAULT_TAG_FIRING_EVENTS.open,
     start_event: DEFAULT_TAG_FIRING_EVENTS.start,
     complete_event: DEFAULT_TAG_FIRING_EVENTS.complete
@@ -964,6 +1051,10 @@
 
   // src/v2/sdk/amazon/loaders.js
   var appendIframeToBody = (iframe) => {
+    Array.from(document.querySelectorAll(PREVIEW_SDK_IFRAME_SELECTOR)).forEach((existing) => {
+      if (existing === iframe || !existing.parentNode) return;
+      existing.parentNode.removeChild(existing);
+    });
     setGlobalIframe(iframe);
     document.body.appendChild(iframe);
   };
@@ -1471,6 +1562,8 @@
   };
 
   // src/v2/utils/sdkLayoutUtils.js
+  var DEFAULT_WIDTH_PC = 380;
+  var DEFAULT_HEIGHT_PC = 620;
   var toLayoutNumber = (value, defaultValue) => {
     if (value == null || value === "") {
       return defaultValue;
@@ -1494,8 +1587,8 @@
       };
     }
     return {
-      width: toLayoutNumber(widthPc, 450),
-      height: toLayoutNumber(heightPc, 700)
+      width: toLayoutNumber(widthPc, DEFAULT_WIDTH_PC),
+      height: toLayoutNumber(heightPc, DEFAULT_HEIGHT_PC)
     };
   };
   var getClosedIframeDimensions = ({
@@ -1804,7 +1897,14 @@
     const data = yield response.json();
     log(data);
   });
-  var handleChatbotMessage = (e, iframe) => __async(null, null, function* () {
+  var getLivePreviewIframe = () => {
+    const byId = document.getElementById(PREVIEW_SDK_ID);
+    if (byId && byId.isConnected) return byId;
+    const global = chatbotLayout.globalIframe;
+    if (global && global.isConnected) return global;
+    return null;
+  };
+  var handleChatbotMessage = (e) => __async(null, null, function* () {
     if (typeof e.data !== "object") return;
     if (e.data.source !== "ec-chatbot") return;
     flushQueuedAmazonPaySelectorPayload();
@@ -1885,6 +1985,8 @@
         break;
     }
     if (e.data.isOpen === void 0) return;
+    const iframe = getLivePreviewIframe();
+    if (!iframe) return;
     resizeIframeFromMessage(iframe, e.data);
     iframe.style.width = `${iframe.width} !important`;
     iframe.style.height = `${iframe.height} !important`;
@@ -1981,7 +2083,7 @@
     window.addEventListener(
       "message",
       (e) => {
-        handleChatbotMessage(e, iframe);
+        handleChatbotMessage(e);
       },
       false
     );
@@ -2052,6 +2154,7 @@
     if (redirected) return;
     initSentry();
     ensureJQuery();
+    registerUgcChatbotModalBridge();
     displayPopup();
   });
 })();

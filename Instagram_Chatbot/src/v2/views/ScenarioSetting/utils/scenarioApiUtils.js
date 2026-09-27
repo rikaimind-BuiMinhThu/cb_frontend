@@ -26,7 +26,8 @@ const parseExecutionPolicy = (data) => {
   if (knownPolicies.includes(data.execution_policy)) {
     return data.execution_policy;
   }
-  return data.isUseFukushashiki ? EXECUTION_POLICIES.FUKUSHASHIKI : DEFAULT_EXECUTION_POLICY;
+  const isFukushashiki = data.is_used_fukushashiki || data.isUseFukushashiki;
+  return isFukushashiki ? EXECUTION_POLICIES.FUKUSHASHIKI : DEFAULT_EXECUTION_POLICY;
 };
 
 export const cleanMessageTimerConfig = (config) => {

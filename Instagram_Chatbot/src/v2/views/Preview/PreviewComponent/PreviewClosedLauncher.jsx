@@ -4,6 +4,7 @@ import { DISPLAY_TYPES } from "./Constants";
 import { toNumber } from "./Utils";
 import { getClosedBarWidth, getClosedLauncherPosition } from "v2/utils/sdkLayoutUtils";
 import { getDesignTypeClassName } from "v2/utils/designTypeChrome";
+import { resolveMainColorCss } from "v2/views/DesignSetting/utils/designChatbotUtils";
 import "v2/assets/css/bot/preview-chat-bot.css";
 
 const buildPositionVars = (position = {}) => ({
@@ -37,8 +38,10 @@ const PreviewClosedLauncher = ({
   const buttonTypePc = toNumber(state.buttonTypePc, 1);
   const positionSp = toNumber(state.positionSp, 1);
   const buttonTypeSp = toNumber(state.buttonTypeSp, 1);
-  const mainColor =
-    state.botInfor?.main_color || state.botInfor?.main_color_other;
+  const mainColor = resolveMainColorCss(
+    state.botInfor?.main_color,
+    state.botInfor?.main_color_other,
+  );
   const title = state.botInfor?.title;
   const toggleOpen = () => onOpen(!state.isOpen);
   const fullWidthMobile = Boolean(state.useFullWidthChatbotMobile);

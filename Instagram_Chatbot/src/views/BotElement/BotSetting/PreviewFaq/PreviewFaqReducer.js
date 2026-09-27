@@ -395,7 +395,7 @@ const pushNewVariablesToVariablesList = (newState) => {
       return item;
     }
 
-    item.default_value = getDefaultValue(item, item.contentType, item.field, item.value, newState.prefecturesList, newState.variables, item.variable_name);
+    item.default_value = getDefaultValue(item, item.contentType, item.value, item.field, newState.prefecturesList, newState.variables, item.variable_name);
 
     newState.objParam[variableName] = item.default_value;
   });
@@ -561,7 +561,7 @@ const handleSaveInputContent = (newState, subContent, contentType, field, value)
       return item;
     }
 
-    item.default_value = getDefaultValue(subContent, contentType, field, value, newState.prefecturesList, newState.variables, subContent.save_input_content);
+    item.default_value = getDefaultValue(subContent, contentType, value, field, newState.prefecturesList, newState.variables, subContent.save_input_content);
 
     newState.objParam[variableName] = value;
   });

@@ -559,11 +559,12 @@ function ClientManagement() {
       }
     }
 
-    var mailformat = /^[a-zA-Z0-9]+[a-zA-Z0-9]+([._+-])*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/;
+    var mailformat = /^[a-zA-Z0-9]+([._+-][a-zA-Z0-9]+)*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/;
+    emaill = (emaill || '').replace(/＠/g, '@');
     if (
       document.getElementById('newEmail') != null &&
-      document.getElementById('newEmail').value.length > 0 &&
-      document.getElementById('newEmail').value.length < 35
+      emaill.length > 0 &&
+      emaill.length < 35
     ) {
       emailCheckLen = true;
       if (emaill.match(mailformat)) {
@@ -748,13 +749,13 @@ function ClientManagement() {
   }
 
   function validateReplySmtp({ requirePasswordIfNew } = { requirePasswordIfNew: false }) {
-    const gmail = (replySmtpGmail || '').trim();
+    const gmail = (replySmtpGmail || '').trim().replace(/＠/g, '@');
     const password = replySmtpGmailAppPassword || '';
     const gmailErrId = document.getElementById('newClientメール送信用GmailErrMsg')
       || document.getElementById('addClientメール送信用GmailErrMsg');
     const passwordErrId = document.getElementById('newClientメール送信用アプリパスワードErrMsg')
       || document.getElementById('addClientメール送信用アプリパスワードErrMsg');
-    const mailformat = /^[a-zA-Z0-9]+[a-zA-Z0-9]+([._+-])*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/;
+    const mailformat = /^[a-zA-Z0-9]+([._+-][a-zA-Z0-9]+)*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/;
 
     if (gmailErrId) {
       gmailErrId.style.display = 'none';
@@ -839,7 +840,8 @@ function ClientManagement() {
     }
 
 
-    var mailformat = /^[a-zA-Z0-9]+[a-zA-Z0-9]+([._+-])*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/;
+    var mailformat = /^[a-zA-Z0-9]+([._+-][a-zA-Z0-9]+)*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/;
+    email = (email || '').replace(/＠/g, '@');
     if (email.length > 35) {
       emailCheck = false;
     }

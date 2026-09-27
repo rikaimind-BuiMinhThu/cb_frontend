@@ -42,7 +42,7 @@ const RadioButtonContent = ({
                       </div>
                     )}
                     <div className="ss-message__content--user-radio_button-wrapper">
-                      {radioButton.type === RADIO_TYPE.DEFAULT &&
+                      {(radioButton.type === RADIO_TYPE.DEFAULT || radioButton.type === RADIO_TYPE.GENDER) &&
                         radioButton[radioButton.type].map((item, index) => {
                           return (
                             <div

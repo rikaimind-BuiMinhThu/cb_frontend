@@ -27,6 +27,7 @@ const RadioButtonSetting = (props) => {
   const renderTypeBody = () => {
     switch (radioButton.type) {
       case RADIO_BUTTON_TYPES.DEFAULT:
+      case RADIO_BUTTON_TYPES.GENDER:
         return <DefaultTypeSetting {...props} />;
       case RADIO_BUTTON_TYPES.RADIO_BUTTON_IMG:
         return <RadioButtonImgTypeSetting {...props} />;

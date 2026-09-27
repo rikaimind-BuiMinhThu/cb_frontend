@@ -163,6 +163,18 @@ const resolveMainColorFromApi = (apiColor) => {
   return apiColor;
 };
 
+/**
+ * CSS color for chrome surfaces (header / launcher / progress fill / buttons).
+ * Named API colors (e.g. "blue") stay as CSS keywords so computed styles match v1
+ * (`blue` → rgb(0,0,255)), not the Design Setting swatch hex (#327AED).
+ */
+export const resolveMainColorCss = (apiColor, otherColor) => {
+  if (apiColor && !String(apiColor).startsWith('#')) return apiColor;
+  if (otherColor) return otherColor;
+  if (apiColor) return apiColor;
+  return null;
+};
+
 export const resolveMainColorContext = (chatbot) => {
   const apiColorKey = chatbot?.main_color && !String(chatbot.main_color).startsWith('#')
     ? chatbot.main_color
@@ -171,8 +183,10 @@ export const resolveMainColorContext = (chatbot) => {
     || resolveMainColorFromApi(chatbot?.main_color)
     || chatbot?.main_color
     || DEFAULT_MAIN_COLOR;
+  const mainColorCss = resolveMainColorCss(chatbot?.main_color, chatbot?.main_color_other)
+    || mainColorHex;
 
-  return { apiColorKey, mainColorHex };
+  return { apiColorKey, mainColorHex, mainColorCss };
 };
 
 const VALID_EFFECT_IDS = new Set(FIELD_FOCUS_EFFECT_IDS);
@@ -316,9 +330,9 @@ export const resolveButtonWidthCss = (widthValue) => {
 };
 
 export const resolveButtonPaddingCss = (paddingValue) => {
-  if (!paddingValue || typeof paddingValue !== 'string') return '4px 10px';
+  if (!paddingValue || typeof paddingValue !== 'string') return '1px 8px';
   const trimmed = paddingValue.trim();
-  return trimmed || '4px 10px';
+  return trimmed || '1px 8px';
 };
 
 export const resolveButtonPositionJustify = (positionId) => {
@@ -374,6 +388,23 @@ const lightenHex = (hex, amount = 0.1) => {
   return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
 };
 
+/** v1 `lightenColor(hex, 0.1)` — opacity, not a solid mix toward white. */
+const hexToRgba = (hex, opacity) => {
+  if (!hex || !String(hex).startsWith('#') || String(hex).length < 7) return hex;
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  if ([r, g, b].some((n) => Number.isNaN(n))) return hex;
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+};
+
+export const hasExplicitThemeValue = (rawTheme, camelKey) => {
+  if (!rawTheme || typeof rawTheme !== 'object') return false;
+  const snakeKey = CAMEL_TO_SNAKE_THEME[camelKey];
+  const value = rawTheme[camelKey] ?? (snakeKey ? rawTheme[snakeKey] : undefined);
+  return value !== undefined && value !== null && value !== '';
+};
+
 export const resolveFieldFocusEffect = (effectId, theme) => {
   const effect = normalizeFieldFocusEffect(effectId);
   const focusBorder = theme.fieldFocusBorderColor || '#327AED';
@@ -386,6 +417,7 @@ export const resolveFieldFocusEffect = (effectId, theme) => {
         fieldTransition: 'none',
         focusAnimation: 'none',
         keyframesCss: '',
+        skipFocusStyle: true,
       };
     case 'outline_strong':
       return {
@@ -424,11 +456,14 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
   const presetKey = resolvePresetKey(mainColorHex, apiColorKey);
   const preset = presetKey ? PRESET_DERIVED[presetKey] : null;
   const opacityColor = preset?.opacity || lightenHex(mainColorHex, 0.1);
+  const chatWindowBgColor = preset?.opacity || hexToRgba(mainColorHex, 0.1);
   const messageColor = preset?.message || mainColorHex;
   const fontColor = preset?.font || '#fff';
+  // Named main_color → CSS keyword for chrome/buttons (v1 parity: blue → #0000FF).
+  const chromeColor = apiColorKey || mainColorHex;
   const pressedColor = presetKey === 'black' || presetKey === 'white'
-    ? mainColorHex
-    : lightenHex(mainColorHex, -0.08) || mainColorHex;
+    ? chromeColor
+    : (apiColorKey ? chromeColor : (lightenHex(mainColorHex, -0.08) || mainColorHex));
 
   return {
     headerTitleTextColor: '#ffffff',
@@ -438,7 +473,7 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
     progressBarBgColor: opacityColor,
     progressBarTextColor: '#ffffff',
     progressBarFontSize: '13px',
-    chatWindowBgColor: opacityColor,
+    chatWindowBgColor,
     botMessageBgColor: messageColor,
     botMessageTextColor: fontColor,
     botMessageFontSize: '14px',
@@ -447,18 +482,19 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
     userMessageTextColor: '#333333',
     userMessageFontSize: '14px',
     userMessageBorderStyle: 'no_tail',
-    fieldFocusBorderColor: mainColorHex,
-    fieldFocusBgColor: '#ffffff',
-    fieldFocusBgEffect: 'outline_soft',
-    fieldUnfocusBorderColor: '#cccccc',
-    fieldUnfocusBgColor: '#ffffff',
+    // Match v1 live fields: gray border, no focus chrome
+    fieldFocusBorderColor: 'gray',
+    fieldFocusBgColor: '#EFF4FD',
+    fieldFocusBgEffect: 'none',
+    fieldUnfocusBorderColor: 'gray',
+    fieldUnfocusBgColor: '#EFF4FD',
     fieldFontSize: '14px',
     validationMessageBgColor: 'transparent',
     validationMessageTextColor: '#FF7E00',
     validationMessageFontSize: '12px',
     requiredLabelTextColor: '#FF7E00',
     requiredLabelFontSize: '12px',
-    buttonNormalBgColor: mainColorHex,
+    buttonNormalBgColor: chromeColor,
     buttonNormalTextColor: '#ffffff',
     buttonPressedBgColor: pressedColor,
     buttonPressedTextColor: '#ffffff',
@@ -468,21 +504,21 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
     buttonBorderStyle: 'rounded',
     buttonEffect: 'none',
     buttonWidth: '',
-    buttonPadding: '4px 10px',
+    buttonPadding: '1px 8px',
     buttonPosition: 'right',
     checkboxUncheckedBgColor: '#ffffff',
     checkboxUncheckedBorderColor: '#cccccc',
-    checkboxCheckedBgColor: mainColorHex,
-    checkboxCheckedBorderColor: mainColorHex,
+    checkboxCheckedBgColor: chromeColor,
+    checkboxCheckedBorderColor: chromeColor,
     checkboxCheckedBorderEffect: 'none',
     checkboxFontSize: '14px',
     radioUnselectedBgColor: opacityColor,
     radioSelectedBgColor: lightenHex(mainColorHex, 0.15) || opacityColor,
     radioUnselectedBorderColor: 'transparent',
-    radioSelectedBorderColor: mainColorHex,
+    radioSelectedBorderColor: chromeColor,
     radioSelectedBorderEffect: 'none',
     radioInputUnselectedColor: '#cccccc',
-    radioInputSelectedColor: mainColorHex,
+    radioInputSelectedColor: chromeColor,
     radioFontSize: '14px',
     errorMessageBgColor: '#ffebee',
     errorMessageTextColor: '#d32f2f',
@@ -546,6 +582,21 @@ export const mergeThemeWithDefaults = (rawTheme, mainColorHex, apiColorKey) => {
     }
   }
 
+  // Prior factory default was #ffffff; v1 never applied it (CSS #EFF4FD). Coerce
+  // saved pure white so v2 LP matches v1 default field background.
+  const unfocusBg = typeof merged.fieldUnfocusBgColor === 'string'
+    ? merged.fieldUnfocusBgColor.trim().toLowerCase()
+    : '';
+  if (
+    unfocusBg === '#fff'
+    || unfocusBg === '#ffffff'
+    || unfocusBg === 'rgb(255, 255, 255)'
+    || unfocusBg === 'rgb(255,255,255)'
+    || unfocusBg === 'white'
+  ) {
+    merged.fieldUnfocusBgColor = '#EFF4FD';
+  }
+
   return merged;
 };
 
@@ -556,6 +607,7 @@ export const resolveBotMessageTheme = (themeSettings, botInfor) => {
     bgColor: theme.botMessageBgColor,
     textColor: theme.botMessageTextColor,
     fontSize: theme.botMessageFontSize,
+    showTail: normalizeMessageBorderStyle(theme.botMessageBorderStyle, 'with_tail') === 'with_tail',
   };
 };
 

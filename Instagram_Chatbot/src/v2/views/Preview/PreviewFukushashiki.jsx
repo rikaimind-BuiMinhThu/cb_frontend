@@ -9,7 +9,6 @@ import {
 import UserMessageTailIcon from 'v2/components/BotMessages/UserMessageTailIcon';
 import { resolveMainColorContext, resolveUserMessageTheme } from "v2/utils/designThemeCore";
 import PreviewFukushashikiReducer from "./PreviewFukushashiki/PreviewFukushashikiReducer";
-import { EC_CHATBOT_URL } from "v2/variables/constants";
 import "moment/locale/zh-cn";
 import {
   CHATBOT_ACTIONS,
@@ -89,10 +88,10 @@ import {
 import { convertToFukushashikiObject } from "./PreviewFukushashiki/FukushashikiDataConverterUtils";
 import { handleValidateField } from "./PreviewFukushashiki/ValidationUtils";
 import { createOrAddLinesCart } from "./PreviewComponent/ShopifyUtils";
-import { clearChatbotState } from "./PreviewComponent/previewSessionUtils";
+import { clearChatbotState, shouldSkipSavedChatbotState, subscribeLpUgcSampleSwap } from "./PreviewComponent/previewSessionUtils";
 import { getBotInforFromPreviewResponse } from "./PreviewComponent/previewBotInfoUtils";
 import {
-  getBotHeaderIconPath,
+  getBotHeaderIconUrl,
   getOpeningBotStyle as buildOpeningBotStyle,
 } from "./PreviewComponent/previewOpeningStyles";
 import { mapParsedDesignToState } from "./PreviewComponent/previewDesignStateUtils";
@@ -302,6 +301,7 @@ const PreviewFukushashiki = () => {
   usePreviewCustomJs({ state, hasSentCustomJs });
   usePreviewThemeCss({ state });
   usePreviewHtmlUgc({ state });
+  useEffect(() => subscribeLpUgcSampleSwap(), []);
   usePreviewScenarioBootstrap({
     state,
     dispatch,
@@ -395,9 +395,18 @@ const PreviewFukushashiki = () => {
     }
 
     const currentBotId = params.get("order_id") || params.get("bot_id") || Cookies.get("bot_id");
-    if (currentBotId && currentBotId !== savedState.botId) {
+    const skipSaved = shouldSkipSavedChatbotState(params, savedState)
+      || (currentBotId && currentBotId !== savedState.botId);
+    if (skipSaved) {
       clearChatbotState();
-      dispatch({ type: PREVIEW_ACTIONS.SET_UPSELL_BOT_ID, payload: currentBotId });
+      if (!currentBotId) {
+        setUseSharedBootstrap(true);
+        return;
+      }
+      dispatch({ type: PREVIEW_ACTIONS.SET_BOT_ID, payload: currentBotId });
+      if (params.get("scenario_id")) {
+        dispatch({ type: PREVIEW_ACTIONS.SET_SCENARIO_ID, payload: params.get("scenario_id") });
+      }
       return getScenarioPreviewData(currentBotId, params.get("scenario_id"))
         .then(extractStateFromPreviewResponse);
     }
@@ -1061,7 +1070,7 @@ const PreviewFukushashiki = () => {
     );
   }
 
-  const headerIconSrc = `${EC_CHATBOT_URL}${getBotHeaderIconPath(state.botInfor, state.isOpen)}`;
+  const headerIconSrc = getBotHeaderIconUrl(state.botInfor, state.isOpen);
 
   if (!state.scenarioId || !state.botInfor || state.displayType === null) return null;
 

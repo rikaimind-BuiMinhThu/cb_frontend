@@ -276,14 +276,19 @@ const PreviewFaq = () => {
     });
   }, [state.isUsedCustomJsCode, state.headCustomJsCode, state.topBodyCustomJsCode, state.bottomBodyCustomJsCode]);
 
-  // For add custom css
+  // For add custom css — last in <head> so it can beat product CSS of equal specificity
   useEffect(() => {
-    if (!state.isUsedCustomCss || !state.customCssContent) return;
+    const existing = document.getElementById('custom-css');
+    if (existing) existing.remove();
+    if (!state.isUsedCustomCss || !state.customCssContent) return undefined;
 
     const style = document.createElement('style');
-    style.id = "custom-css";
+    style.id = 'custom-css';
     style.innerHTML = state.customCssContent;
     document.head.appendChild(style);
+    return () => {
+      style.remove();
+    };
   }, [state.isUsedCustomCss, state.customCssContent]);
 
   // For add HTML_UGC_CONFIG content
@@ -655,7 +660,7 @@ const PreviewFaq = () => {
 
     dispatch({
       type: PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON,
-      payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn}
+      payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn }
     });
   };
 
@@ -809,6 +814,7 @@ const PreviewFaq = () => {
 
     if (!message || message.belong_to !== "user") return null;
     if (message.message_content[0]?.type === "button_submit") return null;
+    if (message.message_content[0]?.type === MESSAGE_CONTENT_TYPES.CONTACT_FORM) return null;
 
     let btnText = message.buttonName;
     if (!btnText) {

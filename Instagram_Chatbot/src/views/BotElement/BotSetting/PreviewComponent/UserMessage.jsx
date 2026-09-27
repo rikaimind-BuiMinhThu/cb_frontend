@@ -456,6 +456,18 @@ const UserMessage = ({
           onClickNext={onClickNext}
           isProcessing={isProcessing}
         />;
+      case MESSAGE_CONTENT_TYPES.CONTACT_FORM:
+        return <ContactForm
+          content={content}
+          disabled={disabled}
+          onChangeValue={onChangeValue}
+          onClickNext={onClickNext}
+          errors={errors}
+          contentIndex={contentIndex}
+          messageIndex={messageIndex}
+          message={message}
+          isProcessing={isProcessing}
+        />;
       case MESSAGE_CONTENT_TYPES.LABEL_NO_TRANSITION:
         return (
           <div className="m-b-10">

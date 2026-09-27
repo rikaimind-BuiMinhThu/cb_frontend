@@ -109,6 +109,10 @@ export const VALIDATION_MESSAGES = {
 };
 
 export const DEFAULT_MAIN_COLOR = '#327AED';
+export {
+  DEFAULT_HEIGHT_PC,
+  DEFAULT_WIDTH_PC,
+} from 'v2/utils/sdkLayoutUtils';
 
 export const TAB_BASIC_LABEL = '基本情報';
 export const TAB_DESIGN_LABEL = 'デザインカスタマイズ';

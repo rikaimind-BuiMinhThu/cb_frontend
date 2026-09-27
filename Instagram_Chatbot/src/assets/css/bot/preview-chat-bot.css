@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Fira+Sans:400,500,600,700,800');
+
 * {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -213,6 +215,75 @@
     width: 100%;
 }
 
+/* Production customer iframe loads scenario-single.css via the main CSS chunk.
+   Staging webpack splits that file onto the admin Scenario route, so v1 preview
+   needs these field/button radii here. Input type stays with scenario custom CSS
+   (Rosemay: .ss-input-value { 16px }). Title/必須/gaps copy scenario-single so
+   they match production when custom CSS is injected last. */
+.sp-body .ss-input-value:not(.ss-bot-chat-detail-content) {
+    padding: 6px 12px;
+    border-radius: 5px;
+    width: 100%;
+    border: 1px solid gray;
+}
+
+.ss-message__content--user-text-input-required,
+.ss-message__content--user-radio_button-required,
+.ss-message__content--user-agree_to_term-required,
+.ss-message__content--user-pull_down-required,
+.ss-message__content--user-checkbox-required {
+    color: #ff7e00 !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+}
+
+.ss-message__content--user-text-input-title,
+.ss-message__content--user-radio_button-title,
+.ss-message__content--user-agree_to_term-title,
+.ss-message__content--user-pull_down-title,
+.ss-message__content--user-checkbox-title {
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    color: black !important;
+    margin-right: 8px;
+}
+
+.ss-message__content--user-text-input-top.m-b-0,
+.ss-message__content--user-radio_button-top.m-b-0,
+.ss-message__content--user-agree_to_term-top.m-b-0,
+.ss-message__content--user-pull_down-top.m-b-0,
+.ss-message__content--user-checkbox-top.m-b-0 {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+/* Production (scenario-single): empty post_link_only is display:flex so it
+   collapses to 0px. Without this it is display:block and keeps a ~23px line
+   box, which adds to the ご利用規約 title-to-checkbox gap. */
+.ss-message__content--user-agree_to_term-post_link_only {
+    display: flex;
+    align-items: center;
+}
+
+.ss-message__content--user-agree_to_term-top.m-b-0 + * .ss-user-setting__item-checkbox {
+    margin-top: 0;
+}
+
+#sp-container1 .ant-select-selector,
+.sp-popup-zip-code-address .ant-select-selector,
+.sp-body .ant-select-selector {
+    border: 1px solid gray !important;
+    border-radius: 5px !important;
+    min-height: 36px !important;
+    display: flex;
+    align-items: center;
+}
+
+.sp-body .ss-user-message__action-btn {
+    border-radius: 25px;
+}
+
 .is_mobile .sp-body input {
     font-size: 16px;
 }
@@ -232,16 +303,19 @@
 }
 
 .sp-body-bot-side.ugc_usage > .sp-body-bot-side-messages {
-    width: 100%;
-    padding: 0;
+    width: 87%;
 }
 
 .sp-body-bot-side.ugc_usage > .sp-body-bot-side-messages .ss-bot-chat-detail-content.display_ugc {
   white-space: normal;
   width: 100% !important;
-  background-color: transparent !important;
-  color: auto;
-  padding: 0;
+  max-width: 100%;
+  /* Same fill as text bot bubbles + tail (theme --c-bot-msg-bg) */
+  background-color: var(--c-bot-msg-bg, var(--html-preview-bg, #3CACEF)) !important;
+  padding: 8px 8px 2px;
+  border-radius: 20px;
+  overflow: visible; /* allow message tail like text bubbles */
+  box-sizing: border-box;
 }
 
 .sp-body-bot-side.ugc_usage > .sp-body-bot-side-messages .ss-bot-chat-detail-content.display_ugc iframe.ugc-slider,
@@ -253,6 +327,7 @@
   width: 100% !important;
   max-width: 100% !important;
   display: block;
+  overflow: hidden !important;
 }
 
 /* Review iframe: grow with take.js height posts; avoid nested scroll / height:100% fight */
@@ -601,6 +676,16 @@
     overflow-y: unset;
     height: auto;
     border-radius: 20px;
+}
+
+/* Production customer iframe inherits Fira Sans from login.css in the main chunk.
+   Staging webpack omits that file on v1 preview, so system UI wraps differently
+   at the same 16px/700. Pin the measured production bubble values. */
+.sp-body-bot-side-messages .ss-bot-chat-detail-content.ss-message__content--bot-text.ss-input-value {
+    font-family: 'Fira Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 6px 9px;
 }
 
 .sp-body-bot-side-messages .ss-bot-chat-detail-content a:hover {
@@ -997,9 +1082,50 @@ slideUp
     }
   }
 
+/* Clip the header photo without shrinking it — let custom CSS / @media 58px win. */
+#sp-header.sp-header {
+    overflow: hidden;
+}
+
+/* Closed pill: clip 58px photo inside the 60×60 bar (3px padding + 58px overflows) */
+.sp-header-left-bt,
+.slideDown .sp-header {
+    overflow: hidden;
+}
+
+.slideDown .sp-header-left {
+    padding: 0 !important;
+}
+
+.sp-header-left-bt .sp-avatar-bt {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.sp-header-left-bt .sp-avatar-bt img {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
 .chatbot_timer_holder {
   width: 100%;
   height: fit-content;
+}
+
+.ss-user-setting__item-bottom {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  width: 100%;
+  align-items: center;
 }
 
 /* Custom width for post code inputs */
@@ -1123,18 +1249,11 @@ slideUp
   text-align: right;
 }
 
-.ss-message__content--user-zip-code-address-post-code-label {
-  font-weight: 400;
-  font-size: 12px;
-  width: 100%;
-  margin-bottom: 5px;
-}
-
+.ss-message__content--user-zip-code-address-post-code-label,
 .ss-message__content--user-zip-code-address-label {
   font-weight: 400;
-  font-size: 12px;
   width: 100%;
-  margin-bottom: 3px;
+  margin-bottom: 5px;
 }
 
 .ss-message__content--attaching_file-button-upload {

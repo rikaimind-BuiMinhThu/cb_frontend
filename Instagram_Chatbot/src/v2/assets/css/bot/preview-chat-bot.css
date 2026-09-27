@@ -84,6 +84,8 @@
     display: flex;
     justify-content: center;
     width: 100%;
+    /* padding avoids collapse with prior .ss-user-setting__item-bottom margin (→ ~20px like v1) */
+    padding-top: 10px;
 }
 
 .sp-container {
@@ -92,7 +94,7 @@
     right: 10px;
     width: 380px;
     height: 620px;
-    background-color: #EBF7FF;
+    background-color: #D6E0EF;
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
     z-index: 900;
@@ -120,6 +122,20 @@
 }
 
 .sp-header-left-avatar {}
+
+/* Open-frame header avatar (desktop + mobile; was mobile-only under max-width 981px) */
+.sp-avatar-bt {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+}
+.sp-avatar-bt img {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    display: block;
+}
 
 .sp-withdrawal-container {
     background-color: #000;
@@ -211,7 +227,7 @@
 }
 
 .sp-process-bar {
-    background-color: #EBF7FF;
+    background-color: #D6E0EF;
     margin-top: 1px;
 }
 
@@ -220,7 +236,7 @@
     min-width: 25%;
     height: 20px;
     width: var(--sp-process-bar-width, 0%);
-    background-color: var(--sp-process-bar-color, #70A5FC);
+    background-color: var(--sp-process-bar-color, #327AED);
     padding: 0 5px;
     color: #FFFFFF;
     display: block;
@@ -236,6 +252,12 @@
 
 .sp-body input {
     width: 100%;
+}
+
+/* Match v1 text-field padding (beat .ss-input-value 6px 12px) */
+.sp-body .ss-input-value.ss-input-custom-field,
+.sp-body .ss-input-custom-field {
+    padding: 6px 30px 6px 12px;
 }
 
 .is_mobile .sp-body input {
@@ -257,16 +279,19 @@
 }
 
 .sp-body-bot-side.ugc_usage > .sp-body-bot-side-messages {
-    width: 100%;
-    padding: 0;
+    width: 87%;
 }
 
 .sp-body-bot-side.ugc_usage > .sp-body-bot-side-messages .ss-bot-chat-detail-content.display_ugc {
   white-space: normal;
   width: 100% !important;
-  background-color: transparent !important;
-  color: auto;
-  padding: 0;
+  max-width: 100%;
+  /* Same fill as text bot bubbles + tail (theme --c-bot-msg-bg) */
+  background-color: var(--c-bot-msg-bg, var(--html-preview-bg, #3CACEF)) !important;
+  padding: 8px 8px 2px;
+  border-radius: 20px;
+  overflow: visible; /* allow message tail like text bubbles */
+  box-sizing: border-box;
 }
 
 .sp-body-bot-side.ugc_usage > .sp-body-bot-side-messages .ss-bot-chat-detail-content.display_ugc iframe.ugc-slider,
@@ -278,6 +303,7 @@
   width: 100% !important;
   max-width: 100% !important;
   display: block;
+  overflow: hidden !important;
 }
 
 /* Review iframe: grow with take.js height posts; avoid nested scroll / height:100% fight */
@@ -321,6 +347,14 @@
     width: 87%;
     display: flex;
     align-items: center;
+    overflow: visible;
+}
+
+.ss-bot-chat-text-input-shell {
+  position: relative;
+  overflow: visible;
+  width: fit-content;
+  max-width: 100%;
 }
 
 .sp-body-user-side {
@@ -359,7 +393,9 @@
 }
 
 .ss-user-message__content-wrapper > .sp-user-message-button-action {
-    margin-top: 10px;
+    /* padding avoids collapse with prior .ss-user-setting__item-bottom margin (→ ~20px like v1) */
+    margin-top: 0;
+    padding-top: 10px;
 }
 
 .underline-none:hover {
@@ -1435,6 +1471,21 @@ slideUp
 .ss-message__content--user-chat-container {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: 4px;
+}
+
+.ss-message__content--user-chat-container > .ss-input-custom-container.ss-message__phone-segment {
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto !important;
+  margin-bottom: 0;
+}
+
+.ss-hyphen-separator {
+  font-size: 20px;
+  flex-shrink: 0;
+  line-height: 1;
 }
 
 .flex-wrap {
@@ -1446,6 +1497,12 @@ slideUp
   text-decoration: underline;
   color: #2c76f0;
   text-align: right;
+}
+
+/* v2-only (.preview-open-frame): zip white card is content-wrapper — pad 20 to match v1 msgs-edge ~20.
+   Do not use unscoped .sp-container1 rules (shared with body 1.0 preview). */
+.preview-open-frame .ss-user-message__content-wrapper:has(.ss-message__content--user-zip-code-address-search-link) {
+  padding: 20px;
 }
 
 .ss-message__content--user-zip-code-address-post-code-label {
@@ -1584,7 +1641,7 @@ slideUp
 }
 
 .ss-bot-chat-delay {
-  background-color: #EBF7FF;
+  background-color: #D6E0EF;
   height: 40px;
   border-radius: 10px;
 }
@@ -1868,6 +1925,30 @@ slideUp
   padding-right: 3px;
 }
 
+/* Beat @media (max-width: 981px): box stays 40px tall while the image is 58px. */
+.preview-closed-launcher--bar-pc .sp-header-left-bt {
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+}
+
+.preview-closed-launcher--bar-pc .sp-avatar-bt {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.preview-closed-launcher--bar-pc .sp-avatar-bt img {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
 .preview-closed-launcher__bar-title {
   display: flex;
   align-items: center;
@@ -1928,10 +2009,28 @@ slideUp
 
 .preview-closed-launcher__sp-avatar {
   width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
 .preview-closed-launcher__sp-avatar--full {
   width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.preview-closed-launcher--bar-sp .sp-avatar img {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
 }
 
 .preview-closed-launcher__sp-title {
@@ -1979,7 +2078,24 @@ slideUp
 }
 
 .preview-open-frame__header {
-  background-color: var(--pof-header-bg, transparent);
+  background-color: var(--pof-header-bg, #327AED);
+  overflow: hidden;
+}
+
+/* Beat @media (max-width: 981px) 58px avatar — preview iframe is always <981px */
+.preview-open-frame .sp-header-left {
+  padding: 8px 12px;
+  align-items: center;
+}
+
+.preview-open-frame .sp-avatar-bt {
+  width: 40px;
+  height: 40px;
+}
+
+.preview-open-frame .sp-avatar-bt img {
+  width: 40px;
+  height: 40px;
 }
 
 .preview-open-frame--desktop .preview-open-frame__header {
@@ -2019,13 +2135,26 @@ slideUp
 }
 
 .ss-message__split-row { display: flex; justify-content: space-between; }
-.w-49-percent-flush { width: 49%; margin-bottom: 0; }
+.w-49-percent-flush { width: 49% !important; margin-bottom: 0; }
 .w-33-percent { width: 33% !important; }
 .m-l-0 { margin-left: 0; }
 .m-l-7 { margin-left: 7px; }
 .m-l-10 { margin-left: 10px; }
 .credit-card-bank-row { display: flex; justify-content: flex-start; margin: 5px 0; }
-.credit-card-expire-row { display: flex; width: 100%; }
+/* Match v1 expire row: two 33% selects + 10px gap (inline styles on SelectCustom) */
+.credit-card-expire-row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+.credit-card-expire-row > .select-custom-antd,
+.credit-card-expire-row > .select-custom-native {
+  min-width: 0;
+  box-sizing: border-box;
+}
+.credit-card-expire-row > .select-custom-antd .ant-select-selector {
+  width: 100%;
+}
 .credit-card-bank-thumb { width: 15.6667%; margin-right: 1%; }
 .preview-inline-center { display: inline-flex; align-items: center; gap: 8px; }
 .preview-icon-24 { width: 24px; height: 24px; object-fit: contain; }

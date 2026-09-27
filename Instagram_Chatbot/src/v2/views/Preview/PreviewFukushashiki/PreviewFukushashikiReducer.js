@@ -35,6 +35,10 @@ import {
   normalizeOpenAnimationStyle,
   resolveMainColorContext,
 } from 'v2/views/DesignSetting/utils/designChatbotUtils';
+import {
+  DEFAULT_HEIGHT_PC,
+  DEFAULT_WIDTH_PC,
+} from 'v2/views/DesignSetting/constants/designChatbotConstants';
 import { getDefaultValue } from 'v2/views/Preview/PreviewComponent/VariablesUtils';
 import { savedChatbotState } from 'v2/views/Preview/PreviewComponent/SessionStorageUtils';
 import { convertToFukushashikiObject } from './FukushashikiDataConverterUtils';
@@ -439,8 +443,8 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
         activePopupCloseBot: Boolean(designSetting?.popup_close_bot),
         titleBubble: designSetting?.title_bubble || "簡単90秒で注文完了",
         displayType: designSetting?.display_type ?? (isEditorPreview ? (state.displayType ?? 1) : designSetting?.display_type),
-        widthPc: designSetting?.width_pc || 450,
-        heightPc: designSetting?.height_pc || 700,
+        widthPc: designSetting?.width_pc || DEFAULT_WIDTH_PC,
+        heightPc: designSetting?.height_pc || DEFAULT_HEIGHT_PC,
         widthSp: designSetting?.width_sp || 100,
         heightSp: designSetting?.height_sp || 100,
         positionPc: designSetting?.position_pc || "1",

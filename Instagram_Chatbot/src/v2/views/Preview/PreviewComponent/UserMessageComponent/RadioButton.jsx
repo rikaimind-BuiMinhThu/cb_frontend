@@ -13,6 +13,11 @@ import {
   getRadioOptionSelectionKey,
   isRadioOptionInitiallySelected,
 } from "v2/views/ScenarioSetting/utils/radioButtonSelectionUtils";
+import { RADIO_BUTTON_TYPES } from "v2/views/ScenarioSetting/constants/contentTypeConstants";
+import {
+  getGenderOptions,
+  isGenderRadio,
+} from "v2/views/ScenarioSetting/utils/radioButtonGenderUtils";
 import { isMobile } from "v2/views/Preview/PreviewComponent/Utils";
 import OptionGender from "./OptionGender";
 
@@ -37,13 +42,6 @@ const visibleRadioItems = (radioButton) => {
   return items.filter((item) => !isFirstTimeOption(item));
 };
 
-const RADIO_BUTTON_TYPES = {
-  DEFAULT: "default",
-  RADIO_BUTTON_IMG: "radio_button_img",
-  UPSELL_BUTTON: "upsell_button",
-  CONSUME_API_RESPONSE: "consume_api_response",
-  BLOCK_STYLE: "block_style",
-};
 const PREVIEW_OPTION_PLACEHOLDER_LABEL = "ラベル";
 const EMPTY_IMAGE_ALT = "";
 
@@ -89,14 +87,17 @@ const RadioButton = ({ content, disabled, onChangeValue, errors, contentIndex, m
     ].filter(Boolean).join(" ");
   };
 
+  const renderGenderContent = () => (
+    <OptionGender
+      contentIndex={contentIndex}
+      radioButton={radioButton}
+      onChangeValue={onChangeValue}
+      options={getGenderOptions(radioButton)}
+    />
+  );
+
   const renderDefaultContent = () => {
-    if (radioButton.use_as_gender)
-      return <OptionGender
-        contentIndex={contentIndex}
-        radioButton={radioButton}
-        onChangeValue={onChangeValue}
-        options={radioButton[radioButton.type]}
-      />;
+    if (isGenderRadio(radioButton)) return renderGenderContent();
 
     return visibleRadioItems(radioButton).map((item, index) => {
       const selectionKey = getRadioOptionSelectionKey(item);
@@ -254,6 +255,8 @@ const RadioButton = ({ content, disabled, onChangeValue, errors, contentIndex, m
     switch (radioButton.type) {
       case RADIO_BUTTON_TYPES.DEFAULT:
         return renderDefaultContent();
+      case RADIO_BUTTON_TYPES.GENDER:
+        return renderGenderContent();
       case RADIO_BUTTON_TYPES.RADIO_BUTTON_IMG:
         return renderRadioButtonImgContent();
       case RADIO_BUTTON_TYPES.UPSELL_BUTTON:

@@ -192,7 +192,7 @@ function Sidebar(props) {
           <img
             src={logo}
             alt='react-logo'
-            style={{ height: '60px', paddingLeft: '10px' }}
+            style={{ height: '40px', width: '90%', paddingLeft: '10px' }}
           />
         </a>
       </div>

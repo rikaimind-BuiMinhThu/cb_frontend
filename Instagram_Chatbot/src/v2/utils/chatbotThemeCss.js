@@ -10,6 +10,7 @@ import {
   resolveFieldFocusEffect,
   resolveModalTitleTextAlign,
   resolveMainColorContext,
+  hasExplicitThemeValue,
   CAMEL_TO_SNAKE_THEME,
 } from './designThemeCore';
 import { buildDesignTypeChromeCss } from './designTypeChrome';
@@ -75,16 +76,20 @@ const withPseudoOnEach = (selectorList, pseudo) =>
     .map((selector) => `${selector.trim()}${pseudo}`)
     .join(', ');
 
-const buildFieldSelectors = (spBodySelector) => `
+const buildFieldTextSelectors = (spBodySelector) => `
 ${spBodySelector} input[type="text"]:not(.theme-preview--field-focus),
 ${spBodySelector} input[type="email"]:not(.theme-preview--field-focus),
 ${spBodySelector} input[type="tel"]:not(.theme-preview--field-focus),
 ${spBodySelector} input[type="number"]:not(.theme-preview--field-focus),
 ${spBodySelector} input[type="password"]:not(.theme-preview--field-focus),
 ${spBodySelector} textarea:not(.theme-preview--field-focus),
-${spBodySelector} select:not(.theme-preview--field-focus),
 ${spBodySelector} .ss-input-value:not(.ss-bot-chat-detail-content):not(.theme-preview--field-focus),
-${spBodySelector} .ss-input-custom-field:not(.ss-bot-chat-detail-content),
+${spBodySelector} .ss-input-custom-field:not(.ss-bot-chat-detail-content)
+`.trim();
+
+const buildFieldSelectSelectors = (spBodySelector) => `
+${spBodySelector} select:not(.theme-preview--field-focus),
+${spBodySelector} .select-custom-native:not(.theme-preview--field-focus),
 ${spBodySelector} .ant-select-selector
 `.trim();
 
@@ -260,11 +265,11 @@ ${buildModalButtonRules('#portal')}`.trim();
 const buildButtonLayoutRules = (hasExplicitWidth) => {
   const widthRule = hasExplicitWidth
     ? 'width: var(--c-btn-width) !important; min-width: 0 !important;'
-    : 'width: auto; min-width: 70px !important;';
+    : 'width: auto; min-width: 90px !important;';
 
   return `
   border-radius: var(--c-btn-border-radius, 4px) !important;
-  padding: var(--c-btn-padding, 4px 10px) !important;
+  padding: var(--c-btn-padding, 1px 8px) !important;
   margin-left: 0 !important;
   margin-right: 0 !important;
   ${widthRule}
@@ -280,6 +285,12 @@ const buildFieldFocusStyles = (fieldFocusSelectors, focusEffect, previewFocusSel
   const transitionRule = focusEffect.fieldTransition !== 'none'
     ? `transition: ${focusEffect.fieldTransition};`
     : '';
+
+  // v1 has no dedicated focus chrome; skip injected focus rules when effect is none.
+  if (focusEffect.skipFocusStyle) {
+    return { transitionRule, focusRules: '', previewRules: '' };
+  }
+
   const animationRule = focusEffect.focusAnimation !== 'none'
     ? `animation: ${focusEffect.focusAnimation} !important;`
     : '';
@@ -341,10 +352,11 @@ const buildTwinkleAnimationRule = (effectId, elementType, theme) => {
   return animation !== 'none' ? `animation: ${animation} !important;` : '';
 };
 
-const buildThemeRules = (theme, scopeSelector = '') => {
+const buildThemeRules = (theme, scopeSelector = '', options = {}) => {
   const fieldScopeSelectors = buildFieldScopeSelectors(scopeSelector);
   const spBodySelector = fieldScopeSelectors[0];
-  const fieldSelectors = combineScopedFieldSelectors(scopeSelector, buildFieldSelectors);
+  const fieldTextSelectors = combineScopedFieldSelectors(scopeSelector, buildFieldTextSelectors);
+  const fieldSelectSelectors = combineScopedFieldSelectors(scopeSelector, buildFieldSelectSelectors);
   const fieldPlaceholderSelectors = combineScopedFieldSelectors(
     scopeSelector,
     buildFieldPlaceholderSelectors,
@@ -405,11 +417,31 @@ const buildThemeRules = (theme, scopeSelector = '') => {
       scopedDescendant(scopeSelector, '.btn-preview-bot'),
       scopedDescendant(scopeSelector, '.sp-body .btn-new-bot'),
       scopedDescendant(scopeSelector, '.sp-body .ss-user-message__action-btn'),
+      scopedDescendant(scopeSelector, '.sp-body .chatbot-submit-button'),
+      scopedDescendant(scopeSelector, '.sp-body #chatbot-submit-button'),
+      scopedDescendant(scopeSelector, '.sp-body [id^="chatbot-submit-button-"]'),
     ].join(', ')
-    : '.btn-preview-bot, .sp-body .btn-new-bot, .sp-body .ss-user-message__action-btn';
+    : [
+      '.btn-preview-bot',
+      '.sp-body .btn-new-bot',
+      '.sp-body .ss-user-message__action-btn',
+      '.sp-body .chatbot-submit-button',
+      '.sp-body #chatbot-submit-button',
+      '.sp-body [id^="chatbot-submit-button-"]',
+    ].join(', ');
   const nextButtonSelector = scopeSelector
-    ? scopedDescendant(scopeSelector, '.sp-body .sp-user-message-button-action .ss-user-message__action-btn')
-    : '.sp-body .sp-user-message-button-action .ss-user-message__action-btn';
+    ? [
+      scopedDescendant(scopeSelector, '.sp-body .sp-user-message-button-action .ss-user-message__action-btn'),
+      scopedDescendant(scopeSelector, '.sp-body .chatbot-submit-button'),
+      scopedDescendant(scopeSelector, '.sp-body #chatbot-submit-button'),
+      scopedDescendant(scopeSelector, '.sp-body [id^="chatbot-submit-button-"]'),
+    ].join(', ')
+    : [
+      '.sp-body .sp-user-message-button-action .ss-user-message__action-btn',
+      '.sp-body .chatbot-submit-button',
+      '.sp-body #chatbot-submit-button',
+      '.sp-body [id^="chatbot-submit-button-"]',
+    ].join(', ');
   const nextButtonActionSelector = scopeSelector
     ? scopedDescendant(scopeSelector, '.sp-body .sp-user-message-button-action')
     : '.sp-body .sp-user-message-button-action';
@@ -450,10 +482,25 @@ ${previewButtonGroupSelector} {
     scopedDescendant(scopeSelector, '.html-code-message-icon'),
     scopedDescendant(scopeSelector, '.theme-customize-preview__bot-bubble-tail'),
   ].join(',\n');
+  const botMessageTailShowSelectors = [
+    scopedDescendant(scopeSelector, '.ss-bot-chat-text-input-bot-icon'),
+    scopedDescendant(scopeSelector, '.html-code-message-icon'),
+    scopedDescendant(scopeSelector, '.theme-customize-preview__bot-bubble-tail'),
+  ].join(',\n');
+  const botMessageTailShellSelectors = [
+    scopedDescendant(scopeSelector, '.ss-bot-chat-text-input-shell'),
+    scopedDescendant(scopeSelector, '.sp-body-bot-side-messages'),
+  ].join(',\n');
   const botMessageTailRules = botMessageBorderStyle === 'no_tail' ? `
 ${botMessageTailHideSelectors} {
   display: none !important;
-}` : '';
+}` : `
+${botMessageTailShellSelectors} {
+  overflow: visible !important;
+}
+${botMessageTailShowSelectors} {
+  display: flex !important;
+}`;
 
   const userMessageShellSelector = scopedDescendant(
     scopeSelector,
@@ -525,7 +572,7 @@ ${previewButtonNormalSelector},
 ${withPseudoOnEach(previewButtonNormalSelector, ':hover')},
 ${withPseudoOnEach(previewButtonNormalSelector, ':focus')},
 ${withPseudoOnEach(previewButtonNormalSelector, ':focus-visible')} {
-  background-color: var(--c-btn-normal-bg) !important;
+  background: var(--c-btn-normal-bg, #327AED) !important;
   color: var(--c-btn-normal-text, #fff) !important;
   font-size: var(--c-btn-font-size, 14px) !important;
   border: none !important;
@@ -538,7 +585,7 @@ ${previewButtonPressedSelector},
 ${withPseudoOnEach(previewButtonPressedSelector, ':hover')},
 ${withPseudoOnEach(previewButtonPressedSelector, ':focus')},
 ${withPseudoOnEach(previewButtonPressedSelector, ':focus-visible')} {
-  background-color: var(--c-btn-pressed-bg) !important;
+  background: var(--c-btn-pressed-bg, #2A68D1) !important;
   color: var(--c-btn-pressed-text, #fff) !important;
   font-size: var(--c-btn-font-size, 14px) !important;
   border: none !important;
@@ -580,7 +627,7 @@ ${scopedClass(scopeSelector, '.sp-header-left-label-sub-title')} {
 }
 
 ${scopedClass(scopeSelector, '.sp-process-bar')} {
-  background-color: var(--c-progress-bg, #EBF7FF) !important;
+  background-color: var(--c-progress-bg, #D6E0EF) !important;
 }
 
 ${scopedClass(scopeSelector, '.sp-process-bar-color')} {
@@ -588,9 +635,9 @@ ${scopedClass(scopeSelector, '.sp-process-bar-color')} {
   font-size: var(--c-progress-font-size, 13px) !important;
 }
 
-${scopeSelector ? spBodySelector : '#sp-body.sp-body, .sp-body'} {
-  background-color: var(--c-chat-window-bg, #EBF7FF) !important;
-}
+${options.applyChatWindowBg ? `${scopeSelector ? spBodySelector : '#sp-body.sp-body, .sp-body'} {
+  background-color: var(--c-chat-window-bg, #D6E0EF) !important;
+}` : ''}
 
 ${scopedClass(scopeSelector, '.ss-bot-message__content-wrapper')},
 ${scopedDescendant(scopeSelector, '.ss-bot-message .ss-bot-message__content')} {
@@ -599,9 +646,16 @@ ${scopedDescendant(scopeSelector, '.ss-bot-message .ss-bot-message__content')} {
   font-size: var(--c-bot-msg-font-size, 14px) !important;
 }
 
-${fieldSelectors} {
-  border: 1px solid var(--c-field-unfocus-border, #ccc) !important;
-  background-color: var(--c-field-unfocus-bg, #fff) !important;
+${fieldTextSelectors} {
+  border: 1px solid var(--c-field-unfocus-border, gray) !important;
+  background-color: var(--c-field-unfocus-bg, #EFF4FD) !important;
+  font-size: var(--c-field-font-size, 14px) !important;
+  ${transitionRule}
+}
+
+${fieldSelectSelectors} {
+  border: 1px solid var(--c-field-unfocus-border, gray) !important;
+  background-color: #ffffff !important;
   font-size: var(--c-field-font-size, 14px) !important;
   ${transitionRule}
 }
@@ -625,7 +679,8 @@ ${scopedClass(scopeSelector, '.ss-bot-chat-text-input.ss-bot-chat-detail-content
   border: none !important;
 }
 
-${scopedDescendant(scopeSelector, '.ss-bot-chat-text-input-bot-icon path')} {
+${scopedDescendant(scopeSelector, '.ss-bot-chat-text-input-bot-icon path')},
+${scopedDescendant(scopeSelector, '.html-code-message-icon path')} {
   fill: var(--c-bot-msg-bg, #3CACEF) !important;
 }
 
@@ -643,6 +698,10 @@ ${userMessageWrapperDirectChildSelector} {
   padding: 10px;
   border-radius: 20px;
 }
+
+${userMessageWrapperDirectChildSelector}:has(.ss-message__content--user-zip-code-address-search-link) {
+  padding: 20px;
+}
 ${botMessageTailRules}
 ${userMessageTailRules}
 
@@ -653,7 +712,7 @@ ${btnSelector},
 ${withPseudoOnEach(btnSelector, ':hover')},
 ${withPseudoOnEach(btnSelector, ':focus')},
 ${withPseudoOnEach(btnSelector, ':focus-visible')} {
-  background-color: var(--c-btn-normal-bg) !important;
+  background: var(--c-btn-normal-bg, #327AED) !important;
   color: var(--c-btn-normal-text, #fff) !important;
   font-size: var(--c-btn-font-size, 14px) !important;
   border: none !important;
@@ -663,7 +722,7 @@ ${withPseudoOnEach(btnSelector, ':focus-visible')} {
 }
 
 ${withPseudoOnEach(btnSelector, ':active')} {
-  background-color: var(--c-btn-pressed-bg) !important;
+  background: var(--c-btn-pressed-bg, #2A68D1) !important;
   color: var(--c-btn-pressed-text, #fff) !important;
   animation: none !important;
 }
@@ -680,9 +739,9 @@ ${nextButtonSelector},
 ${withPseudoOnEach(nextButtonSelector, ':hover')},
 ${withPseudoOnEach(nextButtonSelector, ':focus')},
 ${withPseudoOnEach(nextButtonSelector, ':focus-visible')} {
-  min-height: 36px !important;
+  min-height: 42px !important;
   font-weight: 500 !important;
-  background-color: var(--c-btn-normal-bg) !important;
+  background: var(--c-btn-normal-bg, #327AED) !important;
   color: var(--c-btn-normal-text, #fff) !important;
   font-size: var(--c-btn-font-size, 14px) !important;
   border: none !important;
@@ -692,7 +751,7 @@ ${withPseudoOnEach(nextButtonSelector, ':focus-visible')} {
 }
 
 ${withPseudoOnEach(nextButtonSelector, ':active')} {
-  background-color: var(--c-btn-pressed-bg) !important;
+  background: var(--c-btn-pressed-bg, #2A68D1) !important;
   color: var(--c-btn-pressed-text, #fff) !important;
   font-size: var(--c-btn-font-size, 14px) !important;
   animation: none !important;
@@ -848,7 +907,13 @@ ${scopedClass(scopeSelector, '.title-bot-modal')} {
 ${buildModalButtonRules(toScopeIs(scopeSelector) || scopeSelector)}${previewButtonRules}`.trim();
 };
 
-const buildThemeCss = (theme, scopeSelector = '', designType) => {
+const resolveApplyChatWindowBg = (rawTheme, options = {}) => (
+  typeof options.applyChatWindowBg === 'boolean'
+    ? options.applyChatWindowBg
+    : hasExplicitThemeValue(rawTheme, 'chatWindowBgColor')
+);
+
+const buildThemeCss = (theme, scopeSelector = '', designType, options = {}) => {
   const variablesBlock = scopeSelector
     ? `${scopeSelector} {${buildThemeVariables(theme)}\n}`
     : `#sp-container, .sp-container, #sp-container1, .sp-container1 {${buildThemeVariables(theme)}\n}`;
@@ -860,12 +925,17 @@ const buildThemeCss = (theme, scopeSelector = '', designType) => {
   const portalRules = isLiveBotScope ? `\n\n${buildPortalModalRules()}` : '';
   const chromeCss = `\n\n${buildDesignTypeChromeCss(designType, scopeSelector)}`;
 
-  return `${variablesBlock}${portalVariablesBlock}\n\n${buildThemeRules(theme, scopeSelector)}${portalRules}${chromeCss}`.trim();
+  return `${variablesBlock}${portalVariablesBlock}\n\n${buildThemeRules(theme, scopeSelector, options)}${portalRules}${chromeCss}`.trim();
 };
 
-export const generateThemeCss = (rawTheme, mainColorHex, apiColorKey, designType) => {
+export const generateThemeCss = (rawTheme, mainColorHex, apiColorKey, designType, options = {}) => {
   const theme = mergeThemeWithDefaults(rawTheme, mainColorHex, apiColorKey);
-  return buildThemeCss(theme, LIVE_THEME_SCOPE, designType);
+  return buildThemeCss(
+    theme,
+    LIVE_THEME_SCOPE,
+    designType,
+    { applyChatWindowBg: resolveApplyChatWindowBg(rawTheme, options) },
+  );
 };
 
 export const generateScopedThemeCss = (
@@ -874,12 +944,18 @@ export const generateScopedThemeCss = (
   apiColorKey,
   scopeSelector = '#theme-customize-preview',
   designType,
+  options = {},
 ) => {
   const theme = mergeThemeWithDefaults(rawTheme, mainColorHex, apiColorKey);
-  return buildThemeCss(theme, scopeSelector, designType);
+  return buildThemeCss(
+    theme,
+    scopeSelector,
+    designType,
+    { applyChatWindowBg: resolveApplyChatWindowBg(rawTheme, options) },
+  );
 };
 
-export const injectBotThemeCss = (rawTheme, mainColorHex, apiColorKey, designType) => {
+export const injectBotThemeCss = (rawTheme, mainColorHex, apiColorKey, designType, options = {}) => {
   const existing = document.getElementById('bot-theme-vars');
   if (existing) existing.remove();
 
@@ -887,14 +963,8 @@ export const injectBotThemeCss = (rawTheme, mainColorHex, apiColorKey, designTyp
 
   const style = document.createElement('style');
   style.id = 'bot-theme-vars';
-  style.innerHTML = generateThemeCss(rawTheme, mainColorHex, apiColorKey, designType);
+  style.innerHTML = generateThemeCss(rawTheme, mainColorHex, apiColorKey, designType, options);
   document.head.appendChild(style);
-};
-
-export const applyPreviewThemeCss = (botInfor, themeSettings) => {
-  if (!botInfor) return;
-  const { apiColorKey, mainColorHex } = resolveMainColorContext(botInfor);
-  injectBotThemeCss(themeSettings, mainColorHex, apiColorKey, botInfor.design_type);
 };
 
 export const parseThemeFromDesignSettings = (designSettings) => {
@@ -903,6 +973,15 @@ export const parseThemeFromDesignSettings = (designSettings) => {
     ? JSON.parse(designSettings)
     : designSettings;
   return parsed?.theme || null;
+};
+
+export const applyPreviewThemeCss = (botInfor, themeSettings) => {
+  if (!botInfor) return;
+  const { apiColorKey, mainColorHex } = resolveMainColorContext(botInfor);
+  const savedTheme = parseThemeFromDesignSettings(botInfor.design_settings);
+  injectBotThemeCss(themeSettings, mainColorHex, apiColorKey, botInfor.design_type, {
+    applyChatWindowBg: hasExplicitThemeValue(savedTheme, 'chatWindowBgColor'),
+  });
 };
 
 export const getErrorThemeStyles = (rawTheme, mainColorHex, apiColorKey) => {

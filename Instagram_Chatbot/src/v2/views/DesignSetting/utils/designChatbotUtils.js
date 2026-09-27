@@ -1,9 +1,11 @@
 import IconManDefault from 'v2/assets/img/bot-icon/man1_new.png';
 import { EC_CHATBOT_URL } from 'v2/variables/constants';
 import {
-  CHAT_BODY_VERSION_DEFAULT,
+  CHAT_BODY_VERSION_1,
   COLOR_MAP,
+  DEFAULT_HEIGHT_PC,
   DEFAULT_IMAGES,
+  DEFAULT_WIDTH_PC,
   OPEN_ANIMATION_DURATION_MS_DEFAULT,
   OPEN_ANIMATION_DURATION_MS_MAX,
   OPEN_ANIMATION_DURATION_MS_MIN,
@@ -155,7 +157,10 @@ export const resolveMainColorFromApi = (apiColor) => {
   return apiColor;
 };
 
-export { resolveMainColorContext } from 'v2/utils/designThemeCore';
+export {
+  resolveMainColorContext,
+  resolveMainColorCss,
+} from 'v2/utils/designThemeCore';
 
 export const buildBasicInfoPayload = ({
   title,
@@ -176,7 +181,7 @@ export const buildBasicInfoPayload = ({
       design_type: designType,
       bot_name: botName,
       main_color,
-      chat_body_version: chatBodyVersion || CHAT_BODY_VERSION_DEFAULT,
+      chat_body_version: chatBodyVersion || CHAT_BODY_VERSION_1,
       ...(main_color_other ? { main_color_other } : {}),
     },
   };
@@ -289,8 +294,8 @@ export const parseDesignSettings = (rawSettings, mainColorHex, apiColorKey) => {
 
   return {
     displayType: parseNumericSetting(result?.display_type, 1),
-    widthPc: parseNumericSetting(result?.width_pc, 380),
-    heightPc: parseNumericSetting(result?.height_pc, 620),
+    widthPc: parseNumericSetting(result?.width_pc, DEFAULT_WIDTH_PC),
+    heightPc: parseNumericSetting(result?.height_pc, DEFAULT_HEIGHT_PC),
     widthSp: parseNumericSetting(result?.width_sp, 100),
     heightSp: parseNumericSetting(result?.height_sp, 100),
     positionPc: parseNumericSetting(result?.position_pc, 1),

@@ -1,5 +1,7 @@
 import Cookies from "js-cookie";
 import {
+  DEFAULT_HEIGHT_PC,
+  DEFAULT_WIDTH_PC,
   OPEN_ANIMATION_DURATION_MS_DEFAULT,
   OPEN_ANIMATION_STYLE_DEFAULT,
 } from "v2/views/DesignSetting/constants/designChatbotConstants";
@@ -26,8 +28,8 @@ const sharedPreviewInitialState = (params) => ({
   variablesList: [],
   buttonTypePc: "1",
   positionPc: "1",
-  widthPc: 450,
-  heightPc: 700,
+  widthPc: DEFAULT_WIDTH_PC,
+  heightPc: DEFAULT_HEIGHT_PC,
   widthSp: 100,
   heightSp: 100,
   rightPcTitle: "",

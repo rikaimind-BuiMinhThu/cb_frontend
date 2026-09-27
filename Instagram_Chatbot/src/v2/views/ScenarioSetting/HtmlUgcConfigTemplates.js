@@ -1,7 +1,7 @@
 export const UGC_HOSTS = {
   production: 'https://ugc-creative.com',
   staging: 'https://st.ugc-creative.com',
-  local: 'http://localhost',
+  local: 'http://localhost:8080',
 };
 
 /** @deprecated use getUgcHost(env) — kept as staging alias for compatibility */
@@ -16,18 +16,18 @@ const buildSharedAssets = (ugcHost) => [
 ];
 
 const buildInstagramSpecific = (ugcHost) => [
-  `<script src="${ugcHost}/ugc/js/take.js"></script>`,
   `<input type="hidden" id="ugc-slider-info" data-host="${ugcHost}">`,
+  `<script src="${ugcHost}/ugc/js/take.js"></script>`,
 ];
 
 const buildTiktokSpecific = (ugcHost) => [
-  `<script src="${ugcHost}/ugc/js/tiktoks/take.js"></script>`,
   `<input type="hidden" id="ugc-tiktok-slider-info" data-host="${ugcHost}">`,
+  `<script src="${ugcHost}/ugc/js/tiktoks/take.js"></script>`,
 ];
 
 const buildReviewSnippet = (ugcHost) => [
-  `<script src="${ugcHost}/ugc/js/api_reviews/take.js"></script>`,
   `<input type="hidden" id="ugc-review-slider-info" data-host="${ugcHost}">`,
+  `<script src="${ugcHost}/ugc/js/api_reviews/take.js"></script>`,
 ];
 
 /**

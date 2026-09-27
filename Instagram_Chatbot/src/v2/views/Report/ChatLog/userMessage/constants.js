@@ -82,6 +82,7 @@ export const TEXTAREA_TYPE = {
 
 export const RADIO_TYPE = {
   DEFAULT: 'default',
+  GENDER: 'gender',
   RADIO_BUTTON_IMG: 'radio_button_img',
   UPSELL_BUTTON: 'upsell_button',
   CONSUME_API_RESPONSE: 'consume_api_response',

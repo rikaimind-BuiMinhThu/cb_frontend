@@ -4,7 +4,7 @@ import { PREVIEW_ACTIONS } from "../Constants";
 import { getScenarioPreviewData } from "../Utils";
 import { getChatbotSavedState } from "../SessionStorageUtils";
 import { setConversionParamToLocalStorage } from "v2/views/Preview/PreviewFukushashiki/LPUtils";
-import { clearChatbotState } from "../previewSessionUtils";
+import { clearChatbotState, shouldSkipSavedChatbotState } from "../previewSessionUtils";
 
 /**
  * Session restore vs sequential URL-field hydrate → getScenarioPreviewData.
@@ -28,7 +28,9 @@ export const usePreviewScenarioBootstrap = ({
       const savedState = getChatbotSavedState();
       if (savedState) {
         const currentBotId = params.get("bot_id") || Cookies.get("bot_id");
-        if (currentBotId && currentBotId !== savedState.botId) {
+        const skipSaved = shouldSkipSavedChatbotState(params, savedState)
+          || (currentBotId && currentBotId !== savedState.botId);
+        if (skipSaved) {
           clearChatbotState();
           getScenarioPreviewData(
             currentBotId,

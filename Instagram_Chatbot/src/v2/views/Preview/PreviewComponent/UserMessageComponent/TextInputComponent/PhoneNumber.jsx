@@ -41,6 +41,7 @@ const PhoneNumber = ({ content, disabled, contentIndex, onChangeValue }) => {
         <InputCustom
           disabled={disabled}
           className="ss-message__content--user-text-input ss-input-value ss-message__content--user-text-input-phone_number-hyphen"
+          containerClassName="ss-message__phone-segment"
           maxLength={3}
           type="tel"
           inputMode="numeric"
@@ -64,10 +65,12 @@ const PhoneNumber = ({ content, disabled, contentIndex, onChangeValue }) => {
           }}
           value={textInput[textInput.type]?.value1 || EMPTY_INPUT_VALUE}
         ></InputCustom>
+        <span className="ss-hyphen-separator">-</span>
         <InputCustom
           id={`ss-user-message-phone_number_2_${contentIndex}`}
           disabled={disabled}
           className="ss-message__content--user-text-input ss-input-value ss-message__content--user-text-input-phone_number-hyphen"
+          containerClassName="ss-message__phone-segment"
           type="tel"
           inputMode="numeric"
           maxLength={4}
@@ -91,10 +94,12 @@ const PhoneNumber = ({ content, disabled, contentIndex, onChangeValue }) => {
           }}
           value={textInput[textInput.type]?.value2 || EMPTY_INPUT_VALUE}
         ></InputCustom>
+        <span className="ss-hyphen-separator">-</span>
         <InputCustom
           id={`ss-user-message-phone_number_3_${contentIndex}`}
           disabled={disabled}
           className="ss-message__content--user-text-input ss-input-value ss-message__content--user-text-input-phone_number-hyphen"
+          containerClassName="ss-message__phone-segment"
           placeholder={textInput[textInput.type]?.number3}
           maxLength={4}
           type="tel"

@@ -5,6 +5,14 @@ import ScenarioSettingsModalContainer from './modals/ScenarioSettingsModalContai
 import ScenarioModalShell from './modals/shared/ScenarioModalShell';
 import AddVariableModalContent from './modals/AddVariableModalContent';
 import { useScenarioPanelDestructuring } from '../hooks/useScenarioPanelDestructuring';
+import { mergeGenderIconUrl } from '../constants/genderOptionDefaults';
+
+const BELONG_TO_USER = 'user';
+const PRESET_CONFIG_FIELD = 'preset_config';
+const MODAL_TITLE_ADD_VARIABLE = '変数追加';
+const MODAL_TITLE_FILE_REFERENCE = 'ファイル参照';
+const MODAL_TITLE_SHOPIFY = 'Shopify商品参照';
+const DEFAULT_BOT_FILE_FIELD = 'content';
 
 const ScenarioEditorModals = () => {
   const panel = useScenarioPanelDestructuring();
@@ -36,6 +44,48 @@ const ScenarioEditorModals = () => {
     setErrorVariable('');
   };
 
+  const applyGenderIconFileUrl = (fileUrl) => {
+    const message = dataMessages[indexMessageSelect];
+    const contentItem = message?.message_content?.[varFileReference.indexContent];
+    const radioButton = contentItem?.[varFileReference.contentType];
+    const options = radioButton?.[varFileReference.subContentType];
+    const option = options?.[varFileReference.indexSubContent];
+    if (!option) return;
+
+    const nextPreset = mergeGenderIconUrl(option.preset_config, fileUrl);
+    onChangeValueMessageContent(
+      indexMessageSelect,
+      varFileReference.indexContent,
+      varFileReference.contentType,
+      nextPreset,
+      varFileReference.subContentType,
+      varFileReference.indexSubContent,
+      PRESET_CONFIG_FIELD,
+    );
+  };
+
+  const handleReferFile = (fileUrl) => {
+    if (varFileReference.genderIconUrl) {
+      applyGenderIconFileUrl(fileUrl);
+      setIsOpenFileReference(false);
+      return;
+    }
+
+    if (dataMessages[indexMessageSelect].belong_to === BELONG_TO_USER) {
+      if (varFileReference.indexChildSubContentType !== undefined) {
+        onChangeValueMessageContent(indexMessageSelect, varFileReference.indexContent, varFileReference.contentType, fileUrl, varFileReference.subContentType, varFileReference.indexSubContentType, varFileReference.childSubContentType, varFileReference.indexChildSubContentType, varFileReference.img);
+      } else if (varFileReference.childSubContentType !== undefined) {
+        onChangeValueMessageContent(indexMessageSelect, varFileReference.indexContent, varFileReference.contentType, fileUrl, varFileReference.subContentType, varFileReference.childSubContentType, varFileReference.indexSubContent, varFileReference.img);
+      } else {
+        onChangeValueMessageContent(indexMessageSelect, varFileReference.indexContent, varFileReference.contentType, fileUrl, varFileReference.subContentType, varFileReference.indexSubContent, varFileReference.img);
+      }
+    } else {
+      const field = varFileReference.fieldName || DEFAULT_BOT_FILE_FIELD;
+      onChangeValueMessageContent(indexMessageSelect, 0, messageType, fileUrl, field);
+    }
+    setIsOpenFileReference(false);
+  };
+
   return (
     <>
       <ScenarioSettingsModalContainer />
@@ -43,7 +93,7 @@ const ScenarioEditorModals = () => {
       <ScenarioModalShell
         open={isOpenAddVariable}
         onClose={closeAddVariable}
-        title="変数追加"
+        title={MODAL_TITLE_ADD_VARIABLE}
         width={500}
       >
         <AddVariableModalContent
@@ -58,7 +108,7 @@ const ScenarioEditorModals = () => {
           setIsOpenFileReference(false);
           setAcceptFile();
         }}
-        title="ファイル参照"
+        title={MODAL_TITLE_FILE_REFERENCE}
         width={800}
       >
         <FileReferencePopup
@@ -67,34 +117,20 @@ const ScenarioEditorModals = () => {
             setAcceptFile();
           }}
           acceptFile={acceptFile}
-          onReferFile={(file_url) => {
-            if (dataMessages[indexMessageSelect].belong_to === 'user') {
-              if (varFileReference.indexChildSubContentType !== undefined) {
-                onChangeValueMessageContent(indexMessageSelect, varFileReference.indexContent, varFileReference.contentType, file_url, varFileReference.subContentType, varFileReference.indexSubContentType, varFileReference.childSubContentType, varFileReference.indexChildSubContentType, varFileReference.img);
-              } else if (varFileReference.childSubContentType !== undefined) {
-                onChangeValueMessageContent(indexMessageSelect, varFileReference.indexContent, varFileReference.contentType, file_url, varFileReference.subContentType, varFileReference.childSubContentType, varFileReference.indexSubContent, varFileReference.img);
-              } else {
-                onChangeValueMessageContent(indexMessageSelect, varFileReference.indexContent, varFileReference.contentType, file_url, varFileReference.subContentType, varFileReference.indexSubContent, varFileReference.img);
-              }
-            } else {
-              const field = varFileReference.fieldName || 'content';
-              onChangeValueMessageContent(indexMessageSelect, 0, messageType, file_url, field);
-            }
-            setIsOpenFileReference(false);
-          }}
+          onReferFile={handleReferFile}
         />
       </ScenarioModalShell>
 
       <ScenarioModalShell
         open={isOpenShopifyReference}
         onClose={() => setIsOpenShopifyReference(false)}
-        title="Shopify商品参照"
+        title={MODAL_TITLE_SHOPIFY}
         width={600}
       >
         <ShopifyReferencePopup
           onCancel={() => setIsOpenShopifyReference(false)}
           onReferProductVariant={(productVariantId, displayName) => {
-            if (dataMessages[indexMessageSelect].belong_to === 'user') {
+            if (dataMessages[indexMessageSelect].belong_to === BELONG_TO_USER) {
               if (varFileReference.indexChildSubContentType !== undefined) {
                 onChangeValueMessageContent(indexMessageSelect, varShopifyReference.indexContent, varShopifyReference.contentType, productVariantId, varShopifyReference.subContentType, varShopifyReference.indexSubContentType, varShopifyReference.childSubContentType, varShopifyReference.indexChildSubContentType, varShopifyReference.productVariantId);
                 onChangeValueMessageContent(indexMessageSelect, varShopifyReference.indexContent, varShopifyReference.contentType, displayName, varShopifyReference.subContentType, varShopifyReference.indexSubContentType, varShopifyReference.childSubContentType, varShopifyReference.indexChildSubContentType, varShopifyReference.displayName);
@@ -106,7 +142,7 @@ const ScenarioEditorModals = () => {
                 onChangeValueMessageContent(indexMessageSelect, varShopifyReference.indexContent, varShopifyReference.contentType, displayName, varShopifyReference.subContentType, varShopifyReference.indexSubContent, varShopifyReference.displayName);
               }
             } else {
-              onChangeValueMessageContent(indexMessageSelect, 0, messageType, productVariantId, 'content');
+              onChangeValueMessageContent(indexMessageSelect, 0, messageType, productVariantId, DEFAULT_BOT_FILE_FIELD);
             }
             setIsOpenShopifyReference(false);
           }}

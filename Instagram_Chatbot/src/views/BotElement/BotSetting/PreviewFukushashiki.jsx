@@ -474,14 +474,19 @@ const PreviewFukushashiki = () => {
     });
   }, [state.isUsedCustomJsCode, state.headCustomJsCode, state.topBodyCustomJsCode, state.bottomBodyCustomJsCode]);
 
-  // For add custom css
+  // For add custom css — last in <head> so it can beat product CSS of equal specificity
   useEffect(() => {
-    if (!state.isUsedCustomCss || !state.customCssContent) return;
+    const existing = document.getElementById('custom-css');
+    if (existing) existing.remove();
+    if (!state.isUsedCustomCss || !state.customCssContent) return undefined;
 
     const style = document.createElement('style');
-    style.id = "custom-css";
+    style.id = 'custom-css';
     style.innerHTML = state.customCssContent;
     document.head.appendChild(style);
+    return () => {
+      style.remove();
+    };
   }, [state.isUsedCustomCss, state.customCssContent]);
 
   // For add HTML_UGC_CONFIG content

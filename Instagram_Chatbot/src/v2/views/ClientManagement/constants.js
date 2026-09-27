@@ -20,7 +20,7 @@ export const IMAGE_TYPE_PNG = 'image/png';
 export const IMAGE_TYPE_JPEG = 'image/jpeg';
 export const INTEGER_REGEX = /^\d+$/;
 export const MAIL_FORMAT =
-  /^[a-zA-Z0-9]+[a-zA-Z0-9]+([._+-])*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/;
+  /^[a-zA-Z0-9]+([._+-][a-zA-Z0-9]+)*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/;
 export const PHONE_REGEX = /^[+]*[(]{0,1}[0-9]{1,3}[)]{0,1}[-\s./0-9]*$/g;
 export const FULLWIDTH_AT = '＠';
 export const ASCII_AT = '@';

@@ -1,4 +1,4 @@
-import { CHATBOT_ACTIONS, LP_INTEGRATION_MODES } from './constants.js';
+import { CHATBOT_ACTIONS, LP_INTEGRATION_MODES, PREVIEW_SDK_ID } from './constants.js';
 import { extractSelectorBindingsFromMessages } from './amazon/bindings.js';
 import { resolveLpMode } from './amazon/detection.js';
 import { pushChatbotTagEvent } from './tagFiring.js';
@@ -61,7 +61,15 @@ const getUser = async (url, datacount) => {
   log(data);
 };
 
-const handleChatbotMessage = async (e, iframe) => {
+const getLivePreviewIframe = () => {
+  const byId = document.getElementById(PREVIEW_SDK_ID);
+  if (byId && byId.isConnected) return byId;
+  const global = chatbotLayout.globalIframe;
+  if (global && global.isConnected) return global;
+  return null;
+};
+
+const handleChatbotMessage = async (e) => {
   if (typeof e.data !== 'object') return;
   if (e.data.source !== 'ec-chatbot') return;
 
@@ -148,6 +156,9 @@ const handleChatbotMessage = async (e, iframe) => {
   }
 
   if (e.data.isOpen === undefined) return;
+
+  const iframe = getLivePreviewIframe();
+  if (!iframe) return;
 
   resizeIframeFromMessage(iframe, e.data);
 
@@ -263,7 +274,7 @@ export const displayPopup = async () => {
   window.addEventListener(
     'message',
     (e) => {
-      handleChatbotMessage(e, iframe);
+      handleChatbotMessage(e);
     },
     false,
   );
