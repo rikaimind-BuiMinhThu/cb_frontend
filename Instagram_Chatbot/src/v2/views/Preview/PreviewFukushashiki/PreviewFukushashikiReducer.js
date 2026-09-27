@@ -835,16 +835,32 @@ const handleSaveInputContent = (newState, subContent, contentType, field, value)
   }
 
   const variableName = subContent.save_input_content;
+  if (!variableName) return;
 
-  newState.variables.forEach((item) => {
-    if (item.variable_name !== variableName) {
-      return item;
-    }
+  const defaultValue = getDefaultValue(
+    subContent,
+    contentType,
+    value,
+    field,
+    newState.prefecturesList,
+    newState.variables,
+    variableName,
+  );
 
-    item.default_value = getDefaultValue(subContent, contentType, value, field, newState.prefecturesList, newState.variables, variableName);
+  newState.objParam = {
+    ...newState.objParam,
+    [variableName]: value,
+  };
 
-    newState.objParam[variableName] = value;
-  });
+  const existing = newState.variables.find((item) => item.variable_name === variableName);
+  if (existing) {
+    existing.default_value = defaultValue;
+  } else {
+    newState.variables.push({
+      variable_name: variableName,
+      default_value: defaultValue,
+    });
+  }
 };
 
 export default PreviewFukushashikiReducer;

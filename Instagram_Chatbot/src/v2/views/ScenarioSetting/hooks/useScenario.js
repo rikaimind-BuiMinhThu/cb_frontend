@@ -62,6 +62,15 @@ export const useScenario = (mode = 'scenario') => {
   const [lpProductUrl, setLpProductUrl] = useState('');
   const [orderResultMode, setOrderResultMode] = useState('wait');
   const [lexicaCartUrl, setLexicaCartUrl] = useState('');
+  const [lexicaUpsellProductUrl, setLexicaUpsellProductUrl] = useState('');
+  const [lexicaUpsellSku, setLexicaUpsellSku] = useState('');
+  const [lexicaCrossSellProductUrl, setLexicaCrossSellProductUrl] = useState('');
+  const [lexicaCrossSellSku, setLexicaCrossSellSku] = useState('');
+  const [lexicaOfferChat, setLexicaOfferChat] = useState(true);
+  const [lexicaOfferConfirmUpsell, setLexicaOfferConfirmUpsell] = useState(true);
+  const [lexicaOfferConfirmCrossSell, setLexicaOfferConfirmCrossSell] = useState(false);
+  const [lexicaOfferThanksUpsell, setLexicaOfferThanksUpsell] = useState(true);
+  const [lexicaOfferThanksCrossSell, setLexicaOfferThanksCrossSell] = useState(true);
   const [coupon, setCoupon] = useState('');
   const [isUseOnlyRegularOrder, setIsUseOnlyRegularOrder] = useState(false);
   const [executionPolicy, setExecutionPolicy] = useState(DEFAULT_EXECUTION_POLICY);
@@ -209,6 +218,15 @@ export const useScenario = (mode = 'scenario') => {
     setLpProductUrl(parsed.lpProductUrl);
     setOrderResultMode(parsed.orderResultMode || 'wait');
     setLexicaCartUrl(parsed.lexicaCartUrl || '');
+    setLexicaUpsellProductUrl(parsed.lexicaUpsellProductUrl || '');
+    setLexicaUpsellSku(parsed.lexicaUpsellSku || '');
+    setLexicaCrossSellProductUrl(parsed.lexicaCrossSellProductUrl || '');
+    setLexicaCrossSellSku(parsed.lexicaCrossSellSku || '');
+    setLexicaOfferChat(parsed.lexicaOfferChat !== false);
+    setLexicaOfferConfirmUpsell(parsed.lexicaOfferConfirmUpsell !== false);
+    setLexicaOfferConfirmCrossSell(parsed.lexicaOfferConfirmCrossSell === true);
+    setLexicaOfferThanksUpsell(parsed.lexicaOfferThanksUpsell !== false);
+    setLexicaOfferThanksCrossSell(parsed.lexicaOfferThanksCrossSell !== false);
     setIsUseOnlyRegularOrder(parsed.isUseOnlyRegularOrder);
     setExecutionPolicy(parsed.executionPolicy || DEFAULT_EXECUTION_POLICY);
     setIsUseFukushashiki(parsed.isUseFukushashiki);
@@ -376,6 +394,15 @@ export const useScenario = (mode = 'scenario') => {
     lpProductUrl,
     orderResultMode,
     lexicaCartUrl,
+    lexicaUpsellProductUrl,
+    lexicaUpsellSku,
+    lexicaCrossSellProductUrl,
+    lexicaCrossSellSku,
+    lexicaOfferChat,
+    lexicaOfferConfirmUpsell,
+    lexicaOfferConfirmCrossSell,
+    lexicaOfferThanksUpsell,
+    lexicaOfferThanksCrossSell,
     isUseOnlyRegularOrder,
     executionPolicy,
     isUseFukushashiki,
@@ -458,6 +485,15 @@ export const useScenario = (mode = 'scenario') => {
     merchandiseId,
     orderResultMode,
     lexicaCartUrl,
+    lexicaUpsellProductUrl,
+    lexicaUpsellSku,
+    lexicaCrossSellProductUrl,
+    lexicaCrossSellSku,
+    lexicaOfferChat,
+    lexicaOfferConfirmUpsell,
+    lexicaOfferConfirmCrossSell,
+    lexicaOfferThanksUpsell,
+    lexicaOfferThanksCrossSell,
     productIdCrossSell,
     scenarioName,
     scenarioType,
@@ -588,6 +624,15 @@ export const useScenario = (mode = 'scenario') => {
       lpProductUrl,
       orderResultMode,
       lexicaCartUrl,
+      lexicaUpsellProductUrl,
+      lexicaUpsellSku,
+      lexicaCrossSellProductUrl,
+      lexicaCrossSellSku,
+      lexicaOfferChat,
+      lexicaOfferConfirmUpsell,
+      lexicaOfferConfirmCrossSell,
+      lexicaOfferThanksUpsell,
+      lexicaOfferThanksCrossSell,
       coupon,
       isUseOnlyRegularOrder,
       executionPolicy,
@@ -686,6 +731,15 @@ export const useScenario = (mode = 'scenario') => {
       setLpProductUrl,
       setOrderResultMode,
       setLexicaCartUrl,
+      setLexicaUpsellProductUrl,
+      setLexicaUpsellSku,
+      setLexicaCrossSellProductUrl,
+      setLexicaCrossSellSku,
+      setLexicaOfferChat,
+      setLexicaOfferConfirmUpsell,
+      setLexicaOfferConfirmCrossSell,
+      setLexicaOfferThanksUpsell,
+      setLexicaOfferThanksCrossSell,
       setCoupon,
       setIsUseOnlyRegularOrder,
       setExecutionPolicy,
