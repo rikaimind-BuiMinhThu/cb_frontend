@@ -409,16 +409,17 @@ const routes = [
     layout: '/v2/admin',
   },
   {
-    path: '/bot-orders',
-    name: MENU_LABELS.BOT_ORDERS,
-    component: BotOrderList,
-    layout: '/v2/admin',
-  },
-  {
     path: '/bot-orders/:id',
     name: TITLE_BOT_ORDER_DETAIL,
     component: BotOrderDetail,
     layout: '/v2/admin',
+  },
+  {
+    path: '/bot-orders',
+    name: MENU_LABELS.BOT_ORDERS,
+    component: BotOrderList,
+    layout: '/v2/admin',
+    exact: true,
   },
   {
     path: '/bot-settings/:botId/sms-template',

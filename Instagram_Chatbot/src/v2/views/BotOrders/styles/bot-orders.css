@@ -22,14 +22,23 @@
   margin-bottom: 24px;
 }
 
-.bot-orders-rpa-log {
+.bot-orders-rpa-table {
+  margin-bottom: 24px;
+}
+
+.bot-orders-rpa-step-id {
+  display: block;
+  font-size: 12px;
+}
+
+.bot-orders-rpa-step-detail {
   background: #f5f7fa;
   border: 1px solid #e5e7eb;
   border-radius: 4px;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 13px;
   line-height: 1.6;
-  margin-bottom: 24px;
+  margin: 0;
   overflow: auto;
   padding: 16px;
   white-space: pre-wrap;

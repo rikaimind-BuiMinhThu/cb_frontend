@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Descriptions, Spin, Tag, Typography } from 'antd';
+import { Button, Descriptions, Modal, Spin, Table, Tag, Typography } from 'antd';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import api from 'v2/api/api-management';
@@ -10,14 +10,18 @@ import { AdminActionButton, AdminPage } from 'v2/components/AdminShell';
 import { ADMIN_PATHS } from 'v2/components/AdminShell/constants';
 import { getAdminRoutePath } from 'v2/variables/constants';
 import {
+  cleanErrorMessage,
+  completedRpaSteps,
   formatCardExpiry,
   formatDateTime,
   formatInputLabel,
   formatInputValue,
-  formatRpaLog,
+  formatRpaStepDetail,
+  rpaStepResultLabel,
   showCardFields,
   statusColor,
   statusLabel,
+  truncateText,
 } from './botOrderFormat';
 import {
   BACK_TO_LIST_LABEL,
@@ -42,21 +46,46 @@ import {
   LABEL_START,
   LABEL_STATUS,
   ORDERS_API_PATH,
+  RPA_COL_ACTION,
+  RPA_COL_ERROR,
+  RPA_COL_INDEX,
+  RPA_COL_RESULT,
+  RPA_COL_STEP,
+  RPA_COL_TIME,
+  RPA_COL_URL,
+  RPA_EMPTY_STEPS,
+  RPA_LOG_BUTTON,
+  RPA_LOG_MODAL_TITLE,
+  RPA_NG,
+  RPA_OK,
+  RPA_STEP_FALLBACK,
   SCREENSHOT_ALT,
 } from './constants';
 import './styles/bot-orders.css';
 
-const ExternalLink = ({ href }) => {
+const ExternalLink = ({ href, children }) => {
   if (!href) return DASH;
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
-      {href}
+      {children || href}
     </a>
   );
 };
 
 ExternalLink.propTypes = {
   href: PropTypes.string,
+  children: PropTypes.node,
+};
+
+const truncateUrl = (url) => {
+  if (!url) return DASH;
+  try {
+    const parsed = new URL(url);
+    const path = `${parsed.pathname}${parsed.search}`.slice(0, 28);
+    return `${parsed.host}${path}${path.length >= 28 ? '…' : ''}`;
+  } catch {
+    return truncateText(url, 36);
+  }
 };
 
 const BotOrderDetail = () => {
@@ -66,6 +95,7 @@ const BotOrderDetail = () => {
   const [row, setRow] = useState(null);
   const [loading, setLoading] = useState(false);
   const [screenshotUrl, setScreenshotUrl] = useState('');
+  const [logStep, setLogStep] = useState(null);
   const screenshotObjectUrlRef = useRef('');
   const listPath = getAdminRoutePath(ADMIN_PATHS.BOT_ORDERS);
   const scenarioListPath = getAdminRoutePath(ADMIN_PATHS.SCENARIO_LIST);
@@ -118,7 +148,83 @@ const BotOrderDetail = () => {
   const goToList = () => history.push(listPath);
   const cardVisible = showCardFields(row);
   const answers = row?.answers || [];
-  const rpaLog = useMemo(() => formatRpaLog(row?.rpa_steps), [row]);
+  const rpaSteps = useMemo(() => completedRpaSteps(row?.rpa_steps), [row]);
+  const errorMessage = useMemo(
+    () => (row?.error_message ? cleanErrorMessage(row.error_message) : DASH),
+    [row]
+  );
+  const logDetail = useMemo(() => formatRpaStepDetail(logStep), [logStep]);
+  const logModalTitle = logStep
+    ? `${RPA_LOG_MODAL_TITLE}: ${logStep.description || logStep.name || RPA_STEP_FALLBACK}`
+    : RPA_LOG_MODAL_TITLE;
+
+  const rpaColumns = useMemo(
+    () => [
+      {
+        title: RPA_COL_INDEX,
+        key: 'index',
+        width: 56,
+        render: (_value, _record, index) => index + 1,
+      },
+      {
+        title: RPA_COL_STEP,
+        key: 'step',
+        render: (_value, step) => (
+          <div>
+            <div>{step.description || step.name || RPA_STEP_FALLBACK}</div>
+            {step.name && step.description && step.name !== step.description && (
+              <Typography.Text type="secondary" className="bot-orders-rpa-step-id">
+                {step.name}
+              </Typography.Text>
+            )}
+          </div>
+        ),
+      },
+      {
+        title: RPA_COL_RESULT,
+        key: 'result',
+        width: 72,
+        render: (_value, step) => {
+          const label = rpaStepResultLabel(step.ok);
+          if (label === RPA_OK) return <Tag color="success">{RPA_OK}</Tag>;
+          if (label === RPA_NG) return <Tag color="error">{RPA_NG}</Tag>;
+          return DASH;
+        },
+      },
+      {
+        title: RPA_COL_TIME,
+        key: 'at',
+        width: 160,
+        render: (_value, step) => formatDateTime(step.at),
+      },
+      {
+        title: RPA_COL_URL,
+        key: 'url',
+        ellipsis: true,
+        render: (_value, step) => (
+          <ExternalLink href={step.url}>{truncateUrl(step.url)}</ExternalLink>
+        ),
+      },
+      {
+        title: RPA_COL_ERROR,
+        key: 'error',
+        ellipsis: true,
+        render: (_value, step) =>
+          step.ok === false ? truncateText(cleanErrorMessage(step.error)) : DASH,
+      },
+      {
+        title: RPA_COL_ACTION,
+        key: 'action',
+        width: 88,
+        render: (_value, step) => (
+          <Button type="link" size="small" onClick={() => setLogStep(step)}>
+            {RPA_LOG_BUTTON}
+          </Button>
+        ),
+      },
+    ],
+    []
+  );
 
   return (
     <AdminPage>
@@ -156,7 +262,7 @@ const BotOrderDetail = () => {
                 )}
                 <Descriptions.Item label={LABEL_START}>{formatDateTime(row.start_time)}</Descriptions.Item>
                 <Descriptions.Item label={LABEL_END}>{formatDateTime(row.end_time)}</Descriptions.Item>
-                <Descriptions.Item label={LABEL_ERROR}>{row.error_message || DASH}</Descriptions.Item>
+                <Descriptions.Item label={LABEL_ERROR}>{errorMessage}</Descriptions.Item>
                 <Descriptions.Item label={LABEL_CONVERSATION}>
                   <Link to={chatLogPath}>{CONVERSATION_LINK_LABEL}</Link>
                 </Descriptions.Item>
@@ -176,7 +282,26 @@ const BotOrderDetail = () => {
               )}
 
               <Typography.Title level={5}>{LABEL_RPA_LOG}</Typography.Title>
-              <pre className="bot-orders-rpa-log">{rpaLog}</pre>
+              <Table
+                className="bot-orders-section bot-orders-rpa-table"
+                rowKey={(_step, index) => `${_step.name || 'step'}-${index}-${_step.at || ''}`}
+                columns={rpaColumns}
+                dataSource={rpaSteps}
+                pagination={false}
+                size="small"
+                locale={{ emptyText: RPA_EMPTY_STEPS }}
+              />
+
+              <Modal
+                title={logModalTitle}
+                visible={Boolean(logStep)}
+                onCancel={() => setLogStep(null)}
+                footer={null}
+                width={640}
+                destroyOnClose
+              >
+                <pre className="bot-orders-rpa-step-detail">{logDetail}</pre>
+              </Modal>
 
               {screenshotUrl && (
                 <div className="bot-orders-screenshot">

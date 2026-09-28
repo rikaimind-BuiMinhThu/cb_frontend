@@ -90,6 +90,7 @@ const AdminLayout = () => {
                     <Route
                       path={`${route.layout}${route.path}`}
                       component={route.component}
+                      exact={Boolean(route.exact)}
                       key={`${route.layout}${route.path}`}
                     />
                   ))}

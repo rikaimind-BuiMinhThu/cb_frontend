@@ -92,6 +92,34 @@ export const RPA_STEP_FALLBACK = '—';
 export const RPA_OK = 'OK';
 export const RPA_NG = 'NG';
 export const RPA_EXCEPTION_PREFIX = '例外: ';
+export const RPA_ERROR_TRUNCATE = 40;
+export const RPA_LOG_BUTTON = 'ログ';
+export const RPA_LOG_MODAL_TITLE = 'ステップログ';
+export const RPA_COL_INDEX = '#';
+export const RPA_COL_STEP = 'ステップ';
+export const RPA_COL_RESULT = '結果';
+export const RPA_COL_TIME = '時刻';
+export const RPA_COL_URL = 'URL';
+export const RPA_COL_ERROR = 'エラー';
+export const RPA_COL_ACTION = '操作';
+export const RPA_TOKEN_ARTIFACT = /\[token\]/g;
+export const RPA_STEP_PREFIX = 'Step';
+export const RPA_LABEL_CURRENT_URL = 'Current URL';
+export const RPA_LABEL_RUN_TIME = 'Run time';
+export const RPA_LABEL_ID = 'id';
+export const RPA_LABEL_RESULT = 'Result';
+export const RPA_LABEL_REASON = 'Reason';
+export const RPA_LABEL_ACTIONS = 'Actions';
+export const RPA_LABEL_WHERE = 'where';
+export const RPA_LABEL_VALUE = 'value';
+export const RPA_ACTIONS_MISSING = '— (詳細未記録)';
+export const RPA_EMPTY_STEPS = 'ステップはありません';
+export const RPA_ACTION_TYPE_LABELS = {
+  fill: 'Fill',
+  click: 'Click',
+  select: 'Select',
+  navigate: 'Navigate',
+};
 
 export const BIRTH_DATE_YEAR_SUFFIX = '年';
 export const BIRTH_DATE_MONTH_SUFFIX = '月';

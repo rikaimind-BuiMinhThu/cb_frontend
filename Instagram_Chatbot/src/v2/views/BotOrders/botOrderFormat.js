@@ -16,10 +16,22 @@ import {
   PATH_VALUE_LABELS,
   PAYMENT_CREDIT,
   PAYMENT_ZEUS,
-  RPA_EXCEPTION_PREFIX,
+  RPA_ACTION_TYPE_LABELS,
+  RPA_ACTIONS_MISSING,
+  RPA_ERROR_TRUNCATE,
+  RPA_LABEL_ACTIONS,
+  RPA_LABEL_CURRENT_URL,
+  RPA_LABEL_ID,
+  RPA_LABEL_REASON,
+  RPA_LABEL_RESULT,
+  RPA_LABEL_RUN_TIME,
+  RPA_LABEL_VALUE,
+  RPA_LABEL_WHERE,
   RPA_NG,
   RPA_OK,
   RPA_STEP_FALLBACK,
+  RPA_STEP_PREFIX,
+  RPA_TOKEN_ARTIFACT,
   STATUS_COLOR_DEFAULT,
   STATUS_COLORS,
   STATUS_LABELS,
@@ -109,24 +121,70 @@ export const formatInputValue = (name, value) => {
   return JSON.stringify(value);
 };
 
-export const formatRpaLog = (steps) => {
-  if (!steps || !steps.length) return DASH;
-  return steps
-    .map((step, index) => {
-      const title = step.description || step.name || RPA_STEP_FALLBACK;
-      const lines = [`${index + 1}. ${title}`];
-      if (step.name) lines.push(`       // ${step.name}`);
-      if (step.ok === true) {
-        lines.push(`         -> ${RPA_OK}`);
-        return lines.join('\n');
-      }
-      if (step.ok === false) {
-        lines.push(`         -> ${RPA_NG}`);
-        if (step.error) lines.push(`       ${RPA_EXCEPTION_PREFIX}${step.error}`);
-      }
-      return lines.join('\n');
-    })
-    .join('\n\n');
+export const stripTokenArtifacts = (text) => {
+  if (text == null || text === EMPTY_VALUE) return EMPTY_VALUE;
+  return String(text).replace(RPA_TOKEN_ARTIFACT, EMPTY_VALUE);
+};
+
+export const cleanErrorMessage = (message) => {
+  const cleaned = stripTokenArtifacts(message).trim();
+  return cleaned || DASH;
+};
+
+export const completedRpaSteps = (steps) => {
+  if (!Array.isArray(steps)) return [];
+  return steps.filter((step) => step && (step.ok === true || step.ok === false));
+};
+
+export const truncateText = (text, max = RPA_ERROR_TRUNCATE) => {
+  if (text == null || text === EMPTY_VALUE) return DASH;
+  const value = String(text);
+  if (value.length <= max) return value;
+  return `${value.slice(0, max)}…`;
+};
+
+export const rpaStepResultLabel = (ok) => {
+  if (ok === true) return RPA_OK;
+  if (ok === false) return RPA_NG;
+  return DASH;
+};
+
+const formatActionTypeLabel = (type) => RPA_ACTION_TYPE_LABELS[type] || type || RPA_STEP_FALLBACK;
+
+const formatRpaActionsBlock = (actions) => {
+  if (!Array.isArray(actions) || actions.length === 0) {
+    return [`- ${RPA_LABEL_ACTIONS}: ${RPA_ACTIONS_MISSING}`];
+  }
+  const lines = [`- ${RPA_LABEL_ACTIONS}:`];
+  actions.forEach((action) => {
+    const typeLabel = formatActionTypeLabel(action.type);
+    const label = action.label || EMPTY_VALUE;
+    const title = label ? `${typeLabel} ${label}` : typeLabel;
+    lines.push(`  - ${title}`);
+    lines.push(`    ${RPA_LABEL_WHERE}: ${action.where || DASH}`);
+    if (Object.prototype.hasOwnProperty.call(action, 'value')) {
+      lines.push(`    ${RPA_LABEL_VALUE}: ${cleanErrorMessage(action.value)}`);
+    }
+  });
+  return lines;
+};
+
+export const formatRpaStepDetail = (step) => {
+  if (!step) return DASH;
+  const actionLabel = step.description || step.name || RPA_STEP_FALLBACK;
+  const stepId = step.name || RPA_STEP_FALLBACK;
+  const result = rpaStepResultLabel(step.ok);
+  const reason =
+    step.ok === false ? cleanErrorMessage(step.error) : DASH;
+  return [
+    `- ${RPA_LABEL_CURRENT_URL}: ${step.url || DASH}`,
+    `- ${RPA_LABEL_RUN_TIME}: ${step.at || DASH}`,
+    `- ${RPA_STEP_PREFIX}: ${actionLabel}`,
+    `  ${RPA_LABEL_ID}: ${stepId}`,
+    ...formatRpaActionsBlock(step.actions),
+    `- ${RPA_LABEL_RESULT}: ${result}`,
+    `- ${RPA_LABEL_REASON}: ${reason}`,
+  ].join('\n');
 };
 
 export const formatCardExpiry = (value) => {
