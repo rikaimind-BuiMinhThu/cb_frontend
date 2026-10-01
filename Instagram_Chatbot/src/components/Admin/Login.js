@@ -25,6 +25,20 @@ class Login extends React.Component {
     localStorage.setItem("debug", this.getDebugFlag());
   }
 
+  componentDidMount() {
+    const token = Cookies.get('token');
+    if (!token || Cookies.get('is_auth') !== 'true') {
+      return;
+    }
+    let client = null;
+    try {
+      client = JSON.parse(localStorage.getItem('client'));
+    } catch (e) {
+      client = null;
+    }
+    window.location.href = getDefaultLandingPath(Cookies.get('user_role'), client);
+  }
+
   getEnvironment() {
     const params = new Proxy(new URLSearchParams(window.location.search), {
       get: (searchParams, prop) => searchParams.get(prop),

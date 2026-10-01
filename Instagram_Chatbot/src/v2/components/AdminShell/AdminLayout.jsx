@@ -5,7 +5,7 @@ import Cookies from 'js-cookie';
 import { Route, Switch, useLocation } from 'react-router-dom';
 import { getToken } from 'v2/api/auth';
 import { AUTH_FALSE_VALUE, IS_AUTH_COOKIE_KEY, USER_ROLE_COOKIE_KEY } from 'v2/api/constants';
-import { getAdminRoutePath, getDefaultLandingPath, getSignInPath } from 'v2/variables/constants';
+import { getAdminRoutePath, getSignInPath, getV2ShellLandingPath } from 'v2/variables/constants';
 import routes from 'v2/app/routes';
 import { adminConfigProviderProps } from 'v2/theme/adminTheme';
 import AdminHeader from './AdminHeader';
@@ -45,7 +45,7 @@ const AdminLayout = () => {
     const pathname = location?.pathname;
     const client = parseStoredClient();
     const userRole = Cookies.get(USER_ROLE_COOKIE_KEY) || EMPTY_VALUE;
-    const landingPath = getDefaultLandingPath(userRole, client);
+    const landingPath = getV2ShellLandingPath(userRole, client);
     const dashboardPath = getAdminRoutePath(ADMIN_PATHS.DASHBOARD);
 
     if (pathname === dashboardPath && userRole !== USER_ROLE_ADMIN_DEEL) {

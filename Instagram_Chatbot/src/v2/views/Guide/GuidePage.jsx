@@ -2,7 +2,7 @@ import React from 'react';
 import Cookies from 'js-cookie';
 import { USER_ROLE_COOKIE_KEY } from 'v2/api/constants';
 import { EMPTY_VALUE, parseStoredClient } from 'v2/components/AdminShell/constants';
-import { getDefaultLandingPath } from 'v2/variables/constants';
+import { getV2ShellLandingPath } from 'v2/variables/constants';
 import guideUrl from './guide.htm';
 import './guidePage.css';
 
@@ -12,7 +12,7 @@ const BACK_LINK_LABEL = '管理画面へ';
 const GuidePage = () => {
   const userRole = Cookies.get(USER_ROLE_COOKIE_KEY) || EMPTY_VALUE;
   const client = parseStoredClient();
-  const backHref = getDefaultLandingPath(userRole, client);
+  const backHref = getV2ShellLandingPath(userRole, client);
 
   return (
     <div className="guide-page">

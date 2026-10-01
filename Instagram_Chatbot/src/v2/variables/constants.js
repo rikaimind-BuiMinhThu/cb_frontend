@@ -12,13 +12,35 @@ export const getAdminRoutePath = (path = '') => {
     return getAppPath(normalized);
 };
 
-/** Default landing after login / logo click / unauthorized Home access. */
-export const getDefaultLandingPath = (role, client) => {
-    if (role === 'admin_deel') return getAdminRoutePath('/dashboard');
-    if (client?.is_web) return getAdminRoutePath('/bot');
-    if (client?.is_instagram) return getAdminRoutePath('/crm');
-    return getAdminRoutePath('/dashboard');
+export const ADMIN_VERSION_V2 = 'v2';
+
+/** Page inside an admin shell: dashboard, bot list, or CRM. */
+export const getProductLandingPath = (role, client) => {
+    if (role === 'admin_deel') return '/dashboard';
+    if (client?.is_web) return '/bot';
+    if (client?.is_instagram) return '/crm';
+    return '/dashboard';
 };
+
+const toV1AdminPath = (page) => (
+    page.startsWith('/admin') ? page : `/admin${page.startsWith('/') ? page : `/${page}`}`
+);
+
+/**
+ * Login landing. Existing clients (missing flag or v1) stay on /admin.
+ * Clients created after default_admin_version shipped use /v2/admin.
+ */
+export const getDefaultLandingPath = (role, client) => {
+    const page = toV1AdminPath(getProductLandingPath(role, client));
+    if (client?.default_admin_version === ADMIN_VERSION_V2) {
+        return getAppPath(page);
+    }
+    return page;
+};
+
+/** Logo, guide back, and blocked-page redirects stay inside the v2 shell. */
+export const getV2ShellLandingPath = (role, client) =>
+    getAdminRoutePath(getProductLandingPath(role, client));
 
 export const getEnvironment = () => {
     try {
