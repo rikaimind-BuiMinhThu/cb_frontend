@@ -4,7 +4,7 @@ import { Layout, Menu } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { BOT_ID_COOKIE_KEY, BOT_TYPE_BOT, BOT_TYPE_COOKIE_KEY, USER_ROLE_COOKIE_KEY } from 'v2/api/constants';
-import { getDefaultLandingPath } from 'v2/variables/constants';
+import { getV2ShellLandingPath } from 'v2/variables/constants';
 import logo from 'v2/assets/img/ecchatbot-logo.png';
 import {
   filterMenuByRole,
@@ -87,7 +87,7 @@ const AdminSidebar = ({ collapsed, onCollapse }) => {
   const menuPath = resolveMenuPath(location.pathname);
   const selectedKey = findSelectedKey(menuPath, allPaths);
   const landingPath = useMemo(
-    () => getDefaultLandingPath(userRole, client),
+    () => getV2ShellLandingPath(userRole, client),
     [userRole, client],
   );
 

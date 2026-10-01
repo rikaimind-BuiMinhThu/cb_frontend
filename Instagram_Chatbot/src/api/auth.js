@@ -26,7 +26,6 @@ export function setToken(token, pathname) {
   // Cookies.set(RefreshToken, refresh_token, { path: '/admin/dashboard' });
   axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
   // console.log("token set in auth: ", Cookies.get(TokenKey))
-  window.location.reload()
 }
 
 export function setUserName(name) {
