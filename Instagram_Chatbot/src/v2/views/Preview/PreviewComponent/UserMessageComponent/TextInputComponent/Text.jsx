@@ -7,11 +7,9 @@ import InputDebounce from "v2/views/ScenarioSetting/scenarioCommon/InputDebounce
 
 const TEXT_INPUT_TYPE_TEXT = "text";
 
-const resolveChatInputValue = (value, placeholder) => {
-  if (value == null || value === EMPTY_INPUT_VALUE) return EMPTY_INPUT_VALUE;
-  if (placeholder && String(value) === String(placeholder)) return EMPTY_INPUT_VALUE;
-  return value;
-};
+// A value that happens to equal the placeholder (a customer typing the sample name or the
+// sample phone number) is still what the user typed, so it must be shown as-is.
+const resolveChatInputValue = (value) => (value == null ? EMPTY_INPUT_VALUE : value);
 
 const Text = ({ content, disabled, handleOnChangeJpConvertText, contentIndex, onChangeValue }) => {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.TEXT_INPUT || content.text_input.type !== TEXT_INPUT_TYPE_TEXT) return null;
@@ -37,8 +35,8 @@ const SplitInputText = ({ content, disabled, handleOnChangeJpConvertText, conten
 
   const leftPlaceholder = textInput.text?.placeholderLeft;
   const rightPlaceholder = textInput.text?.placeholderRight;
-  const leftValue = resolveChatInputValue(textInput[textInput.type]?.valueLeft, leftPlaceholder);
-  const rightValue = resolveChatInputValue(textInput[textInput.type]?.valueRight, rightPlaceholder);
+  const leftValue = resolveChatInputValue(textInput[textInput.type]?.valueLeft);
+  const rightValue = resolveChatInputValue(textInput[textInput.type]?.valueRight);
 
   if (textInput.isUseConvertText) {
     return (
@@ -109,7 +107,7 @@ const SingleInputText = ({ content, disabled, handleOnChangeJpConvertText, conte
   if (textInput.text?.isSplitInput) return null;
 
   const placeholder = textInput.text?.placeholderLeft;
-  const inputValue = resolveChatInputValue(textInput[textInput.type]?.value, placeholder);
+  const inputValue = resolveChatInputValue(textInput[textInput.type]?.value);
 
   if (textInput.isUseConvertText) {
     return (
