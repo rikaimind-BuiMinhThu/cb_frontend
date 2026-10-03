@@ -4,6 +4,10 @@ const path = require('path');
 const major = Number(process.versions.node.split('.')[0]);
 const env = { ...process.env };
 
+if (!env.PORT) {
+  env.PORT = '3001';
+}
+
 if (major >= 17) {
   const current = env.NODE_OPTIONS || '';
   if (!/\b--openssl-legacy-provider\b/.test(current)) {

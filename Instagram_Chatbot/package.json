@@ -81,7 +81,7 @@
     "yup": "^1.0.2"
   },
   "scripts": {
-    "start": "PORT=3001 node scripts/react-scripts-with-openssl.js start",
+    "start": "node scripts/react-scripts-with-openssl.js start",
     "build:sdk": "node scripts/build-sdk.mjs",
     "build:sdk:watch": "node scripts/build-sdk.mjs --watch",
     "build": "npm run build:sdk && node scripts/react-scripts-with-openssl.js build && gulp licenses",
