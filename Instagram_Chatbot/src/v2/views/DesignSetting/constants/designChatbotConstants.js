@@ -146,6 +146,7 @@ export const NOTIFICATION_WARNING_MS = 0;
 export const IMAGE_TYPE_PNG = 'image/png';
 export const IMAGE_TYPE_JPEG = 'image/jpeg';
 export const IMAGE_TYPE_JPG = 'image/jpg';
+export const ICON_FILE_ACCEPT = `${IMAGE_TYPE_PNG}, ${IMAGE_TYPE_JPEG}`;
 
 export const ICON_LOAD_ERROR = 'アイコンの読み込みに失敗しました。';
 export const SAVE_BOT_SUCCESS = 'ボットを正常に保存されました！';
@@ -241,6 +242,16 @@ export const MESSAGE_ICON_LABEL = 'メッセージアイコン';
 export const OPENING_ICON_LABEL = '開く時のボットアイコン';
 export const CLOSING_ICON_LABEL = '閉じる時のボットアイコン';
 export const ICON_ADD_PLUS = '+';
+export const ICON_REMOVE_MARK = '×';
+export const ICON_KIND_BOT = 'bot';
+export const ICON_KIND_OPENING = 'opening';
+export const ICON_KIND_CLOSING = 'closing';
+export const ICON_INPUT_BOT = 'bot_icon';
+export const ICON_INPUT_OPENING = 'opening_bot_icon';
+export const ICON_INPUT_CLOSING = 'closing_bot_icon';
+export const ICON_ALT_BOT = 'bot_icon';
+export const ICON_ALT_OPENING = 'opening_bot_icon';
+export const ICON_ALT_CLOSING = 'closing_bot_icon';
 
 export const PREVIEW_BOT_MESSAGE = 'ボットからのメッセージです';
 export const PREVIEW_USER_MESSAGE = 'ユーザーのメッセージです';
