@@ -10,13 +10,47 @@
   var REDIRECT_FLAG = '__EC_CHAT_BODY_VERSION_REDIRECTED__';
 
   function getApiBaseUrl() {
+    var productionApi = 'https://ec-chatbot-test.com';
+    var stagingApi = 'https://ec-chatbot-test1.com';
+    var localApi = 'http://localhost:3000';
+    var scriptHost = '';
+
+    function isLocalHost(host) {
+      return host.indexOf('localhost') === 0 || host.indexOf('127.0.0.1') === 0;
+    }
+
     try {
-      var host = (typeof location !== 'undefined' && location.host) || '';
-      if (host.indexOf('localhost') === 0 || host.indexOf('127.0.0.1') === 0) {
-        return 'http://localhost:3000';
+      if (currentScript && currentScript.src) {
+        scriptHost = new URL(currentScript.src).host;
       }
     } catch (e) {}
-    return 'https://ec-chatbot-test1.com';
+
+    if (scriptHost === 'ec-chatbot.com') {
+      return productionApi;
+    }
+
+    try {
+      var envParam = new URLSearchParams(window.location.search).get('env');
+      if (envParam === 'staging' || envParam === 'test') return stagingApi;
+      if (envParam === 'production') return productionApi;
+      if (envParam === 'local') return localApi;
+    } catch (e) {}
+
+    if (scriptHost === 'ec-chatbot1.com') {
+      return stagingApi;
+    }
+    if (isLocalHost(scriptHost)) {
+      return localApi;
+    }
+
+    try {
+      var pageHost = (typeof location !== 'undefined' && location.host) || '';
+      if (isLocalHost(pageHost)) {
+        return localApi;
+      }
+    } catch (e) {}
+
+    return productionApi;
   }
 
   function getFrontendBase() {
