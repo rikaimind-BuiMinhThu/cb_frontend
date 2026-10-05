@@ -1,0 +1,13 @@
+.ss-zip-code-address-setting {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.ss-zip-code-address-setting__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}

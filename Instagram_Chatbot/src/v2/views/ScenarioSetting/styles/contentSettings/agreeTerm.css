@@ -1,0 +1,46 @@
+.ss-agree-term-setting__textarea {
+  width: 90%;
+}
+
+.ss-agree-term-setting__link-item {
+  width: 87%;
+}
+
+.ss-agree-term-setting__link-panel {
+  margin-bottom: 10px;
+  width: 100%;
+  background-color: #f8f9fa;
+  padding: 5px;
+}
+
+.ss-agree-term-setting__link-comment {
+  width: 94%;
+  margin-bottom: 10px;
+  display: inline;
+}
+
+.ss-agree-term-setting__url-comment {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.ss-agree-term-setting__add-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ss-agree-term-setting__term-checkbox {
+  width: 100%;
+}
+
+.ss-agree-term-setting__term-input {
+  width: 100%;
+  color: #252422;
+}
+
+.ss-agree-term-setting__fukushashiki {
+  display: flex;
+  gap: 10px;
+  margin-left: 34px;
+  width: 90%;
+}

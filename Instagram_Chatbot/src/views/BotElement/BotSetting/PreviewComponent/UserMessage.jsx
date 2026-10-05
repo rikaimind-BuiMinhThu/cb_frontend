@@ -474,6 +474,18 @@ const UserMessage = ({
             {content.label_no_transition.value}
           </div>
         );
+      case MESSAGE_CONTENT_TYPES.CONTACT_FORM:
+        return <ContactForm
+          content={content}
+          disabled={disabled}
+          onChangeValue={onChangeValue}
+          onClickNext={onClickNext}
+          errors={errors}
+          contentIndex={contentIndex}
+          messageIndex={messageIndex}
+          message={message}
+          isProcessing={isProcessing}
+        />;
       default:
         return null;
     }

@@ -242,6 +242,8 @@ const PreviewFaqReducer = (state, action) => {
         bottomBodyCustomJsCode: chatbot?.bottom_body_custom_js_code,
         isUsedCustomCss: !!chatbot?.is_used_custom_css,
         customCssContent: chatbot?.custom_css_content,
+        isUsedHtmlUgc: !!chatbot?.is_used_html_ugc,
+        htmlUgcConfigContent: chatbot?.html_ugc_config_content,
         currentMsgIndex: 0, // Start
         manuallyClosed: false,
         autoOpenAttempted: false,
@@ -393,7 +395,7 @@ const pushNewVariablesToVariablesList = (newState) => {
       return item;
     }
 
-    item.default_value = getDefaultValue(item, item.contentType, item.field, item.value, newState.prefecturesList, newState.variables, item.variable_name);
+    item.default_value = getDefaultValue(item, item.contentType, item.value, item.field, newState.prefecturesList, newState.variables, item.variable_name);
 
     newState.objParam[variableName] = item.default_value;
   });
@@ -559,7 +561,7 @@ const handleSaveInputContent = (newState, subContent, contentType, field, value)
       return item;
     }
 
-    item.default_value = getDefaultValue(subContent, contentType, field, value, newState.prefecturesList, newState.variables, subContent.save_input_content);
+    item.default_value = getDefaultValue(subContent, contentType, value, field, newState.prefecturesList, newState.variables, subContent.save_input_content);
 
     newState.objParam[variableName] = value;
   });

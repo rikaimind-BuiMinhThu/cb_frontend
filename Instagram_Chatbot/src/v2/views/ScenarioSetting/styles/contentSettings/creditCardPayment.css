@@ -1,0 +1,66 @@
+.ss-credit-card-setting__options-row {
+  display: flex;
+  width: 90%;
+}
+
+.ss-credit-card-setting__options-col {
+  width: 28%;
+}
+
+.ss-credit-card-setting__options-col--wide {
+  width: 36%;
+}
+
+.ss-credit-card-setting__expiry-row {
+  width: 35%;
+  margin-left: 52px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.ss-credit-card-setting__expiry-select {
+  width: 53%;
+}
+
+.ss-credit-card-setting__field-block {
+  width: 90%;
+}
+
+.ss-credit-card-setting__payment-method {
+  width: 90%;
+}
+
+.ss-credit-card-setting__separate-name-offset {
+  margin-left: 95px;
+}
+
+.ss-credit-card-setting__year-block,
+.ss-credit-card-setting__month-block {
+  width: 90%;
+}
+
+.ss-credit-card-setting__month-block {
+  margin-top: 10px;
+}
+
+.ss-credit-card-preview__wrapper {
+  margin-bottom: 10px;
+}
+
+.ss-credit-card-preview__header {
+  margin-bottom: 0;
+}
+
+.ss-credit-card-preview__card-number-label {
+  width: 100%;
+}
+
+.ss-credit-card-preview__expiry-row {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.ss-credit-card-preview__expiry-select {
+  width: 49%;
+}

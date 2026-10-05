@@ -1,0 +1,79 @@
+.payment-gateway-form {
+  padding: 24px;
+  max-width: 720px;
+}
+
+.payment-gateway-form-section {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.payment-gateway-form-section:not(:first-child) {
+  margin-top: 28px;
+}
+
+.payment-gateway-form .admin-form-row {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 12px 20px;
+  align-items: start;
+  margin-bottom: 20px;
+}
+
+.payment-gateway-form .admin-form-row-label {
+  grid-column: 1;
+  text-align: right;
+  padding-top: 8px;
+  margin-bottom: 0;
+}
+
+.payment-gateway-form .admin-form-row > *:not(.admin-form-row-label) {
+  grid-column: 2;
+  min-width: 0;
+}
+
+.payment-gateway-form .admin-form-row .ant-form-item {
+  margin-bottom: 0;
+}
+
+.payment-gateway-form-field-narrow {
+  max-width: 280px;
+}
+
+.payment-gateway-form-actions {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .payment-gateway-form {
+    padding: 16px;
+    max-width: 100%;
+  }
+
+  .payment-gateway-form .admin-form-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .payment-gateway-form .admin-form-row-label {
+    text-align: left;
+    padding-top: 0;
+  }
+
+  .payment-gateway-form .admin-form-row > *:not(.admin-form-row-label) {
+    grid-column: 1;
+  }
+
+  .payment-gateway-form-field-narrow {
+    max-width: 100%;
+  }
+}

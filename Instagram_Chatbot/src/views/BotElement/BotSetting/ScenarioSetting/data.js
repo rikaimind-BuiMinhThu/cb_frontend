@@ -806,22 +806,22 @@ let dataClone2 = {
             },
             url: '', //string
             email_address: {
-              placeholder: '',
+              placeholder: '', //string
               value: '',
               domain_suggestion: {
-                enabled: true,
-                mode: 'suggest',
+                enabled: true, //boolean
+                mode: 'suggest', // suggest | restrict
                 domains: [{ id: 1, domain: 'gmail.com' }],
               },
             },
             email_confirmation: {
-              cfEmlAdd_email: '',
-              cfEmlAdd_confirm_email: '',
+              cfEmlAdd_email: '', //string
+              cfEmlAdd_confirm_email: '', //string
               value: '',
               valueConfirm: '',
               domain_suggestion: {
-                enabled: true,
-                mode: 'suggest',
+                enabled: true, //boolean
+                mode: 'suggest', // suggest | restrict
                 domains: [{ id: 1, domain: 'gmail.com' }],
               },
             },
@@ -1116,22 +1116,22 @@ let dataClone2 = {
             },
             url: '', //string
             email_address: {
-              placeholder: '',
+              placeholder: '', //string
               value: '',
               domain_suggestion: {
-                enabled: true,
-                mode: 'suggest',
+                enabled: true, //boolean
+                mode: 'suggest', // suggest | restrict
                 domains: [{ id: 1, domain: 'gmail.com' }],
               },
             },
             email_confirmation: {
-              cfEmlAdd_email: '',
-              cfEmlAdd_confirm_email: '',
+              cfEmlAdd_email: '', //string
+              cfEmlAdd_confirm_email: '', //string
               value: '',
               valueConfirm: '',
               domain_suggestion: {
-                enabled: true,
-                mode: 'suggest',
+                enabled: true, //boolean
+                mode: 'suggest', // suggest | restrict
                 domains: [{ id: 1, domain: 'gmail.com' }],
               },
             },

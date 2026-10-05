@@ -1,0 +1,41 @@
+.login-facebook {
+  padding: 30px;
+}
+
+.login-facebook-section {
+  width: 100%;
+  margin: auto;
+  text-align: center;
+}
+
+.login-facebook-avatar {
+  width: 120px;
+}
+
+.login-facebook-page {
+  display: flex;
+  height: 70px;
+  margin: auto;
+  padding: 10px;
+  text-align: left;
+}
+
+.login-facebook-page-image {
+  padding-left: 2.5%;
+}
+
+.login-facebook-page-name {
+  width: 20%;
+  height: 70px;
+  padding-left: 10px;
+  justify-content: center;
+}
+
+.login-facebook-page-action {
+  width: 70%;
+  text-align: right;
+}
+
+.login-facebook-logout {
+  margin: auto;
+}

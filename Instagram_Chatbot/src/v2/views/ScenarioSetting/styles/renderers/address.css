@@ -1,0 +1,31 @@
+/* Address and related renderer preview styles */
+
+.ss-address-zip-title {
+  margin-bottom: 0;
+}
+
+.ss-address-post-code-row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.ss-lp-integration-preview {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.ss-lp-integration-preview__suffix {
+  width: 30%;
+}
+
+.ss-renderer-pulldown-from-js__jscode-label {
+  width: 18%;
+  margin-bottom: 5px;
+}
+
+.ss-renderer-pulldown-from-js__target-row {
+  margin-left: 35px;
+  width: 90%;
+}

@@ -1,1 +1,13 @@
-*
+node_modules
+build
+public
+**/*.min.js
+src/views
+src/layouts
+src/assets
+src/api
+src/JS
+src/components
+src/index.js
+src/routes.js
+src/variables

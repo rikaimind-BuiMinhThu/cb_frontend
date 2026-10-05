@@ -1,3 +1,41 @@
+/* __EC_CHAT_BODY_VERSION_GATE__
+ *
+ * Existing LPs embed this URL. Body below is the production SDK.
+ * If chat_body_version is not 1.0, load /v2/sdk-faq.js instead.
+ */
+(function () {
+  var currentScript = document.currentScript;
+  var ENTRY_VERSION = "1.0";
+  var ALTERNATE_SCRIPT_PATH = "/v2/sdk-faq.js";
+  var REDIRECT_FLAG = '__EC_CHAT_BODY_VERSION_REDIRECTED__';
+
+  function getApiBaseUrl() {
+    try {
+      var host = (typeof location !== 'undefined' && location.host) || '';
+      if (host.indexOf('localhost') === 0 || host.indexOf('127.0.0.1') === 0) {
+        return 'http://localhost:3000';
+      }
+    } catch (e) {}
+    return 'https://ec-chatbot-test1.com';
+  }
+
+  function getFrontendBase() {
+    try {
+      var src = currentScript && currentScript.src;
+      if (src) return new URL(src).origin;
+    } catch (e) {}
+    return '';
+  }
+
+  function injectAlternate() {
+    window[REDIRECT_FLAG] = true;
+    var script = document.createElement('script');
+    script.src = getFrontendBase() + ALTERNATE_SCRIPT_PATH;
+    script.defer = true;
+    (document.head || document.documentElement).appendChild(script);
+  }
+
+  function startSdk() {
 // Initialize Sentry (single clean block)
 (function initSentry() {
   try {
@@ -615,3 +653,34 @@ const appendIframeToBody = (iframe) => {
 }
 
 displayPopup();
+  }
+
+  if (window[REDIRECT_FLAG]) {
+    startSdk();
+    return;
+  }
+
+  var botId = null;
+  try { botId = sessionStorage.getItem('bot_id'); } catch (e) {}
+  if (!botId) {
+    startSdk();
+    return;
+  }
+
+  fetch(getApiBaseUrl() + '/api/v1/managements/chatbots/' + encodeURIComponent(botId) + '/chat_body_version', {
+    method: 'GET',
+    headers: { Accept: 'application/json' },
+  })
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+      var version = data && data.data && data.data.chat_body_version;
+      if (version && version !== ENTRY_VERSION) {
+        injectAlternate();
+        return;
+      }
+      startSdk();
+    })
+    .catch(function () {
+      startSdk();
+    });
+})();

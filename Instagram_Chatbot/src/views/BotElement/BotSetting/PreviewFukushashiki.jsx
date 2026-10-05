@@ -59,6 +59,7 @@ import {
   sendErrorLogToServer,
   sendAppearLogToServer,
 } from "./PreviewComponent/Utils";
+import { injectHtmlUgcConfigContent } from "./PreviewComponent/BotMessageUtils";
 import {
   getChatbotSavedState,
   savedChatbotState,
@@ -473,15 +474,26 @@ const PreviewFukushashiki = () => {
     });
   }, [state.isUsedCustomJsCode, state.headCustomJsCode, state.topBodyCustomJsCode, state.bottomBodyCustomJsCode]);
 
-  // For add custom css
+  // For add custom css — last in <head> so it can beat product CSS of equal specificity
   useEffect(() => {
-    if (!state.isUsedCustomCss || !state.customCssContent) return;
+    const existing = document.getElementById('custom-css');
+    if (existing) existing.remove();
+    if (!state.isUsedCustomCss || !state.customCssContent) return undefined;
 
     const style = document.createElement('style');
-    style.id = "custom-css";
+    style.id = 'custom-css';
     style.innerHTML = state.customCssContent;
     document.head.appendChild(style);
+    return () => {
+      style.remove();
+    };
   }, [state.isUsedCustomCss, state.customCssContent]);
+
+  // For add HTML_UGC_CONFIG content
+  useEffect(() => {
+    if (!state.isUsedHtmlUgc || !state.htmlUgcConfigContent) return undefined;
+    return injectHtmlUgcConfigContent(state.htmlUgcConfigContent);
+  }, [state.isUsedHtmlUgc, state.htmlUgcConfigContent]);
 
   // Get Preview Scenario Data
   useEffect(() => {
@@ -847,6 +859,8 @@ const PreviewFukushashiki = () => {
       bottomBodyCustomJsCode: chatbot?.bottom_body_custom_js_code,
       isUsedCustomCss: !!chatbot?.is_used_custom_css,
       customCssContent: chatbot?.custom_css_content,
+      isUsedHtmlUgc: !!chatbot?.is_used_html_ugc,
+      htmlUgcConfigContent: chatbot?.html_ugc_config_content,
     };
 
     if (chatbot?.timer_config?.enable) {

@@ -1,0 +1,136 @@
+.ss-address-fields-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.ss-address-field-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.ss-address-field-section__editable-label,
+.ss-address-field-section__static-label {
+  width: 100%;
+  font-size: 14px;
+  font-weight: 400;
+  color: #000;
+}
+
+.ss-address-field-section__editable-label {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 8px 10px;
+  background: #fff;
+}
+
+.ss-address-field-section__input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.ss-address-field-section__input-row--split {
+  flex-wrap: wrap;
+}
+
+.ss-address-field-section__input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ss-address-field-section__post-code-left {
+  flex: 0 0 120px;
+  max-width: 120px;
+}
+
+.ss-address-field-section__post-code-right {
+  flex: 0 0 140px;
+  max-width: 140px;
+}
+
+.ss-address-field-section__remove-icon {
+  flex: 0 0 auto;
+  font-size: 25px !important;
+  color: #ccc !important;
+  cursor: pointer;
+}
+
+.ss-address-field-section__dropdown-option {
+  margin-top: 0;
+}
+
+.ss-address-field-section__fukushashiki {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.ss-address-layout-options,
+.ss-address-require-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.ss-address-require-options__per-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-left: 12px;
+}
+
+.ss-address-field-settings-modal__trigger-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.ss-address-field-settings-modal__trigger-btn {
+  align-self: flex-start;
+  margin: 0;
+  padding: 8px 16px;
+  background-color: #327aed;
+  border: none;
+  font-size: 13px;
+}
+
+.ss-address-field-settings-modal__summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ss-address-field-settings-modal__summary-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: #eef4ff;
+  color: #327aed;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.ss-address-field-settings-modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.ss-address-field-settings-modal__section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ss-address-field-settings-modal__section-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #222;
+}

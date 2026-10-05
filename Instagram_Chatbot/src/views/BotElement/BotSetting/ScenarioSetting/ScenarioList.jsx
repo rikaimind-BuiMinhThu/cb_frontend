@@ -83,8 +83,9 @@ function ScenarioList() {
             .get(`/api/v1/managements/chatbots/${Cookies.get('bot_id')}/scenarios?page=${pgIndex}`)
             .then((res) => {
                 console.log(res.data);
-                let scenarios = [...res?.data?.data];
-                let totalPage = Math.ceil(res?.data?.total / 25);
+                const payload = res?.data?.data;
+                let scenarios = Array.isArray(payload) ? [...payload] : [];
+                let totalPage = Math.ceil((Number(res?.data?.total) || 0) / 25);
                 setTotalPage(totalPage);
                 setScenarioSelected(res.data.scenario_selected);
                 setScenarioSelectedClone(res.data.scenario_selected);

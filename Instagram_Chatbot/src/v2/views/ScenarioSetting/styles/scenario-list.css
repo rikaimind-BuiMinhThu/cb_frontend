@@ -1,0 +1,163 @@
+.sl-wrapper {
+  box-sizing: border-box;
+}
+
+/* sl header */
+.sl-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.sl-btn-create-scenario {
+  background-color: white;
+  border: 1px solid blue;
+  color: blue;
+}
+.sl-btn-save-scenario {
+  background-color: blue;
+  color: white;
+  border: 1px solid blue;
+}
+
+/* sl body */
+.sl-body {
+}
+.sl-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.sl-item-wrapper {
+  padding: 8px 6px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+}
+.sl-items .sl-item-wrapper:last-child {
+  margin-bottom: 0;
+}
+.sl-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sl-item-left {
+  display: flex;
+  align-items: center;
+}
+.sl-radio-active {
+  margin-right: 15px;
+}
+.sl-radio-active #sl-active {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+.sl-info {
+}
+.sl-info-top {
+  display: flex;
+  align-items: center;
+}
+.sl-status {
+  margin-right: 10px;
+}
+.sl-status > span {
+  color: white;
+  background-color: #ccc;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-weight: 400;
+}
+.sl-status.active > span {
+  background-color: #fda44c;
+}
+.sl-last-update > span {
+  font-size: 14px;
+  font-weight: 400;
+}
+.sl-info-bottom {
+  margin-top: 8px;
+}
+.sl-name span {
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.sl-item-right {
+  display: flex;
+  align-items: center;
+}
+.sl-item-right > button {
+  margin-right: 6px;
+}
+.sl-item-right > a {
+  margin-right: 6px;
+}
+.sl-item-right > button:last-child {
+  margin-right: 0;
+}
+.sl-btn-action-edit {
+  background-color: white;
+  color: blue;
+  border: 1px solid blue;
+}
+.sl-btn-action-preview {
+  background-color: #51c4fd;
+  color: white;
+  border: 1px solid #51c4fd;
+}
+.sl-btn-action-duplication {
+  background-color: transparent;
+  border: none;
+  color: blue;
+}
+.sl-btn-action-delete {
+  background-color: transparent;
+  border: none;
+  color: red;
+}
+
+/* create scenario popup */
+.sl-popup-create-scenario-wrapper {
+  width: 550px;
+  text-align: center;
+  color: '#51cbce';
+  border: none;
+}
+.sl-popup-create-scenario-input-wrapper {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sl-popup-create-scenario-input-wrapper > span {
+  font-weight: 400;
+  margin-right: 8px;
+}
+.sl-popup-create-scenario-input-wrapper > input {
+  font-weight: 400;
+  font-size: 15px;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  flex: 1;
+}
+.sl-popup-create-scenario-note-wrapper {
+  margin-bottom: 10px;
+}
+.sl-popup-create-scenario-note-wrapper > span {
+  font-weight: 400;
+  font-size: 12px;
+}
+.sl-popup-create-scenario-btn-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 65%;
+  margin: 0 auto;
+}
+.sl-popup-create-scenario-create-btn {
+  background-color: #51c4fd;
+}
+.sl-popup-create-scenario-cancel-btn {
+}

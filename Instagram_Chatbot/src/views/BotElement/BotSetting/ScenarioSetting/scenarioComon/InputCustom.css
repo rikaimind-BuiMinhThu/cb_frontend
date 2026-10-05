@@ -1,0 +1,86 @@
+.ss-input-custom-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ss-input-custom-container--inline {
+  display: inline-flex;
+  width: auto;
+}
+
+.ss-input-custom-field {
+  width: 100%;
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ss-input-custom-field--with-clear {
+  padding-right: 30px;
+}
+
+.ss-input-custom-field--password {
+  padding-right: 50px;
+}
+
+.ss-input-custom-label {
+  font-size: 14px;
+  font-weight: 400;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.ss-input-custom-label--inline {
+  width: fit-content;
+  display: inline-block;
+  margin-bottom: 0;
+}
+
+.ss-input-custom-label--block {
+  width: 100%;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.ss-input-custom-editable-label {
+  border-radius: 5px;
+  border: 1px solid gray;
+  padding: 5px;
+  font-size: 14px;
+  font-weight: 400;
+  width: 1%;
+}
+
+.ss-password-toggle-icon {
+  position: absolute;
+  cursor: pointer;
+  color: #666;
+  font-size: 14px;
+}
+
+.ss-password-toggle-icon--with-clear {
+  right: 30px;
+}
+
+.ss-password-toggle-icon--default {
+  right: 10px;
+}
+
+.ss-password-toggle-icon--no-clear {
+  right: 20px;
+}
+
+.ss-clear-input-icon {
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+  color: #666;
+  font-size: 14px;
+}
+
+.ss-input-custom-icon {
+  width: 5%;
+}

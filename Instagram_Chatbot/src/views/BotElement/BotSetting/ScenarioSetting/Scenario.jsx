@@ -56,6 +56,7 @@ import EmailDomainSuggestionSetting from './scenarioComon/EmailDomainSuggestionS
 import {
   createDefaultDomainSuggestion,
 } from '../PreviewComponent/emailDomainDefaults';
+import { buildHtmlUgcConfigContent, UGC_HOSTS } from './HtmlUgcConfigTemplates';
 
 const { Option } = Select;
 const _ = require('lodash');
@@ -873,6 +874,17 @@ const Scenario = () => {
   const [urlCartConfirmPage, setUrlCartConfirmPage] = useState('');
   const [isOpenModalCustomCss, setIsOpenModalCustomCss] = useState(false);
 
+  const [isUseHtmlUgc, setIsUseHtmlUgc] = useState(false);
+  const [isUgcInstagram, setIsUgcInstagram] = useState(false);
+  const [isUgcTiktok, setIsUgcTiktok] = useState(false);
+  const [isUgcReview, setIsUgcReview] = useState(false);
+  const [ugcEnv, setUgcEnv] = useState('staging');
+  const [htmlUgcConfigContent, setHtmlUgcConfigContent] = useState({
+    temp: "",
+    final: ""
+  });
+  const [isOpenModalHtmlUgc, setIsOpenModalHtmlUgc] = useState(false);
+
   // New state for custom JS code (separated into 3 fields)
   const [isUseCustomJsCode, setIsUseCustomJsCode] = useState(false);
   const [headCustomJsCode, setHeadCustomJsCode] = useState({
@@ -1036,6 +1048,15 @@ const Scenario = () => {
       setCustomCssContent({
         temp: res.data.data?.custom_css_content || '',
         final: res.data.data?.custom_css_content || '',
+      });
+      setIsUseHtmlUgc(!!res.data.data?.is_used_html_ugc);
+      setIsUgcInstagram(!!res.data.data?.is_ugc_instagram);
+      setIsUgcTiktok(!!res.data.data?.is_ugc_tiktok);
+      setIsUgcReview(!!res.data.data?.is_ugc_review);
+      setUgcEnv(res.data.data?.ugc_env || 'staging');
+      setHtmlUgcConfigContent({
+        temp: res.data.data?.html_ugc_config_content || '',
+        final: res.data.data?.html_ugc_config_content || '',
       });
       setIsUseCustomJsCode(res.data.data?.is_used_custom_js_code || false);
       setHeadCustomJsCode({
@@ -2459,7 +2480,7 @@ const Scenario = () => {
 
   const ensureEmailDomainSuggestion = (indexMessage, indexContent, emailType) => {
     const textInput = dataMessages[indexMessage].message_content[indexContent].text_input;
-    if (!textInput[emailType]) {
+    if (!textInput[emailType] || typeof textInput[emailType] !== 'object') {
       textInput[emailType] = {};
     }
     if (!textInput[emailType].domain_suggestion) {
@@ -2520,14 +2541,6 @@ const Scenario = () => {
         onResetDomains={() => handleResetEmailDomains(indexMessage, indexContent, emailType)}
       />
     );
-  };
-
-  const ensureContactFormDomainSuggestion = (indexMessage, indexContent) => {
-    const contactForm = dataMessages[indexMessage].message_content[indexContent].contact_form;
-    if (!contactForm) return;
-    if (!contactForm.domain_suggestion) {
-      contactForm.domain_suggestion = createDefaultDomainSuggestion();
-    }
   };
 
   const contactFormFieldRowStyle = {
@@ -2611,6 +2624,14 @@ const Scenario = () => {
       }
     }
     setDataMessages([...dataMessages]);
+  };
+
+  const ensureContactFormDomainSuggestion = (indexMessage, indexContent) => {
+    const contactForm = dataMessages[indexMessage].message_content[indexContent].contact_form;
+    if (!contactForm) return;
+    if (!contactForm.domain_suggestion) {
+      contactForm.domain_suggestion = createDefaultDomainSuggestion();
+    }
   };
 
   const handleChangeContactFormDomainSuggestion = (indexMessage, indexContent, field, value) => {
@@ -2758,6 +2779,180 @@ const Scenario = () => {
       final: prevState.temp,
     }));
   }
+
+  const regenerateHtmlUgcTempContent = (nextFlags) => {
+    const content = buildHtmlUgcConfigContent(nextFlags);
+    setHtmlUgcConfigContent((prev) => ({
+      ...prev,
+      temp: content,
+    }));
+  }
+
+  const htmlUgcFlagsSnapshotRef = React.useRef({
+    isUgcInstagram: false,
+    isUgcTiktok: false,
+    isUgcReview: false,
+    ugcEnv: 'staging',
+    isUseHtmlUgc: false,
+  });
+
+  const openHtmlUgcModal = () => {
+    htmlUgcFlagsSnapshotRef.current = {
+      isUgcInstagram,
+      isUgcTiktok,
+      isUgcReview,
+      ugcEnv,
+      isUseHtmlUgc,
+    };
+    setHtmlUgcConfigContent((prev) => ({ ...prev, temp: prev.final }));
+    setIsOpenModalHtmlUgc(true);
+  }
+
+  const handleToggleUgcType = (type) => {
+    const next = {
+      isUgcInstagram,
+      isUgcTiktok,
+      isUgcReview,
+      ugcEnv,
+    };
+    if (type === 'instagram') next.isUgcInstagram = !isUgcInstagram;
+    if (type === 'tiktok') next.isUgcTiktok = !isUgcTiktok;
+    if (type === 'review') next.isUgcReview = !isUgcReview;
+
+    setIsUgcInstagram(next.isUgcInstagram);
+    setIsUgcTiktok(next.isUgcTiktok);
+    setIsUgcReview(next.isUgcReview);
+    setIsUseHtmlUgc(next.isUgcInstagram || next.isUgcTiktok || next.isUgcReview);
+    regenerateHtmlUgcTempContent(next);
+  }
+
+  const handleChangeUgcEnv = (nextEnv) => {
+    setUgcEnv(nextEnv);
+    regenerateHtmlUgcTempContent({
+      isUgcInstagram,
+      isUgcTiktok,
+      isUgcReview,
+      ugcEnv: nextEnv,
+    });
+  }
+
+  const handleOnChangeValueHtmlUgc = (e) => {
+    e.preventDefault();
+    setHtmlUgcConfigContent((prevState) => ({
+      ...prevState,
+      temp: e.target.value,
+    }));
+  }
+
+  const closeAfterDoneHtmlUgc = (func) => (...props) => {
+    func(...props);
+    setTimeout(() => setIsOpenModalHtmlUgc(false), 0);
+  };
+
+  const handleOnCancelHtmlUgc = () => {
+    const snap = htmlUgcFlagsSnapshotRef.current;
+    setIsUgcInstagram(snap.isUgcInstagram);
+    setIsUgcTiktok(snap.isUgcTiktok);
+    setIsUgcReview(snap.isUgcReview);
+    setUgcEnv(snap.ugcEnv || 'staging');
+    setIsUseHtmlUgc(snap.isUseHtmlUgc);
+    setHtmlUgcConfigContent((prevState) => ({
+      ...prevState,
+      temp: prevState.final,
+    }));
+  }
+
+  const handleOnConfirmHtmlUgc = () => {
+    setHtmlUgcConfigContent((prevState) => ({
+      ...prevState,
+      final: prevState.temp,
+    }));
+    const enabled = isUgcInstagram || isUgcTiktok || isUgcReview || !!htmlUgcConfigContent.temp?.trim();
+    setIsUseHtmlUgc(enabled);
+    htmlUgcFlagsSnapshotRef.current = {
+      isUgcInstagram,
+      isUgcTiktok,
+      isUgcReview,
+      ugcEnv,
+      isUseHtmlUgc: enabled,
+    };
+  }
+
+  const renderModalHtmlUgcForm = (isOpen) => {
+    return (
+      <ModalShort open={isOpen} onClose={closeAfterDoneHtmlUgc(handleOnCancelHtmlUgc)}>
+        <div className="sl-popup-create-scenario-wrapper" style={{width: "750px"}}>
+          <h4>HTML_UGC_CONFIG</h4>
+          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '12px' }}>
+            {['production', 'staging', 'local'].map((env) => (
+              <label key={env} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <input
+                  type="radio"
+                  name="ugc_env"
+                  checked={ugcEnv === env}
+                  onChange={() => handleChangeUgcEnv(env)}
+                />
+                {env === 'production' ? 'Production' : env === 'staging' ? 'Staging' : 'Local'}
+                <span style={{ color: '#888', fontSize: '12px' }}>({UGC_HOSTS[env]})</span>
+              </label>
+            ))}
+          </div>
+          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '12px' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <input
+                type="checkbox"
+                checked={isUgcInstagram}
+                onChange={() => handleToggleUgcType('instagram')}
+              />
+              UGC Instagram
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <input
+                type="checkbox"
+                checked={isUgcReview}
+                onChange={() => handleToggleUgcType('review')}
+              />
+              UGC Review
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <input
+                type="checkbox"
+                checked={isUgcTiktok}
+                onChange={() => handleToggleUgcType('tiktok')}
+              />
+              UGC TikTok
+            </label>
+          </div>
+          <div style={{ marginBottom: '10px' }}>
+            <div className="sl-popup-create-scenario-input-wrapper" style={{ marginBottom: '0px' }}>
+              <span style={{ width: '120px', whiteSpace: "nowrap", wordBreak: "normal" }}>UGCコンテンツ</span>
+              <textarea
+                style={{ width: '100%', height: '280px', padding: '10px', fontSize: '13px', flexGrow: "1", fontFamily: 'monospace' }}
+                placeholder="チェックボックスで自動生成されます。手動編集も可能です。"
+                value={htmlUgcConfigContent.temp}
+                onChange={handleOnChangeValueHtmlUgc}
+              />
+            </div>
+          </div>
+          <div className="sl-popup-create-scenario-btn-wrapper">
+            <Button
+              className="ss-popup-add-variable-input-close-button"
+              onClick={closeAfterDoneHtmlUgc(handleOnCancelHtmlUgc)}
+            >
+              閉じる
+            </Button>
+            <Button
+              style={{ backgroundColor: '#024BB9' }}
+              className="ss-popup-add-variable-input-keep-button"
+              onClick={closeAfterDoneHtmlUgc(handleOnConfirmHtmlUgc)}
+            >
+              保存
+            </Button>
+          </div>
+        </div>
+      </ModalShort>
+    );
+  };
 
   // Custom JS code handlers
   const handleChangeOpenModalCustomJsCode = (value) => () => {
@@ -3210,6 +3405,12 @@ const Scenario = () => {
       is_used_fukushashiki: isUseFukushashiki,
       is_used_custom_css: isUseCustomCss,
       custom_css_content: customCssContent.final,
+      is_used_html_ugc: isUseHtmlUgc,
+      is_ugc_instagram: isUgcInstagram,
+      is_ugc_tiktok: isUgcTiktok,
+      is_ugc_review: isUgcReview,
+      ugc_env: ugcEnv,
+      html_ugc_config_content: htmlUgcConfigContent.final,
       is_used_custom_js_code: isUseCustomJsCode,
       head_custom_js_code: headCustomJsCode.final,
       top_body_custom_js_code: topBodyCustomJsCode.final,
@@ -3280,6 +3481,12 @@ const Scenario = () => {
       is_used_fukushashiki: isUseFukushashiki,
       is_used_custom_css : isUseCustomCss,
       custom_css_content: customCssContent.final,
+      is_used_html_ugc: isUseHtmlUgc,
+      is_ugc_instagram: isUgcInstagram,
+      is_ugc_tiktok: isUgcTiktok,
+      is_ugc_review: isUgcReview,
+      ugc_env: ugcEnv,
+      html_ugc_config_content: htmlUgcConfigContent.final,
       is_used_custom_js_code: isUseCustomJsCode,
       head_custom_js_code: headCustomJsCode.final,
       top_body_custom_js_code: topBodyCustomJsCode.final,
@@ -3783,6 +3990,49 @@ const Scenario = () => {
                       <div>
                         <button class="ss-user-setting-checkbox-custom-css_toggle" onClick={handleChangeOpenModalCustomJsCode(true)}>
                           {`( JSコンテンツ設定モダルを開く )`}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <div style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "16px",
+                    justifyContent: "start",
+                    width: "100%",
+                  }}>
+                    <div className='ss-user-setting-checkbox-custom_css'>
+                      <input
+                        type="checkbox"
+                        className="ss-user-setting-checkbox-custom"
+                        onChange={() => {
+                          const next = !isUseHtmlUgc;
+                          setIsUseHtmlUgc(next);
+                          if (!next) {
+                            setIsUgcInstagram(false);
+                            setIsUgcTiktok(false);
+                            setIsUgcReview(false);
+                            setUgcEnv('staging');
+                            setHtmlUgcConfigContent({ temp: '', final: '' });
+                            htmlUgcFlagsSnapshotRef.current = {
+                              isUgcInstagram: false,
+                              isUgcTiktok: false,
+                              isUgcReview: false,
+                              ugcEnv: 'staging',
+                              isUseHtmlUgc: false,
+                            };
+                          } else {
+                            openHtmlUgcModal();
+                          }
+                        }}
+                        checked={isUseHtmlUgc}
+                      />
+                      <label style={{whiteSpace: "nowrap", wordBreak: "normal"}}>HTML_UGC_CONFIGを使用</label>
+                    </div>
+                    {isUseHtmlUgc && (
+                      <div>
+                        <button className="ss-user-setting-checkbox-custom-css_toggle" onClick={openHtmlUgcModal}>
+                          {`( UGCコンテンツ設定モダルを開く )`}
                         </button>
                       </div>
                     )}
@@ -15552,6 +15802,7 @@ const Scenario = () => {
         </div>
       </ModalNoti>
       {renderModalCustomCssForm(isOpenModalCustomCss)}
+      {renderModalHtmlUgcForm(isOpenModalHtmlUgc)}
       {renderModalCustomJsCodeForm(isOpenModalCustomJsCode)}
       {renderModalTimer(timerConfig.isOpen)}
       {renderErrMsgByJsSettingModal(isOpenErrMsgByJsSettingModal)}

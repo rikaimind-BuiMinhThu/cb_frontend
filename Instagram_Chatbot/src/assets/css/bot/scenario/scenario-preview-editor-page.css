@@ -1,0 +1,88 @@
+/* Scenario preview editor iframe page — show body only inside theme shell parent */
+
+html.scenario-preview-editor-embedded,
+body.scenario-preview-editor-embedded,
+body.scenario-preview-editor-embedded #root {
+  height: 100%;
+}
+
+body.scenario-preview-editor-embedded {
+  margin: 0;
+  background: transparent;
+}
+
+body.scenario-preview-editor-embedded #sp-header,
+body.scenario-preview-editor-embedded .sp-container1 > .sp-header,
+body.scenario-preview-editor-embedded #sp-process-bar,
+body.scenario-preview-editor-embedded .sp-container1 > .sp-process-bar,
+body.scenario-preview-editor-embedded .chatbot_timer_holder {
+  display: none !important;
+}
+
+body.scenario-preview-editor-embedded .sp-container1 {
+  position: relative !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  top: auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 100% !important;
+  height: 100% !important;
+  display: flex;
+  flex-direction: column;
+  box-shadow: none !important;
+}
+
+body.scenario-preview-editor-embedded #sp-body,
+body.scenario-preview-editor-embedded .sp-body {
+  display: flex !important;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  width: 100% !important;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: #f6fbff;
+}
+
+body.scenario-preview-editor-embedded .sp-header {
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+body.scenario-preview-editor-embedded .sp-body-user-side,
+body.scenario-preview-editor-embedded .sp-body-bot-side,
+body.scenario-preview-editor-embedded .ss-combine-message__wrapper {
+  cursor: pointer;
+}
+
+body.scenario-preview-editor-embedded .scenario-editor-message--selected {
+  outline: 2px solid #327aed;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+body.scenario-preview-editor-embedded .scenario-editor-radio-option--selected {
+  outline: 2px solid #327aed;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+body.scenario-preview-editor-embedded .scenario-editor-checkbox-option--selected {
+  outline: 2px solid #327aed;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+body.scenario-preview-editor-embedded .sp-user-message-button-action,
+body.scenario-preview-editor-embedded .sp-user-message-button-action button {
+  pointer-events: none;
+  cursor: default;
+}
+
+body.scenario-preview-editor-embedded .chatbot-submit-button,
+body.scenario-preview-editor-embedded [id^="chatbot-submit-button-"] {
+  pointer-events: none;
+  cursor: default;
+}

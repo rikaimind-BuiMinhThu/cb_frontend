@@ -1,0 +1,72 @@
+.ss-carousel-setting__api-wrapper {
+  margin-bottom: 0;
+}
+
+.ss-carousel-setting__add-row {
+  margin-bottom: 0;
+}
+
+.ss-carousel-setting__add-row--spaced {
+  margin-bottom: 0;
+}
+
+.ss-carousel-setting__remove-row {
+  width: 90%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ss-carousel-setting__remove-icon {
+  margin-right: 25px;
+}
+
+.ss-carousel-setting__slider {
+  width: 92%;
+  margin-left: 4%;
+}
+
+.ss-carousel-setting__slide {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ss-carousel-setting__hint {
+  font-weight: 400;
+  width: 90%;
+}
+
+.ss-carousel-setting__error {
+  color: #ff7e00;
+  font-size: 12px;
+  width: 90%;
+}
+
+.ss-carousel-setting__divider {
+  width: 90%;
+  height: 1px;
+  margin-left: 5%;
+  background-color: gray;
+}
+
+.ss-carousel-setting__js-label {
+  width: 18%;
+  font-size: 14px;
+  font-weight: 400;
+  margin-bottom: 5px;
+}
+
+.ss-carousel-setting__js-textarea {
+  width: 90%;
+}
+
+.ss-carousel-setting__upload-btn {
+  margin: 0;
+  background-color: #327aed;
+}
+
+.ss-carousel-setting__file-btn {
+  margin: 0;
+  margin-right: 15px;
+}

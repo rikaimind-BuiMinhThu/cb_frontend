@@ -1,0 +1,36 @@
+.ss-payment-display-style {
+  margin-top: 12px;
+}
+
+.ss-payment-display-style__title-wrap {
+  width: 95%;
+  margin-bottom: 8px;
+}
+
+.ss-payment-display-style__title {
+  font-weight: 600;
+}
+
+.ss-payment-display-style__layout-section {
+  margin-bottom: 12px;
+}
+
+.ss-payment-display-style__layout-label {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.ss-payment-display-style__color-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ss-payment-display-style__color-label {
+  min-width: 180px;
+  font-size: 13px;
+}
+
+.ss-payment-display-style__color-text {
+  flex: 1;
+}

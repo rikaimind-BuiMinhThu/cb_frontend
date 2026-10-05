@@ -1,0 +1,193 @@
+.ss-card-payment-radio-setting__linked-divider {
+  width: 95%;
+  height: 1px;
+  background-color: black;
+}
+
+.ss-card-payment-radio-setting__linked-title {
+  width: 95%;
+}
+
+.ss-card-payment-radio-setting__options-row {
+  width: 90%;
+  display: flex;
+}
+
+.ss-card-payment-radio-setting__options-col {
+  width: 28%;
+  display: flex;
+  align-items: center;
+}
+
+.ss-card-payment-radio-setting__options-col--wide {
+  width: 36%;
+  display: flex;
+  align-items: center;
+}
+
+.ss-card-payment-radio-setting__expiry-row {
+  width: 30%;
+  margin-left: 31px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.ss-card-payment-radio-setting__expiry-select {
+  width: 53%;
+}
+
+.ss-card-payment-radio-setting__picture-item {
+  display: flex;
+  margin-bottom: 10px;
+  background-color: rgb(248, 249, 250);
+  position: relative;
+}
+
+.ss-card-payment-radio-setting__picture-grip {
+  margin-right: 5px;
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.ss-card-payment-radio-setting__picture-content {
+  padding: 5px;
+  flex: 1;
+  min-width: 0;
+}
+
+.ss-card-payment-radio-setting__file-input-row {
+  flex-wrap: nowrap;
+}
+
+.ss-card-payment-radio-setting__file-input {
+  width: 92%;
+}
+
+.ss-card-payment-radio-setting__clip-icon {
+  margin-left: 10px;
+  background-color: #fff;
+  border-radius: 50%;
+  padding: 6px;
+}
+
+.ss-card-payment-radio-setting__counter-actions {
+  display: flex;
+  align-items: center;
+}
+
+.ss-card-payment-radio-setting__counter-add {
+  color: #327aed;
+}
+
+.ss-card-payment-radio-setting__counter-remove {
+  color: #fa8464;
+}
+
+.ss-card-payment-radio-setting__add-btn {
+  margin: 0;
+  padding: 9px 19px;
+  background-color: #327aed;
+}
+
+.ss-card-payment-radio-setting__add-wrap {
+  width: 90%;
+}
+
+.ss-card-payment-radio-setting__type-row {
+  position: relative;
+}
+
+.ss-card-payment-radio-setting__image-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ss-card-payment-radio-setting__image-label {
+  font-size: 12px;
+}
+
+.ss-card-payment-radio-setting__image-preview {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border: 1px solid #ddd;
+}
+
+.ss-card-payment-radio-setting__image-fields-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 10px;
+  padding-left: 28px;
+}
+
+.ss-card-payment-radio-setting__fukushashiki-row {
+  display: flex;
+  gap: 10px;
+  width: 90%;
+  margin-top: 10px;
+}
+
+.ss-card-payment-radio-setting__fukushashiki-row--no-width {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.ss-card-payment-radio-setting__fukushashiki-mode-col {
+  width: 20%;
+}
+
+.ss-card-payment-radio-setting__fukushashiki-value-col {
+  flex: 80%;
+}
+
+.ss-card-payment-radio-setting__field-col--full {
+  width: 100%;
+}
+
+.ss-card-payment-radio-setting__field-col--half {
+  width: 49%;
+}
+
+.ss-card-payment-radio-setting__field-col--47 {
+  width: 47%;
+}
+
+.ss-card-payment-radio-setting__field-width-99 {
+  width: 99%;
+}
+
+.ss-card-payment-radio-setting__expiry-label {
+  width: 90%;
+}
+
+.ss-card-payment-radio-setting__expiry-fields-row {
+  display: flex;
+  width: 90%;
+  gap: 15px;
+}
+
+.ss-card-payment-radio-setting__expiry-fields-row--wrap {
+  flex-wrap: wrap;
+}
+
+.ss-card-payment-radio-setting__expiry-fields-row--nowrap {
+  flex-wrap: nowrap;
+}
+
+.ss-card-payment-radio-setting__options-wrap {
+  flex-wrap: wrap;
+  row-gap: 10px;
+}
+
+.ss-card-payment-radio-setting__options-display-row {
+  width: 90%;
+  display: flex;
+}
+
+.ss-card-payment-radio-preview__wrapper {
+  margin-bottom: 10px;
+}

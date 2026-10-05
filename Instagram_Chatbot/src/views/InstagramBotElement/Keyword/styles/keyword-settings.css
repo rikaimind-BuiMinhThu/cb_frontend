@@ -1,0 +1,75 @@
+.admin-page--keyword-settings {
+  max-width: none;
+}
+
+.keyword-settings-body {
+  padding: 16px 20px 20px;
+  box-sizing: border-box;
+}
+
+.keyword-settings-section {
+  padding: 20px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.keyword-settings-section:last-child {
+  border-bottom: none;
+}
+
+.keyword-settings-section-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 16px;
+}
+
+.keyword-default-reply-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.keyword-default-reply-selects {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  flex-wrap: wrap;
+  min-width: 280px;
+}
+
+.keyword-default-reply-selects .ant-select {
+  min-width: 220px;
+  flex: 1;
+}
+
+.keyword-table-keywords {
+  word-break: break-word;
+}
+
+.keyword-table-message {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.keyword-table-group-name {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.keyword-table-bag-name {
+  font-size: 13px;
+  color: #374151;
+}
+
+.keyword-channel-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.keyword-form-modal .ant-form-item:last-child {
+  margin-bottom: 0;
+}

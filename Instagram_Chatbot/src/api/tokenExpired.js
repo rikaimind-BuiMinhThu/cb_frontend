@@ -13,5 +13,6 @@ export function tokenExpired(){
     Cookies.remove('scenario_id')
     Cookies.remove('refreshToken')
     
-    window.location.href ='/'
+    const isV2 = typeof window !== 'undefined' && window.location.pathname.indexOf('/v2') === 0;
+    window.location.href = isV2 ? '/v2/sign-in' : '/';
 }

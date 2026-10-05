@@ -94,11 +94,12 @@ export function batchConvert(texts, targetType) {
   return texts.map(text => convertTextJapanese(text, targetType));
 }
 
-export default {
+const japaneseConverter = {
   convertTextJapanese,
   containsKanji,
   isHiragana,
   isKatakana,
   isRomaji,
   batchConvert
-}; 
+};
+export default japaneseConverter; 

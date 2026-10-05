@@ -172,6 +172,44 @@ const processBotUgcMessage = async (messagesList, i, newState) => {
   return newState;
 }
 
+/**
+ * Injects scenario-level HTML_UGC_CONFIG content (scripts/hidden inputs) into the
+ * live DOM, mirroring how a <style> tag is injected for scenario-level Custom CSS.
+ * Returns a cleanup function that removes everything it appended.
+ */
+export const injectHtmlUgcConfigContent = (content) => {
+  if (!content) return () => {};
+
+  const doc = new DOMParser().parseFromString(content, "text/html");
+  const injectedNodes = [];
+
+  doc.querySelectorAll("link").forEach((link) => {
+    const node = link.cloneNode(true);
+    document.head.appendChild(node);
+    injectedNodes.push(node);
+  });
+
+  [...doc.body.children]
+    .filter((el) => !["script", "link"].includes(el.tagName.toLowerCase()))
+    .forEach((el) => {
+      const node = el.cloneNode(true);
+      document.body.appendChild(node);
+      injectedNodes.push(node);
+    });
+
+  doc.querySelectorAll("script").forEach((script) => {
+    const node = document.createElement("script");
+    [...script.attributes].forEach((attr) => node.setAttribute(attr.name, attr.value));
+    node.text = script.textContent || "";
+    document.body.appendChild(node);
+    injectedNodes.push(node);
+  });
+
+  return () => {
+    injectedNodes.forEach((node) => node.remove());
+  };
+};
+
 export const processForBotMessage = async (messagesList, i, newState, isUpdateSourceContent = false, assignToState = true) => {
   const firstMsgType = messagesList[i]?.message_content[0]?.type;
 

@@ -1,0 +1,103 @@
+.ss-shipping-address-setting__type-row {
+  position: relative;
+}
+
+.ss-shipping-address-setting__linked-divider {
+  width: 95%;
+  height: 1px;
+  background-color: black;
+}
+
+.ss-shipping-address-setting__linked-title {
+  width: 95%;
+}
+
+.ss-shipping-address-setting__field-label {
+  width: 18%;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.ss-shipping-address-setting__field-input {
+  width: 75%;
+}
+
+.ss-shipping-address-setting__field-input--wide {
+  width: 82%;
+}
+
+.ss-shipping-address-setting__field-input--40 {
+  width: 40%;
+}
+
+.ss-shipping-address-setting__icon-col {
+  width: 6%;
+}
+
+.ss-shipping-address-setting__spacer-col {
+  width: 16%;
+}
+
+.ss-shipping-address-setting__fukushashiki-col {
+  width: 75%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ss-shipping-address-setting__add-btn {
+  margin: 0;
+  padding: 9px 19px;
+  background-color: #327aed;
+}
+
+.ss-shipping-address-setting__add-wrap {
+  width: 90%;
+}
+
+.ss-shipping-address-setting__post-code-left {
+  width: 17%;
+  margin-right: 4%;
+}
+
+.ss-shipping-address-setting__post-code-right {
+  width: 20%;
+  margin-right: 34%;
+}
+
+.ss-shipping-address-setting__icon-col--offset {
+  width: 5%;
+  margin-left: 3px;
+}
+
+.ss-shipping-address-setting__label-section {
+  width: 35%;
+  padding-left: 7px;
+  margin-bottom: 0;
+}
+
+.ss-shipping-address-setting__section-title {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.ss-shipping-address-setting__section-icon {
+  font-size: 20px;
+}
+
+.ss-shipping-address-setting__file-row {
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.ss-shipping-address-setting__file-input {
+  width: 91.5%;
+}
+
+.ss-shipping-address-setting__mt-10 {
+  margin-top: 10px;
+}
+
+.ss-shipping-address-preview__wrapper {
+  margin-bottom: 10px;
+}

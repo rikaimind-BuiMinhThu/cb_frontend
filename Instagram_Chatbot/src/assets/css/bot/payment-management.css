@@ -1,0 +1,214 @@
+.admin-page--payment-management .admin-page-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.admin-page--payment-management .report-filter-panel {
+  padding: 20px 20px 0;
+  margin-bottom: 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.admin-page--payment-management .report-filter-toolbar {
+  margin-bottom: 0;
+}
+
+.admin-page--payment-management .report-date-error {
+  display: block;
+  margin-top: 4px;
+  padding: 0 20px 12px;
+}
+
+.admin-page--payment-management .payment-order-table-wrap {
+  padding: 20px;
+}
+
+.admin-page--payment-management .payment-settings-wrap {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.admin-page--payment-management .payment-setting-section {
+  background: #fafafa;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.admin-page--payment-management .payment-setting-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.admin-page--payment-management .payment-setting-section-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.admin-page--payment-management .payment-setting-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.admin-page--payment-management .payment-native-radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+
+.admin-page--payment-management .payment-native-radio-group label {
+  margin: 0;
+  font-weight: 400;
+  color: #374151;
+  cursor: pointer;
+}
+
+.admin-page--payment-management .payment-native-radio-group input[type='radio'] {
+  margin-right: 6px;
+}
+
+.admin-page--payment-management .payment-native-select,
+.admin-page--payment-management .payment-native-input {
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  padding: 4px 11px;
+  font-size: 14px;
+  color: #1f2937;
+  background: #fff;
+  min-height: 32px;
+  transition: border-color 0.2s;
+}
+
+.admin-page--payment-management .payment-native-select:focus,
+.admin-page--payment-management .payment-native-input:focus {
+  border-color: #1677ff;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.1);
+}
+
+.admin-page--payment-management .payment-hint-text {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.admin-page--payment-management .payment-dynamic-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.admin-page--payment-management .payment-dynamic-row:last-child {
+  border-bottom: none;
+}
+
+.admin-page--payment-management .payment-dynamic-row-label {
+  min-width: 100px;
+  font-size: 14px;
+  color: #374151;
+  padding-top: 5px;
+}
+
+.admin-page--payment-management .payment-dynamic-row-field {
+  flex: 1;
+  min-width: 140px;
+}
+
+.admin-page--payment-management .payment-error-text {
+  display: block;
+  color: #ff4d4f;
+  font-size: 12px;
+  margin-top: 4px;
+  min-height: 18px;
+}
+
+.admin-page--payment-management .payment-prefecture-table {
+  max-width: 520px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.admin-page--payment-management .payment-prefecture-table-header {
+  display: flex;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.admin-page--payment-management .payment-prefecture-table-body {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.admin-page--payment-management .payment-prefecture-table-row {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.admin-page--payment-management .payment-prefecture-table-row:last-child {
+  border-bottom: none;
+}
+
+.admin-page--payment-management .payment-prefecture-name {
+  width: 35%;
+  font-size: 14px;
+  color: #374151;
+}
+
+.admin-page--payment-management .payment-prefecture-amount {
+  width: 65%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-page--payment-management .payment-np-fee-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.admin-page--payment-management .payment-np-fee-row:last-child {
+  border-bottom: none;
+}
+
+.admin-page--payment-management .payment-np-fee-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-page--payment-management .payment-conditional-block {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}

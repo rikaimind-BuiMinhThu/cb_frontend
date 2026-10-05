@@ -1,9 +1,11 @@
 {
   "compilerOptions": {
     "baseUrl": "src",
+    "ignoreDeprecations": "6.0",
     "paths": {
       "*": ["src/*"],
-      "assets": ["src/assets"]
+      "assets": ["src/assets"],
+      "v2/*": ["src/v2/*"]
     }
   }
 }
