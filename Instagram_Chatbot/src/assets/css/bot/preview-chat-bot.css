@@ -217,9 +217,14 @@
 
 /* Production customer iframe loads scenario-single.css via the main CSS chunk.
    Staging webpack splits that file onto the admin Scenario route, so v1 preview
-   needs these field/button radii here. Input type stays with scenario custom CSS
-   (Rosemay: .ss-input-value { 16px }). Title/必須/gaps copy scenario-single so
-   they match production when custom CSS is injected last. */
+   needs these field/button radii here. Keep .ss-input-value type at one class so
+   scenario custom CSS (Rosemay: .ss-input-value { 16px }) still wins. Title/必須/gaps
+   copy scenario-single so they match production when custom CSS is injected last. */
+.ss-input-value {
+    font-weight: 400;
+    font-size: 14px;
+}
+
 .sp-body .ss-input-value:not(.ss-bot-chat-detail-content) {
     padding: 6px 12px;
     border-radius: 5px;
@@ -328,6 +333,10 @@ input#ss-message__content--user-checkbox,
     min-height: 36px !important;
     display: flex;
     align-items: center;
+}
+
+.ss-user-message__action-btn {
+    font-weight: 500;
 }
 
 .sp-body .ss-user-message__action-btn {
@@ -729,11 +738,11 @@ input#ss-message__content--user-checkbox,
 }
 
 /* Production customer iframe inherits Fira Sans from login.css in the main chunk.
-   Staging webpack omits that file on v1 preview, so system UI wraps differently
-   at the same 16px. Pin type, not weight — 700 made every bot bubble look bold. */
+   Staging webpack omits that file on v1 preview, so system UI wraps differently.
+   Pin family only: size stays with .ss-input-value (14px) or scenario custom CSS,
+   and 700 made every bot bubble look bold. */
 .sp-body-bot-side-messages .ss-bot-chat-detail-content.ss-message__content--bot-text.ss-input-value {
     font-family: 'Fira Sans', sans-serif;
-    font-size: 16px;
     font-weight: 400;
     padding: 6px 9px;
 }
@@ -1351,11 +1360,18 @@ slideUp
   text-align: right;
 }
 
-.ss-message__content--user-zip-code-address-post-code-label,
-.ss-message__content--user-zip-code-address-label {
+.ss-message__content--user-zip-code-address-post-code-label {
   font-weight: 400;
+  font-size: 12px;
   width: 100%;
   margin-bottom: 5px;
+}
+
+.ss-message__content--user-zip-code-address-label {
+  font-weight: 400;
+  font-size: 12px;
+  width: 100%;
+  margin-bottom: 3px;
 }
 
 .ss-message__content--attaching_file-button-upload {
