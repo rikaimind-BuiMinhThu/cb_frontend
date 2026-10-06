@@ -225,7 +225,7 @@
     font-size: 14px;
 }
 
-.sp-body .ss-input-value:not(.ss-bot-chat-detail-content) {
+:where(.sp-body .ss-input-value:not(.ss-bot-chat-detail-content)) {
     padding: 6px 12px;
     border-radius: 5px;
     width: 100%;
@@ -237,9 +237,9 @@
 .ss-message__content--user-agree_to_term-required,
 .ss-message__content--user-pull_down-required,
 .ss-message__content--user-checkbox-required {
-    color: #ff7e00 !important;
-    font-size: 12px !important;
-    font-weight: 400 !important;
+    color: #ff7e00;
+    font-size: 12px;
+    font-weight: 400;
 }
 
 .ss-message__content--user-text-input-title,
@@ -247,9 +247,9 @@
 .ss-message__content--user-agree_to_term-title,
 .ss-message__content--user-pull_down-title,
 .ss-message__content--user-checkbox-title {
-    font-size: 12px !important;
-    font-weight: 400 !important;
-    color: black !important;
+    font-size: 12px;
+    font-weight: 400;
+    color: black;
     margin-right: 8px;
 }
 
@@ -325,9 +325,11 @@ input#ss-message__content--user-checkbox,
     margin: 0 0 0 8px;
 }
 
-#sp-container1 .ant-select-selector,
-.sp-popup-zip-code-address .ant-select-selector,
-.sp-body .ant-select-selector {
+:where(
+    #sp-container1 .ant-select-selector,
+    .sp-popup-zip-code-address .ant-select-selector,
+    .sp-body .ant-select-selector
+) {
     border: 1px solid gray !important;
     border-radius: 5px !important;
     min-height: 36px !important;
@@ -339,7 +341,7 @@ input#ss-message__content--user-checkbox,
     font-weight: 500;
 }
 
-.sp-body .ss-user-message__action-btn {
+:where(.sp-body .ss-user-message__action-btn) {
     border-radius: 25px;
 }
 
@@ -739,11 +741,9 @@ input#ss-message__content--user-checkbox,
 
 /* Production customer iframe inherits Fira Sans from login.css in the main chunk.
    Staging webpack omits that file on v1 preview, so system UI wraps differently.
-   Pin family only: size stays with .ss-input-value (14px) or scenario custom CSS,
-   and 700 made every bot bubble look bold. */
-.sp-body-bot-side-messages .ss-bot-chat-detail-content.ss-message__content--bot-text.ss-input-value {
+   :where() keeps family/padding as fallbacks so scenario custom CSS still wins. */
+:where(.sp-body-bot-side-messages .ss-bot-chat-detail-content.ss-message__content--bot-text.ss-input-value) {
     font-family: 'Fira Sans', sans-serif;
-    font-weight: 400;
     padding: 6px 9px;
 }
 
@@ -1142,7 +1142,7 @@ slideUp
   }
 
 /* Clip the header photo without shrinking it — let custom CSS / @media 58px win. */
-#sp-header.sp-header {
+:where(#sp-header.sp-header) {
     overflow: hidden;
 }
 
@@ -1156,7 +1156,7 @@ slideUp
     padding: 0 !important;
 }
 
-.sp-header-left-bt .sp-avatar-bt {
+:where(.sp-header-left-bt .sp-avatar-bt) {
     width: 58px;
     height: 58px;
     border-radius: 50%;
@@ -1164,7 +1164,7 @@ slideUp
     flex-shrink: 0;
 }
 
-.sp-header-left-bt .sp-avatar-bt img {
+:where(.sp-header-left-bt .sp-avatar-bt img) {
     width: 58px;
     height: 58px;
     border-radius: 50%;
@@ -1408,7 +1408,7 @@ slideUp
   width: 100%;
 }
 
-.ss-message__content--user-card-payment-radio-content.ant-radio-wrapper {
+:where(.ss-message__content--user-card-payment-radio-content.ant-radio-wrapper) {
   display: flex;
   align-items: center;
   width: 100%;
@@ -1419,17 +1419,17 @@ slideUp
   border-radius: 5px;
 }
 
-.ss-message__content--user-card-payment-radio-content .ant-radio {
+:where(.ss-message__content--user-card-payment-radio-content .ant-radio) {
   width: 19px;
   height: 19px;
   top: 0;
 }
 
-.ss-message__content--user-card-payment-radio-content .ant-radio-inner {
+:where(.ss-message__content--user-card-payment-radio-content .ant-radio-inner) {
   display: none;
 }
 
-.ss-message__content--user-card-payment-radio-content .ant-radio-input {
+:where(.ss-message__content--user-card-payment-radio-content .ant-radio-input) {
   opacity: 1;
   width: 19px;
   height: 19px;
@@ -1437,7 +1437,7 @@ slideUp
   cursor: pointer;
 }
 
-.ss-message__content--user-card-payment-radio-content.ant-radio-wrapper > span:last-child {
+:where(.ss-message__content--user-card-payment-radio-content.ant-radio-wrapper > span:last-child) {
   padding-left: 8px;
 }
 
