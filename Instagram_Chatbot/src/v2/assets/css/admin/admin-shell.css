@@ -332,7 +332,7 @@
   padding: 0 4px 8px;
 }
 
-:is(.admin-page--design-setting, .admin-page--add-bot) .icon_label {
+:is(.admin-page--design-setting, .admin-page--add-bot) .dbi-label {
   display: inline-flex;
   align-items: center;
   gap: 4px;

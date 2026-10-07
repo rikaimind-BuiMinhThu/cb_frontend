@@ -217,10 +217,15 @@
 
 /* Production customer iframe loads scenario-single.css via the main CSS chunk.
    Staging webpack splits that file onto the admin Scenario route, so v1 preview
-   needs these field/button radii here. Input type stays with scenario custom CSS
-   (Rosemay: .ss-input-value { 16px }). Title/必須/gaps copy scenario-single so
-   they match production when custom CSS is injected last. */
-.sp-body .ss-input-value:not(.ss-bot-chat-detail-content) {
+   needs these field/button radii here. Keep .ss-input-value type at one class so
+   scenario custom CSS (Rosemay: .ss-input-value { 16px }) still wins. Title/必須/gaps
+   copy scenario-single so they match production when custom CSS is injected last. */
+.ss-input-value {
+    font-weight: 400;
+    font-size: 14px;
+}
+
+:where(.sp-body .ss-input-value:not(.ss-bot-chat-detail-content)) {
     padding: 6px 12px;
     border-radius: 5px;
     width: 100%;
@@ -232,9 +237,9 @@
 .ss-message__content--user-agree_to_term-required,
 .ss-message__content--user-pull_down-required,
 .ss-message__content--user-checkbox-required {
-    color: #ff7e00 !important;
-    font-size: 12px !important;
-    font-weight: 400 !important;
+    color: #ff7e00;
+    font-size: 12px;
+    font-weight: 400;
 }
 
 .ss-message__content--user-text-input-title,
@@ -242,9 +247,9 @@
 .ss-message__content--user-agree_to_term-title,
 .ss-message__content--user-pull_down-title,
 .ss-message__content--user-checkbox-title {
-    font-size: 12px !important;
-    font-weight: 400 !important;
-    color: black !important;
+    font-size: 12px;
+    font-weight: 400;
+    color: black;
     margin-right: 8px;
 }
 
@@ -270,9 +275,61 @@
     margin-top: 0;
 }
 
-#sp-container1 .ant-select-selector,
-.sp-popup-zip-code-address .ant-select-selector,
-.sp-body .ant-select-selector {
+/* scenario-single.css no longer ships in the v1 customer iframe.
+   Copy radio/checkbox row layout so the native control sits beside the label.
+   Theme CSS still owns colors. */
+.ss-message__content--user-radio_button {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2px;
+    background: #ebf7ff;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.ss-message__content--user-radio_button:last-child {
+    margin-bottom: 0;
+}
+
+input#ss-message__content--user-radio_button,
+.ss-message__content--user-radio_button-wrapper input[type="radio"],
+.ss-message__content--user-radio_button input[type="radio"] {
+    width: 19px !important;
+    height: 19px !important;
+}
+
+.ss-message__content--user-radio_button > label {
+    margin: 0 0 0 8px;
+}
+
+.ss-message__content--user-checkbox {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2px;
+    background: #ebf7ff;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.ss-message__content--user-checkbox:last-child {
+    margin-bottom: 0;
+}
+
+input#ss-message__content--user-checkbox,
+.ss-message__content--user-checkbox input[type="checkbox"] {
+    width: 19px;
+    height: 19px;
+}
+
+.ss-message__content--user-checkbox > label {
+    margin: 0 0 0 8px;
+}
+
+:where(
+    #sp-container1 .ant-select-selector,
+    .sp-popup-zip-code-address .ant-select-selector,
+    .sp-body .ant-select-selector
+) {
     border: 1px solid gray !important;
     border-radius: 5px !important;
     min-height: 36px !important;
@@ -280,7 +337,11 @@
     align-items: center;
 }
 
-.sp-body .ss-user-message__action-btn {
+.ss-user-message__action-btn {
+    font-weight: 500;
+}
+
+:where(.sp-body .ss-user-message__action-btn) {
     border-radius: 25px;
 }
 
@@ -679,12 +740,10 @@
 }
 
 /* Production customer iframe inherits Fira Sans from login.css in the main chunk.
-   Staging webpack omits that file on v1 preview, so system UI wraps differently
-   at the same 16px/700. Pin the measured production bubble values. */
-.sp-body-bot-side-messages .ss-bot-chat-detail-content.ss-message__content--bot-text.ss-input-value {
+   Staging webpack omits that file on v1 preview, so system UI wraps differently.
+   :where() keeps family/padding as fallbacks so scenario custom CSS still wins. */
+:where(.sp-body-bot-side-messages .ss-bot-chat-detail-content.ss-message__content--bot-text.ss-input-value) {
     font-family: 'Fira Sans', sans-serif;
-    font-size: 16px;
-    font-weight: 700;
     padding: 6px 9px;
 }
 
@@ -1083,7 +1142,7 @@ slideUp
   }
 
 /* Clip the header photo without shrinking it — let custom CSS / @media 58px win. */
-#sp-header.sp-header {
+:where(#sp-header.sp-header) {
     overflow: hidden;
 }
 
@@ -1097,7 +1156,7 @@ slideUp
     padding: 0 !important;
 }
 
-.sp-header-left-bt .sp-avatar-bt {
+:where(.sp-header-left-bt .sp-avatar-bt) {
     width: 58px;
     height: 58px;
     border-radius: 50%;
@@ -1105,7 +1164,7 @@ slideUp
     flex-shrink: 0;
 }
 
-.sp-header-left-bt .sp-avatar-bt img {
+:where(.sp-header-left-bt .sp-avatar-bt img) {
     width: 58px;
     height: 58px;
     border-radius: 50%;
@@ -1128,13 +1187,65 @@ slideUp
   align-items: center;
 }
 
-/* Custom width for post code inputs */
-.ss-user-setting__item-bottom div[style*="display: flex"] > div:first-child {
+/* Do not use a catch-all item-bottom flex > div 39/59 rule — it also
+   resizes credit-card expiry Ant Select. Zip split fields already set
+   containerStyle 39%/59%; keep a scoped fallback. */
+.ss-message__content--user-zip-code-address-post-code-label + .ss-message__content--user-chat-container > div:first-child {
   width: 39% !important;
 }
 
-.ss-user-setting__item-bottom div[style*="display: flex"] > div:last-child {
+.ss-message__content--user-zip-code-address-post-code-label + .ss-message__content--user-chat-container > div:last-child {
   width: 59% !important;
+}
+
+.ss-user-setting__item-select-bottom-wrapper-flex {
+  display: flex;
+  width: 90%;
+  justify-content: space-between;
+}
+
+.ss-user-setting__item-select-bottom-wrapper > div {
+  width: 49%;
+}
+
+.ss-user-setting__item-select-bottom-wrapper-flex > div {
+  width: 49%;
+}
+
+.ss-user-setting__item-select-bottom-wrapper {
+  width: 90%;
+  display: flex;
+}
+
+.ss-user-setting-phone-number-hyphens {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ss-user-setting-phone-number-hyphens > input {
+  width: 28%;
+}
+
+.ss-user-setting-card-number-separate-type > input {
+  width: 24%;
+}
+
+.ss-user-setting-double-input {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.ss-user-setting-double-input input:first-child {
+  border-bottom-right-radius: unset;
+  border-top-right-radius: unset;
+}
+
+.ss-user-setting-double-input input:nth-child(2) {
+  border-left: 0px;
+  border-bottom-left-radius: unset;
+  border-top-left-radius: unset;
 }
 
 .options-gender_wrapper {
@@ -1249,11 +1360,18 @@ slideUp
   text-align: right;
 }
 
-.ss-message__content--user-zip-code-address-post-code-label,
-.ss-message__content--user-zip-code-address-label {
+.ss-message__content--user-zip-code-address-post-code-label {
   font-weight: 400;
+  font-size: 12px;
   width: 100%;
   margin-bottom: 5px;
+}
+
+.ss-message__content--user-zip-code-address-label {
+  font-weight: 400;
+  font-size: 12px;
+  width: 100%;
+  margin-bottom: 3px;
 }
 
 .ss-message__content--attaching_file-button-upload {
@@ -1288,6 +1406,39 @@ slideUp
   margin-bottom: 5px;
   padding: 5px;
   width: 100%;
+}
+
+:where(.ss-message__content--user-card-payment-radio-content.ant-radio-wrapper) {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-right: 0;
+  margin-bottom: 2px;
+  background: #ebf7ff;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+:where(.ss-message__content--user-card-payment-radio-content .ant-radio) {
+  width: 19px;
+  height: 19px;
+  top: 0;
+}
+
+:where(.ss-message__content--user-card-payment-radio-content .ant-radio-inner) {
+  display: none;
+}
+
+:where(.ss-message__content--user-card-payment-radio-content .ant-radio-input) {
+  opacity: 1;
+  width: 19px;
+  height: 19px;
+  position: static;
+  cursor: pointer;
+}
+
+:where(.ss-message__content--user-card-payment-radio-content.ant-radio-wrapper > span:last-child) {
+  padding-left: 8px;
 }
 
 .ss-message__content--user-card-payment-radio-customized-style {

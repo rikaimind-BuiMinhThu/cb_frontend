@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useDebounce from "v2/hooks/useDebounce";
 import InputCustom from "./InputCustom";
 
@@ -20,6 +20,10 @@ const InputDebounce = ({
     isComposing,
     isFocused,
   );
+  // Callers pass a new onChange on every render. As an effect dependency it re-ran the
+  // effect after every render, and the resulting state update froze the chat.
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
 
   const handleChange = (nextValue) => {
     setInputValue(nextValue);
@@ -48,9 +52,7 @@ const InputDebounce = ({
     if (isComposing) {
       return;
     }
-    onChange(debouncedValue);
-    // Notify only when the settled value changes, not when the parent callback identity changes.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    onChangeRef.current(debouncedValue);
   }, [debouncedValue, isComposing]);
 
   return (

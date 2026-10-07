@@ -5,14 +5,28 @@ import { getDesignSettingTooltip } from '../constants/designSettingTooltips';
 import {
   CLOSING_ICON_LABEL,
   ICON_ADD_PLUS,
+  ICON_ALT_BOT,
+  ICON_ALT_CLOSING,
+  ICON_ALT_OPENING,
+  ICON_FILE_ACCEPT,
+  ICON_INPUT_BOT,
+  ICON_INPUT_CLOSING,
+  ICON_INPUT_OPENING,
+  ICON_KIND_BOT,
+  ICON_KIND_CLOSING,
+  ICON_KIND_OPENING,
+  ICON_REMOVE_MARK,
   MESSAGE_ICON_LABEL,
   OPENING_ICON_LABEL,
   SELECT_ICON_LABEL,
 } from '../constants/designChatbotConstants';
 
+const DBI_PRESET_CLASS = 'dbi-preset';
+const DBI_PRESET_ACTIVE_CLASS = 'dbi-preset dbi-preset--active';
+
 const IconSectionHeader = ({ label, tooltipKey }) => (
-  <div className="icon_section_header">
-    <span className="icon_label">
+  <div className="dbi-header">
+    <span className="dbi-label">
       {label}
       <AdminInfoTooltip text={getDesignSettingTooltip(tooltipKey)} />
     </span>
@@ -22,6 +36,92 @@ const IconSectionHeader = ({ label, tooltipKey }) => (
 IconSectionHeader.propTypes = {
   label: PropTypes.string.isRequired,
   tooltipKey: PropTypes.string.isRequired,
+};
+
+const DesignBotIconRow = ({
+  label,
+  tooltipKey,
+  iconSrc,
+  iconAlt,
+  activeIndex,
+  images,
+  inputId,
+  inputName,
+  kind,
+  onUpload,
+  onRemove,
+  onIconClick,
+}) => (
+  <div className="dbi-section">
+    <IconSectionHeader label={label} tooltipKey={tooltipKey} />
+    <div className="dbi-row">
+      <div className="dbi-preview">
+        {iconSrc ? (
+          <div className="dbi-preview-frame">
+            <div className="dbi-preview-image">
+              <img src={iconSrc} alt={iconAlt} className="dbi-preview-img" />
+            </div>
+            <button
+              type="button"
+              className="dbi-remove"
+              onClick={onRemove}
+            >
+              <span>{ICON_REMOVE_MARK}</span>
+            </button>
+          </div>
+        ) : (
+          <div className="dbi-placeholder">
+            <span>{SELECT_ICON_LABEL}</span>
+          </div>
+        )}
+      </div>
+      <div className="dbi-grid">
+        {images.map((icon, index) => (
+          <button
+            key={`${kind}-${index}`}
+            type="button"
+            className={activeIndex === index ? DBI_PRESET_ACTIVE_CLASS : DBI_PRESET_CLASS}
+            onClick={() => onIconClick?.(index, icon, kind)}
+          >
+            <img src={icon} alt="" />
+          </button>
+        ))}
+        <div className="dbi-upload">
+          <span>{ICON_ADD_PLUS}</span>
+          <input
+            type="file"
+            onChange={onUpload}
+            id={inputId}
+            name={inputName}
+            accept={ICON_FILE_ACCEPT}
+            className="dbi-file"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+DesignBotIconRow.propTypes = {
+  label: PropTypes.string.isRequired,
+  tooltipKey: PropTypes.string.isRequired,
+  iconSrc: PropTypes.string,
+  iconAlt: PropTypes.string.isRequired,
+  activeIndex: PropTypes.number,
+  images: PropTypes.arrayOf(PropTypes.string),
+  inputId: PropTypes.string.isRequired,
+  inputName: PropTypes.string.isRequired,
+  kind: PropTypes.string.isRequired,
+  onUpload: PropTypes.func.isRequired,
+  onRemove: PropTypes.func.isRequired,
+  onIconClick: PropTypes.func,
+};
+
+DesignBotIconRow.defaultProps = {
+  iconSrc: '',
+  activeIndex: null,
+  images: [],
+  onIconClick: null,
 };
 
 const DesignBotIcons = ({
@@ -35,141 +135,52 @@ const DesignBotIcons = ({
   onBotIconRemove,
   onOpeningBotIconRemove,
   onClosingBotIconRemove,
-  images = [],
+  images,
   onIconClick,
 }) => (
-  <div className="icon_holder">
-    <div className="icon_holder_section">
-      <IconSectionHeader label={MESSAGE_ICON_LABEL} tooltipKey="messageIcon" />
-      <div className="icon_preview_container">
-        <div className="icon_preview">
-          {!!botIcon ? (
-            <div className="preview_image_container">
-              <img src={botIcon} alt="bot_icon" className="preview_image" />
-              <div className="remove-icon" onClick={onBotIconRemove}>
-                <span>×</span>
-              </div>
-            </div>
-          ) : (
-            <div className="preview_placeholder">
-              <span>{SELECT_ICON_LABEL}</span>
-            </div>
-          )}
-        </div>
-        <div className="icon_selection">
-          <div className="icons_grid">
-            {images.map((icon, index) => (
-              <div
-                key={index}
-                className={`icon icon-${index}${activeIndices?.bot === index ? ' active' : ''}`}
-                onClick={() => onIconClick && onIconClick(index, icon, 'bot')}
-              >
-                <img src={icon} alt="" />
-              </div>
-            ))}
-          </div>
-          <div className="add-icon">
-            <span>{ICON_ADD_PLUS}</span>
-            <input
-              type="file"
-              onChange={onBotIconChange}
-              id="bot_icon"
-              name="bot_icon"
-              accept="image/png, image/jpeg"
-              className="input_select_file"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div className="icon_holder_section">
-      <IconSectionHeader label={OPENING_ICON_LABEL} tooltipKey="openingIcon" />
-      <div className="icon_preview_container">
-        <div className="icon_preview">
-          {!!openingBotIcon ? (
-            <div className="preview_image_container">
-              <img src={openingBotIcon} alt="opening_bot_icon" className="preview_image" />
-              <div className="remove-icon" onClick={onOpeningBotIconRemove}>
-                <span>×</span>
-              </div>
-            </div>
-          ) : (
-            <div className="preview_placeholder">
-              <span>{SELECT_ICON_LABEL}</span>
-            </div>
-          )}
-        </div>
-        <div className="icon_selection">
-          <div className="icons_grid">
-            {images.map((icon, index) => (
-              <div
-                key={`opening-${index}`}
-                className={`icon icon-${index}${activeIndices?.opening === index ? ' active' : ''}`}
-                onClick={() => onIconClick && onIconClick(index, icon, 'opening')}
-              >
-                <img src={icon} alt="" />
-              </div>
-            ))}
-          </div>
-          <div className="add-icon">
-            <span>{ICON_ADD_PLUS}</span>
-            <input
-              type="file"
-              onChange={onOpeningBotIconChange}
-              id="opening_bot_icon"
-              name="opening_bot_icon"
-              accept="image/png, image/jpeg"
-              className="input_select_file"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div className="icon_holder_section">
-      <IconSectionHeader label={CLOSING_ICON_LABEL} tooltipKey="closingIcon" />
-      <div className="icon_preview_container">
-        <div className="icon_preview">
-          {!!closingBotIcon ? (
-            <div className="preview_image_container">
-              <img src={closingBotIcon} alt="closing_bot_icon" className="preview_image" />
-              <div className="remove-icon" onClick={onClosingBotIconRemove}>
-                <span>×</span>
-              </div>
-            </div>
-          ) : (
-            <div className="preview_placeholder">
-              <span>{SELECT_ICON_LABEL}</span>
-            </div>
-          )}
-        </div>
-        <div className="icon_selection">
-          <div className="icons_grid">
-            {images.map((icon, index) => (
-              <div
-                key={`closing-${index}`}
-                className={`icon icon-${index}${activeIndices?.closing === index ? ' active' : ''}`}
-                onClick={() => onIconClick && onIconClick(index, icon, 'closing')}
-              >
-                <img src={icon} alt="" />
-              </div>
-            ))}
-          </div>
-          <div className="add-icon">
-            <span>{ICON_ADD_PLUS}</span>
-            <input
-              type="file"
-              onChange={onClosingBotIconChange}
-              id="closing_bot_icon"
-              name="closing_bot_icon"
-              accept="image/png, image/jpeg"
-              className="input_select_file"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
+  <div className="dbi">
+    <DesignBotIconRow
+      label={MESSAGE_ICON_LABEL}
+      tooltipKey="messageIcon"
+      iconSrc={botIcon}
+      iconAlt={ICON_ALT_BOT}
+      activeIndex={activeIndices?.bot}
+      images={images}
+      inputId={ICON_INPUT_BOT}
+      inputName={ICON_INPUT_BOT}
+      kind={ICON_KIND_BOT}
+      onUpload={onBotIconChange}
+      onRemove={onBotIconRemove}
+      onIconClick={onIconClick}
+    />
+    <DesignBotIconRow
+      label={OPENING_ICON_LABEL}
+      tooltipKey="openingIcon"
+      iconSrc={openingBotIcon}
+      iconAlt={ICON_ALT_OPENING}
+      activeIndex={activeIndices?.opening}
+      images={images}
+      inputId={ICON_INPUT_OPENING}
+      inputName={ICON_INPUT_OPENING}
+      kind={ICON_KIND_OPENING}
+      onUpload={onOpeningBotIconChange}
+      onRemove={onOpeningBotIconRemove}
+      onIconClick={onIconClick}
+    />
+    <DesignBotIconRow
+      label={CLOSING_ICON_LABEL}
+      tooltipKey="closingIcon"
+      iconSrc={closingBotIcon}
+      iconAlt={ICON_ALT_CLOSING}
+      activeIndex={activeIndices?.closing}
+      images={images}
+      inputId={ICON_INPUT_CLOSING}
+      inputName={ICON_INPUT_CLOSING}
+      kind={ICON_KIND_CLOSING}
+      onUpload={onClosingBotIconChange}
+      onRemove={onClosingBotIconRemove}
+      onIconClick={onIconClick}
+    />
   </div>
 );
 

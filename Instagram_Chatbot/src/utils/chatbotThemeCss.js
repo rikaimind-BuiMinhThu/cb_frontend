@@ -213,6 +213,7 @@ ${spBodySelector} .ant-checkbox-checked .ant-checkbox-inner {
 }
 
 ${spBodySelector} .ss-message__content--user-radio_button,
+${spBodySelector} .ss-message__content--user-card-payment-radio-content,
 ${scopePrefix}.theme-customize-preview__radio-default {
   background-color: var(--c-radio-unselected-bg, #ebf7ff) !important;
   border: 1px solid var(--c-radio-unselected-border, transparent) !important;
@@ -220,6 +221,8 @@ ${scopePrefix}.theme-customize-preview__radio-default {
 
 ${spBodySelector} .ss-message__content--user-radio_button--selected,
 ${spBodySelector} .ss-message__content--user-radio_button:has(input[type="radio"]:checked),
+${spBodySelector} .ss-message__content--user-card-payment-radio-content.ant-radio-wrapper-checked,
+${spBodySelector} .ss-message__content--user-card-payment-radio-content:has(input[type="radio"]:checked),
 ${scopePrefix}.theme-customize-preview__radio-default--selected {
   background-color: var(--c-radio-selected-bg, #ebf7ff) !important;
   border-color: var(--c-radio-selected-border, transparent) !important;
@@ -238,11 +241,13 @@ ${scopePrefix}.theme-customize-preview__radio-img--selected {
 }
 
 ${spBodySelector} .ss-message__content--user-radio_button:not(.ss-message__content--user-radio_button--radio_button_img) input[type="radio"],
+${spBodySelector} .ss-message__content--user-card-payment-radio-content input[type="radio"],
 ${scopePrefix}.theme-customize-preview__radio-default input[type="radio"] {
   accent-color: var(--c-radio-input-selected, #327AED) !important;
 }
 
 ${spBodySelector} .ss-message__content--user-radio_button:not(.ss-message__content--user-radio_button--radio_button_img) input[type="radio"]:not(:checked),
+${spBodySelector} .ss-message__content--user-card-payment-radio-content input[type="radio"]:not(:checked),
 ${scopePrefix}.theme-customize-preview__radio-default input[type="radio"]:not(:checked) {
   accent-color: var(--c-radio-input-unselected, #ccc) !important;
 }
