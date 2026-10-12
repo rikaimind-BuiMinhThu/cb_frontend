@@ -7,6 +7,7 @@ import {
   DEFAULT_MAIN_COLOR,
   OPEN_ANIMATION_DURATION_MS_DEFAULT,
   OPEN_ANIMATION_STYLE_DEFAULT,
+  BUTTON_TYPE_WITH_TITLE,
   PREVIEW_CLOSED_TITLE,
   PREVIEW_ICON_PLACEHOLDER,
   PREVIEW_OPEN_TITLE,
@@ -30,11 +31,14 @@ const BasicInfoStatePreview = ({
   botImage,
   openingBotIcon,
   closingBotIcon,
+  buttonTypePc,
   openAnimationDurationMs,
   openAnimationStyle,
 }) => {
   const openIcon = resolveIcon(openingBotIcon, botImage);
   const closeIcon = resolveIcon(closingBotIcon, openingBotIcon, botImage);
+  const showTitleBar = Number(buttonTypePc) === BUTTON_TYPE_WITH_TITLE;
+  const closedTitle = title || PREVIEW_TITLE_FALLBACK;
   const durationMs = clampOpenAnimationDurationMs(
     openAnimationDurationMs ?? OPEN_ANIMATION_DURATION_MS_DEFAULT,
   );
@@ -50,13 +54,30 @@ const BasicInfoStatePreview = ({
       <div className="basic-info-state-preview__section">
         <h6 className="basic-info-state-preview__title">{PREVIEW_CLOSED_TITLE}</h6>
         <div className="basic-info-state-preview__frame basic-info-state-preview__frame--close">
-          <div className="basic-info-state-preview__launcher">
-            {closeIcon ? (
-              <img src={closeIcon} alt="" className="basic-info-state-preview__launcher-icon" />
-            ) : (
-              <span className="basic-info-state-preview__launcher-placeholder">{PREVIEW_ICON_PLACEHOLDER}</span>
-            )}
-          </div>
+          {showTitleBar ? (
+            <div
+              className="basic-info-state-preview__launcher-bar"
+              style={{ backgroundColor: mainColor || DEFAULT_MAIN_COLOR }}
+            >
+              <div className="basic-info-state-preview__launcher basic-info-state-preview__launcher--in-bar">
+                {closeIcon ? (
+                  <img src={closeIcon} alt="" className="basic-info-state-preview__launcher-icon" />
+                ) : (
+                  <span className="basic-info-state-preview__launcher-placeholder">{PREVIEW_ICON_PLACEHOLDER}</span>
+                )}
+              </div>
+              <span className="basic-info-state-preview__bar-title">{closedTitle}</span>
+              <MDBIcon fas icon="chevron-circle-up" className="basic-info-state-preview__bar-arrow" />
+            </div>
+          ) : (
+            <div className="basic-info-state-preview__launcher">
+              {closeIcon ? (
+                <img src={closeIcon} alt="" className="basic-info-state-preview__launcher-icon" />
+              ) : (
+                <span className="basic-info-state-preview__launcher-placeholder">{PREVIEW_ICON_PLACEHOLDER}</span>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -112,6 +133,7 @@ BasicInfoStatePreview.propTypes = {
   botImage: PropTypes.string,
   openingBotIcon: PropTypes.string,
   closingBotIcon: PropTypes.string,
+  buttonTypePc: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   openAnimationDurationMs: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   openAnimationStyle: PropTypes.string,
 };
@@ -123,6 +145,7 @@ BasicInfoStatePreview.defaultProps = {
   botImage: '',
   openingBotIcon: '',
   closingBotIcon: '',
+  buttonTypePc: BUTTON_TYPE_WITH_TITLE,
   openAnimationDurationMs: OPEN_ANIMATION_DURATION_MS_DEFAULT,
   openAnimationStyle: OPEN_ANIMATION_STYLE_DEFAULT,
 };

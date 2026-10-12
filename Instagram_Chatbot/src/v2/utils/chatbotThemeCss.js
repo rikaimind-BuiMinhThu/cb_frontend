@@ -130,6 +130,8 @@ const combineScopedFieldSelectors = (scopeSelector, builder) =>
     .map((fieldScope) => builder(fieldScope))
     .join(',\n');
 
+const themeIsBold = (value) => value === true || value === 'true' || value === 1 || value === '1';
+
 const buildThemeVariables = (theme) => {
   const buttonWidth = resolveButtonWidthCss(theme.buttonWidth);
   const buttonPadding = resolveButtonPaddingCss(theme.buttonPadding);
@@ -139,8 +141,10 @@ const buildThemeVariables = (theme) => {
   return `
   --c-header-title-text: ${theme.headerTitleTextColor};
   --c-header-title-font-size: ${theme.headerTitleFontSize};
+  --c-header-title-weight: ${themeIsBold(theme.headerTitleBold) ? 700 : 400};
   --c-header-subtitle-text: ${theme.headerSubtitleTextColor};
   --c-header-subtitle-font-size: ${theme.headerSubtitleFontSize};
+  --c-header-subtitle-weight: ${themeIsBold(theme.headerSubtitleBold) ? 700 : 400};
   --c-progress-bg: ${theme.progressBarBgColor};
   --c-progress-text: ${theme.progressBarTextColor};
   --c-progress-font-size: ${theme.progressBarFontSize};
@@ -152,8 +156,10 @@ const buildThemeVariables = (theme) => {
   --c-user-msg-text: ${theme.userMessageTextColor};
   --c-user-msg-font-size: ${theme.userMessageFontSize};
   --c-field-focus-border: ${theme.fieldFocusBorderColor};
+  --c-field-focus-border-width: ${theme.fieldFocusBorderWidth || '1px'};
   --c-field-focus-bg: ${theme.fieldFocusBgColor};
   --c-field-unfocus-border: ${theme.fieldUnfocusBorderColor};
+  --c-field-unfocus-border-width: ${theme.fieldUnfocusBorderWidth || '1px'};
   --c-field-unfocus-bg: ${theme.fieldUnfocusBgColor};
   --c-field-font-size: ${theme.fieldFontSize};
   --c-validation-bg: ${theme.validationMessageBgColor};
@@ -295,8 +301,8 @@ const buildFieldFocusStyles = (fieldFocusSelectors, focusEffect, previewFocusSel
     ? `animation: ${focusEffect.focusAnimation} !important;`
     : '';
   const focusBorderRule = focusEffect.useFocusBorderShorthand
-    ? 'border: 1px solid var(--c-field-focus-border, #327AED) !important;'
-    : 'border-color: var(--c-field-focus-border, #327AED) !important;';
+    ? 'border: var(--c-field-focus-border-width, 1px) solid var(--c-field-focus-border, #327AED) !important;'
+    : 'border-width: var(--c-field-focus-border-width, 1px) !important; border-color: var(--c-field-focus-border, #327AED) !important;';
   const boxShadowRule = focusEffect.useAnimatedBoxShadow
     ? ''
     : `box-shadow: ${focusEffect.boxShadow} !important;`;
@@ -329,8 +335,8 @@ const buildTwinkleFieldOverrideRules = (spBodySelector, focusEffect) => {
     ? `animation: ${focusEffect.focusAnimation} !important;`
     : '';
   const focusBorderRule = focusEffect.useFocusBorderShorthand
-    ? 'border: 1px solid var(--c-field-focus-border, #327AED) !important;'
-    : 'border-color: var(--c-field-focus-border, #327AED) !important;';
+    ? 'border: var(--c-field-focus-border-width, 1px) solid var(--c-field-focus-border, #327AED) !important;'
+    : 'border-width: var(--c-field-focus-border-width, 1px) !important; border-color: var(--c-field-focus-border, #327AED) !important;';
   const twinkleOverrideSelectors = `
 ${spBodySelector} .ant-select-focused:not(.ant-select-disabled).ant-select:not(.ant-select-customize-input) .ant-select-selector,
 ${spBodySelector} .select-custom-native:focus,
@@ -619,11 +625,13 @@ ${twinkleKeyframesCss}
 ${scopedClass(scopeSelector, '.sp-header-left-label-title')} {
   color: var(--c-header-title-text, #fff) !important;
   font-size: var(--c-header-title-font-size, 15px) !important;
+  font-weight: var(--c-header-title-weight, 400) !important;
 }
 
 ${scopedClass(scopeSelector, '.sp-header-left-label-sub-title')} {
   color: var(--c-header-subtitle-text, #fff) !important;
   font-size: var(--c-header-subtitle-font-size, 14px) !important;
+  font-weight: var(--c-header-subtitle-weight, 400) !important;
 }
 
 ${scopedClass(scopeSelector, '.sp-process-bar')} {
@@ -647,14 +655,14 @@ ${scopedDescendant(scopeSelector, '.ss-bot-message .ss-bot-message__content')} {
 }
 
 ${fieldTextSelectors} {
-  border: 1px solid var(--c-field-unfocus-border, gray) !important;
+  border: var(--c-field-unfocus-border-width, 1px) solid var(--c-field-unfocus-border, gray) !important;
   background-color: var(--c-field-unfocus-bg, #EFF4FD) !important;
   font-size: var(--c-field-font-size, 14px) !important;
   ${transitionRule}
 }
 
 ${fieldSelectSelectors} {
-  border: 1px solid var(--c-field-unfocus-border, gray) !important;
+  border: var(--c-field-unfocus-border-width, 1px) solid var(--c-field-unfocus-border, gray) !important;
   background-color: #ffffff !important;
   font-size: var(--c-field-font-size, 14px) !important;
   ${transitionRule}

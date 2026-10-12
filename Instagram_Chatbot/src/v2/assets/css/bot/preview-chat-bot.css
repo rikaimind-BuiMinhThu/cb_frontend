@@ -2091,20 +2091,25 @@ slideUp
   overflow: hidden;
 }
 
-/* Beat @media (max-width: 981px) 58px avatar — preview iframe is always <981px */
+/* Open-frame header avatar matches the closed bar (58px). */
+.preview-open-frame .sp-header {
+  height: auto;
+  min-height: 74px;
+}
+
 .preview-open-frame .sp-header-left {
   padding: 8px 12px;
   align-items: center;
 }
 
 .preview-open-frame .sp-avatar-bt {
-  width: 40px;
-  height: 40px;
+  width: 58px;
+  height: 58px;
 }
 
 .preview-open-frame .sp-avatar-bt img {
-  width: 40px;
-  height: 40px;
+  width: 58px;
+  height: 58px;
 }
 
 .preview-open-frame--desktop .preview-open-frame__header {
