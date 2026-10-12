@@ -22,6 +22,7 @@ import {
   CARD_PAYMENT_RADIO_SETTING_LABELS,
   CREDIT_CARD_SETTING_LABELS,
 } from '../../constants/scenarioSettingLabels';
+import CardFieldTitleInput from '../shared/CardFieldTitleInput';
 import '../../styles/contentSettings/cardPaymentRadioButton.css';
 
 const DefaultTypeSetting = (props) => {
@@ -37,6 +38,20 @@ const DefaultTypeSetting = (props) => {
     handleDragEndRadioCheckbox,
   } = props;
   const { cardPaymentRadioButton } = buildCardPaymentRadioContext(props);
+
+  const renderFieldTitle = (fieldKey, fallbackLabel) => (
+    <CardFieldTitleInput
+      placeholder={fallbackLabel}
+      value={cardPaymentRadioButton[fieldKey]}
+      onChange={(value) => onChangeValueMessageContent(
+        indexMessageSelect,
+        indexContent,
+        content.type,
+        value,
+        fieldKey,
+      )}
+    />
+  );
 
   return (
     <DragDropContext
@@ -403,6 +418,7 @@ const DefaultTypeSetting = (props) => {
                                 </div>
                                 {cardPaymentRadioButton.separate_type === false ? (
                                   <div className="ss-user-setting__item-bottom">
+                                    {renderFieldTitle('card_number_label', CREDIT_CARD_SETTING_LABELS.cardNumber)}
                                     <InputCustom
                                       labelClassName="ss-input-custom-label--wide"
                                       label={CREDIT_CARD_SETTING_LABELS.cardNumber}
@@ -489,6 +505,7 @@ const DefaultTypeSetting = (props) => {
                                   </div>
                                 ) : (
                                   <div className="ss-user-setting__item-bottom">
+                                    {renderFieldTitle('card_number_label', CREDIT_CARD_SETTING_LABELS.cardNumber)}
                                     <div className="ss-setting-width-90">{CREDIT_CARD_SETTING_LABELS.cardNumber}</div>
                                     <div className="ss-user-setting__item-select-bottom-wrapper-flex ss-user-setting-card-number-separate-type ss-card-payment-radio-setting__options-wrap">
                                       <div
@@ -852,6 +869,7 @@ const DefaultTypeSetting = (props) => {
                                 )}
                                 {cardPaymentRadioButton.separate_name === false ? (
                                   <div className="ss-user-setting__item-bottom">
+                                    {renderFieldTitle('card_holder_label', CREDIT_CARD_SETTING_LABELS.cardHolder)}
                                     <InputCustom
                                       labelClassName="ss-input-custom-label--wide"
                                       label={CREDIT_CARD_SETTING_LABELS.cardHolder}
@@ -938,6 +956,7 @@ const DefaultTypeSetting = (props) => {
                                   </div>
                                 ) : (
                                   <div className="ss-user-setting__item-bottom">
+                                    {renderFieldTitle('card_holder_label', CREDIT_CARD_SETTING_LABELS.cardHolder)}
                                     <div className="ss-setting-width-90">{CREDIT_CARD_SETTING_LABELS.cardHolder}</div>
                                     <div className="ss-setting-flex-center-gap ss-setting-width-90">
                                       <div className="ss-input--full">
@@ -1201,6 +1220,7 @@ const DefaultTypeSetting = (props) => {
                                     </div>
                                   )}
                                 <div className="ss-user-setting__item-bottom">
+                                  {renderFieldTitle('expiry_label', CREDIT_CARD_SETTING_LABELS.expiry)}
                                   <div className="ss-setting-width-90">{CREDIT_CARD_SETTING_LABELS.expiry}</div>
                                   <div
                                     className={`ss-card-payment-radio-setting__expiry-fields-row ${
@@ -1396,9 +1416,10 @@ const DefaultTypeSetting = (props) => {
                                   </div>
                                 </div>
                                 <div className="ss-user-setting__item-bottom">
+                                  {renderFieldTitle('cvc_label', CREDIT_CARD_SETTING_LABELS.cvc)}
                                   <InputCustom
                                     labelClassName="ss-input-custom-label--wide"
-                                    label={CREDIT_CARD_SETTING_LABELS.hideCvc}
+                                    label={CREDIT_CARD_SETTING_LABELS.cvc}
                                     inline={false}
                                     placeholder={SETTING_PLACEHOLDERS.placeholder}
                                     value={cardPaymentRadioButton.cvc_placeholder}

@@ -16,6 +16,7 @@ import {
 import { CONTENT_SETTING_TYPES } from '../../constants/contentTypeConstants';
 import ContentSettingShell from '../shared/ContentSettingShell';
 import CreditCardFukushashikiField from './shared/CreditCardFukushashikiField';
+import CardFieldTitleInput from '../shared/CardFieldTitleInput';
 import { buildCreditCardPaymentContext } from './creditCardPaymentContext';
 import '../../styles/contentSettings/creditCardPayment.css';
 
@@ -166,6 +167,11 @@ const CreditCardPaymentSetting = (props) => {
     if (creditCardPayment.separate_type === false) {
       return (
         <div className="ss-user-setting__item-bottom">
+          <CardFieldTitleInput
+            placeholder={CREDIT_CARD_SETTING_LABELS.cardNumber}
+            value={creditCardPayment.card_number_label}
+            onChange={changeField('card_number_label')}
+          />
           <InputCustom
             labelClassName="ss-input-custom-label--wide"
             label={CREDIT_CARD_SETTING_LABELS.cardNumber}
@@ -186,6 +192,11 @@ const CreditCardPaymentSetting = (props) => {
 
     return (
       <div className="ss-user-setting__item-bottom">
+        <CardFieldTitleInput
+          placeholder={CREDIT_CARD_SETTING_LABELS.cardNumber}
+          value={creditCardPayment.card_number_label}
+          onChange={changeField('card_number_label')}
+        />
         <div className="ss-credit-card-setting__field-block">{CREDIT_CARD_SETTING_LABELS.cardNumber}</div>
         <div className="ss-user-setting__item-select-bottom-wrapper-flex ss-user-setting-card-number-separate-type">
           <InputCustom
@@ -215,6 +226,11 @@ const CreditCardPaymentSetting = (props) => {
 
   const renderCardHolder = () => (
     <div className="ss-user-setting__item-bottom">
+      <CardFieldTitleInput
+        placeholder={CREDIT_CARD_SETTING_LABELS.cardHolder}
+        value={creditCardPayment.card_holder_label}
+        onChange={changeField('card_holder_label')}
+      />
       <InputCustom
         labelClassName="ss-input-custom-label--wide"
         label={CREDIT_CARD_SETTING_LABELS.cardHolder}
@@ -234,6 +250,11 @@ const CreditCardPaymentSetting = (props) => {
 
   const renderExpiry = () => (
     <div className="ss-user-setting__item-bottom">
+      <CardFieldTitleInput
+        placeholder={CREDIT_CARD_SETTING_LABELS.expiry}
+        value={creditCardPayment.expiry_label}
+        onChange={changeField('expiry_label')}
+      />
       <div className="ss-credit-card-setting__field-block">{CREDIT_CARD_SETTING_LABELS.expiry}</div>
       <div className="ss-credit-card-setting__year-block">
         <SelectCustom
@@ -270,6 +291,11 @@ const CreditCardPaymentSetting = (props) => {
 
   const renderCvc = () => (
     <div className="ss-user-setting__item-bottom">
+      <CardFieldTitleInput
+        placeholder={CREDIT_CARD_SETTING_LABELS.cvc}
+        value={creditCardPayment.cvc_label}
+        onChange={changeField('cvc_label')}
+      />
       <InputCustom
         labelClassName="ss-input-custom-label--wide"
         label={CREDIT_CARD_SETTING_LABELS.cvc}

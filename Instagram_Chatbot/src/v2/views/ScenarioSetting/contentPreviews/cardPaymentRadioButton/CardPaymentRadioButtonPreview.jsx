@@ -5,6 +5,7 @@ import SelectCustom from '../../scenarioCommon/SelectCustom';
 import {
   PREVIEW_LABELS,
   CREDIT_CARD_SETTING_LABELS,
+  resolveCardFieldLabel,
 } from '../../constants/scenarioSettingLabels';
 import { CARD_PAYMENT_RADIO_TYPES } from '../../constants/contentTypeConstants';
 import '../../styles/contentPreviews/cardPaymentRadioButton.css';
@@ -91,13 +92,14 @@ const RadioOptions = ({ data }) => (
   </>
 );
 
-const CardNumberField = ({ data }) => (
-  data.separate_type === false ? (
+const CardNumberField = ({ data }) => {
+  const label = resolveCardFieldLabel(data, 'card_number_label', CREDIT_CARD_SETTING_LABELS.cardNumber);
+  return data.separate_type === false ? (
     <div className="ss-user-setting__item-bottom">
       <InputCustom
         className="ss-user-setting-input-overview"
         labelClassName="ss-input-custom-label--full"
-        label={CREDIT_CARD_SETTING_LABELS.cardNumber}
+        label={label}
         inline={false}
         disabled
         placeholder={data.card_number_placeholder}
@@ -105,7 +107,7 @@ const CardNumberField = ({ data }) => (
     </div>
   ) : (
     <div className="ss-user-setting__item-bottom">
-      <div className="ss-content-preview__field-label--full">{CREDIT_CARD_SETTING_LABELS.cardNumber}</div>
+      <div className="ss-content-preview__field-label--full">{label}</div>
       <div className="ss-user-setting__item-select-bottom-wrapper-flex ss-user-setting-card-number-separate-type">
         <InputCustom disabled placeholder={data.card_number_placeholder1} className="ss-user-setting-input-overview" />
         <InputCustom disabled placeholder={data.card_number_placeholder2} className="ss-user-setting-input-overview" />
@@ -113,8 +115,8 @@ const CardNumberField = ({ data }) => (
         <InputCustom disabled placeholder={data.card_number_placeholder4} className="ss-user-setting-input-overview" />
       </div>
     </div>
-  )
-);
+  );
+};
 
 const InstallmentField = ({ data }) => {
   if (!Array.isArray(data.is_use_installment) || data.is_use_installment.length === 0) return null;
@@ -132,13 +134,14 @@ const InstallmentField = ({ data }) => {
 };
 
 const CardHolderField = ({ data }) => {
+  const label = resolveCardFieldLabel(data, 'card_holder_label', CREDIT_CARD_SETTING_LABELS.cardHolder);
   if (data.is_hide_card_name !== false) return null;
   return data.separate_name === false ? (
     <div className="ss-user-setting__item-bottom">
       <InputCustom
         className="ss-user-setting-input-overview"
         labelClassName="ss-input-custom-label--full"
-        label={CREDIT_CARD_SETTING_LABELS.cardHolder}
+        label={label}
         inline={false}
         disabled
         placeholder={data.card_holder_placeholder}
@@ -146,7 +149,7 @@ const CardHolderField = ({ data }) => {
     </div>
   ) : (
     <>
-      <div className="ss-content-preview__field-label--full">{CREDIT_CARD_SETTING_LABELS.cardHolder}</div>
+      <div className="ss-content-preview__field-label--full">{label}</div>
       <div className="ss-content-preview__field-row">
         <InputCustom
           className="ss-user-setting-input-overview"
@@ -170,7 +173,9 @@ const CardHolderField = ({ data }) => {
 
 const ExpiryField = ({ data }) => (
   <div className="ss-user-setting__item-bottom">
-    <div className="ss-content-preview__field-label--full">{CREDIT_CARD_SETTING_LABELS.expiry}</div>
+    <div className="ss-content-preview__field-label--full">
+      {resolveCardFieldLabel(data, 'expiry_label', CREDIT_CARD_SETTING_LABELS.expiry)}
+    </div>
     <div className="ss-content-preview__expiry-row">
       <SelectCustom
         placeholder={CREDIT_CARD_SETTING_LABELS.year}
@@ -195,7 +200,7 @@ const CvcField = ({ data }) => {
       <InputCustom
         className="ss-user-setting-input-overview"
         labelClassName="ss-input-custom-label--full"
-        label={CREDIT_CARD_SETTING_LABELS.cvc}
+        label={resolveCardFieldLabel(data, 'cvc_label', CREDIT_CARD_SETTING_LABELS.cvc)}
         inline={false}
         disabled
         placeholder={data.cvc_placeholder}

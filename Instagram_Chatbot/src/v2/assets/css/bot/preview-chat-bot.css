@@ -2223,19 +2223,26 @@ slideUp
 .ss-message__content--user-zip-code-address-search-link.is-disabled span {
   cursor: default;
 }
+.ant-radio-group.payment-group-row,
 .payment-group-row {
   width: 100%;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
   gap: 8px;
+  overflow-x: auto;
 }
 .payment-group-row > .payment-option,
 .payment-group-row > .ss-message__content--user-card-payment-radio-content {
   width: auto;
-  flex: 1 1 0;
-  min-width: 0;
+  flex: 1 1 auto;
+  min-width: min-content;
   margin-bottom: 0;
+}
+.payment-option-label,
+.payment-group-row .ant-radio-wrapper > span:last-child {
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .payment-group-column {
   width: 100%;
@@ -2254,6 +2261,32 @@ slideUp
   gap: 8px;
   background-color: var(--payment-option-bg);
   border-color: var(--payment-option-border);
+}
+.payment-group-row > .payment-option--tile {
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto;
+  padding: 0;
+  border: none;
+  background: transparent;
+  gap: 0;
+  box-shadow: none;
+}
+.payment-option--tile .ant-radio,
+.payment-option--tile .ant-radio-button {
+  display: none;
+}
+.payment-option--tile.ant-radio-wrapper > span:last-child,
+.payment-option--tile.ant-radio-button-wrapper > span:last-child {
+  padding: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.payment-option-tile-image {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
 }
 .ss-message__content--user-radio_button-img-grid {
   grid-template-columns: var(--preview-grid-columns);

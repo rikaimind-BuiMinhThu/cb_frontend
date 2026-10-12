@@ -33,10 +33,19 @@ const getPaymentOptionVarStyle = (isSelected, displayStyle = {}) => {
   };
 };
 
-const renderOptionLabel = (itemPayment, isSelected) => {
+const renderOptionLabel = (itemPayment, isSelected, layout) => {
   const image = getPaymentOptionImage(itemPayment, isSelected);
+  if (layout === 'horizontal' && image) {
+    return (
+      <img
+        src={image}
+        alt={itemPayment.text || ''}
+        className="payment-option-tile-image"
+      />
+    );
+  }
   return (
-    <span className="preview-inline-center">
+    <span className="preview-inline-center payment-option-label">
       {image && (
         <img
           src={image}
@@ -44,7 +53,7 @@ const renderOptionLabel = (itemPayment, isSelected) => {
           className="preview-icon-24"
         />
       )}
-      <span>{itemPayment.text}</span>
+      <span className="payment-option-label">{itemPayment.text}</span>
     </span>
   );
 };
@@ -117,15 +126,16 @@ const CardPaymentRadioButton = ({ content, messageIndex, contentIndex, onChangeV
           cardPaymentRadioButton.radio_contents.map(
             (itemPayment, indexPayment) => {
               const isSelected = cardPaymentRadioButton.initial_selection === itemPayment.value;
+              const isTile = layout === 'horizontal' && Boolean(getPaymentOptionImage(itemPayment, isSelected));
               return (
                 <Radio
                   value={itemPayment.value}
                   key={indexPayment}
-                  className="ss-message__content--user-card-payment-radio-content payment-option"
+                  className={`ss-message__content--user-card-payment-radio-content payment-option${isTile ? ' payment-option--tile' : ''}`}
                   style={getPaymentOptionVarStyle(isSelected, displayStyle)}
                   onChange={onRadioChange}
                 >
-                  {renderOptionLabel(itemPayment, isSelected)}
+                  {renderOptionLabel(itemPayment, isSelected, layout)}
                 </Radio>
               );
             }
@@ -149,15 +159,16 @@ const CardPaymentRadioButton = ({ content, messageIndex, contentIndex, onChangeV
           cardPaymentRadioButton.radio_contents.map(
             (itemPayment, indexPayment) => {
               const isSelected = cardPaymentRadioButton.initial_selection === itemPayment.value;
+              const isTile = layout === 'horizontal' && Boolean(getPaymentOptionImage(itemPayment, isSelected));
               return (
                 <Radio.Button
                   value={itemPayment.value}
                   key={indexPayment}
-                  className="ss-message__content--user-card-payment-radio-customized-style payment-option"
+                  className={`ss-message__content--user-card-payment-radio-customized-style payment-option${isTile ? ' payment-option--tile' : ''}`}
                   style={getPaymentOptionVarStyle(isSelected, displayStyle)}
                   onChange={onRadioChange}
                 >
-                  {renderOptionLabel(itemPayment, isSelected)}
+                  {renderOptionLabel(itemPayment, isSelected, layout)}
                 </Radio.Button>
               );
             }

@@ -152,9 +152,11 @@ const buildThemeVariables = (theme) => {
   --c-bot-msg-bg: ${theme.botMessageBgColor};
   --c-bot-msg-text: ${theme.botMessageTextColor};
   --c-bot-msg-font-size: ${theme.botMessageFontSize};
+  --c-bot-msg-weight: ${themeIsBold(theme.botMessageBold) ? 700 : 400};
   --c-user-msg-bg: ${theme.userMessageBgColor};
   --c-user-msg-text: ${theme.userMessageTextColor};
   --c-user-msg-font-size: ${theme.userMessageFontSize};
+  --c-user-msg-weight: ${themeIsBold(theme.userMessageBold) ? 700 : 400};
   --c-field-focus-border: ${theme.fieldFocusBorderColor};
   --c-field-focus-border-width: ${theme.fieldFocusBorderWidth || '1px'};
   --c-field-focus-bg: ${theme.fieldFocusBgColor};
@@ -162,6 +164,8 @@ const buildThemeVariables = (theme) => {
   --c-field-unfocus-border-width: ${theme.fieldUnfocusBorderWidth || '1px'};
   --c-field-unfocus-bg: ${theme.fieldUnfocusBgColor};
   --c-field-font-size: ${theme.fieldFontSize};
+  --c-field-text-weight: ${themeIsBold(theme.fieldTextBold) ? 700 : 400};
+  --c-field-placeholder-weight: ${themeIsBold(theme.fieldPlaceholderBold) ? 700 : 400};
   --c-validation-bg: ${theme.validationMessageBgColor};
   --c-validation-text: ${theme.validationMessageTextColor};
   --c-validation-font-size: ${theme.validationMessageFontSize};
@@ -652,12 +656,14 @@ ${scopedDescendant(scopeSelector, '.ss-bot-message .ss-bot-message__content')} {
   background-color: var(--c-bot-msg-bg, #3CACEF) !important;
   color: var(--c-bot-msg-text, #fff) !important;
   font-size: var(--c-bot-msg-font-size, 14px) !important;
+  font-weight: var(--c-bot-msg-weight, 400) !important;
 }
 
 ${fieldTextSelectors} {
   border: var(--c-field-unfocus-border-width, 1px) solid var(--c-field-unfocus-border, gray) !important;
   background-color: var(--c-field-unfocus-bg, #EFF4FD) !important;
   font-size: var(--c-field-font-size, 14px) !important;
+  font-weight: var(--c-field-text-weight, 400) !important;
   ${transitionRule}
 }
 
@@ -665,15 +671,18 @@ ${fieldSelectSelectors} {
   border: var(--c-field-unfocus-border-width, 1px) solid var(--c-field-unfocus-border, gray) !important;
   background-color: #ffffff !important;
   font-size: var(--c-field-font-size, 14px) !important;
+  font-weight: var(--c-field-text-weight, 400) !important;
   ${transitionRule}
 }
 
 ${fieldPlaceholderSelectors} {
   font-size: var(--c-field-font-size, 14px) !important;
+  font-weight: var(--c-field-placeholder-weight, 400) !important;
 }
 
 ${fieldScopeSelectors.map((fieldScope) => `${fieldScope} .ant-select-selection-placeholder`).join(',\n')} {
   font-size: var(--c-field-font-size, 14px) !important;
+  font-weight: var(--c-field-placeholder-weight, 400) !important;
 }
 ${focusRules}
 ${previewRules}
@@ -684,6 +693,7 @@ ${scopedClass(scopeSelector, '.ss-bot-chat-text-input.ss-bot-chat-detail-content
   background-color: var(--c-bot-msg-bg, #3CACEF) !important;
   color: var(--c-bot-msg-text, #fff) !important;
   font-size: var(--c-bot-msg-font-size, 14px) !important;
+  font-weight: var(--c-bot-msg-weight, 400) !important;
   border: none !important;
 }
 
@@ -700,6 +710,7 @@ ${userMessageWrapperSelector} {
   background-color: var(--c-user-msg-bg, #fff) !important;
   color: var(--c-user-msg-text, #333) !important;
   font-size: var(--c-user-msg-font-size, 14px) !important;
+  font-weight: var(--c-user-msg-weight, 400) !important;
 }
 
 ${userMessageWrapperDirectChildSelector} {
@@ -773,6 +784,15 @@ ${withPseudoOnEach(nextButtonSelector, '.disabled')} {
   opacity: 1 !important;
   animation: none !important;
 }
+${hasExplicitButtonWidth ? '' : `
+${[
+  '.chatbot-submit-button:not(.chatbot-submit-button--image)',
+  '#chatbot-submit-button:not(.chatbot-submit-button--image)',
+  '[id^="chatbot-submit-button-"]:not(.chatbot-submit-button--image)',
+].map((selector) => (scopeSelector ? scopedDescendant(scopeSelector, `.sp-body ${selector}`) : `.sp-body ${selector}`)).join(',\n')} {
+  width: 100% !important;
+  max-width: 100% !important;
+}`}
 
 ${spBodySelector} .ant-checkbox-inner {
   background-color: var(--c-checkbox-unchecked-bg, #fff) !important;

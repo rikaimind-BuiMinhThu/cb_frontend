@@ -103,9 +103,10 @@
 
 .ss-content-preview__radio-group--horizontal > .ss-content-preview__radio-option {
   width: auto;
-  flex: 1 1 0;
-  min-width: 0;
+  flex: 1 1 auto;
+  min-width: min-content;
   margin-bottom: 0;
+  white-space: nowrap;
 }
 
 .ss-content-preview__radio-option {

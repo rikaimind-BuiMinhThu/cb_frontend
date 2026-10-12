@@ -15,6 +15,7 @@ import cvcIcon from "v2/assets/img/cvc-icon.png";
 import { moveToNext } from "v2/views/Preview/PreviewComponent/Utils";
 
 import moment from "moment";
+import { resolveCardFieldLabel } from "v2/views/ScenarioSetting/constants/scenarioSettingLabels";
 
 const CARD_NUMBER_LABEL = "カード番号";
 const CARD_HOLDER_LABEL = "カード名義";
@@ -27,6 +28,10 @@ const CreditCardPayment = ({ content, messageIndex, contentIndex, onChangeValue,
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.CREDIT_CARD_PAYMENT) return null;
 
   const creditCardPayment = content.credit_card_payment;
+  const cardNumberLabel = resolveCardFieldLabel(creditCardPayment, "card_number_label", CARD_NUMBER_LABEL);
+  const cardHolderLabel = resolveCardFieldLabel(creditCardPayment, "card_holder_label", CARD_HOLDER_LABEL);
+  const cardExpiryLabel = resolveCardFieldLabel(creditCardPayment, "expiry_label", CARD_EXPIRY_LABEL);
+  const cardCvcLabel = resolveCardFieldLabel(creditCardPayment, "cvc_label", CARD_CVC_LABEL);
 
   const cardExpiredYearOptions =  Array.from({ length: 10 }, (_, i) => {
     return {
@@ -77,7 +82,7 @@ const CreditCardPayment = ({ content, messageIndex, contentIndex, onChangeValue,
           <InputCustom
             classLabel="w-100-percent"
             id="sp_credit_card_payment"
-            label={CARD_NUMBER_LABEL}
+            label={cardNumberLabel}
             type="number"
             onKeyPress={(e) => {
               if (e.target.value.length >= 16) e.preventDefault();
@@ -114,7 +119,7 @@ const CreditCardPayment = ({ content, messageIndex, contentIndex, onChangeValue,
 
     return (
       <div className="ss-user-setting__item-bottom">
-        <div className="w-100-percent">{CARD_NUMBER_LABEL}</div>
+        <div className="w-100-percent">{cardNumberLabel}</div>
         <div
           className="ss-user-setting__item-select-bottom-wrapper-flex ss-user-setting-card-number-separate-type w-100-percent"
         >
@@ -210,7 +215,7 @@ const CreditCardPayment = ({ content, messageIndex, contentIndex, onChangeValue,
       <div className="ss-user-setting__item-bottom">
         <InputCustom
           classLabel="w-100-percent"
-          label={CARD_HOLDER_LABEL}
+          label={cardHolderLabel}
           inline={false}
           disabled={disabled}
           value={creditCardPayment.card_holder || EMPTY_INPUT_VALUE}
@@ -251,7 +256,7 @@ const CreditCardPayment = ({ content, messageIndex, contentIndex, onChangeValue,
 
     return (
       <div className="ss-user-setting__item-bottom">
-        <div className="w-100-percent">{CARD_EXPIRY_LABEL}</div>
+        <div className="w-100-percent">{cardExpiryLabel}</div>
         {expirationForm}
       </div>
     );
@@ -261,7 +266,7 @@ const CreditCardPayment = ({ content, messageIndex, contentIndex, onChangeValue,
     if (creditCardPayment.is_hide_cvc) return null;
     const cvcLabel = (
       <span className="f-weight-400">
-        {CARD_CVC_LABEL} <img className="w-8-percent" src={cvcIcon} alt="" />
+        {cardCvcLabel} <img className="w-8-percent" src={cvcIcon} alt="" />
       </span>
     );
 
