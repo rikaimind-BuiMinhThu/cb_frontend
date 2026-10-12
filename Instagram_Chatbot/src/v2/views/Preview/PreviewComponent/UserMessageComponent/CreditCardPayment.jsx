@@ -19,7 +19,7 @@ import moment from "moment";
 const CARD_NUMBER_LABEL = "カード番号";
 const CARD_HOLDER_LABEL = "カード名義";
 const CARD_EXPIRY_LABEL = "有効期限";
-const CARD_CVC_LABEL = "CVC";
+const CARD_CVC_LABEL = "セキュリティコード";
 const CVC_PATTERN = /^[0-9]{0,4}$/;
 const EXPIRY_TYPE_YM = "ym";
 

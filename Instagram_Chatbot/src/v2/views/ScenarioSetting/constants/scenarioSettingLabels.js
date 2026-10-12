@@ -151,7 +151,7 @@ export const CREDIT_CARD_SETTING_LABELS = {
   cardNumber: 'カード番号',
   cardHolder: 'カード名義',
   expiry: '有効期限',
-  cvc: 'CVC非表示',
+  cvc: 'セキュリティコード',
   installmentCount: 'お支払い回数',
   year: '年',
   month: '月',

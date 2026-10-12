@@ -34,7 +34,7 @@ const RadioOptions = ({ data }) => (
   <>
     {data.type === CARD_PAYMENT_RADIO_TYPES.DEFAULT && (
       <Radio.Group
-        className="ss-content-preview__radio-group"
+        className={`ss-content-preview__radio-group${data.layout === 'horizontal' ? ' ss-content-preview__radio-group--horizontal' : ''}`}
         value={data.initial_selection}
       >
         {data.radio_contents && data.radio_contents.map((itemPayment, indexPayment) => (

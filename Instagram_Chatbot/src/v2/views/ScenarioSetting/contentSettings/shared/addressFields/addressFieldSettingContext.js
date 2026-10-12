@@ -1,9 +1,13 @@
+import cloneDeep from 'lodash/cloneDeep';
+import { mutateMessageContent } from 'v2/views/ScenarioSetting/utils/scenarioMessageMutations';
+
 export const buildAddressFieldSettingContext = (props) => {
   const {
     indexMessageSelect,
     indexContent,
     content,
     dataMessages,
+    setDataMessages,
     onChangeValueMessageContent,
     handleRemoveItemZipCodeAddress,
     isUseFukushashiki,
@@ -16,6 +20,23 @@ export const buildAddressFieldSettingContext = (props) => {
 
   const changeAddressField = (field) => (value) =>
     onChangeValueMessageContent(indexMessageSelect, indexContent, contentType, value, field);
+
+  const setAddressFields = (updates) => {
+    setDataMessages((current) => {
+      const next = cloneDeep(current);
+      Object.entries(updates).forEach(([field, value]) => {
+        mutateMessageContent(
+          next,
+          indexMessageSelect,
+          indexContent,
+          contentType,
+          value,
+          field,
+        );
+      });
+      return next;
+    });
+  };
 
   const changeMessageFukushashiki = (field) => (value) =>
     onChangeValueMessageContent(indexMessageSelect, indexContent, field, value);
@@ -48,6 +69,7 @@ export const buildAddressFieldSettingContext = (props) => {
     addressData,
     messageContent,
     changeAddressField,
+    setAddressFields,
     changeMessageFukushashiki,
     removeField,
     getFukushashikiProps,

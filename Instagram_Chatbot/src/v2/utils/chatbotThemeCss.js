@@ -446,7 +446,7 @@ const buildThemeRules = (theme, scopeSelector = '', options = {}) => {
     ? scopedDescendant(scopeSelector, '.sp-body .sp-user-message-button-action')
     : '.sp-body .sp-user-message-button-action';
   const buttonPositionRules = `
-${nextButtonActionSelector} {
+${nextButtonActionSelector}:not(.sp-user-message-button-action--hidden) {
   display: flex !important;
   justify-content: var(--c-btn-position-justify, flex-end) !important;
 }`;
