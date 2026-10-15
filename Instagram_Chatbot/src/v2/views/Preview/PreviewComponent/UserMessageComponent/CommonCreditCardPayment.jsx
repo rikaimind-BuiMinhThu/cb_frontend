@@ -41,6 +41,7 @@ const CommonCreditCardPayment = ({ content, messageIndex, contentIndex, onChange
   });
 
   const renderTitle = () => {
+    if (content.type === MESSAGE_CONTENT_TYPES.CARD_PAYMENT_RADIO_BUTTON) return null;
     if (!creditCardPayment.title_require && !creditCardPayment.require) return null;
 
     return (
