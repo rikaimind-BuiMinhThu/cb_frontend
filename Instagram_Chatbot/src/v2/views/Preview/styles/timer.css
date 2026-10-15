@@ -1,6 +1,6 @@
 .timer {
   width: 100%;
-  padding: 10px;
+  padding: 0;
   max-height: 50px;
   overflow: hidden;
   display: flex;

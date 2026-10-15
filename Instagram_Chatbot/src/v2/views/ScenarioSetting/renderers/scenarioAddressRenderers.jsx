@@ -27,6 +27,7 @@ export const createRenderAddressField = () => {
 
 export const createRenderBuildingName = () => {
   const renderBuildingName = (address) => {
+    if (address.compact_municipality_and_address_and_building_name) return;
     if (address.building_name === undefined) return;
     return renderLabeledAddressInput(
       address.building_name_label || SETTING_LABELS.buildingName,

@@ -103,6 +103,7 @@ const DesignChatbot = ({ mode = MODE_EDIT }) => {
               children: (
                 <BasicInfoTab
                   basicInfo={state.basicInfo}
+                  buttonTypePc={state.designSettings.buttonTypePc}
                   validationErrors={state.validationErrors}
                   iconPresetIndices={state.iconPresetIndices}
                   onFieldChange={(field, value) => {

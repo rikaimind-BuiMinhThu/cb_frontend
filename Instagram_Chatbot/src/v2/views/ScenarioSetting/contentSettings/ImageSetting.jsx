@@ -21,17 +21,21 @@ const ImageSetting = ({
 }) => {
   const image = content.image;
 
-  const renderPreviewImage = () => (
-    <div className="ss-user-setting__item-bottom">
-      <img
-        className="ss-image-setting__preview"
-        src={image.imageURL}
-        width={image.image_width}
-        height={image.image_height}
-        alt=""
-      />
-    </div>
-  );
+  const renderPreviewImage = () => {
+    if (!image.imageURL) return null;
+
+    return (
+      <div className="ss-user-setting__item-bottom">
+        <img
+          className="ss-image-setting__preview"
+          src={image.imageURL}
+          width={image.image_width}
+          height={image.image_height}
+          alt=""
+        />
+      </div>
+    );
+  };
 
   const renderFileActions = () => (
     <div className="ss-setting-file-upload-wrapper ss-file-upload-wrapper">

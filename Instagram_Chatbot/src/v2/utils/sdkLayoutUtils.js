@@ -203,10 +203,14 @@ export const getClosedLauncherPosition = (state, options = {}) => {
   }
 
   if (isEmbedded) {
+    // Desktop closed iframe stays at bottom 0 and its height already includes
+    // bottomMarginPc, so the launcher uses that space. Mobile closed iframe
+    // is already offset by bottomMarginSp in the parent SDK.
+    const bottomMargin = isMobile ? 0 : toLayoutNumber(state?.bottomMarginPc, 0);
     if (isMobile && state?.useFullWidthChatbotMobile) {
       return { bottom: '0px', left: '15px', right: 'auto' };
     }
-    return { bottom: '0px', right: '0px', left: 'auto' };
+    return { bottom: `${bottomMargin}px`, right: '0px', left: 'auto' };
   }
 
   if (isMobile) {

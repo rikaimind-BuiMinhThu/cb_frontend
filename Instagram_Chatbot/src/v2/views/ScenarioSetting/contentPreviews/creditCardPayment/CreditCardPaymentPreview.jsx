@@ -2,12 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import InputCustom from '../../scenarioCommon/InputCustom';
 import SelectCustom from '../../scenarioCommon/SelectCustom';
-import { CREDIT_CARD_SETTING_LABELS, PREVIEW_LABELS } from '../../constants/scenarioSettingLabels';
+import { CREDIT_CARD_SETTING_LABELS, PREVIEW_LABELS, resolveCardFieldLabel } from '../../constants/scenarioSettingLabels';
 import { CONTENT_SETTING_TYPES } from '../../constants/contentTypeConstants';
 import '../../styles/contentPreviews/creditCardPayment.css';
 
 const CreditCardPaymentPreview = ({ content }) => {
   const creditCardPayment = content.credit_card_payment;
+  const cardNumberLabel = resolveCardFieldLabel(creditCardPayment, 'card_number_label', CREDIT_CARD_SETTING_LABELS.cardNumber);
+  const cardHolderLabel = resolveCardFieldLabel(creditCardPayment, 'card_holder_label', CREDIT_CARD_SETTING_LABELS.cardHolder);
+  const expiryLabel = resolveCardFieldLabel(creditCardPayment, 'expiry_label', CREDIT_CARD_SETTING_LABELS.expiry);
+  const cvcLabel = resolveCardFieldLabel(creditCardPayment, 'cvc_label', CREDIT_CARD_SETTING_LABELS.cvc);
 
   const renderHeader = () => {
     if (!creditCardPayment.title_require && !creditCardPayment.require) return null;
@@ -30,7 +34,7 @@ const CreditCardPaymentPreview = ({ content }) => {
           <InputCustom
             className="ss-user-setting-input-overview"
             labelClassName="ss-input-custom-label--full"
-            label={CREDIT_CARD_SETTING_LABELS.cardNumber}
+            label={cardNumberLabel}
             inline={false}
             disabled
             placeholder={creditCardPayment.card_number_placeholder}
@@ -41,7 +45,7 @@ const CreditCardPaymentPreview = ({ content }) => {
 
     return (
       <div className="ss-user-setting__item-bottom">
-        <div className="ss-credit-card-preview__card-number-label">{CREDIT_CARD_SETTING_LABELS.cardNumber}</div>
+        <div className="ss-credit-card-preview__card-number-label">{cardNumberLabel}</div>
         <div className="ss-user-setting__item-select-bottom-wrapper-flex ss-user-setting-card-number-separate-type ss-credit-card-preview__card-number-label">
           <InputCustom disabled placeholder={creditCardPayment.card_number_placeholder1} />
           <InputCustom disabled placeholder={creditCardPayment.card_number_placeholder2} />
@@ -59,7 +63,7 @@ const CreditCardPaymentPreview = ({ content }) => {
         <InputCustom
           className="ss-user-setting-input-overview"
           labelClassName="ss-input-custom-label--full"
-          label={CREDIT_CARD_SETTING_LABELS.cardHolder}
+          label={cardHolderLabel}
           inline={false}
           disabled
           placeholder={creditCardPayment.card_number_placeholder}
@@ -70,7 +74,7 @@ const CreditCardPaymentPreview = ({ content }) => {
 
   const renderExpiry = () => (
     <div className="ss-user-setting__item-bottom">
-      <div className="ss-credit-card-preview__card-number-label">{CREDIT_CARD_SETTING_LABELS.expiry}</div>
+      <div className="ss-credit-card-preview__card-number-label">{expiryLabel}</div>
       <div className="ss-credit-card-preview__expiry-row">
         <SelectCustom
           placeholder={CREDIT_CARD_SETTING_LABELS.year}
@@ -95,7 +99,7 @@ const CreditCardPaymentPreview = ({ content }) => {
         <InputCustom
           className="ss-user-setting-input-overview"
           labelClassName="ss-input-custom-label--full"
-          label={CREDIT_CARD_SETTING_LABELS.cvc}
+          label={cvcLabel}
           inline={false}
           disabled
           placeholder={creditCardPayment.cvc_placeholder}

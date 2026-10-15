@@ -94,6 +94,21 @@
   font-size: 14px;
 }
 
+.ss-content-preview__radio-group--horizontal {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+
+.ss-content-preview__radio-group--horizontal > .ss-content-preview__radio-option {
+  width: auto;
+  flex: 1 1 auto;
+  min-width: min-content;
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
 .ss-content-preview__radio-option {
   background-color: #ecf5fa;
   margin-bottom: 5px;

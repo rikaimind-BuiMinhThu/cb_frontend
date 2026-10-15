@@ -15,11 +15,12 @@ import cvcIcon from "v2/assets/img/cvc-icon.png";
 import { moveToNext } from "v2/views/Preview/PreviewComponent/Utils";
 
 import moment from "moment";
+import { resolveCardFieldLabel } from "v2/views/ScenarioSetting/constants/scenarioSettingLabels";
 
 const CARD_NUMBER_LABEL = "カード番号";
 const CARD_HOLDER_LABEL = "カード名義";
 const CARD_EXPIRY_LABEL = "有効期限";
-const CARD_CVC_LABEL = "CVC";
+const CARD_CVC_LABEL = "セキュリティコード";
 const CVC_PATTERN = /^[0-9]{0,4}$/;
 const EXPIRY_TYPE_YM = "ym";
 
@@ -27,6 +28,10 @@ const CommonCreditCardPayment = ({ content, messageIndex, contentIndex, onChange
   if (content.type !== MESSAGE_CONTENT_TYPES.CREDIT_CARD_PAYMENT && content.type !== MESSAGE_CONTENT_TYPES.CARD_PAYMENT_RADIO_BUTTON) return null;
 
   const creditCardPayment = content.type === MESSAGE_CONTENT_TYPES.CREDIT_CARD_PAYMENT ? content.credit_card_payment : content.card_payment_radio_button;
+  const cardNumberLabel = resolveCardFieldLabel(creditCardPayment, "card_number_label", CARD_NUMBER_LABEL);
+  const cardHolderLabel = resolveCardFieldLabel(creditCardPayment, "card_holder_label", CARD_HOLDER_LABEL);
+  const cardExpiryLabel = resolveCardFieldLabel(creditCardPayment, "expiry_label", CARD_EXPIRY_LABEL);
+  const cardCvcLabel = resolveCardFieldLabel(creditCardPayment, "cvc_label", CARD_CVC_LABEL);
 
   const cardExpiredYearOptions =  Array.from({ length: 10 }, (_, i) => {
     return {
@@ -36,6 +41,7 @@ const CommonCreditCardPayment = ({ content, messageIndex, contentIndex, onChange
   });
 
   const renderTitle = () => {
+    if (content.type === MESSAGE_CONTENT_TYPES.CARD_PAYMENT_RADIO_BUTTON) return null;
     if (!creditCardPayment.title_require && !creditCardPayment.require) return null;
 
     return (
@@ -77,7 +83,7 @@ const CommonCreditCardPayment = ({ content, messageIndex, contentIndex, onChange
           <InputCustom
             classLabel="w-100-percent"
             id="sp_credit_card_payment"
-            label={CARD_NUMBER_LABEL}
+            label={cardNumberLabel}
             type="number"
             onKeyPress={(e) => {
               if (e.target.value.length >= 16) e.preventDefault();
@@ -114,7 +120,7 @@ const CommonCreditCardPayment = ({ content, messageIndex, contentIndex, onChange
 
     return (
       <div className="ss-user-setting__item-bottom">
-        <div className="w-100-percent">{CARD_NUMBER_LABEL}</div>
+        <div className="w-100-percent">{cardNumberLabel}</div>
         <div
           className="ss-user-setting__item-select-bottom-wrapper-flex ss-user-setting-card-number-separate-type w-100-percent"
         >
@@ -208,7 +214,7 @@ const CommonCreditCardPayment = ({ content, messageIndex, contentIndex, onChange
     if (creditCardPayment.separate_name === true) {
       return (
         <div className="ss-user-setting__item-bottom">
-          <div className="w-100-percent">{CARD_HOLDER_LABEL}</div>
+          <div className="w-100-percent">{cardHolderLabel}</div>
           <div className="ss-user-setting__item-select-bottom-wrapper-flex w-100-percent">
             <InputCustom
               classLabel="w-100-percent"
@@ -252,7 +258,7 @@ const CommonCreditCardPayment = ({ content, messageIndex, contentIndex, onChange
       <div className="ss-user-setting__item-bottom">
         <InputCustom
           classLabel="w-100-percent"
-          label={CARD_HOLDER_LABEL}
+          label={cardHolderLabel}
           inline={false}
           disabled={disabled}
           value={creditCardPayment.card_holder || EMPTY_INPUT_VALUE}
@@ -293,7 +299,7 @@ const CommonCreditCardPayment = ({ content, messageIndex, contentIndex, onChange
 
     return (
       <div className="ss-user-setting__item-bottom">
-        <div className="w-100-percent">{CARD_EXPIRY_LABEL}</div>
+        <div className="w-100-percent">{cardExpiryLabel}</div>
         {expirationForm}
       </div>
     );
@@ -303,7 +309,7 @@ const CommonCreditCardPayment = ({ content, messageIndex, contentIndex, onChange
     if (creditCardPayment.is_hide_cvc) return null;
     const cvcLabel = (
       <span className="f-weight-400">
-        {CARD_CVC_LABEL} <img className="w-8-percent" src={cvcIcon} alt="" />
+        {cardCvcLabel} <img className="w-8-percent" src={cvcIcon} alt="" />
       </span>
     );
 

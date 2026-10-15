@@ -130,6 +130,8 @@ const combineScopedFieldSelectors = (scopeSelector, builder) =>
     .map((fieldScope) => builder(fieldScope))
     .join(',\n');
 
+const themeIsBold = (value) => value === true || value === 'true' || value === 1 || value === '1';
+
 const buildThemeVariables = (theme) => {
   const buttonWidth = resolveButtonWidthCss(theme.buttonWidth);
   const buttonPadding = resolveButtonPaddingCss(theme.buttonPadding);
@@ -139,8 +141,10 @@ const buildThemeVariables = (theme) => {
   return `
   --c-header-title-text: ${theme.headerTitleTextColor};
   --c-header-title-font-size: ${theme.headerTitleFontSize};
+  --c-header-title-weight: ${themeIsBold(theme.headerTitleBold) ? 700 : 400};
   --c-header-subtitle-text: ${theme.headerSubtitleTextColor};
   --c-header-subtitle-font-size: ${theme.headerSubtitleFontSize};
+  --c-header-subtitle-weight: ${themeIsBold(theme.headerSubtitleBold) ? 700 : 400};
   --c-progress-bg: ${theme.progressBarBgColor};
   --c-progress-text: ${theme.progressBarTextColor};
   --c-progress-font-size: ${theme.progressBarFontSize};
@@ -148,14 +152,20 @@ const buildThemeVariables = (theme) => {
   --c-bot-msg-bg: ${theme.botMessageBgColor};
   --c-bot-msg-text: ${theme.botMessageTextColor};
   --c-bot-msg-font-size: ${theme.botMessageFontSize};
+  --c-bot-msg-weight: ${themeIsBold(theme.botMessageBold) ? 700 : 400};
   --c-user-msg-bg: ${theme.userMessageBgColor};
   --c-user-msg-text: ${theme.userMessageTextColor};
   --c-user-msg-font-size: ${theme.userMessageFontSize};
+  --c-user-msg-weight: ${themeIsBold(theme.userMessageBold) ? 700 : 400};
   --c-field-focus-border: ${theme.fieldFocusBorderColor};
+  --c-field-focus-border-width: ${theme.fieldFocusBorderWidth || '1px'};
   --c-field-focus-bg: ${theme.fieldFocusBgColor};
   --c-field-unfocus-border: ${theme.fieldUnfocusBorderColor};
+  --c-field-unfocus-border-width: ${theme.fieldUnfocusBorderWidth || '1px'};
   --c-field-unfocus-bg: ${theme.fieldUnfocusBgColor};
   --c-field-font-size: ${theme.fieldFontSize};
+  --c-field-text-weight: ${themeIsBold(theme.fieldTextBold) ? 700 : 400};
+  --c-field-placeholder-weight: ${themeIsBold(theme.fieldPlaceholderBold) ? 700 : 400};
   --c-validation-bg: ${theme.validationMessageBgColor};
   --c-validation-text: ${theme.validationMessageTextColor};
   --c-validation-font-size: ${theme.validationMessageFontSize};
@@ -295,8 +305,8 @@ const buildFieldFocusStyles = (fieldFocusSelectors, focusEffect, previewFocusSel
     ? `animation: ${focusEffect.focusAnimation} !important;`
     : '';
   const focusBorderRule = focusEffect.useFocusBorderShorthand
-    ? 'border: 1px solid var(--c-field-focus-border, #327AED) !important;'
-    : 'border-color: var(--c-field-focus-border, #327AED) !important;';
+    ? 'border: var(--c-field-focus-border-width, 1px) solid var(--c-field-focus-border, #327AED) !important;'
+    : 'border-width: var(--c-field-focus-border-width, 1px) !important; border-color: var(--c-field-focus-border, #327AED) !important;';
   const boxShadowRule = focusEffect.useAnimatedBoxShadow
     ? ''
     : `box-shadow: ${focusEffect.boxShadow} !important;`;
@@ -329,8 +339,8 @@ const buildTwinkleFieldOverrideRules = (spBodySelector, focusEffect) => {
     ? `animation: ${focusEffect.focusAnimation} !important;`
     : '';
   const focusBorderRule = focusEffect.useFocusBorderShorthand
-    ? 'border: 1px solid var(--c-field-focus-border, #327AED) !important;'
-    : 'border-color: var(--c-field-focus-border, #327AED) !important;';
+    ? 'border: var(--c-field-focus-border-width, 1px) solid var(--c-field-focus-border, #327AED) !important;'
+    : 'border-width: var(--c-field-focus-border-width, 1px) !important; border-color: var(--c-field-focus-border, #327AED) !important;';
   const twinkleOverrideSelectors = `
 ${spBodySelector} .ant-select-focused:not(.ant-select-disabled).ant-select:not(.ant-select-customize-input) .ant-select-selector,
 ${spBodySelector} .select-custom-native:focus,
@@ -446,7 +456,7 @@ const buildThemeRules = (theme, scopeSelector = '', options = {}) => {
     ? scopedDescendant(scopeSelector, '.sp-body .sp-user-message-button-action')
     : '.sp-body .sp-user-message-button-action';
   const buttonPositionRules = `
-${nextButtonActionSelector} {
+${nextButtonActionSelector}:not(.sp-user-message-button-action--hidden) {
   display: flex !important;
   justify-content: var(--c-btn-position-justify, flex-end) !important;
 }`;
@@ -518,6 +528,63 @@ ${botMessageTailShowSelectors} {
     scopedDescendant(scopeSelector, '.ss-user-chat-text-input-user-icon path'),
     scopedDescendant(scopeSelector, '.theme-customize-preview__user-bubble-tail path'),
   ].join(',\n');
+  const submitOnlyShellSelector = scopedDescendant(
+    scopeSelector,
+    '.sp-body-user-side > .sp-body-user-side-messages:has(> .ss-user-message__content-wrapper--submit-only)',
+  );
+  const submitOnlyWrapperSelector = scopedDescendant(
+    scopeSelector,
+    '.sp-body-user-side > .sp-body-user-side-messages > .ss-user-message__content-wrapper--submit-only',
+  );
+  const submitOnlyTailIconSelector = scopedDescendant(
+    scopeSelector,
+    '.sp-body-user-side-messages:has(> .ss-user-message__content-wrapper--submit-only) .ss-user-chat-text-input-user-icon',
+  );
+  const textSubmitButtonSelector = [
+    '.chatbot-submit-button:not(.chatbot-submit-button--image)',
+    '#chatbot-submit-button:not(.chatbot-submit-button--image)',
+    '[id^="chatbot-submit-button-"]:not(.chatbot-submit-button--image)',
+  ].map((selector) => (
+    scopeSelector ? scopedDescendant(scopeSelector, `.sp-body ${selector}`) : `.sp-body ${selector}`
+  )).join(',\n');
+  const textSubmitButtonRules = `
+${textSubmitButtonSelector},
+${withPseudoOnEach(textSubmitButtonSelector, ':hover')},
+${withPseudoOnEach(textSubmitButtonSelector, ':focus')},
+${withPseudoOnEach(textSubmitButtonSelector, ':focus-visible')} {
+  padding: 15px 30px !important;
+  font-size: 20px !important;
+  font-weight: bold !important;
+  border-radius: 25px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  background: linear-gradient(135deg, #4caf50, #43a047) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+}
+${withPseudoOnEach(textSubmitButtonSelector, ':active')} {
+  padding: 15px 30px !important;
+  font-size: 20px !important;
+  font-weight: bold !important;
+  border-radius: 25px !important;
+  background: linear-gradient(135deg, #43a047, #4caf50) !important;
+  color: #fff !important;
+}`;
+  const submitOnlyMessageRules = `
+${submitOnlyShellSelector} {
+  background-color: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+${submitOnlyWrapperSelector} {
+  background-color: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+${submitOnlyTailIconSelector} {
+  display: none !important;
+}`;
 
   const userMessageTailRules = userMessageBorderStyle === 'with_tail' ? `
 ${userMessageShellSelector} {
@@ -619,11 +686,13 @@ ${twinkleKeyframesCss}
 ${scopedClass(scopeSelector, '.sp-header-left-label-title')} {
   color: var(--c-header-title-text, #fff) !important;
   font-size: var(--c-header-title-font-size, 15px) !important;
+  font-weight: var(--c-header-title-weight, 400) !important;
 }
 
 ${scopedClass(scopeSelector, '.sp-header-left-label-sub-title')} {
   color: var(--c-header-subtitle-text, #fff) !important;
   font-size: var(--c-header-subtitle-font-size, 14px) !important;
+  font-weight: var(--c-header-subtitle-weight, 400) !important;
 }
 
 ${scopedClass(scopeSelector, '.sp-process-bar')} {
@@ -644,28 +713,33 @@ ${scopedDescendant(scopeSelector, '.ss-bot-message .ss-bot-message__content')} {
   background-color: var(--c-bot-msg-bg, #3CACEF) !important;
   color: var(--c-bot-msg-text, #fff) !important;
   font-size: var(--c-bot-msg-font-size, 14px) !important;
+  font-weight: var(--c-bot-msg-weight, 400) !important;
 }
 
 ${fieldTextSelectors} {
-  border: 1px solid var(--c-field-unfocus-border, gray) !important;
+  border: var(--c-field-unfocus-border-width, 1px) solid var(--c-field-unfocus-border, gray) !important;
   background-color: var(--c-field-unfocus-bg, #EFF4FD) !important;
   font-size: var(--c-field-font-size, 14px) !important;
+  font-weight: var(--c-field-text-weight, 400) !important;
   ${transitionRule}
 }
 
 ${fieldSelectSelectors} {
-  border: 1px solid var(--c-field-unfocus-border, gray) !important;
+  border: var(--c-field-unfocus-border-width, 1px) solid var(--c-field-unfocus-border, gray) !important;
   background-color: #ffffff !important;
   font-size: var(--c-field-font-size, 14px) !important;
+  font-weight: var(--c-field-text-weight, 400) !important;
   ${transitionRule}
 }
 
 ${fieldPlaceholderSelectors} {
   font-size: var(--c-field-font-size, 14px) !important;
+  font-weight: var(--c-field-placeholder-weight, 400) !important;
 }
 
 ${fieldScopeSelectors.map((fieldScope) => `${fieldScope} .ant-select-selection-placeholder`).join(',\n')} {
   font-size: var(--c-field-font-size, 14px) !important;
+  font-weight: var(--c-field-placeholder-weight, 400) !important;
 }
 ${focusRules}
 ${previewRules}
@@ -676,6 +750,7 @@ ${scopedClass(scopeSelector, '.ss-bot-chat-text-input.ss-bot-chat-detail-content
   background-color: var(--c-bot-msg-bg, #3CACEF) !important;
   color: var(--c-bot-msg-text, #fff) !important;
   font-size: var(--c-bot-msg-font-size, 14px) !important;
+  font-weight: var(--c-bot-msg-weight, 400) !important;
   border: none !important;
 }
 
@@ -692,6 +767,7 @@ ${userMessageWrapperSelector} {
   background-color: var(--c-user-msg-bg, #fff) !important;
   color: var(--c-user-msg-text, #333) !important;
   font-size: var(--c-user-msg-font-size, 14px) !important;
+  font-weight: var(--c-user-msg-weight, 400) !important;
 }
 
 ${userMessageWrapperDirectChildSelector} {
@@ -704,6 +780,7 @@ ${userMessageWrapperDirectChildSelector}:has(.ss-message__content--user-zip-code
 }
 ${botMessageTailRules}
 ${userMessageTailRules}
+${submitOnlyMessageRules}
 
 ${buttonPositionRules}
 ${previewButtonPositionRule}
@@ -765,6 +842,16 @@ ${withPseudoOnEach(nextButtonSelector, '.disabled')} {
   opacity: 1 !important;
   animation: none !important;
 }
+${hasExplicitButtonWidth ? '' : `
+${[
+  '.chatbot-submit-button:not(.chatbot-submit-button--image)',
+  '#chatbot-submit-button:not(.chatbot-submit-button--image)',
+  '[id^="chatbot-submit-button-"]:not(.chatbot-submit-button--image)',
+].map((selector) => (scopeSelector ? scopedDescendant(scopeSelector, `.sp-body ${selector}`) : `.sp-body ${selector}`)).join(',\n')} {
+  width: 100% !important;
+  max-width: 100% !important;
+}`}
+${textSubmitButtonRules}
 
 ${spBodySelector} .ant-checkbox-inner {
   background-color: var(--c-checkbox-unchecked-bg, #fff) !important;

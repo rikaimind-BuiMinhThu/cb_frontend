@@ -3,7 +3,9 @@ import PropTypes from 'prop-types';
 import DesignSettingLabel from './shared/DesignSettingLabel';
 import { getDesignSettingTooltip } from '../constants/designSettingTooltips';
 
-const ThemeNumberField = ({ label, value, onChange, suffix, fullWidth, tooltipKey }) => {
+const ThemeNumberField = ({
+  label, value, onChange, suffix, fullWidth, tooltipKey, min, max,
+}) => {
   const fieldClassName = `theme-field${fullWidth ? ' theme-field--full' : ''}`;
   const numericValue = String(value || '').replace(/px$/i, '');
 
@@ -15,8 +17,8 @@ const ThemeNumberField = ({ label, value, onChange, suffix, fullWidth, tooltipKe
       <div className="theme-field__control theme-field__control--compact">
         <input
           type="number"
-          min="8"
-          max="32"
+          min={min}
+          max={max}
           className="theme-field__input theme-field__input--number"
           value={numericValue}
           placeholder="14"
@@ -38,6 +40,8 @@ ThemeNumberField.propTypes = {
   suffix: PropTypes.string,
   fullWidth: PropTypes.bool,
   tooltipKey: PropTypes.string,
+  min: PropTypes.number,
+  max: PropTypes.number,
 };
 
 ThemeNumberField.defaultProps = {
@@ -45,6 +49,8 @@ ThemeNumberField.defaultProps = {
   suffix: 'px',
   fullWidth: false,
   tooltipKey: '',
+  min: 8,
+  max: 32,
 };
 
 export default ThemeNumberField;

@@ -1,4 +1,6 @@
+import cloneDeep from 'lodash/cloneDeep';
 import { renderFukushashikiSetting } from '../../ScenarioUtils';
+import { mutateMessageContent } from 'v2/views/ScenarioSetting/utils/scenarioMessageMutations';
 import { createDefaultDomainSuggestion } from 'v2/views/Preview/PreviewComponent/emailDomainDefaults';
 
 export const buildTextInputSettingContext = ({
@@ -30,11 +32,27 @@ export const buildTextInputSettingContext = ({
   };
 
   const handleChangeTextInputType = (value) => {
-    onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'type');
-    if (value === 'email_address' || value === 'email_confirmation') {
-      ensureEmailDomainSuggestion(value);
-      setDataMessages([...dataMessages]);
-    }
+    setDataMessages((current) => {
+      const next = cloneDeep(current);
+      mutateMessageContent(
+        next,
+        indexMessageSelect,
+        indexContent,
+        content.type,
+        value,
+        'type',
+      );
+      if (value === 'email_address' || value === 'email_confirmation') {
+        const textInputData = next[indexMessageSelect].message_content[indexContent].text_input;
+        if (!textInputData[value] || typeof textInputData[value] !== 'object') {
+          textInputData[value] = {};
+        }
+        if (!textInputData[value].domain_suggestion) {
+          textInputData[value].domain_suggestion = createDefaultDomainSuggestion();
+        }
+      }
+      return next;
+    });
   };
 
   const handleAddEmailDomain = (emailType) => {
