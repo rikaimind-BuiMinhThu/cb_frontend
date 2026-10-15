@@ -2288,6 +2288,9 @@ slideUp
   object-fit: contain;
   display: block;
 }
+.payment-option-description {
+  width: 100%;
+}
 .ss-message__content--user-radio_button-img-grid {
   grid-template-columns: var(--preview-grid-columns);
 }
