@@ -478,6 +478,7 @@
   padding: 4px 12px 4px 4px;
   border-radius: 30px;
   color: #fff;
+  background-color: var(--theme-main-color, #327AED);
   box-sizing: border-box;
 }
 
