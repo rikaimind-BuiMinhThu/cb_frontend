@@ -26,6 +26,8 @@ import {
   PROCESSING_LABEL,
 } from "v2/views/Preview/PreviewComponent/Constants";
 import { injectBotThemeCss } from "v2/utils/chatbotThemeCss";
+import { resolveMainColorCss, resolveUserMessageTheme } from "v2/utils/designThemeCore";
+import UserMessageTailIcon from "v2/components/BotMessages/UserMessageTailIcon";
 import { COLOR_MAP } from "v2/views/DesignSetting/constants/designChatbotConstants";
 import {
   getPrefectures,
@@ -216,9 +218,7 @@ const ScenarioPreviewFukushashiki = ({
     const apiColorKey = chatbot.main_color && !String(chatbot.main_color).startsWith('#')
       ? chatbot.main_color
       : null;
-    const mainColorHex = chatbot.main_color_other
-      || COLOR_MAP[chatbot.main_color]
-      || chatbot.main_color
+    const mainColorHex = resolveMainColorCss(chatbot.main_color, chatbot.main_color_other)
       || '#327AED';
     injectBotThemeCss(themeSettings, mainColorHex, apiColorKey, chatbot.design_type);
   }, []);
@@ -465,7 +465,7 @@ const ScenarioPreviewFukushashiki = ({
 
   usePreviewThemeCss({
     state,
-    enabled: !embedded,
+    enabled: editorPreview || !embedded,
     applyTheme: applyScenarioTheme,
   });
 
@@ -984,7 +984,7 @@ const ScenarioPreviewFukushashiki = ({
     return (
       <div className={`sp-user-message-button-action${isDisplayBtnNext ? '' : ' sp-user-message-button-action--hidden'}`}>
         <CustomButton
-          disabled={isEditorDisplayOnly || (state.submitErrorMessage?.length > 0 ? false : message.disabled)}
+          disabled={isEditorDisplayOnly ? false : (state.submitErrorMessage?.length > 0 ? false : message.disabled)}
           actionBtnBg={actionBtnBg}
           className={`ss-user-message__action-btn${hasBtnUpdateClass ? " btn-update" : ""}`}
           onClick={isEditorDisplayOnly ? undefined : () => {
@@ -1003,6 +1003,7 @@ const ScenarioPreviewFukushashiki = ({
     if (!message || message.belong_to !== "user") return null;
     if (!Array.isArray(message?.message_content) || message.message_content.length === 0) return null;
 
+    const userMessageTheme = resolveUserMessageTheme(state.themeSettings, state.botInfor);
     return (
       <div className={`sp-body-user-side${editorPreview ? '' : ' slideLeft'}`} id={getElementMessageById(message.id)}>
         <div className="sp-body-user-side-messages">
@@ -1052,6 +1053,10 @@ const ScenarioPreviewFukushashiki = ({
             cartSystem={state.cartSystem}
           />
           {renderNextButton(message, messageIndex)}
+          <UserMessageTailIcon
+            fillColor={userMessageTheme.bgColor}
+            showTail={userMessageTheme.showTail}
+          />
         </div>
       </div>
     );
@@ -1176,7 +1181,7 @@ const ScenarioPreviewFukushashiki = ({
         cssVars={cssVars}
         headerIconSrc={headerIconSrc}
         subtitle={displayBotInfor?.subtitle}
-        titleBubble={displayBotInfor?.titleBubble}
+        titleBubble={displayBotInfor?.title || displayBotInfor?.titleBubble}
         isOpen={state.isOpen}
         onHeaderClick={onChatbotHeaderClick}
         botConfig={state}

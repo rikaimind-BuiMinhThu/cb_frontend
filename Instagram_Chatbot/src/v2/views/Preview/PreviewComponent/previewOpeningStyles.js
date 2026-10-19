@@ -64,10 +64,15 @@ export const getOpeningBotStyle = (state, options = {}) => {
       "preview-open-frame--embedded",
       editorPreview ? "preview-open-frame--editor" : null,
     ].filter(Boolean);
+    const editorWidth = mobile ? `${state.widthSp || 100}vw` : `${state.widthPc}px`;
+    const editorHeight = mobile
+      ? `${state.heightSp || 100}vh`
+      : `${state.heightPc || DEFAULT_HEIGHT_PC}px`;
 
     return {
       frameClassName: classNames.join(" "),
       cssVars: {
+        ...(editorPreview ? { "--pof-width": editorWidth, "--pof-height": editorHeight } : {}),
         ...(headerBg ? { "--pof-header-bg": headerBg } : {}),
         ...(bodyBg ? { "--pof-body-bg": bodyBg } : {}),
       },
