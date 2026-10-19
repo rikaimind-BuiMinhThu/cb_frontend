@@ -43,6 +43,7 @@ const PreviewClosedLauncher = ({
     state.botInfor?.main_color_other,
   );
   const title = state.botInfor?.title;
+  const bubbleTitle = (state.titleBubble && String(state.titleBubble).trim()) || title;
   const toggleOpen = () => onOpen(!state.isOpen);
   const fullWidthMobile = Boolean(state.useFullWidthChatbotMobile);
   const designTypeClass = getDesignTypeClassName(state.botInfor?.design_type);
@@ -100,7 +101,7 @@ const PreviewClosedLauncher = ({
         </div>
         <div className="preview-closed-launcher__bar-title">
           <div id="comment_bubble" className="preview-closed-launcher__bar-bubble">
-            <span className="preview-closed-launcher__bar-title-text">{title}</span>
+            <span className="preview-closed-launcher__bar-title-text">{bubbleTitle}</span>
           </div>
         </div>
         <div className="sp-header-right-arrow preview-closed-launcher__bar-arrow">
@@ -191,7 +192,7 @@ const PreviewClosedLauncher = ({
                     : "preview-closed-launcher__sp-title"
                 }
               >
-                {title}
+                {bubbleTitle}
               </span>
             </div>
           </div>

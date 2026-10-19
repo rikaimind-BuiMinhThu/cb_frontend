@@ -50,6 +50,7 @@ export const THEME_FIELD_KEYS = [
   'fieldFontSize',
   'fieldTextBold',
   'fieldPlaceholderBold',
+  'fieldTitleBold',
   'validationMessageBgColor',
   'validationMessageTextColor',
   'validationMessageFontSize',
@@ -62,6 +63,7 @@ export const THEME_FIELD_KEYS = [
   'buttonDisabledBgColor',
   'buttonDisabledTextColor',
   'buttonFontSize',
+  'buttonBold',
   'buttonBorderStyle',
   'buttonEffect',
   'buttonWidth',
@@ -127,6 +129,7 @@ export const CAMEL_TO_SNAKE_THEME = {
   fieldFontSize: 'field_font_size',
   fieldTextBold: 'field_text_bold',
   fieldPlaceholderBold: 'field_placeholder_bold',
+  fieldTitleBold: 'field_title_bold',
   validationMessageBgColor: 'validation_message_bg_color',
   validationMessageTextColor: 'validation_message_text_color',
   validationMessageFontSize: 'validation_message_font_size',
@@ -139,6 +142,7 @@ export const CAMEL_TO_SNAKE_THEME = {
   buttonDisabledBgColor: 'button_disabled_bg_color',
   buttonDisabledTextColor: 'button_disabled_text_color',
   buttonFontSize: 'button_font_size',
+  buttonBold: 'button_bold',
   buttonBorderStyle: 'button_border_style',
   buttonEffect: 'button_effect',
   buttonWidth: 'button_width',
@@ -181,11 +185,11 @@ const resolveMainColorFromApi = (apiColor) => {
 
 /**
  * CSS color for chrome surfaces (header / launcher / progress fill / buttons).
- * Named API colors (e.g. "blue") stay as CSS keywords so computed styles match v1
- * (`blue` → rgb(0,0,255)), not the Design Setting swatch hex (#327AED).
+ * Named API colors (e.g. "blue") use the Design Setting swatch hex.
  */
 export const resolveMainColorCss = (apiColor, otherColor) => {
-  if (apiColor && !String(apiColor).startsWith('#')) return apiColor;
+  if (apiColor && COLOR_MAP[apiColor]) return COLOR_MAP[apiColor];
+  if (apiColor && String(apiColor).startsWith('#')) return apiColor;
   if (otherColor) return otherColor;
   if (apiColor) return apiColor;
   return null;
@@ -507,6 +511,7 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
     fieldFontSize: '14px',
     fieldTextBold: false,
     fieldPlaceholderBold: false,
+    fieldTitleBold: false,
     validationMessageBgColor: 'transparent',
     validationMessageTextColor: '#FF7E00',
     validationMessageFontSize: '12px',
@@ -519,6 +524,7 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
     buttonDisabledBgColor: '#e0e0e0',
     buttonDisabledTextColor: '#999999',
     buttonFontSize: '14px',
+    buttonBold: false,
     buttonBorderStyle: 'rounded',
     buttonEffect: 'none',
     buttonWidth: '',

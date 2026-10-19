@@ -1040,7 +1040,7 @@ const PreviewFukushashiki = () => {
         }}
         headerIconSrc={headerIconSrc}
         subtitle={state.botInfor?.subtitle}
-        titleBubble={state.botInfor?.titleBubble}
+        titleBubble={state.botInfor?.title || state.botInfor?.titleBubble}
         isOpen={state.isOpen}
         onHeaderClick={onChatbotHeaderClick}
         botConfig={state}

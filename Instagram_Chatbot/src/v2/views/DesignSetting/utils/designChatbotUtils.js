@@ -113,7 +113,12 @@ export const findMatchingPresetIndex = async (resolvedUrl, defaultImages = DEFAU
   try {
     const currentDataUrl = await convertImageToDataUrl(resolvedUrl);
     const presetDataUrls = await getDefaultImageDataUrls(defaultImages);
-    const matchedIndex = presetDataUrls.findIndex((preset) => preset === currentDataUrl);
+    const payloadOf = (value) => {
+      const comma = value.indexOf(',');
+      return comma >= 0 ? value.slice(comma + 1) : value;
+    };
+    const currentPayload = payloadOf(currentDataUrl);
+    const matchedIndex = presetDataUrls.findIndex((preset) => payloadOf(preset) === currentPayload);
     return matchedIndex >= 0 ? matchedIndex : null;
   } catch {
     return null;
@@ -138,7 +143,8 @@ export const applyIconsFromApiResponse = (data, setters) => {
 };
 
 export const isTempImage = (image) => !!image && (
-  image.includes('image/png;base64')
+  image.startsWith('data:image/')
+  || image.includes('image/png;base64')
   || image.includes('image/jpeg;base64')
   || image.includes('image/jpg;base64')
 );

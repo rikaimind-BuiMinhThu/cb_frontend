@@ -85,6 +85,7 @@ export const THEME_FIELD_KEYS = [
   'fieldFontSize',
   'fieldTextBold',
   'fieldPlaceholderBold',
+  'fieldTitleBold',
   'validationMessageBgColor',
   'validationMessageTextColor',
   'validationMessageFontSize',
@@ -97,6 +98,7 @@ export const THEME_FIELD_KEYS = [
   'buttonDisabledBgColor',
   'buttonDisabledTextColor',
   'buttonFontSize',
+  'buttonBold',
   'buttonBorderStyle',
   'buttonEffect',
   'buttonWidth',
@@ -216,6 +218,7 @@ export const THEME_SECTIONS = [
       { key: 'fieldFontSize', label: 'フォントサイズ', fieldType: 'fontSize', fullWidth: true },
       { key: 'fieldTextBold', label: '入力文字の太字', fieldType: 'checkbox', fullWidth: true },
       { key: 'fieldPlaceholderBold', label: 'プレースホルダーの太字', fieldType: 'checkbox', fullWidth: true },
+      { key: 'fieldTitleBold', label: 'タイトルの太字', fieldType: 'checkbox', fullWidth: true },
       { fieldType: 'groupLabel', label: 'フォーカス時', fullWidth: true },
       { key: 'fieldFocusBorderColor', label: '枠線色' },
       { key: 'fieldFocusBorderWidth', label: '枠線の太さ', fieldType: 'borderWidth' },
@@ -250,6 +253,7 @@ export const THEME_SECTIONS = [
     title: 'ボタン',
     fields: [
       { key: 'buttonFontSize', label: 'フォントサイズ', fieldType: 'fontSize', fullWidth: true },
+      { key: 'buttonBold', label: '太字', fieldType: 'checkbox', fullWidth: true },
       {
         key: 'buttonBorderStyle',
         label: '枠線スタイル',

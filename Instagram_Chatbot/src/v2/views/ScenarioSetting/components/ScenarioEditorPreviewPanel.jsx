@@ -1,34 +1,16 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Cookies from 'js-cookie';
-import { getChatBotSetting } from 'v2/views/Preview/PreviewComponent/Utils';
-import ThemePreviewShell from 'v2/views/DesignSetting/components/ThemePreviewShell';
-import Timer from 'v2/views/Preview/PreviewComponent/Timer';
 import { useScenarioEditor } from '../context/ScenarioEditorContext';
 import { buildScenarioSavePayload } from 'v2/views/ScenarioSetting/utils/scenarioApiUtils';
-import { buildScenarioPreviewHeaderMetaFromChatbotApi } from '../preview/buildScenarioPreviewHeaderMeta';
-import {
-  calculateTimerConfigDuration,
-  getTimerConfigVariable,
-} from '../preview/timerPreviewUtils';
 import {
   buildScenarioPreviewIframeSrc,
   isSameOriginMessage,
   postToIframe,
   SCENARIO_PREVIEW_MESSAGES,
 } from '../preview/scenarioPreviewBridge';
-import 'v2/assets/css/bot/bot-setting.css';
 import 'v2/views/ScenarioSetting/styles/scenario-editor-preview.css';
 
-const PREVIEW_SCOPE_ID = 'scenario-editor-preview';
 const PREVIEW_LOADING_TIMEOUT_MS = 20000;
-
-const DEFAULT_BOT_META = {
-  themeSettings: null,
-  title: '簡単90秒で注文完了',
-  subtitle: '',
-  headerIconUrl: '',
-  mainColor: '#327AED',
-};
 
 const ScenarioEditorPreviewPanel = () => {
   const { state, messages } = useScenarioEditor();
@@ -82,8 +64,6 @@ const ScenarioEditorPreviewPanel = () => {
   const handleSelectMessageRef = useRef(handleSelectMessage);
   const [isIframeReady, setIsIframeReady] = useState(false);
   const [isPreviewLoading, setIsPreviewLoading] = useState(true);
-  const [botMeta, setBotMeta] = useState(DEFAULT_BOT_META);
-  const [timerChanges, setTimerChanges] = useState({ timeLeft: -1, config: null });
 
   const editorDraft = useMemo(() => buildScenarioSavePayload({
     dataMessages,
@@ -166,24 +146,6 @@ const ScenarioEditorPreviewPanel = () => {
     isUseHtmlUgc,
     content: htmlUgcConfigContent?.final,
   }), [htmlUgcConfigContent?.final, isUseHtmlUgc]);
-
-  const editorTimerConfig = editorDraft?.timer_config;
-
-  useEffect(() => {
-    if (scenarioType === 'faq' || !editorTimerConfig?.enable) {
-      setTimerChanges({ timeLeft: -1, config: null });
-      return;
-    }
-
-    setTimerChanges({
-      timeLeft: calculateTimerConfigDuration(editorTimerConfig.type, editorTimerConfig.duration),
-      config: editorTimerConfig,
-    });
-  }, [editorTimerConfig, scenarioType]);
-
-  const handleTimerCounting = useCallback((timer) => {
-    setTimerChanges((prev) => ({ ...prev, timeLeft: timer }));
-  }, []);
 
   const iframeSrc = useMemo(
     () => buildScenarioPreviewIframeSrc({
@@ -285,23 +247,6 @@ const ScenarioEditorPreviewPanel = () => {
   }, [iframeSrc]);
 
   useEffect(() => {
-    const currentBotId = botId || Cookies.get('bot_id');
-    if (!currentBotId) return;
-
-    getChatBotSetting(currentBotId)
-      .then((response) => {
-        const data = response?.data?.data;
-        const meta = buildScenarioPreviewHeaderMetaFromChatbotApi(data);
-        if (!meta) return;
-
-        setBotMeta(meta);
-      })
-      .catch(() => {
-        setBotMeta(DEFAULT_BOT_META);
-      });
-  }, [botId]);
-
-  useEffect(() => {
     if (!isPreviewLoading) return undefined;
 
     const timeoutId = setTimeout(() => {
@@ -331,15 +276,6 @@ const ScenarioEditorPreviewPanel = () => {
 
       if (type === SCENARIO_PREVIEW_MESSAGES.PREVIEW_CONTENT_READY) {
         setIsPreviewLoading(false);
-        return;
-      }
-
-      if (type === SCENARIO_PREVIEW_MESSAGES.PREVIEW_BOT_META) {
-        if (!payload) return;
-        setBotMeta((prev) => ({
-          ...prev,
-          ...payload,
-        }));
         return;
       }
 
@@ -424,65 +360,15 @@ const ScenarioEditorPreviewPanel = () => {
     syncCheckboxOptionHighlight,
   ]);
 
-  const messageCount = useMemo(
-    () => (dataMessages || []).length,
-    [dataMessages],
-  );
-
-  const processLabel = messageCount > 0 ? `1 / ${messageCount}` : 'プレビュー';
-  const processPercent = messageCount > 0 ? Math.round((1 / messageCount) * 100) : 33;
-
-  const timerSlot = useMemo(() => {
-    if (scenarioType === 'faq' || !editorTimerConfig?.enable) {
-      return null;
-    }
-
-    return (
-      <div className="chatbot_timer_holder">
-        <Timer
-          duration={calculateTimerConfigDuration(editorTimerConfig.type, editorTimerConfig.duration)}
-          timeLeft={timerChanges.timeLeft}
-          countMsg={editorTimerConfig.messages.counting}
-          finishMsg={editorTimerConfig.messages.finish}
-          variables={getTimerConfigVariable(editorTimerConfig.variables)}
-          startCount
-          isRealtimeRemainingTime={editorTimerConfig.isRealtimeRemainingTime}
-          scenarioId={scenarioId}
-          onCounting={handleTimerCounting}
-        />
-      </div>
-    );
-  }, [
-    editorTimerConfig,
-    handleTimerCounting,
-    scenarioId,
-    scenarioType,
-    timerChanges.timeLeft,
-  ]);
-
   return (
     <div className="scenario-editor-preview-wrapper">
-      <ThemePreviewShell
-        scopeId={PREVIEW_SCOPE_ID}
-        themeSettings={botMeta?.themeSettings}
-        mainColor={botMeta?.mainColor || DEFAULT_BOT_META.mainColor}
-        title={botMeta?.title}
-        subtitle={botMeta?.subtitle}
-        headerIconUrl={botMeta?.headerIconUrl}
-        showPlaceholderLabels={false}
-        processLabel={processLabel}
-        processPercent={processPercent}
-        className="scenario-editor-preview is_mobile"
-        timerSlot={timerSlot}
-      >
-        <iframe
-          ref={iframeRef}
-          title="Scenario preview"
-          className="scenario-editor-preview__iframe"
-          src={iframeSrc}
-          onLoad={handleIframeLoad}
-        />
-      </ThemePreviewShell>
+      <iframe
+        ref={iframeRef}
+        title="Scenario preview"
+        className="scenario-editor-preview__iframe"
+        src={iframeSrc}
+        onLoad={handleIframeLoad}
+      />
       {isPreviewLoading && (
         <div className="scenario-editor-preview__loading" aria-live="polite" aria-busy="true">
           <div className="scenario-editor-preview__loading-spinner" />
