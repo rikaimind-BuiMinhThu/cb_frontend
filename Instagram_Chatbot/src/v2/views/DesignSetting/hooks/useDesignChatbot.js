@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { message } from 'antd';
 import Cookies from 'js-cookie';
 import api from 'v2/api/api-management';
@@ -99,6 +99,7 @@ export const useDesignChatbot = (initialBotId, options = EMPTY_OPTIONS) => {
   const [chatBodyVersion, setChatBodyVersion] = useState(CHAT_BODY_VERSION_DEFAULT);
   const [mainColor, setMainColor] = useState(DEFAULT_MAIN_COLOR);
   const [iconPresetIndices, setIconPresetIndices] = useState(INITIAL_ICON_PRESET_INDICES);
+  const iconEditVersionRef = useRef(0);
 
   const [displayType, setDisplayType] = useState(1);
   const [widthPc, setWidthPc] = useState(DEFAULT_WIDTH_PC);
@@ -156,37 +157,46 @@ export const useDesignChatbot = (initialBotId, options = EMPTY_OPTIONS) => {
   }, []);
 
   const resolvePresetIndicesFromIcons = useCallback(async (icons) => {
+    const version = iconEditVersionRef.current;
     const [bot, opening, closing] = await Promise.all([
       findMatchingPresetIndex(icons.botImage),
       findMatchingPresetIndex(icons.openingBotIcon),
       findMatchingPresetIndex(icons.closingBotIcon),
     ]);
+    if (iconEditVersionRef.current !== version) return;
     setIconPresetIndices({ bot, opening, closing });
   }, []);
 
-  const syncIconsFromChatbotData = useCallback(async (data) => {
+  const syncIconsFromChatbotData = useCallback(async (data, versionAtStart) => {
+    if (versionAtStart !== undefined && iconEditVersionRef.current !== versionAtStart) return null;
     const icons = applyIconsFromApiResponse(data, {
       setBotImage,
       setOpeningBotIcon,
       setClosingBotIcon,
     });
+    if (versionAtStart !== undefined && iconEditVersionRef.current !== versionAtStart) return icons;
     await resolvePresetIndicesFromIcons(icons);
     return icons;
   }, [resolvePresetIndicesFromIcons]);
 
   const handleIconClickForType = useCallback(async (index, imageDefault, type) => {
+    iconEditVersionRef.current += 1;
+    const version = iconEditVersionRef.current;
     setPresetIndexForType(type, index);
     try {
       const dataUrl = await convertImageToDataUrl(imageDefault);
+      if (iconEditVersionRef.current !== version) return;
       setBotIcon(type, dataUrl);
       clearValidationError('botImage');
     } catch {
+      if (iconEditVersionRef.current !== version) return;
       setPresetIndexForType(type, null);
       showNotification(ICON_LOAD_ERROR, NOTIFICATION_WARNING_MS);
     }
   }, [clearValidationError, setBotIcon, setPresetIndexForType, showNotification]);
 
   const handleRemoveImage = useCallback((type) => () => {
+    iconEditVersionRef.current += 1;
     setBotIcon(type, null);
     setPresetIndexForType(type, null);
   }, [setBotIcon, setPresetIndexForType]);
@@ -196,8 +206,11 @@ export const useDesignChatbot = (initialBotId, options = EMPTY_OPTIONS) => {
     e.target.value = null;
 
     if (file?.type === IMAGE_TYPE_PNG || file?.type === IMAGE_TYPE_JPEG || file?.type === IMAGE_TYPE_JPG) {
+      iconEditVersionRef.current += 1;
+      const version = iconEditVersionRef.current;
       const reader = new FileReader();
       reader.onloadend = () => {
+        if (iconEditVersionRef.current !== version) return;
         setBotIcon(iconType, reader.result);
         setPresetIndexForType(iconType, null);
         clearValidationError('botImage');
@@ -219,8 +232,9 @@ export const useDesignChatbot = (initialBotId, options = EMPTY_OPTIONS) => {
     if (!id) return;
 
     try {
+      const versionAtStart = iconEditVersionRef.current;
       const response = await api.get(`${CHATBOTS_API_PATH}/${id}`);
-      if (isCancelled() || !response.data.data) {
+      if (isCancelled() || iconEditVersionRef.current !== versionAtStart || !response.data.data) {
         return;
       }
 
@@ -258,7 +272,7 @@ export const useDesignChatbot = (initialBotId, options = EMPTY_OPTIONS) => {
       setSubtitle(data.subtitle || '');
       setDesignType(data.design_type || DESIGN_TYPE_DEFAULT);
 
-      await syncIconsFromChatbotData(data);
+      await syncIconsFromChatbotData(data, versionAtStart);
       if (isCancelled()) return;
 
       if (resolvedColor) {
@@ -366,18 +380,23 @@ export const useDesignChatbot = (initialBotId, options = EMPTY_OPTIONS) => {
     widthSp,
   ]);
 
+  const iconDraftRef = useRef({ botImage, openingBotIcon, closingBotIcon });
+  iconDraftRef.current = { botImage, openingBotIcon, closingBotIcon };
+
   const saveBasicInfo = useCallback(() => {
     if (!validateBasicInfo()) return;
 
+    const versionAtSave = iconEditVersionRef.current;
+    const icons = iconDraftRef.current;
     const payload = buildBasicInfoPayload({
       title,
       subtitle,
       designType,
       botName,
       mainColor,
-      botImage,
-      openingBotIcon,
-      closingBotIcon,
+      botImage: icons.botImage,
+      openingBotIcon: icons.openingBotIcon,
+      closingBotIcon: icons.closingBotIcon,
       chatBodyVersion,
     });
 
@@ -394,7 +413,7 @@ export const useDesignChatbot = (initialBotId, options = EMPTY_OPTIONS) => {
         if (basicOk && designOk) {
           Cookies.set(BOT_ID_COOKIE_KEY, basicRes.data.data.id);
           Cookies.set(BOT_TYPE_COOKIE_KEY, BOT_TYPE_BOT);
-          await syncIconsFromChatbotData(basicRes.data.data);
+          await syncIconsFromChatbotData(basicRes.data.data, versionAtSave);
           showNotification(SAVE_BOT_SUCCESS);
           return;
         }
@@ -414,14 +433,11 @@ export const useDesignChatbot = (initialBotId, options = EMPTY_OPTIONS) => {
       });
   }, [
     botId,
-    botImage,
     botName,
     chatBodyVersion,
-    closingBotIcon,
     designType,
     getDesignSettingsPayload,
     mainColor,
-    openingBotIcon,
     showNotification,
     subtitle,
     syncIconsFromChatbotData,
@@ -452,6 +468,7 @@ export const useDesignChatbot = (initialBotId, options = EMPTY_OPTIONS) => {
   ]);
 
   const saveThemeCustomize = useCallback(() => {
+    const versionAtSave = iconEditVersionRef.current;
     const designPayload = getDesignSettingsPayload();
 
     const basicPayload = buildBasicInfoPayload({
@@ -478,7 +495,7 @@ export const useDesignChatbot = (initialBotId, options = EMPTY_OPTIONS) => {
           if (basicRes.data.data?.id) {
             Cookies.set(BOT_ID_COOKIE_KEY, basicRes.data.data.id);
           }
-          await syncIconsFromChatbotData(basicRes.data.data);
+          await syncIconsFromChatbotData(basicRes.data.data, versionAtSave);
           showNotification(SAVE_DESIGN_SUCCESS);
           return;
         }

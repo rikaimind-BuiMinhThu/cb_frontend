@@ -61,7 +61,7 @@ const MAIN_COLOR_PALETTES = {
 
 const MAIN_COLOR_HEX_OVERRIDES = {
   yellow: "#F6CA21",
-  pink: "#F170AA",
+  pink: "#F16FAA",
   purple: "#8C66D9",
 };
 

@@ -622,7 +622,7 @@ const PreviewFaq = () => {
         cssVars={cssVars}
         headerIconSrc={headerIconSrc}
         subtitle={state.botInfor?.subtitle}
-        titleBubble={state.botInfor?.titleBubble}
+        titleBubble={state.botInfor?.title || state.botInfor?.titleBubble}
         isOpen={state.isOpen}
         onHeaderClick={() => onOpenPreview(!state.isOpen)}
         botConfig={state}

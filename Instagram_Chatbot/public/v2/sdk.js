@@ -42,6 +42,19 @@
   };
 
   // src/v2/sdk/config/environment.js
+  var LOCAL_SDK_HOST = "localhost:3001";
+  var LOCAL_FRONTEND_ORIGIN = "http://localhost:3001";
+  var SDK_SCRIPT_SELECTOR = 'script[src*="/v2/sdk"]';
+  var getLoadedSdkScriptHost = () => {
+    var _a, _b;
+    try {
+      const src = ((_a = document.currentScript) == null ? void 0 : _a.src) || ((_b = document.querySelector(SDK_SCRIPT_SELECTOR)) == null ? void 0 : _b.src) || "";
+      if (!src) return "";
+      return new URL(src, window.location.href).host;
+    } catch (e) {
+      return "";
+    }
+  };
   var getEnvFromScriptSrc = () => {
     var _a;
     try {
@@ -50,7 +63,7 @@
       const SRC_PARSER = {
         "ec-chatbot1.com": "staging",
         "ec-chatbot.com": "production",
-        "localhost:3001": "local"
+        [LOCAL_SDK_HOST]: "local"
       };
       const src = ((_a = document.currentScript) == null ? void 0 : _a.src) || "";
       if (!src) return null;
@@ -105,6 +118,7 @@
     }
   };
   var getEcChatBotFrontEndBaseUrl = () => {
+    if (getLoadedSdkScriptHost() === LOCAL_SDK_HOST) return LOCAL_FRONTEND_ORIGIN;
     const environment = getEnvironment();
     switch (environment) {
       case "staging":
@@ -113,9 +127,9 @@
       case "production":
         return "https://ec-chatbot.com";
       case "local":
-        return "http://localhost:3001";
+        return LOCAL_FRONTEND_ORIGIN;
       default:
-        return "http://localhost:3001";
+        return LOCAL_FRONTEND_ORIGIN;
     }
   };
 

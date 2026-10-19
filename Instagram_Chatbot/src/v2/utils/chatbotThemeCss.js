@@ -59,6 +59,12 @@ const USER_MESSAGE_BUBBLE_LABEL_SELECTORS = [
   '.theme-customize-preview__radio-default > label',
 ];
 
+const buildUserMessageTitleSelectors = (scopeSelector) => (
+  USER_MESSAGE_TITLE_CLASSES
+    .map((className) => scopedDescendant(scopeSelector, className))
+    .join(',\n')
+);
+
 const buildUserBubbleTextSelectors = (scopeSelector) => {
   const wrapperPrefix = '.ss-user-message__content-wrapper';
   const titleSelectors = USER_MESSAGE_TITLE_CLASSES.map(
@@ -166,6 +172,7 @@ const buildThemeVariables = (theme) => {
   --c-field-font-size: ${theme.fieldFontSize};
   --c-field-text-weight: ${themeIsBold(theme.fieldTextBold) ? 700 : 400};
   --c-field-placeholder-weight: ${themeIsBold(theme.fieldPlaceholderBold) ? 700 : 400};
+  --c-field-title-weight: ${themeIsBold(theme.fieldTitleBold) ? 700 : 400};
   --c-validation-bg: ${theme.validationMessageBgColor};
   --c-validation-text: ${theme.validationMessageTextColor};
   --c-validation-font-size: ${theme.validationMessageFontSize};
@@ -178,6 +185,7 @@ const buildThemeVariables = (theme) => {
   --c-btn-disabled-bg: ${theme.buttonDisabledBgColor};
   --c-btn-disabled-text: ${theme.buttonDisabledTextColor};
   --c-btn-font-size: ${theme.buttonFontSize};
+  --c-btn-weight: ${themeIsBold(theme.buttonBold) ? 700 : 500};
   --c-btn-border-radius: ${buttonBorderRadius};
   --c-btn-width: ${buttonWidth};
   --c-btn-padding: ${buttonPadding};
@@ -477,6 +485,7 @@ ${previewButtonGroupSelector} {
     '.sp-body-user-side-messages > .ss-user-message__content-wrapper',
   );
   const userBubbleTextSelectors = buildUserBubbleTextSelectors(scopeSelector);
+  const userMessageTitleSelectors = buildUserMessageTitleSelectors(scopeSelector);
 
   const botMessageBorderStyle = normalizeMessageBorderStyle(
     theme.botMessageBorderStyle,
@@ -792,6 +801,7 @@ ${withPseudoOnEach(btnSelector, ':focus-visible')} {
   background: var(--c-btn-normal-bg, #327AED) !important;
   color: var(--c-btn-normal-text, #fff) !important;
   font-size: var(--c-btn-font-size, 14px) !important;
+  font-weight: var(--c-btn-weight, 500) !important;
   border: none !important;
   box-shadow: none !important;
   ${buttonLayoutRules}
@@ -817,7 +827,7 @@ ${withPseudoOnEach(nextButtonSelector, ':hover')},
 ${withPseudoOnEach(nextButtonSelector, ':focus')},
 ${withPseudoOnEach(nextButtonSelector, ':focus-visible')} {
   min-height: 42px !important;
-  font-weight: 500 !important;
+  font-weight: var(--c-btn-weight, 500) !important;
   background: var(--c-btn-normal-bg, #327AED) !important;
   color: var(--c-btn-normal-text, #fff) !important;
   font-size: var(--c-btn-font-size, 14px) !important;
@@ -924,6 +934,10 @@ ${spBodySelector} .ss-message__content--user-radio_button > label,
 ${spBodySelector} .ss-message__content--user-radio_button--block_style > span,
 ${scopedDescendant(scopeSelector, '.theme-customize-preview__radio-default > label')} {
   font-size: var(--c-radio-font-size, 14px) !important;
+}
+
+${userMessageTitleSelectors} {
+  font-weight: var(--c-field-title-weight, 400) !important;
 }
 
 ${userBubbleTextSelectors} {
