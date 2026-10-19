@@ -38,7 +38,8 @@
     cursor: pointer;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
-    width: 85%;
+    width: 100%;
+    box-sizing: border-box;
     align-content: center;
 }
 #chatbot-submit-button:hover,
@@ -78,14 +79,38 @@
     max-width: 100%;
 }
 
+.ss-user-message__content-wrapper:has(.chatbot-submit-button),
+.ss-content-preview-shell:has(.chatbot-submit-button),
 .ss-user-setting__item-text_input-top:has(.chatbot-submit-button),
 .ss-user-setting__item-text_input-top:has(#chatbot-submit-button),
 .ss-user-setting__item-text_input-top:has([id^="chatbot-submit-button-"]) {
-    display: flex;
-    justify-content: center;
+    display: block;
     width: 100%;
     /* padding avoids collapse with prior .ss-user-setting__item-bottom margin (→ ~20px like v1) */
     padding-top: 10px;
+}
+.chatbot-submit-button:not(.chatbot-submit-button--image) {
+    display: block;
+}
+.ss-user-chat:has(.chatbot-submit-button:not(.chatbot-submit-button--image)),
+.sp-body-user-side:has(.chatbot-submit-button:not(.chatbot-submit-button--image)) {
+    width: 100%;
+}
+
+.sp-body-user-side-messages:has(> .ss-user-message__content-wrapper--submit-only) {
+    background-color: transparent;
+    padding: 0;
+    border-radius: 0;
+}
+
+.sp-body-user-side-messages:has(> .ss-user-message__content-wrapper--submit-only) > .ss-user-message__content-wrapper--submit-only {
+    background-color: transparent;
+    padding: 0;
+    border-radius: 0;
+}
+
+.sp-body-user-side-messages:has(> .ss-user-message__content-wrapper--submit-only) .ss-user-chat-text-input-user-icon {
+    display: none;
 }
 
 .sp-container {
@@ -411,6 +436,16 @@
     padding: 1px 8px;
     /* border-radius: 2px; */
     box-sizing: content-box;
+}
+
+.sp-body-user-side-messages .chatbot-submit-button:not(.chatbot-submit-button--image),
+.sp-body-user-side-messages [id^="chatbot-submit-button-"]:not(.chatbot-submit-button--image) {
+    padding: 15px 30px;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 25px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .sp-body-user-side-messages .ss-message__content--user-pull_down-col {
@@ -2082,20 +2117,25 @@ slideUp
   overflow: hidden;
 }
 
-/* Beat @media (max-width: 981px) 58px avatar — preview iframe is always <981px */
+/* Open-frame header avatar matches the closed bar (58px). */
+.preview-open-frame .sp-header {
+  height: auto;
+  min-height: 74px;
+}
+
 .preview-open-frame .sp-header-left {
   padding: 8px 12px;
   align-items: center;
 }
 
 .preview-open-frame .sp-avatar-bt {
-  width: 40px;
-  height: 40px;
+  width: 58px;
+  height: 58px;
 }
 
 .preview-open-frame .sp-avatar-bt img {
-  width: 40px;
-  height: 40px;
+  width: 58px;
+  height: 58px;
 }
 
 .preview-open-frame--desktop .preview-open-frame__header {
@@ -2209,12 +2249,26 @@ slideUp
 .ss-message__content--user-zip-code-address-search-link.is-disabled span {
   cursor: default;
 }
+.ant-radio-group.payment-group-row,
 .payment-group-row {
   width: 100%;
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
+  overflow-x: auto;
+}
+.payment-group-row > .payment-option,
+.payment-group-row > .ss-message__content--user-card-payment-radio-content {
+  width: auto;
+  flex: 1 1 auto;
+  min-width: min-content;
+  margin-bottom: 0;
+}
+.payment-option-label,
+.payment-group-row .ant-radio-wrapper > span:last-child {
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .payment-group-column {
   width: 100%;
@@ -2233,6 +2287,37 @@ slideUp
   gap: 8px;
   background-color: var(--payment-option-bg);
   border-color: var(--payment-option-border);
+}
+.payment-group-row > .payment-option--tile {
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto;
+  padding: 0;
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--payment-option-border, transparent);
+  background-color: var(--payment-option-bg, transparent);
+  gap: 0;
+  box-shadow: none;
+}
+.payment-option--tile .ant-radio,
+.payment-option--tile .ant-radio-button {
+  display: none;
+}
+.payment-option--tile.ant-radio-wrapper > span:last-child,
+.payment-option--tile.ant-radio-button-wrapper > span:last-child {
+  padding: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.payment-option-tile-image {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+.payment-option-description {
+  width: 100%;
 }
 .ss-message__content--user-radio_button-img-grid {
   grid-template-columns: var(--preview-grid-columns);

@@ -204,6 +204,11 @@
   overflow-x: hidden;
 }
 
+.ss-layout-overview-messages .ss-edit-option-wrapper {
+  left: auto;
+  right: 0;
+}
+
 .ss-editor-layout-v2 .ss-layout-overview-messages .ss-overview-detail {
   flex: none;
   height: auto;

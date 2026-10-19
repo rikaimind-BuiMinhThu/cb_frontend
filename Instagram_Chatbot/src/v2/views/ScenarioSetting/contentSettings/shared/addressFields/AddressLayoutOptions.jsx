@@ -5,7 +5,7 @@ import { ADDRESS_FIELD_MODAL_LABELS } from '../../../constants/scenarioSettingLa
 import { buildAddressFieldSettingContext } from './addressFieldSettingContext';
 
 const AddressLayoutOptions = (props) => {
-  const { addressData, changeAddressField } = buildAddressFieldSettingContext(props);
+  const { addressData, changeAddressField, setAddressFields } = buildAddressFieldSettingContext(props);
   const { showDisplayAddressField = false } = props;
 
   return (
@@ -18,10 +18,10 @@ const AddressLayoutOptions = (props) => {
       <ScenarioModalCheckbox
         checked={!!addressData.compact_municipality_and_address}
         onChange={(checked) => {
-          changeAddressField('compact_municipality_and_address')(checked);
-          if (checked) {
-            changeAddressField('compact_municipality_and_address_and_building_name')(false);
-          }
+          setAddressFields({
+            compact_municipality_and_address: checked,
+            ...(checked ? { compact_municipality_and_address_and_building_name: false } : {}),
+          });
         }}
         label={ADDRESS_FIELD_MODAL_LABELS.compactMunicipalityAndAddress}
       />
@@ -36,10 +36,10 @@ const AddressLayoutOptions = (props) => {
       <ScenarioModalCheckbox
         checked={!!addressData.compact_municipality_and_address_and_building_name}
         onChange={(checked) => {
-          changeAddressField('compact_municipality_and_address_and_building_name')(checked);
-          if (checked) {
-            changeAddressField('compact_municipality_and_address')(false);
-          }
+          setAddressFields({
+            compact_municipality_and_address_and_building_name: checked,
+            ...(checked ? { compact_municipality_and_address: false } : {}),
+          });
         }}
         label={ADDRESS_FIELD_MODAL_LABELS.compactAll}
       />

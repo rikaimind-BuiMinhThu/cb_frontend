@@ -21,8 +21,9 @@
   cursor: pointer;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
-  margin: 5px;
-  width: 95%;
+  margin: 5px 0;
+  width: 100%;
+  box-sizing: border-box;
   align-content: center;
 }
 

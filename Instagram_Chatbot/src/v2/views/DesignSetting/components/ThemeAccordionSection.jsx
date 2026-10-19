@@ -225,7 +225,7 @@ const ThemeAccordionSection = ({
       );
     }
 
-    if (fieldType === 'fontSize') {
+    if (fieldType === 'fontSize' || fieldType === 'borderWidth') {
       return (
         <div key={key} className={wrapperClassName}>
           <ThemeNumberField
@@ -233,8 +233,26 @@ const ThemeAccordionSection = ({
             value={themeSettings[key]}
             fullWidth={isFullWidth}
             tooltipKey={key}
+            min={fieldType === 'borderWidth' ? 1 : 8}
+            max={fieldType === 'borderWidth' ? 12 : 32}
             onChange={(value) => onFieldChange(key, value)}
           />
+        </div>
+      );
+    }
+
+    if (fieldType === 'checkbox') {
+      const checked = themeSettings[key] === true || themeSettings[key] === 'true';
+      return (
+        <div key={key} className={wrapperClassName}>
+          <Checkbox
+            checked={checked}
+            onChange={(event) => onFieldChange(key, event.target.checked)}
+          >
+            <DesignSettingLabel className="theme-checkbox-label" tooltip={getDesignSettingTooltip(key)}>
+              {label}
+            </DesignSettingLabel>
+          </Checkbox>
         </div>
       );
     }

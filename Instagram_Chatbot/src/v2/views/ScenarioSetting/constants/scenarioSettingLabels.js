@@ -142,7 +142,8 @@ export const CALENDAR_WEEKDAY_OPTIONS = [
 ];
 
 export const CREDIT_CARD_SETTING_LABELS = {
-  hideCvc: 'CVC非表示',
+  hideCvc: 'セキュリティコード非表示',
+  fieldTitle: 'タイトル',
   hideCardName: 'カード名非表示',
   installment: '分割払い',
   separateType: 'セパレート式',
@@ -151,11 +152,17 @@ export const CREDIT_CARD_SETTING_LABELS = {
   cardNumber: 'カード番号',
   cardHolder: 'カード名義',
   expiry: '有効期限',
-  cvc: 'CVC非表示',
+  cvc: 'セキュリティコード',
   installmentCount: 'お支払い回数',
   year: '年',
   month: '月',
   placeholder: 'プレースホルダ',
+};
+
+export const resolveCardFieldLabel = (source, key, fallback) => {
+  const value = source?.[key];
+  if (typeof value === 'string' && value.trim()) return value.trim();
+  return fallback;
 };
 
 export const CREDIT_CARD_EXPIRY_TYPE_OPTIONS = [

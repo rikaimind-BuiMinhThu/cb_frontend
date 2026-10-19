@@ -20,21 +20,23 @@ export const useScenarioMessages = ({
     subName,
     variable,
   ) => {
-    const next = cloneDeep(dataMessages);
-    mutateMessageContent(
-      next,
-      indexMessage,
-      indexContent,
-      type,
-      value,
-      name,
-      subField,
-      indexSubField,
-      subName,
-      variable,
-    );
-    setDataMessages(next);
-  }, [dataMessages, setDataMessages]);
+    setDataMessages((current) => {
+      const next = cloneDeep(current);
+      mutateMessageContent(
+        next,
+        indexMessage,
+        indexContent,
+        type,
+        value,
+        name,
+        subField,
+        indexSubField,
+        subName,
+        variable,
+      );
+      return next;
+    });
+  }, [setDataMessages]);
 
   const onChangeTimePullDown = useCallback((
     indexMessage,
