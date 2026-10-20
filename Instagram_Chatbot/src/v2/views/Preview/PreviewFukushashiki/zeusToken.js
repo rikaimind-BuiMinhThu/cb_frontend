@@ -1,23 +1,24 @@
 import api from 'api/api-management';
 import { CHATBOT_SERVER } from '../PreviewComponent/Constants';
 import { sendCreateOrderData } from '../PreviewComponent/Utils';
+import './zeusTokenHost.css';
 
 const TOKEN_FAIL_COPY = 'カード情報の認証に失敗しました。カード番号・有効期限・セキュリティコードをご確認のうえ、もう一度お試しください。';
-const WAIT_COPY = 'ご注文を処理しています。完了まで30秒ほどお待ちください。';
-const BUSY_COPY = 'ただいま混み合っています。順番に処理しますので、このままお待ちください。';
-const ACCEPT_COPY = 'ご注文を受け付けました。処理完了後、確認メールをお送りします。';
-const DONE_COPY = 'ご注文が完了しました。確認メールをご確認ください。';
-const FAIL_COPY = 'ご注文を完了できませんでした。入力内容をご確認いただくか、ショップまでお問い合わせください。';
+const ZEUS_HOST_CLASS = 'zeus-token-host';
 const ZEUS_CARD_AREA_ID = 'zeus_token_card_info_area';
+const ZEUS_ACTION_NEW_ID = 'zeus_token_action_type_new';
 const ZEUS_CARD_NUMBER_ID = 'zeus_token_card_number';
 const ZEUS_EXPIRES_MONTH_ID = 'zeus_token_card_expires_month';
 const ZEUS_EXPIRES_YEAR_ID = 'zeus_token_card_expires_year';
 const ZEUS_CARD_CVV_ID = 'zeus_token_card_cvv';
 const ZEUS_CARD_NAME_ID = 'zeus_token_card_name';
-const ZEUS_ACTION_NEW_ID = 'zeus_token_action_type_new';
+const ZEUS_YEAR_PREFIX = '20';
 const ZEUS_RESULT_OK = 1;
-const YEAR_CENTURY = '20';
-const MONTH_LENGTH = 2;
+const WAIT_COPY = 'ご注文を処理しています。完了まで30秒ほどお待ちください。';
+const BUSY_COPY = 'ただいま混み合っています。順番に処理しますので、このままお待ちください。';
+const ACCEPT_COPY = 'ご注文を受け付けました。処理完了後、確認メールをお送りします。';
+const DONE_COPY = 'ご注文が完了しました。確認メールをご確認ください。';
+const FAIL_COPY = 'ご注文を完了できませんでした。入力内容をご確認いただくか、ショップまでお問い合わせください。';
 
 function maskPan(number) {
   const digits = String(number || '').replace(/\D/g, '');
@@ -130,79 +131,132 @@ export async function fetchZeusConfig(scenarioId) {
   return res.data.data;
 }
 
+const fullExpiryYear = (year) => {
+  const digits = String(year || '').replace(/\D/g, '');
+  if (digits.length === 4) return digits;
+  if (digits.length === 2) return `${ZEUS_YEAR_PREFIX}${digits}`;
+  return '';
+};
+
+const tokenAttemptDetail = ({ cardNumber, month, year, cvc, holder, ipcode, clientIp, errorCode }) => {
+  const parts = [
+    `pan_len=${String(cardNumber || '').length}`,
+    `month=${month || ''}`,
+    `year=${year || ''}`,
+    `cvc_len=${String(cvc || '').length}`,
+    `holder_len=${String(holder || '').length}`,
+    `ipcode=${ipcode || ''}`,
+    `client_ip=${clientIp || ''}`,
+  ];
+  if (errorCode) parts.push(`error_code=${errorCode}`);
+  return parts.join(' ');
+};
+
+const tokenFailure = (detail) => {
+  const error = new Error(TOKEN_FAIL_COPY);
+  error.detail = detail;
+  return error;
+};
+
 const ensureZeusCardArea = () => {
-  if (document.getElementById(ZEUS_CARD_AREA_ID)) return;
+  const existing = document.getElementById(ZEUS_CARD_AREA_ID);
+  if (existing) return existing;
   const area = document.createElement('div');
   area.id = ZEUS_CARD_AREA_ID;
-  area.hidden = true;
+  area.className = ZEUS_HOST_CLASS;
   document.body.appendChild(area);
+  return area;
 };
 
-const setZeusFieldValue = (id, value) => {
-  const field = document.getElementById(id);
-  if (!field) return;
-  field.value = value;
+const removeZeusCardArea = () => {
+  const area = document.getElementById(ZEUS_CARD_AREA_ID);
+  if (!area) return;
+  area.remove();
 };
 
-const writeZeusCardFields = ({ cardNumber, month, yearFull, holder }) => {
-  const actionNew = document.getElementById(ZEUS_ACTION_NEW_ID);
-  if (actionNew) actionNew.checked = true;
-  setZeusFieldValue(ZEUS_CARD_NUMBER_ID, cardNumber);
-  setZeusFieldValue(ZEUS_EXPIRES_MONTH_ID, month);
-  setZeusFieldValue(ZEUS_EXPIRES_YEAR_ID, yearFull);
+const setSelectValue = (select, value) => {
+  if (!select) return false;
+  const option = [...select.options].find((item) => item.value === value);
+  if (!option) return false;
+  select.value = value;
+  return true;
+};
+
+const fillZeusCardForm = ({ cardNumber, month, year, cvc, holder }) => {
+  const action = document.getElementById(ZEUS_ACTION_NEW_ID);
+  const number = document.getElementById(ZEUS_CARD_NUMBER_ID);
+  const monthSelect = document.getElementById(ZEUS_EXPIRES_MONTH_ID);
+  const yearSelect = document.getElementById(ZEUS_EXPIRES_YEAR_ID);
   const cvv = document.getElementById(ZEUS_CARD_CVV_ID);
-  if (cvv) {
-    cvv.value = '';
-    cvv.hidden = true;
-  }
-  setZeusFieldValue(ZEUS_CARD_NAME_ID, holder);
+  const name = document.getElementById(ZEUS_CARD_NAME_ID);
+  if (!action || !number || !monthSelect || !yearSelect || !cvv || !name) return false;
+  action.checked = true;
+  number.value = cardNumber;
+  cvv.value = cvc || '';
+  name.value = holder || '';
+  const monthOk = setSelectValue(monthSelect, month);
+  const yearOk = setSelectValue(yearSelect, year);
+  return monthOk && yearOk && Boolean(cardNumber);
 };
 
-const rejectZeus = (reject, errorCode) => {
-  const error = new Error(TOKEN_FAIL_COPY);
-  error.zeusErrorCode = errorCode || '';
-  reject(error);
-};
-
-export const tokenizeZeusCard = async ({ tokenJsUrl, ipcode, cardNumber, expiry, holder }) => {
+export const tokenizeZeusCard = async ({ tokenJsUrl, clientIp, ipcode, cardNumber, expiry, cvc, holder }) => {
   const expire = String(expiry || '').replace(/\s/g, '');
-  const month = expire.slice(0, MONTH_LENGTH);
-  const yearTwo = expire.slice(-MONTH_LENGTH);
-  const yearFull = yearTwo.length === MONTH_LENGTH ? `${YEAR_CENTURY}${yearTwo}` : '';
-  window.zeusTokenIpcode = String(ipcode || '');
+  const month = expire.slice(0, 2);
+  const year = fullExpiryYear(expire.length >= 4 ? expire.slice(-2) : '');
+  const detail = tokenAttemptDetail({
+    cardNumber,
+    month,
+    year,
+    cvc,
+    holder,
+    ipcode,
+    clientIp,
+  });
+  window.zeusTokenIpcode = String(ipcode || clientIp || '');
   ensureZeusCardArea();
-  await loadScript(tokenJsUrl);
-  if (window.zeusToken && typeof window.zeusToken.init === 'function') {
-    window.zeusToken.init();
-  }
-  if (window.zeusToken) {
-    window.zeusToken.ipcode = window.zeusTokenIpcode;
-  }
-  writeZeusCardFields({ cardNumber, month, yearFull, holder });
-
-  return new Promise((resolve, reject) => {
+  try {
+    await loadScript(tokenJsUrl);
     if (!window.zeusToken || typeof window.zeusToken.getToken !== 'function') {
-      rejectZeus(reject);
-      return;
+      throw tokenFailure(detail);
     }
     try {
-      window.zeusToken.getToken((resp) => {
-        const tokenKey = resp?.token_key || '';
-        if (resp?.result === ZEUS_RESULT_OK && tokenKey) {
-          resolve({
-            token_key: tokenKey,
-            masked_pan: resp.masked_card_number || maskPan(cardNumber),
-            expiry: expire,
-            holder,
-          });
-          return;
-        }
-        rejectZeus(reject, resp?.error_code);
-      });
-    } catch (error) {
-      rejectZeus(reject, error?.zeusErrorCode);
+      if (typeof window.zeusToken.init === 'function') window.zeusToken.init();
+    } catch (initError) {
+      throw tokenFailure(`${detail} init=${initError.message || 'failed'}`);
     }
-  });
+    const filled = fillZeusCardForm({ cardNumber, month, year, cvc, holder });
+    if (!filled) throw tokenFailure(detail);
+    return await new Promise((resolve, reject) => {
+      try {
+        window.zeusToken.getToken((resp) => {
+          const tokenKey = resp?.token_key;
+          if (resp?.result === ZEUS_RESULT_OK && tokenKey) {
+            resolve({
+              token_key: tokenKey,
+              masked_pan: resp.masked_card_number || maskPan(cardNumber),
+              expiry: expire,
+              holder: resp.card_name || holder,
+            });
+            return;
+          }
+          reject(tokenFailure(tokenAttemptDetail({
+            cardNumber,
+            month,
+            year,
+            cvc,
+            holder,
+            ipcode,
+            clientIp,
+            errorCode: resp?.error_code,
+          })));
+        });
+      } catch (tokenError) {
+        reject(tokenFailure(`${detail} call=${tokenError.message || 'failed'}`));
+      }
+    });
+  } finally {
+    removeZeusCardArea();
+  }
 };
 
 export async function reportTokenFailure({ scenarioId, userId, path, maskedPan, message }) {
@@ -231,13 +285,12 @@ export async function prepareLexicaCreditToken({ scenarioId, userId, messages })
     stripCardSecrets(card, token);
     return { ok: true, card, token };
   } catch (error) {
-    const code = error?.zeusErrorCode || '';
     await reportTokenFailure({
       scenarioId,
       userId,
       path: findPathFromMessages(messages),
       maskedPan: maskPan(fields.cardNumber),
-      message: code ? `${TOKEN_FAIL_COPY} ${code}` : TOKEN_FAIL_COPY,
+      message: error.detail || TOKEN_FAIL_COPY,
     });
     return { ok: false, copy: TOKEN_FAIL_COPY };
   }

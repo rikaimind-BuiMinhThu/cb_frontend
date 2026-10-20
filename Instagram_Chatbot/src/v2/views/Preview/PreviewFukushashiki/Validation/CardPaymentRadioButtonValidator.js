@@ -5,8 +5,6 @@ import {
 } from "../ValidationUtils";
 import { validateCardNumber, validateExpiryDate } from "./CreditCardPaymentValidator";
 
-const CREDIT_SELECTION = "credit";
-
 const validateCardPaymentRadioButton = (contentType, messageContents, i, index, errorsMess) => {
   const key = `message${index}_content${i}_${messageContents[i].type}`;
   const { type, initial_selection, initial_selection_picture } = contentType;
@@ -74,9 +72,8 @@ const validateCardDetails = (contentType) => {
     card_holder, 
     card_holder1, 
     card_holder2,
-    is_hide_cvc,
-    cvc,
-    initial_selection,
+    is_hide_cvc, 
+    cvc, 
     separate_type, 
     card_number1, 
     card_number2, 
@@ -92,9 +89,7 @@ const validateCardDetails = (contentType) => {
     (!stringNullOrEmpty(card_holder1) && !stringNullOrEmpty(card_holder2)) : !stringNullOrEmpty(card_holder));
 
   // Check CVC validation
-  const isCvcValid = is_hide_cvc === true
-    || initial_selection === CREDIT_SELECTION
-    || !stringNullOrEmpty(cvc);
+  const isCvcValid = is_hide_cvc === true || !stringNullOrEmpty(cvc);
 
   // Check card number validation
   const isCardNumberValid = separate_type === true ? 
