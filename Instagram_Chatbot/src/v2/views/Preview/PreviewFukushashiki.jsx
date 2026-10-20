@@ -131,6 +131,8 @@ const PreviewFukushashiki = () => {
   const [msgUpdateState, setMsgUpdateState] = useState({});
   const msgUpdateStateRef = useRef({});
   const lexicaSubmitLockRef = useRef(false);
+  const lexicaMessagesRef = useRef(state.messagesList);
+  lexicaMessagesRef.current = state.messagesList;
   useEffect(() => { 
     if (!state.isUseBtnUpdateTracking) return;
     msgUpdateStateRef.current = msgUpdateState; 
@@ -769,10 +771,11 @@ const PreviewFukushashiki = () => {
       lexicaSubmitLockRef.current = true;
       dispatch({ type: PREVIEW_ACTIONS.SET_PROCESSING, payload: true });
       (async () => {
+        const messages = lexicaMessagesRef.current;
         const tokenResult = await prepareLexicaCreditToken({
           scenarioId: state.scenarioId,
           userId: state.uuid,
-          messages: state.messagesList,
+          messages,
         });
         if (!tokenResult.ok) {
           dispatch({
@@ -781,7 +784,7 @@ const PreviewFukushashiki = () => {
           });
           return;
         }
-        const cardMessage = findCreditCardMessage(state.messagesList);
+        const cardMessage = findCreditCardMessage(messages);
         if (cardMessage) {
           await sendLogMessageToServer({
             ...data,
