@@ -12,11 +12,17 @@ import { getAdminRoutePath } from 'v2/variables/constants';
 import {
   cleanErrorMessage,
   completedRpaSteps,
+  countChromeSlotDefers,
+  countChromeSlotRetries,
   formatCardExpiry,
+  formatChromeSlotAttemptLabel,
+  formatChromeSlotCount,
   formatDateTime,
   formatInputLabel,
   formatInputValue,
   formatRpaStepDetail,
+  isChromeSlotDeferStep,
+  isChromeSlotRetryStep,
   rpaStepResultLabel,
   showCardFields,
   statusColor,
@@ -32,6 +38,8 @@ import {
   LABEL_CARD_EXPIRY,
   LABEL_CARD_HOLDER,
   LABEL_CART_URL,
+  LABEL_CHROME_SLOT_DEFER,
+  LABEL_CHROME_SLOT_RETRY,
   LABEL_CONVERSATION,
   LABEL_EMAIL,
   LABEL_END,
@@ -59,6 +67,8 @@ import {
   RPA_NG,
   RPA_OK,
   RPA_STEP_FALLBACK,
+  RPA_TAG_RETRY,
+  RPA_TAG_WAIT,
   SCREENSHOT_ALT,
 } from './constants';
 import './styles/bot-orders.css';
@@ -149,6 +159,14 @@ const BotOrderDetail = () => {
   const cardVisible = showCardFields(row);
   const answers = row?.answers || [];
   const rpaSteps = useMemo(() => completedRpaSteps(row?.rpa_steps), [row]);
+  const chromeSlotDeferCount = useMemo(() => {
+    if (row?.chrome_slot_defer_count != null) return Number(row.chrome_slot_defer_count);
+    return countChromeSlotDefers(row?.rpa_steps);
+  }, [row]);
+  const chromeSlotRetryCount = useMemo(() => {
+    if (row?.chrome_slot_retry_count != null) return Number(row.chrome_slot_retry_count);
+    return countChromeSlotRetries(row?.rpa_steps);
+  }, [row]);
   const errorMessage = useMemo(
     () => (row?.error_message ? cleanErrorMessage(row.error_message) : DASH),
     [row]
@@ -169,22 +187,32 @@ const BotOrderDetail = () => {
       {
         title: RPA_COL_STEP,
         key: 'step',
-        render: (_value, step) => (
-          <div>
-            <div>{step.description || step.name || RPA_STEP_FALLBACK}</div>
-            {step.name && step.description && step.name !== step.description && (
-              <Typography.Text type="secondary" className="bot-orders-rpa-step-id">
-                {step.name}
-              </Typography.Text>
-            )}
-          </div>
-        ),
+        render: (_value, step) => {
+          const attemptLabel = formatChromeSlotAttemptLabel(step);
+          return (
+            <div>
+              <div>{step.description || step.name || RPA_STEP_FALLBACK}</div>
+              {attemptLabel ? (
+                <Typography.Text type="secondary" className="bot-orders-rpa-step-id">
+                  {attemptLabel}
+                </Typography.Text>
+              ) : null}
+              {!attemptLabel && step.name && step.description && step.name !== step.description ? (
+                <Typography.Text type="secondary" className="bot-orders-rpa-step-id">
+                  {step.name}
+                </Typography.Text>
+              ) : null}
+            </div>
+          );
+        },
       },
       {
         title: RPA_COL_RESULT,
         key: 'result',
-        width: 72,
+        width: 88,
         render: (_value, step) => {
+          if (isChromeSlotDeferStep(step)) return <Tag>{RPA_TAG_WAIT}</Tag>;
+          if (isChromeSlotRetryStep(step)) return <Tag color="warning">{RPA_TAG_RETRY}</Tag>;
           const label = rpaStepResultLabel(step.ok);
           if (label === RPA_OK) return <Tag color="success">{RPA_OK}</Tag>;
           if (label === RPA_NG) return <Tag color="error">{RPA_NG}</Tag>;
@@ -262,6 +290,12 @@ const BotOrderDetail = () => {
                 )}
                 <Descriptions.Item label={LABEL_START}>{formatDateTime(row.start_time)}</Descriptions.Item>
                 <Descriptions.Item label={LABEL_END}>{formatDateTime(row.end_time)}</Descriptions.Item>
+                <Descriptions.Item label={LABEL_CHROME_SLOT_DEFER}>
+                  {formatChromeSlotCount(chromeSlotDeferCount)}
+                </Descriptions.Item>
+                <Descriptions.Item label={LABEL_CHROME_SLOT_RETRY}>
+                  {formatChromeSlotCount(chromeSlotRetryCount)}
+                </Descriptions.Item>
                 <Descriptions.Item label={LABEL_ERROR}>{errorMessage}</Descriptions.Item>
                 <Descriptions.Item label={LABEL_CONVERSATION}>
                   <Link to={chatLogPath}>{CONVERSATION_LINK_LABEL}</Link>

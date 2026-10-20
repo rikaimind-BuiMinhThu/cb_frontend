@@ -9,8 +9,9 @@ import { tokenExpired } from 'v2/api/tokenExpired';
 import { AdminPage, AdminTable } from 'v2/components/AdminShell';
 import { ADMIN_PATHS } from 'v2/components/AdminShell/constants';
 import { getAdminRoutePath } from 'v2/variables/constants';
-import { formatDateTime, formatStep, statusColor } from './botOrderFormat';
+import { formatChromeSlotListCell, formatDateTime, formatStep, statusColor } from './botOrderFormat';
 import {
+  COL_CHROME_SLOT,
   COL_CREATED_AT,
   COL_EMAIL,
   COL_LAST_STEP,
@@ -103,6 +104,14 @@ const BotOrderList = () => {
       { title: COL_EMAIL, dataIndex: 'email', render: (value) => value || DASH },
       { title: COL_SKU, dataIndex: 'sku', render: (value) => value || DASH },
       { title: COL_LEXICA_ORDER_ID, dataIndex: 'lexica_order_id', render: (value) => value || DASH },
+      {
+        title: COL_CHROME_SLOT,
+        key: 'chrome_slot',
+        render: (_value, record) => formatChromeSlotListCell(
+          record.chrome_slot_defer_count,
+          record.chrome_slot_retry_count,
+        ),
+      },
       { title: COL_LAST_STEP, dataIndex: 'last_step_description', render: (value) => formatStep(value) },
     ],
     [],

@@ -2,9 +2,18 @@ import {
   BIRTH_DATE_DAY_SUFFIX,
   BIRTH_DATE_MONTH_SUFFIX,
   BIRTH_DATE_YEAR_SUFFIX,
+  CHROME_SLOT_COUNT_SUFFIX,
+  CHROME_SLOT_DEFER_STEP,
+  CHROME_SLOT_LIST_RETRY_PREFIX,
+  CHROME_SLOT_LIST_SEP,
+  CHROME_SLOT_LIST_WAIT_PREFIX,
+  CHROME_SLOT_MAX_RETRIES_DISPLAY,
+  CHROME_SLOT_RETRY_STEP,
   DASH,
   EMPTY_VALUE,
   INPUT_LABELS,
+  RPA_ATTEMPT_PREFIX,
+  RPA_ATTEMPT_SEP,
   INPUT_NAME_BIRTH_DATE,
   INPUT_NAME_PATH,
   INPUT_NAME_PHONE,
@@ -131,9 +140,43 @@ export const cleanErrorMessage = (message) => {
   return cleaned || DASH;
 };
 
+export const isChromeSlotDeferStep = (step) => step?.name === CHROME_SLOT_DEFER_STEP;
+
+export const isChromeSlotRetryStep = (step) => step?.name === CHROME_SLOT_RETRY_STEP;
+
+export const countChromeSlotDefers = (steps) => {
+  if (!Array.isArray(steps)) return 0;
+  return steps.filter((step) => isChromeSlotDeferStep(step)).length;
+};
+
+export const countChromeSlotRetries = (steps) => {
+  if (!Array.isArray(steps)) return 0;
+  return steps.filter((step) => isChromeSlotRetryStep(step)).length;
+};
+
+export const formatChromeSlotCount = (count) => `${Number(count) || 0}${CHROME_SLOT_COUNT_SUFFIX}`;
+
+export const formatChromeSlotListCell = (deferCount, retryCount) => {
+  const defers = Number(deferCount) || 0;
+  const retries = Number(retryCount) || 0;
+  if (defers === 0 && retries === 0) return DASH;
+  return `${CHROME_SLOT_LIST_WAIT_PREFIX}${defers}${CHROME_SLOT_LIST_SEP}${CHROME_SLOT_LIST_RETRY_PREFIX}${retries}`;
+};
+
+export const formatChromeSlotAttemptLabel = (step) => {
+  if (!isChromeSlotRetryStep(step)) return EMPTY_VALUE;
+  const attempt = step.attempt;
+  if (attempt == null || attempt === EMPTY_VALUE) return EMPTY_VALUE;
+  return `${RPA_ATTEMPT_PREFIX}${attempt}${RPA_ATTEMPT_SEP}${CHROME_SLOT_MAX_RETRIES_DISPLAY}`;
+};
+
 export const completedRpaSteps = (steps) => {
   if (!Array.isArray(steps)) return [];
-  return steps.filter((step) => step && (step.ok === true || step.ok === false));
+  return steps.filter((step) => {
+    if (!step) return false;
+    if (step.ok === true || step.ok === false) return true;
+    return isChromeSlotDeferStep(step) || isChromeSlotRetryStep(step);
+  });
 };
 
 export const truncateText = (text, max = RPA_ERROR_TRUNCATE) => {
