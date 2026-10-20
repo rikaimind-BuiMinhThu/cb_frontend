@@ -150,7 +150,11 @@ const writeZeusCardFields = ({ cardNumber, month, yearFull, holder }) => {
   setZeusFieldValue(ZEUS_CARD_NUMBER_ID, cardNumber);
   setZeusFieldValue(ZEUS_EXPIRES_MONTH_ID, month);
   setZeusFieldValue(ZEUS_EXPIRES_YEAR_ID, yearFull);
-  setZeusFieldValue(ZEUS_CARD_CVV_ID, '');
+  const cvv = document.getElementById(ZEUS_CARD_CVV_ID);
+  if (cvv) {
+    cvv.value = '';
+    cvv.hidden = true;
+  }
   setZeusFieldValue(ZEUS_CARD_NAME_ID, holder);
 };
 
