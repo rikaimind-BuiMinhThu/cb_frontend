@@ -602,7 +602,8 @@ export const isTempDelay = (message, prefix) => {
 }
 
 const isButtonSubmitMessage = (message) => {
-  return message.message_content[0]?.type === "button_submit";
+  const contents = message?.message_content || [];
+  return contents.some((content) => content?.type === MESSAGE_CONTENT_TYPES.SUBMIT_BUTTON);
 }
 
 const getNextUserMsg = (ext = null) => (item, index) => {
