@@ -9,11 +9,19 @@ import { tokenExpired } from 'v2/api/tokenExpired';
 import { AdminPage, AdminTable } from 'v2/components/AdminShell';
 import { ADMIN_PATHS } from 'v2/components/AdminShell/constants';
 import { getAdminRoutePath } from 'v2/variables/constants';
-import { formatChromeSlotListCell, formatDateTime, formatStep, statusColor } from './botOrderFormat';
+import {
+  formatChromeSlotListCell,
+  formatDateTime,
+  formatDuration,
+  formatStep,
+  statusColor,
+} from './botOrderFormat';
 import {
   COL_CHROME_SLOT,
   COL_CREATED_AT,
+  COL_DURATION,
   COL_EMAIL,
+  COL_END,
   COL_LAST_STEP,
   COL_LEXICA_ORDER_ID,
   COL_PATH,
@@ -93,6 +101,16 @@ const BotOrderList = () => {
         title: COL_CREATED_AT,
         dataIndex: 'created_at',
         render: (value) => formatDateTime(value),
+      },
+      {
+        title: COL_END,
+        dataIndex: 'end_time',
+        render: (value) => formatDateTime(value),
+      },
+      {
+        title: COL_DURATION,
+        key: 'duration',
+        render: (_value, record) => formatDuration(record.start_time, record.end_time),
       },
       {
         title: COL_STATUS,

@@ -10,6 +10,9 @@ import {
   CHROME_SLOT_MAX_RETRIES_DISPLAY,
   CHROME_SLOT_RETRY_STEP,
   DASH,
+  DURATION_HOUR_SUFFIX,
+  DURATION_MINUTE_SUFFIX,
+  DURATION_SECOND_SUFFIX,
   EMPTY_VALUE,
   INPUT_LABELS,
   RPA_ATTEMPT_PREFIX,
@@ -56,6 +59,30 @@ export const formatDateTime = (value) => {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return DASH;
   return date.toLocaleString(LOCALE_JA);
+};
+
+export const formatDuration = (startTime, endTime) => {
+  if (!startTime || !endTime) return DASH;
+  const startMs = new Date(startTime).getTime();
+  const endMs = new Date(endTime).getTime();
+  if (Number.isNaN(startMs) || Number.isNaN(endMs)) return DASH;
+  const totalSec = Math.max(0, Math.floor((endMs - startMs) / 1000));
+  const hours = Math.floor(totalSec / 3600);
+  const minutes = Math.floor((totalSec % 3600) / 60);
+  const seconds = totalSec % 60;
+  if (hours > 0) {
+    if (minutes > 0) {
+      return `${hours}${DURATION_HOUR_SUFFIX}${minutes}${DURATION_MINUTE_SUFFIX}`;
+    }
+    return `${hours}${DURATION_HOUR_SUFFIX}`;
+  }
+  if (minutes > 0) {
+    if (seconds > 0) {
+      return `${minutes}${DURATION_MINUTE_SUFFIX}${seconds}${DURATION_SECOND_SUFFIX}`;
+    }
+    return `${minutes}${DURATION_MINUTE_SUFFIX}`;
+  }
+  return `${seconds}${DURATION_SECOND_SUFFIX}`;
 };
 
 export const formatStep = (value) => {

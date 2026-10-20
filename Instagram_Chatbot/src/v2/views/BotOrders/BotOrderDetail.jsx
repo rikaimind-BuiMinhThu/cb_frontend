@@ -18,6 +18,7 @@ import {
   formatChromeSlotAttemptLabel,
   formatChromeSlotCount,
   formatDateTime,
+  formatDuration,
   formatInputLabel,
   formatInputValue,
   formatRpaStepDetail,
@@ -41,6 +42,7 @@ import {
   LABEL_CHROME_SLOT_DEFER,
   LABEL_CHROME_SLOT_RETRY,
   LABEL_CONVERSATION,
+  LABEL_DURATION,
   LABEL_EMAIL,
   LABEL_END,
   LABEL_ERROR,
@@ -290,6 +292,9 @@ const BotOrderDetail = () => {
                 )}
                 <Descriptions.Item label={LABEL_START}>{formatDateTime(row.start_time)}</Descriptions.Item>
                 <Descriptions.Item label={LABEL_END}>{formatDateTime(row.end_time)}</Descriptions.Item>
+                <Descriptions.Item label={LABEL_DURATION}>
+                  {formatDuration(row.start_time, row.end_time)}
+                </Descriptions.Item>
                 <Descriptions.Item label={LABEL_CHROME_SLOT_DEFER}>
                   {formatChromeSlotCount(chromeSlotDeferCount)}
                 </Descriptions.Item>
