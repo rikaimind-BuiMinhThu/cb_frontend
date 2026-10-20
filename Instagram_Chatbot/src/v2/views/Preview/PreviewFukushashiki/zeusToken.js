@@ -69,13 +69,20 @@ export function isCreditSelection(card) {
   return false;
 }
 
-export function findCreditCardPayload(messages) {
-  for (const message of messages || []) {
+export const findCreditCardMessage = (messages) => {
+  const list = messages || [];
+  const found = list.find((message) => {
     const card = findCardFromMessage(message);
-    if (card && isCreditSelection(card)) return card;
-  }
-  return null;
-}
+    return Boolean(card && isCreditSelection(card));
+  });
+  return found || null;
+};
+
+export const findCreditCardPayload = (messages) => {
+  const message = findCreditCardMessage(messages);
+  if (!message) return null;
+  return findCardFromMessage(message);
+};
 
 export function findPathFromMessages(messages) {
   for (const message of messages || []) {

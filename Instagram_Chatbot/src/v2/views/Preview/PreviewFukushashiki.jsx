@@ -55,6 +55,7 @@ import {
   sendErrorLogToServer,
 } from "./PreviewComponent/Utils";
 import {
+  findCreditCardMessage,
   followLexicaOrder,
   LEXICA_COPY,
   prepareLexicaCreditToken,
@@ -779,6 +780,13 @@ const PreviewFukushashiki = () => {
             payload: tokenResult.copy || LEXICA_COPY.TOKEN_FAIL_COPY,
           });
           return;
+        }
+        const cardMessage = findCreditCardMessage(state.messagesList);
+        if (cardMessage) {
+          await sendLogMessageToServer({
+            ...data,
+            message: cardMessage,
+          }, CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
         }
         continueAfterOptionalToken();
         await followLexicaOrder({
