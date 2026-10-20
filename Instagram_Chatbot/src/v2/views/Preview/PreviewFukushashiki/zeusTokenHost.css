@@ -5,3 +5,7 @@
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
 }
+
+.zeus-token-host #zeus_token_card_cvv {
+  display: none !important;
+}

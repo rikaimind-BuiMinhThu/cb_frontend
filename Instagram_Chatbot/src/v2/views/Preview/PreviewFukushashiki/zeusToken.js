@@ -14,6 +14,7 @@ const ZEUS_CARD_CVV_ID = 'zeus_token_card_cvv';
 const ZEUS_CARD_NAME_ID = 'zeus_token_card_name';
 const ZEUS_YEAR_PREFIX = '20';
 const ZEUS_RESULT_OK = 1;
+const ZEUS_CVV_XML_OMIT = 'omit';
 const WAIT_COPY = 'ご注文を処理しています。完了まで30秒ほどお待ちください。';
 const BUSY_COPY = 'ただいま混み合っています。順番に処理しますので、このままお待ちください。';
 const ACCEPT_COPY = 'ご注文を受け付けました。処理完了後、確認メールをお送りします。';
@@ -144,6 +145,7 @@ const tokenAttemptDetail = ({ cardNumber, month, year, cvc, holder, ipcode, clie
     `month=${month || ''}`,
     `year=${year || ''}`,
     `cvc_len=${String(cvc || '').length}`,
+    `cvv_xml=${ZEUS_CVV_XML_OMIT}`,
     `holder_len=${String(holder || '').length}`,
     `ipcode=${ipcode || ''}`,
     `client_ip=${clientIp || ''}`,
@@ -182,7 +184,7 @@ const setSelectValue = (select, value) => {
   return true;
 };
 
-const fillZeusCardForm = ({ cardNumber, month, year, cvc, holder }) => {
+const fillZeusCardForm = ({ cardNumber, month, year, holder }) => {
   const action = document.getElementById(ZEUS_ACTION_NEW_ID);
   const number = document.getElementById(ZEUS_CARD_NUMBER_ID);
   const monthSelect = document.getElementById(ZEUS_EXPIRES_MONTH_ID);
@@ -192,7 +194,7 @@ const fillZeusCardForm = ({ cardNumber, month, year, cvc, holder }) => {
   if (!action || !number || !monthSelect || !yearSelect || !cvv || !name) return false;
   action.checked = true;
   number.value = cardNumber;
-  cvv.value = cvc || '';
+  cvv.value = '';
   name.value = holder || '';
   const monthOk = setSelectValue(monthSelect, month);
   const yearOk = setSelectValue(yearSelect, year);
@@ -224,7 +226,7 @@ export const tokenizeZeusCard = async ({ tokenJsUrl, clientIp, ipcode, cardNumbe
     } catch (initError) {
       throw tokenFailure(`${detail} init=${initError.message || 'failed'}`);
     }
-    const filled = fillZeusCardForm({ cardNumber, month, year, cvc, holder });
+    const filled = fillZeusCardForm({ cardNumber, month, year, holder });
     if (!filled) throw tokenFailure(detail);
     return await new Promise((resolve, reject) => {
       try {
