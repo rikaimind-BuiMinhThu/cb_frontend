@@ -1,6 +1,7 @@
 @import './img-option-layout-scroll.css';
 
-* {
+.preview-open-frame,
+.preview-open-frame * {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -webkit-tap-highlight-color: transparent;

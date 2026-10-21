@@ -179,6 +179,7 @@ const BotChatLog = () => {
   }
 
   const [botInfor, setBotInfor] = useState();
+  const [designSettings, setDesignSettings] = useState(null);
   const [dataMessages, setDataMessages] = useState([]);
   const [, setDataVariables] = useState([]);
   const [variables, setVariables] = useState([]);
@@ -320,6 +321,7 @@ const BotChatLog = () => {
           }
 
           setBotInfor(res.data.chatbot);
+          setDesignSettings(res.data.design_settings || null);
           if (res.data.variables) {
             setVariables([...res.data.variables, ...variablesAll]);
             res.data.variables.forEach((item) => {
@@ -975,6 +977,7 @@ const BotChatLog = () => {
           dataPrefectures={dataPrefectures}
           variables={variables}
           tracking={tracking}
+          designSettings={designSettings}
         />
       ) : (
         <div className="chat-log-preview">

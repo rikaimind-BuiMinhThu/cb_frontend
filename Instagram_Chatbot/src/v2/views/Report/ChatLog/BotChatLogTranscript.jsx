@@ -1,15 +1,29 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { DownCircleOutlined } from '@ant-design/icons';
 import UserMessageTailIcon from 'v2/components/BotMessages/UserMessageTailIcon';
-import { EC_CHATBOT_URL } from 'v2/variables/constants';
+import { getDesignTypeChromeVars } from 'v2/utils/designTypeChrome';
+import {
+  generateScopedThemeCss,
+  parseThemeFromDesignSettings,
+} from 'v2/utils/chatbotThemeCss';
+import { hasExplicitThemeValue, resolveMainColorContext } from 'v2/utils/designThemeCore';
+import { parseDesignSettings } from 'v2/views/DesignSetting/utils/designChatbotUtils';
+import { resolveUserMessageTheme } from 'v2/views/DesignSetting/utils/designThemeUtils';
+import BotMessage from 'v2/views/Preview/PreviewComponent/BotMessage';
+import CustomButton from 'v2/views/Preview/PreviewComponent/CustomButton';
+import PreviewOpenChatFrame from 'v2/views/Preview/PreviewComponent/PreviewOpenChatFrame';
+import UserMessage from 'v2/views/Preview/PreviewComponent/UserMessage';
+import { getPrefectures } from 'v2/views/Preview/PreviewComponent/Utils';
+import {
+  getBotHeaderIconUrl,
+  getOpeningBotStyle,
+} from 'v2/views/Preview/PreviewComponent/previewOpeningStyles';
 import {
   CHAT_LOG_BELONG_BOT,
   CHAT_LOG_BELONG_COMBINE,
   CHAT_LOG_BELONG_USER,
   CHAT_LOG_BUTTON_SUBMIT_TYPE,
   CHAT_LOG_COMBINE_ROLE_BOT,
-  CHAT_LOG_HEADER_ICON_ALT,
   CHAT_LOG_NEXT_BUTTON,
   CHAT_LOG_TRACKING_LABEL_BROWSER,
   CHAT_LOG_TRACKING_LABEL_DEVICE_CLASS,
@@ -18,32 +32,62 @@ import {
   CHAT_LOG_TRACKING_LABEL_REFERER,
   CHAT_LOG_TRACKING_LABEL_REGION,
   CHAT_LOG_TRACKING_LABEL_USER_AGENT,
-  CHAT_LOG_USER_TAIL_COLOR,
   formatChatLogDeviceLabel,
   formatChatLogRegion,
   formatChatLogTrackingValue,
 } from 'v2/views/Report/constants';
-import BotMessage from './BotMessage';
-import UserMessage from './UserMessage';
 
-const buildHeaderIconSrc = (botInfor) => {
-  const rawPath = botInfor?.opening_bot_icon?.url || botInfor?.icon?.url || '';
-  if (!rawPath) return '';
-  if (rawPath.startsWith('http')) return rawPath;
-  const path = rawPath.replace(/^\/+/, '');
-  return `${EC_CHATBOT_URL}/${path}`;
+const CHAT_LOG_FRAME_WIDTH_FALLBACK = 450;
+const CHAT_LOG_FRAME_HEIGHT_FALLBACK = 700;
+const CHAT_LOG_FRAME_IS_OPEN = true;
+const CHAT_LOG_FRAME_EXTRA_CLASS = 'preview-open-frame--no-exit-popup preview-open-frame--desktop';
+const CHAT_LOG_THEME_SCOPE = '#sp-container1, .sp-container1';
+const CHAT_LOG_USER_BUBBLE_CLASS = 'sp-body-user-side slideLeft';
+const CHAT_LOG_USER_MESSAGES_CLASS = 'sp-body-user-side-messages position-relative';
+const CHAT_LOG_NEXT_ACTION_CLASS = 'sp-user-message-button-action';
+const CHAT_LOG_NEXT_BUTTON_CLASS = 'ss-user-message__action-btn';
+
+const ignoreChatLogInput = () => {};
+
+const readRawDesign = (designSettings) => {
+  if (!designSettings) return {};
+  if (typeof designSettings === 'string') {
+    try {
+      return JSON.parse(designSettings);
+    } catch (error) {
+      return {};
+    }
+  }
+  return designSettings;
 };
 
-const buildFrameStyle = (botInfor) => ({
-  ...(botInfor?.main_color
-    ? {
-      '--pof-header-bg': botInfor.main_color,
-      '--chat-log-action-bg': botInfor.main_color,
-    }
-    : {}),
-  ...(botInfor?.opacity_color ? { '--pof-body-bg': botInfor.opacity_color } : {}),
-  ...(botInfor?.message_color ? { '--bot-message-bg': botInfor.message_color } : {}),
-  ...(botInfor?.font_color ? { '--bot-message-color': botInfor.font_color } : {}),
+const readFramePixels = (value, fallback) => {
+  if (value == null || value === '') return fallback;
+  const parsed = Number(value);
+  if (Number.isNaN(parsed) || parsed <= 0) return fallback;
+  return parsed;
+};
+
+const ensureOriginalContent = (content) => {
+  const contentType = content?.type;
+  if (!contentType) return content;
+  const typed = content[contentType];
+  if (!typed || typeof typed !== 'object') return content;
+  if (typed.originalContent) return content;
+  if (typeof typed.content !== 'string' || typed.content === '') return content;
+  return {
+    ...content,
+    [contentType]: {
+      ...typed,
+      originalContent: typed.content,
+    },
+  };
+};
+
+const buildUserMessage = (messageItem, contents) => ({
+  ...messageItem,
+  belong_to: CHAT_LOG_BELONG_USER,
+  message_content: contents,
 });
 
 const isNextVisible = (messageItem, indexMessage, dataMessages) => {
@@ -81,7 +125,7 @@ const BotChatLogTracking = ({ tracking }) => {
       />
       <TrackingLine
         label={CHAT_LOG_TRACKING_LABEL_IP}
-        value={formatChatLogTrackingValue(tracking?.ip_address)}
+        value={formatChatLogTrackingValue(tracking?.ip)}
       />
       <TrackingLine
         label={CHAT_LOG_TRACKING_LABEL_BROWSER}
@@ -107,66 +151,106 @@ BotChatLogTracking.propTypes = {
   tracking: PropTypes.object,
 };
 
-const NextButton = ({ label }) => (
-  <div className="sp-user-message-button-action">
-    <button type="button" disabled className="ss-user-message__action-btn chat-log-action-btn">
+const ReadOnlyNextButton = ({ label, messageType }) => (
+  <div className={CHAT_LOG_NEXT_ACTION_CLASS}>
+    <CustomButton
+      disabled
+      className={CHAT_LOG_NEXT_BUTTON_CLASS}
+      onClick={ignoreChatLogInput}
+      messageType={messageType}
+    >
       {label || CHAT_LOG_NEXT_BUTTON}
-    </button>
+    </CustomButton>
   </div>
 );
 
-NextButton.propTypes = {
+ReadOnlyNextButton.propTypes = {
   label: PropTypes.string,
+  messageType: PropTypes.string,
 };
 
 const UserBubble = ({
   messageItem,
   indexMessage,
+  contents,
   captcha,
   dataMessages,
-  setDataMessages,
-  indexMessageRender,
-  dataPrefectures,
+  prefecturesList,
   variables,
-  contents,
-}) => (
-  <div className="sp-body-user-side slideLeft">
-    <div className="sp-body-user-side-messages position-relative">
-      <UserMessage
-        captcha={captcha}
-        messageContentProps={contents}
-        disabled
-        onChangeValue={() => {}}
-        indexMessageRender={indexMessageRender}
-        indexMessage={indexMessage}
-        displayButtonNext={(value) => {
-          setDataMessages((prev) => prev.map((msg, idx) => (
-            idx === indexMessage
-              ? { ...msg, is_display_button_next: value }
-              : msg
-          )));
-        }}
-        dataPrefectures={[...dataPrefectures]}
-        variables={variables}
-      />
-      {isNextVisible(messageItem, indexMessage, dataMessages) && (
-        <NextButton label={messageItem.buttonName} />
-      )}
-      <UserMessageTailIcon fillColor={CHAT_LOG_USER_TAIL_COLOR} showTail />
+  themeSettings,
+  botInfor,
+}) => {
+  if (!contents || contents.length === 0) return null;
+
+  const userMessage = buildUserMessage(messageItem, contents);
+  const userMessageTheme = resolveUserMessageTheme(themeSettings, botInfor);
+
+  return (
+    <div className={CHAT_LOG_USER_BUBBLE_CLASS}>
+      <div className={CHAT_LOG_USER_MESSAGES_CLASS}>
+        <UserMessage
+          message={userMessage}
+          messageContentProps={contents}
+          disabled
+          onChangeValue={ignoreChatLogInput}
+          onClickNext={ignoreChatLogInput}
+          onRenderCompleted={ignoreChatLogInput}
+          onChangeErrors={ignoreChatLogInput}
+          onOpen={ignoreChatLogInput}
+          messageIndex={indexMessage}
+          captcha={captcha}
+          prefecturesList={prefecturesList}
+          variables={variables}
+          footer={isNextVisible(messageItem, indexMessage, dataMessages) ? (
+            <ReadOnlyNextButton
+              label={messageItem.buttonName}
+              messageType={messageItem.message_content?.[0]?.type}
+            />
+          ) : null}
+        />
+        <UserMessageTailIcon
+          fillColor={userMessageTheme.bgColor}
+          showTail={userMessageTheme.showTail}
+        />
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 UserBubble.propTypes = {
   messageItem: PropTypes.object.isRequired,
   indexMessage: PropTypes.number.isRequired,
+  contents: PropTypes.array,
   captcha: PropTypes.array,
   dataMessages: PropTypes.array,
-  setDataMessages: PropTypes.func.isRequired,
-  indexMessageRender: PropTypes.number,
-  dataPrefectures: PropTypes.array,
+  prefecturesList: PropTypes.array,
   variables: PropTypes.array,
-  contents: PropTypes.array,
+  themeSettings: PropTypes.object,
+  botInfor: PropTypes.object,
+};
+
+const ReadOnlyBotMessage = ({ content, contentIndex, messageId, botInfor, themeSettings, variables }) => (
+  <BotMessage
+    messageId={messageId}
+    content={ensureOriginalContent(content)}
+    contentIndex={contentIndex}
+    botInfor={botInfor}
+    themeSettings={themeSettings}
+    variables={variables}
+    skipEntryDelay
+    isBotOpen={false}
+    hidden={false}
+    onRenderCompleted={ignoreChatLogInput}
+  />
+);
+
+ReadOnlyBotMessage.propTypes = {
+  content: PropTypes.object,
+  contentIndex: PropTypes.number.isRequired,
+  messageId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  botInfor: PropTypes.object,
+  themeSettings: PropTypes.object,
+  variables: PropTypes.array,
 };
 
 const BotChatLogTranscript = ({
@@ -174,94 +258,145 @@ const BotChatLogTranscript = ({
   botInfor,
   captcha,
   dataMessages,
-  setDataMessages,
-  indexMessageRender,
   dataPrefectures,
   variables,
   tracking,
+  designSettings,
 }) => {
-  const headerIconSrc = buildHeaderIconSrc(botInfor);
-  const subtitle = botInfor?.subtitle || '';
-  const title = botInfor?.title || botInfor?.titleBubble || '';
+  const [prefecturesList, setPrefecturesList] = useState(dataPrefectures);
+  const rawDesign = readRawDesign(designSettings);
+  const parsedDesign = parseDesignSettings(rawDesign);
+  const themeSettings = parsedDesign.themeSettings;
+  const frameState = {
+    botInfor,
+    widthPc: readFramePixels(rawDesign.width_pc, CHAT_LOG_FRAME_WIDTH_FALLBACK),
+    heightPc: readFramePixels(rawDesign.height_pc, CHAT_LOG_FRAME_HEIGHT_FALLBACK),
+  };
+  const opening = getOpeningBotStyle(frameState, {
+    embedded: true,
+    editorPreview: true,
+    mobile: false,
+  });
+  const frameClassName = `${opening.frameClassName} ${CHAT_LOG_FRAME_EXTRA_CLASS}`;
+  const cssVars = {
+    ...opening.cssVars,
+    ...getDesignTypeChromeVars(botInfor?.design_type),
+  };
   const bubbleProps = {
     captcha,
     dataMessages,
-    setDataMessages,
-    indexMessageRender,
-    dataPrefectures,
+    prefecturesList,
     variables,
+    themeSettings,
+    botInfor,
   };
+
+  useEffect(() => {
+    if (dataPrefectures.length > 0) {
+      setPrefecturesList(dataPrefectures);
+      return undefined;
+    }
+
+    const active = { current: true };
+    getPrefectures()
+      .then((res) => {
+        if (!active.current) return;
+        setPrefecturesList(res?.data?.data || []);
+      })
+      .catch(() => {
+        if (!active.current) return;
+        setPrefecturesList([]);
+      });
+
+    return () => {
+      active.current = false;
+    };
+  }, [dataPrefectures]);
+
+  useEffect(() => {
+    if (!botInfor) return undefined;
+
+    const raw = readRawDesign(designSettings);
+    const parsed = parseDesignSettings(raw);
+    const { apiColorKey, mainColorHex } = resolveMainColorContext(botInfor);
+    const savedTheme = parseThemeFromDesignSettings(raw);
+    const style = document.createElement('style');
+    style.innerHTML = generateScopedThemeCss(
+      parsed.themeSettings,
+      mainColorHex,
+      apiColorKey,
+      CHAT_LOG_THEME_SCOPE,
+      botInfor.design_type,
+      { applyChatWindowBg: hasExplicitThemeValue(savedTheme, 'chatWindowBgColor') },
+    );
+    document.head.appendChild(style);
+
+    return () => {
+      style.remove();
+    };
+  }, [botInfor, designSettings]);
 
   return (
     <>
       <BotChatLogTracking tracking={tracking} />
       <div className="chat-log-preview">
-        <div
-          id="sp-container1"
-          className="sp-container1 preview-open-frame preview-open-frame--embedded preview-open-frame--editor preview-open-frame--no-exit-popup chat-log-open-frame"
-          style={buildFrameStyle(botInfor)}
+        <PreviewOpenChatFrame
+          frameClassName={frameClassName}
+          cssVars={cssVars}
+          headerIconSrc={getBotHeaderIconUrl(botInfor, CHAT_LOG_FRAME_IS_OPEN) || ''}
+          subtitle={botInfor?.subtitle || ''}
+          titleBubble={botInfor?.title || botInfor?.titleBubble || ''}
+          isOpen={CHAT_LOG_FRAME_IS_OPEN}
+          designType={botInfor?.design_type}
+          showPopupCloseBot={false}
         >
-          <div id="sp-header" className="sp-header preview-open-frame__header">
-            <div className="sp-header-left">
-              <div className="sp-body-bot-side-avatar sp-avatar-bt">
-                {headerIconSrc ? (
-                  <img src={headerIconSrc} alt={CHAT_LOG_HEADER_ICON_ALT} />
-                ) : null}
-              </div>
-              <div className="sp-header-left-label">
-                <div className="sp-header-left-label-sub-title">{subtitle}</div>
-                <div className="sp-header-left-label-title">{title}</div>
-              </div>
-            </div>
-            <div className="sp-header-right">
-              <div className="sp-header-right-arrow">
-                <DownCircleOutlined />
-              </div>
-            </div>
-          </div>
-          <div id="sp-body" className="sp-body preview-open-frame__body">
-            {messages.map((messageItem, indexMessage) => (
-              <React.Fragment key={messageItem.id ?? indexMessage}>
-                {messageItem.belong_to === CHAT_LOG_BELONG_BOT &&
-                  messageItem.message_content?.map((content, index) => (
-                    <BotMessage
-                      key={content.id ?? index}
-                      content={content}
-                      index={index}
-                      botInfor={botInfor}
-                    />
-                  ))}
-                {messageItem.belong_to === CHAT_LOG_BELONG_USER && (
-                  <UserBubble
-                    messageItem={messageItem}
-                    indexMessage={indexMessage}
-                    contents={messageItem.message_content}
-                    {...bubbleProps}
+          {messages.map((messageItem, indexMessage) => (
+            <React.Fragment key={messageItem.id ?? indexMessage}>
+              {messageItem.belong_to === CHAT_LOG_BELONG_BOT &&
+                messageItem.message_content?.map((content, contentIndex) => (
+                  <ReadOnlyBotMessage
+                    key={content.id ?? contentIndex}
+                    content={content}
+                    contentIndex={contentIndex}
+                    messageId={messageItem.id}
+                    botInfor={botInfor}
+                    themeSettings={themeSettings}
+                    variables={variables}
                   />
-                )}
-                {messageItem.belong_to === CHAT_LOG_BELONG_COMBINE &&
-                  messageItem.message_content?.map((content, index) => (
-                    content.role === CHAT_LOG_COMBINE_ROLE_BOT ? (
-                      <BotMessage
-                        key={content.id ?? index}
-                        content={content}
-                        index={index}
-                        botInfor={botInfor}
-                      />
-                    ) : (
-                      <UserBubble
-                        key={content.id ?? index}
-                        messageItem={messageItem}
-                        indexMessage={indexMessage}
-                        contents={[content]}
-                        {...bubbleProps}
-                      />
-                    )
-                  ))}
-              </React.Fragment>
-            ))}
-          </div>
-        </div>
+                ))}
+              {messageItem.belong_to === CHAT_LOG_BELONG_USER && (
+                <UserBubble
+                  messageItem={messageItem}
+                  indexMessage={indexMessage}
+                  contents={messageItem.message_content}
+                  {...bubbleProps}
+                />
+              )}
+              {messageItem.belong_to === CHAT_LOG_BELONG_COMBINE &&
+                messageItem.message_content?.map((content, contentIndex) => (
+                  content.role === CHAT_LOG_COMBINE_ROLE_BOT ? (
+                    <ReadOnlyBotMessage
+                      key={content.id ?? contentIndex}
+                      content={content}
+                      contentIndex={contentIndex}
+                      messageId={messageItem.id}
+                      botInfor={botInfor}
+                      themeSettings={themeSettings}
+                      variables={variables}
+                    />
+                  ) : (
+                    <UserBubble
+                      key={content.id ?? contentIndex}
+                      messageItem={messageItem}
+                      indexMessage={indexMessage}
+                      contents={[content]}
+                      {...bubbleProps}
+                    />
+                  )
+                ))}
+            </React.Fragment>
+          ))}
+        </PreviewOpenChatFrame>
       </div>
     </>
   );
@@ -272,11 +407,10 @@ BotChatLogTranscript.propTypes = {
   botInfor: PropTypes.object,
   captcha: PropTypes.array,
   dataMessages: PropTypes.array,
-  setDataMessages: PropTypes.func.isRequired,
-  indexMessageRender: PropTypes.number,
   dataPrefectures: PropTypes.array,
   variables: PropTypes.array,
   tracking: PropTypes.object,
+  designSettings: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
 };
 
 BotChatLogTranscript.defaultProps = {
@@ -286,6 +420,7 @@ BotChatLogTranscript.defaultProps = {
   dataPrefectures: [],
   variables: [],
   tracking: null,
+  designSettings: null,
 };
 
 export default BotChatLogTranscript;
