@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useHistory, useParams } from 'react-router-dom';
 import { DatePicker, Empty, Select, Space, Tabs, Typography, message } from 'antd';
 import api from 'v2/api/api-management';
 import Cookies from 'js-cookie';
@@ -7,14 +8,14 @@ import 'v2/views/Report/styles/bot-chat-log.css';
 import 'v2/assets/css/bot/report.css';
 import 'v2/views/Report/styles/chat-log.css';
 import $ from 'jquery';
-import BotMessage from './BotMessage';
-import UserMessage from './UserMessage';
+import BotChatLogTranscript from './BotChatLogTranscript';
 import { findLastIndex } from 'lodash';
 import moment from 'moment';
 import jwt_decode from 'jwt-decode';
 import BotChatStatistic from './BotChatStatistic';
 import { AdminPage, AdminActionButton } from 'v2/components/AdminShell';
-import { getSignInPath } from 'v2/variables/constants';
+import { ADMIN_PATHS } from 'v2/components/AdminShell/constants';
+import { getAdminRoutePath, getSignInPath } from 'v2/variables/constants';
 import {
   CHAT_LOG_DATE_FORMAT,
   CHAT_LOG_DATE_PICKER_FORMAT,
@@ -22,8 +23,8 @@ import {
   CHAT_LOG_LIST_PATH,
   CHAT_LOG_LOAD_ERROR,
   CHAT_LOG_CAPTCHA_ERROR,
-  CHAT_LOG_NEXT_BUTTON,
   CHAT_LOG_PASSWORD_MASK,
+  buildChatLogDetailPath,
   CHAT_LOG_SCENARIO_LABEL,
   CHAT_LOG_SCENARIO_PLACEHOLDER,
   CHAT_LOG_SELECT_CONVERSATION,
@@ -72,11 +73,16 @@ const normalizeConversationEntry = (conversation) => {
 
 const BotChatLog = () => {
   const botId = Cookies.get("bot_id");
+  const history = useHistory();
+  const { scenarioId, userInputId } = useParams();
+  const decodedUserInputId = userInputId ? decodeURIComponent(userInputId) : '';
+  const selectedFromUrlRef = useRef('');
   const [scenarios, setScenarios] = useState([]);
   const [chats, setChats] = useState([]);
   const [, setConversions] = useState([]);
   const [selectScenario, setSelectScenario] = useState(null);
   const [selectUserId, setSelectUserId] = useState(null);
+  const [tracking, setTracking] = useState(null);
   const [selectTab, setSelectTab] = useState(CHAT_LOG_TAB_LOGS);
 
   const [searchScenarioId, setSearchScenarioId] = useState(null);
@@ -162,6 +168,11 @@ const BotChatLog = () => {
     setRenderMessageArr([]);
     setRenderMessageStatisticArr([]);
     setSelectUserId(null);
+    setTracking(null);
+    selectedFromUrlRef.current = '';
+    if (scenarioId) {
+      history.push(getAdminRoutePath(ADMIN_PATHS.BOT_CHAT_LOG));
+    }
 
     searchLog(params)
     getScenarioStatistic({...params, bot_id: botId});
@@ -202,8 +213,15 @@ const BotChatLog = () => {
   });
 
   const onSelectChat = (item) => {
+    const detailPath = buildChatLogDetailPath(item.scenario_id, item.user_input_id);
+    const sameConversation = String(scenarioId) === String(item.scenario_id)
+      && decodedUserInputId === String(item.user_input_id);
+    if (!sameConversation) {
+      history.push(detailPath);
+    }
     setSelectUserId(item.user_input_id);
-    const sc = scenarios.find((s) => s.id === item.scenario_id);
+    setTracking(null);
+    const sc = scenarios.find((s) => String(s.id) === String(item.scenario_id));
     if (!sc) return;
     const conversations = [...JSON.parse(sc.conversation).messages].sort(
       (a, b) => a.id - b.id
@@ -213,6 +231,28 @@ const BotChatLog = () => {
 
     getMessageData(item)
   }
+
+  useEffect(() => {
+    if (!scenarioId || !decodedUserInputId) {
+      selectedFromUrlRef.current = '';
+      return undefined;
+    }
+    if (scenarios.length === 0) return undefined;
+    const key = `${scenarioId}/${decodedUserInputId}`;
+    if (selectedFromUrlRef.current === key) return undefined;
+    const scenario = scenarios.find((sc) => String(sc.id) === String(scenarioId));
+    if (!scenario) return undefined;
+    selectedFromUrlRef.current = key;
+    const item = chats.find(
+      (chat) => String(chat.scenario_id) === String(scenarioId)
+        && chat.user_input_id === decodedUserInputId
+    ) || {
+      scenario_id: Number(scenarioId),
+      user_input_id: decodedUserInputId,
+    };
+    onSelectChat(item);
+    return undefined;
+  }, [scenarioId, decodedUserInputId, scenarios, chats]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const getScenarioMessages = (botId, scenario_id, conversion = [], options = {}) => {
     const messageArr = [];
@@ -828,6 +868,7 @@ const BotChatLog = () => {
         if (response.data.code === 1) {
           const conversations = response.data.conversations.map(normalizeConversationEntry);
           setConversions(conversations);
+          setTracking(response.data.tracking || null);
 
           getScenarioMessages(botId, item.scenario_id, conversations, { saveMsgRender: true });
         }
@@ -923,77 +964,25 @@ const BotChatLog = () => {
         </div>
       </div>
 
-      <div className="chat-log-preview">
-        {selectScenario ? (
-          <div id="csp-body" className="sp-body csp-body chat-area">
-            {renderMessageArr.map((messageItem, indexMessage) => (
-              <React.Fragment key={messageItem.id ?? indexMessage}>
-                {messageItem.belong_to === "bot" &&
-                  messageItem?.message_content.map((content, index) => (
-                    <BotMessage
-                      key={content.id ?? index}
-                      content={content}
-                      index={index}
-                      botInfor={botInfor}
-                    />
-                  ))}
-                {messageItem.belong_to === "user" && (
-                  <div className="sp-body-user-side csp-body-user-side slideLeft chat-log-user-side">
-                    <p className="chat-log-user-message-time">
-                      {messageItem.message_content[0].updated_at
-                        ? format(
-                            new Date(messageItem.message_content[0].updated_at),
-                            CHAT_LOG_DISPLAY_DATE_FORMAT,
-                          )
-                        : ""}
-                    </p>
-                    <div className="sp-body-user-side-messages csp-body-user-side-messages">
-                      <UserMessage
-                        captcha={captcha}
-                        messageContentProps={messageItem.message_content}
-                        disabled={messageItem.disabled}
-                        onChangeValue={() => {}}
-                        indexMessageRender={indexMessageRender}
-                        indexMessage={indexMessage}
-                        displayButtonNext={(value) => {
-                          setDataMessages((prev) => prev.map((msg, idx) => (
-                            idx === indexMessage
-                              ? { ...msg, is_display_button_next: value }
-                              : msg
-                          )));
-                        }}
-                        dataPrefectures={[...dataPrefectures]}
-                        variables={variables}
-                      />
-                      {(dataMessages[indexMessage]?.is_display_button_next !==
-                      undefined
-                        ? dataMessages[indexMessage].is_display_button_next
-                        : true) && (
-                        <div className="sp-user-message-button-action">
-                          <button
-                            type="button"
-                            disabled
-                            className="chat-log-action-btn"
-                            style={{
-                              '--chat-log-action-bg': botInfor?.main_color,
-                            }}
-                          >
-                            {messageItem.buttonName || CHAT_LOG_NEXT_BUTTON}
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </React.Fragment>
-            ))}
-          </div>
-        ) : (
+      {selectScenario ? (
+        <BotChatLogTranscript
+          messages={renderMessageArr}
+          botInfor={botInfor}
+          captcha={captcha}
+          dataMessages={dataMessages}
+          setDataMessages={setDataMessages}
+          indexMessageRender={indexMessageRender}
+          dataPrefectures={dataPrefectures}
+          variables={variables}
+          tracking={tracking}
+        />
+      ) : (
+        <div className="chat-log-preview">
           <div className="chat-log-preview-empty">
             <Empty description={CHAT_LOG_SELECT_CONVERSATION} />
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 

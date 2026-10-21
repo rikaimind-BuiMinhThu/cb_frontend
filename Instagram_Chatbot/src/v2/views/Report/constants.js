@@ -4,6 +4,8 @@ import {
   ROLE_ADMIN_DEEL,
   USER_ROLE_COOKIE_KEY,
 } from 'v2/api/constants';
+import { ADMIN_PATHS } from 'v2/components/AdminShell/constants';
+import { getAdminRoutePath } from 'v2/variables/constants';
 
 export {
   API_SUCCESS_CODE,
@@ -286,6 +288,48 @@ export const CHAT_LOG_LOAD_ERROR = '会話ログの取得に失敗しました';
 export const CHAT_LOG_CAPTCHA_ERROR = 'キャプチャの取得に失敗しました';
 export const CHAT_LOG_LIST_PATH = '/api/v1/managements/chat_log';
 export const CHAT_LOG_STATISTIC_PATH = '/api/v1/managements/chat_log/statistic';
+export const CHAT_LOG_TRACKING_EMPTY = '—';
+export const CHAT_LOG_DEVICE_PC = 'pc';
+export const CHAT_LOG_DEVICE_SMARTPHONE = 'smartphone';
+export const CHAT_LOG_DEVICE_TABLET = 'tablet';
+export const CHAT_LOG_DEVICE_LABEL_PC = 'PC';
+export const CHAT_LOG_DEVICE_LABEL_SP = 'SP';
+export const CHAT_LOG_DEVICE_LABEL_TABLET = 'タブレット';
+export const CHAT_LOG_TRACKING_LABEL_DEVICE_CLASS = 'SP/PC';
+export const CHAT_LOG_TRACKING_LABEL_USER_AGENT = 'デバイス情報';
+export const CHAT_LOG_TRACKING_LABEL_IP = 'IP';
+export const CHAT_LOG_TRACKING_LABEL_BROWSER = 'ブラウザ';
+export const CHAT_LOG_TRACKING_LABEL_REGION = '地域';
+export const CHAT_LOG_TRACKING_LABEL_REFERER = '参照元';
+export const CHAT_LOG_TRACKING_LABEL_PAGE = 'ページ';
+export const CHAT_LOG_HEADER_ICON_ALT = 'bot-header-icon';
+export const CHAT_LOG_BELONG_BOT = 'bot';
+export const CHAT_LOG_BELONG_USER = 'user';
+export const CHAT_LOG_BELONG_COMBINE = 'combine';
+export const CHAT_LOG_COMBINE_ROLE_BOT = 'bot';
+export const CHAT_LOG_BUTTON_SUBMIT_TYPE = 'button_submit';
+export const CHAT_LOG_REGION_SEPARATOR = ' / ';
+export const CHAT_LOG_USER_TAIL_COLOR = '#ffffff';
+
+export const buildChatLogDetailPath = (scenarioId, userInputId) =>
+  `${getAdminRoutePath(ADMIN_PATHS.BOT_CHAT_LOG)}/${scenarioId}/${encodeURIComponent(userInputId)}`;
+
+export const formatChatLogDeviceLabel = (device) => {
+  if (device === CHAT_LOG_DEVICE_PC) return CHAT_LOG_DEVICE_LABEL_PC;
+  if (device === CHAT_LOG_DEVICE_SMARTPHONE) return CHAT_LOG_DEVICE_LABEL_SP;
+  if (device === CHAT_LOG_DEVICE_TABLET) return CHAT_LOG_DEVICE_LABEL_TABLET;
+  if (device) return device;
+  return CHAT_LOG_TRACKING_EMPTY;
+};
+
+export const formatChatLogRegion = (country, city) => {
+  if (country && city) return `${country}${CHAT_LOG_REGION_SEPARATOR}${city}`;
+  if (country) return country;
+  if (city) return city;
+  return CHAT_LOG_TRACKING_EMPTY;
+};
+
+export const formatChatLogTrackingValue = (value) => value || CHAT_LOG_TRACKING_EMPTY;
 
 export const formatChatLogConversationHeader = (count) =>
   `${CHAT_LOG_CONVERSATION_PREFIX}${count}${CHAT_LOG_CONVERSATION_SUFFIX}`;

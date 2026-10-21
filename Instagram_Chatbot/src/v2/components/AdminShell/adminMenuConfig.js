@@ -464,6 +464,7 @@ export const getPageTitle = (pathname) => {
   if (pathname.includes(`/${PUSH_MESSAGE_SEGMENT}`)) return TITLE_PUSH_MESSAGE;
   if (pathname.includes(ADMIN_PATHS.DEMO_BOT)) return TITLE_BOT_DEMO;
   if (pathname.includes(`${ADMIN_PATHS.BOT_ORDERS}/`)) return TITLE_BOT_ORDER_DETAIL;
+  if (pathname.includes(`${ADMIN_PATHS.BOT_CHAT_LOG}/`)) return MENU_LABELS.BOT_CHAT_LOG;
   if (pathname.includes(ADMIN_PATHS.EDIT_EMAIL)) return TITLE_EDIT_EMAIL;
   return DEFAULT_PAGE_TITLE;
 };

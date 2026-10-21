@@ -43,6 +43,7 @@ import {
   sleep,
   changeElementAttributeById,
   userEntryScenario,
+  postVisitorTracking,
   isDislayingLoginForm,
   getElementMessageById,
   sendOpenChatbotCountRequest,
@@ -171,7 +172,7 @@ const PreviewFukushashiki = () => {
   }, [state.isOpen, state.tagFiring, state.scenarioId, state.scenarioName]);
 
   usePreviewConversionOnOpen({ state, dispatch });
-  usePreviewIpParams({ state, dispatch });
+  usePreviewIpParams({ state, dispatch, reportTracking: true });
   usePreviewDesignSettings({
     state,
     dispatch,
@@ -493,6 +494,9 @@ const PreviewFukushashiki = () => {
   };
 
   const onOpenPreview = (opening) => {
+    if (opening) {
+      postVisitorTracking(state);
+    }
     const deviceReceive = state.deviceReceive || params.get("deviceReceive");
     if (!deviceReceive) return;
 

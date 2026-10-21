@@ -403,10 +403,17 @@ const routes = [
     layout: '/v2/admin',
   },
   {
-    path: '/bot-chat-log',
-    name: '会話',
+    path: '/bot-chat-log/:scenarioId/:userInputId',
+    name: MENU_LABELS.BOT_CHAT_LOG,
     component: BotChatLog,
     layout: '/v2/admin',
+  },
+  {
+    path: '/bot-chat-log',
+    name: MENU_LABELS.BOT_CHAT_LOG,
+    component: BotChatLog,
+    layout: '/v2/admin',
+    exact: true,
   },
   {
     path: '/bot-orders/:id',

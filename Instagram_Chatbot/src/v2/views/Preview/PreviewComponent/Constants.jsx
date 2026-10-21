@@ -90,6 +90,7 @@ const CHATBOT_SERVER = {
   UPDATE_STATUS_CONVERSION_USER_RESPONSE: '/api/v1/scenario_users/scenario_user_responses_status',
   CREATE_USER_SCENARIO_RESPONSE_MESSAGE_HISTORY: '/api/v1/scenario_users/scenario_user_responses_message',
   USER_ENTRY_SCENARIO: '/api/v1/scenario_users/entry',
+  USER_TRACKING_SCENARIO: '/api/v1/scenario_users/tracking',
   GET_ADDRESS_FROM_ZIP_CODE_PATH: '/api/v1/get_address_from_zip_code?zip_code=:zip_code',
   ZEUS_CONFIG_PATH: '/api/v1/scenario_users/scenario_user_responses/zeus_config',
   TOKEN_FAILURES_PATH: '/api/v1/scenario_users/scenario_user_responses/token_failures',

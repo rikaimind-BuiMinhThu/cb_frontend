@@ -8,6 +8,7 @@ import { getBotOrder, getBotOrderScreenshot } from './api';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { AdminActionButton, AdminPage } from 'v2/components/AdminShell';
 import { ADMIN_PATHS } from 'v2/components/AdminShell/constants';
+import { buildChatLogDetailPath } from 'v2/views/Report/constants';
 import { getAdminRoutePath } from 'v2/variables/constants';
 import {
   cleanErrorMessage,
@@ -110,7 +111,9 @@ const BotOrderDetail = () => {
   const screenshotObjectUrlRef = useRef('');
   const listPath = getAdminRoutePath(ADMIN_PATHS.BOT_ORDERS);
   const scenarioListPath = getAdminRoutePath(ADMIN_PATHS.SCENARIO_LIST);
-  const chatLogPath = getAdminRoutePath(ADMIN_PATHS.BOT_CHAT_LOG);
+  const chatLogPath = row?.scenario_id && row?.user_input_id
+    ? buildChatLogDetailPath(row.scenario_id, row.user_input_id)
+    : getAdminRoutePath(ADMIN_PATHS.BOT_CHAT_LOG);
 
   useEffect(() => {
     setLoading(true);

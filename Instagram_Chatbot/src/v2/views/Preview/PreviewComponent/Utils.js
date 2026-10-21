@@ -280,6 +280,26 @@ const userEntryScenario = (data) => {
   );
 }
 
+const sendVisitorTracking = (data) => {
+  return postToChatBotServer(
+    CHATBOT_SERVER.USER_TRACKING_SCENARIO,
+    data,
+  );
+}
+
+const postVisitorTracking = (state, extra = {}) => {
+  if (!state?.scenarioId || !state?.uuid) return undefined;
+
+  return sendVisitorTracking({
+    scenario_id: state.scenarioId,
+    user_id: state.uuid,
+    device: state.deviceReceive || '',
+    page_url: state.urlReceive || '',
+    referer: document.referrer || '',
+    ...extra,
+  }).catch(() => undefined);
+}
+
 const getCaptcha = (size, color, charPreset) => {
   const url = GET_CAPTCHA_PATH.replace(":size", size)
     .replace(":color", color)
@@ -657,7 +677,7 @@ export {
   changeElementAttributeById, toCamelCase, sendConvertTextJapaneseRequest,
   scrollToPosition, removeSpace, getColor, processMessagesForErrorState, hideMessageOnError, createTempDelay,
   patchWithDrawalPreview, sendScenarioUserResponse, createStatusConversion, updateStatusConversion, parseQuantity,
-  createScenarioUserResponseMessageHistory, userEntryScenario, isAndroid, isButtonSubmitMessage,
+  createScenarioUserResponseMessageHistory, userEntryScenario, postVisitorTracking, isAndroid, isButtonSubmitMessage,
   sendErrorLogToServer, sendLogMessageToServer,
   moveToNext, getNextUserMsg,
   sendOpenChatbotCountRequest, sendCloseChatbotCountRequest, sendAppearLogToServer,
