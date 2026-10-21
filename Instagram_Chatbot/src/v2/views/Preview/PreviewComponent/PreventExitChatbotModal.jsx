@@ -15,6 +15,8 @@ import {
 } from "./previewWithdrawalUtils";
 
 const PreventExitChatbotModal = ({ isOpen, onClose, onCloseBot, botConfig }) => {
+  if (!isOpen || !botConfig) return null;
+
   const modalClassName = isMobile() ? "ss-bot-prevent-exit-chatbot-modal-sp" : "ss-bot-prevent-exit-chatbot-modal-pc";
   const {widthSp, heightSp, widthPc, heightPc, bottomMarginPc, rightMarginPc, botInfor} = botConfig;
   const modalCssVars = {
@@ -23,8 +25,6 @@ const PreventExitChatbotModal = ({ isOpen, onClose, onCloseBot, botConfig }) => 
     '--prevent-exit-bottom': isMobile() ? `0px` : `${bottomMarginPc || 0}px`,
     '--prevent-exit-right': isMobile() ? `0px` : `${rightMarginPc || 30}px`,
   };
-
-  if (!isOpen) return null;
 
   const isPopUpDisPlayed = isWithdrawalPreventionEnabled(botInfor?.withdrawal_prevention_status)
   if (!isPopUpDisPlayed) return null;

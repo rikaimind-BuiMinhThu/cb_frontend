@@ -43,8 +43,6 @@ import {
 
 const SCAN_REGEX = /\{\{(.*?)\}\}/g;
 const CHAT_LOG_CACHE_BUSTER_PARAM = '_';
-const CHAT_LOG_ERROR_ATTR = 'data-chat-log-error';
-const CHAT_LOG_ERROR_ATTR_LIMIT = 1500;
 const CHAT_LOG_JSON_INPUT_NAMES = ['data_name', 'zip_code_address', 'birth_date'];
 
 const freshChatLogConfig = (params = {}) => ({
@@ -54,16 +52,7 @@ const freshChatLogConfig = (params = {}) => ({
   },
 });
 
-const rememberChatLogError = (error) => {
-  const detail = error?.stack || error?.message || '';
-  if (!detail || typeof document === 'undefined') return;
-  const existing = document.documentElement.getAttribute(CHAT_LOG_ERROR_ATTR) || '';
-  const next = existing ? `${existing}\n${detail}` : detail;
-  document.documentElement.setAttribute(CHAT_LOG_ERROR_ATTR, next.slice(0, CHAT_LOG_ERROR_ATTR_LIMIT));
-};
-
 const reportChatLogLoadError = (error) => {
-  rememberChatLogError(error);
   if (!error?.isAxiosError) return;
   message.error(CHAT_LOG_LOAD_ERROR);
 };
@@ -82,10 +71,6 @@ class ChatLogErrorBoundary extends React.Component {
 
   static getDerivedStateFromError() {
     return { failed: true };
-  }
-
-  componentDidCatch(error) {
-    rememberChatLogError(error);
   }
 
   render() {
