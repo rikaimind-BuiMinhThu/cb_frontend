@@ -20,6 +20,10 @@ const BUSY_COPY = 'ただいま混み合っています。順番に処理しま�
 const ACCEPT_COPY = 'ご注文を受け付けました。処理完了後、確認メールをお送りします。';
 const DONE_COPY = 'ご注文が完了しました。確認メールをご確認ください。';
 const FAIL_COPY = 'ご注文を完了できませんでした。入力内容をご確認いただくか、ショップまでお問い合わせください。';
+const PAYMENT_METHOD_INPUT = 'payment_method';
+const CREDIT_PAYMENT_VALUES = ['credit_card', 'credit', 'zeus'];
+const CREDIT_LABEL_MARK = 'クレジット';
+const ZEUS_LABEL_MARK = 'zeus';
 
 const maskPan = (number) => {
   const digits = String(number || '').replace(/\D/g, '');
@@ -72,16 +76,42 @@ export const findCardFromMessage = (message) => {
   return credit?.credit_card_payment || null;
 }
 
+const isCreditPaymentValue = (value) => {
+  const selection = String(value || '');
+  if (selection === '') return false;
+  if (CREDIT_PAYMENT_VALUES.includes(selection)) return true;
+  if (selection.includes(CREDIT_LABEL_MARK)) return true;
+  if (selection.toLowerCase().includes(ZEUS_LABEL_MARK)) return true;
+  return false;
+};
+
+const paymentRadio = (content) => {
+  const radio = content?.radio_button;
+  if (!radio) return null;
+  if (String(radio.save_input_content || '') !== PAYMENT_METHOD_INPUT) return null;
+  return radio;
+};
+
+const findPaymentMethod = (messages) => {
+  const list = messages || [];
+  const message = list.find((item) => (item?.message_content || []).some(paymentRadio));
+  if (!message) return '';
+  const content = (message.message_content || []).find(paymentRadio);
+  return String(content?.radio_button?.initial_selection || '');
+};
+
 export const isCreditSelection = (card) => {
   if (!card) return false;
   const selection = String(card.initial_selection || card.initial_selection_picture || '');
-  if (['credit_card', 'credit', 'zeus'].includes(selection)) return true;
-  if (selection.includes('クレジット') || selection.toLowerCase().includes('zeus')) return true;
+  if (isCreditPaymentValue(selection)) return true;
   if (card.card_number || card.card_number1 || card.cvc) return true;
   return false;
 }
 
 export const findCreditCardMessage = (messages) => {
+  const payment = findPaymentMethod(messages);
+  if (payment !== '' && !isCreditPaymentValue(payment)) return null;
+
   const list = messages || [];
   const found = list.find((message) => {
     const card = findCardFromMessage(message);
