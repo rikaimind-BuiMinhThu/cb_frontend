@@ -338,15 +338,9 @@ export const resolveButtonBounceEffect = (effectId) => {
 };
 
 export const resolveButtonWidthCss = (widthValue) => {
-  if (widthValue === 0 || widthValue === '0') return 'auto';
-  if (typeof widthValue === 'number' && Number.isFinite(widthValue)) {
-    return `${widthValue}%`;
-  }
   if (!widthValue || typeof widthValue !== 'string') return 'auto';
   const trimmed = widthValue.trim();
-  if (!trimmed) return 'auto';
-  if (/^\d+(\.\d+)?$/.test(trimmed)) return `${trimmed}%`;
-  return trimmed;
+  return trimmed || 'auto';
 };
 
 export const resolveButtonPaddingCss = (paddingValue) => {

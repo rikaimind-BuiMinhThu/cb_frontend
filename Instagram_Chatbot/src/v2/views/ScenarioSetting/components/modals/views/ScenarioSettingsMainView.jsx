@@ -14,6 +14,7 @@ import { createEmptyAutoLogoutConfig } from 'v2/views/ScenarioSetting/utils/auto
 import { applyAmazonPayCartPreset } from 'v2/views/ScenarioSetting/utils/amazonPayConfigUtils';
 import { fillTagFiringDefaults } from 'v2/views/ScenarioSetting/utils/tagFiringUtils';
 import { TAG_FIRING_LABELS } from '../../../constants/tagFiringLabels';
+import { CART_SYSTEM } from 'v2/views/Preview/PreviewComponent/Constants';
 import {
   EXECUTION_POLICIES,
   EXECUTION_POLICY_OPTIONS,
@@ -55,17 +56,7 @@ const ScenarioSettingsMainView = ({ onClose }) => {
     tagFiring,
     useFullwidthChatbotMobile,
     isShopifyPaymentScenario,
-    orderResultMode,
-    lexicaCartUrl,
-    lexicaUpsellProductUrl,
-    lexicaUpsellSku,
-    lexicaCrossSellProductUrl,
-    lexicaCrossSellSku,
-    lexicaOfferChat,
-    lexicaOfferConfirmUpsell,
-    lexicaOfferConfirmCrossSell,
-    lexicaOfferThanksUpsell,
-    lexicaOfferThanksCrossSell,
+    lexica,
   } = state;
   const {
     setUrlThanks,
@@ -101,23 +92,14 @@ const ScenarioSettingsMainView = ({ onClose }) => {
     setTagFiring,
     setUseFullwidthChatbotMobile,
     navigateSettingsModalView,
-    setOrderResultMode,
-    setLexicaCartUrl,
-    setLexicaUpsellProductUrl,
-    setLexicaUpsellSku,
-    setLexicaCrossSellProductUrl,
-    setLexicaCrossSellSku,
-    setLexicaOfferChat,
-    setLexicaOfferConfirmUpsell,
-    setLexicaOfferConfirmCrossSell,
-    setLexicaOfferThanksUpsell,
-    setLexicaOfferThanksCrossSell,
+    setLexicaField,
   } = actions;
 
   const client = contextClient
     || JSON.parse(sessionStorage.getItem('client') || 'null')
     || JSON.parse(localStorage.getItem('client') || 'null');
-  const isLexicaCart = client?.cart_system === 'lexica' || clientCartSystem === 'lexica';
+  const isLexicaCart = client?.cart_system === CART_SYSTEM.LEXICA
+    || clientCartSystem === CART_SYSTEM.LEXICA;
   const isApiPolicy = executionPolicy === EXECUTION_POLICIES.API;
   const isFukushashikiPolicy = executionPolicy === EXECUTION_POLICIES.FUKUSHASHIKI;
 
@@ -224,8 +206,8 @@ const ScenarioSettingsMainView = ({ onClose }) => {
               <ScenarioFormRow label="注文確定後の表示">
                 <select
                   className="ss-input-value"
-                  value={orderResultMode}
-                  onChange={(e) => setOrderResultMode(e.target.value)}
+                  value={lexica.orderResultMode}
+                  onChange={(event) => setLexicaField('orderResultMode', event.target.value)}
                 >
                   <option value="wait">待ち（完了まで表示）</option>
                   <option value="async">受付（裏で処理）</option>
@@ -241,66 +223,66 @@ const ScenarioSettingsMainView = ({ onClose }) => {
               <ScenarioFormRow label="カートURL">
                 <InputCustom
                   style={{ width: '100%' }}
-                  value={lexicaCartUrl}
-                  onChange={(value) => setLexicaCartUrl(value)}
+                  value={lexica.lexicaCartUrl}
+                  onChange={(value) => setLexicaField('lexicaCartUrl', value)}
                   placeholder="https://cart.example.com"
                 />
               </ScenarioFormRow>
               <ScenarioFormRow label="アップセル 商品URL">
                 <InputCustom
                   style={{ width: '100%' }}
-                  value={lexicaUpsellProductUrl}
-                  onChange={(value) => setLexicaUpsellProductUrl(value)}
+                  value={lexica.lexicaUpsellProductUrl}
+                  onChange={(value) => setLexicaField('lexicaUpsellProductUrl', value)}
                   data-testid="lexica-upsell-url"
                 />
               </ScenarioFormRow>
               <ScenarioFormRow label="アップセル 商品コード">
                 <InputCustom
                   style={{ width: '100%' }}
-                  value={lexicaUpsellSku}
-                  onChange={(value) => setLexicaUpsellSku(value)}
+                  value={lexica.lexicaUpsellSku}
+                  onChange={(value) => setLexicaField('lexicaUpsellSku', value)}
                   data-testid="lexica-upsell-sku"
                 />
               </ScenarioFormRow>
               <ScenarioFormRow label="クロスセル 商品URL">
                 <InputCustom
                   style={{ width: '100%' }}
-                  value={lexicaCrossSellProductUrl}
-                  onChange={(value) => setLexicaCrossSellProductUrl(value)}
+                  value={lexica.lexicaCrossSellProductUrl}
+                  onChange={(value) => setLexicaField('lexicaCrossSellProductUrl', value)}
                   data-testid="lexica-cross-sell-url"
                 />
               </ScenarioFormRow>
               <ScenarioFormRow label="クロスセル 商品コード">
                 <InputCustom
                   style={{ width: '100%' }}
-                  value={lexicaCrossSellSku}
-                  onChange={(value) => setLexicaCrossSellSku(value)}
+                  value={lexica.lexicaCrossSellSku}
+                  onChange={(value) => setLexicaField('lexicaCrossSellSku', value)}
                   data-testid="lexica-cross-sell-sku"
                 />
               </ScenarioFormRow>
               <ScenarioModalCheckbox
-                checked={lexicaOfferChat}
-                onChange={setLexicaOfferChat}
+                checked={lexica.lexicaOfferChat}
+                onChange={(checked) => setLexicaField('lexicaOfferChat', checked)}
                 label="チャットで聞く"
               />
               <ScenarioModalCheckbox
-                checked={lexicaOfferConfirmUpsell}
-                onChange={setLexicaOfferConfirmUpsell}
+                checked={lexica.lexicaOfferConfirmUpsell}
+                onChange={(checked) => setLexicaField('lexicaOfferConfirmUpsell', checked)}
                 label="確認画面でアップセル"
               />
               <ScenarioModalCheckbox
-                checked={lexicaOfferConfirmCrossSell}
-                onChange={setLexicaOfferConfirmCrossSell}
+                checked={lexica.lexicaOfferConfirmCrossSell}
+                onChange={(checked) => setLexicaField('lexicaOfferConfirmCrossSell', checked)}
                 label="確認画面でクロスセル（第1版はオフ）"
               />
               <ScenarioModalCheckbox
-                checked={lexicaOfferThanksUpsell}
-                onChange={setLexicaOfferThanksUpsell}
+                checked={lexica.lexicaOfferThanksUpsell}
+                onChange={(checked) => setLexicaField('lexicaOfferThanksUpsell', checked)}
                 label="サンクスでアップセル"
               />
               <ScenarioModalCheckbox
-                checked={lexicaOfferThanksCrossSell}
-                onChange={setLexicaOfferThanksCrossSell}
+                checked={lexica.lexicaOfferThanksCrossSell}
+                onChange={(checked) => setLexicaField('lexicaOfferThanksCrossSell', checked)}
                 label="サンクスでクロスセル"
               />
             </>

@@ -19,6 +19,7 @@ import { mapAmazonPayDataToMessagesListForRoseMay } from 'v2/views/Preview/Previ
 import { mapAmazonPayDataToMessagesListForPhystech } from 'v2/views/Preview/PreviewComponent/PhysTechUtils';
 import { mapAmazonPayDataToMessagesListForYuwaeru, isYuwaeruLP } from 'v2/views/Preview/PreviewComponent/YuwaeruUtils';
 import { mapAmazonPayDataBySelector } from 'v2/views/Preview/PreviewComponent/AmazonPayGenericUtils';
+import { DEFAULT_EXECUTION_POLICY } from 'v2/variables/constants';
 import {
   RENDER_CHATBOT_CONFIG,
   GETTING_ERROR_NOTIFICATION,
@@ -477,6 +478,7 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
         scenarioName: action.payload.responseData?.data?.name || state.scenarioName || "",
         cartSystem: state.cartSystem || chatbot?.client_cart_system || "",
         orderResultMode: chatbot?.order_result_mode || state.orderResultMode || "wait",
+        executionPolicy: chatbot?.execution_policy || state.executionPolicy || DEFAULT_EXECUTION_POLICY,
         merchandiseId: action.payload.responseData?.data?.merchandise_id || "",
         isUsedCrosssell: !!action.payload.responseData?.data?.is_used_crosssell,
         productIdCrossSell:

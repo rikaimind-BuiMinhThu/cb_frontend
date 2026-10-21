@@ -21,13 +21,13 @@ const ACCEPT_COPY = 'ご注文を受け付けました。処理完了後、確�
 const DONE_COPY = 'ご注文が完了しました。確認メールをご確認ください。';
 const FAIL_COPY = 'ご注文を完了できませんでした。入力内容をご確認いただくか、ショップまでお問い合わせください。';
 
-function maskPan(number) {
+const maskPan = (number) => {
   const digits = String(number || '').replace(/\D/g, '');
   if (digits.length < 4) return '';
   return `************${digits.slice(-4)}`;
 }
 
-function loadScript(src) {
+const loadScript = (src) => {
   return new Promise((resolve, reject) => {
     const existing = document.querySelector(`script[src="${src}"]`);
     if (existing) {
@@ -43,7 +43,7 @@ function loadScript(src) {
   });
 }
 
-export function extractCardFields(card) {
+export const extractCardFields = (card) => {
   const parts = [
     card?.card_number1,
     card?.card_number2,
@@ -64,7 +64,7 @@ export function extractCardFields(card) {
   };
 }
 
-export function findCardFromMessage(message) {
+export const findCardFromMessage = (message) => {
   const contents = message?.message_content || [];
   const radio = contents.find((item) => item.type === 'card_payment_radio_button');
   if (radio?.card_payment_radio_button) return radio.card_payment_radio_button;
@@ -72,7 +72,7 @@ export function findCardFromMessage(message) {
   return credit?.credit_card_payment || null;
 }
 
-export function isCreditSelection(card) {
+export const isCreditSelection = (card) => {
   if (!card) return false;
   const selection = String(card.initial_selection || card.initial_selection_picture || '');
   if (['credit_card', 'credit', 'zeus'].includes(selection)) return true;
@@ -96,7 +96,7 @@ export const findCreditCardPayload = (messages) => {
   return findCardFromMessage(message);
 };
 
-export function findPathFromMessages(messages) {
+export const findPathFromMessages = (messages) => {
   for (const message of messages || []) {
     for (const content of message?.message_content || []) {
       const radio = content.radio_button;
@@ -110,7 +110,7 @@ export function findPathFromMessages(messages) {
   return null;
 }
 
-export function stripCardSecrets(card, token) {
+export const stripCardSecrets = (card, token) => {
   if (!card) return;
   card.token_key = token.token_key;
   card.masked_pan = token.masked_pan;
@@ -124,7 +124,7 @@ export function stripCardSecrets(card, token) {
   card.cvc = '';
 }
 
-export async function fetchZeusConfig(scenarioId) {
+export const fetchZeusConfig = async (scenarioId) => {
   const res = await api.get(`${CHATBOT_SERVER.ZEUS_CONFIG_PATH}?scenario_id=${encodeURIComponent(scenarioId)}`);
   if (res?.data?.code !== 1) {
     throw new Error(res?.data?.message || 'zeus not configured');
@@ -261,7 +261,7 @@ export const tokenizeZeusCard = async ({ tokenJsUrl, clientIp, ipcode, cardNumbe
   }
 };
 
-export async function reportTokenFailure({ scenarioId, userId, path, maskedPan, message }) {
+export const reportTokenFailure = async ({ scenarioId, userId, path, maskedPan, message }) => {
   return api.post(CHATBOT_SERVER.TOKEN_FAILURES_PATH, {
     scenario_id: scenarioId,
     user_id: userId,
@@ -271,7 +271,7 @@ export async function reportTokenFailure({ scenarioId, userId, path, maskedPan, 
   });
 }
 
-export async function prepareLexicaCreditToken({ scenarioId, userId, messages }) {
+export const prepareLexicaCreditToken = async ({ scenarioId, userId, messages }) => {
   const card = findCreditCardPayload(messages);
   if (!card || !isCreditSelection(card)) return { ok: true, card: null };
 
@@ -298,7 +298,7 @@ export async function prepareLexicaCreditToken({ scenarioId, userId, messages })
   }
 }
 
-export async function createLexicaOrder({ scenarioId, userId }) {
+export const createLexicaOrder = async ({ scenarioId, userId }) => {
   const res = await sendCreateOrderData({
     scenario_id: scenarioId,
     user_id: userId,
@@ -320,9 +320,9 @@ const isLexicaOrderInProgress = (data) => {
   return !data.result;
 };
 
-export async function pollLexicaOrder({ scenarioId, userId, onBusy }) {
+export const pollLexicaOrder = async ({ scenarioId, userId, onBusy }) => {
   const started = Date.now();
-  let lastInProgress = false;
+  const progress = { lastInProgress: false };
   while (Date.now() - started < POLL_TIMEOUT_MS) {
     const res = await api.get(
       `${CHATBOT_SERVER.SELENIUM_RESULTS_PATH}?scenario_id=${encodeURIComponent(scenarioId)}&user_id=${encodeURIComponent(userId)}`
@@ -334,17 +334,17 @@ export async function pollLexicaOrder({ scenarioId, userId, onBusy }) {
     if (data.result === RESULT_DONE) return { ok: true, copy: DONE_COPY };
     if (data.result === RESULT_ERROR) return { ok: false, copy: FAIL_COPY };
     if (isLexicaOrderInProgress(data)) {
-      lastInProgress = true;
+      progress.lastInProgress = true;
       await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
       continue;
     }
     await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
   }
-  if (lastInProgress) return { ok: true, copy: BUSY_COPY };
+  if (progress.lastInProgress) return { ok: true, copy: BUSY_COPY };
   return { ok: false, copy: FAIL_COPY };
 }
 
-export async function followLexicaOrder({ scenarioId, userId, orderResultMode, onStatus }) {
+export const followLexicaOrder = async ({ scenarioId, userId, orderResultMode, onStatus }) => {
   const queued = await createLexicaOrder({ scenarioId, userId });
   const mode = orderResultMode || queued?.order_result_mode || 'wait';
   if (mode === 'async') {

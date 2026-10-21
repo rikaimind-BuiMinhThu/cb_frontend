@@ -4,6 +4,18 @@ export const AGENCY_ZEUS = 'zeus';
 export const MODE_TEST = 'test';
 export const MODE_PRODUCTION = 'production';
 export const MODE_API_PRODUCT = 'product';
+
+export const toApiGatewayMode = (mode) => (
+  mode === MODE_PRODUCTION ? MODE_API_PRODUCT : mode
+);
+
+export const toFormGatewayMode = (mode) => (
+  mode === MODE_API_PRODUCT ? MODE_PRODUCTION : (mode || MODE_TEST)
+);
+
+export const isProductionGatewayMode = (mode) => (
+  mode === MODE_PRODUCTION || mode === MODE_API_PRODUCT
+);
 export const GATEWAYS_API_PATH = '/api/v1/payment_managements/payment_gateways';
 export const PAYMENT_GATEWAY_LIST_PATH = '/payment-gateway';
 export const API_WARNING_CODE = 2;

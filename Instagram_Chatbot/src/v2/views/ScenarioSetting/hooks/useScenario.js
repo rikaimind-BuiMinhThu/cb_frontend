@@ -39,6 +39,7 @@ import {
 } from 'v2/views/ScenarioSetting/utils/amazonPayConfigUtils';
 import { DEFAULT_EXECUTION_POLICY } from 'v2/variables/constants';
 import { DEFAULT_TAG_FIRING } from 'v2/variables/tagFiringConstants';
+import { useLexicaScenario } from './useLexicaScenario';
 
 const INITIAL_TIMER_CONFIG = {
   isOpen: false,
@@ -60,17 +61,7 @@ export const useScenario = (mode = 'scenario') => {
   const [urlThanks, setUrlThanks] = useState('');
   const [merchandiseId, setMerchandiseId] = useState('');
   const [lpProductUrl, setLpProductUrl] = useState('');
-  const [orderResultMode, setOrderResultMode] = useState('wait');
-  const [lexicaCartUrl, setLexicaCartUrl] = useState('');
-  const [lexicaUpsellProductUrl, setLexicaUpsellProductUrl] = useState('');
-  const [lexicaUpsellSku, setLexicaUpsellSku] = useState('');
-  const [lexicaCrossSellProductUrl, setLexicaCrossSellProductUrl] = useState('');
-  const [lexicaCrossSellSku, setLexicaCrossSellSku] = useState('');
-  const [lexicaOfferChat, setLexicaOfferChat] = useState(true);
-  const [lexicaOfferConfirmUpsell, setLexicaOfferConfirmUpsell] = useState(true);
-  const [lexicaOfferConfirmCrossSell, setLexicaOfferConfirmCrossSell] = useState(false);
-  const [lexicaOfferThanksUpsell, setLexicaOfferThanksUpsell] = useState(true);
-  const [lexicaOfferThanksCrossSell, setLexicaOfferThanksCrossSell] = useState(true);
+  const { lexica, setLexicaField, applyLexica } = useLexicaScenario();
   const [coupon, setCoupon] = useState('');
   const [isUseOnlyRegularOrder, setIsUseOnlyRegularOrder] = useState(false);
   const [executionPolicy, setExecutionPolicy] = useState(DEFAULT_EXECUTION_POLICY);
@@ -216,17 +207,7 @@ export const useScenario = (mode = 'scenario') => {
     setUrlCartConfirmPage(parsed.urlCartConfirmPage);
     setCoupon(parsed.coupon);
     setLpProductUrl(parsed.lpProductUrl);
-    setOrderResultMode(parsed.orderResultMode || 'wait');
-    setLexicaCartUrl(parsed.lexicaCartUrl || '');
-    setLexicaUpsellProductUrl(parsed.lexicaUpsellProductUrl || '');
-    setLexicaUpsellSku(parsed.lexicaUpsellSku || '');
-    setLexicaCrossSellProductUrl(parsed.lexicaCrossSellProductUrl || '');
-    setLexicaCrossSellSku(parsed.lexicaCrossSellSku || '');
-    setLexicaOfferChat(parsed.lexicaOfferChat !== false);
-    setLexicaOfferConfirmUpsell(parsed.lexicaOfferConfirmUpsell !== false);
-    setLexicaOfferConfirmCrossSell(parsed.lexicaOfferConfirmCrossSell === true);
-    setLexicaOfferThanksUpsell(parsed.lexicaOfferThanksUpsell !== false);
-    setLexicaOfferThanksCrossSell(parsed.lexicaOfferThanksCrossSell !== false);
+    applyLexica(parsed);
     setIsUseOnlyRegularOrder(parsed.isUseOnlyRegularOrder);
     setExecutionPolicy(parsed.executionPolicy || DEFAULT_EXECUTION_POLICY);
     setIsUseFukushashiki(parsed.isUseFukushashiki);
@@ -268,7 +249,7 @@ export const useScenario = (mode = 'scenario') => {
     setAmazonPayDetectionForm(amazonDetectionToForm(parsedDetection));
     setIsUseAmazonPay(parsed.isUseAmazonPay || false);
     setTagFiring(parsed.tagFiring || DEFAULT_TAG_FIRING);
-  }, []);
+  }, [applyLexica]);
 
   const getConversationUrl = useCallback(() => {
     if (isTemplateMode) {
@@ -392,17 +373,7 @@ export const useScenario = (mode = 'scenario') => {
     scenarioType,
     merchandiseId,
     lpProductUrl,
-    orderResultMode,
-    lexicaCartUrl,
-    lexicaUpsellProductUrl,
-    lexicaUpsellSku,
-    lexicaCrossSellProductUrl,
-    lexicaCrossSellSku,
-    lexicaOfferChat,
-    lexicaOfferConfirmUpsell,
-    lexicaOfferConfirmCrossSell,
-    lexicaOfferThanksUpsell,
-    lexicaOfferThanksCrossSell,
+    lexica,
     isUseOnlyRegularOrder,
     executionPolicy,
     isUseFukushashiki,
@@ -483,17 +454,7 @@ export const useScenario = (mode = 'scenario') => {
     isUsedMessageLoadedPast,
     lpProductUrl,
     merchandiseId,
-    orderResultMode,
-    lexicaCartUrl,
-    lexicaUpsellProductUrl,
-    lexicaUpsellSku,
-    lexicaCrossSellProductUrl,
-    lexicaCrossSellSku,
-    lexicaOfferChat,
-    lexicaOfferConfirmUpsell,
-    lexicaOfferConfirmCrossSell,
-    lexicaOfferThanksUpsell,
-    lexicaOfferThanksCrossSell,
+    lexica,
     productIdCrossSell,
     scenarioName,
     scenarioType,
@@ -622,17 +583,7 @@ export const useScenario = (mode = 'scenario') => {
       urlThanks,
       merchandiseId,
       lpProductUrl,
-      orderResultMode,
-      lexicaCartUrl,
-      lexicaUpsellProductUrl,
-      lexicaUpsellSku,
-      lexicaCrossSellProductUrl,
-      lexicaCrossSellSku,
-      lexicaOfferChat,
-      lexicaOfferConfirmUpsell,
-      lexicaOfferConfirmCrossSell,
-      lexicaOfferThanksUpsell,
-      lexicaOfferThanksCrossSell,
+      lexica,
       coupon,
       isUseOnlyRegularOrder,
       executionPolicy,
@@ -729,17 +680,7 @@ export const useScenario = (mode = 'scenario') => {
       setUrlThanks,
       setMerchandiseId,
       setLpProductUrl,
-      setOrderResultMode,
-      setLexicaCartUrl,
-      setLexicaUpsellProductUrl,
-      setLexicaUpsellSku,
-      setLexicaCrossSellProductUrl,
-      setLexicaCrossSellSku,
-      setLexicaOfferChat,
-      setLexicaOfferConfirmUpsell,
-      setLexicaOfferConfirmCrossSell,
-      setLexicaOfferThanksUpsell,
-      setLexicaOfferThanksCrossSell,
+      setLexicaField,
       setCoupon,
       setIsUseOnlyRegularOrder,
       setExecutionPolicy,

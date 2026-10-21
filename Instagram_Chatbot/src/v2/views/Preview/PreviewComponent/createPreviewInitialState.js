@@ -6,6 +6,7 @@ import {
   OPEN_ANIMATION_STYLE_DEFAULT,
 } from "v2/views/DesignSetting/constants/designChatbotConstants";
 import { DEFAULT_TAG_FIRING } from "v2/variables/tagFiringConstants";
+import { DEFAULT_EXECUTION_POLICY } from "v2/variables/constants";
 import { RENDER_MODES } from "./Constants";
 import { getAllUrlParams } from "./Utils";
 
@@ -110,6 +111,7 @@ const fukushashikiExtras = (params) => ({
   cartSystem: params.get("cartSystem") || "",
   isUseBtnUpdateTracking: false,
   orderResultMode: "wait",
+  executionPolicy: DEFAULT_EXECUTION_POLICY,
 });
 
 /**

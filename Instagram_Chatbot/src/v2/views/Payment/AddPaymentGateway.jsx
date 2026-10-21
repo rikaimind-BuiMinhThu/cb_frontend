@@ -31,8 +31,9 @@ import {
   LABEL_TOKEN_JS_URL,
   MAX_25,
   MAX_50,
-  MODE_API_PRODUCT,
   MODE_PRODUCTION,
+  toApiGatewayMode,
+  toFormGatewayMode,
   MODE_PRODUCTION_LABEL,
   MODE_TEST,
   MODE_TEST_LABEL,
@@ -62,7 +63,7 @@ import {
 import 'v2/views/Payment/styles/payment-gateway-form.css';
 
 const buildPayload = (values) => {
-  const mode = values.mode === MODE_PRODUCTION ? MODE_API_PRODUCT : values.mode;
+  const mode = toApiGatewayMode(values.mode);
   const base = {
     gateway_name: values.gateway_name.trim(),
     payment_agency: values.payment_agency,
@@ -142,7 +143,7 @@ const AddPaymentGateway = () => {
           form.setFieldsValue({
             gateway_name: data.gateway_name,
             payment_agency: data.payment_agency || AGENCY_GMO,
-            mode: data.mode === MODE_API_PRODUCT ? MODE_PRODUCTION : (data.mode || MODE_TEST),
+            mode: toFormGatewayMode(data.mode),
             shop_id: data.shop_id || '',
             shop_pass: '',
             merchant_code: data.merchant_code || '',

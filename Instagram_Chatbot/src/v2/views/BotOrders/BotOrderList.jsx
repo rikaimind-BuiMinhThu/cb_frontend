@@ -3,8 +3,8 @@ import { DatePicker, Select, Tag } from 'antd';
 import { useHistory } from 'react-router-dom';
 import locale from 'antd/es/date-picker/locale/ja_JP';
 import Cookies from 'js-cookie';
-import api from 'v2/api/api-management';
 import { API_SUCCESS_CODE, BOT_ID_COOKIE_KEY } from 'v2/api/constants';
+import { listBotOrders } from './api';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { AdminPage, AdminTable } from 'v2/components/AdminShell';
 import { ADMIN_PATHS } from 'v2/components/AdminShell/constants';
@@ -34,7 +34,6 @@ import {
   DATE_PARAM_FORMAT,
   FILTER_PATH_PLACEHOLDER,
   FILTER_STATUS_PLACEHOLDER,
-  ORDERS_API_PATH,
   PAGE_SIZE,
   PATH_OPTIONS,
   RESULT_OPTIONS,
@@ -62,8 +61,7 @@ const BotOrderList = () => {
     if (path) params.path = path;
     if (range?.[0]) params.start_date = range[0].format(DATE_PARAM_FORMAT);
     if (range?.[1]) params.end_date = range[1].format(DATE_PARAM_FORMAT);
-    api
-      .get(ORDERS_API_PATH, { params })
+    listBotOrders(params)
       .then((res) => {
         if (res.data.code === API_SUCCESS_CODE) {
           setRows(res.data.data || []);

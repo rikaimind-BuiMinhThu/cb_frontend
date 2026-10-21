@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { Button, Descriptions, Modal, Spin, Table, Tag, Typography } from 'antd';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import api from 'v2/api/api-management';
 import { API_SUCCESS_CODE, BOT_ID_COOKIE_KEY } from 'v2/api/constants';
+import { getBotOrder, getBotOrderScreenshot } from './api';
 import { tokenExpired } from 'v2/api/tokenExpired';
 import { AdminActionButton, AdminPage } from 'v2/components/AdminShell';
 import { ADMIN_PATHS } from 'v2/components/AdminShell/constants';
@@ -55,7 +55,6 @@ import {
   LABEL_SKU,
   LABEL_START,
   LABEL_STATUS,
-  ORDERS_API_PATH,
   RPA_COL_ACTION,
   RPA_COL_ERROR,
   RPA_COL_INDEX,
@@ -115,8 +114,7 @@ const BotOrderDetail = () => {
 
   useEffect(() => {
     setLoading(true);
-    api
-      .get(`${ORDERS_API_PATH}/${id}`, { params: { chatbot_id: botId } })
+    getBotOrder(botId, id)
       .then((res) => {
         if (res.data.code === API_SUCCESS_CODE) {
           setRow(res.data.data);
@@ -138,11 +136,7 @@ const BotOrderDetail = () => {
 
   useEffect(() => {
     if (!row?.id || !row.has_screenshot) return undefined;
-    api
-      .get(`${ORDERS_API_PATH}/${row.id}/screenshot`, {
-        params: { chatbot_id: botId },
-        responseType: 'blob',
-      })
+    getBotOrderScreenshot(botId, row.id)
       .then((res) => {
         screenshotObjectUrlRef.current = URL.createObjectURL(res.data);
         setScreenshotUrl(screenshotObjectUrlRef.current);

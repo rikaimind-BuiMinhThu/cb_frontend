@@ -26,9 +26,9 @@ import {
   PROCESSING_LABEL,
 } from "v2/views/Preview/PreviewComponent/Constants";
 import { injectBotThemeCss } from "v2/utils/chatbotThemeCss";
+import { DEFAULT_EXECUTION_POLICY, EXECUTION_POLICIES } from "v2/variables/constants";
 import { resolveMainColorCss, resolveUserMessageTheme } from "v2/utils/designThemeCore";
 import UserMessageTailIcon from "v2/components/BotMessages/UserMessageTailIcon";
-import { COLOR_MAP } from "v2/views/DesignSetting/constants/designChatbotConstants";
 import {
   getPrefectures,
   getScenarioPreviewData,
@@ -702,6 +702,7 @@ const ScenarioPreviewFukushashiki = ({
       isOpen: (embedded || editorPreview) ? true : ((designSetting?.display_type && Number(designSetting?.display_type) === 1) || state.isOpen),
       ...mapRawDesignSettingsFromExtract(designSetting),
       isUsedErrMsgByJs: chatbot?.is_used_err_msg_by_js,
+      executionPolicy: chatbot?.execution_policy || DEFAULT_EXECUTION_POLICY,
       errMsgJsCode: chatbot?.err_msg_js_code,
       errMsgSettingMode: chatbot?.err_msg_setting_mode || 'js',
       errMsgFieldSelectors: chatbot?.err_msg_field_selectors || '',
@@ -1138,7 +1139,8 @@ const ScenarioPreviewFukushashiki = ({
   );
 
   const renderSubmitErrorMessages = () => {
-    if (!state.isUsedErrMsgByJs || !state.submitErrorMessage) return null;
+    const isRpaStatus = state.executionPolicy === EXECUTION_POLICIES.RPA && state.submitErrorMessage;
+    if (!isRpaStatus && (!state.isUsedErrMsgByJs || !state.submitErrorMessage)) return null;
 
     const className = state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "ss-bot-getting-error-notification" : "ss-bot-submit-error-message";
     const text = state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? PROCESSING_LABEL : state.submitErrorMessage;

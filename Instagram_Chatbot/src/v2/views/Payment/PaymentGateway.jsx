@@ -41,9 +41,8 @@ import {
   LABEL_GATEWAY_NAME,
   LABEL_MODE,
   MERCHANT_CODE_PREFIX,
-  MODE_API_PRODUCT,
-  MODE_PRODUCTION,
   MODE_PRODUCTION_LABEL,
+  isProductionGatewayMode,
   MODE_TEST,
   MODE_TEST_LABEL,
   PAGE_SIZE,
@@ -66,7 +65,7 @@ const formatMode = (mode) => {
   if (mode === MODE_TEST) {
     return MODE_TEST_LABEL;
   }
-  if (mode === MODE_PRODUCTION || mode === MODE_API_PRODUCT) {
+  if (isProductionGatewayMode(mode)) {
     return MODE_PRODUCTION_LABEL;
   }
   return mode || DASH;
@@ -182,7 +181,7 @@ const PaymentGateway = () => {
         dataIndex: 'mode',
         width: COL_MODE_WIDTH,
         render: (mode) => (
-          <Tag color={mode === MODE_PRODUCTION ? 'green' : 'default'}>{formatMode(mode)}</Tag>
+          <Tag color={isProductionGatewayMode(mode) ? 'green' : 'default'}>{formatMode(mode)}</Tag>
         ),
       },
       {

@@ -14,6 +14,7 @@ import {
 } from './clientFormHelpers';
 import {
   ASCII_AT,
+  CART_SYSTEM_LEXICA,
   CART_SYSTEM_SHOPIFY,
   DATE_SLICE_LENGTH,
   EMAIL_FORMAT,
@@ -164,6 +165,12 @@ export const validateUpdateClient = (values, context) => {
   return { valid: Object.keys(fieldErrors).length === 0, fieldErrors };
 };
 
+const lexicaMaxChromePayload = (values) => {
+  if (values.cart_system !== CART_SYSTEM_LEXICA) return null;
+  if (values.lexica_max_chrome === '' || values.lexica_max_chrome == null) return null;
+  return Number(values.lexica_max_chrome);
+};
+
 export const buildClientPayload = (values, context) => {
   const payload = {
     plan: values.plan,
@@ -191,9 +198,7 @@ export const buildClientPayload = (values, context) => {
     phone_number: values.phone_number,
     reply_smtp_gmail: (values.reply_smtp_gmail || '').trim().replace(new RegExp(FULLWIDTH_AT, 'g'), ASCII_AT),
     cart_system: values.cart_system,
-    lexica_max_chrome: values.cart_system === 'lexica' && values.lexica_max_chrome !== '' && values.lexica_max_chrome != null
-      ? Number(values.lexica_max_chrome)
-      : null,
+    lexica_max_chrome: lexicaMaxChromePayload(values),
     status: context.contract,
     subscription_start_at: formatDateValue(context.startDate),
     subscription_end_at: formatDateValue(context.endDate),

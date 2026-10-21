@@ -57,10 +57,12 @@ import {
   USER_ROLE_CLIENT,
 } from './constants';
 
+export const enableBotOrdersMenu = (client) => client?.cart_system === CART_SYSTEM_LEXICA;
+
 export const getBotMenuItems = (botId, client) => {
   const smsPath = p(getBotSmsTemplatePath(botId));
   const pushPath = p(getBotPushMessagePath(botId));
-  const isLexica = client?.cart_system === CART_SYSTEM_LEXICA;
+  const showBotOrders = enableBotOrdersMenu(client);
 
   return [
     {
@@ -144,7 +146,7 @@ export const getBotMenuItems = (botId, client) => {
           path: p(ADMIN_PATHS.BOT_CHAT_LOG),
           icon: <CommentOutlined />,
         },
-        ...(isLexica
+        ...(showBotOrders
           ? [{
               key: p(ADMIN_PATHS.BOT_ORDERS),
               label: MENU_LABELS.BOT_ORDERS,

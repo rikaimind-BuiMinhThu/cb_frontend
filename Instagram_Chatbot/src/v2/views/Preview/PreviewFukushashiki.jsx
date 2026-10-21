@@ -30,6 +30,7 @@ import {
   OK_BUTTON_LABEL,
 } from "./PreviewComponent/Constants";
 import { OPEN_ANIMATION_DURATION_MS_DEFAULT } from "v2/views/DesignSetting/constants/designChatbotConstants";
+import { DEFAULT_EXECUTION_POLICY, EXECUTION_POLICIES } from "v2/variables/constants";
 import {
   clampOpenAnimationDurationMs,
   parseDesignSettings,
@@ -54,12 +55,7 @@ import {
   createScenarioUserResponseMessageHistory,
   sendErrorLogToServer,
 } from "./PreviewComponent/Utils";
-import {
-  findCreditCardMessage,
-  followLexicaOrder,
-  LEXICA_COPY,
-  prepareLexicaCreditToken,
-} from "./PreviewFukushashiki/zeusToken";
+import { runLexicaButtonSubmit } from "./PreviewFukushashiki/lexicaSubmit";
 import {
   getChatbotSavedState,
   savedChatbotState,
@@ -595,6 +591,7 @@ const PreviewFukushashiki = () => {
       isUsedHtmlUgc: !!chatbot?.is_used_html_ugc,
       htmlUgcConfigContent: chatbot?.html_ugc_config_content,
       orderResultMode: chatbot?.order_result_mode || "wait",
+      executionPolicy: chatbot?.execution_policy || DEFAULT_EXECUTION_POLICY,
     };
 
     if (chatbot?.timer_config?.enable) {
@@ -767,45 +764,24 @@ const PreviewFukushashiki = () => {
     };
 
     if (isLexica && isClickedButtonSubmit) {
-      if (lexicaSubmitLockRef.current || state.isProcessing) return;
-      lexicaSubmitLockRef.current = true;
-      dispatch({ type: PREVIEW_ACTIONS.SET_PROCESSING, payload: true });
-      (async () => {
-        const messages = lexicaMessagesRef.current;
-        const tokenResult = await prepareLexicaCreditToken({
-          scenarioId: state.scenarioId,
-          userId: state.uuid,
-          messages,
-        });
-        if (!tokenResult.ok) {
-          dispatch({
-            type: PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE,
-            payload: tokenResult.copy || LEXICA_COPY.TOKEN_FAIL_COPY,
-          });
-          return;
-        }
-        const cardMessage = findCreditCardMessage(messages);
-        if (cardMessage) {
-          await sendLogMessageToServer({
-            ...data,
-            message: cardMessage,
-          }, CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
-        }
-        continueAfterOptionalToken();
-        await followLexicaOrder({
-          scenarioId: state.scenarioId,
-          userId: state.uuid,
-          orderResultMode: state.orderResultMode,
-          onStatus: (copy) => {
-            dispatch({
-              type: PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE,
-              payload: copy,
-            });
-          },
-        });
-      })().finally(() => {
-        lexicaSubmitLockRef.current = false;
-        dispatch({ type: PREVIEW_ACTIONS.SET_PROCESSING, payload: false });
+      runLexicaButtonSubmit({
+        isLocked: lexicaSubmitLockRef.current || state.isProcessing,
+        lock: () => { lexicaSubmitLockRef.current = true; },
+        unlock: () => { lexicaSubmitLockRef.current = false; },
+        setProcessing: (value) => dispatch({
+          type: PREVIEW_ACTIONS.SET_PROCESSING,
+          payload: value,
+        }),
+        messages: lexicaMessagesRef.current,
+        scenarioId: state.scenarioId,
+        userId: state.uuid,
+        orderResultMode: state.orderResultMode,
+        logData: data,
+        continueAfterOptionalToken,
+        setSubmitError: (copy) => dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE,
+          payload: copy,
+        }),
       });
       return;
     }
@@ -1065,8 +1041,8 @@ const PreviewFukushashiki = () => {
   );
 
   const renderSubmitErrorMessages = () => {
-    const isLexicaStatus = state.cartSystem === CART_SYSTEM.LEXICA && state.submitErrorMessage;
-    if (!isLexicaStatus && (!state.isUsedErrMsgByJs || !state.submitErrorMessage)) return null;
+    const isRpaStatus = state.executionPolicy === EXECUTION_POLICIES.RPA && state.submitErrorMessage;
+    if (!isRpaStatus && (!state.isUsedErrMsgByJs || !state.submitErrorMessage)) return null;
 
     const className = state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "ss-bot-getting-error-notification" : "ss-bot-submit-error-message";
     const text = state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "処理中..." : state.submitErrorMessage;
