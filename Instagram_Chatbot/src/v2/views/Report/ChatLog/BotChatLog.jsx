@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import PropTypes from 'prop-types';
 import { useHistory, useParams } from 'react-router-dom';
 import { DatePicker, Empty, Select, Space, Tabs, Typography, message } from 'antd';
 import api from 'v2/api/api-management';
@@ -42,7 +43,8 @@ import {
 
 const SCAN_REGEX = /\{\{(.*?)\}\}/g;
 const CHAT_LOG_CACHE_BUSTER_PARAM = '_';
-const CHAT_LOG_NO_CACHE = 'no-cache';
+const CHAT_LOG_ERROR_ATTR = 'data-chat-log-error';
+const CHAT_LOG_ERROR_ATTR_LIMIT = 1500;
 const CHAT_LOG_JSON_INPUT_NAMES = ['data_name', 'zip_code_address', 'birth_date'];
 
 const freshChatLogConfig = (params = {}) => ({
@@ -50,11 +52,51 @@ const freshChatLogConfig = (params = {}) => ({
     ...params,
     [CHAT_LOG_CACHE_BUSTER_PARAM]: Date.now(),
   },
-  headers: {
-    'Cache-Control': CHAT_LOG_NO_CACHE,
-    Pragma: CHAT_LOG_NO_CACHE,
-  },
 });
+
+const rememberChatLogError = (error) => {
+  const detail = error?.stack || error?.message || '';
+  if (!detail || typeof document === 'undefined') return;
+  const existing = document.documentElement.getAttribute(CHAT_LOG_ERROR_ATTR) || '';
+  const next = existing ? `${existing}\n${detail}` : detail;
+  document.documentElement.setAttribute(CHAT_LOG_ERROR_ATTR, next.slice(0, CHAT_LOG_ERROR_ATTR_LIMIT));
+};
+
+const reportChatLogLoadError = (error) => {
+  rememberChatLogError(error);
+  if (!error?.isAxiosError) return;
+  message.error(CHAT_LOG_LOAD_ERROR);
+};
+
+const formatChatListTime = (value) => {
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return '';
+  return format(parsed, CHAT_LOG_DISPLAY_DATE_FORMAT);
+};
+
+class ChatLogErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { failed: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  componentDidCatch(error) {
+    rememberChatLogError(error);
+  }
+
+  render() {
+    if (this.state.failed) return null;
+    return this.props.children;
+  }
+}
+
+ChatLogErrorBoundary.propTypes = {
+  children: PropTypes.node,
+};
 
 const assignUserNamesToChats = (chats) => {
   if (!Array.isArray(chats)) return [];
@@ -136,9 +178,9 @@ const BotChatLog = () => {
           setChats(assignUserNamesToChats(res.data.chats));
         }
       })
-      .catch(() => {
+      .catch((error) => {
         if (request.cancelled) return;
-        message.error(CHAT_LOG_LOAD_ERROR);
+        reportChatLogLoadError(error);
       });
     getScenarioStatistic({sc_id: searchScenarioId ? parseInt(searchScenarioId) : null, bot_id: botId});
     return () => {
@@ -169,8 +211,8 @@ const BotChatLog = () => {
           setChats(assignUserNamesToChats(res.data.chats));
         }
       })
-      .catch(() => {
-        message.error(CHAT_LOG_LOAD_ERROR);
+      .catch((error) => {
+        reportChatLogLoadError(error);
       });
 
   }
@@ -868,8 +910,8 @@ const BotChatLog = () => {
           }
         }
       })
-      .catch(() => {
-        message.error(CHAT_LOG_LOAD_ERROR);
+      .catch((error) => {
+        reportChatLogLoadError(error);
       })
       .finally(() => {
         if (saveMsgStatistic) {
@@ -896,8 +938,8 @@ const BotChatLog = () => {
           getScenarioMessages(botId, item.scenario_id, conversations, { saveMsgRender: true });
         }
       })
-      .catch(() => {
-        message.error(CHAT_LOG_LOAD_ERROR);
+      .catch((error) => {
+        reportChatLogLoadError(error);
       });
   }
 
@@ -911,8 +953,8 @@ const BotChatLog = () => {
           getScenarioMessages(botId, params.sc_id, [], { saveMsgStatistic: true });
         }
       })
-      .catch(() => {
-        message.error(CHAT_LOG_LOAD_ERROR);
+      .catch((error) => {
+        reportChatLogLoadError(error);
       });
   }
 
@@ -972,7 +1014,7 @@ const BotChatLog = () => {
                     <div className="chat-log-user-meta">
                       <p className="chat-log-user-name">{item.name}</p>
                       <p className="chat-log-user-date">
-                        {format(new Date(item.newest), CHAT_LOG_DISPLAY_DATE_FORMAT)}
+                        {formatChatListTime(item.newest)}
                       </p>
                     </div>
                     <span
@@ -1013,6 +1055,7 @@ const BotChatLog = () => {
 
   return (
     <AdminPage className="admin-page--chat-log" card={false}>
+      <ChatLogErrorBoundary>
       <div id="screenAll" className="admin-page-card chat-log-page-card">
         <div className="report-filter-panel">{filterToolbar}</div>
         <Tabs
@@ -1041,6 +1084,7 @@ const BotChatLog = () => {
           ]}
         />
       </div>
+      </ChatLogErrorBoundary>
     </AdminPage>
   );
 };
