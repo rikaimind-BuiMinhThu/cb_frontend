@@ -41,26 +41,44 @@ import {
 } from 'v2/views/Report/constants';
 
 const SCAN_REGEX = /\{\{(.*?)\}\}/g;
+const CHAT_LOG_CACHE_BUSTER_PARAM = '_';
+const CHAT_LOG_NO_CACHE = 'no-cache';
+const CHAT_LOG_JSON_INPUT_NAMES = ['data_name', 'zip_code_address', 'birth_date'];
 
-const assignUserNamesToChats = (chats) =>
-  chats.map((chat, index) => ({
+const freshChatLogConfig = (params = {}) => ({
+  params: {
+    ...params,
+    [CHAT_LOG_CACHE_BUSTER_PARAM]: Date.now(),
+  },
+  headers: {
+    'Cache-Control': CHAT_LOG_NO_CACHE,
+    Pragma: CHAT_LOG_NO_CACHE,
+  },
+});
+
+const assignUserNamesToChats = (chats) => {
+  if (!Array.isArray(chats)) return [];
+  return chats.map((chat, index) => ({
     ...chat,
     name: formatChatLogUserName(index, chats.length),
   }));
+};
+
+const storedChatLogJson = (conversation) => {
+  if (conversation.string_value) return conversation.string_value;
+  if (conversation.text_value) return conversation.text_value;
+  return '';
+};
 
 const normalizeConversationEntry = (conversation) => {
   const next = { ...conversation };
-  if (
-    ['data_name', 'zip_code_address', 'birth_date'].includes(
-      next.data_input_name,
-    )
-  ) {
-    const str = next.string_value
-      ? next.string_value.replaceAll(SCAN_REGEX)
-      : next.text_value
-        ? next.text_value.replaceAll(SCAN_REGEX)
-        : undefined;
-    next.content = JSON.parse(str ?? '');
+  if (CHAT_LOG_JSON_INPUT_NAMES.includes(next.data_input_name)) {
+    const raw = storedChatLogJson(next).replaceAll(SCAN_REGEX, '');
+    try {
+      next.content = raw ? JSON.parse(raw) : undefined;
+    } catch (error) {
+      next.content = undefined;
+    }
   }
   next.value =
     next.content ??
@@ -110,10 +128,10 @@ const BotChatLog = () => {
       date: searchDate ? searchDate : null,
     };
     api
-      .get(`${CHAT_LOG_LIST_PATH}/${botId}/list`, params)
+      .get(`${CHAT_LOG_LIST_PATH}/${botId}/list`, freshChatLogConfig(params))
       .then((res) => {
         if (request.cancelled) return;
-        if (res.data.code === 1) {
+        if (res.data?.code === 1) {
           setScenarios(res.data.scenarios);
           setChats(assignUserNamesToChats(res.data.chats));
         }
@@ -144,9 +162,9 @@ const BotChatLog = () => {
 
   const searchLog = (params) => {
     api
-      .get(`${CHAT_LOG_LIST_PATH}/${botId}/list`, {params})
+      .get(`${CHAT_LOG_LIST_PATH}/${botId}/list`, freshChatLogConfig(params))
       .then((res) => {
-        if (res.data.code === 1) {
+        if (res.data?.code === 1) {
           setScenarios(res.data.scenarios);
           setChats(assignUserNamesToChats(res.data.chats));
         }
@@ -256,6 +274,7 @@ const BotChatLog = () => {
   }, [scenarioId, decodedUserInputId, scenarios, chats]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const getScenarioMessages = (botId, scenario_id, conversion = [], options = {}) => {
+    if (scenario_id === null || scenario_id === undefined || scenario_id === '') return;
     const messageArr = [];
     const conversationState = { list: conversion };
 
@@ -263,10 +282,11 @@ const BotChatLog = () => {
 
     api
       .get(
-        `/api/v1/managements/chatbots/${botId}/scenarios/${scenario_id}/preview`
+        `/api/v1/managements/chatbots/${botId}/scenarios/${scenario_id}/preview`,
+        freshChatLogConfig(),
       )
       .then(async (res) => {
-        if (res.data.code === 1) {
+        if (res.data?.code === 1) {
           if (res.data.data?.conversation?.messages?.length > 0) {
             messageArr.push(...res.data.data.conversation.messages);
           }
@@ -864,11 +884,12 @@ const BotChatLog = () => {
   const getMessageData = (item) => {
     api
       .get(
-        `${CHAT_LOG_LIST_PATH}/${item.scenario_id}/${item.user_input_id}`
+        `${CHAT_LOG_LIST_PATH}/${item.scenario_id}/${item.user_input_id}`,
+        freshChatLogConfig(),
       )
       .then((response) => {
-        if (response.data.code === 1) {
-          const conversations = response.data.conversations.map(normalizeConversationEntry);
+        if (response.data?.code === 1) {
+          const conversations = (response.data.conversations || []).map(normalizeConversationEntry);
           setConversions(conversations);
           setTracking(response.data.tracking || null);
 
@@ -881,11 +902,12 @@ const BotChatLog = () => {
   }
 
   const getScenarioStatistic = async (params) => {
-    api.get(CHAT_LOG_STATISTIC_PATH, { params })
+    api.get(CHAT_LOG_STATISTIC_PATH, freshChatLogConfig(params))
       .then((response) => {
-        if (response.data.code === 1) {
-          setStatistic(response.data.statistic);
-          setOverall(response.data.overall);
+        if (response.data?.code !== 1) return;
+        setStatistic(response.data.statistic);
+        setOverall(response.data.overall);
+        if (params.sc_id) {
           getScenarioMessages(botId, params.sc_id, [], { saveMsgStatistic: true });
         }
       })
