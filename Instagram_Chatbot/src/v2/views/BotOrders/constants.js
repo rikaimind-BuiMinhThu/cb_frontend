@@ -132,6 +132,8 @@ export const RPA_LABEL_REASON = 'Reason';
 export const RPA_LABEL_ACTIONS = 'Actions';
 export const RPA_LABEL_WHERE = 'where';
 export const RPA_LABEL_VALUE = 'value';
+export const RPA_LABEL_REQUEST = 'request';
+export const RPA_LABEL_RESPONSE = 'response';
 export const RPA_ACTIONS_MISSING = '— (詳細未記録)';
 export const RPA_EMPTY_STEPS = 'ステップはありません';
 export const RPA_ACTION_TYPE_LABELS = {
@@ -139,6 +141,8 @@ export const RPA_ACTION_TYPE_LABELS = {
   click: 'Click',
   select: 'Select',
   navigate: 'Navigate',
+  '2captcha': '2captcha',
+  detect: 'Detect',
 };
 
 export const BIRTH_DATE_YEAR_SUFFIX = '年';

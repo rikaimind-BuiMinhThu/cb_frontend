@@ -35,6 +35,8 @@ import {
   RPA_LABEL_CURRENT_URL,
   RPA_LABEL_ID,
   RPA_LABEL_REASON,
+  RPA_LABEL_REQUEST,
+  RPA_LABEL_RESPONSE,
   RPA_LABEL_RESULT,
   RPA_LABEL_RUN_TIME,
   RPA_LABEL_VALUE,
@@ -221,6 +223,32 @@ export const rpaStepResultLabel = (ok) => {
 
 const formatActionTypeLabel = (type) => RPA_ACTION_TYPE_LABELS[type] || type || RPA_STEP_FALLBACK;
 
+const parseJsonPayload = (value) => {
+  if (value == null) return null;
+  if (typeof value === 'object') return value;
+  if (typeof value !== 'string') return value;
+  try {
+    return JSON.parse(value);
+  } catch (_error) {
+    return value;
+  }
+};
+
+const formatPrettyJsonLines = (label, value, indent = '    ') => {
+  const parsed = parseJsonPayload(value);
+  const pretty =
+    typeof parsed === 'string'
+      ? parsed
+      : JSON.stringify(parsed, null, 2);
+  const lines = [`${indent}${label}:`];
+  String(pretty)
+    .split('\n')
+    .forEach((line) => {
+      lines.push(`${indent}  ${line}`);
+    });
+  return lines;
+};
+
 const formatRpaActionsBlock = (actions) => {
   if (!Array.isArray(actions) || actions.length === 0) {
     return [`- ${RPA_LABEL_ACTIONS}: ${RPA_ACTIONS_MISSING}`];
@@ -234,6 +262,12 @@ const formatRpaActionsBlock = (actions) => {
     lines.push(`    ${RPA_LABEL_WHERE}: ${action.where || DASH}`);
     if (Object.prototype.hasOwnProperty.call(action, 'value')) {
       lines.push(`    ${RPA_LABEL_VALUE}: ${cleanErrorMessage(action.value)}`);
+    }
+    if (Object.prototype.hasOwnProperty.call(action, 'request')) {
+      lines.push(...formatPrettyJsonLines(RPA_LABEL_REQUEST, action.request));
+    }
+    if (Object.prototype.hasOwnProperty.call(action, 'response')) {
+      lines.push(...formatPrettyJsonLines(RPA_LABEL_RESPONSE, action.response));
     }
   });
   return lines;
