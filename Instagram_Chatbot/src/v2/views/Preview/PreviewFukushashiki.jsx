@@ -744,7 +744,9 @@ const PreviewFukushashiki = () => {
         payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn}
       });
 
-      if (isClickedLastMessage) {
+      // Lexica create_order is owned by followLexicaOrder / createLexicaOrder only.
+      // Calling it here too races and creates a second selenium row + RPA job.
+      if (isClickedLastMessage && !isLexica) {
         sendCreateOrderData(data);
       }
 
