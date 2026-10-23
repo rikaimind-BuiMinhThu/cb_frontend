@@ -289,6 +289,105 @@
 .admin-page--chat-log .chat-log-stats-panel {
   width: 100%;
   min-height: 500px;
+  overflow: visible;
+}
+
+.admin-page--chat-log .chat-log-preview--stats {
+  overflow: visible;
+  width: fit-content;
+  max-width: 100%;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+}
+
+.admin-page--chat-log .chat-log-preview--stats .preview-open-frame--embedded.preview-open-frame--editor {
+  height: auto;
+  max-height: none;
+  overflow: visible;
+  flex: none;
+}
+
+.admin-page--chat-log .chat-log-preview.chat-log-preview--stats .preview-open-frame--embedded .preview-open-frame__body {
+  overflow: visible;
+  height: auto;
+  flex: none;
+}
+
+.admin-page--chat-log .chat-log-stat-card {
+  position: relative;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.admin-page--chat-log .chat-log-stats-message-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 280px);
+  gap: 16px;
+  align-items: start;
+  width: calc(100% + 16px + 260px);
+}
+
+.admin-page--chat-log .chat-log-stats-message-row__body {
+  min-width: 0;
+}
+
+.admin-page--chat-log .chat-log-stat-card,
+.admin-page--chat-log .chat-log-stat-card * {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.admin-page--chat-log .chat-log-stat-card::before,
+.admin-page--chat-log .chat-log-stat-card::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+
+.admin-page--chat-log .chat-log-stat-card::before {
+  left: -10px;
+  border-width: 8px 10px 8px 0;
+  border-color: transparent #e5e7eb transparent transparent;
+}
+
+.admin-page--chat-log .chat-log-stat-card::after {
+  left: -8px;
+  border-width: 7px 9px 7px 0;
+  border-color: transparent #fff transparent transparent;
+}
+
+@media (max-width: 992px) {
+  .admin-page--chat-log .chat-log-stats-message-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .admin-page--chat-log .chat-log-stat-card::before,
+  .admin-page--chat-log .chat-log-stat-card::after {
+    left: 50%;
+    top: -10px;
+    transform: translateX(-50%);
+  }
+
+  .admin-page--chat-log .chat-log-stat-card::before {
+    border-width: 0 8px 10px 8px;
+    border-color: transparent transparent #e5e7eb transparent;
+  }
+
+  .admin-page--chat-log .chat-log-stat-card::after {
+    top: -8px;
+    border-width: 0 7px 9px 7px;
+    border-color: transparent transparent #fff transparent;
+  }
 }
 
 .admin-page--chat-log .chat-log-steps {

@@ -1047,6 +1047,7 @@ const BotChatLog = () => {
           activeKey={selectTab}
           onChange={setSelectTab}
           className="admin-page-tabs"
+          destroyInactiveTabPane
           items={[
             {
               key: CHAT_LOG_TAB_LOGS,
@@ -1063,6 +1064,10 @@ const BotChatLog = () => {
                   messages={renderMessageStatisticArr}
                   dataMessages={dataMessages}
                   statistic={statistic}
+                  designSettings={designSettings}
+                  captcha={captcha}
+                  variables={variables}
+                  dataPrefectures={dataPrefectures}
                 />
               ),
             },

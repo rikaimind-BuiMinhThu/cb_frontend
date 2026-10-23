@@ -1,17 +1,18 @@
-import 'v2/views/Report/styles/bot-chat-log.css';
-import UserMessage from './UserMessage';
-import { Fragment, useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import BotMessage from './BotMessage';
 import { Empty } from 'antd';
 import { parseQuantity } from 'v2/views/Report/utils/parseQuantity';
-import ChatbotOverall, { CONVERTERS_OVERALL } from './ChatbotOverall';
-import MessageStatisticDetail from './MessageStatisticDetail';
 import {
+  CHAT_LOG_BELONG_USER,
   CHAT_LOG_METRIC_NO_LABEL,
-  CHAT_LOG_NEXT_BUTTON,
   CHAT_LOG_STATS_EMPTY_DESCRIPTION,
 } from 'v2/views/Report/constants';
+import BotChatLogTranscript from './BotChatLogTranscript';
+import ChatbotOverall, { CONVERTERS_OVERALL } from './ChatbotOverall';
+import MessageStatisticDetail from './MessageStatisticDetail';
+import 'v2/views/Report/styles/bot-chat-log.css';
+
+const statisticMessageKey = (value) => String(value);
 
 const BotChatStatistic = ({
   botInfor = null,
@@ -19,6 +20,10 @@ const BotChatStatistic = ({
   dataMessages = [],
   statistic = [],
   overall = {},
+  designSettings = null,
+  captcha = [],
+  variables = [],
+  dataPrefectures = [],
 }) => {
   const [msgs, setMsgs] = useState([]);
   const [chatbotOverall, setChatbotOverall] = useState([]);
@@ -27,15 +32,17 @@ const BotChatStatistic = ({
     const mapMsgId = new Map();
 
     statisticList.forEach((statItem) => {
-      mapMsgId.set(statItem.msg_id, statItem);
+      if (statItem.msg_id == null) return;
+
+      mapMsgId.set(statisticMessageKey(statItem.msg_id), statItem);
     });
 
     return messageList.map((msg) => {
-      if (msg.belong_to === 'bot') {
+      if (msg.belong_to !== CHAT_LOG_BELONG_USER) {
         return msg;
       }
 
-      const msgStats = mapMsgId.get(msg.id);
+      const msgStats = mapMsgId.get(statisticMessageKey(msg.id));
 
       return {
         ...msg,
@@ -68,8 +75,14 @@ const BotChatStatistic = ({
     bindStatistic(messages, statistic, overall);
   }, [messages, statistic, overall, bindStatistic]);
 
-  const actionButtonStyle = {
-    '--chat-log-action-bg': botInfor?.main_color,
+  const renderMessageAside = (messageItem) => {
+    if (!messageItem.stats) return null;
+
+    return (
+      <div className="chat-log-stat-card">
+        <MessageStatisticDetail stats={messageItem.stats} />
+      </div>
+    );
   };
 
   if (!messages.length) {
@@ -86,58 +99,17 @@ const BotChatStatistic = ({
   return (
     <div className="chat-log-stats-panel">
       <ChatbotOverall overall={chatbotOverall} />
-      <div className="chat-log-steps">
-        {msgs.map((messageItem, indexMessage) => (
-          <Fragment key={messageItem.id ?? indexMessage}>
-            {messageItem.belong_to === 'bot' && (
-              <div className="chat-log-bot-messages">
-                {messageItem?.message_content.map((content, index) => (
-                  <BotMessage
-                    key={content.id ?? index}
-                    content={content}
-                    index={index}
-                    botInfor={botInfor}
-                  />
-                ))}
-              </div>
-            )}
-            {messageItem.belong_to === 'user' && (
-              <div className="chat-log-step-card">
-                <MessageStatisticDetail stats={messageItem.stats} />
-                <div className="chat-log-step-preview">
-                  <div className="sp-body-user-side-messages csp-body-user-side-messages">
-                    <UserMessage
-                      captcha={[]}
-                      messageContentProps={messageItem.message_content}
-                      disabled={messageItem.disabled}
-                      onChangeValue={() => {}}
-                      indexMessageRender={indexMessage}
-                      indexMessage={indexMessage}
-                      displayButtonNext={() => {}}
-                      dataPrefectures={[]}
-                      variables={[]}
-                    />
-                    {(dataMessages[indexMessage]?.is_display_button_next !== undefined
-                      ? dataMessages[indexMessage].is_display_button_next
-                      : true) && (
-                      <div className="sp-user-message-button-action">
-                        <button
-                          type="button"
-                          disabled
-                          className="chat-log-action-btn"
-                          style={actionButtonStyle}
-                        >
-                          {messageItem.buttonName || CHAT_LOG_NEXT_BUTTON}
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-          </Fragment>
-        ))}
-      </div>
+      <BotChatLogTranscript
+        showTracking={false}
+        messages={msgs}
+        botInfor={botInfor}
+        captcha={captcha}
+        dataMessages={dataMessages}
+        dataPrefectures={dataPrefectures}
+        variables={variables}
+        designSettings={designSettings}
+        renderMessageAside={renderMessageAside}
+      />
     </div>
   );
 };
@@ -148,6 +120,10 @@ BotChatStatistic.propTypes = {
   dataMessages: PropTypes.array,
   statistic: PropTypes.array,
   overall: PropTypes.object,
+  designSettings: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
+  captcha: PropTypes.array,
+  variables: PropTypes.array,
+  dataPrefectures: PropTypes.array,
 };
 
 export default BotChatStatistic;

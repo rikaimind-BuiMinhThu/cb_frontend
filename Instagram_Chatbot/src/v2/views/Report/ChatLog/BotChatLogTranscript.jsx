@@ -46,6 +46,10 @@ const CHAT_LOG_USER_BUBBLE_CLASS = 'sp-body-user-side slideLeft';
 const CHAT_LOG_USER_MESSAGES_CLASS = 'sp-body-user-side-messages position-relative';
 const CHAT_LOG_NEXT_ACTION_CLASS = 'sp-user-message-button-action';
 const CHAT_LOG_NEXT_BUTTON_CLASS = 'ss-user-message__action-btn';
+const CHAT_LOG_PREVIEW_CLASS = 'chat-log-preview';
+const CHAT_LOG_PREVIEW_STATS_CLASS = 'chat-log-preview--stats';
+const CHAT_LOG_STATS_MESSAGE_ROW_CLASS = 'chat-log-stats-message-row';
+const CHAT_LOG_STATS_MESSAGE_BODY_CLASS = 'chat-log-stats-message-row__body';
 
 const ignoreChatLogInput = () => {};
 
@@ -262,6 +266,8 @@ const BotChatLogTranscript = ({
   variables,
   tracking,
   designSettings,
+  showTracking,
+  renderMessageAside,
 }) => {
   const [prefecturesList, setPrefecturesList] = useState(dataPrefectures);
   const rawDesign = readRawDesign(designSettings);
@@ -336,10 +342,14 @@ const BotChatLogTranscript = ({
     };
   }, [botInfor, designSettings]);
 
+  const previewClassName = renderMessageAside
+    ? `${CHAT_LOG_PREVIEW_CLASS} ${CHAT_LOG_PREVIEW_STATS_CLASS}`
+    : CHAT_LOG_PREVIEW_CLASS;
+
   return (
     <>
-      <BotChatLogTracking tracking={tracking} />
-      <div className="chat-log-preview">
+      {showTracking ? <BotChatLogTracking tracking={tracking} /> : null}
+      <div className={previewClassName}>
         <PreviewOpenChatFrame
           frameClassName={frameClassName}
           cssVars={cssVars}
@@ -350,31 +360,12 @@ const BotChatLogTranscript = ({
           designType={botInfor?.design_type}
           showPopupCloseBot={false}
         >
-          {messages.map((messageItem, indexMessage) => (
-            <React.Fragment key={messageItem.id ?? indexMessage}>
-              {messageItem.belong_to === CHAT_LOG_BELONG_BOT &&
-                messageItem.message_content?.map((content, contentIndex) => (
-                  <ReadOnlyBotMessage
-                    key={content.id ?? contentIndex}
-                    content={content}
-                    contentIndex={contentIndex}
-                    messageId={messageItem.id}
-                    botInfor={botInfor}
-                    themeSettings={themeSettings}
-                    variables={variables}
-                  />
-                ))}
-              {messageItem.belong_to === CHAT_LOG_BELONG_USER && (
-                <UserBubble
-                  messageItem={messageItem}
-                  indexMessage={indexMessage}
-                  contents={messageItem.message_content}
-                  {...bubbleProps}
-                />
-              )}
-              {messageItem.belong_to === CHAT_LOG_BELONG_COMBINE &&
-                messageItem.message_content?.map((content, contentIndex) => (
-                  content.role === CHAT_LOG_COMBINE_ROLE_BOT ? (
+          {messages.map((messageItem, indexMessage) => {
+            const messageKey = messageItem.id ?? indexMessage;
+            const messageBlock = (
+              <>
+                {messageItem.belong_to === CHAT_LOG_BELONG_BOT &&
+                  messageItem.message_content?.map((content, contentIndex) => (
                     <ReadOnlyBotMessage
                       key={content.id ?? contentIndex}
                       content={content}
@@ -384,18 +375,59 @@ const BotChatLogTranscript = ({
                       themeSettings={themeSettings}
                       variables={variables}
                     />
-                  ) : (
-                    <UserBubble
-                      key={content.id ?? contentIndex}
-                      messageItem={messageItem}
-                      indexMessage={indexMessage}
-                      contents={[content]}
-                      {...bubbleProps}
-                    />
-                  )
-                ))}
-            </React.Fragment>
-          ))}
+                  ))}
+                {messageItem.belong_to === CHAT_LOG_BELONG_USER && (
+                  <UserBubble
+                    messageItem={messageItem}
+                    indexMessage={indexMessage}
+                    contents={messageItem.message_content}
+                    {...bubbleProps}
+                  />
+                )}
+                {messageItem.belong_to === CHAT_LOG_BELONG_COMBINE &&
+                  messageItem.message_content?.map((content, contentIndex) => (
+                    content.role === CHAT_LOG_COMBINE_ROLE_BOT ? (
+                      <ReadOnlyBotMessage
+                        key={content.id ?? contentIndex}
+                        content={content}
+                        contentIndex={contentIndex}
+                        messageId={messageItem.id}
+                        botInfor={botInfor}
+                        themeSettings={themeSettings}
+                        variables={variables}
+                      />
+                    ) : (
+                      <UserBubble
+                        key={content.id ?? contentIndex}
+                        messageItem={messageItem}
+                        indexMessage={indexMessage}
+                        contents={[content]}
+                        {...bubbleProps}
+                      />
+                    )
+                  ))}
+              </>
+            );
+
+            if (!renderMessageAside) {
+              return (
+                <React.Fragment key={messageKey}>
+                  {messageBlock}
+                </React.Fragment>
+              );
+            }
+
+            const messageAside = renderMessageAside(messageItem);
+
+            return (
+              <div className={CHAT_LOG_STATS_MESSAGE_ROW_CLASS} key={messageKey}>
+                <div className={CHAT_LOG_STATS_MESSAGE_BODY_CLASS}>
+                  {messageBlock}
+                </div>
+                {messageAside}
+              </div>
+            );
+          })}
         </PreviewOpenChatFrame>
       </div>
     </>
@@ -411,6 +443,8 @@ BotChatLogTranscript.propTypes = {
   variables: PropTypes.array,
   tracking: PropTypes.object,
   designSettings: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
+  showTracking: PropTypes.bool,
+  renderMessageAside: PropTypes.func,
 };
 
 BotChatLogTranscript.defaultProps = {
@@ -421,6 +455,8 @@ BotChatLogTranscript.defaultProps = {
   variables: [],
   tracking: null,
   designSettings: null,
+  showTracking: true,
+  renderMessageAside: null,
 };
 
 export default BotChatLogTranscript;
