@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>I'm PINCH local embed</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: sans-serif;
+      background: #f6f7f9;
+    }
+    main {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 48px 24px;
+    }
+    .bot_open {
+      display: inline-block;
+      margin-top: 24px;
+      padding: 16px 28px;
+      border: 0;
+      border-radius: 35px;
+      background: #02bb92;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>I'm PINCH local</h1>
+    <p>This page loads the local bot. Bot id 1.</p>
+    <button type="button" class="bot_open">お申し込み</button>
+  </main>
+  <script>sessionStorage.setItem("bot_id", "1");</script>
+  <script src="http://localhost:3001/v2/sdk.js" defer></script>
+</body>
+</html>
