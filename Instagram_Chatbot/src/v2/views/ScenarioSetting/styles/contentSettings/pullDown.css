@@ -75,7 +75,7 @@
   flex: 1 1 96px;
   width: auto;
   min-width: 96px;
-  max-width: 140px;
+  max-width: none;
 }
 
 .ss-pull-down-setting__select--24 {
@@ -159,6 +159,26 @@
 
 .ss-pull-down-setting__ymd-fields > .ss-input-custom-container,
 .ss-pull-down-setting__ymd-fields .ss-pull-down-setting__ymd-comment {
+  grid-column: 1 / -1;
+}
+
+.ss-pull-down-setting__hm-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  width: 90%;
+  justify-content: unset;
+}
+
+.ss-pull-down-setting__hm-fields > .select-custom-antd,
+.ss-pull-down-setting__hm-fields > .ant-select,
+.ss-pull-down-setting__hm-fields > .ss-input-custom-container {
+  width: 100%;
+  max-width: none;
+}
+
+.ss-pull-down-setting__hm-fields > .ss-input-custom-container,
+.ss-pull-down-setting__hm-fields .ss-pull-down-setting__ymd-comment {
   grid-column: 1 / -1;
 }
 

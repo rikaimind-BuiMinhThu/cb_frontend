@@ -123,9 +123,14 @@ export const renderHourMinuteEveryRow = ({
   dataEveryMinute,
   changeTypeField,
   includeComment = true,
+  wrap = false,
 }) => (
   <div className="ss-user-setting__item-bottom">
-    <div className="ss-user-setting__item-select-bottom-wrapper-flex">
+    <div
+      className={`ss-user-setting__item-select-bottom-wrapper-flex${
+        wrap ? ' ss-pull-down-setting__hm-fields' : ''
+      }`.trim()}
+    >
       <SelectCustom
         className="ss-pull-down-setting__select--24"
         value={typeConfig?.time}
@@ -149,7 +154,7 @@ export const renderHourMinuteEveryRow = ({
       />
       {includeComment && (
         <InputCustom
-          className="ss-pull-down-setting__select--24"
+          className={wrap ? 'ss-pull-down-setting__ymd-comment' : 'ss-pull-down-setting__select--24'}
           placeholder={SETTING_PLACEHOLDERS.comment}
           value={typeConfig?.comment}
           onChange={changeTypeField('comment')}
@@ -223,9 +228,16 @@ export const renderYearMonthRow = ({
   dataMonth,
   changeTypeField,
   includeComment = true,
+  wrap = false,
 }) => (
   <div className="ss-user-setting__item-bottom">
-    <div className="ss-user-setting__item-select-bottom-wrapper-flex">
+    <div
+      className={`ss-user-setting__item-select-bottom-wrapper-flex${
+        wrap
+          ? ' ss-pull-down-setting__ymd-fields ss-pull-down-setting__ymd-fields--no-day'
+          : ''
+      }`.trim()}
+    >
       <SelectCustom
         className="ss-pull-down-setting__select--32"
         value={typeConfig?.year}
@@ -242,7 +254,7 @@ export const renderYearMonthRow = ({
       />
       {includeComment && (
         <InputCustom
-          className="ss-pull-down-setting__select--32"
+          className={wrap ? 'ss-pull-down-setting__ymd-comment' : 'ss-pull-down-setting__select--32'}
           placeholder={SETTING_PLACEHOLDERS.comment}
           value={typeConfig?.comment}
           onChange={changeTypeField('comment')}
