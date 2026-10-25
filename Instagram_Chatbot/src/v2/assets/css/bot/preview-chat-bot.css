@@ -2103,7 +2103,42 @@ slideUp
 .preview-closed-launcher--inline.preview-closed-launcher--vertical-pc,
 .preview-closed-launcher--inline.preview-closed-launcher--vertical-sp {
   max-width: none;
-  transform-origin: center right;
+  transform: none;
+  width: 65px;
+  height: 280px;
+  flex-direction: column-reverse;
+  align-items: center;
+  justify-content: flex-start;
+  border-radius: 32px;
+  padding: 8px 0;
+  box-sizing: border-box;
+}
+
+.preview-closed-launcher--inline.preview-closed-launcher--vertical-sp {
+  width: 60px;
+}
+
+.preview-closed-launcher--inline.preview-closed-launcher--vertical-pc .sp-header-left,
+.preview-closed-launcher--inline.preview-closed-launcher--vertical-sp .sp-header-left {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  width: 100%;
+}
+
+.preview-closed-launcher--inline.preview-closed-launcher--vertical-pc .sp-header-left-label,
+.preview-closed-launcher--inline.preview-closed-launcher--vertical-sp .sp-header-left-label {
+  margin: 0;
+}
+
+.preview-closed-launcher--inline.preview-closed-launcher--vertical-pc .sp-header-left-label-title,
+.preview-closed-launcher--inline.preview-closed-launcher--vertical-sp .sp-header-left-label-title {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  max-height: 180px;
+  overflow: hidden;
 }
 
 .preview-closed-launcher--bar-sp {

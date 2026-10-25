@@ -163,15 +163,17 @@ export const getClosedLauncherPosition = (state, options = {}) => {
   const { variant = 'default', isMobile = false, inline = false } = options;
 
   if (variant === 'vertical') {
-    // Design-setting inline preview: keep the rotated tab inside the gray frame.
+    // Design-setting inline preview: dock a true vertical pill with margins (no rotate).
     if (inline) {
-      const barLength = 300;
       const bottomMargin = isMobile
         ? toLayoutNumber(state?.bottomMarginSp, 0)
         : toLayoutNumber(state?.bottomMarginPc, 0);
+      const rightMargin = isMobile
+        ? toLayoutNumber(state?.rightMarginSp, 0)
+        : toLayoutNumber(state?.rightMarginPc, 0);
       return {
-        bottom: `${bottomMargin + barLength / 2}px`,
-        right: '0px',
+        bottom: `${bottomMargin}px`,
+        right: `${rightMargin}px`,
         left: 'auto',
       };
     }
