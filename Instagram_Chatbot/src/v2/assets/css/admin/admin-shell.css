@@ -539,6 +539,27 @@
   box-sizing: border-box;
 }
 
+:is(.admin-page--design-setting, .admin-page--add-bot) .design-device-card__closed-preview-device-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 72px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #9ca3af;
+  opacity: 0.16;
+  pointer-events: none;
+  z-index: 0;
+  user-select: none;
+}
+
+:is(.admin-page--design-setting, .admin-page--add-bot) .design-device-card__closed-preview-frame .preview-closed-launcher {
+  position: absolute;
+  z-index: 1;
+}
+
 :is(.admin-page--design-setting, .admin-page--add-bot) .design-device-card__closed-preview-frame--pc {
   width: 100%;
   min-height: 340px;

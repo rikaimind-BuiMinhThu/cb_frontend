@@ -140,7 +140,9 @@ const PreviewClosedLauncher = ({
           <div className="sp-header-left-avatar sp-avatar">{avatarImg}</div>
           {showVerticalTitle && (
             <div className="sp-header-left-label">
-              <div className="sp-header-left-label-title">{bubbleTitle}</div>
+              <div id="comment_bubble" className="preview-closed-launcher__vertical-bubble">
+                <span className="sp-header-left-label-title">{bubbleTitle}</span>
+              </div>
             </div>
           )}
         </div>
@@ -243,7 +245,9 @@ const PreviewClosedLauncher = ({
           <div className="sp-header-left-avatar sp-avatar">{avatarImg}</div>
           {showVerticalTitle && (
             <div className="sp-header-left-label">
-              <div className="sp-header-left-label-title">{bubbleTitle}</div>
+              <div id="comment_bubble" className="preview-closed-launcher__vertical-bubble">
+                <span className="sp-header-left-label-title">{bubbleTitle}</span>
+              </div>
             </div>
           )}
         </div>

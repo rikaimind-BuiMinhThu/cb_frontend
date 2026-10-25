@@ -174,6 +174,9 @@ const DeviceDesignPanel = ({
         <h5 className="design-device-card__closed-preview-title">{PREVIEW_CLOSED_TITLE}</h5>
         <style>{closedPreviewChromeCss}</style>
         <div className={`design-device-card__closed-preview-frame ${frameModifier}`}>
+          <span className="design-device-card__closed-preview-device-label" aria-hidden="true">
+            {isPc ? 'PC' : 'SP'}
+          </span>
           <PreviewClosedLauncher
             state={previewState}
             headerIconSrc={headerIconSrc}
