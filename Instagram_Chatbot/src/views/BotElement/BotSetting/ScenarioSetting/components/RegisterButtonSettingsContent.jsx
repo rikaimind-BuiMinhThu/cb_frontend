@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import InputCustom from '../scenarioComon/InputCustom';
 import ScenarioModalCheckbox from './modals/shared/ScenarioModalCheckbox';
@@ -17,25 +17,64 @@ const labelWithTooltip = (text, tooltipKey) => (
   </>
 );
 
+const collectScrollSnapshots = (settingsEl) => {
+  if (!settingsEl) return [];
+
+  const snapshots = [];
+  const userSetting = settingsEl.closest('.ss-user-setting, .ss-layout-user-setting, .ss-combine-setting');
+  const bottom = settingsEl.closest('.ss-user-setting__bottom, .ss-combine-setting__bottom');
+  const main = userSetting?.querySelector('.ss-user-setting__main, .ss-combine-setting__main');
+  const detailBody = settingsEl.closest('.ss-layout-detail-body');
+
+  [bottom, main, detailBody].forEach((node) => {
+    if (!node) return;
+    snapshots.push({ node, scrollTop: node.scrollTop });
+  });
+
+  return snapshots;
+};
+
+const restoreScrollSnapshots = (snapshots) => {
+  snapshots.forEach(({ node, scrollTop }) => {
+    if (node) node.scrollTop = scrollTop;
+  });
+};
+
 const RegisterButtonSettingsContent = ({
   selectedMessage,
   dataMessages,
   setDataMessages,
 }) => {
   const [alignBeginningStop, setAlignBeginningStop] = useState(false);
+  const settingsRef = useRef(null);
+  const pendingScrollSnapshotsRef = useRef(null);
 
   const updateMessage = (updates) => {
     Object.assign(selectedMessage, updates);
     setDataMessages([...dataMessages]);
   };
 
+  const updateMessagePreserveScroll = (updates) => {
+    pendingScrollSnapshotsRef.current = collectScrollSnapshots(settingsRef.current);
+    updateMessage(updates);
+  };
+
+  useLayoutEffect(() => {
+    const snapshots = pendingScrollSnapshotsRef.current;
+    if (!snapshots) return;
+    pendingScrollSnapshotsRef.current = null;
+    restoreScrollSnapshots(snapshots);
+    requestAnimationFrame(() => {
+      restoreScrollSnapshots(snapshots);
+    });
+  });
+
   const showCodeEditor = !!selectedMessage.button_jscode;
 
   return (
     <div
-      className={`ss-user-register-button-settings${
-        showCodeEditor ? ' ss-user-register-button-settings--code-open' : ''
-      }`}
+      ref={settingsRef}
+      className="ss-user-register-button-settings"
     >
       <div className="ss-user-register-button-settings__main">
         <ScenarioModalCheckbox
@@ -70,7 +109,7 @@ const RegisterButtonSettingsContent = ({
         )}
         <ScenarioModalCheckbox
           checked={showCodeEditor}
-          onChange={(checked) => updateMessage({ button_jscode: checked })}
+          onChange={(checked) => updateMessagePreserveScroll({ button_jscode: checked })}
           label={labelWithTooltip(
             REGISTER_BUTTON_LABELS.useButtonJavascript,
             'useButtonJavascript',

@@ -20,14 +20,11 @@ export const CombineMessageNextButton = ({
   isExtractFromSession,
 }) => {
   if (!message || !isCombineMessage(message)) return null;
-  if (message.not_use_button) return null;
   if (message.message_content.some((block) => block.type === 'button_submit')) return null;
 
   const btnText = message.buttonName || NEXT_BUTTON_LABEL;
   const firstUserBlock = message.message_content.find((block) => block.role === COMBINE_CONTENT_ROLES.USER);
-  const isDisplayBtnNext = !firstUserBlock
-    || firstUserBlock.type !== 'image'
-    || firstUserBlock.image?.displayButtonNext !== false;
+  const isDisplayBtnNext = !message.not_use_button;
   const isAutoClick = !isDisplayBtnNext && isUpdate;
 
   return (

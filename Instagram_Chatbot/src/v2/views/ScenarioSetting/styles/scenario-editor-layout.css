@@ -29,7 +29,7 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  padding: 16px 20px 20px;
+  padding: 5px;
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -53,7 +53,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: minmax(0, 1fr);
-  gap: 16px;
+  gap: 5px;
   min-height: 600px;
   align-items: stretch;
   position: relative;
@@ -460,6 +460,13 @@
   padding-top: 8px;
 }
 
+/* Keep accordion/JS editor growth inside the bottom pane so the main list does not jump. */
+.ss-editor-layout-v2 .ss-user-setting__bottom:has(.ss-message-settings-accordion__content),
+.ss-editor-layout-v2 .ss-combine-setting__bottom:has(.ss-message-settings-accordion__content) {
+  overflow-y: auto;
+  max-height: min(40vh, 320px);
+}
+
 .ss-editor-layout-v2 .ss-user-setting__select-wrapper {
   max-width: 100%;
   margin: 0;
@@ -559,20 +566,12 @@
 }
 
 .ss-user-register-button-settings__code-flyout {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  right: 0;
-  z-index: 10;
-  padding: 8px;
-  background: #fff;
-  border: 1px solid #e8e8e8;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.ss-user-register-button-settings--code-open {
-  margin-bottom: 148px;
+  position: static;
+  margin-top: 8px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
 .ss-user-register-button-settings .ss-settings-form-row {
@@ -803,9 +802,13 @@
   gap: 8px;
 }
 
-.ss-editor-layout-v2 .ss-zip-code-address-setting .ss-address-field-section__input-row .ss-input-custom-container,
+.ss-editor-layout-v2 .ss-zip-code-address-setting .ss-address-field-section__input-row:not(.ss-address-field-section__input-row--split) .ss-input-custom-container,
 .ss-editor-layout-v2 .ss-zip-code-address-setting .ss-address-field-section__input-row .select-custom-antd,
 .ss-editor-layout-v2 .ss-zip-code-address-setting .ss-address-field-section__input-row .select-custom-native {
+  width: 100%;
+}
+
+.ss-editor-layout-v2 .ss-zip-code-address-setting .ss-address-field-section__input-row--split .ss-input-custom-container {
   width: 100%;
 }
 

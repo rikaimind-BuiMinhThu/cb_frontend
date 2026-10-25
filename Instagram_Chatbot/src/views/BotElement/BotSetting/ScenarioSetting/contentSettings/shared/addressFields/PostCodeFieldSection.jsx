@@ -39,22 +39,24 @@ const PostCodeFieldSection = ({
       <div className="ss-address-field-section">
         {renderLabel()}
         <div className="ss-address-field-section__input-row ss-address-field-section__input-row--split">
-          <InputCustom
-            inline={false}
-            className="ss-address-field-section__post-code-left"
-            containerClassName="ss-address-field-section__input"
-            onChange={changeAddressField('post_code_left')}
-            value={addressData.post_code_left ?? ''}
-            placeholder="000"
-          />
-          <InputCustom
-            inline={false}
-            className="ss-address-field-section__post-code-right"
-            containerClassName="ss-address-field-section__input"
-            onChange={changeAddressField('post_code_right')}
-            value={addressData.post_code_right ?? ''}
-            placeholder="0000"
-          />
+          <div className="ss-address-field-section__post-code-left">
+            <InputCustom
+              inline={false}
+              containerClassName="ss-address-field-section__input"
+              onChange={changeAddressField('post_code_left')}
+              value={addressData.post_code_left ?? ''}
+              placeholder="000"
+            />
+          </div>
+          <div className="ss-address-field-section__post-code-right">
+            <InputCustom
+              inline={false}
+              containerClassName="ss-address-field-section__input"
+              onChange={changeAddressField('post_code_right')}
+              value={addressData.post_code_right ?? ''}
+              placeholder="0000"
+            />
+          </div>
           {showRemoveIcon && (
             <MDBIcon
               fas

@@ -1934,6 +1934,12 @@ slideUp
   box-sizing: border-box;
 }
 
+.preview-closed-launcher.preview-closed-launcher--inline {
+  position: absolute;
+  z-index: 1;
+  max-width: calc(100% - 8px);
+}
+
 .preview-closed-launcher__icon-img {
   width: 96%;
   height: 96%;
@@ -1996,6 +2002,79 @@ slideUp
   padding-left: 20px;
 }
 
+/* PC closed bar bubble — same white pill as SDK iframe (viewport often <981px).
+   Admin design-setting preview is usually >981px, so do not rely on the media query alone. */
+.preview-closed-launcher--bar-pc #comment_bubble {
+  width: 240px;
+  height: 46px;
+  background: #fff;
+  position: relative;
+  display: flex;
+  align-items: center;
+  -moz-border-radius: 12px;
+  -webkit-border-radius: 12px;
+  border-radius: 23px;
+}
+
+.preview-closed-launcher--bar-pc #comment_bubble::before {
+  content: "";
+  width: 0;
+  height: 0;
+  right: 92%;
+  top: 50%;
+  transform: translateY(-50%);
+  position: absolute;
+  border-top: 9px solid transparent;
+  border-right: 26px solid #fff;
+  border-bottom: 9px solid transparent;
+}
+
+.preview-closed-launcher--bar-pc #comment_bubble > span {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+}
+
+/* SP closed bar bubble — same white pill as SDK iframe.
+   Admin design-setting viewport is usually >981px, so do not rely on the media query alone. */
+.preview-closed-launcher--bar-sp #comment_bubble.sp-bubble {
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  width: 160px;
+  height: 30px;
+  margin-left: 10px;
+  background: #fff;
+  position: relative;
+  -moz-border-radius: 12px;
+  -webkit-border-radius: 12px;
+  border-radius: 23px;
+}
+
+.preview-closed-launcher--bar-sp #comment_bubble.sp-bubble::before {
+  content: "";
+  width: 0;
+  height: 0;
+  right: 95%;
+  top: 6px;
+  position: absolute;
+  border-top: 9px solid transparent;
+  border-right: 14px solid #fff;
+  border-bottom: 9px solid transparent;
+}
+
+.preview-closed-launcher--bar-sp #comment_bubble > span {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+}
+
 .preview-closed-launcher__bar-title-text {
   font-size: 18px;
   font-weight: 900;
@@ -2005,20 +2084,136 @@ slideUp
   margin-right: 8px;
 }
 
-.preview-closed-launcher--vertical-pc {
-  width: 300px;
-  height: 65px;
-  border-radius: 0;
-  justify-content: left;
-  transform: rotate(-90deg);
+.preview-closed-launcher--vertical-pc,
+.preview-closed-launcher--vertical-sp {
+  max-width: none;
+  transform: none;
+  width: 65px;
+  height: auto;
+  flex-direction: column-reverse;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  border-radius: 32px;
+  padding: 8px 0 4px;
+  box-sizing: border-box;
 }
 
 .preview-closed-launcher--vertical-sp {
-  width: 300px;
-  height: 60px;
-  border-radius: 0;
-  justify-content: left;
-  transform: rotate(-90deg);
+  width: 60px;
+}
+
+.preview-closed-launcher--vertical-pc .sp-header-left,
+.preview-closed-launcher--vertical-sp .sp-header-left {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: auto;
+  flex: 0 0 auto;
+}
+
+.preview-closed-launcher--vertical-pc .sp-header-left-label,
+.preview-closed-launcher--vertical-sp .sp-header-left-label {
+  margin: 0;
+  color: #1f2937;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  flex: 0 0 auto;
+  min-height: 0;
+}
+
+.preview-closed-launcher--vertical-pc .sp-avatar,
+.preview-closed-launcher--vertical-sp .sp-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  margin: 0 auto;
+}
+
+.preview-closed-launcher--vertical-sp .sp-avatar {
+  width: 48px;
+  height: 48px;
+}
+
+.preview-closed-launcher--vertical-pc .sp-avatar img,
+.preview-closed-launcher--vertical-sp .sp-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.preview-closed-launcher--vertical-pc #comment_bubble.preview-closed-launcher__vertical-bubble,
+.preview-closed-launcher--vertical-sp #comment_bubble.preview-closed-launcher__vertical-bubble {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(100% - 8px);
+  height: auto;
+  margin-left: auto;
+  margin-right: auto;
+  background: #fff;
+  border-radius: 18px;
+  padding: 12px 8px;
+  flex: 0 0 auto;
+  min-height: 0;
+  max-height: 190px;
+  box-sizing: border-box;
+}
+
+.preview-closed-launcher--vertical-pc #comment_bubble.preview-closed-launcher__vertical-bubble::before,
+.preview-closed-launcher--vertical-sp #comment_bubble.preview-closed-launcher__vertical-bubble::before {
+  content: "";
+  position: absolute;
+  left: 50% !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: -8px;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 9px solid #fff;
+  border-bottom: none;
+}
+
+.preview-closed-launcher--vertical-pc #comment_bubble > span.sp-header-left-label-title,
+.preview-closed-launcher--vertical-sp #comment_bubble > span.sp-header-left-label-title {
+  display: block;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  max-height: 170px;
+  overflow: hidden;
+  color: #1f2937;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+  -webkit-line-clamp: unset;
+  -webkit-box-orient: unset;
+  text-overflow: clip;
+  word-break: normal;
+}
+
+.preview-closed-launcher__vertical-arrow {
+  color: #fff;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .preview-closed-launcher--bar-sp {

@@ -606,8 +606,7 @@ const isButtonSubmitMessage = (message) => {
 }
 
 const getNextUserMsg = (ext = null) => (item, index) => {
-  const firstMsgContent = item?.message_content?.at(0);
-  const isDisplayBtnNext = (item?.message_content?.length === 1 && firstMsgContent?.type !== "image") || firstMsgContent?.image?.displayButtonNext !== false;
+  const isDisplayBtnNext = !item.not_use_button;
 
   const conds = !item.hidden && isInteractiveMessage(item) && isDisplayBtnNext;
 

@@ -6,7 +6,13 @@ export const CHAT_BODY_VERSION_DEFAULT = CHAT_BODY_VERSION_2;
  * Resolve recommended SDK embed script paths for a chatbot version.
  * @param {string} version
  * @param {string} baseUrl frontend base URL (no trailing slash)
- * @returns {{ paymentSdkUrl: string, faqSdkUrl: string }}
+ * @returns {{
+ *   paymentSdkUrl: string,
+ *   faqSdkUrl: string,
+ *   utilsSdkUrl: string,
+ *   cartConfirmSdkUrl: string,
+ *   conversionLogSdkUrl: string,
+ * }}
  */
 export const getSdkEmbedPaths = (version, baseUrl) => {
   const normalizedBase = (baseUrl || '').replace(/\/$/, '');
@@ -19,6 +25,9 @@ export const getSdkEmbedPaths = (version, baseUrl) => {
     faqSdkUrl: isV1
       ? `${normalizedBase}/sdk-faq-v1.js`
       : `${normalizedBase}/v2/sdk-faq.js`,
+    utilsSdkUrl: `${normalizedBase}/sdk-utils.js`,
+    cartConfirmSdkUrl: `${normalizedBase}/sdk-cart-confirm.js`,
+    conversionLogSdkUrl: `${normalizedBase}/sdk-conversion-log.js`,
   };
 };
 
@@ -31,3 +40,12 @@ export const buildFaqEmbedScript = (botId, faqSdkUrl, { includeBotType = false }
     : `sessionStorage.setItem("bot_id", "${botId}");`;
   return `<script>${sessionLines}</script>\n<script src="${faqSdkUrl}" defer></script>`;
 };
+
+const buildDualScriptEmbed = (firstUrl, secondUrl) =>
+  `<script type="text/javascript" src="${firstUrl}"></script>\n<script type="text/javascript" src="${secondUrl}"></script>`;
+
+export const buildCartConfirmEmbedScript = (utilsSdkUrl, cartConfirmSdkUrl) =>
+  buildDualScriptEmbed(utilsSdkUrl, cartConfirmSdkUrl);
+
+export const buildConversionLogEmbedScript = (utilsSdkUrl, conversionLogSdkUrl) =>
+  buildDualScriptEmbed(utilsSdkUrl, conversionLogSdkUrl);

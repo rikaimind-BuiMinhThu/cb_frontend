@@ -20,7 +20,7 @@ export const computeClosedContentSize = ({
 
   if (isMobile) {
     if (positionValue === 2) {
-      return { width: 420, height: 300 };
+      return { width: 60, height: 320 };
     }
     if (positionValue === 1 && buttonTypeValue === 2) {
       return { width: 56, height: 56 };
@@ -35,7 +35,7 @@ export const computeClosedContentSize = ({
   }
 
   if (positionValue === 2) {
-    return { width: 420, height: 300 };
+    return { width: 65, height: 320 };
   }
   if (positionValue === 1 && buttonTypeValue === 2) {
     return { width: 56, height: 56 };
@@ -160,44 +160,30 @@ export const getClosedBarWidth = (state, isMobile) => {
 
 export const getClosedLauncherPosition = (state, options = {}) => {
   const isEmbedded = Boolean(state?.urlReceive);
-  const { variant = 'default', isMobile = false } = options;
+  const { variant = 'default', isMobile = false, inline = false } = options;
 
   if (variant === 'vertical') {
-    if (isEmbedded) {
-      if (isMobile) {
-        return {
-          bottom: '0px',
-          right: '-120px',
-          left: 'auto',
-        };
-      }
-      const widthPc = toLayoutNumber(state?.widthPc, DEFAULT_WIDTH_PC);
+    const bottomMargin = isMobile
+      ? toLayoutNumber(state?.bottomMarginSp, 0)
+      : toLayoutNumber(state?.bottomMarginPc, 0);
+    const rightMargin = isMobile
+      ? toLayoutNumber(state?.rightMarginSp, 0)
+      : toLayoutNumber(state?.rightMarginPc, 0);
+
+    // Embed: iframe already applies rightMargin (and SP bottomMargin); match bar.
+    if (isEmbedded && !inline) {
+      const embeddedBottom = isMobile ? 0 : bottomMargin;
       return {
-        bottom: `${widthPc / 2}px`,
-        right: '-120px',
+        bottom: `${embeddedBottom}px`,
+        right: '0px',
         left: 'auto',
       };
     }
 
-    if (isMobile) {
-      const widthSp = toLayoutNumber(state?.widthSp, 100);
-      const bottomMargin = toLayoutNumber(state?.bottomMarginSp, 0);
-      return {
-        bottom: bottomMargin
-          ? `${bottomMargin + widthSp / 2}px`
-          : '20px',
-        right: '-120px',
-        left: 'auto',
-      };
-    }
-
-    const widthPc = toLayoutNumber(state?.widthPc, DEFAULT_WIDTH_PC);
-    const bottomMargin = toLayoutNumber(state?.bottomMarginPc, 0);
+    // Design Setting / non-embed: both margins on the launcher.
     return {
-      bottom: bottomMargin
-        ? `${bottomMargin + widthPc / 2}px`
-        : '20px',
-      right: '-120px',
+      bottom: `${bottomMargin}px`,
+      right: `${rightMargin}px`,
       left: 'auto',
     };
   }

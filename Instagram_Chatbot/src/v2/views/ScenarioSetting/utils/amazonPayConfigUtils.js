@@ -24,10 +24,14 @@ export const getAmazonPayDisplayModeFromConditions = (conditions = []) => {
     : AMAZON_PAY_DISPLAY_MODES.UNDISPLAY_WHEN;
 };
 
-export const hasActiveSpecialDisplayConditions = (message, isUseFukushashiki = false) => {
+export const hasActiveSpecialDisplayConditions = (
+  message,
+  isUseFukushashiki = false,
+  isUseAmazonPay = false,
+) => {
   if (!message) return false;
   if (message.not_display_when_logged_in || message.not_display_when_have_error) return true;
-  if (!isUseFukushashiki) return false;
+  if (!isUseFukushashiki || !isUseAmazonPay) return false;
   return getAmazonPayDisplayModeFromConditions(message.conditions) !== AMAZON_PAY_DISPLAY_MODES.ALWAYS;
 };
 

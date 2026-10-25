@@ -267,6 +267,9 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
       const arrMess = next[indexMessageSelect].message_content;
       const idMax = getNextContentId(arrMess);
       arrMess.push(createDefaultContentItem(messageType, idMax));
+      if (messageType === 'image') {
+        next[indexMessageSelect].not_use_button = true;
+      }
     }));
   }, [dataMessages, indexMessageSelect, setDataMessages]);
 
@@ -274,6 +277,9 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
     setDataMessages(withClonedMessages(dataMessages, (next) => {
       const newBlock = createDefaultCombineBlock(role, blockType, next[indexMessageSelect].message_content);
       next[indexMessageSelect].message_content.push(newBlock);
+      if (role === 'user' && blockType === 'image') {
+        next[indexMessageSelect].not_use_button = true;
+      }
     }));
     setMessageType(blockType);
   }, [dataMessages, indexMessageSelect, setDataMessages, setMessageType]);
