@@ -22,6 +22,8 @@ const joinLauncherClassName = (...parts) => parts.filter(Boolean).join(" ");
  */
 const LAYOUT_MODE_FIXED = 'fixed';
 const LAYOUT_MODE_INLINE = 'inline';
+const ICON_CHEVRON_CIRCLE_UP = 'chevron-circle-up';
+const ICON_CHEVRON_CIRCLE_LEFT = 'chevron-circle-left';
 
 const PreviewClosedLauncher = ({
   state,
@@ -113,7 +115,7 @@ const PreviewClosedLauncher = ({
           </div>
         </div>
         <div className="sp-header-right-arrow preview-closed-launcher__bar-arrow">
-          <MDBIcon fas icon="chevron-circle-up" />
+          <MDBIcon fas icon={ICON_CHEVRON_CIRCLE_UP} />
         </div>
       </div>
     );
@@ -145,6 +147,9 @@ const PreviewClosedLauncher = ({
               </div>
             </div>
           )}
+        </div>
+        <div className="sp-header-right-arrow preview-closed-launcher__vertical-arrow">
+          <MDBIcon fas icon={ICON_CHEVRON_CIRCLE_LEFT} />
         </div>
       </div>
     );
@@ -216,7 +221,7 @@ const PreviewClosedLauncher = ({
             </div>
           </div>
           <div className="sp-header-right-arrow preview-closed-launcher__sp-arrow">
-            <MDBIcon fas icon="chevron-circle-up" />
+            <MDBIcon fas icon={ICON_CHEVRON_CIRCLE_UP} />
           </div>
         </div>
       </div>
@@ -250,6 +255,9 @@ const PreviewClosedLauncher = ({
               </div>
             </div>
           )}
+        </div>
+        <div className="sp-header-right-arrow preview-closed-launcher__vertical-arrow">
+          <MDBIcon fas icon={ICON_CHEVRON_CIRCLE_LEFT} />
         </div>
       </div>
     );
