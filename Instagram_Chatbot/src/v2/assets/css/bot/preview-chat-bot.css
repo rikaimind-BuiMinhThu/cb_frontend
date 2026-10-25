@@ -2089,12 +2089,13 @@ slideUp
   max-width: none;
   transform: none;
   width: 65px;
-  height: 280px;
+  height: auto;
   flex-direction: column-reverse;
   align-items: center;
   justify-content: flex-start;
+  gap: 8px;
   border-radius: 32px;
-  padding: 2px 0;
+  padding: 8px 0 4px;
   box-sizing: border-box;
 }
 
@@ -2107,7 +2108,7 @@ slideUp
   display: flex;
   flex-direction: column-reverse;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   margin: 0;
   padding: 0;
   width: 100%;
@@ -2122,7 +2123,7 @@ slideUp
   display: flex;
   justify-content: center;
   width: 100%;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   min-height: 0;
 }
 
@@ -2133,6 +2134,7 @@ slideUp
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
+  margin: 0 auto;
 }
 
 .preview-closed-launcher--vertical-sp .sp-avatar {
@@ -2158,11 +2160,12 @@ slideUp
   justify-content: center;
   width: calc(100% - 8px);
   height: auto;
-  margin: 0;
+  margin-left: auto;
+  margin-right: auto;
   background: #fff;
   border-radius: 18px;
   padding: 12px 8px;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   min-height: 0;
   max-height: 190px;
   box-sizing: border-box;
@@ -2172,9 +2175,9 @@ slideUp
 .preview-closed-launcher--vertical-sp #comment_bubble.preview-closed-launcher__vertical-bubble::before {
   content: "";
   position: absolute;
-  left: 50%;
-  right: auto;
-  top: auto;
+  left: 50% !important;
+  right: auto !important;
+  top: auto !important;
   bottom: -8px;
   transform: translateX(-50%);
   width: 0;
@@ -2209,8 +2212,8 @@ slideUp
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  padding-top: 4px;
-  margin-bottom: 2px;
+  margin: 0;
+  padding: 0;
 }
 
 .preview-closed-launcher--bar-sp {

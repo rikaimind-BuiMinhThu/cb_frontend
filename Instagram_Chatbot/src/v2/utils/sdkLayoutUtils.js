@@ -20,7 +20,7 @@ export const computeClosedContentSize = ({
 
   if (isMobile) {
     if (positionValue === 2) {
-      return { width: 60, height: 280 };
+      return { width: 60, height: 320 };
     }
     if (positionValue === 1 && buttonTypeValue === 2) {
       return { width: 56, height: 56 };
@@ -35,7 +35,7 @@ export const computeClosedContentSize = ({
   }
 
   if (positionValue === 2) {
-    return { width: 65, height: 280 };
+    return { width: 65, height: 320 };
   }
   if (positionValue === 1 && buttonTypeValue === 2) {
     return { width: 56, height: 56 };
@@ -163,21 +163,24 @@ export const getClosedLauncherPosition = (state, options = {}) => {
   const { variant = 'default', isMobile = false, inline = false } = options;
 
   if (variant === 'vertical') {
-    // True vertical pill: dock with bottom/right margins (preview + live HTML).
-    if (isEmbedded && !inline) {
-      return {
-        bottom: '0px',
-        right: '0px',
-        left: 'auto',
-      };
-    }
-
     const bottomMargin = isMobile
       ? toLayoutNumber(state?.bottomMarginSp, 0)
       : toLayoutNumber(state?.bottomMarginPc, 0);
     const rightMargin = isMobile
       ? toLayoutNumber(state?.rightMarginSp, 0)
       : toLayoutNumber(state?.rightMarginPc, 0);
+
+    // Embed: iframe already applies rightMargin (and SP bottomMargin); match bar.
+    if (isEmbedded && !inline) {
+      const embeddedBottom = isMobile ? 0 : bottomMargin;
+      return {
+        bottom: `${embeddedBottom}px`,
+        right: '0px',
+        left: 'auto',
+      };
+    }
+
+    // Design Setting / non-embed: both margins on the launcher.
     return {
       bottom: `${bottomMargin}px`,
       right: `${rightMargin}px`,
