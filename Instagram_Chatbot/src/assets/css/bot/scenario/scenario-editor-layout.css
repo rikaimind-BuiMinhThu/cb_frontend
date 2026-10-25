@@ -470,6 +470,13 @@
   padding-top: 8px;
 }
 
+/* Keep accordion/JS editor growth inside the bottom pane so the main list does not jump. */
+.ss-editor-layout-v2 .ss-user-setting__bottom:has(.ss-message-settings-accordion__content),
+.ss-editor-layout-v2 .ss-combine-setting__bottom:has(.ss-message-settings-accordion__content) {
+  overflow-y: auto;
+  max-height: min(40vh, 320px);
+}
+
 .ss-editor-layout-v2 .ss-user-setting__select-wrapper {
   max-width: 100%;
   margin: 0;
