@@ -2002,6 +2002,42 @@ slideUp
   padding-left: 20px;
 }
 
+/* PC closed bar bubble — same white pill as SDK iframe (viewport often <981px).
+   Admin design-setting preview is usually >981px, so do not rely on the media query alone. */
+.preview-closed-launcher--bar-pc #comment_bubble {
+  width: 240px;
+  height: 46px;
+  background: #fff;
+  position: relative;
+  display: flex;
+  align-items: center;
+  -moz-border-radius: 12px;
+  -webkit-border-radius: 12px;
+  border-radius: 23px;
+}
+
+.preview-closed-launcher--bar-pc #comment_bubble::before {
+  content: "";
+  width: 0;
+  height: 0;
+  right: 92%;
+  top: 50%;
+  transform: translateY(-50%);
+  position: absolute;
+  border-top: 9px solid transparent;
+  border-right: 26px solid #fff;
+  border-bottom: 9px solid transparent;
+}
+
+.preview-closed-launcher--bar-pc #comment_bubble > span {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+}
+
 .preview-closed-launcher__bar-title-text {
   font-size: 18px;
   font-weight: 900;

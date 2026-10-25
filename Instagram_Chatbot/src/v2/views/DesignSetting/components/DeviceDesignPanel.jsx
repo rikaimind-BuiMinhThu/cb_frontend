@@ -5,6 +5,7 @@ import { AdminInfoTooltip } from 'v2/components/AdminShell';
 import PreviewClosedLauncher from 'v2/views/Preview/PreviewComponent/PreviewClosedLauncher';
 import { getBotHeaderIconUrl } from 'v2/views/Preview/PreviewComponent/previewOpeningStyles';
 import { buildDesignSettingClosedPreviewState } from 'v2/views/Preview/PreviewComponent/buildDesignSettingClosedPreviewState';
+import { buildDesignTypeChromeCss } from 'v2/utils/designTypeChrome';
 import { getDesignSettingTooltip } from '../constants/designSettingTooltips';
 import {
   BUTTON_TYPE_OPTIONS,
@@ -33,6 +34,7 @@ import {
 } from '../constants/designChatbotConstants';
 
 const LAYOUT_MODE_INLINE = 'inline';
+const CLOSED_PREVIEW_FRAME_SCOPE = '.design-device-card__closed-preview-frame';
 
 const noopOpen = () => {};
 
@@ -90,6 +92,10 @@ const DeviceDesignPanel = ({
     designSettings,
   });
   const headerIconSrc = getBotHeaderIconUrl(previewState.botInfor, false);
+  const closedPreviewChromeCss = buildDesignTypeChromeCss(
+    basicInfo.designType,
+    CLOSED_PREVIEW_FRAME_SCOPE,
+  );
 
   return (
     <section className="design-device-card">
@@ -180,6 +186,7 @@ const DeviceDesignPanel = ({
 
       <div className="design-device-card__closed-preview">
         <h5 className="design-device-card__closed-preview-title">{PREVIEW_CLOSED_TITLE}</h5>
+        <style>{closedPreviewChromeCss}</style>
         <div className={`design-device-card__closed-preview-frame ${frameModifier}`}>
           <PreviewClosedLauncher
             state={previewState}
