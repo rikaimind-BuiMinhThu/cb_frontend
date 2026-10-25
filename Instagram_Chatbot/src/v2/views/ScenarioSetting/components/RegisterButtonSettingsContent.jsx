@@ -50,10 +50,13 @@ const RegisterButtonSettingsContent = ({
   selectedMessage,
   dataMessages,
   setDataMessages,
+  isUseFukushashiki = false,
+  isUseAmazonPay = false,
 }) => {
   const [alignBeginningStop, setAlignBeginningStop] = useState(false);
   const settingsRef = useRef(null);
   const pendingScrollSnapshotsRef = useRef(null);
+  const showAmazonPayMessageOptions = isUseFukushashiki && isUseAmazonPay;
 
   const updateMessage = (updates) => {
     setDataMessages(dataMessages.map((msg) => (
@@ -121,14 +124,16 @@ const RegisterButtonSettingsContent = ({
             'useButtonJavascript',
           )}
         />
-        <ScenarioModalCheckbox
-          checked={!!selectedMessage.is_used_when_amazon_pay}
-          onChange={(checked) => updateMessage(applyAmazonPayUsageToMessage(selectedMessage, checked))}
-          label={labelWithTooltip(
-            REGISTER_BUTTON_LABELS.useForAmazonPay,
-            'useForAmazonPay',
-          )}
-        />
+        {showAmazonPayMessageOptions && (
+          <ScenarioModalCheckbox
+            checked={!!selectedMessage.is_used_when_amazon_pay}
+            onChange={(checked) => updateMessage(applyAmazonPayUsageToMessage(selectedMessage, checked))}
+            label={labelWithTooltip(
+              REGISTER_BUTTON_LABELS.useForAmazonPay,
+              'useForAmazonPay',
+            )}
+          />
+        )}
         {shouldShowMessageTagBlock(selectedMessage) && (
           <>
             <ScenarioModalCheckbox
@@ -200,6 +205,8 @@ RegisterButtonSettingsContent.propTypes = {
   selectedMessage: PropTypes.object.isRequired,
   dataMessages: PropTypes.array.isRequired,
   setDataMessages: PropTypes.func.isRequired,
+  isUseFukushashiki: PropTypes.bool,
+  isUseAmazonPay: PropTypes.bool,
 };
 
 export default RegisterButtonSettingsContent;

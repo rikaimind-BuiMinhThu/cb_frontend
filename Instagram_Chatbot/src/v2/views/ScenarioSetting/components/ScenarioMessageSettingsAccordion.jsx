@@ -45,6 +45,7 @@ const ScenarioMessageSettingsAccordion = ({
 }) => {
   const {
     isUseFukushashiki,
+    isUseAmazonPay,
     resetConditionPanelLayout,
     onChangeAmazonPayDisplayMode,
   } = useScenarioPanelDestructuring();
@@ -56,6 +57,7 @@ const ScenarioMessageSettingsAccordion = ({
 
   const role = variant === 'bot' ? 'bot' : 'user';
   const showOtherSettings = variant !== 'bot';
+  const showAmazonPayMessageOptions = isUseFukushashiki && isUseAmazonPay;
   const containerClass = variant === 'bot'
     ? 'ss-bot-setting-condition-container ss-message-settings-accordion'
     : 'ss-user-setting-condition-container ss-message-settings-accordion';
@@ -63,7 +65,11 @@ const ScenarioMessageSettingsAccordion = ({
   useEffect(() => {
     const message = selectedMessageRef.current;
     const hasConditions = (message?.conditions?.length ?? 0) > 0;
-    const hasSpecial = hasActiveSpecialDisplayConditions(message, isUseFukushashiki);
+    const hasSpecial = hasActiveSpecialDisplayConditions(
+      message,
+      isUseFukushashiki,
+      isUseAmazonPay,
+    );
 
     setActivePanel(hasConditions || hasSpecial ? PANEL.AUDIENCE : null);
     resetConditionPanelLayout(role);
@@ -71,9 +77,20 @@ const ScenarioMessageSettingsAccordion = ({
     // Only reset when switching messages. Edits to the open message (tag firing,
     // button name, etc.) must not collapse その他の設定.
     // eslint-disable-next-line react-hooks/exhaustive-deps -- selectedMessage is read via ref
-  }, [indexMessageSelect, selectedMessageId, isUseFukushashiki, resetConditionPanelLayout, role]);
+  }, [
+    indexMessageSelect,
+    selectedMessageId,
+    isUseFukushashiki,
+    isUseAmazonPay,
+    resetConditionPanelLayout,
+    role,
+  ]);
 
-  const hasActiveSpecialDisplay = hasActiveSpecialDisplayConditions(selectedMessage, isUseFukushashiki);
+  const hasActiveSpecialDisplay = hasActiveSpecialDisplayConditions(
+    selectedMessage,
+    isUseFukushashiki,
+    isUseAmazonPay,
+  );
   const hasAudienceConditions = (selectedMessage?.conditions?.length ?? 0) > 0;
   const hasAudienceConfigured = hasActiveSpecialDisplay || hasAudienceConditions;
 
@@ -89,12 +106,12 @@ const ScenarioMessageSettingsAccordion = ({
     if (selectedMessage.button_jscode || selectedMessage.jscode) {
       tags.push('JavaScript');
     }
-    if (selectedMessage.is_used_when_amazon_pay) {
+    if (showAmazonPayMessageOptions && selectedMessage.is_used_when_amazon_pay) {
       tags.push(REGISTER_BUTTON_LABELS.useForAmazonPay);
     }
 
     return tags;
-  }, [selectedMessage]);
+  }, [selectedMessage, showAmazonPayMessageOptions]);
 
   const selectPanel = (panel) => {
     const next = activePanel === panel ? null : panel;
@@ -166,6 +183,7 @@ const ScenarioMessageSettingsAccordion = ({
             dataMessages={dataMessages}
             setDataMessages={setDataMessages}
             isUseFukushashiki={isUseFukushashiki}
+            isUseAmazonPay={isUseAmazonPay}
             onChangeAmazonPayDisplayMode={onChangeAmazonPayDisplayMode}
           />
         </div>
@@ -177,6 +195,8 @@ const ScenarioMessageSettingsAccordion = ({
             selectedMessage={selectedMessage}
             dataMessages={dataMessages}
             setDataMessages={setDataMessages}
+            isUseFukushashiki={isUseFukushashiki}
+            isUseAmazonPay={isUseAmazonPay}
           />
         </div>
       )}

@@ -8,7 +8,7 @@ export const useScenarioPanelDestructuring = () => {
 
   const {
     scenarioName, scenarioType, urlThanks, merchandiseId, lpProductUrl, coupon,
-    isUseOnlyRegularOrder, isUseFukushashiki, isUseCustomCss, customCssContent,
+    isUseOnlyRegularOrder, isUseFukushashiki, isUseAmazonPay, isUseCustomCss, customCssContent,
     isUsedCartConfirmPage, urlCartConfirmPage, isOpenModalCustomCss, isUseCustomJsCode,
     headCustomJsCode, topBodyCustomJsCode, bottomBodyCustomJsCode, isOpenModalCustomJsCode,
     timerConfig, errMsgJsCode, errMsgSettingMode, errMsgFieldSelectors, errMsgFormSelectors,
@@ -74,7 +74,7 @@ export const useScenarioPanelDestructuring = () => {
 
   return {
     scenarioName, scenarioType, urlThanks, merchandiseId, lpProductUrl, coupon,
-    isUseOnlyRegularOrder, isUseFukushashiki, isUseCustomCss, customCssContent,
+    isUseOnlyRegularOrder, isUseFukushashiki, isUseAmazonPay, isUseCustomCss, customCssContent,
     isUsedCartConfirmPage, urlCartConfirmPage, isOpenModalCustomCss, isUseCustomJsCode,
     headCustomJsCode, topBodyCustomJsCode, bottomBodyCustomJsCode, isOpenModalCustomJsCode,
     timerConfig, errMsgJsCode, errMsgSettingMode, errMsgFieldSelectors, errMsgFormSelectors,

@@ -129,6 +129,16 @@
   gap: 8px;
 }
 
+.ss-amazon-pay-display-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ss-amazon-pay-display-group .ss-config-field__label {
+  margin-bottom: 0;
+}
+
 .ss-audience-condition-spacer {
   width: 14%;
 }
