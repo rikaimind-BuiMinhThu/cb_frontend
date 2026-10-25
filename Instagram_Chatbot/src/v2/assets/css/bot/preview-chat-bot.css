@@ -2111,6 +2111,8 @@ slideUp
   margin: 0;
   padding: 0;
   width: 100%;
+  height: auto;
+  flex: 0 0 auto;
 }
 
 .preview-closed-launcher--vertical-pc .sp-header-left-label,
@@ -2120,6 +2122,8 @@ slideUp
   display: flex;
   justify-content: center;
   width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .preview-closed-launcher--vertical-pc .sp-avatar,
@@ -2146,25 +2150,31 @@ slideUp
   display: block;
 }
 
-.preview-closed-launcher--vertical-pc .preview-closed-launcher__vertical-bubble,
-.preview-closed-launcher--vertical-sp .preview-closed-launcher__vertical-bubble {
+.preview-closed-launcher--vertical-pc #comment_bubble.preview-closed-launcher__vertical-bubble,
+.preview-closed-launcher--vertical-sp #comment_bubble.preview-closed-launcher__vertical-bubble {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   width: calc(100% - 8px);
+  height: auto;
+  margin: 0;
   background: #fff;
   border-radius: 18px;
   padding: 12px 8px;
+  flex: 1 1 auto;
+  min-height: 0;
   max-height: 190px;
   box-sizing: border-box;
 }
 
-.preview-closed-launcher--vertical-pc .preview-closed-launcher__vertical-bubble::before,
-.preview-closed-launcher--vertical-sp .preview-closed-launcher__vertical-bubble::before {
+.preview-closed-launcher--vertical-pc #comment_bubble.preview-closed-launcher__vertical-bubble::before,
+.preview-closed-launcher--vertical-sp #comment_bubble.preview-closed-launcher__vertical-bubble::before {
   content: "";
   position: absolute;
   left: 50%;
+  right: auto;
+  top: auto;
   bottom: -8px;
   transform: translateX(-50%);
   width: 0;
@@ -2172,10 +2182,12 @@ slideUp
   border-left: 7px solid transparent;
   border-right: 7px solid transparent;
   border-top: 9px solid #fff;
+  border-bottom: none;
 }
 
-.preview-closed-launcher--vertical-pc .sp-header-left-label-title,
-.preview-closed-launcher--vertical-sp .sp-header-left-label-title {
+.preview-closed-launcher--vertical-pc #comment_bubble > span.sp-header-left-label-title,
+.preview-closed-launcher--vertical-sp #comment_bubble > span.sp-header-left-label-title {
+  display: block;
   writing-mode: vertical-rl;
   text-orientation: mixed;
   max-height: 170px;
@@ -2184,6 +2196,10 @@ slideUp
   font-size: 14px;
   font-weight: 700;
   line-height: 1.35;
+  -webkit-line-clamp: unset;
+  -webkit-box-orient: unset;
+  text-overflow: clip;
+  word-break: normal;
 }
 
 .preview-closed-launcher__vertical-arrow {
