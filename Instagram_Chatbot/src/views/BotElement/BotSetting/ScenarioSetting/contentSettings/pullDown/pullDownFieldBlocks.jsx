@@ -172,7 +172,7 @@ export const renderYearMonthDayRow = ({
   wrap = false,
 }) => (
   <div className="ss-user-setting__item-bottom">
-    <div className={`ss-user-setting__item-select-bottom-wrapper-flex ${wrap ? 'ss-pull-down-setting__fields-row--wrap' : ''}`.trim()}>
+    <div className={`ss-user-setting__item-select-bottom-wrapper-flex${wrap ? ' ss-pull-down-setting__ymd-fields' : ''}`.trim()}>
       <SelectCustom
         className="ss-pull-down-setting__select--32"
         value={typeConfig?.year}
@@ -196,7 +196,7 @@ export const renderYearMonthDayRow = ({
       />
       {includeComment && (
         <InputCustom
-          className={wrap ? 'ss-pull-down-setting__input--32-mt' : 'ss-pull-down-setting__select--32'}
+          className={wrap ? 'ss-pull-down-setting__ymd-comment' : 'ss-pull-down-setting__select--32'}
           placeholder={SETTING_PLACEHOLDERS.comment}
           value={typeConfig?.comment}
           onChange={changeTypeField('comment')}
