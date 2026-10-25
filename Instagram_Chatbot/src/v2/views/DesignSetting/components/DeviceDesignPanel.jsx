@@ -2,6 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Input, InputNumber, Select, Space } from 'antd';
 import { AdminInfoTooltip } from 'v2/components/AdminShell';
+import PreviewClosedLauncher from 'v2/views/Preview/PreviewComponent/PreviewClosedLauncher';
+import { getBotHeaderIconUrl } from 'v2/views/Preview/PreviewComponent/previewOpeningStyles';
+import { buildDesignSettingClosedPreviewState } from 'v2/views/Preview/PreviewComponent/buildDesignSettingClosedPreviewState';
 import { getDesignSettingTooltip } from '../constants/designSettingTooltips';
 import {
   BUTTON_TYPE_OPTIONS,
@@ -21,12 +24,17 @@ import {
   PLACEHOLDER_RIGHT_MARGIN,
   PLACEHOLDER_TITLE_FIELD,
   PLACEHOLDER_WIDTH,
+  PREVIEW_CLOSED_TITLE,
   WIDTH_UNIT_PERCENT,
   WIDTH_UNIT_PX,
   POSITION_BOTTOM,
   POSITION_OPTIONS,
   POSITION_RIGHT,
 } from '../constants/designChatbotConstants';
+
+const LAYOUT_MODE_INLINE = 'inline';
+
+const noopOpen = () => {};
 
 const DesignField = ({ label, tooltipKey, fullWidth, children }) => (
   <div className={`design-field${fullWidth ? ' design-field--full' : ''}`}>
@@ -64,6 +72,8 @@ const DeviceDesignPanel = ({
   rightTitle,
   rightMargin,
   bottomMargin,
+  basicInfo,
+  designSettings,
   onChange,
 }) => {
   const isPc = device === DEVICE_PC;
@@ -72,6 +82,14 @@ const DeviceDesignPanel = ({
   const sizeMax = isPc ? 1000 : 100;
   const positionValue = Number(position);
   const buttonTypeValue = Number(buttonType);
+  const frameModifier = isPc
+    ? 'design-device-card__closed-preview-frame--pc'
+    : 'design-device-card__closed-preview-frame--sp';
+  const previewState = buildDesignSettingClosedPreviewState({
+    basicInfo,
+    designSettings,
+  });
+  const headerIconSrc = getBotHeaderIconUrl(previewState.botInfor, false);
 
   return (
     <section className="design-device-card">
@@ -159,6 +177,20 @@ const DeviceDesignPanel = ({
           />
         </DesignField>
       </div>
+
+      <div className="design-device-card__closed-preview">
+        <h5 className="design-device-card__closed-preview-title">{PREVIEW_CLOSED_TITLE}</h5>
+        <div className={`design-device-card__closed-preview-frame ${frameModifier}`}>
+          <PreviewClosedLauncher
+            state={previewState}
+            headerIconSrc={headerIconSrc}
+            onOpen={noopOpen}
+            isMobileView={!isPc}
+            layoutMode={LAYOUT_MODE_INLINE}
+            hideWhenDisplayHidden={false}
+          />
+        </div>
+      </div>
     </section>
   );
 };
@@ -175,6 +207,28 @@ DeviceDesignPanel.propTypes = {
   rightTitle: PropTypes.string.isRequired,
   rightMargin: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   bottomMargin: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  basicInfo: PropTypes.shape({
+    title: PropTypes.string,
+    mainColor: PropTypes.string,
+    designType: PropTypes.string,
+    botImage: PropTypes.string,
+    openingBotIcon: PropTypes.string,
+    closingBotIcon: PropTypes.string,
+  }).isRequired,
+  designSettings: PropTypes.shape({
+    displayType: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    titleBubble: PropTypes.string,
+    positionPc: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    buttonTypePc: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    rightPcTitle: PropTypes.string,
+    rightMarginPc: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    bottomMarginPc: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    positionSp: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    buttonTypeSp: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    rightSpTitle: PropTypes.string,
+    rightMarginSp: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    bottomMarginSp: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  }).isRequired,
   onChange: PropTypes.func.isRequired,
 };
 

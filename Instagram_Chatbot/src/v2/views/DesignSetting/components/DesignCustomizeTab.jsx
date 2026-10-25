@@ -11,10 +11,15 @@ import {
 import DeviceDesignPanel from './DeviceDesignPanel';
 import BubbleSettingsSection from './BubbleSettingsSection';
 
-const DesignCustomizeTab = ({ designSettings, onFieldChange }) => (
+const DesignCustomizeTab = ({ basicInfo, designSettings, onFieldChange }) => (
   <div className="design-setting-tab-content">
     <form action="POST">
       <div className="design-customize-sections">
+        <BubbleSettingsSection
+          titleBubble={designSettings.titleBubble}
+          onChange={onFieldChange}
+        />
+
         <div className="design-customize-panels">
           <DeviceDesignPanel
             device={DEVICE_PC}
@@ -28,6 +33,8 @@ const DesignCustomizeTab = ({ designSettings, onFieldChange }) => (
             rightTitle={designSettings.rightPcTitle}
             rightMargin={designSettings.rightMarginPc}
             bottomMargin={designSettings.bottomMarginPc}
+            basicInfo={basicInfo}
+            designSettings={designSettings}
             onChange={onFieldChange}
           />
           <DeviceDesignPanel
@@ -41,20 +48,25 @@ const DesignCustomizeTab = ({ designSettings, onFieldChange }) => (
             rightTitle={designSettings.rightSpTitle}
             rightMargin={designSettings.rightMarginSp}
             bottomMargin={designSettings.bottomMarginSp}
+            basicInfo={basicInfo}
+            designSettings={designSettings}
             onChange={onFieldChange}
           />
         </div>
-
-        <BubbleSettingsSection
-          titleBubble={designSettings.titleBubble}
-          onChange={onFieldChange}
-        />
       </div>
     </form>
   </div>
 );
 
 DesignCustomizeTab.propTypes = {
+  basicInfo: PropTypes.shape({
+    title: PropTypes.string,
+    mainColor: PropTypes.string,
+    designType: PropTypes.string,
+    botImage: PropTypes.string,
+    openingBotIcon: PropTypes.string,
+    closingBotIcon: PropTypes.string,
+  }).isRequired,
   designSettings: PropTypes.shape({
     displayType: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     widthPc: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),

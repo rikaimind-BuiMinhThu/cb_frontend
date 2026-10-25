@@ -1934,6 +1934,12 @@ slideUp
   box-sizing: border-box;
 }
 
+.preview-closed-launcher.preview-closed-launcher--inline {
+  position: absolute;
+  z-index: 1;
+  max-width: calc(100% - 8px);
+}
+
 .preview-closed-launcher__icon-img {
   width: 96%;
   height: 96%;
