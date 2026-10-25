@@ -39,9 +39,15 @@
 .ss-pull-down-setting .ss-user-setting__item-bottom-flex-start {
   height: auto;
   min-height: 35px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
   align-items: center;
+  width: 100%;
+}
+
+.ss-pull-down-setting .ss-user-setting__item-bottom-flex-start > .select-custom-antd,
+.ss-pull-down-setting .ss-user-setting__item-bottom-flex-start > .ant-select {
+  min-width: 0;
 }
 
 .ss-pull-down-setting__range-row {
@@ -51,9 +57,10 @@
 }
 
 .ss-pull-down-setting__range-separator {
+  flex-shrink: 0;
   font-size: 30px;
-  margin-left: 10px;
-  margin-right: 10px;
+  margin-left: 0;
+  margin-right: 0;
   opacity: 0.4;
 }
 
@@ -65,7 +72,10 @@
 }
 
 .ss-pull-down-setting__select--18 {
-  width: 18%;
+  flex: 1 1 96px;
+  width: auto;
+  min-width: 96px;
+  max-width: 140px;
 }
 
 .ss-pull-down-setting__select--24 {
@@ -73,7 +83,10 @@
 }
 
 .ss-pull-down-setting__select--29 {
-  width: 29%;
+  flex: 1 1 112px;
+  width: auto;
+  min-width: 112px;
+  max-width: 160px;
   margin-left: 0;
 }
 
@@ -101,7 +114,7 @@
 
 .ss-pull-down-setting__dob-note-row {
   justify-content: flex-start;
-  padding: 0 31px;
+  padding: 0;
 }
 
 .ss-pull-down-setting__dob-note {
@@ -111,7 +124,7 @@
 
 .ss-pull-down-setting__dob-checkbox-row {
   justify-content: flex-start;
-  padding: 0 31px;
+  padding: 0;
   align-items: center;
 }
 
