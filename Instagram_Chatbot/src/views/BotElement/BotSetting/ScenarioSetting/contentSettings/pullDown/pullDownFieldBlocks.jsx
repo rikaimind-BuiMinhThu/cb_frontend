@@ -170,9 +170,18 @@ export const renderYearMonthDayRow = ({
   monthData = dataMonth,
   dayData = dataDay,
   wrap = false,
+  hideDay = false,
 }) => (
   <div className="ss-user-setting__item-bottom">
-    <div className={`ss-user-setting__item-select-bottom-wrapper-flex${wrap ? ' ss-pull-down-setting__ymd-fields' : ''}`.trim()}>
+    <div
+      className={`ss-user-setting__item-select-bottom-wrapper-flex${
+        wrap
+          ? hideDay
+            ? ' ss-pull-down-setting__ymd-fields ss-pull-down-setting__ymd-fields--no-day'
+            : ' ss-pull-down-setting__ymd-fields'
+          : ''
+      }`.trim()}
+    >
       <SelectCustom
         className="ss-pull-down-setting__select--32"
         value={typeConfig?.year}
@@ -187,13 +196,15 @@ export const renderYearMonthDayRow = ({
         placeholder={PULL_DOWN_LABELS.month}
         onChange={changeTypeField('month')}
       />
-      <SelectCustom
-        className="ss-pull-down-setting__select--32"
-        value={typeConfig?.day}
-        data={dayData}
-        placeholder={PULL_DOWN_LABELS.day}
-        onChange={changeTypeField('day')}
-      />
+      {!hideDay && (
+        <SelectCustom
+          className="ss-pull-down-setting__select--32"
+          value={typeConfig?.day}
+          data={dayData}
+          placeholder={PULL_DOWN_LABELS.day}
+          onChange={changeTypeField('day')}
+        />
+      )}
       {includeComment && (
         <InputCustom
           className={wrap ? 'ss-pull-down-setting__ymd-comment' : 'ss-pull-down-setting__select--32'}

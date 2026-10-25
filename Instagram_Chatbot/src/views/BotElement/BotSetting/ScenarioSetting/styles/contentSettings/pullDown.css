@@ -146,6 +146,10 @@
   justify-content: unset;
 }
 
+.ss-pull-down-setting__ymd-fields--no-day {
+  grid-template-columns: 1fr 1fr;
+}
+
 .ss-pull-down-setting__ymd-fields > .select-custom-antd,
 .ss-pull-down-setting__ymd-fields > .ant-select,
 .ss-pull-down-setting__ymd-fields > .ss-input-custom-container {
