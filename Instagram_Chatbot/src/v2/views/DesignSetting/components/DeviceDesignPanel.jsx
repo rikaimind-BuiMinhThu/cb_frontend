@@ -144,23 +144,29 @@ const DeviceDesignPanel = ({
         )}
 
         <DesignField label={LABEL_RIGHT_MARGIN} tooltipKey="rightMargin">
-          <InputNumber
-            name={`right_margin_${device}`}
-            value={rightMargin}
-            placeholder={PLACEHOLDER_RIGHT_MARGIN}
-            min={0}
-            onChange={(value) => onChange(`rightMargin${fieldPrefix}`, value ?? '')}
-          />
+          <Space size={8} align="center">
+            <InputNumber
+              name={`right_margin_${device}`}
+              value={rightMargin}
+              placeholder={PLACEHOLDER_RIGHT_MARGIN}
+              min={0}
+              onChange={(value) => onChange(`rightMargin${fieldPrefix}`, value ?? '')}
+            />
+            <span className="design-field__suffix">{WIDTH_UNIT_PX}</span>
+          </Space>
         </DesignField>
 
         <DesignField label={LABEL_BOTTOM_MARGIN} tooltipKey="bottomMargin">
-          <InputNumber
-            name={`bottom_margin_${device}`}
-            value={bottomMargin}
-            placeholder={PLACEHOLDER_BOTTOM_MARGIN}
-            min={0}
-            onChange={(value) => onChange(`bottomMargin${fieldPrefix}`, value ?? '')}
-          />
+          <Space size={8} align="center">
+            <InputNumber
+              name={`bottom_margin_${device}`}
+              value={bottomMargin}
+              placeholder={PLACEHOLDER_BOTTOM_MARGIN}
+              min={0}
+              onChange={(value) => onChange(`bottomMargin${fieldPrefix}`, value ?? '')}
+            />
+            <span className="design-field__suffix">{WIDTH_UNIT_PX}</span>
+          </Space>
         </DesignField>
       </div>
 
