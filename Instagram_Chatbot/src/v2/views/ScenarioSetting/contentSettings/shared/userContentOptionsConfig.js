@@ -22,7 +22,7 @@ export const USER_CONTENT_OPTIONS_CONFIG = {
     saveToVariable: true,
     apiValidation: true,
     requireInline: false,
-    displayContinueButton: true,
+    displayContinueButton: false,
     apiSelect: {
       valueField: 'use_api_input_value',
       changeField: 'use_api_input_value',
