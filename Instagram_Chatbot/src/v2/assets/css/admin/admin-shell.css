@@ -87,7 +87,13 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 8px 0;
+}
+
+.admin-layout .ant-menu-item,
+.admin-layout .ant-menu-submenu-title {
+  overflow: hidden;
 }
 
 .admin-layout .ant-menu-item-selected {
