@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Input, InputNumber, Select, Space } from 'antd';
+import { InputNumber, Select, Space } from 'antd';
 import { AdminInfoTooltip } from 'v2/components/AdminShell';
 import PreviewClosedLauncher from 'v2/views/Preview/PreviewComponent/PreviewClosedLauncher';
 import { getBotHeaderIconUrl } from 'v2/views/Preview/PreviewComponent/previewOpeningStyles';
@@ -11,19 +11,15 @@ import {
   BUTTON_TYPE_OPTIONS,
   DEVICE_PC,
   DEVICE_SP,
-  DISPLAY_TYPE_OPTIONS,
   LABEL_BOTTOM_MARGIN,
   LABEL_BUTTON_CONTENT,
-  LABEL_DISPLAY_TYPE,
+  LABEL_DISPLAY_CONTENT,
   LABEL_POSITION,
   LABEL_RIGHT_MARGIN,
-  LABEL_RIGHT_TITLE_PC,
-  LABEL_RIGHT_TITLE_SP,
   LABEL_SIZE,
   PLACEHOLDER_BOTTOM_MARGIN,
   PLACEHOLDER_HEIGHT,
   PLACEHOLDER_RIGHT_MARGIN,
-  PLACEHOLDER_TITLE_FIELD,
   PLACEHOLDER_WIDTH,
   PREVIEW_CLOSED_TITLE,
   WIDTH_UNIT_PERCENT,
@@ -38,8 +34,8 @@ const CLOSED_PREVIEW_FRAME_SCOPE = '.design-device-card__closed-preview-frame';
 
 const noopOpen = () => {};
 
-const DesignField = ({ label, tooltipKey, fullWidth, children }) => (
-  <div className={`design-field${fullWidth ? ' design-field--full' : ''}`}>
+const DesignField = ({ label, tooltipKey, children }) => (
+  <div className="design-field">
     <label className="design-field__label">
       {label}
       {tooltipKey && (
@@ -53,25 +49,21 @@ const DesignField = ({ label, tooltipKey, fullWidth, children }) => (
 DesignField.propTypes = {
   label: PropTypes.string.isRequired,
   tooltipKey: PropTypes.string,
-  fullWidth: PropTypes.bool,
   children: PropTypes.node.isRequired,
 };
 
 DesignField.defaultProps = {
   tooltipKey: '',
-  fullWidth: false,
 };
 
 const DeviceDesignPanel = ({
   device,
   title,
-  displayType,
   width,
   height,
   widthUnit,
   position,
   buttonType,
-  rightTitle,
   rightMargin,
   bottomMargin,
   basicInfo,
@@ -80,7 +72,6 @@ const DeviceDesignPanel = ({
 }) => {
   const isPc = device === DEVICE_PC;
   const fieldPrefix = isPc ? 'Pc' : 'Sp';
-  const rightTitleLabel = isPc ? LABEL_RIGHT_TITLE_PC : LABEL_RIGHT_TITLE_SP;
   const sizeMax = isPc ? 1000 : 100;
   const positionValue = Number(position);
   const buttonTypeValue = Number(buttonType);
@@ -101,17 +92,7 @@ const DeviceDesignPanel = ({
     <section className="design-device-card">
       <h4 className="design-device-card__title">{title}</h4>
       <div className="design-device-card__grid">
-        {isPc && (
-          <DesignField label={LABEL_DISPLAY_TYPE} tooltipKey="displayType">
-            <Select
-              value={Number(displayType)}
-              options={DISPLAY_TYPE_OPTIONS}
-              onChange={(value) => onChange('displayType', value)}
-            />
-          </DesignField>
-        )}
-
-        <DesignField label={LABEL_SIZE} tooltipKey="size" fullWidth>
+        <DesignField label={LABEL_SIZE} tooltipKey="size">
           <Space size={12} wrap className="design-size-row">
             <InputNumber
               name={`width_${device}`}
@@ -143,12 +124,11 @@ const DeviceDesignPanel = ({
         </DesignField>
 
         {positionValue === POSITION_RIGHT && (
-          <DesignField label={rightTitleLabel} tooltipKey="rightTitle">
-            <Input
-              name={`right_position_${device}_title`}
-              placeholder={PLACEHOLDER_TITLE_FIELD}
-              value={rightTitle}
-              onChange={(e) => onChange(`right${fieldPrefix}Title`, e.target.value)}
+          <DesignField label={LABEL_DISPLAY_CONTENT} tooltipKey="rightDisplayContent">
+            <Select
+              value={buttonTypeValue}
+              options={BUTTON_TYPE_OPTIONS}
+              onChange={(value) => onChange(`buttonType${fieldPrefix}`, value)}
             />
           </DesignField>
         )}
@@ -205,13 +185,11 @@ const DeviceDesignPanel = ({
 DeviceDesignPanel.propTypes = {
   device: PropTypes.oneOf([DEVICE_PC, DEVICE_SP]).isRequired,
   title: PropTypes.string.isRequired,
-  displayType: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   height: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   widthUnit: PropTypes.oneOf([WIDTH_UNIT_PX, WIDTH_UNIT_PERCENT]).isRequired,
   position: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   buttonType: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
-  rightTitle: PropTypes.string.isRequired,
   rightMargin: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   bottomMargin: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   basicInfo: PropTypes.shape({
@@ -227,12 +205,10 @@ DeviceDesignPanel.propTypes = {
     titleBubble: PropTypes.string,
     positionPc: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     buttonTypePc: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    rightPcTitle: PropTypes.string,
     rightMarginPc: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     bottomMarginPc: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     positionSp: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     buttonTypeSp: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    rightSpTitle: PropTypes.string,
     rightMarginSp: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     bottomMarginSp: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   }).isRequired,

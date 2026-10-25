@@ -497,11 +497,24 @@
   color: #374151;
 }
 
-:is(.admin-page--design-setting, .admin-page--add-bot) .design-device-card__grid,
-:is(.admin-page--design-setting, .admin-page--add-bot) .design-bubble-card__grid {
+:is(.admin-page--design-setting, .admin-page--add-bot) .design-device-card__grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px 16px;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+:is(.admin-page--design-setting, .admin-page--add-bot) .design-bubble-card__grid,
+:is(.admin-page--design-setting, .admin-page--add-bot) .design-customize-shared-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+:is(.admin-page--design-setting, .admin-page--add-bot) .design-customize-shared {
+  background: #fafafa;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
 }
 
 :is(.admin-page--design-setting, .admin-page--add-bot) .design-device-card__closed-preview {

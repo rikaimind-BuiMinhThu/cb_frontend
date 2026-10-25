@@ -124,6 +124,7 @@ const PreviewClosedLauncher = ({
       variant: "vertical",
       inline: isInlineLayout,
     });
+    const showVerticalTitle = buttonTypePc !== 2;
     return (
       <div
         className={joinLauncherClassName(
@@ -137,9 +138,11 @@ const PreviewClosedLauncher = ({
       >
         <div className="sp-header-left" onClick={toggleOpen}>
           <div className="sp-header-left-avatar sp-avatar">{avatarImg}</div>
-          <div className="sp-header-left-label">
-            <div className="sp-header-left-label-title">{state.rightPcTitle}</div>
-          </div>
+          {showVerticalTitle && (
+            <div className="sp-header-left-label">
+              <div className="sp-header-left-label-title">{bubbleTitle}</div>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -224,6 +227,7 @@ const PreviewClosedLauncher = ({
       variant: "vertical",
       inline: isInlineLayout,
     });
+    const showVerticalTitle = buttonTypeSp !== 2;
     return (
       <div
         className={joinLauncherClassName(
@@ -237,9 +241,11 @@ const PreviewClosedLauncher = ({
       >
         <div className="sp-header-left">
           <div className="sp-header-left-avatar sp-avatar">{avatarImg}</div>
-          <div className="sp-header-left-label">
-            <div className="sp-header-left-label-title">{state.rightSpTitle}</div>
-          </div>
+          {showVerticalTitle && (
+            <div className="sp-header-left-label">
+              <div className="sp-header-left-label-title">{bubbleTitle}</div>
+            </div>
+          )}
         </div>
       </div>
     );
