@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { AdminInfoTooltip } from 'v2/components/AdminShell';
 import InputCustom from '../scenarioCommon/InputCustom';
@@ -23,12 +23,25 @@ const labelWithTooltip = (text, tooltipKey) => (
   </>
 );
 
+const findScrollParent = (el) => {
+  let node = el?.parentElement;
+  while (node) {
+    const { overflowY } = window.getComputedStyle(node);
+    if ((overflowY === 'auto' || overflowY === 'scroll') && node.scrollHeight > node.clientHeight) {
+      return node;
+    }
+    node = node.parentElement;
+  }
+  return null;
+};
+
 const RegisterButtonSettingsContent = ({
   selectedMessage,
   dataMessages,
   setDataMessages,
 }) => {
   const [alignBeginningStop, setAlignBeginningStop] = useState(false);
+  const settingsRef = useRef(null);
 
   const updateMessage = (updates) => {
     setDataMessages(dataMessages.map((msg) => (
@@ -36,13 +49,22 @@ const RegisterButtonSettingsContent = ({
     )));
   };
 
+  const updateMessagePreserveScroll = (updates) => {
+    const scrollParent = findScrollParent(settingsRef.current);
+    const scrollTop = scrollParent?.scrollTop;
+    updateMessage(updates);
+    if (scrollParent == null || scrollTop == null) return;
+    requestAnimationFrame(() => {
+      scrollParent.scrollTop = scrollTop;
+    });
+  };
+
   const showCodeEditor = !!selectedMessage.button_jscode;
 
   return (
     <div
-      className={`ss-user-register-button-settings${
-        showCodeEditor ? ' ss-user-register-button-settings--code-open' : ''
-      }`}
+      ref={settingsRef}
+      className="ss-user-register-button-settings"
     >
       <div className="ss-user-register-button-settings__main">
         <ScenarioModalCheckbox
@@ -76,7 +98,7 @@ const RegisterButtonSettingsContent = ({
         )}
         <ScenarioModalCheckbox
           checked={showCodeEditor}
-          onChange={(checked) => updateMessage({ button_jscode: checked })}
+          onChange={(checked) => updateMessagePreserveScroll({ button_jscode: checked })}
           label={labelWithTooltip(
             REGISTER_BUTTON_LABELS.useButtonJavascript,
             'useButtonJavascript',
