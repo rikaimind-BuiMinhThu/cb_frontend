@@ -120,7 +120,10 @@ const PreviewClosedLauncher = ({
   }
 
   if (closedOk && !isMobileView && positionPc === 2) {
-    const position = getClosedLauncherPosition(state, { variant: "vertical" });
+    const position = getClosedLauncherPosition(state, {
+      variant: "vertical",
+      inline: isInlineLayout,
+    });
     return (
       <div
         className={joinLauncherClassName(
@@ -219,6 +222,7 @@ const PreviewClosedLauncher = ({
     const position = getClosedLauncherPosition(state, {
       isMobile: true,
       variant: "vertical",
+      inline: isInlineLayout,
     });
     return (
       <div

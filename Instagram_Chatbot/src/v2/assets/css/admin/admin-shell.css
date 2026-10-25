@@ -528,7 +528,7 @@
 
 :is(.admin-page--design-setting, .admin-page--add-bot) .design-device-card__closed-preview-frame--pc {
   width: 100%;
-  min-height: 200px;
+  min-height: 340px;
   border-radius: 8px;
 }
 

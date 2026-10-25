@@ -160,9 +160,22 @@ export const getClosedBarWidth = (state, isMobile) => {
 
 export const getClosedLauncherPosition = (state, options = {}) => {
   const isEmbedded = Boolean(state?.urlReceive);
-  const { variant = 'default', isMobile = false } = options;
+  const { variant = 'default', isMobile = false, inline = false } = options;
 
   if (variant === 'vertical') {
+    // Design-setting inline preview: keep the rotated tab inside the gray frame.
+    if (inline) {
+      const barLength = 300;
+      const bottomMargin = isMobile
+        ? toLayoutNumber(state?.bottomMarginSp, 0)
+        : toLayoutNumber(state?.bottomMarginPc, 0);
+      return {
+        bottom: `${bottomMargin + barLength / 2}px`,
+        right: '0px',
+        left: 'auto',
+      };
+    }
+
     if (isEmbedded) {
       if (isMobile) {
         return {

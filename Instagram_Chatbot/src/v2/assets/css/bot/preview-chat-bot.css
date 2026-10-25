@@ -2100,6 +2100,12 @@ slideUp
   transform: rotate(-90deg);
 }
 
+.preview-closed-launcher--inline.preview-closed-launcher--vertical-pc,
+.preview-closed-launcher--inline.preview-closed-launcher--vertical-sp {
+  max-width: none;
+  transform-origin: center right;
+}
+
 .preview-closed-launcher--bar-sp {
   width: var(--pcl-width, 240px);
   height: 48px;
