@@ -52,11 +52,13 @@ const RegisterButtonSettingsContent = ({
   setDataMessages,
   isUseFukushashiki = false,
   isUseAmazonPay = false,
+  tagFiringEnabled = false,
 }) => {
   const [alignBeginningStop, setAlignBeginningStop] = useState(false);
   const settingsRef = useRef(null);
   const pendingScrollSnapshotsRef = useRef(null);
   const showAmazonPayMessageOptions = isUseFukushashiki && isUseAmazonPay;
+  const showMessageTagBlock = tagFiringEnabled && shouldShowMessageTagBlock(selectedMessage);
 
   const updateMessage = (updates) => {
     setDataMessages(dataMessages.map((msg) => (
@@ -134,7 +136,7 @@ const RegisterButtonSettingsContent = ({
             )}
           />
         )}
-        {shouldShowMessageTagBlock(selectedMessage) && (
+        {showMessageTagBlock && (
           <>
             <ScenarioModalCheckbox
               checked={!!selectedMessage.tag_enabled}
@@ -207,6 +209,7 @@ RegisterButtonSettingsContent.propTypes = {
   setDataMessages: PropTypes.func.isRequired,
   isUseFukushashiki: PropTypes.bool,
   isUseAmazonPay: PropTypes.bool,
+  tagFiringEnabled: PropTypes.bool,
 };
 
 export default RegisterButtonSettingsContent;

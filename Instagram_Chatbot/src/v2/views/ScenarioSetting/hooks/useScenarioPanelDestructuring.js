@@ -22,7 +22,7 @@ export const useScenarioPanelDestructuring = () => {
     dataEveryMinute, dataYear, dataMonth, dataDay, errorVariable, dataCondition,
     isUsedMessageLoadedPast, isUsedCrosssell, productIdCrossSell,
     isClearLandingPageSession, isUseBtnUpdateTracking, useFullwidthChatbotMobile,
-    clientCartSystem, listProductVariants, isShopifyPaymentScenario,
+    clientCartSystem, listProductVariants, isShopifyPaymentScenario, tagFiring,
   } = state;
 
   const {
@@ -88,7 +88,7 @@ export const useScenarioPanelDestructuring = () => {
     dataEveryMinute, dataYear, dataMonth, dataDay, errorVariable, dataCondition,
     isUsedMessageLoadedPast, isUsedCrosssell, productIdCrossSell,
     isClearLandingPageSession, isUseBtnUpdateTracking, useFullwidthChatbotMobile,
-    clientCartSystem, listProductVariants, isShopifyPaymentScenario,
+    clientCartSystem, listProductVariants, isShopifyPaymentScenario, tagFiring,
     setScenarioName, setScenarioType, setUrlThanks, setMerchandiseId, setLpProductUrl,
     setCoupon, setIsUseOnlyRegularOrder, setIsUseFukushashiki, setIsUseCustomCss,
     setCustomCssContent, setIsUsedCartConfirmPage, setUrlCartConfirmPage,

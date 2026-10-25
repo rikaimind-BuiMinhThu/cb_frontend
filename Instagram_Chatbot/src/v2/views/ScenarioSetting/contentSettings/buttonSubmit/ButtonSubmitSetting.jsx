@@ -17,6 +17,7 @@ import {
   getDefaultSubmitTagEvent,
   getDefaultSubmitTagLabel,
 } from '../../utils/tagFiringUtils';
+import { useScenarioPanelDestructuring } from '../../hooks/useScenarioPanelDestructuring';
 import '../../styles/contentSettings/buttonSubmit.css';
 
 const ButtonSubmitSetting = ({
@@ -33,6 +34,8 @@ const ButtonSubmitSetting = ({
   setVarFileReference,
   setAcceptFile,
 }) => {
+  const { tagFiring } = useScenarioPanelDestructuring();
+  const tagFiringEnabled = !!tagFiring?.enabled;
   const buttonSubmit = content.button_submit;
   const messageContent = dataMessages[indexMessageSelect]?.message_content?.[indexContent];
 
@@ -282,7 +285,7 @@ const ButtonSubmitSetting = ({
       {renderSaveVariableSelect()}
       {renderErrorMessageRow()}
       {renderJsCode()}
-      {renderTagFiring()}
+      {tagFiringEnabled && renderTagFiring()}
       {renderButtonFields()}
     </ContentSettingShell>
   );

@@ -46,9 +46,11 @@ const ScenarioMessageSettingsAccordion = ({
   const {
     isUseFukushashiki,
     isUseAmazonPay,
+    tagFiring,
     resetConditionPanelLayout,
     onChangeAmazonPayDisplayMode,
   } = useScenarioPanelDestructuring();
+  const tagFiringEnabled = !!tagFiring?.enabled;
 
   const [activePanel, setActivePanel] = useState(null);
   const selectedMessageId = selectedMessage?.id;
@@ -197,6 +199,7 @@ const ScenarioMessageSettingsAccordion = ({
             setDataMessages={setDataMessages}
             isUseFukushashiki={isUseFukushashiki}
             isUseAmazonPay={isUseAmazonPay}
+            tagFiringEnabled={tagFiringEnabled}
           />
         </div>
       )}
