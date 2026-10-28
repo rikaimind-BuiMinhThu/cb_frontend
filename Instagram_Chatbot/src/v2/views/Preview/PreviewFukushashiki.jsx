@@ -592,6 +592,8 @@ const PreviewFukushashiki = () => {
       bottomBodyCustomJsCode: chatbot?.bottom_body_custom_js_code,
       isUsedCustomCss: !!chatbot?.is_used_custom_css,
       customCssContent: chatbot?.custom_css_content,
+      isUsedThanksMessage: !!chatbot?.is_used_thanks_message,
+      thanksMessageHtml: chatbot?.thanks_message_html || '',
       isUsedHtmlUgc: !!chatbot?.is_used_html_ugc,
       htmlUgcConfigContent: chatbot?.html_ugc_config_content,
       orderResultMode: chatbot?.order_result_mode || "wait",
@@ -788,6 +790,26 @@ const PreviewFukushashiki = () => {
           type: PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE,
           payload: copy,
         }),
+        showThanks: (fallbackCopy) => {
+          const html = state.isUsedThanksMessage
+            ? String(state.thanksMessageHtml || '').trim()
+            : '';
+          if (!html) {
+            dispatch({
+              type: PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE,
+              payload: fallbackCopy,
+            });
+            return;
+          }
+          dispatch({
+            type: PREVIEW_ACTIONS.SET_SUBMIT_THANKS_MESSAGE,
+            payload: html,
+          });
+        },
+        lockChatAfterSubmit: () => dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+          payload: { isChatLockedAfterSubmit: true },
+        }),
       });
       return;
     }
@@ -904,12 +926,16 @@ const PreviewFukushashiki = () => {
     return (
       <div className={isDisplayBtnNext ? 'sp-user-message-button-action' : 'sp-user-message-button-action sp-user-message-button-action--hidden'}>
         <CustomButton
-          disabled={state.submitErrorMessage.length > 0 ? false : message.disabled}
+          disabled={
+            state.isChatLockedAfterSubmit
+              ? true
+              : (state.submitErrorMessage.length > 0 ? false : message.disabled)
+          }
           className={`ss-user-message__action-btn${hasBtnUpdateClass ? " btn-update" : ""}`}
           onClick={() => {
             onClickNext(messageIndex, message)
           }}
-          autoClick={isAutoClick && !state.isExtractFromSession}
+          autoClick={isAutoClick && !state.isExtractFromSession && !state.isChatLockedAfterSubmit}
           messageType={message.message_content[0]?.type}
         >
           {btnText}
@@ -932,7 +958,13 @@ const PreviewFukushashiki = () => {
             message={message}
             captcha={state.captcha}
             messageContentProps={message.message_content}
-            disabled={(state.submitErrorMessage.length > 0 && state.submitErrorMessage !== GETTING_ERROR_NOTIFICATION) ? false : message.disabled}
+            disabled={
+              state.isChatLockedAfterSubmit
+                ? true
+                : (state.submitErrorMessage.length > 0 && state.submitErrorMessage !== GETTING_ERROR_NOTIFICATION)
+                  ? false
+                  : message.disabled
+            }
             onChangeValue={(
               contentIndex,
               contentType,
@@ -968,8 +1000,10 @@ const PreviewFukushashiki = () => {
             variables={state.variables}
             lpOptionData={state.lpOptionData}
             submitErrorMessage={state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "" : state.submitErrorMessage}
+            submitThanksMessage={state.submitThanksMessage || ""}
             botId={state.botId}
             isProcessing={!!state.isProcessing}
+            isSubmitHidden={!!state.isChatLockedAfterSubmit}
             cartSystem={state.cartSystem}
             footer={renderNextButton(message, messageIndex)}
           />
@@ -993,7 +1027,13 @@ const PreviewFukushashiki = () => {
           postMessageToParent={(options) => postMessageToParent(options, state)}
           message={message}
           captcha={state.captcha}
-          disabled={(state.submitErrorMessage.length > 0 && state.submitErrorMessage !== GETTING_ERROR_NOTIFICATION) ? false : message.disabled}
+          disabled={
+            state.isChatLockedAfterSubmit
+              ? true
+              : (state.submitErrorMessage.length > 0 && state.submitErrorMessage !== GETTING_ERROR_NOTIFICATION)
+                ? false
+                : message.disabled
+          }
           onChangeValue={(
             contentIndex,
             contentType,
@@ -1023,8 +1063,10 @@ const PreviewFukushashiki = () => {
           variables={state.variables}
           lpOptionData={state.lpOptionData}
           submitErrorMessage={state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "" : state.submitErrorMessage}
+          submitThanksMessage={state.submitThanksMessage || ""}
           botId={state.botId}
           isProcessing={!!state.isProcessing}
+          isSubmitHidden={!!state.isChatLockedAfterSubmit}
           botInfor={state.botInfor}
           themeSettings={state.themeSettings}
           previewOrderContent={state.previewOrderContent}
@@ -1033,6 +1075,7 @@ const PreviewFukushashiki = () => {
           cartSystem={state.cartSystem}
           isUpdate={isUpdate}
           isExtractFromSession={state.isExtractFromSession}
+          isChatLockedAfterSubmit={!!state.isChatLockedAfterSubmit}
         />
     );
   };

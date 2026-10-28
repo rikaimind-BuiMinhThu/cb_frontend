@@ -13,6 +13,7 @@ import {
 import ScenarioSettingsMainView from './views/ScenarioSettingsMainView';
 import ScenarioCustomCssView from './views/ScenarioCustomCssView';
 import ScenarioCustomJsView from './views/ScenarioCustomJsView';
+import ScenarioThanksMessageView from './views/ScenarioThanksMessageView';
 import ScenarioHtmlUgcView from './views/ScenarioHtmlUgcView';
 import ScenarioTimerView from './views/ScenarioTimerView';
 import ScenarioErrMsgView from './views/ScenarioErrMsgView';
@@ -21,9 +22,14 @@ import ScenarioSettingsAmazonPayView from './views/ScenarioSettingsAmazonPayView
 import ScenarioSettingsAmazonPayHtmlView from './views/ScenarioSettingsAmazonPayHtmlView';
 import ScenarioSettingsTagFiringView from './views/ScenarioSettingsTagFiringView';
 import ScenarioGlobalDelayView from './views/ScenarioGlobalDelayView';
+import ScenarioLexicaCartView from './views/ScenarioLexicaCartView';
 
 const getSettingsModalWidth = (settingsModalView) => {
-  if (settingsModalView === SETTINGS_MODAL_VIEWS.CSS || settingsModalView === SETTINGS_MODAL_VIEWS.JS) {
+  if (
+    settingsModalView === SETTINGS_MODAL_VIEWS.CSS
+    || settingsModalView === SETTINGS_MODAL_VIEWS.JS
+    || settingsModalView === SETTINGS_MODAL_VIEWS.THANKS
+  ) {
     return SETTINGS_CODE_MODAL_WIDTH;
   }
   if (settingsModalView === SETTINGS_MODAL_VIEWS.AMAZON_PAY_HTML) {
@@ -33,7 +39,11 @@ const getSettingsModalWidth = (settingsModalView) => {
 };
 
 const getSettingsModalClassName = (settingsModalView) => {
-  if (settingsModalView === SETTINGS_MODAL_VIEWS.CSS || settingsModalView === SETTINGS_MODAL_VIEWS.JS) {
+  if (
+    settingsModalView === SETTINGS_MODAL_VIEWS.CSS
+    || settingsModalView === SETTINGS_MODAL_VIEWS.JS
+    || settingsModalView === SETTINGS_MODAL_VIEWS.THANKS
+  ) {
     return SETTINGS_CODE_MODAL_CLASS;
   }
   return SETTINGS_DEFAULT_MODAL_CLASS;
@@ -83,6 +93,8 @@ const ScenarioSettingsModalContainer = () => {
         return <ScenarioCustomCssView onBack={backToSettingsMainView} />;
       case SETTINGS_MODAL_VIEWS.JS:
         return <ScenarioCustomJsView onBack={backToSettingsMainView} />;
+      case SETTINGS_MODAL_VIEWS.THANKS:
+        return <ScenarioThanksMessageView onBack={backToSettingsMainView} />;
       case SETTINGS_MODAL_VIEWS.HTML_UGC:
         return <ScenarioHtmlUgcView onBack={backToSettingsMainView} />;
       case SETTINGS_MODAL_VIEWS.TIMER:
@@ -103,6 +115,8 @@ const ScenarioSettingsModalContainer = () => {
         return <ScenarioGlobalDelayView onBack={backToSettingsMainView} />;
       case SETTINGS_MODAL_VIEWS.TAGS:
         return <ScenarioSettingsTagFiringView onBack={backToSettingsMainView} />;
+      case SETTINGS_MODAL_VIEWS.LEXICA_CART:
+        return <ScenarioLexicaCartView onBack={backToSettingsMainView} />;
       case SETTINGS_MODAL_VIEWS.MAIN:
       default:
         return <ScenarioSettingsMainView onClose={closeScenarioSettingsModal} />;

@@ -364,6 +364,24 @@ export const CONTACT_FORM_SETTING_LABELS = {
   staffEmailTemplate: '担当者向けメールテンプレート',
 };
 
+export const LEXICA_CART_LABELS = {
+  enterCartSettings: 'カート、商品情報を入力',
+  openSettings: '設定する →',
+  viewTitle: 'カート・商品情報を設定',
+  orderResult: '注文確定後の表示',
+  orderResultWait: '待ち（完了まで表示）',
+  orderResultAsync: '受付（裏で処理）',
+  productSku: '商品SKUコード',
+  cartUrl: 'カートURL',
+  cartUrlPlaceholder: 'https://cart.example.com',
+  confirmUpsell: '確認画面でアップセル活用',
+  confirmCrossSell: '確認画面でクロスセル活用',
+  thanksUpsell: 'サンクス画面でアップセル活用',
+  thanksCrossSell: 'サンクス画面でクロスセル活用',
+  upsellSku: 'アップセル 商品SKUコード',
+  crossSellSku: 'クロスセル 商品SKUコード',
+};
+
 export const ADDRESS_FIELD_MODAL_LABELS = {
   title: '住所フィールド設定',
   buttonLabel: '詳細設定',

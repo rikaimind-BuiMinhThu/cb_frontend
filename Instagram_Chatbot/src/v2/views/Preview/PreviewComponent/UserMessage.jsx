@@ -100,9 +100,11 @@ const UserMessage = ({
   variables,
   lpOptionData = {},
   submitErrorMessage = '',
+  submitThanksMessage = '',
   postMessageToParent,
   botId,
   isProcessing = false,
+  isSubmitHidden = false,
   onRenderCompleted,
   cartSystem = '',
   footer = null,
@@ -480,9 +482,11 @@ const UserMessage = ({
             messageIndex={messageIndex}
             message={message}
             submitErrorMessage={submitErrorMessage}
+            submitThanksMessage={submitThanksMessage}
             onChangeValue={onChangeValue}
             onClickNext={onClickNext}
             isProcessing={isProcessing}
+            isHidden={isSubmitHidden}
           />
         );
       case MESSAGE_CONTENT_TYPES.LABEL_NO_TRANSITION:

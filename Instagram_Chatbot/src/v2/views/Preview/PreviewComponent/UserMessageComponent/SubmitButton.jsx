@@ -7,7 +7,18 @@ import { getErrorMessageFromParent } from "v2/views/Preview/PreviewFukushashiki/
 
 const DEFAULT_BUTTON_IMAGE_WIDTH = "80%";
 
-const SubmitButton = ({ content, submitErrorMessage = EMPTY_INPUT_VALUE, onChangeValue, onClickNext, isProcessing = false, messageIndex, contentIndex, message}) => {
+const SubmitButton = ({
+  content,
+  submitErrorMessage = EMPTY_INPUT_VALUE,
+  submitThanksMessage = EMPTY_INPUT_VALUE,
+  onChangeValue,
+  onClickNext,
+  isProcessing = false,
+  isHidden = false,
+  messageIndex,
+  contentIndex,
+  message,
+}) => {
   const buttonSubmit = content?.button_submit;
   const submitButtonId = `chatbot-submit-button-${message?.id ?? 'msg'}-${messageIndex}-${contentIndex}`;
 
@@ -32,7 +43,21 @@ const SubmitButton = ({ content, submitErrorMessage = EMPTY_INPUT_VALUE, onChang
   if (content.type !== MESSAGE_CONTENT_TYPES.SUBMIT_BUTTON) return null;
   if (!buttonSubmit) return null;
 
+  const renderSubmitThanksMessage = () => {
+    if (!submitThanksMessage || submitThanksMessage.length === 0) return null;
+
+    return (
+      <div className="ss-user-setting__item-text_input-top">
+        <div
+          className="ss-bot-submit-thanks-message"
+          dangerouslySetInnerHTML={{ __html: submitThanksMessage }}
+        />
+      </div>
+    );
+  };
+
   const renderSubmitErrorMessage = () => {
+    if (submitThanksMessage && submitThanksMessage.length > 0) return null;
     if (!buttonSubmit.is_display_error_message) return null;
 
     if (submitErrorMessage.length === 0) return null;
@@ -110,21 +135,24 @@ const SubmitButton = ({ content, submitErrorMessage = EMPTY_INPUT_VALUE, onChang
 
   return (
     <>
+      {renderSubmitThanksMessage()}
       {renderSubmitErrorMessage()}
-      <div className="ss-user-setting__item-text_input-top">
-        {buttonSubmit?.style && <style dangerouslySetInnerHTML={{ __html: buttonSubmit.style }} />}
-        <button
-          id={submitButtonId}
-          className={[
-            'chatbot-submit-button',
-            imageUrl ? 'chatbot-submit-button--image' : '',
-          ].filter(Boolean).join(' ')}
-          onClick={onChangeAndClickNext}
-        >
-          {renderButtonContent()}
-        </button>
-      </div>
-      {renderLoadingUnderButton()}
+      {!isHidden && (
+        <div className="ss-user-setting__item-text_input-top">
+          {buttonSubmit?.style && <style dangerouslySetInnerHTML={{ __html: buttonSubmit.style }} />}
+          <button
+            id={submitButtonId}
+            className={[
+              'chatbot-submit-button',
+              imageUrl ? 'chatbot-submit-button--image' : '',
+            ].filter(Boolean).join(' ')}
+            onClick={onChangeAndClickNext}
+          >
+            {renderButtonContent()}
+          </button>
+        </div>
+      )}
+      {!isHidden && renderLoadingUnderButton()}
     </>
   );
 };
@@ -133,8 +161,10 @@ SubmitButton.propTypes = {
   ...baseUserMessageComponentPropTypes,
   message: PropTypes.object,
   submitErrorMessage: PropTypes.string,
+  submitThanksMessage: PropTypes.string,
   onClickNext: PropTypes.func,
   isProcessing: PropTypes.bool,
+  isHidden: PropTypes.bool,
 };
 
 export default SubmitButton;

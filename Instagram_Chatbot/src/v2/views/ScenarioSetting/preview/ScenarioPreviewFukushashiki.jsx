@@ -721,6 +721,8 @@ const ScenarioPreviewFukushashiki = ({
       bottomBodyCustomJsCode: chatbot?.bottom_body_custom_js_code,
       isUsedCustomCss: !!chatbot?.is_used_custom_css,
       customCssContent: chatbot?.custom_css_content,
+      isUsedThanksMessage: !!chatbot?.is_used_thanks_message,
+      thanksMessageHtml: chatbot?.thanks_message_html || '',
     };
 
     if (chatbot?.timer_config?.enable) {

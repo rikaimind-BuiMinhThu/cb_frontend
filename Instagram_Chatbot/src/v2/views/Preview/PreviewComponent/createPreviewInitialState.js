@@ -48,6 +48,7 @@ const sharedPreviewInitialState = (params) => ({
   scenarioUserResponses: [],
   isDisplayErrorMessage: false,
   submitErrorMessage: "",
+  submitThanksMessage: "",
   objParam: {
     current_url: window.location.href,
     current_url_param: getAllUrlParams(window.location.href),
@@ -106,12 +107,15 @@ const fukushashikiExtras = (params) => ({
   errMsgFieldSelectors: "",
   errMsgFormSelectors: "",
   launchButtonSelectors: "",
+  isUsedThanksMessage: false,
+  thanksMessageHtml: "",
   isUpsell: false,
   isNotAutoScroll: false,
   cartSystem: params.get("cartSystem") || "",
   isUseBtnUpdateTracking: false,
   orderResultMode: "wait",
   executionPolicy: DEFAULT_EXECUTION_POLICY,
+  isChatLockedAfterSubmit: false,
 });
 
 /**

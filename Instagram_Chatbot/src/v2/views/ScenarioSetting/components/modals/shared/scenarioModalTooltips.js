@@ -1,3 +1,5 @@
+import { LEXICA_CART_LABELS } from '../../../constants/scenarioSettingLabels';
+
 export const SCENARIO_MODAL_TOOLTIPS = {
   lpProductUrl: '商品購入ページのURLを入力してください。',
   urlThanks: '購入完了後のサンクスページのURLを入力してください。',
@@ -7,10 +9,18 @@ export const SCENARIO_MODAL_TOOLTIPS = {
   launchButtonSelectors: '複数セレクターはカンマ区切り。クリックでチャットボットを開きます。',
   isUseCustomCss: 'カスタムCSSをチャットボットに適用します。',
   isUseCustomJsCode: 'カスタムJSコードをチャットボットに適用します。',
+  isUseThanksMessage: '注文受付・完了時にサンクスメッセージ（HTML）を表示します。',
+  thanksMessageHtml: 'ここにサンクスメッセージのHTMLを入力してください。',
   isUseHtmlUgc: 'UGCコンテンツ（Instagram/TikTok/レビュー）をチャットボットに埋め込みます。「設定する」から種別（Instagram / TikTok / レビュー）を選択してください。',
   timer: 'チャットボット内にカウントダウンタイマーを表示します。',
   isUseErrMsgByJs: 'フォームのエラーメッセージをJSまたはセレクターで取得します。',
   isUseOnlyRegularOrder: '定期注文のみを対象とします。',
+  lexicaEnterCartSettings: 'レキシカのカートURL、商品SKU、アップセルとクロスセルを設定します。',
+  lexicaOrderResult: '注文確定後、完了まで待つか、受付だけ表示するかを選びます。',
+  lexicaProductSku: 'カートに入れる商品のSKUコードを入力してください。',
+  lexicaCartUrl: 'レキシカカートのURLを入力してください。',
+  lexicaUpsellSku: 'アップセル商品のSKUコードを入力してください。',
+  lexicaCrossSellSku: 'クロスセル商品のSKUコードを入力してください。',
   executionPolicy: '注文の実施方針を選択します。複写式を選ぶとLP連携用の設定が表示されます。',
   isUseFukushashiki: '複写式チャットボット機能を有効にします。',
   isUseAmazonPay: 'Amazon Pay連携を有効にします。許可ドメインや判定方法を設定できます。',
@@ -95,6 +105,7 @@ export const SETTINGS_MODAL_VIEWS = {
   MAIN: 'main',
   CSS: 'css',
   JS: 'js',
+  THANKS: 'thanks',
   HTML_UGC: 'htmlUgc',
   TIMER: 'timer',
   ERR_MSG: 'errMsg',
@@ -103,6 +114,7 @@ export const SETTINGS_MODAL_VIEWS = {
   AMAZON_PAY_HTML: 'amazonPayHtml',
   GLOBAL_DELAY: 'globalDelay',
   TAGS: 'tags',
+  LEXICA_CART: 'lexicaCart',
 };
 
 export const AMAZON_PAY_DETECTION_HELP_TEXT = {
@@ -127,6 +139,7 @@ export const SETTINGS_VIEW_TITLES = {
   [SETTINGS_MODAL_VIEWS.MAIN]: 'シナリオ設定',
   [SETTINGS_MODAL_VIEWS.CSS]: 'カスタム CSS を入力',
   [SETTINGS_MODAL_VIEWS.JS]: 'カスタムJSコードを入力',
+  [SETTINGS_MODAL_VIEWS.THANKS]: 'サンクスメッセージを入力',
   [SETTINGS_MODAL_VIEWS.HTML_UGC]: 'UGCForce連携を設定',
   [SETTINGS_MODAL_VIEWS.TIMER]: 'タイマーを使用する',
   [SETTINGS_MODAL_VIEWS.ERR_MSG]: 'エラーメッセージ取得設定',
@@ -135,4 +148,5 @@ export const SETTINGS_VIEW_TITLES = {
   [SETTINGS_MODAL_VIEWS.AMAZON_PAY_HTML]: 'Amazon Pay HTML抽出設定',
   [SETTINGS_MODAL_VIEWS.GLOBAL_DELAY]: '表示待ち時間を設定する',
   [SETTINGS_MODAL_VIEWS.TAGS]: 'タグ発火設定',
+  [SETTINGS_MODAL_VIEWS.LEXICA_CART]: LEXICA_CART_LABELS.viewTitle,
 };

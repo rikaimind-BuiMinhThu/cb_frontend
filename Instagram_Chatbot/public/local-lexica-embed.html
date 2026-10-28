@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>I'm PINCH local FE embed</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: sans-serif;
+      background: #f6f7f9;
+    }
+    main {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 48px 24px;
+    }
+    .bot_open {
+      display: inline-block;
+      margin-top: 24px;
+      padding: 16px 28px;
+      border: 0;
+      border-radius: 35px;
+      background: #02bb92;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>I'm PINCH (local FE)</h1>
+    <p>Loads local <code>/v2/sdk.js</code>. Bot id 325 (staging I'm PINCH). Use this to verify chat lock after submit.</p>
+    <p>Open with <code>?env=staging</code> so the SDK hits staging API (local API is optional).</p>
+    <button type="button" class="bot_open">お申し込み</button>
+  </main>
+  <script>
+    if (!new URLSearchParams(location.search).get('env')) {
+      location.replace(location.pathname + '?env=staging');
+    }
+    sessionStorage.setItem('bot_id', '325');
+  </script>
+  <script src="/v2/sdk.js" defer></script>
+</body>
+</html>

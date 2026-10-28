@@ -1794,6 +1794,14 @@ slideUp
   font-size: var(--c-error-font-size, 14px);
 }
 
+.ss-bot-submit-thanks-message {
+  background-color: var(--c-thanks-bg, #e8f5e9);
+  color: var(--c-thanks-text, #2e7d32);
+  border: 1px solid var(--c-thanks-text, #2e7d32);
+  font-size: var(--c-thanks-font-size, 14px);
+  padding: 8px 12px;
+}
+
 .ss-bot-getting-error-notification {
   background-color: #0000FF;
   color: #FFFFFF;

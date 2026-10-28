@@ -14,6 +14,7 @@ import { createEmptyAutoLogoutConfig } from 'v2/views/ScenarioSetting/utils/auto
 import { applyAmazonPayCartPreset } from 'v2/views/ScenarioSetting/utils/amazonPayConfigUtils';
 import { fillTagFiringDefaults } from 'v2/views/ScenarioSetting/utils/tagFiringUtils';
 import { TAG_FIRING_LABELS } from '../../../constants/tagFiringLabels';
+import { LEXICA_CART_LABELS } from '../../../constants/scenarioSettingLabels';
 import { CART_SYSTEM } from 'v2/views/Preview/PreviewComponent/Constants';
 import {
   EXECUTION_POLICIES,
@@ -31,11 +32,9 @@ const ScenarioSettingsMainView = ({ onClose }) => {
   const { state, actions, client: contextClient } = useScenarioEditor();
   const {
     scenarioType,
-    urlThanks,
     merchandiseId,
     lpProductUrl,
     coupon,
-    isUseOnlyRegularOrder,
     executionPolicy,
     isUseFukushashiki,
     isUseAmazonPay,
@@ -43,6 +42,7 @@ const ScenarioSettingsMainView = ({ onClose }) => {
     clientCartSystem,
     isUseCustomCss,
     isUseCustomJsCode,
+    isUseThanksMessage,
     isUseHtmlUgc,
     timerConfig,
     isUseErrMsgByJs,
@@ -59,11 +59,9 @@ const ScenarioSettingsMainView = ({ onClose }) => {
     lexica,
   } = state;
   const {
-    setUrlThanks,
     setMerchandiseId,
     setLpProductUrl,
     setCoupon,
-    setIsUseOnlyRegularOrder,
     setExecutionPolicy,
     setIsUseFukushashiki,
     setIsUseAmazonPay,
@@ -73,6 +71,7 @@ const ScenarioSettingsMainView = ({ onClose }) => {
     setAmazonPayDetectionForm,
     setIsUseCustomCss,
     setIsUseCustomJsCode,
+    setIsUseThanksMessage,
     setIsUseHtmlUgc,
     setIsUgcInstagram,
     setIsUgcTiktok,
@@ -102,6 +101,8 @@ const ScenarioSettingsMainView = ({ onClose }) => {
     || clientCartSystem === CART_SYSTEM.LEXICA;
   const isApiPolicy = executionPolicy === EXECUTION_POLICIES.API;
   const isFukushashikiPolicy = executionPolicy === EXECUTION_POLICIES.FUKUSHASHIKI;
+  const showLexicaCartSettings = executionPolicy === EXECUTION_POLICIES.RPA && isLexicaCart;
+  const showCartProductFields = isShopifyPaymentScenario || client?.cart_system === 'ec_force';
 
   const handleChangeExecutionPolicy = (value) => {
     setExecutionPolicy(value);
@@ -140,6 +141,12 @@ const ScenarioSettingsMainView = ({ onClose }) => {
     navigateSettingsModalView(SETTINGS_MODAL_VIEWS.TAGS);
   };
 
+  const handleToggleLexicaCartSettings = (checked) => {
+    setLexicaField('useCartSettings', checked);
+    if (!checked) return;
+    navigateSettingsModalView(SETTINGS_MODAL_VIEWS.LEXICA_CART);
+  };
+
   const handleToggleAmazonPay = (checked) => {
     setIsUseAmazonPay(checked);
     if (!checked) return;
@@ -164,7 +171,7 @@ const ScenarioSettingsMainView = ({ onClose }) => {
 
   return (
     <div className="ss-settings-main-view">
-      {scenarioType !== 'faq' && !isApiPolicy && (
+      {scenarioType !== 'faq' && !isApiPolicy && showCartProductFields && (
         <section className="ss-layout-form-section">
           {isShopifyPaymentScenario && (
             <>
@@ -200,92 +207,6 @@ const ScenarioSettingsMainView = ({ onClose }) => {
                 onChange={(value) => setCoupon(value)}
               />
             </ScenarioFormRow>
-          )}
-          {isLexicaCart && (
-            <>
-              <ScenarioFormRow label="注文確定後の表示">
-                <select
-                  className="ss-input-value"
-                  value={lexica.orderResultMode}
-                  onChange={(event) => setLexicaField('orderResultMode', event.target.value)}
-                >
-                  <option value="wait">待ち（完了まで表示）</option>
-                  <option value="async">受付（裏で処理）</option>
-                </select>
-              </ScenarioFormRow>
-              <ScenarioFormRow label="商品コード">
-                <InputCustom
-                  style={{ width: '100%' }}
-                  value={merchandiseId}
-                  onChange={(value) => setMerchandiseId(value)}
-                />
-              </ScenarioFormRow>
-              <ScenarioFormRow label="カートURL">
-                <InputCustom
-                  style={{ width: '100%' }}
-                  value={lexica.lexicaCartUrl}
-                  onChange={(value) => setLexicaField('lexicaCartUrl', value)}
-                  placeholder="https://cart.example.com"
-                />
-              </ScenarioFormRow>
-              <ScenarioFormRow label="アップセル 商品URL">
-                <InputCustom
-                  style={{ width: '100%' }}
-                  value={lexica.lexicaUpsellProductUrl}
-                  onChange={(value) => setLexicaField('lexicaUpsellProductUrl', value)}
-                  data-testid="lexica-upsell-url"
-                />
-              </ScenarioFormRow>
-              <ScenarioFormRow label="アップセル 商品コード">
-                <InputCustom
-                  style={{ width: '100%' }}
-                  value={lexica.lexicaUpsellSku}
-                  onChange={(value) => setLexicaField('lexicaUpsellSku', value)}
-                  data-testid="lexica-upsell-sku"
-                />
-              </ScenarioFormRow>
-              <ScenarioFormRow label="クロスセル 商品URL">
-                <InputCustom
-                  style={{ width: '100%' }}
-                  value={lexica.lexicaCrossSellProductUrl}
-                  onChange={(value) => setLexicaField('lexicaCrossSellProductUrl', value)}
-                  data-testid="lexica-cross-sell-url"
-                />
-              </ScenarioFormRow>
-              <ScenarioFormRow label="クロスセル 商品コード">
-                <InputCustom
-                  style={{ width: '100%' }}
-                  value={lexica.lexicaCrossSellSku}
-                  onChange={(value) => setLexicaField('lexicaCrossSellSku', value)}
-                  data-testid="lexica-cross-sell-sku"
-                />
-              </ScenarioFormRow>
-              <ScenarioModalCheckbox
-                checked={lexica.lexicaOfferChat}
-                onChange={(checked) => setLexicaField('lexicaOfferChat', checked)}
-                label="チャットで聞く"
-              />
-              <ScenarioModalCheckbox
-                checked={lexica.lexicaOfferConfirmUpsell}
-                onChange={(checked) => setLexicaField('lexicaOfferConfirmUpsell', checked)}
-                label="確認画面でアップセル"
-              />
-              <ScenarioModalCheckbox
-                checked={lexica.lexicaOfferConfirmCrossSell}
-                onChange={(checked) => setLexicaField('lexicaOfferConfirmCrossSell', checked)}
-                label="確認画面でクロスセル（第1版はオフ）"
-              />
-              <ScenarioModalCheckbox
-                checked={lexica.lexicaOfferThanksUpsell}
-                onChange={(checked) => setLexicaField('lexicaOfferThanksUpsell', checked)}
-                label="サンクスでアップセル"
-              />
-              <ScenarioModalCheckbox
-                checked={lexica.lexicaOfferThanksCrossSell}
-                onChange={(checked) => setLexicaField('lexicaOfferThanksCrossSell', checked)}
-                label="サンクスでクロスセル"
-              />
-            </>
           )}
         </section>
       )}
@@ -360,33 +281,31 @@ const ScenarioSettingsMainView = ({ onClose }) => {
             </select>
           </ScenarioFormRow>
           {!isApiPolicy && (
-            <>
-              <ScenarioFormRow
-                label="商品購入のURL"
-                tooltip={SCENARIO_MODAL_TOOLTIPS.lpProductUrl}
-              >
-                <InputCustom
-                  value={lpProductUrl}
-                  onChange={(value) => setLpProductUrl(value)}
-                />
-              </ScenarioFormRow>
-              <ScenarioFormRow
-                label="サンクスページのURL"
-                tooltip={SCENARIO_MODAL_TOOLTIPS.urlThanks}
-              >
-                <InputCustom
-                  value={urlThanks}
-                  onChange={(value) => setUrlThanks(value)}
-                />
-              </ScenarioFormRow>
-              <div className="ss-layout-checkbox-item">
-                <ScenarioModalCheckbox
-                  checked={isUseOnlyRegularOrder}
-                  onChange={(checked) => setIsUseOnlyRegularOrder(checked)}
-                  label={labelWithTooltip('定期注文のみ', 'isUseOnlyRegularOrder')}
-                />
-              </div>
-            </>
+            <ScenarioFormRow
+              label="商品購入のURL"
+              tooltip={SCENARIO_MODAL_TOOLTIPS.lpProductUrl}
+            >
+              <InputCustom
+                value={lpProductUrl}
+                onChange={(value) => setLpProductUrl(value)}
+              />
+            </ScenarioFormRow>
+          )}
+          {showLexicaCartSettings && (
+            <OverviewCheckboxRow
+              checked={lexica.useCartSettings}
+              onChange={handleToggleLexicaCartSettings}
+              label={labelWithTooltip(LEXICA_CART_LABELS.enterCartSettings, 'lexicaEnterCartSettings')}
+              actionButton={lexica.useCartSettings && (
+                <button
+                  type="button"
+                  className="ss-settings-modal-action-link"
+                  onClick={() => navigateSettingsModalView(SETTINGS_MODAL_VIEWS.LEXICA_CART)}
+                >
+                  {LEXICA_CART_LABELS.openSettings}
+                </button>
+              )}
+            />
           )}
           {isFukushashikiPolicy && (
             <div className="ss-layout-checkbox-item">
@@ -421,6 +340,20 @@ const ScenarioSettingsMainView = ({ onClose }) => {
                 type="button"
                 className="ss-settings-modal-action-link"
                 onClick={() => navigateSettingsModalView(SETTINGS_MODAL_VIEWS.JS)}
+              >
+                設定する →
+              </button>
+            )}
+          />
+          <OverviewCheckboxRow
+            checked={isUseThanksMessage}
+            onChange={(checked) => setIsUseThanksMessage(checked)}
+            label={labelWithTooltip('サンクスメッセージを表示する', 'isUseThanksMessage')}
+            actionButton={isUseThanksMessage && (
+              <button
+                type="button"
+                className="ss-settings-modal-action-link"
+                onClick={() => navigateSettingsModalView(SETTINGS_MODAL_VIEWS.THANKS)}
               >
                 設定する →
               </button>

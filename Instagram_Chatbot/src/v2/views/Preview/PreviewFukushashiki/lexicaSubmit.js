@@ -19,6 +19,8 @@ export const runLexicaButtonSubmit = ({
   logData,
   continueAfterOptionalToken,
   setSubmitError,
+  showThanks,
+  lockChatAfterSubmit,
 }) => {
   if (isLocked) return;
   lock();
@@ -41,12 +43,16 @@ export const runLexicaButtonSubmit = ({
       }, CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
     }
     continueAfterOptionalToken();
-    await followLexicaOrder({
+    const result = await followLexicaOrder({
       scenarioId,
       userId,
       orderResultMode,
       onStatus: setSubmitError,
+      onSuccess: showThanks,
     });
+    if (result?.ok) {
+      lockChatAfterSubmit();
+    }
   };
   submit().finally(() => {
     unlock();

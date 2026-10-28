@@ -205,6 +205,9 @@ const buildThemeVariables = (theme) => {
   --c-error-bg: ${theme.errorMessageBgColor};
   --c-error-text: ${theme.errorMessageTextColor};
   --c-error-font-size: ${theme.errorMessageFontSize};
+  --c-thanks-bg: ${theme.thanksMessageBgColor};
+  --c-thanks-text: ${theme.thanksMessageTextColor};
+  --c-thanks-font-size: ${theme.thanksMessageFontSize};
   --c-modal-bg: ${theme.modalBgColor};
   --c-modal-title-text: ${theme.modalTitleTextColor};
   --c-modal-title-font-size: ${theme.modalTitleFontSize};
@@ -970,6 +973,13 @@ ${scopedDescendant(scopeSelector, '.error-container .error_each')} {
 
 ${scopedClass(scopeSelector, '.ss-bot-submit-error-message')} {
   border: 1px solid var(--c-error-text, #f44336) !important;
+}
+
+${scopedClass(scopeSelector, '.ss-bot-submit-thanks-message')} {
+  background-color: var(--c-thanks-bg, #e8f5e9) !important;
+  color: var(--c-thanks-text, #2e7d32) !important;
+  font-size: var(--c-thanks-font-size, 14px) !important;
+  border: 1px solid var(--c-thanks-text, #2e7d32) !important;
 }
 
 ${scopedClass(scopeSelector, '.sp-popup-zip-code-address')} {

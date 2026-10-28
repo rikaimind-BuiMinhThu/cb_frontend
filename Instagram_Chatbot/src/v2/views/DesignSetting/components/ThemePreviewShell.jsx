@@ -124,6 +124,21 @@ const ThemePreviewShell = ({
       ) : null}
 
       <PreviewRegion
+        sectionId="thanks"
+        activeSectionId={activeSectionId}
+        onSectionSelect={onSectionSelect}
+        className="theme-preview-region--thanks"
+      >
+        <div className="theme-customize-preview__error-top">
+          <div className="ss-user-setting__item-text_input-top">
+            <div className="ss-bot-submit-thanks-message theme-customize-preview__thanks-message">
+              ご注文ありがとうございました。
+            </div>
+          </div>
+        </div>
+      </PreviewRegion>
+
+      <PreviewRegion
         sectionId="window"
         activeSectionId={activeSectionId}
         onSectionSelect={onSectionSelect}

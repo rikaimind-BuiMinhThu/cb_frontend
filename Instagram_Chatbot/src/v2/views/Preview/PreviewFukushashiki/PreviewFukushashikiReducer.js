@@ -157,11 +157,21 @@ const PreviewFukushashikiReducer = (state, action) => {
         currentMsgIndex: action.payload.endIndex - 1,
         isNotAutoScroll: isNotAutoScroll,
       };
+    case PREVIEW_ACTIONS.SET_SUBMIT_THANKS_MESSAGE: {
+      return {
+        ...state,
+        submitThanksMessage: action.payload || '',
+        submitErrorMessage: '',
+        isProcessing: false,
+      };
+    }
+
     case PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE: {
       if (action.payload === GETTING_ERROR_NOTIFICATION) {
         return {
           ...state,
           submitErrorMessage: action.payload,
+          submitThanksMessage: '',
           isProcessing: false,
         };
       }
@@ -188,6 +198,7 @@ const PreviewFukushashikiReducer = (state, action) => {
           messagesList: messagesList,
           renderMessagesList: messagesList.slice(0, state.currentMsgIndex + 1),
           submitErrorMessage: action.payload,
+          submitThanksMessage: '',
           isProcessing: false,
           nextStopMsgIndex: nextStopMsgIndex,
         };
@@ -205,6 +216,7 @@ const PreviewFukushashikiReducer = (state, action) => {
         messagesList: messagesList,
         renderMessagesList: renderMessagesList,
         submitErrorMessage: action.payload,
+        submitThanksMessage: '',
         isProcessing: false,
       };
     }
@@ -489,6 +501,8 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
         bottomBodyCustomJsCode: chatbot?.bottom_body_custom_js_code,
         isUsedCustomCss: !!chatbot?.is_used_custom_css,
         customCssContent: chatbot?.custom_css_content,
+        isUsedThanksMessage: !!chatbot?.is_used_thanks_message,
+        thanksMessageHtml: chatbot?.thanks_message_html || '',
         isUsedHtmlUgc: !!chatbot?.is_used_html_ugc,
         htmlUgcConfigContent: chatbot?.html_ugc_config_content,
         isUseBtnUpdateTracking: !!conversation?.isUseBtnUpdateTracking,

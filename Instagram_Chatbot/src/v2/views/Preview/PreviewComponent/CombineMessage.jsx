@@ -18,6 +18,7 @@ export const CombineMessageNextButton = ({
   onClickNext,
   isUpdate,
   isExtractFromSession,
+  isChatLockedAfterSubmit = false,
 }) => {
   if (!message || !isCombineMessage(message)) return null;
   if (message.not_use_button) return null;
@@ -33,10 +34,10 @@ export const CombineMessageNextButton = ({
   return (
     <div className={`sp-user-message-button-action ss-combine-message__next-button${isDisplayBtnNext ? '' : ' sp-user-message-button-action--hidden'}`}>
       <CustomButton
-        disabled={false}
+        disabled={isChatLockedAfterSubmit}
         className="ss-user-message__action-btn"
         onClick={() => onClickNext(messageIndex, message)}
-        autoClick={isAutoClick && !isExtractFromSession}
+        autoClick={isAutoClick && !isExtractFromSession && !isChatLockedAfterSubmit}
         messageType={firstUserBlock?.type}
       >
         {btnText}
@@ -62,15 +63,18 @@ const CombineMessage = ({
   prefecturesList,
   lpOptionData,
   submitErrorMessage,
+  submitThanksMessage = '',
   postMessageToParent,
   botId,
   isProcessing,
+  isSubmitHidden = false,
   disabled,
   onOpen,
   messageIndexRender,
   cartSystem,
   isUpdate,
   isExtractFromSession,
+  isChatLockedAfterSubmit = false,
   skipEntryAnimation = false,
 }) => {
   if (!isCombineMessage(message)) return null;
@@ -125,9 +129,11 @@ const CombineMessage = ({
                         variables={variables}
                         lpOptionData={lpOptionData}
                         submitErrorMessage={submitErrorMessage}
+                        submitThanksMessage={submitThanksMessage}
                         postMessageToParent={postMessageToParent}
                         botId={botId}
                         isProcessing={isProcessing}
+                        isSubmitHidden={isSubmitHidden}
                         onClickNext={onClickNext}
                         onOpen={onOpen}
                         messageIndexRender={messageIndexRender}
@@ -146,6 +152,7 @@ const CombineMessage = ({
             onClickNext={onClickNext}
             isUpdate={isUpdate}
             isExtractFromSession={isExtractFromSession}
+            isChatLockedAfterSubmit={isChatLockedAfterSubmit}
           />
         </div>
         <UserMessageTailIcon
@@ -171,9 +178,11 @@ const CombineUserBlock = ({
   variables,
   lpOptionData,
   submitErrorMessage,
+  submitThanksMessage = '',
   postMessageToParent,
   botId,
   isProcessing,
+  isSubmitHidden = false,
   onClickNext,
   onOpen,
   messageIndexRender,
@@ -201,9 +210,11 @@ const CombineUserBlock = ({
       variables={variables}
       lpOptionData={lpOptionData}
       submitErrorMessage={submitErrorMessage}
+      submitThanksMessage={submitThanksMessage}
       postMessageToParent={postMessageToParent}
       botId={botId}
       isProcessing={isProcessing}
+      isSubmitHidden={isSubmitHidden}
       onChangeValue={(idx, contentType, value, field, subField1, subField2) =>
         onChangeValue(contentIndex, contentType, value, field, subField1, subField2)
       }

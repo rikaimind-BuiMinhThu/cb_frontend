@@ -374,11 +374,12 @@ export const pollLexicaOrder = async ({ scenarioId, userId, onBusy }) => {
   return { ok: false, copy: FAIL_COPY };
 }
 
-export const followLexicaOrder = async ({ scenarioId, userId, orderResultMode, onStatus }) => {
+export const followLexicaOrder = async ({ scenarioId, userId, orderResultMode, onStatus, onSuccess }) => {
   const queued = await createLexicaOrder({ scenarioId, userId });
   const mode = orderResultMode || queued?.order_result_mode || 'wait';
+  const showSuccess = onSuccess || onStatus;
   if (mode === 'async') {
-    onStatus(ACCEPT_COPY);
+    showSuccess(ACCEPT_COPY);
     return { ok: true, async: true };
   }
   onStatus(WAIT_COPY);
@@ -387,7 +388,11 @@ export const followLexicaOrder = async ({ scenarioId, userId, orderResultMode, o
     userId,
     onBusy: () => onStatus(BUSY_COPY),
   });
-  onStatus(result.copy);
+  if (result.ok) {
+    showSuccess(result.copy);
+  } else {
+    onStatus(result.copy);
+  }
   return result;
 }
 

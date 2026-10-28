@@ -68,6 +68,8 @@ export const useScenario = (mode = 'scenario') => {
   const [isUseFukushashiki, setIsUseFukushashiki] = useState(false);
   const [isUseCustomCss, setIsUseCustomCss] = useState(false);
   const [customCssContent, setCustomCssContent] = useState(INITIAL_CUSTOM_CODE);
+  const [isUseThanksMessage, setIsUseThanksMessage] = useState(false);
+  const [thanksMessageHtml, setThanksMessageHtml] = useState(INITIAL_CUSTOM_CODE);
   const [isUseHtmlUgc, setIsUseHtmlUgc] = useState(false);
   const [isUgcInstagram, setIsUgcInstagram] = useState(false);
   const [isUgcTiktok, setIsUgcTiktok] = useState(false);
@@ -213,6 +215,8 @@ export const useScenario = (mode = 'scenario') => {
     setIsUseFukushashiki(parsed.isUseFukushashiki);
     setIsUseCustomCss(parsed.isUseCustomCss);
     setCustomCssContent(parsed.customCssContent);
+    setIsUseThanksMessage(parsed.isUseThanksMessage);
+    setThanksMessageHtml(parsed.thanksMessageHtml);
     setIsUseHtmlUgc(parsed.isUseHtmlUgc);
     setIsUgcInstagram(parsed.isUgcInstagram);
     setIsUgcTiktok(parsed.isUgcTiktok);
@@ -379,6 +383,8 @@ export const useScenario = (mode = 'scenario') => {
     isUseFukushashiki,
     isUseCustomCss,
     customCssContent,
+    isUseThanksMessage,
+    thanksMessageHtml,
     isUseHtmlUgc,
     isUgcInstagram,
     isUgcTiktok,
@@ -425,6 +431,8 @@ export const useScenario = (mode = 'scenario') => {
     tagFiring,
     coupon,
     customCssContent,
+    isUseThanksMessage,
+    thanksMessageHtml,
     isUseHtmlUgc,
     isUgcInstagram,
     isUgcTiktok,
@@ -590,6 +598,8 @@ export const useScenario = (mode = 'scenario') => {
       isUseFukushashiki,
       isUseCustomCss,
       customCssContent,
+      isUseThanksMessage,
+      thanksMessageHtml,
       isUseHtmlUgc,
       isUgcInstagram,
       isUgcTiktok,
@@ -687,6 +697,8 @@ export const useScenario = (mode = 'scenario') => {
       setIsUseFukushashiki,
       setIsUseCustomCss,
       setCustomCssContent,
+      setIsUseThanksMessage,
+      setThanksMessageHtml,
       setIsUseHtmlUgc,
       setIsUgcInstagram,
       setIsUgcTiktok,

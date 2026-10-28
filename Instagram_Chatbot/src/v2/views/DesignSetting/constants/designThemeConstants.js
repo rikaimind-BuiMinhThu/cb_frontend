@@ -121,6 +121,9 @@ export const THEME_FIELD_KEYS = [
   'errorMessageBgColor',
   'errorMessageTextColor',
   'errorMessageFontSize',
+  'thanksMessageBgColor',
+  'thanksMessageTextColor',
+  'thanksMessageFontSize',
   'modalBgColor',
   'modalTitleTextColor',
   'modalTitleFontSize',
@@ -148,6 +151,7 @@ export const THEME_PREVIEW_REGIONS = [
   { sectionId: 'checkbox', label: 'チェックボックス', targets: ['checkboxes'] },
   { sectionId: 'radio', label: 'ラジオボタン', targets: ['radios'] },
   { sectionId: 'errors', label: 'エラーメッセージ', targets: ['errorBanner'] },
+  { sectionId: 'thanks', label: 'サンクスメッセージ', targets: ['thanksBanner'] },
   { sectionId: 'modal', label: 'モーダル', targets: ['modalPreview'] },
 ];
 
@@ -337,6 +341,15 @@ export const THEME_SECTIONS = [
       { key: 'errorMessageBgColor', label: '背景色' },
       { key: 'errorMessageTextColor', label: '文字色' },
       { key: 'errorMessageFontSize', label: 'フォントサイズ', fieldType: 'fontSize', fullWidth: true },
+    ],
+  },
+  {
+    id: 'thanks',
+    title: 'サンクスメッセージ',
+    fields: [
+      { key: 'thanksMessageBgColor', label: '背景色' },
+      { key: 'thanksMessageTextColor', label: '文字色' },
+      { key: 'thanksMessageFontSize', label: 'フォントサイズ', fieldType: 'fontSize', fullWidth: true },
     ],
   },
   {
