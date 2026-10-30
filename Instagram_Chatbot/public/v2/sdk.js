@@ -42,19 +42,6 @@
   };
 
   // src/v2/sdk/config/environment.js
-  var LOCAL_SDK_HOST = "localhost:3001";
-  var LOCAL_FRONTEND_ORIGIN = "http://localhost:3001";
-  var SDK_SCRIPT_SELECTOR = 'script[src*="/v2/sdk"]';
-  var getLoadedSdkScriptHost = () => {
-    var _a, _b;
-    try {
-      const src = ((_a = document.currentScript) == null ? void 0 : _a.src) || ((_b = document.querySelector(SDK_SCRIPT_SELECTOR)) == null ? void 0 : _b.src) || "";
-      if (!src) return "";
-      return new URL(src, window.location.href).host;
-    } catch (e) {
-      return "";
-    }
-  };
   var getEnvFromScriptSrc = () => {
     var _a;
     try {
@@ -63,7 +50,7 @@
       const SRC_PARSER = {
         "ec-chatbot1.com": "staging",
         "ec-chatbot.com": "production",
-        [LOCAL_SDK_HOST]: "local"
+        "localhost:3001": "local"
       };
       const src = ((_a = document.currentScript) == null ? void 0 : _a.src) || "";
       if (!src) return null;
@@ -118,7 +105,6 @@
     }
   };
   var getEcChatBotFrontEndBaseUrl = () => {
-    if (getLoadedSdkScriptHost() === LOCAL_SDK_HOST) return LOCAL_FRONTEND_ORIGIN;
     const environment = getEnvironment();
     switch (environment) {
       case "staging":
@@ -127,9 +113,9 @@
       case "production":
         return "https://ec-chatbot.com";
       case "local":
-        return LOCAL_FRONTEND_ORIGIN;
+        return "http://localhost:3001";
       default:
-        return LOCAL_FRONTEND_ORIGIN;
+        return "http://localhost:3001";
     }
   };
 
@@ -1428,6 +1414,7 @@
     );
     return nextData;
   };
+  var PREFECTURE_SELECT_REAPPLY_DELAY_MS = 300;
   var waitToSetValue = (item, bindingValue) => {
     const waitOpts = {
       type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE,
@@ -1438,10 +1425,37 @@
     }
     return waitForElement(item.bindingMode, item.bindingAddress, waitOpts);
   };
+  var buildSelectBindingCandidates = (bindingValue) => {
+    if (bindingValue == null || bindingValue === "") return [];
+    const raw = bindingValue.toString();
+    const candidates = /* @__PURE__ */ new Set([raw, removeLeadingZero(bindingValue).toString()]);
+    if (/^\d+$/.test(raw)) {
+      candidates.add(raw.padStart(2, "0"));
+    }
+    return Array.from(candidates);
+  };
   var resolveSelectBindingValue = (element, bindingValue) => {
-    const acceptableValues = [bindingValue.toString(), removeLeadingZero(bindingValue).toString()];
-    const selectedOption = Array.from(element.options).find((option) => acceptableValues.includes(option.value.toString()));
-    return selectedOption ? bindingValue : EMPTY_VALUE;
+    if (bindingValue == null || bindingValue === "") return EMPTY_VALUE;
+    const acceptableValues = buildSelectBindingCandidates(bindingValue);
+    const selectedOption = Array.from(element.options).find((option) => {
+      const optionValue = option.value.toString();
+      const optionText = (option.text || "").trim();
+      return acceptableValues.includes(optionValue) || acceptableValues.includes(optionText);
+    });
+    return selectedOption ? selectedOption.value : EMPTY_VALUE;
+  };
+  var scheduleSelectValueReapply = (mode, address, value) => {
+    if (value == null || value === "") return;
+    const reapply = () => {
+      const selectElement = getElementByAddress(mode, address);
+      if (!selectElement || selectElement.tagName !== ELEMENT_TAGS.SELECT) return;
+      if (selectElement.value === value.toString()) return;
+      setValueToElement(selectElement, value);
+    };
+    if (document.readyState !== "complete") {
+      window.addEventListener("load", reapply, { once: true });
+    }
+    setTimeout(reapply, PREFECTURE_SELECT_REAPPLY_DELAY_MS);
   };
   var fillDataFromMessage = (data) => __async(null, null, function* () {
     for (const item of data) {
@@ -1495,6 +1509,9 @@
               item.bindingAddress,
               { type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: prefectureValue }
             );
+            if (element.tagName === ELEMENT_TAGS.SELECT) {
+              scheduleSelectValueReapply(item.bindingMode, item.bindingAddress, prefectureValue);
+            }
             break;
           }
           case "agree_term":

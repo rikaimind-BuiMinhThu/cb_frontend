@@ -67,7 +67,10 @@ const fukushashikiSavedStateToLp = (savedState, params, state) => {
       }
 
       if (!message.hidden) {
-        const fukuData = convertToFukushashikiObject({message: message});
+        const fukuData = convertToFukushashikiObject(
+          { message: message },
+          savedState.prefecturesList || [],
+        );
         fukuDataList.push(...fukuData);
       }
     });

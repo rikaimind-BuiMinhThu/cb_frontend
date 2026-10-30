@@ -229,7 +229,17 @@ export const SHIPPING_ADDRESS_SETTING_LABELS = {
   buildingName: '建物名',
   phoneNumber: '電話番号',
   useDropdown: 'プルダウンを利用',
+  lpPrefectureOptionValueType: 'ランディングページの選択肢の種類',
+  lpPrefectureOptionValueTypeId: 'option value = 都道府県ID',
+  lpPrefectureOptionValueTypeName: 'option value = 都道府県名',
 };
+
+export const LP_PREFECTURE_OPTION_VALUE_TYPES = {
+  ID: 'id',
+  NAME: 'name',
+};
+
+export const DEFAULT_LP_PREFECTURE_OPTION_VALUE_TYPE = LP_PREFECTURE_OPTION_VALUE_TYPES.NAME;
 
 export const PULL_DOWN_LABELS = {
   rangeSetting: '範囲設定',

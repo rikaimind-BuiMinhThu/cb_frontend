@@ -4,7 +4,13 @@ import { MDBIcon } from 'mdbreact';
 import SelectCustom from '../../../scenarioCommon/SelectCustom';
 import InputCustom from '../../../scenarioCommon/InputCustom';
 import ScenarioModalCheckbox from '../../../components/modals/shared/ScenarioModalCheckbox';
-import { SETTING_LABELS, SETTING_PLACEHOLDERS, SHIPPING_ADDRESS_SETTING_LABELS } from '../../../constants/scenarioSettingLabels';
+import {
+  SETTING_LABELS,
+  SETTING_PLACEHOLDERS,
+  SHIPPING_ADDRESS_SETTING_LABELS,
+  LP_PREFECTURE_OPTION_VALUE_TYPES,
+  DEFAULT_LP_PREFECTURE_OPTION_VALUE_TYPE,
+} from '../../../constants/scenarioSettingLabels';
 import { buildAddressFieldSettingContext } from './addressFieldSettingContext';
 import AddressFukushashikiRow from './AddressFukushashikiRow';
 
@@ -22,6 +28,13 @@ const PrefectureFieldSection = ({
   } = buildAddressFieldSettingContext(props);
 
   if (!isAddressFieldVisible('prefecture')) return null;
+
+  const lpPrefectureOptionValueType = addressData.lp_prefecture_option_value_type
+    || DEFAULT_LP_PREFECTURE_OPTION_VALUE_TYPE;
+
+  const setLpPrefectureOptionValueType = (nextType) => {
+    changeAddressField('lp_prefecture_option_value_type')(nextType);
+  };
 
   return (
     <div className="ss-address-field-section">
@@ -75,6 +88,35 @@ const PrefectureFieldSection = ({
           />
         </div>
       </div>
+      {!!addressData.is_use_dropdown && (
+        <div className="ss-user-setting-option-row ss-address-field-section__lp-option-type">
+          <span className="ss-address-field-section__static-label">
+            {SHIPPING_ADDRESS_SETTING_LABELS.lpPrefectureOptionValueType}
+          </span>
+          <div className="ss-user-setting-option-row__checkbox">
+            <ScenarioModalCheckbox
+              checked={lpPrefectureOptionValueType === LP_PREFECTURE_OPTION_VALUE_TYPES.ID}
+              onChange={(checked) => {
+                if (checked) {
+                  setLpPrefectureOptionValueType(LP_PREFECTURE_OPTION_VALUE_TYPES.ID);
+                }
+              }}
+              label={SHIPPING_ADDRESS_SETTING_LABELS.lpPrefectureOptionValueTypeId}
+            />
+          </div>
+          <div className="ss-user-setting-option-row__checkbox">
+            <ScenarioModalCheckbox
+              checked={lpPrefectureOptionValueType === LP_PREFECTURE_OPTION_VALUE_TYPES.NAME}
+              onChange={(checked) => {
+                if (checked) {
+                  setLpPrefectureOptionValueType(LP_PREFECTURE_OPTION_VALUE_TYPES.NAME);
+                }
+              }}
+              label={SHIPPING_ADDRESS_SETTING_LABELS.lpPrefectureOptionValueTypeName}
+            />
+          </div>
+        </div>
+      )}
       <AddressFukushashikiRow modeKey="prefecture_fukushashiki_search_mode" valueKey="prefecture_fukushashiki_search_value" selectId="prefecture-fukushashiki" {...props} />
     </div>
   );

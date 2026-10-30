@@ -825,7 +825,7 @@ const ScenarioPreviewFukushashiki = ({
     // For GINZA AIRA
     if (isDislayingLoginForm(clickedMsg)) return;
 
-    const fukuData = convertToFukushashikiObject(data);
+    const fukuData = convertToFukushashikiObject(data, state.prefecturesList);
     fukushashikiToLP(fukuData, state);
 
     const isClickedButtonSubmit = isButtonSubmitMessage(state.messagesList[clickedMsgIndex]);
