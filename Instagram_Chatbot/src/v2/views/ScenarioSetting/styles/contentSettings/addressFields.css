@@ -75,6 +75,13 @@
   margin-top: 0;
 }
 
+.ss-lp-prefecture-option-type-modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
 .ss-address-field-section__fukushashiki {
   margin-top: 0;
   margin-bottom: 0;

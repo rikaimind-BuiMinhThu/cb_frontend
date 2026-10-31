@@ -229,9 +229,10 @@ export const SHIPPING_ADDRESS_SETTING_LABELS = {
   buildingName: '建物名',
   phoneNumber: '電話番号',
   useDropdown: 'プルダウンを利用',
-  lpPrefectureOptionValueType: 'ランディングページの選択肢の種類',
-  lpPrefectureOptionValueTypeId: 'option value = 都道府県ID',
-  lpPrefectureOptionValueTypeName: 'option value = 都道府県名',
+  lpPrefectureOptionValueType: 'ランディングページの都道府県の選び方',
+  lpPrefectureOptionValueTypeOpenSettings: '設定する →',
+  lpPrefectureOptionValueTypeId: '都道府県IDで選ぶ（例: 13）',
+  lpPrefectureOptionValueTypeName: '都道府県名で選ぶ（例: 東京都）',
 };
 
 export const LP_PREFECTURE_OPTION_VALUE_TYPES = {

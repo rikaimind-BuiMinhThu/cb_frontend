@@ -699,7 +699,7 @@ const PreviewFukushashiki = () => {
 
     fireChatbotButtonTags(state, clickedMsg);
 
-    if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
+    if (clickedMsg.button_jscode && clickedMsg.jscode?.length > 0) {
       executeLpJsCode(clickedMsg.jscode, state);
     }
 

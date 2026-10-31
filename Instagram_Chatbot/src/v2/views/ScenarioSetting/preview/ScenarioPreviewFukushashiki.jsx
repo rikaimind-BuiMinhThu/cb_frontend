@@ -805,7 +805,7 @@ const ScenarioPreviewFukushashiki = ({
       sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
     }
 
-    if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
+    if (clickedMsg.button_jscode && clickedMsg.jscode?.length > 0) {
       executeLpJsCode(clickedMsg.jscode, state);
     }
 

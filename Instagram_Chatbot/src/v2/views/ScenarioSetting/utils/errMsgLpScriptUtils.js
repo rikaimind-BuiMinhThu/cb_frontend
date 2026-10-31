@@ -265,9 +265,13 @@ export const generateErrMsgLpScript = ({
 
   setTimeout(getLPErrorOnWindowLoad, 2000);
 
+  // Attributes: LP toggles error visibility via class/style (e.g. .is-visible).
+  // characterData: LP updates error text on existing nodes without replacing them.
   observer.observe(document.body, {
     childList: true,
     subtree: true,
+    attributes: true,
+    characterData: true,
   });
 })();`;
 };

@@ -1832,8 +1832,12 @@
   // src/v2/sdk/messaging/crawl.js
   var excuteJSCode = (jscode) => {
     if (!jscode) return;
-    const func = new Function(jscode);
-    func();
+    try {
+      const func = new Function(jscode);
+      func();
+    } catch (error) {
+      console.error("[EXCUTE_JS] Failed to execute LP JS:", error);
+    }
   };
   var extractSelectOptions = (selectElement, options = {}) => {
     if (!selectElement || selectElement.tagName !== "SELECT") return null;
