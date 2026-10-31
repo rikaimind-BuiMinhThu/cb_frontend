@@ -805,7 +805,7 @@ const ScenarioPreviewFukushashiki = ({
       sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
     }
 
-    if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
+    if (clickedMsg.button_jscode && clickedMsg.jscode?.length > 0) {
       executeLpJsCode(clickedMsg.jscode, state);
     }
 
@@ -825,7 +825,7 @@ const ScenarioPreviewFukushashiki = ({
     // For GINZA AIRA
     if (isDislayingLoginForm(clickedMsg)) return;
 
-    const fukuData = convertToFukushashikiObject(data);
+    const fukuData = convertToFukushashikiObject(data, state.prefecturesList);
     fukushashikiToLP(fukuData, state);
 
     const isClickedButtonSubmit = isButtonSubmitMessage(state.messagesList[clickedMsgIndex]);

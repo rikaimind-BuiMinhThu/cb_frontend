@@ -699,7 +699,7 @@ const PreviewFukushashiki = () => {
 
     fireChatbotButtonTags(state, clickedMsg);
 
-    if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
+    if (clickedMsg.button_jscode && clickedMsg.jscode?.length > 0) {
       executeLpJsCode(clickedMsg.jscode, state);
     }
 
@@ -719,7 +719,7 @@ const PreviewFukushashiki = () => {
     // For GINZA AIRA
     if (isDislayingLoginForm(clickedMsg)) return;
 
-    const fukuData = convertToFukushashikiObject(data);
+    const fukuData = convertToFukushashikiObject(data, state.prefecturesList);
     fukushashikiToLP(fukuData, state);
 
     const isClickedButtonSubmit = isButtonSubmitMessage(state.messagesList[clickedMsgIndex]);

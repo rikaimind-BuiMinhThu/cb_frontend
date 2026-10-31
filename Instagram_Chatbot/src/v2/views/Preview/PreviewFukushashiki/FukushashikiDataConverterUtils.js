@@ -337,14 +337,48 @@ const convertTextareaObject = (content) => {
   return result;
 };
 
-const convertZipCodeAddressObject = (content) => {
+const LP_PREFECTURE_OPTION_VALUE_TYPES = {
+  ID: 'id',
+  NAME: 'name',
+};
+const DEFAULT_LP_PREFECTURE_OPTION_VALUE_TYPE = LP_PREFECTURE_OPTION_VALUE_TYPES.NAME;
+
+const resolvePrefectureLpBindingValue = (rawValue, addressBlock, prefecturesList = []) => {
+  if (rawValue == null || rawValue === '') return rawValue;
+  if (!addressBlock?.is_use_dropdown) return rawValue;
+
+  const optionType = addressBlock.lp_prefecture_option_value_type
+    || DEFAULT_LP_PREFECTURE_OPTION_VALUE_TYPE;
+  if (optionType === LP_PREFECTURE_OPTION_VALUE_TYPES.ID) {
+    return rawValue;
+  }
+
+  const list = Array.isArray(prefecturesList) ? prefecturesList : [];
+  const raw = String(rawValue);
+  const matched = list.find((item) => (
+    String(item.id) === raw
+    || String(item.prefecture_jis_code) === raw
+    || String(item.prefecture_jis_code) === raw.padStart(2, '0')
+    || item.name === rawValue
+  ));
+  return matched ? matched.name : rawValue;
+};
+
+const collectFukushashikiBindings = (...sources) => Object.fromEntries(
+  sources
+    .filter((source) => source && typeof source === 'object')
+    .flatMap((source) => Object.entries(source))
+    .filter(([key]) => key.includes('fukushashiki')),
+);
+
+const convertZipCodeAddressObject = (content, prefecturesList = []) => {
   const result = [];
+  const addressBlock = content.zip_code_address || {};
   const userInputData = Object.fromEntries(
-    Object.entries(content.zip_code_address).filter(([key]) => key.includes("value_"))
+    Object.entries(addressBlock).filter(([key]) => key.includes("value_"))
   );
-  const dataInforFukushashiki = Object.fromEntries(
-    Object.entries(content).filter(([key]) => key.includes("fukushashiki"))
-  );
+  // V2 admin stores bindings inside zip_code_address; legacy scenarios keep them on content.
+  const dataInforFukushashiki = collectFukushashikiBindings(content, addressBlock);
   const types = [
     "post_code",
     "post_code_left",
@@ -364,12 +398,18 @@ const convertZipCodeAddressObject = (content) => {
         return null;
       }
 
+      const isPrefectureDropdown = type === "prefecture" && addressBlock.is_use_dropdown;
+      const rawValue = userInputData[`value_${type}`] || null;
+      const bindingValue = type === "prefecture"
+        ? resolvePrefectureLpBindingValue(rawValue, addressBlock, prefecturesList)
+        : rawValue;
+
       return {
-        type: content.zip_code_address.is_use_dropdown ? "dropdown_prefecture" : "zip_code_address",
+        type: isPrefectureDropdown ? "dropdown_prefecture" : "zip_code_address",
         bindingMode: bindingMode,
         additionalType: type,
         bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-        bindingValue: userInputData[`value_${type}`] || null
+        bindingValue,
       };
     })
     .filter(item => item !== null);
@@ -377,14 +417,14 @@ const convertZipCodeAddressObject = (content) => {
   return result;
 };
 
-const convertShippingAddressObject = (content) => {
+const convertShippingAddressObject = (content, prefecturesList = []) => {
   const result = [];
+  const addressBlock = content.shipping_address || {};
   const userInputData = Object.fromEntries(
-    Object.entries(content.shipping_address).filter(([key]) => key.includes("value_"))
+    Object.entries(addressBlock).filter(([key]) => key.includes("value_"))
   );
-  const dataInforFukushashiki = Object.fromEntries(
-    Object.entries(content).filter(([key]) => key.includes("fukushashiki"))
-  );
+  // V2 admin stores bindings inside shipping_address; legacy scenarios keep them on content.
+  const dataInforFukushashiki = collectFukushashikiBindings(content, addressBlock);
   const types = ["number1", "number2", "number3", "number", "name_left", "name_right", "kana_left", "kana_right", "building_name", "address", "municipality", "prefecture", "post_code", "post_code_left", "post_code_right", "initial_selection"];
   const typesResult = types
     .filter(type => `value_${type}` in userInputData)
@@ -412,11 +452,19 @@ const convertShippingAddressObject = (content) => {
         };
         result.push(objA)
       }
+      const isPrefectureDropdown = type === "prefecture" && addressBlock.is_use_dropdown;
+      const fieldValue = type === "prefecture"
+        ? resolvePrefectureLpBindingValue(
+          userInputData[`value_${type}`],
+          addressBlock,
+          prefecturesList,
+        )
+        : userInputData[`value_${type}`];
       return {
-        type: content.shipping_address.is_use_dropdown ? "dropdown_prefecture" : "shipping_address",
+        type: isPrefectureDropdown ? "dropdown_prefecture" : "shipping_address",
         bindingMode: bindingMode,
         bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-        bindingValue: userInputData[`value_${type}`]
+        bindingValue: fieldValue,
       };
     })
     .filter(item => item !== null);
@@ -518,7 +566,7 @@ const convertCardPaymentObject = (content) => {
   return result;
 };
 
-const convertToFukushashikiObject = (obj) => {
+const convertToFukushashikiObject = (obj, prefecturesList = []) => {
   const result = [];
   if (
     obj &&
@@ -544,10 +592,10 @@ const convertToFukushashikiObject = (obj) => {
           result.push(...convertTextareaObject(content));
           break;
         case 'zip_code_address':
-          result.push(...convertZipCodeAddressObject(content));
+          result.push(...convertZipCodeAddressObject(content, prefecturesList));
           break;
         case 'shipping_address':
-          result.push(...convertShippingAddressObject(content));
+          result.push(...convertShippingAddressObject(content, prefecturesList));
           break;
         case 'radio_button':
           result.push(...convertRadioButtonObject(content));

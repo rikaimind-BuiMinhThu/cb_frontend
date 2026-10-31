@@ -18,6 +18,7 @@ export const createDefaultContentItem = (messageType, idMax) => {
       [messageType]: {
         post_code: '',
         is_use_dropdown: false,
+        lp_prefecture_option_value_type: 'name',
         prefecture: null,
         municipality: '',
         address: '',
@@ -116,6 +117,7 @@ export const createDefaultContentItem = (messageType, idMax) => {
         number: '',
         post_code: '',
         is_use_dropdown: false,
+        lp_prefecture_option_value_type: 'name',
         prefecture: null,
         municipality: '',
         address: '',

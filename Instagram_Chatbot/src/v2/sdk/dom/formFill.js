@@ -39,6 +39,8 @@ export const movePaymentMethodToTop = (data) => {
   return nextData;
 };
 
+const PREFECTURE_SELECT_REAPPLY_DELAY_MS = 300;
+
 const waitToSetValue = (item, bindingValue) => {
   const waitOpts = {
     type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE,
@@ -50,12 +52,42 @@ const waitToSetValue = (item, bindingValue) => {
   return waitForElement(item.bindingMode, item.bindingAddress, waitOpts);
 };
 
+const buildSelectBindingCandidates = (bindingValue) => {
+  if (bindingValue == null || bindingValue === '') return [];
+  const raw = bindingValue.toString();
+  const candidates = new Set([raw, removeLeadingZero(bindingValue).toString()]);
+  if (/^\d+$/.test(raw)) {
+    candidates.add(raw.padStart(2, '0'));
+  }
+  return Array.from(candidates);
+};
+
 const resolveSelectBindingValue = (element, bindingValue) => {
-  const acceptableValues = [bindingValue.toString(), removeLeadingZero(bindingValue).toString()];
-  const selectedOption = Array.from(element.options).find((option) => (
-    acceptableValues.includes(option.value.toString())
-  ));
-  return selectedOption ? bindingValue : EMPTY_VALUE;
+  if (bindingValue == null || bindingValue === '') return EMPTY_VALUE;
+
+  const acceptableValues = buildSelectBindingCandidates(bindingValue);
+  const selectedOption = Array.from(element.options).find((option) => {
+    const optionValue = option.value.toString();
+    const optionText = (option.text || '').trim();
+    return acceptableValues.includes(optionValue) || acceptableValues.includes(optionText);
+  });
+  return selectedOption ? selectedOption.value : EMPTY_VALUE;
+};
+
+const scheduleSelectValueReapply = (mode, address, value) => {
+  if (value == null || value === '') return;
+
+  const reapply = () => {
+    const selectElement = getElementByAddress(mode, address);
+    if (!selectElement || selectElement.tagName !== ELEMENT_TAGS.SELECT) return;
+    if (selectElement.value === value.toString()) return;
+    setValueToElement(selectElement, value);
+  };
+
+  if (document.readyState !== 'complete') {
+    window.addEventListener('load', reapply, { once: true });
+  }
+  setTimeout(reapply, PREFECTURE_SELECT_REAPPLY_DELAY_MS);
 };
 
 export const fillDataFromMessage = async (data) => {
@@ -118,6 +150,9 @@ export const fillDataFromMessage = async (data) => {
             item.bindingAddress,
             { type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: prefectureValue },
           );
+          if (element.tagName === ELEMENT_TAGS.SELECT) {
+            scheduleSelectValueReapply(item.bindingMode, item.bindingAddress, prefectureValue);
+          }
           break;
         }
 

@@ -78,7 +78,7 @@ const PreviewFukushashikiReducer = (state, action) => {
               user_id: state.uuid,
               bot_type: "web"
             };
-            const fukuData = convertToFukushashikiObject(data);
+            const fukuData = convertToFukushashikiObject(data, state.prefecturesList);
             fukushashikiToLP(fukuData, state);
           }
         }
