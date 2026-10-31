@@ -103,7 +103,6 @@ const DesignChatbot = ({ mode = MODE_EDIT }) => {
               children: (
                 <BasicInfoTab
                   basicInfo={state.basicInfo}
-                  buttonTypePc={state.designSettings.buttonTypePc}
                   validationErrors={state.validationErrors}
                   iconPresetIndices={state.iconPresetIndices}
                   onFieldChange={(field, value) => {
@@ -135,6 +134,7 @@ const DesignChatbot = ({ mode = MODE_EDIT }) => {
               label: TAB_DESIGN_LABEL,
               children: (
                 <DesignCustomizeTab
+                  basicInfo={state.basicInfo}
                   designSettings={state.designSettings}
                   onFieldChange={actions.updateDesignSettingField}
                   onSave={isCreateMode ? actions.createBot : actions.saveDesignSettings}

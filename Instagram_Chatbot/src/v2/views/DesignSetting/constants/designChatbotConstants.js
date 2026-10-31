@@ -210,14 +210,12 @@ export const BUTTON_TYPE_OPTIONS = [
 export const LABEL_DISPLAY_TYPE = '表示タイプ';
 export const LABEL_SIZE = 'サイズ';
 export const LABEL_POSITION = '設置場所';
-export const LABEL_RIGHT_TITLE_PC = '右のタイトル';
-export const LABEL_RIGHT_TITLE_SP = 'タイトル';
 export const LABEL_BUTTON_CONTENT = 'ボタン内容';
+export const LABEL_DISPLAY_CONTENT = '表示内容';
 export const LABEL_RIGHT_MARGIN = '右マージン';
 export const LABEL_BOTTOM_MARGIN = '下マージン';
 export const PLACEHOLDER_WIDTH = '幅';
 export const PLACEHOLDER_HEIGHT = '高さ';
-export const PLACEHOLDER_TITLE_FIELD = 'タイトル';
 export const PLACEHOLDER_RIGHT_MARGIN = '右マージン';
 export const PLACEHOLDER_BOTTOM_MARGIN = '下マージン';
 

@@ -21,6 +21,7 @@ import {
 } from './amazonPayConfigUtils';
 import { parseTagFiringFromApi } from './tagFiringUtils';
 import { lexicaScenarioToApi, parseLexicaScenario } from './lexicaScenario';
+import { normalizeMessagesNotUseButton } from './normalizeNotUseButton';
 
 const parseExecutionPolicy = (data) => {
   const knownPolicies = Object.values(EXECUTION_POLICIES);
@@ -90,10 +91,12 @@ export const parseScenarioResponse = (res) => {
   const executionPolicy = parseExecutionPolicy(data);
 
   return {
-    dataMessages: (conversation.messages || []).map((message) => ensureAmazonPayUsageDisplayCondition({
-      ...message,
-      conditions: message.conditions || [],
-    })),
+    dataMessages: normalizeMessagesNotUseButton(
+      (conversation.messages || []).map((message) => ensureAmazonPayUsageDisplayCondition({
+        ...message,
+        conditions: message.conditions || [],
+      })),
+    ),
     scenarioName: data.scenario_name || '',
     scenarioType: data.scenario_type || 'payment',
     clientCartSystem: data.cart_system ?? null,

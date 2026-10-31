@@ -89,10 +89,11 @@ const DobYmdTypeSetting = (props) => {
         dataDay: dataDayFixed,
         changeTypeField,
         wrap: true,
+        hideDay: !!typeConfig?.is_hide_day,
       })}
       {renderFukushashikiYear()}
       {renderFukushashikiMonth()}
-      {renderFukushashikiDay()}
+      {!typeConfig?.is_hide_day && renderFukushashikiDay()}
     </>
   );
 };

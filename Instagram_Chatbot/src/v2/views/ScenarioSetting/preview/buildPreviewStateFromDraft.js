@@ -12,10 +12,13 @@ import {
   RENDER_MODES,
 } from 'v2/views/Preview/PreviewComponent/Constants';
 import { prepareCombineMessagesForPreview } from 'v2/views/Preview/PreviewComponent/CombineMessageUtils';
+import { normalizeMessagesNotUseButton } from 'v2/views/ScenarioSetting/utils/normalizeNotUseButton';
 import { EDITOR_PREVIEW_FALLBACK_BOT_INFOR } from './editorPreviewUtils';
 
 export const buildEditorDraftPreviewUpdate = (draft) => {
-  const messagesList = _.cloneDeep(draft?.conversation?.messages || []);
+  const messagesList = normalizeMessagesNotUseButton(
+    _.cloneDeep(draft?.conversation?.messages || []),
+  );
 
   messagesList.filter(isBotMessage).forEach((message) => {
     message.hidden = false;
@@ -47,9 +50,7 @@ export const buildEditorDraftPreviewUpdate = (draft) => {
       : msg.message_content;
     const contentCount = userContents?.length;
     const firstMsgContent = userContents?.[0];
-    const isDisplayBtnNext = firstMsgContent?.type !== MESSAGE_CONTENT_TYPES.IMAGE
-      || firstMsgContent?.image?.displayButtonNext !== false;
-    if (!isDisplayBtnNext) return false;
+    if (msg.not_use_button) return false;
     if (firstMsgContent?.type === MESSAGE_CONTENT_TYPES.SUBMIT_BUTTON && contentCount === 1) {
       return false;
     }

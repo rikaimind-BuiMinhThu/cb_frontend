@@ -14,6 +14,7 @@ import { processForBotMessage } from 'v2/views/Preview/PreviewComponent/BotMessa
 import { processForUserMessage } from 'v2/views/Preview/PreviewComponent/UserMessageUtils';
 import { processForCombineMessage, prepareCombineMessagesForPreview } from 'v2/views/Preview/PreviewComponent/CombineMessageUtils';
 import { isBotMessage, isUserMessage, isCombineMessage, getNextUserMsg } from 'v2/views/Preview/PreviewComponent/Utils';
+import { normalizeMessagesNotUseButton } from 'v2/views/ScenarioSetting/utils/normalizeNotUseButton';
 import {
   RENDER_CHATBOT_CONFIG,
   PREVIEW_ACTIONS,
@@ -285,8 +286,10 @@ const PreviewFaqReducer = (state, action) => {
         newState.loopCount = state.loopCount;
         newState.progressBarMaxIndex = state.progressBarMaxIndex;
       } else {
-        newState.originalMessagesList = _.cloneDeep(conversation?.messages || []);
-        newState.messagesList = conversation?.messages || [];
+        newState.originalMessagesList = normalizeMessagesNotUseButton(
+          _.cloneDeep(conversation?.messages || []),
+        );
+        newState.messagesList = normalizeMessagesNotUseButton(conversation?.messages || []);
         newState.currentMsgIndex = 0;
         newState.renderMode = RENDER_MODES.NEXT;
         newState.loopCount = 0;
@@ -339,7 +342,7 @@ const PreviewFaqReducer = (state, action) => {
         && !(state.renderMessagesList?.length > 0)
         && (conversation?.messages?.length > 0)
       ) {
-        const apiMessages = _.cloneDeep(conversation.messages);
+        const apiMessages = normalizeMessagesNotUseButton(_.cloneDeep(conversation.messages));
         newState.originalMessagesList = apiMessages;
         newState.messagesList = apiMessages;
         newState.renderMessagesList = apiMessages;

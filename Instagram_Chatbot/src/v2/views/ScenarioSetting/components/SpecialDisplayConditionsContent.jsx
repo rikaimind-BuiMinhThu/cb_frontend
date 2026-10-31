@@ -2,8 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ScenarioModalCheckbox from './modals/shared/ScenarioModalCheckbox';
 import { AdminInfoTooltip } from 'v2/components/AdminShell';
-import SelectCustom from '../scenarioCommon/SelectCustom';
-import { dataAmazonPayDisplayMode } from 'v2/variables/amazonPayConstants';
+import {
+  AMAZON_PAY_DISPLAY_MODES,
+  dataAmazonPayDisplayMode,
+} from 'v2/variables/amazonPayConstants';
 import { getAmazonPayDisplayModeFromConditions } from 'v2/views/ScenarioSetting/utils/amazonPayConfigUtils';
 import {
   SCENARIO_MODAL_TOOLTIPS,
@@ -22,6 +24,7 @@ const SpecialDisplayConditionsContent = ({
   dataMessages,
   setDataMessages,
   isUseFukushashiki,
+  isUseAmazonPay,
   onChangeAmazonPayDisplayMode,
 }) => {
   if (!selectedMessage) return null;
@@ -33,6 +36,7 @@ const SpecialDisplayConditionsContent = ({
   };
 
   const amazonPayDisplayMode = getAmazonPayDisplayModeFromConditions(selectedMessage.conditions);
+  const showAmazonPayMessageOptions = isUseFukushashiki && isUseAmazonPay;
 
   return (
     <div className="ss-special-display-conditions-content">
@@ -52,16 +56,25 @@ const SpecialDisplayConditionsContent = ({
           'hideWhenError',
         )}
       />
-      {isUseFukushashiki && (
-        <div className="ss-config-field--mt16">
-          <SelectCustom
-            label="表示"
-            allowClear={false}
-            className="ss-select--full"
-            data={dataAmazonPayDisplayMode}
-            value={amazonPayDisplayMode}
-            onChange={onChangeAmazonPayDisplayMode}
-          />
+      {showAmazonPayMessageOptions && (
+        <div className="ss-config-field--mt16 ss-amazon-pay-display-group">
+          <span className="ss-config-field__label">表示</span>
+          {dataAmazonPayDisplayMode.map((item) => (
+            <ScenarioModalCheckbox
+              key={item.key}
+              checked={amazonPayDisplayMode === item.key}
+              onChange={(checked) => {
+                if (checked) {
+                  onChangeAmazonPayDisplayMode(item.key);
+                  return;
+                }
+                if (amazonPayDisplayMode === item.key) {
+                  onChangeAmazonPayDisplayMode(AMAZON_PAY_DISPLAY_MODES.ALWAYS);
+                }
+              }}
+              label={item.value}
+            />
+          ))}
         </div>
       )}
     </div>
@@ -73,6 +86,7 @@ SpecialDisplayConditionsContent.propTypes = {
   dataMessages: PropTypes.array.isRequired,
   setDataMessages: PropTypes.func.isRequired,
   isUseFukushashiki: PropTypes.bool,
+  isUseAmazonPay: PropTypes.bool,
   onChangeAmazonPayDisplayMode: PropTypes.func.isRequired,
 };
 

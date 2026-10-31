@@ -67,7 +67,10 @@ const fukushashikiSavedStateToLp = (savedState, params, state) => {
       }
 
       if (!message.hidden) {
-        const fukuData = convertToFukushashikiObject({message: message});
+        const fukuData = convertToFukushashikiObject(
+          { message: message },
+          savedState.prefecturesList || [],
+        );
         fukuDataList.push(...fukuData);
       }
     });
@@ -104,9 +107,9 @@ const executeLpJsCode = (jsCode, state) => {
   postMessageToParent({
     action: CHATBOT_ACTIONS.EXCUTE_JS,
     actionData: jsCode,
-    is_use_js: true
+    is_use_js: true,
   }, state);
-}
+};
 
 const getErrorMessageFromParent = (searchMode, searchValue, isDisplay) => {
   postMessageToParent({

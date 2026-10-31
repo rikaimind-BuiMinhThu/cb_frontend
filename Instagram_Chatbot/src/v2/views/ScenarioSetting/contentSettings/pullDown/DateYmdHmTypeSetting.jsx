@@ -26,23 +26,20 @@ const DateYmdHmTypeSetting = (props) => {
 
   const renderDateSelectors = () => (
     <div className="ss-user-setting__item-bottom">
-      <div className="ss-user-setting__item-select-bottom-wrapper-flex">
+      <div className="ss-user-setting__item-select-bottom-wrapper-flex ss-pull-down-setting__ymd-fields">
         <SelectCustom
-          className="ss-pull-down-setting__select--32"
           value={typeConfig?.year}
           data={DATE_YMD_HM_YEAR_OPTIONS}
           placeholder={PULL_DOWN_LABELS.year}
           onChange={changeTypeField('year')}
         />
         <SelectCustom
-          className="ss-pull-down-setting__select--32"
           value={typeConfig?.month}
           data={dataMonthFixed}
           placeholder={PULL_DOWN_LABELS.month}
           onChange={changeTypeField('month')}
         />
         <SelectCustom
-          className="ss-pull-down-setting__select--32"
           value={typeConfig?.day}
           data={dataDayFixed}
           placeholder={PULL_DOWN_LABELS.day}
@@ -62,6 +59,7 @@ const DateYmdHmTypeSetting = (props) => {
         dataMinutes,
         dataEveryMinute,
         changeTypeField,
+        wrap: true,
       })}
     </>
   );

@@ -206,10 +206,21 @@ export const generateErrMsgLpScript = ({
     }, '*');
   };
 
+  var isElementVisible = function(el) {
+    if (!el) return false;
+    var style = window.getComputedStyle(el);
+    if (style.visibility === 'hidden' || style.display === 'none') return false;
+    return true;
+  };
+
   var sendErrorToChatbot = function() {
     var elements = getErrorElements();
-    var messages = Array.from(elements).map(function(e) {
-      var errorMsg = (e.innerText || '').trim().split('\\n');
+    var messages = Array.from(elements).reduce(function(acc, e) {
+      if (!isElementVisible(e)) return acc;
+      var errorMsg = (e.innerText || '').trim().split('\\n').filter(function(line) {
+        return line.trim().length > 0;
+      });
+      if (!errorMsg.length) return acc;
       var isFormError = FORM_SELECTORS.split(',').some(function(selector) {
         var trimmed = selector.trim();
         if (!trimmed) return false;
@@ -219,12 +230,13 @@ export const generateErrMsgLpScript = ({
           return false;
         }
       });
-      return {
+      acc.push({
         error: errorMsg,
         isFormError: isFormError,
         type: 'emsg',
-      };
-    });
+      });
+      return acc;
+    }, []);
     postMessageToChatbot(messages);
   };
 
@@ -253,9 +265,13 @@ export const generateErrMsgLpScript = ({
 
   setTimeout(getLPErrorOnWindowLoad, 2000);
 
+  // Attributes: LP toggles error visibility via class/style (e.g. .is-visible).
+  // characterData: LP updates error text on existing nodes without replacing them.
   observer.observe(document.body, {
     childList: true,
     subtree: true,
+    attributes: true,
+    characterData: true,
   });
 })();`;
 };

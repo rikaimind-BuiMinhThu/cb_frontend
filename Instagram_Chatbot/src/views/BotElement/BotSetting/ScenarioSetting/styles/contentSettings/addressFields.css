@@ -35,22 +35,33 @@
 }
 
 .ss-address-field-section__input-row--split {
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .ss-address-field-section__input {
   flex: 1 1 auto;
   min-width: 0;
+  width: 100%;
 }
 
 .ss-address-field-section__post-code-left {
   flex: 0 0 120px;
+  width: 120px;
   max-width: 120px;
 }
 
 .ss-address-field-section__post-code-right {
   flex: 0 0 140px;
+  width: 140px;
   max-width: 140px;
+}
+
+.ss-address-field-section__post-code-left .ss-input-custom-container,
+.ss-address-field-section__post-code-right .ss-input-custom-container,
+.ss-address-field-section__post-code-left .ss-address-field-section__input,
+.ss-address-field-section__post-code-right .ss-address-field-section__input {
+  width: 100%;
+  flex: none;
 }
 
 .ss-address-field-section__remove-icon {

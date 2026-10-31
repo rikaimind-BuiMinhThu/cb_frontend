@@ -20,6 +20,11 @@ const joinLauncherClassName = (...parts) => parts.filter(Boolean).join(" ");
  * Closed chatbot launcher matrix (PC/SP × circle/bar/vertical).
  * Layout lives in CSS; only dynamic tokens (color, size, position) use CSS variables.
  */
+const LAYOUT_MODE_FIXED = 'fixed';
+const LAYOUT_MODE_INLINE = 'inline';
+const ICON_CHEVRON_CIRCLE_UP = 'chevron-circle-up';
+const ICON_CHEVRON_CIRCLE_LEFT = 'chevron-circle-left';
+
 const PreviewClosedLauncher = ({
   state,
   headerIconSrc,
@@ -29,6 +34,7 @@ const PreviewClosedLauncher = ({
   spCircleUseParentOffsets = false,
   requireClosed = true,
   hideWhenDisplayHidden = true,
+  layoutMode = LAYOUT_MODE_FIXED,
 }) => {
   if (hideWhenDisplayHidden && state.displayType === DISPLAY_TYPES.HIDDEN) {
     return null;
@@ -47,6 +53,8 @@ const PreviewClosedLauncher = ({
   const toggleOpen = () => onOpen(!state.isOpen);
   const fullWidthMobile = Boolean(state.useFullWidthChatbotMobile);
   const designTypeClass = getDesignTypeClassName(state.botInfor?.design_type);
+  const isInlineLayout = layoutMode === LAYOUT_MODE_INLINE;
+  const inlineClassName = isInlineLayout ? 'preview-closed-launcher--inline' : '';
 
   const iconImg = headerIconSrc ? (
     <img
@@ -70,6 +78,7 @@ const PreviewClosedLauncher = ({
         className={joinLauncherClassName(
           "preview-closed-launcher",
           "preview-closed-launcher--circle-pc",
+          inlineClassName,
           designTypeClass,
         )}
         onClick={toggleOpen}
@@ -87,6 +96,7 @@ const PreviewClosedLauncher = ({
         className={joinLauncherClassName(
           "preview-closed-launcher",
           "preview-closed-launcher--bar-pc",
+          inlineClassName,
           designTypeClass,
         )}
         onClick={toggleOpen}
@@ -105,19 +115,24 @@ const PreviewClosedLauncher = ({
           </div>
         </div>
         <div className="sp-header-right-arrow preview-closed-launcher__bar-arrow">
-          <MDBIcon fas icon="chevron-circle-up" />
+          <MDBIcon fas icon={ICON_CHEVRON_CIRCLE_UP} />
         </div>
       </div>
     );
   }
 
   if (closedOk && !isMobileView && positionPc === 2) {
-    const position = getClosedLauncherPosition(state, { variant: "vertical" });
+    const position = getClosedLauncherPosition(state, {
+      variant: "vertical",
+      inline: isInlineLayout,
+    });
+    const showVerticalTitle = buttonTypePc !== 2;
     return (
       <div
         className={joinLauncherClassName(
           "preview-closed-launcher",
           "preview-closed-launcher--vertical-pc",
+          inlineClassName,
           designTypeClass,
         )}
         onClick={toggleOpen}
@@ -125,9 +140,16 @@ const PreviewClosedLauncher = ({
       >
         <div className="sp-header-left" onClick={toggleOpen}>
           <div className="sp-header-left-avatar sp-avatar">{avatarImg}</div>
-          <div className="sp-header-left-label">
-            <div className="sp-header-left-label-title">{state.rightPcTitle}</div>
-          </div>
+          {showVerticalTitle && (
+            <div className="sp-header-left-label">
+              <div id="comment_bubble" className="preview-closed-launcher__vertical-bubble">
+                <span className="sp-header-left-label-title">{bubbleTitle}</span>
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="sp-header-right-arrow preview-closed-launcher__vertical-arrow">
+          <MDBIcon fas icon={ICON_CHEVRON_CIRCLE_LEFT} />
         </div>
       </div>
     );
@@ -142,6 +164,7 @@ const PreviewClosedLauncher = ({
         className={joinLauncherClassName(
           "preview-closed-launcher",
           "preview-closed-launcher--circle-sp",
+          inlineClassName,
           designTypeClass,
         )}
         onClick={toggleOpen}
@@ -160,6 +183,7 @@ const PreviewClosedLauncher = ({
           "preview-closed-launcher",
           "preview-closed-launcher--bar-sp",
           fullWidthMobile ? "preview-closed-launcher--bar-sp-fullwidth fullwidth_mobile_chatbot" : "",
+          inlineClassName,
           designTypeClass,
         )}
         onClick={toggleOpen}
@@ -197,7 +221,7 @@ const PreviewClosedLauncher = ({
             </div>
           </div>
           <div className="sp-header-right-arrow preview-closed-launcher__sp-arrow">
-            <MDBIcon fas icon="chevron-circle-up" />
+            <MDBIcon fas icon={ICON_CHEVRON_CIRCLE_UP} />
           </div>
         </div>
       </div>
@@ -208,12 +232,15 @@ const PreviewClosedLauncher = ({
     const position = getClosedLauncherPosition(state, {
       isMobile: true,
       variant: "vertical",
+      inline: isInlineLayout,
     });
+    const showVerticalTitle = buttonTypeSp !== 2;
     return (
       <div
         className={joinLauncherClassName(
           "preview-closed-launcher",
           "preview-closed-launcher--vertical-sp",
+          inlineClassName,
           designTypeClass,
         )}
         onClick={toggleOpen}
@@ -221,9 +248,16 @@ const PreviewClosedLauncher = ({
       >
         <div className="sp-header-left">
           <div className="sp-header-left-avatar sp-avatar">{avatarImg}</div>
-          <div className="sp-header-left-label">
-            <div className="sp-header-left-label-title">{state.rightSpTitle}</div>
-          </div>
+          {showVerticalTitle && (
+            <div className="sp-header-left-label">
+              <div id="comment_bubble" className="preview-closed-launcher__vertical-bubble">
+                <span className="sp-header-left-label-title">{bubbleTitle}</span>
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="sp-header-right-arrow preview-closed-launcher__vertical-arrow">
+          <MDBIcon fas icon={ICON_CHEVRON_CIRCLE_LEFT} />
         </div>
       </div>
     );
@@ -241,6 +275,7 @@ const PreviewClosedLauncher = ({
         className={joinLauncherClassName(
           "preview-closed-launcher",
           "preview-closed-launcher--fallback",
+          inlineClassName,
           designTypeClass,
         )}
         onClick={() => onOpen(true)}

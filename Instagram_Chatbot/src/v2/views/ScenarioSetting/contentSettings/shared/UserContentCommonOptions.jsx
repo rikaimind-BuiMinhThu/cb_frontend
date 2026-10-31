@@ -90,6 +90,7 @@ const UserContentCommonOptions = ({
         </div>
       )}
 
+      {/* API validation option temporarily hidden
       {config.apiValidation && (
         <div className="ss-user-setting-option-row">
           <div className="ss-user-setting-option-row__checkbox">
@@ -117,6 +118,7 @@ const UserContentCommonOptions = ({
           )}
         </div>
       )}
+      */}
 
       {beforeRequire}
 

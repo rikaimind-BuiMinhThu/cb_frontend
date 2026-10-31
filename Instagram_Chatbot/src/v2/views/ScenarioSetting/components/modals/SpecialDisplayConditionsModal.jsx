@@ -11,6 +11,7 @@ const SpecialDisplayConditionsModal = ({
   dataMessages,
   setDataMessages,
   isUseFukushashiki,
+  isUseAmazonPay,
   onChangeAmazonPayDisplayMode,
 }) => {
   if (!selectedMessage) return null;
@@ -34,6 +35,7 @@ const SpecialDisplayConditionsModal = ({
           dataMessages={dataMessages}
           setDataMessages={setDataMessages}
           isUseFukushashiki={isUseFukushashiki}
+          isUseAmazonPay={isUseAmazonPay}
           onChangeAmazonPayDisplayMode={onChangeAmazonPayDisplayMode}
         />
       </div>
@@ -48,6 +50,7 @@ SpecialDisplayConditionsModal.propTypes = {
   dataMessages: PropTypes.array.isRequired,
   setDataMessages: PropTypes.func.isRequired,
   isUseFukushashiki: PropTypes.bool,
+  isUseAmazonPay: PropTypes.bool,
   onChangeAmazonPayDisplayMode: PropTypes.func.isRequired,
 };
 

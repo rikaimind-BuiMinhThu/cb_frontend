@@ -33,7 +33,6 @@ import { getDesignSettingTooltip } from '../constants/designSettingTooltips';
 
 const BasicInfoTab = ({
   basicInfo,
-  buttonTypePc,
   validationErrors,
   iconPresetIndices,
   onFieldChange,
@@ -204,8 +203,6 @@ const BasicInfoTab = ({
             subtitle={basicInfo.subtitle}
             botImage={basicInfo.botImage}
             openingBotIcon={basicInfo.openingBotIcon}
-            closingBotIcon={basicInfo.closingBotIcon}
-            buttonTypePc={buttonTypePc}
             openAnimationDurationMs={basicInfo.openAnimationDurationMs}
             openAnimationStyle={basicInfo.openAnimationStyle}
           />
@@ -229,7 +226,6 @@ BasicInfoTab.propTypes = {
     openAnimationDurationMs: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     openAnimationStyle: PropTypes.string,
   }).isRequired,
-  buttonTypePc: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   validationErrors: PropTypes.shape({
     title: PropTypes.string,
     subtitle: PropTypes.string,
@@ -251,7 +247,6 @@ BasicInfoTab.propTypes = {
 };
 
 BasicInfoTab.defaultProps = {
-  buttonTypePc: 1,
   iconPresetIndices: {
     bot: null,
     opening: null,

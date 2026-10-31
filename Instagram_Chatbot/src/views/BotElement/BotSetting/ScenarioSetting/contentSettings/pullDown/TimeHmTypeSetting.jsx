@@ -50,6 +50,7 @@ const TimeHmTypeSetting = (props) => {
         dataMinutes,
         dataEveryMinute,
         changeTypeField,
+        wrap: true,
       })}
       {renderFukushashikiHour()}
       {renderFukushashikiMinute()}

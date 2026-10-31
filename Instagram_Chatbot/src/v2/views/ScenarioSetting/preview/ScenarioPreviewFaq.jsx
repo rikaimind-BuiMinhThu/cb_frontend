@@ -423,7 +423,7 @@ const ScenarioPreviewFaq = ({
 
     sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
 
-    if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
+    if (clickedMsg.button_jscode && clickedMsg.jscode?.length > 0) {
       executeLpJsCode(clickedMsg.jscode, state);
     }
 
@@ -600,8 +600,7 @@ const ScenarioPreviewFaq = ({
 
   const renderNextButton = (message, messageIndex) => {
     const isUpdate = messageIndex >= state.renderMessagesList.length - 1;
-    const firstMsgContent = message?.message_content?.[0];
-    const isDisplayBtnNext = firstMsgContent?.type !== "image" || firstMsgContent?.image?.displayButtonNext !== false;
+    const isDisplayBtnNext = !message.not_use_button;
     const isAutoClick = !isDisplayBtnNext && isUpdate;
 
     if (!message || message.belong_to !== "user") return null;

@@ -47,6 +47,7 @@ const DateYmTypeSetting = (props) => {
         dataYear,
         dataMonth,
         changeTypeField,
+        wrap: true,
       })}
       {renderFukushashikiYear()}
       {renderFukushashikiMonth()}

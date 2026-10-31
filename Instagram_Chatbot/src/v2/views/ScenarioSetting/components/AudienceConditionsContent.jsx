@@ -14,6 +14,7 @@ const AudienceConditionsContent = ({
   dataMessages,
   setDataMessages,
   isUseFukushashiki,
+  isUseAmazonPay,
   onChangeAmazonPayDisplayMode,
 }) => {
   const {
@@ -34,6 +35,7 @@ const AudienceConditionsContent = ({
         dataMessages={dataMessages}
         setDataMessages={setDataMessages}
         isUseFukushashiki={isUseFukushashiki}
+        isUseAmazonPay={isUseAmazonPay}
         onChangeAmazonPayDisplayMode={onChangeAmazonPayDisplayMode}
       />
       <div className="ss-audience-conditions-content__section-divider" />
@@ -102,6 +104,7 @@ AudienceConditionsContent.propTypes = {
   dataMessages: PropTypes.array.isRequired,
   setDataMessages: PropTypes.func.isRequired,
   isUseFukushashiki: PropTypes.bool,
+  isUseAmazonPay: PropTypes.bool,
   onChangeAmazonPayDisplayMode: PropTypes.func.isRequired,
 };
 

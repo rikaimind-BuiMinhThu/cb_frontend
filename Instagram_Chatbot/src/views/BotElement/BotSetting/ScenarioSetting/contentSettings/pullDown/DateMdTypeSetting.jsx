@@ -17,7 +17,7 @@ const DateMdTypeSetting = (props) => {
 
   const renderDateSelectors = () => (
     <div className="ss-user-setting__item-bottom">
-      <div className="ss-user-setting__item-select-bottom-wrapper-flex">
+      <div className="ss-user-setting__item-select-bottom-wrapper-flex ss-pull-down-setting__ymd-fields ss-pull-down-setting__ymd-fields--no-day">
         <SelectCustom
           className="ss-pull-down-setting__select--32"
           value={typeConfig?.month}
@@ -33,7 +33,7 @@ const DateMdTypeSetting = (props) => {
           onChange={changeTypeField('day')}
         />
         <InputCustom
-          className="ss-pull-down-setting__select--32"
+          className="ss-pull-down-setting__ymd-comment"
           placeholder={SETTING_PLACEHOLDERS.comment}
           value={typeConfig?.comment}
           onChange={changeTypeField('comment')}

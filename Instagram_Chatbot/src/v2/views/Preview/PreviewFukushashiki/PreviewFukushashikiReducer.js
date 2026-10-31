@@ -13,6 +13,7 @@ import { processForBotMessage } from 'v2/views/Preview/PreviewComponent/BotMessa
 import { processForUserMessage } from 'v2/views/Preview/PreviewComponent/UserMessageUtils';
 import { processForCombineMessage } from 'v2/views/Preview/PreviewComponent/CombineMessageUtils';
 import { isBotMessage, isUserMessage, isCombineMessage, getNextUserMsg } from 'v2/views/Preview/PreviewComponent/Utils';
+import { normalizeMessagesNotUseButton } from 'v2/views/ScenarioSetting/utils/normalizeNotUseButton';
 import { mapAmazonPayDataToMessagesList } from 'v2/views/Preview/PreviewComponent/TorizenUtils';
 import { mapAmazonPayDataToMessagesListForBliss } from 'v2/views/Preview/PreviewComponent/BlissUtils';
 import { mapAmazonPayDataToMessagesListForRoseMay } from 'v2/views/Preview/PreviewComponent/RoseMayUtils';
@@ -78,7 +79,7 @@ const PreviewFukushashikiReducer = (state, action) => {
               user_id: state.uuid,
               bot_type: "web"
             };
-            const fukuData = convertToFukushashikiObject(data);
+            const fukuData = convertToFukushashikiObject(data, state.prefecturesList);
             fukushashikiToLP(fukuData, state);
           }
         }
@@ -522,7 +523,7 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
         newState.renderMode = state.renderMode;
         newState.progressBarMaxIndex = state.progressBarMaxIndex;
       } else {
-        newState.messagesList = conversation?.messages || [];
+        newState.messagesList = normalizeMessagesNotUseButton(conversation?.messages || []);
         newState.currentMsgIndex = 0;
         newState.renderMode = RENDER_MODES.NEXT;
       }
@@ -568,7 +569,7 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
         && !(state.renderMessagesList?.length > 0)
         && (conversation?.messages?.length > 0)
       ) {
-        const apiMessages = _.cloneDeep(conversation.messages);
+        const apiMessages = normalizeMessagesNotUseButton(_.cloneDeep(conversation.messages));
         newState.messagesList = apiMessages;
         newState.renderMessagesList = apiMessages;
         newState.currentMsgIndex = apiMessages.length > 0 ? apiMessages.length - 1 : 0;
@@ -599,8 +600,7 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
 
         const contentCount = msg?.message_content?.length;
         const firstMsgContent = msg?.message_content?.[0];
-        const isDisplayBtnNext = firstMsgContent?.type !== MESSAGE_CONTENT_TYPES.IMAGE || firstMsgContent?.image?.displayButtonNext !== false;
-        if (!isDisplayBtnNext) return false;
+        if (msg.not_use_button) return false;
         if (firstMsgContent?.type === MESSAGE_CONTENT_TYPES.SUBMIT_BUTTON && contentCount === 1) return false;
 
         return true;
