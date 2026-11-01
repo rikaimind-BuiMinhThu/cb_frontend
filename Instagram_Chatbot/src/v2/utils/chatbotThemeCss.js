@@ -82,6 +82,15 @@ const withPseudoOnEach = (selectorList, pseudo) =>
     .map((selector) => `${selector.trim()}${pseudo}`)
     .join(', ');
 
+/** Prefix each selector so mobile field font can beat the theme 14px !important rule. */
+const withMobileBody = (selectorList) =>
+  selectorList
+    .split(',')
+    .map((selector) => selector.trim())
+    .filter(Boolean)
+    .map((selector) => `body.is_mobile ${selector}`)
+    .join(',\n');
+
 const buildFieldTextSelectors = (spBodySelector) => `
 ${spBodySelector} input[type="text"]:not(.theme-preview--field-focus),
 ${spBodySelector} input[type="email"]:not(.theme-preview--field-focus),
@@ -749,6 +758,15 @@ ${fieldPlaceholderSelectors} {
 ${fieldScopeSelectors.map((fieldScope) => `${fieldScope} .ant-select-selection-placeholder`).join(',\n')} {
   font-size: var(--c-field-font-size, 14px) !important;
   font-weight: var(--c-field-placeholder-weight, 400) !important;
+}
+
+${withMobileBody([
+  fieldTextSelectors,
+  fieldSelectSelectors,
+  fieldPlaceholderSelectors,
+  fieldScopeSelectors.map((fieldScope) => `${fieldScope} .ant-select-selection-placeholder`).join(',\n'),
+].join(',\n'))} {
+  font-size: max(16px, var(--c-field-font-size, 16px)) !important;
 }
 ${focusRules}
 ${previewRules}
