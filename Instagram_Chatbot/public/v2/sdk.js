@@ -1829,6 +1829,78 @@
     }
   };
 
+  // src/v2/sdk/layout/mobileKeyboardPin.js
+  var PINNED_STYLE_PROPS = ["position", "top", "left", "right", "bottom", "width", "height"];
+  var KEYBOARD_OPEN_THRESHOLD_PX = 150;
+  var PIN_INTERVAL_MS = 200;
+  var pinTimer = null;
+  var pinnedIframe = null;
+  var savedStyles = null;
+  var chatIsOpen = false;
+  var isKeyboardOpen = () => {
+    const viewport = window.visualViewport;
+    if (!viewport) return false;
+    return document.documentElement.clientHeight - viewport.height > KEYBOARD_OPEN_THRESHOLD_PX;
+  };
+  var saveIframeStyles = (iframe) => {
+    savedStyles = PINNED_STYLE_PROPS.map((prop) => ({
+      prop,
+      value: iframe.style.getPropertyValue(prop),
+      priority: iframe.style.getPropertyPriority(prop)
+    }));
+  };
+  var restoreIframeStyles = () => {
+    if (!pinnedIframe || !savedStyles) return;
+    savedStyles.forEach(({ prop, value, priority }) => {
+      if (value) {
+        pinnedIframe.style.setProperty(prop, value, priority);
+        return;
+      }
+      pinnedIframe.style.removeProperty(prop);
+    });
+    savedStyles = null;
+  };
+  var applyPin = (iframe) => {
+    const root = document.documentElement;
+    iframe.style.setProperty("position", "absolute", "important");
+    iframe.style.setProperty("top", `${window.scrollY}px`, "important");
+    iframe.style.setProperty("left", "0", "important");
+    iframe.style.setProperty("right", "auto", "important");
+    iframe.style.setProperty("bottom", "auto", "important");
+    iframe.style.setProperty("width", `${root.clientWidth}px`, "important");
+    iframe.style.setProperty("height", `${root.clientHeight}px`, "important");
+  };
+  var pinTick = () => {
+    if (!pinnedIframe || !mobileCheck() || !chatIsOpen || !isKeyboardOpen()) {
+      restoreIframeStyles();
+      return;
+    }
+    if (!savedStyles) {
+      saveIframeStyles(pinnedIframe);
+    }
+    applyPin(pinnedIframe);
+  };
+  var startMobileKeyboardPin = (iframe) => {
+    if (!iframe || !mobileCheck()) return;
+    if (pinTimer !== null && pinnedIframe === iframe && chatIsOpen) {
+      return;
+    }
+    stopMobileKeyboardPin();
+    pinnedIframe = iframe;
+    chatIsOpen = true;
+    pinTick();
+    pinTimer = window.setInterval(pinTick, PIN_INTERVAL_MS);
+  };
+  var stopMobileKeyboardPin = () => {
+    chatIsOpen = false;
+    if (pinTimer !== null) {
+      window.clearInterval(pinTimer);
+      pinTimer = null;
+    }
+    restoreIframeStyles();
+    pinnedIframe = null;
+  };
+
   // src/v2/sdk/messaging/crawl.js
   var excuteJSCode = (jscode) => {
     if (!jscode) return;
@@ -1939,6 +2011,20 @@
     if (global && global.isConnected) return global;
     return null;
   };
+  var shouldLockMobileOpenChat = (messageData) => Boolean(messageData.isOpen) && mobileCheck() && !messageData.isUpsell;
+  var syncPreviewIframeLayout = (iframe, messageData) => {
+    const lockMobileOpenChat = shouldLockMobileOpenChat(messageData);
+    if (!lockMobileOpenChat) {
+      stopMobileKeyboardPin();
+    }
+    resizeIframeFromMessage(iframe, messageData);
+    iframe.style.width = `${iframe.width} !important`;
+    iframe.style.height = `${iframe.height} !important`;
+    document.body.style.overflow = lockMobileOpenChat ? "hidden" : "scroll";
+    if (lockMobileOpenChat) {
+      startMobileKeyboardPin(iframe);
+    }
+  };
   var handleChatbotMessage = (e) => __async(null, null, function* () {
     if (typeof e.data !== "object") return;
     if (e.data.source !== "ec-chatbot") return;
@@ -2022,14 +2108,7 @@
     if (e.data.isOpen === void 0) return;
     const iframe = getLivePreviewIframe();
     if (!iframe) return;
-    resizeIframeFromMessage(iframe, e.data);
-    iframe.style.width = `${iframe.width} !important`;
-    iframe.style.height = `${iframe.height} !important`;
-    if (e.data.isOpen && mobileCheck() && !e.data.isUpsell) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "scroll";
-    }
+    syncPreviewIframeLayout(iframe, e.data);
     setGlobalIframe(iframe);
   });
   var displayPopup = () => __async(null, null, function* () {
