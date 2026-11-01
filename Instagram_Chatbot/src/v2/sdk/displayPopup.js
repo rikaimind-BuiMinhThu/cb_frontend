@@ -34,6 +34,10 @@ import {
   resizeIframeFromMessage,
 } from './layout/iframeLayout.js';
 import {
+  startMobileKeyboardPin,
+  stopMobileKeyboardPin,
+} from './layout/mobileKeyboardPin.js';
+import {
   crawlDataAndSendMessage,
   excuteJSCode,
   processGetErrorMessage,
@@ -67,6 +71,28 @@ const getLivePreviewIframe = () => {
   const global = chatbotLayout.globalIframe;
   if (global && global.isConnected) return global;
   return null;
+};
+
+const shouldLockMobileOpenChat = (messageData) => (
+  Boolean(messageData.isOpen) && mobileCheck() && !messageData.isUpsell
+);
+
+const syncPreviewIframeLayout = (iframe, messageData) => {
+  const lockMobileOpenChat = shouldLockMobileOpenChat(messageData);
+
+  // Restore any keyboard pin before close/upsell resize so those styles win.
+  if (!lockMobileOpenChat) {
+    stopMobileKeyboardPin();
+  }
+
+  resizeIframeFromMessage(iframe, messageData);
+  iframe.style.width = `${iframe.width} !important`;
+  iframe.style.height = `${iframe.height} !important`;
+  document.body.style.overflow = lockMobileOpenChat ? 'hidden' : 'scroll';
+
+  if (lockMobileOpenChat) {
+    startMobileKeyboardPin(iframe);
+  }
 };
 
 const handleChatbotMessage = async (e) => {
@@ -160,15 +186,7 @@ const handleChatbotMessage = async (e) => {
   const iframe = getLivePreviewIframe();
   if (!iframe) return;
 
-  resizeIframeFromMessage(iframe, e.data);
-
-  iframe.style.width = `${iframe.width} !important`;
-  iframe.style.height = `${iframe.height} !important`;
-  if (e.data.isOpen && mobileCheck() && !e.data.isUpsell) {
-    document.body.style.overflow = 'hidden';
-  } else {
-    document.body.style.overflow = 'scroll';
-  }
+  syncPreviewIframeLayout(iframe, e.data);
   setGlobalIframe(iframe);
 };
 
