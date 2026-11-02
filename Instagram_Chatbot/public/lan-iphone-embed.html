@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>LAN iPhone chatbot test</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", sans-serif;
+    }
+    body {
+      margin: 0;
+      padding: 24px 16px 120px;
+      background: #f3f4f6;
+      color: #111827;
+      line-height: 1.5;
+    }
+    h1 { font-size: 22px; margin: 0 0 8px; }
+    p { margin: 0 0 12px; }
+    code, .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 13px;
+      word-break: break-all;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 2px rgba(0,0,0,.06);
+    }
+    .ok { color: #047857; font-weight: 600; }
+    .err { color: #b91c1c; font-weight: 600; }
+    label { display: block; font-size: 13px; margin-bottom: 6px; }
+    input {
+      width: 100%;
+      box-sizing: border-box;
+      font-size: 16px;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+    }
+    button {
+      margin-top: 12px;
+      width: 100%;
+      font-size: 16px;
+      padding: 14px;
+      border: 0;
+      border-radius: 10px;
+      background: #111827;
+      color: #fff;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>LAN iPhone test</h1>
+    <p>Loads local <code>/v2/sdk.js</code> from this Mac. API = staging (<code>ec-chatbot-test1.com</code>).</p>
+    <p>Default bot: <strong>Chill Habit staging 319</strong> (scenario 544).</p>
+    <p id="status" class="err">Waiting for bot_id…</p>
+    <p class="mono" id="page-url"></p>
+  </div>
+
+  <div class="card" id="setup">
+    <label for="bot-id">bot_id (staging)</label>
+    <input id="bot-id" inputmode="numeric" placeholder="319" value="319" autocomplete="off" />
+    <button type="button" id="start">Start chatbot</button>
+  </div>
+
+  <div class="card">
+    <p><strong>Check</strong></p>
+    <p>1. Same Wi‑Fi as this Mac</p>
+    <p>2. Open this page on iPhone</p>
+    <p>3. Advance scenario steps + one text field — no flicker</p>
+  </div>
+
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var botId = params.get('bot_id') || '319';
+      var statusEl = document.getElementById('status');
+      var input = document.getElementById('bot-id');
+      var pageUrl = document.getElementById('page-url');
+      pageUrl.textContent = window.location.href;
+
+      input.value = botId;
+      if (!params.get('bot_id')) {
+        var next = new URL(window.location.href);
+        next.searchParams.set('bot_id', botId);
+        window.location.replace(next.toString());
+        return;
+      }
+
+      function loadSdk(id) {
+        sessionStorage.setItem('bot_id', String(id));
+        statusEl.className = 'ok';
+        statusEl.textContent = 'bot_id=' + id + ' — loading SDK…';
+        document.getElementById('setup').style.display = 'none';
+
+        var s = document.createElement('script');
+        s.src = '/v2/sdk.js';
+        s.defer = true;
+        s.onerror = function () {
+          statusEl.className = 'err';
+          statusEl.textContent = 'Failed to load /v2/sdk.js — is npm start running?';
+        };
+        s.onload = function () {
+          statusEl.textContent = 'bot_id=' + id + ' — SDK loaded. Open the chatbot.';
+        };
+        document.body.appendChild(s);
+      }
+
+      document.getElementById('start').addEventListener('click', function () {
+        var id = (input.value || '').trim();
+        if (!id) {
+          statusEl.className = 'err';
+          statusEl.textContent = 'Enter a staging bot_id first.';
+          return;
+        }
+        var next = new URL(window.location.href);
+        next.searchParams.set('bot_id', id);
+        window.location.replace(next.toString());
+      });
+
+      if (botId) {
+        loadSdk(botId);
+      }
+    })();
+  </script>
+</body>
+</html>

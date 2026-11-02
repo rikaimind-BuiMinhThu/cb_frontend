@@ -42,6 +42,16 @@
   };
 
   // src/v2/sdk/config/environment.js
+  var isLanHost = (host) => {
+    const hostname = String(host || "").split(":")[0];
+    return /^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[0-1])\.)/.test(hostname);
+  };
+  var cacheSdkScriptOrigin = (src) => {
+    try {
+      window.sdkScriptOrigin = new URL(src).origin;
+    } catch (e) {
+    }
+  };
   var getEnvFromScriptSrc = () => {
     var _a;
     try {
@@ -50,11 +60,17 @@
       const SRC_PARSER = {
         "ec-chatbot1.com": "staging",
         "ec-chatbot.com": "production",
-        "localhost:3001": "local"
+        "localhost:3001": "local",
+        "127.0.0.1:3001": "local"
       };
       const src = ((_a = document.currentScript) == null ? void 0 : _a.src) || "";
       if (!src) return null;
       const host = new URL(src).host;
+      cacheSdkScriptOrigin(src);
+      if (isLanHost(host)) {
+        window.sdkEnv = "lan";
+        return "lan";
+      }
       const sdkEnv = SRC_PARSER[host];
       if (sdkEnv) {
         window.sdkEnv = sdkEnv;
@@ -64,6 +80,19 @@
     } catch (e) {
       return null;
     }
+  };
+  var getLanFrontEndBaseUrl = () => {
+    var _a, _b;
+    if (window.sdkScriptOrigin) return window.sdkScriptOrigin;
+    try {
+      const src = ((_a = document.querySelector('script[src*="/v2/sdk"]')) == null ? void 0 : _a.src) || ((_b = document.querySelector('script[src*="sdk.js"]')) == null ? void 0 : _b.src) || "";
+      if (src) {
+        cacheSdkScriptOrigin(src);
+        if (window.sdkScriptOrigin) return window.sdkScriptOrigin;
+      }
+    } catch (e) {
+    }
+    return window.location.origin;
   };
   var getEnvironment = () => {
     const params = new Proxy(new URLSearchParams(window.location.search), {
@@ -95,6 +124,7 @@
     switch (environment) {
       case "staging":
       case "test":
+      case "lan":
         return "https://ec-chatbot-test1.com";
       case "production":
         return "https://ec-chatbot-test.com";
@@ -112,6 +142,8 @@
         return "https://ec-chatbot1.com";
       case "production":
         return "https://ec-chatbot.com";
+      case "lan":
+        return getLanFrontEndBaseUrl();
       case "local":
         return "http://localhost:3001";
       default:
@@ -1774,11 +1806,20 @@
       applyIframeHorizontalAnchor(iframe, options.horizontalRule);
     }
   };
+  var getMobileOpenViewportSize = () => {
+    const viewport = window.visualViewport;
+    const width = Math.round((viewport == null ? void 0 : viewport.width) || window.innerWidth || document.documentElement.clientWidth);
+    const height = Math.round((viewport == null ? void 0 : viewport.height) || window.innerHeight || document.documentElement.clientHeight);
+    return {
+      width: `${Math.max(width, 1)}px`,
+      height: `${Math.max(height, 1)}px`
+    };
+  };
   var resizeIframeFromMessage = (iframe, messageData) => {
     if (messageData.isOpen === void 0) return;
     const useMoblieFullwidth = getUseMobileFullwidth(messageData);
     if (messageData.isOpen && mobileCheck()) {
-      const openDimensions = getOpenDimensions(messageData, true);
+      const openDimensions = getMobileOpenViewportSize();
       applyIframeLayout(iframe, openDimensions.width, openDimensions.height, {
         bottom: "0px",
         resetHorizontal: true
@@ -2018,6 +2059,48 @@
 
   // src/v2/sdk/displayPopup.js
   var lastAppliedLayoutKey = null;
+  var mobileOpenLayoutLocked = false;
+  var mobileViewportListenIframe = null;
+  var mobileViewportRaf = null;
+  var applyMobileOpenViewportSize = (iframe) => {
+    const viewport = window.visualViewport;
+    const width = Math.round((viewport == null ? void 0 : viewport.width) || window.innerWidth || document.documentElement.clientWidth);
+    const height = Math.round((viewport == null ? void 0 : viewport.height) || window.innerHeight || document.documentElement.clientHeight);
+    const nextWidth = `${Math.max(width, 1)}px`;
+    const nextHeight = `${Math.max(height, 1)}px`;
+    const currentWidth = iframe.style.getPropertyValue("width");
+    const currentHeight = iframe.style.getPropertyValue("height");
+    if (currentWidth === nextWidth && currentHeight === nextHeight) return;
+    iframe.width = nextWidth;
+    iframe.height = nextHeight;
+    iframe.style.setProperty("width", nextWidth, "important");
+    iframe.style.setProperty("height", nextHeight, "important");
+    iframe.style.setProperty("bottom", "0px", "important");
+    iframe.style.setProperty("left", "0px", "important");
+    iframe.style.setProperty("right", "0px", "important");
+  };
+  var onMobileViewportResize = () => {
+    if (!mobileViewportListenIframe || !mobileOpenLayoutLocked) return;
+    if (isMobileKeyboardPinApplied()) return;
+    if (mobileViewportRaf !== null) {
+      window.cancelAnimationFrame(mobileViewportRaf);
+    }
+    mobileViewportRaf = window.requestAnimationFrame(() => {
+      mobileViewportRaf = null;
+      applyMobileOpenViewportSize(mobileViewportListenIframe);
+    });
+  };
+  var startMobileOpenViewportWatch = (iframe) => {
+    mobileViewportListenIframe = iframe;
+    if (!window.visualViewport || window.visualViewport.__ecChatbotResizeBound) return;
+    window.visualViewport.addEventListener("resize", onMobileViewportResize);
+    window.visualViewport.addEventListener("scroll", onMobileViewportResize);
+    window.visualViewport.__ecChatbotResizeBound = true;
+  };
+  var stopMobileOpenViewportWatch = () => {
+    mobileViewportListenIframe = null;
+    mobileOpenLayoutLocked = false;
+  };
   var getUser = (url, datacount) => __async(null, null, function* () {
     const response = yield fetch(url, {
       method: "PATCH",
@@ -2060,6 +2143,7 @@
     const layoutKey = buildLayoutKey(messageData, lockMobileOpenChat);
     if (!lockMobileOpenChat) {
       stopMobileKeyboardPin();
+      stopMobileOpenViewportWatch();
     }
     if (lockMobileOpenChat && isMobileKeyboardPinApplied()) {
       if (document.body.style.overflow !== nextOverflow) {
@@ -2067,10 +2151,19 @@
       }
       return;
     }
+    if (lockMobileOpenChat && mobileOpenLayoutLocked) {
+      if (document.body.style.overflow !== nextOverflow) {
+        document.body.style.overflow = nextOverflow;
+      }
+      startMobileKeyboardPin(iframe);
+      return;
+    }
     const layoutUnchanged = lastAppliedLayoutKey === layoutKey;
     const overflowUnchanged = document.body.style.overflow === nextOverflow;
     if (layoutUnchanged && overflowUnchanged) {
       if (lockMobileOpenChat) {
+        mobileOpenLayoutLocked = true;
+        startMobileOpenViewportWatch(iframe);
         startMobileKeyboardPin(iframe);
       }
       return;
@@ -2079,6 +2172,8 @@
     document.body.style.overflow = nextOverflow;
     lastAppliedLayoutKey = layoutKey;
     if (lockMobileOpenChat) {
+      mobileOpenLayoutLocked = true;
+      startMobileOpenViewportWatch(iframe);
       startMobileKeyboardPin(iframe);
     }
   };

@@ -132,13 +132,24 @@ const applyIframeLayout = (iframe, width, height, options = {}) => {
   }
 };
 
+const getMobileOpenViewportSize = () => {
+  const viewport = window.visualViewport;
+  const width = Math.round(viewport?.width || window.innerWidth || document.documentElement.clientWidth);
+  const height = Math.round(viewport?.height || window.innerHeight || document.documentElement.clientHeight);
+  return {
+    width: `${Math.max(width, 1)}px`,
+    height: `${Math.max(height, 1)}px`,
+  };
+};
+
 export const resizeIframeFromMessage = (iframe, messageData) => {
   if (messageData.isOpen === undefined) return;
 
   const useMoblieFullwidth = getUseMobileFullwidth(messageData);
 
   if (messageData.isOpen && mobileCheck()) {
-    const openDimensions = getOpenDimensions(messageData, true);
+    // Pixel size from visualViewport avoids iOS 100%-height chrome flicker.
+    const openDimensions = getMobileOpenViewportSize();
     applyIframeLayout(iframe, openDimensions.width, openDimensions.height, {
       bottom: '0px',
       resetHorizontal: true,

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { MDBIcon } from "mdbreact";
 import PropTypes from "prop-types";
 import PreventExitChatbotModal from "./PreventExitChatbotModal";
@@ -12,6 +12,7 @@ const ICON_CHEVRON_CIRCLE_DOWN = "chevron-circle-down";
 const ICON_CHEVRON_CIRCLE_LEFT = "chevron-circle-left";
 const ICON_CHEVRON_CIRCLE_RIGHT = "chevron-circle-right";
 const ALT_BOT_HEADER_ICON = "bot-header-icon";
+const OPEN_ANIMATION_FALLBACK_MS = 1200;
 
 const OPEN_ANIMATION_CLASS_NAMES = [
   "slideUp",
@@ -34,6 +35,18 @@ const stripOpenAnimationClasses = (className) => (
     .filter((token) => token && !OPEN_ANIMATION_CLASS_SET.has(token))
     .join(" ")
 );
+
+const applyCssVars = (element, cssVars = {}) => {
+  if (!element) return;
+  Object.entries(cssVars).forEach(([key, value]) => {
+    if (value === undefined || value === null) {
+      element.style.removeProperty(key);
+      return;
+    }
+    if (element.style.getPropertyValue(key) === String(value)) return;
+    element.style.setProperty(key, String(value));
+  });
+};
 
 /**
  * Open chatbot chrome: header, exit modal, optional slots, and body.
@@ -59,10 +72,34 @@ const PreviewOpenChatFrame = ({
   children,
 }) => {
   const [openAnimationDone, setOpenAnimationDone] = useState(false);
+  const localRef = useRef(null);
+
+  const setContainerRef = (node) => {
+    localRef.current = node;
+    if (typeof containerRef === "function") {
+      containerRef(node);
+      return;
+    }
+    if (containerRef) {
+      containerRef.current = node;
+    }
+  };
 
   useEffect(() => {
     setOpenAnimationDone(false);
   }, [containerClassName]);
+
+  useEffect(() => {
+    applyCssVars(localRef.current, cssVars);
+  }, [cssVars]);
+
+  useEffect(() => {
+    if (openAnimationDone) return undefined;
+    const timeoutId = window.setTimeout(() => {
+      setOpenAnimationDone(true);
+    }, OPEN_ANIMATION_FALLBACK_MS);
+    return () => window.clearTimeout(timeoutId);
+  }, [openAnimationDone, containerClassName]);
 
   const designTypeClass = getDesignTypeClassName(
     designType || botConfig?.botInfor?.design_type,
@@ -88,16 +125,14 @@ const PreviewOpenChatFrame = ({
 
   const handleOpenAnimationEnd = (event) => {
     if (event.target !== event.currentTarget) return;
-    if (!OPEN_ANIMATION_CLASS_SET.has(event.animationName)) return;
     setOpenAnimationDone(true);
   };
 
   return (
     <div
-      ref={containerRef}
+      ref={setContainerRef}
       id="sp-container1"
       className={className}
-      style={cssVars}
       onAnimationEnd={handleOpenAnimationEnd}
     >
       {overlays}
