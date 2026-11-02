@@ -28,6 +28,8 @@ const postMessageToParent = (options, state) => {
     // Keep legacy keys for backward compatibility in old SDK versions.
     chatbotRight: state.rightMarginPc,
     chatbotBottom: state.bottomMarginPc,
+    // Chat body color so the SDK can paint the iframe underlay on-theme.
+    chatBodyBg: state.botInfor?.opacity_color || '',
     ...buildSdkPostMessageLayout(state, isMobile()),
   };
   

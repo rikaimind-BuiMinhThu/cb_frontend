@@ -34,6 +34,8 @@ import {
   resizeIframeFromMessage,
 } from './layout/iframeLayout.js';
 import {
+  isMobileKeyboardPinApplied,
+  setChatBodyBackground,
   startMobileKeyboardPin,
   stopMobileKeyboardPin,
 } from './layout/mobileKeyboardPin.js';
@@ -51,6 +53,8 @@ import {
   updateChatbotOffsetsFromMessage,
   uuid,
 } from './state.js';
+
+let lastAppliedLayoutKey = null;
 
 const getUser = async (url, datacount) => {
   const response = await fetch(url, {
@@ -77,18 +81,58 @@ const shouldLockMobileOpenChat = (messageData) => (
   Boolean(messageData.isOpen) && mobileCheck() && !messageData.isUpsell
 );
 
+const buildLayoutKey = (messageData, lockMobileOpenChat) => ([
+  Boolean(messageData.isOpen),
+  Boolean(messageData.isUpsell),
+  lockMobileOpenChat,
+  messageData.widthPc,
+  messageData.heightPc,
+  messageData.widthSp,
+  messageData.heightSp,
+  messageData.closedContentWidth,
+  messageData.closedContentHeight,
+  messageData.useMoblieFullwidth,
+  messageData.chatbotRightPc,
+  messageData.chatbotBottomPc,
+  messageData.chatbotRightSp,
+  messageData.chatbotBottomSp,
+].join('|'));
+
 const syncPreviewIframeLayout = (iframe, messageData) => {
   const lockMobileOpenChat = shouldLockMobileOpenChat(messageData);
+  const nextOverflow = lockMobileOpenChat ? 'hidden' : 'scroll';
+  const layoutKey = buildLayoutKey(messageData, lockMobileOpenChat);
+
+  if (typeof messageData.chatBodyBg === 'string') {
+    setChatBodyBackground(messageData.chatBodyBg);
+  }
 
   // Restore any keyboard pin before close/upsell resize so those styles win.
   if (!lockMobileOpenChat) {
     stopMobileKeyboardPin();
   }
 
+  // visualViewport pin owns iframe geometry while applied; do not fight it.
+  if (lockMobileOpenChat && isMobileKeyboardPinApplied()) {
+    if (document.body.style.overflow !== nextOverflow) {
+      document.body.style.overflow = nextOverflow;
+    }
+    startMobileKeyboardPin(iframe);
+    return;
+  }
+
+  const layoutUnchanged = lastAppliedLayoutKey === layoutKey;
+  const overflowUnchanged = document.body.style.overflow === nextOverflow;
+  if (layoutUnchanged && overflowUnchanged) {
+    if (lockMobileOpenChat) {
+      startMobileKeyboardPin(iframe);
+    }
+    return;
+  }
+
   resizeIframeFromMessage(iframe, messageData);
-  iframe.style.width = `${iframe.width} !important`;
-  iframe.style.height = `${iframe.height} !important`;
-  document.body.style.overflow = lockMobileOpenChat ? 'hidden' : 'scroll';
+  document.body.style.overflow = nextOverflow;
+  lastAppliedLayoutKey = layoutKey;
 
   if (lockMobileOpenChat) {
     startMobileKeyboardPin(iframe);
@@ -261,8 +305,8 @@ export const displayPopup = async () => {
   iframe.style.margin = '0';
   iframe.style.borderRadius = '0px';
   iframe.style.zIndex = '999999';
-  iframe.style.width = `${iframe.width} !important`;
-  iframe.style.height = `${iframe.height} !important`;
+  iframe.style.setProperty('width', String(iframe.width), 'important');
+  iframe.style.setProperty('height', String(iframe.height), 'important');
   iframe.src = `${getEcChatBotFrontEndBaseUrl()}${getSdkPreviewBasePath()}/preview-customer-fukushashiki?bot_id=${botId}&scenario_id=${chatbotLayout.scenarioId}&urlReceive=${window.location.origin
   }&deviceReceive=${device}&uuid=${uuid}&env=${getEnvironment()}&debug=${getDebugFlag()}&cartSystem=${data.cart_system}&isLoggedIn=${window.logged_in}`;
 

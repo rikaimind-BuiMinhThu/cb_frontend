@@ -483,6 +483,7 @@ const scrollToPosition = (options = {}) => {
     selector = null,
     forceScroll = false,
     position = "b",
+    behavior = null,
   } = options;
 
   if (!selector) return;
@@ -501,9 +502,12 @@ const scrollToPosition = (options = {}) => {
     }
   })();
 
+  const resolvedBehavior = behavior
+    || (forceScroll || isMobile() ? "auto" : "smooth");
+
   element.scrollTo({
     top,
-    behavior: forceScroll ? "auto" : "smooth",
+    behavior: resolvedBehavior,
   });
 }
 
