@@ -2370,6 +2370,10 @@ slideUp
   background-color: var(--pof-body-bg, transparent);
 }
 
+.preview-open-frame--mobile .preview-open-frame__body {
+  padding-bottom: var(--mobile-keyboard-inset, 0px);
+}
+
 .preview-open-frame--embedded .preview-open-frame__body {
   display: flex;
   flex-direction: column;

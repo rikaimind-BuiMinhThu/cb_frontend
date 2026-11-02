@@ -15,6 +15,7 @@ let pinnedIframe = null;
 let savedStyles = null;
 let chatIsOpen = false;
 let lastPinGeometry = null;
+let lastPostedInset = null;
 let pinRaf = null;
 let listenersBound = false;
 
@@ -39,50 +40,51 @@ const restoreIframeStyles = () => {
   lastPinGeometry = null;
 };
 
-const getViewportMetrics = () => {
-  const viewport = window.visualViewport;
-  if (viewport) {
-    return {
-      width: Math.max(Math.round(viewport.width), 1),
-      height: Math.max(Math.round(viewport.height), 1),
-      offsetLeft: Math.round(viewport.offsetLeft || 0),
-      offsetTop: Math.round(viewport.offsetTop || 0),
-    };
+const postKeyboardInset = (iframe, keyboardInset) => {
+  if (!iframe?.contentWindow) return;
+  if (lastPostedInset === keyboardInset) return;
+  lastPostedInset = keyboardInset;
+  try {
+    iframe.contentWindow.postMessage({
+      source: 'ec-chatbot-sdk',
+      action: 'mobile_viewport',
+      keyboardInset,
+    }, '*');
+  } catch {
+    // Cross-origin or unloaded iframe: ignore.
   }
-
-  return {
-    width: Math.max(Math.round(window.innerWidth || document.documentElement.clientWidth), 1),
-    height: Math.max(Math.round(window.innerHeight || document.documentElement.clientHeight), 1),
-    offsetLeft: 0,
-    offsetTop: 0,
-  };
 };
 
 const applyPin = (iframe) => {
-  const { width, height, offsetLeft, offsetTop } = getViewportMetrics();
-  const nextWidth = `${width}px`;
-  const nextHeight = `${height}px`;
+  const root = document.documentElement;
+  const vv = window.visualViewport;
+  const nextWidth = `${Math.max(root.clientWidth, 1)}px`;
+  const nextHeight = `${Math.max(root.clientHeight, 1)}px`;
+  const offsetLeft = Math.round(vv?.offsetLeft || 0);
+  const offsetTop = Math.round(vv?.offsetTop || 0);
   const nextTransform = `translate(${offsetLeft}px, ${offsetTop}px)`;
   const geometryKey = `${nextWidth}|${nextHeight}|${nextTransform}`;
+  const visibleHeight = Math.round(vv?.height || window.innerHeight || root.clientHeight);
+  const keyboardInset = Math.max(0, root.clientHeight - visibleHeight);
 
   if (
-    lastPinGeometry === geometryKey
-    && iframe.style.getPropertyValue('position') === 'fixed'
+    lastPinGeometry !== geometryKey
+    || iframe.style.getPropertyValue('position') !== 'fixed'
   ) {
-    return;
+    lastPinGeometry = geometryKey;
+    iframe.width = nextWidth;
+    iframe.height = nextHeight;
+    iframe.style.setProperty('position', 'fixed', 'important');
+    iframe.style.setProperty('top', '0', 'important');
+    iframe.style.setProperty('left', '0', 'important');
+    iframe.style.setProperty('right', 'auto', 'important');
+    iframe.style.setProperty('bottom', 'auto', 'important');
+    iframe.style.setProperty('width', nextWidth, 'important');
+    iframe.style.setProperty('height', nextHeight, 'important');
+    iframe.style.setProperty('transform', nextTransform, 'important');
   }
 
-  lastPinGeometry = geometryKey;
-  iframe.width = nextWidth;
-  iframe.height = nextHeight;
-  iframe.style.setProperty('position', 'fixed', 'important');
-  iframe.style.setProperty('top', '0', 'important');
-  iframe.style.setProperty('left', '0', 'important');
-  iframe.style.setProperty('right', 'auto', 'important');
-  iframe.style.setProperty('bottom', 'auto', 'important');
-  iframe.style.setProperty('width', nextWidth, 'important');
-  iframe.style.setProperty('height', nextHeight, 'important');
-  iframe.style.setProperty('transform', nextTransform, 'important');
+  postKeyboardInset(iframe, keyboardInset);
 };
 
 const schedulePin = () => {
@@ -128,9 +130,8 @@ const unbindViewportListeners = () => {
 export const isMobileKeyboardPinApplied = () => Boolean(pinnedIframe && savedStyles);
 
 /**
- * Keep the open mobile chatbot iframe sized to the visible viewport.
- * Uses visualViewport events so the iframe follows iOS keyboard offset
- * without waiting for a polling interval.
+ * Keep the open mobile chatbot iframe covering the full layout viewport
+ * while following iOS visualViewport offset via transform.
  */
 export const startMobileKeyboardPin = (iframe) => {
   if (!iframe || !mobileCheck()) return;
@@ -143,6 +144,7 @@ export const startMobileKeyboardPin = (iframe) => {
   stopMobileKeyboardPin();
   pinnedIframe = iframe;
   chatIsOpen = true;
+  lastPostedInset = null;
   bindViewportListeners();
   schedulePin();
 };
@@ -151,12 +153,17 @@ export const startMobileKeyboardPin = (iframe) => {
  * Stop the pin watcher and restore iframe styles saved before the pin.
  */
 export const stopMobileKeyboardPin = () => {
+  const iframe = pinnedIframe;
   chatIsOpen = false;
   unbindViewportListeners();
   if (pinRaf !== null) {
     window.cancelAnimationFrame(pinRaf);
     pinRaf = null;
   }
+  if (iframe) {
+    postKeyboardInset(iframe, 0);
+  }
   restoreIframeStyles();
   pinnedIframe = null;
+  lastPostedInset = null;
 };

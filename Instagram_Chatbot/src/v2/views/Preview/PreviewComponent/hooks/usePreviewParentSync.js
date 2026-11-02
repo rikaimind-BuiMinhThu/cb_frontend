@@ -3,6 +3,8 @@ import { isMobile } from "../Utils";
 import { postMessageToParent } from "v2/views/Preview/PreviewFukushashiki/LPUtils";
 
 const FOCUSABLE_FIELD_SELECTOR = "input, textarea, select";
+const MOBILE_VIEWPORT_SOURCE = "ec-chatbot-sdk";
+const MOBILE_VIEWPORT_ACTION = "mobile_viewport";
 
 const scrollFocusedFieldIntoChatBody = () => {
   const active = document.activeElement;
@@ -19,6 +21,12 @@ const scheduleFocusedFieldScroll = () => {
   window.requestAnimationFrame(() => {
     scrollFocusedFieldIntoChatBody();
   });
+};
+
+const applyKeyboardInset = (keyboardInset) => {
+  const insetPx = `${Math.max(0, Number(keyboardInset) || 0)}px`;
+  document.documentElement.style.setProperty("--mobile-keyboard-inset", insetPx);
+  scheduleFocusedFieldScroll();
 };
 
 /**
@@ -58,8 +66,17 @@ export const usePreviewParentSync = ({
       scheduleFocusedFieldScroll();
     };
 
+    const onSdkViewportMessage = (event) => {
+      const data = event?.data;
+      if (!data || typeof data !== "object") return;
+      if (data.source !== MOBILE_VIEWPORT_SOURCE) return;
+      if (data.action !== MOBILE_VIEWPORT_ACTION) return;
+      applyKeyboardInset(data.keyboardInset);
+    };
+
     document.addEventListener("focusin", onFocusIn);
     window.addEventListener("resize", onViewportChange);
+    window.addEventListener("message", onSdkViewportMessage);
     if (window.visualViewport) {
       window.visualViewport.addEventListener("resize", onViewportChange);
       window.visualViewport.addEventListener("scroll", onViewportChange);
@@ -68,10 +85,12 @@ export const usePreviewParentSync = ({
     return () => {
       document.removeEventListener("focusin", onFocusIn);
       window.removeEventListener("resize", onViewportChange);
+      window.removeEventListener("message", onSdkViewportMessage);
       if (window.visualViewport) {
         window.visualViewport.removeEventListener("resize", onViewportChange);
         window.visualViewport.removeEventListener("scroll", onViewportChange);
       }
+      document.documentElement.style.removeProperty("--mobile-keyboard-inset");
     };
   }, [enabled]);
 
