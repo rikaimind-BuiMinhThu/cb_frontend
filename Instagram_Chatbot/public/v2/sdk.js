@@ -1871,21 +1871,22 @@
   };
 
   // src/v2/sdk/layout/mobileKeyboardPin.js
-  var PINNED_STYLE_PROPS = ["position", "top", "left", "right", "bottom", "width", "height"];
-  var KEYBOARD_OPEN_THRESHOLD_PX = 150;
-  var PIN_INTERVAL_MS = 200;
-  var KEYBOARD_CLOSE_CONFIRM_TICKS = 2;
-  var pinTimer = null;
+  var PINNED_STYLE_PROPS = [
+    "position",
+    "top",
+    "left",
+    "right",
+    "bottom",
+    "width",
+    "height",
+    "transform"
+  ];
   var pinnedIframe = null;
   var savedStyles = null;
   var chatIsOpen = false;
-  var keyboardClosedTicks = 0;
   var lastPinGeometry = null;
-  var isKeyboardOpen = () => {
-    const viewport = window.visualViewport;
-    if (!viewport) return false;
-    return document.documentElement.clientHeight - viewport.height > KEYBOARD_OPEN_THRESHOLD_PX;
-  };
+  var pinRaf = null;
+  var listenersBound = false;
   var saveIframeStyles = (iframe) => {
     savedStyles = PINNED_STYLE_PROPS.map((prop) => ({
       prop,
@@ -1905,63 +1906,97 @@
     savedStyles = null;
     lastPinGeometry = null;
   };
+  var getViewportMetrics = () => {
+    const viewport = window.visualViewport;
+    if (viewport) {
+      return {
+        width: Math.max(Math.round(viewport.width), 1),
+        height: Math.max(Math.round(viewport.height), 1),
+        offsetLeft: Math.round(viewport.offsetLeft || 0),
+        offsetTop: Math.round(viewport.offsetTop || 0)
+      };
+    }
+    return {
+      width: Math.max(Math.round(window.innerWidth || document.documentElement.clientWidth), 1),
+      height: Math.max(Math.round(window.innerHeight || document.documentElement.clientHeight), 1),
+      offsetLeft: 0,
+      offsetTop: 0
+    };
+  };
   var applyPin = (iframe) => {
-    const root = document.documentElement;
-    const top = `${window.scrollY}px`;
-    const width = `${root.clientWidth}px`;
-    const height = `${root.clientHeight}px`;
-    const geometryKey = `${top}|${width}|${height}`;
-    if (lastPinGeometry === geometryKey && iframe.style.getPropertyValue("position") === "absolute") {
+    const { width, height, offsetLeft, offsetTop } = getViewportMetrics();
+    const nextWidth = `${width}px`;
+    const nextHeight = `${height}px`;
+    const nextTransform = `translate(${offsetLeft}px, ${offsetTop}px)`;
+    const geometryKey = `${nextWidth}|${nextHeight}|${nextTransform}`;
+    if (lastPinGeometry === geometryKey && iframe.style.getPropertyValue("position") === "fixed") {
       return;
     }
     lastPinGeometry = geometryKey;
-    iframe.style.setProperty("position", "absolute", "important");
-    iframe.style.setProperty("top", top, "important");
+    iframe.width = nextWidth;
+    iframe.height = nextHeight;
+    iframe.style.setProperty("position", "fixed", "important");
+    iframe.style.setProperty("top", "0", "important");
     iframe.style.setProperty("left", "0", "important");
     iframe.style.setProperty("right", "auto", "important");
     iframe.style.setProperty("bottom", "auto", "important");
-    iframe.style.setProperty("width", width, "important");
-    iframe.style.setProperty("height", height, "important");
+    iframe.style.setProperty("width", nextWidth, "important");
+    iframe.style.setProperty("height", nextHeight, "important");
+    iframe.style.setProperty("transform", nextTransform, "important");
   };
-  var pinTick = () => {
-    if (!pinnedIframe || !mobileCheck() || !chatIsOpen) {
-      restoreIframeStyles();
-      keyboardClosedTicks = 0;
-      return;
+  var schedulePin = () => {
+    if (pinRaf !== null) {
+      window.cancelAnimationFrame(pinRaf);
     }
-    if (!isKeyboardOpen()) {
-      keyboardClosedTicks += 1;
-      if (keyboardClosedTicks < KEYBOARD_CLOSE_CONFIRM_TICKS) {
+    pinRaf = window.requestAnimationFrame(() => {
+      pinRaf = null;
+      if (!pinnedIframe || !mobileCheck() || !chatIsOpen) {
+        restoreIframeStyles();
         return;
       }
-      restoreIframeStyles();
-      return;
+      if (!savedStyles) {
+        saveIframeStyles(pinnedIframe);
+      }
+      applyPin(pinnedIframe);
+    });
+  };
+  var bindViewportListeners = () => {
+    if (listenersBound) return;
+    listenersBound = true;
+    window.addEventListener("scroll", schedulePin, { passive: true });
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", schedulePin);
+      window.visualViewport.addEventListener("scroll", schedulePin);
     }
-    keyboardClosedTicks = 0;
-    if (!savedStyles) {
-      saveIframeStyles(pinnedIframe);
+  };
+  var unbindViewportListeners = () => {
+    if (!listenersBound) return;
+    listenersBound = false;
+    window.removeEventListener("scroll", schedulePin);
+    if (window.visualViewport) {
+      window.visualViewport.removeEventListener("resize", schedulePin);
+      window.visualViewport.removeEventListener("scroll", schedulePin);
     }
-    applyPin(pinnedIframe);
   };
   var isMobileKeyboardPinApplied = () => Boolean(pinnedIframe && savedStyles);
   var startMobileKeyboardPin = (iframe) => {
     if (!iframe || !mobileCheck()) return;
-    if (pinTimer !== null && pinnedIframe === iframe && chatIsOpen) {
+    if (pinnedIframe === iframe && chatIsOpen && listenersBound) {
+      schedulePin();
       return;
     }
     stopMobileKeyboardPin();
     pinnedIframe = iframe;
     chatIsOpen = true;
-    keyboardClosedTicks = 0;
-    pinTick();
-    pinTimer = window.setInterval(pinTick, PIN_INTERVAL_MS);
+    bindViewportListeners();
+    schedulePin();
   };
   var stopMobileKeyboardPin = () => {
     chatIsOpen = false;
-    keyboardClosedTicks = 0;
-    if (pinTimer !== null) {
-      window.clearInterval(pinTimer);
-      pinTimer = null;
+    unbindViewportListeners();
+    if (pinRaf !== null) {
+      window.cancelAnimationFrame(pinRaf);
+      pinRaf = null;
     }
     restoreIframeStyles();
     pinnedIframe = null;
@@ -2059,48 +2094,6 @@
 
   // src/v2/sdk/displayPopup.js
   var lastAppliedLayoutKey = null;
-  var mobileOpenLayoutLocked = false;
-  var mobileViewportListenIframe = null;
-  var mobileViewportRaf = null;
-  var applyMobileOpenViewportSize = (iframe) => {
-    const viewport = window.visualViewport;
-    const width = Math.round((viewport == null ? void 0 : viewport.width) || window.innerWidth || document.documentElement.clientWidth);
-    const height = Math.round((viewport == null ? void 0 : viewport.height) || window.innerHeight || document.documentElement.clientHeight);
-    const nextWidth = `${Math.max(width, 1)}px`;
-    const nextHeight = `${Math.max(height, 1)}px`;
-    const currentWidth = iframe.style.getPropertyValue("width");
-    const currentHeight = iframe.style.getPropertyValue("height");
-    if (currentWidth === nextWidth && currentHeight === nextHeight) return;
-    iframe.width = nextWidth;
-    iframe.height = nextHeight;
-    iframe.style.setProperty("width", nextWidth, "important");
-    iframe.style.setProperty("height", nextHeight, "important");
-    iframe.style.setProperty("bottom", "0px", "important");
-    iframe.style.setProperty("left", "0px", "important");
-    iframe.style.setProperty("right", "0px", "important");
-  };
-  var onMobileViewportResize = () => {
-    if (!mobileViewportListenIframe || !mobileOpenLayoutLocked) return;
-    if (isMobileKeyboardPinApplied()) return;
-    if (mobileViewportRaf !== null) {
-      window.cancelAnimationFrame(mobileViewportRaf);
-    }
-    mobileViewportRaf = window.requestAnimationFrame(() => {
-      mobileViewportRaf = null;
-      applyMobileOpenViewportSize(mobileViewportListenIframe);
-    });
-  };
-  var startMobileOpenViewportWatch = (iframe) => {
-    mobileViewportListenIframe = iframe;
-    if (!window.visualViewport || window.visualViewport.__ecChatbotResizeBound) return;
-    window.visualViewport.addEventListener("resize", onMobileViewportResize);
-    window.visualViewport.addEventListener("scroll", onMobileViewportResize);
-    window.visualViewport.__ecChatbotResizeBound = true;
-  };
-  var stopMobileOpenViewportWatch = () => {
-    mobileViewportListenIframe = null;
-    mobileOpenLayoutLocked = false;
-  };
   var getUser = (url, datacount) => __async(null, null, function* () {
     const response = yield fetch(url, {
       method: "PATCH",
@@ -2143,15 +2136,8 @@
     const layoutKey = buildLayoutKey(messageData, lockMobileOpenChat);
     if (!lockMobileOpenChat) {
       stopMobileKeyboardPin();
-      stopMobileOpenViewportWatch();
     }
     if (lockMobileOpenChat && isMobileKeyboardPinApplied()) {
-      if (document.body.style.overflow !== nextOverflow) {
-        document.body.style.overflow = nextOverflow;
-      }
-      return;
-    }
-    if (lockMobileOpenChat && mobileOpenLayoutLocked) {
       if (document.body.style.overflow !== nextOverflow) {
         document.body.style.overflow = nextOverflow;
       }
@@ -2162,8 +2148,6 @@
     const overflowUnchanged = document.body.style.overflow === nextOverflow;
     if (layoutUnchanged && overflowUnchanged) {
       if (lockMobileOpenChat) {
-        mobileOpenLayoutLocked = true;
-        startMobileOpenViewportWatch(iframe);
         startMobileKeyboardPin(iframe);
       }
       return;
@@ -2172,8 +2156,6 @@
     document.body.style.overflow = nextOverflow;
     lastAppliedLayoutKey = layoutKey;
     if (lockMobileOpenChat) {
-      mobileOpenLayoutLocked = true;
-      startMobileOpenViewportWatch(iframe);
       startMobileKeyboardPin(iframe);
     }
   };

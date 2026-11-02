@@ -2,6 +2,25 @@ import { useEffect, useRef } from "react";
 import { isMobile } from "../Utils";
 import { postMessageToParent } from "v2/views/Preview/PreviewFukushashiki/LPUtils";
 
+const FOCUSABLE_FIELD_SELECTOR = "input, textarea, select";
+
+const scrollFocusedFieldIntoChatBody = () => {
+  const active = document.activeElement;
+  if (!active || typeof active.matches !== "function") return;
+  if (!active.matches(FOCUSABLE_FIELD_SELECTOR)) return;
+
+  const chatBody = document.getElementById("sp-body");
+  if (!chatBody || !chatBody.contains(active)) return;
+
+  active.scrollIntoView({ block: "nearest", behavior: "auto" });
+};
+
+const scheduleFocusedFieldScroll = () => {
+  window.requestAnimationFrame(() => {
+    scrollFocusedFieldIntoChatBody();
+  });
+};
+
 /**
  * Mobile body class, parent message listener, and initial open-state sync.
  * Mode-specific eventHandler stays in the parent component.
@@ -23,6 +42,37 @@ export const usePreviewParentSync = ({
     if (isMobile()) {
       document.body.classList.add("is_mobile");
     }
+  }, [enabled]);
+
+  useEffect(() => {
+    if (!enabled || !isMobile()) return undefined;
+
+    const onFocusIn = (event) => {
+      const target = event.target;
+      if (!target || typeof target.matches !== "function") return;
+      if (!target.matches(FOCUSABLE_FIELD_SELECTOR)) return;
+      scheduleFocusedFieldScroll();
+    };
+
+    const onViewportChange = () => {
+      scheduleFocusedFieldScroll();
+    };
+
+    document.addEventListener("focusin", onFocusIn);
+    window.addEventListener("resize", onViewportChange);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", onViewportChange);
+      window.visualViewport.addEventListener("scroll", onViewportChange);
+    }
+
+    return () => {
+      document.removeEventListener("focusin", onFocusIn);
+      window.removeEventListener("resize", onViewportChange);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener("resize", onViewportChange);
+        window.visualViewport.removeEventListener("scroll", onViewportChange);
+      }
+    };
   }, [enabled]);
 
   useEffect(() => {

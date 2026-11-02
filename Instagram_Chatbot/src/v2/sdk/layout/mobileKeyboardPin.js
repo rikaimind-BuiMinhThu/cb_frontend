@@ -1,22 +1,22 @@
 import { mobileCheck } from '../device.js';
 
-const PINNED_STYLE_PROPS = ['position', 'top', 'left', 'right', 'bottom', 'width', 'height'];
-const KEYBOARD_OPEN_THRESHOLD_PX = 150;
-const PIN_INTERVAL_MS = 200;
-const KEYBOARD_CLOSE_CONFIRM_TICKS = 2;
+const PINNED_STYLE_PROPS = [
+  'position',
+  'top',
+  'left',
+  'right',
+  'bottom',
+  'width',
+  'height',
+  'transform',
+];
 
-let pinTimer = null;
 let pinnedIframe = null;
 let savedStyles = null;
 let chatIsOpen = false;
-let keyboardClosedTicks = 0;
 let lastPinGeometry = null;
-
-const isKeyboardOpen = () => {
-  const viewport = window.visualViewport;
-  if (!viewport) return false;
-  return document.documentElement.clientHeight - viewport.height > KEYBOARD_OPEN_THRESHOLD_PX;
-};
+let pinRaf = null;
+let listenersBound = false;
 
 const saveIframeStyles = (iframe) => {
   savedStyles = PINNED_STYLE_PROPS.map((prop) => ({
@@ -39,75 +39,112 @@ const restoreIframeStyles = () => {
   lastPinGeometry = null;
 };
 
+const getViewportMetrics = () => {
+  const viewport = window.visualViewport;
+  if (viewport) {
+    return {
+      width: Math.max(Math.round(viewport.width), 1),
+      height: Math.max(Math.round(viewport.height), 1),
+      offsetLeft: Math.round(viewport.offsetLeft || 0),
+      offsetTop: Math.round(viewport.offsetTop || 0),
+    };
+  }
+
+  return {
+    width: Math.max(Math.round(window.innerWidth || document.documentElement.clientWidth), 1),
+    height: Math.max(Math.round(window.innerHeight || document.documentElement.clientHeight), 1),
+    offsetLeft: 0,
+    offsetTop: 0,
+  };
+};
+
 const applyPin = (iframe) => {
-  const root = document.documentElement;
-  const top = `${window.scrollY}px`;
-  const width = `${root.clientWidth}px`;
-  const height = `${root.clientHeight}px`;
-  const geometryKey = `${top}|${width}|${height}`;
+  const { width, height, offsetLeft, offsetTop } = getViewportMetrics();
+  const nextWidth = `${width}px`;
+  const nextHeight = `${height}px`;
+  const nextTransform = `translate(${offsetLeft}px, ${offsetTop}px)`;
+  const geometryKey = `${nextWidth}|${nextHeight}|${nextTransform}`;
 
   if (
     lastPinGeometry === geometryKey
-    && iframe.style.getPropertyValue('position') === 'absolute'
+    && iframe.style.getPropertyValue('position') === 'fixed'
   ) {
     return;
   }
 
   lastPinGeometry = geometryKey;
-  iframe.style.setProperty('position', 'absolute', 'important');
-  iframe.style.setProperty('top', top, 'important');
+  iframe.width = nextWidth;
+  iframe.height = nextHeight;
+  iframe.style.setProperty('position', 'fixed', 'important');
+  iframe.style.setProperty('top', '0', 'important');
   iframe.style.setProperty('left', '0', 'important');
   iframe.style.setProperty('right', 'auto', 'important');
   iframe.style.setProperty('bottom', 'auto', 'important');
-  iframe.style.setProperty('width', width, 'important');
-  iframe.style.setProperty('height', height, 'important');
+  iframe.style.setProperty('width', nextWidth, 'important');
+  iframe.style.setProperty('height', nextHeight, 'important');
+  iframe.style.setProperty('transform', nextTransform, 'important');
 };
 
-const pinTick = () => {
-  if (!pinnedIframe || !mobileCheck() || !chatIsOpen) {
-    restoreIframeStyles();
-    keyboardClosedTicks = 0;
-    return;
+const schedulePin = () => {
+  if (pinRaf !== null) {
+    window.cancelAnimationFrame(pinRaf);
   }
-
-  if (!isKeyboardOpen()) {
-    keyboardClosedTicks += 1;
-    if (keyboardClosedTicks < KEYBOARD_CLOSE_CONFIRM_TICKS) {
+  pinRaf = window.requestAnimationFrame(() => {
+    pinRaf = null;
+    if (!pinnedIframe || !mobileCheck() || !chatIsOpen) {
+      restoreIframeStyles();
       return;
     }
-    restoreIframeStyles();
-    return;
-  }
+    if (!savedStyles) {
+      saveIframeStyles(pinnedIframe);
+    }
+    applyPin(pinnedIframe);
+  });
+};
 
-  keyboardClosedTicks = 0;
-  if (!savedStyles) {
-    saveIframeStyles(pinnedIframe);
+const bindViewportListeners = () => {
+  if (listenersBound) return;
+  listenersBound = true;
+  window.addEventListener('scroll', schedulePin, { passive: true });
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', schedulePin);
+    window.visualViewport.addEventListener('scroll', schedulePin);
   }
-  applyPin(pinnedIframe);
+};
+
+const unbindViewportListeners = () => {
+  if (!listenersBound) return;
+  listenersBound = false;
+  window.removeEventListener('scroll', schedulePin);
+  if (window.visualViewport) {
+    window.visualViewport.removeEventListener('resize', schedulePin);
+    window.visualViewport.removeEventListener('scroll', schedulePin);
+  }
 };
 
 /**
- * True while the keyboard pin has overridden iframe geometry.
+ * True while the open-mobile pin has overridden iframe geometry.
  */
 export const isMobileKeyboardPinApplied = () => Boolean(pinnedIframe && savedStyles);
 
 /**
- * Watch the open mobile chatbot iframe and pin it over the LP while the keyboard is open.
- * Does nothing on desktop / tablet. Does not pin until the keyboard opens.
+ * Keep the open mobile chatbot iframe sized to the visible viewport.
+ * Uses visualViewport events so the iframe follows iOS keyboard offset
+ * without waiting for a polling interval.
  */
 export const startMobileKeyboardPin = (iframe) => {
   if (!iframe || !mobileCheck()) return;
 
-  if (pinTimer !== null && pinnedIframe === iframe && chatIsOpen) {
+  if (pinnedIframe === iframe && chatIsOpen && listenersBound) {
+    schedulePin();
     return;
   }
 
   stopMobileKeyboardPin();
   pinnedIframe = iframe;
   chatIsOpen = true;
-  keyboardClosedTicks = 0;
-  pinTick();
-  pinTimer = window.setInterval(pinTick, PIN_INTERVAL_MS);
+  bindViewportListeners();
+  schedulePin();
 };
 
 /**
@@ -115,10 +152,10 @@ export const startMobileKeyboardPin = (iframe) => {
  */
 export const stopMobileKeyboardPin = () => {
   chatIsOpen = false;
-  keyboardClosedTicks = 0;
-  if (pinTimer !== null) {
-    window.clearInterval(pinTimer);
-    pinTimer = null;
+  unbindViewportListeners();
+  if (pinRaf !== null) {
+    window.cancelAnimationFrame(pinRaf);
+    pinRaf = null;
   }
   restoreIframeStyles();
   pinnedIframe = null;

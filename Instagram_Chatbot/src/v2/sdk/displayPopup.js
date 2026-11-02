@@ -54,52 +54,6 @@ import {
 } from './state.js';
 
 let lastAppliedLayoutKey = null;
-let mobileOpenLayoutLocked = false;
-let mobileViewportListenIframe = null;
-let mobileViewportRaf = null;
-
-const applyMobileOpenViewportSize = (iframe) => {
-  const viewport = window.visualViewport;
-  const width = Math.round(viewport?.width || window.innerWidth || document.documentElement.clientWidth);
-  const height = Math.round(viewport?.height || window.innerHeight || document.documentElement.clientHeight);
-  const nextWidth = `${Math.max(width, 1)}px`;
-  const nextHeight = `${Math.max(height, 1)}px`;
-  const currentWidth = iframe.style.getPropertyValue('width');
-  const currentHeight = iframe.style.getPropertyValue('height');
-  if (currentWidth === nextWidth && currentHeight === nextHeight) return;
-  iframe.width = nextWidth;
-  iframe.height = nextHeight;
-  iframe.style.setProperty('width', nextWidth, 'important');
-  iframe.style.setProperty('height', nextHeight, 'important');
-  iframe.style.setProperty('bottom', '0px', 'important');
-  iframe.style.setProperty('left', '0px', 'important');
-  iframe.style.setProperty('right', '0px', 'important');
-};
-
-const onMobileViewportResize = () => {
-  if (!mobileViewportListenIframe || !mobileOpenLayoutLocked) return;
-  if (isMobileKeyboardPinApplied()) return;
-  if (mobileViewportRaf !== null) {
-    window.cancelAnimationFrame(mobileViewportRaf);
-  }
-  mobileViewportRaf = window.requestAnimationFrame(() => {
-    mobileViewportRaf = null;
-    applyMobileOpenViewportSize(mobileViewportListenIframe);
-  });
-};
-
-const startMobileOpenViewportWatch = (iframe) => {
-  mobileViewportListenIframe = iframe;
-  if (!window.visualViewport || window.visualViewport.__ecChatbotResizeBound) return;
-  window.visualViewport.addEventListener('resize', onMobileViewportResize);
-  window.visualViewport.addEventListener('scroll', onMobileViewportResize);
-  window.visualViewport.__ecChatbotResizeBound = true;
-};
-
-const stopMobileOpenViewportWatch = () => {
-  mobileViewportListenIframe = null;
-  mobileOpenLayoutLocked = false;
-};
 
 const getUser = async (url, datacount) => {
   const response = await fetch(url, {
@@ -151,19 +105,10 @@ const syncPreviewIframeLayout = (iframe, messageData) => {
   // Restore any keyboard pin before close/upsell resize so those styles win.
   if (!lockMobileOpenChat) {
     stopMobileKeyboardPin();
-    stopMobileOpenViewportWatch();
   }
 
-  // Keyboard pin owns iframe geometry while applied; do not fight it.
+  // visualViewport pin owns iframe geometry while applied; do not fight it.
   if (lockMobileOpenChat && isMobileKeyboardPinApplied()) {
-    if (document.body.style.overflow !== nextOverflow) {
-      document.body.style.overflow = nextOverflow;
-    }
-    return;
-  }
-
-  // Keep the open mobile iframe locked; scenario steps must not re-apply layout.
-  if (lockMobileOpenChat && mobileOpenLayoutLocked) {
     if (document.body.style.overflow !== nextOverflow) {
       document.body.style.overflow = nextOverflow;
     }
@@ -175,8 +120,6 @@ const syncPreviewIframeLayout = (iframe, messageData) => {
   const overflowUnchanged = document.body.style.overflow === nextOverflow;
   if (layoutUnchanged && overflowUnchanged) {
     if (lockMobileOpenChat) {
-      mobileOpenLayoutLocked = true;
-      startMobileOpenViewportWatch(iframe);
       startMobileKeyboardPin(iframe);
     }
     return;
@@ -187,8 +130,6 @@ const syncPreviewIframeLayout = (iframe, messageData) => {
   lastAppliedLayoutKey = layoutKey;
 
   if (lockMobileOpenChat) {
-    mobileOpenLayoutLocked = true;
-    startMobileOpenViewportWatch(iframe);
     startMobileKeyboardPin(iframe);
   }
 };
