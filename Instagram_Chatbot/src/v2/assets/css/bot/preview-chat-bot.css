@@ -2310,6 +2310,26 @@ slideUp
   background-color: #fff;
 }
 
+/* Mobile open: fill the iframe layout box (not visualViewport %), so the
+   area under the translucent iOS keyboard stays opaque chatbot chrome.
+   Shell stays solid white — bot opacity_color may be translucent. */
+.preview-open-frame--fixed.preview-open-frame--mobile {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  background-color: #fff !important;
+}
+
+html.preview-chat-mobile-open,
+body.preview-chat-mobile-open {
+  background-color: #fff !important;
+  min-height: 100%;
+}
+
 .preview-open-frame--embedded {
   position: relative;
   width: 100%;
@@ -2370,8 +2390,17 @@ slideUp
   background-color: var(--pof-body-bg, transparent);
 }
 
-.preview-open-frame--mobile .preview-open-frame__body {
+.preview-open-frame--mobile .preview-open-frame__body,
+.preview-open-frame--mobile #sp-body.sp-body.preview-open-frame__body,
+.preview-open-frame--mobile #sp-body.preview-open-frame__body {
   padding-bottom: var(--mobile-keyboard-inset, 0px);
+  /* opacity_color / --c-chat-window-bg are often rgba(..., 0.1). Under the
+     translucent iOS keyboard that reveals the parent LP. Beat theme !important. */
+  background-color: #fff !important;
+}
+
+.preview-open-frame--mobile .chatbot_timer_holder {
+  background-color: #fff !important;
 }
 
 .preview-open-frame--embedded .preview-open-frame__body {

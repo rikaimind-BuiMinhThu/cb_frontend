@@ -154,6 +154,7 @@ export const resizeIframeFromMessage = (iframe, messageData) => {
       bottom: '0px',
       resetHorizontal: true,
     });
+    iframe.style.setProperty('background-color', '#ffffff', 'important');
     return;
   }
 

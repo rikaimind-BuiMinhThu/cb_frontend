@@ -9,7 +9,11 @@ const PINNED_STYLE_PROPS = [
   'width',
   'height',
   'transform',
+  'background-color',
 ];
+
+// Opaque fill so the translucent iOS keyboard composites the chatbot, not the LP.
+const PIN_BACKGROUND = '#ffffff';
 
 let pinnedIframe = null;
 let savedStyles = null;
@@ -82,6 +86,10 @@ const applyPin = (iframe) => {
     iframe.style.setProperty('width', nextWidth, 'important');
     iframe.style.setProperty('height', nextHeight, 'important');
     iframe.style.setProperty('transform', nextTransform, 'important');
+  }
+
+  if (iframe.style.getPropertyValue('background-color') !== PIN_BACKGROUND) {
+    iframe.style.setProperty('background-color', PIN_BACKGROUND, 'important');
   }
 
   postKeyboardInset(iframe, keyboardInset);

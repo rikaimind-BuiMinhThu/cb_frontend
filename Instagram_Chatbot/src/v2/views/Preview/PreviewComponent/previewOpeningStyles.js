@@ -88,9 +88,14 @@ export const getOpeningBotStyle = (state, options = {}) => {
   const hasExitPopup = isWithdrawalPreventionEnabled(
     state.botInfor?.withdrawal_prevention_status,
   );
-  const height = hasExitPopup
-    ? (mobile ? `${state.heightSp}%` : `${state.heightPc}px`)
-    : (mobile ? `${state.heightSp || 100}%` : `${state.heightPc || DEFAULT_HEIGHT_PC}px`);
+  // Mobile open uses CSS inset:0 / height:100% (see preview-chat-bot.css).
+  // Keep a 100% token for any legacy readers; do not use heightSp % here —
+  // percent-of-visualViewport leaves a transparent gap under the iOS keyboard.
+  const height = mobile
+    ? "100%"
+    : (hasExitPopup
+      ? `${state.heightPc}px`
+      : `${state.heightPc || DEFAULT_HEIGHT_PC}px`);
 
   const classNames = [
     "preview-open-frame",

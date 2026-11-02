@@ -93,6 +93,38 @@ const PreviewOpenChatFrame = ({
     applyCssVars(localRef.current, cssVars);
   }, [cssVars]);
 
+  // Keep html/body opaque while mobile chat is open so the translucent iOS
+  // keyboard composites chatbot pixels, not the parent LP through the iframe.
+  // Do not use --pof-body-bg here: bots often set opacity_color with alpha
+  // (e.g. rgba(..., 0.1)), which still reveals the LP under the keyboard.
+  useEffect(() => {
+    const mobileOpen = Boolean(isOpen) && isMobile();
+    const root = document.documentElement;
+    const { body } = document;
+    const className = "preview-chat-mobile-open";
+    const background = "#ffffff";
+
+    if (!mobileOpen) {
+      root.classList.remove(className);
+      body.classList.remove(className);
+      root.style.removeProperty("background-color");
+      body.style.removeProperty("background-color");
+      return undefined;
+    }
+
+    root.classList.add(className);
+    body.classList.add(className);
+    root.style.backgroundColor = background;
+    body.style.backgroundColor = background;
+
+    return () => {
+      root.classList.remove(className);
+      body.classList.remove(className);
+      root.style.removeProperty("background-color");
+      body.style.removeProperty("background-color");
+    };
+  }, [isOpen]);
+
   useEffect(() => {
     if (openAnimationDone) return undefined;
     const timeoutId = window.setTimeout(() => {

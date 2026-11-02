@@ -1824,6 +1824,7 @@
         bottom: "0px",
         resetHorizontal: true
       });
+      iframe.style.setProperty("background-color", "#ffffff", "important");
       return;
     }
     if (messageData.isOpen) {
@@ -1879,8 +1880,10 @@
     "bottom",
     "width",
     "height",
-    "transform"
+    "transform",
+    "background-color"
   ];
+  var PIN_BACKGROUND = "#ffffff";
   var pinnedIframe = null;
   var savedStyles = null;
   var chatIsOpen = false;
@@ -1943,6 +1946,9 @@
       iframe.style.setProperty("width", nextWidth, "important");
       iframe.style.setProperty("height", nextHeight, "important");
       iframe.style.setProperty("transform", nextTransform, "important");
+    }
+    if (iframe.style.getPropertyValue("background-color") !== PIN_BACKGROUND) {
+      iframe.style.setProperty("background-color", PIN_BACKGROUND, "important");
     }
     postKeyboardInset(iframe, keyboardInset);
   };
