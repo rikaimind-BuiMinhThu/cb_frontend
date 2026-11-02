@@ -1788,12 +1788,11 @@
     const useMoblieFullwidth = getUseMobileFullwidth(messageData);
     if (messageData.isOpen && mobileCheck()) {
       const openDimensions = getMobileOpenLayoutSize();
-      const mainColor = messageData.mainColor || "#327AED";
       applyIframeLayout(iframe, openDimensions.width, openDimensions.height, {
         bottom: "0px",
         resetHorizontal: true
       });
-      iframe.style.setProperty("background-color", mainColor, "important");
+      iframe.style.setProperty("background-color", "#ffffff", "important");
       return;
     }
     if (messageData.isOpen) {
@@ -1862,8 +1861,7 @@
     { el: "body", prop: "width" },
     { el: "body", prop: "overflow" }
   ];
-  var DEFAULT_PIN_BACKGROUND = "#327AED";
-  var pinBackground = DEFAULT_PIN_BACKGROUND;
+  var PIN_BACKGROUND = "#ffffff";
   var pinnedIframe = null;
   var savedStyles = null;
   var savedParentStyles = null;
@@ -1908,8 +1906,8 @@
     });
     const html = document.documentElement;
     const body = document.body;
-    html.style.setProperty("background-color", pinBackground, "important");
-    body.style.setProperty("background-color", pinBackground, "important");
+    html.style.setProperty("background-color", PIN_BACKGROUND, "important");
+    body.style.setProperty("background-color", PIN_BACKGROUND, "important");
     body.style.setProperty("position", "fixed", "important");
     body.style.setProperty("top", `-${savedScrollY}px`, "important");
     body.style.setProperty("left", "0", "important");
@@ -1960,7 +1958,7 @@
     const nextWidth = `${layoutWidth}px`;
     const nextHeight = `${pinHeight}px`;
     const nextTransform = `translate(${offsetLeft}px, ${offsetTop}px)`;
-    const geometryKey = `${nextWidth}|${nextHeight}|${nextTransform}|${pinBackground}`;
+    const geometryKey = `${nextWidth}|${nextHeight}|${nextTransform}`;
     const visibleHeight = Math.round((vv == null ? void 0 : vv.height) || window.innerHeight || layoutHeight);
     const keyboardInset = Math.max(0, layoutHeight - visibleHeight);
     if (lastPinGeometry !== geometryKey || iframe.style.getPropertyValue("position") !== "fixed") {
@@ -1975,10 +1973,9 @@
       iframe.style.setProperty("width", nextWidth, "important");
       iframe.style.setProperty("height", nextHeight, "important");
       iframe.style.setProperty("transform", nextTransform, "important");
-      iframe.style.setProperty("background-color", pinBackground, "important");
     }
-    if (iframe.style.getPropertyValue("background-color") !== pinBackground) {
-      iframe.style.setProperty("background-color", pinBackground, "important");
+    if (iframe.style.getPropertyValue("background-color") !== PIN_BACKGROUND) {
+      iframe.style.setProperty("background-color", PIN_BACKGROUND, "important");
     }
     postKeyboardInset(iframe, keyboardInset);
   };
@@ -2015,18 +2012,6 @@
     if (window.visualViewport) {
       window.visualViewport.removeEventListener("resize", schedulePin);
       window.visualViewport.removeEventListener("scroll", schedulePin);
-    }
-  };
-  var setMobileKeyboardPinBackground = (color) => {
-    const next = typeof color === "string" && color.trim() ? color.trim() : DEFAULT_PIN_BACKGROUND;
-    if (pinBackground === next) return;
-    pinBackground = next;
-    if (parentScrollLocked && document.body) {
-      document.documentElement.style.setProperty("background-color", pinBackground, "important");
-      document.body.style.setProperty("background-color", pinBackground, "important");
-    }
-    if (pinnedIframe && chatIsOpen) {
-      schedulePin();
     }
   };
   var isMobileKeyboardPinApplied = () => Boolean(pinnedIframe && savedStyles);
@@ -2194,9 +2179,6 @@
     const lockMobileOpenChat = shouldLockMobileOpenChat(messageData);
     const nextOverflow = lockMobileOpenChat ? "hidden" : "scroll";
     const layoutKey = buildLayoutKey(messageData, lockMobileOpenChat);
-    if (messageData.mainColor) {
-      setMobileKeyboardPinBackground(messageData.mainColor);
-    }
     if (!lockMobileOpenChat) {
       stopMobileKeyboardPin();
     }

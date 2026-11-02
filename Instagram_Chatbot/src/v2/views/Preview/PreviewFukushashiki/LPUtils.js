@@ -1,6 +1,5 @@
 import { CHATBOT_ACTIONS } from "v2/views/Preview/PreviewComponent/Constants";
 import { buildSdkPostMessageLayout } from "v2/utils/sdkLayoutUtils";
-import { resolveMainColorCss } from "v2/utils/designThemeCore";
 import { isMobile } from "v2/views/Preview/PreviewComponent/Utils";
 import { isTorizenLpAmazonData, isTorizenLP } from "v2/views/Preview/PreviewComponent/TorizenUtils";
 import { isBlissLpAmazonData, isBlissLP } from "v2/views/Preview/PreviewComponent/BlissUtils";
@@ -10,15 +9,8 @@ import { isYuwaeruLpAmazonData, isYuwaeruLP } from "v2/views/Preview/PreviewComp
 import { convertToFukushashikiObject } from "./FukushashikiDataConverterUtils";
 import { isUserMessage } from "v2/views/Preview/PreviewComponent/Utils";
 
-const DEFAULT_MAIN_COLOR = "#327AED";
-
 const postMessageToParent = (options, state) => {
   if (!window || !window.parent) return;
-
-  const mainColor = resolveMainColorCss(
-    state.botInfor?.main_color,
-    state.botInfor?.main_color_other,
-  ) || DEFAULT_MAIN_COLOR;
   
   const defaultOptions = {
     isOpen: state.isOpen,
@@ -36,7 +28,6 @@ const postMessageToParent = (options, state) => {
     // Keep legacy keys for backward compatibility in old SDK versions.
     chatbotRight: state.rightMarginPc,
     chatbotBottom: state.bottomMarginPc,
-    mainColor,
     ...buildSdkPostMessageLayout(state, isMobile()),
   };
   
