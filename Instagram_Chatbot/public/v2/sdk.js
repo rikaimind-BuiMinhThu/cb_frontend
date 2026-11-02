@@ -1833,10 +1833,13 @@
   var PINNED_STYLE_PROPS = ["position", "top", "left", "right", "bottom", "width", "height"];
   var KEYBOARD_OPEN_THRESHOLD_PX = 150;
   var PIN_INTERVAL_MS = 200;
+  var KEYBOARD_CLOSE_CONFIRM_TICKS = 2;
   var pinTimer = null;
   var pinnedIframe = null;
   var savedStyles = null;
   var chatIsOpen = false;
+  var keyboardClosedTicks = 0;
+  var lastPinGeometry = null;
   var isKeyboardOpen = () => {
     const viewport = window.visualViewport;
     if (!viewport) return false;
@@ -1859,27 +1862,47 @@
       pinnedIframe.style.removeProperty(prop);
     });
     savedStyles = null;
+    lastPinGeometry = null;
   };
   var applyPin = (iframe) => {
     const root = document.documentElement;
+    const top = `${window.scrollY}px`;
+    const width = `${root.clientWidth}px`;
+    const height = `${root.clientHeight}px`;
+    const geometryKey = `${top}|${width}|${height}`;
+    if (lastPinGeometry === geometryKey && iframe.style.getPropertyValue("position") === "absolute") {
+      return;
+    }
+    lastPinGeometry = geometryKey;
     iframe.style.setProperty("position", "absolute", "important");
-    iframe.style.setProperty("top", `${window.scrollY}px`, "important");
+    iframe.style.setProperty("top", top, "important");
     iframe.style.setProperty("left", "0", "important");
     iframe.style.setProperty("right", "auto", "important");
     iframe.style.setProperty("bottom", "auto", "important");
-    iframe.style.setProperty("width", `${root.clientWidth}px`, "important");
-    iframe.style.setProperty("height", `${root.clientHeight}px`, "important");
+    iframe.style.setProperty("width", width, "important");
+    iframe.style.setProperty("height", height, "important");
   };
   var pinTick = () => {
-    if (!pinnedIframe || !mobileCheck() || !chatIsOpen || !isKeyboardOpen()) {
+    if (!pinnedIframe || !mobileCheck() || !chatIsOpen) {
+      restoreIframeStyles();
+      keyboardClosedTicks = 0;
+      return;
+    }
+    if (!isKeyboardOpen()) {
+      keyboardClosedTicks += 1;
+      if (keyboardClosedTicks < KEYBOARD_CLOSE_CONFIRM_TICKS) {
+        return;
+      }
       restoreIframeStyles();
       return;
     }
+    keyboardClosedTicks = 0;
     if (!savedStyles) {
       saveIframeStyles(pinnedIframe);
     }
     applyPin(pinnedIframe);
   };
+  var isMobileKeyboardPinApplied = () => Boolean(pinnedIframe && savedStyles);
   var startMobileKeyboardPin = (iframe) => {
     if (!iframe || !mobileCheck()) return;
     if (pinTimer !== null && pinnedIframe === iframe && chatIsOpen) {
@@ -1888,11 +1911,13 @@
     stopMobileKeyboardPin();
     pinnedIframe = iframe;
     chatIsOpen = true;
+    keyboardClosedTicks = 0;
     pinTick();
     pinTimer = window.setInterval(pinTick, PIN_INTERVAL_MS);
   };
   var stopMobileKeyboardPin = () => {
     chatIsOpen = false;
+    keyboardClosedTicks = 0;
     if (pinTimer !== null) {
       window.clearInterval(pinTimer);
       pinTimer = null;
@@ -1992,6 +2017,7 @@
   };
 
   // src/v2/sdk/displayPopup.js
+  var lastAppliedLayoutKey = null;
   var getUser = (url, datacount) => __async(null, null, function* () {
     const response = yield fetch(url, {
       method: "PATCH",
@@ -2012,15 +2038,46 @@
     return null;
   };
   var shouldLockMobileOpenChat = (messageData) => Boolean(messageData.isOpen) && mobileCheck() && !messageData.isUpsell;
+  var buildLayoutKey = (messageData, lockMobileOpenChat) => [
+    Boolean(messageData.isOpen),
+    Boolean(messageData.isUpsell),
+    lockMobileOpenChat,
+    messageData.widthPc,
+    messageData.heightPc,
+    messageData.widthSp,
+    messageData.heightSp,
+    messageData.closedContentWidth,
+    messageData.closedContentHeight,
+    messageData.useMoblieFullwidth,
+    messageData.chatbotRightPc,
+    messageData.chatbotBottomPc,
+    messageData.chatbotRightSp,
+    messageData.chatbotBottomSp
+  ].join("|");
   var syncPreviewIframeLayout = (iframe, messageData) => {
     const lockMobileOpenChat = shouldLockMobileOpenChat(messageData);
+    const nextOverflow = lockMobileOpenChat ? "hidden" : "scroll";
+    const layoutKey = buildLayoutKey(messageData, lockMobileOpenChat);
     if (!lockMobileOpenChat) {
       stopMobileKeyboardPin();
     }
+    if (lockMobileOpenChat && isMobileKeyboardPinApplied()) {
+      if (document.body.style.overflow !== nextOverflow) {
+        document.body.style.overflow = nextOverflow;
+      }
+      return;
+    }
+    const layoutUnchanged = lastAppliedLayoutKey === layoutKey;
+    const overflowUnchanged = document.body.style.overflow === nextOverflow;
+    if (layoutUnchanged && overflowUnchanged) {
+      if (lockMobileOpenChat) {
+        startMobileKeyboardPin(iframe);
+      }
+      return;
+    }
     resizeIframeFromMessage(iframe, messageData);
-    iframe.style.width = `${iframe.width} !important`;
-    iframe.style.height = `${iframe.height} !important`;
-    document.body.style.overflow = lockMobileOpenChat ? "hidden" : "scroll";
+    document.body.style.overflow = nextOverflow;
+    lastAppliedLayoutKey = layoutKey;
     if (lockMobileOpenChat) {
       startMobileKeyboardPin(iframe);
     }
@@ -2170,8 +2227,8 @@
     iframe.style.margin = "0";
     iframe.style.borderRadius = "0px";
     iframe.style.zIndex = "999999";
-    iframe.style.width = `${iframe.width} !important`;
-    iframe.style.height = `${iframe.height} !important`;
+    iframe.style.setProperty("width", String(iframe.width), "important");
+    iframe.style.setProperty("height", String(iframe.height), "important");
     iframe.src = `${getEcChatBotFrontEndBaseUrl()}${getSdkPreviewBasePath()}/preview-customer-fukushashiki?bot_id=${botId}&scenario_id=${chatbotLayout.scenarioId}&urlReceive=${window.location.origin}&deviceReceive=${device}&uuid=${uuid}&env=${getEnvironment()}&debug=${getDebugFlag()}&cartSystem=${data.cart_system}&isLoggedIn=${window.logged_in}`;
     const lpMode = resolveLpMode({
       hostname: window.location.hostname,

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { MDBIcon } from "mdbreact";
 import PropTypes from "prop-types";
 import PreventExitChatbotModal from "./PreventExitChatbotModal";
@@ -12,6 +12,28 @@ const ICON_CHEVRON_CIRCLE_DOWN = "chevron-circle-down";
 const ICON_CHEVRON_CIRCLE_LEFT = "chevron-circle-left";
 const ICON_CHEVRON_CIRCLE_RIGHT = "chevron-circle-right";
 const ALT_BOT_HEADER_ICON = "bot-header-icon";
+
+const OPEN_ANIMATION_CLASS_NAMES = [
+  "slideUp",
+  "slideUpSp",
+  "fadeIn",
+  "fadeInSp",
+  "zoomIn",
+  "zoomInSp",
+  "slideFromRight",
+  "slideFromRightSp",
+  "expandFromCorner",
+  "expandFromCornerSp",
+];
+
+const OPEN_ANIMATION_CLASS_SET = new Set(OPEN_ANIMATION_CLASS_NAMES);
+
+const stripOpenAnimationClasses = (className) => (
+  String(className || "")
+    .split(/\s+/)
+    .filter((token) => token && !OPEN_ANIMATION_CLASS_SET.has(token))
+    .join(" ")
+);
 
 /**
  * Open chatbot chrome: header, exit modal, optional slots, and body.
@@ -36,10 +58,19 @@ const PreviewOpenChatFrame = ({
   beforeBody = null,
   children,
 }) => {
+  const [openAnimationDone, setOpenAnimationDone] = useState(false);
+
+  useEffect(() => {
+    setOpenAnimationDone(false);
+  }, [containerClassName]);
+
   const designTypeClass = getDesignTypeClassName(
     designType || botConfig?.botInfor?.design_type,
   );
-  const className = [containerClassName, frameClassName, designTypeClass]
+  const resolvedContainerClassName = openAnimationDone
+    ? stripOpenAnimationClasses(containerClassName)
+    : containerClassName;
+  const className = [resolvedContainerClassName, frameClassName, designTypeClass]
     .filter(Boolean)
     .join(" ");
 
@@ -55,12 +86,19 @@ const PreviewOpenChatFrame = ({
     headerArrowIcon = ICON_CHEVRON_CIRCLE_DOWN;
   }
 
+  const handleOpenAnimationEnd = (event) => {
+    if (event.target !== event.currentTarget) return;
+    if (!OPEN_ANIMATION_CLASS_SET.has(event.animationName)) return;
+    setOpenAnimationDone(true);
+  };
+
   return (
     <div
       ref={containerRef}
       id="sp-container1"
       className={className}
       style={cssVars}
+      onAnimationEnd={handleOpenAnimationEnd}
     >
       {overlays}
       <div id="sp-header" className="sp-header preview-open-frame__header">

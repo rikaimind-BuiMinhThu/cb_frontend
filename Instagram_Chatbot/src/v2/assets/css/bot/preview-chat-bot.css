@@ -997,6 +997,9 @@ slideUp
 
     animation-timing-function: ease;
     -webkit-animation-timing-function: ease;
+
+    animation-fill-mode: forwards;
+    -webkit-animation-fill-mode: forwards;
 }
 
 
@@ -1043,6 +1046,8 @@ slideUp
     -webkit-animation-duration: var(--chatbot-open-animation-duration, 1000ms);
     animation-timing-function: ease;
     -webkit-animation-timing-function: ease;
+    animation-fill-mode: forwards;
+    -webkit-animation-fill-mode: forwards;
 }
 
 @keyframes fadeIn {
@@ -1082,6 +1087,8 @@ slideUp
     -webkit-animation-duration: var(--chatbot-open-animation-duration, 1000ms);
     animation-timing-function: ease;
     -webkit-animation-timing-function: ease;
+    animation-fill-mode: forwards;
+    -webkit-animation-fill-mode: forwards;
 }
 
 @keyframes zoomIn {
@@ -1145,6 +1152,8 @@ slideUp
     -webkit-animation-duration: var(--chatbot-open-animation-duration, 1000ms);
     animation-timing-function: ease;
     -webkit-animation-timing-function: ease;
+    animation-fill-mode: forwards;
+    -webkit-animation-fill-mode: forwards;
 }
 
 @keyframes slideFromRight {
@@ -1212,6 +1221,8 @@ slideUp
     -webkit-animation-duration: var(--chatbot-open-animation-duration, 1000ms);
     animation-timing-function: ease;
     -webkit-animation-timing-function: ease;
+    animation-fill-mode: forwards;
+    -webkit-animation-fill-mode: forwards;
 }
 
 @keyframes expandFromCorner {
