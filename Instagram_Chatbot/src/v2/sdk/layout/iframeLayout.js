@@ -6,6 +6,7 @@ import {
 } from 'v2/utils/sdkLayoutUtils.js';
 import { chatbotLayout } from '../state.js';
 import { mobileCheck } from '../device.js';
+import { applyChatUnderlay } from './mobileKeyboardPin.js';
 
 const resolveOffsetPx = (primaryValue, fallbackValue, defaultValue = 0) => {
   const primaryParsed = parseInt(primaryValue, 10);
@@ -154,7 +155,7 @@ export const resizeIframeFromMessage = (iframe, messageData) => {
       bottom: '0px',
       resetHorizontal: true,
     });
-    iframe.style.setProperty('background-color', '#ffffff', 'important');
+    applyChatUnderlay(iframe);
     return;
   }
 

@@ -10,6 +10,7 @@ const PINNED_STYLE_PROPS = [
   'height',
   'transform',
   'background-color',
+  'background-image',
 ];
 
 const PARENT_LOCK_PROPS = [
@@ -26,6 +27,7 @@ const PARENT_LOCK_PROPS = [
 // Opaque fill so the translucent iOS keyboard composites the chatbot, not the LP.
 const PIN_BACKGROUND = '#ffffff';
 
+let chatBodyBg = '';
 let pinnedIframe = null;
 let savedStyles = null;
 let savedParentStyles = null;
@@ -40,6 +42,36 @@ let listenersBound = false;
 const getParentEl = (name) => (
   name === 'html' ? document.documentElement : document.body
 );
+
+/**
+ * Paint an element on-theme but opaque: chat body color (opacity_color, often
+ * rgba with alpha) layered over white, so the LP never shows through.
+ */
+export const applyChatUnderlay = (element) => {
+  if (!element) return;
+  element.style.setProperty('background-color', PIN_BACKGROUND, 'important');
+  if (chatBodyBg) {
+    element.style.setProperty(
+      'background-image',
+      `linear-gradient(${chatBodyBg}, ${chatBodyBg})`,
+      'important',
+    );
+    return;
+  }
+  element.style.removeProperty('background-image');
+};
+
+/**
+ * Remember the bot chat body color sent by the preview postMessage.
+ */
+export const setChatBodyBackground = (color) => {
+  const next = typeof color === 'string' ? color.trim() : '';
+  if (chatBodyBg === next) return;
+  chatBodyBg = next;
+  if (pinnedIframe && chatIsOpen) {
+    applyChatUnderlay(pinnedIframe);
+  }
+};
 
 const saveIframeStyles = (iframe) => {
   savedStyles = PINNED_STYLE_PROPS.map((prop) => ({
@@ -159,7 +191,7 @@ const applyPin = (iframe) => {
   }
 
   if (iframe.style.getPropertyValue('background-color') !== PIN_BACKGROUND) {
-    iframe.style.setProperty('background-color', PIN_BACKGROUND, 'important');
+    applyChatUnderlay(iframe);
   }
 
   postKeyboardInset(iframe, keyboardInset);

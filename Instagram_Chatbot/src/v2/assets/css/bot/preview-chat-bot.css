@@ -2312,7 +2312,8 @@ slideUp
 
 /* Mobile open: fill the iframe layout box (not visualViewport %), so the
    area under the translucent iOS keyboard stays opaque chatbot chrome.
-   Shell stays white; theme body (opacity_color) paints on top as usual. */
+   Chat body color (--pof-body-bg) layered over white: custom main colors
+   give rgba(...,0.1), so white underneath keeps it opaque and on-theme. */
 .preview-open-frame--fixed.preview-open-frame--mobile {
   top: 0;
   right: 0;
@@ -2322,6 +2323,10 @@ slideUp
   height: 100%;
   max-height: none;
   background-color: #fff !important;
+  background-image: linear-gradient(
+    var(--pof-body-bg, transparent),
+    var(--pof-body-bg, transparent)
+  ) !important;
 }
 
 .preview-open-frame--embedded {
