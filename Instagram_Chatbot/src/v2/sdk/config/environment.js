@@ -1,6 +1,8 @@
 const isLanHost = (host) => {
+  // Strip port for IPv4 hosts (169.254.x.x:3001 → 169.254.x.x).
   const hostname = String(host || '').split(':')[0];
-  return /^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[0-1])\.)/.test(hostname);
+  // Private LAN + USB/link-local (iPhone tethered over Lightning/USB).
+  return /^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[0-1])\.|169\.254\.)/.test(hostname);
 };
 
 const cacheSdkScriptOrigin = (src) => {

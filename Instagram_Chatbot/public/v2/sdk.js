@@ -44,7 +44,7 @@
   // src/v2/sdk/config/environment.js
   var isLanHost = (host) => {
     const hostname = String(host || "").split(":")[0];
-    return /^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[0-1])\.)/.test(hostname);
+    return /^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[0-1])\.|169\.254\.)/.test(hostname);
   };
   var cacheSdkScriptOrigin = (src) => {
     try {
@@ -1883,14 +1883,28 @@
     "transform",
     "background-color"
   ];
+  var PARENT_LOCK_PROPS = [
+    { el: "html", prop: "background-color" },
+    { el: "body", prop: "background-color" },
+    { el: "body", prop: "position" },
+    { el: "body", prop: "top" },
+    { el: "body", prop: "left" },
+    { el: "body", prop: "right" },
+    { el: "body", prop: "width" },
+    { el: "body", prop: "overflow" }
+  ];
   var PIN_BACKGROUND = "#ffffff";
   var pinnedIframe = null;
   var savedStyles = null;
+  var savedParentStyles = null;
+  var savedScrollY = 0;
+  var parentScrollLocked = false;
   var chatIsOpen = false;
   var lastPinGeometry = null;
   var lastPostedInset = null;
   var pinRaf = null;
   var listenersBound = false;
+  var getParentEl = (name) => name === "html" ? document.documentElement : document.body;
   var saveIframeStyles = (iframe) => {
     savedStyles = PINNED_STYLE_PROPS.map((prop) => ({
       prop,
@@ -1910,6 +1924,48 @@
     savedStyles = null;
     lastPinGeometry = null;
   };
+  var lockParentScroll = () => {
+    if (parentScrollLocked || !document.body) return;
+    savedScrollY = Math.round(window.scrollY || window.pageYOffset || 0);
+    savedParentStyles = PARENT_LOCK_PROPS.map(({ el, prop }) => {
+      const node = getParentEl(el);
+      return {
+        el,
+        prop,
+        value: node.style.getPropertyValue(prop),
+        priority: node.style.getPropertyPriority(prop)
+      };
+    });
+    const html = document.documentElement;
+    const body = document.body;
+    html.style.setProperty("background-color", PIN_BACKGROUND, "important");
+    body.style.setProperty("background-color", PIN_BACKGROUND, "important");
+    body.style.setProperty("position", "fixed", "important");
+    body.style.setProperty("top", `-${savedScrollY}px`, "important");
+    body.style.setProperty("left", "0", "important");
+    body.style.setProperty("right", "0", "important");
+    body.style.setProperty("width", "100%", "important");
+    body.style.setProperty("overflow", "hidden", "important");
+    parentScrollLocked = true;
+  };
+  var unlockParentScroll = () => {
+    if (!parentScrollLocked) return;
+    if (savedParentStyles) {
+      savedParentStyles.forEach(({ el, prop, value, priority }) => {
+        const node = getParentEl(el);
+        if (!node) return;
+        if (value) {
+          node.style.setProperty(prop, value, priority);
+          return;
+        }
+        node.style.removeProperty(prop);
+      });
+    }
+    savedParentStyles = null;
+    parentScrollLocked = false;
+    window.scrollTo(0, savedScrollY);
+    savedScrollY = 0;
+  };
   var postKeyboardInset = (iframe, keyboardInset) => {
     if (!(iframe == null ? void 0 : iframe.contentWindow)) return;
     if (lastPostedInset === keyboardInset) return;
@@ -1926,14 +1982,17 @@
   var applyPin = (iframe) => {
     const root = document.documentElement;
     const vv = window.visualViewport;
-    const nextWidth = `${Math.max(root.clientWidth, 1)}px`;
-    const nextHeight = `${Math.max(root.clientHeight, 1)}px`;
+    const layoutWidth = Math.max(root.clientWidth, 1);
+    const layoutHeight = Math.max(root.clientHeight, 1);
     const offsetLeft = Math.round((vv == null ? void 0 : vv.offsetLeft) || 0);
     const offsetTop = Math.round((vv == null ? void 0 : vv.offsetTop) || 0);
+    const pinHeight = Math.max(layoutHeight + offsetTop, 1);
+    const nextWidth = `${layoutWidth}px`;
+    const nextHeight = `${pinHeight}px`;
     const nextTransform = `translate(${offsetLeft}px, ${offsetTop}px)`;
     const geometryKey = `${nextWidth}|${nextHeight}|${nextTransform}`;
-    const visibleHeight = Math.round((vv == null ? void 0 : vv.height) || window.innerHeight || root.clientHeight);
-    const keyboardInset = Math.max(0, root.clientHeight - visibleHeight);
+    const visibleHeight = Math.round((vv == null ? void 0 : vv.height) || window.innerHeight || layoutHeight);
+    const keyboardInset = Math.max(0, layoutHeight - visibleHeight);
     if (lastPinGeometry !== geometryKey || iframe.style.getPropertyValue("position") !== "fixed") {
       lastPinGeometry = geometryKey;
       iframe.width = nextWidth;
@@ -1960,6 +2019,7 @@
       pinRaf = null;
       if (!pinnedIframe || !mobileCheck() || !chatIsOpen) {
         restoreIframeStyles();
+        unlockParentScroll();
         return;
       }
       if (!savedStyles) {
@@ -1990,6 +2050,7 @@
   var startMobileKeyboardPin = (iframe) => {
     if (!iframe || !mobileCheck()) return;
     if (pinnedIframe === iframe && chatIsOpen && listenersBound) {
+      lockParentScroll();
       schedulePin();
       return;
     }
@@ -1997,6 +2058,7 @@
     pinnedIframe = iframe;
     chatIsOpen = true;
     lastPostedInset = null;
+    lockParentScroll();
     bindViewportListeners();
     schedulePin();
   };
@@ -2012,6 +2074,7 @@
       postKeyboardInset(iframe, 0);
     }
     restoreIframeStyles();
+    unlockParentScroll();
     pinnedIframe = null;
     lastPostedInset = null;
   };

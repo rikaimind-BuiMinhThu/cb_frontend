@@ -77,22 +77,28 @@ export const log = (message) => {
 };
 
 export const getEcChatBotApiServerBaseUrl = () => {
-    if (process.env.REACT_APP_API_CHATBOT_URL) {
-        return process.env.REACT_APP_API_CHATBOT_URL;
-    }
-
     const environment = getEnvironment();
     log("Environment: " + environment);
 
+    // URL ?env= must win over baked REACT_APP_API_CHATBOT_URL. Otherwise LAN
+    // iPhone previews keep calling http://localhost:3000 and get ERR_NETWORK.
     switch (environment) {
         case "staging":
         case "test":
+        case "lan":
             return "https://ec-chatbot-test1.com";
         case "production":
             return "https://ec-chatbot-test.com";
         case "development":
         case "local":
+            if (process.env.REACT_APP_API_CHATBOT_URL) {
+                return process.env.REACT_APP_API_CHATBOT_URL;
+            }
+            return "http://localhost:3000";
         default:
+            if (process.env.REACT_APP_API_CHATBOT_URL) {
+                return process.env.REACT_APP_API_CHATBOT_URL;
+            }
             return "http://localhost:3000";
     }
 };
