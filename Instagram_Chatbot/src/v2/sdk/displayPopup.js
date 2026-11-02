@@ -35,6 +35,7 @@ import {
 } from './layout/iframeLayout.js';
 import {
   isMobileKeyboardPinApplied,
+  setMobileKeyboardPinBackground,
   startMobileKeyboardPin,
   stopMobileKeyboardPin,
 } from './layout/mobileKeyboardPin.js';
@@ -101,6 +102,10 @@ const syncPreviewIframeLayout = (iframe, messageData) => {
   const lockMobileOpenChat = shouldLockMobileOpenChat(messageData);
   const nextOverflow = lockMobileOpenChat ? 'hidden' : 'scroll';
   const layoutKey = buildLayoutKey(messageData, lockMobileOpenChat);
+
+  if (messageData.mainColor) {
+    setMobileKeyboardPinBackground(messageData.mainColor);
+  }
 
   // Restore any keyboard pin before close/upsell resize so those styles win.
   if (!lockMobileOpenChat) {

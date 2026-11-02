@@ -23,9 +23,9 @@ const PARENT_LOCK_PROPS = [
   { el: 'body', prop: 'overflow' },
 ];
 
-// Opaque fill so the translucent iOS keyboard composites the chatbot, not the LP.
-const PIN_BACKGROUND = '#ffffff';
+const DEFAULT_PIN_BACKGROUND = '#327AED';
 
+let pinBackground = DEFAULT_PIN_BACKGROUND;
 let pinnedIframe = null;
 let savedStyles = null;
 let savedParentStyles = null;
@@ -78,8 +78,8 @@ const lockParentScroll = () => {
 
   const html = document.documentElement;
   const body = document.body;
-  html.style.setProperty('background-color', PIN_BACKGROUND, 'important');
-  body.style.setProperty('background-color', PIN_BACKGROUND, 'important');
+  html.style.setProperty('background-color', pinBackground, 'important');
+  body.style.setProperty('background-color', pinBackground, 'important');
   body.style.setProperty('position', 'fixed', 'important');
   body.style.setProperty('top', `-${savedScrollY}px`, 'important');
   body.style.setProperty('left', '0', 'important');
@@ -132,12 +132,12 @@ const applyPin = (iframe) => {
   const layoutHeight = Math.max(root.clientHeight, 1);
   const offsetLeft = Math.round(vv?.offsetLeft || 0);
   const offsetTop = Math.round(vv?.offsetTop || 0);
-  // Extend past the visual viewport so the translucent keyboard composites white chatbot, not LP.
+  // Extend past the visual viewport so the translucent keyboard composites chatbot, not LP.
   const pinHeight = Math.max(layoutHeight + offsetTop, 1);
   const nextWidth = `${layoutWidth}px`;
   const nextHeight = `${pinHeight}px`;
   const nextTransform = `translate(${offsetLeft}px, ${offsetTop}px)`;
-  const geometryKey = `${nextWidth}|${nextHeight}|${nextTransform}`;
+  const geometryKey = `${nextWidth}|${nextHeight}|${nextTransform}|${pinBackground}`;
   const visibleHeight = Math.round(vv?.height || window.innerHeight || layoutHeight);
   const keyboardInset = Math.max(0, layoutHeight - visibleHeight);
 
@@ -156,15 +156,17 @@ const applyPin = (iframe) => {
     iframe.style.setProperty('width', nextWidth, 'important');
     iframe.style.setProperty('height', nextHeight, 'important');
     iframe.style.setProperty('transform', nextTransform, 'important');
+    iframe.style.setProperty('background-color', pinBackground, 'important');
   }
 
-  if (iframe.style.getPropertyValue('background-color') !== PIN_BACKGROUND) {
-    iframe.style.setProperty('background-color', PIN_BACKGROUND, 'important');
+  if (iframe.style.getPropertyValue('background-color') !== pinBackground) {
+    iframe.style.setProperty('background-color', pinBackground, 'important');
   }
 
   postKeyboardInset(iframe, keyboardInset);
 };
 
+// Coalesce visualViewport scroll/resize storms into one paint per frame.
 const schedulePin = () => {
   if (pinRaf !== null) {
     window.cancelAnimationFrame(pinRaf);
@@ -200,6 +202,22 @@ const unbindViewportListeners = () => {
   if (window.visualViewport) {
     window.visualViewport.removeEventListener('resize', schedulePin);
     window.visualViewport.removeEventListener('scroll', schedulePin);
+  }
+};
+
+/**
+ * Opaque fill under the iOS keyboard — bot main color from preview postMessage.
+ */
+export const setMobileKeyboardPinBackground = (color) => {
+  const next = typeof color === 'string' && color.trim() ? color.trim() : DEFAULT_PIN_BACKGROUND;
+  if (pinBackground === next) return;
+  pinBackground = next;
+  if (parentScrollLocked && document.body) {
+    document.documentElement.style.setProperty('background-color', pinBackground, 'important');
+    document.body.style.setProperty('background-color', pinBackground, 'important');
+  }
+  if (pinnedIframe && chatIsOpen) {
+    schedulePin();
   }
 };
 

@@ -150,11 +150,12 @@ export const resizeIframeFromMessage = (iframe, messageData) => {
   if (messageData.isOpen && mobileCheck()) {
     // Full layout size covers the LP under the translucent iOS keyboard.
     const openDimensions = getMobileOpenLayoutSize();
+    const mainColor = messageData.mainColor || '#327AED';
     applyIframeLayout(iframe, openDimensions.width, openDimensions.height, {
       bottom: '0px',
       resetHorizontal: true,
     });
-    iframe.style.setProperty('background-color', '#ffffff', 'important');
+    iframe.style.setProperty('background-color', mainColor, 'important');
     return;
   }
 
