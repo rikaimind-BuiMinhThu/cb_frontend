@@ -42,16 +42,6 @@
   };
 
   // src/v2/sdk/config/environment.js
-  var isLanHost = (host) => {
-    const hostname = String(host || "").split(":")[0];
-    return /^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[0-1])\.|169\.254\.)/.test(hostname);
-  };
-  var cacheSdkScriptOrigin = (src) => {
-    try {
-      window.sdkScriptOrigin = new URL(src).origin;
-    } catch (e) {
-    }
-  };
   var getEnvFromScriptSrc = () => {
     var _a;
     try {
@@ -60,17 +50,11 @@
       const SRC_PARSER = {
         "ec-chatbot1.com": "staging",
         "ec-chatbot.com": "production",
-        "localhost:3001": "local",
-        "127.0.0.1:3001": "local"
+        "localhost:3001": "local"
       };
       const src = ((_a = document.currentScript) == null ? void 0 : _a.src) || "";
       if (!src) return null;
       const host = new URL(src).host;
-      cacheSdkScriptOrigin(src);
-      if (isLanHost(host)) {
-        window.sdkEnv = "lan";
-        return "lan";
-      }
       const sdkEnv = SRC_PARSER[host];
       if (sdkEnv) {
         window.sdkEnv = sdkEnv;
@@ -80,19 +64,6 @@
     } catch (e) {
       return null;
     }
-  };
-  var getLanFrontEndBaseUrl = () => {
-    var _a, _b;
-    if (window.sdkScriptOrigin) return window.sdkScriptOrigin;
-    try {
-      const src = ((_a = document.querySelector('script[src*="/v2/sdk"]')) == null ? void 0 : _a.src) || ((_b = document.querySelector('script[src*="sdk.js"]')) == null ? void 0 : _b.src) || "";
-      if (src) {
-        cacheSdkScriptOrigin(src);
-        if (window.sdkScriptOrigin) return window.sdkScriptOrigin;
-      }
-    } catch (e) {
-    }
-    return window.location.origin;
   };
   var getEnvironment = () => {
     const params = new Proxy(new URLSearchParams(window.location.search), {
@@ -124,7 +95,6 @@
     switch (environment) {
       case "staging":
       case "test":
-      case "lan":
         return "https://ec-chatbot-test1.com";
       case "production":
         return "https://ec-chatbot-test.com";
@@ -142,8 +112,6 @@
         return "https://ec-chatbot1.com";
       case "production":
         return "https://ec-chatbot.com";
-      case "lan":
-        return getLanFrontEndBaseUrl();
       case "local":
         return "http://localhost:3001";
       default:
