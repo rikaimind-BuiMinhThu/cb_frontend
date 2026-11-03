@@ -28,6 +28,8 @@ const SelectCustom = ({
   showSearch = true,
   className = '',
   labelClassName = '',
+  dropdownMatchSelectWidth = false,
+  dropdownStyle,
 }) => {
   if (isAndroid()) {
     return (
@@ -97,6 +99,8 @@ const SelectCustom = ({
             : option.value.toLowerCase().includes(input.toLowerCase())
         )}
         optionFilterProp="children"
+        dropdownMatchSelectWidth={dropdownMatchSelectWidth}
+        dropdownStyle={dropdownStyle}
         getPopupContainer={(trigger) => trigger.parentNode}
       >
         {data && data.map((item, index) => (
@@ -125,6 +129,8 @@ SelectCustom.propTypes = {
   showSearch: PropTypes.bool,
   className: PropTypes.string,
   labelClassName: PropTypes.string,
+  dropdownMatchSelectWidth: PropTypes.bool,
+  dropdownStyle: PropTypes.object,
 };
 
 export default SelectCustom;
