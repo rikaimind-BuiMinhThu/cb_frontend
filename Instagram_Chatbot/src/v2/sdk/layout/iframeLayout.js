@@ -132,13 +132,24 @@ const applyIframeLayout = (iframe, width, height, options = {}) => {
   }
 };
 
+const getMobileOpenLayoutSize = () => {
+  const root = document.documentElement;
+  const width = Math.round(root.clientWidth || window.innerWidth || 1);
+  const height = Math.round(root.clientHeight || window.innerHeight || 1);
+  return {
+    width: `${Math.max(width, 1)}px`,
+    height: `${Math.max(height, 1)}px`,
+  };
+};
+
 export const resizeIframeFromMessage = (iframe, messageData) => {
   if (messageData.isOpen === undefined) return;
 
   const useMoblieFullwidth = getUseMobileFullwidth(messageData);
 
   if (messageData.isOpen && mobileCheck()) {
-    const openDimensions = getOpenDimensions(messageData, true);
+    // Full layout size covers the LP under the translucent iOS keyboard.
+    const openDimensions = getMobileOpenLayoutSize();
     applyIframeLayout(iframe, openDimensions.width, openDimensions.height, {
       bottom: '0px',
       resetHorizontal: true,

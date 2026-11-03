@@ -838,6 +838,7 @@ const PreviewFukushashiki = () => {
         isBotOpen={state.isOpen}
         isUseGlobalDelay={state.isUseGlobalDelay}
         globalDelayTime={state.globalDelayTime}
+        skipEntryDelay={messageIndex < state.currentMsgIndex}
       />
     ));
   };
