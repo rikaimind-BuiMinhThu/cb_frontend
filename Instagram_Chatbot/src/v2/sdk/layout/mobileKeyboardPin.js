@@ -2,17 +2,41 @@ import { mobileCheck } from '../device.js';
 
 const PINNED_STYLE_PROPS = ['position', 'top', 'left', 'right', 'bottom', 'width', 'height'];
 const KEYBOARD_OPEN_THRESHOLD_PX = 150;
-const PIN_INTERVAL_MS = 200;
 
-let pinTimer = null;
+let listenersAttached = false;
+let pinRafId = null;
 let pinnedIframe = null;
 let savedStyles = null;
 let chatIsOpen = false;
+let lastPostedInset = null;
 
 const isKeyboardOpen = () => {
   const viewport = window.visualViewport;
   if (!viewport) return false;
   return document.documentElement.clientHeight - viewport.height > KEYBOARD_OPEN_THRESHOLD_PX;
+};
+
+const getKeyboardInset = () => {
+  const root = document.documentElement;
+  const layoutHeight = Math.max(root.clientHeight, 1);
+  const vv = window.visualViewport;
+  const visibleHeight = Math.round(vv?.height || window.innerHeight || layoutHeight);
+  return Math.max(0, layoutHeight - visibleHeight);
+};
+
+const postKeyboardInset = (iframe, keyboardInset) => {
+  if (!iframe?.contentWindow) return;
+  if (lastPostedInset === keyboardInset) return;
+  lastPostedInset = keyboardInset;
+  try {
+    iframe.contentWindow.postMessage({
+      source: 'ec-chatbot-sdk',
+      action: 'mobile_viewport',
+      keyboardInset,
+    }, '*');
+  } catch {
+    // Cross-origin or unloaded iframe: ignore.
+  }
 };
 
 const saveIframeStyles = (iframe) => {
@@ -47,14 +71,45 @@ const applyPin = (iframe) => {
 };
 
 const pinTick = () => {
+  pinRafId = null;
   if (!pinnedIframe || !mobileCheck() || !chatIsOpen || !isKeyboardOpen()) {
     restoreIframeStyles();
+    if (pinnedIframe) {
+      postKeyboardInset(pinnedIframe, 0);
+    }
     return;
   }
   if (!savedStyles) {
     saveIframeStyles(pinnedIframe);
   }
   applyPin(pinnedIframe);
+  postKeyboardInset(pinnedIframe, getKeyboardInset());
+};
+
+// Coalesce visualViewport scroll/resize storms into one paint per frame.
+const schedulePin = () => {
+  if (pinRafId !== null) return;
+  pinRafId = window.requestAnimationFrame(pinTick);
+};
+
+const attachPinListeners = () => {
+  if (listenersAttached) return;
+  window.addEventListener('scroll', schedulePin, { passive: true });
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', schedulePin);
+    window.visualViewport.addEventListener('scroll', schedulePin);
+  }
+  listenersAttached = true;
+};
+
+const detachPinListeners = () => {
+  if (!listenersAttached) return;
+  window.removeEventListener('scroll', schedulePin);
+  if (window.visualViewport) {
+    window.visualViewport.removeEventListener('resize', schedulePin);
+    window.visualViewport.removeEventListener('scroll', schedulePin);
+  }
+  listenersAttached = false;
 };
 
 /**
@@ -64,26 +119,32 @@ const pinTick = () => {
 export const startMobileKeyboardPin = (iframe) => {
   if (!iframe || !mobileCheck()) return;
 
-  if (pinTimer !== null && pinnedIframe === iframe && chatIsOpen) {
+  if (listenersAttached && pinnedIframe === iframe && chatIsOpen) {
     return;
   }
 
   stopMobileKeyboardPin();
   pinnedIframe = iframe;
   chatIsOpen = true;
+  attachPinListeners();
   pinTick();
-  pinTimer = window.setInterval(pinTick, PIN_INTERVAL_MS);
 };
 
 /**
  * Stop the pin watcher and restore iframe styles saved before the pin.
  */
 export const stopMobileKeyboardPin = () => {
+  const iframe = pinnedIframe;
   chatIsOpen = false;
-  if (pinTimer !== null) {
-    window.clearInterval(pinTimer);
-    pinTimer = null;
+  detachPinListeners();
+  if (pinRafId !== null) {
+    window.cancelAnimationFrame(pinRafId);
+    pinRafId = null;
   }
   restoreIframeStyles();
+  if (iframe) {
+    postKeyboardInset(iframe, 0);
+  }
+  lastPostedInset = null;
   pinnedIframe = null;
 };

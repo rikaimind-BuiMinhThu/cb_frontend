@@ -1832,15 +1832,36 @@
   // src/v2/sdk/layout/mobileKeyboardPin.js
   var PINNED_STYLE_PROPS = ["position", "top", "left", "right", "bottom", "width", "height"];
   var KEYBOARD_OPEN_THRESHOLD_PX = 150;
-  var PIN_INTERVAL_MS = 200;
-  var pinTimer = null;
+  var listenersAttached = false;
+  var pinRafId = null;
   var pinnedIframe = null;
   var savedStyles = null;
   var chatIsOpen = false;
+  var lastPostedInset = null;
   var isKeyboardOpen = () => {
     const viewport = window.visualViewport;
     if (!viewport) return false;
     return document.documentElement.clientHeight - viewport.height > KEYBOARD_OPEN_THRESHOLD_PX;
+  };
+  var getKeyboardInset = () => {
+    const root = document.documentElement;
+    const layoutHeight = Math.max(root.clientHeight, 1);
+    const vv = window.visualViewport;
+    const visibleHeight = Math.round((vv == null ? void 0 : vv.height) || window.innerHeight || layoutHeight);
+    return Math.max(0, layoutHeight - visibleHeight);
+  };
+  var postKeyboardInset = (iframe, keyboardInset) => {
+    if (!(iframe == null ? void 0 : iframe.contentWindow)) return;
+    if (lastPostedInset === keyboardInset) return;
+    lastPostedInset = keyboardInset;
+    try {
+      iframe.contentWindow.postMessage({
+        source: "ec-chatbot-sdk",
+        action: "mobile_viewport",
+        keyboardInset
+      }, "*");
+    } catch (e) {
+    }
   };
   var saveIframeStyles = (iframe) => {
     savedStyles = PINNED_STYLE_PROPS.map((prop) => ({
@@ -1871,33 +1892,66 @@
     iframe.style.setProperty("height", `${root.clientHeight}px`, "important");
   };
   var pinTick = () => {
+    pinRafId = null;
     if (!pinnedIframe || !mobileCheck() || !chatIsOpen || !isKeyboardOpen()) {
       restoreIframeStyles();
+      if (pinnedIframe) {
+        postKeyboardInset(pinnedIframe, 0);
+      }
       return;
     }
     if (!savedStyles) {
       saveIframeStyles(pinnedIframe);
     }
     applyPin(pinnedIframe);
+    postKeyboardInset(pinnedIframe, getKeyboardInset());
+  };
+  var schedulePin = () => {
+    if (pinRafId !== null) return;
+    pinRafId = window.requestAnimationFrame(pinTick);
+  };
+  var attachPinListeners = () => {
+    if (listenersAttached) return;
+    window.addEventListener("scroll", schedulePin, { passive: true });
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", schedulePin);
+      window.visualViewport.addEventListener("scroll", schedulePin);
+    }
+    listenersAttached = true;
+  };
+  var detachPinListeners = () => {
+    if (!listenersAttached) return;
+    window.removeEventListener("scroll", schedulePin);
+    if (window.visualViewport) {
+      window.visualViewport.removeEventListener("resize", schedulePin);
+      window.visualViewport.removeEventListener("scroll", schedulePin);
+    }
+    listenersAttached = false;
   };
   var startMobileKeyboardPin = (iframe) => {
     if (!iframe || !mobileCheck()) return;
-    if (pinTimer !== null && pinnedIframe === iframe && chatIsOpen) {
+    if (listenersAttached && pinnedIframe === iframe && chatIsOpen) {
       return;
     }
     stopMobileKeyboardPin();
     pinnedIframe = iframe;
     chatIsOpen = true;
+    attachPinListeners();
     pinTick();
-    pinTimer = window.setInterval(pinTick, PIN_INTERVAL_MS);
   };
   var stopMobileKeyboardPin = () => {
+    const iframe = pinnedIframe;
     chatIsOpen = false;
-    if (pinTimer !== null) {
-      window.clearInterval(pinTimer);
-      pinTimer = null;
+    detachPinListeners();
+    if (pinRafId !== null) {
+      window.cancelAnimationFrame(pinRafId);
+      pinRafId = null;
     }
     restoreIframeStyles();
+    if (iframe) {
+      postKeyboardInset(iframe, 0);
+    }
+    lastPostedInset = null;
     pinnedIframe = null;
   };
 
