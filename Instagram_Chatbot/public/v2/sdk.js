@@ -1776,8 +1776,12 @@
   };
   var getMobileOpenLayoutSize = () => {
     const root = document.documentElement;
-    const width = Math.round(root.clientWidth || window.innerWidth || 1);
-    const height = Math.round(root.clientHeight || window.innerHeight || 1);
+    const width = Math.round(
+      Math.max(root.clientWidth || 0, window.innerWidth || 0) || 1
+    );
+    const height = Math.round(
+      Math.max(root.clientHeight || 0, window.innerHeight || 0) || 1
+    );
     return {
       width: `${Math.max(width, 1)}px`,
       height: `${Math.max(height, 1)}px`

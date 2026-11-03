@@ -293,25 +293,22 @@ const CommonCreditCardPayment = ({ content, messageIndex, contentIndex, onChange
 
   const renderCvc = () => {
     if (creditCardPayment.is_hide_cvc) return null;
-    const cvcLabel = (
-      <span>
-        {cardCvcLabel} <img className="w-8-percent" src={cvcIcon} alt="" />
-      </span>
-    );
 
     return (
       <div className="ss-user-setting__item-bottom d-block">
+        <div className={CARD_FIELD_TITLE_CLASS}>
+          {cardCvcLabel}{' '}
+          <img className="w-8-percent" src={cvcIcon} alt="" />
+        </div>
         <InputCustom
-          classLabel={CARD_FIELD_LABEL_CLASS}
           className="ss-user-setting-input-limit-character w-33-percent m-l-0"
           disabled={disabled}
           value={creditCardPayment.cvc || EMPTY_INPUT_VALUE}
           onChange={(value) => {
             if (CVC_PATTERN.test(value)) {
-              onChangeValue(contentIndex, content.type, value, "cvc")
+              onChangeValue(contentIndex, content.type, value, "cvc");
             }
           }}
-          label={cvcLabel}
           placeholder={creditCardPayment.cvc_placeholder}
         />
       </div>

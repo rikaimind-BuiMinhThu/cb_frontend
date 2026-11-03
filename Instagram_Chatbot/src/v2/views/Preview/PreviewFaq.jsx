@@ -191,36 +191,37 @@ const PreviewFaq = () => {
       savePrevOpenStatus("1");
       sendOpenChatbotCountRequest(state.scenarioId, deviceReceive);
     }
-    
-    if (state.alreadyOpenFirstTime) {
+
+    if (state.isAlreadyOpenFirstTime) {
       if (!opening) {
         if (isWithdrawalPreventionEnabled(state.botInfor?.withdrawal_prevention_status)) {
           return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
         }
+        sendCloseChatbotCountRequest(state.scenarioId, deviceReceive);
+        dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
         postOpenStateToParent(false);
-        return dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
+        return;
       }
 
-      return userEntryScenario({
+      userEntryScenario({
         scenario_id: state.scenarioId,
         user_id: state.uuid,
-      }).then(() => {
-        dispatch({ type: PREVIEW_ACTIONS.OPEN_CHATBOT });
-        postOpenStateToParent(true);
       });
+      dispatch({ type: PREVIEW_ACTIONS.OPEN_CHATBOT });
+      postOpenStateToParent(true);
+      return;
     }
 
     if (opening) {
-      sendOpenChatbotCountRequest(state.scenarioId, deviceReceive).then(() => {
-        dispatch({ type: PREVIEW_ACTIONS.OPEN_CHATBOT });
-        postOpenStateToParent(true);
-      });
-    } else {
-      sendCloseChatbotCountRequest(state.scenarioId, deviceReceive).then(() => {
-        dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
-        postOpenStateToParent(false);
-      });
+      sendOpenChatbotCountRequest(state.scenarioId, deviceReceive);
+      dispatch({ type: PREVIEW_ACTIONS.OPEN_CHATBOT });
+      postOpenStateToParent(true);
+      return;
     }
+
+    sendCloseChatbotCountRequest(state.scenarioId, deviceReceive);
+    dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
+    postOpenStateToParent(false);
   }
 
   const extractStateFromPreviewResponse = async (res) => {

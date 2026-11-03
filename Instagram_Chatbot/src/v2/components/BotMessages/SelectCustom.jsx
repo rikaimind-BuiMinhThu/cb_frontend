@@ -4,7 +4,7 @@ import { Select } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import 'antd/dist/antd.css';
 import './SelectCustom.css';
-import { isAndroid } from 'v2/utils/deviceUtils';
+import { isAndroid, isIOS } from 'v2/utils/deviceUtils';
 
 const { Option } = Select;
 
@@ -67,6 +67,10 @@ const SelectCustom = ({
     );
   }
 
+  const effectiveShowSearch = isIOS() ? false : showSearch;
+  const defaultMode = isIOS() ? undefined : SELECT_MODE_COMBOBOX;
+  const effectiveMode = mode || defaultMode;
+
   return (
     <>
       {label && (
@@ -75,12 +79,12 @@ const SelectCustom = ({
         </span>
       )}
       <Select
-        showSearch={showSearch}
+        showSearch={effectiveShowSearch}
         allowClear={allowClear}
         className={`select-custom-antd ${className}`.trim()}
         style={style}
         placeholder={placeholder}
-        mode={mode || SELECT_MODE_COMBOBOX}
+        mode={effectiveMode}
         notFoundContent={(
           <div className="select-custom-not-found">
             <div className="select-custom-not-found-content">

@@ -337,7 +337,7 @@ const CreditCardPaymentContent = ({
                           disabled={true}
                           controls={false}
                           label={
-                            <span className="chat-log-um-font-400" >
+                            <span>
                               {LABEL_CVC}{' '}
                               <img className="chat-log-um-cvc-icon"  src={cvcIcon} alt={ALT_EMPTY} />
                             </span>
