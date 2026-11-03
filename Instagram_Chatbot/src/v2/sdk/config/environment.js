@@ -1,3 +1,15 @@
+const LOCAL_DEV_PORT = '3001';
+const PRIVATE_LAN_HOST_PATTERN = /^(localhost|127\.0\.0\.1|192\.168\.\d{1,3}\.\d{1,3}|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3})(:\d+)?$/i;
+
+const isLocalDevHost = (host) => {
+  if (!host) return false;
+  const [hostname, port] = String(host).split(':');
+  if (port && port !== LOCAL_DEV_PORT) return false;
+  if (!port && hostname !== 'localhost' && hostname !== '127.0.0.1') return false;
+  return PRIVATE_LAN_HOST_PATTERN.test(hostname)
+    || PRIVATE_LAN_HOST_PATTERN.test(host);
+};
+
 const getEnvFromScriptSrc = () => {
   try {
     if (window.getSdkEnv) return window.sdkEnv;
@@ -8,6 +20,7 @@ const getEnvFromScriptSrc = () => {
       'ec-chatbot1.com': 'staging',
       'ec-chatbot.com': 'production',
       'localhost:3001': 'local',
+      '127.0.0.1:3001': 'local',
     };
 
     const src = document.currentScript?.src || '';
@@ -15,7 +28,7 @@ const getEnvFromScriptSrc = () => {
     if (!src) return null;
 
     const host = new URL(src).host;
-    const sdkEnv = SRC_PARSER[host];
+    const sdkEnv = SRC_PARSER[host] || (isLocalDevHost(host) ? 'local' : null);
 
     if (sdkEnv) {
       window.sdkEnv = sdkEnv;
@@ -70,7 +83,8 @@ export const getEcChatBotApiServerBaseUrl = () => {
     case 'production':
       return 'https://ec-chatbot-test.com';
     case 'local':
-      return 'http://localhost:3000';
+      // Local FE testing against staging API (do not commit).
+      return 'https://ec-chatbot-test1.com';
     default:
       return 'http://localhost:3000';
   }
@@ -86,8 +100,15 @@ export const getEcChatBotFrontEndBaseUrl = () => {
       return 'https://ec-chatbot1.com';
     case 'production':
       return 'https://ec-chatbot.com';
-    case 'local':
+    case 'local': {
+      if (typeof window !== 'undefined' && window.location && window.location.origin) {
+        const { protocol, hostname, port } = window.location;
+        if (hostname && hostname !== 'localhost' && hostname !== '127.0.0.1') {
+          return `${protocol}//${hostname}${port ? `:${port}` : ''}`;
+        }
+      }
       return 'http://localhost:3001';
+    }
     default:
       return 'http://localhost:3001';
   }

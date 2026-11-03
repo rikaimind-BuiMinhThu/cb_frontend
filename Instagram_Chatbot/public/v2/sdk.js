@@ -42,6 +42,15 @@
   };
 
   // src/v2/sdk/config/environment.js
+  var LOCAL_DEV_PORT = "3001";
+  var PRIVATE_LAN_HOST_PATTERN = /^(localhost|127\.0\.0\.1|192\.168\.\d{1,3}\.\d{1,3}|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3})(:\d+)?$/i;
+  var isLocalDevHost = (host) => {
+    if (!host) return false;
+    const [hostname, port] = String(host).split(":");
+    if (port && port !== LOCAL_DEV_PORT) return false;
+    if (!port && hostname !== "localhost" && hostname !== "127.0.0.1") return false;
+    return PRIVATE_LAN_HOST_PATTERN.test(hostname) || PRIVATE_LAN_HOST_PATTERN.test(host);
+  };
   var getEnvFromScriptSrc = () => {
     var _a;
     try {
@@ -50,12 +59,13 @@
       const SRC_PARSER = {
         "ec-chatbot1.com": "staging",
         "ec-chatbot.com": "production",
-        "localhost:3001": "local"
+        "localhost:3001": "local",
+        "127.0.0.1:3001": "local"
       };
       const src = ((_a = document.currentScript) == null ? void 0 : _a.src) || "";
       if (!src) return null;
       const host = new URL(src).host;
-      const sdkEnv = SRC_PARSER[host];
+      const sdkEnv = SRC_PARSER[host] || (isLocalDevHost(host) ? "local" : null);
       if (sdkEnv) {
         window.sdkEnv = sdkEnv;
         return sdkEnv;
@@ -99,7 +109,7 @@
       case "production":
         return "https://ec-chatbot-test.com";
       case "local":
-        return "http://localhost:3000";
+        return "https://ec-chatbot-test1.com";
       default:
         return "http://localhost:3000";
     }
@@ -112,8 +122,15 @@
         return "https://ec-chatbot1.com";
       case "production":
         return "https://ec-chatbot.com";
-      case "local":
+      case "local": {
+        if (typeof window !== "undefined" && window.location && window.location.origin) {
+          const { protocol, hostname, port } = window.location;
+          if (hostname && hostname !== "localhost" && hostname !== "127.0.0.1") {
+            return `${protocol}//${hostname}${port ? `:${port}` : ""}`;
+          }
+        }
         return "http://localhost:3001";
+      }
       default:
         return "http://localhost:3001";
     }
@@ -1776,8 +1793,12 @@
   };
   var getMobileOpenLayoutSize = () => {
     const root = document.documentElement;
-    const width = Math.round(root.clientWidth || window.innerWidth || 1);
-    const height = Math.round(root.clientHeight || window.innerHeight || 1);
+    const width = Math.round(
+      Math.max(root.clientWidth || 0, window.innerWidth || 0) || 1
+    );
+    const height = Math.round(
+      Math.max(root.clientHeight || 0, window.innerHeight || 0) || 1
+    );
     return {
       width: `${Math.max(width, 1)}px`,
       height: `${Math.max(height, 1)}px`

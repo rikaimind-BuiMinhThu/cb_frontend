@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Local SDK + staging API embed</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 24px 16px 160px;
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+      line-height: 1.5;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 2px rgba(0,0,0,.06);
+    }
+    h1 { font-size: 20px; margin: 0 0 8px; }
+    code, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; word-break: break-all; }
+    #status { font-weight: 700; padding: 10px; border-radius: 8px; margin-top: 8px; }
+    .ok { color: #065f46; background: #d1fae5; }
+    .err { color: #991b1b; background: #fee2e2; }
+    input, button { font-size: 16px; padding: 12px; border-radius: 8px; width: 100%; box-sizing: border-box; }
+    input { border: 1px solid #d1d5db; margin-bottom: 8px; }
+    button { border: 0; background: #111827; color: #fff; font-weight: 600; }
+    .hint { font-size: 14px; color: #374151; }
+    .url-box { background: #111827; color: #f9fafb; padding: 12px; border-radius: 8px; word-break: break-all; }
+    .targets { margin-top: 8px; font-size: 13px; }
+    .targets dt { color: #6b7280; margin-top: 6px; }
+    .targets dd { margin: 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; word-break: break-all; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Local FE embed</h1>
+    <p>Loads this host’s <code>/v2/sdk.js</code> with <code>env=local</code>.</p>
+    <p class="hint">Default bot: Dogfood koubou staging clone <strong>327</strong> (prod 295 / scenario 413 → stg scenario 553, body 2.0).</p>
+    <p id="status" class="err">Waiting…</p>
+    <dl class="targets">
+      <dt>Frontend (local)</dt>
+      <dd id="fe-url" class="mono">—</dd>
+      <dt>Backend API (staging)</dt>
+      <dd id="api-url" class="mono">https://ec-chatbot-test1.com</dd>
+      <dt>This page</dt>
+      <dd id="page-url" class="mono">—</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <p class="hint">On iPhone (same Wi‑Fi):</p>
+    <p class="url-box" id="wifi-url"></p>
+  </div>
+
+  <div class="card" id="setup">
+    <label for="bot-id">bot_id</label>
+    <input id="bot-id" inputmode="numeric" value="327" />
+    <button type="button" id="start">Start chatbot</button>
+  </div>
+
+  <script>
+    (function () {
+      var STAGING_API = 'https://ec-chatbot-test1.com';
+      // Staging clone of production dogfoodkoubou LP bot 295 / scenario 413.
+      var DEFAULT_BOT_ID = '327';
+      var params = new URLSearchParams(window.location.search);
+      var botId = params.get('bot_id') || DEFAULT_BOT_ID;
+      var statusEl = document.getElementById('status');
+      var input = document.getElementById('bot-id');
+      var pageUrl = document.getElementById('page-url');
+      var wifiUrl = document.getElementById('wifi-url');
+      var feUrl = document.getElementById('fe-url');
+      var apiUrl = document.getElementById('api-url');
+      var origin = window.location.origin;
+
+      pageUrl.textContent = window.location.href;
+      feUrl.textContent = origin;
+      apiUrl.textContent = STAGING_API;
+      wifiUrl.textContent = origin + '/lan-iphone-embed.html?env=local&bot_id=' + encodeURIComponent(botId);
+      input.value = botId;
+
+      // Force local SDK env so LAN IP hosts never fall through to production.
+      if (params.get('env') !== 'local' || !params.get('bot_id')) {
+        var next = new URL(window.location.href);
+        next.searchParams.set('env', 'local');
+        next.searchParams.set('bot_id', botId);
+        window.location.replace(next.toString());
+        return;
+      }
+
+      function loadSdk(id) {
+        sessionStorage.setItem('bot_id', String(id));
+        statusEl.className = 'ok';
+        statusEl.textContent = 'bot_id=' + id + ' — loading SDK…';
+        document.getElementById('setup').style.display = 'none';
+
+        var s = document.createElement('script');
+        // Relative path keeps FE on this host (localhost / LAN IP :3001).
+        s.src = '/v2/sdk.js';
+        s.defer = true;
+        s.onerror = function () {
+          statusEl.className = 'err';
+          statusEl.textContent = 'Failed to load /v2/sdk.js — is npm start running on :3001?';
+        };
+        s.onload = function () {
+          // Contract: env=local → FE = this origin, API = staging (see src/v2/sdk/config/environment.js).
+          feUrl.textContent = origin + ' (iframe preview from this host)';
+          apiUrl.textContent = STAGING_API;
+          statusEl.className = 'ok';
+          statusEl.textContent = 'bot_id=' + id + ' — local FE + staging API. Tap the bubble at the BOTTOM.';
+        };
+        document.body.appendChild(s);
+      }
+
+      document.getElementById('start').addEventListener('click', function () {
+        var id = (input.value || '').trim() || DEFAULT_BOT_ID;
+        var nextUrl = new URL(window.location.href);
+        nextUrl.searchParams.set('env', 'local');
+        nextUrl.searchParams.set('bot_id', id);
+        window.location.replace(nextUrl.toString());
+      });
+
+      loadSdk(botId);
+    })();
+  </script>
+</body>
+</html>
