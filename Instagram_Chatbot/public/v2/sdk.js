@@ -1681,237 +1681,6 @@
     };
   };
 
-  // src/v2/sdk/layout/mobileKeyboardPin.js
-  var PINNED_STYLE_PROPS = [
-    "position",
-    "top",
-    "left",
-    "right",
-    "bottom",
-    "width",
-    "height",
-    "transform",
-    "background-color",
-    "background-image"
-  ];
-  var PARENT_LOCK_PROPS = [
-    { el: "html", prop: "background-color" },
-    { el: "body", prop: "background-color" },
-    { el: "body", prop: "position" },
-    { el: "body", prop: "top" },
-    { el: "body", prop: "left" },
-    { el: "body", prop: "right" },
-    { el: "body", prop: "width" },
-    { el: "body", prop: "overflow" }
-  ];
-  var PIN_BACKGROUND = "#ffffff";
-  var chatBodyBg = "";
-  var pinnedIframe = null;
-  var savedStyles = null;
-  var savedParentStyles = null;
-  var savedScrollY = 0;
-  var parentScrollLocked = false;
-  var chatIsOpen = false;
-  var lastPinGeometry = null;
-  var lastPostedInset = null;
-  var pinRaf = null;
-  var listenersBound = false;
-  var getParentEl = (name) => name === "html" ? document.documentElement : document.body;
-  var applyChatUnderlay = (element) => {
-    if (!element) return;
-    element.style.setProperty("background-color", PIN_BACKGROUND, "important");
-    if (chatBodyBg) {
-      element.style.setProperty(
-        "background-image",
-        `linear-gradient(${chatBodyBg}, ${chatBodyBg})`,
-        "important"
-      );
-      return;
-    }
-    element.style.removeProperty("background-image");
-  };
-  var setChatBodyBackground = (color) => {
-    const next = typeof color === "string" ? color.trim() : "";
-    if (chatBodyBg === next) return;
-    chatBodyBg = next;
-    if (pinnedIframe && chatIsOpen) {
-      applyChatUnderlay(pinnedIframe);
-    }
-  };
-  var saveIframeStyles = (iframe) => {
-    savedStyles = PINNED_STYLE_PROPS.map((prop) => ({
-      prop,
-      value: iframe.style.getPropertyValue(prop),
-      priority: iframe.style.getPropertyPriority(prop)
-    }));
-  };
-  var restoreIframeStyles = () => {
-    if (!pinnedIframe || !savedStyles) return;
-    savedStyles.forEach(({ prop, value, priority }) => {
-      if (value) {
-        pinnedIframe.style.setProperty(prop, value, priority);
-        return;
-      }
-      pinnedIframe.style.removeProperty(prop);
-    });
-    savedStyles = null;
-    lastPinGeometry = null;
-  };
-  var lockParentScroll = () => {
-    if (parentScrollLocked || !document.body) return;
-    savedScrollY = Math.round(window.scrollY || window.pageYOffset || 0);
-    savedParentStyles = PARENT_LOCK_PROPS.map(({ el, prop }) => {
-      const node = getParentEl(el);
-      return {
-        el,
-        prop,
-        value: node.style.getPropertyValue(prop),
-        priority: node.style.getPropertyPriority(prop)
-      };
-    });
-    const html = document.documentElement;
-    const body = document.body;
-    html.style.setProperty("background-color", PIN_BACKGROUND, "important");
-    body.style.setProperty("background-color", PIN_BACKGROUND, "important");
-    body.style.setProperty("position", "fixed", "important");
-    body.style.setProperty("top", `-${savedScrollY}px`, "important");
-    body.style.setProperty("left", "0", "important");
-    body.style.setProperty("right", "0", "important");
-    body.style.setProperty("width", "100%", "important");
-    body.style.setProperty("overflow", "hidden", "important");
-    parentScrollLocked = true;
-  };
-  var unlockParentScroll = () => {
-    if (!parentScrollLocked) return;
-    if (savedParentStyles) {
-      savedParentStyles.forEach(({ el, prop, value, priority }) => {
-        const node = getParentEl(el);
-        if (!node) return;
-        if (value) {
-          node.style.setProperty(prop, value, priority);
-          return;
-        }
-        node.style.removeProperty(prop);
-      });
-    }
-    savedParentStyles = null;
-    parentScrollLocked = false;
-    window.scrollTo(0, savedScrollY);
-    savedScrollY = 0;
-  };
-  var postKeyboardInset = (iframe, keyboardInset) => {
-    if (!(iframe == null ? void 0 : iframe.contentWindow)) return;
-    if (lastPostedInset === keyboardInset) return;
-    lastPostedInset = keyboardInset;
-    try {
-      iframe.contentWindow.postMessage({
-        source: "ec-chatbot-sdk",
-        action: "mobile_viewport",
-        keyboardInset
-      }, "*");
-    } catch (e) {
-    }
-  };
-  var applyPin = (iframe) => {
-    const root = document.documentElement;
-    const vv = window.visualViewport;
-    const layoutWidth = Math.max(root.clientWidth, 1);
-    const layoutHeight = Math.max(root.clientHeight, 1);
-    const offsetLeft = Math.round((vv == null ? void 0 : vv.offsetLeft) || 0);
-    const offsetTop = Math.round((vv == null ? void 0 : vv.offsetTop) || 0);
-    const pinHeight = Math.max(layoutHeight + offsetTop, 1);
-    const nextWidth = `${layoutWidth}px`;
-    const nextHeight = `${pinHeight}px`;
-    const nextTransform = `translate(${offsetLeft}px, ${offsetTop}px)`;
-    const geometryKey = `${nextWidth}|${nextHeight}|${nextTransform}`;
-    const visibleHeight = Math.round((vv == null ? void 0 : vv.height) || window.innerHeight || layoutHeight);
-    const keyboardInset = Math.max(0, layoutHeight - visibleHeight);
-    if (lastPinGeometry !== geometryKey || iframe.style.getPropertyValue("position") !== "fixed") {
-      lastPinGeometry = geometryKey;
-      iframe.width = nextWidth;
-      iframe.height = nextHeight;
-      iframe.style.setProperty("position", "fixed", "important");
-      iframe.style.setProperty("top", "0", "important");
-      iframe.style.setProperty("left", "0", "important");
-      iframe.style.setProperty("right", "auto", "important");
-      iframe.style.setProperty("bottom", "auto", "important");
-      iframe.style.setProperty("width", nextWidth, "important");
-      iframe.style.setProperty("height", nextHeight, "important");
-      iframe.style.setProperty("transform", nextTransform, "important");
-    }
-    if (iframe.style.getPropertyValue("background-color") !== PIN_BACKGROUND) {
-      applyChatUnderlay(iframe);
-    }
-    postKeyboardInset(iframe, keyboardInset);
-  };
-  var schedulePin = () => {
-    if (pinRaf !== null) {
-      window.cancelAnimationFrame(pinRaf);
-    }
-    pinRaf = window.requestAnimationFrame(() => {
-      pinRaf = null;
-      if (!pinnedIframe || !mobileCheck() || !chatIsOpen) {
-        restoreIframeStyles();
-        unlockParentScroll();
-        return;
-      }
-      if (!savedStyles) {
-        saveIframeStyles(pinnedIframe);
-      }
-      applyPin(pinnedIframe);
-    });
-  };
-  var bindViewportListeners = () => {
-    if (listenersBound) return;
-    listenersBound = true;
-    window.addEventListener("scroll", schedulePin, { passive: true });
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener("resize", schedulePin);
-      window.visualViewport.addEventListener("scroll", schedulePin);
-    }
-  };
-  var unbindViewportListeners = () => {
-    if (!listenersBound) return;
-    listenersBound = false;
-    window.removeEventListener("scroll", schedulePin);
-    if (window.visualViewport) {
-      window.visualViewport.removeEventListener("resize", schedulePin);
-      window.visualViewport.removeEventListener("scroll", schedulePin);
-    }
-  };
-  var isMobileKeyboardPinApplied = () => Boolean(pinnedIframe && savedStyles);
-  var startMobileKeyboardPin = (iframe) => {
-    if (!iframe || !mobileCheck()) return;
-    if (pinnedIframe === iframe && chatIsOpen && listenersBound) {
-      lockParentScroll();
-      schedulePin();
-      return;
-    }
-    stopMobileKeyboardPin();
-    pinnedIframe = iframe;
-    chatIsOpen = true;
-    lastPostedInset = null;
-    lockParentScroll();
-    bindViewportListeners();
-    schedulePin();
-  };
-  var stopMobileKeyboardPin = () => {
-    const iframe = pinnedIframe;
-    chatIsOpen = false;
-    unbindViewportListeners();
-    if (pinRaf !== null) {
-      window.cancelAnimationFrame(pinRaf);
-      pinRaf = null;
-    }
-    if (iframe) {
-      postKeyboardInset(iframe, 0);
-    }
-    restoreIframeStyles();
-    unlockParentScroll();
-    pinnedIframe = null;
-    lastPostedInset = null;
-  };
-
   // src/v2/sdk/layout/iframeLayout.js
   var resolveOffsetPx = (primaryValue, fallbackValue, defaultValue = 0) => {
     const primaryParsed = parseInt(primaryValue, 10);
@@ -2023,7 +1792,6 @@
         bottom: "0px",
         resetHorizontal: true
       });
-      applyChatUnderlay(iframe);
       return;
     }
     if (messageData.isOpen) {
@@ -2068,6 +1836,132 @@
         horizontalRule: desktopCloseOffsets.horizontal
       });
     }
+  };
+
+  // src/v2/sdk/layout/mobileKeyboardPin.js
+  var PINNED_STYLE_PROPS = ["position", "top", "left", "right", "bottom", "width", "height"];
+  var KEYBOARD_OPEN_THRESHOLD_PX = 150;
+  var listenersAttached = false;
+  var pinRafId = null;
+  var pinnedIframe = null;
+  var savedStyles = null;
+  var chatIsOpen = false;
+  var lastPostedInset = null;
+  var isKeyboardOpen = () => {
+    const viewport = window.visualViewport;
+    if (!viewport) return false;
+    return document.documentElement.clientHeight - viewport.height > KEYBOARD_OPEN_THRESHOLD_PX;
+  };
+  var getKeyboardInset = () => {
+    const root = document.documentElement;
+    const layoutHeight = Math.max(root.clientHeight, 1);
+    const vv = window.visualViewport;
+    const visibleHeight = Math.round((vv == null ? void 0 : vv.height) || window.innerHeight || layoutHeight);
+    return Math.max(0, layoutHeight - visibleHeight);
+  };
+  var postKeyboardInset = (iframe, keyboardInset) => {
+    if (!(iframe == null ? void 0 : iframe.contentWindow)) return;
+    if (lastPostedInset === keyboardInset) return;
+    lastPostedInset = keyboardInset;
+    try {
+      iframe.contentWindow.postMessage({
+        source: "ec-chatbot-sdk",
+        action: "mobile_viewport",
+        keyboardInset
+      }, "*");
+    } catch (e) {
+    }
+  };
+  var saveIframeStyles = (iframe) => {
+    savedStyles = PINNED_STYLE_PROPS.map((prop) => ({
+      prop,
+      value: iframe.style.getPropertyValue(prop),
+      priority: iframe.style.getPropertyPriority(prop)
+    }));
+  };
+  var restoreIframeStyles = () => {
+    if (!pinnedIframe || !savedStyles) return;
+    savedStyles.forEach(({ prop, value, priority }) => {
+      if (value) {
+        pinnedIframe.style.setProperty(prop, value, priority);
+        return;
+      }
+      pinnedIframe.style.removeProperty(prop);
+    });
+    savedStyles = null;
+  };
+  var applyPin = (iframe) => {
+    const root = document.documentElement;
+    iframe.style.setProperty("position", "absolute", "important");
+    iframe.style.setProperty("top", `${window.scrollY}px`, "important");
+    iframe.style.setProperty("left", "0", "important");
+    iframe.style.setProperty("right", "auto", "important");
+    iframe.style.setProperty("bottom", "auto", "important");
+    iframe.style.setProperty("width", `${root.clientWidth}px`, "important");
+    iframe.style.setProperty("height", `${root.clientHeight}px`, "important");
+  };
+  var pinTick = () => {
+    pinRafId = null;
+    if (!pinnedIframe || !mobileCheck() || !chatIsOpen || !isKeyboardOpen()) {
+      restoreIframeStyles();
+      if (pinnedIframe) {
+        postKeyboardInset(pinnedIframe, 0);
+      }
+      return;
+    }
+    if (!savedStyles) {
+      saveIframeStyles(pinnedIframe);
+    }
+    applyPin(pinnedIframe);
+    postKeyboardInset(pinnedIframe, getKeyboardInset());
+  };
+  var schedulePin = () => {
+    if (pinRafId !== null) return;
+    pinRafId = window.requestAnimationFrame(pinTick);
+  };
+  var attachPinListeners = () => {
+    if (listenersAttached) return;
+    window.addEventListener("scroll", schedulePin, { passive: true });
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", schedulePin);
+      window.visualViewport.addEventListener("scroll", schedulePin);
+    }
+    listenersAttached = true;
+  };
+  var detachPinListeners = () => {
+    if (!listenersAttached) return;
+    window.removeEventListener("scroll", schedulePin);
+    if (window.visualViewport) {
+      window.visualViewport.removeEventListener("resize", schedulePin);
+      window.visualViewport.removeEventListener("scroll", schedulePin);
+    }
+    listenersAttached = false;
+  };
+  var startMobileKeyboardPin = (iframe) => {
+    if (!iframe || !mobileCheck()) return;
+    if (listenersAttached && pinnedIframe === iframe && chatIsOpen) {
+      return;
+    }
+    stopMobileKeyboardPin();
+    pinnedIframe = iframe;
+    chatIsOpen = true;
+    attachPinListeners();
+    pinTick();
+  };
+  var stopMobileKeyboardPin = () => {
+    const iframe = pinnedIframe;
+    chatIsOpen = false;
+    detachPinListeners();
+    if (pinRafId !== null) {
+      window.cancelAnimationFrame(pinRafId);
+      pinRafId = null;
+    }
+    restoreIframeStyles();
+    if (iframe) {
+      postKeyboardInset(iframe, 0);
+    }
+    lastPostedInset = null;
+    pinnedIframe = null;
   };
 
   // src/v2/sdk/messaging/crawl.js
@@ -2202,18 +2096,8 @@
     const lockMobileOpenChat = shouldLockMobileOpenChat(messageData);
     const nextOverflow = lockMobileOpenChat ? "hidden" : "scroll";
     const layoutKey = buildLayoutKey(messageData, lockMobileOpenChat);
-    if (typeof messageData.chatBodyBg === "string") {
-      setChatBodyBackground(messageData.chatBodyBg);
-    }
     if (!lockMobileOpenChat) {
       stopMobileKeyboardPin();
-    }
-    if (lockMobileOpenChat && isMobileKeyboardPinApplied()) {
-      if (document.body.style.overflow !== nextOverflow) {
-        document.body.style.overflow = nextOverflow;
-      }
-      startMobileKeyboardPin(iframe);
-      return;
     }
     const layoutUnchanged = lastAppliedLayoutKey === layoutKey;
     const overflowUnchanged = document.body.style.overflow === nextOverflow;

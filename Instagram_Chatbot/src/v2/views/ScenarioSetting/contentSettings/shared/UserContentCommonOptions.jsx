@@ -38,9 +38,6 @@ const UserContentCommonOptions = ({
     onChangeValueMessageContent(indexMessageSelect, indexContent, contentType, value, field);
   };
 
-  const apiSelectConfig = config.apiSelect;
-  const apiSelectData = apiSelectConfig?.dataSource === 'variables' ? dataInputVar : [];
-
   return (
     <div className="ss-user-content-common-options">
       {config.faq && renderRootFaqOption?.()}

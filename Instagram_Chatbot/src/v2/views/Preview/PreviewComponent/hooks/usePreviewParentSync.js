@@ -5,6 +5,15 @@ import { postMessageToParent } from "v2/views/Preview/PreviewFukushashiki/LPUtil
 const FOCUSABLE_FIELD_SELECTOR = "input, textarea, select";
 const MOBILE_VIEWPORT_SOURCE = "ec-chatbot-sdk";
 const MOBILE_VIEWPORT_ACTION = "mobile_viewport";
+const FIELD_SCROLL_MARGIN_PX = 12;
+
+const readKeyboardInsetPx = () => {
+  const raw = getComputedStyle(document.documentElement)
+    .getPropertyValue("--mobile-keyboard-inset")
+    .trim();
+  const parsed = Number.parseFloat(raw);
+  return Number.isFinite(parsed) ? Math.max(0, parsed) : 0;
+};
 
 const scrollFocusedFieldIntoChatBody = () => {
   const active = document.activeElement;
@@ -14,7 +23,20 @@ const scrollFocusedFieldIntoChatBody = () => {
   const chatBody = document.getElementById("sp-body");
   if (!chatBody || !chatBody.contains(active)) return;
 
-  active.scrollIntoView({ block: "nearest", behavior: "auto" });
+  const inset = readKeyboardInsetPx();
+  const bodyRect = chatBody.getBoundingClientRect();
+  const activeRect = active.getBoundingClientRect();
+  const visibleBottom = bodyRect.bottom - inset - FIELD_SCROLL_MARGIN_PX;
+  const visibleTop = bodyRect.top + FIELD_SCROLL_MARGIN_PX;
+
+  if (activeRect.bottom > visibleBottom) {
+    chatBody.scrollTop += activeRect.bottom - visibleBottom;
+    return;
+  }
+
+  if (activeRect.top < visibleTop) {
+    chatBody.scrollTop -= visibleTop - activeRect.top;
+  }
 };
 
 const scheduleFocusedFieldScroll = () => {
@@ -23,10 +45,19 @@ const scheduleFocusedFieldScroll = () => {
   });
 };
 
+const scheduleFocusedFieldScrollAfterInset = () => {
+  // Wait two frames so padding-bottom from --mobile-keyboard-inset is laid out.
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      scrollFocusedFieldIntoChatBody();
+    });
+  });
+};
+
 const applyKeyboardInset = (keyboardInset) => {
   const insetPx = `${Math.max(0, Number(keyboardInset) || 0)}px`;
   document.documentElement.style.setProperty("--mobile-keyboard-inset", insetPx);
-  scheduleFocusedFieldScroll();
+  scheduleFocusedFieldScrollAfterInset();
 };
 
 /**

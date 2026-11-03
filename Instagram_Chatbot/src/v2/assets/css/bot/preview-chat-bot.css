@@ -2436,6 +2436,17 @@ slideUp
 .credit-card-expire-row > .select-custom-antd .ant-select-selector {
   width: 100%;
 }
+#sp-body .ant-select-dropdown {
+  min-width: 88px !important;
+}
+#sp-body .ant-select-item-option {
+  overflow: visible;
+}
+#sp-body .ant-select-item-option-content {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: nowrap;
+}
 .credit-card-bank-thumb { width: 15.6667%; margin-right: 1%; }
 .preview-inline-center { display: inline-flex; align-items: center; gap: 8px; }
 .preview-icon-24 { width: 24px; height: 24px; object-fit: contain; }

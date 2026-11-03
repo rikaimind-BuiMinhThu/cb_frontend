@@ -28,7 +28,6 @@ import {
 import { injectBotThemeCss } from "v2/utils/chatbotThemeCss";
 import { resolveMainColorCss, resolveUserMessageTheme } from "v2/utils/designThemeCore";
 import UserMessageTailIcon from "v2/components/BotMessages/UserMessageTailIcon";
-import { COLOR_MAP } from "v2/views/DesignSetting/constants/designChatbotConstants";
 import {
   getPrefectures,
   getScenarioPreviewData,
