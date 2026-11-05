@@ -133,7 +133,9 @@ const transformLeafString = async (value, config) => {
 
 const transformContentItem = async (content, config) => {
   const paramName = resolveParamName(content);
-  if (!paramName || !(config.params || []).includes(paramName)) {
+  const modeOn = config.mode === PARAM_SECURITY_MODES.ENCRYPT
+    || config.mode === PARAM_SECURITY_MODES.HASH;
+  if (!paramName || !modeOn) {
     return content;
   }
 

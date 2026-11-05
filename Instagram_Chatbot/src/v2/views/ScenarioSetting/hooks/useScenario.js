@@ -368,10 +368,7 @@ export const useScenario = (mode = 'scenario') => {
   const validateParamSecuritySettings = useCallback(() => {
     const validation = validateParamSecurity(paramSecurity);
     if (!validation.valid) {
-      const message = validation.message === 'keyRequired'
-        ? PARAM_SECURITY_LABELS.keyRequired
-        : PARAM_SECURITY_LABELS.paramsRequired;
-      showNotification(message);
+      showNotification(PARAM_SECURITY_LABELS.keyRequired);
       return false;
     }
     return true;

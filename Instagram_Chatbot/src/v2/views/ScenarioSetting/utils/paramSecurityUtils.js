@@ -49,9 +49,6 @@ export const validateParamSecurity = (config) => {
   if (normalized.mode === PARAM_SECURITY_MODES.NONE) {
     return { valid: true, message: '' };
   }
-  if (!normalized.params.length) {
-    return { valid: false, message: 'paramsRequired' };
-  }
   if (
     normalized.mode === PARAM_SECURITY_MODES.ENCRYPT
     && (!normalized.key || normalized.key.length < PARAM_SECURITY_MIN_KEY_LENGTH)

@@ -102,6 +102,23 @@ const ScenarioSettingsMainView = ({ onClose }) => {
   const paramSecurityMode = (paramSecurity || DEFAULT_PARAM_SECURITY).mode || PARAM_SECURITY_MODES.NONE;
   const paramSecurityEnabled = paramSecurityMode !== PARAM_SECURITY_MODES.NONE;
 
+  const handleToggleParamSecurity = (checked) => {
+    if (!checked) {
+      setParamSecurity({ ...DEFAULT_PARAM_SECURITY, params: [] });
+      return;
+    }
+    const current = paramSecurity || DEFAULT_PARAM_SECURITY;
+    const nextMode = current.mode === PARAM_SECURITY_MODES.NONE
+      ? PARAM_SECURITY_MODES.ENCRYPT
+      : current.mode;
+    setParamSecurity({
+      ...current,
+      mode: nextMode,
+      algorithm: algorithmForMode(nextMode),
+      params: [],
+    });
+  };
+
   const client = contextClient || JSON.parse(sessionStorage.getItem('client') || 'null');
   const isApiPolicy = executionPolicy === EXECUTION_POLICIES.API;
   const isFukushashikiPolicy = executionPolicy === EXECUTION_POLICIES.FUKUSHASHIKI;
@@ -452,45 +469,20 @@ const ScenarioSettingsMainView = ({ onClose }) => {
               </button>
             )}
           />
-          <ScenarioFormRow label={PARAM_SECURITY_LABELS.useParamSecurity}>
-            <div className="ss-param-security-mode-row">
-              <select
-                className="ss-input-value"
-                value={paramSecurityMode}
-                onChange={(event) => {
-                  const nextMode = event.target.value;
-                  setParamSecurity({
-                    ...(paramSecurity || DEFAULT_PARAM_SECURITY),
-                    mode: nextMode,
-                    algorithm: algorithmForMode(nextMode),
-                    params: nextMode === PARAM_SECURITY_MODES.NONE
-                      ? []
-                      : (paramSecurity?.params || []),
-                    key: nextMode === PARAM_SECURITY_MODES.ENCRYPT
-                      ? (paramSecurity?.key || null)
-                      : null,
-                    salt: nextMode === PARAM_SECURITY_MODES.HASH
-                      ? (paramSecurity?.salt || null)
-                      : null,
-                  });
-                }}
-                aria-label={PARAM_SECURITY_LABELS.mode}
+          <OverviewCheckboxRow
+            checked={paramSecurityEnabled}
+            onChange={handleToggleParamSecurity}
+            label={labelWithTooltip(PARAM_SECURITY_LABELS.useParamSecurity, 'useParamSecurity')}
+            actionButton={paramSecurityEnabled && (
+              <button
+                type="button"
+                className="ss-settings-modal-action-link"
+                onClick={() => navigateSettingsModalView(SETTINGS_MODAL_VIEWS.PARAM_SECURITY)}
               >
-                <option value={PARAM_SECURITY_MODES.NONE}>{PARAM_SECURITY_LABELS.modeNone}</option>
-                <option value={PARAM_SECURITY_MODES.HASH}>{PARAM_SECURITY_LABELS.modeHash}</option>
-                <option value={PARAM_SECURITY_MODES.ENCRYPT}>{PARAM_SECURITY_LABELS.modeEncrypt}</option>
-              </select>
-              {paramSecurityEnabled && (
-                <button
-                  type="button"
-                  className="ss-settings-modal-action-link"
-                  onClick={() => navigateSettingsModalView(SETTINGS_MODAL_VIEWS.PARAM_SECURITY)}
-                >
-                  {PARAM_SECURITY_LABELS.openSettings}
-                </button>
-              )}
-            </div>
-          </ScenarioFormRow>
+                {PARAM_SECURITY_LABELS.openSettings}
+              </button>
+            )}
+          />
         </div>
       </section>
 

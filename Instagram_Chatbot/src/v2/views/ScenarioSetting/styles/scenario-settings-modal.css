@@ -276,29 +276,17 @@
   color: #374151;
 }
 
-.ss-param-security-mode-row {
+.ss-param-security-view__field-row {
   display: flex;
   align-items: center;
   gap: 12px;
   width: 100%;
 }
 
-.ss-param-security-mode-row .ss-input-value {
-  max-width: 220px;
-}
-
-.ss-param-security-view__params {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.ss-param-security-view__param {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  color: #374151;
+.ss-param-security-view__field-row .ss-input-custom,
+.ss-param-security-view__field-row > *:first-child {
+  flex: 1;
+  min-width: 0;
 }
 
 .ss-settings-code-textarea {
@@ -356,6 +344,15 @@
 }
 
 /* Checkbox */
+.ss-settings-modal-checkbox .ant-checkbox-wrapper {
+  display: inline-flex;
+  align-items: center;
+}
+
+.ss-settings-modal-checkbox .ant-checkbox {
+  top: 0; /* cancel Ant's 0.2em offset */
+}
+
 .ss-settings-modal-checkbox .ant-checkbox-checked .ant-checkbox-inner {
   background-color: #024bb9;
   border-color: #024bb9;
@@ -371,13 +368,20 @@
 }
 
 .ss-settings-modal-checkbox__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-size: 13px;
   color: #333;
   line-height: 1.4;
 }
 
 .ss-settings-modal-checkbox .ant-checkbox + span {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1.4;
   padding-right: 4px;
+  padding-inline-start: 8px;
 }
 
 .ss-settings-modal-checkbox__label .admin-info-tooltip {
@@ -399,10 +403,31 @@
 .ss-layout-option-row {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px 12px;
   width: 100%;
   margin-bottom: 4px;
+}
+
+.ss-layout-option-row > .ss-settings-modal-checkbox {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.ss-layout-option-row > .ss-settings-modal-checkbox .ant-checkbox-wrapper {
+  display: inline-flex;
+  align-items: center;
+}
+
+.ss-layout-option-row > .ss-settings-modal-action-link {
+  display: inline-flex;
+  align-items: center;
+  align-self: center;
+  line-height: 1.4;
+  height: auto;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .ss-settings-modal-action-link {
@@ -525,7 +550,7 @@
 
 .ss-settings-main-view .ss-layout-checkbox-item {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
 }
 
 /* Timer modal inside settings */

@@ -367,10 +367,7 @@ export const useScenario = (mode = 'scenario') => {
   const validateParamSecuritySettings = useCallback(() => {
     const validation = validateParamSecurity(paramSecurity);
     if (!validation.valid) {
-      const message = validation.message === 'keyRequired'
-        ? 'キーを入力してください（8文字以上）'
-        : '対象パラメータを1つ以上選択してください';
-      showNotification(message);
+      showNotification('キーを入力してください（8文字以上）');
       return false;
     }
     return true;

@@ -19,22 +19,6 @@ export const DEFAULT_PARAM_SECURITY = {
 
 export const PARAM_SECURITY_MIN_KEY_LENGTH = 8;
 
-export const PARAM_SECURITY_PARAM_OPTIONS = [
-  { value: 'password', label: 'password' },
-  { value: 'credit_card_payment', label: 'credit_card_payment' },
-  { value: 'komoju_payment', label: 'komoju_payment' },
-  { value: 'paypal_payment', label: 'paypal_payment' },
-  { value: 'paidy_payment', label: 'paidy_payment' },
-  { value: 'user_email', label: 'user_email' },
-  { value: 'phone_number', label: 'phone_number' },
-  { value: 'user_name', label: 'user_name' },
-  { value: 'pin_code', label: 'pin_code' },
-  { value: 'user_password', label: 'user_password' },
-  { value: 'zip_code_address', label: 'zip_code_address' },
-  { value: 'birth_date', label: 'birth_date' },
-  { value: 'contact_form', label: 'contact_form' },
-];
-
 export const parseParamSecurityFromApi = (raw) => {
   if (!raw || typeof raw !== 'object') {
     return { ...DEFAULT_PARAM_SECURITY, params: [] };
@@ -88,9 +72,6 @@ export const validateParamSecurity = (config) => {
   const normalized = normalizeParamSecurity(config);
   if (normalized.mode === PARAM_SECURITY_MODES.NONE) {
     return { valid: true, message: '' };
-  }
-  if (!normalized.params.length) {
-    return { valid: false, message: 'paramsRequired' };
   }
   if (
     normalized.mode === PARAM_SECURITY_MODES.ENCRYPT

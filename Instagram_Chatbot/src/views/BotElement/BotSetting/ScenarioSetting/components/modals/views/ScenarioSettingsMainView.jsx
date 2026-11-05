@@ -86,6 +86,23 @@ const ScenarioSettingsMainView = ({ onClose }) => {
   const paramSecurityMode = (paramSecurity || DEFAULT_PARAM_SECURITY).mode || PARAM_SECURITY_MODES.NONE;
   const paramSecurityEnabled = paramSecurityMode !== PARAM_SECURITY_MODES.NONE;
 
+  const handleToggleParamSecurity = (checked) => {
+    if (!checked) {
+      setParamSecurity({ ...DEFAULT_PARAM_SECURITY, params: [] });
+      return;
+    }
+    const current = paramSecurity || DEFAULT_PARAM_SECURITY;
+    const nextMode = current.mode === PARAM_SECURITY_MODES.NONE
+      ? PARAM_SECURITY_MODES.ENCRYPT
+      : current.mode;
+    setParamSecurity({
+      ...current,
+      mode: nextMode,
+      algorithm: algorithmForMode(nextMode),
+      params: [],
+    });
+  };
+
   const handleToggleFukushashiki = (checked) => {
     setIsUseFukushashiki(checked);
     if (!checked) {
@@ -378,45 +395,20 @@ const ScenarioSettingsMainView = ({ onClose }) => {
             )}
           />
         )}
-        <ScenarioFormRow label="パラメータ保護">
-          <div className="ss-param-security-mode-row">
-            <select
-              className="ss-input-value"
-              value={paramSecurityMode}
-              onChange={(event) => {
-                const nextMode = event.target.value;
-                setParamSecurity({
-                  ...(paramSecurity || DEFAULT_PARAM_SECURITY),
-                  mode: nextMode,
-                  algorithm: algorithmForMode(nextMode),
-                  params: nextMode === PARAM_SECURITY_MODES.NONE
-                    ? []
-                    : (paramSecurity?.params || []),
-                  key: nextMode === PARAM_SECURITY_MODES.ENCRYPT
-                    ? (paramSecurity?.key || null)
-                    : null,
-                  salt: nextMode === PARAM_SECURITY_MODES.HASH
-                    ? (paramSecurity?.salt || null)
-                    : null,
-                });
-              }}
-              aria-label="保護方式"
+        <OverviewCheckboxRow
+          checked={paramSecurityEnabled}
+          onChange={handleToggleParamSecurity}
+          label={labelWithTooltip('パラメータ保護', 'useParamSecurity')}
+          actionButton={paramSecurityEnabled && (
+            <button
+              type="button"
+              className="ss-settings-modal-action-link"
+              onClick={() => navigateSettingsModalView(SETTINGS_MODAL_VIEWS.PARAM_SECURITY)}
             >
-              <option value={PARAM_SECURITY_MODES.NONE}>なし</option>
-              <option value={PARAM_SECURITY_MODES.HASH}>ハッシュ</option>
-              <option value={PARAM_SECURITY_MODES.ENCRYPT}>暗号化</option>
-            </select>
-            {paramSecurityEnabled && (
-              <button
-                type="button"
-                className="ss-settings-modal-action-link"
-                onClick={() => navigateSettingsModalView(SETTINGS_MODAL_VIEWS.PARAM_SECURITY)}
-              >
-                設定する →
-              </button>
-            )}
-          </div>
-        </ScenarioFormRow>
+              設定する →
+            </button>
+          )}
+        />
       </section>
 
       <ScenarioModalFooter
