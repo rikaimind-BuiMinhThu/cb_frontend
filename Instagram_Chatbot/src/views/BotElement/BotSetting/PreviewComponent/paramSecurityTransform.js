@@ -81,47 +81,15 @@ export const hashValue = (plaintext, salt) => {
   return bcrypt.hashSync(peppered, BCRYPT_COST);
 };
 
-const SAVE_INPUT_TO_PARAM = {
-  password: 'password',
-  user_email: 'user_email',
-  email: 'user_email',
-  phone_number: 'phone_number',
-  phone: 'phone_number',
-  user_name: 'user_name',
-  pin_code: 'pin_code',
-  user_password: 'user_password',
-};
-
-const resolveParamName = (content) => {
-  if (!content || typeof content !== 'object') return null;
-  if (content.type === 'text_input' || content.text_input) {
-    const textInput = content.text_input || content;
-    const saveInput = textInput.save_input_content;
-    if (SAVE_INPUT_TO_PARAM[saveInput]) return SAVE_INPUT_TO_PARAM[saveInput];
-    if (textInput.type === 'password' || textInput.type === 'password_confirmation') {
-      return 'password';
-    }
-  }
-  if (content.type === 'card_payment_radio_button' || content.card_payment_radio_button) {
-    const card = content.card_payment_radio_button || content;
-    const selection = card.initial_selection;
-    if (selection === 'credit_card') return 'credit_card_payment';
-    if (selection === 'paypal') return 'paypal_payment';
-    if (selection === 'komoju') return 'komoju_payment';
-    if (selection === 'paidy') return 'paidy_payment';
-  }
-  if (content.type === 'credit_card_payment') return 'credit_card_payment';
-  if (content.type === 'contact_form') return 'contact_form';
-  if (content.type === 'zip_code_address') return 'zip_code_address';
-  return null;
-};
-
 const transformLeafString = async (value, config) => {
   if (value == null) return value;
   if (typeof value !== 'string' && typeof value !== 'number') {
     return value;
   }
   const asString = String(value);
+  if (!asString) {
+    return value;
+  }
   if (config.mode === PARAM_SECURITY_MODES.ENCRYPT) {
     return encryptValue(asString, config.key);
   }
@@ -131,106 +99,33 @@ const transformLeafString = async (value, config) => {
   return value;
 };
 
-const transformContentItem = async (content, config) => {
-  const paramName = resolveParamName(content);
-  const modeOn = config.mode === PARAM_SECURITY_MODES.ENCRYPT
-    || config.mode === PARAM_SECURITY_MODES.HASH;
-  if (!paramName || !modeOn) {
-    return content;
+/** When mode is on, encrypt/hash every user-input `value` leaf (all parameters). */
+const transformValueLeaves = async (node, config) => {
+  if (Array.isArray(node)) {
+    const items = [];
+    for (let i = 0; i < node.length; i += 1) {
+      items.push(await transformValueLeaves(node[i], config));
+    }
+    return items;
   }
-
-  const next = { ...content };
-
-  if (paramName === 'password' && next.text_input) {
-    const textInput = { ...next.text_input };
-    if (textInput.password_confirmation?.value != null) {
-      textInput.password_confirmation = {
-        ...textInput.password_confirmation,
-        value: await transformLeafString(textInput.password_confirmation.value, config),
-      };
-    }
-    if (textInput.password?.value != null) {
-      textInput.password = {
-        ...textInput.password,
-        value: await transformLeafString(textInput.password.value, config),
-      };
-    }
-    next.text_input = textInput;
-    return next;
-  }
-
-  if ((paramName === 'user_email' || paramName === 'phone_number' || paramName === 'user_name' || paramName === 'pin_code') && next.text_input) {
-    const textInput = { ...next.text_input };
-    const typeKey = textInput.type;
-    if (typeKey && textInput[typeKey]?.value != null) {
-      textInput[typeKey] = {
-        ...textInput[typeKey],
-        value: await transformLeafString(textInput[typeKey].value, config),
-      };
-    }
-    if (textInput.email_address?.value != null) {
-      textInput.email_address = {
-        ...textInput.email_address,
-        value: await transformLeafString(textInput.email_address.value, config),
-      };
-    }
-    if (textInput.phone_number?.value != null) {
-      textInput.phone_number = {
-        ...textInput.phone_number,
-        value: await transformLeafString(textInput.phone_number.value, config),
-      };
-    }
-    if (textInput.text?.value != null) {
-      textInput.text = {
-        ...textInput.text,
-        value: await transformLeafString(textInput.text.value, config),
-      };
-    }
-    next.text_input = textInput;
-    return next;
-  }
-
-  const transformObjectLeaves = async (value) => {
-    if (Array.isArray(value)) {
-      const items = [];
-      for (let i = 0; i < value.length; i += 1) {
-        items.push(await transformObjectLeaves(value[i]));
+  if (node && typeof node === 'object') {
+    const result = {};
+    const keys = Object.keys(node);
+    for (let i = 0; i < keys.length; i += 1) {
+      const key = keys[i];
+      const child = node[key];
+      if (
+        key === 'value'
+        && (typeof child === 'string' || typeof child === 'number')
+      ) {
+        result[key] = await transformLeafString(child, config);
+      } else {
+        result[key] = await transformValueLeaves(child, config);
       }
-      return items;
     }
-    if (value && typeof value === 'object') {
-      const result = {};
-      const keys = Object.keys(value);
-      for (let i = 0; i < keys.length; i += 1) {
-        result[keys[i]] = await transformObjectLeaves(value[keys[i]]);
-      }
-      return result;
-    }
-    if (typeof value === 'string' || typeof value === 'number') {
-      return transformLeafString(value, config);
-    }
-    return value;
-  };
-
-  if (paramName === 'credit_card_payment' || paramName === 'komoju_payment' || paramName === 'paypal_payment') {
-    const key = next.card_payment_radio_button ? 'card_payment_radio_button' : 'credit_card_payment';
-    if (next[key] && typeof next[key] === 'object') {
-      next[key] = await transformObjectLeaves(next[key]);
-    }
-    return next;
+    return result;
   }
-
-  if (paramName === 'contact_form' && next.contact_form && typeof next.contact_form === 'object') {
-    next.contact_form = await transformObjectLeaves(next.contact_form);
-    return next;
-  }
-
-  if (paramName === 'zip_code_address' && next.zip_code_address && typeof next.zip_code_address === 'object') {
-    next.zip_code_address = await transformObjectLeaves(next.zip_code_address);
-    return next;
-  }
-
-  return next;
+  return node;
 };
 
 export const transformOutboundUserResponse = async (data, config = cachedParamSecurity) => {
@@ -245,7 +140,7 @@ export const transformOutboundUserResponse = async (data, config = cachedParamSe
   const contents = data.message.message_content;
   const nextContents = [];
   for (let i = 0; i < contents.length; i += 1) {
-    nextContents.push(await transformContentItem(contents[i], security));
+    nextContents.push(await transformValueLeaves(contents[i], security));
   }
 
   return {
