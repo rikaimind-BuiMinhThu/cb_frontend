@@ -14,6 +14,10 @@ import {
   normalizeAllowedLpDomains,
   parseAmazonPayConfigFromApi,
 } from './amazonPayConfigUtils';
+import {
+  normalizeParamSecurity,
+  parseParamSecurityFromApi,
+} from './paramSecurityUtils';
 
 export const cleanMessageTimerConfig = (config) => {
   const cleanedConfig = { ...config };
@@ -143,6 +147,7 @@ export const parseScenarioResponse = (res) => {
     lpIntegrationMode: data.lp_integration_mode || LP_INTEGRATION_MODES.AUTO,
     amazonPayConfig: parseAmazonPayConfigFromApi(data.amazon_pay_config),
     isUseAmazonPay: data.is_use_amazon_pay ?? (normalizeAllowedLpDomains(data.allowed_lp_domains || []).length > 0),
+    paramSecurity: parseParamSecurityFromApi(data.param_security),
   };
 };
 
@@ -190,6 +195,7 @@ export const buildScenarioSavePayload = (state) => {
     allowedLpDomains,
     amazonPayConfig,
     isUseAmazonPay,
+    paramSecurity,
   } = state;
 
   return {
@@ -215,6 +221,7 @@ export const buildScenarioSavePayload = (state) => {
     amazon_pay_config: isUseAmazonPay
       ? normalizeAmazonPayConfig(amazonPayConfig)
       : normalizeAmazonPayConfig({}),
+    param_security: normalizeParamSecurity(paramSecurity),
     is_used_custom_css: isUseCustomCss,
     custom_css_content: customCssContent.final,
     is_used_html_ugc: isUseHtmlUgc,

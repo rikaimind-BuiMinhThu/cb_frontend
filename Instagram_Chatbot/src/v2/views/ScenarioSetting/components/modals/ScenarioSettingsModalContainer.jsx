@@ -20,6 +20,7 @@ import ScenarioAutoLogoutView from './views/ScenarioAutoLogoutView';
 import ScenarioSettingsAmazonPayView from './views/ScenarioSettingsAmazonPayView';
 import ScenarioSettingsAmazonPayHtmlView from './views/ScenarioSettingsAmazonPayHtmlView';
 import ScenarioSettingsTagFiringView from './views/ScenarioSettingsTagFiringView';
+import ScenarioSettingsParamSecurityView from './views/ScenarioSettingsParamSecurityView';
 import ScenarioGlobalDelayView from './views/ScenarioGlobalDelayView';
 
 const getSettingsModalWidth = (settingsModalView) => {
@@ -103,6 +104,8 @@ const ScenarioSettingsModalContainer = () => {
         return <ScenarioGlobalDelayView onBack={backToSettingsMainView} />;
       case SETTINGS_MODAL_VIEWS.TAGS:
         return <ScenarioSettingsTagFiringView onBack={backToSettingsMainView} />;
+      case SETTINGS_MODAL_VIEWS.PARAM_SECURITY:
+        return <ScenarioSettingsParamSecurityView onBack={backToSettingsMainView} />;
       case SETTINGS_MODAL_VIEWS.MAIN:
       default:
         return <ScenarioSettingsMainView onClose={closeScenarioSettingsModal} />;

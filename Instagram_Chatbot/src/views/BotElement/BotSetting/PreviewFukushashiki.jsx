@@ -82,6 +82,7 @@ import {
 import { convertToFukushashikiObject } from "./PreviewFukushashiki/FukushashikiDataConverterUtils";
 import { handleValidateField } from "./PreviewFukushashiki/ValidationUtils";
 import { createOrAddLinesCart } from "./ShopifyUtils";
+import { setCachedParamSecurity } from "./PreviewComponent/paramSecurityTransform";
 
 const clearChatbotState = () => {
   sessionStorage.removeItem('chatbotH');
@@ -750,6 +751,8 @@ const PreviewFukushashiki = () => {
 
   const getBotInforFromPreviewResponse = (res) => {
     if (!res || !res.data || !res.data.chatbot) return {};
+
+    setCachedParamSecurity(res.data.chatbot.param_security);
 
     let opacity_color, message_color, font_color, icon_mess;
     if (res.data.chatbot.main_color === "blue") {

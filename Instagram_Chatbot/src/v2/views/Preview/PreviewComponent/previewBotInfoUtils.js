@@ -7,6 +7,7 @@ import iconMessagePurple from "v2/views/Preview/images/icon-mess/icon-message-ch
 import iconMessageBlack from "v2/views/Preview/images/icon-mess/icon-message-chat-black.png";
 import iconMessageWhite from "v2/views/Preview/images/icon-mess/icon-message-chat-white.png";
 import { lightenColor } from "./Utils";
+import { setCachedParamSecurity } from "./paramSecurityTransform";
 
 const MAIN_COLOR_PALETTES = {
   blue: {
@@ -88,6 +89,8 @@ export const getBotInforFromPreviewResponse = (res) => {
     || (res.data.chatbot.main_color_other
       ? getOtherMainColorPalette(res.data.chatbot.main_color_other)
       : {});
+
+  setCachedParamSecurity(res.data.chatbot.param_security);
 
   return {
     ...res.data.chatbot,

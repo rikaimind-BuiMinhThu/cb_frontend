@@ -36,6 +36,11 @@ import {
   normalizeAllowedLpDomains,
   validateAmazonPayConfig,
 } from '../utils/amazonPayConfigUtils';
+import {
+  DEFAULT_PARAM_SECURITY,
+  normalizeParamSecurity,
+  validateParamSecurity,
+} from '../utils/paramSecurityUtils';
 
 const INITIAL_TIMER_CONFIG = {
   isOpen: false,
@@ -159,6 +164,7 @@ export const useScenario = (mode = 'scenario') => {
   const [amazonPayReadyMode, setAmazonPayReadyMode] = useState(AMAZON_PAY_READY_MODES.NONE);
   const [amazonPayDetectionForm, setAmazonPayDetectionForm] = useState(() => amazonDetectionToForm());
   const [isUseAmazonPay, setIsUseAmazonPay] = useState(false);
+  const [paramSecurity, setParamSecurity] = useState(DEFAULT_PARAM_SECURITY);
 
   const [listProductVariants, setListProductVariants] = useState([]);
 
@@ -246,6 +252,7 @@ export const useScenario = (mode = 'scenario') => {
     setAmazonPayReadyMode(inferAmazonPayReadyMode(parsedDetection));
     setAmazonPayDetectionForm(amazonDetectionToForm(parsedDetection));
     setIsUseAmazonPay(parsed.isUseAmazonPay || false);
+    setParamSecurity(parsed.paramSecurity || DEFAULT_PARAM_SECURITY);
   }, []);
 
   const getConversationUrl = useCallback(() => {
@@ -357,6 +364,18 @@ export const useScenario = (mode = 'scenario') => {
     showNotification,
   ]);
 
+  const validateParamSecuritySettings = useCallback(() => {
+    const validation = validateParamSecurity(paramSecurity);
+    if (!validation.valid) {
+      const message = validation.message === 'keyRequired'
+        ? 'キーを入力してください（8文字以上）'
+        : '対象パラメータを1つ以上選択してください';
+      showNotification(message);
+      return false;
+    }
+    return true;
+  }, [paramSecurity, showNotification]);
+
   const getSavePayload = useCallback(() => buildScenarioSavePayload({
     dataMessages,
     urlThanks,
@@ -408,6 +427,7 @@ export const useScenario = (mode = 'scenario') => {
       readySelectorsText: amazonPayDetectionForm.readySelectorsText,
     }),
     isUseAmazonPay,
+    paramSecurity: normalizeParamSecurity(paramSecurity),
   }), [
     autoLogoutConfig,
     allowedLpDomainsInput,
@@ -416,6 +436,7 @@ export const useScenario = (mode = 'scenario') => {
     amazonPayDetectionMode,
     amazonPayReadyMode,
     isUseAmazonPay,
+    paramSecurity,
     coupon,
     customCssContent,
     isUseHtmlUgc,
@@ -460,6 +481,7 @@ export const useScenario = (mode = 'scenario') => {
     if (!validateScenarioName()) return;
     if (!validateAutoLogoutConfig()) return;
     if (!validateAmazonPaySettings()) return;
+    if (!validateParamSecuritySettings()) return;
 
     try {
       const res = await api.post(
@@ -482,12 +504,13 @@ export const useScenario = (mode = 'scenario') => {
         tokenExpired();
       }
     }
-  }, [getConversationUrl, getSavePayload, handleGetMessage, isTemplateMode, validateAmazonPaySettings, validateAutoLogoutConfig, validateScenarioName]);
+  }, [getConversationUrl, getSavePayload, handleGetMessage, isTemplateMode, validateAmazonPaySettings, validateAutoLogoutConfig, validateParamSecuritySettings, validateScenarioName]);
 
   const onClickSavePreview = useCallback(() => {
     if (!validateScenarioName()) return;
     if (!validateAutoLogoutConfig()) return;
     if (!validateAmazonPaySettings()) return;
+    if (!validateParamSecuritySettings()) return;
 
     api.post(
       getConversationUrl(),
@@ -509,7 +532,7 @@ export const useScenario = (mode = 'scenario') => {
         tokenExpired();
       }
     });
-  }, [getConversationUrl, getSavePayload, handleGetMessage, isTemplateMode, validateAmazonPaySettings, validateAutoLogoutConfig, validateScenarioName]);
+  }, [getConversationUrl, getSavePayload, handleGetMessage, isTemplateMode, validateAmazonPaySettings, validateAutoLogoutConfig, validateParamSecuritySettings, validateScenarioName]);
 
   const handleOpenPreview = useCallback((isOpen) => {
     if (!isOpenPreview) return;
@@ -695,6 +718,7 @@ export const useScenario = (mode = 'scenario') => {
       amazonPayReadyMode,
       amazonPayDetectionForm,
       isUseAmazonPay,
+      paramSecurity,
       listProductVariants,
       isShopifyPaymentScenario,
       editorMode: mode,
@@ -794,6 +818,7 @@ export const useScenario = (mode = 'scenario') => {
       setAmazonPayReadyMode,
       setAmazonPayDetectionForm,
       setIsUseAmazonPay,
+      setParamSecurity,
       setListProductVariants,
       handleGetMessage,
       onClickSaveScenario,

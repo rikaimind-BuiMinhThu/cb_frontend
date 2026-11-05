@@ -14,6 +14,12 @@ import { createEmptyAutoLogoutConfig } from 'v2/views/ScenarioSetting/utils/auto
 import { applyAmazonPayCartPreset } from 'v2/views/ScenarioSetting/utils/amazonPayConfigUtils';
 import { fillTagFiringDefaults } from 'v2/views/ScenarioSetting/utils/tagFiringUtils';
 import { TAG_FIRING_LABELS } from '../../../constants/tagFiringLabels';
+import { PARAM_SECURITY_LABELS } from '../../../constants/paramSecurityLabels';
+import {
+  DEFAULT_PARAM_SECURITY,
+  PARAM_SECURITY_MODES,
+} from 'v2/variables/paramSecurityConstants';
+import { algorithmForMode } from '../../../utils/paramSecurityUtils';
 import {
   EXECUTION_POLICIES,
   EXECUTION_POLICY_OPTIONS,
@@ -53,6 +59,7 @@ const ScenarioSettingsMainView = ({ onClose }) => {
     isUseBtnUpdateTracking,
     isUseGlobalDelay,
     tagFiring,
+    paramSecurity,
     useFullwidthChatbotMobile,
     isShopifyPaymentScenario,
   } = state;
@@ -88,9 +95,12 @@ const ScenarioSettingsMainView = ({ onClose }) => {
     setIsUseBtnUpdateTracking,
     setIsUseGlobalDelay,
     setTagFiring,
+    setParamSecurity,
     setUseFullwidthChatbotMobile,
     navigateSettingsModalView,
   } = actions;
+  const paramSecurityMode = (paramSecurity || DEFAULT_PARAM_SECURITY).mode || PARAM_SECURITY_MODES.NONE;
+  const paramSecurityEnabled = paramSecurityMode !== PARAM_SECURITY_MODES.NONE;
 
   const client = contextClient || JSON.parse(sessionStorage.getItem('client') || 'null');
   const isApiPolicy = executionPolicy === EXECUTION_POLICIES.API;
@@ -442,6 +452,45 @@ const ScenarioSettingsMainView = ({ onClose }) => {
               </button>
             )}
           />
+          <ScenarioFormRow label={PARAM_SECURITY_LABELS.useParamSecurity}>
+            <div className="ss-param-security-mode-row">
+              <select
+                className="ss-input-value"
+                value={paramSecurityMode}
+                onChange={(event) => {
+                  const nextMode = event.target.value;
+                  setParamSecurity({
+                    ...(paramSecurity || DEFAULT_PARAM_SECURITY),
+                    mode: nextMode,
+                    algorithm: algorithmForMode(nextMode),
+                    params: nextMode === PARAM_SECURITY_MODES.NONE
+                      ? []
+                      : (paramSecurity?.params || []),
+                    key: nextMode === PARAM_SECURITY_MODES.ENCRYPT
+                      ? (paramSecurity?.key || null)
+                      : null,
+                    salt: nextMode === PARAM_SECURITY_MODES.HASH
+                      ? (paramSecurity?.salt || null)
+                      : null,
+                  });
+                }}
+                aria-label={PARAM_SECURITY_LABELS.mode}
+              >
+                <option value={PARAM_SECURITY_MODES.NONE}>{PARAM_SECURITY_LABELS.modeNone}</option>
+                <option value={PARAM_SECURITY_MODES.HASH}>{PARAM_SECURITY_LABELS.modeHash}</option>
+                <option value={PARAM_SECURITY_MODES.ENCRYPT}>{PARAM_SECURITY_LABELS.modeEncrypt}</option>
+              </select>
+              {paramSecurityEnabled && (
+                <button
+                  type="button"
+                  className="ss-settings-modal-action-link"
+                  onClick={() => navigateSettingsModalView(SETTINGS_MODAL_VIEWS.PARAM_SECURITY)}
+                >
+                  {PARAM_SECURITY_LABELS.openSettings}
+                </button>
+              )}
+            </div>
+          </ScenarioFormRow>
         </div>
       </section>
 

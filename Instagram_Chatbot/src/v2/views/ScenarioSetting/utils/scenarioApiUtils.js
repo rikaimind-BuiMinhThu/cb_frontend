@@ -20,6 +20,7 @@ import {
   parseAmazonPayConfigFromApi,
 } from './amazonPayConfigUtils';
 import { parseTagFiringFromApi } from './tagFiringUtils';
+import { parseParamSecurityFromApi, normalizeParamSecurity } from './paramSecurityUtils';
 import { normalizeMessagesNotUseButton } from './normalizeNotUseButton';
 
 const parseExecutionPolicy = (data) => {
@@ -164,6 +165,7 @@ export const parseScenarioResponse = (res) => {
     amazonPayConfig: parseAmazonPayConfigFromApi(data.amazon_pay_config),
     isUseAmazonPay: data.is_use_amazon_pay ?? (normalizeAllowedLpDomains(data.allowed_lp_domains || []).length > 0),
     tagFiring: parseTagFiringFromApi(data.tag_firing),
+    paramSecurity: parseParamSecurityFromApi(data.param_security),
   };
 };
 
@@ -212,6 +214,7 @@ export const buildScenarioSavePayload = (state) => {
     amazonPayConfig,
     isUseAmazonPay,
     tagFiring,
+    paramSecurity,
   } = state;
 
   return {
@@ -239,6 +242,7 @@ export const buildScenarioSavePayload = (state) => {
       ? normalizeAmazonPayConfig(amazonPayConfig)
       : normalizeAmazonPayConfig({}),
     tag_firing: tagFiring,
+    param_security: normalizeParamSecurity(paramSecurity),
     is_used_custom_css: isUseCustomCss,
     custom_css_content: customCssContent.final,
     is_used_html_ugc: isUseHtmlUgc,

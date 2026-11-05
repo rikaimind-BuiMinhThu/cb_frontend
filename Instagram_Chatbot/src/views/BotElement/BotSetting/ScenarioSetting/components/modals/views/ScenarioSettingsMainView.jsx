@@ -11,6 +11,11 @@ import {
   SETTINGS_MODAL_VIEWS,
 } from '../shared/scenarioModalTooltips';
 import { createEmptyAutoLogoutConfig } from '../../../utils/autoLogoutUtils';
+import {
+  DEFAULT_PARAM_SECURITY,
+  PARAM_SECURITY_MODES,
+  algorithmForMode,
+} from '../../../utils/paramSecurityUtils';
 
 const labelWithTooltip = (text, tooltipKey) => (
   <>
@@ -42,6 +47,7 @@ const ScenarioSettingsMainView = ({ onClose }) => {
     isClearLandingPageSession,
     isUseBtnUpdateTracking,
     isUseGlobalDelay,
+    paramSecurity,
     useFullwidthChatbotMobile,
     isShopifyPaymentScenario,
   } = state;
@@ -71,11 +77,14 @@ const ScenarioSettingsMainView = ({ onClose }) => {
     setAutoLogoutConfig,
     setIsUseBtnUpdateTracking,
     setIsUseGlobalDelay,
+    setParamSecurity,
     setUseFullwidthChatbotMobile,
     navigateSettingsModalView,
   } = actions;
 
   const client = contextClient || JSON.parse(sessionStorage.getItem('client') || 'null');
+  const paramSecurityMode = (paramSecurity || DEFAULT_PARAM_SECURITY).mode || PARAM_SECURITY_MODES.NONE;
+  const paramSecurityEnabled = paramSecurityMode !== PARAM_SECURITY_MODES.NONE;
 
   const handleToggleFukushashiki = (checked) => {
     setIsUseFukushashiki(checked);
@@ -369,6 +378,45 @@ const ScenarioSettingsMainView = ({ onClose }) => {
             )}
           />
         )}
+        <ScenarioFormRow label="パラメータ保護">
+          <div className="ss-param-security-mode-row">
+            <select
+              className="ss-input-value"
+              value={paramSecurityMode}
+              onChange={(event) => {
+                const nextMode = event.target.value;
+                setParamSecurity({
+                  ...(paramSecurity || DEFAULT_PARAM_SECURITY),
+                  mode: nextMode,
+                  algorithm: algorithmForMode(nextMode),
+                  params: nextMode === PARAM_SECURITY_MODES.NONE
+                    ? []
+                    : (paramSecurity?.params || []),
+                  key: nextMode === PARAM_SECURITY_MODES.ENCRYPT
+                    ? (paramSecurity?.key || null)
+                    : null,
+                  salt: nextMode === PARAM_SECURITY_MODES.HASH
+                    ? (paramSecurity?.salt || null)
+                    : null,
+                });
+              }}
+              aria-label="保護方式"
+            >
+              <option value={PARAM_SECURITY_MODES.NONE}>なし</option>
+              <option value={PARAM_SECURITY_MODES.HASH}>ハッシュ</option>
+              <option value={PARAM_SECURITY_MODES.ENCRYPT}>暗号化</option>
+            </select>
+            {paramSecurityEnabled && (
+              <button
+                type="button"
+                className="ss-settings-modal-action-link"
+                onClick={() => navigateSettingsModalView(SETTINGS_MODAL_VIEWS.PARAM_SECURITY)}
+              >
+                設定する →
+              </button>
+            )}
+          </div>
+        </ScenarioFormRow>
       </section>
 
       <ScenarioModalFooter

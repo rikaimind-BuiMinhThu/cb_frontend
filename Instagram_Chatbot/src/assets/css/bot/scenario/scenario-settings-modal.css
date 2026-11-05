@@ -265,6 +265,31 @@
   margin-bottom: 4px;
 }
 
+.ss-param-security-mode-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.ss-param-security-mode-row .ss-input-value {
+  max-width: 220px;
+}
+
+.ss-param-security-view__params {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ss-param-security-view__param {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #374151;
+}
+
 .ss-settings-modal-action-link {
   border: none;
   background: transparent;

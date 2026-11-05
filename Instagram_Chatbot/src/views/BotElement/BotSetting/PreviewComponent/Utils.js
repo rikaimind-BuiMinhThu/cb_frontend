@@ -8,6 +8,12 @@ import {
   CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE,
   MESSAGE_CONTENT_TYPES,
 } from "./Constants";
+import {
+  decryptTreeStrings,
+  getCachedParamSecurity,
+  transformOutboundUserResponse,
+} from "./paramSecurityTransform";
+import { PARAM_SECURITY_MODES } from "../ScenarioSetting/utils/paramSecurityUtils";
 
 const toNumber = (value, fallback = 0) => {
   const parsed = Number(value);
@@ -252,11 +258,34 @@ const sendConvertTextJapaneseRequest = (text) => {
   );
 }
 
-const sendScenarioUserResponse = (data) => {
-  return postToChatBotServer(
+const sendScenarioUserResponse = async (data) => {
+  const security = getCachedParamSecurity();
+  let payload = data;
+  try {
+    payload = await transformOutboundUserResponse(data, security);
+  } catch (error) {
+    console.error('param_security transform failed', error);
+    throw error;
+  }
+
+  const response = await postToChatBotServer(
     CHATBOT_SERVER.SEND_SCENARIO_USER_RESPONSE,
-    data
+    payload
   );
+
+  if (
+    security?.mode === PARAM_SECURITY_MODES.ENCRYPT
+    && security.key
+    && response?.data?.data
+  ) {
+    try {
+      response.data.data = await decryptTreeStrings(response.data.data, security.key);
+    } catch (error) {
+      console.error('param_security response decrypt failed', error);
+    }
+  }
+
+  return response;
 }
 
 const createStatusConversion = (data) => {

@@ -50,6 +50,7 @@ const ScenarioEditorPreviewPanel = () => {
     isUsedCrosssell,
     productIdCrossSell,
     isClearLandingPageSession,
+    paramSecurity,
     scenarioId,
     botId,
     editorSelectedRadioOption,
@@ -100,6 +101,7 @@ const ScenarioEditorPreviewPanel = () => {
     isUsedCrosssell,
     productIdCrossSell,
     isClearLandingPageSession,
+    paramSecurity,
   }), [
     coupon,
     customCssContent,
@@ -107,6 +109,7 @@ const ScenarioEditorPreviewPanel = () => {
     htmlUgcConfigContent,
     dataMessages,
     errMsgJsCode,
+    paramSecurity,
     errMsgSettingMode,
     errMsgFieldSelectors,
     errMsgFormSelectors,

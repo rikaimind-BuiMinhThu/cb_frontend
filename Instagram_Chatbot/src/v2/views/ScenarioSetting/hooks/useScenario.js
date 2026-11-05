@@ -39,6 +39,12 @@ import {
 } from 'v2/views/ScenarioSetting/utils/amazonPayConfigUtils';
 import { DEFAULT_EXECUTION_POLICY } from 'v2/variables/constants';
 import { DEFAULT_TAG_FIRING } from 'v2/variables/tagFiringConstants';
+import { DEFAULT_PARAM_SECURITY } from 'v2/variables/paramSecurityConstants';
+import {
+  normalizeParamSecurity,
+  validateParamSecurity,
+} from 'v2/views/ScenarioSetting/utils/paramSecurityUtils';
+import { PARAM_SECURITY_LABELS } from '../constants/paramSecurityLabels';
 
 const INITIAL_TIMER_CONFIG = {
   isOpen: false,
@@ -163,6 +169,7 @@ export const useScenario = (mode = 'scenario') => {
   const [amazonPayDetectionForm, setAmazonPayDetectionForm] = useState(() => amazonDetectionToForm());
   const [isUseAmazonPay, setIsUseAmazonPay] = useState(false);
   const [tagFiring, setTagFiring] = useState(DEFAULT_TAG_FIRING);
+  const [paramSecurity, setParamSecurity] = useState(DEFAULT_PARAM_SECURITY);
 
   const [listProductVariants, setListProductVariants] = useState([]);
 
@@ -246,6 +253,7 @@ export const useScenario = (mode = 'scenario') => {
     setAmazonPayDetectionForm(amazonDetectionToForm(parsedDetection));
     setIsUseAmazonPay(parsed.isUseAmazonPay || false);
     setTagFiring(parsed.tagFiring || DEFAULT_TAG_FIRING);
+    setParamSecurity(parsed.paramSecurity || DEFAULT_PARAM_SECURITY);
   }, []);
 
   const getConversationUrl = useCallback(() => {
@@ -357,6 +365,18 @@ export const useScenario = (mode = 'scenario') => {
     showNotification,
   ]);
 
+  const validateParamSecuritySettings = useCallback(() => {
+    const validation = validateParamSecurity(paramSecurity);
+    if (!validation.valid) {
+      const message = validation.message === 'keyRequired'
+        ? PARAM_SECURITY_LABELS.keyRequired
+        : PARAM_SECURITY_LABELS.paramsRequired;
+      showNotification(message);
+      return false;
+    }
+    return true;
+  }, [paramSecurity, showNotification]);
+
   const getSavePayload = useCallback(() => buildScenarioSavePayload({
     dataMessages,
     urlThanks,
@@ -410,6 +430,7 @@ export const useScenario = (mode = 'scenario') => {
     }),
     isUseAmazonPay,
     tagFiring,
+    paramSecurity: normalizeParamSecurity(paramSecurity),
   }), [
     autoLogoutConfig,
     allowedLpDomainsInput,
@@ -419,6 +440,7 @@ export const useScenario = (mode = 'scenario') => {
     amazonPayReadyMode,
     isUseAmazonPay,
     tagFiring,
+    paramSecurity,
     coupon,
     customCssContent,
     isUseHtmlUgc,
@@ -464,6 +486,7 @@ export const useScenario = (mode = 'scenario') => {
     if (!validateScenarioName()) return;
     if (!validateAutoLogoutConfig()) return;
     if (!validateAmazonPaySettings()) return;
+    if (!validateParamSecuritySettings()) return;
 
     try {
       const res = await api.post(
@@ -478,15 +501,21 @@ export const useScenario = (mode = 'scenario') => {
       handleGetMessage();
     } catch (error) {
       if (error.response?.data?.code === 0) {
+        const apiMessage = error.response?.data?.message;
+        if (apiMessage) {
+          antdMessage.warning(apiMessage);
+          return;
+        }
         tokenExpired();
       }
     }
-  }, [getConversationUrl, getSavePayload, handleGetMessage, isTemplateMode, validateAmazonPaySettings, validateAutoLogoutConfig, validateScenarioName]);
+  }, [getConversationUrl, getSavePayload, handleGetMessage, isTemplateMode, validateAmazonPaySettings, validateAutoLogoutConfig, validateParamSecuritySettings, validateScenarioName]);
 
   const onClickSavePreview = useCallback(() => {
     if (!validateScenarioName()) return;
     if (!validateAutoLogoutConfig()) return;
     if (!validateAmazonPaySettings()) return;
+    if (!validateParamSecuritySettings()) return;
 
     api.post(
       getConversationUrl(),
@@ -500,10 +529,15 @@ export const useScenario = (mode = 'scenario') => {
       handleGetMessage();
     }).catch((error) => {
       if (error?.response?.data?.code === 0) {
+        const apiMessage = error.response?.data?.message;
+        if (apiMessage) {
+          antdMessage.warning(apiMessage);
+          return;
+        }
         tokenExpired();
       }
     });
-  }, [getConversationUrl, getSavePayload, handleGetMessage, isTemplateMode, validateAmazonPaySettings, validateAutoLogoutConfig, validateScenarioName]);
+  }, [getConversationUrl, getSavePayload, handleGetMessage, isTemplateMode, validateAmazonPaySettings, validateAutoLogoutConfig, validateParamSecuritySettings, validateScenarioName]);
 
   useEffect(() => {
     if (isTemplateMode || !isShopifyPaymentScenario) {
@@ -664,6 +698,7 @@ export const useScenario = (mode = 'scenario') => {
       amazonPayDetectionForm,
       isUseAmazonPay,
       tagFiring,
+      paramSecurity,
       listProductVariants,
       isShopifyPaymentScenario,
       editorMode: mode,
@@ -764,6 +799,7 @@ export const useScenario = (mode = 'scenario') => {
       setAmazonPayDetectionForm,
       setIsUseAmazonPay,
       setTagFiring,
+      setParamSecurity,
       setListProductVariants,
       handleGetMessage,
       onClickSaveScenario,

@@ -61,6 +61,7 @@ import {
   setConversionParamToLocalStorage, postMessageToParent, executeLpJsCode, injectCustomJsCode
 } from "./PreviewFukushashiki/LPUtils";
 import { handleValidateField, ERROR_MESSAGES } from "./PreviewFukushashiki/ValidationUtils";
+import { setCachedParamSecurity } from "./PreviewComponent/paramSecurityTransform";
 
 const clearChatbotState = () => {
   sessionStorage.removeItem('chatbotH');
@@ -519,6 +520,8 @@ const PreviewFaq = () => {
 
   const getBotInforFromPreviewResponse = (res) => {
     if (!res || !res.data || !res.data.chatbot) return {};
+
+    setCachedParamSecurity(res.data.chatbot.param_security);
 
     let opacity_color, message_color, font_color, icon_mess;
     if (res.data.chatbot.main_color === "blue") {

@@ -1,0 +1,32 @@
+export const PARAM_SECURITY_LABELS = {
+  useParamSecurity: 'パラメータ保護',
+  openSettings: '設定する →',
+  mode: '保護方式',
+  modeNone: 'なし',
+  modeHash: 'ハッシュ',
+  modeEncrypt: '暗号化',
+  params: '対象パラメータ',
+  algorithm: 'アルゴリズム',
+  key: 'キー',
+  salt: 'ソルト',
+  cannotDecode: '復号できません',
+  keyRequired: 'キーを入力してください（8文字以上）',
+  paramsRequired: '対象パラメータを1つ以上選択してください',
+  saltHelp: '任意。bcrypt前に付与するペッパーです。空欄可。',
+};
+
+export const PARAM_SECURITY_PARAM_OPTIONS = [
+  { value: 'password', label: 'password' },
+  { value: 'credit_card_payment', label: 'credit_card_payment' },
+  { value: 'komoju_payment', label: 'komoju_payment' },
+  { value: 'paypal_payment', label: 'paypal_payment' },
+  { value: 'paidy_payment', label: 'paidy_payment' },
+  { value: 'user_email', label: 'user_email' },
+  { value: 'phone_number', label: 'phone_number' },
+  { value: 'user_name', label: 'user_name' },
+  { value: 'pin_code', label: 'pin_code' },
+  { value: 'user_password', label: 'user_password' },
+  { value: 'zip_code_address', label: 'zip_code_address' },
+  { value: 'birth_date', label: 'birth_date' },
+  { value: 'contact_form', label: 'contact_form' },
+];

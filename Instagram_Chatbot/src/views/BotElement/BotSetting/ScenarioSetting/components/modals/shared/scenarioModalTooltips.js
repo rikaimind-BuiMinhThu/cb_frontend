@@ -91,6 +91,7 @@ export const SETTINGS_MODAL_VIEWS = {
   AUTO_LOGOUT: 'autoLogout',
   AMAZON_PAY: 'amazonPay',
   GLOBAL_DELAY: 'globalDelay',
+  PARAM_SECURITY: 'paramSecurity',
 };
 
 export const AMAZON_PAY_DETECTION_HELP_TEXT = {
@@ -112,4 +113,5 @@ export const SETTINGS_VIEW_TITLES = {
   [SETTINGS_MODAL_VIEWS.AUTO_LOGOUT]: '自動ログアウト設定',
   [SETTINGS_MODAL_VIEWS.AMAZON_PAY]: 'Amazon Pay 連携設定',
   [SETTINGS_MODAL_VIEWS.GLOBAL_DELAY]: '表示待ち時間を設定する',
+  [SETTINGS_MODAL_VIEWS.PARAM_SECURITY]: 'パラメータ保護設定',
 };
