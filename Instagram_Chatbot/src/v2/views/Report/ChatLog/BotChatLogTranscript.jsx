@@ -358,6 +358,7 @@ const BotChatLogTranscript = ({
           titleBubble={botInfor?.title || botInfor?.titleBubble || ''}
           isOpen={CHAT_LOG_FRAME_IS_OPEN}
           designType={botInfor?.design_type}
+          themeSettings={themeSettings}
           showPopupCloseBot={false}
         >
           {messages.map((messageItem, indexMessage) => {

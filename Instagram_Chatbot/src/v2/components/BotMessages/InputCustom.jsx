@@ -1,9 +1,22 @@
 import React, { useState } from 'react';
 import { MDBIcon } from 'mdbreact';
 import CheckboxCustom from './CheckboxCustom';
+import {
+  isFloatPlaceholderEnabled,
+  usePreviewTheme,
+} from 'v2/views/Preview/PreviewComponent/PreviewThemeContext';
 import './InputCustom.css';
 
 const USE_DROPDOWN_LABEL = 'Use the dropdown';
+const FIELD_FLOAT_CLASS = 'field-float';
+const FIELD_FLOAT_FILLED_CLASS = 'field-float field-float--filled';
+const FIELD_FLOAT_LABEL_CLASS = 'field-float__label';
+
+const resolvePasswordToggleClass = (withClear) => {
+  if (withClear) return 'ss-password-toggle-icon ss-password-toggle-icon--with-clear';
+  if (withClear === false) return 'ss-password-toggle-icon ss-password-toggle-icon--no-clear';
+  return 'ss-password-toggle-icon ss-password-toggle-icon--default';
+};
 
 const InputCustom = ({
   id,
@@ -38,58 +51,76 @@ const InputCustom = ({
   ...props
 }) => {
   const [showPassword, setShowPassword] = useState(false);
+  const themeSettings = usePreviewTheme();
+  const useFloat = isFloatPlaceholderEnabled(themeSettings) && Boolean(placeholder);
   const resolvedClassLabel = classLabel || labelClassName;
+  const hasValue = Boolean(value);
+  const floatWrapperClass = hasValue ? FIELD_FLOAT_FILLED_CLASS : FIELD_FLOAT_CLASS;
 
   const handleTogglePassword = () => {
     setShowPassword(!showPassword);
   };
 
+  const passwordFieldClass = type === 'password' ? 'ss-input-custom-field--password' : '';
+  const clearableFieldClass = type !== 'password' && clearable ? 'ss-input-custom-field--with-clear' : '';
   const inputFieldClassName = [
     'ss-input-custom-field',
-    type === 'password' ? 'ss-input-custom-field--password' : clearable ? 'ss-input-custom-field--with-clear' : '',
+    passwordFieldClass,
+    clearableFieldClass,
     className,
   ].filter(Boolean).join(' ');
 
-  const renderInputField = (withClear) => (
-    <div className={`ss-input-custom-container ${containerClassName}`.trim()}>
-      <input
-        {...props}
-        id={id}
-        maxLength={maxLength}
-        type={type === 'password' && showPassword ? 'text' : type}
-        inputMode={inputMode}
-        onPaste={onPaste}
-        pattern={pattern}
-        onKeyPress={onKeyPress}
-        name="ss-user-setting__item-text_input-use-api"
-        className={`ss-input-value ${!useFukushashiki ? 'ss-user-setting-item' : ''} ${inputFieldClassName}`}
-        placeholder={placeholder}
-        disabled={disabled}
-        value={value ?? ''}
-        style={style}
-        onChange={e => onChange(e.target.value)}
-        readOnly={readOnly}
-        onCompositionStart={(e) => props?.onCompositionStart?.(e)}
-        onCompositionEnd={(e) => props?.onCompositionEnd?.(e)}
-      />
-      {type === 'password' && (
-        <MDBIcon
-          fas
-          icon={showPassword ? 'eye-slash' : 'eye'}
-          onClick={handleTogglePassword}
-          className={`ss-password-toggle-icon ${withClear ? 'ss-password-toggle-icon--with-clear' : withClear === false ? 'ss-password-toggle-icon--no-clear' : 'ss-password-toggle-icon--default'}`}
+  const renderInputField = (withClear) => {
+    const inputNode = (
+      <div className={`ss-input-custom-container ${containerClassName}`.trim()}>
+        <input
+          {...props}
+          id={id}
+          maxLength={maxLength}
+          type={type === 'password' && showPassword ? 'text' : type}
+          inputMode={inputMode}
+          onPaste={onPaste}
+          pattern={pattern}
+          onKeyPress={onKeyPress}
+          name="ss-user-setting__item-text_input-use-api"
+          className={`ss-input-value ${!useFukushashiki ? 'ss-user-setting-item' : ''} ${inputFieldClassName}`}
+          placeholder={useFloat ? '' : placeholder}
+          disabled={disabled}
+          value={value ?? ''}
+          style={style}
+          onChange={e => onChange(e.target.value)}
+          readOnly={readOnly}
+          onCompositionStart={(e) => props?.onCompositionStart?.(e)}
+          onCompositionEnd={(e) => props?.onCompositionEnd?.(e)}
         />
-      )}
-      {withClear && (
-        <MDBIcon
-          fas
-          icon="times"
-          onClick={() => onChange('')}
-          className="ss-clear-input-icon"
-        />
-      )}
-    </div>
-  );
+        {type === 'password' && (
+          <MDBIcon
+            fas
+            icon={showPassword ? 'eye-slash' : 'eye'}
+            onClick={handleTogglePassword}
+            className={resolvePasswordToggleClass(withClear)}
+          />
+        )}
+        {withClear && (
+          <MDBIcon
+            fas
+            icon="times"
+            onClick={() => onChange('')}
+            className="ss-clear-input-icon"
+          />
+        )}
+      </div>
+    );
+
+    if (!useFloat) return inputNode;
+
+    return (
+      <div className={floatWrapperClass}>
+        <span className={FIELD_FLOAT_LABEL_CLASS}>{placeholder}</span>
+        {inputNode}
+      </div>
+    );
+  };
 
   const labelElementClassName = [
     resolvedClassLabel,

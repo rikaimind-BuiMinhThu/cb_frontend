@@ -548,6 +548,7 @@ export const LABEL_SELECT = '選択';
 export const NEXT_BUTTON_LABEL = '次へ';
 export const PROCESS_BAR_COMPLETE_TEXT = '完了しました。';
 export const formatProcessBarRemainingText = (remainingCount) => `あと${remainingCount}問`;
+export const formatProcessBarFractionText = (current, max) => `${current}/${max}`;
 export const UPDATE_BUTTON_LABEL = '更新';
 export const OK_BUTTON_LABEL = 'OK';
 export const DELAY_SECONDS_UNIT = '秒';

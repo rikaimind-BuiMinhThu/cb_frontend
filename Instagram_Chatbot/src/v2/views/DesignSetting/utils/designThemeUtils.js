@@ -7,8 +7,11 @@ import {
   normalizeButtonEffect,
   normalizeButtonPosition,
   normalizeFieldFocusEffect,
+  normalizeFieldPlaceholderStyle,
+  normalizeHeaderChrome,
   normalizeMessageBorderStyle,
   normalizeModalTitleAlignment,
+  normalizeProgressLabelMode,
 } from 'v2/utils/designThemeCore';
 
 export {
@@ -20,10 +23,14 @@ export {
   normalizeMessageBorderStyle,
   normalizeButtonEffect,
   normalizeButtonPosition,
+  normalizeHeaderChrome,
+  normalizeProgressLabelMode,
+  normalizeFieldPlaceholderStyle,
   normalizeModalTitleAlignment,
   resolveModalTitleTextAlign,
   resolveButtonBorderRadius,
   buildButtonBounceKeyframes,
+  buildButtonShakeKeyframes,
   resolveButtonBounceEffect,
   resolveButtonWidthCss,
   resolveButtonPaddingCss,
@@ -58,6 +65,9 @@ const THEME_VALUE_NORMALIZERS = {
   buttonEffect: (value) => (value ? normalizeButtonEffect(value) : value),
   buttonPosition: (value) => (value ? normalizeButtonPosition(value) : value),
   modalTitleAlignment: (value) => (value ? normalizeModalTitleAlignment(value) : value),
+  headerChrome: (value) => (value ? normalizeHeaderChrome(value) : value),
+  progressLabelMode: (value) => (value ? normalizeProgressLabelMode(value) : value),
+  fieldPlaceholderStyle: (value) => (value ? normalizeFieldPlaceholderStyle(value) : value),
 };
 
 export const buildThemePayload = (themeSettings) => {

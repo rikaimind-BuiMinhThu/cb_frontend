@@ -11,7 +11,16 @@ import {
   THEME_PREVIEW_SAMPLE_SUBTITLE,
   THEME_PREVIEW_SAMPLE_TITLE,
 } from '../constants/designChatbotConstants';
+import {
+  HEADER_CHROME_LOGO,
+  PROGRESS_LABEL_MODE_FRACTION,
+} from '../constants/designThemeConstants';
+import { PreviewThemeContext } from 'v2/views/Preview/PreviewComponent/PreviewThemeContext';
 import PreviewRegion from './PreviewRegion';
+
+const HEADER_CLASS_BASE = 'sp-header theme-customize-preview__header';
+const HEADER_CLASS_LOGO = 'sp-header--logo';
+const PROCESS_BAR_FRACTION_CLASS = 'sp-process-bar--fraction';
 
 const ThemePreviewShell = ({
   scopeId,
@@ -46,14 +55,30 @@ const ThemePreviewShell = ({
   const displayTitle = title || (showPlaceholderLabels ? THEME_PREVIEW_SAMPLE_TITLE : '');
   const displaySubtitle = subtitle || (showPlaceholderLabels ? THEME_PREVIEW_SAMPLE_SUBTITLE : '');
   const barWidth = `${Math.min(Math.max(processPercent, 0), 100)}%`;
+  const isLogoChrome = themeSettings?.headerChrome === HEADER_CHROME_LOGO;
+  const isFractionProgress = themeSettings?.progressLabelMode === PROGRESS_LABEL_MODE_FRACTION;
+  const headerClassName = [HEADER_CLASS_BASE, isLogoChrome ? HEADER_CLASS_LOGO : '']
+    .filter(Boolean)
+    .join(' ');
+  const processBarClassName = [
+    'sp-process-bar',
+    isFractionProgress ? PROCESS_BAR_FRACTION_CLASS : '',
+  ].filter(Boolean).join(' ');
   const themeVars = {
     [THEME_CSS_VAR_MAIN_COLOR]: mainColor,
     [THEME_CSS_VAR_PROGRESS_WIDTH]: barWidth,
+    ...(themeSettings?.headerBgColor
+      ? { '--pof-header-bg': themeSettings.headerBgColor }
+      : {}),
+    ...(themeSettings?.headerLogoImage
+      ? { '--c-header-logo-image': `url("${themeSettings.headerLogoImage}")` }
+      : {}),
   };
   const designTypeClass = getDesignTypeClassName(designType);
   const rootClassName = `theme-customize-preview ${designTypeClass} ${className}`.trim();
 
   return (
+    <PreviewThemeContext.Provider value={themeSettings}>
     <div
       id={scopeId}
       className={rootClassName}
@@ -67,7 +92,7 @@ const ThemePreviewShell = ({
         onSectionSelect={onSectionSelect}
         className="theme-preview-region--header-wrap"
       >
-        <div className="sp-header theme-customize-preview__header">
+        <div className={headerClassName}>
           <PreviewRegion
             sectionId="headerMain"
             activeSectionId={activeSectionId}
@@ -97,9 +122,16 @@ const ThemePreviewShell = ({
         onSectionSelect={onSectionSelect}
         className="theme-preview-region--progress"
       >
-        <div className="sp-process-bar">
-          <div className="sp-process-bar-color">
-            {processLabel}
+        <div className={processBarClassName}>
+          {isFractionProgress ? (
+            <div className="sp-process-bar__meta">
+              <span className="sp-process-bar__step">{processLabel}</span>
+            </div>
+          ) : null}
+          <div className="sp-process-bar__track">
+            <div className="sp-process-bar-color">
+              {isFractionProgress ? null : processLabel}
+            </div>
           </div>
         </div>
       </PreviewRegion>
@@ -151,6 +183,7 @@ const ThemePreviewShell = ({
 
       {modalOverlay}
     </div>
+    </PreviewThemeContext.Provider>
   );
 };
 

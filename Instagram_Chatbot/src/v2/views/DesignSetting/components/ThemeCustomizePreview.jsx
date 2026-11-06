@@ -32,8 +32,65 @@ import {
   PREVIEW_VALIDATION_MESSAGE,
   THEME_PREVIEW_PROCESS_LABEL,
 } from '../constants/designChatbotConstants';
+import {
+  FIELD_PLACEHOLDER_STYLE_FLOAT,
+  PROGRESS_LABEL_MODE_FRACTION,
+  PROGRESS_LABEL_MODE_REMAINING,
+  THEME_PREVIEW_PROCESS_FRACTION_LABEL,
+  THEME_PREVIEW_PROCESS_REMAINING_LABEL,
+} from '../constants/designThemeConstants';
 
 const PREVIEW_SCOPE_ID = 'theme-customize-preview';
+const FIELD_FLOAT_CLASS = 'field-float';
+const FIELD_FLOAT_LABEL_CLASS = 'field-float__label';
+const FIELD_FLOAT_FOCUS_CLASS = 'field-float field-float--filled';
+
+const resolvePreviewProcessLabel = (themeSettings) => {
+  if (themeSettings?.progressLabelMode === PROGRESS_LABEL_MODE_FRACTION) {
+    return THEME_PREVIEW_PROCESS_FRACTION_LABEL;
+  }
+  if (themeSettings?.progressLabelMode === PROGRESS_LABEL_MODE_REMAINING) {
+    return THEME_PREVIEW_PROCESS_REMAINING_LABEL;
+  }
+  return THEME_PREVIEW_PROCESS_LABEL;
+};
+
+const PreviewFloatField = ({ placeholder, className, useFloat, filled }) => {
+  if (!useFloat) {
+    return (
+      <input
+        type="text"
+        readOnly
+        placeholder={placeholder}
+        className={className}
+      />
+    );
+  }
+
+  return (
+    <div className={filled ? FIELD_FLOAT_FOCUS_CLASS : FIELD_FLOAT_CLASS}>
+      <span className={FIELD_FLOAT_LABEL_CLASS}>{placeholder}</span>
+      <input
+        type="text"
+        readOnly
+        placeholder=""
+        className={className}
+      />
+    </div>
+  );
+};
+
+PreviewFloatField.propTypes = {
+  placeholder: PropTypes.string.isRequired,
+  className: PropTypes.string.isRequired,
+  useFloat: PropTypes.bool,
+  filled: PropTypes.bool,
+};
+
+PreviewFloatField.defaultProps = {
+  useFloat: false,
+  filled: false,
+};
 
 const BOT_MESSAGE_TAIL_PATH = 'M0 0 C7.59 0 15.18 0 23 0 C23.18 6.32 23.34 12.63 23.44 18.95 C23.48 21.1 23.53 23.25 23.6 25.4 C23.7 28.49 23.75 31.58 23.78 34.67 C23.82 35.63 23.86 36.58 23.91 37.57 C23.91 40.27 23.83 42.43 23 45 C20.61 47.35 18.05 48.68 15 50 C13.61 50.67 13.61 50.67 12.19 51.36 C3.42 54.53 -4.81 54.39 -14 54 C-14 53.34 -14 52.68 -14 52 C-13.31 51.7 -12.63 51.39 -11.92 51.08 C-11.02 50.66 -10.12 50.24 -9.19 49.81 C-8.29 49.41 -7.4 49 -6.48 48.58 C-3.39 46.61 -2.53 45.34 -1 42 C-0.54 38.78 -0.51 35.58 -0.49 32.32 C-0.47 31.4 -0.45 30.47 -0.43 29.52 C-0.38 26.58 -0.35 23.63 -0.31 20.69 C-0.28 18.69 -0.24 16.69 -0.21 14.69 C-0.12 9.79 -0.06 4.9 0 0 Z ';
 
@@ -131,7 +188,11 @@ const ThemeCustomizePreview = ({
   activeSectionId,
   onSectionSelect,
   showModalPreview,
-}) => (
+}) => {
+  const useFloat = themeSettings?.fieldPlaceholderStyle === FIELD_PLACEHOLDER_STYLE_FLOAT;
+  const processLabel = resolvePreviewProcessLabel(themeSettings);
+
+  return (
   <ThemePreviewShell
     scopeId={PREVIEW_SCOPE_ID}
     themeSettings={themeSettings}
@@ -139,7 +200,7 @@ const ThemeCustomizePreview = ({
     designType={designType}
     title={title}
     subtitle={subtitle}
-    processLabel={THEME_PREVIEW_PROCESS_LABEL}
+    processLabel={processLabel}
     processPercent={PREVIEW_PROCESS_PERCENT}
     errorPreviewText={PREVIEW_SAMPLE_ERROR}
     activeSectionId={activeSectionId}
@@ -199,17 +260,16 @@ const ThemeCustomizePreview = ({
         <span className="ss-message__content--user-text-input-title">{PREVIEW_FIELD_TITLE}</span>
       </div>
       <div className="theme-customize-preview__field-group">
-        <input
-          type="text"
-          readOnly
+        <PreviewFloatField
           placeholder={PREVIEW_INPUT_BLUR_PLACEHOLDER}
           className="theme-customize-preview__field ss-input-value"
+          useFloat={useFloat}
         />
-        <input
-          type="text"
-          readOnly
+        <PreviewFloatField
           placeholder={PREVIEW_INPUT_FOCUS_PLACEHOLDER}
           className="theme-customize-preview__field ss-input-value theme-preview--field-focus"
+          useFloat={useFloat}
+          filled
         />
       </div>
     </PreviewUserMessage>
@@ -225,11 +285,10 @@ const ThemeCustomizePreview = ({
         <span className="ss-message__content--user-text-input-required">{PREVIEW_REQUIRED_MARK}</span>
       </div>
       <div className="theme-customize-preview__field-group">
-        <input
-          type="text"
-          readOnly
+        <PreviewFloatField
           placeholder={PREVIEW_INPUT_PLACEHOLDER}
           className="theme-customize-preview__field ss-input-value"
+          useFloat={useFloat}
         />
       </div>
       <div className="validation-error-message">{PREVIEW_VALIDATION_MESSAGE}</div>
@@ -337,7 +396,8 @@ const ThemeCustomizePreview = ({
       </div>
     </PreviewUserMessage>
   </ThemePreviewShell>
-);
+  );
+};
 
 ThemeCustomizePreview.propTypes = {
   themeSettings: PropTypes.object.isRequired,

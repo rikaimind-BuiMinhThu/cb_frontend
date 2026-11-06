@@ -262,6 +262,12 @@ html {
     margin-top: 1px;
 }
 
+.sp-process-bar__track {
+    width: 100%;
+    overflow: hidden;
+    border-radius: inherit;
+}
+
 .sp-process-bar-color {
     font-size: 13px;
     min-width: 25%;
@@ -272,6 +278,48 @@ html {
     color: #FFFFFF;
     display: block;
     margin-top: 1px;
+    box-sizing: border-box;
+}
+
+.sp-process-bar--fraction {
+    background-color: transparent;
+    position: relative;
+    box-sizing: border-box;
+    padding: 6px 20px 10px;
+}
+
+.sp-process-bar--fraction .sp-process-bar__meta {
+    position: relative;
+    height: 18px;
+    margin-bottom: 4px;
+}
+
+.sp-process-bar--fraction .sp-process-bar__step {
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: var(--c-progress-text, #F48879);
+    font-size: var(--c-progress-font-size, 12px);
+    font-weight: var(--c-progress-weight, 700);
+    line-height: 18px;
+    letter-spacing: 0.5px;
+}
+
+.sp-process-bar--fraction .sp-process-bar__track {
+    background-color: var(--c-progress-bg, #FFFFFF);
+    border-radius: var(--c-progress-radius, 20px);
+    height: var(--c-progress-height, 10px);
+    overflow: hidden;
+}
+
+.sp-process-bar--fraction .sp-process-bar-color {
+    min-width: 0;
+    height: 100%;
+    margin-top: 0;
+    padding: 0;
+    color: transparent;
+    font-size: 0;
+    border-radius: inherit;
 }
 
 .sp-body {
@@ -2361,10 +2409,91 @@ slideUp
   overflow: hidden;
 }
 
+.preview-open-frame__header.sp-header--logo,
+.sp-header.sp-header--logo,
+.theme-customize-preview__header.sp-header--logo {
+  background-image: var(--c-header-logo-image, none);
+  background-position: center;
+  background-size: 25%;
+  background-repeat: no-repeat;
+  height: 34px;
+  min-height: 34px;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.sp-header--logo .sp-avatar-bt,
+.sp-header--logo .sp-header-left-label {
+  display: none;
+}
+
+.sp-header--logo .sp-header-left {
+  padding: 0 12px;
+}
+
+.sp-header--logo .sp-header-right {
+  padding: 4px 10px;
+}
+
+.sp-header--logo .sp-header-right-arrow {
+  color: #9e9e9e;
+  font-size: 16px;
+}
+
+.field-float {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.field-float__label {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: var(--c-field-placeholder-size, 16px);
+  font-weight: var(--c-field-placeholder-weight, 400);
+  color: #999;
+  pointer-events: none;
+  transition: top 0.15s ease, transform 0.15s ease, font-size 0.15s ease;
+  z-index: 1;
+  line-height: 1.2;
+}
+
+.field-float:focus-within .field-float__label,
+.field-float--filled .field-float__label {
+  top: 6px;
+  transform: translateY(0);
+  font-size: var(--c-field-placeholder-focus-size, 10px);
+}
+
+.field-float .ss-input-value,
+.field-float textarea {
+  padding: 8px 12px !important;
+  line-height: 18px;
+  box-sizing: border-box;
+  min-height: 55px !important;
+  height: 55px !important;
+}
+
+.field-float:focus-within .ss-input-value,
+.field-float:focus-within textarea,
+.field-float--filled .ss-input-value,
+.field-float--filled textarea {
+  padding-top: 18px !important;
+  padding-bottom: 6px !important;
+}
+
 /* Open-frame header avatar matches the closed bar (58px). */
 .preview-open-frame .sp-header {
   height: auto;
   min-height: 74px;
+}
+
+.preview-open-frame .sp-header.sp-header--logo,
+.preview-open-frame__header.sp-header--logo {
+  height: 34px;
+  min-height: 34px;
 }
 
 .preview-open-frame .sp-header-left {

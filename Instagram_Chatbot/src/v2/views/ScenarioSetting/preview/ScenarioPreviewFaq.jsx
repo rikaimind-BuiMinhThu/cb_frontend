@@ -813,6 +813,7 @@ const ScenarioPreviewFaq = ({
         isOpen={state.isOpen}
         onHeaderClick={() => onOpenPreview(!state.isOpen)}
         botConfig={state}
+        themeSettings={state.themeSettings}
         showPopupCloseBot={state.showPopupCloseBot}
         onClosePopup={() => setShowPopupCloseBot(false)}
         onCloseBot={() => onOpenPreview(false)}

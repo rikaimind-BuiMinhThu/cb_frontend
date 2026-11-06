@@ -34,9 +34,31 @@ export const MESSAGE_BORDER_STYLE_IDS = MESSAGE_BORDER_STYLE_OPTIONS.map(({ id }
 export const BUTTON_EFFECT_OPTIONS = [
   { id: 'none', label: 'なし' },
   { id: 'bounce', label: '動かす' },
+  { id: 'shake', label: '横揺れ' },
 ];
 
 export const BUTTON_EFFECT_IDS = BUTTON_EFFECT_OPTIONS.map(({ id }) => id);
+
+export const HEADER_CHROME_OPTIONS = [
+  { id: 'text', label: 'テキスト' },
+  { id: 'logo', label: 'ロゴ' },
+];
+
+export const HEADER_CHROME_IDS = HEADER_CHROME_OPTIONS.map(({ id }) => id);
+
+export const PROGRESS_LABEL_MODE_OPTIONS = [
+  { id: 'remaining', label: 'あとN問' },
+  { id: 'fraction', label: 'n/N' },
+];
+
+export const PROGRESS_LABEL_MODE_IDS = PROGRESS_LABEL_MODE_OPTIONS.map(({ id }) => id);
+
+export const FIELD_PLACEHOLDER_STYLE_OPTIONS = [
+  { id: 'native', label: 'ネイティブ' },
+  { id: 'float', label: 'フローティング' },
+];
+
+export const FIELD_PLACEHOLDER_STYLE_IDS = FIELD_PLACEHOLDER_STYLE_OPTIONS.map(({ id }) => id);
 
 export const BUTTON_POSITION_OPTIONS = [
   { id: 'left', label: '左' },
@@ -61,9 +83,18 @@ export const THEME_FIELD_KEYS = [
   'headerSubtitleTextColor',
   'headerSubtitleFontSize',
   'headerSubtitleBold',
+  'headerChrome',
+  'headerBgColor',
+  'headerHeight',
+  'headerLogoImage',
   'progressBarBgColor',
   'progressBarTextColor',
   'progressBarFontSize',
+  'progressBarBold',
+  'progressBarHeight',
+  'progressBarRadius',
+  'progressBarFillColor',
+  'progressLabelMode',
   'chatWindowBgColor',
   'botMessageBgColor',
   'botMessageTextColor',
@@ -85,7 +116,12 @@ export const THEME_FIELD_KEYS = [
   'fieldFontSize',
   'fieldTextBold',
   'fieldPlaceholderBold',
+  'fieldPlaceholderStyle',
+  'fieldPlaceholderFontSize',
+  'fieldPlaceholderFocusFontSize',
   'fieldTitleBold',
+  'fieldTitleFontSize',
+  'fieldTitleLetterSpacing',
   'validationMessageBgColor',
   'validationMessageTextColor',
   'validationMessageFontSize',
@@ -169,6 +205,29 @@ export const THEME_SECTIONS = [
       { key: 'headerSubtitleTextColor', label: '文字色' },
       { key: 'headerSubtitleFontSize', label: 'フォントサイズ', fieldType: 'fontSize' },
       { key: 'headerSubtitleBold', label: '太字', fieldType: 'checkbox', fullWidth: true },
+      { fieldType: 'groupLabel', label: 'ヘッダー見た目', fullWidth: true },
+      {
+        key: 'headerChrome',
+        label: '表示',
+        fieldType: 'headerChromeSelect',
+        fullWidth: true,
+      },
+      { key: 'headerBgColor', label: '背景色' },
+      {
+        key: 'headerHeight',
+        label: '高さ',
+        fieldType: 'pxSize',
+        min: 34,
+        max: 120,
+        fullWidth: true,
+      },
+      {
+        key: 'headerLogoImage',
+        label: 'ロゴ画像',
+        fieldType: 'imageUpload',
+        fullWidth: true,
+        visibleWhen: { key: 'headerChrome', value: 'logo' },
+      },
     ],
   },
   {
@@ -177,7 +236,31 @@ export const THEME_SECTIONS = [
     fields: [
       { key: 'progressBarBgColor', label: '背景色' },
       { key: 'progressBarTextColor', label: '文字色' },
-      { key: 'progressBarFontSize', label: 'フォントサイズ', fieldType: 'fontSize', fullWidth: true },
+      { key: 'progressBarFontSize', label: 'フォントサイズ', fieldType: 'fontSize' },
+      { key: 'progressBarBold', label: '太字', fieldType: 'checkbox', fullWidth: true },
+      {
+        key: 'progressBarHeight',
+        label: '高さ',
+        fieldType: 'pxSize',
+        min: 4,
+        max: 40,
+        fullWidth: true,
+      },
+      {
+        key: 'progressBarRadius',
+        label: '角丸',
+        fieldType: 'pxSize',
+        min: 0,
+        max: 40,
+        fullWidth: true,
+      },
+      { key: 'progressBarFillColor', label: '塗り色' },
+      {
+        key: 'progressLabelMode',
+        label: '表示',
+        fieldType: 'progressLabelModeSelect',
+        fullWidth: true,
+      },
     ],
   },
   {
@@ -221,8 +304,33 @@ export const THEME_SECTIONS = [
     fields: [
       { key: 'fieldFontSize', label: 'フォントサイズ', fieldType: 'fontSize', fullWidth: true },
       { key: 'fieldTextBold', label: '入力文字の太字', fieldType: 'checkbox', fullWidth: true },
-      { key: 'fieldPlaceholderBold', label: 'プレースホルダーの太字', fieldType: 'checkbox', fullWidth: true },
-      { key: 'fieldTitleBold', label: 'タイトルの太字', fieldType: 'checkbox', fullWidth: true },
+      { fieldType: 'groupLabel', label: 'タイトル', fullWidth: true },
+      { key: 'fieldTitleFontSize', label: 'フォントサイズ', fieldType: 'fontSize', fullWidth: true },
+      { key: 'fieldTitleBold', label: '太字', fieldType: 'checkbox', fullWidth: true },
+      {
+        key: 'fieldTitleLetterSpacing',
+        label: '字間',
+        fieldType: 'pxSize',
+        min: 0,
+        max: 10,
+        fullWidth: true,
+      },
+      { fieldType: 'groupLabel', label: 'プレースホルダー', fullWidth: true },
+      {
+        key: 'fieldPlaceholderStyle',
+        label: 'スタイル',
+        fieldType: 'placeholderStyleSelect',
+        fullWidth: true,
+      },
+      { key: 'fieldPlaceholderFontSize', label: '通常サイズ', fieldType: 'fontSize', fullWidth: true },
+      {
+        key: 'fieldPlaceholderFocusFontSize',
+        label: 'フォーカス時サイズ',
+        fieldType: 'fontSize',
+        fullWidth: true,
+        visibleWhen: { key: 'fieldPlaceholderStyle', value: 'float' },
+      },
+      { key: 'fieldPlaceholderBold', label: '太字', fieldType: 'checkbox', fullWidth: true },
       { fieldType: 'groupLabel', label: 'フォーカス時', fullWidth: true },
       { key: 'fieldFocusBorderColor', label: '枠線色' },
       { key: 'fieldFocusBorderWidth', label: '枠線の太さ', fieldType: 'borderWidth' },
@@ -390,5 +498,15 @@ export const THEME_MAIN_COLOR_HELPER =
 export const THEME_RESET_SECTION_LABEL = 'デフォルトに戻す';
 export const THEME_SECTION_NAV_ARIA_LABEL = 'テーマ設定セクション';
 export const THEME_COLOR_TEXT_PLACEHOLDER = '例: 0 0 0 2px rgba(50,122,237,0.3)';
+export const THEME_IMAGE_FILE_ACCEPT = 'image/*';
+export const THEME_IMAGE_SELECT_LABEL = '画像を選択';
+export const THEME_IMAGE_REMOVE_LABEL = '削除';
+export const THEME_IMAGE_UPLOAD_ALT = 'header logo';
+export const THEME_PREVIEW_PROCESS_FRACTION_LABEL = '1/6';
+export const THEME_PREVIEW_PROCESS_REMAINING_LABEL = 'あと6問';
+export const HEADER_CHROME_LOGO = 'logo';
+export const FIELD_PLACEHOLDER_STYLE_FLOAT = 'float';
+export const PROGRESS_LABEL_MODE_FRACTION = 'fraction';
+export const PROGRESS_LABEL_MODE_REMAINING = 'remaining';
 
 export { CAMEL_TO_SNAKE_THEME } from 'v2/utils/designThemeCore';

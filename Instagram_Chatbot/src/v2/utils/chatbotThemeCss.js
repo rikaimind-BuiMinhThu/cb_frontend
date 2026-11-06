@@ -194,9 +194,16 @@ const buildThemeVariables = (theme) => {
   --c-header-subtitle-text: ${theme.headerSubtitleTextColor};
   --c-header-subtitle-font-size: ${theme.headerSubtitleFontSize};
   --c-header-subtitle-weight: ${themeIsBold(theme.headerSubtitleBold) ? 700 : 400};
+  --c-header-bg: ${theme.headerBgColor || 'transparent'};
+  --c-header-logo-image: ${theme.headerLogoImage ? `url("${theme.headerLogoImage}")` : 'none'};
+  ${theme.headerHeight ? `--c-header-height: ${theme.headerHeight};` : ''}
   --c-progress-bg: ${theme.progressBarBgColor};
   --c-progress-text: ${theme.progressBarTextColor};
   --c-progress-font-size: ${theme.progressBarFontSize};
+  --c-progress-weight: ${themeIsBold(theme.progressBarBold) ? 700 : 400};
+  --c-progress-height: ${theme.progressBarHeight || '20px'};
+  --c-progress-radius: ${theme.progressBarRadius || '0px'};
+  --c-progress-fill: ${theme.progressBarFillColor || 'transparent'};
   --c-chat-window-bg: ${theme.chatWindowBgColor};
   --c-bot-msg-bg: ${theme.botMessageBgColor};
   --c-bot-msg-text: ${theme.botMessageTextColor};
@@ -215,7 +222,11 @@ const buildThemeVariables = (theme) => {
   --c-field-font-size: ${theme.fieldFontSize};
   --c-field-text-weight: ${themeIsBold(theme.fieldTextBold) ? 700 : 400};
   --c-field-placeholder-weight: ${themeIsBold(theme.fieldPlaceholderBold) ? 700 : 400};
+  --c-field-placeholder-size: ${theme.fieldPlaceholderFontSize || theme.fieldFontSize || '14px'};
+  --c-field-placeholder-focus-size: ${theme.fieldPlaceholderFocusFontSize || '10px'};
   --c-field-title-weight: ${themeIsBold(theme.fieldTitleBold) ? 700 : 400};
+  --c-field-title-size: ${theme.fieldTitleFontSize || theme.fieldFontSize || '14px'};
+  --c-field-title-tracking: ${theme.fieldTitleLetterSpacing || '0px'};
   --c-validation-bg: ${theme.validationMessageBgColor};
   --c-validation-text: ${theme.validationMessageTextColor};
   --c-validation-font-size: ${theme.validationMessageFontSize};
@@ -753,8 +764,38 @@ ${previewFieldPlaceholderSelector} {
   font-size: var(--c-field-font-size, 14px) !important;
 }` : '';
 
+  const headerBgOverride = theme.headerBgColor
+    ? `
+${scopedClass(scopeSelector, '.preview-open-frame__header')},
+${scopedClass(scopeSelector, '.sp-header')},
+${scopedClass(scopeSelector, '.theme-customize-preview__header')} {
+  background-color: ${theme.headerBgColor} !important;
+}`
+    : '';
+  const headerHeightOverride = theme.headerHeight
+    ? `
+${scopedClass(scopeSelector, '.sp-header')},
+${scopedClass(scopeSelector, '.preview-open-frame .sp-header')},
+${scopedClass(scopeSelector, '.preview-open-frame__header')},
+${scopedClass(scopeSelector, '.theme-customize-preview__header')},
+${scopedClass(scopeSelector, '.sp-header--logo')},
+${scopedClass(scopeSelector, '.preview-open-frame__header.sp-header--logo')},
+${scopedClass(scopeSelector, '.theme-customize-preview__header.sp-header--logo')} {
+  height: var(--c-header-height) !important;
+  min-height: var(--c-header-height) !important;
+}`
+    : '';
+  const progressFillOverride = theme.progressBarFillColor
+    ? `
+${scopedClass(scopeSelector, '.sp-process-bar-color')} {
+  --sp-process-bar-color: ${theme.progressBarFillColor};
+  background-color: ${theme.progressBarFillColor} !important;
+}`
+    : '';
+
   return `
 ${twinkleKeyframesCss}
+${headerBgOverride}
 ${scopedClass(scopeSelector, '.sp-header-left-label-title')} {
   color: var(--c-header-title-text, #fff) !important;
   font-size: var(--c-header-title-font-size, 15px) !important;
@@ -767,14 +808,80 @@ ${scopedClass(scopeSelector, '.sp-header-left-label-sub-title')} {
   font-weight: var(--c-header-subtitle-weight, 400) !important;
 }
 
+${scopedClass(scopeSelector, '.sp-header--logo')},
+${scopedClass(scopeSelector, '.preview-open-frame__header.sp-header--logo')},
+${scopedClass(scopeSelector, '.theme-customize-preview__header.sp-header--logo')} {
+  background-image: var(--c-header-logo-image, none) !important;
+  background-position: center !important;
+  background-size: 25% !important;
+  background-repeat: no-repeat !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+${headerHeightOverride}
+
+${scopedClass(scopeSelector, '.sp-header--logo .sp-avatar-bt')},
+${scopedClass(scopeSelector, '.sp-header--logo .sp-header-left-label')},
+${scopedClass(scopeSelector, '.theme-customize-preview__header.sp-header--logo .sp-avatar-bt')},
+${scopedClass(scopeSelector, '.theme-customize-preview__header.sp-header--logo .sp-header-left-label')} {
+  display: none !important;
+}
+
+${scopedClass(scopeSelector, '.sp-header--logo .sp-header-right-arrow')},
+${scopedClass(scopeSelector, '.theme-customize-preview__header.sp-header--logo .sp-header-right-arrow')} {
+  color: #9e9e9e !important;
+}
+
 ${scopedClass(scopeSelector, '.sp-process-bar')} {
   background-color: var(--c-progress-bg, #D6E0EF) !important;
+  border-radius: var(--c-progress-radius, 0px) !important;
+  overflow: hidden !important;
 }
 
 ${scopedClass(scopeSelector, '.sp-process-bar-color')} {
   color: var(--c-progress-text, #fff) !important;
   font-size: var(--c-progress-font-size, 13px) !important;
+  font-weight: var(--c-progress-weight, 400) !important;
+  height: var(--c-progress-height, 20px) !important;
+  border-radius: var(--c-progress-radius, 0px) !important;
+  line-height: var(--c-progress-height, 20px) !important;
 }
+
+${scopedClass(scopeSelector, '.sp-process-bar--fraction')} {
+  background-color: transparent !important;
+  overflow: visible !important;
+  border-radius: 0 !important;
+  min-height: 0 !important;
+  padding: 6px 20px 10px !important;
+  box-sizing: border-box !important;
+}
+
+${scopedClass(scopeSelector, '.sp-process-bar--fraction .sp-process-bar__step')} {
+  color: var(--c-progress-text, #F48879) !important;
+  font-size: var(--c-progress-font-size, 12px) !important;
+  font-weight: var(--c-progress-weight, 700) !important;
+}
+
+${scopedClass(scopeSelector, '.sp-process-bar--fraction .sp-process-bar__track')} {
+  background-color: var(--c-progress-bg, #FFFFFF) !important;
+  border-radius: var(--c-progress-radius, 20px) !important;
+  height: var(--c-progress-height, 10px) !important;
+  overflow: hidden !important;
+}
+
+${scopedClass(scopeSelector, '.sp-process-bar--fraction .sp-process-bar-color')} {
+  height: 100% !important;
+  min-width: 0 !important;
+  margin-top: 0 !important;
+  padding: 0 !important;
+  color: transparent !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+}
+${progressFillOverride}
 
 ${options.applyChatWindowBg ? `${scopeSelector ? spBodySelector : '#sp-body.sp-body, .sp-body'} {
   background-color: var(--c-chat-window-bg, #D6E0EF) !important;
@@ -805,8 +912,50 @@ ${fieldSelectSelectors} {
 }
 
 ${fieldPlaceholderSelectors} {
-  font-size: var(--c-field-font-size, 14px) !important;
+  font-size: var(--c-field-placeholder-size, var(--c-field-font-size, 14px)) !important;
   font-weight: var(--c-field-placeholder-weight, 400) !important;
+}
+
+${scopedClass(scopeSelector, '.field-float')} {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+}
+
+${scopedClass(scopeSelector, '.field-float__label')} {
+  position: absolute !important;
+  left: 8px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  font-size: var(--c-field-placeholder-size, 16px) !important;
+  font-weight: var(--c-field-placeholder-weight, 400) !important;
+  color: #999 !important;
+  pointer-events: none !important;
+  transition: top 0.15s ease, transform 0.15s ease, font-size 0.15s ease !important;
+  z-index: 1 !important;
+  line-height: 1.2 !important;
+}
+
+${scopedClass(scopeSelector, '.field-float:focus-within .field-float__label')},
+${scopedClass(scopeSelector, '.field-float--filled .field-float__label')} {
+  top: 6px !important;
+  transform: translateY(0) !important;
+  font-size: var(--c-field-placeholder-focus-size, 10px) !important;
+}
+
+${scopedClass(scopeSelector, '.field-float .ss-input-value')},
+${scopedClass(scopeSelector, '.field-float textarea')} {
+  padding: 8px 12px !important;
+  line-height: 18px !important;
+  box-sizing: border-box !important;
+}
+
+${scopedClass(scopeSelector, '.field-float:focus-within .ss-input-value')},
+${scopedClass(scopeSelector, '.field-float:focus-within textarea')},
+${scopedClass(scopeSelector, '.field-float--filled .ss-input-value')},
+${scopedClass(scopeSelector, '.field-float--filled textarea')} {
+  padding-top: 18px !important;
+  padding-bottom: 6px !important;
 }
 
 ${fieldScopeSelectors.map((fieldScope) => `${fieldScope} .ant-select-selection-placeholder`).join(',\n')} {
@@ -1028,6 +1177,8 @@ ${spBodySelector} .ss-input-custom-label,
 ${spBodySelector} .select-custom-label,
 ${spBodySelector} .ss-message__content--user-field-label {
   font-weight: var(--c-field-title-weight, 400) !important;
+  font-size: var(--c-field-title-size, var(--c-field-font-size, 14px)) !important;
+  letter-spacing: var(--c-field-title-tracking, 0px) !important;
 }
 
 ${userBubbleTextSelectors} {

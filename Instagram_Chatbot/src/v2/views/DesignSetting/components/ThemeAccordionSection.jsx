@@ -6,8 +6,11 @@ import {
   BUTTON_BORDER_STYLE_OPTIONS,
   BUTTON_EFFECT_OPTIONS,
   BUTTON_POSITION_OPTIONS,
+  FIELD_PLACEHOLDER_STYLE_OPTIONS,
+  HEADER_CHROME_OPTIONS,
   MESSAGE_BORDER_STYLE_OPTIONS,
   MODAL_TITLE_ALIGNMENT_OPTIONS,
+  PROGRESS_LABEL_MODE_OPTIONS,
   THEME_MAIN_COLOR_HELPER,
   THEME_RESET_SECTION_LABEL,
 } from '../constants/designThemeConstants';
@@ -18,13 +21,17 @@ import {
   normalizeButtonBorderStyle,
   normalizeButtonEffect,
   normalizeButtonPosition,
+  normalizeFieldPlaceholderStyle,
+  normalizeHeaderChrome,
   normalizeMessageBorderStyle,
   normalizeModalTitleAlignment,
+  normalizeProgressLabelMode,
 } from 'v2/views/DesignSetting/utils/designThemeUtils';
 import MainColorPicker from './MainColorPicker';
 import ThemeColorField from './ThemeColorField';
 import ThemeDimensionField from './ThemeDimensionField';
 import ThemeEffectSelectField from './ThemeEffectSelectField';
+import ThemeImageUploadField from './ThemeImageUploadField';
 import ThemeNumberField from './ThemeNumberField';
 import DesignSettingLabel from './shared/DesignSettingLabel';
 
@@ -37,6 +44,12 @@ const getGridItemClassName = ({ isColor = false, fullWidth = false, isHighlighte
     isHighlighted ? 'theme-field--highlighted' : '',
   ].filter(Boolean).join(' ')
 );
+
+const resolveNumberFieldBounds = (fieldType, min, max) => {
+  if (fieldType === 'borderWidth') return { min: 1, max: 12 };
+  if (fieldType === 'pxSize') return { min: min ?? 0, max: max ?? 40 };
+  return { min: 8, max: 32 };
+};
 
 const ThemeAccordionSection = ({
   sectionId,
@@ -56,7 +69,24 @@ const ThemeAccordionSection = ({
   onModalPreviewToggle,
 }) => {
   const renderField = (field, index) => {
-    const { key, label, isText, fieldType, fullWidth, effectOptions, unit, unitOptions } = field;
+    const {
+      key,
+      label,
+      isText,
+      fieldType,
+      fullWidth,
+      effectOptions,
+      unit,
+      unitOptions,
+      visibleWhen,
+      min,
+      max,
+    } = field;
+
+    if (visibleWhen) {
+      const currentValue = themeSettings[visibleWhen.key];
+      if (currentValue !== visibleWhen.value) return null;
+    }
 
     if (fieldType === 'groupLabel') {
       return (
@@ -189,6 +219,68 @@ const ThemeAccordionSection = ({
       );
     }
 
+    if (fieldType === 'headerChromeSelect') {
+      return (
+        <div key={key} className={wrapperClassName}>
+          <ThemeEffectSelectField
+            label={label}
+            value={themeSettings[key]}
+            fullWidth={isFullWidth}
+            tooltipKey={key}
+            options={HEADER_CHROME_OPTIONS}
+            normalizeValue={normalizeHeaderChrome}
+            onChange={(value) => onFieldChange(key, value)}
+          />
+        </div>
+      );
+    }
+
+    if (fieldType === 'progressLabelModeSelect') {
+      return (
+        <div key={key} className={wrapperClassName}>
+          <ThemeEffectSelectField
+            label={label}
+            value={themeSettings[key]}
+            fullWidth={isFullWidth}
+            tooltipKey={key}
+            options={PROGRESS_LABEL_MODE_OPTIONS}
+            normalizeValue={normalizeProgressLabelMode}
+            onChange={(value) => onFieldChange(key, value)}
+          />
+        </div>
+      );
+    }
+
+    if (fieldType === 'placeholderStyleSelect') {
+      return (
+        <div key={key} className={wrapperClassName}>
+          <ThemeEffectSelectField
+            label={label}
+            value={themeSettings[key]}
+            fullWidth={isFullWidth}
+            tooltipKey={key}
+            options={FIELD_PLACEHOLDER_STYLE_OPTIONS}
+            normalizeValue={normalizeFieldPlaceholderStyle}
+            onChange={(value) => onFieldChange(key, value)}
+          />
+        </div>
+      );
+    }
+
+    if (fieldType === 'imageUpload') {
+      return (
+        <div key={key} className={wrapperClassName}>
+          <ThemeImageUploadField
+            label={label}
+            value={themeSettings[key]}
+            fullWidth={isFullWidth}
+            tooltipKey={key}
+            onChange={(value) => onFieldChange(key, value)}
+          />
+        </div>
+      );
+    }
+
     if (fieldType === 'modalPreviewToggle') {
       if (sectionId !== 'modal') return null;
 
@@ -225,7 +317,8 @@ const ThemeAccordionSection = ({
       );
     }
 
-    if (fieldType === 'fontSize' || fieldType === 'borderWidth') {
+    if (fieldType === 'fontSize' || fieldType === 'borderWidth' || fieldType === 'pxSize') {
+      const bounds = resolveNumberFieldBounds(fieldType, min, max);
       return (
         <div key={key} className={wrapperClassName}>
           <ThemeNumberField
@@ -233,8 +326,8 @@ const ThemeAccordionSection = ({
             value={themeSettings[key]}
             fullWidth={isFullWidth}
             tooltipKey={key}
-            min={fieldType === 'borderWidth' ? 1 : 8}
-            max={fieldType === 'borderWidth' ? 12 : 32}
+            min={bounds.min}
+            max={bounds.max}
             onChange={(value) => onFieldChange(key, value)}
           />
         </div>

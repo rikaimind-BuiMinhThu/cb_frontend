@@ -14,10 +14,13 @@ const DEFAULT_MAIN_COLOR = '#327AED';
 const FIELD_FOCUS_EFFECT_IDS = ['none', 'outline_soft', 'outline_strong', 'border_twinkle'];
 const BORDER_TWINKLE_EFFECT_IDS = ['none', 'twinkle'];
 const BUTTON_BORDER_STYLE_IDS = ['square', 'rounded', 'pill'];
-const BUTTON_EFFECT_IDS = ['none', 'bounce'];
+const BUTTON_EFFECT_IDS = ['none', 'bounce', 'shake'];
 const BUTTON_POSITION_IDS = ['left', 'center', 'right'];
 const MESSAGE_BORDER_STYLE_IDS = ['with_tail', 'no_tail'];
 const MODAL_TITLE_ALIGNMENT_IDS = ['left', 'center', 'right'];
+const HEADER_CHROME_IDS = ['text', 'logo'];
+const PROGRESS_LABEL_MODE_IDS = ['remaining', 'fraction'];
+const FIELD_PLACEHOLDER_STYLE_IDS = ['native', 'float'];
 
 export const THEME_FIELD_KEYS = [
   'headerTitleTextColor',
@@ -26,9 +29,18 @@ export const THEME_FIELD_KEYS = [
   'headerSubtitleTextColor',
   'headerSubtitleFontSize',
   'headerSubtitleBold',
+  'headerChrome',
+  'headerBgColor',
+  'headerHeight',
+  'headerLogoImage',
   'progressBarBgColor',
   'progressBarTextColor',
   'progressBarFontSize',
+  'progressBarBold',
+  'progressBarHeight',
+  'progressBarRadius',
+  'progressBarFillColor',
+  'progressLabelMode',
   'chatWindowBgColor',
   'botMessageBgColor',
   'botMessageTextColor',
@@ -50,7 +62,12 @@ export const THEME_FIELD_KEYS = [
   'fieldFontSize',
   'fieldTextBold',
   'fieldPlaceholderBold',
+  'fieldPlaceholderStyle',
+  'fieldPlaceholderFontSize',
+  'fieldPlaceholderFocusFontSize',
   'fieldTitleBold',
+  'fieldTitleFontSize',
+  'fieldTitleLetterSpacing',
   'validationMessageBgColor',
   'validationMessageTextColor',
   'validationMessageFontSize',
@@ -108,9 +125,18 @@ export const CAMEL_TO_SNAKE_THEME = {
   headerSubtitleTextColor: 'header_subtitle_text_color',
   headerSubtitleFontSize: 'header_subtitle_font_size',
   headerSubtitleBold: 'header_subtitle_bold',
+  headerChrome: 'header_chrome',
+  headerBgColor: 'header_bg_color',
+  headerHeight: 'header_height',
+  headerLogoImage: 'header_logo_image',
   progressBarBgColor: 'progress_bar_bg_color',
   progressBarTextColor: 'progress_bar_text_color',
   progressBarFontSize: 'progress_bar_font_size',
+  progressBarBold: 'progress_bar_bold',
+  progressBarHeight: 'progress_bar_height',
+  progressBarRadius: 'progress_bar_radius',
+  progressBarFillColor: 'progress_bar_fill_color',
+  progressLabelMode: 'progress_label_mode',
   chatWindowBgColor: 'chat_window_bg_color',
   botMessageBgColor: 'bot_message_bg_color',
   botMessageTextColor: 'bot_message_text_color',
@@ -132,7 +158,12 @@ export const CAMEL_TO_SNAKE_THEME = {
   fieldFontSize: 'field_font_size',
   fieldTextBold: 'field_text_bold',
   fieldPlaceholderBold: 'field_placeholder_bold',
+  fieldPlaceholderStyle: 'field_placeholder_style',
+  fieldPlaceholderFontSize: 'field_placeholder_font_size',
+  fieldPlaceholderFocusFontSize: 'field_placeholder_focus_font_size',
   fieldTitleBold: 'field_title_bold',
+  fieldTitleFontSize: 'field_title_font_size',
+  fieldTitleLetterSpacing: 'field_title_letter_spacing',
   validationMessageBgColor: 'validation_message_bg_color',
   validationMessageTextColor: 'validation_message_text_color',
   validationMessageFontSize: 'validation_message_font_size',
@@ -222,8 +253,12 @@ const VALID_BUTTON_EFFECT_IDS = new Set(BUTTON_EFFECT_IDS);
 const VALID_BUTTON_POSITION_IDS = new Set(BUTTON_POSITION_IDS);
 const VALID_MESSAGE_BORDER_STYLE_IDS = new Set(MESSAGE_BORDER_STYLE_IDS);
 const VALID_MODAL_TITLE_ALIGNMENT_IDS = new Set(MODAL_TITLE_ALIGNMENT_IDS);
+const VALID_HEADER_CHROME_IDS = new Set(HEADER_CHROME_IDS);
+const VALID_PROGRESS_LABEL_MODE_IDS = new Set(PROGRESS_LABEL_MODE_IDS);
+const VALID_FIELD_PLACEHOLDER_STYLE_IDS = new Set(FIELD_PLACEHOLDER_STYLE_IDS);
 
 const BUTTON_BOUNCE_ANIMATION = 'themeButtonBounce 1.2s ease-in-out infinite';
+const BUTTON_SHAKE_ANIMATION = 'themeButtonShake 1.8s ease-in-out infinite';
 
 const BUTTON_BORDER_RADIUS_BY_STYLE = {
   square: '0',
@@ -304,6 +339,24 @@ export const normalizeButtonEffect = (value) => {
   return 'none';
 };
 
+export const normalizeHeaderChrome = (value) => {
+  if (!value) return 'text';
+  if (VALID_HEADER_CHROME_IDS.has(value)) return value;
+  return 'text';
+};
+
+export const normalizeProgressLabelMode = (value) => {
+  if (!value) return 'remaining';
+  if (VALID_PROGRESS_LABEL_MODE_IDS.has(value)) return value;
+  return 'remaining';
+};
+
+export const normalizeFieldPlaceholderStyle = (value) => {
+  if (!value) return 'native';
+  if (VALID_FIELD_PLACEHOLDER_STYLE_IDS.has(value)) return value;
+  return 'native';
+};
+
 export const normalizeButtonPosition = (value) => {
   if (!value) return 'right';
   if (VALID_BUTTON_POSITION_IDS.has(value)) return value;
@@ -332,15 +385,29 @@ export const buildButtonBounceKeyframes = () => `
   50% { transform: translateY(-4px); }
 }`;
 
+export const buildButtonShakeKeyframes = () => `
+@keyframes themeButtonShake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-6px); }
+  20%, 40%, 60%, 80% { transform: translateX(6px); }
+}`;
+
 export const resolveButtonBounceEffect = (effectId) => {
-  if (normalizeButtonEffect(effectId) !== 'bounce') {
-    return { animation: 'none', keyframesCss: '' };
+  const effect = normalizeButtonEffect(effectId);
+  if (effect === 'bounce') {
+    return {
+      animation: BUTTON_BOUNCE_ANIMATION,
+      keyframesCss: buildButtonBounceKeyframes(),
+    };
+  }
+  if (effect === 'shake') {
+    return {
+      animation: BUTTON_SHAKE_ANIMATION,
+      keyframesCss: buildButtonShakeKeyframes(),
+    };
   }
 
-  return {
-    animation: BUTTON_BOUNCE_ANIMATION,
-    keyframesCss: buildButtonBounceKeyframes(),
-  };
+  return { animation: 'none', keyframesCss: '' };
 };
 
 export const resolveButtonWidthCss = (widthValue) => {
@@ -492,9 +559,18 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
     headerSubtitleTextColor: '#ffffff',
     headerSubtitleFontSize: '14px',
     headerSubtitleBold: false,
+    headerChrome: 'text',
+    headerBgColor: '',
+    headerHeight: '',
+    headerLogoImage: '',
     progressBarBgColor: opacityColor,
     progressBarTextColor: '#ffffff',
     progressBarFontSize: '13px',
+    progressBarBold: false,
+    progressBarHeight: '20px',
+    progressBarRadius: '0px',
+    progressBarFillColor: '',
+    progressLabelMode: 'remaining',
     chatWindowBgColor,
     botMessageBgColor: messageColor,
     botMessageTextColor: fontColor,
@@ -517,7 +593,12 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
     fieldFontSize: '14px',
     fieldTextBold: false,
     fieldPlaceholderBold: false,
+    fieldPlaceholderStyle: 'native',
+    fieldPlaceholderFontSize: '',
+    fieldPlaceholderFocusFontSize: '10px',
     fieldTitleBold: false,
+    fieldTitleFontSize: '',
+    fieldTitleLetterSpacing: '0px',
     validationMessageBgColor: 'transparent',
     validationMessageTextColor: '#FF7E00',
     validationMessageFontSize: '12px',
@@ -604,6 +685,9 @@ export const mergeThemeWithDefaults = (rawTheme, mainColorHex, apiColorKey) => {
   merged.buttonEffect = normalizeButtonEffect(merged.buttonEffect);
   merged.buttonPosition = normalizeButtonPosition(merged.buttonPosition);
   merged.modalTitleAlignment = normalizeModalTitleAlignment(merged.modalTitleAlignment);
+  merged.headerChrome = normalizeHeaderChrome(merged.headerChrome);
+  merged.progressLabelMode = normalizeProgressLabelMode(merged.progressLabelMode);
+  merged.fieldPlaceholderStyle = normalizeFieldPlaceholderStyle(merged.fieldPlaceholderStyle);
 
   const legacyHeaderColor = rawTheme.headerTextColor ?? rawTheme.header_text_color;
   if (legacyHeaderColor) {

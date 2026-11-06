@@ -1,24 +1,24 @@
-import React from 'react';
-import ContentPreviewShell from '../shared/ContentPreviewShell';
-import { RADIO_BUTTON_TYPES } from '../../constants/contentTypeConstants';
-import { PREVIEW_LABELS } from '../../constants/scenarioSettingLabels';
+import React from "react";
+import ContentPreviewShell from "../shared/ContentPreviewShell";
+import { RADIO_BUTTON_TYPES } from "../../constants/contentTypeConstants";
+import { PREVIEW_LABELS } from "../../constants/scenarioSettingLabels";
 import {
   getRadioImgGridStyle,
   getImgGridClassName,
   normalizeRadioButtonImgLayout,
-} from 'v2/views/ScenarioSetting/utils/radioButtonImgLayoutUtils';
+} from "v2/views/ScenarioSetting/utils/radioButtonImgLayoutUtils";
 import {
   buildEditorRadioOptionDataAttr,
   isEditorRadioOptionHighlighted,
   isRadioOptionInitiallySelected,
-} from 'v2/views/ScenarioSetting/utils/radioButtonSelectionUtils';
+} from "v2/views/ScenarioSetting/utils/radioButtonSelectionUtils";
 import {
   getGenderOptions,
   isGenderRadio,
-} from 'v2/views/ScenarioSetting/utils/radioButtonGenderUtils';
-import '../../styles/contentPreviews/radioButton.css';
-import 'v2/assets/css/bot/preview-chat-bot.css';
-import { EMPTY_INPUT_VALUE } from 'v2/views/Preview/PreviewComponent/Constants';
+} from "v2/views/ScenarioSetting/utils/radioButtonGenderUtils";
+import "../../styles/contentPreviews/radioButton.css";
+import "v2/assets/css/bot/preview-chat-bot.css";
+import { EMPTY_INPUT_VALUE } from "v2/views/Preview/PreviewComponent/Constants";
 
 const RadioButtonPreview = ({
   radioButton,
@@ -26,15 +26,16 @@ const RadioButtonPreview = ({
   indexContent,
   editorSelectedRadioOption,
 }) => {
-  const getEditorHighlightClassName = (item) => (
+  const getEditorHighlightClassName = (item) =>
     isEditorRadioOptionHighlighted(
       editorSelectedRadioOption,
       indexMessageSelect,
       indexContent,
       radioButton.type,
-      item,
-    ) ? 'ss-radio-button-preview__option--selected' : ''
-  );
+      item
+    )
+      ? "ss-radio-button-preview__option--selected"
+      : "";
 
   const renderHeader = () => {
     if (!radioButton.title_require && !radioButton.require) return null;
@@ -54,19 +55,26 @@ const RadioButtonPreview = ({
     );
   };
 
-  const renderDefaultType = () => (
+  const renderDefaultType = () =>
     radioButton[radioButton.type].map((item, index) => {
       const inputId = `ss-radio-button-preview-default-${index}`;
       const isSelected = isRadioOptionInitiallySelected(radioButton, item);
       return (
         <div
           key={index}
-          data-editor-radio-option={buildEditorRadioOptionDataAttr(indexContent, item)}
+          data-editor-radio-option={buildEditorRadioOptionDataAttr(
+            indexContent,
+            item
+          )}
           className={[
-            'ss-message__content--user-radio_button',
-            isSelected ? 'ss-message__content--user-radio_button--selected' : '',
+            "ss-message__content--user-radio_button",
+            isSelected
+              ? "ss-message__content--user-radio_button--selected"
+              : "",
             getEditorHighlightClassName(item),
-          ].filter(Boolean).join(' ')}
+          ]
+            .filter(Boolean)
+            .join(" ")}
         >
           <input
             type="radio"
@@ -75,49 +83,57 @@ const RadioButtonPreview = ({
             disabled
             checked={isSelected}
           />
-          {item.text && (
-            <label htmlFor={inputId}>{item.text}</label>
-          )}
+          {item.text && <label htmlFor={inputId}>{item.text}</label>}
         </div>
       );
-    })
-  );
+    });
 
   const renderGenderType = () => {
     const options = getGenderOptions(radioButton);
-    const displayClass = radioButton.gender_display_type === 'vertical'
-      ? 'gender-display-column'
-      : radioButton.gender_display_type === 'horizontal'
-        ? 'gender-display-row'
+    const displayClass =
+      radioButton.gender_display_type === "vertical"
+        ? "gender-display-column"
+        : radioButton.gender_display_type === "horizontal"
+        ? "gender-display-row"
         : EMPTY_INPUT_VALUE;
 
     return (
       <div className="options-gender_wrapper">
         <div className={`options-gender_wrapper-item ${displayClass}`}>
           {options.map((item) => {
-            const isSelected = isRadioOptionInitiallySelected(radioButton, item);
+            const isSelected = isRadioOptionInitiallySelected(
+              radioButton,
+              item
+            );
             const buttonColor = item?.preset_config?.preset?.button?.default;
             const icon = item?.preset_config?.preset?.icon;
             return (
               <div
                 key={item.id}
-                data-editor-radio-option={buildEditorRadioOptionDataAttr(indexContent, item)}
+                data-editor-radio-option={buildEditorRadioOptionDataAttr(
+                  indexContent,
+                  item
+                )}
                 className={[
-                  'option-gender-item',
-                  buttonColor ? 'option-gender-item--preset' : '',
-                  isSelected ? 'ss-radio-button-preview__option--selected' : '',
+                  "option-gender-item",
+                  buttonColor ? "option-gender-item--preset" : "",
+                  isSelected ? "ss-radio-button-preview__option--selected" : "",
                   getEditorHighlightClassName(item),
-                ].filter(Boolean).join(' ')}
-                style={buttonColor ? { '--gender-btn-bg': buttonColor } : undefined}
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                style={
+                  buttonColor ? { "--gender-btn-bg": buttonColor } : undefined
+                }
               >
                 {icon?.url ? (
                   <div
                     className="ico option-gender-icon-mask"
                     style={{
-                      '--gender-icon-mask': `url(${icon.url})`,
-                      '--gender-icon-color': icon.default,
-                      '--gender-icon-width': `${icon.width || 24}px`,
-                      '--gender-icon-height': `${icon.height || 24}px`,
+                      "--gender-icon-mask": `url(${icon.url})`,
+                      "--gender-icon-color": icon.default,
+                      "--gender-icon-width": `${icon.width || 24}px`,
+                      "--gender-icon-height": `${icon.height || 24}px`,
                     }}
                   />
                 ) : (
@@ -134,16 +150,21 @@ const RadioButtonPreview = ({
   const renderImgType = () => {
     const items = radioButton[radioButton.type] || [];
     const layout = normalizeRadioButtonImgLayout(radioButton);
-    const gridStyle = getRadioImgGridStyle(radioButton);
     const gridClassName = getImgGridClassName(
-      'ss-message__content--user-radio_button-img-grid',
-      layout.type,
+      "ss-message__content--user-radio_button-img-grid",
+      layout.type
     );
 
     return (
       <div
         className={gridClassName}
-        style={gridStyle}
+        ref={(element) => {
+          if (!element) return;
+          const vars = getRadioImgGridStyle(radioButton);
+          Object.entries(vars).forEach(([name, value]) => {
+            element.style.setProperty(name, value);
+          });
+        }}
       >
         {items.map((item, index) => {
           const inputId = `ss-radio-button-preview-img-${index}`;
@@ -151,12 +172,19 @@ const RadioButtonPreview = ({
           return (
             <div
               key={index}
-              data-editor-radio-option={buildEditorRadioOptionDataAttr(indexContent, item)}
+              data-editor-radio-option={buildEditorRadioOptionDataAttr(
+                indexContent,
+                item
+              )}
               className={[
-                'ss-message__content--user-radio_button--radio_button_img',
-                isSelected ? 'ss-message__content--user-radio_button--selected' : '',
+                "ss-message__content--user-radio_button--radio_button_img",
+                isSelected
+                  ? "ss-message__content--user-radio_button--selected"
+                  : "",
                 getEditorHighlightClassName(item),
-              ].filter(Boolean).join(' ')}
+              ]
+                .filter(Boolean)
+                .join(" ")}
             >
               <input
                 type="radio"
@@ -190,32 +218,35 @@ const RadioButtonPreview = ({
               disabled
               checked={false}
             />
-            <label htmlFor={inputId}>
-              {PREVIEW_LABELS.placeholderLabel}
-            </label>
+            <label htmlFor={inputId}>{PREVIEW_LABELS.placeholderLabel}</label>
           </div>
         );
       })}
     </>
   );
 
-  const renderBlockStyleType = () => (
-    radioButton[radioButton.type].map((item, index) => (
-      item.text && (
-        <div
-          key={index}
-          data-editor-radio-option={buildEditorRadioOptionDataAttr(indexContent, item)}
-          className={[
-            'ss-message__content--user-radio_button--block_style',
-            'ss-radio-button-preview__block-item',
-            getEditorHighlightClassName(item),
-          ].filter(Boolean).join(' ')}
-        >
-          <span>{item.text}</span>
-        </div>
-      )
-    ))
-  );
+  const renderBlockStyleType = () =>
+    radioButton[radioButton.type].map(
+      (item, index) =>
+        item.text && (
+          <div
+            key={index}
+            data-editor-radio-option={buildEditorRadioOptionDataAttr(
+              indexContent,
+              item
+            )}
+            className={[
+              "ss-message__content--user-radio_button--block_style",
+              "ss-radio-button-preview__block-item",
+              getEditorHighlightClassName(item),
+            ]
+              .filter(Boolean)
+              .join(" ")}
+          >
+            <span>{item.text}</span>
+          </div>
+        )
+    );
 
   const renderTypeBody = () => {
     if (isGenderRadio(radioButton)) {
