@@ -674,10 +674,14 @@ const isButtonSubmitMessage = (message) => {
 const getNextUserMsg =
   (ext = null) =>
   (item, index) => {
+    // Submit-only steps set not_use_button (no 「次へ」). Still treat them as the
+    // next stop so clicking Next on the prior step (e.g. upsell) can advance.
     const isDisplayBtnNext = !item.not_use_button;
-
+    const isSubmitStop = isButtonSubmitMessage(item);
     const conds =
-      !item.hidden && isInteractiveMessage(item) && isDisplayBtnNext;
+      !item.hidden &&
+      isInteractiveMessage(item) &&
+      (isDisplayBtnNext || isSubmitStop);
 
     if (ext && typeof ext === "function") {
       return conds && ext(item, index);
