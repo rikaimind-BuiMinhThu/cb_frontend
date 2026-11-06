@@ -1,9 +1,20 @@
-import React, { useEffect, useRef, useReducer, useState, useCallback } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useReducer,
+  useState,
+  useCallback,
+} from "react";
 import Cookies from "js-cookie";
 import CustomButton from "v2/views/Preview/PreviewComponent/CustomButton";
 import {
-  UserMessage, BotMessage, CombineMessage, CombineMessageNextButton,
-  PreviewClosedLauncher, PreviewOpenChatFrame, PreviewMessagesList,
+  UserMessage,
+  BotMessage,
+  CombineMessage,
+  CombineMessageNextButton,
+  PreviewClosedLauncher,
+  PreviewOpenChatFrame,
+  PreviewMessagesList,
 } from "v2/views/Preview/PreviewComponent";
 import PreviewFukushashikiReducer from "v2/views/Preview/PreviewFukushashiki/PreviewFukushashikiReducer";
 import "moment/locale/zh-cn";
@@ -26,8 +37,14 @@ import {
   PROCESSING_LABEL,
 } from "v2/views/Preview/PreviewComponent/Constants";
 import { injectBotThemeCss } from "v2/utils/chatbotThemeCss";
-import { DEFAULT_EXECUTION_POLICY, EXECUTION_POLICIES } from "v2/variables/constants";
-import { resolveMainColorCss, resolveUserMessageTheme } from "v2/utils/designThemeCore";
+import {
+  DEFAULT_EXECUTION_POLICY,
+  EXECUTION_POLICIES,
+} from "v2/variables/constants";
+import {
+  resolveMainColorCss,
+  resolveUserMessageTheme,
+} from "v2/utils/designThemeCore";
 import UserMessageTailIcon from "v2/components/BotMessages/UserMessageTailIcon";
 import {
   getPrefectures,
@@ -45,6 +62,7 @@ import {
   isButtonSubmitMessage,
   createScenarioUserResponseMessageHistory,
   sendErrorLogToServer,
+  errorMessageToHtml,
 } from "v2/views/Preview/PreviewComponent/Utils";
 import {
   getChatbotSavedState,
@@ -53,9 +71,12 @@ import {
   savePrevOpenStatus,
   getPrevOpenStatus,
   getTimerConfig,
-  setTimerConfig
+  setTimerConfig,
 } from "v2/views/Preview/PreviewComponent/SessionStorageUtils";
-import { isTokyoDeveloLP, UPDATE_TOKYO_DEVELO_LP_PREFECTURE_JS_CODE } from "v2/views/Preview/PreviewComponent/TokyoLPUtils";
+import {
+  isTokyoDeveloLP,
+  UPDATE_TOKYO_DEVELO_LP_PREFECTURE_JS_CODE,
+} from "v2/views/Preview/PreviewComponent/TokyoLPUtils";
 import ProcessBar from "v2/views/Preview/PreviewComponent/ProcessBar";
 import ZipCodePopUp from "v2/views/Preview/PreviewComponent/ZipCodePopUp";
 import _ from "lodash";
@@ -66,14 +87,15 @@ import {
   getBotHeaderIconUrl as resolveBotHeaderIconUrl,
   getOpeningBotStyle as buildOpeningBotStyle,
 } from "v2/views/Preview/PreviewComponent/previewOpeningStyles";
-import {
-  mapRawDesignSettingsFromExtract,
-} from "v2/views/Preview/PreviewComponent/previewDesignStateUtils";
+import { mapRawDesignSettingsFromExtract } from "v2/views/Preview/PreviewComponent/previewDesignStateUtils";
 import { createPreviewInitialState } from "v2/views/Preview/PreviewComponent/createPreviewInitialState";
 import { isWithdrawalPreventionEnabled } from "v2/views/Preview/PreviewComponent/previewWithdrawalUtils";
 import {
-  setConversionParamToLocalStorage, fukushashikiSavedStateToLp, fukushashikiToLP,
-  executeLpJsCode, postMessageToParent
+  setConversionParamToLocalStorage,
+  fukushashikiSavedStateToLp,
+  fukushashikiToLP,
+  executeLpJsCode,
+  postMessageToParent,
 } from "v2/views/Preview/PreviewFukushashiki/LPUtils";
 import { resolveErrMsgLpScript } from "v2/views/ScenarioSetting/utils/resolveErrMsgLpScript";
 import { generateLaunchButtonLpScript } from "v2/views/ScenarioSetting/utils/launchButtonLpScriptUtils";
@@ -104,31 +126,38 @@ import {
   usePreviewMessageReveal,
 } from "v2/views/Preview/PreviewComponent/hooks";
 
-const isPreviewMobile = (deviceMode) => deviceMode === 'sp';
+const isPreviewMobile = (deviceMode) => deviceMode === "sp";
 
 savePrevOpenStatus("0");
 const url = new URL(window.location.href);
 const params = new URLSearchParams(url.search);
-const isLoggedIn = params.get('isLoggedIn') === 'true';
+const isLoggedIn = params.get("isLoggedIn") === "true";
 const previewInitialState = createPreviewInitialState("fukushashiki", {
   params,
   includeOpenAnimation: false,
 });
 
-
 const ScenarioPreviewFukushashiki = ({
-  previewDeviceMode = 'pc',
+  previewDeviceMode = "pc",
   editorCustomCss,
   editorHtmlUgc,
   embedded = false,
   editorPreview = false,
   editorDraft = null,
 }) => {
-  const [state, dispatch] = useReducer(PreviewFukushashikiReducer, previewInitialState);
-  const [timerChanges, setTimerChanges] = useState({ timeLeft: -1, config: null });
+  const [state, dispatch] = useReducer(
+    PreviewFukushashikiReducer,
+    previewInitialState
+  );
+  const [timerChanges, setTimerChanges] = useState({
+    timeLeft: -1,
+    config: null,
+  });
   const containerRef = useRef(null);
   const hasSentCustomJs = useRef(false);
-  const [useSharedBootstrap, setUseSharedBootstrap] = useState(() => !getChatbotSavedState());
+  const [useSharedBootstrap, setUseSharedBootstrap] = useState(
+    () => !getChatbotSavedState()
+  );
   const hasSentInitialOpenStateToParent = useRef(false);
   const [msgUpdateState, setMsgUpdateState] = useState({});
   const msgUpdateStateRef = useRef({});
@@ -167,36 +196,36 @@ const ScenarioPreviewFukushashiki = ({
     state.themeSettings,
   ]);
 
-  useEffect(() => { 
+  useEffect(() => {
     if (!state.isUseBtnUpdateTracking) return;
-    msgUpdateStateRef.current = msgUpdateState; 
+    msgUpdateStateRef.current = msgUpdateState;
   }, [msgUpdateState, state.isUseBtnUpdateTracking]);
 
   // Initialize conversion status when chatbot opens
   useEffect(() => {
     if (!state.isUseBtnUpdateTracking) return;
 
-    const spBody = document.getElementById('sp-body');
+    const spBody = document.getElementById("sp-body");
     if (!spBody) return;
 
     const handleChange = (e) => {
-      const msgContainer = e.target.closest('.sp-body-user-side');
+      const msgContainer = e.target.closest(".sp-body-user-side");
       if (!msgContainer) return;
 
-      const btn = msgContainer.querySelector('button.btn-update');
-      if (btn) btn.classList.remove('btn-update');
+      const btn = msgContainer.querySelector("button.btn-update");
+      if (btn) btn.classList.remove("btn-update");
 
-      const rawId = msgContainer.id?.replace('msg_id_', '');
+      const rawId = msgContainer.id?.replace("msg_id_", "");
       const msgId = rawId ? parseInt(rawId) : NaN;
-      if (!isNaN(msgId) && msgUpdateStateRef.current[msgId] === 'clicked') {
-        setMsgUpdateState(prev => ({ ...prev, [msgId]: 'editing' }));
+      if (!isNaN(msgId) && msgUpdateStateRef.current[msgId] === "clicked") {
+        setMsgUpdateState((prev) => ({ ...prev, [msgId]: "editing" }));
       }
     };
 
-    spBody.addEventListener('change', handleChange, true);
+    spBody.addEventListener("change", handleChange, true);
 
     return () => {
-      spBody.removeEventListener('change', handleChange, true);
+      spBody.removeEventListener("change", handleChange, true);
     };
   }, [state.isUseBtnUpdateTracking, state.isOpen]);
 
@@ -215,12 +244,19 @@ const ScenarioPreviewFukushashiki = ({
   const applyScenarioTheme = useCallback((botInfor, themeSettings) => {
     if (!botInfor) return;
     const chatbot = botInfor;
-    const apiColorKey = chatbot.main_color && !String(chatbot.main_color).startsWith('#')
-      ? chatbot.main_color
-      : null;
-    const mainColorHex = resolveMainColorCss(chatbot.main_color, chatbot.main_color_other)
-      || '#327AED';
-    injectBotThemeCss(themeSettings, mainColorHex, apiColorKey, chatbot.design_type);
+    const apiColorKey =
+      chatbot.main_color && !String(chatbot.main_color).startsWith("#")
+        ? chatbot.main_color
+        : null;
+    const mainColorHex =
+      resolveMainColorCss(chatbot.main_color, chatbot.main_color_other) ||
+      "#327AED";
+    injectBotThemeCss(
+      themeSettings,
+      mainColorHex,
+      apiColorKey,
+      chatbot.design_type
+    );
   }, []);
 
   const eventHandler = async (event) => {
@@ -246,11 +282,13 @@ const ScenarioPreviewFukushashiki = ({
           payload: actionData,
         });
       case CHATBOT_ACTIONS.CRAWL_DATA:
-        const receiveOptionData = { [actionData.searchAddress]: actionData.result };
+        const receiveOptionData = {
+          [actionData.searchAddress]: actionData.result,
+        };
 
         return dispatch({
           type: PREVIEW_ACTIONS.ADD_LP_OPTION_DATA,
-          payload: receiveOptionData
+          payload: receiveOptionData,
         });
 
       case CHATBOT_ACTIONS.GET_ERROR_MESSAGE_WITH_DISPLAY_MSG: {
@@ -259,8 +297,8 @@ const ScenarioPreviewFukushashiki = ({
           type: PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG,
           payload: {
             error: error,
-            displayMsg: actionData.displayMsg
-          }
+            displayMsg: actionData.displayMsg,
+          },
         });
       }
 
@@ -269,19 +307,18 @@ const ScenarioPreviewFukushashiki = ({
         const error = actionData === NO_ERROR ? "" : actionData;
         return dispatch({
           type: PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE,
-          payload: error
+          payload: error,
         });
 
       case CHATBOT_ACTIONS.OPEN_PREVIEW:
-        if (!state.isOpen)
-          return onOpenPreview(true);
+        if (!state.isOpen) return onOpenPreview(true);
         break;
 
       case CHATBOT_ACTIONS.GET_PREVIEW_ORDER_CONTENT:
       case CHATBOT_ACTIONS.PREVIEW_OBJECT:
         return dispatch({
           type: PREVIEW_ACTIONS.UPDATE_PREVIEW_ORDER_CONTENT,
-          payload: actionData
+          payload: actionData,
         });
 
       case CHATBOT_ACTIONS.UPDATE_AMAZON_PAY_DATA:
@@ -326,7 +363,7 @@ const ScenarioPreviewFukushashiki = ({
 
           return dispatch({
             type: PREVIEW_ACTIONS.UPDATE_NUMBER_ORDER_TO_UPSELL,
-            payload: {variables, objParam: actionData}
+            payload: { variables, objParam: actionData },
           });
         }
         break;
@@ -354,12 +391,12 @@ const ScenarioPreviewFukushashiki = ({
   useEffect(() => {
     if (embedded) return undefined;
     if (isPreviewMobile(previewDeviceMode)) {
-      document.body.classList.add('is_mobile');
+      document.body.classList.add("is_mobile");
     } else {
-      document.body.classList.remove('is_mobile');
+      document.body.classList.remove("is_mobile");
     }
     return () => {
-      document.body.classList.remove('is_mobile');
+      document.body.classList.remove("is_mobile");
     };
   }, [previewDeviceMode, embedded]);
 
@@ -377,7 +414,7 @@ const ScenarioPreviewFukushashiki = ({
       chatbotBottom: state.bottomMarginPc,
     };
     postMessageToParent(options, state);
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- avoid re-running preview bootstrap on every state change
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- avoid re-running preview bootstrap on every state change
   }, [
     editorPreview,
     state.urlReceive,
@@ -387,7 +424,7 @@ const ScenarioPreviewFukushashiki = ({
     state.widthSp,
     state.heightSp,
     state.rightMarginPc,
-    state.bottomMarginPc
+    state.bottomMarginPc,
   ]);
 
   // Get prefectures
@@ -395,20 +432,22 @@ const ScenarioPreviewFukushashiki = ({
     if (!state.loadedStateFromSession) return;
     if (state.prefecturesList.length !== 0) return;
 
-    getPrefectures()
-      .then((res) => {
-        dispatch({ type: PREVIEW_ACTIONS.UPDATE_PREFECTURES_LIST, payload: { prefecturesList: res.data.data } });
-      })
+    getPrefectures().then((res) => {
+      dispatch({
+        type: PREVIEW_ACTIONS.UPDATE_PREFECTURES_LIST,
+        payload: { prefecturesList: res.data.data },
+      });
+    });
   }, [state.prefecturesList, state.loadedStateFromSession]);
 
-    // For run errorJsCode
+  // For run errorJsCode
   useEffect(() => {
     if (editorPreview) return undefined;
     if (!state.isUsedErrMsgByJs) return undefined;
     const jsCode = resolveErrMsgLpScript(state);
     if (jsCode) executeLpJsCode(jsCode, state);
     return undefined;
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- avoid re-running preview bootstrap on every state change
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- avoid re-running preview bootstrap on every state change
   }, [
     editorPreview,
     state.isUsedErrMsgByJs,
@@ -426,7 +465,7 @@ const ScenarioPreviewFukushashiki = ({
     const jsCode = generateLaunchButtonLpScript(state.launchButtonSelectors);
     if (jsCode) executeLpJsCode(jsCode, state);
     return undefined;
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- avoid re-running preview bootstrap on every state change
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- avoid re-running preview bootstrap on every state change
   }, [editorPreview, state.launchButtonSelectors]);
 
   usePreviewCustomJs({ state, hasSentCustomJs, enabled: !editorPreview });
@@ -437,15 +476,15 @@ const ScenarioPreviewFukushashiki = ({
     : state.customCssContent;
 
   useEffect(() => {
-    const existing = document.getElementById('custom-css');
+    const existing = document.getElementById("custom-css");
     if (existing) {
       existing.remove();
     }
     if (!cssEnabled || !cssContent) {
       return undefined;
     }
-    const style = document.createElement('style');
-    style.id = 'custom-css';
+    const style = document.createElement("style");
+    style.id = "custom-css";
     style.innerHTML = cssContent;
     document.head.appendChild(style);
     return () => {
@@ -475,7 +514,7 @@ const ScenarioPreviewFukushashiki = ({
     if (state.loadedStateFromSession) return undefined;
 
     if (!state.botId) {
-      const currentBotId = params.get('bot_id') || Cookies.get('bot_id');
+      const currentBotId = params.get("bot_id") || Cookies.get("bot_id");
       if (currentBotId) {
         dispatch({ type: PREVIEW_ACTIONS.SET_BOT_ID, payload: currentBotId });
       }
@@ -483,17 +522,27 @@ const ScenarioPreviewFukushashiki = ({
     }
 
     if (!state.scenarioId) {
-      const currentScenarioId = params.get('scenario_id') || Cookies.get('scenario_id');
+      const currentScenarioId =
+        params.get("scenario_id") || Cookies.get("scenario_id");
       if (currentScenarioId) {
-        dispatch({ type: PREVIEW_ACTIONS.SET_SCENARIO_ID, payload: currentScenarioId });
+        dispatch({
+          type: PREVIEW_ACTIONS.SET_SCENARIO_ID,
+          payload: currentScenarioId,
+        });
       }
       return undefined;
     }
 
-    return getScenarioPreviewData(state.botId, state.scenarioId)
-      .then(extractStateFromPreviewResponse);
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- avoid re-running preview bootstrap on every state change
-  }, [editorPreview, state.botId, state.scenarioId, state.loadedStateFromSession]);
+    return getScenarioPreviewData(state.botId, state.scenarioId).then(
+      extractStateFromPreviewResponse
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- avoid re-running preview bootstrap on every state change
+  }, [
+    editorPreview,
+    state.botId,
+    state.scenarioId,
+    state.loadedStateFromSession,
+  ]);
 
   // Fukushashiki session restore (upsell, LP sync, timer) — not covered by shared bootstrap hook
   useEffect(() => {
@@ -507,17 +556,23 @@ const ScenarioPreviewFukushashiki = ({
       return undefined;
     }
 
-    const currentBotId = params.get("order_id") || params.get("bot_id") || Cookies.get("bot_id");
+    const currentBotId =
+      params.get("order_id") || params.get("bot_id") || Cookies.get("bot_id");
     if (currentBotId && currentBotId !== savedState.botId) {
       clearChatbotState();
-      dispatch({ type: PREVIEW_ACTIONS.SET_UPSELL_BOT_ID, payload: currentBotId });
-      return getScenarioPreviewData(currentBotId, params.get("scenario_id"))
-        .then(extractStateFromPreviewResponse);
+      dispatch({
+        type: PREVIEW_ACTIONS.SET_UPSELL_BOT_ID,
+        payload: currentBotId,
+      });
+      return getScenarioPreviewData(
+        currentBotId,
+        params.get("scenario_id")
+      ).then(extractStateFromPreviewResponse);
     }
 
     setConversionParamToLocalStorage(
       savedState.scenarioId,
-      'web',
+      "web",
       savedState.userInputId || params.get("uuid"),
       params.get("env") || "production",
       savedState
@@ -529,31 +584,43 @@ const ScenarioPreviewFukushashiki = ({
         payload: {
           savedState,
           isLoggedIn: isLoggedIn,
-          isUsingAmazonPay: params.get('is_using_amazon_pay')
-        }
+          isUsingAmazonPay: params.get("is_using_amazon_pay"),
+        },
       });
     }
 
     const timerConfig = getTimerConfig();
     if (timerConfig) {
-      setTimerChanges({ timeLeft: calculateTimerConfigDuration(timerConfig?.config?.type, timerConfig?.config?.duration, { timerLeft: timerConfig.timeLeft, useTimerLeft: true }), config: timerConfig });
+      setTimerChanges({
+        timeLeft: calculateTimerConfigDuration(
+          timerConfig?.config?.type,
+          timerConfig?.config?.duration,
+          { timerLeft: timerConfig.timeLeft, useTimerLeft: true }
+        ),
+        config: timerConfig,
+      });
     }
 
-    return fukushashikiSavedStateToLp(savedState, params, state).then(async () => {
-      if (isTokyoDeveloLP(savedState.urlReceive)) {
-        executeLpJsCode(UPDATE_TOKYO_DEVELO_LP_PREFECTURE_JS_CODE, savedState);
-      }
-
-      return dispatch({
-        type: PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SESSION_STORAGE,
-        payload: {
-          savedState,
-          isLoggedIn: isLoggedIn,
-          isUsingAmazonPay: params.get('is_using_amazon_pay')
+    return fukushashikiSavedStateToLp(savedState, params, state).then(
+      async () => {
+        if (isTokyoDeveloLP(savedState.urlReceive)) {
+          executeLpJsCode(
+            UPDATE_TOKYO_DEVELO_LP_PREFECTURE_JS_CODE,
+            savedState
+          );
         }
-      });
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- avoid re-running preview bootstrap on every state change
+
+        return dispatch({
+          type: PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SESSION_STORAGE,
+          payload: {
+            savedState,
+            isLoggedIn: isLoggedIn,
+            isUsingAmazonPay: params.get("is_using_amazon_pay"),
+          },
+        });
+      }
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- avoid re-running preview bootstrap on every state change
   }, [editorPreview, useSharedBootstrap, state.loadedStateFromSession]);
 
   usePreviewScenarioBootstrap({
@@ -568,7 +635,8 @@ const ScenarioPreviewFukushashiki = ({
     enabled: !editorPreview && !state.isUpsell,
     enableScrollAuto: true,
     dependencyLength:
-      (state.renderMessagesList?.length ?? 0) + (state.submitErrorMessage ? 1 : 0),
+      (state.renderMessagesList?.length ?? 0) +
+      (state.submitErrorMessage ? 1 : 0),
   });
 
   useEffect(() => {
@@ -585,7 +653,14 @@ const ScenarioPreviewFukushashiki = ({
       }, 1000);
       return () => clearTimeout(timer);
     }
-  }, [state.loadedStateFromSession, state.displayType, state.isOpen, state.messagesList.length, state.botInfor, state.manuallyClosed]);
+  }, [
+    state.loadedStateFromSession,
+    state.displayType,
+    state.isOpen,
+    state.messagesList.length,
+    state.botInfor,
+    state.manuallyClosed,
+  ]);
 
   usePreviewMessageReveal({
     state,
@@ -606,25 +681,39 @@ const ScenarioPreviewFukushashiki = ({
         startIndex: 0,
         endIndex: state.currentMsgIndex + 1 + 1,
         fromCallback: true,
-      }
+      },
     });
-    if (newMsgIndex < state.messagesList.length && isInteractiveMessage(state.messagesList[newMsgIndex])) {
+    if (
+      newMsgIndex < state.messagesList.length &&
+      isInteractiveMessage(state.messagesList[newMsgIndex])
+    ) {
       createScenarioUserResponseMessageHistory({
         scenario_id: state.scenarioId,
         user_id: state.uuid,
-        msgs: [{ id: state.messagesList[newMsgIndex].id, type: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.APPEAR }],
+        msgs: [
+          {
+            id: state.messagesList[newMsgIndex].id,
+            type: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.APPEAR,
+          },
+        ],
       });
     }
-  }
+  };
 
   const setShowPopupCloseBot = (value) => {
-    dispatch({ type: PREVIEW_ACTIONS.SET_SHOW_POPUP_CLOSE_BOT, payload: value });
+    dispatch({
+      type: PREVIEW_ACTIONS.SET_SHOW_POPUP_CLOSE_BOT,
+      payload: value,
+    });
   };
 
   const onOpenPreview = (opening) => {
     if (editorPreview) {
       if (opening) {
-        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { isOpen: true } });
+        dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+          payload: { isOpen: true },
+        });
       } else {
         dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
       }
@@ -650,7 +739,11 @@ const ScenarioPreviewFukushashiki = ({
 
     if (state.isAlreadyOpenFirstTime) {
       if (!opening) {
-        if (isWithdrawalPreventionEnabled(state.botInfor?.withdrawal_prevention_status)) {
+        if (
+          isWithdrawalPreventionEnabled(
+            state.botInfor?.withdrawal_prevention_status
+          )
+        ) {
           return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
         }
 
@@ -673,18 +766,21 @@ const ScenarioPreviewFukushashiki = ({
 
     sendCloseChatbotCountRequest(state.scenarioId, deviceReceive);
     dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
-  }
+  };
 
   const onChatbotHeaderClick = () => {
     if (!state.isOpen) return dispatch({ type: PREVIEW_ACTIONS.OPEN_CHATBOT });
 
-    if (!isWithdrawalPreventionEnabled(state.botInfor?.withdrawal_prevention_status)) {
+    if (
+      !isWithdrawalPreventionEnabled(
+        state.botInfor?.withdrawal_prevention_status
+      )
+    ) {
       return dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
     }
 
     return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
-  }
-
+  };
 
   const extractStateFromPreviewResponse = async (res) => {
     if (!res || !res.data || res.data.code !== 1) return;
@@ -698,15 +794,20 @@ const ScenarioPreviewFukushashiki = ({
       objParam: {},
       loadedStateFromSession: true,
       messagesList: _.cloneDeep(conversation?.messages || []),
-      isOpen: (embedded || editorPreview) ? true : ((designSetting?.display_type && Number(designSetting?.display_type) === 1) || state.isOpen),
+      isOpen:
+        embedded || editorPreview
+          ? true
+          : (designSetting?.display_type &&
+              Number(designSetting?.display_type) === 1) ||
+            state.isOpen,
       ...mapRawDesignSettingsFromExtract(designSetting),
       isUsedErrMsgByJs: chatbot?.is_used_err_msg_by_js,
       executionPolicy: chatbot?.execution_policy || DEFAULT_EXECUTION_POLICY,
       errMsgJsCode: chatbot?.err_msg_js_code,
-      errMsgSettingMode: chatbot?.err_msg_setting_mode || 'js',
-      errMsgFieldSelectors: chatbot?.err_msg_field_selectors || '',
-      errMsgFormSelectors: chatbot?.err_msg_form_selectors || '',
-      launchButtonSelectors: chatbot?.launch_button_selectors || '',
+      errMsgSettingMode: chatbot?.err_msg_setting_mode || "js",
+      errMsgFieldSelectors: chatbot?.err_msg_field_selectors || "",
+      errMsgFormSelectors: chatbot?.err_msg_form_selectors || "",
+      launchButtonSelectors: chatbot?.launch_button_selectors || "",
       useNewProcess: chatbot?.client_cart_system === CART_SYSTEM.EC_FORCE,
       isUsedPastMessageLoaded: !!chatbot?.is_used_message_loaded_past,
       isProcessing: false,
@@ -721,25 +822,34 @@ const ScenarioPreviewFukushashiki = ({
       isUsedCustomCss: !!chatbot?.is_used_custom_css,
       customCssContent: chatbot?.custom_css_content,
       isUsedThanksMessage: !!chatbot?.is_used_thanks_message,
-      thanksMessageHtml: chatbot?.thanks_message_html || '',
+      thanksMessageHtml: chatbot?.thanks_message_html || "",
     };
 
     if (chatbot?.timer_config?.enable) {
       const timerConfig = chatbot.timer_config;
-      setTimerChanges({ timeLeft: calculateTimerConfigDuration(timerConfig.type, timerConfig.duration), config: timerConfig });
+      setTimerChanges({
+        timeLeft: calculateTimerConfigDuration(
+          timerConfig.type,
+          timerConfig.duration
+        ),
+        config: timerConfig,
+      });
     }
 
     if (!editorPreview) {
       const prevOpenStatus = getPrevOpenStatus();
 
-      if (designSetting.display_type === DISPLAY_TYPES.RELOAD && prevOpenStatus === "0") {
+      if (
+        designSetting.display_type === DISPLAY_TYPES.RELOAD &&
+        prevOpenStatus === "0"
+      ) {
         savePrevOpenStatus("1");
         sendOpenChatbotCountRequest(state.scenarioId, state.deviceReceive);
       }
 
       setConversionParamToLocalStorage(
         newState.scenarioId,
-        'web',
+        "web",
         newState.userInputId || params.get("uuid"),
         params.get("env") || "production",
         newState
@@ -754,17 +864,17 @@ const ScenarioPreviewFukushashiki = ({
         responseData: res.data,
         botInfor: getBotInforFromPreviewResponse(res),
         isLoggedIn: isLoggedIn,
-        isUsingAmazonPay: params.get('is_using_amazon_pay'),
+        isUsingAmazonPay: params.get("is_using_amazon_pay"),
         isEditorPreview: editorPreview,
       },
     });
-  }
+  };
 
   const handleOnCounting = (config) => (timer) => {
     const timerChanges = { timeLeft: timer, config };
     setTimerConfig(timerChanges);
     setTimerChanges(timerChanges);
-  }
+  };
 
   const onClickNext = (clickedMsgIndex, clickedMsg) => {
     if (editorPreview) {
@@ -777,7 +887,7 @@ const ScenarioPreviewFukushashiki = ({
       scenario_id: state.scenarioId,
       message: clickedMsg,
       user_id: state.uuid,
-      bot_type: "web"
+      bot_type: "web",
     };
 
     const validationResult = handleValidateField(clickedMsg, clickedMsgIndex);
@@ -785,42 +895,58 @@ const ScenarioPreviewFukushashiki = ({
     if (!validationResult.isValid) {
       dispatch({
         type: PREVIEW_ACTIONS.SET_ERRORS,
-        payload: validationResult.errors
+        payload: validationResult.errors,
       });
       return sendErrorLogToServer(data);
     }
 
     if (state.isUseBtnUpdateTracking && !clickedMsg.buttonName) {
-      setMsgUpdateState(prev => ({ ...prev, [clickedMsg.id]: 'clicked' }));
+      setMsgUpdateState((prev) => ({ ...prev, [clickedMsg.id]: "clicked" }));
     }
 
-    const isBtnUpdateClick = clickedMsgIndex < state.renderMessagesList.length - 1;
+    const isBtnUpdateClick =
+      clickedMsgIndex < state.renderMessagesList.length - 1;
     const isShopify = state.cartSystem === CART_SYSTEM.SHOPIFY;
 
     if (isShopify) {
-      sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
+      sendLogMessageToServer(
+        data,
+        isBtnUpdateClick
+          ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE
+          : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD
+      );
 
       if (isButtonSubmitMessage(clickedMsg)) {
         createOrAddLinesCart(state);
       }
     } else {
-      sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
+      sendLogMessageToServer(
+        data,
+        isBtnUpdateClick
+          ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE
+          : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD
+      );
     }
 
     if (clickedMsg.button_jscode && clickedMsg.jscode?.length > 0) {
       executeLpJsCode(clickedMsg.jscode, state);
     }
 
-    if (clickedMsg.message_content[0]?.type === "button_submit"
-      && clickedMsg.message_content[0]?.button_submit_id) {
+    if (
+      clickedMsg.message_content[0]?.type === "button_submit" &&
+      clickedMsg.message_content[0]?.button_submit_id
+    ) {
       const buttonId = clickedMsg.message_content[0]?.button_submit_id;
 
       if (!isShopify) {
-        postMessageToParent({
-          action: CHATBOT_ACTIONS.CLICK_BUTTON,
-          actionData: buttonId,
-          isOpen: true,
-        }, state);
+        postMessageToParent(
+          {
+            action: CHATBOT_ACTIONS.CLICK_BUTTON,
+            actionData: buttonId,
+            isOpen: true,
+          },
+          state
+        );
       }
     }
 
@@ -830,13 +956,16 @@ const ScenarioPreviewFukushashiki = ({
     const fukuData = convertToFukushashikiObject(data, state.prefecturesList);
     fukushashikiToLP(fukuData, state);
 
-    const isClickedButtonSubmit = isButtonSubmitMessage(state.messagesList[clickedMsgIndex]);
-    const isClickedLastMessage = state.messagesList.length - 1 === clickedMsgIndex;
+    const isClickedButtonSubmit = isButtonSubmitMessage(
+      state.messagesList[clickedMsgIndex]
+    );
+    const isClickedLastMessage =
+      state.messagesList.length - 1 === clickedMsgIndex;
     const isLexica = state.cartSystem === CART_SYSTEM.LEXICA;
 
     dispatch({
       type: PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON,
-      payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn}
+      payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn },
     });
 
     if (!isLexica && (isClickedButtonSubmit || isClickedLastMessage)) {
@@ -844,10 +973,15 @@ const ScenarioPreviewFukushashiki = ({
         scenario_id: state.scenarioId,
         user_input_id: state.uuid,
         status: CONVERSTION_RESPONSE_STATUS.FINISH,
-      })
+      });
     }
 
-    if (isClickedLastMessage && clickedMsg?.only_display_when_confirm && !state.submitErrorMessage && Object.keys(state.errors).length === 0) {
+    if (
+      isClickedLastMessage &&
+      clickedMsg?.only_display_when_confirm &&
+      !state.submitErrorMessage &&
+      Object.keys(state.errors).length === 0
+    ) {
       setTimeout(() => {
         dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
       }, 1000);
@@ -878,20 +1012,22 @@ const ScenarioPreviewFukushashiki = ({
         subField1,
         subField2,
         message,
-      }
+      },
     });
   };
 
   const onOpenZipCodePopup = (isOpen, contentIndex, messageIndex) => {
     const baseState = {
-      ...(contentIndex !== undefined ? { zipcodeContentIndex: contentIndex } : {}),
+      ...(contentIndex !== undefined
+        ? { zipcodeContentIndex: contentIndex }
+        : {}),
       ...(messageIndex !== undefined ? { zipcodeIndex: messageIndex } : {}),
     };
 
     if (isOpen) {
       changeElementAttributeById([
-        { id: "sp-withdrawal-container", style: { display: "block" }},
-        { id: "sp-popup-zip-code-address", style: { display: "block" }}
+        { id: "sp-withdrawal-container", style: { display: "block" } },
+        { id: "sp-popup-zip-code-address", style: { display: "block" } },
       ]);
 
       dispatch({
@@ -908,8 +1044,8 @@ const ScenarioPreviewFukushashiki = ({
     }
 
     changeElementAttributeById([
-      { id: "sp-withdrawal-container", style: { display: "none" }},
-      { id: "sp-popup-zip-code-address", style: { display: "none" }}
+      { id: "sp-withdrawal-container", style: { display: "none" } },
+      { id: "sp-popup-zip-code-address", style: { display: "none" } },
     ]);
   };
 
@@ -919,7 +1055,12 @@ const ScenarioPreviewFukushashiki = ({
   };
 
   const renderBotMessageContent = (message, messageIndex) => {
-    if (!message || message.belong_to !== "bot" || !Array.isArray(message?.message_content)) return null;
+    if (
+      !message ||
+      message.belong_to !== "bot" ||
+      !Array.isArray(message?.message_content)
+    )
+      return null;
 
     return message.message_content.map((content, contentIndex) => {
       if (editorPreview && content.type === BOT_MESSAGE_TYPES.DELAY) {
@@ -927,7 +1068,7 @@ const ScenarioPreviewFukushashiki = ({
           <div
             key={`${messageIndex}-${contentIndex}`}
             id={getElementMessageById(message.id)}
-            className={`sp-body-bot-side${editorPreview ? '' : ' slideRight'}`}
+            className={`sp-body-bot-side${editorPreview ? "" : " slideRight"}`}
           >
             <div className="sp-body-bot-side-messages">
               <div className="ss-bot-message">
@@ -941,24 +1082,26 @@ const ScenarioPreviewFukushashiki = ({
       }
 
       return (
-      <BotMessage
-        messageId={message.id}
-        key={`${messageIndex}-${contentIndex}`}
-        content={content}
-        contentIndex={contentIndex}
-        botInfor={state.botInfor}
-        previewOrderContent={state.previewOrderContent}
-        executeLpJsCode={(jsCode) => executeLpJsCode(jsCode, state)}
-        variables={state.variables}
-        onRenderCompleted={editorPreview ? () => {} : renderNextMessage}
-        hidden={editorPreview ? false : message.hidden}
-        currentMsgIndex={state.currentMsgIndex}
-        isBotOpen={state.isOpen}
-        delayEachMessage={editorPreview ? 0 : RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE}
-        isUseGlobalDelay={editorPreview ? false : state.isUseGlobalDelay}
-        globalDelayTime={state.globalDelayTime}
-        skipEntryDelay={editorPreview}
-      />
+        <BotMessage
+          messageId={message.id}
+          key={`${messageIndex}-${contentIndex}`}
+          content={content}
+          contentIndex={contentIndex}
+          botInfor={state.botInfor}
+          previewOrderContent={state.previewOrderContent}
+          executeLpJsCode={(jsCode) => executeLpJsCode(jsCode, state)}
+          variables={state.variables}
+          onRenderCompleted={editorPreview ? () => {} : renderNextMessage}
+          hidden={editorPreview ? false : message.hidden}
+          currentMsgIndex={state.currentMsgIndex}
+          isBotOpen={state.isOpen}
+          delayEachMessage={
+            editorPreview ? 0 : RENDER_CHATBOT_CONFIG.DELAY_EACH_MESSAGE
+          }
+          isUseGlobalDelay={editorPreview ? false : state.isUseGlobalDelay}
+          globalDelayTime={state.globalDelayTime}
+          skipEntryDelay={editorPreview}
+        />
       );
     });
   };
@@ -972,26 +1115,49 @@ const ScenarioPreviewFukushashiki = ({
     if (message.is_display_button_next === false) return null;
     if (message.message_content[0]?.type === "button_submit") return null;
 
-    const isBtnUpdateMode = state.isUseBtnUpdateTracking && !message.buttonName && !isUpdate;
-    const msgState = msgUpdateState[message.id]; 
+    const isBtnUpdateMode =
+      state.isUseBtnUpdateTracking && !message.buttonName && !isUpdate;
+    const msgState = msgUpdateState[message.id];
 
-    const btnText = message.buttonName
-      || (isBtnUpdateMode && msgState === 'clicked'
+    const btnText =
+      message.buttonName ||
+      (isBtnUpdateMode && msgState === "clicked"
         ? OK_BUTTON_LABEL
-        : (isUpdate ? NEXT_BUTTON_LABEL : UPDATE_BUTTON_LABEL));
-    const hasBtnUpdateClass = isBtnUpdateMode && msgState !== 'editing';
+        : isUpdate
+        ? NEXT_BUTTON_LABEL
+        : UPDATE_BUTTON_LABEL);
+    const hasBtnUpdateClass = isBtnUpdateMode && msgState !== "editing";
     const isEditorDisplayOnly = editorPreview;
-    const actionBtnBg = state.botInfor?.main_color || state.botInfor?.main_color_other;
+    const actionBtnBg =
+      state.botInfor?.main_color || state.botInfor?.main_color_other;
     return (
-      <div className={`sp-user-message-button-action${isDisplayBtnNext ? '' : ' sp-user-message-button-action--hidden'}`}>
+      <div
+        className={`sp-user-message-button-action${
+          isDisplayBtnNext ? "" : " sp-user-message-button-action--hidden"
+        }`}
+      >
         <CustomButton
-          disabled={isEditorDisplayOnly ? false : (state.submitErrorMessage?.length > 0 ? false : message.disabled)}
+          disabled={
+            isEditorDisplayOnly
+              ? false
+              : state.submitErrorMessage?.length > 0
+              ? false
+              : message.disabled
+          }
           actionBtnBg={actionBtnBg}
-          className={`ss-user-message__action-btn${hasBtnUpdateClass ? " btn-update" : ""}`}
-          onClick={isEditorDisplayOnly ? undefined : () => {
-            onClickNext(messageIndex, message);
-          }}
-          autoClick={!isEditorDisplayOnly && isAutoClick && !state.isExtractFromSession}
+          className={`ss-user-message__action-btn${
+            hasBtnUpdateClass ? " btn-update" : ""
+          }`}
+          onClick={
+            isEditorDisplayOnly
+              ? undefined
+              : () => {
+                  onClickNext(messageIndex, message);
+                }
+          }
+          autoClick={
+            !isEditorDisplayOnly && isAutoClick && !state.isExtractFromSession
+          }
           messageType={message.message_content[0]?.type}
         >
           {btnText}
@@ -1002,18 +1168,35 @@ const ScenarioPreviewFukushashiki = ({
 
   const renderUserMessageContent = (message, messageIndex) => {
     if (!message || message.belong_to !== "user") return null;
-    if (!Array.isArray(message?.message_content) || message.message_content.length === 0) return null;
+    if (
+      !Array.isArray(message?.message_content) ||
+      message.message_content.length === 0
+    )
+      return null;
 
-    const userMessageTheme = resolveUserMessageTheme(state.themeSettings, state.botInfor);
+    const userMessageTheme = resolveUserMessageTheme(
+      state.themeSettings,
+      state.botInfor
+    );
     return (
-      <div className={`sp-body-user-side${editorPreview ? '' : ' slideLeft'}`} id={getElementMessageById(message.id)}>
+      <div
+        className={`sp-body-user-side${editorPreview ? "" : " slideLeft"}`}
+        id={getElementMessageById(message.id)}
+      >
         <div className="sp-body-user-side-messages">
           <UserMessage
-            postMessageToParent={(options) => postMessageToParent(options, state)}
+            postMessageToParent={(options) =>
+              postMessageToParent(options, state)
+            }
             message={message}
             captcha={state.captcha}
             messageContentProps={message.message_content}
-            disabled={(state.submitErrorMessage?.length > 0 && state.submitErrorMessage !== GETTING_ERROR_NOTIFICATION) ? false : message.disabled}
+            disabled={
+              state.submitErrorMessage?.length > 0 &&
+              state.submitErrorMessage !== GETTING_ERROR_NOTIFICATION
+                ? false
+                : message.disabled
+            }
             onChangeValue={(
               contentIndex,
               contentType,
@@ -1034,21 +1217,27 @@ const ScenarioPreviewFukushashiki = ({
             }
             currentMsgIndex={state.currentMsgIndex}
             onClickNext={() => {
-              onClickNext(messageIndex, message)}
-            }
+              onClickNext(messageIndex, message);
+            }}
             onRenderCompleted={editorPreview ? () => {} : renderNextMessage}
             messageIndex={messageIndex}
             errorsProps={state.errors}
             prefecturesList={[...state.prefecturesList]}
             onOpen={(isOpen, contentIndex) => {
-              onOpenZipCodePopup(isOpen, contentIndex, Math.min(state.currentMsgIndex, messageIndex));
+              onOpenZipCodePopup(
+                isOpen,
+                contentIndex,
+                Math.min(state.currentMsgIndex, messageIndex)
+              );
             }}
-            onChangeErrors={(field, value) =>
-              onChangeErrors(field, value)
-            }
+            onChangeErrors={(field, value) => onChangeErrors(field, value)}
             variables={state.variables}
             lpOptionData={state.lpOptionData}
-            submitErrorMessage={state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "" : state.submitErrorMessage}
+            submitErrorMessage={
+              state.submitErrorMessage === GETTING_ERROR_NOTIFICATION
+                ? ""
+                : state.submitErrorMessage
+            }
             botId={state.botId}
             isProcessing={!!state.isProcessing}
             cartSystem={state.cartSystem}
@@ -1065,7 +1254,11 @@ const ScenarioPreviewFukushashiki = ({
 
   const renderCombineMessageContent = (message, messageIndex) => {
     if (!message || message.belong_to !== "combine") return null;
-    if (!Array.isArray(message?.message_content) || message.message_content.length === 0) return null;
+    if (
+      !Array.isArray(message?.message_content) ||
+      message.message_content.length === 0
+    )
+      return null;
 
     const isUpdate = messageIndex >= state.renderMessagesList.length - 1;
 
@@ -1075,7 +1268,12 @@ const ScenarioPreviewFukushashiki = ({
           postMessageToParent={(options) => postMessageToParent(options, state)}
           message={message}
           captcha={state.captcha}
-          disabled={(state.submitErrorMessage?.length > 0 && state.submitErrorMessage !== GETTING_ERROR_NOTIFICATION) ? false : message.disabled}
+          disabled={
+            state.submitErrorMessage?.length > 0 &&
+            state.submitErrorMessage !== GETTING_ERROR_NOTIFICATION
+              ? false
+              : message.disabled
+          }
           onChangeValue={(
             contentIndex,
             contentType,
@@ -1099,12 +1297,20 @@ const ScenarioPreviewFukushashiki = ({
           errorsProps={state.errors}
           prefecturesList={[...state.prefecturesList]}
           onOpen={(isOpen, contentIndex) => {
-            onOpenZipCodePopup(isOpen, contentIndex, Math.min(state.currentMsgIndex, messageIndex));
+            onOpenZipCodePopup(
+              isOpen,
+              contentIndex,
+              Math.min(state.currentMsgIndex, messageIndex)
+            );
           }}
           onChangeErrors={(field, value) => onChangeErrors(field, value)}
           variables={state.variables}
           lpOptionData={state.lpOptionData}
-          submitErrorMessage={state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "" : state.submitErrorMessage}
+          submitErrorMessage={
+            state.submitErrorMessage === GETTING_ERROR_NOTIFICATION
+              ? ""
+              : state.submitErrorMessage
+          }
           botId={state.botId}
           isProcessing={!!state.isProcessing}
           botInfor={state.botInfor}
@@ -1127,11 +1333,13 @@ const ScenarioPreviewFukushashiki = ({
 
   const renderMessages = () => (
     <PreviewMessagesList
-      messages={editorPreview
-        ? (state.renderMessagesList || []).map((message) =>
-            message.hidden ? { ...message, hidden: false } : message
-          )
-        : state.renderMessagesList}
+      messages={
+        editorPreview
+          ? (state.renderMessagesList || []).map((message) =>
+              message.hidden ? { ...message, hidden: false } : message
+            )
+          : state.renderMessagesList
+      }
       renderBotMessage={renderBotMessageContent}
       renderUserMessage={renderUserMessageContent}
       renderCombineMessage={renderCombineMessageContent}
@@ -1139,35 +1347,51 @@ const ScenarioPreviewFukushashiki = ({
   );
 
   const renderSubmitErrorMessages = () => {
-    const isRpaStatus = state.executionPolicy === EXECUTION_POLICIES.RPA && state.submitErrorMessage;
-    if (!isRpaStatus && (!state.isUsedErrMsgByJs || !state.submitErrorMessage)) return null;
+    const isRpaStatus =
+      state.executionPolicy === EXECUTION_POLICIES.RPA &&
+      state.submitErrorMessage;
+    if (!isRpaStatus && (!state.isUsedErrMsgByJs || !state.submitErrorMessage))
+      return null;
 
-    const className = state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "ss-bot-getting-error-notification" : "ss-bot-submit-error-message";
-    const text = state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? PROCESSING_LABEL : state.submitErrorMessage;
-    const htmlText = text.replace(/¥n/g, "<br/>");
+    const className =
+      state.submitErrorMessage === GETTING_ERROR_NOTIFICATION
+        ? "ss-bot-getting-error-notification"
+        : "ss-bot-submit-error-message";
+    const text =
+      state.submitErrorMessage === GETTING_ERROR_NOTIFICATION
+        ? PROCESSING_LABEL
+        : state.submitErrorMessage;
+    const htmlText = errorMessageToHtml(text);
     return (
       <div className="ss-user-setting__item-text_input-top">
-        <div id="error-message"
+        <div
+          id="error-message"
           className={`error-message-modal ${className}`}
           dangerouslySetInnerHTML={{ __html: htmlText }}
         />
       </div>
     );
-  }
+  };
 
   const headerIconSrc = resolveBotHeaderIconUrl(state.botInfor, state.isOpen);
 
-  if (!editorPreview && (!state.scenarioId || !state.botInfor || state.displayType === null)) {
+  if (
+    !editorPreview &&
+    (!state.scenarioId || !state.botInfor || state.displayType === null)
+  ) {
     return null;
   }
 
   const effectiveIsOpen = embedded || editorPreview || state.isOpen;
   const hasApiBotInfor = Boolean(
-    state.botInfor?.title || state.botInfor?.main_color || state.botInfor?.main_color_other,
+    state.botInfor?.title ||
+      state.botInfor?.main_color ||
+      state.botInfor?.main_color_other
   );
-  const displayBotInfor = editorPreview && !hasApiBotInfor
-    ? resolveEditorPreviewBotInfor(state.botInfor)
-    : state.botInfor;
+  const displayBotInfor =
+    editorPreview && !hasApiBotInfor
+      ? resolveEditorPreviewBotInfor(state.botInfor)
+      : state.botInfor;
 
   if (effectiveIsOpen) {
     const { frameClassName, cssVars } = buildOpeningBotStyle(state, {
@@ -1178,7 +1402,13 @@ const ScenarioPreviewFukushashiki = ({
     return (
       <PreviewOpenChatFrame
         containerRef={containerRef}
-        containerClassName={`sp-container1${editorPreview ? '' : (isPreviewMobile(previewDeviceMode) ? ' slideUpSp' : ' slideUp')}`}
+        containerClassName={`sp-container1${
+          editorPreview
+            ? ""
+            : isPreviewMobile(previewDeviceMode)
+            ? " slideUpSp"
+            : " slideUp"
+        }`}
         frameClassName={frameClassName}
         cssVars={cssVars}
         headerIconSrc={headerIconSrc}
@@ -1187,10 +1417,11 @@ const ScenarioPreviewFukushashiki = ({
         isOpen={state.isOpen}
         onHeaderClick={onChatbotHeaderClick}
         botConfig={state}
+        themeSettings={state.themeSettings}
         showPopupCloseBot={state.showPopupCloseBot}
         onClosePopup={() => setShowPopupCloseBot(false)}
         onCloseBot={() => onOpenPreview(false)}
-        overlays={(
+        overlays={
           <ZipCodePopUp
             onOpen={onOpenZipCodePopup}
             prefecturesList={state.prefecturesList}
@@ -1201,19 +1432,26 @@ const ScenarioPreviewFukushashiki = ({
             onChangeErrors={onChangeErrors}
             errors={state.errors}
           />
-        )}
-        beforeBody={(
+        }
+        beforeBody={
           <>
             {!!state.botInfor?.timer_config?.enable && (
               <div className="chatbot_timer_holder">
                 <Timer
-                  duration={calculateTimerConfigDuration(state.botInfor.timer_config.type, state.botInfor.timer_config.duration)}
+                  duration={calculateTimerConfigDuration(
+                    state.botInfor.timer_config.type,
+                    state.botInfor.timer_config.duration
+                  )}
                   timeLeft={timerChanges.timeLeft}
                   countMsg={state.botInfor.timer_config.messages.counting}
                   finishMsg={state.botInfor.timer_config.messages.finish}
-                  variables={getTimerConfigVariable(state.botInfor.timer_config.variables)}
+                  variables={getTimerConfigVariable(
+                    state.botInfor.timer_config.variables
+                  )}
                   startCount={state.isOpen}
-                  isRealtimeRemainingTime={state.botInfor.timer_config.isRealtimeRemainingTime}
+                  isRealtimeRemainingTime={
+                    state.botInfor.timer_config.isRealtimeRemainingTime
+                  }
                   scenarioId={state.scenarioId}
                   onCounting={handleOnCounting(state.botInfor.timer_config)}
                 />
@@ -1223,9 +1461,10 @@ const ScenarioPreviewFukushashiki = ({
               botInfor={displayBotInfor}
               currentIndex={state.passedUserMsgCount}
               maxIndex={state.progressBarMaxIndex}
+              themeSettings={state.themeSettings}
             />
           </>
-        )}
+        }
       >
         {renderMessages()}
         {renderSubmitErrorMessages()}
@@ -1245,6 +1484,6 @@ const ScenarioPreviewFukushashiki = ({
       hideWhenDisplayHidden
     />
   );
-}
+};
 
 export default ScenarioPreviewFukushashiki;

@@ -1,11 +1,11 @@
-import { CONVERSION_RESPONSE_SUBMIT_TYPE } from '../PreviewComponent/Constants';
-import { sendLogMessageToServer } from '../PreviewComponent/Utils';
+import { CONVERSION_RESPONSE_SUBMIT_TYPE } from "../PreviewComponent/Constants";
+import { sendLogMessageToServer } from "../PreviewComponent/Utils";
 import {
   findCreditCardMessage,
   followLexicaOrder,
   LEXICA_COPY,
   prepareLexicaCreditToken,
-} from './zeusToken';
+} from "./zeusToken";
 
 export const runLexicaButtonSubmit = ({
   isLocked,
@@ -37,10 +37,13 @@ export const runLexicaButtonSubmit = ({
     }
     const cardMessage = findCreditCardMessage(messages);
     if (cardMessage) {
-      await sendLogMessageToServer({
-        ...logData,
-        message: cardMessage,
-      }, CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
+      await sendLogMessageToServer(
+        {
+          ...logData,
+          message: cardMessage,
+        },
+        CONVERSION_RESPONSE_SUBMIT_TYPE.ADD
+      );
     }
     continueAfterOptionalToken();
     const result = await followLexicaOrder({
@@ -54,8 +57,12 @@ export const runLexicaButtonSubmit = ({
       lockChatAfterSubmit();
     }
   };
-  submit().finally(() => {
-    unlock();
-    setProcessing(false);
-  });
+  submit()
+    .catch(() => {
+      setSubmitError(LEXICA_COPY.FAIL_COPY);
+    })
+    .finally(() => {
+      unlock();
+      setProcessing(false);
+    });
 };

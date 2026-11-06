@@ -18,7 +18,7 @@ const InputDebounce = ({
     value,
     debounceTime,
     isComposing,
-    isFocused,
+    isFocused
   );
   // Callers pass a new onChange on every render. As an effect dependency it re-ran the
   // effect after every render, and the resulting state update froze the chat.
@@ -42,6 +42,8 @@ const InputDebounce = ({
   };
 
   const handleBlur = (event) => {
+    // Flush pending keystrokes before parent value sync resumes.
+    onChangeRef.current(inputValue);
     setIsFocused(false);
     if (onBlur) {
       onBlur(event);

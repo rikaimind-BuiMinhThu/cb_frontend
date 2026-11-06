@@ -1,6 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-const useDebounce = (value, delay, isComposing = false, skipValueSync = false) => {
+const useDebounce = (
+  value,
+  delay,
+  isComposing = false,
+  skipValueSync = false
+) => {
   const [inputValue, setInputValue] = useState(value);
   const [debouncedValue, setDebouncedValue] = useState(inputValue);
 
@@ -8,8 +13,12 @@ const useDebounce = (value, delay, isComposing = false, skipValueSync = false) =
     if (skipValueSync || isComposing) {
       return;
     }
+    // Keep local edits when the parent still holds the previous value.
+    if (value === inputValue) {
+      return;
+    }
     setInputValue(value);
-  }, [value, skipValueSync, isComposing]);
+  }, [value, skipValueSync, isComposing, inputValue]);
 
   useEffect(() => {
     if (!inputValue || isComposing) {

@@ -1,87 +1,94 @@
-import React, { useEffect, useState } from 'react';
-import 'v2/assets/css/bot/preview-chat-bot.css';
-import api from 'v2/api/api-management';
-import ModalNoti from './ModalNoti';
+import React, { useEffect, useState } from "react";
+import "v2/assets/css/bot/preview-chat-bot.css";
+import api from "v2/api/api-management";
+import ModalNoti from "./ModalNoti";
 import {
   MESSAGE_CONTENT_TYPES,
   PREVIEW_MESSAGE_CONTENT_TYPES,
   SCAN_REGEX,
-} from 'v2/views/Preview/PreviewComponent/Constants';
-import moment from 'moment';
-import { tokenExpired } from 'v2/api/tokenExpired';
-import { SHORTEN_URL } from 'v2/variables/constants';
-import locale from 'antd/es/date-picker/locale/ja_JP';
-import 'moment/locale/zh-cn';
-import SubmitButton from './UserMessageComponent/SubmitButton';
-import { convertTextJapaneseByApi } from 'v2/views/Preview/utils/japaneseConverter';
-import Image from './UserMessageComponent/Image';
-import TextInput from './UserMessageComponent/TextInput';
-import Label from './UserMessageComponent/Label';
-import TextArea from './UserMessageComponent/TextArea';
-import RadioButton from './UserMessageComponent/RadioButton';
-import Checkbox from './UserMessageComponent/Checkbox';
-import PullDown from './UserMessageComponent/PullDown';
-import ZipCodeAddress from './UserMessageComponent/ZipCodeAddress';
-import Attachment from './UserMessageComponent/Attachment';
-import ShippingAddress from './UserMessageComponent/ShippingAddress';
-import ProductPurchaseSelectOption from './UserMessageComponent/ProductPurchaseSelectOption';
-import Calendar from './UserMessageComponent/Calendar';
-import AgreeTerm from './UserMessageComponent/AgreeTerm';
-import CreditCardPayment from './UserMessageComponent/CreditCardPayment';
-import CardPaymentRadioButton from './UserMessageComponent/CardPaymentRadioButton';
-import ContactForm from './UserMessageComponent/ContactForm';
-import Capture from './UserMessageComponent/Capture';
-import Carousel from './UserMessageComponent/Carousel';
-import ProductPurchase from './UserMessageComponent/ProductPurchase';
-import ProductPurchaseRadioButton from './UserMessageComponent/ProductPurchaseRadioButton';
-import SliderInput from './UserMessageComponent/Slider';
-import HtmlCode from './UserMessageComponent/HtmlCode';
-import { isUserMessage } from './Utils';
-import { handleDisableDateCalendar } from 'v2/views/ScenarioSetting/utils/scenarioCalendarUtils';
+} from "v2/views/Preview/PreviewComponent/Constants";
+import moment from "moment";
+import { tokenExpired } from "v2/api/tokenExpired";
+import { SHORTEN_URL } from "v2/variables/constants";
+import locale from "antd/es/date-picker/locale/ja_JP";
+import "moment/locale/zh-cn";
+import SubmitButton from "./UserMessageComponent/SubmitButton";
+import { convertTextJapaneseByApi } from "v2/views/Preview/utils/japaneseConverter";
+import Image from "./UserMessageComponent/Image";
+import TextInput from "./UserMessageComponent/TextInput";
+import Label from "./UserMessageComponent/Label";
+import TextArea from "./UserMessageComponent/TextArea";
+import RadioButton from "./UserMessageComponent/RadioButton";
+import Checkbox from "./UserMessageComponent/Checkbox";
+import PullDown from "./UserMessageComponent/PullDown";
+import ZipCodeAddress from "./UserMessageComponent/ZipCodeAddress";
+import Attachment from "./UserMessageComponent/Attachment";
+import ShippingAddress from "./UserMessageComponent/ShippingAddress";
+import ProductPurchaseSelectOption from "./UserMessageComponent/ProductPurchaseSelectOption";
+import Calendar from "./UserMessageComponent/Calendar";
+import AgreeTerm from "./UserMessageComponent/AgreeTerm";
+import CreditCardPayment from "./UserMessageComponent/CreditCardPayment";
+import CardPaymentRadioButton from "./UserMessageComponent/CardPaymentRadioButton";
+import ContactForm from "./UserMessageComponent/ContactForm";
+import Capture from "./UserMessageComponent/Capture";
+import Carousel from "./UserMessageComponent/Carousel";
+import ProductPurchase from "./UserMessageComponent/ProductPurchase";
+import ProductPurchaseRadioButton from "./UserMessageComponent/ProductPurchaseRadioButton";
+import SliderInput from "./UserMessageComponent/Slider";
+import HtmlCode from "./UserMessageComponent/HtmlCode";
+import { isUserMessage } from "./Utils";
+import { handleDisableDateCalendar } from "v2/views/ScenarioSetting/utils/scenarioCalendarUtils";
 
-const HISTORY_CLICK_URLS_API = '/api/v1/managements/history_click_urls';
+const HISTORY_CLICK_URLS_API = "/api/v1/managements/history_click_urls";
 const NOTIFICATION_CLOSE_DELAY_MS = 2000;
 const CALENDAR_SEARCH_LIMIT = 100;
-const LINK_TARGET_BLANK = '_blank';
-const EMPTY_STRING = '';
-const CHECKBOX_ITEM_SEPARATOR = '-';
+const LINK_TARGET_BLANK = "_blank";
+const EMPTY_STRING = "";
+const CHECKBOX_ITEM_SEPARATOR = "-";
 const CALENDAR_TYPE = {
-  START_END_DATE: 'start_end_date',
+  START_END_DATE: "start_end_date",
 };
 const CHECKBOX_TYPE = {
-  IMG: 'checkbox_img',
+  IMG: "checkbox_img",
 };
 const CARD_PAYMENT_TYPE = {
-  PICTURE_RADIO: 'picture_radio',
+  PICTURE_RADIO: "picture_radio",
 };
-const USER_MESSAGE_CONTENT_WRAPPER_CLASS = 'ss-user-message__content-wrapper';
-const SUBMIT_ONLY_WRAPPER_CLASS = 'ss-user-message__content-wrapper--submit-only';
+const USER_MESSAGE_CONTENT_WRAPPER_CLASS = "ss-user-message__content-wrapper";
+const SUBMIT_ONLY_WRAPPER_CLASS =
+  "ss-user-message__content-wrapper--submit-only";
 
 const isTextOnlySubmitContent = (blocks) => {
   if (!Array.isArray(blocks) || blocks.length === 0) return false;
-  return blocks.every((block) => (
-    block?.type === MESSAGE_CONTENT_TYPES.SUBMIT_BUTTON && !block?.button_submit?.button_image_url
-  ));
+  return blocks.every(
+    (block) =>
+      block?.type === MESSAGE_CONTENT_TYPES.SUBMIT_BUTTON &&
+      !block?.button_submit?.button_image_url
+  );
 };
 
 const PULL_DOWN_DATE_ATTRS = {
-  date_ym: { year: 'valueYear', month: 'valueMonth' },
-  dob_ym: { year: 'valueYear', month: 'valueMonth' },
-  date_ymd: { year: 'valueYear', month: 'valueMonth', day: 'valueDay' },
-  dob_ymd: { year: 'valueYear', month: 'valueMonth', day: 'valueDay' },
-  fixed_date: { year: 'valueYear', month: 'valueMonth', day: 'valueDay' },
-  date_md: { month: 'valueMonth', day: 'valueDay' },
+  date_ym: { year: "valueYear", month: "valueMonth" },
+  dob_ym: { year: "valueYear", month: "valueMonth" },
+  date_ymd: { year: "valueYear", month: "valueMonth", day: "valueDay" },
+  dob_ymd: { year: "valueYear", month: "valueMonth", day: "valueDay" },
+  fixed_date: { year: "valueYear", month: "valueMonth", day: "valueDay" },
+  date_md: { month: "valueMonth", day: "valueDay" },
 };
 
 const findAvailableCalendarDate = (calendar) => {
-  const dayOffsets = Array.from({ length: CALENDAR_SEARCH_LIMIT + 1 }, (_, offset) => offset);
+  const dayOffsets = Array.from(
+    { length: CALENDAR_SEARCH_LIMIT + 1 },
+    (_, offset) => offset
+  );
   const availableOffset = dayOffsets.find(
-    (offset) => !handleDisableDateCalendar(moment().add(offset, 'days'), calendar),
+    (offset) =>
+      !handleDisableDateCalendar(moment().add(offset, "days"), calendar)
   );
   if (availableOffset === undefined) {
     return null;
   }
-  return moment().add(availableOffset, 'days').format('YYYY-MM-DD');
+  return moment().add(availableOffset, "days").format("YYYY-MM-DD");
 };
 
 const UserMessage = ({
@@ -99,33 +106,43 @@ const UserMessage = ({
   prefecturesList,
   variables,
   lpOptionData = {},
-  submitErrorMessage = '',
-  submitThanksMessage = '',
+  submitErrorMessage = "",
+  submitThanksMessage = "",
   postMessageToParent,
   botId,
   isProcessing = false,
   isSubmitHidden = false,
   onRenderCompleted,
-  cartSystem = '',
+  cartSystem = "",
   footer = null,
 }) => {
   const [messageContent, setMessageContent] = useState(messageContentProps);
   const [errors, setErrors] = useState(errorsProps);
   const [isOpenNoti, setIsOpenNoti] = useState(false);
-  const [messageNoti, setMessageNoti] = useState('');
+  const [messageNoti, setMessageNoti] = useState("");
 
-  const handleOnChangeJpConvertText = (contentIndex, contentType, field, subField) => (value) => {
-    onChangeValue(contentIndex, contentType, value, field, subField);
+  const handleOnChangeJpConvertText =
+    (contentIndex, contentType, field, subField) => (value) => {
+      onChangeValue(contentIndex, contentType, value, field, subField);
 
-    const nextContent = messageContent[contentIndex + 1];
-    if (nextContent) {
-      const convertType = messageContent[contentIndex][contentType].convertTextTypeValue;
+      const nextContent = messageContent[contentIndex + 1];
+      if (nextContent) {
+        const convertType =
+          messageContent[contentIndex][contentType].convertTextTypeValue;
 
-      convertTextJapaneseByApi(value, convertType).then((textConvertedValue) => {
-        onChangeValue(contentIndex + 1, contentType, textConvertedValue, field, subField);
-      });
-    }
-  };
+        convertTextJapaneseByApi(value, convertType).then(
+          (textConvertedValue) => {
+            onChangeValue(
+              contentIndex + 1,
+              contentType,
+              textConvertedValue,
+              field,
+              subField
+            );
+          }
+        );
+      }
+    };
 
   useEffect(() => {
     setErrors(errorsProps);
@@ -140,58 +157,110 @@ const UserMessage = ({
     messageContent.forEach((content, contentIndex) => {
       if (content.type === MESSAGE_CONTENT_TYPES.CALENDAR) {
         const calendar = content.calendar;
-        if (calendar.initial_selection && calendar.type !== CALENDAR_TYPE.START_END_DATE) {
-          onChangeValue(contentIndex, content.type, findAvailableCalendarDate(calendar), 'date_select');
-        } else if (calendar.initial_selection && calendar.type === CALENDAR_TYPE.START_END_DATE) {
-          const dayOffsets = Array.from({ length: CALENDAR_SEARCH_LIMIT + 1 }, (_, offset) => offset);
+        if (
+          calendar.initial_selection &&
+          calendar.type !== CALENDAR_TYPE.START_END_DATE
+        ) {
+          onChangeValue(
+            contentIndex,
+            content.type,
+            findAvailableCalendarDate(calendar),
+            "date_select"
+          );
+        } else if (
+          calendar.initial_selection &&
+          calendar.type === CALENDAR_TYPE.START_END_DATE
+        ) {
+          const dayOffsets = Array.from(
+            { length: CALENDAR_SEARCH_LIMIT + 1 },
+            (_, offset) => offset
+          );
           const availableOffset = dayOffsets.find(
-            (offset) => !handleDisableDateCalendar(moment().add(offset, 'days'), calendar),
+            (offset) =>
+              !handleDisableDateCalendar(moment().add(offset, "days"), calendar)
           );
           if (availableOffset === undefined) {
-            onChangeValue(contentIndex, content.type, null, 'start_date_select');
-            onChangeValue(contentIndex, content.type, null, 'end_date_select');
+            onChangeValue(
+              contentIndex,
+              content.type,
+              null,
+              "start_date_select"
+            );
+            onChangeValue(contentIndex, content.type, null, "end_date_select");
           } else {
-            const selectedDate = moment().add(availableOffset, 'days');
-            onChangeValue(contentIndex, content.type, selectedDate, 'start_date_select');
-            onChangeValue(contentIndex, content.type, selectedDate, 'end_date_select');
+            const selectedDate = moment().add(availableOffset, "days");
+            onChangeValue(
+              contentIndex,
+              content.type,
+              selectedDate,
+              "start_date_select"
+            );
+            onChangeValue(
+              contentIndex,
+              content.type,
+              selectedDate,
+              "end_date_select"
+            );
           }
         }
       } else if (content.type === MESSAGE_CONTENT_TYPES.CHECKBOX) {
         const checkbox = content.checkbox;
         if (checkbox.all_item_checked && checkbox.type !== CHECKBOX_TYPE.IMG) {
           const checkedValue = checkbox[checkbox.type].map((item) => item.id);
-          onChangeValue(contentIndex, content.type, checkedValue, 'checkedValue');
-        } else if (checkbox.all_item_checked && checkbox.type === CHECKBOX_TYPE.IMG) {
-          const initialSelectionPicture = checkbox[checkbox.type].flatMap((item) => (
-            item.contents.map((itemContent) => `${item.id}${CHECKBOX_ITEM_SEPARATOR}${itemContent.id}`)
-          ));
+          onChangeValue(
+            contentIndex,
+            content.type,
+            checkedValue,
+            "checkedValue"
+          );
+        } else if (
+          checkbox.all_item_checked &&
+          checkbox.type === CHECKBOX_TYPE.IMG
+        ) {
+          const initialSelectionPicture = checkbox[checkbox.type].flatMap(
+            (item) =>
+              item.contents.map(
+                (itemContent) =>
+                  `${item.id}${CHECKBOX_ITEM_SEPARATOR}${itemContent.id}`
+              )
+          );
           onChangeValue(
             contentIndex,
             content.type,
             initialSelectionPicture,
-            'initial_selection_picture',
+            "initial_selection_picture"
           );
         }
       } else if (content.type === MESSAGE_CONTENT_TYPES.RADIO_BUTTON) {
         const radioButton = content.radio_button;
         if (radioButton.initial_selection) {
-          onChangeValue(contentIndex, content.type, radioButton.initial_selection, 'initial_selection');
+          onChangeValue(
+            contentIndex,
+            content.type,
+            radioButton.initial_selection,
+            "initial_selection"
+          );
         }
-      } else if (content.type === MESSAGE_CONTENT_TYPES.CARD_PAYMENT_RADIO_BUTTON) {
+      } else if (
+        content.type === MESSAGE_CONTENT_TYPES.CARD_PAYMENT_RADIO_BUTTON
+      ) {
         const cardPaymentRadioButton = content.card_payment_radio_button;
-        if (cardPaymentRadioButton.type !== CARD_PAYMENT_TYPE.PICTURE_RADIO && cardPaymentRadioButton.initial_selection) {
+        if (
+          cardPaymentRadioButton.type !== CARD_PAYMENT_TYPE.PICTURE_RADIO &&
+          cardPaymentRadioButton.initial_selection
+        ) {
           onChangeValue(
             contentIndex,
             content.type,
             cardPaymentRadioButton.initial_selection,
-            'initial_selection',
+            "initial_selection"
           );
         } else if (cardPaymentRadioButton.initial_selection_picture) {
           onChangeValue(
             contentIndex,
             content.type,
             cardPaymentRadioButton.initial_selection_picture,
-            'initial_selection_picture',
+            "initial_selection_picture"
           );
         }
       } else if (content.type === MESSAGE_CONTENT_TYPES.SHIPPING_ADDRESS) {
@@ -201,16 +270,18 @@ const UserMessage = ({
             contentIndex,
             content.type,
             shippingAddress.value_initial_selection,
-            'value_initial_selection',
+            "value_initial_selection"
           );
         }
-      } else if (content.type === PREVIEW_MESSAGE_CONTENT_TYPES.PRODUCT_PURCHASE) {
+      } else if (
+        content.type === PREVIEW_MESSAGE_CONTENT_TYPES.PRODUCT_PURCHASE
+      ) {
         const productPurchase = content.product_purchase;
         onChangeValue(
           contentIndex,
           content.type,
           productPurchase.initial_selection,
-          'initial_selection',
+          "initial_selection"
         );
       } else if (content.type === MESSAGE_CONTENT_TYPES.PULL_DOWN) {
         const pullDown = content.pull_down;
@@ -219,12 +290,18 @@ const UserMessage = ({
           const initValue = pullDown[pullDown.type][key];
           const currentValue = pullDown[pullDown.type][attrs[key]];
           if (!currentValue && initValue) {
-            onChangeValue(contentIndex, content.type, initValue, pullDown.type, attrs[key]);
+            onChangeValue(
+              contentIndex,
+              content.type,
+              initValue,
+              pullDown.type,
+              attrs[key]
+            );
           }
         });
       }
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- init-once; prop callback identity is unstable
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- init-once; prop callback identity is unstable
   }, []);
 
   useEffect(() => {
@@ -234,7 +311,7 @@ const UserMessage = ({
     if (messageContent[0].type !== MESSAGE_CONTENT_TYPES.IMAGE) return;
 
     onRenderCompleted();
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- init-once; prop callback identity is unstable
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- init-once; prop callback identity is unstable
   }, []);
 
   if (!isUserMessage(message)) return null;
@@ -252,7 +329,7 @@ const UserMessage = ({
       .then((response) => {
         if (response.data.code === 1) {
           const responseMessage = response.data.message;
-          const link = document.createElement('a');
+          const link = document.createElement("a");
           link.href = useShortenedUrls
             ? SHORTEN_URL + responseMessage.shorten_code
             : responseMessage.origin_url;
@@ -274,20 +351,21 @@ const UserMessage = ({
       });
   };
 
-  const replaceVariable = (contentText) => (
+  const replaceVariable = (contentText) =>
     contentText.replaceAll(SCAN_REGEX, (_text, variable) => {
       if (variables.length === 0) {
         return EMPTY_STRING;
       }
-      const matchedVariable = variables.find((entry) => entry.variable_name === variable);
+      const matchedVariable = variables.find(
+        (entry) => entry.variable_name === variable
+      );
       return matchedVariable ? matchedVariable.default_value : EMPTY_STRING;
-    })
-  );
+    });
 
   const withReplacedTextAreaContent = (content) => {
     if (
-      content.type !== MESSAGE_CONTENT_TYPES.TEXT_AREA
-      || !content.textarea?.invalid_input?.content
+      content.type !== MESSAGE_CONTENT_TYPES.TEXT_AREA ||
+      !content.textarea?.invalid_input?.content
     ) {
       return content;
     }
@@ -307,7 +385,13 @@ const UserMessage = ({
   const renderContent = (content, contentIndex) => {
     switch (content.type) {
       case MESSAGE_CONTENT_TYPES.IMAGE:
-        return <Image content={content} contentIndex={contentIndex} messageIndex={messageIndex} />;
+        return (
+          <Image
+            content={content}
+            contentIndex={contentIndex}
+            messageIndex={messageIndex}
+          />
+        );
       case MESSAGE_CONTENT_TYPES.TEXT_INPUT:
         return (
           <TextInput
@@ -344,6 +428,7 @@ const UserMessage = ({
             messageIndex={messageIndex}
             onClickNext={onClickNext}
             notUseButtonNext={message.not_use_button}
+            cartSystem={cartSystem}
           />
         );
       case MESSAGE_CONTENT_TYPES.CHECKBOX:
@@ -491,9 +576,7 @@ const UserMessage = ({
         );
       case MESSAGE_CONTENT_TYPES.LABEL_NO_TRANSITION:
         return (
-          <div className="m-b-10">
-            {content.label_no_transition.value}
-          </div>
+          <div className="m-b-10">{content.label_no_transition.value}</div>
         );
       case MESSAGE_CONTENT_TYPES.CONTACT_FORM:
         return (

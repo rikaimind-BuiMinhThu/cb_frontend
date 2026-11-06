@@ -3,17 +3,25 @@ import "v2/assets/css/bot/preview-chat-bot.css";
 import Cookies from "js-cookie";
 import CustomButton from "./PreviewComponent/CustomButton";
 import {
-  UserMessage, BotMessage, CombineMessage,
-  PreviewClosedLauncher, PreviewOpenChatFrame, PreviewMessagesList,
+  UserMessage,
+  BotMessage,
+  CombineMessage,
+  PreviewClosedLauncher,
+  PreviewOpenChatFrame,
+  PreviewMessagesList,
 } from "./PreviewComponent";
-import UserMessageTailIcon from 'v2/components/BotMessages/UserMessageTailIcon';
-import { resolveMainColorContext, resolveUserMessageTheme } from "v2/utils/designThemeCore";
+import UserMessageTailIcon from "v2/components/BotMessages/UserMessageTailIcon";
+import {
+  resolveMainColorContext,
+  resolveUserMessageTheme,
+} from "v2/utils/designThemeCore";
 import PreviewFukushashikiReducer from "./PreviewFukushashiki/PreviewFukushashikiReducer";
 import "moment/locale/zh-cn";
 import {
   CHATBOT_ACTIONS,
   NO_ERROR,
   GETTING_ERROR_NOTIFICATION,
+  PROCESSING_LABEL,
   TIMER_MAP_VARIABLES_FIELD,
   TIMER_TYPES,
   CART_SYSTEM,
@@ -30,7 +38,10 @@ import {
   OK_BUTTON_LABEL,
 } from "./PreviewComponent/Constants";
 import { OPEN_ANIMATION_DURATION_MS_DEFAULT } from "v2/views/DesignSetting/constants/designChatbotConstants";
-import { DEFAULT_EXECUTION_POLICY, EXECUTION_POLICIES } from "v2/variables/constants";
+import {
+  DEFAULT_EXECUTION_POLICY,
+  EXECUTION_POLICIES,
+} from "v2/variables/constants";
 import {
   clampOpenAnimationDurationMs,
   parseDesignSettings,
@@ -55,6 +66,7 @@ import {
   isButtonSubmitMessage,
   createScenarioUserResponseMessageHistory,
   sendErrorLogToServer,
+  errorMessageToHtml,
 } from "./PreviewComponent/Utils";
 import { runLexicaButtonSubmit } from "./PreviewFukushashiki/lexicaSubmit";
 import {
@@ -64,16 +76,22 @@ import {
   savePrevOpenStatus,
   getPrevOpenStatus,
   getTimerConfig,
-  setTimerConfig
+  setTimerConfig,
 } from "./PreviewComponent/SessionStorageUtils";
-import { isTokyoDeveloLP, UPDATE_TOKYO_DEVELO_LP_PREFECTURE_JS_CODE } from "./PreviewComponent/TokyoLPUtils";
+import {
+  isTokyoDeveloLP,
+  UPDATE_TOKYO_DEVELO_LP_PREFECTURE_JS_CODE,
+} from "./PreviewComponent/TokyoLPUtils";
 import ProcessBar from "./PreviewComponent/ProcessBar";
 import ZipCodePopUp from "./PreviewComponent/ZipCodePopUp";
 import _ from "lodash";
 import Timer from "./PreviewComponent/Timer";
 import {
-  setConversionParamToLocalStorage, fukushashikiSavedStateToLp, fukushashikiToLP,
-  executeLpJsCode, postMessageToParent
+  setConversionParamToLocalStorage,
+  fukushashikiSavedStateToLp,
+  fukushashikiToLP,
+  executeLpJsCode,
+  postMessageToParent,
 } from "./PreviewFukushashiki/LPUtils";
 import { resolveErrMsgLpScript } from "v2/views/ScenarioSetting/utils/resolveErrMsgLpScript";
 import { generateLaunchButtonLpScript } from "v2/views/ScenarioSetting/utils/launchButtonLpScriptUtils";
@@ -86,7 +104,11 @@ import {
 import { convertToFukushashikiObject } from "./PreviewFukushashiki/FukushashikiDataConverterUtils";
 import { handleValidateField } from "./PreviewFukushashiki/ValidationUtils";
 import { createOrAddLinesCart } from "./PreviewComponent/ShopifyUtils";
-import { clearChatbotState, shouldSkipSavedChatbotState, subscribeLpUgcSampleSwap } from "./PreviewComponent/previewSessionUtils";
+import {
+  clearChatbotState,
+  shouldSkipSavedChatbotState,
+  subscribeLpUgcSampleSwap,
+} from "./PreviewComponent/previewSessionUtils";
 import { getBotInforFromPreviewResponse } from "./PreviewComponent/previewBotInfoUtils";
 import {
   getBotHeaderIconUrl,
@@ -111,55 +133,65 @@ import {
 savePrevOpenStatus("0");
 const url = new URL(window.location.href);
 const params = new URLSearchParams(url.search);
-const isLoggedIn = params.get(QUERY_PARAM_IS_LOGGED_IN) === QUERY_PARAM_VALUE_TRUE;
-const previewInitialState = createPreviewInitialState("fukushashiki", { params });
-
+const isLoggedIn =
+  params.get(QUERY_PARAM_IS_LOGGED_IN) === QUERY_PARAM_VALUE_TRUE;
+const previewInitialState = createPreviewInitialState("fukushashiki", {
+  params,
+});
 
 const PreviewFukushashiki = () => {
-  const [state, dispatch] = useReducer(PreviewFukushashikiReducer, previewInitialState);
-  const [timerChanges, setTimerChanges] = useState({ timeLeft: -1, config: null });
+  const [state, dispatch] = useReducer(
+    PreviewFukushashikiReducer,
+    previewInitialState
+  );
+  const [timerChanges, setTimerChanges] = useState({
+    timeLeft: -1,
+    config: null,
+  });
   const containerRef = useRef(null);
   const hasSentCustomJs = useRef(false);
   const hasSentInitialOpenStateToParent = useRef(false);
   const hasFiredStartTagRef = useRef(false);
   const previewStateRef = useRef(state);
   previewStateRef.current = state;
-  const [useSharedBootstrap, setUseSharedBootstrap] = useState(() => !getChatbotSavedState());
+  const [useSharedBootstrap, setUseSharedBootstrap] = useState(
+    () => !getChatbotSavedState()
+  );
   const [msgUpdateState, setMsgUpdateState] = useState({});
   const msgUpdateStateRef = useRef({});
   const lexicaSubmitLockRef = useRef(false);
   const lexicaMessagesRef = useRef(state.messagesList);
   lexicaMessagesRef.current = state.messagesList;
-  useEffect(() => { 
+  useEffect(() => {
     if (!state.isUseBtnUpdateTracking) return;
-    msgUpdateStateRef.current = msgUpdateState; 
+    msgUpdateStateRef.current = msgUpdateState;
   }, [msgUpdateState, state.isUseBtnUpdateTracking]);
 
   // Initialize conversion status when chatbot opens
   useEffect(() => {
     if (!state.isUseBtnUpdateTracking) return;
 
-    const spBody = document.getElementById('sp-body');
+    const spBody = document.getElementById("sp-body");
     if (!spBody) return;
 
     const handleChange = (e) => {
-      const msgContainer = e.target.closest('.sp-body-user-side');
+      const msgContainer = e.target.closest(".sp-body-user-side");
       if (!msgContainer) return;
 
-      const btn = msgContainer.querySelector('button.btn-update');
-      if (btn) btn.classList.remove('btn-update');
+      const btn = msgContainer.querySelector("button.btn-update");
+      if (btn) btn.classList.remove("btn-update");
 
-      const rawId = msgContainer.id?.replace('msg_id_', '');
+      const rawId = msgContainer.id?.replace("msg_id_", "");
       const msgId = rawId ? parseInt(rawId) : NaN;
-      if (!isNaN(msgId) && msgUpdateStateRef.current[msgId] === 'clicked') {
-        setMsgUpdateState(prev => ({ ...prev, [msgId]: 'editing' }));
+      if (!isNaN(msgId) && msgUpdateStateRef.current[msgId] === "clicked") {
+        setMsgUpdateState((prev) => ({ ...prev, [msgId]: "editing" }));
       }
     };
 
-    spBody.addEventListener('change', handleChange, true);
+    spBody.addEventListener("change", handleChange, true);
 
     return () => {
-      spBody.removeEventListener('change', handleChange, true);
+      spBody.removeEventListener("change", handleChange, true);
     };
   }, [state.isUseBtnUpdateTracking, state.isOpen]);
 
@@ -199,7 +231,7 @@ const PreviewFukushashiki = () => {
 
         return dispatch({
           type: PREVIEW_ACTIONS.ADD_LP_OPTION_DATA,
-          payload: receiveOptionData
+          payload: receiveOptionData,
         });
       }
 
@@ -209,8 +241,8 @@ const PreviewFukushashiki = () => {
           type: PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE_WITH_DISPLAY_MSG,
           payload: {
             error: error,
-            displayMsg: actionData.displayMsg
-          }
+            displayMsg: actionData.displayMsg,
+          },
         });
       }
 
@@ -219,19 +251,18 @@ const PreviewFukushashiki = () => {
         const error = actionData === NO_ERROR ? "" : actionData;
         return dispatch({
           type: PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE,
-          payload: error
+          payload: error,
         });
 
       case CHATBOT_ACTIONS.OPEN_PREVIEW:
-        if (!state.isOpen)
-          return onOpenPreview(true);
+        if (!state.isOpen) return onOpenPreview(true);
         break;
 
       case CHATBOT_ACTIONS.GET_PREVIEW_ORDER_CONTENT:
       case CHATBOT_ACTIONS.PREVIEW_OBJECT:
         return dispatch({
           type: PREVIEW_ACTIONS.UPDATE_PREVIEW_ORDER_CONTENT,
-          payload: actionData
+          payload: actionData,
         });
 
       case CHATBOT_ACTIONS.UPDATE_AMAZON_PAY_DATA:
@@ -276,7 +307,7 @@ const PreviewFukushashiki = () => {
 
           return dispatch({
             type: PREVIEW_ACTIONS.UPDATE_NUMBER_ORDER_TO_UPSELL,
-            payload: {variables, objParam: actionData}
+            payload: { variables, objParam: actionData },
           });
         }
         break;
@@ -314,7 +345,8 @@ const PreviewFukushashiki = () => {
     enabled: !state.isUpsell,
     enableScrollAuto: true,
     dependencyLength:
-      (state.renderMessagesList?.length ?? 0) + (state.submitErrorMessage ? 1 : 0),
+      (state.renderMessagesList?.length ?? 0) +
+      (state.submitErrorMessage ? 1 : 0),
   });
   usePreviewMessageReveal({
     state,
@@ -329,7 +361,7 @@ const PreviewFukushashiki = () => {
     if (!hasSentInitialOpenStateToParent.current) return;
     if (!state.urlReceive) return;
     postMessageToParent({ isOpen: state.isOpen }, state);
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- avoid re-running preview bootstrap on every state change
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- avoid re-running preview bootstrap on every state change
   }, [
     state.urlReceive,
     state.isOpen,
@@ -353,18 +385,20 @@ const PreviewFukushashiki = () => {
     if (!state.loadedStateFromSession) return;
     if (state.prefecturesList.length !== 0) return;
 
-    getPrefectures()
-      .then((res) => {
-        dispatch({ type: PREVIEW_ACTIONS.UPDATE_PREFECTURES_LIST, payload: { prefecturesList: res.data.data } });
-      })
+    getPrefectures().then((res) => {
+      dispatch({
+        type: PREVIEW_ACTIONS.UPDATE_PREFECTURES_LIST,
+        payload: { prefecturesList: res.data.data },
+      });
+    });
   }, [state.prefecturesList, state.loadedStateFromSession]);
 
-    // For run errorJsCode
+  // For run errorJsCode
   useEffect(() => {
     if (!state.isUsedErrMsgByJs) return;
     const jsCode = resolveErrMsgLpScript(state);
     if (jsCode) executeLpJsCode(jsCode, state);
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- avoid re-running preview bootstrap on every state change
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- avoid re-running preview bootstrap on every state change
   }, [
     state.isUsedErrMsgByJs,
     state.errMsgJsCode,
@@ -379,7 +413,7 @@ const PreviewFukushashiki = () => {
     if (!state.launchButtonSelectors) return;
     const jsCode = generateLaunchButtonLpScript(state.launchButtonSelectors);
     if (jsCode) executeLpJsCode(jsCode, state);
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- avoid re-running preview bootstrap on every state change
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- avoid re-running preview bootstrap on every state change
   }, [state.launchButtonSelectors]);
 
   // Fukushashiki session restore (upsell, LP sync, timer) — not covered by shared bootstrap hook
@@ -394,9 +428,11 @@ const PreviewFukushashiki = () => {
       return;
     }
 
-    const currentBotId = params.get("order_id") || params.get("bot_id") || Cookies.get("bot_id");
-    const skipSaved = shouldSkipSavedChatbotState(params, savedState)
-      || (currentBotId && currentBotId !== savedState.botId);
+    const currentBotId =
+      params.get("order_id") || params.get("bot_id") || Cookies.get("bot_id");
+    const skipSaved =
+      shouldSkipSavedChatbotState(params, savedState) ||
+      (currentBotId && currentBotId !== savedState.botId);
     if (skipSaved) {
       clearChatbotState();
       if (!currentBotId) {
@@ -405,15 +441,20 @@ const PreviewFukushashiki = () => {
       }
       dispatch({ type: PREVIEW_ACTIONS.SET_BOT_ID, payload: currentBotId });
       if (params.get("scenario_id")) {
-        dispatch({ type: PREVIEW_ACTIONS.SET_SCENARIO_ID, payload: params.get("scenario_id") });
+        dispatch({
+          type: PREVIEW_ACTIONS.SET_SCENARIO_ID,
+          payload: params.get("scenario_id"),
+        });
       }
-      return getScenarioPreviewData(currentBotId, params.get("scenario_id"))
-        .then(extractStateFromPreviewResponse);
+      return getScenarioPreviewData(
+        currentBotId,
+        params.get("scenario_id")
+      ).then(extractStateFromPreviewResponse);
     }
 
     setConversionParamToLocalStorage(
       savedState.scenarioId,
-      'web',
+      "web",
       savedState.userInputId || params.get("uuid"),
       params.get("env") || "production",
       savedState
@@ -425,31 +466,43 @@ const PreviewFukushashiki = () => {
         payload: {
           savedState,
           isLoggedIn: isLoggedIn,
-          isUsingAmazonPay: params.get('is_using_amazon_pay')
-        }
+          isUsingAmazonPay: params.get("is_using_amazon_pay"),
+        },
       });
     }
 
     const timerConfig = getTimerConfig();
     if (timerConfig) {
-      setTimerChanges({ timeLeft: calculateTimerConfigDuration(timerConfig?.config?.type, timerConfig?.config?.duration, { timerLeft: timerConfig.timeLeft, useTimerLeft: true }), config: timerConfig });
+      setTimerChanges({
+        timeLeft: calculateTimerConfigDuration(
+          timerConfig?.config?.type,
+          timerConfig?.config?.duration,
+          { timerLeft: timerConfig.timeLeft, useTimerLeft: true }
+        ),
+        config: timerConfig,
+      });
     }
 
-    return fukushashikiSavedStateToLp(savedState, params, state).then(async () => {
-      if (isTokyoDeveloLP(savedState.urlReceive)) {
-        executeLpJsCode(UPDATE_TOKYO_DEVELO_LP_PREFECTURE_JS_CODE, savedState);
-      }
-
-      return dispatch({
-        type: PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SESSION_STORAGE,
-        payload: {
-          savedState,
-          isLoggedIn: isLoggedIn,
-          isUsingAmazonPay: params.get('is_using_amazon_pay')
+    return fukushashikiSavedStateToLp(savedState, params, state).then(
+      async () => {
+        if (isTokyoDeveloLP(savedState.urlReceive)) {
+          executeLpJsCode(
+            UPDATE_TOKYO_DEVELO_LP_PREFECTURE_JS_CODE,
+            savedState
+          );
         }
-      });
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- avoid re-running preview bootstrap on every state change
+
+        return dispatch({
+          type: PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SESSION_STORAGE,
+          payload: {
+            savedState,
+            isLoggedIn: isLoggedIn,
+            isUsingAmazonPay: params.get("is_using_amazon_pay"),
+          },
+        });
+      }
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- avoid re-running preview bootstrap on every state change
   }, [useSharedBootstrap, state.loadedStateFromSession]);
 
   useEffect(() => {
@@ -466,7 +519,14 @@ const PreviewFukushashiki = () => {
       }, 1000);
       return () => clearTimeout(timer);
     }
-  }, [state.loadedStateFromSession, state.displayType, state.isOpen, state.messagesList.length, state.botInfor, state.manuallyClosed]);
+  }, [
+    state.loadedStateFromSession,
+    state.displayType,
+    state.isOpen,
+    state.messagesList.length,
+    state.botInfor,
+    state.manuallyClosed,
+  ]);
 
   const renderNextMessage = () => {
     if (state.currentMsgIndex + 1 >= state.nextStopMsgIndex) return;
@@ -478,19 +538,30 @@ const PreviewFukushashiki = () => {
         startIndex: 0,
         endIndex: state.currentMsgIndex + 1 + 1,
         fromCallback: true,
-      }
+      },
     });
-    if (newMsgIndex < state.messagesList.length && isInteractiveMessage(state.messagesList[newMsgIndex])) {
+    if (
+      newMsgIndex < state.messagesList.length &&
+      isInteractiveMessage(state.messagesList[newMsgIndex])
+    ) {
       createScenarioUserResponseMessageHistory({
         scenario_id: state.scenarioId,
         user_id: state.uuid,
-        msgs: [{ id: state.messagesList[newMsgIndex].id, type: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.APPEAR }],
+        msgs: [
+          {
+            id: state.messagesList[newMsgIndex].id,
+            type: CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE.APPEAR,
+          },
+        ],
       });
     }
-  }
+  };
 
   const setShowPopupCloseBot = (value) => {
-    dispatch({ type: PREVIEW_ACTIONS.SET_SHOW_POPUP_CLOSE_BOT, payload: value });
+    dispatch({
+      type: PREVIEW_ACTIONS.SET_SHOW_POPUP_CLOSE_BOT,
+      payload: value,
+    });
   };
 
   const onOpenPreview = (opening) => {
@@ -516,7 +587,11 @@ const PreviewFukushashiki = () => {
 
     if (state.isAlreadyOpenFirstTime) {
       if (!opening) {
-        if (isWithdrawalPreventionEnabled(state.botInfor?.withdrawal_prevention_status)) {
+        if (
+          isWithdrawalPreventionEnabled(
+            state.botInfor?.withdrawal_prevention_status
+          )
+        ) {
           return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
         }
 
@@ -539,18 +614,21 @@ const PreviewFukushashiki = () => {
 
     sendCloseChatbotCountRequest(state.scenarioId, deviceReceive);
     dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
-  }
+  };
 
   const onChatbotHeaderClick = () => {
     if (!state.isOpen) return dispatch({ type: PREVIEW_ACTIONS.OPEN_CHATBOT });
 
-    if (!isWithdrawalPreventionEnabled(state.botInfor?.withdrawal_prevention_status)) {
+    if (
+      !isWithdrawalPreventionEnabled(
+        state.botInfor?.withdrawal_prevention_status
+      )
+    ) {
       return dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
     }
 
     return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
-  }
-
+  };
 
   const extractStateFromPreviewResponse = async (res) => {
     if (!res || !res.data || res.data.code !== 1) return;
@@ -561,9 +639,10 @@ const PreviewFukushashiki = () => {
     const parsedDesign = parseDesignSettings(
       res.data.design_settings,
       mainColorHex,
-      apiColorKey,
+      apiColorKey
     );
-    const shouldAutoOpen = Number(parsedDesign.displayType) === DISPLAY_TYPES.RELOAD;
+    const shouldAutoOpen =
+      Number(parsedDesign.displayType) === DISPLAY_TYPES.RELOAD;
     const newState = {
       ...state,
       botInfor: getBotInforFromPreviewResponse(res),
@@ -574,10 +653,10 @@ const PreviewFukushashiki = () => {
       ...mapParsedDesignToState(parsedDesign),
       isUsedErrMsgByJs: chatbot?.is_used_err_msg_by_js,
       errMsgJsCode: chatbot?.err_msg_js_code,
-      errMsgSettingMode: chatbot?.err_msg_setting_mode || 'js',
-      errMsgFieldSelectors: chatbot?.err_msg_field_selectors || '',
-      errMsgFormSelectors: chatbot?.err_msg_form_selectors || '',
-      launchButtonSelectors: chatbot?.launch_button_selectors || '',
+      errMsgSettingMode: chatbot?.err_msg_setting_mode || "js",
+      errMsgFieldSelectors: chatbot?.err_msg_field_selectors || "",
+      errMsgFormSelectors: chatbot?.err_msg_form_selectors || "",
+      launchButtonSelectors: chatbot?.launch_button_selectors || "",
       useNewProcess: chatbot?.client_cart_system === CART_SYSTEM.EC_FORCE,
       isUsedPastMessageLoaded: !!chatbot?.is_used_message_loaded_past,
       isProcessing: false,
@@ -592,7 +671,7 @@ const PreviewFukushashiki = () => {
       isUsedCustomCss: !!chatbot?.is_used_custom_css,
       customCssContent: chatbot?.custom_css_content,
       isUsedThanksMessage: !!chatbot?.is_used_thanks_message,
-      thanksMessageHtml: chatbot?.thanks_message_html || '',
+      thanksMessageHtml: chatbot?.thanks_message_html || "",
       isUsedHtmlUgc: !!chatbot?.is_used_html_ugc,
       htmlUgcConfigContent: chatbot?.html_ugc_config_content,
       orderResultMode: chatbot?.order_result_mode || "wait",
@@ -601,19 +680,28 @@ const PreviewFukushashiki = () => {
 
     if (chatbot?.timer_config?.enable) {
       const timerConfig = chatbot.timer_config;
-      setTimerChanges({ timeLeft: calculateTimerConfigDuration(timerConfig.type, timerConfig.duration), config: timerConfig });
+      setTimerChanges({
+        timeLeft: calculateTimerConfigDuration(
+          timerConfig.type,
+          timerConfig.duration
+        ),
+        config: timerConfig,
+      });
     }
 
     const prevOpenStatus = getPrevOpenStatus();
 
-    if (parsedDesign.displayType === DISPLAY_TYPES.RELOAD && prevOpenStatus === "0") {
+    if (
+      parsedDesign.displayType === DISPLAY_TYPES.RELOAD &&
+      prevOpenStatus === "0"
+    ) {
       savePrevOpenStatus("1");
       sendOpenChatbotCountRequest(state.scenarioId, state.deviceReceive);
     }
 
     setConversionParamToLocalStorage(
       newState.scenarioId,
-      'web',
+      "web",
       newState.userInputId || params.get("uuid"),
       params.get("env") || "production",
       newState
@@ -628,23 +716,28 @@ const PreviewFukushashiki = () => {
         botInfor: getBotInforFromPreviewResponse(res),
         themeSettings: parsedDesign.themeSettings,
         isLoggedIn: isLoggedIn,
-        isUsingAmazonPay: params.get('is_using_amazon_pay'),
+        isUsingAmazonPay: params.get("is_using_amazon_pay"),
       },
     });
-  }
+  };
 
   const handleOnCounting = (config) => (timer) => {
     const timerChanges = { timeLeft: timer, config };
     setTimerConfig(timerChanges);
     setTimerChanges(timerChanges);
-  }
+  };
 
   const getTimerConfigVariable = (configVariables) => {
-    const variables = Object.values(configVariables)
-      .reduce((acc, key) => !TIMER_MAP_VARIABLES_FIELD[key] ? acc : [...acc, { ...TIMER_MAP_VARIABLES_FIELD[key], name: key }], []);
+    const variables = Object.values(configVariables).reduce(
+      (acc, key) =>
+        !TIMER_MAP_VARIABLES_FIELD[key]
+          ? acc
+          : [...acc, { ...TIMER_MAP_VARIABLES_FIELD[key], name: key }],
+      []
+    );
 
     return variables;
-  }
+  };
 
   const calculateTimerConfigDuration = (type, duration, options = {}) => {
     const { timerLeft = 0, useTimerLeft = false } = options;
@@ -656,7 +749,7 @@ const PreviewFukushashiki = () => {
       return 0;
     }
 
-    switch(type) {
+    switch (type) {
       case TIMER_TYPES.COUNTING_DOWN: {
         if (useTimerLeft) {
           return timerLeft;
@@ -670,7 +763,7 @@ const PreviewFukushashiki = () => {
         return 0;
       }
     }
-  }
+  };
 
   const onClickNext = (clickedMsgIndex, clickedMsg) => {
     savedChatbotState(state);
@@ -679,7 +772,7 @@ const PreviewFukushashiki = () => {
       scenario_id: state.scenarioId,
       message: clickedMsg,
       user_id: state.uuid,
-      bot_type: "web"
+      bot_type: "web",
     };
 
     const validationResult = handleValidateField(clickedMsg, clickedMsgIndex);
@@ -687,30 +780,42 @@ const PreviewFukushashiki = () => {
     if (!validationResult.isValid) {
       dispatch({
         type: PREVIEW_ACTIONS.SET_ERRORS,
-        payload: validationResult.errors
+        payload: validationResult.errors,
       });
       return sendErrorLogToServer(data);
     }
 
     if (state.isUseBtnUpdateTracking && !clickedMsg.buttonName) {
-      setMsgUpdateState(prev => ({ ...prev, [clickedMsg.id]: 'clicked' }));
+      setMsgUpdateState((prev) => ({ ...prev, [clickedMsg.id]: "clicked" }));
     }
 
-    const isBtnUpdateClick = clickedMsgIndex < state.renderMessagesList.length - 1;
+    const isBtnUpdateClick =
+      clickedMsgIndex < state.renderMessagesList.length - 1;
     const isShopify = state.cartSystem === CART_SYSTEM.SHOPIFY;
     const isLexica = state.cartSystem === CART_SYSTEM.LEXICA;
-    const isClickedButtonSubmit = isButtonSubmitMessage(clickedMsg)
-      || isButtonSubmitMessage(state.messagesList[clickedMsgIndex]);
+    const isClickedButtonSubmit =
+      isButtonSubmitMessage(clickedMsg) ||
+      isButtonSubmitMessage(state.messagesList[clickedMsgIndex]);
 
     const continueAfterOptionalToken = () => {
       if (isShopify) {
-        sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
+        sendLogMessageToServer(
+          data,
+          isBtnUpdateClick
+            ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE
+            : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD
+        );
 
         if (isButtonSubmitMessage(clickedMsg)) {
           createOrAddLinesCart(state);
         }
       } else {
-        sendLogMessageToServer(data, isBtnUpdateClick ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD);
+        sendLogMessageToServer(
+          data,
+          isBtnUpdateClick
+            ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE
+            : CONVERSION_RESPONSE_SUBMIT_TYPE.ADD
+        );
       }
 
       fireChatbotButtonTags(state, clickedMsg);
@@ -719,16 +824,21 @@ const PreviewFukushashiki = () => {
         executeLpJsCode(clickedMsg.jscode, state);
       }
 
-      if (clickedMsg.message_content[0]?.type === "button_submit"
-        && clickedMsg.message_content[0]?.button_submit_id) {
+      if (
+        clickedMsg.message_content[0]?.type === "button_submit" &&
+        clickedMsg.message_content[0]?.button_submit_id
+      ) {
         const buttonId = clickedMsg.message_content[0]?.button_submit_id;
 
         if (!isShopify) {
-          postMessageToParent({
-            action: CHATBOT_ACTIONS.CLICK_BUTTON,
-            actionData: buttonId,
-            isOpen: true,
-          }, state);
+          postMessageToParent(
+            {
+              action: CHATBOT_ACTIONS.CLICK_BUTTON,
+              actionData: buttonId,
+              isOpen: true,
+            },
+            state
+          );
         }
       }
 
@@ -737,12 +847,16 @@ const PreviewFukushashiki = () => {
       const fukuData = convertToFukushashikiObject(data, state.prefecturesList);
       fukushashikiToLP(fukuData, state);
 
-      const isClickedLastMessage = state.messagesList.length - 1 === clickedMsgIndex;
-      const shouldFireCompleteTag = isScenarioCompleteClick(state.messagesList, clickedMsgIndex);
+      const isClickedLastMessage =
+        state.messagesList.length - 1 === clickedMsgIndex;
+      const shouldFireCompleteTag = isScenarioCompleteClick(
+        state.messagesList,
+        clickedMsgIndex
+      );
 
       dispatch({
         type: PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON,
-        payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn}
+        payload: { clickedMsgIndex, clickedMsg, isLoggedIn: isLoggedIn },
       });
 
       // Lexica create_order is owned by followLexicaOrder / createLexicaOrder only.
@@ -760,10 +874,15 @@ const PreviewFukushashiki = () => {
           scenario_id: state.scenarioId,
           user_input_id: state.uuid,
           status: CONVERSTION_RESPONSE_STATUS.FINISH,
-        })
+        });
       }
 
-      if (isClickedLastMessage && clickedMsg?.only_display_when_confirm && !state.submitErrorMessage && Object.keys(state.errors).length === 0) {
+      if (
+        isClickedLastMessage &&
+        clickedMsg?.only_display_when_confirm &&
+        !state.submitErrorMessage &&
+        Object.keys(state.errors).length === 0
+      ) {
         setTimeout(() => {
           dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
         }, 1000);
@@ -773,26 +892,32 @@ const PreviewFukushashiki = () => {
     if (isLexica && isClickedButtonSubmit) {
       runLexicaButtonSubmit({
         isLocked: lexicaSubmitLockRef.current || state.isProcessing,
-        lock: () => { lexicaSubmitLockRef.current = true; },
-        unlock: () => { lexicaSubmitLockRef.current = false; },
-        setProcessing: (value) => dispatch({
-          type: PREVIEW_ACTIONS.SET_PROCESSING,
-          payload: value,
-        }),
+        lock: () => {
+          lexicaSubmitLockRef.current = true;
+        },
+        unlock: () => {
+          lexicaSubmitLockRef.current = false;
+        },
+        setProcessing: (value) =>
+          dispatch({
+            type: PREVIEW_ACTIONS.SET_PROCESSING,
+            payload: value,
+          }),
         messages: lexicaMessagesRef.current,
         scenarioId: state.scenarioId,
         userId: state.uuid,
         orderResultMode: state.orderResultMode,
         logData: data,
         continueAfterOptionalToken,
-        setSubmitError: (copy) => dispatch({
-          type: PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE,
-          payload: copy,
-        }),
+        setSubmitError: (copy) =>
+          dispatch({
+            type: PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE,
+            payload: copy,
+          }),
         showThanks: (fallbackCopy) => {
           const html = state.isUsedThanksMessage
-            ? String(state.thanksMessageHtml || '').trim()
-            : '';
+            ? String(state.thanksMessageHtml || "").trim()
+            : "";
           if (!html) {
             dispatch({
               type: PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE,
@@ -805,10 +930,11 @@ const PreviewFukushashiki = () => {
             payload: html,
           });
         },
-        lockChatAfterSubmit: () => dispatch({
-          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-          payload: { isChatLockedAfterSubmit: true },
-        }),
+        lockChatAfterSubmit: () =>
+          dispatch({
+            type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+            payload: { isChatLockedAfterSubmit: true },
+          }),
       });
       return;
     }
@@ -840,20 +966,22 @@ const PreviewFukushashiki = () => {
         subField1,
         subField2,
         message,
-      }
+      },
     });
   };
 
   const onOpenZipCodePopup = (isOpen, contentIndex, messageIndex) => {
     const zipIndexes = {
-      ...(contentIndex !== undefined ? { zipcodeContentIndex: contentIndex } : {}),
+      ...(contentIndex !== undefined
+        ? { zipcodeContentIndex: contentIndex }
+        : {}),
       ...(messageIndex !== undefined ? { zipcodeIndex: messageIndex } : {}),
     };
 
     if (isOpen) {
       changeElementAttributeById([
-        { id: "sp-withdrawal-container", style: { display: "block" }},
-        { id: "sp-popup-zip-code-address", style: { display: "block" }}
+        { id: "sp-withdrawal-container", style: { display: "block" } },
+        { id: "sp-popup-zip-code-address", style: { display: "block" } },
       ]);
 
       dispatch({
@@ -864,14 +992,14 @@ const PreviewFukushashiki = () => {
           cities: null,
           towns: null,
           zipcode: null,
-        }
+        },
       });
       return;
     }
 
     changeElementAttributeById([
-      { id: "sp-withdrawal-container", style: { display: "none" }},
-      { id: "sp-popup-zip-code-address", style: { display: "none" }}
+      { id: "sp-withdrawal-container", style: { display: "none" } },
+      { id: "sp-popup-zip-code-address", style: { display: "none" } },
     ]);
   };
 
@@ -881,7 +1009,12 @@ const PreviewFukushashiki = () => {
   };
 
   const renderBotMessageContent = (message, messageIndex) => {
-    if (!message || message.belong_to !== "bot" || !Array.isArray(message?.message_content)) return null;
+    if (
+      !message ||
+      message.belong_to !== "bot" ||
+      !Array.isArray(message?.message_content)
+    )
+      return null;
 
     return message.message_content.map((content, contentIndex) => (
       <BotMessage
@@ -914,27 +1047,45 @@ const PreviewFukushashiki = () => {
     if (message.is_display_button_next === false) return null;
     if (message.message_content[0]?.type === "button_submit") return null;
 
-    const isBtnUpdateMode = state.isUseBtnUpdateTracking && !message.buttonName && !isUpdate;
-    const msgState = msgUpdateState[message.id]; 
+    const isBtnUpdateMode =
+      state.isUseBtnUpdateTracking && !message.buttonName && !isUpdate;
+    const msgState = msgUpdateState[message.id];
 
-    const btnText = message.buttonName
-      || (isBtnUpdateMode && msgState === 'clicked'
+    const btnText =
+      message.buttonName ||
+      (isBtnUpdateMode && msgState === "clicked"
         ? OK_BUTTON_LABEL
-        : (isUpdate ? NEXT_BUTTON_LABEL : UPDATE_BUTTON_LABEL));
-    const hasBtnUpdateClass = isBtnUpdateMode && msgState !== 'editing';
+        : isUpdate
+        ? NEXT_BUTTON_LABEL
+        : UPDATE_BUTTON_LABEL);
+    const hasBtnUpdateClass = isBtnUpdateMode && msgState !== "editing";
     return (
-      <div className={isDisplayBtnNext ? 'sp-user-message-button-action' : 'sp-user-message-button-action sp-user-message-button-action--hidden'}>
+      <div
+        className={
+          isDisplayBtnNext
+            ? "sp-user-message-button-action"
+            : "sp-user-message-button-action sp-user-message-button-action--hidden"
+        }
+      >
         <CustomButton
           disabled={
             state.isChatLockedAfterSubmit
               ? true
-              : (state.submitErrorMessage.length > 0 ? false : message.disabled)
+              : state.submitErrorMessage.length > 0
+              ? false
+              : message.disabled
           }
-          className={`ss-user-message__action-btn${hasBtnUpdateClass ? " btn-update" : ""}`}
+          className={`ss-user-message__action-btn${
+            hasBtnUpdateClass ? " btn-update" : ""
+          }`}
           onClick={() => {
-            onClickNext(messageIndex, message)
+            onClickNext(messageIndex, message);
           }}
-          autoClick={isAutoClick && !state.isExtractFromSession && !state.isChatLockedAfterSubmit}
+          autoClick={
+            isAutoClick &&
+            !state.isExtractFromSession &&
+            !state.isChatLockedAfterSubmit
+          }
           messageType={message.message_content[0]?.type}
         >
           {btnText}
@@ -945,24 +1096,37 @@ const PreviewFukushashiki = () => {
 
   const renderUserMessageContent = (message, messageIndex) => {
     if (!message || message.belong_to !== "user") return null;
-    if (!Array.isArray(message?.message_content) || message.message_content.length === 0) return null;
+    if (
+      !Array.isArray(message?.message_content) ||
+      message.message_content.length === 0
+    )
+      return null;
 
-    const userMessageTheme = resolveUserMessageTheme(state.themeSettings, state.botInfor);
+    const userMessageTheme = resolveUserMessageTheme(
+      state.themeSettings,
+      state.botInfor
+    );
 
     return (
-      <div className="sp-body-user-side slideLeft" id={getElementMessageById(message.id)}>
+      <div
+        className="sp-body-user-side slideLeft"
+        id={getElementMessageById(message.id)}
+      >
         <div className="sp-body-user-side-messages position-relative">
           <UserMessage
-            postMessageToParent={(options) => postMessageToParent(options, state)}
+            postMessageToParent={(options) =>
+              postMessageToParent(options, state)
+            }
             message={message}
             captcha={state.captcha}
             messageContentProps={message.message_content}
             disabled={
               state.isChatLockedAfterSubmit
                 ? true
-                : (state.submitErrorMessage.length > 0 && state.submitErrorMessage !== GETTING_ERROR_NOTIFICATION)
-                  ? false
-                  : message.disabled
+                : state.submitErrorMessage.length > 0 &&
+                  state.submitErrorMessage !== GETTING_ERROR_NOTIFICATION
+                ? false
+                : message.disabled
             }
             onChangeValue={(
               contentIndex,
@@ -984,21 +1148,27 @@ const PreviewFukushashiki = () => {
             }
             currentMsgIndex={state.currentMsgIndex}
             onClickNext={() => {
-              onClickNext(messageIndex, message)}
-            }
+              onClickNext(messageIndex, message);
+            }}
             onRenderCompleted={renderNextMessage}
             messageIndex={messageIndex}
             errorsProps={state.errors}
             prefecturesList={[...state.prefecturesList]}
             onOpen={(isOpen, contentIndex) => {
-              onOpenZipCodePopup(isOpen, contentIndex, Math.min(state.currentMsgIndex, messageIndex));
+              onOpenZipCodePopup(
+                isOpen,
+                contentIndex,
+                Math.min(state.currentMsgIndex, messageIndex)
+              );
             }}
-            onChangeErrors={(field, value) =>
-              onChangeErrors(field, value)
-            }
+            onChangeErrors={(field, value) => onChangeErrors(field, value)}
             variables={state.variables}
             lpOptionData={state.lpOptionData}
-            submitErrorMessage={state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "" : state.submitErrorMessage}
+            submitErrorMessage={
+              state.submitErrorMessage === GETTING_ERROR_NOTIFICATION
+                ? ""
+                : state.submitErrorMessage
+            }
             submitThanksMessage={state.submitThanksMessage || ""}
             botId={state.botId}
             isProcessing={!!state.isProcessing}
@@ -1017,65 +1187,78 @@ const PreviewFukushashiki = () => {
 
   const renderCombineMessageContent = (message, messageIndex) => {
     if (!message || message.belong_to !== "combine") return null;
-    if (!Array.isArray(message?.message_content) || message.message_content.length === 0) return null;
+    if (
+      !Array.isArray(message?.message_content) ||
+      message.message_content.length === 0
+    )
+      return null;
 
     const isUpdate = messageIndex >= state.renderMessagesList.length - 1;
 
     return (
       <CombineMessage
-          postMessageToParent={(options) => postMessageToParent(options, state)}
-          message={message}
-          captcha={state.captcha}
-          disabled={
-            state.isChatLockedAfterSubmit
-              ? true
-              : (state.submitErrorMessage.length > 0 && state.submitErrorMessage !== GETTING_ERROR_NOTIFICATION)
-                ? false
-                : message.disabled
-          }
-          onChangeValue={(
+        postMessageToParent={(options) => postMessageToParent(options, state)}
+        message={message}
+        captcha={state.captcha}
+        disabled={
+          state.isChatLockedAfterSubmit
+            ? true
+            : state.submitErrorMessage.length > 0 &&
+              state.submitErrorMessage !== GETTING_ERROR_NOTIFICATION
+            ? false
+            : message.disabled
+        }
+        onChangeValue={(
+          contentIndex,
+          contentType,
+          value,
+          field,
+          subField1,
+          subField2
+        ) =>
+          onChangeValue(
             contentIndex,
             contentType,
             value,
             field,
             subField1,
-            subField2
-          ) =>
-            onChangeValue(
-              contentIndex,
-              contentType,
-              value,
-              field,
-              subField1,
-              subField2,
-              message
-            )
-          }
-          onClickNext={() => onClickNext(messageIndex, message)}
-          messageIndex={messageIndex}
-          errorsProps={state.errors}
-          prefecturesList={[...state.prefecturesList]}
-          onOpen={(isOpen, contentIndex) => {
-            onOpenZipCodePopup(isOpen, contentIndex, Math.min(state.currentMsgIndex, messageIndex));
-          }}
-          onChangeErrors={(field, value) => onChangeErrors(field, value)}
-          variables={state.variables}
-          lpOptionData={state.lpOptionData}
-          submitErrorMessage={state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "" : state.submitErrorMessage}
-          submitThanksMessage={state.submitThanksMessage || ""}
-          botId={state.botId}
-          isProcessing={!!state.isProcessing}
-          isSubmitHidden={!!state.isChatLockedAfterSubmit}
-          botInfor={state.botInfor}
-          themeSettings={state.themeSettings}
-          previewOrderContent={state.previewOrderContent}
-          executeLpJsCode={(jsCode) => executeLpJsCode(jsCode, state)}
-          isBotOpen={state.isOpen}
-          cartSystem={state.cartSystem}
-          isUpdate={isUpdate}
-          isExtractFromSession={state.isExtractFromSession}
-          isChatLockedAfterSubmit={!!state.isChatLockedAfterSubmit}
-        />
+            subField2,
+            message
+          )
+        }
+        onClickNext={() => onClickNext(messageIndex, message)}
+        messageIndex={messageIndex}
+        errorsProps={state.errors}
+        prefecturesList={[...state.prefecturesList]}
+        onOpen={(isOpen, contentIndex) => {
+          onOpenZipCodePopup(
+            isOpen,
+            contentIndex,
+            Math.min(state.currentMsgIndex, messageIndex)
+          );
+        }}
+        onChangeErrors={(field, value) => onChangeErrors(field, value)}
+        variables={state.variables}
+        lpOptionData={state.lpOptionData}
+        submitErrorMessage={
+          state.submitErrorMessage === GETTING_ERROR_NOTIFICATION
+            ? ""
+            : state.submitErrorMessage
+        }
+        submitThanksMessage={state.submitThanksMessage || ""}
+        botId={state.botId}
+        isProcessing={!!state.isProcessing}
+        isSubmitHidden={!!state.isChatLockedAfterSubmit}
+        botInfor={state.botInfor}
+        themeSettings={state.themeSettings}
+        previewOrderContent={state.previewOrderContent}
+        executeLpJsCode={(jsCode) => executeLpJsCode(jsCode, state)}
+        isBotOpen={state.isOpen}
+        cartSystem={state.cartSystem}
+        isUpdate={isUpdate}
+        isExtractFromSession={state.isExtractFromSession}
+        isChatLockedAfterSubmit={!!state.isChatLockedAfterSubmit}
+      />
     );
   };
 
@@ -1089,35 +1272,49 @@ const PreviewFukushashiki = () => {
   );
 
   const renderSubmitErrorMessages = () => {
-    const isRpaStatus = state.executionPolicy === EXECUTION_POLICIES.RPA && state.submitErrorMessage;
-    if (!isRpaStatus && (!state.isUsedErrMsgByJs || !state.submitErrorMessage)) return null;
+    const isRpaStatus =
+      state.executionPolicy === EXECUTION_POLICIES.RPA &&
+      state.submitErrorMessage;
+    if (!isRpaStatus && (!state.isUsedErrMsgByJs || !state.submitErrorMessage))
+      return null;
 
-    const className = state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "ss-bot-getting-error-notification" : "ss-bot-submit-error-message";
-    const text = state.submitErrorMessage === GETTING_ERROR_NOTIFICATION ? "処理中..." : state.submitErrorMessage;
-    const htmlText = text.replace(/¥n/g, "<br/>");
+    const className =
+      state.submitErrorMessage === GETTING_ERROR_NOTIFICATION
+        ? "ss-bot-getting-error-notification"
+        : "ss-bot-submit-error-message";
+    const text =
+      state.submitErrorMessage === GETTING_ERROR_NOTIFICATION
+        ? PROCESSING_LABEL
+        : state.submitErrorMessage;
+    const htmlText = errorMessageToHtml(text);
     return (
       <div className="ss-user-setting__item-text_input-top">
-        <div id="error-message"
+        <div
+          id="error-message"
           className={`error-message-modal ${className}`}
           dangerouslySetInnerHTML={{ __html: htmlText }}
         />
       </div>
     );
-  }
+  };
 
   const headerIconSrc = getBotHeaderIconUrl(state.botInfor, state.isOpen);
 
-  if (!state.scenarioId || !state.botInfor || state.displayType === null) return null;
+  if (!state.scenarioId || !state.botInfor || state.displayType === null)
+    return null;
 
   if (state.isOpen) {
     const { frameClassName, cssVars } = buildOpeningBotStyle(state);
     const openAnimationDurationMs = clampOpenAnimationDurationMs(
-      state.openAnimationDurationMs ?? OPEN_ANIMATION_DURATION_MS_DEFAULT,
+      state.openAnimationDurationMs ?? OPEN_ANIMATION_DURATION_MS_DEFAULT
     );
     return (
       <PreviewOpenChatFrame
         containerRef={containerRef}
-        containerClassName={`sp-container1 ${resolveOpenAnimationClassName(state.openAnimationStyle, isMobile())}`}
+        containerClassName={`sp-container1 ${resolveOpenAnimationClassName(
+          state.openAnimationStyle,
+          isMobile()
+        )}`}
         frameClassName={frameClassName}
         cssVars={{
           ...cssVars,
@@ -1129,10 +1326,11 @@ const PreviewFukushashiki = () => {
         isOpen={state.isOpen}
         onHeaderClick={onChatbotHeaderClick}
         botConfig={state}
+        themeSettings={state.themeSettings}
         showPopupCloseBot={state.showPopupCloseBot}
         onClosePopup={() => setShowPopupCloseBot(false)}
         onCloseBot={() => onOpenPreview(false)}
-        overlays={(
+        overlays={
           <ZipCodePopUp
             onOpen={onOpenZipCodePopup}
             prefecturesList={state.prefecturesList}
@@ -1143,19 +1341,26 @@ const PreviewFukushashiki = () => {
             onChangeErrors={onChangeErrors}
             errors={state.errors}
           />
-        )}
-        beforeBody={(
+        }
+        beforeBody={
           <>
             {!!state.botInfor?.timer_config?.enable && (
               <div className="chatbot_timer_holder">
                 <Timer
-                  duration={calculateTimerConfigDuration(state.botInfor.timer_config.type, state.botInfor.timer_config.duration)}
+                  duration={calculateTimerConfigDuration(
+                    state.botInfor.timer_config.type,
+                    state.botInfor.timer_config.duration
+                  )}
                   timeLeft={timerChanges.timeLeft}
                   countMsg={state.botInfor.timer_config.messages.counting}
                   finishMsg={state.botInfor.timer_config.messages.finish}
-                  variables={getTimerConfigVariable(state.botInfor.timer_config.variables)}
+                  variables={getTimerConfigVariable(
+                    state.botInfor.timer_config.variables
+                  )}
                   startCount={state.isOpen}
-                  isRealtimeRemainingTime={state.botInfor.timer_config.isRealtimeRemainingTime}
+                  isRealtimeRemainingTime={
+                    state.botInfor.timer_config.isRealtimeRemainingTime
+                  }
                   scenarioId={state.scenarioId}
                   onCounting={handleOnCounting(state.botInfor.timer_config)}
                 />
@@ -1165,9 +1370,10 @@ const PreviewFukushashiki = () => {
               botInfor={state.botInfor}
               currentIndex={state.passedUserMsgCount}
               maxIndex={state.progressBarMaxIndex}
+              themeSettings={state.themeSettings}
             />
           </>
-        )}
+        }
       >
         {renderMessages()}
         {renderSubmitErrorMessages()}
@@ -1187,6 +1393,6 @@ const PreviewFukushashiki = () => {
       hideWhenDisplayHidden
     />
   );
-}
+};
 
 export default PreviewFukushashiki;
