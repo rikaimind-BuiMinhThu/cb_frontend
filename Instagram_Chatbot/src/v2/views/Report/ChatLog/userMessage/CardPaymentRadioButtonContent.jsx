@@ -579,7 +579,7 @@ const CardPaymentRadioButtonContent = ({
                               disabled={true}
                               controls={false}
                               label={
-                                <span className="chat-log-um-font-400" >
+                                <span>
                                   {LABEL_CVC}{' '}
                                   <img
                                     alt={ALT_EMPTY}

@@ -50,6 +50,12 @@ const USER_MESSAGE_TITLE_CLASSES = [
   '.ss-message__content--user-shipping-address-title',
 ];
 
+const USER_MESSAGE_FIELD_LABEL_CLASSES = [
+  '.ss-input-custom-label',
+  '.select-custom-label',
+  '.ss-message__content--user-field-label',
+];
+
 const USER_MESSAGE_BUBBLE_LABEL_SELECTORS = [
   '.ss-message__content--user-checkbox > label',
   '.ss-message__content--user-checkbox--block_style > span',
@@ -61,6 +67,12 @@ const USER_MESSAGE_BUBBLE_LABEL_SELECTORS = [
 
 const buildUserMessageTitleSelectors = (scopeSelector) => (
   USER_MESSAGE_TITLE_CLASSES
+    .map((className) => scopedDescendant(scopeSelector, className))
+    .join(',\n')
+);
+
+const buildUserMessageFieldLabelSelectors = (scopeSelector) => (
+  USER_MESSAGE_FIELD_LABEL_CLASSES
     .map((className) => scopedDescendant(scopeSelector, className))
     .join(',\n')
 );
@@ -116,7 +128,29 @@ ${spBodySelector} input[type="number"]::placeholder,
 ${spBodySelector} input[type="password"]::placeholder,
 ${spBodySelector} textarea::placeholder,
 ${spBodySelector} .ss-input-value:not(.ss-bot-chat-detail-content)::placeholder,
-${spBodySelector} .ss-input-custom-field:not(.ss-bot-chat-detail-content)::placeholder
+${spBodySelector} .ss-input-custom-field:not(.ss-bot-chat-detail-content)::placeholder,
+${spBodySelector} .ant-input-number-input::placeholder,
+${spBodySelector} .ant-input-number-input::-webkit-input-placeholder,
+${spBodySelector} .ant-select-selection-search-input::placeholder
+`.trim();
+
+const buildFieldInputNumberSelectors = (spBodySelector) => `
+${spBodySelector} .ant-input-number.ss-input-value .ant-input-number-input,
+${spBodySelector} .ant-input-number-input
+`.trim();
+
+const buildFieldSelectValueSelectors = (spBodySelector) => `
+${spBodySelector} .ant-select-selection-item,
+${spBodySelector} .ant-select-selection-search-input
+`.trim();
+
+const buildFieldSelectOptionSelectors = (spBodySelector) => `
+${spBodySelector} .ant-select-item-option,
+${spBodySelector} .ant-select-item-option-content
+`.trim();
+
+const buildNativeSelectPlaceholderSelectors = (spBodySelector) => `
+${spBodySelector} select.select-custom-native:has(option[value=""]:checked)
 `.trim();
 
 const buildFieldFocusSelectors = (spBodySelector) => `
@@ -391,6 +425,22 @@ const buildThemeRules = (theme, scopeSelector = '', options = {}) => {
     scopeSelector,
     buildFieldPlaceholderSelectors,
   );
+  const fieldInputNumberSelectors = combineScopedFieldSelectors(
+    scopeSelector,
+    buildFieldInputNumberSelectors,
+  );
+  const fieldSelectValueSelectors = combineScopedFieldSelectors(
+    scopeSelector,
+    buildFieldSelectValueSelectors,
+  );
+  const fieldSelectOptionSelectors = combineScopedFieldSelectors(
+    scopeSelector,
+    buildFieldSelectOptionSelectors,
+  );
+  const nativeSelectPlaceholderSelectors = combineScopedFieldSelectors(
+    scopeSelector,
+    buildNativeSelectPlaceholderSelectors,
+  );
   const fieldFocusSelectors = combineScopedFieldSelectors(scopeSelector, buildFieldFocusSelectors);
   const focusEffect = resolveFieldFocusEffect(theme.fieldFocusBgEffect, theme);
   const previewFocusSelector = scopeSelector
@@ -498,6 +548,7 @@ ${previewButtonGroupSelector} {
   );
   const userBubbleTextSelectors = buildUserBubbleTextSelectors(scopeSelector);
   const userMessageTitleSelectors = buildUserMessageTitleSelectors(scopeSelector);
+  const userMessageFieldLabelSelectors = buildUserMessageFieldLabelSelectors(scopeSelector);
 
   const botMessageBorderStyle = normalizeMessageBorderStyle(
     theme.botMessageBorderStyle,
@@ -763,10 +814,24 @@ ${fieldScopeSelectors.map((fieldScope) => `${fieldScope} .ant-select-selection-p
   font-weight: var(--c-field-placeholder-weight, 400) !important;
 }
 
+${nativeSelectPlaceholderSelectors} {
+  font-weight: var(--c-field-placeholder-weight, 400) !important;
+}
+
+${fieldInputNumberSelectors},
+${fieldSelectValueSelectors},
+${fieldSelectOptionSelectors} {
+  font-size: var(--c-field-font-size, 14px) !important;
+  font-weight: var(--c-field-text-weight, 400) !important;
+}
+
 ${withMobileBody([
   fieldTextSelectors,
   fieldSelectSelectors,
   fieldPlaceholderSelectors,
+  fieldInputNumberSelectors,
+  fieldSelectValueSelectors,
+  fieldSelectOptionSelectors,
   fieldScopeSelectors.map((fieldScope) => `${fieldScope} .ant-select-selection-placeholder`).join(',\n'),
 ].join(',\n'))} {
   font-size: max(16px, var(--c-field-font-size, 16px)) !important;
@@ -957,7 +1022,11 @@ ${scopedDescendant(scopeSelector, '.theme-customize-preview__radio-default > lab
   font-size: var(--c-radio-font-size, 14px) !important;
 }
 
-${userMessageTitleSelectors} {
+${userMessageTitleSelectors},
+${userMessageFieldLabelSelectors},
+${spBodySelector} .ss-input-custom-label,
+${spBodySelector} .select-custom-label,
+${spBodySelector} .ss-message__content--user-field-label {
   font-weight: var(--c-field-title-weight, 400) !important;
 }
 
@@ -1108,7 +1177,20 @@ export const applyPreviewThemeCss = (botInfor, themeSettings) => {
   if (!botInfor) return;
   const { apiColorKey, mainColorHex } = resolveMainColorContext(botInfor);
   const savedTheme = parseThemeFromDesignSettings(botInfor.design_settings);
-  injectBotThemeCss(themeSettings, mainColorHex, apiColorKey, botInfor.design_type, {
+  const rawTheme = {
+    ...(savedTheme || {}),
+    ...(themeSettings || {}),
+    fieldTitleBold: themeIsBold(themeSettings?.fieldTitleBold)
+      || themeIsBold(savedTheme?.field_title_bold)
+      || themeIsBold(savedTheme?.fieldTitleBold),
+    fieldPlaceholderBold: themeIsBold(themeSettings?.fieldPlaceholderBold)
+      || themeIsBold(savedTheme?.field_placeholder_bold)
+      || themeIsBold(savedTheme?.fieldPlaceholderBold),
+    fieldTextBold: themeIsBold(themeSettings?.fieldTextBold)
+      || themeIsBold(savedTheme?.field_text_bold)
+      || themeIsBold(savedTheme?.fieldTextBold),
+  };
+  injectBotThemeCss(rawTheme, mainColorHex, apiColorKey, botInfor.design_type, {
     applyChatWindowBg: hasExplicitThemeValue(savedTheme, 'chatWindowBgColor'),
   });
 };

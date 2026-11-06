@@ -9,7 +9,6 @@ import {
   dataMonth as cardExpiredMonthOptions
 } from "../Constants";
 import InputCustom from "v2/components/BotMessages/InputCustom";
-import InputNum from "v2/components/BotMessages/InputNum";
 import SelectCustom from "v2/components/BotMessages/SelectCustom";
 import cvcIcon from "v2/assets/img/cvc-icon.png";
 import { moveToNext } from "v2/views/Preview/PreviewComponent/Utils";
@@ -23,6 +22,9 @@ const CARD_EXPIRY_LABEL = "有効期限";
 const CARD_CVC_LABEL = "セキュリティコード";
 const CVC_PATTERN = /^[0-9]{0,4}$/;
 const EXPIRY_TYPE_YM = "ym";
+const CARD_FIELD_TITLE_CLASS = "ss-message__content--user-text-input-title ss-input-custom-label ss-input-custom-label--block w-100-percent";
+const CARD_FIELD_LABEL_CLASS = "ss-message__content--user-text-input-title w-100-percent";
+const toCardSegmentDigits = (value) => String(value ?? "").replace(/[^0-9]/g, "").slice(0, 4);
 
 const CreditCardPayment = ({ content, messageIndex, contentIndex, onChangeValue, errors, disabled }) => {
   if (!content || content.type !== MESSAGE_CONTENT_TYPES.CREDIT_CARD_PAYMENT) return null;
@@ -80,10 +82,10 @@ const CreditCardPayment = ({ content, messageIndex, contentIndex, onChangeValue,
       return (
         <div className="ss-user-setting__item-bottom">
           <InputCustom
-            classLabel="w-100-percent"
+            classLabel={CARD_FIELD_LABEL_CLASS}
             id="sp_credit_card_payment"
             label={cardNumberLabel}
-            type="number"
+            type="tel"
             onKeyPress={(e) => {
               if (e.target.value.length >= 16) e.preventDefault();
             }}
@@ -119,89 +121,73 @@ const CreditCardPayment = ({ content, messageIndex, contentIndex, onChangeValue,
 
     return (
       <div className="ss-user-setting__item-bottom">
-        <div className="w-100-percent">{cardNumberLabel}</div>
+        <div className={CARD_FIELD_TITLE_CLASS}>{cardNumberLabel}</div>
         <div
           className="ss-user-setting__item-select-bottom-wrapper-flex ss-user-setting-card-number-separate-type w-100-percent"
         >
-          <InputNum
-            max={9999}
-            controls={false}
+          <InputCustom
+            type="tel"
+            inputMode="numeric"
             disabled={disabled}
             maxLength={4}
             className="ss-user-setting-input-limit-character m-l-0"
             value={creditCardPayment.card_number1 || EMPTY_INPUT_VALUE}
             placeholder={creditCardPayment.card_number_placeholder1}
             onChange={(value) => {
-              onChangeValue(
-                contentIndex,
-                content.type,
-                value,
-                "card_number1"
-              );
-              if ((value + "").length === 4) {
+              const digits = toCardSegmentDigits(value);
+              onChangeValue(contentIndex, content.type, digits, "card_number1");
+              if (digits.length === 4) {
                 moveToNext("ss-user-card-number-radio-input2");
               }
             }}
           />
-          <InputNum
-            max={9999}
+          <InputCustom
+            type="tel"
+            inputMode="numeric"
             id="ss-user-card-number-radio-input2"
-            controls={false}
             disabled={disabled}
             maxLength={4}
             className="ss-user-setting-input-limit-character m-l-7"
             value={creditCardPayment.card_number2 || EMPTY_INPUT_VALUE}
             placeholder={creditCardPayment.card_number_placeholder2}
             onChange={(value) => {
-              onChangeValue(
-                contentIndex,
-                content.type,
-                value,
-                "card_number2"
-              );
-              if ((value + "").length === 4) {
+              const digits = toCardSegmentDigits(value);
+              onChangeValue(contentIndex, content.type, digits, "card_number2");
+              if (digits.length === 4) {
                 moveToNext("ss-user-card-number-radio-input3");
               }
             }}
           />
-          <InputNum
+          <InputCustom
+            type="tel"
+            inputMode="numeric"
             id="ss-user-card-number-radio-input3"
-            max={9999}
-            controls={false}
             disabled={disabled}
             maxLength={4}
             className="ss-user-setting-input-limit-character m-l-7"
             value={creditCardPayment.card_number3 || EMPTY_INPUT_VALUE}
             placeholder={creditCardPayment.card_number_placeholder3}
             onChange={(value) => {
-              onChangeValue(
-                contentIndex,
-                content.type,
-                value,
-                "card_number3"
-              );
-              if ((value + "").length === 4) {
+              const digits = toCardSegmentDigits(value);
+              onChangeValue(contentIndex, content.type, digits, "card_number3");
+              if (digits.length === 4) {
                 moveToNext("ss-user-card-number-radio-input4");
               }
             }}
           />
-          <InputNum
+          <InputCustom
+            type="tel"
+            inputMode="numeric"
             id="ss-user-card-number-radio-input4"
-            max={9999}
-            controls={false}
             disabled={disabled}
             maxLength={4}
             className="ss-user-setting-input-limit-character m-l-7"
             value={creditCardPayment.card_number4 || EMPTY_INPUT_VALUE}
             placeholder={creditCardPayment.card_number_placeholder4}
-            onChange={(value) =>
-              onChangeValue(
-                contentIndex,
-                content.type,
-                value,
-                "card_number4"
-              )
-            }
+            onChange={(value) => {
+              const digits = toCardSegmentDigits(value);
+              onChangeValue(contentIndex, content.type, digits, "card_number4");
+            }}
           />
         </div>
       </div>
@@ -214,7 +200,7 @@ const CreditCardPayment = ({ content, messageIndex, contentIndex, onChangeValue,
     return (
       <div className="ss-user-setting__item-bottom">
         <InputCustom
-          classLabel="w-100-percent"
+          classLabel={CARD_FIELD_LABEL_CLASS}
           label={cardHolderLabel}
           inline={false}
           disabled={disabled}
@@ -256,7 +242,7 @@ const CreditCardPayment = ({ content, messageIndex, contentIndex, onChangeValue,
 
     return (
       <div className="ss-user-setting__item-bottom">
-        <div className="w-100-percent">{cardExpiryLabel}</div>
+        <div className={CARD_FIELD_TITLE_CLASS}>{cardExpiryLabel}</div>
         {expirationForm}
       </div>
     );
@@ -264,24 +250,22 @@ const CreditCardPayment = ({ content, messageIndex, contentIndex, onChangeValue,
 
   const renderCvc = () => {
     if (creditCardPayment.is_hide_cvc) return null;
-    const cvcLabel = (
-      <span className="f-weight-400">
-        {cardCvcLabel} <img className="w-8-percent" src={cvcIcon} alt="" />
-      </span>
-    );
 
     return (
       <div className="ss-user-setting__item-bottom d-block">
+        <div className={CARD_FIELD_TITLE_CLASS}>
+          {cardCvcLabel}{' '}
+          <img className="w-8-percent" src={cvcIcon} alt="" />
+        </div>
         <InputCustom
           className="ss-user-setting-input-limit-character w-33-percent m-l-0"
           disabled={disabled}
           value={creditCardPayment.cvc || EMPTY_INPUT_VALUE}
           onChange={(value) => {
             if (CVC_PATTERN.test(value)) {
-              onChangeValue(contentIndex, content.type, value, "cvc")
+              onChangeValue(contentIndex, content.type, value, "cvc");
             }
           }}
-          label={cvcLabel}
           placeholder={creditCardPayment.cvc_placeholder}
         />
       </div>

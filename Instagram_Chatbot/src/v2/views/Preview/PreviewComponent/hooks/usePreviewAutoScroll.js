@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { MESSAGE_CONTENT_TYPES } from "../Constants";
-import { scrollToPosition } from "../Utils";
+import { isMobile, scrollToPosition } from "../Utils";
 
 /**
  * @param {boolean} [enableScrollAuto] - Fukushashiki: honor statement scroll_auto when isNotAutoScroll
@@ -26,6 +26,8 @@ export const usePreviewAutoScroll = ({
 
     const currentMsgIndex = currentMsgIndexRef.current;
     const currentMsg = messagesListRef.current?.[currentMsgIndex];
+    // Smooth scroll on iPhone fights the fixed iframe and reads as flicker.
+    const scrollBehavior = isMobile() ? "auto" : "smooth";
 
     if (state.isNotAutoScroll) {
       if (
@@ -34,7 +36,7 @@ export const usePreviewAutoScroll = ({
         const imageTimeoutId = setTimeout(() => {
           document
             .querySelector(`#msg-${currentMsgIndexRef.current}-0`)
-            ?.scrollIntoView({ behavior: "smooth" });
+            ?.scrollIntoView({ behavior: scrollBehavior });
         }, 2000);
         return () => clearTimeout(imageTimeoutId);
       }
@@ -58,7 +60,7 @@ export const usePreviewAutoScroll = ({
                 200;
               container.scrollTo({
                 top: targetScrollTop,
-                behavior: "smooth",
+                behavior: scrollBehavior,
               });
             }
           }, 1000);
@@ -70,7 +72,11 @@ export const usePreviewAutoScroll = ({
     }
 
     const timeoutId = setTimeout(() => {
-      scrollToPosition({ position: "b", selector: "#sp-body" });
+      scrollToPosition({
+        position: "b",
+        selector: "#sp-body",
+        behavior: scrollBehavior,
+      });
     }, 300);
 
     return () => clearTimeout(timeoutId);

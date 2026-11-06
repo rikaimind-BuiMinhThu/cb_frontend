@@ -645,35 +645,34 @@ const ScenarioPreviewFukushashiki = ({
     const timerChatbotStorage = getTimerConfig();
     setTimerChanges((timerChanges) => timerChatbotStorage || timerChanges);
 
-    // post message to parent window
-    postMessageToParent({ isOpen: opening}, state);
+    // Parent layout follows state.isOpen via useEffect — do not post isOpen here
+    // before OPEN_CHATBOT, or the iframe expands while the closed launcher is still painted.
 
-    if (state.alreadyOpenFirstTime) {
+    if (state.isAlreadyOpenFirstTime) {
       if (!opening) {
         if (isWithdrawalPreventionEnabled(state.botInfor?.withdrawal_prevention_status)) {
           return dispatch({ type: PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL });
         }
 
+        sendCloseChatbotCountRequest(state.scenarioId, deviceReceive);
         return dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
       }
 
-      return userEntryScenario({
+      userEntryScenario({
         scenario_id: state.scenarioId,
         user_id: state.uuid,
-      }).then(() => {
-        dispatch({ type: PREVIEW_ACTIONS.OPEN_CHATBOT });
       });
+      return dispatch({ type: PREVIEW_ACTIONS.OPEN_CHATBOT });
     }
 
     if (opening) {
-      sendOpenChatbotCountRequest(state.scenarioId, deviceReceive).then(() => {
-        dispatch({ type: PREVIEW_ACTIONS.OPEN_CHATBOT });
-      });
-    } else {
-      sendCloseChatbotCountRequest(state.scenarioId, deviceReceive).then(() => {
-        dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
-      });
+      sendOpenChatbotCountRequest(state.scenarioId, deviceReceive);
+      dispatch({ type: PREVIEW_ACTIONS.OPEN_CHATBOT });
+      return;
     }
+
+    sendCloseChatbotCountRequest(state.scenarioId, deviceReceive);
+    dispatch({ type: PREVIEW_ACTIONS.CLOSE_CHATBOT });
   }
 
   const onChatbotHeaderClick = () => {
