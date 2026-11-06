@@ -36,6 +36,7 @@ import {
   NEXT_BUTTON_LABEL,
   UPDATE_BUTTON_LABEL,
   OK_BUTTON_LABEL,
+  MESSAGE_CONTENT_TYPES,
 } from "./PreviewComponent/Constants";
 import { OPEN_ANIMATION_DURATION_MS_DEFAULT } from "v2/views/DesignSetting/constants/designChatbotConstants";
 import {
@@ -138,6 +139,25 @@ const isLoggedIn =
 const previewInitialState = createPreviewInitialState("fukushashiki", {
   params,
 });
+const UNLOCK_ON_ANY_SUBMIT_ERROR = false;
+const KEEP_DISABLED_WHILE_GETTING_ERROR = true;
+
+const isPreviewControlDisabled = (
+  state,
+  message,
+  keepDisabledWhileGettingError
+) => {
+  if (state.isChatLockedAfterSubmit) return true;
+  const submitErrorMessage = state.submitErrorMessage;
+  if (!(submitErrorMessage.length > 0)) return message.disabled;
+  if (
+    keepDisabledWhileGettingError &&
+    submitErrorMessage === GETTING_ERROR_NOTIFICATION
+  ) {
+    return message.disabled;
+  }
+  return false;
+};
 
 const PreviewFukushashiki = () => {
   const [state, dispatch] = useReducer(
@@ -825,7 +845,8 @@ const PreviewFukushashiki = () => {
       }
 
       if (
-        clickedMsg.message_content[0]?.type === "button_submit" &&
+        clickedMsg.message_content[0]?.type ===
+          MESSAGE_CONTENT_TYPES.SUBMIT_BUTTON &&
         clickedMsg.message_content[0]?.button_submit_id
       ) {
         const buttonId = clickedMsg.message_content[0]?.button_submit_id;
@@ -1045,7 +1066,10 @@ const PreviewFukushashiki = () => {
 
     if (!message || message.belong_to !== "user") return null;
     if (message.is_display_button_next === false) return null;
-    if (message.message_content[0]?.type === "button_submit") return null;
+    if (
+      message.message_content[0]?.type === MESSAGE_CONTENT_TYPES.SUBMIT_BUTTON
+    )
+      return null;
 
     const isBtnUpdateMode =
       state.isUseBtnUpdateTracking && !message.buttonName && !isUpdate;
@@ -1068,13 +1092,11 @@ const PreviewFukushashiki = () => {
         }
       >
         <CustomButton
-          disabled={
-            state.isChatLockedAfterSubmit
-              ? true
-              : state.submitErrorMessage.length > 0
-              ? false
-              : message.disabled
-          }
+          disabled={isPreviewControlDisabled(
+            state,
+            message,
+            UNLOCK_ON_ANY_SUBMIT_ERROR
+          )}
           className={`ss-user-message__action-btn${
             hasBtnUpdateClass ? " btn-update" : ""
           }`}
@@ -1120,14 +1142,11 @@ const PreviewFukushashiki = () => {
             message={message}
             captcha={state.captcha}
             messageContentProps={message.message_content}
-            disabled={
-              state.isChatLockedAfterSubmit
-                ? true
-                : state.submitErrorMessage.length > 0 &&
-                  state.submitErrorMessage !== GETTING_ERROR_NOTIFICATION
-                ? false
-                : message.disabled
-            }
+            disabled={isPreviewControlDisabled(
+              state,
+              message,
+              KEEP_DISABLED_WHILE_GETTING_ERROR
+            )}
             onChangeValue={(
               contentIndex,
               contentType,
@@ -1200,14 +1219,11 @@ const PreviewFukushashiki = () => {
         postMessageToParent={(options) => postMessageToParent(options, state)}
         message={message}
         captcha={state.captcha}
-        disabled={
-          state.isChatLockedAfterSubmit
-            ? true
-            : state.submitErrorMessage.length > 0 &&
-              state.submitErrorMessage !== GETTING_ERROR_NOTIFICATION
-            ? false
-            : message.disabled
-        }
+        disabled={isPreviewControlDisabled(
+          state,
+          message,
+          KEEP_DISABLED_WHILE_GETTING_ERROR
+        )}
         onChangeValue={(
           contentIndex,
           contentType,

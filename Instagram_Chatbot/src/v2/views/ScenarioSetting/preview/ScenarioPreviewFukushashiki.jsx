@@ -35,6 +35,7 @@ import {
   OK_BUTTON_LABEL,
   DELAY_SECONDS_UNIT,
   PROCESSING_LABEL,
+  MESSAGE_CONTENT_TYPES,
 } from "v2/views/Preview/PreviewComponent/Constants";
 import { injectBotThemeCss } from "v2/utils/chatbotThemeCss";
 import {
@@ -933,7 +934,8 @@ const ScenarioPreviewFukushashiki = ({
     }
 
     if (
-      clickedMsg.message_content[0]?.type === "button_submit" &&
+      clickedMsg.message_content[0]?.type ===
+        MESSAGE_CONTENT_TYPES.SUBMIT_BUTTON &&
       clickedMsg.message_content[0]?.button_submit_id
     ) {
       const buttonId = clickedMsg.message_content[0]?.button_submit_id;
@@ -1113,7 +1115,10 @@ const ScenarioPreviewFukushashiki = ({
 
     if (!message || message.belong_to !== "user") return null;
     if (message.is_display_button_next === false) return null;
-    if (message.message_content[0]?.type === "button_submit") return null;
+    if (
+      message.message_content[0]?.type === MESSAGE_CONTENT_TYPES.SUBMIT_BUTTON
+    )
+      return null;
 
     const isBtnUpdateMode =
       state.isUseBtnUpdateTracking && !message.buttonName && !isUpdate;

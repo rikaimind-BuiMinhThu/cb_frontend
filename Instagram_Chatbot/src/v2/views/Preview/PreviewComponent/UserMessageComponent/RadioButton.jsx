@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { baseUserMessageComponentPropTypes } from "./userMessageComponentPropTypes";
 import "v2/assets/css/bot/preview-chat-bot.css";
 import {
+  CART_SYSTEM,
   MESSAGE_CONTENT_TYPES,
   REQUIRED_FIELD_LABEL,
 } from "v2/views/Preview/PreviewComponent/Constants";
@@ -35,7 +36,6 @@ const applyRadioImgGridCssVars = (element, radioButton) => {
 const LEXICA_PATH_KEYS = ["path", "order_path"];
 const FIRST_TIME_VALUE = "first_time";
 const FIRST_TIME_LABEL = "はじめて";
-const CART_SYSTEM_LEXICA = "lexica";
 
 const isLexicaPathRadio = (radioButton) => {
   const key = String(radioButton?.save_input_content || "");
@@ -50,7 +50,7 @@ const isFirstTimeOption = (item) => {
 
 const visibleRadioItems = (radioButton, cartSystem) => {
   const items = radioButton?.[radioButton.type] || [];
-  if (cartSystem !== CART_SYSTEM_LEXICA) return items;
+  if (cartSystem !== CART_SYSTEM.LEXICA) return items;
   if (!isMobile() || !isLexicaPathRadio(radioButton)) return items;
   return items.filter((item) => !isFirstTimeOption(item));
 };
@@ -79,7 +79,7 @@ const RadioButton = ({
 
   useEffect(() => {
     if (!radioButton) return;
-    if (cartSystem !== CART_SYSTEM_LEXICA) return;
+    if (cartSystem !== CART_SYSTEM.LEXICA) return;
     if (!isMobile() || !isLexicaPathRadio(radioButton)) return;
     if (!initialSelection) return;
     const stillVisible = visibleRadioItems(radioButton, cartSystem).some(

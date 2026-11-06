@@ -91,6 +91,53 @@ const assignUserNamesToChats = (chats) => {
   }));
 };
 
+const CHAT_LOG_SUCCESS_CODE = 1;
+const CHAT_LOG_MAIN_COLOR_PRESETS = {
+  blue: { opacityColor: '#D6E0EF', messageColor: '#3CACEF', fontColor: '#fff' },
+  green: { opacityColor: '#DEEADB', messageColor: '#9DDB7C', fontColor: '#fff' },
+  orange: { opacityColor: '#F4E5DA', messageColor: '#EF8D2F', fontColor: '#fff' },
+  yellow: {
+    opacityColor: '#F0EFEB',
+    messageColor: '#F3AA2D',
+    fontColor: '#fff',
+    mainColor: '#F6CA21',
+  },
+  pink: {
+    opacityColor: '#EBDDE3',
+    messageColor: '#E65B83',
+    fontColor: '#fff',
+    mainColor: '#F170AA',
+  },
+  purple: {
+    opacityColor: '#E9E8F1',
+    messageColor: '#AF82D5',
+    fontColor: '#fff',
+    mainColor: '#8C66D9',
+  },
+  black: { opacityColor: '#ECEDE8', messageColor: '#fff', fontColor: '#333333' },
+  white: { opacityColor: '#fff', messageColor: '#F5F5F5', fontColor: '#000' },
+};
+
+const applyChatbotMainColor = (chatbot) => {
+  if (!chatbot) return;
+  const preset = CHAT_LOG_MAIN_COLOR_PRESETS[chatbot.main_color];
+  if (!preset) {
+    chatbot.opacity_color = chatbot.main_color_other;
+    chatbot.message_color = chatbot.main_color_other;
+    return;
+  }
+  if (preset.mainColor) chatbot.main_color = preset.mainColor;
+  chatbot.opacity_color = preset.opacityColor;
+  chatbot.message_color = preset.messageColor;
+  chatbot.font_color = preset.fontColor;
+};
+
+const storeChatLogList = (res, setScenarios, setChats) => {
+  if (res.data?.code !== CHAT_LOG_SUCCESS_CODE) return;
+  setScenarios(res.data.scenarios);
+  setChats(assignUserNamesToChats(res.data.chats));
+};
+
 const storedChatLogJson = (conversation) => {
   if (conversation.string_value) return conversation.string_value;
   if (conversation.text_value) return conversation.text_value;
@@ -158,10 +205,7 @@ const BotChatLog = () => {
       .get(`${CHAT_LOG_LIST_PATH}/${botId}/list`, freshChatLogConfig(params))
       .then((res) => {
         if (request.cancelled) return;
-        if (res.data?.code === 1) {
-          setScenarios(res.data.scenarios);
-          setChats(assignUserNamesToChats(res.data.chats));
-        }
+        storeChatLogList(res, setScenarios, setChats);
       })
       .catch((error) => {
         if (request.cancelled) return;
@@ -191,10 +235,7 @@ const BotChatLog = () => {
     api
       .get(`${CHAT_LOG_LIST_PATH}/${botId}/list`, freshChatLogConfig(params))
       .then((res) => {
-        if (res.data?.code === 1) {
-          setScenarios(res.data.scenarios);
-          setChats(assignUserNamesToChats(res.data.chats));
-        }
+        storeChatLogList(res, setScenarios, setChats);
       })
       .catch((error) => {
         reportChatLogLoadError(error);
@@ -321,50 +362,7 @@ const BotChatLog = () => {
           setDataVariables(variablesAll);
           setDataMessages(messageArr);
           if (res.data.chatbot) {
-            const colorState = { opacity_color: null, message_color: null, font_color: null };
-            if (res.data.chatbot.main_color === 'blue') {
-              colorState.opacity_color = '#D6E0EF';
-              colorState.message_color = '#3CACEF';
-              colorState.font_color = '#fff';
-            } else if (res.data.chatbot.main_color === 'green') {
-              colorState.opacity_color = '#DEEADB';
-              colorState.message_color = '#9DDB7C';
-              colorState.font_color = '#fff';
-            } else if (res.data.chatbot.main_color === 'orange') {
-              colorState.opacity_color = '#F4E5DA';
-              colorState.message_color = '#EF8D2F';
-              colorState.font_color = '#fff';
-            } else if (res.data.chatbot.main_color === 'yellow') {
-              colorState.opacity_color = '#F0EFEB';
-              colorState.message_color = '#F3AA2D';
-              res.data.chatbot.main_color = '#F6CA21';
-              colorState.font_color = '#fff';
-            } else if (res.data.chatbot.main_color === 'pink') {
-              colorState.opacity_color = '#EBDDE3';
-              colorState.message_color = '#E65B83';
-              res.data.chatbot.main_color = '#F170AA';
-              colorState.font_color = '#fff';
-            } else if (res.data.chatbot.main_color === 'purple') {
-              colorState.opacity_color = '#E9E8F1';
-              colorState.message_color = '#AF82D5';
-              res.data.chatbot.main_color = '#8C66D9';
-              colorState.font_color = '#fff';
-            } else if (res.data.chatbot.main_color === 'black') {
-              colorState.opacity_color = '#ECEDE8';
-              colorState.message_color = '#fff';
-              colorState.font_color = '#333333';
-            } else if (res.data.chatbot.main_color === 'white') {
-              colorState.opacity_color = '#fff';
-              colorState.message_color = '#F5F5F5';
-              colorState.font_color = '#000';
-            } else {
-              colorState.opacity_color = res.data.chatbot.main_color_other;
-              colorState.message_color = res.data.chatbot.main_color_other;
-              colorState.font_color = res.data.chatbot.font_color;
-            }
-            res.data.chatbot.opacity_color = colorState.opacity_color;
-            res.data.chatbot.message_color = colorState.message_color;
-            res.data.chatbot.font_color = colorState.font_color;
+            applyChatbotMainColor(res.data.chatbot);
           }
 
           setBotInfor(res.data.chatbot);

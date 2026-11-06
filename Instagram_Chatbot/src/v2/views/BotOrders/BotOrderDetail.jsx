@@ -22,6 +22,7 @@ import { AdminActionButton, AdminPage } from "v2/components/AdminShell";
 import { ADMIN_PATHS } from "v2/components/AdminShell/constants";
 import { buildChatLogDetailPath } from "v2/views/Report/constants";
 import { getAdminRoutePath } from "v2/variables/constants";
+import { API_AUTH_EXPIRED_CODE, HTTP_FORBIDDEN } from "./constants";
 import {
   cleanErrorMessage,
   completedRpaSteps,
@@ -154,11 +155,11 @@ const BotOrderDetail = () => {
         history.push(scenarioListPath);
       })
       .catch((error) => {
-        if (error.response?.status === 403) {
+        if (error.response?.status === HTTP_FORBIDDEN) {
           history.push(scenarioListPath);
           return;
         }
-        if (error.response?.data?.code === 0) {
+        if (error.response?.data?.code === API_AUTH_EXPIRED_CODE) {
           tokenExpired();
         }
       })
@@ -173,7 +174,8 @@ const BotOrderDetail = () => {
         setScreenshotUrl(screenshotObjectUrlRef.current);
       })
       .catch((error) => {
-        if (error.response?.data?.code === 0) tokenExpired();
+        if (error.response?.data?.code === API_AUTH_EXPIRED_CODE)
+          tokenExpired();
       });
     return () => {
       if (screenshotObjectUrlRef.current) {
@@ -198,7 +200,8 @@ const BotOrderDetail = () => {
         setStepCaptureUrl(stepCaptureObjectUrlRef.current);
       })
       .catch((error) => {
-        if (error.response?.data?.code === 0) tokenExpired();
+        if (error.response?.data?.code === API_AUTH_EXPIRED_CODE)
+          tokenExpired();
       });
     return () => {
       cancelled = true;

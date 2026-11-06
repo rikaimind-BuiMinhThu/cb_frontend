@@ -19,8 +19,6 @@ export const SCENARIO_MODAL_TOOLTIPS = {
   lexicaOrderResult: '注文確定後、完了まで待つか、受付だけ表示するかを選びます。',
   lexicaProductSku: 'カートに入れる商品のSKUコードを入力してください。',
   lexicaCartUrl: 'レキシカカートのURLを入力してください。',
-  lexicaUpsellSku: 'アップセル商品のSKUコードを入力してください。',
-  lexicaCrossSellSku: 'クロスセル商品のSKUコードを入力してください。',
   executionPolicy: '注文の実施方針を選択します。複写式を選ぶとLP連携用の設定が表示されます。',
   isUseFukushashiki: '複写式チャットボット機能を有効にします。',
   isUseAmazonPay: 'Amazon Pay連携を有効にします。許可ドメインや判定方法を設定できます。',

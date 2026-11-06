@@ -387,10 +387,6 @@ export const LEXICA_CART_LABELS = {
   cartUrlPlaceholder: 'https://cart.example.com',
   confirmUpsell: '確認画面でアップセル活用',
   confirmCrossSell: '確認画面でクロスセル活用',
-  thanksUpsell: 'サンクス画面でアップセル活用',
-  thanksCrossSell: 'サンクス画面でクロスセル活用',
-  upsellSku: 'アップセル 商品SKUコード',
-  crossSellSku: 'クロスセル 商品SKUコード',
 };
 
 export const ADDRESS_FIELD_MODAL_LABELS = {

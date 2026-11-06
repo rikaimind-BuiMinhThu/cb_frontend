@@ -9,6 +9,7 @@ import {
   AdminActionButton,
   useAdminHeaderActions,
 } from 'v2/components/AdminShell';
+import { tokenExpired } from 'v2/api/tokenExpired';
 import {
   ADD_CLIENT_TITLE,
   CONVERSION_COUNT_LABEL,
@@ -23,13 +24,11 @@ import {
   SEARCH_PLACEHOLDER,
   STATUS_ENDED,
   STATUS_PAUSE,
-  SYSTEM_SETTINGS_API_PATH,
   TABLE_SCROLL_X,
 } from './constants';
 import { createClientColumns } from './clientManagementColumns';
 import { gotoPaymentDetail } from './utils/clientManagementUtils';
-import api from 'v2/api/api-management';
-import { tokenExpired } from 'v2/api/tokenExpired';
+import { getSystemSettings, patchSystemSetting } from './utils/systemSettings';
 
 const ClientManagementList = ({
   clients,
@@ -65,8 +64,7 @@ const ClientManagementList = ({
   const [savingChrome, setSavingChrome] = useState(false);
 
   useEffect(() => {
-    api
-      .get(SYSTEM_SETTINGS_API_PATH)
+    getSystemSettings()
       .then((res) => {
         if (res.data.code === 1) {
           setLexicaMaxChrome(res.data.data.lexica_max_chrome);
@@ -79,8 +77,7 @@ const ClientManagementList = ({
 
   const saveLexicaMaxChrome = (value) => {
     setSavingChrome(true);
-    api
-      .patch(SYSTEM_SETTINGS_API_PATH, { lexica_max_chrome: value })
+    patchSystemSetting({ lexica_max_chrome: value })
       .then((res) => {
         if (res.data.code === 1) {
           setLexicaMaxChrome(res.data.data.lexica_max_chrome);

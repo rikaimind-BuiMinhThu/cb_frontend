@@ -16,8 +16,6 @@ const ScenarioLexicaCartView = ({ onBack }) => {
   const { state, actions } = useScenarioEditor();
   const { lexica, merchandiseId } = state;
   const { setLexicaField, setMerchandiseId } = actions;
-  const showUpsellSku = lexica.lexicaOfferConfirmUpsell || lexica.lexicaOfferThanksUpsell;
-  const showCrossSellSku = lexica.lexicaOfferConfirmCrossSell || lexica.lexicaOfferThanksCrossSell;
 
   return (
     <div className="ss-settings-lexica-cart-view">
@@ -71,44 +69,6 @@ const ScenarioLexicaCartView = ({ onBack }) => {
           label={LEXICA_CART_LABELS.confirmCrossSell}
         />
       </div>
-      <div className="ss-layout-checkbox-item">
-        <ScenarioModalCheckbox
-          checked={lexica.lexicaOfferThanksUpsell}
-          onChange={(checked) => setLexicaField('lexicaOfferThanksUpsell', checked)}
-          label={LEXICA_CART_LABELS.thanksUpsell}
-        />
-      </div>
-      <div className="ss-layout-checkbox-item">
-        <ScenarioModalCheckbox
-          checked={lexica.lexicaOfferThanksCrossSell}
-          onChange={(checked) => setLexicaField('lexicaOfferThanksCrossSell', checked)}
-          label={LEXICA_CART_LABELS.thanksCrossSell}
-        />
-      </div>
-      {showUpsellSku && (
-        <ScenarioFormRow
-          label={LEXICA_CART_LABELS.upsellSku}
-          tooltip={SCENARIO_MODAL_TOOLTIPS.lexicaUpsellSku}
-        >
-          <InputCustom
-            value={lexica.lexicaUpsellSku}
-            onChange={(value) => setLexicaField('lexicaUpsellSku', value)}
-            data-testid="lexica-upsell-sku"
-          />
-        </ScenarioFormRow>
-      )}
-      {showCrossSellSku && (
-        <ScenarioFormRow
-          label={LEXICA_CART_LABELS.crossSellSku}
-          tooltip={SCENARIO_MODAL_TOOLTIPS.lexicaCrossSellSku}
-        >
-          <InputCustom
-            value={lexica.lexicaCrossSellSku}
-            onChange={(value) => setLexicaField('lexicaCrossSellSku', value)}
-            data-testid="lexica-cross-sell-sku"
-          />
-        </ScenarioFormRow>
-      )}
       <ScenarioModalFooter
         onClose={onBack}
         showConfirm={false}
