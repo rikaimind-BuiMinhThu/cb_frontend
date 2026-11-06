@@ -1,15 +1,27 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
-import { Button, Descriptions, Modal, Spin, Table, Tag, Typography } from 'antd';
-import { Link, useHistory, useParams } from 'react-router-dom';
-import Cookies from 'js-cookie';
-import { API_SUCCESS_CODE, BOT_ID_COOKIE_KEY } from 'v2/api/constants';
-import { getBotOrder, getBotOrderScreenshot } from './api';
-import { tokenExpired } from 'v2/api/tokenExpired';
-import { AdminActionButton, AdminPage } from 'v2/components/AdminShell';
-import { ADMIN_PATHS } from 'v2/components/AdminShell/constants';
-import { buildChatLogDetailPath } from 'v2/views/Report/constants';
-import { getAdminRoutePath } from 'v2/variables/constants';
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import PropTypes from "prop-types";
+import {
+  Button,
+  Descriptions,
+  Modal,
+  Spin,
+  Table,
+  Tag,
+  Typography,
+} from "antd";
+import { Link, useHistory, useParams } from "react-router-dom";
+import Cookies from "js-cookie";
+import { API_SUCCESS_CODE, BOT_ID_COOKIE_KEY } from "v2/api/constants";
+import {
+  getBotOrder,
+  getBotOrderScreenshot,
+  getBotOrderStepScreenshot,
+} from "./api";
+import { tokenExpired } from "v2/api/tokenExpired";
+import { AdminActionButton, AdminPage } from "v2/components/AdminShell";
+import { ADMIN_PATHS } from "v2/components/AdminShell/constants";
+import { buildChatLogDetailPath } from "v2/views/Report/constants";
+import { getAdminRoutePath } from "v2/variables/constants";
 import {
   cleanErrorMessage,
   completedRpaSteps,
@@ -30,7 +42,7 @@ import {
   statusColor,
   statusLabel,
   truncateText,
-} from './botOrderFormat';
+} from "./botOrderFormat";
 import {
   BACK_TO_LIST_LABEL,
   CONVERSATION_LINK_LABEL,
@@ -71,12 +83,25 @@ import {
   RPA_STEP_FALLBACK,
   RPA_TAG_RETRY,
   RPA_TAG_WAIT,
+  SAFE_LINK_PROTOCOLS,
   SCREENSHOT_ALT,
-} from './constants';
-import './styles/bot-orders.css';
+  STEP_CAPTURE_ALT,
+} from "./constants";
+import "./styles/bot-orders.css";
+
+const isSafeExternalHref = (href) => {
+  try {
+    const parsed = new URL(String(href));
+    return SAFE_LINK_PROTOCOLS.includes(parsed.protocol);
+  } catch (error) {
+    return false;
+  }
+};
 
 const ExternalLink = ({ href, children }) => {
   if (!href) return DASH;
+  if (!isSafeExternalHref(href))
+    return children || truncateText(href, 36) || DASH;
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
       {children || href}
@@ -94,7 +119,7 @@ const truncateUrl = (url) => {
   try {
     const parsed = new URL(url);
     const path = `${parsed.pathname}${parsed.search}`.slice(0, 28);
-    return `${parsed.host}${path}${path.length >= 28 ? '…' : ''}`;
+    return `${parsed.host}${path}${path.length >= 28 ? "…" : ""}`;
   } catch {
     return truncateText(url, 36);
   }
@@ -106,14 +131,17 @@ const BotOrderDetail = () => {
   const botId = Cookies.get(BOT_ID_COOKIE_KEY);
   const [row, setRow] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [screenshotUrl, setScreenshotUrl] = useState('');
+  const [screenshotUrl, setScreenshotUrl] = useState("");
   const [logStep, setLogStep] = useState(null);
-  const screenshotObjectUrlRef = useRef('');
+  const [stepCaptureUrl, setStepCaptureUrl] = useState("");
+  const screenshotObjectUrlRef = useRef("");
+  const stepCaptureObjectUrlRef = useRef("");
   const listPath = getAdminRoutePath(ADMIN_PATHS.BOT_ORDERS);
   const scenarioListPath = getAdminRoutePath(ADMIN_PATHS.SCENARIO_LIST);
-  const chatLogPath = row?.scenario_id && row?.user_input_id
-    ? buildChatLogDetailPath(row.scenario_id, row.user_input_id)
-    : getAdminRoutePath(ADMIN_PATHS.BOT_CHAT_LOG);
+  const chatLogPath =
+    row?.scenario_id && row?.user_input_id
+      ? buildChatLogDetailPath(row.scenario_id, row.user_input_id)
+      : getAdminRoutePath(ADMIN_PATHS.BOT_CHAT_LOG);
 
   useEffect(() => {
     setLoading(true);
@@ -154,16 +182,45 @@ const BotOrderDetail = () => {
     };
   }, [botId, row]);
 
+  useEffect(() => {
+    if (stepCaptureObjectUrlRef.current) {
+      URL.revokeObjectURL(stepCaptureObjectUrlRef.current);
+      stepCaptureObjectUrlRef.current = "";
+    }
+    setStepCaptureUrl("");
+    if (!row?.id || !logStep?.screenshot_path) return undefined;
+
+    let cancelled = false;
+    getBotOrderStepScreenshot(botId, row.id, logStep.screenshot_path)
+      .then((res) => {
+        if (cancelled) return;
+        stepCaptureObjectUrlRef.current = URL.createObjectURL(res.data);
+        setStepCaptureUrl(stepCaptureObjectUrlRef.current);
+      })
+      .catch((error) => {
+        if (error.response?.data?.code === 0) tokenExpired();
+      });
+    return () => {
+      cancelled = true;
+      if (stepCaptureObjectUrlRef.current) {
+        URL.revokeObjectURL(stepCaptureObjectUrlRef.current);
+        stepCaptureObjectUrlRef.current = "";
+      }
+    };
+  }, [botId, row, logStep]);
+
   const goToList = () => history.push(listPath);
   const cardVisible = showCardFields(row);
   const answers = row?.answers || [];
   const rpaSteps = useMemo(() => completedRpaSteps(row?.rpa_steps), [row]);
   const chromeSlotDeferCount = useMemo(() => {
-    if (row?.chrome_slot_defer_count != null) return Number(row.chrome_slot_defer_count);
+    if (row?.chrome_slot_defer_count != null)
+      return Number(row.chrome_slot_defer_count);
     return countChromeSlotDefers(row?.rpa_steps);
   }, [row]);
   const chromeSlotRetryCount = useMemo(() => {
-    if (row?.chrome_slot_retry_count != null) return Number(row.chrome_slot_retry_count);
+    if (row?.chrome_slot_retry_count != null)
+      return Number(row.chrome_slot_retry_count);
     return countChromeSlotRetries(row?.rpa_steps);
   }, [row]);
   const errorMessage = useMemo(
@@ -172,32 +229,43 @@ const BotOrderDetail = () => {
   );
   const logDetail = useMemo(() => formatRpaStepDetail(logStep), [logStep]);
   const logModalTitle = logStep
-    ? `${RPA_LOG_MODAL_TITLE}: ${logStep.description || logStep.name || RPA_STEP_FALLBACK}`
+    ? `${RPA_LOG_MODAL_TITLE}: ${
+        logStep.description || logStep.name || RPA_STEP_FALLBACK
+      }`
     : RPA_LOG_MODAL_TITLE;
 
   const rpaColumns = useMemo(
     () => [
       {
         title: RPA_COL_INDEX,
-        key: 'index',
+        key: "index",
         width: 56,
         render: (_value, _record, index) => index + 1,
       },
       {
         title: RPA_COL_STEP,
-        key: 'step',
+        key: "step",
         render: (_value, step) => {
           const attemptLabel = formatChromeSlotAttemptLabel(step);
           return (
             <div>
               <div>{step.description || step.name || RPA_STEP_FALLBACK}</div>
               {attemptLabel ? (
-                <Typography.Text type="secondary" className="bot-orders-rpa-step-id">
+                <Typography.Text
+                  type="secondary"
+                  className="bot-orders-rpa-step-id"
+                >
                   {attemptLabel}
                 </Typography.Text>
               ) : null}
-              {!attemptLabel && step.name && step.description && step.name !== step.description ? (
-                <Typography.Text type="secondary" className="bot-orders-rpa-step-id">
+              {!attemptLabel &&
+              step.name &&
+              step.description &&
+              step.name !== step.description ? (
+                <Typography.Text
+                  type="secondary"
+                  className="bot-orders-rpa-step-id"
+                >
                   {step.name}
                 </Typography.Text>
               ) : null}
@@ -207,11 +275,12 @@ const BotOrderDetail = () => {
       },
       {
         title: RPA_COL_RESULT,
-        key: 'result',
+        key: "result",
         width: 88,
         render: (_value, step) => {
           if (isChromeSlotDeferStep(step)) return <Tag>{RPA_TAG_WAIT}</Tag>;
-          if (isChromeSlotRetryStep(step)) return <Tag color="warning">{RPA_TAG_RETRY}</Tag>;
+          if (isChromeSlotRetryStep(step))
+            return <Tag color="warning">{RPA_TAG_RETRY}</Tag>;
           const label = rpaStepResultLabel(step.ok);
           if (label === RPA_OK) return <Tag color="success">{RPA_OK}</Tag>;
           if (label === RPA_NG) return <Tag color="error">{RPA_NG}</Tag>;
@@ -220,13 +289,13 @@ const BotOrderDetail = () => {
       },
       {
         title: RPA_COL_TIME,
-        key: 'at',
+        key: "at",
         width: 160,
         render: (_value, step) => formatDateTime(step.at),
       },
       {
         title: RPA_COL_URL,
-        key: 'url',
+        key: "url",
         ellipsis: true,
         render: (_value, step) => (
           <ExternalLink href={step.url}>{truncateUrl(step.url)}</ExternalLink>
@@ -234,14 +303,16 @@ const BotOrderDetail = () => {
       },
       {
         title: RPA_COL_ERROR,
-        key: 'error',
+        key: "error",
         ellipsis: true,
         render: (_value, step) =>
-          step.ok === false ? truncateText(cleanErrorMessage(step.error)) : DASH,
+          step.ok === false
+            ? truncateText(cleanErrorMessage(step.error))
+            : DASH,
       },
       {
         title: RPA_COL_ACTION,
-        key: 'action',
+        key: "action",
         width: 88,
         render: (_value, step) => (
           <Button type="link" size="small" onClick={() => setLogStep(step)}>
@@ -260,35 +331,66 @@ const BotOrderDetail = () => {
           {row && (
             <>
               <div className="bot-orders-back">
-                <AdminActionButton action="back" label={BACK_TO_LIST_LABEL} onClick={goToList} />
+                <AdminActionButton
+                  action="back"
+                  label={BACK_TO_LIST_LABEL}
+                  onClick={goToList}
+                />
               </div>
 
-              <Descriptions bordered column={1} size="small" className="bot-orders-section">
+              <Descriptions
+                bordered
+                column={1}
+                size="small"
+                className="bot-orders-section"
+              >
                 <Descriptions.Item label={LABEL_STATUS}>
-                  <Tag color={statusColor(row.result)}>{statusLabel(row.result)}</Tag>
+                  <Tag color={statusColor(row.result)}>
+                    {statusLabel(row.result)}
+                  </Tag>
                 </Descriptions.Item>
-                <Descriptions.Item label={LABEL_PATH}>{row.path_label || DASH}</Descriptions.Item>
-                <Descriptions.Item label={LABEL_PAYMENT}>{row.payment_label || DASH}</Descriptions.Item>
-                <Descriptions.Item label={LABEL_EMAIL}>{row.email || DASH}</Descriptions.Item>
-                <Descriptions.Item label={LABEL_SKU}>{row.sku || DASH}</Descriptions.Item>
+                <Descriptions.Item label={LABEL_PATH}>
+                  {row.path_label || DASH}
+                </Descriptions.Item>
+                <Descriptions.Item label={LABEL_PAYMENT}>
+                  {row.payment_label || DASH}
+                </Descriptions.Item>
+                <Descriptions.Item label={LABEL_EMAIL}>
+                  {row.email || DASH}
+                </Descriptions.Item>
+                <Descriptions.Item label={LABEL_SKU}>
+                  {row.sku || DASH}
+                </Descriptions.Item>
                 <Descriptions.Item label={LABEL_PRODUCT_URL}>
                   <ExternalLink href={row.product_url} />
                 </Descriptions.Item>
                 <Descriptions.Item label={LABEL_CART_URL}>
                   <ExternalLink href={row.cart_url} />
                 </Descriptions.Item>
-                <Descriptions.Item label={LABEL_LEXICA_ORDER_ID}>{row.lexica_order_id || DASH}</Descriptions.Item>
+                <Descriptions.Item label={LABEL_LEXICA_ORDER_ID}>
+                  {row.lexica_order_id || DASH}
+                </Descriptions.Item>
                 {cardVisible && (
-                  <Descriptions.Item label={LABEL_CARD}>{row.masked_pan || DASH}</Descriptions.Item>
+                  <Descriptions.Item label={LABEL_CARD}>
+                    {row.masked_pan || DASH}
+                  </Descriptions.Item>
                 )}
                 {cardVisible && (
-                  <Descriptions.Item label={LABEL_CARD_EXPIRY}>{formatCardExpiry(row.card_expiry)}</Descriptions.Item>
+                  <Descriptions.Item label={LABEL_CARD_EXPIRY}>
+                    {formatCardExpiry(row.card_expiry)}
+                  </Descriptions.Item>
                 )}
                 {cardVisible && (
-                  <Descriptions.Item label={LABEL_CARD_HOLDER}>{row.card_holder || DASH}</Descriptions.Item>
+                  <Descriptions.Item label={LABEL_CARD_HOLDER}>
+                    {row.card_holder || DASH}
+                  </Descriptions.Item>
                 )}
-                <Descriptions.Item label={LABEL_START}>{formatDateTime(row.start_time)}</Descriptions.Item>
-                <Descriptions.Item label={LABEL_END}>{formatDateTime(row.end_time)}</Descriptions.Item>
+                <Descriptions.Item label={LABEL_START}>
+                  {formatDateTime(row.start_time)}
+                </Descriptions.Item>
+                <Descriptions.Item label={LABEL_END}>
+                  {formatDateTime(row.end_time)}
+                </Descriptions.Item>
                 <Descriptions.Item label={LABEL_DURATION}>
                   {formatDuration(row.start_time, row.end_time)}
                 </Descriptions.Item>
@@ -298,7 +400,9 @@ const BotOrderDetail = () => {
                 <Descriptions.Item label={LABEL_CHROME_SLOT_RETRY}>
                   {formatChromeSlotCount(chromeSlotRetryCount)}
                 </Descriptions.Item>
-                <Descriptions.Item label={LABEL_ERROR}>{errorMessage}</Descriptions.Item>
+                <Descriptions.Item label={LABEL_ERROR}>
+                  {errorMessage}
+                </Descriptions.Item>
                 <Descriptions.Item label={LABEL_CONVERSATION}>
                   <Link to={chatLogPath}>{CONVERSATION_LINK_LABEL}</Link>
                 </Descriptions.Item>
@@ -307,9 +411,17 @@ const BotOrderDetail = () => {
               {answers.length > 0 && (
                 <>
                   <Typography.Title level={5}>{LABEL_ANSWERS}</Typography.Title>
-                  <Descriptions bordered column={1} size="small" className="bot-orders-section">
+                  <Descriptions
+                    bordered
+                    column={1}
+                    size="small"
+                    className="bot-orders-section"
+                  >
                     {answers.map((answer) => (
-                      <Descriptions.Item key={answer.data_input_name} label={formatInputLabel(answer.data_input_name)}>
+                      <Descriptions.Item
+                        key={answer.data_input_name}
+                        label={formatInputLabel(answer.data_input_name)}
+                      >
                         {formatInputValue(answer.data_input_name, answer.value)}
                       </Descriptions.Item>
                     ))}
@@ -320,7 +432,9 @@ const BotOrderDetail = () => {
               <Typography.Title level={5}>{LABEL_RPA_LOG}</Typography.Title>
               <Table
                 className="bot-orders-section bot-orders-rpa-table"
-                rowKey={(_step, index) => `${_step.name || 'step'}-${index}-${_step.at || ''}`}
+                rowKey={(_step, index) =>
+                  `${_step.name || "step"}-${index}-${_step.at || ""}`
+                }
                 columns={rpaColumns}
                 dataSource={rpaSteps}
                 pagination={false}
@@ -333,15 +447,26 @@ const BotOrderDetail = () => {
                 visible={Boolean(logStep)}
                 onCancel={() => setLogStep(null)}
                 footer={null}
-                width={640}
+                width={720}
                 destroyOnClose
               >
                 <pre className="bot-orders-rpa-step-detail">{logDetail}</pre>
+                {stepCaptureUrl ? (
+                  <div className="bot-orders-rpa-step-capture">
+                    <img
+                      alt={STEP_CAPTURE_ALT}
+                      className="bot-orders-screenshot-image"
+                      src={stepCaptureUrl}
+                    />
+                  </div>
+                ) : null}
               </Modal>
 
               {screenshotUrl && (
                 <div className="bot-orders-screenshot">
-                  <Typography.Title level={5}>{LABEL_SCREENSHOT}</Typography.Title>
+                  <Typography.Title level={5}>
+                    {LABEL_SCREENSHOT}
+                  </Typography.Title>
                   <img
                     alt={SCREENSHOT_ALT}
                     className="bot-orders-screenshot-image"
@@ -351,7 +476,11 @@ const BotOrderDetail = () => {
               )}
 
               <div className="bot-orders-footer">
-                <AdminActionButton action="back" label={BACK_TO_LIST_LABEL} onClick={goToList} />
+                <AdminActionButton
+                  action="back"
+                  label={BACK_TO_LIST_LABEL}
+                  onClick={goToList}
+                />
               </div>
             </>
           )}

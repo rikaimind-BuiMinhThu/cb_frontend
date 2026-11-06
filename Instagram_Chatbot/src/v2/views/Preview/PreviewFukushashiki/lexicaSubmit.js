@@ -45,7 +45,7 @@ export const runLexicaButtonSubmit = ({
         CONVERSION_RESPONSE_SUBMIT_TYPE.ADD
       );
     }
-    continueAfterOptionalToken();
+    await continueAfterOptionalToken();
     const result = await followLexicaOrder({
       scenarioId,
       userId,
@@ -58,7 +58,9 @@ export const runLexicaButtonSubmit = ({
     }
   };
   submit()
-    .catch(() => {
+    .catch((error) => {
+      // eslint-disable-next-line no-console
+      console.error("lexicaSubmit failed", error);
       setSubmitError(LEXICA_COPY.FAIL_COPY);
     })
     .finally(() => {

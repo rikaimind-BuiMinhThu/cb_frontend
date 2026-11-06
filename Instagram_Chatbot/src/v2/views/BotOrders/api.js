@@ -11,3 +11,11 @@ export const getBotOrderScreenshot = (botId, id) => api.get(`${ORDERS_API_PATH}/
   params: { chatbot_id: botId },
   responseType: 'blob',
 });
+
+export const getBotOrderStepScreenshot = (botId, id, screenshotPath) => api.get(
+  `${ORDERS_API_PATH}/${id}/step_screenshot`,
+  {
+    params: { chatbot_id: botId, screenshot_path: screenshotPath },
+    responseType: 'blob',
+  },
+);

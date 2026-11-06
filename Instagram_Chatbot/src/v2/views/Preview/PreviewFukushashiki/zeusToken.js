@@ -269,7 +269,7 @@ const setSelectValue = (select, value) => {
   return true;
 };
 
-const fillZeusCardForm = ({ cardNumber, month, year, holder }) => {
+const fillZeusCardForm = ({ cardNumber, month, year, holder, cvc }) => {
   const action = document.getElementById(ZEUS_ACTION_NEW_ID);
   const number = document.getElementById(ZEUS_CARD_NUMBER_ID);
   const monthSelect = document.getElementById(ZEUS_EXPIRES_MONTH_ID);
@@ -280,7 +280,7 @@ const fillZeusCardForm = ({ cardNumber, month, year, holder }) => {
     return false;
   action.checked = true;
   number.value = cardNumber;
-  cvv.value = "";
+  cvv.value = String(cvc || "");
   name.value = holder || "";
   const monthOk = setSelectValue(monthSelect, month);
   const yearOk = setSelectValue(yearSelect, year);
@@ -320,7 +320,7 @@ export const tokenizeZeusCard = async ({
     } catch (initError) {
       throw tokenFailure(`${detail} init=${initError.message || "failed"}`);
     }
-    const filled = fillZeusCardForm({ cardNumber, month, year, holder });
+    const filled = fillZeusCardForm({ cardNumber, month, year, holder, cvc });
     if (!filled) throw tokenFailure(detail);
     return await new Promise((resolve, reject) => {
       try {
@@ -423,6 +423,8 @@ const RESULT_DONE = "done";
 const RESULT_ERROR = "error";
 const RESULT_RUNNING = "running";
 const RESULT_OPEN = "open";
+const TIMEOUT_COPY =
+  "ご注文の確認に時間がかかっています。完了メールをご確認いただくか、ショップまでお問い合わせください。";
 
 const isLexicaOrderInProgress = (data) => {
   if (data.queued || data.busy) return true;
@@ -453,7 +455,8 @@ export const pollLexicaOrder = async ({ scenarioId, userId, onBusy }) => {
     }
     await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
   }
-  if (progress.lastInProgress) return { ok: true, copy: BUSY_COPY };
+  // Timeout is not success — do not lock the chat as completed.
+  if (progress.lastInProgress) return { ok: false, copy: TIMEOUT_COPY };
   return { ok: false, copy: FAIL_COPY };
 };
 

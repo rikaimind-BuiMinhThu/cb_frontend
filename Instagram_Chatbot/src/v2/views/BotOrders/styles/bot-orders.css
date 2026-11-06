@@ -52,6 +52,14 @@
   max-width: 100%;
 }
 
+.bot-orders-rpa-step-capture {
+  margin-top: 16px;
+}
+
+.bot-orders-rpa-step-capture .bot-orders-screenshot-image {
+  border: 1px solid #f0f0f0;
+}
+
 .bot-orders-footer {
   margin-top: 24px;
 }

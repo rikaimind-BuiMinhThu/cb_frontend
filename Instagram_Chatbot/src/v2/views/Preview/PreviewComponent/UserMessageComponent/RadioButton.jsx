@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import { baseUserMessageComponentPropTypes } from "./userMessageComponentPropTypes";
 import "v2/assets/css/bot/preview-chat-bot.css";
@@ -23,6 +23,14 @@ import {
 } from "v2/views/ScenarioSetting/utils/radioButtonGenderUtils";
 import { isMobile } from "v2/views/Preview/PreviewComponent/Utils";
 import OptionGender from "./OptionGender";
+
+const applyRadioImgGridCssVars = (element, radioButton) => {
+  if (!element) return;
+  const vars = getRadioImgGridStyle(radioButton);
+  Object.entries(vars).forEach(([name, value]) => {
+    element.style.setProperty(name, value);
+  });
+};
 
 const LEXICA_PATH_KEYS = ["path", "order_path"];
 const FIRST_TIME_VALUE = "first_time";
@@ -61,10 +69,34 @@ const RadioButton = ({
   onClickNext,
   cartSystem = "",
 }) => {
-  if (content.type !== MESSAGE_CONTENT_TYPES.RADIO_BUTTON) return null;
+  const isRadioContent = content.type === MESSAGE_CONTENT_TYPES.RADIO_BUTTON;
+  const radioButton = isRadioContent ? content.radio_button : null;
+  const visibleItems = radioButton
+    ? visibleRadioItems(radioButton, cartSystem)
+    : [];
 
-  const radioButton = content.radio_button;
-  if (!radioButton) return null;
+  const initialSelection = radioButton?.initial_selection || "";
+
+  useEffect(() => {
+    if (!radioButton) return;
+    if (cartSystem !== CART_SYSTEM_LEXICA) return;
+    if (!isMobile() || !isLexicaPathRadio(radioButton)) return;
+    if (!initialSelection) return;
+    const stillVisible = visibleRadioItems(radioButton, cartSystem).some(
+      (item) => getRadioOptionSelectionKey(item) === initialSelection
+    );
+    if (stillVisible) return;
+    onChangeValue(contentIndex, content.type, "", "initial_selection");
+  }, [
+    cartSystem,
+    content.type,
+    contentIndex,
+    initialSelection,
+    onChangeValue,
+    radioButton,
+  ]);
+
+  if (!isRadioContent || !radioButton) return null;
 
   const renderTitle = () => {
     if (!radioButton.title_require && !radioButton.require) return null;
@@ -116,7 +148,7 @@ const RadioButton = ({
   const renderDefaultContent = () => {
     if (isGenderRadio(radioButton)) return renderGenderContent();
 
-    return visibleRadioItems(radioButton, cartSystem).map((item, index) => {
+    return visibleItems.map((item, index) => {
       const selectionKey = getRadioOptionSelectionKey(item);
       const inputId = `ss-message__content--user-radio_button_${messageIndex}_${contentIndex}_${selectionKey}_${index}`;
       const isSelected = isRadioOptionInitiallySelected(radioButton, item);
@@ -166,16 +198,18 @@ const RadioButton = ({
   };
 
   const renderRadioButtonImgContent = () => {
-    const items = visibleRadioItems(radioButton, cartSystem);
+    const items = visibleItems;
     const layout = normalizeRadioButtonImgLayout(radioButton);
-    const gridStyle = getRadioImgGridStyle(radioButton);
     const gridClassName = getImgGridClassName(
       "ss-message__content--user-radio_button-img-grid",
       layout.type
     );
 
     return (
-      <div className={gridClassName} style={gridStyle}>
+      <div
+        className={gridClassName}
+        ref={(element) => applyRadioImgGridCssVars(element, radioButton)}
+      >
         {items.map((item, index) => {
           const selectionKey = getRadioOptionSelectionKey(item);
           const inputId = `ss-message__content--user-radio_button_img_${messageIndex}_${contentIndex}_${selectionKey}_${index}`;
@@ -254,7 +288,7 @@ const RadioButton = ({
   };
 
   const renderBlockStyleContent = () => {
-    return visibleRadioItems(radioButton, cartSystem).map((item, index) => {
+    return visibleItems.map((item, index) => {
       const selectionKey = getRadioOptionSelectionKey(item);
       return (
         <div

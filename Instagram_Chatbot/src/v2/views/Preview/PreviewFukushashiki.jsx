@@ -797,9 +797,9 @@ const PreviewFukushashiki = () => {
       isButtonSubmitMessage(clickedMsg) ||
       isButtonSubmitMessage(state.messagesList[clickedMsgIndex]);
 
-    const continueAfterOptionalToken = () => {
+    const continueAfterOptionalToken = async () => {
       if (isShopify) {
-        sendLogMessageToServer(
+        await sendLogMessageToServer(
           data,
           isBtnUpdateClick
             ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE
@@ -810,7 +810,7 @@ const PreviewFukushashiki = () => {
           createOrAddLinesCart(state);
         }
       } else {
-        sendLogMessageToServer(
+        await sendLogMessageToServer(
           data,
           isBtnUpdateClick
             ? CONVERSION_RESPONSE_SUBMIT_TYPE.UPDATE
@@ -939,7 +939,7 @@ const PreviewFukushashiki = () => {
       return;
     }
 
-    continueAfterOptionalToken();
+    void continueAfterOptionalToken();
   };
 
   const onChangeValue = (
