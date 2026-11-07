@@ -2657,6 +2657,16 @@ slideUp
 #sp-body .ant-select-dropdown {
   min-width: 88px !important;
 }
+#sp-body .ss-message__content--user-pull_down--time_hm .ant-select-dropdown {
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+}
+#sp-body .ss-message__content--user-pull_down--time_hm .ant-select-item-option-content {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 #sp-body .ant-select-item-option {
   overflow: visible;
 }

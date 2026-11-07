@@ -53,6 +53,7 @@ const PullDown = ({ content, errors, contentIndex, messageIndex, disabled, onCha
         data={yearOptions}
         placeholder={PULL_DOWN_PLACEHOLDERS.YEAR}
         className={className}
+        dropdownMatchSelectWidth
         onChange={(value) =>
           onChangeValue(
             contentIndex,
@@ -76,6 +77,7 @@ const PullDown = ({ content, errors, contentIndex, messageIndex, disabled, onCha
         data={MONTH_DEFAULT_OPTIONS}
         placeholder={PULL_DOWN_PLACEHOLDERS.MONTH}
         className={className}
+        dropdownMatchSelectWidth
         onChange={(value) =>
           onChangeValue(
             contentIndex,
@@ -99,6 +101,7 @@ const PullDown = ({ content, errors, contentIndex, messageIndex, disabled, onCha
         data={DAY_DEFAULT_OPTIONS}
         placeholder={PULL_DOWN_PLACEHOLDERS.DAY}
         className={className}
+        dropdownMatchSelectWidth
         onChange={(value) =>
           onChangeValue(
             contentIndex,
