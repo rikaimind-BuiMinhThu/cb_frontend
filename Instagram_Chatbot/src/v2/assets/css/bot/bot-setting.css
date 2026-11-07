@@ -137,6 +137,8 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  container-type: inline-size;
+  container-name: theme-settings;
 }
 
 .theme-customize-tab-settings__footer {
@@ -166,13 +168,20 @@
 
 .theme-section__grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px 16px;
+  grid-template-columns: 1fr;
+  gap: 10px 12px;
 }
 
-.theme-section__grid .theme-field--color,
-.theme-section__grid .theme-field--main-color {
-  grid-column: 1 / -1;
+@container theme-settings (min-width: 520px) {
+  .theme-section__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@container theme-settings (min-width: 720px) {
+  .theme-section__grid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
 }
 
 .theme-field--color .theme-field__control,
@@ -182,8 +191,9 @@
 
 .theme-field {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
   min-width: 0;
 }
 
@@ -203,7 +213,7 @@
 }
 
 .theme-field--main-color {
-  align-items: flex-start;
+  align-items: stretch;
 }
 
 .theme-field--main-color .theme-field__control {
@@ -229,8 +239,8 @@
 }
 
 .theme-field__label {
-  flex: 0 0 38%;
-  max-width: 160px;
+  flex: none;
+  max-width: none;
   display: block;
   margin-bottom: 0;
   font-size: 12px;
@@ -238,22 +248,18 @@
   color: #666;
 }
 
-.theme-field--full .theme-field__label {
-  flex: 0 0 120px;
-  max-width: 120px;
-}
-
 .theme-field__control {
   flex: 1;
   min-width: 0;
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
 .theme-field__control--compact {
-  flex: 0 0 auto;
-  width: auto;
+  flex: 1;
+  width: 100%;
 }
 
 .theme-field__suffix {
@@ -387,9 +393,10 @@
 }
 
 .theme-field__input--number {
-  flex: 0 0 auto;
-  width: 56px;
-  height: 26px;
+  flex: 1;
+  min-width: 72px;
+  width: 100%;
+  height: 32px;
   padding: 0 6px;
   font-size: 12px;
   text-align: center;
@@ -405,6 +412,12 @@
   color: #333;
   background-color: #fff;
   cursor: pointer;
+}
+
+.theme-field__select--unit {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 56px;
 }
 
 .theme-field__select:focus {
@@ -791,25 +804,5 @@
 
   .theme-customize-tab-settings {
     max-height: none;
-  }
-
-  .theme-section__grid {
-    grid-template-columns: 1fr;
-  }
-
-  .theme-field--full {
-    grid-column: auto;
-  }
-
-  .theme-field {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 6px;
-  }
-
-  .theme-field__label,
-  .theme-field--full .theme-field__label {
-    flex: none;
-    max-width: none;
   }
 }
