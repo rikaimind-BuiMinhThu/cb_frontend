@@ -374,14 +374,20 @@ const ThemeAccordionSection = ({
       const checked = themeSettings[key] === true || themeSettings[key] === 'true';
       return (
         <div key={key} className={wrapperClassName}>
-          <Checkbox
-            checked={checked}
-            onChange={(event) => onFieldChange(key, event.target.checked)}
-          >
-            <DesignSettingLabel className="theme-checkbox-label" tooltip={getDesignSettingTooltip(key)}>
+          <div className={`theme-field${isFullWidth ? ' theme-field--full' : ''}`}>
+            <DesignSettingLabel
+              className="theme-field__label"
+              tooltip={getDesignSettingTooltip(key)}
+            >
               {label}
             </DesignSettingLabel>
-          </Checkbox>
+            <div className="theme-field__control theme-field__control--compact">
+              <Checkbox
+                checked={checked}
+                onChange={(event) => onFieldChange(key, event.target.checked)}
+              />
+            </div>
+          </div>
         </div>
       );
     }
