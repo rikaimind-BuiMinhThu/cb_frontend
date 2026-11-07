@@ -1,16 +1,33 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
+import cloneDeep from 'lodash/cloneDeep';
+import {
+  AGREE_TERM_CONTENT_TYPE,
+  canEnableAgreeTermCollapse,
+} from 'v2/components/BotMessages/agreeTermDesign';
+import { agreeTermContentPropType } from 'v2/components/BotMessages/agreeTermPropTypes';
+import { mutateMessageContent } from 'v2/views/ScenarioSetting/utils/scenarioMessageMutations';
 import ContentSettingShell from '../shared/ContentSettingShell';
 import ContentTypeSelector, { ContentTitleInput } from '../shared/ContentTypeSelector';
 import { AGREE_TERM_TYPES } from '../../constants/contentTypeConstants';
 import { agreeTermType } from '../../constants/scenarioFormConstants';
+import { AGREE_TERM_LABELS } from '../../constants/scenarioSettingLabels';
+import {
+  applyAgreeTermDesign,
+  clearAgreeTermCollapse,
+} from '../../utils/agreeTermDesignSync';
 import {
   buildAgreeTermSettingContext,
   renderAgreeTermCheckbox,
   renderAgreeTermFukushashikiRow,
 } from './agreeTermSettingContext';
+import AgreeTermDesignModal from './AgreeTermDesignModal';
 import DetailContentTypeSetting from './DetailContentTypeSetting';
 import PostLinkOnlyTypeSetting from './PostLinkOnlyTypeSetting';
 import '../../styles/contentSettings/agreeTerm.css';
+
+const TITLE_REQUIRE_FIELD = 'title_require';
+const TITLE_FIELD = 'title';
 
 const AgreeTermSetting = (props) => {
   const {
@@ -27,11 +44,44 @@ const AgreeTermSetting = (props) => {
     dataInputVar,
     setIsOpenAddVariable,
   } = props;
+  const [designOpen, setDesignOpen] = useState(false);
+  const detailType = content?.agree_term?.type;
 
-  if (content.type !== 'agree_term') return null;
+  useEffect(() => {
+    if (detailType === AGREE_TERM_TYPES.DETAIL_CONTENT) return;
+    setDesignOpen(false);
+  }, [detailType]);
+
+  if (content.type !== AGREE_TERM_CONTENT_TYPE) return null;
 
   const ctx = buildAgreeTermSettingContext(props);
   const { agreeTerm, changeContent } = ctx;
+  const showDesign = agreeTerm.type === AGREE_TERM_TYPES.DETAIL_CONTENT;
+
+  const updateAgreeTermField = (field, value) => {
+    setDataMessages((current) => {
+      const next = cloneDeep(current);
+      mutateMessageContent(
+        next,
+        indexMessageSelect,
+        indexContent,
+        content.type,
+        value,
+        field,
+      );
+      if (field === TITLE_REQUIRE_FIELD && value !== true) {
+        return clearAgreeTermCollapse(next);
+      }
+      if (field === TITLE_FIELD && String(value ?? '').trim() === '') {
+        return clearAgreeTermCollapse(next);
+      }
+      return next;
+    });
+  };
+
+  const handleDesignChange = (nextDesign) => {
+    setDataMessages((current) => applyAgreeTermDesign(current, nextDesign));
+  };
 
   const renderTypeSelector = () => (
     <div className="ss-user-setting__item-bottom">
@@ -39,37 +89,51 @@ const AgreeTermSetting = (props) => {
         titleRequire={agreeTerm?.title_require}
         typeValue={agreeTerm?.type}
         typeOptions={agreeTermType}
-        onTitleRequireChange={changeContent('title_require')}
+        onTitleRequireChange={(value) => updateAgreeTermField(TITLE_REQUIRE_FIELD, value)}
         onTypeChange={changeContent('type')}
       />
     </div>
   );
+
+  const renderDesignButton = () => {
+    if (!showDesign) return null;
+    return (
+      <div className="ss-user-setting__item-bottom">
+        <button
+          type="button"
+          className="ss-agree-term-setting__design-btn"
+          onClick={() => setDesignOpen(true)}
+        >
+          {AGREE_TERM_LABELS.designButton}
+        </button>
+      </div>
+    );
+  };
 
   const renderTitle = () => {
     if (agreeTerm.title_require !== true) return null;
     return (
       <ContentTitleInput
         title={agreeTerm.title}
-        onChange={changeContent('title')}
+        onChange={(value) => updateAgreeTermField(TITLE_FIELD, value)}
       />
     );
   };
 
   const renderTypeBody = () => {
-    switch (agreeTerm.type) {
-      case AGREE_TERM_TYPES.DETAIL_CONTENT:
-        return <DetailContentTypeSetting {...props} />;
-      case AGREE_TERM_TYPES.POST_LINK_ONLY:
-        return (
-          <PostLinkOnlyTypeSetting
-            {...props}
-            handleRemoveItemContent={handleRemoveItemContent}
-            handleAddItemAgreeTerm={handleAddItemAgreeTerm}
-          />
-        );
-      default:
-        return null;
+    if (agreeTerm.type === AGREE_TERM_TYPES.DETAIL_CONTENT) {
+      return <DetailContentTypeSetting {...props} />;
     }
+    if (agreeTerm.type === AGREE_TERM_TYPES.POST_LINK_ONLY) {
+      return (
+        <PostLinkOnlyTypeSetting
+          {...props}
+          handleRemoveItemContent={handleRemoveItemContent}
+          handleAddItemAgreeTerm={handleAddItemAgreeTerm}
+        />
+      );
+    }
+    return null;
   };
 
   const renderFukushashiki = () => {
@@ -79,7 +143,7 @@ const AgreeTermSetting = (props) => {
 
   return (
     <ContentSettingShell
-      contentType="agree_term"
+      contentType={AGREE_TERM_CONTENT_TYPE}
       contentData={agreeTerm}
       indexMessageSelect={indexMessageSelect}
       indexContent={indexContent}
@@ -91,12 +155,35 @@ const AgreeTermSetting = (props) => {
       setIsOpenAddVariable={setIsOpenAddVariable}
     >
       {renderTypeSelector()}
+      {renderDesignButton()}
       {renderTitle()}
       {renderTypeBody()}
       {renderAgreeTermCheckbox(ctx)}
       {renderFukushashiki()}
+      <AgreeTermDesignModal
+        open={designOpen && showDesign}
+        onClose={() => setDesignOpen(false)}
+        design={agreeTerm.design}
+        canCollapse={canEnableAgreeTermCollapse(agreeTerm)}
+        onChange={handleDesignChange}
+      />
     </ContentSettingShell>
   );
+};
+
+AgreeTermSetting.propTypes = {
+  content: agreeTermContentPropType.isRequired,
+  indexMessageSelect: PropTypes.number,
+  indexContent: PropTypes.number,
+  dataMessages: PropTypes.arrayOf(PropTypes.object),
+  setDataMessages: PropTypes.func,
+  onChangeValueMessageContent: PropTypes.func,
+  isUseFukushashiki: PropTypes.bool,
+  handleRemoveItemContent: PropTypes.func,
+  handleAddItemAgreeTerm: PropTypes.func,
+  renderRootFaqOption: PropTypes.func,
+  dataInputVar: PropTypes.arrayOf(PropTypes.object),
+  setIsOpenAddVariable: PropTypes.func,
 };
 
 export default AgreeTermSetting;

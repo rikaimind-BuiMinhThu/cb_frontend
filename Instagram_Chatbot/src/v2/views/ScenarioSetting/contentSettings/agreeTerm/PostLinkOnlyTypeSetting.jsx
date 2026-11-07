@@ -1,5 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { MDBIcon } from 'mdbreact';
+import {
+  agreeTermPostLinkKey,
+  stampAgreeTermPostLinkIds,
+} from 'v2/components/BotMessages/agreeTermDesign';
 import InputCustom from '../../scenarioCommon/InputCustom';
 import InputDouble from '../../scenarioCommon/InputDouble';
 import {
@@ -14,18 +18,41 @@ const PostLinkOnlyTypeSetting = ({
   content,
   handleRemoveItemContent,
   handleAddItemAgreeTerm,
+  onChangeValueMessageContent,
   ...rest
 }) => {
   const props = {
     indexMessageSelect,
     indexContent,
     content,
+    onChangeValueMessageContent,
     ...rest,
   };
   const { agreeTerm, changeContent } = buildAgreeTermSettingContext(props);
+  const links = agreeTerm?.post_link_only;
+
+  useEffect(() => {
+    if (!Array.isArray(links) || !onChangeValueMessageContent || !agreeTerm) return;
+    const needsId = links.some((item) => item?.id == null || item.id === '');
+    if (!needsId) return;
+    onChangeValueMessageContent(
+      indexMessageSelect,
+      indexContent,
+      content.type,
+      stampAgreeTermPostLinkIds(links),
+      agreeTerm.type,
+    );
+  }, [
+    agreeTerm,
+    content.type,
+    indexContent,
+    indexMessageSelect,
+    links,
+    onChangeValueMessageContent,
+  ]);
 
   const renderLinkItem = (agreeTermItem, indexAgree, array) => (
-    <div key={indexAgree} className="ss-user-setting__item-bottom">
+    <div key={agreeTermPostLinkKey(agreeTermItem)} className="ss-user-setting__item-bottom">
       <div className="ss-user-setting-item-radio-button-drag ss-agree-term-setting__link-item">
         <div className="ss-agree-term-setting__link-panel">
           <InputCustom
@@ -67,7 +94,7 @@ const PostLinkOnlyTypeSetting = ({
 
   const renderLinkList = () => {
     if (!Array.isArray(agreeTerm.post_link_only)) return null;
-    return agreeTerm.post_link_only.map(renderLinkItem);
+    return stampAgreeTermPostLinkIds(agreeTerm.post_link_only).map(renderLinkItem);
   };
 
   const renderAddButton = () => (

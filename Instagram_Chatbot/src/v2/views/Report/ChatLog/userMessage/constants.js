@@ -1,3 +1,8 @@
+import {
+  AGREE_TERM_DETAIL_TYPE,
+  AGREE_TERM_POST_LINK_TYPE,
+} from 'v2/components/BotMessages/agreeTermDesign';
+
 export const SCAN_REGEX = /\{\{(.*?)\}\}/g;
 export const NUMBER_REGEXP = /^[0-9]+$/;
 
@@ -117,8 +122,8 @@ export const CALENDAR_TYPE = {
 };
 
 export const AGREE_TERM_TYPE = {
-  DETAIL_CONTENT: 'detail_content',
-  POST_LINK_ONLY: 'post_link_only',
+  DETAIL_CONTENT: AGREE_TERM_DETAIL_TYPE,
+  POST_LINK_ONLY: AGREE_TERM_POST_LINK_TYPE,
 };
 
 export const CAROUSEL_TYPE = {

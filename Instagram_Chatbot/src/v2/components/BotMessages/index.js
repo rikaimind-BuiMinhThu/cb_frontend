@@ -5,6 +5,7 @@ export { default as CartLoginMessagePreview } from './CartLoginMessagePreview';
 export { default as InputCustom } from './InputCustom';
 export { default as InputNum } from './InputNum';
 export { default as CheckboxCustom } from './CheckboxCustom';
+export { default as AgreeTermDetailBody } from './AgreeTermDetailBody';
 export { default as SelectCustom } from './SelectCustom';
 export { default as DatePickerCustom } from './DatePickerCustom';
 export { default as UserMessageTailIcon } from './UserMessageTailIcon';

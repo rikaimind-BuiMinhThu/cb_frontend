@@ -1,3 +1,9 @@
+import {
+  AGREE_TERM_CONTENT_TYPE,
+  AGREE_TERM_DETAIL_TYPE,
+  AGREE_TERM_POST_LINK_TYPE,
+} from 'v2/components/BotMessages/agreeTermDesign';
+
 export const TEXT_INPUT_TYPES = {
   TEXT: 'text',
   URLS: 'urls',
@@ -61,8 +67,8 @@ export const CAROUSEL_TYPES = {
 };
 
 export const AGREE_TERM_TYPES = {
-  DETAIL_CONTENT: 'detail_content',
-  POST_LINK_ONLY: 'post_link_only',
+  DETAIL_CONTENT: AGREE_TERM_DETAIL_TYPE,
+  POST_LINK_ONLY: AGREE_TERM_POST_LINK_TYPE,
 };
 
 export const CARD_PAYMENT_RADIO_TYPES = {
@@ -99,7 +105,7 @@ export const CONTENT_SETTING_TYPES = {
   SLIDER: 'slider',
   ZIP_CODE_ADDRESS: 'zip_code_address',
   ATTACHING_FILE: 'attaching_file',
-  AGREE_TERM: 'agree_term',
+  AGREE_TERM: AGREE_TERM_CONTENT_TYPE,
   IMAGE: 'image',
   CAROUSEL: 'carousel',
   CAPTURE: 'capture',

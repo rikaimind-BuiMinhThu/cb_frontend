@@ -7,6 +7,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import api from 'v2/api/api-management';
 import { S3_UPLOAD_URL } from 'v2/variables/constants';
 import { tokenExpired } from 'v2/api/tokenExpired';
+import { stampAgreeTermPostLinkIds } from 'v2/components/BotMessages/agreeTermDesign';
 import { createDefaultContentItem, getNextContentId } from 'v2/views/ScenarioSetting/utils/scenarioContentDefaults';
 import {
   createDefaultCombineBlock,
@@ -389,13 +390,18 @@ export const useScenarioMessageActions = ({ state, actions, messages }) => {
       if (termNode[contentType] === undefined || termNode[contentType] === null) {
         termNode[contentType] = [];
       }
-      const arr = termNode[contentType];
-      arr.push({
-        title_comment: '',
-        title: '',
-        urls: '',
-        url_comment: '',
-      });
+      const stamped = stampAgreeTermPostLinkIds(termNode[contentType]);
+      const nextId = stamped.reduce((max, item) => Math.max(max, Number(item.id) || 0), 0) + 1;
+      termNode[contentType] = [
+        ...stamped,
+        {
+          id: nextId,
+          title_comment: '',
+          title: '',
+          urls: '',
+          url_comment: '',
+        },
+      ];
     }));
   }, [dataMessages, setDataMessages]);
 
