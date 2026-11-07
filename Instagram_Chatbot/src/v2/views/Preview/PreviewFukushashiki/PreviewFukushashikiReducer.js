@@ -531,7 +531,10 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
       if (!(isEditorPreview && state.hasEditorPreviewDraftApplied)) {
         newState.messagesList.filter(isBotMessage).forEach((message) => {
           message.message_content?.forEach((content) => {
-            if (content.type === BOT_MESSAGE_TYPES.TEXT_INPUT) {
+            if (
+              content.type === BOT_MESSAGE_TYPES.TEXT_INPUT
+              || content.type === BOT_MESSAGE_TYPES.HTML_CODE
+            ) {
               content[content.type].originalContent = content[content.type].content;
             }
           });

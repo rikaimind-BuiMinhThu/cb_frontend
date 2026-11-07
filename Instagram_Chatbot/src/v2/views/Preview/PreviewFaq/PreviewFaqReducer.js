@@ -298,7 +298,10 @@ const PreviewFaqReducer = (state, action) => {
       if (!(isEditorPreview && state.hasEditorPreviewDraftApplied)) {
         newState.messagesList.filter(isBotMessage).forEach((message) => {
           message.message_content?.forEach((content) => {
-            if (content.type === BOT_MESSAGE_TYPES.TEXT_INPUT) {
+            if (
+              content.type === BOT_MESSAGE_TYPES.TEXT_INPUT
+              || content.type === BOT_MESSAGE_TYPES.HTML_CODE
+            ) {
               content[content.type].originalContent = content[content.type].content;
             }
           });
@@ -455,7 +458,10 @@ const appendRootMessagesToMessagesList = (newState) => {
   const additionalMessagesList = newState.originalMessagesList.slice(rootMessageIndex, lastMessageIndex + 1);
   additionalMessagesList.filter(isBotMessage).forEach(msg => {
     msg.message_content.forEach(content => {
-      if (content.type === BOT_MESSAGE_TYPES.TEXT_INPUT) {
+      if (
+        content.type === BOT_MESSAGE_TYPES.TEXT_INPUT
+        || content.type === BOT_MESSAGE_TYPES.HTML_CODE
+      ) {
         content[content.type].originalContent = content[content.type].content;
       }
     });

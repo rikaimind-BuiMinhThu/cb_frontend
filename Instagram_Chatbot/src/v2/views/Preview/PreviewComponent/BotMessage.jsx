@@ -334,6 +334,7 @@ const BotMessage = ({
         contentIndex={contentIndex}
         botInfor={botInfor}
         themeSettings={themeSettings}
+        variables={variables}
       />
     )
   }

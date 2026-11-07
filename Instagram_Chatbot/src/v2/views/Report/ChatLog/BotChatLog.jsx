@@ -45,6 +45,19 @@ const SCAN_REGEX = /\{\{(.*?)\}\}/g;
 const CHAT_LOG_CACHE_BUSTER_PARAM = '_';
 const CHAT_LOG_JSON_INPUT_NAMES = ['data_name', 'zip_code_address', 'birth_date'];
 
+const replaceChatLogVariables = (contentText, variables) => (
+  (contentText || EMPTY_STRING).replaceAll(SCAN_REGEX, (_text, variable) => {
+    if (variables.length === 0) return EMPTY_STRING;
+    const valueVarRef = { value: EMPTY_STRING };
+    for (const [j] of variables.entries()) {
+      if (variables[j].variable_name === variable) {
+        valueVarRef.value = variables[j].default_value;
+      }
+    }
+    return valueVarRef.value;
+  })
+);
+
 const freshChatLogConfig = (params = {}) => ({
   params: {
     ...params,
@@ -598,23 +611,20 @@ const BotChatLog = () => {
                   messageArr[i].message_content[0].text_input.content
                 ) {
                   messageArr[i].message_content[0].text_input.content =
-                    messageArr[
-                      i
-                    ].message_content[0].text_input.content.replaceAll(
-                      SCAN_REGEX,
-                      (text, variable) => {
-                        if (variables.length !== 0) {
-                          const valueVarRef = { value: '' };
-                          for (const [j] of variables.entries()) {
-                            if (variables[j].variable_name === variable) {
-                              valueVarRef.value = variables[j].default_value;
-                            }
-                          }
-                          return valueVarRef.value;
-                        } else {
-                          return EMPTY_STRING;
-                        }
-                      }
+                    replaceChatLogVariables(
+                      messageArr[i].message_content[0].text_input.content,
+                      variables,
+                    );
+                }
+                if (
+                  messageArr[i].message_content[0]?.type ===
+                    "html_code" &&
+                  messageArr[i].message_content[0].html_code?.content
+                ) {
+                  messageArr[i].message_content[0].html_code.content =
+                    replaceChatLogVariables(
+                      messageArr[i].message_content[0].html_code.content,
+                      variables,
                     );
                 }
 

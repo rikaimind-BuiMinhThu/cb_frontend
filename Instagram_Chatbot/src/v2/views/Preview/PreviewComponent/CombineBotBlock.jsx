@@ -112,6 +112,7 @@ const CombineBotBlock = ({
           contentIndex={contentIndex}
           botInfor={botInfor}
           themeSettings={themeSettings}
+          variables={variables}
         />
       );
     case BOT_MESSAGE_TYPES.AMAZON_PAY_BUTTON:

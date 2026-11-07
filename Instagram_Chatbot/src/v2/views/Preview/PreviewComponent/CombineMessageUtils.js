@@ -11,6 +11,7 @@ const prepareCombineBotBlocks = (messagesList, messageIndex) => {
     if (
       content.type === BOT_MESSAGE_TYPES.TEXT_INPUT
       || content.type === BOT_MESSAGE_TYPES.GETTING_ERROR_NOTIFICATION
+      || content.type === BOT_MESSAGE_TYPES.HTML_CODE
     ) {
       const section = content[content.type];
       if (section && section.content != null) {
