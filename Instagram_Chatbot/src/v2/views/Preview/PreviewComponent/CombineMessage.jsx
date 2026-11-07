@@ -10,6 +10,7 @@ import {
   NEXT_BUTTON_LABEL,
 } from './Constants';
 import { getElementMessageById, isCombineMessage } from './Utils';
+import { COMBINE_USER_BLOCK_ON_RENDER_COMPLETED } from './callIfFunction';
 
 export const CombineMessageNextButton = ({
   message,
@@ -216,6 +217,7 @@ const CombineUserBlock = ({
         onChangeValue(contentIndex, contentType, value, field, subField1, subField2)
       }
       cartSystem={cartSystem}
+      onRenderCompleted={COMBINE_USER_BLOCK_ON_RENDER_COMPLETED}
     />
   );
 };

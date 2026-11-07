@@ -11,6 +11,7 @@ import CartLoginMessagePreview from "v2/components/BotMessages/CartLoginMessageP
 import { getElementMessageById, getBotMessageDelay } from "./Utils";
 import { replaceVariables } from "./VariablesUtils";
 import { buildOrderConfirmJs, buildOrderConfirmPreviewHtml } from "v2/views/ScenarioSetting/utils/OrderConfirmLpScriptGenerator";
+import { callIfFunction } from "./callIfFunction";
 
 const BotMessage = ({
   content,
@@ -39,7 +40,7 @@ const BotMessage = ({
 
   useEffect(() => {
     if (isDelaying) return;
-    onRenderCompleted();
+    callIfFunction(onRenderCompleted);
   // eslint-disable-next-line react-hooks/exhaustive-deps -- prop callback identity is unstable / mount-once
   }, [isDelaying]);
 

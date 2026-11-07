@@ -14,6 +14,7 @@ import locale from "antd/es/date-picker/locale/ja_JP";
 import "moment/locale/zh-cn";
 import SubmitButton from "./UserMessageComponent/SubmitButton";
 import { convertTextJapaneseByApi } from "v2/views/Preview/utils/japaneseConverter";
+import { callIfFunction } from "./callIfFunction";
 import Image from "./UserMessageComponent/Image";
 import TextInput from "./UserMessageComponent/TextInput";
 import Label from "./UserMessageComponent/Label";
@@ -310,7 +311,7 @@ const UserMessage = ({
     if (messageContent.length > 1) return;
     if (messageContent[0].type !== MESSAGE_CONTENT_TYPES.IMAGE) return;
 
-    onRenderCompleted();
+    callIfFunction(onRenderCompleted);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- init-once; prop callback identity is unstable
   }, []);
 
