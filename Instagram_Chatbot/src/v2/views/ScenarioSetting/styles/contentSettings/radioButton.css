@@ -210,6 +210,14 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+.ss-radio-button-img-layout-section__vertical-align-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  margin-bottom: 12px;
+  max-width: 25%;
+}
+
 .ss-radio-button-img-layout-section__control {
   min-width: 0;
 }
@@ -279,6 +287,10 @@
   .ss-radio-button-img-layout-section__controls-row,
   .ss-radio-button-img-layout-section__controls-row--with-width {
     grid-template-columns: 1fr;
+  }
+
+  .ss-radio-button-img-layout-section__vertical-align-row {
+    max-width: none;
   }
 
   .ss-radio-button-img-layout-section__spacing-row {

@@ -15,6 +15,24 @@ export const DEFAULT_RADIO_IMG_LAYOUT_TYPE = RADIO_IMG_LAYOUT_HORIZONTAL_EQUAL_2
 export const DEFAULT_RADIO_IMG_OPTION_PADDING = '0px';
 export const DEFAULT_RADIO_IMG_OPTION_MARGIN = '5px';
 
+export const RADIO_IMG_VERTICAL_ALIGN_STRETCH = 'stretch';
+export const RADIO_IMG_VERTICAL_ALIGN_START = 'start';
+export const RADIO_IMG_VERTICAL_ALIGN_CENTER = 'center';
+export const RADIO_IMG_VERTICAL_ALIGN_END = 'end';
+
+export const DEFAULT_RADIO_IMG_OPTION_VERTICAL_ALIGN = RADIO_IMG_VERTICAL_ALIGN_STRETCH;
+
+export const RADIO_IMG_VERTICAL_ALIGN_OPTIONS = [
+  { key: RADIO_IMG_VERTICAL_ALIGN_STRETCH, value: '高さ揃え' },
+  { key: RADIO_IMG_VERTICAL_ALIGN_START, value: '上揃え' },
+  { key: RADIO_IMG_VERTICAL_ALIGN_CENTER, value: '中央揃え' },
+  { key: RADIO_IMG_VERTICAL_ALIGN_END, value: '下揃え' },
+];
+
+export const RADIO_IMG_VERTICAL_ALIGN_IDS = RADIO_IMG_VERTICAL_ALIGN_OPTIONS.map(
+  ({ key }) => key,
+);
+
 export const RADIO_IMG_DIRECTION_HORIZONTAL = 'horizontal';
 export const RADIO_IMG_DIRECTION_VERTICAL = 'vertical';
 
@@ -68,6 +86,7 @@ export const RADIO_IMG_LAYOUT_SECTION_LABELS = {
   customWidthsHint: '合計が100%になるように設定してください',
   optionPadding: 'オプションの余白',
   optionMargin: 'オプション間の間隔',
+  verticalAlign: '垂直揃え',
   columnPrefix: '列',
   currentWidthPrefix: ' (現在: ',
   currentWidthSuffix: '%)',

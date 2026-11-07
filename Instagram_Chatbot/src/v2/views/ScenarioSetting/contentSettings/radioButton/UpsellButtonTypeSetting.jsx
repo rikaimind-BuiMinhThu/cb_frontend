@@ -65,6 +65,7 @@ const UpsellButtonTypeSetting = (props) => {
       <RadioButtonImgLayoutSection
         radioButton={radioButton}
         changeContent={changeContent}
+        showVerticalAlign
       />
       <RadioButtonItemsList
         {...props}

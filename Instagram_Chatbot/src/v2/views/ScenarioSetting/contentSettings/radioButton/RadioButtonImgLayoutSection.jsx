@@ -13,6 +13,7 @@ import {
   RADIO_IMG_SCROLL_ENABLED,
   RADIO_IMG_SCROLL_NONE,
   RADIO_IMG_SCROLL_OPTIONS,
+  RADIO_IMG_VERTICAL_ALIGN_OPTIONS,
   RADIO_IMG_WIDTH_MODE_CUSTOM,
   RADIO_IMG_WIDTH_MODE_EQUAL,
   RADIO_IMG_WIDTH_MODE_OPTIONS,
@@ -29,14 +30,17 @@ import {
 
 const DEFAULT_OPTION_PADDING = '0px';
 const DEFAULT_OPTION_MARGIN = '5px';
+const OPTION_VERTICAL_ALIGN_FIELD = 'option_vertical_align';
+const RADIO_IMG_LAYOUT_VERTICAL_ALIGN_SELECT_ID = 'radio-img-layout-vertical-align';
 
-const RadioButtonImgLayoutSection = ({ radioButton, changeContent }) => {
+const RadioButtonImgLayoutSection = ({ radioButton, changeContent, showVerticalAlign = false }) => {
   const layout = normalizeRadioButtonImgLayout(radioButton);
   const { direction, columns, widthMode, scroll } = decodeLayoutType(layout.type);
   const isHorizontal = direction === RADIO_IMG_DIRECTION_HORIZONTAL;
   const isScrollEnabled = scroll === RADIO_IMG_SCROLL_ENABLED;
   const columnOptions = isScrollEnabled ? RADIO_IMG_SCROLL_COLUMN_OPTIONS : RADIO_IMG_COLUMN_OPTIONS;
   const showCustomWidths = isHorizontal && !isScrollEnabled && widthMode === RADIO_IMG_WIDTH_MODE_CUSTOM;
+  const showVerticalAlignControl = showVerticalAlign && isHorizontal;
   const customColumnCount = getCustomWidthColumnCount(layout.type);
 
   const updateLayout = (nextDirection, nextColumns, nextWidthMode, nextScroll, resetWidths = false) => {
@@ -83,6 +87,10 @@ const RadioButtonImgLayoutSection = ({ radioButton, changeContent }) => {
   const handleSpacingChange = (field) => (value) => {
     const fallback = field === 'option_padding' ? DEFAULT_OPTION_PADDING : DEFAULT_OPTION_MARGIN;
     changeContent(field)(normalizePxValue(value, fallback));
+  };
+
+  const handleVerticalAlignChange = (value) => {
+    changeContent(OPTION_VERTICAL_ALIGN_FIELD)(value);
   };
 
   const widthSum = showCustomWidths
@@ -164,6 +172,24 @@ const RadioButtonImgLayoutSection = ({ radioButton, changeContent }) => {
         )}
       </div>
 
+      {showVerticalAlignControl && (
+        <div className="ss-radio-button-img-layout-section__vertical-align-row">
+          <div className="ss-radio-button-img-layout-section__control">
+            <span className="ss-radio-button-img-layout-section__label">
+              {RADIO_IMG_LAYOUT_SECTION_LABELS.verticalAlign}
+            </span>
+            <SelectCustom
+              id={RADIO_IMG_LAYOUT_VERTICAL_ALIGN_SELECT_ID}
+              className="ss-radio-button-img-layout-section__select"
+              value={layout.option_vertical_align}
+              data={RADIO_IMG_VERTICAL_ALIGN_OPTIONS}
+              onChange={handleVerticalAlignChange}
+              keyValue="key"
+            />
+          </div>
+        </div>
+      )}
+
       {showCustomWidths && (
         <div className="ss-radio-button-img-layout-section__field">
           <span className="ss-radio-button-img-layout-section__label">
@@ -226,6 +252,7 @@ const RadioButtonImgLayoutSection = ({ radioButton, changeContent }) => {
 RadioButtonImgLayoutSection.propTypes = {
   radioButton: PropTypes.object.isRequired,
   changeContent: PropTypes.func.isRequired,
+  showVerticalAlign: PropTypes.bool,
 };
 
 export default RadioButtonImgLayoutSection;

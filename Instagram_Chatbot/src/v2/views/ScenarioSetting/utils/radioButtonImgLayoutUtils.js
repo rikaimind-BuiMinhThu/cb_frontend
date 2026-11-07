@@ -3,6 +3,7 @@ import {
   DEFAULT_RADIO_IMG_LAYOUT_TYPE,
   DEFAULT_RADIO_IMG_OPTION_MARGIN,
   DEFAULT_RADIO_IMG_OPTION_PADDING,
+  DEFAULT_RADIO_IMG_OPTION_VERTICAL_ALIGN,
   RADIO_IMG_DIRECTION_HORIZONTAL,
   RADIO_IMG_DIRECTION_VERTICAL,
   RADIO_IMG_LAYOUT_HORIZONTAL_CUSTOM_2,
@@ -18,6 +19,7 @@ import {
   RADIO_IMG_LAYOUT_VERTICAL,
   RADIO_IMG_SCROLL_ENABLED,
   RADIO_IMG_SCROLL_NONE,
+  RADIO_IMG_VERTICAL_ALIGN_IDS,
   RADIO_IMG_WIDTH_MODE_CUSTOM,
   RADIO_IMG_WIDTH_MODE_EQUAL,
 } from '../constants/radioButtonImgLayoutConstants';
@@ -156,6 +158,13 @@ export const normalizePxValue = (value, fallback) => {
   return trimmed;
 };
 
+export const normalizeOptionVerticalAlign = (value) => {
+  if (RADIO_IMG_VERTICAL_ALIGN_IDS.includes(value)) {
+    return value;
+  }
+  return DEFAULT_RADIO_IMG_OPTION_VERTICAL_ALIGN;
+};
+
 export const normalizeOptionImgLayout = (contentData = {}) => {
   const layoutType = contentData?.img_layout?.type || DEFAULT_RADIO_IMG_LAYOUT_TYPE;
   const customWidths = resizeCustomWidths(
@@ -169,6 +178,7 @@ export const normalizeOptionImgLayout = (contentData = {}) => {
     custom_widths: customWidths,
     option_padding: normalizePxValue(contentData?.option_padding, DEFAULT_RADIO_IMG_OPTION_PADDING),
     option_margin: normalizePxValue(contentData?.option_margin, DEFAULT_RADIO_IMG_OPTION_MARGIN),
+    option_vertical_align: normalizeOptionVerticalAlign(contentData?.option_vertical_align),
   };
 };
 
@@ -208,12 +218,16 @@ const buildImgGridColumns = (layout) => {
 
 export const getRadioImgGridStyle = (radioButton) => {
   const layout = normalizeRadioButtonImgLayout(radioButton);
-  return {
+  const style = {
     '--radio-option-margin': layout.option_margin,
     '--radio-option-padding': layout.option_padding,
     '--scroll-visible-columns': getLayoutColumnCount(layout.type),
     '--preview-grid-columns': buildImgGridColumns(layout),
   };
+  if (layout.type !== RADIO_IMG_LAYOUT_VERTICAL) {
+    style['--radio-option-align'] = layout.option_vertical_align;
+  }
+  return style;
 };
 
 export const getCheckboxImgGridStyle = (checkbox) => {

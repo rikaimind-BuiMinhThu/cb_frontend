@@ -6,6 +6,7 @@
   gap: var(--radio-option-margin, 5px);
   width: 100%;
   grid-template-columns: var(--preview-grid-columns);
+  align-items: var(--radio-option-align, stretch);
 }
 
 .ss-message__content--user-radio_button-img-grid--scroll {
@@ -22,6 +23,7 @@
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
+  align-items: var(--radio-option-align, stretch);
 }
 
 .ss-message__content--user-radio_button-img-grid--scroll .ss-message__content--user-radio_button--radio_button_img {
