@@ -265,8 +265,8 @@ const CommonCreditCardPayment = ({ content, messageIndex, contentIndex, onChange
   const renderExpirationDateYm = () => {
     return (
       <div className="credit-card-expire-row">
-        <SelectCustom style={{ width: '33%' }} value={creditCardPayment.year} disabled={disabled} placeholder={creditCardPayment.year_placeholder} data={cardExpiredYearOptions} onChange={(value) => onChangeValue(contentIndex, content.type, value, "year")} />
-        <SelectCustom style={{ width: '33%', marginLeft: '10px' }} value={creditCardPayment.month} placeholder={creditCardPayment.month_placeholder} data={cardExpiredMonthOptions} disabled={disabled} onChange={(value) => onChangeValue(contentIndex, content.type, value, "month")} />
+        <SelectCustom dropdownMatchSelectWidth value={creditCardPayment.year} disabled={disabled} placeholder={creditCardPayment.year_placeholder} data={cardExpiredYearOptions} onChange={(value) => onChangeValue(contentIndex, content.type, value, "year")} />
+        <SelectCustom dropdownMatchSelectWidth value={creditCardPayment.month} placeholder={creditCardPayment.month_placeholder} data={cardExpiredMonthOptions} disabled={disabled} onChange={(value) => onChangeValue(contentIndex, content.type, value, "month")} />
       </div>
     );
   };
@@ -274,8 +274,8 @@ const CommonCreditCardPayment = ({ content, messageIndex, contentIndex, onChange
   const renderExpirationDateMy = () => {
     return (
       <div className="credit-card-expire-row">
-        <SelectCustom style={{ width: '33%' }} value={creditCardPayment.month} placeholder={creditCardPayment.month_placeholder} data={cardExpiredMonthOptions} disabled={disabled} onChange={(value) => onChangeValue(contentIndex, content.type, value, "month")} />
-        <SelectCustom style={{ width: '33%', marginLeft: '10px' }} value={creditCardPayment.year} disabled={disabled} placeholder={creditCardPayment.year_placeholder} data={cardExpiredYearOptions} onChange={(value) => onChangeValue(contentIndex, content.type, value, "year")} />
+        <SelectCustom dropdownMatchSelectWidth value={creditCardPayment.month} placeholder={creditCardPayment.month_placeholder} data={cardExpiredMonthOptions} disabled={disabled} onChange={(value) => onChangeValue(contentIndex, content.type, value, "month")} />
+        <SelectCustom dropdownMatchSelectWidth value={creditCardPayment.year} disabled={disabled} placeholder={creditCardPayment.year_placeholder} data={cardExpiredYearOptions} onChange={(value) => onChangeValue(contentIndex, content.type, value, "year")} />
       </div>
     );
   };
