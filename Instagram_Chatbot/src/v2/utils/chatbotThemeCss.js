@@ -199,6 +199,7 @@ const buildThemeVariables = (theme) => {
   --c-header-subtitle-font-size: ${theme.headerSubtitleFontSize};
   --c-header-subtitle-weight: ${themeIsBold(theme.headerSubtitleBold) ? 700 : 400};
   --c-header-title-justify: ${headerTitleJustify};
+  --c-header-close-icon: ${theme.headerCloseIconColor || '#ffffff'};
   --c-header-bg: ${theme.headerBgColor || 'transparent'};
   --c-header-logo-image: ${theme.headerLogoImage ? `url("${theme.headerLogoImage}")` : 'none'};
   ${theme.headerHeight ? `--c-header-height: ${theme.headerHeight};` : ''}
@@ -818,6 +819,11 @@ ${scopedClass(scopeSelector, '.sp-header-left-label-sub-title')} {
   ${themeIsOff(theme.headerSubtitleVisible) ? 'display: none !important;' : ''}
 }
 
+${scopedClass(scopeSelector, '.preview-open-frame__header .sp-header-right-arrow')},
+${scopedClass(scopeSelector, '.theme-customize-preview__header .sp-header-right-arrow')} {
+  color: var(--c-header-close-icon, #fff) !important;
+}
+
 ${scopedClass(scopeSelector, '.sp-header--title-only .sp-avatar-bt')},
 ${scopedClass(scopeSelector, '.preview-open-frame__header.sp-header--title-only .sp-avatar-bt')},
 ${scopedClass(scopeSelector, '.theme-customize-preview__header.sp-header--title-only .sp-avatar-bt')} {
@@ -844,11 +850,6 @@ ${scopedClass(scopeSelector, '.sp-header--logo .sp-header-left-label')},
 ${scopedClass(scopeSelector, '.theme-customize-preview__header.sp-header--logo .sp-avatar-bt')},
 ${scopedClass(scopeSelector, '.theme-customize-preview__header.sp-header--logo .sp-header-left-label')} {
   display: none !important;
-}
-
-${scopedClass(scopeSelector, '.sp-header--logo .sp-header-right-arrow')},
-${scopedClass(scopeSelector, '.theme-customize-preview__header.sp-header--logo .sp-header-right-arrow')} {
-  color: #9e9e9e !important;
 }
 
 ${scopedClass(scopeSelector, '.sp-process-bar')} {

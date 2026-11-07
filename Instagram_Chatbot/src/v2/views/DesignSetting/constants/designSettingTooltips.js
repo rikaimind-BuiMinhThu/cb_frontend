@@ -28,6 +28,7 @@ export const DESIGN_SETTING_TOOLTIPS = {
   headerChrome: 'ヘッダーの表示方法です。タイトルのみはアバターを隠し、アイコンとタイトルはアバターとタイトルを表示します。',
   headerTitleAlignment: 'ヘッダー内のタイトル（とアイコン）の横方向の配置です。閉じるアイコンは右端のままです。',
   headerCloseIcon: 'チャットを閉じるときにヘッダー右端に表示するアイコンです。矢印または×から選べます。',
+  headerCloseIconColor: 'ヘッダー右端の閉じるアイコン（矢印または×）の色です。ヘッダー背景色とのコントラストに注意してください。',
   headerBgColor: 'ヘッダーの背景色です。空欄の場合はメインカラーが使われます。',
   headerHeight: 'ヘッダーの高さです。単位は px です。空欄のときは最小 74px のままです。',
   botMessageBold: 'ボットの吹き出し文字を太字にします。',

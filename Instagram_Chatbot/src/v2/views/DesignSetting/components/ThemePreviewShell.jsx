@@ -100,14 +100,14 @@ const ThemePreviewShell = ({
       <style>{scopedCss}</style>
 
       <PreviewRegion
-        sectionId="headerMain"
+        sectionId="header"
         activeSectionId={activeSectionId}
         onSectionSelect={onSectionSelect}
         className="theme-preview-region--header-wrap"
       >
         <div className={headerClassName}>
           <PreviewRegion
-            sectionId="headerMain"
+            sectionId="header"
             activeSectionId={activeSectionId}
             onSectionSelect={onSectionSelect}
             className="theme-preview-region--header-text"
@@ -192,7 +192,7 @@ const ThemePreviewShell = ({
       </PreviewRegion>
 
       <PreviewRegion
-        sectionId="window"
+        sectionId="mainWindow"
         activeSectionId={activeSectionId}
         onSectionSelect={onSectionSelect}
         className="theme-preview-region--body"

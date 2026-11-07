@@ -109,6 +109,7 @@ export const THEME_FIELD_KEYS = [
   'headerChrome',
   'headerTitleAlignment',
   'headerCloseIcon',
+  'headerCloseIconColor',
   'headerBgColor',
   'headerHeight',
   'progressBarBgColor',
@@ -199,9 +200,9 @@ export const THEME_FIELD_KEYS = [
 ];
 
 export const THEME_PREVIEW_REGIONS = [
-  { sectionId: 'headerMain', label: 'メインカラー・ヘッダー', targets: ['header', 'progressFill', 'headerText'] },
+  { sectionId: 'mainWindow', label: 'メインカラー・チャットウィンドウ', targets: ['chatBody'] },
+  { sectionId: 'header', label: 'ヘッダー', targets: ['header', 'headerText'] },
   { sectionId: 'progress', label: 'プログレスバー', targets: ['progressBar'] },
-  { sectionId: 'window', label: 'チャットウィンドウ', targets: ['chatBody'] },
   { sectionId: 'messages', label: 'メッセージ', targets: ['botBubble', 'userBubble'] },
   { sectionId: 'fields', label: '入力・プルダウン', targets: ['inputs'] },
   {
@@ -219,10 +220,17 @@ export const THEME_PREVIEW_REGIONS = [
 
 export const THEME_SECTIONS = [
   {
-    id: 'headerMain',
-    title: 'メインカラー・ヘッダー',
+    id: 'mainWindow',
+    title: 'メインカラー・チャットウィンドウ',
     fields: [
       { fieldType: 'mainColor', label: 'メインカラー', fullWidth: true },
+      { key: 'chatWindowBgColor', label: 'チャットウィンドウ背景色' },
+    ],
+  },
+  {
+    id: 'header',
+    title: 'ヘッダー',
+    fields: [
       { fieldType: 'groupLabel', label: 'タイトル' },
       { key: 'headerTitleTextColor', label: '文字色' },
       { key: 'headerTitleFontSize', label: 'フォントサイズ', fieldType: 'fontSize' },
@@ -266,6 +274,7 @@ export const THEME_SECTIONS = [
         label: '閉じるアイコン',
         fieldType: 'headerCloseIconSelect',
       },
+      { key: 'headerCloseIconColor', label: '閉じるアイコンの色' },
       { key: 'headerBgColor', label: '背景色' },
       {
         key: 'headerHeight',
@@ -316,13 +325,6 @@ export const THEME_SECTIONS = [
         min: 0,
         max: 40,
       },
-    ],
-  },
-  {
-    id: 'window',
-    title: 'チャットウィンドウ',
-    fields: [
-      { key: 'chatWindowBgColor', label: '背景色' },
     ],
   },
   {

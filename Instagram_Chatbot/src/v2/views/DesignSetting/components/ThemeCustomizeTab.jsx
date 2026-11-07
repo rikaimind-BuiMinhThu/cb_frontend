@@ -28,7 +28,7 @@ const ThemeCustomizeTab = ({
   onResetSection,
   onSave,
 }) => {
-  const [activeSectionId, setActiveSectionId] = useState('headerMain');
+  const [activeSectionId, setActiveSectionId] = useState('mainWindow');
   const [expandedSections, setExpandedSections] = useState(DEFAULT_EXPANDED_SECTIONS);
   const [showModalInPreview, setShowModalInPreview] = useState(true);
   const [pendingMainColor, setPendingMainColor] = useState(null);
