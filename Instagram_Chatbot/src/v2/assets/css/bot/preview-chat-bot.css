@@ -292,18 +292,32 @@ html {
     position: relative;
     height: 18px;
     margin-bottom: 4px;
-    text-align: center;
 }
 
 .sp-process-bar--fraction .sp-process-bar__step {
-    display: block;
-    width: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: var(--c-progress-text, #F48879);
+    font-size: var(--c-progress-font-size, 12px);
+    font-weight: var(--c-progress-weight, 700);
+    line-height: 18px;
+    letter-spacing: 0.5px;
+    text-align: left;
+}
+
+.sp-process-bar--fraction .sp-process-bar__above {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
     color: var(--c-progress-text, #F48879);
     font-size: var(--c-progress-font-size, 12px);
     font-weight: var(--c-progress-weight, 700);
     line-height: 18px;
     letter-spacing: 0.5px;
     text-align: center;
+    white-space: nowrap;
 }
 
 .sp-process-bar--fraction .sp-process-bar__track {

@@ -225,6 +225,10 @@ export const PLACEHOLDER_BUBBLE_TITLE = '簡単90秒で注文完了';
 
 export const PRESET_COLOR_HEX_PATTERN = /^#[0-9A-Fa-f]{6}$/;
 export const PRESET_COLOR_HEX_MAX_LENGTH = 7;
+export const PRESET_COLOR_TRANSPARENT = 'transparent';
+export const PRESET_COLOR_NO_FILL_LABEL = '塗りなし';
+export const PRESET_COLOR_INPUT_MAX_LENGTH = 32;
+export const PRESET_COLOR_ALPHA_OPAQUE = 1;
 
 export const THEME_PREVIEW_SAMPLE_TITLE = 'サンプルタイトル';
 export const THEME_PREVIEW_SAMPLE_SUBTITLE = 'サンプルサブタイトル';

@@ -4,7 +4,6 @@ import PresetColorPicker from './PresetColorPicker';
 import DesignSettingLabel from './shared/DesignSettingLabel';
 import { getDesignSettingTooltip } from '../constants/designSettingTooltips';
 import { THEME_COLOR_TEXT_PLACEHOLDER } from '../constants/designThemeConstants';
-import { DEFAULT_MAIN_COLOR } from '../constants/designChatbotConstants';
 
 const ThemeColorField = ({
   label,
@@ -43,8 +42,10 @@ const ThemeColorField = ({
       </DesignSettingLabel>
       <div className="theme-field__control">
         <PresetColorPicker
-          value={value || DEFAULT_MAIN_COLOR}
+          value={value || ''}
           onChange={onChange}
+          allowEmpty
+          allowAlpha
         />
       </div>
     </div>

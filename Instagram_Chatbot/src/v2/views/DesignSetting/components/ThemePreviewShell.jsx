@@ -66,6 +66,7 @@ const ThemePreviewShell = ({
     themeSettings?.progressLabelMode,
   );
   const isStyle2Progress = progressBarStyle === PROGRESS_BAR_STYLE_2;
+  const progressAboveText = (themeSettings?.progressBarAboveText || '').trim();
   const headerCloseIcon = themeSettings?.headerCloseIcon === HEADER_CLOSE_ICON_TIMES
     ? ICON_TIMES
     : ICON_CHEVRON_CIRCLE_DOWN;
@@ -143,6 +144,9 @@ const ThemePreviewShell = ({
           {isStyle2Progress ? (
             <div className="sp-process-bar__meta">
               <span className="sp-process-bar__step">{processLabel}</span>
+              {progressAboveText ? (
+                <span className="sp-process-bar__above">{progressAboveText}</span>
+              ) : null}
             </div>
           ) : null}
           <div className="sp-process-bar__track">

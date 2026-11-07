@@ -71,7 +71,6 @@ const ProcessBar = ({
   };
 
   const formatText = getFormatText();
-  const captionText = isStyle2 && aboveText ? aboveText : formatText;
   const barClassName = [
     "sp-process-bar",
     isStyle2 ? PROCESS_BAR_FRACTION_CLASS : "",
@@ -84,7 +83,10 @@ const ProcessBar = ({
     >
       {isStyle2 ? (
         <div className="sp-process-bar__meta">
-          <span className="sp-process-bar__step">{captionText}</span>
+          <span className="sp-process-bar__step">{formatText}</span>
+          {aboveText ? (
+            <span className="sp-process-bar__above">{aboveText}</span>
+          ) : null}
         </div>
       ) : null}
       <div className="sp-process-bar__track">

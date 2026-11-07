@@ -876,18 +876,31 @@ ${scopedClass(scopeSelector, '.sp-process-bar--fraction')} {
 }
 
 ${scopedClass(scopeSelector, '.sp-process-bar--fraction .sp-process-bar__meta')} {
-  text-align: center !important;
+  position: relative !important;
 }
 
 ${scopedClass(scopeSelector, '.sp-process-bar--fraction .sp-process-bar__step')} {
-  display: block !important;
-  width: 100% !important;
-  position: static !important;
-  left: auto !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  display: inline !important;
+  width: auto !important;
+  color: var(--c-progress-text, #F48879) !important;
+  font-size: var(--c-progress-font-size, 12px) !important;
+  font-weight: var(--c-progress-weight, 700) !important;
+  text-align: left !important;
+}
+
+${scopedClass(scopeSelector, '.sp-process-bar--fraction .sp-process-bar__above')} {
+  position: absolute !important;
+  left: 50% !important;
+  top: 0 !important;
+  transform: translateX(-50%) !important;
   color: var(--c-progress-text, #F48879) !important;
   font-size: var(--c-progress-font-size, 12px) !important;
   font-weight: var(--c-progress-weight, 700) !important;
   text-align: center !important;
+  white-space: nowrap !important;
 }
 
 ${scopedClass(scopeSelector, '.sp-process-bar--fraction .sp-process-bar__track')} {

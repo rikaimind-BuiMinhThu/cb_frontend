@@ -1,10 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import 'v2/assets/css/bot/preview-chat-bot.css';
-import {
-  normalizeMessageBorderStyle,
-  resolveProgressBarStyle,
-} from 'v2/views/DesignSetting/utils/designThemeUtils';
+import { normalizeMessageBorderStyle } from 'v2/views/DesignSetting/utils/designThemeUtils';
 import UserMessageTailIcon from 'v2/components/BotMessages/UserMessageTailIcon';
 import ThemePreviewShell from './ThemePreviewShell';
 import ThemeModalPreviewOverlay from './ThemeModalPreviewOverlay';
@@ -37,7 +34,6 @@ import {
 } from '../constants/designChatbotConstants';
 import {
   FIELD_PLACEHOLDER_STYLE_FLOAT,
-  PROGRESS_BAR_STYLE_2,
   PROGRESS_LABEL_MODE_FRACTION,
   PROGRESS_LABEL_MODE_REMAINING,
   THEME_PREVIEW_PROCESS_FRACTION_LABEL,
@@ -50,14 +46,6 @@ const FIELD_FLOAT_LABEL_CLASS = 'field-float__label';
 const FIELD_FLOAT_FOCUS_CLASS = 'field-float field-float--filled';
 
 const resolvePreviewProcessLabel = (themeSettings) => {
-  const aboveText = (themeSettings?.progressBarAboveText || '').trim();
-  const style = resolveProgressBarStyle(
-    themeSettings?.progressBarStyle,
-    themeSettings?.progressLabelMode,
-  );
-  if (style === PROGRESS_BAR_STYLE_2 && aboveText) {
-    return aboveText;
-  }
   if (themeSettings?.progressLabelMode === PROGRESS_LABEL_MODE_FRACTION) {
     return THEME_PREVIEW_PROCESS_FRACTION_LABEL;
   }
