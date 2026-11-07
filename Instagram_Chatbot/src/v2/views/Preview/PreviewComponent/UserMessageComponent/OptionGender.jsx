@@ -13,6 +13,7 @@ const OptionGender = ({
   radioButton,
   onChangeValue,
   options,
+  onAdvanceAfterSelect,
 }) => {
   return (
     <div
@@ -27,6 +28,7 @@ const OptionGender = ({
               contentIndex={contentIndex}
               item={item}
               onChangeValue={onChangeValue}
+              onAdvanceAfterSelect={onAdvanceAfterSelect}
               isSelected={radioButton.initial_selection === item.value}
               key={item.id}
             />
@@ -37,7 +39,13 @@ const OptionGender = ({
   );
 };
 
-const OptionGenderItem = ({ contentIndex, item, onChangeValue, isSelected }) => {
+const OptionGenderItem = ({
+  contentIndex,
+  item,
+  onChangeValue,
+  onAdvanceAfterSelect,
+  isSelected,
+}) => {
   const [isHovered, setIsHovered] = useState(false);
 
   const handleMouseEnter = () => {
@@ -100,6 +108,7 @@ const OptionGenderItem = ({ contentIndex, item, onChangeValue, isSelected }) => 
           item.value,
           "initial_selection"
         );
+        if (onAdvanceAfterSelect) onAdvanceAfterSelect();
       }}
     >
       {item.preset_config?.preset?.icon?.url ? (
@@ -116,12 +125,14 @@ const OptionGenderItem = ({ contentIndex, item, onChangeValue, isSelected }) => 
 
 OptionGender.propTypes = {
   ...baseUserMessageComponentPropTypes,
+  onAdvanceAfterSelect: PropTypes.func,
 };
 
 OptionGenderItem.propTypes = {
   contentIndex: PropTypes.number,
   item: PropTypes.object,
   onChangeValue: PropTypes.func,
+  onAdvanceAfterSelect: PropTypes.func,
   isSelected: PropTypes.bool,
 };
 

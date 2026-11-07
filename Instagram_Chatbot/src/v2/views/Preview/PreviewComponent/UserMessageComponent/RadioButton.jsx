@@ -119,6 +119,11 @@ const RadioButton = ({
     );
   };
 
+  const advanceAfterOptionSelect = () => {
+    if (!notUseButtonNext) return;
+    setTimeout(() => onClickNext(), 200);
+  };
+
   const onClickRadioButton = (item) => {
     const selectionKey = getRadioOptionSelectionKey(item);
     if (selectionKey === radioButton.initial_selection && notUseButtonNext) {
@@ -142,6 +147,7 @@ const RadioButton = ({
       radioButton={radioButton}
       onChangeValue={onChangeValue}
       options={getGenderOptions(radioButton)}
+      onAdvanceAfterSelect={advanceAfterOptionSelect}
     />
   );
 
@@ -175,7 +181,7 @@ const RadioButton = ({
                 selectionKey,
                 "initial_selection"
               );
-              if (notUseButtonNext) setTimeout(() => onClickNext(), 200);
+              advanceAfterOptionSelect();
             }}
           />
           {item.text && <label htmlFor={inputId}>{item.text}</label>}
@@ -194,7 +200,7 @@ const RadioButton = ({
       "initial_selection"
     );
     onClickRadioButton(item);
-    if (notUseButtonNext) setTimeout(() => onClickNext(), 200);
+    advanceAfterOptionSelect();
   };
 
   const renderRadioButtonImgContent = () => {
@@ -305,6 +311,7 @@ const RadioButton = ({
               selectionKey,
               "initial_selection"
             );
+            advanceAfterOptionSelect();
           }}
         >
           <span>{item.text}</span>

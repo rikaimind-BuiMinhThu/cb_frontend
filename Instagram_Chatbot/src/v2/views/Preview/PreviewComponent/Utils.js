@@ -671,17 +671,25 @@ const isButtonSubmitMessage = (message) => {
   );
 };
 
+const isRadioChoiceMessage = (message) => {
+  const contents = message?.message_content || [];
+  return contents.some(
+    (content) => content?.type === MESSAGE_CONTENT_TYPES.RADIO_BUTTON
+  );
+};
+
 const getNextUserMsg =
   (ext = null) =>
   (item, index) => {
-    // Submit-only steps set not_use_button (no 「次へ」). Still treat them as the
-    // next stop so clicking Next on the prior step (e.g. upsell) can advance.
+    // Submit-only and single-choice radio steps set not_use_button (no 「次へ」).
+    // Still treat them as the next stop so the chat waits for that interaction.
     const isDisplayBtnNext = !item.not_use_button;
     const isSubmitStop = isButtonSubmitMessage(item);
+    const isRadioStop = isRadioChoiceMessage(item);
     const conds =
       !item.hidden &&
       isInteractiveMessage(item) &&
-      (isDisplayBtnNext || isSubmitStop);
+      (isDisplayBtnNext || isSubmitStop || isRadioStop);
 
     if (ext && typeof ext === "function") {
       return conds && ext(item, index);
