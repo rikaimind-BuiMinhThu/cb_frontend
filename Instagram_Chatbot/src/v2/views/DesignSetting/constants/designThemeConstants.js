@@ -68,6 +68,13 @@ export const PROGRESS_LABEL_MODE_OPTIONS = [
 
 export const PROGRESS_LABEL_MODE_IDS = PROGRESS_LABEL_MODE_OPTIONS.map(({ id }) => id);
 
+export const PROGRESS_BAR_STYLE_OPTIONS = [
+  { id: 'style1', label: 'スタイル1' },
+  { id: 'style2', label: 'スタイル2' },
+];
+
+export const PROGRESS_BAR_STYLE_IDS = PROGRESS_BAR_STYLE_OPTIONS.map(({ id }) => id);
+
 export const FIELD_PLACEHOLDER_STYLE_OPTIONS = [
   { id: 'native', label: 'ネイティブ' },
   { id: 'float', label: 'フローティング' },
@@ -111,7 +118,9 @@ export const THEME_FIELD_KEYS = [
   'progressBarHeight',
   'progressBarRadius',
   'progressBarFillColor',
+  'progressBarStyle',
   'progressLabelMode',
+  'progressBarAboveText',
   'chatWindowBgColor',
   'botMessageBgColor',
   'botMessageTextColor',
@@ -277,10 +286,23 @@ export const THEME_SECTIONS = [
     title: 'プログレスバー',
     fields: [
       {
+        key: 'progressBarStyle',
+        label: 'スタイル',
+        fieldType: 'progressBarStyleSelect',
+        fullWidth: true,
+      },
+      {
         key: 'progressLabelMode',
         label: 'フォーマット',
         fieldType: 'progressLabelModeSelect',
         fullWidth: true,
+      },
+      {
+        key: 'progressBarAboveText',
+        label: '表示テキスト',
+        fieldType: 'text',
+        fullWidth: true,
+        visibleWhen: { key: 'progressBarStyle', value: 'style2' },
       },
       { key: 'progressBarBgColor', label: '背景色' },
       { key: 'progressBarFillColor', label: '塗り色' },
@@ -551,5 +573,7 @@ export const HEADER_CLOSE_ICON_TIMES = 'times';
 export const FIELD_PLACEHOLDER_STYLE_FLOAT = 'float';
 export const PROGRESS_LABEL_MODE_FRACTION = 'fraction';
 export const PROGRESS_LABEL_MODE_REMAINING = 'remaining';
+export const PROGRESS_BAR_STYLE_1 = 'style1';
+export const PROGRESS_BAR_STYLE_2 = 'style2';
 
 export { CAMEL_TO_SNAKE_THEME } from 'v2/utils/designThemeCore';

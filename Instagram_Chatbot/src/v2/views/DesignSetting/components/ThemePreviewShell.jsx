@@ -15,8 +15,9 @@ import {
 import {
   HEADER_CHROME_TITLE_ONLY,
   HEADER_CLOSE_ICON_TIMES,
-  PROGRESS_LABEL_MODE_FRACTION,
+  PROGRESS_BAR_STYLE_2,
 } from '../constants/designThemeConstants';
+import { resolveProgressBarStyle } from 'v2/views/DesignSetting/utils/designThemeUtils';
 import { PreviewThemeContext } from 'v2/views/Preview/PreviewComponent/PreviewThemeContext';
 import PreviewRegion from './PreviewRegion';
 
@@ -60,7 +61,11 @@ const ThemePreviewShell = ({
   const displaySubtitle = subtitle || (showPlaceholderLabels ? THEME_PREVIEW_SAMPLE_SUBTITLE : '');
   const barWidth = `${Math.min(Math.max(processPercent, 0), 100)}%`;
   const isTitleOnlyChrome = themeSettings?.headerChrome === HEADER_CHROME_TITLE_ONLY;
-  const isFractionProgress = themeSettings?.progressLabelMode === PROGRESS_LABEL_MODE_FRACTION;
+  const progressBarStyle = resolveProgressBarStyle(
+    themeSettings?.progressBarStyle,
+    themeSettings?.progressLabelMode,
+  );
+  const isStyle2Progress = progressBarStyle === PROGRESS_BAR_STYLE_2;
   const headerCloseIcon = themeSettings?.headerCloseIcon === HEADER_CLOSE_ICON_TIMES
     ? ICON_TIMES
     : ICON_CHEVRON_CIRCLE_DOWN;
@@ -72,7 +77,7 @@ const ThemePreviewShell = ({
     .join(' ');
   const processBarClassName = [
     'sp-process-bar',
-    isFractionProgress ? PROCESS_BAR_FRACTION_CLASS : '',
+    isStyle2Progress ? PROCESS_BAR_FRACTION_CLASS : '',
   ].filter(Boolean).join(' ');
   const themeVars = {
     [THEME_CSS_VAR_MAIN_COLOR]: mainColor,
@@ -135,14 +140,14 @@ const ThemePreviewShell = ({
         className="theme-preview-region--progress"
       >
         <div className={processBarClassName}>
-          {isFractionProgress ? (
+          {isStyle2Progress ? (
             <div className="sp-process-bar__meta">
               <span className="sp-process-bar__step">{processLabel}</span>
             </div>
           ) : null}
           <div className="sp-process-bar__track">
             <div className="sp-process-bar-color">
-              {isFractionProgress ? null : processLabel}
+              {isStyle2Progress ? null : processLabel}
             </div>
           </div>
         </div>

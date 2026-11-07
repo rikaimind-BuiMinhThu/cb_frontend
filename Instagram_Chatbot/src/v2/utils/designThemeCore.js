@@ -22,6 +22,7 @@ const HEADER_CHROME_IDS = ['title_only', 'icon_and_title'];
 const HEADER_TITLE_ALIGNMENT_IDS = ['left', 'center', 'right'];
 const HEADER_CLOSE_ICON_IDS = ['chevron', 'times'];
 const PROGRESS_LABEL_MODE_IDS = ['remaining', 'fraction'];
+const PROGRESS_BAR_STYLE_IDS = ['style1', 'style2'];
 const FIELD_PLACEHOLDER_STYLE_IDS = ['native', 'float'];
 
 export const THEME_FIELD_KEYS = [
@@ -44,7 +45,9 @@ export const THEME_FIELD_KEYS = [
   'progressBarHeight',
   'progressBarRadius',
   'progressBarFillColor',
+  'progressBarStyle',
   'progressLabelMode',
+  'progressBarAboveText',
   'chatWindowBgColor',
   'botMessageBgColor',
   'botMessageTextColor',
@@ -142,7 +145,9 @@ export const CAMEL_TO_SNAKE_THEME = {
   progressBarHeight: 'progress_bar_height',
   progressBarRadius: 'progress_bar_radius',
   progressBarFillColor: 'progress_bar_fill_color',
+  progressBarStyle: 'progress_bar_style',
   progressLabelMode: 'progress_label_mode',
+  progressBarAboveText: 'progress_bar_above_text',
   chatWindowBgColor: 'chat_window_bg_color',
   botMessageBgColor: 'bot_message_bg_color',
   botMessageTextColor: 'bot_message_text_color',
@@ -263,6 +268,7 @@ const VALID_HEADER_CHROME_IDS = new Set(HEADER_CHROME_IDS);
 const VALID_HEADER_TITLE_ALIGNMENT_IDS = new Set(HEADER_TITLE_ALIGNMENT_IDS);
 const VALID_HEADER_CLOSE_ICON_IDS = new Set(HEADER_CLOSE_ICON_IDS);
 const VALID_PROGRESS_LABEL_MODE_IDS = new Set(PROGRESS_LABEL_MODE_IDS);
+const VALID_PROGRESS_BAR_STYLE_IDS = new Set(PROGRESS_BAR_STYLE_IDS);
 const VALID_FIELD_PLACEHOLDER_STYLE_IDS = new Set(FIELD_PLACEHOLDER_STYLE_IDS);
 
 const BUTTON_BOUNCE_ANIMATION = 'themeButtonBounce 1.2s ease-in-out infinite';
@@ -380,6 +386,18 @@ export const normalizeProgressLabelMode = (value) => {
   if (!value) return 'remaining';
   if (VALID_PROGRESS_LABEL_MODE_IDS.has(value)) return value;
   return 'remaining';
+};
+
+export const normalizeProgressBarStyle = (value) => {
+  if (!value) return 'style1';
+  if (VALID_PROGRESS_BAR_STYLE_IDS.has(value)) return value;
+  return 'style1';
+};
+
+export const resolveProgressBarStyle = (styleValue, labelMode) => {
+  if (VALID_PROGRESS_BAR_STYLE_IDS.has(styleValue)) return styleValue;
+  if (normalizeProgressLabelMode(labelMode) === 'fraction') return 'style2';
+  return 'style1';
 };
 
 export const normalizeFieldPlaceholderStyle = (value) => {
@@ -603,7 +621,9 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
     progressBarHeight: '20px',
     progressBarRadius: '0px',
     progressBarFillColor: '',
+    progressBarStyle: 'style1',
     progressLabelMode: 'remaining',
+    progressBarAboveText: '',
     chatWindowBgColor,
     botMessageBgColor: messageColor,
     botMessageTextColor: fontColor,
@@ -724,6 +744,11 @@ export const mergeThemeWithDefaults = (rawTheme, mainColorHex, apiColorKey) => {
   merged.headerSubtitleVisible = merged.headerSubtitleVisible !== false
     && merged.headerSubtitleVisible !== 'false';
   merged.progressLabelMode = normalizeProgressLabelMode(merged.progressLabelMode);
+  const rawProgressBarStyle = rawTheme.progressBarStyle ?? rawTheme.progress_bar_style;
+  merged.progressBarStyle = resolveProgressBarStyle(rawProgressBarStyle, merged.progressLabelMode);
+  if (merged.progressBarAboveText == null) {
+    merged.progressBarAboveText = '';
+  }
   merged.fieldPlaceholderStyle = normalizeFieldPlaceholderStyle(merged.fieldPlaceholderStyle);
 
   const legacyHeaderColor = rawTheme.headerTextColor ?? rawTheme.header_text_color;

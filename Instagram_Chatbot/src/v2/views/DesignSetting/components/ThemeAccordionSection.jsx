@@ -12,6 +12,7 @@ import {
   HEADER_TITLE_ALIGNMENT_OPTIONS,
   MESSAGE_BORDER_STYLE_OPTIONS,
   MODAL_TITLE_ALIGNMENT_OPTIONS,
+  PROGRESS_BAR_STYLE_OPTIONS,
   PROGRESS_LABEL_MODE_OPTIONS,
   THEME_MAIN_COLOR_HELPER,
   THEME_RESET_SECTION_LABEL,
@@ -29,6 +30,7 @@ import {
   normalizeHeaderTitleAlignment,
   normalizeMessageBorderStyle,
   normalizeModalTitleAlignment,
+  normalizeProgressBarStyle,
   normalizeProgressLabelMode,
 } from 'v2/views/DesignSetting/utils/designThemeUtils';
 import MainColorPicker from './MainColorPicker';
@@ -37,6 +39,7 @@ import ThemeDimensionField from './ThemeDimensionField';
 import ThemeEffectSelectField from './ThemeEffectSelectField';
 import ThemeImageUploadField from './ThemeImageUploadField';
 import ThemeNumberField from './ThemeNumberField';
+import ThemeTextField from './ThemeTextField';
 import DesignSettingLabel from './shared/DesignSettingLabel';
 
 const { Panel } = Collapse;
@@ -271,6 +274,22 @@ const ThemeAccordionSection = ({
       );
     }
 
+    if (fieldType === 'progressBarStyleSelect') {
+      return (
+        <div key={key} className={wrapperClassName}>
+          <ThemeEffectSelectField
+            label={label}
+            value={themeSettings[key]}
+            fullWidth={isFullWidth}
+            tooltipKey={key}
+            options={PROGRESS_BAR_STYLE_OPTIONS}
+            normalizeValue={normalizeProgressBarStyle}
+            onChange={(value) => onFieldChange(key, value)}
+          />
+        </div>
+      );
+    }
+
     if (fieldType === 'progressLabelModeSelect') {
       return (
         <div key={key} className={wrapperClassName}>
@@ -281,6 +300,20 @@ const ThemeAccordionSection = ({
             tooltipKey={key}
             options={PROGRESS_LABEL_MODE_OPTIONS}
             normalizeValue={normalizeProgressLabelMode}
+            onChange={(value) => onFieldChange(key, value)}
+          />
+        </div>
+      );
+    }
+
+    if (fieldType === 'text') {
+      return (
+        <div key={key} className={wrapperClassName}>
+          <ThemeTextField
+            label={label}
+            value={themeSettings[key]}
+            fullWidth={isFullWidth}
+            tooltipKey={key}
             onChange={(value) => onFieldChange(key, value)}
           />
         </div>

@@ -875,10 +875,19 @@ ${scopedClass(scopeSelector, '.sp-process-bar--fraction')} {
   box-sizing: border-box !important;
 }
 
+${scopedClass(scopeSelector, '.sp-process-bar--fraction .sp-process-bar__meta')} {
+  text-align: center !important;
+}
+
 ${scopedClass(scopeSelector, '.sp-process-bar--fraction .sp-process-bar__step')} {
+  display: block !important;
+  width: 100% !important;
+  position: static !important;
+  left: auto !important;
   color: var(--c-progress-text, #F48879) !important;
   font-size: var(--c-progress-font-size, 12px) !important;
   font-weight: var(--c-progress-weight, 700) !important;
+  text-align: center !important;
 }
 
 ${scopedClass(scopeSelector, '.sp-process-bar--fraction .sp-process-bar__track')} {

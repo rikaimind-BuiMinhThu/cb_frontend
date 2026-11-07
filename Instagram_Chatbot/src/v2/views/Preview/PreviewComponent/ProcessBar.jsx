@@ -3,7 +3,11 @@ import PropTypes from "prop-types";
 import "v2/assets/css/bot/preview-chat-bot.css";
 import "moment/locale/zh-cn";
 import { resolveMainColorCss } from "v2/views/DesignSetting/utils/designChatbotUtils";
-import { PROGRESS_LABEL_MODE_FRACTION } from "v2/views/DesignSetting/constants/designThemeConstants";
+import {
+  PROGRESS_BAR_STYLE_2,
+  PROGRESS_LABEL_MODE_FRACTION,
+} from "v2/views/DesignSetting/constants/designThemeConstants";
+import { resolveProgressBarStyle } from "v2/views/DesignSetting/utils/designThemeUtils";
 import {
   PROCESS_BAR_COMPLETE_TEXT,
   formatProcessBarFractionText,
@@ -30,6 +34,16 @@ const ProcessBar = ({
   const progressLabelMode = themeSettings?.progressLabelMode
     || themeSettings?.progress_label_mode;
   const isFractionMode = progressLabelMode === PROGRESS_LABEL_MODE_FRACTION;
+  const progressBarStyle = resolveProgressBarStyle(
+    themeSettings?.progressBarStyle || themeSettings?.progress_bar_style,
+    progressLabelMode,
+  );
+  const isStyle2 = progressBarStyle === PROGRESS_BAR_STYLE_2;
+  const aboveText = (
+    themeSettings?.progressBarAboveText
+    || themeSettings?.progress_bar_above_text
+    || ""
+  ).trim();
   const fractionStep = !maxIndex
     ? 0
     : (current >= maxIndex ? maxIndex : Math.max(current, 1));
@@ -44,7 +58,7 @@ const ProcessBar = ({
     return `${(current / maxIndex) * 100}%`;
   })();
 
-  const getText = () => {
+  const getFormatText = () => {
     if (isFractionMode) {
       if (!maxIndex) return formatProcessBarFractionText(0, 0);
       return formatProcessBarFractionText(fractionStep, maxIndex);
@@ -56,10 +70,11 @@ const ProcessBar = ({
     return formatProcessBarRemainingText(maxIndex);
   };
 
-  const labelText = getText();
+  const formatText = getFormatText();
+  const captionText = isStyle2 && aboveText ? aboveText : formatText;
   const barClassName = [
     "sp-process-bar",
-    isFractionMode ? PROCESS_BAR_FRACTION_CLASS : "",
+    isStyle2 ? PROCESS_BAR_FRACTION_CLASS : "",
   ].filter(Boolean).join(" ");
 
   return (
@@ -67,9 +82,9 @@ const ProcessBar = ({
       id="sp-process-bar"
       className={barClassName}
     >
-      {isFractionMode ? (
+      {isStyle2 ? (
         <div className="sp-process-bar__meta">
-          <span className="sp-process-bar__step">{labelText}</span>
+          <span className="sp-process-bar__step">{captionText}</span>
         </div>
       ) : null}
       <div className="sp-process-bar__track">
@@ -80,7 +95,7 @@ const ProcessBar = ({
             ...(fillColor ? { "--sp-process-bar-color": fillColor } : {}),
           }}
         >
-          {isFractionMode ? null : labelText}
+          {isStyle2 ? null : formatText}
         </div>
       </div>
     </div>

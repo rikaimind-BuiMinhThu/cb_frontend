@@ -13,6 +13,7 @@ import {
   normalizeHeaderTitleAlignment,
   normalizeMessageBorderStyle,
   normalizeModalTitleAlignment,
+  normalizeProgressBarStyle,
   normalizeProgressLabelMode,
 } from 'v2/utils/designThemeCore';
 
@@ -28,7 +29,9 @@ export {
   normalizeHeaderChrome,
   normalizeHeaderCloseIcon,
   normalizeHeaderTitleAlignment,
+  normalizeProgressBarStyle,
   normalizeProgressLabelMode,
+  resolveProgressBarStyle,
   normalizeFieldPlaceholderStyle,
   normalizeModalTitleAlignment,
   resolveHeaderTitleJustify,
@@ -74,6 +77,7 @@ const THEME_VALUE_NORMALIZERS = {
   headerTitleAlignment: (value) => (value ? normalizeHeaderTitleAlignment(value) : value),
   headerCloseIcon: (value) => (value ? normalizeHeaderCloseIcon(value) : value),
   progressLabelMode: (value) => (value ? normalizeProgressLabelMode(value) : value),
+  progressBarStyle: (value) => (value ? normalizeProgressBarStyle(value) : value),
   fieldPlaceholderStyle: (value) => (value ? normalizeFieldPlaceholderStyle(value) : value),
 };
 
