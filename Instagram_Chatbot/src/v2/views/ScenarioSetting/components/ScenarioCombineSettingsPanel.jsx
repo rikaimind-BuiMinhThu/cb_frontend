@@ -14,7 +14,15 @@ import {
   COMBINE_BOT_TYPE_OPTIONS,
   COMBINE_USER_TYPE_OPTIONS,
 } from 'v2/views/ScenarioSetting/utils/combineContentDefaults';
-import { SETTING_LABELS, SETTING_PLACEHOLDERS } from '../constants/scenarioSettingLabels';
+import { SETTING_BUTTON_LABELS, SETTING_LABELS, SETTING_PLACEHOLDERS } from '../constants/scenarioSettingLabels';
+
+const COMBINE_PANEL_LABELS = {
+  botContent: 'ボットコンテンツ',
+  userContent: 'ユーザーコンテンツ',
+};
+const COMBINE_DEFAULT_BOT_TYPE = 'text_input';
+const COMBINE_DROPPABLE_ID = 'combine-messages';
+const BELONG_TO_COMBINE = 'combine';
 
 const AddBlockSelect = ({ options, defaultType, onAdd, label }) => {
   const [blockType, setBlockType] = useState(defaultType);
@@ -32,7 +40,7 @@ const AddBlockSelect = ({ options, defaultType, onAdd, label }) => {
         ))}
       </select>
       <Button className="ss-user-setting__select-btn-add ss-user-setting__select-btn-add--padded" onClick={() => onAdd(blockType)}>
-        追加
+        {SETTING_BUTTON_LABELS.add}
       </Button>
     </div>
   );
@@ -58,12 +66,14 @@ const ScenarioCombineSettingsPanel = () => {
     getBaseUrl,
     fileError,
     setIsOpenFileReference,
+    setVarFileReference,
     botUploadFile,
+    isUseFukushashiki,
   } = useScenarioPanelDestructuring();
 
   const selectedMessage = dataMessages?.[indexMessageSelect];
 
-  if (!selectedMessage || belongTo !== 'combine') {
+  if (!selectedMessage || belongTo !== BELONG_TO_COMBINE) {
     return null;
   }
 
@@ -98,7 +108,7 @@ const ScenarioCombineSettingsPanel = () => {
       </div>
 
       <DragDropContext onDragEnd={handleDragEnd}>
-        <Droppable droppableId="combine-messages">
+        <Droppable droppableId={COMBINE_DROPPABLE_ID}>
           {(provided) => (
             <div className="ss-combine-setting__main ss-user-setting__main" {...provided.droppableProps} ref={provided.innerRef}>
               {selectedMessage.message_content.map((content, indexContent, arr) => (
@@ -106,7 +116,7 @@ const ScenarioCombineSettingsPanel = () => {
                   {(dragProvided) => (
                     <div {...dragProvided.draggableProps} {...dragProvided.dragHandleProps} ref={dragProvided.innerRef}>
                       <div
-                        className={`ss-combine-setting__item ss-user-setting__item ss-user-setting__item-${indexContent} ${indexContent === (arr.length - 1) ? 'ss-user-setting__item--active' : ''}`}
+                        className={`ss-combine-setting__item ss-user-setting__item ss-user-setting__item-${indexContent}${indexContent === (arr.length - 1) ? ' ss-user-setting__item--active' : ''}`}
                         onClick={() => handleSelectContentMessage(indexContent, content.type)}
                       >
                         <MDBIcon
@@ -132,9 +142,11 @@ const ScenarioCombineSettingsPanel = () => {
                               getBaseUrl={getBaseUrl}
                               fileError={fileError}
                               setIsOpenFileReference={setIsOpenFileReference}
+                              setVarFileReference={setVarFileReference}
                               botUploadFile={botUploadFile}
                               dataMessages={dataMessages}
                               setDataMessages={setDataMessages}
+                              isUseFukushashiki={isUseFukushashiki}
                             />
                           ) : (
                             CONTENT_SETTING_MAP[content.type] ? React.createElement(CONTENT_SETTING_MAP[content.type], {
@@ -157,15 +169,15 @@ const ScenarioCombineSettingsPanel = () => {
 
       <div className="ss-combine-setting__bottom ss-user-setting__bottom">
         <AddBlockSelect
-          label="ボットコンテンツ"
+          label={COMBINE_PANEL_LABELS.botContent}
           options={COMBINE_BOT_TYPE_OPTIONS}
-          defaultType="text_input"
+          defaultType={COMBINE_DEFAULT_BOT_TYPE}
           onAdd={(type) => handleAddCombineBlock(COMBINE_CONTENT_ROLES.BOT, type)}
         />
         <AddBlockSelect
-          label="ユーザーコンテンツ"
+          label={COMBINE_PANEL_LABELS.userContent}
           options={COMBINE_USER_TYPE_OPTIONS}
-          defaultType={messageType || 'text_input'}
+          defaultType={messageType || COMBINE_DEFAULT_BOT_TYPE}
           onAdd={(type) => handleAddCombineBlock(COMBINE_CONTENT_ROLES.USER, type)}
         />
         <ScenarioMessageSettingsAccordion

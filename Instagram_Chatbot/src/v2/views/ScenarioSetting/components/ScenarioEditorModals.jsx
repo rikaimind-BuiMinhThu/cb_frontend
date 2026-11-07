@@ -6,13 +6,13 @@ import ScenarioModalShell from './modals/shared/ScenarioModalShell';
 import AddVariableModalContent from './modals/AddVariableModalContent';
 import { useScenarioPanelDestructuring } from '../hooks/useScenarioPanelDestructuring';
 import { mergeGenderIconUrl } from '../constants/genderOptionDefaults';
+import { isUserContentFileTarget } from '../utils/isUserContentFileTarget';
+import { resolveBotFileWriteTarget } from '../utils/resolveBotFileWriteTarget';
 
-const BELONG_TO_USER = 'user';
 const PRESET_CONFIG_FIELD = 'preset_config';
 const MODAL_TITLE_ADD_VARIABLE = '変数追加';
 const MODAL_TITLE_FILE_REFERENCE = 'ファイル参照';
 const MODAL_TITLE_SHOPIFY = 'Shopify商品参照';
-const DEFAULT_BOT_FILE_FIELD = 'content';
 
 const ScenarioEditorModals = () => {
   const panel = useScenarioPanelDestructuring();
@@ -64,6 +64,125 @@ const ScenarioEditorModals = () => {
     );
   };
 
+  const applyUserContentFileUrl = (fileUrl) => {
+    if (varFileReference.indexChildSubContentType !== undefined) {
+      onChangeValueMessageContent(
+        indexMessageSelect,
+        varFileReference.indexContent,
+        varFileReference.contentType,
+        fileUrl,
+        varFileReference.subContentType,
+        varFileReference.indexSubContentType,
+        varFileReference.childSubContentType,
+        varFileReference.indexChildSubContentType,
+        varFileReference.img,
+      );
+      return;
+    }
+    if (varFileReference.childSubContentType !== undefined) {
+      onChangeValueMessageContent(
+        indexMessageSelect,
+        varFileReference.indexContent,
+        varFileReference.contentType,
+        fileUrl,
+        varFileReference.subContentType,
+        varFileReference.childSubContentType,
+        varFileReference.indexSubContent,
+        varFileReference.img,
+      );
+      return;
+    }
+    onChangeValueMessageContent(
+      indexMessageSelect,
+      varFileReference.indexContent,
+      varFileReference.contentType,
+      fileUrl,
+      varFileReference.subContentType,
+      varFileReference.indexSubContent,
+      varFileReference.img,
+    );
+  };
+
+  const applyBotContentFileUrl = (fileUrl) => {
+    const target = resolveBotFileWriteTarget(varFileReference, messageType);
+    onChangeValueMessageContent(
+      indexMessageSelect,
+      target.indexContent,
+      target.contentType,
+      fileUrl,
+      target.fieldName,
+    );
+  };
+
+  const applyUserShopifyProductVariant = (productVariantId, displayName) => {
+    if (varShopifyReference.indexChildSubContentType !== undefined) {
+      onChangeValueMessageContent(
+        indexMessageSelect,
+        varShopifyReference.indexContent,
+        varShopifyReference.contentType,
+        productVariantId,
+        varShopifyReference.subContentType,
+        varShopifyReference.indexSubContentType,
+        varShopifyReference.childSubContentType,
+        varShopifyReference.indexChildSubContentType,
+        varShopifyReference.productVariantId,
+      );
+      onChangeValueMessageContent(
+        indexMessageSelect,
+        varShopifyReference.indexContent,
+        varShopifyReference.contentType,
+        displayName,
+        varShopifyReference.subContentType,
+        varShopifyReference.indexSubContentType,
+        varShopifyReference.childSubContentType,
+        varShopifyReference.indexChildSubContentType,
+        varShopifyReference.displayName,
+      );
+      return;
+    }
+    if (varShopifyReference.childSubContentType !== undefined) {
+      onChangeValueMessageContent(
+        indexMessageSelect,
+        varShopifyReference.indexContent,
+        varShopifyReference.contentType,
+        productVariantId,
+        varShopifyReference.subContentType,
+        varShopifyReference.childSubContentType,
+        varShopifyReference.indexSubContent,
+        varShopifyReference.productVariantId,
+      );
+      onChangeValueMessageContent(
+        indexMessageSelect,
+        varShopifyReference.indexContent,
+        varShopifyReference.contentType,
+        displayName,
+        varShopifyReference.subContentType,
+        varShopifyReference.childSubContentType,
+        varShopifyReference.indexSubContent,
+        varShopifyReference.displayName,
+      );
+      return;
+    }
+    onChangeValueMessageContent(
+      indexMessageSelect,
+      varShopifyReference.indexContent,
+      varShopifyReference.contentType,
+      productVariantId,
+      varShopifyReference.subContentType,
+      varShopifyReference.indexSubContent,
+      varShopifyReference.productVariantId,
+    );
+    onChangeValueMessageContent(
+      indexMessageSelect,
+      varShopifyReference.indexContent,
+      varShopifyReference.contentType,
+      displayName,
+      varShopifyReference.subContentType,
+      varShopifyReference.indexSubContent,
+      varShopifyReference.displayName,
+    );
+  };
+
   const handleReferFile = (fileUrl) => {
     if (varFileReference.genderIconUrl) {
       applyGenderIconFileUrl(fileUrl);
@@ -71,19 +190,34 @@ const ScenarioEditorModals = () => {
       return;
     }
 
-    if (dataMessages[indexMessageSelect].belong_to === BELONG_TO_USER) {
-      if (varFileReference.indexChildSubContentType !== undefined) {
-        onChangeValueMessageContent(indexMessageSelect, varFileReference.indexContent, varFileReference.contentType, fileUrl, varFileReference.subContentType, varFileReference.indexSubContentType, varFileReference.childSubContentType, varFileReference.indexChildSubContentType, varFileReference.img);
-      } else if (varFileReference.childSubContentType !== undefined) {
-        onChangeValueMessageContent(indexMessageSelect, varFileReference.indexContent, varFileReference.contentType, fileUrl, varFileReference.subContentType, varFileReference.childSubContentType, varFileReference.indexSubContent, varFileReference.img);
-      } else {
-        onChangeValueMessageContent(indexMessageSelect, varFileReference.indexContent, varFileReference.contentType, fileUrl, varFileReference.subContentType, varFileReference.indexSubContent, varFileReference.img);
-      }
-    } else {
-      const field = varFileReference.fieldName || DEFAULT_BOT_FILE_FIELD;
-      onChangeValueMessageContent(indexMessageSelect, 0, messageType, fileUrl, field);
+    const selectedMessage = dataMessages[indexMessageSelect];
+    if (isUserContentFileTarget(selectedMessage, varFileReference)) {
+      applyUserContentFileUrl(fileUrl);
+      setIsOpenFileReference(false);
+      return;
     }
+
+    applyBotContentFileUrl(fileUrl);
     setIsOpenFileReference(false);
+  };
+
+  const handleReferShopifyProductVariant = (productVariantId, displayName) => {
+    const selectedMessage = dataMessages[indexMessageSelect];
+    if (isUserContentFileTarget(selectedMessage, varShopifyReference)) {
+      applyUserShopifyProductVariant(productVariantId, displayName);
+      setIsOpenShopifyReference(false);
+      return;
+    }
+
+    const target = resolveBotFileWriteTarget(varShopifyReference, messageType);
+    onChangeValueMessageContent(
+      indexMessageSelect,
+      target.indexContent,
+      target.contentType,
+      productVariantId,
+      target.fieldName,
+    );
+    setIsOpenShopifyReference(false);
   };
 
   return (
@@ -129,23 +263,7 @@ const ScenarioEditorModals = () => {
       >
         <ShopifyReferencePopup
           onCancel={() => setIsOpenShopifyReference(false)}
-          onReferProductVariant={(productVariantId, displayName) => {
-            if (dataMessages[indexMessageSelect].belong_to === BELONG_TO_USER) {
-              if (varFileReference.indexChildSubContentType !== undefined) {
-                onChangeValueMessageContent(indexMessageSelect, varShopifyReference.indexContent, varShopifyReference.contentType, productVariantId, varShopifyReference.subContentType, varShopifyReference.indexSubContentType, varShopifyReference.childSubContentType, varShopifyReference.indexChildSubContentType, varShopifyReference.productVariantId);
-                onChangeValueMessageContent(indexMessageSelect, varShopifyReference.indexContent, varShopifyReference.contentType, displayName, varShopifyReference.subContentType, varShopifyReference.indexSubContentType, varShopifyReference.childSubContentType, varShopifyReference.indexChildSubContentType, varShopifyReference.displayName);
-              } else if (varFileReference.childSubContentType !== undefined) {
-                onChangeValueMessageContent(indexMessageSelect, varShopifyReference.indexContent, varShopifyReference.contentType, productVariantId, varShopifyReference.subContentType, varShopifyReference.childSubContentType, varShopifyReference.indexSubContent, varShopifyReference.productVariantId);
-                onChangeValueMessageContent(indexMessageSelect, varShopifyReference.indexContent, varShopifyReference.contentType, displayName, varShopifyReference.subContentType, varShopifyReference.childSubContentType, varShopifyReference.indexSubContent, varShopifyReference.displayName);
-              } else {
-                onChangeValueMessageContent(indexMessageSelect, varShopifyReference.indexContent, varShopifyReference.contentType, productVariantId, varShopifyReference.subContentType, varShopifyReference.indexSubContent, varShopifyReference.productVariantId);
-                onChangeValueMessageContent(indexMessageSelect, varShopifyReference.indexContent, varShopifyReference.contentType, displayName, varShopifyReference.subContentType, varShopifyReference.indexSubContent, varShopifyReference.displayName);
-              }
-            } else {
-              onChangeValueMessageContent(indexMessageSelect, 0, messageType, productVariantId, DEFAULT_BOT_FILE_FIELD);
-            }
-            setIsOpenShopifyReference(false);
-          }}
+          onReferProductVariant={handleReferShopifyProductVariant}
         />
       </ScenarioModalShell>
     </>
