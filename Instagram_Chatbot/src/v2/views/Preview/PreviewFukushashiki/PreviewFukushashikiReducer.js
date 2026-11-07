@@ -12,7 +12,13 @@ import {
 import { processForBotMessage } from 'v2/views/Preview/PreviewComponent/BotMessageUtils';
 import { processForUserMessage } from 'v2/views/Preview/PreviewComponent/UserMessageUtils';
 import { processForCombineMessage } from 'v2/views/Preview/PreviewComponent/CombineMessageUtils';
-import { isBotMessage, isUserMessage, isCombineMessage, getNextUserMsg } from 'v2/views/Preview/PreviewComponent/Utils';
+import {
+  isBotMessage,
+  isUserMessage,
+  isCombineMessage,
+  isProgressBarStep,
+  getNextUserMsg,
+} from 'v2/views/Preview/PreviewComponent/Utils';
 import { normalizeMessagesNotUseButton } from 'v2/views/ScenarioSetting/utils/normalizeNotUseButton';
 import { mapAmazonPayDataToMessagesList } from 'v2/views/Preview/PreviewComponent/TorizenUtils';
 import { mapAmazonPayDataToMessagesListForBliss } from 'v2/views/Preview/PreviewComponent/BlissUtils';
@@ -309,7 +315,9 @@ const PreviewFukushashikiReducer = (state, action) => {
       newState.isUpdateClicked = isUpdateClicked;
       if (isUpdateClicked) {
         if (newState.renderMode === RENDER_MODES.NEXT) {
-          newState.passedUserMsgCount = newState.renderMessagesList.filter(m => isUserMessage(m)).length - 1;
+          newState.passedUserMsgCount = newState.renderMessagesList.filter(
+            (m) => isProgressBarStep(m),
+          ).length - 1;
         }
       } else {
           newState.passedUserMsgCount = state.passedUserMsgCount + 1;
@@ -598,18 +606,9 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
         });
       }
 
-      const progressBarTargetCountMessagesList = newState.messagesList.filter(msg => {
-        if (!isUserMessage(msg)) return false;
-
-        const contentCount = msg?.message_content?.length;
-        const firstMsgContent = msg?.message_content?.[0];
-        if (msg.not_use_button) return false;
-        if (firstMsgContent?.type === MESSAGE_CONTENT_TYPES.SUBMIT_BUTTON && contentCount === 1) return false;
-
-        return true;
-      });
-
-      newState.progressBarMaxIndex = progressBarTargetCountMessagesList.length;
+      newState.progressBarMaxIndex = newState.messagesList.filter(
+        (msg) => isProgressBarStep(msg),
+      ).length;
       applyAmazonSelectorPayloadToDraft(state.pendingAmazonPaySelectorPayload, newState);
 
       return { ...state, ...newState };

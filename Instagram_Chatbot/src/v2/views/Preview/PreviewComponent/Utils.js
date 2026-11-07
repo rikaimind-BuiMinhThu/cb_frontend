@@ -9,6 +9,7 @@ import {
   CONVERSION_RESPONSE_SUBMIT_TYPE,
   CONVERSION_RESPONSE_MESSAGE_SUBMIT_TYPE,
   MESSAGE_CONTENT_TYPES,
+  COMBINE_CONTENT_ROLES,
 } from "./Constants";
 
 const toNumber = (value, fallback = 0) => {
@@ -652,6 +653,27 @@ export const isCombineMessage = (message) => {
 
 export const isInteractiveMessage = (message) => {
   return isUserMessage(message) || isCombineMessage(message);
+};
+
+export const isProgressBarStep = (message) => {
+  if (!isUserMessage(message) && !isCombineMessage(message)) return false;
+  if (message.not_use_button) return false;
+
+  const userContents = isCombineMessage(message)
+    ? message.message_content.filter(
+      (content) => content.role === COMBINE_CONTENT_ROLES.USER,
+    )
+    : message.message_content;
+  const contentCount = userContents?.length;
+  const firstMsgContent = userContents?.[0];
+  if (
+    firstMsgContent?.type === MESSAGE_CONTENT_TYPES.SUBMIT_BUTTON
+    && contentCount === 1
+  ) {
+    return false;
+  }
+
+  return true;
 };
 
 export const isCreditCardPaymentMessage = (message) => {

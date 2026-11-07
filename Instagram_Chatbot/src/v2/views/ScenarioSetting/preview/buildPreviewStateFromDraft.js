@@ -1,14 +1,11 @@
 import _ from 'lodash';
 import {
   isBotMessage,
-  isUserMessage,
-  isCombineMessage,
+  isProgressBarStep,
 } from 'v2/views/Preview/PreviewComponent/Utils';
 import {
   BOT_MESSAGE_TYPES,
-  COMBINE_CONTENT_ROLES,
   DISPLAY_TYPES,
-  MESSAGE_CONTENT_TYPES,
   RENDER_MODES,
 } from 'v2/views/Preview/PreviewComponent/Constants';
 import { prepareCombineMessagesForPreview } from 'v2/views/Preview/PreviewComponent/CombineMessageUtils';
@@ -44,22 +41,6 @@ export const buildEditorDraftPreviewUpdate = (draft) => {
   const allMessages = messagesList;
   const currentMsgIndex = allMessages.length > 0 ? allMessages.length - 1 : 0;
   const nextStopMsgIndex = allMessages.length;
-
-  const progressBarTargetCountMessagesList = messagesList.filter((msg) => {
-    if (!isUserMessage(msg) && !isCombineMessage(msg)) return false;
-
-    const userContents = msg.belong_to === 'combine'
-      ? msg.message_content.filter((content) => content.role === COMBINE_CONTENT_ROLES.USER)
-      : msg.message_content;
-    const contentCount = userContents?.length;
-    const firstMsgContent = userContents?.[0];
-    if (msg.not_use_button) return false;
-    if (firstMsgContent?.type === MESSAGE_CONTENT_TYPES.SUBMIT_BUTTON && contentCount === 1) {
-      return false;
-    }
-
-    return true;
-  });
 
   return {
     isEditorPreviewDraft: true,
@@ -104,7 +85,7 @@ export const buildEditorDraftPreviewUpdate = (draft) => {
     errMsgFieldSelectors: draft?.err_msg_field_selectors || '',
     errMsgFormSelectors: draft?.err_msg_form_selectors || '',
     launchButtonSelectors: draft?.launch_button_selectors || '',
-    progressBarMaxIndex: progressBarTargetCountMessagesList.length,
+    progressBarMaxIndex: messagesList.filter((msg) => isProgressBarStep(msg)).length,
     timer_config: draft?.timer_config,
   };
 };
