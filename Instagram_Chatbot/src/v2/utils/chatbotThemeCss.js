@@ -66,6 +66,71 @@ const USER_MESSAGE_BUBBLE_LABEL_SELECTORS = [
   '.theme-customize-preview__radio-default > label',
 ];
 
+const AGREE_TERM_DESIGN_CLASS = '.ss-agree-term-design';
+
+const buildAgreeTermDesignOverrideRules = (spBodySelector) => {
+  const root = `${spBodySelector} ${AGREE_TERM_DESIGN_CLASS}`;
+  return `
+${root} .ss-agree-term-design__title {
+  color: var(--agree-term-title-color) !important;
+  font-weight: 400 !important;
+}
+
+${root} .ss-agree-term-design__title--bold {
+  font-weight: 700 !important;
+}
+
+${root} .ss-agree-term-design__label {
+  color: var(--agree-term-label-color) !important;
+  font-size: var(--agree-term-label-size) !important;
+  font-weight: 400 !important;
+}
+
+${root} .ss-agree-term-design__label--bold {
+  font-weight: 700 !important;
+}
+
+${root} .ant-checkbox-inner {
+  width: var(--agree-term-checkbox-size) !important;
+  height: var(--agree-term-checkbox-size) !important;
+  background-color: var(--agree-term-checkbox-bg) !important;
+  border-style: solid !important;
+  border-color: var(--agree-term-checkbox-border-color) !important;
+  border-width: var(--agree-term-checkbox-border-width) !important;
+}
+
+${root} .ant-checkbox-checked .ant-checkbox-inner,
+${root} .ant-checkbox-wrapper:hover .ant-checkbox-inner,
+${root} .ant-checkbox:hover .ant-checkbox-inner,
+${root} .ant-checkbox-checked:hover .ant-checkbox-inner {
+  background-color: var(--agree-term-checkbox-bg) !important;
+  border-color: var(--agree-term-checkbox-border-color) !important;
+}
+
+${root} .ant-checkbox-checked .ant-checkbox-inner::after {
+  width: calc(var(--agree-term-checkbox-size) * 0.35) !important;
+  height: calc(var(--agree-term-checkbox-size) * 0.55) !important;
+  border-style: solid !important;
+  border-color: var(--agree-term-tick-color) !important;
+  border-top-width: 0 !important;
+  border-left-width: 0 !important;
+  border-right-width: var(--agree-term-tick-width) !important;
+  border-bottom-width: var(--agree-term-tick-width) !important;
+}
+
+${root} .ant-checkbox-disabled .ant-checkbox-inner,
+${root} .ant-checkbox-disabled:hover .ant-checkbox-inner,
+${root} .ant-checkbox-wrapper:hover .ant-checkbox-disabled .ant-checkbox-inner {
+  background-color: var(--agree-term-checkbox-bg) !important;
+  border-color: var(--agree-term-checkbox-border-color) !important;
+}
+
+${root} .ant-checkbox-disabled.ant-checkbox-checked .ant-checkbox-inner::after {
+  border-color: var(--agree-term-tick-color) !important;
+}
+`;
+};
+
 const buildUserMessageTitleSelectors = (scopeSelector) => (
   USER_MESSAGE_TITLE_CLASSES
     .map((className) => scopedDescendant(scopeSelector, className))
@@ -1289,6 +1354,8 @@ ${userBubbleTextSelectors} {
   color: var(--c-user-msg-text, #333) !important;
   font-size: var(--c-user-msg-font-size, 14px) !important;
 }
+
+${buildAgreeTermDesignOverrideRules(spBodySelector)}
 
 ${spBodySelector} .validation-error-message,
 ${scopedDescendant(scopeSelector, '.validation-error-message')} {
