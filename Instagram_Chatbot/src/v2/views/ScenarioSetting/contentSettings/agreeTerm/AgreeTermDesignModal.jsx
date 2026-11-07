@@ -221,30 +221,36 @@ const AgreeTermDesignModal = ({
           </div>
           <div className="ss-agree-term-design-modal__pair">
             <ScenarioFormRow label={AGREE_TERM_LABELS.checkboxBorderWidth}>
-              <NumberControl
-                value={resolved.checkbox.border_width}
-                min={AGREE_TERM_BORDER_WIDTH_MIN}
-                max={AGREE_TERM_BORDER_WIDTH_MAX}
-                onChange={changeNumber(
-                  'checkbox',
-                  'border_width',
-                  AGREE_TERM_BORDER_WIDTH_MIN,
-                  AGREE_TERM_BORDER_WIDTH_MAX,
-                )}
-              />
+              <div className="ss-agree-term-design-modal__number-group">
+                <NumberControl
+                  value={resolved.checkbox.border_width}
+                  min={AGREE_TERM_BORDER_WIDTH_MIN}
+                  max={AGREE_TERM_BORDER_WIDTH_MAX}
+                  onChange={changeNumber(
+                    'checkbox',
+                    'border_width',
+                    AGREE_TERM_BORDER_WIDTH_MIN,
+                    AGREE_TERM_BORDER_WIDTH_MAX,
+                  )}
+                />
+                <span className="ss-agree-term-design-modal__unit">{AGREE_TERM_LABELS.pxUnit}</span>
+              </div>
             </ScenarioFormRow>
             <ScenarioFormRow label={AGREE_TERM_LABELS.checkboxSize}>
-              <NumberControl
-                value={resolved.checkbox.size}
-                min={AGREE_TERM_CHECKBOX_SIZE_MIN}
-                max={AGREE_TERM_CHECKBOX_SIZE_MAX}
-                onChange={changeNumber(
-                  'checkbox',
-                  'size',
-                  AGREE_TERM_CHECKBOX_SIZE_MIN,
-                  AGREE_TERM_CHECKBOX_SIZE_MAX,
-                )}
-              />
+              <div className="ss-agree-term-design-modal__number-group">
+                <NumberControl
+                  value={resolved.checkbox.size}
+                  min={AGREE_TERM_CHECKBOX_SIZE_MIN}
+                  max={AGREE_TERM_CHECKBOX_SIZE_MAX}
+                  onChange={changeNumber(
+                    'checkbox',
+                    'size',
+                    AGREE_TERM_CHECKBOX_SIZE_MIN,
+                    AGREE_TERM_CHECKBOX_SIZE_MAX,
+                  )}
+                />
+                <span className="ss-agree-term-design-modal__unit">{AGREE_TERM_LABELS.pxUnit}</span>
+              </div>
             </ScenarioFormRow>
           </div>
           <div className="ss-agree-term-design-modal__pair">
@@ -255,17 +261,20 @@ const AgreeTermDesignModal = ({
               />
             </ScenarioFormRow>
             <ScenarioFormRow label={AGREE_TERM_LABELS.tickWidth}>
-              <NumberControl
-                value={resolved.checkbox.tick_width}
-                min={AGREE_TERM_TICK_WIDTH_MIN}
-                max={AGREE_TERM_TICK_WIDTH_MAX}
-                onChange={changeNumber(
-                  'checkbox',
-                  'tick_width',
-                  AGREE_TERM_TICK_WIDTH_MIN,
-                  AGREE_TERM_TICK_WIDTH_MAX,
-                )}
-              />
+              <div className="ss-agree-term-design-modal__number-group">
+                <NumberControl
+                  value={resolved.checkbox.tick_width}
+                  min={AGREE_TERM_TICK_WIDTH_MIN}
+                  max={AGREE_TERM_TICK_WIDTH_MAX}
+                  onChange={changeNumber(
+                    'checkbox',
+                    'tick_width',
+                    AGREE_TERM_TICK_WIDTH_MIN,
+                    AGREE_TERM_TICK_WIDTH_MAX,
+                  )}
+                />
+                <span className="ss-agree-term-design-modal__unit">{AGREE_TERM_LABELS.pxUnit}</span>
+              </div>
             </ScenarioFormRow>
           </div>
         </DesignSection>
@@ -273,17 +282,20 @@ const AgreeTermDesignModal = ({
         <DesignSection title={AGREE_TERM_LABELS.labelSection}>
           <ScenarioFormRow label={AGREE_TERM_LABELS.labelFontSize}>
             <div className="ss-agree-term-design-modal__inline">
-              <NumberControl
-                value={resolved.label.font_size}
-                min={AGREE_TERM_LABEL_FONT_SIZE_MIN}
-                max={AGREE_TERM_LABEL_FONT_SIZE_MAX}
-                onChange={changeNumber(
-                  'label',
-                  'font_size',
-                  AGREE_TERM_LABEL_FONT_SIZE_MIN,
-                  AGREE_TERM_LABEL_FONT_SIZE_MAX,
-                )}
-              />
+              <div className="ss-agree-term-design-modal__number-group">
+                <NumberControl
+                  value={resolved.label.font_size}
+                  min={AGREE_TERM_LABEL_FONT_SIZE_MIN}
+                  max={AGREE_TERM_LABEL_FONT_SIZE_MAX}
+                  onChange={changeNumber(
+                    'label',
+                    'font_size',
+                    AGREE_TERM_LABEL_FONT_SIZE_MIN,
+                    AGREE_TERM_LABEL_FONT_SIZE_MAX,
+                  )}
+                />
+                <span className="ss-agree-term-design-modal__unit">{AGREE_TERM_LABELS.pxUnit}</span>
+              </div>
               <ScenarioModalCheckbox
                 checked={resolved.label.bold}
                 onChange={(bold) => patchGroup('label', { bold })}

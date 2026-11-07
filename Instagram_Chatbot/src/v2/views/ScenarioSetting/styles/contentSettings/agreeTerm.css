@@ -45,6 +45,29 @@
   width: 90%;
 }
 
+.ss-agree-term-setting .ss-content-setting-body > .ss-user-setting__item-bottom > .ss-input-custom-container {
+  width: 90%;
+}
+
+.ss-agree-term-setting .ss-user-setting__item-select-bottom-wrapper-flex {
+  width: 90%;
+  gap: 8px;
+}
+
+.ss-agree-term-setting .ss-user-setting__item-select-bottom-wrapper-flex > .select-custom-antd,
+.ss-agree-term-setting .ss-user-setting__item-select-bottom-wrapper-flex > .select-custom-native {
+  flex: 1 1 0;
+  width: auto;
+  min-width: 0;
+}
+
+.ss-agree-term-setting .ss-agree-term-setting__design-row {
+  width: 90%;
+  margin-right: auto;
+  margin-left: auto;
+  justify-content: flex-start;
+}
+
 .ss-agree-term-setting__design-btn {
   background-color: rgb(50, 122, 237);
   color: #fff;
@@ -121,6 +144,12 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
+.ss-agree-term-design-modal__number-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .ss-agree-term-design-modal__number {
   width: 88px !important;
   max-width: 88px;
@@ -129,6 +158,12 @@
   font-size: 14px;
   border: 1px solid #d9d9d9;
   border-radius: 4px;
+}
+
+.ss-agree-term-design-modal__unit {
+  font-size: 12px;
+  color: #666;
+  white-space: nowrap;
 }
 
 .ss-agree-term-design-modal__check {

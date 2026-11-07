@@ -61,8 +61,11 @@ const AgreeTermDetailBody = ({
   const textareaRows = contentText.length > AGREE_TERM_LONG_CONTENT_LENGTH
     ? AGREE_TERM_TEXTAREA_ROWS_LONG
     : AGREE_TERM_TEXTAREA_ROWS;
-  const showTerms = !collapseActive || expanded;
   const showHeader = Boolean(titleRequire) || Boolean(requiredLabel);
+  const termsClassName = joinClasses([
+    'ss-agree-term-design__terms',
+    expanded ? '' : 'ss-agree-term-design__terms--collapsed',
+  ]);
 
   const titleClassName = joinClasses([
     'ss-message__content--user-agree_to_term-title',
@@ -108,16 +111,26 @@ const AgreeTermDetailBody = ({
     );
   };
 
+  const renderTermsField = () => (
+    <textarea
+      name={AGREE_TERM_TEXTAREA_NAME}
+      rows={textareaRows}
+      value={contentText}
+      className="ss-input-value"
+      readOnly
+      tabIndex={collapseActive && !expanded ? -1 : undefined}
+      aria-hidden={collapseActive && !expanded}
+    />
+  );
+
   const renderTerms = () => {
-    if (!showTerms) return null;
+    if (!collapseActive) return renderTermsField();
     return (
-      <textarea
-        name={AGREE_TERM_TEXTAREA_NAME}
-        rows={textareaRows}
-        value={contentText}
-        className="ss-input-value"
-        readOnly
-      />
+      <div className={termsClassName}>
+        <div className="ss-agree-term-design__terms-inner">
+          {renderTermsField()}
+        </div>
+      </div>
     );
   };
 

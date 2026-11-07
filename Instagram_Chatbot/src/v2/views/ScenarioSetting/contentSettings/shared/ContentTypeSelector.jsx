@@ -14,6 +14,7 @@ const ContentTypeSelector = ({
   typePlaceholder = SETTING_PLACEHOLDERS.type,
   titleSelectClassName = 'ss-select--half',
   typeSelectClassName = 'ss-select--half',
+  dropdownMatchSelectWidth = false,
 }) => (
   <div className="ss-user-setting__item-bottom">
     <div className="ss-user-setting__item-select-bottom-wrapper-flex">
@@ -24,6 +25,7 @@ const ContentTypeSelector = ({
         data={dropDownTitle}
         onChange={onTitleRequireChange}
         keyValue="key"
+        dropdownMatchSelectWidth={dropdownMatchSelectWidth}
       />
       <SelectCustom
         id="type"
@@ -34,6 +36,7 @@ const ContentTypeSelector = ({
         placeholder={typePlaceholder}
         onChange={onTypeChange}
         keyValue="key"
+        dropdownMatchSelectWidth={dropdownMatchSelectWidth}
       />
     </div>
   </div>
@@ -48,6 +51,7 @@ ContentTypeSelector.propTypes = {
   typePlaceholder: PropTypes.string,
   titleSelectClassName: PropTypes.string,
   typeSelectClassName: PropTypes.string,
+  dropdownMatchSelectWidth: PropTypes.bool,
 };
 
 export default ContentTypeSelector;

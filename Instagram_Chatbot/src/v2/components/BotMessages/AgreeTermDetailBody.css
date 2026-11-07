@@ -34,6 +34,27 @@
   line-height: inherit;
 }
 
+.ss-agree-term-design__terms {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.28s ease;
+}
+
+.ss-agree-term-design__terms--collapsed {
+  grid-template-rows: 0fr;
+}
+
+.ss-agree-term-design__terms-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ss-agree-term-design__terms {
+    transition: none;
+  }
+}
+
 .ss-agree-term-design .ss-agree-term-design__label {
   color: var(--agree-term-label-color);
   font-size: var(--agree-term-label-size);

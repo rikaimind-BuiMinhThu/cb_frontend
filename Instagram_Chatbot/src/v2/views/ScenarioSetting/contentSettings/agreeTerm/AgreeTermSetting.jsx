@@ -91,6 +91,7 @@ const AgreeTermSetting = (props) => {
         typeOptions={agreeTermType}
         onTitleRequireChange={(value) => updateAgreeTermField(TITLE_REQUIRE_FIELD, value)}
         onTypeChange={changeContent('type')}
+        dropdownMatchSelectWidth
       />
     </div>
   );
@@ -98,7 +99,7 @@ const AgreeTermSetting = (props) => {
   const renderDesignButton = () => {
     if (!showDesign) return null;
     return (
-      <div className="ss-user-setting__item-bottom">
+      <div className="ss-user-setting__item-bottom ss-agree-term-setting__design-row">
         <button
           type="button"
           className="ss-agree-term-setting__design-btn"
@@ -143,6 +144,7 @@ const AgreeTermSetting = (props) => {
 
   return (
     <ContentSettingShell
+      className="ss-agree-term-setting"
       contentType={AGREE_TERM_CONTENT_TYPE}
       contentData={agreeTerm}
       indexMessageSelect={indexMessageSelect}
@@ -155,10 +157,10 @@ const AgreeTermSetting = (props) => {
       setIsOpenAddVariable={setIsOpenAddVariable}
     >
       {renderTypeSelector()}
-      {renderDesignButton()}
       {renderTitle()}
       {renderTypeBody()}
       {renderAgreeTermCheckbox(ctx)}
+      {renderDesignButton()}
       {renderFukushashiki()}
       <AgreeTermDesignModal
         open={designOpen && showDesign}
