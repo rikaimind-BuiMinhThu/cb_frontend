@@ -54,7 +54,10 @@
   min-width: 100%;
 }
 
-.ss-editor-layout-v2 .ant-select-item-option,
+.ss-editor-layout-v2 .ant-select-item-option {
+  width: 100%;
+}
+
 .ss-editor-layout-v2 .ant-select-item-option-content {
   overflow: visible;
   text-overflow: clip;
