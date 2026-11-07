@@ -1,66 +1,134 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import { Popover } from 'antd';
+import ColorPicker from '@rc-component/color-picker';
 import {
   MAIN_COLORS,
-  PRESET_COLOR_CUSTOM_LABEL,
-  PRESET_COLOR_INPUT_ID_PREFIX,
+  PRESET_COLOR_HEX_MAX_LENGTH,
+  PRESET_COLOR_HEX_PATTERN,
   THEME_CSS_VAR_MAIN_COLOR,
 } from '../constants/designChatbotConstants';
+import '@rc-component/color-picker/assets/index.css';
+
+const toStoredHex = (hex, presets) => {
+  const trimmed = String(hex || '').slice(0, PRESET_COLOR_HEX_MAX_LENGTH);
+  const matched = presets.find((preset) => preset.toLowerCase() === trimmed.toLowerCase());
+  if (matched) {
+    return matched;
+  }
+  return trimmed.toLowerCase();
+};
 
 const PresetColorPicker = ({ value, onChange, presets = MAIN_COLORS }) => {
-  const customColorRef = useRef(null);
-  const inputIdRef = useRef(null);
-  if (!inputIdRef.current) {
-    inputIdRef.current = `${PRESET_COLOR_INPUT_ID_PREFIX}${Math.random().toString(36).slice(2, 9)}`;
-  }
-  const currentColor = value || presets[0];
-  const presetIndex = presets.indexOf(currentColor);
-  const isCustomColor = presetIndex === -1;
+  const [open, setOpen] = useState(false);
+  const [hexDraft, setHexDraft] = useState(null);
+  const [localColor, setLocalColor] = useState(null);
+  const currentColor = localColor || value || presets[0];
+  const displayHex = hexDraft ?? currentColor;
+  const activePreset = presets.find(
+    (preset) => preset.toLowerCase() === currentColor.toLowerCase(),
+  );
+
+  useEffect(() => {
+    setLocalColor(null);
+    setHexDraft(null);
+  }, [value]);
+
+  const commitColor = (hex) => {
+    const stored = toStoredHex(hex, presets);
+    setLocalColor(stored);
+    onChange(stored);
+  };
+
+  const handlePanelChange = (color) => {
+    const hex = color.toHexString().slice(0, PRESET_COLOR_HEX_MAX_LENGTH);
+    setHexDraft(null);
+    commitColor(hex);
+  };
 
   const handlePresetClick = (color) => {
+    setHexDraft(null);
+    setLocalColor(color);
     onChange(color);
+    setOpen(false);
   };
 
-  const handleCustomClick = () => {
-    customColorRef.current?.click();
+  const handleHexInputChange = (event) => {
+    const next = event.target.value.slice(0, PRESET_COLOR_HEX_MAX_LENGTH);
+    setHexDraft(next);
+    if (!PRESET_COLOR_HEX_PATTERN.test(next)) {
+      return;
+    }
+    commitColor(next);
   };
 
-  return (
-    <div className="main-colors">
-      {presets.map((color, index) => (
-        <div
-          key={color}
-          className={`color color-${index}${!isCustomColor && presetIndex === index ? ' active' : ''}`}
-          onClick={() => handlePresetClick(color)}
-        >
-          <span
-            className="main-colors__swatch"
-            style={{ [THEME_CSS_VAR_MAIN_COLOR]: color }}
-          />
-        </div>
-      ))}
+  const handleOpenChange = (nextOpen) => {
+    setOpen(nextOpen);
+    if (!nextOpen) {
+      setHexDraft(null);
+    }
+  };
 
-      <div className="main-colors__custom">
-        <div
-          className={`color color-999${isCustomColor ? ' active' : ''}`}
-          onClick={handleCustomClick}
-        >
-          <span
-            className="main-colors__swatch"
-            style={{ [THEME_CSS_VAR_MAIN_COLOR]: currentColor }}
-          />
-        </div>
-        <span className="main-colors__custom-label">{PRESET_COLOR_CUSTOM_LABEL}</span>
+  const panel = (
+    <div className="preset-color-picker__panel">
+      <div className="preset-color-picker__presets">
+        {presets.map((color) => {
+          const isActive = activePreset === color;
+          const presetClassName = isActive
+            ? 'preset-color-picker__preset preset-color-picker__preset--active'
+            : 'preset-color-picker__preset';
+          return (
+            <button
+              key={color}
+              type="button"
+              className={presetClassName}
+              aria-label={color}
+              onClick={() => handlePresetClick(color)}
+            >
+              <span
+                className="preset-color-picker__preset-swatch"
+                style={{ [THEME_CSS_VAR_MAIN_COLOR]: color }}
+              />
+            </button>
+          );
+        })}
       </div>
-      <input
-        ref={customColorRef}
-        id={inputIdRef.current}
-        type="color"
+      <ColorPicker
         value={currentColor}
-        onChange={(e) => onChange(e.target.value)}
-        className="main-colors__color-input"
+        disabledAlpha
+        onChange={handlePanelChange}
+      />
+      <input
+        type="text"
+        className="preset-color-picker__hex-input"
+        value={displayHex}
+        maxLength={PRESET_COLOR_HEX_MAX_LENGTH}
+        onChange={handleHexInputChange}
       />
     </div>
+  );
+
+  return (
+    <Popover
+      content={panel}
+      trigger="click"
+      visible={open}
+      onVisibleChange={handleOpenChange}
+      placement="bottomLeft"
+      overlayClassName="preset-color-picker__popover"
+    >
+      <button
+        type="button"
+        className="preset-color-picker__trigger"
+        data-color={currentColor}
+      >
+        <span
+          className="preset-color-picker__swatch"
+          style={{ [THEME_CSS_VAR_MAIN_COLOR]: currentColor }}
+        />
+        <span className="preset-color-picker__hex">{currentColor}</span>
+      </button>
+    </Popover>
   );
 };
 

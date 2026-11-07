@@ -223,8 +223,8 @@ export const BUBBLE_SECTION_TITLE = 'バブル設定';
 export const LABEL_BUBBLE_TITLE = 'タイトル';
 export const PLACEHOLDER_BUBBLE_TITLE = '簡単90秒で注文完了';
 
-export const PRESET_COLOR_CUSTOM_LABEL = 'カスタム';
-export const PRESET_COLOR_INPUT_ID_PREFIX = 'preset-color-';
+export const PRESET_COLOR_HEX_PATTERN = /^#[0-9A-Fa-f]{6}$/;
+export const PRESET_COLOR_HEX_MAX_LENGTH = 7;
 
 export const THEME_PREVIEW_SAMPLE_TITLE = 'サンプルタイトル';
 export const THEME_PREVIEW_SAMPLE_SUBTITLE = 'サンプルサブタイトル';

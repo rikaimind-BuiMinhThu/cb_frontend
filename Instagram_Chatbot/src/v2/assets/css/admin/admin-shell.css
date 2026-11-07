@@ -357,12 +357,9 @@
   gap: 4px;
 }
 
-:is(.admin-page--design-setting, .admin-page--add-bot) .theme-field--color .main-colors {
+:is(.admin-page--design-setting, .admin-page--add-bot) .theme-field--color .preset-color-picker__trigger,
+:is(.admin-page--design-setting, .admin-page--add-bot) .theme-field--main-color .preset-color-picker__trigger {
   margin-top: 0;
-}
-
-:is(.admin-page--design-setting, .admin-page--add-bot) .theme-section--main-color .main-colors {
-  padding: 0 4px 8px;
 }
 
 :is(.admin-page--design-setting, .admin-page--add-bot) .dbi-label {
@@ -453,14 +450,92 @@
   background-color: var(--theme-main-color);
 }
 
-:is(.admin-page--design-setting, .admin-page--add-bot) .main-colors__swatch {
-  background-color: var(--theme-main-color);
+:is(.admin-page--design-setting, .admin-page--add-bot) .preset-color-picker__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px 4px 4px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  min-height: 36px;
 }
 
-:is(.admin-page--design-setting, .admin-page--add-bot) .main-colors__color-input {
-  visibility: hidden;
-  width: 0;
-  height: 0;
+:is(.admin-page--design-setting, .admin-page--add-bot) .preset-color-picker__trigger:hover {
+  border-color: #9ca3af;
+}
+
+:is(.admin-page--design-setting, .admin-page--add-bot) .preset-color-picker__swatch {
+  display: block;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background-color: var(--theme-main-color);
+  flex-shrink: 0;
+}
+
+:is(.admin-page--design-setting, .admin-page--add-bot) .preset-color-picker__hex {
+  font-size: 13px;
+  line-height: 1.2;
+  color: #374151;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.preset-color-picker__popover .ant-popover-inner-content {
+  padding: 12px;
+}
+
+.preset-color-picker__popover .preset-color-picker__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 234px;
+}
+
+.preset-color-picker__popover .preset-color-picker__presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.preset-color-picker__popover .preset-color-picker__preset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.preset-color-picker__popover .preset-color-picker__preset--active {
+  border-color: #327aed;
+  background: #eff6ff;
+}
+
+.preset-color-picker__popover .preset-color-picker__preset-swatch {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background-color: var(--theme-main-color);
+  flex-shrink: 0;
+}
+
+.preset-color-picker__popover .preset-color-picker__hex-input {
+  width: 100%;
+  height: 32px;
+  padding: 4px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 :is(.admin-page--design-setting, .admin-page--add-bot) .basic-info-state-preview__body.sp-body {

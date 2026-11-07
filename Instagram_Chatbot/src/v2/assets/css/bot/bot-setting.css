@@ -175,31 +175,9 @@
   grid-column: 1 / -1;
 }
 
-.theme-customize-tab-settings .main-colors {
-  flex-wrap: nowrap;
-  align-items: center;
-  gap: 3px;
-}
-
-.theme-customize-tab-settings .main-colors .color {
-  width: 32px;
-  height: 32px;
-  flex-shrink: 0;
-}
-
-.theme-customize-tab-settings .main-colors__swatch {
-  width: 20px;
-  height: 20px;
-}
-
-.theme-customize-tab-settings .main-colors__custom {
-  flex-direction: row;
-  align-items: center;
-  gap: 4px;
-}
-
-.theme-field--color .theme-field__control {
-  overflow-x: auto;
+.theme-field--color .theme-field__control,
+.theme-field--main-color .theme-field__control {
+  overflow: visible;
 }
 
 .theme-field {
