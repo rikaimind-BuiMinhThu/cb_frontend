@@ -61,6 +61,7 @@ import {
   sendOpenChatbotCountRequest,
   sendCloseChatbotCountRequest,
   isInteractiveMessage,
+  countProgressBarSteps,
   sendLogMessageToServer,
   sendCreateOrderData,
   updateStatusConversion,
@@ -1384,8 +1385,10 @@ const PreviewFukushashiki = () => {
             )}
             <ProcessBar
               botInfor={state.botInfor}
-              currentIndex={state.passedUserMsgCount}
-              maxIndex={state.progressBarMaxIndex}
+              currentIndex={countProgressBarSteps(
+                state.messagesList.slice(0, state.currentMsgIndex),
+              )}
+              maxIndex={countProgressBarSteps(state.messagesList)}
               themeSettings={state.themeSettings}
             />
           </>

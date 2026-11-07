@@ -1,8 +1,5 @@
 import _ from 'lodash';
-import {
-  isBotMessage,
-  isProgressBarStep,
-} from 'v2/views/Preview/PreviewComponent/Utils';
+import { isBotMessage } from 'v2/views/Preview/PreviewComponent/Utils';
 import {
   BOT_MESSAGE_TYPES,
   DISPLAY_TYPES,
@@ -85,7 +82,6 @@ export const buildEditorDraftPreviewUpdate = (draft) => {
     errMsgFieldSelectors: draft?.err_msg_field_selectors || '',
     errMsgFormSelectors: draft?.err_msg_form_selectors || '',
     launchButtonSelectors: draft?.launch_button_selectors || '',
-    progressBarMaxIndex: messagesList.filter((msg) => isProgressBarStep(msg)).length,
     timer_config: draft?.timer_config,
   };
 };

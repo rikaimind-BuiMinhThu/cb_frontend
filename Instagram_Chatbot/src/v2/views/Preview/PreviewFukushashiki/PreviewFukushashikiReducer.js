@@ -16,7 +16,6 @@ import {
   isBotMessage,
   isUserMessage,
   isCombineMessage,
-  isProgressBarStep,
   getNextUserMsg,
 } from 'v2/views/Preview/PreviewComponent/Utils';
 import { normalizeMessagesNotUseButton } from 'v2/views/ScenarioSetting/utils/normalizeNotUseButton';
@@ -313,15 +312,6 @@ const PreviewFukushashikiReducer = (state, action) => {
 
       newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
       newState.isUpdateClicked = isUpdateClicked;
-      if (isUpdateClicked) {
-        if (newState.renderMode === RENDER_MODES.NEXT) {
-          newState.passedUserMsgCount = newState.renderMessagesList.filter(
-            (m) => isProgressBarStep(m),
-          ).length - 1;
-        }
-      } else {
-          newState.passedUserMsgCount = state.passedUserMsgCount + 1;
-      }
       return { ...state, ...newState };
     case PREVIEW_ACTIONS.UPDATE_PREFECTURES_LIST:
       return { ...state, prefecturesList: action.payload.prefecturesList };
@@ -606,9 +596,6 @@ case PREVIEW_ACTIONS.UPDATE_AMAZON_PAY_DATA_FOR_YUWAERU:
         });
       }
 
-      newState.progressBarMaxIndex = newState.messagesList.filter(
-        (msg) => isProgressBarStep(msg),
-      ).length;
       applyAmazonSelectorPayloadToDraft(state.pendingAmazonPaySelectorPayload, newState);
 
       return { ...state, ...newState };

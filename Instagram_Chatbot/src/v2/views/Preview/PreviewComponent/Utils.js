@@ -655,25 +655,37 @@ export const isInteractiveMessage = (message) => {
   return isUserMessage(message) || isCombineMessage(message);
 };
 
-export const isProgressBarStep = (message) => {
-  if (!isUserMessage(message) && !isCombineMessage(message)) return false;
-  if (message.not_use_button) return false;
-
-  const userContents = isCombineMessage(message)
-    ? message.message_content.filter(
+const getProgressBarUserContents = (message) => {
+  if (isCombineMessage(message)) {
+    return (message.message_content || []).filter(
       (content) => content.role === COMBINE_CONTENT_ROLES.USER,
-    )
-    : message.message_content;
-  const contentCount = userContents?.length;
-  const firstMsgContent = userContents?.[0];
-  if (
-    firstMsgContent?.type === MESSAGE_CONTENT_TYPES.SUBMIT_BUTTON
-    && contentCount === 1
-  ) {
-    return false;
+    );
   }
+  return message.message_content || [];
+};
+
+export const isProgressBarStep = (message) => {
+  if (!message || message.hidden) return false;
+  if (!isUserMessage(message) && !isCombineMessage(message)) return false;
+
+  const userContents = getProgressBarUserContents(message);
+  if (!userContents.length) return false;
+
+  const isDisplayBtnNext = !message.not_use_button;
+  const isSubmitStop = userContents.some(
+    (content) => content?.type === MESSAGE_CONTENT_TYPES.SUBMIT_BUTTON,
+  );
+  const isRadioStop = userContents.some(
+    (content) => content?.type === MESSAGE_CONTENT_TYPES.RADIO_BUTTON,
+  );
+  if (!isDisplayBtnNext && !isSubmitStop && !isRadioStop) return false;
+  if (isSubmitStop) return false;
 
   return true;
+};
+
+export const countProgressBarSteps = (messages) => {
+  return (messages || []).filter((msg) => isProgressBarStep(msg)).length;
 };
 
 export const isCreditCardPaymentMessage = (message) => {
