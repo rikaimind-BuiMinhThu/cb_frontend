@@ -997,7 +997,8 @@ ${scopedClass(scopeSelector, '.field-float--filled .field-float__label')} {
 ${scopedClass(scopeSelector, '.field-float .ss-input-value')},
 ${scopedClass(scopeSelector, '.field-float textarea')} {
   padding: 8px 12px !important;
-  line-height: 18px !important;
+  font-size: var(--c-field-placeholder-size, var(--c-field-font-size, 16px)) !important;
+  line-height: 1.4 !important;
   box-sizing: border-box !important;
   min-height: 55px !important;
   height: 55px !important;
@@ -1018,6 +1019,10 @@ ${scopedClass(scopeSelector, '.field-float--filled textarea')} {
 ${fieldScopeSelectors.map((fieldScope) => `${fieldScope} .ant-select-selection-placeholder`).join(',\n')} {
   font-size: var(--c-field-font-size, 14px) !important;
   font-weight: var(--c-field-placeholder-weight, 400) !important;
+}
+
+${scopedClass(scopeSelector, '.ss-address-field')} {
+  overflow: visible !important;
 }
 
 ${scopedDescendant(scopeSelector, '.ss-address-field .ant-select-selector')},
@@ -1054,7 +1059,12 @@ ${scopedDescendant(scopeSelector, '.ss-address-field.field-float--filled .select
 
 ${scopedDescendant(scopeSelector, '.ss-address-field.field-float .ant-select-selection-item')},
 ${scopedDescendant(scopeSelector, '.ss-address-field.field-float .ant-select-selection-placeholder')} {
-  line-height: 18px !important;
+  font-size: var(--c-field-placeholder-size, var(--c-field-font-size, 16px)) !important;
+  line-height: 1.4 !important;
+}
+
+${scopedDescendant(scopeSelector, '.ss-address-field .ant-select-dropdown')} {
+  min-width: 100% !important;
 }
 
 ${nativeSelectPlaceholderSelectors} {

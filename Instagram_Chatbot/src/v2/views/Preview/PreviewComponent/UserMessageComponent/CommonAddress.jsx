@@ -316,6 +316,7 @@ const CommonAddress = ({ content, prefecturesList, messageIndexRender, messageIn
           keyValue="id"
           nameValue="name"
           placeholder={selectPlaceholder}
+          dropdownMatchSelectWidth={true}
           onChange={(value) =>
             onChangeValue(contentIndex, content.type, value, "value_prefecture")
           }

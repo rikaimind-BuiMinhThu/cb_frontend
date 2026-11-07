@@ -2484,7 +2484,8 @@ slideUp
 .field-float .ss-input-value,
 .field-float textarea {
   padding: 8px 12px !important;
-  line-height: 18px;
+  font-size: var(--c-field-placeholder-size, var(--c-field-font-size, 16px)) !important;
+  line-height: 1.4 !important;
   box-sizing: border-box;
   min-height: 55px !important;
   height: 55px !important;
@@ -2500,6 +2501,10 @@ slideUp
 .field-float--filled textarea {
   padding-top: 18px !important;
   padding-bottom: 6px !important;
+}
+
+.ss-address-field {
+  overflow: visible;
 }
 
 .ss-address-field .ant-select,
@@ -2541,7 +2546,12 @@ slideUp
 
 .ss-address-field.field-float .ant-select-selection-item,
 .ss-address-field.field-float .ant-select-selection-placeholder {
-  line-height: 18px !important;
+  font-size: var(--c-field-placeholder-size, var(--c-field-font-size, 16px)) !important;
+  line-height: 1.4 !important;
+}
+
+.ss-address-field .ant-select-dropdown {
+  min-width: 100% !important;
 }
 
 /* Open-frame header avatar matches the closed bar (58px). */
