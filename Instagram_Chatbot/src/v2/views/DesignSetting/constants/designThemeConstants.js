@@ -111,6 +111,7 @@ export const THEME_FIELD_KEYS = [
   'headerCloseIcon',
   'headerCloseIconColor',
   'headerBgColor',
+  'headerLogoImage',
   'headerHeight',
   'progressBarBgColor',
   'progressBarTextColor',
@@ -276,6 +277,12 @@ export const THEME_SECTIONS = [
       },
       { key: 'headerCloseIconColor', label: '閉じるアイコンの色' },
       { key: 'headerBgColor', label: '背景色' },
+      {
+        key: 'headerLogoImage',
+        label: 'ロゴ画像',
+        fieldType: 'imageUpload',
+        fullWidth: true,
+      },
       {
         key: 'headerHeight',
         label: '高さ',

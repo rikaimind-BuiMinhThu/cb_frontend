@@ -21,6 +21,7 @@ const ALT_BOT_HEADER_ICON = "bot-header-icon";
 const OPEN_ANIMATION_FALLBACK_MS = 1200;
 const HEADER_CLASS_BASE = "sp-header preview-open-frame__header";
 const HEADER_CLASS_TITLE_ONLY = "sp-header--title-only";
+const HEADER_CLASS_LOGO = "sp-header--logo";
 
 const OPEN_ANIMATION_CLASS_NAMES = [
   "slideUp",
@@ -141,6 +142,9 @@ const PreviewOpenChatFrame = ({
     : toNumber(botConfig?.positionPc, 1);
   const isVerticalPosition = position === VERTICAL_POSITION;
   const isTitleOnlyChrome = themeSettings?.headerChrome === HEADER_CHROME_TITLE_ONLY;
+  const hasHeaderLogo = Boolean(
+    themeSettings?.headerLogoImage || themeSettings?.header_logo_image,
+  );
   const headerArrowIcon = resolveHeaderArrowIcon(
     isVerticalPosition,
     isOpen,
@@ -149,6 +153,7 @@ const PreviewOpenChatFrame = ({
   const headerClassName = [
     HEADER_CLASS_BASE,
     isTitleOnlyChrome ? HEADER_CLASS_TITLE_ONLY : "",
+    hasHeaderLogo ? HEADER_CLASS_LOGO : "",
   ]
     .filter(Boolean)
     .join(" ");

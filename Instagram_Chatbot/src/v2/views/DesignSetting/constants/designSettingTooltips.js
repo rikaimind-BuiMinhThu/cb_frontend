@@ -30,6 +30,7 @@ export const DESIGN_SETTING_TOOLTIPS = {
   headerCloseIcon: 'チャットを閉じるときにヘッダー右端に表示するアイコンです。矢印または×から選べます。',
   headerCloseIconColor: 'ヘッダー右端の閉じるアイコン（矢印または×）の色です。ヘッダー背景色とのコントラストに注意してください。',
   headerBgColor: 'ヘッダーの背景色です。空欄の場合はメインカラーが使われます。',
+  headerLogoImage: 'ヘッダー中央に表示するロゴ画像です。設定するとタイトルとアバターの代わりにロゴが表示されます。',
   headerHeight: 'ヘッダーの高さです。単位は px です。空欄のときは最小 74px のままです。',
   botMessageBold: 'ボットの吹き出し文字を太字にします。',
   userMessageBold: 'ユーザー側の吹き出し文字を太字にします。',
