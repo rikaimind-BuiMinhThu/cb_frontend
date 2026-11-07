@@ -8,7 +8,6 @@ import {
   LEXICA_ORDER_RESULT_MODE_WAIT,
 } from '../../../utils/lexicaScenario';
 import ScenarioFormRow from '../shared/ScenarioFormRow';
-import ScenarioModalCheckbox from '../shared/ScenarioModalCheckbox';
 import ScenarioModalFooter from '../shared/ScenarioModalFooter';
 import { SCENARIO_MODAL_TOOLTIPS } from '../shared/scenarioModalTooltips';
 
@@ -55,20 +54,6 @@ const ScenarioLexicaCartView = ({ onBack }) => {
           placeholder={LEXICA_CART_LABELS.cartUrlPlaceholder}
         />
       </ScenarioFormRow>
-      <div className="ss-layout-checkbox-item">
-        <ScenarioModalCheckbox
-          checked={lexica.lexicaOfferConfirmUpsell}
-          onChange={(checked) => setLexicaField('lexicaOfferConfirmUpsell', checked)}
-          label={LEXICA_CART_LABELS.confirmUpsell}
-        />
-      </div>
-      <div className="ss-layout-checkbox-item">
-        <ScenarioModalCheckbox
-          checked={lexica.lexicaOfferConfirmCrossSell}
-          onChange={(checked) => setLexicaField('lexicaOfferConfirmCrossSell', checked)}
-          label={LEXICA_CART_LABELS.confirmCrossSell}
-        />
-      </div>
       <ScenarioModalFooter
         onClose={onBack}
         showConfirm={false}

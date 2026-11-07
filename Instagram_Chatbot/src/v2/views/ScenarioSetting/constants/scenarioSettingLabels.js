@@ -385,8 +385,6 @@ export const LEXICA_CART_LABELS = {
   productSku: '商品SKUコード',
   cartUrl: 'カートURL',
   cartUrlPlaceholder: 'https://cart.example.com',
-  confirmUpsell: '確認画面でアップセル活用',
-  confirmCrossSell: '確認画面でクロスセル活用',
 };
 
 export const ADDRESS_FIELD_MODAL_LABELS = {

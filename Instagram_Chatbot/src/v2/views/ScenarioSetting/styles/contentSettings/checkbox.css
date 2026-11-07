@@ -174,6 +174,10 @@
   grid-template-columns: 1fr;
 }
 
+.ss-checkbox-img-layout-section__controls-row--with-width {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .ss-checkbox-img-layout-section__control {
   min-width: 0;
 }
@@ -240,7 +244,8 @@
 }
 
 @media (max-width: 480px) {
-  .ss-checkbox-img-layout-section__controls-row {
+  .ss-checkbox-img-layout-section__controls-row,
+  .ss-checkbox-img-layout-section__controls-row--with-width {
     grid-template-columns: 1fr;
   }
 

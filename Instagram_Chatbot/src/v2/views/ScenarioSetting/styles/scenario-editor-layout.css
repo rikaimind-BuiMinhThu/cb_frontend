@@ -49,6 +49,18 @@
    Scenario Editor Layout v2 — grid/flex shell (scoped under .ss-editor-layout-v2)
    ============================================================================= */
 
+.ss-editor-layout-v2 .ant-select-dropdown {
+  width: max-content !important;
+  min-width: 100%;
+}
+
+.ss-editor-layout-v2 .ant-select-item-option,
+.ss-editor-layout-v2 .ant-select-item-option-content {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
 .ss-editor-layout-v2 {
   display: grid;
   grid-template-columns: 1fr 1fr;

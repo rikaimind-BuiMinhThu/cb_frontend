@@ -1140,11 +1140,8 @@ input#ss-message__content--user-radio_button,
   justify-content: space-between;
 }
 
-.ss-user-setting__item-select-bottom-wrapper>div {
-  width: 49%;
-}
-
-.ss-user-setting__item-select-bottom-wrapper-flex>div {
+.ss-user-setting__item-select-bottom-wrapper>div:not(.ant-select-dropdown),
+.ss-user-setting__item-select-bottom-wrapper-flex>div:not(.ant-select-dropdown) {
   width: 49%;
 }
 

@@ -88,6 +88,13 @@ const CheckboxImgLayoutSection = ({ checkbox, changeContent }) => {
   const widthSum = showCustomWidths
     ? sumCustomWidths(layout.custom_widths.slice(0, customColumnCount))
     : 100;
+  const controlsRowClassName = [
+    'ss-checkbox-img-layout-section__controls-row',
+    !isHorizontal ? 'ss-checkbox-img-layout-section__controls-row--single' : '',
+    isHorizontal && !isScrollEnabled
+      ? 'ss-checkbox-img-layout-section__controls-row--with-width'
+      : '',
+  ].filter(Boolean).join(' ');
 
   return (
     <div className="ss-checkbox-img-layout-section">
@@ -95,7 +102,7 @@ const CheckboxImgLayoutSection = ({ checkbox, changeContent }) => {
         {RADIO_IMG_LAYOUT_SECTION_LABELS.title}
       </div>
 
-      <div className={`ss-checkbox-img-layout-section__controls-row${!isHorizontal ? ' ss-checkbox-img-layout-section__controls-row--single' : ''}`}>
+      <div className={controlsRowClassName}>
         <div className="ss-checkbox-img-layout-section__control">
           <span className="ss-checkbox-img-layout-section__label">
             {RADIO_IMG_LAYOUT_SECTION_LABELS.direction}
