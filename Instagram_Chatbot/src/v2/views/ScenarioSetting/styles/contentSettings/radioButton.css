@@ -210,14 +210,6 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-.ss-radio-button-img-layout-section__vertical-align-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 12px;
-  margin-bottom: 12px;
-  max-width: 25%;
-}
-
 .ss-radio-button-img-layout-section__control {
   min-width: 0;
 }
@@ -279,6 +271,10 @@
   gap: 16px;
 }
 
+.ss-radio-button-img-layout-section__spacing-row--with-vertical-align {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .ss-radio-button-img-layout-section__spacing-field {
   min-width: 0;
 }
@@ -289,11 +285,8 @@
     grid-template-columns: 1fr;
   }
 
-  .ss-radio-button-img-layout-section__vertical-align-row {
-    max-width: none;
-  }
-
-  .ss-radio-button-img-layout-section__spacing-row {
+  .ss-radio-button-img-layout-section__spacing-row,
+  .ss-radio-button-img-layout-section__spacing-row--with-vertical-align {
     grid-template-columns: 1fr;
   }
 }

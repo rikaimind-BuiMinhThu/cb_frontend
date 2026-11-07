@@ -172,24 +172,6 @@ const RadioButtonImgLayoutSection = ({ radioButton, changeContent, showVerticalA
         )}
       </div>
 
-      {showVerticalAlignControl && (
-        <div className="ss-radio-button-img-layout-section__vertical-align-row">
-          <div className="ss-radio-button-img-layout-section__control">
-            <span className="ss-radio-button-img-layout-section__label">
-              {RADIO_IMG_LAYOUT_SECTION_LABELS.verticalAlign}
-            </span>
-            <SelectCustom
-              id={RADIO_IMG_LAYOUT_VERTICAL_ALIGN_SELECT_ID}
-              className="ss-radio-button-img-layout-section__select"
-              value={layout.option_vertical_align}
-              data={RADIO_IMG_VERTICAL_ALIGN_OPTIONS}
-              onChange={handleVerticalAlignChange}
-              keyValue="key"
-            />
-          </div>
-        </div>
-      )}
-
       {showCustomWidths && (
         <div className="ss-radio-button-img-layout-section__field">
           <span className="ss-radio-button-img-layout-section__label">
@@ -215,7 +197,29 @@ const RadioButtonImgLayoutSection = ({ radioButton, changeContent, showVerticalA
         </div>
       )}
 
-      <div className="ss-radio-button-img-layout-section__spacing-row">
+      <div
+        className={[
+          'ss-radio-button-img-layout-section__spacing-row',
+          showVerticalAlignControl
+            ? 'ss-radio-button-img-layout-section__spacing-row--with-vertical-align'
+            : '',
+        ].filter(Boolean).join(' ')}
+      >
+        {showVerticalAlignControl && (
+          <div className="ss-radio-button-img-layout-section__spacing-field">
+            <span className="ss-radio-button-img-layout-section__label">
+              {RADIO_IMG_LAYOUT_SECTION_LABELS.verticalAlign}
+            </span>
+            <SelectCustom
+              id={RADIO_IMG_LAYOUT_VERTICAL_ALIGN_SELECT_ID}
+              className="ss-radio-button-img-layout-section__select"
+              value={layout.option_vertical_align}
+              data={RADIO_IMG_VERTICAL_ALIGN_OPTIONS}
+              onChange={handleVerticalAlignChange}
+              keyValue="key"
+            />
+          </div>
+        )}
         <div className="ss-radio-button-img-layout-section__spacing-field">
           <span className="ss-radio-button-img-layout-section__label">
             {RADIO_IMG_LAYOUT_SECTION_LABELS.optionPadding}
