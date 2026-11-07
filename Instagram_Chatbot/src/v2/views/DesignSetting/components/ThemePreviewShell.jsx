@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
+import { MDBIcon } from 'mdbreact';
 import { generateScopedThemeCss } from 'v2/utils/chatbotThemeCss';
 import { getDesignTypeClassName } from 'v2/utils/designTypeChrome';
 import {
@@ -12,15 +13,18 @@ import {
   THEME_PREVIEW_SAMPLE_TITLE,
 } from '../constants/designChatbotConstants';
 import {
-  HEADER_CHROME_LOGO,
+  HEADER_CHROME_TITLE_ONLY,
+  HEADER_CLOSE_ICON_TIMES,
   PROGRESS_LABEL_MODE_FRACTION,
 } from '../constants/designThemeConstants';
 import { PreviewThemeContext } from 'v2/views/Preview/PreviewComponent/PreviewThemeContext';
 import PreviewRegion from './PreviewRegion';
 
 const HEADER_CLASS_BASE = 'sp-header theme-customize-preview__header';
-const HEADER_CLASS_LOGO = 'sp-header--logo';
+const HEADER_CLASS_TITLE_ONLY = 'sp-header--title-only';
 const PROCESS_BAR_FRACTION_CLASS = 'sp-process-bar--fraction';
+const ICON_CHEVRON_CIRCLE_DOWN = 'chevron-circle-down';
+const ICON_TIMES = 'times';
 
 const ThemePreviewShell = ({
   scopeId,
@@ -55,9 +59,15 @@ const ThemePreviewShell = ({
   const displayTitle = title || (showPlaceholderLabels ? THEME_PREVIEW_SAMPLE_TITLE : '');
   const displaySubtitle = subtitle || (showPlaceholderLabels ? THEME_PREVIEW_SAMPLE_SUBTITLE : '');
   const barWidth = `${Math.min(Math.max(processPercent, 0), 100)}%`;
-  const isLogoChrome = themeSettings?.headerChrome === HEADER_CHROME_LOGO;
+  const isTitleOnlyChrome = themeSettings?.headerChrome === HEADER_CHROME_TITLE_ONLY;
   const isFractionProgress = themeSettings?.progressLabelMode === PROGRESS_LABEL_MODE_FRACTION;
-  const headerClassName = [HEADER_CLASS_BASE, isLogoChrome ? HEADER_CLASS_LOGO : '']
+  const headerCloseIcon = themeSettings?.headerCloseIcon === HEADER_CLOSE_ICON_TIMES
+    ? ICON_TIMES
+    : ICON_CHEVRON_CIRCLE_DOWN;
+  const headerClassName = [
+    HEADER_CLASS_BASE,
+    isTitleOnlyChrome ? HEADER_CLASS_TITLE_ONLY : '',
+  ]
     .filter(Boolean)
     .join(' ');
   const processBarClassName = [
@@ -69,9 +79,6 @@ const ThemePreviewShell = ({
     [THEME_CSS_VAR_PROGRESS_WIDTH]: barWidth,
     ...(themeSettings?.headerBgColor
       ? { '--pof-header-bg': themeSettings.headerBgColor }
-      : {}),
-    ...(themeSettings?.headerLogoImage
-      ? { '--c-header-logo-image': `url("${themeSettings.headerLogoImage}")` }
       : {}),
   };
   const designTypeClass = getDesignTypeClassName(designType);
@@ -111,6 +118,11 @@ const ThemePreviewShell = ({
               </div>
             </div>
           </PreviewRegion>
+          <div className="sp-header-right">
+            <div className="sp-header-right-arrow">
+              <MDBIcon fas icon={headerCloseIcon} />
+            </div>
+          </div>
         </div>
       </PreviewRegion>
 

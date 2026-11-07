@@ -8,6 +8,7 @@ import {
   resolveButtonPositionJustify,
   resolveButtonWidthCss,
   resolveFieldFocusEffect,
+  resolveHeaderTitleJustify,
   resolveModalTitleTextAlign,
   resolveMainColorContext,
   hasExplicitThemeValue,
@@ -181,11 +182,14 @@ const combineScopedFieldSelectors = (scopeSelector, builder) =>
 
 const themeIsBold = (value) => value === true || value === 'true' || value === 1 || value === '1';
 
+const themeIsOff = (value) => value === false || value === 'false' || value === 0 || value === '0';
+
 const buildThemeVariables = (theme) => {
   const buttonWidth = resolveButtonWidthCss(theme.buttonWidth);
   const buttonPadding = resolveButtonPaddingCss(theme.buttonPadding);
   const buttonBorderRadius = resolveButtonBorderRadius(theme.buttonBorderStyle);
   const buttonPositionJustify = resolveButtonPositionJustify(theme.buttonPosition);
+  const headerTitleJustify = resolveHeaderTitleJustify(theme.headerTitleAlignment);
 
   return `
   --c-header-title-text: ${theme.headerTitleTextColor};
@@ -194,6 +198,7 @@ const buildThemeVariables = (theme) => {
   --c-header-subtitle-text: ${theme.headerSubtitleTextColor};
   --c-header-subtitle-font-size: ${theme.headerSubtitleFontSize};
   --c-header-subtitle-weight: ${themeIsBold(theme.headerSubtitleBold) ? 700 : 400};
+  --c-header-title-justify: ${headerTitleJustify};
   --c-header-bg: ${theme.headerBgColor || 'transparent'};
   --c-header-logo-image: ${theme.headerLogoImage ? `url("${theme.headerLogoImage}")` : 'none'};
   ${theme.headerHeight ? `--c-header-height: ${theme.headerHeight};` : ''}
@@ -796,6 +801,10 @@ ${scopedClass(scopeSelector, '.sp-process-bar-color')} {
   return `
 ${twinkleKeyframesCss}
 ${headerBgOverride}
+${scopedClass(scopeSelector, '.sp-header-left')} {
+  justify-content: var(--c-header-title-justify, flex-start) !important;
+}
+
 ${scopedClass(scopeSelector, '.sp-header-left-label-title')} {
   color: var(--c-header-title-text, #fff) !important;
   font-size: var(--c-header-title-font-size, 15px) !important;
@@ -806,6 +815,13 @@ ${scopedClass(scopeSelector, '.sp-header-left-label-sub-title')} {
   color: var(--c-header-subtitle-text, #fff) !important;
   font-size: var(--c-header-subtitle-font-size, 14px) !important;
   font-weight: var(--c-header-subtitle-weight, 400) !important;
+  ${themeIsOff(theme.headerSubtitleVisible) ? 'display: none !important;' : ''}
+}
+
+${scopedClass(scopeSelector, '.sp-header--title-only .sp-avatar-bt')},
+${scopedClass(scopeSelector, '.preview-open-frame__header.sp-header--title-only .sp-avatar-bt')},
+${scopedClass(scopeSelector, '.theme-customize-preview__header.sp-header--title-only .sp-avatar-bt')} {
+  display: none !important;
 }
 
 ${scopedClass(scopeSelector, '.sp-header--logo')},

@@ -40,11 +40,26 @@ export const BUTTON_EFFECT_OPTIONS = [
 export const BUTTON_EFFECT_IDS = BUTTON_EFFECT_OPTIONS.map(({ id }) => id);
 
 export const HEADER_CHROME_OPTIONS = [
-  { id: 'text', label: 'テキスト' },
-  { id: 'logo', label: 'ロゴ' },
+  { id: 'title_only', label: 'タイトルのみ' },
+  { id: 'icon_and_title', label: 'アイコンとタイトル' },
 ];
 
 export const HEADER_CHROME_IDS = HEADER_CHROME_OPTIONS.map(({ id }) => id);
+
+export const HEADER_TITLE_ALIGNMENT_OPTIONS = [
+  { id: 'left', label: '左' },
+  { id: 'center', label: '中央' },
+  { id: 'right', label: '右' },
+];
+
+export const HEADER_TITLE_ALIGNMENT_IDS = HEADER_TITLE_ALIGNMENT_OPTIONS.map(({ id }) => id);
+
+export const HEADER_CLOSE_ICON_OPTIONS = [
+  { id: 'chevron', label: '矢印' },
+  { id: 'times', label: '×' },
+];
+
+export const HEADER_CLOSE_ICON_IDS = HEADER_CLOSE_ICON_OPTIONS.map(({ id }) => id);
 
 export const PROGRESS_LABEL_MODE_OPTIONS = [
   { id: 'remaining', label: 'あとN問' },
@@ -80,13 +95,15 @@ export const THEME_FIELD_KEYS = [
   'headerTitleTextColor',
   'headerTitleFontSize',
   'headerTitleBold',
+  'headerSubtitleVisible',
   'headerSubtitleTextColor',
   'headerSubtitleFontSize',
   'headerSubtitleBold',
   'headerChrome',
+  'headerTitleAlignment',
+  'headerCloseIcon',
   'headerBgColor',
   'headerHeight',
-  'headerLogoImage',
   'progressBarBgColor',
   'progressBarTextColor',
   'progressBarFontSize',
@@ -202,14 +219,47 @@ export const THEME_SECTIONS = [
       { key: 'headerTitleFontSize', label: 'フォントサイズ', fieldType: 'fontSize' },
       { key: 'headerTitleBold', label: '太字', fieldType: 'checkbox', fullWidth: true },
       { fieldType: 'groupLabel', label: 'サブタイトル', fullWidth: true },
-      { key: 'headerSubtitleTextColor', label: '文字色' },
-      { key: 'headerSubtitleFontSize', label: 'フォントサイズ', fieldType: 'fontSize' },
-      { key: 'headerSubtitleBold', label: '太字', fieldType: 'checkbox', fullWidth: true },
+      {
+        key: 'headerSubtitleVisible',
+        label: '表示',
+        fieldType: 'checkbox',
+        fullWidth: true,
+      },
+      {
+        key: 'headerSubtitleTextColor',
+        label: '文字色',
+        visibleWhen: { key: 'headerSubtitleVisible', value: true },
+      },
+      {
+        key: 'headerSubtitleFontSize',
+        label: 'フォントサイズ',
+        fieldType: 'fontSize',
+        visibleWhen: { key: 'headerSubtitleVisible', value: true },
+      },
+      {
+        key: 'headerSubtitleBold',
+        label: '太字',
+        fieldType: 'checkbox',
+        fullWidth: true,
+        visibleWhen: { key: 'headerSubtitleVisible', value: true },
+      },
       { fieldType: 'groupLabel', label: 'ヘッダー見た目', fullWidth: true },
       {
         key: 'headerChrome',
         label: '表示',
         fieldType: 'headerChromeSelect',
+        fullWidth: true,
+      },
+      {
+        key: 'headerTitleAlignment',
+        label: '配置',
+        fieldType: 'headerTitleAlignmentSelect',
+        fullWidth: true,
+      },
+      {
+        key: 'headerCloseIcon',
+        label: '閉じるアイコン',
+        fieldType: 'headerCloseIconSelect',
         fullWidth: true,
       },
       { key: 'headerBgColor', label: '背景色' },
@@ -220,13 +270,6 @@ export const THEME_SECTIONS = [
         min: 34,
         max: 120,
         fullWidth: true,
-      },
-      {
-        key: 'headerLogoImage',
-        label: 'ロゴ画像',
-        fieldType: 'imageUpload',
-        fullWidth: true,
-        visibleWhen: { key: 'headerChrome', value: 'logo' },
       },
     ],
   },
@@ -504,7 +547,10 @@ export const THEME_IMAGE_REMOVE_LABEL = '削除';
 export const THEME_IMAGE_UPLOAD_ALT = 'header logo';
 export const THEME_PREVIEW_PROCESS_FRACTION_LABEL = '1/6';
 export const THEME_PREVIEW_PROCESS_REMAINING_LABEL = 'あと6問';
-export const HEADER_CHROME_LOGO = 'logo';
+export const HEADER_CHROME_TITLE_ONLY = 'title_only';
+export const HEADER_CHROME_ICON_AND_TITLE = 'icon_and_title';
+export const HEADER_CLOSE_ICON_CHEVRON = 'chevron';
+export const HEADER_CLOSE_ICON_TIMES = 'times';
 export const FIELD_PLACEHOLDER_STYLE_FLOAT = 'float';
 export const PROGRESS_LABEL_MODE_FRACTION = 'fraction';
 export const PROGRESS_LABEL_MODE_REMAINING = 'remaining';

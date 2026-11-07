@@ -18,7 +18,9 @@ const BUTTON_EFFECT_IDS = ['none', 'bounce', 'shake'];
 const BUTTON_POSITION_IDS = ['left', 'center', 'right'];
 const MESSAGE_BORDER_STYLE_IDS = ['with_tail', 'no_tail'];
 const MODAL_TITLE_ALIGNMENT_IDS = ['left', 'center', 'right'];
-const HEADER_CHROME_IDS = ['text', 'logo'];
+const HEADER_CHROME_IDS = ['title_only', 'icon_and_title'];
+const HEADER_TITLE_ALIGNMENT_IDS = ['left', 'center', 'right'];
+const HEADER_CLOSE_ICON_IDS = ['chevron', 'times'];
 const PROGRESS_LABEL_MODE_IDS = ['remaining', 'fraction'];
 const FIELD_PLACEHOLDER_STYLE_IDS = ['native', 'float'];
 
@@ -26,13 +28,15 @@ export const THEME_FIELD_KEYS = [
   'headerTitleTextColor',
   'headerTitleFontSize',
   'headerTitleBold',
+  'headerSubtitleVisible',
   'headerSubtitleTextColor',
   'headerSubtitleFontSize',
   'headerSubtitleBold',
   'headerChrome',
+  'headerTitleAlignment',
+  'headerCloseIcon',
   'headerBgColor',
   'headerHeight',
-  'headerLogoImage',
   'progressBarBgColor',
   'progressBarTextColor',
   'progressBarFontSize',
@@ -122,13 +126,15 @@ export const CAMEL_TO_SNAKE_THEME = {
   headerTitleTextColor: 'header_title_text_color',
   headerTitleFontSize: 'header_title_font_size',
   headerTitleBold: 'header_title_bold',
+  headerSubtitleVisible: 'header_subtitle_visible',
   headerSubtitleTextColor: 'header_subtitle_text_color',
   headerSubtitleFontSize: 'header_subtitle_font_size',
   headerSubtitleBold: 'header_subtitle_bold',
   headerChrome: 'header_chrome',
+  headerTitleAlignment: 'header_title_alignment',
+  headerCloseIcon: 'header_close_icon',
   headerBgColor: 'header_bg_color',
   headerHeight: 'header_height',
-  headerLogoImage: 'header_logo_image',
   progressBarBgColor: 'progress_bar_bg_color',
   progressBarTextColor: 'progress_bar_text_color',
   progressBarFontSize: 'progress_bar_font_size',
@@ -254,6 +260,8 @@ const VALID_BUTTON_POSITION_IDS = new Set(BUTTON_POSITION_IDS);
 const VALID_MESSAGE_BORDER_STYLE_IDS = new Set(MESSAGE_BORDER_STYLE_IDS);
 const VALID_MODAL_TITLE_ALIGNMENT_IDS = new Set(MODAL_TITLE_ALIGNMENT_IDS);
 const VALID_HEADER_CHROME_IDS = new Set(HEADER_CHROME_IDS);
+const VALID_HEADER_TITLE_ALIGNMENT_IDS = new Set(HEADER_TITLE_ALIGNMENT_IDS);
+const VALID_HEADER_CLOSE_ICON_IDS = new Set(HEADER_CLOSE_ICON_IDS);
 const VALID_PROGRESS_LABEL_MODE_IDS = new Set(PROGRESS_LABEL_MODE_IDS);
 const VALID_FIELD_PLACEHOLDER_STYLE_IDS = new Set(FIELD_PLACEHOLDER_STYLE_IDS);
 
@@ -276,6 +284,12 @@ const MODAL_TITLE_TEXT_ALIGN = {
   left: 'left',
   center: 'center',
   right: 'right',
+};
+
+const HEADER_TITLE_JUSTIFY = {
+  left: 'flex-start',
+  center: 'center',
+  right: 'flex-end',
 };
 
 const TWINKLE_ANIMATION_BY_ELEMENT = {
@@ -340,9 +354,26 @@ export const normalizeButtonEffect = (value) => {
 };
 
 export const normalizeHeaderChrome = (value) => {
-  if (!value) return 'text';
+  if (!value || value === 'text' || value === 'logo') return 'icon_and_title';
   if (VALID_HEADER_CHROME_IDS.has(value)) return value;
-  return 'text';
+  return 'icon_and_title';
+};
+
+export const normalizeHeaderTitleAlignment = (value) => {
+  if (!value) return 'left';
+  if (VALID_HEADER_TITLE_ALIGNMENT_IDS.has(value)) return value;
+  return 'left';
+};
+
+export const normalizeHeaderCloseIcon = (value) => {
+  if (!value) return 'chevron';
+  if (VALID_HEADER_CLOSE_ICON_IDS.has(value)) return value;
+  return 'chevron';
+};
+
+export const resolveHeaderTitleJustify = (alignmentId) => {
+  const alignment = normalizeHeaderTitleAlignment(alignmentId);
+  return HEADER_TITLE_JUSTIFY[alignment] || HEADER_TITLE_JUSTIFY.left;
 };
 
 export const normalizeProgressLabelMode = (value) => {
@@ -556,13 +587,15 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
     headerTitleTextColor: '#ffffff',
     headerTitleFontSize: '15px',
     headerTitleBold: false,
+    headerSubtitleVisible: true,
     headerSubtitleTextColor: '#ffffff',
     headerSubtitleFontSize: '14px',
     headerSubtitleBold: false,
-    headerChrome: 'text',
+    headerChrome: 'icon_and_title',
+    headerTitleAlignment: 'left',
+    headerCloseIcon: 'chevron',
     headerBgColor: '',
     headerHeight: '',
-    headerLogoImage: '',
     progressBarBgColor: opacityColor,
     progressBarTextColor: '#ffffff',
     progressBarFontSize: '13px',
@@ -686,6 +719,10 @@ export const mergeThemeWithDefaults = (rawTheme, mainColorHex, apiColorKey) => {
   merged.buttonPosition = normalizeButtonPosition(merged.buttonPosition);
   merged.modalTitleAlignment = normalizeModalTitleAlignment(merged.modalTitleAlignment);
   merged.headerChrome = normalizeHeaderChrome(merged.headerChrome);
+  merged.headerTitleAlignment = normalizeHeaderTitleAlignment(merged.headerTitleAlignment);
+  merged.headerCloseIcon = normalizeHeaderCloseIcon(merged.headerCloseIcon);
+  merged.headerSubtitleVisible = merged.headerSubtitleVisible !== false
+    && merged.headerSubtitleVisible !== 'false';
   merged.progressLabelMode = normalizeProgressLabelMode(merged.progressLabelMode);
   merged.fieldPlaceholderStyle = normalizeFieldPlaceholderStyle(merged.fieldPlaceholderStyle);
 

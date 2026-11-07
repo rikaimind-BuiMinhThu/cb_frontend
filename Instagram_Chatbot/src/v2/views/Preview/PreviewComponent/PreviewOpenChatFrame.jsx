@@ -4,7 +4,10 @@ import PropTypes from "prop-types";
 import PreventExitChatbotModal from "./PreventExitChatbotModal";
 import { isMobile, toNumber } from "./Utils";
 import { getDesignTypeClassName } from "v2/utils/designTypeChrome";
-import { HEADER_CHROME_LOGO } from "v2/views/DesignSetting/constants/designThemeConstants";
+import {
+  HEADER_CHROME_TITLE_ONLY,
+  HEADER_CLOSE_ICON_TIMES,
+} from "v2/views/DesignSetting/constants/designThemeConstants";
 import { PreviewThemeContext } from "./PreviewThemeContext";
 import "v2/assets/css/bot/preview-chat-bot.css";
 
@@ -17,7 +20,7 @@ const ICON_TIMES = "times";
 const ALT_BOT_HEADER_ICON = "bot-header-icon";
 const OPEN_ANIMATION_FALLBACK_MS = 1200;
 const HEADER_CLASS_BASE = "sp-header preview-open-frame__header";
-const HEADER_CLASS_LOGO = "sp-header--logo";
+const HEADER_CLASS_TITLE_ONLY = "sp-header--title-only";
 
 const OPEN_ANIMATION_CLASS_NAMES = [
   "slideUp",
@@ -53,8 +56,8 @@ const applyCssVars = (element, cssVars = {}) => {
   });
 };
 
-const resolveHeaderArrowIcon = (isVerticalPosition, isOpen, isLogoChrome) => {
-  if (isLogoChrome && isOpen) return ICON_TIMES;
+const resolveHeaderArrowIcon = (isVerticalPosition, isOpen, closeIcon) => {
+  if (closeIcon === HEADER_CLOSE_ICON_TIMES) return ICON_TIMES;
   if (isVerticalPosition) {
     return isOpen ? ICON_CHEVRON_CIRCLE_RIGHT : ICON_CHEVRON_CIRCLE_LEFT;
   }
@@ -105,10 +108,7 @@ const PreviewOpenChatFrame = ({
     ...(themeSettings?.headerBgColor
       ? { "--pof-header-bg": themeSettings.headerBgColor }
       : {}),
-    ...(themeSettings?.headerLogoImage
-      ? { "--c-header-logo-image": `url("${themeSettings.headerLogoImage}")` }
-      : {}),
-  }), [cssVars, themeSettings?.headerBgColor, themeSettings?.headerLogoImage]);
+  }), [cssVars, themeSettings?.headerBgColor]);
 
   useEffect(() => {
     setOpenAnimationDone(false);
@@ -140,13 +140,16 @@ const PreviewOpenChatFrame = ({
     ? toNumber(botConfig?.positionSp, 1)
     : toNumber(botConfig?.positionPc, 1);
   const isVerticalPosition = position === VERTICAL_POSITION;
-  const isLogoChrome = themeSettings?.headerChrome === HEADER_CHROME_LOGO;
+  const isTitleOnlyChrome = themeSettings?.headerChrome === HEADER_CHROME_TITLE_ONLY;
   const headerArrowIcon = resolveHeaderArrowIcon(
     isVerticalPosition,
     isOpen,
-    isLogoChrome,
+    themeSettings?.headerCloseIcon,
   );
-  const headerClassName = [HEADER_CLASS_BASE, isLogoChrome ? HEADER_CLASS_LOGO : ""]
+  const headerClassName = [
+    HEADER_CLASS_BASE,
+    isTitleOnlyChrome ? HEADER_CLASS_TITLE_ONLY : "",
+  ]
     .filter(Boolean)
     .join(" ");
 

@@ -8,6 +8,8 @@ import {
   BUTTON_POSITION_OPTIONS,
   FIELD_PLACEHOLDER_STYLE_OPTIONS,
   HEADER_CHROME_OPTIONS,
+  HEADER_CLOSE_ICON_OPTIONS,
+  HEADER_TITLE_ALIGNMENT_OPTIONS,
   MESSAGE_BORDER_STYLE_OPTIONS,
   MODAL_TITLE_ALIGNMENT_OPTIONS,
   PROGRESS_LABEL_MODE_OPTIONS,
@@ -23,6 +25,8 @@ import {
   normalizeButtonPosition,
   normalizeFieldPlaceholderStyle,
   normalizeHeaderChrome,
+  normalizeHeaderCloseIcon,
+  normalizeHeaderTitleAlignment,
   normalizeMessageBorderStyle,
   normalizeModalTitleAlignment,
   normalizeProgressLabelMode,
@@ -229,6 +233,38 @@ const ThemeAccordionSection = ({
             tooltipKey={key}
             options={HEADER_CHROME_OPTIONS}
             normalizeValue={normalizeHeaderChrome}
+            onChange={(value) => onFieldChange(key, value)}
+          />
+        </div>
+      );
+    }
+
+    if (fieldType === 'headerTitleAlignmentSelect') {
+      return (
+        <div key={key} className={wrapperClassName}>
+          <ThemeEffectSelectField
+            label={label}
+            value={themeSettings[key]}
+            fullWidth={isFullWidth}
+            tooltipKey={key}
+            options={HEADER_TITLE_ALIGNMENT_OPTIONS}
+            normalizeValue={normalizeHeaderTitleAlignment}
+            onChange={(value) => onFieldChange(key, value)}
+          />
+        </div>
+      );
+    }
+
+    if (fieldType === 'headerCloseIconSelect') {
+      return (
+        <div key={key} className={wrapperClassName}>
+          <ThemeEffectSelectField
+            label={label}
+            value={themeSettings[key]}
+            fullWidth={isFullWidth}
+            tooltipKey={key}
+            options={HEADER_CLOSE_ICON_OPTIONS}
+            normalizeValue={normalizeHeaderCloseIcon}
             onChange={(value) => onFieldChange(key, value)}
           />
         </div>
