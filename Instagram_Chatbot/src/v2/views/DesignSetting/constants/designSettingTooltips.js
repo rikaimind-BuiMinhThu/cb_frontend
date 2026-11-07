@@ -47,7 +47,7 @@ export const DESIGN_SETTING_TOOLTIPS = {
   progressBarHeight: 'プログレスバーの高さです。単位は px です。',
   progressBarRadius: 'プログレスバーの角丸です。単位は px です。',
   progressBarFillColor: 'プログレスバーの塗りつぶし色です。空欄の場合はメインカラーが使われます。',
-  progressLabelMode: '進捗テキストの表示形式です。あとN問、または n/N（例: 1/6）から選べます。',
+  progressLabelMode: '進捗テキストのフォーマットです。あとN問、または n/N（例: 1/6）から選べます。',
   chatWindowBgColor: 'チャットウィンドウ全体の背景色です。プレビューのメッセージエリア背景に反映されます。',
   botMessageBgColor: 'ボット側の吹き出し背景色です。プレビュー左側のメッセージに反映されます。',
   botMessageTextColor: 'ボット側の吹き出し内テキストの文字色です。',
