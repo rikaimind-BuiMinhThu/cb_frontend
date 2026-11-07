@@ -35,15 +35,13 @@ const AgreeTermDetailBody = ({
   checkboxDisabled,
   design,
 }) => {
-  const hasDesign = Boolean(design);
   const resolved = resolveAgreeTermDesign(design);
   const titleText = title ?? '';
   const agreeTermForCollapse = {
     title_require: titleRequire,
     title: titleText,
   };
-  const collapseActive = hasDesign
-    && resolved.collapse.enabled
+  const collapseActive = resolved.collapse.enabled
     && canEnableAgreeTermCollapse(agreeTermForCollapse);
   const defaultCollapsed = resolved.collapse.default_collapsed;
   const [expanded, setExpanded] = useState(!collapseActive || !defaultCollapsed);
@@ -69,21 +67,19 @@ const AgreeTermDetailBody = ({
 
   const titleClassName = joinClasses([
     'ss-message__content--user-agree_to_term-title',
-    hasDesign ? 'ss-agree-term-design__title' : '',
-    hasDesign && resolved.title.bold ? 'ss-agree-term-design__title--bold' : '',
+    'ss-agree-term-design__title',
+    resolved.title.bold ? 'ss-agree-term-design__title--bold' : '',
     collapseActive ? 'ss-agree-term-design__title-button' : '',
   ]);
 
   const labelClassName = joinClasses([
-    hasDesign ? 'ss-agree-term-design__label' : '',
-    hasDesign && resolved.label.bold ? 'ss-agree-term-design__label--bold' : '',
+    'ss-agree-term-design__label',
+    resolved.label.bold ? 'ss-agree-term-design__label--bold' : '',
   ]);
 
-  const wrapperClassName = hasDesign ? 'ss-agree-term-design' : '';
-  const wrapperStyle = hasDesign ? buildAgreeTermDesignVars(resolved) : undefined;
-  const checkRowClassName = hasDesign
-    ? ALIGN_ROW_CLASS[resolved.align]
-    : '';
+  const wrapperClassName = 'ss-agree-term-design';
+  const wrapperStyle = buildAgreeTermDesignVars(resolved);
+  const checkRowClassName = ALIGN_ROW_CLASS[resolved.align];
 
   const handleAgreeChange = (checked) => {
     if (!onAgreeChange) return;
@@ -144,14 +140,11 @@ const AgreeTermDetailBody = ({
     />
   );
 
-  const renderCheckRow = () => {
-    if (!hasDesign) return renderCheckbox();
-    return (
-      <div className={checkRowClassName}>
-        {renderCheckbox()}
-      </div>
-    );
-  };
+  const renderCheckRow = () => (
+    <div className={checkRowClassName}>
+      {renderCheckbox()}
+    </div>
+  );
 
   return (
     <div className={wrapperClassName} style={wrapperStyle}>

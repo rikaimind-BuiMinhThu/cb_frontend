@@ -9,14 +9,19 @@ const isDetailAgreeTerm = (content) => {
   return content.agree_term?.type === AGREE_TERM_DETAIL_TYPE;
 };
 
-export const applyAgreeTermDesign = (messages, design) => {
+export const applyAgreeTermDesign = (messages, design, messageIndex, contentIndex) => {
   const normalized = resolveAgreeTermDesign(design);
-  return messages.map((message) => {
+  if (!Array.isArray(messages)) return messages;
+
+  return messages.map((message, msgIdx) => {
+    if (msgIdx !== messageIndex) return message;
     const contents = message.message_content;
     if (!Array.isArray(contents)) return message;
+
     return {
       ...message,
-      message_content: contents.map((content) => {
+      message_content: contents.map((content, contentIdx) => {
+        if (contentIdx !== contentIndex) return content;
         if (!isDetailAgreeTerm(content)) return content;
         return {
           ...content,

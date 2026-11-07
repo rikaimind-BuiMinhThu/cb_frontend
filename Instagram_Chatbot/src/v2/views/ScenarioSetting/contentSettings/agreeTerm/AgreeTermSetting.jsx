@@ -4,6 +4,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import {
   AGREE_TERM_CONTENT_TYPE,
   canEnableAgreeTermCollapse,
+  resolveAgreeTermDesign,
 } from 'v2/components/BotMessages/agreeTermDesign';
 import { agreeTermContentPropType } from 'v2/components/BotMessages/agreeTermPropTypes';
 import { mutateMessageContent } from 'v2/views/ScenarioSetting/utils/scenarioMessageMutations';
@@ -80,7 +81,22 @@ const AgreeTermSetting = (props) => {
   };
 
   const handleDesignChange = (nextDesign) => {
-    setDataMessages((current) => applyAgreeTermDesign(current, nextDesign));
+    setDataMessages((current) => applyAgreeTermDesign(
+      current,
+      nextDesign,
+      indexMessageSelect,
+      indexContent,
+    ));
+  };
+
+  const openDesignModal = () => {
+    setDataMessages((current) => applyAgreeTermDesign(
+      current,
+      resolveAgreeTermDesign(agreeTerm.design),
+      indexMessageSelect,
+      indexContent,
+    ));
+    setDesignOpen(true);
   };
 
   const renderTypeSelector = () => (
@@ -103,7 +119,7 @@ const AgreeTermSetting = (props) => {
         <button
           type="button"
           className="ss-agree-term-setting__design-btn"
-          onClick={() => setDesignOpen(true)}
+          onClick={openDesignModal}
         >
           {AGREE_TERM_LABELS.designButton}
         </button>
