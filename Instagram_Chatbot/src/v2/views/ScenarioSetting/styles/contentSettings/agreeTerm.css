@@ -54,49 +54,119 @@
   cursor: pointer;
 }
 
+.ss-agree-term-design-modal__card {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background: #fff;
+  padding: 12px 14px 4px;
+  margin-bottom: 12px;
+}
+
 .ss-agree-term-design-modal__section {
-  margin: 16px 0 8px;
+  margin: 0 0 10px;
   font-size: 14px;
   font-weight: 600;
   color: #222;
 }
 
-.ss-agree-term-design-modal__section:first-child {
-  margin-top: 0;
+.ss-agree-term-design-modal__sample {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background: #f8f9fa;
+  padding: 12px 14px 4px;
+  margin-bottom: 12px;
+}
+
+.ss-agree-term-design-modal__pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 16px;
+}
+
+.ss-agree-term-design-modal .ss-settings-form-row__label {
+  flex: 0 0 132px;
+}
+
+.ss-agree-term-design-modal__pair .ss-settings-form-row__label {
+  flex: 0 0 148px;
+}
+
+.ss-agree-term-design-modal__inline {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.ss-agree-term-design-modal__swatch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
 }
 
 .ss-agree-term-design-modal__color {
-  width: 48px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   padding: 0;
   border: 1px solid #d9d9d9;
+  border-radius: 4px;
   background: transparent;
+  cursor: pointer;
+}
+
+.ss-agree-term-design-modal__hex {
+  font-size: 12px;
+  color: #666;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 .ss-agree-term-design-modal__number {
-  width: 120px;
+  width: 88px !important;
+  max-width: 88px;
+  box-sizing: border-box;
+  padding: 6px 8px;
+  font-size: 14px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+}
+
+.ss-agree-term-design-modal__check {
+  margin: 0 0 10px 144px;
 }
 
 .ss-agree-term-design-modal__hint {
-  margin: 4px 0 0;
+  margin: 0 0 8px 144px;
   font-size: 12px;
   color: #6b7280;
 }
 
 .ss-agree-term-design-modal__align {
-  display: flex;
-  gap: 8px;
+  display: inline-flex;
 }
 
 .ss-agree-term-design-modal__align-btn {
   border: 1px solid #d9d9d9;
   background: #fff;
-  border-radius: 4px;
-  padding: 6px 12px;
+  border-radius: 0;
+  margin-left: -1px;
+  padding: 6px 16px;
   cursor: pointer;
 }
 
+.ss-agree-term-design-modal__align-btn:first-child {
+  border-radius: 4px 0 0 4px;
+  margin-left: 0;
+}
+
+.ss-agree-term-design-modal__align-btn:last-child {
+  border-radius: 0 4px 4px 0;
+}
+
 .ss-agree-term-design-modal__align-btn--active {
+  background: rgb(50, 122, 237);
   border-color: rgb(50, 122, 237);
-  color: rgb(50, 122, 237);
+  color: #fff;
+  position: relative;
+  z-index: 1;
 }

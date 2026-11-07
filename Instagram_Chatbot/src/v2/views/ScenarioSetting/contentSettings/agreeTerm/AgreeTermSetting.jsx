@@ -164,6 +164,9 @@ const AgreeTermSetting = (props) => {
         open={designOpen && showDesign}
         onClose={() => setDesignOpen(false)}
         design={agreeTerm.design}
+        title={agreeTerm.title ?? ''}
+        term={agreeTerm.term ?? ''}
+        termsText={agreeTerm.detail_content?.content ?? ''}
         canCollapse={canEnableAgreeTermCollapse(agreeTerm)}
         onChange={handleDesignChange}
       />
