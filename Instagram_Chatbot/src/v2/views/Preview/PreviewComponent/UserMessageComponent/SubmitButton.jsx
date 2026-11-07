@@ -15,10 +15,12 @@ const SubmitButton = ({
   onClickNext,
   isProcessing = false,
   isHidden = false,
+  disabled = false,
   messageIndex,
   contentIndex,
   message,
 }) => {
+  const isButtonDisabled = disabled || isProcessing;
   const buttonSubmit = content?.button_submit;
   const submitButtonId = `chatbot-submit-button-${message?.id ?? 'msg'}-${messageIndex}-${contentIndex}`;
 
@@ -120,6 +122,8 @@ const SubmitButton = ({
   };
 
   const onChangeAndClickNext = () => {
+    if (isButtonDisabled) return;
+
     onChangeValue(
       contentIndex,
       content.type,
@@ -142,6 +146,8 @@ const SubmitButton = ({
           {buttonSubmit?.style && <style dangerouslySetInnerHTML={{ __html: buttonSubmit.style }} />}
           <button
             id={submitButtonId}
+            type="button"
+            disabled={isButtonDisabled}
             className={[
               'chatbot-submit-button',
               imageUrl ? 'chatbot-submit-button--image' : '',
@@ -165,6 +171,7 @@ SubmitButton.propTypes = {
   onClickNext: PropTypes.func,
   isProcessing: PropTypes.bool,
   isHidden: PropTypes.bool,
+  disabled: PropTypes.bool,
 };
 
 export default SubmitButton;

@@ -34,15 +34,15 @@ html {
 #chatbot-submit-button,
 .chatbot-submit-button,
 [id^="chatbot-submit-button-"] {
-    background: linear-gradient(135deg, #4caf50, #43a047);
-    color: #fff;
+    background: var(--c-btn-normal-bg, #4caf50);
+    color: var(--c-btn-normal-text, #fff);
     border: none;
     border-radius: 25px;
     padding: 15px 30px;
     font-size: 20px;
     font-weight: bold;
     cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: none;
     transition: all 0.3s ease;
     width: 100%;
     box-sizing: border-box;
@@ -50,16 +50,37 @@ html {
 }
 #chatbot-submit-button:hover,
 .chatbot-submit-button:hover,
-[id^="chatbot-submit-button-"]:hover {
-    background: linear-gradient(135deg, #43a047, #4caf50);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    transform: translateY(-2px);
+[id^="chatbot-submit-button-"]:hover,
+#chatbot-submit-button:focus,
+.chatbot-submit-button:focus,
+[id^="chatbot-submit-button-"]:focus,
+#chatbot-submit-button:focus-visible,
+.chatbot-submit-button:focus-visible,
+[id^="chatbot-submit-button-"]:focus-visible {
+    background: var(--c-btn-normal-bg, #4caf50);
+    color: var(--c-btn-normal-text, #fff);
+    box-shadow: none;
+    transform: none;
 }
 #chatbot-submit-button:active,
 .chatbot-submit-button:active,
 [id^="chatbot-submit-button-"]:active {
-    transform: translateY(0);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background: var(--c-btn-pressed-bg, #43a047);
+    color: var(--c-btn-pressed-text, #fff);
+    box-shadow: none;
+    transform: none;
+}
+#chatbot-submit-button:disabled,
+.chatbot-submit-button:disabled,
+[id^="chatbot-submit-button-"]:disabled,
+#chatbot-submit-button.disabled,
+.chatbot-submit-button.disabled,
+[id^="chatbot-submit-button-"].disabled {
+    background: var(--c-btn-disabled-bg, #e0e0e0);
+    color: var(--c-btn-disabled-text, #999);
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
 }
 
 .chatbot-submit-button--image,
@@ -101,22 +122,6 @@ html {
 .ss-user-chat:has(.chatbot-submit-button:not(.chatbot-submit-button--image)),
 .sp-body-user-side:has(.chatbot-submit-button:not(.chatbot-submit-button--image)) {
     width: 100%;
-}
-
-.sp-body-user-side-messages:has(> .ss-user-message__content-wrapper--submit-only) {
-    background-color: transparent;
-    padding: 0;
-    border-radius: 0;
-}
-
-.sp-body-user-side-messages:has(> .ss-user-message__content-wrapper--submit-only) > .ss-user-message__content-wrapper--submit-only {
-    background-color: transparent;
-    padding: 0;
-    border-radius: 0;
-}
-
-.sp-body-user-side-messages:has(> .ss-user-message__content-wrapper--submit-only) .ss-user-chat-text-input-user-icon {
-    display: none;
 }
 
 .sp-container {

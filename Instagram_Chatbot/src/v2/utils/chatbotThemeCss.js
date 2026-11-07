@@ -575,35 +575,36 @@ const buildThemeRules = (theme, scopeSelector = '', options = {}) => {
     buttonBounceEffect.keyframesCss,
   ].filter(Boolean))].join('\n');
 
+  const textSubmitButtonThemeSelector = [
+    '.chatbot-submit-button:not(.chatbot-submit-button--image)',
+    '#chatbot-submit-button:not(.chatbot-submit-button--image)',
+    '[id^="chatbot-submit-button-"]:not(.chatbot-submit-button--image)',
+  ];
   const btnSelector = scopeSelector
     ? [
       scopedDescendant(scopeSelector, '.btn-preview-bot'),
       scopedDescendant(scopeSelector, '.sp-body .btn-new-bot'),
       scopedDescendant(scopeSelector, '.sp-body .ss-user-message__action-btn'),
-      scopedDescendant(scopeSelector, '.sp-body .chatbot-submit-button'),
-      scopedDescendant(scopeSelector, '.sp-body #chatbot-submit-button'),
-      scopedDescendant(scopeSelector, '.sp-body [id^="chatbot-submit-button-"]'),
+      ...textSubmitButtonThemeSelector.map(
+        (selector) => scopedDescendant(scopeSelector, `.sp-body ${selector}`),
+      ),
     ].join(', ')
     : [
       '.btn-preview-bot',
       '.sp-body .btn-new-bot',
       '.sp-body .ss-user-message__action-btn',
-      '.sp-body .chatbot-submit-button',
-      '.sp-body #chatbot-submit-button',
-      '.sp-body [id^="chatbot-submit-button-"]',
+      ...textSubmitButtonThemeSelector.map((selector) => `.sp-body ${selector}`),
     ].join(', ');
   const nextButtonSelector = scopeSelector
     ? [
       scopedDescendant(scopeSelector, '.sp-body .sp-user-message-button-action .ss-user-message__action-btn'),
-      scopedDescendant(scopeSelector, '.sp-body .chatbot-submit-button'),
-      scopedDescendant(scopeSelector, '.sp-body #chatbot-submit-button'),
-      scopedDescendant(scopeSelector, '.sp-body [id^="chatbot-submit-button-"]'),
+      ...textSubmitButtonThemeSelector.map(
+        (selector) => scopedDescendant(scopeSelector, `.sp-body ${selector}`),
+      ),
     ].join(', ')
     : [
       '.sp-body .sp-user-message-button-action .ss-user-message__action-btn',
-      '.sp-body .chatbot-submit-button',
-      '.sp-body #chatbot-submit-button',
-      '.sp-body [id^="chatbot-submit-button-"]',
+      ...textSubmitButtonThemeSelector.map((selector) => `.sp-body ${selector}`),
     ].join(', ');
   const nextButtonActionSelector = scopeSelector
     ? scopedDescendant(scopeSelector, '.sp-body .sp-user-message-button-action')
@@ -683,18 +684,6 @@ ${botMessageTailShowSelectors} {
     scopedDescendant(scopeSelector, '.ss-user-chat-text-input-user-icon path'),
     scopedDescendant(scopeSelector, '.theme-customize-preview__user-bubble-tail path'),
   ].join(',\n');
-  const submitOnlyShellSelector = scopedDescendant(
-    scopeSelector,
-    '.sp-body-user-side > .sp-body-user-side-messages:has(> .ss-user-message__content-wrapper--submit-only)',
-  );
-  const submitOnlyWrapperSelector = scopedDescendant(
-    scopeSelector,
-    '.sp-body-user-side > .sp-body-user-side-messages > .ss-user-message__content-wrapper--submit-only',
-  );
-  const submitOnlyTailIconSelector = scopedDescendant(
-    scopeSelector,
-    '.sp-body-user-side-messages:has(> .ss-user-message__content-wrapper--submit-only) .ss-user-chat-text-input-user-icon',
-  );
   const textSubmitButtonSelector = [
     '.chatbot-submit-button:not(.chatbot-submit-button--image)',
     '#chatbot-submit-button:not(.chatbot-submit-button--image)',
@@ -706,7 +695,8 @@ ${botMessageTailShowSelectors} {
 ${textSubmitButtonSelector},
 ${withPseudoOnEach(textSubmitButtonSelector, ':hover')},
 ${withPseudoOnEach(textSubmitButtonSelector, ':focus')},
-${withPseudoOnEach(textSubmitButtonSelector, ':focus-visible')} {
+${withPseudoOnEach(textSubmitButtonSelector, ':focus-visible')},
+${withPseudoOnEach(textSubmitButtonSelector, ':active')} {
   padding: 15px 30px !important;
   font-size: 20px !important;
   font-weight: bold !important;
@@ -714,31 +704,6 @@ ${withPseudoOnEach(textSubmitButtonSelector, ':focus-visible')} {
   width: 100% !important;
   max-width: 100% !important;
   box-sizing: border-box !important;
-  background: linear-gradient(135deg, #4caf50, #43a047) !important;
-  color: #fff !important;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
-}
-${withPseudoOnEach(textSubmitButtonSelector, ':active')} {
-  padding: 15px 30px !important;
-  font-size: 20px !important;
-  font-weight: bold !important;
-  border-radius: 25px !important;
-  background: linear-gradient(135deg, #43a047, #4caf50) !important;
-  color: #fff !important;
-}`;
-  const submitOnlyMessageRules = `
-${submitOnlyShellSelector} {
-  background-color: transparent !important;
-  padding: 0 !important;
-  border-radius: 0 !important;
-}
-${submitOnlyWrapperSelector} {
-  background-color: transparent !important;
-  padding: 0 !important;
-  border-radius: 0 !important;
-}
-${submitOnlyTailIconSelector} {
-  display: none !important;
 }`;
 
   const userMessageTailRules = userMessageBorderStyle === 'with_tail' ? `
@@ -1193,7 +1158,6 @@ ${userMessageWrapperDirectChildSelector}:has(.ss-message__content--user-zip-code
 }
 ${botMessageTailRules}
 ${userMessageTailRules}
-${submitOnlyMessageRules}
 
 ${buttonPositionRules}
 ${previewButtonPositionRule}

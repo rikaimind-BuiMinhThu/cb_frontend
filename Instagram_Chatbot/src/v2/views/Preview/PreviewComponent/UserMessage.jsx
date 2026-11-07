@@ -56,17 +56,6 @@ const CARD_PAYMENT_TYPE = {
   PICTURE_RADIO: "picture_radio",
 };
 const USER_MESSAGE_CONTENT_WRAPPER_CLASS = "ss-user-message__content-wrapper";
-const SUBMIT_ONLY_WRAPPER_CLASS =
-  "ss-user-message__content-wrapper--submit-only";
-
-const isTextOnlySubmitContent = (blocks) => {
-  if (!Array.isArray(blocks) || blocks.length === 0) return false;
-  return blocks.every(
-    (block) =>
-      block?.type === MESSAGE_CONTENT_TYPES.SUBMIT_BUTTON &&
-      !block?.button_submit?.button_image_url
-  );
-};
 
 const PULL_DOWN_DATE_ATTRS = {
   date_ym: { year: "valueYear", month: "valueMonth" },
@@ -573,6 +562,7 @@ const UserMessage = ({
             onClickNext={onClickNext}
             isProcessing={isProcessing}
             isHidden={isSubmitHidden}
+            disabled={disabled || isProcessing}
           />
         );
       case MESSAGE_CONTENT_TYPES.LABEL_NO_TRANSITION:
@@ -656,12 +646,8 @@ const UserMessage = ({
     }
   };
 
-  const contentWrapperClassName = isTextOnlySubmitContent(messageContent)
-    ? `${USER_MESSAGE_CONTENT_WRAPPER_CLASS} ${SUBMIT_ONLY_WRAPPER_CLASS}`
-    : USER_MESSAGE_CONTENT_WRAPPER_CLASS;
-
   return (
-    <div className={contentWrapperClassName}>
+    <div className={USER_MESSAGE_CONTENT_WRAPPER_CLASS}>
       {messageContent?.map((content, contentIndex) => (
         <React.Fragment key={contentIndex}>
           {renderContent(content, contentIndex)}
