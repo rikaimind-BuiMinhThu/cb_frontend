@@ -22,6 +22,7 @@ const ThemeCustomizeTab = ({
   designType,
   title,
   subtitle,
+  openingBotIcon,
   onFieldChange,
   onMainColorChange,
   onApplyDerivedTheme,
@@ -87,6 +88,7 @@ const ThemeCustomizeTab = ({
             designType={designType}
             title={title}
             subtitle={subtitle}
+            headerIconUrl={openingBotIcon}
             activeSectionId={activeSectionId}
             onSectionSelect={handleSectionSelect}
             showModalPreview={showModalInPreview}
@@ -142,6 +144,7 @@ ThemeCustomizeTab.propTypes = {
   designType: PropTypes.string,
   title: PropTypes.string,
   subtitle: PropTypes.string,
+  openingBotIcon: PropTypes.string,
   onFieldChange: PropTypes.func.isRequired,
   onMainColorChange: PropTypes.func.isRequired,
   onApplyDerivedTheme: PropTypes.func.isRequired,
@@ -154,6 +157,7 @@ ThemeCustomizeTab.defaultProps = {
   designType: '',
   title: '',
   subtitle: '',
+  openingBotIcon: '',
 };
 
 export default ThemeCustomizeTab;

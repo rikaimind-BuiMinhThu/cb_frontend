@@ -213,13 +213,7 @@
 }
 
 .theme-field--main-color {
-  align-items: flex-start;
-}
-
-.theme-field--main-color .theme-field__control {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  align-items: center;
 }
 
 .theme-field-group-label {
@@ -750,10 +744,12 @@
 }
 
 .theme-section__main-color-helper {
-  margin: 10px 0 0;
+  grid-column: 1 / -1;
+  margin: 0;
   font-size: 11px;
   line-height: 1.5;
   color: #888;
+  text-align: left;
 }
 
 .theme-field--highlighted .theme-field__label {

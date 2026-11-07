@@ -220,13 +220,17 @@ export const THEME_PREVIEW_REGIONS = [
   { sectionId: 'modal', label: 'モーダル', targets: ['modalPreview'] },
 ];
 
+export const THEME_MAIN_COLOR_HELPER =
+  'メインカラーを変更しても個別設定は自動では上書きされません。セクションごとに「デフォルトに戻す」で再計算できます。';
+
 export const THEME_SECTIONS = [
   {
     id: 'mainWindow',
     title: 'メインカラー・チャットウィンドウ',
     fields: [
-      { fieldType: 'mainColor', label: 'メインカラー', fullWidth: true },
+      { fieldType: 'mainColor', label: 'メインカラー' },
       { key: 'chatWindowBgColor', label: 'チャットウィンドウ背景色' },
+      { fieldType: 'helperText', text: THEME_MAIN_COLOR_HELPER, fullWidth: true },
     ],
   },
   {
@@ -278,12 +282,6 @@ export const THEME_SECTIONS = [
       },
       { key: 'headerCloseIconColor', label: '閉じるアイコンの色' },
       { key: 'headerBgColor', label: '背景色' },
-      {
-        key: 'headerLogoImage',
-        label: 'ロゴ画像',
-        fieldType: 'imageUpload',
-        fullWidth: true,
-      },
       {
         key: 'headerHeight',
         label: '高さ',
@@ -547,8 +545,6 @@ export const THEME_MAIN_COLOR_CONFIRM_TITLE = '確認';
 export const THEME_MAIN_COLOR_CONFIRM_MESSAGE = 'メインカラーに合わせて各項目を再計算しますか？';
 export const THEME_MAIN_COLOR_CONFIRM_OK = 'はい';
 export const THEME_MAIN_COLOR_CONFIRM_CANCEL = 'いいえ';
-export const THEME_MAIN_COLOR_HELPER =
-  'メインカラーを変更しても個別設定は自動では上書きされません。セクションごとに「デフォルトに戻す」で再計算できます。';
 export const THEME_RESET_SECTION_LABEL = 'デフォルトに戻す';
 export const THEME_SECTION_NAV_ARIA_LABEL = 'テーマ設定セクション';
 export const THEME_COLOR_TEXT_PLACEHOLDER = '例: 0 0 0 2px rgba(50,122,237,0.3)';

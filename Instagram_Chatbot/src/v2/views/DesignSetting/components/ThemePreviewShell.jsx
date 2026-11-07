@@ -23,7 +23,6 @@ import PreviewRegion from './PreviewRegion';
 
 const HEADER_CLASS_BASE = 'sp-header theme-customize-preview__header';
 const HEADER_CLASS_TITLE_ONLY = 'sp-header--title-only';
-const HEADER_CLASS_LOGO = 'sp-header--logo';
 const PROCESS_BAR_FRACTION_CLASS = 'sp-process-bar--fraction';
 const ICON_CHEVRON_CIRCLE_DOWN = 'chevron-circle-down';
 const ICON_TIMES = 'times';
@@ -62,9 +61,7 @@ const ThemePreviewShell = ({
   const displaySubtitle = subtitle || (showPlaceholderLabels ? THEME_PREVIEW_SAMPLE_SUBTITLE : '');
   const barWidth = `${Math.min(Math.max(processPercent, 0), 100)}%`;
   const isTitleOnlyChrome = themeSettings?.headerChrome === HEADER_CHROME_TITLE_ONLY;
-  const hasHeaderLogo = Boolean(
-    themeSettings?.headerLogoImage || themeSettings?.header_logo_image,
-  );
+  const showHeaderIcon = !isTitleOnlyChrome && Boolean(headerIconUrl);
   const progressBarStyle = resolveProgressBarStyle(
     themeSettings?.progressBarStyle,
     themeSettings?.progressLabelMode,
@@ -77,7 +74,6 @@ const ThemePreviewShell = ({
   const headerClassName = [
     HEADER_CLASS_BASE,
     isTitleOnlyChrome ? HEADER_CLASS_TITLE_ONLY : '',
-    hasHeaderLogo ? HEADER_CLASS_LOGO : '',
   ]
     .filter(Boolean)
     .join(' ');
@@ -118,11 +114,11 @@ const ThemePreviewShell = ({
             className="theme-preview-region--header-text"
           >
             <div className="sp-header-left">
-              {headerIconUrl && (
+              {showHeaderIcon ? (
                 <div className="sp-body-bot-side-avatar sp-avatar-bt">
                   <img src={headerIconUrl} alt={THEME_PREVIEW_HEADER_ICON_ALT} />
                 </div>
-              )}
+              ) : null}
               <div className="sp-header-left-label">
                 <div className="sp-header-left-label-sub-title">{displaySubtitle}</div>
                 <div className="sp-header-left-label-title">{displayTitle}</div>

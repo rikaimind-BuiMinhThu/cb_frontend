@@ -151,6 +151,9 @@ const DesignChatbot = ({ mode = MODE_EDIT }) => {
                   designType={state.basicInfo.designType}
                   title={state.basicInfo.title}
                   subtitle={state.basicInfo.subtitle}
+                  openingBotIcon={
+                    state.basicInfo.openingBotIcon || state.basicInfo.botImage
+                  }
                   onFieldChange={actions.updateThemeField}
                   onMainColorChange={actions.setMainColor}
                   onApplyDerivedTheme={actions.applyDerivedTheme}

@@ -185,6 +185,7 @@ const ThemeCustomizePreview = ({
   designType,
   title,
   subtitle,
+  headerIconUrl,
   activeSectionId,
   onSectionSelect,
   showModalPreview,
@@ -200,6 +201,7 @@ const ThemeCustomizePreview = ({
     designType={designType}
     title={title}
     subtitle={subtitle}
+    headerIconUrl={headerIconUrl}
     processLabel={processLabel}
     processPercent={PREVIEW_PROCESS_PERCENT}
     errorPreviewText={PREVIEW_SAMPLE_ERROR}
@@ -405,6 +407,7 @@ ThemeCustomizePreview.propTypes = {
   designType: PropTypes.string,
   title: PropTypes.string,
   subtitle: PropTypes.string,
+  headerIconUrl: PropTypes.string,
   activeSectionId: PropTypes.string,
   onSectionSelect: PropTypes.func,
   showModalPreview: PropTypes.bool,
@@ -415,6 +418,7 @@ ThemeCustomizePreview.defaultProps = {
   designType: '',
   title: '',
   subtitle: '',
+  headerIconUrl: '',
   activeSectionId: '',
   onSectionSelect: null,
   showModalPreview: true,

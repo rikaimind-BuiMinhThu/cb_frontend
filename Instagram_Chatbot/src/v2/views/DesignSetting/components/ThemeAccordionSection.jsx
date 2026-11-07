@@ -14,7 +14,6 @@ import {
   MODAL_TITLE_ALIGNMENT_OPTIONS,
   PROGRESS_BAR_STYLE_OPTIONS,
   PROGRESS_LABEL_MODE_OPTIONS,
-  THEME_MAIN_COLOR_HELPER,
   THEME_RESET_SECTION_LABEL,
 } from '../constants/designThemeConstants';
 import { DEFAULT_MAIN_COLOR } from '../constants/designChatbotConstants';
@@ -106,6 +105,17 @@ const ThemeAccordionSection = ({
       );
     }
 
+    if (fieldType === 'helperText') {
+      return (
+        <p
+          key={`helper-${index}`}
+          className="theme-section__main-color-helper theme-field--full"
+        >
+          {field.text}
+        </p>
+      );
+    }
+
     if (fieldType === 'mainColor') {
       return (
         <div
@@ -120,9 +130,6 @@ const ThemeAccordionSection = ({
           </DesignSettingLabel>
           <div className="theme-field__control">
             <MainColorPicker mainColor={mainColor} onChange={onMainColorChange} />
-            <p className="theme-section__main-color-helper">
-              {THEME_MAIN_COLOR_HELPER}
-            </p>
           </div>
         </div>
       );
@@ -492,7 +499,8 @@ ThemeAccordionSection.propTypes = {
   title: PropTypes.string.isRequired,
   fields: PropTypes.arrayOf(PropTypes.shape({
     key: PropTypes.string,
-    label: PropTypes.string.isRequired,
+    label: PropTypes.string,
+    text: PropTypes.string,
     isText: PropTypes.bool,
     fieldType: PropTypes.string,
     fullWidth: PropTypes.bool,
