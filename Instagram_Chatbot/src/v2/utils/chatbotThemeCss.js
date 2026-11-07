@@ -962,6 +962,17 @@ ${scopedClass(scopeSelector, '.field-float')} {
   width: 100% !important;
 }
 
+${scopedDescendant(scopeSelector, '.ss-message__split-row > .field-float')} {
+  flex: 0 0 49% !important;
+  width: 49% !important;
+  max-width: 49% !important;
+  min-width: 0 !important;
+}
+
+${scopedDescendant(scopeSelector, '.ss-message__split-row > .field-float > .ss-input-custom-container')} {
+  width: 100% !important;
+}
+
 ${scopedClass(scopeSelector, '.field-float__label')} {
   position: absolute !important;
   left: 8px !important;

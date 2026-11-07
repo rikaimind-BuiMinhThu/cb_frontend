@@ -2568,6 +2568,16 @@ slideUp
 }
 
 .ss-message__split-row { display: flex; justify-content: space-between; }
+/* Float wraps the 49% container; without this the flex item is 100% and the box is 49% of half the row. */
+.ss-message__split-row > .field-float {
+  flex: 0 0 49%;
+  width: 49% !important;
+  max-width: 49%;
+  min-width: 0;
+}
+.ss-message__split-row > .field-float > .ss-input-custom-container {
+  width: 100% !important;
+}
 .w-49-percent-flush { width: 49% !important; margin-bottom: 0; }
 .w-33-percent { width: 33% !important; }
 .m-l-0 { margin-left: 0; }
