@@ -42,6 +42,7 @@ export const DESIGN_SETTING_TOOLTIPS = {
   fieldTitleBold: '入力項目のタイトルを太字にします。',
   fieldTitleFontSize: '入力項目タイトルのフォントサイズです。空欄の場合は入力欄のフォントサイズを使います。',
   fieldTitleLetterSpacing: '入力項目タイトルの字間です。単位は px です。',
+  progressBarContainerBgColor: 'プログレスバー全体（キャプションとバーを含む外側）の背景色です。空欄の場合は透明です。スタイル2で反映されます。',
   progressBarBgColor: 'プログレスバーのトラック（未進捗部分）の背景色です。',
   progressBarTextColor: 'プログレスバー内の進捗テキストの文字色です。',
   progressBarFontSize: 'プログレスバー内の進捗テキストのフォントサイズです。単位は px です。',

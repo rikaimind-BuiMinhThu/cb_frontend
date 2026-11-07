@@ -203,6 +203,7 @@ const buildThemeVariables = (theme) => {
   --c-header-bg: ${theme.headerBgColor || 'transparent'};
   --c-header-logo-image: ${theme.headerLogoImage ? `url("${theme.headerLogoImage}")` : 'none'};
   ${theme.headerHeight ? `--c-header-height: ${theme.headerHeight};` : ''}
+  --c-progress-container-bg: ${theme.progressBarContainerBgColor || 'transparent'};
   --c-progress-bg: ${theme.progressBarBgColor};
   --c-progress-text: ${theme.progressBarTextColor};
   --c-progress-font-size: ${theme.progressBarFontSize};
@@ -868,7 +869,7 @@ ${scopedClass(scopeSelector, '.sp-process-bar-color')} {
 }
 
 ${scopedClass(scopeSelector, '.sp-process-bar--fraction')} {
-  background-color: transparent !important;
+  background-color: var(--c-progress-container-bg, transparent) !important;
   overflow: visible !important;
   border-radius: 0 !important;
   min-height: 0 !important;
