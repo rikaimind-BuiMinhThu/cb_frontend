@@ -999,6 +999,12 @@ ${scopedClass(scopeSelector, '.field-float textarea')} {
   padding: 8px 12px !important;
   line-height: 18px !important;
   box-sizing: border-box !important;
+  min-height: 55px !important;
+  height: 55px !important;
+}
+
+${scopedClass(scopeSelector, '.field-float .ss-input-custom-field--with-clear')} {
+  padding-right: 30px !important;
 }
 
 ${scopedClass(scopeSelector, '.field-float:focus-within .ss-input-value')},
@@ -1012,6 +1018,43 @@ ${scopedClass(scopeSelector, '.field-float--filled textarea')} {
 ${fieldScopeSelectors.map((fieldScope) => `${fieldScope} .ant-select-selection-placeholder`).join(',\n')} {
   font-size: var(--c-field-font-size, 14px) !important;
   font-weight: var(--c-field-placeholder-weight, 400) !important;
+}
+
+${scopedDescendant(scopeSelector, '.ss-address-field .ant-select-selector')},
+${scopedDescendant(scopeSelector, '.ss-address-field .select-custom-native')} {
+  background-color: var(--c-field-unfocus-bg, #EFF4FD) !important;
+  font-size: var(--c-field-font-size, 14px) !important;
+  font-weight: var(--c-field-text-weight, 400) !important;
+  box-sizing: border-box !important;
+}
+
+${scopedDescendant(scopeSelector, '.ss-address-field .ant-select-selection-placeholder')},
+${scopedDescendant(scopeSelector, '.ss-address-field .select-custom-native:has(option[value=""]:checked)')} {
+  font-size: var(--c-field-placeholder-size, 16px) !important;
+  font-weight: var(--c-field-placeholder-weight, 400) !important;
+}
+
+${scopedDescendant(scopeSelector, '.ss-address-field.field-float .ant-select-selector')},
+${scopedDescendant(scopeSelector, '.ss-address-field.field-float .select-custom-native')} {
+  min-height: 55px !important;
+  height: 55px !important;
+  padding: 8px 12px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+${scopedDescendant(scopeSelector, '.ss-address-field.field-float:focus-within .ant-select-selector')},
+${scopedDescendant(scopeSelector, '.ss-address-field.field-float--filled .ant-select-selector')},
+${scopedDescendant(scopeSelector, '.ss-address-field.field-float:focus-within .select-custom-native')},
+${scopedDescendant(scopeSelector, '.ss-address-field.field-float--filled .select-custom-native')} {
+  padding-top: 18px !important;
+  padding-bottom: 6px !important;
+  align-items: flex-end !important;
+}
+
+${scopedDescendant(scopeSelector, '.ss-address-field.field-float .ant-select-selection-item')},
+${scopedDescendant(scopeSelector, '.ss-address-field.field-float .ant-select-selection-placeholder')} {
+  line-height: 18px !important;
 }
 
 ${nativeSelectPlaceholderSelectors} {

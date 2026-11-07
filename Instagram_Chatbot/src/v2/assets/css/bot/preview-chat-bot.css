@@ -2490,12 +2490,58 @@ slideUp
   height: 55px !important;
 }
 
+.field-float .ss-input-custom-field--with-clear {
+  padding-right: 30px !important;
+}
+
 .field-float:focus-within .ss-input-value,
 .field-float:focus-within textarea,
 .field-float--filled .ss-input-value,
 .field-float--filled textarea {
   padding-top: 18px !important;
   padding-bottom: 6px !important;
+}
+
+.ss-address-field .ant-select,
+.ss-address-field .select-custom-antd {
+  width: 100%;
+}
+
+.ss-address-field .ant-select-selector,
+.ss-address-field .select-custom-native {
+  background-color: var(--c-field-unfocus-bg, #EFF4FD) !important;
+  font-size: var(--c-field-font-size, 14px) !important;
+  font-weight: var(--c-field-text-weight, 400) !important;
+  box-sizing: border-box !important;
+}
+
+.ss-address-field .ant-select-selection-placeholder,
+.ss-address-field .select-custom-native:has(option[value=""]:checked) {
+  font-size: var(--c-field-placeholder-size, 16px) !important;
+  font-weight: var(--c-field-placeholder-weight, 400) !important;
+}
+
+.ss-address-field.field-float .ant-select-selector,
+.ss-address-field.field-float .select-custom-native {
+  min-height: 55px !important;
+  height: 55px !important;
+  padding: 8px 12px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.ss-address-field.field-float:focus-within .ant-select-selector,
+.ss-address-field.field-float--filled .ant-select-selector,
+.ss-address-field.field-float:focus-within .select-custom-native,
+.ss-address-field.field-float--filled .select-custom-native {
+  padding-top: 18px !important;
+  padding-bottom: 6px !important;
+  align-items: flex-end !important;
+}
+
+.ss-address-field.field-float .ant-select-selection-item,
+.ss-address-field.field-float .ant-select-selection-placeholder {
+  line-height: 18px !important;
 }
 
 /* Open-frame header avatar matches the closed bar (58px). */
