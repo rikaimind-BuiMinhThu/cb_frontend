@@ -130,8 +130,37 @@ const getCheckboxValue = (subContent, field, value) => {
   }
 }
 
+const isAddressFieldObject = (value) => (
+  value
+  && typeof value === 'object'
+  && (
+    Object.prototype.hasOwnProperty.call(value, 'value_post_code')
+    || Object.prototype.hasOwnProperty.call(value, 'value_post_code_left')
+    || Object.prototype.hasOwnProperty.call(value, 'value_prefecture')
+    || Object.prototype.hasOwnProperty.call(value, 'value_municipality')
+    || Object.prototype.hasOwnProperty.call(value, 'value_address')
+    || Object.prototype.hasOwnProperty.call(value, 'value_building_name')
+    || Object.prototype.hasOwnProperty.call(value, 'value_name_left')
+    || Object.prototype.hasOwnProperty.call(value, 'value_name_right')
+  )
+);
+
+const resolveZipCodeAddressFields = (subContent) => {
+  if (!subContent || typeof subContent !== 'object') return null;
+  if (isAddressFieldObject(subContent.zip_code_address)) return subContent.zip_code_address;
+  if (isAddressFieldObject(subContent)) return subContent;
+  return null;
+};
+
+const resolveShippingAddressFields = (subContent) => {
+  if (!subContent || typeof subContent !== 'object') return null;
+  if (isAddressFieldObject(subContent.shipping_address)) return subContent.shipping_address;
+  if (isAddressFieldObject(subContent)) return subContent;
+  return null;
+};
+
 const getZipCodeAddressValue = (subContent, prefecturesList) => {
-  const zipCodeAddress = subContent.zip_code_address; 
+  const zipCodeAddress = resolveZipCodeAddressFields(subContent);
   if (!zipCodeAddress) return "";
   const postCode = !zipCodeAddress.split_postal_code
     ? zipCodeAddress?.value_post_code
@@ -152,7 +181,8 @@ const getZipCodeAddressValue = (subContent, prefecturesList) => {
 }
 
 const getShippingAddressValue = (subContent, prefecturesList) => {
-  const shippingAddress = subContent.shipping_address;
+  const shippingAddress = resolveShippingAddressFields(subContent);
+  if (!shippingAddress) return "";
   const nameLeft = shippingAddress?.value_name_left || "";
   const nameRight = shippingAddress?.value_name_right || "";
   const kanaLeft = shippingAddress?.value_kana_left || "";
