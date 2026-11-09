@@ -9,14 +9,15 @@ import {
 } from "v2/views/DesignSetting/constants/designThemeConstants";
 import { resolveProgressBarStyle } from "v2/views/DesignSetting/utils/designThemeUtils";
 import {
-  PROCESS_BAR_COMPLETE_TEXT,
-  formatProcessBarFractionText,
-  formatProcessBarRemainingText,
-} from "./Constants";
+  PROCESS_BAR_LABEL_TYPE_HTML,
+  resolveProgressBarCompletedHtml,
+  resolveProgressBarLabel,
+} from "./processBarLabel";
 
 const PROCESS_BAR_EMPTY_INDEX = "0";
 const PROCESS_BAR_FULL_WIDTH = "100%";
 const PROCESS_BAR_FRACTION_CLASS = "sp-process-bar--fraction";
+const PROCESS_BAR_COMPLETED_CLASS = "sp-process-bar__completed";
 
 const ProcessBar = ({
   botInfor,
@@ -44,33 +45,44 @@ const ProcessBar = ({
     || themeSettings?.progress_bar_above_text
     || ""
   ).trim();
-  const fractionStep = !maxIndex
-    ? 0
-    : (current >= maxIndex ? maxIndex : Math.max(current, 1));
-  const width = (() => {
+  const completedHtml = resolveProgressBarCompletedHtml(themeSettings);
+  const resolveFractionStep = () => {
+    if (!maxIndex) return 0;
+    if (current >= maxIndex) return maxIndex;
+    return Math.max(current, 1);
+  };
+  const fractionStep = resolveFractionStep();
+  const resolveBarWidth = () => {
     if (!maxIndex) return "0%";
     if (isFractionMode) {
-      return fractionStep >= maxIndex
-        ? PROCESS_BAR_FULL_WIDTH
-        : `${(fractionStep / maxIndex) * 100}%`;
+      if (fractionStep >= maxIndex) return PROCESS_BAR_FULL_WIDTH;
+      return `${(fractionStep / maxIndex) * 100}%`;
     }
     if (current >= maxIndex) return PROCESS_BAR_FULL_WIDTH;
     return `${(current / maxIndex) * 100}%`;
-  })();
+  };
+  const width = resolveBarWidth();
 
-  const getFormatText = () => {
-    if (isFractionMode) {
-      if (!maxIndex) return formatProcessBarFractionText(0, 0);
-      return formatProcessBarFractionText(fractionStep, maxIndex);
+  const label = resolveProgressBarLabel({
+    current,
+    maxIndex,
+    isFractionMode,
+    completedHtml,
+  });
+
+  const renderLabel = () => {
+    if (label.type === PROCESS_BAR_LABEL_TYPE_HTML) {
+      return (
+        <span
+          className={PROCESS_BAR_COMPLETED_CLASS}
+          dangerouslySetInnerHTML={{ __html: label.value }}
+        />
+      );
     }
-    if (currentIndex) {
-      if (maxIndex > currentIndex) return formatProcessBarRemainingText(maxIndex - currentIndex);
-      return PROCESS_BAR_COMPLETE_TEXT;
-    }
-    return formatProcessBarRemainingText(maxIndex);
+    return label.value;
   };
 
-  const formatText = getFormatText();
+  const formatNode = renderLabel();
   const barClassName = [
     "sp-process-bar",
     isStyle2 ? PROCESS_BAR_FRACTION_CLASS : "",
@@ -83,7 +95,7 @@ const ProcessBar = ({
     >
       {isStyle2 ? (
         <div className="sp-process-bar__meta">
-          <span className="sp-process-bar__step">{formatText}</span>
+          <span className="sp-process-bar__step">{formatNode}</span>
           {aboveText ? (
             <span className="sp-process-bar__above">{aboveText}</span>
           ) : null}
@@ -97,7 +109,7 @@ const ProcessBar = ({
             ...(fillColor ? { "--sp-process-bar-color": fillColor } : {}),
           }}
         >
-          {isStyle2 ? null : formatText}
+          {isStyle2 ? null : formatNode}
         </div>
       </div>
     </div>

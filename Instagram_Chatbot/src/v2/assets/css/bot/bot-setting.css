@@ -387,6 +387,45 @@
   font-family: inherit;
 }
 
+.theme-field__input--textarea {
+  width: 100%;
+  min-height: 88px;
+  height: auto;
+  padding: 8px;
+  font-family: monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  resize: vertical;
+}
+
+.theme-field__control--stacked {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.theme-field__html-preview {
+  width: 100%;
+  padding: 8px;
+  border: 1px dashed #d0d0d0;
+  border-radius: 4px;
+  background-color: #fafafa;
+}
+
+.theme-field__html-preview-label {
+  margin-bottom: 4px;
+  font-size: 11px;
+  color: #888;
+}
+
+.theme-field__html-preview-body {
+  font-size: 13px;
+  line-height: 1.4;
+  color: #333;
+  word-break: break-word;
+}
+
 .theme-field__input--number {
   flex: 1;
   min-width: 72px;

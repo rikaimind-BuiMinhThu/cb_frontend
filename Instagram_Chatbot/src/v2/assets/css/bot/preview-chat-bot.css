@@ -311,6 +311,15 @@ html {
     text-align: left;
 }
 
+.sp-process-bar__completed {
+    display: inline;
+    line-height: inherit;
+}
+
+.sp-process-bar__completed * {
+    line-height: inherit;
+}
+
 .sp-process-bar--fraction .sp-process-bar__above {
     position: absolute;
     left: 50%;

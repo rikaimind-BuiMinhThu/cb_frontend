@@ -52,6 +52,7 @@ export const DESIGN_SETTING_TOOLTIPS = {
   progressBarStyle: 'プログレスバーの表示スタイルです。スタイル1はバー内にテキスト、スタイル2はバー上にテキストを表示します。',
   progressLabelMode: '進捗テキストのフォーマットです。あとN問、または n/N（例: 1/6）から選べます。',
   progressBarAboveText: 'スタイル2のとき、バー上に表示するテキストです。空欄の場合はフォーマットの文言が使われます。',
+  progressBarCompletedHtml: '全ステップ完了時に表示するメッセージです。HTMLが使えます。空欄の場合は従来どおり（あとN問モードは「完了しました。」、n/Nモードは最終値）が表示されます。',
   chatWindowBgColor: 'チャットウィンドウ全体の背景色です。プレビューのメッセージエリア背景に反映されます。',
   botMessageBgColor: 'ボット側の吹き出し背景色です。プレビュー左側のメッセージに反映されます。',
   botMessageTextColor: 'ボット側の吹き出し内テキストの文字色です。',

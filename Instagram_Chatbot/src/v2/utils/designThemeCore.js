@@ -51,6 +51,7 @@ export const THEME_FIELD_KEYS = [
   'progressBarStyle',
   'progressLabelMode',
   'progressBarAboveText',
+  'progressBarCompletedHtml',
   'chatWindowBgColor',
   'botMessageBgColor',
   'botMessageTextColor',
@@ -154,6 +155,7 @@ export const CAMEL_TO_SNAKE_THEME = {
   progressBarStyle: 'progress_bar_style',
   progressLabelMode: 'progress_label_mode',
   progressBarAboveText: 'progress_bar_above_text',
+  progressBarCompletedHtml: 'progress_bar_completed_html',
   chatWindowBgColor: 'chat_window_bg_color',
   botMessageBgColor: 'bot_message_bg_color',
   botMessageTextColor: 'bot_message_text_color',
@@ -633,6 +635,7 @@ export const deriveThemeDefaults = (mainColorHex = '#327AED', apiColorKey = null
     progressBarStyle: 'style1',
     progressLabelMode: 'remaining',
     progressBarAboveText: '',
+    progressBarCompletedHtml: '',
     chatWindowBgColor,
     botMessageBgColor: messageColor,
     botMessageTextColor: fontColor,
@@ -757,6 +760,9 @@ export const mergeThemeWithDefaults = (rawTheme, mainColorHex, apiColorKey) => {
   merged.progressBarStyle = resolveProgressBarStyle(rawProgressBarStyle, merged.progressLabelMode);
   if (merged.progressBarAboveText == null) {
     merged.progressBarAboveText = '';
+  }
+  if (merged.progressBarCompletedHtml == null) {
+    merged.progressBarCompletedHtml = '';
   }
   merged.fieldPlaceholderStyle = normalizeFieldPlaceholderStyle(merged.fieldPlaceholderStyle);
 

@@ -39,6 +39,7 @@ import ThemeEffectSelectField from './ThemeEffectSelectField';
 import ThemeImageUploadField from './ThemeImageUploadField';
 import ThemeNumberField from './ThemeNumberField';
 import ThemeTextField from './ThemeTextField';
+import ThemeTextareaField from './ThemeTextareaField';
 import DesignSettingLabel from './shared/DesignSettingLabel';
 
 const { Panel } = Collapse;
@@ -321,6 +322,21 @@ const ThemeAccordionSection = ({
             value={themeSettings[key]}
             fullWidth={isFullWidth}
             tooltipKey={key}
+            onChange={(value) => onFieldChange(key, value)}
+          />
+        </div>
+      );
+    }
+
+    if (fieldType === 'textarea') {
+      return (
+        <div key={key} className={wrapperClassName}>
+          <ThemeTextareaField
+            label={label}
+            value={themeSettings[key]}
+            fullWidth={isFullWidth}
+            tooltipKey={key}
+            showHtmlPreview
             onChange={(value) => onFieldChange(key, value)}
           />
         </div>
