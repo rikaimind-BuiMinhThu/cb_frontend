@@ -59,6 +59,7 @@ import {
   sendErrorLogToServer,
   sendAppearLogToServer,
 } from "./PreviewComponent/Utils";
+import { scheduleLegacyPreviewAutoScroll } from "./PreviewComponent/alignBeginningScroll";
 import { injectHtmlUgcConfigContent } from "./PreviewComponent/BotMessageUtils";
 import {
   getChatbotSavedState,
@@ -179,6 +180,7 @@ const previewInitialState = {
   isUpsell: false,
   progressBarMaxIndex: null,
   isNotAutoScroll: false,
+  alignBeginningMsgId: null,
   cartSystem: params.get("cartSystem") || "",
   isUseBtnUpdateTracking: false,
 };
@@ -189,6 +191,11 @@ const PreviewFukushashiki = () => {
   const [timerChanges, setTimerChanges] = useState({ timeLeft: -1, config: null });
   const containerRef = useRef(null);
   const hasSentCustomJs = useRef(false);
+  const messagesListRef = useRef(state.messagesList);
+  const currentMsgIndexRef = useRef(state.currentMsgIndex);
+  const lastAlignedIdRef = useRef(null);
+  messagesListRef.current = state.messagesList;
+  currentMsgIndexRef.current = state.currentMsgIndex;
   const [msgUpdateState, setMsgUpdateState] = useState({});
   const msgUpdateStateRef = useRef({});
   useEffect(() => { 
@@ -587,41 +594,18 @@ const PreviewFukushashiki = () => {
 
   // Auto-scroll to bottom of the chatbot when render messages list changes or submit error message changes
   useEffect(() => {
-    if (state.isUpsell) return;
-
-    const curretMsg = state.messagesList[state.currentMsgIndex];
-    if (state.isNotAutoScroll) {
-      if (curretMsg?.message_content?.[0]?.type === MESSAGE_CONTENT_TYPES.IMAGE) {
-        setTimeout(() => {
-          document.querySelector(`#msg-${state.currentMsgIndex}-0`)?.scrollIntoView({ behavior: "smooth" });
-        }, 2000);
-        return;
-      }
-
-      const bot_statement_type = curretMsg?.message_content?.[0]?.type;
-      if (bot_statement_type && curretMsg?.message_content?.[0]?.[bot_statement_type]?.scroll_auto === true) {
-        setTimeout(() => {
-          const container = document.querySelector("#sp-body");
-          const element = document.querySelector(`#msg_id_${curretMsg.id}`);
-          if (container && element) {
-            const targetScrollTop = element.getBoundingClientRect().top - container.getBoundingClientRect().top + container.scrollTop - 200;
-            container.scrollTo({
-              top: targetScrollTop,
-              behavior: "smooth"
-            });
-          }
-        }, 1000);
-        return;
-      }
-      return;
-    }
-
-    const timeoutId = setTimeout(() => {
-      scrollToPosition({ position: "b", selector: "#sp-body" });
-    }, 300);
-
-    return () => clearTimeout(timeoutId);
-  }, [state.renderMessagesList?.length, state.submitErrorMessage, state.isUpsell]);
+    const currentMsgIndex = currentMsgIndexRef.current;
+    return scheduleLegacyPreviewAutoScroll({
+      isUpsell: state.isUpsell,
+      alignBeginningMsgId: state.alignBeginningMsgId,
+      isNotAutoScroll: state.isNotAutoScroll,
+      lastAlignedIdRef,
+      currentMsg: messagesListRef.current?.[currentMsgIndex],
+      currentMsgIndex,
+      enableScrollAuto: true,
+      scrollBehavior: isMobile() ? "auto" : "smooth",
+    });
+  }, [state.renderMessagesList?.length, state.submitErrorMessage, state.isUpsell, state.alignBeginningMsgId, state.isNotAutoScroll]);
 
   useEffect(() => {
     if (

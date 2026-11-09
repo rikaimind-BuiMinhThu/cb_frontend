@@ -1,6 +1,15 @@
 import { useEffect, useRef } from "react";
 import { MESSAGE_CONTENT_TYPES } from "../Constants";
 import { isMobile, scrollToPosition } from "../Utils";
+import {
+  ALIGN_BEGINNING_SCROLL_DELAY_MS,
+  BOTTOM_SCROLL_DELAY_MS,
+  SCROLL_AUTO_DELAY_MS,
+  SCROLL_MSG_OFFSET_ALIGN_BEGINNING_PX,
+  SCROLL_MSG_OFFSET_SCROLL_AUTO_PX,
+  SP_BODY_SELECTOR,
+  scrollMsgIntoSpBody,
+} from "../alignBeginningScroll";
 
 /**
  * @param {boolean} [enableScrollAuto] - Fukushashiki: honor statement scroll_auto when isNotAutoScroll
@@ -18,6 +27,7 @@ export const usePreviewAutoScroll = ({
 
   const messagesListRef = useRef(state.messagesList);
   const currentMsgIndexRef = useRef(state.currentMsgIndex);
+  const lastAlignedIdRef = useRef(null);
   messagesListRef.current = state.messagesList;
   currentMsgIndexRef.current = state.currentMsgIndex;
 
@@ -28,6 +38,30 @@ export const usePreviewAutoScroll = ({
     const currentMsg = messagesListRef.current?.[currentMsgIndex];
     // Smooth scroll on iPhone fights the fixed iframe and reads as flicker.
     const scrollBehavior = isMobile() ? "auto" : "smooth";
+    const alignMsgId = state.alignBeginningMsgId;
+
+    if (alignMsgId === null || alignMsgId === undefined) {
+      lastAlignedIdRef.current = null;
+    } else if (lastAlignedIdRef.current === alignMsgId) {
+      return;
+    } else {
+      lastAlignedIdRef.current = alignMsgId;
+      const alignTimeoutId = setTimeout(() => {
+        const scrolled = scrollMsgIntoSpBody({
+          msgId: alignMsgId,
+          offsetPx: SCROLL_MSG_OFFSET_ALIGN_BEGINNING_PX,
+          behavior: scrollBehavior,
+        });
+        if (!scrolled) {
+          scrollToPosition({
+            position: "b",
+            selector: SP_BODY_SELECTOR,
+            behavior: scrollBehavior,
+          });
+        }
+      }, ALIGN_BEGINNING_SCROLL_DELAY_MS);
+      return () => clearTimeout(alignTimeoutId);
+    }
 
     if (state.isNotAutoScroll) {
       if (
@@ -50,20 +84,12 @@ export const usePreviewAutoScroll = ({
         ) {
           const msgId = currentMsg.id;
           const scrollAutoTimeoutId = setTimeout(() => {
-            const container = document.querySelector("#sp-body");
-            const element = document.querySelector(`#msg_id_${msgId}`);
-            if (container && element) {
-              const targetScrollTop =
-                element.getBoundingClientRect().top -
-                container.getBoundingClientRect().top +
-                container.scrollTop -
-                200;
-              container.scrollTo({
-                top: targetScrollTop,
-                behavior: scrollBehavior,
-              });
-            }
-          }, 1000);
+            scrollMsgIntoSpBody({
+              msgId,
+              offsetPx: SCROLL_MSG_OFFSET_SCROLL_AUTO_PX,
+              behavior: scrollBehavior,
+            });
+          }, SCROLL_AUTO_DELAY_MS);
           return () => clearTimeout(scrollAutoTimeoutId);
         }
       }
@@ -74,11 +100,17 @@ export const usePreviewAutoScroll = ({
     const timeoutId = setTimeout(() => {
       scrollToPosition({
         position: "b",
-        selector: "#sp-body",
+        selector: SP_BODY_SELECTOR,
         behavior: scrollBehavior,
       });
-    }, 300);
+    }, BOTTOM_SCROLL_DELAY_MS);
 
     return () => clearTimeout(timeoutId);
-  }, [enabled, enableScrollAuto, length, state.isNotAutoScroll]);
+  }, [
+    enabled,
+    enableScrollAuto,
+    length,
+    state.isNotAutoScroll,
+    state.alignBeginningMsgId,
+  ]);
 };

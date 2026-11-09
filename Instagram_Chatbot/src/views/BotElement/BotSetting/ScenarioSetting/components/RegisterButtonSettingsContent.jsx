@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import InputCustom from '../scenarioComon/InputCustom';
 import ScenarioModalCheckbox from './modals/shared/ScenarioModalCheckbox';
@@ -9,6 +9,8 @@ import {
   SCENARIO_MODAL_TOOLTIPS,
   REGISTER_BUTTON_LABELS,
 } from './modals/shared/scenarioModalTooltips';
+
+import { USER_ALIGN_BEGINNING_STOP } from '../../PreviewComponent/alignBeginningScroll';
 
 const labelWithTooltip = (text, tooltipKey) => (
   <>
@@ -45,7 +47,6 @@ const RegisterButtonSettingsContent = ({
   dataMessages,
   setDataMessages,
 }) => {
-  const [alignBeginningStop, setAlignBeginningStop] = useState(false);
   const settingsRef = useRef(null);
   const pendingScrollSnapshotsRef = useRef(null);
 
@@ -78,8 +79,8 @@ const RegisterButtonSettingsContent = ({
     >
       <div className="ss-user-register-button-settings__main">
         <ScenarioModalCheckbox
-          checked={alignBeginningStop}
-          onChange={setAlignBeginningStop}
+          checked={!!selectedMessage[USER_ALIGN_BEGINNING_STOP]}
+          onChange={(checked) => updateMessage({ [USER_ALIGN_BEGINNING_STOP]: checked })}
           label={labelWithTooltip(
             REGISTER_BUTTON_LABELS.alignBeginningStop,
             'alignBeginningStop',

@@ -13,6 +13,7 @@ import { processForBotMessage } from 'v2/views/Preview/PreviewComponent/BotMessa
 import { processForUserMessage } from 'v2/views/Preview/PreviewComponent/UserMessageUtils';
 import { processForCombineMessage } from 'v2/views/Preview/PreviewComponent/CombineMessageUtils';
 import { isBotMessage, isUserMessage, isCombineMessage, getNextUserMsg } from 'v2/views/Preview/PreviewComponent/Utils';
+import { resolveAlignBeginningMsgId } from 'v2/views/Preview/PreviewComponent/alignBeginningScroll';
 import { normalizeMessagesNotUseButton } from 'v2/views/ScenarioSetting/utils/normalizeNotUseButton';
 import { mapAmazonPayDataToMessagesList } from 'v2/views/Preview/PreviewComponent/TorizenUtils';
 import { mapAmazonPayDataToMessagesListForBliss } from 'v2/views/Preview/PreviewComponent/BlissUtils';
@@ -149,6 +150,7 @@ const PreviewFukushashikiReducer = (state, action) => {
         }
         return state.isNotAutoScroll || false;
       })();
+      const alignBeginningMsgId = resolveAlignBeginningMsgId(currentMsg);
 
       return {
         ...state,
@@ -156,6 +158,7 @@ const PreviewFukushashikiReducer = (state, action) => {
         renderMessagesList: updatedState.messagesList.slice(action.payload.startIndex, action.payload.endIndex),
         currentMsgIndex: action.payload.endIndex - 1,
         isNotAutoScroll: isNotAutoScroll,
+        alignBeginningMsgId,
       };
     case PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE: {
       if (action.payload === GETTING_ERROR_NOTIFICATION) {
@@ -163,6 +166,7 @@ const PreviewFukushashikiReducer = (state, action) => {
           ...state,
           submitErrorMessage: action.payload,
           isProcessing: false,
+          alignBeginningMsgId: null,
         };
       }
 
@@ -190,6 +194,7 @@ const PreviewFukushashikiReducer = (state, action) => {
           submitErrorMessage: action.payload,
           isProcessing: false,
           nextStopMsgIndex: nextStopMsgIndex,
+          alignBeginningMsgId: null,
         };
       }
 
@@ -206,6 +211,7 @@ const PreviewFukushashikiReducer = (state, action) => {
         renderMessagesList: renderMessagesList,
         submitErrorMessage: action.payload,
         isProcessing: false,
+        alignBeginningMsgId: null,
       };
     }
 
@@ -224,6 +230,7 @@ const PreviewFukushashikiReducer = (state, action) => {
         renderMessagesList: renderMessagesList,
         submitErrorMessage: action.payload.error,
         isProcessing: false,
+        alignBeginningMsgId: null,
       };
     }
     case PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON:
