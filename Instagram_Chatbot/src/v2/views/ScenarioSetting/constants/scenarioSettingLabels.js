@@ -308,6 +308,7 @@ export const RADIO_BUTTON_LABELS = {
   designImagePlaceholder: '画像URL',
   designPreview: 'プレビュー',
   designPreviewSample: 'サンプル',
+  designPreviewNoImage: '画像未設定',
 };
 
 export const BUTTON_SUBMIT_LABELS = {

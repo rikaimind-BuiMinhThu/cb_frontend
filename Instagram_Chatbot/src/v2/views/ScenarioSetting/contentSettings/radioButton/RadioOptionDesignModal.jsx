@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { MDBIcon } from 'mdbreact';
 import { BORDER_TWINKLE_EFFECT_OPTIONS } from 'v2/views/DesignSetting/constants/designThemeConstants';
@@ -15,15 +15,19 @@ import {
   RADIO_OPTION_PADDING_MIN,
   RADIO_OPTION_TEXT_SIZE_MAX,
   RADIO_OPTION_TEXT_SIZE_MIN,
+  areRadioOptionDesignsEqual,
   buildRadioOptionDesignVars,
+  buildRadioPreviewPaneVars,
   getAllowedRadioOptionDesignFields,
   resolveRadioOptionDesign,
+  resolveRadioPreviewTheme,
   sanitizeRadioOptionDesign,
+  seedRadioOptionDesignImagesFromOption,
   shouldApplyRadioOptionTwinkle,
 } from '../../utils/radioOptionDesign';
 import '../../styles/contentSettings/radioOptionDesignModal.css';
 
-const RADIO_OPTION_DESIGN_MODAL_WIDTH = 960;
+const RADIO_OPTION_DESIGN_MODAL_WIDTH = 1040;
 const COLOR_PICKER_FALLBACK = '#cccccc';
 const UNIT_PX = 'px';
 const EMPTY_IMAGE_ALT = '';
@@ -98,14 +102,50 @@ ColorField.defaultProps = {
   value: '',
 };
 
+const toNumberInputText = (value) => {
+  if (value === undefined || value === null || value === '') return '';
+  return String(value);
+};
+
 const NumberField = ({
   value,
   min,
   max,
-  onChange,
+  onCommit,
   onClear,
 }) => {
-  const hasValue = value !== undefined && value !== null && value !== '';
+  const [text, setText] = useState(toNumberInputText(value));
+  const showClear = text !== '';
+
+  useEffect(() => {
+    setText(toNumberInputText(value));
+  }, [value]);
+
+  const emitLiveValue = (nextText) => {
+    if (nextText === '') {
+      onClear();
+      return;
+    }
+    const parsed = Number.parseInt(nextText, 10);
+    if (!Number.isFinite(parsed)) return;
+    onCommit(parsed);
+  };
+
+  const commitClamped = () => {
+    if (text === '') {
+      onClear();
+      return;
+    }
+    const parsed = Number.parseInt(text, 10);
+    if (!Number.isFinite(parsed)) {
+      setText(toNumberInputText(value));
+      return;
+    }
+    const clamped = Math.min(max, Math.max(min, parsed));
+    onCommit(clamped);
+    setText(String(clamped));
+  };
+
   return (
     <div className="ss-radio-option-design-modal__inline">
       <div className="ss-radio-option-design-modal__number-group">
@@ -114,16 +154,30 @@ const NumberField = ({
           className="ss-radio-option-design-modal__number"
           min={min}
           max={max}
-          value={hasValue ? value : ''}
-          onChange={onChange}
+          value={text}
+          onChange={(event) => {
+            const nextText = event.target.value;
+            setText(nextText);
+            emitLiveValue(nextText);
+          }}
+          onBlur={commitClamped}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              commitClamped();
+            }
+          }}
         />
         <span className="ss-radio-option-design-modal__unit">{UNIT_PX}</span>
       </div>
-      {hasValue ? (
+      {showClear ? (
         <button
           type="button"
           className="ss-radio-option-design-modal__clear"
-          onClick={onClear}
+          onClick={() => {
+            setText('');
+            onClear();
+          }}
         >
           {RADIO_BUTTON_LABELS.designClear}
         </button>
@@ -136,7 +190,7 @@ NumberField.propTypes = {
   value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   min: PropTypes.number.isRequired,
   max: PropTypes.number.isRequired,
-  onChange: PropTypes.func.isRequired,
+  onCommit: PropTypes.func.isRequired,
   onClear: PropTypes.func.isRequired,
 };
 
@@ -144,9 +198,23 @@ NumberField.defaultProps = {
   value: '',
 };
 
+const chipTypeModifier = (designType) => {
+  if (designType === RADIO_OPTION_DESIGN_TYPES.GENDER) {
+    return 'ss-radio-option-design-modal__preview-chip--gender';
+  }
+  if (
+    designType === RADIO_OPTION_DESIGN_TYPES.RADIO_BUTTON_IMG
+    || designType === RADIO_OPTION_DESIGN_TYPES.UPSELL_BUTTON
+  ) {
+    return 'ss-radio-option-design-modal__preview-chip--image';
+  }
+  return 'ss-radio-option-design-modal__preview-chip--default';
+};
+
 const DesignPreviewChip = ({
   designType,
   draft,
+  theme,
   selectionState,
   stateTitle,
   previewLabel,
@@ -161,19 +229,21 @@ const DesignPreviewChip = ({
   const resolved = resolveRadioOptionDesign({
     option,
     radioButton,
+    theme,
     selectionState,
+    clampNumbers: false,
   });
   const style = buildRadioOptionDesignVars(resolved);
   const twinkle = shouldApplyRadioOptionTwinkle(resolved);
-  const showImage = Boolean(
-    resolved.image
-    && designType !== RADIO_OPTION_DESIGN_TYPES.DEFAULT,
-  );
   const showText = designType === RADIO_OPTION_DESIGN_TYPES.DEFAULT
     || designType === RADIO_OPTION_DESIGN_TYPES.GENDER;
+  const supportsImage = designType !== RADIO_OPTION_DESIGN_TYPES.DEFAULT;
+  const showImage = supportsImage && Boolean(resolved.image);
+  const isImageOnly = !showText;
   const isSelected = selectionState === RADIO_OPTION_DESIGN_STATES.SELECTED;
   const chipClassName = [
     'ss-radio-option-design-modal__preview-chip',
+    chipTypeModifier(designType),
     isSelected ? 'ss-radio-option-design-modal__preview-chip--selected' : '',
     twinkle ? 'ss-radio-option-design-modal__preview-chip--twinkle' : '',
   ].filter(Boolean).join(' ');
@@ -189,6 +259,11 @@ const DesignPreviewChip = ({
             alt={EMPTY_IMAGE_ALT}
           />
         ) : null}
+        {isImageOnly && !showImage ? (
+          <span className="ss-radio-option-design-modal__preview-placeholder">
+            {RADIO_BUTTON_LABELS.designPreviewNoImage}
+          </span>
+        ) : null}
         {showText ? (
           <span className="ss-radio-option-design-modal__preview-text">{previewLabel}</span>
         ) : null}
@@ -200,6 +275,7 @@ const DesignPreviewChip = ({
 DesignPreviewChip.propTypes = {
   designType: PropTypes.string.isRequired,
   draft: PropTypes.object.isRequired,
+  theme: PropTypes.object,
   selectionState: PropTypes.string.isRequired,
   stateTitle: PropTypes.string.isRequired,
   previewLabel: PropTypes.string.isRequired,
@@ -207,6 +283,7 @@ DesignPreviewChip.propTypes = {
 };
 
 DesignPreviewChip.defaultProps = {
+  theme: {},
   previewImage: '',
 };
 
@@ -226,12 +303,21 @@ const RadioOptionDesignModal = ({
   const showTextFields = allowedFields.includes('text_size');
   const showImageField = allowedFields.includes('image');
   const sampleLabel = previewLabel || RADIO_BUTTON_LABELS.designPreviewSample;
+  const previewTheme = useMemo(
+    () => (open ? resolveRadioPreviewTheme() : {}),
+    [open],
+  );
+  const previewPaneStyle = useMemo(
+    () => buildRadioPreviewPaneVars(previewTheme),
+    [previewTheme],
+  );
 
   useEffect(() => {
     if (!open) return;
     const nextDraft = sanitizeRadioOptionDesign(design, designType);
+    // Snapshot stays sparse (no option.img seed) so Cancel does not dirty.
     snapshotRef.current = cloneDesign(nextDraft);
-    setDraft(cloneDesign(nextDraft));
+    setDraft(seedRadioOptionDesignImagesFromOption(nextDraft, previewImage, designType));
     // Re-init only on open/type; draft edits must not reset from prop churn.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, designType]);
@@ -279,12 +365,15 @@ const RadioOptionDesignModal = ({
       } else {
         next[stateKey] = statePatch;
       }
-      return sanitizeRadioOptionDesign(next, designType);
+      // Keep mid-edit numbers unclamped so typing + live preview stay in sync.
+      return sanitizeRadioOptionDesign(next, designType, { clampNumbers: false });
     });
   };
 
   const handleCancel = () => {
-    onSave(snapshotRef.current);
+    if (!areRadioOptionDesignsEqual(design, snapshotRef.current, designType)) {
+      onSave(snapshotRef.current);
+    }
     onClose();
   };
 
@@ -297,124 +386,108 @@ const RadioOptionDesignModal = ({
     const stateValues = draft[section.key] || {};
     return (
       <DesignSection key={section.key} title={section.title}>
-        <ScenarioFormRow label={RADIO_BUTTON_LABELS.designBorderColor}>
-          <ColorField
-            value={stateValues.border_color}
-            onChange={(event) => patchStateField(section.key, 'border_color', event.target.value)}
-            onClear={() => patchStateField(section.key, 'border_color', null)}
-          />
-        </ScenarioFormRow>
-        <ScenarioFormRow label={RADIO_BUTTON_LABELS.designBorderWidth}>
-          <NumberField
-            value={stateValues.border_width}
-            min={RADIO_OPTION_BORDER_WIDTH_MIN}
-            max={RADIO_OPTION_BORDER_WIDTH_MAX}
-            onChange={(event) => {
-              const parsed = Number.parseInt(event.target.value, 10);
-              if (!Number.isFinite(parsed)) {
-                patchStateField(section.key, 'border_width', null);
-                return;
-              }
-              patchStateField(section.key, 'border_width', parsed);
-            }}
-            onClear={() => patchStateField(section.key, 'border_width', null)}
-          />
-        </ScenarioFormRow>
-        <ScenarioFormRow label={RADIO_BUTTON_LABELS.designBorderEffect}>
-          <div className="ss-radio-option-design-modal__inline">
-            <select
-              className="ss-radio-option-design-modal__select"
-              value={stateValues.border_effect || ''}
-              onChange={(event) => {
-                const nextValue = event.target.value;
-                patchStateField(section.key, 'border_effect', nextValue || null);
-              }}
-            >
-              <option value="">{RADIO_BUTTON_LABELS.designClear}</option>
-              {BORDER_TWINKLE_EFFECT_OPTIONS.map((option) => (
-                <option key={option.id} value={option.id}>{option.label}</option>
-              ))}
-            </select>
-          </div>
-        </ScenarioFormRow>
-        <ScenarioFormRow label={RADIO_BUTTON_LABELS.designPadding}>
-          <NumberField
-            value={stateValues.padding}
-            min={RADIO_OPTION_PADDING_MIN}
-            max={RADIO_OPTION_PADDING_MAX}
-            onChange={(event) => {
-              const parsed = Number.parseInt(event.target.value, 10);
-              if (!Number.isFinite(parsed)) {
-                patchStateField(section.key, 'padding', null);
-                return;
-              }
-              patchStateField(section.key, 'padding', parsed);
-            }}
-            onClear={() => patchStateField(section.key, 'padding', null)}
-          />
-        </ScenarioFormRow>
-        {showTextFields ? (
-          <>
-            <ScenarioFormRow label={RADIO_BUTTON_LABELS.designTextSize}>
-              <NumberField
-                value={stateValues.text_size}
-                min={RADIO_OPTION_TEXT_SIZE_MIN}
-                max={RADIO_OPTION_TEXT_SIZE_MAX}
+        <div className="ss-radio-option-design-modal__fields">
+          <ScenarioFormRow label={RADIO_BUTTON_LABELS.designBorderColor}>
+            <ColorField
+              value={stateValues.border_color}
+              onChange={(event) => patchStateField(section.key, 'border_color', event.target.value)}
+              onClear={() => patchStateField(section.key, 'border_color', null)}
+            />
+          </ScenarioFormRow>
+          <ScenarioFormRow label={RADIO_BUTTON_LABELS.designBorderWidth}>
+            <NumberField
+              value={stateValues.border_width}
+              min={RADIO_OPTION_BORDER_WIDTH_MIN}
+              max={RADIO_OPTION_BORDER_WIDTH_MAX}
+              onCommit={(next) => patchStateField(section.key, 'border_width', next)}
+              onClear={() => patchStateField(section.key, 'border_width', null)}
+            />
+          </ScenarioFormRow>
+          <ScenarioFormRow label={RADIO_BUTTON_LABELS.designBorderEffect}>
+            <div className="ss-radio-option-design-modal__inline">
+              <select
+                className="ss-radio-option-design-modal__select"
+                value={stateValues.border_effect || ''}
                 onChange={(event) => {
-                  const parsed = Number.parseInt(event.target.value, 10);
-                  if (!Number.isFinite(parsed)) {
-                    patchStateField(section.key, 'text_size', null);
-                    return;
-                  }
-                  patchStateField(section.key, 'text_size', parsed);
+                  const nextValue = event.target.value;
+                  patchStateField(section.key, 'border_effect', nextValue || null);
                 }}
-                onClear={() => patchStateField(section.key, 'text_size', null)}
-              />
-            </ScenarioFormRow>
-            <ScenarioFormRow label={RADIO_BUTTON_LABELS.designTextColor}>
-              <ColorField
-                value={stateValues.text_color}
-                onChange={(event) => patchStateField(section.key, 'text_color', event.target.value)}
-                onClear={() => patchStateField(section.key, 'text_color', null)}
-              />
-            </ScenarioFormRow>
-          </>
-        ) : null}
-        <ScenarioFormRow label={RADIO_BUTTON_LABELS.designBackgroundColor}>
-          <ColorField
-            value={stateValues.background_color}
-            onChange={(event) => patchStateField(section.key, 'background_color', event.target.value)}
-            onClear={() => patchStateField(section.key, 'background_color', null)}
-          />
-        </ScenarioFormRow>
-        {showImageField ? (
-          <ScenarioFormRow label={RADIO_BUTTON_LABELS.designImage}>
-            <div className="ss-radio-option-design-modal__image-row">
-              <input
-                type="text"
-                className="ss-radio-option-design-modal__image-input"
-                placeholder={RADIO_BUTTON_LABELS.designImagePlaceholder}
-                value={stateValues.image || ''}
-                onChange={(event) => patchStateField(section.key, 'image', event.target.value)}
-              />
-              <MDBIcon
-                fas
-                icon="paperclip"
-                className="ss-radio-option-design-modal__paperclip"
-                onClick={() => onOpenImagePicker(section.key)}
-              />
-              {stateValues.image ? (
-                <button
-                  type="button"
-                  className="ss-radio-option-design-modal__clear"
-                  onClick={() => patchStateField(section.key, 'image', null)}
-                >
-                  {RADIO_BUTTON_LABELS.designClear}
-                </button>
-              ) : null}
+              >
+                <option value="">{RADIO_BUTTON_LABELS.designClear}</option>
+                {BORDER_TWINKLE_EFFECT_OPTIONS.map((option) => (
+                  <option key={option.id} value={option.id}>{option.label}</option>
+                ))}
+              </select>
             </div>
           </ScenarioFormRow>
-        ) : null}
+          <ScenarioFormRow label={RADIO_BUTTON_LABELS.designPadding}>
+            <NumberField
+              value={stateValues.padding}
+              min={RADIO_OPTION_PADDING_MIN}
+              max={RADIO_OPTION_PADDING_MAX}
+              onCommit={(next) => patchStateField(section.key, 'padding', next)}
+              onClear={() => patchStateField(section.key, 'padding', null)}
+            />
+          </ScenarioFormRow>
+          <ScenarioFormRow label={RADIO_BUTTON_LABELS.designBackgroundColor}>
+            <ColorField
+              value={stateValues.background_color}
+              onChange={(event) => patchStateField(section.key, 'background_color', event.target.value)}
+              onClear={() => patchStateField(section.key, 'background_color', null)}
+            />
+          </ScenarioFormRow>
+          {showTextFields ? (
+            <>
+              <ScenarioFormRow label={RADIO_BUTTON_LABELS.designTextColor}>
+                <ColorField
+                  value={stateValues.text_color}
+                  onChange={(event) => patchStateField(section.key, 'text_color', event.target.value)}
+                  onClear={() => patchStateField(section.key, 'text_color', null)}
+                />
+              </ScenarioFormRow>
+              <ScenarioFormRow label={RADIO_BUTTON_LABELS.designTextSize}>
+                <NumberField
+                  value={stateValues.text_size}
+                  min={RADIO_OPTION_TEXT_SIZE_MIN}
+                  max={RADIO_OPTION_TEXT_SIZE_MAX}
+                  onCommit={(next) => patchStateField(section.key, 'text_size', next)}
+                  onClear={() => patchStateField(section.key, 'text_size', null)}
+                />
+              </ScenarioFormRow>
+            </>
+          ) : null}
+          {showImageField ? (
+            <ScenarioFormRow
+              className="ss-settings-form-row--full"
+              label={RADIO_BUTTON_LABELS.designImage}
+            >
+              <div className="ss-radio-option-design-modal__image-row">
+                <input
+                  type="text"
+                  className="ss-radio-option-design-modal__image-input"
+                  placeholder={RADIO_BUTTON_LABELS.designImagePlaceholder}
+                  value={stateValues.image || ''}
+                  onChange={(event) => patchStateField(section.key, 'image', event.target.value)}
+                />
+                <MDBIcon
+                  fas
+                  icon="paperclip"
+                  className="ss-radio-option-design-modal__paperclip"
+                  onClick={() => onOpenImagePicker(section.key)}
+                />
+                {stateValues.image ? (
+                  <button
+                    type="button"
+                    className="ss-radio-option-design-modal__clear"
+                    onClick={() => patchStateField(section.key, 'image', null)}
+                  >
+                    {RADIO_BUTTON_LABELS.designClear}
+                  </button>
+                ) : null}
+              </div>
+            </ScenarioFormRow>
+          ) : null}
+        </div>
       </DesignSection>
     );
   };
@@ -435,11 +508,19 @@ const RadioOptionDesignModal = ({
         />
       )}
     >
-      <div className="ss-radio-option-design-modal">
+      <div
+        className="ss-radio-option-design-modal"
+        onClick={(event) => event.stopPropagation()}
+        onKeyDown={(event) => event.stopPropagation()}
+        role="presentation"
+      >
         <div className="ss-radio-option-design-modal__forms">
           {STATE_SECTIONS.map(renderStateSection)}
         </div>
-        <aside className="ss-radio-option-design-modal__preview-pane">
+        <aside
+          className="ss-radio-option-design-modal__preview-pane"
+          style={previewPaneStyle}
+        >
           <div className="ss-radio-option-design-modal__preview-title">
             {RADIO_BUTTON_LABELS.designPreview}
           </div>
@@ -449,6 +530,7 @@ const RadioOptionDesignModal = ({
                 key={section.key}
                 designType={designType}
                 draft={draft}
+                theme={previewTheme}
                 selectionState={section.key}
                 stateTitle={section.title}
                 previewLabel={sampleLabel}

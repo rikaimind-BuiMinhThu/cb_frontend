@@ -1,7 +1,15 @@
 import { BORDER_TWINKLE_EFFECT_IDS } from 'v2/views/DesignSetting/constants/designThemeConstants';
+import {
+  mergeThemeWithDefaults,
+  resolveMainColorContext,
+} from 'v2/utils/designThemeCore';
+import { parseThemeFromDesignSettings } from 'v2/utils/chatbotThemeCss';
 import { RADIO_BUTTON_TYPES } from '../constants/contentTypeConstants';
 import { isGenderRadio } from './radioButtonGenderUtils';
 import { isRadioOptionInitiallySelected } from './radioButtonSelectionUtils';
+
+const RADIO_PREVIEW_THEME_FALLBACK_HEX = '#327AED';
+const CLIENT_SESSION_KEY = 'client';
 
 export const RADIO_OPTION_DESIGN_STATES = {
   NORMAL: 'normal',
@@ -67,19 +75,27 @@ const normalizeBorderEffect = (value) => {
   return value;
 };
 
-const normalizeSparseField = (key, value) => {
+const parseFiniteNumber = (value) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const normalizeSparseField = (key, value, clampNumbers = true) => {
   if (value === undefined || value === null || value === '') return null;
   if (key === 'border_color' || key === 'text_color' || key === 'background_color') {
     if (!isHexColor(value)) return null;
     return value.toLowerCase();
   }
   if (key === 'border_width') {
+    if (!clampNumbers) return parseFiniteNumber(value);
     return clampNumber(value, RADIO_OPTION_BORDER_WIDTH_MIN, RADIO_OPTION_BORDER_WIDTH_MAX);
   }
   if (key === 'padding') {
+    if (!clampNumbers) return parseFiniteNumber(value);
     return clampNumber(value, RADIO_OPTION_PADDING_MIN, RADIO_OPTION_PADDING_MAX);
   }
   if (key === 'text_size') {
+    if (!clampNumbers) return parseFiniteNumber(value);
     return clampNumber(value, RADIO_OPTION_TEXT_SIZE_MIN, RADIO_OPTION_TEXT_SIZE_MAX);
   }
   if (key === 'border_effect') {
@@ -155,22 +171,27 @@ export const presetConfigToDesign = (presetConfig) => {
   return design;
 };
 
-const sparseStateFromSource = (sourceState, allowedFields) => {
+const sparseStateFromSource = (sourceState, allowedFields, clampNumbers = true) => {
   const source = asObject(sourceState);
   return allowedFields.reduce((acc, key) => {
-    const normalized = normalizeSparseField(key, source[key]);
+    const normalized = normalizeSparseField(key, source[key], clampNumbers);
     if (normalized === null) return acc;
     return { ...acc, [key]: normalized };
   }, {});
 };
 
-export const sanitizeRadioOptionDesign = (design, designType) => {
+export const sanitizeRadioOptionDesign = (design, designType, options = {}) => {
+  const clampNumbers = options.clampNumbers !== false;
   const allowedFields = getAllowedRadioOptionDesignFields(designType);
   const source = asObject(design);
   const next = {};
 
   Object.values(RADIO_OPTION_DESIGN_STATES).forEach((stateKey) => {
-    const sparseState = sparseStateFromSource(source[stateKey], allowedFields);
+    const sparseState = sparseStateFromSource(
+      source[stateKey],
+      allowedFields,
+      clampNumbers,
+    );
     if (Object.keys(sparseState).length === 0) return;
     next[stateKey] = sparseState;
   });
@@ -274,11 +295,17 @@ export const resolveRadioOptionDesign = ({
   radioButton,
   theme,
   selectionState: selectionStateArg,
+  clampNumbers = true,
 }) => {
   const designType = getRadioOptionDesignType(radioButton);
   const allowedFields = getAllowedRadioOptionDesignFields(designType);
   const selectionState = selectionStateArg || getRadioOptionDesignState(radioButton, option);
-  const sparseDesign = sanitizeRadioOptionDesign(option?.design, designType);
+  const sanitizeOptions = { clampNumbers };
+  const sparseDesign = sanitizeRadioOptionDesign(
+    option?.design,
+    designType,
+    sanitizeOptions,
+  );
   const legacyFromPreset = presetConfigToDesign(option?.preset_config);
   const legacyDesign = sanitizeRadioOptionDesign({
     ...legacyFromPreset,
@@ -294,7 +321,7 @@ export const resolveRadioOptionDesign = ({
       ...asObject(legacyFromPreset.unselected),
       ...(option?.img ? { image: option.img } : {}),
     },
-  }, designType);
+  }, designType, sanitizeOptions);
 
   const themeFallback = themeFallbacksForState(theme, selectionState);
   const resolved = { selectionState, designType };
@@ -377,3 +404,73 @@ export const getRadioOptionNormalImage = (option) => {
   if (typeof option?.img === 'string') return option.img;
   return '';
 };
+
+/**
+ * Fill missing per-state images from the option's current image (img / normal design).
+ * Does not overwrite an explicit state image. Used for modal draft defaults only.
+ */
+export const seedRadioOptionDesignImagesFromOption = (design, optionImage, designType) => {
+  const allowedFields = getAllowedRadioOptionDesignFields(designType);
+  const next = sanitizeRadioOptionDesign(design, designType, { clampNumbers: false });
+  if (!allowedFields.includes('image')) return next;
+
+  const fallback = typeof optionImage === 'string' ? optionImage.trim() : '';
+  if (!fallback) return next;
+
+  Object.values(RADIO_OPTION_DESIGN_STATES).forEach((stateKey) => {
+    const state = asObject(next[stateKey]);
+    if (state.image) return;
+    next[stateKey] = { ...state, image: fallback };
+  });
+  return next;
+};
+
+export const resolveRadioPreviewTheme = () => {
+  try {
+    const client = JSON.parse(sessionStorage.getItem(CLIENT_SESSION_KEY) || 'null');
+    const { apiColorKey, mainColorHex } = resolveMainColorContext(client || {});
+    const rawTheme = parseThemeFromDesignSettings(client?.design_settings);
+    return mergeThemeWithDefaults(
+      rawTheme,
+      mainColorHex || RADIO_PREVIEW_THEME_FALLBACK_HEX,
+      apiColorKey,
+    );
+  } catch (error) {
+    // Keep preview usable when sessionStorage/client JSON is corrupt.
+    // eslint-disable-next-line no-console
+    console.error('resolveRadioPreviewTheme failed', error);
+    return mergeThemeWithDefaults(
+      null,
+      RADIO_PREVIEW_THEME_FALLBACK_HEX,
+      null,
+    );
+  }
+};
+
+export const buildRadioPreviewPaneVars = (theme) => {
+  const source = asObject(theme);
+  const vars = {};
+  if (source.radioSelectedBgColor) {
+    vars['--c-radio-selected-bg'] = source.radioSelectedBgColor;
+  }
+  if (source.radioUnselectedBgColor) {
+    vars['--c-radio-unselected-bg'] = source.radioUnselectedBgColor;
+  }
+  if (source.radioSelectedBorderColor) {
+    vars['--c-radio-selected-border'] = source.radioSelectedBorderColor;
+    vars['--c-radio-twinkle-color'] = source.radioSelectedBorderColor;
+  }
+  if (source.radioUnselectedBorderColor) {
+    vars['--c-radio-unselected-border'] = source.radioUnselectedBorderColor;
+  }
+  if (source.radioFontSize) {
+    const fontSize = String(source.radioFontSize).replace(/px$/i, '');
+    vars['--c-radio-font-size'] = `${fontSize}${RADIO_OPTION_DESIGN_PX}`;
+  }
+  return vars;
+};
+
+export const areRadioOptionDesignsEqual = (left, right, designType) => (
+  JSON.stringify(sanitizeRadioOptionDesign(left, designType))
+  === JSON.stringify(sanitizeRadioOptionDesign(right, designType))
+);
