@@ -47,6 +47,7 @@ import {
   isUserMessage,
   toNumber,
 } from "./PreviewComponent/Utils";
+import { scheduleLegacyPreviewAutoScroll } from "./PreviewComponent/alignBeginningScroll";
 import { injectHtmlUgcConfigContent } from "./PreviewComponent/BotMessageUtils";
 import {
   getChatbotSavedState,
@@ -134,6 +135,7 @@ const previewInitialState = {
   manuallyClosed: false,
   renderMode: RENDER_MODES.NEXT,
   progressBarMaxIndex: null,
+  alignBeginningMsgId: null,
   // FAQ specific fields
   rootMessageIndex: null,
   isInCommonFlow: false,
@@ -146,6 +148,11 @@ const PreviewFaq = () => {
   const containerRef = useRef(null);
   const hasSentCustomJs = useRef(false);
   const hasSentInitialOpenStateToParent = useRef(false);
+  const messagesListRef = useRef(state.messagesList);
+  const currentMsgIndexRef = useRef(state.currentMsgIndex);
+  const lastAlignedIdRef = useRef(null);
+  messagesListRef.current = state.messagesList;
+  currentMsgIndexRef.current = state.currentMsgIndex;
 
   useEffect(() => {
     if (state.conversionStatus || !state.uuid || !state.scenarioId || !state.isOpen) return;
@@ -365,21 +372,17 @@ const PreviewFaq = () => {
 
   // Auto-scroll to bottom of the chatbot when render messages list changes or submit error message changes
   useEffect(() => {
-    const curretMsg = state.messagesList[state.currentMsgIndex];
-    if (state.isNotAutoScroll) {
-      if (curretMsg?.message_content?.[0]?.type !== MESSAGE_CONTENT_TYPES.IMAGE) return;
-      setTimeout(() => {
-        document.querySelector(`#msg-${state.currentMsgIndex}-0`)?.scrollIntoView({ behavior: "smooth" });
-      }, 2000);
-      return;
-    }
-
-    const timeoutId = setTimeout(() => {
-      scrollToPosition({ position: "b", selector: "#sp-body" });
-    }, 300);
-
-    return () => clearTimeout(timeoutId);
-  }, [state.renderMessagesList?.length]);
+    const currentMsgIndex = currentMsgIndexRef.current;
+    return scheduleLegacyPreviewAutoScroll({
+      alignBeginningMsgId: state.alignBeginningMsgId,
+      isNotAutoScroll: state.isNotAutoScroll,
+      lastAlignedIdRef,
+      currentMsg: messagesListRef.current?.[currentMsgIndex],
+      currentMsgIndex,
+      enableScrollAuto: false,
+      scrollBehavior: isMobile() ? "auto" : "smooth",
+    });
+  }, [state.renderMessagesList?.length, state.alignBeginningMsgId, state.isNotAutoScroll]);
 
   // Initial sync:
   // Parent SDK currently relies on postMessage payload to set the correct mobile/desktop right/bottom.

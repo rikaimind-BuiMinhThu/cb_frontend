@@ -14,6 +14,7 @@ import { processForBotMessage } from 'v2/views/Preview/PreviewComponent/BotMessa
 import { processForUserMessage } from 'v2/views/Preview/PreviewComponent/UserMessageUtils';
 import { processForCombineMessage, prepareCombineMessagesForPreview } from 'v2/views/Preview/PreviewComponent/CombineMessageUtils';
 import { isBotMessage, isUserMessage, isCombineMessage, getNextUserMsg } from 'v2/views/Preview/PreviewComponent/Utils';
+import { resolveAlignBeginningMsgId } from 'v2/views/Preview/PreviewComponent/alignBeginningScroll';
 import { normalizeMessagesNotUseButton } from 'v2/views/ScenarioSetting/utils/normalizeNotUseButton';
 import {
   RENDER_CHATBOT_CONFIG,
@@ -77,6 +78,7 @@ const PreviewFaqReducer = (state, action) => {
       const isNotAutoScroll = currentMsg?.message_content?.[0]?.type === MESSAGE_CONTENT_TYPES.IMAGE
         ? (currentMsg?.message_content?.[0]?.image?.is_not_auto_scroll || false)
         : (state.isNotAutoScroll || false);
+      const alignBeginningMsgId = resolveAlignBeginningMsgId(currentMsg);
 
       return {
         ...state,
@@ -84,6 +86,7 @@ const PreviewFaqReducer = (state, action) => {
         renderMessagesList: updatedState.messagesList.slice(action.payload.startIndex, action.payload.endIndex),
         currentMsgIndex: action.payload.endIndex - 1,
         isNotAutoScroll: isNotAutoScroll,
+        alignBeginningMsgId,
       };
 
     case PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON:
@@ -439,7 +442,7 @@ const PreviewFaqReducer = (state, action) => {
     case PREVIEW_ACTIONS.SET_MANUALLY_CLOSED:
       return { ...state, manuallyClosed: action.payload };
     case PREVIEW_ACTIONS.SET_SUBMIT_ERROR_MESSAGE:
-      return { ...state, submitErrorMessage: action.payload };
+      return { ...state, submitErrorMessage: action.payload, alignBeginningMsgId: null };
     case PREVIEW_ACTIONS.CLEAR_SUBMIT_ERROR_MESSAGE:
       return { ...state, submitErrorMessage: '' };
   }

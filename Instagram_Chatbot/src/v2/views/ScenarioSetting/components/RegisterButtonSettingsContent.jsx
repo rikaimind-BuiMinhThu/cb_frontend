@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { AdminInfoTooltip } from 'v2/components/AdminShell';
 import InputCustom from '../scenarioCommon/InputCustom';
@@ -15,6 +15,7 @@ import {
   shouldShowMessageTagBlock,
 } from '../utils/tagFiringUtils';
 import { applyAmazonPayUsageToMessage } from '../utils/amazonPayConfigUtils';
+import { USER_ALIGN_BEGINNING_STOP } from '../constants/userMessageScrollConstants';
 
 const labelWithTooltip = (text, tooltipKey) => (
   <>
@@ -54,7 +55,6 @@ const RegisterButtonSettingsContent = ({
   isUseAmazonPay = false,
   tagFiringEnabled = false,
 }) => {
-  const [alignBeginningStop, setAlignBeginningStop] = useState(false);
   const settingsRef = useRef(null);
   const pendingScrollSnapshotsRef = useRef(null);
   const showAmazonPayMessageOptions = isUseFukushashiki && isUseAmazonPay;
@@ -90,8 +90,8 @@ const RegisterButtonSettingsContent = ({
     >
       <div className="ss-user-register-button-settings__main">
         <ScenarioModalCheckbox
-          checked={alignBeginningStop}
-          onChange={setAlignBeginningStop}
+          checked={!!selectedMessage[USER_ALIGN_BEGINNING_STOP]}
+          onChange={(checked) => updateMessage({ [USER_ALIGN_BEGINNING_STOP]: checked })}
           label={labelWithTooltip(
             REGISTER_BUTTON_LABELS.alignBeginningStop,
             'alignBeginningStop',

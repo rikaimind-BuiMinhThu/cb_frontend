@@ -64,6 +64,7 @@ const sharedPreviewInitialState = (params) => ({
   progressBarMaxIndex: null,
   tagFiring: { ...DEFAULT_TAG_FIRING },
   scenarioName: "",
+  alignBeginningMsgId: null,
 });
 
 const faqExtras = () => ({
