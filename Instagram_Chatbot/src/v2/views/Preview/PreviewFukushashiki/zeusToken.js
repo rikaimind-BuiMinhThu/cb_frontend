@@ -382,8 +382,15 @@ export const prepareLexicaCreditToken = async ({
   userId,
   messages,
 }) => {
+  const payment = findPaymentMethod(messages);
   const card = findCreditCardPayload(messages);
-  if (!card || !isCreditSelection(card)) return { ok: true, card: null };
+  if (!card || !isCreditSelection(card)) {
+    // Credit selected but card payload missing → fail closed (do not create_order).
+    if (isCreditPaymentValue(payment)) {
+      return { ok: false, copy: TOKEN_FAIL_COPY };
+    }
+    return { ok: true, card: null };
+  }
 
   const fields = extractCardFields(card);
   try {
