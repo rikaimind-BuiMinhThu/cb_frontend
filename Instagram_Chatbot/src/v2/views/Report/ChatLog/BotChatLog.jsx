@@ -17,6 +17,11 @@ import { AdminPage, AdminActionButton } from 'v2/components/AdminShell';
 import { ADMIN_PATHS } from 'v2/components/AdminShell/constants';
 import { getAdminRoutePath, getSignInPath } from 'v2/variables/constants';
 import {
+  CHAT_LOG_BELONG_BOT,
+  CHAT_LOG_BELONG_COMBINE,
+  CHAT_LOG_BELONG_USER,
+  CHAT_LOG_COMBINE_ROLE_BOT,
+  CHAT_LOG_COMBINE_ROLE_USER,
   CHAT_LOG_DATE_FORMAT,
   CHAT_LOG_DATE_PICKER_FORMAT,
   CHAT_LOG_DISPLAY_DATE_FORMAT,
@@ -39,23 +44,127 @@ import {
   formatChatLogConversationHeader,
   formatChatLogUserName,
 } from 'v2/views/Report/constants';
+import {
+  BOT_MESSAGE_TYPES,
+  MESSAGE_CONTENT_TYPES,
+} from 'v2/views/Preview/PreviewComponent/Constants';
+import { getDefaultValue } from 'v2/views/Preview/PreviewComponent/VariablesUtils';
+import { getPrefectures } from 'v2/views/Preview/PreviewComponent/Utils';
 
 const SCAN_REGEX = /\{\{(.*?)\}\}/g;
 const CHAT_LOG_CACHE_BUSTER_PARAM = '_';
 const CHAT_LOG_JSON_INPUT_NAMES = ['data_name', 'zip_code_address', 'birth_date'];
+const CHAT_LOG_REPLAY_FIELD_INITIAL_SELECTION = 'initial_selection';
+const CHAT_LOG_CONDITION_FAILED_KEY = 'chat_log_condition_failed';
+const CHAT_LOG_BOT_TEMPLATE_TYPES = [
+  BOT_MESSAGE_TYPES.TEXT_INPUT,
+  BOT_MESSAGE_TYPES.HTML_CODE,
+  BOT_MESSAGE_TYPES.GETTING_ERROR_NOTIFICATION,
+];
+const CHAT_LOG_REPLAY_FIELD_BY_TYPE = {
+  [MESSAGE_CONTENT_TYPES.TEXT_INPUT]: (subContent) => subContent?.type,
+  [MESSAGE_CONTENT_TYPES.PULL_DOWN]: (subContent) => subContent?.type,
+  [MESSAGE_CONTENT_TYPES.RADIO_BUTTON]: () => CHAT_LOG_REPLAY_FIELD_INITIAL_SELECTION,
+  [MESSAGE_CONTENT_TYPES.CARD_PAYMENT_RADIO_BUTTON]: () => CHAT_LOG_REPLAY_FIELD_INITIAL_SELECTION,
+};
 
-const replaceChatLogVariables = (contentText, variables) => (
-  (contentText || EMPTY_STRING).replaceAll(SCAN_REGEX, (_text, variable) => {
-    if (variables.length === 0) return EMPTY_STRING;
-    const valueVarRef = { value: EMPTY_STRING };
-    for (const [j] of variables.entries()) {
-      if (variables[j].variable_name === variable) {
-        valueVarRef.value = variables[j].default_value;
-      }
+const dedupeVariablesByName = (...lists) => {
+  const seen = new Set();
+  const result = [];
+  lists.flat().forEach((item) => {
+    if (!item?.variable_name || seen.has(item.variable_name)) return;
+    seen.add(item.variable_name);
+    result.push({ ...item });
+  });
+  return result;
+};
+
+const ensureBotOriginalContent = (messages) => {
+  messages.forEach((message) => {
+    const isBot = message?.belong_to === CHAT_LOG_BELONG_BOT;
+    const isCombine = message?.belong_to === CHAT_LOG_BELONG_COMBINE;
+    if (!isBot && !isCombine) return;
+    (message.message_content || []).forEach((content) => {
+      if (isCombine && content.role !== CHAT_LOG_COMBINE_ROLE_BOT) return;
+      if (!CHAT_LOG_BOT_TEMPLATE_TYPES.includes(content?.type)) return;
+      const section = content[content.type];
+      if (!section || typeof section !== 'object') return;
+      if (section.originalContent) return;
+      if (typeof section.content !== 'string') return;
+      section.originalContent = section.content;
+    });
+  });
+};
+
+const resolveReplayField = (element) => {
+  const resolver = CHAT_LOG_REPLAY_FIELD_BY_TYPE[element?.type];
+  if (!resolver) return undefined;
+  return resolver(element[element.type]);
+};
+
+const resolveReplayValue = (element, chat) => {
+  if (
+    element?.type === MESSAGE_CONTENT_TYPES.RADIO_BUTTON
+    || element?.type === MESSAGE_CONTENT_TYPES.CARD_PAYMENT_RADIO_BUTTON
+  ) {
+    return element[element.type]?.initial_selection;
+  }
+  if (element?.type === MESSAGE_CONTENT_TYPES.ZIP_CODE_ADDRESS) {
+    return element[element.type];
+  }
+  return chat?.value;
+};
+
+const applySavedAnswerToVariables = ({
+  element,
+  chat,
+  replayVariables,
+  replayObjParam,
+  prefectures,
+  messageId,
+}) => {
+  const subElement = element?.[element.type];
+  if (!subElement?.is_save_input_content || !subElement?.save_input_content) return;
+
+  const variableName = subElement.save_input_content;
+  const field = resolveReplayField(element);
+  const value = resolveReplayValue(element, chat);
+
+  try {
+    const defaultValue = getDefaultValue(
+      subElement,
+      element.type,
+      value,
+      field,
+      prefectures,
+      replayVariables,
+      variableName,
+    );
+
+    if (element.type === MESSAGE_CONTENT_TYPES.ZIP_CODE_ADDRESS) {
+      replayObjParam[variableName] = JSON.stringify(subElement);
+    } else {
+      replayObjParam[variableName] = value;
     }
-    return valueVarRef.value;
-  })
-);
+
+    const existing = replayVariables.find((item) => item.variable_name === variableName);
+    if (existing) {
+      existing.default_value = defaultValue;
+      return;
+    }
+    replayVariables.push({
+      variable_name: variableName,
+      default_value: defaultValue,
+    });
+  } catch (error) {
+    console.error('Chat log variable replay failed', {
+      messageId,
+      contentType: element.type,
+      variableName,
+      error,
+    });
+  }
+};
 
 const freshChatLogConfig = (params = {}) => ({
   params: {
@@ -288,11 +397,11 @@ const BotChatLog = () => {
   const [renderMessageStatisticArr, setRenderMessageStatisticArr] = useState([]);
   const [, setIndexUser] = useState(0);
   const [captcha, setCaptcha] = useState([]);
-  const [dataPrefectures] = useState([]);
+  const [dataPrefectures, setDataPrefectures] = useState([]);
   const [statistic, setStatistic] = useState([]);
   const [overall, setOverall] = useState({});
 
-  const [objParam, setObjParam] = useState(() => ({
+  const [, setObjParam] = useState(() => ({
     current_url: window.location.href,
     current_url_title: document.title,
     user_id: Cookies.get('user_id'),
@@ -315,6 +424,7 @@ const BotChatLog = () => {
     );
     setSelectScenario({ ...sc, conversations });
     setRenderMessageArr([]);
+    setVariables([]);
 
     getMessageData(item)
   }
@@ -359,6 +469,8 @@ const BotChatLog = () => {
             messageArr.push(...res.data.data.conversation.messages);
           }
           const variablesAll = res.data?.all_variables || [];
+          const scopedVariables = res.data?.variables || [];
+          const replayVariables = dedupeVariablesByName(scopedVariables, variablesAll);
           setDataVariables(variablesAll);
           setDataMessages(messageArr);
           if (res.data.chatbot) {
@@ -367,23 +479,37 @@ const BotChatLog = () => {
 
           setBotInfor(res.data.chatbot);
           setDesignSettings(res.data.design_settings || null);
-          if (res.data.variables) {
-            setVariables([...res.data.variables, ...variablesAll]);
-            res.data.variables.forEach((item) => {
-              objParam[item.variable_name] = item.default_value;
-            });
-          }
-          setObjParam({ ...objParam });
-          const variables = [...res.data.variables];
+          const replayObjParam = {
+            current_url: window.location.href,
+            current_url_title: document.title,
+            user_id: Cookies.get('user_id'),
+            bot_id: Cookies.get('bot_id'),
+          };
+          scopedVariables.forEach((item) => {
+            replayObjParam[item.variable_name] = item.default_value;
+          });
           const messageUserVar = messageArr.filter(
             (item) =>
-              item.belong_to === "user" && item.message_content.length > 0
+              item.belong_to === CHAT_LOG_BELONG_USER && item.message_content.length > 0
           );
           setMessageUser([...messageUserVar]);
           const renderMessage = [];
+          ensureBotOriginalContent(messageArr);
 
           if (!conversion.length) {
             return;
+          }
+
+          let prefecturesList = dataPrefectures;
+          if (!prefecturesList.length) {
+            try {
+              const prefecturesRes = await getPrefectures();
+              prefecturesList = prefecturesRes?.data?.data || [];
+              setDataPrefectures(prefecturesList);
+            } catch (error) {
+              console.error('Chat log prefectures load failed', { scenarioId: scenario_id, error });
+              prefecturesList = [];
+            }
           }
 
           for (const [i] of messageArr.entries()) {
@@ -391,78 +517,73 @@ const BotChatLog = () => {
               const checkState = { checked: true };
               for (const [j] of messageArr[i].conditions.entries()) {
                 const conditionItem = messageArr[i].conditions[j];
+                const conditionValue = replayObjParam[conditionItem.nameCondition];
                 if (j === 0) {
                   if (conditionItem.condition === "include") {
-                    checkState.checked = objParam[
-                      conditionItem.nameCondition
-                    ].includes(conditionItem.inputCondition);
+                    checkState.checked = String(conditionValue || EMPTY_STRING)
+                      .includes(conditionItem.inputCondition);
                   } else if (conditionItem.condition === "is") {
                     checkState.checked =
-                      objParam[conditionItem.nameCondition] ===
-                      conditionItem.inputCondition;
+                      conditionValue === conditionItem.inputCondition;
                   } else if (conditionItem.condition === "not_include") {
-                    checkState.checked = !objParam[
-                      conditionItem.nameCondition
-                    ].includes(conditionItem.inputCondition);
+                    checkState.checked = !String(conditionValue || EMPTY_STRING)
+                      .includes(conditionItem.inputCondition);
                   } else if (conditionItem.condition === "is_not") {
                     checkState.checked =
-                      objParam[conditionItem.nameCondition] !==
-                      conditionItem.inputCondition;
+                      conditionValue !== conditionItem.inputCondition;
                   }
                 } else if (conditionItem?.linkCondition === "and") {
                   if (conditionItem.condition === "include") {
                     checkState.checked =
                       checkState.checked &&
-                      objParam[conditionItem.nameCondition].includes(
+                      String(conditionValue || EMPTY_STRING).includes(
                         conditionItem.inputCondition
                       );
                   } else if (conditionItem.condition === "is") {
                     checkState.checked =
                       checkState.checked &&
-                      objParam[conditionItem.nameCondition] ===
-                        conditionItem.inputCondition;
+                      conditionValue === conditionItem.inputCondition;
                   } else if (conditionItem.condition === "not_include") {
                     checkState.checked =
                       checkState.checked &&
-                      !objParam[conditionItem.nameCondition].includes(
+                      !String(conditionValue || EMPTY_STRING).includes(
                         conditionItem.inputCondition
                       );
                   } else if (conditionItem.condition === "is_not") {
                     checkState.checked =
                       checkState.checked &&
-                      objParam[conditionItem.nameCondition] !==
-                        conditionItem.inputCondition;
+                      conditionValue !== conditionItem.inputCondition;
                   }
                 } else if (conditionItem?.linkCondition === "or") {
                   if (conditionItem.condition === "include") {
                     checkState.checked =
                       checkState.checked ||
-                      objParam[conditionItem.nameCondition].includes(
+                      String(conditionValue || EMPTY_STRING).includes(
                         conditionItem.inputCondition
                       );
                   } else if (conditionItem.condition === "is") {
                     checkState.checked =
                       checkState.checked ||
-                      objParam[conditionItem.nameCondition] ===
-                        conditionItem.inputCondition;
+                      conditionValue === conditionItem.inputCondition;
                   } else if (conditionItem.condition === "not_include") {
                     checkState.checked =
                       checkState.checked ||
-                      !objParam[conditionItem.nameCondition].includes(
+                      !String(conditionValue || EMPTY_STRING).includes(
                         conditionItem.inputCondition
                       );
                   } else if (conditionItem.condition === "is_not") {
                     checkState.checked =
                       checkState.checked ||
-                      objParam[conditionItem.nameCondition] !==
-                        conditionItem.inputCondition;
+                      conditionValue !== conditionItem.inputCondition;
                   }
                 }
               }
               if (checkState.checked === false) {
-                if (messageArr[i].belong_to === "user")
+                messageArr[i][CHAT_LOG_CONDITION_FAILED_KEY] = true;
+                if (messageArr[i].belong_to === CHAT_LOG_BELONG_USER) {
                   setIndexUser((prev) => prev + 1);
-                // continue;
+                }
+                continue;
               }
             }
             if (
@@ -488,34 +609,24 @@ const BotChatLog = () => {
               } else if (
                 messageArr[i]?.message_content[0]?.type === "email"
               ) {
-                const variablesData = {};
-                variablesAll.forEach((item) => {
-                  variablesData[item.variable_name] = item.default_value;
-                });
-
-                variables.forEach((item) => {
-                  variablesData[item.variable_name] = item.default_value;
-                });
                 renderMessage.push({});
                 setRenderMessageArr([...renderMessage]);
                 setIndexMessageRender(i);
-                setVariables([...variables]);
               } else if (
                 messageArr[i]?.message_content[0]?.type === "variable_set"
               ) {
-                if (variables.length !== 0) {
+                if (replayVariables.length !== 0) {
                   const dataVarExist =
                     messageArr[i]?.message_content[0][
                       messageArr[i]?.message_content[0].type
                     ].variables;
-                  variables.forEach((item) => {
+                  replayVariables.forEach((item) => {
                     for (const [z] of dataVarExist.entries()) {
                       if (item.variable_name === dataVarExist[z].key) {
                         item.default_value = dataVarExist[z].value;
                       }
                     }
                   });
-                  setVariables([...variables]);
                 }
                 renderMessage.push({});
                 setRenderMessageArr([...renderMessage]);
@@ -524,19 +635,18 @@ const BotChatLog = () => {
                 messageArr[i]?.message_content[0]?.type ===
                 "clear_variable"
               ) {
-                if (variables.length !== 0) {
+                if (replayVariables.length !== 0) {
                   const dataVarExist =
                     messageArr[i]?.message_content[0][
                       messageArr[i]?.message_content[0].type
                     ].variables;
-                  variables.forEach((item) => {
+                  replayVariables.forEach((item) => {
                     for (const [z] of dataVarExist.entries()) {
                       if (item.variable_name === dataVarExist[z]) {
-                        item.default_value = "";
+                        item.default_value = EMPTY_STRING;
                       }
                     }
                   });
-                  setVariables([...variables]);
                 }
                 renderMessage.push({});
                 setRenderMessageArr([...renderMessage]);
@@ -592,40 +702,25 @@ const BotChatLog = () => {
                 setIndexUser((prev) => prev + 1);
                 // break;
               } else {
-                if (
-                  messageArr[i].message_content[0]?.type ===
-                    "text_input" &&
-                  messageArr[i].message_content[0].text_input.content
-                ) {
-                  messageArr[i].message_content[0].text_input.content =
-                    replaceChatLogVariables(
-                      messageArr[i].message_content[0].text_input.content,
-                      variables,
-                    );
-                }
-                if (
-                  messageArr[i].message_content[0]?.type ===
-                    "html_code" &&
-                  messageArr[i].message_content[0].html_code?.content
-                ) {
-                  messageArr[i].message_content[0].html_code.content =
-                    replaceChatLogVariables(
-                      messageArr[i].message_content[0].html_code.content,
-                      variables,
-                    );
-                }
-
                 setIndexMessageRender(i);
                 renderMessage.push(messageArr[i]);
                 setRenderMessageArr([...renderMessage]);
               }
             }
-            if (messageArr[i]?.belong_to === "user") {
+            const isUserBelong = messageArr[i]?.belong_to === CHAT_LOG_BELONG_USER;
+            const isCombineBelong = messageArr[i]?.belong_to === CHAT_LOG_BELONG_COMBINE;
+            if (isUserBelong || isCombineBelong) {
               if (conversationState.list.length === 0) {
                 break;
               }
               for (const [msIndex] of messageArr[i].message_content.entries()) {
                 const element = messageArr[i].message_content[msIndex];
+                if (isCombineBelong && element.role === CHAT_LOG_COMBINE_ROLE_BOT) {
+                  continue;
+                }
+                if (isCombineBelong && element.role && element.role !== CHAT_LOG_COMBINE_ROLE_USER) {
+                  continue;
+                }
                 //TODO: find message type
                 const rows = messageArr;
                 const chats = conversationState.list.filter(
@@ -645,10 +740,9 @@ const BotChatLog = () => {
                   continue;
                 }
 
-                conversationState.list = conversationState.list.filter((c) => !(
-                  c?.message_id === chat.message_id 
-                  && (c?.message_child_id >= 0 ? c.message_child_id === chat.message_child_id : true)
-                ));
+                // Remove only the matched answer. Email + phone share one message_id;
+                // wiping the whole message_id drops later siblings before they replay.
+                conversationState.list = conversationState.list.filter((c) => c !== chat);
 
                 const subElement = element[element.type];
                 if (element.type === "text_input") {
@@ -884,9 +978,22 @@ const BotChatLog = () => {
                 if (element.type === "agree_term") {
                   element[element.type].isAgree = true;
                 }
+                applySavedAnswerToVariables({
+                  element,
+                  chat,
+                  replayVariables,
+                  replayObjParam,
+                  prefectures: prefecturesList,
+                  messageId: messageArr[i]?.id,
+                });
                 element.updated_at = chat?.updated_at;
               }
             }
+          }
+
+          if (saveMsgRender) {
+            setVariables([...replayVariables]);
+            setObjParam({ ...replayObjParam });
           }
         }
       })
@@ -894,11 +1001,14 @@ const BotChatLog = () => {
         reportChatLogLoadError(error);
       })
       .finally(() => {
+        const visibleMessages = messageArr.filter(
+          (message) => !message[CHAT_LOG_CONDITION_FAILED_KEY],
+        );
         if (saveMsgStatistic) {
-          setRenderMessageStatisticArr(messageArr)
-        } 
+          setRenderMessageStatisticArr(visibleMessages);
+        }
         if (saveMsgRender) {
-          setRenderMessageArr(messageArr);
+          setRenderMessageArr(visibleMessages);
         }
       });
   }
@@ -915,7 +1025,10 @@ const BotChatLog = () => {
           setConversions(conversations);
           setTracking(response.data.tracking || null);
 
-          getScenarioMessages(botId, item.scenario_id, conversations, { saveMsgRender: true });
+          getScenarioMessages(botId, item.scenario_id, conversations, {
+            saveMsgRender: true,
+            saveMsgStatistic: false,
+          });
         }
       })
       .catch((error) => {
@@ -930,7 +1043,10 @@ const BotChatLog = () => {
         setStatistic(response.data.statistic);
         setOverall(response.data.overall);
         if (params.sc_id) {
-          getScenarioMessages(botId, params.sc_id, [], { saveMsgStatistic: true });
+          getScenarioMessages(botId, params.sc_id, [], {
+            saveMsgRender: false,
+            saveMsgStatistic: true,
+          });
         }
       })
       .catch((error) => {

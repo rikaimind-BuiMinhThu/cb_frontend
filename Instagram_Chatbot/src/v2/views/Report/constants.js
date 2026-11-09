@@ -307,6 +307,7 @@ export const CHAT_LOG_BELONG_BOT = 'bot';
 export const CHAT_LOG_BELONG_USER = 'user';
 export const CHAT_LOG_BELONG_COMBINE = 'combine';
 export const CHAT_LOG_COMBINE_ROLE_BOT = 'bot';
+export const CHAT_LOG_COMBINE_ROLE_USER = 'user';
 export const CHAT_LOG_BUTTON_SUBMIT_TYPE = 'button_submit';
 export const CHAT_LOG_REGION_SEPARATOR = ' / ';
 export const CHAT_LOG_USER_TAIL_COLOR = '#ffffff';
