@@ -328,6 +328,9 @@ const buildThemeVariables = (theme) => {
   --c-radio-input-unselected: ${theme.radioInputUnselectedColor};
   --c-radio-input-selected: ${theme.radioInputSelectedColor};
   --c-radio-font-size: ${theme.radioFontSize};
+  --c-radio-border-width: 1px;
+  --c-radio-text-color: inherit;
+  --c-radio-twinkle-color: ${theme.radioSelectedBorderColor};
   --c-error-bg: ${theme.errorMessageBgColor};
   --c-error-text: ${theme.errorMessageTextColor};
   --c-error-font-size: ${theme.errorMessageFontSize};
@@ -1264,7 +1267,10 @@ ${scopedDescendant(scopeSelector, '.theme-customize-preview__checkbox-option > l
 ${spBodySelector} .ss-message__content--user-radio_button,
 ${scopedClass(scopeSelector, '.theme-customize-preview__radio-default')} {
   background-color: var(--c-radio-unselected-bg, #ebf7ff) !important;
-  border: 1px solid var(--c-radio-unselected-border, transparent) !important;
+  border: var(--c-radio-border-width, 1px) solid var(--c-radio-unselected-border, transparent) !important;
+  padding: var(--c-radio-padding, 0px) !important;
+  color: var(--c-radio-text-color, inherit) !important;
+  box-sizing: border-box;
 }
 
 ${spBodySelector} .ss-message__content--user-radio_button--selected,
@@ -1277,7 +1283,9 @@ ${scopedClass(scopeSelector, '.theme-customize-preview__radio-default--selected'
 
 ${spBodySelector} .ss-message__content--user-radio_button--radio_button_img {
   background-color: var(--c-radio-unselected-bg, transparent) !important;
-  border: 1px solid var(--c-radio-unselected-border, transparent) !important;
+  border: var(--c-radio-border-width, 1px) solid var(--c-radio-unselected-border, transparent) !important;
+  padding: var(--c-radio-padding, var(--radio-option-padding, 0px)) !important;
+  box-sizing: border-box;
 }
 
 ${spBodySelector} .ss-message__content--user-radio_button--radio_button_img.ss-message__content--user-radio_button--selected,
@@ -1302,6 +1310,36 @@ ${spBodySelector} .ss-message__content--user-radio_button > label,
 ${spBodySelector} .ss-message__content--user-radio_button--block_style > span,
 ${scopedDescendant(scopeSelector, '.theme-customize-preview__radio-default > label')} {
   font-size: var(--c-radio-font-size, 14px) !important;
+  color: var(--c-radio-text-color, inherit) !important;
+}
+
+${spBodySelector} .ss-message__content--user-radio_button--option-twinkle,
+${spBodySelector} .option-gender-item--option-twinkle {
+  animation: radioOptionBorderTwinkle 1s ease-in-out infinite !important;
+}
+
+@keyframes radioOptionBorderTwinkle {
+  0%, 100% { box-shadow: 0 0 0 1px var(--c-radio-twinkle-color, currentColor); }
+  50% { box-shadow: 0 0 0 1px transparent; }
+}
+
+${spBodySelector} .option-gender-item--design {
+  background-color: var(--c-radio-unselected-bg, transparent) !important;
+  border: var(--c-radio-border-width, 1px) solid var(--c-radio-unselected-border, transparent) !important;
+  padding: var(--c-radio-padding, 0px) !important;
+  color: var(--c-radio-text-color, inherit) !important;
+  font-size: var(--c-radio-font-size, 14px) !important;
+}
+
+${spBodySelector} .option-gender-item--design.option-gender-item--selected {
+  background-color: var(--c-radio-selected-bg, transparent) !important;
+  border-color: var(--c-radio-selected-border, transparent) !important;
+}
+
+${spBodySelector} .option-gender-item__design-image {
+  display: block;
+  max-width: 100%;
+  height: auto;
 }
 
 ${userMessageTitleSelectors},

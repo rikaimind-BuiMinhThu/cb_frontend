@@ -22,6 +22,10 @@ import {
   getGenderOptions,
   isGenderRadio,
 } from "v2/views/ScenarioSetting/utils/radioButtonGenderUtils";
+import {
+  RADIO_OPTION_TWINKLE_CLASS,
+  resolveOptionDesignStyle,
+} from "v2/views/ScenarioSetting/utils/radioOptionDesignStyle";
 import { isMobile } from "v2/views/Preview/PreviewComponent/Utils";
 import OptionGender from "./OptionGender";
 
@@ -131,11 +135,17 @@ const RadioButton = ({
     }
   };
 
-  const getDefaultOptionClassName = (item) => {
+  const getOptionDesign = (item) => resolveOptionDesignStyle({
+    option: item,
+    radioButton,
+  });
+
+  const getDefaultOptionClassName = (item, twinkle) => {
     const isSelected = isRadioOptionInitiallySelected(radioButton, item);
     return [
       "ss-message__content--user-radio_button",
       isSelected ? "ss-message__content--user-radio_button--selected" : "",
+      twinkle ? RADIO_OPTION_TWINKLE_CLASS : "",
     ]
       .filter(Boolean)
       .join(" ");
@@ -158,6 +168,7 @@ const RadioButton = ({
       const selectionKey = getRadioOptionSelectionKey(item);
       const inputId = `ss-message__content--user-radio_button_${messageIndex}_${contentIndex}_${selectionKey}_${index}`;
       const isSelected = isRadioOptionInitiallySelected(radioButton, item);
+      const { style, twinkle } = getOptionDesign(item);
       return (
         <div
           key={index}
@@ -165,7 +176,8 @@ const RadioButton = ({
             contentIndex,
             item
           )}
-          className={getDefaultOptionClassName(item)}
+          className={getDefaultOptionClassName(item, twinkle)}
+          style={style}
         >
           <input
             disabled={disabled}
@@ -220,6 +232,8 @@ const RadioButton = ({
           const selectionKey = getRadioOptionSelectionKey(item);
           const inputId = `ss-message__content--user-radio_button_img_${messageIndex}_${contentIndex}_${selectionKey}_${index}`;
           const isSelected = isRadioOptionInitiallySelected(radioButton, item);
+          const { resolved, style, twinkle } = getOptionDesign(item);
+          const imageSrc = resolved.image || item.img;
           return (
             <div
               key={index}
@@ -235,9 +249,11 @@ const RadioButton = ({
                 disabled
                   ? "ss-message__content--user-radio_button--radio_button_img--disabled"
                   : "",
+                twinkle ? RADIO_OPTION_TWINKLE_CLASS : "",
               ]
                 .filter(Boolean)
                 .join(" ")}
+              style={style}
               onClick={() => handleImageOptionSelect(item)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
@@ -260,7 +276,7 @@ const RadioButton = ({
                 aria-hidden="true"
               />
               <img
-                src={item.img}
+                src={imageSrc}
                 alt={item.alt || item.text || EMPTY_IMAGE_ALT}
               />
             </div>

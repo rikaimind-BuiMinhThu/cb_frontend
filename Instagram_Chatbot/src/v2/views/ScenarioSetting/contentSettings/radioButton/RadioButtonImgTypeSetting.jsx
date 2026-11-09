@@ -2,10 +2,16 @@ import React from 'react';
 import { MDBIcon } from 'mdbreact';
 import InputCustom from '../../scenarioCommon/InputCustom';
 import { RADIO_BUTTON_LABELS } from '../../constants/scenarioSettingLabels';
+import {
+  getRadioOptionDesignType,
+  getRadioOptionNormalImage,
+  mirrorRadioOptionNormalImage,
+} from '../../utils/radioOptionDesign';
 import { buildRadioButtonSettingContext } from './radioButtonSettingContext';
 import { InitialSelectionCheckbox } from './radioButtonShared';
 import RadioButtonItemsList from './RadioButtonItemsList';
 import RadioButtonImgLayoutSection from './RadioButtonImgLayoutSection';
+import RadioOptionDesignControls from './RadioOptionDesignControls';
 
 const RadioButtonImgTypeSetting = (props) => {
   const {
@@ -16,6 +22,13 @@ const RadioButtonImgTypeSetting = (props) => {
     setAcceptFile,
   } = props;
   const { content, changeContent, toggleInitialSelection } = buildRadioButtonSettingContext(props);
+  const designType = getRadioOptionDesignType(radioButton);
+
+  const updateNormalImage = (indexRadio, itemRadio) => (value) => {
+    const nextOption = mirrorRadioOptionNormalImage(itemRadio, value, designType);
+    changeContent(radioButton.type, indexRadio, 'img')(nextOption.img);
+    changeContent(radioButton.type, indexRadio, 'design')(nextOption.design);
+  };
 
   const renderItemGrip = () => (
     <MDBIcon fas icon="grip-horizontal" className="ss-radio-button-setting__img-grip" />
@@ -26,19 +39,20 @@ const RadioButtonImgTypeSetting = (props) => {
       <InputCustom
         className="ss-radio-button-setting__img-file-input"
         placeholder={RADIO_BUTTON_LABELS.fileUrl}
-        onChange={changeContent(radioButton.type, indexRadio, 'img')}
-        value={itemRadio.img}
+        onChange={updateNormalImage(indexRadio, itemRadio)}
+        value={getRadioOptionNormalImage(itemRadio)}
       />
       <MDBIcon
         onClick={(e) => {
           e.stopPropagation();
           setIsOpenFileReference(true);
           setVarFileReference({
+            radioDesign: true,
+            designState: 'normal',
             indexContent,
             contentType: content.type,
             subContentType: radioButton.type,
             indexSubContent: indexRadio,
-            img: 'img',
           });
           setAcceptFile(['image']);
         }}
@@ -49,12 +63,23 @@ const RadioButtonImgTypeSetting = (props) => {
     </div>
   );
 
-  const renderItemExtra = (itemRadio) => (
+  const renderItemExtra = (itemRadio, indexRadio) => (
     <div className="ss-radio-button-setting__img-item-footer">
       <InitialSelectionCheckbox
         item={itemRadio}
         radioButton={radioButton}
         toggleInitialSelection={toggleInitialSelection}
+      />
+      <RadioOptionDesignControls
+        radioButton={radioButton}
+        item={itemRadio}
+        optionIndex={indexRadio}
+        indexContent={indexContent}
+        contentType={content.type}
+        changeContent={changeContent}
+        setIsOpenFileReference={setIsOpenFileReference}
+        setVarFileReference={setVarFileReference}
+        setAcceptFile={setAcceptFile}
       />
     </div>
   );

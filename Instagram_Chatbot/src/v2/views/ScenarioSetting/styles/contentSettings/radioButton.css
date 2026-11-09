@@ -121,7 +121,9 @@
 
 .ss-radio-button-setting__default-item-extra {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
   gap: 8px;
   width: 100%;
   min-width: 0;
@@ -155,7 +157,9 @@
 }
 
 .ss-radio-button-setting__initial-selection {
-  width: 100%;
+  width: auto;
+  flex: 0 1 auto;
+  min-width: 0;
 }
 
 .ss-radio-button-setting__initial-selection .ant-checkbox-wrapper {
@@ -166,7 +170,13 @@
 }
 
 .ss-radio-button-setting__img-item-footer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   width: 100%;
+  min-width: 0;
 }
 
 .ss-radio-button-img-layout-section {

@@ -16,9 +16,18 @@ import {
   getGenderOptions,
   isGenderRadio,
 } from "v2/views/ScenarioSetting/utils/radioButtonGenderUtils";
+import {
+  GENDER_OPTION_DESIGN_CLASS,
+  GENDER_OPTION_SELECTED_CLASS,
+  GENDER_OPTION_TWINKLE_CLASS,
+  RADIO_OPTION_TWINKLE_CLASS,
+  resolveOptionDesignStyle,
+} from "v2/views/ScenarioSetting/utils/radioOptionDesignStyle";
 import "../../styles/contentPreviews/radioButton.css";
 import "v2/assets/css/bot/preview-chat-bot.css";
 import { EMPTY_INPUT_VALUE } from "v2/views/Preview/PreviewComponent/Constants";
+
+const EMPTY_IMAGE_ALT = "";
 
 const RadioButtonPreview = ({
   radioButton,
@@ -55,10 +64,16 @@ const RadioButtonPreview = ({
     );
   };
 
+  const getOptionDesign = (item) => resolveOptionDesignStyle({
+    option: item,
+    radioButton,
+  });
+
   const renderDefaultType = () =>
     radioButton[radioButton.type].map((item, index) => {
       const inputId = `ss-radio-button-preview-default-${index}`;
       const isSelected = isRadioOptionInitiallySelected(radioButton, item);
+      const { style, twinkle } = getOptionDesign(item);
       return (
         <div
           key={index}
@@ -71,10 +86,12 @@ const RadioButtonPreview = ({
             isSelected
               ? "ss-message__content--user-radio_button--selected"
               : "",
+            twinkle ? RADIO_OPTION_TWINKLE_CLASS : "",
             getEditorHighlightClassName(item),
           ]
             .filter(Boolean)
             .join(" ")}
+          style={style}
         >
           <input
             type="radio"
@@ -88,14 +105,15 @@ const RadioButtonPreview = ({
       );
     });
 
+  const getGenderDisplayClass = () => {
+    if (radioButton.gender_display_type === "vertical") return "gender-display-column";
+    if (radioButton.gender_display_type === "horizontal") return "gender-display-row";
+    return EMPTY_INPUT_VALUE;
+  };
+
   const renderGenderType = () => {
     const options = getGenderOptions(radioButton);
-    const displayClass =
-      radioButton.gender_display_type === "vertical"
-        ? "gender-display-column"
-        : radioButton.gender_display_type === "horizontal"
-        ? "gender-display-row"
-        : EMPTY_INPUT_VALUE;
+    const displayClass = getGenderDisplayClass();
 
     return (
       <div className="options-gender_wrapper">
@@ -105,8 +123,13 @@ const RadioButtonPreview = ({
               radioButton,
               item
             );
-            const buttonColor = item?.preset_config?.preset?.button?.default;
-            const icon = item?.preset_config?.preset?.icon;
+            const { resolved, style, twinkle } = getOptionDesign(item);
+            const hasDesignVisual = Boolean(
+              item?.design
+              || item?.preset_config
+              || resolved.background_color
+              || resolved.image
+            );
             return (
               <div
                 key={item.id}
@@ -116,29 +139,26 @@ const RadioButtonPreview = ({
                 )}
                 className={[
                   "option-gender-item",
-                  buttonColor ? "option-gender-item--preset" : "",
+                  hasDesignVisual ? GENDER_OPTION_DESIGN_CLASS : "",
+                  isSelected ? GENDER_OPTION_SELECTED_CLASS : "",
+                  twinkle ? GENDER_OPTION_TWINKLE_CLASS : "",
                   isSelected ? "ss-radio-button-preview__option--selected" : "",
                   getEditorHighlightClassName(item),
                 ]
                   .filter(Boolean)
                   .join(" ")}
-                style={
-                  buttonColor ? { "--gender-btn-bg": buttonColor } : undefined
-                }
+                style={style}
               >
-                {icon?.url ? (
-                  <div
-                    className="ico option-gender-icon-mask"
-                    style={{
-                      "--gender-icon-mask": `url(${icon.url})`,
-                      "--gender-icon-color": icon.default,
-                      "--gender-icon-width": `${icon.width || 24}px`,
-                      "--gender-icon-height": `${icon.height || 24}px`,
-                    }}
+                {resolved.image ? (
+                  <img
+                    className="option-gender-item__design-image"
+                    src={resolved.image}
+                    alt={item.text || EMPTY_IMAGE_ALT}
                   />
-                ) : (
+                ) : null}
+                {item.text ? (
                   <div className="option-gender-icon-text">{item.text}</div>
-                )}
+                ) : null}
               </div>
             );
           })}
@@ -169,6 +189,8 @@ const RadioButtonPreview = ({
         {items.map((item, index) => {
           const inputId = `ss-radio-button-preview-img-${index}`;
           const isSelected = isRadioOptionInitiallySelected(radioButton, item);
+          const { resolved, style, twinkle } = getOptionDesign(item);
+          const imageSrc = resolved.image || item.img;
           return (
             <div
               key={index}
@@ -181,10 +203,12 @@ const RadioButtonPreview = ({
                 isSelected
                   ? "ss-message__content--user-radio_button--selected"
                   : "",
+                twinkle ? RADIO_OPTION_TWINKLE_CLASS : "",
                 getEditorHighlightClassName(item),
               ]
                 .filter(Boolean)
                 .join(" ")}
+              style={style}
             >
               <input
                 type="radio"
@@ -197,7 +221,7 @@ const RadioButtonPreview = ({
                 tabIndex={-1}
                 aria-hidden="true"
               />
-              <img src={item.img} alt="" />
+              <img src={imageSrc} alt={EMPTY_IMAGE_ALT} />
             </div>
           );
         })}

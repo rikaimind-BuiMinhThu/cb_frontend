@@ -18,7 +18,6 @@ export const GENDER_ICON_URL_FEMALE = createGenderIconDataUri(GENDER_ICON_FEMALE
 
 export const GENDER_ICON_SIZE = 32;
 export const GENDER_ICON_COLOR = '#FFFFFF';
-export const GENDER_COLOR_FALLBACK = '#000000';
 
 export const GENDER_MALE_COLORS = {
   buttonDefault: '#7EB6E8',
@@ -55,11 +54,32 @@ export const createGenderPreset = (
   },
 });
 
+const createGenderDesign = (backgroundDefault, backgroundSelected, imageUrl) => ({
+  normal: {
+    background_color: backgroundDefault,
+    image: imageUrl,
+  },
+  selected: {
+    background_color: backgroundSelected,
+    image: imageUrl,
+  },
+  unselected: {
+    background_color: backgroundDefault,
+    image: imageUrl,
+  },
+});
+
 export const getDefaultGenderOptions = () => ([
   {
     id: 1,
     text: GENDER_LABEL_MALE,
     value: GENDER_VALUE_MALE,
+    img: GENDER_ICON_URL_MALE,
+    design: createGenderDesign(
+      GENDER_MALE_COLORS.buttonDefault,
+      GENDER_MALE_COLORS.buttonSelected,
+      GENDER_ICON_URL_MALE,
+    ),
     preset_config: createGenderPreset(
       GENDER_MALE_COLORS.buttonDefault,
       GENDER_MALE_COLORS.buttonHover,
@@ -71,6 +91,12 @@ export const getDefaultGenderOptions = () => ([
     id: 2,
     text: GENDER_LABEL_FEMALE,
     value: GENDER_VALUE_FEMALE,
+    img: GENDER_ICON_URL_FEMALE,
+    design: createGenderDesign(
+      GENDER_FEMALE_COLORS.buttonDefault,
+      GENDER_FEMALE_COLORS.buttonSelected,
+      GENDER_ICON_URL_FEMALE,
+    ),
     preset_config: createGenderPreset(
       GENDER_FEMALE_COLORS.buttonDefault,
       GENDER_FEMALE_COLORS.buttonHover,
@@ -84,7 +110,7 @@ const isPlaceholderGenderOption = (option) => {
   if (!option || typeof option !== 'object') return true;
   const keys = Object.keys(option);
   if (keys.length === 1 && keys[0] === 'id') return true;
-  if (!option.text && !option.value && !option.preset_config) return true;
+  if (!option.text && !option.value && !option.preset_config && !option.design) return true;
   return false;
 };
 
@@ -93,26 +119,3 @@ export const isPlaceholderGenderList = (options) => {
   return options.every(isPlaceholderGenderOption);
 };
 
-export const mergeGenderIconUrl = (presetConfig, fileUrl) => {
-  const currentPreset = presetConfig?.preset || {};
-  const currentIcon = currentPreset.icon || {};
-  return {
-    ...presetConfig,
-    preset: {
-      ...currentPreset,
-      button: { ...(currentPreset.button || {}) },
-      icon: {
-        ...currentIcon,
-        url: fileUrl,
-        height: currentIcon.height || GENDER_ICON_SIZE,
-        width: currentIcon.width || GENDER_ICON_SIZE,
-      },
-    },
-  };
-};
-
-export const toGenderColorPickerValue = (value) => {
-  const normalized = (value || GENDER_COLOR_FALLBACK).trim();
-  if (/^#[0-9a-fA-F]{6}$/.test(normalized)) return normalized;
-  return GENDER_COLOR_FALLBACK;
-};

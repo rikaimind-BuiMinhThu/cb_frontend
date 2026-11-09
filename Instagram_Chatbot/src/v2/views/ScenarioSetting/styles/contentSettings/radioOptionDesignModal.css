@@ -1,0 +1,224 @@
+.ss-radio-option-design-modal {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) 280px;
+  gap: 12px;
+  align-items: start;
+}
+
+.ss-radio-option-design-modal__forms {
+  min-width: 0;
+}
+
+.ss-radio-option-design-modal__preview-pane {
+  position: sticky;
+  top: 0;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background: #f8f9fa;
+  padding: 10px;
+  min-width: 0;
+}
+
+.ss-radio-option-design-modal__preview-title {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #222;
+}
+
+.ss-radio-option-design-modal__preview-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ss-radio-option-design-modal__preview-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ss-radio-option-design-modal__preview-label {
+  font-size: 11px;
+  color: #666;
+}
+
+.ss-radio-option-design-modal__preview-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  min-height: 40px;
+  padding: var(--c-radio-padding, 8px 10px);
+  border: var(--c-radio-border-width, 1px) solid var(--c-radio-unselected-border, #d9d9d9);
+  border-radius: 6px;
+  background-color: var(--c-radio-unselected-bg, #fff);
+  color: var(--c-radio-text-color, #333);
+  font-size: var(--c-radio-font-size, 14px);
+}
+
+.ss-radio-option-design-modal__preview-chip--selected {
+  background-color: var(--c-radio-selected-bg, #ebf7ff);
+  border-color: var(--c-radio-selected-border, #327aed);
+}
+
+.ss-radio-option-design-modal__preview-chip--twinkle {
+  animation: radioOptionBorderTwinkle 1s ease-in-out infinite;
+}
+
+.ss-radio-option-design-modal__preview-image {
+  display: block;
+  max-width: 48px;
+  max-height: 48px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.ss-radio-option-design-modal__preview-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  word-break: break-word;
+}
+
+.ss-radio-option-design-modal__card {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background: #fff;
+  padding: 8px 10px 2px;
+  margin-bottom: 8px;
+}
+
+.ss-radio-option-design-modal__section {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #222;
+}
+
+.ss-radio-option-design-modal .ss-settings-form-row {
+  margin-bottom: 6px;
+}
+
+.ss-radio-option-design-modal .ss-settings-form-row__label {
+  flex: 0 0 96px;
+}
+
+.ss-radio-option-design-modal__inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ss-radio-option-design-modal__swatch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.ss-radio-option-design-modal__color {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.ss-radio-option-design-modal__hex {
+  font-size: 11px;
+  color: #666;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.ss-radio-option-design-modal__number-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ss-radio-option-design-modal__number {
+  width: 72px;
+  max-width: 72px;
+  box-sizing: border-box;
+  padding: 4px 6px;
+  font-size: 13px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+}
+
+.ss-radio-option-design-modal__unit {
+  font-size: 11px;
+  color: #666;
+  white-space: nowrap;
+}
+
+.ss-radio-option-design-modal__select {
+  min-width: 140px;
+  padding: 4px 6px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 13px;
+}
+
+.ss-radio-option-design-modal__clear {
+  border: 0;
+  background: transparent;
+  color: #327aed;
+  cursor: pointer;
+  padding: 0;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.ss-radio-option-design-modal__image-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.ss-radio-option-design-modal__image-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 4px 6px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.ss-radio-option-design-modal__paperclip {
+  cursor: pointer;
+  color: #666;
+}
+
+.ss-radio-button-setting__design-link {
+  border: 0;
+  background: transparent;
+  color: #327aed;
+  cursor: pointer;
+  padding: 0;
+  font-size: 13px;
+  text-decoration: underline;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+@keyframes radioOptionBorderTwinkle {
+  0%, 100% { box-shadow: 0 0 0 1px var(--c-radio-twinkle-color, currentColor); }
+  50% { box-shadow: 0 0 0 1px transparent; }
+}
+
+@media (max-width: 900px) {
+  .ss-radio-option-design-modal {
+    grid-template-columns: 1fr;
+  }
+
+  .ss-radio-option-design-modal__preview-pane {
+    position: static;
+  }
+}

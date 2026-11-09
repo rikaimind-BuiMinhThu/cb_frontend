@@ -20,3 +20,33 @@
   outline-offset: 2px;
   border-radius: 4px;
 }
+
+.ss-message__content--user-radio_button--option-twinkle,
+.option-gender-item--option-twinkle {
+  animation: radioOptionBorderTwinkle 1s ease-in-out infinite;
+}
+
+@keyframes radioOptionBorderTwinkle {
+  0%, 100% { box-shadow: 0 0 0 1px var(--c-radio-twinkle-color, currentColor); }
+  50% { box-shadow: 0 0 0 1px transparent; }
+}
+
+.option-gender-item--design {
+  background-color: var(--c-radio-unselected-bg, transparent);
+  border: var(--c-radio-border-width, 1px) solid var(--c-radio-unselected-border, transparent);
+  padding: var(--c-radio-padding, 0px);
+  color: var(--c-radio-text-color, inherit);
+  font-size: var(--c-radio-font-size, 14px);
+  box-sizing: border-box;
+}
+
+.option-gender-item--design.option-gender-item--selected {
+  background-color: var(--c-radio-selected-bg, transparent);
+  border-color: var(--c-radio-selected-border, transparent);
+}
+
+.option-gender-item__design-image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}

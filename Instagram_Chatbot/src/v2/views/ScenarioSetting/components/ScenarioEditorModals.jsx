@@ -5,11 +5,16 @@ import ScenarioSettingsModalContainer from './modals/ScenarioSettingsModalContai
 import ScenarioModalShell from './modals/shared/ScenarioModalShell';
 import AddVariableModalContent from './modals/AddVariableModalContent';
 import { useScenarioPanelDestructuring } from '../hooks/useScenarioPanelDestructuring';
-import { mergeGenderIconUrl } from '../constants/genderOptionDefaults';
 import { isUserContentFileTarget } from '../utils/isUserContentFileTarget';
 import { resolveBotFileWriteTarget } from '../utils/resolveBotFileWriteTarget';
+import {
+  RADIO_OPTION_DESIGN_STATES,
+  getRadioOptionDesignType,
+  setRadioOptionDesignImage,
+} from '../utils/radioOptionDesign';
 
-const PRESET_CONFIG_FIELD = 'preset_config';
+const DESIGN_FIELD = 'design';
+const IMG_FIELD = 'img';
 const MODAL_TITLE_ADD_VARIABLE = '変数追加';
 const MODAL_TITLE_FILE_REFERENCE = 'ファイル参照';
 const MODAL_TITLE_SHOPIFY = 'Shopify商品参照';
@@ -44,7 +49,7 @@ const ScenarioEditorModals = () => {
     setErrorVariable('');
   };
 
-  const applyGenderIconFileUrl = (fileUrl) => {
+  const applyRadioDesignImage = (fileUrl) => {
     const message = dataMessages[indexMessageSelect];
     const contentItem = message?.message_content?.[varFileReference.indexContent];
     const radioButton = contentItem?.[varFileReference.contentType];
@@ -52,16 +57,36 @@ const ScenarioEditorModals = () => {
     const option = options?.[varFileReference.indexSubContent];
     if (!option) return;
 
-    const nextPreset = mergeGenderIconUrl(option.preset_config, fileUrl);
+    const designType = getRadioOptionDesignType(radioButton);
+    const designState = varFileReference.designState || RADIO_OPTION_DESIGN_STATES.NORMAL;
+    const nextDesign = setRadioOptionDesignImage(
+      option.design,
+      designState,
+      fileUrl,
+      designType,
+    );
+
     onChangeValueMessageContent(
       indexMessageSelect,
       varFileReference.indexContent,
       varFileReference.contentType,
-      nextPreset,
+      nextDesign,
       varFileReference.subContentType,
       varFileReference.indexSubContent,
-      PRESET_CONFIG_FIELD,
+      DESIGN_FIELD,
     );
+
+    if (designState === RADIO_OPTION_DESIGN_STATES.NORMAL) {
+      onChangeValueMessageContent(
+        indexMessageSelect,
+        varFileReference.indexContent,
+        varFileReference.contentType,
+        fileUrl,
+        varFileReference.subContentType,
+        varFileReference.indexSubContent,
+        IMG_FIELD,
+      );
+    }
   };
 
   const applyUserContentFileUrl = (fileUrl) => {
@@ -184,8 +209,8 @@ const ScenarioEditorModals = () => {
   };
 
   const handleReferFile = (fileUrl) => {
-    if (varFileReference.genderIconUrl) {
-      applyGenderIconFileUrl(fileUrl);
+    if (varFileReference.radioDesign) {
+      applyRadioDesignImage(fileUrl);
       setIsOpenFileReference(false);
       return;
     }
