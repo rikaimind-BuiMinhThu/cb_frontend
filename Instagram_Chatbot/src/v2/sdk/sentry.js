@@ -57,13 +57,11 @@ const initializeSentryClient = () => {
   if (!window.Sentry || window.__SENTRY_INITIALIZED__) return false;
 
   window.__SENTRY_INITIALIZED__ = true;
+  // bundle.min.js is errors-only; BrowserTracing is a warning shim here and tracing is unused.
   window.Sentry.init({
     dsn: SENTRY_DSN,
     debug: false,
     sendDefaultPii: true,
-    integrations: (typeof window.Sentry.BrowserTracing === 'function')
-      ? [new window.Sentry.BrowserTracing()]
-      : [],
   });
   log(SENTRY_INIT_LOG);
   return true;

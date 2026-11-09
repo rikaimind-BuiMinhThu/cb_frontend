@@ -172,8 +172,7 @@
     window.Sentry.init({
       dsn: SENTRY_DSN,
       debug: false,
-      sendDefaultPii: true,
-      integrations: typeof window.Sentry.BrowserTracing === "function" ? [new window.Sentry.BrowserTracing()] : []
+      sendDefaultPii: true
     });
     log(SENTRY_INIT_LOG);
     return true;

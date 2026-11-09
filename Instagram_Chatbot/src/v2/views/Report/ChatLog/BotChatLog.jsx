@@ -8,7 +8,6 @@ import { format } from 'date-fns';
 import 'v2/views/Report/styles/bot-chat-log.css';
 import 'v2/assets/css/bot/report.css';
 import 'v2/views/Report/styles/chat-log.css';
-import $ from 'jquery';
 import BotChatLogTranscript from './BotChatLogTranscript';
 import { findLastIndex } from 'lodash';
 import moment from 'moment';
@@ -293,24 +292,12 @@ const BotChatLog = () => {
   const [statistic, setStatistic] = useState([]);
   const [overall, setOverall] = useState({});
 
-  const [objParam, setObjParam] = useState(() => {
-    const dataObj = {
-      current_url: window.location.href,
-      current_url_title: document.title,
-      user_id: Cookies.get('user_id'),
-      bot_id: Cookies.get('bot_id'),
-    };
-    $.getJSON('https://api.ipregistry.co/?key=tryout', (data) => {
-      dataObj.user_ip_address = data.ip;
-      dataObj.user_country = data.location.country.name;
-      dataObj.user_city = data.location.city;
-      dataObj.user_device = data.user_agent.device.type;
-      dataObj.user_browser = data.user_agent.name;
-      dataObj.user_agent = data.user_agent.header;
-      dataObj.start_datetime = new Date();
-    });
-    return dataObj;
-  });
+  const [objParam, setObjParam] = useState(() => ({
+    current_url: window.location.href,
+    current_url_title: document.title,
+    user_id: Cookies.get('user_id'),
+    bot_id: Cookies.get('bot_id'),
+  }));
 
   const onSelectChat = (item) => {
     const detailPath = buildChatLogDetailPath(item.scenario_id, item.user_input_id);
