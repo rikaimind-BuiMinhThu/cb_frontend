@@ -1,3 +1,7 @@
+.ss-radio-option-design-modal-shell {
+  --ss-radio-design-accent: #327aed;
+}
+
 .ss-radio-option-design-modal {
   display: grid;
   grid-template-columns: minmax(300px, 340px) minmax(360px, 1fr);
@@ -65,20 +69,54 @@
   font-size: var(--c-radio-font-size, 14px);
 }
 
+/* Default: min-height so wrapped label text is not clipped. */
 .ss-radio-option-design-modal__preview-chip--default {
   padding: var(--c-radio-padding, 0);
+  min-height: var(--c-radio-height, 0);
 }
 
+/* Gender: fixed height tile bars (icon centered, matches live OptionGender). */
 .ss-radio-option-design-modal__preview-chip--gender {
   justify-content: center;
+  align-items: center;
+  min-width: 120px;
+  width: 140px;
+  max-width: 100%;
   padding: var(--c-radio-padding, 15px 10px);
   border-radius: 10px;
   font-weight: 600;
+  height: var(--c-radio-height, 78px);
+  overflow: hidden;
+}
+
+.ss-radio-option-design-modal__preview-chip--gender .ss-radio-option-design-modal__preview-image {
+  max-width: 48px;
+  max-height: 48px;
 }
 
 .ss-radio-option-design-modal__preview-chip--image {
   justify-content: center;
   padding: var(--c-radio-padding, 0);
+}
+
+.ss-radio-option-design-modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.ss-radio-option-design-modal__sync {
+  margin-right: auto;
+  border: 1px solid var(--ss-radio-design-accent);
+  background: #fff;
+  color: var(--ss-radio-design-accent);
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
 }
 
 .ss-radio-option-design-modal__preview-chip--selected {
@@ -226,7 +264,7 @@
 .ss-radio-option-design-modal__clear {
   border: 0;
   background: transparent;
-  color: #327aed;
+  color: var(--ss-radio-design-accent);
   cursor: pointer;
   padding: 0;
   font-size: 11px;
@@ -257,7 +295,7 @@
 .ss-radio-button-setting__design-link {
   border: 0;
   background: transparent;
-  color: #327aed;
+  color: var(--ss-radio-design-accent, #327aed);
   cursor: pointer;
   padding: 0;
   font-size: 13px;

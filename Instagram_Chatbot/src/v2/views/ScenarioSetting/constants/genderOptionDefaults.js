@@ -7,9 +7,10 @@ const GENDER_VALUE_FEMALE = 'female';
 
 const GENDER_ICON_MALE_PATH = 'M7.5 10.2c0-1 .8-1.8 1.8-1.8h5.4c1 0 1.8.8 1.8 1.8V16h-2.2v6.5h-4.6V16H7.5z';
 const GENDER_ICON_FEMALE_PATH = 'M12 8.6c-2 0-3.7.9-4.7 2.2L4.2 17.5h4.1V22h7.4v-4.5h4.1l-3.1-6.7C15.7 9.5 14 8.6 12 8.6z';
+export const GENDER_ICON_COLOR = '#FFFFFF';
 
 const createGenderIconDataUri = (bodyPath) => {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="5" r="3.2" fill="#000"/><path fill="#000" d="${bodyPath}"/></svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="5" r="3.2" fill="${GENDER_ICON_COLOR}"/><path fill="${GENDER_ICON_COLOR}" d="${bodyPath}"/></svg>`;
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 };
 
@@ -17,18 +18,22 @@ export const GENDER_ICON_URL_MALE = createGenderIconDataUri(GENDER_ICON_MALE_PAT
 export const GENDER_ICON_URL_FEMALE = createGenderIconDataUri(GENDER_ICON_FEMALE_PATH);
 
 export const GENDER_ICON_SIZE = 32;
-export const GENDER_ICON_COLOR = '#FFFFFF';
 
 export const GENDER_MALE_COLORS = {
-  buttonDefault: '#7EB6E8',
-  buttonHover: '#5A9BD4',
-  buttonSelected: '#3D7ABF',
+  buttonDefault: '#5B9BD5',
+  buttonHover: '#4A8BC4',
+  buttonSelected: '#2F80ED',
 };
 
 export const GENDER_FEMALE_COLORS = {
-  buttonDefault: '#F5A3B5',
-  buttonHover: '#EE8FA6',
-  buttonSelected: '#E56B88',
+  buttonDefault: '#8A8A8A',
+  buttonHover: '#7A7A7A',
+  buttonSelected: '#5A5A5A',
+};
+
+export const GENDER_DESIGN_COMMON = {
+  height: 78,
+  padding: 10,
 };
 
 export const createGenderPreset = (
@@ -55,6 +60,9 @@ export const createGenderPreset = (
 });
 
 const createGenderDesign = (backgroundDefault, backgroundSelected, imageUrl) => ({
+  common: {
+    ...GENDER_DESIGN_COMMON,
+  },
   normal: {
     background_color: backgroundDefault,
     image: imageUrl,
@@ -118,4 +126,3 @@ export const isPlaceholderGenderList = (options) => {
   if (!Array.isArray(options) || options.length === 0) return true;
   return options.every(isPlaceholderGenderOption);
 };
-

@@ -32,9 +32,21 @@ export const RADIO_OPTION_PADDING_MIN = 0;
 export const RADIO_OPTION_PADDING_MAX = 48;
 export const RADIO_OPTION_TEXT_SIZE_MIN = 10;
 export const RADIO_OPTION_TEXT_SIZE_MAX = 32;
+export const RADIO_OPTION_HEIGHT_MIN = 24;
+export const RADIO_OPTION_HEIGHT_MAX = 200;
 
 export const RADIO_OPTION_BORDER_EFFECT_NONE = 'none';
 export const RADIO_OPTION_BORDER_EFFECT_TWINKLE = 'twinkle';
+
+export const RADIO_OPTION_DESIGN_COMMON_KEY = 'common';
+
+/** Size fields stored in design.common (also readable from legacy per-state). */
+export const RADIO_OPTION_COMMON_SIZE_FIELDS = [
+  'height',
+  'border_width',
+  'padding',
+  'text_size',
+];
 
 const SHARED_FIELDS = [
   'border_color',
@@ -46,11 +58,25 @@ const SHARED_FIELDS = [
 const TEXT_FIELDS = ['text_size', 'text_color'];
 const IMAGE_FIELDS = ['image'];
 
+// Keep border_width/padding/text_size on per-state matrix for legacy read (M2).
 export const RADIO_OPTION_DESIGN_FIELD_MATRIX = {
   [RADIO_OPTION_DESIGN_TYPES.DEFAULT]: [...SHARED_FIELDS, ...TEXT_FIELDS],
   [RADIO_OPTION_DESIGN_TYPES.GENDER]: [...SHARED_FIELDS, ...TEXT_FIELDS, ...IMAGE_FIELDS],
   [RADIO_OPTION_DESIGN_TYPES.RADIO_BUTTON_IMG]: [...SHARED_FIELDS, ...IMAGE_FIELDS],
   [RADIO_OPTION_DESIGN_TYPES.UPSELL_BUTTON]: [...SHARED_FIELDS, ...IMAGE_FIELDS],
+};
+
+export const getAllowedRadioOptionCommonFields = (designType) => {
+  if (
+    designType === RADIO_OPTION_DESIGN_TYPES.DEFAULT
+    || designType === RADIO_OPTION_DESIGN_TYPES.GENDER
+  ) {
+    return [...RADIO_OPTION_COMMON_SIZE_FIELDS];
+  }
+  // Image/upsell: shared sizes without height/text (grid layout owns tile size).
+  return RADIO_OPTION_COMMON_SIZE_FIELDS.filter(
+    (field) => field !== 'height' && field !== 'text_size',
+  );
 };
 
 const HEX_COLOR = /^#[0-9a-fA-F]{6}$/;
@@ -85,6 +111,10 @@ const normalizeSparseField = (key, value, clampNumbers = true) => {
   if (key === 'border_color' || key === 'text_color' || key === 'background_color') {
     if (!isHexColor(value)) return null;
     return value.toLowerCase();
+  }
+  if (key === 'height') {
+    if (!clampNumbers) return parseFiniteNumber(value);
+    return clampNumber(value, RADIO_OPTION_HEIGHT_MIN, RADIO_OPTION_HEIGHT_MAX);
   }
   if (key === 'border_width') {
     if (!clampNumbers) return parseFiniteNumber(value);
@@ -183,8 +213,18 @@ const sparseStateFromSource = (sourceState, allowedFields, clampNumbers = true) 
 export const sanitizeRadioOptionDesign = (design, designType, options = {}) => {
   const clampNumbers = options.clampNumbers !== false;
   const allowedFields = getAllowedRadioOptionDesignFields(designType);
+  const allowedCommonFields = getAllowedRadioOptionCommonFields(designType);
   const source = asObject(design);
   const next = {};
+
+  const commonSparse = sparseStateFromSource(
+    source[RADIO_OPTION_DESIGN_COMMON_KEY],
+    allowedCommonFields,
+    clampNumbers,
+  );
+  if (Object.keys(commonSparse).length > 0) {
+    next[RADIO_OPTION_DESIGN_COMMON_KEY] = commonSparse;
+  }
 
   Object.values(RADIO_OPTION_DESIGN_STATES).forEach((stateKey) => {
     const sparseState = sparseStateFromSource(
@@ -238,6 +278,13 @@ const readSparseField = (design, stateKey, field) => {
   return normalizeSparseField(field, state[field]);
 };
 
+const readCommonField = (design, field) => {
+  const common = asObject(asObject(design)[RADIO_OPTION_DESIGN_COMMON_KEY]);
+  return normalizeSparseField(field, common[field]);
+};
+
+const isCommonSizeField = (field) => RADIO_OPTION_COMMON_SIZE_FIELDS.includes(field);
+
 const resolveFieldValue = ({
   design,
   legacyDesign,
@@ -245,6 +292,12 @@ const resolveFieldValue = ({
   selectionState,
   themeFallback,
 }) => {
+  // Precedence for size fields: common → per-state (legacy) → theme.
+  if (isCommonSizeField(field)) {
+    const fromCommon = readCommonField(design, field);
+    if (fromCommon !== null) return fromCommon;
+  }
+
   const fromState = readSparseField(design, selectionState, field);
   if (fromState !== null) return fromState;
 
@@ -325,8 +378,13 @@ export const resolveRadioOptionDesign = ({
 
   const themeFallback = themeFallbacksForState(theme, selectionState);
   const resolved = { selectionState, designType };
+  const allowedCommonFields = getAllowedRadioOptionCommonFields(designType);
+  const fieldsToResolve = Array.from(new Set([
+    ...allowedFields,
+    ...allowedCommonFields,
+  ]));
 
-  allowedFields.forEach((field) => {
+  fieldsToResolve.forEach((field) => {
     resolved[field] = resolveFieldValue({
       design: sparseDesign,
       legacyDesign,
@@ -381,6 +439,10 @@ export const buildRadioOptionDesignVars = (resolved) => {
 
   if (resolved.padding !== null && resolved.padding !== undefined) {
     vars['--c-radio-padding'] = toPx(resolved.padding);
+  }
+
+  if (resolved.height !== null && resolved.height !== undefined) {
+    vars['--c-radio-height'] = toPx(resolved.height);
   }
 
   if (resolved.text_size !== null && resolved.text_size !== undefined) {
@@ -474,3 +536,86 @@ export const areRadioOptionDesignsEqual = (left, right, designType) => (
   JSON.stringify(sanitizeRadioOptionDesign(left, designType))
   === JSON.stringify(sanitizeRadioOptionDesign(right, designType))
 );
+
+/**
+ * Lift legacy per-state size fields into design.common for modal draft editing.
+ * Snapshot must stay unlifted so Cancel is not dirty.
+ * First-wins across normal → unselected → selected; other states' size values
+ * are discarded from the draft and will be gone after Save.
+ */
+export const liftRadioOptionDesignCommonForDraft = (design, designType) => {
+  const next = sanitizeRadioOptionDesign(design, designType, { clampNumbers: false });
+  const allowedCommonFields = getAllowedRadioOptionCommonFields(designType);
+  const common = { ...asObject(next[RADIO_OPTION_DESIGN_COMMON_KEY]) };
+  const stateOrder = [
+    RADIO_OPTION_DESIGN_STATES.NORMAL,
+    RADIO_OPTION_DESIGN_STATES.UNSELECTED,
+    RADIO_OPTION_DESIGN_STATES.SELECTED,
+  ];
+
+  allowedCommonFields.forEach((field) => {
+    if (common[field] !== undefined && common[field] !== null && common[field] !== '') {
+      return;
+    }
+    stateOrder.some((stateKey) => {
+      const state = asObject(next[stateKey]);
+      if (state[field] === undefined || state[field] === null || state[field] === '') {
+        return false;
+      }
+      common[field] = state[field];
+      return true;
+    });
+  });
+
+  Object.values(RADIO_OPTION_DESIGN_STATES).forEach((stateKey) => {
+    const state = asObject(next[stateKey]);
+    if (Object.keys(state).length === 0) return;
+    const cleaned = { ...state };
+    allowedCommonFields.forEach((field) => {
+      delete cleaned[field];
+    });
+    if (Object.keys(cleaned).length === 0) {
+      delete next[stateKey];
+    } else {
+      next[stateKey] = cleaned;
+    }
+  });
+
+  if (Object.keys(common).length > 0) {
+    next[RADIO_OPTION_DESIGN_COMMON_KEY] = common;
+  } else {
+    delete next[RADIO_OPTION_DESIGN_COMMON_KEY];
+  }
+
+  return sanitizeRadioOptionDesign(next, designType, { clampNumbers: false });
+};
+
+/**
+ * Merge source design into sibling, preserving sibling per-state images.
+ * Source images are stripped. Does not touch option.img.
+ */
+export const mergeRadioOptionDesignExceptImage = (sourceDesign, siblingDesign, designType) => {
+  const source = sanitizeRadioOptionDesign(sourceDesign, designType);
+  const sibling = sanitizeRadioOptionDesign(siblingDesign, designType);
+  const next = {};
+
+  if (source[RADIO_OPTION_DESIGN_COMMON_KEY]) {
+    next[RADIO_OPTION_DESIGN_COMMON_KEY] = {
+      ...asObject(source[RADIO_OPTION_DESIGN_COMMON_KEY]),
+    };
+  }
+
+  Object.values(RADIO_OPTION_DESIGN_STATES).forEach((stateKey) => {
+    const sourceState = { ...asObject(source[stateKey]) };
+    delete sourceState.image;
+    const siblingImage = asObject(sibling[stateKey]).image;
+    const merged = { ...sourceState };
+    if (siblingImage) {
+      merged.image = siblingImage;
+    }
+    if (Object.keys(merged).length === 0) return;
+    next[stateKey] = merged;
+  });
+
+  return sanitizeRadioOptionDesign(next, designType);
+};

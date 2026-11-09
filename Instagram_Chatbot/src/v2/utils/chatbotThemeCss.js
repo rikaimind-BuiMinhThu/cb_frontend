@@ -1264,12 +1264,14 @@ ${scopedDescendant(scopeSelector, '.theme-customize-preview__checkbox-option > l
   font-size: var(--c-checkbox-font-size, 14px) !important;
 }
 
-${spBodySelector} .ss-message__content--user-radio_button,
+/* Default text radios: min-height so wrapped labels are not clipped. */
+${spBodySelector} .ss-message__content--user-radio_button:not(.ss-message__content--user-radio_button--radio_button_img),
 ${scopedClass(scopeSelector, '.theme-customize-preview__radio-default')} {
   background-color: var(--c-radio-unselected-bg, #ebf7ff) !important;
   border: var(--c-radio-border-width, 1px) solid var(--c-radio-unselected-border, transparent) !important;
   padding: var(--c-radio-padding, 0px) !important;
   color: var(--c-radio-text-color, inherit) !important;
+  min-height: var(--c-radio-height, auto) !important;
   box-sizing: border-box;
 }
 
@@ -1323,12 +1325,15 @@ ${spBodySelector} .option-gender-item--option-twinkle {
   50% { box-shadow: 0 0 0 1px transparent; }
 }
 
+/* Gender tiles: fixed height for bar layout. */
 ${spBodySelector} .option-gender-item--design {
   background-color: var(--c-radio-unselected-bg, transparent) !important;
   border: var(--c-radio-border-width, 1px) solid var(--c-radio-unselected-border, transparent) !important;
   padding: var(--c-radio-padding, 0px) !important;
   color: var(--c-radio-text-color, inherit) !important;
   font-size: var(--c-radio-font-size, 14px) !important;
+  height: var(--c-radio-height, auto) !important;
+  box-sizing: border-box !important;
 }
 
 ${spBodySelector} .option-gender-item--design.option-gender-item--selected {
@@ -1339,7 +1344,9 @@ ${spBodySelector} .option-gender-item--design.option-gender-item--selected {
 ${spBodySelector} .option-gender-item__design-image {
   display: block;
   max-width: 100%;
+  max-height: 100%;
   height: auto;
+  object-fit: contain;
 }
 
 ${userMessageTitleSelectors},

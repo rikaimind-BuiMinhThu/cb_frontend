@@ -6,11 +6,19 @@ import {
   RADIO_OPTION_DESIGN_TYPES,
   getRadioOptionDesignType,
   getRadioOptionNormalImage,
+  mergeRadioOptionDesignExceptImage,
   sanitizeRadioOptionDesign,
 } from '../../utils/radioOptionDesign';
+import { getGenderOptions, isGenderRadio } from '../../utils/radioButtonGenderUtils';
 import RadioOptionDesignModal from './RadioOptionDesignModal';
 
 const ACCEPT_IMAGE_FILES = ['image'];
+
+const getRadioOptions = (radioButton) => {
+  if (isGenderRadio(radioButton)) return getGenderOptions(radioButton);
+  const key = radioButton?.type;
+  return Array.isArray(radioButton?.[key]) ? radioButton[key] : [];
+};
 
 const RadioOptionDesignControls = ({
   radioButton,
@@ -25,15 +33,32 @@ const RadioOptionDesignControls = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const designType = getRadioOptionDesignType(radioButton);
+  const options = getRadioOptions(radioButton);
+  const optionListKey = radioButton?.type;
   const previewLabel = item?.text || item?.value || '';
   const previewImage = getRadioOptionNormalImage(item);
+  const canSyncToOthers = options.length > 1;
 
   const persistDesign = (sparseDesign) => {
     const nextDesign = sanitizeRadioOptionDesign(sparseDesign, designType);
-    changeContent(radioButton.type, optionIndex, 'design')(nextDesign);
+    changeContent(optionListKey, optionIndex, 'design')(nextDesign);
     if (designType === RADIO_OPTION_DESIGN_TYPES.DEFAULT) return;
     const normalImage = nextDesign?.[RADIO_OPTION_DESIGN_STATES.NORMAL]?.image || '';
-    changeContent(radioButton.type, optionIndex, 'img')(normalImage);
+    changeContent(optionListKey, optionIndex, 'img')(normalImage);
+  };
+
+  const syncDesignToOthers = (sourceDesign) => {
+    const sanitizedSource = sanitizeRadioOptionDesign(sourceDesign, designType);
+    persistDesign(sanitizedSource);
+    options.forEach((sibling, siblingIndex) => {
+      if (siblingIndex === optionIndex) return;
+      const merged = mergeRadioOptionDesignExceptImage(
+        sanitizedSource,
+        sibling?.design,
+        designType,
+      );
+      changeContent(optionListKey, siblingIndex, 'design')(merged);
+    });
   };
 
   const openImagePicker = (designState) => {
@@ -66,6 +91,8 @@ const RadioOptionDesignControls = ({
         open={isOpen}
         onClose={() => setIsOpen(false)}
         onSave={persistDesign}
+        onSyncToOthers={canSyncToOthers ? syncDesignToOthers : undefined}
+        canSyncToOthers={canSyncToOthers}
         design={item?.design}
         designType={designType}
         onOpenImagePicker={openImagePicker}

@@ -37,6 +37,7 @@
   padding: var(--c-radio-padding, 0px);
   color: var(--c-radio-text-color, inherit);
   font-size: var(--c-radio-font-size, 14px);
+  height: var(--c-radio-height, auto);
   box-sizing: border-box;
 }
 
@@ -48,5 +49,13 @@
 .option-gender-item__design-image {
   display: block;
   max-width: 100%;
+  max-height: 100%;
   height: auto;
+  object-fit: contain;
+}
+
+/* Default text radios: min-height so wrapped labels are not clipped. */
+.ss-message__content--user-radio_button:not(.ss-message__content--user-radio_button--radio_button_img) {
+  min-height: var(--c-radio-height, auto);
+  box-sizing: border-box;
 }

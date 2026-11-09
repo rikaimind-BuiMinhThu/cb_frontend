@@ -9,8 +9,11 @@ import { RADIO_BUTTON_LABELS } from '../../constants/scenarioSettingLabels';
 import {
   RADIO_OPTION_BORDER_WIDTH_MAX,
   RADIO_OPTION_BORDER_WIDTH_MIN,
+  RADIO_OPTION_DESIGN_COMMON_KEY,
   RADIO_OPTION_DESIGN_STATES,
   RADIO_OPTION_DESIGN_TYPES,
+  RADIO_OPTION_HEIGHT_MAX,
+  RADIO_OPTION_HEIGHT_MIN,
   RADIO_OPTION_PADDING_MAX,
   RADIO_OPTION_PADDING_MIN,
   RADIO_OPTION_TEXT_SIZE_MAX,
@@ -18,7 +21,9 @@ import {
   areRadioOptionDesignsEqual,
   buildRadioOptionDesignVars,
   buildRadioPreviewPaneVars,
+  getAllowedRadioOptionCommonFields,
   getAllowedRadioOptionDesignFields,
+  liftRadioOptionDesignCommonForDraft,
   resolveRadioOptionDesign,
   resolveRadioPreviewTheme,
   sanitizeRadioOptionDesign,
@@ -113,6 +118,7 @@ const NumberField = ({
   max,
   onCommit,
   onClear,
+  placeholder,
 }) => {
   const [text, setText] = useState(toNumberInputText(value));
   const showClear = text !== '';
@@ -155,6 +161,7 @@ const NumberField = ({
           min={min}
           max={max}
           value={text}
+          placeholder={placeholder}
           onChange={(event) => {
             const nextText = event.target.value;
             setText(nextText);
@@ -192,10 +199,12 @@ NumberField.propTypes = {
   max: PropTypes.number.isRequired,
   onCommit: PropTypes.func.isRequired,
   onClear: PropTypes.func.isRequired,
+  placeholder: PropTypes.string,
 };
 
 NumberField.defaultProps = {
   value: '',
+  placeholder: '',
 };
 
 const chipTypeModifier = (designType) => {
@@ -235,11 +244,16 @@ const DesignPreviewChip = ({
   });
   const style = buildRadioOptionDesignVars(resolved);
   const twinkle = shouldApplyRadioOptionTwinkle(resolved);
-  const showText = designType === RADIO_OPTION_DESIGN_TYPES.DEFAULT
-    || designType === RADIO_OPTION_DESIGN_TYPES.GENDER;
+  const isGender = designType === RADIO_OPTION_DESIGN_TYPES.GENDER;
   const supportsImage = designType !== RADIO_OPTION_DESIGN_TYPES.DEFAULT;
   const showImage = supportsImage && Boolean(resolved.image);
-  const isImageOnly = !showText;
+  // Gender live tiles are icon-first; keep label out of the compact modal chip
+  // (text beside a fixed-height tile wraps to one letter per line).
+  const showText = designType === RADIO_OPTION_DESIGN_TYPES.DEFAULT
+    || (isGender && !showImage);
+  const isImageType = designType === RADIO_OPTION_DESIGN_TYPES.RADIO_BUTTON_IMG
+    || designType === RADIO_OPTION_DESIGN_TYPES.UPSELL_BUTTON
+    || isGender;
   const isSelected = selectionState === RADIO_OPTION_DESIGN_STATES.SELECTED;
   const chipClassName = [
     'ss-radio-option-design-modal__preview-chip',
@@ -259,7 +273,7 @@ const DesignPreviewChip = ({
             alt={EMPTY_IMAGE_ALT}
           />
         ) : null}
-        {isImageOnly && !showImage ? (
+        {isImageType && !showImage ? (
           <span className="ss-radio-option-design-modal__preview-placeholder">
             {RADIO_BUTTON_LABELS.designPreviewNoImage}
           </span>
@@ -291,6 +305,8 @@ const RadioOptionDesignModal = ({
   open,
   onClose,
   onSave,
+  onSyncToOthers,
+  canSyncToOthers,
   design,
   designType,
   onOpenImagePicker,
@@ -300,9 +316,12 @@ const RadioOptionDesignModal = ({
   const snapshotRef = useRef({});
   const [draft, setDraft] = useState({});
   const allowedFields = getAllowedRadioOptionDesignFields(designType);
-  const showTextFields = allowedFields.includes('text_size');
+  const allowedCommonFields = getAllowedRadioOptionCommonFields(designType);
+  const showTextInCommon = allowedCommonFields.includes('text_size');
+  const showHeight = allowedCommonFields.includes('height');
   const showImageField = allowedFields.includes('image');
   const sampleLabel = previewLabel || RADIO_BUTTON_LABELS.designPreviewSample;
+  const commonValues = draft[RADIO_OPTION_DESIGN_COMMON_KEY] || {};
   const previewTheme = useMemo(
     () => (open ? resolveRadioPreviewTheme() : {}),
     [open],
@@ -314,10 +333,11 @@ const RadioOptionDesignModal = ({
 
   useEffect(() => {
     if (!open) return;
-    const nextDraft = sanitizeRadioOptionDesign(design, designType);
-    // Snapshot stays sparse (no option.img seed) so Cancel does not dirty.
-    snapshotRef.current = cloneDesign(nextDraft);
-    setDraft(seedRadioOptionDesignImagesFromOption(nextDraft, previewImage, designType));
+    const sanitized = sanitizeRadioOptionDesign(design, designType);
+    // Snapshot stays unlifted so Cancel does not dirty.
+    snapshotRef.current = cloneDesign(sanitized);
+    const lifted = liftRadioOptionDesignCommonForDraft(sanitized, designType);
+    setDraft(seedRadioOptionDesignImagesFromOption(lifted, previewImage, designType));
     // Re-init only on open/type; draft edits must not reset from prop churn.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, designType]);
@@ -339,7 +359,7 @@ const RadioOptionDesignModal = ({
           delete next[stateKey];
         }
       });
-      return sanitizeRadioOptionDesign(next, designType);
+      return sanitizeRadioOptionDesign(next, designType, { clampNumbers: false });
     });
     // Sync images written by file picker while modal stays open.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -351,23 +371,30 @@ const RadioOptionDesignModal = ({
     design?.unselected?.image,
   ]);
 
-  const patchStateField = (stateKey, field, value) => {
+  const patchNestedField = (bucketKey, field, value) => {
     setDraft((current) => {
       const next = cloneDesign(current);
-      const statePatch = { ...(next[stateKey] || {}) };
+      const bucket = { ...(next[bucketKey] || {}) };
       if (value === null || value === undefined || value === '') {
-        delete statePatch[field];
+        delete bucket[field];
       } else {
-        statePatch[field] = value;
+        bucket[field] = value;
       }
-      if (Object.keys(statePatch).length === 0) {
-        delete next[stateKey];
+      if (Object.keys(bucket).length === 0) {
+        delete next[bucketKey];
       } else {
-        next[stateKey] = statePatch;
+        next[bucketKey] = bucket;
       }
-      // Keep mid-edit numbers unclamped so typing + live preview stay in sync.
       return sanitizeRadioOptionDesign(next, designType, { clampNumbers: false });
     });
+  };
+
+  const patchStateField = (stateKey, field, value) => {
+    patchNestedField(stateKey, field, value);
+  };
+
+  const patchCommonField = (field, value) => {
+    patchNestedField(RADIO_OPTION_DESIGN_COMMON_KEY, field, value);
   };
 
   const handleCancel = () => {
@@ -382,6 +409,63 @@ const RadioOptionDesignModal = ({
     onClose();
   };
 
+  const handleSyncToOthers = () => {
+    if (!onSyncToOthers) return;
+    onSyncToOthers(sanitizeRadioOptionDesign(draft, designType));
+    onClose();
+  };
+
+  const renderCommonSection = () => (
+    <DesignSection title={RADIO_BUTTON_LABELS.designCommon}>
+      <div className="ss-radio-option-design-modal__fields">
+        {showHeight ? (
+          <ScenarioFormRow label={RADIO_BUTTON_LABELS.designHeight}>
+            <NumberField
+              value={commonValues.height}
+              min={RADIO_OPTION_HEIGHT_MIN}
+              max={RADIO_OPTION_HEIGHT_MAX}
+              placeholder={RADIO_BUTTON_LABELS.designHeightAuto}
+              onCommit={(next) => patchCommonField('height', next)}
+              onClear={() => patchCommonField('height', null)}
+            />
+          </ScenarioFormRow>
+        ) : null}
+        <ScenarioFormRow label={RADIO_BUTTON_LABELS.designBorderWidth}>
+          <NumberField
+            value={commonValues.border_width}
+            min={RADIO_OPTION_BORDER_WIDTH_MIN}
+            max={RADIO_OPTION_BORDER_WIDTH_MAX}
+            placeholder={RADIO_BUTTON_LABELS.designClear}
+            onCommit={(next) => patchCommonField('border_width', next)}
+            onClear={() => patchCommonField('border_width', null)}
+          />
+        </ScenarioFormRow>
+        <ScenarioFormRow label={RADIO_BUTTON_LABELS.designPadding}>
+          <NumberField
+            value={commonValues.padding}
+            min={RADIO_OPTION_PADDING_MIN}
+            max={RADIO_OPTION_PADDING_MAX}
+            placeholder={RADIO_BUTTON_LABELS.designClear}
+            onCommit={(next) => patchCommonField('padding', next)}
+            onClear={() => patchCommonField('padding', null)}
+          />
+        </ScenarioFormRow>
+        {showTextInCommon ? (
+          <ScenarioFormRow label={RADIO_BUTTON_LABELS.designTextSize}>
+            <NumberField
+              value={commonValues.text_size}
+              min={RADIO_OPTION_TEXT_SIZE_MIN}
+              max={RADIO_OPTION_TEXT_SIZE_MAX}
+              placeholder={RADIO_BUTTON_LABELS.designClear}
+              onCommit={(next) => patchCommonField('text_size', next)}
+              onClear={() => patchCommonField('text_size', null)}
+            />
+          </ScenarioFormRow>
+        ) : null}
+      </div>
+    </DesignSection>
+  );
+
   const renderStateSection = (section) => {
     const stateValues = draft[section.key] || {};
     return (
@@ -392,15 +476,6 @@ const RadioOptionDesignModal = ({
               value={stateValues.border_color}
               onChange={(event) => patchStateField(section.key, 'border_color', event.target.value)}
               onClear={() => patchStateField(section.key, 'border_color', null)}
-            />
-          </ScenarioFormRow>
-          <ScenarioFormRow label={RADIO_BUTTON_LABELS.designBorderWidth}>
-            <NumberField
-              value={stateValues.border_width}
-              min={RADIO_OPTION_BORDER_WIDTH_MIN}
-              max={RADIO_OPTION_BORDER_WIDTH_MAX}
-              onCommit={(next) => patchStateField(section.key, 'border_width', next)}
-              onClear={() => patchStateField(section.key, 'border_width', null)}
             />
           </ScenarioFormRow>
           <ScenarioFormRow label={RADIO_BUTTON_LABELS.designBorderEffect}>
@@ -420,15 +495,6 @@ const RadioOptionDesignModal = ({
               </select>
             </div>
           </ScenarioFormRow>
-          <ScenarioFormRow label={RADIO_BUTTON_LABELS.designPadding}>
-            <NumberField
-              value={stateValues.padding}
-              min={RADIO_OPTION_PADDING_MIN}
-              max={RADIO_OPTION_PADDING_MAX}
-              onCommit={(next) => patchStateField(section.key, 'padding', next)}
-              onClear={() => patchStateField(section.key, 'padding', null)}
-            />
-          </ScenarioFormRow>
           <ScenarioFormRow label={RADIO_BUTTON_LABELS.designBackgroundColor}>
             <ColorField
               value={stateValues.background_color}
@@ -436,25 +502,14 @@ const RadioOptionDesignModal = ({
               onClear={() => patchStateField(section.key, 'background_color', null)}
             />
           </ScenarioFormRow>
-          {showTextFields ? (
-            <>
-              <ScenarioFormRow label={RADIO_BUTTON_LABELS.designTextColor}>
-                <ColorField
-                  value={stateValues.text_color}
-                  onChange={(event) => patchStateField(section.key, 'text_color', event.target.value)}
-                  onClear={() => patchStateField(section.key, 'text_color', null)}
-                />
-              </ScenarioFormRow>
-              <ScenarioFormRow label={RADIO_BUTTON_LABELS.designTextSize}>
-                <NumberField
-                  value={stateValues.text_size}
-                  min={RADIO_OPTION_TEXT_SIZE_MIN}
-                  max={RADIO_OPTION_TEXT_SIZE_MAX}
-                  onCommit={(next) => patchStateField(section.key, 'text_size', next)}
-                  onClear={() => patchStateField(section.key, 'text_size', null)}
-                />
-              </ScenarioFormRow>
-            </>
+          {showTextInCommon ? (
+            <ScenarioFormRow label={RADIO_BUTTON_LABELS.designTextColor}>
+              <ColorField
+                value={stateValues.text_color}
+                onChange={(event) => patchStateField(section.key, 'text_color', event.target.value)}
+                onClear={() => patchStateField(section.key, 'text_color', null)}
+              />
+            </ScenarioFormRow>
           ) : null}
           {showImageField ? (
             <ScenarioFormRow
@@ -500,12 +555,23 @@ const RadioOptionDesignModal = ({
       width={RADIO_OPTION_DESIGN_MODAL_WIDTH}
       className="ss-radio-option-design-modal-shell"
       footer={(
-        <ScenarioModalFooter
-          onClose={handleCancel}
-          onConfirm={handleSave}
-          closeLabel={RADIO_BUTTON_LABELS.designCancel}
-          confirmLabel={RADIO_BUTTON_LABELS.designSave}
-        />
+        <div className="ss-radio-option-design-modal__footer">
+          {canSyncToOthers && onSyncToOthers ? (
+            <button
+              type="button"
+              className="ss-radio-option-design-modal__sync"
+              onClick={handleSyncToOthers}
+            >
+              {RADIO_BUTTON_LABELS.designSyncToOthers}
+            </button>
+          ) : null}
+          <ScenarioModalFooter
+            onClose={handleCancel}
+            onConfirm={handleSave}
+            closeLabel={RADIO_BUTTON_LABELS.designCancel}
+            confirmLabel={RADIO_BUTTON_LABELS.designSave}
+          />
+        </div>
       )}
     >
       <div
@@ -515,6 +581,7 @@ const RadioOptionDesignModal = ({
         role="presentation"
       >
         <div className="ss-radio-option-design-modal__forms">
+          {renderCommonSection()}
           {STATE_SECTIONS.map(renderStateSection)}
         </div>
         <aside
@@ -548,6 +615,8 @@ RadioOptionDesignModal.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
+  onSyncToOthers: PropTypes.func,
+  canSyncToOthers: PropTypes.bool,
   design: PropTypes.object,
   designType: PropTypes.string.isRequired,
   onOpenImagePicker: PropTypes.func.isRequired,
@@ -556,6 +625,8 @@ RadioOptionDesignModal.propTypes = {
 };
 
 RadioOptionDesignModal.defaultProps = {
+  onSyncToOthers: undefined,
+  canSyncToOthers: false,
   design: {},
   previewLabel: '',
   previewImage: '',
