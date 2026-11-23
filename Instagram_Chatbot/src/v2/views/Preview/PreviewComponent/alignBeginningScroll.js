@@ -1,4 +1,8 @@
-import { getElementMessageById } from './Utils';
+import {
+  getElementMessageById,
+  isCombineMessage,
+  isUserMessage,
+} from './Utils';
 
 export const USER_ALIGN_BEGINNING_STOP = 'user_align_beginning_stop';
 
@@ -14,10 +18,6 @@ export const SCROLL_AUTO_DELAY_MS = 1000;
 
 export const BOTTOM_SCROLL_DELAY_MS = 300;
 
-const BELONG_TO_USER = 'user';
-
-const BELONG_TO_COMBINE = 'combine';
-
 export const resolveAlignBeginningMsgId = (message) => {
   if (!message?.[USER_ALIGN_BEGINNING_STOP]) {
     return null;
@@ -25,13 +25,11 @@ export const resolveAlignBeginningMsgId = (message) => {
   if (message.hidden) {
     return null;
   }
-  if (message.belong_to !== BELONG_TO_USER && message.belong_to !== BELONG_TO_COMBINE) {
+  if (!isUserMessage(message) && !isCombineMessage(message)) {
     return null;
   }
-  if (message.id === undefined || message.id === null) {
-    return null;
-  }
-  return message.id;
+  if (message.id) return message.id;
+  return null;
 };
 
 export const scrollMsgIntoSpBody = ({
