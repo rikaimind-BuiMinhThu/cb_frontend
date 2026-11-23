@@ -12,7 +12,6 @@ import {
 import { processForBotMessage } from '../PreviewComponent/BotMessageUtils';
 import { processForUserMessage } from '../PreviewComponent/UserMessageUtils';
 import { isBotMessage, isUserMessage, getNextUserMsg } from '../PreviewComponent/Utils';
-import { resolveAlignBeginningMsgId } from '../PreviewComponent/alignBeginningScroll';
 import {
   RENDER_CHATBOT_CONFIG,
   PREVIEW_ACTIONS,
@@ -63,15 +62,12 @@ const PreviewFaqReducer = (state, action) => {
         isNotAutoScroll = currentMsg?.message_content?.[0]?.image?.is_not_auto_scroll || false;
       }
 
-      const alignBeginningMsgId = resolveAlignBeginningMsgId(currentMsg);
-
       return {
         ...state,
         ...updatedState,
         renderMessagesList: updatedState.messagesList.slice(action.payload.startIndex, action.payload.endIndex),
         currentMsgIndex: action.payload.endIndex - 1,
         isNotAutoScroll: isNotAutoScroll,
-        alignBeginningMsgId,
       };
 
     case PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON:
@@ -353,7 +349,7 @@ const PreviewFaqReducer = (state, action) => {
     case PREVIEW_ACTIONS.SET_MANUALLY_CLOSED:
       return { ...state, manuallyClosed: action.payload };
     case PREVIEW_ACTIONS.SET_SUBMIT_ERROR_MESSAGE:
-      return { ...state, submitErrorMessage: action.payload, alignBeginningMsgId: null };
+      return { ...state, submitErrorMessage: action.payload };
     case PREVIEW_ACTIONS.CLEAR_SUBMIT_ERROR_MESSAGE:
       return { ...state, submitErrorMessage: '' };
   }

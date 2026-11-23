@@ -11,7 +11,6 @@ import {
 import { processForBotMessage } from '../PreviewComponent/BotMessageUtils';
 import { processForUserMessage } from '../PreviewComponent/UserMessageUtils';
 import { isBotMessage, isUserMessage, getNextUserMsg } from '../PreviewComponent/Utils';
-import { resolveAlignBeginningMsgId } from '../PreviewComponent/alignBeginningScroll';
 import { mapAmazonPayDataToMessagesList } from '../PreviewComponent/TorizenUtils';
 import { mapAmazonPayDataToMessagesListForBliss } from '../PreviewComponent/BlissUtils';
 import { mapAmazonPayDataToMessagesListForRoseMay } from '../PreviewComponent/RoseMayUtils';
@@ -108,15 +107,12 @@ const PreviewFukushashikiReducer = (state, action) => {
         isNotAutoScroll = true;
       }
 
-      const alignBeginningMsgId = resolveAlignBeginningMsgId(currentMsg);
-
       return {
         ...state,
         ...updatedState,
         renderMessagesList: updatedState.messagesList.slice(action.payload.startIndex, action.payload.endIndex),
         currentMsgIndex: action.payload.endIndex - 1,
         isNotAutoScroll: isNotAutoScroll,
-        alignBeginningMsgId,
       };
     case PREVIEW_ACTIONS.UPDATE_SUBMIT_ERROR_MESSAGE: {
       let messagesList = _.cloneDeep(state.messagesList);
@@ -126,7 +122,6 @@ const PreviewFukushashikiReducer = (state, action) => {
           ...state,
           submitErrorMessage: action.payload,
           isProcessing: false,
-          alignBeginningMsgId: null,
         };
       }
 
@@ -153,7 +148,6 @@ const PreviewFukushashikiReducer = (state, action) => {
           submitErrorMessage: action.payload,
           isProcessing: false,
           nextStopMsgIndex: nextStopMsgIndex,
-          alignBeginningMsgId: null,
         };
       }
 
@@ -170,7 +164,6 @@ const PreviewFukushashikiReducer = (state, action) => {
         renderMessagesList: renderMessagesList,
         submitErrorMessage: action.payload,
         isProcessing: false,
-        alignBeginningMsgId: null,
       };
     }
 
@@ -191,7 +184,6 @@ const PreviewFukushashikiReducer = (state, action) => {
         renderMessagesList: renderMessagesList,
         submitErrorMessage: action.payload.error,
         isProcessing: false,
-        alignBeginningMsgId: null,
       };
     }
     case PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON:
