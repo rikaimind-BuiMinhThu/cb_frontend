@@ -1,3 +1,5 @@
+import { getElementMessageById } from './Utils';
+
 export const USER_ALIGN_BEGINNING_STOP = 'user_align_beginning_stop';
 
 export const SP_BODY_SELECTOR = '#sp-body';
@@ -12,6 +14,10 @@ export const SCROLL_AUTO_DELAY_MS = 1000;
 
 export const BOTTOM_SCROLL_DELAY_MS = 300;
 
+const BELONG_TO_USER = 'user';
+
+const BELONG_TO_COMBINE = 'combine';
+
 export const resolveAlignBeginningMsgId = (message) => {
   if (!message?.[USER_ALIGN_BEGINNING_STOP]) {
     return null;
@@ -19,7 +25,7 @@ export const resolveAlignBeginningMsgId = (message) => {
   if (message.hidden) {
     return null;
   }
-  if (message.belong_to !== 'user' && message.belong_to !== 'combine') {
+  if (message.belong_to !== BELONG_TO_USER && message.belong_to !== BELONG_TO_COMBINE) {
     return null;
   }
   if (message.id === undefined || message.id === null) {
@@ -35,8 +41,13 @@ export const scrollMsgIntoSpBody = ({
   containerSelector = SP_BODY_SELECTOR,
 }) => {
   const container = document.querySelector(containerSelector);
-  const element = document.querySelector(`#msg_id_${msgId}`);
-  if (!container || !element) {
+  const elementId = getElementMessageById(msgId);
+  if (!container || !elementId) {
+    return false;
+  }
+  const matches = document.querySelectorAll(`#${elementId}`);
+  const element = matches[matches.length - 1];
+  if (!element) {
     return false;
   }
   const targetScrollTop =

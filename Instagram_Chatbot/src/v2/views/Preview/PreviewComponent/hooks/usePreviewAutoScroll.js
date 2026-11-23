@@ -42,11 +42,12 @@ export const usePreviewAutoScroll = ({
 
     if (alignMsgId === null || alignMsgId === undefined) {
       lastAlignedIdRef.current = null;
-    } else if (lastAlignedIdRef.current === alignMsgId) {
-      return;
     } else {
-      lastAlignedIdRef.current = alignMsgId;
+      if (lastAlignedIdRef.current === alignMsgId) {
+        return;
+      }
       const alignTimeoutId = setTimeout(() => {
+        lastAlignedIdRef.current = alignMsgId;
         const scrolled = scrollMsgIntoSpBody({
           msgId: alignMsgId,
           offsetPx: SCROLL_MSG_OFFSET_ALIGN_BEGINNING_PX,

@@ -439,7 +439,7 @@ const PreviewFaqReducer = (state, action) => {
     case PREVIEW_ACTIONS.SET_MANUALLY_CLOSED:
       return { ...state, manuallyClosed: action.payload };
     case PREVIEW_ACTIONS.SET_SUBMIT_ERROR_MESSAGE:
-      return { ...state, submitErrorMessage: action.payload, alignBeginningMsgId: null };
+      return { ...state, submitErrorMessage: action.payload };
     case PREVIEW_ACTIONS.CLEAR_SUBMIT_ERROR_MESSAGE:
       return { ...state, submitErrorMessage: '' };
   }

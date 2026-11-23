@@ -166,7 +166,6 @@ const PreviewFukushashikiReducer = (state, action) => {
           ...state,
           submitErrorMessage: action.payload,
           isProcessing: false,
-          alignBeginningMsgId: null,
         };
       }
 
@@ -194,7 +193,6 @@ const PreviewFukushashikiReducer = (state, action) => {
           submitErrorMessage: action.payload,
           isProcessing: false,
           nextStopMsgIndex: nextStopMsgIndex,
-          alignBeginningMsgId: null,
         };
       }
 
@@ -211,7 +209,6 @@ const PreviewFukushashikiReducer = (state, action) => {
         renderMessagesList: renderMessagesList,
         submitErrorMessage: action.payload,
         isProcessing: false,
-        alignBeginningMsgId: null,
       };
     }
 
@@ -230,7 +227,6 @@ const PreviewFukushashikiReducer = (state, action) => {
         renderMessagesList: renderMessagesList,
         submitErrorMessage: action.payload.error,
         isProcessing: false,
-        alignBeginningMsgId: null,
       };
     }
     case PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON:
