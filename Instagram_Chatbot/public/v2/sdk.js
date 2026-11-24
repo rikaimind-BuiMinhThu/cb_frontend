@@ -42,20 +42,32 @@
   };
 
   // src/v2/sdk/config/environment.js
+  var SRC_ENV_BY_HOST = {
+    "ec-chatbot1.com": "staging",
+    "ec-chatbot.com": "production",
+    "localhost:3001": "local"
+  };
+  var API_BASE_BY_ENV = {
+    staging: "https://ec-chatbot-test1.com",
+    test: "https://ec-chatbot-test1.com",
+    production: "https://ec-chatbot-test.com",
+    local: "http://localhost:3000"
+  };
+  var FRONTEND_BASE_BY_ENV = {
+    staging: "https://ec-chatbot1.com",
+    test: "https://ec-chatbot1.com",
+    production: "https://ec-chatbot.com",
+    local: "http://localhost:3001"
+  };
   var getEnvFromScriptSrc = () => {
     var _a;
     try {
       if (window.getSdkEnv) return window.sdkEnv;
       window.getSdkEnv = true;
-      const SRC_PARSER = {
-        "ec-chatbot1.com": "staging",
-        "ec-chatbot.com": "production",
-        "localhost:3001": "local"
-      };
       const src = ((_a = document.currentScript) == null ? void 0 : _a.src) || "";
       if (!src) return null;
       const host = new URL(src).host;
-      const sdkEnv = SRC_PARSER[host];
+      const sdkEnv = SRC_ENV_BY_HOST[host];
       if (sdkEnv) {
         window.sdkEnv = sdkEnv;
         return sdkEnv;
@@ -65,59 +77,26 @@
       return null;
     }
   };
-  var getEnvironment = () => {
-    const params = new Proxy(new URLSearchParams(window.location.search), {
-      get: (searchParams, prop) => searchParams.get(prop)
-    });
-    return params.env || getEnvFromScriptSrc() || "production";
-  };
-  var getDebugFlag = () => {
-    const params = new Proxy(new URLSearchParams(window.location.search), {
-      get: (searchParams, prop) => searchParams.get(prop)
-    });
-    return params.debug === "true" || params.debug === "1";
-  };
   var getParam = (paramName) => {
     const params = new Proxy(new URLSearchParams(window.location.search), {
       get: (searchParams, prop) => searchParams.get(prop)
     });
     return params[paramName];
   };
+  var getEnvironment = () => getParam("env") || getEnvFromScriptSrc() || "production";
+  var getApiEnvironment = () => getParam("api_env") || getEnvironment();
+  var getDebugFlag = () => {
+    const debug = getParam("debug");
+    return debug === "true" || debug === "1";
+  };
   var log = (message) => {
-    const debugFlag = getDebugFlag();
-    if (debugFlag) {
+    if (getDebugFlag()) {
       console.log(message);
     }
   };
   var sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-  var getEcChatBotApiServerBaseUrl = () => {
-    const environment = getEnvironment();
-    switch (environment) {
-      case "staging":
-      case "test":
-        return "https://ec-chatbot-test1.com";
-      case "production":
-        return "https://ec-chatbot-test.com";
-      case "local":
-        return "http://localhost:3000";
-      default:
-        return "http://localhost:3000";
-    }
-  };
-  var getEcChatBotFrontEndBaseUrl = () => {
-    const environment = getEnvironment();
-    switch (environment) {
-      case "staging":
-      case "test":
-        return "https://ec-chatbot1.com";
-      case "production":
-        return "https://ec-chatbot.com";
-      case "local":
-        return "http://localhost:3001";
-      default:
-        return "http://localhost:3001";
-    }
-  };
+  var getEcChatBotApiServerBaseUrl = () => API_BASE_BY_ENV[getApiEnvironment()] || API_BASE_BY_ENV.local;
+  var getEcChatBotFrontEndBaseUrl = () => FRONTEND_BASE_BY_ENV[getEnvironment()] || FRONTEND_BASE_BY_ENV.local;
 
   // src/v2/sdk/sentry.js
   var SENTRY_CDN_URL = "https://browser.sentry-cdn.com/7.57.0/bundle.min.js";
@@ -874,12 +853,13 @@
   };
   var resolveSourceElement = (sourceSelector, searchMode) => {
     if (!sourceSelector) return null;
-    if (searchMode !== void 0 && searchMode !== null && searchMode !== "") {
-      try {
-        return getElementByAddress(searchMode, sourceSelector);
-      } catch (err) {
-        console.warn("[AmazonPay] getElementByAddress failed:", err);
-      }
+    if (!searchMode) {
+      return document.getElementById(sourceSelector) || document.querySelector(sourceSelector);
+    }
+    try {
+      return getElementByAddress(searchMode, sourceSelector);
+    } catch (err) {
+      console.warn("[AmazonPay] getElementByAddress failed:", err);
     }
     return document.getElementById(sourceSelector) || document.querySelector(sourceSelector);
   };
@@ -944,6 +924,7 @@
   };
 
   // src/v2/sdk/amazon/detection.js
+  var shouldIgnoreLpDomainGate = () => getDebugFlag() && getParam("ignore_lp_domain") === "1";
   var CUSTOM_JS_SENTRY_FAILED = "Failed sending Amazon Pay custom_js error to Sentry";
   var CUSTOM_JS_EVAL_FAILED = "[AmazonPay] custom_js evaluation failed:";
   var evaluateCustomJsCode = (code) => {
@@ -1009,15 +990,19 @@
   };
   var canRunGenericAmazon = (hostname, scenarioConfig) => {
     var _a, _b;
-    if (!isHostnameAllowedForLp(hostname, scenarioConfig == null ? void 0 : scenarioConfig.allowed_lp_domains)) return false;
+    const domainOk = shouldIgnoreLpDomainGate() || isHostnameAllowedForLp(hostname, scenarioConfig == null ? void 0 : scenarioConfig.allowed_lp_domains);
+    if (!domainOk) return false;
     const strategies = ((_b = (_a = scenarioConfig == null ? void 0 : scenarioConfig.amazon_pay_config) == null ? void 0 : _a.amazon_detection) == null ? void 0 : _b.strategies) || [];
     if (strategies.length > 0) return true;
     return hasAmazonPayTargets(scenarioConfig == null ? void 0 : scenarioConfig.messages) && extractSelectorBindingsFromMessages(scenarioConfig == null ? void 0 : scenarioConfig.messages).length > 0;
   };
   var resolveLpMode = ({ hostname, scenarioConfig }) => {
     const allowedDomains = (scenarioConfig == null ? void 0 : scenarioConfig.allowed_lp_domains) || [];
-    if (!allowedDomains.length) return LP_RESOLVE_MODES.DEFAULT;
-    if (!isHostnameAllowedForLp(hostname, allowedDomains)) return LP_RESOLVE_MODES.DEFAULT;
+    const ignoreLpDomain = shouldIgnoreLpDomainGate();
+    if (!ignoreLpDomain && !allowedDomains.length) return LP_RESOLVE_MODES.DEFAULT;
+    if (!ignoreLpDomain && !isHostnameAllowedForLp(hostname, allowedDomains)) {
+      return LP_RESOLVE_MODES.DEFAULT;
+    }
     if (canRunGenericAmazon(hostname, scenarioConfig)) return LP_RESOLVE_MODES.GENERIC;
     return LP_RESOLVE_MODES.DEFAULT;
   };
@@ -2352,7 +2337,9 @@
     iframe.style.zIndex = "999999";
     iframe.style.setProperty("width", String(iframe.width), "important");
     iframe.style.setProperty("height", String(iframe.height), "important");
-    iframe.src = `${getEcChatBotFrontEndBaseUrl()}${getSdkPreviewBasePath()}/preview-customer-fukushashiki?bot_id=${botId}&scenario_id=${chatbotLayout.scenarioId}&urlReceive=${window.location.origin}&deviceReceive=${device}&uuid=${uuid}&env=${getEnvironment()}&debug=${getDebugFlag()}&cartSystem=${data.cart_system}&isLoggedIn=${window.logged_in}`;
+    const apiEnv = getApiEnvironment();
+    const ignoreLpDomain = getParam("ignore_lp_domain") === "1" ? "&ignore_lp_domain=1" : "";
+    iframe.src = `${getEcChatBotFrontEndBaseUrl()}${getSdkPreviewBasePath()}/preview-customer-fukushashiki?bot_id=${botId}&scenario_id=${chatbotLayout.scenarioId}&urlReceive=${window.location.origin}&deviceReceive=${device}&uuid=${uuid}&env=${getEnvironment()}&api_env=${apiEnv}&debug=${getDebugFlag()}&cartSystem=${data.cart_system}&isLoggedIn=${window.logged_in}${ignoreLpDomain}`;
     const lpMode = resolveLpMode({
       hostname: window.location.hostname,
       scenarioConfig: amazonRuntimeConfig

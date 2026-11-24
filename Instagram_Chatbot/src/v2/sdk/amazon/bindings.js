@@ -350,12 +350,13 @@ export const extractSelectorBindingsFromMessages = (messages) => {
 
 const resolveSourceElement = (sourceSelector, searchMode) => {
   if (!sourceSelector) return null;
-  if (searchMode !== undefined && searchMode !== null && searchMode !== '') {
-    try {
-      return getElementByAddress(searchMode, sourceSelector);
-    } catch (err) {
-      console.warn('[AmazonPay] getElementByAddress failed:', err);
-    }
+  if (!searchMode) {
+    return document.getElementById(sourceSelector) || document.querySelector(sourceSelector);
+  }
+  try {
+    return getElementByAddress(searchMode, sourceSelector);
+  } catch (err) {
+    console.warn('[AmazonPay] getElementByAddress failed:', err);
   }
   return document.getElementById(sourceSelector) || document.querySelector(sourceSelector);
 };
