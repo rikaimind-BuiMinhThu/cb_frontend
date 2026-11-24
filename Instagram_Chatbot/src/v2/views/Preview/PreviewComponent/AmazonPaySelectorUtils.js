@@ -1,36 +1,41 @@
 import {
   AMAZON_SELECTOR_TO_VALUE_PATH,
   FUKUSHIASHIKI_SELECTOR_VALUE_SUFFIX,
-} from 'v2/variables/amazonPayConstants';
-import { SEARCH_MODES } from 'v2/sdk/constants';
-import { getElementByAddress } from 'v2/sdk/dom/lookup';
+} from "v2/variables/amazonPayConstants";
+import { SEARCH_MODES } from "v2/sdk/constants";
+import { findElementByAddress } from "v2/sdk/dom/lookup";
 import {
   appendBindings,
   buildBindingsFromSelectorKey,
-} from './FukushashikiBindingMetaUtils';
-import { extractBindingsFromContent } from './AmazonPayBindingRegistry';
+} from "./FukushashikiBindingMetaUtils";
+import { extractBindingsFromContent } from "./AmazonPayBindingRegistry";
 
 export const resolveValuePath = (selectorKeyType, content) => {
   if (AMAZON_SELECTOR_TO_VALUE_PATH[selectorKeyType]) {
     return AMAZON_SELECTOR_TO_VALUE_PATH[selectorKeyType];
   }
 
-  const inputType = content?.text_input?.type || 'text';
+  const inputType = content?.text_input?.type || "text";
 
-  if (selectorKeyType === 'value_fukushashiki_search_value') {
+  if (selectorKeyType === "value_fukushashiki_search_value") {
     return `text_input.${inputType}.value`;
   }
 
-  if (selectorKeyType === 'valueConfirm_fukushashiki_search_value') {
+  if (selectorKeyType === "valueConfirm_fukushashiki_search_value") {
     return `text_input.${inputType}.valueConfirm`;
   }
 
-  const phoneMatch = selectorKeyType.match(/^value([123])_fukushashiki_search_value$/);
+  const phoneMatch = selectorKeyType.match(
+    /^value([123])_fukushashiki_search_value$/
+  );
   if (phoneMatch) {
     return `text_input.phone_number.value${phoneMatch[1]}`;
   }
 
-  console.warn('[AmazonPay] unresolved valuePath for selector key:', selectorKeyType);
+  console.warn(
+    "[AmazonPay] unresolved valuePath for selector key:",
+    selectorKeyType
+  );
   return null;
 };
 
@@ -43,95 +48,109 @@ export const extractGenericFallbackBindings = (content) => {
     const valuePath = resolveValuePath(selectorKeyType, content);
     if (!valuePath) return;
 
-    bindings.push(...buildBindingsFromSelectorKey({
-      selectorKeyType,
-      rawValue,
-      valuePath,
-      content,
-    }));
+    bindings.push(
+      ...buildBindingsFromSelectorKey({
+        selectorKeyType,
+        rawValue,
+        valuePath,
+        content,
+      })
+    );
   });
 
   return bindings;
 };
 
-const hasAmazonPayIncludeUrlCondition = (msg) => (
-  (msg.conditions || []).some((condition) => (
-    condition.inputCondition === 'is_using_amazon_pay'
-    && condition.nameCondition === 'current_url'
-    && condition.condition === 'include'
-  ))
-);
+const hasAmazonPayIncludeUrlCondition = (msg) =>
+  (msg.conditions || []).some(
+    (condition) =>
+      condition.inputCondition === "is_using_amazon_pay" &&
+      condition.nameCondition === "current_url" &&
+      condition.condition === "include"
+  );
 
 export const isAmazonPayUserMessage = (msg) => {
-  if (msg?.belong_to !== 'user') return false;
+  if (msg?.belong_to !== "user") return false;
   if (msg.is_used_when_amazon_pay) return true;
   if (hasAmazonPayIncludeUrlCondition(msg)) return true;
-  return (msg.message_content || []).some((content) => (
-    !!content?.is_used_when_amazon_pay
-    || Object.values(content?.amazon_pay_fields || {}).some(Boolean)
-  ));
+  return (msg.message_content || []).some(
+    (content) =>
+      !!content?.is_used_when_amazon_pay ||
+      Object.values(content?.amazon_pay_fields || {}).some(Boolean)
+  );
 };
 
 const isAmazonPayFieldEnabled = (content, selectorKeyType) => {
   const fields = content?.amazon_pay_fields;
-  if (!fields || typeof fields !== 'object') return true;
-  if (!Object.prototype.hasOwnProperty.call(fields, selectorKeyType)) return true;
+  if (!fields || typeof fields !== "object") return true;
+  if (!Object.prototype.hasOwnProperty.call(fields, selectorKeyType))
+    return true;
   return fields[selectorKeyType] !== false;
 };
 
-const filterEnabledBindings = (content, bindings) => (
-  (bindings || []).filter((binding) => isAmazonPayFieldEnabled(content, binding.selectorKeyType))
-);
+const filterEnabledBindings = (content, bindings) =>
+  (bindings || []).filter((binding) =>
+    isAmazonPayFieldEnabled(content, binding.selectorKeyType)
+  );
 
 export const extractSelectorBindingsFromMessages = (messages) => {
   const bindings = [];
   const seen = new Set();
 
-  (messages || [])
-    .filter(isAmazonPayUserMessage)
-    .forEach((msg) => {
-      (msg.message_content || []).forEach((content, contentIndex) => {
-        const meta = { messageId: msg.id, contentIndex };
+  (messages || []).filter(isAmazonPayUserMessage).forEach((msg) => {
+    (msg.message_content || []).forEach((content, contentIndex) => {
+      const meta = { messageId: msg.id, contentIndex };
 
-        appendBindings(
-          bindings,
-          seen,
-          filterEnabledBindings(content, extractBindingsFromContent(content)).map((binding) => ({ ...binding, ...meta })),
-        );
+      appendBindings(
+        bindings,
+        seen,
+        filterEnabledBindings(content, extractBindingsFromContent(content)).map(
+          (binding) => ({ ...binding, ...meta })
+        )
+      );
 
-        appendBindings(
-          bindings,
-          seen,
-          filterEnabledBindings(content, extractGenericFallbackBindings(content)).map((binding) => ({ ...binding, ...meta })),
-        );
-      });
+      appendBindings(
+        bindings,
+        seen,
+        filterEnabledBindings(
+          content,
+          extractGenericFallbackBindings(content)
+        ).map((binding) => ({ ...binding, ...meta }))
+      );
     });
+  });
 
   return bindings;
 };
 
 export const collectSelectorValuesFromBindings = ({
   bindings = [],
-  documentRef = typeof document !== 'undefined' ? document : null,
+  documentRef = typeof document !== "undefined" ? document : null,
 }) => {
   const selectorValues = [];
 
-  bindings.forEach(({ selectorKeyType, sourceSelector, valuePath, searchMode }) => {
-    if (!documentRef || !sourceSelector || !valuePath) return;
+  bindings.forEach(
+    ({ selectorKeyType, sourceSelector, valuePath, searchMode }) => {
+      if (!documentRef || !sourceSelector || !valuePath) return;
 
-    let el = null;
-    try {
-      el = getElementByAddress(searchMode || SEARCH_MODES.ID, sourceSelector, documentRef);
-    } catch (err) {
-      console.warn('[AmazonPay] getElementByAddress failed:', err);
+      const el = findElementByAddress(
+        searchMode || SEARCH_MODES.ID,
+        sourceSelector,
+        documentRef
+      );
+      if (!el) return;
+
+      const value = (el.value || "").trim();
+      if (!value) return;
+
+      selectorValues.push({
+        selectorKeyType,
+        sourceSelector,
+        valuePath,
+        value,
+      });
     }
-    if (!el) return;
-
-    const value = (el.value || '').trim();
-    if (!value) return;
-
-    selectorValues.push({ selectorKeyType, sourceSelector, valuePath, value });
-  });
+  );
 
   return selectorValues;
 };
@@ -142,7 +161,10 @@ export const normalizeEcchAmazonSelectorValues = (selectorValues = []) => {
   selectorValues.forEach((item) => {
     const { selectorKeyType, sourceSelector, valuePath, value } = item || {};
     if (!selectorKeyType || !sourceSelector || !valuePath) {
-      console.warn('[ecchAmazon] skip item missing selectorKeyType/sourceSelector/valuePath:', item);
+      console.warn(
+        "[ecchAmazon] skip item missing selectorKeyType/sourceSelector/valuePath:",
+        item
+      );
       return;
     }
 
