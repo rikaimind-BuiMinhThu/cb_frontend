@@ -83,11 +83,17 @@ export const isAmazonPayReady = (detection) => {
   return readyWhen.every((condition) => evaluateAmazonReadyCondition(condition));
 };
 
-export const canRunGenericAmazon = (hostname, scenarioConfig) => (
-  isHostnameAllowedForLp(hostname, scenarioConfig?.allowed_lp_domains)
-  && hasAmazonPayTargets(scenarioConfig?.messages)
-  && extractSelectorBindingsFromMessages(scenarioConfig?.messages).length > 0
-);
+export const canRunGenericAmazon = (hostname, scenarioConfig) => {
+  if (!isHostnameAllowedForLp(hostname, scenarioConfig?.allowed_lp_domains)) return false;
+
+  // Detection config alone is enough to enter GENERIC (flag + poll). Autofill
+  // bindings stay optional for scenarios that only use URL display conditions.
+  const strategies = scenarioConfig?.amazon_pay_config?.amazon_detection?.strategies || [];
+  if (strategies.length > 0) return true;
+
+  return hasAmazonPayTargets(scenarioConfig?.messages)
+    && extractSelectorBindingsFromMessages(scenarioConfig?.messages).length > 0;
+};
 
 export const resolveLpMode = ({ hostname, scenarioConfig }) => {
   const allowedDomains = scenarioConfig?.allowed_lp_domains || [];

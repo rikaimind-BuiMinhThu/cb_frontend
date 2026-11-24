@@ -5,10 +5,12 @@ import {
   ALIGN_BEGINNING_SCROLL_DELAY_MS,
   BOTTOM_SCROLL_DELAY_MS,
   SCROLL_AUTO_DELAY_MS,
+  SCROLL_BEHAVIOR_AUTO,
   SCROLL_MSG_OFFSET_ALIGN_BEGINNING_PX,
   SCROLL_MSG_OFFSET_SCROLL_AUTO_PX,
   SP_BODY_SELECTOR,
   scrollMsgIntoSpBody,
+  scrollMsgIntoSpBodyWhenReady,
 } from "../alignBeginningScroll";
 
 /**
@@ -28,11 +30,69 @@ export const usePreviewAutoScroll = ({
   const messagesListRef = useRef(state.messagesList);
   const currentMsgIndexRef = useRef(state.currentMsgIndex);
   const lastAlignedIdRef = useRef(null);
+  const alignSessionRef = useRef(null);
+  const releaseEpochRef = useRef(state.alignScrollReleaseEpoch ?? 0);
   messagesListRef.current = state.messagesList;
   currentMsgIndexRef.current = state.currentMsgIndex;
 
+  const cancelAlignSession = () => {
+    const session = alignSessionRef.current;
+    if (!session) {
+      return;
+    }
+    if (session.timeoutId !== null) {
+      clearTimeout(session.timeoutId);
+    }
+    if (session.cancelReady) {
+      session.cancelReady();
+    }
+    alignSessionRef.current = null;
+  };
+
+  const startAlignSession = (alignMsgId, scrollBehavior) => {
+    if (alignSessionRef.current?.msgId === alignMsgId) {
+      return;
+    }
+    cancelAlignSession();
+    lastAlignedIdRef.current = alignMsgId;
+    const session = {
+      msgId: alignMsgId,
+      timeoutId: null,
+      cancelReady: null,
+    };
+    alignSessionRef.current = session;
+    session.timeoutId = setTimeout(() => {
+      session.timeoutId = null;
+      session.cancelReady = scrollMsgIntoSpBodyWhenReady({
+        msgId: alignMsgId,
+        offsetPx: SCROLL_MSG_OFFSET_ALIGN_BEGINNING_PX,
+        behavior: scrollBehavior,
+        onResult: (scrolled) => {
+          lastAlignedIdRef.current = alignMsgId;
+          if (scrolled) {
+            return;
+          }
+          scrollToPosition({
+            position: "b",
+            selector: SP_BODY_SELECTOR,
+            behavior: scrollBehavior,
+          });
+        },
+      });
+    }, ALIGN_BEGINNING_SCROLL_DELAY_MS);
+  };
+
+  useEffect(() => () => cancelAlignSession(), []);
+
   useEffect(() => {
     if (!enabled) return;
+
+    const releaseEpoch = state.alignScrollReleaseEpoch ?? 0;
+    if (releaseEpoch !== releaseEpochRef.current) {
+      releaseEpochRef.current = releaseEpoch;
+      cancelAlignSession();
+      lastAlignedIdRef.current = null;
+    }
 
     const currentMsgIndex = currentMsgIndexRef.current;
     const currentMsg = messagesListRef.current?.[currentMsgIndex];
@@ -40,27 +100,29 @@ export const usePreviewAutoScroll = ({
     const scrollBehavior = isMobile() ? "auto" : "smooth";
     const alignMsgId = state.alignBeginningMsgId;
 
-    if (alignMsgId === null || alignMsgId === undefined) {
-      lastAlignedIdRef.current = null;
-    } else if (lastAlignedIdRef.current === alignMsgId) {
+    if (alignMsgId !== null && alignMsgId !== undefined) {
+      if (lastAlignedIdRef.current === alignMsgId) {
+        return;
+      }
+      startAlignSession(alignMsgId, scrollBehavior);
       return;
-    } else {
-      lastAlignedIdRef.current = alignMsgId;
-      const alignTimeoutId = setTimeout(() => {
-        const scrolled = scrollMsgIntoSpBody({
-          msgId: alignMsgId,
-          offsetPx: SCROLL_MSG_OFFSET_ALIGN_BEGINNING_PX,
-          behavior: scrollBehavior,
-        });
-        if (!scrolled) {
-          scrollToPosition({
-            position: "b",
-            selector: SP_BODY_SELECTOR,
-            behavior: scrollBehavior,
-          });
-        }
-      }, ALIGN_BEGINNING_SCROLL_DELAY_MS);
-      return () => clearTimeout(alignTimeoutId);
+    }
+
+    // Hold pin after stop-at-top until Next bumps alignScrollReleaseEpoch.
+    if (lastAlignedIdRef.current !== null) {
+      if (alignSessionRef.current?.msgId === lastAlignedIdRef.current) {
+        return;
+      }
+      scrollMsgIntoSpBody({
+        msgId: lastAlignedIdRef.current,
+        offsetPx: SCROLL_MSG_OFFSET_ALIGN_BEGINNING_PX,
+        behavior: SCROLL_BEHAVIOR_AUTO,
+      });
+      return;
+    }
+
+    if (alignSessionRef.current) {
+      return;
     }
 
     if (state.isNotAutoScroll) {
@@ -106,11 +168,14 @@ export const usePreviewAutoScroll = ({
     }, BOTTOM_SCROLL_DELAY_MS);
 
     return () => clearTimeout(timeoutId);
+    // startAlignSession is stable over refs; listing it retriggers align sessions.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- align session owned by refs
   }, [
     enabled,
     enableScrollAuto,
     length,
     state.isNotAutoScroll,
     state.alignBeginningMsgId,
+    state.alignScrollReleaseEpoch,
   ]);
 };

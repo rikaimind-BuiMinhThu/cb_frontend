@@ -15,7 +15,7 @@ import {
   shouldShowMessageTagBlock,
 } from '../utils/tagFiringUtils';
 import { applyAmazonPayUsageToMessage } from '../utils/amazonPayConfigUtils';
-import { USER_ALIGN_BEGINNING_STOP } from '../constants/userMessageScrollConstants';
+import { USER_ALIGN_BEGINNING_STOP } from 'v2/views/Preview/PreviewComponent/alignBeginningScroll';
 
 const labelWithTooltip = (text, tooltipKey) => (
   <>

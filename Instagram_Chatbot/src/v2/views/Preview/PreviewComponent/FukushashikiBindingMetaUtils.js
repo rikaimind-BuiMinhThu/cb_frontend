@@ -10,13 +10,22 @@ export const splitSourceSelectors = (rawValue) => {
     .filter(Boolean);
 };
 
-export const buildBindingsFromSelectorKey = ({ selectorKeyType, rawValue, valuePath }) => {
+export const buildBindingsFromSelectorKey = ({
+  selectorKeyType,
+  rawValue,
+  valuePath,
+  content,
+  searchMode,
+}) => {
   if (!selectorKeyType || !valuePath) return [];
+
+  const resolvedMode = searchMode ?? content?.[selectorKeyType.replace(/_value$/, '_mode')];
 
   return splitSourceSelectors(rawValue).map((sourceSelector) => ({
     selectorKeyType,
     sourceSelector,
     valuePath,
+    searchMode: resolvedMode,
   }));
 };
 
@@ -36,7 +45,12 @@ export const bindingsFromFieldTypes = ({
     const valuePath = getValuePath(fieldType);
     const rawValue = content[selectorKeyType];
 
-    bindings.push(...buildBindingsFromSelectorKey({ selectorKeyType, rawValue, valuePath }));
+    bindings.push(...buildBindingsFromSelectorKey({
+      selectorKeyType,
+      rawValue,
+      valuePath,
+      content,
+    }));
   });
 
   return bindings;

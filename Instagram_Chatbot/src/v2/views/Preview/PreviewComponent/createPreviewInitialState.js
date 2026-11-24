@@ -65,6 +65,7 @@ const sharedPreviewInitialState = (params) => ({
   tagFiring: { ...DEFAULT_TAG_FIRING },
   scenarioName: "",
   alignBeginningMsgId: null,
+  alignScrollReleaseEpoch: 0,
 });
 
 const faqExtras = () => ({

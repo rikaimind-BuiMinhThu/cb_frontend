@@ -300,8 +300,26 @@ const UserMessage = ({
     if (messageContent.length > 1) return;
     if (messageContent[0].type !== MESSAGE_CONTENT_TYPES.IMAGE) return;
 
-    callIfFunction(onRenderCompleted);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- init-once; prop callback identity is unstable
+    const imageUrl = messageContent[0]?.image?.imageURL;
+    if (!imageUrl) {
+      onRenderCompleted();
+      return undefined;
+    }
+
+    // Wait for decode so 先頭でスクロールを止める can measure final height
+    // before the next message clears alignBeginningMsgId and yanks to bottom.
+    const preload = new window.Image();
+    const finish = () => {
+      onRenderCompleted();
+    };
+    preload.onload = finish;
+    preload.onerror = finish;
+    preload.src = imageUrl;
+    return () => {
+      preload.onload = null;
+      preload.onerror = null;
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- init-once; prop callback identity is unstable
   }, []);
 
   if (!isUserMessage(message)) return null;

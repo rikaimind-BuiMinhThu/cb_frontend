@@ -505,6 +505,41 @@
     WAIT_FOR_SETTING_VALUE: "WAIT_FOR_SETTING_VALUE"
   };
 
+  // src/v2/sdk/dom/lookup.js
+  var LOOKUP_FAILED_LOG_PREFIX = "[lookup] getElementByAddress failed:";
+  var INVALID_SEARCH_MODE_PREFIX = "Invalid search mode ";
+  var getElementByAddress = (mode, address, rootDocument = document) => {
+    if (!mode || !address || !rootDocument) return null;
+    try {
+      switch (mode) {
+        case SEARCH_MODES.ID:
+          return rootDocument.getElementById(address);
+        case SEARCH_MODES.CSS_SELECTOR:
+          return rootDocument.querySelector(address);
+        case SEARCH_MODES.XPATH:
+          return rootDocument.evaluate(
+            address,
+            rootDocument,
+            null,
+            XPathResult.FIRST_ORDERED_NODE_TYPE,
+            null
+          ).singleNodeValue;
+        default:
+          throw new Error(
+            `${INVALID_SEARCH_MODE_PREFIX}${mode}, address: ${address}`
+          );
+      }
+    } catch (err) {
+      console.warn(LOOKUP_FAILED_LOG_PREFIX, { mode, address }, err);
+      return null;
+    }
+  };
+  var removeLeadingZero = (value) => {
+    const strValue = (value == null ? void 0 : value.toString()) || "";
+    const result = strValue.replace(/^0+/, "");
+    return typeof value === "number" ? Number(result) : result;
+  };
+
   // src/v2/sdk/amazon/bindings.js
   var ZIP_FIELD_TYPES = [
     "post_code",
@@ -552,12 +587,30 @@
     if (typeof rawValue !== "string") return [];
     return rawValue.split(",").map((selector) => selector.trim()).filter(Boolean);
   };
-  var buildBindingsFromSelectorKey = ({ selectorKeyType, rawValue, valuePath }) => {
+  var resolveSearchMode = ({ content, selectorKeyType, searchMode }) => {
+    if (searchMode !== void 0 && searchMode !== null && searchMode !== "")
+      return searchMode;
+    if (!content || !selectorKeyType) return void 0;
+    return content[selectorKeyType.replace(/_value$/, "_mode")];
+  };
+  var buildBindingsFromSelectorKey = ({
+    selectorKeyType,
+    rawValue,
+    valuePath,
+    content,
+    searchMode
+  }) => {
     if (!selectorKeyType || !valuePath) return [];
+    const resolvedMode = resolveSearchMode({
+      content,
+      selectorKeyType,
+      searchMode
+    });
     return splitSourceSelectors(rawValue).map((sourceSelector) => ({
       selectorKeyType,
       sourceSelector,
-      valuePath
+      valuePath,
+      searchMode: resolvedMode
     }));
   };
   var bindingsFromFieldTypes = ({
@@ -573,19 +626,29 @@
       const selectorKeyType = getSelectorKeyType(fieldType);
       const valuePath = getValuePath(fieldType);
       const rawValue = content[selectorKeyType];
-      bindings.push(...buildBindingsFromSelectorKey({ selectorKeyType, rawValue, valuePath }));
+      bindings.push(
+        ...buildBindingsFromSelectorKey({
+          selectorKeyType,
+          rawValue,
+          valuePath,
+          content
+        })
+      );
     });
     return bindings;
   };
   var appendBinding = (bindings, seen, binding) => {
-    if (!(binding == null ? void 0 : binding.selectorKeyType) || !(binding == null ? void 0 : binding.sourceSelector) || !(binding == null ? void 0 : binding.valuePath)) return;
+    if (!(binding == null ? void 0 : binding.selectorKeyType) || !(binding == null ? void 0 : binding.sourceSelector) || !(binding == null ? void 0 : binding.valuePath))
+      return;
     const dedupeKey = `${binding.selectorKeyType}::${binding.sourceSelector}`;
     if (seen.has(dedupeKey)) return;
     seen.add(dedupeKey);
     bindings.push(binding);
   };
   var appendBindings = (bindings, seen, newBindings) => {
-    (newBindings || []).forEach((binding) => appendBinding(bindings, seen, binding));
+    (newBindings || []).forEach(
+      (binding) => appendBinding(bindings, seen, binding)
+    );
   };
   var extractTextInputBindings = (content) => {
     var _a, _b, _c, _d, _e;
@@ -598,48 +661,60 @@
             ...buildBindingsFromSelectorKey({
               selectorKeyType: "left_fukushashiki_search_value",
               rawValue: content.left_fukushashiki_search_value,
-              valuePath: "text_input.text.valueLeft"
+              valuePath: "text_input.text.valueLeft",
+              content
             }),
             ...buildBindingsFromSelectorKey({
               selectorKeyType: "right_fukushashiki_search_value",
               rawValue: content.right_fukushashiki_search_value,
-              valuePath: "text_input.text.valueRight"
+              valuePath: "text_input.text.valueRight",
+              content
             })
           );
         }
-        bindings.push(...buildBindingsFromSelectorKey({
-          selectorKeyType: "fukushashiki_search_value",
-          rawValue: content.fukushashiki_search_value,
-          valuePath: "text_input.text.value"
-        }));
+        bindings.push(
+          ...buildBindingsFromSelectorKey({
+            selectorKeyType: "fukushashiki_search_value",
+            rawValue: content.fukushashiki_search_value,
+            valuePath: "text_input.text.value",
+            content
+          })
+        );
         break;
       case "phone_number":
         if (((_e = (_d = content.text_input) == null ? void 0 : _d.phone_number) == null ? void 0 : _e.withHyphen) === false) {
-          bindings.push(...buildBindingsFromSelectorKey({
-            selectorKeyType: "fukushashiki_search_value",
-            rawValue: content.fukushashiki_search_value,
-            valuePath: "text_input.phone_number.value"
-          }));
+          bindings.push(
+            ...buildBindingsFromSelectorKey({
+              selectorKeyType: "fukushashiki_search_value",
+              rawValue: content.fukushashiki_search_value,
+              valuePath: "text_input.phone_number.value",
+              content
+            })
+          );
           break;
         }
-        bindings.push(...bindingsFromFieldTypes({
-          content,
-          fieldTypes: ["value1", "value2", "value3"],
-          getSelectorKeyType: (fieldType) => `${fieldType}_fukushashiki_search_value`,
-          getValuePath: (fieldType) => `text_input.phone_number.${fieldType}`
-        }));
+        bindings.push(
+          ...bindingsFromFieldTypes({
+            content,
+            fieldTypes: ["value1", "value2", "value3"],
+            getSelectorKeyType: (fieldType) => `${fieldType}_fukushashiki_search_value`,
+            getValuePath: (fieldType) => `text_input.phone_number.${fieldType}`
+          })
+        );
         break;
       case "email_confirmation":
         bindings.push(
           ...buildBindingsFromSelectorKey({
             selectorKeyType: "value_fukushashiki_search_value",
             rawValue: content.value_fukushashiki_search_value,
-            valuePath: `text_input.${inputType}.value`
+            valuePath: `text_input.${inputType}.value`,
+            content
           }),
           ...buildBindingsFromSelectorKey({
             selectorKeyType: "valueConfirm_fukushashiki_search_value",
             rawValue: content.valueConfirm_fukushashiki_search_value,
-            valuePath: `text_input.${inputType}.valueConfirm`
+            valuePath: `text_input.${inputType}.valueConfirm`,
+            content
           })
         );
         break;
@@ -648,23 +723,28 @@
           ...buildBindingsFromSelectorKey({
             selectorKeyType: "fukushashiki_search_value",
             rawValue: content.fukushashiki_search_value,
-            valuePath: "text_input.password_confirmation.value"
+            valuePath: "text_input.password_confirmation.value",
+            content
           }),
           ...buildBindingsFromSelectorKey({
             selectorKeyType: "confirm_fukushashiki_search_value",
             rawValue: content.confirm_fukushashiki_search_value,
-            valuePath: "text_input.password_confirmation.valueConfirm"
+            valuePath: "text_input.password_confirmation.valueConfirm",
+            content
           })
         );
         break;
       case "email_address":
       case "urls":
       case "password":
-        bindings.push(...buildBindingsFromSelectorKey({
-          selectorKeyType: "fukushashiki_search_value",
-          rawValue: content.fukushashiki_search_value,
-          valuePath: `text_input.${inputType}.value`
-        }));
+        bindings.push(
+          ...buildBindingsFromSelectorKey({
+            selectorKeyType: "fukushashiki_search_value",
+            rawValue: content.fukushashiki_search_value,
+            valuePath: `text_input.${inputType}.value`,
+            content
+          })
+        );
         break;
       default:
         break;
@@ -698,17 +778,20 @@
   var extractCheckboxBindings = (content) => buildBindingsFromSelectorKey({
     selectorKeyType: "checkedValue_fukushashiki_search_value",
     rawValue: content.checkedValue_fukushashiki_search_value,
-    valuePath: "checkbox.checkedValue"
+    valuePath: "checkbox.checkedValue",
+    content
   });
   var extractRadioButtonBindings = (content) => buildBindingsFromSelectorKey({
     selectorKeyType: "initial_selection_fukushashiki_search_value",
     rawValue: content.initial_selection_fukushashiki_search_value,
-    valuePath: "radio_button.initial_selection"
+    valuePath: "radio_button.initial_selection",
+    content
   });
   var extractTextareaBindings = (content) => buildBindingsFromSelectorKey({
     selectorKeyType: "fukushashiki_search_value",
     rawValue: content.fukushashiki_search_value,
-    valuePath: "textarea.text_input.value"
+    valuePath: "textarea.text_input.value",
+    content
   });
   var extractPullDownBindings = (content) => {
     var _a;
@@ -717,13 +800,15 @@
     return buildBindingsFromSelectorKey({
       selectorKeyType: "fukushashiki_search_value",
       rawValue: content.fukushashiki_search_value,
-      valuePath: `pull_down.${pullDownType}.value`
+      valuePath: `pull_down.${pullDownType}.value`,
+      content
     });
   };
   var extractProductPurchaseSelectOptionBindings = (content) => buildBindingsFromSelectorKey({
     selectorKeyType: "fukushashiki_search_value",
     rawValue: content.fukushashiki_search_value,
-    valuePath: "product_purchase_select_option.value"
+    valuePath: "product_purchase_select_option.value",
+    content
   });
   var extractBindingsFromContent = (content) => {
     if (!(content == null ? void 0 : content.type)) return [];
@@ -763,11 +848,16 @@
     if (selectorKeyType === "valueConfirm_fukushashiki_search_value") {
       return `text_input.${inputType}.valueConfirm`;
     }
-    const phoneMatch = selectorKeyType.match(/^value([123])_fukushashiki_search_value$/);
+    const phoneMatch = selectorKeyType.match(
+      /^value([123])_fukushashiki_search_value$/
+    );
     if (phoneMatch) {
       return `text_input.phone_number.value${phoneMatch[1]}`;
     }
-    console.warn("[AmazonPay] unresolved valuePath for selector key:", selectorKeyType);
+    console.warn(
+      "[AmazonPay] unresolved valuePath for selector key:",
+      selectorKeyType
+    );
     return null;
   };
   var extractGenericFallbackBindings = (content) => {
@@ -776,22 +866,38 @@
       if (!selectorKeyType.endsWith(FUKUSHIASHIKI_SELECTOR_VALUE_SUFFIX)) return;
       const valuePath = resolveValuePath(selectorKeyType, content);
       if (!valuePath) return;
-      bindings.push(...buildBindingsFromSelectorKey({ selectorKeyType, rawValue, valuePath }));
+      bindings.push(
+        ...buildBindingsFromSelectorKey({
+          selectorKeyType,
+          rawValue,
+          valuePath,
+          content
+        })
+      );
     });
     return bindings;
   };
+  var hasAmazonPayIncludeUrlCondition = (msg) => (msg.conditions || []).some(
+    (condition) => condition.inputCondition === "is_using_amazon_pay" && condition.nameCondition === "current_url" && condition.condition === "include"
+  );
   var isAmazonPayUserMessage = (msg) => {
     if ((msg == null ? void 0 : msg.belong_to) !== "user") return false;
     if (msg.is_used_when_amazon_pay) return true;
-    return (msg.message_content || []).some((content) => !!(content == null ? void 0 : content.is_used_when_amazon_pay) || Object.values((content == null ? void 0 : content.amazon_pay_fields) || {}).some(Boolean));
+    if (hasAmazonPayIncludeUrlCondition(msg)) return true;
+    return (msg.message_content || []).some(
+      (content) => !!(content == null ? void 0 : content.is_used_when_amazon_pay) || Object.values((content == null ? void 0 : content.amazon_pay_fields) || {}).some(Boolean)
+    );
   };
   var isAmazonPayFieldEnabled = (content, selectorKeyType) => {
     const fields = content == null ? void 0 : content.amazon_pay_fields;
     if (!fields || typeof fields !== "object") return true;
-    if (!Object.prototype.hasOwnProperty.call(fields, selectorKeyType)) return true;
+    if (!Object.prototype.hasOwnProperty.call(fields, selectorKeyType))
+      return true;
     return fields[selectorKeyType] !== false;
   };
-  var filterEnabledBindings = (content, bindings) => (bindings || []).filter((binding) => isAmazonPayFieldEnabled(content, binding.selectorKeyType));
+  var filterEnabledBindings = (content, bindings) => (bindings || []).filter(
+    (binding) => isAmazonPayFieldEnabled(content, binding.selectorKeyType)
+  );
   var extractSelectorBindingsFromMessages = (messages) => {
     const bindings = [];
     const seen = /* @__PURE__ */ new Set();
@@ -801,12 +907,17 @@
         appendBindings(
           bindings,
           seen,
-          filterEnabledBindings(content, extractBindingsFromContent(content)).map((binding) => __spreadValues(__spreadValues({}, binding), meta))
+          filterEnabledBindings(content, extractBindingsFromContent(content)).map(
+            (binding) => __spreadValues(__spreadValues({}, binding), meta)
+          )
         );
         appendBindings(
           bindings,
           seen,
-          filterEnabledBindings(content, extractGenericFallbackBindings(content)).map((binding) => __spreadValues(__spreadValues({}, binding), meta))
+          filterEnabledBindings(
+            content,
+            extractGenericFallbackBindings(content)
+          ).map((binding) => __spreadValues(__spreadValues({}, binding), meta))
         );
       });
     });
@@ -814,17 +925,32 @@
   };
   var collectSelectorValuesFromBindings = (bindings) => {
     const selectorValues = [];
-    (bindings || []).forEach(({ selectorKeyType, sourceSelector, valuePath }) => {
-      if (!sourceSelector || !valuePath) return;
-      const el = document.querySelector(sourceSelector);
-      if (!el) return;
-      const value = (el.value || "").trim();
-      if (!value) return;
-      selectorValues.push({ selectorKeyType, sourceSelector, valuePath, value });
-    });
+    (bindings || []).forEach(
+      ({ selectorKeyType, sourceSelector, valuePath, searchMode }) => {
+        if (!sourceSelector || !valuePath) return;
+        const el = getElementByAddress(
+          searchMode || SEARCH_MODES.ID,
+          sourceSelector
+        );
+        if (!el) return;
+        const value = (el.value || "").trim();
+        if (!value) return;
+        selectorValues.push({
+          selectorKeyType,
+          sourceSelector,
+          valuePath,
+          value
+        });
+      }
+    );
     return selectorValues;
   };
-  var buildAmazonSelectorPayload = ({ scenarioMessages, selectorBindings, cartSystem, domain }) => {
+  var buildAmazonSelectorPayload = ({
+    scenarioMessages,
+    selectorBindings,
+    cartSystem,
+    domain
+  }) => {
     const bindings = selectorBindings && selectorBindings.length ? selectorBindings : extractSelectorBindingsFromMessages(scenarioMessages);
     const selectorValues = collectSelectorValuesFromBindings(bindings);
     return {
@@ -837,7 +963,10 @@
     (selectorValues || []).forEach((item) => {
       const { selectorKeyType, sourceSelector, valuePath, value } = item || {};
       if (!selectorKeyType || !sourceSelector || !valuePath) {
-        console.warn("[ecchAmazon] skip item missing selectorKeyType/sourceSelector/valuePath:", item);
+        console.warn(
+          "[ecchAmazon] skip item missing selectorKeyType/sourceSelector/valuePath:",
+          item
+        );
         return;
       }
       normalized.push({ selectorKeyType, sourceSelector, valuePath, value });
@@ -849,7 +978,9 @@
     try {
       const payload = yield window.ecchAmazon();
       if (!payload || !Array.isArray(payload.selectorValues)) return null;
-      const selectorValues = normalizeEcchAmazonSelectorValues(payload.selectorValues);
+      const selectorValues = normalizeEcchAmazonSelectorValues(
+        payload.selectorValues
+      );
       if (!selectorValues.length) return null;
       return __spreadProps(__spreadValues({}, payload), { selectorValues });
     } catch (err) {
@@ -869,7 +1000,9 @@
   var isHostnameAllowedForLp = (hostname, allowedDomains) => {
     const host = normalizeLpDomain(hostname);
     if (!host) return false;
-    return (allowedDomains || []).some((domain) => host === domain || host.endsWith(`.${domain}`));
+    return (allowedDomains || []).some(
+      (domain) => host === domain || host.endsWith(`.${domain}`)
+    );
   };
 
   // src/v2/sdk/amazon/detection.js
@@ -936,7 +1069,13 @@
     if (!readyWhen.length) return true;
     return readyWhen.every((condition) => evaluateAmazonReadyCondition(condition));
   };
-  var canRunGenericAmazon = (hostname, scenarioConfig) => isHostnameAllowedForLp(hostname, scenarioConfig == null ? void 0 : scenarioConfig.allowed_lp_domains) && hasAmazonPayTargets(scenarioConfig == null ? void 0 : scenarioConfig.messages) && extractSelectorBindingsFromMessages(scenarioConfig == null ? void 0 : scenarioConfig.messages).length > 0;
+  var canRunGenericAmazon = (hostname, scenarioConfig) => {
+    var _a, _b;
+    if (!isHostnameAllowedForLp(hostname, scenarioConfig == null ? void 0 : scenarioConfig.allowed_lp_domains)) return false;
+    const strategies = ((_b = (_a = scenarioConfig == null ? void 0 : scenarioConfig.amazon_pay_config) == null ? void 0 : _a.amazon_detection) == null ? void 0 : _b.strategies) || [];
+    if (strategies.length > 0) return true;
+    return hasAmazonPayTargets(scenarioConfig == null ? void 0 : scenarioConfig.messages) && extractSelectorBindingsFromMessages(scenarioConfig == null ? void 0 : scenarioConfig.messages).length > 0;
+  };
   var resolveLpMode = ({ hostname, scenarioConfig }) => {
     const allowedDomains = (scenarioConfig == null ? void 0 : scenarioConfig.allowed_lp_domains) || [];
     if (!allowedDomains.length) return LP_RESOLVE_MODES.DEFAULT;
@@ -1066,6 +1205,17 @@
   var queueAmazonPaySelectorPayload = (payload) => {
     chatbotLayout.pendingAmazonSelectorPayload = payload;
   };
+  var sendAmazonPaySelectorWithRetries = (payload) => {
+    queueAmazonPaySelectorPayload(payload);
+    const send = () => sendAmazonPayDataBySelector(payload);
+    const scheduleRetries = () => {
+      send();
+      AMAZON_SELECTOR_SEND_RETRY_DELAYS_MS.forEach((delayMs) => {
+        setTimeout(send, delayMs);
+      });
+    };
+    setTimeout(scheduleRetries, AMAZON_SELECTOR_POST_LOAD_DELAY_MS);
+  };
   var sendAmazonPaySelectorAfterIframeLoad = (iframe, payload) => {
     queueAmazonPaySelectorPayload(payload);
     const send = () => sendAmazonPayDataBySelector(payload);
@@ -1093,21 +1243,45 @@
     const cartSystem = amazonConfig == null ? void 0 : amazonConfig.cart_system;
     const selectorBindings = (amazonConfig == null ? void 0 : amazonConfig.selector_bindings) || [];
     const targetMessages = (amazonConfig == null ? void 0 : amazonConfig.target_messages) || (amazonConfig == null ? void 0 : amazonConfig.messages) || [];
+    const hasBindings = selectorBindings.length > 0 || extractSelectorBindingsFromMessages(targetMessages).length > 0;
     let count = 0;
     let sent = false;
+    let mounted = false;
     let amazonPayFlagSet = false;
+    const mountIframe = () => {
+      if (mounted) return;
+      appendIframeToBody(iframe);
+      mounted = true;
+    };
+    const deliverSelectorPayload = (payload) => {
+      var _a;
+      if (sent || !((_a = payload == null ? void 0 : payload.selectorValues) == null ? void 0 : _a.length)) return;
+      if (!mounted) {
+        sendAmazonPaySelectorAfterIframeLoad(iframe, payload);
+        mountIframe();
+      } else {
+        sendAmazonPaySelectorWithRetries(payload);
+      }
+      sent = true;
+    };
     const interval = setInterval(() => __async(null, null, function* () {
       var _a;
       count++;
       if (!amazonPayFlagSet && isAmazonPayActive(detection)) {
         iframe.src += "&is_using_amazon_pay=true";
         amazonPayFlagSet = true;
+        mountIframe();
       }
       if (!isAmazonPayReady(detection)) {
         if (count >= config.max_count) {
-          appendIframeToBody(iframe);
+          mountIframe();
           clearInterval(interval);
         }
+        return;
+      }
+      if (!hasBindings) {
+        mountIframe();
+        clearInterval(interval);
         return;
       }
       let payload = yield safeGetAmazonPayload();
@@ -1120,16 +1294,12 @@
         });
       }
       if ((_a = payload == null ? void 0 : payload.selectorValues) == null ? void 0 : _a.length) {
-        if (!sent) {
-          sendAmazonPaySelectorAfterIframeLoad(iframe, payload);
-          appendIframeToBody(iframe);
-          sent = true;
-        }
+        deliverSelectorPayload(payload);
         clearInterval(interval);
         return;
       }
       if (count >= config.max_count) {
-        appendIframeToBody(iframe);
+        mountIframe();
         clearInterval(interval);
       }
     }), config.poll_interval_ms);
@@ -1281,26 +1451,6 @@
     if (element.classList.contains("disabled-input-ec")) return true;
     if (getParam("amazonCheckoutSessionId") && element.getAttribute("disabled")) return true;
     return element.disabled;
-  };
-
-  // src/v2/sdk/dom/lookup.js
-  var getElementByAddress = (mode, address) => {
-    if (!mode || !address) return null;
-    switch (mode) {
-      case SEARCH_MODES.ID:
-        return document.getElementById(address);
-      case SEARCH_MODES.CSS_SELECTOR:
-        return document.querySelector(address);
-      case SEARCH_MODES.XPATH:
-        return document.evaluate(address, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-      default:
-        throw new Error(`Invalid search mode ${mode}, address: ${address}`);
-    }
-  };
-  var removeLeadingZero = (value) => {
-    const strValue = (value == null ? void 0 : value.toString()) || "";
-    const result = strValue.replace(/^0+/, "");
-    return typeof value === "number" ? Number(result) : result;
   };
 
   // src/v2/sdk/dom/formValues.js
