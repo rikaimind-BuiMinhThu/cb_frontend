@@ -3,7 +3,7 @@ import {
   FUKUSHIASHIKI_SELECTOR_VALUE_SUFFIX,
 } from "v2/variables/amazonPayConstants";
 import { SEARCH_MODES } from "v2/sdk/constants";
-import { findElementByAddress } from "v2/sdk/dom/lookup";
+import { getElementByAddress } from "v2/sdk/dom/lookup";
 import {
   appendBindings,
   buildBindingsFromSelectorKey,
@@ -133,7 +133,7 @@ export const collectSelectorValuesFromBindings = ({
     ({ selectorKeyType, sourceSelector, valuePath, searchMode }) => {
       if (!documentRef || !sourceSelector || !valuePath) return;
 
-      const el = findElementByAddress(
+      const el = getElementByAddress(
         searchMode || SEARCH_MODES.ID,
         sourceSelector,
         documentRef

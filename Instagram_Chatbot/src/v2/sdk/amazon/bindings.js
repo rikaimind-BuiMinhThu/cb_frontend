@@ -4,7 +4,7 @@ import {
   MESSAGE_CONTENT_TYPES,
   SEARCH_MODES,
 } from "../constants.js";
-import { findElementByAddress } from "../dom/lookup.js";
+import { getElementByAddress } from "../dom/lookup.js";
 
 const ZIP_FIELD_TYPES = [
   "post_code",
@@ -445,7 +445,7 @@ export const collectSelectorValuesFromBindings = (bindings) => {
   (bindings || []).forEach(
     ({ selectorKeyType, sourceSelector, valuePath, searchMode }) => {
       if (!sourceSelector || !valuePath) return;
-      const el = findElementByAddress(
+      const el = getElementByAddress(
         searchMode || SEARCH_MODES.ID,
         sourceSelector
       );

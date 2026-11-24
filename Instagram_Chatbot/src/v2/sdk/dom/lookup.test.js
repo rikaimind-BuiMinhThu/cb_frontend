@@ -1,5 +1,5 @@
 import { SEARCH_MODES } from "../constants";
-import { findElementByAddress, getElementByAddress } from "./lookup";
+import { getElementByAddress } from "./lookup";
 
 const FIELD_ID = "lookup-field-id";
 const FIELD_CLASS = "lookup-field-class";
@@ -20,6 +20,7 @@ const appendTestField = ({ id, className, value }) => {
 describe("getElementByAddress", () => {
   afterEach(() => {
     document.body.innerHTML = "";
+    jest.restoreAllMocks();
   });
 
   it("finds an element by ID in the default document", () => {
@@ -77,23 +78,10 @@ describe("getElementByAddress", () => {
     expect(getElementByAddress(SEARCH_MODES.ID, FIELD_ID, null)).toBeNull();
   });
 
-  it("throws on an unknown search mode", () => {
-    expect(() => getElementByAddress(UNKNOWN_MODE, FIELD_ID)).toThrow(
-      /Invalid search mode/
-    );
-  });
-});
-
-describe("findElementByAddress", () => {
-  afterEach(() => {
-    document.body.innerHTML = "";
-    jest.restoreAllMocks();
-  });
-
   it("returns null and warns for an unknown mode", () => {
     const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
 
-    expect(findElementByAddress(UNKNOWN_MODE, FIELD_ID)).toBeNull();
+    expect(getElementByAddress(UNKNOWN_MODE, FIELD_ID)).toBeNull();
     expect(warnSpy).toHaveBeenCalled();
     expect(warnSpy.mock.calls[0][1]).toEqual({
       mode: UNKNOWN_MODE,
@@ -105,7 +93,7 @@ describe("findElementByAddress", () => {
     const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
 
     expect(
-      findElementByAddress(SEARCH_MODES.CSS_SELECTOR, MALFORMED_SELECTOR)
+      getElementByAddress(SEARCH_MODES.CSS_SELECTOR, MALFORMED_SELECTOR)
     ).toBeNull();
     expect(warnSpy).toHaveBeenCalled();
     expect(warnSpy.mock.calls[0][1]).toEqual({

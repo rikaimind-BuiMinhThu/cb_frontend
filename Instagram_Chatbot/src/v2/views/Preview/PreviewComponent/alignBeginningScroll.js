@@ -42,35 +42,17 @@ export const resolveAlignBeginningMsgId = (message) => {
   return null;
 };
 
-const resolveAlignMessageElement = (
-  msgId,
-  containerSelector = SP_BODY_SELECTOR
-) => {
-  const container = document.querySelector(containerSelector);
-  const elementId = getElementMessageById(msgId);
-  if (!container || !elementId) {
-    return { container: null, element: null };
-  }
-  const matches = document.querySelectorAll(`#${elementId}`);
-  const element = matches[matches.length - 1] || null;
-  return { container, element };
-};
-
-const isImageAtOrAboveElement = (img, element) => {
-  if (element.contains(img)) {
-    return true;
-  }
-  const position = element.compareDocumentPosition(img);
-  return !!(position & Node.DOCUMENT_POSITION_PRECEDING);
-};
-
 const collectPendingImagesAtOrAbove = (container, element) => {
   const images = Array.from(container.querySelectorAll(IMG_SELECTOR));
   return images.filter((img) => {
     if (img.complete) {
       return false;
     }
-    return isImageAtOrAboveElement(img, element);
+    if (element.contains(img)) {
+      return true;
+    }
+    const position = element.compareDocumentPosition(img);
+    return !!(position & Node.DOCUMENT_POSITION_PRECEDING);
   });
 };
 
@@ -80,11 +62,14 @@ export const scrollMsgIntoSpBody = ({
   behavior = "smooth",
   containerSelector = SP_BODY_SELECTOR,
 }) => {
-  const { container, element } = resolveAlignMessageElement(
-    msgId,
-    containerSelector
-  );
-  if (!container || !element) {
+  const container = document.querySelector(containerSelector);
+  const elementId = getElementMessageById(msgId);
+  if (!container || !elementId) {
+    return false;
+  }
+  const matches = document.querySelectorAll(`#${elementId}`);
+  const element = matches[matches.length - 1] || null;
+  if (!element) {
     return false;
   }
   const targetScrollTop =
@@ -117,10 +102,10 @@ export const scrollMsgIntoSpBodyWhenReady = ({
     behavior: SCROLL_BEHAVIOR_AUTO,
     containerSelector,
   };
-  const { container, element } = resolveAlignMessageElement(
-    msgId,
-    containerSelector
-  );
+  const container = document.querySelector(containerSelector);
+  const elementId = getElementMessageById(msgId);
+  const matches = elementId ? document.querySelectorAll(`#${elementId}`) : [];
+  const element = matches[matches.length - 1] || null;
 
   const lifecycle = {
     cancelled: false,
