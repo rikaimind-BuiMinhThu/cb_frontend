@@ -1,14 +1,20 @@
 import { SEARCH_MODES } from '../constants.js';
 
-export const getElementByAddress = (mode, address) => {
-  if (!mode || !address) return null;
+export const getElementByAddress = (mode, address, rootDocument = document) => {
+  if (!mode || !address || !rootDocument) return null;
   switch (mode) {
     case SEARCH_MODES.ID:
-      return document.getElementById(address);
+      return rootDocument.getElementById(address);
     case SEARCH_MODES.CSS_SELECTOR:
-      return document.querySelector(address);
+      return rootDocument.querySelector(address);
     case SEARCH_MODES.XPATH:
-      return document.evaluate(address, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+      return rootDocument.evaluate(
+        address,
+        rootDocument,
+        null,
+        XPathResult.FIRST_ORDERED_NODE_TYPE,
+        null,
+      ).singleNodeValue;
     default:
       throw new Error(`Invalid search mode ${mode}, address: ${address}`);
   }

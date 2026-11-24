@@ -69,10 +69,21 @@ export const applyAmazonPayUsageToMessage = (message = {}, checked) => {
     };
   }
 
-  // Autofill ON: keep the user's display mode (ALWAYS / DISPLAY_WHEN / UNDISPLAY_WHEN).
+  const currentMode = getAmazonPayDisplayModeFromConditions(message.conditions);
+  if (currentMode === AMAZON_PAY_DISPLAY_MODES.UNDISPLAY_WHEN) {
+    return {
+      ...message,
+      is_used_when_amazon_pay: true,
+    };
+  }
+
   return {
     ...message,
     is_used_when_amazon_pay: true,
+    conditions: applyAmazonPayDisplayModeToConditions(
+      message.conditions || [],
+      AMAZON_PAY_DISPLAY_MODES.DISPLAY_WHEN,
+    ),
   };
 };
 

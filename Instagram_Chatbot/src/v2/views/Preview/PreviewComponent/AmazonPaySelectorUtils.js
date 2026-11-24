@@ -2,6 +2,8 @@ import {
   AMAZON_SELECTOR_TO_VALUE_PATH,
   FUKUSHIASHIKI_SELECTOR_VALUE_SUFFIX,
 } from 'v2/variables/amazonPayConstants';
+import { SEARCH_MODES } from 'v2/sdk/constants';
+import { getElementByAddress } from 'v2/sdk/dom/lookup';
 import {
   appendBindings,
   buildBindingsFromSelectorKey,
@@ -108,17 +110,6 @@ export const extractSelectorBindingsFromMessages = (messages) => {
   return bindings;
 };
 
-const resolveSourceElement = (documentRef, sourceSelector, searchMode) => {
-  if (!documentRef || !sourceSelector) return null;
-  if (searchMode === 1 || searchMode === '1') {
-    return documentRef.getElementById(sourceSelector);
-  }
-  if (searchMode === 2 || searchMode === '2') {
-    return documentRef.querySelector(sourceSelector);
-  }
-  return documentRef.getElementById(sourceSelector) || documentRef.querySelector(sourceSelector);
-};
-
 export const collectSelectorValuesFromBindings = ({
   bindings = [],
   documentRef = typeof document !== 'undefined' ? document : null,
@@ -128,7 +119,12 @@ export const collectSelectorValuesFromBindings = ({
   bindings.forEach(({ selectorKeyType, sourceSelector, valuePath, searchMode }) => {
     if (!documentRef || !sourceSelector || !valuePath) return;
 
-    const el = resolveSourceElement(documentRef, sourceSelector, searchMode);
+    let el = null;
+    try {
+      el = getElementByAddress(searchMode || SEARCH_MODES.ID, sourceSelector, documentRef);
+    } catch (err) {
+      console.warn('[AmazonPay] getElementByAddress failed:', err);
+    }
     if (!el) return;
 
     const value = (el.value || '').trim();

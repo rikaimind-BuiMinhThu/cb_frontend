@@ -76,8 +76,8 @@ const extractTextInputBindings = (content) => {
           selectorKeyType: 'fukushashiki_search_value',
           rawValue: content.fukushashiki_search_value,
           valuePath: 'text_input.text.value',
-  content,
-}),
+          content,
+        }),
       );
       break;
     }
@@ -109,14 +109,14 @@ const extractTextInputBindings = (content) => {
           selectorKeyType: 'value_fukushashiki_search_value',
           rawValue: content.value_fukushashiki_search_value,
           valuePath: `text_input.${inputType}.value`,
-  content,
-}),
+          content,
+        }),
         ...buildBindingsFromSelectorKey({
           selectorKeyType: 'valueConfirm_fukushashiki_search_value',
           rawValue: content.valueConfirm_fukushashiki_search_value,
           valuePath: `text_input.${inputType}.valueConfirm`,
-  content,
-}),
+          content,
+        }),
       );
       break;
     case 'password_confirmation':
@@ -125,14 +125,14 @@ const extractTextInputBindings = (content) => {
           selectorKeyType: 'fukushashiki_search_value',
           rawValue: content.fukushashiki_search_value,
           valuePath: 'text_input.password_confirmation.value',
-  content,
-}),
+          content,
+        }),
         ...buildBindingsFromSelectorKey({
           selectorKeyType: 'confirm_fukushashiki_search_value',
           rawValue: content.confirm_fukushashiki_search_value,
           valuePath: 'text_input.password_confirmation.valueConfirm',
-  content,
-}),
+          content,
+        }),
       );
       break;
     case 'email_address':
@@ -143,8 +143,8 @@ const extractTextInputBindings = (content) => {
           selectorKeyType: 'fukushashiki_search_value',
           rawValue: content.fukushashiki_search_value,
           valuePath: `text_input.${inputType}.value`,
-  content,
-}),
+          content,
+        }),
       );
       break;
     default:

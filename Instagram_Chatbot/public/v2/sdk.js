@@ -486,15 +486,21 @@
   };
 
   // src/v2/sdk/dom/lookup.js
-  var getElementByAddress = (mode, address) => {
-    if (!mode || !address) return null;
+  var getElementByAddress = (mode, address, rootDocument = document) => {
+    if (!mode || !address || !rootDocument) return null;
     switch (mode) {
       case SEARCH_MODES.ID:
-        return document.getElementById(address);
+        return rootDocument.getElementById(address);
       case SEARCH_MODES.CSS_SELECTOR:
-        return document.querySelector(address);
+        return rootDocument.querySelector(address);
       case SEARCH_MODES.XPATH:
-        return document.evaluate(address, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+        return rootDocument.evaluate(
+          address,
+          rootDocument,
+          null,
+          XPathResult.FIRST_ORDERED_NODE_TYPE,
+          null
+        ).singleNodeValue;
       default:
         throw new Error(`Invalid search mode ${mode}, address: ${address}`);
     }
@@ -851,23 +857,16 @@
     });
     return bindings;
   };
-  var resolveSourceElement = (sourceSelector, searchMode) => {
-    if (!sourceSelector) return null;
-    if (!searchMode) {
-      return document.getElementById(sourceSelector) || document.querySelector(sourceSelector);
-    }
-    try {
-      return getElementByAddress(searchMode, sourceSelector);
-    } catch (err) {
-      console.warn("[AmazonPay] getElementByAddress failed:", err);
-    }
-    return document.getElementById(sourceSelector) || document.querySelector(sourceSelector);
-  };
   var collectSelectorValuesFromBindings = (bindings) => {
     const selectorValues = [];
     (bindings || []).forEach(({ selectorKeyType, sourceSelector, valuePath, searchMode }) => {
       if (!sourceSelector || !valuePath) return;
-      const el = resolveSourceElement(sourceSelector, searchMode);
+      let el = null;
+      try {
+        el = getElementByAddress(searchMode || SEARCH_MODES.ID, sourceSelector);
+      } catch (err) {
+        console.warn("[AmazonPay] getElementByAddress failed:", err);
+      }
       if (!el) return;
       const value = (el.value || "").trim();
       if (!value) return;

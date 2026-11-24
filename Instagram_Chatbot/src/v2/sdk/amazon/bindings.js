@@ -2,6 +2,7 @@ import {
   AMAZON_SELECTOR_TO_VALUE_PATH,
   FUKUSHIASHIKI_SELECTOR_VALUE_SUFFIX,
   MESSAGE_CONTENT_TYPES,
+  SEARCH_MODES,
 } from '../constants.js';
 import { getElementByAddress } from '../dom/lookup.js';
 
@@ -348,24 +349,16 @@ export const extractSelectorBindingsFromMessages = (messages) => {
   return bindings;
 };
 
-const resolveSourceElement = (sourceSelector, searchMode) => {
-  if (!sourceSelector) return null;
-  if (!searchMode) {
-    return document.getElementById(sourceSelector) || document.querySelector(sourceSelector);
-  }
-  try {
-    return getElementByAddress(searchMode, sourceSelector);
-  } catch (err) {
-    console.warn('[AmazonPay] getElementByAddress failed:', err);
-  }
-  return document.getElementById(sourceSelector) || document.querySelector(sourceSelector);
-};
-
 export const collectSelectorValuesFromBindings = (bindings) => {
   const selectorValues = [];
   (bindings || []).forEach(({ selectorKeyType, sourceSelector, valuePath, searchMode }) => {
     if (!sourceSelector || !valuePath) return;
-    const el = resolveSourceElement(sourceSelector, searchMode);
+    let el = null;
+    try {
+      el = getElementByAddress(searchMode || SEARCH_MODES.ID, sourceSelector);
+    } catch (err) {
+      console.warn('[AmazonPay] getElementByAddress failed:', err);
+    }
     if (!el) return;
     const value = (el.value || '').trim();
     if (!value) return;
