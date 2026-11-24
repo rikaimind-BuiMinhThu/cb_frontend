@@ -3,6 +3,7 @@ import {
   FUKUSHIASHIKI_SELECTOR_VALUE_SUFFIX,
   MESSAGE_CONTENT_TYPES,
 } from '../constants.js';
+import { getElementByAddress } from '../dom/lookup.js';
 
 const ZIP_FIELD_TYPES = [
   'post_code', 'post_code_left', 'post_code_right', 'prefecture', 'municipality', 'address', 'building_name',
@@ -24,12 +25,26 @@ const splitSourceSelectors = (rawValue) => {
   return rawValue.split(',').map((selector) => selector.trim()).filter(Boolean);
 };
 
-export const buildBindingsFromSelectorKey = ({ selectorKeyType, rawValue, valuePath }) => {
+const resolveSearchMode = ({ content, selectorKeyType, searchMode }) => {
+  if (searchMode !== undefined && searchMode !== null && searchMode !== '') return searchMode;
+  if (!content || !selectorKeyType) return undefined;
+  return content[selectorKeyType.replace(/_value$/, '_mode')];
+};
+
+export const buildBindingsFromSelectorKey = ({
+  selectorKeyType,
+  rawValue,
+  valuePath,
+  content,
+  searchMode,
+}) => {
   if (!selectorKeyType || !valuePath) return [];
+  const resolvedMode = resolveSearchMode({ content, selectorKeyType, searchMode });
   return splitSourceSelectors(rawValue).map((sourceSelector) => ({
     selectorKeyType,
     sourceSelector,
     valuePath,
+    searchMode: resolvedMode,
   }));
 };
 
@@ -46,7 +61,12 @@ const bindingsFromFieldTypes = ({
     const selectorKeyType = getSelectorKeyType(fieldType);
     const valuePath = getValuePath(fieldType);
     const rawValue = content[selectorKeyType];
-    bindings.push(...buildBindingsFromSelectorKey({ selectorKeyType, rawValue, valuePath }));
+    bindings.push(...buildBindingsFromSelectorKey({
+      selectorKeyType,
+      rawValue,
+      valuePath,
+      content,
+    }));
   });
   return bindings;
 };
@@ -74,11 +94,13 @@ const extractTextInputBindings = (content) => {
             selectorKeyType: 'left_fukushashiki_search_value',
             rawValue: content.left_fukushashiki_search_value,
             valuePath: 'text_input.text.valueLeft',
+            content,
           }),
           ...buildBindingsFromSelectorKey({
             selectorKeyType: 'right_fukushashiki_search_value',
             rawValue: content.right_fukushashiki_search_value,
             valuePath: 'text_input.text.valueRight',
+            content,
           }),
         );
       }
@@ -86,6 +108,7 @@ const extractTextInputBindings = (content) => {
         selectorKeyType: 'fukushashiki_search_value',
         rawValue: content.fukushashiki_search_value,
         valuePath: 'text_input.text.value',
+        content,
       }));
       break;
     case 'phone_number':
@@ -94,6 +117,7 @@ const extractTextInputBindings = (content) => {
           selectorKeyType: 'fukushashiki_search_value',
           rawValue: content.fukushashiki_search_value,
           valuePath: 'text_input.phone_number.value',
+          content,
         }));
         break;
       }
@@ -110,11 +134,13 @@ const extractTextInputBindings = (content) => {
           selectorKeyType: 'value_fukushashiki_search_value',
           rawValue: content.value_fukushashiki_search_value,
           valuePath: `text_input.${inputType}.value`,
+          content,
         }),
         ...buildBindingsFromSelectorKey({
           selectorKeyType: 'valueConfirm_fukushashiki_search_value',
           rawValue: content.valueConfirm_fukushashiki_search_value,
           valuePath: `text_input.${inputType}.valueConfirm`,
+          content,
         }),
       );
       break;
@@ -124,11 +150,13 @@ const extractTextInputBindings = (content) => {
           selectorKeyType: 'fukushashiki_search_value',
           rawValue: content.fukushashiki_search_value,
           valuePath: 'text_input.password_confirmation.value',
+          content,
         }),
         ...buildBindingsFromSelectorKey({
           selectorKeyType: 'confirm_fukushashiki_search_value',
           rawValue: content.confirm_fukushashiki_search_value,
           valuePath: 'text_input.password_confirmation.valueConfirm',
+          content,
         }),
       );
       break;
@@ -139,6 +167,7 @@ const extractTextInputBindings = (content) => {
         selectorKeyType: 'fukushashiki_search_value',
         rawValue: content.fukushashiki_search_value,
         valuePath: `text_input.${inputType}.value`,
+        content,
       }));
       break;
     default:
@@ -180,18 +209,21 @@ const extractCheckboxBindings = (content) => buildBindingsFromSelectorKey({
   selectorKeyType: 'checkedValue_fukushashiki_search_value',
   rawValue: content.checkedValue_fukushashiki_search_value,
   valuePath: 'checkbox.checkedValue',
+  content,
 });
 
 const extractRadioButtonBindings = (content) => buildBindingsFromSelectorKey({
   selectorKeyType: 'initial_selection_fukushashiki_search_value',
   rawValue: content.initial_selection_fukushashiki_search_value,
   valuePath: 'radio_button.initial_selection',
+  content,
 });
 
 const extractTextareaBindings = (content) => buildBindingsFromSelectorKey({
   selectorKeyType: 'fukushashiki_search_value',
   rawValue: content.fukushashiki_search_value,
   valuePath: 'textarea.text_input.value',
+  content,
 });
 
 const extractPullDownBindings = (content) => {
@@ -201,6 +233,7 @@ const extractPullDownBindings = (content) => {
     selectorKeyType: 'fukushashiki_search_value',
     rawValue: content.fukushashiki_search_value,
     valuePath: `pull_down.${pullDownType}.value`,
+    content,
   });
 };
 
@@ -208,6 +241,7 @@ const extractProductPurchaseSelectOptionBindings = (content) => buildBindingsFro
   selectorKeyType: 'fukushashiki_search_value',
   rawValue: content.fukushashiki_search_value,
   valuePath: 'product_purchase_select_option.value',
+  content,
 });
 
 const extractBindingsFromContent = (content) => {
@@ -252,14 +286,28 @@ const extractGenericFallbackBindings = (content) => {
     if (!selectorKeyType.endsWith(FUKUSHIASHIKI_SELECTOR_VALUE_SUFFIX)) return;
     const valuePath = resolveValuePath(selectorKeyType, content);
     if (!valuePath) return;
-    bindings.push(...buildBindingsFromSelectorKey({ selectorKeyType, rawValue, valuePath }));
+    bindings.push(...buildBindingsFromSelectorKey({
+      selectorKeyType,
+      rawValue,
+      valuePath,
+      content,
+    }));
   });
   return bindings;
 };
 
+const hasAmazonPayIncludeUrlCondition = (msg) => (
+  (msg.conditions || []).some((condition) => (
+    condition.inputCondition === 'is_using_amazon_pay'
+    && condition.nameCondition === 'current_url'
+    && condition.condition === 'include'
+  ))
+);
+
 const isAmazonPayUserMessage = (msg) => {
   if (msg?.belong_to !== 'user') return false;
   if (msg.is_used_when_amazon_pay) return true;
+  if (hasAmazonPayIncludeUrlCondition(msg)) return true;
   return (msg.message_content || []).some((content) => (
     !!content?.is_used_when_amazon_pay
     || Object.values(content?.amazon_pay_fields || {}).some(Boolean)
@@ -300,11 +348,23 @@ export const extractSelectorBindingsFromMessages = (messages) => {
   return bindings;
 };
 
+const resolveSourceElement = (sourceSelector, searchMode) => {
+  if (!sourceSelector) return null;
+  if (searchMode !== undefined && searchMode !== null && searchMode !== '') {
+    try {
+      return getElementByAddress(searchMode, sourceSelector);
+    } catch (err) {
+      console.warn('[AmazonPay] getElementByAddress failed:', err);
+    }
+  }
+  return document.getElementById(sourceSelector) || document.querySelector(sourceSelector);
+};
+
 export const collectSelectorValuesFromBindings = (bindings) => {
   const selectorValues = [];
-  (bindings || []).forEach(({ selectorKeyType, sourceSelector, valuePath }) => {
+  (bindings || []).forEach(({ selectorKeyType, sourceSelector, valuePath, searchMode }) => {
     if (!sourceSelector || !valuePath) return;
-    const el = document.querySelector(sourceSelector);
+    const el = resolveSourceElement(sourceSelector, searchMode);
     if (!el) return;
     const value = (el.value || '').trim();
     if (!value) return;

@@ -41,15 +41,29 @@ export const extractGenericFallbackBindings = (content) => {
     const valuePath = resolveValuePath(selectorKeyType, content);
     if (!valuePath) return;
 
-    bindings.push(...buildBindingsFromSelectorKey({ selectorKeyType, rawValue, valuePath }));
+    bindings.push(...buildBindingsFromSelectorKey({
+      selectorKeyType,
+      rawValue,
+      valuePath,
+      content,
+    }));
   });
 
   return bindings;
 };
 
+const hasAmazonPayIncludeUrlCondition = (msg) => (
+  (msg.conditions || []).some((condition) => (
+    condition.inputCondition === 'is_using_amazon_pay'
+    && condition.nameCondition === 'current_url'
+    && condition.condition === 'include'
+  ))
+);
+
 export const isAmazonPayUserMessage = (msg) => {
   if (msg?.belong_to !== 'user') return false;
   if (msg.is_used_when_amazon_pay) return true;
+  if (hasAmazonPayIncludeUrlCondition(msg)) return true;
   return (msg.message_content || []).some((content) => (
     !!content?.is_used_when_amazon_pay
     || Object.values(content?.amazon_pay_fields || {}).some(Boolean)
@@ -94,16 +108,27 @@ export const extractSelectorBindingsFromMessages = (messages) => {
   return bindings;
 };
 
+const resolveSourceElement = (documentRef, sourceSelector, searchMode) => {
+  if (!documentRef || !sourceSelector) return null;
+  if (searchMode === 1 || searchMode === '1') {
+    return documentRef.getElementById(sourceSelector);
+  }
+  if (searchMode === 2 || searchMode === '2') {
+    return documentRef.querySelector(sourceSelector);
+  }
+  return documentRef.getElementById(sourceSelector) || documentRef.querySelector(sourceSelector);
+};
+
 export const collectSelectorValuesFromBindings = ({
   bindings = [],
   documentRef = typeof document !== 'undefined' ? document : null,
 }) => {
   const selectorValues = [];
 
-  bindings.forEach(({ selectorKeyType, sourceSelector, valuePath }) => {
+  bindings.forEach(({ selectorKeyType, sourceSelector, valuePath, searchMode }) => {
     if (!documentRef || !sourceSelector || !valuePath) return;
 
-    const el = documentRef.querySelector(sourceSelector);
+    const el = resolveSourceElement(documentRef, sourceSelector, searchMode);
     if (!el) return;
 
     const value = (el.value || '').trim();

@@ -27,16 +27,16 @@ const UNDISPLAY_WHEN_CONDITION = {
 };
 
 describe('applyAmazonPayUsageToMessage', () => {
-  it('adds the display-when URL condition when the usage flag is turned on', () => {
+  it('sets the usage flag without changing conditions when autofill is turned on', () => {
     const nextMessage = applyAmazonPayUsageToMessage({
       id: 1,
       conditions: [AUDIENCE_CONDITION],
     }, true);
 
     expect(nextMessage.is_used_when_amazon_pay).toBe(true);
-    expect(nextMessage.conditions).toEqual([AUDIENCE_CONDITION, DISPLAY_WHEN_CONDITION]);
+    expect(nextMessage.conditions).toEqual([AUDIENCE_CONDITION]);
     expect(getAmazonPayDisplayModeFromConditions(nextMessage.conditions))
-      .toBe(AMAZON_PAY_DISPLAY_MODES.DISPLAY_WHEN);
+      .toBe(AMAZON_PAY_DISPLAY_MODES.ALWAYS);
   });
 
   it('removes only the managed Amazon Pay condition when the usage flag is turned off', () => {
@@ -63,17 +63,32 @@ describe('applyAmazonPayUsageToMessage', () => {
     expect(getAmazonPayDisplayModeFromConditions(nextMessage.conditions))
       .toBe(AMAZON_PAY_DISPLAY_MODES.UNDISPLAY_WHEN);
   });
+
+  it('does not overwrite an existing display-when Amazon Pay condition', () => {
+    const nextMessage = applyAmazonPayUsageToMessage({
+      id: 1,
+      conditions: [AUDIENCE_CONDITION, DISPLAY_WHEN_CONDITION],
+    }, true);
+
+    expect(nextMessage.is_used_when_amazon_pay).toBe(true);
+    expect(nextMessage.conditions).toEqual([AUDIENCE_CONDITION, DISPLAY_WHEN_CONDITION]);
+    expect(getAmazonPayDisplayModeFromConditions(nextMessage.conditions))
+      .toBe(AMAZON_PAY_DISPLAY_MODES.DISPLAY_WHEN);
+  });
 });
 
 describe('ensureAmazonPayUsageDisplayCondition', () => {
-  it('backfills display-when when the usage flag is set and no managed condition exists', () => {
+  it('preserves ALWAYS when the usage flag is set and no managed condition exists', () => {
     const nextMessage = ensureAmazonPayUsageDisplayCondition({
       id: 1,
       is_used_when_amazon_pay: true,
       conditions: [AUDIENCE_CONDITION],
     });
 
-    expect(nextMessage.conditions).toEqual([AUDIENCE_CONDITION, DISPLAY_WHEN_CONDITION]);
+    expect(nextMessage.is_used_when_amazon_pay).toBe(true);
+    expect(nextMessage.conditions).toEqual([AUDIENCE_CONDITION]);
+    expect(getAmazonPayDisplayModeFromConditions(nextMessage.conditions))
+      .toBe(AMAZON_PAY_DISPLAY_MODES.ALWAYS);
   });
 
   it('does not overwrite undisplay-when on save or load', () => {
