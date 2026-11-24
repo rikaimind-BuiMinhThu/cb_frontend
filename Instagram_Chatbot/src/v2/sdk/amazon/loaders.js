@@ -12,6 +12,7 @@ import { chatbotLayout, setGlobalIframe } from '../state.js';
 import { sendMessageToChatbot } from '../messaging/bridge.js';
 import {
   buildAmazonSelectorPayload,
+  extractSelectorBindingsFromMessages,
   safeGetAmazonPayload,
 } from './bindings.js';
 import { isAmazonPayActive, isAmazonPayReady } from './detection.js';
@@ -33,6 +34,18 @@ const sendAmazonPayDataBySelector = (payload) => {
 
 const queueAmazonPaySelectorPayload = (payload) => {
   chatbotLayout.pendingAmazonSelectorPayload = payload;
+};
+
+const sendAmazonPaySelectorWithRetries = (payload) => {
+  queueAmazonPaySelectorPayload(payload);
+  const send = () => sendAmazonPayDataBySelector(payload);
+  const scheduleRetries = () => {
+    send();
+    AMAZON_SELECTOR_SEND_RETRY_DELAYS_MS.forEach((delayMs) => {
+      setTimeout(send, delayMs);
+    });
+  };
+  setTimeout(scheduleRetries, AMAZON_SELECTOR_POST_LOAD_DELAY_MS);
 };
 
 const sendAmazonPaySelectorAfterIframeLoad = (iframe, payload) => {
@@ -63,23 +76,51 @@ export const waitToLoadAmazonGeneric = (iframe, amazonConfig) => {
   const cartSystem = amazonConfig?.cart_system;
   const selectorBindings = amazonConfig?.selector_bindings || [];
   const targetMessages = amazonConfig?.target_messages || amazonConfig?.messages || [];
+  const hasBindings = selectorBindings.length > 0
+    || extractSelectorBindingsFromMessages(targetMessages).length > 0;
   let count = 0;
   let sent = false;
+  let mounted = false;
   let amazonPayFlagSet = false;
+
+  const mountIframe = () => {
+    if (mounted) return;
+    appendIframeToBody(iframe);
+    mounted = true;
+  };
+
+  const deliverSelectorPayload = (payload) => {
+    if (sent || !payload?.selectorValues?.length) return;
+    if (!mounted) {
+      sendAmazonPaySelectorAfterIframeLoad(iframe, payload);
+      mountIframe();
+    } else {
+      sendAmazonPaySelectorWithRetries(payload);
+    }
+    sent = true;
+  };
 
   const interval = setInterval(async () => {
     count++;
     if (!amazonPayFlagSet && isAmazonPayActive(detection)) {
       iframe.src += '&is_using_amazon_pay=true';
       amazonPayFlagSet = true;
+      mountIframe();
     }
     if (!isAmazonPayReady(detection)) {
       if (count >= config.max_count) {
-        appendIframeToBody(iframe);
+        mountIframe();
         clearInterval(interval);
       }
       return;
     }
+
+    if (!hasBindings) {
+      mountIframe();
+      clearInterval(interval);
+      return;
+    }
+
     let payload = await safeGetAmazonPayload();
     if (!payload) {
       payload = buildAmazonSelectorPayload({
@@ -90,16 +131,12 @@ export const waitToLoadAmazonGeneric = (iframe, amazonConfig) => {
       });
     }
     if (payload?.selectorValues?.length) {
-      if (!sent) {
-        sendAmazonPaySelectorAfterIframeLoad(iframe, payload);
-        appendIframeToBody(iframe);
-        sent = true;
-      }
+      deliverSelectorPayload(payload);
       clearInterval(interval);
       return;
     }
     if (count >= config.max_count) {
-      appendIframeToBody(iframe);
+      mountIframe();
       clearInterval(interval);
     }
   }, config.poll_interval_ms);

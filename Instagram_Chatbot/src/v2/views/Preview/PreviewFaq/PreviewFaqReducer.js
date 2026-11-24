@@ -1,21 +1,29 @@
 /* eslint-disable default-case */
-import _ from 'lodash';
-import { 
-  stringNullOrEmpty, 
-  checkMessageCondition, 
+import _ from "lodash";
+import {
+  stringNullOrEmpty,
+  checkMessageCondition,
   checkFaqMessageCondition,
-  processMessagesForErrorState, 
+  processMessagesForErrorState,
   isTempDelay,
   buildConditionParams,
   toNumber,
   findItem,
-} from 'v2/views/Preview/PreviewComponent/Utils';
-import { processForBotMessage } from 'v2/views/Preview/PreviewComponent/BotMessageUtils';
-import { processForUserMessage } from 'v2/views/Preview/PreviewComponent/UserMessageUtils';
-import { processForCombineMessage, prepareCombineMessagesForPreview } from 'v2/views/Preview/PreviewComponent/CombineMessageUtils';
-import { isBotMessage, isUserMessage, isCombineMessage, getNextUserMsg } from 'v2/views/Preview/PreviewComponent/Utils';
-import { resolveAlignBeginningMsgId } from 'v2/views/Preview/PreviewComponent/alignBeginningScroll';
-import { normalizeMessagesNotUseButton } from 'v2/views/ScenarioSetting/utils/normalizeNotUseButton';
+} from "v2/views/Preview/PreviewComponent/Utils";
+import { processForBotMessage } from "v2/views/Preview/PreviewComponent/BotMessageUtils";
+import { processForUserMessage } from "v2/views/Preview/PreviewComponent/UserMessageUtils";
+import {
+  processForCombineMessage,
+  prepareCombineMessagesForPreview,
+} from "v2/views/Preview/PreviewComponent/CombineMessageUtils";
+import {
+  isBotMessage,
+  isUserMessage,
+  isCombineMessage,
+  getNextUserMsg,
+} from "v2/views/Preview/PreviewComponent/Utils";
+import { resolveAlignBeginningMsgId } from "v2/views/Preview/PreviewComponent/alignBeginningScroll";
+import { normalizeMessagesNotUseButton } from "v2/views/ScenarioSetting/utils/normalizeNotUseButton";
 import {
   RENDER_CHATBOT_CONFIG,
   PREVIEW_ACTIONS,
@@ -23,25 +31,30 @@ import {
   BOT_MESSAGE_TYPES,
   RENDER_MODES,
   MESSAGE_CONTENT_TYPES,
-} from 'v2/views/Preview/PreviewComponent/Constants.jsx';
-import { getDefaultValue } from 'v2/views/Preview/PreviewComponent/VariablesUtils';
-import { parseThemeSettings } from 'v2/views/DesignSetting/utils/designThemeUtils';
-import { resolveMainColorContext } from 'v2/views/DesignSetting/utils/designChatbotUtils';
+} from "v2/views/Preview/PreviewComponent/Constants.jsx";
+import { getDefaultValue } from "v2/views/Preview/PreviewComponent/VariablesUtils";
+import { parseThemeSettings } from "v2/views/DesignSetting/utils/designThemeUtils";
+import { resolveMainColorContext } from "v2/views/DesignSetting/utils/designChatbotUtils";
 import {
   DEFAULT_HEIGHT_PC,
   DEFAULT_WIDTH_PC,
-} from 'v2/views/DesignSetting/constants/designChatbotConstants';
-import { parseTagFiringFromApi } from 'v2/views/ScenarioSetting/utils/tagFiringUtils';
+} from "v2/views/DesignSetting/constants/designChatbotConstants";
+import { parseTagFiringFromApi } from "v2/views/ScenarioSetting/utils/tagFiringUtils";
 
 const PreviewFaqReducer = (state, action) => {
   switch (action.type) {
     case PREVIEW_ACTIONS.UPDATE_MULTI_STATE: {
-      if (action.payload.removeTempDelay && action.payload.renderMessagesList?.length) {
-        action.payload.renderMessagesList = action.payload.renderMessagesList?.filter(m => {
-          return !isTempDelay(m, RENDER_CHATBOT_CONFIG.TEMP_DELAY_PREFIX);
-        }) || [];
+      if (
+        action.payload.removeTempDelay &&
+        action.payload.renderMessagesList?.length
+      ) {
+        action.payload.renderMessagesList =
+          action.payload.renderMessagesList?.filter((m) => {
+            return !isTempDelay(m, RENDER_CHATBOT_CONFIG.TEMP_DELAY_PREFIX);
+          }) || [];
       }
-      const { isEditorPreviewDraft, ...editorPreviewPayload } = action.payload || {};
+      const { isEditorPreviewDraft, ...editorPreviewPayload } =
+        action.payload || {};
       if (isEditorPreviewDraft) {
         return {
           ...state,
@@ -49,10 +62,15 @@ const PreviewFaqReducer = (state, action) => {
           hasEditorPreviewDraftApplied: true,
         };
       }
-      return { ...state, ...(!!state.submitErrorMessage ? processMessagesForErrorState(action.payload): action.payload) };
+      return {
+        ...state,
+        ...(!!state.submitErrorMessage
+          ? processMessagesForErrorState(action.payload)
+          : action.payload),
+      };
     }
 
-    case PREVIEW_ACTIONS.SET_PROCESSING: 
+    case PREVIEW_ACTIONS.SET_PROCESSING:
       return { ...state, isProcessing: action.payload };
     case PREVIEW_ACTIONS.SET_IS_NOT_AUTO_SCROLL:
       return { ...state, isNotAutoScroll: action.payload };
@@ -65,7 +83,7 @@ const PreviewFaqReducer = (state, action) => {
       };
       const updatedState = Array.from(
         { length: action.payload.endIndex - action.payload.startIndex },
-        (_, offset) => action.payload.startIndex + offset,
+        (_, offset) => action.payload.startIndex + offset
       ).reduce((acc, index) => {
         if (!isBotMessage(acc.messagesList[index])) return acc;
         return {
@@ -75,15 +93,19 @@ const PreviewFaqReducer = (state, action) => {
       }, renderBaseState);
 
       const currentMsg = updatedState.messagesList[action.payload.endIndex - 1];
-      const isNotAutoScroll = currentMsg?.message_content?.[0]?.type === MESSAGE_CONTENT_TYPES.IMAGE
-        ? (currentMsg?.message_content?.[0]?.image?.is_not_auto_scroll || false)
-        : (state.isNotAutoScroll || false);
+      const isNotAutoScroll =
+        currentMsg?.message_content?.[0]?.type === MESSAGE_CONTENT_TYPES.IMAGE
+          ? currentMsg?.message_content?.[0]?.image?.is_not_auto_scroll || false
+          : state.isNotAutoScroll || false;
       const alignBeginningMsgId = resolveAlignBeginningMsgId(currentMsg);
 
       return {
         ...state,
         ...updatedState,
-        renderMessagesList: updatedState.messagesList.slice(action.payload.startIndex, action.payload.endIndex),
+        renderMessagesList: updatedState.messagesList.slice(
+          action.payload.startIndex,
+          action.payload.endIndex
+        ),
         currentMsgIndex: action.payload.endIndex - 1,
         isNotAutoScroll: isNotAutoScroll,
         alignBeginningMsgId,
@@ -93,7 +115,8 @@ const PreviewFaqReducer = (state, action) => {
       // TODO: Update state after click Next in here
       // In here, default is validation ok
       const { clickedMsgIndex } = action.payload;
-      const isUpdateClicked = clickedMsgIndex < state.renderMessagesList.length - 1;
+      const isUpdateClicked =
+        clickedMsgIndex < state.renderMessagesList.length - 1;
       const clickAcc = {
         state: {
           errors: {},
@@ -107,24 +130,44 @@ const PreviewFaqReducer = (state, action) => {
         },
       };
 
-      if (state.conversionStatus === CONVERSTION_RESPONSE_STATUS.FINISH && isUpdateClicked) {
+      if (
+        state.conversionStatus === CONVERSTION_RESPONSE_STATUS.FINISH &&
+        isUpdateClicked
+      ) {
         clickAcc.state.conversionStatus = undefined;
         clickAcc.state.isProcessing = false;
       }
 
-      clickAcc.state = processMessagesAfterClickNext(clickAcc.state, state, clickedMsgIndex);
-      
-      const nextStopMsgIndexInitial = clickAcc.state.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex)) + 1;
+      clickAcc.state = processMessagesAfterClickNext(
+        clickAcc.state,
+        state,
+        clickedMsgIndex
+      );
+
+      const nextStopMsgIndexInitial =
+        clickAcc.state.messagesList.findIndex(
+          getNextUserMsg((_, index) => index > clickedMsgIndex)
+        ) + 1;
 
       if (nextStopMsgIndexInitial < clickAcc.state.currentMsgIndex) {
         clickAcc.state = appendRootMessagesToMessagesList(clickAcc.state);
-        clickAcc.state = processMessagesAfterClickNext(clickAcc.state, state, clickedMsgIndex);
+        clickAcc.state = processMessagesAfterClickNext(
+          clickAcc.state,
+          state,
+          clickedMsgIndex
+        );
       }
 
       const newState = clickAcc.state;
-      const nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg((_, index) => index > clickedMsgIndex)) + 1;
+      const nextStopMsgIndex =
+        newState.messagesList.findIndex(
+          getNextUserMsg((_, index) => index > clickedMsgIndex)
+        ) + 1;
 
-      newState.renderMode = (isUpdateClicked && state.isUsedPastMessageLoaded) ? RENDER_MODES.LAST : RENDER_MODES.NEXT;
+      newState.renderMode =
+        isUpdateClicked && state.isUsedPastMessageLoaded
+          ? RENDER_MODES.LAST
+          : RENDER_MODES.NEXT;
       if (newState.renderMode === RENDER_MODES.LAST) {
         // LAST mode: render all messages up to the next user message
         if (!isUpdateClicked) {
@@ -139,21 +182,38 @@ const PreviewFaqReducer = (state, action) => {
         }
       } else {
         // NEXT mode: render messages one by one
-        newState.currentMsgIndex = clickedMsgIndex; 
+        newState.currentMsgIndex = clickedMsgIndex;
         newState.nextStopMsgIndex = nextStopMsgIndex;
       }
-      
+
       // Ensure nextStopMsgIndex is not less than currentMsgIndex (common validation)
       if (newState.nextStopMsgIndex < newState.currentMsgIndex) {
         newState.nextStopMsgIndex = newState.currentMsgIndex;
       }
 
-      newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+      newState.renderMessagesList = newState.messagesList.slice(
+        0,
+        newState.currentMsgIndex + 1
+      );
       newState.isUpdateClicked = isUpdateClicked;
 
-      return { ...state, ...newState };
+      return {
+        ...state,
+        ...newState,
+        alignBeginningMsgId: null,
+        alignScrollReleaseEpoch: (state.alignScrollReleaseEpoch || 0) + 1,
+      };
     case PREVIEW_ACTIONS.UPDATE_AFTER_CHANGE_VALUE: {
-      const { contentIndex, messageIndex, contentType, value, field, subField1, subField2, message } = action.payload;
+      const {
+        contentIndex,
+        messageIndex,
+        contentType,
+        value,
+        field,
+        subField1,
+        subField2,
+        message,
+      } = action.payload;
       const newState = {
         messagesList: _.cloneDeep(state.messagesList),
         variables: _.cloneDeep(state.variables),
@@ -165,13 +225,13 @@ const PreviewFaqReducer = (state, action) => {
       const subContent = message.message_content[contentIndex][contentType];
 
       switch (contentType) {
-        case 'zip_code_address':
+        case "zip_code_address":
           changeZipCodeAddress(subContent, value, field, state.prefecturesList);
           break;
-        case 'product_purchase':
+        case "product_purchase":
           changeProductPurchase(newState, subContent, value, field);
           break;
-        case 'product_purchase_radio_button':
+        case "product_purchase_radio_button":
           changeProductPurchaseRadioButton(newState, subContent, field, value);
           break;
         default:
@@ -181,7 +241,9 @@ const PreviewFaqReducer = (state, action) => {
 
       // Update value of message
       if (messageIndex && messageIndex >= 0) {
-        newState.messagesList[messageIndex].message_content[contentIndex][contentType] = _.cloneDeep(subContent);
+        newState.messagesList[messageIndex].message_content[contentIndex][
+          contentType
+        ] = _.cloneDeep(subContent);
       }
 
       handleSaveInputContent(newState, subContent, contentType, field, value);
@@ -197,7 +259,7 @@ const PreviewFaqReducer = (state, action) => {
     case PREVIEW_ACTIONS.SET_BOT_ID:
       return { ...state, botId: action.payload };
     case PREVIEW_ACTIONS.SET_UPSELL_BOT_ID:
-      return {...state, botId: action.payload, isUpsell: true};
+      return { ...state, botId: action.payload, isUpsell: true };
     case PREVIEW_ACTIONS.SET_CAPTCHA:
       return { ...state, captcha: action.payload };
     case PREVIEW_ACTIONS.SET_URL_SEND:
@@ -223,7 +285,9 @@ const PreviewFaqReducer = (state, action) => {
       const botInfor = action.payload.botInfor;
       const { conversation } = action.payload.responseData?.data;
       const { variables, all_variables } = action.payload.responseData;
-      const resolvedDisplayType = Number(designSetting?.display_type ?? state.displayType ?? 2);
+      const resolvedDisplayType = Number(
+        designSetting?.display_type ?? state.displayType ?? 2
+      );
       const isOpenFromState = Boolean(state.isOpen);
       const isOpenFromAmazonPay = Boolean(action.payload.isUsingAmazonPay);
       const isEditorPreview = Boolean(action.payload.isEditorPreview);
@@ -234,7 +298,7 @@ const PreviewFaqReducer = (state, action) => {
         botInfor: botInfor,
         objParam: isEditorPreview ? state.objParam : {},
         loadedStateFromSession: true,
-        isOpen: isEditorPreview ? true : (isOpenFromState || isOpenFromAmazonPay),
+        isOpen: isEditorPreview ? true : isOpenFromState || isOpenFromAmazonPay,
         activePopupCloseBot: Boolean(designSetting?.popup_close_bot),
         titleBubble: designSetting?.title_bubble || "簡単90秒で注文完了",
         displayType: resolvedDisplayType,
@@ -254,15 +318,16 @@ const PreviewFaqReducer = (state, action) => {
         bottomMarginSp: toNumber(designSetting?.bottom_margin_sp, 10),
         isUsedErrMsgByJs: chatbot?.is_used_err_msg_by_js,
         errMsgJsCode: chatbot?.err_msg_js_code,
-        errMsgSettingMode: chatbot?.err_msg_setting_mode || 'js',
-        errMsgFieldSelectors: chatbot?.err_msg_field_selectors || '',
-        errMsgFormSelectors: chatbot?.err_msg_form_selectors || '',
-        launchButtonSelectors: chatbot?.launch_button_selectors || '',
+        errMsgSettingMode: chatbot?.err_msg_setting_mode || "js",
+        errMsgFieldSelectors: chatbot?.err_msg_field_selectors || "",
+        errMsgFormSelectors: chatbot?.err_msg_form_selectors || "",
+        launchButtonSelectors: chatbot?.launch_button_selectors || "",
         isUsedPastMessageLoaded: !!chatbot?.is_used_message_loaded_past,
         isProcessing: false,
         useFullWidthChatbotMobile: !!chatbot?.use_fullwidth_chatbot_mobile,
         tagFiring: parseTagFiringFromApi(chatbot?.tag_firing),
-        scenarioName: action.payload.responseData?.data?.name || state.scenarioName || '',
+        scenarioName:
+          action.payload.responseData?.data?.name || state.scenarioName || "",
         isUsedCustomJsCode: !!chatbot?.is_used_custom_js_code,
         headCustomJsCode: chatbot?.head_custom_js_code,
         topBodyCustomJsCode: chatbot?.top_body_custom_js_code,
@@ -271,8 +336,9 @@ const PreviewFaqReducer = (state, action) => {
         customCssContent: chatbot?.custom_css_content,
         isUsedHtmlUgc: !!chatbot?.is_used_html_ugc,
         htmlUgcConfigContent: chatbot?.html_ugc_config_content,
-        themeSettings: action.payload.themeSettings
-          ?? parseThemeSettings(designSetting?.theme, mainColorHex, apiColorKey),
+        themeSettings:
+          action.payload.themeSettings ??
+          parseThemeSettings(designSetting?.theme, mainColorHex, apiColorKey),
         manuallyClosed: false,
         autoOpenAttempted: false,
       };
@@ -290,9 +356,11 @@ const PreviewFaqReducer = (state, action) => {
         newState.progressBarMaxIndex = state.progressBarMaxIndex;
       } else {
         newState.originalMessagesList = normalizeMessagesNotUseButton(
-          _.cloneDeep(conversation?.messages || []),
+          _.cloneDeep(conversation?.messages || [])
         );
-        newState.messagesList = normalizeMessagesNotUseButton(conversation?.messages || []);
+        newState.messagesList = normalizeMessagesNotUseButton(
+          conversation?.messages || []
+        );
         newState.currentMsgIndex = 0;
         newState.renderMode = RENDER_MODES.NEXT;
         newState.loopCount = 0;
@@ -302,7 +370,8 @@ const PreviewFaqReducer = (state, action) => {
         newState.messagesList.filter(isBotMessage).forEach((message) => {
           message.message_content?.forEach((content) => {
             if (content.type === BOT_MESSAGE_TYPES.TEXT_INPUT) {
-              content[content.type].originalContent = content[content.type].content;
+              content[content.type].originalContent =
+                content[content.type].content;
             }
           });
         });
@@ -340,24 +409,31 @@ const PreviewFaqReducer = (state, action) => {
         newState.loopCount = state.loopCount;
         newState.progressBarMaxIndex = state.progressBarMaxIndex;
       } else if (
-        isEditorPreview
-        && !state.hasEditorPreviewDraftApplied
-        && !(state.renderMessagesList?.length > 0)
-        && (conversation?.messages?.length > 0)
+        isEditorPreview &&
+        !state.hasEditorPreviewDraftApplied &&
+        !(state.renderMessagesList?.length > 0) &&
+        conversation?.messages?.length > 0
       ) {
-        const apiMessages = normalizeMessagesNotUseButton(_.cloneDeep(conversation.messages));
+        const apiMessages = normalizeMessagesNotUseButton(
+          _.cloneDeep(conversation.messages)
+        );
         newState.originalMessagesList = apiMessages;
         newState.messagesList = apiMessages;
         newState.renderMessagesList = apiMessages;
-        newState.currentMsgIndex = apiMessages.length > 0 ? apiMessages.length - 1 : 0;
+        newState.currentMsgIndex =
+          apiMessages.length > 0 ? apiMessages.length - 1 : 0;
         newState.nextStopMsgIndex = apiMessages.length;
         newState.renderMode = RENDER_MODES.LAST;
       } else if (!isEditorPreview && newState.isOpen) {
-        newState.nextStopMsgIndex = newState.messagesList.findIndex(getNextUserMsg()) + 1;
+        newState.nextStopMsgIndex =
+          newState.messagesList.findIndex(getNextUserMsg()) + 1;
         if (newState.nextStopMsgIndex < newState.currentMsgIndex) {
           newState.nextStopMsgIndex = newState.currentMsgIndex + 1;
         }
-        newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+        newState.renderMessagesList = newState.messagesList.slice(
+          0,
+          newState.currentMsgIndex + 1
+        );
       } else if (!isEditorPreview) {
         newState.currentMsgIndex = -1;
         newState.nextStopMsgIndex = -1;
@@ -375,32 +451,54 @@ const PreviewFaqReducer = (state, action) => {
       return { ...state, ...newState };
     }
     case PREVIEW_ACTIONS.SET_STATE_AFTER_RETRIEVE_SCENARIO_FROM_SESSION_STORAGE: {
-      const newState = {...action.payload.savedState};
+      const newState = { ...action.payload.savedState };
 
       if (action.payload.isUsingAmazonPay) {
         const conditionParams = buildConditionParams(newState);
         newState.messagesList.forEach((message, index) => {
-          const clickedMsgLoopNumber = Math.floor(index / newState.originalMessagesList.length);
-          const result = checkFaqMessageCondition(message, conditionParams, clickedMsgLoopNumber);
+          const clickedMsgLoopNumber = Math.floor(
+            index / newState.originalMessagesList.length
+          );
+          const result = checkFaqMessageCondition(
+            message,
+            conditionParams,
+            clickedMsgLoopNumber
+          );
           newState.messagesList[index].hidden = !result;
         });
       }
 
       if (action.payload.isLoggedIn) {
-        newState.messagesList.forEach((x) => x.hidden = x.not_display_when_logged_in);
+        newState.messagesList.forEach(
+          (x) => (x.hidden = x.not_display_when_logged_in)
+        );
       }
 
       Array.from(
-        { length: Math.min(newState.nextStopMsgIndex, newState.messagesList.length) },
-        (_, index) => index,
+        {
+          length: Math.min(
+            newState.nextStopMsgIndex,
+            newState.messagesList.length
+          ),
+        },
+        (_, index) => index
       ).forEach((index) => {
         if (isBotMessage(newState.messagesList[index])) {
-          const result = processForBotMessage(newState.messagesList, index, newState, false, false);
+          const result = processForBotMessage(
+            newState.messagesList,
+            index,
+            newState,
+            false,
+            false
+          );
           Object.assign(newState, result);
         }
       });
 
-      newState.renderMessagesList = newState.messagesList.slice(0, newState.nextStopMsgIndex);
+      newState.renderMessagesList = newState.messagesList.slice(
+        0,
+        newState.nextStopMsgIndex
+      );
       newState.currentMsgIndex = newState.nextStopMsgIndex - 1;
       newState.loadedStateFromSession = true;
       newState.isExtractFromSession = false;
@@ -408,11 +506,13 @@ const PreviewFaqReducer = (state, action) => {
       newState.autoOpenAttempted = false;
       newState.renderMode = RENDER_MODES.LAST;
 
-      const { apiColorKey, mainColorHex } = resolveMainColorContext(newState.botInfor);
+      const { apiColorKey, mainColorHex } = resolveMainColorContext(
+        newState.botInfor
+      );
       newState.themeSettings = parseThemeSettings(
         newState.themeSettings,
         mainColorHex,
-        apiColorKey,
+        apiColorKey
       );
 
       return { ...state, ...newState };
@@ -423,15 +523,40 @@ const PreviewFaqReducer = (state, action) => {
           messagesList: _.cloneDeep(state.messagesList),
           currentMsgIndex: 0,
         };
-        openedState.nextStopMsgIndex = openedState.messagesList.findIndex(getNextUserMsg()) + 1;
-        openedState.renderMessagesList = openedState.messagesList.slice(0, openedState.currentMsgIndex + 1);
-        return { ...state, isOpen: true, showPopupCloseBot: false, isAlreadyOpenFirstTime: true, manuallyClosed: false, autoOpenAttempted: true, ...openedState };
+        openedState.nextStopMsgIndex =
+          openedState.messagesList.findIndex(getNextUserMsg()) + 1;
+        openedState.renderMessagesList = openedState.messagesList.slice(
+          0,
+          openedState.currentMsgIndex + 1
+        );
+        return {
+          ...state,
+          isOpen: true,
+          showPopupCloseBot: false,
+          isAlreadyOpenFirstTime: true,
+          manuallyClosed: false,
+          autoOpenAttempted: true,
+          ...openedState,
+        };
       }
 
-      return { ...state, isOpen: true, showPopupCloseBot: false, isAlreadyOpenFirstTime: true, manuallyClosed: false, autoOpenAttempted: true };
+      return {
+        ...state,
+        isOpen: true,
+        showPopupCloseBot: false,
+        isAlreadyOpenFirstTime: true,
+        manuallyClosed: false,
+        autoOpenAttempted: true,
+      };
     }
     case PREVIEW_ACTIONS.CLOSE_CHATBOT:
-      return { ...state, isOpen: false, showPopupCloseBot: true, autoOpenAttempted: false, manuallyClosed: true };
+      return {
+        ...state,
+        isOpen: false,
+        showPopupCloseBot: true,
+        autoOpenAttempted: false,
+        manuallyClosed: true,
+      };
     case PREVIEW_ACTIONS.OPEN_POPUP_CLOSE_BOT_MODAL:
       return { ...state, showPopupCloseBot: true };
     case PREVIEW_ACTIONS.SET_CHATBOT_SETTINGS:
@@ -441,7 +566,7 @@ const PreviewFaqReducer = (state, action) => {
     case PREVIEW_ACTIONS.SET_SUBMIT_ERROR_MESSAGE:
       return { ...state, submitErrorMessage: action.payload };
     case PREVIEW_ACTIONS.CLEAR_SUBMIT_ERROR_MESSAGE:
-      return { ...state, submitErrorMessage: '' };
+      return { ...state, submitErrorMessage: "" };
   }
 
   return state;
@@ -449,15 +574,20 @@ const PreviewFaqReducer = (state, action) => {
 
 const appendRootMessagesToMessagesList = (newState) => {
   const rootMessageIndex = (() => {
-    const found = newState.originalMessagesList.findIndex(msg => msg.is_root_faq_msg === true);
+    const found = newState.originalMessagesList.findIndex(
+      (msg) => msg.is_root_faq_msg === true
+    );
     return found === -1 ? 0 : found;
   })();
   const lastMessageIndex = newState.originalMessagesList.length - 1;
   newState.loopCount++;
 
-  const additionalMessagesList = newState.originalMessagesList.slice(rootMessageIndex, lastMessageIndex + 1);
-  additionalMessagesList.filter(isBotMessage).forEach(msg => {
-    msg.message_content.forEach(content => {
+  const additionalMessagesList = newState.originalMessagesList.slice(
+    rootMessageIndex,
+    lastMessageIndex + 1
+  );
+  additionalMessagesList.filter(isBotMessage).forEach((msg) => {
+    msg.message_content.forEach((content) => {
       if (content.type === BOT_MESSAGE_TYPES.TEXT_INPUT) {
         content[content.type].originalContent = content[content.type].content;
       }
@@ -471,23 +601,31 @@ const appendRootMessagesToMessagesList = (newState) => {
 };
 
 const pushNewVariablesToVariablesList = (newState) => {
-  const newVariables = newState.originalVariables.map(item => {
-    const prefix = newState.loopCount > 0 ? `${newState.loopCount}_` : '';
+  const newVariables = newState.originalVariables.map((item) => {
+    const prefix = newState.loopCount > 0 ? `${newState.loopCount}_` : "";
     return {
       ...item,
-      variable_name: `${prefix}${item.variable_name}`
+      variable_name: `${prefix}${item.variable_name}`,
     };
   });
   newState.variables = [...newState.variables, ...newVariables];
 
   newState.variables.forEach((item) => {
-    const prefix = newState.loopCount > 0 ? `${newState.loopCount}_` : '';
+    const prefix = newState.loopCount > 0 ? `${newState.loopCount}_` : "";
     const variableName = `${prefix}${item.variable_name}`;
     if (item.variable_name !== variableName) {
       return item;
     }
 
-    item.default_value = getDefaultValue(item, item.contentType, item.value, item.field, newState.prefecturesList, newState.variables, item.variable_name);
+    item.default_value = getDefaultValue(
+      item,
+      item.contentType,
+      item.value,
+      item.field,
+      newState.prefecturesList,
+      newState.variables,
+      item.variable_name
+    );
 
     newState.objParam[variableName] = item.default_value;
   });
@@ -499,35 +637,67 @@ const processMessagesAfterClickNext = (newState, oldState, clickedMsgIndex) => {
   const acc = { state: newState };
   newState.messagesList.forEach((message, index) => {
     if (message.conditions && message.conditions.length !== 0) {
-      const clickedMsgLoopNumber = Math.floor(index / acc.state.originalMessagesList.length);
-      const result = checkFaqMessageCondition(message, conditionParams, clickedMsgLoopNumber);
+      const clickedMsgLoopNumber = Math.floor(
+        index / acc.state.originalMessagesList.length
+      );
+      const result = checkFaqMessageCondition(
+        message,
+        conditionParams,
+        clickedMsgLoopNumber
+      );
       acc.state.messagesList[index].hidden = !result;
     }
 
     if (index <= clickedMsgIndex) return;
-    if (acc.state.messagesList[index].hidden && !stringNullOrEmpty(acc.state.messagesList[index].hidden)) return;
+    if (
+      acc.state.messagesList[index].hidden &&
+      !stringNullOrEmpty(acc.state.messagesList[index].hidden)
+    )
+      return;
 
     if (isBotMessage(acc.state.messagesList[index])) {
       acc.state = {
         ...acc.state,
-        ...processForBotMessage(acc.state.messagesList, index, acc.state, false, false),
+        ...processForBotMessage(
+          acc.state.messagesList,
+          index,
+          acc.state,
+          false,
+          false
+        ),
       };
     } else if (isUserMessage(acc.state.messagesList[index])) {
       acc.state = {
         ...acc.state,
-        ...processForUserMessage(acc.state.messagesList, index, acc.state, false),
+        ...processForUserMessage(
+          acc.state.messagesList,
+          index,
+          acc.state,
+          false
+        ),
       };
     } else if (isCombineMessage(acc.state.messagesList[index])) {
       acc.state = {
         ...acc.state,
-        ...processForCombineMessage(acc.state.messagesList, index, acc.state, false),
+        ...processForCombineMessage(
+          acc.state.messagesList,
+          index,
+          acc.state,
+          false
+        ),
       };
     }
   });
   return acc.state;
 };
 
-const changeContentValue = (subContent, value, field, subField1 = null, subField2 = null) => {
+const changeContentValue = (
+  subContent,
+  value,
+  field,
+  subField1 = null,
+  subField2 = null
+) => {
   if (!field) return;
 
   if (subField2) {
@@ -551,33 +721,42 @@ const changeZipCodeAddress = (subContent, value, field, prefecturesList) => {
         if (subContent.value_prefecture_type === "id") {
           return value;
         }
-        return findItem(prefecturesList, { 
-          keys: 'id', 
-          value: value, 
+        return findItem(prefecturesList, {
+          keys: "id",
+          value: value,
           callbackValue: value,
           onSuccess: (item) => item.name,
         });
-      }
+      },
     };
-    
+
     Object.keys(value).forEach((key) => {
-      subContent[key] = transformField[key] ? transformField[key](value[key]) : value[key];
+      subContent[key] = transformField[key]
+        ? transformField[key](value[key])
+        : value[key];
     });
   } else {
     subContent[field] = value;
   }
-}
+};
 
 const changeProductPurchase = (newState, subContent, value, field) => {
   if (field !== "initial_selection" || !value.length) return;
 
-  const { codesArray, namesArray, pricesArray, orderQuantitiesArray } = getProductDetailsForProductPurchase(subContent, value);
+  const { codesArray, namesArray, pricesArray, orderQuantitiesArray } =
+    getProductDetailsForProductPurchase(subContent, value);
 
   const productVariables = [
     { variable_name: "product_code", default_value: codesArray.join(",") },
     { variable_name: "product_name", default_value: namesArray.join(",") },
-    { variable_name: "product_unit_price", default_value: pricesArray.join(",") },
-    { variable_name: "order_quantity", default_value: orderQuantitiesArray.join(",") }
+    {
+      variable_name: "product_unit_price",
+      default_value: pricesArray.join(","),
+    },
+    {
+      variable_name: "order_quantity",
+      default_value: orderQuantitiesArray.join(","),
+    },
   ];
 
   newState.variables.push(...productVariables);
@@ -588,17 +767,23 @@ const changeProductPurchase = (newState, subContent, value, field) => {
     product_unit_price: pricesArray.join(","),
     order_quantity: orderQuantitiesArray.join(","),
   };
-}
+};
 
-const changeProductPurchaseRadioButton = (newState, subContent, field, value) => {
+const changeProductPurchaseRadioButton = (
+  newState,
+  subContent,
+  field,
+  value
+) => {
   if (field !== "initial_selection") return;
 
-  const { valueCode, valueName, valuePrice } = getProductDetailsForProductPurchaseRadioButton(subContent, value);
+  const { valueCode, valueName, valuePrice } =
+    getProductDetailsForProductPurchaseRadioButton(subContent, value);
 
   const productVariables = [
     { variable_name: "product_code", default_value: valueCode },
     { variable_name: "product_name", default_value: valueName },
-    { variable_name: "product_unit_price", default_value: valuePrice }
+    { variable_name: "product_unit_price", default_value: valuePrice },
   ];
 
   newState.variables.push(...productVariables);
@@ -619,32 +804,43 @@ const getProductDetailsForProductPurchaseRadioButton = (subContent, value) => {
   };
 };
 
-const getProductDetailsForProductPurchase = (subContent, value) => (
-  (subContent.products || []).reduce((acc, product) => {
-    value.forEach((val) => {
-      if (!product.id !== val) return;
+const getProductDetailsForProductPurchase = (subContent, value) =>
+  (subContent.products || []).reduce(
+    (acc, product) => {
+      value.forEach((val) => {
+        if (!product.id !== val) return;
 
-      acc.codesArray.push(product?.item_number);
-      acc.namesArray.push(product?.title);
-      acc.pricesArray.push(product?.item_price);
-      acc.orderQuantitiesArray.push(product?.quantity_select);
-    });
-    return acc;
-  }, {
-    codesArray: [],
-    namesArray: [],
-    pricesArray: [],
-    orderQuantitiesArray: [],
-  })
-);
+        acc.codesArray.push(product?.item_number);
+        acc.namesArray.push(product?.title);
+        acc.pricesArray.push(product?.item_price);
+        acc.orderQuantitiesArray.push(product?.quantity_select);
+      });
+      return acc;
+    },
+    {
+      codesArray: [],
+      namesArray: [],
+      pricesArray: [],
+      orderQuantitiesArray: [],
+    }
+  );
 
-const handleSaveInputContent = (newState, subContent, contentType, field, value) => {
+const handleSaveInputContent = (
+  newState,
+  subContent,
+  contentType,
+  field,
+  value
+) => {
   if (!subContent.is_save_input_content) return;
-  if (contentType === 'card_payment_radio_button' && !['initial_selection', 'initial_selection_picture'].includes(field)) {
+  if (
+    contentType === "card_payment_radio_button" &&
+    !["initial_selection", "initial_selection_picture"].includes(field)
+  ) {
     return;
   }
 
-  const prefix = newState.loopCount > 0 ? `${newState.loopCount}_` : '';
+  const prefix = newState.loopCount > 0 ? `${newState.loopCount}_` : "";
 
   const variableName = `${prefix}${subContent.save_input_content}`;
 
@@ -653,7 +849,15 @@ const handleSaveInputContent = (newState, subContent, contentType, field, value)
       return item;
     }
 
-    item.default_value = getDefaultValue(subContent, contentType, value, field, newState.prefecturesList, newState.variables, subContent.save_input_content);
+    item.default_value = getDefaultValue(
+      subContent,
+      contentType,
+      value,
+      field,
+      newState.prefecturesList,
+      newState.variables,
+      subContent.save_input_content
+    );
 
     newState.objParam[variableName] = value;
   });

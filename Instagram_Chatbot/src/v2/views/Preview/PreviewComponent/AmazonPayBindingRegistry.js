@@ -61,11 +61,13 @@ const extractTextInputBindings = (content) => {
             selectorKeyType: 'left_fukushashiki_search_value',
             rawValue: content.left_fukushashiki_search_value,
             valuePath: 'text_input.text.valueLeft',
+            content,
           }),
           ...buildBindingsFromSelectorKey({
             selectorKeyType: 'right_fukushashiki_search_value',
             rawValue: content.right_fukushashiki_search_value,
             valuePath: 'text_input.text.valueRight',
+            content,
           }),
         );
       }
@@ -74,6 +76,7 @@ const extractTextInputBindings = (content) => {
           selectorKeyType: 'fukushashiki_search_value',
           rawValue: content.fukushashiki_search_value,
           valuePath: 'text_input.text.value',
+          content,
         }),
       );
       break;
@@ -85,6 +88,7 @@ const extractTextInputBindings = (content) => {
             selectorKeyType: 'fukushashiki_search_value',
             rawValue: content.fukushashiki_search_value,
             valuePath: 'text_input.phone_number.value',
+            content,
           }),
         );
         break;
@@ -105,11 +109,13 @@ const extractTextInputBindings = (content) => {
           selectorKeyType: 'value_fukushashiki_search_value',
           rawValue: content.value_fukushashiki_search_value,
           valuePath: `text_input.${inputType}.value`,
+          content,
         }),
         ...buildBindingsFromSelectorKey({
           selectorKeyType: 'valueConfirm_fukushashiki_search_value',
           rawValue: content.valueConfirm_fukushashiki_search_value,
           valuePath: `text_input.${inputType}.valueConfirm`,
+          content,
         }),
       );
       break;
@@ -119,11 +125,13 @@ const extractTextInputBindings = (content) => {
           selectorKeyType: 'fukushashiki_search_value',
           rawValue: content.fukushashiki_search_value,
           valuePath: 'text_input.password_confirmation.value',
+          content,
         }),
         ...buildBindingsFromSelectorKey({
           selectorKeyType: 'confirm_fukushashiki_search_value',
           rawValue: content.confirm_fukushashiki_search_value,
           valuePath: 'text_input.password_confirmation.valueConfirm',
+          content,
         }),
       );
       break;
@@ -135,6 +143,7 @@ const extractTextInputBindings = (content) => {
           selectorKeyType: 'fukushashiki_search_value',
           rawValue: content.fukushashiki_search_value,
           valuePath: `text_input.${inputType}.value`,
+          content,
         }),
       );
       break;
@@ -178,18 +187,21 @@ const extractCheckboxBindings = (content) => buildBindingsFromSelectorKey({
   selectorKeyType: 'checkedValue_fukushashiki_search_value',
   rawValue: content.checkedValue_fukushashiki_search_value,
   valuePath: 'checkbox.checkedValue',
+  content,
 });
 
 const extractRadioButtonBindings = (content) => buildBindingsFromSelectorKey({
   selectorKeyType: 'initial_selection_fukushashiki_search_value',
   rawValue: content.initial_selection_fukushashiki_search_value,
   valuePath: 'radio_button.initial_selection',
+  content,
 });
 
 const extractTextareaBindings = (content) => buildBindingsFromSelectorKey({
   selectorKeyType: 'fukushashiki_search_value',
   rawValue: content.fukushashiki_search_value,
   valuePath: 'textarea.text_input.value',
+  content,
 });
 
 const extractPullDownBindings = (content) => {
@@ -200,13 +212,15 @@ const extractPullDownBindings = (content) => {
     selectorKeyType: 'fukushashiki_search_value',
     rawValue: content.fukushashiki_search_value,
     valuePath: `pull_down.${pullDownType}.value`,
-  });
+  content,
+});
 };
 
 const extractProductPurchaseSelectOptionBindings = (content) => buildBindingsFromSelectorKey({
   selectorKeyType: 'fukushashiki_search_value',
   rawValue: content.fukushashiki_search_value,
   valuePath: 'product_purchase_select_option.value',
+  content,
 });
 
 export const extractBindingsFromContent = (content) => {
