@@ -1,9 +1,11 @@
 import { useEffect, useRef } from "react";
+import { PREVIEW_ACTIONS, RENDER_CHATBOT_CONFIG } from "../Constants";
 import {
-  PREVIEW_ACTIONS,
-  RENDER_CHATBOT_CONFIG,
-} from "../Constants";
-import { isUserMessage, sendAppearLogToServer } from "../Utils";
+  getBotMessageDelay,
+  isBotMessage,
+  isUserMessage,
+  sendAppearLogToServer,
+} from "../Utils";
 
 /**
  * Progressive message reveal toward nextStopMsgIndex.
@@ -55,6 +57,17 @@ export const usePreviewMessageReveal = ({
       return;
     }
 
+    const isUseGlobalDelay = state.isUseGlobalDelay || false;
+    const globalDelayTime = state.globalDelayTime;
+    const advanceDelayMs = isBotMessage(currentMsg)
+      ? getBotMessageDelay(
+          currentMsg,
+          isUseGlobalDelay,
+          globalDelayTime,
+          delayMs
+        ) + delayMs
+      : delayMs;
+
     const timeoutId = setTimeout(() => {
       const list = messagesListRef.current || [];
       const newMsgIndex = state.currentMsgIndex + 1;
@@ -76,7 +89,7 @@ export const usePreviewMessageReveal = ({
           message: list[newMsgIndex],
         });
       }
-    }, delayMs);
+    }, advanceDelayMs);
 
     return () => clearTimeout(timeoutId);
   }, [
@@ -85,6 +98,8 @@ export const usePreviewMessageReveal = ({
     state.currentMsgIndex,
     state.nextStopMsgIndex,
     state.isOpen,
+    state.isUseGlobalDelay,
+    state.globalDelayTime,
     dispatch,
   ]);
 };

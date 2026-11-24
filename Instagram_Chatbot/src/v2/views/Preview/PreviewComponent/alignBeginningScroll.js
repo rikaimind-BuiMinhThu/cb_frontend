@@ -12,7 +12,7 @@ export const SCROLL_MSG_OFFSET_ALIGN_BEGINNING_PX = 0;
 
 export const SCROLL_MSG_OFFSET_SCROLL_AUTO_PX = 200;
 
-export const ALIGN_BEGINNING_SCROLL_DELAY_MS = 300;
+export const ALIGN_BEGINNING_SCROLL_DELAY_MS = 1000;
 
 export const ALIGN_BEGINNING_IMAGE_READY_TIMEOUT_MS = 2000;
 
@@ -86,12 +86,13 @@ export const scrollMsgIntoSpBody = ({
 
 /**
  * Scroll after images in/above the target message have loaded (or readyTimeoutMs).
- * Uses behavior auto and re-aligns while layout settles (tall % images).
+ * Re-aligns while layout settles (tall % images).
  * @returns {() => void} cancel function for listeners / timeout
  */
 export const scrollMsgIntoSpBodyWhenReady = ({
   msgId,
   offsetPx = SCROLL_MSG_OFFSET_ALIGN_BEGINNING_PX,
+  behavior = SCROLL_BEHAVIOR_AUTO,
   containerSelector = SP_BODY_SELECTOR,
   readyTimeoutMs = ALIGN_BEGINNING_IMAGE_READY_TIMEOUT_MS,
   onResult,
@@ -99,7 +100,7 @@ export const scrollMsgIntoSpBodyWhenReady = ({
   const preciseScrollOptions = {
     msgId,
     offsetPx,
-    behavior: SCROLL_BEHAVIOR_AUTO,
+    behavior,
     containerSelector,
   };
   const container = document.querySelector(containerSelector);

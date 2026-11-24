@@ -66,6 +66,7 @@ export const usePreviewAutoScroll = ({
       session.cancelReady = scrollMsgIntoSpBodyWhenReady({
         msgId: alignMsgId,
         offsetPx: SCROLL_MSG_OFFSET_ALIGN_BEGINNING_PX,
+        behavior: scrollBehavior,
         onResult: (scrolled) => {
           lastAlignedIdRef.current = alignMsgId;
           if (scrolled) {
