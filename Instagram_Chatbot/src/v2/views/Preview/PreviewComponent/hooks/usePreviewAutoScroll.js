@@ -5,6 +5,7 @@ import {
   ALIGN_BEGINNING_SCROLL_DELAY_MS,
   BOTTOM_SCROLL_DELAY_MS,
   SCROLL_AUTO_DELAY_MS,
+  SCROLL_BEHAVIOR_AUTO,
   SCROLL_MSG_OFFSET_ALIGN_BEGINNING_PX,
   SCROLL_MSG_OFFSET_SCROLL_AUTO_PX,
   SP_BODY_SELECTOR,
@@ -30,6 +31,7 @@ export const usePreviewAutoScroll = ({
   const currentMsgIndexRef = useRef(state.currentMsgIndex);
   const lastAlignedIdRef = useRef(null);
   const alignSessionRef = useRef(null);
+  const releaseEpochRef = useRef(state.alignScrollReleaseEpoch ?? 0);
   messagesListRef.current = state.messagesList;
   currentMsgIndexRef.current = state.currentMsgIndex;
 
@@ -52,6 +54,7 @@ export const usePreviewAutoScroll = ({
       return;
     }
     cancelAlignSession();
+    lastAlignedIdRef.current = alignMsgId;
     const session = {
       msgId: alignMsgId,
       timeoutId: null,
@@ -83,6 +86,13 @@ export const usePreviewAutoScroll = ({
   useEffect(() => {
     if (!enabled) return;
 
+    const releaseEpoch = state.alignScrollReleaseEpoch ?? 0;
+    if (releaseEpoch !== releaseEpochRef.current) {
+      releaseEpochRef.current = releaseEpoch;
+      cancelAlignSession();
+      lastAlignedIdRef.current = null;
+    }
+
     const currentMsgIndex = currentMsgIndexRef.current;
     const currentMsg = messagesListRef.current?.[currentMsgIndex];
     // Smooth scroll on iPhone fights the fixed iframe and reads as flicker.
@@ -97,9 +107,20 @@ export const usePreviewAutoScroll = ({
       return;
     }
 
-    // Stop-at-top was active (or still loading images). Do not yank to bottom
-    // when the next message clears alignBeginningMsgId.
-    if (lastAlignedIdRef.current !== null || alignSessionRef.current) {
+    // Hold pin after stop-at-top until Next bumps alignScrollReleaseEpoch.
+    if (lastAlignedIdRef.current !== null) {
+      if (alignSessionRef.current?.msgId === lastAlignedIdRef.current) {
+        return;
+      }
+      scrollMsgIntoSpBody({
+        msgId: lastAlignedIdRef.current,
+        offsetPx: SCROLL_MSG_OFFSET_ALIGN_BEGINNING_PX,
+        behavior: SCROLL_BEHAVIOR_AUTO,
+      });
+      return;
+    }
+
+    if (alignSessionRef.current) {
       return;
     }
 
@@ -154,5 +175,6 @@ export const usePreviewAutoScroll = ({
     length,
     state.isNotAutoScroll,
     state.alignBeginningMsgId,
+    state.alignScrollReleaseEpoch,
   ]);
 };
