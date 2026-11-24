@@ -219,9 +219,6 @@ const handleChatbotMessage = async (e) => {
   setGlobalIframe(iframe);
 };
 
-const SCENARIO_SELECTED_PATH = '/api/v1/managements/chatbots';
-const SCENARIO_FETCH_FAILED_LOG = 'displayPopup: failed to fetch scenario';
-
 export const displayPopup = async () => {
   const device =
     !tabletCheck() && !mobileCheck()
@@ -229,25 +226,18 @@ export const displayPopup = async () => {
       : tabletCheck()
         ? 'tablet'
         : 'smartphone';
-
-  let data;
-  try {
-    const response = await fetch(
-      `${getEcChatBotApiServerBaseUrl()}${SCENARIO_SELECTED_PATH}/${botId}/get_scenario_selected`,
-      {
-        method: 'GET',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
+  const response = await fetch(
+    `${getEcChatBotApiServerBaseUrl()}/api/v1/managements/chatbots/${botId}/get_scenario_selected`,
+    {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
       },
-    );
-    data = await response.json();
-  } catch (error) {
-    log(`${SCENARIO_FETCH_FAILED_LOG}: ${error?.message || error}`);
-    return;
-  }
+    },
+  );
 
+  const data = await response.json();
   if (data.data && data.data.is_clear_landing_page_session) {
     ecRunEcForceSessionLandingLogout();
   }
