@@ -225,6 +225,7 @@ const PreviewFukushashikiReducer = (state, action) => {
           submitThanksMessage: '',
           isProcessing: false,
           alignBeginningMsgId: null,
+          alignScrollReleaseEpoch: (state.alignScrollReleaseEpoch || 0) + 1,
         };
       }
 
@@ -267,6 +268,7 @@ const PreviewFukushashikiReducer = (state, action) => {
           isProcessing: false,
           nextStopMsgIndex: nextStopMsgIndex,
           alignBeginningMsgId: null,
+          alignScrollReleaseEpoch: (state.alignScrollReleaseEpoch || 0) + 1,
         };
       }
 
@@ -289,6 +291,7 @@ const PreviewFukushashikiReducer = (state, action) => {
         submitThanksMessage: '',
         isProcessing: false,
         alignBeginningMsgId: null,
+        alignScrollReleaseEpoch: (state.alignScrollReleaseEpoch || 0) + 1,
       };
     }
 
@@ -313,6 +316,7 @@ const PreviewFukushashikiReducer = (state, action) => {
         submitErrorMessage: action.payload.error,
         isProcessing: false,
         alignBeginningMsgId: null,
+        alignScrollReleaseEpoch: (state.alignScrollReleaseEpoch || 0) + 1,
       };
     }
     case PREVIEW_ACTIONS.UPDATE_AFTER_CLICK_NEXT_BUTTON:
@@ -1169,15 +1173,21 @@ const handleSaveInputContent = (
   const variableName = subContent.save_input_content;
   if (!variableName) return;
 
-  const defaultValue = getDefaultValue(
-    subContent,
-    contentType,
-    value,
-    field,
-    newState.prefecturesList,
-    newState.variables,
-    variableName,
-  );
+  let defaultValue;
+  try {
+    defaultValue = getDefaultValue(
+      subContent,
+      contentType,
+      value,
+      field,
+      newState.prefecturesList,
+      newState.variables,
+      variableName,
+    );
+  } catch (_unsupportedType) {
+    // Unsupported content types must not crash the reducer.
+    defaultValue = value ?? "";
+  }
 
   newState.objParam = {
     ...newState.objParam,

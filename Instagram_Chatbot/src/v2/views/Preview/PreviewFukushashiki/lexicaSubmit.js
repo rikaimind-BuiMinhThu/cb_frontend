@@ -35,8 +35,20 @@ export const runLexicaButtonSubmit = ({
       setSubmitError(tokenResult.copy || LEXICA_COPY.TOKEN_FAIL_COPY);
       return;
     }
+    // Card secrets are stripped in-place by prepareLexicaCreditToken.
     const cardMessage = findCreditCardMessage(messages);
     if (cardMessage) {
+      const card = cardMessage.message_content?.find?.(
+        (item) =>
+          item.type === "card_payment_radio_button" ||
+          item.type === "credit_card_payment"
+      );
+      const payload =
+        card?.card_payment_radio_button || card?.credit_card_payment;
+      if (payload && !payload.token_key && (payload.card_number || payload.cvc)) {
+        setSubmitError(LEXICA_COPY.TOKEN_FAIL_COPY);
+        return;
+      }
       await sendLogMessageToServer(
         {
           ...logData,

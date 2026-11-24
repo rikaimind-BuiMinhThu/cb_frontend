@@ -152,14 +152,26 @@ export const isCreditSelection = (card) => {
 
 export const findCreditCardMessage = (messages) => {
   const payment = findPaymentMethod(messages);
-  if (payment !== "" && !isCreditPaymentValue(payment)) return null;
-
   const list = messages || [];
   const found = list.find((message) => {
     const card = findCardFromMessage(message);
     return Boolean(card && isCreditSelection(card));
   });
-  return found || null;
+  if (!found) return null;
+  // Explicit non-credit payment skips only when the card fields are empty.
+  if (payment !== "" && !isCreditPaymentValue(payment)) {
+    const card = findCardFromMessage(found);
+    const hasDigits = Boolean(
+      card?.card_number ||
+        card?.card_number1 ||
+        card?.card_number2 ||
+        card?.card_number3 ||
+        card?.card_number4 ||
+        card?.cvc
+    );
+    if (!hasDigits) return null;
+  }
+  return found;
 };
 
 export const findCreditCardPayload = (messages) => {
@@ -444,12 +456,20 @@ export const pollLexicaOrder = async ({ scenarioId, userId, onBusy }) => {
   const started = Date.now();
   const progress = { lastInProgress: false };
   while (Date.now() - started < POLL_TIMEOUT_MS) {
-    const res = await api.get(
-      `${CHATBOT_SERVER.SELENIUM_RESULTS_PATH}?scenario_id=${encodeURIComponent(
-        scenarioId
-      )}&user_id=${encodeURIComponent(userId)}`
-    );
-    const data = res?.data?.data || {};
+    let data = {};
+    try {
+      const res = await api.get(
+        `${CHATBOT_SERVER.SELENIUM_RESULTS_PATH}?scenario_id=${encodeURIComponent(
+          scenarioId
+        )}&user_id=${encodeURIComponent(userId)}`
+      );
+      data = res?.data?.data || {};
+    } catch (_pollError) {
+      // Transient network/API errors must not mark the order failed while RPA runs.
+      progress.lastInProgress = true;
+      await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
+      continue;
+    }
     if (data.queued || data.busy) {
       onBusy?.(BUSY_COPY);
     }

@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { findItem, stringNullOrEmpty } from 'v2/views/Preview/PreviewComponent/Utils';
+import { escapeHtml, findItem, stringNullOrEmpty } from 'v2/views/Preview/PreviewComponent/Utils';
 import { MESSAGE_CONTENT_TYPES, SCAN_REGEX } from 'v2/views/Preview/PreviewComponent/Constants';
 
 const getTextInputValue = (subContent, field) => {
@@ -312,8 +312,12 @@ const getDefaultValue = (subContent, contentType, value, field, prefecturesList,
 
 const replaceVariables = (contentText, variables) => {
   return (contentText || "").replaceAll(SCAN_REGEX, (_, variable) => {
-    return variables.find(item => item.variable_name === variable)?.default_value || "";
+    const raw =
+      variables.find((item) => item.variable_name === variable)?.default_value ||
+      "";
+    // Escape before HTML sinks (text_input / html_code / chat-log transcript).
+    return escapeHtml(raw);
   });
-}
+};
 
 export { getDefaultValue, replaceVariables };
