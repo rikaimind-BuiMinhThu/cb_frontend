@@ -9,6 +9,7 @@ import {
   SCROLL_MSG_OFFSET_SCROLL_AUTO_PX,
   SP_BODY_SELECTOR,
   scrollMsgIntoSpBody,
+  scrollMsgIntoSpBodyWhenReady,
 } from "../alignBeginningScroll";
 
 /**
@@ -28,8 +29,56 @@ export const usePreviewAutoScroll = ({
   const messagesListRef = useRef(state.messagesList);
   const currentMsgIndexRef = useRef(state.currentMsgIndex);
   const lastAlignedIdRef = useRef(null);
+  const alignSessionRef = useRef(null);
   messagesListRef.current = state.messagesList;
   currentMsgIndexRef.current = state.currentMsgIndex;
+
+  const cancelAlignSession = () => {
+    const session = alignSessionRef.current;
+    if (!session) {
+      return;
+    }
+    if (session.timeoutId !== null) {
+      clearTimeout(session.timeoutId);
+    }
+    if (session.cancelReady) {
+      session.cancelReady();
+    }
+    alignSessionRef.current = null;
+  };
+
+  const startAlignSession = (alignMsgId, scrollBehavior) => {
+    if (alignSessionRef.current?.msgId === alignMsgId) {
+      return;
+    }
+    cancelAlignSession();
+    const session = {
+      msgId: alignMsgId,
+      timeoutId: null,
+      cancelReady: null,
+    };
+    alignSessionRef.current = session;
+    session.timeoutId = setTimeout(() => {
+      session.timeoutId = null;
+      session.cancelReady = scrollMsgIntoSpBodyWhenReady({
+        msgId: alignMsgId,
+        offsetPx: SCROLL_MSG_OFFSET_ALIGN_BEGINNING_PX,
+        onResult: (scrolled) => {
+          lastAlignedIdRef.current = alignMsgId;
+          if (scrolled) {
+            return;
+          }
+          scrollToPosition({
+            position: "b",
+            selector: SP_BODY_SELECTOR,
+            behavior: scrollBehavior,
+          });
+        },
+      });
+    }, ALIGN_BEGINNING_SCROLL_DELAY_MS);
+  };
+
+  useEffect(() => () => cancelAlignSession(), []);
 
   useEffect(() => {
     if (!enabled) return;
@@ -40,28 +89,18 @@ export const usePreviewAutoScroll = ({
     const scrollBehavior = isMobile() ? "auto" : "smooth";
     const alignMsgId = state.alignBeginningMsgId;
 
-    if (alignMsgId === null || alignMsgId === undefined) {
-      lastAlignedIdRef.current = null;
-    } else {
+    if (alignMsgId !== null && alignMsgId !== undefined) {
       if (lastAlignedIdRef.current === alignMsgId) {
         return;
       }
-      const alignTimeoutId = setTimeout(() => {
-        lastAlignedIdRef.current = alignMsgId;
-        const scrolled = scrollMsgIntoSpBody({
-          msgId: alignMsgId,
-          offsetPx: SCROLL_MSG_OFFSET_ALIGN_BEGINNING_PX,
-          behavior: scrollBehavior,
-        });
-        if (!scrolled) {
-          scrollToPosition({
-            position: "b",
-            selector: SP_BODY_SELECTOR,
-            behavior: scrollBehavior,
-          });
-        }
-      }, ALIGN_BEGINNING_SCROLL_DELAY_MS);
-      return () => clearTimeout(alignTimeoutId);
+      startAlignSession(alignMsgId, scrollBehavior);
+      return;
+    }
+
+    // Stop-at-top was active (or still loading images). Do not yank to bottom
+    // when the next message clears alignBeginningMsgId.
+    if (lastAlignedIdRef.current !== null || alignSessionRef.current) {
+      return;
     }
 
     if (state.isNotAutoScroll) {
@@ -107,6 +146,8 @@ export const usePreviewAutoScroll = ({
     }, BOTTOM_SCROLL_DELAY_MS);
 
     return () => clearTimeout(timeoutId);
+    // startAlignSession is stable over refs; listing it retriggers align sessions.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- align session owned by refs
   }, [
     enabled,
     enableScrollAuto,

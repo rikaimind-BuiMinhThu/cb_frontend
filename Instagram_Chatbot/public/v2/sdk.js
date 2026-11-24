@@ -90,18 +90,39 @@
     }
   };
   var sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  var API_QUERY_PARAM = "api";
+  var API_ENV_PRODUCTION = "production";
+  var API_ENV_STAGING = "staging";
+  var API_ENV_TEST = "test";
+  var API_BASE_URL_PRODUCTION = "https://ec-chatbot-test.com";
+  var API_BASE_URL_STAGING = "https://ec-chatbot-test1.com";
+  var API_BASE_URL_LOCAL = "http://localhost:3000";
+  var resolveApiBaseUrlFromQuery = () => {
+    const apiOverride = getParam(API_QUERY_PARAM);
+    if (apiOverride === API_ENV_PRODUCTION) {
+      return API_BASE_URL_PRODUCTION;
+    }
+    if (apiOverride === API_ENV_STAGING || apiOverride === API_ENV_TEST) {
+      return API_BASE_URL_STAGING;
+    }
+    return null;
+  };
   var getEcChatBotApiServerBaseUrl = () => {
+    const apiFromQuery = resolveApiBaseUrlFromQuery();
+    if (apiFromQuery) {
+      return apiFromQuery;
+    }
     const environment = getEnvironment();
     switch (environment) {
       case "staging":
       case "test":
-        return "https://ec-chatbot-test1.com";
+        return API_BASE_URL_STAGING;
       case "production":
-        return "https://ec-chatbot-test.com";
+        return API_BASE_URL_PRODUCTION;
       case "local":
-        return "http://localhost:3000";
+        return API_BASE_URL_LOCAL;
       default:
-        return "http://localhost:3000";
+        return API_BASE_URL_LOCAL;
     }
   };
   var getEcChatBotFrontEndBaseUrl = () => {
@@ -2204,20 +2225,28 @@
     syncPreviewIframeLayout(iframe, e.data);
     setGlobalIframe(iframe);
   });
+  var SCENARIO_SELECTED_PATH = "/api/v1/managements/chatbots";
+  var SCENARIO_FETCH_FAILED_LOG = "displayPopup: failed to fetch scenario";
   var displayPopup = () => __async(null, null, function* () {
     var _a, _b, _c, _d;
     const device = !tabletCheck() && !mobileCheck() ? "pc" : tabletCheck() ? "tablet" : "smartphone";
-    const response = yield fetch(
-      `${getEcChatBotApiServerBaseUrl()}/api/v1/managements/chatbots/${botId}/get_scenario_selected`,
-      {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json"
+    let data;
+    try {
+      const response = yield fetch(
+        `${getEcChatBotApiServerBaseUrl()}${SCENARIO_SELECTED_PATH}/${botId}/get_scenario_selected`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json"
+          }
         }
-      }
-    );
-    const data = yield response.json();
+      );
+      data = yield response.json();
+    } catch (error) {
+      log(`${SCENARIO_FETCH_FAILED_LOG}: ${(error == null ? void 0 : error.message) || error}`);
+      return;
+    }
     if (data.data && data.data.is_clear_landing_page_session) {
       ecRunEcForceSessionLandingLogout();
     }

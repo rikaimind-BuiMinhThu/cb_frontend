@@ -60,19 +60,42 @@ export const log = (message) => {
 
 export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const API_QUERY_PARAM = 'api';
+const API_ENV_PRODUCTION = 'production';
+const API_ENV_STAGING = 'staging';
+const API_ENV_TEST = 'test';
+const API_BASE_URL_PRODUCTION = 'https://ec-chatbot-test.com';
+const API_BASE_URL_STAGING = 'https://ec-chatbot-test1.com';
+const API_BASE_URL_LOCAL = 'http://localhost:3000';
+
+const resolveApiBaseUrlFromQuery = () => {
+  const apiOverride = getParam(API_QUERY_PARAM);
+  if (apiOverride === API_ENV_PRODUCTION) {
+    return API_BASE_URL_PRODUCTION;
+  }
+  if (apiOverride === API_ENV_STAGING || apiOverride === API_ENV_TEST) {
+    return API_BASE_URL_STAGING;
+  }
+  return null;
+};
+
 export const getEcChatBotApiServerBaseUrl = () => {
-  // return 'https://ec-chatbot-test1.com';
+  const apiFromQuery = resolveApiBaseUrlFromQuery();
+  if (apiFromQuery) {
+    return apiFromQuery;
+  }
+
   const environment = getEnvironment();
   switch (environment) {
     case 'staging':
     case 'test':
-      return 'https://ec-chatbot-test1.com';
+      return API_BASE_URL_STAGING;
     case 'production':
-      return 'https://ec-chatbot-test.com';
+      return API_BASE_URL_PRODUCTION;
     case 'local':
-      return 'http://localhost:3000';
+      return API_BASE_URL_LOCAL;
     default:
-      return 'http://localhost:3000';
+      return API_BASE_URL_LOCAL;
   }
 };
 
